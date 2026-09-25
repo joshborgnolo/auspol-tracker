@@ -422,7 +422,24 @@ writeAtomic(path.join(ROOT, "assets", "masthead-dial.svg"), fav.masthead.svg + "
    data URIs, so the satellites close on exactly the main page's tide. */
 writeAtomic(path.join(ROOT, "assets", "site-shell.css"), shellCss());
 writeAtomic(path.join(ROOT, "assets", "site-shell.js"), shellJs());
-writeAtomic(path.join(ROOT, "assets", "auspol-now.json"), JSON.stringify({ ...fav.score, dial: fav.masthead.spec }) + "\n");
+/* …and what the satellites' masthead and tab bar show beside it, off the same
+   dataset the main page's do: the "Last poll / Next election / Polls tracked"
+   meta, the tagline's count of past terms, and the houses' release rhythm the
+   bar's next-poll countdown projects from at view time (np-project.js, run by
+   site-shell.js), so the countdown stays right as a page ages between builds. */
+const shellNow = (() => {
+  const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const grab = (name) => {
+    const i = src.indexOf("const " + name + " = ");
+    if (i < 0) throw new Error("site shell: " + name + " not found in dataset");
+    return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
+  };
+  const L = grab("latest");
+  return { latest: { published: L.published, publishedISO: L.publishedISO, nextElectionDue: L.nextElectionDue,
+                     pollsTracked: L.pollsTracked, housesTracked: L.housesTracked },
+           past: pastCycleWord(), pollCadence: grab("pollCadence") };
+})();
+writeAtomic(path.join(ROOT, "assets", "auspol-now.json"), JSON.stringify({ ...fav.score, dial: fav.masthead.spec, ...shellNow }) + "\n");
 for (const [token, file] of [["--tile-art", "tile-art.svg"], ["--tile-art-dark", "tile-art-dark.svg"]]) {
   const m = html.match(new RegExp(token + ':\\s*url\\("data:image\\/svg\\+xml,([^"]+)"\\)'));
   if (m) writeAtomic(path.join(ROOT, "assets", file), decodeURIComponent(m[1]) + "\n");

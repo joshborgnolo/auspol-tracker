@@ -36864,6 +36864,90 @@ function npProject(nowOverride) {
   };
 }
 window.AP.nextPolls = npProject;
+const TN_DAY = 86400000;
+const tnUntil = ms => {
+  const mins = Math.max(1, Math.round(ms / 60000));
+  if (mins < 60) return mins + (mins === 1 ? " min" : " mins");
+  const h = Math.round(mins / 60);
+  if (h < 36) return h + (h === 1 ? " hour" : " hours");
+  const d = Math.round(h / 24);
+  if (d < 14) return d + (d === 1 ? " day" : " days");
+  const w = Math.round(d / 7);
+  return w + (w === 1 ? " week" : " weeks");
+};
+function npTickerItems(proj) {
+  const rows = proj ? proj.rows : [];
+  const nowMs = proj ? proj.nowMs : 0;
+  const t0 = proj ? proj.t0 : 0;
+  const dayFloor = ms => {
+    const d = new Date(ms);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  };
+  const targetOf = r => {
+    const half = r.winHalf || 0;
+    if (r.releaseDow == null) return {
+      at: Math.max(r.release - half * TN_DAY, nowMs),
+      byDay: false
+    };
+    const widen = Math.sqrt((r.ahead || 0) + 1);
+    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+    const earlyHalf = se != null ? 7 * Math.floor((se * widen + 3) / 7) : half;
+    let t = Math.max(t0, dayFloor(r.release - earlyHalf * TN_DAY));
+    t += (r.releaseDow - new Date(t).getUTCDay() + 7) % 7 * TN_DAY;
+    return {
+      at: t,
+      byDay: true
+    };
+  };
+  const isWindowRow = r => r.loose && r.releaseDow == null;
+  const windowOpen = r => r.release - (r.winHalf || 0) * TN_DAY <= nowMs;
+  const windowItems = rows.filter(r => isWindowRow(r) && !r.missed && windowOpen(r)).map(r => ({
+    firm: r.pollster,
+    when: "any day now",
+    maybe: false,
+    site: r.site
+  }));
+  const overdueItems = rows.filter(r => r.missed && !isWindowRow(r)).map(r => {
+    const days = Math.round((t0 - (r.loose ? r.release + (r.winHalf || 0) * TN_DAY : r.release)) / TN_DAY);
+    return {
+      firm: r.pollster,
+      site: r.site,
+      overdue: true,
+      days,
+      when: days === 1 ? "1 day overdue" : days + " days overdue"
+    };
+  }).sort((a, b) => b.days - a.days);
+  const upcomingItems = rows.filter(r => !r.missed && !isWindowRow(r)).map(r => ({
+    r,
+    t: targetOf(r)
+  })).sort((a, b) => a.t.at - b.t.at).filter((seen => ({
+    r
+  }) => !seen.has(r.pollster) && !!seen.add(r.pollster))(new Set())).map(({
+    r,
+    t
+  }) => {
+    const half = r.winHalf || 0;
+    let when;
+    if (t.byDay) {
+      const days = Math.round((t.at - t0) / TN_DAY);
+      const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
+      const left = dueMs - nowMs;
+      when = days === 0 ? dueMs <= nowMs ? "any moment now" : r.releaseMins != null && Math.round(left / 3600000) < 12 ? tnUntil(left) : "today" : days === 1 ? "tomorrow" : days + " days";
+    } else {
+      when = t.at <= nowMs ? "any day now" : Math.round((t.at - nowMs) / 3600000) < 36 ? tnUntil(t.at - nowMs) : Math.round((t.at - t0) / TN_DAY) + " days";
+    }
+    const maybe = when !== "any moment now" && when !== "any day now" && (half > 7 || !!r.loose || r.releaseDow != null && t.at - r.release > 7 * TN_DAY || r.releaseDow == null && half > 0);
+    return {
+      firm: r.pollster,
+      when,
+      maybe,
+      site: r.site
+    };
+  });
+  const items = [...overdueItems, ...upcomingItems, ...windowItems];
+  return items;
+}
+window.AP.nextPollItems = npTickerItems;
 window.AP.npMonthEndSlot = npMonthEndSlot;</script>
   <script>(() => {
   "use strict";
@@ -44256,17 +44340,6 @@ function TabScore({
     className: "ts-abbr"
   }, M.b.abbr)));
 }
-const TN_DAY = 86400000;
-const tnUntil = ms => {
-  const mins = Math.max(1, Math.round(ms / 60000));
-  if (mins < 60) return mins + (mins === 1 ? " min" : " mins");
-  const h = Math.round(mins / 60);
-  if (h < 36) return h + (h === 1 ? " hour" : " hours");
-  const d = Math.round(h / 24);
-  if (d < 14) return d + (d === 1 ? " day" : " days");
-  const w = Math.round(d / 7);
-  return w + (w === 1 ? " week" : " weeks");
-};
 let pinScaleProbe = null;
 function pinnedSetScale() {
   if (!pinScaleProbe) {
@@ -44294,75 +44367,7 @@ function NextPollTicker({
   const [fit, setFit] = React.useState(0);
   const rootRef = React.useRef(null);
   const proj = window.AP.nextPolls ? window.AP.nextPolls() : null;
-  const rows = proj ? proj.rows : [];
-  const nowMs = proj ? proj.nowMs : 0;
-  const t0 = proj ? proj.t0 : 0;
-  const dayFloor = ms => {
-    const d = new Date(ms);
-    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
-  };
-  const targetOf = r => {
-    const half = r.winHalf || 0;
-    if (r.releaseDow == null) return {
-      at: Math.max(r.release - half * TN_DAY, nowMs),
-      byDay: false
-    };
-    const widen = Math.sqrt((r.ahead || 0) + 1);
-    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
-    const earlyHalf = se != null ? 7 * Math.floor((se * widen + 3) / 7) : half;
-    let t = Math.max(t0, dayFloor(r.release - earlyHalf * TN_DAY));
-    t += (r.releaseDow - new Date(t).getUTCDay() + 7) % 7 * TN_DAY;
-    return {
-      at: t,
-      byDay: true
-    };
-  };
-  const isWindowRow = r => r.loose && r.releaseDow == null;
-  const windowOpen = r => r.release - (r.winHalf || 0) * TN_DAY <= nowMs;
-  const windowItems = rows.filter(r => isWindowRow(r) && !r.missed && windowOpen(r)).map(r => ({
-    firm: r.pollster,
-    when: "any day now",
-    maybe: false,
-    site: r.site
-  }));
-  const overdueItems = rows.filter(r => r.missed && !isWindowRow(r)).map(r => {
-    const days = Math.round((t0 - (r.loose ? r.release + (r.winHalf || 0) * TN_DAY : r.release)) / TN_DAY);
-    return {
-      firm: r.pollster,
-      site: r.site,
-      overdue: true,
-      days,
-      when: days === 1 ? "1 day overdue" : days + " days overdue"
-    };
-  }).sort((a, b) => b.days - a.days);
-  const upcomingItems = rows.filter(r => !r.missed && !isWindowRow(r)).map(r => ({
-    r,
-    t: targetOf(r)
-  })).sort((a, b) => a.t.at - b.t.at).filter((seen => ({
-    r
-  }) => !seen.has(r.pollster) && !!seen.add(r.pollster))(new Set())).map(({
-    r,
-    t
-  }) => {
-    const half = r.winHalf || 0;
-    let when;
-    if (t.byDay) {
-      const days = Math.round((t.at - t0) / TN_DAY);
-      const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
-      const left = dueMs - nowMs;
-      when = days === 0 ? dueMs <= nowMs ? "any moment now" : r.releaseMins != null && Math.round(left / 3600000) < 12 ? tnUntil(left) : "today" : days === 1 ? "tomorrow" : days + " days";
-    } else {
-      when = t.at <= nowMs ? "any day now" : Math.round((t.at - nowMs) / 3600000) < 36 ? tnUntil(t.at - nowMs) : Math.round((t.at - t0) / TN_DAY) + " days";
-    }
-    const maybe = when !== "any moment now" && when !== "any day now" && (half > 7 || !!r.loose || r.releaseDow != null && t.at - r.release > 7 * TN_DAY || r.releaseDow == null && half > 0);
-    return {
-      firm: r.pollster,
-      when,
-      maybe,
-      site: r.site
-    };
-  });
-  const items = [...overdueItems, ...upcomingItems, ...windowItems];
+  const items = window.AP.nextPollItems ? window.AP.nextPollItems(proj) : [];
   const itemsKey = items.map(it => it.firm + it.when).join("");
   React.useLayoutEffect(() => {
     const el = rootRef.current;

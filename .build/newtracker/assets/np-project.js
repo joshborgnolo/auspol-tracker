@@ -342,4 +342,189 @@ function npProject(nowOverride) {
   return { rows, t0, nowMs };
 }
 window.AP.nextPolls = npProject;
+
+/* ====================================================================
+   THE NEXT-POLL ROLL – what the tab bar's countdown shows
+
+   Moved here from the main page's NextPollTicker so that every bar that
+   carries the countdown – the main page's and the satellites' (site-shell.js
+   runs this file) – builds the same roll from the same projection. The
+   ticker keeps the fit pass (how much of the roll the bar has room for);
+   the roll itself, and every phrase in it, is here.
+   ==================================================================== */
+const TN_DAY = 86400000;
+const tnUntil = (ms) => {
+  const mins = Math.max(1, Math.round(ms / 60000));
+  if (mins < 60) return mins + (mins === 1 ? " min" : " mins");
+  const h = Math.round(mins / 60);
+  if (h < 36) return h + (h === 1 ? " hour" : " hours");
+  const d = Math.round(h / 24);
+  if (d < 14) return d + (d === 1 ? " day" : " days");
+  const w = Math.round(d / 7);
+  return w + (w === 1 ? " week" : " weeks");
+};
+function npTickerItems(proj) {
+  const rows = proj ? proj.rows : [];
+  const nowMs = proj ? proj.nowMs : 0;
+  const t0 = proj ? proj.t0 : 0;
+  /* A house that keeps a weekday can only publish ON that weekday, and the
+     countdown has to respect that or it says something impossible. Essential
+     files on Wednesdays; projected onto Wed 26 Aug and missed, its +-7 day
+     window was still technically open on the Monday after, so this used to
+     read "any time" - naming a moment that cannot happen until Wednesday. The
+     next slot is the next Wednesday, and that is what it counts to.
+
+     The window's EARLY edge still does the work it should: it decides which
+     slot is the EARLIEST plausible one, and the answer is the first matching
+     weekday on or after that. Roy Morgan, due at midnight today on a Monday
+     schedule, is still today rather than a week away.
+
+     Houses with no weekday habit keep the plain window: the earliest the wave
+     could land, or "any time" once that has passed. */
+  const dayFloor = (ms) => {
+    const d = new Date(ms);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  };
+  const targetOf = (r) => {
+    const half = r.winHalf || 0;
+    if (r.releaseDow == null)
+      return { at: Math.max(r.release - half * TN_DAY, nowMs), byDay: false };
+    /* The window's EARLY edge is measured, not mirrored: no weekday house has
+       ever filed a slot early, so counting to release - ±half names a date
+       with no precedent - Resolve was counting down to Sun 6 Sep when its
+       real alternatives are Sun 13 and Sun 20 Sep. spreadEarly=0 keeps the
+       countdown on the projected day itself. The projection's slotEarly
+       (tails rebased to the slot's own place in the record) is the same
+       measure relative to the slot, and takes precedence where it exists. */
+    const widen = Math.sqrt((r.ahead || 0) + 1);
+    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+    const earlyHalf = se != null
+      ? 7 * Math.floor((se * widen + 3) / 7)
+      : half;
+    let t = Math.max(t0, dayFloor(r.release - earlyHalf * TN_DAY));
+    t += ((r.releaseDow - new Date(t).getUTCDay() + 7) % 7) * TN_DAY;
+    return { at: t, byDay: true };
+  };
+
+  /* A house whose slot is a WINDOW rather than a date - DemosAU's
+     calendar-month bracket - only belongs on the bar while the window is
+     open: before the bracket opens, a countdown to its edge misreads a day
+     range as a date; after it closes unrecorded, the panel's red row is
+     where the lateness is told. While the window IS open the row reads
+     "any day now" and sits at the tail of the roll - "some time in the
+     next N days" is weaker information than every dated count the bar
+     carries, so every slot leads it. */
+  const isWindowRow = (r) => r.loose && r.releaseDow == null;
+  const windowOpen = (r) => r.release - (r.winHalf || 0) * TN_DAY <= nowMs;
+  const windowItems = rows
+    .filter((r) => isWindowRow(r) && !r.missed && windowOpen(r))
+    .map((r) => ({ firm: r.pollster, when: "any day now", maybe: false, site: r.site }));
+
+  /* A slot whose whole tolerance has passed without its release being
+     recorded is not rolled forward onto next week's guess and not dropped:
+     it leads the bar in red, counting the days it is late - the same claim
+     the panel's red row makes, on the same `missed` flag. A late WINDOW
+     counts from its close; a late DAY from the day itself, matching the
+     number the panel prints. It leaves when the real release moves the
+     projection, never on a date guessed in its place. (Window rows sit
+     outside this too - see above.) */
+  const overdueItems = rows
+    .filter((r) => r.missed && !isWindowRow(r))
+    .map((r) => {
+      const days = Math.round(
+        (t0 - (r.loose ? r.release + (r.winHalf || 0) * TN_DAY : r.release)) / TN_DAY);
+      return {
+        firm: r.pollster, site: r.site, overdue: true, days,
+        when: days === 1 ? "1 day overdue" : days + " days overdue",
+      };
+    })
+    .sort((a, b) => b.days - a.days);
+
+  /* Re-sorted on the rolled target rather than left in the panel's order.
+     The panel sorts a missed wave by the slot it missed, because a reader
+     looking at the schedule wants to see it is late; the bar is answering
+     "what lands next", and after rolling, a Monday house due today comes
+     before a Wednesday one that slipped a week. */
+  const upcomingItems = rows
+    .filter((r) => !r.missed && !isWindowRow(r))
+    .map((r) => ({ r, t: targetOf(r) }))
+    .sort((a, b) => a.t.at - b.t.at)
+    /* One slot PER HOUSE, its nearest: the bar is a roll-call of what's due
+       soonest from EVERY house, and a weekly house's second slot inside the
+       coming week only repeats a name instead of adding another house to
+       the roll. There is no count or day-window cap here - how much of the
+       roll actually shows is a space decision measured live on the bar
+       itself (the fit pass below). */
+    .filter(((seen) => ({ r }) =>
+      !seen.has(r.pollster) && !!seen.add(r.pollster))(new Set()))
+    .map(({ r, t }) => {
+      const half = r.winHalf || 0;
+      let when;
+      if (t.byDay) {
+        const days = Math.round((t.at - t0) / TN_DAY);
+        /* "Any moment now" starts when the publication window does - the slot
+           date plus the hour the house keeps - not at the day's first minute:
+           Roy Morgan files Mondays after four, and a 9am reader told the wave
+           is moments away is being lied to for seven hours. An untimed house
+           has no hour to open at, so it keeps its whole day (the projection's
+           same 24*60 default): "today" throughout. */
+        const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
+        /* The same hour that lets the slot say "any moment now" lets the wait
+           before it count itself: a house with a measured (or declared) hour
+           and under twelve of them to go reads "5 hours" - minutes in the
+           last hour, both from tnUntil, bare like the day counts beside it
+           ("2 days") - instead of the vaguer "today". A house nobody has
+           timed has no hour to count to and keeps "today", and twelve hours
+           plus out the day is still the honest claim. */
+        const left = dueMs - nowMs;
+        when = days === 0 ? (dueMs <= nowMs ? "any moment now"
+             : r.releaseMins != null && Math.round(left / 3600000) < 12
+             ? tnUntil(left) : "today")
+             : days === 1 ? "tomorrow"
+             /* exact day counts past "tomorrow" - the panel's own phrasing
+                ("in 12 days") - so the bar and the panel name the same slot
+                the same way; tnUntil's week rounding ("2 weeks") made them
+                disagree */
+             : days + " days";
+      } else {
+        /* No day pinned, so nothing is "moment" away - the wave is due some
+           DAY inside a measured range, and the countdown says so. ("Moment"
+           is the weekday houses' word above: theirs is a date with an hour.)
+           Sub-day resolution only inside 36 hours; past that, the same exact
+           day count the weekday houses get */
+        when = t.at <= nowMs ? "any day now"
+             : Math.round((t.at - nowMs) / 3600000) < 36
+             ? tnUntil(t.at - nowMs)
+             : Math.round((t.at - t0) / TN_DAY) + " days";
+      }
+      /* "(maybe)" answers "could it be some FUTURE day instead?". A weekday
+         house can only file on its weekday, so every alternative date is a
+         slot of its own, a week apart: the hedge belongs only while two
+         slots from now on are both in play – a window wider than a week, or
+         a slot rolled more than one slot-week past the projected one (a
+         one-week roll is just the old window's own far edge, still this
+         wave). A still-open window after a missed slot is not future doubt
+         – its earlier dates are past days the wave publicly did not land
+         on, so Essential rolled from a missed 26 Aug to 2 Sep reads
+         "2 days", full stop. (r.overdue reads "slot moment passed" and
+         fires on exactly that case – it is npProject's missed + still-open
+         flag, not future doubt.) Non-weekday houses keep the day-spread
+         rule. "any moment/day now" is left alone - it already says what
+         the hedge would. */
+      const maybe = when !== "any moment now" && when !== "any day now" &&
+        (half > 7 || !!r.loose ||
+         (r.releaseDow != null && t.at - r.release > 7 * TN_DAY) ||
+         (r.releaseDow == null && half > 0));
+      return { firm: r.pollster, when, maybe, site: r.site };
+    });
+
+  /* Overdue leads: an already-blown forecast is more news than any
+     countdown. The tail is the fit pass's business - the candidate list is
+     the whole roll (one slot per house, nearest first), and the bar shows
+     as much of it as clears the neighbours. Window-house rows trail it all:
+     "any day now" is weaker information than every dated count. */
+  const items = [...overdueItems, ...upcomingItems, ...windowItems];
+  return items;
+}
+window.AP.nextPollItems = npTickerItems;
 window.AP.npMonthEndSlot = npMonthEndSlot;

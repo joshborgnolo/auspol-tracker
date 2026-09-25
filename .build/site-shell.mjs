@@ -89,9 +89,11 @@ export const shellOptsFor = (file) => SHELL_PAGES.find((p) => p.file === file) |
    of it here, exactly as they do on the main page. */
 const TABS = [
   { id: "snapshot", label: "Snapshot", href: "/#snapshot" },
-  { id: "cycles", label: "Past cycles", href: "/#cycles" },
+  // short/pinHide as the main page's TABS: the pinned phone bar's "Cycles",
+  // and the tab that yields to the docked score below 380px
+  { id: "cycles", label: "Past cycles", short: "Cycles", href: "/#cycles" },
   { id: "allpolls", label: "All polls", href: "/#allpolls" },
-  { id: "info", label: "Info", href: "/#info" },
+  { id: "info", label: "Info", href: "/#info", pinHide: true },
 ];
 
 const SUN = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"></path></svg>';
@@ -99,8 +101,10 @@ const MOON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke
 
 // ---- the markup written into each page ---------------------------------------------
 export function shellHeader({ tab } = {}) {
-  const tabs = TABS.map((t) => `<a class="sh-tab${t.cls || ""}${t.id === tab ? " active" : ""}" href="${t.href}"`
-    + `${t.id === tab ? ' aria-current="page"' : ""}>${t.label}</a>`).join("\n      ");
+  const tabs = TABS.map((t) => `<a class="sh-tab${t.pinHide ? " sh-tab-pinhide" : ""}${t.id === tab ? " active" : ""}" href="${t.href}"`
+    + `${t.id === tab ? ' aria-current="page"' : ""}>`
+    + (t.short ? `<span class="sh-tab-long">${t.label}</span><span class="sh-tab-short" aria-hidden="true">${t.short}</span>` : t.label)
+    + `</a>`).join("\n        ");
   /* The lockup is the main page's masthead worn on an <a> instead of a
      <button>: same classes, same hidden spans (extracted shell-copy:brand
      rules style all of it), and it goes where the masthead's click goes –
@@ -109,6 +113,7 @@ export function shellHeader({ tab } = {}) {
   return `<a class="sh-skip" href="#sh-content">Skip to content</a>
 <div class="sh-frame sh-top">
   <header class="sh-head">
+    <div class="sh-brand">
     <div class="wordmark stacked">
       <a class="wm-glyph" href="/#story" title="Wind the dial back through the term" aria-describedby="wm-action">
         <span class="wm-textcol">
@@ -121,17 +126,35 @@ export function shellHeader({ tab } = {}) {
       <span class="wm-sr">– Australian federal polling</span>
       <span id="wm-action" hidden>Replays the term on the masthead dial</span>
     </div>
+    <p class="sh-tagline">Aggregated opinion polling for the next Australian <br class="sh-tagline-br">federal election, set against the last <span class="sh-past">twenty</span>.</p>
+    <p class="sh-meta-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span>Updated <span class="sh-pub"></span> · <span class="sh-npolls"></span> polls</span></p>
+    </div>
+    <div class="sh-right">
+    <div class="sh-meta" hidden>
+      <div class="sh-meta-item"><span class="sh-meta-k">Last poll</span><span class="sh-meta-v"><span class="sh-fresh-dot"></span><span class="sh-pub"></span><span class="sh-fresh-rel"></span></span></div>
+      <div class="sh-meta-divide"></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">Next election</span><span class="sh-meta-v sh-due"></span></div>
+      <div class="sh-meta-divide"></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">Polls tracked</span><span class="sh-meta-v sh-tracked"></span></div>
+    </div>
     <div class="sh-theme" role="group" aria-label="Colour theme">
       <button type="button" class="sh-cell" data-theme="light" aria-pressed="false" aria-label="Light mode" title="Light mode">${SUN}</button><button type="button" class="sh-cell" data-theme="dark" aria-pressed="false" aria-label="Dark mode" title="Dark mode">${MOON}</button>
     </div>
-  </header>
-  <nav class="sh-tabs" aria-label="Site">
-    <div class="sh-tabs-set">
-      ${tabs}
     </div>
-    <a class="sh-score" href="/#snapshot" hidden title="The latest two-party preferred – go to Snapshot"><span class="sh-eyebrow">2PP</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
-  </nav>
-</div>`;
+  </header>
+</div>
+<div class="sh-tabs-sentinel" aria-hidden="true"></div>
+<nav class="sh-tabs" aria-label="Site">
+  <div class="sh-frame">
+    <div class="sh-tabs-inner">
+      <div class="sh-tabs-set">
+        ${tabs}
+      </div>
+      <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A slot that passes unrecorded counts up as overdue until the release is added"><span class="sh-tn-lab">Next</span></div>
+      <a class="sh-score" href="/#snapshot" hidden title="The latest two-party preferred – go to Snapshot"><span class="sh-eyebrow">2PP</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
+    </div>
+  </div>
+</nav>`;
 }
 
 /* The main page's colophon (73de0c58…js MethodNote), word for word: the
@@ -264,7 +287,8 @@ export function shellCss() {
   --sh-sw-well: color-mix(in oklch, black 44%, var(--sh-surface)); --sh-sw-pivot: color-mix(in oklch, black 58%, transparent);
   --sh-btn-lit: color-mix(in oklch, white 9%, transparent); --sh-btn-shade: oklch(0 0 0 / 0.44);
   --sh-btn-press: color-mix(in oklch, black 48%, transparent);
-  --sh-art: url("/assets/tile-art-dark.svg");`;
+  --sh-art: url("/assets/tile-art-dark.svg");
+  --sh-mood-pos: oklch(0.70 0.105 200); --sh-mood-neg: oklch(0.68 0.05 45);`;
   return `/* site-shell.css – written by .build/newtracker/build.mjs from
    .build/site-shell.mjs on every build; edit it there. The shared header,
    footer and theme of the pages outside the main build. */
@@ -282,6 +306,7 @@ ${ss3 ? `@font-face {
   --sh-btn-lit: color-mix(in oklch, white 85%, transparent); --sh-btn-shade: oklch(0.4 0.02 60 / 0.16);
   --sh-btn-press: color-mix(in oklch, var(--ink) 15%, transparent);
   --sh-art: url("/assets/tile-art.svg");
+  --sh-mood-pos: oklch(0.52 0.085 200); --sh-mood-neg: oklch(0.44 0.045 50);
 }
 @media (prefers-color-scheme: dark) { :root:not(.sh-light) {
   ${DARK_TOKENS}
@@ -311,8 +336,46 @@ ${ss3 ? `@font-face {
    the main page's own rules, lifted verbatim from its template (shell-copy
    markers) – one definition for both. */
 .sh-head {
+  position: relative;
   display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap;
-  padding-bottom: 16px; margin-bottom: 26px; border-bottom: 1px solid var(--line);
+  padding-bottom: 16px; border-bottom: 1px solid var(--line);
+}
+/* the tagline and the meta beside it (.tagline, .head-right, .head-meta):
+   the same sentence and the same three figures the main page carries, off
+   auspol-now.json – so every page opens on the same masthead */
+.sh-tagline {
+  margin: 7px 0 -1.5px; font-family: "Crimson Text", var(--serif); font-weight: 400;
+  font-size: 15px; line-height: 1.5; color: var(--ink-3); text-wrap: balance;
+}
+.sh-meta-compact { display: none; }
+.sh-right { display: flex; align-items: center; gap: 18px; }
+.sh-meta { display: flex; align-items: center; gap: 18px; font-family: var(--sans); line-height: 1.5; }
+.sh-meta[hidden] { display: none; }
+.sh-meta-item { display: flex; flex-direction: column; gap: 2px; }
+.sh-meta-k { font-size: 13px; color: var(--ink-3); font-weight: 600; white-space: nowrap; letter-spacing: 0.02em; }
+.sh-meta-v { font-size: 14px; color: var(--ink); font-weight: 600; white-space: nowrap; }
+.sh-fresh-dot {
+  display: inline-block; vertical-align: middle; position: relative; top: -1px;
+  width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; background: var(--ink-3);
+}
+.sh-fresh-dot.fresh { background: var(--sh-mood-pos); }
+.sh-fresh-dot.stale { background: var(--sh-mood-neg); }
+.sh-fresh-rel { margin-left: 6px; color: var(--ink-3); font-weight: 500; }
+.sh-meta-divide { width: 1px; height: 30px; background: var(--line); }
+@media (max-width: 900px) { .sh-meta { gap: 12px; } }
+@media (max-width: 560px) {
+  /* as the main page's phone masthead: the meta gives way to one compact
+     freshness line, and the switch pins to the lockup's corner */
+  .sh-meta { display: none; }
+  .sh-meta-compact:not([hidden]) {
+    display: flex; align-items: center; gap: 8px; margin: 9px 0 0;
+    font-family: var(--sans); font-size: 13px; line-height: 1.5; color: var(--ink-3); font-variant-numeric: tabular-nums;
+  }
+  .sh-meta-compact .sh-fresh-dot { margin-right: 0; width: 6px; height: 6px; top: 0; }
+  .sh-head { flex-direction: column; align-items: flex-start; gap: 13px; }
+  .sh-head .wordmark { padding-right: 92px; }
+  .sh-right { display: contents; }
+  .sh-theme { position: absolute; top: 0; right: 0; }
 }
 ${shellCopy("brand")}
 /* the stand-in the page first paints, swapped for the live inline dial the
@@ -344,12 +407,48 @@ ${shellCopy("dial")}
 .sh-cell svg { display: block; }
 .sh-cell:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
 
-/* the tab bar (.tabs-inner, .tab, editorial .tab-label) */
+/* the tab bar, as the main page's (.tabs, .tabs-inner, .tabs-set, .tab):
+   flush under the masthead rule, sticky on every page, and once it catches
+   the top it pins – the set condenses with ONE composited scale (layout
+   never changes, or the sticky bar would oscillate) and a shadow lifts it
+   off the content. A satellite has no hero 2PP on screen, so the pin is
+   also the main page's show-score moment: the docked score fades in at the
+   right end and the next-poll countdown glides to the centre, exactly as on
+   the main page's other views. The bar sits outside the masthead frame so
+   its sticky range is the whole page. */
+/* sticky needs a containing block as tall as the page: the satellites set
+   html, body { height: 100% }, which boxed the body at one screen */
+body { height: auto; }
+.sh-tabs-sentinel { height: 0; flex: none; }
 .sh-tabs {
-  position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
-  border-bottom: 1px solid var(--line);
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 41; flex: none;
+  margin-bottom: 26px; background: var(--bg);
 }
-.sh-tabs-set { display: flex; gap: 30px; align-items: flex-end; }
+/* up through the notch while pinned (standalone mode owns that strip) */
+.sh-tabs.pinned::before {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 100%;
+  height: env(safe-area-inset-top, 0px); background: var(--bg);
+}
+/* the lift-off shadow on its own layer, faded by opacity (compositor only) */
+.sh-tabs::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  box-shadow: 0 10px 22px -16px color-mix(in oklch, var(--ink) 55%, transparent);
+  opacity: 0; transition: opacity .3s ease;
+}
+.sh-tabs.pinned::after { opacity: 1; }
+.sh-tabs-inner {
+  position: relative; z-index: 1;
+  display: flex; align-items: flex-end;
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+  container-type: inline-size;
+}
+.sh-tabs-set {
+  display: flex; gap: 30px; align-items: flex-end;
+  transform-origin: left bottom;
+  transition: transform .38s cubic-bezier(.22, 1, .36, 1);
+}
+.sh-tabs.pinned .sh-tabs-set { transform: scale(0.789); }   /* 19px → 15px, the main page's pin */
 .sh-tab {
   position: relative; padding: 12px 1px; white-space: nowrap; text-decoration: none;
   font-family: "Crimson Text", var(--serif); font-weight: 600; font-size: 19px; line-height: 23.5px;
@@ -365,18 +464,90 @@ ${shellCopy("dial")}
 .sh-tab.active::after, .sh-tab:hover::after { transform: scaleX(1); }
 .sh-tab:not(.active):hover::after { background: var(--line); }
 .sh-tab:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; border-radius: 4px; }
+.sh-tab-short { display: none; }
+@media (max-width: 420px) {
+  .sh-tabs.pinned .sh-tab-long { display: none; }
+  .sh-tabs.pinned .sh-tab-short { display: inline; }
+}
+@media (max-width: 380px) {
+  .sh-tabs.pinned .sh-tab-pinhide { display: none; }
+}
 
-/* the live figure, as the main page docks it (.tab-score) */
+/* the docked 2PP score (.tab-score): absolutely seated on the underline at
+   the row's right end, so its arrival relayouts nothing */
 .sh-score {
-  display: inline-flex; align-items: baseline; gap: 9px; padding: 0 1px; white-space: nowrap;
-  align-self: center; text-decoration: none; color: var(--ink);
+  position: absolute; right: 1px; bottom: 0; z-index: 1;
+  display: inline-flex; align-items: baseline; gap: 9px; padding: 0 1px 10px; white-space: nowrap;
+  text-decoration: none; color: var(--ink);
+  opacity: 0; transform: translateY(4px); pointer-events: none;
+  transition: opacity .26s ease, transform .34s cubic-bezier(.22, 1, .36, 1);
 }
 .sh-score[hidden] { display: none; }
+.sh-tabs.pinned .sh-score { opacity: 1; transform: none; pointer-events: auto; }
 .sh-eyebrow { font: 700 10.5px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-right: 2px; }
 .sh-party { display: inline-flex; align-items: baseline; gap: 5px; }
 .sh-abbr { font: 700 10.5px var(--sans); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
 .sh-num { font-family: "Crimson Text", var(--serif); font-weight: 600; font-size: 16px; line-height: 1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
 .sh-sep { width: 1.5px; height: 13px; background: var(--line-2); align-self: center; position: relative; top: 1px; }
+
+/* the next-poll countdown (.tab-next): wide screens only, absolutely seated
+   so it glides – docked right until the score owns that end, then to the
+   centre, one transform either way. Its roll is np-project.js's, the main
+   page's own; items past the measured room park rather than wrap. */
+.sh-next { display: none; }
+@media (min-width: 1100px) {
+  .sh-next:not([hidden]) {
+    display: inline-flex; align-items: baseline; gap: 14px;
+    position: absolute; bottom: 0; left: 100%; transform: translateX(-100%);
+    padding-bottom: 11px; font-family: var(--sans); font-size: 12px; line-height: 1.45; white-space: nowrap;
+    color: var(--ink-3); transition: transform .38s cubic-bezier(.22, 1, .36, 1);
+  }
+  .sh-tabs.pinned .sh-next { transform: translateX(calc(-50% - 50cqw)); }
+  .sh-tn-item.sh-tn-park { position: absolute; visibility: hidden; }
+}
+/* the main page's label is a button whose reset inherits the ticker's own
+   12px regular, so that is what it reads as */
+.sh-tn-lab { color: var(--ink-3); }
+.sh-tn-item { display: inline-flex; align-items: baseline; gap: 6px; }
+.sh-tn-firm { font-weight: 700; color: var(--ink-2); }
+.sh-tn-when { font-variant-numeric: tabular-nums; }
+.sh-tn-overdue { color: var(--sh-mood-neg); }
+.sh-tn-maybe { color: var(--ink-3); }
+a.sh-tn-link { color: inherit; text-decoration: none; }
+a.sh-tn-link:hover, a.sh-tn-link:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+.sh-plink { font-size: 9px; font-weight: 700; margin-left: 3px; vertical-align: 1.5px; color: var(--ink-3); }
+@media (prefers-reduced-motion: reduce) {
+  .sh-tabs-set, .sh-tabs::after, .sh-score, .sh-next { transition: none; }
+}
+
+/* the page's own column sits where the main page's Info column does: on the
+   frame's left edge at the Info measure (.info's 66ch, 692px), rather than
+   centred on a column of its own – and the archives' switcher with it. The
+   tab bar's margin is now the gap above it, as on the main page. */
+.frame-wrap {
+  max-width: calc(692px + 56px); margin-left: max(0px, calc((100% - 1200px) / 2)); margin-right: auto;
+}
+.frame-wrap { padding-top: 0; }
+/* the page's headings in the main page's editorial voice: a view's title is
+   30px regular Crimson (.card-title under body.editorial), not 34px bold,
+   and a section head keeps that weight a step down */
+.frame-wrap h1 { font-size: 30px; font-weight: 400; letter-spacing: -0.018em; }
+.frame-wrap h2 { font-size: 23px; font-weight: 400; letter-spacing: -0.01em; }
+/* links in the main page's ink, never a colour of their own: prose links
+   keep each page's tinted underline, and a contents list reads as the Info
+   index does – ink with a faint underline */
+.frame-wrap a { color: var(--ink-2); }
+.frame-wrap a:hover { color: var(--ink); }
+.frame-wrap .toc a { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.frame-wrap .toc a:hover, .frame-wrap .toc a:focus-visible { text-decoration-color: currentColor; }
+/* the archives' switcher on the same edge; its underline is drawn across its
+   own box, so the frame's inset is margin here, not padding – the rule
+   starts where the text does */
+nav.tabs[aria-label="Poll archives"] {
+  box-sizing: border-box; width: auto; max-width: 692px; padding-left: 0; padding-right: 0;
+  margin: 0 calc(28px + env(safe-area-inset-right, 0px)) 22px
+          calc(max(0px, (100% - 1200px) / 2) + 28px + env(safe-area-inset-left, 0px));
+}
 
 /* the colophon (.method .colophon): identity left, ways in right */
 .sh-foot { margin-top: 6px; padding: 24px 0 20px; border-top: 1px solid var(--line); font-family: var(--sans); }
@@ -410,9 +581,16 @@ ${shellCopy("dial")}
   .sh-frame { padding-left: calc(16px + env(safe-area-inset-left, 0px)); padding-right: calc(16px + env(safe-area-inset-right, 0px)); }
   .sh-top { padding-top: calc(18px + env(safe-area-inset-top, 0px)); }
   .sh-head { gap: 16px; padding-bottom: 12px; }
+  .sh-tabs { margin-bottom: 18px; }
+  nav.tabs[aria-label="Poll archives"] {
+    margin-left: calc(16px + env(safe-area-inset-left, 0px)); margin-right: calc(16px + env(safe-area-inset-right, 0px));
+  }
   .sh-tabs-set { gap: 14px; }
   .sh-tab { padding-block: 9px; font-size: 16px; line-height: 19.5px; }
-  .sh-score { display: none; }
+  .sh-tabs.pinned .sh-tabs-set { transform: scale(0.903); }
+  .sh-eyebrow { display: none; }
+  .sh-score { gap: 7px; }
+  .sh-num { font-size: 15px; }
   .sh-colo { grid-template-columns: minmax(0, 1fr); }
   .sh-about { padding-right: 0; border-right: 0; padding-bottom: 16px; }
   .sh-ways { padding-left: 0; padding-top: 16px; border-top: 1px solid var(--line); }
@@ -424,6 +602,11 @@ ${shellCopy("dial")}
 
 /* The theme switch and the live figure. Plain, dependency-free, and
    forgiving: with no storage or no network the page is simply as it was. */
+/* np-project.js, the main page's own next-poll projection and roll, run
+   here as it is there (inside site-shell.js's function scope, so none of
+   its top-level names can meet a page's own). */
+const npProjectSrc = () => fs.readFileSync(path.join(ROOT, ".build", "newtracker", "assets", "np-project.js"), "utf8");
+
 export function shellJs() {
   return `/* site-shell.js – written by .build/newtracker/build.mjs from
    .build/site-shell.mjs on every build; edit it there. */
@@ -480,6 +663,124 @@ export function shellJs() {
     if (document.fonts) document.fonts.ready.then(align);
   }
 
+  /* ---- the main page's next-poll projection (np-project.js, verbatim) ---- */
+  window.AP = window.AP || {};
+${npProjectSrc()}
+  /* ---- the tab bar pins as the main page's does (Tabs, d1a1d215…js) -------
+     A zero-height sentinel marks the bar's natural place; once it scrolls
+     off the top the sticky bar has caught it, and .pinned condenses the set,
+     lifts the bar, docks the score and moves the countdown (all CSS). */
+  var nav = document.querySelector(".sh-tabs"), sent = document.querySelector(".sh-tabs-sentinel");
+  var next = document.querySelector(".sh-next");
+  var fitNext = function () {};
+  if (nav && sent && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (es) {
+      nav.classList.toggle("pinned", !es[0].isIntersecting);
+      fitNext(); setTimeout(fitNext, 420);
+    }, { threshold: 0 }).observe(sent);
+  }
+  /* the pinned set's END scale, off a parked pinned bar, so the countdown's
+     room is measured against where the glide is heading and the scale in
+     the CSS stays the one source (pinnedSetScale on the main page) */
+  var probe = null;
+  var pinnedScale = function () {
+    if (!probe) {
+      probe = document.createElement("div");
+      probe.className = "sh-tabs pinned";
+      probe.setAttribute("aria-hidden", "true");
+      probe.style.cssText = "position:absolute;left:-9999px;top:-9999px;visibility:hidden;pointer-events:none";
+      probe.innerHTML = '<div class="sh-tabs-set"></div>';
+      document.body.appendChild(probe);
+    }
+    var t = getComputedStyle(probe.firstChild).transform;
+    if (!t || t === "none") return 1;
+    return parseFloat(t.slice(t.indexOf("(") + 1)) || 1;
+  };
+  /* the fit pass (NextPollTicker's): as many of the roll as clear the tab
+     set – right-seated unpinned, centred between the set and the docked
+     score once pinned – and the rest parked, still measurable */
+  fitNext = function () {
+    if (!next || next.hidden || !nav) return;
+    var inner = next.parentElement, innerR = inner.getBoundingClientRect();
+    if (innerR.width < 1) return;
+    var items = next.querySelectorAll(".sh-tn-item");
+    for (var i = 0; i < items.length; i++) items[i].classList.remove("sh-tn-park");
+    var setEl = inner.querySelector(".sh-tabs-set"), pinned = nav.classList.contains("pinned");
+    var setRight = setEl.getBoundingClientRect().left + setEl.offsetWidth * (pinned ? pinnedScale() : 1);
+    var SAFE = 56, budget;
+    if (pinned) {
+      var sc = inner.querySelector(".sh-score"), sr = sc && !sc.hidden ? sc.getBoundingClientRect() : null;
+      var c = (innerR.left + innerR.right) / 2;
+      budget = 2 * Math.max(0, Math.min(c - setRight, (sr && sr.width ? sr.left : innerR.right) - c) - SAFE);
+    } else budget = innerR.right - setRight - SAFE;
+    var gap = parseFloat(getComputedStyle(next).columnGap) || 0, used = next.firstElementChild.offsetWidth;
+    for (var k = 0; k < items.length; k++) {
+      if (used + gap + items[k].offsetWidth > budget) {
+        for (var j = k; j < items.length; j++) items[j].classList.add("sh-tn-park");
+        break;
+      }
+      used += gap + items[k].offsetWidth;
+    }
+  };
+  var mk = function (tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  };
+  var renderNext = function (n) {
+    if (!next || !n.pollCadence || !window.AP.nextPollItems) return;
+    window.AP.D = { pollCadence: n.pollCadence };
+    var items = window.AP.nextPollItems(window.AP.nextPolls());
+    while (next.children.length > 1) next.removeChild(next.lastChild);
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i], item = mk("span", "sh-tn-item"), firm = mk("span", "sh-tn-firm");
+      if (it.site) {
+        var a = mk("a", "sh-tn-link", it.firm);
+        a.href = it.site; a.target = "_blank"; a.rel = "noopener noreferrer"; a.title = "Where " + it.firm + " publishes";
+        var mark = mk("span", "sh-plink", "↗"); mark.setAttribute("aria-hidden", "true");
+        a.appendChild(mark); firm.appendChild(a);
+      } else firm.textContent = it.firm;
+      var when = mk("span", "sh-tn-when" + (it.overdue ? " sh-tn-overdue" : ""), it.when);
+      if (it.maybe) when.appendChild(mk("span", "sh-tn-maybe", " (maybe)"));
+      item.appendChild(firm); item.appendChild(when); next.appendChild(item);
+    }
+    next.hidden = !items.length;
+    fitNext();
+  };
+  var startNext = function (n) {
+    renderNext(n);
+    // the labels count down ("3 days", "any moment now"), so they refresh as the main page's do
+    setInterval(function () { renderNext(n); }, 60000);
+    if (next && window.ResizeObserver) new ResizeObserver(function () { fitNext(); }).observe(next.parentElement);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitNext(); });
+  };
+  /* the masthead's meta and tagline count, as the main page's Header fills
+     them; the freshness reading is its freshness() (73de0c58…js): whole
+     Sydney calendar days, fresh to a week, aging to three */
+  var setText = function (sel, v) {
+    var els = document.querySelectorAll(sel);
+    for (var i = 0; i < els.length; i++) els[i].textContent = v;
+  };
+  var fillHead = function (n) {
+    if (n.past) setText(".sh-past", n.past);
+    var L = n.latest;
+    if (!L) return;
+    var days = Math.max(0, Math.round((easternNow().day - Date.parse(L.publishedISO)) / 86400000));
+    var rel = days === 0 ? "Today" : days === 1 ? "Yesterday" : days < 14 ? days + " days ago"
+      : days < 56 ? Math.round(days / 7) + " weeks ago" : Math.round(days / 30) + " months ago";
+    var state = days <= 7 ? "fresh" : days <= 21 ? "aging" : "stale";
+    setText(".sh-pub", L.published);
+    setText(".sh-fresh-rel", "· " + rel);
+    setText(".sh-due", L.nextElectionDue);
+    setText(".sh-tracked", L.pollsTracked + " · " + L.housesTracked + " pollsters");
+    setText(".sh-npolls", L.pollsTracked);
+    var dots = document.querySelectorAll(".sh-fresh-dot");
+    for (var i = 0; i < dots.length; i++) dots[i].className = "sh-fresh-dot " + state;
+    var hid = document.querySelectorAll(".sh-meta, .sh-meta-compact");
+    for (var j = 0; j < hid.length; j++) hid[j].hidden = false;
+  };
+
   // the live figure and dial: what the main page leads with, off one file
   if (!window.fetch) return;
   var score = document.querySelector(".sh-score");
@@ -494,6 +795,8 @@ export function shellJs() {
       score.title = "The latest two-party preferred, Labor v " + (n.rival === "onp" ? "One Nation" : "the Coalition") + " – go to Snapshot";
       score.hidden = false;
     }
+    fillHead(n);
+    startNext(n);
     /* The <img> stand-in steps aside for an inline svg drawn from the spec,
        strokes as var()s so the sheet's own theme rules colour it – the
        masthead's dial, live, not a picture of it. The settle replays too:
