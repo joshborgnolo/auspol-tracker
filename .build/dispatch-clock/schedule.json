@@ -38,6 +38,8 @@
   {"workflow":"newspoll-watch.yml","day":"Sun","time":"20:44","label":"watch: the habitual hour, every 20 min"},
   {"workflow":"newspoll-watch.yml","day":"Sun","time":"21:04","label":"watch: the habitual hour, every 20 min"},
   {"workflow":"newspoll-watch.yml","day":"Sun","time":"21:24","label":"watch: the habitual hour, every 20 min"},
+  {"workflow":"np-score.yml","day":"daily","time":"07:15","label":"daily score (twin of its cron line)"},
+  {"workflow":"prediction-refresh.yml","day":"daily","time":"13:00","label":"daily model read (twin of its cron line)"},
   {"workflow":"redbridge-update.yml","day":"daily","time":"07:20","label":"daily sweep"},
   {"workflow":"redbridge-update.yml","day":"daily","time":"18:15","label":"daily sweep"},
   {"workflow":"redbridge-update.yml","day":"Sun","time":"17:55","label":"release window, every 10 min"},

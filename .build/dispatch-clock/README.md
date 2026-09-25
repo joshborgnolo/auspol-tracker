@@ -28,15 +28,19 @@ Two checks read the clock's work back out of GitHub's run list
   never carries, a failed dispatched run, a cron line still on last week's
   UTC offset or any API error means the update runs.
 - **The heartbeat.** coverage-check.yml's heartbeat job counts the table's
-  slots in the last 24h that got a dispatched run. Under 90% warns; under
-  half fails the job, which emails. The likeliest cause is the token below
-  expiring.
+  slots in the last 24h that got a dispatched run (within 10 minutes, so a
+  retune that nudged a comb doesn't count against it). Under 90% warns;
+  under half fails the job, which emails. The likeliest cause is the token
+  below expiring.
 
 ## How it works
 
 - `schedule.json` is **generated** by `.build/tune-schedules.mjs` (run by
   `schedule-tune.yml`) from the same measured release habits as the cron
   blocks. Times are Australia/Sydney wall-clock, so DST never changes it.
+  It also carries `FIXED_SLOTS` from that script: np-score and
+  prediction-refresh, the two daily ledgers, whose missed day can't be
+  recovered. The clock is their second trigger beside their own cron line.
 - Every minute the Worker (`worker.mjs`, logic in `clock.mjs`) fetches the
   table from `main` and dispatches each workflow that has a slot in that
   Sydney minute.

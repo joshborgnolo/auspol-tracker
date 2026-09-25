@@ -99,13 +99,19 @@ export function backupVerdict(cron, runs, now, { hours = 24 } = {}) {
     : { served: true, slots: slots.length, reason: "the clock already started every slot of this line" };
 }
 
-/* heartbeat: `runs` are the repo's workflow_dispatch runs since `hours` ago */
+/* heartbeat: `runs` are the repo's workflow_dispatch runs since `hours` ago.
+   It asks whether the clock is alive, not whether each slot was exact, so a
+   run within HEARTBEAT_MS of a slot counts: the table it reads is today's,
+   and a retune that moved a comb by a few minutes would otherwise judge
+   yesterday's on-time dispatches against today's times. */
+export const HEARTBEAT_MS = 10 * MIN;
 export function clockHealth(table, runs, now, { hours = 24, settleMin = 15 } = {}) {
   const end = Math.floor((now - settleMin * MIN) / MIN) * MIN;
   const due = [];
   for (let t = end; t > end - hours * 3600e3; t -= MIN)
     for (const workflow of dueWorkflows(table, new Date(t))) due.push({ workflow, t });
-  const unserved = due.filter(({ workflow, t }) => !runs.some((r) => r.workflow === workflow && near(r, t)));
+  const unserved = due.filter(({ workflow, t }) =>
+    !runs.some((r) => r.workflow === workflow && Math.abs(r.created - t) <= HEARTBEAT_MS));
   const served = due.length - unserved.length;
   const ratio = due.length ? served / due.length : 1;
   const verdict = !due.length || ratio >= 0.9 ? "healthy" : ratio >= 0.5 ? "degraded" : "dead";

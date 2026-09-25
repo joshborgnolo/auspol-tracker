@@ -4,6 +4,11 @@
 # data/prediction-history.json + prediction/index.html, rebuilds the sitemap,
 # and commits "Refresh re-election model read as at <date>".
 #
+# One record per Sydney date, so a day GitHub's cron drops is a hole in the
+# history. The dispatch clock (.build/dispatch-clock/, FIXED_SLOTS in
+# tune-schedules.mjs) also starts this at 13:00 Sydney; whichever run comes
+# second that day is a no-op.
+#
 # The generator's model scripts read `git show origin/main:data/polls.json`,
 # so checkout needs fetch-depth 0 for the origin/main ref to exist.
 #

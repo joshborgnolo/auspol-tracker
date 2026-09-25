@@ -4,7 +4,9 @@
 # kept honest by appending only when a prediction's identity moves (a wave
 # landed, a skip confirmed, an estimate re-measured), not on the daily tick.
 # Deterministic, so no repair job: a red run here is a plain failure and
-# emails like the coverage watchdog.
+# emails like the coverage watchdog. A dropped day loses that day's bets, so
+# the dispatch clock (.build/dispatch-clock/) also starts this at 07:15
+# Sydney; the later of the two runs appends nothing new.
 
 name: np-score
 

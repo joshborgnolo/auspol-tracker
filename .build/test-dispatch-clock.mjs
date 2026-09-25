@@ -114,6 +114,11 @@ assert.equal(clockHealth(tbl, slim(ran.slice(0, 1)), noon).verdict, "dead");
 assert.equal(clockHealth(tbl, [], noon).verdict, "dead");
 assert.equal(clockHealth(tbl, slim([d("resolve-update.yml", "2026-09-24T20:00:40Z")]), noon).served, 0, "the right workflow, not just any run");
 assert.equal(clockHealth(tbl, [], Date.parse("2026-09-24T20:05:00Z"), { hours: 0.2 }).due, 0, "a slot 5 min old hasn't settled");
+// a retune moved the 06:00 sweep to 06:05 after it had run on time: still alive
+const moved = { slots: tbl.slots.map((x) => (x.time === "06:00" ? { ...x, time: "06:05" } : x)) };
+assert.equal(clockHealth(moved, slim(ran), noon).served, 4, "a slot a retune shifted a few minutes still finds its run");
+assert.equal(clockHealth(moved, slim([d("roymorgan-update.yml", "2026-09-24T19:40:00Z")]), noon).unserved.some((u) => u.startsWith("roymorgan")), true,
+  "a run 25 min off is not the slot's");
 
 // ---- the CLI, through its test seams ---------------------------------------------------
 const tmp = mkdtempSync(join(tmpdir(), "served-"));
