@@ -41355,17 +41355,18 @@ function OnSourcesPanel({
   });
   const [a, b] = reads;
   const onsLead = (() => {
-    const when = a.now ? "Across the latest polls" : "In " + monthOf(a.ym);
-    if (!(a.v > 0 && b.v > 0)) return `${when}, ${a.v.toFixed(1)}% against ${b.v.toFixed(1)}%.`;
+    const when = a.now ? "" : "In " + monthOf(a.ym);
+    const lead = s => when ? `${when}, ${s}` : s[0].toUpperCase() + s.slice(1);
+    if (!(a.v > 0 && b.v > 0)) return lead(`${a.v.toFixed(1)}% against ${b.v.toFixed(1)}%.`);
     const lnpMore = a.v >= b.v,
       x = lnpMore ? a.v / b.v : b.v / a.v;
     if (rated) {
       const [more, less] = lnpMore ? ["people who voted for the Coalition in 2025", "Labor voters"] : ["people who voted Labor in 2025", "Coalition voters"];
-      return x < 1.25 ? `${when}, people who voted for the Coalition or Labor in 2025 ${a.now ? "are" : "were"} about as likely as each other to now back One Nation.` : `${when}, ${more} ${a.now ? "are" : "were"} ${timesWords(x)} as likely as ${less} to now back One Nation.`;
+      return x < 1.25 ? lead(`people who voted for the Coalition or Labor in 2025 ${a.now ? "are" : "were"} about as likely as each other to now back One Nation.`) : lead(`${more} ${a.now ? "are" : "were"} ${timesWords(x)} as likely as ${less} to now back One Nation.`);
     }
     const [more, less] = lnpMore ? ["the Coalition", "Labor"] : ["Labor", "the Coalition"];
     const has = a.now ? "has" : "had";
-    return x < 1.25 ? `${when}, the Coalition and Labor ${a.now ? "have" : "had"} lost about as many voters to One Nation as each other since the 2025 election.` : `${when}, ${more} ${has} lost ${timesWords(x)} as many voters to One Nation as ${less} ${has} since the 2025 election.`;
+    return x < 1.25 ? lead(`the Coalition and Labor ${a.now ? "have" : "had"} lost about as many voters to One Nation as each other since the 2025 election.`) : lead(`${more} ${has} lost ${timesWords(x)} as many voters to One Nation as ${less} ${has} since the 2025 election.`);
   })();
   return React.createElement("section", {
     className: "card"
