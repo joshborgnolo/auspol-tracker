@@ -188,6 +188,21 @@ function HowTo({ label = "How to read this chart", cls = "table-hint", paras }) 
   );
 }
 
+/* A panel's story, under its heading and a hairline: a serif headline that
+   says what the figures are doing, and one plain sentence that says it with
+   the number. Both are composed from the live readings by the panel that
+   renders them, so they turn over with the data; either may be absent, and
+   a panel with nothing to say shows no rule either. */
+function Story({ head, dek }) {
+  if (!head && !dek) return null;
+  return (
+    <div className="story">
+      {head && <h3 className="story-head">{head}</h3>}
+      {dek && <p className="story-dek">{dek}</p>}
+    </div>
+  );
+}
+
 function Delta({ value, suffix = "", goodUp = true, neutral, small, title, roll, spinIn }) {
   if (value == null) return null;
   const up = value > 0, flat = Math.abs(value) < 0.05;
@@ -246,7 +261,8 @@ function PrimaryVotePanel({ rangeId }) {
     if (!a || !b || !lnp) return null;
     const gap = latest[a.id] - latest[b.id];
     let s = gap < 2
-      ? a.name + " and " + b.name + " are neck and neck in first-preference support"
+      ? a.name + " (" + latest[a.id].toFixed(1) + "%) and " + b.name + " (" + latest[b.id].toFixed(1)
+        + "%) are within " + (gap < 1 ? "a point" : "two points") + " of each other on first preferences"
       : a.name + " leads first-preference support on " + latest[a.id].toFixed(1) + "%, "
         + gap.toFixed(1) + " points clear of " + b.name;
     const lnpBehind = latest[b.id] - latest.lnp;
@@ -254,6 +270,9 @@ function PrimaryVotePanel({ rangeId }) {
       s += ", while the " + lnp.name + " has been left behind on " + latest.lnp.toFixed(1) + "%";
     return s + ".";
   })();
+  const pvHead = parts[1] && (latest[parts[0].id] - latest[parts[1].id] < 2
+    ? parts[0].name + " and " + parts[1].name + " neck and neck"
+    : parts[0].name + " leads the primary vote");
   // every party stays mounted; hiding a chip fades its line via opacity so
   // legend toggles feel continuous instead of popping
   const chartSeries = parts.map((p) => ({
@@ -327,7 +346,7 @@ function PrimaryVotePanel({ rangeId }) {
           })}
         </div>
       </div>
-      {pvLead && <p className="pv-lead"><mark>{pvLead}</mark></p>}
+      <Story head={pvLead && pvHead} dek={pvLead} />
       <TrendChart
         key="pv"
         height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[0, 40]}
@@ -344,14 +363,12 @@ function PrimaryVotePanel({ rangeId }) {
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
         fmt={(v) => v.toFixed(1)}
       />
-      <p className="table-hint">
-        Each dot is one published poll’s first-preference figure; the lines are
+      <HowTo paras={[
+        <>Each dot is one published poll’s first-preference figure; the lines are
         monthly averages. Each chip’s ▲ ▼ is its{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm && window.AP.openTerm("changes", "Primary vote")}>change
-          since the 2025 election</button>. Use the chips to isolate one party.
-      </p>
-      <HowTo paras={[
+          since the 2025 election</button>. Use the chips to isolate one party.</>,
         <>The lines are weighted by sample and adjusted for each house’s lean.</>,
         <>The 2025 election is where every line here begins. A party on its own draws with the
         95% interval around its line{solo ? ", shaded here" : ""}.</>,
@@ -436,6 +453,7 @@ function LeadershipSection({ rangeId }) {
      undecided panels: the two-way preferred-PM gap against the net ratings,
      composed from the live readings so the sentence turns over with the
      numbers. Returns null rather than guess if a reading is missing. */
+  let ldHead = null;
   const ldLead = (() => {
     const byId = {};
     leaders.forEach((L) => { byId[L.id] = L; });
@@ -451,6 +469,9 @@ function LeadershipSection({ rangeId }) {
       + " " + r0(Math.max(pmP.v, opP.v)) + "–" + r0(Math.min(pmP.v, opP.v))
       + " as preferred prime minister";
     const neg = nets.filter((n) => n.r.v < 0);
+    const pref = (ahead ? pm.short : op.short) + " preferred as PM";
+    ldHead = neg.length === nets.length ? pref + ", but all three leaders net-negative"
+      : !neg.length ? pref + ", and all three leaders net-positive" : pref;
     if (neg.length === nets.length) {
       const worst = neg.reduce((a, b) => (a.r.v < b.r.v ? a : b));
       return ppmPart + ", yet all three leaders are rated net-negative – "
@@ -466,7 +487,7 @@ function LeadershipSection({ rangeId }) {
       <div className="leadership-head">
         <h2 className="section-h">Leadership</h2>
       </div>
-      {ldLead && <p className="ld-lead"><mark>{ldLead}</mark></p>}
+      <Story head={ldLead && ldHead} dek={ldLead} />
       <HowTo label="How to read these charts" cls="leadership-note" paras={[
         <>The Coalition line splices leaders – <strong>Ley</strong> to February 2026, <strong>Taylor</strong> since.</>,
         <>The approval and favourability points are monthly aggregates, weighted and house-adjusted
@@ -1416,6 +1437,23 @@ function DirectionPanel({ rangeId }) {
   const yTicks = [];
   for (let v = lo + 5; v < hi; v += 5) yTicks.push(v);
 
+  /* The story: which answer leads, and whether its lead moved on a month
+     ago. "Widened" or "narrowed" only when the change clears its own margin
+     (changeSig); inside it the lead "holds", whatever the arrow shows. Within
+     two points either way there is no lead to speak of. */
+  const wrongLeads = latest.wrong >= latest.right;
+  const side = wrongLeads ? "Wrong track" : "Right direction";
+  const moved = netDelta == null || (now && now.changeSig === false) || Math.abs(netDelta) < 0.5 ? 0
+    : wrongLeads ? -netDelta : netDelta;
+  const head = Math.abs(latest.net) < 2 ? "The country is split on its direction"
+    : moved > 0 ? side + " has widened its lead"
+    : moved < 0 ? side + "’s lead has narrowed"
+    : side + " holds its lead";
+  const big = wrongLeads ? latest.wrong : latest.right;
+  const dek = plainShare(big) + " Australians (" + big + "%) now say the country is heading in the "
+    + (wrongLeads ? "wrong" : "right") + " direction.";
+  const signed = (v) => (v > 0 ? "+" : v < 0 ? "\u2212" : "") + Math.abs(v);
+
   return (
     <section className="card">
       <div className="card-head">
@@ -1423,31 +1461,35 @@ function DirectionPanel({ rangeId }) {
           <h2 className="card-title">National direction</h2>
           <p className="card-sub">{question}{asked ? " · " + asked : ""}</p>
         </div>
-        <div className="dir-net">
-          <span className="dir-net-label">Net</span>
-          <span className={"dir-net-val " + (latest.net >= 0 ? "pos" : "neg")}>
-            {latest.net > 0 ? "+" : ""}{latest.net}
-          </span>
-          {netDelta != null && <Delta value={netDelta} suffix="" small title={now ? nowDeltaTitle(now) : "Change on the previous month"} />}
+      </div>
+      <Story head={head} dek={dek} />
+
+      {/* the two answers as figures over the bar that splits them; the gap in
+          the bar is the unsure, left unlabelled as the figures leave it */}
+      <div className="dir-figs">
+        <div className="dir-fig">
+          <span className="dir-v" style={{ color: "var(--mood-pos)" }}>{latest.right}<span className="pct">%</span></span>
+          <span className="dir-k" style={{ color: "var(--mood-pos)" }}>Right direction</span>
+        </div>
+        <div className="dir-fig ta-r">
+          <span className="dir-v" style={{ color: "var(--mood-neg)" }}>{latest.wrong}<span className="pct">%</span></span>
+          <span className="dir-k" style={{ color: "var(--mood-neg)" }}>Wrong track</span>
         </div>
       </div>
-      {/* the reading in words, in the lead voice the One Nation panel opens with */}
-      <p className="dir-lead"><mark>{plainShare(latest.wrong)} Australians believe we’re on the wrong track.</mark></p>
-
-      <div className="dir-readout">
-        <div className="dir-side">
-          <span className="dir-k" style={{ color: "var(--mood-pos)" }}>Right direction</span>
-          <span className="dir-v">{latest.right}<span className="pct">%</span></span>
-        </div>
-        <div className="dir-bar">
-          <span className="dir-pos" style={{ width: latest.right + "%" }}></span>
-          <span className="dir-uns" style={{ width: latest.unsure + "%" }}></span>
-          <span className="dir-neg" style={{ width: latest.wrong + "%" }}></span>
-        </div>
-        <div className="dir-side ta-r">
-          <span className="dir-k" style={{ color: "var(--mood-neg)" }}>Wrong track</span>
-          <span className="dir-v">{latest.wrong}<span className="pct">%</span></span>
-        </div>
+      <div className="dir-bar" title={`Right direction ${latest.right}% · Unsure ${latest.unsure}% · Wrong track ${latest.wrong}%`}>
+        <span className="dir-pos" style={{ width: latest.right + "%" }}></span>
+        <span className="dir-uns" style={{ width: latest.unsure + "%" }}></span>
+        <span className="dir-neg" style={{ width: latest.wrong + "%" }}></span>
+      </div>
+      <div className="dir-net">
+        <span className="dir-net-label">Net</span>
+        <span className={"dir-net-val " + (latest.net >= 0 ? "pos" : "neg")}>
+          {signed(latest.net)}<span className="dir-net-u">pp</span>
+        </span>
+        {netDelta != null && <>
+          <span className="dir-net-sep" aria-hidden="true"></span>
+          <Delta value={netDelta} suffix=" pp" small title={now ? nowDeltaTitle(now) : "Change on the previous month"} />
+        </>}
       </div>
 
       <TrendChart
@@ -1472,11 +1514,9 @@ function DirectionPanel({ rangeId }) {
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
         fmt={dirFmt}
       />
-      <p className="table-hint">
-        Each dot is one published reading; the lines are monthly averages, shaded with their
-        95% intervals.
-      </p>
       <HowTo paras={[
+        <>Each dot is one published reading; the lines are monthly averages, shaded with their
+        95% intervals.</>,
         <>The lines are adjusted for house effects. Only {asked ? D.directionHouses.length : 0} houses
         ask this question, so some months rest on a single poll – the dots show which, and the
         shading shows what that costs in confidence.</>,
@@ -1566,6 +1606,7 @@ function UndecidedPanel({ rangeId }) {
      the first term reading if the series only started after it). Inside a
      point either way it reads "fairly constant"; beyond it the sentence says
      which way, and by how much. */
+  let termHead = null;
   const termLead = (() => {
     const sr = U.series.find((s) => s.id === "first") || U.series[0];
     if (!sr || sr.monthly.length < 2) return null;
@@ -1573,6 +1614,9 @@ function UndecidedPanel({ rangeId }) {
     const base = sr.monthly.filter((m) => m.ym <= "2025-05").pop() || sr.monthly[0];
     const nowV = sr.now ? sr.now.v : sr.latest.v;
     const d = nowV - base.v;
+    termHead = Math.abs(d) < 1 ? "Undecided share steady since the election"
+      : d > 0 ? "More voters undecided than at the election"
+      : "Fewer voters undecided than at the election";
     if (Math.abs(d) < 1)
       return "The share of undecided and uncommitted has remained fairly constant since the 2025 election.";
     return "The share of undecided and uncommitted voters has " + (d > 0 ? "risen" : "fallen")
@@ -1591,6 +1635,7 @@ function UndecidedPanel({ rangeId }) {
         </div>
       </div>
       {ctl}
+      <Story head={termLead && termHead} dek={termLead} />
       {/* One tile per question, because they ARE different questions and the
           panel would otherwise imply a single measure with two sources. */}
       <div className="und-reads">
@@ -1616,7 +1661,6 @@ function UndecidedPanel({ rangeId }) {
           </div>
         ))}
       </div>
-      {termLead && <p className="und-lead"><mark>{termLead}</mark></p>}
       <TrendChart
         key="und"
         height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[lo, hi]}
@@ -1631,11 +1675,9 @@ function UndecidedPanel({ rangeId }) {
         tooltipTitle={(i) => window.AP.monthLabelFull(spine[i].ym)}
         fmt={(v) => v.toFixed(1)}
       />
-      <p className="table-hint">
-        Each dot is one published reading; the lines are monthly averages, and
-        the figure beside each question pools the last six weeks of polls.
-      </p>
       <HowTo paras={[
+        <>Each dot is one published reading; the lines are monthly averages, and
+        the figure beside each question pools the last six weeks of polls.</>,
         <>Newer and larger polls count for more in the figure beside each question.</>,
         <>The questions are never averaged together – one counts people who can’t name
         a party, the other people who won’t pick a side once preferences are
@@ -1672,8 +1714,10 @@ function FirmnessView({ F, rangeId }) {
     const [top, next] = parties;
     const t = F.now[top];
     if (parties.slice(1).every((k) => firmApart(t, F.now[k]) && t.v > F.now[k].v))
-      return [`${cap(firmWho(top))} are significantly more likely than any other party’s voters to be certain of their vote: ${Math.round(t.v)}%, against ${Math.round(F.now[next].v)}% of ${firmWho(next)}.`, true];
-    return [`${cap(firmWho(top))} are the most likely to be certain of their vote, at ${Math.round(t.v)}%, but not by more than the margin over ${firmWho(next)}.`, false];
+      return [`${cap(firmWho(top))} are significantly more likely than any other party’s voters to be certain of their vote: ${Math.round(t.v)}%, against ${Math.round(F.now[next].v)}% of ${firmWho(next)}.`, true,
+        `${cap(firmWho(top))} the most certain of their vote`];
+    return [`${cap(firmWho(top))} are the most likely to be certain of their vote, at ${Math.round(t.v)}%, but not by more than the margin over ${firmWho(next)}.`, false,
+      "No party’s voters clearly the most certain"];
   })();
 
   const shift = (() => {
@@ -1700,7 +1744,7 @@ function FirmnessView({ F, rangeId }) {
   });
   const inX = (w) => w.x >= xDomain[0] && w.x <= xDomain[1];
   const waves = F.waves.filter(inX), lines = rolled.filter(inX);
-  if (waves.length < 2) return firmSaid("und-lead", lead[0], lead[1]);
+  if (waves.length < 2) return <Story head={lead[2]} dek={lead[0]} />;
   const vals = waves.flatMap((w) => parties.map((k) => w.solid[k]));
   const lo = Math.max(0, Math.floor((Math.min(...vals) - 3) / 10) * 10);
   const hi = Math.min(100, Math.ceil((Math.max(...vals) + 3) / 10) * 10);
@@ -1712,7 +1756,7 @@ function FirmnessView({ F, rangeId }) {
 
   return (
     <>
-      {firmSaid("und-lead", lead[0], lead[1])}
+      {<Story head={lead[2]} dek={lead[0]} />}
       <div className="und-reads">
         {[...parties, "all"].map((k) => {
           const r = F.now[k];
@@ -1747,11 +1791,9 @@ function FirmnessView({ F, rangeId }) {
                 legend: parties.map((k) => ({ label: `${D.PARTIES[k].name}  ${F.now[k].v.toFixed(1)}%`, color: D.PARTIES[k].color, kind: "line" })) }}
       />
       {firmSaid("demo-verdict", shift[0], shift[1])}
-      <p className="table-hint">
-        Each dot is one RedBridge wave; the lines and the figures above pool three waves at a
-        time, the figures its latest three ({F.now.from} to {F.now.to}).
-      </p>
       <HowTo paras={[
+        <>Each dot is one RedBridge wave; the lines and the figures above pool three waves at a
+        time, the figures its latest three ({F.now.from} to {F.now.to}).</>,
         <>Certain voters are RedBridge’s “solid” voters: they named a party when first asked and are
         certain they will vote that way. The rest are soft – they may change their vote – or very
         soft: they named a party only when pressed, or say they will probably change.</>,
@@ -1793,11 +1835,14 @@ function AgeFirmView({ A, rangeId }) {
   const lead = (() => {
     const [y, m, o] = AGE_BANDS, N = A.now;
     if (N[y.id].v > N[m.id].v && N[m.id].v > N[o.id].v && firmApart(N[y.id], N[m.id]) && firmApart(N[m.id], N[o.id]))
-      return [`Firmness rises significantly with age: ${pct(y)} of voters aged 18–34 aren’t firm in their vote, against ${pct(m)} of those aged 35–54 and ${pct(o)} of those 55 and over.`, true];
+      return [`Firmness rises significantly with age: ${pct(y)} of voters aged 18–34 aren’t firm in their vote, against ${pct(m)} of those aged 35–54 and ${pct(o)} of those 55 and over.`, true,
+        "Voters are firmer the older they are"];
     const [f, ...rest] = [...AGE_BANDS].sort((a, b) => N[a.id].v - N[b.id].v);
     if (rest.every((b) => firmApart(N[f.id], N[b.id])))
-      return [`${cap(f.who)} are significantly the firmest: ${pct(f)} aren’t firm in their vote, against ${pct(rest[0])} of ${rest[0].who} and ${pct(rest[1])} of ${rest[1].who}.`, true];
-    return ["Resolve finds no significant difference in how firm voters are between age groups.", false];
+      return [`${cap(f.who)} are significantly the firmest: ${pct(f)} aren’t firm in their vote, against ${pct(rest[0])} of ${rest[0].who} and ${pct(rest[1])} of ${rest[1].who}.`, true,
+        `Voters aged ${f.label} the firmest`];
+    return ["Resolve finds no significant difference in how firm voters are between age groups.", false,
+      "No age group clearly firmer than the others"];
   })();
 
   const shift = (() => {
@@ -1822,7 +1867,7 @@ function AgeFirmView({ A, rangeId }) {
   });
   const inX = (w) => w.x >= xDomain[0] && w.x <= xDomain[1];
   const waves = A.waves.filter(inX), lines = rolled.filter(inX);
-  if (waves.length < 2) return firmSaid("und-lead", lead[0], lead[1]);
+  if (waves.length < 2) return <Story head={lead[2]} dek={lead[0]} />;
   const vals = waves.flatMap((w) => AGE_BANDS.map((b) => w.soft[b.id]));
   const lo = Math.max(0, Math.floor((Math.min(...vals) - 3) / 10) * 10);
   const hi = Math.min(100, Math.ceil((Math.max(...vals) + 3) / 10) * 10);
@@ -1834,7 +1879,7 @@ function AgeFirmView({ A, rangeId }) {
 
   return (
     <>
-      {firmSaid("und-lead", lead[0], lead[1])}
+      {<Story head={lead[2]} dek={lead[0]} />}
       <div className="und-reads">
         {AGE_BANDS.map((b, i) => (
           <div className="und-read" key={b.id}>
@@ -1864,11 +1909,9 @@ function AgeFirmView({ A, rangeId }) {
                 legend: AGE_BANDS.map((b, i) => ({ label: `${b.label}  ${A.now[b.id].v.toFixed(1)}%`, color: col(i), kind: "line" })) }}
       />
       {firmSaid("demo-verdict", shift[0], shift[1])}
-      <p className="table-hint">
-        Each dot is one Resolve wave; the lines and the figures above pool three waves at a
-        time, the figures its latest three ({A.now.from} to {A.now.to}).
-      </p>
       <HowTo paras={[
+        <>Each dot is one Resolve wave; the lines and the figures above pool three waves at a
+        time, the figures its latest three ({A.now.from} to {A.now.to}).</>,
         <>Not firm is Resolve’s “soft” answer to “How firm are you with your vote?”: voters who
         named a party but say they might change. It is the All voters view’s “Not firm” line,
         split by age.</>,
@@ -1956,6 +1999,15 @@ function OnSourcesPanel({ rangeId }) {
       ? lead(`the Coalition and Labor ${a.now ? "have" : "had"} lost about as many voters to One Nation as each other since the 2025 election.`)
       : lead(`${more} ${has} lost ${timesWords(x)} as many voters to One Nation as ${less} ${has} since the 2025 election.`);
   })();
+  // the same comparison as a headline: which of the two has bled more
+  const onsHead = (() => {
+    if (!(a.v > 0 && b.v > 0)) return null;
+    const lnpMore = a.v >= b.v, even = (lnpMore ? a.v / b.v : b.v / a.v) < 1.25;
+    if (rated) return even ? "Coalition and Labor voters switching at similar rates"
+      : (lnpMore ? "Coalition" : "Labor") + " voters likelier to have switched to One Nation";
+    return even ? "Coalition and Labor losing voters to One Nation alike"
+      : (lnpMore ? "The Coalition" : "Labor") + (a.now ? " is" : " was") + " losing more voters to One Nation";
+  })();
   return (
     <section className="card">
       <div className="card-head">
@@ -1972,7 +2024,7 @@ function OnSourcesPanel({ rangeId }) {
           <Segmented options={ONS_VIEWS} value={view} onChange={setView} size="sm" ariaLabel="Figures as a share" />
         </div>
       )}
-      <p className="ons-lead"><mark>{onsLead}</mark></p>
+      <Story head={onsHead} dek={onsLead} />
       <div className="und-reads">
         {reads.map(({ sr, v, chg, now }) => (
           <div className="und-read" key={sr.id}>
@@ -2007,14 +2059,12 @@ function OnSourcesPanel({ rangeId }) {
         copy={{ legend: reads.filter((r) => drawn.some((d) => d.sr.id === r.sr.id))
           .map(({ sr, v }) => ({ label: `${sr.label}  ${v.toFixed(1)}%`, color: sr.color, kind: "line" })) }}
       />
-      <p className="table-hint">
-        Each dot is one poll’s {rated ? "figure" : "split"} and the lines are monthly averages; the
+      <HowTo paras={[
+        <>Each dot is one poll’s {rated ? "figure" : "split"} and the lines are monthly averages; the
         figures above pool the last {S.now ? S.now.window : "six weeks"} of polls.{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where One Nation’s new voters came from")}>
-          How it’s worked out</button>
-      </p>
-      <HowTo paras={[
+          How it’s worked out</button></>,
         <>Newer polls count for more in the figures above.</>,
         <>The two views come from the same tables. “Of each party’s voters” is the share of each
         party’s 2025 voters now backing One Nation. Weighted by that party’s share of the 2025 vote,
@@ -2432,15 +2482,15 @@ function DemographicsPanel({ rangeId = "all" }) {
       {/* The gist stays in view; the reading instructions fold, as the
           Past cycles intro's do - all of it ran eight lines under the charts. */}
       <div className="demo-notes">
-      <p className="table-hint">
-        The figures pool the last {T.window} of polls. Each chart shows how much higher or lower
-        the party’s vote is in each group than among all voters, month by month.{" "}
-        <button type="button" className="hi-term"
-                onClick={() => window.AP.openTerm && window.AP.openTerm("vote-by-group", "Who votes for whom")}>
-          Where the figures come from</button>
-      </p>
       <details className="view-how hint-how">
         <summary>How to read these charts</summary>
+        <p className="table-hint">
+          The figures pool the last {T.window} of polls. Each chart shows how much higher or lower
+          the party’s vote is in each group than among all voters, month by month.{" "}
+          <button type="button" className="hi-term"
+                  onClick={() => window.AP.openTerm && window.AP.openTerm("vote-by-group", "Who votes for whom")}>
+            Where the figures come from</button>
+        </p>
         <p className="table-hint">
           A bar is that group’s share of the first-preference vote: 17.1% beside 18–34 means
           17.1% of people aged 18–34 name the party as their first preference – the same as the
@@ -2690,13 +2740,16 @@ function IssuesPanel({ rangeId = "all" }) {
   const gVerdicts = gtab ? gtab.issues.map((k) => issGroupVerdict(gtab, k)).filter(Boolean)
     .sort((a, b) => b.gap - a.gap).slice(0, 3) : [];
 
-  const lead = top.imp && top.own && (
-    <p className="iss-lead">
-      <mark>{plainShare(top.imp.v)} voters put {ISS_PHRASE[top.id]} among their three most important issues</mark>
-      {top.own.leadSig ? `, and more of them trust ${ISS_PARTY[top.own.lead]} with it than either of the others.`
-        : ", and no party is clearly more trusted with it than the others."}
-    </p>
-  );
+  /* the story: the issue most voters rank in their top three, and whether
+     any party is clearly trusted with it */
+  const phrase = top.imp && top.own && ISS_PHRASE[top.id];
+  const bare = phrase && phrase.replace(/^the /, "");
+  const issHead = phrase && bare[0].toUpperCase() + bare.slice(1)
+    + " tops voters’ concerns" + (top.own.leadSig ? ", " + ISS_PARTY[top.own.lead] + " most trusted on it" : "");
+  const issDek = phrase && plainShare(top.imp.v) + " voters put " + phrase
+    + " among their three most important issues"
+    + (top.own.leadSig ? `, and more of them trust ${ISS_PARTY[top.own.lead]} with it than either of the others.`
+      : ", and no party is clearly more trusted with it than the others.");
 
   return (
     <section className="card">
@@ -2718,9 +2771,9 @@ function IssuesPanel({ rangeId = "all" }) {
                      size="sm" ariaLabel="Group voters by" />
         )}
       </div>
+      {view === "trust" && <Story head={issHead} dek={issDek} />}
       {view === "trust" ? (
         <div className="iss-body">
-          {lead}
           <div className="iss-grid">
             <div className="iss-rows">
               <div className="iss-head" aria-hidden="true">
@@ -2777,12 +2830,12 @@ function IssuesPanel({ rangeId = "all" }) {
               </div>
             )}
             <div className="demo-notes iss-notes">
-              <p className="table-hint">
-                The figures pool the last {I.window} of polls. Pick an issue to follow it in the chart.{" "}
-                <button type="button" className="hi-term" onClick={openInfo}>Where the figures come from</button>
-              </p>
               <details className="view-how hint-how">
                 <summary>How to read these figures</summary>
+                <p className="table-hint">
+                  The figures pool the last {I.window} of polls. Pick an issue to follow it in the chart.{" "}
+                  <button type="button" className="hi-term" onClick={openInfo}>Where the figures come from</button>
+                </p>
                 <p className="table-hint">
                   The grey bar is how many voters put the issue among the three most important to their vote:
                   75% beside the cost of living means three in four rank it first, second or third. RedBridge
@@ -2842,13 +2895,13 @@ function IssuesPanel({ rangeId = "all" }) {
                   : demoSaid(`No two ${gtab.id === "vote" ? "groups of voters" : "groups"} differ significantly on any of these issues.`)}
               </div>
               <div className="demo-notes iss-notes">
-                <p className="table-hint">
-                  Each figure is the share of that group putting the issue among its three most important. Only
-                  RedBridge publishes these by group, so they rest on its polls in the last {G.window}.{" "}
-                  <button type="button" className="hi-term" onClick={openInfo}>Where the figures come from</button>
-                </p>
                 <details className="view-how hint-how">
                   <summary>How to read these figures</summary>
+                  <p className="table-hint">
+                    Each figure is the share of that group putting the issue among its three most important. Only
+                    RedBridge publishes these by group, so they rest on its polls in the last {G.window}.{" "}
+                    <button type="button" className="hi-term" onClick={openInfo}>Where the figures come from</button>
+                  </p>
                   <p className="table-hint">
                     The sentences name the clearest differences. Two groups differ significantly when the gap
                     between them is larger than its own 95% margin, which combines both groups’ margins; with

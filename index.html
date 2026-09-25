@@ -1246,21 +1246,33 @@ body.editorial .leadership .card-title { font-size: 19px; font-weight: 600; lett
 .arch-appr-dis { background: var(--mood-neg); opacity: 0.85; }
 .arch-dir-right { background: var(--mood-pos); opacity: 0.85; }
 .arch-dir-wrong { background: var(--mood-neg); opacity: 0.85; }
-.dir-net { display: flex; align-items: center; gap: 9px; }
-.dir-net-label { font-size: 11px; color: var(--ink-3); font-weight: 700; }
-.dir-net-val { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.dir-net-val.pos { color: var(--mood-pos); }
-.dir-net-val.neg { color: var(--mood-neg); }
-.dir-readout { display: flex; align-items: flex-end; gap: 16px; margin: 4px 0 14px; }
-.dir-side { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.dir-side.ta-r { text-align: right; margin-left: auto; }
-.dir-k { font-size: 13px; font-weight: 700; white-space: nowrap; }
-.dir-v { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
-.dir-v .pct { font-size: 15px; font-weight: 700; color: var(--ink-3); margin-left: 1px; }
-.dir-bar { flex: 1; min-width: 60px; display: flex; height: 14px; border-radius: 7px; overflow: hidden; align-self: center; }
+.dir-figs { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin: 0 2px 10px; }
+.dir-fig { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.dir-fig.ta-r { text-align: right; align-items: flex-end; }
+.dir-v {
+  font-family: var(--heads, var(--serif)); font-size: 46px; font-weight: 700; line-height: 1;
+  letter-spacing: -0.02em; font-variant-numeric: tabular-nums lining-nums;
+}
+.dir-v .pct { font-size: 0.6em; margin-left: 1px; }
+.dir-k { font-size: 14px; font-weight: 700; white-space: nowrap; }
+.dir-bar { display: flex; height: 16px; border-radius: 8px; overflow: hidden; margin: 0 2px; }
 .dir-pos { background: var(--mood-pos); }
 .dir-neg { background: var(--mood-neg); }
-.dir-uns { background: transparent; }
+.dir-uns { background: var(--line); }
+.dir-net { display: flex; align-items: baseline; gap: 10px; margin: 14px 2px 10px; }
+.dir-net-label { font-size: 13px; font-weight: 700; color: var(--ink-3); }
+.dir-net-val {
+  font-family: var(--heads, var(--serif)); font-size: 24px; font-weight: 700;
+  letter-spacing: -0.01em; font-variant-numeric: tabular-nums lining-nums;
+}
+.dir-net-u { font-family: var(--sans); font-size: 13px; font-weight: 700; margin-left: 3px; }
+.dir-net-val.pos { color: var(--mood-pos); }
+.dir-net-val.neg { color: var(--mood-neg); }
+.dir-net-sep { width: 1px; height: 18px; background: var(--line); align-self: center; margin: 0 2px; }
+@media (max-width: 620px) {
+  .dir-v { font-size: 40px; }
+  .dir-k { font-size: 13px; }
+}
 .table-wrap { overflow-x: auto; margin: 0 -4px; }
 .poll-table { width: 100%; border-collapse: collapse; font-size: 16px; }
 .poll-table th {
@@ -1645,8 +1657,6 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .demo-chart-set { font-size: 13px; font-weight: 650; color: var(--ink); margin-right: 8px; }
 .read-ci { margin-left: 2px; }
 .iss-body { container-type: inline-size; }
-.iss-lead { margin: 0 2px 14px; font-size: 15px; line-height: 1.55; color: #000; text-wrap: pretty; }
-body.dark .iss-lead { color: var(--ink-2); }
 .iss-grid { display: grid; gap: 18px 30px; grid-template-columns: minmax(0, 1fr); margin: 0 2px 6px; }
 .iss-head, .iss-row { display: grid; align-items: center; gap: 4px 12px;
   grid-template-columns: minmax(96px, 1.05fr) minmax(96px, 0.95fr) minmax(190px, 1.7fr) minmax(112px, 0.8fr); }
@@ -1719,10 +1729,19 @@ body.dark .iss-lead { color: var(--ink-2); }
     display: inline-block; max-height: 104px; text-align: left; }
   .iss-table tbody th { font-size: 12px; }
 }
-.ons-lead, .dir-lead, .und-lead, .ld-lead, .pv-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: #000;
-  text-wrap: pretty; }
-body.dark .ons-lead, body.dark .dir-lead, body.dark .und-lead, body.dark .ld-lead, body.dark .pv-lead { color: var(--ink-2); }
-.ons-lead mark, .dir-lead mark, .und-lead mark, .ld-lead mark, .pv-lead mark, .iss-lead mark, .demo-verdict mark {
+.story { margin: 2px 2px 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.story-head {
+  margin: 0 0 6px; font-family: var(--serif); font-weight: 700;
+  font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; color: var(--ink);
+  text-wrap: balance;
+}
+.story-dek { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+@media (max-width: 620px) {
+  .story-head { font-size: 21px; }
+  .story-dek { font-size: 15px; }
+}
+.leadership > .story { margin-top: 4px; }
+.demo-verdict mark {
   --hl-l: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%23f5d24e' stop-opacity='.95'/><stop offset='.55' stop-color='%23fee891' stop-opacity='.85'/></linearGradient></defs><g filter='url(%23f)'><path fill='url(%23g)' d='M12 3.4V17.6C8 17.7 4.6 18.2 2.1 17.9C1 14.6 0.9 8.6 2.2 4.6C3.4 3.8 6.2 3.5 12 3.4Z'/></g></svg>");
   --hl-b: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter></defs><g filter='url(%23f)'><path fill='%23fee891' fill-opacity='.85' d='M-6 3.4C22 2.8 50 3.5 76 2.7S110 2.2 126 2.4V16.7C98 17.3 70 16.5 44 17.4S12 17.7 -6 17.6Z'/></g></svg>");
   --hl-r: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter><linearGradient id='g' x1='1' x2='0'><stop offset='0' stop-color='%23f5d24e' stop-opacity='.95'/><stop offset='.55' stop-color='%23fee891' stop-opacity='.85'/></linearGradient></defs><g filter='url(%23f)'><path fill='url(%23g)' d='M-4 2.5C1 2.4 3.6 2.5 5.3 3.1C6.4 7 6.5 12.4 5.6 16.6C3.9 17 1 16.8 -4 16.8Z'/></g></svg>");
@@ -1731,11 +1750,10 @@ body.dark .ons-lead, body.dark .dir-lead, body.dark .und-lead, body.dark .ld-lea
               var(--hl-r) right top / 8px 100% no-repeat,
               var(--hl-b) 8px 0 / calc(100% - 16px) 100% no-repeat;
   -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-body.dark .ons-lead mark, body.dark .dir-lead mark, body.dark .und-lead mark, body.dark .ld-lead mark, body.dark .pv-lead mark, body.dark .iss-lead mark, body.dark .demo-verdict mark {
+body.dark .demo-verdict mark {
   --hl-l: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%23f0c93c' stop-opacity='.5'/><stop offset='.55' stop-color='%23e3bd45' stop-opacity='.34'/></linearGradient></defs><g filter='url(%23f)'><path fill='url(%23g)' d='M12 3.4V17.6C8 17.7 4.6 18.2 2.1 17.9C1 14.6 0.9 8.6 2.2 4.6C3.4 3.8 6.2 3.5 12 3.4Z'/></g></svg>");
   --hl-b: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter></defs><g filter='url(%23f)'><path fill='%23e3bd45' fill-opacity='.34' d='M-6 3.4C22 2.8 50 3.5 76 2.7S110 2.2 126 2.4V16.7C98 17.3 70 16.5 44 17.4S12 17.7 -6 17.6Z'/></g></svg>");
   --hl-r: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter><linearGradient id='g' x1='1' x2='0'><stop offset='0' stop-color='%23f0c93c' stop-opacity='.5'/><stop offset='.55' stop-color='%23e3bd45' stop-opacity='.34'/></linearGradient></defs><g filter='url(%23f)'><path fill='url(%23g)' d='M-4 2.5C1 2.4 3.6 2.5 5.3 3.1C6.4 7 6.5 12.4 5.6 16.6C3.9 17 1 16.8 -4 16.8Z'/></g></svg>"); }
-.dir-lead { margin-bottom: 22px; }
 .ons-ctl { margin: 0 2px 14px; }
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
@@ -1977,7 +1995,7 @@ body.editorial .card {
 }
 body.editorial .hero { border-top: 0; padding-top: 10px; }
 body.editorial .info { border-top: 0; padding-top: 10px; }
-body.editorial .card-title { font-size: 30px; font-weight: 400; letter-spacing: -0.018em; }
+body.editorial .card-title { font-size: 30px; font-weight: 600; letter-spacing: -0.018em; }
 body.editorial .card-sub { font-size: 14px; margin-top: 5px; }
 body.editorial .card-head { margin-bottom: 22px; }
 body.editorial .leadership { border-top: 1px solid var(--line); padding: 38px 0 34px; }
@@ -41357,6 +41375,19 @@ function HowTo({
     className: cls
   }, p)));
 }
+function Story({
+  head,
+  dek
+}) {
+  if (!head && !dek) return null;
+  return React.createElement("div", {
+    className: "story"
+  }, head && React.createElement("h3", {
+    className: "story-head"
+  }, head), dek && React.createElement("p", {
+    className: "story-dek"
+  }, dek));
+}
 function Delta({
   value,
   suffix = "",
@@ -41422,11 +41453,12 @@ function PrimaryVotePanel({
     const lnp = parts.find(p => p.id === "lnp");
     if (!a || !b || !lnp) return null;
     const gap = latest[a.id] - latest[b.id];
-    let s = gap < 2 ? a.name + " and " + b.name + " are neck and neck in first-preference support" : a.name + " leads first-preference support on " + latest[a.id].toFixed(1) + "%, " + gap.toFixed(1) + " points clear of " + b.name;
+    let s = gap < 2 ? a.name + " (" + latest[a.id].toFixed(1) + "%) and " + b.name + " (" + latest[b.id].toFixed(1) + "%) are within " + (gap < 1 ? "a point" : "two points") + " of each other on first preferences" : a.name + " leads first-preference support on " + latest[a.id].toFixed(1) + "%, " + gap.toFixed(1) + " points clear of " + b.name;
     const lnpBehind = latest[b.id] - latest.lnp;
     if (lnp.id !== a.id && lnp.id !== b.id && lnpBehind > 2) s += ", while the " + lnp.name + " has been left behind on " + latest.lnp.toFixed(1) + "%";
     return s + ".";
   })();
+  const pvHead = parts[1] && (latest[parts[0].id] - latest[parts[1].id] < 2 ? parts[0].name + " and " + parts[1].name + " neck and neck" : parts[0].name + " leads the primary vote");
   const chartSeries = parts.map(p => ({
     id: p.id,
     label: p.name,
@@ -41492,9 +41524,10 @@ function PrimaryVotePanel({
       value: latest[p.id] - was,
       small: true
     }));
-  }))), pvLead && React.createElement("p", {
-    className: "pv-lead"
-  }, React.createElement("mark", null, pvLead)), React.createElement(TrendChart, {
+  }))), React.createElement(Story, {
+    head: pvLead && pvHead,
+    dek: pvLead
+  }), React.createElement(TrendChart, {
     key: "pv",
     height: narrow ? 460 : 340,
     xDomain: xDomain,
@@ -41517,14 +41550,12 @@ function PrimaryVotePanel({
     events: majorEvents(),
     tooltipTitle: i => window.AP.monthLabelFull(pts[i].ym),
     fmt: v => v.toFixed(1)
-  }), React.createElement("p", {
-    className: "table-hint"
-  }, "Each dot is one published poll\u2019s first-preference figure; the lines are monthly averages. Each chip\u2019s \u25B2 \u25BC is its", " ", React.createElement("button", {
-    type: "button",
-    className: "hi-term",
-    onClick: () => window.AP.openTerm && window.AP.openTerm("changes", "Primary vote")
-  }, "change since the 2025 election"), ". Use the chips to isolate one party."), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "The lines are weighted by sample and adjusted for each house\u2019s lean."), React.createElement(React.Fragment, null, "The 2025 election is where every line here begins. A party on its own draws with the 95% interval around its line", solo ? ", shaded here" : "", ".")]
+  }), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Each dot is one published poll\u2019s first-preference figure; the lines are monthly averages. Each chip\u2019s \u25B2 \u25BC is its", " ", React.createElement("button", {
+      type: "button",
+      className: "hi-term",
+      onClick: () => window.AP.openTerm && window.AP.openTerm("changes", "Primary vote")
+    }, "change since the 2025 election"), ". Use the chips to isolate one party."), React.createElement(React.Fragment, null, "The lines are weighted by sample and adjusted for each house\u2019s lean."), React.createElement(React.Fragment, null, "The 2025 election is where every line here begins. A party on its own draws with the 95% interval around its line", solo ? ", shaded here" : "", ".")]
   }));
 }
 const eventOn = iso => (window.AP.D.events || []).find(e => e.date === iso) || null;
@@ -41599,6 +41630,7 @@ function LeadershipSection({
   } = window.AP;
   const [view, setView] = useState("pair");
   const leaders = D.LEADERS;
+  let ldHead = null;
   const ldLead = (() => {
     const byId = {};
     leaders.forEach(L => {
@@ -41619,6 +41651,8 @@ function LeadershipSection({
     const ahead = pmP.v - opP.v >= 0;
     const ppmPart = (ahead ? pm.short : op.short) + " leads " + (ahead ? op.short : pm.short) + " " + r0(Math.max(pmP.v, opP.v)) + "–" + r0(Math.min(pmP.v, opP.v)) + " as preferred prime minister";
     const neg = nets.filter(n => n.r.v < 0);
+    const pref = (ahead ? pm.short : op.short) + " preferred as PM";
+    ldHead = neg.length === nets.length ? pref + ", but all three leaders net-negative" : !neg.length ? pref + ", and all three leaders net-positive" : pref;
     if (neg.length === nets.length) {
       const worst = neg.reduce((a, b) => a.r.v < b.r.v ? a : b);
       return ppmPart + ", yet all three leaders are rated net-negative – " + (worst.L.id === "alb" ? "the PM" : worst.L.short) + " most deeply, on " + r0(worst.r.v) + ".";
@@ -41632,9 +41666,10 @@ function LeadershipSection({
     className: "leadership-head"
   }, React.createElement("h2", {
     className: "section-h"
-  }, "Leadership")), ldLead && React.createElement("p", {
-    className: "ld-lead"
-  }, React.createElement("mark", null, ldLead)), React.createElement(HowTo, {
+  }, "Leadership")), React.createElement(Story, {
+    head: ldLead && ldHead,
+    dek: ldLead
+  }), React.createElement(HowTo, {
     label: "How to read these charts",
     cls: "leadership-note",
     paras: [React.createElement(React.Fragment, null, "The Coalition line splices leaders \u2013 ", React.createElement("strong", null, "Ley"), " to February 2026, ", React.createElement("strong", null, "Taylor"), " since."), React.createElement(React.Fragment, null, "The approval and favourability points are monthly aggregates, weighted and house-adjusted the way the vote series are; the preferred-PM lines join published readings as they came, unadjusted."), React.createElement(React.Fragment, null, "Preferred PM is put to voters as two separate two-way contests \u2013 against the opposition leader, and against Hanson head to head \u2013 so both are drawn, as published. In the two-way houses leave anywhere from nothing (Newspoll) to half the sample uncommitted, and the three-way 16\u201350%, so a level isn\u2019t comparable across houses \u2013 but the gap between the two lines, and the trend in each, are.")]
@@ -42486,6 +42521,13 @@ function DirectionPanel({
   const hi = Math.ceil((Math.max(...vals) + 3) / 5) * 5;
   const yTicks = [];
   for (let v = lo + 5; v < hi; v += 5) yTicks.push(v);
+  const wrongLeads = latest.wrong >= latest.right;
+  const side = wrongLeads ? "Wrong track" : "Right direction";
+  const moved = netDelta == null || now && now.changeSig === false || Math.abs(netDelta) < 0.5 ? 0 : wrongLeads ? -netDelta : netDelta;
+  const head = Math.abs(latest.net) < 2 ? "The country is split on its direction" : moved > 0 ? side + " has widened its lead" : moved < 0 ? side + "’s lead has narrowed" : side + " holds its lead";
+  const big = wrongLeads ? latest.wrong : latest.right;
+  const dek = plainShare(big) + " Australians (" + big + "%) now say the country is heading in the " + (wrongLeads ? "wrong" : "right") + " direction.";
+  const signed = v => (v > 0 ? "+" : v < 0 ? "\u2212" : "") + Math.abs(v);
   return React.createElement("section", {
     className: "card"
   }, React.createElement("div", {
@@ -42494,34 +42536,42 @@ function DirectionPanel({
     className: "card-title"
   }, "National direction"), React.createElement("p", {
     className: "card-sub"
-  }, question, asked ? " · " + asked : "")), React.createElement("div", {
-    className: "dir-net"
-  }, React.createElement("span", {
-    className: "dir-net-label"
-  }, "Net"), React.createElement("span", {
-    className: "dir-net-val " + (latest.net >= 0 ? "pos" : "neg")
-  }, latest.net > 0 ? "+" : "", latest.net), netDelta != null && React.createElement(Delta, {
-    value: netDelta,
-    suffix: "",
-    small: true,
-    title: now ? nowDeltaTitle(now) : "Change on the previous month"
-  }))), React.createElement("p", {
-    className: "dir-lead"
-  }, React.createElement("mark", null, plainShare(latest.wrong), " Australians believe we\u2019re on the wrong track.")), React.createElement("div", {
-    className: "dir-readout"
+  }, question, asked ? " · " + asked : ""))), React.createElement(Story, {
+    head: head,
+    dek: dek
+  }), React.createElement("div", {
+    className: "dir-figs"
   }, React.createElement("div", {
-    className: "dir-side"
+    className: "dir-fig"
   }, React.createElement("span", {
+    className: "dir-v",
+    style: {
+      color: "var(--mood-pos)"
+    }
+  }, latest.right, React.createElement("span", {
+    className: "pct"
+  }, "%")), React.createElement("span", {
     className: "dir-k",
     style: {
       color: "var(--mood-pos)"
     }
-  }, "Right direction"), React.createElement("span", {
-    className: "dir-v"
-  }, latest.right, React.createElement("span", {
+  }, "Right direction")), React.createElement("div", {
+    className: "dir-fig ta-r"
+  }, React.createElement("span", {
+    className: "dir-v",
+    style: {
+      color: "var(--mood-neg)"
+    }
+  }, latest.wrong, React.createElement("span", {
     className: "pct"
-  }, "%"))), React.createElement("div", {
-    className: "dir-bar"
+  }, "%")), React.createElement("span", {
+    className: "dir-k",
+    style: {
+      color: "var(--mood-neg)"
+    }
+  }, "Wrong track"))), React.createElement("div", {
+    className: "dir-bar",
+    title: `Right direction ${latest.right}% · Unsure ${latest.unsure}% · Wrong track ${latest.wrong}%`
   }, React.createElement("span", {
     className: "dir-pos",
     style: {
@@ -42538,17 +42588,22 @@ function DirectionPanel({
       width: latest.wrong + "%"
     }
   })), React.createElement("div", {
-    className: "dir-side ta-r"
+    className: "dir-net"
   }, React.createElement("span", {
-    className: "dir-k",
-    style: {
-      color: "var(--mood-neg)"
-    }
-  }, "Wrong track"), React.createElement("span", {
-    className: "dir-v"
-  }, latest.wrong, React.createElement("span", {
-    className: "pct"
-  }, "%")))), React.createElement(TrendChart, {
+    className: "dir-net-label"
+  }, "Net"), React.createElement("span", {
+    className: "dir-net-val " + (latest.net >= 0 ? "pos" : "neg")
+  }, signed(latest.net), React.createElement("span", {
+    className: "dir-net-u"
+  }, "pp")), netDelta != null && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "dir-net-sep",
+    "aria-hidden": "true"
+  }), React.createElement(Delta, {
+    value: netDelta,
+    suffix: " pp",
+    small: true,
+    title: now ? nowDeltaTitle(now) : "Change on the previous month"
+  }))), React.createElement(TrendChart, {
     key: "dir",
     height: narrow ? 460 : 340,
     xDomain: xDomain,
@@ -42583,10 +42638,8 @@ function DirectionPanel({
     events: [eventOn("2025-12-14")].filter(Boolean),
     tooltipTitle: i => window.AP.monthLabelFull(pts[i].ym),
     fmt: dirFmt
-  }), React.createElement("p", {
-    className: "table-hint"
-  }, "Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals."), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "The lines are adjusted for house effects. Only ", asked ? D.directionHouses.length : 0, " houses ask this question, so some months rest on a single poll \u2013 the dots show which, and the shading shows what that costs in confidence.")]
+  }), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals."), React.createElement(React.Fragment, null, "The lines are adjusted for house effects. Only ", asked ? D.directionHouses.length : 0, " houses ask this question, so some months rest on a single poll \u2013 the dots show which, and the shading shows what that costs in confidence.")]
   }));
 }
 function UndecidedPanel({
@@ -42664,6 +42717,7 @@ function UndecidedPanel({
   const yTicks = [];
   for (let v = lo + step; v < hi; v += step) yTicks.push(v);
   const spine = drawn[0].pts;
+  let termHead = null;
   const termLead = (() => {
     const sr = U.series.find(s => s.id === "first") || U.series[0];
     if (!sr || sr.monthly.length < 2) return null;
@@ -42671,6 +42725,7 @@ function UndecidedPanel({
     const base = sr.monthly.filter(m => m.ym <= "2025-05").pop() || sr.monthly[0];
     const nowV = sr.now ? sr.now.v : sr.latest.v;
     const d = nowV - base.v;
+    termHead = Math.abs(d) < 1 ? "Undecided share steady since the election" : d > 0 ? "More voters undecided than at the election" : "Fewer voters undecided than at the election";
     if (Math.abs(d) < 1) return "The share of undecided and uncommitted has remained fairly constant since the 2025 election.";
     return "The share of undecided and uncommitted voters has " + (d > 0 ? "risen" : "fallen") + " since the 2025 election, from " + base.v.toFixed(1) + "% in " + window.AP.monthLabelFull(base.ym) + " to " + nowV.toFixed(1) + "% now.";
   })();
@@ -42682,7 +42737,10 @@ function UndecidedPanel({
     className: "card-title"
   }, "Undecided"), React.createElement("p", {
     className: "card-sub"
-  }, "Electors who won\u2019t name a choice, or won\u2019t call theirs firm \xB7 ", houseList(U.houses)))), ctl, React.createElement("div", {
+  }, "Electors who won\u2019t name a choice, or won\u2019t call theirs firm \xB7 ", houseList(U.houses)))), ctl, React.createElement(Story, {
+    head: termLead && termHead,
+    dek: termLead
+  }), React.createElement("div", {
     className: "und-reads"
   }, U.series.map(sr => React.createElement("div", {
     className: "und-read",
@@ -42709,9 +42767,7 @@ function UndecidedPanel({
     className: "und-read-stale"
   }, "last reading, ", sr.latest.field)), React.createElement("p", {
     className: "und-read-note"
-  }, sr.note, " \xB7 ", houseList(sr.houses)))))), termLead && React.createElement("p", {
-    className: "und-lead"
-  }, React.createElement("mark", null, termLead)), React.createElement(TrendChart, {
+  }, sr.note, " \xB7 ", houseList(sr.houses)))))), React.createElement(TrendChart, {
     key: "und",
     height: narrow ? 460 : 340,
     xDomain: xDomain,
@@ -42739,10 +42795,8 @@ function UndecidedPanel({
     pollFacet: "twopp",
     tooltipTitle: i => window.AP.monthLabelFull(spine[i].ym),
     fmt: v => v.toFixed(1)
-  }), React.createElement("p", {
-    className: "table-hint"
-  }, "Each dot is one published reading; the lines are monthly averages, and the figure beside each question pools the last six weeks of polls."), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Newer and larger polls count for more in the figure beside each question."), React.createElement(React.Fragment, null, "The questions are never averaged together \u2013 one counts people who can\u2019t name a party, the other people who won\u2019t pick a side once preferences are applied. Only the first is left out of the shares elsewhere on this page, so a rising line means the share is being read off a smaller pool of decided voters, not that support has moved.")]
+  }), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Each dot is one published reading; the lines are monthly averages, and the figure beside each question pools the last six weeks of polls."), React.createElement(React.Fragment, null, "Newer and larger polls count for more in the figure beside each question."), React.createElement(React.Fragment, null, "The questions are never averaged together \u2013 one counts people who can\u2019t name a party, the other people who won\u2019t pick a side once preferences are applied. Only the first is left out of the shares elsewhere on this page, so a rising line means the share is being read off a smaller pool of decided voters, not that support has moved.")]
   }));
 }
 const UND_VIEWS = [{
@@ -42777,8 +42831,8 @@ function FirmnessView({
   const lead = (() => {
     const [top, next] = parties;
     const t = F.now[top];
-    if (parties.slice(1).every(k => firmApart(t, F.now[k]) && t.v > F.now[k].v)) return [`${cap(firmWho(top))} are significantly more likely than any other party’s voters to be certain of their vote: ${Math.round(t.v)}%, against ${Math.round(F.now[next].v)}% of ${firmWho(next)}.`, true];
-    return [`${cap(firmWho(top))} are the most likely to be certain of their vote, at ${Math.round(t.v)}%, but not by more than the margin over ${firmWho(next)}.`, false];
+    if (parties.slice(1).every(k => firmApart(t, F.now[k]) && t.v > F.now[k].v)) return [`${cap(firmWho(top))} are significantly more likely than any other party’s voters to be certain of their vote: ${Math.round(t.v)}%, against ${Math.round(F.now[next].v)}% of ${firmWho(next)}.`, true, `${cap(firmWho(top))} the most certain of their vote`];
+    return [`${cap(firmWho(top))} are the most likely to be certain of their vote, at ${Math.round(t.v)}%, but not by more than the margin over ${firmWho(next)}.`, false, "No party’s voters clearly the most certain"];
   })();
   const shift = (() => {
     const moved = parties.map(k => ({
@@ -42808,7 +42862,10 @@ function FirmnessView({
   const inX = w => w.x >= xDomain[0] && w.x <= xDomain[1];
   const waves = F.waves.filter(inX),
     lines = rolled.filter(inX);
-  if (waves.length < 2) return firmSaid("und-lead", lead[0], lead[1]);
+  if (waves.length < 2) return React.createElement(Story, {
+    head: lead[2],
+    dek: lead[0]
+  });
   const vals = waves.flatMap(w => parties.map(k => w.solid[k]));
   const lo = Math.max(0, Math.floor((Math.min(...vals) - 3) / 10) * 10);
   const hi = Math.min(100, Math.ceil((Math.max(...vals) + 3) / 10) * 10);
@@ -42825,7 +42882,10 @@ function FirmnessView({
     label: D.PARTIES[k].name,
     meta: w
   })));
-  return React.createElement(React.Fragment, null, firmSaid("und-lead", lead[0], lead[1]), React.createElement("div", {
+  return React.createElement(React.Fragment, null, React.createElement(Story, {
+    head: lead[2],
+    dek: lead[0]
+  }), React.createElement("div", {
     className: "und-reads"
   }, [...parties, "all"].map(k => {
     const r = F.now[k];
@@ -42889,10 +42949,8 @@ function FirmnessView({
         kind: "line"
       }))
     }
-  }), firmSaid("demo-verdict", shift[0], shift[1]), React.createElement("p", {
-    className: "table-hint"
-  }, "Each dot is one RedBridge wave; the lines and the figures above pool three waves at a time, the figures its latest three (", F.now.from, " to ", F.now.to, ")."), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Certain voters are RedBridge\u2019s \u201Csolid\u201D voters: they named a party when first asked and are certain they will vote that way. The rest are soft \u2013 they may change their vote \u2013 or very soft: they named a party only when pressed, or say they will probably change."), React.createElement(React.Fragment, null, "Each wave counts in proportion to how many of a party\u2019s voters it asked, so the figure for a small party rests on a few hundred people and carries a wider margin. Two figures differ significantly when the gap between them is larger than their two margins combined."), React.createElement(React.Fragment, null, "This is a different question from Resolve\u2019s \u201Chow firm are you\u201D in the All voters view, which is why the shares there are lower.")]
+  }), firmSaid("demo-verdict", shift[0], shift[1]), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Each dot is one RedBridge wave; the lines and the figures above pool three waves at a time, the figures its latest three (", F.now.from, " to ", F.now.to, ")."), React.createElement(React.Fragment, null, "Certain voters are RedBridge\u2019s \u201Csolid\u201D voters: they named a party when first asked and are certain they will vote that way. The rest are soft \u2013 they may change their vote \u2013 or very soft: they named a party only when pressed, or say they will probably change."), React.createElement(React.Fragment, null, "Each wave counts in proportion to how many of a party\u2019s voters it asked, so the figure for a small party rests on a few hundred people and carries a wider margin. Two figures differ significantly when the gap between them is larger than their two margins combined."), React.createElement(React.Fragment, null, "This is a different question from Resolve\u2019s \u201Chow firm are you\u201D in the All voters view, which is why the shares there are lower.")]
   }));
 }
 const AGE_BANDS = [{
@@ -42924,10 +42982,10 @@ function AgeFirmView({
   const lead = (() => {
     const [y, m, o] = AGE_BANDS,
       N = A.now;
-    if (N[y.id].v > N[m.id].v && N[m.id].v > N[o.id].v && firmApart(N[y.id], N[m.id]) && firmApart(N[m.id], N[o.id])) return [`Firmness rises significantly with age: ${pct(y)} of voters aged 18–34 aren’t firm in their vote, against ${pct(m)} of those aged 35–54 and ${pct(o)} of those 55 and over.`, true];
+    if (N[y.id].v > N[m.id].v && N[m.id].v > N[o.id].v && firmApart(N[y.id], N[m.id]) && firmApart(N[m.id], N[o.id])) return [`Firmness rises significantly with age: ${pct(y)} of voters aged 18–34 aren’t firm in their vote, against ${pct(m)} of those aged 35–54 and ${pct(o)} of those 55 and over.`, true, "Voters are firmer the older they are"];
     const [f, ...rest] = [...AGE_BANDS].sort((a, b) => N[a.id].v - N[b.id].v);
-    if (rest.every(b => firmApart(N[f.id], N[b.id]))) return [`${cap(f.who)} are significantly the firmest: ${pct(f)} aren’t firm in their vote, against ${pct(rest[0])} of ${rest[0].who} and ${pct(rest[1])} of ${rest[1].who}.`, true];
-    return ["Resolve finds no significant difference in how firm voters are between age groups.", false];
+    if (rest.every(b => firmApart(N[f.id], N[b.id]))) return [`${cap(f.who)} are significantly the firmest: ${pct(f)} aren’t firm in their vote, against ${pct(rest[0])} of ${rest[0].who} and ${pct(rest[1])} of ${rest[1].who}.`, true, `Voters aged ${f.label} the firmest`];
+    return ["Resolve finds no significant difference in how firm voters are between age groups.", false, "No age group clearly firmer than the others"];
   })();
   const shift = (() => {
     const moved = AGE_BANDS.map(b => ({
@@ -42957,7 +43015,10 @@ function AgeFirmView({
   const inX = w => w.x >= xDomain[0] && w.x <= xDomain[1];
   const waves = A.waves.filter(inX),
     lines = rolled.filter(inX);
-  if (waves.length < 2) return firmSaid("und-lead", lead[0], lead[1]);
+  if (waves.length < 2) return React.createElement(Story, {
+    head: lead[2],
+    dek: lead[0]
+  });
   const vals = waves.flatMap(w => AGE_BANDS.map(b => w.soft[b.id]));
   const lo = Math.max(0, Math.floor((Math.min(...vals) - 3) / 10) * 10);
   const hi = Math.min(100, Math.ceil((Math.max(...vals) + 3) / 10) * 10);
@@ -42974,7 +43035,10 @@ function AgeFirmView({
     label: b.label,
     meta: w
   })));
-  return React.createElement(React.Fragment, null, firmSaid("und-lead", lead[0], lead[1]), React.createElement("div", {
+  return React.createElement(React.Fragment, null, React.createElement(Story, {
+    head: lead[2],
+    dek: lead[0]
+  }), React.createElement("div", {
     className: "und-reads"
   }, AGE_BANDS.map((b, i) => React.createElement("div", {
     className: "und-read",
@@ -43033,10 +43097,8 @@ function AgeFirmView({
         kind: "line"
       }))
     }
-  }), firmSaid("demo-verdict", shift[0], shift[1]), React.createElement("p", {
-    className: "table-hint"
-  }, "Each dot is one Resolve wave; the lines and the figures above pool three waves at a time, the figures its latest three (", A.now.from, " to ", A.now.to, ")."), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Not firm is Resolve\u2019s \u201Csoft\u201D answer to \u201CHow firm are you with your vote?\u201D: voters who named a party but say they might change. It is the All voters view\u2019s \u201CNot firm\u201D line, split by age."), React.createElement(React.Fragment, null, "Resolve doesn\u2019t publish how many people in each age group it asked, so each group is counted in proportion to its share of adults (2021 Census), the mix Resolve\u2019s sample is weighted to. Two figures differ significantly when the gap between them is larger than their two margins combined.")]
+  }), firmSaid("demo-verdict", shift[0], shift[1]), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Each dot is one Resolve wave; the lines and the figures above pool three waves at a time, the figures its latest three (", A.now.from, " to ", A.now.to, ")."), React.createElement(React.Fragment, null, "Not firm is Resolve\u2019s \u201Csoft\u201D answer to \u201CHow firm are you with your vote?\u201D: voters who named a party but say they might change. It is the All voters view\u2019s \u201CNot firm\u201D line, split by age."), React.createElement(React.Fragment, null, "Resolve doesn\u2019t publish how many people in each age group it asked, so each group is counted in proportion to its share of adults (2021 Census), the mix Resolve\u2019s sample is weighted to. Two figures differ significantly when the gap between them is larger than their two margins combined.")]
   }));
 }
 const ONS_VIEWS = [{
@@ -43122,6 +43184,13 @@ function OnSourcesPanel({
     const has = a.now ? "has" : "had";
     return x < 1.25 ? lead(`the Coalition and Labor ${a.now ? "have" : "had"} lost about as many voters to One Nation as each other since the 2025 election.`) : lead(`${more} ${has} lost ${timesWords(x)} as many voters to One Nation as ${less} ${has} since the 2025 election.`);
   })();
+  const onsHead = (() => {
+    if (!(a.v > 0 && b.v > 0)) return null;
+    const lnpMore = a.v >= b.v,
+      even = (lnpMore ? a.v / b.v : b.v / a.v) < 1.25;
+    if (rated) return even ? "Coalition and Labor voters switching at similar rates" : (lnpMore ? "Coalition" : "Labor") + " voters likelier to have switched to One Nation";
+    return even ? "Coalition and Labor losing voters to One Nation alike" : (lnpMore ? "The Coalition" : "Labor") + (a.now ? " is" : " was") + " losing more voters to One Nation";
+  })();
   return React.createElement("section", {
     className: "card"
   }, React.createElement("div", {
@@ -43138,9 +43207,10 @@ function OnSourcesPanel({
     onChange: setView,
     size: "sm",
     ariaLabel: "Figures as a share"
-  })), React.createElement("p", {
-    className: "ons-lead"
-  }, React.createElement("mark", null, onsLead)), React.createElement("div", {
+  })), React.createElement(Story, {
+    head: onsHead,
+    dek: onsLead
+  }), React.createElement("div", {
     className: "und-reads"
   }, reads.map(({
     sr,
@@ -43213,14 +43283,12 @@ function OnSourcesPanel({
         kind: "line"
       }))
     }
-  }), React.createElement("p", {
-    className: "table-hint"
-  }, "Each dot is one poll\u2019s ", rated ? "figure" : "split", " and the lines are monthly averages; the figures above pool the last ", S.now ? S.now.window : "six weeks", " of polls.", " ", React.createElement("button", {
-    type: "button",
-    className: "hi-term",
-    onClick: () => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where One Nation’s new voters came from")
-  }, "How it\u2019s worked out")), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Newer polls count for more in the figures above."), React.createElement(React.Fragment, null, "The two views come from the same tables. \u201COf each party\u2019s voters\u201D is the share of each party\u2019s 2025 voters now backing One Nation. Weighted by that party\u2019s share of the 2025 vote, it becomes the party\u2019s part of One Nation\u2019s gain, so 38% of Coalition voters counts for far more than 38% of a small party\u2019s."), React.createElement(React.Fragment, null, "Voters who can\u2019t recall a 2025 vote are left out, and so are One Nation\u2019s own 2025 voters, who are what it kept rather than gained.")]
+  }), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Each dot is one poll\u2019s ", rated ? "figure" : "split", " and the lines are monthly averages; the figures above pool the last ", S.now ? S.now.window : "six weeks", " of polls.", " ", React.createElement("button", {
+      type: "button",
+      className: "hi-term",
+      onClick: () => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where One Nation’s new voters came from")
+    }, "How it\u2019s worked out")), React.createElement(React.Fragment, null, "Newer polls count for more in the figures above."), React.createElement(React.Fragment, null, "The two views come from the same tables. \u201COf each party\u2019s voters\u201D is the share of each party\u2019s 2025 voters now backing One Nation. Weighted by that party\u2019s share of the 2025 vote, it becomes the party\u2019s part of One Nation\u2019s gain, so 38% of Coalition voters counts for far more than 38% of a small party\u2019s."), React.createElement(React.Fragment, null, "Voters who can\u2019t recall a 2025 vote are left out, and so are One Nation\u2019s own 2025 voters, who are what it kept rather than gained.")]
   }));
 }
 const DEMO_PARTIES = [{
@@ -43726,15 +43794,15 @@ function DemographicsPanel({
     className: "demo-chart"
   }) : null))), React.createElement("div", {
     className: "demo-notes"
-  }, React.createElement("p", {
+  }, React.createElement("details", {
+    className: "view-how hint-how"
+  }, React.createElement("summary", null, "How to read these charts"), React.createElement("p", {
     className: "table-hint"
   }, "The figures pool the last ", T.window, " of polls. Each chart shows how much higher or lower the party\u2019s vote is in each group than among all voters, month by month.", " ", React.createElement("button", {
     type: "button",
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("vote-by-group", "Who votes for whom")
-  }, "Where the figures come from")), React.createElement("details", {
-    className: "view-how hint-how"
-  }, React.createElement("summary", null, "How to read these charts"), React.createElement("p", {
+  }, "Where the figures come from")), React.createElement("p", {
     className: "table-hint"
   }, "A bar is that group\u2019s share of the first-preference vote: 17.1% beside 18\u201334 means 17.1% of people aged 18\u201334 name the party as their first preference \u2013 the same as the all-voters bar, read among that group alone. Each poll says how far a group sits from its own overall figure. Those gaps are pooled, newer and larger polls counting for more as in every figure here, and added to the site\u2019s current figure for all voters. \xB1 is the 95% margin."), React.createElement("p", {
     className: "table-hint"
@@ -44074,9 +44142,10 @@ function IssuesPanel({
     return x && x.imp ? x.imp : null;
   };
   const gVerdicts = gtab ? gtab.issues.map(k => issGroupVerdict(gtab, k)).filter(Boolean).sort((a, b) => b.gap - a.gap).slice(0, 3) : [];
-  const lead = top.imp && top.own && React.createElement("p", {
-    className: "iss-lead"
-  }, React.createElement("mark", null, plainShare(top.imp.v), " voters put ", ISS_PHRASE[top.id], " among their three most important issues"), top.own.leadSig ? `, and more of them trust ${ISS_PARTY[top.own.lead]} with it than either of the others.` : ", and no party is clearly more trusted with it than the others.");
+  const phrase = top.imp && top.own && ISS_PHRASE[top.id];
+  const bare = phrase && phrase.replace(/^the /, "");
+  const issHead = phrase && bare[0].toUpperCase() + bare.slice(1) + " tops voters’ concerns" + (top.own.leadSig ? ", " + ISS_PARTY[top.own.lead] + " most trusted on it" : "");
+  const issDek = phrase && plainShare(top.imp.v) + " voters put " + phrase + " among their three most important issues" + (top.own.leadSig ? `, and more of them trust ${ISS_PARTY[top.own.lead]} with it than either of the others.` : ", and no party is clearly more trusted with it than the others.");
   return React.createElement("section", {
     className: "card"
   }, React.createElement("div", {
@@ -44108,9 +44177,12 @@ function IssuesPanel({
     onChange: setGset,
     size: "sm",
     ariaLabel: "Group voters by"
-  })), view === "trust" ? React.createElement("div", {
+  })), view === "trust" && React.createElement(Story, {
+    head: issHead,
+    dek: issDek
+  }), view === "trust" ? React.createElement("div", {
     className: "iss-body"
-  }, lead, React.createElement("div", {
+  }, React.createElement("div", {
     className: "iss-grid"
   }, React.createElement("div", {
     className: "iss-rows"
@@ -44201,15 +44273,15 @@ function IssuesPanel({
     }
   }), demoSaid(issTrendVerdict(D, it, chart.dots))), React.createElement("div", {
     className: "demo-notes iss-notes"
-  }, React.createElement("p", {
+  }, React.createElement("details", {
+    className: "view-how hint-how"
+  }, React.createElement("summary", null, "How to read these figures"), React.createElement("p", {
     className: "table-hint"
   }, "The figures pool the last ", I.window, " of polls. Pick an issue to follow it in the chart.", " ", React.createElement("button", {
     type: "button",
     className: "hi-term",
     onClick: openInfo
-  }, "Where the figures come from")), React.createElement("details", {
-    className: "view-how hint-how"
-  }, React.createElement("summary", null, "How to read these figures"), React.createElement("p", {
+  }, "Where the figures come from")), React.createElement("p", {
     className: "table-hint"
   }, "The grey bar is how many voters put the issue among the three most important to their vote: 75% beside the cost of living means three in four rank it first, second or third. RedBridge asks this every month, and it is the only pollster that publishes the figures, so this bar is RedBridge\u2019s alone."), React.createElement("p", {
     className: "table-hint"
@@ -44263,15 +44335,15 @@ function IssuesPanel({
     key: i
   }, demoSaid(v.text))) : demoSaid(`No two ${gtab.id === "vote" ? "groups of voters" : "groups"} differ significantly on any of these issues.`)), React.createElement("div", {
     className: "demo-notes iss-notes"
-  }, React.createElement("p", {
+  }, React.createElement("details", {
+    className: "view-how hint-how"
+  }, React.createElement("summary", null, "How to read these figures"), React.createElement("p", {
     className: "table-hint"
   }, "Each figure is the share of that group putting the issue among its three most important. Only RedBridge publishes these by group, so they rest on its polls in the last ", G.window, ".", " ", React.createElement("button", {
     type: "button",
     className: "hi-term",
     onClick: openInfo
-  }, "Where the figures come from")), React.createElement("details", {
-    className: "view-how hint-how"
-  }, React.createElement("summary", null, "How to read these figures"), React.createElement("p", {
+  }, "Where the figures come from")), React.createElement("p", {
     className: "table-hint"
   }, "The sentences name the clearest differences. Two groups differ significantly when the gap between them is larger than its own 95% margin, which combines both groups\u2019 margins; with several groups the bar rises for each extra gap tested, as on the vote-by-group panel. A group\u2019s margin is usually 5 to 7 points, since a group is a slice of one poll. Hover or tap a figure for its margin.")))) : React.createElement("p", {
     className: "table-hint"
@@ -54109,16 +54181,14 @@ function Hero({
     title: "Shade between the implied figure as read on the 2025 and 2022 counted flow tables (TPP cut) \u2013 if One Nation preferences flowed to Labor as they did in 2022, the implied figure would sit at the bracket's top edge. A sensitivity read, not an interval."
   }, React.createElement("span", {
     className: "hl-band hl-band-sens"
-  }), "ON-flow sensitivity")), React.createElement("p", {
-    className: "hero-caption"
-  }, m.real ? React.createElement(React.Fragment, null, impBasis ? "Each dot is one poll’s primaries re-allocated at fixed 2025 preference flows; the line is a " : "Each dot is one published poll; the line is a ", React.createElement("button", {
-    type: "button",
-    className: "hi-term",
-    title: "Why the newest dots can sit past the line\u2019s end",
-    onClick: () => window.AP.openTerm && window.AP.openTerm("dots-past-the-line", "two-party preferred")
-  }, "smoothed average"), impBasis ? " of those implied figures." : " across all pollsters.") : impOnBasis ? "Each dot is one poll’s primaries re-allocated at the site’s fixed ALP–ON flow set; the line is a smoothed average of those implied figures." : `Each dot is one pollster’s published ${m.label} head-to-head` + (adjusted ? ", adjusted for each house’s lean on this matchup as the headline two-party is." : ", averaged monthly – too few houses ask it to weight or correct.") + (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : "")), (m.real || impOnBasis) && React.createElement(HowTo, {
+  }), "ON-flow sensitivity")), React.createElement(HowTo, {
     cls: "hero-caption",
-    paras: m.real ? [React.createElement(React.Fragment, null, "The shading is the interval around the line. Where the two bands overlap, the lead is inside its own margin of error \u2013 the polls cannot separate the parties that month.")] : [React.createElement(React.Fragment, null, "The shading is the flow table\u2019s own range. No election has counted this pairing, so the set is calibrated from preference counts, not anchored to a result.")]
+    paras: [React.createElement(React.Fragment, null, m.real ? React.createElement(React.Fragment, null, impBasis ? "Each dot is one poll’s primaries re-allocated at fixed 2025 preference flows; the line is a " : "Each dot is one published poll; the line is a ", React.createElement("button", {
+      type: "button",
+      className: "hi-term",
+      title: "Why the newest dots can sit past the line\u2019s end",
+      onClick: () => window.AP.openTerm && window.AP.openTerm("dots-past-the-line", "two-party preferred")
+    }, "smoothed average"), impBasis ? " of those implied figures." : " across all pollsters.") : impOnBasis ? "Each dot is one poll’s primaries re-allocated at the site’s fixed ALP–ON flow set; the line is a smoothed average of those implied figures." : `Each dot is one pollster’s published ${m.label} head-to-head` + (adjusted ? ", adjusted for each house’s lean on this matchup as the headline two-party is." : ", averaged monthly – too few houses ask it to weight or correct.") + (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : "")), m.real ? React.createElement(React.Fragment, null, "The shading is the interval around the line. Where the two bands overlap, the lead is inside its own margin of error \u2013 the polls cannot separate the parties that month.") : impOnBasis ? React.createElement(React.Fragment, null, "The shading is the flow table\u2019s own range. No election has counted this pairing, so the set is calibrated from preference counts, not anchored to a result.") : null]
   })), (matchup === "alp_lnp" && impOffered || m.altKey === "alp_on" && impOnOffered) && compareToggle());
 }
 function MethodNote({
