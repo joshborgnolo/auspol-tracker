@@ -6207,7 +6207,7 @@ function infoTerms(D) {
         <span className="info-p"><b>Which pollsters count where.</b> Groups pool only where the
         pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov, and
         RedBridge. 18–34: Resolve, DemosAU, and YouGov. 35–54 and 55+: Resolve and DemosAU, since
-        YouGov’s bands are 35–49 and 50+. Generations: YouGov and RedBridge. Education, on three
+        YouGov’s bands are 35–49 and 50+. {xref("generations", "breakdowns by group", "Generations")}: YouGov and RedBridge. Education, on three
         levels: DemosAU, YouGov, and RedBridge, with RedBridge’s two school rows combined in
         proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA,
         WA, and ACT/NT/Tas columns are combined into the rest of Australia at their shares of the
@@ -6281,6 +6281,21 @@ function infoTerms(D) {
           groups, yᵢ is the gap between them.</span>
           {demoWork}
         </>)}</>) },
+      { id: "generations", term: "Generations", body: (
+        <>The birth years behind the generations in {xref("vote-by-group", "generations", "breakdowns by group")}.
+        YouGov and RedBridge, the two pollsters that group voters this way, label their generations
+        but publish no birth years for them, so these are the usual definitions, set by the Pew
+        Research Center, rather than either pollster’s own:
+        <span className="info-p"><b>Gen Z</b>, born 1997 to 2012 – among voters, 1997 to 2008.<br />
+        <b>Millennials</b>, born 1981 to 1996.<br />
+        <b>Gen X</b>, born 1965 to 1980.<br />
+        <b>Boomers</b>, born 1946 to 1964.</span>
+        <span className="info-p"><b>What is uncertain.</b> Some Australian researchers draw each line
+        a year earlier or later – Gen Z from 1996, say – and neither pollster says which it follows,
+        so a voter born in a boundary year may sit in either group. The oldest voters are counted
+        differently: YouGov reports a Silent generation, born before 1946, which the site leaves
+        out, while RedBridge reports none, and its four generations add up to its whole sample, so
+        its Boomers take in everyone born before 1965. They are a small share of either sample.</span></>) },
       { id: "issues", term: "Issues", body: (
         <>Two questions pollsters ask about the issues: which ones matter most to how people will
         vote, and which party they think would handle each one best. The panel “The issues” turns

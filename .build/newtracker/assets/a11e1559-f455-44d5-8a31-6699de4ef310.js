@@ -2533,6 +2533,15 @@ function DemographicsPanel({ rangeId = "all" }) {
             : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups"
             : ""}.
         </p>
+        {tab.id === "age" && (
+          <p className="table-hint">
+            Neither pollster publishes the birth years behind its generations; the usual ones, and
+            what is uncertain about them, are under{" "}
+            <button type="button" className="hi-term"
+                    onClick={() => window.AP.openTerm && window.AP.openTerm("generations", "Who votes for whom")}>
+              Generations</button>.
+          </p>
+        )}
       </details>
       </div>
       </div>
