@@ -41,8 +41,8 @@ extracted_at: '2026-09-05T00:00:00.000Z'
   sitemap.xml`, commit `Refresh re-election model read as at <asOf>`, push via
   `.build/git-push-main.sh`'s `push_main`. All steps log one line to
   `.build/logs/prediction.log`. Args: `--force`, `--as-of=…` (force implies if-due+force).
-- `.github/workflows/prediction-refresh.yml` — daily 03:00 UTC, `main-writers`
-  concurrency group (see auto-skill-ci-main-writer-races); pages-403 push failures are
+- `.github/workflows/prediction-refresh.yml` — daily 03:00 UTC, its own
+  `prediction-refresh` concurrency group (see auto-skill-ci-main-writer-races); pages-403 push failures are
   tolerated the same way the poll updaters tolerate them (rerun next slot).
 - `.build/probe-prediction.mjs` + `.build/prediction-repair-prompt.md` — read-only probe
   (15 checks: history record invariants — strict asOf sort, 0≤lo≤median≤hi≤1,

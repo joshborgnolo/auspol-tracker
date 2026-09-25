@@ -8,8 +8,7 @@
      page's footer onto its own route. Not part of the .build/newtracker
      pipeline — hand-maintained. Chrome is the main site's static-article
      view (its no-JS static summary): the same 680px column, Crimson Text
-     headings over IBM Plex Sans body, ss-note footer and fixed .ss-back
-     pill home, with the fb-* form styles ported from template.html. -->
+     headings over IBM Plex Sans body, the site's shared header and footer (.build/site-shell.mjs), with the fb-* form styles ported from template.html. -->
 <meta name="description" content="Report a wrong figure, a missing poll, or a site bug in auspol tracker — corrections go straight to the inbox via Formspree and are checked against the pollster’s own release before anything moves.">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
@@ -62,7 +61,7 @@
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.sh-light) {
     --bg:        oklch(0.205 0.010 65);
     --ink:       oklch(0.940 0.008 80);
     --ink-2:     oklch(0.800 0.009 78);
@@ -90,17 +89,6 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
 }
-
-/* ------- back to the interactive tracker (the static page's .ss-back pill) */
-.ss-back {
-  position: fixed; right: 18px; bottom: 18px; z-index: 300;
-  display: inline-block;
-  padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line);
-  background: var(--bg); color: var(--ink); font-size: 13px;
-  font-weight: 600; text-decoration: none; cursor: pointer;
-  box-shadow: 0 3px 16px oklch(0 0 0 / 0.16);
-}
-.ss-back:hover { border-color: var(--ink-3); }
 
 /* ------- article: the static summary's column + type rhythm ------- */
 .frame-wrap {
@@ -163,7 +151,7 @@ body {
    scheme; there is no manual theme toggle here, so it follows the media
    query rather than a body class. */
 .fb-form { color-scheme: light; }
-@media (prefers-color-scheme: dark) { .fb-form { color-scheme: dark; } }
+@media (prefers-color-scheme: dark) { :root:not(.sh-light) .fb-form { color-scheme: dark; } }
 /* iOS Safari zooms the page IN when a focused field's text is under 16px,
    and never zooms back out — two points of type is the cheaper thing to
    give up. */
@@ -194,9 +182,72 @@ body {
 
 @media (max-width: 560px) { .fb-form, .fb-thanks { max-width: none; } }
 </style>
+<!--shell:head-->
+<link rel="preload" href="/assets/fonts/ibmplexsans-latin.056e4e24.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/sourcesans3-latin.ac057a55.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site-shell.css">
+<script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
+<style>
+/* this page's dark-mode rules, for a reader who chose dark on a light device */
+:root.sh-dark { --bg: oklch(0.205 0.010 65); --ink: oklch(0.940 0.008 80); --ink-2: oklch(0.800 0.009 78); --ink-3: oklch(0.670 0.009 72); --ink-faint: oklch(0.545 0.009 68); --line: oklch(0.355 0.011 66); --line-2: oklch(0.312 0.010 66); --accent: oklch(0.70 0.080 205); --mood-neg: oklch(0.685 0.105 38); }
+:root.sh-dark .fb-form { color-scheme: dark; }
+</style>
+<!--/shell:head-->
 </head>
 <body>
-<main class="frame-wrap">
+<!--shell:header-->
+<a class="sh-skip" href="#sh-content">Skip to content</a>
+<div class="sh-frame sh-top">
+  <header class="sh-head">
+    <div class="sh-brand">
+    <div class="wordmark stacked">
+      <a class="wm-glyph" href="/#story" title="Wind the dial back through the term" aria-describedby="wm-action">
+        <span class="wm-textcol">
+          <span class="wm-name">auspol</span>
+          <span class="sr-only"> </span>
+          <span class="wm-track">tracker</span>
+        </span>
+        <img class="wm-dial-img" src="/assets/masthead-dial.svg" alt="" width="57" height="39.7">
+      </a>
+      <span class="wm-sr">– Australian federal polling</span>
+      <span id="wm-action" hidden>Replays the term on the masthead dial</span>
+    </div>
+    <p class="sh-tagline">Aggregated opinion polling for the next Australian <br class="sh-tagline-br">federal election, set against the last <span class="sh-past">twenty</span>.</p>
+    <p class="sh-meta-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span>Updated <span class="sh-pub"></span> · <span class="sh-npolls"></span> polls</span></p>
+    </div>
+    <div class="sh-right">
+    <div class="sh-meta" hidden>
+      <div class="sh-meta-item"><span class="sh-meta-k">Last poll</span><span class="sh-meta-v"><span class="sh-fresh-dot"></span><span class="sh-pub"></span><span class="sh-fresh-rel"></span></span></div>
+      <div class="sh-meta-divide"></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">Next election</span><span class="sh-meta-v sh-due"></span></div>
+      <div class="sh-meta-divide"></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">Polls tracked</span><span class="sh-meta-v sh-tracked"></span></div>
+    </div>
+    <div class="sh-theme" role="group" aria-label="Colour theme">
+      <button type="button" class="sh-cell" data-theme="light" aria-pressed="false" aria-label="Light mode" title="Light mode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"></path></svg></button><button type="button" class="sh-cell" data-theme="dark" aria-pressed="false" aria-label="Dark mode" title="Dark mode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.2 8.2 0 0 1 9.8 3.5a8.2 8.2 0 1 0 10.7 10.7Z"></path></svg></button>
+    </div>
+    </div>
+  </header>
+</div>
+<div class="sh-tabs-sentinel" aria-hidden="true"></div>
+<nav class="sh-tabs" aria-label="Site">
+  <div class="sh-frame">
+    <div class="sh-tabs-inner">
+      <div class="sh-tabs-set">
+        <a class="sh-tab" href="/#snapshot">Snapshot</a>
+        <a class="sh-tab" href="/#cycles"><span class="sh-tab-long">Past cycles</span><span class="sh-tab-short" aria-hidden="true">Cycles</span></a>
+        <a class="sh-tab" href="/#allpolls">All polls</a>
+        <a class="sh-tab sh-tab-pinhide" href="/#info">Info</a>
+      </div>
+      <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A slot that passes unrecorded counts up as overdue until the release is added"><span class="sh-tn-lab">Next</span></div>
+      <a class="sh-score" href="/#snapshot" hidden title="The latest two-party preferred – go to Snapshot"><span class="sh-eyebrow">2PP</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
+    </div>
+  </div>
+</nav>
+<!--/shell:header-->
+<main id="sh-content" class="frame-wrap">
   <h1>Feedback</h1>
   <p class="ss-sub">Spotted a wrong figure, a missing poll, or a site bug? Reports are checked against the pollster’s own release before a figure moves, so a correction lands at the next build rather than straight away.</p>
 
@@ -248,9 +299,7 @@ body {
     </p>
   </div>
 
-  <p class="ss-note">This is the feedback page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
 </main>
-<a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
 <noscript><style>.fb-form { display: none; }</style></noscript>
 <script>
 (function () {
@@ -336,5 +385,23 @@ body {
   });
 })();
 </script>
+<!--shell:footer-->
+<div class="sh-frame">
+  <footer class="sh-foot">
+    <div class="sh-colo">
+      <div class="sh-about" data-nosnippet>
+        <p class="sh-lede">auspol tracker is an unofficial aggregate of published federal opinion polling.</p>
+        <p class="sh-disc">Best efforts are made to make the aggregate figures transparent, trustworthy, statistically sound, and informative, but they are, in the end, estimates only.</p>
+      </div>
+      <div class="sh-ways">
+        <p class="sh-fb">How the figures are built is in <a href="/#info">Info</a>.</p>
+        <p class="sh-arch">Federal polling archives I’ve located are stored <a href="/archives/newspoll/">here</a> for safekeeping and convenience.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+<div class="sh-band" aria-hidden="true"></div>
+<script src="/assets/site-shell.js" defer></script>
+<!--/shell:footer-->
 </body>
 </html>

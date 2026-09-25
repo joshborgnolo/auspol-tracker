@@ -83,4 +83,4 @@ default path).
   auspol-latest.json now exists but the other string-split consumers remain).
 - **launchd-scheduled-data-pipeline** — wrapper conventions (best-effort warn pattern,
   push_main file list, slot lock).
-- **ci-main-writer-races** — main-writers serialisation that stamps/pushes ride on.
+- **ci-main-writer-races** — the push_main race handling that stamps/pushes ride on.

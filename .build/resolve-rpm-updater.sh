@@ -1,6 +1,6 @@
 #!/bin/bash
 # Scheduled Resolve Political Monitor update: extract -> if the CSV changed ->
-# validate -> render-card -> build -> commit -> push. Installed via launchd
+# assimilate -> crosstabs -> validate -> render-card -> build -> commit -> push. Installed via launchd
 # (plist copied to ~/Library/LaunchAgents/local.auspol.resolve-rpm.plist from
 # the copy in this
 # directory). Every step logs one line to .build/logs/resolve-rpm.log; any
@@ -53,6 +53,9 @@ if ! node .build/assimilate-resolve-vi.mjs --apply >> "$LOG" 2>&1; then
   log "FAIL assimilate (errors above); no commit made"
   exit 1
 fi
+# The month's age and gender series join data/demographics.json, and its
+# best-party series data/issues.json, in this same commit (non-fatal; see refresh_crosstabs in git-push-main.sh).
+refresh_crosstabs demographics issues
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
@@ -64,13 +67,13 @@ if ! refresh_site; then
   exit 1
 fi
 
-git add data/resolve-political-monitor.csv data/polls.json .build/resolve-rpm-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
+git add data/resolve-political-monitor.csv data/polls.json data/demographics.json data/issues.json .build/resolve-rpm-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
 MSG="Update Resolve monitor data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! push_main "$MSG" data/resolve-political-monitor.csv data/polls.json .build/resolve-rpm-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
+if ! push_main "$MSG" data/resolve-political-monitor.csv data/polls.json data/demographics.json data/issues.json .build/resolve-rpm-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"

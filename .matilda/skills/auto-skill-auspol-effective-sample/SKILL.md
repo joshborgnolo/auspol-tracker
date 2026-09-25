@@ -1,6 +1,6 @@
 ---
 name: auspol-effective-sample
-description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Filing houses with a sampleEff leg: Newspoll, YouGov, Essential, DemosAU, and (from 2026-09-04) RedBridge/Accent — a fully OFFLINE leg reading the committed .build/redbridge-src caches, 8 waves stamped. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index — with a release-PDF fallback (added 2026-09-02) that parses a needing row's own url when it is a demosau.com wp-content PDF, since the house posts statement-bearing report PDFs it never lists / Essential's ONE living disclosure PDF shared by every covered wave and refreshed in place when re-uploaded — the only leg allowed to overwrite; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md; plus (2026-09-04) an accent-only ride-along inside redbridge-updater.sh — `extract-sampleeff.mjs accent` right after a changed:true extract, so the new wave's eff joins the same commit. Statement caches in .build/sampleeff-src/. Since commit 212282c (2026-09-04) extract-sampleeff.mjs also treats each statement's raw `Sample size` row as authoritative for the row's `sample`, re-parses the committed caches offline every run, and corrects stale press-rounded samples (first data pass 0a280d6 fixed 13 waves, including YouGov 2026-06-16 1500→1492). Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement, DemosAU 2026-01-06's release URL is a Capital Brief article page (no demosau.com PDF to fall back on). RECURRING REPAIR GAP (hit 2026-09-18, DemosAU 2026-09-14 wave): NO pipeline leg stamps releaseUrl — a CI wave-reconcile that adds methodUrl (commit 4bb73b7) arrives WITHOUT the companion releaseUrl, so the expanded poll regresses to a bare 'APC statement' row instead of the merged 'Pollster's release … (includes the wave's APC methodology statement)' row until releaseUrl = the same demosau.com PDF is hand-set on the row."
+description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Filing houses with a sampleEff leg: Newspoll, YouGov, Essential, DemosAU, and (from 2026-09-04) RedBridge/Accent — a fully OFFLINE leg reading the committed .build/redbridge-src caches, 8 waves stamped. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index — with a release-PDF fallback (added 2026-09-02) that parses a needing row's own url when it is a demosau.com wp-content PDF, since the house posts statement-bearing report PDFs it never lists / Essential's ONE living disclosure PDF shared by every covered wave and refreshed in place when re-uploaded — the only leg allowed to overwrite; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md; plus (2026-09-04) an accent-only ride-along inside redbridge-updater.sh — `extract-sampleeff.mjs accent` right after a changed:true extract, so the new wave's eff joins the same commit. Statement caches in .build/sampleeff-src/. Since commit 212282c (2026-09-04) extract-sampleeff.mjs also treats each statement's raw `Sample size` row as authoritative for the row's `sample`, re-parses the committed caches offline every run, and corrects stale press-rounded samples (first data pass 0a280d6 fixed 13 waves, including YouGov 2026-06-16 1500→1492). Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement, DemosAU 2026-01-06's release URL is a Capital Brief article page (no demosau.com PDF to fall back on). RECURRING REPAIR GAP (hit 2026-09-18, DemosAU 2026-09-14 wave): NO pipeline leg stamps releaseUrl — a CI wave-reconcile that adds methodUrl (commit 4bb73b7) arrives WITHOUT the companion releaseUrl, so the expanded poll regresses to a bare 'APC statement' row instead of the merged 'Pollster's release … (includes the wave's APC methodology statement)' row until releaseUrl = the same demosau.com PDF is hand-set on the row. TIMING-GAP TRIAGE (worked 2026-09-23, Newspoll 2026-09-17 wave, fix f7d6cfa): 'statement exists on pyxispolling.com/apc but the row is unstamped' is usually cadence, not breakage — Pyxis posted AFTER the week's Mon 07:15 CI sweep, so probe in order (sampleeff-src cache absent → statement date vs `git log -- .build/sampleeff-src/` runs → LIVE collection API not stale /apc HTML → slug regex match), then run `node .build/extract-sampleeff.mjs` DIRECTLY (wrapper aborts on sibling-session dirty tree), validate, build, commit owned paths."
 source: auto-skill
 extracted_at: '2026-09-04T01:05:29.530Z'
 ---
@@ -395,6 +395,55 @@ when the RedBridge/Accent leg landed, +7 for the DemosAU leg,
 resolve to one living URL);
 README data-fields bullet beside the
 `sampleEff` one.
+
+## Timing-gap triage — "statement exists on the house site, row still unstamped" (worked 2026-09-23)
+
+Report shape: "there's a methodology statement for the latest newspoll
+but it hasn't picked up on this. https://pyxispolling.com/apc/". The
+2026-09-17 Newspoll row had neither `methodUrl` nor `sampleEff` while
+the 21-September Pyxis statement was live. Root cause was NOT extractor
+breakage: Pyxis posted the statement AFTER the only two runs of that
+week (the Mon 07:15 CI sweep cee5e7a AND a manual 12:30 commit 6bf47a7),
+and the weekly cadence meant the row would have waited to the following
+Monday. Probe order that proves the pipeline is healthy in minutes:
+
+1. **Cache audit**: `ls .build/sampleeff-src/ | grep <wave-month>` —
+   no `newspoll-<ymd>.txt` cache = the pipeline never even downloaded
+   the statement, so this is a run-timing story, not a parse failure.
+2. **When did sampleeff last run?** `git log --oneline --
+   .build/sampleeff-src/` — compare the statement's publication day
+   against those commits' timestamps.
+3. **Probe the right endpoint**: NEVER fetch /apc as HTML — it is a
+   JS-rendered CloudCannon collection component whose static HTML
+   shows only one STALE cached item (Nov 2025 at the time of the
+   worked case); it under-reports current statements and sends you
+   looking for bugs that aren't there. The LIVE list is the collection
+   API (`/api.php/collection/6909661a09b83573fd004fe4/items?limit=200&order=columns.date_DESC`).
+   Hitting `cms.sitehub.io` directly returns
+   `{"error":"Full authentication is required"}` — always go through
+   the pyxispolling.com/api.php proxy.
+4. **Slug format check**: `pyxisStatements()` maps items via
+   `/^newspoll-(\d{1,2})-(\d{1,2})-(\d{4})$/` — a house-side slug
+   rename (e.g. "newspoll-march-2026") would silently skip the
+   statement; print `columns.slug` from the API response first. In the
+   worked case `newspoll-21-9-2026` matched fine.
+
+Fix once the statement is live in the API: run the extractor legs
+DIRECTLY (`node .build/extract-sampleeff.mjs`) rather than
+`sampleeff-updater.sh` when the working tree has sibling-session dirt —
+the wrapper hard-aborts on a dirty tree (`refusing to write & commit on
+a dirty base`), exactly the shared-repo state this session found. Then
+validate → build → commit ONLY the owned paths (`data/polls.json`,
+the new `.build/sampleeff-src/*.txt`, `index.html`, rebuilt
+`assets/` / `.build/newtracker/assets/` hashes) with the house message
+style `Update effective sample sizes <date>` and push. Worked outcome
+(commit f7d6cfa): the 2026-09-17 wave gained `sampleEff` 998 (raw
+1244 — Pyxis's own DEFF ≈ 1.25) + the `/api.php/images/document/28195281/…`
+statement PDF as `methodUrl`; validate kept the row consistent on the
+first pass (eff ≤ 1.05×raw guard). Status line
+`SAMPLEEFF_STATUS {"stamped":1,"methods":1,…}` confirms both fields
+landed; a `methods:1`-only run means the statement parsed with no eff
+figure (check the cached txt before believing a parse miss).
 
 ## Rules
 

@@ -1,0 +1,34 @@
+# Crosstabs catch-up. Every YouGov/News24, DemosAU, RedBridge and Resolve
+# update already reads its own wave's crosstabs into data/vote-switching.json
+# and data/demographics.json; this weekly sweep retries whatever those runs
+# left pending, and fails when a wave has stayed unread too long (see
+# .build/crosstabs-updater.sh). The wrapper no-ops when nothing changed.
+
+name: crosstabs-update
+
+on:
+  schedule:
+    - cron: '50 1 * * 3' # Wed 11:50 AEST / 12:50 AEDT – after YouGov's Tuesday release; no writer within 25 min
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: 'Force the update job to fail (tests the Matilda repair job)'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+# the ceiling for poll-agent.yml's update job: it may never ask for more
+permissions:
+  contents: write
+  actions: read # poll-agent's transient-streak check reads earlier runs
+
+jobs:
+  run:
+    uses: ./.github/workflows/poll-agent.yml
+    with:
+      house: crosstabs
+      wrapper: .build/crosstabs-updater.sh
+      apt_packages: poppler-utils
+      simulate_failure: ${{ inputs.simulate_failure }}
+    secrets: inherit

@@ -21,6 +21,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
 import { validate } from "./validate.mjs";
+import { shellCss, shellJs, shellDrift } from "../site-shell.mjs";
 
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -128,16 +129,12 @@ const FONTS = [
   { file: "crimsontext-italic-400-latin.woff2", family: "Crimson Text", style: "italic", weight: "400" },
   { file: "crimsontext-italic-600-latin.woff2", family: "Crimson Text", style: "italic", weight: "600" },
   { file: "crimsontext-italic-700-latin.woff2", family: "Crimson Text", style: "italic", weight: "700" },
-  /* Source Serif 4 sets the tab labels and the navbar's docked 2PP score
-     (--heads in template.html) - one variable cut (wght 200-900 + an
-     optical-size axis the browser steers by font-size). Preloaded - it
-     paints above the fold. */
-  { file: "sourceserif4-latin.woff2",           family: "Source Serif 4", style: "normal", weight: "200 900", preload: true },
+  /* Source Serif 4 retired Sep 2026: the tab labels and docked score set in
+     Crimson Text, the page's one serif. The source subset stays in fonts/. */
   { file: "ibmplexsans-latin.woff2",            family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
-  /* Source Sans 3 has two callers: the .wordmark lockup, which keeps its
-     pre-swap face, and the whole expanded poll breakdown (--panel), which
-     needs 400/500/600/700 - all inside this one variable cut. Neither paints
-     the first screen, so no preload. */
+  /* Source Sans 3 has one caller: the .wordmark lockup. It paints the first
+     screen, but the stack falls back to system sans in the moment before it
+     lands, which is cheaper than a preload. */
   { file: "sourcesans3-latin.woff2",            family: "Source Sans 3", style: "normal", weight: "400 800" },
   /* Archivo is retired: the expanded poll breakdown was its only consumer and
      that panel is now set in Source Sans 3 throughout. The source subset stays
@@ -314,8 +311,36 @@ function buildFavicon() {
   const side = Math.max(x1 - x0, y1 - y0);
   const vb = [ ((x0 + x1) / 2 - side / 2).toFixed(2), ((y0 + y1) / 2 - side / 2).toFixed(2),
                side.toFixed(2), side.toFixed(2) ].join(" ");
+  /* --- the same instrument again at masthead weight, for the satellites ---
+     /assets/masthead-dial.svg is the no-JS stand-in their lockup shows; the
+     spec below (written into auspol-now.json) is what site-shell.js draws
+     their live inline dial from – strokes as var()s off the same geometry,
+     so a satellite's glyph IS the masthead's, not a copy of it. */
+  const SETTLE_H = (MIN_H + MAX_H) / 2;
+  const mBars = glyph.map((p, i) => {
+    const a = BAR_ANGLES[i], s = polar(a, GC.r + 2), e = polar(a, GC.r + 2 + MAX_H);
+    return { id: p.id, x1: s.x, y1: s.y, x2: e.x, y2: e.y, h: +p.h.toFixed(2) };
+  });
+  const mArcL = arc(-90, 0), mArcR = arc(0, 90);
+  const leader = margin >= 0 ? "alp" : top.id;
+  const mastheadSpec = { vp: "0.58 0.07 38.39 26.73", cx: GC.cx, cy: GC.cy,
+                         arcL: mArcL, arcR: mArcR, right: top.id, leader,
+                         settle: SETTLE_H, max: MAX_H, nd: +needleDeg.toFixed(2), bars: mBars };
+  const INK3 = oklchHex(0.52, 0.010, 58);
+  const mastheadSvg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${mastheadSpec.vp}'>`
+    + `<path d='${mArcL}' fill='none' stroke='${PARTY_HEX.alp}' stroke-width='1.4' opacity='0.5'/>`
+    + `<path d='${mArcR}' fill='none' stroke='${PARTY_HEX[top.id]}' stroke-width='1.4' opacity='0.5'/>`
+    + mBars.map((b) => `<line x1='${b.x1}' y1='${b.y1}' x2='${b.x2}' y2='${b.y2}' stroke='${PARTY_HEX[b.id]}' stroke-width='3.4' stroke-linecap='butt' stroke-dasharray='${b.h} ${MAX_H}'/>`).join("")
+    + `<g transform='translate(${GC.cx}, ${GC.cy})'><g transform='rotate(${mastheadSpec.nd})'>`
+    + `<line x1='0' y1='0' x2='0' y2='-8.6' stroke='${PARTY_HEX[leader]}' stroke-width='1.7' stroke-linecap='round'/>`
+    + `<circle cx='0' cy='-8.6' r='1.9' fill='${PARTY_HEX[leader]}'/></g></g>`
+    + `<circle cx='${GC.cx}' cy='${GC.cy}' r='1.7' fill='${INK3}'/></svg>`;
+
   return { svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${vb}'>${parts.join("")}</svg>`,
-           note: `${glyph.map((p) => p.id + " " + p.v.toFixed(1)).join(", ")} · needle ${needleDeg.toFixed(1)}deg vs ${top.id}` };
+           note: `${glyph.map((p) => p.id + " " + p.v.toFixed(1)).join(", ")} · needle ${needleDeg.toFixed(1)}deg vs ${top.id}`,
+           masthead: { spec: mastheadSpec, svg: mastheadSvg },
+           // the dial's contest and figures: the satellites' header docks the same pair
+           score: { rival: top.id, a: +top.lab.toFixed(1), b: +top.opp.toFixed(1), basis: (rival === "onp" ? L.onImp?.a != null : S && S.alp != null) ? "imp" : "resp" } };
 }
 
 /* Pull the derived headline straight out of the dataset gen-data just wrote,
@@ -381,6 +406,53 @@ console.log(`  theme-color: ${THEME_LIGHT} light · ${THEME_DARK} dark (matches 
    masthead's current glyph. Stable unhashed name - the satellites' <link> is
    the point; a content hash would orphan them. */
 writeAtomic(path.join(ROOT, "assets", "favicon.svg"), fav.svg + "\n");
+/* The satellites' lockup glyph: the masthead dial itself at its own weight,
+   as a static stand-in for before JS draws the live one (the spec rides
+   auspol-now.json just below). Same unhashed-name contract as the favicon. */
+writeAtomic(path.join(ROOT, "assets", "masthead-dial.svg"), fav.masthead.svg + "\n");
+
+/* The shared chrome of the pages outside this build (.build/site-shell.mjs):
+   its stylesheet and script, the live figure its header docks, the dial the
+   lockup draws, and the tide band's two drawings, as files beside the
+   favicon – under assets/, which every updater commits, so the satellites
+   follow each build without being rewritten (a page the build rewrote would
+   leave the tree dirty: the updaters' commit lists name no satellite). The
+   figure is the favicon dial's own contest and basis, which are the main
+   page's. The band's drawings are lifted out of this template's --tile-art
+   data URIs, so the satellites close on exactly the main page's tide. */
+writeAtomic(path.join(ROOT, "assets", "site-shell.css"), shellCss());
+writeAtomic(path.join(ROOT, "assets", "site-shell.js"), shellJs());
+/* …and what the satellites' masthead and tab bar show beside it, off the same
+   dataset the main page's do: the "Last poll / Next election / Polls tracked"
+   meta, the tagline's count of past terms, and the houses' release rhythm the
+   bar's next-poll countdown projects from at view time (np-project.js, run by
+   site-shell.js), so the countdown stays right as a page ages between builds. */
+const shellNow = (() => {
+  const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const grab = (name) => {
+    const i = src.indexOf("const " + name + " = ");
+    if (i < 0) throw new Error("site shell: " + name + " not found in dataset");
+    return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
+  };
+  const L = grab("latest");
+  return { latest: { published: L.published, publishedISO: L.publishedISO, nextElectionDue: L.nextElectionDue,
+                     pollsTracked: L.pollsTracked, housesTracked: L.housesTracked },
+           past: pastCycleWord(), pollCadence: grab("pollCadence") };
+})();
+writeAtomic(path.join(ROOT, "assets", "auspol-now.json"), JSON.stringify({ ...fav.score, dial: fav.masthead.spec, ...shellNow }) + "\n");
+for (const [token, file] of [["--tile-art", "tile-art.svg"], ["--tile-art-dark", "tile-art-dark.svg"]]) {
+  const m = html.match(new RegExp(token + ':\\s*url\\("data:image\\/svg\\+xml,([^"]+)"\\)'));
+  if (m) writeAtomic(path.join(ROOT, "assets", file), decodeURIComponent(m[1]) + "\n");
+  else console.warn(`  site shell: ${token} not found in the template – the satellites' tide band keeps its last drawing`);
+}
+/* A satellite whose shell is out of step – the header or footer markup
+   changed here, or a page was edited by hand around it – is a warning, not
+   a failure: the page still works, and the fix is one command a person
+   commits (the build must not rewrite satellites itself, see above). */
+{
+  const drift = shellDrift();
+  if (drift.length) console.warn(`  site shell out of step on ${drift.join(", ")} – run node .build/site-shell.mjs and commit the pages`);
+}
 const favicon = encodeURIComponent(fav.svg);
 
 /* The raster copy Google Search needs, rasterised by render-favicon.mjs and
@@ -538,8 +610,8 @@ function buildStaticSummary() {
         minister and the undecided share stay as plain averages, the differences there being a
         matter of question wording rather than lean. Houses that publish no two-party
         figure feed the primary-vote and leadership series only. Each poll&#8217;s weight rests on
-        its published effective sample where the house files one &#8211; Newspoll, YouGov, Essential,
-        DemosAU, RedBridge/Accent and Fox &amp; Hedgehog do, via their Australian Polling Council
+        its published effective sample where the house publishes one &#8211; Newspoll, YouGov, Essential,
+        DemosAU, RedBridge/Accent, and Fox &amp; Hedgehog do, in their Australian Polling Council
         methodology statements &#8211; and on its raw sample otherwise.</p>
       <p>The headline carries a 95% interval &#8211; the greater of the spread among polls in the
         window and their sampling error &#8211; currently about &#177;${L.alp2ppCi95.toFixed(1)} points
@@ -575,10 +647,10 @@ function buildStaticSummary() {
       <h2>Sources</h2>
       <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
 
-      <p class="ss-note">auspol tracker is an unofficial aggregate of published federal opinion polling.
+      <p class="ss-note" data-nosnippet>auspol tracker is an unofficial aggregate of published federal opinion polling.
         Best efforts are made to make the aggregate figures transparent, trustworthy, statistically
         sound, and informative, but they are, in the end, estimates only. Federal polling archives
-        I&#8217;ve located are stored <a href="https://auspoltracker.com/archives">here</a> for
+        I&#8217;ve located are stored <a href="https://auspoltracker.com/archives/newspoll/">here</a> for
         safekeeping and convenience.</p>
     </article>`;
 }
@@ -657,13 +729,17 @@ const cl = grabLatest();
 const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, Coalition ${cl.lnp2pp.toFixed(1)} `
   + `two-party preferred${basisClause(cl)}, ±${cl.alp2ppCi95.toFixed(1)} points, updated ${cl.updated}, `
   + `with the trend since the 2025 election`;
-/* SERP + social description: the tagline phrasing leads, then the race and
-   provenance. Figures and their date share a sentence, so a stale cached
-   snippet stays self-dating. Reuses the same numbers as the card alt and
-   the summary below. */
-const metaDesc = `Aggregated opinion polling for the next Australian federal election, `
-  + `set against the last ${pastCycleWord()}. ${raceLine(cl)} two-party preferred${basisClause(cl)} (±${cl.alp2ppCi95}) `
-  + `– updated ${cl.updated} from ${cl.pollsTracked} published polls across ${cl.housesTracked} polling houses.`;
+/* SERP + social description. It opens with the site's name because Google
+   rewrites a snippet that doesn't match the query: on a search for "auspol
+   tracker" it skipped the old tagline-first description and quoted the
+   footer disclaimer, the one page line that began with the name. The date
+   leads the race sentence so a stale cached snippet stays self-dating even
+   after Google truncates it (~160 characters). Reuses the same numbers as
+   the card alt and the summary below. */
+const metaDesc = `auspol tracker averages every published Australian federal opinion poll. `
+  + `As of ${cl.updated}, ${raceLine(cl).replace(/^The /, "the ")} two-party preferred${basisClause(cl)} (±${cl.alp2ppCi95}), `
+  + `from ${cl.pollsTracked} polls by ${cl.housesTracked} pollsters. `
+  + `Primary votes, every poll, and the last ${pastCycleWord()} elections for comparison.`;
 
 /* Structured data. With no Wikipedia entry, Google's knowledge of the site
    (and its "About this result" source panel) is auto-derived from crawled
@@ -834,11 +910,11 @@ writeAtomic(path.join(ROOT, "feed.xml"), feed);
    changed, so anyone touching them bumps ARCHIVE_STAMP. /newspoll-archive/
    itself is only a redirect stub to /archives/newspoll/ and stays OUT of the
    sitemap (canonical entry points belong to the real pages). */
-const ARCHIVE_STAMP = "2026-09-18";
+const ARCHIVE_STAMP = "2026-09-24";
 /* prediction/ is not hand-maintained: it regenerates daily via
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
-const PREDICTION_STAMP = "2026-09-22";
+const PREDICTION_STAMP = "2026-09-25";
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -859,6 +935,10 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
   </url>
   <url>
     <loc>${SITE_URL}archives/galaxy/</loc>
+    <lastmod>${ARCHIVE_STAMP}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}archives/aeforecasts/</loc>
     <lastmod>${ARCHIVE_STAMP}</lastmod>
   </url>
   <url>

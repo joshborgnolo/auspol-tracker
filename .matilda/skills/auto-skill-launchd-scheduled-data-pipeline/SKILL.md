@@ -7,6 +7,21 @@ extracted_at: '2026-08-29T02:40:00.000Z'
 
 # Scheduling a data extractor on macOS launchd (auspol-tracker)
 
+> **2026-09-25 — the jobs run in their own clone, installed by a script.** The launchd
+> jobs no longer run in the main checkout: its uncommitted edits made the wrappers'
+> dirty-tree guard refuse 51 of ~148 local slots in Sep 2026, every Roy Morgan release
+> slot on 14 and 21 Sep among them. They run in
+> `~/Library/Application Support/auspol-agents/repo` (a clone nobody edits), whose
+> `.build/logs` is a symlink to the main checkout's — logs stay at `.build/logs/<name>.log`.
+> `run.sh` is now tracked as `.build/launchd/run.sh`, and
+> `bash .build/install-launchd.sh` (from the main checkout) installs or updates the clone,
+> node_modules, run.sh, the per-job shims and the plists, reloading changed jobs;
+> `--check` reports drift and changes nothing. Never hand-copy a plist or edit the
+> installed run.sh again — edit `.build/` and re-run the installer. In the clone,
+> `acquire_slot_lock` discards an interrupted run's uncommitted leftovers under the lock
+> (`AUSPOL_RUNNER_CLONE=1`, set by run.sh) instead of wedging on them. Consequence for
+> sessions: the laptop's commits reach this checkout only through `git pull`, like CI's.
+
 > 2026-08-31: Roy Morgan's primary scheduler moved to **GitHub Actions**
 > (`.github/workflows/roymorgan-update.yml`, commit `5bf7bc9` + Matilda repair job) so the laptop
 > can stay shut; its launchd plist remains as backup, reconciled by an ff-only guard the wrapper
@@ -158,19 +173,16 @@ into a false-green success, because the signature line dies as `log: command not
 - Always set `StandardOutPath`/`StandardErrorPath` to files inside the gitignored log dir —
   launchd swallows output otherwise, and the wrapper's own log only covers stages it reaches.
 
-## Install / reload (idempotent one-liner)
+## Install / reload
 
-```sh
-cp <repo>/.build/<label>.plist ~/Library/LaunchAgents/ \
-  && launchctl bootout "gui/$(id -u)/<label>" 2>/dev/null; \
-  launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/<label>.plist \
-  && launchctl print "gui/$(id -u)/<label>" | head -5
-```
-`bootout` on a not-loaded label errors (harmless, swallowed by 2>/dev/null); `bootstrap` is the
-modern `load`. Uninstall: `launchctl bootout gui/$(id -u)/<label> && rm ~/Library/LaunchAgents/<label>.plist`.
-A transient `srcdir != destdir` alert on the first `cp`+`bootstrap` cleared by `cp`-ing the plist
-to a temp filename inside `~/Library/LaunchAgents/` and `mv`-ing it to the final name before
-bootstrapping (observed on the Roy Morgan schedule edit, 2026-08-29).
+`bash .build/install-launchd.sh` (from the main checkout) — idempotent; it bootouts and
+bootstraps only the jobs whose plist changed, and `--check` lists drift without touching
+anything. Plists are compared semantically (plutil → JSON, keys sorted), so a plist
+reformatted by another tool is not drift. Uninstall one job:
+`launchctl bootout gui/$(id -u)/<label> && rm ~/Library/LaunchAgents/<label>.plist`.
+Historical note: a transient `srcdir != destdir` alert on a first `cp`+`bootstrap` cleared by
+copying the plist to a temp name inside `~/Library/LaunchAgents/` and `mv`-ing it into place
+(Roy Morgan schedule edit, 2026-08-29).
 
 ## Calibrating the schedule to the publisher's clock
 

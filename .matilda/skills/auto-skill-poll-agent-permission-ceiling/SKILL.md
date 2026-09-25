@@ -1,6 +1,6 @@
 ---
 name: poll-agent-permission-ceiling
-description: auspol-tracker — the eight poll-agent caller workflows must keep their top-level `permissions:` block in step with anything the reusable poll-agent.yml's jobs request (currently contents + pull-requests + issues, all write, on the PR-gated `repair` job). A one-sided widening breaks ALL EIGHT data pipelines at their next scheduled trigger with "Invalid workflow file" startup failures. Worked incident/fixes 0c3a2ba (2026-09-06).
+description: auspol-tracker — every poll-agent caller workflow (twelve since 2026-09-25, Roy Morgan's included) must keep its top-level `permissions:` block at least as wide as what the reusable poll-agent.yml's update job requests (currently contents write + actions read). A one-sided widening breaks EVERY data pipeline at its next scheduled trigger with "Invalid workflow file" startup failures. Pinned by .build/test-workflows.mjs. Worked incident/fixes 0c3a2ba (2026-09-06).
 source: auto-skill
 extracted_at: '2026-09-06T05:00:00.000Z'
 ---
@@ -38,29 +38,28 @@ then failed on its next schedule. Fixed in `0c3a2ba` by widening all 8 callers.
 
 ## The invariant to maintain
 
-`poll-agent.yml` currently declares per-job permissions on `repair`
-(~L139-142: `contents: write`, `pull-requests: write`, `issues: write` — the comment block
-explains each: push repair branch / open PR / breaker alert issues). Whenever ANY job in
-`poll-agent.yml` gains a new or widened scope, update the top-level `permissions:` block in
-ALL EIGHT callers in the same commit:
-
-```
-resolve-update.yml, spectre-update.yml, essential-update.yml, demosau-update.yml,
-redbridge-update.yml, newspoll-update.yml, foxhedgehog-update.yml, sampleeff-update.yml
-```
-
-Each caller's block currently reads:
+**Current state (2026-09-25).** `poll-agent.yml` has ONE job, `update` (the per-workflow
+repair jobs moved to agent-repair.yml on 2026-09-19). It declares:
 
 ```yaml
 permissions:
   contents: write
-  pull-requests: write
-  issues: write
+  actions: read # transient-streak.sh reads this workflow's earlier runs
 ```
 
-NOT affected: `roymorgan-update.yml`, `newspoll-watch.yml`, `prediction-refresh.yml`,
-`coverage-check.yml` — their repair jobs are INLINE (not called) and declare their own
-per-job permissions. poll-agent.yml itself needs no top-level widened block; only callers do.
+and every caller's top-level block reads the same:
+
+```yaml
+permissions:
+  contents: write
+  actions: read # poll-agent's transient-streak check reads earlier runs
+```
+
+The twelve callers: roymorgan, resolve, essential, redbridge, newspoll, news24, demosau,
+spectre, foxhedgehog, sampleeff, crosstabs (`<house>-update.yml`) and pollbludger-fallback.
+Whenever the update job gains or widens a scope, widen ALL callers in the same commit —
+`node .build/test-workflows.mjs` fails on any caller that grants less (a mutation check
+dropping one caller's `actions: read` names that file and the missing scope).
 
 ## Verifying a permissions edit (no js-yaml/pyyaml on this machine, but ruby works)
 
@@ -93,8 +92,8 @@ check whenever any workflow's permissions, repair-job scope, or script inventory
 
 ## Related
 
-- **ci-main-writer-races** — the other workflow-topology invariant (main-writers group +
-  push_main); adding a workflow means checking BOTH skills' membership rules.
+- **ci-main-writer-races** — the other workflow-topology invariant (per-workflow queues +
+  push_main); adding a workflow means checking BOTH skills' rules.
 - **launchd-scheduled-data-pipeline** — the launchd twins of these 8 pipelines; a CI
   permissions break is exactly when the local backup tier matters (they share wrappers, so
   startup-failing CI slots don't stop local jobs).

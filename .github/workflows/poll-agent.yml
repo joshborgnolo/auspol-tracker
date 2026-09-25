@@ -1,14 +1,29 @@
-# Reusable poll-agent pipeline — the Roy Morgan pattern (roymorgan-update.yml)
-# generalised. Each caller workflow supplies its own schedule and names the
-# wrapper to run; this file owns the update job (checkout -> wrapper, which
+# Reusable poll-agent pipeline. Every house's caller workflow (Roy Morgan's
+# included, since 2026-09-25) supplies its own schedule and names the wrapper
+# to run; this file owns the update job (checkout -> wrapper, which
 # extracts/validates/builds/commits/pushes). Repair of a failed run is
-# centralised in agent-repair.yml (workflow_run trigger), which boots headless
-# Matilda straight onto main — this file intentionally has no repair job.
+# centralised in agent-repair.yml (workflow_run trigger) — this file
+# intentionally has no repair job.
+#
+# Concurrency is PER HOUSE (writers-<house>), not one shared group. GitHub
+# keeps a single pending run per group and cancels the older one, so the
+# shared main-writers group (2026-09-04..25) threw away 29 scheduled runs in
+# three weeks — RedBridge's morning sweep on 7 of 11 days — whenever one long
+# holder had two runs waiting behind it. Within a house the newest pending
+# run does the same work as the one it replaced. Across houses nothing
+# queues: push_main (.build/git-push-main.sh) resolves the push race itself —
+# generated files are rebuilt rather than merged, and a data conflict re-runs
+# the wrapper once on the fresh base (.build/test-push-main.mjs pins it).
+#
+# Transient failures are not repair work. When the wrapper fails because the
+# pollster was down or walled, or because it lost a push race twice, the
+# updater step's .build/classify-failure.mjs verdict ends the run GREEN with a
+# warning; .build/transient-streak.sh turns it red only once the house has
+# failed that way for 12h+, and agent-repair takes it from there.
 #
 # The wrappers are idempotent no-ops when there's nothing new upstream, so
-# dense schedules are safe. All wrappers fast-forward to origin/main and skip
-# their slot if main moved underneath them, so the local launchd copies of the
-# same jobs can stay installed as backups.
+# dense schedules are safe. All wrappers fast-forward to origin/main first, so
+# the laptop's launchd copies of the same jobs can stay installed as backups.
 
 name: poll-agent (reusable)
 
@@ -36,20 +51,25 @@ on:
 
 jobs:
   update:
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: the label moves to Ubuntu 26 from
+    # 2026-10-19, and these jobs lean on the image's apt, poppler and
+    # /usr/bin/google-chrome. Move deliberately, all workflows at once.
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
-    # All push-capable workflows serialise on the shared main-writers group
-    # (see roymorgan-update.yml) so two writers never race main at once.
     concurrency:
-      group: main-writers
+      group: writers-${{ inputs.house }}
       cancel-in-progress: false
+    # Every caller's top-level `permissions:` must grant at least these —
+    # a reusable workflow can never exceed its caller, and a job that asks
+    # for more makes EVERY caller an invalid workflow (0c3a2ba).
     permissions:
       contents: write
+      actions: read # transient-streak.sh reads this workflow's earlier runs
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0 (node24; v6+ moves the persisted credential out of .git/config — see agent-repair.yml)
 
       - name: Pin Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -72,6 +92,7 @@ jobs:
               *[!a-zA-Z0-9.+=:~-]*|'') echo "::error::refusing apt package name: $pkg"; exit 1 ;;
             esac
           done
+          # shellcheck disable=SC2086 # split on purpose: one argument per package
           sudo apt-get update -qq && sudo apt-get install -y -qq $APT_PACKAGES
 
       - name: Install puppeteer-core (best effort, for the share-card redraw)
@@ -79,26 +100,54 @@ jobs:
         # repo node_modules. --ignore-scripts: nothing here needs postinstall.
         run: npm ci --ignore-scripts --no-audit --no-fund || true
 
+      # A transient verdict (see the header) exits 0 with `transient=true`;
+      # every other failure keeps the wrapper's own exit code.
       - name: Run the ${{ inputs.house }} updater
+        id: updater
         env:
           CHROME: /usr/bin/google-chrome
+          WRAPPER: ${{ inputs.wrapper }}
+          SIMULATE: ${{ inputs.simulate_failure }}
         run: |
-          if [ "${{ inputs.simulate_failure }}" = "true" ]; then
+          if [ "$SIMULATE" = "true" ]; then
             echo "simulate_failure requested; failing to exercise the repair job"
             exit 1
           fi
-          bash ${{ inputs.wrapper }}
+          # the wrappers stamp log lines with this same clock and format
+          since="$(date '+%Y-%m-%d %H:%M:%S')"
+          code=0
+          bash "$WRAPPER" || code=$?
+          [ "$code" -eq 0 ] && exit 0
+          # a classifier that breaks must not mask the wrapper's own exit code
+          verdict="$(node .build/classify-failure.mjs --exit "$code" --since "$since" || true)"
+          echo "$verdict"
+          case "$verdict" in
+            *'"class":"transient"'*)
+              echo "transient=true" >> "$GITHUB_OUTPUT"
+              exit 0 ;;
+          esac
+          exit "$code"
+
+      # Its name is load-bearing: transient-streak.sh finds earlier transient
+      # runs by this step having run green.
+      - name: Note a transient upstream failure
+        if: steps.updater.outputs.transient == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .build/transient-streak.sh
 
       # The wrappers send every step's output to .build/logs/<house>.log and
       # nothing to stdout, so a run used to be opaque in BOTH directions: a
       # failure's diagnosis died with the runner, and a green run never said
       # what it actually saw. .build/logs/ is gitignored, so anything matching
       # here was written by THIS run — no marker file needed. The step summary
-      # (what the notification email links to) is reserved for failures.
+      # (what the notification email links to) carries the tail for a failed
+      # or transient run only.
       - name: Show the updater log
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
+          TRANSIENT: ${{ steps.updater.outputs.transient }}
         run: |
           shopt -s nullglob
           logs=(.build/logs/*.log)
@@ -110,7 +159,7 @@ jobs:
             echo "::group::$f (last 200 lines)"
             tail -n 200 "$f"
             echo "::endgroup::"
-            if [ "$JOB_STATUS" = "failure" ]; then
+            if [ "$JOB_STATUS" = "failure" ] || [ "$TRANSIENT" = "true" ]; then
               {
                 echo "### $f (tail)"
                 echo '```'

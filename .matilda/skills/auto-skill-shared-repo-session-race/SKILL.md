@@ -882,3 +882,34 @@ coherent + your tree sits on top → in-place rebuild + marker-greps
 isolation machinery above (worktree, private index, snapshot-restore).
 Upstream work is INSIDE your staged/staged-over state → the
 private-GIT_INDEX_FILE section.
+
+## Sibling sweep absorbs YOUR REBUILT ARTIFACT mid-flight (2026-09-23, house-credit-lists)
+
+New manifestation of the classic sweep, one step subtler than the 2026-09-03
+"Sibling REBUILD inlines your uncommitted source" variant: there, THEIR build
+compiled my source into their artifact. Here, MY OWN rebuilt `index.html` +
+data asset were sitting in the tree mid-task (built by me, not yet committed)
+when the sibling's feature commit `a2710b3` ran its `git add -A`-style sweep —
+so their commit shipped my FIX while my gen-data.mjs SOURCE stayed uncommitted
+in the shared tree. HEAD/src and HEAD/artifact disagree: a rebuild from HEAD
+alone would REVERT the live fix.
+
+Detection probes (cheap, run them before concluding a commit "should" be
+uncommitted):
+
+```bash
+git show HEAD:index.html | grep -o 'const directionHouses = \[[^]]*\]'  # fix IS in artifact
+git show HEAD:.build/newtracker/gen-data.mjs | grep -c creditHouses     # 0 => NOT in source
+git status --short -- <built-artifact paths>                            # clean (swept)
+```
+
+Response is the reconciliation move already established for the foreign-
+absorption family: never rewrite/rebase-split their (pushed) commit — commit
+the SOURCE file separately, exact pathspec only, so HEAD reaches
+source-matches-build. Whole-file `git add <source>` also swept in some prior
+in-flight gen-data edits (they belonged to the sibling's own just-shipped
+feature family, so entangled-but-coherent was acceptable; hunk-splitting a
+live session's leftovers is worse). Report: the fix was live on `origin/main`
+BEFORE its source commit existed; the local source commit (`8d1cc7e`) only
+reconciles the repo — remember to say so, because pushing it changes nothing
+visible.

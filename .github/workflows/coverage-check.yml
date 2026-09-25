@@ -29,7 +29,7 @@ on:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       issues: write   # class-3 (provisionally covered) ci-alert issues
@@ -37,9 +37,9 @@ jobs:
     outputs:
       verdict: ${{ steps.doctor.outputs.verdict }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: Pin Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: .nvmrc
 
@@ -99,16 +99,18 @@ jobs:
   #             operation; 60h tolerates one fully missed day plus jitter.
   # Goes red independently, like thinness; a failed job emails. Deliberately
   # no repair agent — a dead-writers signal is not a worklist of waves, and
-  # the honest fix is usually the workflow or the lock, not data.
+  # the honest fix is usually the workflow or the lock, not data. (Enforced
+  # in agent-repair.yml's gate, which since 2026-09-25 hands only a failed
+  # check or thinness job to an agent.)
   heartbeat:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 100 # the commit scan has to see past a few quiet days
       - name: Pin Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: .nvmrc
 
@@ -121,14 +123,33 @@ jobs:
   # Separate job, not another step: a missed wave and a thin wave are different
   # failures and must be able to go red independently of each other.
   thinness:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: Pin Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: .nvmrc
 
       - name: Check landed waves for missing derived rows
         run: node .build/check-poll-thinness.mjs
+
+  # Once a day, close the ci-alert issues whose workflow has run green since
+  # they were last updated (.build/resolve-alerts.sh) — before Sep 2026
+  # nothing ever closed one, so open alerts stopped meaning anything. Never
+  # red: a hiccup here must not page anyone (and agent-repair's gate treats
+  # only the check/thinness jobs as repair work anyway).
+  alerts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read  # each workflow's newest run
+      issues: write  # close the resolved ones
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - name: Close alerts whose workflow has run green since
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .build/resolve-alerts.sh || echo "::warning::resolve-alerts.sh failed; alerts left as they were"

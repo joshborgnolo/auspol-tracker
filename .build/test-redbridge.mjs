@@ -55,6 +55,12 @@ assert.deepEqual(w.tppSplitOn, { lnp: 44, grn: 91, oth: 61 });
     `implied ALP-vs-ON ${implied.toFixed(2)} vs printed ${w.tppVsOn}`);
 }
 
+// vote-softness table: the wave's own row, [solid, soft, very soft]
+assert.deepEqual(w.firmness, {
+  all: [49, 42, 9], alp: [51, 40, 9], lnp: [47, 44, 9],
+  onp: [59, 36, 5], grn: [39, 52, 9], oth: [32, 46, 22],
+});
+
 // PPM (Albanese 32, Taylor 15, Hanson 24)
 assert.deepEqual(w.ppm, { alb: 32, opp: 15, han: 24 });
 assert.equal(w.oppName, "Taylor");

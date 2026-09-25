@@ -311,6 +311,21 @@ function Header({ isDark, onToggleTheme }) {
      the app is hidden the dot hides with it, so the way back is a pill
      portaled onto <body> - createPortal, not a second mount point. */
   const [staticView, setStaticView] = useState(false);
+  /* the colophon's "plain text version" link opens the same view; the
+     freshness dot used to be its only door - a 7px target, and on phones a
+     click-only span inside an aria-hidden block */
+  useEffect(() => { window.AP.openStatic = () => setStaticView(true); }, []);
+  /* A satellite page's lockup links here: /#story opens the dial's story
+     exactly as the masthead's own click would. The hash comes off the
+     address straight away (no extra history entry) so the address reads
+     clean and the nav's own hash grammar never sees it. Checked on mount
+     only - the links all live off this page, so every arrival is one. */
+  useEffect(() => {
+    if (window.location.hash === "#story") {
+      openStory();
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }, []);
   useEffect(() => {
     document.body.classList.toggle("ss-view", staticView);
     /* mount marks the article inert so nothing inside it can take focus or a
@@ -337,11 +352,16 @@ function Header({ isDark, onToggleTheme }) {
     <header className="site-head">
       <div className="brand">
         <h1 className="wordmark stacked">
+          {/* The button takes its NAME from the wordmark and describes its
+              action separately. An aria-label here used to replace the
+              wordmark, so the page's h1 was announced as "Wind the dial
+              back: replay the term…" and the site's name was never read. */}
           <button className="wm-glyph" onClick={openStory}
                   title="Wind the dial back through the term"
-                  aria-label="Wind the dial back: replay the term on the masthead dial">
+                  aria-describedby="wm-action">
             <span className="wm-textcol">
               <span className="wm-name" ref={wmName}>auspol</span>
+              <span className="sr-only"> </span>
               <span className="wm-track" ref={wmTrack}>tracker</span>
             </span>
             {/* 57px sizes the ink to 74% of the wordmark's height, the
@@ -352,11 +372,12 @@ function Header({ isDark, onToggleTheme }) {
             <GlyphDial className="wm-dial" svgRef={glyphRef} width="57" height="39.7" />
           </button>
           <span className="wm-sr">– Australian federal polling</span>
+          <span id="wm-action" hidden>Replays the term on the masthead dial</span>
         </h1>
         <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the last {pastWord}.</p>
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot fresh-toggle " + fresh.state}
-                onClick={() => setStaticView(true)}></span>
+                onClick={() => setStaticView(true)}></span>{" "}
           Updated {D.latest.published} · {D.latest.pollsTracked} polls
         </div>
       </div>
@@ -366,7 +387,7 @@ function Header({ isDark, onToggleTheme }) {
             <span className="meta-k">Last poll</span>
             <span className="meta-v">
               <button type="button" className={"fresh-dot fresh-toggle " + fresh.state}
-                      onClick={() => setStaticView(true)}
+                      onClick={() => setStaticView(true)} tabIndex={-1}
                       aria-label="Read this page as a plain, static article"
                       title="Read this page as a plain, static article"></button>
               {D.latest.published}
@@ -690,13 +711,16 @@ function HeroGauge({ a, ci, color, aName, bName, sepRef }) {
   const overA = dev + ci > HG_DOM;
   const overB = dev - ci < -HG_DOM;
   const lo = (a - ci).toFixed(1), hi = (a + ci).toFixed(1);
+  const say = `${aName} ${a.toFixed(1)} per cent two-party preferred, 95% interval ${lo} to ${hi}. `
+    + `A tie is 50. ${(a - ci > 50 || a + ci < 50)
+         ? "The interval does not include a tie."
+         : "The interval includes a tie."}`;
   return (
-    <div className="hero-gauge" role="img" ref={wrapRef}
+    /* title as well as aria-label: the track is unlabelled by design, so a
+       sighted reader pointing at it gets the same sentence a screen reader does */
+    <div className="hero-gauge" role="img" ref={wrapRef} title={say.replace(" per cent", "%")}
          style={box ? { width: box.w + "px", marginLeft: box.ml + "px", maxWidth: "none" } : undefined}
-         aria-label={`${aName} ${a.toFixed(1)} per cent two-party preferred, 95% interval ${lo} to ${hi}. `
-                     + `A tie is 50. ${(a - ci > 50 || a + ci < 50)
-                          ? "The interval does not include a tie."
-                          : "The interval includes a tie."}`}>
+         aria-label={say}>
       <div className="hg-track">
         {[-6, -4, -2, 2, 4, 6].map((t) => (
           <span key={t} className="hg-grad" style={{ left: pos(t) + "%" }} />
@@ -1091,8 +1115,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   // really noise. Where the series is too thin to weight, plot the readings
   // only and let the reader see the scatter for what it is.
   const heroSeries = !adjusted ? [] : [
-    { id: "a", label: m.a.name, color: colA, points: series(drawPts, "a"), width: 3.6 },
-    { id: "b", label: m.b.name, color: colB, points: series(drawPts, "b"), width: 3.6 },
+    { id: "a", label: m.a.name, color: colA, points: series(drawPts, "a"), width: 3.6, endLabel: m.a.abbr },
+    { id: "b", label: m.b.name, color: colB, points: series(drawPts, "b"), width: 3.6, endLabel: m.b.abbr },
   ];
   /* The compare overlay is the OTHER basis: by default (implied) the dashed
      line is the published-basis aggregate, gen-data's agg2pp; on the
@@ -1433,8 +1457,13 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
           <div className="hero-sub" ref={subRef}>
             <Delta value={monthDelta} suffix={Math.abs(monthDelta) === 1 ? " pt" : " pts"} small roll spinIn />
             <span className="hero-sub-note" ref={subNoteRef}>
-              {(m.real || (onImpL && onImpL.aPrev != null) || (altL && altL.aPrev != null))
-                ? "vs 1 month ago" : "vs previous reading"}
+              {/* the reference is a term: the ▲▼ figures across the page
+                  measure against three different things, and this opens the
+                  entry that says which is which */}
+              vs{" "}<button type="button" className="hi-term"
+                onClick={() => window.AP.openTerm && window.AP.openTerm("changes", "two-party preferred")}>
+                {(m.real || (onImpL && onImpL.aPrev != null) || (altL && altL.aPrev != null))
+                  ? "1 month ago" : "previous reading"}</button>
               {/* A month-on-month move smaller than its own interval is not a
                   finding. Say so next to the arrow, not three scrolls down -
                   and let the margin the caveat invokes carry the reader to its
@@ -1606,6 +1635,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
             </span>
           )}
         </div>
+        {/* the gist under the chart; the shading and what an overlap means
+            fold behind the same "How to read this chart" as every panel */}
         <p className="hero-caption">
           {m.real
             ? (<>{impBasis
@@ -1616,21 +1647,20 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
                        onClick={() => window.AP.openTerm &&
                          window.AP.openTerm("dots-past-the-line", "two-party preferred")}>
                  smoothed average</button>
-               {impBasis ? " of those implied figures" : " across all pollsters"},
-               {" "}shaded with the interval around it. Where the two
-               bands overlap, the lead is inside its own margin of error – the polls cannot
-               separate the parties that month.</>)
+               {impBasis ? " of those implied figures." : " across all pollsters."}</>)
             : impOnBasis
-              ? ("Each dot is one poll’s primaries re-allocated at the site’s fixed ALP–ON flow set; " +
-                 "the line is a smoothed average of those implied figures, shaded with the flow " +
-                 "table’s own range. No election has counted this pairing, so the set is calibrated " +
-                 "from preference counts, not anchored to a result.")
+              ? "Each dot is one poll’s primaries re-allocated at the site’s fixed ALP–ON flow set; the line is a smoothed average of those implied figures."
               : `Each dot is one pollster’s published ${m.label} head-to-head` +
               (adjusted
                 ? ", adjusted for each house’s lean on this matchup as the headline two-party is."
                 : ", averaged monthly – too few houses ask it to weight or correct.") +
               (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : "")}
         </p>
+        {(m.real || impOnBasis) && <HowTo cls="hero-caption" paras={m.real
+          ? [<>The shading is the interval around the line. Where the two bands overlap, the lead
+             is inside its own margin of error – the polls cannot separate the parties that month.</>]
+          : [<>The shading is the flow table’s own range. No election has counted this pairing, so
+             the set is calibrated from preference counts, not anchored to a result.</>]} />}
       </div>
       {/* the compare switch's ONE home - under the chart legend, next to the
           lines it annotates, at every width */}
@@ -1674,7 +1704,7 @@ function MethodNote({ onInfo }) {
             does not claim. Right: every way out of the page. Each column is a
             statement over its own quieter footnote, which is why they balance
             at four lines apiece without either being padded to fit. */}
-        <div className="colo-about">
+        <div className="colo-about" data-nosnippet="">
           <p className="colo-lede">
             auspol tracker is an unofficial aggregate of published federal opinion polling.
           </p>
@@ -1692,9 +1722,8 @@ function MethodNote({ onInfo }) {
           <p className="fb-lede">
             {onInfo && (
               <>
-                See{" "}
-                <button type="button" className="hi-term" onClick={onInfo}>Info</button>
-                {" "}for more info.{" "}
+                How the figures are built is in{" "}
+                <button type="button" className="hi-term" onClick={onInfo}>Info</button>.{" "}
               </>
             )}
             Spot an error, a missing poll, or have any other feedback? Please{" "}
@@ -1702,10 +1731,15 @@ function MethodNote({ onInfo }) {
           </p>
           <p className="colo-arch">
             Federal polling archives I’ve located are stored{" "}
-            <a className="colo-link" href="https://auspoltracker.com/archives">
+            <a className="colo-link" href="/archives/newspoll/">
               here<span className="plink-mark" aria-hidden="true">↗</span>
             </a>{" "}
             for safekeeping and convenience.
+          </p>
+          <p className="colo-arch">
+            <button type="button" className="hi-term colo-plain"
+                    onClick={() => window.AP.openStatic && window.AP.openStatic()}>Read this page as plain text</button>
+            {" "}– every figure and the method, without charts.
           </p>
         </div>
       </div>
@@ -1722,7 +1756,9 @@ let chromeSettled = false;
 
 const TABS = [
   { id: "snapshot", label: "Snapshot" },
-  { id: "cycles", label: "Past cycles" },
+  /* short: the docked phone bar's label, which buys the room to keep Info
+     and to name the parties beside the docked score */
+  { id: "cycles", label: "Past cycles", short: "Cycles" },
   { id: "allpolls", label: "All polls" },
   /* pinHide: the docked 2PP score takes this end of the bar once the bar
      pins AND the hero 2PP has scrolled off (.show-score), and on a phone
@@ -1746,13 +1782,22 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
       <PrimaryVotePanel rangeId={rangeId} />
       <PollsterTable tppBasis={tppBasis} setTppBasis={setTppBasis}
                      tppMatchup={tppMatchup} setTppMatchup={setTppMatchup} />
+      {/* when the next ones land, straight after the latest ones - it sat
+          between National direction and the vote-by-group analysis, a
+          schedule in the middle of the reading */}
+      <NextPollsPanel />
       <LeadershipSection rangeId={rangeId} />
       <DirectionPanel rangeId={rangeId} />
-      <NextPollsPanel />
-      {/* the one panel below the what's-next list: it answers a question
-          about the electorate's mood rather than its party choice, so it
-          keeps company with direction - just the far side of the release
-          schedule */}
+      {/* who votes for whom: age, gender, education, place, and home */}
+      <DemographicsPanel rangeId={rangeId} />
+      {/* who One Nation's surge is made of */}
+      <OnSourcesPanel rangeId={rangeId} />
+      {/* what voters say matters, and which party they trust with it -
+          the reasons behind the vote, before the page turns to those who
+          haven't settled on one */}
+      <IssuesPanel rangeId={rangeId} />
+      {/* closes the page: the electorate's mood rather than its party
+          choice - how many can't say who they would vote for */}
       <UndecidedPanel rangeId={rangeId} />
     </>
   );
@@ -1854,6 +1899,7 @@ function App() {
   const [tab, setTab] = useState(readHash);
   const [focusPoll, setFocusPoll] = useState(null);   // the poll a chart dot sent us to
   const [focusTerm, setFocusTerm] = useState(null);   // the glossary entry a link sent us to
+  const [termPop, setTermPop] = useState(null);       // a definition open over the page
   React.useEffect(() => {
     const fn = () => setTab(readHash());
     window.addEventListener("hashchange", fn);
@@ -1906,12 +1952,21 @@ function App() {
        that explains a word it just used - the hero's method label is the first
        - and `from` names the place being left in the words the return button
        will use, so the way back can say where it goes rather than guessing. */
-    window.AP.openTerm = (id, from) => {
+    const openTermPage = (id, from) => {
       if (!id) return;
+      setTermPop(null);
       setFocusTerm({ id, back: { tab: readHash(), y: window.scrollY, from: from || "where you were" } });
       setTab("info");
       if (readHash() !== "info") window.location.hash = "info";
     };
+    /* Away from Info a term opens in place (TermPop); on Info itself it is a
+       cross-reference, and the page scroll it has always been is right. */
+    window.AP.openTerm = (id, from) => {
+      if (!id) return;
+      if (readHash() === "info") openTermPage(id, from);
+      else setTermPop({ id, from });
+    };
+    window.AP.openTermPage = openTermPage;
     /* The navbar "Next" label jumps straight to the NextPollsPanel on the
        snapshot. Same-tab scrolls happen in place; a cross-tab trip has to
        wait for the snapshot view to mount, so the scroll is parked for the
@@ -1922,8 +1977,22 @@ function App() {
       setTab("snapshot");
       window.location.hash = "snapshot";
     };
-    return () => { delete window.AP.openPoll; delete window.AP.openTerm;
-                   delete window.AP.gotoNextPolls; };
+    /* Info's "How the final polls did" mention, as a real link: to Past
+       cycles, then down to the panel once the view (and its lazily fetched
+       source rows) has mounted it. */
+    window.AP.gotoFinalPolls = () => {
+      setTab("cycles");
+      if (readHash() !== "cycles") window.location.hash = "cycles";
+      let tries = 0;
+      const seek = () => {
+        const el = document.getElementById("final-polls");
+        if (el) { el.scrollIntoView({ block: "start" }); return; }
+        if (++tries < 40) setTimeout(seek, 75);
+      };
+      setTimeout(seek, 0);
+    };
+    return () => { delete window.AP.openPoll; delete window.AP.openTerm; delete window.AP.openTermPage;
+                   delete window.AP.gotoNextPolls; delete window.AP.gotoFinalPolls; };
   }, []);
   /* The return trip puts the reader back on the pixel they left from. The
      scroll is handed to a layout effect rather than to requestAnimationFrame:
@@ -2020,9 +2089,17 @@ function App() {
 
   return (
     <div className="page">
+      {/* Twelve tab stops (masthead, theme, the next-poll links, the docked
+          score) sit ahead of the content. Not an href="#…": the hash is the
+          tab router, so the link moves focus itself. */}
+      <a className="skip-link" href="#" onClick={(e) => {
+        e.preventDefault();
+        const m = document.getElementById("main-content");
+        if (m) { m.focus({ preventScroll: true }); m.scrollIntoView({ block: "start" }); }
+      }}>Skip to content</a>
       <Header isDark={isDark} onToggleTheme={cycleTheme} />
       <Tabs tabs={TABS} active={tab} onChange={goTab} tppMatchup={tppMatchup} tppBasis={tppBasis} />
-      <main className="content">
+      <main className="content" id="main-content" tabIndex={-1}>
         {/* The panel the tab strip points at. There was no role="tabpanel" on
             the page at all, so aria-controls had no target and a screen reader
             that moved to the "tab panel" landed nowhere. tabIndex=0 makes the
@@ -2041,6 +2118,8 @@ function App() {
             {tab === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
               backLabel={focusPoll && focusPoll.back ? focusPoll.back.from : null}
               tppBasis={tppBasis} setTppBasis={setTppBasis} />}
+            {termPop && <TermPop id={termPop.id} onClose={() => setTermPop(null)}
+              onMore={() => window.AP.openTermPage(termPop.id, termPop.from)} />}
             {tab === "info" && <InfoView focus={focusTerm ? focusTerm.id : null}
               onBack={focusTerm ? backFromTerm : null}
               backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}

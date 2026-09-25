@@ -1,6 +1,6 @@
 #!/bin/bash
 # Scheduled DemosAU federal-poll update: extract -> if polls.json changed ->
-# validate -> render-card -> build -> commit -> push. Installed via launchd
+# crosstabs -> validate -> render-card -> build -> commit -> push. Installed via launchd
 # (plist copied to ~/Library/LaunchAgents/local.auspol.demosau.plist from
 # the copy in this directory). Every step logs one line to
 # .build/logs/demosau.log; any
@@ -74,6 +74,7 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
       exit 1
     fi
     git add data/polls.json index.html assets/ feed.xml sitemap.xml robots.txt || true
+    stage_dataset
     SKIP_YM="$(git diff --cached -U0 data/polls.json | grep -o '+ *"20[0-9-]*"' | tr -d '+ " ' | head -1)"
     MSG="Confirm skipped DemosAU slot month $SKIP_YM"
     if git diff --cached --quiet; then
@@ -94,6 +95,10 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
 fi
 
 log "new DemosAU wave(s) detected; running validate/build/commit/push"
+# The wave's crosstabs join data/vote-switching.json and
+# data/demographics.json in this same commit (non-fatal; see
+# refresh_crosstabs in git-push-main.sh).
+refresh_crosstabs vote-switching demographics
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
@@ -105,13 +110,13 @@ if ! refresh_site; then
   exit 1
 fi
 
-git add data/polls.json .build/demosau-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
+git add data/polls.json data/vote-switching.json data/demographics.json .build/demosau-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
 MSG="Update DemosAU poll data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! push_main "$MSG" data/polls.json .build/demosau-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
+if ! push_main "$MSG" data/polls.json data/vote-switching.json data/demographics.json .build/demosau-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"

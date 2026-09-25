@@ -1,6 +1,6 @@
 ---
 name: auspol-disclaimer-copy
-description: auspol-tracker — the footer estimates-only disclaimer is a SECOND two-homes copy pair (MethodNote .disclaimer JSX in the 73de0c58 asset + <p class="ss-note"> in build.mjs buildStaticSummary) — edit both together; per-home apostrophe style (literal curly vs &#8217; entity); line-wrapped source breaks naive one-space greps. Learned 2026-09-03 (commit 8ef7495).
+description: auspol-tracker — the footer estimates-only disclaimer is a SECOND two-homes copy pair (MethodNote .disclaimer JSX in the 73de0c58 asset + <p class="ss-note"> in build.mjs buildStaticSummary) — edit both together; per-home apostrophe style (literal curly vs &#8217; entity); line-wrapped source breaks naive one-space greps. Learned 2026-09-03 (commit 8ef7495). UPDATE 2026-09-24: a THIRD home – shellFooter's sh-disc in .build/site-shell.mjs, the satellites' shared colophon (copied into each satellite's <!--shell:footer--> region by node .build/site-shell.mjs; never hand-edit the pages).
 source: auto-skill
 extracted_at: '2026-09-03T01:30:00.000Z'
 ---
@@ -12,6 +12,13 @@ an unofficial aggregate …", shipped `8ef7495`). The user skill
 **auspol-copy-two-homes** maps the METHODOLOGY-prose pair; this is a SECOND,
 separate pair it doesn't cover. Rule 4 of MATILDA.md applies: copy edits
 move in both homes or not at all.
+
+## UPDATE 2026-09-24 – a third home
+
+The satellites now close on the main page's colophon, disclaimer included, from
+`shellFooter` in `.build/site-shell.mjs` (class `sh-disc`, literal curly apostrophes,
+Oxford comma as the main page). Edit it with the other two, run
+`node .build/site-shell.mjs`, and commit the rewritten satellite pages with them.
 
 ## The two homes
 

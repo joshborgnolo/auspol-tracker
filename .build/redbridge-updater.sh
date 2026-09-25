@@ -1,7 +1,7 @@
 #!/bin/bash
 # Scheduled RedBridge/Accent federal-poll update: extract -> if polls.json
 # changed -> stamp the wave's sampleEff/methodUrl off the fresh redbridge-src
-# caches (extract-sampleeff.mjs accent, offline) -> validate -> render-card ->
+# caches (extract-sampleeff.mjs accent, offline) -> crosstabs -> validate -> render-card ->
 # build -> commit -> push. Installed via launchd
 # (plist copied to ~/Library/LaunchAgents/local.auspol.redbridge.plist from
 # the copy in this directory). Every step logs one line to
@@ -74,6 +74,10 @@ case "$SE_LAST" in
   *) log "FAIL sampleeff-accent (no SAMPLEEFF_STATUS line): $SE_LAST"; exit 1 ;;
 esac
 
+# The report's first-preference table by group joins data/demographics.json,
+# and its issue tables data/issues.json, in this same commit (non-fatal; see refresh_crosstabs in git-push-main.sh).
+refresh_crosstabs demographics issues
+
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
@@ -85,13 +89,13 @@ if ! refresh_site; then
   exit 1
 fi
 
-git add data/polls.json .build/redbridge-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
+git add data/polls.json data/demographics.json data/issues.json .build/redbridge-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
 MSG="Update RedBridge/Accent poll data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! push_main "$MSG" data/polls.json .build/redbridge-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
+if ! push_main "$MSG" data/polls.json data/demographics.json data/issues.json .build/redbridge-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"

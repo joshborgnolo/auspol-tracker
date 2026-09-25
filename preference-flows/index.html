@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The two-party figure, two ways · auspol tracker</title>
 <!-- Standalone explainer page, hand-maintained outside the .build/newtracker
-     pipeline; chrome follows the satellite recipe (no masthead, 680px column,
-     Crimson Text headings over IBM Plex Sans body, ss-note footer, fixed
-     .ss-back pill home) and the layout/figure idiom is cloned from the 2025
+     pipeline; chrome follows the satellite recipe (680px column, Crimson Text headings over IBM Plex
+     Sans body, under the site's shared header and footer from .build/site-shell.mjs) and the layout/figure idiom is cloned from the 2025
      ALP–ON flows analysis page. Linked from the "?" beside the hero's
      "Using implied preference flows (default)" toggle (shipped 2026-09-18,
      basis system 6cdfa7e). The numbers quoted are the site's SHIPPED
@@ -80,7 +79,7 @@
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.sh-light) {
     --bg:        oklch(0.205 0.010 65);
     --ink:       oklch(0.940 0.008 80);
     --ink-2:     oklch(0.800 0.009 78);
@@ -140,12 +139,14 @@ body {
    their own — without one they render in the browser's blue, and there is no
    blue anywhere else on this page. A tinted underline rather than a colour
    alone: these sit inside running prose and must not shout over it. */
+/* Sep 2026: ink with an underline, as links are on the tracker itself - the
+   teal made this the one page whose links were a different colour. */
 main p a, main li a, main td a, main caption a {
-  color: var(--accent); text-decoration: none;
-  border-bottom: 1px solid color-mix(in oklch, var(--accent) 34%, transparent);
+  color: var(--ink-2); text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent);
 }
 main p a:hover, main li a:hover, main td a:hover, main caption a:hover,
-main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--accent); }
+main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
 /* The footer list keeps the quiet .ss-note ink and earns its underline
    outright — a citation nobody can see is the problem this set out to fix. */
 .ss-src { margin: 8px 0 0; padding: 0 0 0 18px; list-style: disc; }
@@ -238,20 +239,73 @@ main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--acc
   overflow-x: auto; white-space: pre;
 }
 
-/* ------- back to the interactive tracker (the static page's .ss-back pill) */
-.ss-back {
-  position: fixed; right: 18px; bottom: 18px; z-index: 300;
-  display: inline-block;
-  padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line);
-  background: var(--bg); color: var(--ink); font-size: 13px;
-  font-weight: 600; text-decoration: none; cursor: pointer;
-  box-shadow: 0 3px 16px oklch(0 0 0 / 0.16);
-}
-.ss-back:hover { border-color: var(--ink-3); }
 </style>
+<!--shell:head-->
+<link rel="preload" href="/assets/fonts/ibmplexsans-latin.056e4e24.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/sourcesans3-latin.ac057a55.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site-shell.css">
+<script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
+<style>
+/* this page's dark-mode rules, for a reader who chose dark on a light device */
+:root.sh-dark { --bg: oklch(0.205 0.010 65); --ink: oklch(0.940 0.008 80); --ink-2: oklch(0.800 0.009 78); --ink-3: oklch(0.670 0.009 72); --ink-faint: oklch(0.545 0.009 68); --line: oklch(0.355 0.011 66); --line-2: oklch(0.312 0.010 66); --accent: oklch(0.70 0.080 205); }
+</style>
+<!--/shell:head-->
 </head>
 <body>
-<main class="frame-wrap">
+<!--shell:header-->
+<a class="sh-skip" href="#sh-content">Skip to content</a>
+<div class="sh-frame sh-top">
+  <header class="sh-head">
+    <div class="sh-brand">
+    <div class="wordmark stacked">
+      <a class="wm-glyph" href="/#story" title="Wind the dial back through the term" aria-describedby="wm-action">
+        <span class="wm-textcol">
+          <span class="wm-name">auspol</span>
+          <span class="sr-only"> </span>
+          <span class="wm-track">tracker</span>
+        </span>
+        <img class="wm-dial-img" src="/assets/masthead-dial.svg" alt="" width="57" height="39.7">
+      </a>
+      <span class="wm-sr">– Australian federal polling</span>
+      <span id="wm-action" hidden>Replays the term on the masthead dial</span>
+    </div>
+    <p class="sh-tagline">Aggregated opinion polling for the next Australian <br class="sh-tagline-br">federal election, set against the last <span class="sh-past">twenty</span>.</p>
+    <p class="sh-meta-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span>Updated <span class="sh-pub"></span> · <span class="sh-npolls"></span> polls</span></p>
+    </div>
+    <div class="sh-right">
+    <div class="sh-meta" hidden>
+      <div class="sh-meta-item"><span class="sh-meta-k">Last poll</span><span class="sh-meta-v"><span class="sh-fresh-dot"></span><span class="sh-pub"></span><span class="sh-fresh-rel"></span></span></div>
+      <div class="sh-meta-divide"></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">Next election</span><span class="sh-meta-v sh-due"></span></div>
+      <div class="sh-meta-divide"></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">Polls tracked</span><span class="sh-meta-v sh-tracked"></span></div>
+    </div>
+    <div class="sh-theme" role="group" aria-label="Colour theme">
+      <button type="button" class="sh-cell" data-theme="light" aria-pressed="false" aria-label="Light mode" title="Light mode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"></path></svg></button><button type="button" class="sh-cell" data-theme="dark" aria-pressed="false" aria-label="Dark mode" title="Dark mode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.2 8.2 0 0 1 9.8 3.5a8.2 8.2 0 1 0 10.7 10.7Z"></path></svg></button>
+    </div>
+    </div>
+  </header>
+</div>
+<div class="sh-tabs-sentinel" aria-hidden="true"></div>
+<nav class="sh-tabs" aria-label="Site">
+  <div class="sh-frame">
+    <div class="sh-tabs-inner">
+      <div class="sh-tabs-set">
+        <a class="sh-tab" href="/#snapshot">Snapshot</a>
+        <a class="sh-tab" href="/#cycles"><span class="sh-tab-long">Past cycles</span><span class="sh-tab-short" aria-hidden="true">Cycles</span></a>
+        <a class="sh-tab" href="/#allpolls">All polls</a>
+        <a class="sh-tab sh-tab-pinhide" href="/#info">Info</a>
+      </div>
+      <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A slot that passes unrecorded counts up as overdue until the release is added"><span class="sh-tn-lab">Next</span></div>
+      <a class="sh-score" href="/#snapshot" hidden title="The latest two-party preferred – go to Snapshot"><span class="sh-eyebrow">2PP</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
+    </div>
+  </div>
+</nav>
+<!--/shell:header-->
+<main id="sh-content" class="frame-wrap">
+  <p class="sh-kicker">Methods</p>
   <h1>The two-party figure, two ways</h1>
   <p class="ss-sub">Above the chart, one line says where the site&rsquo;s two-party figure comes from: &ldquo;Using implied preference flows&rdquo; or &ldquo;Using respondent-allocated preferences only&rdquo;. This page explains both: what each one is, why implied is the default, where its preference flows come from (including the Labor&ndash;One Nation flows no election has ever counted), and how polls become the headline figure.</p>
 
@@ -303,7 +357,7 @@ main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--acc
   <p class="pred-tnote">Roy Morgan publishes both every week: a respondent-allocated two-party figure and one on 2025-election flows. The site treats the respondent figure as Morgan&rsquo;s published one, and uses its election-flows figure as a check in the drift chart described below. The &ldquo;Compare&rdquo; checkbox under the chart overlays the other basis on whichever one you&rsquo;re viewing, so the two can be read against each other across the whole term.</p>
 
   <h2 id="why-implied">Why implied is the default</h2>
-  <p>The implied figure became the default on 18 September 2026. The hero, the table aggregates and the share card all quote it, and the toggle marks it &ldquo;(default)&rdquo;. Five reasons, most important first:</p>
+  <p>The implied figure became the default on 18 September 2026. The hero, the table aggregates, and the share card all quote it, and the toggle marks it &ldquo;(default)&rdquo;. Five reasons, most important first:</p>
   <ul class="pred-feats">
     <li>
       <strong>Movement means mood</strong>
@@ -522,7 +576,7 @@ Labor&ndash;One Nation two-party &asymp; 63.4 &ndash; 36.6   (band &plusmn;1.6)<
   <h2 id="wrong">Where each basis can go wrong</h2>
   <p><strong>The implied figure adds no information about preferences.</strong> Same primaries, same table, same answer, every time. It can&rsquo;t discover that One Nation voters have changed their second choices; it can only assume they haven&rsquo;t. Election night, not the table, is the final test.</p>
   <p><strong>Time works against a fixed table.</strong> The 2025 count measured 2025. As the term goes on, the implied figure can drift from the truth while looking perfectly steady. That&rsquo;s why the published series is one click away and the drift chart runs permanently.</p>
-  <p><strong>The Labor v One Nation settings rest on thin evidence.</strong> A state election, a by-election and one heartland federal seat are the whole lower-house record of that pairing so far, and none is a neutral national contest. The Senate anchor is huge, but it&rsquo;s a different chamber with a different &ldquo;others&rdquo; pool, where a tenth to a fifth of ballots run out before reaching either party and drop out of the comparison. And every measured number reflects today&rsquo;s how-to-vote cards, which can change.</p>
+  <p><strong>The Labor v One Nation settings rest on thin evidence.</strong> A state election, a by-election, and one heartland federal seat are the whole lower-house record of that pairing so far, and none is a neutral national contest. The Senate anchor is huge, but it&rsquo;s a different chamber with a different &ldquo;others&rdquo; pool, where a tenth to a fifth of ballots run out before reaching either party and drop out of the comparison. And every measured number reflects today&rsquo;s how-to-vote cards, which can change.</p>
   <p><strong>The published figure isn&rsquo;t a pure reading either.</strong> Pollsters allocate preferences differently, change methods mid-term, and a few allocate by last-election flows themselves, which is this site&rsquo;s implied method, applied privately and unlabelled. Read &ldquo;respondent-allocated&rdquo; as &ldquo;what the pollsters publish&rdquo;, read the implied figure for movement, and keep both in view.</p>
 
   <p class="ss-note">Site constants as at 18 September 2026. Every count is linked below, because this page&rsquo;s argument is that its one assumption can be traced to a real count, and the pollsters&rsquo; can&rsquo;t.</p>
@@ -535,8 +589,24 @@ Labor&ndash;One Nation two-party &asymp; 63.4 &ndash; 36.6   (band &plusmn;1.6)<
     <li><strong>Estimator and interval conventions</strong> &mdash; the site&rsquo;s own aggregation engine.</li>
   </ul>
   <p class="ss-note">Companion to the &ldquo;?&rdquo; beside the two-party basis switch on the main page.</p>
-  <p class="ss-note">This page belongs to <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live tracker has the current figures, charts and every poll.</p>
 </main>
-<a class="ss-back" href="/">&larr; Back to the tracker</a>
+<!--shell:footer-->
+<div class="sh-frame">
+  <footer class="sh-foot">
+    <div class="sh-colo">
+      <div class="sh-about" data-nosnippet>
+        <p class="sh-lede">auspol tracker is an unofficial aggregate of published federal opinion polling.</p>
+        <p class="sh-disc">Best efforts are made to make the aggregate figures transparent, trustworthy, statistically sound, and informative, but they are, in the end, estimates only.</p>
+      </div>
+      <div class="sh-ways">
+        <p class="sh-fb">How the figures are built is in <a href="/#info">Info</a>. Spot an error, a missing poll, or have any other feedback? Please <a class="sh-fb-link" href="/feedback/">let me know</a>.</p>
+        <p class="sh-arch">Federal polling archives I’ve located are stored <a href="/archives/newspoll/">here</a> for safekeeping and convenience.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+<div class="sh-band" aria-hidden="true"></div>
+<script src="/assets/site-shell.js" defer></script>
+<!--/shell:footer-->
 </body>
 </html>

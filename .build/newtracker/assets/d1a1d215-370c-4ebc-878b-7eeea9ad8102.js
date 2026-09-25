@@ -91,17 +91,7 @@ function TabScore({ onGoHero, matchup, tppBasis = "imp" }) {
    and parks the rest (still rendered, still measurable) until room
    returns. The old machinery - a 7-day window, then a hard count of three
    - pretended to know the budget without ever measuring it. */
-const TN_DAY = 86400000;
-const tnUntil = (ms) => {
-  const mins = Math.max(1, Math.round(ms / 60000));
-  if (mins < 60) return mins + (mins === 1 ? " min" : " mins");
-  const h = Math.round(mins / 60);
-  if (h < 36) return h + (h === 1 ? " hour" : " hours");
-  const d = Math.round(h / 24);
-  if (d < 14) return d + (d === 1 ? " day" : " days");
-  const w = Math.round(d / 7);
-  return w + (w === 1 ? " week" : " weeks");
-};
+/* TN_DAY and tnUntil live in np-project.js with the roll they serve. */
 
 /* The pin's condense is a COMPOSITED transform on .tabs-set, so a live
    getBoundingClientRect during the glide returns a mid-animation edge and a
@@ -143,167 +133,10 @@ function NextPollTicker({ showScore }) {
   const [fit, setFit] = React.useState(0);
   const rootRef = React.useRef(null);
   const proj = window.AP.nextPolls ? window.AP.nextPolls() : null;
-  const rows = proj ? proj.rows : [];
-  const nowMs = proj ? proj.nowMs : 0;
-  const t0 = proj ? proj.t0 : 0;
-
-  /* A house that keeps a weekday can only publish ON that weekday, and the
-     countdown has to respect that or it says something impossible. Essential
-     files on Wednesdays; projected onto Wed 26 Aug and missed, its +-7 day
-     window was still technically open on the Monday after, so this used to
-     read "any time" - naming a moment that cannot happen until Wednesday. The
-     next slot is the next Wednesday, and that is what it counts to.
-
-     The window's EARLY edge still does the work it should: it decides which
-     slot is the EARLIEST plausible one, and the answer is the first matching
-     weekday on or after that. Roy Morgan, due at midnight today on a Monday
-     schedule, is still today rather than a week away.
-
-     Houses with no weekday habit keep the plain window: the earliest the wave
-     could land, or "any time" once that has passed. */
-  const dayFloor = (ms) => {
-    const d = new Date(ms);
-    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
-  };
-  const targetOf = (r) => {
-    const half = r.winHalf || 0;
-    if (r.releaseDow == null)
-      return { at: Math.max(r.release - half * TN_DAY, nowMs), byDay: false };
-    /* The window's EARLY edge is measured, not mirrored: no weekday house has
-       ever filed a slot early, so counting to release - ±half names a date
-       with no precedent - Resolve was counting down to Sun 6 Sep when its
-       real alternatives are Sun 13 and Sun 20 Sep. spreadEarly=0 keeps the
-       countdown on the projected day itself. The projection's slotEarly
-       (tails rebased to the slot's own place in the record) is the same
-       measure relative to the slot, and takes precedence where it exists. */
-    const widen = Math.sqrt((r.ahead || 0) + 1);
-    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
-    const earlyHalf = se != null
-      ? 7 * Math.floor((se * widen + 3) / 7)
-      : half;
-    let t = Math.max(t0, dayFloor(r.release - earlyHalf * TN_DAY));
-    t += ((r.releaseDow - new Date(t).getUTCDay() + 7) % 7) * TN_DAY;
-    return { at: t, byDay: true };
-  };
-
-  /* A house whose slot is a WINDOW rather than a date - DemosAU's
-     calendar-month bracket - only belongs on the bar while the window is
-     open: before the bracket opens, a countdown to its edge misreads a day
-     range as a date; after it closes unrecorded, the panel's red row is
-     where the lateness is told. While the window IS open the row reads
-     "any day now" and sits at the tail of the roll - "some time in the
-     next N days" is weaker information than every dated count the bar
-     carries, so every slot leads it. */
-  const isWindowRow = (r) => r.loose && r.releaseDow == null;
-  const windowOpen = (r) => r.release - (r.winHalf || 0) * TN_DAY <= nowMs;
-  const windowItems = rows
-    .filter((r) => isWindowRow(r) && !r.missed && windowOpen(r))
-    .map((r) => ({ firm: r.pollster, when: "any day now", maybe: false, site: r.site }));
-
-  /* A slot whose whole tolerance has passed without its release being
-     recorded is not rolled forward onto next week's guess and not dropped:
-     it leads the bar in red, counting the days it is late - the same claim
-     the panel's red row makes, on the same `missed` flag. A late WINDOW
-     counts from its close; a late DAY from the day itself, matching the
-     number the panel prints. It leaves when the real release moves the
-     projection, never on a date guessed in its place. (Window rows sit
-     outside this too - see above.) */
-  const overdueItems = rows
-    .filter((r) => r.missed && !isWindowRow(r))
-    .map((r) => {
-      const days = Math.round(
-        (t0 - (r.loose ? r.release + (r.winHalf || 0) * TN_DAY : r.release)) / TN_DAY);
-      return {
-        firm: r.pollster, site: r.site, overdue: true, days,
-        when: days === 1 ? "1 day overdue" : days + " days overdue",
-      };
-    })
-    .sort((a, b) => b.days - a.days);
-
-  /* Re-sorted on the rolled target rather than left in the panel's order.
-     The panel sorts a missed wave by the slot it missed, because a reader
-     looking at the schedule wants to see it is late; the bar is answering
-     "what lands next", and after rolling, a Monday house due today comes
-     before a Wednesday one that slipped a week. */
-  const upcomingItems = rows
-    .filter((r) => !r.missed && !isWindowRow(r))
-    .map((r) => ({ r, t: targetOf(r) }))
-    .sort((a, b) => a.t.at - b.t.at)
-    /* One slot PER HOUSE, its nearest: the bar is a roll-call of what's due
-       soonest from EVERY house, and a weekly house's second slot inside the
-       coming week only repeats a name instead of adding another house to
-       the roll. There is no count or day-window cap here - how much of the
-       roll actually shows is a space decision measured live on the bar
-       itself (the fit pass below). */
-    .filter(((seen) => ({ r }) =>
-      !seen.has(r.pollster) && !!seen.add(r.pollster))(new Set()))
-    .map(({ r, t }) => {
-      const half = r.winHalf || 0;
-      let when;
-      if (t.byDay) {
-        const days = Math.round((t.at - t0) / TN_DAY);
-        /* "Any moment now" starts when the publication window does - the slot
-           date plus the hour the house keeps - not at the day's first minute:
-           Roy Morgan files Mondays after four, and a 9am reader told the wave
-           is moments away is being lied to for seven hours. An untimed house
-           has no hour to open at, so it keeps its whole day (the projection's
-           same 24*60 default): "today" throughout. */
-        const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
-        /* The same hour that lets the slot say "any moment now" lets the wait
-           before it count itself: a house with a measured (or declared) hour
-           and under twelve of them to go reads "5 hours" - minutes in the
-           last hour, both from tnUntil, bare like the day counts beside it
-           ("2 days") - instead of the vaguer "today". A house nobody has
-           timed has no hour to count to and keeps "today", and twelve hours
-           plus out the day is still the honest claim. */
-        const left = dueMs - nowMs;
-        when = days === 0 ? (dueMs <= nowMs ? "any moment now"
-             : r.releaseMins != null && Math.round(left / 3600000) < 12
-             ? tnUntil(left) : "today")
-             : days === 1 ? "tomorrow"
-             /* exact day counts past "tomorrow" - the panel's own phrasing
-                ("in 12 days") - so the bar and the panel name the same slot
-                the same way; tnUntil's week rounding ("2 weeks") made them
-                disagree */
-             : days + " days";
-      } else {
-        /* No day pinned, so nothing is "moment" away - the wave is due some
-           DAY inside a measured range, and the countdown says so. ("Moment"
-           is the weekday houses' word above: theirs is a date with an hour.)
-           Sub-day resolution only inside 36 hours; past that, the same exact
-           day count the weekday houses get */
-        when = t.at <= nowMs ? "any day now"
-             : Math.round((t.at - nowMs) / 3600000) < 36
-             ? tnUntil(t.at - nowMs)
-             : Math.round((t.at - t0) / TN_DAY) + " days";
-      }
-      /* "(maybe)" answers "could it be some FUTURE day instead?". A weekday
-         house can only file on its weekday, so every alternative date is a
-         slot of its own, a week apart: the hedge belongs only while two
-         slots from now on are both in play – a window wider than a week, or
-         a slot rolled more than one slot-week past the projected one (a
-         one-week roll is just the old window's own far edge, still this
-         wave). A still-open window after a missed slot is not future doubt
-         – its earlier dates are past days the wave publicly did not land
-         on, so Essential rolled from a missed 26 Aug to 2 Sep reads
-         "2 days", full stop. (r.overdue reads "slot moment passed" and
-         fires on exactly that case – it is npProject's missed + still-open
-         flag, not future doubt.) Non-weekday houses keep the day-spread
-         rule. "any moment/day now" is left alone - it already says what
-         the hedge would. */
-      const maybe = when !== "any moment now" && when !== "any day now" &&
-        (half > 7 || !!r.loose ||
-         (r.releaseDow != null && t.at - r.release > 7 * TN_DAY) ||
-         (r.releaseDow == null && half > 0));
-      return { firm: r.pollster, when, maybe, site: r.site };
-    });
-
-  /* Overdue leads: an already-blown forecast is more news than any
-     countdown. The tail is the fit pass's business - the candidate list is
-     the whole roll (one slot per house, nearest first), and the bar shows
-     as much of it as clears the neighbours. Window-house rows trail it all:
-     "any day now" is weaker information than every dated count. */
-  const items = [...overdueItems, ...upcomingItems, ...windowItems];
+  /* the roll itself - overdue first, then each house's nearest slot, then
+     open windows - is np-project.js's npTickerItems, so the satellites' bar
+     runs the same code */
+  const items = window.AP.nextPollItems ? window.AP.nextPollItems(proj) : [];
   const itemsKey = items.map((it) => it.firm + it.when).join("");
 
   /* ---- fit pass: as many items as the bar has room for -----------------
@@ -510,7 +343,8 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                       + (pinned && heroGone ? " show-score" : "")}
            aria-label="Views">
         <div className="tabs-inner">
-          <div className="tabs-set" role="tablist" aria-label="Views"
+          <div className="tabs-set">
+          <div className="tabs-list" role="tablist" aria-label="Views"
                onKeyDown={onTabKeyDown}>
             {tabs.map((t) => (
               <button key={t.id} role="tab" aria-selected={active === t.id}
@@ -525,10 +359,13 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                       className={"tab" + (active === t.id ? " active" : "")
                                  + (t.pinHide ? " tab-pinhide" : "")}
                       onClick={() => onChange(t.id)}>
-                <span className="tab-label">{t.label}</span>
+                <span className="tab-label">{t.short
+                  ? <><span className="tab-label-long">{t.label}</span><span className="tab-label-short" aria-hidden="true">{t.short}</span></>
+                  : t.label}</span>
                 {t.note != null && <span className="tab-note">{t.note}</span>}
               </button>
             ))}
+          </div>
           </div>
           {/* the ticker's fit budget is keyed to the SEAT, and the seat is
               show-score's (score docked => centred), not the pin's - a bare
@@ -551,6 +388,9 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
 // ====================================================================
 // PAST CYCLES – every term aligned to its election day
 // ====================================================================
+/* Signed measures (leader nets, the preferred-PM lead) to one decimal, as
+   every aggregate on the site is; a figure that rounds to zero takes no sign. */
+const fmtSigned1 = (v) => { const r = +v.toFixed(1); return (r > 0 ? "+" : "") + r.toFixed(1); };
 // y-windows are fitted to the real data per metric+mode (see cycDomain) –
 // fixed windows clip real history (e.g. net approval spans −44…+41)
 const CYC_METRICS = [
@@ -570,15 +410,20 @@ const CYC_METRICS = [
        the flows counted at the election that opened its term (FLOW_LEF /
        FLOW_ERAS). The sitting term follows the hero's rival ruling month by
        month and draws each contest as its own run (tppEras). */
+    /* the gist stays under the chart; the why folds (noteMore, HowTo) */
     note: <>Every line is the <strong>implied</strong> two-party figure: each poll’s primary
       votes read through the preferences counted at the election that opened its term –
       {" "}<button type="button" className="hi-term"
         onClick={() => window.AP.openTerm && window.AP.openTerm("last-election-flows", "Past cycles")}>last-election
-        flows</button>, the only table anyone could have used at the time. So a line moves when
-      voting intentions move, not when pollsters change how they allocate preferences, and every
-      term back to 1972 is on the same footing as today’s. The sitting term follows the rival
-      Labor is doing worst against, as the headline does, and marks where that changed. How the
-      final polls did, below, still scores what the pollsters published.</> },
+        flows</button>.</>,
+    noteMore: [
+      <>That is the only table anyone could have used at the time. So a line moves when voting
+      intentions move, not when pollsters change how they allocate preferences, and every term
+      back to 1972 is on the same footing as today’s.</>,
+      <>The sitting term follows the rival Labor is doing worst against, as the headline does, and
+      marks where that changed. How the final polls did, below, still scores what the pollsters
+      published.</>,
+    ] },
   { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
     unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: null },
@@ -601,15 +446,15 @@ const CYC_METRICS = [
      labelled for that. */
   { key: "ppmm", title: "Preferred prime minister",
     sub: "PM’s lead on the preferred-PM question",
-    unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
+    unit: "", fmt: fmtSigned1,
     step: 10, refAbs: 0, refAbsLabel: "even", chgRefLabel: "First reading" },
   /* The tap-to-define "net approval" link is composed into the card title at
      render time – keeping it in the string here would leave it as dead text. */
   { key: "net", title: "Prime minister net approval", sub: "Sitting prime minister",
-    unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
+    unit: "", fmt: fmtSigned1,
     step: 20, refAbs: 0, refAbsLabel: "even" },
   { key: "oppnet", title: "Opposition leader net approval", sub: "Sitting opposition leader",
-    leader: "opp", unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
+    leader: "opp", unit: "", fmt: fmtSigned1,
     step: 10, refAbs: 0, refAbsLabel: "even", han: true },
 ];
 
@@ -642,11 +487,18 @@ function cycDomain(cycles, M, chg) {
   const ref = chg ? 0 : M.refAbs;
   let lo = Math.min(...vals), hi = Math.max(...vals);
   if (ref != null) { lo = Math.min(lo, ref); hi = Math.max(hi, ref); }
-  const step = M.step;
-  const d0 = Math.floor((lo - step * 0.3) / step) * step;
-  const d1 = Math.ceil((hi + step * 0.3) / step) * step;
-  const ticks = [];
-  for (let v = d0 + step; v < d1 - 1e-9; v += step) ticks.push(v);
+  /* The measure's step, doubled until the axis carries seven labels or
+     fewer: the opposition primary, which reaches down to One Nation's 6%,
+     printed thirteen at 5-point steps */
+  let step = M.step, d0, d1, ticks;
+  for (;;) {
+    d0 = Math.floor((lo - step * 0.3) / step) * step;
+    d1 = Math.ceil((hi + step * 0.3) / step) * step;
+    ticks = [];
+    for (let v = d0 + step; v < d1 - 1e-9; v += step) ticks.push(v);
+    if (ticks.length <= 7) break;
+    step *= 2;
+  }
   return { domain: [d0, d1], ticks };
 }
 
@@ -691,7 +543,11 @@ const CYC_EVENTS = {
      the office changed hands. Two handovers fall in the fortnight after an
      election and are listed the way 2001's Beazley → Crean and 2016's
      Shorten → Albanese are: at the start of the term they open, and at the
-     tail of the term whose line they end. */
+     tail of the term whose line they end.
+     Beside the leadership changes, each term carries the events most liable
+     to have moved its lines – crises, shocks, budgets, scandals and splits,
+     not ceremonies – checked against the record for their dates. Events a
+     few days apart share one marker (2010's ETS and mining tax). */
   1972: [
     {
       date: "1972-12-20", short: "McMahon → Snedden",
@@ -699,6 +555,12 @@ const CYC_EVENTS = {
       desc: "Billy Snedden defeats Nigel Bowen 30–29 for the Liberal leadership after William McMahon stands down following the 1972 election defeat, becoming opposition leader.",
       major: true,
       metrics: ["oppnet"],
+    },
+    {
+      date: "1974-04-11", short: "Double dissolution",
+      label: "Whitlam calls a double dissolution election",
+      desc: "With the Senate threatening to block supply, both houses are dissolved on Gough Whitlam’s advice, sending the government to an early election on 18 May.",
+      major: true,
     },
   ],
   1974: [
@@ -710,6 +572,12 @@ const CYC_EVENTS = {
       metrics: ["oppnet"],
     },
     {
+      date: "1975-10-16", short: "Supply blocked",
+      label: "The Senate blocks supply",
+      desc: "Two days after the Loans Affair forces Rex Connor’s resignation, the Coalition-controlled Senate defers the budget bills, starting the crisis that ends in the Dismissal.",
+      major: true,
+    },
+    {
       date: "1975-11-11", short: "The Dismissal",
       label: "Kerr dismisses Whitlam; Fraser caretaker prime minister",
       desc: "Governor-General Sir John Kerr dismisses the Whitlam government after the Senate blocks supply and commissions Malcolm Fraser as caretaker prime minister pending the 13 December election; Whitlam leads the opposition through the campaign.",
@@ -717,6 +585,18 @@ const CYC_EVENTS = {
     },
   ],
   1975: [
+    {
+      date: "1976-11-28", short: "Dollar devalued",
+      label: "The dollar is devalued 17.5%",
+      desc: "The Fraser government devalues the Australian dollar by 17.5 per cent as foreign reserves drain away.",
+      major: true,
+    },
+    {
+      date: "1977-05-15", short: "Democrats launched",
+      label: "Don Chipp launches the Australian Democrats",
+      desc: "Former Liberal minister Don Chipp launches the Australian Democrats at Melbourne Town Hall, a new home for voters leaving both major parties.",
+      major: true,
+    },
     {
       date: "1977-12-22", short: "Whitlam → Hayden",
       label: "Hayden replaces Whitlam as opposition leader",
@@ -733,13 +613,32 @@ const CYC_EVENTS = {
       major: true,
       metrics: ["oppnet"],
     },
+    {
+      date: "1978-08-15", short: "Tax surcharge budget",
+      label: "Howard’s first budget adds a tax surcharge",
+      desc: "Treasurer John Howard’s first budget imposes a temporary income tax surcharge, months after the Coalition won the 1977 election promising tax cuts.",
+      major: true,
+    },
   ],
   1980: [
+    {
+      date: "1981-04-30", short: "Razor Gang cuts",
+      label: "The Razor Gang’s spending cuts",
+      desc: "The Fraser government’s Review of Commonwealth Functions – the Razor Gang – announces cuts to public services and programs.",
+      major: true,
+    },
     {
       date: "1982-04-08", short: "Peacock challenges Fraser",
       label: "Peacock mounts a leadership challenge",
       desc: "Andrew Peacock, having resigned from cabinet a year earlier, challenges Malcolm Fraser for the Liberal leadership and loses the ballot 54 votes to 27.",
       major: true,
+    },
+    {
+      date: "1982-07-16", short: "Hawke challenges Hayden",
+      label: "Hawke challenges Hayden for the Labor leadership",
+      desc: "Bob Hawke challenges Bill Hayden for the Labor leadership and loses the ballot 42 votes to 37.",
+      major: true,
+      metrics: ["oppnet"],
     },
     {
       date: "1983-02-03", short: "Hayden → Hawke",
@@ -766,8 +665,26 @@ const CYC_EVENTS = {
       major: true,
       metrics: ["oppnet"],
     },
+    {
+      date: "1986-05-14", short: "Banana republic",
+      label: "Keating’s “banana republic” warning",
+      desc: "Treasurer Paul Keating warns that Australia risks becoming a banana republic without economic reform, and the dollar falls sharply.",
+      major: true,
+    },
+    {
+      date: "1987-02-28", short: "Joh for Canberra",
+      label: "Queensland Nationals quit the Coalition",
+      desc: "Backing Premier Joh Bjelke-Petersen’s bid for Canberra, the Queensland National Party decides to pull its 12 federal MPs out of the Coalition, splitting the conservative vote before the July election.",
+      major: true,
+    },
   ],
   1987: [
+    {
+      date: "1987-10-20", short: "Share market crash",
+      label: "The Black Monday share market crash",
+      desc: "The global crash reaches Australia and the All Ordinaries falls 25% in a day, its biggest one-day drop.",
+      major: true,
+    },
     {
       date: "1989-05-09", short: "Howard → Peacock",
       label: "Peacock replaces Howard as opposition leader",
@@ -775,16 +692,52 @@ const CYC_EVENTS = {
       major: true,
       metrics: ["oppnet"],
     },
+    {
+      date: "1989-08-18", short: "Pilots’ dispute",
+      label: "The pilots’ dispute grounds domestic flights",
+      desc: "Domestic airline pilots begin a campaign for a 29.5% pay rise and resign en masse; the Hawke government brings in the RAAF to keep planes flying.",
+      major: true,
+    },
   ],
   1990: [
+    {
+      date: "1990-11-29", short: "Recession we had to have",
+      label: "Keating: “the recession Australia had to have”",
+      desc: "Treasurer Paul Keating announces that Australia is in recession, calling it “a recession that Australia had to have”.",
+      major: true,
+    },
+    {
+      date: "1991-06-03", short: "Keating’s first challenge",
+      label: "Keating challenges Hawke and loses",
+      desc: "Paul Keating challenges Bob Hawke for the Labor leadership, loses the ballot 66 votes to 44, and goes to the backbench.",
+      major: true,
+    },
+    {
+      date: "1991-11-21", short: "Fightback!",
+      label: "Hewson releases Fightback!",
+      desc: "Opposition leader John Hewson releases Fightback!, the Coalition’s platform built around a 15% goods and services tax.",
+      major: true,
+    },
     {
       date: "1991-12-20", short: "Hawke → Keating",
       label: "Keating replaces Hawke as prime minister",
       desc: "Paul Keating defeats Bob Hawke in a Labor leadership spill at his second attempt and is sworn in as prime minister.",
       major: true,
     },
+    {
+      date: "1992-02-26", short: "One Nation statement",
+      label: "Keating’s One Nation statement",
+      desc: "Prime Minister Paul Keating answers Fightback! with One Nation, an economic statement of infrastructure spending and promised income tax cuts.",
+      major: true,
+    },
   ],
   1993: [
+    {
+      date: "1993-08-17", short: "L-A-W tax cuts deferred",
+      label: "The budget defers the promised tax cuts",
+      desc: "Months after Labor won the 1993 election promising tax cuts that were “L-A-W law”, the Dawkins budget raises indirect taxes and defers the second round of cuts.",
+      major: true,
+    },
     {
       date: "1994-05-23", short: "Hewson → Downer",
       label: "Downer replaces Hewson as opposition leader",
@@ -800,6 +753,52 @@ const CYC_EVENTS = {
       metrics: ["oppnet"],
     },
   ],
+  1996: [
+    {
+      date: "1996-04-28", short: "Port Arthur massacre",
+      label: "The Port Arthur massacre",
+      desc: "A gunman kills 35 people at Port Arthur in Tasmania; within weeks the Howard government and the states agree on national gun laws.",
+      major: true,
+    },
+    {
+      date: "1996-09-10", short: "Hanson’s maiden speech",
+      label: "Pauline Hanson’s maiden speech",
+      desc: "Independent MP Pauline Hanson’s first speech in parliament, on immigration and Indigenous policy, draws national attention; she founds One Nation the following April.",
+      major: true,
+    },
+    {
+      date: "1998-06-13", short: "One Nation’s Qld breakthrough",
+      label: "One Nation wins 11 seats in Queensland",
+      desc: "One Nation takes 22.7% of the vote and 11 seats at the Queensland state election.",
+      major: true,
+    },
+    {
+      date: "1998-08-13", short: "GST unveiled",
+      label: "Howard unveils the GST",
+      desc: "The Howard government releases A New Tax System, its tax package built on a 10% goods and services tax, and takes it to an election weeks later.",
+      major: true,
+    },
+  ],
+  1998: [
+    {
+      date: "2000-07-01", short: "GST begins",
+      label: "The GST starts",
+      desc: "The 10% goods and services tax comes into force.",
+      major: true,
+    },
+    {
+      date: "2001-08-26", short: "Tampa",
+      label: "The Tampa affair",
+      desc: "The Norwegian freighter Tampa rescues 433 asylum seekers; the Howard government refuses to let them land, and SAS troops board the ship three days later.",
+      major: true,
+    },
+    {
+      date: "2001-09-11", short: "September 11",
+      label: "The September 11 attacks",
+      desc: "Terrorist attacks on New York and Washington; John Howard, in Washington at the time, invokes the ANZUS treaty.",
+      major: true,
+    },
+  ],
   2001: [
     {
       date: "2001-11-22", short: "Beazley → Crean",
@@ -807,6 +806,18 @@ const CYC_EVENTS = {
       desc: "Kim Beazley resigns after Labor’s 2001 election defeat and Simon Crean is elected unopposed as Labor leader.",
       major: true,
       metrics: ["oppnet"],
+    },
+    {
+      date: "2002-10-12", short: "Bali bombings",
+      label: "The Bali bombings",
+      desc: "Terrorist bombings in Kuta, Bali, kill 202 people, 88 of them Australians.",
+      major: true,
+    },
+    {
+      date: "2003-03-20", short: "Iraq war",
+      label: "Australia joins the invasion of Iraq",
+      desc: "Australian forces join the US-led invasion of Iraq.",
+      major: true,
     },
     {
       date: "2003-12-02", short: "Crean → Latham",
@@ -825,14 +836,38 @@ const CYC_EVENTS = {
       metrics: ["oppnet"],
     },
     {
+      date: "2006-03-27", short: "WorkChoices",
+      label: "WorkChoices comes into force",
+      desc: "The Howard government’s WorkChoices industrial relations laws take effect; the unions’ campaign against them runs through to the 2007 election.",
+      major: true,
+    },
+    {
       date: "2006-12-04", short: "Beazley → Rudd",
       label: "Rudd replaces Beazley as opposition leader",
       desc: "Kevin Rudd defeats Kim Beazley 49–39 in a Labor leadership spill, becoming opposition leader.",
       major: true,
       metrics: ["oppnet"],
     },
+    {
+      date: "2007-11-07", short: "Campaign rate rise",
+      label: "The Reserve Bank raises rates mid-campaign",
+      desc: "The Reserve Bank raises the cash rate to 6.75% seventeen days before the election – the first rate rise during a federal election campaign.",
+      major: true,
+    },
   ],
   2007: [
+    {
+      date: "2008-02-13", short: "The Apology",
+      label: "The Apology to the Stolen Generations",
+      desc: "Prime Minister Kevin Rudd apologises in parliament to the Stolen Generations.",
+      major: true,
+    },
+    {
+      date: "2008-09-15", short: "Global financial crisis",
+      label: "Lehman Brothers collapses",
+      desc: "The collapse of Lehman Brothers turns the credit crunch into a global financial crisis; the Rudd government answers with bank guarantees and stimulus payments.",
+      major: true,
+    },
     {
       date: "2008-09-16", short: "Nelson → Turnbull",
       label: "Turnbull replaces Nelson as opposition leader",
@@ -846,6 +881,12 @@ const CYC_EVENTS = {
       desc: "Tony Abbott defeats Malcolm Turnbull 42–41 in a Liberal leadership spill over emissions trading, becoming opposition leader.",
       major: true,
       metrics: ["oppnet"],
+    },
+    {
+      date: "2010-04-27", short: "ETS shelved, mining tax",
+      label: "Rudd shelves the ETS and targets miners",
+      desc: "Kevin Rudd shelves the emissions trading scheme until at least 2013, and on 2 May announces a resource super profits tax on mining.",
+      major: true,
     },
     {
       date: "2010-06-24", short: "Rudd → Gillard",
@@ -865,6 +906,12 @@ const CYC_EVENTS = {
       date: "2011-02-24", short: "Carbon pricing scheme",
       label: "Gillard announces a carbon pricing scheme",
       desc: "Prime Minister Julia Gillard announces a fixed price on carbon pollution from 1 July 2012 to combat climate change; the Clean Energy Act 2011 is enacted on 18 November.",
+      major: true,
+    },
+    {
+      date: "2012-02-27", short: "Rudd challenge fails",
+      label: "Gillard defeats Rudd’s challenge",
+      desc: "Julia Gillard defeats Kevin Rudd’s challenge for the Labor leadership 71 votes to 31.",
       major: true,
     },
     {
@@ -916,7 +963,7 @@ const CYC_EVENTS = {
     {
       date: "2018-07-28", short: "Super Saturday by-elections",
       label: "Super Saturday by-elections return every incumbent",
-      desc: "Five federal by-elections return every incumbent – Labor holds Braddon, Fremantle, Longman and Perth, and Centre Alliance holds Mayo, with the Coalition winning none.",
+      desc: "Five federal by-elections return every incumbent – Labor holds Braddon, Fremantle, Longman, and Perth, and Centre Alliance holds Mayo, with the Coalition winning none.",
       major: true,
     },
     {
@@ -1789,12 +1836,11 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
         : isOpp ? "opposition" : "government";
       /* The sentence claims a gap or a rank; bracket the raw reading straight
          after the subject so the reader never has to solve back for it.
-         Formatted on the chart's own basis: a share keeps its decimal,
-         a net read stays integral, and the sign appears exactly when the
-         basis is signed (net measures, or anything in change-since mode) –
-         a figure that rounds to zero takes no sign, same rule the rank
-         peers' labels follow. */
-      const curMag = M.unit ? Math.abs(curVal).toFixed(1) : String(Math.round(Math.abs(curVal)));
+         One decimal, shares and nets alike, as every aggregate on the site
+         is, and the sign appears exactly when the basis is signed (net
+         measures, or anything in change-since mode) – a figure that rounds to
+         zero takes no sign, same rule the rank peers' labels follow. */
+      const curMag = Math.abs(curVal).toFixed(1);
       const curSign = (chg || !M.unit) && parseFloat(curMag) !== 0 ? (curVal < 0 ? "−" : "+") : "";
       /* A 2PP that has changed contest names the rival it is now against –
          every past term's figure is against the other party of government,
@@ -1827,13 +1873,13 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
           const counts = {};
           for (const p of cand) counts[p.who] = (counts[p.who] || 0) + 1;
           const fmtPeer = (p) => {
-            const r = Math.round(p.v);
+            const r = +p.v.toFixed(1);
             /* Signed measures (net, preferred-PM lead) and every change-
                since figure need their sign; an absolute share does not –
                "Gillard (+34%)" would read as a change number. */
             const sgn = chg || !M.unit;
             const val = (sgn && r > 0 ? "+" : sgn && r < 0 ? "\u2212" : "") +
-              Math.abs(r) + (M.unit || "");
+              Math.abs(r).toFixed(1) + (M.unit || "");
             return counts[p.who] > 1 ? p.who + " (" + p.yr + ", " + val + ")"
               : p.who + " (" + val + ")";
           };
@@ -1886,7 +1932,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
           <CycleLegend cycles={cycles} hidden={hidden} lifted={lifted} hi={hi} setHi={setHi}
                        chipClick={chipClick} toggle={toggle} showAll={showAll} hideAll={hideAll}
                        showOutcome={showOutcome} outcomeShown={outcomeShown} shapes={shapes}
-                       banded={banded} />
+                       banded={banded} hasData={hasData} />
           {hanCtl && (
             <label className={"pg-check cyc-han" + (showHan ? " on" : "")}
                    title={"Pauline Hanson, on the same approve-minus-disapprove basis. " +
@@ -1910,7 +1956,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
         </div>
         {insight && (() => {
           /* Prose, not a table cell: a gap of exactly nine points reads as
-             "9%", not "9.0%", and the sign is dropped because the
+             "9 points", not "9.0 points", and the sign is dropped because the
              "above"/"below" that follows already carries the direction
              (M.fmt keeps its decimal for the chart's tooltips). */
           const shown = M.fmt(insight.d).replace(/^[+−-]/, "").replace(/\.0+$/, "");
@@ -1930,7 +1976,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
             {" "}{insight.rank.lead}
             {insight.rank.refs.map((r, i, a) => (
               <React.Fragment key={r.yr}>
-                {i > 0 && (i === a.length - 1 ? " and " : ", ")}
+                {i > 0 && (i === a.length - 1 ? (a.length > 2 ? ", and " : " and ") : ", ")}
                 <button type="button" className="ci-peer"
                         title={hidden.has(r.yr)
                           ? "Put the " + r.yr + " term back on the chart"
@@ -1948,16 +1994,17 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
               the average {insight.peerNoun} at this point.{rankJsx}
             </p>
           );
-          /* Net-approval measures carry no axis unit (CYC_METRICS unit:""),
-             so the sentence has to supply its own word – "points" for net
-             gaps, "point" singularised for a one-point gap. Share measures
-             get "x%" free from M.unit. */
+          /* The gap between two shares is a difference in POINTS, never a
+             percent: Labor on 26.8% against an average of 41.3% sits 14.5
+             points below it, not 14.5% below (that would be 6 points). So
+             every measure takes the word, shares and net ratings alike –
+             "point" singularised for a one-point gap. */
           return (
             <p className="cycle-insight">
               {cycMonthLabel(insight.mNow)}, {insight.subjLabel}{" "}
               ({insight.curFmt}) sits{" "}
               <span className={"ci-delta " + (insight.better ? "pos" : "neg")}>
-                {shown}{M.unit || (parseFloat(shown) === 1 ? " point" : " points")}
+                {shown}{parseFloat(shown) === 1 ? " point" : " points"}
               </span>{" "}
               {insight.better ? "above" : "below"} the average {insight.peerNoun} at this point.{rankJsx}
             </p>
@@ -2046,6 +2093,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
           figure from the rest, and why the sitting line is drawn on the basis
           the headline does NOT quote. */}
       {M.note && <p className="cycle-basis">{M.note}</p>}
+      {M.noteMore && <HowTo cls="cycle-basis" paras={M.noteMore} />}
     </section>
   );
 }
@@ -2071,7 +2119,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
    chart) and draws its rule in the colour the line is actually in. One shared
    row of prime ministers above six charts could do neither. */
 function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, showAll, hideAll,
-                      showOutcome, outcomeShown, shapes, banded }) {
+                      showOutcome, outcomeShown, shapes, banded, hasData }) {
   const [pop, setPop] = useState(null);
   /* `hi` is cleared by PastCyclesView, not here: there are six of these
      strips, and a per-strip dismiss meant a tap inside one fired the other
@@ -2095,7 +2143,13 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
      because a control that is doing something should say what. */
   const summary = (hidden.size ? onBoard + " of " + total + " terms"
                    : lifted.size ? total + " terms"
-                   : total + " terms since " + cycles[0].year)
+                   : (() => {
+                       /* terms that hold this measure: preferred PM starts in
+                          1984, and "21 terms since 1972" above a subtitle
+                          saying "since 1984" contradicted it */
+                       const withData = hasData ? cycles.filter((c) => c.current || hasData(c)) : cycles;
+                       return withData.length + " terms since " + withData[0].year;
+                     })())
                   + (lifted.size ? " · " + drawnN + " drawn" : "");
 
   /* The board cut by what each government did at its own election - the
@@ -2111,7 +2165,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
   const QUICK = [
     { id: "all", label: "All", run: showAll, title: "Every term on the board" },
     { id: "none", label: "None", run: hideAll,
-      title: "Clear the board – no term left in the band, the mean or the download" },
+      title: "Clear the board – no term left in the band, the mean, or the download" },
     { id: "returned", label: "Returned", run: () => showOutcome("returned"),
       title: "Only terms whose government was returned" + OUTCOME_NOTE },
     { id: "ousted", label: "Ousted", run: () => showOutcome("ousted"),
@@ -2184,7 +2238,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
                   </button>
                   <button type="button" className="cyc-x"
                           title={off ? "Put " + c.year + " back on the board"
-                                     : "Take " + c.year + " off the board – out of the band, the mean and the download"}
+                                     : "Take " + c.year + " off the board – out of the band, the mean, and the download"}
                           aria-label={off ? "Put " + label + " back on the board"
                                           : "Take " + label + " off the board"}
                           onClick={() => toggle(c.year)}>{off ? "+" : "×"}</button>
@@ -2198,7 +2252,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
           <p className="ap-pop-foot">
             Click a term to draw its own line over the band, and again to put it
             back. The × takes it off the board altogether – out of the band, the
-            mean and the download.
+            mean, and the download.
           </p>
         </FilterPop>
         {/* A caption, not a control: the band is derived from the board, so it
@@ -2214,7 +2268,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
               <rect className="cyc-band hi" x="4" y="2.5" width="22" height="7" fill="var(--cyc-fill)" />
               <line x1="4" y1="6" x2="26" y2="6" stroke="var(--ink-2)" strokeWidth="1.9" strokeDasharray="2 3.4" opacity="0.85" />
             </svg>
-            <span>Past terms: mean of the set, middle half and middle 80%</span>
+            <span>Past terms: mean of the set, middle half, and middle 80%</span>
           </div>
         )}
       </div>
@@ -2413,7 +2467,9 @@ function AccuracyPanel() {
     }).length;
   }, 0);
   const col = (err) => (err > 0 ? "var(--alp)" : "var(--lnp)");
-  const oneSided = A.cycles.filter((c) => c.sameSide);
+  const oneSided = [...A.cycles].filter((c) => c.sameSide).sort((a, b) => a.year - b.year);
+  const numWord = (n) => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] ?? String(n);
+  const listJoin = (a) => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + (a.length > 2 ? ", and " : " and ") + a[a.length - 1];
 
   const TIP_W = 184;                                // matches .acc-tip's width
   const sgn = (v) => (v > 0 ? "+" : "") + v.toFixed(1);
@@ -2453,7 +2509,7 @@ function AccuracyPanel() {
         </div>
         <div className="dir-net">
           <span className="dir-net-label">Average miss</span>
-          <span className="dir-net-val">{A.meanAbs}<span className="pct"> pts</span></span>
+          <span className="dir-net-val">{A.meanAbs.toFixed(1)}<span className="pct"> pts</span></span>
         </div>
       </div>
 
@@ -2476,6 +2532,13 @@ function AccuracyPanel() {
         <span className="acc-scale-l" style={{ color: "var(--lnp)" }}>← Labor understated</span>
         <span className="acc-scale-c">Result</span>
         <span className="acc-scale-r" style={{ color: "var(--alp)" }}>Labor overstated →</span>
+      </div>
+      {/* the gridlines' values, which the rows never said: a reader could see
+          a miss was "past the tick" without knowing the tick was 2.5 points */}
+      <div className="acc-axis" aria-hidden="true">
+        {[-SPAN / 2, SPAN / 2].map((t) => (
+          <span key={t} style={{ left: pct(t) + "%" }}>{t > 0 ? "+" : "−"}{Math.abs(t)} pts</span>
+        ))}
       </div>
 
       <div className={"acc-rows" + (spread ? " acc-spread-on" : "")} ref={rowsRef}>
@@ -2582,23 +2645,25 @@ function AccuracyPanel() {
       </div>
 
       <p className="table-hint">
-        Big dots are the average of that election’s final polls – where only one house
-        was in the field, its own figure stands alone; small dots are the individual
-        houses – {CANT_HOVER ? "tap" : "hover"} one for its figure.
-        {stacked > 0 && (
-          <> {stacked} of them missed by exactly the same amount as another house, so they are
-          drawn on top of each other – <strong>Separate overlapping dots</strong> steps those into
-          their own lanes without moving any of them along the scale.</>
-        )} Exit polls are excluded, and a
-        house that publishes an undecided-inclusive pair is normalised first, so its arithmetic
-        isn’t scored as a miss.
+        Big dots are each election’s average final poll; small dots are the individual houses
+        – {CANT_HOVER ? "tap" : "hover"} one for its figure.
         {bothWays && (
-          <> The two elections where every house missed the same way, {oneSided.map((c) => c.year).join(" and ")},
-          {" "}missed in <strong>opposite directions</strong> – so this is not a standing lean that
+          <> Of the {numWord(oneSided.length)} elections where every house missed the same way
+          ({listJoin(oneSided.map((c) => c.year))}), {numWord(oneSided.filter((c) => c.err > 0).length)} overstated
+          Labor and {numWord(oneSided.filter((c) => c.err < 0).length)} understated it. They missed
+          in <strong>opposite directions</strong>, so this is not a standing lean that
           today’s figures could be corrected for. It is the size of the error, not its direction,
           that carries.</>
         )}
       </p>
+      <HowTo paras={[
+        <>Where only one house was in the field, its own figure stands alone.</>,
+        stacked > 0 && <>{stacked} dots missed by exactly the same amount as another house, so they
+        are drawn on top of each other – <strong>Separate overlapping dots</strong> steps those into
+        their own lanes without moving any of them along the scale.</>,
+        <>Exit polls are excluded, and a house that publishes an undecided-inclusive pair is
+        normalised first, so its arithmetic isn’t scored as a miss.</>,
+      ]} />
 
       <div className="acc-firms">
         <div className="acc-firms-h">By house, where there is more than one election to judge on</div>
@@ -2607,7 +2672,7 @@ function AccuracyPanel() {
             <div className="acc-firm" key={f.firm}>
               <span className="acc-firm-n">{f.firm}</span>
               <span className="acc-firm-v" title="Average size of the miss, ignoring direction">
-                {f.meanAbs}<span className="pct"> pts</span>
+                {f.meanAbs.toFixed(1)}<span className="pct"> pts</span>
               </span>
               <span className="acc-firm-c">{f.n} elections</span>
             </div>
@@ -2885,9 +2950,17 @@ function PastCyclesView() {
   return (
     <div className="view view-cycles">
       <div className="view-intro">
+        {/* The point in one sentence; the reading instructions fold. All of it
+            ran fourteen lines on a phone, and the first chart started ~850px
+            down, below the fold, under a paragraph of how-to. */}
         <p className="view-lede">
           Every federal term since 1972, lined up on its election day so each government’s
-          run can be read off the same clock. The past terms stand together as a band –
+          run can be read off the same clock.
+        </p>
+        <details className="view-how">
+          <summary>How to read these charts</summary>
+          <p className="view-lede">
+          The past terms stand together as a band –
           outer edge the middle 80% of them, darker half the middle 50%, dotted line their
           mean – drawn over the months each term was actually in office, and going fainter
           where fewer of them were.{" "}
@@ -2905,7 +2978,8 @@ function PastCyclesView() {
           take terms off the board, or to cut the board to the governments that were
           returned or turned out at their next election. Leave three or fewer terms on
           the board to see the individual polls under each line.
-        </p>
+          </p>
+        </details>
         {srcFailed && (
           <p className="cyc-src-note">
             The individual polls behind the past terms didn’t load – the monthly
@@ -2954,11 +3028,19 @@ function PastCyclesView() {
 
       <AccuracyPanel />
 
-      <p className="cyc-foot">
+      {/* the tab's method notes, folded like every chart's: the download
+          pointer stays in view, the construction waits behind the toggle */}
+      <details className="view-how hint-how">
+        <summary>How these charts are built</summary>
+        <p className="cyc-foot">
         The individual polls behind the plotted series are downloadable above
         {hidden.size > 0 && ", the file leaving the hidden terms out just as the charts do"}.{" "}
-        Past cycles run the full ~3-year term to the next election; the current cycle stops at the
-        latest reading. Where the band runs faint, fewer than three-quarters of the terms on the
+        Past cycles run the full ~3-year term to the next election. The current term stops at the
+        latest poll, and its last point is the figure the site quotes now, as in the headline,
+        rather than the month so far. Every term’s months are averaged as the current term’s are: a pollster with
+        several polls in a month counts for the square root of their number, and from 1987, when
+        Newspoll joined Morgan, each poll is first corrected for its pollster’s lean within that
+        term. Where the band runs faint, fewer than three-quarters of the terms on the
         board were in office that month – the oldest terms open before any house asked about
         approval, and only the longest parliaments reach three years – and the readout on its
         mean names the headcount, and how many of them were polled rather than interpolated,
@@ -2980,7 +3062,8 @@ function PastCyclesView() {
         {mode === "chg"
           ? "Lines show movement relative to each party’s own election result."
           : "Approval lines splice the sitting prime minister – and opposition leader – where a term changed leaders mid-stream."}
-      </p>
+        </p>
+      </details>
     </div>
   );
 }
@@ -3254,12 +3337,19 @@ function ArchLead({ p, measure, primaryFallback, basis }) {
   return (
     <div className="arch-appr"
          title={`${li.lab} leads by ${Math.abs(li.m).toFixed(1)}${li.note}`}>
+      {/* who leads is SAID, not left to the colour: "ALP +2.8", "ON +0.4" */}
       <span className="netv" style={{ color: inkOf(li.color) }}>
-        {li.m > 0 ? "+" : ""}{li.m.toFixed(1)}
+        <span className="lead-who">{li.lab}</span>{" "}+{Math.abs(li.m).toFixed(1)}
         {li.primary && <>{" "}<span className="facet-flag">primary</span></>}
       </span>
-      <div className="arch-appr-bar" aria-hidden="true">
-        {li.segs.map((s, i) => <span key={i} style={{ width: s.v + "%", background: s.color }}></span>)}
+      {/* The margin drawn out from a centre tie line, the first-named party to
+          the left: the old bar split 52px by the two shares, so +0.8 and +9.8
+          were the same picture. Full half-width is an 8-point lead - the
+          span where polls actually disagree; anything wider pins. */}
+      <div className="lead-bar" aria-hidden="true">
+        <span className={"lead-bar-fill " + (li.m >= 0 ? "from-r" : "from-l")} style={{ background: li.color,
+          width: Math.min(50, Math.abs(li.m) * 6.25) + "%",
+          [li.m >= 0 ? "right" : "left"]: "50%" }}></span>
       </div>
     </div>
   );
@@ -3415,7 +3505,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
 const POLL_TAGS = [
   { id: "2pp",   label: "2PP",   title: "Two-party preferred – one matchup (ALP v L/NP)" },
   { id: "2x2pp", label: "2×2PP", title: "Two 2PP matchups – e.g. ALP v L/NP and ALP v ON" },
-  { id: "3x2pp", label: "3×2PP", title: "Three 2PP matchups – ALP v L/NP, ALP v ON and L/NP v ON" },
+  { id: "3x2pp", label: "3×2PP", title: "Three 2PP matchups – ALP v L/NP, ALP v ON, and L/NP v ON" },
   { id: "3pp",   label: "3PP",   title: "Three-way party-preferred – ALP / L/NP / ON in one distribution" },
   { id: "ppm",   label: "PPM",   title: "Preferred prime minister" },
   { id: "aprv",  label: "Aprv",  title: "Leader approval (approve − disapprove)" },
@@ -3629,7 +3719,7 @@ function VariancePanel({ facet, rangeId }) {
 
   const chartSeries = rows.map((r) => ({
     id: r.m.id, label: r.m.label, color: r.m.color, width: 3, dashed: !!r.m.dashed,
-    opacity: hidden[r.m.id] ? 0 : 1,
+    opacity: hidden[r.m.id] ? 0 : 1, endLabel: r.m.label,
     points: r.pts.filter((d) => d.sigma != null && inWin(d))
       .map((d) => ({ x: d.x, y: d.sigma, note: d.R.toFixed(2) + "×" })),
   })).filter((s) => s.points.length > 1);
@@ -3744,13 +3834,16 @@ function VariancePanel({ facet, rangeId }) {
       </div>
 
       <p className="table-hint ap-var-note">
-        Spread is the recency-weighted standard deviation of each poll’s distance from a local trend,
-        in {unitNote} – recency-weighted only, because weighting by sample size would mute exactly the
-        small divergent polls being measured. The floor is what a design effect of {window.AP.DISC.DEFF} and
-        each poll’s own sample size predict. Their ratio reads: under 0.80× herded · Around 1× as close as
-        sampling allows · Over 1.20× genuinely apart.
-        {view === "leadership" && " Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing."}
+        The ratio of spread to floor reads: under 0.80× herded · around 1× as close as sampling
+        allows · over 1.20× genuinely apart.
       </p>
+      <HowTo cls="table-hint ap-var-note" paras={[
+        <>Spread is the recency-weighted standard deviation of each poll’s distance from a local trend,
+        in {unitNote} – recency-weighted only, because weighting by sample size would mute exactly the
+        small divergent polls being measured.</>,
+        <>The floor is what a design effect of {window.AP.DISC.DEFF} and each poll’s own sample size predict.</>,
+        view === "leadership" && <>Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing.</>,
+      ]} />
     </section>
   );
 }
@@ -3885,9 +3978,21 @@ function HouseLeanPanel({ rangeId }) {
     return { firm, color: houseLeanColour(firm), all, pts: all.filter(inWin) };
   });
 
+  /* Eleven houses in near-neighbour hues were a tangle nobody could read by
+     colour. With more than four on the chart, the houses leaning furthest
+     stay at full strength and carry their names at the line's end; the rest
+     recede to context. Four or fewer (a reader's own pick) are all named. */
+  const shownN = rows.filter((r) => !hidden[r.firm]).length;
+  /* past the first gridline, or failing three of those, the three furthest
+     out - a quiet month still names its edges rather than fading every line */
+  const byLean = rows.filter((r) => !hidden[r.firm])
+    .sort((a, b) => Math.abs(b.all[b.all.length - 1].y) - Math.abs(a.all[a.all.length - 1].y));
+  const named = new Set(byLean.filter((r, i) => i < 3 || Math.abs(r.all[r.all.length - 1].y) >= LEAN_SURFACE).map((r) => r.firm));
+  const standsOut = (r) => named.has(r.firm);
   const chartSeries = rows.map((r) => ({
     id: r.firm, label: r.firm, color: r.color, width: 3,
-    opacity: hidden[r.firm] ? 0 : 1,
+    opacity: hidden[r.firm] ? 0 : (shownN > 4 && !standsOut(r) ? 0.35 : 1),
+    endLabel: shownN <= 4 || standsOut(r) ? r.firm : undefined,
     points: r.pts,
   })).filter((s) => s.points.length > 1);
   if (!chartSeries.length) return null;
@@ -3995,13 +4100,13 @@ function HouseLeanPanel({ rangeId }) {
         fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(1)}
       />
 
-      <p className="table-hint ap-var-note">
-        {meta.ground + " "}Each
-        point reads the lean as of that month, with the 90-day half-life on the evidence, so a
-        house’s current method outranks its history; the All-polls table’s House-effect column
-        instead pools each pollster’s whole history into one standing figure, which is why its
-        numbers won’t match the right-hand edge here.
-      </p>
+      <p className="table-hint ap-var-note">{meta.ground}</p>
+      <HowTo cls="table-hint ap-var-note" paras={[
+        <>Each point reads the lean as of that month, with the 90-day half-life on the evidence, so a
+        house’s current method outranks its history.</>,
+        <>The All-polls table’s House-effect column instead pools each pollster’s whole history into
+        one standing figure, which is why its numbers won’t match the right-hand edge here.</>,
+      ]} />
     </section>
   );
 }
@@ -4273,17 +4378,20 @@ function FlowDriftPanel({ rangeId }) {
           split, and carries no such error. gen-data's fitter went with it. */}
       <p className="table-hint ap-var-note">
         Above zero – the red ground – the published 2PPs are running friendlier to Labor than the
-        frozen table reads their own primaries; below it, friendlier to the Coalition. Each house’s
-        gap against the table is centred on its own polls in the {fd.meta.baseDays} days after the
-        election – the one moment the electorate’s actual flows are counted, and a house’s fixed
-        allocation habits absorbed into the zero
-        {lateFirms.length > 0 && <> – {lateFirms.join(", ")} began polling later and anchor on
-          {" "}their own first waves instead, so their lines read only the drift since they started</>}.
-        The pooled line and its band are the cross-house aggregate with the same sample weighting
-        as the aggregates above. A wave that publishes no two-party figure carries no gap, so a
-        house that reports a 2PP only irregularly reads through a thinner line – and the whole
-        panel is a diagnostic read on published figures: it corrects no other number on this page.
+        frozen table reads their own primaries; below it, friendlier to the Coalition.
       </p>
+      <HowTo cls="table-hint ap-var-note" paras={[
+        <>Each house’s gap against the table is centred on its own polls in the {fd.meta.baseDays} days
+        after the election – the one moment the electorate’s actual flows are counted, and a house’s
+        fixed allocation habits absorbed into the zero
+        {lateFirms.length > 0 && <> – {lateFirms.join(", ")} began polling later and anchor on
+          {" "}their own first waves instead, so their lines read only the drift since they started</>}.</>,
+        <>The pooled line and its band are the cross-house aggregate with the same sample weighting
+        as the aggregates above. A wave that publishes no two-party figure carries no gap, so a
+        house that reports a 2PP only irregularly reads through a thinner line.</>,
+        <>The whole panel is a diagnostic read on published figures: it corrects no other number on
+        this page.</>,
+      ]} />
     </section>
   );
 }
@@ -4407,14 +4515,17 @@ function FlowDriftOnPanel({ rangeId }) {
       <p className="table-hint ap-var-note">
         Above zero – the red ground – the published head-to-heads are running friendlier to
         Labor than the frozen table reads their own primaries; below it, friendlier to One
-        Nation. Each house’s gap against the table is centred on its own first waves – the
-        classic pairing on the panel above can be read at the election, but no count of this
-        pairing exists, so the chart speaks only about drift since each house began. The pooled
-        line and its band are the cross-house aggregate with the same sample weighting as the
-        aggregates above. A wave that publishes no head-to-head carries no gap, and the whole
-        panel is a diagnostic read on published figures: it corrects no other number on this
-        page.
+        Nation.
       </p>
+      <HowTo cls="table-hint ap-var-note" paras={[
+        <>Each house’s gap against the table is centred on its own first waves – the classic
+        pairing on the panel above can be read at the election, but no count of this pairing
+        exists, so the chart speaks only about drift since each house began.</>,
+        <>The pooled line and its band are the cross-house aggregate with the same sample weighting
+        as the aggregates above. A wave that publishes no head-to-head carries no gap.</>,
+        <>The whole panel is a diagnostic read on published figures: it corrects no other number on
+        this page.</>,
+      ]} />
     </section>
   );
 }
@@ -4456,10 +4567,25 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     leadership: { has: (p) => window.ppmContests(p).length > 0 || (p.appr && (p.appr.albNet != null || p.appr.taylorNet != null || p.appr.hansonNet != null)), label: "With leadership numbers" },
     direction: { has: (p) => !!p.dir, label: "With a direction reading" },
   };
+  /* The two published-only matchups are measured by almost no wave – five
+     waves print an L/NP v ON figure, four a three-cornered one – so
+     picking either from the Contest control would line up ~160 rows of
+     dashes around the handful the reader asked for. The matchup scopes the
+     table itself the moment it is picked, armed by default and shown as
+     the same removable auto-pill. While it is up it REPLACES the facet
+     scope (a wave carrying the matchup passes the twopp scope by
+     construction – its `|| p.tppAlt2 || p.tpp3` clause), and it only ever
+     engages on the 2PP facet – the Contest control exists nowhere else. */
+  const CONTEST_SCOPE = {
+    lnponp: { has: (p) => !!p.tppAlt2, label: "With an L/NP v ON 2PP" },
+    "3cp": { has: (p) => !!p.tpp3, label: "With a 3-cornered figure" },
+  };
   /* The scope a facet ARMS ITSELF with. Facets with nothing to scope get
-     false; the 2PP facet follows the basis (see the note on twopp above);
+     false; the 2PP facet follows the basis (see the note on twopp above)
+     unless the matchup is a published-only one, which always self-arms;
      everything else keeps the long-standing "on". */
-  const defaultScopeFor = (f) => (!FACET_SCOPE[f] ? false : f === "twopp" ? pubBasis : true);
+  const defaultScopeFor = (f, m) =>
+    (!FACET_SCOPE[f] ? false : f === "twopp" ? Boolean(CONTEST_SCOPE[m]) || pubBasis : true);
 
   const FACETS = [
     { id: "twopp", label: "2PP" },
@@ -4517,6 +4643,9 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     const get = (...keys) => { for (const k of keys) { const v = p.get(k); if (v != null) return v; } return null; };
     const view = FACET_BY_URL[get("f", "view")] || "twopp";
     const sExplicit = get("s", "scope") != null;
+    /* the matchup is lifted out ahead of the literal so the scope seed can
+       see it – a published-only matchup self-arms its contest scope */
+    const meas = MEAS_BY_URL[get("v", "vs")] || DEFAULT_MEASURE;
     return {
       q: get("q") || "",
       who: (() => {
@@ -4530,7 +4659,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         return (mask ? [...mask] : raw.split(",")).filter((t) => POLL_TAGS.some((pt) => pt.id === t));
       })(),
       lead: LEAD_BY_URL[get("l", "lead")] || "all",
-      measure: MEAS_BY_URL[get("v", "vs")] || DEFAULT_MEASURE,
+      measure: meas,
       range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
       facet: view,
       /* "explicit" means the reader (or a shared link) said something about
@@ -4538,7 +4667,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
          the basis moves. */
       scope: sExplicit
         ? (get("s") !== "0" && get("s", "scope") !== "off")
-        : defaultScopeFor(view),
+        : defaultScopeFor(view, meas),
       scopeExplicit: sExplicit,
     };
   })();
@@ -4566,8 +4695,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      itself – as a visible, removable pill, not a hidden default. */
   const [scope, setScope] = useState(urlInit.scope);
   React.useEffect(() => {
-    if (!scopeSet) setScope(defaultScopeFor(facet));
-  }, [pubBasis, facet, scopeSet]);
+    if (!scopeSet) setScope(defaultScopeFor(facet, measure));
+  }, [pubBasis, facet, measure, scopeSet]);
 
   /* Arriving from a dot on a chart. The filters ride in the URL now, so they
      survive the remount this trip causes - and any of them could hide the
@@ -4593,7 +4722,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const onMeasure = (mv) => { setMeasure(mv); setLead("all"); };
   const onFacet = (f) => {
     setFacet(f); setSort({ key: "date", dir: -1 }); setPop(null);
-    setScopeSet(false); setScope(defaultScopeFor(f));
+    // the matchup survives the hop only if the 2PP facet is where we land –
+    // every other facet resets it below – so seed the scope from the
+    // matchup that will actually be in force
+    setScopeSet(false); setScope(defaultScopeFor(f, f === "twopp" ? measure : DEFAULT_MEASURE));
     // the expanded row STAYS expanded: `open` keys the poll itself, and the
     // detail panel shows every measure whatever the facet. If the new facet's
     // scope hides that poll it simply isn't rendered, and it resurfaces –
@@ -4743,7 +4875,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      panels can ask the question the numbers beside each option answer: how
      many polls would this leave, given everything else already set. That means
      counting with exactly one predicate lifted out – `without(f)`. */
-  const scoping = scope && FACET_SCOPE[facet];
+  /* A published-only matchup stands in for its facet's scope while it is
+     picked (CONTEST_SCOPE notes why), so the pill reads "With an
+     L/NP v ON 2PP" rather than the everything-but-nothing "With a 2PP". */
+  const scoping = scope && ((facet === "twopp" && CONTEST_SCOPE[measure]) || FACET_SCOPE[facet]);
   const TESTS = [
     ["who", (p) => !sel.size || sel.has(baseHouse(p.pollster))],
     // a row must contain EVERY selected data type (AND)
@@ -4807,6 +4942,16 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     // stable tiebreak: newest first
     return b.x - a.x;
   });
+
+  /* The table shows a page at a time. At ~90px a row, all 163 made a
+     19,600px page and buried the diagnostics under it. Any change to what is
+     listed or how starts again from the first page; a row being asked for
+     (a chart dot, an open breakdown) always makes the cut. */
+  const PAGE = 40;
+  const [limit, setLimit] = useState(PAGE);
+  React.useEffect(() => { setLimit(PAGE); }, [ql, sel, lead, range, tagSel, scope, facet, sort.key, sort.dir, measure]);
+  const openIdx = open ? sorted.findIndex((p) => p.pollster + "|" + p.released === open) : -1;
+  const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
 
   const total = rows.length;
   const clearAll = () => {
@@ -4904,6 +5049,19 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     ["Direction unsure", (p) => (p.dir ? p.dir.unsure : "")],
     ["Direction net", (p) => (p.dir ? p.dir.net : "")],
     ["Contains", (p) => p.tags.join(" ")],
+    // Appended, so the columns above keep their places. The vote by group:
+    // each poll's first preferences for the common groups, exactly as the
+    // pooled figures use them (gen-data DEMO_BY_POLL) – and how they were read
+    ["Groups read from", (p) => (p.grp ? p.grp.r : "")],
+    ...(D.demoGroups || []).flatMap((g, gi) => ["ALP", "L/NP", "GRN", "ON", "OTH"].map((lab, k) =>
+      [g + " " + lab, (p) => { const v = p.grp && p.grp.v[gi]; return v ? v[k] : ""; }])),
+    // where One Nation's new voters came from: % of each 2025 group now voting
+    // One Nation, and of its own 2025 voters still with it
+    ["2025 L/NP now ON", (p) => (p.sw && p.sw.lnp != null ? p.sw.lnp : "")],
+    ["2025 ALP now ON", (p) => (p.sw && p.sw.alp != null ? p.sw.alp : "")],
+    ["2025 GRN now ON", (p) => (p.sw && p.sw.grn != null ? p.sw.grn : "")],
+    ["2025 OTH now ON", (p) => (p.sw && p.sw.oth != null ? p.sw.oth : "")],
+    ["2025 ON still ON", (p) => (p.sw && p.sw.onp != null ? p.sw.onp : "")],
   ];
   const exportCsv = () => downloadCsv(
     `auspol-tracker-polls-${D.latest.updatedISO}.csv`,
@@ -4972,6 +5130,20 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
           <strong>{sorted.length}</strong>{sorted.length !== total ? " of " + total : ""} {sorted.length === 1 ? "poll" : "polls"}
         </span>
       </div>
+
+      {/* The basis as a visible control. The 2PP column's heading also
+          switches it, but that was the only way in - a hidden affordance on
+          desktop, and on phones (where the column is .hide-md) no way at all. */}
+      {facet === "twopp" && (
+        <div className="ap-basis-narrow">
+          <span className="ap-ctl-group">
+            <span className="ap-ctl-lab">Basis</span>
+            <TextToggle value={tppBasis} onChange={setTppBasis}
+                        options={[{ id: "imp", label: "implied" }, { id: "resp", label: "published" }]}
+                        ariaLabel="Two-party basis" caps />
+          </span>
+        </div>
+      )}
 
       <div className="ap-bar">
         <div className="ap-search">
@@ -5116,10 +5288,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
               <ArchSortTh label="Fieldwork" short="Field" k="date" sort={sort} onSort={onSort} className="ta-l" />
               <ArchSortTh label="Sample" k="sample" sort={sort} onSort={onSort} className="hide-md" />
               {/* the house's own published effective n - only where the
-                  pollster filed one with the APC (Resolve, Roy Morgan et al.
-                  file none and dash). Sparse column, so not sortable. */}
+                  pollster published one in its APC methodology statement
+                  (Resolve, Roy Morgan et al. publish none and dash). Sparse
+                  column, so not sortable. */}
               <th scope="col" className="hide-md"
-                  title="Effective sample, where the pollster filed one with the Australian Polling Council">n<sub>eff</sub></th>
+                  title="Effective sample, where the pollster published one in its Australian Polling Council methodology statement">n<sub>eff</sub></th>
 
               {facet === "twopp" && (<>
                 {/* the 2PP column head is the basis switch – names the ACTIVE
@@ -5163,7 +5336,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
             </tr>
           </thead>
           <tbody ref={bodyRef}>
-            {sorted.map((p, i) => {
+            {shownRows.map((p, i) => {
               const alpLead = p.alp >= 50;
               /* Identity, not position: this used to carry the row's index,
                  so re-sorting the table silently closed whatever was open -
@@ -5184,10 +5357,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                   </td>
                   <td className="ta-l pollster-cell">
                     <PollsterName name={p.pollster} url={p.url} />
-                    {/* the publisher, as the Latest-polls table shows it -
-                        above MethodLink, matching that table's cell order */}
+                    {/* the publisher, as the Latest-polls table shows it; the
+                        APC statement link lives in the breakdown, where the
+                        release links are - a third line in every row cost
+                        the archive a screen of height per 20 polls */}
                     <span className="pollster-mode">{p.client}</span>
-                    <MethodLink url={p.methodUrl} />
                     {p.tags.length > 0 && (
                       <span className="poll-tags" aria-label={"Contains " + p.tags.map((id) => POLL_TAG_META[id].label).join(", ")}>
                         {p.tags.map((id) => (
@@ -5281,26 +5455,42 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
           </tbody>
         </table>
       </div>
+      {shownRows.length < sorted.length && (
+        <div className="ap-more">
+          <button type="button" className="ap-jump" onClick={() => setLimit((n) => n + PAGE)}>
+            Show {Math.min(PAGE, sorted.length - shownRows.length)} more
+          </button>
+          <button type="button" className="ap-more-all" onClick={() => setLimit(sorted.length)}>
+            Show all {sorted.length}
+          </button>
+          <span className="ap-more-n">{shownRows.length} of {sorted.length} shown</span>
+        </div>
+      )}
       <p className="table-hint">
-        Tap any poll for its full breakdown · Dates are fieldwork windows (publication dates sit in the
-        breakdown) ·
-        {pubBasis
-          ? "“As published” lists each poll’s headline figures exactly as the pollster released them · The lead bar is the published figure in margin form"
-          : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown · The lead bar is that implied figure in margin form"}
-        {" "}(the L/NP v ON and 3-cornered matchups are the
-        pollsters’ own published figures – the site prices no implied series for them) · “Poll lean” is
-        the poll’s {pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate"} for that month · “—” Means the pollster didn’t
-        publish that measure · Search matches
-        anything in a row · Click any column heading to sort · Click the “{pubBasis ? "As published" : "Implied 2PP"}”
-        heading to switch bases.{" "}
-        <strong>House effect</strong> is how far a pollster systematically sits from the cross-house consensus
-        on {pubBasis ? "published" : "implied"} 2PP – pooled from its polls with a 90-day half-life, so its recent methods count for more, and
-        shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure’s
-        own time, and it is a property of the pollster, not of this one poll.
-        {" "}<strong>n<sub>eff</sub></strong> is the pollster’s own published effective sample, filed with the
-        Australian Polling Council – Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog
-        file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown.
+        Tap any poll for its full breakdown · Search matches anything in a row ·{" "}
+        {CANT_HOVER ? "Tap" : "Click"} any column heading to sort.
       </p>
+      <HowTo label="How to read this table" paras={[
+        <>Dates are fieldwork windows; publication dates sit in the breakdown. “—” means the
+        pollster didn’t publish that measure.</>,
+        <>{pubBasis
+          ? "“As published” lists each poll’s headline figures exactly as the pollster released them. The lead bar draws the published margin out from a tie line at its centre"
+          : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown. The lead bar draws that implied margin out from a tie line at its centre"}
+        {" "}(the L/NP v ON and 3-cornered matchups are the pollsters’ own published figures – the
+        site prices no implied series for them).
+        <span className="hint-wide"> {CANT_HOVER ? "Tap" : "Click"} the “{pubBasis ? "As published" : "Implied 2PP"}”
+        heading to switch bases.</span><span className="hint-narrow"> The Basis switch above the table changes bases.</span></>,
+        <><strong>Poll lean</strong> is the poll’s {pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate"} for
+        that month. <strong>House effect</strong> is how far a pollster systematically sits from the
+        cross-house consensus on {pubBasis ? "published" : "implied"} 2PP – pooled from its polls with a
+        90-day half-life, so its recent methods count for more, and shrunk toward zero while it has
+        published few. The aggregates subtract it, read as of each figure’s own time, and it is a
+        property of the pollster, not of this one poll.</>,
+        <><strong>n<sub>eff</sub></strong> is the pollster’s own published effective sample, from its
+        Australian Polling Council methodology statement – Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent,
+        and Fox & Hedgehog publish one; Resolve and Roy Morgan publish none, so a dash there means
+        unpublished, not unknown.</>,
+      ]} />
 
       <VariancePanel key={facet} facet={facet} rangeId={range} />
 
@@ -5542,7 +5732,7 @@ function infoTerms(D) {
      group naming its years and the size (or range) of its miss. */
   const lefBigText = (() => {
     const yrs = (a) => a.map((m) => m.at).sort((x, y) => x - y)
-      .reduce((s, y, i, arr) => s + (i ? (i === arr.length - 1 ? " and " : ", ") : "") + y, "");
+      .reduce((s, y, i, arr) => s + (i ? (i === arr.length - 1 ? (arr.length > 2 ? ", and " : " and ") : ", ") : "") + y, "");
     const size = (a) => {
       const v = a.map((m) => Math.abs(m.bt).toFixed(1)).sort();
       return (v[0] === v[v.length - 1] ? v[0] : v[0] + "–" + v[v.length - 1]) + " points";
@@ -5561,6 +5751,87 @@ function infoTerms(D) {
     const [yy, mm] = w[i].ym.split("-").map(Number);
     return D.monthNameFull ? D.monthNameFull(mm) + " " + yy : w[i].ym;
   })();
+  /* Vote switching (the One Nation sources panel): the latest YouGov wave
+     for the worked example, and every wave for the working table. */
+  const ONS = D.onSources;
+  const onsWaves = ONS ? ONS.waves : [];
+  const onsYg = [...onsWaves].reverse().find((w) => w.pollster === "YouGov") || null;
+  const onsWork = onsWaves.length ? (
+    <div className="info-work-wrap">
+      <table className="info-work">
+        <thead><tr><th>Poll</th><th>Fieldwork</th><th>Coalition</th><th>Labor</th><th>Greens</th>
+          <th>Others</th><th>Kept</th><th>Drawn</th><th>Table</th><th>Published</th></tr></thead>
+        <tbody>
+          {onsWaves.map((w) => (
+            <tr key={w.pollster + w.date}>
+              <td>{w.pollster}</td><td>{w.date}</td>
+              <td>{w.toOn.lnp}</td><td>{w.toOn.alp}</td><td>{w.toOn.grn}</td><td>{w.toOn.oth}</td>
+              <td>{w.keptPct}</td><td>{w.drawn.toFixed(1)}</td><td>{w.implied.toFixed(1)}</td><td>{w.onp ?? "–"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="info-work-note">Coalition to Kept: per cent of each 2025 group now voting One
+        Nation (Kept is One Nation’s own 2025 voters). Drawn: the points of the national vote One
+        Nation has taken from the other groups, at their 2025 weights (Coalition {ONS.weights.lnp},
+        Labor {ONS.weights.alp}, Greens {ONS.weights.grn}, others and independents
+        {" "}{(ONS.weights.oth + ONS.weights.ind).toFixed(2)}, One Nation {ONS.weights.onp}). Table:
+        drawn plus kept – what the poll’s own table adds up to – beside the One Nation vote it
+        published. DemosAU’s voters who can’t recall a 2025 vote are the rest of its gap.</p>
+    </div>
+  ) : null;
+  /* The vote by group: the polls its six-week window holds, newest first. */
+  const DEMO = D.demographics;
+  const DEMO_SET_NAME = { age: "age", generation: "generation", gender: "gender", education: "education",
+    state: "state", location: "location", housing: "housing", language: "language at home" };
+  // "Age, gender, and state": a list in sentence case, with the Oxford comma
+  const demoSets = (ids) => {
+    const n = ids.map((id) => DEMO_SET_NAME[id] || id);
+    const s = n.length < 3 ? n.join(" and ") : n.slice(0, -1).join(", ") + ", and " + n[n.length - 1];
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+  const demoWork = DEMO && DEMO.polls && DEMO.polls.length ? (
+    <div className="info-work-wrap">
+      <table className="info-work info-work-list">
+        <thead><tr><th>Poll</th><th>Fieldwork</th><th>Groups</th></tr></thead>
+        <tbody>
+          {DEMO.polls.map((p) => (
+            <tr key={p.pollster + p.dateLabel}>
+              <td>{p.pollster}</td><td>{p.dateLabel}</td><td>{demoSets(p.sets)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="info-work-note">The polls in the six-week window, newest first. A poll’s weight
+        is its sample, halving every 14 days and fading out by day 42; a pollster with several polls
+        in the window counts for the square root of their number.</p>
+    </div>
+  ) : null;
+  /* The issues panel's working: the polls its six-week window holds, and
+     which answers each offered (the three-party shares drop the rest). */
+  const ISS = D.issues;
+  const ISS_OPT = { alp: "Labor", lnp: "the Coalition", onp: "One Nation", grn: "the Greens", oth: "someone else",
+                    equal: "all about equal", none: "none of these", unsure: "not sure" };
+  const issWork = ISS && ISS.polls && ISS.polls.length ? (
+    <div className="info-work-wrap">
+      <table className="info-work info-work-list">
+        <thead><tr><th>Poll</th><th>Fieldwork</th><th>Answers offered</th></tr></thead>
+        <tbody>
+          {ISS.polls.map((p) => (
+            <tr key={p.pollster + p.dateLabel}>
+              <td>{p.pollster}</td><td>{p.dateLabel}</td>
+              <td>{(p.options || []).map((o) => (o === "unsure"
+                ? ({ Resolve: "undecided", YouGov: "don’t know" }[p.pollster] || "not sure")
+                : ISS_OPT[o] || o)).join(", ")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="info-work-note">The polls in the six-week window, newest first. A poll’s weight
+        is its sample, halving every 14 days and fading out by day 42; a pollster with several polls
+        in the window counts for the square root of their number.</p>
+    </div>
+  ) : null;
   const pc = (v) => (v == null ? "–" : (100 * v).toFixed(1));
   const lefWork = lefT.length ? (
     <div className="info-work-wrap">
@@ -5601,9 +5872,9 @@ function infoTerms(D) {
         counts in full for two weeks, then fades smoothly to nothing by day 21, when it leaves
         the window.</span>
         <span className="info-p"><b>Size.</b> Larger samples count for more. Where a pollster
-        files an {xref("effective-sample", "weighted aggregate", "effective sample")} with the
-        Australian Polling Council, that figure is used; otherwise the raw sample, capped at
-        3,000.</span>
+        publishes an {xref("effective-sample", "weighted aggregate", "effective sample")} in its
+        Australian Polling Council methodology statement, that figure is used; otherwise the raw
+        sample, capped at 3,000.</span>
         <span className="info-p"><b>Repeat polls.</b> A pollster that publishes several times in
         the window counts for the square root of its number of polls, so three weekly Roy Morgan
         polls count as 1.7, not 3.</span>
@@ -5613,17 +5884,24 @@ function infoTerms(D) {
         publishes primaries counts.{SL ? <> Today that is {SL.alp.toFixed(1)}–{SL.lnp.toFixed(1)} to
         Labor.</> : null} The pollsters’ own published figures go through the same machinery for
         the version the chart switches to: {L.alp2pp.toFixed(1)}–{L.lnp2pp.toFixed(1)}.</span>
-        <span className="info-p">The monthly trend line uses the same method without the recency
-        weighting, and so do the leader ratings and national direction. Preferred prime minister
-        and the undecided share are plain
-        {" "}{xref("monthly-average", "weighted aggregate", "monthly averages")}: their differences
-        between pollsters come from the questions asked, not from a lean to correct.</span>
+        <span className="info-p">The monthly trend lines use the same method without the recency
+        weighting: the vote, the leader ratings, national direction, and every past term on Past
+        cycles. The current figure beside each panel is built as the headline is: a leader’s
+        rating, preferred prime minister, national direction, where One Nation’s new voters came
+        from, and who votes for whom. Measures polled about once a week or less
+        use a six-week window instead: favourability, Hanson’s approval, preferred prime minister,
+        the One Nation split, and the vote by group. There a poll’s weight halves every 14 days,
+        counts in full for four weeks, and fades out by day 42.</span>
+        <span className="info-p">Preferred prime minister gets no house adjustment, and the
+        undecided share is each pollster’s own reading: their differences between pollsters come
+        from the questions asked, not from a lean to correct. See
+        {" "}{xref("monthly-average", "weighted aggregate", "monthly averages")}.</span>
         {working(<>
           <span className="info-p">The headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window,
           where xᵢ is a poll’s figure minus its house effect and wᵢ = nᵢ × 2^(−d/7) × t(d) ÷ √m.</span>
           <span className="info-p"><b>nᵢ</b> is the poll’s sample: its published effective sample
-          × 1.6 (the design factor) where the pollster files one – Newspoll, YouGov, Essential,
-          DemosAU, RedBridge/Accent and Fox & Hedgehog do – otherwise its raw sample capped at
+          × 1.6 (the design factor) where the pollster publishes one – Newspoll, YouGov, Essential,
+          DemosAU, RedBridge/Accent, and Fox & Hedgehog do – otherwise its raw sample capped at
           3,000, or 1,200 if no sample is given. <b>d</b> is the poll’s age in days, counted from
           its fieldwork midpoint. <b>t(d)</b> is 1 up to day 14, then a half-cosine taper to 0 at
           day 21. <b>m</b> is the number of polls that pollster has in the window. The window’s
@@ -5700,17 +5978,17 @@ function infoTerms(D) {
         <>How far a single poll can miss purely because it surveyed a sample rather than everyone.
         A thousand respondents carry about ±3 points at 95% confidence. The error shrinks only
         with the square root of the sample, so four times the interviews halves it. It covers
-        chance and nothing else: skewed samples, turnout assumptions and a pollster’s methods sit
+        chance and nothing else: skewed samples, turnout assumptions, and a pollster’s methods sit
         outside it. Pooling several polls narrows the chance part, which is why the headline’s
         {" "}{xref("interval", "margin of error", "95% interval")} (±{hl.ci.toFixed(1)} today) is
         tighter than one poll’s ±3. The part every pollster shares doesn’t shrink at all.</>) },
       { id: "effective-sample", term: "Effective sample", body: (
         <>How many polls the window is really worth once weighting is counted: today, {hl.nEff} of
-        the {hl.n} in it. Older polls, smaller samples and repeat polls from one pollster all pull
+        the {hl.n} in it. Older polls, smaller samples, and repeat polls from one pollster all pull
         it below the raw count. The {xref("interval", "effective sample", "95% interval")} is
         computed from it.
         <span className="info-p">A single poll has its own version, shown as {eff} beside its
-        sample: the effective sample its pollster files in its
+        sample: the effective sample its pollster publishes in its
         {" "}{xref("apc-statement", "effective sample", "APC statement")}, which says what that one
         sample is worth after weighting.</span></>) },
       { id: "poll-disagreement", term: "Poll disagreement", body: (
@@ -5739,10 +6017,10 @@ function infoTerms(D) {
         Coalition against One Nation, is shown as published.</>) },
       { id: "primary-vote", term: "Primary vote", body: (
         <>The share of voters who put a party first, before any preferences are distributed.
-        Polls that publish no two-party figure still feed this series, the implied 2PP and the
+        Polls that publish no two-party figure still feed this series, the implied 2PP, and the
         leader ratings.</>) },
       { id: "implied-2pp", term: "Implied 2PP", body: (
-        <>The site’s main two-party figure, and the one on the hero, the share card and the
+        <>The site’s main two-party figure, and the one on the hero, the share card, and the
         summary. It takes each poll’s primary votes and distributes the minor parties’ shares
         using one fixed {xref("preference-flows", "implied 2PP", "preference table")}: the flows
         counted at the 2025 election. Every pollster allocates preferences its own way, so using
@@ -5764,7 +6042,10 @@ function infoTerms(D) {
         ) : null}
         <span className="info-p">Past cycles reads every earlier term the same way, each through
         the flows of the election that opened it – see
-        {" "}{xref("last-election-flows", "implied 2PP", "Last-election flows")}.</span></>) },
+        {" "}{xref("last-election-flows", "implied 2PP", "Last-election flows")}.</span>
+        <span className="info-p">Both tables, where their numbers come from, and how polls become
+        the headline figure are set out line by line in
+        {" "}<a href="/preference-flows/">The two-party figure, two ways</a>.</span></>) },
       { id: "preference-flows", term: "Preference flows", body: (
         <>How minor-party votes split between the final two candidates once preferences are
         distributed. The {xref("implied-2pp", "preference flows", "implied 2PP")} uses the flows
@@ -5776,7 +6057,8 @@ function infoTerms(D) {
         Party-by-party flows exist only from 1996, when full preference data was first published;
         One Nation’s line breaks where it barely stood candidates. Labor v One Nation uses a
         different table, the {xref("fp-flows", "preference flows", "first-principles flow set")},
-        because no election has counted that pairing.</>) },
+        because no election has counted that pairing. The full working, table by table, is in
+        {" "}<a href="/preference-flows/">The two-party figure, two ways</a>.</>) },
       { id: "last-election-flows", term: "Last-election flows", body: (
         <>The flow table a term’s implied 2PP is read through: the preferences counted at the
         election that opened the term. It’s the only table anyone inside the term could have used,
@@ -5831,20 +6113,21 @@ function infoTerms(D) {
     ] },
     { id: "g-pollsters", title: "Pollsters and their polls", entries: [
       { id: "house", term: "House", body: (
-        <>A polling company: Newspoll, YouGov, Resolve and the rest. The industry calls them
+        <>A polling company: Newspoll, YouGov, Resolve, and the rest. The industry calls them
         houses. A single poll release is often called a wave.</>) },
       { id: "apc-statement", term: "APC statement", body: (
-        <>The methodology statement a pollster files with the Australian Polling Council, the
-        industry body. Members publish one for each poll, covering fieldwork dates and method, the
-        raw sample, the effective sample (what that sample is worth after weighting), the
-        weighting used and the question order.
+        <>The methodology statement a pollster publishes under the Australian Polling Council’s
+        Code of Conduct. The council sets the disclosure standard; the statement itself is the
+        pollster’s own publication – nothing is lodged with the council. Members publish one for
+        each poll, covering fieldwork dates and method, the raw sample, the effective sample
+        (what that sample is worth after weighting), the weighting used, and the question order.
         <span className="info-p">A poll’s breakdown links its statement where there is one, and
         reads both sample figures off it. The effective sample, scaled back up by the 1.6 design
         factor, sets the poll’s weight in the
         {" "}{xref("weighted-aggregate", "APC statement", "weighted aggregate")}. Newspoll, YouGov,
-        Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog file them. Where a pollster files
-        none, the breakdown shows the raw sample alone and the {eff} column shows a dash: the site
-        doesn’t invent a figure the pollster never published.</span></>) },
+        Essential, DemosAU, RedBridge/Accent, and Fox & Hedgehog publish one. Where a pollster
+        publishes none, the breakdown shows the raw sample alone and the {eff} column shows a
+        dash: the site doesn’t invent a figure the pollster never published.</span></>) },
       { id: "mrp", term: "MRP", body: (
         <>Multilevel regression and post-stratification: a model that estimates each seat
         separately instead of applying one national swing everywhere. Seat figures appear on this
@@ -5874,6 +6157,198 @@ function infoTerms(D) {
         <span className="info-p">Open a row to see the house’s five most recent releases and its
         release page, so you can check the forecast against its record.</span></>) },
     ] },
+    { id: "g-who", title: "Who votes for whom", entries: [
+      { id: "vote-switching", term: "Vote switching", body: (
+        <>How people who voted for each party in 2025 say they would vote now. DemosAU and
+        YouGov both publish it, as a table with a row for each 2025 vote, and it’s what the panel
+        “Where One Nation’s new voters came from” is built from.
+        <span className="info-p"><b>How the split is worked out.</b> For each 2025 group, the share
+        now backing One Nation is multiplied by that group’s share of the 2025 vote. That gives the
+        points of the national vote One Nation has drawn from the group, and each group’s part of
+        the total is the share the panel shows.{onsYg ? <> In YouGov’s latest poll, {onsYg.toOn.lnp}%
+        of Coalition voters backing One Nation is worth {onsYg.pts.lnp.toFixed(1)} points, and
+        {" "}{onsYg.toOn.alp}% of Labor voters is worth {onsYg.pts.alp.toFixed(1)}.</> : null} The
+        panel’s other view shows the shares themselves: how much of each party’s 2025 vote One
+        Nation has taken.</span>
+        <span className="info-p"><b>A check.</b> Add the 2025 One Nation voters it kept, and every
+        poll’s table rebuilds its published One Nation vote to within about a point.</span>
+        <span className="info-p"><b>Limits.</b> People misremember how they voted, and memory tends
+        to drift toward how they feel now, which can blur the very switching being measured. Each
+        2025 group is only a few hundred respondents in any one poll, so a single poll’s split can
+        move several points. The figures pool each group’s share over the last six weeks of polls,
+        as the headline pools polls, and work the split out from the pooled shares; the lines do
+        the same month by month. Voters who can’t recall a 2025 vote,
+        or didn’t vote, are left out. Other parties and independents are counted together, because
+        DemosAU doesn’t separate them.</span>
+        <span className="info-p"><b>Sources.</b> YouGov’s figures are its own published tables,
+        from Sky News Pulse until July 2026 and News24 Pulse since. DemosAU prints its table only
+        as a chart, so its figures are measured from the chart in each report, and match every
+        label the chart prints. Newspoll publishes only Labor’s row: its September poll found 15% of
+        Labor’s 2025 voters now back One Nation (
+        <a className="fb-link" href="https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455"
+           target="_blank" rel="noopener noreferrer">The Australian</a>), close to DemosAU’s 14%
+        and YouGov’s 15%. Each poll’s figures are in the All polls export.</span>
+        {working(onsWork)}</>) },
+      { id: "vote-by-group", term: "Breakdowns by group", body: (
+        <>How each group – men and women, age groups, education levels, states, where people live,
+        whether they own or rent, the language they speak at home, and how certain of their choice
+        they are – says it will vote, from the
+        tables pollsters publish with their polls. The panel “Who votes for whom” pools them into
+        one figure per group.
+        <span className="info-p"><b>How it’s built.</b> Each poll says how far a group sits from
+        that poll’s own overall figure: One Nation ten points lower among 18–34s, say. Those gaps
+        are pooled over the last six weeks of polls, weighted as the headline’s polls are, so newer
+        and larger polls count for more. They are then added to the site’s current figure for all
+        voters. Measuring each poll against its own total removes its pollster’s lean, and puts
+        every group on the same level as the headline. The charts under the figures follow each
+        group month by month, built the same way: each month’s pooled gaps are added to that
+        month’s figure for all voters, as every monthly line on the site is built. They show each
+        group as a percentage above or below all voters.</span>
+        <span className="info-p"><b>Which pollsters count where.</b> Groups pool only where the
+        pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov, and
+        RedBridge. 18–34: Resolve, DemosAU, and YouGov. 35–54 and 55+: Resolve and DemosAU, since
+        YouGov’s bands are 35–49 and 50+. Generations: YouGov and RedBridge. Education, on three
+        levels: DemosAU, YouGov, and RedBridge, with RedBridge’s two school rows combined in
+        proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA,
+        WA, and ACT/NT/Tas columns are combined into the rest of Australia at their shares of the
+        2025 vote. Where people live: YouGov and RedBridge, which draw the same four areas, and
+        DemosAU for the two metropolitan ones, since its third combines provincial and rural
+        voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its
+        renters include others who don’t own. Language at home: YouGov and DemosAU. Softness of
+        the vote – certain of the choice, may change it, or only named it when pressed (or says
+        they will probably change it) – is RedBridge’s own question, asked by no other
+        pollster.</span>
+        <span className="info-p"><b>Reading a gap.</b> Each figure carries its 95% margin, usually
+        2 to 5 points. It is the {xref("interval", "breakdowns by group", "95% interval")} taken
+        over the group’s pooled gaps, with each poll’s sample for the group estimated as the poll’s
+        sample times the group’s share of adults: 18–34s are about 28%.</span>
+        <span className="info-p"><b>What “significantly” means.</b> The sentences under the figures
+        and the charts call a difference or a change significant only when chance is an unlikely
+        explanation for it. If the groups really voted alike, or hadn’t really moved, a gap as large
+        as the one measured would turn up less than one time in twenty.</span>
+        <span className="info-p"><b>Differences between groups.</b> Two groups differ significantly
+        when the gap between them is larger than its own margin. That margin combines both groups’
+        margins. Because the groups are different people, their errors partly offset, so margins of
+        1.3 and 1.2 points combine to 1.8, not 2.5. With three or four groups there are three to six
+        gaps to choose from, and testing that many at one in twenty would find a difference that
+        isn’t there far more often than that. So the bar rises with the number of gaps. With six,
+        the clearest gap must be one chance would produce less than one time in 120, the next one
+        time in 100, then 80, and so on, stopping at the first that falls short. The sentence then
+        reports what passes: no difference, a steady rise or fall across ordered groups such as age
+        (only when every step passes), one group apart from all the others, or failing those, the
+        largest gap that passes.</span>
+        <span className="info-p"><b>Changes over time.</b> The sentence under each chart asks whether
+        any group has moved towards or away from the party, relative to all voters, over the period
+        on screen. The monthly lines can’t answer that by themselves. Resolve asked alone until
+        February 2026, then YouGov, RedBridge, and DemosAU joined, and pollsters read some groups
+        differently, so a line can move just because a new pollster arrived. The test compares each
+        pollster only with itself. It fits a straight line through every poll’s gap for the group,
+        giving each pollster its own level and all of them one shared slope, with larger polls
+        counting for more. How far the polls scatter around that line is measured from the polls
+        themselves rather than assumed. The slope counts as a change when chance would produce one
+        that steep less than one time in twenty, and the same rising bar applies across three or
+        four groups. Men and women, and the two language groups, are a single test of the gap
+        between them.</span>
+        <span className="info-p"><b>Limits.</b> One in twenty is a convention, and a result near the
+        line can flip with a single new poll. The margins can’t see pollsters defining or weighting
+        a group differently, though the test over time sidesteps that by comparing each pollster
+        with itself. It looks for steady change, so a rise and a fall within the period cancel out.
+        And each sentence allows only for its own tests: across every tab, party, and period, about
+        one chart sentence in twenty could report a change that isn’t there.</span>
+        <span className="info-p"><b>A check.</b> Every table is checked before it’s used: each
+        group must add up to 100, give or take rounding, and an all-voters column must match the
+        poll’s published vote.</span>
+        <span className="info-p"><b>Sources.</b> Resolve’s monthly age, gender, and state series (its
+        Political Monitor interactive), YouGov’s published crosstabs, RedBridge’s report tables,
+        and DemosAU’s report charts, measured from the chart in each report because small bars
+        carry no label. Each poll’s figures for these groups are in the All polls export.</span>
+        {working(<>
+          <span className="info-p"><b>Gap between two groups:</b> z = 1.96 × (a − b) ÷ √(±a² + ±b²),
+          where a and b are the groups’ figures and ±a and ±b their 95% margins. p is the chance of
+          a z at least that far from zero under the normal curve. p &lt; 0.05 is the same as the gap
+          exceeding √(±a² + ±b²).</span>
+          <span className="info-p"><b>Several groups:</b> Holm’s method. With m gaps, sort their p
+          from smallest. The kth smallest passes if p &lt; 0.05 ÷ (m − k + 1) and every smaller one
+          passed.</span>
+          <span className="info-p"><b>Change over time:</b> for poll i from pollster h,
+          yᵢ = αₕ + βtᵢ + εᵢ, fitted by least squares weighted by each poll’s sample nᵢ. Here yᵢ is
+          the group’s gap to the poll’s all-voters figure, in percent, and tᵢ is the fieldwork date,
+          in years. With t̄ₕ and ȳₕ the pollster’s own weighted means,
+          β = Σnᵢ(tᵢ − t̄ₕ)(yᵢ − ȳₕ) ÷ Σnᵢ(tᵢ − t̄ₕ)². Its standard error is
+          √(s² ÷ Σnᵢ(tᵢ − t̄ₕ)²), where s² is the weighted sum of squared residuals ÷ (N − H − 1),
+          for N polls from the H pollsters with at least two. β gets a t-test on N − H − 1 degrees
+          of freedom; with fewer than three, the sentence says there aren’t enough polls. For two
+          groups, yᵢ is the gap between them.</span>
+          {demoWork}
+        </>)}</>) },
+      { id: "issues", term: "Issues", body: (
+        <>Two questions pollsters ask about the issues: which ones matter most to how people will
+        vote, and which party they think would handle each one best. The panel “The issues” turns
+        them into one figure per issue.
+        <span className="info-p"><b>What matters.</b> RedBridge asks every month, “If a federal
+        election were held today, which of the following issues would be most important to you when
+        deciding who will receive your vote? Please rank your top 3.” It lists 14 issues. The panel
+        shows the share of voters putting each issue first, second or third. DemosAU and Spectre ask
+        their own versions – DemosAU leaves the answer open, Spectre allows up to three of 17 – so
+        their figures can’t be combined with RedBridge’s, and the panel leaves them out.</span>
+        <span className="info-p"><b>Who’s best.</b> Three pollsters ask which party would handle an
+        issue best, each in its own words. Resolve asks every month, “Which party do you think would
+        perform best in each of these areas?” RedBridge asks every month, “Which of the following do
+        you believe is best able to deal with…” YouGov asked in August 2026, “Which party is best at
+        handling…” Each offers different answers. Resolve offers the Liberals, Labor, One Nation
+        (since July 2026), someone else, and undecided. RedBridge offers Labor, the Liberals, the
+        Nationals, the Greens, One Nation, all about equal, none of these, and not sure. YouGov offers
+        Labor, the Coalition, One Nation, the Greens, and don’t know.</span>
+        <span className="info-p"><b>How it’s built.</b> The part every question shares is the choice
+        between Labor, the Coalition and One Nation. So each poll is read as those three parties’
+        shares of the voters who named one of them: 25, 20 and 20 of all voters become 38, 31 and 31.
+        Those shares are pooled over the last six weeks of polls, weighted as the headline’s polls
+        are, so newer and larger polls count for more. Only two pollsters ask regularly, too few to
+        measure each one’s lean, so no lean is removed. RedBridge’s share putting an issue in their
+        top three is built the same way, from RedBridge alone. The panel shows the eight issues at
+        least two of the three pollsters ask: the cost of living, housing, health, economic
+        management, immigration, climate change, crime, and national security. Pollsters word them a
+        little differently – RedBridge’s “the rate of immigration” is Resolve’s “immigration and
+        refugees” – and each counts as the same issue.</span>
+        <span className="info-p"><b>What’s left out.</b> The Greens, whom Resolve doesn’t offer, and
+        every answer that names no party. Together they are about a quarter to a third of voters on
+        most issues, and more than half on climate change with RedBridge and YouGov, where many
+        choose the Greens. RedBridge puts the Greens first on climate change, and the panel says so
+        beside its rows.</span>
+        <span className="info-p"><b>Ahead, or no clear lead.</b> A party is ahead on an issue when its
+        lead over the next party is larger than that lead’s own 95% margin. The lead and its margin
+        are worked out together, because both shares come from the same voters: when one rises, the
+        other tends to fall.</span>
+        <span className="info-p"><b>Changes over time.</b> The sentence under the chart asks whether
+        any party has gained or lost ground on the issue over the period shown. Resolve joined the
+        three-party question only in July 2026, so a line can move just because it arrived. The test
+        compares each pollster only with itself, as on the vote-by-group charts, and the bar rises
+        for testing three parties at once.</span>
+        <span className="info-p"><b>By group.</b> RedBridge publishes a table for each of its main
+        issues giving each group’s share putting it in their top three: by vote, generation, gender,
+        where people live, home ownership, and education. A group’s margin comes from its share of the
+        poll, so One Nation voters, about a quarter of RedBridge’s sample, carry margins of about 6
+        points. The sentences under the table use the same test as the{" "}
+        {xref("vote-by-group", "issues", "breakdowns by group")}.</span>
+        <span className="info-p"><b>Limits.</b> Unfortunately, only RedBridge publishes figures for
+        what matters, so nothing checks its readings against another pollster’s. And the three-party
+        shares can’t show a party gaining ground among voters who had named no one.</span>
+        <span className="info-p"><b>A check.</b> Every table is checked before it’s used. A
+        salience row’s three ranks must add up to its top-three share, and every best-party row must
+        add up to 100, give or take rounding. RedBridge prints each month twice, in its own report and
+        again in the next, and the two must agree.</span>
+        <span className="info-p"><b>Sources.</b> RedBridge’s monthly reports with Accent Research
+        (accent-research.com), Resolve’s Political Monitor interactive (The Sydney Morning Herald),
+        and YouGov’s News24 Pulse charts.</span>
+        {working(<>
+          <span className="info-p"><b>Three-party share:</b> for each party p, s = 100 × p ÷
+          (Labor + Coalition + One Nation), from the poll’s published shares.</span>
+          <span className="info-p"><b>Lead:</b> the leader’s share minus the next party’s, pooled like
+          the shares. As a difference of two shares of one sample, its sampling variance is
+          (a + b − (a − b)²) ÷ n, where a and b are the two shares as fractions.</span>
+          {issWork}
+        </>)}</>) },
+    ] },
     { id: "g-leaders", title: "Leaders", entries: [
       { id: "approval", term: "Approval", body: (
         <>A rating of how a leader is doing the job: approve minus disapprove. Essential asks,
@@ -5886,21 +6361,23 @@ function infoTerms(D) {
       { id: "favourability", term: "Favourability", body: (
         <>A rating of the leader as a person: positive minus negative. RedBridge/Accent asks,
         “Do you have a favourable or unfavourable view of the following?” DemosAU asks, “What is
-        your opinion of the following people?”, offering positive, neutral and negative.
+        your opinion of the following people?”, offering positive, neutral, and negative.
         Freshwater asks its own version. A leader can be approved of for the job and disliked as
         a person, or the reverse, so {xref("approval", "favourability", "approval")} and
         favourability are shown in separate panels, never averaged together.</>) },
       { id: "net-approval", term: "Net approval", body: (
         <>Approve minus disapprove for a party leader, or favourable minus unfavourable where a
         pollster asks about favourability. Pollsters ask irregularly and word the questions
-        differently. The lines are monthly aggregates, weighted and adjusted for house effects the
-        same way as the vote figures – see
+        differently. The lines are monthly aggregates, adjusted for house effects the same way as
+        the vote figures, with each pollster counting equally. The figure beside each leader is
+        the current reading, built as the headline is – see
         {" "}{xref("weighted-aggregate", "net approval", "Weighted aggregate")}.</>) },
       { id: "preferred-pm", term: "Preferred prime minister", body: (
         <>Who voters say would make the better prime minister, head to head or three-way where a
         pollster offers it. Pollsters leave different shares uncommitted, so their levels can’t be
-        compared directly; the gaps and trends can. These lines are plain monthly averages, with
-        no adjustment for house effects.</>) },
+        compared directly; the gaps and trends can. The lines are monthly averages weighted by
+        sample size, with no adjustment for house effects. The figure beside each leader pools the
+        last six weeks of polls, newer ones counting for more.</>) },
     ] },
   ];
 
@@ -5913,7 +6390,7 @@ function infoTerms(D) {
   const faqs = [
     { id: "what-am-i-looking-at", q: "What exactly am I looking at in the main chart?", a: (
       <>Each dot is one published poll, placed at the midpoint of its fieldwork. The line is one
-      point per calendar month, pooling that month’s polls, adjusted for house effects and
+      point per calendar month, pooling that month’s polls, adjusted for house effects, and
       weighted by sample size, with the {xref("interval", "what am i looking at", "95% interval")}
       {" "}shaded around it. Where the two parties’ bands overlap, the polls can’t separate them
       that month. A dash (—) in any table means the pollster didn’t ask that question. The
@@ -5932,7 +6409,7 @@ function infoTerms(D) {
       sits at its own fieldwork midpoint, so after mid-month the newest dots land to the right of
       the line’s last point, even though they’re already counted in it. When the first poll of a
       new month closes, the line gains a point at that month’s midpoint; until then, up to half a
-      month of dots can run ahead of it. That’s lag in the ink, not in the estimate: the headline
+      month of dots can run ahead of it. Only the drawing lags, not the estimate: the headline
       comes from the 21-day
       {" "}{xref("weighted-aggregate", "dots past the line", "weighted aggregate")}, which moves
       with every poll.</>) },
@@ -5950,6 +6427,25 @@ function infoTerms(D) {
       days. The figure is recalculated every time the site rebuilds, so it can move on a quiet
       day – but only because weights change, never because it’s being smoothed towards
       anything.</>) },
+    /* The ▲ ▼ figures measure against three different things depending on
+       where they sit, and the panels only say which in a hover title. */
+    { id: "changes", q: "What are the ▲ and ▼ figures measured against?", a: (
+      <>It depends on where they sit.
+      <ul className="info-list">
+        <li><strong>Beside a figure in a panel</strong> (the two-party headline, preferred prime
+        minister, leader approval, national direction, the undecided share, and where One
+        Nation’s new voters came from): the change on a month ago. It is the same estimate, built
+        the same way from the polls of 30 days earlier. When the move is smaller than its margin
+        of error, the headline says “within the margin”.</li>
+        <li><strong>On the primary vote chips:</strong> the change since the 2025 election, where
+        every line on that chart begins.</li>
+        <li><strong>Inside a poll’s breakdown and in the All polls table:</strong> the change on
+        that pollster’s own previous poll. It doesn’t pass through the average at all.</li>
+      </ul>
+      Hovering over any of them names its reference, and the date where there is one. A green ▲
+      is a rise and a red ▼ a fall: a direction, not a verdict on anyone. The undecided share
+      reverses the colours, since more undecided voters is the less settled reading, and where
+      One Nation’s voters came from stays grey either way.</>) },
     { id: "polls-disagree", q: "Two new polls say different things. Which of them is right?", a: (
       <>Usually both are doing their job. Each is a sample, so two honest polls of an unchanged
       electorate will differ. The question is whether they differ by more than luck allows, and
@@ -6000,7 +6496,8 @@ function infoTerms(D) {
       Nor does the site project seats – see
       {" "}{xref("two-party-to-seats", "is this a forecast", "What would these numbers mean in seats")}.</>) },
     { id: "how-wrong-are-the-polls", q: "How wrong have the polls been at past elections?", a: acc ? (
-      <>The How the final polls did panel in Past cycles scores each pollster’s last two-party
+      <>The{" "}<button type="button" className="hi-term"
+        onClick={() => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()}>How the final polls did</button>{" "}panel in Past cycles scores each pollster’s last two-party
       figure in the {acc.windowDays} days before polling day against the result. Across {accSpan},
       the final polls missed by {acc.meanAbs} points on average, and by
       {" "}{Math.abs(acc.worstCycle.err)} at worst, in {acc.worstCycle.year}.
@@ -6008,7 +6505,8 @@ function infoTerms(D) {
       {" "}{accShared.absErr}.</> : null} An error every pollster shares is one no aggregate can
       see, which is why the {xref("interval", "how wrong are the polls", "95% interval")} never
       claims to cover it.</>) : (
-      <>The How the final polls did panel in Past cycles scores each pollster’s last two-party
+      <>The{" "}<button type="button" className="hi-term"
+        onClick={() => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()}>How the final polls did</button>{" "}panel in Past cycles scores each pollster’s last two-party
       figure of the campaign against the result, election by election, house by house.</>) },
     { id: "two-party-to-seats", q: "What would these numbers mean in seats?", a: (
       <>The site doesn’t turn them into seats, on purpose. Converting a national two-party figure
@@ -6047,7 +6545,7 @@ function infoTerms(D) {
       <p className="info-about-p"><b>Errors.</b> Spot a wrong number or a missing poll?
       {" "}<a className="fb-link" href="/feedback/">Let me know</a>.</p>
       <p className="info-about-p"><b>Archives.</b> Older federal polling archives are kept
-      {" "}<a className="fb-link" href="https://auspoltracker.com/archives">here</a> for safekeeping.</p>
+      {" "}<a className="fb-link" href="/archives/newspoll/">here</a> for safekeeping.</p>
     </>
   );
   return { groups, faqs, about };
@@ -6072,6 +6570,8 @@ function InfoBack({ onBack, backLabel }) {
    site open terms by id, and a link that once landed on "Seat projection"
    should now land on the question that absorbed it. */
 const INFO_ALIAS = {
+  "change-arrows": "changes",
+  "deltas": "changes",
   "individual-poll": "what-am-i-looking-at",
   "polling-error": "how-wrong-are-the-polls",
   "seat-projection": "two-party-to-seats",
@@ -6131,6 +6631,44 @@ function InfoView({ focus, onBack, backLabel }) {
   );
 }
 
-Object.assign(window, { Tabs, PastCyclesView, AllPollsView, InfoView,
+/* A definition where the word is. Tapping an underlined term used to carry
+   the reader off to the Info tab mid-page (with a button to come back); for
+   most terms the answer is two sentences, so the entry now opens over the
+   page, and the full Info page is one step further for whoever wants it. */
+function TermPop({ id, onClose, onMore }) {
+  const { D } = window.AP;
+  const { groups, faqs } = React.useMemo(() => infoTerms(D), []);
+  const key = INFO_ALIAS[id] || id;
+  const hit = faqs.find((f) => f.id === key)
+    || groups.flatMap((g) => g.entries).find((t) => t.id === key);
+  const boxRef = React.useRef(null);
+  React.useEffect(() => {
+    const prev = document.activeElement;
+    boxRef.current && boxRef.current.focus();
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("keydown", onKey); prev && prev.focus && prev.focus(); };
+  }, [id]);
+  // an id the glossary doesn't carry: fall back to the Info page trip
+  React.useEffect(() => { if (!hit) onMore(); }, [hit]);
+  if (!hit) return null;
+  const head = hit.q || hit.term;
+  return ReactDOM.createPortal(
+    <div className="term-pop-scrim" onClick={onClose}>
+      <div className="term-pop" role="dialog" aria-modal="true" aria-label={head}
+           tabIndex={-1} ref={boxRef} onClick={(e) => e.stopPropagation()}>
+        <div className="term-pop-head">
+          <h2 className="term-pop-t">{head}</h2>
+          <button type="button" className="term-pop-x" onClick={onClose} aria-label="Close">×</button>
+        </div>
+        <div className="term-pop-body info-term">{hit.a || hit.body}</div>
+        <button type="button" className="term-pop-more" onClick={onMore}>
+          Read it in Info, with the rest of the glossary →
+        </button>
+      </div>
+    </div>, document.body);
+}
+
+Object.assign(window, { Tabs, PastCyclesView, AllPollsView, InfoView, TermPop,
   // shared cell renderers reused by the latest-polls table
   ArchSortTh, ArchImplied, ArchPublished, ArchTpp, ArchLead, ArchApprCell, ArchDirCell, archLeadInfo });

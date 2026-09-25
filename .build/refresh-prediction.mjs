@@ -22,6 +22,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
+import { applyShell, shellOptsFor } from "./site-shell.mjs";
 
 // ---------- cadence + term constants -------------------------------------
 const ELECTION_DATE = "2025-05-03";       // Albanese-2025 term start
@@ -102,7 +103,7 @@ const ORD = [null, "1st", "2nd", "3rd", "4th", "5th", "6th"];
 const BANDS = [6, 12, 15, 18, 24, 30];
 const bandNear = (age) => BANDS.reduce((a, b) => (Math.abs(b - age) < Math.abs(a - age) ? b : a));
 const bandRead = (t, band) => (t.bands[String(band)] != null ? t.bands[String(band)] : t.bands.fin);
-const joinL = (xs) => xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
+const joinL = (xs) => xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + (xs.length > 2 ? ", and " : " and ") + xs[xs.length - 1];
 
 // Everything the page needs to say for one record. Recomposed for every
 // record at every run — the history file keeps bare numbers, wording live here.
@@ -408,17 +409,6 @@ body {
   min-height: 100dvh;
 }
 
-/* ------- back to the interactive tracker (the static page's .ss-back pill) */
-.ss-back {
-  position: fixed; right: 18px; bottom: 18px; z-index: 300;
-  display: inline-block;
-  padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line);
-  background: var(--bg); color: var(--ink); font-size: 13px;
-  font-weight: 600; text-decoration: none; cursor: pointer;
-  box-shadow: 0 3px 16px oklch(0 0 0 / 0.16);
-}
-.ss-back:hover { border-color: var(--ink-3); }
-
 /* ------- article: the static summary's column + type rhythm ------- */
 .frame-wrap {
   flex: 1; display: flex; flex-direction: column;
@@ -536,6 +526,7 @@ body {
 </head>
 <body>
 <main class="frame-wrap">
+  <p class="sh-kicker">Forecast</p>
   <h1>Will this government be re-elected?</h1>
   <p class="ss-sub" data-slot="sub">${S.sub}</p>
 
@@ -633,17 +624,15 @@ body {
       <tr class="picked"><td><strong>Snapshot / hazard model — the one above</strong></td><td><strong><span data-slot="hazardCell">${S.hazardCell}</span></strong></td><td>68–79% across bands, months 6–24 · 76% at 30 · 79% final</td></tr>
     </tbody>
   </table>
-  <p>The construction. Each completed term contributes snapshots at ages 6, 12, 15, 18, 24 and 30 months plus a final read three months before its last day — a hundred and thirty-one snapshots in all. Each snapshot’s features are trailing-three-month summaries knowable at that age: the primary-vote and two-party swings against the term’s own election result, the government’s incumbency age in consecutive terms, the fraction of the term elapsed (the current term is assumed to run a full span), and the interaction of primary swing with elapsed fraction — five features in all. Missing values are median-imputed within the training fold; features are standardised within it; the fit is ridge logistic regression with λ = 1.</p>
+  <p>The construction. Each completed term contributes snapshots at ages 6, 12, 15, 18, 24, and 30 months plus a final read three months before its last day — a hundred and thirty-one snapshots in all. Each snapshot’s features are trailing-three-month summaries knowable at that age: the primary-vote and two-party swings against the term’s own election result, the government’s incumbency age in consecutive terms, the fraction of the term elapsed (the current term is assumed to run a full span), and the interaction of primary swing with elapsed fraction — five features in all. Missing values are median-imputed within the training fold; features are standardised within it; the fit is ridge logistic regression with λ = 1.</p>
   <p>The validation. Leave-one-term-out: a term’s snapshots are scored only by a model trained on the other eighteen. The baseline “always re-elected” scores 68 per cent. Snapshot-level AUC is 0.75 with Brier score 0.185. The interval comes from a 300-draw cluster bootstrap that resamples whole terms, refits, and re-scores the current term each draw. The live call, verbatim:</p>
   <div class="pred-code" data-slot="code">${S.code}</div>
   <p>The feature audit. Until September 2026 this model also read leadership ratings — net PM approval and the preferred-PM lead. Ablated feature by feature on this same leave-one-term-out harness (run over the 1987-and-later thirteen-term record, before the era extension), neither earned its place: dropping the preferred-PM lead changed no accuracy band at all, and dropping both leadership readings lifted snapshot AUC from 0.77 to 0.84 and cut the Brier score from 0.182 to 0.153, with per-band accuracy never worse. Their fitted coefficients had shrunk to nothing, or landed the wrong sign — Howard was popular mid-term and lost anyway. That matches the published record: preferred-PM scores are weak, skewed predictors of election outcomes (Kevin Bonham, 2020), and the strongest leadership construction on offer — the PM-versus-opposition-leader approval margin (Armarium, 2021) — scored no better here than ignoring leadership ratings entirely. The ratings still tell part of the term’s story, so they stay in the live summary as context; the model just no longer lets them vote.</p>
   <p>The cross-check. A deliberately different construction — one ridge logistic per term on first-sixteen-month features — <span data-slot="ridgeCell2">${S.ridgeCell2}</span> Its best-calibrated variant, adding leadership-spill and minority-government flags, reaches 74 per cent leave-one-term-out accuracy with AUC 0.81 and Brier 0.153; adding election-quarter unemployment lands in the same place. On nineteen terms the estimator is not the constraint — a diagonal LDA nearly ties the ridge and k-nearest-neighbours collapses — and no capacity beyond logistic earns its keep: adjacent accuracies are statistically indistinguishable (the base model’s 68 per cent carries a 95% Wilson interval of roughly [46%, 85%]).</p>
   <p>To reproduce: from the repo root, <code>node .build/analysis/reelect-snapshot-hazard.mjs</code> (the headline — its snapshot age defaults to the canonical 16.2 months and moves via <code>--age=N.N</code>), <code>node .build/analysis/reelect-term-ridge.mjs</code> (the cross-check), plus <code>reelect-15mo-levels.mjs</code> and <code>reelect-15mo-declines.mjs</code> (the composites). Both models emit machine-readable results with <code>--json</code>; this page is regenerated from them by <code>.build/refresh-prediction.mjs</code> on a daily due gate, and each refresh is one dated, selectable record above. The analysis scripts read poll data straight from origin/main, so they are immune to working-tree state; the canonical numbers live in <code>.build/analysis/README.md</code>. The analysis’s own closing caution stands: this is historical signature analysis, not a forecast.</p>
 
-  <p class="ss-note">This is a satellite analysis page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
 </main>
 ${pageJs}
-<a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
 </body>
 </html>
 `;
@@ -667,7 +656,8 @@ const put = (file, content) => {
   }
 };
 put(HISTORY_FILE, JSON.stringify(hist, null, 2) + "\n");
-put(PAGE, html);
+// the site's shared header and footer (.build/site-shell.mjs), as every satellite carries them
+put(PAGE, applyShell(html, shellOptsFor(PAGE)));
 
 // The sitemap's prediction/ route reads PREDICTION_STAMP from build.mjs —
 // keep it honest each refresh rather than touching generated sitemap.xml

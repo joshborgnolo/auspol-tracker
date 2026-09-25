@@ -128,17 +128,42 @@ assert.ok(crons(rmDst).some((c) => c.cron === "40,50 4 * * 1" && /Mon 15:40–15
 // daily sweep at 06:00 eastern is 19:00 UTC the day before — daily stays daily
 assert.ok(crons(rmDst).some((c) => c.cron === "0 19 * * *" && /daily 06:00/.test(c.note)));
 
-// ---- the collision audit: phases keep shared weekdays apart, triples refuse ----
+// ---- the dispatch table: the same slots in eastern wall-clock, DST-proof --------
+const table = path.join(dir, "clock", "schedule.json");
+res = tune({ data, workflowsDir: dir, now: new Date("2026-09-22T00:00:00Z"), apply: true, tablePath: table });
+assert.equal(res.tableStatus, "updated", "the first apply writes the table");
+const tableText = readFileSync(table, "utf8");
+const tj = JSON.parse(tableText);
+assert.equal(tj.timezone, "Australia/Sydney");
+const rmSlots = tj.slots.filter((x) => x.workflow === "roymorgan-update.yml");
+assert.ok(rmSlots.some((x) => x.day === "Mon" && x.time === "15:40" && /release window/.test(x.label)), "comb start in eastern time " + JSON.stringify(rmSlots));
+assert.ok(rmSlots.some((x) => x.day === "Mon" && x.time === "17:40"), "comb end");
+assert.ok(rmSlots.some((x) => x.day === "daily" && x.time === "06:00" && x.label === "daily sweep"), "daily sweep");
+assert.ok(!rmSlots.some((x) => x.day === "Tue" && x.time === "06:00"), "next-day morning folds into the daily sweep, as in cron");
+assert.ok(tj.slots.some((x) => x.workflow === "newspoll-watch.yml" && x.day === "Sun" && x.time === "20:04"), "the watchdog's comb is dispatched too");
+assert.equal(tableText.split("\n").filter((l) => l.startsWith("  {")).length, tj.slots.length, "one slot per line");
+// DST rewrites every cron block; the table has no UTC in it and stays put
+res = tune({ data, workflowsDir: dir, now: new Date("2027-01-12T00:00:00Z"), apply: true, tablePath: table });
+assert.equal(res.find((r) => r.target.workflow === "roymorgan-update.yml").status, "updated", "blocks move with DST");
+assert.equal(res.tableStatus, "current", "the table does not");
+assert.equal(readFileSync(table, "utf8"), tableText);
+
+// ---- the collision audit: per-house queues never collide; a shared group does ----
 res = tune({ data, workflowsDir: dir, now: new Date("2026-09-22T00:00:00Z"), apply: true });
-assert.deepEqual(res.audit.triples, [], "no minute with three writers");
-// a hand-authored slot on top of two tuned ones → a triple → nothing written
+assert.deepEqual(res.audit.triples, [], "no minute with three runs of one group");
+// poll-agent callers queue per house (writers-${{ inputs.house }}, an
+// expression), so three of them on one minute cost nothing
 const rb = readFileSync(path.join(dir, "redbridge-update.yml"), "utf8");
 writeFileSync(path.join(dir, "redbridge-update.yml"), rb.replace("  workflow_dispatch:", "    - cron: '0 9 * * 1' # hand-authored on Roy Morgan + Resolve's next-day slot\n  workflow_dispatch:"));
-writeFileSync(path.join(dir, "zzz-writer.yml"), "name: z\non:\n  schedule:\n    - cron: '0 9 * * 1'\nconcurrency:\n  group: main-writers\n");
-res = tune({ data, workflowsDir: dir, now: new Date("2027-01-12T00:00:00Z"), apply: true });
-assert.ok(res.audit.triples.length >= 1 && /Mon 09:00 UTC/.test(res.audit.triples[0]), JSON.stringify(res.audit));
+res = tune({ data, workflowsDir: dir, now: new Date("2026-09-22T00:00:00Z"), apply: false });
+assert.deepEqual(res.audit.triples, [], "separate queues: a shared minute is no collision");
+// three workflows in ONE literal group on one minute → a triple → nothing written
+for (const z of ["zz1", "zz2", "zz3"])
+  writeFileSync(path.join(dir, `${z}.yml`), "name: z\non:\n  schedule:\n    - cron: '0 9 * * 1'\nconcurrency:\n  group: shared-queue\n");
+res = tune({ data, workflowsDir: dir, now: new Date("2027-01-12T00:00:00Z"), apply: true, tablePath: table });
+assert.ok(res.audit.triples.length >= 1 && /Mon 09:00 UTC \[shared-queue\]/.test(res.audit.triples[0]), JSON.stringify(res.audit));
 assert.ok(res.every((r) => r.status !== "updated"), "a collision blocks every write");
-writeFileSync(path.join(dir, "zzz-writer.yml"), "name: z\non:\n  workflow_dispatch:\n");
+for (const z of ["zz1", "zz2", "zz3"]) writeFileSync(path.join(dir, `${z}.yml`), "name: z\non:\n  workflow_dispatch:\n");
 writeFileSync(path.join(dir, "redbridge-update.yml"), rb);
 
 // ---- a file without markers is reported, not silently skipped ----------------

@@ -122,10 +122,26 @@ function lastReadings(rows, key) {
   const last = nn[nn.length - 1], prev = nn[nn.length - 2];
   return { v: last[key], ym: last.ym, prev: prev ? prev[key] : null, prevYm: prev ? prev.ym : null };
 }
+/* A leader readout's figure: the current reading gen-data builds the way it
+   builds the headline (leaderNow – recency-weighted, house-adjusted where the
+   measure allows) wherever its window holds a poll; else the latest monthly
+   reading, with its month tag. */
+function leaderReading(rows, key) {
+  const N = window.AP.D.leaderNow && window.AP.D.leaderNow[key];
+  if (N) return { v: N.v, ym: null, prev: N.prev, prevYm: null, now: N };
+  return lastReadings(rows, key);
+}
+// the change on a current reading, spelled out as the hero's is
+function nowDeltaTitle(now) {
+  if (!now || now.chg == null) return undefined;
+  return "Change on a month ago – the same estimate, built the same way, 30 days earlier"
+       + (now.changeSig === false ? " (within the margin)" : "");
+}
 // what a snapshot-panel delta is measured against, spelled out – these compare
 // monthly AGGREGATE readings, unlike the archive's ChgTag which compares a
 // single pollster with its own previous poll
 function readoutDeltaTitle(r) {
+  if (r && r.now) return nowDeltaTitle(r.now);
   if (!r || r.prevYm == null) return undefined;
   return "Change since " + window.AP.monthLabelFull(r.prevYm)
        + " – this leader's previous published monthly reading across all pollsters,"
@@ -159,17 +175,35 @@ function fitDomain(vals, step, include) {
    RollNum is defined by the header script, which loads after this one -
    resolved at render, and guarded so a reordering degrades to a plain figure
    rather than a blank panel. */
-function Delta({ value, suffix = "", goodUp = true, small, title, roll, spinIn }) {
+/* The one fold for a chart's reading notes: the gist stays in view above it,
+   and the method, caveats and edge cases wait behind "How to read this chart"
+   (as Past cycles' intro and the vote-by-group notes do). Children are the
+   folded paragraphs; `cls` is the note class they're set in. */
+function HowTo({ label = "How to read this chart", cls = "table-hint", paras }) {
+  return (
+    <details className="view-how hint-how">
+      <summary>{label}</summary>
+      {paras.filter(Boolean).map((p, i) => <p key={i} className={cls}>{p}</p>)}
+    </details>
+  );
+}
+
+function Delta({ value, suffix = "", goodUp = true, neutral, small, title, roll, spinIn }) {
   if (value == null) return null;
   const up = value > 0, flat = Math.abs(value) < 0.05;
-  const cls = flat ? "flat" : (up === goodUp ? "up" : "down");
+  // neutral: a move that is news but neither good nor bad (where One Nation's
+  // voters came from) keeps its arrow and figure in the flat grey
+  const cls = flat || neutral ? "flat" : (up === goodUp ? "up" : "down");
   const arrow = flat ? "→" : up ? "▲" : "▼";
   const figure = `${up ? "+" : ""}${value.toFixed(1)}`;
   const Roll = window.RollNum;
   return (
-    <span className={"delta " + cls + (small ? " delta-sm" : "")} title={title}>
+    <span className={"delta " + cls + (small ? " delta-sm" : "")} title={flat && roll ? "No change" + (title ? " · " + title : "") : title}>
       <span className="delta-arrow">{arrow}</span>
-      {flat ? "no change"
+      {/* in a readout row a flat move prints as a figure like its
+          neighbours: "no change" was twice their width and, on a phone, broke
+          the preferred-PM row onto two lines while the row beneath held one */}
+      {flat ? (roll ? "0.0" : "no change")
         : roll && Roll ? <><Roll value={figure} spinIn={spinIn} />{suffix}</>
         : figure + suffix}
     </span>
@@ -180,10 +214,7 @@ function Delta({ value, suffix = "", goodUp = true, small, title, roll, spinIn }
 function PrimaryVotePanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const [xDomain] = [rangeDomain(rangeId)];
-  /* Others/Ind. ships hidden: it's a residual aggregate, not a party, and
-     with the majors' three-way contest crowded it went from context to
-     crossings. One chip-tap brings it back. */
-  const [hidden, setHidden] = useState({ oth: true });
+  const [hidden, setHidden] = useState({});
   const narrow = useNarrow();
   const latest = D.latest.primary;
   /* The 2025 result, which is where every line on this chart starts: the month
@@ -204,6 +235,25 @@ function PrimaryVotePanel({ rangeId }) {
     { id: "oth", ...D.PARTIES.oth },
   ].sort((a, b) => latest[b.id] - latest[a.id]);
   const pts = filterPts(D.aggPrimary, xDomain[0]);
+  /* The one-sentence lead, as on the direction and undecided panels: the top
+     of the primary vote says what kind of contest this is, and the
+     Coalition's distance from it is the other half of the story since May
+     2025. Composed from the live aggregate so the sentence turns over with
+     the numbers. */
+  const pvLead = (() => {
+    const a = parts[0], b = parts[1];
+    const lnp = parts.find((p) => p.id === "lnp");
+    if (!a || !b || !lnp) return null;
+    const gap = latest[a.id] - latest[b.id];
+    let s = gap < 2
+      ? a.name + " and " + b.name + " are neck and neck in first-preference support"
+      : a.name + " leads first-preference support on " + latest[a.id].toFixed(1) + "%, "
+        + gap.toFixed(1) + " points clear of " + b.name;
+    const lnpBehind = latest[b.id] - latest.lnp;
+    if (lnp.id !== a.id && lnp.id !== b.id && lnpBehind > 2)
+      s += ", while the " + lnp.name + " has been left behind on " + latest.lnp.toFixed(1) + "%";
+    return s + ".";
+  })();
   // every party stays mounted; hiding a chip fades its line via opacity so
   // legend toggles feel continuous instead of popping
   const chartSeries = parts.map((p) => ({
@@ -211,6 +261,10 @@ function PrimaryVotePanel({ rangeId }) {
     width: p.id === "oth" ? 2 : 3,
     dashed: p.id === "oth",
     opacity: hidden[p.id] ? 0 : 1,
+    /* named at the line's end: Labor, One Nation and the Coalition finish
+       within a few points of each other, and red/orange alone does not
+       separate them for a colour-blind reader */
+    endLabel: p.short,
   }));
 
   // The published readings behind each line. This chart needs them MORE than
@@ -245,7 +299,6 @@ function PrimaryVotePanel({ rangeId }) {
       <div className="card-head">
         <div>
           <h2 className="card-title">Primary vote</h2>
-          <p className="card-sub">First-preference support, poll aggregate</p>
         </div>
         <div className="legend">
           {parts.map((p) => {
@@ -274,6 +327,7 @@ function PrimaryVotePanel({ rangeId }) {
           })}
         </div>
       </div>
+      {pvLead && <p className="pv-lead"><mark>{pvLead}</mark></p>}
       <TrendChart
         key="pv"
         height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[0, 40]}
@@ -292,12 +346,16 @@ function PrimaryVotePanel({ rangeId }) {
       />
       <p className="table-hint">
         Each dot is one published poll’s first-preference figure; the lines are
-        monthly averages, weighted by sample and adjusted for each house’s lean.
-        Each chip carries a party’s current share and its change since the 2025
-        election, where every line here begins. Use the chips to isolate one
-        party – on its own its line draws with the 95% interval around
-        it{solo ? ", shaded here" : ""}.
+        monthly averages. Each chip’s ▲ ▼ is its{" "}
+        <button type="button" className="hi-term"
+                onClick={() => window.AP.openTerm && window.AP.openTerm("changes", "Primary vote")}>change
+          since the 2025 election</button>. Use the chips to isolate one party.
       </p>
+      <HowTo paras={[
+        <>The lines are weighted by sample and adjusted for each house’s lean.</>,
+        <>The 2025 election is where every line here begins. A party on its own draws with the
+        95% interval around its line{solo ? ", shaded here" : ""}.</>,
+      ]} />
     </section>
   );
 }
@@ -374,19 +432,52 @@ function LeadershipSection({ rangeId }) {
      question rather than of who you feel like looking at. The panel states
      that itself now. */
   const leaders = D.LEADERS;
+  /* The section's one-sentence lead, in the same voice as the direction and
+     undecided panels: the two-way preferred-PM gap against the net ratings,
+     composed from the live readings so the sentence turns over with the
+     numbers. Returns null rather than guess if a reading is missing. */
+  const ldLead = (() => {
+    const byId = {};
+    leaders.forEach((L) => { byId[L.id] = L; });
+    const pm = byId.alb, op = byId.taylor, hn = byId.hanson;
+    if (!pm || !op || !hn) return null;
+    const pmP = leaderReading(D.leaderMonths, "alb_pref");
+    const opP = leaderReading(D.leaderMonths, "taylor_pref");
+    const nets = [pm, op, hn].map((L) => ({ L, r: leaderReading(D.leaderMonths, L.id + "_net") }));
+    if (!pmP || !opP || nets.some((n) => !n.r)) return null;
+    const r0 = Math.round;
+    const ahead = pmP.v - opP.v >= 0;
+    const ppmPart = (ahead ? pm.short : op.short) + " leads " + (ahead ? op.short : pm.short)
+      + " " + r0(Math.max(pmP.v, opP.v)) + "–" + r0(Math.min(pmP.v, opP.v))
+      + " as preferred prime minister";
+    const neg = nets.filter((n) => n.r.v < 0);
+    if (neg.length === nets.length) {
+      const worst = neg.reduce((a, b) => (a.r.v < b.r.v ? a : b));
+      return ppmPart + ", yet all three leaders are rated net-negative – "
+        + (worst.L.id === "alb" ? "the PM" : worst.L.short) + " most deeply, on " + r0(worst.r.v) + ".";
+    }
+    if (!neg.length) return ppmPart + ", and all three carry net-positive ratings.";
+    return ppmPart + ", and on approval only "
+      + nets.filter((n) => n.r.v >= 0).map((n) => n.L.short).join(" and ")
+      + " rate" + (nets.length - neg.length === 1 ? "s" : "") + " net-positive.";
+  })();
   return (
     <section className="leadership">
       <div className="leadership-head">
         <h2 className="section-h">Leadership</h2>
       </div>
-      <p className="leadership-note">
-        The Coalition line splices leaders – <strong>Ley</strong> to February 2026, <strong>Taylor</strong> since.
-        The approval and favourability points are monthly aggregates, weighted and house-adjusted
+      {ldLead && <p className="ld-lead"><mark>{ldLead}</mark></p>}
+      <HowTo label="How to read these charts" cls="leadership-note" paras={[
+        <>The Coalition line splices leaders – <strong>Ley</strong> to February 2026, <strong>Taylor</strong> since.</>,
+        <>The approval and favourability points are monthly aggregates, weighted and house-adjusted
         the way the vote series are; the preferred-PM lines join published readings as they came,
-        unadjusted.
-        Preferred PM is put to voters as two separate two-way contests – against the opposition
-        leader, and against Hanson head to head – so both are drawn, the head-to-head dashed.
-      </p>
+        unadjusted.</>,
+        <>Preferred PM is put to voters as two separate two-way contests – against the opposition
+        leader, and against Hanson head to head – so both are drawn, as published. In the two-way
+        houses leave anywhere from nothing (Newspoll) to half the sample uncommitted, and the
+        three-way 16–50%, so a level isn’t comparable across houses – but the gap between the two
+        lines, and the trend in each, are.</>,
+      ]} />
       {/* Both children stay mounted while a column collapses to 0fr, so the
           grid can animate rather than the panel popping out of existence.
           `both` swaps the left child for a second net-rating panel.
@@ -557,7 +648,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         mk: id === "alb" && pr.id === "ah" ? "alb-h2h" : id,
       })));
   const rows = rowsFor(fmt);
-  rows.forEach((r) => { r.read = lastReadings(D.leaderMonths, r.L.id + r.suf); });
+  rows.forEach((r) => { r.read = leaderReading(D.leaderMonths, r.L.id + r.suf); });
   /* Same fixed order as the approval readout - see leaderOrder. It used to
      descend by preference after the PM, which put Hanson second here while she
      sat third over there on identical people, and moved her between the two
@@ -838,7 +929,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         <div className="leader-vals">
           <div className="leader-name">{r.L.short}{tag && <span className="stale-tag" title={"Latest published reading · " + tag}> {tag}</span>}</div>
           <div className="leader-num">
-            {rd ? (Roll ? <Roll value={String(rd.v)} /> : rd.v) : "—"}
+            {rd ? (Roll ? <Roll value={rd.v.toFixed(1)} /> : rd.v.toFixed(1)) : "—"}
             {rd && <span className="pct">%</span>}
           </div>
         </div>
@@ -847,16 +938,24 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
     );
   });
 
-  /* The lead, taken from the last month BOTH names were asked in that contest
-     – which is not always the latest month, since the head-to-head is asked by
+  /* The lead: the gap between the two tiles' current readings where both
+     have one, else the last month BOTH names were asked in that contest –
+     which is not always the latest month, since the head-to-head is asked by
      fewer houses. Stating it is the point of showing two contests at once. */
   const leadOf = (pr) => {
+    const gap = (a, b) => {
+      const d = +Math.abs(a - b).toFixed(1);
+      const who = byId[a > b ? pr.ids[0] : pr.ids[1]];
+      return { m: d.toFixed(1), name: who.short, color: inkOf(who.color), level: d === 0 };
+    };
+    // the two tiles' own figures where both are current readings, so the
+    // lead is the gap the reader can see
+    const [ra, rb] = pr.ids.map((id) => leaderReading(D.leaderMonths, id + pr.suf));
+    if (ra && rb && ra.now && rb.now) return gap(ra.v, rb.v);
     for (let i = D.leaderMonths.length - 1; i >= 0; i--) {
       const m = D.leaderMonths[i], a = m[pr.ids[0] + pr.suf], b = m[pr.ids[1] + pr.suf];
       if (a == null || b == null) continue;
-      const d = Math.round(Math.abs(a - b));
-      const who = byId[a > b ? pr.ids[0] : pr.ids[1]];
-      return { m: d, name: who.short, color: inkOf(who.color), level: d === 0 };
+      return gap(a, b);
     }
     return null;
   };
@@ -869,9 +968,6 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
           <p className="card-sub">
             {three ? "“Who would make the better PM?”, asked as a three-way including Hanson"
                    : "“Who would make the better PM?”, asked head to head – in both of the contests pollsters run"}
-            {three
-              ? " · As published: houses leave 16–50% uncommitted, so levels aren’t comparable across houses – the gaps and the trend are"
-              : " · As published: uncommitted runs from none (Newspoll) to half the sample, so levels aren’t comparable across houses – the tinted gaps are"}
           </p>
         </div>
         <div className="card-head-tools">
@@ -938,6 +1034,10 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
           id: d.era ? d.r.mk + "-" + d.era : d.r.mk,
           label: d.era === "ley" ? "Ley" : d.r.label, color: d.r.L.color, dashed: d.r.dashed,
           endCap: d.era === "ley" ? false : undefined,
+          /* named at the end, once per leader: the dashed Albanese (his
+             head-to-head with Hanson) would only repeat the solid one's name */
+          endLabel: d.era === "ley" || (d.r.dashed && drawRows.some((o) => o !== d && !o.r.dashed && o.r.L.short === d.r.L.short))
+            ? undefined : (d.r.L.short || d.r.L.name || d.r.label),
           /* The three-way is seven months against the two-way's fourteen, so
              every line here retreats by a different amount – each needs its own
              window or the shorter ones arrive at full length and snap. */
@@ -950,7 +1050,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         scatterMove={cross ? cross.scatterMove : []}
         fade={morph ? morph.t : 1}
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
-        fmt={(v) => v.toFixed(0)}
+        fmt={(v) => v.toFixed(1)}
       />
     </section>
   );
@@ -994,7 +1094,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
   const pts = filterPts(D.leaderMonths, xDomain[0]);
   const latestYm = D.leaderMonths[D.leaderMonths.length - 1].ym;
   const reads = {};
-  leaders.forEach((L) => { reads[L.id] = lastReadings(D.leaderMonths, L.id + suf); });
+  leaders.forEach((L) => { reads[L.id] = leaderReading(D.leaderMonths, L.id + suf); });
   const ordered = [...leaders].sort((a, b) => byLeaderOrder(leaderOrder(D))(a.party, b.party));
   const Roll = window.RollNum;
   // Published readings behind the lines, for the ACTIVE metric only. A net is a
@@ -1100,12 +1200,12 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
                      title="What the approval question asks"
                      onClick={() => window.AP.openTerm &&
                        window.AP.openTerm("approval", "Leader net approval")}>Approve minus disapprove</button>
-                   {" – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential and others"}</>)
+                   {" – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential, and others"}</>)
               : (<><button type="button" className="hi-term"
                      title="What the favourability question asks"
                      onClick={() => window.AP.openTerm &&
                        window.AP.openTerm("favourability", "Leader net favourability")}>Positive minus negative</button>
-                   {" – the person, not the job · RedBridge/Accent, DemosAU and Freshwater ask favourability, not approval"}</>)}
+                   {" – the person, not the job · "}{houseList(D.favHouses)}{" ask favourability, not approval"}</>)}
           </p>
         </div>
         <div className="card-head-tools">
@@ -1145,8 +1245,8 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
                 {net == null
                   ? <span className="net dash">—</span>
                   : <span className={"net " + (net >= 0 ? "pos" : "neg")}>
-                      {Roll ? <Roll value={(net > 0 ? "+" : "") + net} />
-                            : <>{net > 0 ? "+" : ""}{net}</>}
+                      {Roll ? <Roll value={(net > 0 ? "+" : "") + net.toFixed(1)} />
+                            : <>{net > 0 ? "+" : ""}{net.toFixed(1)}</>}
                     </span>}
                 {/* same movement indicator the preferred-PM readout carries –
                     a net that moved is as much news as a share that moved */}
@@ -1194,6 +1294,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
             id: d.era ? L.id + "-" + d.era : L.id,
             label: (d.era === "ley" ? "Ley" : L.short) + " net", color: L.color,
             endCap: d.era === "ley" ? false : undefined,
+            endLabel: d.era === "ley" ? undefined : L.short,
             /* Hanson has nine months of favourability against five of
                approval, so her line has to shorten while the other two barely
                move. Each carries its own window for that reason. */
@@ -1207,7 +1308,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
         scatterMove={cross ? cross.scatterMove : []}
         fade={morph ? morph.t : 1}
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
-        fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(0)}
+        fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(1)}
       />
     </section>
   );
@@ -1222,17 +1323,41 @@ const dirFmt = (v) => (v % 1 ? v.toFixed(1) : v.toFixed(0));
 
 function houseList(names, max = 4) {
   if (!names || !names.length) return "";
-  if (names.length > max) return names.slice(0, max).join(", ") + " and others";
+  if (names.length > max) return names.slice(0, max).join(", ") + ", and others";
   if (names.length === 1) return names[0];
-  return names.slice(0, -1).join(", ") + " and " + names[names.length - 1];
+  return names.slice(0, -1).join(", ") + (names.length > 2 ? ", and " : " and ") + names[names.length - 1];
+}
+
+/* A share as the nearest plain fraction a reader would say aloud: 62.5 →
+   "More than three in five", 58.9 → "Almost three in five", 66.4 → "Almost
+   two in three". Within half a point of the fraction it's "About". */
+const PLAIN_FRACTIONS = [[1, 5], [1, 4], [1, 3], [2, 5], [1, 2], [3, 5], [2, 3], [7, 10], [3, 4], [4, 5], [9, 10]];
+const NUM_WORDS = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+function plainShare(v) {
+  const [a, b] = PLAIN_FRACTIONS.reduce((best, f) =>
+    (Math.abs(v - 100 * f[0] / f[1]) < Math.abs(v - 100 * best[0] / best[1]) ? f : best));
+  const d = v - 100 * a / b;
+  const lead = Math.abs(d) < 0.5 ? "About" : d < 0 ? "Almost" : "More than";
+  return lead + " " + (a === 1 && b === 2 ? "half of" : NUM_WORDS[a] + " in " + NUM_WORDS[b]);
+}
+/* A ratio as a reader would say it, to the nearest half: 2.52 → "about two
+   and a half times", 2.1 → "about twice". No finer: a ratio of two pooled
+   figures is rarely known closer than that (the Coalition-to-Labor ratio
+   under the One Nation panel carried a 95% range of about 2.1 to 3.1 when
+   it read 2.5). */
+function timesWords(r) {
+  const h = Math.round(r * 2) / 2;
+  if (h >= 11) return "about " + Math.round(r) + " times";
+  if (h === 2) return "about twice";
+  return "about " + NUM_WORDS[Math.floor(h)] + (h % 1 ? " and a half" : "") + " times";
 }
 
 // ---- National direction (right track / wrong track) -----------------
 function DirectionPanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
-  const asked = houseList(D.directionHouses);
-  const question = "“Is the country heading in the right direction, or on the wrong track?”";
+  const asked = houseList(D.directionHousesAll || D.directionHouses);
+  const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   // no right-track / wrong-track series in the dataset yet – keep the panel
   // as an honest empty state so the question has a home when it's polled
   if (!D.direction.length) {
@@ -1251,9 +1376,12 @@ function DirectionPanel({ rangeId }) {
   }
   const xDomain = rangeDomain(rangeId);
   const pts = filterPts(D.direction, xDomain[0]);
-  const latest = D.direction[D.direction.length - 1];
+  /* The readout is the current reading (gen-data directionNow – built as the
+     headline is); the chart keeps its monthly means. */
+  const now = D.directionNow;
+  const latest = now || D.direction[D.direction.length - 1];
   const prev = D.direction[D.direction.length - 2];
-  const netDelta = prev ? latest.net - prev.net : null;
+  const netDelta = now ? (now.chg ?? null) : prev ? latest.net - prev.net : null;
 
   // y-window fitted to the data – a fixed one clipped the real range the
   // moment wrong-track climbed past 60
@@ -1300,9 +1428,11 @@ function DirectionPanel({ rangeId }) {
           <span className={"dir-net-val " + (latest.net >= 0 ? "pos" : "neg")}>
             {latest.net > 0 ? "+" : ""}{latest.net}
           </span>
-          {netDelta != null && <Delta value={netDelta} suffix="" small />}
+          {netDelta != null && <Delta value={netDelta} suffix="" small title={now ? nowDeltaTitle(now) : "Change on the previous month"} />}
         </div>
       </div>
+      {/* the reading in words, in the lead voice the One Nation panel opens with */}
+      <p className="dir-lead"><mark>{plainShare(latest.wrong)} Australians believe we’re on the wrong track.</mark></p>
 
       <div className="dir-readout">
         <div className="dir-side">
@@ -1327,8 +1457,8 @@ function DirectionPanel({ rangeId }) {
         pad={{ l: 58, r: 22, t: 16, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         series={[
-          { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right") },
-          { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong") },
+          { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right"), endLabel: "Right" },
+          { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong"), endLabel: "Wrong" },
         ]}
         spine={series(pts, "right")}
         areas={dirAreas}
@@ -1343,11 +1473,14 @@ function DirectionPanel({ rangeId }) {
         fmt={dirFmt}
       />
       <p className="table-hint">
-        Each dot is one published reading; the lines are monthly averages
-        adjusted for house effects, shaded with their 95% intervals. Only {asked ? D.directionHouses.length : 0} houses ask
-        this question, so some months rest on a single poll – the dots show which,
-        and the shading shows what that costs in confidence.
+        Each dot is one published reading; the lines are monthly averages, shaded with their
+        95% intervals.
       </p>
+      <HowTo paras={[
+        <>The lines are adjusted for house effects. Only {asked ? D.directionHouses.length : 0} houses
+        ask this question, so some months rest on a single poll – the dots show which, and the
+        shading shows what that costs in confidence.</>,
+      ]} />
     </section>
   );
 }
@@ -1367,8 +1500,35 @@ function DirectionPanel({ rangeId }) {
 function UndecidedPanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
+  const [view, setView] = useState("all");
   const U = D.undecided;
   if (!U || !U.series.length) return null;
+  const F = D.firmness, A = U.softAge;
+  const views = UND_VIEWS.filter((v) => v.id === "all" || (v.id === "party" && F) || (v.id === "age" && A));
+  const ctl = views.length > 1 && (
+    <div className="ons-ctl">
+      <Segmented options={views} value={view} onChange={setView} size="sm" ariaLabel="Undecided among" />
+    </div>
+  );
+  const extra = view === "party" && F ? {
+    sub: <>Share of each party’s voters certain of their vote · {houseList(F.houses.map(demoHouse))}</>,
+    body: <FirmnessView F={F} rangeId={rangeId} />,
+  } : view === "age" && A ? {
+    sub: <>Share of each age group not firm in its vote · {houseList(A.houses)}</>,
+    body: <AgeFirmView A={A} rangeId={rangeId} />,
+  } : null;
+  if (extra) return (
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="card-title">Undecided</h2>
+          <p className="card-sub">{extra.sub}</p>
+        </div>
+      </div>
+      {ctl}
+      {extra.body}
+    </section>
+  );
   const xDomain = rangeDomain(rangeId);
   /* Not a party colour: --ink-2 is the one neutral legible in both themes,
      which is what a line meaning "none of the above" wants. The two questions
@@ -1400,6 +1560,26 @@ function UndecidedPanel({ rangeId }) {
   for (let v = lo + step; v < hi; v += step) yTicks.push(v);
   const spine = drawn[0].pts;
 
+  /* one plain sentence above the readings, as on the direction and One Nation
+     panels: the live figure of the headline question against the monthly mean
+     nearest the 2025 election (the last at or before the election month, or
+     the first term reading if the series only started after it). Inside a
+     point either way it reads "fairly constant"; beyond it the sentence says
+     which way, and by how much. */
+  const termLead = (() => {
+    const sr = U.series.find((s) => s.id === "first") || U.series[0];
+    if (!sr || sr.monthly.length < 2) return null;
+    if (!sr.monthly.some((m) => m.ym > "2025-05")) return null;
+    const base = sr.monthly.filter((m) => m.ym <= "2025-05").pop() || sr.monthly[0];
+    const nowV = sr.now ? sr.now.v : sr.latest.v;
+    const d = nowV - base.v;
+    if (Math.abs(d) < 1)
+      return "The share of undecided and uncommitted has remained fairly constant since the 2025 election.";
+    return "The share of undecided and uncommitted voters has " + (d > 0 ? "risen" : "fallen")
+      + " since the 2025 election, from " + base.v.toFixed(1) + "% in "
+      + window.AP.monthLabelFull(base.ym) + " to " + nowV.toFixed(1) + "% now.";
+  })();
+
   return (
     <section className="card">
       <div className="card-head">
@@ -1410,6 +1590,7 @@ function UndecidedPanel({ rangeId }) {
           </p>
         </div>
       </div>
+      {ctl}
       {/* One tile per question, because they ARE different questions and the
           panel would otherwise imply a single measure with two sources. */}
       <div className="und-reads">
@@ -1419,21 +1600,29 @@ function UndecidedPanel({ rangeId }) {
             <div className="und-read-body">
               <div className="und-read-top">
                 <span className="und-read-lab">{sr.label}</span>
-                <span className="und-read-v">{sr.latest.v}<span className="pct">%</span></span>
+                {/* the six-week average, as every sparse figure here is
+                    built; a question no house has asked for six weeks falls
+                    back to its last reading and says so */}
+                <span className="und-read-v">{(sr.now ? sr.now.v : sr.latest.v).toFixed(1)}<span className="pct">%</span></span>
                 {/* rising undecided is not good news for anyone – neither arrow
                     is coloured as a gain */}
-                {sr.latest.chg != null && <Delta value={sr.latest.chg} goodUp={false} small />}
+                {sr.now
+                  ? sr.now.chg != null && <Delta value={sr.now.chg} goodUp={false} small
+                      title={"vs a month ago" + (sr.now.changeSig === false ? " – within the margin" : "")} />
+                  : <span className="und-read-stale">last reading, {sr.latest.field}</span>}
               </div>
               <p className="und-read-note">{sr.note} · {houseList(sr.houses)}</p>
             </div>
           </div>
         ))}
       </div>
+      {termLead && <p className="und-lead"><mark>{termLead}</mark></p>}
       <TrendChart
         key="und"
         height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[lo, hi]}
         yTicks={yTicks} unit="%" axisFont={narrow ? 28 : 20}
-        pad={{ l: 58, r: 22, t: 16, b: 42 }}
+        // two-digit shares ("20%") at the phone's 28px axis need the room
+        pad={{ l: narrow ? 84 : 58, r: 22, t: 16, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         series={drawn.map((d) => ({ id: d.sr.id, label: d.sr.label, color: COL,
                                     dashed: d.sr.dashed, dash: d.sr.dash, points: series(d.pts, "v") }))}
@@ -1443,14 +1632,1245 @@ function UndecidedPanel({ rangeId }) {
         fmt={(v) => v.toFixed(1)}
       />
       <p className="table-hint">
-        Each dot is one published reading; the lines are monthly averages.
-        The two are never averaged together – one counts people who can’t name
+        Each dot is one published reading; the lines are monthly averages, and
+        the figure beside each question pools the last six weeks of polls.
+      </p>
+      <HowTo paras={[
+        <>Newer and larger polls count for more in the figure beside each question.</>,
+        <>The questions are never averaged together – one counts people who can’t name
         a party, the other people who won’t pick a side once preferences are
         applied. Only the first is left out of the shares elsewhere on this
         page, so a rising line means the share is being read off a smaller
-        pool of decided voters, not that support has moved.
-      </p>
+        pool of decided voters, not that support has moved.</>,
+      ]} />
     </section>
+  );
+}
+
+/* The Undecided panel's second view: how firm each party's vote is, from
+   RedBridge's vote-softness table (gen-data §5c2). "Certain" is RedBridge's
+   "solid": named a party at the first ask and certain they will vote that
+   way. The readings pool the house's last three waves, the lines every run of
+   three; the dots are its waves. Two sentences, each carrying the leads' highlighter only when it
+   reports a significant difference: which party's voters are the most
+   certain, and (under the chart) which party's share has moved most since
+   the term's first waves. A gap is significant when it exceeds the combined
+   95% margin, √(a² + b²) of the two ± figures. */
+const UND_VIEWS = [{ id: "all", label: "All voters" }, { id: "party", label: "By party" }, { id: "age", label: "By age" }];
+const FIRM_ORDER = ["onp", "alp", "lnp", "grn", "oth"];
+const firmWho = (k) => (k === "oth" ? "voters for independents and minor parties" : window.AP.D.PARTIES[k].name + " voters");
+const firmApart = (a, b) => Math.abs(a.v - b.v) > Math.hypot(a.ci95, b.ci95);
+const firmSaid = (cls, t, sig) => <p className={cls}>{sig ? <mark>{t}</mark> : t}</p>;
+function FirmnessView({ F, rangeId }) {
+  const { D, rangeDomain, buildXTicks } = window.AP;
+  const narrow = useNarrow();
+  const xDomain = rangeDomain(rangeId);
+  const parties = FIRM_ORDER.filter((k) => F.now[k]).sort((a, b) => F.now[b].v - F.now[a].v);
+  const cap = (s) => s[0].toUpperCase() + s.slice(1);
+
+  const lead = (() => {
+    const [top, next] = parties;
+    const t = F.now[top];
+    if (parties.slice(1).every((k) => firmApart(t, F.now[k]) && t.v > F.now[k].v))
+      return [`${cap(firmWho(top))} are significantly more likely than any other party’s voters to be certain of their vote: ${Math.round(t.v)}%, against ${Math.round(F.now[next].v)}% of ${firmWho(next)}.`, true];
+    return [`${cap(firmWho(top))} are the most likely to be certain of their vote, at ${Math.round(t.v)}%, but not by more than the margin over ${firmWho(next)}.`, false];
+  })();
+
+  const shift = (() => {
+    const moved = parties.map((k) => ({ k, d: F.now[k].v - F.base[k].v }))
+      .filter(({ k }) => firmApart(F.now[k], F.base[k]))
+      .sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+    if (!moved.length)
+      return ["No party’s share of voters certain of their vote has changed significantly since the months after the 2025 election.", false];
+    const { k, d } = moved[0];
+    return [`Since the months after the 2025 election, the share of ${firmWho(k)} certain of their vote has ${d < 0 ? "fallen" : "risen"} significantly, from ${Math.round(F.base[k].v)}% to ${Math.round(F.now[k].v)}%.`, true];
+  })();
+
+  /* The lines pool each wave with the two before it, weighted as the
+     figures above are, so a line moves on what three months say rather than
+     on one wave's few hundred respondents; the dots are the waves. */
+  const rolled = F.waves.map((w, i) => {
+    const ws = F.waves.slice(Math.max(0, i - F.pool + 1), i + 1);
+    const r = { x: w.x };
+    for (const k of parties) {
+      const n = ws.reduce((a, v) => a + v.n[k], 0);
+      r[k] = ws.reduce((a, v) => a + v.n[k] * v.solid[k], 0) / n;
+    }
+    return r;
+  });
+  const inX = (w) => w.x >= xDomain[0] && w.x <= xDomain[1];
+  const waves = F.waves.filter(inX), lines = rolled.filter(inX);
+  if (waves.length < 2) return firmSaid("und-lead", lead[0], lead[1]);
+  const vals = waves.flatMap((w) => parties.map((k) => w.solid[k]));
+  const lo = Math.max(0, Math.floor((Math.min(...vals) - 3) / 10) * 10);
+  const hi = Math.min(100, Math.ceil((Math.max(...vals) + 3) / 10) * 10);
+  const yTicks = [];
+  for (let v = lo + 10; v < hi; v += 10) yTicks.push(v);
+  const pts = (k) => lines.map((w) => ({ x: w.x, y: w[k] }));
+  const dots = waves.flatMap((w) => parties.map((k) => ({ x: w.x, y: w.solid[k], color: D.PARTIES[k].color,
+                                                          label: D.PARTIES[k].name, meta: w })));
+
+  return (
+    <>
+      {firmSaid("und-lead", lead[0], lead[1])}
+      <div className="und-reads">
+        {[...parties, "all"].map((k) => {
+          const r = F.now[k];
+          return (
+            <div className="und-read" key={k}>
+              <span className="und-swatch" style={{ background: k === "all" ? "var(--ink-3)" : D.PARTIES[k].color }} aria-hidden="true"></span>
+              <div className="und-read-body">
+                <div className="und-read-top">
+                  <span className="und-read-lab">{k === "all" ? "All voters" : D.PARTIES[k].name}</span>
+                  <span className="und-read-v">{r.v.toFixed(1)}<span className="pct">%</span></span>
+                  <span className="read-ci" title="95% margin">± {r.ci95.toFixed(1)}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <TrendChart
+        key="firm"
+        height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[lo, hi]}
+        yTicks={yTicks} unit="%" axisFont={narrow ? 28 : 20}
+        pad={{ l: narrow ? 84 : 58, r: 22, t: 16, b: 42 }}
+        xTicks={buildXTicks(xDomain[0], xDomain[1])}
+        series={parties.map((k) => ({ id: k, label: D.PARTIES[k].name, color: D.PARTIES[k].color,
+                                      width: k === "oth" ? 2 : 3, dashed: k === "oth",
+                                      points: pts(k), endLabel: D.PARTIES[k].short }))}
+        spine={pts(parties[0])}
+        scatter={dots} pollFacet="twopp"
+        tooltipTitle={(i) => waves[i] && waves[i].dateLabel}
+        fmt={(v) => v.toFixed(0)}
+        copy={{ sub: `Share of each party’s voters certain of their vote, wave by wave · ${houseList(F.houses.map(demoHouse))}`,
+                legend: parties.map((k) => ({ label: `${D.PARTIES[k].name}  ${F.now[k].v.toFixed(1)}%`, color: D.PARTIES[k].color, kind: "line" })) }}
+      />
+      {firmSaid("demo-verdict", shift[0], shift[1])}
+      <p className="table-hint">
+        Each dot is one RedBridge wave; the lines and the figures above pool three waves at a
+        time, the figures its latest three ({F.now.from} to {F.now.to}).
+      </p>
+      <HowTo paras={[
+        <>Certain voters are RedBridge’s “solid” voters: they named a party when first asked and are
+        certain they will vote that way. The rest are soft – they may change their vote – or very
+        soft: they named a party only when pressed, or say they will probably change.</>,
+        <>Each wave counts in proportion to how many of a party’s voters it asked, so the figure
+        for a small party rests on a few hundred people and carries a wider margin. Two figures
+        differ significantly when the gap between them is larger than their two margins combined.</>,
+        <>This is a different question from Resolve’s “how firm are you” in the All voters view,
+        which is why the shares there are lower.</>,
+      ]} />
+    </>
+  );
+}
+
+/* The Undecided panel's third view: how firm each age group's vote is, from
+   Resolve's "how firm are you" by age band (gen-data: softAge). The share
+   plotted is the not-firm one, the same measure as the All voters view's
+   "Not firm" line. Same furniture and tests as the By party view: readings
+   pooled over the last three waves, lines pooling every run of three, the
+   waves as dots; a lead on how the bands stand now and a sentence under the
+   chart on which band has moved since the term's first waves, each
+   highlighted only when it reports a significant difference. Bands run
+   from the accent to grey, youngest strongest, since they are ordered and
+   no party's. */
+const AGE_BANDS = [
+  { id: "18-34", label: "18–34", who: "voters aged 18–34" },
+  { id: "35-54", label: "35–54", who: "those aged 35–54" },
+  { id: "55+", label: "55+", who: "those 55 and over" },
+];
+function AgeFirmView({ A, rangeId }) {
+  const { rangeDomain, buildXTicks } = window.AP;
+  const narrow = useNarrow();
+  const xDomain = rangeDomain(rangeId);
+  // accent, then accent half-faded to grey, then the page's grey ink: the
+  // party-panel ramp towards --ink left 35–54 and 55+ too close to tell apart
+  const col = (i) => ["var(--accent)", "color-mix(in oklch, var(--accent) 45%, var(--ink-3))", "var(--ink-2)"][i];
+  const pct = (b) => Math.round(A.now[b.id].v) + "%";
+  const cap = (s) => s[0].toUpperCase() + s.slice(1);
+
+  const lead = (() => {
+    const [y, m, o] = AGE_BANDS, N = A.now;
+    if (N[y.id].v > N[m.id].v && N[m.id].v > N[o.id].v && firmApart(N[y.id], N[m.id]) && firmApart(N[m.id], N[o.id]))
+      return [`Firmness rises significantly with age: ${pct(y)} of voters aged 18–34 aren’t firm in their vote, against ${pct(m)} of those aged 35–54 and ${pct(o)} of those 55 and over.`, true];
+    const [f, ...rest] = [...AGE_BANDS].sort((a, b) => N[a.id].v - N[b.id].v);
+    if (rest.every((b) => firmApart(N[f.id], N[b.id])))
+      return [`${cap(f.who)} are significantly the firmest: ${pct(f)} aren’t firm in their vote, against ${pct(rest[0])} of ${rest[0].who} and ${pct(rest[1])} of ${rest[1].who}.`, true];
+    return ["Resolve finds no significant difference in how firm voters are between age groups.", false];
+  })();
+
+  const shift = (() => {
+    const moved = AGE_BANDS.map((b) => ({ b, d: A.now[b.id].v - A.base[b.id].v }))
+      .filter(({ b }) => firmApart(A.now[b.id], A.base[b.id]))
+      .sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+    if (!moved.length)
+      return ["No age group’s share not firm in its vote has changed significantly since the months after the 2025 election.", false];
+    const { b, d } = moved[0];
+    return [`Since the months after the 2025 election, the share of ${b.who} not firm in their vote has ${d > 0 ? "risen" : "fallen"} significantly, from ${Math.round(A.base[b.id].v)}% to ${Math.round(A.now[b.id].v)}%.`, true];
+  })();
+
+  // each wave pooled with the two before it, as the readings are
+  const rolled = A.waves.map((w, i) => {
+    const ws = A.waves.slice(Math.max(0, i - A.pool + 1), i + 1);
+    const r = { x: w.x };
+    for (const b of AGE_BANDS) {
+      const n = ws.reduce((a, v) => a + v.n[b.id], 0);
+      r[b.id] = ws.reduce((a, v) => a + v.n[b.id] * v.soft[b.id], 0) / n;
+    }
+    return r;
+  });
+  const inX = (w) => w.x >= xDomain[0] && w.x <= xDomain[1];
+  const waves = A.waves.filter(inX), lines = rolled.filter(inX);
+  if (waves.length < 2) return firmSaid("und-lead", lead[0], lead[1]);
+  const vals = waves.flatMap((w) => AGE_BANDS.map((b) => w.soft[b.id]));
+  const lo = Math.max(0, Math.floor((Math.min(...vals) - 3) / 10) * 10);
+  const hi = Math.min(100, Math.ceil((Math.max(...vals) + 3) / 10) * 10);
+  const yTicks = [];
+  for (let v = lo + 10; v < hi; v += 10) yTicks.push(v);
+  const pts = (b) => lines.map((w) => ({ x: w.x, y: w[b.id] }));
+  const dots = waves.flatMap((w) => AGE_BANDS.map((b, i) => ({ x: w.x, y: w.soft[b.id], color: col(i),
+                                                               label: b.label, meta: w })));
+
+  return (
+    <>
+      {firmSaid("und-lead", lead[0], lead[1])}
+      <div className="und-reads">
+        {AGE_BANDS.map((b, i) => (
+          <div className="und-read" key={b.id}>
+            <span className="und-swatch" style={{ background: col(i) }} aria-hidden="true"></span>
+            <div className="und-read-body">
+              <div className="und-read-top">
+                <span className="und-read-lab">{b.label}</span>
+                <span className="und-read-v">{A.now[b.id].v.toFixed(1)}<span className="pct">%</span></span>
+                <span className="read-ci" title="95% margin">± {A.now[b.id].ci95.toFixed(1)}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <TrendChart
+        key="soft-age"
+        height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[lo, hi]}
+        yTicks={yTicks} unit="%" axisFont={narrow ? 28 : 20}
+        pad={{ l: narrow ? 84 : 58, r: 22, t: 16, b: 42 }}
+        xTicks={buildXTicks(xDomain[0], xDomain[1])}
+        series={AGE_BANDS.map((b, i) => ({ id: b.id, label: b.label, color: col(i), points: pts(b), endLabel: b.label }))}
+        spine={pts(AGE_BANDS[0])}
+        scatter={dots} pollFacet="twopp"
+        tooltipTitle={(i) => waves[i] && waves[i].dateLabel}
+        fmt={(v) => v.toFixed(0)}
+        copy={{ sub: `Share of each age group not firm in its vote, wave by wave · ${houseList(A.houses)}`,
+                legend: AGE_BANDS.map((b, i) => ({ label: `${b.label}  ${A.now[b.id].v.toFixed(1)}%`, color: col(i), kind: "line" })) }}
+      />
+      {firmSaid("demo-verdict", shift[0], shift[1])}
+      <p className="table-hint">
+        Each dot is one Resolve wave; the lines and the figures above pool three waves at a
+        time, the figures its latest three ({A.now.from} to {A.now.to}).
+      </p>
+      <HowTo paras={[
+        <>Not firm is Resolve’s “soft” answer to “How firm are you with your vote?”: voters who
+        named a party but say they might change. It is the All voters view’s “Not firm” line,
+        split by age.</>,
+        <>Resolve doesn’t publish how many people in each age group it asked, so each group is
+        counted in proportion to its share of adults (2021 Census), the mix Resolve’s sample is
+        weighted to. Two figures differ significantly when the gap between them is larger than
+        their two margins combined.</>,
+      ]} />
+    </>
+  );
+}
+
+// ---- Where One Nation’s new voters came from ---------------------------
+/* One Nation's gain since the 2025 election, split by how the voters it
+   gained voted in 2025 – from the vote-switching tables DemosAU and YouGov
+   publish (gen-data §5b, data/vote-switching.json). Same furniture as the
+   undecided panel: a reading per group, monthly lines, one dot per poll.
+   A second view reads the same tables the other way: the share of each
+   party's 2025 voters now backing One Nation (sr.rate), the rates the split
+   is worked out from. The two can rank parties differently: a party with a
+   big 2025 vote gives a large part of the gain while losing only a small
+   share of its own voters. */
+const ONS_VIEWS = [{ id: "gain", label: "Of One Nation’s gain" }, { id: "rate", label: "Of each party’s voters" }];
+function OnSourcesPanel({ rangeId }) {
+  const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
+  const narrow = useNarrow();
+  const [view, setView] = useState("gain");
+  const S = D.onSources;
+  if (!S || !S.series.length) return null;
+  /* The houses began publishing these tables in February 2026, so the chart
+     starts at its first month rather than at the 2025 election the other
+     panels open on – on the full range that would leave most of it empty. */
+  const [rangeLo, rangeHi] = rangeDomain(rangeId);
+  // the view's figures for a group: its part of the gain, or its own rate
+  const rated = view === "rate" && S.series.every((sr) => sr.rate);
+  const src = (sr) => (rated ? sr.rate : sr);
+  const firstX = Math.min(...S.series.map((sr) => (src(sr).monthly[0] || { x: Infinity }).x));
+  const xDomain = [Math.max(rangeLo, firstX - 0.06), rangeHi];
+  const drawn = S.series.map((sr) => {
+    const pts = filterPts(src(sr).monthly, xDomain[0]);
+    const dots = src(sr).polls.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1])
+      .map((d) => ({ x: d.x, y: d.v, color: sr.color, label: sr.label, meta: d }));
+    return { sr, pts, dots };
+  }).filter((d) => d.pts.length >= 1);
+  if (!drawn.length) return null;
+  const vals = drawn.flatMap((d) => d.pts.map((p) => p.v).concat(d.dots.map((p) => p.y)));
+  const hi = Math.ceil((Math.max(...vals) + 3) / 10) * 10;
+  const yTicks = [];
+  for (let v = 10; v < hi; v += 10) yTicks.push(v);
+  const spine = drawn.reduce((a, d) => (d.pts.length > a.length ? d.pts : a), []);
+  /* The readings are the current reading (gen-data: each group's rate pooled
+     over six weeks as the headline pools polls, then split), not the latest
+     poll or calendar month – one wave's split rests on a few hundred
+     respondents per group, and early in a month the month is one wave. The
+     latest month stands in only if the window holds no poll. */
+  const monthOf = (ym) => D.monthNameFull(+ym.slice(5)) + " " + ym.slice(0, 4);
+  const reads = S.series.map((sr) => {
+    const now = src(sr).now;
+    if (now) return { sr, v: now.v, now, chg: now.chg ?? null };
+    const m = src(sr).monthly, last = m[m.length - 1], prev = m[m.length - 2];
+    return { sr, v: last.v, ym: last.ym, chg: prev ? +(last.v - prev.v).toFixed(1) : null };
+  });
+  const [a, b] = reads;
+  /* The lead is the comparison the tables make plainest, the Coalition
+     against Labor: how many times as many voters one has lost to One Nation
+     as the other (the gain view), or how many times as likely its 2025
+     voters are to have switched (the rates) - each view its own ratio, the
+     Coalition's smaller 2025 vote making its rate ratio the larger. The
+     figures themselves are the readings just below. */
+  const onsLead = (() => {
+    const when = a.now ? "" : "In " + monthOf(a.ym);
+    const lead = (s) => (when ? `${when}, ${s}` : s[0].toUpperCase() + s.slice(1));
+    if (!(a.v > 0 && b.v > 0)) return lead(`${a.v.toFixed(1)}% against ${b.v.toFixed(1)}%.`);
+    const lnpMore = a.v >= b.v, x = lnpMore ? a.v / b.v : b.v / a.v;
+    if (rated) {
+      const [more, less] = lnpMore ? ["people who voted for the Coalition in 2025", "Labor voters"]
+        : ["people who voted Labor in 2025", "Coalition voters"];
+      return x < 1.25
+        ? lead(`people who voted for the Coalition or Labor in 2025 ${a.now ? "are" : "were"} about as likely as each other to now back One Nation.`)
+        : lead(`${more} ${a.now ? "are" : "were"} ${timesWords(x)} as likely as ${less} to now back One Nation.`);
+    }
+    const [more, less] = lnpMore ? ["the Coalition", "Labor"] : ["Labor", "the Coalition"];
+    const has = a.now ? "has" : "had";
+    return x < 1.25
+      ? lead(`the Coalition and Labor ${a.now ? "have" : "had"} lost about as many voters to One Nation as each other since the 2025 election.`)
+      : lead(`${more} ${has} lost ${timesWords(x)} as many voters to One Nation as ${less} ${has} since the 2025 election.`);
+  })();
+  return (
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="card-title">Where One Nation’s new voters came from</h2>
+          <p className="card-sub">
+            {rated ? "Share of each party’s 2025 voters now backing One Nation"
+              : "Share of One Nation’s gain since the 2025 election, by how those voters voted in 2025"} · {houseList(S.houses)}
+          </p>
+        </div>
+      </div>
+      {S.series.every((sr) => sr.rate) && (
+        <div className="ons-ctl">
+          <Segmented options={ONS_VIEWS} value={view} onChange={setView} size="sm" ariaLabel="Figures as a share" />
+        </div>
+      )}
+      <p className="ons-lead"><mark>{onsLead}</mark></p>
+      <div className="und-reads">
+        {reads.map(({ sr, v, chg, now }) => (
+          <div className="und-read" key={sr.id}>
+            <span className="und-swatch" style={{ background: sr.color }} aria-hidden="true"></span>
+            <div className="und-read-body">
+              <div className="und-read-top">
+                <span className="und-read-lab">{sr.label}</span>
+                <span className="und-read-v">{v.toFixed(1)}<span className="pct">%</span></span>
+                {now && now.ci95 != null && <span className="read-ci" title="95% margin">± {now.ci95.toFixed(1)}</span>}
+                {chg != null && <Delta value={chg} neutral small title={now ? nowDeltaTitle(now) : "Change on the previous month"} />}
+              </div>
+              <p className="und-read-note">{sr.note}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <TrendChart
+        key="ons"
+        height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[0, hi]}
+        yTicks={yTicks} unit="%" axisFont={narrow ? 28 : 20}
+        // two-digit shares ("60%") at the phone's 28px axis need the room
+        pad={{ l: narrow ? 84 : 58, r: 22, t: 16, b: 42 }}
+        xTicks={buildXTicks(xDomain[0], xDomain[1])}
+        series={drawn.map((d) => ({ id: d.sr.id, label: d.sr.label, color: d.sr.color, points: series(d.pts, "v"),
+                                    endLabel: d.sr.short || d.sr.label.replace(/ voters$/, "") }))}
+        spine={series(spine, "v")}
+        scatter={drawn.flatMap((d) => d.dots)} pollFacet="twopp"
+        tooltipTitle={(i) => window.AP.monthLabelFull(spine[i].ym)}
+        fmt={(v) => v.toFixed(1)}
+        // the readings above are this chart's key on the page; the image
+        // carries them as its legend, with the figure each one shows
+        copy={{ legend: reads.filter((r) => drawn.some((d) => d.sr.id === r.sr.id))
+          .map(({ sr, v }) => ({ label: `${sr.label}  ${v.toFixed(1)}%`, color: sr.color, kind: "line" })) }}
+      />
+      <p className="table-hint">
+        Each dot is one poll’s {rated ? "figure" : "split"} and the lines are monthly averages; the
+        figures above pool the last {S.now ? S.now.window : "six weeks"} of polls.{" "}
+        <button type="button" className="hi-term"
+                onClick={() => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where One Nation’s new voters came from")}>
+          How it’s worked out</button>
+      </p>
+      <HowTo paras={[
+        <>Newer polls count for more in the figures above.</>,
+        <>The two views come from the same tables. “Of each party’s voters” is the share of each
+        party’s 2025 voters now backing One Nation. Weighted by that party’s share of the 2025 vote,
+        it becomes the party’s part of One Nation’s gain, so 38% of Coalition voters counts for far
+        more than 38% of a small party’s.</>,
+        <>Voters who can’t recall a 2025 vote are left out, and so are One Nation’s own 2025
+        voters, who are what it kept rather than gained.</>,
+      ]} />
+    </section>
+  );
+}
+
+// ---- Who votes for whom: the vote by group -----------------------------------
+/* One figure per group and party (gen-data §7g): each poll's gap between a
+   group and its own all-voters figure, pooled over six weeks the way the
+   headline pools polls, added to the site's current primaries. Groups pool
+   only where pollsters cut the population the same way, so Age shows its
+   bands and, beside them, the generations two houses ask by; Place shows
+   states beside location, Home housing beside language at home. One party at a
+   time, One Nation first. Under each set's bars, a chart of how much higher
+   or lower each group's vote is than all voters', in PERCENT, month by month
+   (gen-data's monthly lines over that month's primaries) inside its 95%
+   interval, each poll's own figure against its own all-voters figure a dot,
+   all voters the dashed zero line; the bars' swatches are its legend. The
+   bands are what make it readable: a group's month rests on a few hundred
+   respondents, and in 2025 on one poll, so most wiggles sit inside their
+   own margin – where bands overlap, those groups can't be told apart.
+   Not the levels: every group's line is the month's primaries plus its gap,
+   so they redrew the national trend once per group. Not the gap in points
+   either: One Nation grew 3.5-fold over the chart, and a group giving it
+   two-thirds of the national rate sits 3 points under at 8% and 9 under at
+   27%, so points read growth as a deepening divide. The percent difference
+   holds still unless the group really moves apart. */
+const DEMO_PARTIES = [
+  { id: "onp", label: "One Nation" }, { id: "alp", label: "Labor" },
+  { id: "lnp", label: "Coalition" }, { id: "grn", label: "Greens" },
+];
+const demoHouse = (h) => (h === "RedBridge/Accent" ? "RedBridge" : h);
+// a poll row's grp.v party order (gen-data DEMO_BY_POLL; the export's columns)
+const DEMO_GRP_PARTY = ["alp", "lnp", "grn", "onp", "oth"];
+/* A set's groups as a ramp of the party's colour, first group full strength
+   shading towards the page's own ink – dark on the light theme, pale on the
+   dark one, so the ends of the ramp part in both and neither is mistaken for
+   the grey all-voters line. Ordered groups (ages, generations, levels of
+   education) read in order, and every line still says which party. */
+const demoRamp = (color, n, i) => (n < 2 ? color
+  : `color-mix(in oklch, ${color} ${Math.round(100 - (i * 60) / (n - 1))}%, var(--ink))`);
+/* One sentence under a set's bars saying whether its groups differ for the
+   chosen party. Two groups differ significantly when their gap exceeds the
+   gap's own 95% margin, √(±a² + ±b²): the groups are separate respondents,
+   so their errors add in quadrature. Overlapping ± bars alone would miss
+   gaps that are real. With three or four groups the sentence picks from
+   three to six gaps, which unadjusted would find a difference that isn't
+   there one time in five to eight, so Holm's correction raises the bar, as
+   the chart's sentence does: the smallest p against .05/m, the next against
+   .05/(m − 1), and so on. Ordered sets (ages, generations) whose every step
+   is significant, one way, read as a trend; otherwise the sentence names
+   the group that stands apart from all the others (the one further from its
+   nearest neighbour, if both ends do), or failing that the widest
+   significant gap. */
+const DEMO_WHO = {
+  "18–34": "voters aged 18–34", "35–54": "voters aged 35–54", "55+": "voters aged 55 and over",
+  "Gen Z": "Gen Z voters", Millennials: "Millennials", "Gen X": "Gen X voters", Boomers: "Boomers",
+  Men: "men", Women: "women",
+  "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "voters with a TAFE or trade qualification",
+  University: "university graduates",
+  NSW: "voters in NSW", Vic: "voters in Victoria", Qld: "voters in Queensland",
+  "Rest of Australia": "voters in SA, WA, Tasmania, and the territories",
+  "Inner metro": "voters in the inner suburbs", "Outer metro": "voters in the outer suburbs",
+  Provincial: "voters in provincial towns and cities", Rural: "rural voters",
+  "Own outright": "voters who own their home outright", Mortgage: "voters with a mortgage", Renting: "renters",
+  "English only": "voters who speak only English at home", "Other language": "voters who speak another language at home",
+};
+/* Per set: `all` names the groups together, `others` the rest of them beside
+   one group, `step` the trend phrase for an ordered set (null where the
+   groups have no order), and `one` a single group, for the chart's
+   sentence. */
+const DEMO_SET_WORDS = {
+  age: { all: "age groups", others: "any other age group", step: "with each older age group", one: "age group" },
+  generation: { all: "generations", others: "any other generation", step: "with each older generation", one: "generation" },
+  gender: { all: "men and women", others: null, step: null },
+  education: { all: "levels of education", others: "voters with other levels of education", step: null, one: "education group" },
+  state: { all: "the states", others: "voters in other states", step: null, one: "state" },
+  // inner suburbs, outer suburbs, provincial, rural: each further from a capital
+  location: { all: "the city and the country", others: "voters in other areas", step: "with each step further from the city", one: "area" },
+  housing: { all: "owners and renters", others: "other voters", step: null, one: "group" },
+  language: { all: "voters who speak only English at home and those who don’t", others: null, step: null },
+};
+const DEMO_VOTE_FOR = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "a minor party or independent" };
+// P(|Z| > z) for a standard normal (Abramowitz & Stegun 7.1.26, error under 1.5e-7)
+function zTail(z) {
+  const x = Math.abs(z) / Math.SQRT2, t = 1 / (1 + 0.3275911 * x);
+  return t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429)))) * Math.exp(-x * x);
+}
+function demoVerdict(st, party) {
+  const gs = st.groups.filter((g) => g.v[party] != null && g.ci[party] != null);
+  if (gs.length < 2) return null;
+  const words = DEMO_SET_WORDS[st.id] || { all: "these groups", others: "any other group", step: null };
+  const who = (g) => DEMO_WHO[g.label] || g.label;
+  const Who = (g) => { const s = who(g); return s[0].toUpperCase() + s.slice(1); };
+  const vote = "to vote for " + DEMO_VOTE_FOR[party];
+  // every gap against its own margin: z = gap / √(se_a² + se_b²), each ± being 1.96 se
+  const gaps = gs.flatMap((a, i) => gs.slice(i + 1).map((b) => {
+    const m = Math.hypot(a.ci[party], b.ci[party]);
+    return { a, b, p: m > 0 ? zTail(1.96 * (a.v[party] - b.v[party]) / m) : 1 };
+  }));
+  const sig = new Set();
+  for (const [i, g] of [...gaps].sort((x, y) => x.p - y.p).entries()) {
+    if (g.p >= 0.05 / (gaps.length - i)) break;
+    sig.add(g);
+  }
+  // +1 if a is significantly above b, −1 if below, 0 if the polls can't tell
+  const cmp = (a, b) => (sig.has(gaps.find((g) => (g.a === a && g.b === b) || (g.a === b && g.b === a)))
+    ? Math.sign(a.v[party] - b.v[party]) : 0);
+  const pairs = gs.flatMap((a, i) => gs.slice(i + 1).map((b) => [a, b, cmp(a, b)])).filter((p) => p[2]);
+  if (!pairs.length) return `There is no significant difference between ${words.all}.`;
+  if (gs.length === 2) {
+    const [a, b] = gs[0].v[party] > gs[1].v[party] ? gs : [gs[1], gs[0]];
+    return `${Who(a)} are significantly more likely than ${who(b)} ${vote}.`;
+  }
+  if (words.step && gs.length === st.groups.length) {
+    const steps = gs.slice(1).map((g, i) => cmp(g, gs[i]));
+    if (steps[0] !== 0 && steps.every((s) => s === steps[0])) return `Support for ${DEMO_VOTE_FOR[party]} ${steps[0] > 0 ? "rises" : "falls"} significantly ${words.step}.`;
+  }
+  const byV = [...gs].sort((a, b) => b.v[party] - a.v[party]);
+  const top = byV[0], bot = byV[byV.length - 1];
+  const topApart = byV.slice(1).every((g) => cmp(top, g) > 0), botApart = byV.slice(0, -1).every((g) => cmp(bot, g) < 0);
+  const topGap = top.v[party] - byV[1].v[party], botGap = byV[byV.length - 2].v[party] - bot.v[party];
+  if (topApart && (!botApart || topGap >= botGap)) return `${Who(top)} are significantly more likely than ${words.others} ${vote}.`;
+  if (botApart) return `${Who(bot)} are significantly less likely than ${words.others} ${vote}.`;
+  const [a, b] = pairs.map(([x, y, s]) => (s > 0 ? [x, y] : [y, x]))
+    .sort((p, q) => (q[0].v[party] - q[1].v[party]) - (p[0].v[party] - p[1].v[party]))[0];
+  return `${Who(a)} are significantly more likely than ${who(b)} ${vote}.`;
+}
+/* A verdict that finds something carries the leads' highlighter; one that
+   finds nothing ("no significant difference", "hasn’t changed significantly",
+   "aren’t enough polls") stays plain, so the marks point at the findings. */
+const demoSaid = (t) => t && <p className="demo-verdict">
+  {/significant/.test(t) && !/\bno\b|n’t/.test(t) ? <mark>{t}</mark> : t}</p>;
+/* The sentence under a set's chart: has any group moved towards or away
+   from the party, relative to all voters, over the period on screen? The
+   lines pool every pollster, and who asks changes over the term (Resolve
+   alone until February 2026, then YouGov, RedBridge and DemosAU), so a line
+   can move only because a pollster joined. The test compares each pollster
+   with itself: a straight line through a group's gap to all voters (the
+   chart's dots), a level for each pollster and one shared slope, each poll
+   weighted by its sample, and the scatter about the line measured from the
+   polls rather than assumed. The slope is significant when its t-test
+   clears 95%. With three or four groups tested at once, Holm's correction
+   keeps one of them from clearing it by chance. Two groups (men, women) are
+   a single test: the gap between them. */
+// P(|T| > t) for Student's t on whole degrees of freedom, exact (Abramowitz & Stegun 26.7.3–4)
+function tTail(t, df) {
+  const th = Math.atan(Math.abs(t) / Math.sqrt(df)), c2 = Math.cos(th) ** 2;
+  let term = 1, sum = 1;
+  if (df % 2) {
+    for (let k = 1; k <= (df - 3) / 2; k++) sum += (term *= (2 * k) / (2 * k + 1) * c2);
+    return 1 - (2 / Math.PI) * (th + (df > 1 ? Math.sin(th) * Math.cos(th) * sum : 0));
+  }
+  for (let k = 1; k <= (df - 2) / 2; k++) sum += (term *= (2 * k - 1) / (2 * k) * c2);
+  return 1 - Math.sin(th) * sum;
+}
+// the slope (per year) through points { h: pollster, t, y, w }, each pollster its own level
+function withinHouseSlope(pts) {
+  const byHouse = new Map();
+  for (const p of pts) (byHouse.get(p.h) || byHouse.set(p.h, []).get(p.h)).push(p);
+  const dm = [];
+  let houses = 0;
+  for (const ps of byHouse.values()) {
+    if (ps.length < 2) continue;                  // one poll says nothing about its house's trend
+    houses++;
+    const W = ps.reduce((a, p) => a + p.w, 0);
+    const tb = ps.reduce((a, p) => a + p.w * p.t, 0) / W, yb = ps.reduce((a, p) => a + p.w * p.y, 0) / W;
+    for (const p of ps) dm.push({ w: p.w, dt: p.t - tb, dy: p.y - yb });
+  }
+  const df = dm.length - houses - 1;
+  const sxx = dm.reduce((a, p) => a + p.w * p.dt * p.dt, 0);
+  if (df < 3 || !(sxx > 0)) return null;
+  const b = dm.reduce((a, p) => a + p.w * p.dt * p.dy, 0) / sxx;
+  const se = Math.sqrt(dm.reduce((a, p) => a + p.w * (p.dy - b * p.dt) ** 2, 0) / df / sxx);
+  return { b, p: se > 0 ? tTail(b / se, df) : 1 };
+}
+function demoTrendVerdict(D, st, party, inX) {
+  const gpi = DEMO_GRP_PARTY.indexOf(party);
+  const words = DEMO_SET_WORDS[st.id] || {};
+  const who = (g) => DEMO_WHO[g.label] || g.label;
+  const P = DEMO_VOTE_FOR[party];
+  const polls = D.individualPolls.filter((p) => p.grp && p.grp.t && p.grp.t[gpi] > 0 && inX(p.x));
+  const gapOf = (p, g) => {                       // as the chart's dots draw it
+    const v = p.grp.v[D.demoGroups.indexOf(g.label)];
+    const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
+    return sum > 0 ? 100 * ((100 * v[gpi] / sum) / p.grp.t[gpi] - 1) : null;
+  };
+  const points = (y) => polls.map((p) => ({ h: p.pollster, t: p.x, w: p.sample || 1000, y: y(p) }))
+    .filter((d) => d.y != null && isFinite(d.y));
+  const asked = polls.find((p) => st.groups.some((g) => gapOf(p, g) != null));
+  if (!asked) return null;
+  const when = D.monthNameFull(+asked.ym.slice(5)) + " " + asked.ym.slice(0, 4);
+  if (st.groups.length === 2) {
+    const [a, b] = st.groups;
+    const fit = withinHouseSlope(points((p) => {
+      const ga = gapOf(p, a), gb = gapOf(p, b);
+      return ga == null || gb == null ? null : ga - gb;
+    }));
+    if (!fit) return `There aren’t enough polls since ${when} to tell whether the gap between ${who(a)} and ${who(b)} has changed.`;
+    // no party named, as the bars' "no significant difference between men and women":
+    // with it, the language pair ran to thirty words
+    if (fit.p >= 0.05) return `The gap between ${who(a)} and ${who(b)} hasn’t changed significantly since ${when}.`;
+    const [towards, from] = fit.b > 0 ? [a, b] : [b, a];
+    return `Since ${when}, ${who(towards)} have moved significantly towards ${P} relative to ${who(from)}.`;
+  }
+  const one = words.one || "group";
+  const fits = st.groups.map((g) => ({ g, fit: withinHouseSlope(points((p) => gapOf(p, g))) })).filter((f) => f.fit);
+  if (!fits.length) return `There aren’t enough polls since ${when} to tell whether any ${one} has moved relative to all voters.`;
+  // Holm: the smallest p against .05/m, the next against .05/(m − 1), and so on, stopping at the first miss
+  const sig = [];
+  for (const [i, f] of [...fits].sort((x, y) => x.fit.p - y.fit.p).entries()) {
+    if (f.fit.p >= 0.05 / (fits.length - i)) break;
+    sig.push(f);
+  }
+  if (!sig.length) return `Since ${when}, no ${one} has moved significantly towards or away from ${P} relative to all voters.`;
+  const names = (fs) => houseList(fs.map((f) => who(f.g)), Infinity);
+  const towards = sig.filter((f) => f.fit.b > 0), away = sig.filter((f) => f.fit.b < 0);
+  const [first, then] = away.length >= towards.length ? [[away, "away from"], [towards, "towards"]] : [[towards, "towards"], [away, "away from"]];
+  return `Since ${when}, ${names(first[0])} have moved significantly ${first[1]} ${P} relative to all voters` +
+    (then[0].length ? `, and ${names(then[0])} ${then[1]} it.` : ".");
+}
+function DemographicsPanel({ rangeId = "all" }) {
+  const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
+  const narrow = useNarrow();
+  const T = D.demographics;
+  const [tabId, setTab] = useState("age");
+  const [party, setParty] = useState("onp");
+  if (!T || !T.tabs || !T.tabs.length) return null;
+  const tab = T.tabs.find((t) => t.id === tabId) || T.tabs[0];
+  const color = D.PARTIES[party].color;
+  const name = D.PARTIES[party].name;
+  const all = T.all[party];
+  const vals = tab.sets.flatMap((st) => st.groups.map((g) => g.v[party])).concat([all]);
+  const top = Math.max(10, Math.ceil((Math.max(...vals) + 2) / 10) * 10);
+  const row = (label, v, ci, isAll, title, swatch) => (
+    <div className={"demo-row" + (isAll ? " all" : "")} key={label} title={title}>
+      <span className="demo-lab">
+        {swatch && <span className={"demo-sw" + (isAll ? " dash" : "")} style={isAll ? null : { background: swatch }} aria-hidden="true"></span>}
+        {label}
+      </span>
+      <span className="demo-track" aria-hidden="true">
+        <span className="demo-fill" style={{ width: (100 * v / top) + "%", background: isAll ? "var(--ink-3)" : color }}></span>
+      </span>
+      <span className="demo-v">{v.toFixed(1)}<span className="pct">%</span></span>
+      <span className="demo-ci">{ci != null ? "± " + ci.toFixed(1) : ""}</span>
+    </div>
+  );
+  /* One set's chart: each group's monthly figure for the chosen party as a
+     percent above or below that month's all-voters figure, its 95% interval
+     (the month's margin in points, after the shares in each monthly row, over
+     the same all-voters figure – that figure's own margin, a tenth the size,
+     is left out), and each poll's group figure against its own all-voters
+     figure (grp.t). */
+  const rel = (g, a) => 100 * (g / a - 1);
+  const ki = T.order.indexOf(party), gpi = DEMO_GRP_PARTY.indexOf(party);
+  const [rangeLo, rangeHi] = rangeDomain(rangeId);
+  const build = (st, firstXShared) => {
+    const n = st.groups.length;
+    const allAt = new Map(T.allMonthly.map((m) => [m[0], m[1 + ki]]));
+    const lines = st.groups.map((g, i) => ({ g, color: demoRamp(color, n, i),
+      pts: (g.monthly || []).filter((m) => allAt.has(m[0]))
+        .filter((m) => allAt.get(m[0]) > 0)
+        .map((m) => ({ ym: m[0], x: D.mx(m[0]), v: +rel(m[1 + ki], allAt.get(m[0])).toFixed(1),
+                       ci: m[1 + T.order.length + ki] != null ? 100 * m[1 + T.order.length + ki] / allAt.get(m[0]) : null })) }))
+      .filter((l) => l.pts.length);
+    if (!lines.length) return null;
+    // the houses asked from Feb 2026 (Resolve's age and gender from mid-2025),
+    // so a set's chart opens at its first month, as the One Nation panel does
+    const firstX = firstXShared != null ? firstXShared : Math.min(...lines.map((l) => l.pts[0].x));
+    const xDomain = [Math.max(rangeLo, firstX - 0.06), rangeHi];
+    const inX = (x) => x >= xDomain[0] && x <= xDomain[1];
+    const allPts = filterPts(T.allMonthly.map((m) => ({ ym: m[0], x: D.mx(m[0]), v: 0 }))
+      .filter((d) => d.x >= firstX), xDomain[0]);
+    const drawn = lines.map((l) => ({ ...l, pts: filterPts(l.pts, xDomain[0]) }));
+    const dots = D.individualPolls.filter((p) => p.grp && p.grp.t && inX(p.x)).flatMap((p) => drawn.map((l) => {
+      const v = p.grp.v[D.demoGroups.indexOf(l.g.label)];
+      const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
+      return sum > 0 && p.grp.t[gpi] > 0
+        ? { x: p.x, y: +rel(100 * v[gpi] / sum, p.grp.t[gpi]).toFixed(1), color: l.color, label: l.g.label, meta: p } : null;
+    }).filter(Boolean));
+    // a share can't fall below zero, so neither can a band's floor fall below −100%
+    const areas = drawn.map((l) => ({ id: "ci-" + l.g.label, color: l.color, className: "ci-band", edge: false,
+      smooth: true, points: l.pts.filter((d) => d.ci != null)
+        .map((d) => ({ x: d.x, y0: Math.max(-100, d.v - d.ci), y1: d.v + d.ci })) }))
+      .filter((a) => a.points.length >= 2);
+    // the domain covers the bands too, or the widest months would run off the plot
+    const vals = drawn.flatMap((l) => l.pts.map((d) => d.v)).concat(allPts.map((d) => d.v), dots.map((d) => d.y),
+      areas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])));
+    return { st, n, lines, firstX, xDomain, allPts, drawn, dots, areas, vals };
+  };
+  /* The sets on a tab sit side by side (by age | by generation), so they
+     share a time axis and a scale: two charts starting in different months
+     with different gridlines invited a comparison neither could support. */
+  const builtFirst = tab.sets.map((st) => build(st, null)).filter(Boolean);
+  const sharedFirstX = builtFirst.length ? Math.min(...builtFirst.map((b) => b.firstX)) : null;
+  const built = new Map(tab.sets.map((st) => [st.id, build(st, sharedFirstX)]));
+  const sharedVals = [...built.values()].filter(Boolean).flatMap((b) => b.vals);
+  /* the finest step that keeps to six gridlines, and never a floor under
+     −100%: no group can sit more than 100% below all voters. The domain ends
+     on the first gridline past the data (a tenth of a step clear), and both
+     end gridlines are labelled: fitDomain's 40% pad plus unlabelled edges
+     could leave nearly a whole empty step above and below the lines. */
+  const sharedAxis = (() => {
+    if (!sharedVals.length) return null;
+    const lo = Math.min(0, ...sharedVals), hi = Math.max(0, ...sharedVals);
+    const step = [10, 20, 25, 50, 100].find((st) => (hi - lo) / st <= 6) || 200;
+    const d0 = Math.max(-100, Math.floor((lo - step * 0.1) / step) * step);
+    const d1 = Math.ceil((hi + step * 0.1) / step) * step;
+    const ticks = [];
+    for (let v = d0; v <= d1 + 1e-9; v += step) ticks.push(v);
+    return { domain: [d0, d1], ticks };
+  })();
+  const chartFor = (st0) => {
+    const b = built.get(st0.id);
+    if (!b || !sharedAxis) return null;
+    const { st, n, xDomain, allPts, drawn, dots, areas } = b;
+    const { domain, ticks } = sharedAxis;
+    const signed = (v) => (Math.round(v) > 0 ? "+" : Math.round(v) < 0 ? "\u2212" : "") + Math.abs(Math.round(v));
+    const by = st.label ? st.label.replace(/^By /, "") : tab.label.toLowerCase();
+    return (
+      <div className="demo-chart">
+        {/* on a phone the charts stack apart from their bars, so with two sets
+            each chart names its own, as the bars' header does */}
+        <p className="demo-chart-lab">
+          {tab.sets.length > 1 && <span className="demo-chart-set">{st.label}</span>}
+          How much higher or lower than among all voters (%), month by month
+        </p>
+        <TrendChart
+          key={"demo-" + st.id}
+          height={narrow ? 560 : 500} xDomain={xDomain} yDomain={domain}
+          yTicks={ticks} unit="%"
+          yTickFmt={(t) => (t > 0 ? "+" + t + "%" : t < 0 ? "\u2212" + -t + "%" : "0")}
+          // the right margin keeps the last month's label clear of the copy button
+          pad={{ l: narrow ? 92 : 76, r: 60, t: 16, b: narrow ? 66 : 56 }}
+          xTicks={buildXTicks(xDomain[0], xDomain[1])}
+          series={[{ id: "all", label: "All voters", color: "var(--ink-3)", dashed: true, points: series(allPts, "v") },
+                   ...drawn.map((l) => ({ id: l.g.label, label: l.g.label, color: l.color, points: series(l.pts, "v"),
+                                          /* three shades of one party colour: the name at the line's end is what tells them apart */
+                                          endLabel: l.g.label }))]}
+          areas={areas}
+          spine={series(allPts, "v")}
+          scatter={dots} pollFacet="primary"
+          tooltipTitle={(i) => window.AP.monthLabelFull(allPts[i].ym)}
+          fmt={signed}
+          ariaLabel={`${name} by ${by}: how much higher or lower each group's vote is than all voters', in percent, month by month`}
+          copy={{
+            sub: `How much higher or lower ${name}’s vote is in each group than among all voters, by ${by} · the latest figures pool the last ${T.window} of polls`,
+            legend: [{ label: `All voters  ${all.toFixed(1)}%`, color: "var(--ink-3)", kind: "dashed" },
+                     ...st.groups.map((g, i) => ({ label: `${g.label}  ${signed(rel(g.v[party], all))}%`,
+                                                   color: demoRamp(color, n, i), kind: "line" })),
+                     ...(areas.length ? [{ label: "95% interval (shaded)", color: "var(--ink-faint)", kind: "shade" }] : [])],
+          }}
+        />
+        {(() => {
+          const t = demoTrendVerdict(D, st, party, (x) => x >= xDomain[0] && x <= xDomain[1]);
+          return demoSaid(t);
+        })()}
+      </div>
+    );
+  };
+
+  return (
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="card-title">Who votes for whom</h2>
+          <p className="card-sub">
+            {name}’s share of each group’s first-preference vote, pooled from the last {T.window} of polls · {houseList(T.houses.map(demoHouse))}
+          </p>
+        </div>
+      </div>
+      <div className="demo-ctl">
+        <Segmented options={T.tabs.map((t) => ({ id: t.id, label: t.label }))} value={tab.id} onChange={setTab}
+                   size="sm" ariaLabel="Group voters by" />
+        <Segmented options={DEMO_PARTIES} value={party} onChange={setParty} size="sm" ariaLabel="Party" />
+      </div>
+      {/* A tab with one set (gender, education) has the width the age tab
+          spends on its second set, so its chart takes that column, and the
+          notes sit under the bars they explain rather than below the chart.
+          The notes are one element on every tab, so an open "How to read"
+          stays open across a tab switch. */}
+      <div className="demo-body">
+      <div className={"demo-grid" + (tab.sets.length === 1 ? " solo" : "")}>
+        {/* Every set's bars, then every set's chart. Two columns put the bars
+            side by side over the charts, level by construction; one column (a
+            phone) reads bars, bars, chart, chart, since the bars say more - the
+            charts mostly show no significant change. */}
+        {tab.sets.map((st) => (
+            <div className="demo-bars" key={st.id}>
+            {tab.sets.length > 1 && (
+              <div className="demo-house-head">
+                <span className="demo-house-name">{st.label}</span>
+                <span className="demo-house-when">{houseList(st.houses.map(demoHouse))}</span>
+              </div>
+            )}
+            {row("All voters", all, null, true, "The site’s current figure for all voters – the headline’s own estimate", "dash")}
+            {st.groups.map((g, i) => row(g.label, g.v[party], g.ci[party], false,
+              `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"} · ${houseList(g.houses.map(demoHouse))} · ± ${g.ci[party].toFixed(1)} is the 95% margin`,
+              demoRamp(color, st.groups.length, i)))}
+            {demoSaid(demoVerdict(st, party))}
+            </div>
+        ))}
+        {/* an empty slot keeps a set with no chart from pulling the other set's chart under the wrong bars */}
+        {tab.sets.map((st) => (
+          <React.Fragment key={st.id + "-chart"}>
+            {chartFor(st) || (tab.sets.length > 1 ? <div className="demo-chart" /> : null)}
+          </React.Fragment>
+        ))}
+      {/* The gist stays in view; the reading instructions fold, as the
+          Past cycles intro's do - all of it ran eight lines under the charts. */}
+      <div className="demo-notes">
+      <p className="table-hint">
+        The figures pool the last {T.window} of polls. Each chart shows how much higher or lower
+        the party’s vote is in each group than among all voters, month by month.{" "}
+        <button type="button" className="hi-term"
+                onClick={() => window.AP.openTerm && window.AP.openTerm("vote-by-group", "Who votes for whom")}>
+          Where the figures come from</button>
+      </p>
+      <details className="view-how hint-how">
+        <summary>How to read these charts</summary>
+        <p className="table-hint">
+          A bar is that group’s share of the first-preference vote: 17.1% beside 18–34 means
+          17.1% of people aged 18–34 name the party as their first preference – the same as the
+          all-voters bar, read among that group alone. Each poll says how far a group sits from
+          its own overall figure. Those gaps are pooled, newer and larger polls counting for more
+          as in every figure here, and added to the site’s current figure for all voters. ± is
+          the 95% margin.
+        </p>
+        <p className="table-hint">
+          The sentence under the bars says whether the groups really differ. Two groups differ
+          significantly when the gap between them is larger than its own 95% margin, which
+          combines both groups’ ± figures. With three or four groups there are several gaps to
+          test at once, so each has to clear a higher bar.
+        </p>
+        <p className="table-hint">
+          The sentence under each chart says whether any group has moved towards or away from the
+          party, relative to all voters, over the period shown. It compares each pollster only with
+          itself, so a pollster joining or leaving can’t pass for a change. The same higher bar
+          applies when three or four groups are tested at once.
+        </p>
+        <p className="table-hint">
+          The charts are built the way the site’s other monthly lines are: each poll is a dot and
+          each line’s 95% interval is shaded. Where two groups’ shading overlaps, the polls can’t
+          tell them apart that month. −38% means the party’s vote in that group is 38% lower than
+          among all voters, not 38 points. Measured this way a party’s growth doesn’t read as a
+          widening divide, so a flat line means the group moved with everyone else.
+        </p>
+        <p className="table-hint">
+          Groups pool only where pollsters cut them the same way
+          {tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34"
+            : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the rest of Australia at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups"
+            : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups"
+            : ""}.
+        </p>
+      </details>
+      </div>
+      </div>
+      </div>
+    </section>
+  );
+}
+
+// ---- The issues: what matters, and who voters trust with it ----------------
+/* Two views of the one question. "Who's trusted": for each issue, how many
+   voters put it in their top three (RedBridge – the one pollster that asks
+   this monthly and publishes the figures) beside who they think is best on
+   it: Labor, the Coalition and One Nation as shares of the voters who named
+   one of those three, pooled across Resolve, RedBridge and YouGov (gen-data
+   §7h: the three houses offer different options, and those three are the
+   part every question shares). A row picks the issue the chart follows
+   month by month. "What matters to whom": RedBridge's top three by group. */
+const ISS_PARTY = { alp: "Labor", lnp: "the Coalition", onp: "One Nation" };
+const ISS_PARTY_CAP = { alp: "Labor", lnp: "Coalition", onp: "One Nation" };
+// the group table's column heads: a word or two
+const ISS_SHORT = { col: "Cost of living", housing: "Housing", health: "Health", economy: "Economy",
+  immigration: "Immigration", climate: "Climate", crime: "Crime", security: "Security" };
+// an issue inside a sentence
+const ISS_PHRASE = { col: "the cost of living", housing: "housing", health: "health",
+  economy: "economic management", immigration: "immigration", climate: "climate change",
+  crime: "crime", security: "national security" };
+const ISS_WHO = {
+  Labor: "Labor voters", Coalition: "Coalition voters", Liberal: "Liberal voters",
+  "Nationals, LNP and CLP": "Nationals, LNP and CLP voters", "One Nation": "One Nation voters",
+  Greens: "Greens voters", Others: "voters for other parties and independents", Undecided: "undecided voters",
+  "Below Year 12": "voters who left school before Year 12", "Year 12": "voters who finished Year 12",
+  "Renting and other": "renters and others",
+};
+const ISS_SET_WORDS = {
+  vote: { all: "voters of different parties", others: "any other group of voters" },
+  generation: DEMO_SET_WORDS.generation, gender: DEMO_SET_WORDS.gender, location: DEMO_SET_WORDS.location,
+  housing: { all: "owners and renters", others: "other voters" }, education: DEMO_SET_WORDS.education,
+};
+const issWho = (g) => ISS_WHO[g] || DEMO_WHO[g] || g;
+const issCap = (s) => s[0].toUpperCase() + s.slice(1);
+/* One sentence per issue on the group view, or null when no gap between two
+   groups clears its margin: the same test as the vote-by-group bars (each
+   gap against √(±a² + ±b²), Holm's correction across the set's gaps), the
+   group that stands apart named if there is one, else the widest gap. */
+function issGroupVerdict(tab, k) {
+  const gs = tab.groups.map((g) => ({ g, c: tab.cells[g] && tab.cells[g][k] })).filter((x) => x.c && x.c.ci != null);
+  if (gs.length < 2) return null;
+  const gaps = gs.flatMap((a, i) => gs.slice(i + 1).map((b) => {
+    const m = Math.hypot(a.c.ci, b.c.ci);
+    return { a, b, p: m > 0 ? zTail(1.96 * (a.c.v - b.c.v) / m) : 1 };
+  }));
+  const sig = new Set();
+  for (const [i, g] of [...gaps].sort((x, y) => x.p - y.p).entries()) {
+    if (g.p >= 0.05 / (gaps.length - i)) break;
+    sig.add(g);
+  }
+  if (!sig.size) return null;
+  const words = ISS_SET_WORDS[tab.id] || { all: "these groups", others: "any other group" };
+  const cmp = (a, b) => {
+    const g = gaps.find((x) => (x.a === a && x.b === b) || (x.a === b && x.b === a));
+    return sig.has(g) ? Math.sign(a.c.v - b.c.v) : 0;
+  };
+  const what = `to put ${ISS_PHRASE[k] || k} in their top three`;
+  const pct = (x) => Math.round(x.c.v) + "%";
+  const byV = [...gs].sort((a, b) => b.c.v - a.c.v);
+  const top = byV[0], bot = byV[byV.length - 1];
+  if (gs.length === 2) return { gap: top.c.v - bot.c.v,
+    text: `${issCap(issWho(top.g))} are significantly more likely than ${issWho(bot.g)} ${what} (${pct(top)} against ${pct(bot)}).` };
+  const topApart = byV.slice(1).every((x) => cmp(top, x) > 0), botApart = byV.slice(0, -1).every((x) => cmp(bot, x) < 0);
+  const topGap = top.c.v - byV[1].c.v, botGap = byV[byV.length - 2].c.v - bot.c.v;
+  if (topApart && (!botApart || topGap >= botGap)) return { gap: topGap,
+    text: `${issCap(issWho(top.g))} are significantly more likely than ${words.others} ${what} (${pct(top)}).` };
+  if (botApart) return { gap: botGap,
+    text: `${issCap(issWho(bot.g))} are significantly less likely than ${words.others} ${what} (${pct(bot)}).` };
+  const [a, b] = gaps.filter((g) => sig.has(g)).map((g) => (g.a.c.v > g.b.c.v ? [g.a, g.b] : [g.b, g.a]))
+    .sort((p, q) => (q[0].c.v - q[1].c.v) - (p[0].c.v - p[1].c.v))[0];
+  return { gap: a.c.v - b.c.v,
+    text: `${issCap(issWho(a.g))} are significantly more likely than ${issWho(b.g)} ${what} (${pct(a)} against ${pct(b)}).` };
+}
+/* The sentence under the chart: has any party gained or lost ground on the
+   issue over the period on screen? Each pollster is compared only with
+   itself (withinHouseSlope: a level per pollster, one shared slope, larger
+   polls counting for more), since Resolve joined the three-way question
+   only in July 2026 and a line can move just because it arrived. Holm across
+   the three parties. */
+function issTrendVerdict(D, it, dots) {
+  if (!dots.length) return null;
+  const ym = dots[0].date.slice(0, 7);
+  const when = D.monthNameFull(+ym.slice(5)) + " " + ym.slice(0, 4);
+  const what = ISS_PHRASE[it.id] || it.label.toLowerCase();
+  const fits = D.issues.parties.map((q) => ({ q, fit: withinHouseSlope(dots.map((d) =>
+    ({ h: d.pollster, t: d.x, w: d.n, y: d.s[q] }))) })).filter((f) => f.fit);
+  if (!fits.length) return `There aren’t enough polls since ${when} to tell whether any party has gained ground on ${what}.`;
+  const sig = [];
+  for (const [i, f] of [...fits].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+    if (f.fit.p >= 0.05 / (fits.length - i)) break;
+    sig.push(f);
+  }
+  if (!sig.length) return `No party’s share on ${what} has changed significantly since ${when}.`;
+  const up = sig.filter((f) => f.fit.b > 0).map((f) => ISS_PARTY[f.q]);
+  const down = sig.filter((f) => f.fit.b < 0).map((f) => ISS_PARTY[f.q]);
+  const has = (xs) => (xs.length > 1 ? "have" : "has");
+  return `Since ${when}, ` + [
+    up.length ? `${houseList(up, Infinity)} ${has(up)} gained ground significantly on ${what}` : null,
+    down.length ? `${houseList(down, Infinity)} ${has(down)} lost ground significantly` : null,
+  ].filter(Boolean).join(", and ") + ".";
+}
+function IssuesPanel({ rangeId = "all" }) {
+  const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
+  const narrow = useNarrow();
+  /* the chart's box: beside the rows it gets their height, full width it is
+     a main panel's 360 (a phone asks for a taller box, as every chart here
+     does). 1136px of viewport is the 1080px of panel the CSS splits at –
+     the panel runs the viewport's width less 56px, capped at 1144. */
+  const beside = useNarrow("(min-width: 1136px)");
+  const I = D.issues;
+  const [view, setView] = useState("trust");
+  const [selId, setSel] = useState(null);
+  const [gsetId, setGset] = useState("vote");
+  if (!I || !I.list || !I.list.length) return null;
+  const P = I.parties;
+  const list = I.list;
+  const it = list.find((x) => x.id === selId) || list[0];
+  const top = list[0];
+  const pName = (q) => D.PARTIES[q].name;
+  const pColor = (q) => D.PARTIES[q].color;
+  const openInfo = () => window.AP.openTerm && window.AP.openTerm("issues", "The issues");
+
+  // ---- who's trusted: the rows
+  const rowVerdict = (x) => !x.own ? null : x.own.leadSig
+    ? { text: `${ISS_PARTY_CAP[x.own.lead]} ahead`, color: pColor(x.own.lead),
+        title: `${issCap(ISS_PARTY[x.own.lead])} leads ${ISS_PARTY[x.own.runner]} by ${x.own.gap.toFixed(1)} points (95% margin ± ${x.own.gapCi.toFixed(1)})` }
+    : { text: "No clear lead", color: null,
+        title: `${issCap(ISS_PARTY[x.own.lead])} and ${ISS_PARTY[x.own.runner]} are ${x.own.gap.toFixed(1)} points apart, inside the 95% margin of ± ${x.own.gapCi.toFixed(1)}` };
+  const pick = (id) => setSel(id);
+  const onRowKey = (e, id) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(id); } };
+  const issueRow = (x) => {
+    const v = rowVerdict(x), sel = x.id === it.id;
+    return (
+      <div key={x.id} className={"iss-row" + (sel ? " sel" : "")} role="button" tabIndex={0} aria-pressed={sel}
+           onClick={() => pick(x.id)} onKeyDown={(e) => onRowKey(e, x.id)}
+           aria-label={`${x.label}: ${x.imp ? Math.round(x.imp.v) + "% put it in their top three" : "not asked"}; ` +
+             (x.own ? P.map((q) => `${pName(q)} ${Math.round(x.own.v[q])}`).join(", ") + "; " + v.text : "no three-way figures")}>
+        <span className="iss-lab">{x.label}</span>
+        <span className="iss-imp" title={x.imp ? `${Math.round(x.imp.v)}% put it in their top three, ${x.imp.r1 != null ? Math.round(x.imp.r1) + "% first" : ""} (± ${x.imp.ci.toFixed(1)})` : ""}>
+          {/* the column heads hide on a phone, so each cell names itself there */}
+          <span className="iss-mini" aria-hidden="true">In top three</span>
+          {x.imp ? <>
+            <span className="demo-track iss-imp-track" aria-hidden="true"><span className="demo-fill" style={{ width: x.imp.v + "%", background: "var(--ink-3)" }}></span></span>
+            <span className="iss-imp-v">{Math.round(x.imp.v)}<span className="pct">%</span></span>
+          </> : <span className="iss-na">not asked</span>}
+        </span>
+        <span className="iss-own">
+          <span className="iss-mini" aria-hidden="true">Best on it</span>
+          {x.own ? <>
+            <span className="sbar iss-sbar" aria-hidden="true">
+              {P.map((q) => <span key={q} className="sbar-seg" style={{ width: x.own.v[q] + "%", background: pColor(q) }}></span>)}
+            </span>
+            <span className="iss-nums" aria-hidden="true">
+              {P.map((q) => (
+                <span key={q} className="skey"><span className="skey-dot" style={{ background: pColor(q) }}></span>
+                  <span className="skey-val">{Math.round(x.own.v[q])}</span></span>
+              ))}
+            </span>
+          </> : <span className="iss-na">not asked with all three parties</span>}
+        </span>
+        <span className={"iss-verdict" + (v && v.color ? " lead" : "")} title={v ? v.title : ""}>
+          {v && v.color && <span className="skey-dot" style={{ background: v.color }} aria-hidden="true"></span>}
+          {v ? v.text : ""}
+        </span>
+      </div>
+    );
+  };
+
+  // ---- who's trusted: the chart for the chosen issue
+  const [rangeLo, rangeHi] = rangeDomain(rangeId);
+  const monthPts = (it.monthly || []).map((m) => ({ ym: m[0], x: D.mx(m[0]),
+    ...Object.fromEntries(P.map((q, i) => [q, m[1 + i]])),
+    ...Object.fromEntries(P.map((q, i) => ["ci_" + q, m[1 + P.length + i]])) }));
+  const chart = (() => {
+    if (monthPts.length < 1) return null;
+    // the question was first asked in December 2025, so the chart opens there, as the vote-by-group charts do
+    const xDomain = [Math.max(rangeLo, monthPts[0].x - 0.06), rangeHi];
+    const inX = (x) => x >= xDomain[0] && x <= xDomain[1];
+    const pts = filterPts(monthPts, xDomain[0]);
+    const byRow = new Map(D.individualPolls.map((p) => [p.pollster + "|" + p.released, p]));
+    const dots = (it.dots || []).filter((d) => inX(d[0])).map((d) => {
+      const meta = byRow.get(d[1] + "|" + d[2]) || { pollster: demoHouse(d[1]), released: d[2] };
+      return { x: d[0], pollster: d[1], date: d[2], n: meta.sample || 1000, meta,
+               s: Object.fromEntries(P.map((q, i) => [q, d[3 + i]])) };
+    });
+    const scatter = dots.flatMap((d) => P.map((q) => ({ x: d.x, y: d.s[q], color: pColor(q), label: pName(q), meta: d.meta })));
+    const areas = P.map((q) => ({ id: "ci-" + q, color: pColor(q), className: "ci-band", edge: false, smooth: true,
+      points: pts.filter((d) => d["ci_" + q] != null).map((d) => ({ x: d.x, y0: d[q] - d["ci_" + q], y1: d[q] + d["ci_" + q] })) }))
+      .filter((a) => a.points.length >= 2);
+    const vals = pts.flatMap((d) => P.map((q) => d[q])).concat(scatter.map((d) => d.y),
+      areas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])));
+    if (!vals.length) return null;
+    /* the first gridline past the data at each end (a tenth of a step clear),
+       both labelled, as the vote-by-group charts do: fitDomain's padding left
+       most of an empty step above the lines */
+    const lo = Math.min(...vals), hi = Math.max(...vals), step = 10;
+    const d0 = Math.max(0, Math.floor((lo - step * 0.1) / step) * step), d1 = Math.ceil((hi + step * 0.1) / step) * step;
+    const ticks = [];
+    for (let v = d0; v <= d1 + 1e-9; v += step) ticks.push(v);
+    return { xDomain, pts, dots, scatter, areas, domain: [d0, d1], ticks };
+  })();
+
+  // ---- what matters to whom
+  const G = I.groups;
+  const gtab = G && (G.tabs.find((t) => t.id === gsetId) || G.tabs[0]);
+  const impOf = (k) => { const x = list.find((i) => i.id === k); return x && x.imp ? x.imp : null; };
+  const gVerdicts = gtab ? gtab.issues.map((k) => issGroupVerdict(gtab, k)).filter(Boolean)
+    .sort((a, b) => b.gap - a.gap).slice(0, 3) : [];
+
+  const lead = top.imp && top.own && (
+    <p className="iss-lead">
+      <mark>{plainShare(top.imp.v)} voters put {ISS_PHRASE[top.id]} among their three most important issues</mark>
+      {top.own.leadSig ? `, and more of them trust ${ISS_PARTY[top.own.lead]} with it than either of the others.`
+        : ", and no party is clearly more trusted with it than the others."}
+    </p>
+  );
+
+  return (
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="card-title">The issues</h2>
+          <p className="card-sub">
+            {view === "trust"
+              ? <>What voters say matters most, and which party they think is best on it · pooled from the last {I.window} of polls · {houseList(I.houses)}</>
+              : <>Each group’s share putting an issue in its top three · {G ? `${G.house}, its polls in the last ${G.window}` : "no poll in the window"}</>}
+          </p>
+        </div>
+      </div>
+      <div className="demo-ctl">
+        <Segmented options={[{ id: "trust", label: "Who’s trusted" }, { id: "whom", label: "What matters to whom" }]}
+                   value={view} onChange={setView} size="sm" ariaLabel="View" />
+        {view === "whom" && G && (
+          <Segmented options={G.tabs.map((t) => ({ id: t.id, label: t.label }))} value={gtab.id} onChange={setGset}
+                     size="sm" ariaLabel="Group voters by" />
+        )}
+      </div>
+      {view === "trust" ? (
+        <div className="iss-body">
+          {lead}
+          <div className="iss-grid">
+            <div className="iss-rows">
+              <div className="iss-head" aria-hidden="true">
+                <span className="iss-lab"></span>
+                <span className="iss-imp">In voters’ top three</span>
+                <span className="iss-own">Best on it
+                  <span className="iss-legend">{P.map((q) => (
+                    <span key={q} className="skey"><span className="skey-dot" style={{ background: pColor(q) }}></span>
+                      <span className="skey-lab">{ISS_PARTY_CAP[q]}</span></span>
+                  ))}</span>
+                </span>
+                <span className="iss-verdict"></span>
+              </div>
+              {/* on a phone the header is gone, so the legend stands on its own above the rows */}
+              <p className="iss-legend iss-legend-solo" aria-hidden="true">Best on it:{" "}
+                {P.map((q) => (
+                  <span key={q} className="skey"><span className="skey-dot" style={{ background: pColor(q) }}></span>
+                    <span className="skey-lab">{ISS_PARTY_CAP[q]}</span></span>
+                ))}
+              </p>
+              {list.map(issueRow)}
+              {list.filter((x) => x.grnTop).map((x) => (
+                <p key={"grn-" + x.id} className="table-hint iss-grn">
+                  RedBridge also offers the Greens, who come first on {ISS_PHRASE[x.id]} ({x.grnTop.grn}%).
+                </p>
+              ))}
+            </div>
+            {chart && (
+              <div className="iss-chart demo-chart">
+                <p className="demo-chart-lab">
+                  <span className="demo-chart-set">{it.label}</span>
+                  Who voters think is best, month by month (%, of those naming Labor, the Coalition or One Nation)
+                </p>
+                <TrendChart
+                  key={"iss-" + it.id}
+                  height={narrow ? 560 : beside ? 460 : 360} xDomain={chart.xDomain} yDomain={chart.domain}
+                  yTicks={chart.ticks} unit="%"
+                  pad={{ l: narrow ? 70 : 56, r: 60, t: 16, b: narrow ? 66 : 56 }}
+                  xTicks={buildXTicks(chart.xDomain[0], chart.xDomain[1])}
+                  series={P.map((q) => ({ id: q, label: pName(q), color: pColor(q), points: series(chart.pts, q), endLabel: ISS_PARTY_CAP[q] }))}
+                  areas={chart.areas}
+                  spine={series(chart.pts, P[0])}
+                  scatter={chart.scatter} pollFacet="primary"
+                  tooltipTitle={(i) => window.AP.monthLabelFull(chart.pts[i].ym)}
+                  fmt={(v) => Math.round(v) + ""}
+                  ariaLabel={`${it.label}: the share of voters naming Labor, the Coalition or One Nation who think each is best on it, month by month`}
+                  copy={{
+                    sub: `${it.label}: who voters think is best, of those naming Labor, the Coalition or One Nation · pooled from ${houseList((it.own && it.own.houses) || I.houses)}`,
+                    legend: [...P.map((q) => ({ label: `${pName(q)}  ${it.own ? Math.round(it.own.v[q]) + "%" : ""}`, color: pColor(q), kind: "line" })),
+                             ...(chart.areas.length ? [{ label: "95% interval (shaded)", color: "var(--ink-faint)", kind: "shade" }] : [])],
+                  }}
+                />
+                {demoSaid(issTrendVerdict(D, it, chart.dots))}
+              </div>
+            )}
+            <div className="demo-notes iss-notes">
+              <p className="table-hint">
+                The figures pool the last {I.window} of polls. Pick an issue to follow it in the chart.{" "}
+                <button type="button" className="hi-term" onClick={openInfo}>Where the figures come from</button>
+              </p>
+              <details className="view-how hint-how">
+                <summary>How to read these figures</summary>
+                <p className="table-hint">
+                  The grey bar is how many voters put the issue among the three most important to their vote:
+                  75% beside the cost of living means three in four rank it first, second or third. RedBridge
+                  asks this every month, and it is the only pollster that publishes the figures, so this bar is
+                  RedBridge’s alone.
+                </p>
+                <p className="table-hint">
+                  The coloured bar splits the voters who named Labor, the Coalition or One Nation as best on the
+                  issue. Pollsters also offer other answers – the Greens, someone else, all about equal, don’t
+                  know – and each offers a different set, so only these three can be pooled. Resolve, RedBridge and
+                  YouGov count wherever they ask the issue.
+                </p>
+                <p className="table-hint">
+                  “Ahead” means the leading party’s margin over the next is larger than that margin’s own 95%
+                  range; “No clear lead” means the polls can’t separate them. In the chart each dot is one poll
+                  and each line’s 95% interval is shaded.
+                </p>
+              </details>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="iss-body">
+          {gtab ? (
+            <div className="iss-grid whom">
+              <div className="iss-table-wrap">
+                <table className="iss-table">
+                  <caption className="sr-only">Share of each group putting each issue in its top three, %</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col"><span className="sr-only">Group</span></th>
+                      {gtab.issues.map((k) => <th scope="col" key={k}><span>{ISS_SHORT[k] || I.labels[k]}</span></th>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="all">
+                      <th scope="row">All voters</th>
+                      {gtab.issues.map((k) => {
+                        const x = impOf(k);
+                        return <td key={k}>{x ? <IssCell v={x.v} ci={x.ci} all /> : "–"}</td>;
+                      })}
+                    </tr>
+                    {gtab.groups.map((g) => (
+                      <tr key={g}>
+                        <th scope="row">{g}</th>
+                        {gtab.issues.map((k) => {
+                          const c = gtab.cells[g] && gtab.cells[g][k];
+                          return <td key={k}>{c ? <IssCell v={c.v} ci={c.ci} /> : "–"}</td>;
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="iss-said">
+                {gVerdicts.length ? gVerdicts.map((v, i) => <React.Fragment key={i}>{demoSaid(v.text)}</React.Fragment>)
+                  : demoSaid(`No two ${gtab.id === "vote" ? "groups of voters" : "groups"} differ significantly on any of these issues.`)}
+              </div>
+              <div className="demo-notes iss-notes">
+                <p className="table-hint">
+                  Each figure is the share of that group putting the issue among its three most important. Only
+                  RedBridge publishes these by group, so they rest on its polls in the last {G.window}.{" "}
+                  <button type="button" className="hi-term" onClick={openInfo}>Where the figures come from</button>
+                </p>
+                <details className="view-how hint-how">
+                  <summary>How to read these figures</summary>
+                  <p className="table-hint">
+                    The sentences name the clearest differences. Two groups differ significantly when the gap
+                    between them is larger than its own 95% margin, which combines both groups’ margins; with
+                    several groups the bar rises for each extra gap tested, as on the vote-by-group panel. A
+                    group’s margin is usually 5 to 7 points, since a group is a slice of one poll. Hover or tap a
+                    figure for its margin.
+                  </p>
+                </details>
+              </div>
+            </div>
+          ) : <p className="table-hint">No poll in the last {I.window} published these figures by group.</p>}
+        </div>
+      )}
+    </section>
+  );
+}
+function IssCell({ v, ci, all }) {
+  return (
+    <span className={"iss-cell" + (all ? " all" : "")} title={ci != null ? `± ${ci.toFixed(1)} is the 95% margin` : ""}>
+      <span className="iss-cell-v">{Math.round(v)}</span>
+      <span className="iss-cell-bar" aria-hidden="true"><span style={{ width: Math.max(0, Math.min(100, v)) + "%" }}></span></span>
+    </span>
   );
 }
 
@@ -2199,7 +3619,7 @@ function ApprLine({ id, appr, chg }) {
 }
 
 /* "n = 1,510, n_eff = 1,053" – the sample the pollster reported and, where it
-   files one with the Australian Polling Council, what that sample is worth
+   published one in its APC methodology statement, what that sample is worth
    after its own weighting. Shared by both tables so the two bands cannot
    drift. n_eff is set as a true subscript rather than borrowed from the
    Unicode subscript block, which has no "f". */
@@ -2993,7 +4413,10 @@ function NextPollsPanel() {
                   Median {r.cadence} days between{" "}
                   {r.basis === "published" ? "publications" : "fieldwork ends"} across the
                   last {r.gapsUsed} intervals
-                  {r.spreadEarly != null && r.spreadEarly !== r.spreadLate
+                  {/* a month-end house's ± belongs to the month-end rule, not
+                      to the median, and is told with the rule below */}
+                  {r.monthEnd ? ""
+                    : r.spreadEarly != null && r.spreadEarly !== r.spreadLate
                     ? `, –${r.spreadEarly}/+${r.spreadLate} days`
                     : r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : ""}.
                   {/* a publication-based projection steps from one publication
@@ -3007,11 +4430,19 @@ function NextPollsPanel() {
                       only some houses have either. Run together they made a
                       house with no weekday - DemosAU - read as though its
                       publication lag happened at 6:52 in the morning. */}
-                  {r.releaseDow != null &&
+                  {r.releaseDow != null && !r.monthEnd &&
                     ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`}
+                  {/* the month-end rule steps month-end to month-end, so the
+                      interval above is context, not the projection */}
+                  {r.monthEnd &&
+                    ` Projected onto the ${WD[r.releaseDow]} nearest the month’s last day${hour ? `, when it files at ${zoned(hour, r.release)}` : ""} – the day it has published on in ${r.monthEndKept} of its last ${r.monthEndN} releases.`}
                   {r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`}
                   {(r.declared || []).length > 0 &&
-                    ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`}
+                    ` The ${houseList(r.declared, Infinity)} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`}
+                  {/* the slot this rhythm names falls in the summer break, so
+                      the row is the resumption window instead (npInSummer) */}
+                  {r.summer &&
+                    ` That puts the next one in the summer break. No federal poll has been published between 23 December and 8 January, and last summer the pollsters came back anywhere from 9 January to 1 February, so that range is the window.`}
                 </p>
               </div>
             )}
@@ -3220,7 +4651,6 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                     <td className="ta-l pollster-cell">
                       <PollsterName name={r.pollster} url={r.url} />
                       <span className="pollster-mode">{r.client}</span>
-                      <MethodLink url={r.methodUrl} />
                       {/* filed from Poll Bludger's feed while the house's own
                           release is still uncaptured – the expanded row says
                           what that means */}
@@ -3278,19 +4708,35 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
           </tbody>
         </table>
       </div>
-      <p className="table-hint">
-        Tap any poll to see its full breakdown · Click a column heading to sort · “—” Means the pollster didn’t ask that question.
-        {tppBasis === "resp"
-          ? " “As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar is the published figure in margin form. Click the “As published” heading to switch back to implied."
-          : " “Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar is that figure in margin form. Click the “Implied 2PP” heading to switch to the pollsters’ own published figures."}
-        {" "}<strong>Published</strong> is the day the poll was released, taken from the source each row links to.
-        {" "}Each house’s systematic lean – its house effect – sits beside poll lean in the All polls archive.
-      </p>
+      {(() => { const act = typeof CANT_HOVER !== "undefined" && CANT_HOVER ? "Tap" : "Click";
+        return (<>
+          <p className="table-hint">
+            Tap any poll to see its full breakdown · {act} a column heading to sort.
+          </p>
+          {/* The basis switch is the 2PP column's heading, and that column is
+              .hide-md: below 1000px the sentence points at the hero's own
+              toggle instead of a heading the reader can't see. */}
+          <HowTo label="How to read this table" paras={[
+            <>“—” means the pollster didn’t ask that question.</>,
+            <>{tppBasis === "resp"
+              ? "“As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar draws the published margin out from a tie line at its centre."
+              : "“Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar draws that margin out from a tie line at its centre."}
+            <span className="hint-wide">{tppBasis === "resp"
+              ? ` ${act} the “As published” heading to switch back to implied.`
+              : ` ${act} the “Implied 2PP” heading to switch to the pollsters’ own published figures.`}</span>
+            <span className="hint-narrow">{tppBasis === "resp"
+              ? " The switch above the headline figure flips back to implied."
+              : " The switch above the headline figure flips to the pollsters’ own published figures."}</span></>,
+            <><strong>Published</strong> is the day the poll was released, taken from the source each
+            row links to. Each house’s systematic lean – its house effect – sits beside poll lean in
+            the All polls archive.</>,
+          ]} />
+        </>); })()}
     </section>
   );
 }
 
-Object.assign(window, { Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, PollsterTable, NextPollsPanel,
+Object.assign(window, { Segmented, TextToggle, Delta, HowTo, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, OnSourcesPanel, DemographicsPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
   ShareBar, NetVal, FavMark, ChgTag, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
   PollLedger, PdSec, TppLine, ApprLine, ChgParen, releaseMetaRows, EffLines, sampleValue,

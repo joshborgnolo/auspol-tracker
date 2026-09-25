@@ -1,25 +1,40 @@
-# Central repair agent for the repo. Any failing workflow run on main fires
-# this: a breaker-gated headless-Matilda session diagnoses the failure from
-# the failed run's log, reproduces it locally, publishes a minimal fix as
-# commits on LOCAL main, and only the deterministic post-gate (forbidden
-# paths, syntax checks, validate.mjs) may push HEAD:main. The agent phase
-# holds no git credentials — it cannot push, exfiltrate, or create PRs.
+# Central repair agent for the repo. A failing run of a watched workflow on
+# main fires this: a breaker-gated headless-Matilda session diagnoses the
+# failure from the failed run's log, reproduces it, and commits a minimal fix
+# on LOCAL main; a separate publish job gates those commits and pushes them.
 #
-# Replaces the per-workflow PR-gated repair jobs (poll-agent.yml `repair`,
-# and the in-job repairs in roymorgan-update.yml, coverage-check.yml,
-# prediction-refresh.yml) retired in the same commit: repairs land straight
-# on main, and the gate + prompt hard rules + circuit breaker carry what
-# the human PR review used to.
+# Three jobs, three trust levels (2026-09-25):
+#   gate     reads the failed run, decides whether it is repair work at all,
+#            and runs the circuit breaker (.build/repair-gate.sh: 3 agent
+#            sessions per workflow per 24h).
+#   repair   the agent. READ-ONLY token, git credentials stripped, no
+#            concurrency group: it holds nothing while it thinks. Its commits
+#            leave the job as a git bundle artifact — nothing else does.
+#   publish  a FRESH runner (no process the agent started can still be
+#            alive to watch for a credential) checks the bundle against the
+#            deterministic gate — forbidden paths, syntax, validate.mjs —
+#            then throws away whatever generated files the agent's pipeline
+#            runs produced, rebuilds the site from the repaired sources
+#            itself, and pushes through push_main (.build/git-push-main.sh).
+# Before this split the gate refused any commit touching index.html/assets,
+# while the prompt told the agent to let the pipeline commit its data — which
+# always carries the rebuilt site — so a correct repair was thrown away
+# (sampleeff, 2026-09-21, issue #2). Generated files are now never taken
+# from the agent, so they no longer need forbidding.
 #
-# NOT self-triggering: this workflow is deliberately missing from its own
-# `workflow_run.workflows` list, so a red agent-repair run emails normally
+# Not watched, on purpose: tests (a red run is usually a human mid-edit —
+# an agent pushing to main underneath them is worse than the email),
+# site-check (Pages, not code), newspoll-watch (its failure IS the message,
+# and it has its own filer), citation-check (a dead citation is a human's
+# rewrite), schedule-tune (.github/ is forbidden to agents; a secret is a
+# human's job). NOT self-triggering: a red agent-repair run emails normally
 # instead of spawning repairs of repairs.
 
 name: agent-repair
 
 on:
   workflow_run:
-    workflows: # every workflow on main except this one (poll-agent is reusable-only)
+    workflows:
       - resolve-update
       - demosau-update
       - essential-update
@@ -29,15 +44,12 @@ on:
       - newspoll-update
       - news24-update
       - sampleeff-update
+      - crosstabs-update
       - roymorgan-update
       - pollbludger-fallback
       - coverage-check
-      - citation-check
       - prediction-refresh
       - np-score
-      - newspoll-watch
-      - site-check
-      - tests
     types: [completed]
   workflow_dispatch:
     inputs:
@@ -52,26 +64,28 @@ on:
 
 run-name: "agent-repair: ${{ github.event.workflow_run.name || inputs.workflow_name }}"
 
-permissions:
-  contents: write # push the repaired main
-  actions: read   # read the failed run's metadata/log via gh
-  issues: write   # circuit-breaker + gate-block alert issues
+# every job declares its own
+permissions: {}
 
 jobs:
   gate:
     # Only failures on main are repair work. Green runs, cancelled runs and
     # branch runs exit here without spending a cent.
     if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_branch == 'main')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read # the failed run's jobs; the breaker's session count
+      issues: write # breaker alert issues
     outputs:
-      allowed: ${{ steps.breaker.outputs.allowed }}
+      allowed: ${{ steps.scope.outputs.repairable == 'true' && steps.breaker.outputs.allowed == 'true' }}
       failed_run_id: ${{ steps.ctx.outputs.failed_run_id }}
       workflow_name: ${{ steps.ctx.outputs.workflow_name }}
       house_prompt: ${{ steps.ctx.outputs.house_prompt }}
       run_url: ${{ steps.ctx.outputs.run_url }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0 (see the credential note at the repair job)
 
       - name: Resolve run context and house-prompt map
         id: ctx
@@ -97,6 +111,7 @@ jobs:
             newspoll-update)    HP=.build/newspoll-repair-prompt.md ;;
             news24-update)      HP=.build/news24-repair-prompt.md ;;
             sampleeff-update)   HP=.build/sampleeff-repair-prompt.md ;;
+            crosstabs-update)   HP=.build/crosstabs-repair-prompt.md ;;
             roymorgan-update)   HP=.build/roymorgan-repair-prompt.md ;;
             pollbludger-fallback) HP=.build/pollbludger-repair-prompt.md ;;
             coverage-check)     HP=.build/coverage-doctor-repair-prompt.md ;;
@@ -112,20 +127,42 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "failed run: $RUN_URL (workflow '$WF', house prompt: ${HP:-none — generic repair})"
 
+      # coverage-check's heartbeat job pages on dead writers — a workflow or
+      # lock problem, never a worklist of waves (its own header says so). Only
+      # its check (class 2) and thinness jobs are repair work.
+      - name: Is this failure repair work?
+        id: scope
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.ctx.outputs.failed_run_id }}
+          WF: ${{ steps.ctx.outputs.workflow_name }}
+        run: |
+          repairable=true
+          if [ "$WF" = "coverage-check" ]; then
+            failed="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/jobs" --jq '[.jobs[] | select(.conclusion == "failure") | .name] | join(",")')" || failed=""
+            echo "failed jobs: ${failed:-none found}"
+            case ",$failed," in
+              *,check,*|*,thinness,*) ;;
+              *) repairable=false; echo "only the heartbeat failed — the red run's email is the message; no agent" ;;
+            esac
+          fi
+          echo "repairable=$repairable" >> "$GITHUB_OUTPUT"
+
       # A persistent breakage fires a repair on every failed slot — Roy Morgan
-      # alone has 12 slots a Monday. The breaker counts this workflow's
-      # agent-repair runs in the trailing 24h and closes the loop at 3.
+      # alone has a dozen slots a Monday. The breaker counts the agent sessions
+      # actually spent on this workflow in the trailing 24h and closes at 3.
       - name: Circuit breaker
         id: breaker
+        if: steps.scope.outputs.repairable == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           WF: ${{ steps.ctx.outputs.workflow_name }}
         run: bash .build/repair-gate.sh "$WF"
 
       - name: Alert when the circuit breaker is tripped
-        if: steps.breaker.outputs.allowed == 'false'
+        if: steps.scope.outputs.repairable == 'true' && steps.breaker.outputs.allowed == 'false'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           WF: ${{ steps.ctx.outputs.workflow_name }}
           RUN_URL: ${{ steps.ctx.outputs.run_url }}
         run: |
@@ -136,20 +173,27 @@ jobs:
   repair:
     needs: gate
     if: needs.gate.outputs.allowed == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 35 # 25m agent wall-clock + gate/push headroom
-    # Push-capable → serialise with every other main writer (updaters,
-    # coverage, np-score, and sibling repair jobs); queue, never cancel.
-    concurrency:
-      group: main-writers
-      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35 # 25m agent wall-clock + setup/bundle headroom
+    # Read-only: whatever the agent does, this job's token cannot write.
+    # No concurrency group — nothing here touches origin.
+    permissions:
+      contents: read
+      actions: read # fetch the failed run's log
+    outputs:
+      base: ${{ steps.base.outputs.sha }}
+      commits: ${{ steps.bundle.outputs.commits }}
+      offmain: ${{ steps.bundle.outputs.offmain }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      # checkout v5 still persists its credential as an extraheader in
+      # .git/config, which the strip step below removes. v6+ moved it to a
+      # separate file — revisit that step before bumping this pin.
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0 # prediction's model scripts read git show origin/main:...
 
       - name: Pin Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -171,20 +215,24 @@ jobs:
       - name: Install puppeteer-core (best effort, for the share-card redraw)
         run: npm ci --ignore-scripts --no-audit --no-fund || true
 
+      # The failed steps' log first — a whole-run log blew the agent's
+      # context on 2026-09-17 ("Context is too large to send safely") — and
+      # never more than its tail.
       - name: Fetch the failed run's job log
         continue-on-error: true # a log-fetch hiccup must not block repair; the prompt tells the agent to reproduce locally instead
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ needs.gate.outputs.failed_run_id }}
         run: |
           mkdir -p .build/logs
-          gh run view "$RUN_ID" --log > .build/logs/failed-run.log 2>&1 || \
-            gh run view "$RUN_ID" --log-failed > .build/logs/failed-run.log 2>&1 || true
-          wc -l < .build/logs/failed-run.log || true
+          raw="$RUNNER_TEMP/failed-run-raw.log"
+          gh run view "$RUN_ID" --log-failed > "$raw" 2>&1 || true
+          [ -s "$raw" ] || gh run view "$RUN_ID" --log > "$raw" 2>&1 || true
+          tail -n 2500 "$raw" > .build/logs/failed-run.log
+          wc -l < .build/logs/failed-run.log
 
-      # The agent phase gets NO git credentials: only the deterministic
-      # post-gate may re-attach the token and push. Prompts off so a stray
-      # credential prompt fails fast instead of hanging.
+      # The agent phase gets NO git credentials (and the token is read-only
+      # anyway). Prompts off so a stray credential prompt fails fast.
       - name: Strip git credentials for the agent phase
         run: |
           git config --unset-all http.https://github.com/.extraheader || true
@@ -193,10 +241,8 @@ jobs:
 
       # Pin the repair-agent CLI: a floating @latest install means a tag
       # move (compromised or accidental) changes the code that runs with
-      # contents:write and MATILDA_API_KEY. Bump this deliberately after
-      # verifying the new release. (Pin sites: poll-agent.yml's update-side,
-      # roymorgan-update.yml, coverage-check.yml, prediction-refresh.yml,
-      # newspoll-watch.yml, and here — grep `matilda-code@` before bumping.)
+      # MATILDA_API_KEY. Bump deliberately after verifying the new release
+      # (other pin site: newspoll-watch.yml — grep `matilda-code@`).
       - name: Install Matilda CLI
         run: npm i -g @maincode-ai/matilda-code@0.21.4
 
@@ -214,8 +260,6 @@ jobs:
             cat .build/agent-repair-prompt.md
           } > .build/agent-repair-run.md
 
-      # Deliberately NO GITHUB_TOKEN/GH_TOKEN here: the agent edits and
-      # commits locally; the post-gate owns every remote operation.
       - name: Run the repair agent
         env:
           MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
@@ -229,50 +273,120 @@ jobs:
           fi
           matilda -p "$(cat .build/agent-repair-run.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80
 
-      - name: Gate the repair commits and push main
-        if: always() # an out-of-budget agent may still have left good commits
+      # an out-of-budget agent may still have left good commits
+      - name: Bundle the repair commits for the publish job
+        id: bundle
+        if: always()
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE: ${{ steps.base.outputs.sha }}
-          WF: ${{ needs.gate.outputs.workflow_name }}
-          RUN_URL: ${{ needs.gate.outputs.run_url }}
         run: |
-          set -u
-          block() {
-            echo "::error::$1"
-            GH_TOKEN="$GH_TOKEN" bash .build/alert-issue.sh \
-              "Repair gate blocked: ${WF}" \
-              "An agent-repair session for ${WF} left commits the deterministic gate refused to push: $1 — [workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). Commits remain on the runner only; main is untouched." || true
-            exit 1
-          }
-
-          # The agent must commit on main itself — a branch/ref left behind
-          # means it went off-script; refuse to push whatever it did.
-          [ "$(git symbolic-ref --short HEAD)" = "main" ] || block "agent left HEAD off main"
-
-          if git diff --quiet "$BASE" HEAD; then
-            echo "no repair commits; nothing to push (agent's report is in the log above)"
+          if [ "$(git symbolic-ref --short -q HEAD)" != "main" ]; then
+            echo "::error::the agent left HEAD off main; nothing will be published"
+            echo "offmain=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          n="$(git rev-list --count "$BASE..HEAD")"
+          echo "commits=$n" >> "$GITHUB_OUTPUT"
+          if [ "$n" -eq 0 ]; then
+            echo "no repair commits; nothing to publish (the agent's report is in the log above)"
+            exit 0
+          fi
+          git log --oneline "$BASE..HEAD"
+          git bundle create "$RUNNER_TEMP/repair.bundle" "$BASE..main"
+
+      - name: Upload the repair bundle
+        if: always() && steps.bundle.outputs.commits != '' && steps.bundle.outputs.commits != '0'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: repair-bundle
+          path: ${{ runner.temp }}/repair.bundle
+          retention-days: 7
+          if-no-files-found: error
+
+  publish:
+    needs: [gate, repair]
+    if: always() && needs.gate.outputs.allowed == 'true' && ((needs.repair.outputs.commits != '' && needs.repair.outputs.commits != '0') || needs.repair.outputs.offmain == 'true')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    concurrency:
+      group: repair-publish-${{ needs.gate.outputs.workflow_name }}
+      cancel-in-progress: false
+    permissions:
+      contents: write # push the repaired main
+      issues: write   # gate-block alert issues
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0 # the bundle's prerequisite is the repair job's base
+
+      - name: Pin Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install puppeteer-core (best effort, for the share-card redraw)
+        run: npm ci --ignore-scripts --no-audit --no-fund || true
+
+      - name: Download the repair bundle
+        if: needs.repair.outputs.offmain != 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: repair-bundle
+          path: ${{ runner.temp }}/bundle
+
+      - name: Gate the repair commits, rebuild the site, push main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ needs.repair.outputs.base }}
+          OFFMAIN: ${{ needs.repair.outputs.offmain }}
+          WF: ${{ needs.gate.outputs.workflow_name }}
+          CHROME: /usr/bin/google-chrome
+        run: |
+          set -u
+          BUNDLE="$RUNNER_TEMP/bundle/repair.bundle"
+          # The push and alert machinery comes from main as checked out, not
+          # from the agent's tree: block() must not run a script the gate is
+          # busy refusing, and the push must follow the helper main trusts.
+          TRUSTED="$RUNNER_TEMP/trusted"
+          mkdir -p "$TRUSTED"
+          cp .build/alert-issue.sh .build/git-push-main.sh "$TRUSTED/"
+          block() {
+            echo "::error::$1"
+            bash "$TRUSTED/alert-issue.sh" \
+              "Repair gate blocked: ${WF}" \
+              "An agent-repair session for ${WF} left commits the deterministic gate refused to push: $1 — [workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). The commits are in the run's repair-bundle artifact for 7 days; main is untouched." || true
+            exit 1
+          }
+          [ "$OFFMAIN" != "true" ] || block "the agent left HEAD off main"
+          git bundle verify "$BUNDLE" > /dev/null 2>&1 || block "the repair bundle does not verify against main's history"
+          git fetch -q "$BUNDLE" "refs/heads/main:refs/repair/head" || block "could not read the repair bundle"
+          git merge-base --is-ancestor "$BASE" refs/repair/head || block "the repair commits do not descend from the base the agent was given"
+          git checkout -q -B main refs/repair/head
 
           git log --oneline "$BASE..HEAD"
           CHANGED="$(git diff --name-only "$BASE..HEAD")"
           echo "$CHANGED"
 
-          # Human-review replacement #1: generated artifacts, CI, dependency
-          # manifests and infra are off-limits to agents, in code. A repair
-          # needing them is a human's job.
-          if echo "$CHANGED" | grep -E '^(\.github/|assets/|index\.html$|feed\.xml$|sitemap\.xml$|robots\.txt$|CNAME$|package\.json$|package-lock\.json$|\.nvmrc$)' | grep -q .; then
+          # 1. Off-limits in code: CI, dependency manifests, the domain, the
+          #    clock and laptop installers, and the repair machinery itself —
+          #    an agent must not edit its own breaker, gate or prompts.
+          if echo "$CHANGED" | grep -E '^(\.github/|CNAME$|package\.json$|package-lock\.json$|\.nvmrc$|\.build/dispatch-clock/|\.build/launchd/|\.build/install-launchd\.sh$|\.build/repair-gate\.sh$|\.build/alert-issue\.sh$|\.build/resolve-alerts\.sh$|\.build/classify-failure\.mjs$|\.build/transient-streak\.sh$|\.build/[a-z0-9-]*repair-prompt\.md$|\.build/newspoll-file-missing-prompt\.md$)' | grep -q .; then
             block "repair commits touch forbidden paths"
           fi
-          # Never push the agent's scratch (log dir is gitignored, belt+braces)
           if echo "$CHANGED" | grep -q '^\.build/logs/'; then
             block "repair commits include .build/logs scratch"
           fi
 
-          # Human-review replacement #2: syntax checks on everything the
-          # agent touched, then the same data validator the wrappers run.
+          # 2. Syntax checks on everything the agent touched, then the same
+          #    data validator the wrappers run.
           while IFS= read -r f; do
+            [ -f "$f" ] || continue
             case "$f" in
               *.mjs) node --check "$f" || block "node --check failed on $f" ;;
               *.sh)  bash -n "$f"       || block "bash -n failed on $f" ;;
@@ -280,20 +394,31 @@ jobs:
           done <<< "$CHANGED"
           node .build/newtracker/validate.mjs || block "validate.mjs failed against the repaired tree"
 
-          # Head-of-the-queue push with ONE rebase retry — the CI-agent
-          # analogue of push_main (ci-main-writer-races): a writer that lost
-          # the main-writers queue may have raced a launchd/human push. Repair
-          # commits never carry index.html, so no rebuild step is needed.
-          AUTH="http.https://github.com/.extraheader=AUTHORIZATION: basic $(printf 'x:%s' "$GH_TOKEN" | base64 -w0)"
-          if git -c "$AUTH" push origin HEAD:main; then
-            echo "pushed repair to main"
-            exit 0
+          # 3. Generated files are never taken from the agent: put them back
+          #    as they were at the base (dropping any the agent's commits
+          #    added), then rebuild them from the repaired sources here.
+          GEN="index.html feed.xml sitemap.xml robots.txt assets .build/newtracker/assets"
+          # shellcheck disable=SC2086 # fixed path list, split on purpose
+          git checkout -q "$BASE" -- $GEN || block "could not restore the generated files"
+          # shellcheck disable=SC2086
+          git diff --name-only --diff-filter=A "$BASE" HEAD -- $GEN | while IFS= read -r f; do git rm -q -- "$f"; done
+          LOG="$RUNNER_TEMP/publish.log"
+          log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$LOG"; }
+          . "$TRUSTED/git-push-main.sh"
+          refresh_site || { cat "$LOG"; block "rebuilding the site from the repaired sources failed"; }
+          # shellcheck disable=SC2086
+          git add -A -- $GEN
+          if ! git diff --cached --quiet; then
+            git commit -q -m "Rebuild the site from the repaired sources" \
+              -m "agent-repair publish job: generated files rebuilt from the repair's sources, never taken from the agent."
           fi
-          echo "first push rejected; rebasing onto origin/main and retrying once"
-          git -c "$AUTH" pull --rebase origin main || {
-            git rebase --abort || true
-            block "rebase onto origin/main conflicted"
-          }
-          node .build/newtracker/validate.mjs || block "validate.mjs failed after rebase"
-          git -c "$AUTH" push origin HEAD:main || block "second push rejected"
-          echo "pushed repair to main after one rebase"
+
+          # 4. Push through the same helper every wrapper uses: a lost race
+          #    rebases with generated files rebuilt; a data conflict blocks.
+          # shellcheck disable=SC2086
+          if ! push_main "agent-repair: $WF" $GEN; then
+            cat "$LOG"
+            block "the push to main failed after one rebase (see the log)"
+          fi
+          cat "$LOG" 2>/dev/null || true
+          echo "pushed the repair for ${WF} to main"

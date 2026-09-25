@@ -1,111 +1,81 @@
 ---
 name: ci-main-writer-races
-description: auspol-tracker — how the repo keeps GitHub Actions writers from racing origin/main (shipped 2026-09-04, commit ab0df87). Two mechanisms that must be kept together: the shared `main-writers` concurrency group on every push-capable workflow, and .build/git-push-main.sh `push_main()` — the push→rebase→rebuild→amend→push-once retry every wrapper's push site routes through. Adding a new data workflow or wrapper? It MUST join both.
+description: auspol-tracker — how writers (CI updaters, the laptop's launchd copies, agent repairs, humans) stay safe pushing to one main. Since 2026-09-25 there is NO shared concurrency group: each workflow queues in its own (poll-agent.yml's writers-<house>), and .build/git-push-main.sh push_main() resolves every push race — generated files rebuilt not merged, one wrapper re-run on a data conflict, "FAIL push race" (classified transient) only when a race is lost twice. Adding a writer? Its own group, and push through push_main. Never re-add a shared group.
 source: auto-skill
 extracted_at: '2026-09-04T13:36:12.593Z'
+updated_at: '2026-09-25'
 ---
 
-# Serialising writers against origin/main (F6)
+# Writers racing origin/main
 
-A single GitHub Pages site served from `main` means every automated job that commits+opens a
-push window is a potential lost-update: a second writer (another workflow, the local launchd
-backup, a human) can land a commit between a writer's freshness pre-flight and its push, and
-the old behaviour was "slot fails, wave sits in a local commit". The fix is two mechanisms that
-cover CI↔CI and CI↔launchd/human races respectively. Both were shipped in one commit
-(`ab0df87`); treat them as one system.
+GitHub Pages serves `main`, and many writers push to it: every house's updater (CI and the
+laptop), prediction-refresh, np-score, citation-check, schedule-tune, agent-repair's publish
+job, and humans. Any of them can land between another's freshness pre-flight and its push.
 
-## 1. The `main-writers` concurrency group (CI↔CI races)
+## History: why there is no shared group any more
 
-Every push-capable workflow joins ONE shared group:
+2026-09-04 (ab0df87) put every push-capable workflow in ONE concurrency group,
+`main-writers`, so CI writers could never race each other. It traded a race for silent
+losses: a group holds one running job and ONE pending one, and a newer pending run CANCELS
+the older ("Canceling since a higher priority waiting request for main-writers exists").
+Whenever one long holder (Essential's 10-minute crawl, a 25-minute repair session) had two
+runs waiting, one was thrown away: 29 scheduled runs from 1–22 Sep 2026, RedBridge's
+morning sweep on 7 of 11 days, np-score on 12 of 14. No-op joiners made it worse:
+newspoll-watch's filer job and schedule-tune entered the queue on every run.
 
-```yaml
-concurrency:
-  group: main-writers
-  cancel-in-progress: false
-```
+And the queue never covered the laptop or humans anyway, so push_main had to handle
+races regardless. Its old single rebase conflicted on the generated files (both sides
+rebuilt index.html), so the retry failed exactly when it was needed (DemosAU, 2026-09-17).
 
-- `cancel-in-progress: false` is deliberate — writers **queue**, never cancel each other.
-- Members as of F6: `roymorgan-update.yml` (workflow level, replacing its own
-  `roymorgan-update` group), `poll-agent.yml` **update AND repair jobs** (job level, replacing
-  per-house `poll-agent-${{ inputs.house }}` — per-house groups let two houses race main),
-  `np-score.yml`, `citation-check.yml` (both workflow level), and `coverage-check.yml`'s
-  **repair job only** (its `check`/`thinness` jobs are read-only and stay OUT of the group;
-  same logic applies to any future read-only job).
-- Joined 2026-09-05 (commit 076c022): `newspoll-watch.yml`'s `file-missing` job (job level)
-  — the missing-wave filing agent commits+pushes. Its sibling `watch` job is read-only
-  and stays out, mirroring coverage-check's read-only-jobs-stay-out pattern. The filer's
-  push goes through its prompt's protocol (HEAD:main, one rebase retry) — the CI-agent
-  analogue of push_main; the .build shell-wrapper mechanism doesn't apply to prompt-driven
-  agents. See auto-skill-auspol-newspoll-missing-wave-filer.
-- Group names are repo-global: a job-level group in one workflow serialises against a
-  workflow-level group in another. Repair agents count as writers (they commit+push with
-  `contents: write`).
-- When adding ANY new workflow that can push: join the group. When adding a job to an existing
-  file, ask "can this job's runner hold an unpushed commit?" — yes → join, no → stay out.
+## The system now (2026-09-25)
 
-## 2. `push_main()` in `.build/git-push-main.sh` (CI↔launchd↔human races)
+1. **Per-workflow queues.** `poll-agent.yml`'s update job uses
+   `group: writers-${{ inputs.house }}`; prediction-refresh, citation-check, np-score and
+   schedule-tune each have a group named after themselves; agent-repair's publish job uses
+   `repair-publish-<wf>`; newspoll-watch's filer uses `newspoll-file` (it pushes a branch,
+   not main). Within one group the newest pending run does the same work as the one it
+   replaces, so cancellations cost nothing.
+2. **`push_main()` makes cross-writer races safe** (`.build/git-push-main.sh`):
+   - push; on rejection `git pull --rebase` with the generated paths (index.html, feed,
+     sitemap, robots, `assets/**`, `.build/newtracker/assets/**`) resolved by a no-op
+     merge driver (`auspol-regen`, set via `-c core.attributesFile=<scratch file in .git>`
+     for that one command — no human merge inherits it);
+   - nothing of ours left after the rebase (the other writer landed the same wave) →
+     success, nothing to push;
+   - otherwise validate + `refresh_site` (build → card → favicon → build) against the
+     merged tree, re-stage, `--amend`, push;
+   - a DATA conflict (two houses' rows side by side in polls.json) or a second rejection →
+     `git reset --hard origin/main` and `exec` the wrapper once more with
+     `AUSPOL_PUSH_RERUN=1` (the extractors are idempotent; the writers lock is released
+     first because exec skips the EXIT trap). Only the re-run's own loss logs
+     `FAIL push race`, which `.build/classify-failure.mjs` calls transient.
+   - Re-runs only work from a `.build/*-updater.sh` / `prediction-refresh.sh` (captured at
+     source time as `PUSH_MAIN_SELF`); inline workflow steps that source the file
+     (citation-check, np-score) commit files nobody else writes and never need it.
+   - `.build/test-push-main.mjs` races two clones through every rung (different files,
+     side-by-side rows, the same row, a race lost twice, AUSPOL_PR_GATE, the runner-clone
+     heal). A mutation check: drop the merge driver and scenario A needs a re-run.
 
-Concurrency groups can't block the local launchd copies or a human pushing by hand, so every
-wrapper's push site retries once instead of failing the slot:
+## Adding a writer
 
-```bash
-. "$REPO/.build/git-push-main.sh"   # source AFTER the wrapper defines LOG and log()
-...
-push_main "$MSG" <exactly the file set the commit was staged from>
-```
+- Give it its OWN concurrency group (`cancel-in-progress: false`). Never a group shared
+  with another workflow — `tune-schedules.mjs`'s collision audit refuses a schedule where
+  three runs of one literal group share a minute, as a tripwire.
+- Push through `push_main "<msg>" <exactly the staged files>`; name the generated files in
+  the list when the commit carries them (that is the rebuild signal).
+- Agent sessions (`AUSPOL_PR_GATE=1`) never push: push_main leaves the commit local and
+  the calling workflow's publish step owns the push.
 
-Contract:
+## Verifying
 
-1. `git push origin HEAD:main`; success → done.
-2. On rejection: `git pull --rebase origin main` (conflict → `rebase --abort`, fail with the
-   commit kept locally).
-3. If the file list contains **`index.html`** — that string is the signal — re-run
-   `validate.mjs` + `build.mjs` against the merged tree and `git add assets/` (the rebuild can
-   rename/delete hashed asset layers, which the explicit file list would miss). A commit without
-   index.html (e.g. essential's report-index-only commit) skips the rebuild.
-4. `git add <files>` again, `git commit --amend --no-edit`, push ONCE more.
-5. A second rejection fails the slot ("commit kept locally"). Extractors are idempotent, so the
-   next scheduled run redoes the extraction on the fresh base — nothing is lost.
-
-Conversion rules learned wiring all eight wrappers:
-
-- Preserve each site's existing failure semantics: sites that were
-  `git push … || log "FAIL …"` (essential index commit, both skip-confirm commits) stay
-  non-fatal log lines; sites that were `if ! git push …; then … exit 1; fi` become
-  `if ! push_main …; then exit 1; fi`.
-- Conditional pathspecs can't go in a literal call. Essential's main commit does:
-  `ESS_FILES=(…); [ -d .build/essential-src ] && ESS_FILES+=(.build/essential-src/);
-  push_main "$MSG" "${ESS_FILES[@]}"` (the dir only exists after the first retro-fill, so an
-  unconditional pathspec would fail `git add` on a fresh checkout).
-- If a wrapper already `git add`s more than its push list before committing (sampleeff's extra
-  `git add assets/`), include the extra path in the push_main list too so the amend path
-  re-stages it.
-- Multi-line log alignment: long file lists wrap with a trailing `\` and a 2-space continuation —
-  irrelevant to git, but it's the house style in these wrappers.
-
-## Verifying a conversion
-
-- `grep -n 'git push' .build/*.sh` — the ONLY hits allowed are inside `git-push-main.sh` itself
-  and `log "FAIL git push …"` message strings.
-- `bash -n` every touched wrapper (no test suite exists for these; syntax check + diff review
-  is the bar).
-- No pyyaml/yq/js-yaml on this machine, but `ruby -ryaml` IS available and parses workflow
-  YAML fine (used to validate the 0c3a2ba permissions fix) — prefer it for assertions;
-  otherwise keep hunks tight and minimal (comments are safe anywhere, a `concurrency:`
-  block slots between top-level keys) and review `git diff .github/workflows/` in full
-  before committing.
+- `grep -rn 'group:' .github/workflows/` — no literal group appears in two files.
+- `node .build/test-push-main.mjs` and `node .build/test-workflows.mjs` (the latter also
+  pins the poll-agent permissions ceiling — see poll-agent-permission-ceiling).
+- `ruby -ryaml` parses workflow YAML locally (no pyyaml/yq); actionlint is not installed —
+  fetch its release binary to a scratch dir to lint.
 
 ## Related
 
-- The F5 injection-hardening (commit `c9d3505`) pinned the repair-agent CLI to
-  `@maincode-ai/matilda-code@0.21.4` with a "bump deliberately" comment in poll-agent.yml,
-  roymorgan-update.yml **and** (via F6) coverage-check.yml — plus (076c022, 2026-09-05) the
-  `file-missing` job in newspoll-watch.yml. A FIFTH site exists and was missed here at
-  first: the PR-gated `repair` job in `prediction-refresh.yml` ("bump both together"
-  comment at its Install Matilda CLI step, ~:125). That's FIVE pin sites now — when
-  bumping the pin, grep `matilda-code@` across .github/workflows/ rather than trusting
-  this count. The same commit's UNTRUSTED-CONTENT preamble lives in all 8
-  `.build/*-repair-prompt.md` (the filer's `.build/newspoll-file-missing-prompt.md` carries
-  its own copy of the clause, but it is a FILING prompt, not one of the repair eight).
-- Wrapper anatomy, failure logs, and the launchd side live in the
-  **launchd-scheduled-data-pipeline** skill.
+- **launchd-scheduled-data-pipeline** — wrapper anatomy, the slot lock, and the laptop's
+  runner clone.
+- **poll-agent-permission-ceiling** — the other workflow-topology invariant.

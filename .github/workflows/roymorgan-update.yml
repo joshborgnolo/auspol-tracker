@@ -1,5 +1,7 @@
 # Roy Morgan poll update pipeline — cloud-scheduled (replaces/supplements the
-# local launchd job so the site updates while the laptop is shut).
+# local launchd job so the site updates while the laptop is shut). Since
+# 2026-09-25 it runs through the reusable poll-agent.yml like every other
+# house: one update job, per-house concurrency, transient failures green.
 #
 # Roy Morgan normally releases its federal voting-intention poll on Monday
 # afternoons (eastern), so the release window gets a dense 10-minute comb
@@ -44,45 +46,16 @@ on:
         type: choice
         options: ['false', 'true']
 
-# Every push-capable workflow shares one concurrency group so two writers
-# can never be mid-flight against main at the same time. Serialised, not
-# cancelled: a queued run still gets its slot.
-concurrency:
-  group: main-writers
-  cancel-in-progress: false
-
+# the ceiling for poll-agent.yml's update job: it may never ask for more
 permissions:
   contents: write
+  actions: read # poll-agent's transient-streak check reads earlier runs
 
 jobs:
-  update:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
-
-      - name: Pin Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-
-      - name: Configure git identity
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Install puppeteer-core (best effort, for the share-card redraw)
-        # Version lives in package-lock.json; render-card.mjs resolves it
-        # from repo node_modules. --ignore-scripts: no postinstall needed.
-        run: npm ci --ignore-scripts --no-audit --no-fund || true
-
-      - name: Run the Roy Morgan updater
-        env:
-          CHROME: /usr/bin/google-chrome
-        run: |
-          if [ "${{ inputs.simulate_failure }}" = "true" ]; then
-            echo "simulate_failure requested; failing to exercise the repair job"
-            exit 1
-          fi
-          bash .build/roymorgan-updater.sh
+  run:
+    uses: ./.github/workflows/poll-agent.yml
+    with:
+      house: roymorgan
+      wrapper: .build/roymorgan-updater.sh
+      simulate_failure: ${{ inputs.simulate_failure }}
+    secrets: inherit

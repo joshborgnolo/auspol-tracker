@@ -47,15 +47,23 @@
    by an hour at each DST change; schedule-tune.yml re-runs weekly for exactly
    that reason, and the header comment it writes records the offset used.
 
+   The same slots also go to .build/dispatch-clock/schedule.json in eastern
+   wall-clock time, for the external clock (.build/dispatch-clock/): GitHub's
+   own scheduler ran these combs 2–5 hours late at the median in Sep 2026 and
+   dropped the whole Roy Morgan window on both 14 and 21 Sep, while a
+   workflow_dispatch starts within seconds. The cron blocks stay as the
+   backup. The table carries no UTC offset, so DST never changes it.
+
    Usage:
      node .build/tune-schedules.mjs            dry run — print each block + diff status
-     node .build/tune-schedules.mjs --apply    rewrite the blocks in place
-     node .build/tune-schedules.mjs --check    exit 1 if any block is out of date
-     POLLS_JSON=<path>  read another dataset (tests); WORKFLOWS_DIR likewise.
+     node .build/tune-schedules.mjs --apply    rewrite the blocks and the dispatch table
+     node .build/tune-schedules.mjs --check    exit 1 if a block or the table is out of date
+     POLLS_JSON=<path>  read another dataset (tests); WORKFLOWS_DIR and
+     DISPATCH_TABLE likewise.
      TUNE_NOW=<ISO instant>  pin the clock (tests: the offset and the header). */
 
-import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from "node:fs";
+import { join, dirname } from "node:path";
 
 // ---- policy ---------------------------------------------------------------
 const CAD_RECENT = 12;        // dated releases the weekday habit is judged over
@@ -87,14 +95,13 @@ const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
    ends the comb at the trimmed-latest release instead of reaching past the
    single latest one; `phase` shifts every weekday slot by that many minutes.
 
-   WHY PHASES: every writer shares one GitHub concurrency group
-   (main-writers), and GitHub keeps at most ONE job waiting in a group — a
-   third arrival CANCELS the older waiting one ("Canceling since a higher
-   priority waiting request for main-writers exists"). Two houses combing
-   the same evening on the same minutes therefore throw runs away, and
-   nothing red says so. So workflows that share a weekday sit on different
-   minutes, the daily sweeps are spread, and the audit below refuses to
-   write a schedule in which three writers share a minute. */
+   WHY PHASES: until 2026-09-25 every writer shared one GitHub concurrency
+   group (main-writers), and GitHub keeps at most ONE job waiting in a group
+   — a third arrival CANCELS the older waiting one ("Canceling since a
+   higher priority waiting request for main-writers exists"). Writers now
+   queue per house, so shared minutes no longer cost runs, but the phases
+   stay: they spread the load, and the audit below still refuses a schedule
+   in which three runs of any ONE group share a minute. */
 const TARGETS = [
   { workflow: "roymorgan-update.yml", houses: ["Roy Morgan"], mode: "dense", sweep: "06:00", phase: 0 },
   { workflow: "resolve-update.yml", houses: ["Resolve"], mode: "dense", sweep: "07:00", phase: 0 },
@@ -102,7 +109,9 @@ const TARGETS = [
   // writers queue is serialised, so the comb is coarse and stops at the
   // habitual hour; the hourly follow-ups cover the occasional late file.
   // Its daily sweep sits AFTER the morning cluster: a 10-minute holder of
-  // the writers queue in the middle of it is what got np-score cancelled.
+  // the writers queue in the middle of it got np-score cancelled (np-score
+  // has since left main-writers for its own group; the spacing still helps
+  // the updaters themselves).
   { workflow: "essential-update.yml", houses: ["Essential"], mode: "dense", sweep: "07:45",
     step: 30, chaseOutliers: false, phase: 0 },
   // shares its Sunday evening with Resolve: phased 5 min off Resolve's comb
@@ -361,8 +370,37 @@ function blockFor(target, data, now) {
     header.push(`# ${m.house}: ${bits.join("; ")}`);
   }
   const lines = toCron(slots, offset);
-  return { lines: [...header, ...lines, MARK_END], notes, measured: ms, offset };
+  return { lines: [...header, ...lines, MARK_END], notes, measured: ms, offset, slots: localSlots(slots) };
 }
+
+/* The slots in eastern wall-clock time, deduplicated the way toCron does it:
+   a weekday slot on a daily slot's minute is dropped, and each (day, minute)
+   appears once, earliest label winning. */
+function localSlots(slots) {
+  const dailyMins = new Set(slots.filter((s) => s.dow == null).map((s) => s.mins));
+  const uniq = new Map();
+  for (const s of slots) {
+    if (s.dow != null && dailyMins.has(s.mins)) continue;
+    const k = `${s.dow ?? "*"}|${s.mins}`;
+    if (!uniq.has(k)) uniq.set(k, s);
+  }
+  return [...uniq.values()];
+}
+
+// ---- the dispatch table for the external clock ------------------------------------
+export const TABLE_ABOUT = "Dispatch table for the external clock (.build/dispatch-clock/worker.mjs). GENERATED by .build/tune-schedules.mjs from the houses' recorded release times; edit the recipe there. Times are Australia/Sydney wall-clock; day is a weekday or \"daily\".";
+export function dispatchTable(blocks) {
+  const slots = [];
+  for (const { target, slots: ss } of blocks)
+    for (const s of ss) slots.push({ workflow: target.workflow, day: s.dow == null ? "daily" : DOW[s.dow], time: hm(s.mins), label: s.label, _k: [s.dow ?? -1, s.mins] });
+  slots.sort((a, b) => a.workflow.localeCompare(b.workflow) || (a._k[0] - b._k[0]) || (a._k[1] - b._k[1]));
+  return { about: TABLE_ABOUT, timezone: TZ, slots: slots.map(({ _k, ...rest }) => rest) };
+}
+// one slot per line, so a retune diffs as the slots that moved
+export const tableJson = (t) => "{\n" +
+  ` "about": ${JSON.stringify(t.about)},\n` +
+  ` "timezone": ${JSON.stringify(t.timezone)},\n` +
+  ` "slots": [\n${t.slots.map((x) => "  " + JSON.stringify(x)).join(",\n")}\n ]\n}\n`;
 
 // ---- splice into the workflow file --------------------------------------------
 function splice(text, blockLines) {
@@ -376,10 +414,14 @@ function splice(text, blockLines) {
 }
 
 // ---- collision audit -------------------------------------------------------------
-/* Every `- cron:` line in every writer workflow (a caller of poll-agent.yml
-   or a member of the main-writers group), expanded to (utc weekday, hour,
-   minute) keys. Returns the minutes three or more writers share — the ones
-   GitHub will cancel a run on — and, for information, the pairs. */
+/* Every `- cron:` line in every workflow that names a LITERAL concurrency
+   group, expanded to (utc weekday, hour, minute) keys and grouped by that
+   group. GitHub keeps one pending run per group and cancels the older, so
+   three runs of ONE group on a minute throw a run away. The writers shared
+   one group (main-writers) until 2026-09-25; each house now has its own
+   (poll-agent.yml's writers-${{ inputs.house }} — an expression, so not
+   counted here), which makes this a guard against a shared group coming
+   back. Returns those minutes, and for information the pairs. */
 function expandCron(expr) {
   const [mi, hr, , , dw] = expr.trim().split(/\s+/);
   const list = (f, max) => (f === "*" ? [...Array(max).keys()] : f.split(",").flatMap((x) => {
@@ -389,26 +431,31 @@ function expandCron(expr) {
   return keys;
 }
 export function auditCollisions(workflowsDir, overrides = {}) {
-  const byKey = new Map();
+  const byGroupKey = new Map(); // "group|key" -> Set(files)
   for (const f of readdirSync(workflowsDir).filter((x) => x.endsWith(".yml")).sort()) {
     const text = overrides[f] ?? readFileSync(join(workflowsDir, f), "utf8");
-    if (!/group: main-writers|poll-agent\.yml/.test(text)) continue;
+    const groups = new Set([...text.matchAll(/^\s*group:\s*([A-Za-z0-9_.-]+)\s*(?:#.*)?$/gm)].map((m) => m[1]));
+    if (!groups.size) continue;
     for (const m of text.matchAll(/^\s*- cron: '([^']+)'/gm))
-      for (const k of expandCron(m[1])) (byKey.get(k) || byKey.set(k, new Set()).get(k)).add(f);
+      for (const k of expandCron(m[1]))
+        for (const g of groups) {
+          const gk = `${g}|${k}`;
+          (byGroupKey.get(gk) || byGroupKey.set(gk, new Set()).get(gk)).add(f);
+        }
   }
-  const fmt = (k, ws) => { const [d, h, mi] = k.split("|").map(Number); return `${DOW[d]} ${String(h).padStart(2, "0")}:${String(mi).padStart(2, "0")} UTC — ${[...ws].join(", ")}`; };
+  const fmt = (gk, ws) => { const [g, d, h, mi] = gk.split("|"); return `${DOW[+d]} ${String(h).padStart(2, "0")}:${String(mi).padStart(2, "0")} UTC [${g}] — ${[...ws].join(", ")}`; };
   const triples = [], pairs = [];
-  for (const [k, ws] of byKey) { if (ws.size >= 3) triples.push(fmt(k, ws)); else if (ws.size === 2) pairs.push(fmt(k, ws)); }
+  for (const [gk, ws] of byGroupKey) { if (ws.size >= 3) triples.push(fmt(gk, ws)); else if (ws.size === 2) pairs.push(fmt(gk, ws)); }
   return { triples: triples.sort(), pairs: pairs.sort() };
 }
 
 // ---- main ----------------------------------------------------------------------
-export function tune({ data, workflowsDir, now, apply = false }) {
+export function tune({ data, workflowsDir, now, apply = false, tablePath = null }) {
   const results = [];
   const proposed = {};
   for (const t of TARGETS) {
     const path = join(workflowsDir, t.workflow);
-    const { lines, notes, measured } = blockFor(t, data, now);
+    const { lines, notes, measured, slots } = blockFor(t, data, now);
     let status = "missing";
     let before = null, after = null;
     if (existsSync(path)) {
@@ -419,15 +466,25 @@ export function tune({ data, workflowsDir, now, apply = false }) {
       else status = "stale";
       if (after != null) proposed[t.workflow] = after;
     }
-    results.push({ target: t, path, lines, notes, measured, status, after });
+    results.push({ target: t, path, lines, notes, measured, status, after, slots });
   }
+  // the external clock's table, from the same slots (no UTC in it: DST-proof)
+  const table = dispatchTable(results);
+  const tableText = tableJson(table);
+  let tableStatus = "none";
+  if (tablePath) tableStatus = existsSync(tablePath) && readFileSync(tablePath, "utf8") === tableText ? "current" : "stale";
   // the schedule as it WOULD be — nothing is written while three writers
   // share a minute anywhere in it (hand-authored slots included)
   const audit = auditCollisions(workflowsDir, proposed);
   if (apply && !audit.triples.length) {
     for (const r of results) if (r.status === "stale") { writeFileSync(r.path, r.after); r.status = "updated"; }
+    if (tableStatus === "stale") {
+      mkdirSync(dirname(tablePath), { recursive: true });
+      writeFileSync(tablePath, tableText);
+      tableStatus = "updated";
+    }
   }
-  return Object.assign(results, { audit });
+  return Object.assign(results, { audit, table, tableStatus });
 }
 
 const isMain = process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/^.*[\\/]/, "/"));
@@ -437,7 +494,8 @@ if (isMain) {
   const data = JSON.parse(readFileSync(process.env.POLLS_JSON || "data/polls.json", "utf8"));
   const workflowsDir = process.env.WORKFLOWS_DIR || ".github/workflows";
   const now = process.env.TUNE_NOW ? new Date(process.env.TUNE_NOW) : new Date();
-  const results = tune({ data, workflowsDir, now, apply });
+  const tablePath = process.env.DISPATCH_TABLE || ".build/dispatch-clock/schedule.json";
+  const results = tune({ data, workflowsDir, now, apply, tablePath });
   let stale = 0, broken = 0;
   for (const r of results) {
     console.log(`\n== ${r.target.workflow}  [${r.status}]`);
@@ -447,12 +505,14 @@ if (isMain) {
     if (r.status === "missing" || r.status === "no-markers") broken++;
   }
   const { triples, pairs } = results.audit;
-  console.log(`\n== writers sharing a minute (main-writers keeps ONE job waiting; a third cancels it)`);
+  console.log(`\n== dispatch table ${tablePath}  [${results.tableStatus}] — ${results.table.slots.length} slots`);
+  console.log(`\n== runs of one concurrency group sharing a minute (GitHub keeps ONE waiting; a third cancels it)`);
   for (const t of triples) console.log(`   COLLISION ${t}`);
   for (const p of pairs) console.log(`   pair      ${p}`);
   if (!triples.length && !pairs.length) console.log("   none");
   const summary = results.map((r) => `${r.target.workflow}=${r.status}`).join(" ");
-  console.log(`\nTUNE_STATUS ${JSON.stringify({ stale, broken, apply, check, collisions: triples.length, offsetMinutes: easternOffsetMinutes(now), results: summary })}`);
+  if (results.tableStatus === "stale") stale++;
+  console.log(`\nTUNE_STATUS ${JSON.stringify({ stale, broken, apply, check, collisions: triples.length, offsetMinutes: easternOffsetMinutes(now), table: results.tableStatus, results: summary })}`);
   if (broken) { console.error("workflow files without tune-schedules markers — add them before running the tuner"); process.exit(2); }
   if (triples.length) { console.error(`refusing: ${triples.length} minute(s) with three or more writers scheduled — move a hand-authored slot or a phase`); process.exit(3); }
   if (check && stale) process.exit(1);

@@ -65,6 +65,9 @@
 //    `primary_vote_ley_scenario`; the Taylor headline (14/02/2026) stays in
 //    `primary_vote`. Note the source holds only one Feb-2026 approval wave.
 //
+// 8. Feb 2026's Ley-scenario firmness and 9. the May 2026 wave's two dates
+//    (17/05 in the 2021 file, 16/05 in the 2026 one): resolve-rpm-repairs.mjs.
+//
 // Left UNREPAIRED (internally consistent, contradicts only the publication):
 // the source stores 2024-02-25 federal LNP = 36 (Lib 32 + Nat 4), but the
 // SMH/Age report of that wave printed "Coalition primary vote 37 per cent".
@@ -123,6 +126,8 @@
 import { createHash, createDecipheriv } from "node:crypto";
 import { readFileSync, writeFileSync, renameSync, existsSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
+import { rowToLine, parseLine } from "./resolve-rpm-csv.mjs";
+import { repairWaveDates } from "./resolve-rpm-repairs.mjs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
@@ -273,33 +278,7 @@ const num = (v) => {
   return Number.isFinite(n) ? Math.round(n * 100) / 100 : "";
 };
 
-const csvCell = (x) => {
-  const s = String(x ?? "");
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-};
-
 const stripTags = (s) => s.replace(/<[^>]*>/g, "").trim();
-
-// Rows stay objects until the end so the repair passes can rewrite values and
-// labels; stringified only at write time.
-const ROW_KEYS = ["dataset", "question_id", "question", "visual", "answer", "dimension", "key", "date", "value_pct", "parties"];
-const rowToLine = (r) => ROW_KEYS.map((k) => csvCell(r[k] ?? "")).join(",");
-const parseLine = (line) => {
-  const cells = [];
-  let cell = "", inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (inQ) {
-      if (c === '"' && line[i + 1] === '"') { cell += '"'; i++; }
-      else if (c === '"') inQ = false;
-      else cell += c;
-    } else if (c === '"') inQ = true;
-    else if (c === ",") { cells.push(cell); cell = ""; }
-    else cell += c;
-  }
-  cells.push(cell);
-  return Object.fromEntries(cells.map((v, i) => [ROW_KEYS[i], v]));
-};
 
 const SUB_DATASETS = {
   Q5: [[/actual .*election results/i, "election_2025_results"], [/firm are you/i, "vote_firmness"]],
@@ -423,6 +402,10 @@ for (const r of existingRows) {
   legacyFixed.push(r);
 }
 
+// (8)(9) one wave filed under two dates (Feb firmness, May): see
+// resolve-rpm-repairs.mjs, which also applied them to the committed CSV once.
+const waveFix = repairWaveDates(legacyFixed, rowsOut);
+
 const combined = [...legacyFixed, ...rowsOut];
 
 // (2)(3) Net reconciliation: a stored "Net" that contradicts the same wave's
@@ -539,7 +522,7 @@ else if (changed) {
   console.log(`updated ${OUT}: kept ${existingRows.length} existing rows, added ${rowsOut.length}, wrote ${merged.length} total (${legacyFixed.length + rowsOut.length - merged.length} dupes)`);
 } else console.log(`no change: ${OUT} unchanged (${merged.length} rows)`);
 
-console.log(`drops/renames: wiw-corrupt-2021=${wiwCorrupt2021} wiw-existing-dropped=${wiwExistingDropped} legacy-relabelled=${legacyRenamed} legacy-dropped=${legacyDropped} ley-scenario=${leyScenario} ley-scenario-legacy=${legacyLey} wiw-zero-second-warn=${wiwZeroSecond}`);
+console.log(`drops/renames: wiw-corrupt-2021=${wiwCorrupt2021} wiw-existing-dropped=${wiwExistingDropped} legacy-relabelled=${legacyRenamed} legacy-dropped=${legacyDropped} ley-scenario=${leyScenario} ley-scenario-legacy=${legacyLey} firmness-ley=${waveFix.firmLey} may-dropped=${waveFix.mayDropped} may-redated=${waveFix.mayRedated} wiw-zero-second-warn=${wiwZeroSecond}`);
 console.log(`subsections: election-2025-points=${electionPoints} verbatim-comments-skipped=${verbatimCount}`);
 console.log(`merge: value_conflicts=${valueConflicts} rep_rounding=${repRounding} meta_drift=${metaDrift} wiw_restored=${wiwRestored} leader_names=${leaderNameResolutions} leader_name_fallbacks=${leaderNameFallbacks} scheme=${VALUE_SCHEME}`);
 if (valueConflicts) console.log(`conflicts by dataset: ${[...conflictFams.entries()].sort((a, b) => b[1] - a[1]).map(([d, n]) => `${d}=${n}`).join(" ")}`);

@@ -16,8 +16,10 @@ on:
         type: choice
         options: ['false', 'true']
 
+# the ceiling for poll-agent.yml's update job: it may never ask for more
 permissions:
   contents: write
+  actions: read # poll-agent's transient-streak check reads earlier runs
 
 jobs:
   run:

@@ -80,8 +80,13 @@ function rootWith(over = {}) {
 /* the child runs ASYNC: spawnSync would freeze this process's event loop,
    and with it the fixture server the child is trying to fetch from */
 async function run(url, root, extraEnv = {}) {
-  const env = { ...process.env, ...extraEnv };
-  delete env.GITHUB_ACTIONS; // keep local semantics unless a case opts in
+  /* Local semantics unless a case opts in. GITHUB_EVENT_NAME goes too: the
+     daily `tests` run is itself a schedule event, and inheriting it turned
+     every "local" unreachable case into the scheduled backstop (class 2). */
+  const env = { ...process.env };
+  delete env.GITHUB_ACTIONS;
+  delete env.GITHUB_EVENT_NAME;
+  Object.assign(env, extraEnv);
   const opts = {
     env: {
       ...env,

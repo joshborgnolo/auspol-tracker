@@ -1,0 +1,421 @@
+/* site-shell.css – written by .build/newtracker/build.mjs from
+   .build/site-shell.mjs on every build; edit it there. The shared header,
+   footer and theme of the pages outside the main build. */
+@font-face {
+  font-family: "Source Sans 3"; font-style: normal; font-weight: 200 900; font-display: swap;
+  src: url("/assets/fonts/sourcesans3-latin.ac057a55.woff2") format("woff2");
+}
+:root {
+  /* the main page's party tokens, lifted verbatim from its template
+     (shell-copy:tokens), so this page's dial uses the site's own colours */
+  /* .build/site-shell.mjs ships these to the satellites */
+  --alp: oklch(0.55 0.150 27);   /* Labor red    */
+  --lnp: oklch(0.50 0.095 250);  /* Coalition blue */
+  --grn: oklch(0.60 0.120 150);  /* Greens       */
+  --onp: oklch(0.66 0.130 58);   /* One Nation orange */
+  --sh-surface: oklch(0.992 0.004 85);
+  --sh-sw-plate: color-mix(in oklch, var(--ink) 5%, var(--sh-surface)); --sh-sw-cap: var(--sh-surface);
+  --sh-sw-well: color-mix(in oklch, var(--ink) 13%, var(--sh-surface)); --sh-sw-pivot: color-mix(in oklch, var(--ink) 18%, transparent);
+  --sh-btn-lit: color-mix(in oklch, white 85%, transparent); --sh-btn-shade: oklch(0.4 0.02 60 / 0.16);
+  --sh-btn-press: color-mix(in oklch, var(--ink) 15%, transparent);
+  --sh-art: url("/assets/tile-art.svg");
+  --sh-mood-pos: oklch(0.52 0.085 200); --sh-mood-neg: oklch(0.44 0.045 50);
+}
+@media (prefers-color-scheme: dark) { :root:not(.sh-light) {
+    --alp: oklch(0.660 0.165 28);
+    --lnp: oklch(0.680 0.130 252);
+    --grn: oklch(0.720 0.135 152);
+    --onp: oklch(0.760 0.135 64);
+  --sh-surface: oklch(0.252 0.011 66);
+  --sh-sw-plate: color-mix(in oklch, black 22%, var(--sh-surface)); --sh-sw-cap: color-mix(in oklch, white 7%, var(--sh-surface));
+  --sh-sw-well: color-mix(in oklch, black 44%, var(--sh-surface)); --sh-sw-pivot: color-mix(in oklch, black 58%, transparent);
+  --sh-btn-lit: color-mix(in oklch, white 9%, transparent); --sh-btn-shade: oklch(0 0 0 / 0.44);
+  --sh-btn-press: color-mix(in oklch, black 48%, transparent);
+  --sh-art: url("/assets/tile-art-dark.svg");
+  --sh-mood-pos: oklch(0.70 0.105 200); --sh-mood-neg: oklch(0.68 0.05 45);
+} }
+:root.sh-dark {
+    --alp: oklch(0.660 0.165 28);
+    --lnp: oklch(0.680 0.130 252);
+    --grn: oklch(0.720 0.135 152);
+    --onp: oklch(0.760 0.135 64);
+  --sh-surface: oklch(0.252 0.011 66);
+  --sh-sw-plate: color-mix(in oklch, black 22%, var(--sh-surface)); --sh-sw-cap: color-mix(in oklch, white 7%, var(--sh-surface));
+  --sh-sw-well: color-mix(in oklch, black 44%, var(--sh-surface)); --sh-sw-pivot: color-mix(in oklch, black 58%, transparent);
+  --sh-btn-lit: color-mix(in oklch, white 9%, transparent); --sh-btn-shade: oklch(0 0 0 / 0.44);
+  --sh-btn-press: color-mix(in oklch, black 48%, transparent);
+  --sh-art: url("/assets/tile-art-dark.svg");
+  --sh-mood-pos: oklch(0.70 0.105 200); --sh-mood-neg: oklch(0.68 0.05 45);
+}
+/* the main page's cool accent (tweaks.accent): the paper and rules go blue-grey */
+:root.sh-cool { --bg: oklch(0.972 0.006 235); --sh-surface: oklch(0.993 0.003 235); --line: oklch(0.892 0.009 235); --line-2: oklch(0.934 0.006 235); }
+@media (prefers-color-scheme: dark) { :root.sh-cool:not(.sh-light) { --bg: oklch(0.210 0.012 248); --sh-surface: oklch(0.248 0.013 248); --line: oklch(0.352 0.013 248); --line-2: oklch(0.310 0.012 248); } }
+:root.sh-cool.sh-dark { --bg: oklch(0.210 0.012 248); --sh-surface: oklch(0.248 0.013 248); --line: oklch(0.352 0.013 248); --line-2: oklch(0.310 0.012 248); }
+
+/* the main page's .page box: the header and footer line up with its own */
+.sh-frame {
+  box-sizing: border-box; width: 100%; max-width: 1200px; margin: 0 auto; flex: none;
+  padding-left: calc(28px + env(safe-area-inset-left, 0px));
+  padding-right: calc(28px + env(safe-area-inset-right, 0px));
+}
+.sh-top { padding-top: calc(28px + env(safe-area-inset-top, 0px)); }
+.sh-skip {
+  position: absolute; left: 12px; top: -60px; z-index: 400; padding: 8px 12px; border-radius: 8px;
+  background: var(--bg); color: var(--ink); border: 1px solid var(--line); font: 600 13px var(--sans);
+}
+.sh-skip:focus { top: 12px; }
+
+/* masthead: the lockup left, the switch right (.site-head). The lockup is
+   the main page's own rules, lifted verbatim from its template (shell-copy
+   markers) – one definition for both. */
+.sh-head {
+  position: relative;
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap;
+  padding-bottom: 16px; border-bottom: 1px solid var(--line);
+}
+/* the tagline and the meta beside it (.tagline, .head-right, .head-meta):
+   the same sentence and the same three figures the main page carries, off
+   auspol-now.json – so every page opens on the same masthead */
+.sh-tagline {
+  margin: 7px 0 -1.5px; font-family: "Crimson Text", var(--serif); font-weight: 400;
+  font-size: 15px; line-height: 1.5; color: var(--ink-3); text-wrap: balance;
+}
+.sh-meta-compact { display: none; }
+.sh-right { display: flex; align-items: center; gap: 18px; }
+.sh-meta { display: flex; align-items: center; gap: 18px; font-family: var(--sans); line-height: 1.5; }
+.sh-meta[hidden] { display: none; }
+.sh-meta-item { display: flex; flex-direction: column; gap: 2px; }
+.sh-meta-k { font-size: 13px; color: var(--ink-3); font-weight: 600; white-space: nowrap; letter-spacing: 0.02em; }
+.sh-meta-v { font-size: 14px; color: var(--ink); font-weight: 600; white-space: nowrap; }
+.sh-fresh-dot {
+  display: inline-block; vertical-align: middle; position: relative; top: -1px;
+  width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; background: var(--ink-3);
+}
+.sh-fresh-dot.fresh { background: var(--sh-mood-pos); }
+.sh-fresh-dot.stale { background: var(--sh-mood-neg); }
+.sh-fresh-rel { margin-left: 6px; color: var(--ink-3); font-weight: 500; }
+.sh-meta-divide { width: 1px; height: 30px; background: var(--line); }
+@media (max-width: 900px) { .sh-meta { gap: 12px; } }
+@media (max-width: 560px) {
+  /* as the main page's phone masthead: the meta gives way to one compact
+     freshness line, and the switch pins to the lockup's corner */
+  .sh-meta { display: none; }
+  .sh-meta-compact:not([hidden]) {
+    display: flex; align-items: center; gap: 8px; margin: 9px 0 0;
+    font-family: var(--sans); font-size: 13px; line-height: 1.5; color: var(--ink-3); font-variant-numeric: tabular-nums;
+  }
+  .sh-meta-compact .sh-fresh-dot { margin-right: 0; width: 6px; height: 6px; top: 0; }
+  .sh-head { flex-direction: column; align-items: flex-start; gap: 13px; }
+  .sh-head .wordmark { padding-right: 92px; }
+  .sh-right { display: contents; }
+  .sh-theme { position: absolute; top: 0; right: 0; }
+}
+/* the masthead lockup: .build/site-shell.mjs ships
+   the blocks inside the shell-copy markers to the satellites, so a change
+   here is a change there */
+.wordmark {
+  /* the lockup's own face, Source Sans 3, shipped for this one caller. Myriad
+     Pro used to lead the stack, so a machine with Adobe fonts installed drew
+     a different wordmark from every reader's. The .wm-name/.wm-track spans
+     set no family, so this inherits into both words and the stacked variant. */
+  font-family: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  display: inline-flex; align-items: center; gap: 3px;
+  font-weight: 800; font-size: 30px; letter-spacing: -0.025em; line-height: 1;
+  margin: 0;
+}
+.wm-sr, .sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.wordmark.stacked { flex-direction: row; align-items: center; }
+/* Both words at ONE size, told apart by weight alone. At 30px `auspol` at 800
+   measures 93.6px and `tracker` at 400 measures 95px, so the block squares
+   itself off on its own - no tracking, no size step, no indent to force it.
+   The old second line bought that same width with 0.46em of letter-spacing,
+   which is enough air to stop the word reading as a word; and the 0.23em
+   indent it needed to re-centre pushed the T 2.8px right of the a, so the
+   lockup had no shared left edge. Weight contrast also survives what the old
+   grey/black split did not: small sizes, greyscale, and dark, where --ink-3
+   on a dark ground reads as switched off rather than as secondary. */
+.wm-textcol { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+.wm-name {
+  display: inline-flex; font-weight: 800; font-size: 30px;
+  letter-spacing: -0.025em; line-height: 0.95; color: var(--ink);
+}
+.wordmark.stacked .wm-track {
+  align-self: flex-start; margin-left: 0; padding-bottom: 0;
+  display: inline-block; text-indent: 0;
+  font-size: 30px; font-weight: 400; letter-spacing: -0.03em;
+  text-transform: none; line-height: 0.95; color: var(--ink-3);
+}
+.wm-track {
+  align-self: flex-end; margin-left: 9px; padding-bottom: 3px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.34em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+/* glyph = one dial: live primary-vote columns as radial graduations on a
+   two-tone 2PP swing arc, needle from the shared pivot */
+.wm-glyph {
+  display: inline-flex; align-items: center; margin-left: 0; align-self: center;
+  /* No vertical nudge, and none needed: once the viewBox bounds what is
+     actually drawn, centring the box centres the INK - 0.05px off the
+     wordmark's own ink centre. The old translateY was compensating for a
+     viewBox with all its slack on one side. The dial's own foot cannot help
+     here: standing it on either visible baseline throws it 10px clear of the
+     block at one end or 2.5px past it at the other, and the midpoint between
+     them is a construction line nobody can see. */
+  background: none; border: 0; padding: 3px; margin: -3px; cursor: pointer;
+  text-decoration: none;   /* the satellites wear the same rule on an <a> */
+  /* The words live inside this button - the whole lockup is the way into the
+     replay - so it has to carry the wordmark's typography onward to them
+     rather than fall back to the button UA face. */
+  font: inherit; letter-spacing: inherit; text-align: left; color: inherit;
+  /* 12px, not 7: the dial's nearest ink is the tallest graduation's tip,
+     which reaches to within 0.9px of the box edge, so the clear space a
+     reader sees is the gap plus almost nothing. 12px puts it at 12.9px - a
+     third of the mark's own height, and it opens to 25px beside the letters
+     themselves. */
+  gap: 12px;
+  /* A hover scale is a surface responding to a pointer, not a mass with
+     momentum, so it decelerates rather than overshooting - the old curve
+     sprang past 1.06 and settled back, which reads as a toy. The needle keeps
+     its overshoot deliberately (see .wm-needle-g): a real gauge needle does
+     swing past and settle, and that one IS a mass. */
+  border-radius: 8px; transition: transform .28s cubic-bezier(.22, 1, .36, 1), background-color .2s ease;
+}
+.wm-glyph:hover { background: color-mix(in oklch, var(--ink) 6%, transparent); transform: scale(1.06); }
+.wm-glyph:active { transform: scale(0.97); }
+.wm-glyph:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
+/* the stand-in the page first paints, swapped for the live inline dial the
+   moment auspol-now.json lands – same box the masthead's svg takes */
+.wm-dial-img { display: block; overflow: visible; }
+@media (prefers-reduced-motion: reduce) { .wm-glyph, .wm-glyph:hover, .wm-glyph:active { transition: none; transform: none; } }
+.wordmark.stacked .wm-glyph { align-self: center; }
+.wm-dial { display: block; overflow: visible; }
+.wm-arc { fill: none; stroke-width: 1.4; opacity: 0.5; }
+.wm-pivot { fill: var(--ink-3); }
+.wm-needle-g { transition: transform .75s cubic-bezier(.34,1.3,.5,1); }
+/* settles alongside the needle; no overshoot, since a graduation running past
+   its own value and back reads as an error rather than as momentum */
+.wm-bar { transition: stroke-dasharray .75s cubic-bezier(.22,.9,.24,1); }
+@media (prefers-reduced-motion: reduce) { .wm-needle-g, .wm-bar { transition: none; } }
+
+/* the colour switch (.theme-seg): a light switch, the pressed half is the theme */
+.sh-theme {
+  display: inline-flex; padding: 3px; border-radius: 10px; background: var(--sh-sw-plate);
+  box-shadow: inset 0 1px 0 var(--sh-btn-lit), 0 1px 1.5px var(--sh-btn-shade), 0 3px 6px -3px var(--sh-btn-shade);
+  visibility: hidden;
+}
+.sh-js .sh-theme { visibility: visible; }
+.sh-cell {
+  appearance: none; border: 0; margin: 0; cursor: pointer; padding: 7px 11px; color: var(--ink-3);
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--sh-sw-cap); box-shadow: inset 0 1px 0 var(--sh-btn-lit), 0 1px 1.5px var(--sh-btn-shade);
+  transition: background-color .19s, box-shadow .19s, color .19s;
+}
+.sh-cell:first-child { border-radius: 7px 0 0 7px; border-right: 1px solid var(--sh-sw-pivot); }
+.sh-cell:last-child { border-radius: 0 7px 7px 0; }
+.sh-cell:hover { color: var(--ink-2); }
+.sh-cell[aria-pressed="true"] {
+  color: var(--ink); background: var(--sh-sw-well);
+  box-shadow: inset 0 2px 3px var(--sh-btn-press), inset 0 -1px 0 var(--sh-btn-lit);
+}
+.sh-cell[aria-pressed="true"] svg { transform: translateY(0.5px); }
+.sh-cell svg { display: block; }
+.sh-cell:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
+
+/* the tab bar, as the main page's (.tabs, .tabs-inner, .tabs-set, .tab):
+   flush under the masthead rule, sticky on every page, and once it catches
+   the top it pins – the set condenses with ONE composited scale (layout
+   never changes, or the sticky bar would oscillate) and a shadow lifts it
+   off the content. A satellite has no hero 2PP on screen, so the pin is
+   also the main page's show-score moment: the docked score fades in at the
+   right end and the next-poll countdown glides to the centre, exactly as on
+   the main page's other views. The bar sits outside the masthead frame so
+   its sticky range is the whole page. */
+/* sticky needs a containing block as tall as the page: the satellites set
+   html, body { height: 100% }, which boxed the body at one screen */
+body { height: auto; }
+.sh-tabs-sentinel { height: 0; flex: none; }
+.sh-tabs {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 41; flex: none;
+  margin-bottom: 26px; background: var(--bg);
+}
+/* up through the notch while pinned (standalone mode owns that strip) */
+.sh-tabs.pinned::before {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 100%;
+  height: env(safe-area-inset-top, 0px); background: var(--bg);
+}
+/* the lift-off shadow on its own layer, faded by opacity (compositor only) */
+.sh-tabs::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  box-shadow: 0 10px 22px -16px color-mix(in oklch, var(--ink) 55%, transparent);
+  opacity: 0; transition: opacity .3s ease;
+}
+.sh-tabs.pinned::after { opacity: 1; }
+.sh-tabs-inner {
+  position: relative; z-index: 1;
+  display: flex; align-items: flex-end;
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+  container-type: inline-size;
+}
+.sh-tabs-set {
+  display: flex; gap: 30px; align-items: flex-end;
+  transform-origin: left bottom;
+  transition: transform .38s cubic-bezier(.22, 1, .36, 1);
+}
+.sh-tabs.pinned .sh-tabs-set { transform: scale(0.789); }   /* 19px → 15px, the main page's pin */
+.sh-tab {
+  position: relative; padding: 12px 1px; white-space: nowrap; text-decoration: none;
+  font-family: "Crimson Text", var(--serif); font-weight: 600; font-size: 19px; line-height: 23.5px;
+  letter-spacing: -0.01em; color: var(--ink-3); transition: color .15s ease;
+}
+.sh-tab:hover { color: var(--ink-2); }
+.sh-tab.active { color: var(--ink); }
+.sh-tab::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2.5px;
+  background: var(--ink); border-radius: 2px 2px 0 0; transform: scaleX(0); transform-origin: left center;
+  transition: transform .2s ease;
+}
+.sh-tab.active::after, .sh-tab:hover::after { transform: scaleX(1); }
+.sh-tab:not(.active):hover::after { background: var(--line); }
+.sh-tab:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; border-radius: 4px; }
+.sh-tab-short { display: none; }
+@media (max-width: 420px) {
+  .sh-tabs.pinned .sh-tab-long { display: none; }
+  .sh-tabs.pinned .sh-tab-short { display: inline; }
+}
+@media (max-width: 380px) {
+  .sh-tabs.pinned .sh-tab-pinhide { display: none; }
+}
+
+/* the docked 2PP score (.tab-score): absolutely seated on the underline at
+   the row's right end, so its arrival relayouts nothing */
+.sh-score {
+  position: absolute; right: 1px; bottom: 0; z-index: 1;
+  display: inline-flex; align-items: baseline; gap: 9px; padding: 0 1px 10px; white-space: nowrap;
+  text-decoration: none; color: var(--ink);
+  opacity: 0; transform: translateY(4px); pointer-events: none;
+  transition: opacity .26s ease, transform .34s cubic-bezier(.22, 1, .36, 1);
+}
+.sh-score[hidden] { display: none; }
+.sh-tabs.pinned .sh-score { opacity: 1; transform: none; pointer-events: auto; }
+.sh-eyebrow { font: 700 10.5px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-right: 2px; }
+.sh-party { display: inline-flex; align-items: baseline; gap: 5px; }
+.sh-abbr { font: 700 10.5px var(--sans); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.sh-num { font-family: "Crimson Text", var(--serif); font-weight: 600; font-size: 16px; line-height: 1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.sh-sep { width: 1.5px; height: 13px; background: var(--line-2); align-self: center; position: relative; top: 1px; }
+
+/* the next-poll countdown (.tab-next): wide screens only, absolutely seated
+   so it glides – docked right until the score owns that end, then to the
+   centre, one transform either way. Its roll is np-project.js's, the main
+   page's own; items past the measured room park rather than wrap. */
+.sh-next { display: none; }
+@media (min-width: 1100px) {
+  .sh-next:not([hidden]) {
+    display: inline-flex; align-items: baseline; gap: 14px;
+    position: absolute; bottom: 0; left: 100%; transform: translateX(-100%);
+    padding-bottom: 11px; font-family: var(--sans); font-size: 12px; line-height: 1.45; white-space: nowrap;
+    color: var(--ink-3); transition: transform .38s cubic-bezier(.22, 1, .36, 1);
+  }
+  .sh-tabs.pinned .sh-next { transform: translateX(calc(-50% - 50cqw)); }
+  .sh-tn-item.sh-tn-park { position: absolute; visibility: hidden; }
+}
+/* the main page's label is a button whose reset inherits the ticker's own
+   12px regular, so that is what it reads as */
+.sh-tn-lab { color: var(--ink-3); }
+.sh-tn-item { display: inline-flex; align-items: baseline; gap: 6px; }
+.sh-tn-firm { font-weight: 700; color: var(--ink-2); }
+.sh-tn-when { font-variant-numeric: tabular-nums; }
+.sh-tn-overdue { color: var(--sh-mood-neg); }
+.sh-tn-maybe { color: var(--ink-3); }
+a.sh-tn-link { color: inherit; text-decoration: none; }
+a.sh-tn-link:hover, a.sh-tn-link:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+.sh-plink { font-size: 9px; font-weight: 700; margin-left: 3px; vertical-align: 1.5px; color: var(--ink-3); }
+@media (prefers-reduced-motion: reduce) {
+  .sh-tabs-set, .sh-tabs::after, .sh-score, .sh-next { transition: none; }
+}
+
+/* the page's own column sits where the main page's Info column does: on the
+   frame's left edge at the Info measure (.info's 66ch, 692px), rather than
+   centred on a column of its own – and the archives' switcher with it. The
+   tab bar's margin is now the gap above it, as on the main page. */
+.frame-wrap {
+  max-width: calc(692px + 56px); margin-left: max(0px, calc((100% - 1200px) / 2)); margin-right: auto;
+}
+.frame-wrap { padding-top: 0; }
+/* The Morgan and Trove archives run to ~30,000 table elements; laid out
+   whole, that cost a phone-class CPU 350–550ms before the page settled.
+   A table off screen now skips layout and paint until it nears the
+   viewport, and remembers its real height once seen (auto). */
+.frame-wrap .rm-scroll { content-visibility: auto; contain-intrinsic-size: auto 900px; }
+/* the page's headings in the main page's editorial voice: a view's title is
+   30px regular Crimson (.card-title under body.editorial), not 34px bold,
+   and a section head keeps that weight a step down */
+.frame-wrap h1 { font-size: 30px; font-weight: 400; letter-spacing: -0.018em; }
+.frame-wrap h2 { font-size: 23px; font-weight: 400; letter-spacing: -0.01em; }
+/* links in the main page's ink, never a colour of their own: prose links
+   keep each page's tinted underline, and a contents list reads as the Info
+   index does – ink with a faint underline */
+.frame-wrap a { color: var(--ink-2); }
+.frame-wrap a:hover { color: var(--ink); }
+.frame-wrap .toc a { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.frame-wrap .toc a:hover, .frame-wrap .toc a:focus-visible { text-decoration-color: currentColor; }
+/* the archives' switcher on the same edge; its underline is drawn across its
+   own box, so the frame's inset is margin here, not padding – the rule
+   starts where the text does */
+nav.tabs[aria-label="Poll archives"] {
+  box-sizing: border-box; width: auto; max-width: 692px; padding-left: 0; padding-right: 0;
+  margin: 0 calc(28px + env(safe-area-inset-right, 0px)) 22px
+          calc(max(0px, (100% - 1200px) / 2) + 28px + env(safe-area-inset-left, 0px));
+}
+
+/* the colophon (.method .colophon): identity left, ways in right */
+.sh-foot { margin-top: 6px; padding: 24px 0 20px; border-top: 1px solid var(--line); font-family: var(--sans); }
+.sh-colo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.sh-about { padding-right: 40px; border-right: 1px solid var(--line); min-width: 0; }
+.sh-ways { padding-left: 40px; min-width: 0; }
+.sh-foot p { margin: 0; }
+.sh-lede { font-family: "Crimson Text", var(--serif); font-size: 17px; line-height: 1.45; color: var(--ink); }
+.sh-disc { margin-top: 13px !important; font-size: 12px; line-height: 1.65; color: var(--ink-3); }
+.sh-fb { font-size: 13px; line-height: 1.6; color: var(--ink-2); }
+.sh-arch { margin-top: 20px !important; font-size: 13px; line-height: 1.65; color: var(--ink-3); }
+.sh-foot a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid var(--line); }
+.sh-foot a:hover, .sh-foot a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
+.sh-foot a.sh-fb-link { color: var(--ink); font-weight: 600; }
+
+/* the tide band that closes every page (.tile-band) */
+.sh-band { flex: none; height: 240px; margin-top: 12px; position: relative; background: var(--sh-art) center bottom / auto 400px repeat-x; }
+.sh-band::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, var(--bg) 0%, color-mix(in oklch, var(--bg) 94%, transparent) 22%,
+    color-mix(in oklch, var(--bg) 80%, transparent) 42%, color-mix(in oklch, var(--bg) 54%, transparent) 57%,
+    color-mix(in oklch, var(--bg) 25%, transparent) 68%, transparent 76%);
+}
+
+/* a page's own column: the space under the new tab bar replaces its old top margin */
+.sh-kicker {
+  margin: 0 0 6px; font: 700 11px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3);
+}
+
+@media (max-width: 640px) {
+  .sh-frame { padding-left: calc(16px + env(safe-area-inset-left, 0px)); padding-right: calc(16px + env(safe-area-inset-right, 0px)); }
+  .sh-top { padding-top: calc(18px + env(safe-area-inset-top, 0px)); }
+  .sh-head { gap: 16px; padding-bottom: 12px; }
+  .sh-tabs { margin-bottom: 18px; }
+  nav.tabs[aria-label="Poll archives"] {
+    margin-left: calc(16px + env(safe-area-inset-left, 0px)); margin-right: calc(16px + env(safe-area-inset-right, 0px));
+  }
+  .sh-tabs-set { gap: 14px; }
+  .sh-tab { padding-block: 9px; font-size: 16px; line-height: 19.5px; }
+  .sh-tabs.pinned .sh-tabs-set { transform: scale(0.903); }
+  .sh-eyebrow { display: none; }
+  .sh-score { gap: 7px; }
+  .sh-num { font-size: 15px; }
+  .sh-colo { grid-template-columns: minmax(0, 1fr); }
+  .sh-about { padding-right: 0; border-right: 0; padding-bottom: 16px; }
+  .sh-ways { padding-left: 0; padding-top: 16px; border-top: 1px solid var(--line); }
+  .sh-band { height: 190px; margin-top: 8px; background-size: auto 320px; }
+}
+@media (prefers-reduced-motion: reduce) { .sh-tab, .sh-tab::after, .sh-cell { transition: none; } }

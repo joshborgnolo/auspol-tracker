@@ -46,6 +46,8 @@ async function main() {
   const lines = body.toString("utf8").trim().split("\n");
   const dates = lines.slice(1).map((l) => l.split(",")[0]).filter((d) => /^\d{4}/.test(d)).sort();
   const sha = crypto.createHash("sha256").update(body).digest("hex").slice(0, 12);
+  // the archive page reads this file, so it follows every refresh
+  await import("./refresh-aeforecasts-archive.mjs");
   console.log(
     `${outRel(OUT)} <- ${outRel(CACHE)}\n` +
       `rows ${lines.length - 1} · span ${dates[0]}..${dates[dates.length - 1]} · sha256 ${sha} · bytes ${body.length}`

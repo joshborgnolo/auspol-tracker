@@ -30,20 +30,22 @@ on:
         type: choice
         options: ['false', 'true']
 
+# the ceiling for poll-agent.yml's update job: it may never ask for more
 permissions:
   contents: write
+  actions: read # poll-agent's transient-streak check reads earlier runs
 
 jobs:
   pending:
     # Cheap gate: exit 0 while a Capital Brief hand-entry awaits its DemosAU
     # PDF (recent DemosAU row with no methodUrl — clears at reconciliation).
     # No node setup needed: demosau-pending.mjs has no dependencies and
-    # ubuntu-latest ships node.
-    runs-on: ubuntu-latest
+    # the runner image ships node.
+    runs-on: ubuntu-24.04
     outputs:
       active: ${{ steps.check.outputs.active }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - id: check
         run: |
           if node .build/demosau-pending.mjs; then

@@ -14,9 +14,10 @@
 # (.build/newspoll-file-missing-prompt.md) — the LLM last resort, never part
 # of the deterministic chain it stands in for.
 #
-# PR-gated (2026-09-05): the filing agent works a repair/ branch with no git
-# credentials; the workflow pushes the branch and opens the PR. Nothing the
-# agent files reaches main or the site until a human merges it.
+# Review-gated (2026-09-05): the filing agent works a repair/ branch with no
+# git credentials; the workflow pushes the branch and files a ci-alert issue
+# with the link to open the PR (Actions may not open PRs in this repo).
+# Nothing the agent files reaches main or the site until a human merges it.
 
 name: newspoll-watch
 
@@ -31,17 +32,18 @@ on:
     - cron: '30 21 * * *' # 07:30 AEST daily — catch-all for off-pattern releases
   workflow_dispatch:
 
+# read-only by default; the filer job declares what it needs
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   watch:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: Pin Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: .nvmrc
 
@@ -49,29 +51,57 @@ jobs:
         run: node .build/check-newspoll-release.mjs
 
   # The watch job's failure IS its message, so its outputs can't be trusted
-  # from a failed job — the gate re-runs the (anonymous, seconds-cheap)
+  # from a failed job — this gate re-runs the (anonymous, seconds-cheap)
   # watchdog and reads the NP_WATCH verdict line for itself. escalate only
-  # ever appears on a release verdict, so a quiet run skips every agent step.
-  file-missing:
+  # ever appears on a release verdict, so a quiet run ends here. It is its
+  # own job so that the filer below joins its concurrency group ONLY when
+  # there is something to file: until 2026-09-25 the filer ran on every watch
+  # run and queued in the shared writers group each time, where GitHub's
+  # one-pending rule cancelled real updater runs behind it.
+  escalation:
     needs: watch
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      escalate: ${{ steps.gate.outputs.escalate }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - name: Pin Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Gate on the escalated watch verdict
+        id: gate
+        run: |
+          node .build/check-newspoll-release.mjs 2>&1 | tee "$RUNNER_TEMP/npwatch.log" || true
+          json=$(grep '^NP_WATCH ' "$RUNNER_TEMP/npwatch.log" | tail -n 1 | sed 's/^NP_WATCH //') || true
+          esc=$(printf '%s' "$json" | node -e 'let s="";process.stdin.on("data",(d)=>s+=d).on("end",()=>{try{const o=JSON.parse(s);process.stdout.write(o.fired===true&&o.escalate===true?"true":"false")}catch{process.stdout.write("false")}})')
+          echo "gate verdict: escalate=$esc"
+          echo "escalate=$esc" >> "$GITHUB_OUTPUT"
+
+  file-missing:
+    needs: escalation
+    if: needs.escalation.outputs.escalate == 'true'
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
-    # The filing agent no longer writes main (PR-gated), but it still pushes
-    # a branch — keep it on the shared main-writers serialisation like every
-    # other push-capable job (see roymorgan-update.yml).
+    # The filer pushes a repair/ BRANCH, never main, so it only has to keep
+    # from racing itself.
     concurrency:
-      group: main-writers
+      group: newspoll-file
       cancel-in-progress: false
     permissions:
       contents: write        # push the repair branch (and only the branch)
-      pull-requests: write   # open the PR
-      issues: write          # circuit-breaker alert issues + labels
+      issues: write          # the review request + circuit-breaker alerts
+      actions: read          # the breaker counts earlier file-missing jobs
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0 (the branch step below strips the persisted credential; v6+ moves it)
 
       - name: Pin Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -84,36 +114,26 @@ jobs:
       - name: Install puppeteer-core (best effort, for the gated share-card redraw)
         run: npm ci --ignore-scripts --no-audit --no-fund || true
 
-      - name: Gate on the escalated watch verdict
-        id: gate
-        run: |
-          node .build/check-newspoll-release.mjs 2>&1 | tee "$RUNNER_TEMP/npwatch.log" || true
-          json=$(grep '^NP_WATCH ' "$RUNNER_TEMP/npwatch.log" | tail -n 1 | sed 's/^NP_WATCH //') || true
-          esc=$(printf '%s' "$json" | node -e 'let s="";process.stdin.on("data",(d)=>s+=d).on("end",()=>{try{const o=JSON.parse(s);process.stdout.write(o.fired===true&&o.escalate===true?"true":"false")}catch{process.stdout.write("false")}})')
-          echo "gate verdict: escalate=$esc"
-          echo "escalate=$esc" >> "$GITHUB_OUTPUT"
-
       # A daily escalated watch would otherwise re-file (and re-spend) on the
-      # same wave forever. Breaker counts repair PRs in 24h.
+      # same wave forever. The breaker counts this job's own runs in 24h.
       - name: Circuit breaker
         id: breaker
-        if: steps.gate.outputs.escalate == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bash .build/repair-gate.sh newspoll-file
+          GH_TOKEN: ${{ github.token }}
+        run: bash .build/repair-gate.sh newspoll-file newspoll-watch.yml file-missing
 
       - name: Alert when the circuit breaker is tripped
-        if: steps.gate.outputs.escalate == 'true' && steps.breaker.outputs.allowed == 'false'
+        if: steps.breaker.outputs.allowed == 'false'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           bash .build/alert-issue.sh \
             "Repair circuit breaker: newspoll-file" \
-            "Three filing-agent PRs in 24h and the unlanded Newspoll wave still isn't in polls.json — [run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). No further agent sessions this window; this needs a human."
+            "Three filing-agent sessions in 24h and the unlanded Newspoll wave still isn't in polls.json — [run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). No further agent sessions this window; this needs a human."
 
       - name: Prepare a credential-free repair branch
         id: branch
-        if: steps.gate.outputs.escalate == 'true' && steps.breaker.outputs.allowed == 'true'
+        if: steps.breaker.outputs.allowed == 'true'
         run: |
           BRANCH="repair/newspoll-file-${GITHUB_RUN_ID}"
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
@@ -126,12 +146,12 @@ jobs:
       # (compromised or accidental) changes the code that runs with
       # contents:write and MATILDA_API_KEY (same rationale as poll-agent.yml).
       - name: Install Matilda CLI
-        if: steps.gate.outputs.escalate == 'true' && steps.breaker.outputs.allowed == 'true'
+        if: steps.breaker.outputs.allowed == 'true'
         run: npm i -g @maincode-ai/matilda-code@0.21.4
 
       # Deliberately NO GITHUB_TOKEN here: the workflow owns every remote op.
       - name: Run the missing-wave filing agent
-        if: steps.gate.outputs.escalate == 'true' && steps.breaker.outputs.allowed == 'true'
+        if: steps.breaker.outputs.allowed == 'true'
         env:
           MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
           CHROME: /usr/bin/google-chrome
@@ -144,27 +164,29 @@ jobs:
           fi
           matilda -p "$(cat .build/newspoll-file-missing-prompt.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80
 
-      - name: Push the repair branch and open a PR
-        if: steps.gate.outputs.escalate == 'true' && steps.breaker.outputs.allowed == 'true'
+      # This repo does not let GitHub Actions open pull requests (Settings →
+      # Actions → "Allow GitHub Actions to create and approve pull requests"
+      # is off), so `gh pr create` here could only ever fail after the push.
+      # The branch goes up, and a ci-alert issue carries the one-click link
+      # to open the PR as a human — which is the review this gate exists for.
+      - name: Push the repair branch and ask for a review
+        if: steps.breaker.outputs.allowed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           BRANCH: ${{ steps.branch.outputs.branch }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           if ! git log --oneline origin/main..HEAD | grep -q .; then
-            echo "the agent left no commits; nothing to PR (its report is in the log above)"
+            echo "the agent left no commits; nothing to review (its report is in the log above)"
             exit 0
           fi
           git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x:%s' "$GH_TOKEN" | base64 -w0)" \
             push origin "HEAD:${BRANCH}"
-          gh label create repair-agent --force --description "Opened by a repair agent; human review required" --color 0E8A16 || true
-          printf '%s\n\n%s\n\n%s\n' \
-            "Automated filing of the unlanded Newspoll wave the watch job escalated — [run](${RUN_URL})." \
-            "**Review before merging.** Nothing here has touched main or the live site; merging deploys it." \
+          COMPARE="https://github.com/${GITHUB_REPOSITORY}/compare/main...${BRANCH}?expand=1"
+          BODY="$(printf '%s\n\n%s\n\n%s\n\n%s\n' \
+            "The filing agent pushed \`${BRANCH}\` for the unlanded Newspoll wave the watch job escalated — [run](${RUN_URL})." \
+            "**[Open the pull request](${COMPARE})** to review it. Nothing here has touched main or the live site; merging deploys it." \
             "Expected shape of an honest filing: one polls.json Newspoll row with a source URL whose figures match the row, plus the built artifacts from the normal validate+build path. No workflow or permissions changes. Reject anything else." \
-            > "$RUNNER_TEMP/pr-body.md"
-          gh pr create \
-            --label repair-agent \
-            --title "Repair: newspoll-file pipeline (run ${GITHUB_RUN_ID})" \
-            --body-file "$RUNNER_TEMP/pr-body.md"
-          gh pr view --json url --jq .url | tee -a "$GITHUB_STEP_SUMMARY"
+            "Delete the branch once it is merged or rejected.")"
+          bash .build/alert-issue.sh "Newspoll filing ready for review" "$BODY"
+          echo "review link: $COMPARE" | tee -a "$GITHUB_STEP_SUMMARY"

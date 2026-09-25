@@ -1,0 +1,16 @@
+# auspol dispatch clock — Cloudflare Worker config. See README.md here.
+# Deploy from this directory: npx wrangler deploy
+name = "auspol-dispatch-clock"
+main = "worker.mjs"
+compatibility_date = "2026-09-01"
+
+# every minute; the Worker decides from schedule.json what is due
+[triggers]
+crons = ["* * * * *"]
+
+[vars]
+REPO = "joshborgnolo/auspol-tracker"
+TABLE_URL = "https://raw.githubusercontent.com/joshborgnolo/auspol-tracker/main/.build/dispatch-clock/schedule.json"
+
+# The dispatch token is a secret, never a var:
+#   npx wrangler secret put GITHUB_TOKEN

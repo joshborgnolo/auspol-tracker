@@ -142,6 +142,7 @@ if [ "$DATA_CHANGED" = false ]; then
       exit 1
     fi
     git add data/polls.json index.html assets/ feed.xml sitemap.xml robots.txt || true
+    stage_dataset
     SKIP_ISO="$(git diff --cached -U0 data/polls.json | grep -o '+ *"20[0-9-]*"' | tr -d '+ " ' | head -1)"
     MSG="Confirm skipped Essential slot $SKIP_ISO"
     if git diff --cached --quiet; then

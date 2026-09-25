@@ -1,31 +1,62 @@
-# Shared push-with-one-rebase-retry for the *-updater.sh wrappers.
+# Shared push-with-retry for the *-updater.sh wrappers.
 #
 # Why this exists: every wrapper extracts, validates, builds, commits, then
-# pushes to main. Another writer (a neighbouring CI workflow, the local
-# launchd backup, a human) can land a commit between our freshness pre-flight
-# and our push — git rejects the push non-fast-forward, and previously the
-# slot simply failed with the wave sitting in a local commit. Now the push is
-# attempted, and on rejection we rebase onto origin/main, regenerate the built
-# artifacts against the merged tree (validate + build), fold them into the
-# commit via --amend, and push ONCE more. A second rejection fails the slot —
-# the next scheduled run redoes the extraction on the fresh base, and the
-# extractors are idempotent.
+# pushes to main. Another writer (a sibling house's CI run, the laptop's
+# launchd copy, a human) can land a commit between our freshness pre-flight
+# and our push — git rejects the push non-fast-forward. Writers no longer
+# queue behind one another in CI (each house has its own concurrency group;
+# a single shared group made GitHub cancel waiting runs), so this function is
+# what makes concurrent writers safe, and it has three rungs:
 #
-# Source AFTER the wrapper defines LOG and log(). Usage:
+#   1. Rebase onto origin/main with the GENERATED files (index.html, feed,
+#      sitemap, robots, assets/, the gen-data dataset) resolved blindly — both
+#      sides rebuilt them, a textual merge of two builds is meaningless, and
+#      the next step regenerates them from the merged data anyway. Before
+#      2026-09-25 those files conflicted on every race, so the retry failed
+#      exactly when it was needed (DemosAU, 2026-09-17).
+#   2. Rebuild against the merged tree (validate + refresh_site), amend,
+#      push. A rebase that leaves nothing of ours — the other writer landed
+#      the same wave — is success with nothing to push.
+#   3. A rebase that conflicts on DATA (two houses' rows side by side in
+#      polls.json), or a second rejection: reset to origin/main and re-run
+#      the whole wrapper ONCE on the fresh base. The extractors are
+#      idempotent, so the re-run re-derives our rows on top of theirs. Only
+#      a race lost twice fails the slot, logged as "FAIL push race" — which
+#      .build/classify-failure.mjs treats as transient, not as a defect.
+#
+# Source AFTER the wrapper defines REPO, LOG and log(). Usage:
 #   push_main <commit-message> <file> [<file>...]
 # where <file>... is exactly the set the commit was staged from; the amend
-# path re-stages it so regenerated artifacts land in the same commit. Pass
-# index.html in the list whenever the commit carries it — that is the signal
-# that the merged tree needs a rebuild before the retry.
+# path re-stages it so regenerated artifacts land in the same commit. A list
+# naming any generated file (index.html, assets/…) is the signal that the
+# merged tree needs a rebuild before the retry.
 #
 # Agent sessions (AUSPOL_PR_GATE=1, set by agent-repair.yml's repair job and
 # by newspoll-watch.yml's filer): the agent works credential-free and the
 # calling workflow owns every remote op, so this function must NOT push — it
 # leaves the commit local and returns success so the wrapper pipeline
-# completes. agent-repair.yml's deterministic post-gate then reviews the
-# commits and pushes HEAD:main itself (the agent commits straight on main);
-# the Newspoll filer's session instead runs on a repair branch its caller
-# pushes afterwards.
+# completes. agent-repair.yml's publish job then gates the commits in a
+# fresh job and pushes them itself; the Newspoll filer's session instead
+# runs on a repair branch its caller pushes afterwards.
+
+# Generated paths a rebase may resolve blindly (rung 1), as gitattributes
+# lines. prediction/ is NOT here: refresh-prediction.mjs, not build.mjs,
+# writes it, so a conflict there takes rung 3 and the re-run regenerates it.
+push_main_regen_attrs() {
+  printf '%s merge=auspol-regen\n' index.html feed.xml sitemap.xml robots.txt \
+    'assets/**' '.build/newtracker/assets/**'
+}
+
+# The wrapper that sourced this file, and its arguments, for rung 3. Only a
+# .build wrapper can be re-run; an inline workflow step that sources this
+# file (citation-check, np-score) commits files nobody else writes, so it
+# never needs to.
+PUSH_MAIN_SELF=""
+case "$0" in
+  *-updater.sh|*prediction-refresh.sh) PUSH_MAIN_SELF="${REPO:-.}/.build/$(basename "$0")" ;;
+esac
+PUSH_MAIN_ARGV=("$@")
+
 push_main() {
   local msg="$1"; shift
   if [ "${AUSPOL_PR_GATE:-}" = "1" ]; then
@@ -35,29 +66,41 @@ push_main() {
   if git push origin HEAD:main >> "$LOG" 2>&1; then
     return 0
   fi
-  log "push rejected; rebasing onto origin/main and retrying once"
-  if ! git pull --rebase origin main >> "$LOG" 2>&1; then
+  log "push rejected; rebasing onto origin/main (generated files are rebuilt, not merged)"
+  local f rebuild=false
+  for f in "$@"; do
+    case "$f" in index.html|feed.xml|sitemap.xml|robots.txt|assets|assets/*) rebuild=true ;; esac
+  done
+  # rung 1 — the attributes live in a scratch file inside .git, named by -c
+  # for this one command, so no human merge ever inherits the blind driver
+  local attrs
+  attrs="$(git rev-parse --git-dir)/auspol-regen.attributes"
+  push_main_regen_attrs > "$attrs"
+  if ! git -c core.attributesFile="$attrs" \
+         -c merge.auspol-regen.name="generated file: rebuilt after the rebase" \
+         -c merge.auspol-regen.driver=true \
+         pull --rebase origin main >> "$LOG" 2>&1; then
     git rebase --abort >> "$LOG" 2>&1 || true
-    log "FAIL rebase onto origin/main (commit kept locally: $msg)"
+    push_main_rerun "the rebase onto origin/main conflicted on data"
+    log "FAIL push race: the rebase onto origin/main conflicted on data (commit kept locally: $msg)"
     return 1
   fi
-  # If the commit carries the generated index.html, the merged tree's data
-  # may differ from what those artifacts were built against (the other
-  # writer may have landed data too) — re-validate and rebuild before the
-  # retry so index.html/feed/sitemap reflect the merged polls.json.
-  local f rebuild=false
-  for f in "$@"; do [ "$f" = "index.html" ] && rebuild=true; done
+  # rung 2
+  if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ]; then
+    log "nothing of ours left after the rebase — origin/main already carries it; nothing to push"
+    return 0
+  fi
   if $rebuild; then
     if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
       log "FAIL validate after rebase; retry abandoned (commit kept locally)"
       return 1
     fi
-    if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
+    # the full redraw, not a bare build: the merged tree may carry the other
+    # writer's wave, which moves the card and favicon too
+    if ! refresh_site; then
       log "FAIL build after rebase; retry abandoned (commit kept locally)"
       return 1
     fi
-    # build.mjs rewrites hashed asset layers; catch renames/deletions too
-    git add assets/ >> "$LOG" 2>&1 || true
   fi
   if ! git add "$@" >> "$LOG" 2>&1; then
     log "FAIL git add after rebase"
@@ -68,10 +111,28 @@ push_main() {
     return 1
   fi
   if ! git push origin HEAD:main >> "$LOG" 2>&1; then
-    log "FAIL git push after rebase (commit kept locally)"
+    push_main_rerun "the push after the rebase was rejected too"
+    log "FAIL push race: the push after the rebase was rejected too (commit kept locally: $msg)"
     return 1
   fi
   return 0
+}
+
+# Rung 3: reset to origin/main and exec the wrapper again, once. Returns (1)
+# only when a re-run is not possible — no wrapper to re-run, or this IS the
+# re-run — so the caller falls through to its FAIL line.
+push_main_rerun() {
+  [ -n "$PUSH_MAIN_SELF" ] && [ -f "$PUSH_MAIN_SELF" ] || return 1
+  [ "${AUSPOL_PUSH_RERUN:-}" = "1" ] && return 1
+  log "push race ($1); resetting to origin/main and re-running $(basename "$PUSH_MAIN_SELF") once — the extractors are idempotent"
+  git fetch -q origin >> "$LOG" 2>&1 || true
+  git reset -q --hard origin/main >> "$LOG" 2>&1 || return 1
+  # exec skips the EXIT trap, so hand the writers lock back first — the
+  # re-run takes it again
+  [ -n "${SLOT_LOCK_DIR:-}" ] && rm -rf "$SLOT_LOCK_DIR"
+  trap - EXIT
+  export AUSPOL_PUSH_RERUN=1
+  exec bash "$PUSH_MAIN_SELF" ${PUSH_MAIN_ARGV[@]+"${PUSH_MAIN_ARGV[@]}"}
 }
 
 # ---------------------------------------------------------------------------
@@ -85,7 +146,8 @@ push_main() {
 # the working file. mkdir is atomic, so it is the mutex; a pid file inside
 # lets a later slot reap the lock of a wrapper that died mid-run.
 #
-# Usage: acquire_slot_lock   — takes the lock or exits 0 (slot skipped).
+# Usage: acquire_slot_lock   — takes the lock (waiting up to SLOT_LOCK_WAIT
+# for a live holder) or exits 0 (slot skipped).
 # The lock releases itself via an EXIT trap.
 #
 # SLOT_LOCK_MAX_AGE is the staleness ceiling: a live pid is NOT proof of a
@@ -95,35 +157,76 @@ push_main() {
 # numbers recycle, and kill -0 cannot tell a wedged wrapper from an
 # innocent process that inherited the number.
 SLOT_LOCK_MAX_AGE=2700 # 45 min — the longest legitimate wrapper run is well under this
+# SLOT_LOCK_WAIT: how long to wait for a LIVE holder before skipping. Several
+# plists share morning slots, and skipping on first contact dropped real
+# slots (2026-09-23 06:12: Roy Morgan and Resolve both skipped behind one
+# holder). Waiting costs nothing — the waiter's freshness_sync runs after the
+# holder's push. The lock probe sets 0 so it answers instantly.
+SLOT_LOCK_WAIT="${SLOT_LOCK_WAIT:-900}"
+SLOT_LOCK_POLL="${SLOT_LOCK_POLL:-20}"
 SLOT_LOCK_DIR=""
 acquire_slot_lock() {
   SLOT_LOCK_DIR="$REPO/.build/locks/writers.lock"
-  if [ -d "$SLOT_LOCK_DIR" ]; then
-    local oldpid=""
-    [ -f "$SLOT_LOCK_DIR/pid" ] && oldpid="$(cat "$SLOT_LOCK_DIR/pid" 2>/dev/null)"
-    if [ -n "$oldpid" ] && kill -0 "$oldpid" 2>/dev/null; then
-      local lock_mtime lock_age=999999
-      lock_mtime="$(stat -f %m "$SLOT_LOCK_DIR" 2>/dev/null || stat -c %Y "$SLOT_LOCK_DIR" 2>/dev/null)"
-      [ -n "$lock_mtime" ] && lock_age=$(( $(date +%s) - lock_mtime ))
-      if [ "$lock_age" -lt "$SLOT_LOCK_MAX_AGE" ]; then
-        log "another wrapper holds the writers lock (pid $oldpid); skipping slot"
-        exit 0
-      fi
-      log "WARN writers lock held $(( lock_age / 60 ))min by live pid $oldpid (> $(( SLOT_LOCK_MAX_AGE / 60 ))min ceiling) — treating as wedged and breaking"
-    else
-      log "reaping stale writers lock (pid ${oldpid:-unknown} no longer running)"
-    fi
-    rm -rf "$SLOT_LOCK_DIR"
-  fi
   # The locks parent is gitignored, so it never exists in a fresh checkout —
   # create it explicitly or the atomic mkdir below fails at every slot.
   mkdir -p "$(dirname "$SLOT_LOCK_DIR")" 2>/dev/null || true
-  if ! mkdir "$SLOT_LOCK_DIR" 2>/dev/null; then
+  local waited=0 oldpid lock_mtime lock_age
+  while :; do
+    if [ -d "$SLOT_LOCK_DIR" ]; then
+      oldpid=""
+      [ -f "$SLOT_LOCK_DIR/pid" ] && oldpid="$(cat "$SLOT_LOCK_DIR/pid" 2>/dev/null)"
+      lock_age=999999
+      lock_mtime="$(stat -f %m "$SLOT_LOCK_DIR" 2>/dev/null || stat -c %Y "$SLOT_LOCK_DIR" 2>/dev/null)"
+      [ -n "$lock_mtime" ] && lock_age=$(( $(date +%s) - lock_mtime ))
+      # A holder mkdirs, then writes its pid: a pidless dir seconds old is
+      # a live holder mid-acquire, not a stale lock to reap.
+      if [ -z "$oldpid" ] && [ "$lock_age" -lt 10 ] && [ "$waited" -lt "$SLOT_LOCK_WAIT" ]; then
+        sleep 1; waited=$(( waited + 1 ))
+        continue
+      fi
+      if [ -n "$oldpid" ] && kill -0 "$oldpid" 2>/dev/null; then
+        if [ "$lock_age" -lt "$SLOT_LOCK_MAX_AGE" ]; then
+          if [ "$waited" -lt "$SLOT_LOCK_WAIT" ]; then
+            [ "$waited" -eq 0 ] && log "writers lock held by pid $oldpid; waiting up to ${SLOT_LOCK_WAIT}s"
+            sleep "$SLOT_LOCK_POLL"; waited=$(( waited + SLOT_LOCK_POLL ))
+            continue
+          fi
+          log "another wrapper holds the writers lock (pid $oldpid); skipping slot"
+          exit 0
+        fi
+        log "WARN writers lock held $(( lock_age / 60 ))min by live pid $oldpid (> $(( SLOT_LOCK_MAX_AGE / 60 ))min ceiling) — treating as wedged and breaking"
+      else
+        log "reaping stale writers lock (pid ${oldpid:-unknown} no longer running)"
+      fi
+      rm -rf "$SLOT_LOCK_DIR"
+    fi
+    if mkdir "$SLOT_LOCK_DIR" 2>/dev/null; then
+      break
+    fi
+    # A sibling won the mkdir race between our check and our mkdir: its lock
+    # dir now exists, so go round and wait on it. No dir at all means the
+    # mkdir itself is broken — the 2026-09-05..07 outage signature the lock
+    # probe greps for — so fail fast with that exact line.
+    if [ -d "$SLOT_LOCK_DIR" ] && [ "$waited" -lt "$SLOT_LOCK_WAIT" ]; then
+      sleep 1; waited=$(( waited + 1 ))
+      continue
+    fi
     log "writers lock lost to a concurrent wrapper; skipping slot"
     exit 0
-  fi
+  done
+  [ "$waited" -gt 0 ] && log "writers lock acquired after waiting ${waited}s"
   echo $$ > "$SLOT_LOCK_DIR/pid"
   trap 'rm -rf "$SLOT_LOCK_DIR"' EXIT
+  # The laptop's launchd jobs run in a clone nobody edits (run.sh sets
+  # AUSPOL_RUNNER_CLONE=1; see .build/install-launchd.sh). A dirty tree
+  # there can only be the leftovers of a run that died mid-write — a lid
+  # closed mid-crawl — and the wrappers' dirty-tree guard would then refuse
+  # every later slot. Discard them, under the lock so no live run is
+  # touched. Never in a checkout people work in: there the guard stands.
+  if [ "${AUSPOL_RUNNER_CLONE:-}" = "1" ] && ! { git diff --quiet && git diff --cached --quiet; }; then
+    log "runner clone: discarding an interrupted run's uncommitted leftovers"
+    git reset -q --hard HEAD >> "$LOG" 2>&1 || true
+  fi
 }
 
 # ---------------------------------------------------------------------------
@@ -198,5 +301,62 @@ refresh_site() {
   if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
     log "FAIL build (card restamp)"; return 1
   fi
+  stage_dataset
   return 0
+}
+
+# ---------------------------------------------------------------------------
+# stage_dataset — gen-data's two outputs are tracked, and every build
+# rewrites them. A commit that carries the rebuilt index.html has to carry
+# them too, or it leaves them modified in the working tree. A CI runner
+# never notices; the laptop's next launchd slot finds the tree dirty and
+# refuses to run, and so does every slot after it, until some unrelated
+# commit happens to carry the files (2026-09-23: the 06:55 News24 commit
+# left the dataset behind and the 12:00 slot refused). refresh_site and
+# push_main's rebuild stage them; a wrapper that runs build.mjs itself calls
+# this before committing.
+GEN_DATASET=".build/newtracker/assets/9f09dca2-bd46-49a8-8ae1-51847608cf92.js .build/newtracker/assets/cycle-source.json"
+stage_dataset() {
+  # shellcheck disable=SC2086 # two fixed paths, split on purpose
+  git add $GEN_DATASET >> "$LOG" 2>&1 || true
+  # build.mjs names cycle-source and the webfonts by content hash and sweeps
+  # the old names; the wrappers' explicit add lists name neither, so a build
+  # that renamed one would commit an index.html pointing at an unstaged
+  # file. Stage assets/ whole (adds, renames and deletions) — the wrappers
+  # only get here on a clean tree, so nothing foreign rides along.
+  git add assets/ >> "$LOG" 2>&1 || true
+}
+
+# ---------------------------------------------------------------------------
+# refresh_crosstabs — the Snapshot's crosstab panels ride along with a data
+# update. .build/vote-switching.mjs ("Where One Nation's new voters came
+# from") and .build/demographics.mjs ("The vote by age, gender and
+# education") read the new wave's tables into data/vote-switching.json and
+# data/demographics.json; call this before refresh_site so the page carries
+# them, and stage those files with the rest.
+#
+# Non-fatal by design: a table that can't be read yet stays pending in the
+# script and is retried by later runs and by the weekly crosstabs-update,
+# whose wrapper (not this) fails once a wave has been pending too long. A
+# VI update never waits on a crosstab. Each pending wave's reason goes to
+# the log, then the script's status line.
+#
+# Usage: refresh_crosstabs vote-switching demographics
+refresh_crosstabs() {
+  local b out
+  for b in "$@"; do
+    if out="$(node ".build/$b.mjs" 2>&1)"; then
+      echo "$out" | grep '^\(pending\|dropped\) ' | while IFS= read -r l; do log "$b: $l"; done
+      log "$(echo "$out" | tail -1)"
+    else
+      log "WARN $b did not finish: $(node_error "$out")"
+    fi
+  done
+  return 0
+}
+
+# The line worth logging from a node script that failed: the error it threw
+# (Node prints the stack, then its own version, last), else its last line.
+node_error() {
+  printf '%s\n' "$1" | grep -m1 -E '^([A-Za-z]*Error|Error)\b' || printf '%s\n' "$1" | tail -1
 }

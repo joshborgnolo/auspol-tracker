@@ -81,8 +81,8 @@ Generalised pattern (reusable beyond this file):
 
 ## Related
 
-- **ci-main-writer-races** — the push-side counterpart (`main-writers` concurrency group +
-  `push_main()` retry in `.build/git-push-main.sh`); commit groups vs pull-side YAML steps.
+- **ci-main-writer-races** — the push-side counterpart (per-workflow concurrency groups +
+  `push_main()` race handling in `.build/git-push-main.sh`); commit groups vs pull-side YAML steps.
 - **launchd-scheduled-data-pipeline** — wrapper anatomy; the local mirror jobs re-convert
   cleanly because they're unload-loaded.
 - **auspol-build-pipeline** — never hand-edit `index.html`; build.mjs change verified by

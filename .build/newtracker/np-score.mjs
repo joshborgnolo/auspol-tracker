@@ -53,7 +53,18 @@
    against. The log stores claims only; both measures derive at report
    time, so a scoring change is retroactive across the whole record.
 
+   Missed bets. A tuple is only seen if the scorer runs while its slot is
+   open, and runs do get missed (12 of 14 cancelled in Sep 2026, before
+   np-score left the main-writers queue): Roy Morgan's 14 Sep slot never
+   entered the ledger. So when a house's new live tuple is anchored more
+   than one release past its previous tuple, each release in between gets
+   its bet RECONSTRUCTED - np-replay.mjs rebuilds the data as it stood the
+   morning after that release and runs the shipped projection on it - and
+   logged with `reconstructed: true`, timestamped that morning. Today's
+   code, not the code that was live then, so the ledger marks them.
+
    Usage:   node .build/newtracker/np-score.mjs            append new tuples
+            node .build/newtracker/np-score.mjs --backfill reconstruct every gap already in the log
             node .build/newtracker/np-score.mjs --report   rewrite the report
    Both are idempotent and exit 0 on the happy path (1 = internal error).
    Scheduled daily by .github/workflows/np-score.yml. Env seams for testing:
@@ -63,6 +74,7 @@
 
 import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { cleanup, replayAsOf } from "./np-replay.mjs";
 
 /* fileURLToPath, not URL.pathname: the working copy's path may carry spaces,
    and pathname leaves them percent-encoded */
@@ -95,19 +107,23 @@ const sydNow = () => {
   }
 };
 
-function liveTuples() {
-  const { rows } = window.AP.nextPolls();
+/* one tuple per house from a projection's rows: its FIRST projected slot */
+function tuplesOf(rows, ts, syd) {
   const out = {};
   for (const r of rows) {
     if (r.ahead !== 0 || out[r.pollster]) continue;
+    /* anchored on a provisional wave's estimated publication: not a bet
+       worth logging - the house's real row replaces it within a day, and
+       the tuple it then yields is the one the ledger can resolve */
+    if (r.lastProvisional) continue;
     /* loose rows key their own window differently (release is the window's
        midpoint), but [release-winHalf, release+winHalf] recovers open/close
        for every form - dated, loose, calMonth - so one shape serves all. */
     out[r.pollster] = {
-      ts: new Date().toISOString(),
-      syd: sydNow(),
+      ts,
+      syd,
       pollster: r.pollster,
-      kind: r.calMonth ? "calMonth" : r.loose ? "loose" : "dated",
+      kind: r.calMonth ? "calMonth" : r.summer ? "summer" : r.loose ? "loose" : "dated",
       anchor: r.last,
       release: iso(r.release),
       open: iso(r.release - (r.winHalf || 0) * DAY),
@@ -120,28 +136,99 @@ function liveTuples() {
   return out;
 }
 
+const liveTuples = () => tuplesOf(window.AP.nextPolls().rows, new Date().toISOString(), sydNow());
+
+/* a house's release keys, oldest first - the recorded published date, else
+   the fieldwork end: the same key the report resolves on and gen-data
+   anchors on */
+function releaseKeys(polls, house) {
+  return [...new Set((polls.polls || []).filter((p) => p.pollster === house)
+    .map((p) => (p.published || "").slice(0, 10) || p.date))].sort();
+}
+
+/* the bets for every release strictly between two logged anchors, replayed
+   as of the morning after each (06:00 Sydney ~ 20:00Z the day before is
+   close enough for ordering; the stamp says which morning) */
+function reconstructGap(srcText, polls, house, fromAnchor, toAnchor) {
+  const K = releaseKeys(polls, house);
+  const a = K.indexOf(fromAnchor), b = K.indexOf(toAnchor);
+  if (a < 0 || b <= a + 1) return [];
+  const out = [];
+  for (const key of K.slice(a + 1, b)) {
+    const morning = new Date(Date.parse(key) + DAY);
+    const stamp = iso(morning.getTime());
+    let rows;
+    try { ({ rows } = replayAsOf(srcText, key)); } catch (e) { continue; }
+    const t = tuplesOf(rows, `${stamp}T06:00:00+10:00`, `${stamp} 06:00`)[house];
+    // only a bet anchored on THIS release is the one that went unlogged
+    if (t && t.anchor === key) out.push({ ...t, ts: new Date(t.ts).toISOString(), reconstructed: true });
+  }
+  return out;
+}
+
 function readLog() {
   if (!existsSync(JSONL)) return [];
   return readFileSync(JSONL, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
 }
 
-function cmdLog() {
+/* each house's newest tuple by timestamp - not by file order, since
+   reconstructed tuples are appended after the live ones they precede */
+function latestByHouse(log) {
   const last = {};
-  for (const rec of readLog()) last[rec.pollster] = rec;
+  for (const rec of log) if (!last[rec.pollster] || rec.ts > last[rec.pollster].ts) last[rec.pollster] = rec;
+  return last;
+}
+
+function cmdLog() {
+  const last = latestByHouse(readLog());
   const live = liveTuples();
-  let appended = 0;
+  const srcText = readFileSync(POLLS, "utf8");
+  const polls = JSON.parse(srcText);
+  let appended = 0, rebuilt = 0;
   const names = [];
   for (const [pollster, t] of Object.entries(live)) {
     const prev = last[pollster];
     const changed = !prev || prev.release !== t.release || prev.winHalf !== t.winHalf || prev.rolled !== t.rolled;
     if (!changed) continue;
+    if (prev) for (const g of reconstructGap(srcText, polls, pollster, prev.anchor, t.anchor)) {
+      appendFileSync(JSONL, JSON.stringify(g) + "\n");
+      rebuilt++;
+    }
     appendFileSync(JSONL, JSON.stringify(t) + "\n");
     appended++;
     names.push(pollster);
   }
+  cleanup();
+  if (rebuilt) console.log(`np-score: reconstructed ${rebuilt} missed bet(s) by replay`);
   console.log(appended
     ? `np-score: appended ${appended} tuple(s) [${names.join(", ")}] to ${JSONL}`
     : `np-score: no tuple changes across ${Object.keys(live).length} houses`);
+}
+
+/* One-off repair: reconstruct every gap already in the log - consecutive
+   tuples of a house whose anchors skip a release. Idempotent: a bet that is
+   already logged (same house and anchor) is never added twice. */
+function cmdBackfill() {
+  const log = readLog();
+  const srcText = readFileSync(POLLS, "utf8");
+  const polls = JSON.parse(srcText);
+  const have = new Set(log.map((e) => `${e.pollster}|${e.anchor}`));
+  const byHouse = {};
+  for (const e of log) (byHouse[e.pollster] ||= []).push(e);
+  let rebuilt = 0;
+  for (const [house, list] of Object.entries(byHouse)) {
+    list.sort((a, b) => (a.ts < b.ts ? -1 : 1));
+    for (let i = 0; i + 1 < list.length; i++) {
+      for (const g of reconstructGap(srcText, polls, house, list[i].anchor, list[i + 1].anchor)) {
+        if (have.has(`${house}|${g.anchor}`)) continue;
+        appendFileSync(JSONL, JSON.stringify(g) + "\n");
+        have.add(`${house}|${g.anchor}`);
+        rebuilt++;
+      }
+    }
+  }
+  cleanup();
+  console.log(`np-score: backfill reconstructed ${rebuilt} missed bet(s)`);
 }
 
 /* --- resolution -------------------------------------------------------- */
@@ -259,6 +346,8 @@ function cmdReport() {
     "A **hit** published inside the window, a **miss** outside it; a publisher-confirmed absence (**skip**) and a " +
     "data-side supersede (**void**) count neither for nor against. Rolled slots (moved by a confirmed skip) tally separately. " +
     "The newest entry per house is the live **pending** bet. " +
+    "A bet the daily run missed is **reconstructed** by replaying the data as it stood the morning after the release before it " +
+    "(today's code, not the code live then) and marked so in the ledger. " +
     "Hit-rate is not comparable across houses on its own - an exact-day house and a ±9-day house face different tests - " +
     "so the table also carries each house's **median midpoint error**: days from the window's centre to the wave's " +
     "publication, the like-for-like accuracy number (lower is better).");
@@ -279,14 +368,15 @@ function cmdReport() {
     `${PE != null ? ` · median midpoint error ${fmtErr(PE)}` : ""}` +
     `${R.h + R.m ? ` · ${R.h}/${R.h + R.m} rolled` : ""}` +
     `${counts("skip") ? ` · ${counts("skip")} skip` : ""}${counts("void") ? ` · ${counts("void")} void` : ""}` +
-    ` · ${counts("pending")} pending**`);
+    ` · ${counts("pending")} pending**` +
+    `${resolved.some((r) => r.reconstructed) ? ` (${resolved.filter((r) => r.reconstructed).length} reconstructed)` : ""}`);
   line.push("");
   line.push("## Ledger");
   line.push("");
   line.push("| logged (Sydney) | house | slot | window | rolled | verdict |");
   line.push("|---|---|---|---|---|---|");
   for (const r of resolved) {
-    line.push(`| ${r.syd} | ${r.house} | ${r.kind === "calMonth" ? r.release.slice(0, 7) + " (month)" : fmt(r.release)} | ${fmt(r.open)} - ${fmt(r.close)} | ${r.rolled ? "yes" : ""} | ${r.verdict}${r.note ? ` - ${r.note}` : ""} |`);
+    line.push(`| ${r.syd}${r.reconstructed ? " (reconstructed)" : ""} | ${r.house} | ${r.kind === "calMonth" ? r.release.slice(0, 7) + " (month)" : fmt(r.release)} | ${fmt(r.open)} - ${fmt(r.close)} | ${r.rolled ? "yes" : ""} | ${r.verdict}${r.note ? ` - ${r.note}` : ""} |`);
   }
   line.push("");
   writeFileSync(REPORT, line.join("\n"));
@@ -295,6 +385,7 @@ function cmdReport() {
 
 try {
   if (process.argv[2] === "--report") cmdReport();
+  else if (process.argv[2] === "--backfill") cmdBackfill();
   else cmdLog();
 } catch (e) {
   console.error("np-score: " + (e && e.message ? e.message : e));
