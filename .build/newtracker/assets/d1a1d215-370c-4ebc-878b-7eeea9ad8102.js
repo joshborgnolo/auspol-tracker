@@ -6322,6 +6322,25 @@ function infoTerms(D) {
       days. The figure is recalculated every time the site rebuilds, so it can move on a quiet
       day – but only because weights change, never because it’s being smoothed towards
       anything.</>) },
+    /* The ▲ ▼ figures measure against three different things depending on
+       where they sit, and the panels only say which in a hover title. */
+    { id: "changes", q: "What are the ▲ and ▼ figures measured against?", a: (
+      <>It depends on where they sit.
+      <ul className="info-list">
+        <li><strong>Beside a figure in a panel</strong> (the two-party headline, preferred prime
+        minister, leader approval, national direction, the undecided share, and where One
+        Nation’s new voters came from): the change on a month ago. It is the same estimate, built
+        the same way from the polls of 30 days earlier. When the move is smaller than its margin
+        of error, the headline says “within the margin”.</li>
+        <li><strong>On the primary vote chips:</strong> the change since the 2025 election, where
+        every line on that chart begins.</li>
+        <li><strong>Inside a poll’s breakdown and in the All polls table:</strong> the change on
+        that pollster’s own previous poll. It doesn’t pass through the average at all.</li>
+      </ul>
+      Hovering over any of them names its reference, and the date where there is one. A green ▲
+      is a rise and a red ▼ a fall: a direction, not a verdict on anyone. The undecided share
+      reverses the colours, since more undecided voters is the less settled reading, and where
+      One Nation’s voters came from stays grey either way.</>) },
     { id: "polls-disagree", q: "Two new polls say different things. Which of them is right?", a: (
       <>Usually both are doing their job. Each is a sample, so two honest polls of an unchanged
       electorate will differ. The question is whether they differ by more than luck allows, and
@@ -6446,6 +6465,8 @@ function InfoBack({ onBack, backLabel }) {
    site open terms by id, and a link that once landed on "Seat projection"
    should now land on the question that absorbed it. */
 const INFO_ALIAS = {
+  "change-arrows": "changes",
+  "deltas": "changes",
   "individual-poll": "what-am-i-looking-at",
   "polling-error": "how-wrong-are-the-polls",
   "seat-projection": "two-party-to-seats",

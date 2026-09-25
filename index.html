@@ -1360,6 +1360,8 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .info { max-width: 66ch; }
 @media (min-width: 1100px) { .info { max-width: 72ch; } }
 .info [id] { scroll-margin-top: 130px; }
+.info-list { margin: 8px 0 8px; padding-left: 20px; }
+.info-list li { margin: 0 0 6px; }
 .info-h { margin: 2px 0 18px; }
 .info-h-faq { margin-top: 34px; padding-top: 22px;
   border-top: 1px solid var(--line-2); }
@@ -40333,8 +40335,12 @@ function PrimaryVotePanel({
     fmt: v => v.toFixed(1)
   }), React.createElement("p", {
     className: "table-hint"
-  }, "Each dot is one published poll\u2019s first-preference figure; the lines are monthly averages. Use the chips to isolate one party."), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "The lines are weighted by sample and adjusted for each house\u2019s lean."), React.createElement(React.Fragment, null, "Each chip carries a party\u2019s current share and its change since the 2025 election, where every line here begins. A party on its own draws with the 95% interval around its line", solo ? ", shaded here" : "", ".")]
+  }, "Each dot is one published poll\u2019s first-preference figure; the lines are monthly averages. Each chip\u2019s \u25B2 \u25BC is its", " ", React.createElement("button", {
+    type: "button",
+    className: "hi-term",
+    onClick: () => window.AP.openTerm && window.AP.openTerm("changes", "Primary vote")
+  }, "change since the 2025 election"), ". Use the chips to isolate one party."), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "The lines are weighted by sample and adjusted for each house\u2019s lean."), React.createElement(React.Fragment, null, "The 2025 election is where every line here begins. A party on its own draws with the 95% interval around its line", solo ? ", shaded here" : "", ".")]
   }));
 }
 const eventOn = iso => (window.AP.D.events || []).find(e => e.date === iso) || null;
@@ -49991,6 +49997,12 @@ function infoTerms(D) {
     q: "Why did the headline move when no new poll came out?",
     a: React.createElement(React.Fragment, null, "Because polls age. A poll\u2019s weight halves every seven days, so between releases the newest polls steadily take over from older ones, and a poll leaves the average altogether after 21 days. The figure is recalculated every time the site rebuilds, so it can move on a quiet day \u2013 but only because weights change, never because it\u2019s being smoothed towards anything.")
   }, {
+    id: "changes",
+    q: "What are the ▲ and ▼ figures measured against?",
+    a: React.createElement(React.Fragment, null, "It depends on where they sit.", React.createElement("ul", {
+      className: "info-list"
+    }, React.createElement("li", null, React.createElement("strong", null, "Beside a figure in a panel"), " (the two-party headline, preferred prime minister, leader approval, national direction, the undecided share, and where One Nation\u2019s new voters came from): the change on a month ago. It is the same estimate, built the same way from the polls of 30 days earlier. When the move is smaller than its margin of error, the headline says \u201Cwithin the margin\u201D."), React.createElement("li", null, React.createElement("strong", null, "On the primary vote chips:"), " the change since the 2025 election, where every line on that chart begins."), React.createElement("li", null, React.createElement("strong", null, "Inside a poll\u2019s breakdown and in the All polls table:"), " the change on that pollster\u2019s own previous poll. It doesn\u2019t pass through the average at all.")), "Hovering over any of them names its reference, and the date where there is one. A green \u25B2 is a rise and a red \u25BC a fall: a direction, not a verdict on anyone. The undecided share reverses the colours, since more undecided voters is the less settled reading, and where One Nation\u2019s voters came from stays grey either way.")
+  }, {
     id: "polls-disagree",
     q: "Two new polls say different things. Which of them is right?",
     a: React.createElement(React.Fragment, null, "Usually both are doing their job. Each is a sample, so two honest polls of an unchanged electorate will differ. The question is whether they differ by more than luck allows, and the ", xref("poll-disagreement", "polls disagree", "Poll disagreement"), " panel answers it. A gap that comes from method rather than luck \u2013 one pollster leaning the same way poll after poll \u2013 shows up as a ", xref("house-effect", "polls disagree", "house effect"), ", which the aggregate measures and removes instead of splitting the difference.")
@@ -50092,6 +50104,8 @@ function InfoBack({
   })), "Back to ", backLabel || "where you were");
 }
 const INFO_ALIAS = {
+  "change-arrows": "changes",
+  "deltas": "changes",
   "individual-poll": "what-am-i-looking-at",
   "polling-error": "how-wrong-are-the-polls",
   "seat-projection": "two-party-to-seats",
@@ -52153,7 +52167,11 @@ function Hero({
   }), React.createElement("span", {
     className: "hero-sub-note",
     ref: subNoteRef
-  }, m.real || onImpL && onImpL.aPrev != null || altL && altL.aPrev != null ? "vs 1 month ago" : "vs previous reading", unc && unc.changeSig === false && React.createElement("span", {
+  }, "vs", " ", React.createElement("button", {
+    type: "button",
+    className: "hi-term",
+    onClick: () => window.AP.openTerm && window.AP.openTerm("changes", "two-party preferred")
+  }, m.real || onImpL && onImpL.aPrev != null || altL && altL.aPrev != null ? "1 month ago" : "previous reading"), unc && unc.changeSig === false && React.createElement("span", {
     className: "hero-caveat"
   }, " (within ", subTight ? "" : "the ", React.createElement("button", {
     type: "button",

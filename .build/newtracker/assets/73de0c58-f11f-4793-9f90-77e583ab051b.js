@@ -1457,8 +1457,13 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
           <div className="hero-sub" ref={subRef}>
             <Delta value={monthDelta} suffix={Math.abs(monthDelta) === 1 ? " pt" : " pts"} small roll spinIn />
             <span className="hero-sub-note" ref={subNoteRef}>
-              {(m.real || (onImpL && onImpL.aPrev != null) || (altL && altL.aPrev != null))
-                ? "vs 1 month ago" : "vs previous reading"}
+              {/* the reference is a term: the ▲▼ figures across the page
+                  measure against three different things, and this opens the
+                  entry that says which is which */}
+              vs{" "}<button type="button" className="hi-term"
+                onClick={() => window.AP.openTerm && window.AP.openTerm("changes", "two-party preferred")}>
+                {(m.real || (onImpL && onImpL.aPrev != null) || (altL && altL.aPrev != null))
+                  ? "1 month ago" : "previous reading"}</button>
               {/* A month-on-month move smaller than its own interval is not a
                   finding. Say so next to the arrow, not three scrolls down -
                   and let the margin the caveat invokes carry the reader to its

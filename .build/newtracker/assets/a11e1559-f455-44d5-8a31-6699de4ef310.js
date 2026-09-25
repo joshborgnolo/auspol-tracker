@@ -346,13 +346,15 @@ function PrimaryVotePanel({ rangeId }) {
       />
       <p className="table-hint">
         Each dot is one published poll’s first-preference figure; the lines are
-        monthly averages. Use the chips to isolate one party.
+        monthly averages. Each chip’s ▲ ▼ is its{" "}
+        <button type="button" className="hi-term"
+                onClick={() => window.AP.openTerm && window.AP.openTerm("changes", "Primary vote")}>change
+          since the 2025 election</button>. Use the chips to isolate one party.
       </p>
       <HowTo paras={[
         <>The lines are weighted by sample and adjusted for each house’s lean.</>,
-        <>Each chip carries a party’s current share and its change since the 2025 election, where
-        every line here begins. A party on its own draws with the 95% interval around its
-        line{solo ? ", shaded here" : ""}.</>,
+        <>The 2025 election is where every line here begins. A party on its own draws with the
+        95% interval around its line{solo ? ", shaded here" : ""}.</>,
       ]} />
     </section>
   );
