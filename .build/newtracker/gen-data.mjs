@@ -1483,26 +1483,38 @@ const undecidedSeries = UNDECIDED_BASES.map((b) => {
     now,
   };
 }).filter(Boolean);
-/* Resolve's "not firm" share by age band (polls.json `softAge`), pooled over
-   its last SOFT_AGE_POOL waves for the panel's age sentence. Resolve files
-   no age-band counts, so each band's base is the wave's effective sample
-   times the band's share of adults (ABS 2021 Census: 18–34 29.5%, 35–54
-   33.4%, 55+ 37.1% of those 18 and over) – the weighting Resolve's sample is
-   drawn to. The 95% margin is binomial on that pooled base. */
+/* Resolve's "not firm" share by age band (polls.json `softAge`), for the
+   Undecided panel's By age view: every wave, the pooled current figure (its
+   last SOFT_AGE_POOL waves) and the same pool over the term's first waves,
+   which the change sentence compares against. Resolve files no age-band
+   counts, so each band's base is the wave's effective sample times the
+   band's share of adults (ABS 2021 Census: 18–34 29.5%, 35–54 33.4%, 55+
+   37.1% of those 18 and over) – the weighting Resolve's sample is drawn to.
+   The 95% margin is binomial on the pooled base. */
 const SOFT_AGE_POOL = 3;
 const AGE_SHARE = { "18-34": 0.295, "35-54": 0.334, "55+": 0.371 };
-const softAgeRows = POLLS.filter((p) => p.softAge).sort((a, b) => (a.date < b.date ? -1 : 1)).slice(-SOFT_AGE_POOL);
-const softAge = softAgeRows.length === SOFT_AGE_POOL ? {
-  house: softAgeRows[0].pollster,
-  from: fwLabel(softAgeRows[0].dateStart, softAgeRows[0].date),
-  to: fwLabel(softAgeRows[SOFT_AGE_POOL - 1].dateStart, softAgeRows[SOFT_AGE_POOL - 1].date),
-  bands: Object.fromEntries(Object.keys(AGE_SHARE).map((k) => {
-    let sn = 0, snv = 0;
-    for (const p of softAgeRows) { const n = rowN(p) / HL_DEFF * AGE_SHARE[k]; sn += n; snv += n * p.softAge[k]; }
-    const v = snv / sn, q = v / 100;
-    return [k, { v: r1(v), ci95: r1(196 * Math.sqrt(q * (1 - q) / sn)), n: Math.round(sn) }];
-  })),
-} : null;
+const softAgeWaves = POLLS.filter((p) => p.softAge).sort((a, b) => (a.date < b.date ? -1 : 1)).map((p) => ({
+  x: dx(p.date), ym: ymOf(p.date), released: p.date, dateLabel: fwLabel(p.dateStart, p.date),
+  pollster: p.pollster, sample: p.sample ?? null,
+  soft: { ...p.softAge },
+  n: Object.fromEntries(Object.keys(AGE_SHARE).map((k) => [k, Math.round(rowN(p) / HL_DEFF * AGE_SHARE[k])])),
+}));
+const softAgePooled = (ws) => Object.fromEntries(Object.keys(AGE_SHARE).map((k) => {
+  let sn = 0, snv = 0;
+  for (const w of ws) { sn += w.n[k]; snv += w.n[k] * w.soft[k]; }
+  const v = snv / sn, q = v / 100;
+  return [k, { v: r1(v), ci95: r1(196 * Math.sqrt(q * (1 - q) / sn)), n: Math.round(sn) }];
+}));
+const softAge = softAgeWaves.length >= 2 * SOFT_AGE_POOL ? (() => {
+  const last = softAgeWaves.slice(-SOFT_AGE_POOL), first = softAgeWaves.slice(0, SOFT_AGE_POOL);
+  return {
+    houses: creditHouses(softAgeWaves, (w) => w.pollster, (w) => Date.parse(w.released)),
+    waves: softAgeWaves,
+    pool: SOFT_AGE_POOL,
+    now: { from: last[0].dateLabel, to: last[SOFT_AGE_POOL - 1].dateLabel, ...softAgePooled(last) },
+    base: { from: first[0].dateLabel, to: first[SOFT_AGE_POOL - 1].dateLabel, ...softAgePooled(first) },
+  };
+})() : null;
 const undecided = undecidedSeries.length ? {
   series: undecidedSeries,
   softAge,

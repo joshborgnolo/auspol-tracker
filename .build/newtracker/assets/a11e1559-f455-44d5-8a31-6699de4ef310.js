@@ -1501,25 +1501,30 @@ function UndecidedPanel({ rangeId }) {
   const [view, setView] = useState("all");
   const U = D.undecided;
   if (!U || !U.series.length) return null;
-  const F = D.firmness;
-  const byParty = view === "party" && F;
-  const ctl = F && (
+  const F = D.firmness, A = U.softAge;
+  const views = UND_VIEWS.filter((v) => v.id === "all" || (v.id === "party" && F) || (v.id === "age" && A));
+  const ctl = views.length > 1 && (
     <div className="ons-ctl">
-      <Segmented options={UND_VIEWS} value={view} onChange={setView} size="sm" ariaLabel="Undecided among" />
+      <Segmented options={views} value={view} onChange={setView} size="sm" ariaLabel="Undecided among" />
     </div>
   );
-  if (byParty) return (
+  const extra = view === "party" && F ? {
+    sub: <>Share of each party’s voters certain of their vote · {houseList(F.houses.map(demoHouse))}</>,
+    body: <FirmnessView F={F} rangeId={rangeId} />,
+  } : view === "age" && A ? {
+    sub: <>Share of each age group not firm in its vote · {houseList(A.houses)}</>,
+    body: <AgeFirmView A={A} rangeId={rangeId} />,
+  } : null;
+  if (extra) return (
     <section className="card">
       <div className="card-head">
         <div>
           <h2 className="card-title">Undecided</h2>
-          <p className="card-sub">
-            Share of each party’s voters certain of their vote · {houseList(F.houses.map(demoHouse))}
-          </p>
+          <p className="card-sub">{extra.sub}</p>
         </div>
       </div>
       {ctl}
-      <FirmnessView F={F} rangeId={rangeId} />
+      {extra.body}
     </section>
   );
   const xDomain = rangeDomain(rangeId);
@@ -1573,26 +1578,6 @@ function UndecidedPanel({ rangeId }) {
       + window.AP.monthLabelFull(base.ym) + " to " + nowV.toFixed(1) + "% now.";
   })();
 
-  /* One sentence under the chart on firmness by age, from Resolve's "how
-     firm are you" by age band (gen-data: pooled over its last three waves).
-     Highlighted when it reports a significant difference: firmness rising
-     band by band, or one band apart from both others; otherwise it says the
-     bands can't be told apart. Same test as the By party view. */
-  const ageSaid = (() => {
-    const A = U.softAge;
-    if (!A) return null;
-    const B = A.bands, who = { "18-34": "voters aged 18–34", "35-54": "those aged 35–54", "55+": "those 55 and over" };
-    const pct = (k) => Math.round(B[k].v) + "%";
-    const [y, m, o] = ["18-34", "35-54", "55+"];
-    if (B[y].v > B[m].v && B[m].v > B[o].v && firmApart(B[y], B[m]) && firmApart(B[m], B[o]))
-      return [`Firmness rises significantly with age: ${pct(y)} of voters aged 18–34 aren’t firm in their vote, against ${pct(m)} of those aged 35–54 and ${pct(o)} of those 55 and over.`, true];
-    const bySoft = [y, m, o].sort((a, b) => B[a].v - B[b].v);
-    const [f, ...rest] = bySoft;
-    if (rest.every((k) => firmApart(B[f], B[k])))
-      return [`${who[f][0].toUpperCase() + who[f].slice(1)} are significantly the firmest: ${pct(f)} aren’t firm in their vote, against ${pct(rest[0])} of ${who[rest[0]]} and ${pct(rest[1])} of ${who[rest[1]]}.`, true];
-    return ["Resolve finds no significant difference in how firm voters are between age groups.", false];
-  })();
-
   return (
     <section className="card">
       <div className="card-head">
@@ -1644,11 +1629,9 @@ function UndecidedPanel({ rangeId }) {
         tooltipTitle={(i) => window.AP.monthLabelFull(spine[i].ym)}
         fmt={(v) => v.toFixed(1)}
       />
-      {ageSaid && firmSaid("demo-verdict", ageSaid[0], ageSaid[1])}
       <p className="table-hint">
         Each dot is one published reading; the lines are monthly averages, and
         the figure beside each question pools the last six weeks of polls.
-        {U.softAge && <> The sentence on age pools {U.softAge.house}’s last three waves, {U.softAge.from} to {U.softAge.to}.</>}
       </p>
       <HowTo paras={[
         <>Newer and larger polls count for more in the figure beside each question.</>,
@@ -1671,7 +1654,7 @@ function UndecidedPanel({ rangeId }) {
    certain, and (under the chart) which party's share has moved most since
    the term's first waves. A gap is significant when it exceeds the combined
    95% margin, √(a² + b²) of the two ± figures. */
-const UND_VIEWS = [{ id: "all", label: "All voters" }, { id: "party", label: "By party" }];
+const UND_VIEWS = [{ id: "all", label: "All voters" }, { id: "party", label: "By party" }, { id: "age", label: "By age" }];
 const FIRM_ORDER = ["onp", "alp", "lnp", "grn", "oth"];
 const firmWho = (k) => (k === "oth" ? "voters for independents and minor parties" : window.AP.D.PARTIES[k].name + " voters");
 const firmApart = (a, b) => Math.abs(a.v - b.v) > Math.hypot(a.ci95, b.ci95);
@@ -1775,6 +1758,122 @@ function FirmnessView({ F, rangeId }) {
         differ significantly when the gap between them is larger than their two margins combined.</>,
         <>This is a different question from Resolve’s “how firm are you” in the All voters view,
         which is why the shares there are lower.</>,
+      ]} />
+    </>
+  );
+}
+
+/* The Undecided panel's third view: how firm each age group's vote is, from
+   Resolve's "how firm are you" by age band (gen-data: softAge). The share
+   plotted is the not-firm one, the same measure as the All voters view's
+   "Not firm" line. Same furniture and tests as the By party view: readings
+   pooled over the last three waves, lines pooling every run of three, the
+   waves as dots; a lead on how the bands stand now and a sentence under the
+   chart on which band has moved since the term's first waves, each
+   highlighted only when it reports a significant difference. Bands run
+   from the accent to grey, youngest strongest, since they are ordered and
+   no party's. */
+const AGE_BANDS = [
+  { id: "18-34", label: "18–34", who: "voters aged 18–34" },
+  { id: "35-54", label: "35–54", who: "those aged 35–54" },
+  { id: "55+", label: "55+", who: "those 55 and over" },
+];
+function AgeFirmView({ A, rangeId }) {
+  const { rangeDomain, buildXTicks } = window.AP;
+  const narrow = useNarrow();
+  const xDomain = rangeDomain(rangeId);
+  // accent, then accent half-faded to grey, then the page's grey ink: the
+  // party-panel ramp towards --ink left 35–54 and 55+ too close to tell apart
+  const col = (i) => ["var(--accent)", "color-mix(in oklch, var(--accent) 45%, var(--ink-3))", "var(--ink-2)"][i];
+  const pct = (b) => Math.round(A.now[b.id].v) + "%";
+  const cap = (s) => s[0].toUpperCase() + s.slice(1);
+
+  const lead = (() => {
+    const [y, m, o] = AGE_BANDS, N = A.now;
+    if (N[y.id].v > N[m.id].v && N[m.id].v > N[o.id].v && firmApart(N[y.id], N[m.id]) && firmApart(N[m.id], N[o.id]))
+      return [`Firmness rises significantly with age: ${pct(y)} of voters aged 18–34 aren’t firm in their vote, against ${pct(m)} of those aged 35–54 and ${pct(o)} of those 55 and over.`, true];
+    const [f, ...rest] = [...AGE_BANDS].sort((a, b) => N[a.id].v - N[b.id].v);
+    if (rest.every((b) => firmApart(N[f.id], N[b.id])))
+      return [`${cap(f.who)} are significantly the firmest: ${pct(f)} aren’t firm in their vote, against ${pct(rest[0])} of ${rest[0].who} and ${pct(rest[1])} of ${rest[1].who}.`, true];
+    return ["Resolve finds no significant difference in how firm voters are between age groups.", false];
+  })();
+
+  const shift = (() => {
+    const moved = AGE_BANDS.map((b) => ({ b, d: A.now[b.id].v - A.base[b.id].v }))
+      .filter(({ b }) => firmApart(A.now[b.id], A.base[b.id]))
+      .sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+    if (!moved.length)
+      return ["No age group’s share not firm in its vote has changed significantly since the months after the 2025 election.", false];
+    const { b, d } = moved[0];
+    return [`Since the months after the 2025 election, the share of ${b.who} not firm in their vote has ${d > 0 ? "risen" : "fallen"} significantly, from ${Math.round(A.base[b.id].v)}% to ${Math.round(A.now[b.id].v)}%.`, true];
+  })();
+
+  // each wave pooled with the two before it, as the readings are
+  const rolled = A.waves.map((w, i) => {
+    const ws = A.waves.slice(Math.max(0, i - A.pool + 1), i + 1);
+    const r = { x: w.x };
+    for (const b of AGE_BANDS) {
+      const n = ws.reduce((a, v) => a + v.n[b.id], 0);
+      r[b.id] = ws.reduce((a, v) => a + v.n[b.id] * v.soft[b.id], 0) / n;
+    }
+    return r;
+  });
+  const inX = (w) => w.x >= xDomain[0] && w.x <= xDomain[1];
+  const waves = A.waves.filter(inX), lines = rolled.filter(inX);
+  if (waves.length < 2) return firmSaid("und-lead", lead[0], lead[1]);
+  const vals = waves.flatMap((w) => AGE_BANDS.map((b) => w.soft[b.id]));
+  const lo = Math.max(0, Math.floor((Math.min(...vals) - 3) / 10) * 10);
+  const hi = Math.min(100, Math.ceil((Math.max(...vals) + 3) / 10) * 10);
+  const yTicks = [];
+  for (let v = lo + 10; v < hi; v += 10) yTicks.push(v);
+  const pts = (b) => lines.map((w) => ({ x: w.x, y: w[b.id] }));
+  const dots = waves.flatMap((w) => AGE_BANDS.map((b, i) => ({ x: w.x, y: w.soft[b.id], color: col(i),
+                                                               label: b.label, meta: w })));
+
+  return (
+    <>
+      {firmSaid("und-lead", lead[0], lead[1])}
+      <div className="und-reads">
+        {AGE_BANDS.map((b, i) => (
+          <div className="und-read" key={b.id}>
+            <span className="und-swatch" style={{ background: col(i) }} aria-hidden="true"></span>
+            <div className="und-read-body">
+              <div className="und-read-top">
+                <span className="und-read-lab">{b.label}</span>
+                <span className="und-read-v">{A.now[b.id].v.toFixed(1)}<span className="pct">%</span></span>
+                <span className="read-ci" title="95% margin">± {A.now[b.id].ci95.toFixed(1)}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <TrendChart
+        key="soft-age"
+        height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[lo, hi]}
+        yTicks={yTicks} unit="%" axisFont={narrow ? 28 : 20}
+        pad={{ l: narrow ? 84 : 58, r: 22, t: 16, b: 42 }}
+        xTicks={buildXTicks(xDomain[0], xDomain[1])}
+        series={AGE_BANDS.map((b, i) => ({ id: b.id, label: b.label, color: col(i), points: pts(b), endLabel: b.label }))}
+        spine={pts(AGE_BANDS[0])}
+        scatter={dots} pollFacet="twopp"
+        tooltipTitle={(i) => waves[i] && waves[i].dateLabel}
+        fmt={(v) => v.toFixed(0)}
+        copy={{ sub: `Share of each age group not firm in its vote, wave by wave · ${houseList(A.houses)}`,
+                legend: AGE_BANDS.map((b, i) => ({ label: `${b.label}  ${A.now[b.id].v.toFixed(1)}%`, color: col(i), kind: "line" })) }}
+      />
+      {firmSaid("demo-verdict", shift[0], shift[1])}
+      <p className="table-hint">
+        Each dot is one Resolve wave; the lines and the figures above pool three waves at a
+        time, the figures its latest three ({A.now.from} to {A.now.to}).
+      </p>
+      <HowTo paras={[
+        <>Not firm is Resolve’s “soft” answer to “How firm are you with your vote?”: voters who
+        named a party but say they might change. It is the All voters view’s “Not firm” line,
+        split by age.</>,
+        <>Resolve doesn’t publish how many people in each age group it asked, so each group is
+        counted in proportion to its share of adults (2021 Census), the mix Resolve’s sample is
+        weighted to. Two figures differ significantly when the gap between them is larger than
+        their two margins combined.</>,
       ]} />
     </>
   );
