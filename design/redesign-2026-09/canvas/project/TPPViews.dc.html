@@ -44,10 +44,13 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 .check{min-height:44px;display:flex;align-items:center;gap:10px;font-size:14px;color:#171717;cursor:pointer;white-space:nowrap}
 .check input{width:18px;height:18px;margin:0;accent-color:#171717;cursor:pointer}
 .key{display:flex;align-items:center;gap:8px}
-.chip{min-height:44px;padding:0 18px;border:1px solid #DDDCD8;border-radius:22px;background:#FEFCF9;font-size:14px;color:#171717;display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
-.chip:hover{background:#EFEDE8}
+/* the site's raised chip, from the same family as the theme switch; a 44px hit area around a 36px face */
+.chip{position:relative;min-height:36px;padding:0 14px;border:1px solid #DFDCD7;border-radius:18px;background:#FEFCF9;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16),0 3px 6px -3px rgba(91,79,69,0.16);font-size:14px;color:#4A4843;display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
+.chip::after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+.chip:hover{border-color:#C9C6BF}
+.chip:active{box-shadow:inset 0 1.5px 2.5px rgba(43,37,33,0.15);transform:translateY(1px)}
 .term{padding:0;border:0;background:none;font:inherit;color:inherit;text-decoration:underline dotted #9A968E;text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:help}
-.qbtn{width:44px;height:44px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;vertical-align:middle}
+.qbtn{width:44px;height:44px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;margin:-13px 0;padding:0;border:0;border-radius:8px;background:transparent;vertical-align:middle}
 .qbtn:hover{background:#EFEDE8}
 .qbtn span{width:20px;height:20px;box-sizing:border-box;border-radius:10px;border:1.5px solid #6B6862;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#4A4843}
 .qbtn[aria-expanded="true"] span{background:#171717;border-color:#171717;color:#FAF9F6}
@@ -60,9 +63,9 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 .chip:focus-visible,.term:focus-visible,.qbtn:focus-visible,.switch:focus-visible,.link:focus-visible{outline:2px solid #171717;outline-offset:2px}
 </style>
 </helmet>
-<div style="width: 1280px; height: 3160px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
+<div style="width: 1280px; height: 3010px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
 <div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">
-<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Two-party preferred</span>
+<span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Two-party preferred</span>
 <span>Other states of the section · same data as the desktop board</span>
 </div>
 
@@ -144,7 +147,7 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 <p style="margin: 6px 0 0; max-width: 900px; font-size: 15px; line-height: 1.5; color: #4A4843">The basis switch lives here, off the main surface. Implied flows stay the strong default; anyone who wants the pollsters’ own figures is one tap away, and sees the number before switching.</p>
 
 <div style="display: flex; flex-direction: column; align-items: flex-end; width: 640px; margin: 20px auto 0; text-align: center">
-<p class="num" style="margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: #6B6862">Implied preference flows · <button class="term">weighted aggregate</button> of 8 polls in the 21 days to 21 Sep<button class="qbtn" aria-label="How this is counted, and the pollsters’ published figures" aria-expanded="true"><span>?</span></button></p>
+<p class="num" style="margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: #6B6862">Implied preference flows · <button class="term">weighted aggregate</button> of 8 polls in the 21 days to 21 Sep<button class="qbtn" aria-label="How this is counted, and the pollsters’ published figures" aria-expanded="true"><span>?</span></button></p>
 <div role="dialog" aria-label="How this is counted" style="position: relative; margin-top: 10px; width: 420px; box-sizing: border-box; padding: 18px 20px 6px; background: #FEFCF9; border: 1px solid #DDDCD8; border-radius: 12px; box-shadow: 0 10px 28px rgba(23, 23, 23, 0.14); text-align: left">
 <span aria-hidden="true" style="position: absolute; top: -7px; right: 15px; width: 12px; height: 12px; background: #FEFCF9; border-left: 1px solid #DDDCD8; border-top: 1px solid #DDDCD8; transform: rotate(45deg)"></span>
 <p style="margin: 0; font-size: 15px; font-weight: 600">How this is counted</p>
@@ -185,9 +188,9 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 <text class="ax" x="380" y="78" style="text-anchor: middle; font-weight: 600; fill: #4A4843">Tied</text>
 </svg>
 <p class="num" style="margin: 14px 0 0; font-size: 17px; line-height: 1.5; color: #3D3B37"><b style="font-weight: 600; color: #171717">Labor ahead.</b> Its 8.6-point lead is outside the ±3.4 <button class="term">margin</button>.</p>
-<p class="num" style="margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: #6B6862">Labor ▼ 0.1 on a month ago, within the margin</p>
-<p class="num" style="margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: #6B6862">Pollsters’ published figures · <button class="term">weighted aggregate</button> of 5 polls in the 21 days to 21 Sep<button class="qbtn" aria-label="How this is counted, and the pollsters’ published figures" aria-expanded="false"><span>?</span></button> · <button class="link">Back to implied flows</button></p>
-<div style="margin-top: 8px; display: flex; align-items: center; gap: 12px"><span style="font-size: 13px; color: #6B6862">Switch 2PP</span><button class="chip">Labor v Coalition<span class="num" style="font-weight: 600"><span style="color: #B9463F">52.0</span><span style="color: #9A968E">–</span><span style="color: #356697">48.0</span></span></button></div>
+<p class="num" style="margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: #4A4843">Labor ▼ 0.1 on a month ago, within the margin</p>
+<p class="num" style="margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: #6B6862">Pollsters’ published figures · <button class="term">weighted aggregate</button> of 5 polls in the 21 days to 21 Sep<button class="qbtn" aria-label="How this is counted, and the pollsters’ published figures" aria-expanded="false"><span>?</span></button> · <button class="link">Back to implied flows</button></p>
+<div style="margin-top: 12px; display: flex; align-items: center; gap: 12px"><span style="font-size: 13px; color: #6B6862">Switch 2PP</span><button class="chip">Labor v Coalition<span class="num" style="font-weight: 600"><span style="color: #B9463F">52.0</span><span style="color: #9A968E">–</span><span style="color: #356697">48.0</span></span></button></div>
 </div>
 
 <div style="margin-top: 56px"></div><div style="display: flex; align-items: baseline; gap: 12px">
@@ -217,9 +220,9 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 <text class="ax" x="380" y="78" style="text-anchor: middle; font-weight: 600; fill: #4A4843">Tied</text>
 </svg>
 <p class="num" style="margin: 14px 0 0; font-size: 17px; line-height: 1.5; color: #3D3B37"><b style="font-weight: 600; color: #171717">Labor ahead.</b> Its 3.2-point lead is outside the ±2.4 <button class="term">margin</button>.</p>
-<p class="num" style="margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: #6B6862">Labor ▼ 0.1 on a month ago, within the margin · ▼ 3.6 since the 2025 election</p>
-<p class="num" style="margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: #6B6862">Implied preference flows · <button class="term">weighted aggregate</button> of 8 polls in the 21 days to 21 Sep<button class="qbtn" aria-label="How this is counted, and the pollsters’ published figures" aria-expanded="false"><span>?</span></button></p>
-<div style="margin-top: 8px; display: flex; align-items: center; gap: 12px"><span style="font-size: 13px; color: #6B6862">Switch 2PP</span><button class="chip">Labor v One Nation<span class="num" style="font-weight: 600"><span style="color: #B9463F">51.2</span><span style="color: #9A968E">–</span><span style="color: #9E5200">48.8</span></span></button></div>
+<p class="num" style="margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: #4A4843">Labor ▼ 0.1 on a month ago, within the margin · ▼ 3.6 since the 2025 election</p>
+<p class="num" style="margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: #6B6862">Implied preference flows · <button class="term">weighted aggregate</button> of 8 polls in the 21 days to 21 Sep<button class="qbtn" aria-label="How this is counted, and the pollsters’ published figures" aria-expanded="false"><span>?</span></button></p>
+<div style="margin-top: 12px; display: flex; align-items: center; gap: 12px"><span style="font-size: 13px; color: #6B6862">Switch 2PP</span><button class="chip">Labor v One Nation<span class="num" style="font-weight: 600"><span style="color: #B9463F">51.2</span><span style="color: #9A968E">–</span><span style="color: #9E5200">48.8</span></span></button></div>
 </div>
 
 <div style="margin-top: 36px"></div><div style="margin-top: 16px; display: flex; align-items: center; border-bottom: 1px solid #DDDCD8">
@@ -285,7 +288,7 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":3160}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":3010}}'>
 class Component extends DCLogic {
 renderVals() {
 return {};

@@ -29,10 +29,10 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 .copy:focus-visible{outline:2px solid #171717;outline-offset:2px}
 </style>
 </helmet>
-<div style="width: 390px; height: 1800px; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; background: #FAF9F6">
+<div style="width: 390px; height: 1640px; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; background: #FAF9F6">
 
-<div style="display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #6B6862">
-<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Undecided</span>
+<div style="border-top: 2px solid #171717; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #6B6862">
+<span style="font-size: 19px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Undecided</span>
 <span>Roy Morgan, DemosAU, Essential and Resolve</span>
 </div>
 <h1 style="margin: 14px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 32px; line-height: 1.1; letter-spacing: -0.01em">About one voter in twenty is undecided. A quarter of the rest could still switch.</h1>
@@ -153,14 +153,14 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 
 <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid #DDDCD8; font-size: 12px; line-height: 1.5; color: #6B6862">None of the three has changed significantly on the previous period. ± is the 95% margin.</div>
 <div style="margin-top: 4px; display: flex; align-items: center">
-<a href="#method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500">How it’s built</a>
+<a href="#method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>
 <span style="flex-grow: 1"></span>
 <button class="copy" aria-label="Copy chart: undecided and not firm over time" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
 </div>
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1800}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1640}}'>
 class Component extends DCLogic {
 renderVals() {
 return {};

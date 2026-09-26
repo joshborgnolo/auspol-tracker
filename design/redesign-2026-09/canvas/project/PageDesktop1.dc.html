@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Snapshot page – desktop, 1 of 2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&amp;family=IBM+Plex+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s1{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s1 a{color:#171717;text-decoration:none}
+.s1 a:hover{text-decoration:underline;text-underline-offset:3px}
+.s1 button{font:inherit;cursor:pointer}
+.s1 .num{font-variant-numeric:tabular-nums}
+.s1 .wm{display:flex;align-items:center;gap:14px;padding:0;border:0;background:none;color:#171717;text-align:left}
+.s1 .wm:focus-visible,.s1 .tab:focus-visible,.s1 .seg:focus-visible,.s1 .score:focus-visible,.s1 .tn a:focus-visible{outline:2px solid #171717;outline-offset:3px;border-radius:4px}
+.s1 .tab{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:0 2px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;font-size:16px;font-weight:500;color:#6B6862;white-space:nowrap}
+.s1 .tab[aria-current="page"]{border-bottom-color:#171717;font-weight:600;color:#171717}
+.s1 .tab:hover{color:#171717}
+.s1 /* the site's rocker switch: a plate,.s1 a raised cap,.s1 the chosen side pressed into a well */
+.segs{display:flex;padding:3px;border-radius:10px;background:#F2F0EC;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16),0 3px 6px -3px rgba(91,79,69,0.16)}
+.s1 .seg{width:40px;height:32px;display:flex;align-items:center;justify-content:center;padding:0;border:0;background:#FEFCF9;color:#6B6862;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16)}
+.s1 .seg:first-child{border-radius:7px 0 0 7px;border-right:1px solid rgba(43,37,33,0.18)}
+.s1 .seg:last-child{border-radius:0 7px 7px 0}
+.s1 .seg[aria-pressed="true"]{background:#E0DDD8;color:#171717;box-shadow:inset 0 2px 3px rgba(43,37,33,0.15),inset 0 -1px 0 rgba(255,255,255,0.85)}
+.s1 .seg[aria-pressed="true"] svg{transform:translateY(0.5px)}
+.s1 .dt{font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6B6862}
+.s1 .dd{font-size:15px;font-weight:600;color:#171717;white-space:nowrap}
+.s1 .dd2{font-size:13px;color:#6B6862;white-space:nowrap}
+.s1 .dot{display:inline-block;width:8px;height:8px;border-radius:4px;background:#10777C;margin-right:7px;vertical-align:1px}
+.s1 .tn{display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap}
+.s1 .tn a{font-weight:600;color:#3D3B37}
+.s1 .ext{font-size:10px;color:#9A968E}
+.s1 .score{display:inline-flex;flex-wrap:wrap;align-content:center;align-items:baseline;gap:9px;min-height:44px;padding:0 4px;border:0;background:none;white-space:nowrap}
+.s1 .plabel{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#9A968E}
+.s2{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s2 a{color:#171717}
+.s2 a:hover{color:#B9463F}
+.s2 button{font:inherit;cursor:pointer}
+.s2 .num{font-variant-numeric:tabular-nums}
+.s2 svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s2 .grid{stroke:#E6E4DF;stroke-width:1;fill:none}
+.s2 .base{stroke:#9A968E;stroke-width:1;fill:none}
+.s2 .even{stroke:#9A968E;stroke-width:1;stroke-dasharray:3 3;fill:none}
+.s2 .zero{stroke:#9A968E;stroke-width:1;fill:none}
+.s2 .ax{font-size:12px;fill:#6B6862}
+.s2 .ev{stroke:#C9C6BF;stroke-width:1;stroke-dasharray:1 3;fill:none}
+.s2 .evt{font-size:12px;font-weight:500;fill:#4A4843}
+.s2 .evn{fill:#FAF9F6;stroke:#6B6862;stroke-width:1}
+.s2 .evnt{font-size:9px;font-weight:600;fill:#4A4843;text-anchor:middle}
+.s2 .dots{fill:none;stroke-width:5;stroke-linecap:round}
+.s2 .ln{fill:none;stroke-linejoin:round;stroke-linecap:round}
+.s2 .halo{paint-order:stroke;stroke:#FAF9F6;stroke-width:4px;stroke-linejoin:round}
+.s2 .end{font-size:13px;font-weight:600}
+.s2 .sub{font-size:13px}
+.s2 .val{font-size:12px;font-weight:600;fill:#171717;text-anchor:middle}
+.s2 .tab{min-height:44px;padding:0 12px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;font-size:15px;color:#6B6862;white-space:nowrap}
+.s2 .tab[aria-pressed="true"]{border-bottom-color:#171717;font-weight:600;color:#171717}
+.s2 .tab:hover{color:#171717}
+.s2 .tab:focus-visible,.s2 .check:focus-within,.s2 .help:focus-visible{outline:2px solid #171717;outline-offset:2px;border-radius:4px}
+.s2 .copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.s2 .copy:hover{background:#EFEDE8;color:#171717}
+.s2 .copy:focus-visible{outline:2px solid #171717;outline-offset:2px}
+.s2 .help{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:8px}
+.s2 .help:hover{background:#EFEDE8}
+.s2 .help span{width:20px;height:20px;box-sizing:border-box;border-radius:10px;border:1.5px solid #6B6862;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#4A4843}
+.s2 .check{min-height:44px;display:flex;align-items:center;gap:10px;font-size:14px;color:#171717;cursor:pointer;white-space:nowrap}
+.s2 .check input{width:18px;height:18px;margin:0;accent-color:#171717;cursor:pointer}
+.s2 .key{display:flex;align-items:center;gap:8px}
+.s2 /* the site's raised chip,.s2 from the same family as the theme switch; a 44px hit area around a 36px face */
+.chip{position:relative;min-height:36px;padding:0 14px;border:1px solid #DFDCD7;border-radius:18px;background:#FEFCF9;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16),0 3px 6px -3px rgba(91,79,69,0.16);font-size:14px;color:#4A4843;display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
+.s2 .chip::after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+.s2 .chip:hover{border-color:#C9C6BF}
+.s2 .chip:active{box-shadow:inset 0 1.5px 2.5px rgba(43,37,33,0.15);transform:translateY(1px)}
+.s2 .term{padding:0;border:0;background:none;font:inherit;color:inherit;text-decoration:underline dotted #9A968E;text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:help}
+.s2 .qbtn{width:44px;height:44px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;margin:-13px 0;padding:0;border:0;border-radius:8px;background:transparent;vertical-align:middle}
+.s2 .qbtn:hover{background:#EFEDE8}
+.s2 .qbtn span{width:20px;height:20px;box-sizing:border-box;border-radius:10px;border:1.5px solid #6B6862;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#4A4843}
+.s2 .qbtn[aria-expanded="true"] span{background:#171717;border-color:#171717;color:#FAF9F6}
+.s2 .link{min-height:44px;padding:0 4px;border:0;background:none;font:inherit;font-weight:500;color:#171717;text-decoration:underline;text-underline-offset:3px;vertical-align:middle}
+.s2 .switch{width:52px;height:44px;flex-shrink:0;padding:0;border:0;background:transparent;display:flex;align-items:center;justify-content:center}
+.s2 .switch span{position:relative;display:block;width:40px;height:24px;border-radius:12px;background:#8C8881}
+.s2 .switch span::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:9px;background:#FAF9F6}
+.s2 .switch[aria-checked="true"] span{background:#171717}
+.s2 .switch[aria-checked="true"] span::after{left:19px}
+.s2 .chip:focus-visible,.s2 .term:focus-visible,.s2 .qbtn:focus-visible,.s2 .switch:focus-visible,.s2 .link:focus-visible{outline:2px solid #171717;outline-offset:2px}
+.s3{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s3 a{color:#171717}
+.s3 a:hover{color:#B9463F}
+.s3 button{font:inherit;cursor:pointer}
+.s3 .num{font-variant-numeric:tabular-nums}
+.s3 svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s3 .grid{stroke:#DDDCD8;stroke-width:1;fill:none}
+.s3 .base{stroke:#9A968E;stroke-width:1;fill:none}
+.s3 .ax{font-size:12px;fill:#6B6862}
+.s3 .ev{stroke:#C9C6BF;stroke-width:1;stroke-dasharray:1 3;fill:none}
+.s3 .evt{font-size:12px;font-weight:500;fill:#4A4843;paint-order:stroke;stroke:#FAF9F6;stroke-width:4px;stroke-linejoin:round}
+.s3 .evn{fill:#FAF9F6;stroke:#6B6862;stroke-width:1}
+.s3 .dots{fill:none;stroke-width:5;stroke-linecap:round}
+.s3 .trend{fill:none;stroke-width:2.75;stroke-linejoin:round;stroke-linecap:round}
+.s3 .ring{fill:#FAF9F6;stroke-width:2}
+.s3 .lbl{font-size:13px;font-weight:600}
+.s3 .copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.s3 .copy:hover{background:#EFEDE8;color:#171717}
+.s3 .copy:focus-visible{outline:2px solid #171717;outline-offset:2px}
+.s4{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s4 a{color:#171717;text-decoration:none}
+.s4 a:hover{text-decoration:underline;text-underline-offset:3px}
+.s4 button{font:inherit;cursor:pointer}
+.s4 .num{font-variant-numeric:tabular-nums}
+.s4 svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s4 .tab{min-height:44px;padding:0 12px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;font-size:15px;color:#6B6862;white-space:nowrap}
+.s4 .tab[aria-pressed="true"]{border-bottom-color:#171717;font-weight:600;color:#171717}
+.s4 .tab:hover{color:#171717}
+.s4 .th{font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6B6862;white-space:nowrap}
+.s4 .sortb{padding:0;border:0;background:none;display:inline-flex;align-items:flex-end;gap:4px;min-height:32px}
+.s4 .row{border-top:1px solid #E6E4DF;cursor:pointer}
+.s4 .row:hover{background:#F5F3EE}
+.s4 .row[aria-expanded="true"]{background:#F1EFEA;border-top-color:transparent}
+.s4 .firm{font-size:15px;font-weight:600;color:#171717}
+.s4 .ext{font-size:10px;color:#9A968E;margin-left:3px}
+.s4 .sub{font-size:12px;line-height:1.45;color:#6B6862}
+.s4 .chev{width:40px;height:44px;padding:0;border:0;background:none;color:#6B6862;display:flex;align-items:center;justify-content:center}
+.s4 .link{min-height:36px;padding:0;border:0;background:none;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:#171717}
+.s4 .qbtn{width:44px;height:44px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent}
+.s4 .qbtn span{width:20px;height:20px;box-sizing:border-box;border-radius:10px;border:1.5px solid #6B6862;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#4A4843}
+.s4 .swap{min-height:44px;padding:0 4px;border:0;background:none;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#171717}
+.s4 .copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.s4 .copy:hover{background:#EFEDE8;color:#171717}
+.s4 .row:focus-visible,.s4 .tab:focus-visible,.s4 .chev:focus-visible,.s4 .sortb:focus-visible,.s4 .swap:focus-visible,.s4 .qbtn:focus-visible,.s4 .copy:focus-visible,.s4 .link:focus-visible{outline:2px solid #171717;outline-offset:2px}
+.s4 .ax{font-size:11px;fill:#6B6862}
+.s4 .key{display:inline-flex;align-items:center;gap:6px}
+.s5{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s5 a{color:#171717}
+.s5 a:hover{color:#B9463F}
+.s5 button{font:inherit;cursor:pointer}
+.s5 .num{font-variant-numeric:tabular-nums}
+.s5 svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s5 .grid{stroke:#E6E4DF;stroke-width:1;fill:none}
+.s5 .base{stroke:#9A968E;stroke-width:1;fill:none}
+.s5 .even{stroke:#9A968E;stroke-width:1;stroke-dasharray:3 3;fill:none}
+.s5 .ax{font-size:12px;fill:#6B6862}
+.s5 .cap{font-size:13px;font-weight:600;fill:#171717}
+.s5 .bn{font-size:13px;font-weight:500}
+.s5 .bv{font-size:15px;font-weight:600}
+.s5 .nm{font-size:15px;fill:#171717}
+.s5 .v{font-size:15px;font-weight:600;fill:#171717}
+.s5 .e{font-size:13px;fill:#6B6862}
+.s5 .ln{fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.s5 .lbl{font-size:12px;font-weight:600}
+.s5 .note{font-size:11px;fill:#6B6862}
+.s5 .copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.s5 .copy:hover{background:#EFEDE8;color:#171717}
+.s5 .copy:focus-visible{outline:2px solid #171717;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1280px; height: 4681px; display: flex; flex-direction: column; background: #FAF9F6">
+<section class="s1" style="width: 1280px; height: 251px; box-sizing: border-box; padding: 40px 64px 0; display: flex; flex-direction: column; background: #FAF9F6">
+<header style="margin-top: 0px; display: flex; align-items: flex-start; gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<button class="wm" title="Wind the dial back through the term" aria-label="auspol tracker, Australian federal polling. Replay the term on the dial"><span style="display: flex; flex-direction: column; font-size: 40px; line-height: 0.92; letter-spacing: -0.02em"><span style="font-weight: 700">auspol</span><span style="font-weight: 300; letter-spacing: -0.011em; color: #5C5853">tracker</span></span><svg viewBox="0 0 60 42" width="60" height="42" role="img" aria-label="Primary vote: One Nation 27.3, Labor 26.8, Coalition 21.2, Greens 13.2. Implied two-party preferred, Labor v One Nation: Labor ahead by 2.4." style="display: block; flex-shrink: 0"><path d="M13 38A17 17 0 0 1 47 38" style="fill: none; stroke: #D8C3B3; stroke-width: 2.5; stroke-linecap: round"></path><path d="M12.2 26.9L3.3 21.3" style="stroke: #CC7C37; stroke-width: 4"></path><path d="M22.8 18.3L19.3 8.6" style="stroke: #B9463F; stroke-width: 4"></path><path d="M36.5 18.0L38.8 10.9" style="stroke: #356697; stroke-width: 4"></path><path d="M47.4 26.3L51.6 23.5" style="stroke: #439458; stroke-width: 4"></path><path d="M30 38L28.2 23.1" style="stroke: #B9463F; stroke-width: 2.5; stroke-linecap: round"></path><circle cx="30" cy="38" r="2.6" style="fill: #4A4843"></circle></svg></button>
+<p style="margin: 0; max-width: 420px; font-family: 'Crimson Text', Georgia, serif; font-size: 19px; line-height: 1.35; color: #4A4843">Aggregated opinion polling for the next federal election, set against every term since 1972.</p>
+</div>
+<span style="flex-grow: 1"></span>
+<div style="padding-top: 6px; display: flex; align-items: flex-start; gap: 28px">
+<div style="display: flex; gap: 24px"><div style="display: flex; flex-direction: column; gap: 3px"><span class="dt">Latest poll</span><span class="dd"><span class="dot" aria-hidden="true"></span>YouGov, 15–21 Sep</span><span class="dd2">published 3 days ago</span></div><span style="width: 1px; align-self: stretch; background: #E6E4DF"></span><div style="display: flex; flex-direction: column; gap: 3px"><span class="dt">This term</span><span class="dd">163 polls</span><span class="dd2">12 pollsters</span></div><span style="width: 1px; align-self: stretch; background: #E6E4DF"></span><div style="display: flex; flex-direction: column; gap: 3px"><span class="dt">Next election</span><span class="dd">By 20 May 2028</span><span class="dd2">20 months at most</span></div></div>
+<div class="segs" role="group" aria-label="Colour theme"><button class="seg" aria-pressed="true" aria-label="Light theme" title="Light"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"></path></svg></button><button class="seg" aria-pressed="false" aria-label="Dark theme" title="Dark"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linejoin: round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg></button></div>
+</div>
+</header>
+<nav aria-label="Pages" style="margin-top: 28px; display: flex; align-items: baseline; gap: 24px; border-bottom: 1px solid #DDDCD8">
+<div style="display: flex; gap: 28px"><a class="tab" href="#snapshot" aria-current="page">Snapshot</a><a class="tab" href="#past-cycles">Past cycles</a><a class="tab" href="#all-polls">All polls</a><a class="tab" href="#info">Info</a></div>
+<span style="flex-grow: 1"></span>
+<div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862" title="Projected from each house’s recent publication intervals: the earliest each could land, not the likeliest"><a href="#next-polls" style="font-weight: 600; color: #4A4843">Next polls, at the earliest</a><span class="tn"><a href="#where-redbridge" target="_blank" rel="noopener">RedBridge/Accent</a><span class="ext" aria-hidden="true">↗</span><span>tomorrow</span></span><span class="tn"><a href="#where-roymorgan" target="_blank" rel="noopener">Roy Morgan</a><span class="ext" aria-hidden="true">↗</span><span>in 2 days</span></span><span class="tn"><a href="#where-essential" target="_blank" rel="noopener">Essential</a><span class="ext" aria-hidden="true">↗</span><span>in 4 days</span></span></div>
+</nav>
+</section>
+<section class="s2" style="width: 1280px; height: 1270px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
+
+<div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">
+<span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Two-party preferred</span>
+<span>After preferences · 163 polls from 12 pollsters · updated 21 Sep 2026</span>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center">
+<div class="num" style="margin-top: 36px; width: 760px; display: grid; grid-template-columns: minmax(0, 1fr) 2px minmax(0, 1fr); column-gap: 28px; align-items: center">
+<div style="display: flex; align-items: center; justify-content: flex-end; gap: 14px"><span style="width: 14px; height: 14px; border-radius: 7px; background: #B9463F"></span><span style="font-size: 20px; font-weight: 600; color: #B9463F">Labor</span><span style="font-size: 88px; font-weight: 500; line-height: 1; letter-spacing: -0.03em; color: #B9463F">51.2</span></div>
+<span style="height: 72px; background: #9A968E"></span>
+<div style="display: flex; align-items: center; gap: 14px"><span style="font-size: 88px; font-weight: 500; line-height: 1; letter-spacing: -0.03em; color: #9E5200">48.8</span><span style="font-size: 20px; font-weight: 600; color: #9E5200">One Nation</span><span style="width: 14px; height: 14px; border-radius: 7px; background: #CC7C37"></span></div>
+</div>
+<svg viewBox="0 0 760 82" width="760" height="82" role="img" aria-label="Labor leads One Nation by 2.4 points, flow range −0.2 to 5.0." style="margin-top: 18px; display: block; overflow: visible">
+<text class="ax" x="44" y="12" style="font-weight: 600; fill: #B9463F">◀ Labor ahead</text>
+<text class="ax" x="716" y="12" style="text-anchor: end; font-weight: 600; fill: #9E5200">One Nation ahead ▶</text>
+<path class="grid" d="M100 20V58M240 20V58M520 20V58M660 20V58"></path>
+<path class="zero" d="M380 16V60" style="stroke-width: 1.5"></path>
+<rect x="240" y="28" width="145.6" height="16" rx="2" style="fill: #B9463F; opacity: 0.2"></rect>
+<path d="M240 28v16M385.6 28v16" style="stroke: #B9463F; stroke-width: 2"></path>
+<circle cx="312.8" cy="36" r="8" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<text class="ax num" x="100" y="78" style="text-anchor: middle">10 pts</text>
+<text class="ax num" x="240" y="78" style="text-anchor: middle">5</text>
+<text class="ax num" x="520" y="78" style="text-anchor: middle">5</text>
+<text class="ax num" x="660" y="78" style="text-anchor: middle">10 pts</text>
+<text class="ax" x="380" y="78" style="text-anchor: middle; font-weight: 600; fill: #4A4843">Tied</text>
+</svg>
+<p class="num" style="margin: 14px 0 0; font-size: 17px; line-height: 1.5; color: #3D3B37"><b style="font-weight: 600; color: #171717">Too close to call.</b> Labor’s 2.4-point lead is inside the ±2.6 <button class="term">flow range</button>.</p>
+<p class="num" style="margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: #4A4843">Labor ▼ 0.8 on a month ago, within the <button class="term">margin</button></p>
+<p class="num" style="margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: #6B6862">Implied preference flows · <button class="term">weighted aggregate</button> of 8 polls in the 21 days to 21 Sep<button class="qbtn" aria-label="How this is counted, and the pollsters’ published figures" aria-expanded="false"><span>?</span></button></p>
+<div style="margin-top: 12px; display: flex; align-items: center; gap: 12px"><span style="font-size: 13px; color: #6B6862">Switch 2PP</span><button class="chip">Labor v Coalition<span class="num" style="font-weight: 600"><span style="color: #B9463F">51.6</span><span style="color: #9A968E">–</span><span style="color: #356697">48.4</span></span></button></div>
+</div>
+
+<h2 style="margin: 56px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 28px; line-height: 1.15">One Nation now runs Labor as close as the Coalition does</h2>
+<p style="margin: 6px 0 0; max-width: 880px; font-size: 15px; line-height: 1.5; color: #4A4843">Labor’s share against One Nation has fallen from 64% in June 2025 to 51%; against the Coalition, from 56% to 52%. Since February the two contests have run within a point and a half of each other.</p>
+
+<div style="margin-top: 16px; display: flex; align-items: center; border-bottom: 1px solid #DDDCD8">
+<div role="group" aria-label="Time range" style="display: flex; gap: 2px"><button class="tab" aria-pressed="false" style="font-size: 14px; padding: 0 10px">3 mo</button><button class="tab" aria-pressed="false" style="font-size: 14px; padding: 0 10px">6 mo</button><button class="tab" aria-pressed="false" style="font-size: 14px; padding: 0 10px">12 mo</button><button class="tab" aria-pressed="true" style="font-size: 14px; padding: 0 10px">All</button></div>
+<span style="flex-grow: 1"></span>
+<label class="check"><input type="checkbox">Compare published head-to-heads</label>
+<span style="width: 12px"></span>
+<button class="copy" aria-label="Expand two-party preferred chart" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button>
+</div>
+
+<span style="margin-top: 16px; font-size: 13px; font-weight: 600">Labor’s two-party share, %</span>
+
+<svg viewBox="0 0 1152 372" width="1152" height="372" role="img" aria-label="Labor’s two-party share by matchup, May 2025 to September 2026, on implied flows. Against One Nation it fell from 63.8 in June 2025 to 51.1 in September 2026; against the Coalition from 55.2 at the election to 51.6. The two lines have been within 1.5 points of each other since February 2026." style="margin-top: 8px; display: block; overflow: visible">
+<g transform="translate(36 50)">
+<path class="grid" d="M0 14H1010M0 84H1010M0 154H1010"></path>
+<path class="even" d="M0 224H1010"></path>
+<path class="base" d="M0 294H1010"></path>
+<text class="ax num" x="-6" y="18" style="text-anchor: end">65%</text>
+<text class="ax num" x="-6" y="88" style="text-anchor: end">60</text>
+<text class="ax num" x="-6" y="158" style="text-anchor: end">55</text>
+<text class="ax num" x="-6" y="228" style="text-anchor: end">50</text>
+<text class="ax num" x="-6" y="298" style="text-anchor: end">45</text>
+<path class="base" d="M118.9 294v4M298.3 294v4M477.7 294v4M653.2 294v4M830.6 294v4"></path>
+<text class="ax" x="118.9" y="314" style="text-anchor: middle">Jul 2025</text>
+<text class="ax" x="298.3" y="314" style="text-anchor: middle">Oct</text>
+<text class="ax" x="477.7" y="314" style="text-anchor: middle">Jan 2026</text>
+<text class="ax" x="653.2" y="314" style="text-anchor: middle">Apr</text>
+<text class="ax" x="830.6" y="314" style="text-anchor: middle">Jul</text>
+<path class="ev" d="M52.6 -30V294M442.6 -30V294M594.7 -30V294M733.1 -30V294M430.9 -14V294M518.6 -14V294"></path>
+<text class="evt halo" x="57.6" y="-36">1st Coalition split</text>
+<text class="evt halo" x="447.6" y="-36">Bondi shooting</text>
+<text class="evt halo" x="599.7" y="-36">Hormuz crisis</text>
+<text class="evt halo" x="738.1" y="-36">2026 Budget</text>
+<text class="evt halo" x="425.9" y="-20" style="text-anchor: end">Joyce → ONP</text>
+<text class="evt halo" x="523.6" y="-20">2nd Coalition split</text>
+<text class="ax" x="6" y="217">▲ Labor ahead</text>
+<text class="ax" x="6" y="241">▼ Rival ahead</text>
+<path d="M92.2 9.8L151.5 9.8L210.8 23.8L270.1 42L329.4 54.6L388.7 74.2L448 92.4L507.4 134.4L566.7 155.4L626 158.2L685.3 152.6L744.6 179.2L803.9 186.2L863.2 187.6L922.5 177.8L981.8 190.4L981.8 226.8L922.5 214.2L863.2 224L803.9 219.8L744.6 212.8L685.3 189L626 194.6L566.7 189L507.4 170.8L448 131.6L388.7 113.4L329.4 93.8L270.1 84L210.8 65.8L151.5 51.8L92.2 51.8Z" style="fill: #CC7C37; opacity: 0.16"></path>
+<path class="dots" d="M64.9 18.2h0M105.9 12.6h0M119.5 36.4h0M121.5 43.4h0M124.2 33.6h0M134 19.6h0M155.4 30.8h0M157.4 37.8h0M174.9 26.6h0M208.9 42h0M212.8 25.2h0M228.4 54.6h0M256.5 68.6h0M262.3 35h0M266.2 67.2h0M281.8 58.8h0M297.4 88.2h0M304.1 43.4h0M313.8 93.8h0M323.6 68.6h0M337.2 56h0M339.2 68.6h0M352.8 96.6h0M358.7 82.6h0M358.7 72.8h0M375.1 88.2h0M380.9 98h0M384.8 92.4h0M390.7 86.8h0M392.6 106.4h0M392.6 109.2h0M398.5 63h0M406.3 74.2h0M410.2 113.4h0M422.7 119h0M432.5 78.4h0M434.4 119h0M442.2 91h0M446.1 124.6h0M457.8 113.4h0M463.6 140h0M489.8 170.8h0M489.8 151.2h0M499.6 119h0M509.3 137.2h0M509.3 152.6h0M513.2 154h0M513.2 134.4h0M519.1 161h0M523 170.8h0M526.9 149.8h0M530.8 163.8h0M534.7 152.6h0M539.4 165.2h0M553 158.2h0M553 176.4h0M556.9 189h0M560.8 162.4h0M562.8 161h0M564.7 148.4h0M568.6 138.6h0M574.5 182h0M576.4 201.6h0M580.3 140h0M582.3 170.8h0M584.2 169.4h0M588.1 176.4h0M590.1 176.4h0M598.7 156.8h0M602.6 194.6h0M612.3 176.4h0M616.2 169.4h0M624 175h0M626 170.8h0M633.8 196h0M639.6 187.6h0M641.6 170.8h0M643.5 183.4h0M645.5 159.6h0M647.4 173.6h0M649.4 172.2h0M653.3 165.2h0M653.3 158.2h0M665.8 152.6h0M669.7 156.8h0M671.6 203h0M679.4 170.8h0M683.3 207.2h0M687.2 154h0M691.1 142.8h0M693.1 141.4h0M697 194.6h0M706.7 148.4h0M708.7 186.2h0M714.5 179.2h0M714.5 165.2h0M721.2 154h0M725.1 155.4h0M734.8 162.4h0M740.7 165.2h0M742.6 193.2h0M742.6 224h0M744.6 204.4h0M746.5 177.8h0M748.5 183.4h0M748.5 177.8h0M752.4 187.6h0M754.3 222.6h0M762.1 191.8h0M762.1 212.8h0M766 173.6h0M766 217h0M769.9 226.8h0M775.8 197.4h0M778.5 221.2h0M782.4 212.8h0M788.3 204.4h0M800 205.8h0M801.9 197.4h0M805.8 217h0M809.7 215.6h0M815.6 222.6h0M823.4 165.2h0M825.3 183.4h0M829.2 190.4h0M831.2 204.4h0M833.1 198.8h0M843.7 158.2h0M849.5 218.4h0M855.4 198.8h0M855.4 231h0M857.3 205.8h0M861.2 190.4h0M865.1 204.4h0M871 166.6h0M878.8 198.8h0M884.6 186.2h0M888.5 183.4h0M892.4 236.6h0M897.2 173.6h0M906.9 190.4h0M910.8 194.6h0M912.8 182h0M922.5 198.8h0M924.5 187.6h0M932.3 204.4h0M938.1 197.4h0M940.1 186.2h0M947.8 205.8h0M947.8 204.4h0M951.7 155.4h0M953.7 201.6h0M964.3 193.2h0M968.2 226.8h0M976 222.6h0M977.9 187.6h0M979.9 184.8h0M985.7 218.4h0M991.6 193.2h0M993.5 204.4h0" style="stroke: #CC7C37; opacity: 0.35"></path>
+<path class="ln" d="M3.9 151.2L92.2 137.2L151.5 130.2L210.8 140L270.1 147L329.4 147L388.7 148.4L448 162.4L507.4 176.4L566.7 173.6L626 179.2L685.3 179.2L744.6 193.2L803.9 182L863.2 200.2L922.5 197.4L981.8 201.6" style="stroke: #356697; stroke-width: 2"></path>
+<path class="ln" d="M92.2 30.8L151.5 30.8L210.8 44.8L270.1 63L329.4 74.2L388.7 93.8L448 112L507.4 152.6L566.7 172.2L626 176.4L685.3 170.8L744.6 196L803.9 203L863.2 205.8L922.5 196L981.8 208.6" style="stroke: #CC7C37; stroke-width: 3"></path>
+<circle cx="3.9" cy="151.2" r="5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 1.75"></circle>
+<text class="ax halo" x="13.9" y="173.2" style="fill: #4A4843">2025 election: 55.2</text>
+</g>
+<text class="end" x="1054" y="251.1" style="fill: #356697; font-weight: 500">v Coalition</text>
+<text class="end" x="1054" y="267.1" style="fill: #9E5200; font-weight: 600">v One Nation</text>
+</svg>
+
+<div style="margin-top: 16px; padding-top: 10px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; flex-wrap: wrap; column-gap: 24px; row-gap: 4px; font-size: 13px; color: #4A4843">
+<span class="key"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="2.5" style="fill: #CC7C37; opacity: 0.55"></circle></svg>One poll, implied flows</span>
+<span class="key"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><rect x="0" y="2" width="24" height="10" rx="2" style="fill: #CC7C37; opacity: 0.2"></rect><path d="M1 7H23" style="stroke: #CC7C37; stroke-width: 3; stroke-linecap: round"></path></svg>Monthly average and flow range</span>
+<span class="key"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><path d="M1 7H23" style="stroke: #356697; stroke-width: 2; stroke-linecap: round"></path></svg>v Coalition, monthly average</span>
+<span class="key"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 1.75"></circle></svg>2025 election result</span>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Copy chart: two-party preferred" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+
+<div style="margin-top: 32px; padding-top: 12px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 24px; font-size: 13px; color: #6B6862">
+<span>Figures pool the last 21 days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above.</span>
+<span style="flex-grow: 1"></span>
+<a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-weight: 500; color: #171717; white-space: nowrap; flex-shrink: 0">How it’s built</a>
+</div>
+
+</section>
+<section class="s3" style="width: 1280px; height: 1000px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
+
+
+<div style="border-top: 2px solid #171717; padding-top: 12px; display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">
+<span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Primary vote</span>
+<span>163 national polls since the 3 May 2025 election · latest fieldwork 21 Sep 2026</span>
+</div>
+
+<h1 style="margin: 16px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 46px; line-height: 1.08; letter-spacing: -0.01em; color: #171717">One Nation and Labor are level</h1>
+<p style="margin: 12px 0 0; max-width: 820px; font-size: 18px; line-height: 1.5; color: #3D3B37">One Nation, on 27.3%, and Labor, on 26.8%, are too close to separate. The Coalition, on 21.2%, has lost a third of its election-night vote.</p>
+
+<div style="margin-top: 32px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 32px; row-gap: 10px">
+<div style="grid-column: 1 / span 2; display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 500; color: #6B6862">
+<span style="flex-grow: 1; height: 1px; background: #9A968E"></span>
+<span>Within the margin of uncertainty</span>
+<span style="flex-grow: 1; height: 1px; background: #9A968E"></span>
+</div>
+<div style="grid-column: 3 / span 3"></div>
+
+<div style="display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 3px solid #CC7C37">
+<span style="font-size: 14px; font-weight: 600; color: #9E5200">One Nation</span>
+<span style="font-size: 36px; font-weight: 500; line-height: 1.1; letter-spacing: -0.02em">27.3<span style="font-size: 20px; color: #6B6862">%</span></span>
+<span class="num" style="font-size: 13px; color: #6B6862">▲ 20.9 since the election</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 3px solid #B9463F">
+<span style="font-size: 14px; font-weight: 600; color: #B9463F">Labor</span>
+<span style="font-size: 36px; font-weight: 500; line-height: 1.1; letter-spacing: -0.02em">26.8<span style="font-size: 20px; color: #6B6862">%</span></span>
+<span class="num" style="font-size: 13px; color: #6B6862">▼ 7.8 since the election</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 3px solid #356697">
+<span style="font-size: 14px; font-weight: 600; color: #356697">Coalition</span>
+<span style="font-size: 36px; font-weight: 500; line-height: 1.1; letter-spacing: -0.02em">21.2<span style="font-size: 20px; color: #6B6862">%</span></span>
+<span class="num" style="font-size: 13px; color: #6B6862">▼ 10.6 since the election</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 3px solid #439458">
+<span style="font-size: 14px; font-weight: 600; color: #287C42">Greens</span>
+<span style="font-size: 36px; font-weight: 500; line-height: 1.1; letter-spacing: -0.02em">13.2<span style="font-size: 20px; color: #6B6862">%</span></span>
+<span class="num" style="font-size: 13px; color: #6B6862">▲ 1.0 since the election</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 3px solid #938A81">
+<span style="font-size: 14px; font-weight: 600; color: #70675E">Others &amp; independents</span>
+<span style="font-size: 36px; font-weight: 500; line-height: 1.1; letter-spacing: -0.02em">11.2<span style="font-size: 20px; color: #6B6862">%</span></span>
+<span class="num" style="font-size: 13px; color: #6B6862">▼ 3.8 since the election</span>
+</div>
+</div>
+
+<svg viewBox="0 0 1152 460" width="1152" height="460" role="img" aria-label="Primary vote by month since the May 2025 election, with each poll as a dot. One Nation rose from 6.4% to 27.3%, level with Labor on 26.8%; the Coalition fell from 31.8% to 21.2%." style="margin-top: 28px; display: block; overflow: visible">
+<path class="grid" d="M0 333H1016M0 238H1016M0 143H1016M0 48H1016"></path>
+<path class="base" d="M0 428H1016"></path>
+<text class="ax" x="0" y="44">40%</text>
+<text class="ax" x="0" y="139">30%</text>
+<text class="ax" x="0" y="234">20%</text>
+<text class="ax" x="0" y="329">10%</text>
+
+<g style="opacity: 1">
+<path class="ev" d="M87.7 24V428M469.7 24V428M544.2 40V428M618.7 24V428M754.3 24V428"></path>
+<text class="evt" x="92.7" y="18">1st Coalition split</text>
+<text class="evt" x="474.7" y="18">Bondi shooting</text>
+<text class="evt" x="549.2" y="34">2nd Coalition split</text>
+<text class="evt" x="623.7" y="18">Hormuz crisis</text>
+<text class="evt" x="759.3" y="18">2026 Budget</text>
+</g>
+
+<g style="opacity: 0.18">
+<path style="fill: #938A81" d="M126.5 293.1L184.6 277.9L242.7 281.7L300.8 263.6L358.9 292.1L417 305.4L475.1 307.4L533.2 308.3L591.3 322.6L649.4 316.9L707.5 319.7L765.6 314.9L823.6 320.6L881.7 319.7L939.8 316.9L997.9 311.1L997.9 332.1L939.8 330.1L881.7 338.7L823.6 332.1L765.6 335.9L707.5 334.9L649.4 330.1L591.3 332.1L533.2 321.6L475.1 324.4L417 320.6L358.9 311.1L300.8 313.1L242.7 304.5L184.6 302.6L126.5 315.9Z"></path>
+<path style="fill: #439458" d="M126.5 311.1L184.6 302.6L242.7 304.5L300.8 310.2L358.9 306.4L417 307.4L475.1 304.5L533.2 307.4L591.3 310.2L649.4 305.4L707.5 302.6L765.6 312.1L823.6 302.6L881.7 303.6L939.8 301.7L997.9 295.9L997.9 313.1L939.8 313.1L881.7 314.9L823.6 314L765.6 321.6L707.5 314L649.4 316.8L591.3 321.6L533.2 322.6L475.1 319.7L417 320.6L358.9 325.4L300.8 323.5L242.7 323.5L184.6 319.7L126.5 326.4Z"></path>
+<path style="fill: #356697" d="M126.5 123.1L184.6 135.4L242.7 132.6L300.8 146.8L358.9 154.4L417 171.5L475.1 172.4L533.2 185.8L591.3 212.3L649.4 214.2L707.5 208.5L765.6 211.4L823.6 237L881.7 217.1L939.8 206.7L997.9 217.1L997.9 239.9L939.8 227.6L881.7 230.4L823.6 258L765.6 234.2L707.5 223.8L649.4 231.3L591.3 237.1L533.2 221.8L475.1 193.4L417 192.4L358.9 179.1L300.8 169.6L242.7 159.1L184.6 158.2L126.5 145.9Z"></path>
+<path style="fill: #B9463F" d="M126.5 65.1L184.6 76.5L242.7 75.6L300.8 86.9L358.9 92.7L417 95.5L475.1 104.1L533.2 126.9L591.3 127.8L649.4 137.3L707.5 134.4L765.6 144.9L823.6 147.8L881.7 155.3L939.8 155.3L997.9 162.9L997.9 182L939.8 170.6L881.7 170.6L823.6 164.8L765.6 158.2L707.5 153.5L649.4 152.5L591.3 143L533.2 143.9L475.1 130.6L417 112.6L358.9 109.8L300.8 107.9L242.7 109.8L184.6 97.4L126.5 87.9Z"></path>
+<path style="fill: #CC7C37" d="M126.5 338.7L184.6 346.3L242.7 332.1L300.8 314L358.9 295L417 264.6L475.1 251.3L533.2 205.7L591.3 175.3L649.4 180L707.5 186.7L765.6 161.1L823.6 142L881.7 155.3L939.8 169.6L997.9 156.3L997.9 175.3L939.8 190.5L881.7 180.1L823.6 161.1L765.6 185.8L707.5 201.9L649.4 195.2L591.3 196.2L533.2 234.2L475.1 276L417 289.3L358.9 317.8L300.8 333L242.7 349.2L184.6 359.6L126.5 371Z"></path>
+</g>
+
+<g style="opacity: 0.32">
+<path class="dots" style="stroke: #938A81" d="M99.8 290.2h0M139.9 299.8h0M153.2 309.2h0M155.2 314h0M157.9 311.1h0M167.4 285.5h0M188.4 285.5h0M190.3 276h0M207.5 299.8h0M240.8 304.5h0M244.6 295h0M259.9 285.5h0M287.4 304.5h0M293.2 295h0M297 285.5h0M312.3 290.2h0M327.5 314h0M329.4 219h0M334.1 314h0M343.6 314h0M353.2 276h0M366.5 304.5h0M368.4 323.5h0M381.8 304.5h0M387.5 285.5h0M387.5 295h0M403.6 304.5h0M409.3 304.5h0M413.2 323.5h0M418.9 299.8h0M420.8 314h0M420.8 333h0M426.5 314h0M434.2 314h0M438 323.5h0M450.2 314h0M459.8 295h0M461.7 314h0M469.3 342.5h0M473.2 314h0M484.6 314h0M490.4 304.5h0M516 304.5h0M516 323.5h0M525.5 323.5h0M535.1 304.5h0M535.1 295h0M538.9 304.5h0M538.9 342.5h0M544.6 314h0M548.5 304.5h0M552.3 318.8h0M556.1 314h0M559.9 333h0M564.5 318.8h0M577.9 333h0M577.9 323.5h0M581.7 323.5h0M585.5 333h0M587.4 318.8h0M589.4 314h0M593.2 328.2h0M598.9 342.5h0M600.8 333h0M604.6 314h0M606.5 323.5h0M608.5 314h0M612.3 333h0M614.2 342.5h0M622.6 309.2h0M626.4 323.5h0M636 304.5h0M639.8 314h0M647.5 304.5h0M649.4 309.2h0M657 323.5h0M662.7 328.2h0M664.6 314h0M666.6 314h0M668.5 323.5h0M670.4 333h0M672.3 342.5h0M676.1 352h0M676.1 328.2h0M688.4 314h0M692.2 304.5h0M694.1 333h0M701.7 328.2h0M705.5 314h0M709.4 323.5h0M713.2 323.5h0M715.1 318.8h0M718.9 314h0M728.5 323.5h0M730.4 333h0M736.1 361.5h0M736.1 352h0M742.6 314h0M746.5 323.5h0M756 323.5h0M761.7 304.5h0M763.6 342.5h0M763.6 318.8h0M765.6 342.5h0M767.5 314h0M769.4 328.2h0M769.4 333h0M773.2 323.5h0M775.1 333h0M782.7 328.2h0M782.7 342.5h0M786.6 247.5h0M786.6 342.5h0M790.4 342.5h0M796.1 309.2h0M798.8 314h0M802.6 333h0M808.4 318.8h0M819.8 314h0M821.7 318.8h0M825.6 314h0M829.4 314h0M835.1 328.2h0M842.7 352h0M844.7 342.5h0M848.5 318.8h0M850.4 333h0M852.3 323.5h0M862.6 295h0M868.4 333h0M874.1 323.5h0M874.1 333h0M876 314h0M879.8 295h0M883.7 342.5h0M889.4 304.5h0M897 323.5h0M902.8 323.5h0M904.7 371h0M906.6 314h0M910.4 352h0M915 333h0M924.6 333h0M928.4 323.5h0M930.3 295h0M939.8 323.5h0M941.7 328.2h0M949.4 304.5h0M955.1 323.5h0M957 314h0M964.7 342.5h0M964.7 342.5h0M968.5 304.5h0M970.4 323.5h0M980.7 328.2h0M984.6 295h0M992.2 342.5h0M994.1 309.2h0M996 304.5h0M1001.8 323.5h0M1007.5 309.2h0M1009.4 314h0"></path>
+<path class="dots" style="stroke: #439458" d="M99.8 318.8h0M139.9 314h0M153.2 314h0M155.2 323.5h0M157.9 306.4h0M167.4 295h0M188.4 314h0M190.3 314h0M207.5 314h0M240.8 314h0M244.6 314h0M259.9 314h0M287.4 323.5h0M293.2 304.5h0M297 323.5h0M312.3 314h0M327.5 323.5h0M329.4 314h0M334.1 314h0M343.6 323.5h0M353.2 323.5h0M366.5 304.5h0M368.4 295h0M381.8 342.5h0M387.5 314h0M387.5 323.5h0M403.6 314h0M409.3 304.5h0M413.2 342.5h0M418.9 309.2h0M420.8 309.2h0M420.8 314h0M426.5 304.5h0M434.2 323.5h0M438 333h0M450.2 304.5h0M459.8 323.5h0M461.7 333h0M469.3 304.5h0M473.2 304.5h0M484.6 314h0M490.4 304.5h0M516 314h0M516 295h0M525.5 299.8h0M535.1 314h0M535.1 333h0M538.9 299.8h0M538.9 323.5h0M544.6 304.5h0M548.5 342.5h0M552.3 304.5h0M556.1 314h0M559.9 323.5h0M564.5 309.2h0M577.9 314h0M577.9 299.8h0M581.7 314h0M585.5 323.5h0M587.4 304.5h0M589.4 323.5h0M593.2 309.2h0M598.9 314h0M600.8 314h0M604.6 309.2h0M606.5 323.5h0M608.5 304.5h0M612.3 323.5h0M614.2 314h0M622.6 318.8h0M626.4 314h0M636 290.2h0M639.8 304.5h0M647.5 314h0M649.4 309.2h0M657 304.5h0M662.7 299.8h0M664.6 333h0M666.6 304.5h0M668.5 304.5h0M670.4 314h0M672.3 304.5h0M676.1 314h0M676.1 299.8h0M688.4 314h0M692.2 304.5h0M694.1 314h0M701.7 309.2h0M705.5 304.5h0M709.4 304.5h0M713.2 314h0M715.1 299.8h0M718.9 295h0M728.5 295h0M730.4 323.5h0M736.1 304.5h0M736.1 314h0M742.6 304.5h0M746.5 295h0M756 318.8h0M761.7 323.5h0M763.6 323.5h0M763.6 318.8h0M765.6 323.5h0M767.5 314h0M769.4 318.8h0M769.4 314h0M773.2 304.5h0M775.1 304.5h0M782.7 299.8h0M782.7 323.5h0M786.6 333h0M786.6 333h0M790.4 314h0M796.1 299.8h0M798.8 304.5h0M802.6 323.5h0M808.4 280.8h0M819.8 314h0M821.7 295h0M825.6 304.5h0M829.4 304.5h0M835.1 299.8h0M842.7 304.5h0M844.7 295h0M848.5 304.5h0M850.4 333h0M852.3 304.5h0M862.6 295h0M868.4 295h0M874.1 314h0M874.1 304.5h0M876 309.2h0M879.8 314h0M883.7 314h0M889.4 295h0M897 314h0M902.8 295h0M904.7 314h0M906.6 304.5h0M910.4 333h0M915 285.5h0M924.6 295h0M928.4 280.8h0M930.3 314h0M939.8 314h0M941.7 309.2h0M949.4 314h0M955.1 295h0M957 314h0M964.7 304.5h0M964.7 314h0M968.5 299.8h0M970.4 304.5h0M980.7 290.2h0M984.6 314h0M992.2 323.5h0M994.1 276h0M996 304.5h0M1001.8 304.5h0M1007.5 280.8h0M1009.4 295h0"></path>
+<path class="dots" style="stroke: #356697" d="M99.8 133.5h0M139.9 133.5h0M153.2 138.2h0M155.2 133.5h0M157.9 133.5h0M167.4 181h0M188.4 152.5h0M190.3 152.5h0M207.5 133.5h0M213.3 143h0M240.8 143h0M244.6 152.5h0M259.9 143h0M287.4 143h0M293.2 171.5h0M297 171.5h0M312.3 143h0M327.5 171.5h0M329.4 171.5h0M334.1 162h0M343.6 152.5h0M353.2 162h0M366.5 171.5h0M368.4 133.5h0M381.8 181h0M387.5 171.5h0M387.5 200h0M403.6 152.5h0M409.3 200h0M413.2 200h0M418.9 171.5h0M420.8 190.5h0M420.8 181h0M426.5 200h0M434.2 171.5h0M438 181h0M450.2 200h0M459.8 181h0M461.7 181h0M469.3 181h0M473.2 166.8h0M484.6 162h0M490.4 200h0M516 209.5h0M516 190.5h0M525.5 138.2h0M535.1 228.5h0M535.1 162h0M538.9 200h0M538.9 162h0M544.6 228.5h0M548.5 190.5h0M552.3 214.2h0M556.1 238h0M559.9 247.5h0M564.5 233.3h0M577.9 257h0M577.9 214.2h0M581.7 247.5h0M585.5 266.5h0M587.4 238h0M589.4 209.5h0M593.2 204.8h0M598.9 200h0M600.8 228.5h0M604.6 200h0M606.5 181h0M608.5 219h0M612.3 238h0M614.2 247.5h0M622.6 204.8h0M626.4 228.5h0M636 214.2h0M639.8 247.5h0M647.5 219h0M649.4 200h0M657 228.5h0M662.7 185.8h0M664.6 200h0M666.6 247.5h0M668.5 209.5h0M670.4 228.5h0M672.3 266.5h0M676.1 209.5h0M676.1 214.2h0M688.4 200h0M692.2 238h0M694.1 200h0M701.7 214.2h0M705.5 209.5h0M709.4 228.5h0M713.2 209.5h0M715.1 209.5h0M718.9 238h0M728.5 214.2h0M730.4 200h0M736.1 219h0M736.1 209.5h0M742.6 200h0M746.5 228.5h0M756 190.5h0M761.7 200h0M763.6 228.5h0M763.6 271.2h0M765.6 190.5h0M767.5 209.5h0M769.4 200h0M769.4 238h0M773.2 209.5h0M775.1 209.5h0M782.7 209.5h0M782.7 209.5h0M786.6 257h0M786.6 190.5h0M790.4 238h0M796.1 238h0M798.8 238h0M802.6 257h0M808.4 261.8h0M819.8 238h0M821.7 266.5h0M825.6 228.5h0M829.4 257h0M835.1 261.8h0M842.7 266.5h0M844.7 257h0M848.5 223.8h0M850.4 209.5h0M852.3 266.5h0M862.6 223.8h0M868.4 228.5h0M874.1 209.5h0M874.1 228.5h0M876 238h0M879.8 238h0M883.7 247.5h0M889.4 209.5h0M897 209.5h0M902.8 219h0M904.7 219h0M906.6 219h0M910.4 219h0M915 204.8h0M924.6 257h0M928.4 219h0M930.3 219h0M939.8 209.5h0M941.7 204.8h0M949.4 190.5h0M955.1 228.5h0M957 228.5h0M964.7 247.5h0M964.7 219h0M968.5 233.3h0M970.4 181h0M980.7 223.8h0M984.6 257h0M992.2 200h0M994.1 223.8h0M996 238h0M1001.8 247.5h0M1007.5 223.8h0M1009.4 228.5h0"></path>
+<path class="dots" style="stroke: #B9463F" d="M99.8 76.5h0M139.9 71.8h0M153.2 81.2h0M155.2 76.5h0M157.9 86.9h0M167.4 86h0M188.4 86h0M190.3 95.5h0M207.5 81.2h0M213.3 86h0M240.8 86h0M244.6 76.5h0M259.9 105h0M287.4 95.5h0M293.2 86h0M297 95.5h0M312.3 105h0M327.5 95.5h0M329.4 105h0M334.1 76.5h0M343.6 105h0M353.2 105h0M366.5 95.5h0M368.4 114.5h0M381.8 86h0M387.5 114.5h0M387.5 86h0M403.6 114.5h0M409.3 114.5h0M413.2 67h0M418.9 114.5h0M420.8 114.5h0M420.8 105h0M426.5 86h0M434.2 86h0M438 95.5h0M450.2 124h0M459.8 95.5h0M461.7 105h0M469.3 95.5h0M473.2 138.2h0M484.6 124h0M490.4 143h0M516 152.5h0M516 152.5h0M525.5 143h0M535.1 124h0M535.1 143h0M538.9 157.2h0M538.9 114.5h0M544.6 143h0M548.5 133.5h0M552.3 138.2h0M556.1 133.5h0M559.9 105h0M564.5 138.2h0M577.9 114.5h0M577.9 157.2h0M581.7 143h0M585.5 105h0M587.4 138.2h0M589.4 124h0M593.2 124h0M598.9 143h0M600.8 152.5h0M604.6 133.5h0M606.5 143h0M608.5 152.5h0M612.3 124h0M614.2 124h0M622.6 138.2h0M626.4 152.5h0M636 176.2h0M639.8 143h0M647.5 152.5h0M649.4 157.2h0M657 162h0M662.7 171.5h0M664.6 133.5h0M666.6 152.5h0M668.5 143h0M670.4 133.5h0M672.3 124h0M676.1 124h0M676.1 143h0M688.4 138.2h0M692.2 143h0M694.1 162h0M701.7 143h0M705.5 181h0M709.4 133.5h0M713.2 124h0M715.1 138.2h0M718.9 171.5h0M728.5 143h0M730.4 143h0M736.1 133.5h0M736.1 124h0M742.6 147.8h0M746.5 143h0M756 138.2h0M761.7 143h0M763.6 133.5h0M763.6 157.2h0M765.6 152.5h0M767.5 152.5h0M769.4 147.8h0M769.4 133.5h0M773.2 162h0M775.1 181h0M782.7 166.8h0M782.7 152.5h0M786.6 152.5h0M786.6 152.5h0M790.4 162h0M796.1 171.5h0M798.8 181h0M802.6 143h0M808.4 181h0M819.8 162h0M821.7 162h0M825.6 181h0M829.4 171.5h0M835.1 171.5h0M842.7 114.5h0M844.7 143h0M848.5 162h0M850.4 143h0M852.3 152.5h0M862.6 162h0M868.4 181h0M874.1 162h0M874.1 181h0M876 166.8h0M879.8 162h0M883.7 143h0M889.4 166.8h0M897 162h0M902.8 166.8h0M904.7 133.5h0M906.6 162h0M910.4 152.5h0M915 166.8h0M924.6 152.5h0M928.4 185.8h0M930.3 162h0M939.8 162h0M941.7 157.2h0M949.4 181h0M955.1 171.5h0M957 152.5h0M964.7 152.5h0M964.7 152.5h0M968.5 147.8h0M970.4 181h0M980.7 171.5h0M984.6 181h0M992.2 162h0M994.1 190.5h0M996 162h0M1001.8 171.5h0M1007.5 190.5h0M1009.4 181h0"></path>
+<path class="dots" style="stroke: #CC7C37" d="M99.8 371h0M139.9 371h0M153.2 347.2h0M155.2 342.5h0M157.9 352.9h0M167.4 342.5h0M188.4 352h0M190.3 352h0M207.5 361.5h0M240.8 342.5h0M244.6 342.5h0M259.9 342.5h0M287.4 323.5h0M293.2 333h0M297 314h0M312.3 337.8h0M327.5 304.5h0M329.4 314h0M334.1 323.5h0M343.6 295h0M353.2 314h0M366.5 314h0M368.4 333h0M381.8 285.5h0M387.5 304.5h0M387.5 285.5h0M403.6 314h0M409.3 266.5h0M413.2 257h0M418.9 295h0M420.8 261.8h0M420.8 257h0M426.5 285.5h0M434.2 285.5h0M438 257h0M450.2 247.5h0M459.8 295h0M461.7 266.5h0M469.3 266.5h0M473.2 266.5h0M484.6 276h0M490.4 238h0M516 209.5h0M516 228.5h0M525.5 285.5h0M535.1 219h0M535.1 257h0M538.9 228.5h0M538.9 247.5h0M544.6 200h0M548.5 219h0M552.3 214.2h0M556.1 190.5h0M559.9 181h0M564.5 190.5h0M577.9 171.5h0M577.9 195.2h0M581.7 162h0M585.5 162h0M587.4 190.5h0M589.4 209.5h0M593.2 223.8h0M598.9 190.5h0M600.8 162h0M604.6 233.3h0M606.5 219h0M608.5 200h0M612.3 171.5h0M614.2 162h0M622.6 219h0M626.4 171.5h0M636 204.8h0M639.8 181h0M647.5 200h0M649.4 214.2h0M657 181h0M662.7 204.8h0M664.6 200h0M666.6 171.5h0M668.5 209.5h0M670.4 181h0M672.3 152.5h0M676.1 190.5h0M676.1 204.8h0M688.4 223.8h0M692.2 190.5h0M694.1 181h0M701.7 195.2h0M705.5 181h0M709.4 200h0M713.2 219h0M715.1 223.8h0M718.9 171.5h0M728.5 214.2h0M730.4 190.5h0M736.1 171.5h0M736.1 190.5h0M742.6 223.8h0M746.5 200h0M756 219h0M761.7 219h0M763.6 162h0M763.6 124h0M765.6 181h0M767.5 200h0M769.4 195.2h0M769.4 171.5h0M773.2 190.5h0M775.1 162h0M782.7 185.8h0M782.7 162h0M786.6 200h0M786.6 171.5h0M790.4 133.5h0M796.1 171.5h0M798.8 152.5h0M802.6 133.5h0M808.4 147.8h0M819.8 152.5h0M821.7 147.8h0M825.6 162h0M829.4 143h0M835.1 128.8h0M842.7 152.5h0M844.7 152.5h0M848.5 181h0M850.4 181h0M852.3 143h0M862.6 214.2h0M868.4 152.5h0M874.1 181h0M874.1 143h0M876 162h0M879.8 181h0M883.7 143h0M889.4 214.2h0M897 181h0M902.8 185.8h0M904.7 190.5h0M906.6 190.5h0M910.4 133.5h0M915 200h0M924.6 152.5h0M928.4 181h0M930.3 200h0M939.8 181h0M941.7 190.5h0M949.4 200h0M955.1 171.5h0M957 181h0M964.7 143h0M964.7 162h0M968.5 204.8h0M970.4 209.5h0M980.7 176.2h0M984.6 143h0M992.2 171.5h0M994.1 190.5h0M996 181h0M1001.8 143h0M1007.5 185.8h0M1009.4 171.5h0"></path>
+</g>
+
+<path class="trend" style="stroke: #938A81; stroke-dasharray: 6 4" d="M40 285.5L126.5 304.5L184.6 290.2L242.7 293.1L300.8 288.4L358.9 301.6L417 313.1L475.1 315.9L533.2 314.9L591.3 327.3L649.4 323.5L707.5 327.3L765.6 325.4L823.6 326.4L881.7 329.2L939.8 323.5L997.9 321.6"></path>
+<path class="trend" style="stroke: #439458" d="M40 312.1L126.5 318.8L184.6 311.1L242.7 314L300.8 316.9L358.9 315.9L417 314L475.1 312.1L533.2 314.9L591.3 315.9L649.4 311.1L707.5 308.3L765.6 316.9L823.6 308.3L881.7 309.2L939.8 307.4L997.9 304.5"></path>
+<path class="trend" style="stroke: #356697" d="M40 125.9L126.5 134.4L184.6 146.8L242.7 145.9L300.8 158.2L358.9 166.8L417 182L475.1 182.9L533.2 203.8L591.3 224.7L649.4 222.8L707.5 216.2L765.6 222.8L823.6 247.5L881.7 223.8L939.8 217.1L997.9 228.5"></path>
+<path class="trend" style="stroke: #B9463F" d="M40 99.3L126.5 76.5L184.6 86.9L242.7 92.7L300.8 97.4L358.9 101.2L417 104.1L475.1 117.3L533.2 135.4L591.3 135.4L649.4 144.9L707.5 144L765.6 151.6L823.6 156.3L881.7 162.9L939.8 162.9L997.9 172.5"></path>
+<path class="trend" style="stroke: #CC7C37" d="M40 367.2L126.5 354.9L184.6 352.9L242.7 340.6L300.8 323.5L358.9 306.4L417 276.9L475.1 263.6L533.2 220L591.3 185.8L649.4 187.6L707.5 194.3L765.6 173.4L823.6 151.6L881.7 167.7L939.8 180L997.9 165.8"></path>
+
+<circle class="ring" style="stroke: #938A81" cx="40" cy="285.5" r="4.5"></circle>
+<circle class="ring" style="stroke: #439458" cx="40" cy="312.1" r="4.5"></circle>
+<circle class="ring" style="stroke: #356697" cx="40" cy="125.9" r="4.5"></circle>
+<circle class="ring" style="stroke: #B9463F" cx="40" cy="99.3" r="4.5"></circle>
+<circle class="ring" style="stroke: #CC7C37" cx="40" cy="367.2" r="4.5"></circle>
+<circle style="fill: #938A81; stroke: #FAF9F6; stroke-width: 2" cx="997.9" cy="321.6" r="5"></circle>
+<circle style="fill: #439458; stroke: #FAF9F6; stroke-width: 2" cx="997.9" cy="304.5" r="5"></circle>
+<circle style="fill: #356697; stroke: #FAF9F6; stroke-width: 2" cx="997.9" cy="228.5" r="5"></circle>
+<circle style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2" cx="997.9" cy="172.5" r="5"></circle>
+<circle style="fill: #CC7C37; stroke: #FAF9F6; stroke-width: 2" cx="997.9" cy="165.8" r="5"></circle>
+<path style="fill: none; stroke: #9A968E; stroke-width: 1" d="M1004.9 172.5L1009.9 177.6M1004.9 165.8L1009.9 160.6"></path>
+<text class="lbl" x="1011.9" y="326.1" style="fill: #70675E">Others</text>
+<text class="lbl" x="1011.9" y="309" style="fill: #287C42">Greens</text>
+<text class="lbl" x="1011.9" y="233" style="fill: #356697">Coalition</text>
+<text class="lbl" x="1011.9" y="182.1" style="fill: #B9463F">Labor</text>
+<text class="lbl" x="1011.9" y="165.1" style="fill: #9E5200">One Nation</text>
+
+<path class="base" d="M40 428V434M152.7 428V434M271.1 428V434M387.6 428V434M504.1 428V434M616.8 428V434M733.3 428V434M849.8 428V434M968.3 428V434"></path>
+<text class="ax" x="40" y="452" style="text-anchor: middle; font-weight: 600; fill: #171717">Election</text>
+<text class="ax" x="152.7" y="452" style="text-anchor: middle">Jul</text>
+<text class="ax" x="271.1" y="452" style="text-anchor: middle">Sep</text>
+<text class="ax" x="387.6" y="452" style="text-anchor: middle">Nov</text>
+<text class="ax" x="504.1" y="452" style="text-anchor: middle">Jan 2026</text>
+<text class="ax" x="616.8" y="452" style="text-anchor: middle">Mar</text>
+<text class="ax" x="733.3" y="452" style="text-anchor: middle">May</text>
+<text class="ax" x="849.8" y="452" style="text-anchor: middle">Jul</text>
+<text class="ax" x="968.3" y="452" style="text-anchor: middle">Sep</text>
+</svg>
+
+<div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 28px; font-size: 13px; color: #4A4843">
+<span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="2.5" style="fill: #6B6862; opacity: 0.5"></circle></svg>One poll</span>
+<span style="display: flex; align-items: center; gap: 8px"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><rect x="0" y="2" width="24" height="10" rx="2" style="fill: #6B6862; opacity: 0.2"></rect><path d="M1 7H23" style="stroke: #171717; stroke-width: 2.5; stroke-linecap: round"></path></svg>Monthly average and its 95% interval</span>
+<span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 2"></circle></svg>2025 election result</span>
+<span style="flex-grow: 1"></span>
+<a href="#method" style="font-weight: 500; white-space: nowrap">How it’s built</a>
+<button class="copy" aria-label="Copy chart: primary vote" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+
+
+</section>
+<section class="s4" style="width: 1280px; height: 960px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
+
+<div style="border-top: 2px solid #171717; padding-top: 12px; display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862"><span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Latest and next polls</span><span>8 pollsters · latest release Wed 23 Sep</span></div>
+<p style="margin: 14px 0 0; max-width: 900px; font-size: 16px; line-height: 1.5; color: #3D3B37">The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm. Open a row for the full poll and the releases behind the projection.</p>
+
+<div style="margin-top: 20px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #DDDCD8"><div role="group" aria-label="Figures" style="display: flex; gap: 4px"><button class="tab" aria-pressed="true">2PP</button><button class="tab" aria-pressed="false">Primary</button><button class="tab" aria-pressed="false">Leadership</button></div><span style="flex-grow: 1"></span><span style="font-size: 14px; color: #6B6862">Two-party:</span><button class="swap" title="Switch the page to Labor v Coalition">Labor v One Nation <span aria-hidden="true" style="color: #6B6862">⇄</span></button><span style="font-size: 14px; color: #6B6862">· implied flows</span><button class="qbtn" aria-label="How the two-party figures are counted, and the pollsters’ published figures"><span>?</span></button></div>
+
+<div role="table" aria-label="Latest poll and next expected poll from each pollster" style="margin-top: 16px; display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: 190px 128px 214px 392px 188px 40px; align-items: end; padding-bottom: 6px; border-bottom: 1px solid #9A968E"><span class="th" style="padding-left: 12px">Pollster</span><button class="sortb th" aria-pressed="true" aria-label="Sorted by latest, newest first">Latest <span aria-hidden="true">▾</span></button><span class="th">Labor v One Nation</span><span style="display: flex; flex-direction: column"><span class="th">Releases · next</span><svg viewBox="0 0 392 36" width="392" height="36" aria-hidden="true" style="display: block; overflow: visible"><text class="ax" x="20.5" y="30" style="text-anchor: middle">17 Aug</text><text class="ax" x="93.8" y="30" style="text-anchor: middle">31 Aug</text><text class="ax" x="167.2" y="30" style="text-anchor: middle">14 Sep</text><text class="ax" x="313.9" y="30" style="text-anchor: middle">12 Oct</text><text x="230.1" y="30" style="font-size: 11px; font-weight: 600; fill: #171717; text-anchor: middle">Today</text></svg></span><button class="sortb th" aria-pressed="false" aria-label="Sort by next release, soonest first">Next, at the earliest <span aria-hidden="true"><span style="color: #C9C6BF">▾</span></span></button><span></span></div>
+<div class="row" role="row" aria-expanded="false" style="display: grid; grid-template-columns: 190px 128px 214px 392px 188px 40px; align-items: center; min-height: 64px;"><span style="padding-left: 12px; display: flex; flex-direction: column; gap: 2px"><a class="firm" href="#yougov" target="_blank" rel="noopener">YouGov<span class="ext" aria-hidden="true">↗</span></a><span class="sub">News24 · fortnightly</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600">23 Sep</span><span class="sub num">15–21 Sep · 1,500</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600"><span style="color: #B9463F">51.4</span><span style="color: #9A968E; font-weight: 400"> – </span><span style="color: #9E5200">48.6</span><span style="margin-left: 8px; font-size: 13px; color: #B9463F">ALP +2.8</span></span><span class="sub num">Labor ▲ 1.6 since its 8 Sep poll</span></span><svg viewBox="0 0 392 64" width="392" height="64" role="img" aria-label="YouGov: last published 23 Sep; next expected Wed 7 Oct, in 11 days · 5 or 6 am" style="display: block; overflow: visible"><path d="M20.5 8V56M93.8 8V56M167.2 8V56M240.5 8V56M313.9 8V56" style="stroke: #EFEDE8; stroke-width: 1"></path><path d="M230.1 4V60" style="stroke: #171717; stroke-width: 1"></path><path d="M10 32.0H382" style="stroke: #E6E4DF; stroke-width: 1"></path><circle cx="67.6" cy="32.0" r="3.5" style="fill: #9A968E"></circle><circle cx="141.0" cy="32.0" r="3.5" style="fill: #9A968E"></circle><circle cx="214.3" cy="32.0" r="5.5" style="fill: #171717"></circle><circle cx="287.7" cy="32.0" r="5.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 2"></circle><circle cx="361.0" cy="32.0" r="3.5" style="fill: #FAF9F6; stroke: #9A968E; stroke-width: 1.5"></circle></svg><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 14px; font-weight: 600">Wed 7 Oct</span><span class="sub">in 11 days · 5 or 6 am</span></span><button class="chev" aria-label="Show this poll and YouGov’s release history" aria-expanded="false"><span aria-hidden="true" style="display: inline-block; transform: rotate(0deg)">▸</span></button></div>
+<div class="row" role="row" aria-expanded="false" style="display: grid; grid-template-columns: 190px 128px 214px 392px 188px 40px; align-items: center; min-height: 64px;"><span style="padding-left: 12px; display: flex; flex-direction: column; gap: 2px"><a class="firm" href="#roy morgan" target="_blank" rel="noopener">Roy Morgan<span class="ext" aria-hidden="true">↗</span></a><span class="sub">Self-published · weekly</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600">21 Sep</span><span class="sub num">14–20 Sep · 1,561</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600"><span style="color: #B9463F">52.2</span><span style="color: #9A968E; font-weight: 400"> – </span><span style="color: #9E5200">47.8</span><span style="margin-left: 8px; font-size: 13px; color: #B9463F">ALP +4.4</span></span><span class="sub num">Labor ▼ 0.4 since its 13 Sep poll</span></span><svg viewBox="0 0 392 64" width="392" height="64" role="img" aria-label="Roy Morgan: last published 21 Sep; next expected Mon 28 Sep, in 2 days · about 4 pm" style="display: block; overflow: visible"><path d="M20.5 8V56M93.8 8V56M167.2 8V56M240.5 8V56M313.9 8V56" style="stroke: #EFEDE8; stroke-width: 1"></path><path d="M230.1 4V60" style="stroke: #171717; stroke-width: 1"></path><path d="M10 32.0H382" style="stroke: #E6E4DF; stroke-width: 1"></path><circle cx="20.5" cy="32.0" r="3.5" style="fill: #9A968E"></circle><circle cx="57.2" cy="32.0" r="3.5" style="fill: #9A968E"></circle><circle cx="93.8" cy="32.0" r="3.5" style="fill: #9A968E"></circle><circle cx="130.5" cy="32.0" r="3.5" style="fill: #9A968E"></circle><circle cx="167.2" cy="32.0" r="3.5" style="fill: #9A968E"></circle><circle cx="203.9" cy="32.0" r="5.5" style="fill: #171717"></circle><circle cx="240.5" cy="32.0" r="5.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 2"></circle><circle cx="277.2" cy="32.0" r="3.5" style="fill: #FAF9F6; stroke: #9A968E; stroke-width: 1.5"></circle><circle cx="313.9" cy="32.0" r="3.5" style="fill: #FAF9F6; stroke: #9A968E; stroke-width: 1.5"></circle><circle cx="350.6" cy="32.0" r="3.5" style="fill: #FAF9F6; stroke: #9A968E; stroke-width: 1.5"></circle></svg><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 14px; font-weight: 600">Mon 28 Sep</span><span class="sub">in 2 days · about 4 pm</span></span><button class="chev" aria-label="Show this poll and Roy Morgan’s release history" aria-expanded="false"><span aria-hidden="true" style="display: inline-block; transform: rotate(0deg)">▸</span></button></div>
+<div class="row" role="row" aria-expanded="false" style="display: grid; grid-template-columns: 190px 128px 214px 392px 188px 40px; align-items: center; min-height: 64px;"><span style="padding-left: 12px; display: flex; flex-direction: column; gap: 2px"><a class="firm" href="#newspoll" target="_blank" rel="noopener">Newspoll<span class="ext" aria-hidden="true">↗</span></a><span class="sub">The Australian · every 3 weeks</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600">20 Sep</span><span class="sub num">14–17 Sep · 1,244</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600"><span style="color: #B9463F">50.4</span><span style="color: #9A968E; font-weight: 400"> – </span><span style="color: #9E5200">49.6</span><span style="margin-left: 8px; font-size: 13px; color: #B9463F">ALP +0.8</span></span><span class="sub num">Labor ▼ 0.9 since its 28 Aug poll</span></span><svg viewBox="0 0 392 64" width="392" height="64" role="img" aria-label="Newspoll: last published 20 Sep; next expected Sun 11 Oct, in 15 days · or 18 Oct" style="display: block; overflow: visible"><path d="M20.5 8V56M93.8 8V56M167.2 8V56M240.5 8V56M313.9 8V56" style="stroke: #EFEDE8; stroke-width: 1"></path><path d="M230.1 4V60" style="stroke: #171717; stroke-width: 1"></path><path d="M10 32.0H382" style="stroke: #E6E4DF; stroke-width: 1"></path><path d="M308.6 32.0H345.3" style="stroke: #C9C6BF; stroke-width: 6; stroke-linecap: round"></path><circle cx="345.3" cy="32.0" r="3.5" style="fill: #FAF9F6; stroke: #9A968E; stroke-width: 1.5"></circle><circle cx="88.6" cy="32.0" r="3.5" style="fill: #9A968E"></circle><circle cx="198.6" cy="32.0" r="5.5" style="fill: #171717"></circle><circle cx="308.6" cy="32.0" r="5.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 2"></circle></svg><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 14px; font-weight: 600">Sun 11 Oct</span><span class="sub">in 15 days · or 18 Oct</span></span><button class="chev" aria-label="Show this poll and Newspoll’s release history" aria-expanded="false"><span aria-hidden="true" style="display: inline-block; transform: rotate(0deg)">▸</span></button></div>
+<div class="row" role="row" aria-expanded="false" style="display: grid; grid-template-columns: 190px 128px 214px 392px 188px 40px; align-items: center; min-height: 64px;"><span style="padding-left: 12px; display: flex; flex-direction: column; gap: 2px"><a class="firm" href="#demosau" target="_blank" rel="noopener">DemosAU<span class="ext" aria-hidden="true">↗</span></a><span class="sub">Capital Brief · monthly</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600">17 Sep</span><span class="sub num">10–14 Sep · 1,583</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600"><span style="color: #B9463F">52.8</span><span style="color: #9A968E; font-weight: 400"> – </span><span style="color: #9E5200">47.2</span><span style="margin-left: 8px; font-size: 13px; color: #B9463F">ALP +5.6</span></span><span class="sub num">Labor ▲ 1.4 since its 20 Aug poll</span></span><svg viewBox="0 0 392 64" width="392" height="64" role="img" aria-label="DemosAU: last published 17 Sep; next expected 9–27 Oct, window opens in 13 days" style="display: block; overflow: visible"><path d="M20.5 8V56M93.8 8V56M167.2 8V56M240.5 8V56M313.9 8V56" style="stroke: #EFEDE8; stroke-width: 1"></path><path d="M230.1 4V60" style="stroke: #171717; stroke-width: 1"></path><path d="M10 32.0H382" style="stroke: #E6E4DF; stroke-width: 1"></path><rect x="298.2" y="27.0" width="83.8" height="10" rx="5" style="fill: none; stroke: #171717; stroke-width: 1.5; stroke-dasharray: 3 2"></rect><circle cx="57.2" cy="32.0" r="3.5" style="fill: #9A968E"></circle><circle cx="182.9" cy="32.0" r="5.5" style="fill: #171717"></circle></svg><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 14px; font-weight: 600">9–27 Oct</span><span class="sub">window opens in 13 days</span></span><button class="chev" aria-label="Show this poll and DemosAU’s release history" aria-expanded="false"><span aria-hidden="true" style="display: inline-block; transform: rotate(0deg)">▸</span></button></div>
+<div class="row" role="row" aria-expanded="false" style="display: grid; grid-template-columns: 190px 128px 214px 392px 188px 40px; align-items: center; min-height: 64px;"><span style="padding-left: 12px; display: flex; flex-direction: column; gap: 2px"><a class="firm" href="#resolve" target="_blank" rel="noopener">Resolve<span class="ext" aria-hidden="true">↗</span></a><span class="sub">SMH / Age · monthly</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600">13 Sep</span><span class="sub num">12 Sep · 2,250</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600"><span style="color: #B9463F">50.1</span><span style="color: #9A968E; font-weight: 400"> – </span><span style="color: #9E5200">49.9</span><span style="margin-left: 8px; font-size: 13px; color: #B9463F">ALP +0.2</span></span><span class="sub num">Labor ▼ 1.7 since its 15 Aug poll</span></span><svg viewBox="0 0 392 64" width="392" height="64" role="img" aria-label="Resolve: last published 13 Sep; next expected Sun 11 Oct, in 15 days · or 18 Oct" style="display: block; overflow: visible"><path d="M20.5 8V56M93.8 8V56M167.2 8V56M240.5 8V56M313.9 8V56" style="stroke: #EFEDE8; stroke-width: 1"></path><path d="M230.1 4V60" style="stroke: #171717; stroke-width: 1"></path><path d="M10 32.0H382" style="stroke: #E6E4DF; stroke-width: 1"></path><path d="M308.6 32.0H345.3" style="stroke: #C9C6BF; stroke-width: 6; stroke-linecap: round"></path><circle cx="345.3" cy="32.0" r="3.5" style="fill: #FAF9F6; stroke: #9A968E; stroke-width: 1.5"></circle><circle cx="15.2" cy="32.0" r="3.5" style="fill: #9A968E"></circle><circle cx="161.9" cy="32.0" r="5.5" style="fill: #171717"></circle><circle cx="308.6" cy="32.0" r="5.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 2"></circle></svg><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 14px; font-weight: 600">Sun 11 Oct</span><span class="sub">in 15 days · or 18 Oct</span></span><button class="chev" aria-label="Show this poll and Resolve’s release history" aria-expanded="false"><span aria-hidden="true" style="display: inline-block; transform: rotate(0deg)">▸</span></button></div>
+<div class="row" role="row" aria-expanded="false" style="display: grid; grid-template-columns: 190px 128px 214px 392px 188px 40px; align-items: center; min-height: 64px;"><span style="padding-left: 12px; display: flex; flex-direction: column; gap: 2px"><a class="firm" href="#essential" target="_blank" rel="noopener">Essential<span class="ext" aria-hidden="true">↗</span></a><span class="sub">The Guardian · monthly</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600">2 Sep</span><span class="sub num">26–31 Aug · 1,017</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600"><span style="color: #B9463F">51.6</span><span style="color: #9A968E; font-weight: 400"> – </span><span style="color: #9E5200">48.4</span><span style="margin-left: 8px; font-size: 13px; color: #B9463F">ALP +3.2</span></span><span class="sub num">Labor ▲ 0.2 since its 29 Jun poll</span></span><svg viewBox="0 0 392 64" width="392" height="64" role="img" aria-label="Essential: last published 2 Sep; next expected Wed 30 Sep, in 4 days · or 7 Oct" style="display: block; overflow: visible"><path d="M20.5 8V56M93.8 8V56M167.2 8V56M240.5 8V56M313.9 8V56" style="stroke: #EFEDE8; stroke-width: 1"></path><path d="M230.1 4V60" style="stroke: #171717; stroke-width: 1"></path><path d="M10 32.0H382" style="stroke: #E6E4DF; stroke-width: 1"></path><path d="M251.0 32.0H287.7" style="stroke: #C9C6BF; stroke-width: 6; stroke-linecap: round"></path><circle cx="287.7" cy="32.0" r="3.5" style="fill: #FAF9F6; stroke: #9A968E; stroke-width: 1.5"></circle><circle cx="104.3" cy="32.0" r="5.5" style="fill: #171717"></circle><circle cx="251.0" cy="32.0" r="5.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 2"></circle></svg><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 14px; font-weight: 600">Wed 30 Sep</span><span class="sub">in 4 days · or 7 Oct</span></span><button class="chev" aria-label="Show this poll and Essential’s release history" aria-expanded="false"><span aria-hidden="true" style="display: inline-block; transform: rotate(0deg)">▸</span></button></div>
+<div class="row" role="row" aria-expanded="false" style="display: grid; grid-template-columns: 190px 128px 214px 392px 188px 40px; align-items: center; min-height: 64px;"><span style="padding-left: 12px; display: flex; flex-direction: column; gap: 2px"><a class="firm" href="#redbridge/accent" target="_blank" rel="noopener">RedBridge/Accent<span class="ext" aria-hidden="true">↗</span></a><span class="sub">AFR · monthly</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600">30 Aug</span><span class="sub num">24–28 Aug · 1,006</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600"><span style="color: #B9463F">51.4</span><span style="color: #9A968E; font-weight: 400"> – </span><span style="color: #9E5200">48.6</span><span style="margin-left: 8px; font-size: 13px; color: #B9463F">ALP +2.8</span></span><span class="sub num">Labor ▲ 2.3 since its 30 Jul poll</span></span><svg viewBox="0 0 392 64" width="392" height="64" role="img" aria-label="RedBridge/Accent: last published 30 Aug; next expected Sun 27 Sep, tomorrow · 6 or 8 pm" style="display: block; overflow: visible"><path d="M20.5 8V56M93.8 8V56M167.2 8V56M240.5 8V56M313.9 8V56" style="stroke: #EFEDE8; stroke-width: 1"></path><path d="M230.1 4V60" style="stroke: #171717; stroke-width: 1"></path><path d="M10 32.0H382" style="stroke: #E6E4DF; stroke-width: 1"></path><circle cx="88.6" cy="32.0" r="5.5" style="fill: #171717"></circle><circle cx="235.3" cy="32.0" r="5.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 2"></circle></svg><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 14px; font-weight: 600">Sun 27 Sep</span><span class="sub">tomorrow · 6 or 8 pm</span></span><button class="chev" aria-label="Show this poll and RedBridge/Accent’s release history" aria-expanded="false"><span aria-hidden="true" style="display: inline-block; transform: rotate(0deg)">▸</span></button></div>
+<div class="row" role="row" aria-expanded="false" style="display: grid; grid-template-columns: 190px 128px 214px 392px 188px 40px; align-items: center; min-height: 64px; opacity: 0.6;"><span style="padding-left: 12px; display: flex; flex-direction: column; gap: 2px"><a class="firm" href="#spectre strategy" target="_blank" rel="noopener">Spectre Strategy<span class="ext" aria-hidden="true">↗</span></a><span class="sub">Self-published · irregular · no poll in six weeks</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600">27 Jul</span><span class="sub num">11–23 Jul · 1,434</span></span><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 15px; font-weight: 600"><span style="color: #B9463F">51.8</span><span style="color: #9A968E; font-weight: 400"> – </span><span style="color: #9E5200">48.2</span><span style="margin-left: 8px; font-size: 13px; color: #B9463F">ALP +3.6</span></span><span class="sub num">Labor ▲ 0.3 since its 19 Apr poll</span></span><svg viewBox="0 0 392 64" width="392" height="64" role="img" aria-label="Spectre Strategy: last published 27 Jul; next expected About 10 Dec, give or take 18 days" style="display: block; overflow: visible"><path d="M20.5 8V56M93.8 8V56M167.2 8V56M240.5 8V56M313.9 8V56" style="stroke: #EFEDE8; stroke-width: 1"></path><path d="M230.1 4V60" style="stroke: #171717; stroke-width: 1"></path><path d="M10 32.0H382" style="stroke: #E6E4DF; stroke-width: 1"></path><text class="ax" x="10" y="23.0">◂ 27 Jul</text><circle cx="10" cy="32.0" r="3.5" style="fill: #171717"></circle><text class="ax" x="382" y="23.0" style="text-anchor: end">Dec ▸</text><circle cx="382" cy="32.0" r="4.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 2"></circle></svg><span style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 14px; font-weight: 600">About 10 Dec</span><span class="sub">give or take 18 days</span></span><button class="chev" aria-label="Show this poll and Spectre Strategy’s release history" aria-expanded="false"><span aria-hidden="true" style="display: inline-block; transform: rotate(0deg)">▸</span></button></div>
+</div>
+
+<div style="margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 22px; row-gap: 6px; font-size: 13px; color: #4A4843"><span class="key"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" style="fill: #171717"></circle></svg>Latest release</span><span class="key"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="3.5" style="fill: #9A968E"></circle></svg>Earlier releases</span><span class="key"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 2"></circle></svg>Next, at the earliest</span><span class="key"><svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true"><path d="M4 6H20" style="stroke: #C9C6BF; stroke-width: 6; stroke-linecap: round"></path><circle cx="21" cy="6" r="3.5" style="fill: #FAF9F6; stroke: #9A968E; stroke-width: 1.5"></circle></svg>Or a week later</span><span class="key"><svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true"><rect x="1" y="1" width="24" height="10" rx="5" style="fill: none; stroke: #171717; stroke-width: 1.5; stroke-dasharray: 3 2"></rect></svg>Window, for irregular pollsters</span></div>
+
+<p style="margin: 16px 0 0; max-width: 960px; font-size: 13px; line-height: 1.55; color: #6B6862">Projections read each pollster’s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest. A pollster that misses its slot shows as overdue until the release is added. Spectre Strategy has not published in six weeks, so its poll is outside the averages.</p>
+
+</section>
+<section class="s5" style="width: 1280px; height: 1200px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
+
+
+<div style="border-top: 2px solid #171717; padding-top: 12px; display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">
+<span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Leadership</span>
+<span>Preferred PM and net approval · Newspoll, YouGov, Resolve, Essential and others</span>
+</div>
+<h1 style="margin: 16px 0 0; max-width: 1000px; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 46px; line-height: 1.08; letter-spacing: -0.01em">Albanese still leads as preferred PM, but his net approval has fallen 40 points</h1>
+<p style="margin: 12px 0 0; max-width: 860px; font-size: 18px; line-height: 1.5; color: #3D3B37">He leads Taylor 42–38 and Hanson 51–39 head to head, but his lead over the Coalition leader has shrunk from about 18 points under Ley to about 5 under Taylor. His net approval is down about 40 points since the election, to −25, the lowest of the three.</p>
+
+<div style="margin-top: 40px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 64px; row-gap: 20px">
+
+<div style="display: flex; flex-direction: column">
+<h2 style="margin: 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 26px; line-height: 1.15">Preferred prime minister</h2>
+<p style="margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: #4A4843">“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.</p>
+<div style="margin-top: 14px; display: flex; align-items: center; border-bottom: 1px solid #DDDCD8">
+<div role="group" aria-label="Contest" style="display: flex; gap: 4px">
+<button aria-pressed="true" style="min-height: 44px; padding: 0 12px; border: 0; border-bottom: 2px solid #171717; margin-bottom: -1px; background: transparent; font-size: 15px; font-weight: 600; color: #171717">Two-way</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 12px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Three-way</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 12px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Both</button>
+</div>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Expand preferred prime minister chart" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column">
+<h2 style="margin: 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 26px; line-height: 1.15">Net approval</h2>
+<p style="margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: #4A4843">Approve minus disapprove of the job each leader is doing. Newspoll, YouGov, Resolve, Essential and others.</p>
+<div style="margin-top: 14px; display: flex; align-items: center; border-bottom: 1px solid #DDDCD8">
+<div role="group" aria-label="Measure" style="display: flex; gap: 4px">
+<button aria-pressed="true" style="min-height: 44px; padding: 0 12px; border: 0; border-bottom: 2px solid #171717; margin-bottom: -1px; background: transparent; font-size: 15px; font-weight: 600; color: #171717">Approval</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 12px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Favourability</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 12px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Both</button>
+</div>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Expand net approval chart" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column">
+<svg viewBox="0 0 544 118" width="544" height="118" role="img" aria-label="Head to head: Albanese 42.1 per cent, Taylor 37.6; Albanese 51.0 per cent, Hanson 39.0." style="display: block; overflow: visible">
+<text class="cap" x="0" y="14">Albanese v Taylor</text>
+<text class="cap num" x="544" y="14" style="text-anchor: end; fill: #B9463F">Albanese +4.5</text>
+<rect x="0" y="22" width="229" height="30" style="fill: #B9463F"></rect>
+<rect x="229" y="22" width="110.5" height="30" style="fill: #EFEDE8"></rect>
+<rect x="339.5" y="22" width="204.5" height="30" style="fill: #356697"></rect>
+<text x="10" y="42" style="fill: #FAF9F6"><tspan class="bn">Albanese</tspan><tspan class="bv num" dx="6">42.1</tspan></text>
+<text class="note" x="284.2" y="41" style="text-anchor: middle">neither</text>
+<text x="534" y="42" style="text-anchor: end; fill: #FAF9F6"><tspan class="bn">Taylor</tspan><tspan class="bv num" dx="6">37.6</tspan></text>
+<text class="cap" x="0" y="76">Albanese v Hanson</text>
+<text class="cap num" x="544" y="76" style="text-anchor: end; fill: #B9463F">Albanese +12.0</text>
+<rect x="0" y="84" width="277.4" height="30" style="fill: #B9463F"></rect>
+<rect x="277.4" y="84" width="54.4" height="30" style="fill: #EFEDE8"></rect>
+<rect x="331.8" y="84" width="212.2" height="30" style="fill: #CC7C37"></rect>
+<text x="10" y="104" style="fill: #FAF9F6"><tspan class="bn">Albanese</tspan><tspan class="bv num" dx="6">51.0</tspan></text>
+<text class="note" x="304.6" y="103" style="text-anchor: middle">neither</text>
+<text x="534" y="104" style="text-anchor: end; fill: #3D2200"><tspan class="bn">Hanson</tspan><tspan class="bv num" dx="6">39.0</tspan></text>
+</svg>
+<p style="margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: #4A4843">Asked to choose from all three: Albanese 36%, Hanson 27%, Taylor 21%. Hanson, not Taylor, runs second.</p>
+</div>
+
+<div style="display: flex; flex-direction: column">
+<svg viewBox="0 0 544 132" width="544" height="132" role="img" aria-label="Net approval now: Albanese minus 24.6, plus or minus 4.5; Taylor minus 6.9, plus or minus 6.2; Hanson minus 4.9, plus or minus 7.2." style="display: block; overflow: visible">
+<path class="grid" d="M120 16V116M223.3 16V116M430 16V116"></path>
+<path class="even" d="M326.7 16V116"></path>
+<text class="note" x="326.7" y="10" style="text-anchor: middle">Even</text>
+<text class="note" x="446" y="10">Now</text>
+<text class="note" x="544" y="10" style="text-anchor: end">Change</text>
+<circle cx="6" cy="29" r="5" style="fill: #B9463F"></circle>
+<text class="nm" x="18" y="34">Albanese</text>
+<path class="ln" style="stroke: #B9463F" d="M176.3 29H222.8"></path>
+<circle cx="199.6" cy="29" r="6" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<text class="v num" x="446" y="34">−24.6</text>
+<text class="v num" x="544" y="34" style="text-anchor: end">▼ 6.2</text>
+<circle cx="6" cy="63" r="5" style="fill: #356697"></circle>
+<text class="nm" x="18" y="68">Taylor</text>
+<path class="ln" style="stroke: #356697" d="M259 63H323.1"></path>
+<circle cx="291" cy="63" r="6" style="fill: #356697; stroke: #FAF9F6; stroke-width: 2"></circle>
+<text class="v num" x="446" y="68">−6.9</text>
+<text class="e num" x="544" y="68" style="text-anchor: end">▼ 3.2</text>
+<circle cx="6" cy="97" r="5" style="fill: #CC7C37"></circle>
+<text class="nm" x="18" y="102">Hanson</text>
+<path class="ln" style="stroke: #CC7C37" d="M264.2 97H338.6"></path>
+<circle cx="301.4" cy="97" r="6" style="fill: #CC7C37; stroke: #FAF9F6; stroke-width: 2"></circle>
+<text class="v num" x="446" y="102">−4.9</text>
+<text class="e num" x="544" y="102" style="text-anchor: end">▼ 6.0</text>
+<text class="ax" x="120" y="130" style="text-anchor: middle">−40</text>
+<text class="ax" x="223.3" y="130" style="text-anchor: middle">−20</text>
+<text class="ax" x="326.7" y="130" style="text-anchor: middle">0</text>
+<text class="ax" x="430" y="130" style="text-anchor: middle">+20</text>
+</svg>
+<p style="margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: #4A4843">Bars are 95% intervals. Only Albanese’s fall is statistically significant, and Hanson’s range still includes even.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 600">Albanese’s lead, month by month</span>
+<svg viewBox="0 0 544 250" width="544" height="250" role="img" aria-label="Albanese's preferred-PM lead over the Coalition leader: 15 to 22 points against Ley, 2 to 9 points against Taylor since February 2026; over Hanson 7 to 15 points since April 2026." style="display: block; overflow: visible">
+<g transform="translate(36 20)">
+<path class="grid" d="M0 0H430M0 66.7H430M0 133.3H430"></path>
+<path class="base" d="M0 200H430"></path>
+<text class="ax" x="-8" y="4" style="text-anchor: end">+30</text>
+<text class="ax" x="-8" y="70.7" style="text-anchor: end">+20</text>
+<text class="ax" x="-8" y="137.3" style="text-anchor: end">+10</text>
+<text class="ax" x="-8" y="204" style="text-anchor: end">Tied</text>
+<path class="even" d="M238.2 0V200"></path>
+<text class="note" x="242" y="-6">Ley → Taylor</text>
+<path class="ln" style="stroke: #356697" d="M62.3 102.7L88.0 83.3L113.7 82.7L138.6 54.0L164.4 50.7L189.3 74.7L215.0 98.7L232.4 90.0"></path>
+<path class="ln" style="stroke: #356697" d="M244.9 152.0L264.0 160.0L289.7 159.3L314.6 187.3L340.3 162.0L365.3 143.3L391.0 163.3L416.7 173.3"></path>
+<path class="ln" style="stroke: #CC7C37" d="M289.7 141.3L314.6 98.0L340.3 151.3L365.3 128.0L391.0 116.0L416.7 123.3"></path>
+<circle cx="416.7" cy="173.3" r="4.5" style="fill: #356697; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<circle cx="416.7" cy="123.3" r="4.5" style="fill: #CC7C37; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<text class="lbl" x="164.4" y="40" style="text-anchor: middle; fill: #356697">over Ley</text>
+<text class="lbl" x="425" y="177.3" style="fill: #356697">over Taylor</text>
+<text class="lbl" x="425" y="127.3" style="fill: #9E5200">over Hanson</text>
+<path class="base" d="M50.6 200V206M127 200V206M203.4 200V206M278.1 200V206M353.6 200V206"></path>
+<text class="ax" x="50.6" y="222" style="text-anchor: middle">Jul 2025</text>
+<text class="ax" x="127" y="222" style="text-anchor: middle">Oct</text>
+<text class="ax" x="203.4" y="222" style="text-anchor: middle">Jan 2026</text>
+<text class="ax" x="278.1" y="222" style="text-anchor: middle">Apr</text>
+<text class="ax" x="353.6" y="222" style="text-anchor: middle">Jul</text>
+</g>
+</svg>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 600">Net approval, month by month</span>
+<svg viewBox="0 0 544 250" width="544" height="250" role="img" aria-label="Net approval since the May 2025 election: Albanese from plus 17.5 to minus 23.5; Ley from 0 to minus 31; Taylor from plus 1 to minus 6; Hanson from plus 9 to minus 7." style="display: block; overflow: visible">
+<g transform="translate(36 20)">
+<path class="grid" d="M0 28.6H430M0 142.9H430"></path>
+<path class="base" d="M0 200H430"></path>
+<path class="even" d="M0 85.7H430"></path>
+<text class="ax" x="-8" y="32.6" style="text-anchor: end">+20</text>
+<text class="ax" x="-8" y="89.7" style="text-anchor: end">Even</text>
+<text class="ax" x="-8" y="146.9" style="text-anchor: end">−20</text>
+<text class="ax" x="-8" y="204" style="text-anchor: end">−40</text>
+<path class="even" d="M238.2 0V200"></path>
+<text class="note" x="242" y="-6">Ley → Taylor</text>
+<path style="fill: #B9463F; opacity: 0.14" d="M11.6 0L37.4 16.9L62.3 43.4L88.0 66.0L113.7 59.4L138.6 82.6L164.4 40.6L189.3 72.0L215.0 112.0L240.7 115.1L264.0 123.4L289.7 120.6L314.6 132.3L340.3 133.4L365.3 123.7L391.0 136.9L416.7 140.3L416.7 165.4L391.0 151.1L365.3 138.6L340.3 151.7L314.6 144.9L289.7 134.9L264.0 138.9L240.7 132.9L215.0 135.4L189.3 104.6L164.4 92.6L138.6 96.3L113.7 104.0L88.0 90.6L62.3 86.3L37.4 57.4L11.6 72.0Z"></path>
+<path style="fill: #356697; opacity: 0.14" d="M62.3 59.1L88.0 62.6L113.7 84.0L138.6 113.7L164.4 112.6L189.3 96.3L215.0 132.0L232.4 159.7L232.4 191.1L215.0 165.1L189.3 119.7L164.4 157.1L138.6 154.9L113.7 141.1L88.0 111.7L62.3 112.3Z"></path>
+<path style="fill: #356697; opacity: 0.14" d="M244.9 72.3L264.0 76.9L289.7 72.6L314.6 83.7L340.3 88.9L365.3 97.4L391.0 96.0L416.7 84.9L416.7 120.9L391.0 121.1L365.3 134.6L340.3 116.9L314.6 103.1L289.7 105.1L264.0 91.7L244.9 92.3Z"></path>
+<path style="fill: #CC7C37; opacity: 0.16" d="M240.7 42.9L264.0 54.0L314.6 47.1L340.3 77.1L365.3 72.0L391.0 72.6L416.7 88.6L416.7 122.9L391.0 96.6L365.3 94.9L340.3 111.4L314.6 78.6L264.0 88.9L240.7 77.1Z"></path>
+<path class="ln" style="stroke: #356697" d="M62.3 85.7L88.0 87.1L113.7 112.6L138.6 134.3L164.4 134.9L189.3 108.0L215.0 148.6L232.4 175.4"></path>
+<path class="ln" style="stroke: #356697" d="M244.9 82.3L264.0 84.3L289.7 88.9L314.6 93.4L340.3 102.9L365.3 116.0L391.0 108.6L416.7 102.9"></path>
+<path class="ln" style="stroke: #CC7C37" d="M240.7 60.0L264.0 71.4L314.6 62.9L340.3 94.3L365.3 83.4L391.0 84.6L416.7 105.7"></path>
+<path class="ln" style="stroke: #B9463F" d="M11.6 35.7L37.4 37.1L62.3 64.9L88.0 78.3L113.7 81.7L138.6 89.4L164.4 66.6L189.3 88.3L215.0 123.7L240.7 124.0L264.0 131.1L289.7 127.7L314.6 138.6L340.3 142.6L365.3 131.1L391.0 144.0L416.7 152.9"></path>
+<circle cx="416.7" cy="152.9" r="4.5" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<circle cx="416.7" cy="102.9" r="4.5" style="fill: #356697; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<circle cx="416.7" cy="105.7" r="4.5" style="fill: #CC7C37; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<text class="lbl" x="226" y="193" style="text-anchor: end; fill: #356697">Ley</text>
+<text class="lbl" x="425" y="99" style="fill: #356697">Taylor</text>
+<text class="lbl" x="425" y="118" style="fill: #9E5200">Hanson</text>
+<text class="lbl" x="425" y="157" style="fill: #B9463F">Albanese</text>
+<path class="base" d="M50.6 200V206M127 200V206M203.4 200V206M278.1 200V206M353.6 200V206"></path>
+<text class="ax" x="50.6" y="222" style="text-anchor: middle">Jul 2025</text>
+<text class="ax" x="127" y="222" style="text-anchor: middle">Oct</text>
+<text class="ax" x="203.4" y="222" style="text-anchor: middle">Jan 2026</text>
+<text class="ax" x="278.1" y="222" style="text-anchor: middle">Apr</text>
+<text class="ax" x="353.6" y="222" style="text-anchor: middle">Jul</text>
+</g>
+</svg>
+</div>
+
+<div style="display: flex; align-items: center; gap: 16px; font-size: 13px; line-height: 1.5; color: #6B6862">
+<span>Lead is Albanese’s share minus his opponent’s. Pollsters leave different shares undecided, so the gap is more comparable than the levels. Lines are monthly averages.</span>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Copy chart: preferred prime minister" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+
+<div style="display: flex; align-items: center; gap: 16px; font-size: 13px; line-height: 1.5; color: #6B6862">
+<span style="display: flex; align-items: center; gap: 8px"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><rect x="0" y="2" width="24" height="10" rx="2" style="fill: #6B6862; opacity: 0.2"></rect><path d="M1 7H23" style="stroke: #6B6862; stroke-width: 2"></path></svg>Monthly average and its 95% interval</span>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Copy chart: net approval" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+
+</div>
+
+<div style="margin-top: 32px; padding-top: 12px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 24px; font-size: 13px; color: #6B6862">
+<span>Figures pool the last six weeks of polls. Changes are on the previous period; ▼ in bold marks a significant change.</span>
+<span style="flex-grow: 1"></span>
+<a href="#method" style="min-height: 44px; display: flex; align-items: center; font-weight: 500; color: #171717; white-space: nowrap; flex-shrink: 0">How it’s built</a>
+</div>
+
+
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":4681}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

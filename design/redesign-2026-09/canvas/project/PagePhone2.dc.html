@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Snapshot page – phone, 2 of 3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&amp;family=IBM+Plex+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s5{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s5 a{color:#171717}
+.s5 a:hover{color:#B9463F}
+.s5 button{font:inherit;cursor:pointer}
+.s5 .num{font-variant-numeric:tabular-nums}
+.s5 svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s5 .grid{stroke:#E6E4DF;stroke-width:1;fill:none}
+.s5 .base{stroke:#9A968E;stroke-width:1;fill:none}
+.s5 .even{stroke:#9A968E;stroke-width:1;stroke-dasharray:3 3;fill:none}
+.s5 .ax{font-size:11px;fill:#6B6862}
+.s5 .cap{font-size:13px;font-weight:600;fill:#171717}
+.s5 .bn{font-size:12px;font-weight:500}
+.s5 .bv{font-size:14px;font-weight:600}
+.s5 .nm{font-size:15px;fill:#171717}
+.s5 .v{font-size:15px;font-weight:600;fill:#171717}
+.s5 .e{font-size:13px;fill:#6B6862}
+.s5 .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.s5 .lbl{font-size:11px;font-weight:600}
+.s5 .note{font-size:11px;fill:#6B6862}
+.s5 .copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.s5 .copy:hover{background:#EFEDE8;color:#171717}
+.s5 .copy:focus-visible{outline:2px solid #171717;outline-offset:2px}
+.s6{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s6 a{color:#171717}
+.s6 a:hover{color:#10777C}
+.s6 button{font:inherit;cursor:pointer}
+.s6 .num{font-variant-numeric:tabular-nums}
+.s6 svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s6 .grid{stroke:#E6E4DF;stroke-width:1;fill:none}
+.s6 .base{stroke:#9A968E;stroke-width:1;fill:none}
+.s6 .ax{font-size:11px;fill:#6B6862}
+.s6 .ev{stroke:#C9C6BF;stroke-width:1;stroke-dasharray:1 3;fill:none}
+.s6 .evt{font-size:12px;font-weight:500;fill:#4A4843}
+.s6 .ln{fill:none;stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round}
+.s6 .end{font-size:11px;font-weight:600}
+.s6 .halo{paint-order:stroke;stroke:#FAF9F6;stroke-width:4px;stroke-linejoin:round}
+.s6 .copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.s6 .copy:hover{background:#EFEDE8;color:#171717}
+.s6 .copy:focus-visible,.s6 .how:focus-visible{outline:2px solid #171717;outline-offset:2px}
+.s6 .how{min-height:44px;padding:0;border:0;background:none;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:#171717}
+.s6 .key{display:flex;align-items:center;gap:8px}
+.s7{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s7 a{color:#171717}
+.s7 a:hover{color:#9E5200}
+.s7 button{font:inherit;cursor:pointer}
+.s7 .num{font-variant-numeric:tabular-nums}
+.s7 svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.s7 .grid{stroke:#E6E4DF;stroke-width:1;fill:none}
+.s7 .base{stroke:#9A968E;stroke-width:1;fill:none}
+.s7 .ax{font-size:11px;fill:#6B6862}
+.s7 .rowl{font-size:15px;fill:#171717}
+.s7 .sec{font-size:13px;font-weight:600;fill:#171717}
+.s7 .secs{font-size:12px;fill:#6B6862}
+.s7 .wh{stroke:#CC7C37;stroke-width:2;stroke-linecap:round;fill:none}
+.s7 .pt{fill:#CC7C37;stroke:#FAF9F6;stroke-width:2}
+.s7 .pto{fill:#FAF9F6;stroke:#CC7C37;stroke-width:2}
+.s7 .v{font-size:15px;font-weight:600;fill:#171717}
+.s7 .e{font-size:13px;fill:#6B6862}
+.s7 .d{font-size:13px;font-weight:600;fill:#9E5200}
+.s7 .all{stroke:#171717;stroke-width:1.5;stroke-dasharray:4 3;fill:none}
+.s7 .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.s7 .lbl{font-size:11px;font-weight:600}
+.s7 .copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.s7 .copy:hover{background:#EFEDE8;color:#171717}
+.s7 .copy:focus-visible{outline:2px solid #171717;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 4870px; display: flex; flex-direction: column; background: #FAF9F6">
+<section class="s5" style="width: 390px; height: 1850px; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; background: #FAF9F6">
+
+
+<div style="border-top: 2px solid #171717; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #6B6862">
+<span style="font-size: 19px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Leadership</span>
+<span>Preferred PM and net approval · Newspoll, YouGov, Resolve, Essential and others</span>
+</div>
+<h1 style="margin: 14px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 32px; line-height: 1.1; letter-spacing: -0.01em">Albanese still leads as preferred PM, but his net approval has fallen 40 points</h1>
+<p style="margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: #3D3B37">He leads Taylor 42–38 and Hanson 51–39 head to head, but his lead over the Coalition leader has shrunk from about 18 points under Ley to about 5 under Taylor. His net approval is down about 40 points since the election, to −25, the lowest of the three.</p>
+
+<h2 style="margin: 32px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 22px; line-height: 1.15">Preferred prime minister</h2>
+<p style="margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: #4A4843">“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.</p>
+<div style="margin-top: 12px; display: flex; align-items: center; border-bottom: 1px solid #DDDCD8">
+<div role="group" aria-label="Contest" style="display: flex">
+<button aria-pressed="true" style="min-height: 44px; padding: 0 10px; border: 0; border-bottom: 2px solid #171717; margin-bottom: -1px; background: transparent; font-size: 15px; font-weight: 600; color: #171717">Two-way</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Three-way</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Both</button>
+</div>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Expand preferred prime minister chart" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button>
+</div>
+
+<svg viewBox="0 0 350 118" width="350" height="118" role="img" aria-label="Head to head: Albanese 42.1 per cent, Taylor 37.6; Albanese 51.0 per cent, Hanson 39.0." style="margin-top: 16px; display: block; overflow: visible">
+<text class="cap" x="0" y="14">Albanese v Taylor</text>
+<text class="cap num" x="350" y="14" style="text-anchor: end; fill: #B9463F">Albanese +4.5</text>
+<rect x="0" y="22" width="147.4" height="30" style="fill: #B9463F"></rect>
+<rect x="147.4" y="22" width="71" height="30" style="fill: #EFEDE8"></rect>
+<rect x="218.4" y="22" width="131.6" height="30" style="fill: #356697"></rect>
+<text x="8" y="42" style="fill: #FAF9F6"><tspan class="bn">Albanese</tspan><tspan class="bv num" dx="4">42.1</tspan></text>
+<text class="note" x="182.9" y="41" style="text-anchor: middle">neither</text>
+<text x="342" y="42" style="text-anchor: end; fill: #FAF9F6"><tspan class="bn">Taylor</tspan><tspan class="bv num" dx="4">37.6</tspan></text>
+<text class="cap" x="0" y="76">Albanese v Hanson</text>
+<text class="cap num" x="350" y="76" style="text-anchor: end; fill: #B9463F">Albanese +12.0</text>
+<rect x="0" y="84" width="178.5" height="30" style="fill: #B9463F"></rect>
+<rect x="178.5" y="84" width="35" height="30" style="fill: #EFEDE8"></rect>
+<rect x="213.5" y="84" width="136.5" height="30" style="fill: #CC7C37"></rect>
+<text x="8" y="104" style="fill: #FAF9F6"><tspan class="bn">Albanese</tspan><tspan class="bv num" dx="4">51.0</tspan></text>
+<text x="342" y="104" style="text-anchor: end; fill: #3D2200"><tspan class="bn">Hanson</tspan><tspan class="bv num" dx="4">39.0</tspan></text>
+</svg>
+<p style="margin: 10px 0 0; font-size: 13px; line-height: 1.5; color: #4A4843">Asked to choose from all three: Albanese 36%, Hanson 27%, Taylor 21%. Hanson, not Taylor, runs second.</p>
+
+<span style="margin-top: 20px; font-size: 13px; font-weight: 600">Albanese’s lead, month by month</span>
+<svg viewBox="0 0 350 186" width="350" height="186" role="img" aria-label="Albanese's preferred-PM lead over the Coalition leader: 15 to 22 points against Ley, 2 to 9 points against Taylor since February 2026; over Hanson 7 to 15 points since April 2026." style="margin-top: 6px; display: block; overflow: visible">
+<g transform="translate(28 16)">
+<path class="grid" d="M0 0H270M0 50H270M0 100H270"></path>
+<path class="base" d="M0 150H270"></path>
+<text class="ax" x="-6" y="4" style="text-anchor: end">+30</text>
+<text class="ax" x="-6" y="54" style="text-anchor: end">+20</text>
+<text class="ax" x="-6" y="104" style="text-anchor: end">+10</text>
+<text class="ax" x="-6" y="154" style="text-anchor: end">Tied</text>
+<path class="even" d="M149.6 0V150"></path>
+<text class="note" x="152" y="-5" style="font-size: 10px">Ley → Taylor</text>
+<path class="ln" style="stroke: #356697" d="M39.1 77.0L55.3 62.5L71.4 62.0L87.0 40.5L103.2 38.0L118.8 56.0L135.0 74.0L145.9 67.5"></path>
+<path class="ln" style="stroke: #356697" d="M153.8 114.0L165.8 120.0L181.9 119.5L197.5 140.5L213.7 121.5L229.3 107.5L245.5 122.5L261.7 130.0"></path>
+<path class="ln" style="stroke: #CC7C37" d="M181.9 106.0L197.5 73.5L213.7 113.5L229.3 96.0L245.5 87.0L261.7 92.5"></path>
+<circle cx="261.7" cy="130" r="3.5" style="fill: #356697; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<circle cx="261.7" cy="92.5" r="3.5" style="fill: #CC7C37; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<text class="lbl" x="103.2" y="28" style="text-anchor: middle; fill: #356697">over Ley</text>
+<text class="lbl" x="268" y="134" style="fill: #356697">Taylor</text>
+<text class="lbl" x="268" y="96" style="fill: #9E5200">Hanson</text>
+<path class="base" d="M31.8 150V155M79.7 150V155M127.7 150V155M174.6 150V155M222 150V155"></path>
+<text class="ax" x="31.8" y="168" style="text-anchor: middle">Jul ’25</text>
+<text class="ax" x="79.7" y="168" style="text-anchor: middle">Oct</text>
+<text class="ax" x="127.7" y="168" style="text-anchor: middle">Jan ’26</text>
+<text class="ax" x="174.6" y="168" style="text-anchor: middle">Apr</text>
+<text class="ax" x="222" y="168" style="text-anchor: middle">Jul</text>
+</g>
+</svg>
+<div style="margin-top: 8px; display: flex; align-items: flex-start; gap: 12px">
+<p style="margin: 0; flex-grow: 1; font-size: 12px; line-height: 1.5; color: #6B6862">Lead is Albanese’s share minus his opponent’s; the gap compares better across pollsters than the levels. Monthly averages.</p>
+<button class="copy" aria-label="Copy chart: preferred prime minister" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+
+<h2 style="margin: 36px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 22px; line-height: 1.15">Net approval</h2>
+<p style="margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: #4A4843">Approve minus disapprove of the job each leader is doing. Newspoll, YouGov, Resolve, Essential and others.</p>
+<div style="margin-top: 12px; display: flex; align-items: center; border-bottom: 1px solid #DDDCD8">
+<div role="group" aria-label="Measure" style="display: flex">
+<button aria-pressed="true" style="min-height: 44px; padding: 0 10px; border: 0; border-bottom: 2px solid #171717; margin-bottom: -1px; background: transparent; font-size: 15px; font-weight: 600; color: #171717">Approval</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Favourability</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Both</button>
+</div>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Expand net approval chart" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button>
+</div>
+
+<svg viewBox="0 0 350 160" width="350" height="160" role="img" aria-label="Net approval now: Albanese minus 24.6, plus or minus 4.5; Taylor minus 6.9, plus or minus 6.2; Hanson minus 4.9, plus or minus 7.2." style="margin-top: 16px; display: block; overflow: visible">
+<path class="even" d="M233.3 24V44M233.3 70V90M233.3 116V136"></path>
+<circle cx="6" cy="11" r="5" style="fill: #B9463F"></circle>
+<text class="nm" x="18" y="16">Albanese</text>
+<text x="350" y="16" style="text-anchor: end"><tspan class="v num">−24.6</tspan><tspan class="v num" dx="10">▼ 6.2</tspan></text>
+<path class="ln" style="stroke: #B9463F; stroke-width: 2.5" d="M63.6 34H116.1"></path>
+<circle cx="89.8" cy="34" r="6" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="6" cy="57" r="5" style="fill: #356697"></circle>
+<text class="nm" x="18" y="62">Taylor</text>
+<text x="350" y="62" style="text-anchor: end"><tspan class="v num">−6.9</tspan><tspan class="e num" dx="10">▼ 3.2</tspan></text>
+<path class="ln" style="stroke: #356697; stroke-width: 2.5" d="M156.9 80H229.2"></path>
+<circle cx="193.1" cy="80" r="6" style="fill: #356697; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="6" cy="103" r="5" style="fill: #CC7C37"></circle>
+<text class="nm" x="18" y="108">Hanson</text>
+<text x="350" y="108" style="text-anchor: end"><tspan class="v num">−4.9</tspan><tspan class="e num" dx="10">▼ 6.0</tspan></text>
+<path class="ln" style="stroke: #CC7C37; stroke-width: 2.5" d="M162.8 126H246.8"></path>
+<circle cx="204.8" cy="126" r="6" style="fill: #CC7C37; stroke: #FAF9F6; stroke-width: 2"></circle>
+<path class="base" d="M0 144H350"></path>
+<text class="ax" x="0" y="158">−40</text>
+<text class="ax" x="116.7" y="158" style="text-anchor: middle">−20</text>
+<text class="ax" x="233.3" y="158" style="text-anchor: middle">Even</text>
+<text class="ax" x="350" y="158" style="text-anchor: end">+20</text>
+</svg>
+<p style="margin: 10px 0 0; font-size: 13px; line-height: 1.5; color: #4A4843">Bars are 95% intervals. Only Albanese’s fall is statistically significant, and Hanson’s range still includes even.</p>
+
+<span style="margin-top: 20px; font-size: 13px; font-weight: 600">Net approval, month by month</span>
+<svg viewBox="0 0 350 186" width="350" height="186" role="img" aria-label="Net approval since the May 2025 election: Albanese from plus 17.5 to minus 23.5; Ley from 0 to minus 31; Taylor from plus 1 to minus 6; Hanson from plus 9 to minus 7." style="margin-top: 6px; display: block; overflow: visible">
+<g transform="translate(28 16)">
+<path class="grid" d="M0 21.4H270M0 107.1H270"></path>
+<path class="base" d="M0 150H270"></path>
+<path class="even" d="M0 64.3H270"></path>
+<text class="ax" x="-6" y="25.4" style="text-anchor: end">+20</text>
+<text class="ax" x="-6" y="68.3" style="text-anchor: end">Even</text>
+<text class="ax" x="-6" y="111.1" style="text-anchor: end">−20</text>
+<text class="ax" x="-6" y="154" style="text-anchor: end">−40</text>
+<path class="even" d="M149.6 0V150"></path>
+<text class="note" x="152" y="-5" style="font-size: 10px">Ley → Taylor</text>
+<path style="fill: #B9463F; opacity: 0.14" d="M7.3 0L23.5 12.6L39.1 32.6L55.3 49.5L71.4 44.6L87.0 61.9L103.2 30.4L118.8 54.0L135.0 84.0L151.2 86.4L165.8 92.6L181.9 90.4L197.5 99.2L213.7 100.1L229.3 92.8L245.5 102.6L261.7 105.2L261.7 124.1L245.5 113.4L229.3 103.9L213.7 113.8L197.5 108.6L181.9 101.1L165.8 104.1L151.2 99.6L135.0 101.6L118.8 78.4L103.2 69.4L87.0 72.2L71.4 78.0L55.3 67.9L39.1 64.7L23.5 43.1L7.3 54.0Z"></path>
+<path style="fill: #356697; opacity: 0.14" d="M39.1 44.4L55.3 46.9L71.4 63.0L87.0 85.3L103.2 84.4L118.8 72.2L135.0 99.0L145.9 119.8L145.9 143.4L135.0 123.9L118.8 89.8L103.2 117.9L87.0 116.1L71.4 105.9L55.3 83.8L39.1 84.2Z"></path>
+<path style="fill: #356697; opacity: 0.14" d="M153.8 54.2L165.8 57.6L181.9 54.4L197.5 62.8L213.7 66.6L229.3 73.1L245.5 72.0L261.7 63.6L261.7 90.6L245.5 90.9L229.3 100.9L213.7 87.6L197.5 77.4L181.9 78.9L165.8 68.8L153.8 69.2Z"></path>
+<path style="fill: #CC7C37; opacity: 0.16" d="M151.2 32.1L165.8 40.5L197.5 35.4L213.7 57.9L229.3 54.0L245.5 54.4L261.7 66.4L261.7 92.1L245.5 72.4L229.3 71.1L213.7 83.6L197.5 58.9L165.8 66.6L151.2 57.9Z"></path>
+<path class="ln" style="stroke: #356697" d="M39.1 64.3L55.3 65.4L71.4 84.4L87.0 100.7L103.2 101.1L118.8 81.0L135.0 111.4L145.9 131.6"></path>
+<path class="ln" style="stroke: #356697" d="M153.8 61.7L165.8 63.2L181.9 66.6L197.5 70.1L213.7 77.1L229.3 87.0L245.5 81.4L261.7 77.1"></path>
+<path class="ln" style="stroke: #CC7C37" d="M151.2 45.0L165.8 53.6L197.5 47.1L213.7 70.7L229.3 62.6L245.5 63.4L261.7 79.3"></path>
+<path class="ln" style="stroke: #B9463F" d="M7.3 26.8L23.5 27.9L39.1 48.6L55.3 58.7L71.4 61.3L87.0 67.1L103.2 49.9L118.8 66.2L135.0 92.8L151.2 93.0L165.8 98.4L181.9 95.8L197.5 103.9L213.7 106.9L229.3 98.4L245.5 108.0L261.7 114.6"></path>
+<circle cx="261.7" cy="114.6" r="3.5" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<circle cx="261.7" cy="77.1" r="3.5" style="fill: #356697; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<circle cx="261.7" cy="79.3" r="3.5" style="fill: #CC7C37; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<text class="lbl" x="141" y="146" style="text-anchor: end; fill: #356697">Ley</text>
+<text class="lbl" x="268" y="73" style="fill: #356697">Taylor</text>
+<text class="lbl" x="268" y="90" style="fill: #9E5200">Hanson</text>
+<text class="lbl" x="268" y="118" style="fill: #B9463F">Albanese</text>
+<path class="base" d="M31.8 150V155M79.7 150V155M127.7 150V155M174.6 150V155M222 150V155"></path>
+<text class="ax" x="31.8" y="168" style="text-anchor: middle">Jul ’25</text>
+<text class="ax" x="79.7" y="168" style="text-anchor: middle">Oct</text>
+<text class="ax" x="127.7" y="168" style="text-anchor: middle">Jan ’26</text>
+<text class="ax" x="174.6" y="168" style="text-anchor: middle">Apr</text>
+<text class="ax" x="222" y="168" style="text-anchor: middle">Jul</text>
+</g>
+</svg>
+<div style="margin-top: 8px; display: flex; align-items: center; gap: 12px">
+<span style="flex-grow: 1; display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 1.5; color: #6B6862"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><rect x="0" y="2" width="24" height="10" rx="2" style="fill: #6B6862; opacity: 0.2"></rect><path d="M1 7H23" style="stroke: #6B6862; stroke-width: 2"></path></svg>Monthly average and its 95% interval</span>
+<button class="copy" aria-label="Copy chart: net approval" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+
+<div style="margin-top: 28px; padding-top: 12px; border-top: 1px solid #DDDCD8; font-size: 12px; line-height: 1.5; color: #6B6862">Figures pool the last six weeks of polls. Changes are on the previous period; ▼ in bold marks a significant change.</div>
+<a href="#method" style="margin-top: 4px; min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>
+
+
+</section>
+<section class="s6" style="width: 390px; height: 1240px; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; background: #FAF9F6">
+
+<div style="border-top: 2px solid #171717; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; line-height: 1.4; color: #6B6862">
+<span style="font-size: 19px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">National direction</span>
+<span>‘Is the country heading in the right direction, or on the wrong track?’</span>
+</div>
+
+<h1 style="margin: 14px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1.1; letter-spacing: -0.01em">More than three in five say the country is on the wrong track, the most this term</h1>
+<p style="margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: #3D3B37">Only 23% say it is heading in the right direction. The gap between the two has widened significantly in a month, by 10 points, and by more than 30 since just after the 2025 election.</p>
+
+<div style="margin-top: 22px; display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 2px"><span class="num" style="font-size: 40px; font-weight: 500; line-height: 1; letter-spacing: -0.02em; color: #10777C">23.2<span style="font-size: 18px">%</span></span><span style="font-size: 13px; font-weight: 600; color: #10777C">Right direction</span></div>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px"><span class="num" style="font-size: 40px; font-weight: 500; line-height: 1; letter-spacing: -0.02em; color: #674B3C">62.5<span style="font-size: 18px">%</span></span><span style="font-size: 13px; font-weight: 600; color: #674B3C">Wrong track</span></div>
+</div>
+<div role="img" aria-label="Right direction 23.2%, unsure 14.3%, wrong track 62.5%" style="margin-top: 10px; display: flex; gap: 2px; height: 16px"><span style="width: 81.2px; border-radius: 10px 0 0 10px; background: #10777C"></span><span style="width: 46.0px; background: #D9D6D0"></span><span style="flex-grow: 1; border-radius: 0 10px 10px 0; background: #674B3C"></span></div>
+<div style="position: relative; height: 20px; margin-top: 4px"><span class="num" style="position: absolute; left: 106.2px; transform: translateX(-50%); font-size: 12px; color: #6B6862; white-space: nowrap">14.3% unsure</span></div>
+<p class="num" style="margin: 8px 0 0; font-size: 14px; line-height: 1.5; color: #4A4843"><b style="font-weight: 600; color: #171717">Net −39.3 points</b> · ▼ 10.0 on a month ago, a significant fall · the lowest since the 2025 election</p>
+
+<div style="margin-top: 28px; display: flex; align-items: center; gap: 4px"><span style="flex-grow: 1; font-size: 13px; font-weight: 600">Right direction and wrong track, %</span><button class="copy" aria-label="Expand national direction chart" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button><button class="copy" aria-label="Copy chart: national direction" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button></div>
+
+<div style="margin-top: 4px; display: flex; gap: 16px; font-size: 12px; color: #4A4843"><span class="key"><svg width="22" height="12" viewBox="0 0 22 12" aria-hidden="true"><path d="M1 6H21" style="stroke: #674B3C; stroke-width: 2.5; stroke-linecap: round"></path></svg>Wrong track</span><span class="key"><svg width="22" height="12" viewBox="0 0 22 12" aria-hidden="true"><path d="M1 6H21" style="stroke: #10777C; stroke-width: 2.5; stroke-linecap: round"></path></svg>Right direction</span></div>
+
+<svg viewBox="0 0 350 280" width="350" height="280" role="img" aria-label="Share saying the country is heading in the right direction and on the wrong track, May 2025 to September 2026. Right direction fell from 37 to 24.1 per cent; wrong track rose from 42 to 61.6. The gap widened from 16.1 points in December 2025, before the Bondi shooting, to 37.5 in September 2026." style="margin-top: 10px; display: block; overflow: visible">
+<g transform="translate(26 34)">
+<path class="grid" d="M0 200H320M0 160H320M0 120H320M0 80H320M0 40H320M0 0H320"></path>
+<text class="ax num" x="-6" y="204" style="text-anchor: end">20</text>
+<text class="ax num" x="-6" y="164" style="text-anchor: end">30</text>
+<text class="ax num" x="-6" y="124" style="text-anchor: end">40</text>
+<text class="ax num" x="-6" y="84" style="text-anchor: end">50</text>
+<text class="ax num" x="-6" y="44" style="text-anchor: end">60</text>
+<text class="ax num" x="-6" y="4" style="text-anchor: end">70%</text>
+<path class="base" d="M0 220H320M37.7 220v4M94.5 220v4M151.4 220v4M206.9 220v4M263.2 220v4"></path>
+<text class="ax" x="37.7" y="236" style="text-anchor: middle">Jul 25</text>
+<text class="ax" x="94.5" y="236" style="text-anchor: middle">Oct</text>
+<text class="ax" x="151.4" y="236" style="text-anchor: middle">Jan 26</text>
+<text class="ax" x="206.9" y="236" style="text-anchor: middle">Apr</text>
+<text class="ax" x="263.2" y="236" style="text-anchor: middle">Jul</text>
+<path class="ev" d="M140.2 -14V220"></path><circle cx="140.2" cy="-21" r="7" style="fill: #FAF9F6; stroke: #6B6862; stroke-width: 1"></circle><text x="140.2" y="-18" style="font-size: 9px; font-weight: 600; fill: #4A4843; text-anchor: middle">1</text>
+<path d="M10.4 118.0L29.2 108.4L48.0 126.0L66.8 125.2L85.6 142.0L104.4 138.0L123.2 139.2L142.0 132.4L160.7 152.0L179.5 148.4L198.3 158.0L217.1 165.6L235.9 165.2L254.7 160.0L273.5 164.8L292.3 163.6L311.1 176.8L311.1 190.4L292.3 183.6L273.5 174.4L254.7 177.6L235.9 174.8L217.1 176.0L198.3 177.2L179.5 166.0L160.7 190.4L142.0 153.2L123.2 152.8L104.4 150.8L85.6 157.2L66.8 145.2L48.0 139.6L29.2 127.6L10.4 146.0Z" style="fill: #10777C; opacity: 0.12"></path>
+<path d="M10.4 98.0L29.2 94.4L48.0 85.2L66.8 65.6L85.6 58.0L104.4 59.6L123.2 66.4L142.0 68.0L160.7 44.8L179.5 48.0L198.3 43.6L217.1 41.2L235.9 42.4L254.7 31.2L273.5 46.0L292.3 41.2L311.1 26.4L311.1 40.8L292.3 53.2L273.5 58.8L254.7 60.0L235.9 52.8L217.1 54.0L198.3 58.0L179.5 74.4L160.7 86.4L142.0 88.8L123.2 88.8L104.4 91.6L85.6 83.6L66.8 96.0L48.0 110.8L29.2 114.4L10.4 126.0Z" style="fill: #674B3C; opacity: 0.12"></path>
+<g style="fill: #10777C; opacity: 0.45"><circle cx="6.2" cy="132.0" r="2.75"></circle><circle cx="19.2" cy="116.0" r="2.75"></circle><circle cx="32.1" cy="108.0" r="2.75"></circle><circle cx="36.4" cy="126.0" r="2.75"></circle><circle cx="37.7" cy="136.0" r="2.75"></circle><circle cx="53.7" cy="132.0" r="2.75"></circle><circle cx="55.0" cy="128.0" r="2.75"></circle><circle cx="71.0" cy="136.0" r="2.75"></circle><circle cx="72.3" cy="128.0" r="2.75"></circle><circle cx="88.3" cy="150.0" r="2.75"></circle><circle cx="93.3" cy="144.0" r="2.75"></circle><circle cx="105.6" cy="148.0" r="2.75"></circle><circle cx="106.3" cy="140.0" r="2.75"></circle><circle cx="110.6" cy="140.0" r="2.75"></circle><circle cx="122.9" cy="146.0" r="2.75"></circle><circle cx="123.6" cy="156.0" r="2.75"></circle><circle cx="127.9" cy="140.0" r="2.75"></circle><circle cx="136.5" cy="136.0" r="2.75"></circle><circle cx="140.2" cy="148.0" r="2.75"></circle><circle cx="157.5" cy="202.0" r="2.75"></circle><circle cx="161.9" cy="158.0" r="2.75"></circle><circle cx="164.9" cy="164.0" r="2.75"></circle><circle cx="166.2" cy="162.0" r="2.75"></circle><circle cx="170.5" cy="160.0" r="2.75"></circle><circle cx="174.8" cy="168.0" r="2.75"></circle><circle cx="177.9" cy="166.0" r="2.75"></circle><circle cx="179.8" cy="148.0" r="2.75"></circle><circle cx="183.5" cy="162.0" r="2.75"></circle><circle cx="184.1" cy="144.0" r="2.75"></circle><circle cx="187.8" cy="174.0" r="2.75"></circle><circle cx="192.1" cy="174.0" r="2.75"></circle><circle cx="196.4" cy="178.0" r="2.75"></circle><circle cx="200.8" cy="172.0" r="2.75"></circle><circle cx="201.4" cy="148.0" r="2.75"></circle><circle cx="205.1" cy="182.0" r="2.75"></circle><circle cx="209.4" cy="188.0" r="2.75"></circle><circle cx="211.3" cy="176.0" r="2.75"></circle><circle cx="213.7" cy="176.0" r="2.75"></circle><circle cx="218.1" cy="174.0" r="2.75"></circle><circle cx="222.4" cy="178.0" r="2.75"></circle><circle cx="223.0" cy="160.0" r="2.75"></circle><circle cx="226.7" cy="174.0" r="2.75"></circle><circle cx="231.0" cy="180.0" r="2.75"></circle><circle cx="235.4" cy="174.0" r="2.75"></circle><circle cx="239.7" cy="168.0" r="2.75"></circle><circle cx="239.7" cy="178.0" r="2.75"></circle><circle cx="244.0" cy="168.0" r="2.75"></circle><circle cx="248.3" cy="184.0" r="2.75"></circle><circle cx="252.7" cy="174.0" r="2.75"></circle><circle cx="257.0" cy="180.0" r="2.75"></circle><circle cx="261.3" cy="178.0" r="2.75"></circle><circle cx="261.9" cy="152.0" r="2.75"></circle><circle cx="265.6" cy="174.0" r="2.75"></circle><circle cx="270.0" cy="186.0" r="2.75"></circle><circle cx="274.3" cy="176.0" r="2.75"></circle><circle cx="276.8" cy="164.0" r="2.75"></circle><circle cx="278.6" cy="172.0" r="2.75"></circle><circle cx="279.2" cy="168.0" r="2.75"></circle><circle cx="282.9" cy="172.0" r="2.75"></circle><circle cx="287.3" cy="184.0" r="2.75"></circle><circle cx="291.6" cy="176.0" r="2.75"></circle><circle cx="295.9" cy="172.0" r="2.75"></circle><circle cx="300.2" cy="168.0" r="2.75"></circle><circle cx="300.8" cy="188.0" r="2.75"></circle><circle cx="304.6" cy="184.0" r="2.75"></circle><circle cx="308.9" cy="188.0" r="2.75"></circle><circle cx="313.2" cy="196.0" r="2.75"></circle></g>
+<g style="fill: #674B3C; opacity: 0.45"><circle cx="6.2" cy="112.0" r="2.75"></circle><circle cx="19.2" cy="104.0" r="2.75"></circle><circle cx="32.1" cy="114.0" r="2.75"></circle><circle cx="36.4" cy="96.0" r="2.75"></circle><circle cx="37.7" cy="112.0" r="2.75"></circle><circle cx="53.7" cy="94.0" r="2.75"></circle><circle cx="55.0" cy="100.0" r="2.75"></circle><circle cx="71.0" cy="78.0" r="2.75"></circle><circle cx="72.3" cy="92.0" r="2.75"></circle><circle cx="88.3" cy="68.0" r="2.75"></circle><circle cx="93.3" cy="80.0" r="2.75"></circle><circle cx="105.6" cy="68.0" r="2.75"></circle><circle cx="106.3" cy="72.0" r="2.75"></circle><circle cx="110.6" cy="96.0" r="2.75"></circle><circle cx="122.9" cy="74.0" r="2.75"></circle><circle cx="123.6" cy="68.0" r="2.75"></circle><circle cx="127.9" cy="92.0" r="2.75"></circle><circle cx="136.5" cy="88.0" r="2.75"></circle><circle cx="140.2" cy="72.0" r="2.75"></circle><circle cx="157.5" cy="98.0" r="2.75"></circle><circle cx="161.9" cy="50.0" r="2.75"></circle><circle cx="164.9" cy="64.0" r="2.75"></circle><circle cx="166.2" cy="54.0" r="2.75"></circle><circle cx="170.5" cy="54.0" r="2.75"></circle><circle cx="174.8" cy="48.0" r="2.75"></circle><circle cx="177.9" cy="52.0" r="2.75"></circle><circle cx="179.8" cy="60.0" r="2.75"></circle><circle cx="183.5" cy="50.0" r="2.75"></circle><circle cx="184.1" cy="84.0" r="2.75"></circle><circle cx="187.8" cy="48.0" r="2.75"></circle><circle cx="192.1" cy="44.0" r="2.75"></circle><circle cx="196.4" cy="38.0" r="2.75"></circle><circle cx="200.8" cy="42.0" r="2.75"></circle><circle cx="201.4" cy="68.0" r="2.75"></circle><circle cx="205.1" cy="42.0" r="2.75"></circle><circle cx="209.4" cy="32.0" r="2.75"></circle><circle cx="211.3" cy="40.0" r="2.75"></circle><circle cx="213.7" cy="38.0" r="2.75"></circle><circle cx="218.1" cy="42.0" r="2.75"></circle><circle cx="222.4" cy="38.0" r="2.75"></circle><circle cx="223.0" cy="64.0" r="2.75"></circle><circle cx="226.7" cy="44.0" r="2.75"></circle><circle cx="231.0" cy="40.0" r="2.75"></circle><circle cx="235.4" cy="46.0" r="2.75"></circle><circle cx="239.7" cy="48.0" r="2.75"></circle><circle cx="239.7" cy="38.0" r="2.75"></circle><circle cx="244.0" cy="46.0" r="2.75"></circle><circle cx="248.3" cy="30.0" r="2.75"></circle><circle cx="252.7" cy="24.0" r="2.75"></circle><circle cx="257.0" cy="24.0" r="2.75"></circle><circle cx="261.3" cy="52.0" r="2.75"></circle><circle cx="261.9" cy="68.0" r="2.75"></circle><circle cx="265.6" cy="44.0" r="2.75"></circle><circle cx="270.0" cy="30.0" r="2.75"></circle><circle cx="274.3" cy="42.0" r="2.75"></circle><circle cx="276.8" cy="52.0" r="2.75"></circle><circle cx="278.6" cy="48.0" r="2.75"></circle><circle cx="279.2" cy="68.0" r="2.75"></circle><circle cx="282.9" cy="42.0" r="2.75"></circle><circle cx="287.3" cy="34.0" r="2.75"></circle><circle cx="291.6" cy="38.0" r="2.75"></circle><circle cx="295.9" cy="46.0" r="2.75"></circle><circle cx="300.2" cy="44.0" r="2.75"></circle><circle cx="300.8" cy="44.0" r="2.75"></circle><circle cx="304.6" cy="32.0" r="2.75"></circle><circle cx="308.9" cy="24.0" r="2.75"></circle><circle cx="313.2" cy="20.0" r="2.75"></circle></g>
+<path class="ln" d="M10.4 132.0L29.2 118.0L48.0 132.8L66.8 135.2L85.6 149.6L104.4 144.4L123.2 146.0L142.0 142.8L160.7 171.2L179.5 157.2L198.3 167.6L217.1 170.8L235.9 170.0L254.7 168.8L273.5 169.6L292.3 173.6L311.1 183.6" style="stroke: #10777C"></path>
+<path class="ln" d="M10.4 112.0L29.2 104.4L48.0 98.0L66.8 80.8L85.6 70.8L104.4 75.6L123.2 77.6L142.0 78.4L160.7 65.6L179.5 61.2L198.3 50.8L217.1 47.6L235.9 47.6L254.7 45.6L273.5 52.4L292.3 47.2L311.1 33.6" style="stroke: #674B3C"></path>
+<path d="M313.1 33.6H317.1V183.6H313.1" style="fill: none; stroke: #171717; stroke-width: 1"></path>
+<text class="halo" x="309.1" y="106.6" style="font-size: 11px; fill: #3D3B37; text-anchor: end"><tspan x="309.1">37.5 points apart</tspan><tspan x="309.1" dy="14">in September;</tspan><tspan x="309.1" dy="14">16.1 before Bondi</tspan></text>
+</g>
+</svg>
+
+<p style="margin: 10px 0 0; font-size: 13px; color: #3D3B37"><span class="num" style="display: inline-block; width: 16px; font-weight: 600; color: #6B6862">1</span>Bondi shooting, Dec 2025</p>
+
+<div style="margin-top: 12px; display: flex; flex-wrap: wrap; column-gap: 16px; row-gap: 6px; font-size: 12px; color: #4A4843"><span class="key"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="3" style="fill: #6B6862; opacity: 0.55"></circle></svg>One poll</span><span class="key"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><rect x="0" y="2" width="24" height="10" rx="2" style="fill: #6B6862; opacity: 0.15"></rect><path d="M1 7H23" style="stroke: #6B6862; stroke-width: 2.5; stroke-linecap: round"></path></svg>Monthly average, adjusted for each pollster’s lean, and its 95% interval</span></div>
+
+<div style="margin-top: 6px"><button class="how" aria-expanded="false"><span aria-hidden="true" style="font-size: 11px">▶</span>How to read this chart</button></div>
+
+<p style="margin: 16px 0 0; padding-top: 12px; border-top: 1px solid #DDDCD8; font-size: 12px; line-height: 1.55; color: #6B6862">Most readings are Roy Morgan’s weekly poll: 47 of the 67 since the election. Essential and Spectre Strategy supply the rest; Freshwater has stopped asking. The headline figures pool the latest polls, so they can differ a little from September’s monthly average.</p>
+
+<a href="#direction-method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>
+
+</section>
+<section class="s7" style="width: 390px; height: 1780px; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; background: #FAF9F6">
+
+
+<div style="border-top: 2px solid #171717; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #6B6862">
+<span style="font-size: 19px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Who votes for whom</span>
+<span>Last six weeks of YouGov, DemosAU, Resolve and RedBridge polls</span>
+</div>
+<h1 style="margin: 14px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 32px; line-height: 1.1; letter-spacing: -0.01em">One Nation’s vote climbs with age</h1>
+<p style="margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: #3D3B37">About one in three over-55s back One Nation, against one in six 18–34s. Gen Z is the outlier, at about one in nine.</p>
+
+<div role="group" aria-label="Break down by" style="margin-top: 20px; display: flex; border-bottom: 1px solid #DDDCD8">
+<button aria-pressed="true" style="min-height: 44px; padding: 0 10px; border: 0; border-bottom: 2px solid #171717; margin-bottom: -1px; background: transparent; font-size: 15px; font-weight: 600; color: #171717">Age</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Gender</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Education</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Place</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Home</button>
+</div>
+<div role="group" aria-label="Party" style="margin-top: 12px; display: flex; gap: 6px">
+<button aria-pressed="true" style="flex: 1 1 auto; min-height: 44px; padding: 0 8px; border: 1px solid #CC7C37; border-radius: 22px; background: #F7E9DA; font-size: 13px; font-weight: 600; color: #7A3F00; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 5px"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 4px; background: #CC7C37"></span>One Nation</button>
+<button aria-pressed="false" style="flex: 1 1 auto; min-height: 44px; padding: 0 8px; border: 1px solid #DDDCD8; border-radius: 22px; background: transparent; font-size: 13px; color: #3D3B37; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 5px"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 4px; background: #B9463F"></span>Labor</button>
+<button aria-pressed="false" style="flex: 1 1 auto; min-height: 44px; padding: 0 8px; border: 1px solid #DDDCD8; border-radius: 22px; background: transparent; font-size: 13px; color: #3D3B37; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 5px"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 4px; background: #356697"></span>Coalition</button>
+<button aria-pressed="false" style="flex: 1 1 auto; min-height: 44px; padding: 0 8px; border: 1px solid #DDDCD8; border-radius: 22px; background: transparent; font-size: 13px; color: #3D3B37; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 5px"><span style="width: 8px; height: 8px; flex-shrink: 0; border-radius: 4px; background: #439458"></span>Greens</button>
+</div>
+
+<svg viewBox="0 0 350 500" width="350" height="500" role="img" aria-label="One Nation's share by age and generation, with 95% intervals, against 27.3% among all voters." style="margin-top: 24px; display: block; overflow: visible">
+<path class="grid" d="M0 52V76M87.5 52V76M175 52V76M262.5 52V76M350 52V76M0 108V132M87.5 108V132M175 108V132M262.5 108V132M350 108V132M0 164V188M87.5 164V188M175 164V188M262.5 164V188M350 164V188M0 258V282M87.5 258V282M175 258V282M262.5 258V282M350 258V282M0 314V338M87.5 314V338M175 314V338M262.5 314V338M350 314V338M0 370V394M87.5 370V394M175 370V394M262.5 370V394M350 370V394M0 426V456M87.5 426V456M175 426V456M262.5 426V456M350 426V456"></path>
+<path class="all" d="M238.9 52V76M238.9 108V132M238.9 164V188M238.9 258V282M238.9 314V338M238.9 370V394M238.9 426V456"></path>
+
+<text x="0" y="14"><tspan class="sec">By age</tspan><tspan class="secs" dx="6">Resolve, DemosAU, YouGov</tspan></text>
+<text class="e" x="350" y="14" style="text-anchor: end">vs all voters</text>
+
+<text class="rowl" x="0" y="48">18–34</text>
+<text x="350" y="48" style="text-anchor: end"><tspan class="v num">17.1%</tspan><tspan class="e num" dx="5">±2.0</tspan><tspan class="d num" dx="8">−10.2</tspan></text>
+<path class="wh" d="M132.1 64H167.1M132.1 59V69M167.1 59V69"></path>
+<circle class="pt" cx="149.6" cy="64" r="6"></circle>
+
+<text class="rowl" x="0" y="104">35–54</text>
+<text x="350" y="104" style="text-anchor: end"><tspan class="v num">26.0%</tspan><tspan class="e num" dx="5">±3.4</tspan><tspan class="e num" dx="8">−1.3</tspan></text>
+<path class="wh" d="M197.8 120H257.3M197.8 115V125M257.3 115V125"></path>
+<circle class="pto" cx="227.5" cy="120" r="5"></circle>
+
+<text class="rowl" x="0" y="160">55+</text>
+<text x="350" y="160" style="text-anchor: end"><tspan class="v num">34.0%</tspan><tspan class="e num" dx="5">±3.3</tspan><tspan class="d num" dx="8">+6.7</tspan></text>
+<path class="wh" d="M268.6 176H326.4M268.6 171V181M326.4 171V181"></path>
+<circle class="pt" cx="297.5" cy="176" r="6"></circle>
+
+<path d="M0 200H350" style="stroke: #DDDCD8; stroke-width: 1"></path>
+<text x="0" y="224"><tspan class="sec">By generation</tspan><tspan class="secs" dx="6">YouGov, RedBridge</tspan></text>
+
+<text class="rowl" x="0" y="254">Gen Z</text>
+<text x="350" y="254" style="text-anchor: end"><tspan class="v num">11.1%</tspan><tspan class="e num" dx="5">±4.1</tspan><tspan class="d num" dx="8">−16.2</tspan></text>
+<path class="wh" d="M61.3 270H133M61.3 265V275M133 265V275"></path>
+<circle class="pt" cx="97.1" cy="270" r="6"></circle>
+
+<text class="rowl" x="0" y="310">Millennials</text>
+<text x="350" y="310" style="text-anchor: end"><tspan class="v num">27.4%</tspan><tspan class="e num" dx="5">±3.7</tspan><tspan class="e num" dx="8">+0.1</tspan></text>
+<path class="wh" d="M207.4 326H272.1M207.4 321V331M272.1 321V331"></path>
+<circle class="pto" cx="239.8" cy="326" r="5"></circle>
+
+<text class="rowl" x="0" y="366">Gen X</text>
+<text x="350" y="366" style="text-anchor: end"><tspan class="v num">33.5%</tspan><tspan class="e num" dx="5">±3.3</tspan><tspan class="d num" dx="8">+6.2</tspan></text>
+<path class="wh" d="M264.3 382H322M264.3 377V387M322 377V387"></path>
+<circle class="pt" cx="293.1" cy="382" r="6"></circle>
+
+<text class="rowl" x="0" y="422">Boomers</text>
+<text x="350" y="422" style="text-anchor: end"><tspan class="v num">30.4%</tspan><tspan class="e num" dx="5">±3.4</tspan><tspan class="e num" dx="8">+3.1</tspan></text>
+<path class="wh" d="M236.3 438H295.8M236.3 433V443M295.8 433V443"></path>
+<circle class="pto" cx="266" cy="438" r="5"></circle>
+
+<path class="base" d="M0 456H350"></path>
+<text class="ax" x="0" y="472">0%</text>
+<text class="ax" x="87.5" y="472" style="text-anchor: middle">10%</text>
+<text class="ax" x="175" y="472" style="text-anchor: middle">20%</text>
+<text class="ax" x="262.5" y="472" style="text-anchor: middle">30%</text>
+<text class="ax" x="350" y="472" style="text-anchor: end">40%</text>
+<text class="ax" x="238.9" y="492" style="text-anchor: middle; font-weight: 600; fill: #171717">All voters 27.3%</text>
+</svg>
+
+<div style="margin-top: 14px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #4A4843">
+<div style="display: flex; align-items: center; column-gap: 18px">
+<span style="display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" style="fill: #CC7C37"></circle></svg>Clearly above or below all voters</span>
+<span style="display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style="fill: #FAF9F6; stroke: #CC7C37; stroke-width: 2"></circle></svg>Within the margin</span>
+</div>
+<div style="display: flex; align-items: center; column-gap: 18px">
+<span style="display: flex; align-items: center; gap: 6px"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><path d="M2 7H22M2 3V11M22 3V11" style="stroke: #CC7C37; stroke-width: 2; stroke-linecap: round; fill: none"></path></svg>95% interval</span>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Copy chart: One Nation’s share by group" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+</div>
+
+<h2 style="margin: 36px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 24px; line-height: 1.15">The age gap has widened as One Nation has grown</h2>
+<p style="margin: 8px 0 0; font-size: 15px; line-height: 1.5; color: #3D3B37">Every group has risen roughly in step with all voters, so none has moved relative to the whole. In percentage points, though, the gap between over-55s and 18–34s has grown from about 3 points in July 2025 to about 17 now.</p>
+
+<svg viewBox="0 0 350 444" width="350" height="444" role="img" aria-label="One Nation's monthly share by age group since July 2025 and by generation since February 2026, on a shared time axis." style="margin-top: 20px; display: block; overflow: visible">
+<text x="0" y="10"><tspan class="sec">By age</tspan></text>
+<g transform="translate(28 26)">
+<path class="grid" d="M0 0H252M0 40H252M0 80H252M0 120H252"></path>
+<path class="base" d="M0 160H252"></path>
+<text class="ax" x="-6" y="4" style="text-anchor: end">40%</text>
+<text class="ax" x="-6" y="84" style="text-anchor: end">20%</text>
+<text class="ax" x="-6" y="164" style="text-anchor: end">0</text>
+<path class="all" d="M0 128.4L18 123.2L36 116.0L54 108.8L72 96.4L90 90.8L108 72.4L126 58.0L144 58.8L162 61.6L180 52.8L198 43.6L216 50.4L234 55.6L252 49.6"></path>
+<path class="ln" style="stroke: #CC7C37" d="M0 138.4L18 135.2L36 121.6L54 121.6L72 117.2L90 113.2L108 110.4L126 104.4L144 94.4L162 91.6L180 91.2L198 82.4L216 84.4L234 100.8L252 92.0"></path>
+<path class="ln" style="stroke: #9E5200" d="M0 126.4L18 118.4L36 112.8L54 105.6L72 85.6L90 95.2L108 60.8L126 53.2L144 55.2L162 68.4L180 48.0L198 46.0L216 42.4L234 46.8L252 55.2"></path>
+<path class="ln" style="stroke: #5E3000" d="M0 126.0L18 113.6L36 114.4L54 99.6L72 87.6L90 72.4L108 56.0L126 30.0L144 42.4L162 33.6L180 30.4L198 20.4L216 35.6L234 34.8L252 21.6"></path>
+<text class="lbl" x="258" y="25.6" style="fill: #5E3000">55+</text>
+<text class="lbl" x="258" y="49.9" style="fill: #171717; font-weight: 500">All voters</text>
+<text class="lbl" x="258" y="62.9" style="fill: #9E5200">35–54</text>
+<text class="lbl" x="258" y="96.0" style="fill: #B06418">18–34</text>
+<path class="base" d="M0 160V165M36 160V165M72 160V165M108 160V165M144 160V165M180 160V165M216 160V165M252 160V165"></path>
+<text class="ax" x="0" y="180" style="text-anchor: middle">Jul ’25</text>
+<text class="ax" x="72" y="180" style="text-anchor: middle">Nov</text>
+<text class="ax" x="144" y="180" style="text-anchor: middle">Mar ’26</text>
+<text class="ax" x="216" y="180" style="text-anchor: middle">Jul</text>
+</g>
+
+<text x="0" y="250"><tspan class="sec">By generation</tspan></text>
+<g transform="translate(28 266)">
+<path class="grid" d="M126 0H252M126 40H252M126 80H252M126 120H252"></path>
+<path class="base" d="M0 160H252"></path>
+<text class="ax" x="-6" y="4" style="text-anchor: end">40%</text>
+<text class="ax" x="-6" y="84" style="text-anchor: end">20%</text>
+<text class="ax" x="-6" y="164" style="text-anchor: end">0</text>
+<text class="ax" x="4" y="84" style="font-style: italic">Series starts Feb 2026</text>
+<path class="all" d="M126 58.0L144 58.8L162 61.6L180 52.8L198 43.6L216 50.4L234 55.6L252 49.6"></path>
+<path class="ln" style="stroke: #CC7C37" d="M126 122.0L144 126.8L162 114.4L180 120.4L198 109.6L216 98.0L234 112.4L252 124.0"></path>
+<path class="ln" style="stroke: #A8631C" d="M126 54.0L144 46.8L162 65.6L180 62.0L198 52.0L216 53.2L234 56.4L252 56.0"></path>
+<path class="ln" style="stroke: #7A4210" d="M126 30.0L144 37.6L162 32.8L180 19.2L198 7.6L216 38.4L234 30.0L252 25.6"></path>
+<path class="ln" style="stroke: #4E2800" d="M126 38.0L144 45.6L162 48.4L180 34.4L198 22.0L216 32.0L234 40.0L252 31.2"></path>
+<text class="lbl" x="258" y="25.1" style="fill: #7A4210">Gen X</text>
+<text class="lbl" x="258" y="38.1" style="fill: #4E2800">Boomers</text>
+<text class="lbl" x="258" y="51.1" style="fill: #171717; font-weight: 500">All</text>
+<text class="lbl" x="258" y="64.1" style="fill: #A8631C">Millennials</text>
+<text class="lbl" x="258" y="128.0" style="fill: #B06418">Gen Z</text>
+<path class="base" d="M0 160V165M36 160V165M72 160V165M108 160V165M144 160V165M180 160V165M216 160V165M252 160V165"></path>
+<text class="ax" x="0" y="180" style="text-anchor: middle">Jul ’25</text>
+<text class="ax" x="72" y="180" style="text-anchor: middle">Nov</text>
+<text class="ax" x="144" y="180" style="text-anchor: middle">Mar ’26</text>
+<text class="ax" x="216" y="180" style="text-anchor: middle">Jul</text>
+</g>
+</svg>
+
+<p style="margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: #6B6862">Lines are monthly averages; the dashed line is all voters. Both panels share one time axis.</p>
+<div style="margin-top: 8px; display: flex; align-items: center">
+<a href="#method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Copy chart: One Nation’s share over time" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+
+
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":4870}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

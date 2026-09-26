@@ -35,10 +35,10 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 .copy:focus-visible{outline:2px solid #171717;outline-offset:2px}
 </style>
 </helmet>
-<div style="width: 1280px; height: 1320px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
+<div style="width: 1280px; height: 1290px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
 
-<div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">
-<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Who votes for whom</span>
+<div style="border-top: 2px solid #171717; padding-top: 12px; display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">
+<span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Who votes for whom</span>
 <span>Pooled from the last six weeks of YouGov, DemosAU, Resolve and RedBridge polls</span>
 </div>
 <h1 style="margin: 16px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 46px; line-height: 1.08; letter-spacing: -0.01em">The Greens’ vote falls steeply with age</h1>
@@ -61,7 +61,7 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 </div>
 </div>
 
-<svg viewBox="0 0 1152 356" width="1152" height="356" role="img" aria-label="The Greens' share by age and generation, with 90% ranges, against 13.2% among all voters." style="margin-top: 28px; display: block; overflow: visible">
+<svg viewBox="0 0 1152 356" width="1152" height="356" role="img" aria-label="The Greens' share by age and generation, with 95% intervals, against 13.2% among all voters." style="margin-top: 28px; display: block; overflow: visible">
 <path class="grid" d="M220 28V318M400 28V318M580 28V318M760 28V318M940 28V318"></path>
 <path class="grid" d="M0 140H1152" style="stroke: #DDDCD8"></path>
 <path class="all" d="M457.6 28V318"></path>
@@ -124,7 +124,7 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 <div style="margin-top: 12px; display: flex; align-items: center; gap: 28px; font-size: 13px; color: #4A4843">
 <span style="display: flex; align-items: center; gap: 8px"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" style="fill: #439458"></circle></svg>Clearly above or below all voters</span>
 <span style="display: flex; align-items: center; gap: 8px"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5" style="fill: #FAF9F6; stroke: #439458; stroke-width: 2"></circle></svg>Within the margin</span>
-<span style="display: flex; align-items: center; gap: 8px"><svg width="28" height="16" viewBox="0 0 28 16" aria-hidden="true"><path d="M2 8H26M2 4V12M26 4V12" style="stroke: #439458; stroke-width: 2; stroke-linecap: round; fill: none"></path></svg>90% range</span>
+<span style="display: flex; align-items: center; gap: 8px"><svg width="28" height="16" viewBox="0 0 28 16" aria-hidden="true"><path d="M2 8H26M2 4V12M26 4V12" style="stroke: #439458; stroke-width: 2; stroke-linecap: round; fill: none"></path></svg>95% interval</span>
 <span>Right-hand column: difference from all voters, in points</span>
 <span style="flex-grow: 1"></span>
 <button class="copy" aria-label="Copy chart: the Greens’ share by group" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
@@ -188,13 +188,13 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 <div style="margin-top: 12px; display: flex; align-items: center; gap: 24px; font-size: 13px; color: #6B6862">
 <span>Lines are monthly averages; the dashed line is all voters. Both panels share one scale, so each is only as wide as its data.</span>
 <span style="flex-grow: 1"></span>
-<a href="#method" style="font-weight: 500; color: #171717">How it’s built</a>
+<a href="#method" style="font-weight: 500; color: #171717; white-space: nowrap; flex-shrink: 0">How it’s built</a>
 <button class="copy" aria-label="Copy chart: the Greens’ share over time" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
 </div>
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1320}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1290}}'>
 class Component extends DCLogic {
 renderVals() {
 return {};

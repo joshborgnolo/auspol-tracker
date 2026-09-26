@@ -44,10 +44,13 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 .check{min-height:44px;display:flex;align-items:center;gap:10px;font-size:14px;color:#171717;cursor:pointer;white-space:nowrap}
 .check input{width:18px;height:18px;margin:0;accent-color:#171717;cursor:pointer}
 .key{display:flex;align-items:center;gap:8px}
-.chip{min-height:44px;padding:0 18px;border:1px solid #DDDCD8;border-radius:22px;background:#FEFCF9;font-size:14px;color:#171717;display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
-.chip:hover{background:#EFEDE8}
+/* the site's raised chip, from the same family as the theme switch; a 44px hit area around a 36px face */
+.chip{position:relative;min-height:36px;padding:0 14px;border:1px solid #DFDCD7;border-radius:18px;background:#FEFCF9;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16),0 3px 6px -3px rgba(91,79,69,0.16);font-size:14px;color:#4A4843;display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
+.chip::after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+.chip:hover{border-color:#C9C6BF}
+.chip:active{box-shadow:inset 0 1.5px 2.5px rgba(43,37,33,0.15);transform:translateY(1px)}
 .term{padding:0;border:0;background:none;font:inherit;color:inherit;text-decoration:underline dotted #9A968E;text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:help}
-.qbtn{width:44px;height:44px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;vertical-align:middle}
+.qbtn{width:44px;height:44px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;margin:-13px 0;padding:0;border:0;border-radius:8px;background:transparent;vertical-align:middle}
 .qbtn:hover{background:#EFEDE8}
 .qbtn span{width:20px;height:20px;box-sizing:border-box;border-radius:10px;border:1.5px solid #6B6862;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#4A4843}
 .qbtn[aria-expanded="true"] span{background:#171717;border-color:#171717;color:#FAF9F6}
@@ -60,9 +63,9 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 .chip:focus-visible,.term:focus-visible,.qbtn:focus-visible,.switch:focus-visible,.link:focus-visible{outline:2px solid #171717;outline-offset:2px}
 </style>
 </helmet>
-<div style="width: 1280px; height: 1340px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
+<div style="width: 1280px; height: 1270px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
 <div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">
-<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Two-party preferred</span>
+<span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Two-party preferred</span>
 <span>After preferences · 163 polls from 12 pollsters · updated 21 Sep 2026</span>
 </div>
 
@@ -87,9 +90,9 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 <text class="ax" x="380" y="78" style="text-anchor: middle; font-weight: 600; fill: #4A4843">Tied</text>
 </svg>
 <p class="num" style="margin: 14px 0 0; font-size: 17px; line-height: 1.5; color: #3D3B37"><b style="font-weight: 600; color: #171717">Too close to call.</b> Labor’s 2.4-point lead is inside the ±2.6 <button class="term">flow range</button>.</p>
-<p class="num" style="margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: #6B6862">Labor ▼ 0.8 on a month ago, within the <button class="term">margin</button></p>
-<p class="num" style="margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: #6B6862">Implied preference flows · <button class="term">weighted aggregate</button> of 8 polls in the 21 days to 21 Sep<button class="qbtn" aria-label="How this is counted, and the pollsters’ published figures" aria-expanded="false"><span>?</span></button></p>
-<div style="margin-top: 8px; display: flex; align-items: center; gap: 12px"><span style="font-size: 13px; color: #6B6862">Switch 2PP</span><button class="chip">Labor v Coalition<span class="num" style="font-weight: 600"><span style="color: #B9463F">51.6</span><span style="color: #9A968E">–</span><span style="color: #356697">48.4</span></span></button></div>
+<p class="num" style="margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: #4A4843">Labor ▼ 0.8 on a month ago, within the <button class="term">margin</button></p>
+<p class="num" style="margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: #6B6862">Implied preference flows · <button class="term">weighted aggregate</button> of 8 polls in the 21 days to 21 Sep<button class="qbtn" aria-label="How this is counted, and the pollsters’ published figures" aria-expanded="false"><span>?</span></button></p>
+<div style="margin-top: 12px; display: flex; align-items: center; gap: 12px"><span style="font-size: 13px; color: #6B6862">Switch 2PP</span><button class="chip">Labor v Coalition<span class="num" style="font-weight: 600"><span style="color: #B9463F">51.6</span><span style="color: #9A968E">–</span><span style="color: #356697">48.4</span></span></button></div>
 </div>
 
 <h2 style="margin: 56px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 28px; line-height: 1.15">One Nation now runs Labor as close as the Coalition does</h2>
@@ -153,11 +156,11 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 <div style="margin-top: 32px; padding-top: 12px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 24px; font-size: 13px; color: #6B6862">
 <span>Figures pool the last 21 days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above.</span>
 <span style="flex-grow: 1"></span>
-<a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-weight: 500; color: #171717">How it’s built</a>
+<a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-weight: 500; color: #171717; white-space: nowrap; flex-shrink: 0">How it’s built</a>
 </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1340}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1270}}'>
 class Component extends DCLogic {
 renderVals() {
 return {};

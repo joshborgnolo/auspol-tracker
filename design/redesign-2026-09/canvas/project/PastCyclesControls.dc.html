@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Past cycles – the comparison controls</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&amp;family=IBM+Plex+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+a{color:#171717}a:hover{color:#B9463F}
+button{font:inherit;cursor:pointer}
+.num{font-variant-numeric:tabular-nums}
+svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.wm{display:flex;align-items:center;gap:14px;padding:0;border:0;background:none;color:#171717;text-align:left}
+.ntab{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:0 2px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;font-size:16px;font-weight:500;color:#6B6862;white-space:nowrap;text-decoration:none}
+.ntab[aria-current="page"]{border-bottom-color:#171717;font-weight:600;color:#171717}
+.ntab:hover{color:#171717}
+.segs{display:flex;padding:3px;border-radius:10px;background:#F2F0EC;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16),0 3px 6px -3px rgba(91,79,69,0.16)}
+.seg{width:40px;height:32px;display:flex;align-items:center;justify-content:center;padding:0;border:0;background:#FEFCF9;color:#6B6862;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16)}
+.seg:first-child{border-radius:7px 0 0 7px;border-right:1px solid rgba(43,37,33,0.18)}.seg:last-child{border-radius:0 7px 7px 0}
+.seg[aria-pressed="true"]{background:#E0DDD8;color:#171717;box-shadow:inset 0 2px 3px rgba(43,37,33,0.15),inset 0 -1px 0 rgba(255,255,255,0.85)}
+.dt{font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6B6862}
+.dd{font-size:15px;font-weight:600;color:#171717;white-space:nowrap}
+.dd2{font-size:13px;color:#6B6862;white-space:nowrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:4px;background:#10777C;margin-right:7px;vertical-align:1px}
+.tn{display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap}
+.tn a{font-weight:600;color:#3D3B37;text-decoration:none}
+.ext{font-size:10px;color:#9A968E}
+.grid{stroke:#E6E4DF;stroke-width:1;fill:none}
+.base{stroke:#9A968E;stroke-width:1;fill:none}
+.even{stroke:#9A968E;stroke-width:1;stroke-dasharray:3 3;fill:none}
+.ax{font-size:12px;fill:#6B6862}
+.axb{font-size:12px;font-weight:600;fill:#171717}
+.ev{stroke:#C9C6BF;stroke-width:1;stroke-dasharray:1 3;fill:none}
+.evt{font-size:12px;font-weight:500;fill:#4A4843}
+.evn{fill:#FAF9F6;stroke:#6B6862;stroke-width:1}
+.evnt{font-size:9px;font-weight:600;fill:#4A4843;text-anchor:middle}
+.ln{fill:none;stroke-linejoin:round;stroke-linecap:round}
+.mean{fill:none;stroke:#4A4843;stroke-width:1.75;stroke-dasharray:4 3}
+.nowl{stroke:#171717;stroke-width:1;opacity:0.55}
+.halo{paint-order:stroke;stroke:#FAF9F6;stroke-width:4px;stroke-linejoin:round}
+.end{font-size:13px;font-weight:600}
+.lbl{font-size:13px}
+.tab{min-height:44px;padding:0 12px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;font-size:15px;color:#6B6862;white-space:nowrap}
+.tab[aria-pressed="true"]{border-bottom-color:#171717;font-weight:600;color:#171717}
+.tab:hover{color:#171717}
+.tab .n{margin-left:6px;font-weight:400;color:#6B6862}
+.ctl{font-size:13px;font-weight:600;color:#4A4843;white-space:nowrap}
+.chip{position:relative;min-height:36px;padding:0 14px;border:1px solid #DFDCD7;border-radius:18px;background:#FEFCF9;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16),0 3px 6px -3px rgba(91,79,69,0.16);font-size:14px;color:#3D3B37;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.chip::after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+.chip:hover{border-color:#C9C6BF}
+.copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.copy:hover{background:#EFEDE8;color:#171717}
+.how{min-height:44px;padding:0;border:0;background:none;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:#171717}
+.key{display:flex;align-items:center;gap:8px}
+.th{font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6B6862;white-space:nowrap}
+.srow{border-top:1px solid #E6E4DF}
+.srow:hover{background:#F5F3EE}
+.jump{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#4A4843;text-decoration:none}
+.jump:hover{background:#EFEDE8;color:#171717}
+.check{min-height:44px;display:flex;align-items:center;gap:10px;font-size:14px;color:#171717;cursor:pointer;white-space:nowrap}
+.check input{width:18px;height:18px;margin:0;accent-color:#171717;cursor:pointer}
+.score{display:inline-flex;flex-wrap:wrap;align-content:center;align-items:baseline;gap:9px;min-height:44px;padding:0 4px;border:0;background:none;white-space:nowrap}
+.plabel{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#9A968E}
+.tipbox{fill:#FEFCF9;stroke:#DFDCD7;stroke-width:1}
+.tipsh{fill:#402C1A;opacity:0.06}
+.tt{font-size:12px;font-weight:700;fill:#2B2521}
+.tl{font-size:13px;fill:#6E6863}
+.tv{font-size:13px;font-weight:700;fill:#2B2521}
+.ts{font-size:11px;fill:#6E6863}
+.term{min-height:44px;flex-grow:1;padding:0 10px;border:0;border-radius:8px;background:transparent;display:flex;align-items:center;gap:10px;text-align:left;color:#171717}
+.term:hover{background:#F1EFEA}
+.term[aria-pressed="true"]{background:#F1EFEA}
+.tx{width:32px;height:32px;flex-shrink:0;padding:0;border:0;border-radius:16px;background:transparent;color:#6B6862;font-size:17px;line-height:1}
+.tx:hover{background:#EFEDE8;color:#171717}
+.term:focus-visible,.tab:focus-visible,.ntab:focus-visible,.chip:focus-visible,.copy:focus-visible,.how:focus-visible,.jump:focus-visible,.seg:focus-visible,.wm:focus-visible,.check:focus-within{outline:2px solid #171717;outline-offset:2px;border-radius:4px}
+</style>
+</helmet>
+<div style="width: 1280px; height: 3196px; display: flex; flex-direction: column; background: #FAF9F6">
+<section style="width: 1280px; box-sizing: border-box; padding: 56px 64px 64px; display: flex; flex-direction: column; flex-shrink: 0; background: #FAF9F6">
+<div style="border-top: 2px solid #171717; padding-top: 12px; display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">
+<span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Past cycles: the comparison</span>
+<span>Hover on desktop, tap on touch screens</span>
+</div>
+
+<h1 style="margin: 16px 0 0; max-width: 1000px; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 46px; line-height: 1.08; letter-spacing: -0.01em">One set of controls moves every chart on the page</h1>
+<p style="margin: 12px 0 0; max-width: 880px; font-size: 18px; line-height: 1.5; color: #3D3B37">The comparison is chosen once, above the summary, and the summary, all six charts and the download follow it. Scrolled down, the same controls pin under the site’s bar beside a link to each section.</p>
+
+<div style="margin-top: 56px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600">1 · Re-elected or turned out</span><span style="max-width: 760px; font-size: 13px; line-height: 1.5; color: #6B6862">Choosing a set re-pools the band, the average and the summary’s ranks around it. Labor’s 51.2% sits in the middle of the governments that were re-elected, and above five of the six that went on to lose. The summary’s rank reads “middle of 15” against the first set and “2nd highest of 7” against the second.</span></div>
+
+<div style="margin-top: 8px"></div><div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; align-items: start">
+<div style="display: flex; flex-direction: column"><div role="group" aria-label="Past terms on the board" style="margin-top: 14px; display: flex; gap: 2px; border-bottom: 1px solid #DDDCD8"><button class="tab" aria-pressed="false" style="font-size: 14px; padding: 0 10px">All past terms<span class="n">20</span></button><button class="tab" aria-pressed="true" style="font-size: 14px; padding: 0 10px">Re-elected<span class="n">14</span></button><button class="tab" aria-pressed="false" style="font-size: 14px; padding: 0 10px">Turned out<span class="n">6</span></button></div><div style="margin-top: 14px; display: flex; align-items: center; gap: 4px"><span style="flex-grow: 1; font-size: 13px; font-weight: 600; line-height: 1.35">Against the 14 governments re-elected at their next election</span><button class="copy" aria-label="Copy chart: two-party preferred" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button></div><svg viewBox="0 0 552 296" width="552" height="296" role="img" aria-label="Labor’s two-party share against the governments later re-elected: 51.2 against their average of 50.6." style="margin-top: 6px; display: block; overflow: visible">
+<g transform="translate(30 16)">
+<path class="grid" d="M0 250.0H452M0 200.0H452M0 150.0H452M0 50.0H452M0 0.0H452"></path>
+<path class="even" d="M0 100.0H452"></path>
+<text class="ax num" x="-6" y="254.0" style="text-anchor: end">35</text>
+<text class="ax num" x="-6" y="204.0" style="text-anchor: end">40</text>
+<text class="ax num" x="-6" y="154.0" style="text-anchor: end">45</text>
+<text class="ax num" x="-6" y="104.0" style="text-anchor: end">50</text>
+<text class="ax num" x="-6" y="54.0" style="text-anchor: end">55</text>
+<text class="ax num" x="-6" y="4.0" style="text-anchor: end">60%</text>
+<path class="base" d="M0 250H452M9.6 250v4M153.9 250v4M298.1 250v4M442.4 250v4"></path>
+<text class="axb" x="9.6" y="270" style="text-anchor: middle">Election</text>
+<text class="ax" x="153.9" y="270" style="text-anchor: middle">1 yr</text>
+<text class="ax" x="298.1" y="270" style="text-anchor: middle">2 yrs</text>
+<text class="ax" x="442.4" y="270" style="text-anchor: middle">3 yrs</text>
+<path d="M9.6 57.0L21.6 0.2L33.7 10.8L45.7 29.0L57.7 38.4L69.7 45.3L81.7 44.6L93.8 38.9L105.8 31.4L117.8 44.8L129.8 36.2L141.9 30.0L153.9 32.2L165.9 22.5L177.9 31.1L189.9 47.8L202.0 57.0L214.0 59.6L226.0 55.8L238.0 45.2L250.0 39.4L262.1 69.2L274.1 83.4L286.1 85.4L298.1 57.4L310.1 76.0L322.2 69.0L334.2 67.0L346.2 65.0L358.2 76.0L370.3 85.0L382.3 72.0L382.3 135.0L370.3 138.0L358.2 143.0L346.2 144.0L334.2 141.0L322.2 131.0L310.1 121.0L298.1 123.5L286.1 137.7L274.1 135.3L262.1 134.2L250.0 148.0L238.0 140.8L226.0 134.8L214.0 138.3L202.0 139.7L189.9 137.0L177.9 136.4L165.9 136.0L153.9 139.0L141.9 133.6L129.8 134.6L117.8 136.7L105.8 138.4L93.8 127.9L81.7 123.6L69.7 116.0L57.7 113.4L45.7 108.5L33.7 109.7L21.6 100.9L9.6 99.5Z" style="fill: #6B6862; opacity: 0.1"></path>
+<path d="M9.6 65.8L21.6 46.7L33.7 32.5L45.7 37.3L57.7 46.2L69.7 51.7L81.7 62.5L93.8 45.5L105.8 56.5L117.8 56.2L129.8 55.7L141.9 57.3L153.9 51.2L165.9 56.2L177.9 67.3L189.9 66.2L202.0 67.3L214.0 78.5L226.0 80.0L238.0 83.0L250.0 85.0L262.1 84.0L274.1 90.0L286.1 92.7L298.1 90.2L310.1 90.0L322.2 96.0L334.2 92.5L346.2 93.0L358.2 81.5L370.3 90.0L382.3 84.0L382.3 109.0L370.3 119.0L358.2 129.0L346.2 138.0L334.2 125.0L322.2 125.0L310.1 112.5L298.1 115.2L286.1 134.2L274.1 125.2L262.1 129.0L250.0 141.0L238.0 128.0L226.0 129.0L214.0 124.0L202.0 133.5L189.9 129.0L177.9 124.2L165.9 116.0L153.9 127.2L141.9 127.7L129.8 127.7L117.8 133.5L105.8 129.8L93.8 121.8L81.7 110.5L69.7 100.5L57.7 108.3L45.7 101.2L33.7 86.0L21.6 87.2L9.6 91.5Z" style="fill: #6B6862; opacity: 0.17"></path>
+<path d="M382.3 72.0L394.3 66.8L406.3 81.9L418.3 86.8L430.4 75.0L442.4 57.2L442.4 90.8L430.4 115.0L418.3 124.6L406.3 135.1L394.3 137.6L382.3 135.0Z" style="fill: #6B6862; opacity: 0.045"></path>
+<path d="M382.3 84.0L394.3 83.0L406.3 99.8L418.3 93.0L430.4 79.5L442.4 63.5L442.4 84.5L430.4 110.5L418.3 114.0L406.3 121.7L394.3 111.0L382.3 109.0Z" style="fill: #6B6862; opacity: 0.075"></path>
+<path class="mean" d="M9.6 77.9L21.6 59.6L33.7 62.1L45.7 64.1L57.7 72.5L69.7 77.0L81.7 83.9L93.8 88.9L105.8 94.3L117.8 98.4L129.8 91.4L141.9 87.6L153.9 88.6L165.9 83.1L177.9 91.1L189.9 92.4L202.0 93.7L214.0 95.1L226.0 94.9L238.0 100.7L250.0 108.1L262.1 103.4L274.1 104.1L286.1 106.7L298.1 97.5L310.1 97.6L322.2 106.6L334.2 107.3L346.2 107.2L358.2 109.6L370.3 108.5L382.3 101.5L394.3 104.7L406.3 109.9L418.3 105.1L430.4 95.0L442.4 74.0"></path>
+<path class="ln" d="M9.6 48.0L21.6 38.0L33.7 33.0L45.7 40.0L57.7 45.0L69.7 45.0L81.7 46.0L93.8 56.0L105.8 66.0L117.8 64.0L129.8 68.0L141.9 68.0L153.9 78.0" style="stroke: #B9463F; stroke-width: 3"></path>
+<path class="ln" d="M165.9 85.0L177.9 87.0L189.9 80.0L202.0 88.0" style="stroke: #B9463F; stroke-width: 3"></path>
+<circle cx="9.6" cy="48.0" r="5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 1.75"></circle>
+<path class="nowl" d="M202.0 0V250"></path>
+<text class="axb" x="202.0" y="270" style="text-anchor: middle">Now</text>
+<circle cx="202.0" cy="88.0" r="5.5" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="202.0" cy="93.7" r="3.5" style="fill: #FAF9F6; stroke: #4A4843; stroke-width: 1.5"></circle>
+<path d="M208.0 88.0H211.0V93.7H208.0" style="fill: none; stroke: #171717; stroke-width: 1"></path>
+<text class="halo num" x="218.0" y="87.9" style="font-size: 13px"><tspan x="218.0" style="font-weight: 600; fill: #B9463F">Labor 51.2</tspan><tspan x="218.0" dy="17" style="fill: #3D3B37">0.6 above average</tspan></text>
+<text class="lbl halo" x="448.4" y="78.0" style="fill: #4A4843; font-weight: 600">Average</text>
+</g>
+</svg></div>
+<div style="display: flex; flex-direction: column"><div role="group" aria-label="Past terms on the board" style="margin-top: 14px; display: flex; gap: 2px; border-bottom: 1px solid #DDDCD8"><button class="tab" aria-pressed="false" style="font-size: 14px; padding: 0 10px">All past terms<span class="n">20</span></button><button class="tab" aria-pressed="false" style="font-size: 14px; padding: 0 10px">Re-elected<span class="n">14</span></button><button class="tab" aria-pressed="true" style="font-size: 14px; padding: 0 10px">Turned out<span class="n">6</span></button></div><div style="margin-top: 14px; display: flex; align-items: center; gap: 4px"><span style="flex-grow: 1; font-size: 13px; font-weight: 600; line-height: 1.35">Against the 6 turned out at their next election</span><button class="copy" aria-label="Copy chart: two-party preferred" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button></div><svg viewBox="0 0 552 296" width="552" height="296" role="img" aria-label="Labor’s two-party share against the governments later turned out: 51.2 against their average of 46.3." style="margin-top: 6px; display: block; overflow: visible">
+<g transform="translate(30 16)">
+<path class="grid" d="M0 250.0H452M0 200.0H452M0 150.0H452M0 50.0H452M0 0.0H452"></path>
+<path class="even" d="M0 100.0H452"></path>
+<text class="ax num" x="-6" y="254.0" style="text-anchor: end">35</text>
+<text class="ax num" x="-6" y="204.0" style="text-anchor: end">40</text>
+<text class="ax num" x="-6" y="154.0" style="text-anchor: end">45</text>
+<text class="ax num" x="-6" y="104.0" style="text-anchor: end">50</text>
+<text class="ax num" x="-6" y="54.0" style="text-anchor: end">55</text>
+<text class="ax num" x="-6" y="4.0" style="text-anchor: end">60%</text>
+<path class="base" d="M0 250H452M9.6 250v4M153.9 250v4M298.1 250v4M442.4 250v4"></path>
+<text class="axb" x="9.6" y="270" style="text-anchor: middle">Election</text>
+<text class="ax" x="153.9" y="270" style="text-anchor: middle">1 yr</text>
+<text class="ax" x="298.1" y="270" style="text-anchor: middle">2 yrs</text>
+<text class="ax" x="442.4" y="270" style="text-anchor: middle">3 yrs</text>
+<path d="M9.6 78.0L21.6 64.5L33.7 67.5L45.7 66.0L57.7 80.5L69.7 88.0L81.7 94.5L93.8 91.0L105.8 98.5L117.8 109.5L129.8 113.5L141.9 93.0L153.9 85.5L165.9 90.0L177.9 84.0L189.9 96.5L202.0 89.5L214.0 94.0L226.0 81.5L238.0 85.5L250.0 77.8L262.1 87.8L274.1 91.4L286.1 109.0L298.1 113.0L310.1 109.8L322.2 119.8L334.2 120.0L346.2 113.0L358.2 122.6L358.2 168.6L346.2 156.4L334.2 146.2L322.2 141.0L310.1 130.0L298.1 147.2L286.1 146.8L274.1 140.8L262.1 145.0L250.0 149.0L238.0 159.0L226.0 148.0L214.0 160.0L202.0 188.5L189.9 172.5L177.9 193.5L165.9 177.0L153.9 174.0L141.9 166.0L129.8 147.0L117.8 140.0L105.8 157.5L93.8 170.0L81.7 174.5L69.7 162.0L57.7 132.5L45.7 131.0L33.7 127.0L21.6 101.5L9.6 97.5Z" style="fill: #6B6862; opacity: 0.1"></path>
+<path d="M9.6 83.5L21.6 80.0L33.7 70.8L45.7 75.8L57.7 88.8L69.7 90.5L81.7 97.3L93.8 106.8L105.8 114.5L117.8 117.0L129.8 117.3L141.9 99.2L153.9 94.3L165.9 101.0L177.9 97.3L189.9 107.3L202.0 104.7L214.0 100.0L226.0 97.8L238.0 105.8L250.0 91.0L262.1 104.0L274.1 110.0L286.1 112.0L298.1 113.0L310.1 114.0L322.2 121.0L334.2 120.0L346.2 116.0L358.2 125.0L358.2 132.0L346.2 151.0L334.2 130.0L322.2 132.0L310.1 127.0L298.1 140.0L286.1 139.0L274.1 130.0L262.1 118.0L250.0 122.0L238.0 143.5L226.0 135.5L214.0 152.3L202.0 143.3L189.9 132.7L177.9 146.0L165.9 152.3L153.9 161.0L141.9 163.8L129.8 134.5L117.8 135.0L105.8 131.7L93.8 135.5L81.7 142.3L69.7 124.5L57.7 100.5L45.7 99.0L33.7 99.8L21.6 86.8L9.6 93.5Z" style="fill: #6B6862; opacity: 0.17"></path>
+<path d="M358.2 122.6L370.3 123.1L382.3 127.6L394.3 132.6L406.3 126.7L418.3 131.0L430.4 108.5L442.4 120.8L442.4 150.8L430.4 156.8L418.3 148.1L406.3 157.3L394.3 161.2L382.3 169.7L370.3 174.8L358.2 168.6Z" style="fill: #6B6862; opacity: 0.045"></path>
+<path d="M358.2 125.0L370.3 126.2L382.3 128.5L394.3 138.0L406.3 135.2L418.3 135.5L430.4 115.2L442.4 123.5L442.4 140.0L430.4 141.5L418.3 142.3L406.3 153.3L394.3 158.5L382.3 160.2L370.3 159.5L358.2 132.0Z" style="fill: #6B6862; opacity: 0.075"></path>
+<path class="mean" d="M9.6 87.0L21.6 83.5L33.7 92.5L45.7 96.2L57.7 101.7L69.7 115.7L81.7 125.8L93.8 128.5L105.8 128.0L117.8 125.2L129.8 126.7L141.9 132.2L153.9 127.2L165.9 133.8L177.9 134.7L189.9 128.2L202.0 137.0L214.0 123.3L226.0 117.0L238.0 121.2L250.0 111.4L262.1 114.2L274.1 115.6L286.1 126.8L298.1 128.0L310.1 120.4L322.2 128.2L334.2 129.6L346.2 131.4L358.2 139.8L370.3 146.2L382.3 146.7L394.3 147.5L406.3 143.0L418.3 139.2L430.4 130.8L442.4 134.0"></path>
+<path class="ln" d="M9.6 48.0L21.6 38.0L33.7 33.0L45.7 40.0L57.7 45.0L69.7 45.0L81.7 46.0L93.8 56.0L105.8 66.0L117.8 64.0L129.8 68.0L141.9 68.0L153.9 78.0" style="stroke: #B9463F; stroke-width: 3"></path>
+<path class="ln" d="M165.9 85.0L177.9 87.0L189.9 80.0L202.0 88.0" style="stroke: #B9463F; stroke-width: 3"></path>
+<circle cx="9.6" cy="48.0" r="5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 1.75"></circle>
+<path class="nowl" d="M202.0 0V250"></path>
+<text class="axb" x="202.0" y="270" style="text-anchor: middle">Now</text>
+<circle cx="202.0" cy="88.0" r="5.5" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="202.0" cy="137.0" r="3.5" style="fill: #FAF9F6; stroke: #4A4843; stroke-width: 1.5"></circle>
+<path d="M208.0 88.0H211.0V137.0H208.0" style="fill: none; stroke: #171717; stroke-width: 1"></path>
+<text class="halo num" x="218.0" y="109.5" style="font-size: 13px"><tspan x="218.0" style="font-weight: 600; fill: #B9463F">Labor 51.2</tspan><tspan x="218.0" dy="17" style="fill: #3D3B37">4.9 above average</tspan></text>
+<text class="lbl halo" x="448.4" y="138.0" style="fill: #4A4843; font-weight: 600">Average</text>
+</g>
+</svg></div>
+</div>
+
+<div style="margin-top: 56px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600">2 · Choosing terms</span><span style="max-width: 760px; font-size: 13px; line-height: 1.5; color: #6B6862">One button opens every term, in order. A term’s own line is a click; taking it out of the band, the average and the download is the × beside it. The same board governs every chart on the page.</span></div>
+
+<div style="margin-top: 28px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #DDDCD8">
+<span class="ctl" style="margin-right: 4px">Compare with</span>
+<div role="group" aria-label="Past terms on the board" style="display: flex; gap: 2px"><button class="tab" aria-pressed="true">All past terms<span class="n">20</span></button><button class="tab" aria-pressed="false">Re-elected<span class="n">14</span></button><button class="tab" aria-pressed="false">Turned out<span class="n">6</span></button></div>
+<span style="width: 1px; height: 20px; margin: 0 12px; background: #DDDCD8"></span>
+<div role="group" aria-label="Measure" style="display: flex; gap: 2px"><button class="tab" aria-pressed="true">Level</button><button class="tab" aria-pressed="false">Change since election</button></div>
+<span style="flex-grow: 1"></span>
+<button class="chip" aria-haspopup="dialog" aria-expanded="true"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M12 5v14M5 12h14"></path></svg>Draw a past term</button>
+</div>
+<div style="margin-top: 10px; display: flex; align-items: center; gap: 10px"><span class="ctl" style="font-weight: 500; color: #6B6862">Drawn over the band</span><span class="chip" style="gap: 6px; padding: 0 4px 0 12px; border-color: #B9463F; box-shadow: none; background: #FAF9F6"><span style="width: 14px; height: 3px; border-radius: 2px; background: #B9463F"></span>2022 Albanese<button class="tx" aria-label="Return 2022 Albanese to the band" title="Return to the band" style="width: 28px; height: 28px; font-size: 16px">×</button></span><span class="chip" style="gap: 6px; padding: 0 4px 0 12px; border-color: #356697; box-shadow: none; background: #FAF9F6"><span style="width: 14px; height: 3px; border-radius: 2px; background: #356697"></span>1996 Howard<button class="tx" aria-label="Return 1996 Howard to the band" title="Return to the band" style="width: 28px; height: 28px; font-size: 16px">×</button></span></div>
+
+<div role="dialog" aria-label="Past terms" style="margin-top: 8px; padding: 18px 20px 16px; border: 1px solid #DFDCD7; border-radius: 12px; background: #FEFCF9; box-shadow: 0 1px 1.5px rgba(91,79,69,0.12), 0 12px 28px -12px rgba(64,44,26,0.22)"><div style="display: flex; align-items: baseline; gap: 16px"><span style="font-size: 15px; font-weight: 600">Past terms</span><span style="font-size: 13px; color: #6B6862">19 on the board · 2 drawn as their own line</span><span style="flex-grow: 1"></span><button class="how" style="font-size: 13px; min-height: 36px">Only the drawn terms</button><button class="how" style="font-size: 13px; min-height: 36px">Clear lines</button><button class="tx" aria-label="Close" style="width: 36px; height: 36px">×</button></div><div style="margin-top: 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 20px"><div style="display: flex; flex-direction: column; gap: 2px"><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="1972 Whitlam – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #B9463F; opacity: 0.35"></span><span class="num" style="font-weight: 600">1972</span><span style="flex-grow: 1">Whitlam</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 1972 off the board" aria-label="Take 1972 Whitlam off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="1974 Whitlam–Fraser – off the board, put it back" style="color: #9A968E; text-decoration: line-through"><span style="width: 18px; height: 3px; border-radius: 2px; background: #B9463F; opacity: 0.18"></span><span class="num" style="font-weight: 600">1974</span><span style="flex-grow: 1">Whitlam–Fraser</span><span style="font-size: 12px; color: #9A968E; text-decoration: none">Turned out</span></button><button class="tx" title="Put 1974 back on the board" aria-label="Put 1974 Whitlam–Fraser back on the board">+</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="1975 Fraser – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #356697; opacity: 0.35"></span><span class="num" style="font-weight: 600">1975</span><span style="flex-grow: 1">Fraser</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 1975 off the board" aria-label="Take 1975 Fraser off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="1977 Fraser – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #356697; opacity: 0.35"></span><span class="num" style="font-weight: 600">1977</span><span style="flex-grow: 1">Fraser</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 1977 off the board" aria-label="Take 1977 Fraser off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="1980 Fraser – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #356697; opacity: 0.35"></span><span class="num" style="font-weight: 600">1980</span><span style="flex-grow: 1">Fraser</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Turned out</span></button><button class="tx" title="Take 1980 off the board" aria-label="Take 1980 Fraser off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="1983 Hawke – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #B9463F; opacity: 0.35"></span><span class="num" style="font-weight: 600">1983</span><span style="flex-grow: 1">Hawke</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 1983 off the board" aria-label="Take 1983 Hawke off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="1984 Hawke – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #B9463F; opacity: 0.35"></span><span class="num" style="font-weight: 600">1984</span><span style="flex-grow: 1">Hawke</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 1984 off the board" aria-label="Take 1984 Hawke off the board">×</button></span></div><div style="display: flex; flex-direction: column; gap: 2px"><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="1987 Hawke – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #B9463F; opacity: 0.35"></span><span class="num" style="font-weight: 600">1987</span><span style="flex-grow: 1">Hawke</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 1987 off the board" aria-label="Take 1987 Hawke off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="1990 Hawke–Keating – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #B9463F; opacity: 0.35"></span><span class="num" style="font-weight: 600">1990</span><span style="flex-grow: 1">Hawke–Keating</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 1990 off the board" aria-label="Take 1990 Hawke–Keating off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="1993 Keating – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #B9463F; opacity: 0.35"></span><span class="num" style="font-weight: 600">1993</span><span style="flex-grow: 1">Keating</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Turned out</span></button><button class="tx" title="Take 1993 off the board" aria-label="Take 1993 Keating off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="true" aria-label="1996 Howard – drawn as its own line, return it to the band" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #356697"></span><span class="num" style="font-weight: 600">1996</span><span style="flex-grow: 1">Howard</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 1996 off the board" aria-label="Take 1996 Howard off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="1998 Howard – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #356697; opacity: 0.35"></span><span class="num" style="font-weight: 600">1998</span><span style="flex-grow: 1">Howard</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 1998 off the board" aria-label="Take 1998 Howard off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="2001 Howard – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #356697; opacity: 0.35"></span><span class="num" style="font-weight: 600">2001</span><span style="flex-grow: 1">Howard</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 2001 off the board" aria-label="Take 2001 Howard off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="2004 Howard – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #356697; opacity: 0.35"></span><span class="num" style="font-weight: 600">2004</span><span style="flex-grow: 1">Howard</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Turned out</span></button><button class="tx" title="Take 2004 off the board" aria-label="Take 2004 Howard off the board">×</button></span></div><div style="display: flex; flex-direction: column; gap: 2px"><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="2007 Rudd–Gillard – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #B9463F; opacity: 0.35"></span><span class="num" style="font-weight: 600">2007</span><span style="flex-grow: 1">Rudd–Gillard</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 2007 off the board" aria-label="Take 2007 Rudd–Gillard off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="2010 Gillard–Rudd – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #B9463F; opacity: 0.35"></span><span class="num" style="font-weight: 600">2010</span><span style="flex-grow: 1">Gillard–Rudd</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Turned out</span></button><button class="tx" title="Take 2010 off the board" aria-label="Take 2010 Gillard–Rudd off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="2013 Abbott–Turnbull – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #356697; opacity: 0.35"></span><span class="num" style="font-weight: 600">2013</span><span style="flex-grow: 1">Abbott–Turnbull</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 2013 off the board" aria-label="Take 2013 Abbott–Turnbull off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="2016 Turnbull–Morrison – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #356697; opacity: 0.35"></span><span class="num" style="font-weight: 600">2016</span><span style="flex-grow: 1">Turnbull–Morrison</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 2016 off the board" aria-label="Take 2016 Turnbull–Morrison off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="false" aria-label="2019 Morrison – in the band, draw its own line" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #356697; opacity: 0.35"></span><span class="num" style="font-weight: 600">2019</span><span style="flex-grow: 1">Morrison</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Turned out</span></button><button class="tx" title="Take 2019 off the board" aria-label="Take 2019 Morrison off the board">×</button></span><span style="display: flex; align-items: center; gap: 2px"><button class="term" aria-pressed="true" aria-label="2022 Albanese – drawn as its own line, return it to the band" style="color: #171717"><span style="width: 18px; height: 3px; border-radius: 2px; background: #B9463F"></span><span class="num" style="font-weight: 600">2022</span><span style="flex-grow: 1">Albanese</span><span style="font-size: 12px; color: #6B6862; text-decoration: none">Re-elected</span></button><button class="tx" title="Take 2022 off the board" aria-label="Take 2022 Albanese off the board">×</button></span><span style="display: flex; align-items: center"><span class="term" style="cursor: default"><span style="width: 18px; height: 3px; border-radius: 2px; background: #B9463F"></span><span class="num" style="font-weight: 600">2025</span><span>Albanese</span><span style="margin-left: auto; padding: 1px 6px; border-radius: 4px; background: #171717; color: #FAF9F6; font-size: 11px; font-weight: 600">This term</span></span></span></div></div><p style="margin: 12px 0 0; padding-top: 10px; border-top: 1px solid #E6E4DF; font-size: 13px; line-height: 1.5; color: #6B6862">Click a term to draw its own line over the band, and again to put it back. The × takes it off the board altogether: out of the band, the average and the download. With three terms or fewer on the board, the band gives way to the polls under each line.</p></div>
+
+<div style="margin-top: 56px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600">3 · Two terms drawn over the band</span><span style="max-width: 760px; font-size: 13px; line-height: 1.5; color: #6B6862">Drawn terms keep their party’s colour and carry their name at the line’s end; a chip for each sits in the controls, with a × to put it back in the band. The band does not move: a drawn term is still one of the terms it is made of.</span></div>
+
+<div style="margin-top: 14px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #DDDCD8">
+<span class="ctl" style="margin-right: 4px">Compare with</span>
+<div role="group" aria-label="Past terms on the board" style="display: flex; gap: 2px"><button class="tab" aria-pressed="true">All past terms<span class="n">20</span></button><button class="tab" aria-pressed="false">Re-elected<span class="n">14</span></button><button class="tab" aria-pressed="false">Turned out<span class="n">6</span></button></div>
+<span style="width: 1px; height: 20px; margin: 0 12px; background: #DDDCD8"></span>
+<div role="group" aria-label="Measure" style="display: flex; gap: 2px"><button class="tab" aria-pressed="true">Level</button><button class="tab" aria-pressed="false">Change since election</button></div>
+<span style="flex-grow: 1"></span>
+<button class="chip" aria-haspopup="dialog" aria-expanded="false"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M12 5v14M5 12h14"></path></svg>Draw a past term</button>
+</div>
+<div style="margin-top: 10px; display: flex; align-items: center; gap: 10px"><span class="ctl" style="font-weight: 500; color: #6B6862">Drawn over the band</span><span class="chip" style="gap: 6px; padding: 0 4px 0 12px; border-color: #B9463F; box-shadow: none; background: #FAF9F6"><span style="width: 14px; height: 3px; border-radius: 2px; background: #B9463F"></span>2022 Albanese<button class="tx" aria-label="Return 2022 Albanese to the band" title="Return to the band" style="width: 28px; height: 28px; font-size: 16px">×</button></span><span class="chip" style="gap: 6px; padding: 0 4px 0 12px; border-color: #356697; box-shadow: none; background: #FAF9F6"><span style="width: 14px; height: 3px; border-radius: 2px; background: #356697"></span>1996 Howard<button class="tx" aria-label="Return 1996 Howard to the band" title="Return to the band" style="width: 28px; height: 28px; font-size: 16px">×</button></span></div>
+
+<svg viewBox="0 0 1152 330" width="1152" height="330" role="img" aria-label="The two-party chart with the 2022 and 1996 terms drawn over the band." style="margin-top: 16px; display: block; overflow: visible">
+<g transform="translate(36 20)">
+<path class="grid" d="M0 280.0H1010M0 210.0H1010M0 70.0H1010M0 0.0H1010"></path>
+<path class="even" d="M0 140.0H1010"></path>
+<text class="ax num" x="-6" y="284.0" style="text-anchor: end">40</text>
+<text class="ax num" x="-6" y="214.0" style="text-anchor: end">45</text>
+<text class="ax num" x="-6" y="144.0" style="text-anchor: end">50</text>
+<text class="ax num" x="-6" y="74.0" style="text-anchor: end">55</text>
+<text class="ax num" x="-6" y="4.0" style="text-anchor: end">60%</text>
+<path class="base" d="M0 280H1010M21.5 280v4M343.8 280v4M666.2 280v4M988.5 280v4"></path>
+<text class="axb" x="21.5" y="300" style="text-anchor: middle">Election</text>
+<text class="ax" x="343.8" y="300" style="text-anchor: middle">1 year</text>
+<text class="ax" x="666.2" y="300" style="text-anchor: middle">2 years</text>
+<text class="ax" x="988.5" y="300" style="text-anchor: middle">3 years</text>
+<path d="M21.5 88.2L48.4 12.0L75.2 28.6L102.1 49.0L128.9 60.5L155.8 64.3L182.7 80.9L209.5 57.0L236.4 50.7L263.2 67.8L290.1 54.0L317.0 50.4L343.8 56.8L370.7 52.5L397.6 74.6L424.4 80.4L451.3 79.8L478.1 93.5L505.0 89.9L531.9 85.4L558.7 79.8L585.6 103.2L612.4 114.0L639.3 122.4L666.2 104.2L693.0 115.5L719.9 113.4L746.8 109.2L773.6 109.9L800.5 109.2L827.3 121.8L854.2 104.7L854.2 216.4L827.3 233.2L800.5 228.9L773.6 210.7L746.8 203.7L719.9 195.3L693.0 181.3L666.2 192.6L639.3 193.8L612.4 192.1L585.6 197.8L558.7 209.3L531.9 211.4L505.0 194.9L478.1 212.5L451.3 199.1L424.4 192.6L397.6 205.1L370.7 212.2L343.8 222.5L317.0 228.3L290.1 195.3L263.2 192.6L236.4 198.2L209.5 195.4L182.7 190.1L155.8 176.0L128.9 161.3L102.1 155.1L75.2 159.9L48.4 149.8L21.5 138.9Z" style="fill: #6B6862; opacity: 0.1"></path>
+<path d="M21.5 100.4L48.4 72.1L75.2 64.4L102.1 59.5L128.9 72.1L155.8 93.4L182.7 89.6L209.5 102.6L236.4 114.8L263.2 123.9L290.1 112.7L317.0 100.1L343.8 101.2L370.7 82.9L397.6 109.9L424.4 110.6L451.3 106.8L478.1 112.0L505.0 112.0L531.9 119.7L558.7 121.1L585.6 121.4L612.4 127.4L639.3 134.4L666.2 130.2L693.0 129.5L719.9 148.0L746.8 142.8L773.6 138.9L800.5 131.9L827.3 131.6L854.2 128.1L854.2 184.8L827.3 186.2L800.5 181.7L773.6 198.4L746.8 177.8L719.9 177.1L693.0 169.8L666.2 170.8L639.3 189.0L612.4 180.6L585.6 179.2L558.7 197.4L531.9 184.8L505.0 181.3L478.1 184.8L451.3 194.9L424.4 183.1L397.6 184.8L370.7 185.8L343.8 188.3L317.0 182.0L290.1 179.5L263.2 189.3L236.4 186.5L209.5 173.9L182.7 159.9L155.8 145.2L128.9 147.3L102.1 141.8L75.2 133.3L48.4 122.2L21.5 130.2Z" style="fill: #6B6862; opacity: 0.17"></path>
+<path d="M854.2 104.7L881.1 99.4L907.9 124.2L934.8 123.2L961.6 110.6L988.5 103.6L988.5 204.4L961.6 200.5L934.8 194.6L907.9 210.8L881.1 226.5L854.2 216.4Z" style="fill: #6B6862; opacity: 0.045"></path>
+<path d="M854.2 128.1L881.1 148.4L907.9 149.8L934.8 139.3L961.6 137.9L988.5 141.4L988.5 184.4L961.6 171.5L934.8 191.8L907.9 198.4L881.1 197.4L854.2 184.8Z" style="fill: #6B6862; opacity: 0.075"></path>
+<path class="mean" d="M21.5 112.8L48.4 93.4L75.2 99.8L102.1 103.2L128.9 113.8L155.8 124.0L182.7 135.1L209.5 141.1L236.4 146.2L263.2 149.0L290.1 142.8L317.0 141.3L343.8 140.2L370.7 137.6L397.6 145.8L424.4 144.3L451.3 149.4L478.1 145.0L505.0 142.7L531.9 150.0L558.7 152.6L585.6 148.9L612.4 150.5L639.3 157.6L666.2 149.1L693.0 146.6L719.9 158.7L746.8 160.0L773.6 160.7L800.5 166.7L827.3 165.9L854.2 159.0L881.1 165.0L907.9 169.3L934.8 164.6L961.6 158.0L988.5 159.6"></path>
+<path class="ln" d="M21.5 110.6L48.4 85.4L75.2 64.4L102.1 51.8L128.9 70.0L155.8 63.0L182.7 53.2L209.5 53.2L236.4 35.0L263.2 60.2L290.1 54.6L317.0 51.8L343.8 58.8L370.7 56.0L397.6 79.8L424.4 82.6L451.3 92.4L478.1 95.2L505.0 112.0L531.9 116.2L558.7 119.0L585.6 114.8L612.4 127.4L639.3 124.6L666.2 127.4L693.0 124.6L719.9 138.6L746.8 134.4L773.6 141.4L800.5 137.2L827.3 141.4L854.2 151.2L881.1 148.4L907.9 151.2L934.8 123.2L961.6 100.8" style="stroke: #B9463F; stroke-width: 2.25; opacity: 0.9"></path>
+<text class="end halo" x="968.6" y="104.8" style="fill: #B9463F; font-size: 13px">2022 Albanese</text>
+<path class="ln" d="M21.5 89.6L48.4 63.0L75.2 30.8L102.1 53.2L128.9 61.6L155.8 64.4L182.7 84.0L209.5 57.4L236.4 51.8L263.2 68.6L290.1 74.2L317.0 75.6L343.8 67.2L370.7 79.8L397.6 107.8L424.4 106.4L451.3 109.2L478.1 135.8L505.0 131.6L531.9 128.8L558.7 207.2L585.6 189.0L612.4 162.4L639.3 193.2L666.2 166.6L693.0 169.4L719.9 175.0L746.8 176.4L773.6 210.0L800.5 180.6L827.3 158.2L854.2 151.2" style="stroke: #356697; stroke-width: 2.25; opacity: 0.9"></path>
+<text class="end halo" x="861.2" y="155.2" style="fill: #356697; font-size: 13px">1996 Howard</text>
+<path class="ln" d="M21.5 67.2L48.4 53.2L75.2 46.2L102.1 56.0L128.9 63.0L155.8 63.0L182.7 64.4L209.5 78.4L236.4 92.4L263.2 89.6L290.1 95.2L317.0 95.2L343.8 109.2" style="stroke: #B9463F; stroke-width: 3"></path>
+<path class="ln" d="M370.7 119.0L397.6 121.8L424.4 112.0L451.3 123.2" style="stroke: #B9463F; stroke-width: 3"></path>
+<circle cx="21.5" cy="67.2" r="5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 1.75"></circle>
+<path class="nowl" d="M451.3 0V280"></path>
+<text class="axb" x="451.3" y="300" style="text-anchor: middle">Now</text>
+<circle cx="451.3" cy="123.2" r="5.5" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="451.3" cy="149.4" r="3.5" style="fill: #FAF9F6; stroke: #4A4843; stroke-width: 1.5"></circle>
+<path d="M457.3 123.2H460.3V149.4H457.3" style="fill: none; stroke: #171717; stroke-width: 1"></path>
+<text class="halo num" x="467.3" y="133.3" style="font-size: 13px"><tspan x="467.3" style="font-weight: 600; fill: #B9463F">Labor 51.2</tspan><tspan x="467.3" dy="17" style="fill: #3D3B37">1.9 above average</tspan></text>
+<text class="lbl halo" x="994.5" y="163.6" style="fill: #4A4843; font-weight: 600">Average</text>
+</g>
+</svg>
+
+<div style="margin-top: 56px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600">4 · Three terms or fewer: the polls under the lines</span><span style="max-width: 760px; font-size: 13px; line-height: 1.5; color: #6B6862">Cut the board to three terms and the band gives way to the polls each line is made of. Terms of one party are told apart by shape: circles for this term, triangles and diamonds for the others.</span></div>
+
+<svg viewBox="0 0 1152 350" width="1152" height="350" role="img" aria-label="Net approval for three prime ministers only: Whitlam from 1974, Keating from 1993 and Albanese, with every poll under each line." style="margin-top: 16px; display: block; overflow: visible">
+<g transform="translate(36 20)">
+<path class="grid" d="M0 300.0H1010M0 250.0H1010M0 200.0H1010M0 100.0H1010M0 50.0H1010M0 0.0H1010"></path>
+<path class="even" d="M0 150.0H1010"></path>
+<text class="ax num" x="-6" y="304.0" style="text-anchor: end">−60</text>
+<text class="ax num" x="-6" y="254.0" style="text-anchor: end">−40</text>
+<text class="ax num" x="-6" y="204.0" style="text-anchor: end">−20</text>
+<text class="ax num" x="-6" y="154.0" style="text-anchor: end">Even</text>
+<text class="ax num" x="-6" y="104.0" style="text-anchor: end">+20</text>
+<text class="ax num" x="-6" y="54.0" style="text-anchor: end">+40</text>
+<text class="ax num" x="-6" y="4.0" style="text-anchor: end">+60</text>
+<path class="base" d="M0 300H1010M21.5 300v4M343.8 300v4M666.2 300v4M988.5 300v4"></path>
+<text class="axb" x="21.5" y="320" style="text-anchor: middle">Election</text>
+<text class="ax" x="343.8" y="320" style="text-anchor: middle">1 year</text>
+<text class="ax" x="666.2" y="320" style="text-anchor: middle">2 years</text>
+<text class="ax" x="988.5" y="320" style="text-anchor: middle">3 years</text>
+<path class="ln" d="M21.5 77.5L48.4 110.0L75.2 137.5L102.1 160.0L128.9 153.8L155.8 176.8L182.7 200.0L209.5 195.0L236.4 176.8L263.2 158.2L290.1 140.0L317.0 150.7L343.8 166.0L370.7 181.2L397.6 224.3L424.4 215.0L451.3 213.8L478.1 200.0" style="stroke: #B9463F; stroke-width: 1.75; opacity: 0.75"></path>
+<path class="ln" d="M505.0 155.0L531.9 155.0" style="stroke: #B9463F; stroke-width: 1.75; opacity: 0.75"></path>
+<text class="end halo" x="538.9" y="153.0" style="fill: #B9463F; font-size: 13px">1974 Whitlam–Fraser</text>
+<path class="ln" d="M21.5 161.5L48.4 154.8L75.2 172.2L102.1 200.5L128.9 212.0L155.8 245.2L182.7 259.2L209.5 239.5L236.4 226.0L263.2 232.7L290.1 201.2L317.0 196.0L343.8 194.0L370.7 182.2L397.6 173.2L424.4 195.8L451.3 210.2L478.1 192.8L505.0 167.5L531.9 168.2L558.7 160.5L585.6 182.5L612.4 191.0L639.3 201.8L666.2 213.8L693.0 202.5L719.9 193.0L746.8 205.0L773.6 203.2L800.5 210.0L827.3 203.8L854.2 207.0L881.1 200.2L907.9 204.8L934.8 204.5L961.6 194.0L988.5 190.5" style="stroke: #B9463F; stroke-width: 1.75; opacity: 0.75"></path>
+<text class="end halo" x="995.5" y="194.5" style="fill: #B9463F; font-size: 13px">1993 Keating</text>
+<path d="M26.9 73.9l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M45.7 106.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M80.6 133.9l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M94.0 156.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M120.9 138.9l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M126.3 161.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M180.0 196.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M206.8 191.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M292.8 136.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M306.2 146.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M317.0 141.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M330.4 153.9l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M368.0 181.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M378.8 173.9l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M386.8 231.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M397.6 221.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M411.0 208.9l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M421.7 221.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M435.2 201.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M448.6 211.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M459.3 208.9l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M472.8 196.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M515.7 151.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M521.1 151.4l3.2 5.6h-6.4z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M26.9 148.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M29.5 168.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M40.3 156.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M43.0 148.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M51.0 148.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M53.7 151.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M61.8 153.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M64.5 166.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M75.2 158.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M77.9 181.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M86.0 176.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M91.3 208.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M99.4 176.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M102.1 208.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M112.8 181.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M115.5 221.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M123.6 183.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M126.3 221.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M137.0 203.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M139.7 223.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M147.7 211.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M153.1 238.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M161.2 226.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M163.9 288.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M174.6 243.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M177.3 288.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M185.3 246.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M188.0 268.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M196.1 248.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M198.8 223.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M206.8 261.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M209.5 226.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M220.3 246.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M223.0 208.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M233.7 243.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M236.4 213.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M244.4 226.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M247.1 206.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M257.9 243.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M263.2 218.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M268.6 238.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M284.7 201.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M292.8 186.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M295.5 198.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M306.2 186.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M308.9 181.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M319.7 208.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M322.3 193.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M330.4 203.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M333.1 186.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M343.8 188.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M346.5 178.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M357.3 203.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M359.9 176.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M370.7 168.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M373.4 183.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M384.1 168.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M386.8 188.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M394.9 166.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M400.2 158.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M408.3 163.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M411.0 196.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M421.7 181.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M424.4 188.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M432.5 188.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M435.2 211.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M445.9 196.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M448.6 211.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M456.6 191.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M462.0 228.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M470.1 186.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M472.8 186.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M480.8 181.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M486.2 203.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M494.3 168.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M496.9 176.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M507.7 163.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M510.4 153.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M515.7 158.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M526.5 153.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M529.2 171.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M534.5 166.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M542.6 166.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M542.6 158.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M553.4 171.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M556.0 151.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M566.8 158.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M569.5 143.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M577.5 181.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M580.2 153.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M591.0 213.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M615.1 193.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M628.6 183.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M639.3 186.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M639.3 211.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M652.7 198.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M652.7 213.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M663.5 198.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M666.2 211.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M676.9 203.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M676.9 226.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M687.7 191.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M690.3 203.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M701.1 198.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M701.1 201.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M714.5 181.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M714.5 188.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M725.3 183.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M728.0 201.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M738.7 198.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M738.7 198.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M749.4 191.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M752.1 216.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M762.9 178.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M762.9 216.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M776.3 196.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M776.3 206.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M787.0 203.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M789.7 218.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M800.5 188.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M800.5 216.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M811.2 198.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M813.9 211.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M824.7 193.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M824.7 218.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M838.1 193.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M838.1 193.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M848.8 203.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M851.5 203.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M862.3 188.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M862.3 216.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M873.0 198.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M881.1 193.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M886.4 183.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M894.5 208.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M905.2 216.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M910.6 198.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M942.8 206.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M956.3 196.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M961.6 191.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M967.0 193.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M972.4 198.9l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<path d="M977.8 191.4l3.4 3.6-3.4 3.6-3.4-3.6z" style="fill: #B9463F; opacity: 0.4"></path>
+<circle cx="87.6" cy="150.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="88.6" cy="142.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="112.3" cy="142.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="114.2" cy="155.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="137.0" cy="162.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="138.9" cy="152.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="153.1" cy="155.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="153.9" cy="160.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="155.5" cy="152.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="164.4" cy="165.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="177.8" cy="147.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="180.2" cy="157.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="180.2" cy="162.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="188.3" cy="150.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="198.8" cy="150.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="202.5" cy="140.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="213.8" cy="135.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="214.9" cy="155.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="225.4" cy="172.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="240.4" cy="185.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="249.3" cy="177.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="249.3" cy="205.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="255.5" cy="185.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="258.9" cy="190.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="269.4" cy="175.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="274.8" cy="200.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="279.1" cy="187.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="282.6" cy="165.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="283.7" cy="185.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="285.3" cy="187.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="296.0" cy="190.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="299.5" cy="190.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="307.3" cy="180.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="309.2" cy="197.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="310.0" cy="195.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="320.7" cy="190.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="328.5" cy="192.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="330.4" cy="187.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="333.1" cy="197.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="338.2" cy="175.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="345.4" cy="185.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="353.2" cy="195.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="355.1" cy="205.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="355.9" cy="192.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="357.8" cy="197.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="362.1" cy="192.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="364.0" cy="205.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="370.2" cy="215.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="371.8" cy="210.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="379.8" cy="200.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="382.5" cy="212.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="390.3" cy="192.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="393.8" cy="182.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="394.9" cy="202.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="404.5" cy="185.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="407.2" cy="195.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="408.8" cy="195.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="418.5" cy="185.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="419.6" cy="192.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="428.4" cy="205.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="430.9" cy="202.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="435.4" cy="190.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="443.2" cy="210.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="447.0" cy="202.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="449.4" cy="202.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="456.6" cy="207.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="460.1" cy="195.0" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="464.4" cy="217.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<circle cx="467.9" cy="222.5" r="2.6" style="fill: #B9463F; opacity: 0.4"></circle>
+<path class="ln" d="M21.5 106.2L48.4 107.5L75.2 131.8L102.1 140.0L128.9 138.0L155.8 153.8L182.7 141.0L209.5 144.2L236.4 177.7L263.2 186.2L290.1 182.5L317.0 188.5L343.8 191.2L370.7 202.8L397.6 190.5L424.4 194.3L451.3 211.5" style="stroke: #B9463F; stroke-width: 3"></path>
+<path class="nowl" d="M451.3 0V300"></path>
+<text class="axb" x="451.3" y="320" style="text-anchor: middle">Now</text>
+<circle cx="451.3" cy="211.5" r="5.5" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<text class="end halo" x="460.3" y="215.5" style="fill: #B9463F">2025 Albanese</text>
+</g>
+</svg>
+
+<div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; flex-wrap: wrap; column-gap: 24px; row-gap: 6px; font-size: 13px; color: #4A4843">
+<span class="key"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><path d="M1 7H23" style="stroke: #B9463F; stroke-width: 3; stroke-linecap: round"></path></svg>Monthly average</span>
+<span class="key"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="3" style="fill: #B9463F; opacity: 0.5"></circle></svg>A poll this term</span>
+<span class="key"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 3.2l3.4 6H3.6z" style="fill: #B9463F; opacity: 0.5"></path></svg>A poll, 1974 term</span>
+<span class="key"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 3l3.6 4-3.6 4-3.6-4z" style="fill: #B9463F; opacity: 0.5"></path></svg>A poll, 1993 term</span>
+</div>
+
+<div style="margin-top: 56px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600">5 · Change since the election</span><span style="max-width: 760px; font-size: 13px; line-height: 1.5; color: #6B6862">Every line starts from its own election result. The Coalition’s −10.6 is the largest fall of any opposition by this stage; the average opposition had gained 1.7. The summary’s figures, ranks and averages switch with it.</span></div>
+
+<div style="margin-top: 20px"></div><div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; align-items: start">
+<div style="display: flex; flex-direction: column"><div style="margin-top: 0px; display: flex; align-items: center; gap: 4px"><span style="flex-grow: 1; font-size: 13px; font-weight: 600; line-height: 1.35">Government’s primary vote, change since the election</span><button class="copy" aria-label="Copy chart: government primary vote" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button></div><svg viewBox="0 0 552 310" width="552" height="310" role="img" aria-label="Change in the government’s primary vote since its election." style="margin-top: 8px; display: block; overflow: visible">
+<g transform="translate(30 30)">
+<path class="grid" d="M0 250.0H452M0 214.3H452M0 178.6H452M0 142.9H452M0 71.4H452M0 35.7H452M0 0.0H452"></path>
+<path class="even" d="M0 107.1H452"></path>
+<text class="ax num" x="-6" y="254.0" style="text-anchor: end">−20</text>
+<text class="ax num" x="-6" y="218.3" style="text-anchor: end">−15</text>
+<text class="ax num" x="-6" y="182.6" style="text-anchor: end">−10</text>
+<text class="ax num" x="-6" y="146.9" style="text-anchor: end">−5</text>
+<text class="ax num" x="-6" y="111.1" style="text-anchor: end">Result</text>
+<text class="ax num" x="-6" y="75.4" style="text-anchor: end">+5</text>
+<text class="ax num" x="-6" y="39.7" style="text-anchor: end">+10</text>
+<text class="ax num" x="-6" y="4.0" style="text-anchor: end">+15</text>
+<path class="base" d="M0 250H452M9.6 250v4M153.9 250v4M298.1 250v4M442.4 250v4"></path>
+<text class="axb" x="9.6" y="270" style="text-anchor: middle">Election</text>
+<text class="ax" x="153.9" y="270" style="text-anchor: middle">1 yr</text>
+<text class="ax" x="298.1" y="270" style="text-anchor: middle">2 yrs</text>
+<text class="ax" x="442.4" y="270" style="text-anchor: middle">3 yrs</text>
+<path d="M9.6 107.1L21.6 74.9L33.7 73.6L45.7 72.3L57.7 70.0L69.7 70.4L81.7 83.1L93.8 87.9L105.8 87.9L117.8 82.4L129.8 79.5L141.9 74.5L153.9 76.9L165.9 75.3L177.9 78.1L189.9 90.6L202.0 98.4L214.0 90.1L226.0 96.7L238.0 92.6L250.0 83.9L262.1 97.9L274.1 100.4L286.1 102.3L298.1 100.1L310.1 102.9L322.2 104.3L334.2 108.2L346.2 107.5L358.2 114.6L370.3 108.3L382.3 104.0L382.3 153.4L370.3 155.6L358.2 163.6L346.2 160.0L334.2 157.9L322.2 161.8L310.1 151.1L298.1 154.3L286.1 159.6L274.1 154.9L262.1 165.6L250.0 168.1L238.0 161.0L226.0 155.6L214.0 162.5L202.0 158.9L189.9 157.9L177.9 164.4L165.9 157.9L153.9 158.4L141.9 159.7L129.8 153.1L117.8 154.6L105.8 155.1L93.8 152.1L81.7 145.0L69.7 142.7L57.7 134.1L45.7 130.9L33.7 122.2L21.6 120.9L9.6 107.1Z" style="fill: #6B6862; opacity: 0.1"></path>
+<path d="M9.6 107.1L21.6 90.7L33.7 86.8L45.7 88.9L57.7 95.2L69.7 100.0L81.7 112.1L93.8 96.8L105.8 107.1L117.8 103.4L129.8 101.6L141.9 100.0L153.9 90.4L165.9 92.1L177.9 96.6L189.9 98.2L202.0 103.6L214.0 102.9L226.0 105.4L238.0 109.3L250.0 107.9L262.1 113.4L274.1 120.0L286.1 116.4L298.1 117.1L310.1 111.4L322.2 119.3L334.2 116.1L346.2 121.6L358.2 121.3L370.3 120.4L382.3 122.1L382.3 146.4L370.3 147.1L358.2 149.6L346.2 142.0L334.2 145.9L322.2 137.5L310.1 132.9L298.1 141.4L286.1 152.1L274.1 144.3L262.1 143.4L250.0 160.0L238.0 151.8L226.0 150.0L214.0 159.5L202.0 147.1L189.9 145.5L177.9 153.4L165.9 147.1L153.9 151.2L141.9 146.3L129.8 143.0L117.8 152.3L105.8 151.1L93.8 144.5L81.7 133.0L69.7 133.9L57.7 114.8L45.7 110.4L33.7 112.9L21.6 110.7L9.6 107.1Z" style="fill: #6B6862; opacity: 0.17"></path>
+<path d="M382.3 104.0L394.3 106.0L406.3 115.1L418.3 92.1L430.4 87.5L442.4 57.5L442.4 157.1L430.4 157.5L418.3 157.1L406.3 157.4L394.3 156.6L382.3 153.4Z" style="fill: #6B6862; opacity: 0.045"></path>
+<path d="M382.3 122.1L394.3 128.6L406.3 123.9L418.3 116.4L430.4 95.5L442.4 87.1L442.4 152.3L430.4 143.0L418.3 140.7L406.3 145.4L394.3 152.1L382.3 146.4Z" style="fill: #6B6862; opacity: 0.075"></path>
+<path class="mean" d="M9.6 107.1L21.6 97.1L33.7 99.9L45.7 101.2L57.7 105.2L69.7 112.9L81.7 121.1L93.8 124.4L105.8 126.2L117.8 128.9L129.8 124.2L141.9 123.0L153.9 123.4L165.9 122.8L177.9 127.7L189.9 125.4L202.0 131.1L214.0 126.6L226.0 126.7L238.0 130.8L250.0 131.9L262.1 130.6L274.1 130.2L286.1 134.3L298.1 128.5L310.1 123.5L322.2 129.6L334.2 130.4L346.2 132.9L358.2 135.4L370.3 135.2L382.3 133.7L394.3 134.0L406.3 132.9L418.3 127.2L430.4 117.1L442.4 115.8"></path>
+<path class="ev" d="M19.5 -7V250"></path><circle class="evn" cx="19.5" cy="-14" r="7"></circle><text class="evnt" x="19.5" y="-11">1</text>
+<path class="ev" d="M98.5 -7V250"></path><circle class="evn" cx="98.5" cy="-14" r="7"></circle><text class="evnt" x="98.5" y="-11">2</text>
+<path class="ev" d="M113.9 -7V250"></path><circle class="evn" cx="113.9" cy="-14" r="7"></circle><text class="evnt" x="113.9" y="-11">3</text>
+<path class="ev" d="M157.3 -7V250"></path><circle class="evn" cx="157.3" cy="-14" r="7"></circle><text class="evnt" x="157.3" y="-11">4</text>
+<path class="ln" d="M9.6 107.1L21.6 90.0L33.7 97.9L45.7 102.1L57.7 105.7L69.7 108.6L81.7 110.7L93.8 120.7L105.8 134.3L117.8 134.3L129.8 141.4L141.9 140.7L153.9 146.4L165.9 150.0L177.9 155.0L189.9 155.0L202.0 162.9" style="stroke: #B9463F; stroke-width: 3"></path>
+<path class="nowl" d="M202.0 0V250"></path>
+<text class="axb" x="202.0" y="270" style="text-anchor: middle">Now</text>
+<circle cx="202.0" cy="162.9" r="5.5" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="202.0" cy="131.1" r="3.5" style="fill: #FAF9F6; stroke: #4A4843; stroke-width: 1.5"></circle>
+<path d="M208.0 162.9H211.0V131.1H208.0" style="fill: none; stroke: #171717; stroke-width: 1"></path>
+<text class="halo num" x="218.0" y="144.0" style="font-size: 13px"><tspan x="218.0" style="font-weight: 600; fill: #B9463F">Labor −7.8</tspan><tspan x="218.0" dy="17" style="fill: #3D3B37">4.5 below average</tspan></text>
+<text class="lbl halo" x="448.4" y="119.8" style="fill: #4A4843; font-weight: 600">Average</text>
+</g>
+</svg></div>
+<div style="display: flex; flex-direction: column"><div style="margin-top: 0px; display: flex; align-items: center; gap: 4px"><span style="flex-grow: 1; font-size: 13px; font-weight: 600; line-height: 1.35">Opposition’s primary vote, change since the election</span><button class="copy" aria-label="Copy chart: opposition primary vote" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button></div><svg viewBox="0 0 552 310" width="552" height="310" role="img" aria-label="Change in the opposition’s primary vote since the election." style="margin-top: 8px; display: block; overflow: visible">
+<g transform="translate(30 30)">
+<path class="grid" d="M0 250.0H452M0 214.3H452M0 178.6H452M0 142.9H452M0 71.4H452M0 35.7H452M0 0.0H452"></path>
+<path class="even" d="M0 107.1H452"></path>
+<text class="ax num" x="-6" y="254.0" style="text-anchor: end">−20</text>
+<text class="ax num" x="-6" y="218.3" style="text-anchor: end">−15</text>
+<text class="ax num" x="-6" y="182.6" style="text-anchor: end">−10</text>
+<text class="ax num" x="-6" y="146.9" style="text-anchor: end">−5</text>
+<text class="ax num" x="-6" y="111.1" style="text-anchor: end">Result</text>
+<text class="ax num" x="-6" y="75.4" style="text-anchor: end">+5</text>
+<text class="ax num" x="-6" y="39.7" style="text-anchor: end">+10</text>
+<text class="ax num" x="-6" y="4.0" style="text-anchor: end">+15</text>
+<path class="base" d="M0 250H452M9.6 250v4M153.9 250v4M298.1 250v4M442.4 250v4"></path>
+<text class="axb" x="9.6" y="270" style="text-anchor: middle">Election</text>
+<text class="ax" x="153.9" y="270" style="text-anchor: middle">1 yr</text>
+<text class="ax" x="298.1" y="270" style="text-anchor: middle">2 yrs</text>
+<text class="ax" x="442.4" y="270" style="text-anchor: middle">3 yrs</text>
+<path d="M9.6 107.1L21.6 93.5L33.7 92.3L45.7 82.4L57.7 86.6L69.7 82.1L81.7 81.3L93.8 74.6L105.8 58.1L117.8 63.3L129.8 72.9L141.9 57.3L153.9 49.1L165.9 58.2L177.9 66.6L189.9 65.7L202.0 64.3L214.0 53.4L226.0 68.0L238.0 61.7L250.0 63.1L262.1 68.9L274.1 77.0L286.1 65.6L298.1 72.7L310.1 81.8L322.2 66.1L334.2 58.2L346.2 60.7L358.2 61.1L370.3 66.3L382.3 71.9L382.3 116.4L370.3 109.3L358.2 116.8L346.2 120.0L334.2 115.4L322.2 118.9L310.1 116.8L298.1 130.4L286.1 112.9L274.1 124.1L262.1 123.3L250.0 130.4L238.0 130.4L226.0 125.1L214.0 121.0L202.0 134.4L189.9 127.2L177.9 140.1L165.9 134.3L153.9 132.9L141.9 136.2L129.8 137.4L117.8 128.1L105.8 142.2L93.8 131.2L81.7 127.2L69.7 126.6L57.7 126.4L45.7 131.6L33.7 142.7L21.6 143.4L9.6 107.1Z" style="fill: #6B6862; opacity: 0.1"></path>
+<path d="M9.6 107.1L21.6 100.5L33.7 101.6L45.7 100.9L57.7 91.8L69.7 92.1L81.7 85.0L93.8 83.2L105.8 76.2L117.8 82.0L129.8 77.9L141.9 74.1L153.9 72.7L165.9 81.1L177.9 76.8L189.9 79.8L202.0 77.1L214.0 80.5L226.0 84.6L238.0 81.1L250.0 71.4L262.1 78.2L274.1 85.0L286.1 77.1L298.1 82.1L310.1 83.9L322.2 79.6L334.2 77.5L346.2 78.9L358.2 74.5L370.3 76.1L382.3 81.4L382.3 102.5L370.3 104.3L358.2 103.8L346.2 103.4L334.2 102.3L322.2 100.7L310.1 103.8L298.1 99.3L286.1 103.6L274.1 105.7L262.1 108.8L250.0 112.9L238.0 110.7L226.0 118.6L214.0 113.8L202.0 115.4L189.9 118.0L177.9 120.2L165.9 122.1L153.9 127.5L141.9 111.1L129.8 103.9L117.8 99.8L105.8 103.9L93.8 106.6L81.7 108.0L69.7 116.1L57.7 118.9L45.7 124.1L33.7 124.5L21.6 123.9L9.6 107.1Z" style="fill: #6B6862; opacity: 0.17"></path>
+<path d="M382.3 71.9L394.3 59.1L406.3 57.0L418.3 55.0L430.4 70.4L442.4 62.9L442.4 115.0L430.4 110.6L418.3 103.6L406.3 103.6L394.3 124.0L382.3 116.4Z" style="fill: #6B6862; opacity: 0.045"></path>
+<path d="M382.3 81.4L394.3 76.4L406.3 80.4L418.3 83.2L430.4 89.1L442.4 92.5L442.4 95.9L430.4 104.6L418.3 100.7L406.3 97.3L394.3 92.1L382.3 102.5Z" style="fill: #6B6862; opacity: 0.075"></path>
+<path class="mean" d="M9.6 107.1L21.6 116.4L33.7 113.6L45.7 110.9L57.7 105.6L69.7 103.1L81.7 99.6L93.8 96.3L105.8 92.9L117.8 93.8L129.8 95.4L141.9 95.9L153.9 96.8L165.9 98.6L177.9 95.8L189.9 94.7L202.0 95.1L214.0 95.2L226.0 98.1L238.0 93.9L250.0 93.2L262.1 95.3L274.1 94.8L286.1 91.3L298.1 96.4L310.1 96.7L322.2 90.1L334.2 88.9L346.2 90.4L358.2 87.6L370.3 86.4L382.3 91.0L394.3 87.3L406.3 83.8L418.3 86.9L430.4 91.0L442.4 90.6"></path>
+<path class="ev" d="M19.5 -7V250"></path><circle class="evn" cx="19.5" cy="-14" r="7"></circle><text class="evnt" x="19.5" y="-11">1</text>
+<path class="ev" d="M98.5 -7V250"></path><circle class="evn" cx="98.5" cy="-14" r="7"></circle><text class="evnt" x="98.5" y="-11">2</text>
+<path class="ev" d="M113.9 -7V250"></path><circle class="evn" cx="113.9" cy="-14" r="7"></circle><text class="evnt" x="113.9" y="-11">3</text>
+<path class="ev" d="M157.3 -7V250"></path><circle class="evn" cx="157.3" cy="-14" r="7"></circle><text class="evnt" x="157.3" y="-11">4</text>
+<path class="ln" d="M9.6 107.1L21.6 113.6L33.7 122.9L45.7 122.1L57.7 131.4L69.7 137.9L81.7 149.3L93.8 150.0L105.8 165.7L117.8 181.4L129.8 180.0L141.9 175.0L153.9 180.0L165.9 198.6L177.9 180.7L189.9 175.7L202.0 182.9" style="stroke: #356697; stroke-width: 3"></path>
+<path class="nowl" d="M202.0 0V250"></path>
+<text class="axb" x="202.0" y="270" style="text-anchor: middle">Now</text>
+<circle cx="202.0" cy="182.9" r="5.5" style="fill: #356697; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="202.0" cy="95.1" r="3.5" style="fill: #FAF9F6; stroke: #4A4843; stroke-width: 1.5"></circle>
+<path d="M208.0 182.9H211.0V95.1H208.0" style="fill: none; stroke: #171717; stroke-width: 1"></path>
+<text class="halo num" x="218.0" y="136.0" style="font-size: 13px"><tspan x="218.0" style="font-weight: 600; fill: #356697">Coalition −10.6</tspan><tspan x="218.0" dy="17" style="fill: #3D3B37">12.3 below average</tspan></text>
+<text class="lbl halo" x="448.4" y="94.6" style="fill: #4A4843; font-weight: 600">Average</text>
+</g>
+</svg></div>
+</div>
+
+<ol style="margin: 16px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; column-gap: 28px; row-gap: 6px; font-size: 13px; color: #3D3B37"><li style="display: flex; align-items: center; gap: 8px"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle class="evn" cx="8" cy="8" r="7"></circle><text class="evnt" x="8" y="11">1</text></svg><span>1st Coalition split</span><span style="color: #6B6862">May 2025</span></li><li style="display: flex; align-items: center; gap: 8px"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle class="evn" cx="8" cy="8" r="7"></circle><text class="evnt" x="8" y="11">2</text></svg><span>Bondi shooting</span><span style="color: #6B6862">Dec 2025</span></li><li style="display: flex; align-items: center; gap: 8px"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle class="evn" cx="8" cy="8" r="7"></circle><text class="evnt" x="8" y="11">3</text></svg><span>2nd Coalition split</span><span style="color: #6B6862">Jan 2026</span></li><li style="display: flex; align-items: center; gap: 8px"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle class="evn" cx="8" cy="8" r="7"></circle><text class="evnt" x="8" y="11">4</text></svg><span>2026 Budget</span><span style="color: #6B6862">May 2026</span></li></ol>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":3196}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -20,7 +20,7 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 .tab[aria-pressed="true"]{border-bottom-color:#171717;font-weight:600;color:#171717}
 .tab:hover{color:#171717}
 .th{font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6B6862;white-space:nowrap}
-.sortb{padding:0;border:0;background:none;display:inline-flex;align-items:center;gap:4px;min-height:32px}
+.sortb{padding:0;border:0;background:none;display:inline-flex;align-items:flex-end;gap:4px;min-height:32px}
 .row{border-top:1px solid #E6E4DF;cursor:pointer}
 .row:hover{background:#F5F3EE}
 .row[aria-expanded="true"]{background:#F1EFEA;border-top-color:transparent}
@@ -39,10 +39,10 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 .key{display:inline-flex;align-items:center;gap:6px}
 </style>
 </helmet>
-<div style="width: 390px; height: 1640px; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; background: #FAF9F6">
-<h2 style="margin: 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 26px; line-height: 1.15">Latest polls, and when the next are due</h2>
+<div style="width: 390px; height: 1490px; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; background: #FAF9F6">
+<div style="border-top: 2px solid #171717; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #6B6862"><span style="font-size: 19px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Latest and next polls</span><span>8 pollsters · latest release 23 Sep</span></div>
 
-<p style="margin: 6px 0 0; font-size: 14px; line-height: 1.5; color: #4A4843">The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll.</p>
+<p style="margin: 12px 0 0; font-size: 15px; line-height: 1.5; color: #3D3B37">The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll.</p>
 
 <div role="group" aria-label="Figures" style="margin-top: 14px; display: flex; border-bottom: 1px solid #DDDCD8"><button class="tab" aria-pressed="true" style="flex: 1">2PP</button><button class="tab" aria-pressed="false" style="flex: 1">Primary</button><button class="tab" aria-pressed="false" style="flex: 1">Leaders</button></div>
 
@@ -112,7 +112,7 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 <p style="margin: 16px 0 0; max-width: 960px; font-size: 12px; line-height: 1.55; color: #6B6862">Projections read each pollster’s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest. A pollster that misses its slot shows as overdue until the release is added. Spectre Strategy has not published in six weeks, so its poll is outside the averages.</p>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1640}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1490}}'>
 class Component extends DCLogic {
 renderVals() {
 return {};
