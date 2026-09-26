@@ -7,7 +7,7 @@
       "title": "Dark mode — variables and components",
       "w": 1280,
       "x": 0,
-      "y": 20550
+      "y": 20590
     },
     "Demographics.dc.html": {
       "h": 1290,
@@ -42,14 +42,14 @@
       "title": "National direction — desktop",
       "w": 1280,
       "x": 0,
-      "y": 16310
+      "y": 16350
     },
     "DirectionMobile.dc.html": {
       "h": 1240,
       "title": "National direction — phone",
       "w": 390,
       "x": 1360,
-      "y": 16310
+      "y": 16350
     },
     "Interaction.dc.html": {
       "h": 1620,
@@ -63,63 +63,63 @@
       "title": "The issues — desktop, Who’s trusted",
       "w": 1280,
       "x": 0,
-      "y": 13990
+      "y": 14030
     },
     "IssuesMobile.dc.html": {
       "h": 1940,
       "title": "The issues — phone, Who’s trusted",
       "w": 390,
       "x": 1360,
-      "y": 13990
+      "y": 14030
     },
     "IssuesWhom.dc.html": {
       "h": 1030,
       "title": "The issues — What matters to whom (by vote)",
       "w": 1280,
       "x": 1830,
-      "y": 13990
+      "y": 14030
     },
     "IssuesWhomMobile.dc.html": {
       "h": 1160,
       "title": "The issues — What matters to whom, phone",
       "w": 390,
       "x": 3190,
-      "y": 13990
+      "y": 14030
     },
     "Leadership.dc.html": {
       "h": 1200,
       "title": "Leadership — desktop",
       "w": 1280,
       "x": 0,
-      "y": 8370
+      "y": 8410
     },
     "LeadershipBoth.dc.html": {
       "h": 1540,
       "title": "Leadership — Both + Both",
       "w": 1280,
       "x": 3190,
-      "y": 8370
+      "y": 8410
     },
     "LeadershipMobile.dc.html": {
       "h": 1850,
       "title": "Leadership — phone",
       "w": 390,
       "x": 1360,
-      "y": 8370
+      "y": 8410
     },
     "LeadershipTablet.dc.html": {
       "h": 1770,
       "title": "Leadership — tablet (768)",
       "w": 768,
       "x": 4550,
-      "y": 8370
+      "y": 8410
     },
     "LeadershipThreeWay.dc.html": {
       "h": 1180,
       "title": "Leadership — Three-way + Favourability",
       "w": 1280,
       "x": 1830,
-      "y": 8370
+      "y": 8410
     },
     "Main.dc.html": {
       "h": 1000,
@@ -182,7 +182,7 @@
       "y": 4409
     },
     "PagePhone3.dc.html": {
-      "h": 5390,
+      "h": 5430,
       "page": "page",
       "title": "Snapshot page – phone, 3 of 3",
       "w": 390,
@@ -194,21 +194,21 @@
       "title": "Latest and next polls — desktop",
       "w": 1280,
       "x": 0,
-      "y": 17930
+      "y": 17970
     },
     "PollsMobile.dc.html": {
       "h": 1490,
       "title": "Latest and next polls — phone",
       "w": 390,
       "x": 1360,
-      "y": 17930
+      "y": 17970
     },
     "PollsViews.dc.html": {
       "h": 2240,
       "title": "Latest and next polls — row opened, Primary, sorted by next release",
       "w": 1280,
       "x": 1830,
-      "y": 17930
+      "y": 17970
     },
     "Switching.dc.html": {
       "h": 1310,
@@ -218,7 +218,7 @@
       "y": 4160
     },
     "SwitchingMobile.dc.html": {
-      "h": 1810,
+      "h": 1850,
       "title": "Where One Nation’s voters came from — phone",
       "w": 390,
       "x": 1360,
@@ -229,49 +229,49 @@
       "title": "Two-party preferred — desktop",
       "w": 1280,
       "x": 0,
-      "y": 10600
+      "y": 10640
     },
     "TPPMobile.dc.html": {
       "h": 1300,
       "title": "Two-party preferred — phone",
       "w": 390,
       "x": 1360,
-      "y": 10600
+      "y": 10640
     },
     "TPPViews.dc.html": {
       "h": 3010,
       "title": "Two-party preferred — compare on, the ‘?’ opened, published figures, v Coalition",
       "w": 1280,
       "x": 1830,
-      "y": 10600
+      "y": 10640
     },
     "Undecided.dc.html": {
       "h": 1250,
       "title": "Undecided — desktop",
       "w": 1280,
       "x": 0,
-      "y": 6350
+      "y": 6390
     },
     "UndecidedAge.dc.html": {
       "h": 1200,
       "title": "Undecided — By age",
       "w": 1280,
       "x": 3190,
-      "y": 6350
+      "y": 6390
     },
     "UndecidedMobile.dc.html": {
       "h": 1640,
       "title": "Undecided — phone",
       "w": 390,
       "x": 1360,
-      "y": 6350
+      "y": 6390
     },
     "UndecidedParty.dc.html": {
       "h": 1200,
       "title": "Undecided — By party",
       "w": 1280,
       "x": 1830,
-      "y": 6350
+      "y": 6390
     }
   },
   "createdOnFiles": {
@@ -314,7 +314,7 @@
       "text": "Latest and next polls",
       "w": 240,
       "x": 0,
-      "y": 17670
+      "y": 17710
     },
     "t2": {
       "kind": "title1",
@@ -338,7 +338,7 @@
       "text": "Undecided",
       "w": 240,
       "x": 0,
-      "y": 6090
+      "y": 6130
     },
     "t5": {
       "kind": "title1",
@@ -346,7 +346,7 @@
       "text": "Leadership",
       "w": 240,
       "x": 0,
-      "y": 8110
+      "y": 8150
     },
     "t6": {
       "kind": "title1",
@@ -354,7 +354,7 @@
       "text": "Dark mode",
       "w": 240,
       "x": 0,
-      "y": 20290
+      "y": 20330
     },
     "t7": {
       "kind": "title1",
@@ -362,7 +362,7 @@
       "text": "Two-party preferred",
       "w": 240,
       "x": 0,
-      "y": 10340
+      "y": 10380
     },
     "t8": {
       "kind": "title1",
@@ -370,7 +370,7 @@
       "text": "The issues",
       "w": 240,
       "x": 0,
-      "y": 13730
+      "y": 13770
     },
     "t9": {
       "kind": "title1",
@@ -378,7 +378,7 @@
       "text": "National direction",
       "w": 240,
       "x": 0,
-      "y": 16050
+      "y": 16090
     }
   },
   "order": [
