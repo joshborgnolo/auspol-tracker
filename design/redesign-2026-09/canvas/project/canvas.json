@@ -166,7 +166,7 @@
       "y": 4801
     },
     "PagePhone1.dc.html": {
-      "h": 4299,
+      "h": 4289,
       "page": "page",
       "title": "Snapshot page – phone, 1 of 3",
       "w": 390,
@@ -179,7 +179,7 @@
       "title": "Snapshot page – phone, 2 of 3",
       "w": 390,
       "x": 1360,
-      "y": 4419
+      "y": 4409
     },
     "PagePhone3.dc.html": {
       "h": 5390,
@@ -187,7 +187,7 @@
       "title": "Snapshot page – phone, 3 of 3",
       "w": 390,
       "x": 1360,
-      "y": 9389
+      "y": 9379
     },
     "Polls.dc.html": {
       "h": 960,
@@ -232,7 +232,7 @@
       "y": 10580
     },
     "TPPMobile.dc.html": {
-      "h": 1310,
+      "h": 1300,
       "title": "Two-party preferred — phone",
       "w": 390,
       "x": 1360,
