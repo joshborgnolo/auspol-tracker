@@ -180,19 +180,42 @@ the same user-supplied Sky Pulse report.
 
 Same-place edits, both done at ship (house list extended 2026-09-04 to
 add RedBridge/Accent when its eff leg landed):
-- weighted-aggregate glossary entry (asset d1a1d215, infoTerms) — nᵢ
-  sentence lists the filing houses "(Newspoll, YouGov, Essential,
-  DemosAU and RedBridge/Accent, via their Australian Polling Council
-  methodology statements), else its raw sample", plus the note that nᵢ
-  also sets the seFloor.
-- build.mjs static-summary "About this tracker" paragraph — same
-  sentence before the CI paragraph.
-- archive-panel "Eff. n" legend (asset d1a1d215) — same house list,
-  with "Resolve and Roy Morgan file none".
-- gen-data.mjs rowN comment header — same house list; edited with the
-  three copy sites above.
+- weighted-aggregate glossary entry (asset d1a1d215, infoTerms) —
+  both the "Size." summary para and the nᵢ formula spelling out the
+  publishing houses "(…, via their Australian Polling Council
+  methodology statements), else its raw sample", plus the seFloor note.
+- build.mjs static-summary "About this tracker" paragraph (~:537) —
+  same sentence before the CI paragraph.
+- archive n_eff th title + comment (d1a1d215 ~:5442) and the Latest
+  PollDetail `sampleValue` comment (a11e1559 ~:2604) — the title and
+  the comments carry the APC provenance claim too.
+- InfoNotes n_eff strip (d1a1d215 ~:5640) and the `effective-sample`
+  (~:6108) + `apc-statement` (~:6233, d1a1d215 infoTerms) glossary
+  entries — the statement-framing lives here.
+- gen-data.mjs rowN/sampleEff comment (~:1689) — same house list.
 - README.md data-fields table has `sampleEff`; README layout section
   lists `.build/sampleeff-src/`.
+(Line refs are as of the 2026-09-24 terminology pass; house list now
+includes Fox & Hedgehog in the "publish one" clause — F&H is
+hand-entered, auspol-foxhedgehog-hand-entry.)
+
+## APC terminology — "published under the code", never "filed with" (fix 0e45c97, 2026-09-24)
+
+The council is NOT a registry and nothing is lodged with it: the Code of
+Conduct (E2: member ensures the Short statement is published, Long on the
+member's own site within 2 business days, accessible ≥2 years; F1/F2:
+contents) obliges MEMBERS to PUBLISH. All reader copy and comments now say
+"published in its Australian Polling Council methodology statement" /
+"publishes one / publishes none"; the apc-statement glossary entry
+explicitly carries "nothing is lodged with the council". Do not
+reintroduce "filed with the APC" phrasing anywhere. Verbatim source
+mirrors (`.build/sampleeff-src/*.txt`) and extractor headers describing
+parse targets are untouched by the rule.
+
+Also on the same commit: the InfoNotes n_eff strip and archive th were
+the two display surfaces the user first saw the wrong phrasing in — when
+correcting terminology, grep the d1a1d215/a11e1559 comments for the old
+phrase too (`file[sd]? (with|one|them|an)`), not just JSX text lines.
 
 ## Display surfaces (Eff. n, shipped 2026-09-02; published-only same day)
 

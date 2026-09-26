@@ -142,3 +142,41 @@ it" is just as often "didn't do the gesture" as a stale page. Probe kept
 at `.matilda/cyc-evts-live-check.mjs`; the pattern (live URL + real click
 + element-count assert) generalises to any "is the interaction actually
 live" question and takes under a minute to write.
+
+## Declared ≠ exposed: the window.AUSPOL return list (2026-09-24 instance)
+
+Fifth "can't see it" — and the first where the answer really was CODE, not
+cache. Commit `157f35c` added two new data-bundle consts
+(`directionHousesAll`, `favHouses`) and updated the panels to read
+`D.directionHousesAll || D.directionHouses` / `houseList(D.favHouses)`.
+Every check passed: build clean, validate green, both consts present
+verbatim in the SERVED live HTML, headers `age: 1`. The user was told
+"hard refresh" — and was right to push back.
+
+The defect: gen-data.mjs exposes bundle consts to the page through an
+EXPLICIT name-by-name shorthand `return { PARTIES, MONTHS, …, directionHouses,
+directionPolls, … }` inside `window.AUSPOL = (function () {…})()`
+(gen-data ~:3773). The new consts were never added to that list, so at
+runtime `D.directionHousesAll` / `D.favHouses` were `undefined` — the
+`|| D.directionHouses` fallback silently rendered the OLD active-only
+list (exactly the "no change" the user reported) and the favourability
+subtitle rendered no roster. Fix shipped `88aaf46` (both names added to
+the return). Nothing catches this class: a declared-but-unreturned const
+compiles and validates clean, and an `|| fallback` consumer masks the miss
+perfectly.
+
+**Rule pinned** — when byte-greps decide "is it deployed", the anchor must
+sit at the WIRING boundary, not just anywhere in the payload. For a new
+data-bundle const the checklist is:
+
+1. const declaration present in the served HTML (necessary, NOT
+   sufficient),
+2. `<name>,` present inside the `return {…}` list of `window.AUSPOL`:
+   `grep -A2 "directionHouses," index.html | grep directionHousesAll`
+   (compare with the SAME grep on origin's index.html before concluding),
+3. only then run the consumer/DOM-level assertions of the previous section.
+
+Debug corollary: when the user says "it's not there" and every server
+check passes, re-read the code path BEFORE writing the cache answer —
+the max-age=600 / hard-refresh story had become a reflex, and it was flat
+wrong here.

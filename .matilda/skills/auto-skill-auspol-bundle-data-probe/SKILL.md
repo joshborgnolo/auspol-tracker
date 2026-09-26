@@ -50,8 +50,17 @@ national-direction heal; the traps below cost four broken probes.
 - Rebuild caveats: `build.mjs` may leave other hashed assets (e.g. `cycle-source.<hash>.json`)
   at the same name — their absence from `git status` is normal, not a failed build.
 
-## Adjacent gotcha
+## Adjacent gotchas
 
 Grepping the built `index.html` for curly-typography copy returns zero matches even when
 correct — babel escapes non-ASCII in compiled JS strings to `\uXXXX` (see the
 auspol-built-html-verification skill for that side).
+
+Exposing a NEW bundle const to the page is a TWO-step edit: the `const X = …`
+emit, AND adding `X` to the explicit shorthand `return { … }` inside
+`window.AUSPOL = (function () {…})()` (gen-data ~:3775). A
+declared-but-unreturned const compiles and validates clean, and
+`D.oldField || fallback` consumers mask it — the 2026-09-24 `157f35c`→
+`88aaf46` incident. Probe wiring with
+`grep -A2 "<name before yours in the return list>," index.html | grep <your const>`
+on the BUILT index.html (full story in auspol-live-site-verify).

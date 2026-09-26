@@ -17,8 +17,10 @@ which is what the aggregate continues to consume.
 ## Data layer
 
 - `data/polls.json` — `tpp3: { alp, lnp, onp }` on the wave's row, inserted
-  after `tpp_lnp`. Feb 2026: 44/27/29, May 2026: 43/27/30. Jan + Mar 2026
-  published NO 3PP figure and carry no field
+  after `tpp_lnp`. At ship time Feb + May 2026 carried it (44/27/29,
+  43/27/30); as of 2026-09-24 FOUR F&H waves carry one (2026-01, -02, -03,
+  -05 — the Jan/Mar readings were backfilled later). A wave with no reading
+  carries NO field at all
   (absent-not-zero, the `undecided`/`tpp_flows` precedent — the pattern this
   feature is modelled on end-to-end; see the auspol-extra-datapoint-pipeline
   user skill for the recipe).
@@ -42,7 +44,7 @@ which is what the aggregate continues to consume.
   carries `alp2pp/lnp2pp`, individualPolls carries `alp/lnp`; `tppKind` /
   `tpp3` are spelled the same on both.
 
-## Archive renderer (d1a1d215) — Lead popover has FOUR homes
+## Archive renderer (d1a1d215) — Lead popover has FIVE homes
 
 All inside `AllPollsView` unless noted (line refs at ship time):
 
@@ -62,6 +64,11 @@ All inside `AllPollsView` unless noted (line refs at ship time):
      silently resets to the lnp default.
    - URL key is `v` (was `vs` in the legacy verbose scheme); the effect
      sets it only when `measure !== "lnp"`.
+5. `CONTEST_SCOPE` (~:4711, added 2026-09-24) — picking a published-only
+   matchup (lnponp or 3cp) SELF-ARMS a scope pill ("With a 3-cornered
+   figure") so the table shows only the waves that printed it, not ~160
+   rows of dashes. Replaces the facet scope while up; engages on the twopp
+   facet only. Full contract in auspol-allpolls-scope-pills.
 
 Already-shipped renderer half (committed before the data half, needs no
 edits when adding 3PP data): `tppContests` 3cp branch (a11e1559 ~:1446,
@@ -78,8 +85,12 @@ positive = ALP holds the lead, matching the two-way branches), POLL_TAGS
 - `node .build/newtracker/validate.mjs` — should print 0 errors.
 - Root `assets/` has NO compiled JS (fonts/JSON only — the JS layers are
   inlined into index.html by the build). Verify the payload in the built
-  `index.html`: grep `"tppKind":"3cp"` — expect 2 hits (Feb + May F&H rows),
-  each followed by `"tpp3":{"alp":..,"lnp":..,"onp":..}`.
+  `index.html`: grep `"tppKind":"3cp"` — expect as many hits as the F&H
+  waves carrying tpp3 (4 as of 2026-09-24), each followed by
+  `"tpp3":{"alp":..,"lnp":..,"onp":..}`.
 - The sort header and popover can only be checked live/simulated — the
-  13-ish literal `tpp3` matches in index.html are renderer-source references
-  mixed with the two data rows.
+  ~15 literal `tpp3` matches in index.html are renderer-source references
+  mixed with the data rows. For the end-to-end UI check the repo convention
+  is a `.matilda/probe/` headless script — see `contest-scope.mjs` (asserts
+  the 3-cornered scope pill + "4 of 163 polls") and
+  auspol-headless-geometry-verify for the skeleton/gotchas.

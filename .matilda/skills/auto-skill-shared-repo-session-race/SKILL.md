@@ -913,3 +913,19 @@ live session's leftovers is worse). Report: the fix was live on `origin/main`
 BEFORE its source commit existed; the local source commit (`8d1cc7e`) only
 reconciles the repo — remember to say so, because pushing it changes nothing
 visible.
+
+## User-requested "commit and push" lifts FOREIGN unpushed commits (2026-09-24, APC-terminology)
+
+Benign-invert of the sweep: my WIP was ALREADY committed *for me* by a
+sibling (`ca1f18d`, exactly my two files, coherent) — and one fully FOREIGN
+unpushed commit (`802effb`, a PRODUCT.md doc edit) sat on top. The user's
+"commit and push" then lifted `802effb` to origin along with mine. Two
+habits added: (1) before pushing a user-requested push, enumerate
+`git log --oneline origin/main..HEAD` and classify every entry — a foreign
+unpushed commit riding your push is fine (it's a fast-forward; there's no
+clean way to push around a commit already on the tip) but MUST be named in
+the report so the user knows whose unpublished work just shipped; (2) a
+sibling committing YOUR work under THEIR wording is the happy path — verify
+`git show --stat <their-commit>` matches your file set before treating it
+as yours, and remember your go-to defence (private GIT_INDEX_FILE etc.)
+is unneeded when their commit is clean.
