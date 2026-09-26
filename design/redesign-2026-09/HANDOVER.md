@@ -4,9 +4,11 @@ Section-by-section redesign mocks for the site. They were started in a cloud ses
 
 ## Where things are
 
-- **The canvas is the source of truth:** https://claude.ai/artifact/2tAJDk5xJ9K2AYzQq7HhDj (private to its owner). It has two canvas pages:
+- **The canvas is the source of truth:** https://claude.ai/artifact/2tAJDk5xJ9K2AYzQq7HhDj (private to its owner). It has four canvas pages:
   - **Sections:** one row per section, desktop and phone boards side by side, other states to the right.
   - **Whole page:** the Snapshot page top to bottom, desktop and phone.
+  - **Past cycles:** that tab top to bottom, desktop and phone, with its controls and details boards. These boards were made on the canvas; the copies in `canvas/project/` were pulled from it on 27 Sep, and no script here builds them.
+  - **All polls:** that tab top to bottom (`AllPollsDesktop1–2`, `AllPollsPhone1–3`), with `AllPollsTable` (a poll opened, filtering, sorting, the other views, Labor v Coalition) and `AllPollsDetails` (the pinned headings, the phone's filter sheet, readouts, dark mode).
 - **`canvas/project/`** holds a snapshot of every board and `canvas.json`. The snapshot was taken at the local session's last publish.
 - **`gen/`** holds the scripts that build the boards, plus `extract_site_data.mjs`, which refreshes their data.
 - **`data/`** holds the figures the boards use, extracted from the built `index.html`.
@@ -47,6 +49,19 @@ On the **Whole page** canvas page, `PageDesktop1–2` and `PagePhone1–3` stack
 - **Boards end with the same padding they start with.** Run `gen/preview.py` after edits to check. It measures at natural height, because a fixed-height board silently squeezes content that overruns it.
 - **Section headings are a 2px ink rule over a sentence-case title** (22px desktop, 19px phone), with the meta beside or below it; the finding stays the big serif headline. The two-party section has no rule, since it sits under the masthead. The polls section uses the title in place of its old heading.
 
+## All polls (27 Sep)
+
+- **Built like Past cycles.** The same masthead and stylesheet (the generator lifts both from `PastCyclesDesktop1`/`PastCyclesPhone1`), a page header with an on-this-page nav, and headline-first sections under the 2px rule. The table's controls match "Latest and next polls": tabs for 2PP, Primary, Leadership and Direction, and "Two-party: Labor v One Nation ⇄ · implied flows ?" on the right.
+- **The headline ties the table to the Snapshot's figure:** "The eight polls that make up Labor's 51.2 run from 49.8 to 52.8". Its rule: the polls in the headline's 21-day window (`latest.onImp.n`), their lowest and highest implied ALP v ON share, and how many have Labor ahead. The deck's "none sits further from the average than its own margin" is computed too.
+- **Each row draws its poll against the average of its month.** The centre line is that month's implied aggregate (the site's Poll lean, unchanged). The dot is the poll's lean, red towards Labor, orange towards One Nation (blue on the Coalition contest). The whisker is its 95% interval from sampling alone. The interval uses the poll's primaries and the frozen flows (variance of each respondent's flow to Labor), not p(1−p): about a fifth narrower, roughly ±2.6 rather than ±3.2 for a typical poll. The flows' own doubt is left out because it is the same for every poll.
+- **Rows are grouped by month**, with the month's average beside the heading and how many of its polls are in today's figure. Sorting by anything else drops the groups and puts the year on every date. The first view shows whole months (34 polls, back to July) and then "Show earlier months".
+- **Dropped from the row:** the tag pills (2PP, PPM, APRV…) and the House effect column. The Includes filter and the opened poll carry the tags; each pollster's lean now has its own section. The Contest filter's rare contests (Coalition v One Nation, three-cornered) move into Includes, and "held by" goes, since sorting by Labor's share does the same job.
+- **The four panels became three sections:**
+  - How much the polls disagree: one small chart per party, the combined One Nation + Coalition vote among them, because that is the finding (split disagrees, size doesn't).
+  - How each pollster leans: one row per pollster, a bar for its lean now and a line for its lean by month.
+  - Preference flows: both contests side by side, with the pooled "now" reading drawn at the right edge so the chart shows the figure the text quotes.
+- **Worth checking at the port:** the site's disagreement floor for the implied 2PP uses the simple-share formula, which overstates sampling error by about a quarter. On that basis the implied 2PP's 0.78× ("herded") would read nearer 1×. The Primary vote tab, the section's default, is unaffected.
+
 ## Still open
 
 - **The port hasn't started.** The earlier question to the owner was whether to start it on this branch. There's no answer yet.
@@ -67,6 +82,7 @@ On the **Whole page** canvas page, `PageDesktop1–2` and `PagePhone1–3` stack
   | `gen/masthead_build.py` | `Masthead*` |
   | `gen/polls_build.py` | `Polls*` |
   | `gen/page_build.py` | `PageDesktop*`, `PagePhone*`. Run it last, after any board changes. |
+  | `gen/allpolls_build.py` | `AllPolls*`, and the All polls page's entries in `canvas.json`. Refresh its data first with `node design/redesign-2026-09/gen/extract_allpolls_data.mjs`; board heights live in `gen/allpolls_heights.json`. |
 
   Run them with `python3 design/redesign-2026-09/gen/<script>.py`. They write into `canvas/project/` and reproduce the committed boards byte for byte. Set `PYTHONDONTWRITEBYTECODE=1` so no `__pycache__` lands in the tree.
 - **Hand-written boards:** everything else. Edit the `.dc.html` directly. `gen/calc.py`, `calcm.py` and `demo.py` are the first session's geometry scripts. They're kept for the record; nothing current depends on them.

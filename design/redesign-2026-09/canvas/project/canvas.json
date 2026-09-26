@@ -328,6 +328,62 @@
       "w": 1280,
       "x": 1830,
       "y": 3316
+    },
+    "AllPollsDesktop1.dc.html": {
+      "h": 3150,
+      "page": "allpolls",
+      "title": "All polls page – desktop, 1 of 2",
+      "w": 1280,
+      "x": 0,
+      "y": 0
+    },
+    "AllPollsDesktop2.dc.html": {
+      "h": 2970,
+      "page": "allpolls",
+      "title": "All polls page – desktop, 2 of 2",
+      "w": 1280,
+      "x": 0,
+      "y": 3270
+    },
+    "AllPollsPhone1.dc.html": {
+      "h": 2950,
+      "page": "allpolls",
+      "title": "All polls page – phone, 1 of 3",
+      "w": 390,
+      "x": 1360,
+      "y": 0
+    },
+    "AllPollsPhone2.dc.html": {
+      "h": 3130,
+      "page": "allpolls",
+      "title": "All polls page – phone, 2 of 3",
+      "w": 390,
+      "x": 1360,
+      "y": 3070
+    },
+    "AllPollsPhone3.dc.html": {
+      "h": 2890,
+      "page": "allpolls",
+      "title": "All polls page – phone, 3 of 3",
+      "w": 390,
+      "x": 1360,
+      "y": 6320
+    },
+    "AllPollsTable.dc.html": {
+      "h": 5470,
+      "page": "allpolls",
+      "title": "All polls – exploring the table: a poll opened, filtering, sorting, the other figures, Labor v Coalition",
+      "w": 1280,
+      "x": 1830,
+      "y": 0
+    },
+    "AllPollsDetails.dc.html": {
+      "h": 3727,
+      "page": "allpolls",
+      "title": "All polls – getting around: the pinned headings, the phone’s filters, readouts, dark mode",
+      "w": 1280,
+      "x": 1830,
+      "y": 5590
     }
   },
   "createdOnFiles": {
@@ -453,6 +509,24 @@
       "w": 240,
       "x": 1830,
       "y": -260
+    },
+    "a1": {
+      "kind": "title1",
+      "maxW": 1750,
+      "page": "allpolls",
+      "text": "The All polls page, top to bottom",
+      "w": 240,
+      "x": 0,
+      "y": -260
+    },
+    "a2": {
+      "kind": "title1",
+      "maxW": 1280,
+      "page": "allpolls",
+      "text": "How it’s explored",
+      "w": 240,
+      "x": 1830,
+      "y": -260
     }
   },
   "order": [
@@ -500,7 +574,14 @@
     "PastCyclesPhone2.dc.html",
     "PastCyclesPhone3.dc.html",
     "PastCyclesControls.dc.html",
-    "PastCyclesDetails.dc.html"
+    "PastCyclesDetails.dc.html",
+    "AllPollsDesktop1.dc.html",
+    "AllPollsDesktop2.dc.html",
+    "AllPollsPhone1.dc.html",
+    "AllPollsPhone2.dc.html",
+    "AllPollsPhone3.dc.html",
+    "AllPollsTable.dc.html",
+    "AllPollsDetails.dc.html"
   ],
   "pages": [
     {
@@ -514,6 +595,10 @@
     {
       "id": "cycles",
       "name": "Past cycles"
+    },
+    {
+      "id": "allpolls",
+      "name": "All polls"
     }
   ],
   "title": "Primary vote chart redesign"

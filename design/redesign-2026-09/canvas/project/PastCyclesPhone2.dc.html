@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Past cycles page – phone, 2 of 3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&amp;family=IBM+Plex+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+a{color:#171717}a:hover{color:#B9463F}
+button{font:inherit;cursor:pointer}
+.num{font-variant-numeric:tabular-nums}
+svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.wm{display:flex;align-items:center;gap:14px;padding:0;border:0;background:none;color:#171717;text-align:left}
+.ntab{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:0 2px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;font-size:16px;font-weight:500;color:#6B6862;white-space:nowrap;text-decoration:none}
+.ntab[aria-current="page"]{border-bottom-color:#171717;font-weight:600;color:#171717}
+.ntab:hover{color:#171717}
+.segs{display:flex;padding:3px;border-radius:10px;background:#F2F0EC;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16),0 3px 6px -3px rgba(91,79,69,0.16)}
+.seg{width:40px;height:32px;display:flex;align-items:center;justify-content:center;padding:0;border:0;background:#FEFCF9;color:#6B6862;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16)}
+.seg:first-child{border-radius:7px 0 0 7px;border-right:1px solid rgba(43,37,33,0.18)}.seg:last-child{border-radius:0 7px 7px 0}
+.seg[aria-pressed="true"]{background:#E0DDD8;color:#171717;box-shadow:inset 0 2px 3px rgba(43,37,33,0.15),inset 0 -1px 0 rgba(255,255,255,0.85)}
+.dt{font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6B6862}
+.dd{font-size:15px;font-weight:600;color:#171717;white-space:nowrap}
+.dd2{font-size:13px;color:#6B6862;white-space:nowrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:4px;background:#10777C;margin-right:7px;vertical-align:1px}
+.tn{display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap}
+.tn a{font-weight:600;color:#3D3B37;text-decoration:none}
+.ext{font-size:10px;color:#9A968E}
+.grid{stroke:#E6E4DF;stroke-width:1;fill:none}
+.base{stroke:#9A968E;stroke-width:1;fill:none}
+.even{stroke:#9A968E;stroke-width:1;stroke-dasharray:3 3;fill:none}
+.ax{font-size:12px;fill:#6B6862}
+.axb{font-size:12px;font-weight:600;fill:#171717}
+.ev{stroke:#C9C6BF;stroke-width:1;stroke-dasharray:1 3;fill:none}
+.evt{font-size:12px;font-weight:500;fill:#4A4843}
+.evn{fill:#FAF9F6;stroke:#6B6862;stroke-width:1}
+.evnt{font-size:9px;font-weight:600;fill:#4A4843;text-anchor:middle}
+.ln{fill:none;stroke-linejoin:round;stroke-linecap:round}
+.mean{fill:none;stroke:#4A4843;stroke-width:1.75;stroke-dasharray:4 3}
+.nowl{stroke:#171717;stroke-width:1;opacity:0.55}
+.halo{paint-order:stroke;stroke:#FAF9F6;stroke-width:4px;stroke-linejoin:round}
+.end{font-size:13px;font-weight:600}
+.lbl{font-size:13px}
+.tab{min-height:44px;padding:0 12px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;font-size:15px;color:#6B6862;white-space:nowrap}
+.tab[aria-pressed="true"]{border-bottom-color:#171717;font-weight:600;color:#171717}
+.tab:hover{color:#171717}
+.tab .n{margin-left:6px;font-weight:400;color:#6B6862}
+.ctl{font-size:13px;font-weight:600;color:#4A4843;white-space:nowrap}
+.chip{position:relative;min-height:36px;padding:0 14px;border:1px solid #DFDCD7;border-radius:18px;background:#FEFCF9;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16),0 3px 6px -3px rgba(91,79,69,0.16);font-size:14px;color:#3D3B37;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.chip::after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+.chip:hover{border-color:#C9C6BF}
+.copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.copy:hover{background:#EFEDE8;color:#171717}
+.how{min-height:44px;padding:0;border:0;background:none;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:#171717}
+.key{display:flex;align-items:center;gap:8px}
+.th{font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6B6862;white-space:nowrap}
+.srow{border-top:1px solid #E6E4DF}
+.srow:hover{background:#F5F3EE}
+.jump{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#4A4843;text-decoration:none}
+.jump:hover{background:#EFEDE8;color:#171717}
+.check{min-height:44px;display:flex;align-items:center;gap:10px;font-size:14px;color:#171717;cursor:pointer;white-space:nowrap}
+.check input{width:18px;height:18px;margin:0;accent-color:#171717;cursor:pointer}
+.score{display:inline-flex;flex-wrap:wrap;align-content:center;align-items:baseline;gap:9px;min-height:44px;padding:0 4px;border:0;background:none;white-space:nowrap}
+.plabel{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#9A968E}
+.tipbox{fill:#FEFCF9;stroke:#DFDCD7;stroke-width:1}
+.tipsh{fill:#402C1A;opacity:0.06}
+.tt{font-size:12px;font-weight:700;fill:#2B2521}
+.tl{font-size:13px;fill:#6E6863}
+.tv{font-size:13px;font-weight:700;fill:#2B2521}
+.ts{font-size:11px;fill:#6E6863}
+.term{min-height:44px;flex-grow:1;padding:0 10px;border:0;border-radius:8px;background:transparent;display:flex;align-items:center;gap:10px;text-align:left;color:#171717}
+.term:hover{background:#F1EFEA}
+.term[aria-pressed="true"]{background:#F1EFEA}
+.tx{width:32px;height:32px;flex-shrink:0;padding:0;border:0;border-radius:16px;background:transparent;color:#6B6862;font-size:17px;line-height:1}
+.tx:hover{background:#EFEDE8;color:#171717}
+.term:focus-visible,.tab:focus-visible,.ntab:focus-visible,.chip:focus-visible,.copy:focus-visible,.how:focus-visible,.jump:focus-visible,.seg:focus-visible,.wm:focus-visible,.check:focus-within{outline:2px solid #171717;outline-offset:2px;border-radius:4px}
+.ax,.axb{font-size:11px}
+.lbl{font-size:12px}
+</style>
+</helmet>
+<div style="width: 390px; height: 3375px; display: flex; flex-direction: column; background: #FAF9F6">
+<section id="primary-vote" style="width: 390px; box-sizing: border-box; padding: 32px 20px 40px; display: flex; flex-direction: column; flex-shrink: 0; background: #FAF9F6">
+<div style="border-top: 2px solid #171717; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #6B6862"><span style="font-size: 19px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Primary vote</span><span>First preferences for the governing party and the main opposition</span></div>
+
+<h1 style="margin: 14px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1.1; letter-spacing: -0.01em">No opposition has lost as much of its vote this early as the Coalition has</h1>
+<p style="margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: #3D3B37">The Coalition is down 10.6 points since the election, to 21.2%; by this stage the average opposition had gained 1.7. Labor is down 7.8, to 26.8%. Only Whitlam’s government, in 1974, had lost more by now.</p>
+
+<div style="margin-top: 24px; display: flex; align-items: center; gap: 2px"><span style="flex-grow: 1; font-size: 13px; font-weight: 600; line-height: 1.35">Government’s primary vote, %</span><button class="copy" aria-label="Expand government primary vote chart" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button><button class="copy" aria-label="Copy chart: government primary vote" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button></div>
+
+<svg viewBox="0 0 350 284" width="350" height="284" role="img" aria-label="The governing party’s primary vote by month since its election; Labor now 26.8, the lowest of any government at this point." style="margin-top: 10px; display: block; overflow: visible">
+<g transform="translate(28 30)">
+<path class="grid" d="M0 201.2H314M0 143.8H314M0 86.2H314M0 28.8H314"></path>
+<text class="ax num" x="-6" y="205.2" style="text-anchor: end">20</text>
+<text class="ax num" x="-6" y="147.8" style="text-anchor: end">30</text>
+<text class="ax num" x="-6" y="90.2" style="text-anchor: end">40</text>
+<text class="ax num" x="-6" y="32.8" style="text-anchor: end">50%</text>
+<path class="base" d="M0 230H314M6.7 230v4M106.9 230v4M207.1 230v4M307.3 230v4"></path>
+<text class="axb" x="2.7" y="246" style="text-anchor: start">Election</text>
+<text class="ax" x="106.9" y="246" style="text-anchor: middle">1 yr</text>
+<text class="ax" x="207.1" y="246" style="text-anchor: middle">2 yrs</text>
+<text class="ax" x="307.3" y="246" style="text-anchor: end">3 yrs</text>
+<path d="M6.7 31.6L15.0 22.3L23.4 23.5L31.7 17.2L40.1 28.2L48.4 33.9L56.8 37.3L65.1 34.7L73.5 39.9L81.8 41.7L90.2 41.3L98.5 40.2L106.9 41.9L115.2 32.4L123.6 40.2L131.9 34.2L140.3 34.2L148.6 44.9L157.0 45.8L165.4 51.8L173.7 49.6L182.1 52.8L190.4 65.3L198.8 63.3L207.1 55.2L215.5 57.2L223.8 59.8L232.2 54.3L240.5 54.6L248.9 58.9L257.2 60.5L265.6 52.9L265.6 126.7L257.2 128.5L248.9 121.9L240.5 116.7L232.2 109.8L223.8 115.0L215.5 105.5L207.1 114.3L198.8 116.3L190.4 115.7L182.1 117.7L173.7 120.4L165.4 116.2L157.0 111.1L148.6 119.0L140.3 120.9L131.9 110.9L123.6 116.3L115.2 108.6L106.9 109.9L98.5 104.6L90.2 107.6L81.8 113.9L73.5 113.0L65.1 110.2L56.8 107.7L48.4 97.3L40.1 96.4L31.7 94.0L23.4 87.2L15.0 87.9L6.7 91.5Z" style="fill: #6B6862; opacity: 0.1"></path>
+<path d="M6.7 41.8L15.0 36.8L23.4 33.5L31.7 33.6L40.1 38.7L48.4 47.6L56.8 50.2L65.1 60.5L73.5 57.6L81.8 63.3L90.2 55.8L98.5 54.8L106.9 51.0L115.2 56.8L123.6 60.9L131.9 57.5L140.3 62.2L148.6 53.3L157.0 60.1L165.4 58.4L173.7 65.7L182.1 66.8L190.4 68.4L198.8 66.1L207.1 65.0L215.5 62.7L223.8 68.0L232.2 69.3L240.5 69.7L248.9 67.7L257.2 70.7L265.6 75.0L265.6 108.1L257.2 106.4L248.9 109.5L240.5 102.5L232.2 100.2L223.8 98.5L215.5 93.7L207.1 90.3L198.8 92.6L190.4 88.5L182.1 93.9L173.7 97.0L165.4 91.7L157.0 87.4L148.6 93.3L140.3 99.3L131.9 96.9L123.6 98.2L115.2 91.3L106.9 87.4L98.5 94.4L90.2 97.8L81.8 98.6L73.5 94.0L65.1 99.0L56.8 96.3L48.4 92.3L40.1 76.0L31.7 74.8L23.4 70.4L15.0 67.3L6.7 75.6Z" style="fill: #6B6862; opacity: 0.17"></path>
+<path d="M265.6 52.9L273.9 61.3L282.3 64.6L290.6 58.7L299.0 67.7L307.3 50.3L307.3 115.9L299.0 120.8L290.6 120.2L282.3 127.4L273.9 130.9L265.6 126.7Z" style="fill: #6B6862; opacity: 0.045"></path>
+<path d="M265.6 75.0L273.9 78.2L282.3 80.8L290.6 71.9L299.0 81.2L307.3 68.6L307.3 106.4L299.0 99.8L290.6 109.2L282.3 107.1L273.9 117.3L265.6 108.1Z" style="fill: #6B6862; opacity: 0.075"></path>
+<path class="mean" d="M6.7 59.7L15.0 51.6L23.4 53.8L31.7 54.9L40.1 58.1L48.4 64.3L56.8 70.9L65.1 73.5L73.5 75.0L81.8 77.1L90.2 73.4L98.5 72.5L106.9 72.7L115.2 72.2L123.6 76.2L131.9 74.3L140.3 78.9L148.6 75.3L157.0 76.9L165.4 80.2L173.7 82.7L182.1 81.6L190.4 83.1L198.8 86.4L207.1 81.8L215.5 81.1L223.8 86.0L232.2 86.6L240.5 88.7L248.9 90.6L257.2 91.7L265.6 90.5L273.9 94.5L282.3 95.4L290.6 91.5L299.0 90.5L307.3 84.0"></path>
+<path class="ev" d="M13.5 -7V230"></path><circle class="evn" cx="13.5" cy="-14" r="7"></circle><text class="evnt" x="13.5" y="-11">1</text>
+<path class="ev" d="M68.4 -7V230M79.1 -7V230"></path><circle class="evn" cx="73.8" cy="-14" r="7"></circle><text class="evnt" x="73.8" y="-11">2</text>
+<path class="ev" d="M109.3 -7V230"></path><circle class="evn" cx="109.3" cy="-14" r="7"></circle><text class="evnt" x="109.3" y="-11">3</text>
+<path class="ln" d="M6.7 117.3L15.0 103.5L23.4 109.8L31.7 113.3L40.1 116.2L48.4 118.5L56.8 120.2L65.1 128.2L73.5 139.2L81.8 139.2L90.2 144.9L98.5 144.3L106.9 148.9L115.2 151.8L123.6 155.8L131.9 155.8L140.3 162.1" style="stroke: #B9463F; stroke-width: 2.5"></path>
+<circle cx="6.7" cy="117.3" r="4" style="fill: #FAF9F6; stroke: #171717; stroke-width: 1.75"></circle>
+<path class="nowl" d="M140.3 0V230"></path>
+<text class="axb" x="140.3" y="246" style="text-anchor: middle">Now</text>
+<circle cx="140.3" cy="162.1" r="4.5" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="140.3" cy="78.9" r="3.5" style="fill: #FAF9F6; stroke: #4A4843; stroke-width: 1.5"></circle>
+<path d="M144.3 162.1H147.3V78.9H144.3" style="fill: none; stroke: #171717; stroke-width: 1"></path>
+<text class="halo num" x="154.3" y="117.5" style="font-size: 12px"><tspan x="154.3" style="font-weight: 600; fill: #B9463F">Labor 26.8</tspan><tspan x="154.3" dy="16" style="fill: #3D3B37">14.5 below average</tspan></text>
+</g>
+</svg>
+
+<div style="margin-top: 28px; display: flex; align-items: center; gap: 2px"><span style="flex-grow: 1; font-size: 13px; font-weight: 600; line-height: 1.35">Opposition’s primary vote, %</span><button class="copy" aria-label="Expand opposition primary vote chart" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button><button class="copy" aria-label="Copy chart: opposition primary vote" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button></div>
+
+<div style="display: flex"><label class="check" style="font-size: 13px; gap: 8px"><input type="checkbox">One Nation this term</label></div>
+
+<svg viewBox="0 0 350 284" width="350" height="284" role="img" aria-label="The main opposition party’s primary vote by month since the election; the Coalition now 21.2, the lowest of any opposition at this point." style="margin-top: 10px; display: block; overflow: visible">
+<g transform="translate(28 30)">
+<path class="grid" d="M0 201.2H314M0 143.8H314M0 86.2H314M0 28.8H314"></path>
+<text class="ax num" x="-6" y="205.2" style="text-anchor: end">20</text>
+<text class="ax num" x="-6" y="147.8" style="text-anchor: end">30</text>
+<text class="ax num" x="-6" y="90.2" style="text-anchor: end">40</text>
+<text class="ax num" x="-6" y="32.8" style="text-anchor: end">50%</text>
+<path class="base" d="M0 230H314M6.7 230v4M106.9 230v4M207.1 230v4M307.3 230v4"></path>
+<text class="axb" x="2.7" y="246" style="text-anchor: start">Election</text>
+<text class="ax" x="106.9" y="246" style="text-anchor: middle">1 yr</text>
+<text class="ax" x="207.1" y="246" style="text-anchor: middle">2 yrs</text>
+<text class="ax" x="307.3" y="246" style="text-anchor: end">3 yrs</text>
+<path d="M6.7 57.4L15.0 63.1L23.4 57.2L31.7 57.7L40.1 53.8L48.4 45.9L56.8 45.9L65.1 37.4L73.5 33.9L81.8 39.6L90.2 39.7L98.5 33.6L106.9 32.1L115.2 40.1L123.6 42.8L131.9 39.6L140.3 41.7L148.6 41.4L157.0 28.4L165.4 34.3L173.7 32.4L182.1 42.6L190.4 39.1L198.8 38.4L207.1 46.0L215.5 44.6L223.8 43.1L232.2 43.1L240.5 48.0L248.9 39.4L257.2 48.4L265.6 44.5L265.6 107.5L257.2 105.2L248.9 106.1L240.5 107.0L232.2 106.1L223.8 102.9L215.5 112.4L207.1 109.4L198.8 109.5L190.4 108.0L182.1 109.3L173.7 106.5L165.4 108.7L157.0 106.4L148.6 110.9L140.3 115.2L131.9 119.1L123.6 120.2L115.2 114.5L106.9 115.5L98.5 115.4L90.2 109.4L81.8 112.7L73.5 110.5L65.1 117.7L56.8 115.1L48.4 118.5L40.1 119.7L31.7 121.3L23.4 121.2L15.0 118.6L6.7 117.5Z" style="fill: #6B6862; opacity: 0.1"></path>
+<path d="M6.7 64.5L15.0 72.3L23.4 66.7L31.7 66.6L40.1 63.0L48.4 62.2L56.8 60.9L65.1 48.3L73.5 48.3L81.8 45.3L90.2 45.4L98.5 40.2L106.9 36.7L115.2 45.0L123.6 46.0L131.9 51.8L140.3 47.9L148.6 52.9L157.0 58.1L165.4 52.0L173.7 42.7L182.1 54.3L190.4 49.5L198.8 55.2L207.1 53.5L215.5 58.9L223.8 56.9L232.2 54.3L240.5 56.5L248.9 50.7L257.2 54.3L265.6 58.7L265.6 91.7L257.2 85.4L248.9 85.8L240.5 96.3L232.2 92.7L223.8 97.2L215.5 103.1L207.1 103.5L198.8 100.6L190.4 103.5L182.1 103.5L173.7 103.1L165.4 98.9L157.0 102.9L148.6 105.2L140.3 103.6L131.9 101.3L123.6 105.2L115.2 107.1L106.9 106.9L98.5 104.2L90.2 99.5L81.8 100.5L73.5 99.0L65.1 109.5L56.8 104.5L48.4 105.1L40.1 102.2L31.7 108.2L23.4 110.5L15.0 107.1L6.7 99.2Z" style="fill: #6B6862; opacity: 0.17"></path>
+<path d="M265.6 44.5L273.9 43.1L282.3 46.3L290.6 46.0L299.0 43.9L307.3 46.0L307.3 109.8L299.0 114.6L290.6 111.5L282.3 107.7L273.9 101.0L265.6 107.5Z" style="fill: #6B6862; opacity: 0.045"></path>
+<path d="M265.6 58.7L273.9 46.0L282.3 49.3L290.6 51.2L299.0 50.2L307.3 52.2L307.3 94.9L299.0 97.6L290.6 106.7L282.3 95.5L273.9 92.6L265.6 91.7Z" style="fill: #6B6862; opacity: 0.075"></path>
+<path class="mean" d="M6.7 82.5L15.0 89.9L23.4 87.7L31.7 85.6L40.1 81.2L48.4 79.3L56.8 76.4L65.1 73.8L73.5 71.0L81.8 71.8L90.2 73.0L98.5 73.4L106.9 74.2L115.2 75.6L123.6 73.4L131.9 72.5L140.3 72.8L148.6 72.9L157.0 75.5L165.4 72.1L173.7 72.9L182.1 74.6L190.4 75.3L198.8 72.5L207.1 76.6L215.5 77.8L223.8 72.5L232.2 71.5L240.5 72.7L248.9 70.4L257.2 71.5L265.6 75.1L273.9 74.1L282.3 74.4L290.6 78.6L299.0 76.4L307.3 70.9"></path>
+<path class="ev" d="M13.5 -7V230"></path><circle class="evn" cx="13.5" cy="-14" r="7"></circle><text class="evnt" x="13.5" y="-11">1</text>
+<path class="ev" d="M68.4 -7V230M79.1 -7V230"></path><circle class="evn" cx="73.8" cy="-14" r="7"></circle><text class="evnt" x="73.8" y="-11">2</text>
+<path class="ev" d="M109.3 -7V230"></path><circle class="evn" cx="109.3" cy="-14" r="7"></circle><text class="evnt" x="109.3" y="-11">3</text>
+<path class="ln" d="M6.7 133.4L15.0 138.6L23.4 146.1L31.7 145.5L40.1 153.0L48.4 158.1L56.8 167.3L65.1 167.9L73.5 180.5L81.8 193.2L90.2 192.0L98.5 188.0L106.9 192.0L115.2 207.0L123.6 192.6L131.9 188.6L140.3 194.3" style="stroke: #356697; stroke-width: 2.5"></path>
+<circle cx="6.7" cy="133.4" r="4" style="fill: #FAF9F6; stroke: #171717; stroke-width: 1.75"></circle>
+<path class="nowl" d="M140.3 0V230"></path>
+<text class="axb" x="140.3" y="246" style="text-anchor: middle">Now</text>
+<circle cx="140.3" cy="194.3" r="4.5" style="fill: #356697; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="140.3" cy="72.8" r="3.5" style="fill: #FAF9F6; stroke: #4A4843; stroke-width: 1.5"></circle>
+<path d="M144.3 194.3H147.3V72.8H144.3" style="fill: none; stroke: #171717; stroke-width: 1"></path>
+<text class="halo num" x="154.3" y="130.6" style="font-size: 12px"><tspan x="154.3" style="font-weight: 600; fill: #356697">Coalition 21.2</tspan><tspan x="154.3" dy="16" style="fill: #3D3B37">21.1 below average</tspan></text>
+</g>
+</svg>
+
+<ol style="margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #3D3B37"><li style="display: flex; gap: 10px"><span class="num" style="width: 16px; font-weight: 600; color: #6B6862">1</span><span style="flex-grow: 1">1st Coalition split</span><span style="color: #6B6862">May 2025</span></li><li style="display: flex; gap: 10px"><span class="num" style="width: 16px; font-weight: 600; color: #6B6862">2</span><span style="flex-grow: 1">Bondi shooting · 2nd Coalition split</span><span style="color: #6B6862">Dec 2025</span></li><li style="display: flex; gap: 10px"><span class="num" style="width: 16px; font-weight: 600; color: #6B6862">3</span><span style="flex-grow: 1">2026 Budget</span><span style="color: #6B6862">May 2026</span></li></ol>
+
+<div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #DDDCD8; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 14px; row-gap: 8px; font-size: 12px; color: #4A4843">
+<span class="key"><svg width="20" height="16" viewBox="0 0 20 16" aria-hidden="true"><rect x="0" y="0" width="20" height="16" rx="2" style="fill: #6B6862; opacity: 0.1"></rect><rect x="0" y="4" width="20" height="8" style="fill: #6B6862; opacity: 0.17"></rect></svg>Middle half, middle 80%</span>
+<span class="key"><svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true"><path d="M1 7H19" class="mean"></path></svg>Past-term average</span>
+<span class="key"><svg width="20" height="16" viewBox="0 0 20 16" aria-hidden="true"><rect x="0" y="0" width="20" height="16" rx="2" style="fill: #6B6862; opacity: 0.045"></rect><rect x="0" y="4" width="20" height="8" style="fill: #6B6862; opacity: 0.075"></rect></svg>Fewer terms this far in</span>
+<span class="key"><svg width="30" height="14" viewBox="0 0 30 14" aria-hidden="true"><path d="M1 7H13" style="stroke: #B9463F; stroke-width: 3; stroke-linecap: round"></path><path d="M17 7H29" style="stroke: #356697; stroke-width: 3; stroke-linecap: round"></path></svg>Labor, the Coalition</span>
+<span class="key"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 1.75"></circle></svg>2025 election</span>
+</div>
+
+<p style="margin: 16px 0 0; padding-top: 12px; border-top: 1px solid #DDDCD8; font-size: 12px; line-height: 1.55; color: #6B6862">Past terms are the governing party and the main opposition party of the day, Labor or the Coalition.</p>
+<div style="display: flex; align-items: center; gap: 20px"><a href="#primary-method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap">How it’s built</a></div>
+</section>
+<section id="leadership" style="width: 390px; box-sizing: border-box; padding: 32px 20px 40px; display: flex; flex-direction: column; flex-shrink: 0; background: #FAF9F6">
+<div style="border-top: 2px solid #171717; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #6B6862"><span style="font-size: 19px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Leadership</span><span>Net approval since 1972, preferred PM since 1984</span></div>
+
+<h1 style="margin: 14px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1.1; letter-spacing: -0.01em">Albanese’s net approval is the second lowest of any prime minister at this point, after Whitlam’s</h1>
+<p style="margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: #3D3B37">At −24.6 he is 25.3 points below the average prime minister 16 months in. He still leads as preferred PM by 12.0 points, close to the average, and Taylor, at −6.9, rates about as opposition leaders usually do.</p>
+
+<div style="margin-top: 24px; display: flex; align-items: center; gap: 2px"><span style="flex-grow: 1; font-size: 13px; font-weight: 600; line-height: 1.35">Prime minister’s net approval, points</span><button class="copy" aria-label="Expand prime minister net approval chart" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button><button class="copy" aria-label="Copy chart: prime minister net approval" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button></div>
+
+<svg viewBox="0 0 350 284" width="350" height="284" role="img" aria-label="Prime ministers’ net approval by month since their election; Albanese now −24.6, second lowest at this point after Whitlam in 1974." style="margin-top: 10px; display: block; overflow: visible">
+<g transform="translate(28 30)">
+<path class="grid" d="M0 230.0H314M0 184.0H314M0 92.0H314M0 46.0H314M0 0.0H314"></path>
+<path class="even" d="M0 138.0H314"></path>
+<text class="ax num" x="-6" y="234.0" style="text-anchor: end">−40</text>
+<text class="ax num" x="-6" y="188.0" style="text-anchor: end">−20</text>
+<text class="ax num" x="-6" y="142.0" style="text-anchor: end">Even</text>
+<text class="ax num" x="-6" y="96.0" style="text-anchor: end">+20</text>
+<text class="ax num" x="-6" y="50.0" style="text-anchor: end">+40</text>
+<text class="ax num" x="-6" y="4.0" style="text-anchor: end">+60</text>
+<path class="base" d="M0 230H314M6.7 230v4M106.9 230v4M207.1 230v4M307.3 230v4"></path>
+<text class="axb" x="2.7" y="246" style="text-anchor: start">Election</text>
+<text class="ax" x="106.9" y="246" style="text-anchor: middle">1 yr</text>
+<text class="ax" x="207.1" y="246" style="text-anchor: middle">2 yrs</text>
+<text class="ax" x="307.3" y="246" style="text-anchor: end">3 yrs</text>
+<path d="M6.7 39.1L15.0 36.3L23.4 39.5L31.7 57.2L40.1 60.7L48.4 71.4L56.8 69.0L65.1 76.5L73.5 78.1L81.8 83.6L90.2 86.8L98.5 64.1L106.9 51.3L115.2 50.3L123.6 51.7L131.9 54.2L140.3 61.4L148.6 64.2L157.0 70.7L165.4 64.3L173.7 65.8L182.1 69.4L190.4 93.1L198.8 103.9L207.1 97.9L215.5 82.2L223.8 98.0L232.2 105.7L240.5 108.4L248.9 107.8L257.2 109.0L265.6 119.8L265.6 189.4L257.2 191.5L248.9 196.3L240.5 188.1L232.2 179.4L223.8 176.8L215.5 176.3L207.1 184.7L198.8 188.6L190.4 188.5L182.1 189.4L173.7 200.3L165.4 201.5L157.0 196.5L148.6 184.7L140.3 191.2L131.9 184.6L123.6 196.2L115.2 171.8L106.9 179.4L98.5 181.5L90.2 188.7L81.8 199.5L73.5 198.0L65.1 204.7L56.8 176.6L48.4 165.1L40.1 180.5L31.7 172.8L23.4 157.0L15.0 145.2L6.7 149.5Z" style="fill: #6B6862; opacity: 0.1"></path>
+<path d="M6.7 74.4L15.0 62.1L23.4 79.6L31.7 71.1L40.1 77.6L48.4 97.5L56.8 105.3L65.1 105.8L73.5 100.0L81.8 102.4L90.2 103.5L98.5 95.1L106.9 81.7L115.2 86.8L123.6 85.8L131.9 110.4L140.3 109.2L148.6 94.6L157.0 110.1L165.4 120.4L173.7 120.3L182.1 125.6L190.4 131.1L198.8 141.2L207.1 130.4L215.5 120.3L223.8 123.2L232.2 126.3L240.5 129.9L248.9 135.2L257.2 137.8L265.6 137.2L265.6 179.5L257.2 177.7L248.9 165.0L240.5 166.8L232.2 159.8L223.8 160.2L215.5 164.1L207.1 168.6L198.8 175.5L190.4 175.7L182.1 170.5L173.7 170.5L165.4 159.3L157.0 172.3L148.6 177.6L140.3 180.6L131.9 179.4L123.6 160.3L115.2 164.7L106.9 175.7L98.5 167.1L90.2 181.1L81.8 179.5L73.5 188.7L65.1 165.8L56.8 157.9L48.4 143.5L40.1 129.1L31.7 138.9L23.4 125.6L15.0 124.4L6.7 143.9Z" style="fill: #6B6862; opacity: 0.17"></path>
+<path d="M265.6 119.8L273.9 117.1L282.3 125.9L290.6 132.5L299.0 106.0L307.3 96.6L307.3 180.3L299.0 183.4L290.6 188.1L282.3 187.3L273.9 183.0L265.6 189.4Z" style="fill: #6B6862; opacity: 0.045"></path>
+<path d="M265.6 137.2L273.9 135.5L282.3 132.0L290.6 139.5L299.0 120.0L307.3 138.8L307.3 173.8L299.0 166.1L290.6 176.8L282.3 168.9L273.9 166.8L265.6 179.5Z" style="fill: #6B6862; opacity: 0.075"></path>
+<path class="mean" d="M6.7 105.5L15.0 95.1L23.4 99.6L31.7 110.8L40.1 112.8L48.4 118.6L56.8 126.9L65.1 133.0L73.5 140.6L81.8 139.9L90.2 134.8L98.5 126.8L106.9 122.7L115.2 123.9L123.6 125.2L131.9 131.7L140.3 136.5L148.6 134.3L157.0 137.8L165.4 138.2L173.7 141.0L182.1 140.7L190.4 145.7L198.8 151.5L207.1 147.3L215.5 138.4L223.8 140.2L232.2 143.4L240.5 148.4L248.9 150.9L257.2 153.1L265.6 152.2L273.9 154.7L282.3 152.9L290.6 154.5L299.0 142.9L307.3 147.5"></path>
+<path class="ev" d="M13.5 -7V230"></path><circle class="evn" cx="13.5" cy="-14" r="7"></circle><text class="evnt" x="13.5" y="-11">1</text>
+<path class="ev" d="M68.4 -7V230M79.1 -7V230"></path><circle class="evn" cx="73.8" cy="-14" r="7"></circle><text class="evnt" x="73.8" y="-11">2</text>
+<path class="ev" d="M109.3 -7V230"></path><circle class="evn" cx="109.3" cy="-14" r="7"></circle><text class="evnt" x="109.3" y="-11">3</text>
+<path class="ln" d="M6.7 97.8L15.0 98.9L23.4 121.2L31.7 128.8L40.1 127.0L48.4 141.4L56.8 129.7L65.1 132.7L73.5 163.5L81.8 171.3L90.2 167.9L98.5 173.4L106.9 176.0L115.2 186.5L123.6 175.3L131.9 178.7L140.3 194.6" style="stroke: #B9463F; stroke-width: 2.5"></path>
+<path class="nowl" d="M140.3 0V230"></path>
+<text class="axb" x="140.3" y="246" style="text-anchor: middle">Now</text>
+<circle cx="140.3" cy="194.6" r="4.5" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="140.3" cy="136.5" r="3.5" style="fill: #FAF9F6; stroke: #4A4843; stroke-width: 1.5"></circle>
+<path d="M144.3 194.6H147.3V136.5H144.3" style="fill: none; stroke: #171717; stroke-width: 1"></path>
+<text class="halo num" x="154.3" y="162.5" style="font-size: 12px"><tspan x="154.3" style="font-weight: 600; fill: #B9463F">Albanese −24.6</tspan><tspan x="154.3" dy="16" style="fill: #3D3B37">25.3 below average</tspan></text>
+</g>
+</svg>
+
+<ol style="margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #3D3B37"><li style="display: flex; gap: 10px"><span class="num" style="width: 16px; font-weight: 600; color: #6B6862">1</span><span style="flex-grow: 1">1st Coalition split</span><span style="color: #6B6862">May 2025</span></li><li style="display: flex; gap: 10px"><span class="num" style="width: 16px; font-weight: 600; color: #6B6862">2</span><span style="flex-grow: 1">Bondi shooting · 2nd Coalition split</span><span style="color: #6B6862">Dec 2025</span></li><li style="display: flex; gap: 10px"><span class="num" style="width: 16px; font-weight: 600; color: #6B6862">3</span><span style="flex-grow: 1">2026 Budget</span><span style="color: #6B6862">May 2026</span></li></ol>
+
+<div style="margin-top: 36px"></div><h3 style="margin: 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 22px; line-height: 1.15">Preferred prime minister</h3>
+<p style="margin: 4px 0 0; font-size: 14px; line-height: 1.45; color: #4A4843">The PM’s lead over the opposition leader as better PM. Asked since 1984.</p>
+
+<div style="margin-top: 14px; display: flex; align-items: center; gap: 2px"><span style="flex-grow: 1; font-size: 13px; font-weight: 600; line-height: 1.35">PM’s lead, points</span><button class="copy" aria-label="Expand preferred prime minister chart" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button><button class="copy" aria-label="Copy chart: preferred prime minister" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button></div>
+
+<svg viewBox="0 0 350 288" width="350" height="288" role="img" aria-label="The prime minister’s lead as preferred PM by month since the election; Albanese now +12.0, close to the average." style="margin-top: 10px; display: block; overflow: visible">
+<g transform="translate(28 34)">
+<path class="grid" d="M0 230.0H314M0 98.6H314M0 32.9H314"></path>
+<path class="even" d="M0 164.3H314"></path>
+<text class="ax num" x="-6" y="234.0" style="text-anchor: end">−20</text>
+<text class="ax num" x="-6" y="168.3" style="text-anchor: end">Tied</text>
+<text class="ax num" x="-6" y="102.6" style="text-anchor: end">+20</text>
+<text class="ax num" x="-6" y="36.9" style="text-anchor: end">+40</text>
+<path class="base" d="M0 230H314M6.7 230v4M106.9 230v4M207.1 230v4M307.3 230v4"></path>
+<text class="axb" x="2.7" y="246" style="text-anchor: start">Election</text>
+<text class="ax" x="106.9" y="246" style="text-anchor: middle">1 yr</text>
+<text class="ax" x="207.1" y="246" style="text-anchor: middle">2 yrs</text>
+<text class="ax" x="307.3" y="246" style="text-anchor: end">3 yrs</text>
+<path d="M6.7 118.3L15.0 46.7L15.0 130.1L6.7 118.3Z" style="fill: #6B6862; opacity: 0.045"></path>
+<path d="M6.7 118.3L15.0 57.5L15.0 114.2L6.7 118.3Z" style="fill: #6B6862; opacity: 0.075"></path>
+<path d="M15.0 46.7L23.4 39.4L31.7 37.8L40.1 52.6L48.4 61.1L56.8 49.3L65.1 64.7L73.5 49.3L81.8 49.3L90.2 64.1L98.5 51.6L106.9 31.5L115.2 37.1L123.6 42.7L131.9 52.6L140.3 53.2L148.6 20.2L157.0 55.2L165.4 37.9L173.7 35.3L182.1 25.6L190.4 30.9L198.8 31.0L207.1 33.8L215.5 70.7L223.8 63.1L232.2 81.2L240.5 86.4L248.9 93.3L257.2 72.0L265.6 98.4L273.9 101.1L282.3 122.2L282.3 175.8L273.9 174.5L265.6 170.0L257.2 180.6L248.9 181.3L240.5 179.3L232.2 175.5L223.8 167.1L215.5 166.9L207.1 171.8L198.8 172.4L190.4 166.5L182.1 171.9L173.7 169.1L165.4 154.0L157.0 157.7L148.6 160.3L140.3 191.7L131.9 184.7L123.6 172.5L115.2 156.1L106.9 166.6L98.5 159.0L90.2 155.4L81.8 175.8L73.5 173.5L65.1 146.5L56.8 147.2L48.4 135.4L40.1 136.4L31.7 132.4L23.4 126.5L15.0 130.1Z" style="fill: #6B6862; opacity: 0.1"></path>
+<path d="M15.0 57.5L23.4 44.8L31.7 57.0L40.1 69.8L48.4 81.3L56.8 79.5L65.1 73.9L73.5 64.2L81.8 70.6L90.2 78.0L98.5 68.2L106.9 77.0L115.2 72.1L123.6 64.9L131.9 60.8L140.3 80.8L148.6 76.4L157.0 65.3L165.4 73.7L173.7 72.3L182.1 70.2L190.4 78.0L198.8 77.5L207.1 79.7L215.5 77.0L223.8 103.5L232.2 116.6L240.5 132.0L248.9 127.6L257.2 124.9L265.6 119.3L273.9 116.8L282.3 127.3L282.3 157.2L273.9 161.9L265.6 169.2L257.2 177.4L248.9 177.5L240.5 171.8L232.2 155.5L223.8 144.7L215.5 154.6L207.1 153.9L198.8 171.8L190.4 153.7L182.1 154.1L173.7 161.6L165.4 140.1L157.0 138.4L148.6 149.5L140.3 152.0L131.9 138.7L123.6 116.6L115.2 119.8L106.9 119.9L98.5 133.9L90.2 148.7L81.8 156.6L73.5 152.0L65.1 130.1L56.8 126.7L48.4 132.2L40.1 128.5L31.7 124.9L23.4 112.5L15.0 114.2Z" style="fill: #6B6862; opacity: 0.17"></path>
+<path d="M282.3 122.2L290.6 123.8L299.0 115.6L307.3 110.4L307.3 181.5L299.0 184.4L290.6 166.3L282.3 175.8Z" style="fill: #6B6862; opacity: 0.045"></path>
+<path d="M282.3 127.3L290.6 138.2L299.0 121.4L307.3 145.6L307.3 165.9L299.0 164.9L290.6 164.1L282.3 157.2Z" style="fill: #6B6862; opacity: 0.075"></path>
+<path class="mean" d="M6.7 118.3L15.0 90.8L23.4 77.5L31.7 83.4L40.1 91.9L48.4 99.9L56.8 103.1L65.1 103.2L73.5 108.1L81.8 109.7L90.2 115.1L98.5 102.2L106.9 96.5L115.2 100.4L123.6 99.8L131.9 107.0L140.3 121.2L148.6 111.6L157.0 107.4L165.4 104.4L173.7 111.2L182.1 112.8L190.4 114.0L198.8 121.7L207.1 116.9L215.5 118.2L223.8 120.4L232.2 128.9L240.5 140.6L248.9 142.7L257.2 140.0L265.6 141.1L273.9 137.6L282.3 146.5L290.6 150.6L299.0 145.4L307.3 148.8"></path>
+<path class="ev" d="M84.9 -32V230"></path>
+<path class="ln" d="M23.4 107.1L31.7 118.3L40.1 112.0L48.4 97.9L56.8 90.7L65.1 89.0L73.5 126.5L81.8 95.9" style="stroke: #B9463F; stroke-width: 2.5"></path>
+<path class="ln" d="M90.2 130.1L98.5 138.3L106.9 145.2L115.2 140.3L123.6 110.7L131.9 121.2L140.3 124.9" style="stroke: #B9463F; stroke-width: 2.5"></path>
+<text class="lbl halo" x="65.1" y="80.0" style="fill: #B9463F; font-weight: 600; text-anchor: middle">over Ley</text>
+<path class="nowl" d="M140.3 0V230"></path>
+<text class="axb" x="140.3" y="246" style="text-anchor: middle">Now</text>
+<circle cx="140.3" cy="124.9" r="4.5" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="140.3" cy="121.2" r="3.5" style="fill: #FAF9F6; stroke: #4A4843; stroke-width: 1.5"></circle>
+<path d="M144.3 124.9H147.3V121.2H144.3" style="fill: none; stroke: #171717; stroke-width: 1"></path>
+<text class="halo num" x="154.3" y="120.0" style="font-size: 12px"><tspan x="154.3" style="font-weight: 600; fill: #B9463F">over Taylor +12.0</tspan><tspan x="154.3" dy="16" style="fill: #3D3B37">1.1 below average</tspan></text>
+<text class="evt halo" x="89.9" y="-36">Ley → Taylor</text>
+</g>
+</svg>
+
+<div style="margin-top: 36px"></div><h3 style="margin: 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 22px; line-height: 1.15">Opposition leader’s net approval</h3>
+<p style="margin: 4px 0 0; font-size: 14px; line-height: 1.45; color: #4A4843">Approve minus disapprove, for whoever led the opposition.</p>
+
+<div style="margin-top: 14px; display: flex; align-items: center; gap: 2px"><span style="flex-grow: 1; font-size: 13px; font-weight: 600; line-height: 1.35">Net approval, points</span><button class="copy" aria-label="Expand opposition leader net approval chart" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button><button class="copy" aria-label="Copy chart: opposition leader net approval" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button></div>
+
+<svg viewBox="0 0 350 288" width="350" height="288" role="img" aria-label="Opposition leaders’ net approval by month since the election; Taylor now −6.9, close to the average." style="margin-top: 10px; display: block; overflow: visible">
+<g transform="translate(28 34)">
+<path class="grid" d="M0 230.0H314M0 184.0H314M0 92.0H314M0 46.0H314M0 0.0H314"></path>
+<path class="even" d="M0 138.0H314"></path>
+<text class="ax num" x="-6" y="234.0" style="text-anchor: end">−40</text>
+<text class="ax num" x="-6" y="188.0" style="text-anchor: end">−20</text>
+<text class="ax num" x="-6" y="142.0" style="text-anchor: end">Even</text>
+<text class="ax num" x="-6" y="96.0" style="text-anchor: end">+20</text>
+<text class="ax num" x="-6" y="50.0" style="text-anchor: end">+40</text>
+<text class="ax num" x="-6" y="4.0" style="text-anchor: end">+60</text>
+<path class="base" d="M0 230H314M6.7 230v4M106.9 230v4M207.1 230v4M307.3 230v4"></path>
+<text class="axb" x="2.7" y="246" style="text-anchor: start">Election</text>
+<text class="ax" x="106.9" y="246" style="text-anchor: middle">1 yr</text>
+<text class="ax" x="207.1" y="246" style="text-anchor: middle">2 yrs</text>
+<text class="ax" x="307.3" y="246" style="text-anchor: end">3 yrs</text>
+<path d="M6.7 70.4L15.0 76.6L15.0 150.4L6.7 182.2Z" style="fill: #6B6862; opacity: 0.045"></path>
+<path d="M6.7 74.8L15.0 85.4L15.0 141.4L6.7 161.0Z" style="fill: #6B6862; opacity: 0.075"></path>
+<path d="M15.0 76.6L23.4 80.5L31.7 81.1L40.1 86.5L48.4 88.2L56.8 82.7L65.1 92.5L73.5 112.7L81.8 107.9L90.2 109.4L98.5 94.2L106.9 95.7L115.2 100.3L123.6 98.0L131.9 93.8L140.3 90.8L148.6 112.5L157.0 126.3L165.4 117.3L173.7 119.3L182.1 98.5L190.4 94.8L198.8 110.2L207.1 105.8L215.5 113.0L223.8 112.7L232.2 75.4L240.5 49.8L248.9 72.5L257.2 84.6L265.6 89.5L265.6 184.0L257.2 194.5L248.9 197.7L240.5 204.1L232.2 208.0L223.8 205.3L215.5 200.2L207.1 194.6L198.8 190.9L190.4 206.8L182.1 204.6L173.7 214.7L165.4 207.9L157.0 205.9L148.6 185.4L140.3 202.5L131.9 180.2L123.6 180.8L115.2 175.6L106.9 177.5L98.5 182.0L90.2 181.8L81.8 185.7L73.5 181.7L65.1 175.6L56.8 169.6L48.4 167.9L40.1 167.8L31.7 166.6L23.4 165.0L15.0 150.4Z" style="fill: #6B6862; opacity: 0.1"></path>
+<path d="M15.0 85.4L23.4 88.5L31.7 88.8L40.1 94.9L48.4 102.9L56.8 107.5L65.1 107.1L73.5 124.2L81.8 123.4L90.2 119.9L98.5 106.4L106.9 110.5L115.2 122.8L123.6 120.0L131.9 118.9L140.3 115.6L148.6 134.9L157.0 137.0L165.4 139.2L173.7 129.7L182.1 137.5L190.4 129.0L198.8 131.8L207.1 120.8L215.5 131.9L223.8 130.2L232.2 116.2L240.5 121.4L248.9 116.3L257.2 127.7L265.6 138.1L265.6 167.2L257.2 176.3L248.9 173.0L240.5 174.8L232.2 173.9L223.8 169.8L215.5 182.4L207.1 187.2L198.8 182.9L190.4 191.1L182.1 180.6L173.7 184.5L165.4 187.3L157.0 184.9L148.6 176.5L140.3 180.1L131.9 173.1L123.6 171.8L115.2 169.5L106.9 167.8L98.5 168.8L90.2 167.1L81.8 170.0L73.5 173.7L65.1 169.6L56.8 160.2L48.4 155.5L40.1 157.8L31.7 153.8L23.4 151.5L15.0 141.4Z" style="fill: #6B6862; opacity: 0.17"></path>
+<path d="M265.6 89.5L273.9 113.2L282.3 102.0L290.6 94.3L299.0 79.6L307.3 83.7L307.3 156.6L299.0 180.0L290.6 161.0L282.3 167.6L273.9 191.7L265.6 184.0Z" style="fill: #6B6862; opacity: 0.045"></path>
+<path d="M265.6 138.1L273.9 141.9L282.3 133.5L290.6 116.3L299.0 126.1L307.3 125.4L307.3 150.6L299.0 165.3L290.6 159.2L282.3 163.1L273.9 168.6L265.6 167.2Z" style="fill: #6B6862; opacity: 0.075"></path>
+<path class="mean" d="M6.7 123.2L15.0 117.2L23.4 123.9L31.7 126.9L40.1 128.2L48.4 128.8L56.8 132.3L65.1 138.0L73.5 144.0L81.8 146.4L90.2 142.6L98.5 138.5L106.9 140.5L115.2 147.8L123.6 146.1L131.9 144.8L140.3 148.1L148.6 153.7L157.0 162.5L165.4 165.8L173.7 162.0L182.1 160.6L190.4 157.8L198.8 156.3L207.1 156.8L215.5 153.5L223.8 149.4L232.2 143.3L240.5 139.4L248.9 139.7L257.2 146.3L265.6 145.1L273.9 149.9L282.3 139.6L290.6 132.8L299.0 135.7L307.3 128.0"></path>
+<path class="ev" d="M84.9 -32V230"></path>
+<path class="ln" d="M23.4 137.5L31.7 140.5L40.1 147.0L48.4 168.8L56.8 180.6L65.1 167.7L73.5 181.7L81.8 201.5" style="stroke: #356697; stroke-width: 2.5"></path>
+<path class="ln" d="M90.2 133.9L98.5 137.8L106.9 143.3L115.2 146.1L123.6 156.9L131.9 155.9L140.3 153.9" style="stroke: #356697; stroke-width: 2.5"></path>
+<text class="lbl halo" x="87.8" y="205.5" style="fill: #356697; font-weight: 600; text-anchor: start">Ley</text>
+<path class="nowl" d="M140.3 0V230"></path>
+<text class="axb" x="140.3" y="246" style="text-anchor: middle">Now</text>
+<circle cx="140.3" cy="153.9" r="4.5" style="fill: #356697; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="140.3" cy="148.1" r="3.5" style="fill: #FAF9F6; stroke: #4A4843; stroke-width: 1.5"></circle>
+<path d="M144.3 153.9H147.3V148.1H144.3" style="fill: none; stroke: #171717; stroke-width: 1"></path>
+<text class="halo num" x="154.3" y="148.0" style="font-size: 12px"><tspan x="154.3" style="font-weight: 600; fill: #356697">Taylor −6.9</tspan><tspan x="154.3" dy="16" style="fill: #3D3B37">2.5 below average</tspan></text>
+<text class="evt halo" x="89.9" y="-36">Ley → Taylor</text>
+</g>
+</svg>
+
+<div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #DDDCD8; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 14px; row-gap: 8px; font-size: 12px; color: #4A4843">
+<span class="key"><svg width="20" height="16" viewBox="0 0 20 16" aria-hidden="true"><rect x="0" y="0" width="20" height="16" rx="2" style="fill: #6B6862; opacity: 0.1"></rect><rect x="0" y="4" width="20" height="8" style="fill: #6B6862; opacity: 0.17"></rect></svg>Middle half, middle 80%</span>
+<span class="key"><svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true"><path d="M1 7H19" class="mean"></path></svg>Past-term average</span>
+<span class="key"><svg width="20" height="16" viewBox="0 0 20 16" aria-hidden="true"><rect x="0" y="0" width="20" height="16" rx="2" style="fill: #6B6862; opacity: 0.045"></rect><rect x="0" y="4" width="20" height="8" style="fill: #6B6862; opacity: 0.075"></rect></svg>Fewer terms this far in</span>
+<span class="key"><svg width="30" height="14" viewBox="0 0 30 14" aria-hidden="true"><path d="M1 7H13" style="stroke: #B9463F; stroke-width: 3; stroke-linecap: round"></path><path d="M17 7H29" style="stroke: #356697; stroke-width: 3; stroke-linecap: round"></path></svg>PM, opposition leader</span>
+</div>
+
+<p style="margin: 16px 0 0; padding-top: 12px; border-top: 1px solid #DDDCD8; font-size: 12px; line-height: 1.55; color: #6B6862">Where a term changed leader its line follows whoever held the office. Favourability ratings are left out.</p>
+<div style="display: flex; align-items: center; gap: 20px"><a href="#leaders-method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap">How it’s built</a></div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":3375}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
