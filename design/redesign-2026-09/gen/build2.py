@@ -194,7 +194,7 @@ phone = '\n\n'.join([
     '<a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>\n'
     f'<span style="flex-grow: 1"></span>\n{copy_btn("two-party preferred")}\n</div>',
 ])
-PHONE_H = 1320
+PHONE_H = 1310
 open(OUT + 'TPPMobile.dc.html', 'w').write(page('Two-party preferred – phone', 390, PHONE_H, phone, ax=11, dot=3.5))
 
 # ================================================================ other states board

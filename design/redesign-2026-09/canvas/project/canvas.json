@@ -146,7 +146,7 @@
       "x": 1360,
       "y": 10580,
       "w": 390,
-      "h": 1320,
+      "h": 1310,
       "title": "Two-party preferred — phone"
     },
     "TPPViews.dc.html": {
@@ -253,13 +253,13 @@
       "x": 1360,
       "y": 0,
       "w": 390,
-      "h": 4309,
+      "h": 4299,
       "title": "Snapshot page – phone, 1 of 3",
       "page": "page"
     },
     "PagePhone2.dc.html": {
       "x": 1360,
-      "y": 4429,
+      "y": 4419,
       "w": 390,
       "h": 4850,
       "title": "Snapshot page – phone, 2 of 3",
@@ -267,7 +267,7 @@
     },
     "PagePhone3.dc.html": {
       "x": 1360,
-      "y": 9399,
+      "y": 9389,
       "w": 390,
       "h": 5390,
       "title": "Snapshot page – phone, 3 of 3",
