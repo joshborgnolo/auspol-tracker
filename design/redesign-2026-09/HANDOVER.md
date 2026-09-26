@@ -43,7 +43,8 @@ On the **Whole page** canvas page, `PageDesktop1–2` and `PagePhone1–3` stack
 - **Monthly lines are straight segments** on every chart. The live site smooths them with cubic curves, which can show highs and lows no month had. When porting, switch the chart engine's curve to straight (or monotone). This is the owner's call if they prefer the smooth look.
 - **Bands and whiskers are "95% interval"**, the site's glossary term. The ± figures are "95% margin".
 - **Restated figures quote their source exactly.** For example, the By-party small multiples quote the dot plot's 56.2, not 56.
-- **Boards end with the same padding they start with.** Run `gen/preview.py` after edits to check.
+- **Boards end with the same padding they start with.** Run `gen/preview.py` after edits to check. It measures at natural height, because a fixed-height board silently squeezes content that overruns it.
+- **Section headings are a 2px ink rule over a sentence-case title** (22px desktop, 19px phone), with the meta beside or below it; the finding stays the big serif headline. The two-party section has no rule, since it sits under the masthead. The polls section uses the title in place of its old heading.
 
 ## Still open
 

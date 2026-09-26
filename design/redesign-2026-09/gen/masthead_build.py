@@ -123,7 +123,7 @@ def status(phone=False):
 def hero_preview(phone=False):
     big = 44 if phone else 72
     return (f'<div style="margin-top: {20 if phone else 32}px; display: flex; flex-direction: column; align-items: {"stretch" if phone else "flex-start"}; opacity: 0.45" aria-hidden="true">'
-            f'<span style="font-size: {12 if phone else 13}px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase">Two-party preferred</span>'
+            f'<span style="font-size: {19 if phone else 22}px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em">Two-party preferred</span>'
             f'<span class="num" style="margin-top: 14px; {"text-align: center; " if phone else "align-self: center; "}font-size: {big}px; font-weight: 500; line-height: 1; letter-spacing: -0.03em">'
             f'<span style="color: {ALP}">51.2</span><span style="color: #9A968E; font-weight: 300"> | </span><span style="color: #9E5200">48.8</span></span></div>')
 
@@ -148,7 +148,7 @@ def pinned(phone=False):
 
 def content_under_pinned(phone=False):
     return (f'<div style="margin-top: {20 if phone else 28}px; opacity: 0.45" aria-hidden="true">'
-            f'<span style="font-size: {12 if phone else 13}px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase">Leadership</span>'
+            f'<span style="display: block; border-top: 2px solid #171717; padding-top: {10 if phone else 12}px; font-size: {19 if phone else 22}px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em">Leadership</span>'
             f'<p style="margin: {8 if phone else 10}px 0 0; font-family: \'Crimson Text\', Georgia, serif; font-size: {26 if phone else 36}px; font-weight: 700; line-height: 1.1">Albanese still leads as preferred PM, but his net approval has fallen 40 points</p></div>')
 
 label = lambda t, top=0: f'<span class="plabel" style="margin-top: {top}px">{t}</span>'
@@ -177,7 +177,7 @@ desk = '\n\n'.join([
     '<div style="margin-top: 16px"></div>' + pinned(),
     content_under_pinned(),
 ])
-open(OUT + 'Masthead.dc.html', 'w').write(page('Masthead', 1280, 760, desk))
+open(OUT + 'Masthead.dc.html', 'w').write(page('Masthead', 1280, 790, desk))
 
 # ================================================================ phone
 phone = '\n\n'.join([
@@ -193,5 +193,5 @@ phone = '\n\n'.join([
     '<div style="margin-top: 12px"></div>' + pinned(phone=True),
     content_under_pinned(phone=True),
 ])
-open(OUT + 'MastheadMobile.dc.html', 'w').write(page('Masthead – phone', 390, 660, phone))
+open(OUT + 'MastheadMobile.dc.html', 'w').write(page('Masthead – phone', 390, 680, phone))
 print('ok')

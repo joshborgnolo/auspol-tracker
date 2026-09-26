@@ -39,9 +39,9 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 .key{display:inline-flex;align-items:center;gap:6px}
 </style>
 </helmet>
-<div style="width: 1280px; height: 950px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
-<h2 style="margin: 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1.15">Latest polls, and when the next are due</h2>
-<p style="margin: 6px 0 0; max-width: 900px; font-size: 15px; line-height: 1.5; color: #4A4843">The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm. Open a row for the full poll and the releases behind the projection.</p>
+<div style="width: 1280px; height: 960px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
+<div style="border-top: 2px solid #171717; padding-top: 12px; display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862"><span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Latest and next polls</span><span>8 pollsters · latest release Wed 23 Sep</span></div>
+<p style="margin: 14px 0 0; max-width: 900px; font-size: 16px; line-height: 1.5; color: #3D3B37">The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm. Open a row for the full poll and the releases behind the projection.</p>
 
 <div style="margin-top: 20px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #DDDCD8"><div role="group" aria-label="Figures" style="display: flex; gap: 4px"><button class="tab" aria-pressed="true">2PP</button><button class="tab" aria-pressed="false">Primary</button><button class="tab" aria-pressed="false">Leadership</button></div><span style="flex-grow: 1"></span><span style="font-size: 14px; color: #6B6862">Two-party:</span><button class="swap" title="Switch the page to Labor v Coalition">Labor v One Nation <span aria-hidden="true" style="color: #6B6862">⇄</span></button><span style="font-size: 14px; color: #6B6862">· implied flows</span><button class="qbtn" aria-label="How the two-party figures are counted, and the pollsters’ published figures"><span>?</span></button></div>
 
@@ -62,7 +62,7 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 <p style="margin: 16px 0 0; max-width: 960px; font-size: 13px; line-height: 1.55; color: #6B6862">Projections read each pollster’s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest. A pollster that misses its slot shows as overdue until the release is added. Spectre Strategy has not published in six weeks, so its poll is outside the averages.</p>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":950}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":960}}'>
 class Component extends DCLogic {
 renderVals() {
 return {};

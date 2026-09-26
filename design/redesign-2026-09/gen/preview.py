@@ -22,12 +22,16 @@ def chrome():
     return shells[-1] if shells else '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 
-def static_copy(name):
+def static_copy(name, natural=False):
     t = open(os.path.join(PROJ, name)).read()
     t = t.replace('<script src="./support.js"></script>', '<style>x-dc{display:block}helmet{display:none}</style>')
     for k, v in HOLES.items():
         t = t.replace(k, v)
     t = re.sub(r'<script type="text/x-dc".*?</script>', '', t, flags=re.S)
+    if natural:
+        # let the root grow to its content: at a fixed height a flex column squeezes its
+        # children (a 20px bar became 8px) instead of overflowing, which hides the overrun
+        t = re.sub(r'(<div style="width: \d+px; )height: \d+px;', r'\1', t, count=1)
     out = os.path.join(OUTD, name.replace('.dc.html', '.html'))
     open(out, 'w').write(t)
     return out
@@ -46,7 +50,7 @@ def main(args):
         pad = re.search(r'height: \d+px; box-sizing: border-box; padding: ([^;]+);', src)
         p = pad.group(1).split() if pad else ['0px']
         pb = int(p[2 if len(p) >= 3 else 0].rstrip('px'))
-        html = static_copy(name)
+        html = static_copy(name, natural=True)
         png = os.path.join(OUTD, 'png', name.replace('.dc.html', '.png'))
         subprocess.run([chrome(), '--headless', '--disable-gpu', '--hide-scrollbars', f'--force-device-scale-factor={scale}',
                         f'--window-size={b["w"]},{b["h"] + 400}', '--virtual-time-budget=3000', f'--screenshot={png}',
@@ -60,8 +64,9 @@ def main(args):
         bottom = round(bottom / scale)
         fit = -(-(bottom + pb) // 10) * 10
         flag = '' if fit == b['h'] else f'  -> {fit} for equal padding'
-        print(f'{name:30s} {b["w"]:>5} x {b["h"]:<5} content ends {bottom:>5}{flag}')
+        print(f'{name:30s} {b["w"]:>5} x {b["h"]:<5} content ends {bottom:>5}{flag}' + ('  OVERRUNS: content is squeezed' if bottom + pb > b['h'] else ''))
         im.crop((0, 0, w, round(b['h'] * scale))).save(png)
+        static_copy(name)
 
 
 if __name__ == '__main__':

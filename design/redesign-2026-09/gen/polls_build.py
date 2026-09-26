@@ -201,8 +201,10 @@ KEY = (f'<div style="margin-top: 14px; display: flex; flex-wrap: wrap; align-ite
        f'<span class="key"><svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true"><path d="M4 6H20" style="stroke: #C9C6BF; stroke-width: 6; stroke-linecap: round"></path><circle cx="21" cy="6" r="3.5" style="fill: #FAF9F6; stroke: #9A968E; stroke-width: 1.5"></circle></svg>Or a week later</span>'
        f'<span class="key"><svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true"><rect x="1" y="1" width="24" height="10" rx="5" style="fill: none; stroke: #171717; stroke-width: 1.5; stroke-dasharray: 3 2"></rect></svg>Window, for irregular pollsters</span></div>')
 
-HEAD = ('<h2 style="margin: 0; font-family: \'Crimson Text\', Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1.15">Latest polls, and when the next are due</h2>\n'
-        '<p style="margin: 6px 0 0; max-width: 900px; font-size: 15px; line-height: 1.5; color: #4A4843">The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm. '
+HEAD = ('<div style="border-top: 2px solid #171717; padding-top: 12px; display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">'
+        '<span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Latest and next polls</span>'
+        '<span>8 pollsters · latest release Wed 23 Sep</span></div>\n'
+        '<p style="margin: 14px 0 0; max-width: 900px; font-size: 16px; line-height: 1.5; color: #3D3B37">The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm. '
         'Open a row for the full poll and the releases behind the projection.</p>')
 
 FOOT = ('<p style="margin: 16px 0 0; max-width: 960px; font-size: 13px; line-height: 1.55; color: #6B6862">Projections read each pollster’s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest. '
@@ -216,7 +218,7 @@ desk = '\n\n'.join([
     KEY,
     FOOT,
 ])
-open(OUT + 'Polls.dc.html', 'w').write(page('Latest and next polls', 1280, 950, desk))
+open(OUT + 'Polls.dc.html', 'w').write(page('Latest and next polls', 1280, 960, desk))
 
 # ================================================================ other states: expanded row, primary facet
 def detail_yougov():
@@ -280,8 +282,10 @@ def card(r):
 </div>'''
 
 phone = '\n\n'.join([
-    '<h2 style="margin: 0; font-family: \'Crimson Text\', Georgia, serif; font-weight: 700; font-size: 26px; line-height: 1.15">Latest polls, and when the next are due</h2>',
-    '<p style="margin: 6px 0 0; font-size: 14px; line-height: 1.5; color: #4A4843">The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll.</p>',
+    '<div style="border-top: 2px solid #171717; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #6B6862">'
+    '<span style="font-size: 19px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Latest and next polls</span>'
+    '<span>8 pollsters · latest release 23 Sep</span></div>',
+    '<p style="margin: 12px 0 0; font-size: 15px; line-height: 1.5; color: #3D3B37">The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll.</p>',
     '<div role="group" aria-label="Figures" style="margin-top: 14px; display: flex; border-bottom: 1px solid #DDDCD8">'
     + ''.join(f'<button class="tab" aria-pressed="{"true" if i == 0 else "false"}" style="flex: 1">{l}</button>' for i, l in enumerate(['2PP', 'Primary', 'Leaders'])) + '</div>',
     '<div style="display: flex; align-items: center; gap: 4px; font-size: 13px; color: #6B6862"><button class="swap" style="font-size: 13px">Labor v One Nation <span aria-hidden="true" style="color: #6B6862">⇄</span></button><span>· implied</span><span style="flex-grow: 1"></span><button class="qbtn" aria-label="How the two-party figures are counted"><span>?</span></button></div>',

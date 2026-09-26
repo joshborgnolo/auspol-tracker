@@ -223,8 +223,8 @@ def build_main(H):
     b = [head]
     b.append(f'<div style="width: 1280px; height: {H}px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">')
     b.append('')
-    b.append('<div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">')
-    b.append('<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Primary vote</span>')
+    b.append('<div style="border-top: 2px solid #171717; padding-top: 12px; display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">')
+    b.append('<span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Primary vote</span>')
     b.append(f'<span>{L["pollsTracked"]} national polls since the 3 May 2025 election · latest fieldwork 21 Sep 2026</span>')
     b.append('</div>')
     b.append('')
@@ -262,8 +262,8 @@ def build_mobile(H):
     b = [head]
     b.append(f'<div style="width: 390px; height: {H}px; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; background: #FAF9F6">')
     b.append('')
-    b.append('<div style="display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #6B6862">')
-    b.append('<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Primary vote</span>')
+    b.append('<div style="border-top: 2px solid #171717; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #6B6862">')
+    b.append('<span style="font-size: 19px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Primary vote</span>')
     b.append(f'<span>{L["pollsTracked"]} polls since the May 2025 election · to 21 Sep 2026</span>')
     b.append('</div>')
     b.append('')
@@ -398,8 +398,8 @@ def patch_interaction():
 
 if __name__ == '__main__':
     import sys
-    hm = int(sys.argv[1]) if len(sys.argv) > 1 else 980
-    hp = int(sys.argv[2]) if len(sys.argv) > 2 else 1230
+    hm = int(sys.argv[1]) if len(sys.argv) > 1 else 1000
+    hp = int(sys.argv[2]) if len(sys.argv) > 2 else 1250
     build_main(hm)
     build_mobile(hp)
     patch_interaction()

@@ -141,7 +141,7 @@ FOOT = ('<div style="margin-top: 32px; padding-top: 12px; border-top: 1px solid 
 
 def eyebrow(sub):
     return ('<div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">\n'
-            '<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Two-party preferred</span>\n'
+            '<span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Two-party preferred</span>\n'
             f'<span>{sub}</span>\n</div>')
 
 def chart_section(emph, compare, cmp_label, aria):
@@ -161,7 +161,7 @@ desk = '\n\n'.join([
     chart_section('on', False, 'Compare published head-to-heads', ARIA_ON),
     FOOT,
 ])
-DESK_H = 1260
+DESK_H = 1270
 open(OUT + 'TPP.dc.html', 'w').write(page('Two-party preferred', 1280, DESK_H, desk))
 
 # ================================================================ phone board
@@ -172,8 +172,8 @@ ph_ev_html = ('<ol style="margin: 14px 0 0; padding: 0; list-style: none; displa
               + '\n</ol>')
 
 phone = '\n\n'.join([
-    '<div style="display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #6B6862">\n'
-    '<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Two-party preferred</span>\n'
+    '<div style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #6B6862">\n'
+    '<span style="font-size: 19px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">Two-party preferred</span>\n'
     '<span>After preferences · updated 21 Sep 2026</span>\n</div>',
     hero('imp-on', phone=True),
     f'<h2 style="margin: 40px 0 0; font-family: \'Crimson Text\', Georgia, serif; font-weight: 700; font-size: 22px; line-height: 1.15">{H2}</h2>\n'
@@ -191,7 +191,7 @@ phone = '\n\n'.join([
     '<a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>\n'
     f'<span style="flex-grow: 1"></span>\n{copy_btn("two-party preferred")}\n</div>',
 ])
-PHONE_H = 1310
+PHONE_H = 1320
 open(OUT + 'TPPMobile.dc.html', 'w').write(page('Two-party preferred – phone', 390, PHONE_H, phone, ax=11, dot=3.5))
 
 # ================================================================ other states board
@@ -240,6 +240,6 @@ views = '\n\n'.join([
     hero('imp-co'),
     '<div style="margin-top: 36px"></div>' + chart_section('co', True, 'Compare published 2PP', ARIA_C),
 ])
-VIEWS_H = 2990
+VIEWS_H = 3000
 open(OUT + 'TPPViews.dc.html', 'w').write(page('Two-party preferred – other states', 1280, VIEWS_H, views))
 print('ok', DESK_H, PHONE_H, VIEWS_H)

@@ -172,8 +172,8 @@ FOOT_TEXT = ('Most readings are Roy Morgan’s weekly poll: 47 of the 67 since t
              'The headline figures pool the latest polls, so they can differ a little from September’s monthly average.')
 
 desk = '\n\n'.join([
-    '<div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">\n'
-    '<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">National direction</span>\n'
+    '<div style="border-top: 2px solid #171717; padding-top: 12px; display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">\n'
+    '<span style="font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">National direction</span>\n'
     f'<span>{QUESTION} · Roy Morgan, Essential and Spectre Strategy</span>\n</div>',
     f'<h1 style="margin: 16px 0 0; max-width: 1000px; font-family: \'Crimson Text\', Georgia, serif; font-weight: 700; font-size: 46px; line-height: 1.08; letter-spacing: -0.01em">{H1}</h1>\n'
     f'<p style="margin: 12px 0 0; max-width: 880px; font-size: 18px; line-height: 1.5; color: #3D3B37">{DEK}</p>',
@@ -186,12 +186,12 @@ desk = '\n\n'.join([
     f'<div style="margin-top: 24px; padding-top: 12px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 24px; font-size: 13px; line-height: 1.5; color: #6B6862">\n<span>{FOOT_TEXT}</span>\n<span style="flex-grow: 1"></span>\n'
     '<a href="#direction-method" style="min-height: 44px; display: flex; align-items: center; font-weight: 500; color: #171717; white-space: nowrap">How it’s built</a>\n</div>',
 ])
-DESK_H = 1140
+DESK_H = 1160
 open(OUT + 'Direction.dc.html', 'w').write(page('National direction', 1280, DESK_H, desk))
 
 phone = '\n\n'.join([
-    '<div style="display: flex; flex-direction: column; gap: 2px; font-size: 12px; line-height: 1.4; color: #6B6862">\n'
-    '<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">National direction</span>\n'
+    '<div style="border-top: 2px solid #171717; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; line-height: 1.4; color: #6B6862">\n'
+    '<span style="font-size: 19px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em; color: #171717">National direction</span>\n'
     f'<span>{QUESTION}</span>\n</div>',
     f'<h1 style="margin: 14px 0 0; font-family: \'Crimson Text\', Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1.1; letter-spacing: -0.01em">{H1}</h1>\n'
     f'<p style="margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: #3D3B37">{DEK}</p>',
@@ -208,6 +208,6 @@ phone = '\n\n'.join([
     f'<p style="margin: 16px 0 0; padding-top: 12px; border-top: 1px solid #DDDCD8; font-size: 12px; line-height: 1.55; color: #6B6862">{FOOT_TEXT}</p>',
     '<a href="#direction-method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>',
 ])
-PHONE_H = 1210
+PHONE_H = 1240
 open(OUT + 'DirectionMobile.dc.html', 'w').write(page('National direction – phone', 390, PHONE_H, phone, ax=11, lw=2.25))
 print('ok', MONTHS[0], MONTHS[-1], NOW)
