@@ -7,7 +7,7 @@
       "title": "Dark mode — variables and components",
       "w": 1280,
       "x": 0,
-      "y": 20550
+      "y": 20530
     },
     "Demographics.dc.html": {
       "h": 1290,
@@ -42,14 +42,14 @@
       "title": "National direction — desktop",
       "w": 1280,
       "x": 0,
-      "y": 16310
+      "y": 16290
     },
     "DirectionMobile.dc.html": {
       "h": 1240,
       "title": "National direction — phone",
       "w": 390,
       "x": 1360,
-      "y": 16310
+      "y": 16290
     },
     "Interaction.dc.html": {
       "h": 1620,
@@ -63,28 +63,28 @@
       "title": "The issues — desktop, Who’s trusted",
       "w": 1280,
       "x": 0,
-      "y": 13990
+      "y": 13970
     },
     "IssuesMobile.dc.html": {
       "h": 1940,
       "title": "The issues — phone, Who’s trusted",
       "w": 390,
       "x": 1360,
-      "y": 13990
+      "y": 13970
     },
     "IssuesWhom.dc.html": {
       "h": 1030,
       "title": "The issues — What matters to whom (by vote)",
       "w": 1280,
       "x": 1830,
-      "y": 13990
+      "y": 13970
     },
     "IssuesWhomMobile.dc.html": {
       "h": 1160,
       "title": "The issues — What matters to whom, phone",
       "w": 390,
       "x": 3190,
-      "y": 13990
+      "y": 13970
     },
     "Leadership.dc.html": {
       "h": 1200,
@@ -150,7 +150,7 @@
       "y": 0
     },
     "PageDesktop1.dc.html": {
-      "h": 4691,
+      "h": 4681,
       "page": "page",
       "title": "Snapshot page – desktop, 1 of 2",
       "w": 1280,
@@ -163,7 +163,7 @@
       "title": "Snapshot page – desktop, 2 of 2",
       "w": 1280,
       "x": 0,
-      "y": 4811
+      "y": 4801
     },
     "PagePhone1.dc.html": {
       "h": 4299,
@@ -194,21 +194,21 @@
       "title": "Latest and next polls — desktop",
       "w": 1280,
       "x": 0,
-      "y": 17930
+      "y": 17910
     },
     "PollsMobile.dc.html": {
       "h": 1490,
       "title": "Latest and next polls — phone",
       "w": 390,
       "x": 1360,
-      "y": 17930
+      "y": 17910
     },
     "PollsViews.dc.html": {
       "h": 2240,
       "title": "Latest and next polls — row opened, Primary, sorted by next release",
       "w": 1280,
       "x": 1830,
-      "y": 17930
+      "y": 17910
     },
     "Switching.dc.html": {
       "h": 1310,
@@ -225,7 +225,7 @@
       "y": 4140
     },
     "TPP.dc.html": {
-      "h": 1280,
+      "h": 1270,
       "title": "Two-party preferred — desktop",
       "w": 1280,
       "x": 0,
@@ -239,7 +239,7 @@
       "y": 10580
     },
     "TPPViews.dc.html": {
-      "h": 3030,
+      "h": 3010,
       "title": "Two-party preferred — compare on, the ‘?’ opened, published figures, v Coalition",
       "w": 1280,
       "x": 1830,
@@ -314,7 +314,7 @@
       "text": "Latest and next polls",
       "w": 240,
       "x": 0,
-      "y": 17670
+      "y": 17650
     },
     "t2": {
       "kind": "title1",
@@ -354,7 +354,7 @@
       "text": "Dark mode",
       "w": 240,
       "x": 0,
-      "y": 20290
+      "y": 20270
     },
     "t7": {
       "kind": "title1",
@@ -370,7 +370,7 @@
       "text": "The issues",
       "w": 240,
       "x": 0,
-      "y": 13730
+      "y": 13710
     },
     "t9": {
       "kind": "title1",
@@ -378,7 +378,7 @@
       "text": "National direction",
       "w": 240,
       "x": 0,
-      "y": 16050
+      "y": 16030
     }
   },
   "order": [

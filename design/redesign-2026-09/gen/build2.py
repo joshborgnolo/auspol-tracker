@@ -3,8 +3,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 exec(open(os.path.join(HERE, 'common.py')).read())
 
 # ---------------------------------------------------------------- extra styles
-HELMET = HELMET.replace('</style>', '''.chip{min-height:44px;padding:0 18px;border:1px solid #DDDCD8;border-radius:22px;background:#FEFCF9;font-size:14px;color:#171717;display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
-.chip:hover{background:#EFEDE8}
+HELMET = HELMET.replace('</style>', '''/* the site's raised chip, from the same family as the theme switch; a 44px hit area around a 36px face */
+.chip{position:relative;min-height:36px;padding:0 14px;border:1px solid #DFDCD7;border-radius:18px;background:#FEFCF9;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16),0 3px 6px -3px rgba(91,79,69,0.16);font-size:14px;color:#4A4843;display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
+.chip::after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+.chip:hover{border-color:#C9C6BF}
+.chip:active{box-shadow:inset 0 1.5px 2.5px rgba(43,37,33,0.15);transform:translateY(1px)}
 .term{padding:0;border:0;background:none;font:inherit;color:inherit;text-decoration:underline dotted #9A968E;text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:help}
 .qbtn{width:44px;height:44px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;margin:-13px 0;padding:0;border:0;border-radius:8px;background:transparent;vertical-align:middle}
 .qbtn:hover{background:#EFEDE8}
@@ -164,7 +167,7 @@ desk = '\n\n'.join([
     chart_section('on', False, 'Compare published head-to-heads', ARIA_ON),
     FOOT,
 ])
-DESK_H = 1280
+DESK_H = 1270
 open(OUT + 'TPP.dc.html', 'w').write(page('Two-party preferred', 1280, DESK_H, desk))
 
 # ================================================================ phone board
@@ -243,6 +246,6 @@ views = '\n\n'.join([
     hero('imp-co'),
     '<div style="margin-top: 36px"></div>' + chart_section('co', True, 'Compare published 2PP', ARIA_C),
 ])
-VIEWS_H = 3030
+VIEWS_H = 3010
 open(OUT + 'TPPViews.dc.html', 'w').write(page('Two-party preferred – other states', 1280, VIEWS_H, views))
 print('ok', DESK_H, PHONE_H, VIEWS_H)
