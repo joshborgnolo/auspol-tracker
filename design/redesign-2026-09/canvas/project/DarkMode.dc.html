@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Dark mode</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#1D1915;color:#EEEBE5;font-family:"IBM Plex Sans",system-ui,sans-serif}
+a{color:#EEEBE5}a:hover{color:#EC9D4B}
+.num{font-variant-numeric:tabular-nums}
+svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.grid{stroke:#34302C;stroke-width:1;fill:none}
+.base{stroke:#746F6B;stroke-width:1;fill:none}
+.even{stroke:#746F6B;stroke-width:1;stroke-dasharray:3 3;fill:none}
+.ax{font-size:12px;fill:#99948F}
+.cap{font-size:13px;font-weight:600;fill:#EEEBE5}
+.caps{font-size:13px;fill:#99948F}
+.sec{font-size:15px;font-weight:600;fill:#EEEBE5}
+.bn{font-size:13px;font-weight:500}
+.bv{font-size:15px;font-weight:600}
+.nm{font-size:15px;fill:#EEEBE5}
+.nmc{font-size:15px;font-weight:600}
+.sz{font-size:12px;fill:#99948F}
+.v{font-size:15px;font-weight:600;fill:#EEEBE5}
+.e{font-size:13px;fill:#99948F}
+.big{font-size:22px;font-weight:600}
+.pts{font-size:15px;font-weight:600;fill:#EEEBE5}
+.ln{fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.all{stroke:#EEEBE5;stroke-width:1.5;stroke-dasharray:4 3;fill:none}
+.lbl{font-size:12px;font-weight:600}
+.note{font-size:11px;fill:#99948F}
+.chip{width:28px;height:20px;border-radius:4px;border:1px solid #403B36;box-sizing:border-box;flex-shrink:0}
+</style>
+</helmet>
+<div style="width: 1280px; height: 2300px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #1D1915">
+
+<div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #99948F">
+<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #EEEBE5">Dark mode</span>
+<span>The site’s variables, and the ones this redesign adds</span>
+</div>
+<h1 style="margin: 16px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 40px; line-height: 1.1; color: #EEEBE5">Every new colour needs a dark twin</h1>
+<p style="margin: 12px 0 0; max-width: 880px; font-size: 17px; line-height: 1.5; color: #C1BDB7">The site already switches its colours through variables when a reader picks dark mode. The redesign adds tints, ramps and text-on-fill colours. Their values in each theme are below, then the new charts drawn in dark. The other mock-ups use close hex values; the port should use these variables.</p>
+
+<div style="margin-top: 32px; display: grid; grid-template-columns: 230px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.6fr); column-gap: 24px; row-gap: 0; font-size: 13px; color: #C1BDB7">
+<span style="padding: 10px 0; border-bottom: 1px solid #403B36; font-weight: 600; color: #EEEBE5">Variable</span>
+<span style="padding: 10px 0; border-bottom: 1px solid #403B36; font-weight: 600; color: #EEEBE5">Light</span>
+<span style="padding: 10px 0; border-bottom: 1px solid #403B36; font-weight: 600; color: #EEEBE5">Dark</span>
+<span style="padding: 10px 0; border-bottom: 1px solid #403B36; font-weight: 600; color: #EEEBE5">Used for</span>
+
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; color: #EEEBE5">--tint-lnp, alp, grn, oth</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 6px"><span class="chip" style="background: #D9E4EF"></span><span class="chip" style="background: #F7DFDB"></span><span class="chip" style="background: #DEECE0"></span><span class="chip" style="background: #ECE9E5"></span></span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 6px"><span class="chip" style="background: #2C3D50"></span><span class="chip" style="background: #51312C"></span><span class="chip" style="background: #2E4534"></span><span class="chip" style="background: #413C36"></span></span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C">Column grounds in “where One Nation’s voters came from”; the selected party pill. Party colour mixed into the surface, 16% light, 24% dark.</span>
+
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; color: #EEEBE5">--onp-deep</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 8px"><span class="chip" style="background: #9E5200"></span>#9E5200</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 8px"><span class="chip" style="background: #B76B27"></span>#B76B27</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C">“Already One Nation in 2025” fill, set apart from --onp by lightness.</span>
+
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; color: #EEEBE5">--ramp-onp-1…4</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 6px"><span class="chip" style="background: #C67630"></span><span class="chip" style="background: #AB5E0C"></span><span class="chip" style="background: #883D00"></span><span class="chip" style="background: #602800"></span></span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 6px"><span class="chip" style="background: #9E5200"></span><span class="chip" style="background: #C67630"></span><span class="chip" style="background: #EE9B58"></span><span class="chip" style="background: #FFC699"></span></span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C">Ordered groups (age, location). Light mode runs pale to dark; dark mode runs dim to bright, so the last group keeps the most contrast in both.</span>
+
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; color: #EEEBE5">--ramp-grn-1…4</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 6px"><span class="chip" style="background: #4A9A5E"></span><span class="chip" style="background: #25793F"></span><span class="chip" style="background: #005B23"></span><span class="chip" style="background: #003F15"></span></span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 6px"><span class="chip" style="background: #21763C"></span><span class="chip" style="background: #4A9A5E"></span><span class="chip" style="background: #6FC082"></span><span class="chip" style="background: #AAE1B4"></span></span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C">The same rule for the Greens; Labor and the Coalition get ramps built the same way.</span>
+
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; color: #EEEBE5">--on-fill</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 6px"><span class="chip" style="background: #B9463F; color: #FEFCF9; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">Aa</span><span class="chip" style="background: #CC7C37; color: #3D2200; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">Aa</span></span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 6px"><span class="chip" style="background: #E56356; color: #1D1915; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">Aa</span><span class="chip" style="background: #EC9D4B; color: #1D1915; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">Aa</span></span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C">Text inside party-coloured bars. Light: white on Labor and Coalition, dark brown on One Nation and Greens. Dark: all dark, because white on dark-mode Labor is only 2.8:1.</span>
+
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; color: #EEEBE5">“neither” gap → --line-2</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 8px"><span class="chip" style="background: #ECE9E5"></span>#ECE9E5</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 8px"><span class="chip" style="background: #34302C"></span>#34302C</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C">The undecided gap in head-to-head bars. An existing variable; no new one needed.</span>
+
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; color: #EEEBE5">Composition → --line, --ink-3, --ink</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 6px"><span class="chip" style="background: #DFDCD7"></span><span class="chip" style="background: #6E6863"></span><span class="chip" style="background: #2B2521"></span></span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; display: flex; align-items: center; gap: 6px"><span class="chip" style="background: #403B36"></span><span class="chip" style="background: #99948F"></span><span class="chip" style="background: #EEEBE5"></span></span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C">Firm, not firm and undecided in “of every 100 voters”. Existing variables, so the order of lightness flips with the theme and undecided stays the most prominent.</span>
+
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C; color: #EEEBE5">--band-opacity</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C" class="num">0.14</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C" class="num">0.22</span>
+<span style="padding: 12px 0; border-bottom: 1px solid #34302C">Shaded 95% ranges; matches the site’s dark .ci-band.</span>
+</div>
+
+<span style="margin-top: 48px; font-size: 15px; font-weight: 600; color: #EEEBE5">Where One Nation’s voters came from</span>
+<span style="margin-top: 4px; font-size: 13px; color: #99948F">Tints and both oranges in dark. Rates inside the orange switch to dark text; “93%” is set large, since dark text on --onp-deep is 4.3:1.</span>
+<svg viewBox="0 0 1152 440" width="1152" height="440" role="img" aria-label="Dark-mode version of the vote-switching chart." style="margin-top: 20px; display: block; overflow: visible">
+<text class="nmc" x="0" y="20" style="fill: #589CE6">Coalition</text>
+<text class="sz num" x="0" y="40">31.8% of 2025 voters</text>
+<text class="nmc" x="365.5" y="20" style="fill: #E56356">Labor</text>
+<text class="sz num" x="365.5" y="40">34.6% of 2025 voters</text>
+<text class="nmc" x="762.1" y="20" style="fill: #A69D93">Others</text>
+<text class="sz num" x="762.1" y="40">15.0%, incl. independents</text>
+<text class="nmc" x="936.6" y="20" style="fill: #5ABC7A">Greens</text>
+<text class="sz num" x="936.6" y="40">12.2%</text>
+<text class="nmc" x="1079.2" y="20" style="fill: #EC9D4B; font-size: 13px">One Nation</text>
+<text class="sz num" x="1079.2" y="40">6.4%</text>
+<rect x="0" y="60" width="361.5" height="300" style="fill: #2C3D50"></rect>
+<rect x="365.5" y="60" width="392.6" height="300" style="fill: #51312C"></rect>
+<rect x="762.1" y="60" width="170.5" height="300" style="fill: #413C36"></rect>
+<rect x="936.6" y="60" width="138.6" height="300" style="fill: #2E4534"></rect>
+<rect x="1079.2" y="60" width="72.7" height="300" style="fill: #34302C"></rect>
+<rect x="0" y="249.3" width="361.5" height="110.7" style="fill: #EC9D4B"></rect>
+<rect x="365.5" y="320.4" width="392.6" height="39.6" style="fill: #EC9D4B"></rect>
+<rect x="762.1" y="297.3" width="170.5" height="62.7" style="fill: #EC9D4B"></rect>
+<rect x="936.6" y="348.9" width="138.6" height="11.1" style="fill: #EC9D4B"></rect>
+<rect x="1079.2" y="81" width="72.7" height="279" style="fill: #B76B27"></rect>
+<text class="sz" x="12" y="84" style="fill: #C1BDB7">Stayed or went elsewhere</text>
+<text class="big num" x="14" y="280" style="fill: #1D1915">36.9%</text>
+<text class="sz" x="14" y="298" style="fill: #1D1915">now back One Nation</text>
+<text class="bv num" x="379.5" y="345" style="fill: #1D1915">13.2%</text>
+<text class="bv num" x="776.1" y="322" style="fill: #1D1915">20.9%</text>
+<text class="bv num" x="950.6" y="341" style="fill: #EC9D4B">3.7%</text>
+<text class="num" x="1089" y="108" style="font-size: 19px; font-weight: 600; fill: #1D1915">93%</text>
+<path class="base" d="M0 360H1152"></path>
+<text class="pts num" x="0" y="388">≈ 11.8 points</text>
+<text class="sz num" x="0" y="407">59% of One Nation’s gain · ±5.2</text>
+<text class="pts num" x="365.5" y="388">≈ 4.6 points</text>
+<text class="sz num" x="365.5" y="407">23% of the gain · ±3.5</text>
+<text class="pts num" x="762.1" y="388">≈ 3.1 points</text>
+<text class="sz num" x="762.1" y="407">16% · ±4.9</text>
+<text class="pts num" x="936.6" y="388">≈ 0.5 points</text>
+<text class="sz num" x="936.6" y="407">2% · ±1.0</text>
+<text class="pts num" x="1079.2" y="388">≈ 6.0</text>
+<text class="sz num" x="1079.2" y="407">kept</text>
+</svg>
+
+<span style="margin-top: 40px; font-size: 15px; font-weight: 600; color: #EEEBE5">Of every 100 voters</span>
+<span style="margin-top: 4px; font-size: 13px; color: #99948F">Built from existing variables, so undecided, the smallest and most important segment, becomes the brightest.</span>
+<svg viewBox="0 0 1152 112" width="1152" height="112" role="img" aria-label="Dark-mode version of the of-every-100-voters bar." style="margin-top: 16px; display: block; overflow: visible">
+<text class="cap" x="1152" y="14" style="text-anchor: end">About 29 in 100 could still move</text>
+<path class="base" d="M814.5 28V22H1152V28"></path>
+<text x="0" y="50"><tspan class="cap">Firm</tspan><tspan class="caps" dx="6">named a party and don’t expect to change</tspan></text>
+<text x="818.5" y="50"><tspan class="cap">Not firm</tspan><tspan class="caps" dx="6">might still change</tspan></text>
+<text class="cap" x="1152" y="50" style="text-anchor: end">Undecided</text>
+<rect x="0" y="60" width="814.5" height="48" style="fill: #403B36"></rect>
+<rect x="814.5" y="60" width="286.8" height="48" style="fill: #99948F"></rect>
+<rect x="1101.3" y="60" width="50.7" height="48" style="fill: #EEEBE5"></rect>
+<path d="M814.5 60V108M1101.3 60V108" style="stroke: #1D1915; stroke-width: 2"></path>
+<text class="big num" x="16" y="92" style="fill: #EEEBE5">71</text>
+<text class="big num" x="830.5" y="92" style="fill: #1D1915">25</text>
+<text class="big num" x="1126.6" y="92" style="fill: #1D1915; text-anchor: middle">4</text>
+</svg>
+
+<span style="margin-top: 40px; font-size: 15px; font-weight: 600; color: #EEEBE5">Leadership</span>
+<span style="margin-top: 4px; font-size: 13px; color: #99948F">Dark text on every party fill; the “neither” gap uses --line-2 with light text.</span>
+<div style="margin-top: 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 64px">
+<svg viewBox="0 0 544 118" width="544" height="118" role="img" aria-label="Dark-mode head-to-head bars." style="display: block; overflow: visible">
+<text class="cap" x="0" y="14">Albanese v Taylor</text>
+<text class="cap num" x="544" y="14" style="text-anchor: end; fill: #E56356">Albanese +4.5</text>
+<rect x="0" y="22" width="229" height="30" style="fill: #E56356"></rect>
+<rect x="229" y="22" width="110.5" height="30" style="fill: #34302C"></rect>
+<rect x="339.5" y="22" width="204.5" height="30" style="fill: #589CE6"></rect>
+<text x="10" y="42" style="fill: #1D1915"><tspan class="bn">Albanese</tspan><tspan class="bv num" dx="6">42.1</tspan></text>
+<text class="note" x="284.2" y="41" style="text-anchor: middle; fill: #C1BDB7">neither</text>
+<text x="534" y="42" style="text-anchor: end; fill: #1D1915"><tspan class="bn">Taylor</tspan><tspan class="bv num" dx="6">37.6</tspan></text>
+<text class="cap" x="0" y="76">Albanese v Hanson</text>
+<text class="cap num" x="544" y="76" style="text-anchor: end; fill: #E56356">Albanese +12.0</text>
+<rect x="0" y="84" width="277.4" height="30" style="fill: #E56356"></rect>
+<rect x="277.4" y="84" width="54.4" height="30" style="fill: #34302C"></rect>
+<rect x="331.8" y="84" width="212.2" height="30" style="fill: #EC9D4B"></rect>
+<text x="10" y="104" style="fill: #1D1915"><tspan class="bn">Albanese</tspan><tspan class="bv num" dx="6">51.0</tspan></text>
+<text class="note" x="304.6" y="103" style="text-anchor: middle; fill: #C1BDB7">neither</text>
+<text x="534" y="104" style="text-anchor: end; fill: #1D1915"><tspan class="bn">Hanson</tspan><tspan class="bv num" dx="6">39.0</tspan></text>
+</svg>
+<svg viewBox="0 0 544 132" width="544" height="132" role="img" aria-label="Dark-mode net approval standings." style="display: block; overflow: visible">
+<path class="grid" d="M120 16V116M223.3 16V116M430 16V116"></path>
+<path class="even" d="M326.7 16V116"></path>
+<text class="note" x="326.7" y="10" style="text-anchor: middle">Even</text>
+<text class="note" x="446" y="10">Now</text>
+<text class="note" x="544" y="10" style="text-anchor: end">Change</text>
+<circle cx="6" cy="29" r="5" style="fill: #E56356"></circle>
+<text class="nm" x="18" y="34">Albanese</text>
+<path class="ln" style="stroke: #E56356" d="M176.3 29H222.8"></path>
+<circle cx="199.6" cy="29" r="6" style="fill: #E56356; stroke: #1D1915; stroke-width: 2"></circle>
+<text class="v num" x="446" y="34">−24.6</text>
+<text class="v num" x="544" y="34" style="text-anchor: end">▼ 6.2</text>
+<circle cx="6" cy="63" r="5" style="fill: #589CE6"></circle>
+<text class="nm" x="18" y="68">Taylor</text>
+<path class="ln" style="stroke: #589CE6" d="M259 63H323.1"></path>
+<circle cx="291" cy="63" r="6" style="fill: #589CE6; stroke: #1D1915; stroke-width: 2"></circle>
+<text class="v num" x="446" y="68">−6.9</text>
+<text class="e num" x="544" y="68" style="text-anchor: end">▼ 3.2</text>
+<circle cx="6" cy="97" r="5" style="fill: #EC9D4B"></circle>
+<text class="nm" x="18" y="102">Hanson</text>
+<path class="ln" style="stroke: #EC9D4B" d="M264.2 97H338.6"></path>
+<circle cx="301.4" cy="97" r="6" style="fill: #EC9D4B; stroke: #1D1915; stroke-width: 2"></circle>
+<text class="v num" x="446" y="102">−4.9</text>
+<text class="e num" x="544" y="102" style="text-anchor: end">▼ 6.0</text>
+<text class="ax" x="120" y="130" style="text-anchor: middle">−40</text>
+<text class="ax" x="223.3" y="130" style="text-anchor: middle">−20</text>
+<text class="ax" x="326.7" y="130" style="text-anchor: middle">0</text>
+<text class="ax" x="430" y="130" style="text-anchor: middle">+20</text>
+</svg>
+</div>
+
+<span style="margin-top: 40px; font-size: 15px; font-weight: 600; color: #EEEBE5">Who votes for whom: an ordered ramp</span>
+<span style="margin-top: 4px; font-size: 13px; color: #99948F">One Nation’s share by age. In dark mode the oldest group is the brightest line; labels sit one step brighter than their line where the line itself is too dim for text.</span>
+<svg viewBox="0 0 760 270" width="760" height="270" role="img" aria-label="Dark-mode version of One Nation's share by age over time." style="margin-top: 16px; display: block; overflow: visible">
+<g transform="translate(36 16)">
+<path class="grid" d="M0 0H616M0 55H616M0 110H616M0 165H616"></path>
+<path class="base" d="M0 220H616"></path>
+<text class="ax" x="-8" y="4" style="text-anchor: end">40%</text>
+<text class="ax" x="-8" y="59" style="text-anchor: end">30%</text>
+<text class="ax" x="-8" y="114" style="text-anchor: end">20%</text>
+<text class="ax" x="-8" y="169" style="text-anchor: end">10%</text>
+<text class="ax" x="-8" y="224" style="text-anchor: end">0</text>
+<path class="all" d="M0 176.0L44 170.5L88 158.4L132 149.6L176 131.4L220 125.9L264 101.8L308 81.9L352 83.6L396 85.8L440 77.6L484 60.5L528 73.2L572 78.1L616 70.9"></path>
+<path class="ln" style="stroke: #9E5200" d="M0 189.8L44 187.6L88 166.1L132 167.8L176 158.9L220 156.2L264 154.0L308 148.5L352 134.2L396 126.0L440 132.6L484 117.2L528 121.0L572 136.9L616 129.8"></path>
+<path class="ln" style="stroke: #C67630" d="M0 173.2L44 164.4L88 154.0L132 145.8L176 116.0L220 131.4L264 85.8L308 87.4L352 83.6L396 94.0L440 69.9L484 64.9L528 68.8L572 68.2L616 73.1"></path>
+<path class="ln" style="stroke: #EE9B58" d="M0 172.7L44 157.8L88 156.2L132 137.5L176 118.8L220 101.8L264 79.2L308 44.5L352 61.1L396 50.1L440 46.2L484 22.0L528 46.2L572 47.3L616 35.8"></path>
+<text class="lbl" x="626" y="40" style="fill: #EE9B58">55+</text>
+<text class="lbl" x="626" y="64" style="fill: #EEEBE5; font-weight: 500">All voters</text>
+<text class="lbl" x="626" y="84" style="fill: #C67630">35–54</text>
+<text class="lbl" x="626" y="134" style="fill: #C67630">18–34</text>
+<path class="base" d="M0 220V226M88 220V226M176 220V226M264 220V226M352 220V226M440 220V226M528 220V226M616 220V226"></path>
+<text class="ax" x="0" y="244" style="text-anchor: middle">Jul 2025</text>
+<text class="ax" x="88" y="244" style="text-anchor: middle">Sep</text>
+<text class="ax" x="176" y="244" style="text-anchor: middle">Nov</text>
+<text class="ax" x="264" y="244" style="text-anchor: middle">Jan 2026</text>
+<text class="ax" x="352" y="244" style="text-anchor: middle">Mar</text>
+<text class="ax" x="440" y="244" style="text-anchor: middle">May</text>
+<text class="ax" x="528" y="244" style="text-anchor: middle">Jul</text>
+<text class="ax" x="616" y="244" style="text-anchor: middle">Sep</text>
+</g>
+</svg>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2300}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

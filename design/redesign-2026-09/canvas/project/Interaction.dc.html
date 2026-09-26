@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Interaction states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@600;700&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+a{color:#171717}a:hover{color:#B9463F}
+button{font:inherit;cursor:pointer}
+.num{font-variant-numeric:tabular-nums}
+svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.grid{stroke:#DDDCD8;stroke-width:1;fill:none}
+.gridl{stroke:#E6E4DF;stroke-width:1;fill:none}
+.base{stroke:#9A968E;stroke-width:1;fill:none}
+.even{stroke:#9A968E;stroke-width:1;stroke-dasharray:3 3;fill:none}
+.ax{font-size:12px;fill:#6B6862}
+.ev{stroke:#C9C6BF;stroke-width:1;stroke-dasharray:1 3;fill:none}
+.evt{font-size:12px;font-weight:500;fill:#4A4843}
+.dots{fill:none;stroke-width:5;stroke-linecap:round}
+.trend{fill:none;stroke-width:2.75;stroke-linejoin:round;stroke-linecap:round}
+.link{fill:none;stroke-width:1.5;stroke-dasharray:2 3}
+.ring{fill:#FAF9F6;stroke-width:2}
+.lbl{font-size:13px;font-weight:600}
+.lblv{font-size:13px;font-weight:400}
+.ln{fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.lbs{font-size:12px;font-weight:600}
+.note{font-size:11px;fill:#6B6862}
+.tipbox{fill:#FEFCF9;stroke:#DFDCD7;stroke-width:1}
+.tipsh{fill:#402C1A;opacity:0.06}
+.tt{font-size:12px;font-weight:700;fill:#2B2521}
+.tl{font-size:13px;fill:#6E6863}
+.tv{font-size:13px;font-weight:700;fill:#2B2521}
+.ts{font-size:11px;fill:#6E6863}
+.th{font-size:11px;font-weight:600;fill:#286F76}
+.td{font-size:11px;font-weight:600;fill:#6E6863}
+.tdesc{font-size:12px;fill:#58514C}
+.copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.copy:hover{background:#EFEDE8;color:#171717}
+.copy:focus-visible{outline:2px solid #171717;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1540px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
+
+<div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">
+<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Interaction states</span>
+<span>Hover on desktop, tap on touch screens</span>
+</div>
+<h1 style="margin: 16px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 40px; line-height: 1.1">Every chart keeps its trail back to the polls</h1>
+<p style="margin: 12px 0 0; max-width: 880px; font-size: 17px; line-height: 1.5; color: #3D3B37">The redesign keeps the site’s three tooltips and their styling: a poll dot names its pollster and opens that poll in All polls, an event marker explains itself, and anywhere else on a chart shows that month’s figures. Poll dots come back to every chart that has raw polls behind it.</p>
+
+<span style="margin-top: 36px; font-size: 15px; font-weight: 600">1 · Hovering a poll</span>
+<span style="margin-top: 4px; font-size: 13px; color: #6B6862">The dot grows and rings; the tooltip sits above it, and a click opens the poll.</span>
+<svg viewBox="0 0 1152 460" width="1152" height="460" role="img" aria-label="Primary vote chart with the latest YouGov poll hovered, showing its tooltip." style="margin-top: 16px; display: block; overflow: visible">
+<path class="grid" d="M0 333H1016M0 238H1016M0 143H1016M0 48H1016"></path>
+<path class="base" d="M0 428H1016"></path>
+<text class="ax" x="0" y="44">40%</text>
+<text class="ax" x="0" y="139">30%</text>
+<text class="ax" x="0" y="234">20%</text>
+<text class="ax" x="0" y="329">10%</text>
+<path class="ev" d="M88 24V428M470 24V428M619 24V428M754 24V428M544 40V428"></path>
+<text class="evt" x="93" y="18">1st Coalition split</text>
+<text class="evt" x="475" y="18">Bondi shooting</text>
+<text class="evt" x="624" y="18">Hormuz crisis</text>
+<text class="evt" x="759" y="18">2026 Budget</text>
+<text class="evt" x="549" y="34">2nd Coalition split</text>
+<g style="opacity: 0.18">
+<path style="fill: #938A81" d="M59 290.0L72 290.8L86 291.4L99 291.8L113 291.9L126 291.8L139 291.5L153 291.2L166 290.8L179 290.3L193 289.8L206 289.2L220 288.5L233 287.6L246 286.6L260 285.7L273 285.2L286 285.0L300 285.5L313 286.5L326 288.1L340 290.2L353 292.7L367 295.3L380 297.9L393 300.4L407 302.7L420 304.8L433 306.6L447 308.1L460 309.4L474 310.6L487 311.6L500 312.5L514 313.5L527 314.5L540 315.5L554 316.4L567 317.3L581 318.0L594 318.6L607 319.1L621 319.4L634 319.7L647 320.0L661 320.3L674 320.6L687 320.8L701 321.0L714 321.1L728 321.0L741 320.7L754 320.4L768 320.1L781 319.8L794 319.5L808 319.4L821 319.4L835 319.4L848 319.5L861 319.6L875 319.7L888 319.7L901 319.5L915 319.2L928 318.7L942 318.1L955 317.4L968 316.6L982 315.7L995 314.9L1006 314.2L1006 325.3L995 325.6L982 326.1L968 326.6L955 327.1L942 327.6L928 328.1L915 328.5L901 328.7L888 328.8L875 328.8L861 328.7L848 328.5L835 328.4L821 328.3L808 328.4L794 328.6L781 328.8L768 329.0L754 329.1L741 329.1L728 328.9L714 328.6L701 328.2L687 327.7L674 327.2L661 326.7L647 326.2L634 325.8L621 325.4L607 325.1L594 324.7L581 324.2L567 323.7L554 323.0L540 322.3L527 321.5L514 320.6L500 319.8L487 319.0L474 318.3L460 317.7L447 317.0L433 316.2L420 315.3L407 314.2L393 312.9L380 311.5L367 310.0L353 308.6L340 307.2L326 305.9L313 304.7L300 303.8L286 302.9L273 302.2L260 301.5L246 301.1L233 300.8L220 300.8L206 301.1L193 301.7L179 302.5L166 303.2L153 303.9L139 304.5L126 305.0L113 305.3L99 305.6L86 305.7L72 305.7L59 305.7Z"></path>
+<path style="fill: #439458" d="M59 309.4L72 309.2L86 309.0L99 308.8L113 308.6L126 308.5L139 308.5L153 308.5L166 308.8L179 309.1L193 309.6L206 310.2L220 310.8L233 311.4L246 311.9L260 312.4L273 312.6L286 312.8L300 312.9L313 312.9L326 312.9L340 312.9L353 312.9L367 312.8L380 312.7L393 312.5L407 312.3L420 312.0L433 311.7L447 311.3L460 311.0L474 310.6L487 310.3L500 310.2L514 310.1L527 310.1L540 310.1L554 310.2L567 310.1L581 310.0L594 309.8L607 309.4L621 309.0L634 308.5L647 308.1L661 307.8L674 307.5L687 307.4L701 307.5L714 307.6L728 307.8L741 307.9L754 307.8L768 307.7L781 307.4L794 306.9L808 306.3L821 305.6L835 304.9L848 304.3L861 303.7L875 303.2L888 302.8L901 302.4L915 302.0L928 301.5L942 301.0L955 300.4L968 299.6L982 298.9L995 298.0L1006 297.3L1006 306.9L995 307.1L982 307.3L968 307.6L955 307.8L942 308.0L928 308.3L915 308.5L901 308.8L888 309.1L875 309.4L861 309.8L848 310.3L835 310.9L821 311.5L808 312.2L794 312.7L781 313.1L768 313.3L754 313.3L741 313.1L728 312.7L714 312.4L701 312.1L687 311.9L674 312.0L661 312.2L647 312.6L634 313.1L621 313.7L607 314.2L594 314.8L581 315.3L567 315.7L554 316.0L540 316.2L527 316.4L514 316.6L500 316.9L487 317.3L474 317.8L460 318.4L447 319.1L433 319.6L420 320.1L407 320.4L393 320.6L380 320.7L367 320.8L353 320.7L340 320.6L326 320.5L313 320.2L300 319.9L286 319.4L273 318.9L260 318.3L246 317.6L233 317.0L220 316.5L206 316.2L193 316.0L179 316.0L166 316.1L153 316.3L139 316.6L126 316.9L113 317.4L99 317.9L86 318.5L72 319.1L59 319.8Z"></path>
+<path style="fill: #356697" d="M59 129.4L72 130.6L86 131.8L99 132.9L113 134.1L126 135.2L139 136.2L153 137.3L166 138.3L179 139.4L193 140.5L206 141.6L220 142.9L233 144.4L246 146.2L260 148.1L273 150.1L286 152.2L300 154.4L313 156.6L326 158.9L340 161.3L353 163.7L367 166.2L380 168.5L393 170.7L407 172.7L420 174.5L433 176.1L447 177.7L460 179.6L474 182.0L487 185.0L500 188.6L514 192.6L527 196.8L540 200.8L554 204.4L567 207.5L581 210.0L594 211.9L607 213.1L621 213.9L634 214.2L647 214.2L661 214.0L674 213.8L687 213.7L701 213.7L714 214.0L728 214.6L741 215.5L754 216.9L768 218.6L781 220.6L794 222.6L808 224.4L821 225.8L835 226.4L848 226.3L861 225.5L875 224.3L888 222.8L901 221.3L915 220.0L928 219.0L942 218.2L955 217.8L968 217.5L982 217.5L995 217.6L1006 217.7L1006 231.4L995 230.6L982 229.8L968 229.2L955 228.8L942 228.8L928 229.3L915 230.2L901 231.5L888 233.1L875 234.7L861 236.1L848 237.0L835 237.3L821 236.8L808 235.7L794 234.0L781 232.0L768 229.8L754 227.7L741 225.9L728 224.5L714 223.6L701 223.1L687 223.1L674 223.4L661 223.9L647 224.4L634 224.9L621 225.2L607 225.2L594 224.8L581 223.9L567 222.4L554 220.3L540 217.4L527 213.7L514 209.5L500 205.0L487 200.6L474 196.6L460 193.2L447 190.5L433 188.3L420 186.4L407 184.7L393 182.8L380 180.8L367 178.6L353 176.3L340 173.9L326 171.5L313 169.1L300 166.7L286 164.2L273 161.8L260 159.5L246 157.4L233 155.6L220 154.3L206 153.4L193 152.8L179 152.4L166 152.1L153 151.7L139 151.3L126 150.9L113 150.3L99 149.7L86 149.1L72 148.5L59 148.0Z"></path>
+<path style="fill: #DD9231" d="M59 351.1L72 350.5L86 349.9L99 349.2L113 348.6L126 348.0L139 347.4L153 346.7L166 345.7L179 344.4L193 342.5L206 340.0L220 336.7L233 332.8L246 328.4L260 323.9L273 319.5L286 315.0L300 310.7L313 306.3L326 301.9L340 297.3L353 292.6L367 287.9L380 283.2L393 278.5L407 273.7L420 268.8L433 263.3L447 257.3L460 250.3L474 242.6L487 234.3L500 225.9L514 218.0L527 211.0L540 205.1L554 200.4L567 196.7L581 193.9L594 191.9L607 190.5L621 189.6L634 189.0L647 188.5L661 188.1L674 187.4L687 186.5L701 185.0L714 183.0L728 180.5L741 177.6L754 174.4L768 171.3L781 168.4L794 165.8L808 163.9L821 162.6L835 162.1L848 162.4L861 163.3L875 164.6L888 166.1L901 167.7L915 169.0L928 169.9L942 170.4L955 170.5L968 170.3L982 169.8L995 169.2L1006 168.5L1006 183.2L995 183.3L982 183.3L968 183.3L955 183.1L942 182.7L928 182.0L915 181.0L901 179.8L888 178.3L875 176.7L861 175.3L848 174.4L835 174.1L821 174.8L808 176.3L794 178.5L781 181.3L768 184.3L754 187.2L741 190.0L728 192.4L714 194.3L701 195.8L687 196.9L674 197.7L661 198.3L647 198.9L634 199.8L621 201.1L607 202.9L594 205.4L581 208.6L567 212.8L554 217.9L540 224.0L527 231.0L514 238.8L500 247.0L487 255.3L474 263.1L460 270.1L447 276.3L433 281.6L420 286.5L407 291.2L393 295.8L380 300.4L367 305.0L353 309.6L340 314.1L326 318.5L313 322.7L300 326.8L286 330.8L273 334.9L260 339.0L246 342.9L233 346.4L220 349.4L206 351.7L193 353.6L179 355.1L166 356.4L153 357.6L139 358.9L126 360.2L113 361.7L99 363.3L86 365.1L72 367.0L59 369.1Z"></path>
+<path style="fill: #B9463F" d="M59 74.8L72 75.5L86 76.2L99 76.9L113 77.6L126 78.3L139 79.0L153 79.8L166 80.5L179 81.2L193 82.1L206 83.0L220 84.0L233 85.2L246 86.5L260 87.8L273 89.2L286 90.5L300 91.6L313 92.6L326 93.5L340 94.2L353 94.9L367 95.6L380 96.3L393 97.2L407 98.3L420 99.9L433 102.1L447 105.0L460 108.7L474 112.9L487 117.2L500 121.2L514 124.7L527 127.4L540 129.4L554 131.0L567 132.3L581 133.5L594 134.7L607 135.9L621 137.1L634 138.2L647 139.3L661 140.2L674 141.1L687 141.9L701 142.8L714 143.7L728 144.8L741 146.1L754 147.5L768 148.9L781 150.4L794 151.8L808 153.0L821 154.1L835 155.0L848 155.7L861 156.3L875 156.8L888 157.4L901 158.1L915 158.8L928 159.6L942 160.4L955 161.2L968 162.0L982 162.8L995 163.5L1006 164.1L1006 174.1L995 173.0L982 171.8L968 170.5L955 169.3L942 168.1L928 167.1L915 166.2L901 165.5L888 164.9L875 164.4L861 163.9L848 163.3L835 162.7L821 161.8L808 160.8L794 159.6L781 158.2L768 156.7L754 155.2L741 153.7L728 152.4L714 151.2L701 150.2L687 149.4L674 148.6L661 147.8L647 147.0L634 146.1L621 145.0L607 144.0L594 142.9L581 141.9L567 140.9L554 140.0L540 138.9L527 137.6L514 135.7L500 133.1L487 129.9L474 126.2L460 122.3L447 118.5L433 115.1L420 112.2L407 109.9L393 108.0L380 106.5L367 105.3L353 104.3L340 103.3L326 102.4L313 101.3L300 100.2L286 99.0L273 97.6L260 96.1L246 94.5L233 93.0L220 91.5L206 90.3L193 89.2L179 88.2L166 87.4L153 86.7L139 86.1L126 85.5L113 84.9L99 84.4L86 83.9L72 83.5L59 83.1Z"></path>
+</g>
+<g style="opacity: 0.32">
+<path class="dots" style="stroke: #938A81" d="M95 290.2h0M135 299.8h0M149 309.2h0M151 314.0h0M153 311.1h0M162 285.5h0M183 285.5h0M185 276.0h0M202 299.8h0M237 304.5h0M241 295.0h0M256 285.5h0M284 304.5h0M290 295.0h0M294 285.5h0M309 290.2h0M325 314.0h0M326 219.0h0M330 314.0h0M340 314.0h0M349 276.0h0M363 304.5h0M365 323.5h0M378 304.5h0M384 285.5h0M384 295.0h0M401 304.5h0M407 304.5h0M411 323.5h0M416 299.8h0M418 314.0h0M418 333.0h0M424 314.0h0M432 314.0h0M435 323.5h0M447 314.0h0M456 295.0h0M458 314.0h0M466 342.5h0M470 314.0h0M481 314.0h0M487 304.5h0M514 304.5h0M514 323.5h0M523 323.5h0M533 304.5h0M533 295.0h0M537 304.5h0M537 342.5h0M542 314.0h0M546 304.5h0M550 318.8h0M554 314.0h0M558 333.0h0M563 318.8h0M577 333.0h0M577 323.5h0M581 323.5h0M584 333.0h0M586 318.8h0M588 314.0h0M592 328.2h0M598 342.5h0M600 333.0h0M603 314.0h0M605 323.5h0M607 314.0h0M611 333.0h0M613 342.5h0M617 309.2h0M621 323.5h0M630 304.5h0M634 314.0h0M642 304.5h0M644 309.2h0M651 323.5h0M657 328.2h0M659 314.0h0M661 314.0h0M663 323.5h0M665 333.0h0M666 342.5h0M670 352.0h0M670 328.2h0M684 314.0h0M687 304.5h0M689 333.0h0M697 328.2h0M701 314.0h0M705 323.5h0M708 323.5h0M710 318.8h0M714 314.0h0M724 323.5h0M726 333.0h0M731 361.5h0M731 352.0h0M737 314.0h0M741 323.5h0M751 323.5h0M756 304.5h0M758 342.5h0M758 318.8h0M760 342.5h0M762 314.0h0M764 328.2h0M764 333.0h0M768 323.5h0M770 333.0h0M777 328.2h0M777 342.5h0M781 247.5h0M781 342.5h0M785 342.5h0M791 309.2h0M794 314.0h0M798 333.0h0M804 318.8h0M815 314.0h0M817 318.8h0M821 314.0h0M825 314.0h0M831 328.2h0M838 352.0h0M840 342.5h0M844 318.8h0M846 333.0h0M848 323.5h0M857 295.0h0M863 333.0h0M869 323.5h0M869 333.0h0M871 314.0h0M875 295.0h0M878 342.5h0M884 304.5h0M892 323.5h0M898 323.5h0M899 371.0h0M901 314.0h0M905 352.0h0M911 333.0h0M921 333.0h0M924 323.5h0M926 295.0h0M936 323.5h0M938 328.2h0M945 304.5h0M951 323.5h0M953 314.0h0M961 342.5h0M961 342.5h0M964 304.5h0M966 323.5h0M978 328.2h0M982 295.0h0M989 342.5h0M991 309.2h0M993 304.5h0M999 323.5h0M1005 309.2h0M1006 314.0h0"></path>
+<path class="dots" style="stroke: #439458" d="M95 318.8h0M135 314.0h0M149 314.0h0M151 323.5h0M153 306.4h0M162 295.0h0M183 314.0h0M185 314.0h0M202 314.0h0M237 314.0h0M241 314.0h0M256 314.0h0M284 323.5h0M290 304.5h0M294 323.5h0M309 314.0h0M325 323.5h0M326 314.0h0M330 314.0h0M340 323.5h0M349 323.5h0M363 304.5h0M365 295.0h0M378 342.5h0M384 314.0h0M384 323.5h0M401 314.0h0M407 304.5h0M411 342.5h0M416 309.2h0M418 309.2h0M418 314.0h0M424 304.5h0M432 323.5h0M435 333.0h0M447 304.5h0M456 323.5h0M458 333.0h0M466 304.5h0M470 304.5h0M481 314.0h0M487 304.5h0M514 314.0h0M514 295.0h0M523 299.8h0M533 314.0h0M533 333.0h0M537 299.8h0M537 323.5h0M542 304.5h0M546 342.5h0M550 304.5h0M554 314.0h0M558 323.5h0M563 309.2h0M577 314.0h0M577 299.8h0M581 314.0h0M584 323.5h0M586 304.5h0M588 323.5h0M592 309.2h0M598 314.0h0M600 314.0h0M603 309.2h0M605 323.5h0M607 304.5h0M611 323.5h0M613 314.0h0M617 318.8h0M621 314.0h0M630 290.2h0M634 304.5h0M642 314.0h0M644 309.2h0M651 304.5h0M657 299.8h0M659 333.0h0M661 304.5h0M663 304.5h0M665 314.0h0M666 304.5h0M670 314.0h0M670 299.8h0M684 314.0h0M687 304.5h0M689 314.0h0M697 309.2h0M701 304.5h0M705 304.5h0M708 314.0h0M710 299.8h0M714 295.0h0M724 295.0h0M726 323.5h0M731 304.5h0M731 314.0h0M737 304.5h0M741 295.0h0M751 318.8h0M756 323.5h0M758 323.5h0M758 318.8h0M760 323.5h0M762 314.0h0M764 318.8h0M764 314.0h0M768 304.5h0M770 304.5h0M777 299.8h0M777 323.5h0M781 333.0h0M781 333.0h0M785 314.0h0M791 299.8h0M794 304.5h0M798 323.5h0M804 280.8h0M815 314.0h0M817 295.0h0M821 304.5h0M825 304.5h0M831 299.8h0M838 304.5h0M840 295.0h0M844 304.5h0M846 333.0h0M848 304.5h0M857 295.0h0M863 295.0h0M869 314.0h0M869 304.5h0M871 309.2h0M875 314.0h0M878 314.0h0M884 295.0h0M892 314.0h0M898 295.0h0M899 314.0h0M901 304.5h0M905 333.0h0M911 285.5h0M921 295.0h0M924 280.8h0M926 314.0h0M936 314.0h0M938 309.2h0M945 314.0h0M951 295.0h0M953 314.0h0M961 304.5h0M961 314.0h0M964 299.8h0M966 304.5h0M978 290.2h0M982 314.0h0M989 323.5h0M991 276.0h0M993 304.5h0M999 304.5h0M1005 280.8h0M1006 295.0h0"></path>
+<path class="dots" style="stroke: #356697" d="M95 133.5h0M135 133.5h0M149 138.2h0M151 133.5h0M153 133.5h0M162 181.0h0M183 152.5h0M185 152.5h0M202 133.5h0M208 143.0h0M237 143.0h0M241 152.5h0M256 143.0h0M284 143.0h0M290 171.5h0M294 171.5h0M309 143.0h0M325 171.5h0M326 171.5h0M330 162.0h0M340 152.5h0M349 162.0h0M363 171.5h0M365 133.5h0M378 181.0h0M384 171.5h0M384 200.0h0M401 152.5h0M407 200.0h0M411 200.0h0M416 171.5h0M418 190.5h0M418 181.0h0M424 200.0h0M432 171.5h0M435 181.0h0M447 200.0h0M456 181.0h0M458 181.0h0M466 181.0h0M470 166.8h0M481 162.0h0M487 200.0h0M514 209.5h0M514 190.5h0M523 138.2h0M533 228.5h0M533 162.0h0M537 200.0h0M537 162.0h0M542 228.5h0M546 190.5h0M550 214.2h0M554 238.0h0M558 247.5h0M563 233.3h0M577 257.0h0M577 214.2h0M581 247.5h0M584 266.5h0M586 238.0h0M588 209.5h0M592 204.8h0M598 200.0h0M600 228.5h0M603 200.0h0M605 181.0h0M607 219.0h0M611 238.0h0M613 247.5h0M617 204.8h0M621 228.5h0M630 214.2h0M634 247.5h0M642 219.0h0M644 200.0h0M651 228.5h0M657 185.8h0M659 200.0h0M661 247.5h0M663 209.5h0M665 228.5h0M666 266.5h0M670 209.5h0M670 214.2h0M684 200.0h0M687 238.0h0M689 200.0h0M697 214.2h0M701 209.5h0M705 228.5h0M708 209.5h0M710 209.5h0M714 238.0h0M724 214.2h0M726 200.0h0M731 219.0h0M731 209.5h0M737 200.0h0M741 228.5h0M751 190.5h0M756 200.0h0M758 228.5h0M758 271.2h0M760 190.5h0M762 209.5h0M764 200.0h0M764 238.0h0M768 209.5h0M770 209.5h0M777 209.5h0M777 209.5h0M781 257.0h0M781 190.5h0M785 238.0h0M791 238.0h0M794 238.0h0M798 257.0h0M804 261.8h0M815 238.0h0M817 266.5h0M821 228.5h0M825 257.0h0M831 261.8h0M838 266.5h0M840 257.0h0M844 223.8h0M846 209.5h0M848 266.5h0M857 223.8h0M863 228.5h0M869 209.5h0M869 228.5h0M871 238.0h0M875 238.0h0M878 247.5h0M884 209.5h0M892 209.5h0M898 219.0h0M899 219.0h0M901 219.0h0M905 219.0h0M911 204.8h0M921 257.0h0M924 219.0h0M926 219.0h0M936 209.5h0M938 204.8h0M945 190.5h0M951 228.5h0M953 228.5h0M961 247.5h0M961 219.0h0M964 233.3h0M966 181.0h0M978 223.8h0M982 257.0h0M989 200.0h0M991 223.8h0M993 238.0h0M999 247.5h0M1005 223.8h0M1006 228.5h0"></path>
+<path class="dots" style="stroke: #DD9231" d="M95 371.0h0M135 371.0h0M149 347.2h0M151 342.5h0M153 352.9h0M162 342.5h0M183 352.0h0M185 352.0h0M202 361.5h0M237 342.5h0M241 342.5h0M256 342.5h0M284 323.5h0M290 333.0h0M294 314.0h0M309 337.8h0M325 304.5h0M326 314.0h0M330 323.5h0M340 295.0h0M349 314.0h0M363 314.0h0M365 333.0h0M378 285.5h0M384 304.5h0M384 285.5h0M401 314.0h0M407 266.5h0M411 257.0h0M416 295.0h0M418 261.8h0M418 257.0h0M424 285.5h0M432 285.5h0M435 257.0h0M447 247.5h0M456 295.0h0M458 266.5h0M466 266.5h0M470 266.5h0M481 276.0h0M487 238.0h0M514 209.5h0M514 228.5h0M523 285.5h0M533 219.0h0M533 257.0h0M537 228.5h0M537 247.5h0M542 200.0h0M546 219.0h0M550 214.2h0M554 190.5h0M558 181.0h0M563 190.5h0M577 171.5h0M577 195.2h0M581 162.0h0M584 162.0h0M586 190.5h0M588 209.5h0M592 223.8h0M598 190.5h0M600 162.0h0M603 233.3h0M605 219.0h0M607 200.0h0M611 171.5h0M613 162.0h0M617 219.0h0M621 171.5h0M630 204.8h0M634 181.0h0M642 200.0h0M644 214.2h0M651 181.0h0M657 204.8h0M659 200.0h0M661 171.5h0M663 209.5h0M665 181.0h0M666 152.5h0M670 190.5h0M670 204.8h0M684 223.8h0M687 190.5h0M689 181.0h0M697 195.2h0M701 181.0h0M705 200.0h0M708 219.0h0M710 223.8h0M714 171.5h0M724 214.2h0M726 190.5h0M731 171.5h0M731 190.5h0M737 223.8h0M741 200.0h0M751 219.0h0M756 219.0h0M758 162.0h0M758 124.0h0M760 181.0h0M762 200.0h0M764 195.2h0M764 171.5h0M768 190.5h0M770 162.0h0M777 185.8h0M777 162.0h0M781 200.0h0M781 171.5h0M785 133.5h0M791 171.5h0M794 152.5h0M798 133.5h0M804 147.8h0M815 152.5h0M817 147.8h0M821 162.0h0M825 143.0h0M831 128.8h0M838 152.5h0M840 152.5h0M844 181.0h0M846 181.0h0M848 143.0h0M857 214.2h0M863 152.5h0M869 181.0h0M869 143.0h0M871 162.0h0M875 181.0h0M878 143.0h0M884 214.2h0M892 181.0h0M898 185.8h0M899 190.5h0M901 190.5h0M905 133.5h0M911 200.0h0M921 152.5h0M924 181.0h0M926 200.0h0M936 181.0h0M938 190.5h0M945 200.0h0M951 171.5h0M953 181.0h0M961 143.0h0M961 162.0h0M964 204.8h0M966 209.5h0M978 176.2h0M982 143.0h0M989 171.5h0M991 190.5h0M993 181.0h0M999 143.0h0M1005 185.8h0M1006 171.5h0"></path>
+<path class="dots" style="stroke: #B9463F" d="M95 76.5h0M135 71.8h0M149 81.2h0M151 76.5h0M153 86.9h0M162 86.0h0M183 86.0h0M185 95.5h0M202 81.2h0M208 86.0h0M237 86.0h0M241 76.5h0M256 105.0h0M284 95.5h0M290 86.0h0M294 95.5h0M309 105.0h0M325 95.5h0M326 105.0h0M330 76.5h0M340 105.0h0M349 105.0h0M363 95.5h0M365 114.5h0M378 86.0h0M384 114.5h0M384 86.0h0M401 114.5h0M407 114.5h0M411 67.0h0M416 114.5h0M418 114.5h0M418 105.0h0M424 86.0h0M432 86.0h0M435 95.5h0M447 124.0h0M456 95.5h0M458 105.0h0M466 95.5h0M470 138.2h0M481 124.0h0M487 143.0h0M514 152.5h0M514 152.5h0M523 143.0h0M533 124.0h0M533 143.0h0M537 157.2h0M537 114.5h0M542 143.0h0M546 133.5h0M550 138.2h0M554 133.5h0M558 105.0h0M563 138.2h0M577 114.5h0M577 157.2h0M581 143.0h0M584 105.0h0M586 138.2h0M588 124.0h0M592 124.0h0M598 143.0h0M600 152.5h0M603 133.5h0M605 143.0h0M607 152.5h0M611 124.0h0M613 124.0h0M617 138.2h0M621 152.5h0M630 176.2h0M634 143.0h0M642 152.5h0M644 157.2h0M651 162.0h0M657 171.5h0M659 133.5h0M661 152.5h0M663 143.0h0M665 133.5h0M666 124.0h0M670 124.0h0M670 143.0h0M684 138.2h0M687 143.0h0M689 162.0h0M697 143.0h0M701 181.0h0M705 133.5h0M708 124.0h0M710 138.2h0M714 171.5h0M724 143.0h0M726 143.0h0M731 133.5h0M731 124.0h0M737 147.8h0M741 143.0h0M751 138.2h0M756 143.0h0M758 133.5h0M758 157.2h0M760 152.5h0M762 152.5h0M764 147.8h0M764 133.5h0M768 162.0h0M770 181.0h0M777 166.8h0M777 152.5h0M781 152.5h0M781 152.5h0M785 162.0h0M791 171.5h0M794 181.0h0M798 143.0h0M804 181.0h0M815 162.0h0M817 162.0h0M821 181.0h0M825 171.5h0M831 171.5h0M838 114.5h0M840 143.0h0M844 162.0h0M846 143.0h0M848 152.5h0M857 162.0h0M863 181.0h0M869 162.0h0M869 181.0h0M871 166.8h0M875 162.0h0M878 143.0h0M884 166.8h0M892 162.0h0M898 166.8h0M899 133.5h0M901 162.0h0M905 152.5h0M911 166.8h0M921 152.5h0M924 185.8h0M926 162.0h0M936 162.0h0M938 157.2h0M945 181.0h0M951 171.5h0M953 152.5h0M961 152.5h0M961 152.5h0M964 147.8h0M966 181.0h0M978 171.5h0M982 181.0h0M989 162.0h0M991 190.5h0M993 162.0h0M999 171.5h0M1005 190.5h0M1006 181.0h0"></path>
+</g>
+<path class="link" style="stroke: #938A81" d="M40 285.5L59 297.8"></path>
+<path class="link" style="stroke: #439458" d="M40 312.1L59 314.6"></path>
+<path class="link" style="stroke: #356697" d="M40 125.9L59 138.7"></path>
+<path class="link" style="stroke: #DD9231" d="M40 367.2L59 360.1"></path>
+<path class="link" style="stroke: #B9463F" d="M40 99.3L59 79.0"></path>
+<path class="trend" style="stroke: #938A81; stroke-dasharray: 6 4" d="M59 297.8L72 298.3L86 298.5L99 298.7L113 298.6L126 298.4L139 298.0L153 297.6L166 297.0L179 296.4L193 295.8L206 295.2L220 294.6L233 294.2L246 293.8L260 293.6L273 293.7L286 294.0L300 294.6L313 295.6L326 297.0L340 298.7L353 300.6L367 302.7L380 304.7L393 306.7L407 308.4L420 310.0L433 311.4L447 312.5L460 313.5L474 314.4L487 315.3L500 316.2L514 317.1L527 318.0L540 318.9L554 319.7L567 320.5L581 321.1L594 321.6L607 322.1L621 322.4L634 322.8L647 323.1L661 323.5L674 323.9L687 324.3L701 324.6L714 324.8L728 324.9L741 324.9L754 324.8L768 324.5L781 324.3L794 324.1L808 323.9L821 323.9L835 323.9L848 324.0L861 324.1L875 324.2L888 324.2L901 324.1L915 323.8L928 323.4L942 322.9L955 322.2L968 321.6L982 320.9L995 320.3L1006 319.8"></path>
+<path class="trend" style="stroke: #439458" d="M59 314.6L72 314.2L86 313.7L99 313.3L113 313.0L126 312.7L139 312.5L153 312.4L166 312.4L179 312.6L193 312.8L206 313.2L220 313.7L233 314.2L246 314.8L260 315.3L273 315.8L286 316.1L300 316.4L313 316.6L326 316.7L340 316.8L353 316.8L367 316.8L380 316.7L393 316.6L407 316.4L420 316.1L433 315.7L447 315.2L460 314.7L474 314.2L487 313.8L500 313.5L514 313.3L527 313.2L540 313.2L554 313.1L567 312.9L581 312.6L594 312.3L607 311.8L621 311.3L634 310.8L647 310.4L661 310.0L674 309.8L687 309.7L701 309.8L714 310.0L728 310.2L741 310.5L754 310.6L768 310.5L781 310.2L794 309.8L808 309.2L821 308.5L835 307.9L848 307.3L861 306.7L875 306.3L888 305.9L901 305.6L915 305.3L928 304.9L942 304.5L955 304.1L968 303.6L982 303.1L995 302.6L1006 302.1"></path>
+<path class="trend" style="stroke: #356697" d="M59 138.7L72 139.5L86 140.4L99 141.3L113 142.2L126 143.0L139 143.8L153 144.5L166 145.2L179 145.9L193 146.6L206 147.5L220 148.6L233 150.0L246 151.8L260 153.8L273 156.0L286 158.2L300 160.5L313 162.8L326 165.2L340 167.6L353 170.0L367 172.4L380 174.7L393 176.8L407 178.7L420 180.4L433 182.2L447 184.1L460 186.4L474 189.3L487 192.8L500 196.8L514 201.1L527 205.2L540 209.1L554 212.3L567 215.0L581 217.0L594 218.4L607 219.2L621 219.5L634 219.5L647 219.3L661 218.9L674 218.6L687 218.4L701 218.4L714 218.8L728 219.5L741 220.7L754 222.3L768 224.2L781 226.3L794 228.3L808 230.1L821 231.3L835 231.9L848 231.7L861 230.8L875 229.5L888 228.0L901 226.4L915 225.1L928 224.1L942 223.5L955 223.3L968 223.4L982 223.7L995 224.1L1006 224.5"></path>
+<path class="trend" style="stroke: #DD9231" d="M59 360.1L72 358.8L86 357.5L99 356.3L113 355.2L126 354.1L139 353.2L153 352.2L166 351.1L179 349.8L193 348.1L206 345.9L220 343.0L233 339.6L246 335.7L260 331.5L273 327.2L286 322.9L300 318.7L313 314.5L326 310.2L340 305.7L353 301.1L367 296.5L380 291.8L393 287.1L407 282.4L420 277.6L433 272.5L447 266.8L460 260.2L474 252.8L487 244.8L500 236.5L514 228.4L527 221.0L540 214.6L554 209.2L567 204.8L581 201.3L594 198.6L607 196.7L621 195.3L634 194.4L647 193.7L661 193.2L674 192.5L687 191.7L701 190.4L714 188.6L728 186.4L741 183.8L754 180.8L768 177.8L781 174.8L794 172.2L808 170.1L821 168.7L835 168.1L848 168.4L861 169.3L875 170.7L888 172.2L901 173.7L915 175.0L928 175.9L942 176.5L955 176.8L968 176.8L982 176.6L995 176.2L1006 175.9"></path>
+<path class="trend" style="stroke: #B9463F" d="M59 79.0L72 79.5L86 80.1L99 80.6L113 81.3L126 81.9L139 82.6L153 83.2L166 83.9L179 84.7L193 85.6L206 86.6L220 87.8L233 89.1L246 90.5L260 92.0L273 93.4L286 94.7L300 95.9L313 97.0L326 97.9L340 98.8L353 99.6L367 100.4L380 101.4L393 102.6L407 104.1L420 106.1L433 108.6L447 111.8L460 115.5L474 119.5L487 123.5L500 127.2L514 130.2L527 132.5L540 134.2L554 135.5L567 136.6L581 137.7L594 138.8L607 139.9L621 141.1L634 142.1L647 143.1L661 144.0L674 144.8L687 145.6L701 146.5L714 147.5L728 148.6L741 149.9L754 151.3L768 152.8L781 154.3L794 155.7L808 156.9L821 158.0L835 158.8L848 159.5L861 160.1L875 160.6L888 161.2L901 161.8L915 162.5L928 163.4L942 164.3L955 165.2L968 166.2L982 167.3L995 168.3L1006 169.1"></path>
+<circle class="ring" style="stroke: #938A81" cx="40" cy="285.5" r="4.5"></circle>
+<circle class="ring" style="stroke: #439458" cx="40" cy="312.1" r="4.5"></circle>
+<circle class="ring" style="stroke: #356697" cx="40" cy="125.9" r="4.5"></circle>
+<circle class="ring" style="stroke: #DD9231" cx="40" cy="367.2" r="4.5"></circle>
+<circle class="ring" style="stroke: #B9463F" cx="40" cy="99.3" r="4.5"></circle>
+<circle style="fill: #356697; stroke: #FAF9F6; stroke-width: 2" cx="1006.5" cy="224.5" r="5"></circle>
+<circle style="fill: #439458; stroke: #FAF9F6; stroke-width: 2" cx="1006.5" cy="302.1" r="5"></circle>
+<circle style="fill: #938A81; stroke: #FAF9F6; stroke-width: 2" cx="1006.5" cy="319.8" r="5"></circle>
+<path style="fill: none; stroke: #9A968E; stroke-width: 1" d="M1014 168L1022 159M1014 177L1022 186"></path>
+<text x="1026" y="163"><tspan class="lbl" style="fill: #B9463F">Labor</tspan><tspan class="lblv num" style="fill: #171717" dx="6">27.3</tspan></text>
+<text x="1026" y="191"><tspan class="lbl" style="fill: #9E5200">One Nation</tspan><tspan class="lblv num" style="fill: #171717" dx="6">26.5</tspan></text>
+<text x="1026" y="229"><tspan class="lbl" style="fill: #356697">Coalition</tspan><tspan class="lblv num" style="fill: #171717" dx="6">21.4</tspan></text>
+<text x="1026" y="305"><tspan class="lbl" style="fill: #287C42">Greens</tspan><tspan class="lblv num" style="fill: #171717" dx="6">13.3</tspan></text>
+<text x="1026" y="325"><tspan class="lbl" style="fill: #70675E">Others</tspan><tspan class="lblv num" style="fill: #171717" dx="6">11.4</tspan></text>
+<circle cx="1006" cy="171.5" r="11" style="fill: none; stroke: #DD9231; stroke-width: 1.5; opacity: 0.55"></circle>
+<circle cx="1006" cy="171.5" r="6" style="fill: #DD9231; stroke: #FAF9F6; stroke-width: 2"></circle>
+<rect class="tipsh" x="897" y="62" width="222" height="100" rx="10"></rect>
+<rect class="tipbox" x="895" y="59.5" width="222" height="100" rx="10"></rect>
+<text class="tt" x="906" y="79.5">YouGov</text>
+<rect x="906" y="92" width="9" height="9" rx="2" style="fill: #DD9231"></rect>
+<text class="tl" x="922" y="100.5">One Nation</text>
+<text class="tv num" x="1106" y="100.5" style="text-anchor: end">27%</text>
+<text class="tl" x="906" y="117">Field</text>
+<text class="tv" x="1106" y="117" style="text-anchor: end">15–21 Sep</text>
+<text class="ts num" x="906" y="133">n = 1,500</text>
+<text class="th" x="906" y="150">Click to open this poll in All polls</text>
+<path class="base" d="M40 428V434M153 428V434M271 428V434M388 428V434M504 428V434M617 428V434M733 428V434M850 428V434M968 428V434"></path>
+<text class="ax" x="40" y="452" style="text-anchor: middle; font-weight: 600; fill: #171717">Election</text>
+<text class="ax" x="153" y="452" style="text-anchor: middle">Jul</text>
+<text class="ax" x="271" y="452" style="text-anchor: middle">Sep</text>
+<text class="ax" x="388" y="452" style="text-anchor: middle">Nov</text>
+<text class="ax" x="504" y="452" style="text-anchor: middle">Jan 2026</text>
+<text class="ax" x="617" y="452" style="text-anchor: middle">Mar</text>
+<text class="ax" x="733" y="452" style="text-anchor: middle">May</text>
+<text class="ax" x="850" y="452" style="text-anchor: middle">Jul</text>
+<text class="ax" x="968" y="452" style="text-anchor: middle">Sep</text>
+</svg>
+
+<span style="margin-top: 36px; font-size: 15px; font-weight: 600">2 · Hovering an event</span>
+<span style="margin-top: 4px; font-size: 13px; color: #6B6862">The marker line darkens; the tooltip gives the full name, the date and the site’s one-line description.</span>
+<svg viewBox="0 0 1152 170" width="1152" height="170" role="img" aria-label="Event markers with the Hormuz crisis hovered, showing its tooltip." style="margin-top: 16px; display: block; overflow: visible">
+<path class="grid" d="M0 48H1016"></path>
+<path class="ev" d="M88 24V170M470 24V170M754 24V170M544 40V170"></path>
+<path d="M619 24V170" style="stroke: #2B2521; stroke-width: 1.25; fill: none"></path>
+<text class="evt" x="93" y="18">1st Coalition split</text>
+<text class="evt" x="475" y="18">Bondi shooting</text>
+<text class="evt" x="624" y="18" style="fill: #171717; font-weight: 600">Hormuz crisis</text>
+<text class="evt" x="759" y="18">2026 Budget</text>
+<text class="evt" x="549" y="34">2nd Coalition split</text>
+<rect class="tipsh" x="501" y="58.5" width="240" height="96" rx="10"></rect>
+<rect class="tipbox" x="499" y="56" width="240" height="96" rx="10"></rect>
+<text class="tt" x="510" y="76">Strait of Hormuz closed</text>
+<text class="td" x="510" y="92">2 March 2026</text>
+<text class="tdesc" x="510" y="114">Closure during Iran war triggers</text>
+<text class="tdesc" x="510" y="131">an Australian fuel crisis.</text>
+</svg>
+
+<span style="margin-top: 36px; font-size: 15px; font-weight: 600">3 · Hovering anywhere else on a chart</span>
+<span style="margin-top: 4px; font-size: 13px; color: #6B6862">A guide line snaps to the nearest month and the tooltip lists every series, with its 95% range where the chart shows one. On touch screens, tap to show it and tap elsewhere to hide it.</span>
+<svg viewBox="0 0 544 250" width="544" height="250" role="img" aria-label="Net approval chart with September 2026 hovered, showing each leader's figure." style="margin-top: 16px; display: block; overflow: visible">
+<g transform="translate(36 20)">
+<path class="gridl" d="M0 28.6H430M0 142.9H430"></path>
+<path class="base" d="M0 200H430"></path>
+<path class="even" d="M0 85.7H430"></path>
+<text class="ax" x="-8" y="32.6" style="text-anchor: end">+20</text>
+<text class="ax" x="-8" y="89.7" style="text-anchor: end">Even</text>
+<text class="ax" x="-8" y="146.9" style="text-anchor: end">−20</text>
+<text class="ax" x="-8" y="204" style="text-anchor: end">−40</text>
+<path style="fill: #B9463F; opacity: 0.14" d="M11.6 0L37.4 16.9L62.3 43.4L88.0 66.0L113.7 59.4L138.6 82.6L164.4 40.6L189.3 72.0L215.0 112.0L240.7 115.1L264.0 123.4L289.7 120.6L314.6 132.3L340.3 133.4L365.3 123.7L391.0 136.9L416.7 140.3L416.7 165.4L391.0 151.1L365.3 138.6L340.3 151.7L314.6 144.9L289.7 134.9L264.0 138.9L240.7 132.9L215.0 135.4L189.3 104.6L164.4 92.6L138.6 96.3L113.7 104.0L88.0 90.6L62.3 86.3L37.4 57.4L11.6 72.0Z"></path>
+<path style="fill: #356697; opacity: 0.14" d="M62.3 59.1L88.0 62.6L113.7 84.0L138.6 113.7L164.4 112.6L189.3 96.3L215.0 132.0L232.4 159.7L232.4 191.1L215.0 165.1L189.3 119.7L164.4 157.1L138.6 154.9L113.7 141.1L88.0 111.7L62.3 112.3Z"></path>
+<path style="fill: #356697; opacity: 0.14" d="M244.9 72.3L264.0 76.9L289.7 72.6L314.6 83.7L340.3 88.9L365.3 97.4L391.0 96.0L416.7 84.9L416.7 120.9L391.0 121.1L365.3 134.6L340.3 116.9L314.6 103.1L289.7 105.1L264.0 91.7L244.9 92.3Z"></path>
+<path style="fill: #DD9231; opacity: 0.16" d="M240.7 42.9L264.0 54.0L314.6 47.1L340.3 77.1L365.3 72.0L391.0 72.6L416.7 88.6L416.7 122.9L391.0 96.6L365.3 94.9L340.3 111.4L314.6 78.6L264.0 88.9L240.7 77.1Z"></path>
+<path class="ln" style="stroke: #356697" d="M62.3 85.7L88.0 87.1L113.7 112.6L138.6 134.3L164.4 134.9L189.3 108.0L215.0 148.6L232.4 175.4"></path>
+<path class="ln" style="stroke: #356697" d="M244.9 82.3L264.0 84.3L289.7 88.9L314.6 93.4L340.3 102.9L365.3 116.0L391.0 108.6L416.7 102.9"></path>
+<path class="ln" style="stroke: #DD9231" d="M240.7 60.0L264.0 71.4L314.6 62.9L340.3 94.3L365.3 83.4L391.0 84.6L416.7 105.7"></path>
+<path class="ln" style="stroke: #B9463F" d="M11.6 35.7L37.4 37.1L62.3 64.9L88.0 78.3L113.7 81.7L138.6 89.4L164.4 66.6L189.3 88.3L215.0 123.7L240.7 124.0L264.0 131.1L289.7 127.7L314.6 138.6L340.3 142.6L365.3 131.1L391.0 144.0L416.7 152.9"></path>
+<path d="M416.7 0V200" style="stroke: #2B2521; stroke-width: 1; fill: none; opacity: 0.6"></path>
+<circle cx="416.7" cy="152.9" r="5" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="416.7" cy="102.9" r="5" style="fill: #356697; stroke: #FAF9F6; stroke-width: 2"></circle>
+<circle cx="416.7" cy="105.7" r="5" style="fill: #DD9231; stroke: #FAF9F6; stroke-width: 2"></circle>
+<rect class="tipsh" x="196" y="8.5" width="208" height="102" rx="10"></rect>
+<rect class="tipbox" x="194" y="6" width="208" height="102" rx="10" style="fill-opacity: 0.92"></rect>
+<text class="tt" x="205" y="26">September 2026</text>
+<rect x="205" y="38.5" width="9" height="9" rx="2" style="fill: #B9463F"></rect>
+<text class="tl" x="221" y="47">Albanese</text>
+<text class="tv num" x="391" y="47" style="text-anchor: end">−23.5</text>
+<rect x="205" y="54.5" width="9" height="9" rx="2" style="fill: #356697"></rect>
+<text class="tl" x="221" y="63">Taylor</text>
+<text class="tv num" x="391" y="63" style="text-anchor: end">−6.0</text>
+<rect x="205" y="70.5" width="9" height="9" rx="2" style="fill: #DD9231"></rect>
+<text class="tl" x="221" y="79">Hanson</text>
+<text class="tv num" x="391" y="79" style="text-anchor: end">−7.0</text>
+<text class="ts num" x="205" y="98">95% ranges ±4.4, ±6.3, ±6.0</text>
+<path class="base" d="M50.6 200V206M127 200V206M203.4 200V206M278.1 200V206M353.6 200V206"></path>
+<text class="ax" x="50.6" y="222" style="text-anchor: middle">Jul 2025</text>
+<text class="ax" x="127" y="222" style="text-anchor: middle">Oct</text>
+<text class="ax" x="203.4" y="222" style="text-anchor: middle">Jan 2026</text>
+<text class="ax" x="278.1" y="222" style="text-anchor: middle">Apr</text>
+<text class="ax" x="353.6" y="222" style="text-anchor: middle">Jul</text>
+</g>
+</svg>
+
+<span style="margin-top: 36px; font-size: 15px; font-weight: 600">4 · Copy and expand buttons</span>
+<span style="margin-top: 4px; font-size: 13px; color: #6B6862">44-pixel targets with an accessible name that says which chart they act on.</span>
+<div style="margin-top: 16px; display: flex; align-items: flex-start; gap: 48px">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; color: #6B6862">
+<button class="copy" aria-label="Copy chart: example, default state" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+<span>Copy: default</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; color: #6B6862">
+<button class="copy" aria-label="Copy chart: example, hover state" title="Copy chart" style="background: #EFEDE8; color: #171717"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+<span>Hover</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; color: #6B6862">
+<button class="copy" aria-label="Copy chart: example, keyboard focus state" title="Copy chart" style="outline: 2px solid #171717; outline-offset: 2px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+<span>Keyboard focus</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; color: #6B6862">
+<button class="copy" aria-label="Expand chart: example, default state" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button>
+<span>Expand: default</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; color: #6B6862">
+<button class="copy" aria-label="Expand chart: example, hover state" title="Expand" style="background: #EFEDE8; color: #171717"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button>
+<span>Hover</span>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1540}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

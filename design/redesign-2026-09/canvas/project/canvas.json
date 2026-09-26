@@ -1,0 +1,372 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "DarkMode.dc.html": {
+      "h": 2300,
+      "title": "Dark mode — variables and components",
+      "w": 1280,
+      "x": 0,
+      "y": 20320
+    },
+    "Demographics.dc.html": {
+      "h": 1300,
+      "title": "Who votes for whom — desktop",
+      "w": 1280,
+      "x": 0,
+      "y": 1860
+    },
+    "DemographicsGreens.dc.html": {
+      "h": 1320,
+      "title": "Who votes for whom — Age, Greens",
+      "w": 1280,
+      "x": 3190,
+      "y": 1860
+    },
+    "DemographicsMobile.dc.html": {
+      "h": 1840,
+      "title": "Who votes for whom — phone",
+      "w": 390,
+      "x": 1360,
+      "y": 1860
+    },
+    "DemographicsPlace.dc.html": {
+      "h": 1540,
+      "title": "Who votes for whom — Place, One Nation",
+      "w": 1280,
+      "x": 1830,
+      "y": 1860
+    },
+    "Interaction.dc.html": {
+      "h": 1540,
+      "title": "Interaction states — hover, tap, buttons",
+      "w": 1280,
+      "x": 1830,
+      "y": 0
+    },
+    "Leadership.dc.html": {
+      "h": 1240,
+      "title": "Leadership — desktop",
+      "w": 1280,
+      "x": 0,
+      "y": 8420
+    },
+    "LeadershipBoth.dc.html": {
+      "h": 1600,
+      "title": "Leadership — Both + Both",
+      "w": 1280,
+      "x": 3190,
+      "y": 8420
+    },
+    "LeadershipMobile.dc.html": {
+      "h": 1960,
+      "title": "Leadership — phone",
+      "w": 390,
+      "x": 1360,
+      "y": 8420
+    },
+    "LeadershipTablet.dc.html": {
+      "h": 1920,
+      "title": "Leadership — tablet (768)",
+      "w": 768,
+      "x": 4550,
+      "y": 8420
+    },
+    "LeadershipThreeWay.dc.html": {
+      "h": 1240,
+      "title": "Leadership — Three-way + Favourability",
+      "w": 1280,
+      "x": 1830,
+      "y": 8420
+    },
+    "Main.dc.html": {
+      "h": 1020,
+      "title": "Primary vote — desktop",
+      "w": 1280,
+      "x": 0,
+      "y": 0
+    },
+    "Mobile.dc.html": {
+      "h": 1320,
+      "title": "Primary vote — phone",
+      "w": 390,
+      "x": 1360,
+      "y": 0
+    },
+    "Switching.dc.html": {
+      "h": 1320,
+      "title": "Where One Nation’s voters came from — desktop",
+      "w": 1280,
+      "x": 0,
+      "y": 4020
+    },
+    "SwitchingMobile.dc.html": {
+      "h": 1960,
+      "title": "Where One Nation’s voters came from — phone",
+      "w": 390,
+      "x": 1360,
+      "y": 4020
+    },
+    "Undecided.dc.html": {
+      "h": 1300,
+      "title": "Undecided — desktop",
+      "w": 1280,
+      "x": 0,
+      "y": 6300
+    },
+    "UndecidedAge.dc.html": {
+      "h": 1220,
+      "title": "Undecided — By age",
+      "w": 1280,
+      "x": 3190,
+      "y": 6300
+    },
+    "UndecidedMobile.dc.html": {
+      "h": 1800,
+      "title": "Undecided — phone",
+      "w": 390,
+      "x": 1360,
+      "y": 6300
+    },
+    "UndecidedParty.dc.html": {
+      "h": 1220,
+      "title": "Undecided — By party",
+      "w": 1280,
+      "x": 1830,
+      "y": 6300
+    },
+    "TPP.dc.html": {
+      "x": 0,
+      "y": 10700,
+      "w": 1280,
+      "h": 1340,
+      "title": "Two-party preferred — desktop"
+    },
+    "TPPMobile.dc.html": {
+      "x": 1360,
+      "y": 10700,
+      "w": 390,
+      "h": 1460,
+      "title": "Two-party preferred — phone"
+    },
+    "TPPViews.dc.html": {
+      "x": 1830,
+      "y": 10700,
+      "w": 1280,
+      "h": 3160,
+      "title": "Two-party preferred — compare on, the ‘?’ opened, published figures, v Coalition"
+    },
+    "Issues.dc.html": {
+      "x": 0,
+      "y": 14220,
+      "w": 1280,
+      "h": 1280,
+      "title": "The issues — desktop, Who’s trusted"
+    },
+    "IssuesMobile.dc.html": {
+      "x": 1360,
+      "y": 14220,
+      "w": 390,
+      "h": 2080,
+      "title": "The issues — phone, Who’s trusted"
+    },
+    "IssuesWhom.dc.html": {
+      "x": 1830,
+      "y": 14220,
+      "w": 1280,
+      "h": 1220,
+      "title": "The issues — What matters to whom (by vote)"
+    },
+    "IssuesWhomMobile.dc.html": {
+      "x": 3190,
+      "y": 14220,
+      "w": 390,
+      "h": 1320,
+      "title": "The issues — What matters to whom, phone"
+    },
+    "Direction.dc.html": {
+      "x": 0,
+      "y": 16660,
+      "w": 1280,
+      "h": 1180,
+      "title": "National direction — desktop"
+    },
+    "DirectionMobile.dc.html": {
+      "x": 1360,
+      "y": 16660,
+      "w": 390,
+      "h": 1300,
+      "title": "National direction — phone"
+    },
+    "Masthead.dc.html": {
+      "x": 0,
+      "y": -1180,
+      "w": 1280,
+      "h": 820,
+      "title": "Masthead — desktop, top of page and pinned bar"
+    },
+    "MastheadMobile.dc.html": {
+      "x": 1360,
+      "y": -1180,
+      "w": 390,
+      "h": 760,
+      "title": "Masthead — phone"
+    },
+    "Polls.dc.html": {
+      "x": 0,
+      "y": 18320,
+      "w": 1280,
+      "h": 1000,
+      "title": "Latest and next polls — desktop"
+    },
+    "PollsMobile.dc.html": {
+      "x": 1360,
+      "y": 18320,
+      "w": 390,
+      "h": 1640,
+      "title": "Latest and next polls — phone"
+    },
+    "PollsViews.dc.html": {
+      "x": 1830,
+      "y": 18320,
+      "w": 1280,
+      "h": 1540,
+      "title": "Latest and next polls — row opened, Primary"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-26T00:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "t1": {
+      "kind": "title1",
+      "maxW": 3110,
+      "text": "Primary vote",
+      "w": 240,
+      "x": 0,
+      "y": -260
+    },
+    "t2": {
+      "kind": "title1",
+      "maxW": 4470,
+      "text": "Who votes for whom",
+      "w": 240,
+      "x": 0,
+      "y": 1600
+    },
+    "t3": {
+      "kind": "title1",
+      "maxW": 1750,
+      "text": "Where One Nation’s voters came from",
+      "w": 240,
+      "x": 0,
+      "y": 3760
+    },
+    "t4": {
+      "kind": "title1",
+      "maxW": 4470,
+      "text": "Undecided",
+      "w": 240,
+      "x": 0,
+      "y": 6040
+    },
+    "t5": {
+      "kind": "title1",
+      "maxW": 5318,
+      "text": "Leadership",
+      "w": 240,
+      "x": 0,
+      "y": 8160
+    },
+    "t6": {
+      "kind": "title1",
+      "maxW": 1280,
+      "text": "Dark mode",
+      "w": 240,
+      "x": 0,
+      "y": 20060
+    },
+    "t7": {
+      "kind": "title1",
+      "maxW": 3110,
+      "text": "Two-party preferred",
+      "w": 240,
+      "x": 0,
+      "y": 10440
+    },
+    "t8": {
+      "kind": "title1",
+      "maxW": 3580,
+      "text": "The issues",
+      "w": 240,
+      "x": 0,
+      "y": 13960
+    },
+    "t9": {
+      "kind": "title1",
+      "maxW": 1750,
+      "text": "National direction",
+      "w": 240,
+      "x": 0,
+      "y": 16400
+    },
+    "t10": {
+      "kind": "title1",
+      "maxW": 1750,
+      "text": "Masthead",
+      "w": 240,
+      "x": 0,
+      "y": -1440
+    },
+    "t11": {
+      "kind": "title1",
+      "maxW": 3110,
+      "text": "Latest and next polls",
+      "w": 240,
+      "x": 0,
+      "y": 18060
+    }
+  },
+  "order": [
+    "Masthead.dc.html",
+    "MastheadMobile.dc.html",
+    "Main.dc.html",
+    "Mobile.dc.html",
+    "Interaction.dc.html",
+    "Demographics.dc.html",
+    "DemographicsMobile.dc.html",
+    "DemographicsPlace.dc.html",
+    "DemographicsGreens.dc.html",
+    "Switching.dc.html",
+    "SwitchingMobile.dc.html",
+    "Undecided.dc.html",
+    "UndecidedMobile.dc.html",
+    "UndecidedParty.dc.html",
+    "UndecidedAge.dc.html",
+    "Leadership.dc.html",
+    "LeadershipMobile.dc.html",
+    "LeadershipThreeWay.dc.html",
+    "LeadershipBoth.dc.html",
+    "LeadershipTablet.dc.html",
+    "TPP.dc.html",
+    "TPPMobile.dc.html",
+    "TPPViews.dc.html",
+    "Issues.dc.html",
+    "IssuesMobile.dc.html",
+    "IssuesWhom.dc.html",
+    "IssuesWhomMobile.dc.html",
+    "Direction.dc.html",
+    "DirectionMobile.dc.html",
+    "Polls.dc.html",
+    "PollsMobile.dc.html",
+    "PollsViews.dc.html",
+    "DarkMode.dc.html"
+  ],
+  "pages": [],
+  "title": "Primary vote chart redesign"
+}

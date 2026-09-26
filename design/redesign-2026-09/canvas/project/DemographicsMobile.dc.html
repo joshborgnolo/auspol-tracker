@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Who votes for whom — phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+a{color:#171717}a:hover{color:#9E5200}
+button{font:inherit;cursor:pointer}
+.num{font-variant-numeric:tabular-nums}
+svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.grid{stroke:#E6E4DF;stroke-width:1;fill:none}
+.base{stroke:#9A968E;stroke-width:1;fill:none}
+.ax{font-size:11px;fill:#6B6862}
+.rowl{font-size:15px;fill:#171717}
+.sec{font-size:13px;font-weight:600;fill:#171717}
+.secs{font-size:12px;fill:#6B6862}
+.wh{stroke:#CC7C37;stroke-width:2;stroke-linecap:round;fill:none}
+.pt{fill:#CC7C37;stroke:#FAF9F6;stroke-width:2}
+.pto{fill:#FAF9F6;stroke:#CC7C37;stroke-width:2}
+.v{font-size:15px;font-weight:600;fill:#171717}
+.e{font-size:13px;fill:#6B6862}
+.d{font-size:13px;font-weight:600;fill:#9E5200}
+.all{stroke:#171717;stroke-width:1.5;stroke-dasharray:4 3;fill:none}
+.ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.lbl{font-size:11px;font-weight:600}
+.copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.copy:hover{background:#EFEDE8;color:#171717}
+.copy:focus-visible{outline:2px solid #171717;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 1840px; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; background: #FAF9F6">
+
+<div style="display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #6B6862">
+<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Who votes for whom</span>
+<span>Last six weeks of YouGov, DemosAU, Resolve and RedBridge polls</span>
+</div>
+<h1 style="margin: 14px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 32px; line-height: 1.1; letter-spacing: -0.01em">One Nation’s vote climbs with age</h1>
+<p style="margin: 10px 0 0; font-size: 16px; line-height: 1.5; color: #3D3B37">About one in three over-55s back One Nation, against one in six 18–34s. Gen Z is the outlier, at about one in nine.</p>
+
+<div role="group" aria-label="Break down by" style="margin-top: 20px; display: flex; border-bottom: 1px solid #DDDCD8">
+<button aria-pressed="true" style="min-height: 44px; padding: 0 10px; border: 0; border-bottom: 2px solid #171717; margin-bottom: -1px; background: transparent; font-size: 15px; font-weight: 600; color: #171717">Age</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Gender</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Education</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Place</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 10px; border: 0; background: transparent; font-size: 15px; color: #6B6862">Home</button>
+</div>
+<div role="group" aria-label="Party" style="margin-top: 12px; display: flex; gap: 6px">
+<button aria-pressed="true" style="min-height: 44px; padding: 0 12px; border: 1px solid #CC7C37; border-radius: 22px; background: #F7E9DA; font-size: 13px; font-weight: 600; color: #7A3F00; display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 4px; background: #CC7C37"></span>One Nation</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 12px; border: 1px solid #DDDCD8; border-radius: 22px; background: transparent; font-size: 13px; color: #3D3B37; display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 4px; background: #B9463F"></span>Labor</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 12px; border: 1px solid #DDDCD8; border-radius: 22px; background: transparent; font-size: 13px; color: #3D3B37; display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 4px; background: #356697"></span>Coalition</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 12px; border: 1px solid #DDDCD8; border-radius: 22px; background: transparent; font-size: 13px; color: #3D3B37; display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 4px; background: #439458"></span>Greens</button>
+</div>
+
+<svg viewBox="0 0 350 500" width="350" height="500" role="img" aria-label="One Nation's share by age and generation, with 90% ranges, against 27.3% among all voters." style="margin-top: 24px; display: block; overflow: visible">
+<path class="grid" d="M0 52V76M87.5 52V76M175 52V76M262.5 52V76M350 52V76M0 108V132M87.5 108V132M175 108V132M262.5 108V132M350 108V132M0 164V188M87.5 164V188M175 164V188M262.5 164V188M350 164V188M0 258V282M87.5 258V282M175 258V282M262.5 258V282M350 258V282M0 314V338M87.5 314V338M175 314V338M262.5 314V338M350 314V338M0 370V394M87.5 370V394M175 370V394M262.5 370V394M350 370V394M0 426V456M87.5 426V456M175 426V456M262.5 426V456M350 426V456"></path>
+<path class="all" d="M238.9 52V76M238.9 108V132M238.9 164V188M238.9 258V282M238.9 314V338M238.9 370V394M238.9 426V456"></path>
+
+<text x="0" y="14"><tspan class="sec">By age</tspan><tspan class="secs" dx="6">Resolve, DemosAU, YouGov</tspan></text>
+
+<text class="rowl" x="0" y="48">18–34</text>
+<text x="350" y="48" style="text-anchor: end"><tspan class="v num">17.1%</tspan><tspan class="e num" dx="5">±2.0</tspan><tspan class="d num" dx="8">−10.2</tspan></text>
+<path class="wh" d="M132.1 64H167.1M132.1 59V69M167.1 59V69"></path>
+<circle class="pt" cx="149.6" cy="64" r="6"></circle>
+
+<text class="rowl" x="0" y="104">35–54</text>
+<text x="350" y="104" style="text-anchor: end"><tspan class="v num">26.0%</tspan><tspan class="e num" dx="5">±3.4</tspan><tspan class="e num" dx="8">−1.3</tspan></text>
+<path class="wh" d="M197.8 120H257.3M197.8 115V125M257.3 115V125"></path>
+<circle class="pto" cx="227.5" cy="120" r="5"></circle>
+
+<text class="rowl" x="0" y="160">55+</text>
+<text x="350" y="160" style="text-anchor: end"><tspan class="v num">34.0%</tspan><tspan class="e num" dx="5">±3.3</tspan><tspan class="d num" dx="8">+6.7</tspan></text>
+<path class="wh" d="M268.6 176H326.4M268.6 171V181M326.4 171V181"></path>
+<circle class="pt" cx="297.5" cy="176" r="6"></circle>
+
+<path d="M0 200H350" style="stroke: #DDDCD8; stroke-width: 1"></path>
+<text x="0" y="224"><tspan class="sec">By generation</tspan><tspan class="secs" dx="6">YouGov, RedBridge</tspan></text>
+
+<text class="rowl" x="0" y="254">Gen Z</text>
+<text x="350" y="254" style="text-anchor: end"><tspan class="v num">11.1%</tspan><tspan class="e num" dx="5">±4.1</tspan><tspan class="d num" dx="8">−16.2</tspan></text>
+<path class="wh" d="M61.3 270H133M61.3 265V275M133 265V275"></path>
+<circle class="pt" cx="97.1" cy="270" r="6"></circle>
+
+<text class="rowl" x="0" y="310">Millennials</text>
+<text x="350" y="310" style="text-anchor: end"><tspan class="v num">27.4%</tspan><tspan class="e num" dx="5">±3.7</tspan><tspan class="e num" dx="8">+0.1</tspan></text>
+<path class="wh" d="M207.4 326H272.1M207.4 321V331M272.1 321V331"></path>
+<circle class="pto" cx="239.8" cy="326" r="5"></circle>
+
+<text class="rowl" x="0" y="366">Gen X</text>
+<text x="350" y="366" style="text-anchor: end"><tspan class="v num">33.5%</tspan><tspan class="e num" dx="5">±3.3</tspan><tspan class="d num" dx="8">+6.2</tspan></text>
+<path class="wh" d="M264.3 382H322M264.3 377V387M322 377V387"></path>
+<circle class="pt" cx="293.1" cy="382" r="6"></circle>
+
+<text class="rowl" x="0" y="422">Boomers</text>
+<text x="350" y="422" style="text-anchor: end"><tspan class="v num">30.4%</tspan><tspan class="e num" dx="5">±3.4</tspan><tspan class="e num" dx="8">+3.1</tspan></text>
+<path class="wh" d="M236.3 438H295.8M236.3 433V443M295.8 433V443"></path>
+<circle class="pto" cx="266" cy="438" r="5"></circle>
+
+<path class="base" d="M0 456H350"></path>
+<text class="ax" x="0" y="472">0%</text>
+<text class="ax" x="87.5" y="472" style="text-anchor: middle">10%</text>
+<text class="ax" x="175" y="472" style="text-anchor: middle">20%</text>
+<text class="ax" x="350" y="472" style="text-anchor: end">40%</text>
+<text class="ax" x="238.9" y="492" style="text-anchor: middle; font-weight: 600; fill: #171717">All voters 27.3%</text>
+</svg>
+
+<div style="margin-top: 14px; display: flex; flex-wrap: wrap; column-gap: 18px; row-gap: 8px; font-size: 12px; color: #4A4843">
+<span style="display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" style="fill: #CC7C37"></circle></svg>Clearly above or below all voters</span>
+<span style="display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style="fill: #FAF9F6; stroke: #CC7C37; stroke-width: 2"></circle></svg>Within the margin</span>
+<span style="display: flex; align-items: center; gap: 6px"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><path d="M2 7H22M2 3V11M22 3V11" style="stroke: #CC7C37; stroke-width: 2; stroke-linecap: round; fill: none"></path></svg>90% range</span>
+<span>Last figure: points vs all voters</span>
+<button class="copy" aria-label="Copy chart: One Nation’s share by group" title="Copy chart" style="margin-left: auto"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+
+<h2 style="margin: 36px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 24px; line-height: 1.15">The age gap has widened as One Nation has grown</h2>
+<p style="margin: 8px 0 0; font-size: 15px; line-height: 1.5; color: #3D3B37">Every group has risen roughly in step with all voters, so none has moved relative to the whole. In percentage points, though, the gap between over-55s and 18–34s has grown from about 3 points in July 2025 to about 17 now.</p>
+
+<svg viewBox="0 0 350 420" width="350" height="420" role="img" aria-label="One Nation's monthly share by age group since July 2025 and by generation since February 2026, on a shared time axis." style="margin-top: 20px; display: block; overflow: visible">
+<text x="0" y="10"><tspan class="sec">By age</tspan></text>
+<g transform="translate(28 26)">
+<path class="grid" d="M0 0H252M0 40H252M0 80H252M0 120H252"></path>
+<path class="base" d="M0 160H252"></path>
+<text class="ax" x="-6" y="4" style="text-anchor: end">40%</text>
+<text class="ax" x="-6" y="84" style="text-anchor: end">20%</text>
+<text class="ax" x="-6" y="164" style="text-anchor: end">0</text>
+<path class="all" d="M0 128.0L18 124.0L36 115.2L54 108.8L72 95.6L90 91.6L108 74.0L126 59.6L144 60.8L162 62.4L180 56.4L198 44.0L216 53.2L234 56.8L252 51.6"></path>
+<path class="ln" style="stroke: #CC7C37" d="M0 138.0L18 136.4L36 120.8L54 122.0L72 115.6L90 113.6L108 112.0L126 108.0L144 97.6L162 91.6L180 96.4L198 85.2L216 88.0L234 99.6L252 94.4"></path>
+<path class="ln" style="stroke: #9E5200" d="M0 126.0L18 119.6L36 112.0L54 106.0L72 84.4L90 95.6L108 62.4L126 63.6L144 60.8L162 68.4L180 50.8L198 47.2L216 50.0L234 49.6L252 53.2"></path>
+<path class="ln" style="stroke: #5E3000" d="M0 125.6L18 114.8L36 113.6L54 100.0L72 86.4L90 74.0L108 57.6L126 32.4L144 44.4L162 36.4L180 33.6L198 16.0L216 33.6L234 34.4L252 26.0"></path>
+<text class="lbl" x="258" y="29" style="fill: #5E3000">55+</text>
+<text class="lbl" x="258" y="47" style="fill: #171717; font-weight: 500">All voters</text>
+<text class="lbl" x="258" y="62" style="fill: #9E5200">35–54</text>
+<text class="lbl" x="258" y="98" style="fill: #B06418">18–34</text>
+<path class="base" d="M0 160V165M36 160V165M72 160V165M108 160V165M144 160V165M180 160V165M216 160V165M252 160V165"></path>
+<text class="ax" x="0" y="180" style="text-anchor: middle">Jul ’25</text>
+<text class="ax" x="72" y="180" style="text-anchor: middle">Nov</text>
+<text class="ax" x="144" y="180" style="text-anchor: middle">Mar ’26</text>
+<text class="ax" x="216" y="180" style="text-anchor: middle">Jul</text>
+</g>
+
+<text x="0" y="226"><tspan class="sec">By generation</tspan></text>
+<g transform="translate(28 242)">
+<path class="grid" d="M126 0H252M126 40H252M126 80H252M126 120H252"></path>
+<path class="base" d="M0 160H252"></path>
+<text class="ax" x="-6" y="4" style="text-anchor: end">40%</text>
+<text class="ax" x="-6" y="84" style="text-anchor: end">20%</text>
+<text class="ax" x="-6" y="164" style="text-anchor: end">0</text>
+<text class="ax" x="4" y="84" style="font-style: italic">Series starts Feb 2026</text>
+<path class="all" d="M126 59.6L144 60.8L162 62.4L180 56.4L198 44.0L216 53.2L234 56.8L252 51.6"></path>
+<path class="ln" style="stroke: #CC7C37" d="M126 123.6L144 128.8L162 115.6L180 123.2L198 110.8L216 101.2L234 114.0L252 125.6"></path>
+<path class="ln" style="stroke: #A8631C" d="M126 55.6L144 48.8L162 66.4L180 65.6L198 53.2L216 56.0L234 58.0L252 57.6"></path>
+<path class="ln" style="stroke: #7A4210" d="M126 31.6L144 40.8L162 34.4L180 24.4L198 8.0L216 41.2L234 31.6L252 27.6"></path>
+<path class="ln" style="stroke: #4E2800" d="M126 39.6L144 48.8L162 49.2L180 37.6L198 22.8L216 34.4L234 40.8L252 33.6"></path>
+<text class="lbl" x="258" y="25" style="fill: #7A4210">Gen X</text>
+<text class="lbl" x="258" y="38" style="fill: #4E2800">Boomers</text>
+<text class="lbl" x="258" y="51" style="fill: #171717; font-weight: 500">All</text>
+<text class="lbl" x="258" y="64" style="fill: #A8631C">Millennials</text>
+<text class="lbl" x="258" y="129" style="fill: #B06418">Gen Z</text>
+<path class="base" d="M0 160V165M36 160V165M72 160V165M108 160V165M144 160V165M180 160V165M216 160V165M252 160V165"></path>
+<text class="ax" x="0" y="180" style="text-anchor: middle">Jul ’25</text>
+<text class="ax" x="72" y="180" style="text-anchor: middle">Nov</text>
+<text class="ax" x="144" y="180" style="text-anchor: middle">Mar ’26</text>
+<text class="ax" x="216" y="180" style="text-anchor: middle">Jul</text>
+</g>
+</svg>
+
+<p style="margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: #6B6862">Lines are monthly averages; the dashed line is all voters. Both panels share one time axis.</p>
+<div style="margin-top: 8px; display: flex; align-items: center">
+<a href="#method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500">How it’s built</a>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Copy chart: One Nation’s share over time" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1840}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

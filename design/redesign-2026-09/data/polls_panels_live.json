@@ -1,0 +1,1767 @@
+{
+ "np": {
+  "rows": [
+   {
+    "pollster": "RedBridge/Accent",
+    "last": "2026-08-30",
+    "cadence": 28,
+    "loose": false,
+    "spread": 1,
+    "spreadEarly": 0,
+    "spreadLate": 0,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": 1080,
+    "releaseTo": 1200,
+    "releaseMid": 1080,
+    "releaseTimed": 12,
+    "releaseVals": [
+     1080,
+     1200
+    ],
+    "releaseMins": 1080,
+    "releaseDow": 0,
+    "releaseDowN": 10,
+    "declared": [
+     "month-end rhythm"
+    ],
+    "monthEnd": true,
+    "monthEndKept": 7,
+    "monthEndN": 8,
+    "waves": 15,
+    "site": "https://www.afr.com/topic/redbridge-accent-poll-6ikd",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [
+     {
+      "field": "2026-04-30",
+      "pub": "2026-05-03",
+      "mins": 1080,
+      "url": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
+      "since": "2026-03-29",
+      "gap": 35
+     },
+     {
+      "field": "2026-05-28",
+      "pub": "2026-05-31",
+      "mins": 1080,
+      "url": "https://www.afr.com/politics/federal/one-nation-surges-ahead-of-labor-as-budget-flops-poll-20260531-p602d9",
+      "since": "2026-05-03",
+      "gap": 28
+     },
+     {
+      "field": "2026-06-26",
+      "pub": "2026-06-28",
+      "mins": 1080,
+      "url": "https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9",
+      "since": "2026-05-31",
+      "gap": 28
+     },
+     {
+      "field": "2026-07-30",
+      "pub": "2026-08-02",
+      "mins": 1080,
+      "url": "https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6",
+      "since": "2026-06-28",
+      "gap": 35
+     },
+     {
+      "field": "2026-08-28",
+      "pub": "2026-08-30",
+      "mins": 1080,
+      "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn",
+      "since": "2026-08-02",
+      "gap": 28
+     }
+    ],
+    "gapsUsed": 8,
+    "field": 1790467200000,
+    "release": 1790467200000,
+    "overdue": false,
+    "ahead": 0,
+    "winHalf": 0,
+    "slotEarly": 0,
+    "slotLate": 0,
+    "rolled": false,
+    "inDays": 1,
+    "opensIn": 1,
+    "closesIn": 1,
+    "missed": false
+   },
+   {
+    "pollster": "Roy Morgan",
+    "last": "2026-09-21",
+    "cadence": 7,
+    "loose": false,
+    "spread": 1,
+    "spreadEarly": 0,
+    "spreadLate": 0,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": 956,
+    "releaseTo": 996,
+    "releaseMid": 981,
+    "releaseTimed": 12,
+    "releaseVals": null,
+    "releaseMins": 981,
+    "releaseDow": 1,
+    "releaseDowN": 0,
+    "declared": [
+     "day"
+    ],
+    "waves": 47,
+    "site": "https://www.roymorgan.com/findings",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [
+     {
+      "field": "2026-08-23",
+      "pub": "2026-08-24",
+      "mins": 990,
+      "url": "https://www.roymorgan.com/findings/10321-federal-voting-intention-august-24-2026",
+      "since": "2026-08-17",
+      "gap": 7
+     },
+     {
+      "field": "2026-08-30",
+      "pub": "2026-08-31",
+      "mins": 1020,
+      "url": "https://www.roymorgan.com/findings/10328-federal-voting-intention-august-31-2026",
+      "since": "2026-08-24",
+      "gap": 7
+     },
+     {
+      "field": "2026-09-06",
+      "pub": "2026-09-07",
+      "mins": 990,
+      "url": "https://www.roymorgan.com/findings/10333-federal-voting-intention-september-7-2026",
+      "since": "2026-08-31",
+      "gap": 7
+     },
+     {
+      "field": "2026-09-13",
+      "pub": "2026-09-14",
+      "mins": 996,
+      "url": "https://www.roymorgan.com/findings/10343-federal-voting-intention-september-14-2026",
+      "since": "2026-09-07",
+      "gap": 7
+     },
+     {
+      "field": "2026-09-20",
+      "pub": "2026-09-21",
+      "mins": 956,
+      "url": "https://www.roymorgan.com/findings/10353-federal-voting-intention-september-21-2026",
+      "since": "2026-09-14",
+      "gap": 7
+     }
+    ],
+    "gapsUsed": 8,
+    "field": 1790553600000,
+    "release": 1790553600000,
+    "overdue": false,
+    "ahead": 0,
+    "winHalf": 0,
+    "slotEarly": 0,
+    "slotLate": 0,
+    "rolled": false,
+    "inDays": 2,
+    "opensIn": 2,
+    "closesIn": 2,
+    "missed": false
+   },
+   {
+    "pollster": "Essential",
+    "last": "2026-09-02",
+    "cadence": 31.5,
+    "loose": false,
+    "spread": 4,
+    "spreadEarly": 3.5,
+    "spreadLate": 3.5,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": 60,
+    "releaseTo": 276,
+    "releaseMid": 60,
+    "releaseTimed": 11,
+    "releaseVals": null,
+    "releaseMins": 60,
+    "releaseDow": 3,
+    "releaseDowN": 11,
+    "declared": [],
+    "waves": 12,
+    "site": "https://essentialreport.com.au/#latest-reports",
+    "skipped": [
+     "2026-08-26"
+    ],
+    "skippedMonths": [],
+    "recent": [
+     {
+      "field": "2026-04-27",
+      "pub": "2026-04-29",
+      "mins": 60,
+      "url": "https://www.theguardian.com/australia-news/2026/apr/28/pauline-hanson-one-nation-leadership-guardian-essential-poll-ntwnfb",
+      "since": "2026-03-25",
+      "gap": 35
+     },
+     {
+      "field": "2026-05-24",
+      "pub": "2026-05-27",
+      "mins": 60,
+      "url": "https://www.theguardian.com/australia-news/2026/may/27/guardian-essential-poll-labors-housing-and-tax-changes-fail-to-win-over-voters-as-support-for-one-nation-swells",
+      "since": "2026-04-29",
+      "gap": 28
+     },
+     {
+      "field": "2026-06-29",
+      "pub": "2026-07-01",
+      "mins": 276,
+      "url": "https://www.theguardian.com/australia-news/2026/jun/30/guardian-essential-poll-voters-reject-key-one-nation-policies-as-support-drops",
+      "since": "2026-05-27",
+      "gap": 35
+     },
+     {
+      "field": "2026-07-27",
+      "pub": "2026-07-29",
+      "mins": 60,
+      "url": "https://www.theguardian.com/australia-news/2026/jul/29/guardian-essential-poll-angus-taylors-approval-rating-crashes-and-one-nation-support-plateaus",
+      "since": "2026-07-01",
+      "gap": 28
+     },
+     {
+      "field": "2026-08-31",
+      "pub": "2026-09-02",
+      "mins": 60,
+      "url": "https://www.theguardian.com/australia-news/2026/sep/02/guardian-essential-poll-one-nation-popularity-slips-albanese-records-lowest-approval-as-prime-minister-ntwnfb",
+      "since": "2026-07-29",
+      "gap": 35
+     }
+    ],
+    "gapsUsed": 8,
+    "field": 1791028800000,
+    "release": 1790726400000,
+    "overdue": false,
+    "ahead": 0,
+    "winHalf": 7,
+    "slotEarly": 0,
+    "slotLate": 7,
+    "rolled": false,
+    "inDays": 4,
+    "opensIn": -3,
+    "closesIn": 11,
+    "missed": false
+   },
+   {
+    "pollster": "Roy Morgan",
+    "last": "2026-09-21",
+    "cadence": 7,
+    "loose": false,
+    "spread": 1,
+    "spreadEarly": 0,
+    "spreadLate": 0,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": 956,
+    "releaseTo": 996,
+    "releaseMid": 981,
+    "releaseTimed": 12,
+    "releaseVals": null,
+    "releaseMins": 981,
+    "releaseDow": 1,
+    "releaseDowN": 0,
+    "declared": [
+     "day"
+    ],
+    "waves": 47,
+    "site": "https://www.roymorgan.com/findings",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [
+     {
+      "field": "2026-08-23",
+      "pub": "2026-08-24",
+      "mins": 990,
+      "url": "https://www.roymorgan.com/findings/10321-federal-voting-intention-august-24-2026",
+      "since": "2026-08-17",
+      "gap": 7
+     },
+     {
+      "field": "2026-08-30",
+      "pub": "2026-08-31",
+      "mins": 1020,
+      "url": "https://www.roymorgan.com/findings/10328-federal-voting-intention-august-31-2026",
+      "since": "2026-08-24",
+      "gap": 7
+     },
+     {
+      "field": "2026-09-06",
+      "pub": "2026-09-07",
+      "mins": 990,
+      "url": "https://www.roymorgan.com/findings/10333-federal-voting-intention-september-7-2026",
+      "since": "2026-08-31",
+      "gap": 7
+     },
+     {
+      "field": "2026-09-13",
+      "pub": "2026-09-14",
+      "mins": 996,
+      "url": "https://www.roymorgan.com/findings/10343-federal-voting-intention-september-14-2026",
+      "since": "2026-09-07",
+      "gap": 7
+     },
+     {
+      "field": "2026-09-20",
+      "pub": "2026-09-21",
+      "mins": 956,
+      "url": "https://www.roymorgan.com/findings/10353-federal-voting-intention-september-21-2026",
+      "since": "2026-09-14",
+      "gap": 7
+     }
+    ],
+    "gapsUsed": 8,
+    "field": 1791158400000,
+    "release": 1791158400000,
+    "overdue": false,
+    "ahead": 1,
+    "winHalf": 0,
+    "slotEarly": 0,
+    "slotLate": 0,
+    "rolled": false,
+    "inDays": 9,
+    "opensIn": 9,
+    "closesIn": 9,
+    "missed": false
+   },
+   {
+    "pollster": "YouGov",
+    "last": "2026-09-23",
+    "cadence": 14,
+    "loose": false,
+    "spread": 1,
+    "spreadEarly": 0,
+    "spreadLate": 0,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": 300,
+    "releaseTo": 360,
+    "releaseMid": 300,
+    "releaseTimed": 12,
+    "releaseVals": [
+     300,
+     360
+    ],
+    "releaseMins": 300,
+    "releaseDow": 3,
+    "releaseDowN": 12,
+    "declared": [],
+    "waves": 23,
+    "site": "https://www.news24.com.au/politics/australian-politics",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [
+     {
+      "field": "2026-07-28",
+      "pub": "2026-07-29",
+      "mins": 300,
+      "url": "https://www.news24.com.au/politics/australian-politics/labor-on-lowest-majoritywinning-vote-since-federation-as-voters-turn-on-major-parties-news24-pulse/news-story/30abb89ce081815670d1a05c4517f90e",
+      "since": "2026-07-15",
+      "gap": 14
+     },
+     {
+      "field": "2026-08-10",
+      "pub": "2026-08-12",
+      "mins": 300,
+      "url": "https://www.news24.com.au/politics/australian-politics/coalition-and-one-nation-face-vote-consolidation-battle-to-oust-albanese-as-formal-alliance-ruled-out/news-story/647c039e1efc5027e63a509879724195",
+      "since": "2026-07-29",
+      "gap": 14
+     },
+     {
+      "field": "2026-08-24",
+      "pub": "2026-08-26",
+      "mins": 300,
+      "url": "https://www.news24.com.au/politics/australian-politics/one-nation-trails-labor-by-three-points-following-a-difficult-parliamentary-fortnight-for-albanese/news-story/d04bde51f5545775296ce13f7e15515e",
+      "since": "2026-08-12",
+      "gap": 14
+     },
+     {
+      "field": "2026-09-08",
+      "pub": "2026-09-09",
+      "mins": 300,
+      "url": "https://www.news24.com.au/politics/australian-politics/pauline-hansons-one-nation-surges-to-top-of-pulse-as-labor-plunges-to-record-low/news-story/334ce8596f4b51edb853c103514385a0",
+      "since": "2026-08-26",
+      "gap": 14
+     },
+     {
+      "field": "2026-09-21",
+      "pub": "2026-09-23",
+      "mins": 300,
+      "url": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209",
+      "since": "2026-09-09",
+      "gap": 14
+     }
+    ],
+    "gapsUsed": 8,
+    "field": 1791331200000,
+    "release": 1791331200000,
+    "overdue": false,
+    "ahead": 0,
+    "winHalf": 0,
+    "slotEarly": 0,
+    "slotLate": 0,
+    "rolled": false,
+    "inDays": 11,
+    "opensIn": 11,
+    "closesIn": 11,
+    "missed": false
+   },
+   {
+    "pollster": "DemosAU",
+    "last": "2026-09-17",
+    "cadence": 29,
+    "loose": true,
+    "spread": 9,
+    "spreadEarly": 11,
+    "spreadLate": 13,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": 300,
+    "releaseTo": 744,
+    "releaseMid": 517,
+    "releaseTimed": 10,
+    "releaseVals": null,
+    "releaseMins": 517,
+    "releaseDow": null,
+    "releaseDowN": 0,
+    "declared": [
+     "calendar-month rhythm"
+    ],
+    "calMonth": true,
+    "calDays": [
+     9,
+     27
+    ],
+    "waves": 10,
+    "site": "https://demosau.com/methodology-statements/",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [
+     {
+      "field": "2026-05-20",
+      "pub": "2026-05-22",
+      "mins": 300,
+      "url": "https://www.capitalbrief.com/article/labors-budget-backlash-begins-as-one-nation-continues-its-rise-f730690e-86cf-4231-8d1f-f6bf23d1d8a0/",
+      "since": "2026-04-17",
+      "gap": 35
+     },
+     {
+      "field": "2026-06-18",
+      "pub": "2026-06-22",
+      "mins": 530,
+      "url": "https://demosau.com/news/one-nation-lead-grows-as-l-np-primary-sinks-to-18/",
+      "since": "2026-05-22",
+      "gap": 31
+     },
+     {
+      "field": "2026-07-08",
+      "pub": "2026-07-13",
+      "mins": 524,
+      "url": "https://www.capitalbrief.com/newsletter/pauline-hansons-agenda-takes-a-hit-in-new-poll-701d8498-f9f1-43f6-ab7c-dd8d236dfa78/",
+      "since": "2026-06-22",
+      "gap": 21
+     },
+     {
+      "field": "2026-08-20",
+      "pub": "2026-08-24",
+      "mins": 531,
+      "url": "https://www.capitalbrief.com/newsletter/hanson-support-plunges-in-new-poll-7ec0e908-55c4-434a-bd91-97190dcf30ff/",
+      "since": "2026-07-13",
+      "gap": 42
+     },
+     {
+      "field": "2026-09-14",
+      "pub": "2026-09-17",
+      "mins": 510,
+      "url": "https://www.capitalbrief.com/newsletter/exclusive-poll-voters-back-social-media-reform-fbd908f1-a09e-4d1e-9713-9c8c02dd0d31/",
+      "since": "2026-08-24",
+      "gap": 24
+     }
+    ],
+    "gapsUsed": 8,
+    "field": 1791504000000,
+    "release": 1792281600000,
+    "missed": false,
+    "ahead": 0,
+    "overdue": false,
+    "winHalf": 9,
+    "inDays": 22,
+    "opensIn": 13,
+    "closesIn": 31
+   },
+   {
+    "pollster": "Newspoll",
+    "last": "2026-09-20",
+    "cadence": 21,
+    "loose": false,
+    "spread": 4,
+    "spreadEarly": 0,
+    "spreadLate": 7,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": 1140,
+    "releaseTo": 1260,
+    "releaseMid": 1200,
+    "releaseTimed": 12,
+    "releaseVals": null,
+    "releaseMins": 1200,
+    "releaseDow": 0,
+    "releaseDowN": 11,
+    "declared": [],
+    "waves": 18,
+    "site": "https://www.theaustralian.com.au/topics/newspoll?eafs_enabled=false",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [
+     {
+      "field": "2026-06-25",
+      "pub": "2026-06-28",
+      "mins": 1200,
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albanese-and-labor-bounce-back-after-budget-tax-backflips-take-primary-vote-lead-from-one-nation/news-story/3c57c1c54f74b697324f5b5917e74337",
+      "since": "2026-06-07",
+      "gap": 21
+     },
+     {
+      "field": "2026-07-16",
+      "pub": "2026-07-19",
+      "mins": 1200,
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hanson-regains-ground-and-liberals-rise-as-labor-falls-to-equal-lowest-point-since-2022/news-story/da8374ff67e3769478b13867909a1074",
+      "since": "2026-06-28",
+      "gap": 21
+     },
+     {
+      "field": "2026-08-07",
+      "pub": "2026-08-09",
+      "mins": 1200,
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albaneses-labor-hits-a-julia-gillardlevel-low-primary-vote-after-winter-break/news-story/ca81774a347a1fd299e48ce0361d1a8a",
+      "since": "2026-07-19",
+      "gap": 21
+     },
+     {
+      "field": "2026-08-28",
+      "pub": "2026-08-30",
+      "mins": 1200,
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b",
+      "since": "2026-08-09",
+      "gap": 21
+     },
+     {
+      "field": "2026-09-17",
+      "pub": "2026-09-20",
+      "mins": 1260,
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455",
+      "since": "2026-08-30",
+      "gap": 21
+     }
+    ],
+    "gapsUsed": 8,
+    "field": 1791676800000,
+    "release": 1791676800000,
+    "overdue": false,
+    "ahead": 0,
+    "winHalf": 7,
+    "slotEarly": 0,
+    "slotLate": 7,
+    "rolled": false,
+    "inDays": 15,
+    "opensIn": 8,
+    "closesIn": 22,
+    "missed": false
+   },
+   {
+    "pollster": "Resolve",
+    "last": "2026-09-13",
+    "cadence": 28,
+    "loose": false,
+    "spread": 4,
+    "spreadEarly": 0,
+    "spreadLate": 7,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": 1070,
+    "releaseTo": 1080,
+    "releaseMid": 1080,
+    "releaseTimed": 12,
+    "releaseVals": null,
+    "releaseMins": 1080,
+    "releaseDow": 0,
+    "releaseDowN": 11,
+    "declared": [],
+    "waves": 16,
+    "site": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [
+     {
+      "field": "2026-05-16",
+      "pub": "2026-05-17",
+      "mins": 1080,
+      "url": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
+      "since": "2026-04-19",
+      "gap": 28
+     },
+     {
+      "field": "2026-06-13",
+      "pub": "2026-06-14",
+      "mins": 1080,
+      "url": "https://www.smh.com.au/politics/federal/hanson-overtakes-albanese-as-preferred-pm-coalition-crashes-to-record-low-20260614-p606lg.html",
+      "since": "2026-05-17",
+      "gap": 28
+     },
+     {
+      "field": "2026-07-11",
+      "pub": "2026-07-12",
+      "mins": 1070,
+      "url": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
+      "since": "2026-06-14",
+      "gap": 28
+     },
+     {
+      "field": "2026-08-15",
+      "pub": "2026-08-16",
+      "mins": 1079,
+      "url": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+      "since": "2026-07-12",
+      "gap": 35
+     },
+     {
+      "field": "2026-09-12",
+      "pub": "2026-09-13",
+      "mins": 1080,
+      "url": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+      "since": "2026-08-16",
+      "gap": 28
+     }
+    ],
+    "gapsUsed": 8,
+    "field": 1791676800000,
+    "release": 1791676800000,
+    "overdue": false,
+    "ahead": 0,
+    "winHalf": 7,
+    "slotEarly": 0,
+    "slotLate": 7,
+    "rolled": false,
+    "inDays": 15,
+    "opensIn": 8,
+    "closesIn": 22,
+    "missed": false
+   },
+   {
+    "pollster": "Roy Morgan",
+    "last": "2026-09-21",
+    "cadence": 7,
+    "loose": false,
+    "spread": 2,
+    "spreadEarly": 0,
+    "spreadLate": 0,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": 956,
+    "releaseTo": 996,
+    "releaseMid": 981,
+    "releaseTimed": 12,
+    "releaseVals": null,
+    "releaseMins": 981,
+    "releaseDow": 1,
+    "releaseDowN": 0,
+    "declared": [
+     "day"
+    ],
+    "waves": 47,
+    "site": "https://www.roymorgan.com/findings",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [
+     {
+      "field": "2026-08-23",
+      "pub": "2026-08-24",
+      "mins": 990,
+      "url": "https://www.roymorgan.com/findings/10321-federal-voting-intention-august-24-2026",
+      "since": "2026-08-17",
+      "gap": 7
+     },
+     {
+      "field": "2026-08-30",
+      "pub": "2026-08-31",
+      "mins": 1020,
+      "url": "https://www.roymorgan.com/findings/10328-federal-voting-intention-august-31-2026",
+      "since": "2026-08-24",
+      "gap": 7
+     },
+     {
+      "field": "2026-09-06",
+      "pub": "2026-09-07",
+      "mins": 990,
+      "url": "https://www.roymorgan.com/findings/10333-federal-voting-intention-september-7-2026",
+      "since": "2026-08-31",
+      "gap": 7
+     },
+     {
+      "field": "2026-09-13",
+      "pub": "2026-09-14",
+      "mins": 996,
+      "url": "https://www.roymorgan.com/findings/10343-federal-voting-intention-september-14-2026",
+      "since": "2026-09-07",
+      "gap": 7
+     },
+     {
+      "field": "2026-09-20",
+      "pub": "2026-09-21",
+      "mins": 956,
+      "url": "https://www.roymorgan.com/findings/10353-federal-voting-intention-september-21-2026",
+      "since": "2026-09-14",
+      "gap": 7
+     }
+    ],
+    "gapsUsed": 8,
+    "field": 1791763200000,
+    "release": 1791763200000,
+    "overdue": false,
+    "ahead": 2,
+    "winHalf": 0,
+    "slotEarly": 0,
+    "slotLate": 0,
+    "rolled": false,
+    "inDays": 16,
+    "opensIn": 16,
+    "closesIn": 16,
+    "missed": false
+   },
+   {
+    "pollster": "Roy Morgan",
+    "last": "2026-09-21",
+    "cadence": 7,
+    "loose": false,
+    "spread": 2,
+    "spreadEarly": 0,
+    "spreadLate": 0,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": 956,
+    "releaseTo": 996,
+    "releaseMid": 981,
+    "releaseTimed": 12,
+    "releaseVals": null,
+    "releaseMins": 981,
+    "releaseDow": 1,
+    "releaseDowN": 0,
+    "declared": [
+     "day"
+    ],
+    "waves": 47,
+    "site": "https://www.roymorgan.com/findings",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [
+     {
+      "field": "2026-08-23",
+      "pub": "2026-08-24",
+      "mins": 990,
+      "url": "https://www.roymorgan.com/findings/10321-federal-voting-intention-august-24-2026",
+      "since": "2026-08-17",
+      "gap": 7
+     },
+     {
+      "field": "2026-08-30",
+      "pub": "2026-08-31",
+      "mins": 1020,
+      "url": "https://www.roymorgan.com/findings/10328-federal-voting-intention-august-31-2026",
+      "since": "2026-08-24",
+      "gap": 7
+     },
+     {
+      "field": "2026-09-06",
+      "pub": "2026-09-07",
+      "mins": 990,
+      "url": "https://www.roymorgan.com/findings/10333-federal-voting-intention-september-7-2026",
+      "since": "2026-08-31",
+      "gap": 7
+     },
+     {
+      "field": "2026-09-13",
+      "pub": "2026-09-14",
+      "mins": 996,
+      "url": "https://www.roymorgan.com/findings/10343-federal-voting-intention-september-14-2026",
+      "since": "2026-09-07",
+      "gap": 7
+     },
+     {
+      "field": "2026-09-20",
+      "pub": "2026-09-21",
+      "mins": 956,
+      "url": "https://www.roymorgan.com/findings/10353-federal-voting-intention-september-21-2026",
+      "since": "2026-09-14",
+      "gap": 7
+     }
+    ],
+    "gapsUsed": 8,
+    "field": 1792368000000,
+    "release": 1792368000000,
+    "overdue": false,
+    "ahead": 3,
+    "winHalf": 0,
+    "slotEarly": 0,
+    "slotLate": 0,
+    "rolled": false,
+    "inDays": 23,
+    "opensIn": 23,
+    "closesIn": 23,
+    "missed": false
+   },
+   {
+    "pollster": "YouGov",
+    "last": "2026-09-23",
+    "cadence": 14,
+    "loose": false,
+    "spread": 1,
+    "spreadEarly": 0,
+    "spreadLate": 0,
+    "basis": "published",
+    "lag": 0,
+    "lagMeasured": 0,
+    "releaseFrom": 300,
+    "releaseTo": 360,
+    "releaseMid": 300,
+    "releaseTimed": 12,
+    "releaseVals": [
+     300,
+     360
+    ],
+    "releaseMins": 300,
+    "releaseDow": 3,
+    "releaseDowN": 12,
+    "declared": [],
+    "waves": 23,
+    "site": "https://www.news24.com.au/politics/australian-politics",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [
+     {
+      "field": "2026-07-28",
+      "pub": "2026-07-29",
+      "mins": 300,
+      "url": "https://www.news24.com.au/politics/australian-politics/labor-on-lowest-majoritywinning-vote-since-federation-as-voters-turn-on-major-parties-news24-pulse/news-story/30abb89ce081815670d1a05c4517f90e",
+      "since": "2026-07-15",
+      "gap": 14
+     },
+     {
+      "field": "2026-08-10",
+      "pub": "2026-08-12",
+      "mins": 300,
+      "url": "https://www.news24.com.au/politics/australian-politics/coalition-and-one-nation-face-vote-consolidation-battle-to-oust-albanese-as-formal-alliance-ruled-out/news-story/647c039e1efc5027e63a509879724195",
+      "since": "2026-07-29",
+      "gap": 14
+     },
+     {
+      "field": "2026-08-24",
+      "pub": "2026-08-26",
+      "mins": 300,
+      "url": "https://www.news24.com.au/politics/australian-politics/one-nation-trails-labor-by-three-points-following-a-difficult-parliamentary-fortnight-for-albanese/news-story/d04bde51f5545775296ce13f7e15515e",
+      "since": "2026-08-12",
+      "gap": 14
+     },
+     {
+      "field": "2026-09-08",
+      "pub": "2026-09-09",
+      "mins": 300,
+      "url": "https://www.news24.com.au/politics/australian-politics/pauline-hansons-one-nation-surges-to-top-of-pulse-as-labor-plunges-to-record-low/news-story/334ce8596f4b51edb853c103514385a0",
+      "since": "2026-08-26",
+      "gap": 14
+     },
+     {
+      "field": "2026-09-21",
+      "pub": "2026-09-23",
+      "mins": 300,
+      "url": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209",
+      "since": "2026-09-09",
+      "gap": 14
+     }
+    ],
+    "gapsUsed": 8,
+    "field": 1792540800000,
+    "release": 1792540800000,
+    "overdue": false,
+    "ahead": 1,
+    "winHalf": 0,
+    "slotEarly": 0,
+    "slotLate": 0,
+    "rolled": false,
+    "inDays": 25,
+    "opensIn": 25,
+    "closesIn": 25,
+    "missed": false
+   },
+   {
+    "pollster": "Spectre Strategy",
+    "last": "2026-07-23",
+    "cadence": 139,
+    "loose": false,
+    "spread": 18,
+    "spreadEarly": 33,
+    "spreadLate": 3,
+    "basis": "fieldwork",
+    "lag": 1,
+    "lagMeasured": 0,
+    "releaseFrom": null,
+    "releaseTo": null,
+    "releaseMid": null,
+    "releaseTimed": 0,
+    "releaseVals": null,
+    "releaseMins": null,
+    "releaseDow": null,
+    "releaseDowN": 0,
+    "declared": [],
+    "waves": 4,
+    "site": "https://www.spectrestrategy.com/blog-3-1",
+    "skipped": [],
+    "skippedMonths": [],
+    "recent": [
+     {
+      "field": "2025-07-01",
+      "pub": "2025-07-08",
+      "mins": 675,
+      "url": "https://www.spectrestrategy.com/blog-3-1/austalian-federal-polling-update-july-2025",
+      "since": null,
+      "gap": null
+     },
+     {
+      "field": "2025-11-17",
+      "pub": "2025-11-20",
+      "mins": 630,
+      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-polling-update-november-2025",
+      "since": "2025-07-01",
+      "gap": 139
+     },
+     {
+      "field": "2026-04-08",
+      "pub": "2026-04-19",
+      "mins": 745,
+      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026",
+      "since": "2025-11-17",
+      "gap": 142
+     },
+     {
+      "field": "2026-07-23",
+      "pub": "2026-07-27",
+      "mins": 633,
+      "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026-lrxjw",
+      "since": "2026-04-08",
+      "gap": 106
+     }
+    ],
+    "gapsUsed": 3,
+    "field": 1796774400000,
+    "release": 1796860800000,
+    "overdue": false,
+    "ahead": 0,
+    "winHalf": 18,
+    "slotEarly": null,
+    "slotLate": null,
+    "rolled": false,
+    "inDays": 75,
+    "opensIn": 57,
+    "closesIn": 93,
+    "missed": false
+   }
+  ],
+  "t0": 1790380800000,
+  "nowMs": 1790433480000
+ },
+ "pt": [
+  {
+   "pollster": "YouGov",
+   "client": "News24",
+   "field": "15–21 Sep",
+   "released": "2026-09-21",
+   "releasedLabel": "21 Sep",
+   "published": "2026-09-23T05:00",
+   "publishedLabel": "23 Sep",
+   "pubSort": "2026-09-23T05:00",
+   "sample": 1500,
+   "alpImp": 51.8,
+   "alpOnImp": 51.4,
+   "eff": {
+    "lnp": {
+     "lo": 52.1,
+     "hi": 52,
+     "w": 1
+    },
+    "imp": {
+     "lo": 51.5,
+     "hi": 51.6,
+     "w": 1
+    },
+    "onimp": {
+     "lo": 51,
+     "hi": 51.1,
+     "w": 1
+    },
+    "onp": {
+     "lo": 54,
+     "hi": 54.3,
+     "w": 1
+    }
+   },
+   "alp2pp": 52,
+   "lnp2pp": 48,
+   "p": {
+    "alp": 26,
+    "lnp": 21,
+    "grn": 14,
+    "onp": 27,
+    "oth": 12
+   },
+   "tppAlt": {
+    "alp": 55,
+    "onp": 45
+   },
+   "ppmSets": [
+    {
+     "alb": 41,
+     "taylor": 37,
+     "unc": 22
+    },
+    {
+     "alb": 50,
+     "hanson": 38,
+     "unc": 12
+    }
+   ],
+   "appr": {
+    "alb": {
+     "app": 33,
+     "dis": 62
+    },
+    "taylor": {
+     "app": 36,
+     "dis": 48
+    },
+    "hanson": null,
+    "albNet": -29,
+    "taylorNet": -12,
+    "hansonNet": null,
+    "oppName": "Taylor",
+    "metricBy": {
+     "alb": "approval",
+     "taylor": "approval",
+     "hanson": "approval"
+    }
+   },
+   "chg": {
+    "d": {
+     "alp2pp": 0,
+     "pAlp": 0,
+     "pLnp": 3,
+     "pGrn": 2,
+     "pOnp": -3,
+     "pOth": -2,
+     "imp": -0.1,
+     "impOn": 1.6,
+     "albNet": -6,
+     "taylorNet": 0,
+     "altAlpOn": 2,
+     "ppmAlb": -2,
+     "ppmOpp": -2
+    },
+    "r": {
+     "alp2pp": "2026-09-08",
+     "pAlp": "2026-09-08",
+     "pLnp": "2026-09-08",
+     "pGrn": "2026-09-08",
+     "pOnp": "2026-09-08",
+     "pOth": "2026-09-08",
+     "imp": "2026-09-08",
+     "impOn": "2026-09-08",
+     "albNet": "2026-09-08",
+     "taylorNet": "2026-09-08",
+     "altAlpOn": "2026-09-08",
+     "ppmAlb": "2026-09-08",
+     "ppmOpp": "2026-09-08"
+    }
+   },
+   "url": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209"
+  },
+  {
+   "pollster": "Roy Morgan",
+   "client": "Self-published",
+   "field": "14–20 Sep",
+   "released": "2026-09-20",
+   "releasedLabel": "20 Sep",
+   "published": "2026-09-21T15:56",
+   "publishedLabel": "21 Sep",
+   "pubSort": "2026-09-21T15:56",
+   "sample": 1561,
+   "undecided": 1,
+   "undecidedBasis": "first",
+   "tppFlows": 52,
+   "alpImp": 52.1,
+   "alpOnImp": 52.2,
+   "eff": {
+    "lnp": {
+     "lo": 52.4,
+     "hi": 52,
+     "w": 1
+    },
+    "imp": {
+     "lo": 51.5,
+     "hi": 51.6,
+     "w": 1
+    },
+    "onimp": {
+     "lo": 51.1,
+     "hi": 51.1,
+     "w": 1
+    },
+    "onp": {
+     "lo": 54.3,
+     "hi": 54.3,
+     "w": 1
+    }
+   },
+   "alp2pp": 53,
+   "lnp2pp": 47,
+   "p": {
+    "alp": 25,
+    "lnp": 21.5,
+    "grn": 15.5,
+    "onp": 25.5,
+    "oth": 12.5
+   },
+   "tppAlt": {
+    "alp": 54,
+    "onp": 46
+   },
+   "appr": {
+    "alb": null,
+    "taylor": null,
+    "hanson": null,
+    "albNet": null,
+    "taylorNet": null,
+    "hansonNet": null,
+    "oppName": null,
+    "metric": null
+   },
+   "chg": {
+    "d": {
+     "alp2pp": -2,
+     "pAlp": 0,
+     "pLnp": 0,
+     "pGrn": -0.5,
+     "pOnp": 0.5,
+     "pOth": 0,
+     "und": -5.5,
+     "flows": -1,
+     "imp": -0.3,
+     "impOn": -0.4,
+     "altAlpOn": -0.5
+    },
+    "r": {
+     "alp2pp": "2026-09-13",
+     "pAlp": "2026-09-13",
+     "pLnp": "2026-09-13",
+     "pGrn": "2026-09-13",
+     "pOnp": "2026-09-13",
+     "pOth": "2026-09-13",
+     "und": "2026-09-13",
+     "flows": "2026-09-13",
+     "imp": "2026-09-13",
+     "impOn": "2026-09-13",
+     "altAlpOn": "2026-09-13"
+    }
+   },
+   "url": "https://www.roymorgan.com/findings/10353-federal-voting-intention-september-21-2026",
+   "dir": {
+    "right": 21,
+    "wrong": 65,
+    "unsure": 14,
+    "net": -44,
+    "chg": {
+     "net": -3,
+     "right": -2,
+     "wrong": 1
+    },
+    "ref": "2026-09-13"
+   }
+  },
+  {
+   "pollster": "Newspoll",
+   "client": "The Australian",
+   "field": "14–17 Sep",
+   "released": "2026-09-17",
+   "releasedLabel": "17 Sep",
+   "published": "2026-09-20T21:00",
+   "publishedLabel": "20 Sep",
+   "pubSort": "2026-09-20T21:00",
+   "sample": 1244,
+   "sampleEff": 998,
+   "alpImp": 52.2,
+   "alpOnImp": 50.4,
+   "eff": {
+    "imp": {
+     "lo": 51.6,
+     "hi": 51.6,
+     "w": 1
+    },
+    "onimp": {
+     "lo": 51.3,
+     "hi": 51.1,
+     "w": 1
+    }
+   },
+   "alp2pp": null,
+   "lnp2pp": null,
+   "p": {
+    "alp": 27,
+    "lnp": 19,
+    "grn": 13,
+    "onp": 30,
+    "oth": 11
+   },
+   "ppmSets": [
+    {
+     "alb": 44,
+     "taylor": 24,
+     "hanson": 32,
+     "unc": 0
+    },
+    {
+     "alb": 42,
+     "taylor": 41,
+     "unc": 17
+    }
+   ],
+   "appr": {
+    "alb": {
+     "app": 35,
+     "dis": 62
+    },
+    "taylor": null,
+    "hanson": {
+     "app": 44,
+     "dis": 51
+    },
+    "albNet": -27,
+    "taylorNet": -15,
+    "hansonNet": -7,
+    "oppName": "Taylor",
+    "metricBy": {
+     "alb": "approval",
+     "taylor": "approval",
+     "hanson": "approval"
+    }
+   },
+   "chg": {
+    "d": {
+     "pAlp": -2,
+     "pLnp": 0,
+     "pGrn": 0,
+     "pOnp": 0,
+     "pOth": 2,
+     "imp": -0.9,
+     "impOn": -0.9,
+     "albNet": -6,
+     "taylorNet": 2,
+     "hansonNet": -6,
+     "ppmAlb": -2,
+     "ppmOpp": 1,
+     "ppmHan": 1
+    },
+    "r": {
+     "pAlp": "2026-08-28",
+     "pLnp": "2026-08-28",
+     "pGrn": "2026-08-28",
+     "pOnp": "2026-08-28",
+     "pOth": "2026-08-28",
+     "imp": "2026-08-28",
+     "impOn": "2026-08-28",
+     "albNet": "2026-08-28",
+     "taylorNet": "2026-08-28",
+     "hansonNet": "2026-08-28",
+     "ppmAlb": "2026-08-28",
+     "ppmOpp": "2026-08-28",
+     "ppmHan": "2026-08-28"
+    }
+   },
+   "url": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455",
+   "methodUrl": "https://pyxispolling.com/api.php/images/document/28195281/NewspollMethodologyStatement21September2026byPyxis-bToKYVD66G-g0e4tmAkQNA.pdf"
+  },
+  {
+   "pollster": "DemosAU",
+   "client": "Capital Brief",
+   "field": "10–14 Sep",
+   "released": "2026-09-14",
+   "releasedLabel": "14 Sep",
+   "published": "2026-09-17T08:30",
+   "publishedLabel": "17 Sep",
+   "pubSort": "2026-09-17T08:30",
+   "sample": 1583,
+   "sampleEff": 869,
+   "undecided": 4,
+   "undecidedBasis": "first",
+   "alpImp": 53.3,
+   "alpOnImp": 52.8,
+   "eff": {
+    "imp": {
+     "lo": 51.3,
+     "hi": 51.6,
+     "w": 1
+    },
+    "onimp": {
+     "lo": 50.8,
+     "hi": 51.1,
+     "w": 1
+    }
+   },
+   "alp2pp": null,
+   "lnp2pp": null,
+   "p": {
+    "alp": 28,
+    "lnp": 20,
+    "grn": 13,
+    "onp": 26,
+    "oth": 13
+   },
+   "ppmSets": [
+    {
+     "alb": 36,
+     "taylor": 21,
+     "hanson": 25,
+     "unc": 18
+    },
+    {
+     "alb": 45,
+     "taylor": 33,
+     "unc": 22
+    }
+   ],
+   "appr": {
+    "alb": {
+     "app": 29,
+     "dis": 45
+    },
+    "taylor": {
+     "app": 23,
+     "dis": 27
+    },
+    "hanson": {
+     "app": 32,
+     "dis": 44
+    },
+    "albNet": -16,
+    "taylorNet": -4,
+    "hansonNet": -12,
+    "oppName": "Taylor",
+    "metricBy": {
+     "alb": "fav",
+     "taylor": "fav",
+     "hanson": "fav"
+    }
+   },
+   "chg": {
+    "d": {
+     "pAlp": 2,
+     "pLnp": -5,
+     "pGrn": 1,
+     "pOnp": 2,
+     "pOth": 0,
+     "und": -1,
+     "imp": 3.4,
+     "impOn": 1.4,
+     "albNet": 3,
+     "taylorNet": 0,
+     "hansonNet": 5,
+     "ppmAlb": 1,
+     "ppmOpp": -2,
+     "ppmHan": 3
+    },
+    "r": {
+     "pAlp": "2026-08-20",
+     "pLnp": "2026-08-20",
+     "pGrn": "2026-08-20",
+     "pOnp": "2026-08-20",
+     "pOth": "2026-08-20",
+     "und": "2026-08-20",
+     "imp": "2026-08-20",
+     "impOn": "2026-08-20",
+     "albNet": "2026-08-20",
+     "taylorNet": "2026-08-20",
+     "hansonNet": "2026-08-20",
+     "ppmAlb": "2026-08-20",
+     "ppmOpp": "2026-08-20",
+     "ppmHan": "2026-08-20"
+    }
+   },
+   "url": "https://www.capitalbrief.com/newsletter/exclusive-poll-voters-back-social-media-reform-fbd908f1-a09e-4d1e-9713-9c8c02dd0d31/",
+   "releaseUrl": "https://demosau.com/wp-content/uploads/2026/09/Capital-BriefDemosAU-Federal-Poll-September-2026.pdf",
+   "methodUrl": "https://demosau.com/wp-content/uploads/2026/09/Capital-BriefDemosAU-Federal-Poll-September-2026.pdf"
+  },
+  {
+   "pollster": "Resolve",
+   "client": "SMH / Age",
+   "field": "12 Sep",
+   "released": "2026-09-12",
+   "releasedLabel": "12 Sep",
+   "published": "2026-09-13T18:00",
+   "publishedLabel": "13 Sep",
+   "pubSort": "2026-09-13T18:00",
+   "sample": 2250,
+   "undecided": 26,
+   "undecidedBasis": "soft",
+   "alpImp": 49.6,
+   "alpOnImp": 50.1,
+   "eff": {
+    "imp": {
+     "lo": 52,
+     "hi": 51.6,
+     "w": 1
+    },
+    "onimp": {
+     "lo": 51.4,
+     "hi": 51.1,
+     "w": 1
+    }
+   },
+   "alp2pp": null,
+   "lnp2pp": null,
+   "p": {
+    "alp": 28,
+    "lnp": 24,
+    "grn": 11,
+    "onp": 27,
+    "oth": 9
+   },
+   "ppm": {
+    "alb": 29,
+    "taylor": 21,
+    "hanson": 25,
+    "unc": 25
+   },
+   "appr": {
+    "alb": {
+     "app": 35,
+     "dis": 53
+    },
+    "taylor": {
+     "app": 39,
+     "dis": 30
+    },
+    "hanson": null,
+    "albNet": -18,
+    "taylorNet": 9,
+    "hansonNet": null,
+    "oppName": "Taylor",
+    "metricBy": {
+     "alb": "approval",
+     "taylor": "approval",
+     "hanson": "approval"
+    }
+   },
+   "chg": {
+    "d": {
+     "pAlp": 0,
+     "pLnp": 1,
+     "pGrn": -1,
+     "pOnp": 1,
+     "pOth": -2,
+     "und": -1,
+     "imp": -1.7,
+     "impOn": -1.7,
+     "albNet": -2,
+     "taylorNet": 2,
+     "ppmAlb": -3,
+     "ppmOpp": 2,
+     "ppmHan": -1
+    },
+    "r": {
+     "pAlp": "2026-08-15",
+     "pLnp": "2026-08-15",
+     "pGrn": "2026-08-15",
+     "pOnp": "2026-08-15",
+     "pOth": "2026-08-15",
+     "und": "2026-08-15",
+     "imp": "2026-08-15",
+     "impOn": "2026-08-15",
+     "albNet": "2026-08-15",
+     "taylorNet": "2026-08-15",
+     "ppmAlb": "2026-08-15",
+     "ppmOpp": "2026-08-15",
+     "ppmHan": "2026-08-15"
+    }
+   },
+   "url": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html"
+  },
+  {
+   "pollster": "Essential",
+   "client": "The Guardian",
+   "field": "26–31 Aug",
+   "released": "2026-08-31",
+   "releasedLabel": "31 Aug",
+   "published": "2026-09-02T01:00",
+   "publishedLabel": "2 Sep",
+   "pubSort": "2026-09-02T01:00",
+   "sample": 1017,
+   "sampleEff": 645,
+   "undecided": 5,
+   "undecidedBasis": "tpp",
+   "alpImp": 49.4,
+   "alpOnImp": 51.6,
+   "eff": {
+    "lnp": {
+     "lo": 52,
+     "hi": 52,
+     "w": 0,
+     "t": {
+      "lo": 51.6,
+      "hi": 50.9
+     }
+    },
+    "imp": {
+     "lo": 51.6,
+     "hi": 51.6,
+     "w": 0,
+     "t": {
+      "lo": 52.3,
+      "hi": 51.9
+     }
+    },
+    "onimp": {
+     "lo": 51.1,
+     "hi": 51.1,
+     "w": 0,
+     "t": {
+      "lo": 52.1,
+      "hi": 52
+     }
+    }
+   },
+   "alp2pp": 45,
+   "lnp2pp": 50,
+   "p": {
+    "alp": 26,
+    "lnp": 26,
+    "grn": 13,
+    "onp": 23,
+    "oth": 11
+   },
+   "appr": {
+    "alb": {
+     "app": 35,
+     "dis": 56
+    },
+    "taylor": {
+     "app": 32,
+     "dis": 41
+    },
+    "hanson": null,
+    "albNet": -21,
+    "taylorNet": -9,
+    "hansonNet": null,
+    "oppName": "Taylor",
+    "metricBy": {
+     "alb": "approval",
+     "taylor": "approval",
+     "hanson": "approval"
+    }
+   },
+   "chg": {
+    "d": {
+     "alp2pp": -3,
+     "pAlp": -5,
+     "pLnp": 4,
+     "pGrn": 1,
+     "pOnp": -2,
+     "pOth": 5,
+     "und": 0,
+     "imp": -1.6,
+     "impOn": 0.2,
+     "albNet": -7,
+     "taylorNet": 2
+    },
+    "r": {
+     "alp2pp": "2026-07-27",
+     "pAlp": "2026-07-27",
+     "pLnp": "2026-07-27",
+     "pGrn": "2026-07-27",
+     "pOnp": "2026-07-27",
+     "pOth": "2026-07-27",
+     "und": "2026-07-27",
+     "imp": "2026-06-29",
+     "impOn": "2026-06-29",
+     "albNet": "2026-07-27",
+     "taylorNet": "2026-07-27"
+    }
+   },
+   "url": "https://www.theguardian.com/australia-news/2026/sep/02/guardian-essential-poll-one-nation-popularity-slips-albanese-records-lowest-approval-as-prime-minister-ntwnfb",
+   "releaseUrl": "https://essentialreport.com.au/reports/01-september-2026",
+   "releaseHub": "https://essentialreport.com.au/reports/federal-political-insights",
+   "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/09/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+   "dir": {
+    "right": 23,
+    "wrong": 59,
+    "unsure": 19,
+    "net": -36,
+    "chg": {
+     "net": -11,
+     "right": -5,
+     "wrong": 6
+    },
+    "ref": "2026-07-27"
+   }
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "client": "AFR",
+   "field": "24–28 Aug",
+   "released": "2026-08-28",
+   "releasedLabel": "28 Aug",
+   "published": "2026-08-30T18:00",
+   "publishedLabel": "30 Aug",
+   "pubSort": "2026-08-30T18:00",
+   "sample": 1006,
+   "sampleEff": 808,
+   "tppFlows": 52,
+   "alpImp": 51.7,
+   "alpOnImp": 51.4,
+   "eff": {
+    "lnp": {
+     "lo": 52,
+     "hi": 52,
+     "w": 0,
+     "t": {
+      "lo": 52.9,
+      "hi": 51.4
+     }
+    },
+    "imp": {
+     "lo": 51.6,
+     "hi": 51.6,
+     "w": 0,
+     "t": {
+      "lo": 52.4,
+      "hi": 52.2
+     }
+    },
+    "onimp": {
+     "lo": 51.1,
+     "hi": 51.1,
+     "w": 0,
+     "t": {
+      "lo": 52.1,
+      "hi": 52
+     }
+    },
+    "onp": {
+     "lo": 54.3,
+     "hi": 54.3,
+     "w": 0,
+     "t": {
+      "lo": 55,
+      "hi": 54
+     }
+    }
+   },
+   "alp2pp": 48,
+   "lnp2pp": 52,
+   "p": {
+    "alp": 29,
+    "lnp": 22,
+    "grn": 12,
+    "onp": 28,
+    "oth": 9
+   },
+   "tppAlt": {
+    "alp": 52,
+    "onp": 48
+   },
+   "ppm": {
+    "alb": 31,
+    "taylor": 15,
+    "hanson": 24,
+    "unc": 30
+   },
+   "appr": {
+    "alb": {
+     "app": 31,
+     "dis": 48
+    },
+    "taylor": {
+     "app": 22,
+     "dis": 25
+    },
+    "hanson": {
+     "app": 36,
+     "dis": 48
+    },
+    "albNet": -17,
+    "taylorNet": -3,
+    "hansonNet": -12,
+    "oppName": "Taylor",
+    "metricBy": {
+     "alb": "fav",
+     "taylor": "fav",
+     "hanson": "fav"
+    }
+   },
+   "chg": {
+    "d": {
+     "alp2pp": 0,
+     "pAlp": 0,
+     "pLnp": 0,
+     "pGrn": 2,
+     "pOnp": -3,
+     "pOth": 1,
+     "flows": 2,
+     "imp": 1.5,
+     "impOn": 2.3,
+     "albNet": 2,
+     "taylorNet": 3,
+     "hansonNet": -2,
+     "altAlpOn": -1,
+     "ppmAlb": -1,
+     "ppmOpp": 0,
+     "ppmHan": 0
+    },
+    "r": {
+     "alp2pp": "2026-07-30",
+     "pAlp": "2026-07-30",
+     "pLnp": "2026-07-30",
+     "pGrn": "2026-07-30",
+     "pOnp": "2026-07-30",
+     "pOth": "2026-07-30",
+     "flows": "2026-07-30",
+     "imp": "2026-07-30",
+     "impOn": "2026-07-30",
+     "albNet": "2026-07-30",
+     "taylorNet": "2026-07-30",
+     "hansonNet": "2026-07-30",
+     "altAlpOn": "2026-07-30",
+     "ppmAlb": "2026-07-30",
+     "ppmOpp": "2026-07-30",
+     "ppmHan": "2026-07-30"
+    }
+   },
+   "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn",
+   "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
+   "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_cab524c6cbb54cdc80cfeed7d9863703.pdf"
+  }
+ ],
+ "now": 1790397515943
+}

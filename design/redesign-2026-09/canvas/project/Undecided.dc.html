@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Undecided</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+a{color:#171717}a:hover{color:#4A4843}
+button{font:inherit;cursor:pointer}
+.num{font-variant-numeric:tabular-nums}
+svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.grid{stroke:#E6E4DF;stroke-width:1;fill:none}
+.base{stroke:#9A968E;stroke-width:1;fill:none}
+.ax{font-size:12px;fill:#6B6862}
+.sec{font-size:15px;font-weight:600;fill:#171717}
+.cap{font-size:13px;font-weight:600;fill:#171717}
+.caps{font-size:13px;fill:#6B6862}
+.big{font-size:22px;font-weight:600}
+.dots{fill:none;stroke-width:5;stroke-linecap:round}
+.ln{fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.note{font-size:11px;fill:#6B6862}
+.copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.copy:hover{background:#EFEDE8;color:#171717}
+.copy:focus-visible{outline:2px solid #171717;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1300px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
+
+<div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">
+<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Undecided</span>
+<span>Roy Morgan, DemosAU, Essential and Resolve · since the 2025 election</span>
+</div>
+<h1 style="margin: 16px 0 0; max-width: 1000px; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 46px; line-height: 1.08; letter-spacing: -0.01em">About one voter in twenty is undecided. A quarter of the rest could still switch.</h1>
+<p style="margin: 12px 0 0; max-width: 860px; font-size: 18px; line-height: 1.5; color: #3D3B37">Neither share has moved significantly since the 2025 election. Undecided voters have mostly run between 5% and 7% in Roy Morgan’s weekly polls; the latest pooled figure, 4.4%, is lower mainly because of a single 1% reading.</p>
+
+<div role="group" aria-label="Show" style="margin-top: 28px; display: flex; gap: 4px; border-bottom: 1px solid #DDDCD8">
+<button aria-pressed="true" style="min-height: 44px; padding: 0 14px; border: 0; border-bottom: 2px solid #171717; margin-bottom: -1px; background: transparent; font-size: 15px; font-weight: 600; color: #171717">All voters</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 14px; border: 0; background: transparent; font-size: 15px; color: #6B6862">By party</button>
+<button aria-pressed="false" style="min-height: 44px; padding: 0 14px; border: 0; background: transparent; font-size: 15px; color: #6B6862">By age</button>
+</div>
+
+<svg viewBox="0 0 1152 112" width="1152" height="112" role="img" aria-label="Of every 100 voters, roughly 71 have named a party and are firm, 25 have named a party but might change, and 4 are undecided." style="margin-top: 32px; display: block; overflow: visible">
+<text class="sec" x="0" y="14">Of every 100 voters</text>
+<text class="cap" x="1152" y="14" style="text-anchor: end">About 29 in 100 could still move</text>
+<path class="base" d="M814.5 28V22H1152V28"></path>
+<text x="0" y="50"><tspan class="cap">Firm</tspan><tspan class="caps" dx="6">named a party and don’t expect to change</tspan></text>
+<text x="818.5" y="50"><tspan class="cap">Not firm</tspan><tspan class="caps" dx="6">might still change</tspan></text>
+<text class="cap" x="1152" y="50" style="text-anchor: end">Undecided</text>
+<rect x="0" y="60" width="814.5" height="48" style="fill: #E3E0DA"></rect>
+<rect x="814.5" y="60" width="286.8" height="48" style="fill: #77726A"></rect>
+<rect x="1101.3" y="60" width="50.7" height="48" style="fill: #2F2D2A"></rect>
+<path d="M814.5 60V108M1101.3 60V108" style="stroke: #FAF9F6; stroke-width: 2"></path>
+<text class="big num" x="16" y="92" style="fill: #171717">71</text>
+<text class="big num" x="830.5" y="92" style="fill: #FAF9F6">25</text>
+<text class="big num" x="1126.6" y="92" style="fill: #FAF9F6; text-anchor: middle">4</text>
+</svg>
+
+<div style="margin-top: 12px; display: flex; align-items: center; gap: 24px">
+<p style="margin: 0; max-width: 900px; font-size: 13px; line-height: 1.5; color: #6B6862">Approximate: combines Roy Morgan and DemosAU’s undecided share (4.4%) with Resolve’s firmness question (26% of those who named a party). Pollsters ask these questions differently.</p>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Copy chart: of every 100 voters" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+
+<h2 style="margin: 48px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 28px; line-height: 1.15">Steady since the election</h2>
+<p style="margin: 8px 0 0; max-width: 880px; font-size: 16px; line-height: 1.5; color: #3D3B37">Each dot is one poll; lines are monthly averages. Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales.</p>
+
+<div style="margin-top: 24px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 64px; row-gap: 16px">
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: baseline; gap: 10px"><span style="font-size: 16px; font-weight: 600">Undecided</span><span style="font-size: 13px; color: #6B6862">% of all voters</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="28" height="12" viewBox="0 0 28 12" aria-hidden="true"><path d="M1 6H27" style="stroke: #2F2D2A; stroke-width: 2.5; stroke-linecap: round"></path><circle cx="14" cy="6" r="3.5" style="fill: #2F2D2A"></circle></svg>
+<span style="font-size: 14px; font-weight: 600">First preference</span>
+<span class="num" style="font-size: 20px; font-weight: 600">4.4%</span>
+<span class="num" style="font-size: 13px; color: #6B6862">±2.1</span>
+</div>
+<span style="padding-left: 38px; font-size: 13px; line-height: 1.5; color: #6B6862">Can’t say who they’d vote for. Roy Morgan and DemosAU.</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="28" height="12" viewBox="0 0 28 12" aria-hidden="true"><path d="M1 6H27" style="stroke: #8C877F; stroke-width: 2.5; stroke-dasharray: 5 3"></path><circle cx="14" cy="6" r="3.5" style="fill: #FAF9F6; stroke: #8C877F; stroke-width: 1.5"></circle></svg>
+<span style="font-size: 14px; font-weight: 600">After preferences</span>
+<span class="num" style="font-size: 20px; font-weight: 600">5.0%</span>
+<span class="num" style="font-size: 13px; color: #6B6862">±1.7</span>
+</div>
+<span style="padding-left: 38px; font-size: 13px; line-height: 1.5; color: #6B6862">Won’t pick between Labor and the Coalition. Essential.</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: baseline; gap: 10px"><span style="font-size: 16px; font-weight: 600">Not firm</span><span style="font-size: 13px; color: #6B6862">% of voters who named a party</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="28" height="12" viewBox="0 0 28 12" aria-hidden="true"><path d="M1 6H27" style="stroke: #77726A; stroke-width: 2.5; stroke-linecap: round"></path><circle cx="14" cy="6" r="3.5" style="fill: #77726A"></circle></svg>
+<span style="font-size: 14px; font-weight: 600">Might still change</span>
+<span class="num" style="font-size: 20px; font-weight: 600">26.0%</span>
+<span class="num" style="font-size: 13px; color: #6B6862">±2.3</span>
+</div>
+<span style="padding-left: 38px; font-size: 13px; line-height: 1.5; color: #6B6862">Named a party but say they could change their mind. Resolve.</span>
+</div>
+</div>
+
+<svg viewBox="0 0 544 240" width="544" height="240" role="img" aria-label="Undecided share of all voters since June 2025: first preference mostly 5 to 7 percent, latest pooled 4.4 percent; after preferences about 5 percent since March 2026." style="display: block; overflow: visible">
+<g transform="translate(36 10)">
+<path class="grid" d="M0 0H500M0 100H500"></path>
+<path class="base" d="M0 200H500"></path>
+<text class="ax" x="-8" y="4" style="text-anchor: end">10%</text>
+<text class="ax" x="-8" y="104" style="text-anchor: end">5%</text>
+<text class="ax" x="-8" y="204" style="text-anchor: end">0</text>
+<path class="dots" style="stroke: #2F2D2A; opacity: 0.3" d="M0.0 80.0h0M21.6 60.0h0M28.7 10.0h0M57.5 80.0h0M86.2 90.0h0M115.0 100.0h0M143.7 90.0h0M172.5 80.0h0M201.2 100.0h0M251.5 70.0h0M258.7 70.0h0M263.9 60.0h0M266.9 60.0h0M273.1 80.0h0M280.3 80.0h0M287.5 80.0h0M294.7 80.0h0M301.8 90.0h0M309.0 90.0h0M316.2 60.0h0M323.4 70.0h0M330.6 100.0h0M337.8 90.0h0M345.0 100.0h0M352.2 70.0h0M388.1 120.0h0M395.3 100.0h0M402.5 70.0h0M409.7 100.0h0M416.8 70.0h0M424.0 100.0h0M431.2 80.0h0M438.4 30.0h0M445.6 80.0h0M452.8 120.0h0M456.9 100.0h0M460.0 70.0h0M467.1 70.0h0M474.3 70.0h0M481.5 70.0h0M482.5 120.0h0M488.7 180.0h0"></path>
+<circle cx="302.9" cy="60" r="3.5" style="fill: #FAF9F6; stroke: #8C877F; stroke-width: 1.5"></circle>
+<circle cx="338.8" cy="120" r="3.5" style="fill: #FAF9F6; stroke: #8C877F; stroke-width: 1.5"></circle>
+<circle cx="366.5" cy="100" r="3.5" style="fill: #FAF9F6; stroke: #8C877F; stroke-width: 1.5"></circle>
+<circle cx="403.5" cy="80" r="3.5" style="fill: #FAF9F6; stroke: #8C877F; stroke-width: 1.5"></circle>
+<circle cx="432.2" cy="100" r="3.5" style="fill: #FAF9F6; stroke: #8C877F; stroke-width: 1.5"></circle>
+<circle cx="468.2" cy="100" r="3.5" style="fill: #FAF9F6; stroke: #8C877F; stroke-width: 1.5"></circle>
+<path class="ln" style="stroke: #8C877F; stroke-dasharray: 6 4" d="M294.7 60.0L326.5 120.0L357.3 100.0L389.1 80.0L419.9 100.0L451.7 100.0"></path>
+<path class="ln" style="stroke: #2F2D2A" d="M14.4 58.0L45.2 80.0L77.0 90.0L108.8 100.0L139.6 90.0L171.5 80.0L202.3 100.0L265.9 70.0L294.7 84.0L326.5 80.0L357.3 86.0L389.1 96.0L419.9 88.0L451.7 78.0L483.6 110.0"></path>
+<circle cx="451.7" cy="100" r="4.5" style="fill: #8C877F; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<circle cx="483.6" cy="110" r="4.5" style="fill: #2F2D2A; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<circle cx="488.7" cy="180" r="6.5" style="fill: none; stroke: #6B6862; stroke-width: 1"></circle>
+<text class="note" x="478" y="184" style="text-anchor: end">1% · Roy Morgan, 14–20 Sep</text>
+<path class="base" d="M30.8 200V206M125.3 200V206M219.7 200V206M312.1 200V206M405.5 200V206"></path>
+<text class="ax" x="30.8" y="224" style="text-anchor: middle">Jul 2025</text>
+<text class="ax" x="125.3" y="224" style="text-anchor: middle">Oct</text>
+<text class="ax" x="219.7" y="224" style="text-anchor: middle">Jan 2026</text>
+<text class="ax" x="312.1" y="224" style="text-anchor: middle">Apr</text>
+<text class="ax" x="405.5" y="224" style="text-anchor: middle">Jul</text>
+</g>
+</svg>
+
+<svg viewBox="0 0 544 240" width="544" height="240" role="img" aria-label="Share of voters who named a party but are not firm, Resolve, since July 2025: between 23 and 29 percent, latest 26 percent." style="display: block; overflow: visible">
+<g transform="translate(36 10)">
+<path class="grid" d="M0 0H500M0 50H500M0 100H500M0 150H500"></path>
+<path class="base" d="M0 200H500"></path>
+<text class="ax" x="-8" y="4" style="text-anchor: end">40%</text>
+<text class="ax" x="-8" y="54" style="text-anchor: end">30%</text>
+<text class="ax" x="-8" y="104" style="text-anchor: end">20%</text>
+<text class="ax" x="-8" y="154" style="text-anchor: end">10%</text>
+<text class="ax" x="-8" y="204" style="text-anchor: end">0</text>
+<path class="dots" style="stroke: #77726A; opacity: 0.35" d="M48.3 75.0h0M78.0 85.0h0M106.8 65.0h0M136.6 65.0h0M164.3 60.0h0M194.0 55.0h0M207.4 75.0h0M235.1 70.0h0M264.9 70.0h0M293.6 75.0h0M329.6 65.0h0M358.3 70.0h0M387.1 65.0h0M415.8 65.0h0M451.7 65.0h0M480.5 70.0h0"></path>
+<path class="ln" style="stroke: #77726A" d="M45.2 75.0L77.0 85.0L108.8 65.0L139.6 65.0L171.5 60.0L202.3 62.0L234.1 70.0L265.9 70.0L294.7 75.0L326.5 65.0L357.3 70.0L389.1 65.0L419.9 65.0L451.7 65.0L483.6 70.0"></path>
+<circle cx="483.6" cy="70" r="4.5" style="fill: #77726A; stroke: #FAF9F6; stroke-width: 1.5"></circle>
+<path class="base" d="M30.8 200V206M125.3 200V206M219.7 200V206M312.1 200V206M405.5 200V206"></path>
+<text class="ax" x="30.8" y="224" style="text-anchor: middle">Jul 2025</text>
+<text class="ax" x="125.3" y="224" style="text-anchor: middle">Oct</text>
+<text class="ax" x="219.7" y="224" style="text-anchor: middle">Jan 2026</text>
+<text class="ax" x="312.1" y="224" style="text-anchor: middle">Apr</text>
+<text class="ax" x="405.5" y="224" style="text-anchor: middle">Jul</text>
+</g>
+</svg>
+
+</div>
+
+<div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 24px; font-size: 13px; color: #6B6862">
+<span>None of the three has changed significantly on the previous period: first preference −1.2, after preferences unchanged, not firm −1.0. ± is the 95% margin.</span>
+<span style="flex-grow: 1"></span>
+<a href="#method" style="font-weight: 500; color: #171717">How it’s built</a>
+<button class="copy" aria-label="Copy chart: undecided and not firm over time" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1300}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Two-party preferred – phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF9F6;color:#171717;font-family:"IBM Plex Sans",system-ui,sans-serif}
+a{color:#171717}a:hover{color:#B9463F}
+button{font:inherit;cursor:pointer}
+.num{font-variant-numeric:tabular-nums}
+svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.grid{stroke:#E6E4DF;stroke-width:1;fill:none}
+.base{stroke:#9A968E;stroke-width:1;fill:none}
+.even{stroke:#9A968E;stroke-width:1;stroke-dasharray:3 3;fill:none}
+.zero{stroke:#9A968E;stroke-width:1;fill:none}
+.ax{font-size:11px;fill:#6B6862}
+.ev{stroke:#C9C6BF;stroke-width:1;stroke-dasharray:1 3;fill:none}
+.evt{font-size:12px;font-weight:500;fill:#4A4843}
+.evn{fill:#FAF9F6;stroke:#6B6862;stroke-width:1}
+.evnt{font-size:9px;font-weight:600;fill:#4A4843;text-anchor:middle}
+.dots{fill:none;stroke-width:3.5;stroke-linecap:round}
+.ln{fill:none;stroke-linejoin:round;stroke-linecap:round}
+.halo{paint-order:stroke;stroke:#FAF9F6;stroke-width:4px;stroke-linejoin:round}
+.end{font-size:13px;font-weight:600}
+.sub{font-size:13px}
+.val{font-size:12px;font-weight:600;fill:#171717;text-anchor:middle}
+.tab{min-height:44px;padding:0 12px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;font-size:15px;color:#6B6862;white-space:nowrap}
+.tab[aria-pressed="true"]{border-bottom-color:#171717;font-weight:600;color:#171717}
+.tab:hover{color:#171717}
+.tab:focus-visible,.check:focus-within,.help:focus-visible{outline:2px solid #171717;outline-offset:2px;border-radius:4px}
+.copy{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;color:#6B6862;cursor:pointer}
+.copy:hover{background:#EFEDE8;color:#171717}
+.copy:focus-visible{outline:2px solid #171717;outline-offset:2px}
+.help{width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:8px}
+.help:hover{background:#EFEDE8}
+.help span{width:20px;height:20px;box-sizing:border-box;border-radius:10px;border:1.5px solid #6B6862;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#4A4843}
+.check{min-height:44px;display:flex;align-items:center;gap:10px;font-size:14px;color:#171717;cursor:pointer;white-space:nowrap}
+.check input{width:18px;height:18px;margin:0;accent-color:#171717;cursor:pointer}
+.key{display:flex;align-items:center;gap:8px}
+.chip{min-height:44px;padding:0 18px;border:1px solid #DDDCD8;border-radius:22px;background:#FEFCF9;font-size:14px;color:#171717;display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
+.chip:hover{background:#EFEDE8}
+.term{padding:0;border:0;background:none;font:inherit;color:inherit;text-decoration:underline dotted #9A968E;text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:help}
+.qbtn{width:44px;height:44px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;vertical-align:middle}
+.qbtn:hover{background:#EFEDE8}
+.qbtn span{width:20px;height:20px;box-sizing:border-box;border-radius:10px;border:1.5px solid #6B6862;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#4A4843}
+.qbtn[aria-expanded="true"] span{background:#171717;border-color:#171717;color:#FAF9F6}
+.link{min-height:44px;padding:0 4px;border:0;background:none;font:inherit;font-weight:500;color:#171717;text-decoration:underline;text-underline-offset:3px;vertical-align:middle}
+.switch{width:52px;height:44px;flex-shrink:0;padding:0;border:0;background:transparent;display:flex;align-items:center;justify-content:center}
+.switch span{position:relative;display:block;width:40px;height:24px;border-radius:12px;background:#8C8881}
+.switch span::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:9px;background:#FAF9F6}
+.switch[aria-checked="true"] span{background:#171717}
+.switch[aria-checked="true"] span::after{left:19px}
+.chip:focus-visible,.term:focus-visible,.qbtn:focus-visible,.switch:focus-visible,.link:focus-visible{outline:2px solid #171717;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 1460px; box-sizing: border-box; padding: 28px 20px; display: flex; flex-direction: column; background: #FAF9F6">
+<div style="display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #6B6862">
+<span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Two-party preferred</span>
+<span>After preferences · updated 21 Sep 2026</span>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center">
+<div class="num" style="margin-top: 22px; width: 350px; display: grid; grid-template-columns: minmax(0, 1fr) 2px minmax(0, 1fr); column-gap: 16px; align-items: end">
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px"><span style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: #B9463F"><span style="width: 9px; height: 9px; border-radius: 5px; background: #B9463F"></span>Labor</span><span style="font-size: 52px; font-weight: 500; line-height: 1; letter-spacing: -0.03em; color: #B9463F">51.2</span></div>
+<span style="height: 60px; background: #9A968E"></span>
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px"><span style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: #9E5200">One Nation<span style="width: 9px; height: 9px; border-radius: 5px; background: #CC7C37"></span></span><span style="font-size: 52px; font-weight: 500; line-height: 1; letter-spacing: -0.03em; color: #9E5200">48.8</span></div>
+</div>
+<svg viewBox="0 0 350 72" width="350" height="72" role="img" aria-label="Labor leads One Nation by 2.4 points, flow range −0.2 to 5.0." style="margin-top: 12px; display: block; overflow: visible">
+<text class="ax" x="19" y="11" style="font-weight: 600; fill: #B9463F">◀ Labor ahead</text>
+<text class="ax" x="331" y="11" style="text-anchor: end; font-weight: 600; fill: #9E5200">One Nation ahead ▶</text>
+<path class="grid" d="M45 18V50M110 18V50M240 18V50M305 18V50"></path>
+<path class="zero" d="M175 14V52" style="stroke-width: 1.5"></path>
+<rect x="110" y="24" width="67.6" height="14" rx="2" style="fill: #B9463F; opacity: 0.2"></rect>
+<path d="M110 24v14M177.6 24v14" style="stroke: #B9463F; stroke-width: 2"></path>
+<circle cx="143.8" cy="31" r="7" style="fill: #B9463F; stroke: #FAF9F6; stroke-width: 2"></circle>
+<text class="ax num" x="45" y="68" style="text-anchor: middle">10</text>
+<text class="ax num" x="110" y="68" style="text-anchor: middle">5</text>
+<text class="ax num" x="240" y="68" style="text-anchor: middle">5</text>
+<text class="ax num" x="305" y="68" style="text-anchor: middle">10</text>
+<text class="ax" x="175" y="68" style="text-anchor: middle; font-weight: 600; fill: #4A4843">Tied</text>
+</svg>
+<p class="num" style="margin: 12px 0 0; font-size: 15px; line-height: 1.5; color: #3D3B37"><b style="font-weight: 600; color: #171717">Too close to call.</b> Labor’s 2.4-point lead is inside the ±2.6 <button class="term">flow range</button>.</p>
+<p class="num" style="margin: 2px 0 0; font-size: 13px; line-height: 1.5; color: #6B6862">Labor ▼ 0.8 on a month ago, within the <button class="term">margin</button></p>
+<p class="num" style="margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: #6B6862">Implied preference flows · <button class="term">weighted aggregate</button> of 8 polls in the 21 days to 21 Sep<button class="qbtn" aria-label="How this is counted, and the pollsters’ published figures" aria-expanded="false"><span>?</span></button></p>
+<div style="margin-top: 10px; display: flex; align-items: center; gap: 12px"><span style="font-size: 13px; color: #6B6862">Switch 2PP</span><button class="chip">Labor v Coalition<span class="num" style="font-weight: 600"><span style="color: #B9463F">51.6</span><span style="color: #9A968E">–</span><span style="color: #356697">48.4</span></span></button></div>
+</div>
+
+<h2 style="margin: 40px 0 0; font-family: 'Crimson Text', Georgia, serif; font-weight: 700; font-size: 22px; line-height: 1.15">One Nation now runs Labor as close as the Coalition does</h2>
+<p style="margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: #4A4843">Labor’s share against One Nation has fallen from 64% in June 2025 to 51%; against the Coalition, from 56% to 52%. Since February the two contests have run within a point and a half of each other.</p>
+
+<div style="margin-top: 14px; display: flex; align-items: center; border-bottom: 1px solid #DDDCD8">
+<div role="group" aria-label="Time range" style="display: flex"><button class="tab" aria-pressed="false" style="font-size: 14px; padding: 0 8px">3 mo</button><button class="tab" aria-pressed="false" style="font-size: 14px; padding: 0 8px">6 mo</button><button class="tab" aria-pressed="false" style="font-size: 14px; padding: 0 8px">12 mo</button><button class="tab" aria-pressed="true" style="font-size: 14px; padding: 0 8px">All</button></div>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Expand two-party preferred chart" title="Expand"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"></path></svg></button>
+</div>
+<label class="check" style="margin-top: 4px"><input type="checkbox">Compare published head-to-heads</label>
+
+<div style="margin-top: 14px; display: flex; flex-wrap: wrap; column-gap: 16px; row-gap: 4px; font-size: 12px; color: #4A4843">
+<span style="width: 100%; font-size: 13px; font-weight: 600; color: #171717">Labor’s two-party share, %</span>
+<span class="key"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><rect x="0" y="2" width="24" height="10" rx="2" style="fill: #CC7C37; opacity: 0.2"></rect><path d="M1 7H23" style="stroke: #CC7C37; stroke-width: 3; stroke-linecap: round"></path></svg>v One Nation</span>
+<span class="key"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><path d="M1 7H23" style="stroke: #356697; stroke-width: 2; stroke-linecap: round"></path></svg>v Coalition</span>
+</div>
+
+<svg viewBox="0 0 350 270" width="350" height="270" role="img" aria-label="Labor’s two-party share by matchup, May 2025 to September 2026, on implied flows. Against One Nation it fell from 63.8 in June 2025 to 51.1 in September 2026; against the Coalition from 55.2 at the election to 51.6. The two lines have been within 1.5 points of each other since February 2026." style="margin-top: 12px; display: block; overflow: visible">
+<g transform="translate(26 34)">
+<path class="grid" d="M0 10H320M0 60H320M0 110H320"></path>
+<path class="even" d="M0 160H320"></path>
+<path class="base" d="M0 210H320"></path>
+<text class="ax num" x="-6" y="14" style="text-anchor: end">65%</text>
+<text class="ax num" x="-6" y="64" style="text-anchor: end">60</text>
+<text class="ax num" x="-6" y="114" style="text-anchor: end">55</text>
+<text class="ax num" x="-6" y="164" style="text-anchor: end">50</text>
+<text class="ax num" x="-6" y="214" style="text-anchor: end">45</text>
+<path class="base" d="M37.7 210v4M94.5 210v4M151.4 210v4M206.9 210v4M263.2 210v4"></path>
+<text class="ax" x="37.7" y="228" style="text-anchor: middle">Jul 25</text>
+<text class="ax" x="94.5" y="228" style="text-anchor: middle">Oct</text>
+<text class="ax" x="151.4" y="228" style="text-anchor: middle">Jan 26</text>
+<text class="ax" x="206.9" y="228" style="text-anchor: middle">Apr</text>
+<text class="ax" x="263.2" y="228" style="text-anchor: middle">Jul</text>
+<path class="ev" d="M16.7 -14V210M138.35 -14V210M164.3 -14V210M188.4 -14V210M232.3 -14V210"></path>
+<circle class="evn" cx="16.7" cy="-21" r="7"></circle><text class="evnt" x="16.7" y="-18">1</text>
+<circle class="evn" cx="138.35" cy="-21" r="7"></circle><text class="evnt" x="138.35" y="-18">2</text>
+<circle class="evn" cx="164.3" cy="-21" r="7"></circle><text class="evnt" x="164.3" y="-18">3</text>
+<circle class="evn" cx="188.4" cy="-21" r="7"></circle><text class="evnt" x="188.4" y="-18">4</text>
+<circle class="evn" cx="232.3" cy="-21" r="7"></circle><text class="evnt" x="232.3" y="-18">5</text>
+<text class="ax" x="4" y="153">▲ Labor ahead</text>
+<text class="ax" x="4" y="175">▼ Rival ahead</text>
+<path d="M29.2 7L48 7L66.8 17L85.6 30L104.4 39L123.2 53L142 66L160.7 96L179.5 111L198.3 113L217.1 109L235.9 128L254.7 133L273.5 134L292.3 127L311.1 136L311.1 162L292.3 153L273.5 160L254.7 157L235.9 152L217.1 135L198.3 139L179.5 135L160.7 122L142 94L123.2 81L104.4 67L85.6 60L66.8 47L48 37L29.2 37Z" style="fill: #CC7C37; opacity: 0.16"></path>
+<path class="dots" d="M20.6 13h0M33.5 9h0M37.9 26h0M38.5 31h0M39.4 24h0M42.4 14h0M49.2 22h0M49.9 27h0M55.4 19h0M66.2 30h0M67.4 18h0M72.4 39h0M81.3 49h0M83.1 25h0M84.4 48h0M89.3 42h0M94.2 63h0M96.3 31h0M99.4 67h0M102.5 49h0M106.8 40h0M107.5 49h0M111.8 69h0M113.6 59h0M113.6 52h0M118.8 63h0M120.7 70h0M121.9 66h0M123.8 62h0M124.4 76h0M124.4 78h0M126.3 45h0M128.7 53h0M130 81h0M133.9 85h0M137 56h0M137.6 85h0M140.1 65h0M141.3 89h0M145 81h0M146.9 100h0M155.2 122h0M155.2 108h0M158.3 85h0M161.4 98h0M161.4 109h0M162.6 110h0M162.6 96h0M164.5 115h0M165.7 122h0M166.9 107h0M168.2 117h0M169.4 109h0M170.9 118h0M175.2 113h0M175.2 126h0M176.4 135h0M177.7 116h0M178.3 115h0M178.9 106h0M180.2 99h0M182 130h0M182.6 144h0M183.9 100h0M184.5 122h0M185.1 121h0M186.3 126h0M186.9 126h0M189.7 112h0M190.9 139h0M194 126h0M195.2 121h0M197.7 125h0M198.3 122h0M200.8 140h0M202.7 134h0M203.3 122h0M203.9 131h0M204.5 114h0M205.1 124h0M205.7 123h0M207 118h0M207 113h0M210.9 109h0M212.2 112h0M212.8 145h0M215.3 122h0M216.5 148h0M217.7 110h0M219 102h0M219.6 101h0M220.8 139h0M223.9 106h0M224.5 133h0M226.4 128h0M226.4 118h0M228.5 110h0M229.7 111h0M232.8 116h0M234.7 118h0M235.3 138h0M235.3 160h0M235.9 146h0M236.5 127h0M237.1 131h0M237.1 127h0M238.4 134h0M239 159h0M241.5 137h0M241.5 152h0M242.7 124h0M242.7 155h0M243.9 162h0M245.8 141h0M246.7 158h0M247.9 152h0M249.8 146h0M253.5 147h0M254.1 141h0M255.3 155h0M256.6 154h0M258.4 159h0M260.9 118h0M261.5 131h0M262.7 136h0M263.3 146h0M264 142h0M267.3 113h0M269.2 156h0M271 142h0M271 165h0M271.6 147h0M272.9 136h0M274.1 146h0M276 119h0M278.4 142h0M280.3 133h0M281.5 131h0M282.8 169h0M284.2 124h0M287.3 136h0M288.6 139h0M289.2 130h0M292.3 142h0M292.9 134h0M295.4 146h0M297.2 141h0M297.8 133h0M300.3 147h0M300.3 146h0M301.5 111h0M302.2 144h0M305.5 138h0M306.7 162h0M309.2 159h0M309.8 134h0M310.5 132h0M312.3 156h0M314.2 138h0M314.8 146h0" style="stroke: #CC7C37; opacity: 0.35"></path>
+<path class="ln" d="M1.2 108L29.2 98L48 93L66.8 100L85.6 105L104.4 105L123.2 106L142 116L160.7 126L179.5 124L198.3 128L217.1 128L235.9 138L254.7 130L273.5 143L292.3 141L311.1 144" style="stroke: #356697; stroke-width: 1.75"></path>
+<path class="ln" d="M29.2 22L48 22L66.8 32L85.6 45L104.4 53L123.2 67L142 80L160.7 109L179.5 123L198.3 126L217.1 122L235.9 140L254.7 145L273.5 147L292.3 140L311.1 149" style="stroke: #CC7C37; stroke-width: 2.5"></path>
+<circle cx="1.2" cy="108.0" r="4" style="fill: #FAF9F6; stroke: #171717; stroke-width: 1.75"></circle>
+</g>
+</svg>
+
+<ol style="margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #3D3B37">
+<li style="display: flex; gap: 10px"><span class="num" style="width: 16px; font-weight: 600; color: #6B6862">1</span><span style="flex-grow: 1">1st Coalition split</span><span style="color: #6B6862">May 2025</span></li>
+<li style="display: flex; gap: 10px"><span class="num" style="width: 16px; font-weight: 600; color: #6B6862">2</span><span style="flex-grow: 1">Joyce joins One Nation · Bondi shooting</span><span style="color: #6B6862">Dec 2025</span></li>
+<li style="display: flex; gap: 10px"><span class="num" style="width: 16px; font-weight: 600; color: #6B6862">3</span><span style="flex-grow: 1">2nd Coalition split</span><span style="color: #6B6862">Jan 2026</span></li>
+<li style="display: flex; gap: 10px"><span class="num" style="width: 16px; font-weight: 600; color: #6B6862">4</span><span style="flex-grow: 1">Hormuz crisis</span><span style="color: #6B6862">Mar 2026</span></li>
+<li style="display: flex; gap: 10px"><span class="num" style="width: 16px; font-weight: 600; color: #6B6862">5</span><span style="flex-grow: 1">2026 Budget</span><span style="color: #6B6862">May 2026</span></li>
+</ol>
+
+<div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #DDDCD8; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; row-gap: 10px; font-size: 12px; color: #4A4843">
+<span class="key"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="2.5" style="fill: #CC7C37; opacity: 0.55"></circle></svg>One poll, implied flows</span>
+<span class="key"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><rect x="0" y="2" width="24" height="10" rx="2" style="fill: #CC7C37; opacity: 0.2"></rect><path d="M1 7H23" style="stroke: #CC7C37; stroke-width: 3; stroke-linecap: round"></path></svg>Monthly, flow range</span>
+<span class="key"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 1.75"></circle></svg>2025 election</span>
+</div>
+
+<div style="margin-top: 16px; display: flex; align-items: center">
+<a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500">How it’s built</a>
+<span style="flex-grow: 1"></span>
+<button class="copy" aria-label="Copy chart: two-party preferred" title="Copy chart"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"></path></svg></button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1460}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
