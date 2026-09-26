@@ -60,8 +60,13 @@ extracted_at: '2026-09-26'
   housing ± homelessness drift) – compare with RedBridge's first rank, not
   its top three. Not pooled; the Info cites it as a check. It also asked
   "Which political party do you trust more to handle the following issues?"
-  once (Feb 2026: Greens, Labor, Don't know, Coalition, One Nation) – that
-  would qualify for the ownership pool; not added (one wave).
+  once (Feb 2026: Greens, Labor, Don't know, Coalition, One Nation; 12
+  issues) – pooled since 2026-09-26 (`daOwnership`). "Medicare" maps to
+  health (its three-way shares sat within a few points of RedBridge's health
+  that month); "Inflation" and "Aged care" keep keys of their own. One poll:
+  no lean measurable, excluded from the trend test (withinHouseSlope skips
+  one-poll houses), but it moves February's monthly points (it reads Labor
+  lower than RedBridge on most issues).
 - **Spectre**: up to 3 of 14 issues (+ other, unsure), bundled ("health &
   aged care", "immigration & population growth"), ~every three months.
   Not pooled; cited as a check. Its levels match Ipsos within ~4 points.
@@ -144,7 +149,7 @@ extracted_at: '2026-09-26'
 
 ## Adding a house or an issue
 
-Map labels in `issues-parse.mjs` (RB_ISSUE / RS_ISSUE / YG_ISSUE / IP_ISSUE)
+Map labels in `issues-parse.mjs` (RB_ISSUE / RS_ISSUE / YG_ISSUE / IP_ISSUE / DA_ISSUE)
 only where it is the same issue; pin with a case in `test-issues.mjs`. A new
 house joins ownership pooling only if its question offers Labor, the
 Coalition and One Nation separately. A third salience house would need a

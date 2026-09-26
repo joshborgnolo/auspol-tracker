@@ -129,7 +129,9 @@ a GENERATED build artifact — never hand-edit it.
   `data/resolve-political-monitor.csv` (monthly since 2021; One Nation an
   option from July 2026 – that month's rows count it twice and the reader
   subtracts it), YouGov's occasional News24 Pulse "best at handling"
-  chart, and Ipsos's Issues Monitor (monthly since Dec 2025: all 19 issues
+  chart, DemosAU's one "trust more to handle" table (Feb 2026, 12 issues,
+  read from its cached report text; its updater runs issues.mjs so a repeat
+  joins with the wave), and Ipsos's Issues Monitor (monthly since Dec 2025: all 19 issues
   "pick three facing Australia", best party on the month's five top issues,
   One Nation an option from June 2026; `.build/extract-ipsos.mjs` caches
   the national reports and methodology statements as text in

@@ -30,7 +30,9 @@
   "unemployment": "Unemployment",
   "population": "Population",
   "racism": "Racism",
-  "drugs": "Drug and alcohol abuse"
+  "drugs": "Drug and alcohol abuse",
+  "agedcare": "Aged care",
+  "inflation": "Inflation"
  },
  "salience": [
   {
@@ -15987,6 +15989,109 @@
      "alp": 26,
      "oth": 26,
      "unsure": 28
+    }
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-02-20",
+   "dateStart": "2026-02-16",
+   "sample": 1551,
+   "sampleEff": 1008,
+   "source": "https://demosau.com/wp-content/uploads/2026/02/DemosAU-Federal-Poll-Feb-2026.pdf",
+   "read": "report",
+   "question": "trust more to handle",
+   "options": [
+    "alp",
+    "lnp",
+    "onp",
+    "grn",
+    "unsure"
+   ],
+   "issues": {
+    "agedcare": {
+     "grn": 10,
+     "alp": 25,
+     "unsure": 27,
+     "lnp": 19,
+     "onp": 19
+    },
+    "climate": {
+     "grn": 25,
+     "alp": 18,
+     "unsure": 27,
+     "lnp": 13,
+     "onp": 17
+    },
+    "col": {
+     "grn": 9,
+     "alp": 23,
+     "unsure": 24,
+     "lnp": 23,
+     "onp": 21
+    },
+    "economy": {
+     "grn": 6,
+     "alp": 24,
+     "unsure": 24,
+     "lnp": 29,
+     "onp": 17
+    },
+    "energy": {
+     "grn": 16,
+     "alp": 21,
+     "unsure": 24,
+     "lnp": 21,
+     "onp": 18
+    },
+    "foreign": {
+     "grn": 6,
+     "alp": 26,
+     "unsure": 24,
+     "lnp": 22,
+     "onp": 22
+    },
+    "housing": {
+     "grn": 10,
+     "alp": 22,
+     "unsure": 27,
+     "lnp": 20,
+     "onp": 21
+    },
+    "immigration": {
+     "grn": 7,
+     "alp": 19,
+     "unsure": 21,
+     "lnp": 20,
+     "onp": 33
+    },
+    "inflation": {
+     "grn": 7,
+     "alp": 22,
+     "unsure": 27,
+     "lnp": 26,
+     "onp": 18
+    },
+    "health": {
+     "grn": 10,
+     "alp": 31,
+     "unsure": 22,
+     "lnp": 20,
+     "onp": 17
+    },
+    "security": {
+     "grn": 6,
+     "alp": 24,
+     "unsure": 23,
+     "lnp": 26,
+     "onp": 21
+    },
+    "tax": {
+     "grn": 7,
+     "alp": 25,
+     "unsure": 24,
+     "lnp": 26,
+     "onp": 18
     }
    }
   },

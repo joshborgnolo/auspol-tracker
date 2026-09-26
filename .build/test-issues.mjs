@@ -2,14 +2,15 @@
    Snapshot's Issues panel – against the cached reports (.build/redbridge-src
    and .build/ipsos-src, tracked) and the YouGov chart fixtures
    (.build/news24-src/ig-fixtures-*), plus synthetic Resolve rows for the
-   file's known quirks.
+   file's known quirks. DemosAU's February 2026 "trust more to handle"
+   table from .build/demosau-src.
    Run: node .build/test-issues.mjs */
 import fs from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
 import {
   rbSalienceSummary, rbOwnershipSummary, rbGroupTables, resolveOwnership, ygIssuesOf,
-  ipReports, ipStatement, salienceProblem, ownershipProblem, rbIssue,
+  ipReports, ipStatement, daOwnership, salienceProblem, ownershipProblem, rbIssue,
 } from "./issues-parse.mjs";
 import { coverOf } from "./extract-ipsos.mjs";
 import { infographicDataOf } from "./infogram.mjs";
@@ -197,6 +198,17 @@ assert.equal(coverOf("report", "/x/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%
 assert.equal(coverOf("report", "/x/IM_States_Jun_26_v4.pdf"), null, "the state reports are skipped");
 assert.equal(coverOf("statement", "/x/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20July%202026_0.pdf"), "2026-07");
 assert.equal(coverOf("statement", "/x/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20Q2%202023.pdf"), null);
+// ---- DemosAU: "Which political party do you trust more to handle…" (February 2026) ----
+const daRep = (f) => fs.readFileSync(path.join(".build/demosau-src", f + ".txt"), "utf8");
+const da = daOwnership(daRep("DemosAU-Federal-Poll-Feb-2026"));
+assert.equal(Object.keys(da.issues).length, 12);
+assert.deepEqual(da.unknown, []);
+assert.deepEqual(da.issues.col, { grn: 9, alp: 23, unsure: 24, lnp: 23, onp: 21 }, "columns in the header's order");
+assert.deepEqual(da.issues.health, { grn: 10, alp: 31, unsure: 22, lnp: 20, onp: 17 }, "Medicare is health");
+assert.ok(da.issues.inflation && da.issues.agedcare, "inflation and aged care keep issues of their own");
+for (const [k, sh] of Object.entries(da.issues)) assert.equal(ownershipProblem(sh), null, `DemosAU ${k} passes the gate`);
+assert.equal(daOwnership(daRep("Capital-BriefDemosAU-Federal-Poll-August-2026")), null, "a report without the table");
+
 // a top three with no ranks
 assert.equal(salienceProblem({ top3: 63 }), null);
 assert.match(salienceProblem({ top3: 130 }), /outside/);

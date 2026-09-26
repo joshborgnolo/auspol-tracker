@@ -5832,7 +5832,7 @@ function infoTerms(D) {
             <tr key={p.pollster + p.dateLabel}>
               <td>{p.pollster}</td><td>{p.dateLabel}</td>
               <td>{(p.options || []).map((o) => (o === "unsure"
-                ? ({ Resolve: "undecided", YouGov: "don’t know", Ipsos: "don’t know" }[p.pollster] || "not sure")
+                ? ({ Resolve: "undecided", YouGov: "don’t know", Ipsos: "don’t know", DemosAU: "don’t know" }[p.pollster] || "not sure")
                 : ISS_OPT[o] || o)).join(", ")}</td>
             </tr>
           ))}
@@ -6349,17 +6349,18 @@ function infoTerms(D) {
         several of them bundled, such as “health and aged care”. Neither can be pooled with the
         others, but both side with Ipsos on health. In 2026 Spectre had it at 18 to 20%, and 1 to 3%
         named it the biggest issue at DemosAU, where 7 to 10% put it first at RedBridge.</span>
-        <span className="info-p"><b>Who’s best.</b> Four pollsters ask which party would handle an
+        <span className="info-p"><b>Who’s best.</b> Five pollsters ask which party would handle an
         issue best, each in its own words. Resolve asks every month, “Which party do you think would
         perform best in each of these areas?” RedBridge asks every month, “Which of the following do
         you believe is best able to deal with…” Ipsos asks every month, “Please select the political
         party that you believe is most capable of managing each of the following issues,” for its
-        month’s five top issues. YouGov asked in August 2026, “Which party is best at handling…”
-        Each offers different answers. Resolve offers the Liberals, Labor, One Nation (since July
+        month’s five top issues. YouGov asked in August 2026, “Which party is best at handling…”, and
+        DemosAU in February 2026, “Which political party do you trust more to handle the following
+        issues?” Each offers different answers. Resolve offers the Liberals, Labor, One Nation (since July
         2026), someone else, and undecided. RedBridge offers Labor, the Liberals, the Nationals, the
         Greens, One Nation, all about equal, none of these, and not sure. Ipsos offers Labor, the
         Coalition, the Greens, One Nation (since June 2026), other, don’t know, and none. YouGov
-        offers Labor, the Coalition, One Nation, the Greens, and don’t know.</span>
+        and DemosAU offer Labor, the Coalition, One Nation, the Greens, and don’t know.</span>
         <span className="info-p"><b>How it’s built.</b> The part every question shares is the choice
         between Labor, the Coalition and One Nation. So each poll is read as those three parties’
         shares of the voters who named one of them: 25, 20 and 20 of all voters become 38, 31 and 31.
@@ -6371,8 +6372,9 @@ function infoTerms(D) {
         {" "}points</> : null}. The panel shows eight issues most of the pollsters ask: the cost of living,
         housing, health, economic management, immigration, climate change, crime, and national
         security. Pollsters word them a little differently – RedBridge’s “the rate of immigration”
-        is Resolve’s “immigration and refugees”, and Ipsos’s “defence, foreign affairs and
-        terrorism” counts as national security – and each counts as the same issue.</span>
+        is Resolve’s “immigration and refugees”, Ipsos’s “defence, foreign affairs and terrorism”
+        counts as national security, and DemosAU’s “Medicare” as health – and each counts as the
+        same issue.</span>
         <span className="info-p"><b>What’s left out.</b> The Greens, whom Resolve doesn’t offer, and
         every answer that names no party. Together they are about a quarter to two fifths of voters
         on most issues, and more than half on climate change with RedBridge and YouGov, where many
@@ -6386,7 +6388,8 @@ function infoTerms(D) {
         any party has gained or lost ground on the issue over the period shown. Ipsos and Resolve
         joined the three-party question only in June and July 2026, so a line can move just because
         one of them arrived. The test compares each pollster only with itself, as on the
-        vote-by-group charts, and the bar rises for testing three parties at once.</span>
+        vote-by-group charts, and the bar rises for testing three parties at once. A pollster with
+        a single poll, such as DemosAU, can’t show a change, so it’s left out of the test.</span>
         <span className="info-p"><b>By group.</b> RedBridge publishes a table for each of its main
         issues giving each group’s share putting it in their top three: by vote, generation, gender,
         where people live, home ownership, and education. A group’s margin comes from its share of the
@@ -6406,8 +6409,9 @@ function infoTerms(D) {
         must agree.</span>
         <span className="info-p"><b>Sources.</b> RedBridge’s monthly reports with Accent Research
         (accent-research.com), Resolve’s Political Monitor interactive (The Sydney Morning Herald),
-        Ipsos’s Issues Monitor reports and methodology statements (ipsos.com), and YouGov’s News24
-        Pulse charts. For the check, DemosAU’s and Spectre’s reports.</span>
+        Ipsos’s Issues Monitor reports and methodology statements (ipsos.com), YouGov’s News24
+        Pulse charts, and DemosAU’s report for February 2026. For the check, DemosAU’s and
+        Spectre’s reports.</span>
         {working(<>
           <span className="info-p"><b>Top three, two pollsters:</b> with g = RedBridge’s figure minus
           Ipsos’s on average, each RedBridge poll’s share x counts as x − g ÷ 2 and each Ipsos poll’s

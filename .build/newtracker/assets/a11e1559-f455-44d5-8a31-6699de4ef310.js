@@ -2556,9 +2556,9 @@ function DemographicsPanel({ rangeId = "all" }) {
    toward the other – they word the question differently and sit a steady
    distance apart; gen-data §7h) beside who they think is best on it: Labor,
    the Coalition and One Nation as shares of the voters who named one of
-   those three, pooled across Resolve, RedBridge, Ipsos and YouGov (the four
-   offer different options, and those three are the part every question
-   shares). A row picks the issue the chart follows month by month. "What
+   those three, pooled across Resolve, RedBridge, Ipsos, YouGov and DemosAU
+   (the five offer different options, and those three are the part every
+   question shares). A row picks the issue the chart follows month by month. "What
    matters to whom": RedBridge's top three by group, under its own
    all-voters row. */
 const ISS_PARTY = { alp: "Labor", lnp: "the Coalition", onp: "One Nation" };
@@ -2631,7 +2631,10 @@ function issGroupVerdict(tab, k) {
    arrived. Holm across the three parties. */
 function issTrendVerdict(D, it, dots) {
   if (!dots.length) return null;
-  const ym = dots[0].date.slice(0, 7);
+  // the test's own start: its first poll from a pollster with two or more (withinHouseSlope drops a lone poll)
+  const per = {};
+  for (const d of dots) per[d.pollster] = (per[d.pollster] || 0) + 1;
+  const ym = (dots.find((d) => per[d.pollster] >= 2) || dots[0]).date.slice(0, 7);
   const when = D.monthNameFull(+ym.slice(5)) + " " + ym.slice(0, 4);
   const what = ISS_PHRASE[it.id] || it.label.toLowerCase();
   const fits = D.issues.parties.map((q) => ({ q, fit: withinHouseSlope(dots.map((d) =>
@@ -2893,8 +2896,8 @@ function IssuesPanel({ rangeId = "all" }) {
                   The coloured bar splits the voters who named Labor, the Coalition or One Nation as best on the
                   issue. Pollsters also offer other answers – the Greens, someone else, all about equal, don’t
                   know – and each offers a different set, so only these three can be pooled. Resolve, RedBridge,
-                  Ipsos and YouGov count wherever they ask the issue, each less its usual lean, as in the
-                  headline figures.
+                  Ipsos, YouGov and DemosAU count wherever they ask the issue, each less its usual lean, as in
+                  the headline figures.
                 </p>
                 <p className="table-hint">
                   “Ahead” means the leading party’s margin over the next is larger than that margin’s own 95%

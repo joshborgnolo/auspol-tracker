@@ -37,6 +37,12 @@
                  an option from June 2026. Fieldwork dates and the effective
                  sample come from the month's methodology statement where
                  one is cached.
+     DemosAU   – the report text extract-demosau.mjs caches
+                 (.build/demosau-src/): "Which political party do you trust
+                 more to handle the following issues?", asked in February
+                 2026 (12 issues). Every cached report is read, so a wave
+                 that asks it again joins by itself; the DemosAU updater
+                 runs this script too.
    Shares are stored as published, each house's options as it offers them
    (see issues-parse.mjs for the keys). Nothing is saved on a guess: every
    row passes the gate in issues-parse.mjs, a wave printed twice (a report's
@@ -57,7 +63,7 @@ import { ROOT, IG } from "./crosstab-sources.mjs";
 import { infographicDataOf } from "./infogram.mjs";
 import {
   ISSUES, rbSalienceSummary, rbOwnershipSummary, rbGroupTables, resolveOwnership, ygIssuesOf,
-  ipReports, ipStatement, IP_FIRST, salienceProblem, ownershipProblem,
+  ipReports, ipStatement, IP_FIRST, daOwnership, salienceProblem, ownershipProblem,
 } from "./issues-parse.mjs";
 
 const OUT = path.join(ROOT, "data", "issues.json");
@@ -283,6 +289,29 @@ for (const [ym, prints] of [...ipOwn.entries()].sort()) {
   ownership.push({ ...row, read: "report", question: "most capable of managing",
     options: Object.values(r.own).some((sh) => sh.onp != null) ? ["alp", "lnp", "onp", "grn", "oth", "unsure", "none"]
       : ["alp", "lnp", "grn", "oth", "unsure", "none"], issues: r.own });
+}
+
+// ---- DemosAU ---------------------------------------------------------------------------
+/* Its "trust more to handle" table, in whichever cached report prints one;
+   the wave's dates and samples from its poll row. */
+const DA = "DemosAU";
+const daDir = path.join(ROOT, ".build", "demosau-src");
+const daSeen = new Set();
+for (const f of fs.existsSync(daDir) ? fs.readdirSync(daDir).filter((x) => x.endsWith(".txt")).sort() : []) {
+  const tb = daOwnership(fs.readFileSync(path.join(daDir, f), "utf8"));
+  if (!tb) continue;
+  let meta = {};
+  try { meta = JSON.parse(fs.readFileSync(path.join(daDir, f.replace(/\.txt$/, ".json")), "utf8")); } catch {}
+  for (const u of tb.unknown) unknown.add(`DemosAU ${meta.date || f}: ${u}`);
+  const p = meta.date ? rowOf(DA, meta.date) : null;
+  if (!p) { pending.push(`${DA}|${meta.date || f}: no poll row for the wave`); continue; }
+  if (daSeen.has(p.date)) continue;               // one wave, printed in two cached reports
+  const bad = Object.entries(tb.issues).map(([k, sh]) => { const e = ownershipProblem(sh); return e && `${ISSUES[k]}: ${e}`; }).filter(Boolean);
+  if (!Object.keys(tb.issues).length) bad.push("the trust table didn't read");
+  if (bad.length) { pending.push(`${DA}|${p.date}: ${bad.slice(0, 3).join("; ")}`); continue; }
+  daSeen.add(p.date);
+  ownership.push(base(p, { read: "report", question: "trust more to handle",
+    options: ["alp", "lnp", "onp", "grn", "unsure"], issues: tb.issues }));
 }
 
 // ---- write -----------------------------------------------------------------------------

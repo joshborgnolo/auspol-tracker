@@ -23,6 +23,8 @@ export const ISSUES = {
   // on Ipsos's list alone
   petrol: "Petrol prices", poverty: "Poverty", personaldebt: "Personal debt", unemployment: "Unemployment",
   population: "Population", racism: "Racism", drugs: "Drug and alcohol abuse",
+  // on DemosAU's alone
+  agedcare: "Aged care", inflation: "Inflation",
 };
 
 const norm = (s) => String(s).replace(/[’‘]/g, "'").replace(/\s+/g, " ").trim().toLowerCase();
@@ -83,6 +85,20 @@ export const IP_ISSUE = {
 };
 const IP_ANSWER = { coalition: "lnp", alp: "alp", greens: "grn", "one nation": "onp", other: "oth",
                     "don't know": "unsure", none: "none" };
+
+/* DemosAU's "trust more to handle" issues. It asks "Inflation" beside "Cost
+   of living" and "Aged care" apart from "Medicare", so each is its own
+   issue. "Medicare" is health: the public health system as Australians name
+   it, and in February 2026 its three-party shares (Labor 46, Coalition 29,
+   One Nation 25) sat within a few points of RedBridge's health figures. */
+const DA_ISSUE = {
+  "aged care": "agedcare", "climate change": "climate", "cost of living": "col",
+  "economic management": "economy", "energy policy": "energy", "foreign relations": "foreign",
+  housing: "housing", immigration: "immigration", inflation: "inflation", medicare: "health",
+  "national security": "security", "tax policy": "tax",
+};
+const DA_ANSWER = { "the greens": "grn", labor: "alp", "don't know": "unsure",
+                    "the liberal national coalition": "lnp", "one nation": "onp" };
 
 // ---- RedBridge ------------------------------------------------------------------------
 const lines = (txt) => txt.split("\n");
@@ -515,6 +531,41 @@ export function ipStatement(txt) {
   const num = (s) => (s ? Number(s[1].replace(/,/g, "")) : null);
   return { ym: ymOfParts(t[2], MONTH_N[t[1]]), start: fw ? d(fw[1], fw[2], fw[3]) : null,
            end: fw ? d(fw[4], fw[5], fw[6]) : null, sample: num(n), sampleEff: num(eff) };
+}
+
+// ---- DemosAU ------------------------------------------------------------------------
+/* "Party Trusted To Address Issues" (February 2026): "Which political party
+   do you trust more to handle the following issues?", a row per issue and a
+   column per answer, in the order the header prints them (The Greens,
+   Labor, Don't Know, The Liberal National Coalition, One Nation), shares to
+   a decimal place. { issues: { key: { grn, alp, unsure, lnp, onp } },
+   unknown }, or null when the report has no such table. The question is
+   printed again on the report's question-wording page, with no table under
+   it; the first printing is the table's. */
+export function daOwnership(txt) {
+  const ls = lines(txt);
+  const i = ls.findIndex((l) => /Which political party do you trust more to handle the following issues/.test(l));
+  if (i < 0) return null;
+  const hi = ls.findIndex((l, j) => j > i && j <= i + 5 && /Labor/.test(l) && /One Nation/.test(l));
+  if (hi < 0) return null;
+  const head = ls[hi].trim().split(/\s{2,}/);
+  const cols = head.map((h) => DA_ANSWER[norm(h)] || null);
+  if (cols.includes(null)) return { issues: {}, unknown: head.filter((h, n) => !cols[n]).map((h) => "answer: " + h) };
+  const issues = {}, unknown = [];
+  for (let j = hi + 1; j < Math.min(ls.length, hi + 40); j++) {
+    const t = ls[j].trim();
+    if (!t) continue;
+    // the chart's axis ("0%  20% …") or the page number ends the table
+    if (/^0%/.test(t) || /^\d+$/.test(t)) break;
+    const m = t.match(/^([A-Za-z][A-Za-z ,'’&/-]*?)\s{2,}((?:\d+(?:\.\d+)?%\s*)+)$/);
+    if (!m) continue;
+    const k = DA_ISSUE[norm(m[1])];
+    if (!k) { unknown.push(m[1]); continue; }
+    const v = [...m[2].matchAll(/(\d+(?:\.\d+)?)%/g)].map((x) => Number(x[1]));
+    if (v.length !== cols.length) { unknown.push(m[1] + " (short row)"); continue; }
+    issues[k] = Object.fromEntries(cols.map((c, n) => [c, v[n]]));
+  }
+  return { issues, unknown };
 }
 
 // ---- the gate --------------------------------------------------------------------------

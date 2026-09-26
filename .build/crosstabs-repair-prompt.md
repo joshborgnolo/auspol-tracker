@@ -85,7 +85,8 @@ The third script reads what voters say matters and which party they think is
 best on each issue: RedBridge's report text (its summary tables from April
 2026, each issue's table by group), Resolve's `party_attributes` rows in
 `data/resolve-political-monitor.csv`, YouGov's News24 Pulse "Which party
-is best at handling…" chart when a wave carries one, and Ipsos's Issues
+is best at handling…" chart when a wave carries one, DemosAU's "trust more
+to handle" table (February 2026, from its cached report text), and Ipsos's Issues
 Monitor – its national reports and methodology statements, which
 `.build/extract-ipsos.mjs` caches as text in `.build/ipsos-src/` at the
 start of this run. The readers are pure functions in
@@ -97,7 +98,8 @@ start of this run. The readers are pure functions in
   twice (its own report and the next report's previous-wave columns) must
   agree within a point; a disagreement is a reader bug or a publisher
   correction – find which before touching anything.
-- `unknown` lists issue labels no map knows (RB_ISSUE, RS_ISSUE, YG_ISSUE).
+- `unknown` lists issue labels no map knows (RB_ISSUE, RS_ISSUE, YG_ISSUE,
+  IP_ISSUE, DA_ISSUE).
   Map a label only to the issue it plainly is (a rewording, not a different
   issue: "climate change" and "the environment" are two), and add it to
   `ISSUES` if it is genuinely new.
