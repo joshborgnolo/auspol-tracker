@@ -84,9 +84,12 @@ run `node .build/test-crosstabs.mjs`, then `bash .build/crosstabs-updater.sh`.
 The third script reads what voters say matters and which party they think is
 best on each issue: RedBridge's report text (its summary tables from April
 2026, each issue's table by group), Resolve's `party_attributes` rows in
-`data/resolve-political-monitor.csv`, and YouGov's News24 Pulse "Which party
-is best at handling…" chart when a wave carries one. The readers are pure
-functions in `.build/issues-parse.mjs`, pinned by `.build/test-issues.mjs`.
+`data/resolve-political-monitor.csv`, YouGov's News24 Pulse "Which party
+is best at handling…" chart when a wave carries one, and Ipsos's Issues
+Monitor – its national reports and methodology statements, which
+`.build/extract-ipsos.mjs` caches as text in `.build/ipsos-src/` at the
+start of this run. The readers are pure functions in
+`.build/issues-parse.mjs`, pinned by `.build/test-issues.mjs`.
 
 - A `stale` or `pending` RedBridge wave usually means a report's layout
   moved: read the new table in the cached `.txt`, teach `issues-parse.mjs`
@@ -101,6 +104,20 @@ functions in `.build/issues-parse.mjs`, pinned by `.build/test-issues.mjs`.
 - Resolve's file has known quirks the reader already handles (unasked items
   at 0, one item under several labels, July 2026's One Nation counted twice).
   A new clash between labels is a question for a person, not a guess.
+- An Ipsos month (`Ipsos|<fieldwork end>`) waits when its report doesn't
+  read cleanly or two printings disagree: page 1's five against page 2, the
+  monthly report against the bound year, or a later report's page 2
+  reprint against the month's own column. Read the cached `.txt`: a moved
+  layout is a reader fix (pin it in `test-issues.mjs`); a reprint that
+  disagrees can be Ipsos revising a month (its 2025 reports reprinted April
+  2024 with different figures) – that is a question for a person, not a
+  guess.
+- `Ipsos|quiet` means no Ipsos report whose fieldwork closed in the last
+  90 days: check the run's IPSOS_STATUS line (a warning that the page
+  didn't load, or that no national report is linked – has
+  ipsos.com/en-au/issuesmonitor moved or changed its file names?) and fix
+  `extract-ipsos.mjs`'s `coverOf` if the names changed. If Ipsos really
+  stopped, say so in your report; don't silence the alarm.
 
 ## Hard rules
 
@@ -110,9 +127,10 @@ functions in `.build/issues-parse.mjs`, pinned by `.build/test-issues.mjs`.
 - NEVER hand-edit `data/vote-switching.json`, `data/demographics.json` or
   `data/issues.json`; only the scripts write them.
 - NEVER loosen the gate: `SUM_TOLERANCE`, the one-point all-voters check,
-  `FIT_LIMIT`, the stale alarm (`STALE_DAYS`), the dropped-group check, or
-  issues-parse.mjs's `salienceProblem` / `ownershipProblem` and the
-  printed-twice agreement.
+  `FIT_LIMIT`, the stale alarm (`STALE_DAYS`), Ipsos's quiet alarm
+  (`IP_QUIET_DAYS`) and its 19-shares-near-300 check, the dropped-group
+  check, or issues-parse.mjs's `salienceProblem` / `ownershipProblem` and
+  the printed-twice agreement.
 - `KNOWN_DROP` is only for a group verified to be gone from the house's own
   publication, with the evidence in its reason – never for one the reader
   merely fails to find.

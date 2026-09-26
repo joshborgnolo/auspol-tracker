@@ -7,7 +7,9 @@
 # its own wave's tables (refresh_crosstabs in git-push-main.sh), so most
 # weeks this is a no-op. It exists for what those runs leave pending: a
 # chart id the laptop's Chrome run records after the CI run, a report PDF a
-# fetch didn't get, a table that didn't read cleanly. And it is the alarm
+# fetch didn't get, a table that didn't read cleanly. It is also the only
+# reader of Ipsos's Issues Monitor, which no house updater covers
+# (extract-ipsos.mjs caches it, issues.mjs reads it). And it is the alarm
 # for anything that stays unread: a wave still pending STALE_DAYS after its
 # fieldwork closed (listed as `stale` in the scripts' status lines) fails
 # the run – after committing whatever did land – so the failure email and
@@ -47,6 +49,14 @@ UNFINISHED=""
 STALE=""
 DROPPED=""
 UNKNOWN=""
+# Ipsos has no updater of its own: its Issues Monitor reports (which issues
+# matter, and which party is most capable on them) are cached here, weekly,
+# for issues.mjs to read. A page that won't load is a warning – the cache
+# stays, and issues.mjs fails the run once Ipsos has been quiet too long. A
+# newly cached file is committed even when no figure moves, so the tree
+# (the laptop clone's included) is never left dirty.
+IPS="$(node .build/extract-ipsos.mjs 2>&1)"
+log "$(echo "$IPS" | tail -1)"
 for b in vote-switching demographics issues; do
   OUT="$(node ".build/$b.mjs" 2>&1)"
   CODE=$?
@@ -71,6 +81,7 @@ for b in vote-switching demographics issues; do
   U="$(echo "$LAST" | sed -n 's/.*"unknown":\[\([^]]*\)\].*/\1/p')"
   if [ -n "$U" ]; then UNKNOWN="$UNKNOWN $b: $U"; fi
 done
+if [ -n "$(git status --porcelain -- .build/ipsos-src)" ]; then CHANGED=true; fi
 
 if $CHANGED; then
   log "crosstab tables changed; running validate/build/commit/push"
@@ -84,7 +95,7 @@ if $CHANGED; then
     log "FAIL build; no commit made"
     exit 1
   fi
-  FILES=(data/vote-switching.json data/demographics.json data/issues.json "${SITE_FILES[@]}")
+  FILES=(data/vote-switching.json data/demographics.json data/issues.json .build/ipsos-src "${SITE_FILES[@]}")
   git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
   MSG="Update crosstab tables $(date '+%Y-%m-%d')"
   if ! git commit -m "$MSG" >> "$LOG" 2>&1; then

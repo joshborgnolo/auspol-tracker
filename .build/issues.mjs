@@ -28,14 +28,26 @@
                  the News24 extractor records but doesn't read ("unmodelled")
                  are fetched and kept if they have its shape, plus
                  KNOWN_IG_ISSUES found by hand. Most waves carry none.
+     Ipsos     – the Issues Monitor's national reports, cached as text by
+                 extract-ipsos.mjs (.build/ipsos-src/), which the weekly
+                 crosstabs run calls first. Salience: "What would you say are
+                 the three most important issues facing Australia today?"
+                 (three of 19, no ranks). Best party: "most capable of
+                 managing" each of the month's five top issues, One Nation
+                 an option from June 2026. Fieldwork dates and the effective
+                 sample come from the month's methodology statement where
+                 one is cached.
    Shares are stored as published, each house's options as it offers them
    (see issues-parse.mjs for the keys). Nothing is saved on a guess: every
    row passes the gate in issues-parse.mjs, a wave printed twice (a report's
-   own summary and the next report's previous-wave columns) must agree
-   within a point, and a report's tables by group must match its summary.
-   A wave that fails stays pending and is retried every run; one pending
-   STALE_DAYS after fieldwork closed is listed as `stale`, and the weekly
-   run fails on it so a person (or agent-repair) looks.
+   own summary and the next report's previous-wave columns; an Ipsos month
+   in its own report, the bound year and every later report's page 2) must
+   agree within a point, and a report's tables by group must match its
+   summary. A wave that fails stays pending and is retried every run; one
+   pending STALE_DAYS after fieldwork closed is listed as `stale`, and the
+   weekly run fails on it so a person (or agent-repair) looks. So does
+   Ipsos gone quiet: no report for IP_QUIET_DAYS after the newest one's
+   fieldwork closed.
 
    Usage: node .build/issues.mjs
    Last line: ISSUES_STATUS {"changed":…,"added":[…],"pending":[…],"stale":[…],"unknown":[…]} */
@@ -45,7 +57,7 @@ import { ROOT, IG } from "./crosstab-sources.mjs";
 import { infographicDataOf } from "./infogram.mjs";
 import {
   ISSUES, rbSalienceSummary, rbOwnershipSummary, rbGroupTables, resolveOwnership, ygIssuesOf,
-  salienceProblem, ownershipProblem,
+  ipReports, ipStatement, IP_FIRST, salienceProblem, ownershipProblem,
 } from "./issues-parse.mjs";
 
 const OUT = path.join(ROOT, "data", "issues.json");
@@ -53,6 +65,10 @@ const RB = "RedBridge/Accent";
 const FIRST_RB = "2025-12-01";          // the first report extract-redbridge.mjs cached this term
 const FIRST_YG = "2026-08-01";          // News24 Pulse (Sky News Pulse pages need a browser)
 const STALE_DAYS = 16;
+/* Ipsos publishes about 3½ weeks after fieldwork closes, and a month's
+   report can be later still over summer (December's came out in January):
+   ninety days without a newer one means it stopped, or its page moved. */
+const IP_QUIET_DAYS = 90;
 const MATCH_DAYS = 4;                   // Resolve's series date sits a day or so off its poll row
 /* YouGov issue charts found by hand in waves whose chart list the News24
    extractor no longer holds (its cache keeps only the newest wave). */
@@ -212,6 +228,63 @@ for (const p of ygRows) {
   }
 }
 
+// ---- Ipsos -----------------------------------------------------------------------------
+/* Every month from IP_FIRST, read from its own report: the 19 issues from
+   page 2, the best party on the five top issues from page 1. Every printing
+   of the month must agree within a point – page 1's five against page 2,
+   the monthly report against the bound year, and each later report's page 2
+   against the month's own column – or the month waits. */
+const IP = "Ipsos";
+const ipDir = path.join(ROOT, ".build", "ipsos-src");
+const ipOwn = new Map(), ipReprint = new Map(), ipStat = new Map();
+for (const f of fs.existsSync(ipDir) ? fs.readdirSync(ipDir).filter((x) => x.endsWith(".txt")).sort() : []) {
+  const t = fs.readFileSync(path.join(ipDir, f), "utf8");
+  let meta = {};
+  try { meta = JSON.parse(fs.readFileSync(path.join(ipDir, f.replace(/\.txt$/, ".json")), "utf8")); } catch {}
+  const st = ipStatement(t);
+  if (st) { ipStat.set(st.ym, st); continue; }
+  for (const r of ipReports(t)) {
+    if (r.ym < IP_FIRST) continue;
+    for (const u of r.unknown) unknown.add(`Ipsos ${r.ym}: ${u}`);
+    (ipOwn.get(r.ym) || ipOwn.set(r.ym, []).get(r.ym)).push({ r, pdf: meta.pdf || null, bound: /REPORTS_\d{4}$/.test(f.replace(/\.txt$/, "")) });
+    for (const [ym, v] of Object.entries(r.reprint)) (ipReprint.get(ym) || ipReprint.set(ym, []).get(ym)).push({ v, from: r.ym });
+  }
+}
+let ipNewest = null;
+for (const [ym, prints] of [...ipOwn.entries()].sort()) {
+  // the month's own report before the bound year; of two copies, the one the page links last
+  const main = prints.filter((p) => !p.bound).pop() || prints[0], r = main.r, st = ipStat.get(ym);
+  const date = (st && st.end) || r.end || `${ym}-28`, dateStart = (st && st.start) || r.start || null;
+  const bad = prints.flatMap((p) => p.r.problems);
+  if (!bad.length) {
+    for (const p of prints) {
+      if (p === main) continue;
+      for (const [k, v] of Object.entries(r.all)) if (p.r.all[k] == null || Math.abs(p.r.all[k] - v) > PRINT_TOL) bad.push(`${ISSUES[k]}: printed ${v} and ${p.r.all[k]}`);
+      for (const [k, sh] of Object.entries(r.own)) for (const [q, v] of Object.entries(sh))
+        if (p.r.own[k]?.[q] == null || Math.abs(p.r.own[k][q] - v) > PRINT_TOL) bad.push(`${ISSUES[k]} (best party, ${q}): printed ${v} and ${p.r.own[k]?.[q]}`);
+    }
+    for (const x of ipReprint.get(ym) || [])
+      for (const [k, v] of Object.entries(x.v)) if (r.all[k] == null || Math.abs(r.all[k] - v) > PRINT_TOL) bad.push(`${ISSUES[k]}: ${r.all[k]} in its own report, ${v} in ${x.from}'s`);
+    const n = Object.keys(r.all).length, sum = Object.values(r.all).reduce((a, b) => a + b, 0);
+    // three issues each: the 19 shares make about 300
+    if (n !== 19 || Math.abs(sum - 300) > 10) bad.push(`${n} issues summing to ${sum}, not 19 near 300`);
+    for (const [k, v] of Object.entries(r.all)) { const e = salienceProblem({ top3: v }); if (e) bad.push(`${ISSUES[k]}: ${e}`); }
+    for (const [k, sh] of Object.entries(r.own)) { const e = ownershipProblem(sh); if (e) bad.push(`${ISSUES[k]} (best party): ${e}`); }
+  }
+  if (!ipNewest || date > ipNewest) ipNewest = date;
+  if (bad.length) { pending.push(`${IP}|${date}: ${[...new Set(bad)].slice(0, 3).join("; ")}`); continue; }
+  const row = {
+    pollster: IP, date, dateStart, sample: (st && st.sample) || r.sample || null, sampleEff: (st && st.sampleEff) || null, source: main.pdf,
+    ...(st && st.end && (st.start !== r.start || st.end !== r.end)
+      ? { note: `fieldwork dates from Ipsos's methodology statement; the report prints ${r.start} to ${r.end}` } : {}),
+  };
+  salience.push({ ...row, read: "report", question: "pick 3 of 19",
+    issues: Object.fromEntries(Object.entries(r.all).map(([k, v]) => [k, { top3: v }])) });
+  ownership.push({ ...row, read: "report", question: "most capable of managing",
+    options: Object.values(r.own).some((sh) => sh.onp != null) ? ["alp", "lnp", "onp", "grn", "oth", "unsure", "none"]
+      : ["alp", "lnp", "grn", "oth", "unsure", "none"], issues: r.own });
+}
+
 // ---- write -----------------------------------------------------------------------------
 const byDate = (a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.pollster.localeCompare(b.pollster));
 for (const arr of [salience, ownership, salienceGroups]) arr.sort(byDate);
@@ -220,8 +293,13 @@ const daysAgo = (d) => (Date.now() - Date.parse(d + "T00:00:00Z")) / 864e5;
 const onFile = new Set([...salience, ...ownership].map(key));
 const stale = pending.map((m) => m.split(":")[0]).filter((k) => k.includes("|") && !onFile.has(k)
   && daysAgo(k.split("|")[1]) > STALE_DAYS);
+// Ipsos gone quiet – or never cached – is stale too: nothing newer will arrive by itself
+if (!ipNewest || daysAgo(ipNewest) > IP_QUIET_DAYS) {
+  pending.push(`${IP}|quiet: ${ipNewest ? `no report since the one whose fieldwork closed ${ipNewest}` : "no report cached"} – is extract-ipsos.mjs still finding the Issues Monitor page?`);
+  stale.push(`${IP}|quiet`);
+}
 const doc = {
-  _about: "What voters say matters, and which party they think is best on each issue, per poll wave, as each pollster asks it. salience[].issues[issue] = {r1, r2, r3, top3}: % ranking it first, second, third, and in their top three (RedBridge). salienceGroups[].issues[issue][dim][group] = {r1, r2, r3, not}. ownership[].issues[issue] = % naming each option: alp, lnp (the Coalition; RedBridge's Liberal and National summed), onp, grn, oth (someone else), equal (all about equal), none, unsure – only the options that house offers. Issue keys in `issues`. Built by .build/issues.mjs – see its header for sources.",
+  _about: "What voters say matters, and which party they think is best on each issue, per poll wave, as each pollster asks it. salience[].issues[issue] = {r1, r2, r3, top3}: % ranking it first, second, third, and in their top three (RedBridge); {top3} alone where a house asks for three without ranking them (Ipsos). salienceGroups[].issues[issue][dim][group] = {r1, r2, r3, not}. ownership[].issues[issue] = % naming each option: alp, lnp (the Coalition; RedBridge's Liberal and National summed), onp, grn, oth (someone else), equal (all about equal), none, unsure – only the options that house offers. Issue keys in `issues`. Built by .build/issues.mjs – see its header for sources.",
   issues: ISSUES,
   salience, salienceGroups, ownership,
   // items left out of a wave because they failed the gate (see the header)

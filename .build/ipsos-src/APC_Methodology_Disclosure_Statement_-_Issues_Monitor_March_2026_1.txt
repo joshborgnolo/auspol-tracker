@@ -1,0 +1,93 @@
+                                                                             Long Methodology Disclosure Statement
+
+                              Issues Monitor March 2026
+Ipsos reference:             -                                                      This disclosure statement complies with the
+Release Date:                15 April 2026                                          Australian Polling Council Code of Conduct.*
+ Short Methodology Disclosure Statement
+ F1a. Research company conducting the research                           Ipsos
+ F1b. Client commissioning the research                                  This study did not have any external sponsors or
+                                                                         partners. It was initiated and run by Ipsos, because
+                                                                         we are curious about the world we live in and how
+                                                                         citizens around the globe think and feel about their
+                                                                         world.
+ F1c.    Name of end client                                              As above
+ F1d.    Fieldwork dates                                                 06/03/2026 – 10/03/2026
+ F1e.    Data collection methodology and (F1f.) split                    Online self-completion
+ F1g.    Target population                                               Australian adults aged 18+
+ F1h.    Sample size                                                     n= 1,000
+ F1i.    Compliant with Australian Polling Council Code.                 Yes
+ F1j.    URL for Long Methodology Disclosure Statement                   https://www.ipsos.com/en-au/disclosure_statements
+ F1k.    Voting intention published                                      Yes / No
+
+ Long Methodology Disclosure Statement
+ F2a. Effective sample size after weighting             Effective sample size = 892
+ F2b. Error margin associated with the                  Credibility Interval is +/- 3.3%
+       effective sample size for the                    For information on the Ipsos use of credibility intervals, visit: :
+       research.                                        https://www.ipsos.com/sites/default/files/ct/publication/documents/2021-
+                                                        03/credibility_intervals_for_online_polling_-_2021.pdf
+ F2c.     Variables used for weighting,                 Age, gender and location (GCCSA) from 2016 and 2021 ABS Census
+          population data source
+ F2d. Weighting methodology used                        Cell weighting
+ F2e. Full question text                                See below
+ F2f. **Prior questions which may have                  Not applicable
+          materially influenced results
+ F2g. **Proportion of completed phone                   Not applicable
+          interviews by type
+ F2h. **Source of online sample used.                   Online panel
+ **
+    If voting intention is published
+ G2b. Ability to provide ‘undecided’                    Not applicable
+          response
+ G2c. Do voting intention figures exclude               Not applicable
+          ‘undecided’
+ G2e. Method of calculating 2PP                         Not applicable
+*Relevant clauses of the Code of Conduct are noted for each item
+**This item may not be applicable
+
+
+The Australian Polling Council Code of Conduct can be found here.
+                                                                       Long Methodology Disclosure Statement
+
+Full question text (F2e.)
+
+The following questions form the basis of this report:
+        What would you say are the three most important issues facing Australia today?
+        What would you say are the three most important issues facing [INSERT STATE/TERRITORY] today?
+        What would you say are the three most important issues facing your local area today?
+        Please select the political party that you believe is most capable of managing each of the following issues
+
+The issues that respondents are asked to select from are:
+        The Economy
+        Immigration
+        Race relations/racism
+        Defence/Foreign affairs/Terrorism
+        Crime/Law and Order/Violence/Anti-Social Behaviour
+        Drug/Alcohol abuse
+        Education
+        Housing/Price of Housing
+        Healthcare/Hospitals
+        Environmental/Pollution/Water concerns
+        Population/Overpopulation
+        Poverty/Inequality
+        Taxation
+        Transport/Public Transport/Infrastructure
+        Unemployment
+        Issues facing Aboriginal and Torres Strait Islanders
+        Petrol prices/Fuel
+        Household Debt/Personal Debt
+        Inflation/cost of living
+
+The political parties that respondents are asked to select from are:
+        Australian Labor Party
+        Liberal-National Party
+        The Greens
+        Other
+        Don’t Know
+        None
+
+All response options are visible to respondents and randomised.
+
+Questions asked prior which may have materially influenced results (F2f.)
+
+Not applicable.
+

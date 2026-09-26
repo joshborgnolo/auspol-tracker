@@ -411,6 +411,50 @@ function houseEffectsFor(rows) {
   );
   return { at, evidenceN, evidenceFrom, snapshot, estimable: devs.length > 0 };
 }
+/* Two pollsters asking different questions about one thing – RedBridge's
+   and Ipsos's top three issues (§7h) – sit a steady distance apart, set by
+   the wording rather than by sampling. houseEffectsFor can't measure that:
+   it wants three polls from other houses around each one, and with two
+   houses "the others" are the other house, so each would be charged the
+   whole gap. Here each poll's gap from the other house's polls within
+   HE_WINDOW days (sample-weighted) is pooled with the headline's recency
+   decay and read at t, as houseEffectsFor reads its leans; each house then
+   leans HALF the gap, one either side of the pair's middle – two houses
+   can't say which of them is right. Not shrunk: a gap in wording, measured
+   poll after poll, isn't the noise SHRINK_K guards against, and a shrunk
+   lean would hand back most of the swing it exists to remove (Ipsos files
+   about 3½ weeks after fieldwork, so its poll is in a six-week window for
+   only part of each month, and an unadjusted pool jumps between the two
+   houses' levels as it comes and goes – health between 27 and 38 over
+   2026). Fewer than PAIR_MIN measured gaps: nothing is removed. */
+const PAIR_MIN = 4;
+function pairLeanFor(rows) {
+  const firms = [...new Set(rows.map((r) => r.firm))];
+  if (firms.length !== 2) return { at: () => 0, estimable: false, firms, gapAt: () => null };
+  const devs = [];                               // { mid, gap: firms[0] minus firms[1] }
+  for (const a of rows) {
+    let sw = 0, swx = 0;
+    for (const b of rows) {
+      if (b.firm === a.firm || Math.abs(ddays(b.mid, a.mid)) > HE_WINDOW) continue;
+      sw += b.n; swx += b.n * b.x;
+    }
+    if (sw) devs.push({ mid: a.mid, gap: a.firm === firms[0] ? a.x - swx / sw : swx / sw - a.x });
+  }
+  const gapAt = (t) => {
+    let sw = 0, swx = 0, k = 0;
+    for (const d of devs) {
+      if (d.mid > t) continue;
+      const w = Number.isFinite(t) ? Math.exp(-LN2 * ddays(t, d.mid) / HE_HALF) : 1;
+      sw += w; swx += w * d.gap; k++;
+    }
+    return k >= PAIR_MIN ? swx / sw : null;
+  };
+  const at = (firm, t) => {
+    const g = gapAt(t);
+    return g == null ? 0 : firm === firms[0] ? g / 2 : firm === firms[1] ? -g / 2 : 0;
+  };
+  return { at, gapAt, firms, estimable: devs.length >= PAIR_MIN };
+}
 /* t = the reference time the lean is read at – the nowcast's ref for the
    current estimate, the month's midpoint for monthly points – so every
    displayed figure is debiased by what each house's lean was AT the time the
@@ -2347,29 +2391,41 @@ if (demographics) {
    wave, as published. Three figures come out of it, each built as the
    headline is (the six-week window: a house or two asks each month, so the
    headline's three weeks would often hold one poll or none).
-   Who is best on each issue (ownership). Resolve, RedBridge and YouGov each
-   ask which party is best on an issue, but offer different options: Resolve
-   no Greens and, until July 2026, no One Nation; RedBridge "all about
-   equal" and the Liberals and Nationals apart; YouGov a single don't-know.
-   The part every current question shares is the choice between Labor, the
-   Coalition and One Nation, so each wave is read as those three's shares of
-   the voters who named one of them, and only those waves pool – the
-   questions match there and nowhere else. Pooled in the six-week window
-   (sample- and recency-weighted, a house's repeat waves as sqrt(m)); a
-   house effect can't be measured from two regular houses, so none is
-   applied, as for every measure where it isn't estimable. Eight issues all
-   three (or both regular) houses ask; `leadSig` says whether the leader's
-   margin over the runner-up clears its own 95% margin, the difference of
-   two shares of one sample carrying its own variance, as the leader nets do.
+   Who is best on each issue (ownership). Resolve, RedBridge, Ipsos and
+   YouGov each ask which party is best on an issue, but offer different
+   options: Resolve no Greens and, until July 2026, no One Nation; Ipsos no
+   One Nation until June 2026; RedBridge "all about equal" and the Liberals
+   and Nationals apart; YouGov a single don't-know. The part every current
+   question shares is the choice between Labor, the Coalition and One
+   Nation, so each wave is read as those three's shares of the voters who
+   named one of them, and only those waves pool – the questions match there
+   and nowhere else. Pooled in the six-week window (sample- and recency-
+   weighted, a house's repeat waves as sqrt(m)), less each house's lean on
+   each party's share (houseEffectsFor: with three regular houses there are
+   neighbours enough to measure one; each party's leans sum to zero across
+   a house's three shares, so the pooled shares still make 100). Few polls
+   have offered all three parties, so the shrunk leans are small yet – about
+   a point of Ipsos's eight-point Labor lean in Sep 2026. Ipsos asks only
+   its month's five top issues. `leadSig` says whether the leader's margin
+   over the runner-up clears its own 95% margin, the difference of two
+   shares of one sample carrying its own variance, as the leader nets do.
    Where it doesn't, `pairSig` says whether the runner-up's margin over the
    third clears ITS margin: two parties the polls can't separate, both
    clearly ahead of the one left behind.
-   What matters (salience): RedBridge's share putting each issue in their top
-   three of 14, the one monthly salience question with figures – the same
-   window, one house. And by group: its table for each issue by vote,
-   generation, gender, place, education and home, the group's sample taken
-   as the poll's times the group's rough share of voters (only its sampling
-   floor depends on that share). */
+   What matters (salience): the share putting each issue in their top three.
+   RedBridge asks which issues matter most to your vote (rank three of 14),
+   Ipsos which are the most important facing Australia (pick three of 19);
+   both monthly. The wording sets them a steady distance apart – RedBridge
+   about 14 points higher on health, 7 lower on housing (Sep 2026) – so each wave is
+   moved half that distance toward the other (pairLeanFor) and pooled in the
+   same window. DemosAU (an open question, one answer, coded by AI into
+   categories that change month to month) and Spectre (every three months,
+   bundled categories) aren't pooled; the Info entry cites them as checks.
+   And by group: RedBridge's table for each issue by vote, generation,
+   gender, place, education and home, the group's sample taken as the
+   poll's times the group's rough share of voters (only its sampling floor
+   depends on that share), beside RedBridge's own all-voters figure – the
+   groups are its alone, so the row above them must be too. */
 const ISSUES_FILE = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "issues.json"), "utf8")); }
   catch { return null; }
@@ -2428,42 +2484,60 @@ const issues = (() => {
     }
     if (used && inWin(mid)) wavesIn.push({ w, p, d: ddays(refNow, mid) });
   }
-  const lead = (rows, a, b) => {
+  // each house's lean on each party's three-way share, per issue, measured as the headline's are
+  const ownHE = Object.fromEntries(Object.entries(own).map(([k, o]) =>
+    [k, Object.fromEntries(OWN3.map((q) => [q, houseEffectsFor(o[q])]))]));
+  const lead = (k, rows, a, b) => {
     /* the leader's margin over the runner-up, as its own measure: a
-       difference of two shares of one sample, variance (pa + pb − (pa − pb)²)/n */
+       difference of two shares of one sample, variance (pa + pb − (pa − pb)²)/n,
+       less the difference of the two parties' leans */
     const diff = rows.alp.map((r) => {
       const pa = r.s3[a] / 100, pb = r.s3[b] / 100;
       return { mid: r.mid, x: r.s3[a] - r.s3[b], n: r.n, firm: r.firm, pq: Math.max(0, 1e4 * (pa + pb - (pa - pb) ** 2)) };
     });
-    return weightedWithSe(nowcastPts(diff, null, refNow, SPARSE_K));
+    const he = { at: (firm, t) => heV(ownHE[k][a], firm, t) - heV(ownHE[k][b], firm, t) };
+    return weightedWithSe(nowcastPts(diff, he, refNow, SPARSE_K));
   };
-  // ---- what matters: RedBridge's top three, all voters
+  // ---- what matters: RedBridge's and Ipsos's top three, all voters
   const salRows = {}, salR1 = {};
   for (const w of F.salience) {
-    const p = pollOf(w) || { date: w.date, sample: w.sample, sampleEff: w.sampleEff };
+    const p = pollOf(w) || { date: w.date, dateStart: w.dateStart, sample: w.sample, sampleEff: w.sampleEff };
     for (const [k, v] of Object.entries(w.issues)) {
       const base = { ym: ymOf(w.date), mid: midMs(p), n: rowN(p), firm: w.pollster };
-      (salRows[k] ||= []).push({ ...base, x: v.top3 });
-      (salR1[k] ||= []).push({ ...base, x: v.r1 });
+      (salRows[k] ||= []).push({ ...base, x: v.top3, date: w.date });
+      // ranked first: RedBridge ranks its three, Ipsos doesn't
+      if (v.r1 != null) (salR1[k] ||= []).push({ ...base, x: v.r1 });
     }
   }
+  const salLean = Object.fromEntries(Object.entries(salRows).map(([k, rs]) => [k, pairLeanFor(rs)]));
+  const houseName = (f) => (f === "RedBridge/Accent" ? "RedBridge" : f);
+  /* each house's newest poll on the issue, as published, for the reader to
+     see the two apart: within two months of the newest poll, so a house that
+     stopped asking drops out */
+  const salBy = (k) => [...new Set((salRows[k] || []).map((r) => r.firm))].map((f) => {
+    const r = salRows[k].filter((x) => x.firm === f && x.mid <= refNow).sort((a, b) => b.mid - a.mid)[0];
+    return r && ddays(refNow, r.mid) <= 61 ? { house: houseName(f), v: r.x, date: r.date } : null;
+  }).filter(Boolean);
   const salNow = (k) => {
-    const r = salRows[k] && currentReading(salRows[k], null, SPARSE_K);
+    const r = salRows[k] && currentReading(salRows[k], salLean[k], SPARSE_K);
     if (!r) return null;
-    const r1v = currentReading(salR1[k], null, SPARSE_K);
-    return { v: r.v, ci: r.ci95, r1: r1v ? r1v.v : null,
+    const r1v = salR1[k] && currentReading(salR1[k], null, SPARSE_K);
+    const g = salLean[k].gapAt(refNow);
+    return { v: r.v, ci: r.ci95, r1: r1v ? r1v.v : null, by: salBy(k),
+             // the steady gap between the two houses, first named minus second
+             ...(g != null ? { gap: { houses: salLean[k].firms.map(houseName), v: r1(g) } } : {}),
              ...(r.chg != null ? { chg: r.chg, changeSig: r.changeSig } : {}) };
   };
   const list = ISSUE_SHARED.map((k) => {
     const o = own[k];
     let ownNow = null;
     if (o) {
-      const est = Object.fromEntries(OWN3.map((q) => [q, currentReading(o[q], null, SPARSE_K)]));
+      const est = Object.fromEntries(OWN3.map((q) => [q, currentReading(o[q], ownHE[k][q], SPARSE_K)]));
       if (OWN3.every((q) => est[q])) {
         const order = [...OWN3].sort((a, b) => est[b].v - est[a].v);
-        const L = lead(o, order[0], order[1]);
+        const L = lead(k, o, order[0], order[1]);
         const leadSig = !!(L && L.v > 1.96 * L.se);
-        const L2 = leadSig ? null : lead(o, order[1], order[2]);
+        const L2 = leadSig ? null : lead(k, o, order[1], order[2]);
         ownNow = {
           v: Object.fromEntries(OWN3.map((q) => [q, est[q].v])),
           ci: Object.fromEntries(OWN3.map((q) => [q, est[q].ci95])),
@@ -2480,7 +2554,7 @@ const issues = (() => {
        every monthly line here is (monthWithSe), from the first month the
        three-way question was asked */
     const monthly = o ? MONTHS.map((ym) => {
-      const m = OWN3.map((q) => monthWithSe(o[q], null, ym));
+      const m = OWN3.map((q) => monthWithSe(o[q], ownHE[k][q], ym));
       return m.every(Boolean) ? [ym, ...m.map((e) => r1(e.v)), ...m.map((e) => r1(1.96 * e.se))] : null;
     }).filter(Boolean) : [];
     return { id: k, label: F.issues[k], imp: salNow(k), own: ownNow, monthly,
@@ -2525,16 +2599,36 @@ const issues = (() => {
     return { id: s.id, label: s.label, groups: groupsSeen, issues: issuesSeen, cells };
   }).filter(Boolean);
   wavesIn.sort((a, b) => a.d - b.d);
+  /* the group table's all-voters row: the group house's own reading, never
+     the pooled one above – its groups average to its figure, not the pool's */
+  const gAll = {};
+  for (const k of new Set(groupTabs.flatMap((t) => t.issues))) {
+    const e = salRows[k] && currentReading(salRows[k].filter((r) => r.firm === gHouse), null, SPARSE_K);
+    if (e) gAll[k] = { v: e.v, ci: e.ci95 };
+  }
+  // the largest lean taken off a three-way share today, from a house with a poll in the window (the Info entry)
+  let leanMax = null;
+  for (const it of list) if (it.own) for (const q of OWN3) for (const f of Object.keys(ownHE[it.id][q].evidenceN)) {
+    if (!own[it.id][q].some((r) => r.firm === f && inWin(r.mid))) continue;
+    const v = heV(ownHE[it.id][q], f, refNow);
+    if (Math.abs(v) >= 0.05 && (!leanMax || Math.abs(v) > Math.abs(leanMax.v))) leanMax = { house: houseName(f), party: q, issue: it.id, v: r1(v) };
+  }
+  /* credited: the houses with a poll in the window, and each house whose
+     newest poll sets the grey bars' level through its gap to the other,
+     even once that poll has left the window (Ipsos's, for part of each month) */
+  const salCredit = [...new Map(list.flatMap((it) => (it.imp?.gap ? it.imp.by : []).map((b) => [b.house, b]))).values()];
   return {
-    window: SPARSE_K.label, parties: OWN3, list, labels: F.issues,
-    houses: creditHouses(wavesIn, (r) => r.w.pollster === "RedBridge/Accent" ? "RedBridge" : r.w.pollster, (r) => Date.parse(r.w.date)),
+    window: SPARSE_K.label, parties: OWN3, list, labels: F.issues, leanMax,
+    houses: creditHouses([...wavesIn.map((r) => ({ f: houseName(r.w.pollster), t: Date.parse(r.w.date) })),
+                          ...salCredit.filter((b) => !wavesIn.some((r) => houseName(r.w.pollster) === b.house))
+                            .map((b) => ({ f: b.house, t: Date.parse(b.date) }))], (r) => r.f, (r) => r.t),
     // the polls the window holds, newest first (the Info entry's working)
     polls: wavesIn.map(({ w, p }) => ({
-      pollster: w.pollster === "RedBridge/Accent" ? "RedBridge" : w.pollster,
+      pollster: houseName(w.pollster),
       dateLabel: fwLabel(p.dateStart, p.date), source: w.source || null,
       options: w.options || null,
     })),
-    groups: groupTabs.length ? { tabs: groupTabs, house: gHouse === "RedBridge/Accent" ? "RedBridge" : gHouse,
+    groups: groupTabs.length ? { tabs: groupTabs, house: houseName(gHouse), all: gAll,
                                  newest: gNewest, window: SPARSE_K.label } : null,
   };
 })();

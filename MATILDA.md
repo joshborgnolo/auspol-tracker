@@ -128,14 +128,25 @@ a GENERATED build artifact — never hand-edit it.
   group; best party on 6–9 issues), Resolve's `party_attributes` rows in
   `data/resolve-political-monitor.csv` (monthly since 2021; One Nation an
   option from July 2026 – that month's rows count it twice and the reader
-  subtracts it) and YouGov's occasional News24 Pulse "best at handling"
-  chart. gen-data §7h pools ownership only as Labor/Coalition/One Nation
-  shares of those naming one of the three (the one part every house's
-  question shares), six-week window, no house effect (not estimable from
-  two regular houses); salience and salience-by-group are RedBridge alone.
-  The RedBridge, Resolve and News24 updaters run it (refresh_crosstabs),
-  and the weekly crosstabs run fails on a stale wave or an unmapped label.
-  See the auspol-issues-panel skill.
+  subtracts it), YouGov's occasional News24 Pulse "best at handling"
+  chart, and Ipsos's Issues Monitor (monthly since Dec 2025: all 19 issues
+  "pick three facing Australia", best party on the month's five top issues,
+  One Nation an option from June 2026; `.build/extract-ipsos.mjs` caches
+  the national reports and methodology statements as text in
+  `.build/ipsos-src/`, and only the weekly crosstabs run fetches them).
+  gen-data §7h pools ownership only as Labor/Coalition/One Nation shares
+  of those naming one of the three (the one part every house's question
+  shares), six-week window, each house's lean removed by houseEffectsFor
+  (estimable since Ipsos made a third regular house; shrunk, so small at
+  first). Salience pools RedBridge and Ipsos, each wave moved half the
+  pair's measured gap toward the other (pairLeanFor: their wording sets
+  them a steady distance apart – RedBridge ~14 points higher on health);
+  salience-by-group, and its all-voters row, are RedBridge alone. DemosAU
+  and Spectre ask salience too but aren't pooled (Info cites them as
+  checks). The RedBridge, Resolve and News24 updaters run issues.mjs
+  (refresh_crosstabs), and the weekly crosstabs run fails on a stale wave,
+  an unmapped label, or Ipsos quiet for 90 days. See the
+  auspol-issues-panel skill.
 - Pre-1987 past-cycle leadership lines come from The Bulletin's Morgan
   Gallup column (harvest → extract → assimilate scripts named
   `*-bulletin-gallup.mjs`; CSV `data/bulletin-leader-approval.csv`; rows

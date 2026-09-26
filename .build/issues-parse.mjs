@@ -20,6 +20,9 @@ export const ISSUES = {
   ir: "Industrial relations", finances: "Managing the finances", foreign: "Foreign affairs",
   indigenous: "Indigenous affairs", disasters: "Natural disasters",
   inequality: "Inequality", pensions: "Pensions and older Australians",
+  // on Ipsos's list alone
+  petrol: "Petrol prices", poverty: "Poverty", personaldebt: "Personal debt", unemployment: "Unemployment",
+  population: "Population", racism: "Racism", drugs: "Drug and alcohol abuse",
 };
 
 const norm = (s) => String(s).replace(/[’‘]/g, "'").replace(/\s+/g, " ").trim().toLowerCase();
@@ -59,6 +62,27 @@ export const YG_ISSUE = {
   "international affairs and trade": "foreign", "education and childcare": "education",
 };
 const YG_ANSWER = { labor: "alp", coalition: "lnp", "one nation": "onp", "the greens": "grn", greens: "grn", "don't know": "unsure" };
+
+/* Ipsos prints short labels for the 19 issues its question lists in full
+   (its methodology statement): "Crime" is "Crime/Law and Order/Violence/
+   Anti-Social Behaviour", "Poverty" is "Poverty/Inequality". "Defence" is
+   "Defence/Foreign affairs/Terrorism": national security, as Resolve's and
+   YouGov's security-and-defence items are. "Environment" is "Environmental/
+   Pollution/Water concerns" – the environment, not climate change, which
+   Ipsos doesn't list. "Unemployment" and "Poverty" are narrower than
+   Resolve's "Jobs and wages" and YouGov's "Growing inequality", so they keep
+   issues of their own. */
+// the first month read: RedBridge's first cached wave, so the two cover the same months
+export const IP_FIRST = "2025-12";
+export const IP_ISSUE = {
+  "cost of living": "col", housing: "housing", crime: "crime", "the economy": "economy",
+  healthcare: "health", immigration: "immigration", environment: "environment", "the environment": "environment", taxation: "tax",
+  education: "education", transport: "transport", "indigenous issues": "indigenous", defence: "security",
+  "petrol prices": "petrol", poverty: "poverty", "personal debt": "personaldebt",
+  unemployment: "unemployment", population: "population", racism: "racism", "drug abuse": "drugs",
+};
+const IP_ANSWER = { coalition: "lnp", alp: "alp", greens: "grn", "one nation": "onp", other: "oth",
+                    "don't know": "unsure", none: "none" };
 
 // ---- RedBridge ------------------------------------------------------------------------
 const lines = (txt) => txt.split("\n");
@@ -324,11 +348,183 @@ export function ygIssuesOf(data) {
   return null;
 }
 
+// ---- Ipsos --------------------------------------------------------------------------
+/* The Ipsos Issues Monitor: a two-page national report each month, and each
+   year's reports bound into one PDF afterwards.
+     Page 1: the month's five top issues, beside the month before and the
+       last election month; then "Party most capable to manage the top issues
+       facing Australia" for those five – Coalition, ALP, Greens, One Nation
+       (from June 2026; until then inside Other), Other, Don't know, None –
+       a column per issue, in the five's order.
+     Page 2: all 19 issues – a yearly average from 2010, then monthly
+       columns: the report's year so far, or from the January before in a
+       January or February report – so every month is printed again in
+       later reports.
+   The questions, from Ipsos's methodology statement: "What would you say
+   are the three most important issues facing Australia today?" (three of
+   19, so a figure is the share putting the issue among their three – a top
+   three with no ranks), and "Please select the political party that you
+   believe is most capable of managing each of the following issues".
+   pdftotext -layout lays the tables out by position, and has printed two of
+   a row's cells on the line above it (None, June 2026): a cell belongs to
+   the column it sits under, never to its place in the line.
+   ipReports(text) → one entry per month the text holds (a monthly report
+   holds one, a bound year twelve): { ym, start, end, sample, top5: [keys in
+   page 1's order], front: { key: share } (page 1's own row), all: { key:
+   share } (page 2, the month's column), reprint: { ym: { key: share } } (page
+   2's earlier months), own: { key: { lnp, alp, grn, onp?, oth, unsure, none
+   } }, unknown, problems }. A problem means the month didn't read cleanly. */
+const IP_MON = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+const ymOfParts = (y, m) => `${y}-${String(m).padStart(2, "0")}`;
+// each "NN%" on a line, with the column its % sign ends at
+const pctCells = (l) => [...l.matchAll(/(\d+(?:\.\d+)?)%/g)].map((m) => ({ v: Number(m[1]), at: m.index + m[0].length }));
+export function ipReports(txt) {
+  const byMonth = new Map();
+  for (const page of txt.split("\f")) {
+    const h = page.match(/IPSOS ISSUES MONITOR ([A-Z]+) (\d{4})/);
+    // the national report only: the state reports share its header
+    if (!h || !/The top issues facing Australia/.test(page)) continue;
+    const mo = MONTH_N[h[1][0] + h[1].slice(1).toLowerCase()];
+    if (!mo) continue;
+    const ym = ymOfParts(h[2], mo);
+    const r = byMonth.get(ym) || { ym, top5: null, front: null, all: null, reprint: {}, own: null, unknown: [], problems: [] };
+    byMonth.set(ym, r);
+    if (/Party most capable/.test(page)) ipFront(page, r);
+    else ipBack(page, r);
+  }
+  for (const r of byMonth.values()) {
+    if (!r.front) r.problems.push("no page 1");
+    if (!r.all) r.problems.push("no page 2");
+    // the five printed twice, on each page, agree
+    for (const [k, v] of Object.entries(r.front || {}))
+      if (r.all && r.all[k] != null && Math.abs(r.all[k] - v) > 1) r.problems.push(`${ISSUES[k]}: page 1 has ${v}, page 2 ${r.all[k]}`);
+  }
+  return [...byMonth.values()].sort((a, b) => (a.ym < b.ym ? -1 : 1));
+}
+function ipFront(page, r) {
+  const ls = page.split("\n");
+  const flat = page.replace(/\s+/g, " ");
+  const [y, m] = [Number(r.ym.slice(0, 4)), Number(r.ym.slice(5))];
+  // "between 5th and 13th August, 2026" | "between 4th and 9th February 2026, 2026" | "between 28th January and 3rd February, 2026"
+  const fw = flat.match(/between (\d{1,2})(?:st|nd|rd|th)?(?: ([A-Z][a-z]+))?,? and (\d{1,2})(?:st|nd|rd|th)? ([A-Z][a-z]+)[ ,]+(\d{4})/);
+  const m2 = fw && MONTH_N[fw[4]], m1 = fw && (fw[2] ? MONTH_N[fw[2]] : m2);
+  if (!fw || !m1 || !m2) r.problems.push("no fieldwork dates");
+  else {
+    const y2 = Number(fw[5]), y1 = m1 > m2 ? y2 - 1 : y2;
+    r.start = `${ymOfParts(y1, m1)}-${fw[1].padStart(2, "0")}`;
+    r.end = `${ymOfParts(y2, m2)}-${fw[3].padStart(2, "0")}`;
+  }
+  const n = flat.match(/A sample of ([\d,]+) people/);
+  if (n) r.sample = Number(n[1].replace(/,/g, "")); else r.problems.push("no sample size");
+  // the five: the month's own row ("AUG 26  63%  39% …") under the line naming them
+  const own = new RegExp(`^\\s*${IP_MON[m - 1]}\\s+${String(y).slice(2)}\\s+\\d`, "i");
+  const ci = ls.findIndex((l) => own.test(l));
+  let hi = ci - 1;
+  while (hi >= 0 && !/[a-z]/.test(ls[hi])) hi--;
+  const names = ci > 0 && hi >= 0 ? ls[hi].trim().split(/\s{2,}/) : [];
+  const vals = ci > 0 ? pctCells(ls[ci]).map((c) => c.v) : [];
+  if (names.length !== 5 || vals.length !== 5) { r.problems.push("page 1: the top five didn't read"); return; }
+  r.top5 = names.map((s) => { const k = IP_ISSUE[norm(s)]; if (!k) r.unknown.push(s); return k || null; });
+  if (r.top5.includes(null)) return;
+  r.front = Object.fromEntries(r.top5.map((k, i) => [k, vals[i]]));
+  // the best-party table: labelled rows, and lines of cells that lost their label
+  const oi = ls.findIndex((l) => /Party most capable to manage/.test(l));
+  const rows = [], loose = [];
+  for (let j = oi + 1; oi >= 0 && j < ls.length; j++) {
+    if (/©|research was conducted/.test(ls[j])) break;
+    const cells = pctCells(ls[j]);
+    if (!cells.length) continue;
+    const lab = ls[j].match(/^\s*([A-Z][A-Z’' ]*[A-Z])\s{2,}\d/);
+    (lab ? rows : loose).push({ label: lab && lab[1], cells, line: j });
+  }
+  // the columns: where a full row's five cells end
+  const full = rows.find((x) => x.cells.length === 5);
+  if (!full) { r.problems.push("page 1: the best-party table didn't read"); return; }
+  const cols = full.cells.map((c) => c.at);
+  const colOf = (c) => {
+    const d = cols.map((a) => Math.abs(a - c.at)), i = d.indexOf(Math.min(...d));
+    return d[i] <= 6 ? i : -1;
+  };
+  for (const x of rows) {
+    x.v = Array(5).fill(null);
+    for (const c of x.cells) { const i = colOf(c); if (i >= 0) x.v[i] = c.v; }
+  }
+  // a label-less line fills the one neighbouring row missing exactly its columns
+  for (const lo of loose) {
+    const at = lo.cells.map(colOf);
+    const fits = rows.filter((x) => Math.abs(x.line - lo.line) <= 2 && at.every((i) => i >= 0 && x.v[i] == null));
+    if (fits.length === 1) at.forEach((i, n) => { fits[0].v[i] = lo.cells[n].v; });
+  }
+  const shares = r.top5.map(() => ({}));
+  for (const x of rows) {
+    const q = IP_ANSWER[norm(x.label)];
+    if (!q) { r.unknown.push("best party: " + x.label); continue; }
+    x.v.forEach((v, i) => { if (v != null) shares[i][q] = v; });
+  }
+  const missing = rows.filter((x) => IP_ANSWER[norm(x.label)] && x.v.includes(null)).map((x) => x.label);
+  if (missing.length) { r.problems.push(`page 1: best-party cells missing (${missing.join(", ")})`); return; }
+  r.own = Object.fromEntries(r.top5.map((k, i) => [k, shares[i]]));
+}
+/* Page 2's monthly columns are headed by a line of month names ("JAN FEB
+   …", or "January February …"). They usually run through the report's
+   year, but a January or February report runs from a year before, and the
+   years printed under them are sometimes clipped ("202"). So the months are
+   read off the names – consecutive, ending at the report's own month – and
+   dated back from the report's month. */
+const monthWord = (w) => /^[A-Za-z]+$/.test(w) && IP_MON.includes(w.slice(0, 3).toLowerCase());
+function ipBack(page, r) {
+  const ls = page.split("\n");
+  const mi = ls.findIndex((l) => l.trim() && l.trim().split(/\s+/).every(monthWord));
+  const months = mi >= 0 ? ls[mi].trim().split(/\s+/).map((w) => IP_MON.indexOf(w.slice(0, 3).toLowerCase()) + 1) : [];
+  const n = months.length;
+  if (!n || months.some((x, i) => i && x !== (months[i - 1] % 12) + 1)) { r.problems.push("page 2: the month columns didn't read"); return; }
+  if (months[n - 1] !== Number(r.ym.slice(5))) { r.problems.push(`page 2 ends in month ${months[n - 1]}, not ${r.ym}`); return; }
+  const yms = [];
+  for (let i = n - 1, y = Number(r.ym.slice(0, 4)); i >= 0; i--) {
+    yms[i] = ymOfParts(y, months[i]);
+    if (months[i] === 1) y--;
+  }
+  const all = {}, lens = new Set();
+  for (const l of ls) {
+    const row = l.match(/^\s*([A-Z][A-Za-z /’'&().-]*?)\s{2,}((?:\d+%\s*){2,})$/);
+    if (!row) continue;
+    const k = IP_ISSUE[norm(row[1])];
+    if (!k) { r.unknown.push(row[1]); continue; }
+    const v = pctCells(row[2]).map((c) => c.v);
+    lens.add(v.length);
+    const mon = v.slice(-n);
+    all[k] = mon[n - 1];
+    mon.slice(0, -1).forEach((x, i) => { (r.reprint[yms[i]] ||= {})[k] = x; });
+  }
+  // every row runs the same years and months: a row the text layer wrapped would be shorter
+  if (lens.size !== 1 || [...lens][0] < n) { r.problems.push("page 2: rows of different lengths"); return; }
+  r.all = all;
+}
+/* Ipsos's methodology statement for one month ("Long Methodology Disclosure
+   Statement – Issues Monitor August 2026"): fieldwork dates, sample and the
+   effective sample size after weighting. Null if it isn't one. */
+export function ipStatement(txt) {
+  const flat = txt.replace(/\s+/g, " ");
+  if (!/Methodology Disclosure Statement/.test(flat) || !/F1d\. ?Fieldwork dates/.test(flat)) return null;
+  const t = flat.match(/Issues Monitor ([A-Z][a-z]+) (\d{4})/);
+  if (!t || !MONTH_N[t[1]]) return null;
+  const d = (dd, mm, yyyy) => `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
+  const fw = flat.match(/Fieldwork dates (\d{1,2})\/(\d{1,2})\/(\d{4}) ?[–—-] ?(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  const n = flat.match(/Sample size n ?= ?([\d,]+)/);
+  const eff = flat.match(/Effective sample size ?= ?([\d,]+)/);
+  const num = (s) => (s ? Number(s[1].replace(/,/g, "")) : null);
+  return { ym: ymOfParts(t[2], MONTH_N[t[1]]), start: fw ? d(fw[1], fw[2], fw[3]) : null,
+           end: fw ? d(fw[4], fw[5], fw[6]) : null, sample: num(n), sampleEff: num(eff) };
+}
+
 // ---- the gate --------------------------------------------------------------------------
 /* A salience row: its three ranks add to its top three, give or take a
-   point of rounding. A group row: ranks and not-ranked add to 100 (±2). */
+   point of rounding. A group row: ranks and not-ranked add to 100 (±2). A
+   top three with no ranks (Ipsos) need only be a share. */
 export function salienceProblem(r) {
   if (!r) return "no figures";
+  if (r.r1 == null && r.r2 == null && r.r3 == null && r.not == null)
+    return Number.isFinite(r.top3) && r.top3 >= 0 && r.top3 <= 100 ? null : "a figure outside 0–100";
   const v = [r.r1, r.r2, r.r3, r.top3 ?? r.not];
   if (v.some((x) => !Number.isFinite(x) || x < 0 || x > 100)) return "a figure outside 0–100";
   if (r.top3 != null && Math.abs(r.r1 + r.r2 + r.r3 - r.top3) > 1) return `ranks ${r.r1}+${r.r2}+${r.r3} don't make top three ${r.top3}`;

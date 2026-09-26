@@ -2552,13 +2552,15 @@ function DemographicsPanel({ rangeId = "all" }) {
 
 // ---- The issues: what matters, and who voters trust with it ----------------
 /* Two views of the one question. "Who's trusted": for each issue, how many
-   voters put it in their top three (RedBridge – the one pollster that asks
-   this monthly and publishes the figures) beside who they think is best on
-   it: Labor, the Coalition and One Nation as shares of the voters who named
-   one of those three, pooled across Resolve, RedBridge and YouGov (gen-data
-   §7h: the three houses offer different options, and those three are the
-   part every question shares). A row picks the issue the chart follows
-   month by month. "What matters to whom": RedBridge's top three by group. */
+   voters put it in their top three (RedBridge and Ipsos, each moved halfway
+   toward the other – they word the question differently and sit a steady
+   distance apart; gen-data §7h) beside who they think is best on it: Labor,
+   the Coalition and One Nation as shares of the voters who named one of
+   those three, pooled across Resolve, RedBridge, Ipsos and YouGov (the four
+   offer different options, and those three are the part every question
+   shares). A row picks the issue the chart follows month by month. "What
+   matters to whom": RedBridge's top three by group, under its own
+   all-voters row. */
 const ISS_PARTY = { alp: "Labor", lnp: "the Coalition", onp: "One Nation" };
 const ISS_PARTY_CAP = { alp: "Labor", lnp: "Coalition", onp: "One Nation" };
 // the group table's column heads: a word or two
@@ -2624,9 +2626,9 @@ function issGroupVerdict(tab, k) {
 /* The sentence under the chart: has any party gained or lost ground on the
    issue over the period on screen? Each pollster is compared only with
    itself (withinHouseSlope: a level per pollster, one shared slope, larger
-   polls counting for more), since Resolve joined the three-way question
-   only in July 2026 and a line can move just because it arrived. Holm across
-   the three parties. */
+   polls counting for more), since Ipsos and Resolve joined the three-way
+   question only in June and July 2026 and a line can move just because one
+   arrived. Holm across the three parties. */
 function issTrendVerdict(D, it, dots) {
   if (!dots.length) return null;
   const ym = dots[0].date.slice(0, 7);
@@ -2693,7 +2695,9 @@ function IssuesPanel({ rangeId = "all" }) {
            aria-label={`${x.label}: ${x.imp ? Math.round(x.imp.v) + "% put it in their top three" : "not asked"}; ` +
              (x.own ? P.map((q) => `${pName(q)} ${Math.round(x.own.v[q])}`).join(", ") + "; " + v.text : "no three-way figures")}>
         <span className="iss-lab">{x.label}</span>
-        <span className="iss-imp" title={x.imp ? `${Math.round(x.imp.v)}% put it in their top three, ${x.imp.r1 != null ? Math.round(x.imp.r1) + "% first" : ""} (± ${x.imp.ci.toFixed(1)})` : ""}>
+        <span className="iss-imp" title={x.imp ? `${Math.round(x.imp.v)}% put it in their top three (± ${x.imp.ci.toFixed(1)})`
+          + (x.imp.gap && x.imp.by.length > 1 ? `. Latest polls: ${x.imp.by.map((b) => `${b.house} ${Math.round(b.v)}%`).join(", ")}` : "")
+          + (x.imp.r1 != null ? `. ${Math.round(x.imp.r1)}% put it first at RedBridge` : "") : ""}>
           {/* the column heads hide on a phone, so each cell names itself there */}
           <span className="iss-mini" aria-hidden="true">In top three</span>
           {x.imp ? <>
@@ -2757,10 +2761,18 @@ function IssuesPanel({ rangeId = "all" }) {
     return { xDomain, pts, dots, scatter, areas, domain: [d0, d1], ticks };
   })();
 
+  /* the issue the two pollsters' latest polls put furthest apart, said under
+     the rows (a hover title reaches few readers) once it's more than
+     sampling could make: five points */
+  const wide = list.filter((x) => x.imp && x.imp.gap && x.imp.by.length === 2)
+    .map((x) => { const [hi, lo] = [...x.imp.by].sort((a, b) => b.v - a.v); return { x, hi, lo, d: hi.v - lo.v }; })
+    .sort((a, b) => b.d - a.d).find((w) => w.d >= 5);
+
   // ---- what matters to whom
   const G = I.groups;
   const gtab = G && (G.tabs.find((t) => t.id === gsetId) || G.tabs[0]);
-  const impOf = (k) => { const x = list.find((i) => i.id === k); return x && x.imp ? x.imp : null; };
+  // the all-voters row is the group house's own reading, which its groups average to
+  const allOf = (k) => (G && G.all && G.all[k]) || null;
   const gVerdicts = gtab ? gtab.issues.map((k) => issGroupVerdict(gtab, k)).filter(Boolean)
     .sort((a, b) => b.gap - a.gap).slice(0, 3) : [];
 
@@ -2821,6 +2833,14 @@ function IssuesPanel({ rangeId = "all" }) {
                 ))}
               </p>
               {list.map(issueRow)}
+              {wide && (
+                <p className="table-hint iss-grn">
+                  {wide.hi.house} and {wide.lo.house} word the question differently and disagree most
+                  on {ISS_PHRASE[wide.x.id]}: {Math.round(wide.hi.v)}% in {wide.hi.house}’s latest poll,
+                  {" "}{Math.round(wide.lo.v)}% in {wide.lo.house}’s. The grey bars sit midway between the two
+                  pollsters’ usual figures.
+                </p>
+              )}
               {list.filter((x) => x.grnTop).map((x) => (
                 <p key={"grn-" + x.id} className="table-hint iss-grn">
                   RedBridge also offers the Greens, who come first on {ISS_PHRASE[x.id]} ({x.grnTop.grn}%).
@@ -2863,16 +2883,18 @@ function IssuesPanel({ rangeId = "all" }) {
                   <button type="button" className="hi-term" onClick={openInfo}>Where the figures come from</button>
                 </p>
                 <p className="table-hint">
-                  The grey bar is how many voters put the issue among the three most important to their vote:
-                  75% beside the cost of living means three in four rank it first, second or third. RedBridge
-                  asks this every month, and it is the only pollster that publishes the figures, so this bar is
-                  RedBridge’s alone.
+                  The grey bar is how many voters put the issue among their three most important. RedBridge
+                  and Ipsos both ask every month, in different words: RedBridge asks which issues matter most
+                  to your vote, Ipsos which matter most for Australia. Their figures sit a steady distance
+                  apart, so each poll is moved half that distance toward the other pollster before the two
+                  are pooled.
                 </p>
                 <p className="table-hint">
                   The coloured bar splits the voters who named Labor, the Coalition or One Nation as best on the
                   issue. Pollsters also offer other answers – the Greens, someone else, all about equal, don’t
-                  know – and each offers a different set, so only these three can be pooled. Resolve, RedBridge and
-                  YouGov count wherever they ask the issue.
+                  know – and each offers a different set, so only these three can be pooled. Resolve, RedBridge,
+                  Ipsos and YouGov count wherever they ask the issue, each less its usual lean, as in the
+                  headline figures.
                 </p>
                 <p className="table-hint">
                   “Ahead” means the leading party’s margin over the next is larger than that margin’s own 95%
@@ -2901,7 +2923,7 @@ function IssuesPanel({ rangeId = "all" }) {
                     <tr className="all">
                       <th scope="row">All voters</th>
                       {gtab.issues.map((k) => {
-                        const x = impOf(k);
+                        const x = allOf(k);
                         return <td key={k}>{x ? <IssCell v={x.v} ci={x.ci} all /> : "–"}</td>;
                       })}
                     </tr>
@@ -2926,7 +2948,9 @@ function IssuesPanel({ rangeId = "all" }) {
                   <summary>How to read these figures</summary>
                   <p className="table-hint">
                     Each figure is the share of that group putting the issue among its three most important. Only
-                    RedBridge publishes these by group, so they rest on its polls in the last {G.window}.{" "}
+                    RedBridge publishes these by group, so they rest on its polls in the last {G.window}. The
+                    all-voters row is RedBridge’s own too, so it can differ from the grey bars under Who’s
+                    trusted, which pool RedBridge with Ipsos.{" "}
                     <button type="button" className="hi-term" onClick={openInfo}>Where the figures come from</button>
                   </p>
                   <p className="table-hint">

@@ -5807,11 +5807,22 @@ function infoTerms(D) {
         in the window counts for the square root of their number.</p>
     </div>
   ) : null;
-  /* The issues panel's working: the polls its six-week window holds, and
-     which answers each offered (the three-party shares drop the rest). */
+  /* The issues panel's working: the polls its six-week window holds and
+     which answers each offered (the three-party shares drop the rest); the
+     gap between the two top-three pollsters on each issue, which moves each
+     halfway toward the other; and the largest lean taken off a three-party
+     share. */
   const ISS = D.issues;
   const ISS_OPT = { alp: "Labor", lnp: "the Coalition", onp: "One Nation", grn: "the Greens", oth: "someone else",
                     equal: "all about equal", none: "none of these", unsure: "not sure" };
+  const issPhrase = (id) => ({ col: "the cost of living", economy: "economic management", climate: "climate change",
+                               security: "national security" }[id] || (ISS.labels[id] || id).toLowerCase());
+  // each issue's gap turned to RedBridge minus Ipsos (gen-data gives the first house named minus the second)
+  const issGaps = ISS && ISS.list ? ISS.list.filter((it) => it.imp && it.imp.gap).map((it) => {
+    const [a, b] = it.imp.gap.houses, flip = a !== "RedBridge";
+    return { id: it.id, label: it.label, hi: flip ? b : a, lo: flip ? a : b, v: flip ? -it.imp.gap.v : it.imp.gap.v };
+  }) : [];
+  const gapUp = [...issGaps].sort((a, b) => b.v - a.v)[0], gapDown = [...issGaps].sort((a, b) => a.v - b.v)[0];
   const issWork = ISS && ISS.polls && ISS.polls.length ? (
     <div className="info-work-wrap">
       <table className="info-work info-work-list">
@@ -5821,7 +5832,7 @@ function infoTerms(D) {
             <tr key={p.pollster + p.dateLabel}>
               <td>{p.pollster}</td><td>{p.dateLabel}</td>
               <td>{(p.options || []).map((o) => (o === "unsure"
-                ? ({ Resolve: "undecided", YouGov: "don’t know" }[p.pollster] || "not sure")
+                ? ({ Resolve: "undecided", YouGov: "don’t know", Ipsos: "don’t know" }[p.pollster] || "not sure")
                 : ISS_OPT[o] || o)).join(", ")}</td>
             </tr>
           ))}
@@ -5829,7 +5840,23 @@ function infoTerms(D) {
       </table>
       <p className="info-work-note">The polls in the six-week window, newest first. A poll’s weight
         is its sample, halving every 14 days and fading out by day 42; a pollster with several polls
-        in the window counts for the square root of their number.</p>
+        in the window counts for the square root of their number.
+        {ISS.leanMax ? <> The largest lean taken off a three-party share today is {ISS.leanMax.house}’s
+          on {ISS_OPT[ISS.leanMax.party]}’s share for {issPhrase(ISS.leanMax.issue)}:
+          {" "}{ISS.leanMax.v > 0 ? "+" : "−"}{Math.abs(ISS.leanMax.v).toFixed(1)} points.</> : null}</p>
+      {issGaps.length ? <>
+        <table className="info-work info-work-list">
+          <thead><tr><th>Issue</th><th>RedBridge minus Ipsos, points</th></tr></thead>
+          <tbody>
+            {issGaps.map((g) => (
+              <tr key={g.id}><td>{g.label}</td><td>{g.v > 0 ? "+" : g.v < 0 ? "−" : ""}{Math.abs(g.v).toFixed(1)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="info-work-note">Each poll’s gap to the other pollster’s polls in the four weeks
+          either side, averaged over every poll so far with a weight that halves every 90 days. Each
+          pollster’s figures move half the gap toward the other’s before they are pooled.</p>
+      </> : null}
     </div>
   ) : null;
   const pc = (v) => (v == null ? "–" : (100 * v).toFixed(1));
@@ -6297,37 +6324,58 @@ function infoTerms(D) {
         out, while RedBridge reports none, and its four generations add up to its whole sample, so
         its Boomers take in everyone born before 1965. They are a small share of either sample.</span></>) },
       { id: "issues", term: "Issues", body: (
-        <>Two questions pollsters ask about the issues: which ones matter most to how people will
-        vote, and which party they think would handle each one best. The panel “The issues” turns
-        them into one figure per issue.
-        <span className="info-p"><b>What matters.</b> RedBridge asks every month, “If a federal
-        election were held today, which of the following issues would be most important to you when
-        deciding who will receive your vote? Please rank your top 3.” It lists 14 issues. The panel
-        shows the share of voters putting each issue first, second or third. DemosAU and Spectre ask
-        their own versions – DemosAU leaves the answer open, Spectre allows up to three of 17 – so
-        their figures can’t be combined with RedBridge’s, and the panel leaves them out.</span>
-        <span className="info-p"><b>Who’s best.</b> Three pollsters ask which party would handle an
+        <>Two questions pollsters ask about the issues: which ones matter most, and which party would
+        handle each one best. The panel “The issues” turns them into one figure per issue.
+        <span className="info-p"><b>What matters.</b> Two pollsters ask every month. RedBridge asks,
+        “If a federal election were held today, which of the following issues would be most
+        important to you when deciding who will receive your vote? Please rank your top 3.” It lists
+        14 issues. Ipsos asks, “What would you say are the three most important issues facing
+        Australia today?” It lists 19. The panel shows the share of voters putting each issue among
+        their three.</span>
+        <span className="info-p"><b>Two questions, two answers.</b> The different wording gives
+        steadily different answers.{gapUp && gapDown && gapUp.v > 0 && gapDown.v < 0 ? <> RedBridge’s
+        figure for {issPhrase(gapUp.id)} runs {Math.round(gapUp.v)} points above Ipsos’s, and its
+        figure for {issPhrase(gapDown.id)} {Math.round(-gapDown.v)} points below.</> : null} Two
+        pollsters can’t say which of them is right, so each poll is moved half their average gap
+        toward the other pollster, and the two are pooled over the last six weeks. The grey bars sit
+        midway between the two pollsters’ usual figures, and they don’t jump when one pollster’s poll
+        leaves the window.
+        Ipsos publishes about three and a half weeks after its fieldwork, so its latest poll is in
+        the window for only part of each month.</span>
+        <span className="info-p"><b>Two more pollsters, as a check.</b> DemosAU asks every month,
+        “In your opinion, what is the biggest issue facing Australia today?” It takes one answer in
+        the voter’s own words and sorts the answers into categories generated by AI, which change
+        from month to month. Spectre asks about every three months for up to three of 14 issues,
+        several of them bundled, such as “health and aged care”. Neither can be pooled with the
+        others, but both side with Ipsos on health. In 2026 Spectre had it at 18 to 20%, and 1 to 3%
+        named it the biggest issue at DemosAU, where 7 to 10% put it first at RedBridge.</span>
+        <span className="info-p"><b>Who’s best.</b> Four pollsters ask which party would handle an
         issue best, each in its own words. Resolve asks every month, “Which party do you think would
         perform best in each of these areas?” RedBridge asks every month, “Which of the following do
-        you believe is best able to deal with…” YouGov asked in August 2026, “Which party is best at
-        handling…” Each offers different answers. Resolve offers the Liberals, Labor, One Nation
-        (since July 2026), someone else, and undecided. RedBridge offers Labor, the Liberals, the
-        Nationals, the Greens, One Nation, all about equal, none of these, and not sure. YouGov offers
-        Labor, the Coalition, One Nation, the Greens, and don’t know.</span>
+        you believe is best able to deal with…” Ipsos asks every month, “Please select the political
+        party that you believe is most capable of managing each of the following issues,” for its
+        month’s five top issues. YouGov asked in August 2026, “Which party is best at handling…”
+        Each offers different answers. Resolve offers the Liberals, Labor, One Nation (since July
+        2026), someone else, and undecided. RedBridge offers Labor, the Liberals, the Nationals, the
+        Greens, One Nation, all about equal, none of these, and not sure. Ipsos offers Labor, the
+        Coalition, the Greens, One Nation (since June 2026), other, don’t know, and none. YouGov
+        offers Labor, the Coalition, One Nation, the Greens, and don’t know.</span>
         <span className="info-p"><b>How it’s built.</b> The part every question shares is the choice
         between Labor, the Coalition and One Nation. So each poll is read as those three parties’
         shares of the voters who named one of them: 25, 20 and 20 of all voters become 38, 31 and 31.
         Those shares are pooled over the last six weeks of polls, weighted as the headline’s polls
-        are, so newer and larger polls count for more. Only two pollsters ask regularly, too few to
-        measure each one’s lean, so no lean is removed. RedBridge’s share putting an issue in their
-        top three is built the same way, from RedBridge alone. The panel shows the eight issues at
-        least two of the three pollsters ask: the cost of living, housing, health, economic
-        management, immigration, climate change, crime, and national security. Pollsters word them a
-        little differently – RedBridge’s “the rate of immigration” is Resolve’s “immigration and
-        refugees” – and each counts as the same issue.</span>
+        are, so newer and larger polls count for more. Each pollster’s usual lean is taken off
+        first, measured as the headline’s are. A lean measured from few polls is shrunk toward
+        zero, and Ipsos and Resolve have offered all three parties only since mid-2026
+        {ISS && ISS.leanMax ? <>: the largest lean taken off today is {Math.abs(ISS.leanMax.v).toFixed(1)}
+        {" "}points</> : null}. The panel shows eight issues most of the pollsters ask: the cost of living,
+        housing, health, economic management, immigration, climate change, crime, and national
+        security. Pollsters word them a little differently – RedBridge’s “the rate of immigration”
+        is Resolve’s “immigration and refugees”, and Ipsos’s “defence, foreign affairs and
+        terrorism” counts as national security – and each counts as the same issue.</span>
         <span className="info-p"><b>What’s left out.</b> The Greens, whom Resolve doesn’t offer, and
-        every answer that names no party. Together they are about a quarter to a third of voters on
-        most issues, and more than half on climate change with RedBridge and YouGov, where many
+        every answer that names no party. Together they are about a quarter to two fifths of voters
+        on most issues, and more than half on climate change with RedBridge and YouGov, where many
         choose the Greens. RedBridge puts the Greens first on climate change, and the panel says so
         beside its rows.</span>
         <span className="info-p"><b>Ahead, or no clear lead.</b> A party is ahead on an issue when its
@@ -6335,27 +6383,37 @@ function infoTerms(D) {
         are worked out together, because both shares come from the same voters: when one rises, the
         other tends to fall.</span>
         <span className="info-p"><b>Changes over time.</b> The sentence under the chart asks whether
-        any party has gained or lost ground on the issue over the period shown. Resolve joined the
-        three-party question only in July 2026, so a line can move just because it arrived. The test
-        compares each pollster only with itself, as on the vote-by-group charts, and the bar rises
-        for testing three parties at once.</span>
+        any party has gained or lost ground on the issue over the period shown. Ipsos and Resolve
+        joined the three-party question only in June and July 2026, so a line can move just because
+        one of them arrived. The test compares each pollster only with itself, as on the
+        vote-by-group charts, and the bar rises for testing three parties at once.</span>
         <span className="info-p"><b>By group.</b> RedBridge publishes a table for each of its main
         issues giving each group’s share putting it in their top three: by vote, generation, gender,
         where people live, home ownership, and education. A group’s margin comes from its share of the
         poll, so One Nation voters, about a quarter of RedBridge’s sample, carry margins of about 6
-        points. The sentences under the table use the same test as the{" "}
+        points. The table’s all-voters row is RedBridge’s own, so it can differ from the grey bars,
+        which pool RedBridge with Ipsos. The sentences under the table use the same test as the{" "}
         {xref("vote-by-group", "issues", "breakdowns by group")}.</span>
-        <span className="info-p"><b>Limits.</b> Unfortunately, only RedBridge publishes figures for
-        what matters, so nothing checks its readings against another pollster’s. And the three-party
-        shares can’t show a party gaining ground among voters who had named no one.</span>
+        <span className="info-p"><b>Limits.</b> Unfortunately, the two pollsters that ask what
+        matters every month ask different questions, and nothing shows which is closer to how
+        people will vote. The grey bars simply sit midway between them. And the three-party shares can’t
+        show a party gaining ground among voters who had named no one.</span>
         <span className="info-p"><b>A check.</b> Every table is checked before it’s used. A
         salience row’s three ranks must add up to its top-three share, and every best-party row must
         add up to 100, give or take rounding. RedBridge prints each month twice, in its own report and
-        again in the next, and the two must agree.</span>
+        again in the next, and the two must agree. Ipsos’s 19 shares must add up to about 300, three
+        per voter, and Ipsos prints each month again in every later report that year: every printing
+        must agree.</span>
         <span className="info-p"><b>Sources.</b> RedBridge’s monthly reports with Accent Research
         (accent-research.com), Resolve’s Political Monitor interactive (The Sydney Morning Herald),
-        and YouGov’s News24 Pulse charts.</span>
+        Ipsos’s Issues Monitor reports and methodology statements (ipsos.com), and YouGov’s News24
+        Pulse charts. For the check, DemosAU’s and Spectre’s reports.</span>
         {working(<>
+          <span className="info-p"><b>Top three, two pollsters:</b> with g = RedBridge’s figure minus
+          Ipsos’s on average, each RedBridge poll’s share x counts as x − g ÷ 2 and each Ipsos poll’s
+          as x + g ÷ 2, and the results pool like the shares below. g is measured poll by poll, against
+          the other pollster’s polls within four weeks, and averaged with a weight that halves every
+          90 days.</span>
           <span className="info-p"><b>Three-party share:</b> for each party p, s = 100 × p ÷
           (Labor + Coalition + One Nation), from the poll’s published shares.</span>
           <span className="info-p"><b>Lead:</b> the leader’s share minus the next party’s, pooled like
