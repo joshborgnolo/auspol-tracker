@@ -122,14 +122,17 @@ POPOVER = f'''<div role="dialog" aria-label="How this is counted" style="positio
 <a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500">Read the full explainer →</a>
 </div>'''
 
+def phone_compare(compare, cmp_label):
+    return f'<label class="check" style="margin-top: 6px; font-size: 13px; color: #4A4843"><input type="checkbox"{" checked" if compare else ""}>{cmp_label}</label>'
+
 def chart_controls2(compare, cmp_label, phone=False):
     chk = ' checked' if compare else ''
-    ranges = ''.join(f'<button class="tab" aria-pressed="{"true" if r == "All" else "false"}" style="font-size: 14px; padding: 0 {8 if phone else 10}px">{r}</button>' for r in ('3 mo', '6 mo', '12 mo', 'All'))
+    ranges = ''.join(f'<button class="tab" aria-pressed="{"true" if r == "All" else "false"}" style="font-size: {13 if phone else 14}px; padding: 0 {6 if phone else 10}px">{r}</button>' for r in ('3 mo', '6 mo', '12 mo', 'All'))
     if phone:
-        return (f'<div style="margin-top: 14px; display: flex; align-items: center; border-bottom: 1px solid #DDDCD8">\n'
+        # a quiet range picker; the compare box sits with the legend under the chart (phone_compare)
+        return (f'<div style="margin-top: 12px; display: flex; align-items: center; border-bottom: 1px solid #DDDCD8">\n'
                 f'<div role="group" aria-label="Time range" style="display: flex">{ranges}</div>\n<span style="flex-grow: 1"></span>\n'
-                f'{expand_btn("two-party preferred chart")}\n</div>\n'
-                f'<label class="check" style="margin-top: 4px"><input type="checkbox"{chk}>{cmp_label}</label>')
+                f'{expand_btn("two-party preferred chart")}\n</div>')
     return (f'<div style="margin-top: 16px; display: flex; align-items: center; border-bottom: 1px solid #DDDCD8">\n'
             f'<div role="group" aria-label="Time range" style="display: flex; gap: 2px">{ranges}</div>\n<span style="flex-grow: 1"></span>\n'
             f'<label class="check"><input type="checkbox"{chk}>{cmp_label}</label>\n<span style="width: 12px"></span>\n'
@@ -193,7 +196,8 @@ phone = '\n\n'.join([
     '<div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #DDDCD8; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; row-gap: 10px; font-size: 12px; color: #4A4843">\n'
     + key_item(K_DOT(ONP), 'One poll, implied flows') + '\n' + key_item(K_LINEBAND(ONP), 'Monthly, flow range') + '\n'
     + key_item(K_RING, '2025 election') + '\n</div>',
-    '<div style="margin-top: 16px; display: flex; align-items: center">\n'
+    phone_compare(False, 'Compare published head-to-heads'),
+    '<div style="margin-top: 8px; display: flex; align-items: center">\n'
     '<a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>\n'
     f'<span style="flex-grow: 1"></span>\n{copy_btn("two-party preferred")}\n</div>',
 ])

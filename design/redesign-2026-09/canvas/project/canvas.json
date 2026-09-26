@@ -7,7 +7,7 @@
       "title": "Dark mode — variables and components",
       "w": 1280,
       "x": 0,
-      "y": 20590
+      "y": 20610
     },
     "Demographics.dc.html": {
       "h": 1290,
@@ -42,14 +42,14 @@
       "title": "National direction — desktop",
       "w": 1280,
       "x": 0,
-      "y": 16350
+      "y": 16370
     },
     "DirectionMobile.dc.html": {
       "h": 1240,
       "title": "National direction — phone",
       "w": 390,
       "x": 1360,
-      "y": 16350
+      "y": 16370
     },
     "Interaction.dc.html": {
       "h": 1620,
@@ -63,52 +63,52 @@
       "title": "The issues — desktop, Who’s trusted",
       "w": 1280,
       "x": 0,
-      "y": 14030
+      "y": 14050
     },
     "IssuesMobile.dc.html": {
       "h": 1940,
       "title": "The issues — phone, Who’s trusted",
       "w": 390,
       "x": 1360,
-      "y": 14030
+      "y": 14050
     },
     "IssuesWhom.dc.html": {
       "h": 1030,
       "title": "The issues — What matters to whom (by vote)",
       "w": 1280,
       "x": 1830,
-      "y": 14030
+      "y": 14050
     },
     "IssuesWhomMobile.dc.html": {
       "h": 1160,
       "title": "The issues — What matters to whom, phone",
       "w": 390,
       "x": 3190,
-      "y": 14030
+      "y": 14050
     },
     "Leadership.dc.html": {
-      "h": 1200,
+      "h": 1210,
       "title": "Leadership — desktop",
       "w": 1280,
       "x": 0,
       "y": 8410
     },
     "LeadershipBoth.dc.html": {
-      "h": 1540,
+      "h": 1580,
       "title": "Leadership — Both + Both",
       "w": 1280,
       "x": 3190,
       "y": 8410
     },
     "LeadershipMobile.dc.html": {
-      "h": 1850,
+      "h": 1870,
       "title": "Leadership — phone",
       "w": 390,
       "x": 1360,
       "y": 8410
     },
     "LeadershipTablet.dc.html": {
-      "h": 1770,
+      "h": 1810,
       "title": "Leadership — tablet (768)",
       "w": 768,
       "x": 4550,
@@ -150,7 +150,7 @@
       "y": 0
     },
     "PageDesktop1.dc.html": {
-      "h": 4681,
+      "h": 4691,
       "page": "page",
       "title": "Snapshot page – desktop, 1 of 2",
       "w": 1280,
@@ -163,7 +163,7 @@
       "title": "Snapshot page – desktop, 2 of 2",
       "w": 1280,
       "x": 0,
-      "y": 4801
+      "y": 4811
     },
     "PagePhone1.dc.html": {
       "h": 4289,
@@ -174,7 +174,7 @@
       "y": 0
     },
     "PagePhone2.dc.html": {
-      "h": 4870,
+      "h": 4890,
       "page": "page",
       "title": "Snapshot page – phone, 2 of 3",
       "w": 390,
@@ -187,28 +187,28 @@
       "title": "Snapshot page – phone, 3 of 3",
       "w": 390,
       "x": 1360,
-      "y": 9399
+      "y": 9419
     },
     "Polls.dc.html": {
       "h": 960,
       "title": "Latest and next polls — desktop",
       "w": 1280,
       "x": 0,
-      "y": 17970
+      "y": 17990
     },
     "PollsMobile.dc.html": {
       "h": 1490,
       "title": "Latest and next polls — phone",
       "w": 390,
       "x": 1360,
-      "y": 17970
+      "y": 17990
     },
     "PollsViews.dc.html": {
       "h": 2240,
       "title": "Latest and next polls — row opened, Primary, sorted by next release",
       "w": 1280,
       "x": 1830,
-      "y": 17970
+      "y": 17990
     },
     "Switching.dc.html": {
       "h": 1310,
@@ -229,21 +229,21 @@
       "title": "Two-party preferred — desktop",
       "w": 1280,
       "x": 0,
-      "y": 10640
+      "y": 10660
     },
     "TPPMobile.dc.html": {
       "h": 1300,
       "title": "Two-party preferred — phone",
       "w": 390,
       "x": 1360,
-      "y": 10640
+      "y": 10660
     },
     "TPPViews.dc.html": {
       "h": 3010,
       "title": "Two-party preferred — compare on, the ‘?’ opened, published figures, v Coalition",
       "w": 1280,
       "x": 1830,
-      "y": 10640
+      "y": 10660
     },
     "Undecided.dc.html": {
       "h": 1250,
@@ -272,6 +272,62 @@
       "w": 1280,
       "x": 1830,
       "y": 6390
+    },
+    "PastCyclesDesktop1.dc.html": {
+      "h": 2333,
+      "page": "cycles",
+      "title": "Past cycles page – desktop, 1 of 2",
+      "w": 1280,
+      "x": 0,
+      "y": 0
+    },
+    "PastCyclesDesktop2.dc.html": {
+      "h": 4183,
+      "page": "cycles",
+      "title": "Past cycles page – desktop, 2 of 2",
+      "w": 1280,
+      "x": 0,
+      "y": 2453
+    },
+    "PastCyclesPhone1.dc.html": {
+      "h": 3123,
+      "page": "cycles",
+      "title": "Past cycles page – phone, 1 of 3",
+      "w": 390,
+      "x": 1360,
+      "y": 0
+    },
+    "PastCyclesPhone2.dc.html": {
+      "h": 3375,
+      "page": "cycles",
+      "title": "Past cycles page – phone, 2 of 3",
+      "w": 390,
+      "x": 1360,
+      "y": 3243
+    },
+    "PastCyclesPhone3.dc.html": {
+      "h": 2333,
+      "page": "cycles",
+      "title": "Past cycles page – phone, 3 of 3",
+      "w": 390,
+      "x": 1360,
+      "y": 6738
+    },
+    "PastCyclesControls.dc.html": {
+      "h": 3196,
+      "page": "cycles",
+      "title": "Past cycles – the comparison: re-elected or turned out, the term picker, drawn terms, polls, change",
+      "w": 1280,
+      "x": 1830,
+      "y": 0
+    },
+    "PastCyclesDetails.dc.html": {
+      "h": 3074,
+      "page": "cycles",
+      "title": "Past cycles – the pinned section bar, readouts, dark mode",
+      "w": 1280,
+      "x": 1830,
+      "y": 3316
     }
   },
   "createdOnFiles": {
@@ -314,7 +370,7 @@
       "text": "Latest and next polls",
       "w": 240,
       "x": 0,
-      "y": 17710
+      "y": 17730
     },
     "t2": {
       "kind": "title1",
@@ -354,7 +410,7 @@
       "text": "Dark mode",
       "w": 240,
       "x": 0,
-      "y": 20330
+      "y": 20350
     },
     "t7": {
       "kind": "title1",
@@ -362,7 +418,7 @@
       "text": "Two-party preferred",
       "w": 240,
       "x": 0,
-      "y": 10380
+      "y": 10400
     },
     "t8": {
       "kind": "title1",
@@ -370,7 +426,7 @@
       "text": "The issues",
       "w": 240,
       "x": 0,
-      "y": 13770
+      "y": 13790
     },
     "t9": {
       "kind": "title1",
@@ -378,7 +434,25 @@
       "text": "National direction",
       "w": 240,
       "x": 0,
-      "y": 16090
+      "y": 16110
+    },
+    "c1": {
+      "kind": "title1",
+      "maxW": 1750,
+      "page": "cycles",
+      "text": "The Past cycles page, top to bottom",
+      "w": 240,
+      "x": 0,
+      "y": -260
+    },
+    "c2": {
+      "kind": "title1",
+      "maxW": 1280,
+      "page": "cycles",
+      "text": "How it moves",
+      "w": 240,
+      "x": 1830,
+      "y": -260
     }
   },
   "order": [
@@ -419,7 +493,14 @@
     "PageDesktop2.dc.html",
     "PagePhone1.dc.html",
     "PagePhone2.dc.html",
-    "PagePhone3.dc.html"
+    "PagePhone3.dc.html",
+    "PastCyclesDesktop1.dc.html",
+    "PastCyclesDesktop2.dc.html",
+    "PastCyclesPhone1.dc.html",
+    "PastCyclesPhone2.dc.html",
+    "PastCyclesPhone3.dc.html",
+    "PastCyclesControls.dc.html",
+    "PastCyclesDetails.dc.html"
   ],
   "pages": [
     {
@@ -429,6 +510,10 @@
     {
       "id": "page",
       "name": "Whole page"
+    },
+    {
+      "id": "cycles",
+      "name": "Past cycles"
     }
   ],
   "title": "Primary vote chart redesign"
