@@ -7,7 +7,7 @@
       "title": "Dark mode — variables and components",
       "w": 1280,
       "x": 0,
-      "y": 20530
+      "y": 20550
     },
     "Demographics.dc.html": {
       "h": 1290,
@@ -24,7 +24,7 @@
       "y": 2000
     },
     "DemographicsMobile.dc.html": {
-      "h": 1760,
+      "h": 1780,
       "title": "Who votes for whom — phone",
       "w": 390,
       "x": 1360,
@@ -42,14 +42,14 @@
       "title": "National direction — desktop",
       "w": 1280,
       "x": 0,
-      "y": 16290
+      "y": 16310
     },
     "DirectionMobile.dc.html": {
       "h": 1240,
       "title": "National direction — phone",
       "w": 390,
       "x": 1360,
-      "y": 16290
+      "y": 16310
     },
     "Interaction.dc.html": {
       "h": 1620,
@@ -63,63 +63,63 @@
       "title": "The issues — desktop, Who’s trusted",
       "w": 1280,
       "x": 0,
-      "y": 13970
+      "y": 13990
     },
     "IssuesMobile.dc.html": {
       "h": 1940,
       "title": "The issues — phone, Who’s trusted",
       "w": 390,
       "x": 1360,
-      "y": 13970
+      "y": 13990
     },
     "IssuesWhom.dc.html": {
       "h": 1030,
       "title": "The issues — What matters to whom (by vote)",
       "w": 1280,
       "x": 1830,
-      "y": 13970
+      "y": 13990
     },
     "IssuesWhomMobile.dc.html": {
       "h": 1160,
       "title": "The issues — What matters to whom, phone",
       "w": 390,
       "x": 3190,
-      "y": 13970
+      "y": 13990
     },
     "Leadership.dc.html": {
       "h": 1200,
       "title": "Leadership — desktop",
       "w": 1280,
       "x": 0,
-      "y": 8350
+      "y": 8370
     },
     "LeadershipBoth.dc.html": {
       "h": 1540,
       "title": "Leadership — Both + Both",
       "w": 1280,
       "x": 3190,
-      "y": 8350
+      "y": 8370
     },
     "LeadershipMobile.dc.html": {
       "h": 1850,
       "title": "Leadership — phone",
       "w": 390,
       "x": 1360,
-      "y": 8350
+      "y": 8370
     },
     "LeadershipTablet.dc.html": {
       "h": 1770,
       "title": "Leadership — tablet (768)",
       "w": 768,
       "x": 4550,
-      "y": 8350
+      "y": 8370
     },
     "LeadershipThreeWay.dc.html": {
       "h": 1180,
       "title": "Leadership — Three-way + Favourability",
       "w": 1280,
       "x": 1830,
-      "y": 8350
+      "y": 8370
     },
     "Main.dc.html": {
       "h": 1000,
@@ -174,7 +174,7 @@
       "y": 0
     },
     "PagePhone2.dc.html": {
-      "h": 4850,
+      "h": 4870,
       "page": "page",
       "title": "Snapshot page – phone, 2 of 3",
       "w": 390,
@@ -187,91 +187,91 @@
       "title": "Snapshot page – phone, 3 of 3",
       "w": 390,
       "x": 1360,
-      "y": 9379
+      "y": 9399
     },
     "Polls.dc.html": {
       "h": 960,
       "title": "Latest and next polls — desktop",
       "w": 1280,
       "x": 0,
-      "y": 17910
+      "y": 17930
     },
     "PollsMobile.dc.html": {
       "h": 1490,
       "title": "Latest and next polls — phone",
       "w": 390,
       "x": 1360,
-      "y": 17910
+      "y": 17930
     },
     "PollsViews.dc.html": {
       "h": 2240,
       "title": "Latest and next polls — row opened, Primary, sorted by next release",
       "w": 1280,
       "x": 1830,
-      "y": 17910
+      "y": 17930
     },
     "Switching.dc.html": {
       "h": 1310,
       "title": "Where One Nation’s voters came from — desktop",
       "w": 1280,
       "x": 0,
-      "y": 4140
+      "y": 4160
     },
     "SwitchingMobile.dc.html": {
       "h": 1810,
       "title": "Where One Nation’s voters came from — phone",
       "w": 390,
       "x": 1360,
-      "y": 4140
+      "y": 4160
     },
     "TPP.dc.html": {
       "h": 1270,
       "title": "Two-party preferred — desktop",
       "w": 1280,
       "x": 0,
-      "y": 10580
+      "y": 10600
     },
     "TPPMobile.dc.html": {
       "h": 1300,
       "title": "Two-party preferred — phone",
       "w": 390,
       "x": 1360,
-      "y": 10580
+      "y": 10600
     },
     "TPPViews.dc.html": {
       "h": 3010,
       "title": "Two-party preferred — compare on, the ‘?’ opened, published figures, v Coalition",
       "w": 1280,
       "x": 1830,
-      "y": 10580
+      "y": 10600
     },
     "Undecided.dc.html": {
       "h": 1250,
       "title": "Undecided — desktop",
       "w": 1280,
       "x": 0,
-      "y": 6330
+      "y": 6350
     },
     "UndecidedAge.dc.html": {
       "h": 1200,
       "title": "Undecided — By age",
       "w": 1280,
       "x": 3190,
-      "y": 6330
+      "y": 6350
     },
     "UndecidedMobile.dc.html": {
       "h": 1640,
       "title": "Undecided — phone",
       "w": 390,
       "x": 1360,
-      "y": 6330
+      "y": 6350
     },
     "UndecidedParty.dc.html": {
       "h": 1200,
       "title": "Undecided — By party",
       "w": 1280,
       "x": 1830,
-      "y": 6330
+      "y": 6350
     }
   },
   "createdOnFiles": {
@@ -314,7 +314,7 @@
       "text": "Latest and next polls",
       "w": 240,
       "x": 0,
-      "y": 17650
+      "y": 17670
     },
     "t2": {
       "kind": "title1",
@@ -330,7 +330,7 @@
       "text": "Where One Nation’s voters came from",
       "w": 240,
       "x": 0,
-      "y": 3880
+      "y": 3900
     },
     "t4": {
       "kind": "title1",
@@ -338,7 +338,7 @@
       "text": "Undecided",
       "w": 240,
       "x": 0,
-      "y": 6070
+      "y": 6090
     },
     "t5": {
       "kind": "title1",
@@ -346,7 +346,7 @@
       "text": "Leadership",
       "w": 240,
       "x": 0,
-      "y": 8090
+      "y": 8110
     },
     "t6": {
       "kind": "title1",
@@ -354,7 +354,7 @@
       "text": "Dark mode",
       "w": 240,
       "x": 0,
-      "y": 20270
+      "y": 20290
     },
     "t7": {
       "kind": "title1",
@@ -362,7 +362,7 @@
       "text": "Two-party preferred",
       "w": 240,
       "x": 0,
-      "y": 10320
+      "y": 10340
     },
     "t8": {
       "kind": "title1",
@@ -370,7 +370,7 @@
       "text": "The issues",
       "w": 240,
       "x": 0,
-      "y": 13710
+      "y": 13730
     },
     "t9": {
       "kind": "title1",
@@ -378,7 +378,7 @@
       "text": "National direction",
       "w": 240,
       "x": 0,
-      "y": 16030
+      "y": 16050
     }
   },
   "order": [
