@@ -115,7 +115,8 @@ def chart(phone=False):
     for k, col in (('right', POS), ('wrong', NEG)):
         g.append(f'<path class="ln" d="{smooth([(X(m["x"]), Y(m[k])) for m in MONTHS])}" style="stroke: {col}"></path>')
     first, last = MONTHS[0], MONTHS[-1]
-    base = next(m for m in MONTHS if m['ym'] == '2025-06')      # the first month with several polls; May is one poll
+    # December 2025: the last month before the Bondi shooting (both its polls closed by 14 Dec), level with Oct and Nov
+    base = next(m for m in MONTHS if m['ym'] == '2025-12')
     bgap = base['wrong'] - base['right']
     xl = X(last['x'])
     # gap bracket at the end
@@ -124,16 +125,16 @@ def chart(phone=False):
     mid = (Y(last['wrong']) + Y(last['right'])) / 2
     gap = last['wrong'] - last['right']
     if phone:
-        g.append(f'<text class="halo" x="{bx - 8:.1f}" y="{mid - 2:.1f}" style="font-size: 11px; fill: #3D3B37; text-anchor: end"><tspan x="{bx - 8:.1f}">{gap:.1f} points apart</tspan><tspan x="{bx - 8:.1f}" dy="14">in September;</tspan><tspan x="{bx - 8:.1f}" dy="14">{bgap:.1f} in June 2025</tspan></text>')
+        g.append(f'<text class="halo" x="{bx - 8:.1f}" y="{mid - 2:.1f}" style="font-size: 11px; fill: #3D3B37; text-anchor: end"><tspan x="{bx - 8:.1f}">{gap:.1f} points apart</tspan><tspan x="{bx - 8:.1f}" dy="14">in September;</tspan><tspan x="{bx - 8:.1f}" dy="14">{bgap:.1f} before Bondi</tspan></text>')
     else:
-        g.append(f'<text class="halo" x="{bx - 10:.1f}" y="{mid - 6:.1f}" style="font-size: 13px; fill: #3D3B37; text-anchor: end"><tspan x="{bx - 10:.1f}" style="font-weight: 600">{gap:.1f} points apart in September</tspan><tspan x="{bx - 10:.1f}" dy="18">up from {bgap:.1f} in June 2025</tspan></text>')
+        g.append(f'<text class="halo" x="{bx - 10:.1f}" y="{mid - 6:.1f}" style="font-size: 13px; fill: #3D3B37; text-anchor: end"><tspan x="{bx - 10:.1f}" style="font-weight: 600">{gap:.1f} points apart in September</tspan><tspan x="{bx - 10:.1f}" dy="18">up from {bgap:.1f} in December, before Bondi</tspan></text>')
     g.append('</g>')
     if not phone:
         g.append(f'<text class="end" x="{OX + bx + 10:.1f}" y="{OY + Y(last["wrong"]) + 4:.1f}" style="fill: {NEG}">Wrong track</text>')
         g.append(f'<text class="end" x="{OX + bx + 10:.1f}" y="{OY + Y(last["right"]) + 4:.1f}" style="fill: {POS}">Right direction</text>')
     aria = (f'Share saying the country is heading in the right direction and on the wrong track, May 2025 to September 2026. '
             f'Right direction fell from {first["right"]} to {last["right"]} per cent; wrong track rose from {first["wrong"]} to {last["wrong"]}. '
-            f'The gap widened from {bgap:.1f} points in June 2025 to {gap:.1f} in September 2026, with a sharp fall after the Bondi shooting in December 2025.')
+            f'The gap widened from {bgap:.1f} points in December 2025, before the Bondi shooting, to {gap:.1f} in September 2026.')
     return (f'<svg viewBox="0 0 {SW} {SH:g}" width="{SW}" height="{SH:g}" role="img" aria-label="{aria}" style="display: block; overflow: visible">\n'
             + '\n'.join(g) + '\n</svg>')
 
@@ -186,7 +187,7 @@ desk = '\n\n'.join([
     f'<div style="margin-top: 24px; padding-top: 12px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 24px; font-size: 13px; line-height: 1.5; color: #6B6862">\n<span>{FOOT_TEXT}</span>\n<span style="flex-grow: 1"></span>\n'
     '<a href="#direction-method" style="min-height: 44px; display: flex; align-items: center; font-weight: 500; color: #171717; white-space: nowrap">How it’s built</a>\n</div>',
 ])
-DESK_H = 1160
+DESK_H = 1170
 open(OUT + 'Direction.dc.html', 'w').write(page('National direction', 1280, DESK_H, desk))
 
 phone = '\n\n'.join([

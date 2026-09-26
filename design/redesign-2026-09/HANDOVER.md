@@ -31,7 +31,7 @@ The canvas lives on claude.ai, not on disk. A session with the Artifact tool can
 | Leadership | `Leadership`, `LeadershipMobile`, `LeadershipThreeWay`, `LeadershipBoth`, `LeadershipTablet` | |
 | Two-party preferred | `TPP`, `TPPMobile`, `TPPViews` | Owner's calls: no headline (this is the page's headline section). Implied flows against the strongest rival is big and central. "Switch 2PP" gives the other contest. The implied/published switch lives inside the "?" panel, because implied is the strong default. |
 | The issues | `Issues`, `IssuesMobile`, `IssuesWhom`, `IssuesWhomMobile` | RedBridge publishes group figures for six issues only, so "What matters to whom" shows six. Its all-voters row is RedBridge's own, which the footer now says. |
-| National direction | `Direction`, `DirectionMobile` | The annotation's baseline is June 2025 (three polls), not May (one Essential poll). |
+| National direction | `Direction`, `DirectionMobile` | The gap annotation's baseline is December 2025, the month before the Bondi shooting (its two polls closed by 14 Dec, level with October and November). |
 | Latest and next polls | `Polls`, `PollsMobile`, `PollsViews` | One table, one row per pollster, replaces both Snapshot panels (see the decision below). Essential's change is measured against its 29 June poll. |
 | Dark mode | `DarkMode` | Colour tokens, light and dark, for the port. Its charts mirror the light boards. |
 
