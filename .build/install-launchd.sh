@@ -100,6 +100,16 @@ if ! cmp -s "$SRC/.build/launchd/run.sh" "$AGENTS/run.sh"; then
   fi
 fi
 
+# the Node the jobs will run: launchd's bare environment (the plists' PATH),
+# through run.sh's own choice, against this checkout's .nvmrc
+jobpath="$(plutil -extract EnvironmentVariables.PATH raw -o - "$(ls "$SRC"/.build/local.auspol.*.plist | head -n 1)" 2>/dev/null)"
+if node_line="$(env -i HOME="$HOME" PATH="${jobpath:-/usr/bin:/bin}" AUSPOL_NVMRC="$SRC/.nvmrc" \
+     bash "$SRC/.build/launchd/run.sh" --which-node 2>/dev/null)"; then
+  echo "  node: $node_line"
+else
+  bad "the jobs would run ${node_line:-no node}, but .nvmrc pins $(head -n 1 "$SRC/.nvmrc"): brew install node@$(head -n 1 "$SRC/.nvmrc")"
+fi
+
 # plist → a canonical JSON form (key order and whitespace don't count)
 canon() { plutil -convert json -o - "$1" 2>/dev/null | node -e '
   let s = ""; process.stdin.on("data", (d) => (s += d)).on("end", () => {

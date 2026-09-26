@@ -63,7 +63,9 @@ a GENERATED build artifact — never hand-edit it.
     checkout, whose edits made them refuse 51 of ~148 slots in Sep 2026. Its
     `.build/logs` links here. `bash .build/install-launchd.sh` installs or
     updates the clone, run.sh (tracked as `.build/launchd/run.sh`), the
-    shims and the plists; `--check` reports drift.
+    shims and the plists; `--check` reports drift. run.sh runs the Node
+    major `.nvmrc` pins, as CI does (Homebrew's keg-only `node@<major>`;
+    `--check` flags it when that isn't installed).
 - `.build/extract-pollbludger.mjs` + `pollbludger-updater.sh` +
   `pollbludger-fallback.yml` — the LAST-RESORT poll agent. Reads
   BludgerTrack's poll-data feed (pollbludger.net …/xml/current.xml) four

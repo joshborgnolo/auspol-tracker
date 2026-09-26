@@ -32,11 +32,39 @@
 # slots overlapping is how a run ends up fighting itself for the repo
 # (observed 2026-08-30 06:00: "Resource deadlock avoided").
 #
+# WHICH NODE (2026-09-26)
+# The one CI runs: the major version in .nvmrc, not whatever `node` Homebrew
+# last linked. Until 2026-09-26 these jobs ran Node 23, past its end of life,
+# while CI ran the pinned 22, and both write the same generated files.
+# Homebrew's versioned formulae are keg-only (node@22 is never on PATH by
+# itself), so this puts node@<major> first. If that isn't installed, the job
+# still runs on the PATH's node and says so on stderr, and
+# install-launchd.sh --check reports it.
+#
 #   usage: run.sh <wrapper-basename>     e.g. run.sh roymorgan-updater.sh
+#          run.sh --which-node           print the node the jobs get (exit 1 if not .nvmrc's)
 set -uo pipefail
 
 AGENTS="$(cd "$(dirname "$0")" && pwd)"
 REPO="$AGENTS/repo"
+
+pin_node() {
+  local want d
+  want="$(sed -n '1{s/^[vV]//;s/[^0-9].*//;p;}' "${AUSPOL_NVMRC:-$REPO/.nvmrc}" 2>/dev/null)"
+  [ -n "$want" ] || return 0 # no numeric pin: nothing to match
+  for d in "/opt/homebrew/opt/node@$want/bin" "/usr/local/opt/node@$want/bin"; do
+    if [ -x "$d/node" ]; then PATH="$d:$PATH"; export PATH; break; fi
+  done
+  [ "$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null)" = "$want" ] && return 0
+  echo "run.sh: .nvmrc pins Node $want, but the jobs get $(node --version 2>/dev/null || echo 'no node'); brew install node@$want" >&2
+  return 1
+}
+if [ "${1:-}" = "--which-node" ]; then
+  pin_node; ok=$?
+  echo "$(command -v node) $(node --version 2>/dev/null)"
+  exit "$ok"
+fi
+
 WRAPPER="$REPO/.build/${1:?usage: run.sh <wrapper-basename>}"
 LOCKDIR="/tmp/auspol-agent-locks/$(basename "$1" .sh).lock"
 
@@ -60,6 +88,7 @@ fi
 # the next slot reaps it once the pid is gone
 echo $$ > "$LOCKDIR/pid"
 
+pin_node || true # never skip a slot over it: a warning, and --check's drift
 export AUSPOL_RUNNER_CLONE=1
 cd "$REPO" || exit 1
 exec bash "$WRAPPER"
