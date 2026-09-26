@@ -6,7 +6,7 @@
 import json, re, os, sys
 from common import S, OUT
 
-PREVIEW = os.path.join(os.path.dirname(os.path.dirname(S.rstrip('/'))), '.matilda', 'redesign-preview-b407')
+PREVIEW = os.path.join(os.path.dirname(os.path.dirname(S.rstrip('/'))), '.matilda', 'redesign-preview')
 
 DESKTOP = [['Masthead', 'TPP', 'Main', 'Polls', 'Leadership'],
            ['Direction', 'Demographics', 'Switching', 'Issues', 'Undecided']]
