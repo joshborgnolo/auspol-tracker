@@ -44034,7 +44034,7 @@ function IssuesPanel({
     colors: [pColor(x.own.lead)],
     title: `${issCap(ISS_PARTY[x.own.lead])} leads ${ISS_PARTY[x.own.runner]} by ${x.own.gap.toFixed(1)} points (95% margin ± ${x.own.gapCi.toFixed(1)})`
   } : x.own.pairSig ? {
-    text: `${ISS_PARTY_CAP[x.own.lead]} and ${ISS_PARTY_CAP[x.own.runner]} ahead`,
+    text: `${ISS_PARTY_CAP[x.own.third]} behind`,
     colors: [pColor(x.own.lead), pColor(x.own.runner)],
     title: `${issCap(ISS_PARTY[x.own.lead])} and ${ISS_PARTY[x.own.runner]} are ${x.own.gap.toFixed(1)} points apart, inside the 95% margin of ± ${x.own.gapCi.toFixed(1)}; ${ISS_PARTY[x.own.runner]} leads ${ISS_PARTY[x.own.third]} by ${x.own.gap2.toFixed(1)} (± ${x.own.gap2Ci.toFixed(1)})`
   } : {
@@ -44201,8 +44201,7 @@ function IssuesPanel({
   const phrase = top.imp && top.own && ISS_PHRASE[top.id];
   const bare = phrase && phrase.replace(/^the /, "");
   const issHead = phrase && bare[0].toUpperCase() + bare.slice(1) + " tops voters’ concerns" + (top.own.leadSig ? ", " + ISS_PARTY[top.own.lead] + " most trusted on it" : "");
-  const pairWords = top.own && top.own.pairSig && ISS_PARTY[top.own.lead] + " and " + ISS_PARTY[top.own.runner];
-  const issDek = phrase && plainShare(top.imp.v) + " voters put " + phrase + " among their three most important issues" + (top.own.leadSig ? `, and more of them trust ${ISS_PARTY[top.own.lead]} with it than either of the others.` : pairWords ? `, and ${pairWords} are both more trusted with it than ${ISS_PARTY[top.own.third]}, with neither clearly ahead of the other.` : ", and no party is clearly more trusted with it than the others.");
+  const issDek = phrase && plainShare(top.imp.v) + " voters put " + phrase + " among their three most important issues" + (top.own.leadSig ? `, and more of them trust ${ISS_PARTY[top.own.lead]} with it than either of the others.` : top.own && top.own.pairSig ? `, and ${ISS_PARTY[top.own.third]} is less trusted with it than either ${ISS_PARTY[top.own.lead]} or ${ISS_PARTY[top.own.runner]}.` : ", and no party is clearly more trusted with it than the others.");
   return React.createElement("section", {
     className: "card"
   }, React.createElement("div", {
@@ -44348,7 +44347,7 @@ function IssuesPanel({
     className: "table-hint"
   }, "The coloured bar splits the voters who named Labor, the Coalition or One Nation as best on the issue. Pollsters also offer other answers \u2013 the Greens, someone else, all about equal, don\u2019t know \u2013 and each offers a different set, so only these three can be pooled. Resolve, RedBridge and YouGov count wherever they ask the issue."), React.createElement("p", {
     className: "table-hint"
-  }, "\u201CAhead\u201D means the leading party\u2019s margin over the next is larger than that margin\u2019s own 95% range; two parties \u201Cahead\u201D are two the polls can\u2019t separate, both clearly ahead of the third by the same test; \u201CNo clear lead\u201D means the polls can\u2019t separate them. In the chart each dot is one poll and each line\u2019s 95% interval is shaded."))))) : React.createElement("div", {
+  }, "\u201CAhead\u201D means the leading party\u2019s margin over the next is larger than that margin\u2019s own 95% range. \u201CBehind\u201D names the party clearly in third; its dots mark the two ahead of it, which the polls can\u2019t separate. \u201CNo clear lead\u201D means the polls can\u2019t separate them. In the chart each dot is one poll and each line\u2019s 95% interval is shaded."))))) : React.createElement("div", {
     className: "iss-body"
   }, gtab ? React.createElement("div", {
     className: "iss-grid whom"

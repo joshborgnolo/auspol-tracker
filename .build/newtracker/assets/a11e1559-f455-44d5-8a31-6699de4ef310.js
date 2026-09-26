@@ -2671,13 +2671,14 @@ function IssuesPanel({ rangeId = "all" }) {
   const openInfo = () => window.AP.openTerm && window.AP.openTerm("issues", "The issues");
 
   // ---- who's trusted: the rows
-  /* one party clearly ahead; or two the polls can't separate, both clearly
-     ahead of the third; or no lead at all */
+  /* one party clearly ahead; or one clearly behind the two the polls can't
+     separate; or no lead at all */
   const rowVerdict = (x) => !x.own ? null : x.own.leadSig
     ? { text: `${ISS_PARTY_CAP[x.own.lead]} ahead`, colors: [pColor(x.own.lead)],
         title: `${issCap(ISS_PARTY[x.own.lead])} leads ${ISS_PARTY[x.own.runner]} by ${x.own.gap.toFixed(1)} points (95% margin ± ${x.own.gapCi.toFixed(1)})` }
     : x.own.pairSig
-    ? { text: `${ISS_PARTY_CAP[x.own.lead]} and ${ISS_PARTY_CAP[x.own.runner]} ahead`,
+    // shorter than naming the two ahead; the dots still mark those two
+    ? { text: `${ISS_PARTY_CAP[x.own.third]} behind`,
         colors: [pColor(x.own.lead), pColor(x.own.runner)],
         title: `${issCap(ISS_PARTY[x.own.lead])} and ${ISS_PARTY[x.own.runner]} are ${x.own.gap.toFixed(1)} points apart, inside the 95% margin of ± ${x.own.gapCi.toFixed(1)}; ${ISS_PARTY[x.own.runner]} leads ${ISS_PARTY[x.own.third]} by ${x.own.gap2.toFixed(1)} (± ${x.own.gap2Ci.toFixed(1)})` }
     : { text: "No clear lead", colors: null,
@@ -2769,11 +2770,10 @@ function IssuesPanel({ rangeId = "all" }) {
   const bare = phrase && phrase.replace(/^the /, "");
   const issHead = phrase && bare[0].toUpperCase() + bare.slice(1)
     + " tops voters’ concerns" + (top.own.leadSig ? ", " + ISS_PARTY[top.own.lead] + " most trusted on it" : "");
-  const pairWords = top.own && top.own.pairSig && ISS_PARTY[top.own.lead] + " and " + ISS_PARTY[top.own.runner];
   const issDek = phrase && plainShare(top.imp.v) + " voters put " + phrase
     + " among their three most important issues"
     + (top.own.leadSig ? `, and more of them trust ${ISS_PARTY[top.own.lead]} with it than either of the others.`
-      : pairWords ? `, and ${pairWords} are both more trusted with it than ${ISS_PARTY[top.own.third]}, with neither clearly ahead of the other.`
+      : top.own && top.own.pairSig ? `, and ${ISS_PARTY[top.own.third]} is less trusted with it than either ${ISS_PARTY[top.own.lead]} or ${ISS_PARTY[top.own.runner]}.`
       : ", and no party is clearly more trusted with it than the others.");
 
   return (
@@ -2876,9 +2876,9 @@ function IssuesPanel({ rangeId = "all" }) {
                 </p>
                 <p className="table-hint">
                   “Ahead” means the leading party’s margin over the next is larger than that margin’s own 95%
-                  range; two parties “ahead” are two the polls can’t separate, both clearly ahead of the third by the same
-                  test; “No clear lead” means the polls can’t separate them. In the chart each dot is one poll
-                  and each line’s 95% interval is shaded.
+                  range. “Behind” names the party clearly in third; its dots mark the two ahead of it, which the
+                  polls can’t separate. “No clear lead” means the polls can’t separate them. In the chart each dot
+                  is one poll and each line’s 95% interval is shaded.
                 </p>
               </details>
             </div>
