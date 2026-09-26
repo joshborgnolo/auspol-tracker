@@ -11,9 +11,12 @@
 // checkout, token permissions lost. Those break the pipeline without touching
 // any data file, so no data-level check will ever see them.
 //
-// The metronome is the automation's own commit stream on main: the
-// next-polls projection scores daily, the citation ledger and model read
-// refresh on schedule, poll wrappers commit whenever a house releases.
+// The metronome is the automation's own commit stream on main: the model
+// read (prediction-refresh) commits a record every Sydney day, started by the
+// dispatch clock and by its cron line since 2026-09-26; the next-polls score,
+// the citation ledger and the poll wrappers commit when something moved.
+// (Until 2026-09-26 the score job also committed daily, a report whose only
+// change was its run stamp.)
 // Authored by github-actions[bot], so hand-committed human work cannot mask
 // an automation stall. In normal operation the worst observed gap between bot
 // commits is under 48h... barely — one silently dropped run of the daily
