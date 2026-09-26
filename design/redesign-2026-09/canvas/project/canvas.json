@@ -37,12 +37,54 @@
       "x": 1830,
       "y": 2000
     },
+    "Direction.dc.html": {
+      "h": 1160,
+      "title": "National direction — desktop",
+      "w": 1280,
+      "x": 0,
+      "y": 16310
+    },
+    "DirectionMobile.dc.html": {
+      "h": 1240,
+      "title": "National direction — phone",
+      "w": 390,
+      "x": 1360,
+      "y": 16310
+    },
     "Interaction.dc.html": {
       "h": 1620,
       "title": "Interaction states — hover, tap, buttons",
       "w": 1280,
       "x": 1830,
       "y": 0
+    },
+    "Issues.dc.html": {
+      "h": 1190,
+      "title": "The issues — desktop, Who’s trusted",
+      "w": 1280,
+      "x": 0,
+      "y": 13990
+    },
+    "IssuesMobile.dc.html": {
+      "h": 1940,
+      "title": "The issues — phone, Who’s trusted",
+      "w": 390,
+      "x": 1360,
+      "y": 13990
+    },
+    "IssuesWhom.dc.html": {
+      "h": 1030,
+      "title": "The issues — What matters to whom (by vote)",
+      "w": 1280,
+      "x": 1830,
+      "y": 13990
+    },
+    "IssuesWhomMobile.dc.html": {
+      "h": 1160,
+      "title": "The issues — What matters to whom, phone",
+      "w": 390,
+      "x": 3190,
+      "y": 13990
     },
     "Leadership.dc.html": {
       "h": 1200,
@@ -86,12 +128,87 @@
       "x": 0,
       "y": 0
     },
+    "Masthead.dc.html": {
+      "h": 790,
+      "title": "Masthead — desktop, top of page and pinned bar",
+      "w": 1280,
+      "x": 0,
+      "y": -1170
+    },
+    "MastheadMobile.dc.html": {
+      "h": 680,
+      "title": "Masthead — phone",
+      "w": 390,
+      "x": 1360,
+      "y": -1170
+    },
     "Mobile.dc.html": {
       "h": 1250,
       "title": "Primary vote — phone",
       "w": 390,
       "x": 1360,
       "y": 0
+    },
+    "PageDesktop1.dc.html": {
+      "h": 4691,
+      "page": "page",
+      "title": "Snapshot page – desktop, 1 of 2",
+      "w": 1280,
+      "x": 0,
+      "y": 0
+    },
+    "PageDesktop2.dc.html": {
+      "h": 6200,
+      "page": "page",
+      "title": "Snapshot page – desktop, 2 of 2",
+      "w": 1280,
+      "x": 0,
+      "y": 4811
+    },
+    "PagePhone1.dc.html": {
+      "h": 4299,
+      "page": "page",
+      "title": "Snapshot page – phone, 1 of 3",
+      "w": 390,
+      "x": 1360,
+      "y": 0
+    },
+    "PagePhone2.dc.html": {
+      "h": 4850,
+      "page": "page",
+      "title": "Snapshot page – phone, 2 of 3",
+      "w": 390,
+      "x": 1360,
+      "y": 4419
+    },
+    "PagePhone3.dc.html": {
+      "h": 5390,
+      "page": "page",
+      "title": "Snapshot page – phone, 3 of 3",
+      "w": 390,
+      "x": 1360,
+      "y": 9389
+    },
+    "Polls.dc.html": {
+      "h": 960,
+      "title": "Latest and next polls — desktop",
+      "w": 1280,
+      "x": 0,
+      "y": 17930
+    },
+    "PollsMobile.dc.html": {
+      "h": 1490,
+      "title": "Latest and next polls — phone",
+      "w": 390,
+      "x": 1360,
+      "y": 17930
+    },
+    "PollsViews.dc.html": {
+      "h": 2240,
+      "title": "Latest and next polls — row opened, Primary, sorted by next release",
+      "w": 1280,
+      "x": 1830,
+      "y": 17930
     },
     "Switching.dc.html": {
       "h": 1310,
@@ -106,6 +223,27 @@
       "w": 390,
       "x": 1360,
       "y": 4140
+    },
+    "TPP.dc.html": {
+      "h": 1280,
+      "title": "Two-party preferred — desktop",
+      "w": 1280,
+      "x": 0,
+      "y": 10580
+    },
+    "TPPMobile.dc.html": {
+      "h": 1310,
+      "title": "Two-party preferred — phone",
+      "w": 390,
+      "x": 1360,
+      "y": 10580
+    },
+    "TPPViews.dc.html": {
+      "h": 3030,
+      "title": "Two-party preferred — compare on, the ‘?’ opened, published figures, v Coalition",
+      "w": 1280,
+      "x": 1830,
+      "y": 10580
     },
     "Undecided.dc.html": {
       "h": 1250,
@@ -134,144 +272,6 @@
       "w": 1280,
       "x": 1830,
       "y": 6330
-    },
-    "TPP.dc.html": {
-      "x": 0,
-      "y": 10580,
-      "w": 1280,
-      "h": 1280,
-      "title": "Two-party preferred — desktop"
-    },
-    "TPPMobile.dc.html": {
-      "x": 1360,
-      "y": 10580,
-      "w": 390,
-      "h": 1310,
-      "title": "Two-party preferred — phone"
-    },
-    "TPPViews.dc.html": {
-      "x": 1830,
-      "y": 10580,
-      "w": 1280,
-      "h": 3030,
-      "title": "Two-party preferred — compare on, the ‘?’ opened, published figures, v Coalition"
-    },
-    "Issues.dc.html": {
-      "x": 0,
-      "y": 13990,
-      "w": 1280,
-      "h": 1190,
-      "title": "The issues — desktop, Who’s trusted"
-    },
-    "IssuesMobile.dc.html": {
-      "x": 1360,
-      "y": 13990,
-      "w": 390,
-      "h": 1940,
-      "title": "The issues — phone, Who’s trusted"
-    },
-    "IssuesWhom.dc.html": {
-      "x": 1830,
-      "y": 13990,
-      "w": 1280,
-      "h": 1030,
-      "title": "The issues — What matters to whom (by vote)"
-    },
-    "IssuesWhomMobile.dc.html": {
-      "x": 3190,
-      "y": 13990,
-      "w": 390,
-      "h": 1160,
-      "title": "The issues — What matters to whom, phone"
-    },
-    "Direction.dc.html": {
-      "x": 0,
-      "y": 16310,
-      "w": 1280,
-      "h": 1160,
-      "title": "National direction — desktop"
-    },
-    "DirectionMobile.dc.html": {
-      "x": 1360,
-      "y": 16310,
-      "w": 390,
-      "h": 1240,
-      "title": "National direction — phone"
-    },
-    "Masthead.dc.html": {
-      "x": 0,
-      "y": -1170,
-      "w": 1280,
-      "h": 790,
-      "title": "Masthead — desktop, top of page and pinned bar"
-    },
-    "MastheadMobile.dc.html": {
-      "x": 1360,
-      "y": -1170,
-      "w": 390,
-      "h": 680,
-      "title": "Masthead — phone"
-    },
-    "Polls.dc.html": {
-      "x": 0,
-      "y": 17930,
-      "w": 1280,
-      "h": 960,
-      "title": "Latest and next polls — desktop"
-    },
-    "PollsMobile.dc.html": {
-      "x": 1360,
-      "y": 17930,
-      "w": 390,
-      "h": 1490,
-      "title": "Latest and next polls — phone"
-    },
-    "PollsViews.dc.html": {
-      "x": 1830,
-      "y": 17930,
-      "w": 1280,
-      "h": 2240,
-      "title": "Latest and next polls — row opened, Primary, sorted by next release"
-    },
-    "PageDesktop1.dc.html": {
-      "x": 0,
-      "y": 0,
-      "w": 1280,
-      "h": 4691,
-      "title": "Snapshot page – desktop, 1 of 2",
-      "page": "page"
-    },
-    "PageDesktop2.dc.html": {
-      "x": 0,
-      "y": 4811,
-      "w": 1280,
-      "h": 6200,
-      "title": "Snapshot page – desktop, 2 of 2",
-      "page": "page"
-    },
-    "PagePhone1.dc.html": {
-      "x": 1360,
-      "y": 0,
-      "w": 390,
-      "h": 4299,
-      "title": "Snapshot page – phone, 1 of 3",
-      "page": "page"
-    },
-    "PagePhone2.dc.html": {
-      "x": 1360,
-      "y": 4419,
-      "w": 390,
-      "h": 4850,
-      "title": "Snapshot page – phone, 2 of 3",
-      "page": "page"
-    },
-    "PagePhone3.dc.html": {
-      "x": 1360,
-      "y": 9389,
-      "w": 390,
-      "h": 5390,
-      "title": "Snapshot page – phone, 3 of 3",
-      "page": "page"
     }
   },
   "createdOnFiles": {
@@ -283,6 +283,15 @@
     "view": "canvas"
   },
   "notes": {
+    "p1": {
+      "kind": "title1",
+      "maxW": 1750,
+      "page": "page",
+      "text": "The Snapshot page, top to bottom",
+      "w": 240,
+      "x": 0,
+      "y": -260
+    },
     "t1": {
       "kind": "title1",
       "maxW": 3110,
@@ -290,6 +299,22 @@
       "w": 240,
       "x": 0,
       "y": -260
+    },
+    "t10": {
+      "kind": "title1",
+      "maxW": 1750,
+      "text": "Masthead",
+      "w": 240,
+      "x": 0,
+      "y": -1430
+    },
+    "t11": {
+      "kind": "title1",
+      "maxW": 3110,
+      "text": "Latest and next polls",
+      "w": 240,
+      "x": 0,
+      "y": 17670
     },
     "t2": {
       "kind": "title1",
@@ -354,31 +379,6 @@
       "w": 240,
       "x": 0,
       "y": 16050
-    },
-    "t10": {
-      "kind": "title1",
-      "maxW": 1750,
-      "text": "Masthead",
-      "w": 240,
-      "x": 0,
-      "y": -1430
-    },
-    "t11": {
-      "kind": "title1",
-      "maxW": 3110,
-      "text": "Latest and next polls",
-      "w": 240,
-      "x": 0,
-      "y": 17670
-    },
-    "p1": {
-      "kind": "title1",
-      "maxW": 1750,
-      "text": "The Snapshot page, top to bottom",
-      "w": 240,
-      "x": 0,
-      "y": -260,
-      "page": "page"
     }
   },
   "order": [
