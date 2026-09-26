@@ -797,9 +797,9 @@ FLOW_KEY = [(line_sw(INK), 'All pollsters, combined month by month'), (band_sw(0
 PICK = f'<button class="chip" aria-haspopup="listbox" style="min-height: 34px; font-size: 13px">Highlight a pollster{CARET}</button>'
 
 # ================================================================ desktop page
-H1 = f'The {WORDS[len(WIN)]} polls that make up Labor’s {f1(AGG_ON)} run from {f1(min(WIN_V))} to {f1(max(WIN_V))}'
+H1 = f'Labor’s {f1(AGG_ON)} comes from {WORDS[len(WIN)]} polls, which range from {f1(min(WIN_V))} to {f1(max(WIN_V))}'
 N_OUT = sum(1 for p in WIN if abs(tpp(p)['lean']) > tpp(p)['moe'])
-H1_DECK = (f'{WORDS[N_AHEAD].capitalize()} have Labor ahead of One Nation, and '
+H1_DECK = (f'{WORDS[N_AHEAD].capitalize()} of them have Labor ahead of One Nation, and '
            + ('none sits further from the average than its own margin of error. ' if N_OUT == 0 else f'{WORDS[N_OUT]} sit further from the average than their margin of error. ')
            + 'Below is every national poll since the 2025 election, newest first, each linked to its source.')
 NAV = [('#disagreement', 'How much the polls disagree'), ('#pollster-lean', 'How each pollster leans'), ('#preference-flows', 'Preference flows')]
