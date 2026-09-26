@@ -85,8 +85,9 @@ THEME = (f'<div class="segs" role="group" aria-label="Colour theme"><button clas
 
 def wordmark(size=40, dial_scale=1.0):
     return (f'<button class="wm" title="Wind the dial back through the term" aria-label="auspol tracker, Australian federal polling. Replay the term on the dial">'
+            # "tracker" is spaced a touch looser so its r ends under the l of "auspol", as on the live wordmark
             f'<span style="display: flex; flex-direction: column; font-size: {size}px; line-height: 0.92; letter-spacing: -0.02em">'
-            f'<span style="font-weight: 700">auspol</span><span style="font-weight: 300; color: #5C5853">tracker</span></span>'
+            f'<span style="font-weight: 700">auspol</span><span style="font-weight: 300; letter-spacing: -0.011em; color: #5C5853">tracker</span></span>'
             f'{dial(dial_scale)}</button>')
 
 TAGLINE = 'Aggregated opinion polling for the next federal election, set against every term since 1972.'
