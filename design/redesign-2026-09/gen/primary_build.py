@@ -254,7 +254,7 @@ def build_main(H):
 
 # ------------------------------------------------------------------ phone
 def build_mobile(H):
-    g = geom(32, 262, 34, 270)
+    g = geom(32, 304, 34, 270)          # the plot runs to within the end labels' width of the edge
     fx, fy = g['fx'], g['fy']
     head = (HEAD.replace('__AX__', '11').replace('__EVT__', '9').replace('__EVW__', '600')
             .replace('__EVX__', ';text-anchor:middle').replace('__DOT__', '3.5').replace('__TW__', '2.25')
@@ -292,8 +292,8 @@ def build_mobile(H):
     b.append('</div>')
     b.append('')
     b.append(f'<svg viewBox="0 0 350 300" width="350" height="300" role="img" aria-label="{ARIA}" style="margin-top: 24px; display: block; overflow: visible">')
-    b.append('<path class="grid" d="M0 211H262M0 152H262M0 93H262M0 34H262"></path>')
-    b.append('<path class="base" d="M0 270H262"></path>')
+    b.append('<path class="grid" d="M0 211H304M0 152H304M0 93H304M0 34H304"></path>')
+    b.append('<path class="base" d="M0 270H304"></path>')
     for v in (40, 30, 20, 10):
         b.append(f'<text class="ax" x="0" y="{f(fy(v) - 4)}">{v}%</text>')
     b.append('')
