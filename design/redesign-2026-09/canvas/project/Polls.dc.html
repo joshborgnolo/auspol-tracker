@@ -20,7 +20,7 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 .tab[aria-pressed="true"]{border-bottom-color:#171717;font-weight:600;color:#171717}
 .tab:hover{color:#171717}
 .th{font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6B6862;white-space:nowrap}
-.sortb{padding:0;border:0;background:none;display:inline-flex;align-items:center;gap:4px;min-height:32px}
+.sortb{padding:0;border:0;background:none;display:inline-flex;align-items:flex-end;gap:4px;min-height:32px}
 .row{border-top:1px solid #E6E4DF;cursor:pointer}
 .row:hover{background:#F5F3EE}
 .row[aria-expanded="true"]{background:#F1EFEA;border-top-color:transparent}

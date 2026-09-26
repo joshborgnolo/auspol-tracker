@@ -352,7 +352,7 @@ def build_mobile(H):
     b.append(f'<span style="display: flex; align-items: center; gap: 8px">{KEY_LINE_M}Monthly average and its 95% range</span>')
     b.append('</div>')
     b.append('<div style="margin-top: 12px; display: flex; align-items: center">')
-    b.append('<a href="#method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500">How it’s built</a>')
+    b.append('<a href="#method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>')
     b.append('<span style="flex-grow: 1"></span>')
     b.append(f'<button class="copy" aria-label="Copy chart: primary vote" title="Copy chart">{COPY_SVG}</button>')
     b.append('</div>')

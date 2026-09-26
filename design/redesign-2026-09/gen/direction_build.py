@@ -76,15 +76,9 @@ TICKS_PH = [('Jul 25', dec('2025-07-01')), ('Oct', dec('2025-10-01')), ('Jan 26'
 BONDI = dec('2025-12-14')
 
 def smooth(p):
-    d = f'M{p[0][0]:.1f} {p[0][1]:.1f}'
-    for i in range(len(p) - 1):
-        a = p[i - 1] if i > 0 else p[i]
-        b, c = p[i], p[i + 1]
-        e = p[i + 2] if i + 2 < len(p) else c
-        c1 = (b[0] + (c[0] - a[0]) / 6, b[1] + (c[1] - a[1]) / 6)
-        c2 = (c[0] - (e[0] - b[0]) / 6, c[1] - (e[1] - b[1]) / 6)
-        d += f'C{c1[0]:.1f} {c1[1]:.1f} {c2[0]:.1f} {c2[1]:.1f} {c[0]:.1f} {c[1]:.1f}'
-    return d
+    # straight segments between monthly figures, as on the redesign's other monthly charts:
+    # a curve through them can overshoot, showing highs and lows no month had
+    return 'M' + 'L'.join(f'{x:.1f} {y:.1f}' for x, y in p)
 
 def chart(phone=False):
     if phone:
@@ -121,6 +115,8 @@ def chart(phone=False):
     for k, col in (('right', POS), ('wrong', NEG)):
         g.append(f'<path class="ln" d="{smooth([(X(m["x"]), Y(m[k])) for m in MONTHS])}" style="stroke: {col}"></path>')
     first, last = MONTHS[0], MONTHS[-1]
+    base = next(m for m in MONTHS if m['ym'] == '2025-06')      # the first month with several polls; May is one poll
+    bgap = base['wrong'] - base['right']
     xl = X(last['x'])
     # gap bracket at the end
     bx = xl + (6 if phone else 8)
@@ -128,22 +124,22 @@ def chart(phone=False):
     mid = (Y(last['wrong']) + Y(last['right'])) / 2
     gap = last['wrong'] - last['right']
     if phone:
-        g.append(f'<text class="halo" x="{bx - 8:.1f}" y="{mid - 2:.1f}" style="font-size: 11px; fill: #3D3B37; text-anchor: end"><tspan x="{bx - 8:.1f}">{gap:.1f} points apart</tspan><tspan x="{bx - 8:.1f}" dy="14">in September;</tspan><tspan x="{bx - 8:.1f}" dy="14">5 in May 2025</tspan></text>')
+        g.append(f'<text class="halo" x="{bx - 8:.1f}" y="{mid - 2:.1f}" style="font-size: 11px; fill: #3D3B37; text-anchor: end"><tspan x="{bx - 8:.1f}">{gap:.1f} points apart</tspan><tspan x="{bx - 8:.1f}" dy="14">in September;</tspan><tspan x="{bx - 8:.1f}" dy="14">{bgap:.1f} in June 2025</tspan></text>')
     else:
-        g.append(f'<text class="halo" x="{bx - 10:.1f}" y="{mid - 6:.1f}" style="font-size: 13px; fill: #3D3B37; text-anchor: end"><tspan x="{bx - 10:.1f}" style="font-weight: 600">{gap:.1f} points apart in September</tspan><tspan x="{bx - 10:.1f}" dy="18">up from 5 in May 2025</tspan></text>')
+        g.append(f'<text class="halo" x="{bx - 10:.1f}" y="{mid - 6:.1f}" style="font-size: 13px; fill: #3D3B37; text-anchor: end"><tspan x="{bx - 10:.1f}" style="font-weight: 600">{gap:.1f} points apart in September</tspan><tspan x="{bx - 10:.1f}" dy="18">up from {bgap:.1f} in June 2025</tspan></text>')
     g.append('</g>')
     if not phone:
         g.append(f'<text class="end" x="{OX + bx + 10:.1f}" y="{OY + Y(last["wrong"]) + 4:.1f}" style="fill: {NEG}">Wrong track</text>')
         g.append(f'<text class="end" x="{OX + bx + 10:.1f}" y="{OY + Y(last["right"]) + 4:.1f}" style="fill: {POS}">Right direction</text>')
     aria = (f'Share saying the country is heading in the right direction and on the wrong track, May 2025 to September 2026. '
             f'Right direction fell from {first["right"]} to {last["right"]} per cent; wrong track rose from {first["wrong"]} to {last["wrong"]}. '
-            f'The gap widened from {first["wrong"] - first["right"]:.0f} to {gap:.1f} points, with a sharp fall after the Bondi shooting in December 2025.')
+            f'The gap widened from {bgap:.1f} points in June 2025 to {gap:.1f} in September 2026, with a sharp fall after the Bondi shooting in December 2025.')
     return (f'<svg viewBox="0 0 {SW} {SH:g}" width="{SW}" height="{SH:g}" role="img" aria-label="{aria}" style="display: block; overflow: visible">\n'
             + '\n'.join(g) + '\n</svg>')
 
 H1 = 'More than three in five say the country is on the wrong track, the most this term'
-DEK = ('Only 23% say it is heading in the right direction. The gap between the two has widened by 10 points in a month, '
-       'a significant fall, and by more than 30 since just after the 2025 election.')
+DEK = ('Only 23% say it is heading in the right direction. The gap between the two has widened significantly in a month, '
+       'by 10 points, and by more than 30 since just after the 2025 election.')
 QUESTION = '‘Is the country heading in the right direction, or on the wrong track?’'
 
 def hero(phone=False):
@@ -210,7 +206,7 @@ phone = '\n\n'.join([
     KEY.replace('font-size: 13px', 'font-size: 12px').replace('column-gap: 24px', 'column-gap: 16px'),
     f'<div style="margin-top: 6px">{HOW}</div>',
     f'<p style="margin: 16px 0 0; padding-top: 12px; border-top: 1px solid #DDDCD8; font-size: 12px; line-height: 1.55; color: #6B6862">{FOOT_TEXT}</p>',
-    '<a href="#direction-method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500">How it’s built</a>',
+    '<a href="#direction-method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>',
 ])
 PHONE_H = 1300
 open(OUT + 'DirectionMobile.dc.html', 'w').write(page('National direction – phone', 390, PHONE_H, phone, ax=11, lw=2.25))

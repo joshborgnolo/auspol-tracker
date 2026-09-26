@@ -6,7 +6,7 @@ exec(open(os.path.join(HERE, 'common.py')).read())
 HELMET = HELMET.replace('</style>', '''.chip{min-height:44px;padding:0 18px;border:1px solid #DDDCD8;border-radius:22px;background:#FEFCF9;font-size:14px;color:#171717;display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
 .chip:hover{background:#EFEDE8}
 .term{padding:0;border:0;background:none;font:inherit;color:inherit;text-decoration:underline dotted #9A968E;text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:help}
-.qbtn{width:44px;height:44px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:8px;background:transparent;vertical-align:middle}
+.qbtn{width:44px;height:44px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;margin:-13px 0;padding:0;border:0;border-radius:8px;background:transparent;vertical-align:middle}
 .qbtn:hover{background:#EFEDE8}
 .qbtn span{width:20px;height:20px;box-sizing:border-box;border-radius:10px;border:1.5px solid #6B6862;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#4A4843}
 .qbtn[aria-expanded="true"] span{background:#171717;border-color:#171717;color:#FAF9F6}
@@ -137,7 +137,7 @@ ARIA_ON = ('Labor’s two-party share by matchup, May 2025 to September 2026, on
 FOOT = ('<div style="margin-top: 32px; padding-top: 12px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 24px; font-size: 13px; color: #6B6862">\n'
         '<span>Figures pool the last 21 days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above.</span>\n'
         '<span style="flex-grow: 1"></span>\n'
-        '<a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-weight: 500; color: #171717">How it’s built</a>\n</div>')
+        '<a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-weight: 500; color: #171717; white-space: nowrap; flex-shrink: 0">How it’s built</a>\n</div>')
 
 def eyebrow(sub):
     return ('<div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">\n'
@@ -188,7 +188,7 @@ phone = '\n\n'.join([
     + key_item(K_DOT(ONP), 'One poll, implied flows') + '\n' + key_item(K_LINEBAND(ONP), 'Monthly, flow range') + '\n'
     + key_item(K_RING, '2025 election') + '\n</div>',
     '<div style="margin-top: 16px; display: flex; align-items: center">\n'
-    '<a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500">How it’s built</a>\n'
+    '<a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>\n'
     f'<span style="flex-grow: 1"></span>\n{copy_btn("two-party preferred")}\n</div>',
 ])
 PHONE_H = 1460

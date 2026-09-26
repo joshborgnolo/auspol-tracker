@@ -14,7 +14,7 @@ button{font:inherit;cursor:pointer}
 .num{font-variant-numeric:tabular-nums}
 .wm{display:flex;align-items:center;gap:14px;padding:0;border:0;background:none;color:#171717;text-align:left}
 .wm:focus-visible,.tab:focus-visible,.seg:focus-visible,.score:focus-visible,.tn a:focus-visible{outline:2px solid #171717;outline-offset:3px;border-radius:4px}
-.tab{min-height:44px;padding:0 2px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;font-size:16px;font-weight:500;color:#6B6862;white-space:nowrap}
+.tab{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:0 2px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;font-size:16px;font-weight:500;color:#6B6862;white-space:nowrap}
 .tab[aria-current="page"]{border-bottom-color:#171717;font-weight:600;color:#171717}
 .tab:hover{color:#171717}
 .segs{display:flex;padding:3px;border:1px solid #DDDCD8;border-radius:22px;background:#FAF9F6}
@@ -131,9 +131,9 @@ def pinned(phone=False):
     score = (f'<button class="score" title="Latest Labor v One Nation two-party preferred – go to Snapshot">'
              + ('' if phone else '<span class="plabel" style="color: #6B6862">2PP</span>')
              + f'<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #6B6862">ALP</span>'
-             f'<span class="num" style="font-family: \'Crimson Text\', Georgia, serif; font-size: {17 if phone else 19}px; font-weight: 700; color: {ALP}">51.2</span>'
+             f'<span class="num" style="font-size: {17 if phone else 19}px; font-weight: 600; color: {ALP}">51.2</span>'
              f'<span style="width: 1.5px; height: 14px; background: #DDDCD8; align-self: center"></span>'
-             f'<span class="num" style="font-family: \'Crimson Text\', Georgia, serif; font-size: {17 if phone else 19}px; font-weight: 700; color: #9E5200">48.8</span>'
+             f'<span class="num" style="font-size: {17 if phone else 19}px; font-weight: 600; color: #9E5200">48.8</span>'
              f'<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #6B6862">ON</span></button>')
     if phone:
         score = score.replace('<button class="score"', '<button class="score" style="gap: 6px"', 1)
@@ -167,7 +167,7 @@ desk = '\n\n'.join([
 {THEME}
 </div>
 </header>''',
-    f'''<nav aria-label="Pages" style="margin-top: 28px; display: flex; align-items: center; gap: 24px; border-bottom: 1px solid #DDDCD8">
+    f'''<nav aria-label="Pages" style="margin-top: 28px; display: flex; align-items: baseline; gap: 24px; border-bottom: 1px solid #DDDCD8">
 {tabs()}
 <span style="flex-grow: 1"></span>
 {next_strip()}

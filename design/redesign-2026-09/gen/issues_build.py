@@ -318,7 +318,7 @@ phone = '\n\n'.join([
     phone_rows(),
     '<div style="margin-top: 28px; padding-top: 16px; border-top: 1px solid #DDDCD8; display: flex; flex-direction: column">\n' + chart_panel(phone=True) + '\n</div>',
     '<div style="margin-top: 20px">\n' + NOTES.replace('font-size: 13px', 'font-size: 12px') + '\n</div>',
-    f'<div style="margin-top: 8px; display: flex; align-items: center">{HOW}<span style="flex-grow: 1"></span><a href="#issues-method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500">How it’s built</a></div>',
+    f'<div style="margin-top: 8px; display: flex; align-items: center">{HOW}<span style="flex-grow: 1"></span><a href="#issues-method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a></div>',
 ])
 PHONE_H = 2080
 open(OUT + 'IssuesMobile.dc.html', 'w').write(page('The issues – phone', 390, PHONE_H, phone, ax=11, lw=2))
@@ -376,12 +376,9 @@ def group_tabs(phone=False):
             + ''.join(f'<button class="tab" aria-pressed="{"true" if l == "Vote" else "false"}">{l}</button>' for l in labs)
             + f'</div><span style="flex-grow: 1"></span>{copy_btn("what matters to whom, by vote")}</div>')
 
-SENTS = ['One Nation voters are far more likely than other voters to put immigration in their top three: 63%, against 29% of all voters.',
-         'Greens voters are more likely than others to put housing there (55%), and almost none put immigration (4%).',
-         'Labor voters are more likely than others to put health in their top three (51%).']
 WHOM_KEY = ('<div style="display: flex; flex-wrap: wrap; column-gap: 24px; row-gap: 6px; font-size: 13px; color: #4A4843">'
             '<span class="key"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><rect x="0" y="2" width="24" height="10" rx="2" style="fill: #EFEDE8"></rect><rect x="0" y="2" width="14" height="10" rx="2" style="fill: #B5B1AA"></rect><rect x="17" y="0" width="2" height="14" style="fill: #171717"></rect></svg>Group’s share, with all voters marked</span>'
-            '<span class="key"><span style="font-weight: 600; color: #171717">▲ ▼</span>Differs from all voters by more than the group’s own 95% margin</span></div>')
+            '<span class="key"><span style="min-width: 24px; font-weight: 600; color: #171717; white-space: nowrap; flex-shrink: 0">▲ ▼</span>Differs from all voters by more than the group’s own 95% margin</span></div>')
 
 whom = '\n\n'.join([
     eyebrow(),
@@ -391,10 +388,8 @@ whom = '\n\n'.join([
     '<span style="margin-top: 16px; font-size: 13px; color: #6B6862"><b style="font-weight: 600; color: #171717">Share of each group putting each issue in its top three, %</b> · RedBridge, 24–28 August 2026</span>',
     '<div style="margin-top: 14px; display: flex; flex-direction: column" role="table" aria-label="Share of each group of voters putting each issue in its top three">\n' + whom_table() + '\n</div>',
     '<div style="margin-top: 14px">' + WHOM_KEY + '</div>',
-    '<div style="margin-top: 24px; display: flex; flex-direction: column; gap: 6px; max-width: 900px">' + ''.join(f'<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #3D3B37">{s}</p>' for s in SENTS) + '</div>',
-    '<p style="margin: 16px 0 0; max-width: 900px; font-size: 13px; line-height: 1.55; color: #6B6862">Only RedBridge publishes what matters by group. A group’s margin depends on its share of the sample: about 6 points for One Nation and Labor voters, 9 to 13 for the smaller groups.</p>',
-    '<div style="margin-top: 32px; padding-top: 12px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 24px; font-size: 13px; color: #6B6862">\n'
-    '<span>Each group’s share putting an issue among their three most important, from RedBridge’s latest poll in the last six weeks.</span>\n<span style="flex-grow: 1"></span>\n'
+    '<div style="margin-top: 32px; padding-top: 12px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 24px; font-size: 13px; line-height: 1.5; color: #6B6862">\n'
+    '<span style="max-width: 900px">Only RedBridge publishes what matters by group, and only for these six issues, so its all-voters row can differ from the pooled figures in Who’s trusted. A group’s margin depends on its share of the sample: about 6 points for One Nation and Labor voters, 9 to 13 for the smaller groups.</span>\n<span style="flex-grow: 1"></span>\n'
     '<a href="#issues-method" style="min-height: 44px; display: flex; align-items: center; font-weight: 500; color: #171717; white-space: nowrap">How it’s built</a>\n</div>',
 ])
 WHOM_H = 1220
@@ -431,9 +426,8 @@ whom_phone = '\n\n'.join([
     + copy_btn('immigration by vote') + '</div>',
     '<div style="margin-top: 8px; display: flex; flex-direction: column" role="table" aria-label="Share of each group of voters putting immigration in its top three">\n' + whom_phone_bars() + '\n</div>',
     '<div style="margin-top: 12px">' + WHOM_KEY.replace('font-size: 13px', 'font-size: 12px').replace('column-gap: 24px', 'column-gap: 16px') + '</div>',
-    '<div style="margin-top: 20px; display: flex; flex-direction: column; gap: 6px">' + ''.join(f'<p style="margin: 0; font-size: 14px; line-height: 1.5; color: #3D3B37">{s}</p>' for s in SENTS[:2]) + '</div>',
-    '<p style="margin: 14px 0 0; font-size: 12px; line-height: 1.55; color: #6B6862">Only RedBridge publishes what matters by group. A group’s margin depends on its share of the sample: about 6 points for One Nation and Labor voters, 9 to 13 for the smaller groups.</p>',
-    '<a href="#issues-method" style="margin-top: 8px; min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500">How it’s built</a>',
+    '<p style="margin: 20px 0 0; padding-top: 14px; border-top: 1px solid #DDDCD8; font-size: 12px; line-height: 1.55; color: #6B6862">Only RedBridge publishes what matters by group, and only for these six issues, so its all-voters row can differ from the pooled figures in Who’s trusted. A group’s margin depends on its share of the sample: about 6 points for One Nation and Labor voters, 9 to 13 for the smaller groups.</p>',
+    '<a href="#issues-method" style="margin-top: 8px; min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>',
 ])
 WHOM_PH_H = 1320
 open(OUT + 'IssuesWhomMobile.dc.html', 'w').write(page('The issues – what matters to whom, phone', 390, WHOM_PH_H, whom_phone, ax=11, lw=2))
