@@ -87,12 +87,15 @@ def readout(st, phone=False):
 
 def meta_line(st, phone=False, expanded=False):
     back = ' · <button class="link">Back to implied flows</button>' if st['meta'].startswith('Pollsters') else ''
-    return (f'<p class="num" style="margin: {4 if phone else 6}px 0 0; font-size: {12 if phone else 13}px; line-height: 1.5; color: #6B6862">'
-            f'{st["meta"]} · {T("weighted aggregate")} of {st["n"]} polls in the 21 days to 21 Sep{Q.format(exp="true" if expanded else "false")}{back}</p>')
+    # provenance, a step apart from the verdict above; on the phone, short enough for one line
+    meta = st['meta'].replace('Implied preference flows', 'Implied flows') if phone else st['meta']
+    span = 'to 21 Sep' if phone else 'in the 21 days to 21 Sep'
+    return (f'<p class="num" style="margin: {10 if phone else 12}px 0 0; font-size: {12 if phone else 13}px; line-height: 1.5; color: #6B6862">'
+            f'{meta} · {T("weighted aggregate")} of {st["n"]} polls {span}{Q.format(exp="true" if expanded else "false")}{back}</p>')
 
 def chip(st, phone=False):
     name, a, b, col = st['alt']
-    return (f'<div style="margin-top: {10 if phone else 8}px; display: flex; align-items: center; gap: 12px">'
+    return (f'<div style="margin-top: {14 if phone else 12}px; display: flex; align-items: center; gap: 12px">'
             f'<span style="font-size: 13px; color: #6B6862">Switch 2PP</span>'
             f'<button class="chip">{name}<span class="num" style="font-weight: 600"><span style="color: {ALP}">{a}</span><span style="color: #9A968E">–</span><span style="color: {col}">{b}</span></span></button></div>')
 
@@ -101,7 +104,7 @@ def hero(key, phone=False, expanded=False):
     return (f'<div style="display: flex; flex-direction: column; align-items: center; text-align: center">\n'
             + readout(st, phone) + '\n' + gauge(st, phone) + '\n'
             + f'<p class="num" style="margin: {12 if phone else 14}px 0 0; font-size: {15 if phone else 17}px; line-height: 1.5; color: #3D3B37"><b style="font-weight: 600; color: #171717">{st["verdict"]}</b> {st["why"]}</p>\n'
-            + f'<p class="num" style="margin: 2px 0 0; font-size: {13 if phone else 14}px; line-height: 1.5; color: #6B6862">{st["change"]}</p>\n'
+            + f'<p class="num" style="margin: 2px 0 0; font-size: {13 if phone else 14}px; line-height: 1.5; color: #4A4843">{st["change"]}</p>\n'
             + meta_line(st, phone, expanded) + '\n' + chip(st, phone) + '\n</div>')
 
 POPOVER = f'''<div role="dialog" aria-label="How this is counted" style="position: relative; margin-top: 10px; width: 420px; box-sizing: border-box; padding: 18px 20px 6px; background: #FEFCF9; border: 1px solid #DDDCD8; border-radius: 12px; box-shadow: 0 10px 28px rgba(23, 23, 23, 0.14); text-align: left">
@@ -161,7 +164,7 @@ desk = '\n\n'.join([
     chart_section('on', False, 'Compare published head-to-heads', ARIA_ON),
     FOOT,
 ])
-DESK_H = 1270
+DESK_H = 1280
 open(OUT + 'TPP.dc.html', 'w').write(page('Two-party preferred', 1280, DESK_H, desk))
 
 # ================================================================ phone board
@@ -240,6 +243,6 @@ views = '\n\n'.join([
     hero('imp-co'),
     '<div style="margin-top: 36px"></div>' + chart_section('co', True, 'Compare published 2PP', ARIA_C),
 ])
-VIEWS_H = 3000
+VIEWS_H = 3030
 open(OUT + 'TPPViews.dc.html', 'w').write(page('Two-party preferred – other states', 1280, VIEWS_H, views))
 print('ok', DESK_H, PHONE_H, VIEWS_H)
