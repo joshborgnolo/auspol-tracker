@@ -4,8 +4,8 @@
 
    Ipsos isn't a voting-intention house here: it asks every month which
    issues matter most and which party is most capable on the top five, and
-   publishes a two-page national report about three and a half weeks after
-   fieldwork closes. Two pages are read:
+   publishes a two-page national report about three weeks after fieldwork
+   closes (16 to 22 days in 2026, January's 31 aside). Two pages are read:
      https://www.ipsos.com/en-au/issuesmonitor – the national reports: this
        year's monthly PDFs (IM_Nat_…) and each past year's reports bound in
        one PDF (AU NATIONAL IPSOS ISSUES MONITOR - JAN-DEC REPORTS 2025).
@@ -17,8 +17,15 @@
    .build/ipsos-src/<slug>.txt (pdftotext -layout) and <slug>.json ({ pdf,
    kind }), written once when first fetched and never touched again, so a
    run that finds nothing new changes nothing. A page that won't load is a
-   warning, not a failure: the cache stays, and issues.mjs raises the alarm
-   if no new report arrives for too long.
+   warning, not a failure: the cache stays. The daily run
+   (.build/ipsos-updater.sh) fails on the warning, once anything that did
+   load is committed; the weekly crosstabs run, which fetches again as the
+   backstop, leaves the alarm to issues.mjs, which raises it if no new
+   report arrives for too long.
+
+   No release date is kept: nothing in the PDFs states one, and their
+   Last-Modified stamps move when Ipsos re-uploads a corrected version
+   (June 2026's v4 reads 23 July, but its v3 was up on 2 July).
 
    Usage: node .build/extract-ipsos.mjs [--force]   (--force refetches PDFs
    already cached). IPSOS_SRC_DIR redirects the cache.

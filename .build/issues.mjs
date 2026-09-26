@@ -4,8 +4,10 @@
    entry are drawn from this file.
 
    Runs itself: the RedBridge, Resolve and YouGov/News24 updaters call it
-   after every new wave (non-fatal), and the weekly crosstabs-update
-   workflow (.build/crosstabs-updater.sh) runs it too.
+   after every new wave (non-fatal), the daily Ipsos run
+   (.build/ipsos-updater.sh) whenever it caches a new report or statement,
+   and the weekly crosstabs-update workflow (.build/crosstabs-updater.sh)
+   runs it too.
      RedBridge – the report text extract-redbridge.mjs caches
                  (.build/redbridge-src/). Salience: "which of the following
                  issues would be most important to you when deciding who will
@@ -29,14 +31,14 @@
                  are fetched and kept if they have its shape, plus
                  KNOWN_IG_ISSUES found by hand. Most waves carry none.
      Ipsos     – the Issues Monitor's national reports, cached as text by
-                 extract-ipsos.mjs (.build/ipsos-src/), which the weekly
-                 crosstabs run calls first. Salience: "What would you say are
-                 the three most important issues facing Australia today?"
-                 (three of 19, no ranks). Best party: "most capable of
-                 managing" each of the month's five top issues, One Nation
-                 an option from June 2026. Fieldwork dates and the effective
-                 sample come from the month's methodology statement where
-                 one is cached.
+                 extract-ipsos.mjs (.build/ipsos-src/), which the daily
+                 Ipsos run and the weekly crosstabs run call first.
+                 Salience: "What would you say are the three most important
+                 issues facing Australia today?" (three of 19, no ranks).
+                 Best party: "most capable of managing" each of the month's
+                 five top issues, One Nation an option from June 2026.
+                 Fieldwork dates and the effective sample come from the
+                 month's methodology statement where one is cached.
      DemosAU   – the report text extract-demosau.mjs caches
                  (.build/demosau-src/): "Which political party do you trust
                  more to handle the following issues?", asked in February
@@ -71,8 +73,9 @@ const RB = "RedBridge/Accent";
 const FIRST_RB = "2025-12-01";          // the first report extract-redbridge.mjs cached this term
 const FIRST_YG = "2026-08-01";          // News24 Pulse (Sky News Pulse pages need a browser)
 const STALE_DAYS = 16;
-/* Ipsos publishes about 3½ weeks after fieldwork closes, and a month's
-   report can be later still over summer (December's came out in January):
+/* Ipsos publishes about three weeks after fieldwork closes, later over
+   summer (January 2026's took 31 days), and from one report's fieldwork to
+   the next report has taken up to 68 days (December 2025 to mid-February):
    ninety days without a newer one means it stopped, or its page moved. */
 const IP_QUIET_DAYS = 90;
 const MATCH_DAYS = 4;                   // Resolve's series date sits a day or so off its poll row

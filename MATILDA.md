@@ -17,8 +17,9 @@ a GENERATED build artifact — never hand-edit it.
 - `data/polls.json` — canonical poll rows (never hand-edit; extractors write it)
 - `.build/extract-*.mjs` + `.build/*-updater.sh` — pollster extractors and
   their scheduled pipelines. GitHub Actions runs them: `poll-agent.yml`
-  (reusable) driven by the twelve house caller workflows, Roy Morgan's
-  included; `coverage-check.yml` is the gap watchdog whose failure emails a
+  (reusable) driven by thirteen caller workflows (nine houses, Roy Morgan's
+  included, plus the crosstabs, sample-size, Poll Bludger fallback and daily
+  Ipsos jobs); `coverage-check.yml` is the gap watchdog whose failure emails a
   missing-poll alert. Local launchd jobs mirror these as backup.
   - Writers queue PER HOUSE (`writers-<house>`), never in one shared group:
     GitHub keeps one pending run per group and cancels the rest, which cost
@@ -135,7 +136,9 @@ a GENERATED build artifact — never hand-edit it.
   "pick three facing Australia", best party on the month's five top issues,
   One Nation an option from June 2026; `.build/extract-ipsos.mjs` caches
   the national reports and methodology statements as text in
-  `.build/ipsos-src/`, and only the weekly crosstabs run fetches them).
+  `.build/ipsos-src/`, fetched daily by `ipsos-update.yml`
+  (`.build/ipsos-updater.sh`) and again by the weekly crosstabs run. No
+  voting intention, so deliberately not on Next expected polls).
   gen-data §7h pools ownership only as Labor/Coalition/One Nation shares
   of those naming one of the three (the one part every house's question
   shares), six-week window, each house's lean removed by houseEffectsFor
@@ -146,8 +149,10 @@ a GENERATED build artifact — never hand-edit it.
   salience-by-group, and its all-voters row, are RedBridge alone. DemosAU
   and Spectre ask salience too but aren't pooled (Info cites them as
   checks). The RedBridge, Resolve and News24 updaters run issues.mjs
-  (refresh_crosstabs), and the weekly crosstabs run fails on a stale wave,
-  an unmapped label, or Ipsos quiet for 90 days. See the
+  (refresh_crosstabs), the daily Ipsos run does whenever it caches a new
+  file (failing, once, on a new report that doesn't read), and the weekly
+  crosstabs run fails on a stale wave, an unmapped label, or Ipsos quiet
+  for 90 days. See the
   auspol-issues-panel skill.
 - Pre-1987 past-cycle leadership lines come from The Bulletin's Morgan
   Gallup column (harvest → extract → assimilate scripts named

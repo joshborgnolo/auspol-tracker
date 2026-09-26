@@ -147,4 +147,8 @@ Interactions to know before raising a house's visibility:
 - **Provisional rows** (Poll Bludger fallback) are excluded from the cadence measurement but the newest one moves the anchor (fieldwork end + measured lag), flagged `lastProvisional`; np-score does not log bets on such anchors.
 - **np-score** runs in its OWN concurrency group (not main-writers: a group keeps one pending job and it was cancelled 12/14 days), regenerates the data asset before scoring (the committed asset can lag polls.json), and reconstructs missed bets by replay (`reconstructed: true`; `--backfill` for gaps already in the log).
 
+## Voting-intention houses only — why Ipsos isn't here (26 Sep 2026)
+
+pollCadence reads `polls[]` alone, so a house with no voting intention never gets a row, and that is deliberate: the panel and the tab-bar countdown (every page, beside the live 2PP) promise a new VI number. Asked about Ipsos (issues panel only), the answer was no, on evidence: replaying the shipped engine over Ipsos's 2025–26 releases (injected into a scratch copy of polls.json, run through np-replay) gave loose windows of ±9–15 days that caught 6 to 10 of 14 releases, and for Feb–May 2026 no row at all (relative spread 0.86 > `CAD_LOOSE_MAX_REL_SPREAD`) — against the VI houses' mostly exact-day record. Its publication dates are also unreliable (see the auspol-issues-panel skill). Freshness came from fetching it daily instead (`ipsos-update.yml`). Don't add a non-VI house to the projection without the user asking.
+
 Related: auspol-build-pipeline (never hand-edit index.html; rebuild + validate), auspol-built-html-verification (babel escapes non-ASCII — grep ASCII tokens only).

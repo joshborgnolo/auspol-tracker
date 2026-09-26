@@ -23,8 +23,11 @@ extracted_at: '2026-09-26'
     offered "The Liberal National Party Coalition" as ONE option (7 columns);
     January on, Liberal and National apart (8). Read off the header.
 - **Ipsos** Issues Monitor, monthly (`.build/extract-ipsos.mjs` caches text in
-  `.build/ipsos-src/`; only the weekly crosstabs run fetches it). Read from
-  Dec 2025 (`IP_FIRST`, RedBridge's first month).
+  `.build/ipsos-src/`; fetched daily by `ipsos-update.yml` →
+  `.build/ipsos-updater.sh`, and again by the weekly crosstabs run as the
+  backstop). Read from Dec 2025 (`IP_FIRST`, RedBridge's first month). Not
+  on Next expected polls, deliberately: it publishes no voting intention,
+  and its release rhythm is weak (see the traps below).
   - national report, two pages. Page 1: the month's five top issues, then
     "Party most capable to manage the top issues facing Australia" for those
     five – Coalition, ALP, Greens, One Nation (from June 2026; inside Other
@@ -146,6 +149,24 @@ extracted_at: '2026-09-26'
 - `Ipsos|quiet` (IP_QUIET_DAYS = 90 since the newest cached month's
   fieldwork) fails the weekly run: the page moved, the file names changed,
   or Ipsos stopped.
+- The daily run fails on a page or PDF that didn't load (a 403 or timeout is
+  transient, via classify-failure.mjs), and on a newly fetched report whose
+  month is pending or carries an unmapped label, but only in the run that
+  fetched it. Whatever landed is pushed first, so the next run finds nothing
+  new and exits 0; the weekly run keeps the stale alarm up.
+- Nothing records when a report went up, and the PDFs' Last-Modified stamps
+  are NOT publication dates: re-uploads move them. June 2026's linked v4
+  reads 23 July, but `documents/2026-07/IM_Nat_Jun_26_v3.pdf` was up on
+  2 July; August 2025's linked copy reads 17 October, but its first copy
+  (`documents/2025-09/`) reads 1 September and the Wayback Machine has it
+  on the page on 13 September. Probe earlier `_vN` names and folders, and
+  Wayback captures, before quoting a release date. First-known releases:
+  2026 lags of 16–22 days after fieldwork closed (January's 31 aside);
+  2025–26 median 22.5, range 10–40. By the upload folder's month, every
+  month's report since Jan 2023 was out by the end of the following month
+  (44 of 44). Replaying np-project over these dates gave windows of ±9–15
+  days that caught 6 to 10 of the 14 releases since mid-2025, depending on
+  September 2025's uncertain date – why it isn't projected.
 
 ## Adding a house or an issue
 

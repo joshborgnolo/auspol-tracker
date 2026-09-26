@@ -423,7 +423,7 @@ function houseEffectsFor(rows) {
    can't say which of them is right. Not shrunk: a gap in wording, measured
    poll after poll, isn't the noise SHRINK_K guards against, and a shrunk
    lean would hand back most of the swing it exists to remove (Ipsos files
-   about 3½ weeks after fieldwork, so its poll is in a six-week window for
+   about three weeks after fieldwork, so its poll is in a six-week window for
    only part of each month, and an unadjusted pool jumps between the two
    houses' levels as it comes and goes – health between 27 and 38 over
    2026). Fewer than PAIR_MIN measured gaps: nothing is removed. */

@@ -7,17 +7,17 @@
 # its own wave's tables (refresh_crosstabs in git-push-main.sh), so most
 # weeks this is a no-op. It exists for what those runs leave pending: a
 # chart id the laptop's Chrome run records after the CI run, a report PDF a
-# fetch didn't get, a table that didn't read cleanly. It is also the only
-# reader of Ipsos's Issues Monitor, which no house updater covers
-# (extract-ipsos.mjs caches it, issues.mjs reads it). And it is the alarm
-# for anything that stays unread: a wave still pending STALE_DAYS after its
-# fieldwork closed (listed as `stale` in the scripts' status lines) fails
-# the run – after committing whatever did land – so the failure email and
-# agent-repair (.build/crosstabs-repair-prompt.md) take it from there. So
-# does a group demographics.mjs lists as `dropped` (a house's newest wave
-# missing a group it printed two waves running: a renamed column or chart
-# the reader no longer finds, or a house that stopped). A script that
-# doesn't finish fails the run the same way.
+# fetch didn't get, a table that didn't read cleanly. It also fetches Ipsos's
+# Issues Monitor again behind the daily Ipsos run (.build/ipsos-updater.sh),
+# as the backstop (extract-ipsos.mjs caches it, issues.mjs reads it). And it
+# is the alarm for anything that stays unread: a wave still pending
+# STALE_DAYS after its fieldwork closed (listed as `stale` in the scripts'
+# status lines) fails the run – after committing whatever did land – so the
+# failure email and agent-repair (.build/crosstabs-repair-prompt.md) take it
+# from there. So does a group demographics.mjs lists as `dropped` (a house's
+# newest wave missing a group it printed two waves running: a renamed column
+# or chart the reader no longer finds, or a house that stopped). A script
+# that doesn't finish fails the run the same way.
 #
 # Every step logs one line to .build/logs/crosstabs.log.
 set -uo pipefail
@@ -49,12 +49,13 @@ UNFINISHED=""
 STALE=""
 DROPPED=""
 UNKNOWN=""
-# Ipsos has no updater of its own: its Issues Monitor reports (which issues
-# matter, and which party is most capable on them) are cached here, weekly,
-# for issues.mjs to read. A page that won't load is a warning – the cache
-# stays, and issues.mjs fails the run once Ipsos has been quiet too long. A
-# newly cached file is committed even when no figure moves, so the tree
-# (the laptop clone's included) is never left dirty.
+# Ipsos's Issues Monitor reports (which issues matter, and which party is
+# most capable on them) are fetched daily by .build/ipsos-updater.sh; this
+# weekly pass fetches them again, as the backstop, for issues.mjs to read.
+# A page that won't load is a warning here – the cache stays, and issues.mjs
+# fails the run once Ipsos has been quiet too long. A newly cached file is
+# committed even when no figure moves, so the tree (the laptop clone's
+# included) is never left dirty.
 IPS="$(node .build/extract-ipsos.mjs 2>&1)"
 log "$(echo "$IPS" | tail -1)"
 for b in vote-switching demographics issues; do

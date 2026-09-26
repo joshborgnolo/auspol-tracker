@@ -42,6 +42,14 @@ assert.equal(cls("FAIL git commit"), "defect", "an extractor that claimed a chan
 assert.equal(classify([], 1).class, "defect", "a failure that logged nothing is a defect");
 assert.equal(classify([at("RM_STATUS {\"changed\":false}")], 1).kind, "no-fail-line");
 
+// ---- the daily Ipsos run (.build/ipsos-updater.sh) --------------------------------
+// its FAIL lines carry extract-ipsos.mjs's warning as written, or the months a
+// newly fetched report left waiting
+assert.equal(cls("FAIL extract-ipsos (exit 1): report page: https://www.ipsos.com/en-au/issuesmonitor: HTTP 403"), "transient");
+assert.equal(cls("FAIL extract-ipsos (exit 1): IM_Nat_Sep_26_v1: https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-10/IM_Nat_Sep_26_v1.pdf: The operation was aborted due to timeout"), "transient");
+assert.equal(cls("FAIL extract-ipsos (exit 1): report page: no national report linked from 2025-12 on – has the page changed?"), "defect", "a page that stopped linking reports has moved");
+assert.equal(cls("FAIL issues (exit 1): new Ipsos report didn't read: Ipsos|2026-09-14; Ipsos 2026-09: Energy prices (reasons in the issues lines above)"), "defect");
+
 // ---- the LAST failure wins, across logs ---------------------------------------
 assert.equal(classify([
   at("FAIL extract (exit 1): X_ERROR fetch failed", "2026-09-23 10:00:00"),
