@@ -17,9 +17,12 @@ button{font:inherit;cursor:pointer}
 .tab{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:0 2px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;font-size:16px;font-weight:500;color:#6B6862;white-space:nowrap}
 .tab[aria-current="page"]{border-bottom-color:#171717;font-weight:600;color:#171717}
 .tab:hover{color:#171717}
-.segs{display:flex;padding:3px;border:1px solid #DDDCD8;border-radius:22px;background:#FAF9F6}
-.seg{width:38px;height:38px;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:19px;background:transparent;color:#6B6862}
-.seg[aria-pressed="true"]{background:#EFEDE8;color:#171717}
+/* the site's rocker switch: a plate, a raised cap, the chosen side pressed into a well */
+.segs{display:flex;padding:3px;border-radius:10px;background:#F2F0EC;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16),0 3px 6px -3px rgba(91,79,69,0.16)}
+.seg{width:40px;height:32px;display:flex;align-items:center;justify-content:center;padding:0;border:0;background:#FEFCF9;color:#6B6862;box-shadow:inset 0 1px 0 rgba(255,255,255,0.85),0 1px 1.5px rgba(91,79,69,0.16)}
+.seg:first-child{border-radius:7px 0 0 7px;border-right:1px solid rgba(43,37,33,0.18)}.seg:last-child{border-radius:0 7px 7px 0}
+.seg[aria-pressed="true"]{background:#E0DDD8;color:#171717;box-shadow:inset 0 2px 3px rgba(43,37,33,0.15),inset 0 -1px 0 rgba(255,255,255,0.85)}
+.seg[aria-pressed="true"] svg{transform:translateY(0.5px)}
 .dt{font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6B6862}
 .dd{font-size:15px;font-weight:600;color:#171717;white-space:nowrap}
 .dd2{font-size:13px;color:#6B6862;white-space:nowrap}
@@ -75,8 +78,8 @@ def dial(scale=1.0):
             f'aria-label="Primary vote: One Nation 27.3, Labor 26.8, Coalition 21.2, Greens 13.2. Implied two-party preferred, Labor v One Nation: Labor ahead by 2.4." style="display: block; flex-shrink: 0">'
             + ''.join(g) + '</svg>')
 
-SUN = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"></path></svg>'
-MOON = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linejoin: round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>'
+SUN = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"></path></svg>'
+MOON = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linejoin: round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>'
 THEME = (f'<div class="segs" role="group" aria-label="Colour theme"><button class="seg" aria-pressed="true" aria-label="Light theme" title="Light">{SUN}</button>'
          f'<button class="seg" aria-pressed="false" aria-label="Dark theme" title="Dark">{MOON}</button></div>')
 
