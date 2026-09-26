@@ -285,7 +285,7 @@ desk = '\n\n'.join([
     '<span style="flex-grow: 1"></span>\n'
     '<a href="#issues-method" style="min-height: 44px; display: flex; align-items: center; font-weight: 500; color: #171717; white-space: nowrap">How it’s built</a>\n</div>',
 ])
-DESK_H = 1280
+DESK_H = 1170
 open(OUT + 'Issues.dc.html', 'w').write(page('The issues', 1280, DESK_H, desk))
 
 # ================================================================ phone: who's trusted
@@ -320,7 +320,7 @@ phone = '\n\n'.join([
     '<div style="margin-top: 20px">\n' + NOTES.replace('font-size: 13px', 'font-size: 12px') + '\n</div>',
     f'<div style="margin-top: 8px; display: flex; align-items: center">{HOW}<span style="flex-grow: 1"></span><a href="#issues-method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a></div>',
 ])
-PHONE_H = 2080
+PHONE_H = 1920
 open(OUT + 'IssuesMobile.dc.html', 'w').write(page('The issues – phone', 390, PHONE_H, phone, ax=11, lw=2))
 
 # ================================================================ what matters to whom
@@ -392,7 +392,7 @@ whom = '\n\n'.join([
     '<span style="max-width: 900px">Only RedBridge publishes what matters by group, and only for these six issues, so its all-voters row can differ from the pooled figures in Who’s trusted. A group’s margin depends on its share of the sample: about 6 points for One Nation and Labor voters, 9 to 13 for the smaller groups.</span>\n<span style="flex-grow: 1"></span>\n'
     '<a href="#issues-method" style="min-height: 44px; display: flex; align-items: center; font-weight: 500; color: #171717; white-space: nowrap">How it’s built</a>\n</div>',
 ])
-WHOM_H = 1220
+WHOM_H = 1010
 open(OUT + 'IssuesWhom.dc.html', 'w').write(page('The issues – what matters to whom', 1280, WHOM_H, whom))
 
 # ================================================================ phone: what matters to whom (one issue at a time)
@@ -429,7 +429,7 @@ whom_phone = '\n\n'.join([
     '<p style="margin: 20px 0 0; padding-top: 14px; border-top: 1px solid #DDDCD8; font-size: 12px; line-height: 1.55; color: #6B6862">Only RedBridge publishes what matters by group, and only for these six issues, so its all-voters row can differ from the pooled figures in Who’s trusted. A group’s margin depends on its share of the sample: about 6 points for One Nation and Labor voters, 9 to 13 for the smaller groups.</p>',
     '<a href="#issues-method" style="margin-top: 8px; min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>',
 ])
-WHOM_PH_H = 1320
+WHOM_PH_H = 1130
 open(OUT + 'IssuesWhomMobile.dc.html', 'w').write(page('The issues – what matters to whom, phone', 390, WHOM_PH_H, whom_phone, ax=11, lw=2))
 
 # flags summary for checking

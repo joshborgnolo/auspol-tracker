@@ -161,7 +161,7 @@ desk = '\n\n'.join([
     chart_section('on', False, 'Compare published head-to-heads', ARIA_ON),
     FOOT,
 ])
-DESK_H = 1340
+DESK_H = 1260
 open(OUT + 'TPP.dc.html', 'w').write(page('Two-party preferred', 1280, DESK_H, desk))
 
 # ================================================================ phone board
@@ -191,7 +191,7 @@ phone = '\n\n'.join([
     '<a href="/preference-flows/" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>\n'
     f'<span style="flex-grow: 1"></span>\n{copy_btn("two-party preferred")}\n</div>',
 ])
-PHONE_H = 1460
+PHONE_H = 1310
 open(OUT + 'TPPMobile.dc.html', 'w').write(page('Two-party preferred – phone', 390, PHONE_H, phone, ax=11, dot=3.5))
 
 # ================================================================ other states board
@@ -240,6 +240,6 @@ views = '\n\n'.join([
     hero('imp-co'),
     '<div style="margin-top: 36px"></div>' + chart_section('co', True, 'Compare published 2PP', ARIA_C),
 ])
-VIEWS_H = 3160
+VIEWS_H = 2990
 open(OUT + 'TPPViews.dc.html', 'w').write(page('Two-party preferred – other states', 1280, VIEWS_H, views))
 print('ok', DESK_H, PHONE_H, VIEWS_H)

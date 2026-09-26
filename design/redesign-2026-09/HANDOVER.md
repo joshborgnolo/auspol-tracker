@@ -1,58 +1,78 @@
 # Redesign handover — 26 September 2026
 
-Section-by-section redesign mocks for the site, made in a cloud session and handed over here so the work can carry on locally. Nothing in the site itself has changed yet.
+Section-by-section redesign mocks for the site. They were started in a cloud session, then reviewed and revised in a local session the same day. Nothing in the site itself has changed yet.
 
 ## Where things are
 
-- **The canvas is the source of truth:** https://claude.ai/artifact/2tAJDk5xJ9K2AYzQq7HhDj (private to its owner). One row per section, desktop and phone boards side by side, other states to the right.
-- **`canvas/project/`** holds a snapshot of every board and `canvas.json`, taken from artifact version `1790397796-b6c4`.
-- **`gen/`** holds the scripts that generate some of the boards, and `extract_site_data.mjs`, which refreshes their data.
-- **`data/`** holds the figures the boards use, extracted from the built `index.html`. The Issues and National direction data come from `origin/main`, the rest from this branch.
+- **The canvas is the source of truth:** https://claude.ai/artifact/2tAJDk5xJ9K2AYzQq7HhDj (private to its owner). It has two canvas pages:
+  - **Sections:** one row per section, desktop and phone boards side by side, other states to the right.
+  - **Whole page:** the Snapshot page top to bottom, desktop and phone.
+- **`canvas/project/`** holds a snapshot of every board and `canvas.json`. The snapshot was taken at the local session's last publish.
+- **`gen/`** holds the scripts that build the boards, plus `extract_site_data.mjs`, which refreshes their data.
+- **`data/`** holds the figures the boards use, extracted from the built `index.html`.
 - **Keep this folder out of `main`.** The site is served from the repo root, so merging it would publish these files.
 
-## Picking this up locally
+## Picking this up
 
 1. In your clone, run `git fetch origin && git checkout claude/busy-albattani-3lhy6c`.
-2. Start Claude Code in the repo: either the Claude Desktop app, or `claude remote-control` in a terminal there, which then shows up in the Claude Code app.
-3. Open with: "Read design/redesign-2026-09/HANDOVER.md and carry on."
+2. Start Claude Code in the repo, then open with: "Read design/redesign-2026-09/HANDOVER.md and carry on."
 
-The canvas lives on claude.ai, not on disk. A local session can keep publishing to it if it has the Artifact tool. If it doesn't, edit the files here and publish from a web session.
+The canvas lives on claude.ai, not on disk. A session with the Artifact tool can publish to it. One without it should edit the files here and publish from a session that has it.
 
 ## Rows on the canvas, top to bottom
 
 | Row | Boards | Notes and decisions |
 |---|---|---|
-| Masthead | `Masthead`, `MastheadMobile` | Status block names the latest poll (YouGov, 15–21 Sep) so the header's date and the sections' "to 21 Sep" agree. The pinned bar drops the next-poll list; that's reversible. |
-| Primary vote | `Main`, `Mobile`, `Interaction` | Figures come from a 28-day trend (Labor 27.3, One Nation 26.5), not the site's 21-day estimate (One Nation 27.3, Labor 26.8); use the site's when porting. The One Nation line colour `#DD9231` is 2.4:1 against the background; use `#CC7C37`. |
-| Who votes for whom | `Demographics`, `DemographicsMobile`, `DemographicsPlace`, `DemographicsGreens` | Phone: the dashed all-voters line no longer crosses the figures. |
-| Where One Nation's voters came from | `Switching`, `SwitchingMobile` | "50%" labels moved clear of the chart titles. |
+| Masthead | `Masthead`, `MastheadMobile` | The status block names the latest poll (YouGov, 15–21 Sep), so the header's date and the sections' "to 21 Sep" agree. The pinned bar drops the next-poll list; that's reversible. Its 2PP figures are in the sans, like the TPP section's. |
+| Primary vote | `Main`, `Mobile`, `Interaction` | Built by `gen/primary_build.py` from the site's own figures. The stat row is the 21-day nowcast, ordered by size (One Nation 27.3, Labor 26.8…). The chart draws `aggPrimary`'s monthly aggregates with their 95% intervals. The line ends carry names only, because the figures are in the stat row. |
+| Who votes for whom | `Demographics`, `DemographicsMobile`, `DemographicsPlace`, `DemographicsGreens` | Whiskers are the site's 95% margins. Monthly lines use the site's per-group monthly figures. The location chart starts in February 2026, when that series begins. |
+| Where One Nation's voters came from | `Switching`, `SwitchingMobile` | The points note quotes the site's 27.3. |
 | Undecided | `Undecided`, `UndecidedMobile`, `UndecidedParty`, `UndecidedAge` | |
 | Leadership | `Leadership`, `LeadershipMobile`, `LeadershipThreeWay`, `LeadershipBoth`, `LeadershipTablet` | |
 | Two-party preferred | `TPP`, `TPPMobile`, `TPPViews` | Owner's calls: no headline (this is the page's headline section). Implied flows against the strongest rival is big and central. "Switch 2PP" gives the other contest. The implied/published switch lives inside the "?" panel, because implied is the strong default. |
-| The issues | `Issues`, `IssuesMobile`, `IssuesWhom`, `IssuesWhomMobile` | Built from `origin/main` data. To settle before porting: "a third name none of the three" is a plain average of five polls, not a site figure; the ▲▼ rule differs from the site's between-group test; the chart (September monthly) and table (six-week pool) rank Labor differently. |
-| National direction | `Direction`, `DirectionMobile` | "5 points apart in May 2025" rests on one Essential poll. |
-| Latest and next polls | `Polls`, `PollsMobile`, `PollsViews` | One table, one row per pollster, replaces both Snapshot panels. Essential's change is measured against its 29 June poll. |
-| Dark mode | `DarkMode` | Colour tokens, light and dark, for the port. |
+| The issues | `Issues`, `IssuesMobile`, `IssuesWhom`, `IssuesWhomMobile` | RedBridge publishes group figures for six issues only, so "What matters to whom" shows six. Its all-voters row is RedBridge's own, which the footer now says. |
+| National direction | `Direction`, `DirectionMobile` | The annotation's baseline is June 2025 (three polls), not May (one Essential poll). |
+| Latest and next polls | `Polls`, `PollsMobile`, `PollsViews` | One table, one row per pollster, replaces both Snapshot panels (see the decision below). Essential's change is measured against its 29 June poll. |
+| Dark mode | `DarkMode` | Colour tokens, light and dark, for the port. Its charts mirror the light boards. |
 
-Standing rules from the owner:
-- Every chart keeps its copy-chart button (and expand).
-- Copy is in Australian English.
+On the **Whole page** canvas page, `PageDesktop1–2` and `PagePhone1–3` stack the section boards in the live site's order. A board can be at most 8000px tall, so each page is split into parts.
+
+## Decisions from the review (26 Sep, local session)
+
+- **Latest and next polls stay unified.** The single table is better for finding one pollster's next release beside its last result, for seeing each pollster's rhythm, and for spotting a stale pollster. The split panels are better at one job: listing upcoming polls soonest first. The masthead's "Next polls" strip covers that, and so does making "Next, at the earliest" sortable (state C in `PollsViews`). The cost is that a weekly pollster's later releases appear only as small rings, not dated rows.
+- **Monthly lines are straight segments** on every chart. The live site smooths them with cubic curves, which can show highs and lows no month had. When porting, switch the chart engine's curve to straight (or monotone). This is the owner's call if they prefer the smooth look.
+- **Bands and whiskers are "95% interval"**, the site's glossary term. The ± figures are "95% margin".
+- **Restated figures quote their source exactly.** For example, the By-party small multiples quote the dot plot's 56.2, not 56.
+- **Boards end with the same padding they start with.** Run `gen/preview.py` after edits to check.
 
 ## Still open
 
-- **The port hasn't started.** The last question to the owner was whether to start it on this branch. There's no answer yet.
-- **`origin/main` is three commits ahead of this branch** (Issues: Ipsos and DemosAU added). Bring it in before porting.
-- **Headlines and decks are written by hand.** The site generates its own, so each one needs a rule.
+- **The port hasn't started.** The earlier question to the owner was whether to start it on this branch. There's no answer yet.
+- **`origin/main` is ahead of this branch** (Issues: Ipsos and DemosAU added). Bring it in before porting.
+- **Headlines and decks are written by hand.** The site generates its own, so each one needs a rule. On "What matters to whom" the deck should be the chosen group tab's verdict sentences, as the site's are now.
+- **The canvas title** still reads "Primary vote chart redesign", from when it covered one chart.
 
 ## Working on the boards
 
-- **Generated boards:** `TPP*` (`gen/build2.py`, after `gen/geom.py` if the data changed), `Issues*` (`gen/issues_build.py`), `Direction*` (`gen/direction_build.py`), `Masthead*` (`gen/masthead_build.py`) and `Polls*` (`gen/polls_build.py`). Run them with `python3 design/redesign-2026-09/gen/<script>.py`; they write into `canvas/project/`. Each reproduces its snapshot byte for byte.
-- **Hand-written boards:** everything else. Edit the `.dc.html` directly. `gen/calc.py`, `calcm.py` and `demo.py` computed some of their geometry and must be run from the repo root.
+- **Generated boards** (edit the script, not the board):
+
+  | Script | Boards |
+  |---|---|
+  | `gen/primary_build.py` | `Main`, `Mobile`, and the chart in `Interaction`'s first state |
+  | `gen/build2.py` | `TPP*` (run `gen/geom.py` first if the data changed) |
+  | `gen/issues_build.py` | `Issues*` |
+  | `gen/direction_build.py` | `Direction*` |
+  | `gen/masthead_build.py` | `Masthead*` |
+  | `gen/polls_build.py` | `Polls*` |
+  | `gen/page_build.py` | `PageDesktop*`, `PagePhone*`. Run it last, after any board changes. |
+
+  Run them with `python3 design/redesign-2026-09/gen/<script>.py`. They write into `canvas/project/` and reproduce the committed boards byte for byte. Set `PYTHONDONTWRITEBYTECODE=1` so no `__pycache__` lands in the tree.
+- **Hand-written boards:** everything else. Edit the `.dc.html` directly. `gen/calc.py`, `calcm.py` and `demo.py` are the first session's geometry scripts. They're kept for the record; nothing current depends on them.
+- **Previewing:** `python3 design/redesign-2026-09/gen/preview.py [--scale 2] [Board ...]`. It writes static copies and screenshots to `.matilda/redesign-preview/` (gitignored). It also prints where each board's content ends and flags any board whose height leaves uneven padding.
 - **Refreshing data:** `git show origin/main:index.html > /tmp/index_main.html`, then `node design/redesign-2026-09/gen/extract_site_data.mjs /tmp/index_main.html`.
 - **Board format:**
   - Keep `<script src="./support.js"></script>` in the head.
   - Content goes inside `<x-dc>` with a `<helmet>` for fonts and styles.
   - The root `div` is fixed to the board size and matches `$preview` in `data-props`.
   - Nothing on the board is built from script.
-- **Publishing with the Artifact tool:** `url` is the canvas link, `root` is `design/redesign-2026-09/canvas`, `file_path` is `.../canvas/project/canvas.json`, and `files` maps `"project/X.dc.html": "project/X.dc.html"` for each changed board. Read `canvas.json`, and any board you change, back from the artifact first: the canvas app adds fields, and boards may have been edited on the canvas.
-- **Comments:** all comment threads on the canvas were answered and resolved at handover.
+- **Publishing with the Artifact tool:** set `url` to the canvas link, `root` to `design/redesign-2026-09/canvas`, and `file_path` to `.../canvas/project/canvas.json`. In `files`, map `"project/X.dc.html": "project/X.dc.html"` for each changed board. Read `canvas.json`, and any board you change, back from the artifact first: the canvas app adds fields, and boards may have been edited on the canvas.

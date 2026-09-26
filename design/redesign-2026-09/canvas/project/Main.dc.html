@@ -32,7 +32,7 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 </style>
 </helmet>
 
-<div style="width: 1280px; height: 1020px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
+<div style="width: 1280px; height: 980px; box-sizing: border-box; padding: 56px 64px; display: flex; flex-direction: column; background: #FAF9F6">
 
 <div style="display: flex; align-items: baseline; gap: 16px; font-size: 13px; color: #6B6862">
 <span style="font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #171717">Primary vote</span>
@@ -147,7 +147,7 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 
 <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 28px; font-size: 13px; color: #4A4843">
 <span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="2.5" style="fill: #6B6862; opacity: 0.5"></circle></svg>One poll</span>
-<span style="display: flex; align-items: center; gap: 8px"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><rect x="0" y="2" width="24" height="10" rx="2" style="fill: #6B6862; opacity: 0.2"></rect><path d="M1 7H23" style="stroke: #171717; stroke-width: 2.5; stroke-linecap: round"></path></svg>Monthly average and its 95% range</span>
+<span style="display: flex; align-items: center; gap: 8px"><svg width="24" height="14" viewBox="0 0 24 14" aria-hidden="true"><rect x="0" y="2" width="24" height="10" rx="2" style="fill: #6B6862; opacity: 0.2"></rect><path d="M1 7H23" style="stroke: #171717; stroke-width: 2.5; stroke-linecap: round"></path></svg>Monthly average and its 95% interval</span>
 <span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 2"></circle></svg>2025 election result</span>
 <span style="flex-grow: 1"></span>
 <a href="#method" style="font-weight: 500; white-space: nowrap">How it’s built</a>
@@ -156,7 +156,7 @@ svg text{font-family:"IBM Plex Sans",system-ui,sans-serif}
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"showDots":{"editor":"boolean","default":true,"section":"Layers"},"showBands":{"editor":"boolean","default":true,"section":"Layers"},"showEvents":{"editor":"boolean","default":true,"section":"Layers"},"$preview":{"width":1280,"height":1020}}'>
+<script type="text/x-dc" data-dc-script data-props='{"showDots":{"editor":"boolean","default":true,"section":"Layers"},"showBands":{"editor":"boolean","default":true,"section":"Layers"},"showEvents":{"editor":"boolean","default":true,"section":"Layers"},"$preview":{"width":1280,"height":980}}'>
 class Component extends DCLogic {
 renderVals() {
 const p = this.props;

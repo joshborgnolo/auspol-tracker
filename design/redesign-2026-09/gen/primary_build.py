@@ -239,7 +239,7 @@ def build_main(H):
     b.append('')
     b.append('<div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 28px; font-size: 13px; color: #4A4843">')
     b.append('<span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="2.5" style="fill: #6B6862; opacity: 0.5"></circle></svg>One poll</span>')
-    b.append(f'<span style="display: flex; align-items: center; gap: 8px">{KEY_LINE}Monthly average and its 95% range</span>')
+    b.append(f'<span style="display: flex; align-items: center; gap: 8px">{KEY_LINE}Monthly average and its 95% interval</span>')
     b.append('<span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4.5" style="fill: #FAF9F6; stroke: #171717; stroke-width: 2"></circle></svg>2025 election result</span>')
     b.append('<span style="flex-grow: 1"></span>')
     b.append('<a href="#method" style="font-weight: 500; white-space: nowrap">How it’s built</a>')
@@ -349,7 +349,7 @@ def build_mobile(H):
     b.append('<span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="2.5" style="fill: #6B6862; opacity: 0.5"></circle></svg>One poll</span>')
     b.append('<span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="4" style="fill: #FAF9F6; stroke: #171717; stroke-width: 1.75"></circle></svg>2025 election result</span>')
     b.append('</div>')
-    b.append(f'<span style="display: flex; align-items: center; gap: 8px">{KEY_LINE_M}Monthly average and its 95% range</span>')
+    b.append(f'<span style="display: flex; align-items: center; gap: 8px">{KEY_LINE_M}Monthly average and its 95% interval</span>')
     b.append('</div>')
     b.append('<div style="margin-top: 12px; display: flex; align-items: center">')
     b.append('<a href="#method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>')
@@ -398,8 +398,8 @@ def patch_interaction():
 
 if __name__ == '__main__':
     import sys
-    hm = int(sys.argv[1]) if len(sys.argv) > 1 else 1020
-    hp = int(sys.argv[2]) if len(sys.argv) > 2 else 1320
+    hm = int(sys.argv[1]) if len(sys.argv) > 1 else 980
+    hp = int(sys.argv[2]) if len(sys.argv) > 2 else 1230
     build_main(hm)
     build_mobile(hp)
     patch_interaction()

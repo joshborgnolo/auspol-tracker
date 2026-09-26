@@ -186,7 +186,7 @@ desk = '\n\n'.join([
     f'<div style="margin-top: 24px; padding-top: 12px; border-top: 1px solid #DDDCD8; display: flex; align-items: center; gap: 24px; font-size: 13px; line-height: 1.5; color: #6B6862">\n<span>{FOOT_TEXT}</span>\n<span style="flex-grow: 1"></span>\n'
     '<a href="#direction-method" style="min-height: 44px; display: flex; align-items: center; font-weight: 500; color: #171717; white-space: nowrap">How it’s built</a>\n</div>',
 ])
-DESK_H = 1180
+DESK_H = 1140
 open(OUT + 'Direction.dc.html', 'w').write(page('National direction', 1280, DESK_H, desk))
 
 phone = '\n\n'.join([
@@ -208,6 +208,6 @@ phone = '\n\n'.join([
     f'<p style="margin: 16px 0 0; padding-top: 12px; border-top: 1px solid #DDDCD8; font-size: 12px; line-height: 1.55; color: #6B6862">{FOOT_TEXT}</p>',
     '<a href="#direction-method" style="min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0">How it’s built</a>',
 ])
-PHONE_H = 1300
+PHONE_H = 1210
 open(OUT + 'DirectionMobile.dc.html', 'w').write(page('National direction – phone', 390, PHONE_H, phone, ax=11, lw=2.25))
 print('ok', MONTHS[0], MONTHS[-1], NOW)

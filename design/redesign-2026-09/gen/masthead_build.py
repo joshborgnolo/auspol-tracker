@@ -27,7 +27,7 @@ button{font:inherit;cursor:pointer}
 .tn{display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap}
 .tn a{font-weight:600;color:#3D3B37}
 .ext{font-size:10px;color:#9A968E}
-.score{display:inline-flex;align-items:baseline;gap:9px;min-height:44px;padding:0 4px;border:0;background:none;white-space:nowrap}
+.score{display:inline-flex;flex-wrap:wrap;align-content:center;align-items:baseline;gap:9px;min-height:44px;padding:0 4px;border:0;background:none;white-space:nowrap}
 .plabel{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#9A968E}
 </style>
 </helmet>'''
@@ -177,7 +177,7 @@ desk = '\n\n'.join([
     '<div style="margin-top: 16px"></div>' + pinned(),
     content_under_pinned(),
 ])
-open(OUT + 'Masthead.dc.html', 'w').write(page('Masthead', 1280, 820, desk))
+open(OUT + 'Masthead.dc.html', 'w').write(page('Masthead', 1280, 760, desk))
 
 # ================================================================ phone
 phone = '\n\n'.join([
@@ -193,5 +193,5 @@ phone = '\n\n'.join([
     '<div style="margin-top: 12px"></div>' + pinned(phone=True),
     content_under_pinned(phone=True),
 ])
-open(OUT + 'MastheadMobile.dc.html', 'w').write(page('Masthead – phone', 390, 760, phone))
+open(OUT + 'MastheadMobile.dc.html', 'w').write(page('Masthead – phone', 390, 660, phone))
 print('ok')

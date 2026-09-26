@@ -156,15 +156,22 @@ def fig_prim(r):
 
 COLS = '190px 128px 214px 392px 188px 40px'
 
-def header_row(facet='tpp'):
+def sort_head(label, active, aria):
+    # the sorted column's arrow is dark; a sortable one's is faint
+    arrow = '▾' if active else '<span style="color: #C9C6BF">▾</span>'
+    return (f'<button class="sortb th" aria-pressed="{"true" if active else "false"}" aria-label="{aria}">'
+            f'{label} <span aria-hidden="true">{arrow}</span></button>')
+
+def header_row(facet='tpp', sort='latest'):
     fig_head = ('<span class="th">Labor v One Nation</span>' if facet == 'tpp' else
                 '<span style="display: flex">' + ''.join(f'<span class="th" style="width: 38px; color: {c}">{lab}</span>' for lab, c in PRIM) + '</span>')
     return (f'<div style="display: grid; grid-template-columns: {COLS}; align-items: end; padding-bottom: 6px; border-bottom: 1px solid #9A968E">'
             f'<span class="th" style="padding-left: 12px">Pollster</span>'
-            f'<button class="sortb th" aria-label="Sorted by latest, newest first">Latest <span aria-hidden="true">▾</span></button>'
-            f'{fig_head}'
+            + sort_head('Latest', sort == 'latest', 'Sorted by latest, newest first' if sort == 'latest' else 'Sort by latest, newest first')
+            + f'{fig_head}'
             f'<span style="display: flex; flex-direction: column"><span class="th">Releases · next</span>{axis()}</span>'
-            f'<span class="th">Next, at the earliest</span><span></span></div>')
+            + sort_head('Next, at the earliest', sort == 'next', 'Sorted by next release, soonest first' if sort == 'next' else 'Sort by next release, soonest first')
+            + '<span></span></div>')
 
 def data_row(r, facet='tpp', expanded=False):
     stale = r.get('stale')
@@ -209,7 +216,7 @@ desk = '\n\n'.join([
     KEY,
     FOOT,
 ])
-open(OUT + 'Polls.dc.html', 'w').write(page('Latest and next polls', 1280, 1000, desk))
+open(OUT + 'Polls.dc.html', 'w').write(page('Latest and next polls', 1280, 950, desk))
 
 # ================================================================ other states: expanded row, primary facet
 def detail_yougov():
@@ -238,6 +245,9 @@ def detail_yougov():
 </div>
 </div>'''
 
+NEXT_ORDER = ['RedBridge/Accent', 'Roy Morgan', 'Essential', 'YouGov', 'DemosAU', 'Newspoll', 'Resolve', 'Spectre Strategy']
+BY_NEXT = sorted(P, key=lambda r: NEXT_ORDER.index(r['f']))
+
 def panel_head(tag, title, note):
     return (f'<div style="display: flex; align-items: baseline; gap: 12px">'
             f'<span style="padding: 2px 8px; border-radius: 4px; background: #EFEDE8; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: #4A4843">{tag}</span>'
@@ -250,8 +260,11 @@ views = '\n\n'.join([
     '<div style="margin-top: 56px"></div>' + panel_head('B', 'Primary', 'The figures column swaps to the five primaries; everything about timing stays put, so switching views never moves a pollster’s row.'),
     controls('prim'),
     '<div style="margin-top: 16px; display: flex; flex-direction: column">' + header_row('prim') + '\n'.join(data_row(r, 'prim') for r in P) + '</div>',
+    '<div style="margin-top: 56px"></div>' + panel_head('C', 'Sorted by next release', 'The same rows in the order the polls are due, soonest first: the table becomes a schedule. Weekly and fortnightly pollsters’ later releases show as the smaller rings on their timelines.'),
+    controls('tpp'),
+    '<div style="margin-top: 16px; display: flex; flex-direction: column">' + header_row('tpp', sort='next') + '\n'.join(data_row(r) for r in BY_NEXT) + '</div>',
 ])
-open(OUT + 'PollsViews.dc.html', 'w').write(page('Latest and next polls – other states', 1280, 1540, views))
+open(OUT + 'PollsViews.dc.html', 'w').write(page('Latest and next polls – other states', 1280, 2240, views))
 
 # ================================================================ phone
 def card(r):
@@ -277,5 +290,5 @@ phone = '\n\n'.join([
     KEY.replace('font-size: 13px', 'font-size: 12px').replace('column-gap: 22px', 'column-gap: 14px'),
     FOOT.replace('font-size: 13px', 'font-size: 12px'),
 ])
-open(OUT + 'PollsMobile.dc.html', 'w').write(page('Latest and next polls – phone', 390, 1640, phone))
+open(OUT + 'PollsMobile.dc.html', 'w').write(page('Latest and next polls – phone', 390, 1490, phone))
 print('ok')
