@@ -864,10 +864,25 @@ body.rd .rd-wv-ci > i:first-child { left: 0; }
 body.rd .rd-wv-ci > i:last-child { right: 0; }
 body.rd .rd-wv-dot { position: absolute; top: 50%; width: 13px; height: 13px; box-sizing: border-box; border-radius: 50%; border: 2px solid; transform: translate(-50%, -50%); z-index: 3; box-shadow: 0 0 0 2px var(--bg);
   transition: left .32s cubic-bezier(.4, .1, .25, 1), background-color .2s ease; }
+/* a party switch (or a grouping switch's rows, which are keyed by place)
+   glides each mark to its new value, the leadership bars' ease and length,
+   colours easing with them; the scale's ticks slide if its top changes */
+body.rd .rd-wv-dot { transition: left .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease, border-color .32s ease; }
+body.rd .rd-wv-ci { transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1), color .32s ease; }
+body.rd .rd-wv-allline i, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+/* a grouping switch brings the charts in fresh: faded in, not cut */
+body.rd .rd-wv-enter > .rd-wv-chart { animation: rd-wv-in .32s ease both; }
+@keyframes rd-wv-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  body.rd .rd-wv-dot, body.rd .rd-wv-ci, body.rd .rd-wv-allline i, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: none; }
+  body.rd .rd-wv-enter > .rd-wv-chart { animation: none; }
+}
 body.rd .rd-wv-dot.open { background: var(--bg); }
 body.rd .rd-wv-v { font-size: 14px; color: var(--ink); white-space: nowrap; }
 body.rd .rd-wv-v b { font-weight: 600; }
-body.rd .rd-wv-v span { font-size: 12px; color: var(--ink-3); margin-left: 4px; }
+/* the ± alone: a child selector, since the figures' own digits are spans
+   (RollNum) that a descendant rule spaced out */
+body.rd .rd-wv-v > span { font-size: 12px; color: var(--ink-3); margin-left: 4px; }
 body.rd .rd-wv-d { text-align: right; font-size: 14px; color: var(--ink-3); }
 body.rd .rd-wv-d.sig { font-weight: 700; }
 body.rd .rd-wv-axis { margin-top: 4px; min-height: 22px; border-top: 1px solid var(--ink-faint); }

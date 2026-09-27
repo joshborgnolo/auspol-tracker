@@ -3684,10 +3684,19 @@ body.rd .rd-wv-ci > i:first-child { left: 0; }
 body.rd .rd-wv-ci > i:last-child { right: 0; }
 body.rd .rd-wv-dot { position: absolute; top: 50%; width: 13px; height: 13px; box-sizing: border-box; border-radius: 50%; border: 2px solid; transform: translate(-50%, -50%); z-index: 3; box-shadow: 0 0 0 2px var(--bg);
   transition: left .32s cubic-bezier(.4, .1, .25, 1), background-color .2s ease; }
+body.rd .rd-wv-dot { transition: left .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease, border-color .32s ease; }
+body.rd .rd-wv-ci { transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1), color .32s ease; }
+body.rd .rd-wv-allline i, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-wv-enter > .rd-wv-chart { animation: rd-wv-in .32s ease both; }
+@keyframes rd-wv-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  body.rd .rd-wv-dot, body.rd .rd-wv-ci, body.rd .rd-wv-allline i, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: none; }
+  body.rd .rd-wv-enter > .rd-wv-chart { animation: none; }
+}
 body.rd .rd-wv-dot.open { background: var(--bg); }
 body.rd .rd-wv-v { font-size: 14px; color: var(--ink); white-space: nowrap; }
 body.rd .rd-wv-v b { font-weight: 600; }
-body.rd .rd-wv-v span { font-size: 12px; color: var(--ink-3); margin-left: 4px; }
+body.rd .rd-wv-v > span { font-size: 12px; color: var(--ink-3); margin-left: 4px; }
 body.rd .rd-wv-d { text-align: right; font-size: 14px; color: var(--ink-3); }
 body.rd .rd-wv-d.sig { font-weight: 700; }
 body.rd .rd-wv-axis { margin-top: 4px; min-height: 22px; border-top: 1px solid var(--ink-faint); }
@@ -58556,6 +58565,7 @@ function RdDemographics({
   const T = D.demographics;
   const [tabId, setTab] = useState("age");
   const [party, setParty] = useState("onp");
+  const [partyMorph, chooseParty] = window.AP.useMorph(party, v => setParty(v), (a, b) => a !== b);
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find(x => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
@@ -58596,7 +58606,7 @@ function RdDemographics({
   const signedD = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
   const dotSet = (st, idx) => React.createElement("div", {
     className: "rd-wv-set",
-    key: st.id,
+    key: "s" + idx,
     role: "table",
     "aria-label": (st.label || tab.label) + ": " + pName + "’s share of each group’s vote"
   }, React.createElement("div", {
@@ -58611,16 +58621,18 @@ function RdDemographics({
     style: {
       left: xp(all) + "%"
     }
-  }, "All voters ", all.toFixed(1), "%")), React.createElement("span", {
+  }, "All voters ", React.createElement(RollNum, {
+    value: all.toFixed(1)
+  }), "%")), React.createElement("span", {
     className: "rd-wv-vs",
     role: "columnheader"
-  }, idx === 0 ? "vs all voters" : "")), st.groups.map(g => {
+  }, idx === 0 ? "vs all voters" : "")), st.groups.map((g, gi) => {
     const v = g.v[party],
       ci = g.ci[party] || 0,
       d = v - all,
       sig = Math.abs(d) > ci;
     return React.createElement("div", {
-      key: g.label,
+      key: "r" + gi,
       className: "rd-wv-row",
       role: "row",
       title: "Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + " · " + rdList((g.houses || []).map(demoHouse)) + " · ± is the 95% margin"
@@ -58652,13 +58664,19 @@ function RdDemographics({
     })), React.createElement("span", {
       role: "cell",
       className: "rd-wv-v"
-    }, React.createElement("b", null, v.toFixed(1), "%"), " ", React.createElement("span", null, "\xB1", ci.toFixed(1))), React.createElement("span", {
+    }, React.createElement("b", null, React.createElement(RollNum, {
+      value: v.toFixed(1)
+    }), "%"), " ", React.createElement("span", null, "\xB1", React.createElement(RollNum, {
+      value: ci.toFixed(1)
+    }))), React.createElement("span", {
       role: "cell",
       className: "rd-wv-d" + (sig ? " sig" : ""),
       style: sig ? {
         color: inkOf(pColor)
       } : undefined
-    }, signedD(d)));
+    }, React.createElement(RollNum, {
+      value: signedD(d)
+    })));
   }));
   const axis = React.createElement("div", {
     className: "rd-wv-axis",
@@ -58672,54 +58690,63 @@ function RdDemographics({
     }
   }, v, "%"))), React.createElement("span", null), React.createElement("span", null));
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
-  const allAt = new Map(T.allMonthly.map(m => [m[0], m[1 + ki]]));
-  const setLines = st => st.groups.map((g, i) => ({
-    g,
-    color: rdRamp(party, st.groups.length, i),
-    pts: (g.monthly || []).filter(m => m[1 + ki] != null).map(m => ({
-      ym: m[0],
-      x: D.mx(m[0]),
-      y: m[1 + ki]
-    }))
-  })).filter(l => l.pts.length);
-  const charts = tab.sets.map(st => {
-    const lines = setLines(st);
-    if (!lines.length) return null;
-    const firstX = Math.min(...lines.map(l => l.pts[0].x));
-    const x0 = Math.max(rangeLo, firstX - 0.06),
-      x1 = rangeHi;
-    const drawn = lines.map(l => ({
-      ...l,
-      pts: filterPts(l.pts, x0)
-    }));
-    const allPts = filterPts(T.allMonthly.map(m => ({
-      ym: m[0],
-      x: D.mx(m[0]),
-      y: m[1 + ki]
-    })).filter(d => d.x >= firstX - 0.01), x0);
-    const dots = D.individualPolls.filter(q => q.grp && q.grp.t && q.x >= x0 && q.x <= x1).flatMap(q => drawn.map(l => {
-      const v = q.grp.v[D.demoGroups.indexOf(l.g.label)];
-      const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
-      const base = allAt.get(q.ym);
-      return sum > 0 && q.grp.t[gpi] > 0 && base != null ? {
-        x: q.x,
-        y: +(base + (100 * v[gpi] / sum - q.grp.t[gpi])).toFixed(1),
-        color: l.color,
-        label: l.g.label,
-        meta: q
-      } : null;
-    }).filter(Boolean));
-    return {
-      st,
-      drawn,
-      allPts,
-      dots,
-      x0,
-      x1,
-      span: x1 - x0
-    };
-  }).filter(Boolean);
-  const yMax = Math.max(10, Math.ceil(Math.max(...charts.flatMap(c => c.drawn.flatMap(l => l.pts.map(p => p.y)).concat(c.dots.map(d => d.y)))) / 10) * 10);
+  const chartsFor = pty => {
+    const ki = T.order.indexOf(pty),
+      gpi = DEMO_GRP_PARTY.indexOf(pty);
+    const allAt = new Map(T.allMonthly.map(m => [m[0], m[1 + ki]]));
+    const setLines = st => st.groups.map((g, i) => ({
+      g,
+      color: rdRamp(pty, st.groups.length, i),
+      pts: (g.monthly || []).filter(m => m[1 + ki] != null).map(m => ({
+        ym: m[0],
+        x: D.mx(m[0]),
+        y: m[1 + ki]
+      }))
+    })).filter(l => l.pts.length);
+    return tab.sets.map(st => {
+      const lines = setLines(st);
+      if (!lines.length) return null;
+      const firstX = Math.min(...lines.map(l => l.pts[0].x));
+      const x0 = Math.max(rangeLo, firstX - 0.06),
+        x1 = rangeHi;
+      const drawn = lines.map(l => ({
+        ...l,
+        pts: filterPts(l.pts, x0)
+      }));
+      const allPts = filterPts(T.allMonthly.map(m => ({
+        ym: m[0],
+        x: D.mx(m[0]),
+        y: m[1 + ki]
+      })).filter(d => d.x >= firstX - 0.01), x0);
+      const dots = D.individualPolls.filter(q => q.grp && q.grp.t && q.x >= x0 && q.x <= x1).flatMap(q => drawn.map(l => {
+        const v = q.grp.v[D.demoGroups.indexOf(l.g.label)];
+        const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
+        const base = allAt.get(q.ym);
+        return sum > 0 && q.grp.t[gpi] > 0 && base != null ? {
+          x: q.x,
+          y: +(base + (100 * v[gpi] / sum - q.grp.t[gpi])).toFixed(1),
+          color: l.color,
+          label: l.g.label,
+          meta: q
+        } : null;
+      }).filter(Boolean));
+      return {
+        st,
+        drawn,
+        allPts,
+        dots,
+        x0,
+        x1,
+        span: x1 - x0
+      };
+    }).filter(Boolean);
+  };
+  const yMaxOf = cs => Math.max(10, Math.ceil(Math.max(...cs.flatMap(c => c.drawn.flatMap(l => l.pts.map(p => p.y)).concat(c.dots.map(d => d.y)))) / 10) * 10);
+  const charts = chartsFor(party);
+  const yMax = yMaxOf(charts);
+  const pm = partyMorph && partyMorph.from !== party ? partyMorph : null;
+  const fromCharts = pm ? chartsFor(pm.from) : null;
+  const fromYMax = fromCharts ? yMaxOf(fromCharts) : yMax;
   const sub = (() => {
     const c = charts[0];
     if (!c || c.drawn.length < 2) return null;
@@ -58749,85 +58776,105 @@ function RdDemographics({
       dek
     };
   })();
-  const chartOf = c => React.createElement("div", {
-    className: "card rd-card rd-wv-chart",
-    key: c.st.id,
-    style: {
-      flexGrow: narrow ? 1 : Math.max(0.35, c.span)
-    }
-  }, React.createElement("div", {
-    className: "rd-chead"
-  }, React.createElement("span", {
-    className: "rd-chead-t"
-  }, c.st.label || "By " + tab.label.toLowerCase(), React.createElement("span", {
-    className: "rd-chead-meta"
-  }, "since ", rdMonthYear(c.drawn.reduce((m, l) => l.pts[0].ym < m ? l.pts[0].ym : m, "9999"))))), React.createElement(TrendChart, {
-    key: "rd-wv-" + c.st.id + "-" + tab.id,
-    heightPx: narrow ? 240 : 260,
-    padPx: narrow ? {
-      l: 34,
-      r: 8,
-      t: 12,
-      b: 28
-    } : {
-      l: 40,
-      r: 12,
-      t: 12,
-      b: 30
-    },
-    xDomain: [c.x0, c.x1],
-    yDomain: [0, yMax],
-    yTicks: rdYTicks(0, yMax, 10),
-    yTickFmt: v => v === 0 ? "0" : v + "%",
-    xTicks: rdXTicks(c.x0, c.x1, narrow || c.span < 0.8),
-    baseline: true,
-    series: [{
-      id: "all",
-      label: "All voters",
-      color: "var(--ink)",
-      dash: "4 3",
-      dashed: true,
-      rdWidth: 1.5,
-      endCap: false,
-      points: c.allPts.map(d => ({
-        x: d.x,
-        y: d.y
-      })),
-      endLabel: narrow ? null : "All voters"
-    }, ...c.drawn.map(l => ({
-      id: l.g.label,
-      label: l.g.label,
-      color: l.color,
-      rdWidth: 2.2,
-      endCap: false,
-      points: l.pts.map(d => ({
-        x: d.x,
-        y: d.y
-      })),
-      endLabel: l.g.label
-    }))],
-    spine: c.allPts.map(d => ({
-      x: d.x,
-      y: d.y
-    })),
-    scatter: c.dots,
-    pollFacet: "primary",
-    tooltipTitle: i => c.allPts[i] ? monthLabelFull(c.allPts[i].ym) : "",
-    fmt: v => v.toFixed(1),
-    copy: {
-      title: "Who votes for whom",
-      sub: pName + "’s share of the vote, " + (c.st.label || "By " + tab.label).toLowerCase() + ", month by month",
-      legend: c.drawn.map(l => ({
+  const chartOf = c => {
+    const A = fromCharts && fromCharts.find(x => x.st.id === c.st.id);
+    const t = pm ? pm.t : 1;
+    const blend = (a, b) => A && a && b && a.length && b.length ? window.AP.blendRows(a, b, t, ["y"]) : null;
+    const allBl = A ? blend(A.allPts, c.allPts) : null;
+    const lineSeries = c.drawn.map(l => {
+      const la = A && A.drawn.find(x => x.g.label === l.g.label);
+      const bl = la ? blend(la.pts, l.pts) : null;
+      return {
+        id: l.g.label,
         label: l.g.label,
         color: l.color,
-        kind: "line"
-      })).concat([{
+        rdWidth: 2.2,
+        endCap: false,
+        clipX: bl ? bl.clip : undefined,
+        points: (bl ? bl.rows : l.pts).filter(d => d.y != null).map(d => ({
+          x: d.x,
+          y: d.y
+        })),
+        endLabel: l.g.label
+      };
+    });
+    const cross = A ? window.AP.crossClouds(A.dots, c.dots, t, d => d.meta.pollster + "|" + d.meta.released + "|" + d.label) : null;
+    const xDom = A ? window.AP.blendDomain([A.x0, A.x1], [c.x0, c.x1], t) : [c.x0, c.x1];
+    const yDom = A ? window.AP.blendDomain([0, fromYMax], [0, yMax], t) : [0, yMax];
+    return React.createElement("div", {
+      className: "card rd-card rd-wv-chart",
+      key: c.st.id,
+      style: {
+        flexGrow: narrow ? 1 : Math.max(0.35, c.span)
+      }
+    }, React.createElement("div", {
+      className: "rd-chead"
+    }, React.createElement("span", {
+      className: "rd-chead-t"
+    }, c.st.label || "By " + tab.label.toLowerCase(), React.createElement("span", {
+      className: "rd-chead-meta"
+    }, "since ", rdMonthYear(c.drawn.reduce((m, l) => l.pts[0].ym < m ? l.pts[0].ym : m, "9999"))))), React.createElement(TrendChart, {
+      key: "rd-wv-" + c.st.id + "-" + tab.id,
+      heightPx: narrow ? 240 : 260,
+      padPx: narrow ? {
+        l: 34,
+        r: 8,
+        t: 12,
+        b: 28
+      } : {
+        l: 40,
+        r: 12,
+        t: 12,
+        b: 30
+      },
+      xDomain: xDom,
+      yDomain: yDom,
+      yTicks: rdYTicks(0, yMax, 10),
+      yTickFmt: v => v === 0 ? "0" : v + "%",
+      xTicks: rdXTicks(c.x0, c.x1, narrow || c.span < 0.8),
+      baseline: true,
+      driven: !!A,
+      series: [{
+        id: "all",
         label: "All voters",
         color: "var(--ink)",
-        kind: "dashed"
-      }])
-    }
-  }));
+        dash: "4 3",
+        dashed: true,
+        rdWidth: 1.5,
+        endCap: false,
+        clipX: allBl ? allBl.clip : undefined,
+        points: (allBl ? allBl.rows : c.allPts).filter(d => d.y != null).map(d => ({
+          x: d.x,
+          y: d.y
+        })),
+        endLabel: narrow ? null : "All voters"
+      }, ...lineSeries],
+      spine: c.allPts.map(d => ({
+        x: d.x,
+        y: d.y
+      })),
+      scatter: cross ? cross.scatter : c.dots,
+      scatterOut: cross ? cross.scatterOut : [],
+      scatterMove: cross ? cross.scatterMove : [],
+      fade: A ? t : 1,
+      pollFacet: "primary",
+      tooltipTitle: i => c.allPts[i] ? monthLabelFull(c.allPts[i].ym) : "",
+      fmt: v => v.toFixed(1),
+      copy: {
+        title: "Who votes for whom",
+        sub: pName + "’s share of the vote, " + (c.st.label || "By " + tab.label).toLowerCase() + ", month by month",
+        legend: c.drawn.map(l => ({
+          label: l.g.label,
+          color: l.color,
+          kind: "line"
+        })).concat([{
+          label: "All voters",
+          color: "var(--ink)",
+          kind: "dashed"
+        }])
+      }
+    }));
+  };
   return React.createElement(RdSec, {
     id: "who-votes",
     cls: "rd-wv",
@@ -58855,7 +58902,7 @@ function RdDemographics({
     type: "button",
     className: "rd-chip",
     "aria-pressed": party === pp.id,
-    onClick: () => setParty(pp.id),
+    onClick: () => chooseParty(pp.id),
     style: party === pp.id ? {
       background: "var(--tint-" + pp.id + ")",
       borderColor: D.PARTIES[pp.id].color
@@ -58874,7 +58921,7 @@ function RdDemographics({
     type: "button",
     className: "rd-chip",
     "aria-pressed": party === pp.id,
-    onClick: () => setParty(pp.id),
+    onClick: () => chooseParty(pp.id),
     style: party === pp.id ? {
       background: "var(--tint-" + pp.id + ")",
       borderColor: D.PARTIES[pp.id].color
@@ -58916,7 +58963,8 @@ function RdDemographics({
     head: sub.head,
     dek: sub.dek
   }), React.createElement("div", {
-    className: "rd-wv-charts"
+    className: "rd-wv-charts rd-wv-enter",
+    key: "wv-" + tab.id
   }, charts.map(chartOf)), React.createElement(RdFoot, {
     how: {
       term: "vote-by-group",

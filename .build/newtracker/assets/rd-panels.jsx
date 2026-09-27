@@ -961,6 +961,13 @@ function RdDemographics({ rangeId = "all" }) {
   const T = D.demographics;
   const [tabId, setTab] = useState("age");
   const [party, setParty] = useState("onp");
+  /* A party switch asks the same groups about another party, so it morphs:
+     the dot plot's marks glide and their figures roll, and each group's line
+     reshapes into its line for the new party (useMorph, as the issues and
+     leadership charts do). A switch of GROUPING is different people, so
+     nothing there is drawn as turning into anything: the dot plot's rows
+     slide by place and the charts fade in. */
+  const [partyMorph, chooseParty] = window.AP.useMorph(party, (v) => setParty(v), (a, b) => a !== b);
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find((x) => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
@@ -1002,16 +1009,16 @@ function RdDemographics({ rangeId = "all" }) {
   const xp = (v) => (Math.max(0, Math.min(hi, v)) / hi) * 100;
   const signedD = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
   const dotSet = (st, idx) => (
-    <div className="rd-wv-set" key={st.id} role="table" aria-label={(st.label || tab.label) + ": " + pName + "’s share of each group’s vote"}>
+    <div className="rd-wv-set" key={"s" + idx} role="table" aria-label={(st.label || tab.label) + ": " + pName + "’s share of each group’s vote"}>
       <div className="rd-wv-sethead" role="row">
         <span role="columnheader"><b>{st.label || "By " + tab.label.toLowerCase()}</b> <span>{rdList((st.houses || []).map(demoHouse))}</span></span>
-        <span className="rd-wv-allcap" aria-hidden="true">{idx === 0 && <span style={{ left: xp(all) + "%" }}>All voters {all.toFixed(1)}%</span>}</span>
+        <span className="rd-wv-allcap" aria-hidden="true">{idx === 0 && <span style={{ left: xp(all) + "%" }}>All voters <RollNum value={all.toFixed(1)} />%</span>}</span>
         <span className="rd-wv-vs" role="columnheader">{idx === 0 ? "vs all voters" : ""}</span>
       </div>
-      {st.groups.map((g) => {
+      {st.groups.map((g, gi) => {
         const v = g.v[party], ci = g.ci[party] || 0, d = v - all, sig = Math.abs(d) > ci;
         return (
-          <div key={g.label} className="rd-wv-row" role="row"
+          <div key={"r" + gi} className="rd-wv-row" role="row"
                title={"Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + " · " + rdList((g.houses || []).map(demoHouse)) + " · ± is the 95% margin"}>
             <span role="cell" className="rd-wv-lab">{g.label}</span>
             <span className="rd-wv-track" aria-hidden="true">
@@ -1019,8 +1026,8 @@ function RdDemographics({ rangeId = "all" }) {
               <span className="rd-wv-ci" style={{ left: xp(v - ci) + "%", width: xp(v + ci) - xp(v - ci) + "%", color: pColor }}><i></i><i></i></span>
               <span className={"rd-wv-dot" + (sig ? "" : " open")} style={{ left: xp(v) + "%", background: sig ? pColor : undefined, borderColor: pColor }}></span>
             </span>
-            <span role="cell" className="rd-wv-v"><b>{v.toFixed(1)}%</b> <span>±{ci.toFixed(1)}</span></span>
-            <span role="cell" className={"rd-wv-d" + (sig ? " sig" : "")} style={sig ? { color: inkOf(pColor) } : undefined}>{signedD(d)}</span>
+            <span role="cell" className="rd-wv-v"><b><RollNum value={v.toFixed(1)} />%</b> <span>±<RollNum value={ci.toFixed(1)} /></span></span>
+            <span role="cell" className={"rd-wv-d" + (sig ? " sig" : "")} style={sig ? { color: inkOf(pColor) } : undefined}><RollNum value={signedD(d)} /></span>
           </div>
         );
       })}
@@ -1036,28 +1043,37 @@ function RdDemographics({ rangeId = "all" }) {
 
   /* ---- the groups month by month, in points -------------------------------- */
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
-  const allAt = new Map(T.allMonthly.map((m) => [m[0], m[1 + ki]]));
-  const setLines = (st) => st.groups.map((g, i) => ({
-    g, color: rdRamp(party, st.groups.length, i),
-    pts: (g.monthly || []).filter((m) => m[1 + ki] != null).map((m) => ({ ym: m[0], x: D.mx(m[0]), y: m[1 + ki] })),
-  })).filter((l) => l.pts.length);
-  const charts = tab.sets.map((st) => {
-    const lines = setLines(st);
-    if (!lines.length) return null;
-    const firstX = Math.min(...lines.map((l) => l.pts[0].x));
-    const x0 = Math.max(rangeLo, firstX - 0.06), x1 = rangeHi;
-    const drawn = lines.map((l) => ({ ...l, pts: filterPts(l.pts, x0) }));
-    const allPts = filterPts(T.allMonthly.map((m) => ({ ym: m[0], x: D.mx(m[0]), y: m[1 + ki] })).filter((d) => d.x >= firstX - 0.01), x0);
-    const dots = D.individualPolls.filter((q) => q.grp && q.grp.t && q.x >= x0 && q.x <= x1).flatMap((q) => drawn.map((l) => {
-      const v = q.grp.v[D.demoGroups.indexOf(l.g.label)];
-      const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
-      const base = allAt.get(q.ym);
-      return sum > 0 && q.grp.t[gpi] > 0 && base != null
-        ? { x: q.x, y: +(base + (100 * v[gpi] / sum - q.grp.t[gpi])).toFixed(1), color: l.color, label: l.g.label, meta: q } : null;
-    }).filter(Boolean));
-    return { st, drawn, allPts, dots, x0, x1, span: x1 - x0 };
-  }).filter(Boolean);
-  const yMax = Math.max(10, Math.ceil(Math.max(...charts.flatMap((c) => c.drawn.flatMap((l) => l.pts.map((p) => p.y)).concat(c.dots.map((d) => d.y)))) / 10) * 10);
+  const chartsFor = (pty) => {
+    const ki = T.order.indexOf(pty), gpi = DEMO_GRP_PARTY.indexOf(pty);
+    const allAt = new Map(T.allMonthly.map((m) => [m[0], m[1 + ki]]));
+    const setLines = (st) => st.groups.map((g, i) => ({
+      g, color: rdRamp(pty, st.groups.length, i),
+      pts: (g.monthly || []).filter((m) => m[1 + ki] != null).map((m) => ({ ym: m[0], x: D.mx(m[0]), y: m[1 + ki] })),
+    })).filter((l) => l.pts.length);
+    return tab.sets.map((st) => {
+      const lines = setLines(st);
+      if (!lines.length) return null;
+      const firstX = Math.min(...lines.map((l) => l.pts[0].x));
+      const x0 = Math.max(rangeLo, firstX - 0.06), x1 = rangeHi;
+      const drawn = lines.map((l) => ({ ...l, pts: filterPts(l.pts, x0) }));
+      const allPts = filterPts(T.allMonthly.map((m) => ({ ym: m[0], x: D.mx(m[0]), y: m[1 + ki] })).filter((d) => d.x >= firstX - 0.01), x0);
+      const dots = D.individualPolls.filter((q) => q.grp && q.grp.t && q.x >= x0 && q.x <= x1).flatMap((q) => drawn.map((l) => {
+        const v = q.grp.v[D.demoGroups.indexOf(l.g.label)];
+        const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
+        const base = allAt.get(q.ym);
+        return sum > 0 && q.grp.t[gpi] > 0 && base != null
+          ? { x: q.x, y: +(base + (100 * v[gpi] / sum - q.grp.t[gpi])).toFixed(1), color: l.color, label: l.g.label, meta: q } : null;
+      }).filter(Boolean));
+      return { st, drawn, allPts, dots, x0, x1, span: x1 - x0 };
+    }).filter(Boolean);
+  };
+  const yMaxOf = (cs) => Math.max(10, Math.ceil(Math.max(...cs.flatMap((c) => c.drawn.flatMap((l) => l.pts.map((p) => p.y)).concat(c.dots.map((d) => d.y)))) / 10) * 10);
+  const charts = chartsFor(party);
+  const yMax = yMaxOf(charts);
+  /* mid-switch: the party left behind, its charts and scale, to blend from */
+  const pm = partyMorph && partyMorph.from !== party ? partyMorph : null;
+  const fromCharts = pm ? chartsFor(pm.from) : null;
+  const fromYMax = fromCharts ? yMaxOf(fromCharts) : yMax;
   /* the points gap between the first set's top and bottom groups, then and now */
   const sub = (() => {
     const c = charts[0];
@@ -1081,17 +1097,36 @@ function RdDemographics({ rangeId = "all" }) {
         + " from about " + Math.round(gap0) + " points in " + rdMonthYear(firstYm) + " to about " + Math.round(gap1) + " now.");
     return { head, dek };
   })();
-  const chartOf = (c) => (
+  const chartOf = (c) => {
+    const A = fromCharts && fromCharts.find((x) => x.st.id === c.st.id);
+    const t = pm ? pm.t : 1;
+    const blend = (a, b) => (A && a && b && a.length && b.length ? window.AP.blendRows(a, b, t, ["y"]) : null);
+    const allBl = A ? blend(A.allPts, c.allPts) : null;
+    const lineSeries = c.drawn.map((l) => {
+      const la = A && A.drawn.find((x) => x.g.label === l.g.label);
+      const bl = la ? blend(la.pts, l.pts) : null;
+      /* the new party's colour from the first frame: .series-line eases its
+         stroke in CSS, and a colour re-mixed every frame restarted that
+         ease each frame and snapped at the end */
+      return { id: l.g.label, label: l.g.label, color: l.color, rdWidth: 2.2, endCap: false,
+               clipX: bl ? bl.clip : undefined, points: (bl ? bl.rows : l.pts).filter((d) => d.y != null).map((d) => ({ x: d.x, y: d.y })), endLabel: l.g.label };
+    });
+    const cross = A ? window.AP.crossClouds(A.dots, c.dots, t, (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.label) : null;
+    const xDom = A ? window.AP.blendDomain([A.x0, A.x1], [c.x0, c.x1], t) : [c.x0, c.x1];
+    const yDom = A ? window.AP.blendDomain([0, fromYMax], [0, yMax], t) : [0, yMax];
+    return (
     <div className="card rd-card rd-wv-chart" key={c.st.id} style={{ flexGrow: narrow ? 1 : Math.max(0.35, c.span) }}>
       <div className="rd-chead"><span className="rd-chead-t">{c.st.label || "By " + tab.label.toLowerCase()}<span className="rd-chead-meta">since {rdMonthYear(c.drawn.reduce((m, l) => (l.pts[0].ym < m ? l.pts[0].ym : m), "9999"))}</span></span></div>
       <TrendChart key={"rd-wv-" + c.st.id + "-" + tab.id} heightPx={narrow ? 240 : 260}
         padPx={narrow ? { l: 34, r: 8, t: 12, b: 28 } : { l: 40, r: 12, t: 12, b: 30 }}
-        xDomain={[c.x0, c.x1]} yDomain={[0, yMax]} yTicks={rdYTicks(0, yMax, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
-        xTicks={rdXTicks(c.x0, c.x1, narrow || c.span < 0.8)} baseline
-        series={[{ id: "all", label: "All voters", color: "var(--ink)", dash: "4 3", dashed: true, rdWidth: 1.5, endCap: false, points: c.allPts.map((d) => ({ x: d.x, y: d.y })), endLabel: narrow ? null : "All voters" },
-                 ...c.drawn.map((l) => ({ id: l.g.label, label: l.g.label, color: l.color, rdWidth: 2.2, endCap: false, points: l.pts.map((d) => ({ x: d.x, y: d.y })), endLabel: l.g.label }))]}
+        xDomain={xDom} yDomain={yDom} yTicks={rdYTicks(0, yMax, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
+        xTicks={rdXTicks(c.x0, c.x1, narrow || c.span < 0.8)} baseline driven={!!A}
+        series={[{ id: "all", label: "All voters", color: "var(--ink)", dash: "4 3", dashed: true, rdWidth: 1.5, endCap: false, clipX: allBl ? allBl.clip : undefined,
+                   points: (allBl ? allBl.rows : c.allPts).filter((d) => d.y != null).map((d) => ({ x: d.x, y: d.y })), endLabel: narrow ? null : "All voters" },
+                 ...lineSeries]}
         spine={c.allPts.map((d) => ({ x: d.x, y: d.y }))}
-        scatter={c.dots} pollFacet="primary"
+        scatter={cross ? cross.scatter : c.dots} scatterOut={cross ? cross.scatterOut : []} scatterMove={cross ? cross.scatterMove : []}
+        fade={A ? t : 1} pollFacet="primary"
         tooltipTitle={(i) => (c.allPts[i] ? monthLabelFull(c.allPts[i].ym) : "")}
         fmt={(v) => v.toFixed(1)}
         /* keyed in full: a phone names no line at its end, and "All voters"
@@ -1100,7 +1135,8 @@ function RdDemographics({ rangeId = "all" }) {
                 legend: c.drawn.map((l) => ({ label: l.g.label, color: l.color, kind: "line" })).concat([{ label: "All voters", color: "var(--ink)", kind: "dashed" }]) }}
       />
     </div>
-  );
+    );
+  };
 
   return (
     <RdSec id="who-votes" cls="rd-wv" title="Who votes for whom" meta={"Pooled from the last " + T.window + " of " + rdList(T.houses.map(demoHouse)) + " polls"}>
@@ -1109,7 +1145,7 @@ function RdDemographics({ rangeId = "all" }) {
         {!narrow && (
           <span className="rd-chips" role="group" aria-label="Party">
             {DEMO_PARTIES.map((pp) => (
-              <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => setParty(pp.id)}
+              <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => chooseParty(pp.id)}
                       style={party === pp.id ? { background: "var(--tint-" + pp.id + ")", borderColor: D.PARTIES[pp.id].color } : undefined}>
                 <span className="rd-sw" style={{ background: D.PARTIES[pp.id].color }}></span>{pp.label}</button>
             ))}
@@ -1119,7 +1155,7 @@ function RdDemographics({ rangeId = "all" }) {
       {narrow && (
         <div className="rd-chips rd-chips-row" role="group" aria-label="Party">
           {DEMO_PARTIES.map((pp) => (
-            <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => setParty(pp.id)}
+            <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => chooseParty(pp.id)}
                     style={party === pp.id ? { background: "var(--tint-" + pp.id + ")", borderColor: D.PARTIES[pp.id].color } : undefined}>
               <span className="rd-sw" style={{ background: D.PARTIES[pp.id].color }}></span>{pp.label}</button>
           ))}
@@ -1140,7 +1176,9 @@ function RdDemographics({ rangeId = "all" }) {
         ]}><span className="rd-key-item rd-wv-keytxt">Right-hand column: difference from all voters, in points</span></RdKey>
       </div>
       {sub && <RdSub head={sub.head} dek={sub.dek} />}
-      <div className="rd-wv-charts">{charts.map(chartOf)}</div>
+      {/* keyed on the grouping: a switch of it brings the charts in fresh,
+          faded rather than cut (a party switch keeps them and morphs) */}
+      <div className="rd-wv-charts rd-wv-enter" key={"wv-" + tab.id}>{charts.map(chartOf)}</div>
       <RdFoot how={{ term: "vote-by-group", from: "Who votes for whom" }}>
         Each dot is one poll; lines are monthly averages; the dashed line is all voters.{charts.length > 1 ? " Both panels share one scale, so each is only as wide as its data." : ""}
       </RdFoot>
