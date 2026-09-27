@@ -268,7 +268,15 @@ function RdHero(p) {
   ];
   const chartTitle = M[matchup].vsLabor ? "Labor’s two-party share, %" : "The Coalition’s two-party share against One Nation, %";
   const flowsBand = matchup === "alp_on" && onImp;
-  const spine = mainRows.map((d) => ({ x: d.x, y: d.a, ym: d.ym }));
+  /* The hover guide steps along the main line's months, and on the default
+     contest (v One Nation, first asked months after polling day) that left
+     the election ring with no month of its own: hovering it read out the ON
+     line's first month. Where the ring is drawn and the main line starts
+     after it, the election is the guide's first stop, as it is on the
+     primary-vote chart, and says what it is. */
+  const spineRows = (ringOn && elec.x >= xDomain[0] && mainRows.length && mainRows[0].x > elec.x + 1e-6
+    ? [{ ...elec, a: elec.alp }] : []).concat(mainRows);
+  const spine = spineRows.map((d) => ({ x: d.x, y: d.a, ym: d.ym }));
 
   /* ---- the finding over the chart --------------------------------------
      About the two Labor contests together, whichever one the chart is set
@@ -333,7 +341,9 @@ function RdHero(p) {
 
   const tooltipTitle = (i) => { const d = spine[i] || spine[spine.length - 1]; return d && d.ym ? monthLabelFull(d.ym) : ""; };
   const extraRows = (i) => {
-    const d = mainRows[i];
+    const d = spineRows[i];
+    // by date, not flag: the Coalition line's own first row is the result too
+    if (d && ringOn && Math.abs(d.x - elec.x) < 1e-6) return [{ label: "", value: "The election result" }];
     if (!d || !d.ci95) return [];
     return [{ label: flowsBand ? "Flow range" : "95% interval", value: "± " + d.ci95.toFixed(1) + " pts" + (d.k ? " · " + d.k + " poll" + (d.k === 1 ? "" : "s") : "") }];
   };
