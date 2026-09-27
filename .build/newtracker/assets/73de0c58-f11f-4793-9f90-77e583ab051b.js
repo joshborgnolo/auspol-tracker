@@ -401,11 +401,13 @@ function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
         </div>
       </div>
       {rd && (
-        /* the phone's status lines, under the tagline */
+        /* the phone's status, under the tagline: one line, as the old
+           design's was - the latest poll and how many this term. The
+           election date is the laptop block's; a second line for it cost
+           the phone 20px above the headline figure. */
         <div className="rd-head-compact">
           <span className={"fresh-dot " + fresh.state}></span>
-          <span><b>Latest poll</b> {rdLatest ? rdLatest.pollster + ", " + rdLatest.field : D.latest.published} · {fresh.label.toLowerCase()}<br />
-            {D.latest.pollsTracked} polls this term · election {D.latest.nextElectionDue.replace(/^By/, "by")}</span>
+          <span><b>Latest poll</b> {rdLatest ? rdLatest.pollster + ", " + rdLatest.field : D.latest.published} · {fresh.label.toLowerCase()} · {D.latest.pollsTracked} polls</span>
         </div>
       )}
       <div className="head-right">

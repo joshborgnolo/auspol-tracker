@@ -328,13 +328,19 @@ body.rd .rd-link:focus-visible { outline: 2px solid var(--accent); outline-offse
    Identity left - the lockup a size up, the tagline in the serif - and on
    the right a status block of three facts with their notes under them, then
    the rocker. No rule under it: the tab row carries the page's first rule. */
-body.rd .site-head { border-bottom: 0; padding-bottom: 0; margin-bottom: 40px; align-items: flex-start; }
-body.rd .wordmark, body.rd .wm-name, body.rd .wordmark.stacked .wm-track { font-size: 38px; }
+/* Tightened from the board's masthead (38px wordmark, 18px tagline over two
+   lines, 40px to the tabs), which put the tab bar 55px lower than the old
+   design's and the headline figure 62px lower, most of it an empty band
+   under the tagline. The content is the board's; the air is taken out. The
+   tagline keeps its two lines: on one, it pushes the status block to a row
+   of its own. */
+body.rd .site-head { border-bottom: 0; padding-bottom: 0; margin-bottom: 16px; align-items: flex-start; }
+body.rd .wordmark, body.rd .wm-name, body.rd .wordmark.stacked .wm-track { font-size: 34px; }
 body.rd .wordmark.stacked .wm-track { color: var(--ink-2); }
-body.rd .wm-dial { width: 64px; height: 44.6px; }
+body.rd .wm-dial { width: 57px; height: 39.7px; }
 body.rd .tagline {
-  margin: 14px 0 0; max-width: 440px;
-  font-size: 18px; line-height: 1.45; color: var(--ink-2); text-wrap: pretty;
+  margin: 10px 0 0; max-width: 440px;
+  font-size: 16px; line-height: 1.45; color: var(--ink-2); text-wrap: pretty;
 }
 body.rd .tagline-br { display: none; }
 body.rd .head-right { align-items: flex-start; gap: 28px; padding-top: 4px; }
