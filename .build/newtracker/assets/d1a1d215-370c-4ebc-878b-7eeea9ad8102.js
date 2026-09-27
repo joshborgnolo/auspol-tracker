@@ -231,7 +231,7 @@ function NextPollTicker({ showScore }) {
       <button type="button" className="tn-lab tn-jump"
               title="Jump to the Next expected polls panel"
               onClick={() => window.AP.gotoNextPolls && window.AP.gotoNextPolls()}>
-        {window.AP.rd ? "Next polls, at the earliest" : "Next"}
+        {window.AP.rd ? "Next polls" : "Next"}
       </button>
       {items.map((it, i) => (
         <span className={"tn-item" + (i >= fit ? " tn-park" : "")} key={i}>

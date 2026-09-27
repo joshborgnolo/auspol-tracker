@@ -149,92 +149,9 @@ const dayAlt = (r) => {
   return null;
 };
 
-// --- exact algorithm shipped in d1a1d215 (NextPollTicker) ---
-const tnUntil = (ms) => {
-  const mins = Math.max(1, Math.round(ms / 60000));
-  if (mins < 60) return mins + (mins === 1 ? " min" : " mins");
-  const h = Math.round(mins / 60);
-  if (h < 36) return h + (h === 1 ? " hour" : " hours");
-  const d = Math.round(h / 24);
-  if (d < 14) return d + (d === 1 ? " day" : " days");
-  const w = Math.round(d / 7);
-  return w + (w === 1 ? " week" : " weeks");
-};
-function ticker(rows, t0, nowMs) {
-  const targetOf = (r) => {
-    const half = r.winHalf || 0;
-    if (r.releaseDow == null)
-      return { at: Math.max(r.release - half * DAY, nowMs), byDay: false };
-    const widen = Math.sqrt((r.ahead || 0) + 1);
-    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
-    const earlyHalf = se != null
-      ? 7 * Math.floor((se * widen + 3) / 7)
-      : half;
-    let t = Math.max(t0, dayFloor(r.release - earlyHalf * DAY));
-    t += ((r.releaseDow - new Date(t).getUTCDay() + 7) % 7) * DAY;
-    return { at: t, byDay: true };
-  };
-  // a window house (DemosAU's calendar-month bracket) only joins the bar
-  // while its window is open, as the trailing "any day now" row (d1a1d215)
-  const isWindowRow = (r) => r.loose && r.releaseDow == null;
-  const windowOpen = (r) => r.release - (r.winHalf || 0) * DAY <= nowMs;
-  const windowItems = rows
-    .filter((r) => isWindowRow(r) && !r.missed && windowOpen(r))
-    .map((r) => ({ firm: r.pollster, when: "any day now", maybe: false, site: r.site }));
-  const overdueItems = rows
-    .filter((r) => r.missed && !isWindowRow(r))
-    .map((r) => {
-      const days = Math.round(
-        (t0 - (r.loose ? r.release + (r.winHalf || 0) * DAY : r.release)) / DAY);
-      return {
-        firm: r.pollster, site: r.site, overdue: true, days,
-        when: days === 1 ? "1 day overdue" : days + " days overdue",
-      };
-    })
-    .sort((a, b) => b.days - a.days);
-  const upcomingItems = rows
-    .filter((r) => !r.missed && !isWindowRow(r))
-    .map((r) => ({ r, t: targetOf(r) }))
-    .sort((a, b) => a.t.at - b.t.at)
-    .filter(((seen) => ({ r }) =>
-      !seen.has(r.pollster) && !!seen.add(r.pollster))(new Set()))
-    .map(({ r, t }) => {
-      const half = r.winHalf || 0;
-      let when;
-      if (t.byDay) {
-        const days = Math.round((t.at - t0) / DAY);
-        // "any moment now" opens at the measured release hour, not midnight -
-        // an untimed house keeps its whole day (the projection's 24*60)
-        const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
-        // a measured/declared hour counts the wait itself under 12h of
-        // runway ("5 hours", bare like the day counts); untimed or further
-        // out keeps "today"
-        const left = dueMs - nowMs;
-        when = days === 0 ? (dueMs <= nowMs ? "any moment now"
-             : r.releaseMins != null && Math.round(left / 3600000) < 12
-             ? tnUntil(left) : "today")
-             : days === 1 ? "tomorrow"
-             : days + " days";
-      } else {
-        // no day pinned → "any day now"; "any moment now" is the dated
-        // houses' word, for a slot whose moment has arrived TODAY
-        when = t.at <= nowMs ? "any day now"
-             : Math.round((t.at - nowMs) / 3600000) < 36
-             ? tnUntil(t.at - nowMs)
-             : Math.round((t.at - t0) / DAY) + " days";
-      }
-      const maybe = when !== "any moment now" && when !== "any day now" &&
-        (half > 7 || !!r.loose ||
-         (r.releaseDow != null && t.at - r.release > 7 * DAY) ||
-         (r.releaseDow == null && half > 0));
-      return { firm: r.pollster, when, maybe, site: r.site };
-    });
-  /* the shipped bar no longer slices the roll: the candidate list is one
-     slot per house, nearest first, and how many show is a fit decision
-     measured on the live bar (not simulated here - the screen is the
-     budget, the sim only checks the roll's derivation and order) */
-  return [...overdueItems, ...upcomingItems, ...windowItems];
-}
+// --- the bar's roll: the shipped npTickerItems itself (np-project.js), so
+// the sim tests what the bar says rather than a copy of it ---
+const ticker = (rows, t0, nowMs) => window.AP.nextPollItems({ rows, t0, nowMs });
 
 // ---------------------------------------------------------------------------
 const cad = JSON.parse(JSON.stringify(D.pollCadence));
@@ -254,6 +171,9 @@ for (const [firm, last] of [["Roy Morgan", "2026-09-07"],
                             ["Newspoll", "2026-08-30"],
                             ["DemosAU", "2026-08-24"]])
   cad.find((c) => c.pollster === firm).last = last;
+// RedBridge's 27 Sep Sunday was confirmed absent after that world was
+// written; its skip scenarios (S12) seed the list themselves
+cad.find((c) => c.pollster === "RedBridge/Accent").skipped = [];
 // Essential's 2 Sep wave is in the real data now, so the world the skip
 // scenarios exercise is rebuilt by stepping the row back one wave: last
 // returns to the 29 Jul wave on the 28-day cadence that measured it, which
@@ -715,6 +635,29 @@ function eq(name, got, want) {
   const sk2 = scen("Sun 4 Oct 10pm, the late Sunday absent too", "2026-10-04", 1320);
   const sk2Row = project(cadSkip, sk2.t0, sk2.nowMs).find((r) => r.pollster === "RedBridge/Accent");
   eq("a second skip goes to the next month-end", sk2Row && npFmt(sk2Row.release), "Sun 1 Nov");
+  // a house that files at 6pm OR 8pm has no one hour to count to: "today"
+  // until the wait to 6pm is no longer than that 2-hour span, then "any
+  // moment now" - never "2 hours" when it may as well be 4
+  cadSkip.find((c) => c.pollster === "RedBridge/Accent").skipped = ["2026-09-27"];
+  const rbWhen = (mins) => {
+    const s = scen("Sun 4 Oct", "2026-10-04", mins);
+    const it = ticker(project(cadSkip, s.t0, s.nowMs), s.t0, s.nowMs).find((i) => i.firm === "RedBridge/Accent");
+    return it && [it.when, !!it.maybe];
+  };
+  eq("two-hour house at 3:30pm reads today", rbWhen(930), ["today", false]);
+  eq("two-hour house at 4pm reads any moment now", rbWhen(960), ["any moment now", false]);
+}
+
+// S12b – the bar names the EARLIEST date, so a weekday house whose record
+// holds a later slot too is hedged: Newspoll's Sunday or the one after
+// reads "tomorrow (maybe)" on the Saturday
+{
+  const npRel = firm(project(cad, Date.parse("2026-09-10T00:00:00Z"), Date.parse("2026-09-10T00:00:00Z")), "Newspoll").release;
+  const { t0, nowMs, label } = scen("eve of Newspoll's slot", new Date(npRel - DAY).toISOString().slice(0, 10), 600);
+  const items = ticker(project(cad, t0, nowMs), t0, nowMs);
+  console.log(`\n${label}:  ticker → ${fmtT(items)}`);
+  const np = items.find((i) => i.firm === "Newspoll");
+  eq("a later slot on record hedges the count", np && [np.when, np.maybe], ["tomorrow", true]);
 }
 
 // S13 – the SUMMER BREAK: a dated slot inside 23 Dec – 8 Jan is no date at

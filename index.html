@@ -39938,11 +39938,14 @@ function npTickerItems(proj) {
       const days = Math.round((t.at - t0) / TN_DAY);
       const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
       const left = dueMs - nowMs;
-      when = days === 0 ? dueMs <= nowMs ? "any moment now" : r.releaseMins != null && Math.round(left / 3600000) < 12 ? tnUntil(left) : "today" : days === 1 ? "tomorrow" : days + " days";
+      const hourless = r.releaseFrom != null && r.releaseTo - r.releaseFrom >= 60;
+      when = days === 0 ? dueMs <= nowMs ? "any moment now" : hourless ? t.at + r.releaseFrom * 60000 - nowMs <= (r.releaseTo - r.releaseFrom) * 60000 ? "any moment now" : "today" : r.releaseMins != null && Math.round(left / 3600000) < 12 ? tnUntil(left) : "today" : days === 1 ? "tomorrow" : days + " days";
     } else {
       when = t.at <= nowMs ? "any day now" : Math.round((t.at - nowMs) / 3600000) < 36 ? tnUntil(t.at - nowMs) : Math.round((t.at - t0) / TN_DAY) + " days";
     }
-    const maybe = when !== "any moment now" && when !== "any day now" && (half > 7 || !!r.loose || r.releaseDow != null && t.at - r.release > 7 * TN_DAY || r.releaseDow == null && half > 0);
+    const lateW = r.releaseDow != null && !r.rolled ? Math.floor(((r.slotLate != null ? r.slotLate : r.spreadLate || 0) * Math.sqrt((r.ahead || 0) + 1) + 3) / 7) : 0;
+    const laterSlot = t.byDay && lateW >= 1 && t.at < r.release + lateW * 7 * TN_DAY;
+    const maybe = when !== "any moment now" && when !== "any day now" && (half > 7 || !!r.loose || laterSlot || r.releaseDow != null && t.at - r.release > 7 * TN_DAY || r.releaseDow == null && half > 0);
     return {
       firm: r.pollster,
       when,
@@ -48353,7 +48356,7 @@ function NextPollTicker({
     className: "tn-lab tn-jump",
     title: "Jump to the Next expected polls panel",
     onClick: () => window.AP.gotoNextPolls && window.AP.gotoNextPolls()
-  }, window.AP.rd ? "Next polls, at the earliest" : "Next"), items.map((it, i) => React.createElement("span", {
+  }, window.AP.rd ? "Next polls" : "Next"), items.map((it, i) => React.createElement("span", {
     className: "tn-item" + (i >= fit ? " tn-park" : ""),
     key: i
   }, React.createElement("span", {

@@ -545,7 +545,18 @@ function npTickerItems(proj) {
            timed has no hour to count to and keeps "today", and twelve hours
            plus out the day is still the honest claim. */
         const left = dueMs - nowMs;
+        /* ...unless the house keeps no one hour. RedBridge files at 6pm or
+           8pm, so at 4pm the wait is "2 hours or 4 hours" - a count to
+           either is a claim the record doesn't make. A house whose recorded
+           hours span an hour or more says "any moment now" for the whole
+           count once the wait to its EARLIEST hour is no longer than its
+           own span of hours (RedBridge from 4pm), and "today" before that -
+           10am is not a moment away from 6pm. A house on one hour
+           (Resolve's 6pm, Roy Morgan's 4pm-ish) keeps counting it. */
+        const hourless = r.releaseFrom != null && r.releaseTo - r.releaseFrom >= 60;
         when = days === 0 ? (dueMs <= nowMs ? "any moment now"
+             : hourless ? (t.at + r.releaseFrom * 60000 - nowMs <= (r.releaseTo - r.releaseFrom) * 60000
+               ? "any moment now" : "today")
              : r.releaseMins != null && Math.round(left / 3600000) < 12
              ? tnUntil(left) : "today")
              : days === 1 ? "tomorrow"
@@ -579,8 +590,19 @@ function npTickerItems(proj) {
          flag, not future doubt.) Non-weekday houses keep the day-spread
          rule. "any moment/day now" is left alone - it already says what
          the hedge would. */
+      /* ...and a weekday house whose record names a LATER slot than the one
+         counted - Newspoll's Sunday or the one after, Essential's Wednesday
+         or the next - is hedged too: "tomorrow (maybe)", since the bar says
+         the earliest date, not the only one. The late alternative is the
+         panel's own (slotLate, widened by sqrt(waves), in whole weeks); a
+         rolled slot already sits on it, and a count past the slot, inside
+         the window, is nearer the far edge by as much. */
+      const lateW = r.releaseDow != null && !r.rolled
+        ? Math.floor(((r.slotLate != null ? r.slotLate : r.spreadLate || 0) * Math.sqrt((r.ahead || 0) + 1) + 3) / 7)
+        : 0;
+      const laterSlot = t.byDay && lateW >= 1 && t.at < r.release + lateW * 7 * TN_DAY;
       const maybe = when !== "any moment now" && when !== "any day now" &&
-        (half > 7 || !!r.loose ||
+        (half > 7 || !!r.loose || laterSlot ||
          (r.releaseDow != null && t.at - r.release > 7 * TN_DAY) ||
          (r.releaseDow == null && half > 0));
       return { firm: r.pollster, when, maybe, site: r.site };
