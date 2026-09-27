@@ -3774,21 +3774,58 @@ body.rd .rd-iw-tabs { border-bottom: 0; flex-grow: 1; }
 body.rd .rd-iw-src { margin: 14px 0 6px; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-iw-src b { font-weight: 600; color: var(--ink); }
 body.rd .rd-iw-wrap { overflow-x: auto; }
-body.rd .rd-iw-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+body.rd .rd-iw-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+body.rd .rd-iw-table col.rd-iw-labcol { width: 200px; }
 body.rd .rd-iw-table th, body.rd .rd-iw-table td { padding: 10px 12px 10px 0; text-align: left; border-bottom: 1px solid var(--line); }
-body.rd .rd-iw-table thead th { font-size: 13px; font-weight: 600; color: var(--ink); border-bottom: 1.5px solid var(--ink-2); white-space: nowrap; }
-body.rd .rd-iw-table tbody th { font-size: 15px; font-weight: 400; color: var(--ink); white-space: nowrap; }
+body.rd .rd-iw-table thead th { font-size: 13px; font-weight: 600; line-height: 1.3; vertical-align: bottom; color: var(--ink); border-bottom: 1.5px solid var(--ink-2); }
+body.rd .rd-iw-table tbody th { font-size: 15px; font-weight: 400; line-height: 1.3; color: var(--ink); }
 body.rd .rd-iw-table tr.all th { font-weight: 600; }
 body.rd .rd-iw-table tr.all td, body.rd .rd-iw-table tr.all th { border-bottom: 1.5px solid var(--ink-3); }
-body.rd .rd-iw-cell { display: flex; align-items: center; gap: 10px; }
-body.rd .rd-iw-bar { position: relative; flex: 0 0 96px; height: 10px; background: var(--line-2); }
-body.rd .rd-iw-bar > span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink-faint); }
+body.rd .rd-iw-cell { display: flex; align-items: center; gap: 8px; min-width: 0; }
+body.rd .rd-iw-bar { position: relative; flex: 1 1 96px; max-width: 96px; min-width: 0; height: 10px; border-radius: 2px; background: var(--line-2); }
+body.rd .rd-iw-bar > span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; background: var(--ink-faint); }
 body.rd .rd-iw-cell.all .rd-iw-bar > span { background: var(--ink); }
 body.rd .rd-iw-cell.sig .rd-iw-bar > span { background: var(--ink-2); }
 body.rd .rd-iw-bar > i { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); transform: translateX(-1px); }
-body.rd .rd-iw-cell b { font-size: 14px; font-weight: 400; color: var(--ink-2); white-space: nowrap; }
+body.rd .rd-iw-cell b { flex: 0 0 42px; font-size: 14px; font-weight: 400; color: var(--ink-2); white-space: nowrap; }
 body.rd .rd-iw-cell.all b, body.rd .rd-iw-cell.sig b { font-weight: 600; color: var(--ink); }
 body.rd .rd-iw-cell b em { font-style: normal; margin-left: 3px; font-size: 12px; }
+@media (max-width: 1100px) {
+  body.rd .rd-iw-table col.rd-iw-labcol { width: 170px; }
+}
+body.rd .rd-iw-k { display: block; margin-top: 16px; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+body.rd .rd-iw-k:first-child { margin-top: 0; }
+body.rd .rd-iw-chips {
+  margin: 8px calc(-1 * var(--rd-gutter)) 0 0; padding-right: var(--rd-gutter);
+  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+}
+body.rd .rd-iw-chips::-webkit-scrollbar { display: none; }
+body.rd .rd-iw-chip {
+  all: unset; box-sizing: border-box; cursor: pointer; flex-shrink: 0;
+  min-height: 44px; padding: 0 14px; display: inline-flex; align-items: center;
+  border: 1px solid var(--line); border-radius: 22px;
+  font-size: 14px; color: var(--ink-2); white-space: nowrap;
+}
+body.rd .rd-iw-chip:hover { border-color: var(--ink-faint); color: var(--ink); }
+body.rd .rd-iw-chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); font-weight: 600; }
+body.rd .rd-iw-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+body.rd .rd-iw-ltitle { margin: 18px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-3); }
+body.rd .rd-iw-ltitle b { font-weight: 600; color: var(--ink); }
+body.rd .rd-iw-list { margin-top: 8px; font-variant-numeric: tabular-nums; }
+body.rd .rd-iw-lrow { display: grid; grid-template-columns: 200px minmax(0, 1fr) 56px; column-gap: 12px; align-items: center; min-height: 36px; }
+body.rd .rd-iw-lrow.all { border-bottom: 1px solid var(--ink-faint); margin-bottom: 4px; }
+body.rd .rd-iw-lrow > span:first-child { font-size: 14px; color: var(--ink); }
+body.rd .rd-iw-lrow.all > span:first-child { font-weight: 600; }
+body.rd .rd-iw-lbar { position: relative; height: 12px; border-radius: 2px; background: var(--line-2); }
+body.rd .rd-iw-lbar > span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; background: var(--ink-faint); }
+body.rd .rd-iw-lrow.sig .rd-iw-lbar > span { background: var(--ink-2); }
+body.rd .rd-iw-lrow.all .rd-iw-lbar > span { background: var(--ink); }
+body.rd .rd-iw-lbar > i { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); transform: translateX(-1px); }
+body.rd .rd-iw-lv { text-align: right; font-size: 14px; color: var(--ink-2); white-space: nowrap; }
+body.rd .rd-iw-lrow.sig .rd-iw-lv, body.rd .rd-iw-lrow.all .rd-iw-lv { font-weight: 600; color: var(--ink); }
+@media (max-width: 640px) {
+  body.rd .rd-iw-lrow { grid-template-columns: 128px minmax(0, 1fr) 46px; column-gap: 8px; }
+}
 body.rd .rd-iw-na { color: var(--ink-3); }
 body.rd .rd-iw-key { margin-top: 14px; }
 body.rd .rd-iw-key b { font-size: 12px; letter-spacing: 1px; }
@@ -3821,9 +3858,6 @@ body.rd .rd-is-impw { display: none; }
   body.rd .rd-is-row .rd-is-dots { grid-area: dots; height: 26px; }
   body.rd .rd-is-axis { order: -1; grid-template-columns: minmax(0, 1fr); padding: 0 8px; min-height: 22px; }
   body.rd .rd-is-axis > span:not(.rd-is-dots) { display: none; }
-  body.rd .rd-iw-ctl { flex-direction: column; align-items: flex-start; gap: 0; }
-  body.rd .rd-iw-tabs { overflow-x: auto; max-width: 100%; }
-  body.rd .rd-iw-bar { flex-basis: 48px; }
 }
 body.rd .rd-un-tabs { margin-top: 32px; }
 body.rd .rd-un-100 { margin-top: 28px; font-variant-numeric: tabular-nums; }
@@ -58505,6 +58539,8 @@ function RdIssues({
   const [view, setView] = useState("trust");
   const [selId, setSel] = useState(null);
   const [gsetId, setGset] = useState("vote");
+  const [whomK, setWhomK] = useState(null);
+  const whomList = useNarrow("(max-width: 1000px)");
   const stripRef = React.useRef(null);
   const stripW = useRdWidth(stripRef, 150);
   if (!I || !I.list || !I.list.length) return null;
@@ -58755,6 +58791,41 @@ function RdIssues({
       }
     })), React.createElement("b", null, Math.round(c.v), sig ? React.createElement("em", null, diff > 0 ? "▲" : "▼") : null));
   };
+  const groupLong = g => rdCap(issWho(g).replace(/^voters for other parties and independents$/, "Others voters").replace(/^Nationals, LNP and CLP voters$/, "Nationals, LNP, CLP voters"));
+  const groupShort = g => g.replace(/^Nationals, LNP and CLP$/, "Nationals, LNP, CLP");
+  const whomIssue = !gtab ? null : whomK && gtab.issues.includes(whomK) ? whomK : (gtab.issues.map(k => ({
+    k,
+    v: issGroupVerdict(gtab, k)
+  })).filter(x => x.v).sort((a, b) => b.v.gap - a.v.gap)[0] || {}).k || gtab.issues[0];
+  const whomRow = (g, k) => {
+    const c = g ? gtab.cells[g] && gtab.cells[g][k] : allOf(k);
+    if (!c) return null;
+    const a = allOf(k);
+    const diff = g && a ? c.v - a.v : 0;
+    const sig = g && a && Math.abs(diff) > c.ci;
+    return React.createElement("div", {
+      key: g || "all",
+      className: "rd-iw-lrow" + (g ? "" : " all") + (sig ? " sig" : ""),
+      role: "row",
+      title: "± " + c.ci.toFixed(1) + " is the 95% margin"
+    }, React.createElement("span", {
+      role: "rowheader"
+    }, g ? groupShort(g) : "All voters"), React.createElement("span", {
+      className: "rd-iw-lbar",
+      "aria-hidden": "true"
+    }, React.createElement("span", {
+      style: {
+        width: c.v + "%"
+      }
+    }), g && a && React.createElement("i", {
+      style: {
+        left: a.v + "%"
+      }
+    })), React.createElement("span", {
+      role: "cell",
+      className: "rd-iw-lv"
+    }, Math.round(c.v), sig ? " " + (diff > 0 ? "▲" : "▼") : ""));
+  };
   const tabs = React.createElement(RdTabs, {
     value: view,
     onChange: setView,
@@ -58884,7 +58955,37 @@ function RdIssues({
     dek: gVerdicts.length ? gVerdicts.map(v => v.text).join(" ") : "No two groups differ significantly on any of these issues."
   }), gtab ? React.createElement("div", {
     className: "card rd-card rd-iw"
-  }, React.createElement("div", {
+  }, whomList ? React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-iw-k"
+  }, "Group voters by"), React.createElement("div", {
+    className: "rd-iw-chips",
+    role: "group",
+    "aria-label": "Group voters by"
+  }, G.tabs.map(x => React.createElement("button", {
+    key: x.id,
+    type: "button",
+    className: "rd-iw-chip",
+    "aria-pressed": gtab.id === x.id,
+    onClick: () => setGset(x.id)
+  }, x.label))), React.createElement("span", {
+    className: "rd-iw-k"
+  }, "Issue"), React.createElement("div", {
+    className: "rd-iw-chips",
+    role: "group",
+    "aria-label": "Issue"
+  }, gtab.issues.map(k => React.createElement("button", {
+    key: k,
+    type: "button",
+    className: "rd-iw-chip",
+    "aria-pressed": whomIssue === k,
+    onClick: () => setWhomK(k)
+  }, ISS_SHORT[k] || I.labels[k] || k))), React.createElement("p", {
+    className: "rd-iw-ltitle"
+  }, React.createElement("b", null, I.labels[whomIssue] || whomIssue, " in their top three, %"), React.createElement("br", null), gSource), React.createElement("div", {
+    className: "rd-iw-list",
+    role: "table",
+    "aria-label": "Share of each group putting " + (ISS_PHRASE[whomIssue] || whomIssue) + " in its top three"
+  }, whomRow(null, whomIssue), gtab.groups.map(g => whomRow(g, whomIssue)))) : React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-iw-ctl"
   }, React.createElement("span", {
     className: "rd-iw-by"
@@ -58903,7 +59004,11 @@ function RdIssues({
     className: "rd-iw-wrap"
   }, React.createElement("table", {
     className: "rd-iw-table"
-  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
+  }, React.createElement("colgroup", null, React.createElement("col", {
+    className: "rd-iw-labcol"
+  }), gtab.issues.map(k => React.createElement("col", {
+    key: k
+  }))), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
     scope: "col"
   }, React.createElement("span", {
     className: "sr-only"
@@ -58920,9 +59025,9 @@ function RdIssues({
     key: g
   }, React.createElement("th", {
     scope: "row"
-  }, rdCap(issWho(g).replace(/^voters for other parties and independents$/, "Others voters"))), gtab.issues.map(k => React.createElement("td", {
+  }, groupLong(g)), gtab.issues.map(k => React.createElement("td", {
     key: k
-  }, whomCell(g, k)))))))), React.createElement("div", {
+  }, whomCell(g, k))))))))), React.createElement("div", {
     className: "rd-key rd-iw-key"
   }, React.createElement("span", {
     className: "rd-key-item"

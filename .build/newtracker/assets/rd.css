@@ -627,7 +627,7 @@ body.rd .rd-pld-prim > span > span { font-size: 19px; font-weight: 600; }
 body.rd .rd-pld-dl { display: grid; grid-template-columns: 180px minmax(0, 1fr); row-gap: 5px; column-gap: 12px; margin: 0; }
 body.rd .rd-pld-dl dt { color: var(--ink-3); }
 body.rd .rd-pld-dl dd { margin: 0; color: var(--ink); }
-body.rd .rd-pld-links { display: flex; gap: 12px; margin-top: 8px; margin-left: -4px; }
+body.rd .rd-pld-links { display: flex; flex-wrap: wrap; column-gap: 12px; margin-top: 8px; margin-left: -4px; }
 body.rd .rd-pld-tab { border-collapse: collapse; width: 100%; font-size: 13px; }
 body.rd .rd-pld-tab th { text-align: left; font-weight: 400; color: var(--ink-3); padding: 0 12px 4px 0; }
 body.rd .rd-pld-tab td { padding: 3px 12px 3px 0; color: var(--ink); }
@@ -954,21 +954,68 @@ body.rd .rd-iw-tabs { border-bottom: 0; flex-grow: 1; }
 body.rd .rd-iw-src { margin: 14px 0 6px; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-iw-src b { font-weight: 600; color: var(--ink); }
 body.rd .rd-iw-wrap { overflow-x: auto; }
-body.rd .rd-iw-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+/* A fixed layout, as the canvas's grid was: the label column set, the six
+   issues sharing the rest equally, and in each cell a bar that gives way
+   before its figure does. Laid out by their words instead, short heads like
+   "Housing" and "Crime" took columns narrower than their 96px bars, and the
+   figures were pushed under the next column's bar. */
+body.rd .rd-iw-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+body.rd .rd-iw-table col.rd-iw-labcol { width: 200px; }
 body.rd .rd-iw-table th, body.rd .rd-iw-table td { padding: 10px 12px 10px 0; text-align: left; border-bottom: 1px solid var(--line); }
-body.rd .rd-iw-table thead th { font-size: 13px; font-weight: 600; color: var(--ink); border-bottom: 1.5px solid var(--ink-2); white-space: nowrap; }
-body.rd .rd-iw-table tbody th { font-size: 15px; font-weight: 400; color: var(--ink); white-space: nowrap; }
+body.rd .rd-iw-table thead th { font-size: 13px; font-weight: 600; line-height: 1.3; vertical-align: bottom; color: var(--ink); border-bottom: 1.5px solid var(--ink-2); }
+body.rd .rd-iw-table tbody th { font-size: 15px; font-weight: 400; line-height: 1.3; color: var(--ink); }
 body.rd .rd-iw-table tr.all th { font-weight: 600; }
 body.rd .rd-iw-table tr.all td, body.rd .rd-iw-table tr.all th { border-bottom: 1.5px solid var(--ink-3); }
-body.rd .rd-iw-cell { display: flex; align-items: center; gap: 10px; }
-body.rd .rd-iw-bar { position: relative; flex: 0 0 96px; height: 10px; background: var(--line-2); }
-body.rd .rd-iw-bar > span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink-faint); }
+body.rd .rd-iw-cell { display: flex; align-items: center; gap: 8px; min-width: 0; }
+body.rd .rd-iw-bar { position: relative; flex: 1 1 96px; max-width: 96px; min-width: 0; height: 10px; border-radius: 2px; background: var(--line-2); }
+body.rd .rd-iw-bar > span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; background: var(--ink-faint); }
 body.rd .rd-iw-cell.all .rd-iw-bar > span { background: var(--ink); }
 body.rd .rd-iw-cell.sig .rd-iw-bar > span { background: var(--ink-2); }
 body.rd .rd-iw-bar > i { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); transform: translateX(-1px); }
-body.rd .rd-iw-cell b { font-size: 14px; font-weight: 400; color: var(--ink-2); white-space: nowrap; }
+/* the figure takes a fixed slot, arrow or not, so every bar in a column is
+   the same length: a bar is a 0-100 scale, and one shortened to make room
+   for "51 ▲" drew its share, and its all-voters mark, out of line */
+body.rd .rd-iw-cell b { flex: 0 0 42px; font-size: 14px; font-weight: 400; color: var(--ink-2); white-space: nowrap; }
 body.rd .rd-iw-cell.all b, body.rd .rd-iw-cell.sig b { font-weight: 600; color: var(--ink); }
 body.rd .rd-iw-cell b em { font-style: normal; margin-left: 3px; font-size: 12px; }
+@media (max-width: 1100px) {
+  body.rd .rd-iw-table col.rd-iw-labcol { width: 170px; }
+}
+/* a tablet or phone: one issue at a time, as the canvas's phone board drew it -
+   chips for the groups and the issue, then every group down one scale */
+body.rd .rd-iw-k { display: block; margin-top: 16px; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+body.rd .rd-iw-k:first-child { margin-top: 0; }
+body.rd .rd-iw-chips {
+  margin: 8px calc(-1 * var(--rd-gutter)) 0 0; padding-right: var(--rd-gutter);
+  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+}
+body.rd .rd-iw-chips::-webkit-scrollbar { display: none; }
+body.rd .rd-iw-chip {
+  all: unset; box-sizing: border-box; cursor: pointer; flex-shrink: 0;
+  min-height: 44px; padding: 0 14px; display: inline-flex; align-items: center;
+  border: 1px solid var(--line); border-radius: 22px;
+  font-size: 14px; color: var(--ink-2); white-space: nowrap;
+}
+body.rd .rd-iw-chip:hover { border-color: var(--ink-faint); color: var(--ink); }
+body.rd .rd-iw-chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); font-weight: 600; }
+body.rd .rd-iw-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+body.rd .rd-iw-ltitle { margin: 18px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-3); }
+body.rd .rd-iw-ltitle b { font-weight: 600; color: var(--ink); }
+body.rd .rd-iw-list { margin-top: 8px; font-variant-numeric: tabular-nums; }
+body.rd .rd-iw-lrow { display: grid; grid-template-columns: 200px minmax(0, 1fr) 56px; column-gap: 12px; align-items: center; min-height: 36px; }
+body.rd .rd-iw-lrow.all { border-bottom: 1px solid var(--ink-faint); margin-bottom: 4px; }
+body.rd .rd-iw-lrow > span:first-child { font-size: 14px; color: var(--ink); }
+body.rd .rd-iw-lrow.all > span:first-child { font-weight: 600; }
+body.rd .rd-iw-lbar { position: relative; height: 12px; border-radius: 2px; background: var(--line-2); }
+body.rd .rd-iw-lbar > span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; background: var(--ink-faint); }
+body.rd .rd-iw-lrow.sig .rd-iw-lbar > span { background: var(--ink-2); }
+body.rd .rd-iw-lrow.all .rd-iw-lbar > span { background: var(--ink); }
+body.rd .rd-iw-lbar > i { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); transform: translateX(-1px); }
+body.rd .rd-iw-lv { text-align: right; font-size: 14px; color: var(--ink-2); white-space: nowrap; }
+body.rd .rd-iw-lrow.sig .rd-iw-lv, body.rd .rd-iw-lrow.all .rd-iw-lv { font-weight: 600; color: var(--ink); }
+@media (max-width: 640px) {
+  body.rd .rd-iw-lrow { grid-template-columns: 128px minmax(0, 1fr) 46px; column-gap: 8px; }
+}
 body.rd .rd-iw-na { color: var(--ink-3); }
 body.rd .rd-iw-key { margin-top: 14px; }
 body.rd .rd-iw-key b { font-size: 12px; letter-spacing: 1px; }
@@ -1004,9 +1051,6 @@ body.rd .rd-is-impw { display: none; }
   body.rd .rd-is-row .rd-is-dots { grid-area: dots; height: 26px; }
   body.rd .rd-is-axis { order: -1; grid-template-columns: minmax(0, 1fr); padding: 0 8px; min-height: 22px; }
   body.rd .rd-is-axis > span:not(.rd-is-dots) { display: none; }
-  body.rd .rd-iw-ctl { flex-direction: column; align-items: flex-start; gap: 0; }
-  body.rd .rd-iw-tabs { overflow-x: auto; max-width: 100%; }
-  body.rd .rd-iw-bar { flex-basis: 48px; }
 }
 
 /* ---------- undecided -------------------------------------------------------- */

@@ -1174,6 +1174,11 @@ function RdIssues({ rangeId = "all" }) {
   const [view, setView] = useState("trust");
   const [selId, setSel] = useState(null);
   const [gsetId, setGset] = useState("vote");
+  /* What matters to whom: a tablet or phone shows one issue at a time, as the
+     canvas's phone board did, with the reader's pick kept across group sets.
+     From 1000px down the six columns' bars would fall under 60px. */
+  const [whomK, setWhomK] = useState(null);
+  const whomList = useNarrow("(max-width: 1000px)");
   /* the dot strip's width on screen, so dots that would print over one
      another can be told apart (see dodge, below) */
   const stripRef = React.useRef(null);
@@ -1324,6 +1329,29 @@ function RdIssues({ rangeId = "all" }) {
       </span>
     );
   };
+  const groupLong = (g) => rdCap(issWho(g).replace(/^voters for other parties and independents$/, "Others voters")
+    .replace(/^Nationals, LNP and CLP voters$/, "Nationals, LNP, CLP voters"));
+  const groupShort = (g) => g.replace(/^Nationals, LNP and CLP$/, "Nationals, LNP, CLP");
+  /* the issue the one-issue list opens on: the reader's pick, else the one
+     that divides the groups most (the canvas opened on immigration) */
+  const whomIssue = !gtab ? null : whomK && gtab.issues.includes(whomK) ? whomK
+    : (gtab.issues.map((k) => ({ k, v: issGroupVerdict(gtab, k) })).filter((x) => x.v)
+        .sort((a, b) => b.v.gap - a.v.gap)[0] || {}).k || gtab.issues[0];
+  const whomRow = (g, k) => {
+    const c = g ? gtab.cells[g] && gtab.cells[g][k] : allOf(k);
+    if (!c) return null;
+    const a = allOf(k);
+    const diff = g && a ? c.v - a.v : 0;
+    const sig = g && a && Math.abs(diff) > c.ci;
+    return (
+      <div key={g || "all"} className={"rd-iw-lrow" + (g ? "" : " all") + (sig ? " sig" : "")} role="row"
+           title={"± " + c.ci.toFixed(1) + " is the 95% margin"}>
+        <span role="rowheader">{g ? groupShort(g) : "All voters"}</span>
+        <span className="rd-iw-lbar" aria-hidden="true"><span style={{ width: c.v + "%" }}></span>{g && a && <i style={{ left: a.v + "%" }}></i>}</span>
+        <span role="cell" className="rd-iw-lv">{Math.round(c.v)}{sig ? " " + (diff > 0 ? "▲" : "▼") : ""}</span>
+      </div>
+    );
+  };
 
   const tabs = (
     <RdTabs value={view} onChange={setView} ariaLabel="View" className="rd-is-tabs"
@@ -1388,20 +1416,48 @@ function RdIssues({ rangeId = "all" }) {
           <RdHed head={whomHead} dek={gVerdicts.length ? gVerdicts.map((v) => v.text).join(" ") : "No two groups differ significantly on any of these issues."} />
           {gtab ? (
             <div className="card rd-card rd-iw">
-              <div className="rd-iw-ctl">
-                <span className="rd-iw-by">Group voters by</span>
-                <RdTabs value={gtab.id} onChange={setGset} options={G.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-tabs-sm rd-iw-tabs" />
-              </div>
-              <p className="rd-iw-src"><b>Share of each group putting each issue in its top three, %</b> · {gSource}</p>
-              <div className="rd-iw-wrap">
-                <table className="rd-iw-table">
-                  <thead><tr><th scope="col"><span className="sr-only">Group</span></th>{gtab.issues.map((k) => <th scope="col" key={k}>{I.labels[k] || k}</th>)}</tr></thead>
-                  <tbody>
-                    <tr className="all"><th scope="row">All voters</th>{gtab.issues.map((k) => <td key={k}>{whomCell(null, k)}</td>)}</tr>
-                    {gtab.groups.map((g) => <tr key={g}><th scope="row">{rdCap(issWho(g).replace(/^voters for other parties and independents$/, "Others voters"))}</th>{gtab.issues.map((k) => <td key={k}>{whomCell(g, k)}</td>)}</tr>)}
-                  </tbody>
-                </table>
-              </div>
+              {whomList ? (
+                /* a tablet or phone: pick the groups and the issue, and read
+                   every group's share of that one issue down a single scale */
+                <>
+                  <span className="rd-iw-k">Group voters by</span>
+                  <div className="rd-iw-chips" role="group" aria-label="Group voters by">
+                    {G.tabs.map((x) => <button key={x.id} type="button" className="rd-iw-chip" aria-pressed={gtab.id === x.id} onClick={() => setGset(x.id)}>{x.label}</button>)}
+                  </div>
+                  <span className="rd-iw-k">Issue</span>
+                  <div className="rd-iw-chips" role="group" aria-label="Issue">
+                    {gtab.issues.map((k) => <button key={k} type="button" className="rd-iw-chip" aria-pressed={whomIssue === k} onClick={() => setWhomK(k)}>{ISS_SHORT[k] || I.labels[k] || k}</button>)}
+                  </div>
+                  <p className="rd-iw-ltitle"><b>{I.labels[whomIssue] || whomIssue} in their top three, %</b><br />{gSource}</p>
+                  <div className="rd-iw-list" role="table" aria-label={"Share of each group putting " + (ISS_PHRASE[whomIssue] || whomIssue) + " in its top three"}>
+                    {whomRow(null, whomIssue)}
+                    {gtab.groups.map((g) => whomRow(g, whomIssue))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="rd-iw-ctl">
+                    <span className="rd-iw-by">Group voters by</span>
+                    <RdTabs value={gtab.id} onChange={setGset} options={G.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-tabs-sm rd-iw-tabs" />
+                  </div>
+                  <p className="rd-iw-src"><b>Share of each group putting each issue in its top three, %</b> · {gSource}</p>
+                  {/* a fixed layout, as the canvas's grid was: the label column
+                      set, the six issues sharing the rest equally. Sized by
+                      their words, short heads like "Housing" took columns
+                      narrower than their bars, which pushed the figures
+                      under the next column. */}
+                  <div className="rd-iw-wrap">
+                    <table className="rd-iw-table">
+                      <colgroup><col className="rd-iw-labcol" />{gtab.issues.map((k) => <col key={k} />)}</colgroup>
+                      <thead><tr><th scope="col"><span className="sr-only">Group</span></th>{gtab.issues.map((k) => <th scope="col" key={k}>{I.labels[k] || k}</th>)}</tr></thead>
+                      <tbody>
+                        <tr className="all"><th scope="row">All voters</th>{gtab.issues.map((k) => <td key={k}>{whomCell(null, k)}</td>)}</tr>
+                        {gtab.groups.map((g) => <tr key={g}><th scope="row">{groupLong(g)}</th>{gtab.issues.map((k) => <td key={k}>{whomCell(g, k)}</td>)}</tr>)}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
               <div className="rd-key rd-iw-key">
                 <span className="rd-key-item"><span className="rd-iw-keybar" aria-hidden="true"><i></i></span>Group’s share, with all voters marked</span>
                 <span className="rd-key-item"><b aria-hidden="true">▲▼</b>Differs from all voters by more than the group’s own 95% margin</span>
