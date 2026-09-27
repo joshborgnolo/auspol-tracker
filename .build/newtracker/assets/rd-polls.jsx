@@ -27,6 +27,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   /* a tablet has no room for the release strip beside five columns, so it
      takes the phone's cards too */
   const narrow = useNarrow("(max-width: 900px)");
+  const phone = useNarrow("(max-width: 640px)");
   const [facet, setFacet] = useState("twopp");
   const [sort, setSort] = useState({ key: "latest", dir: -1 });
   const [open, setOpen] = useState(null);
@@ -334,8 +335,8 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     <RdSec id="latest-polls" cls="rd-polls" facet={facet} title="Latest and next polls"
            meta={entries.length + " pollsters · latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))}>
       <p className="rd-dek rd-pl-dek">
-        The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm.
-        {narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection."}
+        {phone ? "The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll."
+          : "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm." + (narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection.")}
       </p>
       <RdTabs value={facet} onChange={setFacet} options={narrow ? RD_PL_FACETS.map((f) => (f.id === "leadership" ? { ...f, label: "Leaders" } : f)) : RD_PL_FACETS}
               ariaLabel="Poll table view" className="rd-pl-tabs">

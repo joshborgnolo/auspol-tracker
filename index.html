@@ -3167,6 +3167,8 @@ body.rd .rd-badge circle { fill: var(--chart-bg); stroke: var(--ink-3); stroke-w
 body.rd .rd-badge text { font-family: var(--sans); font-weight: 600; fill: var(--ink-2); }
 body.rd .rd-badge-tie { fill: none; stroke: var(--ink-faint); stroke-width: 1; vector-effect: non-scaling-stroke; }
 body.rd .rd-evlist { list-style: none; margin: 12px 0 0; padding: 0; font-size: 13px; color: var(--ink-2); }
+body.rd .chart:has(> .chart-copy-btn) + .rd-evlist { margin-top: 0; }
+body.rd .rd-evlist + .rd-ckey { margin-top: 16px; }
 body.rd .rd-evlist li { display: flex; align-items: baseline; gap: 12px; padding: 3px 0; }
 body.rd .rd-evlist-n { width: 14px; flex-shrink: 0; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-evlist-l { flex-grow: 1; }
@@ -3378,6 +3380,7 @@ body.rd .rd-pv-list .rd-pv-chg { grid-column: 1 / span 2; padding-left: 18px; fo
 body.rd .rd-pv-list .rd-pv-stat:focus-visible { outline-offset: 2px; }
 body.rd .rd-grow { flex-grow: 1; }
 body.rd .rd-pl-dek { margin-top: 12px; font-size: 17px; }
+@media (max-width: 640px) { body.rd .rd-pl-dek { font-size: 15px; } }
 body.rd .rd-pl-tabs { margin-top: 24px; }
 body.rd .rd-pl-ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-pl-ctl-l { color: var(--ink-3); }
@@ -3590,8 +3593,17 @@ body.rd .rd-dp-key { margin-top: 10px; }
 }
 @media (max-width: 640px) {
   body.rd .rd-ld-panel .rd-sub { margin-top: 36px; }
-  body.rd .rd-dp-head, body.rd .rd-dp-row, body.rd .rd-dp-foot { grid-template-columns: 84px minmax(0, 1fr) 50px 44px; column-gap: 8px; }
-  body.rd .rd-dp-name { font-size: 14px; gap: 7px; }
+  body.rd .rd-dp-head, body.rd .rd-dp-row, body.rd .rd-dp-foot { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 8px; }
+  body.rd .rd-dp:not(.both) .rd-dp-head { display: none; }
+  body.rd .rd-dp-head > .rd-dp-axis { display: none; }
+  body.rd .rd-dp-head > span[role="columnheader"] { min-width: 52px; }
+  body.rd .rd-dp-row { grid-template-areas: "name now chg" "track track track"; row-gap: 0; padding-top: 6px; min-height: 0; }
+  body.rd .rd-dp-name { grid-area: name; font-size: 15px; gap: 8px; }
+  body.rd .rd-dp-now { grid-area: now; min-width: 52px; }
+  body.rd .rd-dp-chg { grid-area: chg; min-width: 52px; }
+  body.rd .rd-dp-track { grid-area: track; height: 26px; border-left: 0; border-right: 0; }
+  body.rd .rd-dp-foot > span:not(.rd-dp-axis) { display: none; }
+  body.rd .rd-dp-foot > .rd-dp-axis { grid-column: 1 / -1; }
   body.rd .rd-hb-seg { padding: 0 7px; font-size: 12px; }
   body.rd .rd-hb-seg b { font-size: 14px; }
 }
@@ -3661,13 +3673,20 @@ body.rd .rd-wv-charts { display: flex; gap: 48px; margin-top: 20px; }
 body.rd .rd-wv-chart { min-width: 0; }
 @media (max-width: 640px) {
   body.rd .rd-wv-tabs .rd-tab { padding: 0 8px; font-size: 14px; }
-  body.rd .rd-wv-sethead, body.rd .rd-wv-row, body.rd .rd-wv-axis { grid-template-columns: 88px minmax(0, 1fr) 62px 44px; column-gap: 8px; }
-  body.rd .rd-wv-lab { font-size: 13px; }
-  body.rd .rd-wv-v span { display: none; }
-  body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 4; }
-  body.rd .rd-wv-allcap { grid-row: 2; }
-  body.rd .rd-wv-vs { grid-row: 2; }
+  body.rd .rd-wv-sethead, body.rd .rd-wv-row, body.rd .rd-wv-axis { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 8px; }
+  body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1; }
+  body.rd .rd-wv-vs { grid-column: 3; grid-row: 1; }
+  body.rd .rd-wv-allcap { grid-column: 1 / -1; grid-row: 2; }
+  body.rd .rd-wv-row { grid-template-areas: "lab v d" "track track track"; row-gap: 0; padding-top: 8px; min-height: 0; }
+  body.rd .rd-wv-lab { grid-area: lab; font-size: 15px; }
+  body.rd .rd-wv-v { grid-area: v; font-size: 15px; }
+  body.rd .rd-wv-d { grid-area: d; font-size: 13px; min-width: 38px; }
+  body.rd .rd-wv-track { grid-area: track; height: 28px; }
+  body.rd .rd-wv-axis > span:not(.rd-wv-ticks) { display: none; }
+  body.rd .rd-wv-axis .rd-wv-ticks { grid-column: 1 / -1; }
   body.rd .rd-wv-charts { flex-direction: column; gap: 28px; }
+  body.rd .rd-chips-row { display: flex; flex-wrap: nowrap; gap: 6px; }
+  body.rd .rd-chips-row .rd-chip { flex: 1 1 auto; justify-content: center; min-height: 44px; padding: 0 8px; gap: 5px; font-size: 13px; }
 }
 body.rd .rd-mo-wrap { margin-top: 36px; }
 body.rd .rd-mo { display: block; overflow: visible; font-variant-numeric: tabular-nums; }
@@ -3692,6 +3711,10 @@ body.rd .rd-mo-rsub { font-size: 12px; color: var(--ink-3); margin: 1px 0 6px; }
 body.rd .rd-mo-rbar { position: relative; }
 body.rd .rd-mo-rbar > span { position: absolute; left: 0; top: 0; bottom: 0; }
 body.rd .rd-mo-rbar > em { position: absolute; top: 50%; transform: translateY(-50%); font-style: normal; font-size: 15px; font-weight: 600; color: var(--onp-text); }
+body.rd .rd-mo-rbar > em.rd-mo-first { display: flex; flex-direction: column; gap: 2px; line-height: 1.15; }
+body.rd .rd-mo-big { font-size: 22px; font-weight: 600; }
+body.rd .rd-mo-nb { font-size: 12px; font-weight: 400; }
+body.rd .rd-mo-rbar > i.rd-mo-else { position: absolute; right: 8px; bottom: 6px; font-style: normal; font-size: 11px; }
 body.rd .rd-sm-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px; margin-top: 24px; }
 body.rd .rd-sm-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; font-weight: 600; }
 body.rd .rd-sm-top b { font-size: 18px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -3775,15 +3798,22 @@ body.rd .rd-iw-keybar i { position: absolute; right: -3px; top: -3px; bottom: -3
   body.rd .rd-is-leg { gap: 8px; }
   body.rd .rd-un-long { display: none; }
 }
+body.rd .rd-is-impw { display: none; }
 @media (max-width: 760px) {
-  body.rd .rd-is-head { display: none; }
-  body.rd .rd-is-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "lab verdict" "imp nums" "dots dots"; row-gap: 4px; padding: 10px 8px; min-height: 0; }
+  body.rd .rd-is-left { display: flex; flex-direction: column; }
+  body.rd .rd-is-head { display: flex; flex-direction: column; align-items: flex-start; order: -2; min-height: 0; padding: 0 0 6px; }
+  body.rd .rd-is-head > span:not(.rd-is-dotsh) { display: none; }
+  body.rd .rd-is-dotsh { grid-column: auto; }
+  body.rd .rd-is-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "lab imp" "dots dots" "nums verdict"; row-gap: 6px; padding: 10px 8px; min-height: 0; }
   body.rd .rd-is-lab { grid-area: lab; }
   body.rd .rd-is-verdict { grid-area: verdict; text-align: right; font-size: 13px; }
-  body.rd .rd-is-imp { grid-area: imp; }
-  body.rd .rd-is-nums { grid-area: nums; gap: 4px; }
+  body.rd .rd-is-imp { grid-area: imp; justify-self: end; gap: 0; }
+  body.rd .rd-is-imp .rd-is-bar { display: none; }
+  body.rd .rd-is-imp b, body.rd .rd-is-impw { display: inline; font-size: 12px; font-weight: 400; color: var(--ink-3); white-space: pre; }
+  body.rd .rd-is-nums { grid-area: nums; justify-content: flex-start; gap: 9px; font-size: 13px; }
+  body.rd .rd-is-nums b { width: auto; }
   body.rd .rd-is-row .rd-is-dots { grid-area: dots; height: 26px; }
-  body.rd .rd-is-axis { grid-template-columns: minmax(0, 1fr); padding: 0 8px; }
+  body.rd .rd-is-axis { order: -1; grid-template-columns: minmax(0, 1fr); padding: 0 8px; min-height: 22px; }
   body.rd .rd-is-axis > span:not(.rd-is-dots) { display: none; }
   body.rd .rd-iw-ctl { flex-direction: column; align-items: flex-start; gap: 0; }
   body.rd .rd-iw-tabs { overflow-x: auto; max-width: 100%; }
@@ -3807,6 +3837,12 @@ body.rd .rd-un-bar > span { flex-grow: 0; flex-shrink: 1; min-width: 0; display:
 body.rd .rd-un-f { background: var(--line); color: var(--ink); }
 body.rd .rd-un-s { background: var(--ink-3); color: var(--bg); }
 body.rd .rd-un-u { background: var(--ink); color: var(--bg); justify-content: center; padding: 0 !important; }
+body.rd .rd-un-key { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.4; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+body.rd .rd-un-key > div { display: flex; align-items: center; gap: 8px; }
+body.rd .rd-un-key b { font-weight: 600; color: var(--ink); }
+body.rd .rd-un-sw { width: 12px; height: 12px; flex-shrink: 0; box-sizing: border-box; }
+body.rd .rd-un-sw.rd-un-f { border: 1px solid var(--ink-faint); }
+body.rd .rd-un-kn { width: 22px; flex-shrink: 0; }
 body.rd .rd-un-panels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 64px; margin-top: 24px; align-items: stretch; }
 body.rd .rd-un-panel { display: flex; flex-direction: column; }
 body.rd .rd-un-panel > .chart { margin-top: auto; }
@@ -3853,8 +3889,10 @@ body.rd .rd-sp-ticks > span { position: absolute; top: 4px; transform: translate
 }
 @media (max-width: 640px) {
   body.rd .rd-un-panels { grid-template-columns: minmax(0, 1fr); row-gap: 28px; }
-  body.rd .rd-un-bar { height: 38px; }
+  body.rd .rd-un-bar { height: 36px; }
   body.rd .rd-un-bar > span { padding: 0 10px; font-size: 17px; }
+  body.rd .rd-un-100h { align-items: flex-start; min-height: 54px; }
+  body.rd .rd-un-100b { top: 24px; white-space: nowrap; direction: rtl; }
   body.rd .rd-un-sm { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; }
   body.rd .rd-sp-head, body.rd .rd-sp-row, body.rd .rd-sp-axis { grid-template-columns: 86px minmax(0, 1fr) 54px 40px; column-gap: 8px; }
   body.rd .rd-sp-head b { grid-column: 1 / span 4; }
@@ -41885,6 +41923,16 @@ function TrendChart(props) {
         y: rowY(null)
       }));
     }
+    if (rd && evs.some(e => e.badge != null)) {
+      return evs.map(e => ({
+        e,
+        ex: sx(e.x),
+        w: 0,
+        fsz,
+        row: null,
+        y: rowY(null)
+      }));
+    }
     return evs.map(e => {
       const ex = sx(e.x);
       const w = textWidth(e.short, fsz);
@@ -56293,11 +56341,11 @@ function RdHero(p) {
         kind: k.kind === "dash" ? "dashed" : k.kind === "band" ? "shade" : "line"
       }))
     }
+  }), badges && React.createElement(RdEventList, {
+    list: badges.list
   }), React.createElement(RdKey, {
     className: "rd-ckey",
     items: keyItems
-  }), badges && React.createElement(RdEventList, {
-    list: badges.list
   }), narrow && cmpAvail && React.createElement(RdCheck, {
     checked: showSynth,
     onChange: setShowSynth
@@ -56381,6 +56429,13 @@ function RdPrimary({
     onp: "One Nation",
     oth: "Others"
   };
+  const ABBR = {
+    alp: "ALP",
+    lnp: "L/NP",
+    grn: "GRN",
+    onp: "ON",
+    oth: "OTH"
+  };
   const parts = ["alp", "lnp", "grn", "onp", "oth"].map(id => ({
     id,
     color: D.PARTIES[id].color,
@@ -56425,7 +56480,7 @@ function RdPrimary({
     dashed: p.id === "oth",
     dash: p.id === "oth" ? "6 4" : undefined,
     opacity: hidden[p.id] ? 0 : 1,
-    endLabel: narrow ? null : SHORT[p.id],
+    endLabel: narrow ? ABBR[p.id] : SHORT[p.id],
     rdCap: 4
   }));
   const areas = visible.map(p => ({
@@ -56570,6 +56625,8 @@ function RdPrimary({
         kind: p.id === "oth" ? "dashed" : "line"
       }))
     }
+  }), badges && React.createElement(RdEventList, {
+    list: badges.list
   }), React.createElement(RdKey, {
     className: "rd-ckey",
     items: [{
@@ -56589,9 +56646,7 @@ function RdPrimary({
   }), React.createElement(RdHow, {
     term: "primary-vote",
     from: "Primary vote"
-  })), badges && React.createElement(RdEventList, {
-    list: badges.list
-  })));
+  }))));
 }
 const RD_LEAD_ORDER = ["alb", "taylor", "hanson"];
 function RdHeadBar({
@@ -56603,6 +56658,7 @@ function RdHeadBar({
 }) {
   const total = segs.reduce((s, x) => s + x.v, 0);
   const neither = Math.max(0, 100 - total);
+  const narrow = useNarrow("(max-width: 640px)");
   return React.createElement("div", {
     className: "rd-hb"
   }, React.createElement("div", {
@@ -56630,7 +56686,7 @@ function RdHeadBar({
       flexBasis: neither + "%",
       order: segs.length === 2 ? 1 : 99
     }
-  }, neither >= 7 ? "neither" : "")), cis && React.createElement("div", {
+  }, neither >= (narrow ? 14 : 7) ? "neither" : "")), cis && React.createElement("div", {
     className: "rd-hb-cis"
   }, segs.map(s => React.createElement("span", {
     key: s.name,
@@ -56790,14 +56846,14 @@ function RdLeadership({
       color: opp.color,
       points: run("alb_pref", "taylor_pref"),
       rdWidth: 2.5,
-      endLabel: narrow ? null : "over " + opp.short
+      endLabel: "over " + opp.short
     }, {
       id: "hanson",
       label: "over " + han.short,
       color: han.color,
       points: run("alb_prefH", "hanson_prefH"),
       rdWidth: 2.5,
-      endLabel: narrow ? null : "over " + han.short
+      endLabel: "over " + han.short
     }].filter(s => s.points.length);
   })();
   const leadDots = D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).flatMap(q => ["at", "ah"].map(mode => {
@@ -56840,14 +56896,14 @@ function RdLeadership({
       color: pm.color,
       points: run("alb_pref3"),
       rdWidth: 2.5,
-      endLabel: narrow ? null : pm.short
+      endLabel: pm.short
     }, {
       id: "han3",
       label: han.short,
       color: han.color,
       points: run("hanson_pref3"),
       rdWidth: 2.5,
-      endLabel: narrow ? null : han.short
+      endLabel: han.short
     }, {
       id: "ley3",
       label: "Ley",
@@ -56861,7 +56917,7 @@ function RdLeadership({
       color: opp.color,
       points: run("taylor_pref3"),
       rdWidth: 2.5,
-      endLabel: narrow ? null : opp.short
+      endLabel: opp.short
     }].filter(s => s.points.length);
   })();
   const firstThree = threeSeries.length ? Math.min(...threeSeries.map(s => s.points[0].x)) : null;
@@ -56887,7 +56943,7 @@ function RdLeadership({
   const chartPad = narrow ? {
     l: 34,
     r: 6,
-    t: 26,
+    t: 40,
     b: 28
   } : {
     l: 40,
@@ -57010,7 +57066,7 @@ function RdLeadership({
       rdWidth: 2.5,
       clipX: d.clip,
       endCap: d.era !== "ley",
-      endLabel: narrow || d.era === "ley" ? null : Ld.short
+      endLabel: d.era === "ley" ? null : Ld.short
     })));
     const areas = drawn.flatMap(({
       Ld,
@@ -57392,18 +57448,18 @@ function RdDirection({
   const last = pts[pts.length - 1];
   const base = bondi ? M.find(d => d.ym === bondi.date.slice(0, 7)) : null;
   const gapNow = last ? Math.abs(last.wrong - last.right) : null;
-  const brackets = last && !narrow ? [{
+  const brackets = !last ? [] : !narrow ? [{
     x: last.x,
     y0: last.wrong,
     y1: last.right,
     lines: [gapNow.toFixed(1) + " points apart in " + D.monthNameFull(Number(last.ym.slice(5))), base ? "up from " + Math.abs(base.wrong - base.right).toFixed(1) + " in " + D.monthNameFull(Number(base.ym.slice(5))) + ", before Bondi" : null].filter(Boolean)
-  }] : last ? [{
+  }] : [{
     x: last.x,
     y0: last.wrong,
     y1: last.right,
     dx: 4,
-    lines: []
-  }] : [];
+    lines: [gapNow.toFixed(1) + " points apart", "in " + D.monthNameFull(Number(last.ym.slice(5))) + (base ? ";" : ""), base ? Math.abs(base.wrong - base.right).toFixed(1) + " before Bondi" : null].filter(Boolean)
+  }];
   const evs = bondi ? [bondi] : [];
   const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
   const counts = {};
@@ -57560,6 +57616,8 @@ function RdDirection({
         kind: "line"
       }]
     }
+  }), badges && React.createElement(RdEventList, {
+    list: badges.list
   }), React.createElement(RdKey, {
     className: "rd-ckey",
     items: [{
@@ -57571,11 +57629,7 @@ function RdDirection({
       color: "var(--ink-3)",
       label: "Monthly average, adjusted for each pollster’s lean, and its 95% interval"
     }]
-  }), badges && React.createElement(RdEventList, {
-    list: badges.list
-  }), narrow && gapNow != null && React.createElement("p", {
-    className: "rd-note"
-  }, gapNow.toFixed(1), " points apart in ", D.monthNameFull(Number(last.ym.slice(5))), base ? "; " + Math.abs(base.wrong - base.right).toFixed(1) + " before Bondi" : "", ".")), React.createElement(HowTo, {
+  })), React.createElement(HowTo, {
     paras: [React.createElement(React.Fragment, null, "Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals."), React.createElement(React.Fragment, null, "The lines are adjusted for each pollster\u2019s lean. Only ", (D.directionHouses || []).length, " pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.")]
   }), React.createElement(RdFoot, {
     how: {
@@ -58255,7 +58309,7 @@ function RdSwitching({
     className: "rd-mo-base"
   })) : React.createElement("div", {
     className: "rd-mo-rows"
-  }, all.map(c => React.createElement("div", {
+  }, all.map((c, i) => React.createElement("div", {
     key: c.id,
     className: "rd-mo-row"
   }, React.createElement("div", {
@@ -58264,7 +58318,7 @@ function RdSwitching({
     style: {
       color: c.ink
     }
-  }, c.kept ? "One Nation" : LONG[c.id]), React.createElement("b", null, "\u2248 ", fmt1(c.kept ? keptPts : c.pts), " pts")), React.createElement("div", {
+  }, c.kept ? "One Nation" : c.id === "oth" ? "Others & independents" : NAME[c.id]), React.createElement("b", null, "\u2248 ", fmt1(c.kept ? keptPts : c.pts), " pts")), React.createElement("div", {
     className: "rd-mo-rsub"
   }, React.createElement("span", null, fmt1(c.w), "% of 2025 voters"), React.createElement("span", null, c.kept ? Math.round(c.rate) + "% still back it" : Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + " of the gain")), React.createElement("div", {
     className: "rd-mo-rbar",
@@ -58277,11 +58331,25 @@ function RdSwitching({
       width: c.rate + "%",
       background: c.kept ? "var(--onp-deep)" : "var(--onp)"
     }
-  }), !c.kept && React.createElement("em", {
+  }), !c.kept && i === 0 ? React.createElement("em", {
+    className: "rd-mo-first",
     style: {
       left: "calc(" + c.rate + "% + 8px)"
     }
-  }, fmt1(c.rate), "%")))));
+  }, React.createElement("span", {
+    className: "rd-mo-big"
+  }, fmt1(c.rate), "%"), React.createElement("span", {
+    className: "rd-mo-nb"
+  }, "now back One Nation")) : !c.kept && React.createElement("em", {
+    style: {
+      left: "calc(" + c.rate + "% + 8px)"
+    }
+  }, fmt1(c.rate), "%"), !c.kept && i === 0 && React.createElement("i", {
+    className: "rd-mo-else",
+    style: {
+      color: c.ink
+    }
+  }, "Stayed or went elsewhere")))));
   return React.createElement(RdSec, {
     id: "switching",
     cls: "rd-sw",
@@ -58586,7 +58654,9 @@ function RdIssues({
       style: {
         width: x.imp.v + "%"
       }
-    })), React.createElement("b", null, Math.round(x.imp.v), "%")) : React.createElement("span", {
+    })), React.createElement("b", null, Math.round(x.imp.v), "%"), React.createElement("span", {
+      className: "rd-is-impw"
+    }, " rank it top three")) : React.createElement("span", {
       className: "rd-is-na"
     }, "not asked")), React.createElement("span", {
       className: "rd-is-dots",
@@ -59257,18 +59327,13 @@ function RdUndecided({
     style: {
       width: soft100 + und100 + "%"
     }
-  }, "About ", soft100 + und100, " in 100 could still move")), React.createElement("div", {
+  }, "About ", soft100 + und100, " in 100 could still move")), !narrow && React.createElement("div", {
     className: "rd-un-100l"
   }, React.createElement("span", {
     style: {
       flexBasis: firm100 + "%"
     }
-  }, React.createElement("b", null, "Firm"), " ", narrow ? "" : "named a party and don’t expect to change"), narrow ? React.createElement("span", {
-    style: {
-      flexBasis: soft100 + und100 + "%"
-    },
-    className: "rd-un-pair"
-  }, React.createElement("b", null, "Not firm"), " \xB7 ", React.createElement("b", null, "Undecided")) : React.createElement(React.Fragment, null, React.createElement("span", {
+  }, React.createElement("b", null, "Firm"), " named a party and don\u2019t expect to change"), React.createElement("span", {
     style: {
       flexBasis: soft100 + "%"
     }
@@ -59279,7 +59344,7 @@ function RdUndecided({
       flexBasis: und100 + "%"
     },
     className: "rd-un-und"
-  }, React.createElement("b", null, "Undecided")))), React.createElement("div", {
+  }, React.createElement("b", null, "Undecided"))), React.createElement("div", {
     className: "rd-un-bar",
     role: "img",
     "aria-label": `Of every 100 voters, about ${firm100} are firm, ${soft100} not firm and ${und100} undecided`
@@ -59288,17 +59353,26 @@ function RdUndecided({
     style: {
       flexBasis: firm100 + "%"
     }
-  }, firm100), React.createElement("span", {
+  }, narrow ? "" : firm100), React.createElement("span", {
     className: "rd-un-s",
     style: {
       flexBasis: soft100 + "%"
     }
-  }, soft100), React.createElement("span", {
+  }, narrow ? "" : soft100), React.createElement("span", {
     className: "rd-un-u",
     style: {
       flexBasis: und100 + "%"
     }
-  }, und100)), React.createElement("p", {
+  }, narrow ? "" : und100)), narrow && React.createElement("div", {
+    className: "rd-un-key",
+    "aria-hidden": "true"
+  }, [["f", firm100, "Firm:", "named a party and don’t expect to change"], ["s", soft100, "Not firm:", "named a party but might change"], ["u", und100, "Undecided:", "can’t say who they’d vote for"]].map(([k, n, b, t]) => React.createElement("div", {
+    key: k
+  }, React.createElement("span", {
+    className: "rd-un-sw rd-un-" + k
+  }), React.createElement("b", {
+    className: "rd-un-kn"
+  }, n), React.createElement("span", null, React.createElement("b", null, b), " ", t)))), React.createElement("p", {
     className: "rd-note"
   }, "Approximate: combines ", rdList(first.houses), "\u2019s undecided share (", u.toFixed(1), "%) with ", rdList(soft.houses), "\u2019s firmness question (", Math.round(sf), "% of those who named a party). Pollsters ask these questions differently.")), React.createElement(RdSub, {
     head: (() => {
@@ -59586,6 +59660,7 @@ function RdPolls({
     D
   } = window.AP;
   const narrow = useNarrow("(max-width: 900px)");
+  const phone = useNarrow("(max-width: 640px)");
   const [facet, setFacet] = useState("twopp");
   const [sort, setSort] = useState({
     key: "latest",
@@ -60053,7 +60128,7 @@ function RdPolls({
     meta: entries.length + " pollsters · latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))
   }, React.createElement("p", {
     className: "rd-dek rd-pl-dek"
-  }, "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm.", narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection."), React.createElement(RdTabs, {
+  }, phone ? "The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll." : "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm." + (narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection.")), React.createElement(RdTabs, {
     value: facet,
     onChange: setFacet,
     options: narrow ? RD_PL_FACETS.map(f => f.id === "leadership" ? {

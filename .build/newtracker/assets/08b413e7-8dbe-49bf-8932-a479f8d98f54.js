@@ -782,6 +782,13 @@ function TrendChart(props) {
     if (evs.length > 2 && cw < 640) {
       return evs.map((e) => ({ e, ex: sx(e.x), w: 0, fsz, row: null, y: rowY(null) }));
     }
+    /* A redesign panel that numbered its events (a phone's, whose names are
+       listed under the chart) gets its numbers however few there are: a lone
+       event named on the chart as well as listed under it had a list whose
+       "1" matched nothing on the plot. */
+    if (rd && evs.some((e) => e.badge != null)) {
+      return evs.map((e) => ({ e, ex: sx(e.x), w: 0, fsz, row: null, y: rowY(null) }));
+    }
 
     return evs.map((e) => {
       const ex = sx(e.x);

@@ -268,6 +268,10 @@ body.rd .rd-badge circle { fill: var(--chart-bg); stroke: var(--ink-3); stroke-w
 body.rd .rd-badge text { font-family: var(--sans); font-weight: 600; fill: var(--ink-2); }
 body.rd .rd-badge-tie { fill: none; stroke: var(--ink-faint); stroke-width: 1; vector-effect: non-scaling-stroke; }
 body.rd .rd-evlist { list-style: none; margin: 12px 0 0; padding: 0; font-size: 13px; color: var(--ink-2); }
+/* straight under its chart the list starts in the band the copy button
+   keeps, so the numbers sit next to the badges they decode */
+body.rd .chart:has(> .chart-copy-btn) + .rd-evlist { margin-top: 0; }
+body.rd .rd-evlist + .rd-ckey { margin-top: 16px; }
 body.rd .rd-evlist li { display: flex; align-items: baseline; gap: 12px; padding: 3px 0; }
 body.rd .rd-evlist-n { width: 14px; flex-shrink: 0; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-evlist-l { flex-grow: 1; }
@@ -515,6 +519,7 @@ body.rd .rd-grow { flex-grow: 1; }
 
 /* ---------- latest and next polls ------------------------------------------ */
 body.rd .rd-pl-dek { margin-top: 12px; font-size: 17px; }
+@media (max-width: 640px) { body.rd .rd-pl-dek { font-size: 15px; } }
 body.rd .rd-pl-tabs { margin-top: 24px; }
 body.rd .rd-pl-ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-pl-ctl-l { color: var(--ink-3); }
@@ -741,10 +746,22 @@ body.rd .rd-dp-key { margin-top: 10px; }
   body.rd .rd-ld-panel .rd-iconbtn { display: none; }
   body.rd .rd-ld-panel.rd-hidden { display: block; }
 }
+/* A phone sets each leader as the canvas drew it: the name, the rating and
+   its change on one line, the dot and its interval on a full-width track
+   under them; the column heads only for the two-measure view */
 @media (max-width: 640px) {
   body.rd .rd-ld-panel .rd-sub { margin-top: 36px; }
-  body.rd .rd-dp-head, body.rd .rd-dp-row, body.rd .rd-dp-foot { grid-template-columns: 84px minmax(0, 1fr) 50px 44px; column-gap: 8px; }
-  body.rd .rd-dp-name { font-size: 14px; gap: 7px; }
+  body.rd .rd-dp-head, body.rd .rd-dp-row, body.rd .rd-dp-foot { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 8px; }
+  body.rd .rd-dp:not(.both) .rd-dp-head { display: none; }
+  body.rd .rd-dp-head > .rd-dp-axis { display: none; }
+  body.rd .rd-dp-head > span[role="columnheader"] { min-width: 52px; }
+  body.rd .rd-dp-row { grid-template-areas: "name now chg" "track track track"; row-gap: 0; padding-top: 6px; min-height: 0; }
+  body.rd .rd-dp-name { grid-area: name; font-size: 15px; gap: 8px; }
+  body.rd .rd-dp-now { grid-area: now; min-width: 52px; }
+  body.rd .rd-dp-chg { grid-area: chg; min-width: 52px; }
+  body.rd .rd-dp-track { grid-area: track; height: 26px; border-left: 0; border-right: 0; }
+  body.rd .rd-dp-foot > span:not(.rd-dp-axis) { display: none; }
+  body.rd .rd-dp-foot > .rd-dp-axis { grid-column: 1 / -1; }
   body.rd .rd-hb-seg { padding: 0 7px; font-size: 12px; }
   body.rd .rd-hb-seg b { font-size: 14px; }
 }
@@ -816,15 +833,27 @@ body.rd .rd-wv-key { margin-top: 16px; }
 body.rd .rd-wv-keytxt { color: var(--ink-3); }
 body.rd .rd-wv-charts { display: flex; gap: 48px; margin-top: 20px; }
 body.rd .rd-wv-chart { min-width: 0; }
+/* A phone sets each group as the canvas drew it: the name, and its figure,
+   margin and gap from all voters on one line, the dot and its interval on a
+   track the full width of the column under them. Squeezed into one row, the
+   track had a third of the column and the intervals were a few pixels long. */
 @media (max-width: 640px) {
   body.rd .rd-wv-tabs .rd-tab { padding: 0 8px; font-size: 14px; }
-  body.rd .rd-wv-sethead, body.rd .rd-wv-row, body.rd .rd-wv-axis { grid-template-columns: 88px minmax(0, 1fr) 62px 44px; column-gap: 8px; }
-  body.rd .rd-wv-lab { font-size: 13px; }
-  body.rd .rd-wv-v span { display: none; }
-  body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 4; }
-  body.rd .rd-wv-allcap { grid-row: 2; }
-  body.rd .rd-wv-vs { grid-row: 2; }
+  body.rd .rd-wv-sethead, body.rd .rd-wv-row, body.rd .rd-wv-axis { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 8px; }
+  body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1; }
+  body.rd .rd-wv-vs { grid-column: 3; grid-row: 1; }
+  body.rd .rd-wv-allcap { grid-column: 1 / -1; grid-row: 2; }
+  body.rd .rd-wv-row { grid-template-areas: "lab v d" "track track track"; row-gap: 0; padding-top: 8px; min-height: 0; }
+  body.rd .rd-wv-lab { grid-area: lab; font-size: 15px; }
+  body.rd .rd-wv-v { grid-area: v; font-size: 15px; }
+  body.rd .rd-wv-d { grid-area: d; font-size: 13px; min-width: 38px; }
+  body.rd .rd-wv-track { grid-area: track; height: 28px; }
+  body.rd .rd-wv-axis > span:not(.rd-wv-ticks) { display: none; }
+  body.rd .rd-wv-axis .rd-wv-ticks { grid-column: 1 / -1; }
   body.rd .rd-wv-charts { flex-direction: column; gap: 28px; }
+  /* the four party chips share one row, as drawn */
+  body.rd .rd-chips-row { display: flex; flex-wrap: nowrap; gap: 6px; }
+  body.rd .rd-chips-row .rd-chip { flex: 1 1 auto; justify-content: center; min-height: 44px; padding: 0 8px; gap: 5px; font-size: 13px; }
 }
 
 /* ---------- where One Nation's voters came from ------------------------------ */
@@ -851,6 +880,10 @@ body.rd .rd-mo-rsub { font-size: 12px; color: var(--ink-3); margin: 1px 0 6px; }
 body.rd .rd-mo-rbar { position: relative; }
 body.rd .rd-mo-rbar > span { position: absolute; left: 0; top: 0; bottom: 0; }
 body.rd .rd-mo-rbar > em { position: absolute; top: 50%; transform: translateY(-50%); font-style: normal; font-size: 15px; font-weight: 600; color: var(--onp-text); }
+body.rd .rd-mo-rbar > em.rd-mo-first { display: flex; flex-direction: column; gap: 2px; line-height: 1.15; }
+body.rd .rd-mo-big { font-size: 22px; font-weight: 600; }
+body.rd .rd-mo-nb { font-size: 12px; font-weight: 400; }
+body.rd .rd-mo-rbar > i.rd-mo-else { position: absolute; right: 8px; bottom: 6px; font-style: normal; font-size: 11px; }
 body.rd .rd-sm-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px; margin-top: 24px; }
 body.rd .rd-sm-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; font-weight: 600; }
 body.rd .rd-sm-top b { font-size: 18px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -943,15 +976,25 @@ body.rd .rd-iw-keybar i { position: absolute; right: -3px; top: -3px; bottom: -3
   body.rd .rd-is-leg { gap: 8px; }
   body.rd .rd-un-long { display: none; }
 }
+/* A phone sets the table as the canvas drew it: the key and the scale over
+   the rows, then each issue as its name and how many rank it top three, the
+   dots on a full-width strip, and the three figures with the verdict. */
+body.rd .rd-is-impw { display: none; }
 @media (max-width: 760px) {
-  body.rd .rd-is-head { display: none; }
-  body.rd .rd-is-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "lab verdict" "imp nums" "dots dots"; row-gap: 4px; padding: 10px 8px; min-height: 0; }
+  body.rd .rd-is-left { display: flex; flex-direction: column; }
+  body.rd .rd-is-head { display: flex; flex-direction: column; align-items: flex-start; order: -2; min-height: 0; padding: 0 0 6px; }
+  body.rd .rd-is-head > span:not(.rd-is-dotsh) { display: none; }
+  body.rd .rd-is-dotsh { grid-column: auto; }
+  body.rd .rd-is-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "lab imp" "dots dots" "nums verdict"; row-gap: 6px; padding: 10px 8px; min-height: 0; }
   body.rd .rd-is-lab { grid-area: lab; }
   body.rd .rd-is-verdict { grid-area: verdict; text-align: right; font-size: 13px; }
-  body.rd .rd-is-imp { grid-area: imp; }
-  body.rd .rd-is-nums { grid-area: nums; gap: 4px; }
+  body.rd .rd-is-imp { grid-area: imp; justify-self: end; gap: 0; }
+  body.rd .rd-is-imp .rd-is-bar { display: none; }
+  body.rd .rd-is-imp b, body.rd .rd-is-impw { display: inline; font-size: 12px; font-weight: 400; color: var(--ink-3); white-space: pre; }
+  body.rd .rd-is-nums { grid-area: nums; justify-content: flex-start; gap: 9px; font-size: 13px; }
+  body.rd .rd-is-nums b { width: auto; }
   body.rd .rd-is-row .rd-is-dots { grid-area: dots; height: 26px; }
-  body.rd .rd-is-axis { grid-template-columns: minmax(0, 1fr); padding: 0 8px; }
+  body.rd .rd-is-axis { order: -1; grid-template-columns: minmax(0, 1fr); padding: 0 8px; min-height: 22px; }
   body.rd .rd-is-axis > span:not(.rd-is-dots) { display: none; }
   body.rd .rd-iw-ctl { flex-direction: column; align-items: flex-start; gap: 0; }
   body.rd .rd-iw-tabs { overflow-x: auto; max-width: 100%; }
@@ -977,6 +1020,13 @@ body.rd .rd-un-bar > span { flex-grow: 0; flex-shrink: 1; min-width: 0; display:
 body.rd .rd-un-f { background: var(--line); color: var(--ink); }
 body.rd .rd-un-s { background: var(--ink-3); color: var(--bg); }
 body.rd .rd-un-u { background: var(--ink); color: var(--bg); justify-content: center; padding: 0 !important; }
+/* the phone's key under the bar: a swatch, the count, and what it counts */
+body.rd .rd-un-key { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.4; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+body.rd .rd-un-key > div { display: flex; align-items: center; gap: 8px; }
+body.rd .rd-un-key b { font-weight: 600; color: var(--ink); }
+body.rd .rd-un-sw { width: 12px; height: 12px; flex-shrink: 0; box-sizing: border-box; }
+body.rd .rd-un-sw.rd-un-f { border: 1px solid var(--ink-faint); }
+body.rd .rd-un-kn { width: 22px; flex-shrink: 0; }
 /* the two panels' titles share a line and their charts share a baseline, as
    the canvas drew them: the panel with fewer readings leaves its gap above
    the chart rather than above its title */
@@ -1027,8 +1077,12 @@ body.rd .rd-sp-ticks > span { position: absolute; top: 4px; transform: translate
 }
 @media (max-width: 640px) {
   body.rd .rd-un-panels { grid-template-columns: minmax(0, 1fr); row-gap: 28px; }
-  body.rd .rd-un-bar { height: 38px; }
+  body.rd .rd-un-bar { height: 36px; }
   body.rd .rd-un-bar > span { padding: 0 10px; font-size: 17px; }
+  /* the title on its own line, the bracket's words on one line under it,
+     running left past the bracket as far as they need, as drawn */
+  body.rd .rd-un-100h { align-items: flex-start; min-height: 54px; }
+  body.rd .rd-un-100b { top: 24px; white-space: nowrap; direction: rtl; }
   body.rd .rd-un-sm { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; }
   body.rd .rd-sp-head, body.rd .rd-sp-row, body.rd .rd-sp-axis { grid-template-columns: 86px minmax(0, 1fr) 54px 40px; column-gap: 8px; }
   body.rd .rd-sp-head b { grid-column: 1 / span 4; }

@@ -52,6 +52,9 @@ function RdPrimary({ rangeId }) {
   const lastM = D.aggPrimary[D.aggPrimary.length - 1];
   const NAME = { oth: "Others & independents" };
   const SHORT = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "Others" };
+  /* a phone's line ends carry the parties' letters, as the canvas drew them:
+     the full names don't fit beside a 350px plot */
+  const ABBR = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", oth: "OTH" };
   const parts = ["alp", "lnp", "grn", "onp", "oth"].map((id) => ({
     id, color: D.PARTIES[id].color, name: NAME[id] || D.PARTIES[id].name,
     v: now[id], was: base ? base[id] : null, ci: (lastM.ci && lastM.ci[id]) || 0,
@@ -92,7 +95,7 @@ function RdPrimary({ rangeId }) {
   const chartSeries = parts.slice().reverse().map((p) => ({
     id: p.id, label: p.name, color: p.color, points: series(pts, p.id),
     rdWidth: p.id === "oth" ? 2 : 2.5, dashed: p.id === "oth", dash: p.id === "oth" ? "6 4" : undefined,
-    opacity: hidden[p.id] ? 0 : 1, endLabel: narrow ? null : SHORT[p.id], rdCap: 4,
+    opacity: hidden[p.id] ? 0 : 1, endLabel: narrow ? ABBR[p.id] : SHORT[p.id], rdCap: 4,
   }));
   const areas = visible.map((p) => ({
     id: "ci-" + p.id, color: p.color, className: "ci-band", edge: false,
@@ -179,6 +182,7 @@ function RdPrimary({ rangeId }) {
           fmt={(v) => v.toFixed(1)}
           copy={{ title: "Primary vote", sub: story.head, legend: parts.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
         />
+        {badges && <RdEventList list={badges.list} />}
         <RdKey className="rd-ckey" items={[
           { kind: "dot", color: "var(--ink-3)", label: "One poll" },
           { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
@@ -187,7 +191,6 @@ function RdPrimary({ rangeId }) {
           <span className="rd-grow"></span>
           <RdHow term="primary-vote" from="Primary vote" />
         </RdKey>
-        {badges && <RdEventList list={badges.list} />}
       </div>
     </RdSec>
   );
@@ -203,6 +206,9 @@ const RD_LEAD_ORDER = ["alb", "taylor", "hanson"];
 function RdHeadBar({ label, right, rightColor, segs, cis }) {
   const total = segs.reduce((s, x) => s + x.v, 0);
   const neither = Math.max(0, 100 - total);
+  /* "neither" is named only where it fits: a phone's tenth of the bar is
+     narrower than the word, and the canvas left that one blank */
+  const narrow = useNarrow("(max-width: 640px)");
   return (
     <div className="rd-hb">
       <div className="rd-hb-top"><b>{label}</b><span style={{ color: rightColor ? inkOf(rightColor) : undefined }}>{right}</span></div>
@@ -215,7 +221,7 @@ function RdHeadBar({ label, right, rightColor, segs, cis }) {
         ))}
         {neither > 0.5 && (
           <span className="rd-hb-seg rd-hb-neither" style={{ flexBasis: neither + "%", order: segs.length === 2 ? 1 : 99 }}>
-            {neither >= 7 ? "neither" : ""}</span>
+            {neither >= (narrow ? 14 : 7) ? "neither" : ""}</span>
         )}
       </div>
       {cis && (
@@ -326,8 +332,10 @@ function RdLeadership({ rangeId }) {
     const run = (ka, kb) => pts.filter((r) => r[ka] != null && r[kb] != null).map((r) => ({ x: r.x, y: +(r[ka] - r[kb]).toFixed(1), ym: r.ym }));
     return [
       { id: "ley", label: "over Ley", color: opp.color, points: run("alb_pref", "ley_pref"), rdWidth: 2.5, endCap: false },
-      { id: "taylor", label: "over " + opp.short, color: opp.color, points: run("alb_pref", "taylor_pref"), rdWidth: 2.5, endLabel: narrow ? null : "over " + opp.short },
-      { id: "hanson", label: "over " + han.short, color: han.color, points: run("alb_prefH", "hanson_prefH"), rdWidth: 2.5, endLabel: narrow ? null : "over " + han.short },
+      /* the lines are named at their ends on a phone too, as the canvas drew
+         them: no key under the chart names them */
+      { id: "taylor", label: "over " + opp.short, color: opp.color, points: run("alb_pref", "taylor_pref"), rdWidth: 2.5, endLabel: "over " + opp.short },
+      { id: "hanson", label: "over " + han.short, color: han.color, points: run("alb_prefH", "hanson_prefH"), rdWidth: 2.5, endLabel: "over " + han.short },
     ].filter((s) => s.points.length);
   })();
   /* each poll's own lead in each head-to-head it asked: the opposition
@@ -351,10 +359,10 @@ function RdLeadership({ rangeId }) {
   const threeSeries = (() => {
     const run = (k) => pts.filter((r) => r[k] != null).map((r) => ({ x: r.x, y: r[k], ym: r.ym }));
     return [
-      { id: "alb3", label: pm.short, color: pm.color, points: run("alb_pref3"), rdWidth: 2.5, endLabel: narrow ? null : pm.short },
-      { id: "han3", label: han.short, color: han.color, points: run("hanson_pref3"), rdWidth: 2.5, endLabel: narrow ? null : han.short },
+      { id: "alb3", label: pm.short, color: pm.color, points: run("alb_pref3"), rdWidth: 2.5, endLabel: pm.short },
+      { id: "han3", label: han.short, color: han.color, points: run("hanson_pref3"), rdWidth: 2.5, endLabel: han.short },
       { id: "ley3", label: "Ley", color: opp.color, points: run("ley_pref3"), rdWidth: 2.5, endCap: true },
-      { id: "tay3", label: opp.short, color: opp.color, points: run("taylor_pref3"), rdWidth: 2.5, endLabel: narrow ? null : opp.short },
+      { id: "tay3", label: opp.short, color: opp.color, points: run("taylor_pref3"), rdWidth: 2.5, endLabel: opp.short },
     ].filter((s) => s.points.length);
   })();
   const firstThree = threeSeries.length ? Math.min(...threeSeries.map((s) => s.points[0].x)) : null;
@@ -364,7 +372,9 @@ function RdLeadership({ rangeId }) {
     firstThree != null && firstThree - xDomain[0] > 0.2 ? { x: "left", y: threeTop * 0.62, text: "Three-way questions began in " + (() => { const r = LM.find((m) => m.alb_pref3 != null); return r ? rdMonthYear(r.ym) : ""; })(), cls: "rd-note-it" } : null,
     leyRun && leyRun.points.length ? { x: leyRun.points[leyRun.points.length - 1].x, y: leyRun.points[leyRun.points.length - 1].y, dy: 18, text: "Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 } : null,
   ].filter(Boolean);
-  const chartPad = narrow ? { l: 34, r: 6, t: 26, b: 28 } : { l: 40, r: 12, t: 30, b: 30 };
+  /* a phone's title runs the chart's width, so the Ley → Taylor flag needs
+     its own band above the plot or it prints over the title */
+  const chartPad = narrow ? { l: 34, r: 6, t: 40, b: 28 } : { l: 40, r: 12, t: 30, b: 30 };
   const lchart = (key, title, props) => (
     <div className="card rd-card rd-ld-chart" key={key}>
       <div className="rd-chead"><span className="rd-chead-t">{title}</span></div>
@@ -416,7 +426,7 @@ function RdLeadership({ rangeId }) {
     const series = drawn.flatMap(({ Ld, runs: rs }) => rs.map((d) => ({
       id: Ld.id + (d.era ? "-" + d.era : ""), label: d.era === "ley" ? "Ley" : Ld.short, color: Ld.color,
       points: d.rows.map((r) => ({ x: r.x, y: r.v })), rdWidth: 2.5, clipX: d.clip,
-      endCap: d.era !== "ley", endLabel: narrow || d.era === "ley" ? null : Ld.short,
+      endCap: d.era !== "ley", endLabel: d.era === "ley" ? null : Ld.short,
     })));
     const areas = drawn.flatMap(({ Ld, runs: rs }) => rs.map((d) => ({
       id: "ci-" + Ld.id + (d.era ? "-" + d.era : ""), color: Ld.color, className: "ci-band", edge: false, clipX: d.clip,
@@ -630,10 +640,15 @@ function RdDirection({ rangeId }) {
   const last = pts[pts.length - 1];
   const base = bondi ? M.find((d) => d.ym === bondi.date.slice(0, 7)) : null;
   const gapNow = last ? Math.abs(last.wrong - last.right) : null;
-  const brackets = last && !narrow ? [{ x: last.x, y0: last.wrong, y1: last.right, lines: [
+  /* the gap is named where it is drawn, on a phone too, as the canvas did:
+     three short lines beside the bracket rather than a note under the chart */
+  const brackets = !last ? [] : !narrow ? [{ x: last.x, y0: last.wrong, y1: last.right, lines: [
     gapNow.toFixed(1) + " points apart in " + D.monthNameFull(Number(last.ym.slice(5))),
     base ? "up from " + Math.abs(base.wrong - base.right).toFixed(1) + " in " + D.monthNameFull(Number(base.ym.slice(5))) + ", before Bondi" : null,
-  ].filter(Boolean) }] : last ? [{ x: last.x, y0: last.wrong, y1: last.right, dx: 4, lines: [] }] : [];
+  ].filter(Boolean) }] : [{ x: last.x, y0: last.wrong, y1: last.right, dx: 4, lines: [
+    gapNow.toFixed(1) + " points apart", "in " + D.monthNameFull(Number(last.ym.slice(5))) + (base ? ";" : ""),
+    base ? Math.abs(base.wrong - base.right).toFixed(1) + " before Bondi" : null,
+  ].filter(Boolean) }];
   const evs = bondi ? [bondi] : [];
   const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
   const counts = {};
@@ -685,12 +700,11 @@ function RdDirection({ rangeId }) {
           fmt={(v) => v.toFixed(1)}
           copy={{ title: "National direction", sub: head, legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
         />
+        {badges && <RdEventList list={badges.list} />}
         <RdKey className="rd-ckey" items={[
           { kind: "dot", color: "var(--ink-3)", label: "One poll" },
           { kind: "lineband", color: "var(--ink-3)", label: "Monthly average, adjusted for each pollster’s lean, and its 95% interval" },
         ]} />
-        {badges && <RdEventList list={badges.list} />}
-        {narrow && gapNow != null && <p className="rd-note">{gapNow.toFixed(1)} points apart in {D.monthNameFull(Number(last.ym.slice(5)))}{base ? "; " + Math.abs(base.wrong - base.right).toFixed(1) + " before Bondi" : ""}.</p>}
       </div>
       <HowTo paras={[
         <>Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals.</>,
@@ -1072,13 +1086,19 @@ function RdSwitching({ rangeId }) {
     </svg>
   ) : (
     <div className="rd-mo-rows">
-      {all.map((c) => (
+      {/* the parties named as the canvas named them, and the first bar
+          spelling out what its two parts are, as the laptop's mosaic does */}
+      {all.map((c, i) => (
         <div key={c.id} className="rd-mo-row">
-          <div className="rd-mo-rtop"><b style={{ color: c.ink }}>{c.kept ? "One Nation" : LONG[c.id]}</b><b>≈ {fmt1(c.kept ? keptPts : c.pts)} pts</b></div>
+          <div className="rd-mo-rtop"><b style={{ color: c.ink }}>{c.kept ? "One Nation" : c.id === "oth" ? "Others & independents" : NAME[c.id]}</b><b>≈ {fmt1(c.kept ? keptPts : c.pts)} pts</b></div>
           <div className="rd-mo-rsub"><span>{fmt1(c.w)}% of 2025 voters</span><span>{c.kept ? Math.round(c.rate) + "% still back it" : Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + " of the gain"}</span></div>
           <div className="rd-mo-rbar" style={{ height: Math.max(22, c.w * 3.6), background: c.tint }}>
             <span style={{ width: c.rate + "%", background: c.kept ? "var(--onp-deep)" : "var(--onp)" }}></span>
-            {!c.kept && <em style={{ left: "calc(" + c.rate + "% + 8px)" }}>{fmt1(c.rate)}%</em>}
+            {!c.kept && i === 0 ? (
+              <em className="rd-mo-first" style={{ left: "calc(" + c.rate + "% + 8px)" }}>
+                <span className="rd-mo-big">{fmt1(c.rate)}%</span><span className="rd-mo-nb">now back One Nation</span></em>
+            ) : !c.kept && <em style={{ left: "calc(" + c.rate + "% + 8px)" }}>{fmt1(c.rate)}%</em>}
+            {!c.kept && i === 0 && <i className="rd-mo-else" style={{ color: c.ink }}>Stayed or went elsewhere</i>}
           </div>
         </div>
       ))}
@@ -1255,7 +1275,7 @@ function RdIssues({ rangeId = "all" }) {
            onClick={() => setSel(x.id)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSel(x.id); } }}
            aria-label={x.label + ": " + (x.imp ? Math.round(x.imp.v) + "% put it in their top three" : "not asked") + "; " + (x.own ? P.map((q) => pName(q) + " " + Math.round(x.own.v[q])).join(", ") + "; " + v.text : "no three-way figures")}>
         <span className="rd-is-lab">{x.label}</span>
-        <span className="rd-is-imp">{x.imp ? <><span className="rd-is-bar"><span style={{ width: x.imp.v + "%" }}></span></span><b>{Math.round(x.imp.v)}%</b></> : <span className="rd-is-na">not asked</span>}</span>
+        <span className="rd-is-imp">{x.imp ? <><span className="rd-is-bar"><span style={{ width: x.imp.v + "%" }}></span></span><b>{Math.round(x.imp.v)}%</b><span className="rd-is-impw"> rank it top three</span></> : <span className="rd-is-na">not asked</span>}</span>
         <span className="rd-is-dots" aria-hidden="true">
           {[20, 30, 40, 50].map((g) => <span key={g} className="rd-is-gl" style={{ left: dx(g) + "%" }}></span>)}
           <span className="rd-is-third" style={{ left: dx(100 / 3) + "%" }}></span>
@@ -1593,22 +1613,29 @@ function RdUndecided({ rangeId }) {
         <>
           <div className="card rd-card rd-un-100">
             <div className="rd-un-100h"><b>Of every 100 voters</b><span className="rd-un-100b" style={{ width: (soft100 + und100) + "%" }}>About {soft100 + und100} in 100 could still move</span></div>
-            <div className="rd-un-100l">
-              <span style={{ flexBasis: firm100 + "%" }}><b>Firm</b> {narrow ? "" : "named a party and don’t expect to change"}</span>
-              {narrow ? (
-                /* a phone has no room over a four-point segment: the two
-                   labels share the span over both, in the bar's order */
-                <span style={{ flexBasis: (soft100 + und100) + "%" }} className="rd-un-pair"><b>Not firm</b> · <b>Undecided</b></span>
-              ) : <>
+            {/* a phone keys the bar underneath, as the canvas drew it: a
+                four-point segment has no room for its number or its name */}
+            {!narrow && (
+              <div className="rd-un-100l">
+                <span style={{ flexBasis: firm100 + "%" }}><b>Firm</b> named a party and don’t expect to change</span>
                 <span style={{ flexBasis: soft100 + "%" }}><b>Not firm</b> <span className="rd-un-long">might still change</span></span>
                 <span style={{ flexBasis: und100 + "%" }} className="rd-un-und"><b>Undecided</b></span>
-              </>}
-            </div>
+              </div>
+            )}
             <div className="rd-un-bar" role="img" aria-label={`Of every 100 voters, about ${firm100} are firm, ${soft100} not firm and ${und100} undecided`}>
-              <span className="rd-un-f" style={{ flexBasis: firm100 + "%" }}>{firm100}</span>
-              <span className="rd-un-s" style={{ flexBasis: soft100 + "%" }}>{soft100}</span>
-              <span className="rd-un-u" style={{ flexBasis: und100 + "%" }}>{und100}</span>
+              <span className="rd-un-f" style={{ flexBasis: firm100 + "%" }}>{narrow ? "" : firm100}</span>
+              <span className="rd-un-s" style={{ flexBasis: soft100 + "%" }}>{narrow ? "" : soft100}</span>
+              <span className="rd-un-u" style={{ flexBasis: und100 + "%" }}>{narrow ? "" : und100}</span>
             </div>
+            {narrow && (
+              <div className="rd-un-key" aria-hidden="true">
+                {[["f", firm100, "Firm:", "named a party and don’t expect to change"],
+                  ["s", soft100, "Not firm:", "named a party but might change"],
+                  ["u", und100, "Undecided:", "can’t say who they’d vote for"]].map(([k, n, b, t]) => (
+                  <div key={k}><span className={"rd-un-sw rd-un-" + k}></span><b className="rd-un-kn">{n}</b><span><b>{b}</b> {t}</span></div>
+                ))}
+              </div>
+            )}
             <p className="rd-note">Approximate: combines {rdList(first.houses)}’s undecided share ({u.toFixed(1)}%) with {rdList(soft.houses)}’s firmness question ({Math.round(sf)}% of those who named a party). Pollsters ask these questions differently.</p>
           </div>
           <RdSub head={(() => { const m = [slopeOf(first), slopeOf(soft)].filter(Boolean); return m.every((f) => f.p >= 0.05 / m.length) ? "Steady since the election" : "Moving since the election"; })()}

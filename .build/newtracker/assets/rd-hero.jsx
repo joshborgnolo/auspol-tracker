@@ -403,8 +403,8 @@ function RdHero(p) {
           copy={{ title: chartTitle.replace(/, %$/, ""), sub: basisWords + (unc ? " · weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
                   legend: keyItems.filter(Boolean).filter((k) => k.kind !== "ring" && k.kind !== "dot").map((k) => ({ label: k.label, color: k.color, kind: k.kind === "dash" ? "dashed" : k.kind === "band" ? "shade" : "line" })) }}
         />
-        <RdKey className="rd-ckey" items={keyItems} />
         {badges && <RdEventList list={badges.list} />}
+        <RdKey className="rd-ckey" items={keyItems} />
         {narrow && cmpAvail && <RdCheck checked={showSynth} onChange={setShowSynth}>{cmpBox}</RdCheck>}
       </div>
       <RdFoot how={{ href: "/preference-flows/" }}>
