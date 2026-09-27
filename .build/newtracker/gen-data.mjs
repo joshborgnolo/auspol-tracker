@@ -1793,7 +1793,7 @@ const onSources = onSourceWaves.length ? {
       x: w.x, ym: w.ym, pollster: w.pollster, dateLabel: fwLabel(w.dateStart, w.date), released: w.date,
       sample: w.sample ?? null, v: w.share[g.id], pts: w.pts[g.id],
     }));
-    const monthly = onMonthly.map((m) => ({ ym: m.ym, x: m.x, v: r1(m.sp.share[g.id]), k: m.k }));
+    const monthly = onMonthly.map((m) => ({ ym: m.ym, x: m.x, v: r1(m.sp.share[g.id]), ci95: r1(1.96 * m.sp.se[g.id]), k: m.k }));
     let now = null;
     if (onNow) {
       now = { v: r1(onNow.share[g.id]), ci95: r1(1.96 * onNow.se[g.id]), pts: r1(onNow.pts[g.id]) };
@@ -1807,12 +1807,14 @@ const onSources = onSourceWaves.length ? {
     /* The panel's other view: the rates themselves - the share of this
        group's 2025 voters now backing One Nation - before any split. The
        reading is built as every current reading is (six-week window, change
-       on 30 days earlier), the line month by month, a dot per poll. */
+       on 30 days earlier), the line month by month inside its 95% interval,
+       a dot per poll. A month rests on two to four polls and a group on its
+       share of each, so the band is what says a one-month jump is noise. */
     const rate = {
       now: currentReading(onRateRows[g.id], null, SPARSE_K),
       monthly: MONTHS.map((ym) => {
         const m = monthWithSe(onRateRows[g.id], null, ym);
-        return m && { ym, x: mx(ym), v: r1(m.v), k: m.n };
+        return m && { ym, x: mx(ym), v: r1(m.v), ci95: r1(1.96 * m.se), k: m.n };
       }).filter(Boolean),
       polls: onSourceWaves.filter((w) => w.toOn[g.id] != null).map((w) => ({
         x: w.x, ym: w.ym, pollster: w.pollster, dateLabel: fwLabel(w.dateStart, w.date), released: w.date,

@@ -971,6 +971,9 @@ body.rd .rd-sm-top b { font-size: 18px; font-weight: 600; color: var(--ink); fon
 body.rd .rd-sm .chart:has(> .chart-copy-btn) { padding-bottom: 0; }
 body.rd .rd-sm .chart-copy-btn { display: none; }
 body.rd .rd-sm-ylab { fill: var(--ink-3); }
+/* the small multiples' key sits under the grid with no rule of its own: the
+   section's foot draws the rule below it */
+body.rd .rd-sm-key { margin-top: 12px; padding-top: 0; border-top: 0; }
 @media (max-width: 900px) { body.rd .rd-sm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px; } }
 @media (max-width: 640px) { body.rd .rd-sm-grid { column-gap: 16px; } body.rd .rd-sm-top { font-size: 13px; } body.rd .rd-sm-top b { font-size: 16px; } }
 

@@ -1282,12 +1282,14 @@ function RdSwitching({ rangeId }) {
       + (sig.length > 1 ? "rates have" : "rate has") + " " + (sig.every((f) => f.fit.b < 0) ? "fallen" : sig.every((f) => f.fit.b > 0) ? "risen" : "moved");
   const ks = cols.flatMap((c) => c.sr.rate.monthly.map((m) => m.k)).filter((k) => k != null);
   const kLo = Math.min(...ks), kHi = Math.max(...ks);
-  const subDek = "Share of each party’s 2025 voters now backing One Nation: each dot is one poll, and the lines are monthly averages. "
-    + "Monthly figures rest on " + (kLo === kHi ? rdNumWord(kLo) : rdNumWord(kLo) + " to " + rdNumWord(kHi)) + " polls, so single-month moves of a few points are noise.";
+  const subDek = "Share of each party’s 2025 voters now backing One Nation: each dot is one poll, and the lines are monthly averages, shaded by their 95% interval. "
+    + "A month rests on " + (kLo === kHi ? rdNumWord(kLo) : rdNumWord(kLo) + " to " + rdNumWord(kHi)) + " polls, so a move that stays inside the band is noise.";
   const monthsIn = D.MONTHS.filter((ym) => D.mx(ym) >= x0 && D.mx(ym) <= x1 + 0.01);
   const smTicks = monthsIn.length ? [monthsIn[0], monthsIn[Math.floor((monthsIn.length - 1) / 2)], monthsIn[monthsIn.length - 1]]
     .filter((v, i, a) => a.indexOf(v) === i).map((ym) => ({ x: D.mx(ym), label: D.monthName(Number(ym.slice(5))) })) : [];
-  const smTop = Math.max(50, Math.ceil(Math.max(...cols.flatMap((c) => pollRate(c.id).map((d) => d.y))) / 25) * 25);
+  /* the scale clears the polls and the tops of the monthly bands */
+  const smTop = Math.max(50, Math.ceil(Math.max(...cols.flatMap((c) => pollRate(c.id).map((d) => d.y)
+    .concat(c.sr.rate.monthly.map((m) => m.v + (m.ci95 || 0))))) / 25) * 25);
 
   /* ---- the mosaic ------------------------------------------------------------ */
   const GAP = 4, H = narrow ? 0 : 300;
@@ -1398,7 +1400,11 @@ function RdSwitching({ rangeId }) {
       <RdSub head={subHead} dek={subDek} />
       <div className="rd-sm-grid">
         {cols.map((c) => {
-          const pts = filterPts(c.sr.rate.monthly, x0).map((m) => ({ x: m.x, y: m.v, ym: m.ym }));
+          const pts = filterPts(c.sr.rate.monthly, x0).map((m) => ({ x: m.x, y: m.v, ym: m.ym, ci: m.ci95 }));
+          /* each month inside its 95% interval: a month rests on two to four
+             polls, and a party on its share of each, so the band is what
+             tells a one-month jump from a move */
+          const band = pts.filter((p) => p.ci != null).map((p) => ({ x: p.x, y0: Math.max(0, p.y - p.ci), y1: p.y + p.ci }));
           const dots = pollRate(c.id).filter((d) => d.x >= x0 && d.x <= x1 + 0.02).map((d) => ({ x: d.x, y: d.y, color: c.color, label: LONG[c.id], meta: d.meta }));
           return (
             <div key={c.id} className="card rd-card rd-sm">
@@ -1408,15 +1414,22 @@ function RdSwitching({ rangeId }) {
                 yTickFmt={() => ""} xTicks={smTicks} baseline
                 series={[{ id: c.id, label: LONG[c.id], color: c.color, rdWidth: narrow ? 2 : 2.5, endCap: false, points: pts }]}
                 spine={pts} scatter={dots}
+                areas={band.length >= 2 ? [{ id: "ci-" + c.id, color: c.color, className: "ci-band", edge: false, points: band }] : []}
                 notes={rdYTicks(25, smTop, 25).map((v) => ({ x: "left", y: v, dy: -4, text: v + "%", size: 11, cls: "rd-sm-ylab" }))}
                 tooltipTitle={(i) => (pts[i] ? window.AP.monthLabelFull(pts[i].ym) : "")}
+                extraRows={(i) => (pts[i] && pts[i].ci != null ? [{ label: "95% interval", value: "±" + pts[i].ci.toFixed(1) }] : [])}
                 fmt={(v) => v.toFixed(1)}
-                copy={{ title: LONG[c.id] + " now backing One Nation", sub: "Share of the party’s 2025 voters, month by month" }}
+                copy={{ title: LONG[c.id] + " now backing One Nation", sub: "Share of the party’s 2025 voters, month by month",
+                        legend: [{ label: "Monthly average", color: c.color, kind: "line" }, { label: "95% interval", color: c.color, kind: "band" }] }}
               />
             </div>
           );
         })}
       </div>
+      <RdKey className="rd-ckey rd-sm-key" items={[
+        { kind: "dot", color: "var(--ink-3)", label: "One poll" },
+        { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
+      ]} />
       <RdFoot how={{ term: "vote-switching", from: "Where One Nation’s voters came from" }}>
         2025 vote is as respondents recall it. {narrow ? "Bar heights" : "Column widths"} use the AEC 2025 first-preference result.
       </RdFoot>

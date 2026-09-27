@@ -1963,8 +1963,14 @@ function OnSourcesPanel({ rangeId }) {
     return { sr, pts, dots };
   }).filter((d) => d.pts.length >= 1);
   if (!drawn.length) return null;
-  const vals = drawn.flatMap((d) => d.pts.map((p) => p.v).concat(d.dots.map((p) => p.y)));
+  const vals = drawn.flatMap((d) => d.pts.map((p) => p.v + (p.ci95 || 0)).concat(d.dots.map((p) => p.y)));
   const hi = Math.ceil((Math.max(...vals) + 3) / 10) * 10;
+  /* each month inside its 95% interval: a month rests on two to four polls
+     and a party on its share of each, so the band is what tells a one-month
+     jump from a move */
+  const areas = drawn.map((d) => ({ id: "ci-" + d.sr.id, color: d.sr.color, className: "ci-band", edge: false, smooth: true,
+    points: d.pts.filter((p) => p.ci95 != null).map((p) => ({ x: p.x, y0: Math.max(0, p.v - p.ci95), y1: p.v + p.ci95 })) }))
+    .filter((a) => a.points.length >= 2);
   const yTicks = [];
   for (let v = 10; v < hi; v += 10) yTicks.push(v);
   const spine = drawn.reduce((a, d) => (d.pts.length > a.length ? d.pts : a), []);
@@ -2056,17 +2062,23 @@ function OnSourcesPanel({ rangeId }) {
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         series={drawn.map((d) => ({ id: d.sr.id, label: d.sr.label, color: d.sr.color, points: series(d.pts, "v"),
                                     endLabel: d.sr.short || d.sr.label.replace(/ voters$/, "") }))}
-        spine={series(spine, "v")}
+        spine={series(spine, "v")} areas={areas}
         scatter={drawn.flatMap((d) => d.dots)} pollFacet="twopp"
         tooltipTitle={(i) => window.AP.monthLabelFull(spine[i].ym)}
+        extraRows={(i) => {
+          const ym = spine[i] && spine[i].ym;
+          const cs = drawn.map((d) => { const p = d.pts.find((q) => q.ym === ym); return p && p.ci95 != null ? (d.sr.short || d.sr.label.replace(/ voters$/, "")) + " ±" + p.ci95.toFixed(1) : null; }).filter(Boolean);
+          return cs.length ? [{ label: "95% intervals", value: cs.join(", ") }] : [];
+        }}
         fmt={(v) => v.toFixed(1)}
         // the readings above are this chart's key on the page; the image
         // carries them as its legend, with the figure each one shows
         copy={{ legend: reads.filter((r) => drawn.some((d) => d.sr.id === r.sr.id))
-          .map(({ sr, v }) => ({ label: `${sr.label}  ${v.toFixed(1)}%`, color: sr.color, kind: "line" })) }}
+          .map(({ sr, v }) => ({ label: `${sr.label}  ${v.toFixed(1)}%`, color: sr.color, kind: "line" }))
+          .concat([{ label: "Shading: 95% interval", color: "var(--ink-3)", kind: "shade" }]) }}
       />
       <HowTo paras={[
-        <>Each dot is one poll’s {rated ? "figure" : "split"} and the lines are monthly averages; the
+        <>Each dot is one poll’s {rated ? "figure" : "split"} and the lines are monthly averages, shaded by their 95% interval; the
         figures above pool the last {S.now ? S.now.window : "six weeks"} of polls.{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where One Nation’s new voters came from")}>
