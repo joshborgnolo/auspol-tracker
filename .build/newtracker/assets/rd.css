@@ -757,7 +757,7 @@ body.rd .rd-dp-sw { width: 10px; height: 10px; border-radius: 5px; flex-shrink: 
 body.rd .rd-dp-track { position: relative; height: 34px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
 body.rd .rd-dp-zero { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px dashed var(--ink-faint); }
 body.rd .rd-dp-ci { position: absolute; top: 50%; height: 2.5px; transform: translateY(-50%); border-radius: 2px; transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
-body.rd .rd-dp-link { position: absolute; top: 50%; height: 2px; transform: translateY(-50%); opacity: 0.6; }
+body.rd .rd-dp-link { position: absolute; top: 50%; height: 2px; transform: translateY(-50%); opacity: 0.6; transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
 body.rd .rd-dp-dot { position: absolute; top: 50%; width: 11px; height: 11px; box-sizing: border-box; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 2px var(--bg); transition: left .32s cubic-bezier(.4, .1, .25, 1); }
 body.rd .rd-dp-dot.open { background: var(--bg); border: 2px solid; }
 body.rd .rd-dp-now { text-align: right; font-size: 15px; font-weight: 600; color: var(--ink); }
@@ -844,7 +844,14 @@ body.rd .rd-wv-row { min-height: 32px; }
 body.rd .rd-wv-lab { font-size: 15px; color: var(--ink); }
 body.rd .rd-wv-track { position: relative; height: 32px; }
 body.rd .rd-wv-track::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), var(--line-2) calc(25% - 1px), var(--line-2) 25%); opacity: 0.8; }
-body.rd .rd-wv-all { position: absolute; top: -6px; bottom: -6px; border-left: 1.5px dashed var(--ink); transform: translateX(-0.75px); z-index: 1; }
+/* The all-voters line is the board's stroke: 1.5px, 4 on and 3 off. A CSS
+   dashed border can't set its dash, and Chrome draws it as specks. */
+body.rd .rd-wv-plot { position: relative; }
+body.rd .rd-wv-allline { position: absolute; top: 22px; bottom: 26px; left: 0; right: 0; display: grid; grid-template-columns: 180px minmax(0, 1fr) 120px 70px; column-gap: 16px; pointer-events: none; }
+body.rd .rd-wv-allline > span { grid-column: 2; position: relative; }
+body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; bottom: 0; width: 1.5px; transform: translateX(-0.75px); z-index: 1;
+  background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-wv-all { display: none; }
 body.rd .rd-wv-ci { position: absolute; top: 50%; height: 12px; transform: translateY(-50%); box-sizing: border-box; border-left: 2px solid currentColor; border-right: 2px solid currentColor; z-index: 2;
   transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
 body.rd .rd-wv-ci::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; transform: translateY(-50%); background: currentColor; }
@@ -880,6 +887,11 @@ body.rd .rd-wv-chart { min-width: 0; }
   body.rd .rd-wv-track { grid-area: track; height: 28px; }
   body.rd .rd-wv-axis > span:not(.rd-wv-ticks) { display: none; }
   body.rd .rd-wv-axis .rd-wv-ticks { grid-column: 1 / -1; }
+  body.rd .rd-wv-allline { display: none; }
+  body.rd .rd-wv-all { display: block; }
+  /* the end ticks sit inside the track, as drawn, rather than half off it */
+  body.rd .rd-wv-ticks > span:first-child { transform: none; }
+  body.rd .rd-wv-ticks > span:last-child { transform: translateX(-100%); }
   body.rd .rd-wv-charts { flex-direction: column; gap: 28px; }
   /* the four party chips share one row, as drawn */
   body.rd .rd-chips-row { display: flex; flex-wrap: nowrap; gap: 6px; }

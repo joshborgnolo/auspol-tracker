@@ -238,14 +238,14 @@ function RdHeadBar({ label, right, rightColor, segs, cis }) {
   }, [key]);
   const isTight = (s) => tight.split("|").includes(s.name);
   return (
-    <div className="rd-hb">
+    <div className="rd-hb" data-hb={label}>
       <div className="rd-hb-top"><b>{label}</b><span style={{ color: rightColor ? inkOf(rightColor) : undefined }}>{right}</span></div>
       <div className="rd-hb-bar" ref={barRef}>
         {segs.map((s, i) => (
           <span key={s.name} className={"rd-hb-seg" + (i === segs.length - 1 && segs.length === 2 ? " end" : "") + (isTight(s) ? " tight" : "")}
-                aria-label={s.name + " " + s.v.toFixed(1)}
+                aria-label={s.name + " " + s.v.toFixed(1)} data-mk={s.mk}
                 style={{ flexBasis: s.v + "%", background: s.color, color: "var(--on-fill-" + s.party + ")", order: s.order != null ? s.order : i * 2 }}>
-            <span className="rd-hb-name">{s.name}</span><b>{s.v.toFixed(1)}</b>
+            <span className="rd-hb-name">{s.name}</span><b><RollNum value={s.v.toFixed(1)} /></b>
           </span>
         ))}
         {neither > 0.5 && (
@@ -258,7 +258,7 @@ function RdHeadBar({ label, right, rightColor, segs, cis }) {
           {/* ordered as the bar is, so a two-way's ± sits under its own
               leader either side of "neither" */}
           {segs.map((s, i) => <span key={s.name} className={i === segs.length - 1 && segs.length === 2 ? "end" : undefined}
-            style={{ flexBasis: s.v + "%", order: s.order != null ? s.order : i * 2 }}>{(isTight(s) ? s.name + " " : "") + (s.ci != null ? "±" + s.ci.toFixed(1) : "")}</span>)}
+            style={{ flexBasis: s.v + "%", order: s.order != null ? s.order : i * 2 }}>{isTight(s) ? s.name + " " : ""}{s.ci != null ? <>±<RollNum value={s.ci.toFixed(1)} /></> : null}</span>)}
           {neither > 0.5 && <span style={{ flexBasis: neither + "%", order: segs.length === 2 ? 1 : 99 }}></span>}
         </div>
       )}
@@ -318,22 +318,110 @@ function RdLeadership({ rangeId }) {
   })();
 
   /* ---- preferred PM: the bars ------------------------------------------- */
-  const seg = (Ld, k, order) => ({ name: Ld.short, v: get(k), color: Ld.color, party: Ld.id === "alb" ? "alp" : Ld.id === "taylor" ? "lnp" : "onp", ci: N[k] ? N[k].ci95 : null, order });
+  /* `mk` is who a segment IS across the switch, the way the chart's lines
+     are matched: the two-way's first Albanese and its Taylor and Hanson are
+     the three-way's ("3:" marks the three-way bar, so "Both", which shows the
+     two side by side, never pairs a segment with one still on screen). The
+     head-to-head Albanese has no three-way counterpart. */
+  const seg = (Ld, k, order, mk) => ({ name: Ld.short, v: get(k), color: Ld.color, party: Ld.id === "alb" ? "alp" : Ld.id === "taylor" ? "lnp" : "onp", ci: N[k] ? N[k].ci95 : null, order, mk });
   const two = get("alb_pref") != null && get("taylor_pref") != null
-    ? { label: pm.short + " v " + opp.short, segs: [seg(pm, "alb_pref", 0), seg(opp, "taylor_pref", 2)] } : null;
+    ? { label: pm.short + " v " + opp.short, segs: [seg(pm, "alb_pref", 0, "alb"), seg(opp, "taylor_pref", 2, "taylor")] } : null;
   const twoH = get("alb_prefH") != null && get("hanson_prefH") != null
-    ? { label: pm.short + " v " + han.short, segs: [seg(pm, "alb_prefH", 0), seg(han, "hanson_prefH", 2)] } : null;
+    ? { label: pm.short + " v " + han.short, segs: [seg(pm, "alb_prefH", 0, "alb-h2h"), seg(han, "hanson_prefH", 2, "hanson")] } : null;
   const three = ["alb_pref3", "taylor_pref3", "hanson_pref3"].every((k) => get(k) != null)
-    ? [seg(pm, "alb_pref3"), seg(opp, "taylor_pref3"), seg(han, "hanson_pref3")].sort((x, y) => y.v - x.v) : null;
+    ? [seg(pm, "alb_pref3", null, "3:alb"), seg(opp, "taylor_pref3", null, "3:taylor"), seg(han, "hanson_pref3", null, "3:hanson")].sort((x, y) => y.v - x.v) : null;
   const leadOf = (segs) => { const w = segs[0].v >= segs[1].v ? segs[0] : segs[1]; return { who: w, m: Math.abs(segs[0].v - segs[1].v) }; };
   const headBar = (h) => {
     const l = leadOf(h.segs);
-    return <RdHeadBar key={h.label} label={h.label} right={l.who.name + " +" + l.m.toFixed(1)} rightColor={l.who.color} segs={h.segs} cis />;
+    return <RdHeadBar key={h.label} label={h.label} right={<>{l.who.name} +<RollNum value={l.m.toFixed(1)} /></>} rightColor={l.who.color} segs={h.segs} cis />;
   };
   const threeBar = three && (
-    <RdHeadBar key="three" label="All three" right={three[0].name + " +" + (three[0].v - three[1].v).toFixed(1) + " on " + three[1].name}
+    <RdHeadBar key="three" label="All three" right={<>{three[0].name} +<RollNum value={(three[0].v - three[1].v).toFixed(1)} /> on {three[1].name}</>}
                rightColor={three[0].color} segs={three} cis />
   );
+  /* ---- the bars travel between the questions ------------------------------
+     As the old design's readout does: a leader in both questions keeps his
+     segment, which slides and resizes to where the other question puts him,
+     and its figure rolls from the old reading to the new. The layouts are
+     different shapes (two bars of two, one bar of three), so React builds new
+     elements and nothing can be matched by position: they are matched by
+     `mk`. FLIP - where each segment was is read at the click, BEFORE React
+     replaces anything, so a switch made mid-flight starts from where the
+     segment is on screen; after the render each is put back there with a
+     transform and flex-basis and released onto the shared 320ms curve.
+     Anything with no counterpart (the head-to-head Albanese, "neither", a
+     bar's heading and ± row) fades in. */
+  const hbsRef = React.useRef(null);
+  const hbSnap = React.useRef(null);
+  const ppmPick = (v) => {
+    const root = hbsRef.current;
+    if (root && v !== ppmView) {
+      const rr = root.getBoundingClientRect();
+      const segsAt = {};
+      root.querySelectorAll("[data-mk]").forEach((n) => {
+        const r = n.getBoundingClientRect();
+        segsAt[n.dataset.mk] = { x: r.left - rr.left, y: r.top - rr.top, w: r.width,
+          d: [...n.querySelectorAll("b .roll-reel")].map((x) => x.style.getPropertyValue("--d")) };
+      });
+      hbSnap.current = { segs: segsAt, bars: new Set([...root.querySelectorAll("[data-hb]")].map((b) => b.dataset.hb)) };
+    }
+    choosePpm(v);
+  };
+  React.useLayoutEffect(() => {
+    const prev = hbSnap.current, root = hbsRef.current;
+    hbSnap.current = null;
+    if (!prev || !root) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const MS = window.AP.MORPH_MS || 320, EASE = "cubic-bezier(.4, .1, .25, 1)";
+    const alias = (k) => (k.startsWith("3:") ? k.slice(2) : "3:" + k);
+    const nodes = [...root.querySelectorAll("[data-mk]")];
+    const here = new Set(nodes.map((n) => n.dataset.mk));
+    const release = [];
+    const fadeIn = (n) => {
+      n.style.transition = "none"; n.style.opacity = "0";
+      release.push(() => { n.style.transition = "opacity " + MS + "ms " + EASE; n.style.opacity = ""; });
+    };
+    // a figure rolls from the old reading: its reels start on the old digits,
+    // paired from the right (units under units), as an odometer lines up
+    const seed = (n, was) => {
+      const cur = [...n.querySelectorAll("b .roll-reel")];
+      const off = cur.length - was.length;
+      cur.forEach((reel, i) => {
+        const from = was[i - off], to = reel.style.getPropertyValue("--d");
+        if (from == null || from === "" || from === to) return;
+        reel.style.transition = "none"; reel.style.setProperty("--d", from);
+        release.push(() => { reel.style.transition = ""; reel.style.setProperty("--d", to); });
+      });
+    };
+    const moving = [];
+    nodes.forEach((n) => {
+      const k = n.dataset.mk;
+      // its own self if it was there; else its counterpart in the other
+      // question, provided that one has gone (under "Both" it hasn't)
+      const a = prev.segs[k] || (!here.has(alias(k)) && prev.segs[alias(k)]) || null;
+      if (!a) { fadeIn(n); return; }
+      seed(n, a.d);
+      moving.push({ n, a, basis: n.style.flexBasis });
+      // start at the old width, so the flex row lays out the old shape first
+      n.style.transition = "none";
+      n.style.flexBasis = (a.w / n.parentElement.getBoundingClientRect().width) * 100 + "%";
+    });
+    [...root.querySelectorAll("[data-hb]")].forEach((b) => {
+      if (prev.bars.has(b.dataset.hb)) return;
+      b.querySelectorAll(".rd-hb-top, .rd-hb-cis, .rd-hb-neither").forEach(fadeIn);
+    });
+    const rr = root.getBoundingClientRect();
+    moving.forEach((m) => {
+      const r = m.n.getBoundingClientRect();
+      m.n.style.transform = "translate(" + (m.a.x - (r.left - rr.left)) + "px, " + (m.a.y - (r.top - rr.top)) + "px)";
+      release.push(() => {
+        m.n.style.transition = "transform " + MS + "ms " + EASE + ", flex-basis " + MS + "ms " + EASE;
+        m.n.style.transform = ""; m.n.style.flexBasis = m.basis;
+      });
+    });
+    void root.offsetWidth;          // commit every start state at once, then release them together
+    release.forEach((f) => f());
+  }, [ppmView]);
   const secondIsHanson = three && three[1].name === han.short;
   const ppmNote = (() => {
     if (ppmView === "two") {
@@ -607,9 +695,10 @@ function RdLeadership({ rangeId }) {
               {a && <span className="rd-dp-dot" style={{ left: dxp(a.v) + "%", background: Ld.color }}></span>}
               {both && f && <span className="rd-dp-dot open" style={{ left: dxp(f.v) + "%", borderColor: Ld.color }}></span>}
             </span>
-            <span role="cell" className="rd-dp-now">{a ? signed(a.v) : "—"}</span>
+            <span role="cell" className="rd-dp-now">{a ? <RollNum value={signed(a.v)} /> : "—"}</span>
             <span role="cell" className={"rd-dp-chg" + (!both && a && a.changeSig ? " sig" : "")}>
-              {both ? (f ? signed(f.v) : "—") : a && a.chg != null ? (Math.abs(a.chg) < 0.05 ? "→ 0.0" : rdArrow(a.chg) + " " + Math.abs(a.chg).toFixed(1)) : ""}</span>
+              {both ? (f ? <RollNum value={signed(f.v)} /> : "—")
+                : a && a.chg != null ? <>{Math.abs(a.chg) < 0.05 ? "→" : rdArrow(a.chg)} <RollNum value={Math.abs(a.chg) < 0.05 ? "0.0" : Math.abs(a.chg).toFixed(1)} /></> : ""}</span>
           </div>
         ))}
         <div className="rd-dp-foot" aria-hidden="true">
@@ -671,12 +760,12 @@ function RdLeadership({ rangeId }) {
       {story && <RdHed head={story.head} dek={story.dek} />}
       <div className={"rd-ld-grid" + (expanded ? " one" : "")}>
         {panel("ppm", "Preferred prime minister", "“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.",
-          <RdTabs swipe value={ppmView} onChange={choosePpm} ariaLabel="Preferred prime minister question"
+          <RdTabs swipe value={ppmView} onChange={ppmPick} ariaLabel="Preferred prime minister question"
                   options={[{ id: "two", label: "Two-way" }, { id: "three", label: "Three-way" }, { id: "both", label: "Both" }]}>
             {!narrow && expandBtn("ppm", "preferred prime minister")}
           </RdTabs>,
           <>
-            <div className="rd-hbs">
+            <div className="rd-hbs" ref={hbsRef}>
               {ppmView !== "three" && two && headBar(two)}
               {ppmView !== "three" && twoH && headBar(twoH)}
               {ppmView !== "two" && threeBar}
@@ -1037,8 +1126,13 @@ function RdDemographics({ rangeId = "all" }) {
         </div>
       )}
       <div className="card rd-card rd-wv-dots">
-        {tab.sets.map((st, i) => dotSet(st, i))}
-        {axis}
+        <div className="rd-wv-plot">
+          {tab.sets.map((st, i) => dotSet(st, i))}
+          {axis}
+          {/* one all-voters line from its label to the axis, through every set,
+              as the board draws it; a phone keeps it to each row's track */}
+          <div className="rd-wv-allline" aria-hidden="true"><span><i style={{ left: xp(all) + "%" }}></i></span></div>
+        </div>
         <RdKey className="rd-ckey rd-wv-key" items={[
           { kind: "dot-solid", color: pColor, label: "Clearly above or below all voters" },
           { kind: "dot-open", color: pColor, label: "Within the margin" },

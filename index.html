@@ -3593,7 +3593,7 @@ body.rd .rd-dp-sw { width: 10px; height: 10px; border-radius: 5px; flex-shrink: 
 body.rd .rd-dp-track { position: relative; height: 34px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
 body.rd .rd-dp-zero { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px dashed var(--ink-faint); }
 body.rd .rd-dp-ci { position: absolute; top: 50%; height: 2.5px; transform: translateY(-50%); border-radius: 2px; transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
-body.rd .rd-dp-link { position: absolute; top: 50%; height: 2px; transform: translateY(-50%); opacity: 0.6; }
+body.rd .rd-dp-link { position: absolute; top: 50%; height: 2px; transform: translateY(-50%); opacity: 0.6; transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
 body.rd .rd-dp-dot { position: absolute; top: 50%; width: 11px; height: 11px; box-sizing: border-box; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 2px var(--bg); transition: left .32s cubic-bezier(.4, .1, .25, 1); }
 body.rd .rd-dp-dot.open { background: var(--bg); border: 2px solid; }
 body.rd .rd-dp-now { text-align: right; font-size: 15px; font-weight: 600; color: var(--ink); }
@@ -3670,7 +3670,12 @@ body.rd .rd-wv-row { min-height: 32px; }
 body.rd .rd-wv-lab { font-size: 15px; color: var(--ink); }
 body.rd .rd-wv-track { position: relative; height: 32px; }
 body.rd .rd-wv-track::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), var(--line-2) calc(25% - 1px), var(--line-2) 25%); opacity: 0.8; }
-body.rd .rd-wv-all { position: absolute; top: -6px; bottom: -6px; border-left: 1.5px dashed var(--ink); transform: translateX(-0.75px); z-index: 1; }
+body.rd .rd-wv-plot { position: relative; }
+body.rd .rd-wv-allline { position: absolute; top: 22px; bottom: 26px; left: 0; right: 0; display: grid; grid-template-columns: 180px minmax(0, 1fr) 120px 70px; column-gap: 16px; pointer-events: none; }
+body.rd .rd-wv-allline > span { grid-column: 2; position: relative; }
+body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; bottom: 0; width: 1.5px; transform: translateX(-0.75px); z-index: 1;
+  background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-wv-all { display: none; }
 body.rd .rd-wv-ci { position: absolute; top: 50%; height: 12px; transform: translateY(-50%); box-sizing: border-box; border-left: 2px solid currentColor; border-right: 2px solid currentColor; z-index: 2;
   transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
 body.rd .rd-wv-ci::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; transform: translateY(-50%); background: currentColor; }
@@ -3702,6 +3707,10 @@ body.rd .rd-wv-chart { min-width: 0; }
   body.rd .rd-wv-track { grid-area: track; height: 28px; }
   body.rd .rd-wv-axis > span:not(.rd-wv-ticks) { display: none; }
   body.rd .rd-wv-axis .rd-wv-ticks { grid-column: 1 / -1; }
+  body.rd .rd-wv-allline { display: none; }
+  body.rd .rd-wv-all { display: block; }
+  body.rd .rd-wv-ticks > span:first-child { transform: none; }
+  body.rd .rd-wv-ticks > span:last-child { transform: translateX(-100%); }
   body.rd .rd-wv-charts { flex-direction: column; gap: 28px; }
   body.rd .rd-chips-row { display: flex; flex-wrap: nowrap; gap: 6px; }
   body.rd .rd-chips-row .rd-chip { flex: 1 1 auto; justify-content: center; min-height: 44px; padding: 0 8px; gap: 5px; font-size: 13px; }
@@ -57238,7 +57247,8 @@ function RdHeadBar({
   }, [key]);
   const isTight = s => tight.split("|").includes(s.name);
   return React.createElement("div", {
-    className: "rd-hb"
+    className: "rd-hb",
+    "data-hb": label
   }, React.createElement("div", {
     className: "rd-hb-top"
   }, React.createElement("b", null, label), React.createElement("span", {
@@ -57252,6 +57262,7 @@ function RdHeadBar({
     key: s.name,
     className: "rd-hb-seg" + (i === segs.length - 1 && segs.length === 2 ? " end" : "") + (isTight(s) ? " tight" : ""),
     "aria-label": s.name + " " + s.v.toFixed(1),
+    "data-mk": s.mk,
     style: {
       flexBasis: s.v + "%",
       background: s.color,
@@ -57260,7 +57271,9 @@ function RdHeadBar({
     }
   }, React.createElement("span", {
     className: "rd-hb-name"
-  }, s.name), React.createElement("b", null, s.v.toFixed(1)))), neither > 0.5 && React.createElement("span", {
+  }, s.name), React.createElement("b", null, React.createElement(RollNum, {
+    value: s.v.toFixed(1)
+  })))), neither > 0.5 && React.createElement("span", {
     className: "rd-hb-seg rd-hb-neither",
     style: {
       flexBasis: neither + "%",
@@ -57275,7 +57288,9 @@ function RdHeadBar({
       flexBasis: s.v + "%",
       order: s.order != null ? s.order : i * 2
     }
-  }, (isTight(s) ? s.name + " " : "") + (s.ci != null ? "±" + s.ci.toFixed(1) : ""))), neither > 0.5 && React.createElement("span", {
+  }, isTight(s) ? s.name + " " : "", s.ci != null ? React.createElement(React.Fragment, null, "\xB1", React.createElement(RollNum, {
+    value: s.ci.toFixed(1)
+  })) : null)), neither > 0.5 && React.createElement("span", {
     style: {
       flexBasis: neither + "%",
       order: segs.length === 2 ? 1 : 99
@@ -57341,23 +57356,24 @@ function RdLeadership({
       dek
     };
   })();
-  const seg = (Ld, k, order) => ({
+  const seg = (Ld, k, order, mk) => ({
     name: Ld.short,
     v: get(k),
     color: Ld.color,
     party: Ld.id === "alb" ? "alp" : Ld.id === "taylor" ? "lnp" : "onp",
     ci: N[k] ? N[k].ci95 : null,
-    order
+    order,
+    mk
   });
   const two = get("alb_pref") != null && get("taylor_pref") != null ? {
     label: pm.short + " v " + opp.short,
-    segs: [seg(pm, "alb_pref", 0), seg(opp, "taylor_pref", 2)]
+    segs: [seg(pm, "alb_pref", 0, "alb"), seg(opp, "taylor_pref", 2, "taylor")]
   } : null;
   const twoH = get("alb_prefH") != null && get("hanson_prefH") != null ? {
     label: pm.short + " v " + han.short,
-    segs: [seg(pm, "alb_prefH", 0), seg(han, "hanson_prefH", 2)]
+    segs: [seg(pm, "alb_prefH", 0, "alb-h2h"), seg(han, "hanson_prefH", 2, "hanson")]
   } : null;
-  const three = ["alb_pref3", "taylor_pref3", "hanson_pref3"].every(k => get(k) != null) ? [seg(pm, "alb_pref3"), seg(opp, "taylor_pref3"), seg(han, "hanson_pref3")].sort((x, y) => y.v - x.v) : null;
+  const three = ["alb_pref3", "taylor_pref3", "hanson_pref3"].every(k => get(k) != null) ? [seg(pm, "alb_pref3", null, "3:alb"), seg(opp, "taylor_pref3", null, "3:taylor"), seg(han, "hanson_pref3", null, "3:hanson")].sort((x, y) => y.v - x.v) : null;
   const leadOf = segs => {
     const w = segs[0].v >= segs[1].v ? segs[0] : segs[1];
     return {
@@ -57370,7 +57386,9 @@ function RdLeadership({
     return React.createElement(RdHeadBar, {
       key: h.label,
       label: h.label,
-      right: l.who.name + " +" + l.m.toFixed(1),
+      right: React.createElement(React.Fragment, null, l.who.name, " +", React.createElement(RollNum, {
+        value: l.m.toFixed(1)
+      })),
       rightColor: l.who.color,
       segs: h.segs,
       cis: true
@@ -57379,11 +57397,105 @@ function RdLeadership({
   const threeBar = three && React.createElement(RdHeadBar, {
     key: "three",
     label: "All three",
-    right: three[0].name + " +" + (three[0].v - three[1].v).toFixed(1) + " on " + three[1].name,
+    right: React.createElement(React.Fragment, null, three[0].name, " +", React.createElement(RollNum, {
+      value: (three[0].v - three[1].v).toFixed(1)
+    }), " on ", three[1].name),
     rightColor: three[0].color,
     segs: three,
     cis: true
   });
+  const hbsRef = React.useRef(null);
+  const hbSnap = React.useRef(null);
+  const ppmPick = v => {
+    const root = hbsRef.current;
+    if (root && v !== ppmView) {
+      const rr = root.getBoundingClientRect();
+      const segsAt = {};
+      root.querySelectorAll("[data-mk]").forEach(n => {
+        const r = n.getBoundingClientRect();
+        segsAt[n.dataset.mk] = {
+          x: r.left - rr.left,
+          y: r.top - rr.top,
+          w: r.width,
+          d: [...n.querySelectorAll("b .roll-reel")].map(x => x.style.getPropertyValue("--d"))
+        };
+      });
+      hbSnap.current = {
+        segs: segsAt,
+        bars: new Set([...root.querySelectorAll("[data-hb]")].map(b => b.dataset.hb))
+      };
+    }
+    choosePpm(v);
+  };
+  React.useLayoutEffect(() => {
+    const prev = hbSnap.current,
+      root = hbsRef.current;
+    hbSnap.current = null;
+    if (!prev || !root) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const MS = window.AP.MORPH_MS || 320,
+      EASE = "cubic-bezier(.4, .1, .25, 1)";
+    const alias = k => k.startsWith("3:") ? k.slice(2) : "3:" + k;
+    const nodes = [...root.querySelectorAll("[data-mk]")];
+    const here = new Set(nodes.map(n => n.dataset.mk));
+    const release = [];
+    const fadeIn = n => {
+      n.style.transition = "none";
+      n.style.opacity = "0";
+      release.push(() => {
+        n.style.transition = "opacity " + MS + "ms " + EASE;
+        n.style.opacity = "";
+      });
+    };
+    const seed = (n, was) => {
+      const cur = [...n.querySelectorAll("b .roll-reel")];
+      const off = cur.length - was.length;
+      cur.forEach((reel, i) => {
+        const from = was[i - off],
+          to = reel.style.getPropertyValue("--d");
+        if (from == null || from === "" || from === to) return;
+        reel.style.transition = "none";
+        reel.style.setProperty("--d", from);
+        release.push(() => {
+          reel.style.transition = "";
+          reel.style.setProperty("--d", to);
+        });
+      });
+    };
+    const moving = [];
+    nodes.forEach(n => {
+      const k = n.dataset.mk;
+      const a = prev.segs[k] || !here.has(alias(k)) && prev.segs[alias(k)] || null;
+      if (!a) {
+        fadeIn(n);
+        return;
+      }
+      seed(n, a.d);
+      moving.push({
+        n,
+        a,
+        basis: n.style.flexBasis
+      });
+      n.style.transition = "none";
+      n.style.flexBasis = a.w / n.parentElement.getBoundingClientRect().width * 100 + "%";
+    });
+    [...root.querySelectorAll("[data-hb]")].forEach(b => {
+      if (prev.bars.has(b.dataset.hb)) return;
+      b.querySelectorAll(".rd-hb-top, .rd-hb-cis, .rd-hb-neither").forEach(fadeIn);
+    });
+    const rr = root.getBoundingClientRect();
+    moving.forEach(m => {
+      const r = m.n.getBoundingClientRect();
+      m.n.style.transform = "translate(" + (m.a.x - (r.left - rr.left)) + "px, " + (m.a.y - (r.top - rr.top)) + "px)";
+      release.push(() => {
+        m.n.style.transition = "transform " + MS + "ms " + EASE + ", flex-basis " + MS + "ms " + EASE;
+        m.n.style.transform = "";
+        m.n.style.flexBasis = m.basis;
+      });
+    });
+    void root.offsetWidth;
+    release.forEach(f => f());
+  }, [ppmView]);
   const secondIsHanson = three && three[1].name === han.short;
   const ppmNote = (() => {
     if (ppmView === "two") {
@@ -57939,10 +58051,16 @@ function RdLeadership({
     })), React.createElement("span", {
       role: "cell",
       className: "rd-dp-now"
-    }, a ? signed(a.v) : "—"), React.createElement("span", {
+    }, a ? React.createElement(RollNum, {
+      value: signed(a.v)
+    }) : "—"), React.createElement("span", {
       role: "cell",
       className: "rd-dp-chg" + (!both && a && a.changeSig ? " sig" : "")
-    }, both ? f ? signed(f.v) : "—" : a && a.chg != null ? Math.abs(a.chg) < 0.05 ? "→ 0.0" : rdArrow(a.chg) + " " + Math.abs(a.chg).toFixed(1) : ""))), React.createElement("div", {
+    }, both ? f ? React.createElement(RollNum, {
+      value: signed(f.v)
+    }) : "—" : a && a.chg != null ? React.createElement(React.Fragment, null, Math.abs(a.chg) < 0.05 ? "→" : rdArrow(a.chg), " ", React.createElement(RollNum, {
+      value: Math.abs(a.chg) < 0.05 ? "0.0" : Math.abs(a.chg).toFixed(1)
+    })) : ""))), React.createElement("div", {
       className: "rd-dp-foot",
       "aria-hidden": "true"
     }, React.createElement("span", null), React.createElement("span", {
@@ -58023,7 +58141,7 @@ function RdLeadership({
   }, panel("ppm", "Preferred prime minister", "“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.", React.createElement(RdTabs, {
     swipe: true,
     value: ppmView,
-    onChange: choosePpm,
+    onChange: ppmPick,
     ariaLabel: "Preferred prime minister question",
     options: [{
       id: "two",
@@ -58036,7 +58154,8 @@ function RdLeadership({
       label: "Both"
     }]
   }, !narrow && expandBtn("ppm", "preferred prime minister")), React.createElement(React.Fragment, null, React.createElement("div", {
-    className: "rd-hbs"
+    className: "rd-hbs",
+    ref: hbsRef
   }, ppmView !== "three" && two && headBar(two), ppmView !== "three" && twoH && headBar(twoH), ppmView !== "two" && threeBar), ppmNote && React.createElement("p", {
     className: "rd-note rd-ld-note"
   }, ppmNote), mainPpmChart, ppmView === "both" && threeChart, React.createElement(RdKey, {
@@ -58735,7 +58854,16 @@ function RdDemographics({
     }
   }), pp.label))), React.createElement("div", {
     className: "card rd-card rd-wv-dots"
-  }, tab.sets.map((st, i) => dotSet(st, i)), axis, React.createElement(RdKey, {
+  }, React.createElement("div", {
+    className: "rd-wv-plot"
+  }, tab.sets.map((st, i) => dotSet(st, i)), axis, React.createElement("div", {
+    className: "rd-wv-allline",
+    "aria-hidden": "true"
+  }, React.createElement("span", null, React.createElement("i", {
+    style: {
+      left: xp(all) + "%"
+    }
+  })))), React.createElement(RdKey, {
     className: "rd-ckey rd-wv-key",
     items: [{
       kind: "dot-solid",
