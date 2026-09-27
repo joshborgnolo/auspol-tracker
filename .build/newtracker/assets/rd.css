@@ -852,9 +852,16 @@ body.rd .rd-wv-allline > span { grid-column: 2; position: relative; }
 body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; bottom: 0; width: 1.5px; transform: translateX(-0.75px); z-index: 1;
   background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); transition: left .32s cubic-bezier(.4, .1, .25, 1); }
 body.rd .rd-wv-all { display: none; }
-body.rd .rd-wv-ci { position: absolute; top: 50%; height: 12px; transform: translateY(-50%); box-sizing: border-box; border-left: 2px solid currentColor; border-right: 2px solid currentColor; z-index: 2;
+body.rd .rd-wv-ci { position: absolute; top: 50%; height: 12px; transform: translateY(-50%); z-index: 2;
   transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
 body.rd .rd-wv-ci::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; transform: translateY(-50%); background: currentColor; }
+/* The end ticks carry the dots' background ring, so the all-voters line
+   stops short of a tick it passes under, as it does at a dot. Without it the
+   1.5px dash and the 2px tick land on different sub-pixels, and a sliver of
+   dash shows beside the tick. The bar, drawn after, covers the inner side. */
+body.rd .rd-wv-ci > i { position: absolute; top: 0; bottom: 0; width: 2px; background: currentColor; box-shadow: 0 0 0 2px var(--bg); }
+body.rd .rd-wv-ci > i:first-child { left: 0; }
+body.rd .rd-wv-ci > i:last-child { right: 0; }
 body.rd .rd-wv-dot { position: absolute; top: 50%; width: 13px; height: 13px; box-sizing: border-box; border-radius: 50%; border: 2px solid; transform: translate(-50%, -50%); z-index: 3; box-shadow: 0 0 0 2px var(--bg);
   transition: left .32s cubic-bezier(.4, .1, .25, 1), background-color .2s ease; }
 body.rd .rd-wv-dot.open { background: var(--bg); }
@@ -1045,6 +1052,13 @@ body.rd .rd-iw-lbar > span { position: absolute; left: 0; top: 0; bottom: 0; bor
 body.rd .rd-iw-lrow.sig .rd-iw-lbar > span { background: var(--ink-2); }
 body.rd .rd-iw-lrow.all .rd-iw-lbar > span { background: var(--ink); }
 body.rd .rd-iw-lbar > i { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); transform: translateX(-1px); }
+/* a switch of grouping or issue slides each bar to its new share, the
+   leadership bars' ease and length, while the figure beside it rolls */
+body.rd .rd-iw-bar > span, body.rd .rd-iw-lbar > span { transition: width .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease; }
+body.rd .rd-iw-bar > i, body.rd .rd-iw-lbar > i { transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+@media (prefers-reduced-motion: reduce) {
+  body.rd .rd-iw-bar > span, body.rd .rd-iw-lbar > span, body.rd .rd-iw-bar > i, body.rd .rd-iw-lbar > i { transition: none; }
+}
 body.rd .rd-iw-lv { text-align: right; font-size: 14px; color: var(--ink-2); white-space: nowrap; }
 body.rd .rd-iw-lrow.sig .rd-iw-lv, body.rd .rd-iw-lrow.all .rd-iw-lv { font-weight: 600; color: var(--ink); }
 @media (max-width: 640px) {

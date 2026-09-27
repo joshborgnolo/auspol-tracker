@@ -3676,9 +3676,12 @@ body.rd .rd-wv-allline > span { grid-column: 2; position: relative; }
 body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; bottom: 0; width: 1.5px; transform: translateX(-0.75px); z-index: 1;
   background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); transition: left .32s cubic-bezier(.4, .1, .25, 1); }
 body.rd .rd-wv-all { display: none; }
-body.rd .rd-wv-ci { position: absolute; top: 50%; height: 12px; transform: translateY(-50%); box-sizing: border-box; border-left: 2px solid currentColor; border-right: 2px solid currentColor; z-index: 2;
+body.rd .rd-wv-ci { position: absolute; top: 50%; height: 12px; transform: translateY(-50%); z-index: 2;
   transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
 body.rd .rd-wv-ci::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; transform: translateY(-50%); background: currentColor; }
+body.rd .rd-wv-ci > i { position: absolute; top: 0; bottom: 0; width: 2px; background: currentColor; box-shadow: 0 0 0 2px var(--bg); }
+body.rd .rd-wv-ci > i:first-child { left: 0; }
+body.rd .rd-wv-ci > i:last-child { right: 0; }
 body.rd .rd-wv-dot { position: absolute; top: 50%; width: 13px; height: 13px; box-sizing: border-box; border-radius: 50%; border: 2px solid; transform: translate(-50%, -50%); z-index: 3; box-shadow: 0 0 0 2px var(--bg);
   transition: left .32s cubic-bezier(.4, .1, .25, 1), background-color .2s ease; }
 body.rd .rd-wv-dot.open { background: var(--bg); }
@@ -3842,6 +3845,11 @@ body.rd .rd-iw-lbar > span { position: absolute; left: 0; top: 0; bottom: 0; bor
 body.rd .rd-iw-lrow.sig .rd-iw-lbar > span { background: var(--ink-2); }
 body.rd .rd-iw-lrow.all .rd-iw-lbar > span { background: var(--ink); }
 body.rd .rd-iw-lbar > i { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); transform: translateX(-1px); }
+body.rd .rd-iw-bar > span, body.rd .rd-iw-lbar > span { transition: width .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease; }
+body.rd .rd-iw-bar > i, body.rd .rd-iw-lbar > i { transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+@media (prefers-reduced-motion: reduce) {
+  body.rd .rd-iw-bar > span, body.rd .rd-iw-lbar > span, body.rd .rd-iw-bar > i, body.rd .rd-iw-lbar > i { transition: none; }
+}
 body.rd .rd-iw-lv { text-align: right; font-size: 14px; color: var(--ink-2); white-space: nowrap; }
 body.rd .rd-iw-lrow.sig .rd-iw-lv, body.rd .rd-iw-lrow.all .rd-iw-lv { font-weight: 600; color: var(--ink); }
 @media (max-width: 640px) {
@@ -58616,7 +58624,7 @@ function RdDemographics({
         width: xp(v + ci) - xp(v - ci) + "%",
         color: pColor
       }
-    }), React.createElement("span", {
+    }, React.createElement("i", null), React.createElement("i", null)), React.createElement("span", {
       className: "rd-wv-dot" + (sig ? "" : " open"),
       style: {
         left: xp(v) + "%",
@@ -59651,7 +59659,9 @@ function RdIssues({
       style: {
         left: a.v + "%"
       }
-    })), React.createElement("b", null, Math.round(c.v), sig ? React.createElement("em", null, diff > 0 ? "▲" : "▼") : null));
+    })), React.createElement("b", null, React.createElement(RollNum, {
+      value: String(Math.round(c.v))
+    }), sig ? React.createElement("em", null, diff > 0 ? "▲" : "▼") : null));
   };
   const groupLong = g => rdCap(issWho(g).replace(/^voters for other parties and independents$/, "Others voters").replace(/^Nationals, LNP and CLP voters$/, "Nationals, LNP, CLP voters"));
   const groupShort = g => g.replace(/^Nationals, LNP and CLP$/, "Nationals, LNP, CLP");
@@ -59659,14 +59669,14 @@ function RdIssues({
     k,
     v: issGroupVerdict(gtab, k)
   })).filter(x => x.v).sort((a, b) => b.v.gap - a.v.gap)[0] || {}).k || gtab.issues[0];
-  const whomRow = (g, k) => {
+  const whomRow = (g, k, i) => {
     const c = g ? gtab.cells[g] && gtab.cells[g][k] : allOf(k);
     if (!c) return null;
     const a = allOf(k);
     const diff = g && a ? c.v - a.v : 0;
     const sig = g && a && Math.abs(diff) > c.ci;
     return React.createElement("div", {
-      key: g || "all",
+      key: g ? "r" + i : "all",
       className: "rd-iw-lrow" + (g ? "" : " all") + (sig ? " sig" : ""),
       role: "row",
       title: "± " + c.ci.toFixed(1) + " is the 95% margin"
@@ -59686,7 +59696,9 @@ function RdIssues({
     })), React.createElement("span", {
       role: "cell",
       className: "rd-iw-lv"
-    }, Math.round(c.v), sig ? " " + (diff > 0 ? "▲" : "▼") : ""));
+    }, React.createElement(RollNum, {
+      value: String(Math.round(c.v))
+    }), sig ? " " + (diff > 0 ? "▲" : "▼") : ""));
   };
   const tabs = React.createElement(RdTabs, {
     swipe: true,
@@ -59855,7 +59867,7 @@ function RdIssues({
     className: "rd-iw-list",
     role: "table",
     "aria-label": "Share of each group putting " + (ISS_PHRASE[whomIssue] || whomIssue) + " in its top three"
-  }, whomRow(null, whomIssue), gtab.groups.map(g => whomRow(g, whomIssue)))) : React.createElement(React.Fragment, null, React.createElement("div", {
+  }, whomRow(null, whomIssue), gtab.groups.map((g, i) => whomRow(g, whomIssue, i)))) : React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-iw-ctl"
   }, React.createElement("span", {
     className: "rd-iw-by"
@@ -59891,8 +59903,8 @@ function RdIssues({
     scope: "row"
   }, "All voters"), gtab.issues.map(k => React.createElement("td", {
     key: k
-  }, whomCell(null, k)))), gtab.groups.map(g => React.createElement("tr", {
-    key: g
+  }, whomCell(null, k)))), gtab.groups.map((g, i) => React.createElement("tr", {
+    key: "r" + i
   }, React.createElement("th", {
     scope: "row"
   }, groupLong(g)), gtab.issues.map(k => React.createElement("td", {

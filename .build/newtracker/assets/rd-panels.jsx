@@ -1016,7 +1016,7 @@ function RdDemographics({ rangeId = "all" }) {
             <span role="cell" className="rd-wv-lab">{g.label}</span>
             <span className="rd-wv-track" aria-hidden="true">
               <span className="rd-wv-all" style={{ left: xp(all) + "%" }}></span>
-              <span className="rd-wv-ci" style={{ left: xp(v - ci) + "%", width: xp(v + ci) - xp(v - ci) + "%", color: pColor }}></span>
+              <span className="rd-wv-ci" style={{ left: xp(v - ci) + "%", width: xp(v + ci) - xp(v - ci) + "%", color: pColor }}><i></i><i></i></span>
               <span className={"rd-wv-dot" + (sig ? "" : " open")} style={{ left: xp(v) + "%", background: sig ? pColor : undefined, borderColor: pColor }}></span>
             </span>
             <span role="cell" className="rd-wv-v"><b>{v.toFixed(1)}%</b> <span>±{ci.toFixed(1)}</span></span>
@@ -1578,7 +1578,7 @@ function RdIssues({ rangeId = "all" }) {
     return (
       <span className={"rd-iw-cell" + (g ? "" : " all") + (sig ? " sig" : "")} title={"± " + c.ci.toFixed(1) + " is the 95% margin"}>
         <span className="rd-iw-bar"><span style={{ width: c.v + "%" }}></span>{g && a && <i style={{ left: a.v + "%" }}></i>}</span>
-        <b>{Math.round(c.v)}{sig ? <em>{diff > 0 ? "▲" : "▼"}</em> : null}</b>
+        <b><RollNum value={String(Math.round(c.v))} />{sig ? <em>{diff > 0 ? "▲" : "▼"}</em> : null}</b>
       </span>
     );
   };
@@ -1590,18 +1590,22 @@ function RdIssues({ rangeId = "all" }) {
   const whomIssue = !gtab ? null : whomK && gtab.issues.includes(whomK) ? whomK
     : (gtab.issues.map((k) => ({ k, v: issGroupVerdict(gtab, k) })).filter((x) => x.v)
         .sort((a, b) => b.v.gap - a.v.gap)[0] || {}).k || gtab.issues[0];
-  const whomRow = (g, k) => {
+  /* Rows are keyed by their PLACE, not their group, in both layouts: a
+     switch of grouping (age -> gender) or of issue keeps each row's bar and
+     figure, so the bar slides to its new share and the figure rolls to it -
+     the leadership bars' motion - instead of the table being torn down. */
+  const whomRow = (g, k, i) => {
     const c = g ? gtab.cells[g] && gtab.cells[g][k] : allOf(k);
     if (!c) return null;
     const a = allOf(k);
     const diff = g && a ? c.v - a.v : 0;
     const sig = g && a && Math.abs(diff) > c.ci;
     return (
-      <div key={g || "all"} className={"rd-iw-lrow" + (g ? "" : " all") + (sig ? " sig" : "")} role="row"
+      <div key={g ? "r" + i : "all"} className={"rd-iw-lrow" + (g ? "" : " all") + (sig ? " sig" : "")} role="row"
            title={"± " + c.ci.toFixed(1) + " is the 95% margin"}>
         <span role="rowheader">{g ? groupShort(g) : "All voters"}</span>
         <span className="rd-iw-lbar" aria-hidden="true"><span style={{ width: c.v + "%" }}></span>{g && a && <i style={{ left: a.v + "%" }}></i>}</span>
-        <span role="cell" className="rd-iw-lv">{Math.round(c.v)}{sig ? " " + (diff > 0 ? "▲" : "▼") : ""}</span>
+        <span role="cell" className="rd-iw-lv"><RollNum value={String(Math.round(c.v))} />{sig ? " " + (diff > 0 ? "▲" : "▼") : ""}</span>
       </div>
     );
   };
@@ -1686,7 +1690,7 @@ function RdIssues({ rangeId = "all" }) {
                   <p className="rd-iw-ltitle"><b>{I.labels[whomIssue] || whomIssue} in their top three, %</b><br />{gSource}</p>
                   <div className="rd-iw-list" role="table" aria-label={"Share of each group putting " + (ISS_PHRASE[whomIssue] || whomIssue) + " in its top three"}>
                     {whomRow(null, whomIssue)}
-                    {gtab.groups.map((g) => whomRow(g, whomIssue))}
+                    {gtab.groups.map((g, i) => whomRow(g, whomIssue, i))}
                   </div>
                 </>
               ) : (
@@ -1707,7 +1711,7 @@ function RdIssues({ rangeId = "all" }) {
                       <thead><tr><th scope="col"><span className="sr-only">Group</span></th>{gtab.issues.map((k) => <th scope="col" key={k}>{I.labels[k] || k}</th>)}</tr></thead>
                       <tbody>
                         <tr className="all"><th scope="row">All voters</th>{gtab.issues.map((k) => <td key={k}>{whomCell(null, k)}</td>)}</tr>
-                        {gtab.groups.map((g) => <tr key={g}><th scope="row">{groupLong(g)}</th>{gtab.issues.map((k) => <td key={k}>{whomCell(g, k)}</td>)}</tr>)}
+                        {gtab.groups.map((g, i) => <tr key={"r" + i}><th scope="row">{groupLong(g)}</th>{gtab.issues.map((k) => <td key={k}>{whomCell(g, k)}</td>)}</tr>)}
                       </tbody>
                     </table>
                   </div>
