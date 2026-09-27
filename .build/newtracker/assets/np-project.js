@@ -228,12 +228,23 @@ function npProject(nowOverride) {
        35, not 56), a full cadence otherwise. The honest row then is the
        next UNVERIFIED expectation, not a "(or N days ago)" asterisk on a
        release verified never filed. */
+    /* A month-end house's late step is a week too: RedBridge's record is 28
+       or 35 days and nothing else (29 Mar -> 3 May, 28 Jun -> 2 Aug), so a
+       confirmed-absent Sunday rolls to the Sunday after it. Skip that one as
+       well and the wave is not late any more, it is gone - the slot is the
+       next month-end's, stepped from the original slot. */
     let rolled = false;
     {
       const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
+      let meSlot = release;
       while ((c.skipped || []).includes(isoDay(release))) {
         rolled = true;
-        if (monthEnd) { field = release = stepFrom(release); continue; }
+        if (monthEnd) {
+          if (release === meSlot) release = meSlot + 7 * DAY_MS;
+          else release = meSlot = stepFrom(meSlot);
+          field = release;
+          continue;
+        }
         field += (c.releaseDow != null ? 7 : c.cadence) * DAY_MS;
         release = relOf(field);
       }

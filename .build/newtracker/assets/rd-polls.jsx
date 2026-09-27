@@ -119,7 +119,10 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     if (r.missed) return { date: wdm(r.release), sub: when(r.closesIn), missed: true };
     if (r.overdue) {
       const edge = r.release + r.winHalf * DAY_MS;
-      return { date: wdm(edge), sub: when(r.closesIn) + " · due " + (r.inDays === -1 ? "yesterday" : -r.inDays + " days ago") };
+      /* past its hour on the day itself it isn't "due 0 days ago": it is
+         simply not out yet */
+      return { date: wdm(edge), sub: when(r.closesIn) + (r.inDays === 0 ? " · not out yet"
+        : " · due " + (r.inDays === -1 ? "yesterday" : -r.inDays + " days ago")) };
     }
     const alt = altOf(r), hr = hourWords(r);
     return { date: wdm(r.release), sub: (inHours(r) || when(r.inDays)) + (alt ? " · or " + dm(alt) : hr ? " · " + hr : "") };

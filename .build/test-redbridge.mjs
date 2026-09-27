@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 
 process.env.RB_LIB = "1";
-const { parsePdf, guardNewWave } = await import("./extract-redbridge.mjs");
+const { parsePdf, parseAfrTopic, guardNewWave } = await import("./extract-redbridge.mjs");
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
@@ -81,3 +81,21 @@ const guardErrs = guardNewWave(w, "2026-08-02");
 assert.deepEqual(guardErrs, [], `guard errors: ${guardErrs.join(" | ")}`);
 
 console.log("PASS: July 2026 wave parses to the committed values and passes the guard");
+
+// The AFR topic page: only the topic's own story list (tag.assetsConnection)
+// counts - a sidebar promo in another content unit must not - and a page
+// with no list is null (no evidence), never an empty list.
+{
+  const blob = { loaderData: { "1-0-20-0": {
+    contentUnitsDetails: { contentUnits: [{ assets: [{ urls: { canonical: { path: "/life/car-review-20260927-p60yrf" } }, dates: { firstPublished: "2026-09-26T19:00:00Z" } }] }] },
+    tag: { assetsConnection: { assets: [
+      { urls: { canonical: { path: "/politics/state-poll-20260915-p60xev" } }, dates: { firstPublished: "2026-09-15T09:55:00Z" } },
+      { urls: { canonical: { path: "/politics/federal/wave-20260830-p60srn" } }, dates: { firstPublished: "2026-08-30T08:00:00Z" } },
+    ] } },
+  } } };
+  const page = (o) => `<script>window.__staticRouterHydrationData = JSON.parse(${JSON.stringify(JSON.stringify(o))});</script>`;
+  assert.deepEqual(parseAfrTopic(page(blob)).map((x) => x.firstPublished), ["2026-09-15T09:55:00Z", "2026-08-30T08:00:00Z"]);
+  assert.equal(parseAfrTopic(page({ loaderData: { a: { tag: { assetsConnection: { assets: [] } } } } })), null);
+  assert.equal(parseAfrTopic("<html>no blob</html>"), null);
+  console.log("PASS: AFR topic list parses the topic's own stories, and no list is no evidence");
+}

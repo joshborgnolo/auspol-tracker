@@ -438,6 +438,29 @@ function parseTable2(txt) {
 // Nation …`, `Other parties and candidates …`) — cells are the ALP share,
 // the Coalition share, then "-". We keep the ALP share per bucket (the
 // complement is implied).
+// The AFR topic page's own story list, from the router hydration JSON the
+// page ships (window.__staticRouterHydrationData = JSON.parse("…")): every
+// loaderData entry's tag.assetsConnection.assets, as {path, firstPublished}.
+// Null when the blob or the list is missing - no list is no evidence, which
+// the caller must not read as "nothing published".
+function parseAfrTopic(html) {
+  const m = html.match(/window\.__staticRouterHydrationData\s*=\s*JSON\.parse\(("(?:[^"\\]|\\.)*")\)/);
+  if (!m) return null;
+  let data;
+  try { data = JSON.parse(JSON.parse(m[1])); } catch { return null; }
+  const out = [];
+  for (const entry of Object.values(data?.loaderData || {})) {
+    const assets = entry?.tag?.assetsConnection?.assets;
+    if (!Array.isArray(assets)) continue;
+    for (const a of assets) {
+      const path = a?.urls?.canonical?.path || a?.urls?.published?.afr?.path;
+      const firstPublished = a?.dates?.firstPublished;
+      if (typeof path === "string" && typeof firstPublished === "string" && Date.parse(firstPublished)) out.push({ path, firstPublished });
+    }
+  }
+  return out.length ? out : null;
+}
+
 function parseTable1(txt) {
   const sec = sliceBetween(txt, /Table \d+: Federal two-party vote intention/i, /\n\s*(?:Table|Figure) \d+:/);
   if (!sec) return { error: "preference-split table (Table 1) not found" };
@@ -787,9 +810,29 @@ if (process.env.RB_LIB !== "1") try {
     const topic = (await fetchBuffer(AFR_TOPIC)).toString("utf8");
     const latestPub = Math.max(...D.polls.filter((r) => r.pollster === POLLSTER).map((r) => (r.published || r.date).slice(0, 10).replace(/-/g, "")).map(Number));
     const fresh = new Map();
-    for (const m of topic.matchAll(/href="([^"]*?-(20\d{6})-p[0-9a-z]+)"/g)) {
-      const day = +m[2];
-      if (day > latestPub && !fresh.has(m[1])) fresh.set(m[1], day);
+    /* The topic's OWN story list is the page's hydration JSON (tag.
+       assetsConnection.assets, newest first, each with a firstPublished
+       instant). The page's hrefs also carry every sidebar and magazine
+       promo on it, so a bare href scan reports the week's car reviews as
+       post-wave articles - it is only the fallback when the JSON is gone.
+       Parsed, the list is also POSITIVE evidence of what the topic holds:
+       status.afrTopic's newest story is what redbridge-confirm-skip.mjs
+       reads to rule a passed slot unfiled. */
+    const stories = parseAfrTopic(topic);
+    if (stories) {
+      const newest = stories.reduce((a, s) => (!a || s.firstPublished > a.firstPublished ? s : a), null);
+      status.afrTopic = { fetchedAt: new Date().toISOString(), stories: stories.length,
+        newest: newest && newest.firstPublished, newestUrl: newest && `https://www.afr.com${newest.path}` };
+      for (const s of stories) {
+        const m = s.path.match(/-(20\d{6})-p[0-9a-z]+$/);
+        if (m && +m[1] > latestPub && !fresh.has(s.path)) fresh.set(s.path, +m[1]);
+      }
+    } else {
+      status.notes.push("AFR topic page: no story list in its hydration JSON (layout change?) — href fallback, no skip evidence this run");
+      for (const m of topic.matchAll(/href="([^"]*?-(20\d{6})-p[0-9a-z]+)"/g)) {
+        const day = +m[2];
+        if (day > latestPub && !fresh.has(m[1])) fresh.set(m[1], day);
+      }
     }
     for (const [path, day] of [...fresh].sort((a, b) => a[1] - b[1])) {
       const url = path.startsWith("http") ? path : `https://www.afr.com${path}`;
@@ -1024,4 +1067,4 @@ if (process.env.RB_LIB !== "1") try {
 
 // parser exports for .build/test-redbridge.mjs (RB_LIB=1 import skips the
 // main block above)
-export { parsePdf, parseFirmness, parseTable1On, parseCoalitionComponents, parseTable2, parseTable5, parsePpm, sliceBetween, guardNewWave };
+export { parsePdf, parseAfrTopic, parseFirmness, parseTable1On, parseCoalitionComponents, parseTable2, parseTable5, parsePpm, sliceBetween, guardNewWave };

@@ -700,6 +700,21 @@ function eq(name, got, want) {
   eq("after a 27 Sep release the slot steps to Sun 1 Nov", mRow && npFmt(mRow.release), "Sun 1 Nov");
   eq("a month-end slot names no weekday-snap shift", mRow && [mRow.slotEarly, mRow.slotLate],
     [rb.spreadEarly, rb.spreadLate]);
+  // a confirmed-absent Sunday (redbridge-confirm-skip.mjs, 9pm on the day)
+  // rolls a WEEK, to the 35-day Sunday the record shows; skip that too
+  // and the slot is the next month-end's
+  const cadSkip = JSON.parse(JSON.stringify(cad));
+  cadSkip.find((c) => c.pollster === "RedBridge/Accent").skipped = ["2026-09-27"];
+  const sk = scen("Sun 27 Sep 10:30pm, slot confirmed absent", "2026-09-27", 1350);
+  const skRows = project(cadSkip, sk.t0, sk.nowMs).filter((r) => r.pollster === "RedBridge/Accent");
+  console.log(`\n${sk.label}:  RedBridge → ${skRows.map((r) => npFmt(r.release)).join(", ")}`);
+  eq("a skipped month-end Sunday rolls to the 35-day Sunday", skRows[0] && npFmt(skRows[0].release), "Sun 4 Oct");
+  eq("the rolled slot is flagged, not overdue", skRows[0] && [skRows[0].rolled, skRows[0].overdue], [true, false]);
+  eq("the walk after it sits past the horizon", skRows.length, 1);
+  cadSkip.find((c) => c.pollster === "RedBridge/Accent").skipped = ["2026-09-27", "2026-10-04"];
+  const sk2 = scen("Sun 4 Oct 10pm, the late Sunday absent too", "2026-10-04", 1320);
+  const sk2Row = project(cadSkip, sk2.t0, sk2.nowMs).find((r) => r.pollster === "RedBridge/Accent");
+  eq("a second skip goes to the next month-end", sk2Row && npFmt(sk2Row.release), "Sun 1 Nov");
 }
 
 // S13 – the SUMMER BREAK: a dated slot inside 23 Dec – 8 Jan is no date at

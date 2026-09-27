@@ -53,6 +53,46 @@ case "$LAST_LINE" in
 esac
 
 if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
+  # No new wave: give the skip-confirm a go. It verifies — from the AFR topic
+  # list this run's extractor parsed a moment ago, not a cached state file —
+  # that nothing has been filed since before the slot day and that it's past
+  # 9pm Sydney on it (an hour after the latest recorded filing); exit 3 means
+  # the slot got recorded in pollsterRules.skippedSlots and the projection
+  # rolls to the Sunday a week on, which then needs a rebuild and a commit
+  # like any other data change. Anything else is a silent no-op.
+  STATUS_JSON="${LAST_LINE#RB_STATUS }"
+  node .build/redbridge-confirm-skip.mjs "$STATUS_JSON" >> "$LOG" 2>&1
+  CONFIRM=$?
+  if [ $CONFIRM -eq 3 ]; then
+    log "skip confirmed; validating and rebuilding next-polls data"
+    if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
+      log "FAIL validate after skip-confirm; skipping slot"
+      exit 1
+    fi
+    if ! refresh_site; then
+      log "FAIL build after skip-confirm; skipping slot"
+      exit 1
+    fi
+    git add data/polls.json "${SITE_FILES[@]}" || true
+    stage_dataset
+    SKIP_ISO="$(git diff --cached -U0 data/polls.json | grep -o '+ *"20[0-9-]*"' | tr -d '+ " ' | head -1)"
+    MSG="Confirm skipped RedBridge/Accent slot $SKIP_ISO"
+    if git diff --cached --quiet; then
+      log "skip-confirm recorded slot $SKIP_ISO but nothing staged to commit; leaving tree for review"
+      exit 1
+    fi
+    if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
+      log "FAIL git commit after skip-confirm; no commit made"
+      exit 1
+    fi
+    if push_main "$MSG" data/polls.json "${SITE_FILES[@]}"; then
+      log "OK committed + pushed: $MSG"
+    else
+      log "FAIL git push (commit kept locally)"
+    fi
+  elif [ $CONFIRM -ne 0 ]; then
+    log "skip-confirm refused (see above); human review needed"
+  fi
   exit 0
 fi
 
