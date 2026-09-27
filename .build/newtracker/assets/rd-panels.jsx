@@ -968,6 +968,11 @@ function RdDemographics({ rangeId = "all" }) {
      nothing there is drawn as turning into anything: the dot plot's rows
      slide by place and the charts fade in. */
   const [partyMorph, chooseParty] = window.AP.useMorph(party, (v) => setParty(v), (a, b) => a !== b);
+  /* each party's charts, built once per grouping and range: a switch
+     re-renders every frame, and rebuilding both parties' lines and poll
+     dots (a pass over every poll) on each one starved the dot plot's own
+     motion of frames on a phone */
+  const chartCache = React.useRef({});
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find((x) => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
@@ -1012,7 +1017,7 @@ function RdDemographics({ rangeId = "all" }) {
     <div className="rd-wv-set" key={"s" + idx} role="table" aria-label={(st.label || tab.label) + ": " + pName + "’s share of each group’s vote"}>
       <div className="rd-wv-sethead" role="row">
         <span role="columnheader"><b>{st.label || "By " + tab.label.toLowerCase()}</b> <span>{rdList((st.houses || []).map(demoHouse))}</span></span>
-        <span className="rd-wv-allcap" aria-hidden="true">{idx === 0 && <span style={{ left: xp(all) + "%" }}>All voters <RollNum value={all.toFixed(1)} />%</span>}</span>
+        <span className="rd-wv-allcap" aria-hidden="true">{idx === 0 && <span style={{ "--x": xp(all) }}>All voters <RollNum value={all.toFixed(1)} />%</span>}</span>
         <span className="rd-wv-vs" role="columnheader">{idx === 0 ? "vs all voters" : ""}</span>
       </div>
       {st.groups.map((g, gi) => {
@@ -1022,9 +1027,12 @@ function RdDemographics({ rangeId = "all" }) {
                title={"Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + " · " + rdList((g.houses || []).map(demoHouse)) + " · ± is the 95% margin"}>
             <span role="cell" className="rd-wv-lab">{g.label}</span>
             <span className="rd-wv-track" aria-hidden="true">
-              <span className="rd-wv-all" style={{ left: xp(all) + "%" }}></span>
-              <span className="rd-wv-ci" style={{ left: xp(v - ci) + "%", width: xp(v + ci) - xp(v - ci) + "%", color: pColor }}><i></i><i></i></span>
-              <span className={"rd-wv-dot" + (sig ? "" : " open")} style={{ left: xp(v) + "%", background: sig ? pColor : undefined, borderColor: pColor }}></span>
+              {/* positions go to CSS as --x/--lo/--hi (percent of the track)
+                  and are drawn with transforms, so a switch glides them on
+                  the compositor however busy the page's own frames are */}
+              <span className="rd-wv-all" style={{ "--x": xp(all) }}></span>
+              <span className="rd-wv-ci" style={{ "--lo": xp(v - ci), "--hi": xp(v + ci), color: pColor }}><i className="lo"></i><i className="hi"></i><b></b></span>
+              <span className={"rd-wv-dot" + (sig ? "" : " open")} style={{ "--x": xp(v), background: sig ? pColor : undefined, borderColor: pColor }}></span>
             </span>
             <span role="cell" className="rd-wv-v"><b><RollNum value={v.toFixed(1)} />%</b> <span>±<RollNum value={ci.toFixed(1)} /></span></span>
             <span role="cell" className={"rd-wv-d" + (sig ? " sig" : "")} style={sig ? { color: inkOf(pColor) } : undefined}><RollNum value={signedD(d)} /></span>
@@ -1036,7 +1044,7 @@ function RdDemographics({ rangeId = "all" }) {
   const axis = (
     <div className="rd-wv-axis" aria-hidden="true">
       <span></span>
-      <span className="rd-wv-ticks">{rdYTicks(0, hi, 10).map((v) => <span key={v} style={{ left: xp(v) + "%" }}>{v}%</span>)}</span>
+      <span className="rd-wv-ticks">{rdYTicks(0, hi, 10).map((v) => <span key={v} style={{ "--x": xp(v) }}>{v}%</span>)}</span>
       <span></span><span></span>
     </div>
   );
@@ -1068,11 +1076,15 @@ function RdDemographics({ rangeId = "all" }) {
     }).filter(Boolean);
   };
   const yMaxOf = (cs) => Math.max(10, Math.ceil(Math.max(...cs.flatMap((c) => c.drawn.flatMap((l) => l.pts.map((p) => p.y)).concat(c.dots.map((d) => d.y)))) / 10) * 10);
-  const charts = chartsFor(party);
+  const chartsCached = (pty) => {
+    const k = pty + "|" + tab.id + "|" + rangeLo + "|" + rangeHi;
+    return chartCache.current[k] || (chartCache.current[k] = chartsFor(pty));
+  };
+  const charts = chartsCached(party);
   const yMax = yMaxOf(charts);
   /* mid-switch: the party left behind, its charts and scale, to blend from */
   const pm = partyMorph && partyMorph.from !== party ? partyMorph : null;
-  const fromCharts = pm ? chartsFor(pm.from) : null;
+  const fromCharts = pm ? chartsCached(pm.from) : null;
   const fromYMax = fromCharts ? yMaxOf(fromCharts) : yMax;
   /* the points gap between the first set's top and bottom groups, then and now */
   const sub = (() => {
@@ -1167,7 +1179,7 @@ function RdDemographics({ rangeId = "all" }) {
           {axis}
           {/* one all-voters line from its label to the axis, through every set,
               as the board draws it; a phone keeps it to each row's track */}
-          <div className="rd-wv-allline" aria-hidden="true"><span><i style={{ left: xp(all) + "%" }}></i></span></div>
+          <div className="rd-wv-allline" aria-hidden="true"><span><i style={{ "--x": xp(all) }}></i></span></div>
         </div>
         <RdKey className="rd-ckey rd-wv-key" items={[
           { kind: "dot-solid", color: pColor, label: "Clearly above or below all voters" },

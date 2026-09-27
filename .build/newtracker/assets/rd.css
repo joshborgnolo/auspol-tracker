@@ -838,43 +838,50 @@ body.rd .rd-wv-sethead { min-height: 28px; font-size: 13px; color: var(--ink-3);
 body.rd .rd-wv-sethead b { font-weight: 600; color: var(--ink); margin-right: 6px; }
 body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1; }
 body.rd .rd-wv-allcap { position: relative; grid-column: 2; grid-row: 1; height: 18px; }
-body.rd .rd-wv-allcap > span { position: absolute; transform: translateX(-50%); font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+body.rd .rd-wv-allcap > span { position: absolute; left: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)); font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-wv-vs { grid-column: 3 / span 2; text-align: right; font-size: 12px; }
 body.rd .rd-wv-row { min-height: 32px; }
 body.rd .rd-wv-lab { font-size: 15px; color: var(--ink); }
 body.rd .rd-wv-track { position: relative; height: 32px; }
+/* the dot plot's marks are placed by transform in units of these boxes'
+   own width (cqw), not by left: a transform transition runs on the
+   compositor, so a party switch glides them even on a phone whose main
+   thread is busy redrawing the charts' morph, where left stepped */
+body.rd .rd-wv-track, body.rd .rd-wv-allline > span, body.rd .rd-wv-allcap, body.rd .rd-wv-ticks { container-type: inline-size; }
 body.rd .rd-wv-track::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), var(--line-2) calc(25% - 1px), var(--line-2) 25%); opacity: 0.8; }
 /* The all-voters line is the board's stroke: 1.5px, 4 on and 3 off. A CSS
    dashed border can't set its dash, and Chrome draws it as specks. */
 body.rd .rd-wv-plot { position: relative; }
 body.rd .rd-wv-allline { position: absolute; top: 22px; bottom: 26px; left: 0; right: 0; display: grid; grid-template-columns: 180px minmax(0, 1fr) 120px 70px; column-gap: 16px; pointer-events: none; }
 body.rd .rd-wv-allline > span { grid-column: 2; position: relative; }
-body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; bottom: 0; width: 1.5px; transform: translateX(-0.75px); z-index: 1;
-  background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; bottom: 0; left: 0; width: 1.5px; transform: translateX(calc(var(--x) * 1cqw - 0.75px)); z-index: 1;
+  background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); }
 body.rd .rd-wv-all { display: none; }
-body.rd .rd-wv-ci { position: absolute; top: 50%; height: 12px; transform: translateY(-50%); z-index: 2;
-  transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
-body.rd .rd-wv-ci::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; transform: translateY(-50%); background: currentColor; }
+/* the interval spans the track and draws its parts inside it: the bar
+   shifted to --lo and stretched to --hi (a 2px-tall line can scale
+   sideways without distorting), each end tick shifted on its own */
+body.rd .rd-wv-ci { position: absolute; top: 50%; left: 0; right: 0; height: 12px; transform: translateY(-50%); z-index: 2; }
+body.rd .rd-wv-ci > b { position: absolute; left: 0; top: 50%; width: 100%; height: 2px; background: currentColor; transform-origin: 0 50%;
+  transform: translate(calc(var(--lo) * 1cqw), -50%) scaleX(calc((var(--hi) - var(--lo)) / 100)); }
 /* The end ticks carry the dots' background ring, so the all-voters line
    stops short of a tick it passes under, as it does at a dot. Without it the
    1.5px dash and the 2px tick land on different sub-pixels, and a sliver of
    dash shows beside the tick. The bar, drawn after, covers the inner side. */
-body.rd .rd-wv-ci > i { position: absolute; top: 0; bottom: 0; width: 2px; background: currentColor; box-shadow: 0 0 0 2px var(--bg); }
-body.rd .rd-wv-ci > i:first-child { left: 0; }
-body.rd .rd-wv-ci > i:last-child { right: 0; }
-body.rd .rd-wv-dot { position: absolute; top: 50%; width: 13px; height: 13px; box-sizing: border-box; border-radius: 50%; border: 2px solid; transform: translate(-50%, -50%); z-index: 3; box-shadow: 0 0 0 2px var(--bg);
-  transition: left .32s cubic-bezier(.4, .1, .25, 1), background-color .2s ease; }
+body.rd .rd-wv-ci > i { position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background: currentColor; box-shadow: 0 0 0 2px var(--bg); }
+body.rd .rd-wv-ci > i.lo { transform: translateX(calc(var(--lo) * 1cqw)); }
+body.rd .rd-wv-ci > i.hi { transform: translateX(calc(var(--hi) * 1cqw - 2px)); }
+body.rd .rd-wv-dot { position: absolute; top: 50%; left: 0; width: 13px; height: 13px; box-sizing: border-box; border-radius: 50%; border: 2px solid; transform: translate(calc(var(--x) * 1cqw - 50%), -50%); z-index: 3; box-shadow: 0 0 0 2px var(--bg); }
 /* a party switch (or a grouping switch's rows, which are keyed by place)
    glides each mark to its new value, the leadership bars' ease and length,
    colours easing with them; the scale's ticks slide if its top changes */
-body.rd .rd-wv-dot { transition: left .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease, border-color .32s ease; }
-body.rd .rd-wv-ci { transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1), color .32s ease; }
-body.rd .rd-wv-allline i, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-wv-dot { transition: transform .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease, border-color .32s ease; }
+body.rd .rd-wv-ci { transition: color .32s ease; }
+body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: transform .32s cubic-bezier(.4, .1, .25, 1); }
 /* a grouping switch brings the charts in fresh: faded in, not cut */
 body.rd .rd-wv-enter > .rd-wv-chart { animation: rd-wv-in .32s ease both; }
 @keyframes rd-wv-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  body.rd .rd-wv-dot, body.rd .rd-wv-ci, body.rd .rd-wv-allline i, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: none; }
+  body.rd .rd-wv-dot, body.rd .rd-wv-ci, body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: none; }
   body.rd .rd-wv-enter > .rd-wv-chart { animation: none; }
 }
 body.rd .rd-wv-dot.open { background: var(--bg); }
@@ -887,7 +894,7 @@ body.rd .rd-wv-d { text-align: right; font-size: 14px; color: var(--ink-3); }
 body.rd .rd-wv-d.sig { font-weight: 700; }
 body.rd .rd-wv-axis { margin-top: 4px; min-height: 22px; border-top: 1px solid var(--ink-faint); }
 body.rd .rd-wv-ticks { position: relative; height: 20px; grid-column: 2; }
-body.rd .rd-wv-ticks > span { position: absolute; top: 4px; transform: translateX(-50%); font-size: 12px; color: var(--ink-3); }
+body.rd .rd-wv-ticks > span { position: absolute; top: 4px; left: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)); font-size: 12px; color: var(--ink-3); }
 body.rd .rd-wv-key { margin-top: 16px; }
 body.rd .rd-wv-keytxt { color: var(--ink-3); }
 body.rd .rd-wv-charts { display: flex; gap: 48px; margin-top: 20px; }
@@ -912,8 +919,8 @@ body.rd .rd-wv-chart { min-width: 0; }
   body.rd .rd-wv-allline { display: none; }
   body.rd .rd-wv-all { display: block; }
   /* the end ticks sit inside the track, as drawn, rather than half off it */
-  body.rd .rd-wv-ticks > span:first-child { transform: none; }
-  body.rd .rd-wv-ticks > span:last-child { transform: translateX(-100%); }
+  body.rd .rd-wv-ticks > span:first-child { transform: translateX(calc(var(--x) * 1cqw)); }
+  body.rd .rd-wv-ticks > span:last-child { transform: translateX(calc(var(--x) * 1cqw - 100%)); }
   body.rd .rd-wv-charts { flex-direction: column; gap: 28px; }
   /* the four party chips share one row, as drawn */
   body.rd .rd-chips-row { display: flex; flex-wrap: nowrap; gap: 6px; }

@@ -3664,33 +3664,33 @@ body.rd .rd-wv-sethead { min-height: 28px; font-size: 13px; color: var(--ink-3);
 body.rd .rd-wv-sethead b { font-weight: 600; color: var(--ink); margin-right: 6px; }
 body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1; }
 body.rd .rd-wv-allcap { position: relative; grid-column: 2; grid-row: 1; height: 18px; }
-body.rd .rd-wv-allcap > span { position: absolute; transform: translateX(-50%); font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+body.rd .rd-wv-allcap > span { position: absolute; left: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)); font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-wv-vs { grid-column: 3 / span 2; text-align: right; font-size: 12px; }
 body.rd .rd-wv-row { min-height: 32px; }
 body.rd .rd-wv-lab { font-size: 15px; color: var(--ink); }
 body.rd .rd-wv-track { position: relative; height: 32px; }
+body.rd .rd-wv-track, body.rd .rd-wv-allline > span, body.rd .rd-wv-allcap, body.rd .rd-wv-ticks { container-type: inline-size; }
 body.rd .rd-wv-track::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), var(--line-2) calc(25% - 1px), var(--line-2) 25%); opacity: 0.8; }
 body.rd .rd-wv-plot { position: relative; }
 body.rd .rd-wv-allline { position: absolute; top: 22px; bottom: 26px; left: 0; right: 0; display: grid; grid-template-columns: 180px minmax(0, 1fr) 120px 70px; column-gap: 16px; pointer-events: none; }
 body.rd .rd-wv-allline > span { grid-column: 2; position: relative; }
-body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; bottom: 0; width: 1.5px; transform: translateX(-0.75px); z-index: 1;
-  background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; bottom: 0; left: 0; width: 1.5px; transform: translateX(calc(var(--x) * 1cqw - 0.75px)); z-index: 1;
+  background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); }
 body.rd .rd-wv-all { display: none; }
-body.rd .rd-wv-ci { position: absolute; top: 50%; height: 12px; transform: translateY(-50%); z-index: 2;
-  transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
-body.rd .rd-wv-ci::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; transform: translateY(-50%); background: currentColor; }
-body.rd .rd-wv-ci > i { position: absolute; top: 0; bottom: 0; width: 2px; background: currentColor; box-shadow: 0 0 0 2px var(--bg); }
-body.rd .rd-wv-ci > i:first-child { left: 0; }
-body.rd .rd-wv-ci > i:last-child { right: 0; }
-body.rd .rd-wv-dot { position: absolute; top: 50%; width: 13px; height: 13px; box-sizing: border-box; border-radius: 50%; border: 2px solid; transform: translate(-50%, -50%); z-index: 3; box-shadow: 0 0 0 2px var(--bg);
-  transition: left .32s cubic-bezier(.4, .1, .25, 1), background-color .2s ease; }
-body.rd .rd-wv-dot { transition: left .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease, border-color .32s ease; }
-body.rd .rd-wv-ci { transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1), color .32s ease; }
-body.rd .rd-wv-allline i, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-wv-ci { position: absolute; top: 50%; left: 0; right: 0; height: 12px; transform: translateY(-50%); z-index: 2; }
+body.rd .rd-wv-ci > b { position: absolute; left: 0; top: 50%; width: 100%; height: 2px; background: currentColor; transform-origin: 0 50%;
+  transform: translate(calc(var(--lo) * 1cqw), -50%) scaleX(calc((var(--hi) - var(--lo)) / 100)); }
+body.rd .rd-wv-ci > i { position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background: currentColor; box-shadow: 0 0 0 2px var(--bg); }
+body.rd .rd-wv-ci > i.lo { transform: translateX(calc(var(--lo) * 1cqw)); }
+body.rd .rd-wv-ci > i.hi { transform: translateX(calc(var(--hi) * 1cqw - 2px)); }
+body.rd .rd-wv-dot { position: absolute; top: 50%; left: 0; width: 13px; height: 13px; box-sizing: border-box; border-radius: 50%; border: 2px solid; transform: translate(calc(var(--x) * 1cqw - 50%), -50%); z-index: 3; box-shadow: 0 0 0 2px var(--bg); }
+body.rd .rd-wv-dot { transition: transform .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease, border-color .32s ease; }
+body.rd .rd-wv-ci { transition: color .32s ease; }
+body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: transform .32s cubic-bezier(.4, .1, .25, 1); }
 body.rd .rd-wv-enter > .rd-wv-chart { animation: rd-wv-in .32s ease both; }
 @keyframes rd-wv-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  body.rd .rd-wv-dot, body.rd .rd-wv-ci, body.rd .rd-wv-allline i, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: none; }
+  body.rd .rd-wv-dot, body.rd .rd-wv-ci, body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: none; }
   body.rd .rd-wv-enter > .rd-wv-chart { animation: none; }
 }
 body.rd .rd-wv-dot.open { background: var(--bg); }
@@ -3701,7 +3701,7 @@ body.rd .rd-wv-d { text-align: right; font-size: 14px; color: var(--ink-3); }
 body.rd .rd-wv-d.sig { font-weight: 700; }
 body.rd .rd-wv-axis { margin-top: 4px; min-height: 22px; border-top: 1px solid var(--ink-faint); }
 body.rd .rd-wv-ticks { position: relative; height: 20px; grid-column: 2; }
-body.rd .rd-wv-ticks > span { position: absolute; top: 4px; transform: translateX(-50%); font-size: 12px; color: var(--ink-3); }
+body.rd .rd-wv-ticks > span { position: absolute; top: 4px; left: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)); font-size: 12px; color: var(--ink-3); }
 body.rd .rd-wv-key { margin-top: 16px; }
 body.rd .rd-wv-keytxt { color: var(--ink-3); }
 body.rd .rd-wv-charts { display: flex; gap: 48px; margin-top: 20px; }
@@ -3721,8 +3721,8 @@ body.rd .rd-wv-chart { min-width: 0; }
   body.rd .rd-wv-axis .rd-wv-ticks { grid-column: 1 / -1; }
   body.rd .rd-wv-allline { display: none; }
   body.rd .rd-wv-all { display: block; }
-  body.rd .rd-wv-ticks > span:first-child { transform: none; }
-  body.rd .rd-wv-ticks > span:last-child { transform: translateX(-100%); }
+  body.rd .rd-wv-ticks > span:first-child { transform: translateX(calc(var(--x) * 1cqw)); }
+  body.rd .rd-wv-ticks > span:last-child { transform: translateX(calc(var(--x) * 1cqw - 100%)); }
   body.rd .rd-wv-charts { flex-direction: column; gap: 28px; }
   body.rd .rd-chips-row { display: flex; flex-wrap: nowrap; gap: 6px; }
   body.rd .rd-chips-row .rd-chip { flex: 1 1 auto; justify-content: center; min-height: 44px; padding: 0 8px; gap: 5px; font-size: 13px; }
@@ -58567,6 +58567,7 @@ function RdDemographics({
   const [tabId, setTab] = useState("age");
   const [party, setParty] = useState("onp");
   const [partyMorph, chooseParty] = window.AP.useMorph(party, v => setParty(v), (a, b) => a !== b);
+  const chartCache = React.useRef({});
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find(x => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
@@ -58620,7 +58621,7 @@ function RdDemographics({
     "aria-hidden": "true"
   }, idx === 0 && React.createElement("span", {
     style: {
-      left: xp(all) + "%"
+      "--x": xp(all)
     }
   }, "All voters ", React.createElement(RollNum, {
     value: all.toFixed(1)
@@ -58646,19 +58647,23 @@ function RdDemographics({
     }, React.createElement("span", {
       className: "rd-wv-all",
       style: {
-        left: xp(all) + "%"
+        "--x": xp(all)
       }
     }), React.createElement("span", {
       className: "rd-wv-ci",
       style: {
-        left: xp(v - ci) + "%",
-        width: xp(v + ci) - xp(v - ci) + "%",
+        "--lo": xp(v - ci),
+        "--hi": xp(v + ci),
         color: pColor
       }
-    }, React.createElement("i", null), React.createElement("i", null)), React.createElement("span", {
+    }, React.createElement("i", {
+      className: "lo"
+    }), React.createElement("i", {
+      className: "hi"
+    }), React.createElement("b", null)), React.createElement("span", {
       className: "rd-wv-dot" + (sig ? "" : " open"),
       style: {
-        left: xp(v) + "%",
+        "--x": xp(v),
         background: sig ? pColor : undefined,
         borderColor: pColor
       }
@@ -58687,7 +58692,7 @@ function RdDemographics({
   }, rdYTicks(0, hi, 10).map(v => React.createElement("span", {
     key: v,
     style: {
-      left: xp(v) + "%"
+      "--x": xp(v)
     }
   }, v, "%"))), React.createElement("span", null), React.createElement("span", null));
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
@@ -58743,10 +58748,14 @@ function RdDemographics({
     }).filter(Boolean);
   };
   const yMaxOf = cs => Math.max(10, Math.ceil(Math.max(...cs.flatMap(c => c.drawn.flatMap(l => l.pts.map(p => p.y)).concat(c.dots.map(d => d.y)))) / 10) * 10);
-  const charts = chartsFor(party);
+  const chartsCached = pty => {
+    const k = pty + "|" + tab.id + "|" + rangeLo + "|" + rangeHi;
+    return chartCache.current[k] || (chartCache.current[k] = chartsFor(pty));
+  };
+  const charts = chartsCached(party);
   const yMax = yMaxOf(charts);
   const pm = partyMorph && partyMorph.from !== party ? partyMorph : null;
-  const fromCharts = pm ? chartsFor(pm.from) : null;
+  const fromCharts = pm ? chartsCached(pm.from) : null;
   const fromYMax = fromCharts ? yMaxOf(fromCharts) : yMax;
   const sub = (() => {
     const c = charts[0];
@@ -58941,7 +58950,7 @@ function RdDemographics({
     "aria-hidden": "true"
   }, React.createElement("span", null, React.createElement("i", {
     style: {
-      left: xp(all) + "%"
+      "--x": xp(all)
     }
   })))), React.createElement(RdKey, {
     className: "rd-ckey rd-wv-key",
