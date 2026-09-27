@@ -483,24 +483,34 @@ body.rd .rd-pv-val { font-size: 36px; font-weight: 500; line-height: 1.1; letter
 body.rd .rd-pv-pct { font-size: 20px; color: var(--ink-3); letter-spacing: 0; }
 body.rd .rd-pv-chg { font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-pv-chart { margin-top: 28px; }
+/* a column too narrow for "Others & independents" says "Others", as the
+   chart's own end label does, rather than cutting the name short */
+body.rd .rd-pv-short { display: none; }
 @media (max-width: 900px) {
   body.rd .rd-pv-stats { column-gap: 18px; }
   body.rd .rd-pv-val { font-size: 30px; }
   body.rd .rd-pv-chg { font-size: 12px; }
+  body.rd .rd-pv-long { display: none; }
+  body.rd .rd-pv-short { display: inline; }
 }
-@media (max-width: 640px) {
-  /* a phone lists the five as rows: name, figure, change */
-  body.rd .rd-pv-stats { grid-template-columns: 1fr; row-gap: 0; margin-top: 24px; }
-  body.rd .rd-pv-bracket { display: none; }
-  body.rd .rd-pv-stat {
-    grid-row: auto; flex-direction: row; align-items: baseline; gap: 10px;
-    padding: 9px 0 9px 12px; border-top: 0; border-left: 3px solid var(--ink-3); margin-top: 6px;
-  }
-  body.rd .rd-pv-name { flex-grow: 1; font-size: 15px; }
-  body.rd .rd-pv-val { font-size: 22px; }
-  body.rd .rd-pv-pct { font-size: 14px; }
-  body.rd .rd-pv-stat:nth-child(-n + 3 of .rd-pv-stat) { }
+/* the phone's list, as the canvas drew it: a tinted box round the parties
+   inside each other's margin, rows of dot and name over the change, and the
+   figures right-aligned in one column */
+body.rd .rd-pv-list { margin-top: 24px; display: flex; flex-direction: column; font-variant-numeric: tabular-nums; }
+body.rd .rd-pv-group { padding: 0 12px 4px; border-radius: 8px; background: color-mix(in oklab, var(--ink) 5%, var(--bg)); }
+body.rd .rd-pv-grouph { padding: 10px 0 4px; font-size: 12px; font-weight: 500; color: var(--ink-3); }
+body.rd .rd-pv-rest { padding: 0 12px; }
+body.rd .rd-pv-list .rd-pv-stat {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; row-gap: 2px;
+  width: 100%; padding: 10px 0; border-top: 0; border-bottom: 1px solid var(--line);
 }
+body.rd .rd-pv-list .rd-pv-stat:last-child { border-bottom: 0; }
+body.rd .rd-pv-list .rd-pv-name { display: flex; align-items: center; gap: 8px; font-size: 15px; white-space: normal; overflow: visible; }
+body.rd .rd-pv-dot { width: 10px; height: 10px; border-radius: 5px; flex-shrink: 0; }
+body.rd .rd-pv-list .rd-pv-val { font-size: 24px; letter-spacing: -0.01em; }
+body.rd .rd-pv-list .rd-pv-pct { font-size: 14px; }
+body.rd .rd-pv-list .rd-pv-chg { grid-column: 1 / span 2; padding-left: 18px; font-size: 12px; }
+body.rd .rd-pv-list .rd-pv-stat:focus-visible { outline-offset: 2px; }
 body.rd .rd-grow { flex-grow: 1; }
 
 /* ---------- latest and next polls ------------------------------------------ */
@@ -655,6 +665,14 @@ body.rd .rd-pl-exp { font-size: 13px; }
 /* ---------- leadership ------------------------------------------------------ */
 body.rd .rd-ld-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 64px; margin-top: 8px; }
 body.rd .rd-ld-grid.one { grid-template-columns: minmax(0, 1fr); }
+/* Side by side, the two panels share their rows - title, deck, tabs, the
+   figures, the note, the chart, the key - so the charts start level, as the
+   canvas drew them. Left to themselves, the net-approval dot plot ran 24px
+   taller than the head-to-head bars and every row below it slipped. */
+@media (min-width: 1001px) {
+  body.rd .rd-ld-grid:not(.one) > .rd-ld-panel { display: grid; grid-row: span 9; grid-template-rows: subgrid; align-content: start; }
+  body.rd .rd-ld-grid:not(.one) .rd-dp { margin-top: 20px; }
+}
 body.rd .rd-ld-panel.rd-hidden { display: none; }
 body.rd .rd-ld-panel .rd-sub { margin-top: 48px; }
 body.rd .rd-ld-panel .rd-subdek { font-size: 15px; min-height: 45px; }
@@ -717,6 +735,11 @@ body.rd .rd-dp-key { margin-top: 10px; }
   body.rd .rd-ld-grid { grid-template-columns: minmax(0, 1fr); }
   body.rd .rd-ld-panel .rd-subdek { min-height: 0; }
   body.rd .rd-ld-note { min-height: 0; }
+  /* one column already gives each panel the full width, so there is nothing
+     to expand into (the canvas's tablet board has no expand button), and a
+     panel expanded on a wider screen doesn't hide the other one here */
+  body.rd .rd-ld-panel .rd-iconbtn { display: none; }
+  body.rd .rd-ld-panel.rd-hidden { display: block; }
 }
 @media (max-width: 640px) {
   body.rd .rd-ld-panel .rd-sub { margin-top: 36px; }
@@ -841,11 +864,18 @@ body.rd .rd-sm-ylab { fill: var(--ink-3); }
 body.rd .rd-is-tabs { margin-top: 20px; }
 body.rd .rd-is .rd-hed { margin-top: 28px; }
 body.rd .rd-is-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; column-gap: 48px; margin-top: 36px; align-items: start; }
+/* the canvas's columns (176/112/212/84/132, no gaps) as near as the row's
+   padding allows: the strip keeps about 200px beside the chart, where the
+   port's added gaps had left it 152 - five pixels a point */
 body.rd .rd-is-head, body.rd .rd-is-row, body.rd .rd-is-axis {
-  display: grid; grid-template-columns: 150px 118px minmax(0, 1fr) 96px 128px; column-gap: 14px; align-items: center;
+  display: grid; grid-template-columns: 150px 104px minmax(0, 1fr) 88px 120px; column-gap: 10px; align-items: center;
 }
 body.rd .rd-is-head { font-size: 12px; color: var(--ink-3); align-items: end; min-height: 40px; padding: 0 12px 6px; }
-body.rd .rd-is-dotsh { position: relative; height: 40px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 3px; }
+body.rd .rd-is-imph { white-space: nowrap; }
+/* the strip's words start over the strip and run on over the figures and the
+   verdict, the key under them - centred on a laptop's narrow strip, they ran
+   back over "In voters' top three" */
+body.rd .rd-is-dotsh { grid-column: 3 / span 3; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 body.rd .rd-is-cap { white-space: nowrap; }
 body.rd .rd-is-leg { display: flex; gap: 12px; white-space: nowrap; }
 body.rd .rd-is-leg i { display: inline-block; width: 8px; height: 8px; border-radius: 4px; margin-right: 5px; }
@@ -909,8 +939,7 @@ body.rd .rd-iw-keybar i { position: absolute; right: -3px; top: -3px; bottom: -3
 @media (max-width: 900px) {
   body.rd .rd-is-head, body.rd .rd-is-row, body.rd .rd-is-axis { grid-template-columns: 120px 96px minmax(0, 1fr) 88px 104px; column-gap: 10px; }
   body.rd .rd-is-bar { flex-basis: 40px; }
-  body.rd .rd-is-dotsh { height: auto; min-height: 40px; }
-  body.rd .rd-is-cap { white-space: normal; text-align: center; line-height: 1.3; }
+  body.rd .rd-is-cap { white-space: normal; line-height: 1.3; }
   body.rd .rd-is-leg { gap: 8px; }
   body.rd .rd-un-long { display: none; }
 }
@@ -948,7 +977,12 @@ body.rd .rd-un-bar > span { flex-grow: 0; flex-shrink: 1; min-width: 0; display:
 body.rd .rd-un-f { background: var(--line); color: var(--ink); }
 body.rd .rd-un-s { background: var(--ink-3); color: var(--bg); }
 body.rd .rd-un-u { background: var(--ink); color: var(--bg); justify-content: center; padding: 0 !important; }
-body.rd .rd-un-panels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 64px; margin-top: 24px; align-items: end; }
+/* the two panels' titles share a line and their charts share a baseline, as
+   the canvas drew them: the panel with fewer readings leaves its gap above
+   the chart rather than above its title */
+body.rd .rd-un-panels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 64px; margin-top: 24px; align-items: stretch; }
+body.rd .rd-un-panel { display: flex; flex-direction: column; }
+body.rd .rd-un-panel > .chart { margin-top: auto; }
 body.rd .rd-un-ptitle { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
 body.rd .rd-un-ptitle b { font-size: 16px; font-weight: 600; color: var(--ink); }
 body.rd .rd-un-ptitle span { font-size: 13px; color: var(--ink-3); }

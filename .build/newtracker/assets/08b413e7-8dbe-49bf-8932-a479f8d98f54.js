@@ -1038,13 +1038,26 @@ function TrendChart(props) {
               <line x1={ex} x2={ex} y1={ruleTop} y2={H - pad.b} className="evt-line" />
               {/* elbow: reads as a lead-in rule at the label's baseline */}
               {displaced && <line x1={ex} x2={connTo} y1={yRow} y2={yRow} className="evt-conn" />}
-              <text x={x} y={yRow} className="evt-label" textAnchor="start"
-                    style={{ fontSize: fsz, strokeWidth: refUnits * 0.34 }}>
-                {e.short}
-              </text>
+              {/* the redesign sets every name after every rule (below), so a
+                  top-row event's rule, which runs down through the lower row,
+                  passes behind its neighbour's name rather than through it */}
+              {!rd && (
+                <text x={x} y={yRow} className="evt-label" textAnchor="start"
+                      style={{ fontSize: fsz, strokeWidth: refUnits * 0.34 }}>
+                  {e.short}
+                </text>
+              )}
             </g>
           );
         })}
+        {rd && evPlaced.map((p, i) => p.row == null ? null : (
+          <g key={"evl" + i} className={"evt" + (evt && evt.e === p.e ? " on" : "")} aria-hidden="true">
+            <text x={p.x} y={p.y} className="evt-label" textAnchor="start"
+                  style={{ fontSize: p.fsz, strokeWidth: PX(4) }}>
+              {p.e.short}
+            </text>
+          </g>
+        ))}
         {vlines.map((v, i) => (v.x < win[0] || v.x > win[1]) ? null : (
           <line key={"vl" + i} x1={sx(v.x)} x2={sx(v.x)} y1={pad.t} y2={H - pad.b} className={"rd-vline" + (v.cls ? " " + v.cls : "")} />
         ))}

@@ -115,28 +115,50 @@ function RdPrimary({ rangeId }) {
     return parts.every((p) => next[p.id]) ? {} : next;   // never an empty chart
   });
 
+  /* A phone lists the five as the canvas drew them: the parties the leader
+     can't be told apart from grouped in a tinted box under "Within the margin
+     of uncertainty", each row a dot and a name over the change, the figure
+     right-aligned so the column reads straight down. A wider screen sets the
+     five side by side under a coloured rule, the bracket over the group. */
+  const stat = (p) => (
+    <button key={p.id} type="button" className="rd-pv-stat" aria-pressed={!hidden[p.id]}
+            style={narrow ? undefined : { borderTopColor: p.color }}
+            title={(hidden[p.id] ? "Show " : "Hide ") + p.name + " on the chart"}
+            onClick={() => toggle(p.id)}>
+      <span className="rd-pv-name" style={{ color: inkOf(p.color) }}>
+        {narrow && <span className="rd-pv-dot" style={{ background: p.color }}></span>}
+        {p.id === "oth" && !narrow ? <><span className="rd-pv-long">{p.name}</span><span className="rd-pv-short">Others</span></> : p.name}
+      </span>
+      <span className="rd-pv-val">{p.v.toFixed(1)}<span className="rd-pv-pct">%</span></span>
+      {p.was != null && (
+        <span className="rd-pv-chg">{rdArrow(p.v - p.was)} {Math.abs(p.v - p.was).toFixed(1)} since the election</span>
+      )}
+    </button>
+  );
+
   return (
     <RdSec id="primary-vote" title="Primary vote" meta={meta}>
       <RdHed head={story.head} dek={story.dek} />
-      <div className="rd-pv-stats" style={{ "--rd-k": k }}>
-        {k >= 2 && (
-          <div className="rd-pv-bracket" style={{ gridColumn: "1 / span " + k }}>
-            <span></span>Within the margin of uncertainty<span></span>
-          </div>
-        )}
-        {parts.map((p) => (
-          <button key={p.id} type="button" className="rd-pv-stat" aria-pressed={!hidden[p.id]}
-                  style={{ borderTopColor: p.color }}
-                  title={(hidden[p.id] ? "Show " : "Hide ") + p.name + " on the chart"}
-                  onClick={() => toggle(p.id)}>
-            <span className="rd-pv-name" style={{ color: inkOf(p.color) }}>{p.name}</span>
-            <span className="rd-pv-val">{p.v.toFixed(1)}<span className="rd-pv-pct">%</span></span>
-            {p.was != null && (
-              <span className="rd-pv-chg">{rdArrow(p.v - p.was)} {Math.abs(p.v - p.was).toFixed(1)} since the election</span>
-            )}
-          </button>
-        ))}
-      </div>
+      {narrow ? (
+        <div className="rd-pv-list">
+          {k >= 2 && (
+            <div className="rd-pv-group">
+              <div className="rd-pv-grouph">Within the margin of uncertainty</div>
+              {parts.slice(0, k).map(stat)}
+            </div>
+          )}
+          <div className="rd-pv-rest">{parts.slice(k >= 2 ? k : 0).map(stat)}</div>
+        </div>
+      ) : (
+        <div className="rd-pv-stats" style={{ "--rd-k": k }}>
+          {k >= 2 && (
+            <div className="rd-pv-bracket" style={{ gridColumn: "1 / span " + k }}>
+              <span></span>Within the margin of uncertainty<span></span>
+            </div>
+          )}
+          {parts.map(stat)}
+        </div>
+      )}
       <div className="card rd-card rd-pv-chart">
         <TrendChart
           key="rd-pv"
@@ -948,7 +970,9 @@ function RdSwitching({ rangeId }) {
   /* ---- the rates, month by month -------------------------------------------- */
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
   const firstX = Math.min(...cols.map((c) => c.sr.rate.monthly[0].x));
-  const x0 = Math.max(rangeLo, firstX - 0.04), x1 = rangeHi;
+  /* the window opens about a month before the first average, as the canvas
+     drew it, so the first reading clears the "25%" and "50%" set on the plot */
+  const x0 = Math.max(rangeLo, firstX - 0.075), x1 = rangeHi;
   const pollRate = (id) => (S.waves || []).map((w) => {
     const v = w.toOn ? w.toOn[id] : null;
     return v == null ? null : { x: D.mx(w.date.slice(0, 7)) + ((+w.date.slice(8, 10) - 15) / 365), y: v, h: w.pollster, w: w.sample || 1000, meta: { pollster: w.pollster, released: w.date, dateLabel: w.dateStart ? "" : "", sample: w.sample } };
@@ -964,8 +988,8 @@ function RdSwitching({ rangeId }) {
   /* the rates that moved, tested within each pollster, the rest said to hold */
   const subHead = !sig.length ? "The rates have held since " + sinceM
     : sig.length === cols.length ? "Every party’s rate has " + (sig.every((f) => f.fit.b > 0) ? "risen" : sig.every((f) => f.fit.b < 0) ? "fallen" : "moved") + " since " + sinceM
-    : "The rates have held since " + sinceM + ", apart from " + rdList(sig.map((f) => NAME[f.c.id] + " voters’"))
-      + ", which " + (sig.length > 1 ? "have" : "has") + " " + (sig.every((f) => f.fit.b < 0) ? "fallen" : sig.every((f) => f.fit.b > 0) ? "risen" : "moved");
+    : "The rates have held since " + sinceM + ", except for " + rdList(sig.map((f) => NAME[f.c.id])) + " voters, whose "
+      + (sig.length > 1 ? "rates have" : "rate has") + " " + (sig.every((f) => f.fit.b < 0) ? "fallen" : sig.every((f) => f.fit.b > 0) ? "risen" : "moved");
   const ks = cols.flatMap((c) => c.sr.rate.monthly.map((m) => m.k)).filter((k) => k != null);
   const kLo = Math.min(...ks), kHi = Math.max(...ks);
   const subDek = "Share of each party’s 2025 voters now backing One Nation: each dot is one poll, and the lines are monthly averages. "
@@ -1130,6 +1154,10 @@ function RdIssues({ rangeId = "all" }) {
   const [view, setView] = useState("trust");
   const [selId, setSel] = useState(null);
   const [gsetId, setGset] = useState("vote");
+  /* the dot strip's width on screen, so dots that would print over one
+     another can be told apart (see dodge, below) */
+  const stripRef = React.useRef(null);
+  const stripW = useRdWidth(stripRef, 150);
   if (!I || !I.list || !I.list.length) return null;
   const P = I.parties;
   const list = I.list;
@@ -1198,12 +1226,30 @@ function RdIssues({ rangeId = "all" }) {
   /* ---- who's trusted: the rows -------------------------------------------- */
   const dotLo = 20, dotHi = 50;
   const dx = (v) => ((Math.max(dotLo, Math.min(dotHi, v)) - dotLo) / (dotHi - dotLo)) * 100;
+  /* Parties within a dot's width of each other on this strip - on a laptop
+     the table shares its row with the chart, so a point is about five pixels
+     - step apart vertically, centred on the row, rather than printing one
+     dot over another (cost of living's 34, 32 and 34 showed as one). */
+  const dodge = (own) => {
+    const need = 12 / Math.max(1, stripW / (dotHi - dotLo));
+    const s = P.map((q) => ({ q, v: own.v[q] })).sort((a, b) => a.v - b.v);
+    const off = {};
+    let run = [s[0]];
+    const flush = () => run.forEach((d, i) => { off[d.q] = (i - (run.length - 1) / 2) * 9; });
+    for (let i = 1; i < s.length; i++) {
+      if (s[i].v - s[i - 1].v < need) run.push(s[i]);
+      else { flush(); run = [s[i]]; }
+    }
+    flush();
+    return off;
+  };
   const verdictOf = (x) => !x.own ? null : x.own.leadSig
     ? { text: ISS_PARTY_CAP[x.own.lead] + " ahead", color: inkOf(pColor(x.own.lead)), strong: true }
     : x.own.pairSig ? { text: ISS_PARTY_CAP[x.own.third] + " behind", strong: true }
     : { text: "No clear lead" };
   const row = (x) => {
     const v = verdictOf(x), sel = x.id === it.id;
+    const off = x.own ? dodge(x.own) : {};
     return (
       <div key={x.id} className={"rd-is-row" + (sel ? " sel" : "")} role="button" tabIndex={0} aria-pressed={sel}
            onClick={() => setSel(x.id)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSel(x.id); } }}
@@ -1213,7 +1259,7 @@ function RdIssues({ rangeId = "all" }) {
         <span className="rd-is-dots" aria-hidden="true">
           {[20, 30, 40, 50].map((g) => <span key={g} className="rd-is-gl" style={{ left: dx(g) + "%" }}></span>)}
           <span className="rd-is-third" style={{ left: dx(100 / 3) + "%" }}></span>
-          {x.own && P.map((q) => <span key={q} className="rd-is-dot" style={{ left: dx(x.own.v[q]) + "%", background: pColor(q) }}></span>)}
+          {x.own && P.map((q) => <span key={q} className="rd-is-dot" style={{ left: dx(x.own.v[q]) + "%", top: "calc(50% + " + off[q] + "px)", background: pColor(q) }}></span>)}
         </span>
         <span className="rd-is-nums">{x.own ? P.map((q) => <b key={q} style={{ color: inkOf(pColor(q)) }}>{Math.round(x.own.v[q])}</b>) : null}</span>
         <span className={"rd-is-verdict" + (v && v.strong ? " strong" : "")} style={v && v.color ? { color: v.color } : undefined}>
@@ -1272,19 +1318,21 @@ function RdIssues({ rangeId = "all" }) {
           <RdHed head={trustHead} dek={trustDek} />
           <div className="rd-is-grid">
             <div className="rd-is-left">
+              {/* The strip's words run from the strip across the columns to its
+                  right, the key under them, so neither runs back over "In
+                  voters' top three" when a laptop's strip is narrow. */}
               <div className="rd-is-head" aria-hidden="true">
                 <span></span>
-                <span className="rd-is-imp">In voters’ top three</span>
-                <span className="rd-is-dots rd-is-dotsh">
+                <span className="rd-is-imph">In voters’ top three</span>
+                <span className="rd-is-dotsh">
                   <span className="rd-is-cap">Best on it · % of voters naming one of these three</span>
                   <span className="rd-is-leg">{P.map((q) => <span key={q}><i style={{ background: pColor(q) }}></i>{ISS_PARTY_CAP[q]}</span>)}</span>
                 </span>
-                <span></span><span></span>
               </div>
               {list.map(row)}
               <div className="rd-is-axis" aria-hidden="true">
                 <span></span><span></span>
-                <span className="rd-is-dots">{[20, 30, 40, 50].map((g) => <span key={g} style={{ left: dx(g) + "%" }}>{g === 50 ? "50%" : g}</span>)}
+                <span className="rd-is-dots" ref={stripRef}>{[20, 30, 40, 50].map((g) => <span key={g} style={{ left: dx(g) + "%" }}>{g === 50 ? "50%" : g}</span>)}
                   <span className="rd-is-thirdlab" style={{ left: dx(100 / 3) + "%" }}>⅓ each</span></span>
                 <span></span><span></span>
               </div>
@@ -1330,7 +1378,7 @@ function RdIssues({ rangeId = "all" }) {
                   <thead><tr><th scope="col"><span className="sr-only">Group</span></th>{gtab.issues.map((k) => <th scope="col" key={k}>{I.labels[k] || k}</th>)}</tr></thead>
                   <tbody>
                     <tr className="all"><th scope="row">All voters</th>{gtab.issues.map((k) => <td key={k}>{whomCell(null, k)}</td>)}</tr>
-                    {gtab.groups.map((g) => <tr key={g}><th scope="row">{issWho(g).replace(/^voters for other parties and independents$/, "Others voters")}</th>{gtab.issues.map((k) => <td key={k}>{whomCell(g, k)}</td>)}</tr>)}
+                    {gtab.groups.map((g) => <tr key={g}><th scope="row">{rdCap(issWho(g).replace(/^voters for other parties and independents$/, "Others voters"))}</th>{gtab.issues.map((k) => <td key={k}>{whomCell(g, k)}</td>)}</tr>)}
                   </tbody>
                 </table>
               </div>
@@ -1455,7 +1503,7 @@ function RdUndecided({ rangeId }) {
         ))}
         <TrendChart key={"rd-un-" + key} heightPx={narrow ? 200 : 230} padPx={{ l: 36, r: 10, t: 14, b: 28 }}
           xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, step)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
-          xTicks={rdXTicks(xDomain[0], xDomain[1], true)} baseline
+          xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline
           series={drawn.map((d) => ({ id: d.s.id, label: d.s.label, color: COL(d.s), rdWidth: 2, dashed: d.s.dashed, rdCap: 3.5, points: series(d.pts, "v") }))}
           spine={series(drawn[0].pts, "v")}
           scatter={drawn.flatMap((d) => d.dots.map((q) => ({ x: q.x, y: q.v, color: "var(--ink-3)", label: d.s.label, meta: q })))} pollFacet="twopp"
