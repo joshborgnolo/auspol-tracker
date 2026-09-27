@@ -50181,7 +50181,7 @@ function CycleLegend({
     id: "ousted",
     label: "Ousted",
     run: () => showOutcome("ousted"),
-    title: "Only terms whose government was turned out" + OUTCOME_NOTE
+    title: "Only terms whose government was ousted" + OUTCOME_NOTE
   }];
   const quick = hidden.size === 0 ? "all" : hidden.size === total ? "none" : outcomeShown;
   return React.createElement("div", {
@@ -51086,7 +51086,7 @@ function PastCyclesView() {
     className: "view-how"
   }, React.createElement("summary", null, "How to read these charts"), React.createElement("p", {
     className: "view-lede"
-  }, "The past terms stand together as a band \u2013 outer edge the middle 80% of them, darker half the middle 50%, dotted line their mean \u2013 drawn over the months each term was actually in office, and going fainter where fewer of them were.", " ", "Open ", React.createElement("strong", null, "Cycles"), " below to draw any term\u2019s own line over the band, to take terms off the board, or to cut the board to the governments that were returned or turned out at their next election. Leave three or fewer terms on the board to see the individual polls under each line.")), srcFailed && React.createElement("p", {
+  }, "The past terms stand together as a band \u2013 outer edge the middle 80% of them, darker half the middle 50%, dotted line their mean \u2013 drawn over the months each term was actually in office, and going fainter where fewer of them were.", " ", "Open ", React.createElement("strong", null, "Cycles"), " below to draw any term\u2019s own line over the band, to take terms off the board, or to cut the board to the governments that were returned or ousted at their next election. Leave three or fewer terms on the board to see the individual polls under each line.")), srcFailed && React.createElement("p", {
     className: "cyc-src-note"
   }, "The individual polls behind the past terms didn\u2019t load \u2013 the monthly lines are unaffected.", " ", React.createElement("button", {
     type: "button",
@@ -61235,11 +61235,11 @@ function RdPastCycles(p) {
     let head;
     if (ret && ous) {
       const nearRet = Math.abs(t.v - ret.mean) <= Math.abs(t.v - ous.mean);
-      head = "After preferences, " + govName + " is on a par with governments that went on to be " + (nearRet ? "re-elected" : "turned out");
+      head = "After preferences, " + govName + " is on a par with governments that went on to be " + (nearRet ? "re-elected" : "ousted");
     } else head = "After preferences, " + govName + " is " + (dAvg >= 0 ? "above" : "below") + " the average government at this point";
     const vs = rivalWord === "One Nation" ? " against One Nation" : "";
     let dek = "Its " + fmtOf("tpp")(t.v) + (chg ? "" : "%") + vs + " is " + Math.abs(dAvg).toFixed(1) + " points " + (dAvg >= 0 ? "above" : "below") + " the average government " + m + " months in.";
-    if (ret && ous) dek += " Governments later re-elected averaged " + fmtOf("tpp")(ret.mean) + (chg ? "" : "%") + " at this point; the " + rdNumWord(ous.n) + " turned out averaged " + fmtOf("tpp")(ous.mean) + (chg ? "" : "%") + ".";
+    if (ret && ous) dek += " Governments later re-elected averaged " + fmtOf("tpp")(ret.mean) + (chg ? "" : "%") + " at this point; the " + rdNumWord(ous.n) + " ousted averaged " + fmtOf("tpp")(ous.mean) + (chg ? "" : "%") + ".";
     return {
       head,
       dek
@@ -61413,7 +61413,7 @@ function RdPastCycles(p) {
         className: "tip-label"
       }, "Next election"), React.createElement("span", {
         className: "tip-val"
-      }, oc === "returned" ? "Re-elected" : "Turned out")));
+      }, oc === "returned" ? "Re-elected" : "Ousted")));
     })()), React.createElement("span", {
       role: "cell",
       className: "rd-cs-avg"
@@ -61462,7 +61462,7 @@ function RdPastCycles(p) {
     className: "rd-tabs rd-cc-tabs",
     role: "group",
     "aria-label": "Compare with"
-  }, [["all", "All past terms", nPast], ["returned", "Re-elected", nRet], ["ousted", "Turned out", nOus]].map(([id, lab, n]) => React.createElement("button", {
+  }, [["all", "All past terms", nPast], ["returned", "Re-elected", nRet], ["ousted", "Ousted", nOus]].map(([id, lab, n]) => React.createElement("button", {
     key: id,
     type: "button",
     className: "rd-tab",
@@ -61566,7 +61566,7 @@ function RdPastCycles(p) {
       className: "rd-cc-now"
     }, "This term") : React.createElement("span", {
       className: "rd-cc-oc"
-    }, oc === "returned" ? "Re-elected" : "Turned out"), !c.current && React.createElement("button", {
+    }, oc === "returned" ? "Re-elected" : "Ousted"), !c.current && React.createElement("button", {
       type: "button",
       className: "rd-cc-x",
       "aria-label": (off ? "Put " : "Take ") + c.year + (off ? " back on the board" : " off the board"),

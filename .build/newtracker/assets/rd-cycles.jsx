@@ -240,7 +240,7 @@ function RdPastCycles(p) {
     }
     return { head, dek };
   })();
-  /* the 2PP against the governments that were re-elected and turned out */
+  /* the 2PP against the governments that were re-elected and ousted */
   const outcomePeers = (which) => {
     const keep = new Set(cycles.filter((c, i) => outcomeOf(i) === which).map((c) => c.year));
     const hid = new Set(cycles.filter((c) => !keep.has(c.year) && !c.current).map((c) => c.year));
@@ -254,11 +254,11 @@ function RdPastCycles(p) {
     let head;
     if (ret && ous) {
       const nearRet = Math.abs(t.v - ret.mean) <= Math.abs(t.v - ous.mean);
-      head = "After preferences, " + govName + " is on a par with governments that went on to be " + (nearRet ? "re-elected" : "turned out");
+      head = "After preferences, " + govName + " is on a par with governments that went on to be " + (nearRet ? "re-elected" : "ousted");
     } else head = "After preferences, " + govName + " is " + (dAvg >= 0 ? "above" : "below") + " the average government at this point";
     const vs = rivalWord === "One Nation" ? " against One Nation" : "";
     let dek = "Its " + fmtOf("tpp")(t.v) + (chg ? "" : "%") + vs + " is " + Math.abs(dAvg).toFixed(1) + " points " + (dAvg >= 0 ? "above" : "below") + " the average government " + m + " months in.";
-    if (ret && ous) dek += " Governments later re-elected averaged " + fmtOf("tpp")(ret.mean) + (chg ? "" : "%") + " at this point; the " + rdNumWord(ous.n) + " turned out averaged " + fmtOf("tpp")(ous.mean) + (chg ? "" : "%") + ".";
+    if (ret && ous) dek += " Governments later re-elected averaged " + fmtOf("tpp")(ret.mean) + (chg ? "" : "%") + " at this point; the " + rdNumWord(ous.n) + " ousted averaged " + fmtOf("tpp")(ous.mean) + (chg ? "" : "%") + ".";
     return { head, dek };
   })();
   /* the primaries: how far each party has moved since its own election */
@@ -343,7 +343,7 @@ function RdPastCycles(p) {
                       <span className="tip rd-cs-tip" style={{ left: Math.min(80, Math.max(20, X(sc, q.v))) + "%" }}>
                         <span className="tip-title">{q.who}, {q.yr} term</span>
                         <span className="tip-row"><span className="tip-label">At {m} months</span><span className="tip-val">{r.fmt(q.v)}</span></span>
-                        {oc && <span className="tip-row"><span className="tip-label">Next election</span><span className="tip-val">{oc === "returned" ? "Re-elected" : "Turned out"}</span></span>}
+                        {oc && <span className="tip-row"><span className="tip-label">Next election</span><span className="tip-val">{oc === "returned" ? "Re-elected" : "Ousted"}</span></span>}
                       </span>
                     );
                   })()}
@@ -372,7 +372,7 @@ function RdPastCycles(p) {
       <div className="rd-cc-row">
         <span className="rd-cc-l">Compare with</span>
         <div className="rd-tabs rd-cc-tabs" role="group" aria-label="Compare with">
-          {[["all", "All past terms", nPast], ["returned", "Re-elected", nRet], ["ousted", "Turned out", nOus]].map(([id, lab, n]) => (
+          {[["all", "All past terms", nPast], ["returned", "Re-elected", nRet], ["ousted", "Ousted", nOus]].map(([id, lab, n]) => (
             <button key={id} type="button" className="rd-tab" aria-pressed={compare === id} onClick={() => setCompare(id)}>{narrow && id === "all" ? "All" : lab}<span className="rd-cc-n">{n}</span></button>
           ))}
         </div>
@@ -416,7 +416,7 @@ function RdPastCycles(p) {
                     <span className="rd-cc-rule" style={{ background: c.color, opacity: drawn || c.current ? 1 : 0.4 }}></span>
                     <b>{c.year}</b><span>{pmNames(c)}</span>
                   </button>
-                  {c.current ? <span className="rd-cc-now">This term</span> : <span className="rd-cc-oc">{oc === "returned" ? "Re-elected" : "Turned out"}</span>}
+                  {c.current ? <span className="rd-cc-now">This term</span> : <span className="rd-cc-oc">{oc === "returned" ? "Re-elected" : "Ousted"}</span>}
                   {!c.current && <button type="button" className="rd-cc-x" aria-label={(off ? "Put " : "Take ") + c.year + (off ? " back on the board" : " off the board")} onClick={() => toggle(c.year)}>{off ? "+" : "×"}</button>}
                 </span>
               );

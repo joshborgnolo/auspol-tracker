@@ -2178,7 +2178,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
     { id: "returned", label: "Returned", run: () => showOutcome("returned"),
       title: "Only terms whose government was returned" + OUTCOME_NOTE },
     { id: "ousted", label: "Ousted", run: () => showOutcome("ousted"),
-      title: "Only terms whose government was turned out" + OUTCOME_NOTE },
+      title: "Only terms whose government was ousted" + OUTCOME_NOTE },
   ];
   const quick = hidden.size === 0 ? "all" : hidden.size === total ? "none" : outcomeShown;
 
@@ -3101,7 +3101,7 @@ function PastCyclesView() {
               said inside the panel, next to the halves. */}
           Open <strong>Cycles</strong> below to draw any term’s own line over the band, to
           take terms off the board, or to cut the board to the governments that were
-          returned or turned out at their next election. Leave three or fewer terms on
+          returned or ousted at their next election. Leave three or fewer terms on
           the board to see the individual polls under each line.
           </p>
         </details>
