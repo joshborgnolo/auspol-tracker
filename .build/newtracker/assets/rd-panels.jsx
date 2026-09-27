@@ -654,7 +654,7 @@ function RdLeadership({ rangeId }) {
       {story && <RdHed head={story.head} dek={story.dek} />}
       <div className={"rd-ld-grid" + (expanded ? " one" : "")}>
         {panel("ppm", "Preferred prime minister", "“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.",
-          <RdTabs value={ppmView} onChange={choosePpm} ariaLabel="Preferred prime minister question"
+          <RdTabs swipe value={ppmView} onChange={choosePpm} ariaLabel="Preferred prime minister question"
                   options={[{ id: "two", label: "Two-way" }, { id: "three", label: "Three-way" }, { id: "both", label: "Both" }]}>
             {!narrow && expandBtn("ppm", "preferred prime minister")}
           </RdTabs>,
@@ -677,7 +677,7 @@ function RdLeadership({ rangeId }) {
           metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person."
             : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. RedBridge, DemosAU, Freshwater and Spectre Strategy."
             : "Approve minus disapprove of the job each leader is doing. Newspoll, YouGov, Resolve, Essential and others.",
-          <RdTabs value={metric} onChange={(v) => { if (v === "both" || own === "both") setOwn(v); else chooseMetric(v); }} ariaLabel="Leader rating"
+          <RdTabs swipe value={metric} onChange={(v) => { if (v === "both" || own === "both") setOwn(v); else chooseMetric(v); }} ariaLabel="Leader rating"
                   options={[{ id: "net", label: "Approval" }, { id: "fav", label: "Favourability" }, { id: "both", label: "Both" }]}>
             {!narrow && expandBtn("appr", "leader ratings")}
           </RdTabs>,
@@ -996,7 +996,7 @@ function RdDemographics({ rangeId = "all" }) {
   return (
     <RdSec id="who-votes" cls="rd-wv" title="Who votes for whom" meta={"Pooled from the last " + T.window + " of " + rdList(T.houses.map(demoHouse)) + " polls"}>
       <RdHed head={story.head} dek={story.dek} />
-      <RdTabs value={tab.id} onChange={setTab} options={T.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-wv-tabs">
+      <RdTabs swipe value={tab.id} onChange={setTab} options={T.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-wv-tabs">
         {!narrow && (
           <span className="rd-chips" role="group" aria-label="Party">
             {DEMO_PARTIES.map((pp) => (
@@ -1493,7 +1493,7 @@ function RdIssues({ rangeId = "all" }) {
   };
 
   const tabs = (
-    <RdTabs value={view} onChange={setView} ariaLabel="View" className="rd-is-tabs"
+    <RdTabs swipe value={view} onChange={setView} ariaLabel="View" className="rd-is-tabs"
             options={[{ id: "trust", label: "Who’s trusted" }, { id: "whom", label: "What matters to whom" }]} />
   );
   return (

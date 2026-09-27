@@ -31,6 +31,13 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const [facet, setFacet] = useState("twopp");
   const [sort, setSort] = useState({ key: "latest", dir: -1 });
   const [open, setOpen] = useState(null);
+  /* an earlier release's readout, as a chart's poll dot has one:
+     { id, row, key, left, src } - src is the input that raised it */
+  const [tl, setTl] = useState(null);
+  const tlBox = React.useRef(null);
+  const tlPtr = React.useRef(null);
+  // a readout a finger raised stays up until the next tap somewhere else
+  window.useDismissOutside(tlBox, !!(tl && tl.src === "touch"), () => setTl(null));
   const measure = window.AP.measureOfMatchup(tppMatchup);
   const basis = tppBasis || "imp";
   const proj = window.AP.nextPolls ? window.AP.nextPolls() : { rows: [], t0: 0, nowMs: 0 };
@@ -205,6 +212,22 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const L = t0 - 43 * DAY_MS, R = t0 + 23 * DAY_MS;
   const pos = (ms) => ((ms - L) / (R - L)) * 100;
   const ticks = [-42, -28, -14, 0, 14].map((k) => ({ x: pos(t0 + k * DAY_MS), label: k === 0 ? "Today" : dm(t0 + k * DAY_MS), today: k === 0 }));
+  /* the readout: the poll as this row would show it, on the facet in view -
+     figCell run on that poll, so it can never disagree with the table */
+  const tlTip = (t) => {
+    const q = D.individualPolls.find((x) => x.pollster + "|" + x.released === t.key);
+    if (!q) return null;
+    const pr = rdPollRow(q);
+    return (
+      <div className="tip tip-dot rd-tl-tip" style={{ left: t.left + "%", top: "50%" }} aria-hidden="true">
+        <div className="tip-title">{q.pollster}</div>
+        <div className="rd-tl-tipdate">Fieldwork {pr.field} · published {pr.publishedLabel}</div>
+        {figCell({ poll: pr })}
+        {q.sample ? <div className="tip-sub">n = {q.sample.toLocaleString()}</div> : null}
+        {t.src !== "touch" && <div className="tip-hint">{t.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"}</div>}
+      </div>
+    );
+  };
   const strip = (e) => {
     const r = e.next;
     const marks = [];
@@ -213,19 +236,36 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       const ms = Date.parse((x.pub || x.field).slice(0, 10));
       if (Math.abs(ms - e.pubMs) < DAY_MS / 2) return;
       if (ms < L || ms > R) return;
-      /* an earlier release opens its own row in All polls; the row's poll
-         is the dark dot and needs no link - the row already is it */
+      /* An earlier release behaves as a chart's poll dot does: pointing at
+         it (or focusing it) shows the poll, and only then does a mouse click
+         open it in All polls. A tap shows it and nothing more - on a touch
+         screen the tap is the only way to read a dot, so it can't also be the
+         trip. The row's own poll is the dark dot and has no readout: the row
+         already is it. */
       const key = window.AP.pollRowKey && window.AP.pollRowKey({ pollster: e.poll.pollster, released: x.field });
-      /* openPoll is asked for at the click, not here: the app registers it
-         in an effect, after this table's first render */
       if (!key) {
         marks.push(<span key={"e" + ms} className="rd-tl-dot" style={{ left: pos(ms) + "%" }} aria-hidden="true"></span>);
         return;
       }
-      const lab = e.poll.pollster + "’s poll of " + dm(ms) + ": open in All polls";
-      marks.push(<button key={"e" + ms} type="button" className="rd-tl-dot rd-tl-dotlink" style={{ left: pos(ms) + "%" }}
-                         title={lab} aria-label={lab}
-                         onClick={(ev) => { ev.stopPropagation(); if (window.AP.openPoll) window.AP.openPoll(key, facet, "latest and next polls"); }}></button>);
+      const id = key, row = e.poll.pollster, left = pos(ms);
+      const show = (src) => setTl({ id, row, key, left, src });
+      const hide = (src) => setTl((t) => (t && t.id === id && (!src || t.src === src) ? null : t));
+      // openPoll is looked up at the click: the app registers it after this table's first render
+      const go = () => { setTl(null); if (window.AP.openPoll) window.AP.openPoll(key, facet, "latest and next polls"); };
+      marks.push(<button key={"e" + ms} type="button" className={"rd-tl-dot rd-tl-dotlink" + (tl && tl.id === id ? " on" : "")}
+                         style={{ left: left + "%" }} aria-label={row + "’s poll of " + dm(ms) + ": open in All polls"}
+                         onPointerDown={(ev) => { tlPtr.current = ev.pointerType; }}
+                         onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show("mouse"); }}
+                         onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide("mouse"); }}
+                         onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show("focus"); }}
+                         onBlur={() => hide("focus")}
+                         onClick={(ev) => {
+                           ev.stopPropagation();
+                           const ptr = ev.detail === 0 ? "key" : tlPtr.current;
+                           tlPtr.current = null;
+                           if (ptr === "mouse" || ptr === "key") { go(); return; }
+                           if (tl && tl.id === id) setTl(null); else show("touch");
+                         }}></button>);
     });
     if (e.pubMs >= L) marks.push(<span key="latest" className="rd-tl-latest" style={{ left: pos(e.pubMs) + "%" }}></span>);
     else marks.push(<span key="latest" className="rd-tl-off rd-tl-offl" aria-hidden="true"><span className="rd-tl-dot"></span>{dm(e.pubMs)}</span>);
@@ -247,10 +287,11 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     return (
       /* not hidden whole: the earlier-release dots are links. Every other
          mark is empty or hidden itself, so they are all a reader meets */
-      <div className="rd-tl">
+      <div className="rd-tl" ref={tl && tl.row === e.poll.pollster ? tlBox : undefined}>
         <span className="rd-tl-base"></span>
         {ticks.map((t) => <span key={t.label} className={"rd-tl-grid" + (t.today ? " today" : "")} style={{ left: t.x + "%" }}></span>)}
         {marks}
+        {tl && tl.row === e.poll.pollster && tlTip(tl)}
       </div>
     );
   };
@@ -357,7 +398,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
         {phone ? "The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll."
           : "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm." + (narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection.")}
       </p>
-      <RdTabs value={facet} onChange={setFacet} options={narrow ? RD_PL_FACETS.map((f) => (f.id === "leadership" ? { ...f, label: "Leaders" } : f)) : RD_PL_FACETS}
+      <RdTabs swipe value={facet} onChange={setFacet} options={narrow ? RD_PL_FACETS.map((f) => (f.id === "leadership" ? { ...f, label: "Leaders" } : f)) : RD_PL_FACETS}
               ariaLabel="Poll table view" className="rd-pl-tabs">
         {!narrow && controls}
       </RdTabs>

@@ -884,7 +884,7 @@ function RdAllPolls(P) {
       </div>
       {head && <RdHed head={head} dek={dek} level={2} />}
 
-      <RdTabs value={facet} onChange={onFacet} options={FACETS} ariaLabel="Figures" className="rd-ap-tabs">
+      <RdTabs swipe value={facet} onChange={onFacet} options={FACETS} ariaLabel="Figures" className="rd-ap-tabs">
         {facet === "twopp" && !phone && (
           <span className="rd-pl-ctl">
             <span className="rd-pl-ctl-l">Two-party:</span>{flip}

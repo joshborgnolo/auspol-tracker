@@ -3457,7 +3457,10 @@ body.rd .rd-tl-dot, body.rd .rd-tl-latest, body.rd .rd-tl-next, body.rd .rd-tl-l
 body.rd .rd-tl-dot { width: 6px; height: 6px; background: var(--ink-faint); }
 body.rd .rd-tl-dotlink { border: 0; padding: 0; cursor: pointer; transition: background .15s, width .15s, height .15s; }
 body.rd .rd-tl-dotlink::before { content: ""; position: absolute; left: 50%; top: 50%; width: 20px; height: 20px; transform: translate(-50%, -50%); border-radius: 50%; }
-body.rd .rd-tl-dotlink:hover, body.rd .rd-tl-dotlink:focus-visible { background: var(--ink-2); width: 8px; height: 8px; }
+body.rd .rd-tl-dotlink:hover, body.rd .rd-tl-dotlink:focus-visible, body.rd .rd-tl-dotlink.on { background: var(--ink-2); width: 8px; height: 8px; }
+body.rd .rd-tl-tip { z-index: 30; white-space: nowrap; text-align: left; }
+body.rd .rd-tl-tipdate { font-size: 11px; color: var(--ink-3); margin: -3px 0 6px; }
+body.rd .rd-tl-tip .rd-pl-main { font-size: 14px; }
 body.rd .rd-tl-dotlink:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 body.rd .rd-tl-latest { width: 11px; height: 11px; background: var(--ink); }
 body.rd .rd-tl-next { width: 13px; height: 13px; box-sizing: border-box; border: 2px solid var(--ink); background: var(--bg); z-index: 3; }
@@ -55860,10 +55863,24 @@ function RdTabs({
   options,
   ariaLabel,
   children,
-  className
+  className,
+  swipe
 }) {
+  const live = React.useRef(null);
+  live.current = dir => {
+    const i = options.findIndex(o => o.id === value);
+    const next = options[i + dir];
+    if (i < 0 || !next) return false;
+    onChange(next.id);
+    return true;
+  };
+  const mark = React.useCallback(el => {
+    if (el) el.__rdSwipe = dir => live.current(dir);
+  }, []);
   return React.createElement("div", {
-    className: "rd-tabs" + (className ? " " + className : "")
+    className: "rd-tabs" + (className ? " " + className : ""),
+    ref: swipe ? mark : undefined,
+    "data-rd-swipe": swipe ? "" : undefined
   }, React.createElement("div", {
     role: "group",
     "aria-label": ariaLabel,
@@ -57846,6 +57863,7 @@ function RdLeadership({
   }), React.createElement("div", {
     className: "rd-ld-grid" + (expanded ? " one" : "")
   }, panel("ppm", "Preferred prime minister", "“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.", React.createElement(RdTabs, {
+    swipe: true,
     value: ppmView,
     onChange: choosePpm,
     ariaLabel: "Preferred prime minister question",
@@ -57869,6 +57887,7 @@ function RdLeadership({
   }, React.createElement("span", {
     className: "rd-ld-keytxt"
   }, ppmView === "three" ? "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Shares of all respondents. Pollsters leave different shares undecided, so read the order and the gaps rather than the levels." : ppmView === "two" ? "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Lead is " + pm.short + "’s share minus his opponent’s, which lets one chart carry both head-to-head contests." : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Lead is " + pm.short + "’s share minus his opponent’s; three-way figures are shares of all respondents.")))), panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval", metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person." : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. RedBridge, DemosAU, Freshwater and Spectre Strategy." : "Approve minus disapprove of the job each leader is doing. Newspoll, YouGov, Resolve, Essential and others.", React.createElement(RdTabs, {
+    swipe: true,
     value: metric,
     onChange: v => {
       if (v === "both" || own === "both") setOwn(v);else chooseMetric(v);
@@ -58500,6 +58519,7 @@ function RdDemographics({
     head: story.head,
     dek: story.dek
   }), React.createElement(RdTabs, {
+    swipe: true,
     value: tab.id,
     onChange: setTab,
     options: T.tabs.map(x => ({
@@ -59368,6 +59388,7 @@ function RdIssues({
     }, Math.round(c.v), sig ? " " + (diff > 0 ? "▲" : "▼") : ""));
   };
   const tabs = React.createElement(RdTabs, {
+    swipe: true,
     value: view,
     onChange: setView,
     ariaLabel: "View",
@@ -60332,6 +60353,10 @@ function RdPolls({
     dir: -1
   });
   const [open, setOpen] = useState(null);
+  const [tl, setTl] = useState(null);
+  const tlBox = React.useRef(null);
+  const tlPtr = React.useRef(null);
+  window.useDismissOutside(tlBox, !!(tl && tl.src === "touch"), () => setTl(null));
   const measure = window.AP.measureOfMatchup(tppMatchup);
   const basis = tppBasis || "imp";
   const proj = window.AP.nextPolls ? window.AP.nextPolls() : {
@@ -60593,6 +60618,29 @@ function RdPolls({
     label: k === 0 ? "Today" : dm(t0 + k * DAY_MS),
     today: k === 0
   }));
+  const tlTip = t => {
+    const q = D.individualPolls.find(x => x.pollster + "|" + x.released === t.key);
+    if (!q) return null;
+    const pr = rdPollRow(q);
+    return React.createElement("div", {
+      className: "tip tip-dot rd-tl-tip",
+      style: {
+        left: t.left + "%",
+        top: "50%"
+      },
+      "aria-hidden": "true"
+    }, React.createElement("div", {
+      className: "tip-title"
+    }, q.pollster), React.createElement("div", {
+      className: "rd-tl-tipdate"
+    }, "Fieldwork ", pr.field, " \xB7 published ", pr.publishedLabel), figCell({
+      poll: pr
+    }), q.sample ? React.createElement("div", {
+      className: "tip-sub"
+    }, "n = ", q.sample.toLocaleString()) : null, t.src !== "touch" && React.createElement("div", {
+      className: "tip-hint"
+    }, t.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"));
+  };
   const strip = e => {
     const r = e.next;
     const marks = [];
@@ -60616,19 +60664,51 @@ function RdPolls({
         }));
         return;
       }
-      const lab = e.poll.pollster + "’s poll of " + dm(ms) + ": open in All polls";
+      const id = key,
+        row = e.poll.pollster,
+        left = pos(ms);
+      const show = src => setTl({
+        id,
+        row,
+        key,
+        left,
+        src
+      });
+      const hide = src => setTl(t => t && t.id === id && (!src || t.src === src) ? null : t);
+      const go = () => {
+        setTl(null);
+        if (window.AP.openPoll) window.AP.openPoll(key, facet, "latest and next polls");
+      };
       marks.push(React.createElement("button", {
         key: "e" + ms,
         type: "button",
-        className: "rd-tl-dot rd-tl-dotlink",
+        className: "rd-tl-dot rd-tl-dotlink" + (tl && tl.id === id ? " on" : ""),
         style: {
-          left: pos(ms) + "%"
+          left: left + "%"
         },
-        title: lab,
-        "aria-label": lab,
+        "aria-label": row + "’s poll of " + dm(ms) + ": open in All polls",
+        onPointerDown: ev => {
+          tlPtr.current = ev.pointerType;
+        },
+        onPointerEnter: ev => {
+          if (ev.pointerType === "mouse") show("mouse");
+        },
+        onPointerLeave: ev => {
+          if (ev.pointerType === "mouse") hide("mouse");
+        },
+        onFocus: ev => {
+          if (ev.target.matches(":focus-visible")) show("focus");
+        },
+        onBlur: () => hide("focus"),
         onClick: ev => {
           ev.stopPropagation();
-          if (window.AP.openPoll) window.AP.openPoll(key, facet, "latest and next polls");
+          const ptr = ev.detail === 0 ? "key" : tlPtr.current;
+          tlPtr.current = null;
+          if (ptr === "mouse" || ptr === "key") {
+            go();
+            return;
+          }
+          if (tl && tl.id === id) setTl(null);else show("touch");
         }
       }));
     });
@@ -60699,7 +60779,8 @@ function RdPolls({
       })));
     }
     return (React.createElement("div", {
-        className: "rd-tl"
+        className: "rd-tl",
+        ref: tl && tl.row === e.poll.pollster ? tlBox : undefined
       }, React.createElement("span", {
         className: "rd-tl-base"
       }), ticks.map(t => React.createElement("span", {
@@ -60708,7 +60789,7 @@ function RdPolls({
         style: {
           left: t.x + "%"
         }
-      })), marks)
+      })), marks, tl && tl.row === e.poll.pollster && tlTip(tl))
     );
   };
   const detail = e => {
@@ -60827,6 +60908,7 @@ function RdPolls({
   }, React.createElement("p", {
     className: "rd-dek rd-pl-dek"
   }, phone ? "The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll." : "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm." + (narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection.")), React.createElement(RdTabs, {
+    swipe: true,
     value: facet,
     onChange: setFacet,
     options: narrow ? RD_PL_FACETS.map(f => f.id === "leadership" ? {
@@ -63684,6 +63766,7 @@ function RdAllPolls(P) {
     dek: dek,
     level: 2
   }), React.createElement(RdTabs, {
+    swipe: true,
     value: facet,
     onChange: onFacet,
     options: FACETS,
@@ -66726,6 +66809,106 @@ function App() {
     setFocusPoll(null);
     setFocusTerm(null);
   };
+  const swipeRef = useRef(null);
+  swipeRef.current = {
+    tab,
+    goTab
+  };
+  React.useEffect(() => {
+    const PHONE = window.matchMedia("(max-width: 640px)");
+    const MIN_DX = 60;
+    const EDGE = 24;
+    const NEAR_BELOW = 120;
+    const MAX_MS = 800;
+    let g = null;
+    const claimsSideways = el => {
+      for (let n = el; n && n.nodeType === 1 && n !== document.body; n = n.parentElement) {
+        if (n.matches("input, textarea, select, [contenteditable], [role=slider]")) return true;
+        const cs = getComputedStyle(n);
+        const ta = cs.touchAction;
+        if (ta && ta !== "auto" && ta !== "manipulation" && !/pan-x/.test(ta)) return true;
+        if ((cs.overflowX === "auto" || cs.overflowX === "scroll") && n.scrollWidth > n.clientWidth + 1) return true;
+      }
+      return false;
+    };
+    const rowAt = y => {
+      let best = null,
+        bestD = Infinity;
+      for (const el of document.querySelectorAll("[data-rd-swipe]")) {
+        const r = el.getBoundingClientRect();
+        if (!r.height || y < r.top - 12 || y > r.bottom + NEAR_BELOW) continue;
+        const d = y < r.bottom ? 0 : y - r.bottom;
+        if (d < bestD) {
+          bestD = d;
+          best = el;
+        }
+      }
+      return best;
+    };
+    const onStart = e => {
+      g = null;
+      if (!PHONE.matches || e.touches.length !== 1) return;
+      if (window.visualViewport && window.visualViewport.scale > 1.01) return;
+      const t = e.touches[0];
+      if (t.clientX < EDGE || t.clientX > window.innerWidth - EDGE) return;
+      if (claimsSideways(e.target)) return;
+      g = {
+        x: t.clientX,
+        y: t.clientY,
+        t: Date.now(),
+        sy: window.scrollY,
+        row: rowAt(t.clientY)
+      };
+    };
+    const onMove = e => {
+      if (g && e.touches.length > 1) g = null;
+    };
+    const onCancel = () => {
+      g = null;
+    };
+    const onEnd = e => {
+      const s = g;
+      g = null;
+      if (!s || !e.changedTouches.length) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - s.x,
+        dy = t.clientY - s.y;
+      if (Math.abs(dx) < MIN_DX || Math.abs(dy) > Math.abs(dx) * 0.5) return;
+      if (Date.now() - s.t > MAX_MS || Math.abs(window.scrollY - s.sy) > 12) return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const dir = dx < 0 ? 1 : -1;
+      if (s.row) {
+        if (s.row.isConnected && s.row.__rdSwipe) s.row.__rdSwipe(dir);
+        return;
+      }
+      const {
+        tab: cur,
+        goTab: go
+      } = swipeRef.current;
+      const ids = TABS.map(x => x.id);
+      const next = ids[ids.indexOf(cur) + dir];
+      if (next) go(next);
+    };
+    document.addEventListener("touchstart", onStart, {
+      passive: true
+    });
+    document.addEventListener("touchmove", onMove, {
+      passive: true
+    });
+    document.addEventListener("touchend", onEnd, {
+      passive: true
+    });
+    document.addEventListener("touchcancel", onCancel, {
+      passive: true
+    });
+    return () => {
+      document.removeEventListener("touchstart", onStart);
+      document.removeEventListener("touchmove", onMove);
+      document.removeEventListener("touchend", onEnd);
+      document.removeEventListener("touchcancel", onCancel);
+    };
+  }, []);
   const npJumpRef = useRef(false);
   const npScrollNow = () => {
     const el = document.querySelector("section.next-polls, section.rd-polls");

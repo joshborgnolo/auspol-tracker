@@ -2032,6 +2032,93 @@ function App() {
     setFocusTerm(null);
   };
 
+  /* A phone swipes between the pages: finger right-to-left for the next tab
+     (Snapshot -> Past cycles), left-to-right for the one before, anywhere on
+     the page. The exception is a row of subpages (RdTabs marked `swipe`: All
+     polls' figures, preferred PM's questions, who votes by age or place...):
+     a swipe on it or just under it steps through ITS views instead, the
+     nearest row winning. Rows that only re-cut one figure (the time range,
+     Past cycles' re-elected/ousted) aren't marked, so the page turns there.
+
+     It only ever reads a finished gesture, and leaves alone anything that
+     claims sideways drags for itself: a chart scrubs (touch-action: pan-y),
+     a slider drags (none), a wide table scrolls. So do the edges, where iOS
+     and Android put their own back gesture, a zoomed-in page (the finger is
+     panning it) and a second finger (a pinch). Passive throughout: the page
+     never waits on this to scroll. */
+  const swipeRef = useRef(null);
+  swipeRef.current = { tab, goTab };
+  React.useEffect(() => {
+    const PHONE = window.matchMedia("(max-width: 640px)");
+    const MIN_DX = 60;          // travel that makes it a swipe, not a nudge
+    const EDGE = 24;            // the system back-gesture strip at either side
+    const NEAR_BELOW = 120;     // "just under" a subpage row, in px
+    const MAX_MS = 800;
+    let g = null;
+    const claimsSideways = (el) => {
+      for (let n = el; n && n.nodeType === 1 && n !== document.body; n = n.parentElement) {
+        if (n.matches("input, textarea, select, [contenteditable], [role=slider]")) return true;
+        const cs = getComputedStyle(n);
+        const ta = cs.touchAction;
+        if (ta && ta !== "auto" && ta !== "manipulation" && !/pan-x/.test(ta)) return true;
+        if ((cs.overflowX === "auto" || cs.overflowX === "scroll") && n.scrollWidth > n.clientWidth + 1) return true;
+      }
+      return false;
+    };
+    // the subpage row this touch is on or just under, nearest first
+    const rowAt = (y) => {
+      let best = null, bestD = Infinity;
+      for (const el of document.querySelectorAll("[data-rd-swipe]")) {
+        const r = el.getBoundingClientRect();
+        if (!r.height || y < r.top - 12 || y > r.bottom + NEAR_BELOW) continue;
+        const d = y < r.bottom ? 0 : y - r.bottom;
+        if (d < bestD) { bestD = d; best = el; }
+      }
+      return best;
+    };
+    const onStart = (e) => {
+      g = null;
+      if (!PHONE.matches || e.touches.length !== 1) return;
+      if (window.visualViewport && window.visualViewport.scale > 1.01) return;
+      const t = e.touches[0];
+      if (t.clientX < EDGE || t.clientX > window.innerWidth - EDGE) return;
+      if (claimsSideways(e.target)) return;
+      g = { x: t.clientX, y: t.clientY, t: Date.now(), sy: window.scrollY, row: rowAt(t.clientY) };
+    };
+    const onMove = (e) => { if (g && e.touches.length > 1) g = null; };
+    const onCancel = () => { g = null; };
+    const onEnd = (e) => {
+      const s = g;
+      g = null;
+      if (!s || !e.changedTouches.length) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - s.x, dy = t.clientY - s.y;
+      if (Math.abs(dx) < MIN_DX || Math.abs(dy) > Math.abs(dx) * 0.5) return;
+      if (Date.now() - s.t > MAX_MS || Math.abs(window.scrollY - s.sy) > 12) return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;       // the finger was selecting text
+      const dir = dx < 0 ? 1 : -1;               // right-to-left = next
+      if (s.row) {
+        if (s.row.isConnected && s.row.__rdSwipe) s.row.__rdSwipe(dir);
+        return;                                  // a row's last view doesn't turn the page
+      }
+      const { tab: cur, goTab: go } = swipeRef.current;
+      const ids = TABS.map((x) => x.id);
+      const next = ids[ids.indexOf(cur) + dir];
+      if (next) go(next);
+    };
+    document.addEventListener("touchstart", onStart, { passive: true });
+    document.addEventListener("touchmove", onMove, { passive: true });
+    document.addEventListener("touchend", onEnd, { passive: true });
+    document.addEventListener("touchcancel", onCancel, { passive: true });
+    return () => {
+      document.removeEventListener("touchstart", onStart);
+      document.removeEventListener("touchmove", onMove);
+      document.removeEventListener("touchend", onEnd);
+      document.removeEventListener("touchcancel", onCancel);
+    };
+  }, []);
+
   /* The navbar's "Next" label is a jump to the NextPollsPanel, which sits
      second-to-last on the snapshot view (undecided is the foot). When the
      reader is on another tab the scroll has to wait for the snapshot to

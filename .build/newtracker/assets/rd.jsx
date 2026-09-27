@@ -113,9 +113,25 @@ function RdFoot({ children, how }) {
 
 /* ---------------------------------------------------------------- tabs
    The views inside a section: a row of words, the chosen one underlined. */
-function RdTabs({ value, onChange, options, ariaLabel, children, className }) {
+function RdTabs({ value, onChange, options, ariaLabel, children, className, swipe }) {
+  /* `swipe`: the views are pages of their own (All polls' figures, preferred
+     PM's questions, who votes by age or by place…), so on a phone a sideways
+     swipe on or just under the row steps through them - the app's swipe
+     handler finds the row by data-rd-swipe and calls its step. Views that
+     only re-cut one figure (a time range, a filter) leave it off, and a
+     swipe near them turns the page instead. */
+  const live = React.useRef(null);
+  live.current = (dir) => {
+    const i = options.findIndex((o) => o.id === value);
+    const next = options[i + dir];
+    if (i < 0 || !next) return false;
+    onChange(next.id);
+    return true;
+  };
+  const mark = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => live.current(dir); }, []);
   return (
-    <div className={"rd-tabs" + (className ? " " + className : "")}>
+    <div className={"rd-tabs" + (className ? " " + className : "")}
+         ref={swipe ? mark : undefined} data-rd-swipe={swipe ? "" : undefined}>
       <div role="group" aria-label={ariaLabel} style={{ display: "flex", gap: 4 }}>
         {options.map((o) => (
           <button key={o.id} type="button" className="rd-tab" aria-pressed={value === o.id}
