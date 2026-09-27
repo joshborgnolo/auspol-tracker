@@ -3445,7 +3445,7 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
     color: var(--ink-3);
     transition: transform .38s cubic-bezier(.22, 1, .36, 1);
   }
-  .tabs.show-score .tab-next { transform: translateX(calc(-50% - 50cqw)); }
+  .tabs.show-score .tab-next { transform: translateX(calc(-50% - 50cqw + var(--tn-shift, 0px))); }
   /* an item past the measured budget parks rather than wraps: out of flow
      and hidden, but still rendered (and measurable), so the fit pass can
      bring it straight back the moment the bar has room for it again. The

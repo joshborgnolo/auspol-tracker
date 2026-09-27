@@ -193,13 +193,26 @@ function NextPollTicker({ showScore }) {
       }
       const gap = parseFloat(getComputedStyle(el).columnGap) || 0;
       const kids = el.children;
+      let shift = 0;
       if (showScore) {
         const scoreEl = inner.querySelector(".tab-score");
         const scoreR = scoreEl ? scoreEl.getBoundingClientRect() : null;
         const centre = (innerR.left + innerR.right) / 2;
-        const leftRoom = centre - setRight;
-        const rightRoom = (scoreR && scoreR.width ? scoreR.left : innerR.right) - centre;
-        budget = 2 * Math.max(0, Math.min(leftRoom, rightRoom) - SAFE);
+        const scoreLeft = scoreR && scoreR.width ? scoreR.left : innerR.right;
+        if (window.AP && window.AP.rd) {
+          /* The redesign centres the strip in the GAP between the tab set
+             and the docked score, not on the bar: centred on the bar, the
+             short run to the tab set capped it at one house below 1200px,
+             and the reader should always have at least the next two. The
+             offset rides the same single transform (--tn-shift). */
+          const SAFE_RD = 24;
+          shift = (setRight + scoreLeft) / 2 - centre;
+          budget = Math.max(0, scoreLeft - setRight - 2 * SAFE_RD);
+        } else {
+          const leftRoom = centre - setRight;
+          const rightRoom = scoreLeft - centre;
+          budget = 2 * Math.max(0, Math.min(leftRoom, rightRoom) - SAFE);
+        }
       } else {
         budget = innerR.right - setRight - SAFE;
       }
@@ -209,6 +222,7 @@ function NextPollTicker({ showScore }) {
         used += gap + kids[i].offsetWidth;
         k++;
       }
+      el.style.setProperty("--tn-shift", shift.toFixed(1) + "px");
       setFit(k);
     };
     compute();
