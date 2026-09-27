@@ -116,7 +116,10 @@ function straightPath(pts, sx, sy) {
  * ------------------------------------------------------------------ */
 function TrendChart(props) {
   const {
-    height = 360, xDomain, yDomain, pad: padProp = { l: 46, r: 20, t: 18, b: 34 },
+    height: heightIn = 360, xDomain, yDomain, pad: padIn = { l: 46, r: 20, t: 18, b: 34 },
+    /* the redesign sizes a chart in screen px - a fixed height and fixed
+       margins however wide the column - and the viewBox follows the width */
+    heightPx, padPx,
     series: seriesProp = [], scatter: scatterProp = [], yTicks = [], xTicks = [], refLines = [],
     bands = [], areas = [], fmt = (v) => v.toFixed(1), unit = "", tooltipTitle: tooltipTitleProp,
     onHoverIndex, spine: spineProp, axisFont = 15, events = [], extraRows: extraRowsProp, ariaLabel,
@@ -130,7 +133,28 @@ function TrendChart(props) {
     /* Which archive view a dot from THIS chart should land in. The chart has no
        idea what it is plotting; the panel does. */
     pollFacet,
+    /* The redesign's extras, drawn only where a panel passes them:
+       marks  – [{x, y, label?, labelDx?, labelDy?, anchor?}] an open ring on
+                a point that is a count rather than a poll (an election
+                result), with its words beside it;
+       notes  – [{x, y, text, dy?, anchor?, color?, weight?}] a word or two
+                set on the plot (x "left" pins it to the plot's left edge);
+       baseline – draw the x axis as a solid rule at the domain's floor,
+                with a tick under each labelled month. */
+    marks = [], notes = [], baseline = false,
+    /* brackets – [{x, y0, y1, dx?, lines: [strong, plain]}] a span between two
+       readings at one month, measured off the chart with its words to the left */
+    brackets = [],
+    /* vlines – [{x, cls?}] a rule the full height of the plot (the "Now" of
+       a term, lined up across every chart on the tab) */
+    vlines = [],
   } = props;
+  /* The redesign draws the same data with a lighter hand: straight monthly
+     segments (a curve can show highs and lows no month had), line weights and
+     dot sizes set in screen pixels so a phone draws them as boldly as a
+     laptop, and event names above the plot rather than over the data. App
+     sets AP.rd while it renders; every view remounts when it flips. */
+  const rd = !!(window.AP && window.AP.rd);
 
   // series may be ragged (a leader not polled every month), so points are
   // matched to the hover spine by x value, never by index
@@ -209,6 +233,7 @@ function TrendChart(props) {
   React.useEffect(() => { if (!travelling.current) prev.current = fresh; });
 
   const ref = useRef(null);
+  const badgeAt = useRef({});                // the redesign's spread event badges, by event
   // axis text in real on-screen px – normalise by measured width so every
   // chart's labels match regardless of column width / responsive stacking
   const [cw, setCw] = useState(VB.W);
@@ -221,6 +246,9 @@ function TrendChart(props) {
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+  const k0 = cw / VB.W;
+  const height = heightPx ? heightPx / k0 : heightIn;
+  const padProp = padPx ? { l: padPx.l / k0, r: padPx.r / k0, t: padPx.t / k0, b: padPx.b / k0 } : padIn;
   /* Direct end-of-line labels need room past the last point, and it has to
      be found in SCREEN px: the viewBox is a fixed width, so a phone's label
      costs three times the plot units a laptop's does. The right pad grows to
@@ -234,7 +262,7 @@ function TrendChart(props) {
     const need = seriesProp.filter((s) => s.endLabel && s.opacity !== 0 && s.points.length).map((s) => {
       const f = (s.points[s.points.length - 1].x - xDomain[0]) / (xDomain[1] - xDomain[0]);
       const txt = [...s.endLabel].reduce((n, ch) => n + (ch >= "0" && ch <= "9" ? 0.55 : ch === " " ? 0.3 : 0.72), 0)
-        * 10.5 * 0.95 + 12;
+        * ((window.AP && window.AP.rd) ? 13 : 10.5) * 0.95 + 12;
       return txt - Math.max(0, 1 - f) * innerPx;
     });
     if (!need.length) return padProp;
@@ -298,8 +326,10 @@ function TrendChart(props) {
   const wipeId = clipId + "w";      // + the series id, for a line being erased
 
   const scale = cw / W;                 // px per user-unit
-  const axisUnits = 11 / scale;         // → ~11px on screen, every chart
-  const refUnits = 10.5 / scale;
+  const axisUnits = (rd ? 12 : 11) / scale;         // → ~11px on screen, every chart
+  const refUnits = (rd ? 12 : 10.5) / scale;
+  /* screen px -> user units, for the redesign's pixel-true marks */
+  const PX = (v) => v / Math.max(scale, 0.0001);
 
   // shared x spine for guide-line hover (monthly)
   const spinePts = spine || (series[0] ? series[0].points : []);
@@ -680,13 +710,14 @@ function TrendChart(props) {
   /* Named because the plot clip has to know them: a dot is placed by its
      CENTRE, so a clip drawn at the plot's edge shaves the outer half of any
      reading that sits on it. */
-  const DOT_R = 4.2, DOT_R_LIVE = 6.5;
+  const DOT_R = rd ? PX(cw < 640 ? 2 : 2.6) : 4.2, DOT_R_LIVE = rd ? PX(4.5) : 6.5;
+  const DOT_OP = rd ? 0.5 : 0.6;
   const dotEls = (arr, live) => arr.map((d, i) => {
     const cx = sx(d.x), cy = sy(d.y), r = live && dot === d ? DOT_R_LIVE : DOT_R;
     /* no per-dot pointer listeners: both inputs pick from the svg root, so
        nothing here depends on a browser firing enter/leave on an SVG child */
     const common = { className: "scatter-dot", fill: d.color,
-                     opacity: (live && dot && dot !== d ? 0.25 : 0.6) * (d.op != null ? d.op : 1) };
+                     opacity: (live && dot && dot !== d ? 0.25 : DOT_OP) * (d.op != null ? d.op : 1) };
     const p = dotPath(d.shape, cx, cy, r);
     return p ? <path key={"s" + i} d={p} {...common} />
              : <circle key={"s" + i} cx={cx} cy={cy} r={r} {...common} />;
@@ -699,7 +730,7 @@ function TrendChart(props) {
      circles a frame rather than the ~330 on the chart. */
   const moveDots = scatterMove.map((d, i) => (
     <circle key={"m" + i} cx={sx(d.x)} cy={sy(d.y)} r={DOT_R}
-            className="scatter-dot" fill={d.color} opacity={0.6 * (d.op != null ? d.op : 1)} />
+            className="scatter-dot" fill={d.color} opacity={DOT_OP * (d.op != null ? d.op : 1)} />
   ));
 
   /* ---- key events ---------------------------------------------------------
@@ -729,13 +760,17 @@ function TrendChart(props) {
       .filter((e) => e.x >= win[0] && e.x <= win[1])
       .sort((a, b) => a.x - b.x);
     const fsz = refUnits;          // 10.5px on screen: the type floor for words
-    const ROWS = 3;
-    const ROW_H = refUnits * 1.4;
-    const LEAD = refUnits * 0.55;   // shortest elbow, line to text
+    /* the redesign hangs its event names in two rows ABOVE the plot, each
+       name a flag on its own rule, so no label sits over the data */
+    const ROWS = rd ? 2 : 3;
+    const ROW_H = refUnits * (rd ? 1.35 : 1.4);
+    const LEAD = rd ? PX(5) : refUnits * 0.55;   // shortest elbow, line to text
     const SEP = refUnits * 0.85;    // clear air between labels in a row
     const rowEnd = new Array(ROWS).fill(-Infinity);
     const rightEdge = W - pad.r;
-    const rowY = (r) => (r == null ? pad.t + 4 : pad.t + 3 + r * ROW_H);
+    const rowY = rd
+      ? (r) => (r == null ? pad.t : pad.t - PX(10) - (ROWS - 1 - r) * ROW_H)
+      : (r) => (r == null ? pad.t + 4 : pad.t + 3 + r * ROW_H);
 
     /* What needs room on a narrow chart is the LABELS, not the marks. This
        used to drop the annotation entirely below 640px unless there were two
@@ -768,7 +803,7 @@ function TrendChart(props) {
         const cost = (x - (ex + LEAD)) + r * ROW_PEN;
         if (best === null || cost < best.cost) best = { r, x, cost };
       }
-      if (best) { rowEnd[best.r] = best.x + w; return { e, ex, w, fsz, row: best.r, y: rowY(best.r), x: best.x, flip: false }; }
+      if (best) { rowEnd[best.r] = best.x + w; return { e, ex, w, fsz, row: best.r, y: rowY(best.r), x: best.x, flip: false, disp: best.x - (ex + LEAD) > PX(1) }; }
       // out of room on the right – hang it to the left of its own line
       for (let r = 0; r < ROWS; r++) {
         const x = ex - LEAD - w;
@@ -864,7 +899,7 @@ function TrendChart(props) {
              interval ribbon has to be drawn with the curve it belongs to –
              straight edges under a smoothed line pull away from it mid-month
              and read as a second, disagreeing series. */
-          const edgePath = (pts, key, lead) => a.smooth
+          const edgePath = (pts, key, lead) => (a.smooth && !rd)
             ? smoothPath(pts.map((d) => ({ x: d.x, y: d[key] })), sx, sy).replace(/^M/, lead)
             : pts.map((d, i) => `${i ? "L" : lead} ${sx(d.x).toFixed(2)} ${sy(d[key]).toFixed(2)}`).join(" ");
           const top = edgePath(a.points, "y1", "M");
@@ -891,10 +926,20 @@ function TrendChart(props) {
           <g key={"y" + t}>
             <line x1={pad.l} x2={W - pad.r} y1={sy(t)} y2={sy(t)} className="grid" />
             {yLabelled.has(t) && (
-              <text x={pad.l - 10} y={sy(t)} className="axis-label y" style={{ fontSize: axisUnits }} dominantBaseline="middle">{yTickFmt ? yTickFmt(t) : t + unit}</text>
+              <text x={pad.l - (rd ? PX(8) : 10)} y={sy(t)} className="axis-label y" style={{ fontSize: axisUnits }} dominantBaseline="middle">{yTickFmt ? yTickFmt(t) : t + unit}</text>
             )}
           </g>
         ))}
+        {/* the redesign's x axis: a solid rule at the floor of the window,
+            and a short tick under each month it names */}
+        {baseline && (
+          <g className="rd-axis">
+            <line x1={pad.l} x2={W - pad.r} y1={sy(yDomain[0])} y2={sy(yDomain[0])} className="rd-base" />
+            {xTicks.filter((t) => t.x >= win[0] && t.x <= win[1]).map((t) => (
+              <line key={"xt" + t.x} x1={sx(t.x)} x2={sx(t.x)} y1={sy(yDomain[0])} y2={sy(yDomain[0]) + PX(4)} className="rd-base" />
+            ))}
+          </g>
+        )}
         {/* reference lines (e.g. 50% / 0 net) – labels drawn last, on top */}
         {refLines.map((r, i) => (
           <line key={"r" + i} x1={pad.l} x2={W - pad.r} y1={sy(r.y)} y2={sy(r.y)}
@@ -916,9 +961,37 @@ function TrendChart(props) {
           }
           return ts;
         })().map((t, i) => (
-          <text key={"x" + t.x} x={sx(t.x)} y={H - 10} className="axis-label x" style={{ fontSize: axisUnits }} textAnchor="middle">{t.label}</text>
+          <text key={"x" + t.x} x={sx(t.x)} y={rd ? H - pad.b + PX(20) : H - 10} className={"axis-label x" + (t.strong ? " strong" : "")} style={{ fontSize: axisUnits }} textAnchor="middle">{t.label}</text>
         ))}
         {/* Key events – geometry from evPlaced above; this only draws it. */}
+        {(() => {
+          /* The redesign's numbered badges sit a month apart on a phone, closer
+             than a badge is wide, so they are spread along the row the usual
+             way: runs that would overlap are centred on their events a badge's
+             width apart, and each keeps a short tie down to its own rule. */
+          if (!rd) return null;
+          const lead = evPlaced.map((p, i) => ({ i, ex: p.ex, p })).filter((b) => b.p.row == null && b.p.e.badge != null && b.p.e.badgeLead);
+          const gap = PX(17);
+          let runs = lead.map((b) => ({ items: [b], x0: b.ex }));
+          for (let moved = true, guard = 0; moved && guard < 20; guard++) {
+            moved = false;
+            runs.forEach((r) => { const mid = r.items.reduce((s, b) => s + b.ex, 0) / r.items.length; r.x0 = mid - ((r.items.length - 1) * gap) / 2; });
+            for (let k = 1; k < runs.length; k++) {
+              const a = runs[k - 1], b = runs[k];
+              if (a.x0 + (a.items.length - 1) * gap + gap > b.x0) { a.items = a.items.concat(b.items); runs.splice(k, 1); moved = true; break; }
+            }
+          }
+          const lo = pad.l + PX(8), hi = W - pad.r - PX(8);
+          badgeAt.current = {};
+          runs.forEach((r) => {
+            let x0 = r.x0;
+            const span = (r.items.length - 1) * gap;
+            if (x0 < lo) x0 = lo;
+            if (x0 + span > hi) x0 = hi - span;
+            r.items.forEach((b, k) => { badgeAt.current[b.i] = x0 + k * gap; });
+          });
+          return null;
+        })()}
         {evPlaced.map((p, i) => {
           const { e, ex, w, fsz, row, y: yRow, x, flip } = p;
           /* aria-label rather than <title>: a <title> child also produces the
@@ -941,15 +1014,30 @@ function TrendChart(props) {
                   line over it makes the annotation reachable */}
               <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-hit" />
               <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-line" />
+              {/* the redesign numbers a phone's events; the names are listed
+                  under the chart, and events in one month share a number */}
+              {rd && e.badge != null && e.badgeLead && (() => {
+                const bx = badgeAt.current && badgeAt.current[i] != null ? badgeAt.current[i] : ex;
+                return (
+                  <g className="rd-badge">
+                    {Math.abs(bx - ex) > PX(1) && <path d={`M${bx} ${pad.t - PX(5.5)}L${ex} ${pad.t}`} className="rd-badge-tie" />}
+                    <circle cx={bx} cy={pad.t - PX(13)} r={PX(7.5)} />
+                    <text x={bx} y={pad.t - PX(13)} dominantBaseline="central" textAnchor="middle"
+                          style={{ fontSize: PX(10) }}>{e.badge}</text>
+                  </g>
+                );
+              })()}
             </g>
           );
           const connTo = flip ? x + w + fsz * 0.24 : x - fsz * 0.24;
+          const ruleTop = rd ? yRow + PX(5) : yRow;
+          const displaced = !rd || !!p.disp;
           return (
             <g key={"ev" + i} className={cls} role="img" aria-label={aria}>
-              <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-hit" />
-              <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-line" />
+              <line x1={ex} x2={ex} y1={ruleTop} y2={H - pad.b} className="evt-hit" />
+              <line x1={ex} x2={ex} y1={ruleTop} y2={H - pad.b} className="evt-line" />
               {/* elbow: reads as a lead-in rule at the label's baseline */}
-              <line x1={ex} x2={connTo} y1={yRow} y2={yRow} className="evt-conn" />
+              {displaced && <line x1={ex} x2={connTo} y1={yRow} y2={yRow} className="evt-conn" />}
               <text x={x} y={yRow} className="evt-label" textAnchor="start"
                     style={{ fontSize: fsz, strokeWidth: refUnits * 0.34 }}>
                 {e.short}
@@ -957,6 +1045,9 @@ function TrendChart(props) {
             </g>
           );
         })}
+        {vlines.map((v, i) => (v.x < win[0] || v.x > win[1]) ? null : (
+          <line key={"vl" + i} x1={sx(v.x)} x2={sx(v.x)} y1={pad.t} y2={H - pad.b} className={"rd-vline" + (v.cls ? " " + v.cls : "")} />
+        ))}
         {/* hover guide – kept mounted; glides between months on transform */}
         {spinePts.length > 0 && (
           <line x1={0} x2={0} y1={pad.t} y2={H - pad.b} className="guide"
@@ -981,8 +1072,9 @@ function TrendChart(props) {
         <g clipPath={`url(#${clipId})`}>
           {series.map((s) => (s.wipe != null && s.wipe >= 1 ? null : (
             <path key={s.id} className="series-line"
-                  d={(s.smooth === false ? straightPath : smoothPath)(s.points, sx, sy)}
-                  fill="none" stroke={s.color} strokeWidth={s.width || 3.4}
+                  d={(s.smooth === false || (rd && s.curve !== "smooth") ? straightPath : smoothPath)(s.points, sx, sy)}
+                  fill="none" stroke={s.color}
+                  strokeWidth={rd ? (s.rdWidth || Math.min(3, (s.width || 3.4) * 0.8)) : (s.width || 3.4)}
                   strokeDasharray={s.dash || (s.dashed ? "6 6" : "none")}
                   clipPath={s.clipX ? `url(#${clipId + "s" + s.id})` : undefined}
                   mask={s.wipe != null && s.wipe > 0 ? `url(#${wipeId + s.id})` : undefined}
@@ -1000,13 +1092,13 @@ function TrendChart(props) {
           const at = p || last;
           if (!at) return null;
           return (
-            <circle key={"h" + s.id} cx={0} cy={0} r={5}
+            <circle key={"h" + s.id} cx={0} cy={0} r={rd ? PX(4.5) : 5}
                     className="hover-marker"
                     style={{
                       transform: `translate(${sx(at.x).toFixed(2)}px, ${sy(at.y).toFixed(2)}px)`,
                       opacity: p ? 1 : 0,
                     }}
-                    fill="var(--chart-bg)" stroke={s.color} strokeWidth={3} />
+                    fill="var(--chart-bg)" stroke={s.color} strokeWidth={rd ? 2 : 3} />
           );
         })}
         {/* end-cap dots on latest reading. `endCap:false` is how a line that
@@ -1016,9 +1108,21 @@ function TrendChart(props) {
         {series.map((s) => {
           const last = s.points[s.points.length - 1];
           if (!last || s.endCap === false) return null;
-          return <circle key={"e" + s.id} className="end-cap" cx={sx(last.x)} cy={sy(last.y)} r={4.5}
+          return <circle key={"e" + s.id} className="end-cap" cx={sx(last.x)} cy={sy(last.y)} r={rd ? PX(s.rdCap || 3.5) : 4.5}
                          fill={s.color} style={s.opacity != null ? { opacity: s.opacity } : null} />;
         })}
+        {/* rings: a point that is a count, not a poll (the election result) */}
+        {marks.map((m, i) => (m.x < win[0] || m.x > win[1]) ? null : (
+          <g key={"mk" + i} className="rd-mark" style={m.opacity != null ? { opacity: m.opacity } : null}>
+            <circle cx={sx(m.x)} cy={sy(m.y)} r={PX(m.r || 5)} className="rd-ring"
+                    style={m.color ? { stroke: m.color } : null} />
+            {m.label && (
+              <text x={sx(m.x) + PX(m.labelDx != null ? m.labelDx : 10)} y={sy(m.y) + PX(m.labelDy != null ? m.labelDy : 22)}
+                    className="rd-note-text" textAnchor={m.anchor || "start"}
+                    style={{ fontSize: PX(12), strokeWidth: PX(4) }}>{m.label}</text>
+            )}
+          </g>
+        ))}
         {/* direct end-of-line labels (series with an endLabel – e.g. cycle
             years) so lines are identifiable at rest, without hover; labels
             that finish at similar values are nudged apart */}
@@ -1030,7 +1134,7 @@ function TrendChart(props) {
               /* inkOf, not the series colour: the label is a GLYPH, and the
                  mark values for Greens/One Nation/Others fail the text
                  threshold on paper (see the -text tokens in the template) */
-              return { text: s.endLabel, x: sx(last.x) + 7 / scale, ideal: sy(last.y), y: sy(last.y),
+              return { text: s.endLabel, x: sx(last.x) + (rd ? 12 : 7) / scale, ideal: sy(last.y), y: sy(last.y),
                        /* a colour with no text-weight variant (the house-lean
                           palette) is pulled a third of the way to ink, or a
                           light teal label sits under 3:1 on paper */
@@ -1045,7 +1149,8 @@ function TrendChart(props) {
              room to spare. 1.45 was an earlier extra-cautious choice; it
              let a daylight-having label get swept into a neighbour's
              cluster and pushed a line-height off its own line end. */
-          const gap = refUnits * 1.15;
+          const elFs = rd ? PX(13) : refUnits * 0.95;
+          const gap = rd ? elFs * 1.22 : refUnits * 1.15;
           /* Can these be placed at all? Spreading buys room by moving labels
              off their line ends, and past a point it stops being a dodge:
              every label joins one evenly spaced stack that points at
@@ -1076,7 +1181,7 @@ function TrendChart(props) {
              pushed a line height or more off their own line ends. */
           const adv = (ch) => (ch >= "0" && ch <= "9" ? 0.55 : ch === " " ? 0.3 : ch === "’" ? 0.25 : 0.72);
           for (const l of labs)
-            l.w = [...l.text].reduce((t, ch) => t + adv(ch), 0) * refUnits * 0.95;
+            l.w = [...l.text].reduce((t, ch) => t + adv(ch), 0) * elFs;
           const xOverlap = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w;
           const comp = labs.map(() => -1);
           let nComp = 0;
@@ -1166,7 +1271,7 @@ function TrendChart(props) {
           }
           return groups.flat().map((l, i) => (
             <text key={"el" + i} x={l.x} y={l.y} className="end-label" dominantBaseline="middle"
-                  style={{ fontSize: refUnits * 0.95, strokeWidth: refUnits * 0.34, opacity: l.op }}
+                  style={{ fontSize: elFs, strokeWidth: refUnits * 0.34, opacity: l.op }}
                   fill={l.color}>{l.text}</text>
           ));
         })()}
@@ -1197,6 +1302,34 @@ function TrendChart(props) {
                    the escape hatch for a party-coloured one. */
                 fill={r.labelColor || "var(--ink-3)"}>{r.label}</text>
         ))}
+        {brackets.map((b, i) => {
+          if (b.x < win[0] || b.x > win[1]) return null;
+          const bx = sx(b.x) + PX(b.dx != null ? b.dx : 7), ya = sy(b.y0), yb = sy(b.y1), tk = PX(5);
+          const mid = (ya + yb) / 2, lh = PX(17);
+          const lines = b.lines || [];
+          return (
+            <g key={"bk" + i} className="rd-bracket">
+              <path d={`M${bx - tk} ${ya}H${bx}V${yb}H${bx - tk}`} className="rd-bracket-line" />
+              {lines.map((ln, j) => (
+                <text key={j} x={bx - PX(10)} y={mid + (j - (lines.length - 1) / 2) * lh}
+                      dominantBaseline="middle" textAnchor="end"
+                      className={"rd-note-text" + (j === 0 ? " rd-bracket-strong" : "")}
+                      style={{ fontSize: PX(12.5), strokeWidth: PX(4) }}>{ln}</text>
+              ))}
+            </g>
+          );
+        })}
+        {notes.map((n, i) => {
+          const x = (n.x === "left" ? pad.l + PX(6) : n.x === "right" ? W - pad.r - PX(6) : sx(n.x)) + PX(n.dx || 0);
+          return (
+            <text key={"nt" + i} x={x} y={sy(n.y) + PX(n.dy || 0)}
+                  className={"rd-note-text" + (n.cls ? " " + n.cls : "")}
+                  textAnchor={n.anchor || (n.x === "right" ? "end" : "start")}
+                  dominantBaseline={n.baseline || "auto"}
+                  style={{ fontSize: PX(n.size || 12), strokeWidth: PX(4),
+                           fill: n.color || undefined, fontWeight: n.weight || undefined }}>{n.text}</text>
+          );
+        })}
       </svg>
 
       {tip && (

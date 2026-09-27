@@ -165,7 +165,7 @@ function GlyphDial({ className, svgRef, width, height }) {
 }
 window.GlyphDial = GlyphDial;   // the tab bar's placeholder instance (views.jsx)
 
-function Header({ isDark, onToggleTheme }) {
+function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
   const { D } = window.AP;
   const fresh = freshness(D.latest.publishedISO);
 
@@ -347,6 +347,18 @@ function Header({ isDark, onToggleTheme }) {
                      "eighteen","nineteen","twenty"];
   const pastTerms = D.cycles.filter((c) => !c.current).length;
   const pastWord = TAGLINE_N[pastTerms] || String(pastTerms);
+  /* The redesign's status block names the newest poll by its pollster and
+     fieldwork, so the masthead and the sections' "to 21 Sep" agree; the
+     election line counts the months left before it must be held. */
+  const rdLatest = rd ? (D.pollsterTable || []).slice().sort((a, b) => (a.pubSort < b.pubSort ? 1 : -1))[0] : null;
+  const rdDue = (() => {
+    const m = /(\d{1,2}) (\w+) (\d{4})/.exec(D.latest.nextElectionDue || "");
+    if (!m) return null;
+    const t = Date.parse(m[1] + " " + m[2] + " " + m[3] + " UTC");
+    if (isNaN(t)) return null;
+    const months = Math.round((t - easternNow().day) / (86400000 * 30.44));
+    return months > 1 ? months + " months at most" : null;
+  })();
 
   return (
     <header className="site-head">
@@ -374,14 +386,56 @@ function Header({ isDark, onToggleTheme }) {
           <span className="wm-sr">– Australian federal polling</span>
           <span id="wm-action" hidden>Replays the term on the masthead dial</span>
         </h1>
-        <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the last {pastWord}.</p>
+        {/* "last" is the way between the two designs: the new one by
+            default, the one it replaced a press away, and a second press
+            back again. A button that reads as the word it is, so the
+            sentence stays a sentence to a screen reader too. */}
+        <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the{" "}
+          <button type="button" className="tagline-flip" onClick={onFlipDesign}
+                  title={rd ? "Show the site’s previous design" : "Show the site’s new design"}>last</button>
+          {" "}{pastWord}.</p>
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot fresh-toggle " + fresh.state}
                 onClick={() => setStaticView(true)}></span>{" "}
           Updated {D.latest.published} · {D.latest.pollsTracked} polls
         </div>
       </div>
+      {rd && (
+        /* the phone's status lines, under the tagline */
+        <div className="rd-head-compact">
+          <span className={"fresh-dot " + fresh.state}></span>
+          <span><b>Latest poll</b> {rdLatest ? rdLatest.pollster + ", " + rdLatest.field : D.latest.published} · {fresh.label.toLowerCase()}<br />
+            {D.latest.pollsTracked} polls this term · election {D.latest.nextElectionDue.replace(/^By/, "by")}</span>
+        </div>
+      )}
       <div className="head-right">
+        {rd ? (
+          <div className="head-meta rd-head-meta">
+            <div className="meta-item">
+              <span className="meta-k">Latest poll</span>
+              <span className="meta-v">
+                <button type="button" className={"fresh-dot fresh-toggle " + fresh.state}
+                        onClick={() => setStaticView(true)} tabIndex={-1}
+                        aria-label="Read this page as a plain, static article"
+                        title="Read this page as a plain, static article"></button>
+                {rdLatest ? rdLatest.pollster + ", " + rdLatest.field : D.latest.published}
+              </span>
+              <span className="meta-s">published {fresh.label.toLowerCase()}</span>
+            </div>
+            <div className="meta-divide"></div>
+            <div className="meta-item">
+              <span className="meta-k">This term</span>
+              <span className="meta-v">{D.latest.pollsTracked} polls</span>
+              <span className="meta-s">{D.latest.housesTracked} pollsters</span>
+            </div>
+            <div className="meta-divide"></div>
+            <div className="meta-item">
+              <span className="meta-k">Next election</span>
+              <span className="meta-v">{D.latest.nextElectionDue}</span>
+              {rdDue && <span className="meta-s">{rdDue}</span>}
+            </div>
+          </div>
+        ) : (
         <div className="head-meta">
           <div className="meta-item meta-updated">
             <span className="meta-k">Last poll</span>
@@ -405,6 +459,7 @@ function Header({ isDark, onToggleTheme }) {
             <span className="meta-v">{D.latest.pollsTracked} · {D.latest.housesTracked} pollsters</span>
           </div>
         </div>
+        )}
         <div className="theme-seg segmented" role="group" aria-label="Colour theme"
              ref={segRef} onPointerDown={onSegDown} onPointerMove={onSegMove}
              onPointerUp={onSegUp} onPointerCancel={onSegCancel}>
@@ -1352,6 +1407,17 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
     return () => ro.disconnect();
   });
 
+  /* The redesign draws its own layout from the same state and machinery:
+     both switches, the morph clock and the accessors are passed down, so a
+     contest or basis flip animates exactly as it does here. */
+  if (window.AP.rd) return (
+    <RdHero rangeId={rangeId} setRangeId={setRangeId} matchup={matchup} basis={basis} morph={morph}
+      chooseMatchup={chooseMatchup} chooseBasis={chooseBasis} orderedMatchups={orderedMatchups}
+      latest={latest} unc={unc} monthDelta={monthDelta} leadSwing={leadSwing}
+      impOffered={impOffered} impOnOffered={impOnOffered} impBasis={impBasis} impOnBasis={impOnBasis}
+      adjusted={adjusted} iDataOf={iDataOf} iScatOf={iScatOf} showScatter={showScatter}
+      showSynth={showSynth} setShowSynth={setShowSynth} otherContests={otherContests} xDomain={xDomain} />
+  );
   return (
     <section className="card hero">
       <div className="hero-top">
@@ -1865,12 +1931,51 @@ function App() {
   React.useLayoutEffect(() => { document.body.classList.add("js"); }, []);
   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
     "layout": "editorial",
+    "design": "new",
     "theme": "auto",
     "accent": "warm",
     "showScatter": true
   }/*EDITMODE-END*/;
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [rangeId, setRangeId] = useState("all");
+
+  /* Which design the page wears. The redesign is the default; the one it
+     replaced stays one press away, on the tagline's "last". A ?design=
+     query overrides the stored choice for this visit only (for checking one
+     against the other), and every component reads the flag off window.AP
+     while rendering, so the whole tree re-reads it when App re-renders -
+     the views below are keyed on it and remount. */
+  const qDesign = (() => {
+    try { const q = new URLSearchParams(window.location.search).get("design"); return q === "old" || q === "new" ? q : null; }
+    catch (_) { return null; }
+  })();
+  const rd = (qDesign || t.design) !== "old";
+  window.AP.rd = rd;
+  React.useLayoutEffect(() => { document.body.classList.toggle("rd", rd); }, [rd]);
+  /* A flip crossfades the page like the theme does - one picture before, one
+     after - with the DOM change forced to land inside the transition's
+     callback, or the browser would capture two identical pictures. */
+  const flipDesign = () => {
+    const next = rd ? "old" : "new";
+    const apply = () => {
+      ReactDOM.flushSync(() => setTweak("design", next));
+      document.body.classList.toggle("rd", next === "new");
+      window.scrollTo({ top: 0, behavior: "auto" });
+    };
+    if (qDesign) {
+      // an explicit ?design= would pin the old choice; the press drops it
+      const u = new URL(window.location.href);
+      u.searchParams.delete("design");
+      history.replaceState(null, "", u.pathname + u.search + u.hash);
+    }
+    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (still || typeof document.startViewTransition !== "function") { apply(); return; }
+    const vt = document.startViewTransition(apply);
+    if (vt) {
+      if (vt.ready && vt.ready.catch) vt.ready.catch(() => {});
+      if (vt.finished && vt.finished.catch) vt.finished.catch(() => {});
+    }
+  };
 
   /* Which two-party contest the hero is showing. Owned here, not inside Hero,
      for two reasons that are the same one: the docked 2PP score in the tab
@@ -1929,7 +2034,7 @@ function App() {
      clear of the pinned tab bar. */
   const npJumpRef = useRef(false);
   const npScrollNow = () => {
-    const el = document.querySelector("section.next-polls");
+    const el = document.querySelector("section.next-polls, section.rd-polls");
     if (el) el.scrollIntoView({ block: "start", behavior: "auto" });
   };
 
@@ -2101,15 +2206,15 @@ function App() {
         const m = document.getElementById("main-content");
         if (m) { m.focus({ preventScroll: true }); m.scrollIntoView({ block: "start" }); }
       }}>Skip to content</a>
-      <Header isDark={isDark} onToggleTheme={cycleTheme} />
-      <Tabs tabs={TABS} active={tab} onChange={goTab} tppMatchup={tppMatchup} tppBasis={tppBasis} />
+      <Header isDark={isDark} onToggleTheme={cycleTheme} rd={rd} onFlipDesign={flipDesign} key={"head-" + rd} />
+      <Tabs tabs={TABS} active={tab} onChange={goTab} tppMatchup={tppMatchup} tppBasis={tppBasis} key={"tabs-" + rd} />
       <main className="content" id="main-content" tabIndex={-1}>
         {/* The panel the tab strip points at. There was no role="tabpanel" on
             the page at all, so aria-controls had no target and a screen reader
             that moved to the "tab panel" landed nowhere. tabIndex=0 makes the
             panel itself focusable, which is what the pattern asks for when the
             panel's first child isn't. */}
-        <div className="view-enter content" key={tab}
+        <div className="view-enter content" key={tab + (rd ? "-rd" : "")}
              role="tabpanel" id={"panel-" + tab} aria-labelledby={"tab-" + tab}
              tabIndex={0}>
           <ViewBoundary>
@@ -2129,7 +2234,7 @@ function App() {
               backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}
           </ViewBoundary>
         </div>
-        <MethodNote onInfo={tab === "info" ? null : () => goTab("info")} />
+        <MethodNote onInfo={tab === "info" ? null : () => goTab("info")} key={"foot-" + rd} />
       </main>
 
       <TweaksPanel>

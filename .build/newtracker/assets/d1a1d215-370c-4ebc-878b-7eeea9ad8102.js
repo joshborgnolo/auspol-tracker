@@ -231,7 +231,7 @@ function NextPollTicker({ showScore }) {
       <button type="button" className="tn-lab tn-jump"
               title="Jump to the Next expected polls panel"
               onClick={() => window.AP.gotoNextPolls && window.AP.gotoNextPolls()}>
-        Next
+        {window.AP.rd ? "Next polls, at the earliest" : "Next"}
       </button>
       {items.map((it, i) => (
         <span className={"tn-item" + (i >= fit ? " tn-park" : "")} key={i}>
@@ -322,7 +322,7 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
   React.useEffect(() => {
     if (!("IntersectionObserver" in window)) { setHeroGone(true); return; }
     if (active !== "snapshot") { setHeroGone(true); return; }
-    const el = document.querySelector(".hero-gauge")
+    const el = document.querySelector(".hero-gauge, .rd-lg")
             || document.querySelector(".hero-readout");
     if (!el) { setHeroGone(true); return; }
     setHeroGone(false);
@@ -1332,7 +1332,7 @@ function cycHolderAt(c, M, m) {
 
 function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, chipClick, toggle,
                      showAll, hideAll, showOutcome, showHan, setHan, showOnp, setOnp, shapes,
-                     outcomeShown }) {
+                     outcomeShown, rdHalf, rdEvents }) {
   const { D } = window.AP;
   const narrow = useNarrow();
   const M = metric;
@@ -1909,6 +1909,15 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
     }
   }
 
+  /* The redesign draws the same series, band and readings in its own frame:
+     a chart title over the plot, the sitting term's figure written at "Now"
+     against the band's average, and the tab's controls kept once, above. */
+  if (window.AP.rd) return (
+    <RdCycleChart M={M} chg={chg} built={built} bandAreas={bandAreas} bandRows={bandRows} scatter={scatter}
+      events={rdEvents || cycleEvents} badged={!!rdEvents} domain={domain} ticks={ticks} cur={cur} hidden={hidden} narrow={narrow} half={!!rdHalf}
+      hanCtl={hanCtl} showHan={showHan} setHan={setHan} showOnp={showOnp} setOnp={setOnp} tipCycle={tipCycle}
+      banded={banded} bandN={bandN} isOpp={isOpp} />
+  );
   return (
     <section className="card cycle-card">
       <div className="card-head cycle-head">
@@ -2497,6 +2506,116 @@ function AccuracyPanel() {
   const recent = byRecency.slice(0, 5);
   const earlier = byRecency.slice(5);
 
+  if (window.AP.rd) {
+    /* the redesign: the same rows, lanes and readouts, with the finding
+       written out and the pollsters ranked closest first */
+    const nw = (n) => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
+                       "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"][n] ?? String(n);
+    const last = byRecency[0];
+    const opp = last && last.sameSide ? byRecency.slice(1).find((c) => c.sameSide && Math.sign(c.err) !== Math.sign(last.err)) : null;
+    const head = "The final polls have missed the result by " + A.meanAbs.toFixed(1) + " points on average" + (bothWays ? ", and not always the same way" : "");
+    let dek = "";
+    if (last && last.sameSide) dek += "In " + last.year + " all " + nw(last.n) + " pollsters " + (last.err < 0 ? "understated" : "overstated") + " Labor, by " + Math.abs(last.err).toFixed(1) + " points on average";
+    if (opp) dek += "; in " + opp.year + " all " + nw(opp.n) + " " + (opp.err < 0 ? "understated" : "overstated") + " it";
+    if (dek) dek += ".";
+    if (bothWays) dek += (dek ? " " : "") + "Because misses run both ways, what carries over to today’s figures is their size, not their direction.";
+    const firms = A.firms.filter((f) => f.n > 1).slice().sort((a, b) => a.meanAbs - b.meanAbs);
+    const longest = A.firms.slice().sort((a, b) => b.n - a.n);
+    const fHead = firms.length >= 3 ? firms[0].firm + " and " + firms[1].firm + " have come closest; " + firms[firms.length - 1].firm + " has missed by most" : "How each pollster has done";
+    const fDek = "Average miss ignoring direction, closest first, for pollsters with more than one election to judge on. A pollster only counts against the elections it published a final poll for"
+      + (longest[0] && longest[1] && longest[0].n >= 1.5 * longest[1].n ? ", and " + longest[0].firm + "’s " + nw(longest[0].n) + " are the longest record by far." : ".");
+    const ticks = [-SPAN, -SPAN / 2, 0, SPAN / 2, SPAN];
+    return (
+      <RdSec id="final-polls" cls="rd-acc" title="How the final polls did"
+             meta={"Each pollster’s last two-party figure in the " + A.windowDays + " days before polling day, against the result"}>
+        <RdHed head={head} dek={dek} />
+        <div className="card rd-card rd-acc-card">
+          <div className="rd-chead"><span className="rd-chead-t">Labor’s final two-party figure in the polls, minus the result, points</span>
+            {stacked > 0 && <button type="button" className="rd-chip" aria-pressed={spread} onClick={() => setSpread(!spread)}
+              title="Dots at the same miss are drawn on top of one another. This steps them into their own lanes, keeping each one exactly where it sits on the scale.">Separate overlapping dots</button>}
+          </div>
+          <div className="rd-acc-head" aria-hidden="true">
+            <span>Election</span>
+            <span className="rd-acc-scale">
+              <em className="rd-acc-l">◀ <span className="rd-acc-long">Labor </span>understated</em><em className="rd-acc-r"><span className="rd-acc-long">Labor </span>overstated ▶</em>
+              {ticks.map((v) => <i key={v} className={Math.abs(v) === SPAN ? (v < 0 ? "first" : "last") : v !== 0 ? "half" : ""} style={{ left: pct(v) + "%" }}>{v === 0 ? "Result" : (v > 0 ? "+" : "−") + Math.abs(v) + (Math.abs(v) === SPAN ? " pts" : "")}</i>)}
+            </span>
+            <span className="rd-acc-mh">Miss</span><span>Final polls</span>
+          </div>
+          <div className={"acc-rows rd-acc-rows" + (spread ? " acc-spread-on" : "")} ref={rowsRef}>
+            {[["Last five elections", recent], ["Earlier elections", earlier]].filter(([, l]) => l.length).map(([label, list], gi) => (
+              <React.Fragment key={label}>
+                <div className="rd-acc-group">{label}</div>
+                {list.map((c, rj) => {
+                  const ri = (gi ? recent.length : 0) + rj;
+                  const { lane, n: nLanes } = lanesFor(c.houses);
+                  const maxOff = Math.ceil((nLanes - 1) / 2) * LANE_H;
+                  const solo = c.n === 1 ? c.houses[0] : null;
+                  const accErr = solo ? solo.err : c.err;
+                  return (
+                    <div className="rd-acc-row" key={c.year}>
+                      <span className="rd-acc-lab"><b>{c.year}</b><span>{c.mean.toFixed(1)} v {c.result.toFixed(1)}</span></span>
+                      <div className="acc-track rd-acc-track" style={spread && maxOff ? { height: (26 + maxOff * 2) + "px" } : null}>
+                        <span className="acc-zero"></span>
+                        {[-SPAN / 2, SPAN / 2].map((v) => <span key={v} className="acc-tick" style={{ left: pct(v) + "%" }}></span>)}
+                        {!solo && c.houses.map((h) => {
+                          const off = spread ? laneOffset(lane[h.firm] || 0) : 0;
+                          return (
+                            <span key={h.firm} className="acc-dot" role="img" style={{ left: pct(h.err) + "%", background: col(h.err), top: off ? `calc(50% + ${off}px)` : null }}
+                                  aria-label={`${h.firm}, ${fmtDay(h.date)}: Labor ${h.alp2pp.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(h.err)}`}
+                                  onMouseEnter={(e) => open(e, pct(h.err), { year: c.year, flip: ri === 0, off, title: h.firm, date: fmtDay(h.date),
+                                    rows: [{ label: "Poll", value: h.alp2pp.toFixed(1), color: col(h.err) }, { label: "Result", value: c.result.toFixed(1) }, { label: "Miss", value: sgn(h.err), strong: col(h.err) }],
+                                    sub: lean(h.err) })}
+                                  onMouseLeave={close}></span>
+                          );
+                        })}
+                        <span className="acc-mean" role="img" style={{ left: pct(accErr) + "%", background: col(accErr) }}
+                              aria-label={solo ? `${solo.firm}: a miss of ${sgn(solo.err)}` : `Average of the ${c.n} final polls of ${c.year}: a miss of ${sgn(c.err)}`}
+                              onMouseEnter={(e) => open(e, pct(accErr), { year: c.year, flip: ri === 0, title: solo ? solo.firm : `Average of ${c.n} final polls`,
+                                date: solo ? fmtDay(solo.date) : fmtDay(c.eDate),
+                                rows: [{ label: solo ? "Poll" : "Poll average", value: (solo ? solo.alp2pp : c.mean).toFixed(1), color: col(accErr) }, { label: "Result", value: c.result.toFixed(1) }, { label: "Miss", value: sgn(accErr), strong: col(accErr) }],
+                                sub: lean(accErr) })}
+                              onMouseLeave={close}></span>
+                        {hov && hov.year === c.year && (
+                          <div className={"tip acc-tip" + (hov.flip ? " acc-tip-below" : "")} style={{ left: hov.left + "%", top: hov.off ? `calc(50% + ${hov.off}px)` : null }}>
+                            <div className="tip-title">{hov.title}</div>
+                            <div className="tip-date">{hov.date}</div>
+                            {hov.rows.map((r, i) => (
+                              <div className="tip-row" key={i}><span className="tip-swatch" style={{ background: r.color || "transparent" }}></span>
+                                <span className="tip-label">{r.label}</span><span className="tip-val" style={r.strong ? { color: r.strong } : null}>{r.value}</span></div>
+                            ))}
+                            <div className="tip-sub">{hov.sub}</div>
+                          </div>
+                        )}
+                      </div>
+                      <span className="rd-acc-err" style={{ color: inkOf(col(c.err)) }}>{c.err > 0 ? "+" : c.err < 0 ? "−" : ""}{Math.abs(c.err).toFixed(1)}</span>
+                      <span className="rd-acc-n">{c.n} pollster{c.n === 1 ? "" : "s"}{c.sameSide && c.n > 1 && <b className="rd-acc-flag">All one way</b>}</span>
+                    </div>
+                  );
+                })}
+              </React.Fragment>
+            ))}
+          </div>
+          <div className="rd-key rd-ckey">
+            <span className="rd-key-item"><RdSwatch kind="dot" color="var(--ink-3)" />One pollster’s final poll</span>
+            <span className="rd-key-item"><RdSwatch kind="dot-solid" color="var(--ink-2)" />Their average</span>
+            <span className="rd-key-item"><RdSwatch kind="dot-solid" color="var(--alp)" />Overstated Labor</span>
+            <span className="rd-key-item"><RdSwatch kind="dot-solid" color="var(--lnp)" />Understated Labor</span>
+            <span className="rd-key-item"><b className="rd-acc-flag">All one way</b>Every pollster missed in the same direction</span>
+          </div>
+        </div>
+        <RdSub head={fHead} dek={fDek} />
+        <div className="rd-acc-firms">
+          {firms.map((f) => (
+            <div className="rd-acc-firm" key={f.firm}><b>{f.firm}</b><span className="rd-acc-fv">{f.meanAbs.toFixed(1)}<small> pts</small></span><span>{f.n} elections</span></div>
+          ))}
+        </div>
+        <RdFoot how={{ term: "how-wrong-are-the-polls", from: "How the final polls did" }}>
+          Exit polls are left out, and a pollster that publishes an undecided-inclusive pair is normalised first, so its arithmetic is not scored as a miss. Before 1993 Morgan was the only pollster in the field, and its figure is read through the last election’s flows, so the miss folds in drift in the flows too.
+        </RdFoot>
+      </RdSec>
+    );
+  }
   return (
     <section className="card acc-card" id="final-polls">
       <div className="card-head">
@@ -2947,6 +3066,12 @@ function PastCyclesView() {
   const retrySource = () => D.loadCycleSource()
     .then((j) => setSrcFailed(!Object.keys(j || {}).length));
 
+  if (window.AP.rd) return (
+    <RdPastCycles cycles={cycles} mode={mode} setMode={setMode} hidden={hidden} lifted={lifted} hi={hi} setHi={setHi}
+      toggle={toggle} lift={lift} unlift={unlift} chipClick={chipClick} showAll={showAll} hideAll={hideAll}
+      showOutcome={showOutcome} outcomeShown={outcomeShown} shapes={shapes} showHan={showHan} setShowHan={setShowHan}
+      showOnp={showOnp} setShowOnp={setShowOnp} exportSource={exportSource} srcFailed={srcFailed} retrySource={retrySource} />
+  );
   return (
     <div className="view view-cycles">
       <div className="view-intro">
@@ -4715,7 +4840,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const bodyRef = useRef(null);
   React.useEffect(() => {
     if (!focus || open !== focus.key || !bodyRef.current) return;
-    const row = bodyRef.current.querySelector("tr.arch-row.open");
+    const row = bodyRef.current.querySelector("tr.arch-row.open, .rd-ap-row.open, .rd-ap-card.open");
     if (row) row.scrollIntoView({ block: "center", behavior: "auto" });
   }, [focus, open, facet]);
   const toggleTag = (id) => setTagSel((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -5066,6 +5191,25 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const exportCsv = () => downloadCsv(
     `auspol-tracker-polls-${D.latest.updatedISO}.csv`,
     [CSV_COLS.map((c) => c[0]), ...sorted.map((p) => CSV_COLS.map((c) => c[1](p)))]);
+
+  /* The redesign draws the table and its three sections itself (rd-allpolls);
+     everything above - the filters, their counts, the address bar, the sort,
+     the open row, the export - is shared with it. */
+  if (window.AP.rd) return (
+    <div className="view view-allpolls">
+      <RdAllPolls rows={rows} sorted={sorted} total={total} houses={houses} houseRank={houseRank} houseN={houseN}
+        tagN={tagN} shownTags={shownTags} rangeN={rangeN} RANGE_LAB={RANGE_LAB}
+        facet={facet} onFacet={onFacet} measure={measure} onMeasure={onMeasure} tppBasis={tppBasis} setTppBasis={setTppBasis}
+        q={q} setQ={setQ} sel={sel} setSel={setSel} toggleHouse={toggleHouse} range={range} setRange={setRange}
+        tagSel={tagSel} setTagSel={setTagSel} toggleTag={toggleTag} pop={pop} setPop={setPop}
+        pills={pills} clearAll={clearAll} sort={sort} onSort={onSort} open={open} setOpen={setOpen}
+        focus={focus} onBack={onBack} backLabel={backLabel} exportCsv={exportCsv} bodyRef={bodyRef}
+        synthByYm={synthByYm} aggByYm={aggByYm} synthOnByYm={synthOnByYm} altOnByYm={altOnByYm} />
+      <RdDisagree />
+      <RdHouseLean measure={measure} tppBasis={tppBasis} />
+      <RdFlows />
+    </div>
+  );
 
   return (
     <div className="view view-allpolls">

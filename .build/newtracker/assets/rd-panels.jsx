@@ -1,0 +1,1638 @@
+/* auspol tracker – the redesign's Snapshot sections (Sep 2026).
+
+   Each existing panel returns one of these while window.AP.rd is set. They
+   read the same dataset the panels do and keep the site's machinery - the
+   chart engine's travelling window, tooltips and poll links, the copy
+   buttons - and write each section's headline from the live figures by a
+   rule, so the words turn over with the numbers. */
+
+/* how much of a thing is gone, as a reader says it: "a third", "about half" */
+function rdShareWords(p) {
+  const c = [[1, 2, "half"], [1, 3, "a third"], [2, 3, "two-thirds"], [1, 4, "a quarter"], [3, 4, "three-quarters"],
+             [1, 5, "a fifth"], [2, 5, "two-fifths"], [3, 5, "three-fifths"], [4, 5, "four-fifths"],
+             [1, 6, "a sixth"], [1, 8, "an eighth"], [1, 10, "a tenth"]];
+  let best = null;
+  for (const [a, b, w] of c) {
+    const err = Math.abs(p - a / b);
+    if (!best || err < best.err) best = { w, err };
+  }
+  return (best.err < 0.012 ? "" : "about ") + best.w;
+}
+/* a party as a sentence names it, and at the start of one */
+const RD_PARTY_IN = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "minor parties and independents" };
+const rdPartyIn = (id) => RD_PARTY_IN[id] || id;
+const rdPartyStart = (id) => rdCap(rdPartyIn(id));
+const rdPlural = (id) => id === "grn" || id === "oth";
+
+/* month ticks that open on the election itself */
+function rdElectionTicks(x0, x1, narrow, elecX) {
+  const t = rdXTicks(x0, x1, narrow, { step: x1 - x0 > 1.1 ? (narrow ? 4 : 2) : undefined });
+  if (elecX == null || elecX < x0 - 0.01) return t;
+  const rest = t.filter((k) => k.x - elecX > 0.1);
+  /* "Election" already dates the axis, so the next tick drops a repeat of its year */
+  const ey = String(Math.floor(elecX));
+  if (rest.length) {
+    const lab = rest[0].label;
+    const cut = lab.endsWith(" " + ey) ? ey.length + 1 : lab.endsWith(" " + ey.slice(2)) ? 3 : 0;
+    if (cut) rest[0] = { ...rest[0], label: lab.slice(0, -cut) };
+  }
+  return [{ x: elecX, label: "Election", strong: true }, ...rest];
+}
+
+/* ======================================================================
+   Primary vote
+   ====================================================================== */
+function RdPrimary({ rangeId }) {
+  const { D, rangeDomain, filterPts, series, monthLabelFull } = window.AP;
+  const xDomain = rangeDomain(rangeId);
+  const narrow = useNarrow("(max-width: 640px)");
+  const [hidden, setHidden] = useState({});
+  const now = D.latest.primary;
+  const base = D.aggPrimary.find((d) => d.election) || null;
+  const lastM = D.aggPrimary[D.aggPrimary.length - 1];
+  const NAME = { oth: "Others & independents" };
+  const SHORT = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "Others" };
+  const parts = ["alp", "lnp", "grn", "onp", "oth"].map((id) => ({
+    id, color: D.PARTIES[id].color, name: NAME[id] || D.PARTIES[id].name,
+    v: now[id], was: base ? base[id] : null, ci: (lastM.ci && lastM.ci[id]) || 0,
+  })).sort((a, b) => b.v - a.v);
+  const top = parts[0];
+  /* the parties the leader cannot be told apart from: the gap to each is
+     inside the two figures' 95% margins combined */
+  let k = 1;
+  while (k < parts.length && top.v - parts[k].v < Math.sqrt(top.ci * top.ci + parts[k].ci * parts[k].ci)) k++;
+  const level = parts.slice(0, k);
+
+  const story = (() => {
+    const list = (arr) => arr.length === 2 ? arr.join(" and ") : arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
+    const pc = (v) => v.toFixed(1) + "%";
+    let head, dek;
+    if (k >= 2) {
+      head = rdCap(list(level.map((p) => rdPartyIn(p.id)))) + " are level";
+      dek = level.map((p, i) => (i === 0 ? rdPartyStart(p.id) : rdPartyIn(p.id)) + ", on " + pc(p.v)).reduce((s, c, i, a) =>
+        s + (i === 0 ? c : i === a.length - 1 ? ", and " + c : ", " + c), "") + ", are too close to separate.";
+    } else {
+      head = rdPartyStart(top.id) + " leads the primary vote";
+      dek = rdPartyStart(top.id) + " leads on " + pc(top.v) + ", " + (top.v - parts[1].v).toFixed(1) + " points clear of "
+        + rdPartyIn(parts[1].id) + " on " + pc(parts[1].v) + ".";
+    }
+    /* the biggest faller outside the leading group, if the fall is big */
+    const fallers = parts.slice(k).filter((p) => p.was && p.v < p.was && (p.was - p.v) / p.was >= 0.15)
+      .sort((a, b) => (b.was - b.v) / b.was - (a.was - a.v) / a.was);
+    if (fallers.length) {
+      const f = fallers[0];
+      dek += " " + rdPartyStart(f.id) + ", on " + pc(f.v) + ", " + (rdPlural(f.id) ? "have" : "has") + " lost "
+        + rdShareWords((f.was - f.v) / f.was) + " of " + (rdPlural(f.id) ? "their" : "its") + " election-night vote.";
+    }
+    return { head, dek };
+  })();
+
+  const pts = filterPts(D.aggPrimary, xDomain[0]);
+  const visible = parts.filter((p) => !hidden[p.id]);
+  const chartSeries = parts.slice().reverse().map((p) => ({
+    id: p.id, label: p.name, color: p.color, points: series(pts, p.id),
+    rdWidth: p.id === "oth" ? 2 : 2.5, dashed: p.id === "oth", dash: p.id === "oth" ? "6 4" : undefined,
+    opacity: hidden[p.id] ? 0 : 1, endLabel: narrow ? null : SHORT[p.id], rdCap: 4,
+  }));
+  const areas = visible.map((p) => ({
+    id: "ci-" + p.id, color: p.color, className: "ci-band", edge: false,
+    points: pts.filter((d) => d.ci && d.ci[p.id] != null && d[p.id] != null)
+      .map((d) => ({ x: d.x, y0: d[p.id] - d.ci[p.id], y1: d[p.id] + d.ci[p.id] })),
+  })).filter((a) => a.points.length >= 2);
+  const scatter = D.individualPolls
+    .filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
+    .flatMap((q) => visible.filter((p) => q.p && q.p[p.id] != null)
+      .map((p) => ({ x: q.x, y: q.p[p.id], color: p.color, label: p.name, meta: q })));
+  const marks = base ? visible.map((p) => ({ x: base.x, y: base[p.id], color: p.color, r: 4.5 })) : [];
+  const evs = (D.events || []).filter((e) => e.major);
+  const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
+  const eDate = (D.cycles.find((c) => c.current) || {}).eDate;
+  const meta = narrow
+    ? D.latest.pollsTracked + " national polls · latest fieldwork " + rdDate(D.latest.updatedISO)
+    : D.latest.pollsTracked + " national polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election · latest fieldwork " + rdDate(D.latest.updatedISO, true);
+  const toggle = (id) => setHidden((h) => {
+    const next = { ...h, [id]: !h[id] };
+    return parts.every((p) => next[p.id]) ? {} : next;   // never an empty chart
+  });
+
+  return (
+    <RdSec id="primary-vote" title="Primary vote" meta={meta}>
+      <RdHed head={story.head} dek={story.dek} />
+      <div className="rd-pv-stats" style={{ "--rd-k": k }}>
+        {k >= 2 && (
+          <div className="rd-pv-bracket" style={{ gridColumn: "1 / span " + k }}>
+            <span></span>Within the margin of uncertainty<span></span>
+          </div>
+        )}
+        {parts.map((p) => (
+          <button key={p.id} type="button" className="rd-pv-stat" aria-pressed={!hidden[p.id]}
+                  style={{ borderTopColor: p.color }}
+                  title={(hidden[p.id] ? "Show " : "Hide ") + p.name + " on the chart"}
+                  onClick={() => toggle(p.id)}>
+            <span className="rd-pv-name" style={{ color: inkOf(p.color) }}>{p.name}</span>
+            <span className="rd-pv-val">{p.v.toFixed(1)}<span className="rd-pv-pct">%</span></span>
+            {p.was != null && (
+              <span className="rd-pv-chg">{rdArrow(p.v - p.was)} {Math.abs(p.v - p.was).toFixed(1)} since the election</span>
+            )}
+          </button>
+        ))}
+      </div>
+      <div className="card rd-card rd-pv-chart">
+        <TrendChart
+          key="rd-pv"
+          heightPx={narrow ? 320 : 440}
+          padPx={narrow ? { l: 34, r: 6, t: 34, b: 28 } : { l: 40, r: 16, t: 44, b: 30 }}
+          xDomain={xDomain} yDomain={[0, 40]} yTicks={[0, 10, 20, 30, 40]}
+          yTickFmt={(v) => (v === 0 ? "" : v + "%")} baseline
+          xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)}
+          series={chartSeries} spine={series(pts, "alp")} areas={areas}
+          scatter={scatter} pollFacet="primary" marks={marks}
+          events={badges ? badges.events : evs}
+          tooltipTitle={(i) => (pts[i] ? monthLabelFull(pts[i].ym) : "")}
+          extraRows={(i) => {
+            const d = pts[i];
+            if (!d || !d.ci || d.election) return d && d.election ? [{ label: "", value: "The election result" }] : [];
+            return [{ label: "95% intervals", value: visible.map((p) => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ") }];
+          }}
+          fmt={(v) => v.toFixed(1)}
+          copy={{ title: "Primary vote", sub: story.head, legend: parts.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
+        />
+        <RdKey className="rd-ckey" items={[
+          { kind: "dot", color: "var(--ink-3)", label: "One poll" },
+          { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
+          base ? { kind: "ring", label: "2025 election result" } : null,
+        ]}>
+          <span className="rd-grow"></span>
+          <RdHow term="primary-vote" from="Primary vote" />
+        </RdKey>
+        {badges && <RdEventList list={badges.list} />}
+      </div>
+    </RdSec>
+  );
+}
+
+/* ======================================================================
+   Leadership
+   ====================================================================== */
+const RD_LEAD_ORDER = ["alb", "taylor", "hanson"];
+
+/* a head-to-head as one bar: each side's share from its end, the gap
+   between them the voters who named neither */
+function RdHeadBar({ label, right, rightColor, segs, cis }) {
+  const total = segs.reduce((s, x) => s + x.v, 0);
+  const neither = Math.max(0, 100 - total);
+  return (
+    <div className="rd-hb">
+      <div className="rd-hb-top"><b>{label}</b><span style={{ color: rightColor ? inkOf(rightColor) : undefined }}>{right}</span></div>
+      <div className="rd-hb-bar">
+        {segs.map((s, i) => (
+          <span key={s.name} className={"rd-hb-seg" + (i === segs.length - 1 && segs.length === 2 ? " end" : "")}
+                style={{ flexBasis: s.v + "%", background: s.color, color: "var(--on-fill-" + s.party + ")", order: s.order != null ? s.order : i * 2 }}>
+            <span className="rd-hb-name">{s.name}</span><b>{s.v.toFixed(1)}</b>
+          </span>
+        ))}
+        {neither > 0.5 && (
+          <span className="rd-hb-seg rd-hb-neither" style={{ flexBasis: neither + "%", order: segs.length === 2 ? 1 : 99 }}>
+            {neither >= 7 ? "neither" : ""}</span>
+        )}
+      </div>
+      {cis && (
+        <div className="rd-hb-cis">
+          {segs.map((s) => <span key={s.name} style={{ flexBasis: s.v + "%" }}>{s.ci != null ? "±" + s.ci.toFixed(1) : ""}</span>)}
+          {neither > 0.5 && <span style={{ flexBasis: neither + "%" }}></span>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RdLeadership({ rangeId }) {
+  const { D, rangeDomain, filterPts, monthLabelFull } = window.AP;
+  const narrow = useNarrow("(max-width: 640px)");
+  const xDomain = rangeDomain(rangeId);
+  const N = D.leaderNow || {};
+  const LM = D.leaderMonths;
+  const L = {};
+  D.LEADERS.forEach((x) => { L[x.id] = x; });
+  const opp = L.taylor, han = L.hanson, pm = L.alb;
+  const [ppmView, setPpmView] = useState("two");
+  const [expanded, setExpanded] = useState(null);
+  const [own, setOwn] = useState("net");
+  const [rawMorph, chooseMetric] = window.AP.useMorph(own, (v) => setOwn(v), (from, to) => from !== "both" && to !== "both" && from !== to);
+  const morph = rawMorph;
+  const metric = own;
+  const r1 = (v) => Math.round(v);
+  const signed = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
+  const signed0 = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(Math.round(v));
+  const get = (k) => (N[k] ? N[k].v : null);
+
+  /* ---- the headline: preferred PM against net approval ------------------ */
+  const story = (() => {
+    const a = get("alb_pref"), o = get("taylor_pref"), aH = get("alb_prefH"), h = get("hanson_prefH");
+    const net = get("alb_net");
+    const first = LM.find((r) => r.alb_net != null);
+    if (a == null || o == null || net == null || !first) return null;
+    const fall = first.alb_net - net;
+    const leads = a > o;
+    const nets = RD_LEAD_ORDER.map((id) => ({ id, v: get(id + "_net") })).filter((x) => x.v != null);
+    const lowest = nets.length === 3 && nets.every((x) => x.v >= net);
+    const round5 = (v) => Math.round(v / 5) * 5;
+    const head = (leads ? pm.short + " still leads as preferred PM" : opp.short + " leads as preferred PM")
+      + (Math.abs(fall) >= 10 ? ", but his net approval has " + (fall > 0 ? "fallen " : "risen ") + round5(Math.abs(fall)) + " points" : "");
+    const leyRows = LM.filter((r) => r.alb_pref != null && r.ley_pref != null);
+    const leyLead = leyRows.length ? leyRows.reduce((s, r) => s + r.alb_pref - r.ley_pref, 0) / leyRows.length : null;
+    let dek = (leads ? "He leads " : "He trails ") + opp.short + " " + r1(Math.max(a, o)) + "–" + r1(Math.min(a, o))
+      + (aH != null && h != null ? " and " + han.short + " " + r1(Math.max(aH, h)) + "–" + r1(Math.min(aH, h)) : "") + " head to head";
+    if (leyLead != null && leads && leyLead - (a - o) >= 4)
+      dek += ", but his lead over the Coalition leader has shrunk from about " + r1(leyLead) + " points under Ley to about " + r1(a - o) + " under " + opp.short;
+    dek += ". His net approval is " + (fall > 0 ? "down" : "up") + " about " + round5(Math.abs(fall)) + " points since the election, to " + signed0(net)
+      + (lowest ? ", the lowest of the three." : ".");
+    return { head, dek };
+  })();
+
+  /* ---- preferred PM: the bars ------------------------------------------- */
+  const seg = (Ld, k, order) => ({ name: Ld.short, v: get(k), color: Ld.color, party: Ld.id === "alb" ? "alp" : Ld.id === "taylor" ? "lnp" : "onp", ci: N[k] ? N[k].ci95 : null, order });
+  const two = get("alb_pref") != null && get("taylor_pref") != null
+    ? { label: pm.short + " v " + opp.short, segs: [seg(pm, "alb_pref", 0), seg(opp, "taylor_pref", 2)] } : null;
+  const twoH = get("alb_prefH") != null && get("hanson_prefH") != null
+    ? { label: pm.short + " v " + han.short, segs: [seg(pm, "alb_prefH", 0), seg(han, "hanson_prefH", 2)] } : null;
+  const three = ["alb_pref3", "taylor_pref3", "hanson_pref3"].every((k) => get(k) != null)
+    ? [seg(pm, "alb_pref3"), seg(opp, "taylor_pref3"), seg(han, "hanson_pref3")].sort((x, y) => y.v - x.v) : null;
+  const leadOf = (segs) => { const w = segs[0].v >= segs[1].v ? segs[0] : segs[1]; return { who: w, m: Math.abs(segs[0].v - segs[1].v) }; };
+  const headBar = (h) => {
+    const l = leadOf(h.segs);
+    return <RdHeadBar key={h.label} label={h.label} right={l.who.name + " +" + l.m.toFixed(1)} rightColor={l.who.color} segs={h.segs} />;
+  };
+  const threeBar = three && (
+    <RdHeadBar key="three" label="All three" right={three[0].name + " +" + (three[0].v - three[1].v).toFixed(1) + " on " + three[1].name}
+               rightColor={three[0].color} segs={three} cis />
+  );
+  const secondIsHanson = three && three[1].name === han.short;
+  const ppmNote = (() => {
+    if (ppmView === "two") {
+      if (!three) return null;
+      return "Asked to choose from all three: " + three.map((s) => s.name + " " + r1(s.v) + "%").join(", ") + "."
+        + (secondIsHanson ? " " + han.short + ", not " + opp.short + ", runs second." : "");
+    }
+    if (ppmView === "three") {
+      const rows = LM.filter((r) => r.hanson_pref3 != null && (r.taylor_pref3 != null || r.ley_pref3 != null));
+      if (!rows.length) return null;
+      const gapOf = (r) => r.hanson_pref3 - (r.taylor_pref3 != null ? r.taylor_pref3 : r.ley_pref3);
+      const ahead = rows.every((r) => gapOf(r) > 0);
+      const peak = rows.reduce((m, r) => (gapOf(r) > gapOf(m) ? r : m), rows[0]);
+      const last = rows[rows.length - 1];
+      let s = ahead ? han.short + " has run ahead of the Coalition leader in every month’s three-way average since " + D.monthNameFull(Number(rows[0].ym.slice(5)))
+        : han.short + " and the Coalition leader have swapped places in the three-way average";
+      if (ahead && gapOf(peak) - gapOf(last) >= 3)
+        s += ", though " + opp.short + " has cut the gap from " + r1(gapOf(peak)) + " points in " + D.monthNameFull(Number(peak.ym.slice(5))) + " to " + r1(gapOf(last));
+      s += ".";
+      const cis = three.map((x) => x.ci || 0);
+      if (N.alb_pref3 && N.alb_pref3.ci95 > 1.6 * Math.max(...cis.filter((c, i) => three[i].name !== pm.short)))
+        s += " " + pm.short + "’s wide range reflects how differently pollsters ask this question.";
+      return s;
+    }
+    const beats = two && twoH && leadOf(two.segs).who.name === pm.short && leadOf(twoH.segs).who.name === pm.short;
+    return (beats ? "Head to head, " + pm.short + " beats both." : "")
+      + (secondIsHanson ? " In the three-way question " + han.short + ", not " + opp.short + ", runs second." : "");
+  })();
+
+  /* ---- preferred PM: the charts ----------------------------------------- */
+  const pts = filterPts(LM, xDomain[0]);
+  const handover = (D.events || []).find((e) => e.date === "2026-02-12");
+  const evs = handover ? [{ ...handover, short: "Ley → Taylor" }] : [];
+  const leadSeries = (() => {
+    const run = (ka, kb) => pts.filter((r) => r[ka] != null && r[kb] != null).map((r) => ({ x: r.x, y: +(r[ka] - r[kb]).toFixed(1), ym: r.ym }));
+    return [
+      { id: "ley", label: "over Ley", color: opp.color, points: run("alb_pref", "ley_pref"), rdWidth: 2.5, endCap: false },
+      { id: "taylor", label: "over " + opp.short, color: opp.color, points: run("alb_pref", "taylor_pref"), rdWidth: 2.5, endLabel: narrow ? null : "over " + opp.short },
+      { id: "hanson", label: "over " + han.short, color: han.color, points: run("alb_prefH", "hanson_prefH"), rdWidth: 2.5, endLabel: narrow ? null : "over " + han.short },
+    ].filter((s) => s.points.length);
+  })();
+  /* each poll's own lead in each head-to-head it asked: the opposition
+     leader ("at") and Hanson ("ah"), never the three-way */
+  const leadDots = D.individualPolls.filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
+    .flatMap((q) => ["at", "ah"].map((mode) => {
+      const c = ppmMatch(q, mode);
+      if (!c || c.alb == null) return null;
+      const o = mode === "ah" ? "hanson" : c.taylor != null ? "taylor" : c.ley != null ? "ley" : null;
+      if (!o || c[o] == null) return null;
+      return { x: q.x, y: c.alb - c[o], color: o === "hanson" ? han.color : opp.color,
+               label: "Albanese over " + (o === "hanson" ? "Hanson" : o === "ley" ? "Ley" : opp.short), meta: q };
+    })).filter(Boolean);
+  const leadVals = leadSeries.flatMap((s) => s.points.map((p) => p.y)).concat(leadDots.map((d) => d.y));
+  const leadFit = fitDomain(leadVals.length ? leadVals : [0, 20], 10, 0);
+  const leyPeak = leadSeries.find((s) => s.id === "ley");
+  const leadNotes = leyPeak && leyPeak.points.length ? (() => {
+    const pk = leyPeak.points.reduce((m, p) => (p.y > m.y ? p : m), leyPeak.points[0]);
+    return [{ x: pk.x, y: pk.y, dy: -9, text: "over Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 }];
+  })() : [];
+  const threeSeries = (() => {
+    const run = (k) => pts.filter((r) => r[k] != null).map((r) => ({ x: r.x, y: r[k], ym: r.ym }));
+    return [
+      { id: "alb3", label: pm.short, color: pm.color, points: run("alb_pref3"), rdWidth: 2.5, endLabel: narrow ? null : pm.short },
+      { id: "han3", label: han.short, color: han.color, points: run("hanson_pref3"), rdWidth: 2.5, endLabel: narrow ? null : han.short },
+      { id: "ley3", label: "Ley", color: opp.color, points: run("ley_pref3"), rdWidth: 2.5, endCap: true },
+      { id: "tay3", label: opp.short, color: opp.color, points: run("taylor_pref3"), rdWidth: 2.5, endLabel: narrow ? null : opp.short },
+    ].filter((s) => s.points.length);
+  })();
+  const firstThree = threeSeries.length ? Math.min(...threeSeries.map((s) => s.points[0].x)) : null;
+  const threeTop = Math.max(40, Math.ceil(Math.max(...threeSeries.flatMap((s) => s.points.map((p) => p.y)), 0) / 10) * 10);
+  const leyRun = threeSeries.find((s) => s.id === "ley3");
+  const threeNotes = [
+    firstThree != null && firstThree - xDomain[0] > 0.2 ? { x: "left", y: threeTop * 0.62, text: "Three-way questions began in " + (() => { const r = LM.find((m) => m.alb_pref3 != null); return r ? rdMonthYear(r.ym) : ""; })(), cls: "rd-note-it" } : null,
+    leyRun && leyRun.points.length ? { x: leyRun.points[leyRun.points.length - 1].x, y: leyRun.points[leyRun.points.length - 1].y, dy: 18, text: "Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 } : null,
+  ].filter(Boolean);
+  const chartPad = narrow ? { l: 34, r: 6, t: 26, b: 28 } : { l: 40, r: 12, t: 30, b: 30 };
+  const lchart = (key, title, props) => (
+    <div className="card rd-card rd-ld-chart" key={key}>
+      <div className="rd-chead"><span className="rd-chead-t">{title}</span></div>
+      <TrendChart key={key} heightPx={narrow ? 250 : 270} padPx={chartPad} xDomain={xDomain}
+                  xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline events={evs}
+                  tooltipTitle={(i) => { const s = props.spine || []; return s[i] && s[i].ym ? monthLabelFull(s[i].ym) : ""; }}
+                  fmt={(v) => v.toFixed(1)} {...props} />
+    </div>
+  );
+  const leadChart = lchart("rd-lead", pm.short + "’s lead" + (ppmView === "both" ? " head to head" : "") + ", month by month", {
+    yDomain: leadFit.domain, yTicks: rdYTicks(leadFit.domain[0], leadFit.domain[1], 10).filter((v) => v >= 0 || v === leadFit.domain[0]),
+    yTickFmt: (v) => (v === 0 ? "Tied" : v > 0 ? "+" + v : "−" + Math.abs(v)),
+    refLines: [{ y: 0, color: "var(--ink-3)" }], series: leadSeries, scatter: leadDots, notes: leadNotes, pollFacet: "leadership",
+    spine: (leadSeries.find((s) => s.id === "taylor") || leadSeries[0] || { points: [] }).points,
+  });
+  const threeChart = lchart("rd-three", "Share in the three-way question, month by month", {
+    yDomain: [0, threeTop], yTicks: rdYTicks(0, threeTop, 10), yTickFmt: (v) => (v === 0 ? "0" : v % 20 === 0 ? v + "%" : ""),
+    series: threeSeries, notes: threeNotes, spine: (threeSeries[0] || { points: [] }).points,
+  });
+
+  /* ---- net approval and favourability ------------------------------------ */
+  const leaders = RD_LEAD_ORDER.map((id) => L[id]).filter(Boolean);
+  const erasOf = (Ld) => (Ld.id === "taylor" ? ["ley", "taylor"] : [null]);
+  const lineFor = (Ld, mt, era) => {
+    const k = (era || Ld.id) + "_" + mt;
+    return pts.filter((d) => d[k] != null).map((d) => ({ ym: d.ym, x: d.x, v: d[k], ci: d[k + "Ci"] != null ? d[k + "Ci"] : null }));
+  };
+  const cloudFor = (mt) => {
+    const wantFav = mt === "fav";
+    return D.individualPolls.filter((q) => q.appr && q.x >= xDomain[0] && q.x <= xDomain[1])
+      .flatMap((q) => leaders.flatMap((Ld) => {
+        const a = q.appr, out = [];
+        const isFav = ((a.metricBy || {})[Ld.id] === "fav");
+        if (a[Ld.id + "Net"] != null && isFav === wantFav) out.push(a[Ld.id + "Net"]);
+        const alt = a.alt && a.alt[Ld.id];
+        if (alt && alt.net != null && (alt.metric === "fav") === wantFav) out.push(alt.net);
+        const lab = Ld.id === "taylor" ? (a.oppName || Ld.short) : Ld.short;
+        return out.map((y) => ({ x: q.x, y, color: Ld.color, label: lab, meta: q, leader: Ld.id }));
+      }));
+  };
+  const netChart = (mt, key) => {
+    const m = key === "main" ? morph : null;
+    const runs = (Ld) => erasOf(Ld).map((era) => {
+      if (!m) return { era, rows: lineFor(Ld, mt, era), clip: null };
+      const b = window.AP.blendRows(lineFor(Ld, m.from, era), lineFor(Ld, m.to, era), m.t, ["v", "ci"]);
+      return b ? { era, rows: b.rows, clip: b.clip } : { era, rows: lineFor(Ld, mt, era), clip: null };
+    }).filter((d) => d.rows.length);
+    const drawn = leaders.map((Ld) => ({ Ld, runs: runs(Ld) }));
+    const series = drawn.flatMap(({ Ld, runs: rs }) => rs.map((d) => ({
+      id: Ld.id + (d.era ? "-" + d.era : ""), label: d.era === "ley" ? "Ley" : Ld.short, color: Ld.color,
+      points: d.rows.map((r) => ({ x: r.x, y: r.v })), rdWidth: 2.5, clipX: d.clip,
+      endCap: d.era !== "ley", endLabel: narrow || d.era === "ley" ? null : Ld.short,
+    })));
+    const areas = drawn.flatMap(({ Ld, runs: rs }) => rs.map((d) => ({
+      id: "ci-" + Ld.id + (d.era ? "-" + d.era : ""), color: Ld.color, className: "ci-band", edge: false, clipX: d.clip,
+      points: d.rows.filter((r) => r.ci != null).map((r) => ({ x: r.x, y0: r.v - r.ci, y1: r.v + r.ci })) }))).filter((a) => a.points.length >= 2);
+    const cross = m ? window.AP.crossClouds(cloudFor(m.from), cloudFor(m.to), m.t, (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.leader) : null;
+    const valsFor = (mm) => leaders.flatMap((Ld) => erasOf(Ld).flatMap((era) => lineFor(Ld, mm, era)).flatMap((d) => d.ci != null ? [d.v - d.ci, d.v + d.ci] : [d.v]))
+      .concat(cloudFor(mm).map((d) => d.y));
+    const fitFor = (mm) => { const v = valsFor(mm); return fitDomain(v.length ? v : [-20, 20], 20, 0); };
+    const tgt = fitFor(mt);
+    const dom = m ? window.AP.blendDomain(fitFor(m.from).domain, tgt.domain, m.t) : tgt.domain;
+    const leyRun = drawn.find((d) => d.Ld.id === "taylor");
+    const ley = leyRun && leyRun.runs.find((r) => r.era === "ley");
+    const notes = ley && ley.rows.length ? [{ x: ley.rows[ley.rows.length - 1].x, y: ley.rows[ley.rows.length - 1].v, dy: 18, text: "Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 }] : [];
+    const spine = (drawn[0] && drawn[0].runs[0] ? drawn[0].runs[0].rows : []);
+    const title = (mt === "fav" ? "Favourability" : "Net approval") + ", month by month";
+    return lchart("rd-" + mt + "-" + key, title, {
+      yDomain: dom, yTicks: rdYTicks(tgt.domain[0], tgt.domain[1], 20),
+      yTickFmt: (v) => (v === 0 ? "Even" : v > 0 ? "+" + v : "−" + Math.abs(v)),
+      refLines: [{ y: 0, color: "var(--ink-faint)" }], series, areas, notes,
+      scatter: cross ? cross.scatter : cloudFor(mt), scatterOut: cross ? cross.scatterOut : [], scatterMove: cross ? cross.scatterMove : [],
+      fade: m ? m.t : 1, pollFacet: "leadership", spine,
+      extraRows: (i) => { const r = spine[i]; if (!r) return []; const cs = leaders.map((Ld) => { const row = pts.find((p) => p.ym === r.ym); const k = (Ld.id === "taylor" && row && row.taylor_net == null && row.ley_net != null ? "ley" : Ld.id) + "_" + mt + "Ci"; return row && row[k] != null ? "±" + row[k].toFixed(1) : null; }).filter(Boolean); return cs.length ? [{ label: "95% intervals", value: cs.join(", ") }] : []; },
+    });
+  };
+
+  /* the dot plot: now, its 95% interval, and the change */
+  const dotRows = (mt) => leaders.map((Ld) => ({ Ld, n: N[Ld.id + "_" + mt] })).filter((r) => r.n);
+  const dotDom = [-40, 20];
+  const dxp = (v) => ((Math.max(dotDom[0], Math.min(dotDom[1], v)) - dotDom[0]) / (dotDom[1] - dotDom[0])) * 100;
+  const dotPlot = (mode) => {
+    const rowsA = dotRows("net"), rowsF = dotRows("fav");
+    const both = mode === "both";
+    const list = both ? leaders.map((Ld) => ({ Ld, a: N[Ld.id + "_net"], f: N[Ld.id + "_fav"] })) : (mode === "fav" ? rowsF : rowsA).map((r) => ({ Ld: r.Ld, a: r.n }));
+    return (
+      <div className={"rd-dp" + (both ? " both" : "")} role="table" aria-label={both ? "Net approval and favourability now" : (mode === "fav" ? "Net favourability now" : "Net approval now") + ", with 95% intervals and change"}>
+        <div className="rd-dp-head" role="row">
+          <span></span>
+          <span className="rd-dp-axis" aria-hidden="true"><span style={{ left: dxp(0) + "%" }}>Even</span></span>
+          <span role="columnheader">{both ? "Approval" : "Now"}</span>
+          <span role="columnheader">{both ? "Favour." : "Change"}</span>
+        </div>
+        {list.map(({ Ld, a, f }) => (
+          <div key={Ld.id} className="rd-dp-row" role="row">
+            <span role="cell" className="rd-dp-name"><span className="rd-dp-sw" style={{ background: Ld.color }}></span>{Ld.short}</span>
+            <span className="rd-dp-track" aria-hidden="true">
+              <span className="rd-dp-zero" style={{ left: dxp(0) + "%" }}></span>
+              {!both && a && <span className="rd-dp-ci" style={{ left: dxp(a.v - a.ci95) + "%", width: dxp(a.v + a.ci95) - dxp(a.v - a.ci95) + "%", background: Ld.color }}></span>}
+              {both && a && f && <span className="rd-dp-link" style={{ left: Math.min(dxp(a.v), dxp(f.v)) + "%", width: Math.abs(dxp(a.v) - dxp(f.v)) + "%", background: Ld.color }}></span>}
+              {a && <span className="rd-dp-dot" style={{ left: dxp(a.v) + "%", background: Ld.color }}></span>}
+              {both && f && <span className="rd-dp-dot open" style={{ left: dxp(f.v) + "%", borderColor: Ld.color }}></span>}
+            </span>
+            <span role="cell" className="rd-dp-now">{a ? signed(a.v) : "—"}</span>
+            <span role="cell" className={"rd-dp-chg" + (!both && a && a.changeSig ? " sig" : "")}>
+              {both ? (f ? signed(f.v) : "—") : a && a.chg != null ? (Math.abs(a.chg) < 0.05 ? "→ 0.0" : rdArrow(a.chg) + " " + Math.abs(a.chg).toFixed(1)) : ""}</span>
+          </div>
+        ))}
+        <div className="rd-dp-foot" aria-hidden="true">
+          <span></span>
+          <span className="rd-dp-axis">{[-40, -20, 0, 20].map((v) => <span key={v} style={{ left: dxp(v) + "%" }}>{v === 0 ? "0" : v > 0 ? "+" + v : "−" + Math.abs(v)}</span>)}</span>
+          <span></span><span></span>
+        </div>
+      </div>
+    );
+  };
+  const apprNote = (() => {
+    if (metric === "both") {
+      const d = leaders.map((Ld) => ({ Ld, a: get(Ld.id + "_net"), f: get(Ld.id + "_fav") })).filter((x) => x.a != null && x.f != null);
+      const worseJob = d.filter((x) => x.a < x.f - 3), betterJob = d.filter((x) => x.a > x.f + 3);
+      const bits = [];
+      if (worseJob.length) bits.push("Voters rate " + worseJob.map((x) => x.Ld.short).join(" and ") + "’s job worse than they rate " + (worseJob.length > 1 ? "them" : "him"));
+      if (betterJob.length) bits.push((bits.length ? "" : "Voters rate ") + betterJob.map((x) => x.Ld.short).join(" and ") + (bits.length ? " the reverse" : "’s job better than they rate " + (betterJob.length > 1 ? "them" : "her")));
+      return (bits.length ? bits.join(", and ") + ". " : "") + "Different pollsters ask each question, so part of each gap reflects who asked.";
+    }
+    const mt = metric;
+    const rows = leaders.map((Ld) => ({ Ld, n: N[Ld.id + "_" + mt] })).filter((r) => r.n);
+    const sig = rows.filter((r) => r.n.changeSig);
+    let s = "Bars are 95% intervals. ";
+    s += !sig.length ? "None of the changes is significant." : sig.length === 1
+      ? "Only " + sig[0].Ld.short + "’s " + (sig[0].n.chg < 0 ? "fall" : "rise") + " is statistically significant"
+      : sig.map((r) => r.Ld.short).join(" and ") + "’s changes are statistically significant";
+    const even = rows.filter((r) => Math.abs(r.n.v) <= r.n.ci95);
+    if (sig.length) s += even.length ? ", and " + even.map((r) => r.Ld.short).join(" and ") + "’s range still includes even." : ".";
+    else if (even.length) s += " " + even.map((r) => r.Ld.short).join(" and ") + "’s range includes even.";
+    if (mt === "fav") {
+      const cmp = leaders.map((Ld) => ({ Ld, a: get(Ld.id + "_net"), f: get(Ld.id + "_fav") })).filter((x) => x.a != null && x.f != null);
+      const worse = cmp.filter((x) => x.f < x.a - 3).map((x) => x.Ld.short), better = cmp.filter((x) => x.f > x.a + 3).map((x) => x.Ld.short);
+      if (worse.length || better.length)
+        s += " " + [worse.length ? worse.join(" and ") + " rates worse here than on job approval" : null,
+                    better.length ? (worse.length ? "" : "") + better.join(" and ") + " better" : null].filter(Boolean).join(" and ")
+          + ", though different pollsters ask each question.";
+    }
+    return s;
+  })();
+
+  const panel = (id, head, dek, tabs, body) => (
+    <div className={"rd-ld-panel" + (expanded && expanded !== id ? " rd-hidden" : "")}>
+      <RdSub head={head} dek={dek} />
+      {tabs}
+      {body}
+    </div>
+  );
+  const expandBtn = (id, label) => (
+    <button type="button" className="rd-iconbtn" onClick={() => setExpanded(expanded === id ? null : id)}
+            aria-label={(expanded === id ? "Show both panels" : "Expand " + label)} title={expanded === id ? "Show both panels" : "Expand"}>
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d={expanded === id
+        ? "M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"
+        : "M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"} /></svg>
+    </button>
+  );
+
+  return (
+    <RdSec id="leadership" cls="rd-lead" title="Leadership" meta="Preferred PM and net approval · Newspoll, YouGov, Resolve, Essential and others">
+      {story && <RdHed head={story.head} dek={story.dek} />}
+      <div className={"rd-ld-grid" + (expanded ? " one" : "")}>
+        {panel("ppm", "Preferred prime minister", "“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.",
+          <RdTabs value={ppmView} onChange={setPpmView} ariaLabel="Preferred prime minister question"
+                  options={[{ id: "two", label: "Two-way" }, { id: "three", label: "Three-way" }, { id: "both", label: "Both" }]}>
+            {!narrow && expandBtn("ppm", "preferred prime minister")}
+          </RdTabs>,
+          <>
+            <div className="rd-hbs">
+              {ppmView !== "three" && two && headBar(two)}
+              {ppmView !== "three" && twoH && headBar(twoH)}
+              {ppmView !== "two" && threeBar}
+            </div>
+            {ppmNote && <p className="rd-note rd-ld-note">{ppmNote}</p>}
+            {ppmView !== "three" && leadChart}
+            {ppmView !== "two" && threeChart}
+            <RdKey className="rd-ckey" items={[]}>
+              <span className="rd-ld-keytxt">{ppmView === "three" ? "Shares of all respondents. Pollsters leave different shares undecided, so read the order and the gaps rather than the levels. Lines are monthly averages."
+                : ppmView === "two" ? "Each dot is one poll; lines are monthly averages. Lead is " + pm.short + "’s share minus his opponent’s, which lets one chart carry both head-to-head contests."
+                : "Each dot is one poll; lines are monthly averages. Lead is " + pm.short + "’s share minus his opponent’s; three-way figures are shares of all respondents."}</span>
+            </RdKey>
+          </>)}
+        {panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval",
+          metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person."
+            : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. RedBridge, DemosAU, Freshwater and Spectre Strategy."
+            : "Approve minus disapprove of the job each leader is doing. Newspoll, YouGov, Resolve, Essential and others.",
+          <RdTabs value={metric} onChange={(v) => { if (v === "both" || own === "both") setOwn(v); else chooseMetric(v); }} ariaLabel="Leader rating"
+                  options={[{ id: "net", label: "Approval" }, { id: "fav", label: "Favourability" }, { id: "both", label: "Both" }]}>
+            {!narrow && expandBtn("appr", "leader ratings")}
+          </RdTabs>,
+          <>
+            {dotPlot(metric)}
+            {metric === "both" && <RdKey className="rd-dp-key" items={[{ kind: "dot-solid", color: "var(--ink-3)", label: "Approval: the job they’re doing" }, { kind: "dot-open", color: "var(--ink-3)", label: "Favourability: views of them as a person" }]} />}
+            <p className="rd-note rd-ld-note">{apprNote}</p>
+            {metric !== "fav" && netChart(metric === "both" ? "net" : "net", metric === "both" ? "a" : "main")}
+            {metric === "fav" && netChart("fav", "main")}
+            {metric === "both" && netChart("fav", "b")}
+            <RdKey className="rd-ckey" items={[
+              { kind: "dot", color: "var(--ink-3)", label: "One poll" },
+              { kind: "lineband", color: "var(--ink-3)", label: "Monthly average and its 95% interval" },
+            ]} />
+          </>)}
+      </div>
+      <RdFoot how={{ term: "leadership", from: "Leadership" }}>
+        Figures pool the last six weeks of polls. Changes are on the previous period; ▼ in bold marks a significant change.
+      </RdFoot>
+    </RdSec>
+  );
+}
+
+/* ======================================================================
+   National direction
+   ====================================================================== */
+/* a count of points as a reader rounds it: "more than 30", "about 10" */
+function rdRoughPts(v) {
+  const a = Math.abs(v);
+  if (a < 12) return String(Math.round(a));
+  const tens = Math.floor(a / 10) * 10;
+  return a - tens >= 2 ? "more than " + tens : "about " + tens;
+}
+function RdDirection({ rangeId }) {
+  const { D, rangeDomain, filterPts, series, monthLabelFull } = window.AP;
+  const narrow = useNarrow("(max-width: 640px)");
+  if (!D.direction.length) return null;
+  const xDomain = rangeDomain(rangeId);
+  const pts = filterPts(D.direction, xDomain[0]);
+  const now = D.directionNow || D.direction[D.direction.length - 1];
+  const M = D.direction;
+  const wrongLeads = now.wrong >= now.right;
+  const big = wrongLeads ? now.wrong : now.right, small = wrongLeads ? now.right : now.wrong;
+  const most = wrongLeads ? now.wrong >= Math.max(...M.map((d) => d.wrong)) - 0.05 : now.right >= Math.max(...M.map((d) => d.right)) - 0.05;
+  const head = plainShare(big) + " say the country is " + (wrongLeads ? "on the wrong track" : "heading in the right direction")
+    + (most ? ", the most this term" : "");
+  const first = M[0];
+  const sinceFirst = now.net - first.net;
+  const gapWord = (d) => ((wrongLeads ? -d : d) > 0 ? "widened" : "narrowed");
+  const dek = (small < 30 ? "Only " : "") + Math.round(small) + "% say it is " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". "
+    + (now.chg == null ? ""
+      : now.changeSig ? "The gap between the two has " + gapWord(now.chg) + " significantly in a month, by " + Math.round(Math.abs(now.chg)) + " points"
+      : "The gap between the two has not changed significantly in a month")
+    + (Math.abs(sinceFirst) >= 5 ? (now.chg == null ? "The gap has " + gapWord(sinceFirst) + " by " : ", and " + (now.changeSig ? "by " : "it has " + gapWord(sinceFirst) + " by ")) + rdRoughPts(sinceFirst) + " since just after the 2025 election." : ".");
+  const lowest = now.net <= Math.min(...M.map((d) => d.net)) + 0.05;
+  const highest = now.net >= Math.max(...M.map((d) => d.net)) - 0.05;
+  const signedP = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
+
+  const dots = (D.directionPolls || []).filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1]).flatMap((d) => [
+    { x: d.x, y: d.right, color: "var(--mood-pos)", label: "Right direction", meta: d },
+    { x: d.x, y: d.wrong, color: "var(--mood-neg)", label: "Wrong track", meta: d },
+  ]);
+  const band = (k, ck) => pts.filter((d) => d[ck] != null).map((d) => ({ x: d.x, y0: d[k] - d[ck], y1: d[k] + d[ck] }));
+  const areas = [
+    { id: "ci-right", color: "var(--mood-pos)", className: "ci-band", edge: false, points: band("right", "rightCi") },
+    { id: "ci-wrong", color: "var(--mood-neg)", className: "ci-band", edge: false, points: band("wrong", "wrongCi") },
+  ].filter((a) => a.points.length >= 2);
+  const vals = pts.flatMap((p) => [p.right, p.wrong]).concat(dots.map((d) => d.y)).concat(areas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])));
+  const lo = Math.floor((Math.min(...vals) + 0.6) / 10) * 10, hi = Math.ceil((Math.max(...vals) - 0.6) / 10) * 10;
+  /* the gap drawn where it now stands, against the month before Bondi */
+  const bondi = (D.events || []).find((e) => e.date === "2025-12-14");
+  const last = pts[pts.length - 1];
+  const base = bondi ? M.find((d) => d.ym === bondi.date.slice(0, 7)) : null;
+  const gapNow = last ? Math.abs(last.wrong - last.right) : null;
+  const brackets = last && !narrow ? [{ x: last.x, y0: last.wrong, y1: last.right, lines: [
+    gapNow.toFixed(1) + " points apart in " + D.monthNameFull(Number(last.ym.slice(5))),
+    base ? "up from " + Math.abs(base.wrong - base.right).toFixed(1) + " in " + D.monthNameFull(Number(base.ym.slice(5))) + ", before Bondi" : null,
+  ].filter(Boolean) }] : last ? [{ x: last.x, y0: last.wrong, y1: last.right, dx: 4, lines: [] }] : [];
+  const evs = bondi ? [bondi] : [];
+  const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
+  const counts = {};
+  (D.directionPolls || []).forEach((d) => { counts[d.pollster] = (counts[d.pollster] || 0) + 1; });
+  const total = (D.directionPolls || []).length;
+  const houses = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  const inactive = (D.directionHousesAll || []).filter((h) => /inactive/.test(h)).map((h) => h.replace(/ \(inactive\)/, ""));
+  const active = houses.filter((h) => !inactive.includes(h));
+  const top = houses[0];
+  const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
+  const foot = top ? "Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + counts[top] + " of the " + total + " since the election. "
+    + (active.filter((h) => h !== top).length ? rdList(active.filter((h) => h !== top)) + " supply the rest" : "")
+    + (inactive.length ? "; " + rdList(inactive) + " " + (inactive.length > 1 ? "have" : "has") + " stopped asking" : "") + ". "
+    + "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
+  const asked = rdList(D.directionHouses || []);
+  const question = "‘Is the country heading in the right direction, or on the wrong track?’";
+  return (
+    <RdSec id="direction" cls="rd-dir" title="National direction" meta={narrow ? question : question + (asked ? " · " + asked : "")}>
+      <RdHed head={head} dek={dek} />
+      <div className="rd-dir-figs">
+        <div className="rd-dir-fig"><span className="rd-dir-v" style={{ color: "var(--mood-pos)" }}>{now.right.toFixed(1)}<span className="rd-dir-pct">%</span></span>
+          <span className="rd-dir-k" style={{ color: "var(--mood-pos)" }}>Right direction</span></div>
+        <div className="rd-dir-fig rd-r"><span className="rd-dir-v" style={{ color: "var(--mood-neg)" }}>{now.wrong.toFixed(1)}<span className="rd-dir-pct">%</span></span>
+          <span className="rd-dir-k" style={{ color: "var(--mood-neg)" }}>Wrong track</span></div>
+      </div>
+      <div className="rd-dir-bar" role="img" aria-label={`Right direction ${now.right}%, unsure ${now.unsure}%, wrong track ${now.wrong}%`}>
+        <span className="rd-dir-pos" style={{ flexBasis: now.right + "%" }}></span>
+        <span className="rd-dir-uns" style={{ flexBasis: now.unsure + "%" }}><span>{now.unsure.toFixed(1)}% unsure</span></span>
+        <span className="rd-dir-neg" style={{ flexBasis: now.wrong + "%" }}></span>
+      </div>
+      <p className="rd-dir-net"><b>Net {signedP(now.net)} points</b>
+        {now.chg != null && <> · {rdArrow(now.chg)} {Math.abs(now.chg).toFixed(1)} on a month ago{now.changeSig ? ", a significant " + (now.chg < 0 ? "fall" : "rise") : now.changeSig === false ? ", within the margin" : ""}</>}
+        {lowest ? " · the lowest since the 2025 election" : highest ? " · the highest since the 2025 election" : ""}</p>
+      <div className="card rd-card rd-dir-chart">
+        <div className="rd-chead"><span className="rd-chead-t">{narrow ? "Right direction and wrong track, %" : "Right direction and wrong track, % of voters, month by month"}</span></div>
+        {narrow && <RdKey items={[{ kind: "line", color: "var(--mood-neg)", label: "Wrong track" }, { kind: "line", color: "var(--mood-pos)", label: "Right direction" }]} className="rd-tpp-legend" />}
+        <TrendChart key="rd-dir" heightPx={narrow ? 280 : 360}
+          padPx={narrow ? { l: 34, r: 8, t: 30, b: 28 } : { l: 40, r: 16, t: 40, b: 30 }}
+          xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => (v === hi ? v + "%" : String(v))}
+          xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline
+          series={[
+            { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong"), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Wrong track" },
+            { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right"), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Right direction" },
+          ]}
+          spine={series(pts, "right")} areas={areas} scatter={dots} pollFacet="direction"
+          events={badges ? badges.events : evs} brackets={brackets}
+          tooltipTitle={(i) => (pts[i] ? monthLabelFull(pts[i].ym) : "")}
+          extraRows={(i) => { const d = pts[i]; return d && d.rightCi != null ? [{ label: "95% intervals", value: "±" + d.rightCi.toFixed(1) + ", ±" + d.wrongCi.toFixed(1) }] : []; }}
+          fmt={(v) => v.toFixed(1)}
+          copy={{ title: "National direction", sub: head, legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
+        />
+        <RdKey className="rd-ckey" items={[
+          { kind: "dot", color: "var(--ink-3)", label: "One poll" },
+          { kind: "lineband", color: "var(--ink-3)", label: "Monthly average, adjusted for each pollster’s lean, and its 95% interval" },
+        ]} />
+        {badges && <RdEventList list={badges.list} />}
+        {narrow && gapNow != null && <p className="rd-note">{gapNow.toFixed(1)} points apart in {D.monthNameFull(Number(last.ym.slice(5)))}{base ? "; " + Math.abs(base.wrong - base.right).toFixed(1) + " before Bondi" : ""}.</p>}
+      </div>
+      <HowTo paras={[
+        <>Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals.</>,
+        <>The lines are adjusted for each pollster’s lean. Only {(D.directionHouses || []).length} pollsters ask this question, so some months rest on a single poll: the dots show which, and the shading shows what that costs in confidence.</>,
+      ]} />
+      <RdFoot how={{ term: "direction", from: "National direction" }}>{foot}</RdFoot>
+    </RdSec>
+  );
+}
+function rdList(arr) {
+  if (!arr.length) return "";
+  if (arr.length === 1) return arr[0];
+  return arr.slice(0, -1).join(", ") + " and " + arr[arr.length - 1];
+}
+
+/* ======================================================================
+   Who votes for whom
+   ====================================================================== */
+const RD_DEMO_SHORT = {
+  "18–34": "18–34s", "35–54": "35–54s", "55+": "over-55s", "Gen Z": "Gen Z", Millennials: "Millennials",
+  "Gen X": "Gen X", Boomers: "Boomers", Men: "men", Women: "women",
+  "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "TAFE or trade graduates", University: "university graduates",
+  NSW: "NSW voters", Vic: "Victorians", Qld: "Queenslanders", "Rest of Australia": "voters in the other states",
+  "Inner metro": "inner-suburban voters", "Outer metro": "outer-suburban voters", Provincial: "provincial voters", Rural: "rural voters",
+  "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
+  "English only": "English-only speakers", "Other language": "voters who speak another language at home",
+};
+const RD_DEMO_NOUN = { age: "age", gender: "gender", education: "education" };
+/* groups in order as one party colour's ramp, pale to dark (dark mode runs
+   the other way, so the last group keeps the most contrast in both) */
+const rdRamp = (party, n, i) => (n < 2 ? "var(--" + party + ")" : "var(--ramp-" + party + "-" + (1 + Math.round((i * 3) / (n - 1))) + ")");
+
+function RdDemographics({ rangeId = "all" }) {
+  const { D, rangeDomain, filterPts, monthLabelFull } = window.AP;
+  const narrow = useNarrow("(max-width: 640px)");
+  const T = D.demographics;
+  const [tabId, setTab] = useState("age");
+  const [party, setParty] = useState("onp");
+  if (!T || !T.tabs || !T.tabs.length) return null;
+  const tab = T.tabs.find((x) => x.id === tabId) || T.tabs[0];
+  const P = D.PARTIES[party];
+  const pName = P.name, pColor = P.color;
+  const all = T.all[party];
+  const ki = T.order.indexOf(party), gpi = DEMO_GRP_PARTY.indexOf(party);
+  const short = (g) => RD_DEMO_SHORT[g.label] || DEMO_WHO[g.label] || g.label;
+
+  /* ---- the finding -------------------------------------------------------- */
+  const st0 = tab.sets[0];
+  const verdict = demoVerdict(st0, party) || "";
+  const story = (() => {
+    let head;
+    const m = /^Support for .* (rises|falls) significantly (.*)\.$/.exec(verdict);
+    if (m && st0.id === "age") head = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with age";
+    else if (m && st0.id === "generation") head = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";
+    else if (m && st0.id === "location") head = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";
+    else if (/no significant difference/.test(verdict)) head = pName + "’s vote is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");
+    else head = verdict.replace(/ significantly/, "").replace(/\.$/, "");
+    const gs = st0.groups.filter((g) => g.v[party] != null);
+    const byV = gs.slice().sort((a, b) => b.v[party] - a.v[party]);
+    const top = byV[0], bot = byV[byV.length - 1];
+    let dek = top && bot && top !== bot
+      ? rdCap(rdFraction(top.v[party])) + " " + short(top) + " back " + pName + ", against " + rdFraction(bot.v[party]) + " " + short(bot) + "."
+      : "";
+    const st1 = tab.sets[1];
+    if (st1) {
+      const out = st1.groups.filter((g) => g.v[party] != null)
+        .map((g) => ({ g, d: g.v[party] - all, sig: Math.abs(g.v[party] - all) > (g.ci[party] || 0) }))
+        .sort((a, b) => Math.abs(b.d) - Math.abs(a.d))[0];
+      if (out && out.sig) dek += " " + rdCap(short(out.g)) + " " + (/s$/.test(short(out.g)) && !/^Gen/.test(out.g.label) ? "are" : "is") + " the outlier, at " + rdFraction(out.g.v[party]) + ".";
+    }
+    return { head, dek };
+  })();
+
+  /* ---- the dot plot, every set on one scale -------------------------------- */
+  const vals = tab.sets.flatMap((st) => st.groups.flatMap((g) => [g.v[party] + (g.ci[party] || 0), g.v[party] - (g.ci[party] || 0)])).concat([all]);
+  const hi = Math.max(10, Math.ceil(Math.max(...vals) / 10) * 10);
+  const xp = (v) => (Math.max(0, Math.min(hi, v)) / hi) * 100;
+  const signedD = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
+  const dotSet = (st, idx) => (
+    <div className="rd-wv-set" key={st.id} role="table" aria-label={(st.label || tab.label) + ": " + pName + "’s share of each group’s vote"}>
+      <div className="rd-wv-sethead" role="row">
+        <span role="columnheader"><b>{st.label || "By " + tab.label.toLowerCase()}</b> <span>{rdList((st.houses || []).map(demoHouse))}</span></span>
+        <span className="rd-wv-allcap" aria-hidden="true">{idx === 0 && <span style={{ left: xp(all) + "%" }}>All voters {all.toFixed(1)}%</span>}</span>
+        <span className="rd-wv-vs" role="columnheader">{idx === 0 ? "vs all voters" : ""}</span>
+      </div>
+      {st.groups.map((g) => {
+        const v = g.v[party], ci = g.ci[party] || 0, d = v - all, sig = Math.abs(d) > ci;
+        return (
+          <div key={g.label} className="rd-wv-row" role="row"
+               title={"Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + " · " + rdList((g.houses || []).map(demoHouse)) + " · ± is the 95% margin"}>
+            <span role="cell" className="rd-wv-lab">{g.label}</span>
+            <span className="rd-wv-track" aria-hidden="true">
+              <span className="rd-wv-all" style={{ left: xp(all) + "%" }}></span>
+              <span className="rd-wv-ci" style={{ left: xp(v - ci) + "%", width: xp(v + ci) - xp(v - ci) + "%", color: pColor }}></span>
+              <span className={"rd-wv-dot" + (sig ? "" : " open")} style={{ left: xp(v) + "%", background: sig ? pColor : undefined, borderColor: pColor }}></span>
+            </span>
+            <span role="cell" className="rd-wv-v"><b>{v.toFixed(1)}%</b> <span>±{ci.toFixed(1)}</span></span>
+            <span role="cell" className={"rd-wv-d" + (sig ? " sig" : "")} style={sig ? { color: inkOf(pColor) } : undefined}>{signedD(d)}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+  const axis = (
+    <div className="rd-wv-axis" aria-hidden="true">
+      <span></span>
+      <span className="rd-wv-ticks">{rdYTicks(0, hi, 10).map((v) => <span key={v} style={{ left: xp(v) + "%" }}>{v}%</span>)}</span>
+      <span></span><span></span>
+    </div>
+  );
+
+  /* ---- the groups month by month, in points -------------------------------- */
+  const [rangeLo, rangeHi] = rangeDomain(rangeId);
+  const allAt = new Map(T.allMonthly.map((m) => [m[0], m[1 + ki]]));
+  const setLines = (st) => st.groups.map((g, i) => ({
+    g, color: rdRamp(party, st.groups.length, i),
+    pts: (g.monthly || []).filter((m) => m[1 + ki] != null).map((m) => ({ ym: m[0], x: D.mx(m[0]), y: m[1 + ki] })),
+  })).filter((l) => l.pts.length);
+  const charts = tab.sets.map((st) => {
+    const lines = setLines(st);
+    if (!lines.length) return null;
+    const firstX = Math.min(...lines.map((l) => l.pts[0].x));
+    const x0 = Math.max(rangeLo, firstX - 0.06), x1 = rangeHi;
+    const drawn = lines.map((l) => ({ ...l, pts: filterPts(l.pts, x0) }));
+    const allPts = filterPts(T.allMonthly.map((m) => ({ ym: m[0], x: D.mx(m[0]), y: m[1 + ki] })).filter((d) => d.x >= firstX - 0.01), x0);
+    const dots = D.individualPolls.filter((q) => q.grp && q.grp.t && q.x >= x0 && q.x <= x1).flatMap((q) => drawn.map((l) => {
+      const v = q.grp.v[D.demoGroups.indexOf(l.g.label)];
+      const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
+      const base = allAt.get(q.ym);
+      return sum > 0 && q.grp.t[gpi] > 0 && base != null
+        ? { x: q.x, y: +(base + (100 * v[gpi] / sum - q.grp.t[gpi])).toFixed(1), color: l.color, label: l.g.label, meta: q } : null;
+    }).filter(Boolean));
+    return { st, drawn, allPts, dots, x0, x1, span: x1 - x0 };
+  }).filter(Boolean);
+  const yMax = Math.max(10, Math.ceil(Math.max(...charts.flatMap((c) => c.drawn.flatMap((l) => l.pts.map((p) => p.y)).concat(c.dots.map((d) => d.y)))) / 10) * 10);
+  /* the points gap between the first set's top and bottom groups, then and now */
+  const sub = (() => {
+    const c = charts[0];
+    if (!c || c.drawn.length < 2) return null;
+    const ends = c.drawn.map((l) => ({ l, first: l.pts[0], last: l.pts[l.pts.length - 1] }));
+    const byNow = ends.slice().sort((a, b) => b.last.y - a.last.y);
+    const hiL = byNow[0], loL = byNow[byNow.length - 1];
+    const firstYm = [hiL.first.ym, loL.first.ym].sort().pop();
+    const fHi = hiL.l.pts.find((p) => p.ym === firstYm), fLo = loL.l.pts.find((p) => p.ym === firstYm);
+    if (!fHi || !fLo) return null;
+    const gap0 = fHi.y - fLo.y, gap1 = hiL.last.y - loL.last.y;
+    const noun = RD_DEMO_NOUN[tab.id];
+    const grew = (allPts) => allPts.length > 1 && allPts[allPts.length - 1].y - allPts[0].y >= 3;
+    const pGrew = grew(c.allPts);
+    const move = gap1 - gap0 >= 4 ? "widened" : gap0 - gap1 >= 4 ? "narrowed" : "held steady";
+    const head = (noun ? "The " + noun + " gap" : "The gap between " + short(hiL.l.g) + " and " + short(loL.l.g)) + " has " + move
+      + (move === "widened" && pGrew ? " as " + pName + " has grown" : "");
+    const trend = demoTrendVerdict(D, c.st, party, (x) => x >= c.x0 && x <= c.x1);
+    const dek = (trend ? trend + " " : "") + (move === "held steady" ? "In percentage points the gap between " + short(hiL.l.g) + " and " + short(loL.l.g) + " has stayed near " + Math.round(gap1) + "."
+      : "In percentage points, though, the gap between " + short(hiL.l.g) + " and " + short(loL.l.g) + " has " + (move === "widened" ? "grown" : "shrunk")
+        + " from about " + Math.round(gap0) + " points in " + rdMonthYear(firstYm) + " to about " + Math.round(gap1) + " now.");
+    return { head, dek };
+  })();
+  const chartOf = (c) => (
+    <div className="card rd-card rd-wv-chart" key={c.st.id} style={{ flexGrow: narrow ? 1 : Math.max(0.35, c.span) }}>
+      <div className="rd-chead"><span className="rd-chead-t">{c.st.label || "By " + tab.label.toLowerCase()}<span className="rd-chead-meta">since {rdMonthYear(c.drawn.reduce((m, l) => (l.pts[0].ym < m ? l.pts[0].ym : m), "9999"))}</span></span></div>
+      <TrendChart key={"rd-wv-" + c.st.id + "-" + tab.id} heightPx={narrow ? 240 : 260}
+        padPx={narrow ? { l: 34, r: 8, t: 12, b: 28 } : { l: 40, r: 12, t: 12, b: 30 }}
+        xDomain={[c.x0, c.x1]} yDomain={[0, yMax]} yTicks={rdYTicks(0, yMax, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
+        xTicks={rdXTicks(c.x0, c.x1, narrow || c.span < 0.8)} baseline
+        series={[{ id: "all", label: "All voters", color: "var(--ink)", dash: "4 3", dashed: true, rdWidth: 1.5, endCap: false, points: c.allPts.map((d) => ({ x: d.x, y: d.y })), endLabel: narrow ? null : "All voters" },
+                 ...c.drawn.map((l) => ({ id: l.g.label, label: l.g.label, color: l.color, rdWidth: 2.2, endCap: false, points: l.pts.map((d) => ({ x: d.x, y: d.y })), endLabel: l.g.label }))]}
+        spine={c.allPts.map((d) => ({ x: d.x, y: d.y }))}
+        scatter={c.dots} pollFacet="primary"
+        tooltipTitle={(i) => (c.allPts[i] ? monthLabelFull(c.allPts[i].ym) : "")}
+        fmt={(v) => v.toFixed(1)}
+        copy={{ title: "Who votes for whom", sub: pName + "’s share of the vote, " + (c.st.label || tab.label).toLowerCase() + ", month by month" }}
+      />
+    </div>
+  );
+
+  return (
+    <RdSec id="who-votes" cls="rd-wv" title="Who votes for whom" meta={"Pooled from the last " + T.window + " of " + rdList(T.houses.map(demoHouse)) + " polls"}>
+      <RdHed head={story.head} dek={story.dek} />
+      <RdTabs value={tab.id} onChange={setTab} options={T.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-wv-tabs">
+        {!narrow && (
+          <span className="rd-chips" role="group" aria-label="Party">
+            {DEMO_PARTIES.map((pp) => (
+              <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => setParty(pp.id)}
+                      style={party === pp.id ? { background: "var(--tint-" + pp.id + ")", borderColor: D.PARTIES[pp.id].color } : undefined}>
+                <span className="rd-sw" style={{ background: D.PARTIES[pp.id].color }}></span>{pp.label}</button>
+            ))}
+          </span>
+        )}
+      </RdTabs>
+      {narrow && (
+        <div className="rd-chips rd-chips-row" role="group" aria-label="Party">
+          {DEMO_PARTIES.map((pp) => (
+            <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => setParty(pp.id)}
+                    style={party === pp.id ? { background: "var(--tint-" + pp.id + ")", borderColor: D.PARTIES[pp.id].color } : undefined}>
+              <span className="rd-sw" style={{ background: D.PARTIES[pp.id].color }}></span>{pp.label}</button>
+          ))}
+        </div>
+      )}
+      <div className="card rd-card rd-wv-dots">
+        {tab.sets.map((st, i) => dotSet(st, i))}
+        {axis}
+        <RdKey className="rd-ckey rd-wv-key" items={[
+          { kind: "dot-solid", color: pColor, label: "Clearly above or below all voters" },
+          { kind: "dot-open", color: pColor, label: "Within the margin" },
+          { kind: "whisker", color: pColor, label: "95% interval" },
+        ]}><span className="rd-key-item rd-wv-keytxt">Right-hand column: difference from all voters, in points</span></RdKey>
+      </div>
+      {sub && <RdSub head={sub.head} dek={sub.dek} />}
+      <div className="rd-wv-charts">{charts.map(chartOf)}</div>
+      <RdFoot how={{ term: "vote-by-group", from: "Who votes for whom" }}>
+        Each dot is one poll; lines are monthly averages; the dashed line is all voters.{charts.length > 1 ? " Both panels share one scale, so each is only as wide as its data." : ""}
+      </RdFoot>
+    </RdSec>
+  );
+}
+
+/* ======================================================================
+   Where One Nation's voters came from
+   ====================================================================== */
+/* a container's width, kept current: for drawings laid out in pixels */
+function useRdWidth(ref, fallback) {
+  const [w, setW] = React.useState(fallback || 800);
+  React.useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const fit = () => setW(el.getBoundingClientRect().width || fallback || 800);
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return w;
+}
+
+function RdSwitching({ rangeId }) {
+  const { D, rangeDomain, filterPts } = window.AP;
+  const narrow = useNarrow("(max-width: 640px)");
+  const S = D.onSources;
+  const boxRef = React.useRef(null);
+  const W = useRdWidth(boxRef, 1152);
+  if (!S || !S.series.length || !S.series.every((sr) => sr.rate)) return null;
+  const Wt = S.weights || {};
+  const byId = {};
+  S.series.forEach((sr) => { byId[sr.id] = sr; });
+  const NAME = { lnp: "Coalition", alp: "Labor", oth: "Others", grn: "Greens" };
+  const LONG = { lnp: "Coalition voters", alp: "Labor voters", oth: "Others & independents", grn: "Greens voters" };
+  /* One Nation's own 2025 voters: the share still backing it, pooled over
+     the same polls as the rates */
+  const recent = (S.waves || []).slice(-(S.now && S.now.n ? S.now.n : 5));
+  const keptPct = recent.length ? recent.reduce((s, w) => s + w.keptPct * (w.sample || 1), 0) / recent.reduce((s, w) => s + (w.sample || 1), 0) : null;
+  const cols = ["lnp", "alp", "oth", "grn"].filter((id) => byId[id]).map((id) => {
+    const sr = byId[id];
+    const w = id === "oth" ? (Wt.oth || 0) + (Wt.ind || 0) : Wt[id];
+    return { id, sr, w, rate: sr.rate.now.v, rateCi: sr.rate.now.ci95, gain: sr.now.v, gainCi: sr.now.ci95, pts: sr.now.pts,
+             color: sr.color, tint: "var(--tint-" + id + ")", ink: inkOf(sr.color) };
+  });
+  const onpW = Wt.onp || 0;
+  const keptPts = keptPct != null ? keptPct * onpW / 100 : null;
+  const gained = cols.reduce((s, c) => s + (c.pts || 0), 0);
+  const onNow = D.latest.primary.onp;
+
+  /* ---- the finding ---------------------------------------------------------- */
+  const top = cols.slice().sort((a, b) => b.gain - a.gain)[0];
+  const lnp = cols.find((c) => c.id === "lnp"), alp = cols.find((c) => c.id === "alp");
+  const head = top ? rdCap(rdFraction(top.gain)) + " of One Nation’s new voters backed " + (top.id === "lnp" ? "the Coalition" : top.id === "alp" ? "Labor" : top.id === "grn" ? "the Greens" : "another party") + " in 2025" : null;
+  const dek = (() => {
+    if (!lnp || !alp) return null;
+    const hiC = lnp.rate >= alp.rate ? lnp : alp, loC = hiC === lnp ? alp : lnp;
+    const nm = (c) => (c.id === "lnp" ? "Coalition" : "Labor");
+    let s = plainShare(hiC.rate) + " 2025 " + nm(hiC) + " voters now say they’d vote One Nation, " + timesWords(hiC.rate / loC.rate) + " " + nm(loC) + "’s rate.";
+    if (Math.abs(lnp.w - alp.w) / Math.max(lnp.w, alp.w) < 0.15)
+      s += " The two parties won similar shares in 2025, so that difference in rates accounts for almost the whole gap.";
+    return s;
+  })();
+
+  /* ---- the rates, month by month -------------------------------------------- */
+  const [rangeLo, rangeHi] = rangeDomain(rangeId);
+  const firstX = Math.min(...cols.map((c) => c.sr.rate.monthly[0].x));
+  const x0 = Math.max(rangeLo, firstX - 0.04), x1 = rangeHi;
+  const pollRate = (id) => (S.waves || []).map((w) => {
+    const v = w.toOn ? w.toOn[id] : null;
+    return v == null ? null : { x: D.mx(w.date.slice(0, 7)) + ((+w.date.slice(8, 10) - 15) / 365), y: v, h: w.pollster, w: w.sample || 1000, meta: { pollster: w.pollster, released: w.date, dateLabel: w.dateStart ? "" : "", sample: w.sample } };
+  }).filter(Boolean);
+  const fits = cols.map((c) => ({ c, fit: withinHouseSlope(pollRate(c.id).map((d) => ({ h: d.h, t: d.x, w: d.w, y: d.y }))) })).filter((f) => f.fit);
+  const sig = [];
+  for (const [i, f] of [...fits].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+    if (f.fit.p >= 0.05 / (fits.length - i)) break;
+    sig.push(f);
+  }
+  const firstYm = cols[0].sr.rate.monthly[0].ym;
+  const sinceM = D.monthNameFull(Number(firstYm.slice(5)));
+  /* the rates that moved, tested within each pollster, the rest said to hold */
+  const subHead = !sig.length ? "The rates have held since " + sinceM
+    : sig.length === cols.length ? "Every party’s rate has " + (sig.every((f) => f.fit.b > 0) ? "risen" : sig.every((f) => f.fit.b < 0) ? "fallen" : "moved") + " since " + sinceM
+    : "The rates have held since " + sinceM + ", apart from " + rdList(sig.map((f) => NAME[f.c.id] + " voters’"))
+      + ", which " + (sig.length > 1 ? "have" : "has") + " " + (sig.every((f) => f.fit.b < 0) ? "fallen" : sig.every((f) => f.fit.b > 0) ? "risen" : "moved");
+  const ks = cols.flatMap((c) => c.sr.rate.monthly.map((m) => m.k)).filter((k) => k != null);
+  const kLo = Math.min(...ks), kHi = Math.max(...ks);
+  const subDek = "Share of each party’s 2025 voters now backing One Nation: each dot is one poll, and the lines are monthly averages. "
+    + "Monthly figures rest on " + (kLo === kHi ? rdNumWord(kLo) : rdNumWord(kLo) + " to " + rdNumWord(kHi)) + " polls, so single-month moves of a few points are noise.";
+  const monthsIn = D.MONTHS.filter((ym) => D.mx(ym) >= x0 && D.mx(ym) <= x1 + 0.01);
+  const smTicks = monthsIn.length ? [monthsIn[0], monthsIn[Math.floor((monthsIn.length - 1) / 2)], monthsIn[monthsIn.length - 1]]
+    .filter((v, i, a) => a.indexOf(v) === i).map((ym) => ({ x: D.mx(ym), label: D.monthName(Number(ym.slice(5))) })) : [];
+  const smTop = Math.max(50, Math.ceil(Math.max(...cols.flatMap((c) => pollRate(c.id).map((d) => d.y))) / 25) * 25);
+
+  /* ---- the mosaic ------------------------------------------------------------ */
+  const GAP = 4, H = narrow ? 0 : 300;
+  const all = cols.concat(onpW ? [{ id: "onp", w: onpW, rate: keptPct, kept: true, color: "var(--onp-deep)", tint: "var(--line-2)", ink: "var(--onp-text)" }] : []);
+  const totW = all.reduce((s, c) => s + c.w, 0);
+  const usable = W - GAP * (all.length - 1);
+  let acc = 0;
+  const geo = all.map((c) => { const x = acc, w = (c.w / totW) * usable; acc += w + GAP; return { ...c, x, cw: w }; });
+  const fmt1 = (v) => v.toFixed(1);
+  /* the column labels, each at the longest wording that clears its
+     neighbour: a laptop's One Nation column is too narrow for its name */
+  const labOpts = geo.map((c, i) => ({
+    nm: c.kept ? ["One Nation", "ON"] : [NAME[c.id]],
+    sz: [fmt1(c.w) + "%" + (c.id === "lnp" || c.id === "alp" ? " of 2025 voters" : c.id === "oth" ? ", incl. independents" : ""), fmt1(c.w) + "%"],
+    pts: c.kept ? ["≈ " + fmt1(keptPts)] : ["≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)],
+    sh: c.kept ? ["kept"] : [Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + (i === 0 ? " of One Nation’s gain" : i === 1 ? " of the gain" : ""),
+                            Math.round(c.gain) + "% ±" + fmt1(c.gainCi), Math.round(c.gain) + "%"],
+  }));
+  const lab = {};
+  [["nm", 15, 600], ["sz", 12, 400], ["pts", 15, 600], ["sh", 12, 400]].forEach(([key, size, wt]) => {
+    const k = geo.map(() => 0);
+    const ext = (i) => {
+      const w = textWidth(labOpts[i][key][k[i]], size, wt);
+      const last = i === geo.length - 1;
+      const x = last ? geo[i].x + geo[i].cw : geo[i].x;
+      return last ? [x - w, x] : [x, x + w];
+    };
+    for (let i = 0; i < geo.length - 1; i++) {
+      for (let guard = 0; guard < 6 && ext(i)[1] + 10 > ext(i + 1)[0]; guard++) {
+        if (k[i] < labOpts[i][key].length - 1) k[i]++;
+        else if (k[i + 1] < labOpts[i + 1][key].length - 1) k[i + 1]++;
+        else break;
+      }
+    }
+    lab[key] = k.map((j, i) => labOpts[i][key][j]);
+  });
+  const mosaic = !narrow ? (
+    <svg className="rd-mo" width={W} height={H + 110} viewBox={`0 0 ${W} ${H + 110}`} role="img"
+         aria-label={"Each 2025 party’s voters as a column sized by its 2025 vote, filled by the share now backing One Nation. "
+           + cols.map((c) => NAME[c.id] + " " + fmt1(c.rate) + "%").join(", ") + (keptPct != null ? "; One Nation kept " + Math.round(keptPct) + "% of its own." : ".")}>
+      {geo.map((c, i) => {
+        const last = i === geo.length - 1;
+        const tx = last ? c.x + c.cw : c.x, anchor = last ? "end" : "start";
+        const fillH = (c.rate / 100) * H;
+        return (
+          <g key={c.id}>
+            <text className="rd-mo-nm" x={tx} y={16} textAnchor={anchor} style={{ fill: c.ink }}>{lab.nm[i]}</text>
+            <text className="rd-mo-sz" x={tx} y={35} textAnchor={anchor}>{lab.sz[i]}</text>
+            <rect x={c.x} y={48} width={c.cw} height={H} style={{ fill: c.tint }} />
+            <rect className="rd-mo-fill" x={c.x} y={48 + H - fillH} width={c.cw} height={fillH} style={{ fill: c.kept ? "var(--onp-deep)" : "var(--onp)" }} />
+            {i === 0 && <text className="rd-mo-sz" x={c.x + 12} y={48 + 22} style={{ fill: c.ink }}>Stayed or went elsewhere</text>}
+            {c.kept ? (
+              <>
+                <text className="rd-mo-rates" x={c.x + 10} y={48 + H - fillH + 24} style={{ fill: "var(--bg)" }}>{Math.round(c.rate)}%</text>
+                <text className="rd-mo-sz" x={c.x + 10} y={48 + H - fillH + 40} style={{ fill: "var(--bg)" }}>kept</text>
+              </>
+            ) : i === 0 ? (
+              <>
+                <text className="rd-mo-rate" x={c.x + 14} y={48 + H - fillH + 30}>{fmt1(c.rate)}%</text>
+                <text className="rd-mo-sz rd-mo-onfill" x={c.x + 14} y={48 + H - fillH + 48}>now back One Nation</text>
+              </>
+            ) : (
+              <text className="rd-mo-rates" x={c.x + 14} y={fillH >= 22 ? 48 + H - fillH + 20 : 48 + H - fillH - 8}
+                    style={fillH >= 22 ? undefined : { fill: "var(--onp-text)" }}>{fmt1(c.rate)}%</text>
+            )}
+            <text className="rd-mo-pts" x={tx} y={48 + H + 28} textAnchor={anchor}>{lab.pts[i]}</text>
+            <text className="rd-mo-sh" x={tx} y={48 + H + 47} textAnchor={anchor}>{lab.sh[i]}</text>
+          </g>
+        );
+      })}
+      <line x1="0" x2={W} y1={48 + H} y2={48 + H} className="rd-mo-base" />
+    </svg>
+  ) : (
+    <div className="rd-mo-rows">
+      {all.map((c) => (
+        <div key={c.id} className="rd-mo-row">
+          <div className="rd-mo-rtop"><b style={{ color: c.ink }}>{c.kept ? "One Nation" : LONG[c.id]}</b><b>≈ {fmt1(c.kept ? keptPts : c.pts)} pts</b></div>
+          <div className="rd-mo-rsub"><span>{fmt1(c.w)}% of 2025 voters</span><span>{c.kept ? Math.round(c.rate) + "% still back it" : Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + " of the gain"}</span></div>
+          <div className="rd-mo-rbar" style={{ height: Math.max(22, c.w * 3.6), background: c.tint }}>
+            <span style={{ width: c.rate + "%", background: c.kept ? "var(--onp-deep)" : "var(--onp)" }}></span>
+            {!c.kept && <em style={{ left: "calc(" + c.rate + "% + 8px)" }}>{fmt1(c.rate)}%</em>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <RdSec id="switching" cls="rd-sw" title="Where One Nation’s voters came from"
+           meta={"How 2025 voters say they’d vote now · " + rdList(S.houses || []) + ", last " + (S.now ? S.now.window : "six weeks")}>
+      {head && <RdHed head={head} dek={dek} />}
+      <div className="card rd-card rd-mo-wrap" ref={boxRef}>
+        {mosaic}
+        <p className="rd-note rd-mo-note">Points are shares of all voters. About {Math.round(gained)} gained from other parties{keptPts != null ? ", plus " + Math.round(keptPts) + " kept," : ""} add up to {Math.round(gained + (keptPts || 0))} of One Nation’s {onNow.toFixed(1)} points today.</p>
+        <div className="rd-key rd-mo-key">
+          <span className="rd-key-item"><RdSwatch kind="square" color="var(--onp)" />Switched to One Nation</span>
+          <span className="rd-key-item"><RdSwatch kind="square" color="var(--onp-deep)" />Already One Nation in 2025</span>
+          {!narrow && <span className="rd-key-item rd-mo-howread">Width: share of the 2025 vote · Height: share now backing One Nation · Area: voters gained</span>}
+        </div>
+        {narrow && <p className="rd-note">Bar height: that party’s share of the 2025 vote. Filled width: share now backing One Nation. Filled area: voters One Nation gained.</p>}
+      </div>
+      <RdSub head={subHead} dek={subDek} />
+      <div className="rd-sm-grid">
+        {cols.map((c) => {
+          const pts = filterPts(c.sr.rate.monthly, x0).map((m) => ({ x: m.x, y: m.v, ym: m.ym }));
+          const dots = pollRate(c.id).filter((d) => d.x >= x0 && d.x <= x1 + 0.02).map((d) => ({ x: d.x, y: d.y, color: c.color, label: LONG[c.id], meta: d.meta }));
+          return (
+            <div key={c.id} className="card rd-card rd-sm">
+              <div className="rd-sm-top"><span style={{ color: c.ink }}>{narrow ? NAME[c.id] : LONG[c.id]}</span><b>{fmt1(c.rate)}%</b></div>
+              <TrendChart key={"rd-sm-" + c.id} heightPx={narrow ? 120 : 150} padPx={{ l: 4, r: 4, t: 18, b: 24 }}
+                xDomain={[x0, x1]} yDomain={[0, smTop]} yTicks={rdYTicks(0, smTop, 25)}
+                yTickFmt={() => ""} xTicks={smTicks} baseline
+                series={[{ id: c.id, label: LONG[c.id], color: c.color, rdWidth: narrow ? 2 : 2.5, endCap: false, points: pts }]}
+                spine={pts} scatter={dots}
+                notes={rdYTicks(25, smTop, 25).map((v) => ({ x: "left", y: v, dy: -4, text: v + "%", size: 11, cls: "rd-sm-ylab" }))}
+                tooltipTitle={(i) => (pts[i] ? window.AP.monthLabelFull(pts[i].ym) : "")}
+                fmt={(v) => v.toFixed(1)}
+                copy={{ title: LONG[c.id] + " now backing One Nation", sub: "Share of the party’s 2025 voters, month by month" }}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <RdFoot how={{ term: "vote-switching", from: "Where One Nation’s voters came from" }}>
+        2025 vote is as respondents recall it. {narrow ? "Bar heights" : "Column widths"} use the AEC 2025 first-preference result.
+      </RdFoot>
+    </RdSec>
+  );
+}
+
+/* ======================================================================
+   The issues
+   ====================================================================== */
+/* the slope test behind issTrendVerdict, kept as figures so a headline can
+   be written from it */
+function rdIssTrend(D, it, dots) {
+  if (!dots.length) return null;
+  const per = {};
+  for (const d of dots) per[d.pollster] = (per[d.pollster] || 0) + 1;
+  const ym = (dots.find((d) => per[d.pollster] >= 2) || dots[0]).date.slice(0, 7);
+  const fits = D.issues.parties.map((q) => ({ q, fit: withinHouseSlope(dots.map((d) => ({ h: d.pollster, t: d.x, w: d.n, y: d.s[q] }))) })).filter((f) => f.fit);
+  const sig = [];
+  for (const [i, f] of [...fits].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+    if (f.fit.p >= 0.05 / (fits.length - i)) break;
+    sig.push(f);
+  }
+  return { ym, up: sig.filter((f) => f.fit.b > 0).map((f) => f.q), down: sig.filter((f) => f.fit.b < 0).map((f) => f.q), tested: fits.length };
+}
+
+function RdIssues({ rangeId = "all" }) {
+  const { D, rangeDomain, filterPts, series, monthLabelFull } = window.AP;
+  const narrow = useNarrow("(max-width: 760px)");
+  const I = D.issues;
+  const [view, setView] = useState("trust");
+  const [selId, setSel] = useState(null);
+  const [gsetId, setGset] = useState("vote");
+  if (!I || !I.list || !I.list.length) return null;
+  const P = I.parties;
+  const list = I.list;
+  const it = list.find((x) => x.id === selId) || list[0];
+  const top = list[0];
+  const pName = (q) => D.PARTIES[q].name, pColor = (q) => D.PARTIES[q].color;
+  const [rangeLo, rangeHi] = rangeDomain(rangeId);
+
+  /* ---- one issue's chart and its trend ------------------------------------ */
+  const chartFor = (x) => {
+    const monthPts = (x.monthly || []).map((m) => ({ ym: m[0], x: D.mx(m[0]),
+      ...Object.fromEntries(P.map((q, i) => [q, m[1 + i]])), ...Object.fromEntries(P.map((q, i) => ["ci_" + q, m[1 + P.length + i]])) }));
+    if (!monthPts.length) return null;
+    const xDomain = [Math.max(rangeLo, monthPts[0].x - 0.06), rangeHi];
+    const pts = filterPts(monthPts, xDomain[0]);
+    const byRow = new Map(D.individualPolls.map((q) => [q.pollster + "|" + q.released, q]));
+    const dots = (x.dots || []).filter((d) => d[0] >= xDomain[0] && d[0] <= xDomain[1]).map((d) => {
+      const meta = byRow.get(d[1] + "|" + d[2]) || { pollster: demoHouse(d[1]), released: d[2] };
+      return { x: d[0], pollster: d[1], date: d[2], n: meta.sample || 1000, meta, s: Object.fromEntries(P.map((q, i) => [q, d[3 + i]])) };
+    });
+    const scatter = dots.flatMap((d) => P.map((q) => ({ x: d.x, y: d.s[q], color: pColor(q), label: pName(q), meta: d.meta })));
+    const areas = P.map((q) => ({ id: "ci-" + q, color: pColor(q), className: "ci-band", edge: false,
+      points: pts.filter((d) => d["ci_" + q] != null).map((d) => ({ x: d.x, y0: d[q] - d["ci_" + q], y1: d[q] + d["ci_" + q] })) })).filter((a) => a.points.length >= 2);
+    const vals = pts.flatMap((d) => P.map((q) => d[q])).concat(scatter.map((d) => d.y), areas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])));
+    const d0 = Math.max(0, Math.floor((Math.min(...vals) + 0.6) / 10) * 10), d1 = Math.ceil((Math.max(...vals) - 0.6) / 10) * 10;
+    return { xDomain, pts, dots, scatter, areas, domain: [d0, d1], trend: rdIssTrend(D, x, dots) };
+  };
+  const ch = chartFor(it);
+  const chTop = it === top ? ch : chartFor(top);
+  const since = (tr) => tr ? D.monthNameFull(+tr.ym.slice(5)) + (Number(tr.ym.slice(0, 4)) === new Date(Date.parse(D.latest.updatedISO)).getUTCFullYear() ? "" : " " + tr.ym.slice(0, 4)) : "";
+  const trendHead = (x, c) => {
+    const tr = c && c.trend;
+    if (!tr) return null;
+    if (!tr.up.length && !tr.down.length) return "No party has gained significant ground since " + since(tr);
+    if (tr.up.length) return rdList(tr.up.map((q) => rdPartyStart(q))) + " " + (tr.up.length > 1 ? "have" : "has") + " gained significant ground since " + since(tr);
+    return rdList(tr.down.map((q) => rdPartyStart(q))) + " " + (tr.down.length > 1 ? "have" : "has") + " lost significant ground since " + since(tr);
+  };
+
+  /* ---- the finding: the top concern, and who is trusted with it ------------- */
+  const phrase = ISS_PHRASE[top.id] || top.label.toLowerCase();
+  const own = top.own;
+  const trTop = chTop && chTop.trend;
+  const minor = trTop && trTop.up.length === 1 && trTop.up[0] === "onp" ? "onp" : null;
+  const trustHead = !own ? rdCap(phrase.replace(/^the /, "")) + " tops voters’ concerns"
+    : own.leadSig ? rdPartyStart(own.lead) + " is most trusted on " + phrase + ", voters’ top concern"
+    : minor ? "One Nation has drawn level with the major parties on " + phrase
+    : "No party is clearly trusted most on " + phrase + ", voters’ top concern";
+  const trustDek = (() => {
+    if (!top.imp) return null;
+    let s = plainShare(top.imp.v) + " voters put " + phrase + " among their three most important issues.";
+    if (own && minor && chTop.pts.length) {
+      const first = chTop.pts.find((d) => d.ym >= trTop.ym) || chTop.pts[0];
+      s += " " + rdCap(rdShareWords(own.v.onp / 100)) + " of those naming Labor, the Coalition or One Nation as best on it now pick One Nation, up from "
+        + rdShareWords(first.onp / 100) + " in " + D.monthNameFull(+first.ym.slice(5)) + (own.leadSig ? "." : ", and none of the three is clearly ahead.");
+    } else if (own && !own.leadSig) s += " None of the three parties is clearly more trusted with it than the others.";
+    const leads = {};
+    list.filter((x) => x.own && x.own.leadSig).forEach((x) => { (leads[x.own.lead] = leads[x.own.lead] || []).push(ISS_PHRASE[x.id] || x.label.toLowerCase()); });
+    const order = Object.keys(leads).sort((a, b) => leads[b].length - leads[a].length);
+    if (order.length) {
+      const bits = order.map((q, i) => (i === 0 ? rdPartyStart(q) + " leads on " : rdPartyIn(q) + (leads[q].length === 1 && order.length > 1 && leads[order[0]].length > 1 ? " only" : "") + " on ") + rdList(leads[q]));
+      s += " " + (bits.length === 1 ? bits[0] : bits.slice(0, -1).join(", ") + ", and " + bits[bits.length - 1]) + ".";
+    }
+    return s;
+  })();
+
+  /* ---- who's trusted: the rows -------------------------------------------- */
+  const dotLo = 20, dotHi = 50;
+  const dx = (v) => ((Math.max(dotLo, Math.min(dotHi, v)) - dotLo) / (dotHi - dotLo)) * 100;
+  const verdictOf = (x) => !x.own ? null : x.own.leadSig
+    ? { text: ISS_PARTY_CAP[x.own.lead] + " ahead", color: inkOf(pColor(x.own.lead)), strong: true }
+    : x.own.pairSig ? { text: ISS_PARTY_CAP[x.own.third] + " behind", strong: true }
+    : { text: "No clear lead" };
+  const row = (x) => {
+    const v = verdictOf(x), sel = x.id === it.id;
+    return (
+      <div key={x.id} className={"rd-is-row" + (sel ? " sel" : "")} role="button" tabIndex={0} aria-pressed={sel}
+           onClick={() => setSel(x.id)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSel(x.id); } }}
+           aria-label={x.label + ": " + (x.imp ? Math.round(x.imp.v) + "% put it in their top three" : "not asked") + "; " + (x.own ? P.map((q) => pName(q) + " " + Math.round(x.own.v[q])).join(", ") + "; " + v.text : "no three-way figures")}>
+        <span className="rd-is-lab">{x.label}</span>
+        <span className="rd-is-imp">{x.imp ? <><span className="rd-is-bar"><span style={{ width: x.imp.v + "%" }}></span></span><b>{Math.round(x.imp.v)}%</b></> : <span className="rd-is-na">not asked</span>}</span>
+        <span className="rd-is-dots" aria-hidden="true">
+          {[20, 30, 40, 50].map((g) => <span key={g} className="rd-is-gl" style={{ left: dx(g) + "%" }}></span>)}
+          <span className="rd-is-third" style={{ left: dx(100 / 3) + "%" }}></span>
+          {x.own && P.map((q) => <span key={q} className="rd-is-dot" style={{ left: dx(x.own.v[q]) + "%", background: pColor(q) }}></span>)}
+        </span>
+        <span className="rd-is-nums">{x.own ? P.map((q) => <b key={q} style={{ color: inkOf(pColor(q)) }}>{Math.round(x.own.v[q])}</b>) : null}</span>
+        <span className={"rd-is-verdict" + (v && v.strong ? " strong" : "")} style={v && v.color ? { color: v.color } : undefined}>
+          {v ? v.text : ""}{x.grnTop && <small>Greens first where offered</small>}</span>
+      </div>
+    );
+  };
+  const wide = list.filter((x) => x.imp && x.imp.gap && x.imp.by.length === 2)
+    .map((x) => { const [hi, lo] = [...x.imp.by].sort((a, b) => b.v - a.v); return { x, hi, lo, d: hi.v - lo.v }; })
+    .sort((a, b) => b.d - a.d).find((w) => w.d >= 5);
+
+  /* ---- what matters to whom ------------------------------------------------ */
+  const G = I.groups;
+  const gtab = G && (G.tabs.find((x) => x.id === gsetId) || G.tabs[0]);
+  const allOf = (k) => (G && G.all && G.all[k]) || null;
+  const gVerdicts = gtab ? gtab.issues.map((k) => issGroupVerdict(gtab, k)).filter(Boolean).sort((a, b) => b.gap - a.gap).slice(0, 3) : [];
+  const whomHead = (() => {
+    if (!gtab) return null;
+    const firstOf = (cells) => gtab.issues.slice().sort((a, b) => ((cells[b] || {}).v || 0) - ((cells[a] || {}).v || 0));
+    const allRank = firstOf(Object.fromEntries(gtab.issues.map((k) => [k, allOf(k) || {}])));
+    const ranks = gtab.groups.map((g) => firstOf(gtab.cells[g] || {}));
+    const sameFirst = ranks.every((r) => r[0] === allRank[0]);
+    const secondDiffers = new Set(ranks.map((r) => r[1])).size > 1;
+    const first = (ISS_PHRASE[allRank[0]] || allRank[0]);
+    if (sameFirst) return rdCap(first) + " comes first for everyone." + (secondDiffers ? " What comes second divides them." : "");
+    return rdCap(first) + " comes first for most voters, but not all.";
+  })();
+  const newestPoll = G && G.newest ? D.individualPolls.find((q) => /^RedBridge/.test(q.pollster) && q.released === G.newest) : null;
+  const monFull = (lab) => lab.replace(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)\b/g,
+    (m) => D.monthNameFull(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].indexOf(m.slice(0, 3)) + 1));
+  const gSource = G ? G.house + ", " + (newestPoll ? monFull(newestPoll.dateLabel) + " " + G.newest.slice(0, 4) : rdDate(G.newest, true)) : "";
+  const whomCell = (g, k) => {
+    const c = g ? gtab.cells[g] && gtab.cells[g][k] : allOf(k);
+    if (!c) return <span className="rd-iw-na">–</span>;
+    const a = allOf(k);
+    const diff = g && a ? c.v - a.v : 0;
+    const sig = g && a && Math.abs(diff) > c.ci;
+    return (
+      <span className={"rd-iw-cell" + (g ? "" : " all") + (sig ? " sig" : "")} title={"± " + c.ci.toFixed(1) + " is the 95% margin"}>
+        <span className="rd-iw-bar"><span style={{ width: c.v + "%" }}></span>{g && a && <i style={{ left: a.v + "%" }}></i>}</span>
+        <b>{Math.round(c.v)}{sig ? <em>{diff > 0 ? "▲" : "▼"}</em> : null}</b>
+      </span>
+    );
+  };
+
+  const tabs = (
+    <RdTabs value={view} onChange={setView} ariaLabel="View" className="rd-is-tabs"
+            options={[{ id: "trust", label: "Who’s trusted" }, { id: "whom", label: "What matters to whom" }]} />
+  );
+  return (
+    <RdSec id="issues" cls="rd-is" title="The issues"
+           meta={"What voters say matters most, and who they think is best on it · " + rdList(I.houses) + ", last " + I.window}>
+      {tabs}
+      {view === "trust" ? (
+        <>
+          <RdHed head={trustHead} dek={trustDek} />
+          <div className="rd-is-grid">
+            <div className="rd-is-left">
+              <div className="rd-is-head" aria-hidden="true">
+                <span></span>
+                <span className="rd-is-imp">In voters’ top three</span>
+                <span className="rd-is-dots rd-is-dotsh">
+                  <span className="rd-is-cap">Best on it · % of voters naming one of these three</span>
+                  <span className="rd-is-leg">{P.map((q) => <span key={q}><i style={{ background: pColor(q) }}></i>{ISS_PARTY_CAP[q]}</span>)}</span>
+                </span>
+                <span></span><span></span>
+              </div>
+              {list.map(row)}
+              <div className="rd-is-axis" aria-hidden="true">
+                <span></span><span></span>
+                <span className="rd-is-dots">{[20, 30, 40, 50].map((g) => <span key={g} style={{ left: dx(g) + "%" }}>{g === 50 ? "50%" : g}</span>)}
+                  <span className="rd-is-thirdlab" style={{ left: dx(100 / 3) + "%" }}>⅓ each</span></span>
+                <span></span><span></span>
+              </div>
+              {wide && <p className="rd-note">{wide.hi.house} and {wide.lo.house} word the importance question differently and disagree most on {ISS_PHRASE[wide.x.id]}: {Math.round(wide.hi.v)}% in {wide.hi.house}’s latest poll, {Math.round(wide.lo.v)}% in {wide.lo.house}’s. The grey bars sit midway between the two pollsters’ usual figures.</p>}
+              {list.filter((x) => x.grnTop).map((x) => <p key={"g" + x.id} className="rd-note">{x.grnTop.house} also offers the Greens, who come first on {ISS_PHRASE[x.id]} ({x.grnTop.grn}%).</p>)}
+            </div>
+            {ch && (
+              <div className="card rd-card rd-is-chart">
+                <div className="rd-is-ctop"><span>{it.label}</span></div>
+                {trendHead(it, ch) && <h4 className="rd-is-chead">{trendHead(it, ch)}</h4>}
+                <p className="rd-is-csub">Who voters think is best, month by month · % of those naming Labor, the Coalition or One Nation</p>
+                <TrendChart key={"rd-is-" + it.id} heightPx={narrow ? 240 : 260} padPx={{ l: 36, r: 10, t: 12, b: 28 }}
+                  xDomain={ch.xDomain} yDomain={ch.domain} yTicks={rdYTicks(ch.domain[0], ch.domain[1], 10)}
+                  yTickFmt={(v) => (v === ch.domain[1] ? v + "%" : String(v))} xTicks={rdXTicks(ch.xDomain[0], ch.xDomain[1], true)} baseline
+                  series={P.map((q) => ({ id: q, label: pName(q), color: pColor(q), rdWidth: 2.2, endCap: false, points: series(ch.pts, q), endLabel: ISS_PARTY_CAP[q] }))}
+                  areas={ch.areas} spine={series(ch.pts, P[0])} scatter={ch.scatter} pollFacet="primary"
+                  tooltipTitle={(i) => (ch.pts[i] ? monthLabelFull(ch.pts[i].ym) : "")} fmt={(v) => Math.round(v) + ""}
+                  copy={{ title: it.label + ": who voters think is best", sub: "Of those naming Labor, the Coalition or One Nation" }} />
+                <RdKey className="rd-ckey" items={[{ kind: "dot", color: "var(--ink-3)", label: "One poll" }, { kind: "lineband", color: "var(--ink-3)", label: "Monthly average and 95% interval" }]} />
+                <HowTo label="How to read these figures" paras={[
+                  <>The grey bar is how many voters put the issue among their three most important. RedBridge and Ipsos both ask every month, in different words, and their figures sit a steady distance apart, so each poll is moved half that distance toward the other before the two are pooled.</>,
+                  <>The dots split the voters who named Labor, the Coalition or One Nation as best on the issue. Pollsters also offer other answers, and each offers a different set, so only these three can be pooled.</>,
+                ]} />
+              </div>
+            )}
+          </div>
+          <RdFoot how={{ term: "issues", from: "The issues" }}>
+            Figures pool the last {I.window} of polls, newer and larger polls counting for more. “Ahead” means a lead larger than its own 95% margin; “behind” names a party clearly third. Pick an issue to follow it in the chart.
+          </RdFoot>
+        </>
+      ) : (
+        <>
+          <RdHed head={whomHead} dek={gVerdicts.length ? gVerdicts.map((v) => v.text).join(" ") : "No two groups differ significantly on any of these issues."} />
+          {gtab ? (
+            <div className="card rd-card rd-iw">
+              <div className="rd-iw-ctl">
+                <span className="rd-iw-by">Group voters by</span>
+                <RdTabs value={gtab.id} onChange={setGset} options={G.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-tabs-sm rd-iw-tabs" />
+              </div>
+              <p className="rd-iw-src"><b>Share of each group putting each issue in its top three, %</b> · {gSource}</p>
+              <div className="rd-iw-wrap">
+                <table className="rd-iw-table">
+                  <thead><tr><th scope="col"><span className="sr-only">Group</span></th>{gtab.issues.map((k) => <th scope="col" key={k}>{I.labels[k] || k}</th>)}</tr></thead>
+                  <tbody>
+                    <tr className="all"><th scope="row">All voters</th>{gtab.issues.map((k) => <td key={k}>{whomCell(null, k)}</td>)}</tr>
+                    {gtab.groups.map((g) => <tr key={g}><th scope="row">{issWho(g).replace(/^voters for other parties and independents$/, "Others voters")}</th>{gtab.issues.map((k) => <td key={k}>{whomCell(g, k)}</td>)}</tr>)}
+                  </tbody>
+                </table>
+              </div>
+              <div className="rd-key rd-iw-key">
+                <span className="rd-key-item"><span className="rd-iw-keybar" aria-hidden="true"><i></i></span>Group’s share, with all voters marked</span>
+                <span className="rd-key-item"><b aria-hidden="true">▲▼</b>Differs from all voters by more than the group’s own 95% margin</span>
+              </div>
+            </div>
+          ) : <p className="rd-note">No poll in the last {I.window} published these figures by group.</p>}
+          <RdFoot how={{ term: "issues", from: "The issues" }}>
+            Only {G ? G.house : "RedBridge"} publishes what matters by group, and only for these {gtab ? rdNumWord(gtab.issues.length) : ""} issues, so its all-voters row can differ from the pooled figures in Who’s trusted. A group’s margin depends on its share of the sample.
+          </RdFoot>
+        </>
+      )}
+    </RdSec>
+  );
+}
+
+/* ======================================================================
+   Undecided
+   ====================================================================== */
+/* round denominators only: "one in twenty" is something a reader carries
+   away, "one in twenty-three" is not */
+const RD_ONE_IN = [3, 4, 5, 10, 20, 50, 100];
+const RD_BIG_WORDS = { 50: "fifty", 100: "a hundred" };
+/* a small share as "one voter in twenty", the nearest in ratio terms */
+function rdOneIn(v) {
+  const n = RD_ONE_IN.reduce((b, k) => (Math.abs(Math.log(100 / k / v)) < Math.abs(Math.log(100 / b / v)) ? k : b), RD_ONE_IN[0]);
+  return (Math.abs(100 / n - v) < 0.3 ? "one voter in " : "about one voter in ") + (RD_BIG_WORDS[n] || rdNumWord(n));
+}
+/* the mid-2025 ring and the now dot, per group, on one scale */
+function RdShiftPlot({ rows, all, lo, hi, title, source, allLabel }) {
+  const X = (v) => ((Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * 100;
+  const signedD = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
+  return (
+    <div className="rd-sp" role="table" aria-label={title}>
+      <div className="rd-sp-head" role="row">
+        <b role="columnheader">{title}</b>
+        <span className="rd-sp-allcap" aria-hidden="true">{all != null && <span style={{ left: X(all) + "%" }}>{allLabel}</span>}</span>
+        <span className="rd-sp-src" role="columnheader">{source}</span>
+      </div>
+      {rows.map((r) => (
+        <div key={r.id} className="rd-sp-row" role="row">
+          <span role="cell" className="rd-sp-lab">{r.sw && <span className="rd-sp-sw" style={{ background: r.color }}></span>}{r.label}</span>
+          <span className="rd-sp-track" aria-hidden="true">
+            {all != null && <span className="rd-sp-all" style={{ left: X(all) + "%" }}></span>}
+            <span className="rd-sp-link" style={{ left: Math.min(X(r.base), X(r.now)) + "%", width: Math.abs(X(r.now) - X(r.base)) + "%", background: r.color }}></span>
+            <span className="rd-sp-ring" style={{ left: X(r.base) + "%" }}></span>
+            <span className="rd-sp-dot" style={{ left: X(r.now) + "%", background: r.color }}></span>
+          </span>
+          <span role="cell" className="rd-sp-v"><b>{r.now.toFixed(1)}%</b> <span>±{r.ci.toFixed(1)}</span></span>
+          <span role="cell" className={"rd-sp-d" + (r.sig ? " sig" : "")}>{signedD(r.now - r.base)}</span>
+        </div>
+      ))}
+      <div className="rd-sp-axis" aria-hidden="true">
+        <span></span>
+        <span className="rd-sp-ticks">{rdYTicks(lo, hi, 10).map((v) => <span key={v} style={{ left: X(v) + "%" }}>{v}%</span>)}</span>
+        <span></span><span></span>
+      </div>
+    </div>
+  );
+}
+
+function RdUndecided({ rangeId }) {
+  const { D, rangeDomain, filterPts, series, monthLabelFull } = window.AP;
+  const narrow = useNarrow("(max-width: 640px)");
+  const [view, setView] = useState("all");
+  const U = D.undecided;
+  if (!U || !U.series.length) return null;
+  const F = D.firmness, A = U.softAge;
+  const byId = {};
+  U.series.forEach((s) => { byId[s.id] = s; });
+  const first = byId.first, tpp = byId.tpp, soft = byId.soft;
+  const nowOf = (s) => (s ? (s.now ? s.now.v : s.latest.v) : null);
+  const xDomain = rangeDomain(rangeId);
+  const slopeOf = (s) => (s ? withinHouseSlope(s.polls.map((d) => ({ h: d.pollster, t: d.x, w: d.sample || 1000, y: d.v }))) : null);
+
+  /* ---- the finding ----------------------------------------------------------- */
+  const story = (() => {
+    const u = nowOf(first), sf = nowOf(soft);
+    if (u == null) return null;
+    const head = rdCap(rdOneIn(u)) + " is undecided." + (sf != null ? " " + rdCap(rdShareWords(sf / 100)) + " of the rest could still switch." : "");
+    const moves = [["undecided", first], ["not firm", soft]].map(([nm, s]) => ({ nm, s, f: slopeOf(s) })).filter((m) => m.f);
+    const movedSig = moves.filter((m) => m.f.p < 0.05 / moves.length);
+    let dek = !movedSig.length ? (moves.length > 1 ? "Neither share has" : "The share has") + " moved significantly since the 2025 election."
+      : movedSig.map((m) => "The " + m.nm + " share has " + (m.f.b > 0 ? "risen" : "fallen") + " significantly since the 2025 election.").join(" ");
+    const house = first.houses[0];
+    const hp = first.polls.filter((d) => d.pollster === house).map((d) => d.v).sort((a, b) => a - b);
+    if (hp.length >= 8) {
+      const q = (f) => hp[Math.floor(f * (hp.length - 1))];
+      const lo = Math.round(q(0.25)), hi = Math.round(q(0.75));
+      dek += " Undecided voters have mostly run between " + lo + "% and " + hi + "% in " + house + "’s " + (house === "Roy Morgan" ? "weekly " : "") + "polls";
+      const last = first.latest;
+      if (u < lo - 0.3 && last && last.v < lo - 2 && last.firm === house)
+        dek += "; the latest pooled figure, " + u.toFixed(1) + "%, is lower mainly because of a single " + (+last.v.toFixed(1)) + "% reading.";
+      else dek += "; the latest pooled figure is " + u.toFixed(1) + "%.";
+    }
+    return { head, dek };
+  })();
+
+  /* ---- all voters: of every 100 ---------------------------------------------- */
+  const u = nowOf(first), sf = nowOf(soft);
+  const und100 = Math.round(u), soft100 = Math.round(sf * (100 - u) / 100), firm100 = 100 - und100 - soft100;
+  const moved = moves100 => moves100;
+  const panel = (list, lo, hi, step, key, title, meta) => {
+    const drawn = list.map((s) => ({ s, pts: filterPts(s.monthly, xDomain[0]), dots: s.polls.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1]) }))
+      .filter((d) => d.pts.length >= 2);
+    if (!drawn.length) return null;
+    const COL = (s) => (s.id === "soft" ? "var(--ink-2)" : "var(--ink)");
+    const outlier = key === "und" && first.latest && first.latest.v < lo + 2.5 ? first.polls.find((d) => d.released === first.latest.released && d.pollster === first.latest.firm) : null;
+    return (
+      <div className="card rd-card rd-un-panel" key={key}>
+        <div className="rd-un-ptitle"><b>{title}</b><span>{meta}</span></div>
+        {list.map((s) => (
+          <div key={s.id} className="rd-un-read">
+            <RdSwatch kind={s.dashed ? "dash" : "line"} color={COL(s)} />
+            <div>
+              <div className="rd-un-rtop"><b>{s.id === "soft" ? "Might still change" : s.label}</b><span className="rd-un-rv">{nowOf(s).toFixed(1)}%</span>{s.now && <span className="rd-un-rci">±{s.now.ci95.toFixed(1)}</span>}</div>
+              <p>{s.id === "first" ? "Can’t say who they’d vote for. " : s.id === "tpp" ? "Won’t pick between Labor and the Coalition. " : "Named a party but say they could change their mind. "}{rdList(s.houses)}.</p>
+            </div>
+          </div>
+        ))}
+        <TrendChart key={"rd-un-" + key} heightPx={narrow ? 200 : 230} padPx={{ l: 36, r: 10, t: 14, b: 28 }}
+          xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, step)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
+          xTicks={rdXTicks(xDomain[0], xDomain[1], true)} baseline
+          series={drawn.map((d) => ({ id: d.s.id, label: d.s.label, color: COL(d.s), rdWidth: 2, dashed: d.s.dashed, rdCap: 3.5, points: series(d.pts, "v") }))}
+          spine={series(drawn[0].pts, "v")}
+          scatter={drawn.flatMap((d) => d.dots.map((q) => ({ x: q.x, y: q.v, color: "var(--ink-3)", label: d.s.label, meta: q })))} pollFacet="twopp"
+          notes={outlier ? [{ x: outlier.x, y: outlier.v, dy: -8, text: (+outlier.v.toFixed(1)) + "% · " + outlier.pollster + ", " + outlier.dateLabel, anchor: "end", size: 11 }] : []}
+          tooltipTitle={(i) => { const p = drawn[0].pts[i]; return p ? monthLabelFull(p.ym) : ""; }}
+          fmt={(v) => v.toFixed(1)}
+          copy={{ title: title, sub: meta }} />
+      </div>
+    );
+  };
+  const changeFoot = (() => {
+    const bits = [first, tpp, soft].filter(Boolean).map((s) => {
+      const c = s.now ? s.now.chg : null;
+      const nm = s.id === "first" ? "first preference" : s.id === "tpp" ? "after preferences" : "not firm";
+      return { nm, c, sig: s.now && s.now.changeSig };
+    });
+    const anySig = bits.some((b) => b.sig);
+    return (anySig ? "Changes on the previous period: " : "None of the " + rdNumWord(bits.length) + " has changed significantly on the previous period: ")
+      + bits.map((b) => b.nm + " " + (b.c == null ? "n/a" : Math.abs(b.c) < 0.05 ? "unchanged" : (b.c > 0 ? "+" : "−") + Math.abs(b.c).toFixed(1))).join(", ") + ". ± is the 95% margin.";
+  })();
+
+  /* ---- by party ---------------------------------------------------------------- */
+  const partyView = F && (() => {
+    const ids = ["onp", "alp", "lnp", "grn", "oth"].filter((k) => F.now[k] && F.base[k]).sort((a, b) => F.now[b].v - F.now[a].v);
+    const apart = (a, b) => Math.abs(a.v - b.v) > Math.hypot(a.ci95, b.ci95);
+    const rows = ids.map((k) => ({ id: k, label: k === "oth" ? "Others" : D.PARTIES[k].name, color: D.PARTIES[k].color, sw: true,
+      now: F.now[k].v, base: F.base[k].v, ci: F.now[k].ci95, sig: apart(F.now[k], F.base[k]) }));
+    const vals = rows.flatMap((r) => [r.now, r.base]).concat([F.now.all.v]);
+    const lo = Math.floor((Math.min(...vals) - 3) / 10) * 10, hi = Math.ceil((Math.max(...vals) + 3) / 10) * 10;
+    const sigRows = rows.filter((r) => r.sig);
+    const allSig = apart(F.now.all, F.base.all);
+    const note = "RedBridge asks voters how firm their choice is, a different question from Resolve’s in All voters, so the two views don’t compare directly. "
+      + (!sigRows.length ? "Among the parties, no change is significant." : sigRows.length === 1 ? "Among the parties, only the " + (sigRows[0].id === "lnp" ? "Coalition" : sigRows[0].label) + "’s " + (sigRows[0].now < sigRows[0].base ? "fall" : "rise") + " is significant."
+        : "Among the parties, " + rdList(sigRows.map((r) => r.label)) + " have changed significantly.")
+      + (allSig ? " The share of all voters calling their vote solid has also " + (F.now.all.v < F.base.all.v ? "fallen" : "risen") + " significantly, from " + F.base.all.v.toFixed(1) + "% to " + F.now.all.v.toFixed(1) + "%." : "");
+    const biggest = sigRows.slice().sort((a, b) => Math.abs(b.now - b.base) - Math.abs(a.now - a.base))[0];
+    const sub = biggest ? (biggest.id === "oth" ? "Minor-party voters" : biggest.label + " voters") + " " + (biggest.now < biggest.base ? "have softened" : "have firmed") + " since mid-2025"
+      : "No party’s voters have softened significantly since mid-2025";
+    const rolled = F.waves.map((w, i) => {
+      const ws = F.waves.slice(Math.max(0, i - F.pool + 1), i + 1);
+      const r = { x: w.x, dateLabel: w.dateLabel };
+      for (const k of ids.concat(["all"])) { const n = ws.reduce((a, v) => a + v.n[k], 0); r[k] = ws.reduce((a, v) => a + v.n[k] * v.solid[k], 0) / n; }
+      return r;
+    });
+    const inX = (w) => w.x >= xDomain[0] && w.x <= xDomain[1];
+    const waves = F.waves.filter(inX), lines = rolled.filter(inX);
+    const smVals = waves.flatMap((w) => ids.map((k) => w.solid[k]));
+    const sLo = Math.floor((Math.min(...smVals) - 2) / 20) * 20, sHi = Math.ceil((Math.max(...smVals) + 2) / 20) * 20;
+    const monthOf = (lab) => lab;
+    return { rows, lo, hi, note, sub, ids, waves, lines, sLo, sHi };
+  })();
+
+  /* ---- by age ---------------------------------------------------------------------- */
+  const ageView = A && (() => {
+    const B = [{ id: "18-34", label: "18–34" }, { id: "35-54", label: "35–54" }, { id: "55+", label: "55+" }];
+    const grey = (i) => ["color-mix(in oklab, var(--ink) 50%, var(--bg))", "color-mix(in oklab, var(--ink) 72%, var(--bg))", "var(--ink)"][i];
+    const apart = (a, b) => Math.abs(a.v - b.v) > Math.hypot(a.ci95, b.ci95);
+    const allNow = soft ? nowOf(soft) : null;
+    const rows = B.map((b, i) => ({ id: b.id, label: b.label, color: grey(i), now: A.now[b.id].v, base: A.base[b.id].v, ci: A.now[b.id].ci95, sig: apart(A.now[b.id], A.base[b.id]) }));
+    const vals = rows.flatMap((r) => [r.now, r.base]).concat(allNow != null ? [allNow] : []);
+    const lo = Math.max(0, Math.floor((Math.min(...vals) - 3) / 10) * 10), hi = Math.ceil((Math.max(...vals) + 3) / 10) * 10;
+    const young = A.now["18-34"], old = A.now["55+"];
+    const gapSig = apart(young, old);
+    const anyChg = rows.filter((r) => r.sig);
+    const note = "Resolve doesn’t publish how many people it asked in each age group, so each group is weighted by its share of adults (2021 Census). "
+      + (gapSig ? "The gap between 18–34s and over-55s is significant; " : "The gap between 18–34s and over-55s is not significant; ")
+      + (anyChg.length ? rdList(anyChg.map((r) => r.label + "s")) + "’ change is significant." : "no group’s change is.");
+    const least = rows.slice().sort((a, b) => b.now - a.now)[0];
+    const sub = least.id === "18-34" && gapSig ? "Young voters are the least firm" : least.id === "55+" && gapSig ? "Older voters are the least firm" : "No age group is clearly less firm than the others";
+    const rolled = A.waves.map((w, i) => {
+      const ws = A.waves.slice(Math.max(0, i - A.pool + 1), i + 1);
+      const r = { x: w.x, dateLabel: w.dateLabel };
+      for (const b of B) { const n = ws.reduce((a, v) => a + v.n[b.id], 0); r[b.id] = ws.reduce((a, v) => a + v.n[b.id] * v.soft[b.id], 0) / n; }
+      return r;
+    });
+    const inX = (w) => w.x >= xDomain[0] && w.x <= xDomain[1];
+    return { B, grey, rows, lo, hi, note, sub, allNow, waves: A.waves.filter(inX), lines: rolled.filter(inX) };
+  })();
+  const monthsLabel = (from, to) => from + " → " + to;
+
+  const views = [{ id: "all", label: "All voters" }].concat(F ? [{ id: "party", label: "By party" }] : [], A ? [{ id: "age", label: "By age" }] : []);
+  return (
+    <RdSec id="undecided" cls="rd-un" title="Undecided" meta={rdList(U.houses) + " · since the 2025 election"}>
+      {story && <RdHed head={story.head} dek={story.dek} />}
+      <RdTabs value={view} onChange={setView} options={views} ariaLabel="Undecided among" className="rd-un-tabs" />
+      {view === "all" && (
+        <>
+          <div className="card rd-card rd-un-100">
+            <div className="rd-un-100h"><b>Of every 100 voters</b><span className="rd-un-100b" style={{ width: (soft100 + und100) + "%" }}>About {soft100 + und100} in 100 could still move</span></div>
+            <div className="rd-un-100l">
+              <span style={{ flexBasis: firm100 + "%" }}><b>Firm</b> {narrow ? "" : "named a party and don’t expect to change"}</span>
+              {narrow ? (
+                /* a phone has no room over a four-point segment: the two
+                   labels share the span over both, in the bar's order */
+                <span style={{ flexBasis: (soft100 + und100) + "%" }} className="rd-un-pair"><b>Not firm</b> · <b>Undecided</b></span>
+              ) : <>
+                <span style={{ flexBasis: soft100 + "%" }}><b>Not firm</b> <span className="rd-un-long">might still change</span></span>
+                <span style={{ flexBasis: und100 + "%" }} className="rd-un-und"><b>Undecided</b></span>
+              </>}
+            </div>
+            <div className="rd-un-bar" role="img" aria-label={`Of every 100 voters, about ${firm100} are firm, ${soft100} not firm and ${und100} undecided`}>
+              <span className="rd-un-f" style={{ flexBasis: firm100 + "%" }}>{firm100}</span>
+              <span className="rd-un-s" style={{ flexBasis: soft100 + "%" }}>{soft100}</span>
+              <span className="rd-un-u" style={{ flexBasis: und100 + "%" }}>{und100}</span>
+            </div>
+            <p className="rd-note">Approximate: combines {rdList(first.houses)}’s undecided share ({u.toFixed(1)}%) with {rdList(soft.houses)}’s firmness question ({Math.round(sf)}% of those who named a party). Pollsters ask these questions differently.</p>
+          </div>
+          <RdSub head={(() => { const m = [slopeOf(first), slopeOf(soft)].filter(Boolean); return m.every((f) => f.p >= 0.05 / m.length) ? "Steady since the election" : "Moving since the election"; })()}
+                 dek="Each dot is one poll; lines are monthly averages. Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales." />
+          <div className="rd-un-panels">
+            {panel([first, tpp].filter(Boolean), 0, 10, 5, "und", "Undecided", "% of all voters")}
+            {soft && panel([soft], 0, 40, 10, "soft", "Not firm", "% of voters who named a party")}
+          </div>
+          <RdFoot how={{ term: "undecided", from: "Undecided" }}>{changeFoot}</RdFoot>
+        </>
+      )}
+      {view === "party" && partyView && (
+        <>
+          <div className="card rd-card rd-un-sp">
+            <RdShiftPlot rows={partyView.rows} all={F.now.all.v} lo={partyView.lo} hi={partyView.hi}
+                         title="Share who call their vote solid" source={"RedBridge · mid-2025 → now"} allLabel={"All voters " + F.now.all.v.toFixed(1) + "%"} />
+            <RdKey className="rd-ckey" items={[{ kind: "dot-open", color: "var(--ink-3)", label: "Mid-2025 (" + F.base.from + " to " + F.base.to + ")" },
+                                                { kind: "dot-solid", color: "var(--ink-3)", label: "Now (" + F.now.from + " to " + F.now.to + ")" }]}>
+              <span className="rd-key-item" style={{ color: "var(--ink-3)" }}>Change in bold: significant</span>
+            </RdKey>
+            <p className="rd-note">{partyView.note}</p>
+          </div>
+          <RdSub head={partyView.sub} dek="Share of each party’s voters calling their vote solid, pooled three RedBridge waves at a time; dots are single waves. The dashed line is all voters." />
+          <div className="rd-sm-grid rd-un-sm">
+            {partyView.ids.map((k) => (
+              <div key={k} className="card rd-card rd-sm">
+                <div className="rd-sm-top"><span style={{ color: inkOf(D.PARTIES[k].color) }}>{k === "oth" ? "Others" : D.PARTIES[k].name}</span><b>{F.now[k].v.toFixed(1)}%</b></div>
+                <TrendChart key={"rd-firm-" + k} heightPx={narrow ? 120 : 140} padPx={{ l: 30, r: 6, t: 10, b: 24 }}
+                  xDomain={xDomain} yDomain={[partyView.sLo, partyView.sHi]} yTicks={rdYTicks(partyView.sLo, partyView.sHi, 20)}
+                  yTickFmt={(v) => v + "%"} xTicks={rdXTicks(xDomain[0], xDomain[1], true)} baseline
+                  series={[{ id: "all", label: "All voters", color: "var(--ink)", dashed: true, dash: "4 3", rdWidth: 1.2, endCap: false, points: partyView.lines.map((w) => ({ x: w.x, y: w.all })) },
+                           { id: k, label: D.PARTIES[k].name, color: D.PARTIES[k].color, rdWidth: 2.2, rdCap: 3.5, points: partyView.lines.map((w) => ({ x: w.x, y: w[k] })) }]}
+                  spine={partyView.lines.map((w) => ({ x: w.x, y: w[k] }))}
+                  scatter={partyView.waves.map((w) => ({ x: w.x, y: w.solid[k], color: D.PARTIES[k].color, label: D.PARTIES[k].name, meta: w }))} pollFacet="twopp"
+                  tooltipTitle={(i) => (partyView.lines[i] ? partyView.lines[i].dateLabel : "")} fmt={(v) => v.toFixed(0)}
+                  copy={{ title: (k === "oth" ? "Others" : D.PARTIES[k].name) + " voters calling their vote solid", sub: "Three RedBridge waves at a time" }} />
+              </div>
+            ))}
+          </div>
+          <RdFoot how={{ term: "undecided", from: "Undecided" }}>Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined.</RdFoot>
+        </>
+      )}
+      {view === "age" && ageView && (
+        <>
+          <div className="card rd-card rd-un-sp">
+            <RdShiftPlot rows={ageView.rows} all={ageView.allNow} lo={ageView.lo} hi={ageView.hi}
+                         title="Share not firm, by age" source="Resolve · mid-2025 → now" allLabel={"All voters " + Math.round(ageView.allNow) + "%"} />
+            <RdKey className="rd-ckey" items={[{ kind: "dot-open", color: "var(--ink-3)", label: "Mid-2025 (" + A.base.from + " to " + A.base.to + ")" },
+                                                { kind: "dot-solid", color: "var(--ink-3)", label: "Now (" + A.now.from + " to " + A.now.to + ")" }]}>
+              <span className="rd-key-item" style={{ color: "var(--ink-3)" }}>Change in bold: significant</span>
+            </RdKey>
+            <p className="rd-note">{ageView.note}</p>
+          </div>
+          <RdSub head={ageView.sub} dek="Share of each age group who named a party but aren’t firm, pooled three Resolve waves at a time; dots are single waves. The dashed line is all voters." />
+          <div className="card rd-card rd-un-age">
+            <TrendChart key="rd-soft-age" heightPx={narrow ? 240 : 250} padPx={narrow ? { l: 34, r: 8, t: 14, b: 28 } : { l: 40, r: 12, t: 14, b: 30 }}
+              xDomain={xDomain} yDomain={[0, 40]} yTicks={rdYTicks(0, 40, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
+              xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline
+              series={[{ id: "all", label: "All voters", color: "var(--ink)", dashed: true, dash: "4 3", rdWidth: 1.4, endCap: false,
+                         points: soft ? filterPts(soft.monthly, xDomain[0]).map((m) => ({ x: m.x, y: m.v })) : [], endLabel: narrow ? null : "All voters" },
+                       ...ageView.B.map((b, i) => ({ id: b.id, label: b.label, color: ageView.grey(i), rdWidth: 2.2, rdCap: 3.5,
+                         points: ageView.lines.map((w) => ({ x: w.x, y: w[b.id] })), endLabel: narrow ? null : b.label }))]}
+              spine={ageView.lines.map((w) => ({ x: w.x, y: w["18-34"] }))}
+              scatter={ageView.waves.flatMap((w) => ageView.B.map((b, i) => ({ x: w.x, y: w.soft[b.id], color: ageView.grey(i), label: b.label, meta: w })))} pollFacet="twopp"
+              tooltipTitle={(i) => (ageView.lines[i] ? ageView.lines[i].dateLabel : "")} fmt={(v) => v.toFixed(0)}
+              copy={{ title: "Voters not firm, by age", sub: "Three Resolve waves at a time" }} />
+          </div>
+          <RdFoot how={{ term: "undecided", from: "Undecided" }}>Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined.</RdFoot>
+        </>
+      )}
+    </RdSec>
+  );
+}
+
+Object.assign(window, { RdPrimary, rdShareWords, rdPartyIn, rdPartyStart, rdElectionTicks, RdLeadership, RdHeadBar, RdDirection, rdList, rdRoughPts, RdDemographics, RdSwitching, useRdWidth, RdIssues, RdUndecided, RdShiftPlot, rdOneIn });

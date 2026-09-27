@@ -85,6 +85,12 @@ const JSX = [
   "a11e1559-f455-44d5-8a31-6699de4ef310.js",  // panels
   "d1a1d215-370c-4ebc-878b-7eeea9ad8102.js",  // tabbed views
   "wm-story.jsx",                             // the wordmark dial, replayed
+  "rd.jsx",                                   // the redesign's own pieces (sections, gauges, tables)
+  "rd-hero.jsx",                              // the redesign's two-party section
+  "rd-panels.jsx",                            // the redesign's other Snapshot sections
+  "rd-polls.jsx",                             // the redesign's latest-and-next polls table
+  "rd-cycles.jsx",                            // the redesign's Past cycles tab
+  "rd-allpolls.jsx",                          // the redesign's All polls tab
   "73de0c58-f11f-4793-9f90-77e583ab051b.js",  // header, hero, mount
 ];
 
@@ -179,6 +185,12 @@ for (const old of fs.readdirSync(FONT_DIR)) {
    Function replacer: face css could carry $-patterns for the string form. */
 if (!html.includes("/*FONTFACES*/")) throw new Error("FONTFACES marker not found in template");
 html = html.replace("/*FONTFACES*/", () => faceCss);
+
+/* The redesign's stylesheet, kept in its own file beside the components that
+   use it. Every rule in it is scoped to body.rd, so the design it replaced
+   (the tagline's "last" switches between them) renders exactly as before. */
+if (!html.includes("/*RDCSS*/")) throw new Error("RDCSS marker not found in template");
+html = html.replace("/*RDCSS*/", () => fs.readFileSync(A("rd.css"), "utf8"));
 
 // -- head: give the page a tab icon + a share card --
 

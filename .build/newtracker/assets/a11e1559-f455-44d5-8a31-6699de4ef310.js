@@ -227,6 +227,7 @@ function Delta({ value, suffix = "", goodUp = true, neutral, small, title, roll,
 
 // ---- Primary vote ---------------------------------------------------
 function PrimaryVotePanel({ rangeId }) {
+  if (window.AP.rd) return <RdPrimary rangeId={rangeId} />;
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const [xDomain] = [rangeDomain(rangeId)];
   const [hidden, setHidden] = useState({});
@@ -435,6 +436,7 @@ function PanelZoom({ expanded, onExpand, onSwap, onClose, label, otherLabel }) {
 }
 
 function LeadershipSection({ rangeId }) {
+  if (window.AP.rd) return <RdLeadership rangeId={rangeId} />;
   const { D } = window.AP;
   /* pair  – preferred PM | net rating (default)
      ppm   – preferred PM full width
@@ -1383,6 +1385,7 @@ function timesWords(r) {
 
 // ---- National direction (right track / wrong track) -----------------
 function DirectionPanel({ rangeId }) {
+  if (window.AP.rd) return <RdDirection rangeId={rangeId} />;
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
   const asked = houseList(D.directionHousesAll || D.directionHouses);
@@ -1546,6 +1549,7 @@ function DirectionPanel({ rangeId }) {
    three weeks came in one combined release whose single figure cannot be
    attributed to a wave, so they are not attributed to one. */
 function UndecidedPanel({ rangeId }) {
+  if (window.AP.rd) return <RdUndecided rangeId={rangeId} />;
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
   const [view, setView] = useState("all");
@@ -1944,6 +1948,7 @@ function AgeFirmView({ A, rangeId }) {
    share of its own voters. */
 const ONS_VIEWS = [{ id: "gain", label: "Of One Nation’s gain" }, { id: "rate", label: "Of each party’s voters" }];
 function OnSourcesPanel({ rangeId }) {
+  if (window.AP.rd) return <RdSwitching rangeId={rangeId} />;
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
   const [view, setView] = useState("gain");
@@ -2301,6 +2306,7 @@ function demoTrendVerdict(D, st, party, inX) {
     (then[0].length ? `, and ${names(then[0])} ${then[1]} it.` : ".");
 }
 function DemographicsPanel({ rangeId = "all" }) {
+  if (window.AP.rd) return <RdDemographics rangeId={rangeId} />;
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
   const T = D.demographics;
@@ -2655,6 +2661,7 @@ function issTrendVerdict(D, it, dots) {
   ].filter(Boolean).join(", and ") + ".";
 }
 function IssuesPanel({ rangeId = "all" }) {
+  if (window.AP.rd) return <RdIssues rangeId={rangeId} />;
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
   /* the chart's box: beside the rows it gets their height, full width it is
@@ -4206,6 +4213,7 @@ function cadenceLabel(d) {
 // component on why an open row has to outlive the trip to the archive
 let npOpenRow = null;
 function NextPollsPanel() {
+  if (window.AP.rd) return null;   // folded into RdPolls, the table above
   const { D } = window.AP;
   /* Which row is showing its working. A date arrived at by a median of
      intervals is a claim, and the releases it was taken over are the evidence
@@ -4570,6 +4578,8 @@ window.AP.measureOfMatchup = (id) => ({ alp_lnp: "lnp", alp_on: "onp", lnp_on: "
 const LEAD_LABEL = { lnp: "ALP v L/NP", onp: "ALP v ON", lnponp: "L/NP v ON" };
 
 function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
+  /* the redesign folds this table and the next-polls panel into one */
+  if (window.AP.rd) return <RdPolls tppBasis={tppBasis} setTppBasis={setTppBasis} tppMatchup={tppMatchup} setTppMatchup={setTppMatchup} />;
   const { D } = window.AP;
   // ledger look shared with the All-polls archive – its cell renderers are
   // defined in the archive script and arrive on window once both assets load

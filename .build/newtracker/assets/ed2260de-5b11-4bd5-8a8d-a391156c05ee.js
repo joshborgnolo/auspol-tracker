@@ -178,7 +178,33 @@ window.AP = (function () {
       stratum: (p) => metricOf(p, "taylor") + "|" + (p.released < OPP_SPLICE ? "ley" : "taylor") },
     { id: "net_han",   facet: "leadership", label: "Hanson",     color: "var(--onp)", net: true,
       val: (p) => p.appr.hansonNet, stratum: (p) => metricOf(p, "hanson") },
+    /* The redesign's own three, under a facet no panel of the old design
+       lists. The Coalition and One Nation primaries summed, to test whether
+       the pollsters disagree on how the right's vote splits or on its size;
+       and the two implied contests with the sampling floor of an implied
+       figure: each respondent carries their party's flow to Labor, so the
+       variance is that of the flows over the primaries, which p(1 − p)
+       overstates by about a quarter. The flows are gen-data's (the 2025 count
+       against the Coalition, the first-principles set against One Nation). */
+    { id: "rd_right",   facet: "rd", label: "L/NP + ON", color: "var(--ink-2)",
+      val: (p) => (p.p.lnp != null && p.p.onp != null ? p.p.lnp + p.p.onp : null), share: (p) => p.p.lnp + p.p.onp },
+    { id: "rd_on_imp",  facet: "rd", label: "ALP v ON (implied)", color: "var(--onp)",
+      val: (p) => p.alpOnImp, share: (p) => p.alpOnImp,
+      flows: { alp: 1, lnp: 0.315, grn: 0.89, onp: 0, oth: 0.53 } },
+    { id: "rd_lnp_imp", facet: "rd", label: "ALP v L/NP (implied)", color: "var(--lnp)",
+      val: (p) => p.alpImp, share: (p) => p.alpImp,
+      flows: { alp: 1, lnp: 0, grn: 0.8819, onp: 0.255, oth: 0.5455 } },
   ];
+  /* the variance of a respondent's flow to Labor over a poll's primaries */
+  const flowVar = (p, F) => {
+    const q = p.p || {};
+    if (["alp", "lnp", "grn", "onp"].some((k) => q[k] == null)) return null;
+    let tot = 0, e1 = 0, e2 = 0;
+    for (const k in F) tot += q[k] || 0;
+    if (!tot) return null;
+    for (const k in F) { const s = (q[k] || 0) / tot; e1 += s * F[k]; e2 += s * F[k] * F[k]; }
+    return Math.max(0, e2 - e1 * e1);
+  };
 
   function discordPoints(m) {
     const pts = [];
@@ -188,8 +214,10 @@ window.AP = (function () {
       const n = p.sample || 1000;
       // a net is a DIFFERENCE of two proportions, so its sampling variance is
       // (approve + disapprove − net²)/n – wider than a single share's
+      const fv = m.flows ? flowVar(p, m.flows) : null;
       const sv = m.net
         ? (DISC.DEFF * (DISC.ENGAGED - (y / 100) * (y / 100)) / n) * 1e4
+        : fv != null ? (DISC.DEFF * fv / n) * 1e4
         : (DISC.DEFF * (m.share(p) / 100) * (1 - m.share(p) / 100) / n) * 1e4;
       pts.push({ t: dayOf(p.released), y, house: p.pollster, sv, k: m.stratum ? m.stratum(p) : "_" });
     });
