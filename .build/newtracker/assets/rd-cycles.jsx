@@ -442,11 +442,24 @@ function RdPastCycles(p) {
                        showHan={showHan} setHan={setShowHan} showOnp={showOnp} setOnp={setShowOnp} shapes={shapes}
                        outcomeShown={outcomeShown} rdHalf={half} rdEvents={evs} />;
   };
-  const bandKey = (
+  /* The key names the sitting term's own lines and its election ring as well
+     as the band, as the canvas did: the lines were keyed only by the words at
+     their ends, and the ring not at all. */
+  const twoLines = (a, b) => (
+    <svg width="30" height="14" viewBox="0 0 30 14" aria-hidden="true">
+      <path d="M1 7H13" style={{ stroke: a, strokeWidth: 3, strokeLinecap: "round" }} />
+      <path d="M17 7H29" style={{ stroke: b, strokeWidth: 3, strokeLinecap: "round" }} />
+    </svg>
+  );
+  const bandKey = (sec) => (
     <RdKey className="rd-ckey" items={[]}>
       <span className="rd-key-item"><span className="rd-cs-keyband" aria-hidden="true"><i></i></span>Middle half and middle 80% of past terms</span>
       <span className="rd-key-item"><RdSwatch kind="dash" color="var(--ink-2)" />Their average</span>
       <span className="rd-key-item"><span className="rd-cs-keythin" aria-hidden="true"></span>Paler: fewer terms ran this long</span>
+      {sec === "tpp" && <span className="rd-key-item"><RdSwatch kind="line" color={cur.color} />The {cur.year} term, monthly</span>}
+      {sec === "primary" && <span className="rd-key-item">{twoLines(D.PARTIES[cur.gov].color, D.PARTIES[cur.opp].color)}The {cur.year} term: {govName}, {oppIn}</span>}
+      {sec === "leaders" && <span className="rd-key-item">{twoLines(D.PARTIES[cur.gov].color, D.PARTIES[cur.opp].color)}The {cur.year} term: {pm}, the opposition leader</span>}
+      {(sec === "tpp" || sec === "primary") && <span className="rd-key-item"><RdSwatch kind="ring" />{cur.year} election result</span>}
     </RdKey>
   );
   const navs = [["cyc-tpp", "Two-party preferred"], ["cyc-primary", "Primary vote"], ["cyc-leaders", "Leadership"], ["final-polls", "How the final polls did"]];
@@ -472,7 +485,7 @@ function RdPastCycles(p) {
       <RdSec id="cyc-tpp" title="Two-party preferred" meta="Implied from each poll’s primary votes, on the flows counted at the election that opened its term">
         {tppStory && <RdHed head={tppStory.head} dek={tppStory.dek} />}
         <div className="rd-cyc-one">{chart("tpp", false)}</div>
-        {bandKey}
+        {bandKey("tpp")}
         <RdFoot how={{ term: "last-election-flows", from: "Past cycles" }}>
           Every line is the implied two-party figure: each poll’s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The {cur.year} term follows the rival {govName} is doing worst against, as the headline does.
         </RdFoot>
@@ -480,8 +493,8 @@ function RdPastCycles(p) {
       <RdSec id="cyc-primary" title="Primary vote" meta="First preferences for the governing party and the main opposition party">
         {primStory && <RdHed head={primStory.head} dek={primStory.dek} />}
         <div className="rd-cyc-two">{chart("primary", true, "primary")}{chart("oppr", true, "primary")}</div>
-        <RdEventList list={PAIRS.primary.list} />
-        {bandKey}
+        <RdEventList list={PAIRS.primary.list} inline />
+        {bandKey("primary")}
         <RdFoot how={{ term: "what-am-i-looking-at", from: "Past cycles" }}>
           Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed.
         </RdFoot>
@@ -493,8 +506,8 @@ function RdPastCycles(p) {
           <div><RdSub head="Preferred prime minister" dek="The prime minister’s lead over the opposition leader on the question of who would make the better PM. Asked since 1984." />{chart("ppmm", true, "leaders")}</div>
           <div><RdSub head="Opposition leader’s net approval" dek="Approve minus disapprove, for whoever led the opposition at the time. Rated since 1972." />{chart("oppnet", true, "leaders")}</div>
         </div>
-        <RdEventList list={PAIRS.leaders.list} />
-        {bandKey}
+        <RdEventList list={PAIRS.leaders.list} inline />
+        {bandKey("leaders")}
         <RdFoot how={{ term: "approval", from: "Past cycles" }}>
           Where a term changed leader its line follows whoever held the office. The earliest terms’ ratings are the Morgan Gallup Poll’s; later terms pool every pollster that asked, each corrected for its lean. Favourability ratings are left out.
         </RdFoot>

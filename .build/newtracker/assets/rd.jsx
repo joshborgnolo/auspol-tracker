@@ -217,10 +217,12 @@ function rdEventBadges(events, x0, x1) {
   });
   return { events: out, list };
 }
-function RdEventList({ list }) {
+function RdEventList({ list, inline }) {
   if (!list || !list.length) return null;
+  /* `inline` runs the list across the page, as the canvas set the one shared
+     by a pair of half-width charts; a phone always stacks it */
   return (
-    <ol className="rd-evlist">
+    <ol className={"rd-evlist" + (inline ? " inline" : "")}>
       {list.map((l) => (
         <li key={l.n}><span className="rd-evlist-n">{l.n}</span>
           <span className="rd-evlist-l">{l.labels.join(" · ")}</span>

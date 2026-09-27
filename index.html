@@ -3173,6 +3173,12 @@ body.rd .rd-evlist li { display: flex; align-items: baseline; gap: 12px; padding
 body.rd .rd-evlist-n { width: 14px; flex-shrink: 0; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-evlist-l { flex-grow: 1; }
 body.rd .rd-evlist-d { color: var(--ink-3); white-space: nowrap; }
+@media (min-width: 641px) {
+  body.rd .rd-evlist.inline { display: flex; flex-wrap: wrap; column-gap: 28px; row-gap: 6px; margin-top: 16px; }
+  body.rd .rd-evlist.inline li { gap: 8px; padding: 0; align-items: center; }
+  body.rd .rd-evlist.inline .rd-evlist-n { width: 16px; height: 16px; box-sizing: border-box; border: 1px solid var(--ink-3); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: var(--ink-2); }
+  body.rd .rd-evlist.inline .rd-evlist-l { flex-grow: 0; }
+}
 body.rd .rd-check { min-height: 44px; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink); cursor: pointer; white-space: nowrap; }
 body.rd .rd-check input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); cursor: pointer; }
 body.rd .rd-check:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
@@ -4531,6 +4537,10 @@ body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 60
 @media (max-width: 640px) {
   body.rd .info-index { top: 43px; }
   body.rd .info-h { font-size: 19px; }
+  body.rd .info-index::after {
+    content: ""; position: sticky; right: 0; flex: 0 0 28px; margin-left: -28px; align-self: stretch;
+    background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none;
+  }
 }
 </style>
 </head>
@@ -55564,11 +55574,12 @@ function rdEventBadges(events, x0, x1) {
   };
 }
 function RdEventList({
-  list
+  list,
+  inline
 }) {
   if (!list || !list.length) return null;
   return React.createElement("ol", {
-    className: "rd-evlist"
+    className: "rd-evlist" + (inline ? " inline" : "")
   }, list.map(l => React.createElement("li", {
     key: l.n
   }, React.createElement("span", {
@@ -61161,7 +61172,27 @@ function RdPastCycles(p) {
       rdEvents: evs
     });
   };
-  const bandKey = React.createElement(RdKey, {
+  const twoLines = (a, b) => React.createElement("svg", {
+    width: "30",
+    height: "14",
+    viewBox: "0 0 30 14",
+    "aria-hidden": "true"
+  }, React.createElement("path", {
+    d: "M1 7H13",
+    style: {
+      stroke: a,
+      strokeWidth: 3,
+      strokeLinecap: "round"
+    }
+  }), React.createElement("path", {
+    d: "M17 7H29",
+    style: {
+      stroke: b,
+      strokeWidth: 3,
+      strokeLinecap: "round"
+    }
+  }));
+  const bandKey = sec => React.createElement(RdKey, {
     className: "rd-ckey",
     items: []
   }, React.createElement("span", {
@@ -61179,7 +61210,20 @@ function RdPastCycles(p) {
   }, React.createElement("span", {
     className: "rd-cs-keythin",
     "aria-hidden": "true"
-  }), "Paler: fewer terms ran this long"));
+  }), "Paler: fewer terms ran this long"), sec === "tpp" && React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement(RdSwatch, {
+    kind: "line",
+    color: cur.color
+  }), "The ", cur.year, " term, monthly"), sec === "primary" && React.createElement("span", {
+    className: "rd-key-item"
+  }, twoLines(D.PARTIES[cur.gov].color, D.PARTIES[cur.opp].color), "The ", cur.year, " term: ", govName, ", ", oppIn), sec === "leaders" && React.createElement("span", {
+    className: "rd-key-item"
+  }, twoLines(D.PARTIES[cur.gov].color, D.PARTIES[cur.opp].color), "The ", cur.year, " term: ", pm, ", the opposition leader"), (sec === "tpp" || sec === "primary") && React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement(RdSwatch, {
+    kind: "ring"
+  }), cur.year, " election result"));
   const navs = [["cyc-tpp", "Two-party preferred"], ["cyc-primary", "Primary vote"], ["cyc-leaders", "Leadership"], ["final-polls", "How the final polls did"]];
   return React.createElement("div", {
     className: "view view-cycles rd-cycles"
@@ -61233,7 +61277,7 @@ function RdPastCycles(p) {
     dek: tppStory.dek
   }), React.createElement("div", {
     className: "rd-cyc-one"
-  }, chart("tpp", false)), bandKey, React.createElement(RdFoot, {
+  }, chart("tpp", false)), bandKey("tpp"), React.createElement(RdFoot, {
     how: {
       term: "last-election-flows",
       from: "Past cycles"
@@ -61248,8 +61292,9 @@ function RdPastCycles(p) {
   }), React.createElement("div", {
     className: "rd-cyc-two"
   }, chart("primary", true, "primary"), chart("oppr", true, "primary")), React.createElement(RdEventList, {
-    list: PAIRS.primary.list
-  }), bandKey, React.createElement(RdFoot, {
+    list: PAIRS.primary.list,
+    inline: true
+  }), bandKey("primary"), React.createElement(RdFoot, {
     how: {
       term: "what-am-i-looking-at",
       from: "Past cycles"
@@ -61272,8 +61317,9 @@ function RdPastCycles(p) {
     head: "Opposition leader\u2019s net approval",
     dek: "Approve minus disapprove, for whoever led the opposition at the time. Rated since 1972."
   }), chart("oppnet", true, "leaders"))), React.createElement(RdEventList, {
-    list: PAIRS.leaders.list
-  }), bandKey, React.createElement(RdFoot, {
+    list: PAIRS.leaders.list,
+    inline: true
+  }), bandKey("leaders"), React.createElement(RdFoot, {
     how: {
       term: "approval",
       from: "Past cycles"

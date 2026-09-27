@@ -276,6 +276,14 @@ body.rd .rd-evlist li { display: flex; align-items: baseline; gap: 12px; padding
 body.rd .rd-evlist-n { width: 14px; flex-shrink: 0; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-evlist-l { flex-grow: 1; }
 body.rd .rd-evlist-d { color: var(--ink-3); white-space: nowrap; }
+/* the list a pair of half-width charts shares runs across the page, each
+   number in the badge the charts draw, as the canvas set it */
+@media (min-width: 641px) {
+  body.rd .rd-evlist.inline { display: flex; flex-wrap: wrap; column-gap: 28px; row-gap: 6px; margin-top: 16px; }
+  body.rd .rd-evlist.inline li { gap: 8px; padding: 0; align-items: center; }
+  body.rd .rd-evlist.inline .rd-evlist-n { width: 16px; height: 16px; box-sizing: border-box; border: 1px solid var(--ink-3); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: var(--ink-2); }
+  body.rd .rd-evlist.inline .rd-evlist-l { flex-grow: 0; }
+}
 
 /* ---------- small controls ------------------------------------------------ */
 body.rd .rd-check { min-height: 44px; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink); cursor: pointer; white-space: nowrap; }
@@ -1774,4 +1782,12 @@ body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 60
 @media (max-width: 640px) {
   body.rd .info-index { top: 43px; }
   body.rd .info-h { font-size: 19px; }
+  /* a phone's index scrolls sideways; a fade at its right edge says so, as
+     All polls' pinned links do. A sticky end cap rather than a mask: the
+     index is pinned over the page, and a mask would let the text beneath
+     show through its faded edge. */
+  body.rd .info-index::after {
+    content: ""; position: sticky; right: 0; flex: 0 0 28px; margin-left: -28px; align-self: stretch;
+    background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none;
+  }
 }
