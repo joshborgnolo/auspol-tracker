@@ -274,6 +274,11 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, onBack, backLabel }) {
   const who = p.client && !/^self/i.test(p.client) ? " for " + p.client : p.client ? ", self-published" : "";
   const out = rdApOut(p.published);
   const from = D.MONTHS[Math.max(0, D.MONTHS.indexOf(p.ym) - 6)];
+  /* the release, and beside it the poll's APC methodology statement where the
+     pollster published one. Where the release is itself the statement
+     (DemosAU's reports), both links open the same file and the statement
+     link's title says so. */
+  const relUrl = p.releaseUrl || p.url;
 
   return (
     <div className="rd-apd">
@@ -331,7 +336,8 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, onBack, backLabel }) {
           </div>
         )}
         <div className="rd-apd-links">
-          {(p.releaseUrl || p.url) && <a className="rd-link" href={p.releaseUrl || p.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>Read the release <span aria-hidden="true" className="rd-apd-ext">↗</span></a>}
+          {relUrl && <a className="rd-link" href={relUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>Read the release <span aria-hidden="true" className="rd-apd-ext">↗</span></a>}
+          {p.methodUrl && <a className="rd-link" href={p.methodUrl} target="_blank" rel="noopener noreferrer" title={"This poll’s Australian Polling Council methodology statement" + (p.methodUrl === relUrl ? ", part of the release" : "")} onClick={(e) => e.stopPropagation()}>APC methodology <span aria-hidden="true" className="rd-apd-ext">↗</span></a>}
           <a className="rd-link" href={report} onClick={(e) => e.stopPropagation()}>Report an error</a>
           {onBack && <button type="button" className="rd-link" onClick={(e) => { e.stopPropagation(); onBack(); }}>Back to {backLabel || "the chart"}</button>}
         </div>

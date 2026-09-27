@@ -19,7 +19,7 @@ function rdPollRow(p) {
   return { pollster: p.pollster, client: p.client, field: p.dateLabel || p.field, released: p.released,
            published: p.published, publishedLabel: lab, pubSort: pub, sample: p.sample,
            alpImp: p.alpImp, alpOnImp: p.alpOnImp, alp2pp: p.alp, lnp2pp: p.lnp, p: p.p || {},
-           tppAlt: p.tppAlt, tppAlt2: p.tppAlt2, ppmSets: p.ppmSets, appr: p.appr || {}, chg: p.chg, url: p.url };
+           tppAlt: p.tppAlt, tppAlt2: p.tppAlt2, ppmSets: p.ppmSets, appr: p.appr || {}, chg: p.chg, url: p.url, methodUrl: p.methodUrl };
 }
 
 function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
@@ -283,6 +283,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
           <div className="rd-pld-links">
             {key && window.AP.openPoll && <button type="button" className="rd-link" onClick={(ev) => { ev.stopPropagation(); window.AP.openPoll(key, facet, "latest and next polls"); }}>Open in All polls →</button>}
             {r.url && <a className="rd-link" href={r.url} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}>Read the release ↗</a>}
+            {r.methodUrl && <a className="rd-link" href={r.methodUrl} target="_blank" rel="noopener noreferrer" title={"This poll’s Australian Polling Council methodology statement" + (r.methodUrl === r.url ? ", part of the release" : "")} onClick={(ev) => ev.stopPropagation()}>APC methodology ↗</a>}
           </div>
         </div>
         {pj && (

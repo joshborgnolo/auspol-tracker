@@ -59765,7 +59765,8 @@ function rdPollRow(p) {
     ppmSets: p.ppmSets,
     appr: p.appr || {},
     chg: p.chg,
-    url: p.url
+    url: p.url,
+    methodUrl: p.methodUrl
   };
 }
 function RdPolls({
@@ -60195,7 +60196,14 @@ function RdPolls({
       target: "_blank",
       rel: "noopener noreferrer",
       onClick: ev => ev.stopPropagation()
-    }, "Read the release \u2197"))), pj && React.createElement("div", {
+    }, "Read the release \u2197"), r.methodUrl && React.createElement("a", {
+      className: "rd-link",
+      href: r.methodUrl,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      title: "This poll’s Australian Polling Council methodology statement" + (r.methodUrl === r.url ? ", part of the release" : ""),
+      onClick: ev => ev.stopPropagation()
+    }, "APC methodology \u2197"))), pj && React.createElement("div", {
       className: "rd-pld-rhythm"
     }, React.createElement("div", {
       className: "rd-pld-h"
@@ -61882,6 +61890,7 @@ function RdApDetail({
   const who = p.client && !/^self/i.test(p.client) ? " for " + p.client : p.client ? ", self-published" : "";
   const out = rdApOut(p.published);
   const from = D.MONTHS[Math.max(0, D.MONTHS.indexOf(p.ym) - 6)];
+  const relUrl = p.releaseUrl || p.url;
   return React.createElement("div", {
     className: "rd-apd"
   }, React.createElement("div", {
@@ -61971,13 +61980,23 @@ function RdApDetail({
     }
   }, p.seats.p[k.id].est)))))), React.createElement("div", {
     className: "rd-apd-links"
-  }, (p.releaseUrl || p.url) && React.createElement("a", {
+  }, relUrl && React.createElement("a", {
     className: "rd-link",
-    href: p.releaseUrl || p.url,
+    href: relUrl,
     target: "_blank",
     rel: "noopener noreferrer",
     onClick: e => e.stopPropagation()
   }, "Read the release ", React.createElement("span", {
+    "aria-hidden": "true",
+    className: "rd-apd-ext"
+  }, "\u2197")), p.methodUrl && React.createElement("a", {
+    className: "rd-link",
+    href: p.methodUrl,
+    target: "_blank",
+    rel: "noopener noreferrer",
+    title: "This poll’s Australian Polling Council methodology statement" + (p.methodUrl === relUrl ? ", part of the release" : ""),
+    onClick: e => e.stopPropagation()
+  }, "APC methodology ", React.createElement("span", {
     "aria-hidden": "true",
     className: "rd-apd-ext"
   }, "\u2197")), React.createElement("a", {
