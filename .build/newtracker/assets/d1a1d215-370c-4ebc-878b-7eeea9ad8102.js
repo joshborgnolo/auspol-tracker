@@ -225,7 +225,10 @@ function NextPollTicker({ showScore }) {
     + " – the earliest each wave could land, not the likeliest."
     + " A slot that passes unrecorded counts up as overdue until the release is added";
   return (
-    <div ref={rootRef} className="tab-next" title={title}>
+    /* with room for no house at all, the label alone would announce an
+       empty list: the strip hides (still laid out, so the next fit pass can
+       measure its way back when the bar has room again) */
+    <div ref={rootRef} className={"tab-next" + (fit === 0 ? " tn-none" : "")} title={title}>
       {/* the label itself is the way DOWN to the full panel on the snapshot -
           same trick as the house names being the way OUT to the publisher */}
       <button type="button" className="tn-lab tn-jump"

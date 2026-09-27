@@ -357,8 +357,12 @@ body.rd .tab { color: var(--ink-2); }
 body.rd .tab.active { color: var(--ink); }
 body.rd .tab.active .tab-label { font-weight: 600; }
 body.rd .tab::after { height: 2px; border-radius: 0; }
+/* Pinned, the tabs keep their size. The old design condenses them (a
+   transform, so the bar's box never moves), and the port carried a 0.9 of it
+   over; but the redesign's boards draw the pinned bar at the same size as the
+   unpinned one, and on a laptop the shrink read as the bar losing height. */
 body.rd .tabs.pinned .tabs-set,
-body.rd.editorial .tabs.pinned .tabs-set { transform: scale(0.9); }
+body.rd.editorial .tabs.pinned .tabs-set { transform: none; }
 @media (min-width: 1100px) {
   body.rd .tab-next { padding-bottom: 14px; gap: 16px; font-size: 13px; color: var(--ink-3); }
 }
