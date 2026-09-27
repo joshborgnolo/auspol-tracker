@@ -2036,8 +2036,9 @@ function App() {
      (Snapshot -> Past cycles), left-to-right for the one before, anywhere on
      the page. The exception is a row of subpages (RdTabs marked `swipe`: All
      polls' figures, preferred PM's questions, who votes by age or place...):
-     a swipe on it or just under it steps through ITS views instead, the
-     nearest row winning. Rows that only re-cut one figure (the time range,
+     a swipe on it or anywhere in what it switches - down to the end of
+     its panel or section, so the table or chart under the row too - steps
+     through ITS views instead, the nearest row winning. Rows that only re-cut one figure (the time range,
      Past cycles' re-elected/ousted) aren't marked, so the page turns there.
 
      It only ever reads a finished gesture, and leaves alone anything that
@@ -2052,7 +2053,7 @@ function App() {
     const PHONE = window.matchMedia("(max-width: 640px)");
     const MIN_DX = 60;          // travel that makes it a swipe, not a nudge
     const EDGE = 24;            // the system back-gesture strip at either side
-    const NEAR_BELOW = 120;     // "just under" a subpage row, in px
+    const NEAR_BELOW = 120;     // the least a row reaches below itself, in px
     const MAX_MS = 800;
     let g = null;
     const claimsSideways = (el) => {
@@ -2065,12 +2066,20 @@ function App() {
       }
       return false;
     };
-    // the subpage row this touch is on or just under, nearest first
+    /* the subpage row this touch is on or under, nearest first. A row reaches
+       down over the content it switches: its own panel where it heads one
+       (preferred PM, approval - two to a section), else its section. The
+       latest polls table runs over a thousand px under its row on a phone,
+       and a swipe on the table is as plainly aimed at 2PP/Primary/Leaders
+       as one on the row itself. */
     const rowAt = (y) => {
       let best = null, bestD = Infinity;
       for (const el of document.querySelectorAll("[data-rd-swipe]")) {
         const r = el.getBoundingClientRect();
-        if (!r.height || y < r.top - 12 || y > r.bottom + NEAR_BELOW) continue;
+        if (!r.height) continue;
+        const owner = el.closest(".rd-ld-panel") || el.closest("section");
+        const reach = Math.max(r.bottom + NEAR_BELOW, owner ? owner.getBoundingClientRect().bottom : 0);
+        if (y < r.top - 12 || y > reach) continue;
         const d = y < r.bottom ? 0 : y - r.bottom;
         if (d < bestD) { bestD = d; best = el; }
       }

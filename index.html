@@ -66837,7 +66837,10 @@ function App() {
         bestD = Infinity;
       for (const el of document.querySelectorAll("[data-rd-swipe]")) {
         const r = el.getBoundingClientRect();
-        if (!r.height || y < r.top - 12 || y > r.bottom + NEAR_BELOW) continue;
+        if (!r.height) continue;
+        const owner = el.closest(".rd-ld-panel") || el.closest("section");
+        const reach = Math.max(r.bottom + NEAR_BELOW, owner ? owner.getBoundingClientRect().bottom : 0);
+        if (y < r.top - 12 || y > reach) continue;
         const d = y < r.bottom ? 0 : y - r.bottom;
         if (d < bestD) {
           bestD = d;
