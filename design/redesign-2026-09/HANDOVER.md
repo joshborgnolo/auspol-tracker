@@ -1,13 +1,13 @@
 # Redesign handover — 26 September 2026
 
-Section-by-section redesign mocks for the site. They were started in a cloud session, then reviewed and revised in a local session the same day. Nothing in the site itself has changed yet.
+Section-by-section redesign mocks for the site. They were started in a cloud session, then reviewed and revised in a local session the same day. They were ported to the live site on 27 September (see The port).
 
 ## Where things are
 
 - **The canvas is the source of truth:** https://claude.ai/artifact/2tAJDk5xJ9K2AYzQq7HhDj (private to its owner). It has four canvas pages:
   - **Sections:** one row per section, desktop and phone boards side by side, other states to the right.
   - **Whole page:** the Snapshot page top to bottom, desktop and phone.
-  - **Past cycles:** that tab top to bottom, desktop and phone, with its controls and details boards. These boards were made on the canvas; the copies in `canvas/project/` were pulled from it on 27 Sep, and no script here builds them.
+  - **Past cycles:** that tab top to bottom, desktop and phone, with its controls and details boards. `gen/cycles_build.py` first built them; they were then edited on the canvas, and the copies in `canvas/project/` were pulled from it on 27 Sep.
   - **All polls:** that tab top to bottom (`AllPollsDesktop1–2`, `AllPollsPhone1–3`), with `AllPollsTable` (a poll opened, filtering, sorting, the other views, Labor v Coalition) and `AllPollsDetails` (the pinned headings, the phone's filter sheet, readouts, dark mode).
 - **`canvas/project/`** holds a snapshot of every board and `canvas.json`. The snapshot was taken at the local session's last publish.
 - **`gen/`** holds the scripts that build the boards, plus `extract_site_data.mjs`, which refreshes their data.
@@ -62,11 +62,16 @@ On the **Whole page** canvas page, `PageDesktop1–2` and `PagePhone1–3` stack
   - Preference flows: both contests side by side, with the pooled "now" reading drawn at the right edge so the chart shows the figure the text quotes.
 - **Worth checking at the port:** the site's disagreement floor for the implied 2PP uses the simple-share formula, which overstates sampling error by about a quarter. On that basis the implied 2PP's 0.78× ("herded") would read nearer 1×. The Primary vote tab, the section's default, is unaffected.
 
-## Still open
+## The port (27 Sep)
 
-- **The port hasn't started.** The earlier question to the owner was whether to start it on this branch. There's no answer yet.
-- **`origin/main` is ahead of this branch** (Issues: Ipsos and DemosAU added). Bring it in before porting.
-- **Headlines and decks are written by hand.** The site generates its own, so each one needs a rule. On "What matters to whom" the deck should be the chosen group tab's verdict sentences, as the site's are now.
+- **Live on `main` since 27 Sep (`ad50e31`).** The redesign is the default design. The tagline's "last" ("…set against the last twenty.") switches to the design it replaced and back, and `?design=old|new` overrides. Every tab is ported: Snapshot, Past cycles, All polls, and Info (its section headings only; the canvas has no Info board).
+- **Where it lives:** `.build/newtracker/assets/rd*.jsx` and `rd.css`. The existing panels keep their data and machinery and branch at their return into the redesign's layout when `window.AP.rd` is set; every style is scoped to `body.rd`, so the old design renders as it did.
+- **Headlines and decks are written by rule**, from the live figures, section by section (the rules sit beside each component). The boards' wording is what the rules produce today.
+- **Decisions made at the port:**
+  - The redesign's Two-party disagreement tab uses the implied figures' own sampling floor: the variance of each respondent's flow to Labor, as the All polls intervals do. The old design's panel still uses p(1 − p).
+  - Monthly lines are straight, as the review decided.
+  - Tablet widths (to 900px) take the phone's cards for the polls table and the Past cycles summary; the switching mosaic's labels shorten when a column is too narrow for them ("ON"); numbered event badges spread apart instead of overlapping.
+  - The page carries both designs, so it is about a quarter heavier: 492 KB gzipped against 387 KB.
 - **The canvas title** still reads "Primary vote chart redesign", from when it covered one chart.
 
 ## Working on the boards
@@ -83,6 +88,7 @@ On the **Whole page** canvas page, `PageDesktop1–2` and `PagePhone1–3` stack
   | `gen/polls_build.py` | `Polls*` |
   | `gen/page_build.py` | `PageDesktop*`, `PagePhone*`. Run it last, after any board changes. |
   | `gen/allpolls_build.py` | `AllPolls*`, and the All polls page's entries in `canvas.json`. Refresh its data first with `node design/redesign-2026-09/gen/extract_allpolls_data.mjs`; board heights live in `gen/allpolls_heights.json`. |
+  | `gen/cycles_build.py` | `PastCycles*`, from `data/cycles.json`, which `gen/extract_cycles.js` reads from the running site (serve the repo first); `gen/measure_cycles.js` sizes the boards. The boards have been edited on the canvas since, so carry those edits into the script before running it. |
 
   Run them with `python3 design/redesign-2026-09/gen/<script>.py`. They write into `canvas/project/` and reproduce the committed boards byte for byte. Set `PYTHONDONTWRITEBYTECODE=1` so no `__pycache__` lands in the tree.
 - **Hand-written boards:** everything else. Edit the `.dc.html` directly. `gen/calc.py`, `calcm.py` and `demo.py` are the first session's geometry scripts. They're kept for the record; nothing current depends on them.
