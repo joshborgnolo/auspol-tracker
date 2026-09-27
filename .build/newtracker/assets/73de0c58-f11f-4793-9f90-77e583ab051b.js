@@ -1843,10 +1843,16 @@ const TABS = [
 ];
 const TAB_IDS = TABS.map((t) => t.id);
 
-function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatchup, tppBasis, setTppBasis }) {
+function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup, setTppMatchup, tppBasis, setTppBasis }) {
+  /* The redesign sets its range tabs over the two-party chart, beside that
+     chart's own checkbox, so they read as the chart's - and every other
+     section's headline is written for the whole term. There the range zooms
+     the two-party chart alone; the design it replaced keeps its page-wide
+     range, set at the top of its hero. */
+  const rangeId = window.AP.rd ? "all" : heroRange;
   return (
     <>
-      <Hero rangeId={rangeId} setRangeId={setRangeId} showScatter={showScatter}
+      <Hero rangeId={heroRange} setRangeId={setRangeId} showScatter={showScatter}
             matchup={tppMatchup} setMatchup={setTppMatchup}
             basis={tppBasis} setBasis={setTppBasis} />
       <PrimaryVotePanel rangeId={rangeId} />

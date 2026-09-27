@@ -3261,6 +3261,13 @@ body.rd .ts-sep { background: var(--line); }
   body.rd .tabs-list { width: 100%; justify-content: space-between; }
   body.rd .tab { padding: 11px 6px 12px; }
   body.rd .tab-label, body.rd.editorial .tab-label { font-size: 15px; line-height: 19px; }
+  body.rd .tabs.pinned .tabs-set, body.rd .tabs.pinned .tabs-list { width: auto; }
+  body.rd .tabs.pinned .tabs-list { justify-content: flex-start; }
+  body.rd .ts-num { font-size: 15px; }
+  body.rd .tab-score { gap: 6px; }
+}
+@media (max-width: 340px) {
+  body.rd .tabs.show-score .ts-abbr { display: none; }
 }
 body.rd .rd-tpp-top { display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: 36px; }
 body.rd .rd-tpp-read {
@@ -4056,7 +4063,15 @@ body.rd .rd-ap-pinbar::before, body.rd .rd-ap-headwrap.pinned::before {
   content: ""; position: absolute; top: 0; bottom: 0; left: calc(-50vw + 50%); right: calc(-50vw + 50%);
   background: var(--bg); z-index: -1;
 }
-body.rd .rd-ap-pinnav { display: flex; align-items: stretch; gap: 22px; min-width: 0; }
+body.rd .rd-ap-pinnav {
+  display: flex; align-items: stretch; gap: 22px; flex: 1 1 auto; min-width: 0;
+  padding-bottom: 1px; margin-bottom: -1px;
+  overflow-x: auto; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+body.rd .rd-ap-pinnav::-webkit-scrollbar { display: none; }
+body.rd .rd-ap-pinbar > :not(.rd-ap-pinnav) { flex-shrink: 0; }
 body.rd .rd-ap-pinl, body.rd .rd-ap-pint {
   all: unset; cursor: pointer; box-sizing: border-box; display: inline-flex; align-items: center;
   border-bottom: 2px solid transparent; margin-bottom: -1px; font-size: 14px; color: var(--ink-3); white-space: nowrap;
@@ -4283,8 +4298,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-table { margin-top: 14px; }
   body.rd .rd-ap-headwrap { top: calc(var(--rd-pin) + 44px); }
   body.rd .rd-ap-pinbar { height: 44px; gap: 10px; }
-  body.rd .rd-ap-pinnav { flex: 1; gap: 16px; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(to right, #000 85%, transparent); mask-image: linear-gradient(to right, #000 85%, transparent); }
-  body.rd .rd-ap-pinnav::-webkit-scrollbar { display: none; }
+  body.rd .rd-ap-pinnav { gap: 16px; }
   body.rd .rd-ap-pinl { font-size: 13px; }
   body.rd .rd-ap-phead { padding: 8px 0 6px; border-bottom: 1px solid var(--ink-faint); }
   body.rd .rd-ap-phead .rd-ap-hpic { min-height: 38px; }
@@ -55436,7 +55450,7 @@ function rdXTicks(x0, x1, narrow, opts) {
   const keep = months.filter(m => (Number(m.ym.slice(5)) - 1) % step === 0);
   return keep.map((m, i) => {
     const [y, mo] = m.ym.split("-").map(Number);
-    const yr = narrow ? " " + String(y).slice(2) : " " + y;
+    const yr = narrow ? " ’" + String(y).slice(2) : " " + y;
     return {
       x: m.x,
       label: D.monthName(mo) + (mo === 1 || i === 0 ? yr : "")
@@ -56302,7 +56316,7 @@ function rdElectionTicks(x0, x1, narrow, elecX) {
   const ey = String(Math.floor(elecX));
   if (rest.length) {
     const lab = rest[0].label;
-    const cut = lab.endsWith(" " + ey) ? ey.length + 1 : lab.endsWith(" " + ey.slice(2)) ? 3 : 0;
+    const cut = lab.endsWith(" " + ey) ? ey.length + 1 : lab.endsWith(" ’" + ey.slice(2)) ? 4 : 0;
     if (cut) rest[0] = {
       ...rest[0],
       label: lab.slice(0, -cut)
@@ -61851,6 +61865,7 @@ function RdAllPolls(P) {
   } = P;
   const D = window.AUSPOL;
   const phone = useNarrow("(max-width: 760px)");
+  const tight = useNarrow("(max-width: 1100px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const contest = onM ? "onp" : "lnp";
@@ -62666,7 +62681,7 @@ function RdAllPolls(P) {
       color: "var(--mood-neg)"
     }
   }, "wrong track"), ", %")));
-  const NAV = phone ? [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagreement"], ["house-lean", "Lean"], ["flow-drift", "Flows"]] : [["rd-ap-top", "The polls"], ["poll-disagreement", "How much they disagree"], ["house-lean", "How each pollster leans"], ["flow-drift", "Preference flows"]];
+  const NAV = phone || tight ? [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagreement"], ["house-lean", "Lean"], ["flow-drift", "Flows"]] : [["rd-ap-top", "The polls"], ["poll-disagreement", "How much they disagree"], ["house-lean", "How each pollster leans"], ["flow-drift", "Preference flows"]];
   const pinBar = React.createElement("div", {
     className: "rd-ap-pinbar" + (pinned ? " on" : ""),
     "aria-hidden": !pinned
@@ -62696,8 +62711,6 @@ function RdAllPolls(P) {
   }, React.createElement("path", {
     d: "M4 6h16M7 12h10M10 18h4"
   })), "Filters", nFilters ? " · " + nFilters : "") : React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-grow"
-  }), React.createElement("span", {
     className: "rd-ap-pintabs",
     role: "group",
     "aria-label": "Figures"
@@ -65642,7 +65655,7 @@ const TABS = [{
 }];
 const TAB_IDS = TABS.map(t => t.id);
 function SnapshotView({
-  rangeId,
+  rangeId: heroRange,
   setRangeId,
   showScatter,
   tppMatchup,
@@ -65650,8 +65663,9 @@ function SnapshotView({
   tppBasis,
   setTppBasis
 }) {
+  const rangeId = window.AP.rd ? "all" : heroRange;
   return React.createElement(React.Fragment, null, React.createElement(Hero, {
-    rangeId: rangeId,
+    rangeId: heroRange,
     setRangeId: setRangeId,
     showScatter: showScatter,
     matchup: tppMatchup,

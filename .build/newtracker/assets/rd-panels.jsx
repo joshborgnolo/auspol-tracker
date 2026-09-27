@@ -33,7 +33,7 @@ function rdElectionTicks(x0, x1, narrow, elecX) {
   const ey = String(Math.floor(elecX));
   if (rest.length) {
     const lab = rest[0].label;
-    const cut = lab.endsWith(" " + ey) ? ey.length + 1 : lab.endsWith(" " + ey.slice(2)) ? 3 : 0;
+    const cut = lab.endsWith(" " + ey) ? ey.length + 1 : lab.endsWith(" ’" + ey.slice(2)) ? 4 : 0;
     if (cut) rest[0] = { ...rest[0], label: lab.slice(0, -cut) };
   }
   return [{ x: elecX, label: "Election", strong: true }, ...rest];

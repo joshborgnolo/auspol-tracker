@@ -373,6 +373,20 @@ body.rd .ts-sep { background: var(--line); }
   body.rd .tabs-list { width: 100%; justify-content: space-between; }
   body.rd .tab { padding: 11px 6px 12px; }
   body.rd .tab-label, body.rd.editorial .tab-label { font-size: 15px; line-height: 19px; }
+  /* Pinned, the tabs close up at the left, so the 2PP score can dock at the
+     right. Spread across the whole row, they sat under it: the score covered
+     "All polls" and pushed Info off the bar. The switch rides the pin, when
+     the bar is already moving; the bar's height never changes. */
+  body.rd .tabs.pinned .tabs-set, body.rd .tabs.pinned .tabs-list { width: auto; }
+  body.rd .tabs.pinned .tabs-list { justify-content: flex-start; }
+  body.rd .ts-num { font-size: 15px; }
+  body.rd .tab-score { gap: 6px; }
+}
+/* the narrowest phones: Info leaves the docked bar from 380px, as in the old
+   design (template.html's .tab-pinhide rule), and below 340px the score drops
+   its party letters - the figures keep their party colours */
+@media (max-width: 340px) {
+  body.rd .tabs.show-score .ts-abbr { display: none; }
 }
 
 /* ---------- two-party section ---------------------------------------------- */
@@ -1219,7 +1233,19 @@ body.rd .rd-ap-pinbar::before, body.rd .rd-ap-headwrap.pinned::before {
   content: ""; position: absolute; top: 0; bottom: 0; left: calc(-50vw + 50%); right: calc(-50vw + 50%);
   background: var(--bg); z-index: -1;
 }
-body.rd .rd-ap-pinnav { display: flex; align-items: stretch; gap: 22px; min-width: 0; }
+/* The section links take whatever the figures' tabs, search and count leave,
+   and scroll under a fade when that is too little. Sized to their words, they
+   ran on under the tabs at every width from a tablet's 761px to 1024px. The
+   1px of padding keeps the chosen link's underline inside the scroller. */
+body.rd .rd-ap-pinnav {
+  display: flex; align-items: stretch; gap: 22px; flex: 1 1 auto; min-width: 0;
+  padding-bottom: 1px; margin-bottom: -1px;
+  overflow-x: auto; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+body.rd .rd-ap-pinnav::-webkit-scrollbar { display: none; }
+body.rd .rd-ap-pinbar > :not(.rd-ap-pinnav) { flex-shrink: 0; }
 body.rd .rd-ap-pinl, body.rd .rd-ap-pint {
   all: unset; cursor: pointer; box-sizing: border-box; display: inline-flex; align-items: center;
   border-bottom: 2px solid transparent; margin-bottom: -1px; font-size: 14px; color: var(--ink-3); white-space: nowrap;
@@ -1464,8 +1490,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-table { margin-top: 14px; }
   body.rd .rd-ap-headwrap { top: calc(var(--rd-pin) + 44px); }
   body.rd .rd-ap-pinbar { height: 44px; gap: 10px; }
-  body.rd .rd-ap-pinnav { flex: 1; gap: 16px; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(to right, #000 85%, transparent); mask-image: linear-gradient(to right, #000 85%, transparent); }
-  body.rd .rd-ap-pinnav::-webkit-scrollbar { display: none; }
+  body.rd .rd-ap-pinnav { gap: 16px; }
   body.rd .rd-ap-pinl { font-size: 13px; }
   body.rd .rd-ap-phead { padding: 8px 0 6px; border-bottom: 1px solid var(--ink-faint); }
   body.rd .rd-ap-phead .rd-ap-hpic { min-height: 38px; }

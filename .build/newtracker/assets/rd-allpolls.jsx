@@ -426,6 +426,9 @@ function RdAllPolls(P) {
           synthByYm, aggByYm, synthOnByYm, altOnByYm } = P;
   const D = window.AUSPOL;
   const phone = useNarrow("(max-width: 760px)");
+  /* the pinned bar's section links take their short names wherever the long
+     ones would crowd the figures' tabs */
+  const tight = useNarrow("(max-width: 1100px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const contest = onM ? "onp" : "lnp";
@@ -822,7 +825,7 @@ function RdAllPolls(P) {
       {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span> · unsure · <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
     </div>
   );
-  const NAV = phone
+  const NAV = phone || tight
     ? [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagreement"], ["house-lean", "Lean"], ["flow-drift", "Flows"]]
     : [["rd-ap-top", "The polls"], ["poll-disagreement", "How much they disagree"], ["house-lean", "How each pollster leans"], ["flow-drift", "Preference flows"]];
   const pinBar = (
@@ -836,7 +839,6 @@ function RdAllPolls(P) {
           Filters{nFilters ? " · " + nFilters : ""}
         </button>
       ) : <>
-        <span className="rd-grow"></span>
         <span className="rd-ap-pintabs" role="group" aria-label="Figures">
           {FACETS.map((f) => <button key={f.id} type="button" className="rd-ap-pint" aria-pressed={facet === f.id} tabIndex={pinned ? 0 : -1} onClick={() => onFacet(f.id)}>{f.label}</button>)}
         </span>

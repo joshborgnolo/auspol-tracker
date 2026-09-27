@@ -176,7 +176,9 @@ function rdPointsPhrase(g) {
 /* ---------------------------------------------------------------- axes
    Month ticks the redesign's way: quarters on a long window, each January
    and the first tick carrying the year ("Jan 2026"); a window under a year
-   ticks every other month, a short one every month. A phone halves them. */
+   ticks every other month, a short one every month. A phone halves them,
+   and shortens the year to "Jan ’26": without the apostrophe, "Jan 26"
+   and "Jul 25" read as dates. */
 function rdXTicks(x0, x1, narrow, opts) {
   const D = window.AUSPOL;
   const o = opts || {};
@@ -186,7 +188,7 @@ function rdXTicks(x0, x1, narrow, opts) {
   const keep = months.filter((m) => (Number(m.ym.slice(5)) - 1) % step === 0);
   return keep.map((m, i) => {
     const [y, mo] = m.ym.split("-").map(Number);
-    const yr = narrow ? " " + String(y).slice(2) : " " + y;
+    const yr = narrow ? " ’" + String(y).slice(2) : " " + y;
     return { x: m.x, label: D.monthName(mo) + (mo === 1 || i === 0 ? yr : "") };
   });
 }
