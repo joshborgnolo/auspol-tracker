@@ -195,6 +195,14 @@ function TrendChart(props) {
        to draw in, which travels with the morph so a series is never drawn over
        months it was never asked in. */
     scatterOut: scatterOutProp = [], scatterMove = [], fade = 1, clipX,
+    /* `driven`: the caller is moving xDomain itself, frame by frame (a
+       switch that blends one view's window into another's). The chart then
+       draws in exactly the window it is handed - no travel of its own on
+       top, and never the held previous render the travel draws while
+       zooming in, which froze the old view's lines and dots for a whole
+       switch to a view whose months start later (the issues' Immigration ->
+       Crime) while its bands, not held, moved. */
+    driven = false,
     /* Which archive view a dot from THIS chart should land in. The chart has no
        idea what it is plotting; the panel does. */
     pollFacet,
@@ -249,7 +257,8 @@ function TrendChart(props) {
      one still covering the ground the window is leaving; zooming out, the new
      set already covers where it is going. Either way nothing pops in at an
      edge, and the held copy is only refreshed on a settled render. */
-  const [win, setWin] = useState(xDomain);
+  const [winState, setWin] = useState(xDomain);
+  const win = driven ? xDomain : winState;
   const winRef = useRef(xDomain);
   const winRaf = useRef(0);
   const prev = useRef(null);                 // the props of the last SETTLED render
@@ -258,6 +267,7 @@ function TrendChart(props) {
   React.useEffect(() => {
     const from = winRef.current, to = xDomain;
     if (from[0] === to[0] && from[1] === to[1]) return;
+    if (driven) { cancelAnimationFrame(winRaf.current); winRef.current = to; travelling.current = false; setWin(to); return; }
     /* Snap where an animation would be a lie, a trap, or a waste: the reader
        asked for less motion; the tab is hidden, where rAF does not run at all
        and a frame-driven tween would park the window half way; or this chart
@@ -300,7 +310,7 @@ function TrendChart(props) {
      on the travelling flag, or the first frame would flash the new data inside
      the old window. */
   const moved = xDomain[0] !== winRef.current[0] || xDomain[1] !== winRef.current[1];
-  const drawn = (travelling.current || moved) && xDomain[0] > winRef.current[0] && prev.current
+  const drawn = !driven && (travelling.current || moved) && xDomain[0] > winRef.current[0] && prev.current
     ? prev.current : fresh;
   const series = drawn.series, scatter = drawn.scatter, spine = drawn.spine, scatterOut = drawn.scatterOut;
   const tooltipTitle = drawn.tooltipTitle, extraRows = drawn.extraRows;

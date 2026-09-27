@@ -41858,6 +41858,7 @@ function TrendChart(props) {
     scatterMove = [],
     fade = 1,
     clipX,
+    driven = false,
     pollFacet,
     marks = [],
     notes = [],
@@ -41870,7 +41871,8 @@ function TrendChart(props) {
     for (let i = 0; i < s.points.length; i++) if (s.points[i].x === x) return s.points[i];
     return null;
   };
-  const [win, setWin] = useState(xDomain);
+  const [winState, setWin] = useState(xDomain);
+  const win = driven ? xDomain : winState;
   const winRef = useRef(xDomain);
   const winRaf = useRef(0);
   const prev = useRef(null);
@@ -41880,6 +41882,13 @@ function TrendChart(props) {
     const from = winRef.current,
       to = xDomain;
     if (from[0] === to[0] && from[1] === to[1]) return;
+    if (driven) {
+      cancelAnimationFrame(winRaf.current);
+      winRef.current = to;
+      travelling.current = false;
+      setWin(to);
+      return;
+    }
     const box = ref.current && ref.current.getBoundingClientRect();
     const onScreen = !!box && box.bottom > 0 && box.top < (window.innerHeight || 0);
     const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches || document.visibilityState === "hidden" || !onScreen;
@@ -41917,7 +41926,7 @@ function TrendChart(props) {
     extraRows: extraRowsProp
   };
   const moved = xDomain[0] !== winRef.current[0] || xDomain[1] !== winRef.current[1];
-  const drawn = (travelling.current || moved) && xDomain[0] > winRef.current[0] && prev.current ? prev.current : fresh;
+  const drawn = !driven && (travelling.current || moved) && xDomain[0] > winRef.current[0] && prev.current ? prev.current : fresh;
   const series = drawn.series,
     scatter = drawn.scatter,
     spine = drawn.spine,
@@ -59814,6 +59823,7 @@ function RdIssues({
     scatterOut: chDraw.scatterOut,
     scatterMove: chDraw.scatterMove,
     fade: chDraw.fade,
+    driven: !!issMorph,
     pollFacet: "primary",
     tooltipTitle: i => ch.pts[i] ? monthLabelFull(ch.pts[i].ym) : "",
     fmt: v => Math.round(v) + "",

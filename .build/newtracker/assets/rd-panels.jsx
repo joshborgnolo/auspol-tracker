@@ -1655,7 +1655,7 @@ function RdIssues({ rangeId = "all" }) {
                   series={P.map((q) => ({ id: q, label: pName(q), color: pColor(q), rdWidth: 2.2, endCap: false, clipX: chDraw.clip,
                     points: chDraw.pts.filter((d) => d[q] != null).map((d) => ({ x: d.x, y: d[q] })), endLabel: ISS_PARTY_CAP[q] }))}
                   areas={chDraw.areas} spine={series(ch.pts, P[0])} scatter={chDraw.scatter} scatterOut={chDraw.scatterOut}
-                  scatterMove={chDraw.scatterMove} fade={chDraw.fade} pollFacet="primary"
+                  scatterMove={chDraw.scatterMove} fade={chDraw.fade} driven={!!issMorph} pollFacet="primary"
                   tooltipTitle={(i) => (ch.pts[i] ? monthLabelFull(ch.pts[i].ym) : "")} fmt={(v) => Math.round(v) + ""}
                   copy={{ title: it.label + ": who voters think is best", sub: "Of those naming Labor, the Coalition or One Nation" }} />
                 <RdKey className="rd-ckey" items={[{ kind: "dot", color: "var(--ink-3)", label: "One poll" }, { kind: "lineband", color: "var(--ink-3)", label: "Monthly average and 95% interval" }]} />
