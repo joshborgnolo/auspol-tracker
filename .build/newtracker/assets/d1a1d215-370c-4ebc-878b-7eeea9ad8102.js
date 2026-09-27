@@ -6044,8 +6044,9 @@ function infoTerms(D) {
         the window.</span>
         <span className="info-p"><b>Size.</b> Larger samples count for more. Where a pollster
         publishes an {xref("effective-sample", "weighted aggregate", "effective sample")} in its
-        Australian Polling Council methodology statement, that figure is used; otherwise the raw
-        sample, capped at 3,000.</span>
+        Australian Polling Council methodology statement, that figure is used. Otherwise the raw
+        sample is discounted by 1.6, roughly what weighting costs the pollsters that do publish,
+        and capped at 3,000 people.</span>
         <span className="info-p"><b>Repeat polls.</b> A pollster that publishes several times in
         the window counts for the square root of its number of polls, so three weekly Roy Morgan
         polls count as 1.7, not 3.</span>
