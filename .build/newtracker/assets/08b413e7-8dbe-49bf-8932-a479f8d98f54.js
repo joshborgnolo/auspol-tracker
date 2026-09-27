@@ -796,9 +796,16 @@ function TrendChart(props) {
   /* Named because the plot clip has to know them: a dot is placed by its
      CENTRE, so a clip drawn at the plot's edge shaves the outer half of any
      reading that sits on it. */
-  const DOT_R = rd ? PX(cw < 640 ? 2 : 2.6) : 4.2, DOT_R_LIVE = rd ? PX(4.5) : 6.5;
+  const DOT_R = rd ? PX(cw < 640 ? 2 : 2.6) : 4.2, DOT_R_LIVE = rd ? PX(6) : 6.5;
   const DOT_OP = rd ? 0.5 : 0.6;
+  /* The redesign's picked poll, as the Interaction board draws it: "the dot
+     grows and rings" - solid at r 6 with a 2px halo of the chart's own
+     ground, inside a 1.5px ring at r 11 in its colour. It is lifted out of
+     the half-transparent cloud and drawn over the lines (hotDot, after the
+     series), where a line crossing it can't hide which poll is open. */
+  const RING_R = PX(11);
   const dotEls = (arr, live) => arr.map((d, i) => {
+    if (rd && live && dot === d) return null;
     const cx = sx(d.x), cy = sy(d.y), r = live && dot === d ? DOT_R_LIVE : DOT_R;
     /* no per-dot pointer listeners: both inputs pick from the svg root, so
        nothing here depends on a browser firing enter/leave on an SVG child */
@@ -809,6 +816,17 @@ function TrendChart(props) {
              : <circle key={"s" + i} cx={cx} cy={cy} r={r} {...common} />;
   });
   const dots = React.useMemo(() => dotEls(scatter, true), [scatter, dot, geom]);
+  const hotDot = rd && dot && scatter.includes(dot) ? (() => {
+    const cx = sx(dot.x), cy = sy(dot.y);
+    const p = dotPath(dot.shape, cx, cy, DOT_R_LIVE);
+    const face = { fill: dot.color, stroke: "var(--chart-bg)", strokeWidth: PX(2) };
+    return (
+      <g className="rd-dot-hot" pointerEvents="none">
+        <circle cx={cx} cy={cy} r={RING_R} fill="none" stroke={dot.color} strokeWidth={PX(1.5)} opacity={0.55} />
+        {p ? <path d={p} {...face} /> : <circle cx={cx} cy={cy} r={DOT_R_LIVE} {...face} />}
+      </g>
+    );
+  })() : null;
   const outDots = React.useMemo(() => dotEls(scatterOut, false), [scatterOut, geom]);
   /* The dots that TRAVEL are the one group that cannot be memoised - they hold
      a different position and colour on every frame. Deliberately the small
@@ -1438,6 +1456,7 @@ function TrendChart(props) {
             </g>
           );
         })}
+        {hotDot}
         {notes.map((n, i) => {
           const cls = "rd-note-text" + (n.cls ? " " + n.cls : "");
           const style = { fontSize: PX(n.size || 12), strokeWidth: PX(4),
