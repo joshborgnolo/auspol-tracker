@@ -326,14 +326,13 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     const nets = [["Albanese", a.albNet], [a.oppName || "Taylor", a.taylorNet], ["Hanson", a.hansonNet]]
       .filter(([, v]) => v != null).map(([n, v]) => n + " " + net(v)).join(" · ");
     const key = window.AP.pollRowKey && window.AP.pollRowKey({ pollster: r.pollster, released: r.released });
-    const pubDate = r.published ? WDs(Date.parse(r.published.slice(0, 10))) + " " + isoD(r.published) : null;
     const recent = ((pj && pj.recent) || []).slice(-5).reverse();
     const nx = nextWords(e);
     const then = e.proj.filter((x) => x.ahead === 1)[0];
     return (
       <div className="rd-pl-detail">
         <div className="rd-pld-poll">
-          <div className="rd-pld-h">This poll · fieldwork {r.field}{r.sample ? " · " + r.sample.toLocaleString() + " voters" : ""}{r.client ? " · " + r.client : ""}{pubDate ? ", " + pubDate : ""}</div>
+          <div className="rd-pld-h">{rdPollHead({ ...(D.individualPolls.find((q) => q.pollster === r.pollster && q.released === r.released) || {}), ...r })}</div>
           {r.p && (
             <div className="rd-pld-prim">
               {RD_PL_PARTIES.map(([id, lab]) => r.p[id] != null && (

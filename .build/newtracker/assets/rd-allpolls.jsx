@@ -86,6 +86,30 @@ function rdApOut(stamp) {
   return s;
 }
 
+/* A poll's header, one wording wherever a poll is opened (All polls, Latest
+   and next polls): when it was in the field, how many were asked, and who
+   published it when (a self-published poll names its pollster). "n = 1,500" rather than "1,500 voters", with the
+   pollster's effective sample beside it where it prints one - and "eff. TBC"
+   where it normally does but this wave's hasn't appeared yet (the house's
+   previous poll carried one, and this came out in the last three weeks;
+   older gaps are left unsaid, since some waves never get one). "Published by
+   News24" rather than "for News24", which read as if the voters were. */
+function rdPollHead(p) {
+  const D = window.AUSPOL;
+  const prev = D.individualPolls.filter((q) => q.pollster === p.pollster && q.released < p.released)
+    .sort((a, b) => (a.released < b.released ? -1 : 1)).pop();
+  const fresh = p.published && Date.now() - Date.parse(p.published.slice(0, 10)) < 21 * 86400000;
+  const tbc = p.sampleEff == null && fresh && prev && prev.sampleEff != null;
+  const n = p.sample != null
+    ? "n = " + p.sample.toLocaleString() + (p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? " (eff. TBC)" : "")
+    : "sample not published";
+  const out = rdApOut(p.published);
+  // a self-published poll is published by its pollster, and says so
+  const by = "Published by " + (p.client && !/^self/i.test(p.client) ? p.client : p.pollster);
+  const field = p.field || p.dateLabel;
+  return <>This poll{field ? " · Fieldwork " + field : ""} · <span className="rd-nocaps">{n}</span>{" · " + by + (out ? ", " + out : "")}</>;
+}
+
 /* The primary columns in the order every table on the site keeps. */
 const RD_AP_PRIM = [
   { id: "alp", lab: "ALP", ink: "var(--alp-text)", dot: "var(--alp)" },
@@ -271,8 +295,6 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, onBack, backLabel }) {
     : Math.abs(lean) < moe / 2 ? "well inside" : Math.abs(lean) <= moe ? "inside" : "outside";
   const yr = p.year != null ? p.year : Number(String(p.released).slice(0, 4));
   const report = "/feedback/?msg=" + encodeURIComponent(`${p.pollster}, ${p.field} ${yr} – `);
-  const who = p.client && !/^self/i.test(p.client) ? " for " + p.client : p.client ? ", self-published" : "";
-  const out = rdApOut(p.published);
   const from = D.MONTHS[Math.max(0, D.MONTHS.indexOf(p.ym) - 6)];
   /* the release, and beside it the poll's APC methodology statement where the
      pollster published one. Where the release is itself the statement
@@ -283,7 +305,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, onBack, backLabel }) {
   return (
     <div className="rd-apd">
       <div className="rd-apd-l poll-detail">
-        <span className="rd-apd-h">This poll · {p.sample != null ? p.sample.toLocaleString() + " voters" : "sample not published"}{who}{out ? " · out " + out : ""}</span>
+        <span className="rd-apd-h">{rdPollHead(p)}</span>
         {prim.length > 0 && (
           <div className="rd-apd-prim">
             {prim.map((k) => (

@@ -4337,6 +4337,7 @@ body.rd .rd-apd-l.poll-detail { padding: 0; background: transparent; font-family
 body.rd .rd-apd-l.poll-detail.copy-wide { padding: 28px 24px; background: var(--surface-2); }
 body.rd .rd-apd-l .poll-copy-btn { bottom: 8px; right: 0; }
 body.rd .rd-apd-r { display: flex; flex-direction: column; min-width: 0; }
+body.rd .rd-pld-h .rd-nocaps, body.rd .rd-apd-h .rd-nocaps { text-transform: none; letter-spacing: 0.02em; white-space: nowrap; }
 body.rd .rd-apd-h { font-size: 12px; font-weight: 600; letter-spacing: 0.05em; line-height: 1.5; text-transform: uppercase; color: var(--ink-3); }
 body.rd .rd-apd-prim { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
 body.rd .rd-apd-prim > span { width: 64px; display: flex; flex-direction: column; gap: 1px; }
@@ -61180,7 +61181,6 @@ function RdPolls({
       pollster: r.pollster,
       released: r.released
     });
-    const pubDate = r.published ? WDs(Date.parse(r.published.slice(0, 10))) + " " + isoD(r.published) : null;
     const recent = (pj && pj.recent || []).slice(-5).reverse();
     const nx = nextWords(e);
     const then = e.proj.filter(x => x.ahead === 1)[0];
@@ -61190,7 +61190,10 @@ function RdPolls({
       className: "rd-pld-poll"
     }, React.createElement("div", {
       className: "rd-pld-h"
-    }, "This poll \xB7 fieldwork ", r.field, r.sample ? " · " + r.sample.toLocaleString() + " voters" : "", r.client ? " · " + r.client : "", pubDate ? ", " + pubDate : ""), r.p && React.createElement("div", {
+    }, rdPollHead({
+      ...(D.individualPolls.find(q => q.pollster === r.pollster && q.released === r.released) || {}),
+      ...r
+    })), r.p && React.createElement("div", {
       className: "rd-pld-prim"
     }, RD_PL_PARTIES.map(([id, lab]) => r.p[id] != null && React.createElement("span", {
       key: id
@@ -62590,6 +62593,19 @@ function rdApOut(stamp) {
   }
   return s;
 }
+function rdPollHead(p) {
+  const D = window.AUSPOL;
+  const prev = D.individualPolls.filter(q => q.pollster === p.pollster && q.released < p.released).sort((a, b) => a.released < b.released ? -1 : 1).pop();
+  const fresh = p.published && Date.now() - Date.parse(p.published.slice(0, 10)) < 21 * 86400000;
+  const tbc = p.sampleEff == null && fresh && prev && prev.sampleEff != null;
+  const n = p.sample != null ? "n = " + p.sample.toLocaleString() + (p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? " (eff. TBC)" : "") : "sample not published";
+  const out = rdApOut(p.published);
+  const by = "Published by " + (p.client && !/^self/i.test(p.client) ? p.client : p.pollster);
+  const field = p.field || p.dateLabel;
+  return React.createElement(React.Fragment, null, "This poll", field ? " · Fieldwork " + field : "", " \xB7 ", React.createElement("span", {
+    className: "rd-nocaps"
+  }, n), " · " + by + (out ? ", " + out : ""));
+}
 const RD_AP_PRIM = [{
   id: "alp",
   lab: "ALP",
@@ -62940,8 +62956,6 @@ function RdApDetail({
   const inside = lean == null || moe == null ? null : Math.abs(lean) < moe / 2 ? "well inside" : Math.abs(lean) <= moe ? "inside" : "outside";
   const yr = p.year != null ? p.year : Number(String(p.released).slice(0, 4));
   const report = "/feedback/?msg=" + encodeURIComponent(`${p.pollster}, ${p.field} ${yr} – `);
-  const who = p.client && !/^self/i.test(p.client) ? " for " + p.client : p.client ? ", self-published" : "";
-  const out = rdApOut(p.published);
   const from = D.MONTHS[Math.max(0, D.MONTHS.indexOf(p.ym) - 6)];
   const relUrl = p.releaseUrl || p.url;
   return React.createElement("div", {
@@ -62950,7 +62964,7 @@ function RdApDetail({
     className: "rd-apd-l poll-detail"
   }, React.createElement("span", {
     className: "rd-apd-h"
-  }, "This poll \xB7 ", p.sample != null ? p.sample.toLocaleString() + " voters" : "sample not published", who, out ? " · out " + out : ""), prim.length > 0 && React.createElement("div", {
+  }, rdPollHead(p)), prim.length > 0 && React.createElement("div", {
     className: "rd-apd-prim"
   }, prim.map(k => React.createElement("span", {
     key: k.id

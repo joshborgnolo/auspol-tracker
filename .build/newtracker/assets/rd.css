@@ -1590,6 +1590,9 @@ body.rd .rd-apd-l.poll-detail { padding: 0; background: transparent; font-family
 body.rd .rd-apd-l.poll-detail.copy-wide { padding: 28px 24px; background: var(--surface-2); }
 body.rd .rd-apd-l .poll-copy-btn { bottom: 8px; right: 0; }
 body.rd .rd-apd-r { display: flex; flex-direction: column; min-width: 0; }
+/* a poll header's "n = 1,500 (eff. 1,053)": n is a sample's letter, and
+   capitals would make it N, the population's */
+body.rd .rd-pld-h .rd-nocaps, body.rd .rd-apd-h .rd-nocaps { text-transform: none; letter-spacing: 0.02em; white-space: nowrap; }
 body.rd .rd-apd-h { font-size: 12px; font-weight: 600; letter-spacing: 0.05em; line-height: 1.5; text-transform: uppercase; color: var(--ink-3); }
 body.rd .rd-apd-prim { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
 body.rd .rd-apd-prim > span { width: 64px; display: flex; flex-direction: column; gap: 1px; }
