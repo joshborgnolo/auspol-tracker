@@ -4545,10 +4545,18 @@ body.rd .rd-fl-keynow::before { content: ""; position: absolute; left: 6px; top:
 body.rd .rd-fl-keynow i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ink); }
 @media (max-width: 1000px) {
   body.rd .rd-hl-hrow, body.rd .rd-hl-row { grid-template-columns: 170px 240px 56px 24px minmax(0, 1fr); }
+  body.rd .rd-hl-who { flex-direction: column; align-items: flex-start; gap: 0; }
+}
+@media (max-width: 1120px) {
+  body.rd .rd-hl-shead { height: auto; padding-bottom: 22px; }
+  body.rd .rd-hl-shead .rd-ap-cap { position: static; display: block; white-space: normal; }
+  body.rd .rd-hl-shead .rd-ap-cap em { display: block; text-wrap: balance; }
+  body.rd .rd-hl-sep { display: none; }
 }
 @media (max-width: 760px) {
-  body.rd .rd-dis-tabs .rd-tab, body.rd .rd-hl-tabs .rd-tab { flex: 1; }
+  body.rd .rd-dis-tabs .rd-tab, body.rd .rd-hl-tabs .rd-tab { flex: 1; justify-content: center; }
   body.rd .rd-dis-tabs > div[role="group"], body.rd .rd-hl-tabs > div[role="group"] { flex: 1; }
+  body.rd .rd-hl-tabs .rd-tab { padding: 0 4px; font-size: 14px; }
   body.rd .rd-dis-name { font-size: 13px; }
   body.rd .rd-dis-big b { font-size: 22px; }
   body.rd .rd-dis-sub, body.rd .rd-dis-verdict { font-size: 12px; }
@@ -64260,6 +64268,7 @@ function RdHouseLean({
 }) {
   const D = window.AUSPOL;
   const phone = useNarrow("(max-width: 760px)");
+  const narrowBar = useNarrow("(max-width: 1000px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const [view, setView] = useState("tpp");
@@ -64340,6 +64349,7 @@ function RdHouseLean({
   const SH = phone ? 26 : 44;
   const sx = ym => 6 + ms.indexOf(ym) / (ms.length - 1) * (SW - 14);
   const sy = v => SH / 2 - Math.max(-SM, Math.min(SM, v)) / SM * (SH / 2 - 3);
+  const tStep = Math.max(4, Math.ceil(56 * (ms.length - 1) / Math.max(1, SW - 14)));
   const spark = r => {
     const pts = r.s.filter(d => ms.includes(d.ym));
     if (!pts.length) return null;
@@ -64435,7 +64445,7 @@ function RdHouseLean({
     style: {
       color: posInk
     }
-  }, rText), (phone ? [-edge, 0, edge].filter(v => v != null && !Number.isNaN(v)) : bTicks.map(v => -v).concat([0]).concat(bTicks)).map(v => React.createElement("span", {
+  }, rText), (narrowBar ? [-edge, 0, edge].filter(v => v != null && !Number.isNaN(v)) : bTicks.map(v => -v).concat([0]).concat(bTicks)).map(v => React.createElement("span", {
     key: v,
     className: "rd-ap-tk" + (v === 0 ? " mid" : ""),
     style: {
@@ -64527,7 +64537,9 @@ function RdHouseLean({
     ref: boxRef
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Since the election ", React.createElement("em", null, "\xB7 each row\u2019s height is ", SM === 1 ? "a point" : SM + " points", " either way")), rdApMonthTicks(ms, 4).map(t => React.createElement("span", {
+  }, "Since the election ", React.createElement("em", null, React.createElement("span", {
+    className: "rd-hl-sep"
+  }, "\xB7 "), "each row\u2019s height is ", SM === 1 ? "a point" : SM + " points", " either way")), rdApMonthTicks(ms, tStep).map(t => React.createElement("span", {
     key: t.ym,
     className: "rd-ap-tk " + t.a,
     style: {

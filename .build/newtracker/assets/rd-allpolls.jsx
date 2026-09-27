@@ -1194,6 +1194,9 @@ function RdDisagree() {
 function RdHouseLean({ measure, tppBasis }) {
   const D = window.AUSPOL;
   const phone = useNarrow("(max-width: 760px)");
+  /* the tablet's narrower bar column (rd.css) has room to label only the
+     scale's ends and the others, as the phone does */
+  const narrowBar = useNarrow("(max-width: 1000px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const [view, setView] = useState("tpp");
@@ -1252,6 +1255,9 @@ function RdHouseLean({ measure, tppBasis }) {
   const SH = phone ? 26 : 44;
   const sx = (ym) => 6 + (ms.indexOf(ym) / (ms.length - 1)) * (SW - 14);
   const sy = (v) => SH / 2 - (Math.max(-SM, Math.min(SM, v)) / SM) * (SH / 2 - 3);
+  /* a month tick every four months, as drawn, and further apart where a
+     narrow column would run their labels together (about 56px each) */
+  const tStep = Math.max(4, Math.ceil((56 * (ms.length - 1)) / Math.max(1, SW - 14)));
   const spark = (r) => {
     const pts = r.s.filter((d) => ms.includes(d.ym));
     if (!pts.length) return null;
@@ -1291,7 +1297,7 @@ function RdHouseLean({ measure, tppBasis }) {
     <span className="rd-hl-bhead" aria-hidden="true">
       <span className="rd-ap-in">
         <b className="rd-ap-scl" style={{ color: negInk }}>{lText}</b><b className="rd-ap-scr" style={{ color: posInk }}>{rText}</b>
-        {(phone ? [-edge, 0, edge].filter((v) => v != null && !Number.isNaN(v)) : bTicks.map((v) => -v).concat([0]).concat(bTicks)).map((v) => (
+        {(narrowBar ? [-edge, 0, edge].filter((v) => v != null && !Number.isNaN(v)) : bTicks.map((v) => -v).concat([0]).concat(bTicks)).map((v) => (
           <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "")} style={{ left: bx(v) + "%" }}>
             {v === 0 ? (phone ? "Others" : "The others") : Math.abs(v) === edge ? Math.abs(v) + " pt" + (Math.abs(v) === 1 ? "" : "s") : String(Math.abs(v))}
           </span>
@@ -1328,8 +1334,8 @@ function RdHouseLean({ measure, tppBasis }) {
           {!phone && <span></span>}
           {!phone && (
             <span className="rd-hl-shead" role="columnheader" ref={boxRef}>
-              <span className="rd-ap-cap">Since the election <em>· each row’s height is {SM === 1 ? "a point" : SM + " points"} either way</em></span>
-              {rdApMonthTicks(ms, 4).map((t) => <span key={t.ym} className={"rd-ap-tk " + t.a} style={{ left: sx(t.ym) }}>{t.lab}</span>)}
+              <span className="rd-ap-cap">Since the election <em><span className="rd-hl-sep">· </span>each row’s height is {SM === 1 ? "a point" : SM + " points"} either way</em></span>
+              {rdApMonthTicks(ms, tStep).map((t) => <span key={t.ym} className={"rd-ap-tk " + t.a} style={{ left: sx(t.ym) }}>{t.lab}</span>)}
             </span>
           )}
         </div>

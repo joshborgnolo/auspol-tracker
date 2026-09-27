@@ -1798,10 +1798,24 @@ body.rd .rd-fl-keynow i { position: absolute; left: 50%; top: 50%; width: 9px; h
 
 @media (max-width: 1000px) {
   body.rd .rd-hl-hrow, body.rd .rd-hl-row { grid-template-columns: 170px 240px 56px 24px minmax(0, 1fr); }
+  /* a long name fills this narrower column, so its count goes under it, as on the phone */
+  body.rd .rd-hl-who { flex-direction: column; align-items: flex-start; gap: 0; }
+}
+/* The line's caption needs a column of about 345px to sit on one line, as
+   drawn, and the board's columns leave it that only from 1121px. Narrower,
+   its note drops under its label and the header grows to hold both lines
+   above the month ticks, rather than the caption running off the page. */
+@media (max-width: 1120px) {
+  body.rd .rd-hl-shead { height: auto; padding-bottom: 22px; }
+  body.rd .rd-hl-shead .rd-ap-cap { position: static; display: block; white-space: normal; }
+  body.rd .rd-hl-shead .rd-ap-cap em { display: block; text-wrap: balance; }
+  body.rd .rd-hl-sep { display: none; }
 }
 @media (max-width: 760px) {
-  body.rd .rd-dis-tabs .rd-tab, body.rd .rd-hl-tabs .rd-tab { flex: 1; }
+  body.rd .rd-dis-tabs .rd-tab, body.rd .rd-hl-tabs .rd-tab { flex: 1; justify-content: center; }
   body.rd .rd-dis-tabs > div[role="group"], body.rd .rd-hl-tabs > div[role="group"] { flex: 1; }
+  /* four measures across a phone, set as its board set them, so they fit 360px */
+  body.rd .rd-hl-tabs .rd-tab { padding: 0 4px; font-size: 14px; }
   body.rd .rd-dis-name { font-size: 13px; }
   body.rd .rd-dis-big b { font-size: 22px; }
   body.rd .rd-dis-sub, body.rd .rd-dis-verdict { font-size: 12px; }
