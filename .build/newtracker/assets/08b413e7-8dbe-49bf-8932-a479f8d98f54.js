@@ -69,6 +69,42 @@ function smoothPath(pts, sx, sy) {
   return d;
 }
 
+/* Monotone cubic (Fritsch–Carlson, d3's curveMonotoneX) through screen points
+   [[x, y], ...]: as smooth as the spline above, but between two months it
+   never rises above the higher or dips below the lower, so it can't draw a
+   high or low no month had. A turning month gets a flat tangent - the curve
+   peaks exactly on it. `lead` replaces the opening "M" when the path
+   continues another (a band's second edge). */
+function monotoneXY(p, lead = "M") {
+  const n = p.length;
+  if (!n) return "";
+  const f = (v) => v.toFixed(2);
+  let d = `${lead} ${f(p[0][0])} ${f(p[0][1])}`;
+  if (n === 1) return d;
+  if (n === 2) return d + ` L ${f(p[1][0])} ${f(p[1][1])}`;
+  const h = [], s = [];
+  for (let i = 0; i < n - 1; i++) {
+    h[i] = p[i + 1][0] - p[i][0];
+    s[i] = h[i] ? (p[i + 1][1] - p[i][1]) / h[i] : 0;
+  }
+  const sign = (v) => (v > 0) - (v < 0);
+  const m = [];
+  for (let i = 1; i < n - 1; i++) {
+    const q = (s[i - 1] * h[i] + s[i] * h[i - 1]) / (h[i - 1] + h[i] || 1);
+    m[i] = (sign(s[i - 1]) + sign(s[i])) * Math.min(Math.abs(s[i - 1]), Math.abs(s[i]), 0.5 * Math.abs(q)) || 0;
+  }
+  m[0] = (3 * s[0] - m[1]) / 2;
+  m[n - 1] = (3 * s[n - 2] - m[n - 2]) / 2;
+  for (let i = 0; i < n - 1; i++) {
+    const k = h[i] / 3;
+    d += ` C ${f(p[i][0] + k)} ${f(p[i][1] + k * m[i])}, ${f(p[i + 1][0] - k)} ${f(p[i + 1][1] - k * m[i + 1])}, ${f(p[i + 1][0])} ${f(p[i + 1][1])}`;
+  }
+  return d;
+}
+function monotonePath(pts, sx, sy) {
+  return monotoneXY(pts.map((d) => [sx(d.x), sy(d.y)]));
+}
+
 function straightPath(pts, sx, sy) {
   return pts.map((d, i) => `${i ? "L" : "M"} ${sx(d.x).toFixed(2)} ${sy(d.y).toFixed(2)}`).join(" ");
 }
@@ -150,7 +186,8 @@ function TrendChart(props) {
     vlines = [],
   } = props;
   /* The redesign draws the same data with a lighter hand: straight monthly
-     segments (a curve can show highs and lows no month had), line weights and
+     monotone curves through the months (the spline can show highs and lows
+     no month had; a monotone curve can't), line weights and
      dot sizes set in screen pixels so a phone draws them as boldly as a
      laptop, and event names above the plot rather than over the data. App
      sets AP.rd while it renders; every view remounts when it flips. */
@@ -902,11 +939,15 @@ function TrendChart(props) {
         {/* x-varying shaded areas – drawn under everything, clipped to the plot */}
         {areas.map((a) => {
           if (!a.points || a.points.length < 2) return null;
-          /* `smooth` follows the same Catmull-Rom the trend lines use. An
-             interval ribbon has to be drawn with the curve it belongs to –
-             straight edges under a smoothed line pull away from it mid-month
-             and read as a second, disagreeing series. */
-          const edgePath = (pts, key, lead) => (a.smooth && !rd)
+          /* `smooth` follows the same curve the trend lines use (the spline,
+             or the redesign's monotone). An interval ribbon has to be drawn
+             with the curve it belongs to – straight edges under a curved line
+             pull away from it mid-month and read as a second, disagreeing series.
+             The redesign curves every band unless it opts out (`smooth: false`):
+             its lines are all monotone, so a straight band is always the odd one. */
+          const edgePath = (pts, key, lead) => rd && a.smooth !== false
+            ? monotoneXY(pts.map((d) => [sx(d.x), sy(d[key])]), lead)
+            : a.smooth
             ? smoothPath(pts.map((d) => ({ x: d.x, y: d[key] })), sx, sy).replace(/^M/, lead)
             : pts.map((d, i) => `${i ? "L" : lead} ${sx(d.x).toFixed(2)} ${sy(d[key]).toFixed(2)}`).join(" ");
           const top = edgePath(a.points, "y1", "M");
@@ -1092,7 +1133,7 @@ function TrendChart(props) {
         <g clipPath={`url(#${clipId})`}>
           {series.map((s) => (s.wipe != null && s.wipe >= 1 ? null : (
             <path key={s.id} className="series-line"
-                  d={(s.smooth === false || (rd && s.curve !== "smooth") ? straightPath : smoothPath)(s.points, sx, sy)}
+                  d={(s.smooth === false ? straightPath : rd ? monotonePath : smoothPath)(s.points, sx, sy)}
                   fill="none" stroke={s.color}
                   strokeWidth={rd ? (s.rdWidth || Math.min(3, (s.width || 3.4) * 0.8)) : (s.width || 3.4)}
                   strokeDasharray={s.dash || (s.dashed ? "6 6" : "none")}
@@ -1391,4 +1432,4 @@ function TrendChart(props) {
   );
 }
 
-Object.assign(window, { TrendChart, makeScales, smoothPath, straightPath, VB });
+Object.assign(window, { TrendChart, makeScales, smoothPath, monotonePath, monotoneXY, straightPath, VB });

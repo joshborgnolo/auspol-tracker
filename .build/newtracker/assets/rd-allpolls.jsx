@@ -189,7 +189,7 @@ function RdApMini({ p, onM, pub, avgBy }) {
            aria-label={`${p.pollster}’s polls since ${rdMonthYear(ms[0])} against the monthly average; this poll ${valOf(p).toFixed(1)}.`}>
         {yt.map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === 50 ? "rd-apd-even" : "rd-apd-gl"}></path>)}
         {yt.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{v}</text>)}
-        {avg.length > 1 && <path d={"M" + avg.map((a) => `${X(a.t).toFixed(1)} ${Y(a.v).toFixed(1)}`).join("L")} className="rd-apd-avgline"></path>}
+        {avg.length > 1 && <path d={monotoneXY(avg.map((a) => [X(a.t), Y(a.v)]))} className="rd-apd-avgline"></path>}
         {avg.length > 0 && <text x={X(avg[0].t)} y={Y(avg[0].v) - 9} className="rd-apd-lab">Monthly average</text>}
         {mine.filter((q) => q.released !== p.released).map((q, i) => (
           <circle key={i} cx={X(rdApDays(q.released))} cy={Y(valOf(q))} r="4" className="rd-apd-dot"></circle>
@@ -1043,7 +1043,9 @@ function RdDisChart({ panel, pts, ms, yMax, first, W, H, phone, hover, setHover 
   const Y = (v) => bot - (Math.min(v, yMax) / yMax) * (bot - top);
   const have = pts.filter((d) => d.sigma != null && ms.includes(d.ym));
   if (!have.length) return <svg width={W} height={H}></svg>;
-  const area = `M${X(have[0].ym)} ${bot}` + have.map((d) => `L${X(d.ym).toFixed(1)} ${Y(d.floor).toFixed(1)}`).join("") + `L${X(have[have.length - 1].ym)} ${bot}Z`;
+  /* monthly lines are monotone curves here as on the engine's charts */
+  const floorXY = have.map((d) => [X(d.ym), Y(d.floor)]);
+  const area = `M${X(have[0].ym)} ${bot} ` + monotoneXY(floorXY, "L") + ` L${X(have[have.length - 1].ym)} ${bot}Z`;
   const e = have[have.length - 1];
   const yt = [];
   for (let v = 1; v <= yMax; v++) yt.push(v);
@@ -1067,8 +1069,8 @@ function RdDisChart({ panel, pts, ms, yMax, first, W, H, phone, hover, setHover 
       <path d={`M${x0} ${bot}H${x1}`} className="rd-dis-base"></path>
       {first && yt.concat([0]).map((v) => <text key={"t" + v} x={x0 - 5} y={Y(v) + 4} className="rd-dis-ax" textAnchor="end">{v}</text>)}
       <path d={area} className="rd-dis-floor"></path>
-      <path d={"M" + have.map((d) => `${X(d.ym).toFixed(1)} ${Y(d.floor).toFixed(1)}`).join("L")} className="rd-dis-floorline"></path>
-      <path d={"M" + have.map((d) => `${X(d.ym).toFixed(1)} ${Y(d.sigma).toFixed(1)}`).join("L")} className="rd-dis-line"
+      <path d={monotoneXY(floorXY)} className="rd-dis-floorline"></path>
+      <path d={monotoneXY(have.map((d) => [X(d.ym), Y(d.sigma)]))} className="rd-dis-line"
             style={{ stroke: panel.line, strokeDasharray: panel.dash ? "4 3" : null }}></path>
       <circle cx={X(e.ym)} cy={Y(e.sigma)} r="3.5" className="rd-dis-end" style={{ fill: panel.line }}></circle>
       {hv && <>
@@ -1253,7 +1255,7 @@ function RdHouseLean({ measure, tppBasis }) {
   const spark = (r) => {
     const pts = r.s.filter((d) => ms.includes(d.ym));
     if (!pts.length) return null;
-    const line = pts.map((d) => `${sx(d.ym).toFixed(1)} ${sy(d.v).toFixed(1)}`).join("L");
+    const line = monotoneXY(pts.map((d) => [sx(d.ym), sy(d.v)]), "");
     const e = pts[pts.length - 1];
     const hv = hover && hover.h === r.h ? pts.find((d) => d.ym === hover.ym) : null;
     const onMove = (ev) => {
@@ -1362,8 +1364,8 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
   const Y = (v) => zero - (v / 3.5) * (zero - top);
   const mo = (fd.months || []).filter((d) => ms.includes(d.ym));
   if (!mo.length) return null;
-  const band = "M" + mo.map((d) => `${X(d.ym).toFixed(1)} ${Y(Math.min(3.5, d.v + d.ci95)).toFixed(1)}`).join("L")
-    + "L" + mo.slice().reverse().map((d) => `${X(d.ym).toFixed(1)} ${Y(Math.max(-3.5, d.v - d.ci95)).toFixed(1)}`).join("L") + "Z";
+  const band = monotoneXY(mo.map((d) => [X(d.ym), Y(Math.min(3.5, d.v + d.ci95))]))
+    + " " + monotoneXY(mo.slice().reverse().map((d) => [X(d.ym), Y(Math.max(-3.5, d.v - d.ci95))]), "L") + " Z";
   const e = mo[mo.length - 1];
   const nw = fd.now || e;
   const nx = x1 + 22;
@@ -1393,8 +1395,8 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
           <circle key={h + i} cx={X(d.ym)} cy={Y(Math.max(-3.4, Math.min(3.4, d.v)))} r={pick === h ? 3.5 : 2.5}
                   className={"rd-fl-hdot" + (pick ? (pick === h ? " on" : " off") : "")}></circle>
         )))}
-        {pickS && pickS.length > 1 && <path d={"M" + pickS.map((d) => `${X(d.ym).toFixed(1)} ${Y(Math.max(-3.4, Math.min(3.4, d.v))).toFixed(1)}`).join("L")} className="rd-fl-pick"></path>}
-        <path d={"M" + mo.map((d) => `${X(d.ym).toFixed(1)} ${Y(d.v).toFixed(1)}`).join("L")} className="rd-fl-line"></path>
+        {pickS && pickS.length > 1 && <path d={monotoneXY(pickS.map((d) => [X(d.ym), Y(Math.max(-3.4, Math.min(3.4, d.v)))]))} className="rd-fl-pick"></path>}
+        <path d={monotoneXY(mo.map((d) => [X(d.ym), Y(d.v)]))} className="rd-fl-line"></path>
         <circle cx={X(e.ym)} cy={Y(e.v)} r="3" className="rd-fl-enddot"></circle>
         <path d={`M${nx} ${Y(Math.min(3.5, nw.v + nw.ci95))}V${Y(Math.max(-3.5, nw.v - nw.ci95))}`} className="rd-fl-nowwh"></path>
         <circle cx={nx} cy={Y(nw.v)} r="5" className="rd-fl-now"></circle>
