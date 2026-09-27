@@ -709,6 +709,9 @@ body.rd .rd-hb-seg {
 }
 body.rd .rd-hb-seg b { font-size: 15px; font-weight: 600; }
 body.rd .rd-hb-seg.end { justify-content: flex-end; }
+/* too narrow for its name: the number stays, the name moves to the row beneath.
+   Hidden but still laid out, so RdHeadBar can measure whether it would fit again */
+body.rd .rd-hb-seg.tight .rd-hb-name { position: absolute; visibility: hidden; }
 body.rd .rd-hb-neither { justify-content: center; background: var(--line-2); color: var(--ink-3); font-size: 12px; padding: 0 4px; }
 body.rd .rd-hb-cis { display: flex; gap: 2px; margin-top: 4px; font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-hb-cis > span { padding-left: 10px; flex-shrink: 1; min-width: 0; }

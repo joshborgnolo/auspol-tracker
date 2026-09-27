@@ -209,12 +209,41 @@ function RdHeadBar({ label, right, rightColor, segs, cis }) {
   /* "neither" is named only where it fits: a phone's tenth of the bar is
      narrower than the word, and the canvas left that one blank */
   const narrow = useNarrow("(max-width: 640px)");
+  /* a segment too narrow for its name and number keeps the number: on a
+     phone the three-way bar's smallest share is ~70px, a few short of
+     "Taylor 21.3", which ran into the edge. The name moves beneath the bar,
+     beside its ± where there is one. Measured against the segment's target
+     width, not its current one, so the flex-basis transition can't flicker it. */
+  const barRef = React.useRef(null);
+  const [tight, setTight] = useState("");
+  const key = segs.map((s) => s.name + s.v).join("|");
+  React.useLayoutEffect(() => {
+    const el = barRef.current;
+    if (!el) return;
+    const fit = () => {
+      const kids = [...el.children];
+      const W = el.clientWidth - 2 * (kids.length - 1);
+      const out = segs.filter((s, i) => {
+        const c = kids[i], cs = getComputedStyle(c);
+        const parts = [...c.children].map((k) => k.offsetWidth);
+        const need = parts.reduce((a, b) => a + b, 0) + 6 * (parts.length - 1) + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+        return need > W * s.v / 100;
+      }).map((s) => s.name).join("|");
+      setTight((prev) => (prev === out ? prev : out));
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [key]);
+  const isTight = (s) => tight.split("|").includes(s.name);
   return (
     <div className="rd-hb">
       <div className="rd-hb-top"><b>{label}</b><span style={{ color: rightColor ? inkOf(rightColor) : undefined }}>{right}</span></div>
-      <div className="rd-hb-bar">
+      <div className="rd-hb-bar" ref={barRef}>
         {segs.map((s, i) => (
-          <span key={s.name} className={"rd-hb-seg" + (i === segs.length - 1 && segs.length === 2 ? " end" : "")}
+          <span key={s.name} className={"rd-hb-seg" + (i === segs.length - 1 && segs.length === 2 ? " end" : "") + (isTight(s) ? " tight" : "")}
+                aria-label={s.name + " " + s.v.toFixed(1)}
                 style={{ flexBasis: s.v + "%", background: s.color, color: "var(--on-fill-" + s.party + ")", order: s.order != null ? s.order : i * 2 }}>
             <span className="rd-hb-name">{s.name}</span><b>{s.v.toFixed(1)}</b>
           </span>
@@ -226,7 +255,7 @@ function RdHeadBar({ label, right, rightColor, segs, cis }) {
       </div>
       {cis && (
         <div className="rd-hb-cis">
-          {segs.map((s) => <span key={s.name} style={{ flexBasis: s.v + "%" }}>{s.ci != null ? "±" + s.ci.toFixed(1) : ""}</span>)}
+          {segs.map((s) => <span key={s.name} style={{ flexBasis: s.v + "%" }}>{(isTight(s) ? s.name + " " : "") + (s.ci != null ? "±" + s.ci.toFixed(1) : "")}</span>)}
           {neither > 0.5 && <span style={{ flexBasis: neither + "%" }}></span>}
         </div>
       )}

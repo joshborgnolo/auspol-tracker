@@ -3557,6 +3557,7 @@ body.rd .rd-hb-seg {
 }
 body.rd .rd-hb-seg b { font-size: 15px; font-weight: 600; }
 body.rd .rd-hb-seg.end { justify-content: flex-end; }
+body.rd .rd-hb-seg.tight .rd-hb-name { position: absolute; visibility: hidden; }
 body.rd .rd-hb-neither { justify-content: center; background: var(--line-2); color: var(--ink-3); font-size: 12px; padding: 0 4px; }
 body.rd .rd-hb-cis { display: flex; gap: 2px; margin-top: 4px; font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-hb-cis > span { padding-left: 10px; flex-shrink: 1; min-width: 0; }
@@ -56709,6 +56710,30 @@ function RdHeadBar({
   const total = segs.reduce((s, x) => s + x.v, 0);
   const neither = Math.max(0, 100 - total);
   const narrow = useNarrow("(max-width: 640px)");
+  const barRef = React.useRef(null);
+  const [tight, setTight] = useState("");
+  const key = segs.map(s => s.name + s.v).join("|");
+  React.useLayoutEffect(() => {
+    const el = barRef.current;
+    if (!el) return;
+    const fit = () => {
+      const kids = [...el.children];
+      const W = el.clientWidth - 2 * (kids.length - 1);
+      const out = segs.filter((s, i) => {
+        const c = kids[i],
+          cs = getComputedStyle(c);
+        const parts = [...c.children].map(k => k.offsetWidth);
+        const need = parts.reduce((a, b) => a + b, 0) + 6 * (parts.length - 1) + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+        return need > W * s.v / 100;
+      }).map(s => s.name).join("|");
+      setTight(prev => prev === out ? prev : out);
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [key]);
+  const isTight = s => tight.split("|").includes(s.name);
   return React.createElement("div", {
     className: "rd-hb"
   }, React.createElement("div", {
@@ -56718,10 +56743,12 @@ function RdHeadBar({
       color: rightColor ? inkOf(rightColor) : undefined
     }
   }, right)), React.createElement("div", {
-    className: "rd-hb-bar"
+    className: "rd-hb-bar",
+    ref: barRef
   }, segs.map((s, i) => React.createElement("span", {
     key: s.name,
-    className: "rd-hb-seg" + (i === segs.length - 1 && segs.length === 2 ? " end" : ""),
+    className: "rd-hb-seg" + (i === segs.length - 1 && segs.length === 2 ? " end" : "") + (isTight(s) ? " tight" : ""),
+    "aria-label": s.name + " " + s.v.toFixed(1),
     style: {
       flexBasis: s.v + "%",
       background: s.color,
@@ -56743,7 +56770,7 @@ function RdHeadBar({
     style: {
       flexBasis: s.v + "%"
     }
-  }, s.ci != null ? "±" + s.ci.toFixed(1) : "")), neither > 0.5 && React.createElement("span", {
+  }, (isTight(s) ? s.name + " " : "") + (s.ci != null ? "±" + s.ci.toFixed(1) : ""))), neither > 0.5 && React.createElement("span", {
     style: {
       flexBasis: neither + "%"
     }
