@@ -42339,7 +42339,13 @@ function TrendChart(props) {
     const cx = sx(d.x),
       cy = sy(d.y),
       r = live && dot === d ? DOT_R_LIVE : DOT_R;
-    const common = {
+    const common = d.hollow ? {
+      className: "scatter-dot",
+      fill: "var(--chart-bg)",
+      stroke: d.color,
+      strokeWidth: PX(1.25),
+      opacity: (live && dot && dot !== d ? 0.35 : Math.min(1, DOT_OP * 1.7)) * (d.op != null ? d.op : 1)
+    } : {
       className: "scatter-dot",
       fill: d.color,
       opacity: (live && dot && dot !== d ? 0.25 : DOT_OP) * (d.op != null ? d.op : 1)
@@ -60077,7 +60083,7 @@ function RdUndecided({
       dots: s.polls.filter(d => d.x >= xDomain[0] && d.x <= xDomain[1])
     })).filter(d => d.pts.length >= 2);
     if (!drawn.length) return null;
-    const COL = s => s.id === "soft" ? "var(--ink-2)" : "var(--ink)";
+    const COL = s => s.id === "soft" ? "var(--ink-2)" : s.id === "tpp" ? "var(--ink-3)" : "var(--ink)";
     const outlier = key === "und" && first.latest && first.latest.v < lo + 2.5 ? first.polls.find(d => d.released === first.latest.released && d.pollster === first.latest.firm) : null;
     return React.createElement("div", {
       className: "card rd-card rd-un-panel",
@@ -60124,7 +60130,8 @@ function RdUndecided({
       scatter: drawn.flatMap(d => d.dots.map(q => ({
         x: q.x,
         y: q.v,
-        color: "var(--ink-3)",
+        color: COL(d.s),
+        hollow: d.s.id === "tpp",
         label: d.s.label,
         meta: q
       }))),
@@ -60145,7 +60152,7 @@ function RdUndecided({
       copy: {
         title: title,
         sub: meta,
-        caption: "Each dot is one poll; lines are monthly averages.",
+        caption: drawn.some(d => d.s.id === "tpp") ? "Each dot is one poll, open rings for after preferences; lines are monthly averages." : "Each dot is one poll; lines are monthly averages.",
         legend: drawn.map(d => ({
           label: (d.s.id === "soft" ? "Might still change" : d.s.label) + " " + nowOf(d.s).toFixed(1) + "%",
           color: COL(d.s),
@@ -60365,7 +60372,7 @@ function RdUndecided({
       const m = [slopeOf(first), slopeOf(soft)].filter(Boolean);
       return m.every(f => f.p >= 0.05 / m.length) ? "Steady since the election" : "Moving since the election";
     })(),
-    dek: "Each dot is one poll; lines are monthly averages. Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales."
+    dek: "Each dot is one poll, open rings for after preferences; lines are monthly averages. Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales."
   }), React.createElement("div", {
     className: "rd-un-panels"
   }, panel([first, tpp].filter(Boolean), 0, 10, 5, "und", "Undecided", "% of all voters"), soft && panel([soft], 0, 40, 10, "soft", "Not firm", "% of voters who named a party")), React.createElement(RdFoot, {

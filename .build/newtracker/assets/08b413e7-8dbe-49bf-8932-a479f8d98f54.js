@@ -809,8 +809,15 @@ function TrendChart(props) {
     const cx = sx(d.x), cy = sy(d.y), r = live && dot === d ? DOT_R_LIVE : DOT_R;
     /* no per-dot pointer listeners: both inputs pick from the svg root, so
        nothing here depends on a browser firing enter/leave on an SVG child */
-    const common = { className: "scatter-dot", fill: d.color,
-                     opacity: (live && dot && dot !== d ? 0.25 : DOT_OP) * (d.op != null ? d.op : 1) };
+    /* `hollow`: an open ring on the chart's ground rather than a disc, for
+       a cloud that must read apart from another in the same colour (the
+       Undecided panel's after-preference polls, whose line is dashed). A
+       ring is less ink than a disc, so it carries more of its own. */
+    const common = d.hollow
+      ? { className: "scatter-dot", fill: "var(--chart-bg)", stroke: d.color, strokeWidth: PX(1.25),
+          opacity: (live && dot && dot !== d ? 0.35 : Math.min(1, DOT_OP * 1.7)) * (d.op != null ? d.op : 1) }
+      : { className: "scatter-dot", fill: d.color,
+          opacity: (live && dot && dot !== d ? 0.25 : DOT_OP) * (d.op != null ? d.op : 1) };
     const p = dotPath(d.shape, cx, cy, r);
     return p ? <path key={"s" + i} d={p} {...common} />
              : <circle key={"s" + i} cx={cx} cy={cy} r={r} {...common} />;

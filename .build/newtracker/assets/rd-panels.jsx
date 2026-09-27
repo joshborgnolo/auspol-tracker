@@ -1818,7 +1818,11 @@ function RdUndecided({ rangeId }) {
     const drawn = list.map((s) => ({ s, pts: filterPts(s.monthly, xDomain[0]), dots: s.polls.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1]) }))
       .filter((d) => d.pts.length >= 2);
     if (!drawn.length) return null;
-    const COL = (s) => (s.id === "soft" ? "var(--ink-2)" : "var(--ink)");
+    /* the board's tones: first preference in ink, after preferences a
+       lighter grey (dashed), not firm between. Their polls wear the same
+       tones, and after preferences' as open rings - six Essential readings
+       carry that line, so they stay on show, but told apart */
+    const COL = (s) => (s.id === "soft" ? "var(--ink-2)" : s.id === "tpp" ? "var(--ink-3)" : "var(--ink)");
     const outlier = key === "und" && first.latest && first.latest.v < lo + 2.5 ? first.polls.find((d) => d.released === first.latest.released && d.pollster === first.latest.firm) : null;
     return (
       <div className="card rd-card rd-un-panel" key={key}>
@@ -1837,13 +1841,15 @@ function RdUndecided({ rangeId }) {
           xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline
           series={drawn.map((d) => ({ id: d.s.id, label: d.s.label, color: COL(d.s), rdWidth: 2, dashed: d.s.dashed, rdCap: 3.5, points: series(d.pts, "v") }))}
           spine={series(drawn[0].pts, "v")}
-          scatter={drawn.flatMap((d) => d.dots.map((q) => ({ x: q.x, y: q.v, color: "var(--ink-3)", label: d.s.label, meta: q })))} pollFacet="twopp"
+          scatter={drawn.flatMap((d) => d.dots.map((q) => ({ x: q.x, y: q.v, color: COL(d.s), hollow: d.s.id === "tpp", label: d.s.label, meta: q })))} pollFacet="twopp"
           notes={outlier ? [{ x: outlier.x, y: outlier.v, dy: -8, text: (+outlier.v.toFixed(1)) + "% · " + outlier.pollster + ", " + outlier.dateLabel, anchor: "end", size: 11 }] : []}
           tooltipTitle={(i) => { const p = drawn[0].pts[i]; return p ? monthLabelFull(p.ym) : ""; }}
           fmt={(v) => v.toFixed(1)}
           /* the readouts over the chart say which line is which; the copy
              leaves them behind, so its key says it, with the figures */
-          copy={{ title: title, sub: meta, caption: "Each dot is one poll; lines are monthly averages.",
+          copy={{ title: title, sub: meta, caption: drawn.some((d) => d.s.id === "tpp")
+                    ? "Each dot is one poll, open rings for after preferences; lines are monthly averages."
+                    : "Each dot is one poll; lines are monthly averages.",
                   legend: drawn.map((d) => ({ label: (d.s.id === "soft" ? "Might still change" : d.s.label) + " " + nowOf(d.s).toFixed(1) + "%",
                                               color: COL(d.s), kind: d.s.dashed ? "dashed" : "line" })) }} />
       </div>
@@ -1954,7 +1960,7 @@ function RdUndecided({ rangeId }) {
             <p className="rd-note">Approximate: combines {rdList(first.houses)}’s undecided share ({u.toFixed(1)}%) with {rdList(soft.houses)}’s firmness question ({Math.round(sf)}% of those who named a party). Pollsters ask these questions differently.</p>
           </div>
           <RdSub head={(() => { const m = [slopeOf(first), slopeOf(soft)].filter(Boolean); return m.every((f) => f.p >= 0.05 / m.length) ? "Steady since the election" : "Moving since the election"; })()}
-                 dek="Each dot is one poll; lines are monthly averages. Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales." />
+                 dek="Each dot is one poll, open rings for after preferences; lines are monthly averages. Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales." />
           <div className="rd-un-panels">
             {panel([first, tpp].filter(Boolean), 0, 10, 5, "und", "Undecided", "% of all voters")}
             {soft && panel([soft], 0, 40, 10, "soft", "Not firm", "% of voters who named a party")}
