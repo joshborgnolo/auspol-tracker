@@ -592,12 +592,17 @@ body.rd .rd-pl-item.stale .rd-pl-c-figs, body.rd .rd-pl-item.stale .rd-pl-c-next
 
 /* the release strip */
 body.rd .rd-tl { position: relative; height: 100%; min-height: 40px; }
-body.rd .rd-tl > span { position: absolute; top: 50%; }
+body.rd .rd-tl > span, body.rd .rd-tl > button { position: absolute; top: 50%; }
 body.rd .rd-tl-base { left: 0; right: 0; height: 1px; background: var(--line); }
 body.rd .rd-tl-grid { top: 0 !important; bottom: 0; width: 1px; background: var(--line-2); }
 body.rd .rd-tl-grid.today { width: 1.5px; background: var(--ink-2); z-index: 1; }
 body.rd .rd-tl-dot, body.rd .rd-tl-latest, body.rd .rd-tl-next, body.rd .rd-tl-later { border-radius: 50%; transform: translate(-50%, -50%); z-index: 2; }
 body.rd .rd-tl-dot { width: 6px; height: 6px; background: var(--ink-faint); }
+/* a 6px dot is too small to hit: the button's catchment is a 20px circle */
+body.rd .rd-tl-dotlink { border: 0; padding: 0; cursor: pointer; transition: background .15s, width .15s, height .15s; }
+body.rd .rd-tl-dotlink::before { content: ""; position: absolute; left: 50%; top: 50%; width: 20px; height: 20px; transform: translate(-50%, -50%); border-radius: 50%; }
+body.rd .rd-tl-dotlink:hover, body.rd .rd-tl-dotlink:focus-visible { background: var(--ink-2); width: 8px; height: 8px; }
+body.rd .rd-tl-dotlink:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 body.rd .rd-tl-latest { width: 11px; height: 11px; background: var(--ink); }
 body.rd .rd-tl-next { width: 13px; height: 13px; box-sizing: border-box; border: 2px solid var(--ink); background: var(--bg); z-index: 3; }
 body.rd .rd-tl-next.missed { border-color: var(--mood-neg); }

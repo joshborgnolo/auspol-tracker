@@ -276,6 +276,13 @@ function RdLeadership({ rangeId }) {
   D.LEADERS.forEach((x) => { L[x.id] = x; });
   const opp = L.taylor, han = L.hanson, pm = L.alb;
   const [ppmView, setPpmView] = useState("two");
+  /* two-way <-> three-way is the same people asked a differently shaped
+     question, so the chart reshapes rather than being replaced - the gesture
+     useMorph gives every such switch. "Both" keeps the lead chart in this slot
+     and adds the three-way below it, so reaching it from three-way is the
+     morph to two-way. */
+  const ppmSlot = (v) => (v === "three" ? "three" : "two");
+  const [ppmMorph, choosePpm] = window.AP.useMorph(ppmView, (v) => setPpmView(v), (from, to) => ppmSlot(from) !== ppmSlot(to));
   const [expanded, setExpanded] = useState(null);
   const [own, setOwn] = useState("net");
   const [rawMorph, chooseMetric] = window.AP.useMorph(own, (v) => setOwn(v), (from, to) => from !== "both" && to !== "both" && from !== to);
@@ -365,7 +372,7 @@ function RdLeadership({ rangeId }) {
      shares' bands stacked as if they were independent */
   const run = (k) => pts.filter((r) => r[k] != null).map((r) => ({ x: r.x, y: r[k], ym: r.ym, ci: r[k + "Ci"] }));
   const bandsOf = (series) => series.map((s) => ({
-    id: "ci-" + s.id, color: s.color, className: "ci-band", edge: false,
+    id: "ci-" + s.id, color: s.color, className: "ci-band", edge: false, clipX: s.clipX,
     points: s.points.filter((p) => p.ci != null).map((p) => ({ x: p.x, y0: p.y - p.ci, y1: p.y + p.ci })),
   })).filter((a) => a.points.length >= 2);
   const ciRows = (series, i, spine) => {
@@ -389,7 +396,7 @@ function RdLeadership({ rangeId }) {
       if (!c || c.alb == null) return null;
       const o = mode === "ah" ? "hanson" : c.taylor != null ? "taylor" : c.ley != null ? "ley" : null;
       if (!o || c[o] == null) return null;
-      return { x: q.x, y: c.alb - c[o], color: o === "hanson" ? han.color : opp.color,
+      return { x: q.x, y: c.alb - c[o], color: o === "hanson" ? han.color : opp.color, who: o,
                label: "Albanese over " + (o === "hanson" ? "Hanson" : o === "ley" ? "Ley" : opp.short), meta: q };
     })).filter(Boolean);
   const bandVals = (series) => series.flatMap((s) => s.points.flatMap((p) => (p.ci != null ? [p.y - p.ci, p.y + p.ci] : [p.y])));
@@ -402,10 +409,10 @@ function RdLeadership({ rangeId }) {
   })() : [];
   const threeSeries = (() => {
     return [
-      { id: "alb3", label: pm.short, color: pm.color, points: run("alb_pref3"), rdWidth: 2.5, endLabel: pm.short },
-      { id: "han3", label: han.short, color: han.color, points: run("hanson_pref3"), rdWidth: 2.5, endLabel: han.short },
-      { id: "ley3", label: "Ley", color: opp.color, points: run("ley_pref3"), rdWidth: 2.5, endCap: true },
-      { id: "tay3", label: opp.short, color: opp.color, points: run("taylor_pref3"), rdWidth: 2.5, endLabel: opp.short },
+      { id: "alb", label: pm.short, color: pm.color, points: run("alb_pref3"), rdWidth: 2.5, endLabel: pm.short },
+      { id: "hanson", label: han.short, color: han.color, points: run("hanson_pref3"), rdWidth: 2.5, endLabel: han.short },
+      { id: "ley", label: "Ley", color: opp.color, points: run("ley_pref3"), rdWidth: 2.5, endCap: true },
+      { id: "taylor", label: opp.short, color: opp.color, points: run("taylor_pref3"), rdWidth: 2.5, endLabel: opp.short },
     ].filter((s) => s.points.length);
   })();
   const firstThree = threeSeries.length ? Math.min(...threeSeries.map((s) => s.points[0].x)) : null;
@@ -418,10 +425,10 @@ function RdLeadership({ rangeId }) {
       const oppK = c.taylor != null ? "taylor" : c.ley != null ? "ley" : null;
       return [["alb", pm.color, pm.short], [oppK, opp.color, oppK === "ley" ? "Ley" : opp.short], ["hanson", han.color, han.short]]
         .filter(([k]) => k && c[k] != null)
-        .map(([k, color, label]) => ({ x: q.x, y: c[k], color, label, meta: q }));
+        .map(([k, color, label]) => ({ x: q.x, y: c[k], color, label, meta: q, who: k }));
     });
   const threeTop = Math.max(40, Math.ceil(Math.max(...bandVals(threeSeries), ...threeDots.map((d) => d.y), 0) / 10) * 10);
-  const leyRun = threeSeries.find((s) => s.id === "ley3");
+  const leyRun = threeSeries.find((s) => s.id === "ley");
   const threeNotes = [
     firstThree != null && firstThree - xDomain[0] > 0.2 ? { x: "left", y: threeTop * 0.62, text: "Three-way questions began in " + (() => { const r = LM.find((m) => m.alb_pref3 != null); return r ? rdMonthYear(r.ym) : ""; })(), cls: "rd-note-it" } : null,
     leyRun && leyRun.points.length ? { x: leyRun.points[leyRun.points.length - 1].x, y: leyRun.points[leyRun.points.length - 1].y, dy: 18, text: "Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 } : null,
@@ -438,19 +445,62 @@ function RdLeadership({ rangeId }) {
                   fmt={(v) => v.toFixed(1)} {...props} />
     </div>
   );
-  const leadChart = lchart("rd-lead", pm.short + "’s lead" + (ppmView === "both" ? " head to head" : "") + ", month by month", {
-    yDomain: leadFit.domain, yTicks: rdYTicks(leadFit.domain[0], leadFit.domain[1], 10).filter((v) => v >= 0 || v === leadFit.domain[0]),
-    yTickFmt: (v) => (v === 0 ? "Tied" : v > 0 ? "+" + v : "−" + Math.abs(v)),
-    refLines: [{ y: 0, color: "var(--ink-3)" }], series: leadSeries, areas: bandsOf(leadSeries), scatter: leadDots, notes: leadNotes, pollFacet: "leadership",
+  /* The two views as data, so the one chart can be either or on its way
+     between them. Series ids are shared across the views - a line is matched
+     by the rival whose colour it is: Albanese's lead over Taylor reshapes into
+     Taylor's three-way share, and over Hanson into Hanson's. Albanese's own
+     three-way line has no head-to-head counterpart, so it is drawn in (and
+     rubbed out on the way back) rather than travelling. */
+  const ppmModel = (v) => v === "three" ? {
+    title: "Share in the three-way question, month by month", series: threeSeries, dots: threeDots,
+    domain: [0, threeTop], yTicks: rdYTicks(0, threeTop, 10), yTickFmt: (y) => (y === 0 ? "0" : y % 20 === 0 ? y + "%" : ""),
+    refLines: [], notes: threeNotes, spine: (threeSeries[0] || { points: [] }).points,
+  } : {
+    title: pm.short + "’s lead" + (ppmView === "both" ? " head to head" : "") + ", month by month", series: leadSeries, dots: leadDots,
+    domain: leadFit.domain, yTicks: rdYTicks(leadFit.domain[0], leadFit.domain[1], 10).filter((y) => y >= 0 || y === leadFit.domain[0]),
+    yTickFmt: (y) => (y === 0 ? "Tied" : y > 0 ? "+" + y : "−" + Math.abs(y)),
+    refLines: [{ y: 0, color: "var(--ink-3)" }], notes: leadNotes,
     spine: (leadSeries.find((s) => s.id === "taylor") || leadSeries[0] || { points: [] }).points,
-    extraRows: (i) => ciRows(leadSeries, i, (leadSeries.find((s) => s.id === "taylor") || leadSeries[0] || { points: [] }).points),
-  });
-  const threeChart = lchart("rd-three", "Share in the three-way question, month by month", {
-    yDomain: [0, threeTop], yTicks: rdYTicks(0, threeTop, 10), yTickFmt: (v) => (v === 0 ? "0" : v % 20 === 0 ? v + "%" : ""),
-    series: threeSeries, areas: bandsOf(threeSeries), scatter: threeDots, notes: threeNotes, pollFacet: "leadership",
-    spine: (threeSeries[0] || { points: [] }).points,
-    extraRows: (i) => ciRows(threeSeries, i, (threeSeries[0] || { points: [] }).points),
-  });
+  };
+  /* The engine widens the right margin to the longest end label showing, so
+     each view would get its own plot width and the switch would jolt it.
+     One margin for the widest label either view prints (the engine's own
+     measure of a label), and the plot keeps its width through the morph. */
+  const ppmPad = (() => {
+    const room = (t) => [...t].reduce((n, c) => n + (c >= "0" && c <= "9" ? 0.55 : c === " " ? 0.3 : 0.72), 0) * 13 * 0.95 + 12;
+    const labs = leadSeries.concat(threeSeries).map((x) => x.endLabel).filter(Boolean);
+    return { ...chartPad, r: Math.max(chartPad.r, ...labs.map(room)) };
+  })();
+  const ppmChart = (key, v, m) => {
+    const B = ppmModel(m ? ppmSlot(m.to) : v);
+    let series = B.series, cross = null, dom = B.domain;
+    if (m) {
+      const A = ppmModel(ppmSlot(m.from)), t = m.t;
+      const byId = (list) => { const o = {}; list.forEach((x) => (o[x.id] = x)); return o; };
+      const a = byId(A.series), b = byId(B.series);
+      series = [...new Set(A.series.concat(B.series).map((x) => x.id))].map((id) => {
+        if (a[id] && b[id]) {
+          const bl = window.AP.blendRows(a[id].points, b[id].points, t, ["y", "ci"]);
+          const own = t < 0.5 ? a[id] : b[id];
+          // the name fades out and the other view's fades in, crossing at halfway
+          return { ...own, points: bl ? bl.rows : own.points, clipX: bl ? bl.clip : null, endCap: false, endLabelOpacity: Math.abs(1 - 2 * t) };
+        }
+        return { ...(a[id] || b[id]), wipe: a[id] ? t : 1 - t, endCap: false, endLabelOpacity: a[id] ? 1 - t : t };
+      });
+      cross = window.AP.crossClouds(A.dots, B.dots, t, (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.who);
+      dom = window.AP.blendDomain(A.domain, B.domain, t);
+    }
+    return lchart(key, B.title, {
+      padPx: ppmPad, yDomain: dom, yTicks: B.yTicks, yTickFmt: B.yTickFmt, refLines: B.refLines,
+      series, areas: bandsOf(series.filter((x) => x.wipe == null)), notes: m ? [] : B.notes,
+      scatter: cross ? cross.scatter : B.dots, scatterOut: cross ? cross.scatterOut : [], scatterMove: cross ? cross.scatterMove : [],
+      fade: m ? m.t : 1, pollFacet: "leadership", spine: B.spine,
+      extraRows: (i) => ciRows(B.series, i, B.spine),
+    });
+  };
+  // one persistent slot, so the chart morphs in place rather than remounting
+  const mainPpmChart = ppmChart("rd-ppm", ppmSlot(ppmView), ppmMorph);
+  const threeChart = ppmChart("rd-three", "three", null);
 
   /* ---- net approval and favourability ------------------------------------ */
   const leaders = RD_LEAD_ORDER.map((id) => L[id]).filter(Boolean);
@@ -599,7 +649,7 @@ function RdLeadership({ rangeId }) {
       {story && <RdHed head={story.head} dek={story.dek} />}
       <div className={"rd-ld-grid" + (expanded ? " one" : "")}>
         {panel("ppm", "Preferred prime minister", "“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.",
-          <RdTabs value={ppmView} onChange={setPpmView} ariaLabel="Preferred prime minister question"
+          <RdTabs value={ppmView} onChange={choosePpm} ariaLabel="Preferred prime minister question"
                   options={[{ id: "two", label: "Two-way" }, { id: "three", label: "Three-way" }, { id: "both", label: "Both" }]}>
             {!narrow && expandBtn("ppm", "preferred prime minister")}
           </RdTabs>,
@@ -610,8 +660,8 @@ function RdLeadership({ rangeId }) {
               {ppmView !== "two" && threeBar}
             </div>
             {ppmNote && <p className="rd-note rd-ld-note">{ppmNote}</p>}
-            {ppmView !== "three" && leadChart}
-            {ppmView !== "two" && threeChart}
+            {mainPpmChart}
+            {ppmView === "both" && threeChart}
             <RdKey className="rd-ckey" items={[]}>
               <span className="rd-ld-keytxt">{ppmView === "three" ? "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Shares of all respondents. Pollsters leave different shares undecided, so read the order and the gaps rather than the levels."
                 : ppmView === "two" ? "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Lead is " + pm.short + "’s share minus his opponent’s, which lets one chart carry both head-to-head contests."
@@ -1229,7 +1279,12 @@ function RdIssues({ rangeId = "all" }) {
   const narrow = useNarrow("(max-width: 760px)");
   const I = D.issues;
   const [view, setView] = useState("trust");
-  const [selId, setSel] = useState(null);
+  const [selId, setSelId] = useState(null);
+  /* picking another issue asks the same three parties a different question,
+     so the chart reshapes into it (useMorph) rather than being swapped out.
+     Called before the early return below: a hook can't sit after one. */
+  const selNow = selId || (I && I.list && I.list[0] ? I.list[0].id : null);
+  const [issMorph, setSel] = window.AP.useMorph(selNow, (v) => setSelId(v), (a, b) => a !== b);
   const [gsetId, setGset] = useState("vote");
   /* What matters to whom: a tablet or phone shows one issue at a time, as the
      canvas's phone board did, with the reader's pick kept across group sets.
@@ -1268,6 +1323,28 @@ function RdIssues({ rangeId = "all" }) {
     return { xDomain, pts, dots, scatter, areas, domain: [d0, d1], trend: rdIssTrend(D, x, dots) };
   };
   const ch = chartFor(it);
+  /* mid-switch: both issues' months on one grid, interpolated, with the x
+     window, the y range and the bands travelling too, and the dots of a poll
+     that asked about both issues crossing over */
+  const chDraw = (() => {
+    if (!ch) return null;
+    const draw = { xDomain: ch.xDomain, domain: ch.domain, pts: ch.pts, areas: ch.areas, scatter: ch.scatter, scatterOut: [], scatterMove: [], fade: 1, clip: null };
+    const m = issMorph;
+    const a = m && list.find((x) => x.id === m.from), A = a && chartFor(a);
+    if (!m || !A) return draw;
+    const t = m.t;
+    const bl = window.AP.blendRows(A.pts, ch.pts, t, P.concat(P.map((q) => "ci_" + q)));
+    if (!bl) return draw;
+    const keyOf = (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.label;
+    const cross = window.AP.crossClouds(A.scatter, ch.scatter, t, keyOf);
+    return {
+      xDomain: window.AP.blendDomain(A.xDomain, ch.xDomain, t), domain: window.AP.blendDomain(A.domain, ch.domain, t),
+      pts: bl.rows, clip: bl.clip,
+      areas: P.map((q) => ({ id: "ci-" + q, color: pColor(q), className: "ci-band", edge: false, clipX: bl.clip,
+        points: bl.rows.filter((d) => d["ci_" + q] != null && d[q] != null).map((d) => ({ x: d.x, y0: d[q] - d["ci_" + q], y1: d[q] + d["ci_" + q] })) })).filter((x) => x.points.length >= 2),
+      scatter: cross.scatter, scatterOut: cross.scatterOut, scatterMove: cross.scatterMove, fade: t,
+    };
+  })();
   const chTop = it === top ? ch : chartFor(top);
   const since = (tr) => tr ? D.monthNameFull(+tr.ym.slice(5)) + (Number(tr.ym.slice(0, 4)) === new Date(Date.parse(D.latest.updatedISO)).getUTCFullYear() ? "" : " " + tr.ym.slice(0, 4)) : "";
   const trendHead = (x, c) => {
@@ -1449,11 +1526,13 @@ function RdIssues({ rangeId = "all" }) {
                 <div className="rd-is-ctop"><span>{it.label}</span></div>
                 {trendHead(it, ch) && <h4 className="rd-is-chead">{trendHead(it, ch)}</h4>}
                 <p className="rd-is-csub">Who voters think is best, month by month · % of those naming Labor, the Coalition or One Nation</p>
-                <TrendChart key={"rd-is-" + it.id} heightPx={narrow ? 240 : 260} padPx={{ l: 36, r: 10, t: 12, b: 28 }}
-                  xDomain={ch.xDomain} yDomain={ch.domain} yTicks={rdYTicks(ch.domain[0], ch.domain[1], 10)}
+                <TrendChart key="rd-is-chart" heightPx={narrow ? 240 : 260} padPx={{ l: 36, r: 10, t: 12, b: 28 }}
+                  xDomain={chDraw.xDomain} yDomain={chDraw.domain} yTicks={rdYTicks(ch.domain[0], ch.domain[1], 10)}
                   yTickFmt={(v) => (v === ch.domain[1] ? v + "%" : String(v))} xTicks={rdXTicks(ch.xDomain[0], ch.xDomain[1], true)} baseline
-                  series={P.map((q) => ({ id: q, label: pName(q), color: pColor(q), rdWidth: 2.2, endCap: false, points: series(ch.pts, q), endLabel: ISS_PARTY_CAP[q] }))}
-                  areas={ch.areas} spine={series(ch.pts, P[0])} scatter={ch.scatter} pollFacet="primary"
+                  series={P.map((q) => ({ id: q, label: pName(q), color: pColor(q), rdWidth: 2.2, endCap: false, clipX: chDraw.clip,
+                    points: chDraw.pts.filter((d) => d[q] != null).map((d) => ({ x: d.x, y: d[q] })), endLabel: ISS_PARTY_CAP[q] }))}
+                  areas={chDraw.areas} spine={series(ch.pts, P[0])} scatter={chDraw.scatter} scatterOut={chDraw.scatterOut}
+                  scatterMove={chDraw.scatterMove} fade={chDraw.fade} pollFacet="primary"
                   tooltipTitle={(i) => (ch.pts[i] ? monthLabelFull(ch.pts[i].ym) : "")} fmt={(v) => Math.round(v) + ""}
                   copy={{ title: it.label + ": who voters think is best", sub: "Of those naming Labor, the Coalition or One Nation" }} />
                 <RdKey className="rd-ckey" items={[{ kind: "dot", color: "var(--ink-3)", label: "One poll" }, { kind: "lineband", color: "var(--ink-3)", label: "Monthly average and 95% interval" }]} />

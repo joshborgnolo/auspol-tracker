@@ -212,16 +212,29 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     recent.forEach((x) => {
       const ms = Date.parse((x.pub || x.field).slice(0, 10));
       if (Math.abs(ms - e.pubMs) < DAY_MS / 2) return;
-      if (ms >= L && ms <= R) marks.push(<span key={"e" + ms} className="rd-tl-dot" style={{ left: pos(ms) + "%" }}></span>);
+      if (ms < L || ms > R) return;
+      /* an earlier release opens its own row in All polls; the row's poll
+         is the dark dot and needs no link - the row already is it */
+      const key = window.AP.pollRowKey && window.AP.pollRowKey({ pollster: e.poll.pollster, released: x.field });
+      /* openPoll is asked for at the click, not here: the app registers it
+         in an effect, after this table's first render */
+      if (!key) {
+        marks.push(<span key={"e" + ms} className="rd-tl-dot" style={{ left: pos(ms) + "%" }} aria-hidden="true"></span>);
+        return;
+      }
+      const lab = e.poll.pollster + "’s poll of " + dm(ms) + ": open in All polls";
+      marks.push(<button key={"e" + ms} type="button" className="rd-tl-dot rd-tl-dotlink" style={{ left: pos(ms) + "%" }}
+                         title={lab} aria-label={lab}
+                         onClick={(ev) => { ev.stopPropagation(); if (window.AP.openPoll) window.AP.openPoll(key, facet, "latest and next polls"); }}></button>);
     });
     if (e.pubMs >= L) marks.push(<span key="latest" className="rd-tl-latest" style={{ left: pos(e.pubMs) + "%" }}></span>);
-    else marks.push(<span key="latest" className="rd-tl-off rd-tl-offl"><span className="rd-tl-dot"></span>{dm(e.pubMs)}</span>);
+    else marks.push(<span key="latest" className="rd-tl-off rd-tl-offl" aria-hidden="true"><span className="rd-tl-dot"></span>{dm(e.pubMs)}</span>);
     if (r) {
       if (r.loose && !irregular(r)) {
         const a = Math.max(L, r.release - r.spread * DAY_MS), b = Math.min(R, r.release + r.spread * DAY_MS);
         marks.push(<span key="win" className="rd-tl-win" style={{ left: pos(a) + "%", width: (pos(b) - pos(a)) + "%" }}></span>);
       } else if (r.release > R) {
-        marks.push(<span key="next" className="rd-tl-off rd-tl-offr">{D.monthName(new Date(r.release).getUTCMonth() + 1)}<span className="rd-tl-ring"></span></span>);
+        marks.push(<span key="next" className="rd-tl-off rd-tl-offr" aria-hidden="true">{D.monthName(new Date(r.release).getUTCMonth() + 1)}<span className="rd-tl-ring"></span></span>);
       } else {
         const alt = altOf(r);
         if (alt && alt <= R) marks.push(<span key="alt" className="rd-tl-alt" style={{ left: pos(Math.min(r.release, alt)) + "%", width: Math.abs(pos(alt) - pos(r.release)) + "%" }}></span>);
@@ -232,7 +245,9 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
         marks.push(<span key={"l" + x.release} className="rd-tl-later" style={{ left: pos(x.release) + "%" }}></span>));
     }
     return (
-      <div className="rd-tl" aria-hidden="true">
+      /* not hidden whole: the earlier-release dots are links. Every other
+         mark is empty or hidden itself, so they are all a reader meets */
+      <div className="rd-tl">
         <span className="rd-tl-base"></span>
         {ticks.map((t) => <span key={t.label} className={"rd-tl-grid" + (t.today ? " today" : "")} style={{ left: t.x + "%" }}></span>)}
         {marks}
