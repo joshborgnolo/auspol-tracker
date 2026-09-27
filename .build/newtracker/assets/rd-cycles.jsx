@@ -44,6 +44,16 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
   const series = built.map((s) => {
     if (s.id === "cyc-band-mean") return { ...s, label: "Past-term average", dash: "4 3", rdWidth: 1.5, endLabel: "Average", endLabelOpacity: 1 };
     if (s.current) return { ...s, rdWidth: 3, rdCap: 4, endLabel: null };
+    /* The "this term" overlays (One Nation's primary vote, Hanson's rating)
+       are the old design's thin dotted and dashed lines. At the redesign's
+       weights they drew as specks, and a half-width chart drops end labels,
+       so ticking the box seemed to do nothing - on the chart where One
+       Nation now polls above the opposition it overlays. Here each is a
+       plain 2px line in its own colour, curved like every other line, and
+       named at its end by a note (overlayNotes, below). */
+    if (s.id === "cyc-onp" || s.id === "cyc-han")
+      return { ...s, smooth: undefined, dash: null, dashed: false, rdWidth: 2, endLabel: null,
+               opacity: s.opacity != null && s.opacity < 0.5 ? s.opacity : 1 };
     if (s.endLabel && s.label) return { ...s, rdWidth: s.width >= 3 ? 2.2 : 1.4, endLabel: half ? null : s.label.replace(" · ", " ") };
     return s;
   });
@@ -80,6 +90,18 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
     notes.push({ x: nowM, y: curVal, dx: 10, dy: dys[0], text: subj + " " + fmt(curVal), color: inkOf(subjColor), weight: 600, size: 12.5 });
     notes.push({ x: nowM, y: curVal, dx: 10, dy: dys[1], text: Math.abs(d).toFixed(1) + (d >= 0 ? " above" : " below") + " average", size: 12.5 });
   }
+  /* an overlay's name and figure at its end, on whichever side keeps it
+     15px clear of the sitting term's two lines of words */
+  const plotH = (narrow ? 260 : half ? 290 : 330) - 80;
+  const pxOf = (v) => ((v - domain[0]) / (domain[1] - domain[0])) * plotH;
+  series.filter((s) => (s.id === "cyc-onp" || s.id === "cyc-han") && s.points.length && !(s.opacity < 0.5)).forEach((s) => {
+    const last = s.points[s.points.length - 1];
+    const taken = peer && curVal != null ? notes.slice(0, 2).map((n) => pxOf(last.y) - pxOf(curVal) + n.dy) : [];
+    // candidate baselines, nearest the line's end first; y grows downward in dy
+    const dy = [4, -8, 16, -20, 28, -32, 40].find((c) => taken.every((t) => Math.abs(c - t) >= 15)) ?? 4;
+    notes.push({ x: last.x, y: last.y, dx: 10, dy, text: (s.id === "cyc-onp" ? "One Nation " : "Hanson ") + fmt(last.y),
+                 color: inkOf(s.color), weight: 600, size: 12.5 });
+  });
   if (!chg && M.key === "tpp") {
     notes.push({ x: "left", y: 50, dy: -6, text: "▲ Government ahead", size: 11.5 });
     notes.push({ x: "left", y: 50, dy: 15, text: "▼ Opposition ahead", size: 11.5 });

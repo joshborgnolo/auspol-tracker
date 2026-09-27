@@ -61489,6 +61489,15 @@ function RdCycleChart({
       rdCap: 4,
       endLabel: null
     };
+    if (s.id === "cyc-onp" || s.id === "cyc-han") return {
+      ...s,
+      smooth: undefined,
+      dash: null,
+      dashed: false,
+      rdWidth: 2,
+      endLabel: null,
+      opacity: s.opacity != null && s.opacity < 0.5 ? s.opacity : 1
+    };
     if (s.endLabel && s.label) return {
       ...s,
       rdWidth: s.width >= 3 ? 2.2 : 1.4,
@@ -61551,6 +61560,23 @@ function RdCycleChart({
       size: 12.5
     });
   }
+  const plotH = (narrow ? 260 : half ? 290 : 330) - 80;
+  const pxOf = v => (v - domain[0]) / (domain[1] - domain[0]) * plotH;
+  series.filter(s => (s.id === "cyc-onp" || s.id === "cyc-han") && s.points.length && !(s.opacity < 0.5)).forEach(s => {
+    const last = s.points[s.points.length - 1];
+    const taken = peer && curVal != null ? notes.slice(0, 2).map(n => pxOf(last.y) - pxOf(curVal) + n.dy) : [];
+    const dy = [4, -8, 16, -20, 28, -32, 40].find(c => taken.every(t => Math.abs(c - t) >= 15)) ?? 4;
+    notes.push({
+      x: last.x,
+      y: last.y,
+      dx: 10,
+      dy,
+      text: (s.id === "cyc-onp" ? "One Nation " : "Hanson ") + fmt(last.y),
+      color: inkOf(s.color),
+      weight: 600,
+      size: 12.5
+    });
+  });
   if (!chg && M.key === "tpp") {
     notes.push({
       x: "left",
