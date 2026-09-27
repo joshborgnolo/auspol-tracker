@@ -36,6 +36,18 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const [tl, setTl] = useState(null);
   const tlBox = React.useRef(null);
   const tlPtr = React.useRef(null);
+  /* the readout centres on its dot, so a dot near the page's edge would put
+     half of it off screen: once it is laid out, it is nudged back inside the
+     viewport (8px clear), the nudge measured from its centred place */
+  const tlTipRef = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = tlTipRef.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect(), vw = document.documentElement.clientWidth, M = 8;
+    const dx = r.left < M ? M - r.left : r.right > vw - M ? vw - M - r.right : 0;
+    el.style.marginLeft = dx + "px";
+  }, [tl && tl.id]);
   // a readout a finger raised stays up until the next tap somewhere else
   window.useDismissOutside(tlBox, !!(tl && tl.src === "touch"), () => setTl(null));
   const measure = window.AP.measureOfMatchup(tppMatchup);
@@ -219,7 +231,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     if (!q) return null;
     const pr = rdPollRow(q);
     return (
-      <div className="tip tip-dot rd-tl-tip" style={{ left: t.left + "%", top: "50%" }} aria-hidden="true">
+      <div ref={tlTipRef} className="tip tip-dot rd-tl-tip" style={{ left: t.left + "%", top: "50%" }} aria-hidden="true">
         <div className="tip-title">{q.pollster}</div>
         <div className="rd-tl-tipdate">Fieldwork {pr.field} · published {pr.publishedLabel}</div>
         {figCell({ poll: pr })}

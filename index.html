@@ -3462,6 +3462,8 @@ body.rd .rd-tl-tip { z-index: 30; white-space: nowrap; text-align: left;
   background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; }
 body.rd .rd-tl-tipdate { font-size: 11px; color: var(--ink-3); margin: -3px 0 6px; }
 body.rd .rd-tl-tip .rd-pl-main { font-size: 14px; }
+body.rd .rd-tl-tip .rd-pl-sub .rd-pl-tag, body.rd .rd-tl-tip .rd-pl-short { display: none; }
+body.rd .rd-tl-tip .rd-pl-long { display: inline; }
 body.rd .rd-tl-dotlink:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 body.rd .rd-tl-latest { width: 11px; height: 11px; background: var(--ink); }
 body.rd .rd-tl-next { width: 13px; height: 13px; box-sizing: border-box; border: 2px solid var(--ink); background: var(--bg); z-index: 3; }
@@ -60357,6 +60359,17 @@ function RdPolls({
   const [tl, setTl] = useState(null);
   const tlBox = React.useRef(null);
   const tlPtr = React.useRef(null);
+  const tlTipRef = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = tlTipRef.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect(),
+      vw = document.documentElement.clientWidth,
+      M = 8;
+    const dx = r.left < M ? M - r.left : r.right > vw - M ? vw - M - r.right : 0;
+    el.style.marginLeft = dx + "px";
+  }, [tl && tl.id]);
   window.useDismissOutside(tlBox, !!(tl && tl.src === "touch"), () => setTl(null));
   const measure = window.AP.measureOfMatchup(tppMatchup);
   const basis = tppBasis || "imp";
@@ -60624,6 +60637,7 @@ function RdPolls({
     if (!q) return null;
     const pr = rdPollRow(q);
     return React.createElement("div", {
+      ref: tlTipRef,
       className: "tip tip-dot rd-tl-tip",
       style: {
         left: t.left + "%",
