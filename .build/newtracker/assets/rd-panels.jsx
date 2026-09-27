@@ -255,8 +255,11 @@ function RdHeadBar({ label, right, rightColor, segs, cis }) {
       </div>
       {cis && (
         <div className="rd-hb-cis">
-          {segs.map((s) => <span key={s.name} style={{ flexBasis: s.v + "%" }}>{(isTight(s) ? s.name + " " : "") + (s.ci != null ? "±" + s.ci.toFixed(1) : "")}</span>)}
-          {neither > 0.5 && <span style={{ flexBasis: neither + "%" }}></span>}
+          {/* ordered as the bar is, so a two-way's ± sits under its own
+              leader either side of "neither" */}
+          {segs.map((s, i) => <span key={s.name} className={i === segs.length - 1 && segs.length === 2 ? "end" : undefined}
+            style={{ flexBasis: s.v + "%", order: s.order != null ? s.order : i * 2 }}>{(isTight(s) ? s.name + " " : "") + (s.ci != null ? "±" + s.ci.toFixed(1) : "")}</span>)}
+          {neither > 0.5 && <span style={{ flexBasis: neither + "%", order: segs.length === 2 ? 1 : 99 }}></span>}
         </div>
       )}
     </div>
@@ -318,7 +321,7 @@ function RdLeadership({ rangeId }) {
   const leadOf = (segs) => { const w = segs[0].v >= segs[1].v ? segs[0] : segs[1]; return { who: w, m: Math.abs(segs[0].v - segs[1].v) }; };
   const headBar = (h) => {
     const l = leadOf(h.segs);
-    return <RdHeadBar key={h.label} label={h.label} right={l.who.name + " +" + l.m.toFixed(1)} rightColor={l.who.color} segs={h.segs} />;
+    return <RdHeadBar key={h.label} label={h.label} right={l.who.name + " +" + l.m.toFixed(1)} rightColor={l.who.color} segs={h.segs} cis />;
   };
   const threeBar = three && (
     <RdHeadBar key="three" label="All three" right={three[0].name + " +" + (three[0].v - three[1].v).toFixed(1) + " on " + three[1].name}
@@ -357,16 +360,27 @@ function RdLeadership({ rangeId }) {
   const pts = filterPts(LM, xDomain[0]);
   const handover = (D.events || []).find((e) => e.date === "2026-02-12");
   const evs = handover ? [{ ...handover, short: "Ley → Taylor" }] : [];
-  const leadSeries = (() => {
-    const run = (ka, kb) => pts.filter((r) => r[ka] != null && r[kb] != null).map((r) => ({ x: r.x, y: +(r[ka] - r[kb]).toFixed(1), ym: r.ym }));
-    return [
-      { id: "ley", label: "over Ley", color: opp.color, points: run("alb_pref", "ley_pref"), rdWidth: 2.5, endCap: false },
-      /* the lines are named at their ends on a phone too, as the canvas drew
-         them: no key under the chart names them */
-      { id: "taylor", label: "over " + opp.short, color: opp.color, points: run("alb_pref", "taylor_pref"), rdWidth: 2.5, endLabel: "over " + opp.short },
-      { id: "hanson", label: "over " + han.short, color: han.color, points: run("alb_prefH", "hanson_prefH"), rdWidth: 2.5, endLabel: "over " + han.short },
-    ].filter((s) => s.points.length);
-  })();
+  /* each month's lead is its polls' own margins averaged (gen-data's
+     lead_*), so its 95% band carries a margin's variance rather than two
+     shares' bands stacked as if they were independent */
+  const run = (k) => pts.filter((r) => r[k] != null).map((r) => ({ x: r.x, y: r[k], ym: r.ym, ci: r[k + "Ci"] }));
+  const bandsOf = (series) => series.map((s) => ({
+    id: "ci-" + s.id, color: s.color, className: "ci-band", edge: false,
+    points: s.points.filter((p) => p.ci != null).map((p) => ({ x: p.x, y0: p.y - p.ci, y1: p.y + p.ci })),
+  })).filter((a) => a.points.length >= 2);
+  const ciRows = (series, i, spine) => {
+    const r = spine[i];
+    if (!r) return [];
+    const cs = series.map((s) => { const p = s.points.find((q) => q.ym === r.ym); return p && p.ci != null ? s.label + " ±" + p.ci.toFixed(1) : null; }).filter(Boolean);
+    return cs.length ? [{ label: "95% intervals", value: cs.join(", ") }] : [];
+  };
+  const leadSeries = [
+    { id: "ley", label: "over Ley", color: opp.color, points: run("lead_ley"), rdWidth: 2.5, endCap: false },
+    /* the lines are named at their ends on a phone too, as the canvas drew
+       them: no key under the chart names them */
+    { id: "taylor", label: "over " + opp.short, color: opp.color, points: run("lead_taylor"), rdWidth: 2.5, endLabel: "over " + opp.short },
+    { id: "hanson", label: "over " + han.short, color: han.color, points: run("lead_hanson"), rdWidth: 2.5, endLabel: "over " + han.short },
+  ].filter((s) => s.points.length);
   /* each poll's own lead in each head-to-head it asked: the opposition
      leader ("at") and Hanson ("ah"), never the three-way */
   const leadDots = D.individualPolls.filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
@@ -378,7 +392,8 @@ function RdLeadership({ rangeId }) {
       return { x: q.x, y: c.alb - c[o], color: o === "hanson" ? han.color : opp.color,
                label: "Albanese over " + (o === "hanson" ? "Hanson" : o === "ley" ? "Ley" : opp.short), meta: q };
     })).filter(Boolean);
-  const leadVals = leadSeries.flatMap((s) => s.points.map((p) => p.y)).concat(leadDots.map((d) => d.y));
+  const bandVals = (series) => series.flatMap((s) => s.points.flatMap((p) => (p.ci != null ? [p.y - p.ci, p.y + p.ci] : [p.y])));
+  const leadVals = bandVals(leadSeries).concat(leadDots.map((d) => d.y));
   const leadFit = fitDomain(leadVals.length ? leadVals : [0, 20], 10, 0);
   const leyPeak = leadSeries.find((s) => s.id === "ley");
   const leadNotes = leyPeak && leyPeak.points.length ? (() => {
@@ -386,7 +401,6 @@ function RdLeadership({ rangeId }) {
     return [{ x: pk.x, y: pk.y, dy: -9, text: "over Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 }];
   })() : [];
   const threeSeries = (() => {
-    const run = (k) => pts.filter((r) => r[k] != null).map((r) => ({ x: r.x, y: r[k], ym: r.ym }));
     return [
       { id: "alb3", label: pm.short, color: pm.color, points: run("alb_pref3"), rdWidth: 2.5, endLabel: pm.short },
       { id: "han3", label: han.short, color: han.color, points: run("hanson_pref3"), rdWidth: 2.5, endLabel: han.short },
@@ -395,7 +409,18 @@ function RdLeadership({ rangeId }) {
     ].filter((s) => s.points.length);
   })();
   const firstThree = threeSeries.length ? Math.min(...threeSeries.map((s) => s.points[0].x)) : null;
-  const threeTop = Math.max(40, Math.ceil(Math.max(...threeSeries.flatMap((s) => s.points.map((p) => p.y)), 0) / 10) * 10);
+  /* each poll's three-way shares, one dot per leader in his or her colour -
+     the spread the key tells readers to expect, shown rather than asserted */
+  const threeDots = D.individualPolls.filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
+    .flatMap((q) => {
+      const c = ppmMatch(q, "3");
+      if (!c) return [];
+      const oppK = c.taylor != null ? "taylor" : c.ley != null ? "ley" : null;
+      return [["alb", pm.color, pm.short], [oppK, opp.color, oppK === "ley" ? "Ley" : opp.short], ["hanson", han.color, han.short]]
+        .filter(([k]) => k && c[k] != null)
+        .map(([k, color, label]) => ({ x: q.x, y: c[k], color, label, meta: q }));
+    });
+  const threeTop = Math.max(40, Math.ceil(Math.max(...bandVals(threeSeries), ...threeDots.map((d) => d.y), 0) / 10) * 10);
   const leyRun = threeSeries.find((s) => s.id === "ley3");
   const threeNotes = [
     firstThree != null && firstThree - xDomain[0] > 0.2 ? { x: "left", y: threeTop * 0.62, text: "Three-way questions began in " + (() => { const r = LM.find((m) => m.alb_pref3 != null); return r ? rdMonthYear(r.ym) : ""; })(), cls: "rd-note-it" } : null,
@@ -416,12 +441,15 @@ function RdLeadership({ rangeId }) {
   const leadChart = lchart("rd-lead", pm.short + "’s lead" + (ppmView === "both" ? " head to head" : "") + ", month by month", {
     yDomain: leadFit.domain, yTicks: rdYTicks(leadFit.domain[0], leadFit.domain[1], 10).filter((v) => v >= 0 || v === leadFit.domain[0]),
     yTickFmt: (v) => (v === 0 ? "Tied" : v > 0 ? "+" + v : "−" + Math.abs(v)),
-    refLines: [{ y: 0, color: "var(--ink-3)" }], series: leadSeries, scatter: leadDots, notes: leadNotes, pollFacet: "leadership",
+    refLines: [{ y: 0, color: "var(--ink-3)" }], series: leadSeries, areas: bandsOf(leadSeries), scatter: leadDots, notes: leadNotes, pollFacet: "leadership",
     spine: (leadSeries.find((s) => s.id === "taylor") || leadSeries[0] || { points: [] }).points,
+    extraRows: (i) => ciRows(leadSeries, i, (leadSeries.find((s) => s.id === "taylor") || leadSeries[0] || { points: [] }).points),
   });
   const threeChart = lchart("rd-three", "Share in the three-way question, month by month", {
     yDomain: [0, threeTop], yTicks: rdYTicks(0, threeTop, 10), yTickFmt: (v) => (v === 0 ? "0" : v % 20 === 0 ? v + "%" : ""),
-    series: threeSeries, notes: threeNotes, spine: (threeSeries[0] || { points: [] }).points,
+    series: threeSeries, areas: bandsOf(threeSeries), scatter: threeDots, notes: threeNotes, pollFacet: "leadership",
+    spine: (threeSeries[0] || { points: [] }).points,
+    extraRows: (i) => ciRows(threeSeries, i, (threeSeries[0] || { points: [] }).points),
   });
 
   /* ---- net approval and favourability ------------------------------------ */
@@ -585,9 +613,9 @@ function RdLeadership({ rangeId }) {
             {ppmView !== "three" && leadChart}
             {ppmView !== "two" && threeChart}
             <RdKey className="rd-ckey" items={[]}>
-              <span className="rd-ld-keytxt">{ppmView === "three" ? "Shares of all respondents. Pollsters leave different shares undecided, so read the order and the gaps rather than the levels. Lines are monthly averages."
-                : ppmView === "two" ? "Each dot is one poll; lines are monthly averages. Lead is " + pm.short + "’s share minus his opponent’s, which lets one chart carry both head-to-head contests."
-                : "Each dot is one poll; lines are monthly averages. Lead is " + pm.short + "’s share minus his opponent’s; three-way figures are shares of all respondents."}</span>
+              <span className="rd-ld-keytxt">{ppmView === "three" ? "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Shares of all respondents. Pollsters leave different shares undecided, so read the order and the gaps rather than the levels."
+                : ppmView === "two" ? "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Lead is " + pm.short + "’s share minus his opponent’s, which lets one chart carry both head-to-head contests."
+                : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Lead is " + pm.short + "’s share minus his opponent’s; three-way figures are shares of all respondents."}</span>
             </RdKey>
           </>)}
         {panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval",

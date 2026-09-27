@@ -711,25 +711,6 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.leader)
     : null;
 
-  /* The tinted lead bands belong to the two-way question only, so on the way
-     to a three-way they fade rather than vanish under the lines that are still
-     moving (and fade back in on the way home). */
-  const areaFade = !morph ? 1 : (morph.to === "3" ? 1 - morph.t : morph.t);
-  const areas = (three && !morph) || areaFade <= 0.01 ? [] : PPM_PAIRS.map((pr) => {
-    const [a, b] = pr.ids;
-    const points = pts.map((d) => {
-      // the band spans the office, not the person: Ley's months count too
-      const hi = d[a + pr.suf], lo = d[b + pr.suf] != null ? d[b + pr.suf] : (b === "taylor" ? d["ley" + pr.suf] : null);
-      return hi == null || lo == null ? null : { x: d.x, y0: Math.min(hi, lo), y1: Math.max(hi, lo) };
-    }).filter(Boolean);
-    /* Tinted in the OPPONENT's colour, at an opacity low enough that it
-       reads as a gap rather than as an area chart of his share – which is the
-       one way this band could be misread, since the tint sits under his line. */
-    return points.length > 1
-      ? { id: pr.id, points, color: byId[b].color, opacity: 0.085 * areaFade, edge: false }
-      : null;
-  }).filter(Boolean);
-
   /* Each line, on its own months, for either question – and put on one grid
      and interpolated while the switch is running. The opposition office is
      one colour but two people: Ley's readings live in ley_* and Taylor's in
@@ -740,7 +721,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
   const erasOf = (r) => (r.L.id === "taylor" ? ["ley", "taylor"] : [null]);
   const lineFor = (r, era) => {
     const k = (era || r.L.id) + r.suf;
-    return pts.filter((d) => d[k] != null).map((d) => ({ ym: d.ym, x: d.x, v: d[k] }));
+    return pts.filter((d) => d[k] != null).map((d) => ({ ym: d.ym, x: d.x, v: d[k], ci: d[k + "Ci"] != null ? d[k + "Ci"] : null }));
   };
   const fromRows = morph ? rowsFor(morph.from) : null;
   const toRows = morph ? rowsFor(morph.to) : null;
@@ -757,7 +738,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         const [mk, eraS] = k.split("|"), era = eraS || null;
         const a = fromBy[mk], b = toBy[mk];
         if (a && b) {
-          const bl = window.AP.blendRows(lineFor(a, era), lineFor(b, era), morph.t, ["v"]);
+          const bl = window.AP.blendRows(lineFor(a, era), lineFor(b, era), morph.t, ["v", "ci"]);
           // dash says WHICH contest, so it changes with the line's allegiance
           const r = morph.t < 0.5 ? a : b;
           return { r, era, pts: bl ? bl.rows : lineFor(r, era), opacity: 1, clip: bl ? bl.clip : null };
@@ -771,6 +752,14 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         const only = a || b;
         return { r: only, era, pts: lineFor(only, era), wipe: a ? morph.t : 1 - morph.t };
       }).filter((d) => d.pts.length);
+  /* Each line's 95% interval (gen-data's *_pref*Ci: the houses' spread or
+     the sampling floor, whichever is wider), travelling with its line. A
+     line being rubbed out on a switch takes its band with it rather than
+     leaving it behind. */
+  const ciAreas = drawRows.filter((d) => d.wipe == null).map((d) => ({
+    id: "ci-" + (d.era ? d.r.mk + "-" + d.era : d.r.mk), color: d.r.L.color, className: "ci-band", edge: false, smooth: true,
+    clipX: d.clip, points: d.pts.filter((p) => p.ci != null).map((p) => ({ x: p.x, y0: p.v - p.ci, y1: p.v + p.ci })),
+  })).filter((a) => a.points.length >= 2);
 
 
   // y-window fitted to the readings in view, scatter included – and taken
@@ -778,7 +767,8 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
   // that are still moving
   const valsFor = (f) => rowsFor(f)
     .flatMap((r) => D.leaderMonths.flatMap((m) =>
-      [m[r.L.id + r.suf], r.L.id === "taylor" ? m["ley" + r.suf] : null]).filter((v) => v != null))
+      [r.L.id + r.suf, r.L.id === "taylor" ? "ley" + r.suf : null].filter(Boolean).flatMap((k) =>
+        m[k] == null ? [] : m[k + "Ci"] != null ? [m[k] - m[k + "Ci"], m[k] + m[k + "Ci"]] : [m[k]])))
     .concat(cloudFor(f).map((d) => d.y));
   const fitFor = (f) => { const v = valsFor(f); return fitDomain(v.length ? v : [30, 50], 10); };
   const target = fitFor(fmt);
@@ -1048,7 +1038,10 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         events={[OPP_HANDOVER].filter(Boolean)}
-        areas={areas}
+        /* the intervals replace the tinted lead gaps this chart used to
+           draw: those stood in for a measure of the lines' doubt, and the
+           two stacked read as mud */
+        areas={ciAreas}
         series={drawRows.map((d) => ({
           /* An era's run is its own series: Ley's ends at the handover (no
              end-cap – nothing continues from it) and answers to her name in

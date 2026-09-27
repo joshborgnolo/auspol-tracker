@@ -715,6 +715,8 @@ body.rd .rd-hb-seg.tight .rd-hb-name { position: absolute; visibility: hidden; }
 body.rd .rd-hb-neither { justify-content: center; background: var(--line-2); color: var(--ink-3); font-size: 12px; padding: 0 4px; }
 body.rd .rd-hb-cis { display: flex; gap: 2px; margin-top: 4px; font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-hb-cis > span { padding-left: 10px; flex-shrink: 1; min-width: 0; }
+/* a two-way's far leader reads from the right end, as its segment does */
+body.rd .rd-hb-cis > span.end { padding-left: 0; padding-right: 10px; text-align: right; }
 body.rd .rd-ld-note { margin-top: 12px; min-height: 40px; }
 body.rd .rd-ld-chart { margin-top: 20px; }
 /* the copy button joins the key row under the chart, as on every other chart */

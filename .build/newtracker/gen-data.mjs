@@ -972,6 +972,29 @@ const wMeanOf = (rows, f) => {
   return swx / sw;
 };
 
+/* ...and their 95% intervals, taken the way net approval's are
+   (weightedWithSe: the larger of the houses' spread and the sampling floor)
+   on the same weights. The spread term is what makes an interval honest
+   here: preferred PM's house differences are question format, not lean,
+   so a three-way Albanese read by Resolve (35% uncommitted) and by Newspoll
+   (16%) disagree by far more than sampling - and the interval says so
+   rather than a line pretending to a precision the houses don't share.
+   `pq` is a lead's own variance where the reading is a margin (netPq: the
+   difference of two shares of one sample), a share's p(1-p) otherwise. */
+const wCiOf = (rows, f, pqf) => {
+  const waves = new Map();
+  const kept = rows.map((r) => ({ r, v: f(r) })).filter((d) => d.v != null);
+  if (!kept.length) return null;
+  for (const d of kept) waves.set(d.r.firm, (waves.get(d.r.firm) || 0) + 1);
+  const pts = kept.map((d) => ({ w: ppmN(d.r) / Math.sqrt(waves.get(d.r.firm)), x: d.v, n: ppmN(d.r),
+    ...(pqf ? { pq: pqf(d.r, d.v) } : {}) }));
+  const r = weightedWithSe(pts);
+  return r ? { v: r1n(r.v), ci: r1(1.96 * r.se) } : null;
+};
+const leadOf = (a, b) => (r) => (r[a] != null && r[b] != null ? r[a] - r[b] : null);
+const leadPq = (a, b) => (r, lead) => netPq(lead, { app: r[a], dis: r[b] });
+const ciOf = (e) => (e ? e.ci : null);
+
 const leaderMonths = MONTHS.map((ym) => {
   const pp = ppm.filter((p) => ymOf(p.date) === ym);
   // a three-way prompt is a different question, never averaged with a two-way
@@ -1072,6 +1095,25 @@ const leaderMonths = MONTHS.map((ym) => {
        against the opposition leader, and only some houses ask it (11 polls,
        Apr 2026 on), so it is a third series rather than a filter on the first. */
     alb_prefH: r1n(wMeanOf(ppH, (r) => r.alb)), hanson_prefH: r1n(wMeanOf(ppH, (r) => r.han)), taylor_prefH: null, ley_prefH: null,
+    alb_prefCi: ciOf(wCiOf(pp2, (p) => p.alb)),
+    ley_prefCi: ciOf(wCiOf(pp2L, (p) => p.opp)), taylor_prefCi: ciOf(wCiOf(pp2T, (p) => p.opp)),
+    alb_pref3Ci: ciOf(wCiOf(pp3, (p) => p.alb)),
+    ley_pref3Ci: ciOf(wCiOf(pp3L, (p) => p.opp)), taylor_pref3Ci: ciOf(wCiOf(pp3T, (p) => p.opp)),
+    hanson_pref3Ci: ciOf(wCiOf(pp3, (p) => p.han)),
+    alb_prefHCi: ciOf(wCiOf(ppH, (r) => r.alb)), hanson_prefHCi: ciOf(wCiOf(ppH, (r) => r.han)),
+    /* Albanese's lead in each head-to-head, taken POLL BY POLL (each poll's
+       own margin, then the month's mean) so its interval carries a margin's
+       variance - not two shares' intervals added as if independent, when
+       both come out of one sample and move against each other */
+    ...(() => {
+      const o = {};
+      for (const [k, pool, b] of [["ley", pp2L, "opp"], ["taylor", pp2T, "opp"], ["hanson", ppH, "han"]]) {
+        const e = wCiOf(pool, leadOf("alb", b), leadPq("alb", b));
+        o["lead_" + k] = e ? e.v : null;
+        o["lead_" + k + "Ci"] = e ? e.ci : null;
+      }
+      return o;
+    })(),
     alb_net: A.net, ley_net: OL.net, taylor_net: OT.net, hanson_net: H.net,
     alb_fav: A.fav, ley_fav: OL.fav, taylor_fav: OT.fav, hanson_fav: H.fav,
     alb_netCi: A.netCi, ley_netCi: OL.netCi, taylor_netCi: OT.netCi, hanson_netCi: H.netCi,

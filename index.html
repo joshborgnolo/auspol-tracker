@@ -3561,6 +3561,7 @@ body.rd .rd-hb-seg.tight .rd-hb-name { position: absolute; visibility: hidden; }
 body.rd .rd-hb-neither { justify-content: center; background: var(--line-2); color: var(--ink-3); font-size: 12px; padding: 0 4px; }
 body.rd .rd-hb-cis { display: flex; gap: 2px; margin-top: 4px; font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-hb-cis > span { padding-left: 10px; flex-shrink: 1; min-width: 0; }
+body.rd .rd-hb-cis > span.end { padding-left: 0; padding-right: 10px; text-align: right; }
 body.rd .rd-ld-note { margin-top: 12px; min-height: 40px; }
 body.rd .rd-ld-chart { margin-top: 20px; }
 body.rd .rd-ld-chart:has(+ .rd-ckey) .chart { padding-bottom: 0; }
@@ -10021,6 +10022,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": null,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": null,
+    "ley_prefCi": null,
+    "taylor_prefCi": null,
+    "alb_pref3Ci": null,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": null,
+    "hanson_pref3Ci": null,
+    "alb_prefHCi": null,
+    "hanson_prefHCi": null,
+    "lead_ley": null,
+    "lead_leyCi": null,
+    "lead_taylor": null,
+    "lead_taylorCi": null,
+    "lead_hanson": null,
+    "lead_hansonCi": null,
     "alb_net": 17.5,
     "ley_net": null,
     "taylor_net": null,
@@ -10060,6 +10076,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": null,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": null,
+    "ley_prefCi": null,
+    "taylor_prefCi": null,
+    "alb_pref3Ci": null,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": null,
+    "hanson_pref3Ci": null,
+    "alb_prefHCi": null,
+    "hanson_prefHCi": null,
+    "lead_ley": null,
+    "lead_leyCi": null,
+    "lead_taylor": null,
+    "lead_taylorCi": null,
+    "lead_hanson": null,
+    "lead_hansonCi": null,
     "alb_net": 17,
     "ley_net": null,
     "taylor_net": null,
@@ -10099,6 +10130,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": null,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 5.1,
+    "ley_prefCi": 5.4,
+    "taylor_prefCi": null,
+    "alb_pref3Ci": null,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": null,
+    "hanson_pref3Ci": null,
+    "alb_prefHCi": null,
+    "hanson_prefHCi": null,
+    "lead_ley": 14.6,
+    "lead_leyCi": 5,
+    "lead_taylor": null,
+    "lead_taylorCi": null,
+    "lead_hanson": null,
+    "lead_hansonCi": null,
     "alb_net": 7.3,
     "ley_net": 0,
     "taylor_net": null,
@@ -10138,6 +10184,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": null,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 9.8,
+    "ley_prefCi": 4.9,
+    "taylor_prefCi": null,
+    "alb_pref3Ci": null,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": null,
+    "hanson_pref3Ci": null,
+    "alb_prefHCi": null,
+    "hanson_prefHCi": null,
+    "lead_ley": 17.4,
+    "lead_leyCi": 4.9,
+    "lead_taylor": null,
+    "lead_taylorCi": null,
+    "lead_hanson": null,
+    "lead_hansonCi": null,
     "alb_net": 2.6,
     "ley_net": -0.5,
     "taylor_net": null,
@@ -10177,6 +10238,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": null,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 8.5,
+    "ley_prefCi": 3,
+    "taylor_prefCi": null,
+    "alb_pref3Ci": null,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": null,
+    "hanson_pref3Ci": null,
+    "alb_prefHCi": null,
+    "hanson_prefHCi": null,
+    "lead_ley": 17.6,
+    "lead_leyCi": 6.1,
+    "lead_taylor": null,
+    "lead_taylorCi": null,
+    "lead_hanson": null,
+    "lead_hansonCi": null,
     "alb_net": 1.4,
     "ley_net": -9.4,
     "taylor_net": null,
@@ -10216,6 +10292,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": null,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 5.1,
+    "ley_prefCi": 2.9,
+    "taylor_prefCi": null,
+    "alb_pref3Ci": null,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": null,
+    "hanson_pref3Ci": null,
+    "alb_prefHCi": null,
+    "hanson_prefHCi": null,
+    "lead_ley": 21.9,
+    "lead_leyCi": 4.3,
+    "lead_taylor": null,
+    "lead_taylorCi": null,
+    "lead_hanson": null,
+    "lead_hansonCi": null,
     "alb_net": -1.3,
     "ley_net": -17,
     "taylor_net": null,
@@ -10255,6 +10346,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": null,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 10.2,
+    "ley_prefCi": 9.7,
+    "taylor_prefCi": null,
+    "alb_pref3Ci": null,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": null,
+    "hanson_pref3Ci": null,
+    "alb_prefHCi": null,
+    "hanson_prefHCi": null,
+    "lead_ley": 22.4,
+    "lead_leyCi": 10.2,
+    "lead_taylor": null,
+    "lead_taylorCi": null,
+    "lead_hanson": null,
+    "lead_hansonCi": null,
     "alb_net": 6.7,
     "ley_net": -17.2,
     "taylor_net": null,
@@ -10294,6 +10400,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": null,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 1.9,
+    "ley_prefCi": 11.1,
+    "taylor_prefCi": null,
+    "alb_pref3Ci": null,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": null,
+    "hanson_pref3Ci": null,
+    "alb_prefHCi": null,
+    "hanson_prefHCi": null,
+    "lead_ley": 18.8,
+    "lead_leyCi": 12.2,
+    "lead_taylor": null,
+    "lead_taylorCi": null,
+    "lead_hanson": null,
+    "lead_hansonCi": null,
     "alb_net": -0.9,
     "ley_net": -7.8,
     "taylor_net": null,
@@ -10333,6 +10454,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": null,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 6.6,
+    "ley_prefCi": 7.7,
+    "taylor_prefCi": null,
+    "alb_pref3Ci": 2.7,
+    "ley_pref3Ci": 2,
+    "taylor_pref3Ci": null,
+    "hanson_pref3Ci": 2.4,
+    "alb_prefHCi": null,
+    "hanson_prefHCi": null,
+    "lead_ley": 15.2,
+    "lead_leyCi": 8,
+    "lead_taylor": null,
+    "lead_taylorCi": null,
+    "lead_hanson": null,
+    "lead_hansonCi": null,
     "alb_net": -13.3,
     "ley_net": -22,
     "taylor_net": null,
@@ -10372,6 +10508,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": null,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 3.8,
+    "ley_prefCi": 8,
+    "taylor_prefCi": 1.7,
+    "alb_pref3Ci": 3,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": 8.9,
+    "hanson_pref3Ci": 2,
+    "alb_prefHCi": null,
+    "hanson_prefHCi": null,
+    "lead_ley": 17.8,
+    "lead_leyCi": 3.8,
+    "lead_taylor": 7.3,
+    "lead_taylorCi": 3.1,
+    "lead_hanson": null,
+    "lead_hansonCi": null,
     "alb_net": -13.4,
     "ley_net": -31.4,
     "taylor_net": 1.2,
@@ -10411,6 +10562,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": null,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 3.6,
+    "ley_prefCi": null,
+    "taylor_prefCi": 2,
+    "alb_pref3Ci": 3.7,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": 2.7,
+    "hanson_pref3Ci": 3.3,
+    "alb_prefHCi": null,
+    "hanson_prefHCi": null,
+    "lead_ley": null,
+    "lead_leyCi": null,
+    "lead_taylor": 5.9,
+    "lead_taylorCi": 2.4,
+    "lead_hanson": null,
+    "lead_hansonCi": null,
     "alb_net": -15.9,
     "ley_net": null,
     "taylor_net": 0.5,
@@ -10450,6 +10616,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": 39,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 4.4,
+    "ley_prefCi": null,
+    "taylor_prefCi": 2.5,
+    "alb_pref3Ci": 2.3,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": 7.9,
+    "hanson_pref3Ci": 2.1,
+    "alb_prefHCi": 6.1,
+    "hanson_prefHCi": 2.3,
+    "lead_ley": null,
+    "lead_leyCi": null,
+    "lead_taylor": 6.1,
+    "lead_taylorCi": 2.8,
+    "lead_hanson": 8.8,
+    "lead_hansonCi": 6.1,
     "alb_net": -14.7,
     "ley_net": null,
     "taylor_net": -1.1,
@@ -10489,6 +10670,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": 36.6,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 5.2,
+    "ley_prefCi": null,
+    "taylor_prefCi": 2.3,
+    "alb_pref3Ci": 2.9,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": 8.8,
+    "hanson_pref3Ci": 2.2,
+    "alb_prefHCi": 3.9,
+    "hanson_prefHCi": 2.9,
+    "lead_ley": null,
+    "lead_leyCi": null,
+    "lead_taylor": 1.9,
+    "lead_taylorCi": 4.3,
+    "lead_hanson": 15.4,
+    "lead_hansonCi": 6.9,
     "alb_net": -18.5,
     "ley_net": null,
     "taylor_net": -2.7,
@@ -10528,6 +10724,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": 40.7,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 1.6,
+    "ley_prefCi": null,
+    "taylor_prefCi": 1.7,
+    "alb_pref3Ci": 9,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": 3.8,
+    "hanson_pref3Ci": 4.2,
+    "alb_prefHCi": 1.8,
+    "hanson_prefHCi": 1.8,
+    "lead_ley": null,
+    "lead_leyCi": null,
+    "lead_taylor": 5.6,
+    "lead_taylorCi": 2.9,
+    "lead_hanson": 7.4,
+    "lead_hansonCi": 3.4,
     "alb_net": -19.9,
     "ley_net": null,
     "taylor_net": -6,
@@ -10567,6 +10778,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": 36.5,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 2.2,
+    "ley_prefCi": null,
+    "taylor_prefCi": 2.9,
+    "alb_pref3Ci": 6.1,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": 3,
+    "hanson_pref3Ci": 3.4,
+    "alb_prefHCi": 8.5,
+    "hanson_prefHCi": 1.6,
+    "lead_ley": null,
+    "lead_leyCi": null,
+    "lead_taylor": 8.5,
+    "lead_taylorCi": 4.9,
+    "lead_hanson": 10.8,
+    "lead_hansonCi": 9.5,
     "alb_net": -15.9,
     "ley_net": null,
     "taylor_net": -10.6,
@@ -10606,6 +10832,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": 38.6,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 2.1,
+    "ley_prefCi": null,
+    "taylor_prefCi": 2.1,
+    "alb_pref3Ci": 6.6,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": 3.2,
+    "hanson_pref3Ci": 3.5,
+    "alb_prefHCi": 4.7,
+    "hanson_prefHCi": 4.5,
+    "lead_ley": null,
+    "lead_leyCi": null,
+    "lead_taylor": 5.5,
+    "lead_taylorCi": 3.9,
+    "lead_hanson": 12.6,
+    "lead_hansonCi": 2.7,
     "alb_net": -20.4,
     "ley_net": null,
     "taylor_net": -8,
@@ -10645,6 +10886,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "hanson_prefH": 39,
     "taylor_prefH": null,
     "ley_prefH": null,
+    "alb_prefCi": 2.2,
+    "ley_prefCi": null,
+    "taylor_prefCi": 2.1,
+    "alb_pref3Ci": 9.1,
+    "ley_pref3Ci": null,
+    "taylor_pref3Ci": 2,
+    "hanson_pref3Ci": 4.6,
+    "alb_prefHCi": 2.2,
+    "hanson_prefHCi": 2.2,
+    "lead_ley": null,
+    "lead_leyCi": null,
+    "lead_taylor": 4,
+    "lead_taylorCi": 4,
+    "lead_hanson": 11.5,
+    "lead_hansonCi": 4.2,
     "alb_net": -23.5,
     "ley_net": null,
     "taylor_net": -6,
@@ -43904,33 +44160,14 @@ function PreferredPMPanel({
   }));
   const ppmScatter = cloudFor(fmt);
   const cross = morph ? window.AP.crossClouds(cloudFor(morph.from), cloudFor(morph.to), morph.t, d => d.meta.pollster + "|" + d.meta.released + "|" + d.leader) : null;
-  const areaFade = !morph ? 1 : morph.to === "3" ? 1 - morph.t : morph.t;
-  const areas = three && !morph || areaFade <= 0.01 ? [] : PPM_PAIRS.map(pr => {
-    const [a, b] = pr.ids;
-    const points = pts.map(d => {
-      const hi = d[a + pr.suf],
-        lo = d[b + pr.suf] != null ? d[b + pr.suf] : b === "taylor" ? d["ley" + pr.suf] : null;
-      return hi == null || lo == null ? null : {
-        x: d.x,
-        y0: Math.min(hi, lo),
-        y1: Math.max(hi, lo)
-      };
-    }).filter(Boolean);
-    return points.length > 1 ? {
-      id: pr.id,
-      points,
-      color: byId[b].color,
-      opacity: 0.085 * areaFade,
-      edge: false
-    } : null;
-  }).filter(Boolean);
   const erasOf = r => r.L.id === "taylor" ? ["ley", "taylor"] : [null];
   const lineFor = (r, era) => {
     const k = (era || r.L.id) + r.suf;
     return pts.filter(d => d[k] != null).map(d => ({
       ym: d.ym,
       x: d.x,
-      v: d[k]
+      v: d[k],
+      ci: d[k + "Ci"] != null ? d[k + "Ci"] : null
     }));
   };
   const fromRows = morph ? rowsFor(morph.from) : null;
@@ -43954,7 +44191,7 @@ function PreferredPMPanel({
     const a = fromBy[mk],
       b = toBy[mk];
     if (a && b) {
-      const bl = window.AP.blendRows(lineFor(a, era), lineFor(b, era), morph.t, ["v"]);
+      const bl = window.AP.blendRows(lineFor(a, era), lineFor(b, era), morph.t, ["v", "ci"]);
       const r = morph.t < 0.5 ? a : b;
       return {
         r,
@@ -43972,7 +44209,20 @@ function PreferredPMPanel({
       wipe: a ? morph.t : 1 - morph.t
     };
   }).filter(d => d.pts.length);
-  const valsFor = f => rowsFor(f).flatMap(r => D.leaderMonths.flatMap(m => [m[r.L.id + r.suf], r.L.id === "taylor" ? m["ley" + r.suf] : null]).filter(v => v != null)).concat(cloudFor(f).map(d => d.y));
+  const ciAreas = drawRows.filter(d => d.wipe == null).map(d => ({
+    id: "ci-" + (d.era ? d.r.mk + "-" + d.era : d.r.mk),
+    color: d.r.L.color,
+    className: "ci-band",
+    edge: false,
+    smooth: true,
+    clipX: d.clip,
+    points: d.pts.filter(p => p.ci != null).map(p => ({
+      x: p.x,
+      y0: p.v - p.ci,
+      y1: p.v + p.ci
+    }))
+  })).filter(a => a.points.length >= 2);
+  const valsFor = f => rowsFor(f).flatMap(r => D.leaderMonths.flatMap(m => [r.L.id + r.suf, r.L.id === "taylor" ? "ley" + r.suf : null].filter(Boolean).flatMap(k => m[k] == null ? [] : m[k + "Ci"] != null ? [m[k] - m[k + "Ci"], m[k] + m[k + "Ci"]] : [m[k]]))).concat(cloudFor(f).map(d => d.y));
   const fitFor = f => {
     const v = valsFor(f);
     return fitDomain(v.length ? v : [30, 50], 10);
@@ -44212,7 +44462,7 @@ function PreferredPMPanel({
     },
     xTicks: buildXTicks(xDomain[0], xDomain[1]),
     events: [OPP_HANDOVER].filter(Boolean),
-    areas: areas,
+    areas: ciAreas,
     series: drawRows.map(d => ({
       id: d.era ? d.r.mk + "-" + d.era : d.r.mk,
       label: d.era === "ley" ? "Ley" : d.r.label,
@@ -56765,14 +57015,17 @@ function RdHeadBar({
     }
   }, neither >= (narrow ? 14 : 7) ? "neither" : "")), cis && React.createElement("div", {
     className: "rd-hb-cis"
-  }, segs.map(s => React.createElement("span", {
+  }, segs.map((s, i) => React.createElement("span", {
     key: s.name,
+    className: i === segs.length - 1 && segs.length === 2 ? "end" : undefined,
     style: {
-      flexBasis: s.v + "%"
+      flexBasis: s.v + "%",
+      order: s.order != null ? s.order : i * 2
     }
   }, (isTight(s) ? s.name + " " : "") + (s.ci != null ? "±" + s.ci.toFixed(1) : ""))), neither > 0.5 && React.createElement("span", {
     style: {
-      flexBasis: neither + "%"
+      flexBasis: neither + "%",
+      order: segs.length === 2 ? 1 : 99
     }
   })));
 }
@@ -56864,7 +57117,8 @@ function RdLeadership({
       label: h.label,
       right: l.who.name + " +" + l.m.toFixed(1),
       rightColor: l.who.color,
-      segs: h.segs
+      segs: h.segs,
+      cis: true
     });
   };
   const threeBar = three && React.createElement(RdHeadBar, {
@@ -56904,35 +57158,57 @@ function RdLeadership({
     ...handover,
     short: "Ley → Taylor"
   }] : [];
-  const leadSeries = (() => {
-    const run = (ka, kb) => pts.filter(r => r[ka] != null && r[kb] != null).map(r => ({
-      x: r.x,
-      y: +(r[ka] - r[kb]).toFixed(1),
-      ym: r.ym
-    }));
-    return [{
-      id: "ley",
-      label: "over Ley",
-      color: opp.color,
-      points: run("alb_pref", "ley_pref"),
-      rdWidth: 2.5,
-      endCap: false
-    }, {
-      id: "taylor",
-      label: "over " + opp.short,
-      color: opp.color,
-      points: run("alb_pref", "taylor_pref"),
-      rdWidth: 2.5,
-      endLabel: "over " + opp.short
-    }, {
-      id: "hanson",
-      label: "over " + han.short,
-      color: han.color,
-      points: run("alb_prefH", "hanson_prefH"),
-      rdWidth: 2.5,
-      endLabel: "over " + han.short
-    }].filter(s => s.points.length);
-  })();
+  const run = k => pts.filter(r => r[k] != null).map(r => ({
+    x: r.x,
+    y: r[k],
+    ym: r.ym,
+    ci: r[k + "Ci"]
+  }));
+  const bandsOf = series => series.map(s => ({
+    id: "ci-" + s.id,
+    color: s.color,
+    className: "ci-band",
+    edge: false,
+    points: s.points.filter(p => p.ci != null).map(p => ({
+      x: p.x,
+      y0: p.y - p.ci,
+      y1: p.y + p.ci
+    }))
+  })).filter(a => a.points.length >= 2);
+  const ciRows = (series, i, spine) => {
+    const r = spine[i];
+    if (!r) return [];
+    const cs = series.map(s => {
+      const p = s.points.find(q => q.ym === r.ym);
+      return p && p.ci != null ? s.label + " ±" + p.ci.toFixed(1) : null;
+    }).filter(Boolean);
+    return cs.length ? [{
+      label: "95% intervals",
+      value: cs.join(", ")
+    }] : [];
+  };
+  const leadSeries = [{
+    id: "ley",
+    label: "over Ley",
+    color: opp.color,
+    points: run("lead_ley"),
+    rdWidth: 2.5,
+    endCap: false
+  }, {
+    id: "taylor",
+    label: "over " + opp.short,
+    color: opp.color,
+    points: run("lead_taylor"),
+    rdWidth: 2.5,
+    endLabel: "over " + opp.short
+  }, {
+    id: "hanson",
+    label: "over " + han.short,
+    color: han.color,
+    points: run("lead_hanson"),
+    rdWidth: 2.5,
+    endLabel: "over " + han.short
+  }].filter(s => s.points.length);
   const leadDots = D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).flatMap(q => ["at", "ah"].map(mode => {
     const c = ppmMatch(q, mode);
     if (!c || c.alb == null) return null;
@@ -56946,7 +57222,8 @@ function RdLeadership({
       meta: q
     };
   })).filter(Boolean);
-  const leadVals = leadSeries.flatMap(s => s.points.map(p => p.y)).concat(leadDots.map(d => d.y));
+  const bandVals = series => series.flatMap(s => s.points.flatMap(p => p.ci != null ? [p.y - p.ci, p.y + p.ci] : [p.y]));
+  const leadVals = bandVals(leadSeries).concat(leadDots.map(d => d.y));
   const leadFit = fitDomain(leadVals.length ? leadVals : [0, 20], 10, 0);
   const leyPeak = leadSeries.find(s => s.id === "ley");
   const leadNotes = leyPeak && leyPeak.points.length ? (() => {
@@ -56962,11 +57239,6 @@ function RdLeadership({
     }];
   })() : [];
   const threeSeries = (() => {
-    const run = k => pts.filter(r => r[k] != null).map(r => ({
-      x: r.x,
-      y: r[k],
-      ym: r.ym
-    }));
     return [{
       id: "alb3",
       label: pm.short,
@@ -56998,7 +57270,19 @@ function RdLeadership({
     }].filter(s => s.points.length);
   })();
   const firstThree = threeSeries.length ? Math.min(...threeSeries.map(s => s.points[0].x)) : null;
-  const threeTop = Math.max(40, Math.ceil(Math.max(...threeSeries.flatMap(s => s.points.map(p => p.y)), 0) / 10) * 10);
+  const threeDots = D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).flatMap(q => {
+    const c = ppmMatch(q, "3");
+    if (!c) return [];
+    const oppK = c.taylor != null ? "taylor" : c.ley != null ? "ley" : null;
+    return [["alb", pm.color, pm.short], [oppK, opp.color, oppK === "ley" ? "Ley" : opp.short], ["hanson", han.color, han.short]].filter(([k]) => k && c[k] != null).map(([k, color, label]) => ({
+      x: q.x,
+      y: c[k],
+      color,
+      label,
+      meta: q
+    }));
+  });
+  const threeTop = Math.max(40, Math.ceil(Math.max(...bandVals(threeSeries), ...threeDots.map(d => d.y), 0) / 10) * 10);
   const leyRun = threeSeries.find(s => s.id === "ley3");
   const threeNotes = [firstThree != null && firstThree - xDomain[0] > 0.2 ? {
     x: "left",
@@ -57058,22 +57342,32 @@ function RdLeadership({
       color: "var(--ink-3)"
     }],
     series: leadSeries,
+    areas: bandsOf(leadSeries),
     scatter: leadDots,
     notes: leadNotes,
     pollFacet: "leadership",
     spine: (leadSeries.find(s => s.id === "taylor") || leadSeries[0] || {
       points: []
-    }).points
+    }).points,
+    extraRows: i => ciRows(leadSeries, i, (leadSeries.find(s => s.id === "taylor") || leadSeries[0] || {
+      points: []
+    }).points)
   });
   const threeChart = lchart("rd-three", "Share in the three-way question, month by month", {
     yDomain: [0, threeTop],
     yTicks: rdYTicks(0, threeTop, 10),
     yTickFmt: v => v === 0 ? "0" : v % 20 === 0 ? v + "%" : "",
     series: threeSeries,
+    areas: bandsOf(threeSeries),
+    scatter: threeDots,
     notes: threeNotes,
+    pollFacet: "leadership",
     spine: (threeSeries[0] || {
       points: []
-    }).points
+    }).points,
+    extraRows: i => ciRows(threeSeries, i, (threeSeries[0] || {
+      points: []
+    }).points)
   });
   const leaders = RD_LEAD_ORDER.map(id => L[id]).filter(Boolean);
   const erasOf = Ld => Ld.id === "taylor" ? ["ley", "taylor"] : [null];
@@ -57406,7 +57700,7 @@ function RdLeadership({
     items: []
   }, React.createElement("span", {
     className: "rd-ld-keytxt"
-  }, ppmView === "three" ? "Shares of all respondents. Pollsters leave different shares undecided, so read the order and the gaps rather than the levels. Lines are monthly averages." : ppmView === "two" ? "Each dot is one poll; lines are monthly averages. Lead is " + pm.short + "’s share minus his opponent’s, which lets one chart carry both head-to-head contests." : "Each dot is one poll; lines are monthly averages. Lead is " + pm.short + "’s share minus his opponent’s; three-way figures are shares of all respondents.")))), panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval", metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person." : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. RedBridge, DemosAU, Freshwater and Spectre Strategy." : "Approve minus disapprove of the job each leader is doing. Newspoll, YouGov, Resolve, Essential and others.", React.createElement(RdTabs, {
+  }, ppmView === "three" ? "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Shares of all respondents. Pollsters leave different shares undecided, so read the order and the gaps rather than the levels." : ppmView === "two" ? "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Lead is " + pm.short + "’s share minus his opponent’s, which lets one chart carry both head-to-head contests." : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Lead is " + pm.short + "’s share minus his opponent’s; three-way figures are shares of all respondents.")))), panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval", metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person." : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. RedBridge, DemosAU, Freshwater and Spectre Strategy." : "Approve minus disapprove of the job each leader is doing. Newspoll, YouGov, Resolve, Essential and others.", React.createElement(RdTabs, {
     value: metric,
     onChange: v => {
       if (v === "both" || own === "both") setOwn(v);else chooseMetric(v);
