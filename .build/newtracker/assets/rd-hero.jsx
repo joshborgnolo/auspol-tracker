@@ -317,6 +317,19 @@ function RdHero(p) {
     sensOn ? { kind: "band", color: "var(--lnp)", label: "Range if One Nation preferences flowed as in 2022" } : null,
     ringOn ? { kind: "ring", label: narrow ? "2025 election" : "2025 election result" } : null,
   ];
+  /* The copy's key, worded as a laptop words it whatever the screen: the
+     image is laid out wide, and a phone's lines carry no names at their
+     ends, so the key names both. The election ring is keyed only where the
+     chart leaves it unlabelled. */
+  const copyKey = [
+    keyItems.find((k) => k && k.kind === "dot"),
+    (adjusted || morph) ? { kind: "line", color: mainCol,
+      label: labelMain + ", monthly average" + (bandPts.length >= 2 ? (flowsBand ? " and flow range" : " and its 95% interval") : "") } : null,
+    labelOther ? { kind: "line", color: otherCol, label: labelOther + ", monthly average" } : null,
+    cmpOn ? { kind: "dashed", color: mainCol, label: cmpName + ", monthly average" } : null,
+    sensOn ? { kind: "shade", color: "var(--lnp)", label: "Range if One Nation preferences flowed as in 2022" } : null,
+    ringOn && narrow ? { kind: "ring", color: "var(--ink)", label: "2025 election result" } : null,
+  ].filter(Boolean);
 
   const tooltipTitle = (i) => { const d = spine[i] || spine[spine.length - 1]; return d && d.ym ? monthLabelFull(d.ym) : ""; };
   const extraRows = (i) => {
@@ -400,8 +413,9 @@ function RdHero(p) {
           pollFacet="twopp"
           tooltipTitle={tooltipTitle} extraRows={extraRows}
           fmt={(v) => v.toFixed(1)}
-          copy={{ title: chartTitle.replace(/, %$/, ""), sub: basisWords + (unc ? " · weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
-                  legend: keyItems.filter(Boolean).filter((k) => k.kind !== "ring" && k.kind !== "dot").map((k) => ({ label: k.label, color: k.color, kind: k.kind === "dash" ? "dashed" : k.kind === "band" ? "shade" : "line" })) }}
+          copy={{ title: chartTitle.replace(/, %$/, ""),
+                  sub: basisWords.replace(/^Implied flows$/, "Implied preference flows") + (unc ? " · weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
+                  legend: copyKey.map((k) => ({ label: k.label, color: k.color, kind: k.kind })) }}
         />
         {badges && <RdEventList list={badges.list} />}
         <RdKey className="rd-ckey" items={keyItems} />

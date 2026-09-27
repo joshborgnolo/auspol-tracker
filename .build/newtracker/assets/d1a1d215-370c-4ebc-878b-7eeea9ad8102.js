@@ -1916,7 +1916,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
     <RdCycleChart M={M} chg={chg} built={built} bandAreas={bandAreas} bandRows={bandRows} scatter={scatter}
       events={rdEvents || cycleEvents} badged={!!rdEvents} domain={domain} ticks={ticks} cur={cur} hidden={hidden} narrow={narrow} half={!!rdHalf}
       hanCtl={hanCtl} showHan={showHan} setHan={setHan} showOnp={showOnp} setOnp={setOnp} tipCycle={tipCycle}
-      banded={banded} bandN={bandN} isOpp={isOpp} />
+      banded={banded} bandN={bandN} isOpp={isOpp} terms={shown.filter(hasData).map((c) => c.year)} />
   );
   return (
     <section className="card cycle-card">

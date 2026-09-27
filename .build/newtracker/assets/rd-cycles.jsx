@@ -27,7 +27,7 @@ const rdSgn = (v, unit) => (unit ? "" : v > 0 ? "+" : v < 0 ? "−" : "") + Math
 
 /* ---- one chart, in the redesign's frame --------------------------------- */
 function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evIn, badged, domain, ticks, cur, hidden, narrow, half,
-                        hanCtl, showHan, setHan, showOnp, setOnp, tipCycle, banded, bandN, isOpp }) {
+                        hanCtl, showHan, setHan, showOnp, setOnp, tipCycle, banded, bandN, isOpp, terms }) {
   const { D } = window.AP;
   /* the sitting term's change of contest, said as the headline says it */
   const events = evIn.map((e) => (/^Now v /.test(e.short || "")
@@ -107,6 +107,10 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
   if (!tickSet.includes(domain[0])) tickSet.unshift(domain[0]);
   if (!tickSet.includes(domain[1])) tickSet.push(domain[1]);
   const title = (chg ? RD_CYC_TITLE_CHG : RD_CYC_TITLE)[M.key];
+  /* a copy is read away from the section heads, so it says whose measure
+     it is where the chart's own head leaves that to the section */
+  const copyTitle = M.key === "ppmm" ? "The PM’s lead as preferred prime minister, " + (chg ? "change since the first reading" : "points")
+    : M.key === "oppnet" && !chg ? "Opposition leader’s net approval, points" : title;
   return (
     <div className="card rd-card rd-cyc-chart">
       <div className="rd-chead">
@@ -127,7 +131,7 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
           return r && banded ? [{ label: "Middle half", value: fmt(r.q1) + "–" + fmt(r.q3) }, { label: "Middle 80%", value: fmt(r.p10) + "–" + fmt(r.p90) }] : [];
         }}
         fmt={(v) => fmt(v)} pollFacet={M.key === "tpp" ? "twopp" : M.key === "primary" || M.key === "oppr" ? "primary" : "leadership"}
-        copy={{ title: title, sub: banded ? "Against the middle half and middle 80% of " + bandN + " past terms" : "" }}
+        copy={{ title: copyTitle, sub: banded ? "Against the middle half and middle 80% of " + bandN + " past terms" : "", terms }}
       />
       {badges && badges.list && <RdEventList list={badges.list} />}
     </div>

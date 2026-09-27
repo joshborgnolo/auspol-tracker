@@ -167,10 +167,14 @@ function straightPath(pts, sx, sy) {
  *           window, which an interval belonging to ONE line needs for the same
  *           reason the line does.
  *  yTickFmt: (t) => string  a y-axis label (default: the tick, then `unit`)
- *  copy:    { title?, sub?, legend: [{label, color, kind: "line"|"dashed"|"shade"}] }
+ *  copy:    { title?, sub?, caption?, terms?,
+ *             legend?: [{label, color, kind: "line"|"dashed"|"shade"|"dot"|"ring"}] }
  *           what the copy-as-image button (copy-chart.js) draws for THIS
  *           chart, for a panel with no legend chips of its own or with more
- *           than one chart in its card; rides on the host as data-copy
+ *           than one chart in its card; rides on the host as data-copy. A
+ *           legend given is the whole legend ([] for none, where the lines
+ *           are named at their ends); `caption` sits under it; `terms` are
+ *           the Past cycles terms the chart has data for
  *  extraRows: (i) => [{label,value,color?}]  rows appended to the tooltip
  *           below the series rows; a point may also carry `note` for a
  *           secondary value shown beside its own row
@@ -837,8 +841,14 @@ function TrendChart(props) {
      drawing below, and the pointer pick above – an annotation is now picked
      from the svg root like everything else on this chart, which needs its
      geometry in hand before an event arrives. */
+  /* copy-chart.js marks the host data-copying while it lays the chart out
+     1120px wide for an image. The numbers a phone or a half-width chart puts
+     on its events are keyed by a list under the chart, which the image does
+     not carry, and at that width the names fit - so the copy names them. */
+  const copying = !!(ref.current && ref.current.hasAttribute("data-copying"));
   const evPlaced = (() => {
     const evs = events
+      .map((e) => (copying && e.badge != null ? { ...e, badge: null, badgeLead: false } : e))
       .filter((e) => e.x >= win[0] && e.x <= win[1])
       .sort((a, b) => a.x - b.x);
     const fsz = refUnits;          // 10.5px on screen: the type floor for words
@@ -847,7 +857,10 @@ function TrendChart(props) {
     const ROWS = rd ? 2 : 3;
     const ROW_H = refUnits * (rd ? 1.35 : 1.4);
     const LEAD = rd ? PX(5) : refUnits * 0.55;   // shortest elbow, line to text
-    const SEP = refUnits * 0.85;    // clear air between labels in a row
+    /* clear air between labels in a row - wider in a copy, which names what
+       a half-width chart only numbers, and five events in a term's first
+       year set end to end read as one phrase ("Bondi shooting Ley → Taylor") */
+    const SEP = refUnits * (copying ? 2 : 0.85);
     const rowEnd = new Array(ROWS).fill(-Infinity);
     const rightEdge = W - pad.r;
     const rowY = rd
@@ -1177,7 +1190,7 @@ function TrendChart(props) {
             don't draw the entering segment past the y-axis) */}
         <g clipPath={`url(#${clipId})`}>
           {series.map((s) => (s.wipe != null && s.wipe >= 1 ? null : (
-            <path key={s.id} className="series-line"
+            <path key={s.id} className="series-line" data-series={s.id}
                   d={(s.smooth === false ? straightPath : rd ? monotonePath : smoothPath)(s.points, sx, sy)}
                   fill="none" stroke={s.color}
                   strokeWidth={rd ? (s.rdWidth || Math.min(3, (s.width || 3.4) * 0.8)) : (s.width || 3.4)}
@@ -1240,7 +1253,7 @@ function TrendChart(props) {
               /* inkOf, not the series colour: the label is a GLYPH, and the
                  mark values for Greens/One Nation/Others fail the text
                  threshold on paper (see the -text tokens in the template) */
-              return { text: s.endLabel, x: sx(last.x) + (rd ? 12 : 7) / scale, ideal: sy(last.y), y: sy(last.y),
+              return { sid: s.id, text: s.endLabel, x: sx(last.x) + (rd ? 12 : 7) / scale, ideal: sy(last.y), y: sy(last.y),
                        /* a colour with no text-weight variant (the house-lean
                           palette) is pulled a third of the way to ink, or a
                           light teal label sits under 3:1 on paper */
@@ -1376,7 +1389,7 @@ function TrendChart(props) {
             settle();
           }
           return groups.flat().map((l, i) => (
-            <text key={"el" + i} x={l.x} y={l.y} className="end-label" dominantBaseline="middle"
+            <text key={"el" + i} x={l.x} y={l.y} className="end-label" data-series={l.sid} dominantBaseline="middle"
                   style={{ fontSize: elFs, strokeWidth: refUnits * 0.34, opacity: l.op }}
                   fill={l.color}>{l.text}</text>
           ));

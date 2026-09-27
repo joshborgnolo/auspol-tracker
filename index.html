@@ -40386,6 +40386,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
     stand.style.pointerEvents = "none";
     stand.setAttribute("aria-hidden", "true");
     document.body.appendChild(stand);
+    host.setAttribute("data-copying", "");
     host.style.position = "absolute";
     host.style.top = "0";
     host.style.left = "-99999px";
@@ -40396,6 +40397,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
     }
     return () => {
       if (stand.parentNode) stand.parentNode.removeChild(stand);
+      host.removeAttribute("data-copying");
       if (hostStyle == null) host.removeAttribute("style");else host.setAttribute("style", hostStyle);
       for (const f of frozenSibs) {
         if (f.style == null) f.el.removeAttribute("style");else f.el.setAttribute("style", f.style);
@@ -40419,16 +40421,48 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
     };
     walk(src, clone);
     const vb = (src.getAttribute("viewBox") || "0 0 1000 420").split(/\s+/).map(Number);
-    clone.setAttribute("width", vb[2]);
-    clone.setAttribute("height", vb[3]);
+    let [bx, by, bw, bh] = vb;
+    try {
+      const r = src.getBoundingClientRect(),
+        k = bw / r.width,
+        m = 4;
+      const shown = el => {
+        for (let n = el; n && n !== src; n = n.parentElement) {
+          const cs = getComputedStyle(n);
+          if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) === 0) return false;
+        }
+        return true;
+      };
+      let x0 = bx,
+        y0 = by,
+        x1 = bx + bw,
+        y1 = by + bh;
+      for (const t of src.querySelectorAll("text")) {
+        if (!t.textContent.trim() || !shown(t)) continue;
+        const q = t.getBoundingClientRect();
+        x0 = Math.min(x0, vb[0] + (q.left - r.left) * k - m);
+        y0 = Math.min(y0, vb[1] + (q.top - r.top) * k - m);
+        x1 = Math.max(x1, vb[0] + (q.right - r.left) * k + m);
+        y1 = Math.max(y1, vb[1] + (q.bottom - r.top) * k + m);
+      }
+      if (r.width > 0) {
+        bx = x0;
+        by = y0;
+        bw = x1 - x0;
+        bh = y1 - y0;
+      }
+    } catch (e) {}
+    clone.setAttribute("viewBox", [bx, by, bw, bh].join(" "));
+    clone.setAttribute("width", bw);
+    clone.setAttribute("height", bh);
     clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     clone.style.visibility = "visible";
     clone.style.opacity = "1";
     clone.style.display = "block";
     return {
       markup: new XMLSerializer().serializeToString(clone),
-      w: vb[2],
-      h: vb[3]
+      w: bw,
+      h: bh
     };
   };
   const txt = el => {
@@ -40501,14 +40535,14 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
       ink: col(p.querySelector(".ro-num"))
     }));
     const board0 = target.classList.contains("ap-lean") && window.AP_LEAN_BOARD || target.classList.contains("ap-flow") && (window.AP_FLOW_BOARD || {})[target.id] || null;
-    const titleBase = own && own.title || board0 && board0.title || txt(target.querySelector(".card-title, h2, h3")) || "auspol tracker";
+    const titleBase = own && own.title || board0 && board0.title || txt(target.querySelector(".card-title, h2, h3")) || txt(target.querySelector(".rd-chead-t")) || "auspol tracker";
     const sub = own && own.sub != null ? own.sub : txt(target.querySelector(".card-sub"));
     const noteLead = (() => {
       if (!target.classList.contains("ap-flow")) return "";
       const n = txt(target.querySelector(".ap-var-note"));
       return (n.match(/^.*?[.!?](?=\s|$)/) || [n])[0];
     })();
-    const caption = board0 && board0.caption || noteLead || txt(target.querySelector(".hero-caption, .chart-note, .card-note"));
+    const caption = own && own.caption || board0 && board0.caption || noteLead || txt(target.querySelector(".hero-caption, .chart-note, .card-note"));
     const insightRuns = (() => {
       const el = target.querySelector(".cycle-insight");
       if (!el || !el.getClientRects().length) return null;
@@ -40541,15 +40575,31 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
     const board = (() => {
       if (!cycList || !target.closest || !target.closest(".view-cycles")) return [];
       const off = new Set((window.AP_CYC_BOARD || {}).off || []);
+      const has = own && Array.isArray(own.terms) ? new Set(own.terms) : null;
       return cycList.map(c => ({
         year: c.year,
-        off: off.has(c.year),
+        off: off.has(c.year) || !!has && !has.has(c.year),
         current: !!c.current
       })).sort((a, b) => a.year - b.year);
     })();
     const cycleLegend = () => {
       const labels = [...svgEl.querySelectorAll(".end-label")];
       if (!cycList || !labels.length) return [];
+      if (!target.closest || !target.closest(".view-cycles")) {
+        const lines = [...svgEl.querySelectorAll("path.series-line")];
+        return labels.map(t => {
+          const id = t.getAttribute("data-series");
+          const line = id != null && lines.find(p => p.getAttribute("data-series") === id);
+          const cs = line && getComputedStyle(line);
+          return {
+            label: txt(t),
+            kind: cs && cs.strokeDasharray && cs.strokeDasharray !== "none" ? "dashed" : "line",
+            fill: cs ? cs.stroke : getComputedStyle(t).fill,
+            alpha: 1,
+            year: 9999
+          };
+        });
+      }
       const opp = /opposition/i.test(titleBase + " " + sub);
       const resolve = c => {
         const el = document.createElement("span");
@@ -40597,7 +40647,18 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
           alpha: 1,
           year: 9999
         };
-      }).sort((a, b) => a.year - b.year);
+      });
+      const sitting = board.find(b => b.current && !b.off);
+      const sitCyc = sitting && cycList.find(r => r.year === sitting.year);
+      const sitLine = sitCyc && !entries.some(e => e.year === sitCyc.year) && [...svgEl.querySelectorAll("path.series-line")].find(p => (p.getAttribute("data-series") || "").split("-")[0] === "c" + sitCyc.year);
+      if (sitLine) entries.push({
+        label: sitCyc.year + " " + (opp ? sitCyc.oppLead || sitCyc.lead : sitCyc.lead),
+        kind: "line",
+        fill: getComputedStyle(sitLine).stroke,
+        alpha: 1,
+        year: sitCyc.year
+      });
+      entries.sort((a, b) => a.year - b.year);
       if (svgEl.querySelector(".cyc-band")) {
         const named = new Set(entries.filter(e => e.year < 9000).map(e => e.year));
         const years = board.filter(c => !c.off && !c.current && !named.has(c.year)).map(c => c.year);
@@ -40616,7 +40677,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
           entries.push({
             label: "Past terms (" + spans.map(spanFmt).join(", ") + "): mean of the set, middle half, and middle 80%",
             kind: "cycband",
-            fill: inkVar("--cyc-fill"),
+            fill: lo ? getComputedStyle(lo).fill : inkVar("--cyc-fill"),
             lo: lo ? parseFloat(getComputedStyle(lo).opacity) || 0.09 : 0.09,
             hi: hiB ? parseFloat(getComputedStyle(hiB).opacity) || 0.17 : 0.17,
             alpha: 1,
@@ -40655,14 +40716,15 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
       }));
       return out;
     };
-    let legend = own && own.legend ? own.legend.map(l => ({
+    const stated = !!(own && Array.isArray(own.legend));
+    let legend = stated ? own.legend.map(l => ({
       label: l.label,
-      kind: l.kind === "dashed" || l.kind === "shade" ? l.kind : "line",
+      kind: ["dashed", "shade", "dot", "ring"].includes(l.kind) ? l.kind : "line",
       fill: paint(l.color),
       alpha: 1
     })) : readLegend(target);
-    if (!legend.length && board0) legend = boardLegend();
-    if (!legend.length) legend = cycleLegend();
+    if (!stated && !legend.length && board0) legend = boardLegend();
+    if (!stated && !legend.length) legend = cycleLegend();
     if (target.classList.contains("ap-var")) legend.push({
       label: "Chance floor (shaded)",
       kind: "shade",
@@ -40955,6 +41017,12 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
               c.roundRect(lx, my - 5, 18, 11, 2);
               c.fill();
               c.globalAlpha = it.alpha;
+            } else if (it.kind === "ring") {
+              c.strokeStyle = it.fill;
+              c.lineWidth = 2;
+              c.beginPath();
+              c.arc(lx + 6, my, 5, 0, 7);
+              c.stroke();
             } else {
               c.fillStyle = it.fill;
               c.beginPath();
@@ -42287,13 +42355,18 @@ function TrendChart(props) {
     fill: d.color,
     opacity: DOT_OP * (d.op != null ? d.op : 1)
   }));
+  const copying = !!(ref.current && ref.current.hasAttribute("data-copying"));
   const evPlaced = (() => {
-    const evs = events.filter(e => e.x >= win[0] && e.x <= win[1]).sort((a, b) => a.x - b.x);
+    const evs = events.map(e => copying && e.badge != null ? {
+      ...e,
+      badge: null,
+      badgeLead: false
+    } : e).filter(e => e.x >= win[0] && e.x <= win[1]).sort((a, b) => a.x - b.x);
     const fsz = refUnits;
     const ROWS = rd ? 2 : 3;
     const ROW_H = refUnits * (rd ? 1.35 : 1.4);
     const LEAD = rd ? PX(5) : refUnits * 0.55;
-    const SEP = refUnits * 0.85;
+    const SEP = refUnits * (copying ? 2 : 0.85);
     const rowEnd = new Array(ROWS).fill(-Infinity);
     const rightEdge = W - pad.r;
     const rowY = rd ? r => r == null ? pad.t : pad.t - PX(10) - (ROWS - 1 - r) * ROW_H : r => r == null ? pad.t + 4 : pad.t + 3 + r * ROW_H;
@@ -42721,6 +42794,7 @@ function TrendChart(props) {
   }, series.map(s => s.wipe != null && s.wipe >= 1 ? null : React.createElement("path", {
     key: s.id,
     className: "series-line",
+    "data-series": s.id,
     d: (s.smooth === false ? straightPath : rd ? monotonePath : smoothPath)(s.points, sx, sy),
     fill: "none",
     stroke: s.color,
@@ -42795,6 +42869,7 @@ function TrendChart(props) {
     const labs = series.filter(s => s.endLabel && s.points.length && s.opacity !== 0).map(s => {
       const last = s.points[s.points.length - 1];
       return {
+        sid: s.id,
         text: s.endLabel,
         x: sx(last.x) + (rd ? 12 : 7) / scale,
         ideal: sy(last.y),
@@ -42884,6 +42959,7 @@ function TrendChart(props) {
       x: l.x,
       y: l.y,
       className: "end-label",
+      "data-series": l.sid,
       dominantBaseline: "middle",
       style: {
         fontSize: elFs,
@@ -50102,7 +50178,8 @@ function CycleChart({
     tipCycle: tipCycle,
     banded: banded,
     bandN: bandN,
-    isOpp: isOpp
+    isOpp: isOpp,
+    terms: shown.filter(hasData).map(c => c.year)
   });
   return React.createElement("section", {
     className: "card cycle-card"
@@ -56578,6 +56655,27 @@ function RdHero(p) {
     kind: "ring",
     label: narrow ? "2025 election" : "2025 election result"
   } : null];
+  const copyKey = [keyItems.find(k => k && k.kind === "dot"), adjusted || morph ? {
+    kind: "line",
+    color: mainCol,
+    label: labelMain + ", monthly average" + (bandPts.length >= 2 ? flowsBand ? " and flow range" : " and its 95% interval" : "")
+  } : null, labelOther ? {
+    kind: "line",
+    color: otherCol,
+    label: labelOther + ", monthly average"
+  } : null, cmpOn ? {
+    kind: "dashed",
+    color: mainCol,
+    label: cmpName + ", monthly average"
+  } : null, sensOn ? {
+    kind: "shade",
+    color: "var(--lnp)",
+    label: "Range if One Nation preferences flowed as in 2022"
+  } : null, ringOn && narrow ? {
+    kind: "ring",
+    color: "var(--ink)",
+    label: "2025 election result"
+  } : null].filter(Boolean);
   const tooltipTitle = i => {
     const d = spine[i] || spine[spine.length - 1];
     return d && d.ym ? monthLabelFull(d.ym) : "";
@@ -56760,11 +56858,11 @@ function RdHero(p) {
     fmt: v => v.toFixed(1),
     copy: {
       title: chartTitle.replace(/, %$/, ""),
-      sub: basisWords + (unc ? " · weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
-      legend: keyItems.filter(Boolean).filter(k => k.kind !== "ring" && k.kind !== "dot").map(k => ({
+      sub: basisWords.replace(/^Implied flows$/, "Implied preference flows") + (unc ? " · weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
+      legend: copyKey.map(k => ({
         label: k.label,
         color: k.color,
-        kind: k.kind === "dash" ? "dashed" : k.kind === "band" ? "shade" : "line"
+        kind: k.kind
       }))
     }
   }), badges && React.createElement(RdEventList, {
@@ -57464,6 +57562,9 @@ function RdLeadership({
     },
     fmt: v => v.toFixed(1)
   }, props)));
+  const keyDots = "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.";
+  const keyThree = "Shares of all respondents. Pollsters leave different shares undecided, so read the order and the gaps rather than the levels.";
+  const keyLead = "Lead is " + pm.short + "’s share minus his opponent’s";
   const ppmModel = v => v === "three" ? {
     title: "Share in the three-way question, month by month",
     series: threeSeries,
@@ -57475,7 +57576,13 @@ function RdLeadership({
     notes: threeNotes,
     spine: (threeSeries[0] || {
       points: []
-    }).points
+    }).points,
+    copy: {
+      title: "Preferred prime minister",
+      sub: "Each leader’s share when asked to choose from all three, month by month",
+      legend: [],
+      caption: keyDots + " " + keyThree
+    }
   } : {
     title: pm.short + "’s lead" + (ppmView === "both" ? " head to head" : "") + ", month by month",
     series: leadSeries,
@@ -57490,7 +57597,13 @@ function RdLeadership({
     notes: leadNotes,
     spine: (leadSeries.find(s => s.id === "taylor") || leadSeries[0] || {
       points: []
-    }).points
+    }).points,
+    copy: {
+      title: "Preferred prime minister",
+      sub: pm.short + "’s lead over each rival, asked head to head, month by month",
+      legend: [],
+      caption: keyDots + " " + keyLead + "."
+    }
   };
   const ppmPad = (() => {
     const room = t => [...t].reduce((n, c) => n + (c >= "0" && c <= "9" ? 0.55 : c === " " ? 0.3 : 0.72), 0) * 13 * 0.95 + 12;
@@ -57552,6 +57665,7 @@ function RdLeadership({
       fade: m ? m.t : 1,
       pollFacet: "leadership",
       spine: B.spine,
+      copy: B.copy,
       extraRows: i => ciRows(B.series, i, B.spine)
     });
   };
@@ -57680,6 +57794,17 @@ function RdLeadership({
       fade: m ? m.t : 1,
       pollFacet: "leadership",
       spine,
+      copy: mt === "fav" ? {
+        title: "Leaders’ net favourability",
+        sub: "Favourable minus unfavourable views of each leader as a person, month by month",
+        legend: [],
+        caption: keyDots + " Polls by RedBridge, DemosAU, Freshwater and Spectre Strategy."
+      } : {
+        title: "Leaders’ net approval",
+        sub: "Approve minus disapprove of the job each leader is doing, month by month",
+        legend: [],
+        caption: keyDots + " Polls by Newspoll, YouGov, Resolve, Essential and others."
+      },
       extraRows: i => {
         const r = spine[i];
         if (!r) return [];
@@ -57889,7 +58014,7 @@ function RdLeadership({
     items: []
   }, React.createElement("span", {
     className: "rd-ld-keytxt"
-  }, ppmView === "three" ? "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Shares of all respondents. Pollsters leave different shares undecided, so read the order and the gaps rather than the levels." : ppmView === "two" ? "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Lead is " + pm.short + "’s share minus his opponent’s, which lets one chart carry both head-to-head contests." : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals. Lead is " + pm.short + "’s share minus his opponent’s; three-way figures are shares of all respondents.")))), panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval", metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person." : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. RedBridge, DemosAU, Freshwater and Spectre Strategy." : "Approve minus disapprove of the job each leader is doing. Newspoll, YouGov, Resolve, Essential and others.", React.createElement(RdTabs, {
+  }, keyDots + " " + (ppmView === "three" ? keyThree : ppmView === "two" ? keyLead + ", which lets one chart carry both head-to-head contests." : keyLead + "; three-way figures are shares of all respondents."))))), panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval", metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person." : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. RedBridge, DemosAU, Freshwater and Spectre Strategy." : "Approve minus disapprove of the job each leader is doing. Newspoll, YouGov, Resolve, Essential and others.", React.createElement(RdTabs, {
     swipe: true,
     value: metric,
     onChange: v => {
@@ -58510,7 +58635,16 @@ function RdDemographics({
     fmt: v => v.toFixed(1),
     copy: {
       title: "Who votes for whom",
-      sub: pName + "’s share of the vote, " + (c.st.label || tab.label).toLowerCase() + ", month by month"
+      sub: pName + "’s share of the vote, " + (c.st.label || "By " + tab.label).toLowerCase() + ", month by month",
+      legend: c.drawn.map(l => ({
+        label: l.g.label,
+        color: l.color,
+        kind: "line"
+      })).concat([{
+        label: "All voters",
+        color: "var(--ink)",
+        kind: "dashed"
+      }])
     }
   }));
   return React.createElement(RdSec, {
@@ -59852,7 +59986,13 @@ function RdUndecided({
       fmt: v => v.toFixed(1),
       copy: {
         title: title,
-        sub: meta
+        sub: meta,
+        caption: "Each dot is one poll; lines are monthly averages.",
+        legend: drawn.map(d => ({
+          label: (d.s.id === "soft" ? "Might still change" : d.s.label) + " " + nowOf(d.s).toFixed(1) + "%",
+          color: COL(d.s),
+          kind: d.s.dashed ? "dashed" : "line"
+        }))
       }
     }));
   };
@@ -60171,7 +60311,17 @@ function RdUndecided({
     fmt: v => v.toFixed(0),
     copy: {
       title: (k === "oth" ? "Others" : D.PARTIES[k].name) + " voters calling their vote solid",
-      sub: "Three RedBridge waves at a time"
+      sub: "Three RedBridge waves at a time",
+      caption: "Dots are single waves.",
+      legend: [{
+        label: (k === "oth" ? "Others" : D.PARTIES[k].name) + " voters " + F.now[k].v.toFixed(1) + "%",
+        color: D.PARTIES[k].color,
+        kind: "line"
+      }, {
+        label: "All voters " + F.now.all.v.toFixed(1) + "%",
+        color: "var(--ink)",
+        kind: "dashed"
+      }]
     }
   })))), React.createElement(RdFoot, {
     how: {
@@ -60272,7 +60422,17 @@ function RdUndecided({
     fmt: v => v.toFixed(0),
     copy: {
       title: "Voters not firm, by age",
-      sub: "Three Resolve waves at a time"
+      sub: "Share of each age group who named a party but aren’t firm",
+      caption: "Pooled three Resolve waves at a time; dots are single waves.",
+      legend: ageView.B.map((b, i) => ({
+        label: b.label,
+        color: ageView.grey(i),
+        kind: "line"
+      })).concat([{
+        label: "All voters",
+        color: "var(--ink)",
+        kind: "dashed"
+      }])
     }
   })), React.createElement(RdFoot, {
     how: {
@@ -61133,7 +61293,8 @@ function RdCycleChart({
   tipCycle,
   banded,
   bandN,
-  isOpp
+  isOpp,
+  terms
 }) {
   const {
     D
@@ -61295,6 +61456,7 @@ function RdCycleChart({
   if (!tickSet.includes(domain[0])) tickSet.unshift(domain[0]);
   if (!tickSet.includes(domain[1])) tickSet.push(domain[1]);
   const title = (chg ? RD_CYC_TITLE_CHG : RD_CYC_TITLE)[M.key];
+  const copyTitle = M.key === "ppmm" ? "The PM’s lead as preferred prime minister, " + (chg ? "change since the first reading" : "points") : M.key === "oppnet" && !chg ? "Opposition leader’s net approval, points" : title;
   return React.createElement("div", {
     className: "card rd-card rd-cyc-chart"
   }, React.createElement("div", {
@@ -61353,8 +61515,9 @@ function RdCycleChart({
     fmt: v => fmt(v),
     pollFacet: M.key === "tpp" ? "twopp" : M.key === "primary" || M.key === "oppr" ? "primary" : "leadership",
     copy: {
-      title: title,
-      sub: banded ? "Against the middle half and middle 80% of " + bandN + " past terms" : ""
+      title: copyTitle,
+      sub: banded ? "Against the middle half and middle 80% of " + bandN + " past terms" : "",
+      terms
     }
   }), badges && badges.list && React.createElement(RdEventList, {
     list: badges.list

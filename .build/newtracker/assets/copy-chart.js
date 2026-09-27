@@ -316,6 +316,10 @@
     stand.style.pointerEvents = "none";
     stand.setAttribute("aria-hidden", "true");
     document.body.appendChild(stand);
+    /* read by TrendChart on the re-render the width sets off: the image is
+       laid out to be read on its own, so it names the events a narrow chart
+       only numbers */
+    host.setAttribute("data-copying", "");
     host.style.position = "absolute";
     host.style.top = "0";
     host.style.left = "-99999px";
@@ -331,6 +335,7 @@
       /* stand out first so the frame that brings the host back never shows
          the pair stacked - removal and restore are one paint */
       if (stand.parentNode) stand.parentNode.removeChild(stand);
+      host.removeAttribute("data-copying");
       if (hostStyle == null) host.removeAttribute("style"); else host.setAttribute("style", hostStyle);
       for (const f of frozenSibs) {
         if (f.style == null) f.el.removeAttribute("style"); else f.el.setAttribute("style", f.style);
@@ -354,15 +359,44 @@
     };
     walk(src, clone);
     const vb = (src.getAttribute("viewBox") || "0 0 1000 420").split(/\s+/).map(Number);
-    clone.setAttribute("width", vb[2]);
-    clone.setAttribute("height", vb[3]);
+    /* The page draws a chart with overflow showing, and the redesign hangs
+       words past its box: an event name above a shallow top margin, a y
+       label left of a phone's narrow gutter. An image stops at the viewBox,
+       which cut "Ley → Taylor" in half, so the box grows to take in the
+       words that are showing. Only those: the svg's own getBBox counts
+       hidden marks too, and a hover marker parked where the phone layout
+       left it doubled the copy's height with blank paper. */
+    let [bx, by, bw, bh] = vb;
+    try {
+      const r = src.getBoundingClientRect(), k = bw / r.width, m = 4;
+      const shown = (el) => {
+        for (let n = el; n && n !== src; n = n.parentElement) {
+          const cs = getComputedStyle(n);
+          if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) === 0) return false;
+        }
+        return true;
+      };
+      let x0 = bx, y0 = by, x1 = bx + bw, y1 = by + bh;
+      for (const t of src.querySelectorAll("text")) {
+        if (!t.textContent.trim() || !shown(t)) continue;
+        const q = t.getBoundingClientRect();
+        x0 = Math.min(x0, vb[0] + (q.left - r.left) * k - m);
+        y0 = Math.min(y0, vb[1] + (q.top - r.top) * k - m);
+        x1 = Math.max(x1, vb[0] + (q.right - r.left) * k + m);
+        y1 = Math.max(y1, vb[1] + (q.bottom - r.top) * k + m);
+      }
+      if (r.width > 0) { bx = x0; by = y0; bw = x1 - x0; bh = y1 - y0; }
+    } catch (e) { /* not laid out: keep the viewBox as it was */ }
+    clone.setAttribute("viewBox", [bx, by, bw, bh].join(" "));
+    clone.setAttribute("width", bw);
+    clone.setAttribute("height", bh);
     clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     /* The root is the one element whose own visibility must not be inherited
        from the page: it is being rendered standalone. */
     clone.style.visibility = "visible";
     clone.style.opacity = "1";
     clone.style.display = "block";
-    return { markup: new XMLSerializer().serializeToString(clone), w: vb[2], h: vb[3] };
+    return { markup: new XMLSerializer().serializeToString(clone), w: bw, h: bh };
   };
 
   /* textContent is wrong here. A rolling figure is ten digits per column - the
@@ -476,7 +510,9 @@
     const board0 = (target.classList.contains("ap-lean") && window.AP_LEAN_BOARD)
                 || (target.classList.contains("ap-flow") && (window.AP_FLOW_BOARD || {})[target.id]) || null;
     const titleBase = (own && own.title) || (board0 && board0.title)
-      || txt(target.querySelector(".card-title, h2, h3")) || "auspol tracker";
+      || txt(target.querySelector(".card-title, h2, h3"))
+      /* the redesign names a chart in the head over it, not in a heading */
+      || txt(target.querySelector(".rd-chead-t")) || "auspol tracker";
     const sub = own && own.sub != null ? own.sub : txt(target.querySelector(".card-sub"));
     /* the drift panels' ground note opens with the sentence that reads the
        chart's two colours ("Above zero – the red ground – …"); the image
@@ -486,7 +522,7 @@
       const n = txt(target.querySelector(".ap-var-note"));
       return (n.match(/^.*?[.!?](?=\s|$)/) || [n])[0];
     })();
-    const caption = (board0 && board0.caption) || noteLead
+    const caption = (own && own.caption) || (board0 && board0.caption) || noteLead
       || txt(target.querySelector(".hero-caption, .chart-note, .card-note"));
     /* The past-cycles insight sentence ("16 months in, the Coalition
        (21.0%) sits 21.4% below the average opposition at this point. ...")
@@ -531,7 +567,12 @@
     const board = (() => {
       if (!cycList || !target.closest || !target.closest(".view-cycles")) return [];
       const off = new Set((window.AP_CYC_BOARD || {}).off || []);
-      return cycList.map((c) => ({ year: c.year, off: off.has(c.year), current: !!c.current }))
+      /* A chart can say which terms it has data for (the redesign's copy
+         `terms`): preferred PM starts in 1984, so a board running from 1972
+         titled its copy "1972–present" and its band "Past terms (1972–2022)".
+         A term with none counts as off the board, which keeps the runs. */
+      const has = own && Array.isArray(own.terms) ? new Set(own.terms) : null;
+      return cycList.map((c) => ({ year: c.year, off: off.has(c.year) || (!!has && !has.has(c.year)), current: !!c.current }))
                     .sort((a, b) => a.year - b.year);
     })();
 
@@ -555,6 +596,21 @@
     const cycleLegend = () => {
       const labels = [...svgEl.querySelectorAll(".end-label")];
       if (!cycList || !labels.length) return [];
+      /* Outside Past cycles an end label is simply the name of its line, and
+         the line itself says whether it is dashed. Naming by colour (Labor's
+         red is Albanese's, the Coalition's blue Taylor's) and keying every
+         entry dashed are that tab's rules for its overlays; on the issues
+         chart they keyed Labor's line as "Albanese, from 2025". */
+      if (!target.closest || !target.closest(".view-cycles")) {
+        const lines = [...svgEl.querySelectorAll("path.series-line")];
+        return labels.map((t) => {
+          const id = t.getAttribute("data-series");
+          const line = id != null && lines.find((p) => p.getAttribute("data-series") === id);
+          const cs = line && getComputedStyle(line);
+          return { label: txt(t), kind: cs && cs.strokeDasharray && cs.strokeDasharray !== "none" ? "dashed" : "line",
+                   fill: cs ? cs.stroke : getComputedStyle(t).fill, alpha: 1, year: 9999 };
+        });
+      }
       const opp = /opposition/i.test(titleBase + " " + sub);   // `title` is not bound yet here
       const resolve = (c) => {
         const el = document.createElement("span");
@@ -601,7 +657,19 @@
         const from = m && firstYear(m.id);
         return { label: m ? (m.name + (from ? ", from " + from : "")) : (t.textContent || "").trim(),
                  kind: "dashed", fill, alpha: 1, year: 9999 };
-      }).sort((a, b) => a.year - b.year);
+      });
+      /* The redesign names the sitting term at "Now" rather than at the end
+         of its line, so it has no end label to be keyed from - and on the
+         opposition's charts the Ley stretch of it is named nowhere. Keyed
+         from its line instead, as the terms with labels are. */
+      const sitting = board.find((b) => b.current && !b.off);
+      const sitCyc = sitting && cycList.find((r) => r.year === sitting.year);
+      const sitLine = sitCyc && !entries.some((e) => e.year === sitCyc.year)
+        && [...svgEl.querySelectorAll("path.series-line")].find((p) => (p.getAttribute("data-series") || "").split("-")[0] === "c" + sitCyc.year);
+      if (sitLine)
+        entries.push({ label: sitCyc.year + " " + (opp ? (sitCyc.oppLead || sitCyc.lead) : sitCyc.lead),
+                       kind: "line", fill: getComputedStyle(sitLine).stroke, alpha: 1, year: sitCyc.year });
+      entries.sort((a, b) => a.year - b.year);
       /* While the band is on the chart, the end labels name only the current
          term (plus any hovered one) - the copied card showed a purple
          wash that nothing claimed, warming over terms it never named. Here
@@ -636,7 +704,9 @@
           entries.push({
             label: "Past terms (" + spans.map(spanFmt).join(", ") + "): mean of the set, middle half, and middle 80%",
             kind: "cycband",
-            fill: inkVar("--cyc-fill"),
+            /* the band's own fill: the redesign draws it in ink, not the
+               old design's violet */
+            fill: lo ? getComputedStyle(lo).fill : inkVar("--cyc-fill"),
             lo: lo ? parseFloat(getComputedStyle(lo).opacity) || 0.09 : 0.09,
             hi: hiB ? parseFloat(getComputedStyle(hiB).opacity) || 0.17 : 0.17,
             alpha: 1, year: 9998,
@@ -668,12 +738,16 @@
                                         fill: solid(i.color), alpha: i.off ? 0.45 : 1 }));
       return out;
     };
-    let legend = own && own.legend
-      ? own.legend.map((l) => ({ label: l.label, kind: l.kind === "dashed" || l.kind === "shade" ? l.kind : "line",
+    /* A chart that states its legend is taken at its word, an empty one
+       included: a chart whose lines are named at their ends needs none, and
+       says so rather than being handed one built from those names. */
+    const stated = !!(own && Array.isArray(own.legend));
+    let legend = stated
+      ? own.legend.map((l) => ({ label: l.label, kind: ["dashed", "shade", "dot", "ring"].includes(l.kind) ? l.kind : "line",
                                  fill: paint(l.color), alpha: 1 }))
       : readLegend(target);
-    if (!legend.length && board0) legend = boardLegend();
-    if (!legend.length) legend = cycleLegend();
+    if (!stated && !legend.length && board0) legend = boardLegend();
+    if (!stated && !legend.length) legend = cycleLegend();
     /* The Poll disagreement panel's chance-floor shading has no chip of its
        own – the live page explains it in the sub, which the image keeps only
        the first sentence of – so the copy names it in the legend, the way
@@ -922,6 +996,10 @@
               c.fillStyle = it.fill; c.globalAlpha = it.alpha * 0.7;
               c.beginPath(); c.roundRect(lx, my - 5, 18, 11, 2); c.fill();
               c.globalAlpha = it.alpha;
+            } else if (it.kind === "ring") {
+              /* an election result: a count, drawn open as the chart draws it */
+              c.strokeStyle = it.fill; c.lineWidth = 2;
+              c.beginPath(); c.arc(lx + 6, my, 5, 0, 7); c.stroke();
             } else {
               c.fillStyle = it.fill;
               c.beginPath(); c.arc(lx + 5, my, 4.5, 0, 7); c.fill();
