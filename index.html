@@ -41626,6 +41626,28 @@ function textWidth(str, size, weight) {
   _measCache.set(key, w);
   return w;
 }
+function wrapText(str, size, weight, w, max) {
+  const words = str.split(/ +/).filter(Boolean);
+  const wide = ln => textWidth(ln, size, weight);
+  for (let n = 1; n <= Math.min(max, words.length); n++) {
+    let best = null;
+    const walk = (at, left, acc) => {
+      if (left === 1) {
+        const lines = acc.concat(words.slice(at).join(" "));
+        const widest = Math.max(...lines.map(wide));
+        if (widest <= w && (!best || widest < best.widest)) best = {
+          lines,
+          widest
+        };
+        return;
+      }
+      for (let k = at + 1; k <= words.length - left + 1; k++) walk(k, left - 1, acc.concat(words.slice(at, k).join(" ")));
+    };
+    walk(0, n, []);
+    if (best) return best.lines;
+  }
+  return null;
+}
 const VB = {
   W: 1000
 };
@@ -41900,6 +41922,14 @@ function TrendChart(props) {
   const axisUnits = (rd ? 12 : 11) / scale;
   const refUnits = (rd ? 12 : 10.5) / scale;
   const PX = v => v / Math.max(scale, 0.0001);
+  const spanEdge = (v, j) => {
+    if (v === "left") return pad.l + PX(6);
+    if (v === "right") return W - pad.r - PX(6);
+    if (v !== "data") return sx(v);
+    const xs = series.filter(s => s.opacity !== 0 && !(s.wipe >= 1)).flatMap(s => s.points.map(p => p.x)).concat(scatter.map(d => d.x), areas.flatMap(a => (a.points || []).map(p => p.x))).filter(x => x >= win[0] && x <= win[1]);
+    if (!xs.length) return j ? W - pad.r - PX(6) : pad.l + PX(6);
+    return j ? sx(Math.min(...xs)) - PX(12) : sx(Math.max(...xs)) + PX(12);
+  };
   const spinePts = spine || (series[0] ? series[0].points : []);
   const toVB = e => {
     const rect = ref.current.querySelector("svg").getBoundingClientRect();
@@ -42895,20 +42925,51 @@ function TrendChart(props) {
       }
     }, ln)));
   }), notes.map((n, i) => {
+    const cls = "rd-note-text" + (n.cls ? " " + n.cls : "");
+    const style = {
+      fontSize: PX(n.size || 12),
+      strokeWidth: PX(4),
+      fill: n.color || undefined,
+      fontWeight: n.weight || undefined
+    };
+    if (n.span) {
+      const [a, b] = n.span.map(spanEdge),
+        base = n.size || 12;
+      let fit = null;
+      for (const size of [base, base - 1]) for (const t of [].concat(n.text)) {
+        const lines = !fit && b > a && wrapText(t, size, n.weight || 400, (b - a) * scale, 2);
+        if (lines) fit = {
+          lines,
+          size
+        };
+      }
+      if (!fit) return null;
+      const lh = PX(fit.size * 1.3),
+        mid = sy(n.y) + PX(n.dy || 0);
+      return React.createElement("g", {
+        key: "nt" + i
+      }, fit.lines.map((ln, j) => React.createElement("text", {
+        key: j,
+        x: (a + b) / 2,
+        y: mid + (j - (fit.lines.length - 1) / 2) * lh,
+        className: cls,
+        textAnchor: "middle",
+        dominantBaseline: "middle",
+        style: {
+          ...style,
+          fontSize: PX(fit.size)
+        }
+      }, ln)));
+    }
     const x = (n.x === "left" ? pad.l + PX(6) : n.x === "right" ? W - pad.r - PX(6) : sx(n.x)) + PX(n.dx || 0);
     return React.createElement("text", {
       key: "nt" + i,
       x: x,
       y: sy(n.y) + PX(n.dy || 0),
-      className: "rd-note-text" + (n.cls ? " " + n.cls : ""),
+      className: cls,
       textAnchor: n.anchor || (n.x === "right" ? "end" : "start"),
       dominantBaseline: n.baseline || "auto",
-      style: {
-        fontSize: PX(n.size || 12),
-        strokeWidth: PX(4),
-        fill: n.color || undefined,
-        fontWeight: n.weight || undefined
-      }
+      style: style
     }, n.text);
   })), tip && React.createElement("div", {
     ref: tipRef,
@@ -57333,13 +57394,14 @@ function RdLeadership({
   });
   const threeTop = Math.max(40, Math.ceil(Math.max(...bandVals(threeSeries), ...threeDots.map(d => d.y), 0) / 10) * 10);
   const leyRun = threeSeries.find(s => s.id === "ley");
+  const threeFrom = (() => {
+    const r = LM.find(m => m.alb_pref3 != null);
+    return r ? rdMonthYear(r.ym).replace(" ", "\u00a0") : "";
+  })();
   const threeNotes = [firstThree != null && firstThree - xDomain[0] > 0.2 ? {
-    x: "left",
+    span: ["left", "data"],
     y: threeTop * 0.62,
-    text: "Three-way questions began in " + (() => {
-      const r = LM.find(m => m.alb_pref3 != null);
-      return r ? rdMonthYear(r.ym) : "";
-    })(),
+    text: ["Three-way questions began in " + threeFrom, "First asked in " + threeFrom],
     cls: "rd-note-it"
   } : null, leyRun && leyRun.points.length ? {
     x: leyRun.points[leyRun.points.length - 1].x,

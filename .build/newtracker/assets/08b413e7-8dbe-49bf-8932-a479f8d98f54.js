@@ -26,6 +26,31 @@ function textWidth(str, size, weight) {
   _measCache.set(key, w);
   return w;
 }
+/* The fewest lines no wider than `w` px that hold `str`, split as evenly as
+   they go: a note wrapped into a gap breaks "Three-way questions / began in
+   January 2026", not "Three-way questions began in / January 2026". null
+   when `max` lines won't hold it. Breaks at plain spaces only, so a
+   no-break space holds "January 2026" together. */
+function wrapText(str, size, weight, w, max) {
+  const words = str.split(/ +/).filter(Boolean);
+  const wide = (ln) => textWidth(ln, size, weight);
+  for (let n = 1; n <= Math.min(max, words.length); n++) {
+    let best = null;
+    const walk = (at, left, acc) => {
+      if (left === 1) {
+        const lines = acc.concat(words.slice(at).join(" "));
+        const widest = Math.max(...lines.map(wide));
+        if (widest <= w && (!best || widest < best.widest)) best = { lines, widest };
+        return;
+      }
+      for (let k = at + 1; k <= words.length - left + 1; k++)
+        walk(k, left - 1, acc.concat(words.slice(at, k).join(" ")));
+    };
+    walk(0, n, []);
+    if (best) return best.lines;
+  }
+  return null;
+}
 /* bare hooks (useState, useRef, …) come from the window aliases set in utils.js */
 
 // viewBox geometry (scales to container width, aspect preserved)
@@ -174,7 +199,15 @@ function TrendChart(props) {
                 a point that is a count rather than a poll (an election
                 result), with its words beside it;
        notes  – [{x, y, text, dy?, anchor?, color?, weight?}] a word or two
-                set on the plot (x "left" pins it to the plot's left edge);
+                set on the plot (x "left" pins it to the plot's left edge).
+                One that explains a stretch of the plot - the months before
+                a question was first asked - takes `span: [from, to]` in
+                place of x: centred in that stretch and wrapped to fit it.
+                Its `text` may be a list, longest first; it takes the first
+                that fits in two lines, then tries a size smaller, and is
+                dropped if nothing fits. An end is an x, "left" or "right"
+                (the plot's edges), or "data" (where the lines, bands and
+                dots begin or end);
        baseline – draw the x axis as a solid rule at the domain's floor,
                 with a tick under each labelled month. */
     marks = [], notes = [], baseline = false,
@@ -367,6 +400,18 @@ function TrendChart(props) {
   const refUnits = (rd ? 12 : 10.5) / scale;
   /* screen px -> user units, for the redesign's pixel-true marks */
   const PX = (v) => v / Math.max(scale, 0.0001);
+  /* one end of a spanned note's stretch (see `notes`); "data" stops short
+     of the first or last mark by enough to clear an end cap */
+  const spanEdge = (v, j) => {
+    if (v === "left") return pad.l + PX(6);
+    if (v === "right") return W - pad.r - PX(6);
+    if (v !== "data") return sx(v);
+    const xs = series.filter((s) => s.opacity !== 0 && !(s.wipe >= 1)).flatMap((s) => s.points.map((p) => p.x))
+      .concat(scatter.map((d) => d.x), areas.flatMap((a) => (a.points || []).map((p) => p.x)))
+      .filter((x) => x >= win[0] && x <= win[1]);
+    if (!xs.length) return j ? W - pad.r - PX(6) : pad.l + PX(6);
+    return j ? sx(Math.min(...xs)) - PX(12) : sx(Math.max(...xs)) + PX(12);
+  };
 
   // shared x spine for guide-line hover (monthly)
   const spinePts = spine || (series[0] ? series[0].points : []);
@@ -1381,14 +1426,36 @@ function TrendChart(props) {
           );
         })}
         {notes.map((n, i) => {
+          const cls = "rd-note-text" + (n.cls ? " " + n.cls : "");
+          const style = { fontSize: PX(n.size || 12), strokeWidth: PX(4),
+                          fill: n.color || undefined, fontWeight: n.weight || undefined };
+          if (n.span) {
+            const [a, b] = n.span.map(spanEdge), base = n.size || 12;
+            let fit = null;
+            for (const size of [base, base - 1])
+              for (const t of [].concat(n.text)) {
+                const lines = !fit && b > a && wrapText(t, size, n.weight || 400, (b - a) * scale, 2);
+                if (lines) fit = { lines, size };
+              }
+            if (!fit) return null;
+            const lh = PX(fit.size * 1.3), mid = sy(n.y) + PX(n.dy || 0);
+            return (
+              <g key={"nt" + i}>
+                {fit.lines.map((ln, j) => (
+                  <text key={j} x={(a + b) / 2} y={mid + (j - (fit.lines.length - 1) / 2) * lh}
+                        className={cls} textAnchor="middle" dominantBaseline="middle"
+                        style={{ ...style, fontSize: PX(fit.size) }}>{ln}</text>
+                ))}
+              </g>
+            );
+          }
           const x = (n.x === "left" ? pad.l + PX(6) : n.x === "right" ? W - pad.r - PX(6) : sx(n.x)) + PX(n.dx || 0);
           return (
             <text key={"nt" + i} x={x} y={sy(n.y) + PX(n.dy || 0)}
-                  className={"rd-note-text" + (n.cls ? " " + n.cls : "")}
+                  className={cls}
                   textAnchor={n.anchor || (n.x === "right" ? "end" : "start")}
                   dominantBaseline={n.baseline || "auto"}
-                  style={{ fontSize: PX(n.size || 12), strokeWidth: PX(4),
-                           fill: n.color || undefined, fontWeight: n.weight || undefined }}>{n.text}</text>
+                  style={style}>{n.text}</text>
           );
         })}
       </svg>

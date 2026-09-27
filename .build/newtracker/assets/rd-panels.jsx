@@ -429,8 +429,13 @@ function RdLeadership({ rangeId }) {
     });
   const threeTop = Math.max(40, Math.ceil(Math.max(...bandVals(threeSeries), ...threeDots.map((d) => d.y), 0) / 10) * 10);
   const leyRun = threeSeries.find((s) => s.id === "ley");
+  /* the note on the empty months before the question was first asked sits
+     in them, wrapped to their width and in fewer words where a phone leaves
+     too little room: pinned to the plot's left edge, a phone's narrow plot
+     ran it across January and over Hanson's line */
+  const threeFrom = (() => { const r = LM.find((m) => m.alb_pref3 != null); return r ? rdMonthYear(r.ym).replace(" ", "\u00a0") : ""; })();
   const threeNotes = [
-    firstThree != null && firstThree - xDomain[0] > 0.2 ? { x: "left", y: threeTop * 0.62, text: "Three-way questions began in " + (() => { const r = LM.find((m) => m.alb_pref3 != null); return r ? rdMonthYear(r.ym) : ""; })(), cls: "rd-note-it" } : null,
+    firstThree != null && firstThree - xDomain[0] > 0.2 ? { span: ["left", "data"], y: threeTop * 0.62, text: ["Three-way questions began in " + threeFrom, "First asked in " + threeFrom], cls: "rd-note-it" } : null,
     leyRun && leyRun.points.length ? { x: leyRun.points[leyRun.points.length - 1].x, y: leyRun.points[leyRun.points.length - 1].y, dy: 18, text: "Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 } : null,
   ].filter(Boolean);
   /* a phone's title runs the chart's width, so the Ley → Taylor flag needs
