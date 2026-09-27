@@ -62651,11 +62651,14 @@ function rdApOut(stamp) {
   }
   return s;
 }
+function rdEffTbc(p) {
+  if (p.sampleEff != null || !p.published) return false;
+  if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
+  const prev = window.AUSPOL.individualPolls.filter(q => q.pollster === p.pollster && q.released < p.released).sort((a, b) => a.released < b.released ? -1 : 1).pop();
+  return !!(prev && prev.sampleEff != null);
+}
 function rdPollHead(p) {
-  const D = window.AUSPOL;
-  const prev = D.individualPolls.filter(q => q.pollster === p.pollster && q.released < p.released).sort((a, b) => a.released < b.released ? -1 : 1).pop();
-  const fresh = p.published && Date.now() - Date.parse(p.published.slice(0, 10)) < 21 * 86400000;
-  const tbc = p.sampleEff == null && fresh && prev && prev.sampleEff != null;
+  const tbc = rdEffTbc(p);
   const n = p.sample != null ? "n = " + p.sample.toLocaleString() + (p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? " (eff. TBC)" : "") : "sample not published";
   const out = rdApOut(p.published);
   const by = "Published by " + (p.client && !/^self/i.test(p.client) ? p.client : p.pollster);
@@ -63610,9 +63613,12 @@ function RdAllPolls(P) {
   const sampleCell = p => React.createElement("span", {
     role: "cell",
     className: "rd-ap-n"
-  }, React.createElement("span", null, p.sample != null ? p.sample.toLocaleString() : "—"), p.sampleEff != null && React.createElement("span", {
+  }, React.createElement("span", null, p.sample != null ? p.sample.toLocaleString() : "—"), p.sampleEff != null ? React.createElement("span", {
     className: "rd-ap-sub"
-  }, "eff. ", p.sampleEff.toLocaleString()));
+  }, "eff. ", p.sampleEff.toLocaleString()) : rdEffTbc(p) ? React.createElement("span", {
+    className: "rd-ap-sub",
+    title: "The pollster publishes an effective sample, but not yet for this poll"
+  }, "eff. TBC") : null);
   const tipCard = (p, f, m) => {
     const lean = p.lean;
     const outside = m != null && Math.abs(lean) > m;

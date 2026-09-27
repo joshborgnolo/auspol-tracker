@@ -86,6 +86,16 @@ function rdApOut(stamp) {
   return s;
 }
 
+/* the effective sample is still to come: the house's previous poll carried
+   one and this came out in the last three weeks (older gaps are left unsaid).
+   One rule for the header and the table's Sample column, so they agree. */
+function rdEffTbc(p) {
+  if (p.sampleEff != null || !p.published) return false;
+  if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
+  const prev = window.AUSPOL.individualPolls.filter((q) => q.pollster === p.pollster && q.released < p.released)
+    .sort((a, b) => (a.released < b.released ? -1 : 1)).pop();
+  return !!(prev && prev.sampleEff != null);
+}
 /* A poll's header, one wording wherever a poll is opened (All polls, Latest
    and next polls): when it was in the field, how many were asked, and who
    published it when (a self-published poll names its pollster). "n = 1,500" rather than "1,500 voters", with the
@@ -95,11 +105,7 @@ function rdApOut(stamp) {
    older gaps are left unsaid, since some waves never get one). "Published by
    News24" rather than "for News24", which read as if the voters were. */
 function rdPollHead(p) {
-  const D = window.AUSPOL;
-  const prev = D.individualPolls.filter((q) => q.pollster === p.pollster && q.released < p.released)
-    .sort((a, b) => (a.released < b.released ? -1 : 1)).pop();
-  const fresh = p.published && Date.now() - Date.parse(p.published.slice(0, 10)) < 21 * 86400000;
-  const tbc = p.sampleEff == null && fresh && prev && prev.sampleEff != null;
+  const tbc = rdEffTbc(p);
   const n = p.sample != null
     ? "n = " + p.sample.toLocaleString() + (p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? " (eff. TBC)" : "")
     : "sample not published";
@@ -650,7 +656,8 @@ function RdAllPolls(P) {
     <span role="cell" className="rd-ap-when"><b>{fieldTxt(p)}</b>{p.published && <span className="rd-ap-sub">released {rdDate(p.published.slice(0, 10))}</span>}</span>
   );
   const sampleCell = (p) => (
-    <span role="cell" className="rd-ap-n"><span>{p.sample != null ? p.sample.toLocaleString() : "—"}</span>{p.sampleEff != null && <span className="rd-ap-sub">eff. {p.sampleEff.toLocaleString()}</span>}</span>
+    <span role="cell" className="rd-ap-n"><span>{p.sample != null ? p.sample.toLocaleString() : "—"}</span>{p.sampleEff != null ? <span className="rd-ap-sub">eff. {p.sampleEff.toLocaleString()}</span>
+      : rdEffTbc(p) ? <span className="rd-ap-sub" title="The pollster publishes an effective sample, but not yet for this poll">eff. TBC</span> : null}</span>
   );
   const tipCard = (p, f, m) => {
     const lean = p.lean;
