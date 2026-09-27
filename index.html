@@ -3482,7 +3482,7 @@ body.rd .rd-pld-prim > span > span { font-size: 19px; font-weight: 600; }
 body.rd .rd-pld-dl { display: grid; grid-template-columns: 180px minmax(0, 1fr); row-gap: 5px; column-gap: 12px; margin: 0; }
 body.rd .rd-pld-dl dt { color: var(--ink-3); }
 body.rd .rd-pld-dl dd { margin: 0; color: var(--ink); }
-body.rd .rd-pld-links { display: flex; gap: 12px; margin-top: 8px; margin-left: -4px; }
+body.rd .rd-pld-links { display: flex; flex-wrap: wrap; column-gap: 12px; margin-top: 8px; margin-left: -4px; }
 body.rd .rd-pld-tab { border-collapse: collapse; width: 100%; font-size: 13px; }
 body.rd .rd-pld-tab th { text-align: left; font-weight: 400; color: var(--ink-3); padding: 0 12px 4px 0; }
 body.rd .rd-pld-tab td { padding: 3px 12px 3px 0; color: var(--ink); }
@@ -38712,7 +38712,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "monthEndN": 8,
     "waves": 15,
     "site": "https://www.afr.com/topic/redbridge-accent-poll-6ikd",
-    "skipped": [],
+    "skipped": ["2026-09-27"],
     "skippedMonths": [],
     "recent": [{
       "field": "2026-04-30",
@@ -39788,10 +39788,12 @@ function npProject(nowOverride) {
     let rolled = false;
     {
       const isoDay = ms => new Date(ms).toISOString().slice(0, 10);
+      let meSlot = release;
       while ((c.skipped || []).includes(isoDay(release))) {
         rolled = true;
         if (monthEnd) {
-          field = release = stepFrom(release);
+          if (release === meSlot) release = meSlot + 7 * DAY_MS;else release = meSlot = stepFrom(meSlot);
+          field = release;
           continue;
         }
         field += (c.releaseDow != null ? 7 : c.cadence) * DAY_MS;
@@ -59910,7 +59912,7 @@ function RdPolls({
       const edge = r.release + r.winHalf * DAY_MS;
       return {
         date: wdm(edge),
-        sub: when(r.closesIn) + " · due " + (r.inDays === -1 ? "yesterday" : -r.inDays + " days ago")
+        sub: when(r.closesIn) + (r.inDays === 0 ? " · not out yet" : " · due " + (r.inDays === -1 ? "yesterday" : -r.inDays + " days ago"))
       };
     }
     const alt = altOf(r),
