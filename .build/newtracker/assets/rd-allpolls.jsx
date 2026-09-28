@@ -119,15 +119,18 @@ const RD_AP_BARE_CLIENTS = { News24: 1, "Capital Brief": 1, "News.com.au": 1, "N
 const rdApThe = (name) => (/^the /i.test(name) || RD_AP_BARE_CLIENTS[name] ? name : "the " + name);
 function rdPollHead(p) {
   const tbc = rdEffTbc(p);
+  // the figure cluster stays glued so it never splits mid-figure; the
+  // "a sample of" lead-in wraps freely or the whole run would jump to the
+  // next line as one block and strand a wide gap after "from"
   const n = p.sample != null
-    ? <>a sample of {p.sample.toLocaleString()}{p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? <> ({rdEffTbcNote(p)})</> : ""}</>
+    ? <>a sample of <span className="rd-nocaps">{p.sample.toLocaleString()}{p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? <> ({rdEffTbcNote(p)})</> : ""}</span></>
     : "an unpublished sample";
   const out = rdApOut(p.published);
   // a commissioned wave credits its client; a self-published poll is
   // published by its pollster, and says so
   const by = "published by " + (p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
   const field = p.field || p.dateLabel;
-  return <>{field ? "Conducted on " + field + " from " : "From "}<span className="rd-nocaps">{n}</span>{", " + by + (out ? " on " + out : "")}</>;
+  return <>{field ? "Conducted on " + field + " from " : "From "}{n}{", " + by + (out ? " on " + out : "")}</>;
 }
 
 /* The primary columns in the order every table on the site keeps. */
