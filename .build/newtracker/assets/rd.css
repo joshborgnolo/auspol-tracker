@@ -777,6 +777,10 @@ body.rd .rd-ld-grid.one { grid-template-columns: minmax(0, 1fr); }
   /* here too the panel heads sit straight under the dek, as they do stacked:
      the 48px below belongs between the two panels once one follows the other */
   body.rd .rd-ld-grid > .rd-ld-panel .rd-sub { margin-top: 20px; }
+  /* the three-way note runs a line longer than the approval panel's beside
+     it, and the paired notes close on the same line: the longer note climbs
+     into the bars' slack above (one 19.5px line) rather than hanging low */
+  body.rd .rd-ld-grid:not(.one) .rd-ld-noteup .rd-ld-note { margin-top: calc(12px - 19.5px); }
 }
 body.rd .rd-ld-panel.rd-hidden { display: none; }
 body.rd .rd-ld-panel .rd-sub { margin-top: 48px; }

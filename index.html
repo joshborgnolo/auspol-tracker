@@ -3590,6 +3590,7 @@ body.rd .rd-ld-grid.one { grid-template-columns: minmax(0, 1fr); }
   body.rd .rd-ld-grid:not(.one) > .rd-ld-panel { display: grid; grid-row: span 9; grid-template-rows: subgrid; align-content: start; }
   body.rd .rd-ld-grid:not(.one) .rd-dp { margin-top: 20px; }
   body.rd .rd-ld-grid > .rd-ld-panel .rd-sub { margin-top: 20px; }
+  body.rd .rd-ld-grid:not(.one) .rd-ld-noteup .rd-ld-note { margin-top: calc(12px - 19.5px); }
 }
 body.rd .rd-ld-panel.rd-hidden { display: none; }
 body.rd .rd-ld-panel .rd-sub { margin-top: 48px; }
@@ -59637,7 +59638,8 @@ function RdLeadership({
     className: "rd-hbs",
     ref: hbsRef
   }, ppmView !== "three" && two && headBar(two), ppmView !== "three" && twoH && headBar(twoH), ppmView !== "two" && threeBar)), ppmNote && React.createElement(RdGlide, {
-    watch: ppmNote
+    watch: ppmNote,
+    className: ppmView === "three" ? "rd-ld-noteup" : undefined
   }, React.createElement("p", {
     className: "rd-note rd-ld-note"
   }, ppmNote)), mainPpmChart, ppmView === "both" && threeChart, React.createElement(RdKey, {

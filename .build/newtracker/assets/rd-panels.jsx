@@ -812,7 +812,7 @@ function RdLeadership({ rangeId }) {
                 {ppmView !== "two" && threeBar}
               </div>
             </RdGlide>
-            {ppmNote && <RdGlide watch={ppmNote}><p className="rd-note rd-ld-note">{ppmNote}</p></RdGlide>}
+            {ppmNote && <RdGlide watch={ppmNote} className={ppmView === "three" ? "rd-ld-noteup" : undefined}><p className="rd-note rd-ld-note">{ppmNote}</p></RdGlide>}
             {mainPpmChart}
             {ppmView === "both" && threeChart}
             <RdKey className="rd-ckey" items={[]}>
