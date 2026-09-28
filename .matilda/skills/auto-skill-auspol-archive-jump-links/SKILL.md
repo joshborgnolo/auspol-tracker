@@ -1,6 +1,6 @@
 ---
 name: auspol-archive-jump-links
-description: "auspol-tracker — the All-polls jump-pills (29c5447) and the site's scroll-to-section conventions: targets carry a section id + scroll-margin-top:72px (.next-polls clearance for .tabs.sticky), smooth scroll needs EXPLICIT behavior:\"smooth\" (no global scroll-behavior exists), a facet-gated panel (HouseLeanPanel is twopp-only) needs switch-facet-then-DEFERRED-scroll (leanJump ref + useEffect on [facet], not setTimeout), and .ap-export's pill shape is display:none ≤1000px so mirror it on a new class rather than reusing it."
+description: "auspol-tracker — the All-polls jump-pills (29c5447) and the site's scroll-to-section conventions: targets carry a section id + scroll-margin-top:72px (.next-polls clearance for .tabs.sticky), smooth scroll needs EXPLICIT behavior:\"smooth\" (no global scroll-behavior exists), a facet-gated panel (HouseLeanPanel is twopp-only) needs switch-facet-then-DEFERRED-scroll (leanJump ref + useEffect on [facet], not setTimeout), and .ap-export's pill shape is display:none ≤1000px so mirror it on a new class rather than reusing it. Also the AllPollsView FOCUS-SCROLL effect (rewritten 2026-09-28, d1a1d215 ~:4856): centres the open row + .rd-ap-open sibling detail as ONE group inside the usable viewport (clearance = .tabs.sticky HEIGHT + 10, never the bar's rect.bottom — the effect fires pre-scroll when the un-pinned bar's in-flow position is meaningless), tall groups clamp to a just-under-bar tuck; matches '.rd-ap-row.open, .rd-ap-card.open' AND old-design 'tr.arch-row.open'."
 source: auto-skill
 extracted_at: '2026-09-02T13:08:59.383Z'
 ---
@@ -30,10 +30,46 @@ targets — don't rename/remove them.
   any new jump target.
 - `scrollIntoView({behavior:"smooth", block:"start"})` — template.html sets NO
   global `scroll-behavior`, so "smooth" must be passed explicitly or you get an
-  instant jump. (Exception precedent: table-row scrolls deliberately use
-  `behavior:"auto"` + `block:"center"` because a row pinned to the top would sit
-  under the pinned bar.)
+  instant jump. (Table-row focus scrolls are their own effect — see below.)
 - Helper `jumpTo(id)` lives in AllPollsView right after `onFacet` (~:2607).
+
+## The AllPollsView focus-scroll effect (rewritten 2026-09-28)
+
+Until 2026-09-28 the row-focus scroll was `scrollIntoView({block:"center",
+behavior:"auto"})` on the collapsed ~58px row — the ~450px+ open detail hung
+below the fold (user-visible "opens a little high, not centred"). Now
+(d1a1d215 ~:4856-4877, gated `!focus || open !== focus.key ||
+!bodyRef.current`, deps `[focus, open, facet]`):
+
+```js
+const row  = bodyRef.current.querySelector("tr.arch-row.open, .rd-ap-row.open, .rd-ap-card.open");
+const d    = row.nextElementSibling;          // .rd-ap-open | tr.detail-row
+const pair = matches ? d : null;
+const top  = row.getBoundingClientRect().top + window.scrollY;
+const h    = (pair || row).getBoundingClientRect().bottom + window.scrollY - top;
+const clear = (bar ? bar.getBoundingClientRect().height : 0) + 10;   // .tabs.sticky
+let y = top - (window.innerHeight + clear - h) / 2;                  // centre the GROUP
+if (y > top - clear) y = top - clear;                                // tall group → tuck
+window.scrollTo({ top: Math.max(0, y), behavior: "auto" });
+```
+
+Conventions now established:
+
+- **Centre the row+detail SIBLING PAIR as one block**, not the summary row —
+  in both designs the row (`.rd-ap-row.open` / `.rd-ap-card.open` /
+  `tr.arch-row.open`) and its `.rd-ap-open` / `tr.detail-row` detail are
+  adjacent siblings in the same list, so `row.nextElementSibling` finds the
+  detail defensively (class-check before pairing).
+- **Clearance comes from the sticky bar's `.height`, never its `.bottom`**:
+  the effect fires pre-scroll (`window.scrollY === 0`), when the un-pinned
+  bar's rect in-flow can be anywhere (measured 221px vs the pinned 46px —
+  a 107px error landed in the first fix attempt).
+- **A group taller than the viewport tucks just under the bar** via the
+  `y > top - clear` clamp (a 1121px phone group in a 791px usable viewport
+  lands snug at 48px with a 43px bar — verified).
+- Verified numerically both widths: desktop group centre 526 vs
+  usable-centre 528; see auspol-headless-geometry-verify for the
+  scroll-instrumenting probe technique used.
 
 ## Facet-gated panel → switch facet first, defer the scroll
 

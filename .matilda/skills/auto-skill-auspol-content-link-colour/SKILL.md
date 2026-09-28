@@ -51,7 +51,10 @@ See the comment block above `a.pollster-link` (template.html ~:1736).
    no class of its own (`.ss-note a { color: var(--ink-2) }`, the "Full archives
    here" link in the build.mjs static summary — pattern 2 by another shape). A
    class-only grep misses those. Check each rule falls into pattern 1, 2, or 3
-   (for 3, grep the JSX for both class names on the same element).
+   (for 3, grep the JSX for both class names on the same element). A link
+   rendered by an rd-* asset (the `body.rd` layer) is styled in
+   `.build/newtracker/assets/rd.css`, NOT template.html — grep the `body.rd`
+   rules there too (`.rd-tbc` is the first instance); the same invariant applies.
 2. Verify against the BUILT `index.html` — the CSS is inlined verbatim (ASCII
    anchors like `a.pd-release { color: inherit` grep fine; the babel string
    escaping caveat in auspol-built-html-verification applies to JSX strings,
@@ -68,3 +71,13 @@ Its sibling instance — the "archives" link inside the MethodNote footer's
 var(--ink-2) }` (~:2197); each home of the disclaimer copy needs its OWN
 selector check (`:is(.ss-note, .disclaimer)` is not how the stylesheet expresses it).
 `button.npd-field-link` is a button — UA link colour does not apply.
+
+2026-09-28 addition, the first link class outside template.html: `.rd-tbc`
+(rd.css ~:1558, commit 42491f8 — YouGov's "eff. TBC" APC-listing link in
+rd-allpolls) conforms via pattern 1 (`color: inherit`). Its affordance is a
+standing DOTTED underline, a recorded exception to the
+no-standing-underline link language: an inline three-letter abbreviation
+inside 12px `.rd-ap-sub` text has no room for the ↗ plink-mark, and
+`.rd-link` (rd.css:324, bold + standing solid underline) was considered and
+rejected as too loud for sub-text. Do not "fix" it to the plink-mark form
+without asking.

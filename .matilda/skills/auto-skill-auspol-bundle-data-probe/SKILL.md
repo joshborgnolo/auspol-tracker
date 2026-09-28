@@ -37,6 +37,16 @@ national-direction heal; the traps below cost four broken probes.
 
 - **Tail of a series const** (`direction`, `directionPolls`, …): bracket-depth parse (above),
   filter by `pollster`, print the last N — proves the rows landed.
+- **Need MANY consts, or a derived value the page will compute? Evaluate the WHOLE asset**
+  instead of parsing anything: `new Function("window", src)({})` then read
+  `window.AUSPOL.leaderMonths` / `.leaderNow` / `Object.keys(window.AUSPOL)` directly. The
+  bundle is a plain self-cataloguing script with no deps beyond `window` — the global name is
+  confirmed with `grep -o 'window\.[A-Za-z_]*='` on the asset. Worked 2026-09-28
+  (`.matilda/probe/leadership-dek-figures.mjs`): computed the ley-era mean preferred-PM
+  margin (18.0), current v Taylor (+4.5) and v Hanson (+12) leads and their first monthly
+  readings before writing any dek copy. Reach for this whenever the question is "what will
+  the UI say", not "did row X land" — and it makes trap 4 moot, since you inspect the real
+  row keys live.
 - **Is an optional payload attached to specific poll rows?** Regex adjacency fails — payloads
   like `dir` can sit after long nested fields (`eff`, `appr`, …) beyond any sane `-o`-window,
   and both emitters order keys differently. Instead: `src.indexOf` a unique row fingerprint

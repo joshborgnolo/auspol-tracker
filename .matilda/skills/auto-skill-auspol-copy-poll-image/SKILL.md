@@ -79,6 +79,40 @@ removed the short-lived painted header — see the next section.
   `metaValue(panel, "Fieldwork")` still finds the row the capture
   temporarily re-labelled. Keep that call order.
 
+## The redesign panel variant: second retitle site `retitlePollHead` (2026-09-28)
+
+The REDESIGN poll detail (`.rd-apd-l.poll-detail` from `rd-allpolls.jsx`) has
+NO `.pd-meta` band and no `.pollster-name` cell, so the old-panel wiring
+above no-ops there. The redesign card instead rewrites the detail head
+`.rd-apd-h` text nodes in place at capture time only (screen copy is
+untouched): `retitlePollHead(panel, house)` swaps the lead text node
+`"This poll"` → the house name, and when the house is its own publisher
+also swaps `"Published by ‹house›"` → `"self-published"`. Supporting
+fallbacks the redesign panel needs:
+
+- `houseName(panel)` falls back to `panel.getAttribute("data-pollster")`
+  (set on `.rd-apd-l` by `rd-allpolls.jsx`) when the old-panel
+  `.pollster-name` lookup finds nothing.
+- `metaValue(panel, "Fieldwork")` falls back to the regex
+  `/Fieldwork ([^·]+)/` on `.rd-apd-h`'s textContent, so `fileName()`
+  still builds `auspol-breakdown-‹house›-‹fieldwork›.png` — the `fileName`
+  call AFTER `compose()` returns depends on this (the in-place node edits
+  are restored in the same `finally`, so the regex still matches).
+- `compose()` threads the second untitle like the first: hoist
+  `const house = houseName(panel)`, `let unhead = retitlePollHead(panel,
+  house)` after `untitle`, re-create BOTH inside the second widen window
+  (`unhead(); untitle(); restore();` then re-widen/re-retitle/re-unhead),
+  and `unhead(); untitle(); restore();` in the `finally`.
+- Verified end-state (probe, 2026-09-28): client-published YouGov head
+  reads `YouGov · Fieldwork 15–21 Sep · n = … · Published by News24, …`;
+  self-published Roy Morgan reads `Roy Morgan · Fieldwork 14–20 Sep · … ·
+  self-published, Mon 21 Sep, 3 pm`. The n= figure sits in an ELEMENT
+  child between text nodes — the retitle only touches
+  `node.nodeType === 3` text nodes, so it cheaply skips over it.
+- The card captures ONLY the left column `.rd-apd-l.poll-detail`; the
+  mini chart (right column `.rd-apd-r`) and its dot tooltips are never
+  on the PNG, so interactive additions there need no copy-poll guard.
+
 ## The Poll row: provenance as a band row, not chrome (6072cdb)
 
 The band carries Fieldwork/Published/Sample/… but never names the firm

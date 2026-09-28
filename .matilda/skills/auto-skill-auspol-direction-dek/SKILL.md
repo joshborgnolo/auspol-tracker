@@ -91,8 +91,12 @@ movement wording.
 - Right-edge bracket (~:860s, `brackets`): "N.N points apart in ‹Month›" /
   "up from M.M in ‹base›, before Bondi" — GAP (distance-between-lines)
   framing, which the net-framed dek does not replace; don't "align" the two.
-- Footer (~:881): house-credit counts ("Most readings are ‹top›'s weekly
-  poll: n of the m since May 2025").
+- Footer (~:899): house-credit counts ("Most readings are ‹top›'s weekly
+  poll: n of the m since May 2025") plus, since 2026-09-28, a DATED stop
+  clause for inactive houses — "‹House› became inactive in ‹Month YYYY›"
+  off gen-data's `directionStoppedSince` (month after the last series
+  reading; houses grouped by quiet-month). Machinery and convention live in
+  the `auspol-house-credit-lists` skill.
 
 ## Single home — legacy panel is different copy
 

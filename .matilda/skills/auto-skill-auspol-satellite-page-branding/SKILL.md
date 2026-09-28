@@ -108,6 +108,10 @@ shell-theme.mjs, shell-tabs-width.mjs, main-archives-tab.mjs,
 masthead-parity.mjs). Serve the repo over HTTP (file:// breaks the /assets/
 paths).
 
+**Sweeping copy across all satellites** (titles, separators, any user-facing
+string): auto-skill-auspol-satellite-copy-sweep — the emitter/hand/shell
+three-class edit workflow, regeneration commands, `&#183;` entity grep trap.
+
 ## HISTORY: the 2026-09-03 recipe (SUPERSEDED by the site shell above)
 
 ## Which pages are standalone (NOT the newtracker build)

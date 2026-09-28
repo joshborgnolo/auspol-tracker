@@ -1,6 +1,6 @@
 ---
 name: auspol-effective-sample
-description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Filing houses with a sampleEff leg: Newspoll, YouGov, Essential, DemosAU, and (from 2026-09-04) RedBridge/Accent — a fully OFFLINE leg reading the committed .build/redbridge-src caches, 8 waves stamped. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index — with a release-PDF fallback (added 2026-09-02) that parses a needing row's own url when it is a demosau.com wp-content PDF, since the house posts statement-bearing report PDFs it never lists / Essential's ONE living disclosure PDF shared by every covered wave and refreshed in place when re-uploaded — the only leg allowed to overwrite; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md; plus (2026-09-04) an accent-only ride-along inside redbridge-updater.sh — `extract-sampleeff.mjs accent` right after a changed:true extract, so the new wave's eff joins the same commit. Statement caches in .build/sampleeff-src/. Since commit 212282c (2026-09-04) extract-sampleeff.mjs also treats each statement's raw `Sample size` row as authoritative for the row's `sample`, re-parses the committed caches offline every run, and corrects stale press-rounded samples (first data pass 0a280d6 fixed 13 waves, including YouGov 2026-06-16 1500→1492). Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement, DemosAU 2026-01-06's release URL is a Capital Brief article page (no demosau.com PDF to fall back on). RECURRING REPAIR GAP (hit 2026-09-18, DemosAU 2026-09-14 wave): NO pipeline leg stamps releaseUrl — a CI wave-reconcile that adds methodUrl (commit 4bb73b7) arrives WITHOUT the companion releaseUrl, so the expanded poll regresses to a bare 'APC statement' row instead of the merged 'Pollster's release … (includes the wave's APC methodology statement)' row until releaseUrl = the same demosau.com PDF is hand-set on the row. TIMING-GAP TRIAGE (worked 2026-09-23, Newspoll 2026-09-17 wave, fix f7d6cfa): 'statement exists on pyxispolling.com/apc but the row is unstamped' is usually cadence, not breakage — Pyxis posted AFTER the week's Mon 07:15 CI sweep, so probe in order (sampleeff-src cache absent → statement date vs `git log -- .build/sampleeff-src/` runs → LIVE collection API not stale /apc HTML → slug regex match), then run `node .build/extract-sampleeff.mjs` DIRECTLY (wrapper aborts on sibling-session dirty tree), validate, build, commit owned paths."
+description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Filing houses with a sampleEff leg: Newspoll, YouGov, Essential, DemosAU, and (from 2026-09-04) RedBridge/Accent — a fully OFFLINE leg reading the committed .build/redbridge-src caches, 8 waves stamped. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index — with a release-PDF fallback (added 2026-09-02) that parses a needing row's own url when it is a demosau.com wp-content PDF, since the house posts statement-bearing report PDFs it never lists / Essential's ONE living disclosure PDF shared by every covered wave and refreshed in place when re-uploaded — the only leg allowed to overwrite; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md; plus (2026-09-04) an accent-only ride-along inside redbridge-updater.sh — `extract-sampleeff.mjs accent` right after a changed:true extract, so the new wave's eff joins the same commit. Statement caches in .build/sampleeff-src/. Since commit 212282c (2026-09-04) extract-sampleeff.mjs also treats each statement's raw `Sample size` row as authoritative for the row's `sample`, re-parses the committed caches offline every run, and corrects stale press-rounded samples (first data pass 0a280d6 fixed 13 waves, including YouGov 2026-06-16 1500→1492). Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement, DemosAU 2026-01-06's release URL is a Capital Brief article page (no demosau.com PDF to fall back on). RECURRING REPAIR GAP (hit 2026-09-18, DemosAU 2026-09-14 wave): NO pipeline leg stamps releaseUrl — a CI wave-reconcile that adds methodUrl (commit 4bb73b7) arrives WITHOUT the companion releaseUrl, so the expanded poll regresses to a bare 'APC statement' row instead of the merged 'Pollster's release … (includes the wave's APC methodology statement)' row until releaseUrl = the same demosau.com PDF is hand-set on the row. TIMING-GAP TRIAGE (worked 2026-09-23, Newspoll 2026-09-17 wave, fix f7d6cfa): 'statement exists on pyxispolling.com/apc but the row is unstamped' is usually cadence, not breakage — Pyxis posted AFTER the week's Mon 07:15 CI sweep, so probe in order (sampleeff-src cache absent → statement date vs `git log -- .build/sampleeff-src/` runs → LIVE collection API not stale /apc HTML → slug regex match), then run `node .build/extract-sampleeff.mjs` DIRECTLY (wrapper aborts on sibling-session dirty tree), validate, build, commit owned paths. The rd layer's pending display for a filing house's just-released, not-yet-stamped wave is the 'eff. TBC' marker — rdEffTbc gate → rdEffTbcNote renderer, BOTH homes in rd-allpolls.jsx (rdPollHead `n` line + All-polls sampleCell); YouGov's TBC links yougov.com/about/methodology/australian-polling-council since 42491f8 (2026-09-28), other houses a plain span; .rd-tbc CSS in rd.css beside .rd-ap-sub."
 source: auto-skill
 extracted_at: '2026-09-04T01:05:29.530Z'
 ---
@@ -247,6 +247,41 @@ roy morgan"). Resolve and Roy Morgan file nothing, so they dash.
   rendered ONLY when `sampleEff != null`.
 - CSV export: single `Effective sample` column (sampleEff; empty
   where the house filed none).
+
+## "eff. TBC" — the pending-stamp marker in the rd layer (linked for YouGov, 42491f8)
+
+A THIRD eff display surface beyond the archive "Eff. n" column and the
+expanded meta-band item, living entirely in
+`.build/newtracker/assets/rd-allpolls.jsx` (NOT the a11e1559/d1a1d215
+pair): the reader-facing side of the cadence gap the Timing-gap triage
+section below describes.
+
+- Gate `rdEffTbc(p)` (~:93): true when the row has NO `sampleEff` but
+  the same pollster's PREVIOUS row carries one and that wave is <21
+  days old — i.e. a filing house's brand-new wave awaiting its stamp.
+- Renderer `rdEffTbcNote(p)` (~:101; introduced 42491f8, 2026-09-28)
+  emits `eff. TBC`. For pollster exactly "YouGov" the TBC is a link to
+  the house's APC LISTING page
+  `https://yougov.com/about/methodology/australian-polling-council`
+  (`target="_blank" rel="noopener noreferrer"`, `onClick`
+  stopPropagation — the rd inline-link convention); every other house
+  gets a plain `<span>`. Both carry the tooltip "The pollster publishes
+  an effective sample, but not yet for this poll". The target is the
+  rolling statement window (see the YouGov methodUrl bullet below), NOT
+  a per-wave PDF; the exact-string test means "YouGov (MRP)" rows do
+  not link. `grep TBC` in the assets lands only in rd-allpolls.jsx.
+- Homes (two, both in rd-allpolls.jsx — edit together like the
+  pollster-cell pair): `rdPollHead`'s `n` line (~:119 — converted from
+  a plain string to a JSX fragment in 42491f8; renders
+  `n = 1,523 (eff. TBC)`) and `sampleCell` (~:669 — the All-polls
+  Sample column's `.rd-ap-sub` second line).
+- Style `.rd-tbc` (rd.css ~:1558, beside `.rd-ap-sub`): `color:
+  inherit` + standing DOTTED underline (`text-underline-offset: 2px`),
+  hover goes solid, focus-visible `--accent` outline. Deliberately NOT
+  `.rd-link` (rd.css:324 — bold with a standing solid underline), which
+  would shout inside the 12px ink-3 sub-text. Meets the
+  content-link-colour pattern-1 colour rule; that skill's audit now
+  greps rd.css alongside template.html.
 
 ## methodUrl — APC statement LINK, sibling of sampleEff (shipped 2026-09-02)
 

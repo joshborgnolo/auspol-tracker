@@ -1,6 +1,6 @@
 ---
 name: auspol-headless-geometry-verify
-description: "auspol-tracker — verifying a layout/spacing OR interactivity fix headlessly in this repo: screenshots are USELESS to the reviewing model (read_file cannot process PNG — no image input), so assert geometry NUMERICALLY via getBoundingClientRect diffs / computedStyle / DOM text inside a puppeteer-core probe instead, and drive interactivity via page.mouse.hover / elementFromPoint with state read off classes and cursor style. Includes the .matilda/probe/*.mjs serve-and-probe skeleton (node:http on an ephemeral port, system Chrome headless: 'new', stub window.AP bridge calls, keep probes untracked). Worked 2026-09-23: house-lean control gap measured 2px, fixed by CSS, re-probed at 12px (77eed98); 2026-09-24: undecided dots unclickable — key/query and overlay causes eliminated with probes, catchment grid-walk showed the pick region displaced down-right, rect comparison found .chart wrapper 30px taller than its svg (toVB measured the wrong box; 0c3d9b7). Also 2026-09-24, PAGE-PARITY probing traps (masthead-parity.mjs asserting a satellite == the main page): React style-prop SVG attrs land in style not attributes and CSSOM serialises dasharrays comma-separated (normalise commas or NaN); compare CSS custom properties at the consuming element not :root (dark tokens sit at body.dark on main vs :root on satellites — documentElement reads legitimately differ); third-party embeds (Infogram) never fire load → goto with domcontentloaded; headless Chrome is dark-scheme by default."
+description: "auspol-tracker — verifying a layout/spacing OR interactivity fix headlessly in this repo: screenshots are USELESS to the reviewing model (read_file cannot process PNG — no image input), so assert geometry NUMERICALLY via getBoundingClientRect diffs / computedStyle / DOM text inside a puppeteer-core probe instead, and drive interactivity via page.mouse.hover / elementFromPoint with state read off classes and cursor style. Includes the .matilda/probe/*.mjs serve-and-probe skeleton (node:http on an ephemeral port, system Chrome headless: 'new', stub window.AP bridge calls, keep probes untracked). Worked 2026-09-23: house-lean control gap measured 2px, fixed by CSS, re-probed at 12px (77eed98); 2026-09-24: undecided dots unclickable — key/query and overlay causes eliminated with probes, catchment grid-walk showed the pick region displaced down-right, rect comparison found .chart wrapper 30px taller than its svg (toVB measured the wrong box; 0c3d9b7). Also 2026-09-24, PAGE-PARITY probing traps (masthead-parity.mjs asserting a satellite == the main page): React style-prop SVG attrs land in style not attributes and CSSOM serialises dasharrays comma-separated (normalise commas or NaN); compare CSS custom properties at the consuming element not :root (dark tokens sit at body.dark on main vs :root on satellites — documentElement reads legitimately differ); third-party embeds (Infogram) never fire load → goto with domcontentloaded; headless Chrome is dark-scheme by default. 2026-09-28, SCROLL/event verification: wrap window.scrollTo IN-PAGE before triggering the action (empty capture list + a changed scrollY = some other API scrolled, e.g. scrollIntoView via boundingBox-mouse-click coordinates); assert ONE call and a stable docTop trajectory across 60–1200ms (no late layout shift); clicking SVG circles — ElementHandle.focus() is unsupported protocol-side, SVGElements have no .click(), and narrow viewports switch row/card selectors, so drive clicks with el.dispatchEvent(MouseEvent) and select '.rd-ap-row, .rd-ap-card'."
 source: auto-skill
 extracted_at: '2026-09-23T02:20:41.637Z'
 ---
@@ -35,6 +35,47 @@ Inside a `page.evaluate`, read geometry directly and return plain numbers:
 Then: re-run the SAME probe after the CSS/source change + rebuild and the
 asserted numbers must move (2px → 12px). The probe doubles as the
 regression check; diffing numbers is also diffable evidence for the user.
+
+## Scroll-behaviour fixes (worked 2026-09-28, All-polls focus scroll)
+
+Verifying a "scrolls to the wrong place" fix needs the SCROLL CALLS
+themselves, not just final geometry:
+
+- **Instrument, don't infer.** In-page, BEFORE triggering the UI action,
+  monkey-patch `window.scrollTo` to record `{y, docTop, scrollY}` and
+  schedule position re-reads at 60/160/320/640/1200ms. What that proves:
+  the new code path actually ran (a scroll captured with the NEW formula's
+  y = the fix is live; empty capture + moved scrollY = some OTHER API
+  scrolled — in one probe scrollY=582 matched `scrollIntoView({block:"center"})`
+  arithmetic, meaning the action never fired the effect because the CLICK
+  had missed), and the trajectory is stable (row docTop identical at 60ms
+  and 1200ms ⇒ no post-scroll layout growth shifting things later).
+- **Assert against the right target.** If the fix centres content below a
+  pinned bar, the "ideal" is (barBottom + viewport)/2, not viewport/2 —
+  otherwise a correct fix reads "off by half the bar height".
+- **Re-probe at a phone rung using env-var viewport sizes**
+  (`VW=390 VH=844 node probe.mjs`): the tall-group clamp and the
+  `.rd-ap-card` layout only exist there.
+
+## Clicking this app's SVG dot buttons headlessly
+
+The mini-chart dots (RdApMini, TrendChart plot points) are `<circle>`
+elements with React listeners — three traps in one day:
+
+- `ElementHandle.focus()` on an SVG node fails: "Protocol error
+  (DOM.focus)". Focus in-page via `page.evaluate(() => el.focus())`
+  instead (SVGElement.focus exists in modern Chrome).
+- Puppeteer's `page.mouse.click(boundingBoxCentre)` silently misses when
+  the element is offscreen (the click dispatches at viewport coords that
+  are outside the window). Don't synthesise coordinates for these:
+  `page.evaluate(() => el.dispatchEvent(new MouseEvent("click",
+  {bubbles:true, cancelable:true})))` — SVG elements have NO `.click()`
+  method (HTMLElement only), so dispatch the event; React's delegated
+  onClick at the root still fires.
+- Narrow viewports swap component classes — `.rd-ap-row` becomes
+  `.rd-ap-card` — so `waitForSelector(".rd-ap-row")` times out at 390px.
+  Wait/click `".rd-ap-row, .rd-ap-card"` and match opens with
+  `".rd-ap-row.open, .rd-ap-card.open"`.
 
 ## Probe skeleton (repo convention — keep in `.matilda/probe/`, untracked)
 

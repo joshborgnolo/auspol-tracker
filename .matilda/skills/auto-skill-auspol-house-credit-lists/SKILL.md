@@ -1,6 +1,6 @@
 ---
 name: auspol-house-credit-lists
-description: auspol-tracker — the "· House A, House B and House C" credit lists on the National-direction, Undecided and Leader-net-favourability panels. Derived in gen-data.mjs by creditHouses() (shipped 8d1cc7e, 2026-09-23): a house counts only with a reading within six months of the series' OWN newest reading, ordered most-readings-first; creditHousesWithStopped() (157f35c, 2026-09-24) appends pollsterRules.stopped contributors as "Name (inactive)" and a declared stop OVERRIDES the recency window. Also the gen-data dx() unit trap: dx() returns DECIMAL YEARS (chart x-units), not ms — window comparisons against it silently never trigger.
+description: auspol-tracker — the "· House A, House B and House C" credit lists on the National-direction, Undecided and Leader-net-favourability panels. Derived in gen-data.mjs by creditHouses() (shipped 8d1cc7e, 2026-09-23): a house counts only with a reading within six months of the series' OWN newest reading, ordered most-readings-first; creditHousesWithStopped() (157f35c, 2026-09-24) appends pollsterRules.stopped contributors as "Name (inactive)" and a declared stop OVERRIDES the recency window; directionStoppedSince (2026-09-28) dates each stopped direction house ("became inactive in ‹Month YYYY›" = month AFTER its last series reading); the same footer (same day) singles out an ACTIVE house on a lone reading ("has supplied only one direction reading, in ‹M YYYY›" from directionPolls counts) and closes its list with a panel-local Oxford-comma rdListOx. Also the gen-data dx() unit trap: dx() returns DECIMAL YEARS (chart x-units), not ms — window comparisons against it silently never trigger.
 source: auto-skill
 extracted_at: '2026-09-24T07:06:54.567Z'
 ---
@@ -111,7 +111,82 @@ const creditHousesWithStopped = (items, firmOf, xOf, display = (f) => f) => {
   `directionHousesAll = ["Roy Morgan","Essential","Spectre Strategy","Freshwater (inactive)"]`,
   `favHouses = ["DemosAU","RedBridge/Accent","Spectre Strategy","Freshwater (inactive)"]`.
   Order between the two differs because active ordering is reading-count —
-  don't "fix" it to be alphabetical.
+  don't "fix" it to be alphabetical. By 2026-09-28 RedBridge/Accent had
+  joined the direction roster:
+  `directionHousesAll = ["Roy Morgan","Essential","Spectre Strategy","RedBridge/Accent","Freshwater (inactive)"]`.
+
+## Dating the stop — directionStoppedSince (2026-09-28, direction only)
+
+Task: the direction footer's bare "Freshwater has stopped asking" became
+"Freshwater became inactive in ‹Month YYYY›" per user request. New derived
+const sibling to directionHousesAll, computed in gen-data right after it:
+
+```js
+const dirLastYm = {};
+for (const d of DIR) {
+  if (!MONTH_SET.has(ymOf(d.date)) || !STOPPED_HOUSES.has(d.pollster)) continue;
+  … // max ymOf(d.date) per firm
+}
+// then each ym bumped ONE MONTH (Dec → next-year-01)
+```
+
+- Convention (chosen, user-ratifiable): **"became inactive in ‹M YYYY›" =
+  the month AFTER the house's last series reading** — its first quiet month
+  (Freshwater's last direction reading Oct 2025 → "became inactive in
+  November 2025"). "Inactive in the last-reading month" would be false copy
+  (it published then). If the user ever says the displayed month feels
+  wrong, the knob is the one-month bump in the derivation loop.
+- Derived from the DIRECTION series (DIR, MONTH_SET-scoped), never from
+  poll rows: a house goes quiet per-measure (Freshwater polled VI to
+  May 2026). Emitted as `const directionStoppedSince = {"Freshwater":"2025-11"}`
+  and added to the gen-data return list beside directionHousesAll;
+  renderer is the RdDirection foot in rd-panels.jsx (~:887): a sinceGroups
+  Map groups inactive houses by ym so two houses quiet in the same month
+  share one clause ("A and B became inactive in M"), differing months join
+  with "; "; "became" needs no has/have agreement. A "(has|have) stopped
+  asking" fallback branch remains in the JSX for a ym-less house — with the
+  shared derivation that case is unreachable, kept only against a stale
+  hand-built bundle.
+- Only the direction panel got dates; favHouses' "(inactive)" label in the
+  ApprovalPanel sub is undated (not requested).
+
+## Lone-reading houses, Oxford comma, sentence shape (2026-09-28, same footer)
+
+User spec (verbatim target, filled by derivation): "Essential, Spectre Strategy,
+and RedBridge/Accent supply the rest. RedBridge/Accent has supplied only one
+direction reading, in ‹M YYYY›; Freshwater became inactive in November 2025."
+
+- `sparseBits` (rd-panels foot ~:895-900): the non-`top` ACTIVE houses with
+  `counts[h] === 1` over `D.directionPolls` get
+  "‹House› has supplied only one direction reading, in ‹Month YYYY›" — the
+  date is the spare row's OWN `ym` field (directionPolls rows carry
+  `ym`/`pollster`/`x`; no date parsing). Currently RedBridge/Accent
+  (hand-entered one-off, May 2026). Derived, so the clause deletes itself
+  when that house's second wave lands; `top` is excluded (it is by
+  definition the plurality house).
+- Sentence shape changed: "…supply the rest" now ENDS a sentence; sparse and
+  inactive bits share the NEXT sentence —
+  `tail = sparseBits.concat(inactiveBits).join("; ")` — replacing the old
+  `inactiveClause` string that opened with "; " and glued the stop clause
+  onto the supply-the-rest sentence. Rendered 2026-09-28 (68 readings):
+  "Most readings are Roy Morgan's weekly poll: 47 of the 68 since May 2025.
+  Essential, Spectre Strategy, and RedBridge/Accent supply the rest.
+  RedBridge/Accent has supplied only one direction reading, in May 2026;
+  Freshwater became inactive in November 2025."
+- `rdListOx` — PANEL-LOCAL Oxford-comma joiner ("A, B, and C"; 1–2 items
+  delegate to rdList), used only for this closing list because the user
+  quoted it with the Oxford comma. Shared `rdList` (bare "and", ~:954) is
+  untouched — every other list on the site keeps the no-comma house style.
+  Don't widen a user's quoted Oxford comma into a global rdList change.
+- House names in templates come from DATA. The user's spec wrote
+  "Redbridge/Accent" twice; the stored canonical name is "RedBridge/Accent"
+  and that is what renders in both clauses. Follow the data, not the user's
+  loose house-name typography — same rule as the direction-dek skill's
+  loosely quoted sentences. If a rename is really wanted it belongs in
+  polls.json/`canonFirm`, not in template literals.
+- `ymLong(ym)` is the footer's single month-name formatter
+  (`D.monthNameFull(Number(ym.slice(5))) + " " + ym.slice(0, 4)`) — clone
+  it rather than re-deriving month labels inline.
 
 ## TRAP — dx() is decimal years, not ms (first fix silently no-oped)
 
@@ -133,6 +208,8 @@ node .build/newtracker/gen-data.mjs   # standalone: surfaces errors build.mjs sw
 node .build/newtracker/build.mjs && node .build/newtracker/validate.mjs
 grep -o 'const directionHouses = \[[^]]*\]' index.html   # the arbiter
 grep -o 'const directionHousesAll = \[[^]]*\]' index.html
+grep -A2 'const directionStoppedSince' index.html   # per-firm first quiet month
+grep -o 'became inactive in ' index.html            # the rd-panels foot clause
 grep -o 'const favHouses = \[[^]]*\]' index.html
 grep -c '(inactive)' index.html      # expect ≥ 4 (two lists × data asset + jsx)
 grep -o 'const directionHouses = \[[^]]*\]' .build/newtracker/assets/9f09dca2-*.js
