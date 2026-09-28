@@ -201,10 +201,11 @@ function RdCrossfade({ k, children, className }) {
 
 /* A table cell's words giving way to others on a tab (the Latest polls
    figures): the same out-then-in as RdCrossfade, without its height glide,
-   since the row decides the height, not the cell. The two copies share one
-   grid area rather than the old one floating over the new, so neither is
-   ever laid out narrower than itself - a floated copy wrapped its figures
-   onto a second line on a phone. */
+   since the row decides the height, not the cell. The outgoing copy floats
+   out of flow over the incoming one (rd.css): a cell co-sized by both
+   copies snapped back to the new content's real box ~360ms later, when the
+   ghost unmounted, visibly shifting the figures on a phone's content-sized
+   columns. The float keeps its natural width, so it cannot wrap. */
 function RdSwap({ k, children, className }) {
   const was = React.useRef({ k, node: children });
   const fading = React.useRef(null);

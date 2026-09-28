@@ -3178,9 +3178,12 @@ body.rd .rd-xf-now.in { animation: rd-xf-in .2s ease-out .12s both; }
 @keyframes rd-xf-out { to { opacity: 0; } }
 @keyframes rd-xf-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { body.rd .rd-xf-was { display: none; } body.rd .rd-xf-now.in { animation: none; } }
-body.rd .rd-swap { display: grid; min-width: 0; }
+body.rd .rd-swap { display: grid; min-width: 0; position: relative; }
 body.rd .rd-swap > * { grid-area: 1 / 1; min-width: 0; }
-body.rd .rd-swap-was { pointer-events: none; animation: rd-xf-out .13s ease-out both; }
+body.rd .rd-swap-was { position: absolute; top: 0; left: 0; right: 0; min-width: max-content; pointer-events: none; animation: rd-xf-out .13s ease-out both; }
+@media (max-width: 900px) {
+  body.rd .rd-pl .rd-swap-was { left: auto; right: 0; }
+}
 body.rd .rd-swap-now.in { animation: rd-xf-in .2s ease-out .12s both; }
 @media (prefers-reduced-motion: reduce) { body.rd .rd-swap-was { display: none; } body.rd .rd-swap-now.in { animation: none; } }
 @keyframes rd-ap-in-c2pp { from { opacity: 0; } }
