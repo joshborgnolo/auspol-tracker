@@ -128,7 +128,7 @@ export function shellHeader({ tab } = {}) {
       <span id="wm-action" hidden>Replays the term on the masthead dial</span>
     </div>
     <p class="sh-tagline">Aggregated opinion polling for the next Australian <br class="sh-tagline-br">federal election, set against the last <span class="sh-past">twenty</span>.</p>
-    <p class="sh-meta-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span>Updated <span class="sh-pub"></span> · <span class="sh-npolls"></span> polls</span></p>
+    <p class="sh-meta-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span>Updated <span class="sh-pub"></span>, <span class="sh-npolls"></span> polls</span></p>
     </div>
     <div class="sh-right">
     <div class="sh-meta" hidden>
@@ -787,9 +787,9 @@ ${npProjectSrc()}
       : days < 56 ? Math.round(days / 7) + " weeks ago" : Math.round(days / 30) + " months ago";
     var state = days <= 7 ? "fresh" : days <= 21 ? "aging" : "stale";
     setText(".sh-pub", L.published);
-    setText(".sh-fresh-rel", "· " + rel);
+    setText(".sh-fresh-rel", ", " + rel);
     setText(".sh-due", L.nextElectionDue);
-    setText(".sh-tracked", L.pollsTracked + " · " + L.housesTracked + " pollsters");
+    setText(".sh-tracked", L.pollsTracked + ", " + L.housesTracked + " pollsters");
     setText(".sh-npolls", L.pollsTracked);
     var dots = document.querySelectorAll(".sh-fresh-dot");
     for (var i = 0; i < dots.length; i++) dots[i].className = "sh-fresh-dot " + state;

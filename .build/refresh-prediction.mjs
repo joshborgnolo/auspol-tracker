@@ -167,10 +167,10 @@ function compose(rec) {
     ridgeCell2: `reads p(ousted) = ${rec.ridge.liveP.toFixed(2)} — ${rec.ridge.liveP < 0.5 ? "same verdict, well short of alarm" : "in ousted territory too"}${age > 18.5 ? " (its window is now closed)" : ""}.`,
     hazardCell: `median p(ousted) = ${o.median.toFixed(2)}, 10–90% [${o.lo.toFixed(2)}, ${o.hi.toFixed(2)}]`,
     code: [
-      `p(ousted | profile at ${age}mo) = median ${o.median.toFixed(2)} · 10–90% CI [${o.lo.toFixed(2)}, ${o.hi.toFixed(2)}]`,
+      `p(ousted | profile at ${age}mo) = median ${o.median.toFixed(2)}, 10–90% CI [${o.lo.toFixed(2)}, ${o.hi.toFixed(2)}]`,
       `share of bootstrap draws calling ousted (p ≥ 0.5): ${pct(o.shareOuster)}%`,
-      `features: primSw ${s1(f.primSw)} · tppSw ${s1(f.tppSw)} · govAge ${f.govAge} · ageFrac ${f.ageFrac.toFixed(2)} · inter ${(f.primSw * f.ageFrac).toFixed(2)}`,
-      `context, not modelled (dropped in the September 2026 feature audit): pmNet ${s1(f.pmNet)} · ppm ${sp1(f.ppm)}`,
+      `features: primSw ${s1(f.primSw)}, tppSw ${s1(f.tppSw)}, govAge ${f.govAge}, ageFrac ${f.ageFrac.toFixed(2)}, inter ${(f.primSw * f.ageFrac).toFixed(2)}`,
+      `context, not modelled (dropped in the September 2026 feature audit): pmNet ${s1(f.pmNet)}, ppm ${sp1(f.ppm)}`,
       `(the table’s current-term row shows the in-sample profile read: ${inS.toFixed(2)})`,
     ].join("\n"),
     metaDesc: `Modelled ${rPct} per cent chance of re-election for the Albanese government as at ${dateLabel(rec.asOf)} — honest range ${loPct}–${hiPct}. A statistical read of nineteen completed federal terms, refreshed daily.`,
@@ -320,20 +320,20 @@ const html = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Will this government be re-elected? · auspol tracker</title>
+<title>Will this government be re-elected? – auspol tracker</title>
 <!-- GENERATED FILE — do not hand-edit. Rebuilt by .build/prediction-refresh.mjs
      daily (first run of each Sydney date; .build/prediction-refresh.sh,
      driven by prediction-refresh.yml and the wrapper's --if-due gate).
      Chrome matches the /feedback/ satellite
      recipe; numbers are composed once in the generator from the live output
      of .build/analysis/reelect-snapshot-hazard.mjs (+ term-ridge cross-check).
-     This read: ${dateLabel(latest.asOf)} · age ${latest.age} months. -->
+     This read: ${dateLabel(latest.asOf)}, age ${latest.age} months. -->
 <meta name="description" content="${S.metaDesc}">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="auspol tracker">
-<meta property="og:title" content="Will this government be re-elected? · auspol tracker">
+<meta property="og:title" content="Will this government be re-elected? – auspol tracker">
 <meta property="og:description" content="${S.metaDesc}">
 <meta name="twitter:card" content="summary">
 <link rel="canonical" href="https://auspoltracker.com/prediction/">
@@ -540,9 +540,9 @@ body {
       <div class="pred-med" style="left:${pc1(1 - latest.ousted.median)}%"></div>
     </div>
     <div class="pred-scale" aria-hidden="true">
-      <span>defeat certain · 0</span>
+      <span>defeat certain, 0</span>
       <span>50</span>
-      <span>100 · re-election certain</span>
+      <span>100, re-election certain</span>
     </div>
     <figcaption class="pred-note" data-slot="note">${S.note}</figcaption>
   </figure>
@@ -560,15 +560,15 @@ body {
   <p>Three readings, all knowable from published polling, drive the call — extended by two the model derives itself: the fraction of the term elapsed, and the interaction of the primary fade with that elapsed fraction.</p>
   <ul class="pred-feats">
     <li>
-      <strong>Primary vote · <span data-slot="f1l">${S.f1l}</span> on 2025</strong>
+      <strong>Primary vote, <span data-slot="f1l">${S.f1l}</span> on 2025</strong>
       <span data-slot="f1">${S.f1}</span>
     </li>
     <li>
-      <strong>Two-party preferred · <span data-slot="f2l">${S.f2l}</span> on 2025</strong>
+      <strong>Two-party preferred, <span data-slot="f2l">${S.f2l}</span> on 2025</strong>
       <span data-slot="f2">${S.f2}</span>
     </li>
     <li>
-      <strong>Age of the government · <span data-slot="f3l">${S.f3l}</span></strong>
+      <strong>Age of the government, <span data-slot="f3l">${S.f3l}</span></strong>
       <span data-slot="f3">${S.f3}</span>
     </li>
   </ul>
@@ -620,8 +620,8 @@ body {
     <tbody>
       <tr><td>15-month <em>levels</em> composite (approval, lead, swings scored against the ousted and survivor centroids)</td><td>−1.18 — worse than the typical ousted term’s level</td><td>15% (useless)</td></tr>
       <tr><td>15-month <em>declines</em> composite (fade from the term’s own honeymoon)</td><td>+0.86 — a standard honeymoon fade</td><td>54%</td></tr>
-      <tr><td>Ridge logistic on per-term trajectory features</td><td><span data-slot="ridgeCell">${S.ridgeCell}</span></td><td>68% full-term · 79% live</td></tr>
-      <tr class="picked"><td><strong>Snapshot / hazard model — the one above</strong></td><td><strong><span data-slot="hazardCell">${S.hazardCell}</span></strong></td><td>68–79% across bands, months 6–24 · 76% at 30 · 79% final</td></tr>
+      <tr><td>Ridge logistic on per-term trajectory features</td><td><span data-slot="ridgeCell">${S.ridgeCell}</span></td><td>68% full-term, 79% live</td></tr>
+      <tr class="picked"><td><strong>Snapshot / hazard model — the one above</strong></td><td><strong><span data-slot="hazardCell">${S.hazardCell}</span></strong></td><td>68–79% across bands, months 6–24, 76% at 30, 79% final</td></tr>
     </tbody>
   </table>
   <p>The construction. Each completed term contributes snapshots at ages 6, 12, 15, 18, 24, and 30 months plus a final read three months before its last day — a hundred and thirty-one snapshots in all. Each snapshot’s features are trailing-three-month summaries knowable at that age: the primary-vote and two-party swings against the term’s own election result, the government’s incumbency age in consecutive terms, the fraction of the term elapsed (the current term is assumed to run a full span), and the interaction of primary swing with elapsed fraction — five features in all. Missing values are median-imputed within the training fold; features are standardised within it; the fit is ridge logistic regression with λ = 1.</p>
