@@ -1106,20 +1106,23 @@ function RdDemographics({ rangeId = "all" }) {
     const fHi = hiL.l.pts.find((p) => p.ym === firstYm), fLo = loL.l.pts.find((p) => p.ym === firstYm);
     if (!fHi || !fLo) return null;
     const gap0 = fHi.y - fLo.y, gap1 = hiL.last.y - loL.last.y;
-    /* a gap that has changed sides reads signed, "from about −3 to about +7":
-       unsigned, the "7" read as the same side as the "3" */
-    const flipped = Math.round(gap0) < 0;
-    const gapWord = (g) => (flipped ? (g < 0 ? "−" : "+") + Math.abs(Math.round(g)) : String(Math.round(g)));
+    const pts = (g) => Math.abs(Math.round(g)) + (Math.abs(Math.round(g)) === 1 ? " point" : " points");
     const noun = RD_DEMO_NOUN[tab.id];
     const grew = (allPts) => allPts.length > 1 && allPts[allPts.length - 1].y - allPts[0].y >= 3;
     const pGrew = grew(c.allPts);
-    const move = gap1 - gap0 >= 4 ? "widened" : gap0 - gap1 >= 4 ? "narrowed" : "held steady";
+    /* a gap that has changed sides has reversed, not grown: the group ahead
+       now was behind then. (The one ahead now can't be behind by more than
+       it leads, so a reversal only ever shows as a signed widening.) */
+    const move = gap1 - gap0 >= 4 ? (Math.round(gap0) < 0 ? "reversed" : "widened") : gap0 - gap1 >= 4 ? "narrowed" : "held steady";
     const head = (noun ? "The " + noun + " gap" : "The gap between " + short(hiL.l.g) + " and " + short(loL.l.g)) + " has " + move
       + (move === "widened" && pGrew ? " as " + pName + " has grown" : "");
     const trend = demoTrendVerdict(D, c.st, party, (x) => x >= c.x0 && x <= c.x1);
     const dek = (trend ? trend + " " : "") + (move === "held steady" ? "In percentage points the gap between " + short(hiL.l.g) + " and " + short(loL.l.g) + " has stayed near " + Math.round(gap1) + "."
-      : "In percentage points, though, the gap between " + short(hiL.l.g) + " and " + short(loL.l.g) + " has " + (move === "widened" ? "grown" : "shrunk")
-        + " from about " + gapWord(gap0) + (gapWord(gap0) === "1" ? " point in " : " points in ") + rdMonthYear(firstYm) + " to about " + gapWord(gap1) + " now.");
+      : move === "reversed"
+        ? "In percentage points, though, " + short(hiL.l.g) + " were about " + pts(gap0) + " less likely than " + short(loL.l.g) + " to back " + DEMO_VOTE_FOR[party]
+          + " in " + rdMonthYear(firstYm) + "; now they are about " + pts(gap1) + " more likely."
+        : "In percentage points, though, the gap between " + short(hiL.l.g) + " and " + short(loL.l.g) + " has " + (move === "widened" ? "grown" : "shrunk")
+          + " from about " + pts(gap0) + " in " + rdMonthYear(firstYm) + " to about " + Math.round(gap1) + " now.");
     return { head, dek };
   })();
   /* Place draws its states as the board drew them: a small panel each, the
