@@ -25,6 +25,14 @@ Up/Down row walk (a398185) to extend across all of the site's tab rows.
 - It only fires when a button of that row has focus (handler lives on the
   row container, no global key listener) — reading the page with arrows is
   unaffected elsewhere.
+- **A click must focus the tab explicitly** (`rdTabFocus`, wired as onClick
+  on every walk-enabled role=group, f0996a9): Safari and Firefox on macOS
+  never focus a `<button>` on click (Chrome does), so the walk was dead for
+  pointer users until this landed. The issues-trust rows never needed it
+  because they're `tabIndex={0}` divs, which click-focus in every browser —
+  that difference is exactly why "only the issues arrows worked" was the
+  bug report. The probe's walkRow pins it: it clicks the first tab (real
+  `page.click`, not `.focus()`), asserts focus landed, then walks.
 
 ## Covered automatically (via `RdTabs`, rd.jsx ~:334)
 
