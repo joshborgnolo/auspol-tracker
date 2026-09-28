@@ -976,7 +976,7 @@ function rdList(arr) {
 const RD_DEMO_SHORT = {
   "18–34": "18–34s", "35–54": "35–54s", "55+": "over-55s", "Gen Z": "Gen Z", Millennials: "Millennials",
   "Gen X": "Gen X", Boomers: "Boomers", Men: "men", Women: "women",
-  "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "TAFE or trade graduates", University: "university graduates",
+  "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "TAFE- or trade-qualified voters", University: "university graduates",
   NSW: "NSW voters", Vic: "Victorians", Qld: "Queenslanders", "Rest of Australia": "voters in the other states",
   "Inner metro": "inner-suburban voters", "Outer metro": "outer-suburban voters", Provincial: "provincial voters", Rural: "rural voters",
   "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",

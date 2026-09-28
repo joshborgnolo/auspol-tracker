@@ -2147,7 +2147,7 @@ const DEMO_WHO = {
   "18–34": "voters aged 18–34", "35–54": "voters aged 35–54", "55+": "voters aged 55 and over",
   "Gen Z": "Gen Z voters", Millennials: "Millennials", "Gen X": "Gen X voters", Boomers: "Boomers",
   Men: "men", Women: "women",
-  "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "voters with a TAFE or trade qualification",
+  "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "TAFE- or trade-qualified voters",
   University: "university graduates",
   NSW: "voters in NSW", Vic: "voters in Victoria", Qld: "voters in Queensland",
   "Rest of Australia": "voters in SA, WA, Tasmania, and the territories",
