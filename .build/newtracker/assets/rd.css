@@ -559,7 +559,9 @@ body.rd .rd-pl-head, body.rd .rd-pl-row {
   display: grid; column-gap: 16px; align-items: center;
   grid-template-columns: 170px 124px 236px minmax(0, 1fr) 176px 28px;
 }
-body.rd .rd-polls[data-facet="primary"] .rd-pl-head, body.rd .rd-polls[data-facet="primary"] .rd-pl-row { grid-template-columns: 170px 124px 200px minmax(0, 1fr) 176px 28px; }
+@media (min-width: 901px) {
+  body.rd .rd-polls[data-facet="primary"] .rd-pl-head, body.rd .rd-polls[data-facet="primary"] .rd-pl-row { grid-template-columns: 170px 124px 200px minmax(0, 1fr) 176px 28px; }
+}
 body.rd .rd-pl-head {
   padding: 0 8px; min-height: 56px; align-items: end; padding-bottom: 8px;
   border-bottom: 1.5px solid var(--ink-2);
