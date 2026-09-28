@@ -6410,8 +6410,7 @@ function infoTerms(D) {
         {working(onsWork)}</>) },
       { id: "vote-by-group", term: "Breakdowns by group", body: (
         <>How each group – men and women, age groups, education levels, states, where people live,
-        whether they own or rent, the language they speak at home, and how certain of their choice
-        they are – says it will vote, from the
+        whether they own or rent, and the language they speak at home – says it will vote, from the
         tables pollsters publish with their polls. The panel “Who votes for whom” pools them into
         one figure per group.
         <span className="info-p"><b>How it’s built.</b> Each poll says how far a group sits from
@@ -6433,10 +6432,7 @@ function infoTerms(D) {
         2025 vote. Where people live: YouGov and RedBridge, which draw the same four areas, and
         DemosAU for the two metropolitan ones, since its third combines provincial and rural
         voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its
-        renters include others who don’t own. Language at home: YouGov and DemosAU. Softness of
-        the vote – certain of the choice, may change it, or only named it when pressed (or says
-        they will probably change it) – is RedBridge’s own question, asked by no other
-        pollster.</span>
+        renters include others who don’t own. Language at home: YouGov and DemosAU.</span>
         <span className="info-p"><b>Reading a gap.</b> Each figure carries its 95% margin, usually
         2 to 5 points. It is the {xref("interval", "breakdowns by group", "95% interval")} taken
         over the group’s pooled gaps, with each poll’s sample for the group estimated as the poll’s
