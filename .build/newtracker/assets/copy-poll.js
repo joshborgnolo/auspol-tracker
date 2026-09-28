@@ -151,25 +151,35 @@
   };
 
   /* The redesign's opened detail has no meta band to re-title: its head
-     line reads "This poll, Fieldwork …, published by ‹name›, …" because
-     the row above it on screen already says the house. The card travels
-     alone, so for the measure the head names the house instead ("YouGov,
-     Fieldwork …"); and where the by-name IS the house (it publishes its
-     own work) the tail just says "self-published" rather than name the
-     house twice. Text values only: no swap, no size change against the
-     measure, and the originals go back afterwards. */
+     line reads "Conducted on … from a sample of …, published by ‹name› on
+     …" because the row above it on screen already says the house. The
+     card travels alone, so for the measure the head names the house and
+     pulls the facts into a parenthetical - "YouGov (fieldwork …, n =
+     1,500 …, self-published, …)"; where the by-name IS the house (it
+     publishes its own work) the tail just says "self-published" rather
+     than name the house twice. Text values only: no swap, no size change
+     against the measure, and the originals go back afterwards. */
   const retitlePollHead = (panel, house) => {
     const head = (house && panel.querySelector(".rd-apd-h")) || null;
     if (!head) return () => {};
-    const by = "Published by " + house;
+    /* the sample clause is nested inside the .rd-nocaps span, so walk
+       every text node under the head, not just its direct children */
+    const tw = document.createTreeWalker(head, 4);
     const edits = [];
-    Array.prototype.forEach.call(head.childNodes, (n) => {
-      if (n.nodeType !== 3) return;
+    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
       const from = n.nodeValue;
-      let to = from.replace("This poll", house);
-      if (to.indexOf(by) !== -1) to = to.replace(by, "self-published");
-      if (to !== from) edits.push([n, from, to]);
-    });
+      let to = null;
+      const lead = /^(?:Conducted on (.*?) )?[Ff]rom $/.exec(from);
+      if (lead) to = house + " (" + (lead[1] ? "fieldwork " + lead[1] + ", " : "");
+      else if (from === "a sample of ") to = "n = ";
+      else if (from === "an unpublished sample") to = "sample not published";
+      else {
+        const by = /^, published by (.*) on (.*)$/.exec(from) || /^, published by (.*)()$/.exec(from);
+        if (by) to = ", " + (by[1] === house ? "self-published" : "published by " + by[1]) +
+          (by[2] ? ", " + by[2] : "") + ")";
+      }
+      if (to != null && to !== from) edits.push([n, from, to]);
+    }
     if (!edits.length) return () => {};
     edits.forEach(([n, , to]) => { n.nodeValue = to; });
     return () => edits.forEach(([n, from]) => { n.nodeValue = from; });
@@ -464,7 +474,7 @@
     /* the redesign packs the facts into the head line instead of a band */
     if (key === "Fieldwork") {
       const head = panel.querySelector(".rd-apd-h");
-      const m = head && /Fieldwork ([^,]+)/.exec(head.textContent || "");
+      const m = head && /Conducted on (.*?) from /.exec(head.textContent || "");
       if (m) return m[1].replace(/\s+/g, " ").trim();
     }
     return "";

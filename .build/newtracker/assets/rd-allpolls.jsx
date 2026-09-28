@@ -107,22 +107,27 @@ function rdEffTbcNote(p) {
 }
 /* A poll's header, one wording wherever a poll is opened (All polls, Latest
    and next polls): when it was in the field, how many were asked, and who
-   published it when (a self-published poll names its pollster). "n = 1,500" rather than "1,500 voters", with the
+   published it when, as one running sentence. "a sample of 1,500" with the
    pollster's effective sample beside it where it prints one - and "eff. TBC"
    where it normally does but this wave's hasn't appeared yet (the house's
    previous poll carried one, and this came out in the last three weeks;
-   older gaps are left unsaid, since some waves never get one). "Published by
-   News24" rather than "for News24", which read as if the voters were. */
+   older gaps are left unsaid, since some waves never get one). A wave filed
+   under a client is "published by the AFR" (mastheads take the article,
+   brands like News24 go bare); a self-published poll is published by its
+   pollster, and says so. */
+const RD_AP_BARE_CLIENTS = { News24: 1, "Capital Brief": 1, "News.com.au": 1, "News Australia": 1, Amplify: 1 };
+const rdApThe = (name) => (/^the /i.test(name) || RD_AP_BARE_CLIENTS[name] ? name : "the " + name);
 function rdPollHead(p) {
   const tbc = rdEffTbc(p);
   const n = p.sample != null
-    ? <>n = {p.sample.toLocaleString()}{p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? <> ({rdEffTbcNote(p)})</> : ""}</>
-    : "sample not published";
+    ? <>a sample of {p.sample.toLocaleString()}{p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? <> ({rdEffTbcNote(p)})</> : ""}</>
+    : "an unpublished sample";
   const out = rdApOut(p.published);
-  // a self-published poll is published by its pollster, and says so
-  const by = "Published by " + (p.client && !/^self/i.test(p.client) ? p.client : p.pollster);
+  // a commissioned wave credits its client; a self-published poll is
+  // published by its pollster, and says so
+  const by = "published by " + (p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
   const field = p.field || p.dateLabel;
-  return <>This poll{field ? ", Fieldwork " + field : ""}, <span className="rd-nocaps">{n}</span>{", " + by + (out ? ", " + out : "")}</>;
+  return <>{field ? "Conducted on " + field + " from " : "From "}<span className="rd-nocaps">{n}</span>{", " + by + (out ? " on " + out : "")}</>;
 }
 
 /* The primary columns in the order every table on the site keeps. */
