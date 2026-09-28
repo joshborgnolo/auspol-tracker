@@ -60,6 +60,23 @@ rd-dis-tabs/rd-hl-tabs rows incidentally.
 A newly hand-rolled tab row gets the walk by adding the same one-line prop;
 check it renders buttons in the same order as the array passed.
 
+## Number-key hotkeys: rdDigitKey (2648f0d, 2026-09-29)
+
+A row can also take NUMBER keys: `rdDigitKey(items, onChange)` (rd.jsx,
+beside rdTabsKey) maps 1..9 to `items[n-1]` left to right, no wrap and no
+focus move; 0, out-of-range and any modifier chord are inert (Cmd+digit is
+the browser's own tab switcher, never hijacked). `RdTabs` takes an
+`onDigits` prop hung on its OUTER `.rd-tabs` div (not the role=group, where
+rdTabsKey lives) so the row's view tabs AND its inline children both reach
+it. The one call site is Who votes for whom: with an Age…Home view tab or a
+party chip focused, 1..5 = One Nation, Labor, Coalition, Greens, Others -
+the RdTabs row carries `onDigits={rdDigitKey(DEMO_PARTIES, chooseParty)}`
+and the phone's separate `.rd-chips-row` attaches the same handler itself;
+both chips rows also got `onClick={rdTabFocus}` so a pointer click lands
+focus where the keys can hear it. Probe: `.matilda/probe-whovotes-numkeys.mjs`
+(digit picks from a view tab and from a chip, desktop + phone chips row, the
+figure itself switching, inert keys, Meta+digit, no-row-focus dead air).
+
 ## Beyond tab rows (5219307, 2026-09-29)
 
 Two more walk families ride the same ideas:
