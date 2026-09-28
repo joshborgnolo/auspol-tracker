@@ -22,6 +22,26 @@ const RD_CYC_TITLE_CHG = {
   ppmm: "PM’s lead, change since the first reading",
   oppnet: "Opposition leader’s net approval, change since the first reading",
 };
+/* the value a key stood for until it last changed, kept while a switch plays
+   out (`ms`) so the old version can be drawn going out beside the new */
+function rdUseOutgoing(k, value, ms = (window.AP && window.AP.MORPH_MS || 320) + 40) {
+  const cur = React.useRef({ k, value }), out = React.useRef(null), timer = React.useRef(0);
+  const [, force] = React.useReducer((x) => x + 1, 0);
+  if (cur.current.k !== k) {
+    const still = window.AP && window.AP.reduceMotion && window.AP.reduceMotion();
+    out.current = still ? null : { k: cur.current.k, value: cur.current.value, id: (out.current ? out.current.id : 0) + 1 };
+  }
+  cur.current = { k, value };
+  React.useEffect(() => {
+    const o = out.current;
+    if (!o || o.timed) return;
+    o.timed = true;
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => { if (out.current === o) { out.current = null; force(); } }, ms);
+  });
+  React.useEffect(() => () => clearTimeout(timer.current), []);
+  return out.current;
+}
 const rdOrd = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th");
 const rdSgn = (v, unit) => (unit ? "" : v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
 
@@ -87,8 +107,8 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
     const frac = (curVal - domain[0]) / (domain[1] - domain[0]);
     /* straddling the point, unless it sits at an edge of the window */
     const dys = frac < 0.22 ? [-24, -8] : frac > 0.82 ? [16, 32] : [-6, 10];
-    notes.push({ x: nowM, y: curVal, dx: 10, dy: dys[0], text: subj + " " + fmt(curVal), color: inkOf(subjColor), weight: 600, size: 12.5 });
-    notes.push({ x: nowM, y: curVal, dx: 10, dy: dys[1], text: Math.abs(d).toFixed(1) + (d >= 0 ? " above" : " below") + " average", size: 12.5 });
+    notes.push({ k: "cur", x: nowM, y: curVal, dx: 10, dy: dys[0], text: subj + " " + fmt(curVal), color: inkOf(subjColor), weight: 600, size: 12.5 });
+    notes.push({ k: "gap", x: nowM, y: curVal, dx: 10, dy: dys[1], text: Math.abs(d).toFixed(1) + (d >= 0 ? " above" : " below") + " average", size: 12.5 });
   }
   /* an overlay's name and figure at its end, on whichever side keeps it
      15px clear of the sitting term's two lines of words */
@@ -99,7 +119,7 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
     const taken = peer && curVal != null ? notes.slice(0, 2).map((n) => pxOf(last.y) - pxOf(curVal) + n.dy) : [];
     // candidate baselines, nearest the line's end first; y grows downward in dy
     const dy = [4, -8, 16, -20, 28, -32, 40].find((c) => taken.every((t) => Math.abs(c - t) >= 15)) ?? 4;
-    notes.push({ x: last.x, y: last.y, dx: 10, dy, text: (s.id === "cyc-onp" ? "One Nation " : "Hanson ") + fmt(last.y),
+    notes.push({ k: s.id, x: last.x, y: last.y, dx: 10, dy, text: (s.id === "cyc-onp" ? "One Nation " : "Hanson ") + fmt(last.y),
                  color: inkOf(s.color), weight: 600, size: 12.5 });
   });
   if (!chg && M.key === "tpp") {
@@ -107,9 +127,13 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
     notes.push({ x: "left", y: 50, dy: 15, text: "▼ Opposition ahead", size: 11.5 });
   }
   const marks = [];
-  if (peer && curVal != null) marks.push({ x: nowM, y: peer.mean, r: 3.5, color: "var(--ink-2)" });
-  if (!chg && cur && !hidden.has(cur.year) && (M.key === "tpp" || M.key === "primary" || M.key === "oppr") && cur.base[M.key] != null)
-    marks.push({ x: 0, y: cur.base[M.key], r: 5 });
+  if (peer && curVal != null) marks.push({ k: "mean", x: nowM, y: peer.mean, r: 3.5, color: "var(--ink-2)" });
+  /* The election-result ring sits where the term's line starts. Change mode
+     draws no ring - the "Result" rule says it - but keeps one, unseen, at
+     zero, so on the switch the ring travels with the line's start as it
+     fades rather than parting from it. */
+  if (cur && !hidden.has(cur.year) && (M.key === "tpp" || M.key === "primary" || M.key === "oppr") && cur.base[M.key] != null)
+    marks.push({ k: "base", x: 0, y: chg ? 0 : cur.base[M.key], r: 5, ...(chg ? { opacity: 0 } : {}) });
   const brackets = peer && curVal != null && Math.abs(d) >= 0.3 ? [{ x: nowM, y0: curVal, y1: peer.mean, dx: 5, lines: [] }] : [];
   const refY = chg ? 0 : M.refAbs;
   const refLines = refY != null ? [{ y: refY, color: "var(--ink-faint)" }] : [];
@@ -129,24 +153,69 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
   if (!tickSet.includes(domain[0])) tickSet.unshift(domain[0]);
   if (!tickSet.includes(domain[1])) tickSet.push(domain[1]);
   const title = (chg ? RD_CYC_TITLE_CHG : RD_CYC_TITLE)[M.key];
+  /* Level or change, and which past terms are on: the reader's choices. A
+     change of either morphs the chart from the picture on screen to the new
+     one - each term's line slides to its new level, the band reshapes, a
+     term switched on or off fades - rather than the chart being rebuilt.
+     (It was keyed by level-or-change, so that switch remounted it: the chart
+     blanked and faded back in.) Hover and lifting stay instant. */
+  const viewKey = (chg ? "c" : "a") + "|" + [...hidden].sort().join(",") + "|" + (showOnp ? 1 : 0) + (showHan ? 1 : 0);
+  const cardRef = React.useRef(null);
+  const clk = window.AP.useKeyClock(viewKey, cardRef);
+  const shownScene = React.useRef(null), fromScene = React.useRef(null);
+  const now = { series, areas: bandAreas || [], scatter, domain, ticks: tickSet, fmt: yTickFmt, refLines, notes, brackets, marks };
+  if (clk && (!fromScene.current || fromScene.current.n !== clk.n)) fromScene.current = { n: clk.n, scene: shownScene.current };
+  if (!clk) fromScene.current = null;
+  const was = clk && fromScene.current && fromScene.current.scene;
+  const drawn = was ? window.AP.blendScene(was, now, clk.t,
+    (d) => (d.meta ? (d.meta.pollster || "") + "|" + (d.meta.released || d.meta.date || "") : "") + "|" + d.label + "|" + d.x) : null;
+  /* The words at a line's end, the average's marker and the bracket between
+     them ride with the lines: each is matched to its counterpart in the view
+     being left and drawn at the blend of the two places, so "Labor 51.1"
+     gives way to "Labor −4.1" where the line's end actually is mid-switch,
+     rather than the new words waiting where the line has yet to arrive. What
+     has no counterpart fades where it is. */
+  const glide = (a, b, t) => ({ ...b, y: a.y + (b.y - a.y) * t, dy: (a.dy || 0) + ((b.dy || 0) - (a.dy || 0)) * t });
+  let notesNow = notes, notesWas = was ? was.notes : null, marksNow = marks, bracketsNow = brackets, bracketsWas = was ? was.brackets : null;
+  if (was) {
+    const t = clk.t;
+    const wk = new Map(was.notes.filter((n) => n.k).map((n) => [n.k, n])), nk = new Map(notes.filter((n) => n.k).map((n) => [n.k, n]));
+    notesNow = notes.map((n) => (n.k && wk.has(n.k) ? glide(wk.get(n.k), n, t) : n));
+    notesWas = was.notes.map((n) => (n.k && nk.has(n.k) ? { ...glide(n, nk.get(n.k), t), text: n.text, color: n.color, weight: n.weight } : n));
+    const mk = new Map((was.marks || []).filter((q) => q.k).map((q) => [q.k, q])), mn = new Set(marks.map((q) => q.k));
+    const opOf = (q) => (q.opacity != null ? q.opacity : 1);
+    marksNow = marks.map((q) => (q.k && mk.has(q.k) ? { ...q, y: mk.get(q.k).y + (q.y - mk.get(q.k).y) * t, opacity: opOf(mk.get(q.k)) + (opOf(q) - opOf(mk.get(q.k))) * t }
+      : { ...q, opacity: opOf(q) * t }))
+      .concat((was.marks || []).filter((q) => !mn.has(q.k)).map((q) => ({ ...q, opacity: opOf(q) * (1 - t) })));
+    const b0 = was.brackets && was.brackets[0], b1 = brackets[0];
+    if (b0 && b1) {
+      bracketsNow = [{ ...b1, y0: b0.y0 + (b1.y0 - b0.y0) * t, y1: b0.y1 + (b1.y1 - b0.y1) * t }];
+      bracketsWas = bracketsNow;
+    }
+  }
+  shownScene.current = drawn ? { ...now, series: drawn.series, areas: drawn.areas, scatter: drawn.scatter.concat(drawn.scatterMove), domain: drawn.domain,
+                                 notes: notesNow, marks: marksNow, brackets: bracketsNow } : now;
   /* a copy is read away from the section heads, so it says whose measure
      it is where the chart's own head leaves that to the section */
   const copyTitle = M.key === "ppmm" ? "The PM’s lead as preferred prime minister, " + (chg ? "change since the first reading" : "points")
     : M.key === "oppnet" && !chg ? "Opposition leader’s net approval, points" : title;
   return (
-    <div className="card rd-card rd-cyc-chart">
+    <div className="card rd-card rd-cyc-chart" ref={cardRef}>
       <div className="rd-chead">
         <span className="rd-chead-t">{title}</span>
         {M.onp && <RdCheck checked={showOnp} onChange={setOnp}>One Nation this term</RdCheck>}
         {hanCtl && <RdCheck checked={showHan} onChange={setHan}>Pauline Hanson this term</RdCheck>}
       </div>
-      <TrendChart key={"rd-cyc-" + M.key + "-" + (chg ? "c" : "a")}
+      <TrendChart key={"rd-cyc-" + M.key}
         heightPx={narrow ? 260 : half ? 290 : 330}
         padPx={narrow ? { l: 34, r: 8, t: badges ? 34 : 40, b: 28 } : { l: 40, r: half ? 12 : 16, t: badges ? 36 : 56, b: 30 }}
-        xDomain={CYC_XDOMAIN} yDomain={domain} yTicks={tickSet} yTickFmt={yTickFmt}
+        xDomain={CYC_XDOMAIN} yDomain={drawn ? drawn.domain : domain} yTicks={tickSet} yTickFmt={yTickFmt}
         xTicks={xTicks} baseline refLines={refLines} vlines={nowM != null ? [{ x: nowM }] : []}
-        series={series} spine={CYC_SPINE} scatter={scatter} areas={bandAreas || undefined}
-        events={badges ? badges.events : events} notes={notes} marks={marks} brackets={brackets}
+        series={drawn ? drawn.series : series} spine={CYC_SPINE} scatter={drawn ? drawn.scatter : scatter}
+        scatterOut={drawn ? drawn.scatterOut : []} scatterMove={drawn ? drawn.scatterMove : []} fade={drawn ? clk.t : 1}
+        areas={drawn ? drawn.areas : (bandAreas || undefined)}
+        morphFrom={was ? { yTicks: was.ticks, yTickFmt: was.fmt, refLines: was.refLines, notes: notesWas, brackets: bracketsWas } : null} morphT={clk ? clk.t : 1}
+        events={badges ? badges.events : events} notes={notesNow} marks={marksNow} brackets={bracketsNow}
         tooltipTitle={(i) => cycMonthLabel(CYC_SPINE[i].x) + (tipCycle ? " – " + cycMonthOf(tipCycle.eDate, CYC_SPINE[i].x) : "")}
         extraRows={(i) => {
           const r = bandRows.find((b) => b.m === CYC_SPINE[i].x);
@@ -243,22 +312,66 @@ function RdPastCycles(p) {
   const X = (sc, v) => ((v - sc.lo) / (sc.hi - sc.lo)) * 100;
   const tickLab = (group, v) => (group === "votes" && !chg ? (v === SC.votes.hi ? v + "%" : String(v))
     : v === 0 ? (chg ? "0" : "Even") : v > 0 ? "+" + v : "−" + Math.abs(v));
+  /* Each group's scale, and the one it replaced while a switch plays: the
+     marks on the strips glide to their new places (rd.css), and the scale's
+     words and rules hand over - the old ones fade as the new ones come in -
+     rather than the whole scale cutting from percentages to points. */
+  const scaleNow = {};
+  ["votes", "leaders"].forEach((g) => {
+    const sc = SC[g];
+    scaleNow[g] = { key: (chg ? "c" : "a") + sc.lo + "|" + sc.hi + "|" + sc.step,
+                    ticks: rdYTicks(sc.lo, sc.hi, sc.step).map((v) => ({ v, left: X(sc, v), lab: tickLab(g, v) })) };
+  });
+  const scaleWas = rdUseOutgoing(scaleNow.votes.key + "/" + scaleNow.leaders.key, scaleNow);
+  const scaleOut = (g) => (scaleWas && scaleWas.value[g].key !== scaleNow[g].key ? scaleWas : null);
+  /* the past terms on each strip, where they sat: a term the new set drops
+     fades where it was, and one it adds fades in, while the rest glide */
+  const dotsNow = {};
+  ROWS.forEach((r) => { dotsNow[r.key] = r.peers ? r.peers.vals.map((q) => ({ yr: q.yr, left: X(SC[r.group], q.v) })) : []; });
+  const dotsWas = rdUseOutgoing((chg ? "c" : "a") + "|" + [...hidden].sort().join(","), dotsNow);
 
   /* ---- the findings ---------------------------------------------------------------- */
   const R = {};
   ROWS.forEach((r) => { R[r.key] = r; });
+  /* With "Change since election" on, every rank is a rank of the change, so
+     the lowest is the biggest fall (or the smallest rise). The words say so:
+     they used to call it a record low, and the head could claim a party was
+     at its lowest level on the strength of how far it had fallen. */
+  const pts1 = (v) => Math.abs(v).toFixed(1);
+  const upDown = (v) => (v < 0 ? "down " : "up ") + pts1(v);
   const pageStory = (() => {
     const g = R.primary, o = R.oppr, t = R.tpp;
     const gLow = g.rank && /^Lowest/.test(g.rank.main), oLow = o.rank && /^Lowest/.test(o.rank.main);
-    const head = gLow && oLow ? "Both major parties are at record lows for this point in a term"
+    const moved = (r) => (r.v < 0 ? "fallen further" : "risen less");
+    const head = chg
+      ? (gLow && oLow ? (g.v < 0 && o.v < 0 ? "Both major parties have lost more of their vote than any before them at this point in a term"
+          : "Both major parties are at record lows against their election results for this point in a term")
+        : gLow ? govName + "’s primary vote has " + moved(g) + " than any government’s at this point in a term"
+        : oLow ? rdCap(oppIn) + "’s primary vote has " + moved(o) + " than any opposition’s at this point in a term"
+        : t.peers && t.v != null ? govName + "’s two-party vote has done " + (t.v >= t.peers.mean ? "better" : "worse") + " than the average government’s since its election"
+        : "Every term since 1972, lined up on its election day")
+      : gLow && oLow ? "Both major parties are at record lows for this point in a term"
       : gLow ? govName + "’s primary vote is the lowest of any government at this point in a term"
       : oLow ? rdCap(oppIn) + "’s primary vote is the lowest of any opposition at this point in a term"
-      : t.peers ? govName + " sits " + (t.v >= t.peers.mean ? "above" : "below") + " the average government at this point in a term" : "Every term since 1972, lined up on its election day";
+      : t.peers && t.v != null ? govName + " sits " + (t.v >= t.peers.mean ? "above" : "below") + " the average government at this point in a term" : "Every term since 1972, lined up on its election day";
     let dek = monthsWord + " after the " + cur.year + " election, ";
     const bits = [];
-    if (gLow) bits.push(govName + "’s primary vote is the lowest of any government at the same point since " + cycles[0].year);
-    if (oLow) bits.push((gLow ? "and " + oppIn + "’s" : rdCap(oppIn) + "’s primary vote is") + " the lowest of any opposition");
-    dek += bits.length ? bits.join(", ") + "." : govName + "’s primary vote is " + (g.rank ? g.rank.main.toLowerCase() : "") + " past governments at this point.";
+    const extreme = (r) => (r.v < 0 ? "the biggest fall" : "the smallest rise");
+    if (chg) {
+      if (gLow) bits.push(govName + "’s primary vote is " + upDown(g.v) + " points, " + extreme(g) + " for any government at that point since " + cycles[0].year);
+      if (oLow) bits.push((gLow ? "and " + oppIn + "’s is " : oppIn + "’s primary vote is ") + upDown(o.v) + " points, " + extreme(o) + " for any opposition");
+    } else {
+      if (gLow) bits.push(govName + "’s primary vote is the lowest of any government at the same point since " + cycles[0].year);
+      if (oLow) bits.push((gLow ? "and " + oppIn + "’s" : oppIn + "’s primary vote is") + " the lowest of any opposition");
+    }
+    /* a rank counts this term among its peers, so "of 21" is 21 governments,
+       twenty of them past */
+    const rankWords = (r) => (/^Middle/.test(r.rank.main) ? "in the " : "the ") + r.rank.main.toLowerCase().replace(/ of (\d+)$/, " of $1 governments");
+    dek += bits.length ? bits.join(", ") + "."
+      : g.v == null || !g.rank ? govName + "’s primary vote has no reading to set against past governments yet."
+      : chg ? govName + "’s primary vote is " + upDown(g.v) + " points since the election; past governments were "
+          + (g.peers.mean < 0 ? "down " : "up ") + pts1(g.peers.mean) + " on average by now."
+      : govName + "’s primary vote is " + rankWords(g) + " at this point.";
     if (t.peers && t.v != null && !chg) {
       const where = t.v >= t.peers.q1 && t.v <= t.peers.q3 ? "sits in the middle half of past governments"
         : t.v > t.peers.q3 ? "is above three in four past governments" : "is below three in four past governments";
@@ -282,9 +395,15 @@ function RdPastCycles(p) {
       const nearRet = Math.abs(t.v - ret.mean) <= Math.abs(t.v - ous.mean);
       head = "After preferences, " + govName + " is on a par with governments that went on to be " + (nearRet ? "re-elected" : "ousted");
     } else head = "After preferences, " + govName + " is " + (dAvg >= 0 ? "above" : "below") + " the average government at this point";
+    if (chg && !(ret && ous)) head = "After preferences, " + govName + " has done " + (dAvg >= 0 ? "better" : "worse") + " than the average government since its election";
     const vs = rivalWord === "One Nation" ? " against One Nation" : "";
-    let dek = "Its " + fmtOf("tpp")(t.v) + (chg ? "" : "%") + vs + " is " + Math.abs(dAvg).toFixed(1) + " points " + (dAvg >= 0 ? "above" : "below") + " the average government " + m + " months in.";
-    if (ret && ous) dek += " Governments later re-elected averaged " + fmtOf("tpp")(ret.mean) + (chg ? "" : "%") + " at this point; the " + rdNumWord(ous.n) + " ousted averaged " + fmtOf("tpp")(ous.mean) + (chg ? "" : "%") + ".";
+    /* in change mode the figure is a move from the election result, said as one */
+    let dek = chg
+      ? (vs ? "Against One Nation it is " : "It is ") + upDown(t.v) + " points on its election result, " + pts1(dAvg) + " " + (dAvg >= 0 ? "better" : "worse") + " than the average government " + m + " months in."
+      : "Its " + fmtOf("tpp")(t.v) + "%" + vs + " is " + pts1(dAvg) + " points " + (dAvg >= 0 ? "above" : "below") + " the average government " + m + " months in.";
+    if (ret && ous) dek += chg
+      ? " By this stage governments later re-elected were " + (ret.mean < 0 ? "down " : "up ") + pts1(ret.mean) + " points on average, and the " + rdNumWord(ous.n) + " ousted " + (ous.mean < 0 ? "down " : "up ") + pts1(ous.mean) + "."
+      : " Governments later re-elected averaged " + fmtOf("tpp")(ret.mean) + "% at this point; the " + rdNumWord(ous.n) + " ousted averaged " + fmtOf("tpp")(ous.mean) + "%.";
     return { head, dek };
   })();
   /* the primaries: how far each party has moved since its own election */
@@ -309,13 +428,31 @@ function RdPastCycles(p) {
     if (!n.peers || n.v == null) return null;
     const rk = n.rank;
     const low = n.peers.vals[0];
+    const dN = n.v - n.peers.mean;
+    const pp = R.ppmm, on = R.oppnet;
+    if (chg) {
+      const less = n.v < 0 ? "fallen further" : "risen less";
+      const head = /^Lowest/.test(rk.main) ? pm + "’s net approval has " + less + " than any prime minister’s at this point"
+        : /^2nd lowest/.test(rk.main) ? pm + "’s net approval has " + less + " than any prime minister’s at this point but " + low.who + "’s"
+        : /^Highest/.test(rk.main) ? pm + "’s net approval has " + (n.v >= 0 ? "risen more" : "fallen less") + " than any prime minister’s at this point"
+        : pm + "’s net approval has done " + (dN >= 0 ? "better" : "worse") + " than the average prime minister’s since the term’s first reading";
+      /* the leaders' measures count from the term's first reading, not the election */
+      let dek = "It is " + upDown(n.v) + " points on the term’s first reading, " + pts1(dN) + " " + (dN >= 0 ? "better" : "worse") + " than the average prime minister " + m + " months in.";
+      if (pp.peers && pp.v != null) {
+        const dP = pp.v - pp.peers.mean;
+        dek += " His lead as preferred PM is " + upDown(pp.v) + ", " + (Math.abs(dP) <= 3 ? "close to the average" : pts1(dP) + " " + (dP > 0 ? "better" : "worse") + " than the average");
+        if (on.peers && on.v != null) {
+          const dO = on.v - on.peers.mean;
+          dek += ", and " + oppL + " is " + upDown(on.v) + (Math.abs(dO) <= 4 ? ", about as opposition leaders usually are by now." : ", " + (dO > 0 ? "better" : "worse") + " than opposition leaders usually do.");
+        } else dek += ".";
+      }
+      return { head, dek };
+    }
     const head = /^Lowest/.test(rk.main) ? pm + "’s net approval is the lowest of any prime minister at this point"
       : /^2nd lowest/.test(rk.main) ? pm + "’s net approval is the second lowest of any prime minister at this point, after " + low.who + "’s"
       : /^Highest/.test(rk.main) ? pm + "’s net approval is the highest of any prime minister at this point"
       : pm + "’s net approval is " + (n.v >= n.peers.mean ? "above" : "below") + " the average prime minister’s at this point";
-    const dN = n.v - n.peers.mean;
     let dek = "At " + fmtOf("net")(n.v) + " he is " + Math.abs(dN).toFixed(1) + " points " + (dN >= 0 ? "above" : "below") + " the average prime minister " + m + " months in.";
-    const pp = R.ppmm, on = R.oppnet;
     if (pp.peers && pp.v != null) {
       const dP = pp.v - pp.peers.mean;
       dek += " He " + (pp.v >= 0 ? "still leads" : "trails") + " as preferred PM by " + Math.abs(pp.v).toFixed(1) + " points, " + (Math.abs(dP) <= 3 ? "close to the average" : Math.abs(dP).toFixed(1) + " " + (dP > 0 ? "above" : "below") + " the average");
@@ -341,7 +478,10 @@ function RdPastCycles(p) {
           <div className="rd-cs-group" role="row">
             <span><b>{g === "votes" ? "Votes" : "Leaders"}</b> {g === "votes" ? (chg ? "points since the election" : "% of voters") : "net points"}</span>
             <span></span>
-            <span className="rd-cs-scale">{rdYTicks(SC[g].lo, SC[g].hi, SC[g].step).map((v) => <span key={v} style={{ left: X(SC[g], v) + "%" }}>{tickLab(g, v)}</span>)}</span>
+            <span className="rd-cs-scale">
+              {scaleOut(g) && scaleOut(g).value[g].ticks.map((q) => <span key={"o" + scaleOut(g).id + "-" + q.v} className="out" aria-hidden="true" style={{ left: q.left + "%" }}>{q.lab}</span>)}
+              {scaleNow[g].ticks.map((q) => <span key={scaleNow[g].key + "-" + q.v} className={scaleOut(g) ? "in" : undefined} style={{ left: q.left + "%" }}>{q.lab}</span>)}
+            </span>
             <span></span><span></span><span></span>
           </div>
           {ROWS.filter((r) => r.group === g).map((r) => {
@@ -352,11 +492,16 @@ function RdPastCycles(p) {
                 <span role="cell" className="rd-cs-name"><b>{r.name}</b><span>{r.sub}</span></span>
                 <span role="cell" className="rd-cs-now" style={{ color: inkOf(r.color) }}>{r.v != null ? r.fmt(r.v) : "—"}{r.v != null && Mby[r.key].unit === "%" && !chg ? <small>%</small> : null}</span>
                 <span className="rd-cs-strip" aria-hidden="true">
-                  {rdYTicks(sc.lo, sc.hi, sc.step).map((v) => <i key={v} className="rd-cs-gl" style={{ left: X(sc, v) + "%" }}></i>)}
+                  {scaleOut(g) && scaleOut(g).value[g].ticks.map((q) => <i key={"o" + scaleOut(g).id + "-" + q.v} className="rd-cs-gl out" style={{ left: q.left + "%" }}></i>)}
+                  {scaleNow[g].ticks.map((q) => <i key={scaleNow[g].key + "-" + q.v} className={"rd-cs-gl" + (scaleOut(g) ? " in" : "")} style={{ left: q.left + "%" }}></i>)}
                   {P && P.n >= 3 && <i className="rd-cs-b80" style={{ left: X(sc, P.p10) + "%", width: X(sc, P.p90) - X(sc, P.p10) + "%" }}></i>}
                   {P && P.n >= 3 && <i className="rd-cs-b50" style={{ left: X(sc, P.q1) + "%", width: X(sc, P.q3) - X(sc, P.q1) + "%" }}></i>}
+                  {dotsWas && dotsWas.value[r.key].filter((q) => !dotsNow[r.key].some((d) => d.yr === q.yr)).map((q) => (
+                    <i key={"o" + dotsWas.id + "-" + q.yr} className="rd-cs-dot out" aria-hidden="true" style={{ left: q.left + "%" }}></i>
+                  ))}
                   {P && P.vals.map((q, qi) => (
-                    <i key={q.yr} className={"rd-cs-dot" + (tip && tip.key === r.key && tip.i === qi ? " on" : "")} style={{ left: X(sc, q.v) + "%" }}
+                    <i key={q.yr} className={"rd-cs-dot" + (tip && tip.key === r.key && tip.i === qi ? " on" : "")
+                         + (dotsWas && !dotsWas.value[r.key].some((d) => d.yr === q.yr) ? " in" : "")} style={{ left: X(sc, q.v) + "%" }}
                        onMouseEnter={() => setTip({ key: r.key, i: qi })} onMouseLeave={() => setTip(null)}></i>
                   ))}
                   {P && <i className="rd-cs-mean" style={{ left: X(sc, P.mean) + "%" }}></i>}
@@ -489,6 +634,10 @@ function RdPastCycles(p) {
     </RdKey>
   );
   const navs = [["cyc-tpp", "Two-party preferred"], ["cyc-primary", "Primary vote"], ["cyc-leaders", "Leadership"], ["final-polls", "How the final polls did"]];
+  /* the final polls' record answers to none of the controls above it, so it
+     is made once and handed back unchanged: React skips an element it has
+     already drawn, and a Level/Change press stops redrawing the whole panel */
+  const accuracy = React.useMemo(() => <AccuracyPanel />, []);
   return (
     <div className="view view-cycles rd-cycles">
       <section className="rd-sec rd-first" id="cyc-summary" aria-labelledby="rd-cyc-t">
@@ -538,7 +687,7 @@ function RdPastCycles(p) {
           Where a term changed leader its line follows whoever held the office. The earliest terms’ ratings are the Morgan Gallup Poll’s; later terms pool every pollster that asked, each corrected for its lean. Favourability ratings are left out.
         </RdFoot>
       </RdSec>
-      <AccuracyPanel />
+      {accuracy}
     </div>
   );
 }

@@ -174,6 +174,41 @@ function RdCrossfade({ k, children, className }) {
   );
 }
 
+/* A table cell's words giving way to others on a tab (the Latest polls
+   figures): the same out-then-in as RdCrossfade, without its height glide,
+   since the row decides the height, not the cell. The two copies share one
+   grid area rather than the old one floating over the new, so neither is
+   ever laid out narrower than itself - a floated copy wrapped its figures
+   onto a second line on a phone. */
+function RdSwap({ k, children, className }) {
+  const was = React.useRef({ k, node: children });
+  const fading = React.useRef(null);
+  const timer = React.useRef(0);
+  const [, force] = React.useReducer((x) => x + 1, 0);
+  const AP = window.AP || {};
+  if (was.current.k !== k) {
+    const still = AP.reduceMotion && AP.reduceMotion();
+    fading.current = still ? null : { k: was.current.k, node: was.current.node, id: (fading.current ? fading.current.id : 0) + 1 };
+  }
+  was.current = { k, node: children };
+  React.useEffect(() => {
+    const f = fading.current;
+    if (!f || f.timed) return undefined;
+    f.timed = true;
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => { if (fading.current === f) { fading.current = null; force(); } }, (AP.MORPH_MS || 320) + 40);
+    return undefined;
+  });
+  React.useEffect(() => () => clearTimeout(timer.current), []);
+  const f = fading.current;
+  return (
+    <div className={"rd-swap" + (className ? " " + className : "")}>
+      <div className={"rd-swap-now" + (f ? " in" : "")} key={"now-" + k}>{children}</div>
+      {f && <div className="rd-swap-was" key={"was-" + f.k + "-" + f.id} aria-hidden="true" inert="">{f.node}</div>}
+    </div>
+  );
+}
+
 if (typeof window !== "undefined" && !window.__rdInputWatch) {
   window.__rdInputWatch = true;
   const note = () => { window.__rdInput = performance.now(); };

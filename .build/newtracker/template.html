@@ -1526,8 +1526,11 @@ body.dark .sens-band { opacity: 0.10; }
   font-family: var(--sans); font-weight: 700;
   paint-order: stroke; stroke: var(--chart-bg);
   stroke-linejoin: round; stroke-linecap: round;
-  transition: opacity .2s ease;
+  transition: opacity .2s ease, transform .2s ease;
 }
+/* mid-switch the chart places every name itself, each frame: an easing
+   restarted by every frame would drag the names behind their lines */
+.chart-svg.switching .end-label { transition: none; }
 /* key-event markers (wide charts only – gated in TrendChart by measured px) */
 .evt-line { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 2 5; opacity: 0.5; }
 /* The elbow that ties a label to its own line. Solid where the reference line
@@ -1561,8 +1564,11 @@ body.dark .sens-band { opacity: 0.10; }
    own clock, frame by frame, and a CSS transition restarted by every one of
    those frames dragged the colour behind the line and was still settling
    after the line had landed. (The theme crossfade is a view transition.) */
-.scatter-dot { transition: r .12s ease, opacity .12s ease, fill-opacity .12s ease; cursor: pointer; }
+.scatter-dot { transition: r .12s ease, opacity .12s ease, fill-opacity .2s ease; cursor: pointer; }
 .series-line { transition: opacity .2s ease; }
+/* a mark a reader hides or shows (a party toggled off the chart) fades with
+   its line: its band, its ring, and its dots (fill-opacity, above) */
+.fade-mark { transition: opacity .2s ease; }
 .grid, .refline { transition: stroke .35s ease; }
 
 /* tooltip */

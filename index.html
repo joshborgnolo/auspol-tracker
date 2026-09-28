@@ -995,8 +995,9 @@ body.dark .sens-band { opacity: 0.10; }
   font-family: var(--sans); font-weight: 700;
   paint-order: stroke; stroke: var(--chart-bg);
   stroke-linejoin: round; stroke-linecap: round;
-  transition: opacity .2s ease;
+  transition: opacity .2s ease, transform .2s ease;
 }
+.chart-svg.switching .end-label { transition: none; }
 .evt-line { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 2 5; opacity: 0.5; }
 .evt-conn { stroke: var(--ink-faint); stroke-width: 1; opacity: 0.55; }
 .evt:hover .evt-conn, .evt.on .evt-conn { opacity: 0.95; }
@@ -1016,8 +1017,9 @@ body.dark .sens-band { opacity: 0.10; }
 .axis-label { font-family: var(--sans); fill: var(--ink-3); font-size: 13px; transition: fill .35s ease; }
 .axis-label.y { text-anchor: end; font-weight: 500; }
 .axis-label.x { font-weight: 500; }
-.scatter-dot { transition: r .12s ease, opacity .12s ease, fill-opacity .12s ease; cursor: pointer; }
+.scatter-dot { transition: r .12s ease, opacity .12s ease, fill-opacity .2s ease; cursor: pointer; }
 .series-line { transition: opacity .2s ease; }
+.fade-mark { transition: opacity .2s ease; }
 .grid, .refline { transition: stroke .35s ease; }
 .tip {
   position: absolute; pointer-events: none; z-index: 5;
@@ -3171,11 +3173,36 @@ body.rd .rd-badge-tie { fill: none; stroke: var(--ink-faint); stroke-width: 1; v
 body.rd .rd-evlist { list-style: none; margin: 12px 0 0; padding: 0; font-size: 13px; color: var(--ink-2); }
 body.rd .chart:has(> .chart-copy-btn) + .rd-evlist { margin-top: 0; }
 body.rd .rd-xf { position: relative; }
-body.rd .rd-xf-was { position: absolute; inset: 0 0 auto 0; pointer-events: none; animation: rd-xf-out .32s var(--morph-ease) both; }
-body.rd .rd-xf-now.in { animation: rd-xf-in .32s var(--morph-ease) both; }
+body.rd .rd-xf-was { position: absolute; inset: 0 0 auto 0; pointer-events: none; animation: rd-xf-out .13s ease-out both; }
+body.rd .rd-xf-now.in { animation: rd-xf-in .2s ease-out .12s both; }
 @keyframes rd-xf-out { to { opacity: 0; } }
 @keyframes rd-xf-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { body.rd .rd-xf-was { display: none; } body.rd .rd-xf-now.in { animation: none; } }
+body.rd .rd-swap { display: grid; min-width: 0; }
+body.rd .rd-swap > * { grid-area: 1 / 1; min-width: 0; }
+body.rd .rd-swap-was { pointer-events: none; animation: rd-xf-out .13s ease-out both; }
+body.rd .rd-swap-now.in { animation: rd-xf-in .2s ease-out .12s both; }
+@media (prefers-reduced-motion: reduce) { body.rd .rd-swap-was { display: none; } body.rd .rd-swap-now.in { animation: none; } }
+@keyframes rd-ap-in-c2pp { from { opacity: 0; } }
+@keyframes rd-ap-in-cprim { from { opacity: 0; } }
+@keyframes rd-ap-in-clead { from { opacity: 0; } }
+@keyframes rd-ap-in-cdir { from { opacity: 0; } }
+body.rd .rd-ap-sw.rd-ap-c2pp { --rd-ap-in: rd-ap-in-c2pp; }
+body.rd .rd-ap-sw.rd-ap-cprim { --rd-ap-in: rd-ap-in-cprim; }
+body.rd .rd-ap-sw.rd-ap-clead { --rd-ap-in: rd-ap-in-clead; }
+body.rd .rd-ap-sw.rd-ap-cdir { --rd-ap-in: rd-ap-in-cdir; }
+body.rd :is(.rd-ap-row, .rd-ap-hrow).rd-ap-sw > :nth-child(n+5):not(.rd-ap-chev),
+body.rd .rd-ap-card.rd-ap-sw > :is(.rd-ap-c1, .rd-ap-c2) > :last-child,
+body.rd .rd-ap-card.rd-ap-sw > :nth-child(n+3),
+body.rd .rd-ap-phead.rd-ap-sw > *,
+body.rd .rd-ap-mrow.rd-ap-sw > :not(.rd-ap-mlab), body.rd .rd-ap-mrow.rd-ap-sw > .rd-ap-mlab > span { animation: var(--rd-ap-in, none) .2s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  body.rd :is(.rd-ap-row, .rd-ap-hrow).rd-ap-sw > :nth-child(n+5):not(.rd-ap-chev),
+  body.rd .rd-ap-card.rd-ap-sw > :is(.rd-ap-c1, .rd-ap-c2) > :last-child,
+  body.rd .rd-ap-card.rd-ap-sw > :nth-child(n+3),
+  body.rd .rd-ap-phead.rd-ap-sw > *,
+  body.rd .rd-ap-mrow.rd-ap-sw > :not(.rd-ap-mlab), body.rd .rd-ap-mrow.rd-ap-sw > .rd-ap-mlab > span { animation: none; }
+}
 body.rd .rd-evstack { display: grid; }
 body.rd .rd-evstack > .rd-evlist { grid-area: 1 / 1; }
 body.rd .rd-evlist + .rd-ckey { margin-top: 16px; }
@@ -4066,6 +4093,13 @@ body.rd .rd-cs-dot:hover, body.rd .rd-cs-dot.on { width: 11px; height: 11px; opa
 body.rd .rd-cs-dot::after { content: ""; position: absolute; inset: -6px; }
 body.rd .rd-cs-mean { width: 2px; height: 22px; background: var(--ink); transform: translate(-1px, -50%); z-index: 2; }
 body.rd .rd-cs-cur { width: 13px; height: 13px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 2px var(--bg); z-index: 3; }
+body.rd .rd-cs-dot, body.rd .rd-cs-mean, body.rd .rd-cs-cur { transition: left .32s var(--morph-ease); }
+body.rd .rd-cs-b80, body.rd .rd-cs-b50 { transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
+body.rd .rd-cs-scale > span.out, body.rd .rd-cs-gl.out, body.rd .rd-cs-dot.out { animation: rd-xf-out .13s ease-out both; pointer-events: none; }
+body.rd .rd-cs-scale > span.in, body.rd .rd-cs-gl.in, body.rd .rd-cs-dot.in { animation: rd-xf-in .2s ease-out .12s both; }
+@media (prefers-reduced-motion: reduce) {
+  body.rd .rd-cs-dot, body.rd .rd-cs-mean, body.rd .rd-cs-cur, body.rd .rd-cs-b80, body.rd .rd-cs-b50 { transition: none; }
+}
 body.rd .rd-cs-tip { position: absolute; bottom: calc(100% + 4px); top: auto; transform: translateX(-50%); z-index: 20; white-space: nowrap; display: flex; flex-direction: column; }
 body.rd .rd-cs-avg, body.rd .rd-cs-rank { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-cs-avg b, body.rd .rd-cs-rank b { font-size: 15px; font-weight: 600; color: var(--ink); }
@@ -40178,6 +40212,167 @@ window.AP = function () {
       t: m.t
     } : null;
   }
+  function useKeyClock(key, ref) {
+    const st = React.useRef({
+      key,
+      n: 0,
+      run: null
+    });
+    const raf = React.useRef(0),
+      land = React.useRef(0);
+    const seen = React.useRef(true);
+    const [, force] = React.useReducer(x => x + 1, 0);
+    const s = st.current;
+    if (key !== s.key) {
+      s.key = key;
+      s.n++;
+      s.run = reduceMotion() || !seen.current ? null : {
+        t: morphEase(FRAME_MS / MORPH_MS),
+        n: s.n,
+        pending: true
+      };
+    }
+    React.useEffect(() => {
+      const el = ref && ref.current;
+      if (!el || !window.IntersectionObserver) return undefined;
+      const io = new IntersectionObserver(es => {
+        es.forEach(e => {
+          seen.current = e.isIntersecting;
+        });
+      });
+      io.observe(el);
+      return () => io.disconnect();
+    }, [ref]);
+    React.useLayoutEffect(() => {
+      const r = st.current.run;
+      if (!r || !r.pending) return;
+      r.pending = false;
+      clearTimeout(land.current);
+      morphClock(raf, t => {
+        if (st.current.run === r) {
+          r.t = t;
+          force();
+        }
+      }, () => {
+        if (st.current.run === r) {
+          st.current.run = null;
+          force();
+        }
+      });
+      land.current = setTimeout(() => {
+        cancelAnimationFrame(raf.current);
+        if (st.current.run === r) {
+          st.current.run = null;
+          force();
+        }
+      }, MORPH_MS + 200);
+    });
+    React.useEffect(() => () => {
+      cancelAnimationFrame(raf.current);
+      clearTimeout(land.current);
+    }, []);
+    return s.run ? {
+      t: s.run.t,
+      n: s.run.n
+    } : null;
+  }
+  const sceneYm = x => String(Math.round((x + 1e4) * 1e4)).padStart(12, "0");
+  const sceneRows = new WeakMap();
+  const rowsOfPts = (pts, area) => {
+    let r = sceneRows.get(pts);
+    if (!r) {
+      r = area ? pts.filter(p => p.y0 != null && p.y1 != null).map(p => ({
+        ym: sceneYm(p.x),
+        x: p.x,
+        y0: p.y0,
+        y1: p.y1
+      })) : pts.filter(p => p.y != null).map(p => ({
+        ...p,
+        ym: sceneYm(p.x)
+      }));
+      sceneRows.set(pts, r);
+    }
+    return r;
+  };
+  function blendScene(A, B, t, dotKey) {
+    const rows = pts => rowsOfPts(pts, false);
+    const byId = arr => new Map((arr || []).map(s => [s.id, s]));
+    const lerp = (a, b) => a + (b - a) * t;
+    const sa = byId(A.series),
+      sb = byId(B.series);
+    const series = [];
+    (B.series || []).forEach(s => {
+      const a = sa.get(s.id);
+      if (!a) {
+        series.push({
+          ...s,
+          opacity: (s.opacity != null ? s.opacity : 1) * t,
+          endLabelOpacity: (s.endLabelOpacity != null ? s.endLabelOpacity : 1) * t
+        });
+        return;
+      }
+      const bl = a.points.length && s.points.length ? blendRows(rows(a.points), rows(s.points), t, ["y"]) : null;
+      const oa = a.opacity != null ? a.opacity : 1,
+        ob = s.opacity != null ? s.opacity : 1;
+      series.push({
+        ...s,
+        points: bl ? bl.rows.map(r => ({
+          x: r.x,
+          y: r.y
+        })) : s.points,
+        clipX: bl ? bl.clip : s.clipX,
+        opacity: lerp(oa, ob),
+        endCap: s.endCap
+      });
+    });
+    (A.series || []).forEach(a => {
+      if (sb.has(a.id)) return;
+      series.push({
+        ...a,
+        opacity: (a.opacity != null ? a.opacity : 1) * (1 - t),
+        endLabelOpacity: (a.endLabelOpacity != null ? a.endLabelOpacity : 1) * (1 - t)
+      });
+    });
+    const aa = byId(A.areas),
+      ab = byId(B.areas);
+    const areas = [];
+    (B.areas || []).forEach(z => {
+      const a = aa.get(z.id);
+      if (!a) {
+        areas.push({
+          ...z,
+          fade: t
+        });
+        return;
+      }
+      const toRows = pts => rowsOfPts(pts, true);
+      const bl = a.points.length && z.points.length ? blendRows(toRows(a.points), toRows(z.points), t, ["y0", "y1"]) : null;
+      areas.push({
+        ...z,
+        points: bl ? bl.rows.filter(r => r.y0 != null && r.y1 != null).map(r => ({
+          x: r.x,
+          y0: r.y0,
+          y1: r.y1
+        })) : z.points,
+        clipX: bl ? bl.clip : z.clipX
+      });
+    });
+    (A.areas || []).forEach(a => {
+      if (!ab.has(a.id)) areas.push({
+        ...a,
+        fade: 1 - t
+      });
+    });
+    const cross = crossClouds(A.scatter || [], B.scatter || [], t, dotKey);
+    return {
+      series,
+      areas,
+      scatter: cross.scatter,
+      scatterOut: cross.scatterOut,
+      scatterMove: cross.scatterMove,
+      domain: blendDomain(A.domain, B.domain, t)
+    };
+  }
   const softKey = k => /^ci/.test(k);
   const monoTangents = (xs, ys) => {
     const n = xs.length,
@@ -40374,33 +40569,55 @@ window.AP = function () {
       clips
     };
   }
+  const crossMemo = new WeakMap();
   function crossClouds(A, B, t, keyOf) {
-    const claim = arr => {
-      const m = new Map();
-      arr.forEach(d => {
-        const k = keyOf(d);
-        if (!m.has(k)) m.set(k, d);
+    let byB = crossMemo.get(A),
+      hit = byB && byB.get(B);
+    if (!hit) {
+      const claim = arr => {
+        const m = new Map();
+        arr.forEach(d => {
+          const k = keyOf(d);
+          if (!m.has(k)) m.set(k, d);
+        });
+        return m;
+      };
+      const ia = claim(A),
+        ib = claim(B);
+      const travel = [],
+        leaving = [],
+        arriving = [];
+      ia.forEach((d, k) => ib.has(k) ? travel.push([d, ib.get(k)]) : leaving.push(d));
+      ib.forEach((d, k) => {
+        if (!ia.has(k)) arriving.push(d);
       });
-      return m;
-    };
-    const ia = claim(A),
-      ib = claim(B);
-    const travel = [],
-      leaving = [],
-      arriving = [];
-    ia.forEach((d, k) => ib.has(k) ? travel.push([d, ib.get(k)]) : leaving.push(d));
-    ib.forEach((d, k) => {
-      if (!ia.has(k)) arriving.push(d);
-    });
+      hit = {
+        travel,
+        leaving,
+        arriving
+      };
+      if (!byB) {
+        byB = new WeakMap();
+        crossMemo.set(A, byB);
+      }
+      byB.set(B, hit);
+    }
+    const {
+      travel,
+      leaving,
+      arriving
+    } = hit;
     return {
       scatter: arriving,
       scatterOut: leaving,
       scatterMove: travel.map(([a, b]) => ({
-        x: a.x,
+        x: a.x + (b.x - a.x) * t,
         y: a.y + (b.y - a.y) * t,
         color: mixC(a.color, b.color, t),
         label: b.label,
-        meta: b.meta
+        meta: b.meta,
+        shape: b.shape,
+        op: a.op != null || b.op != null ? (a.op != null ? a.op : 1) + ((b.op != null ? b.op : 1) - (a.op != null ? a.op : 1)) * t : undefined
       }))
     };
   }
@@ -40427,6 +40644,8 @@ window.AP = function () {
     reduceMotion,
     useMorph,
     useValueMorph,
+    useKeyClock,
+    blendScene,
     blendRows,
     crossClouds,
     mixC,
@@ -42500,6 +42719,7 @@ function TrendChart(props) {
   });
   const ref = useRef(null);
   const badgeAt = useRef({});
+  const labOff = useRef(new Map());
   const [cw, setCw] = useState(VB.W);
   React.useLayoutEffect(() => {
     if (!ref.current) return;
@@ -42709,6 +42929,7 @@ function TrendChart(props) {
     let near = null,
       nearD = Infinity;
     scatter.forEach(d => {
+      if (d.op === 0) return;
       const dx = sx(d.x) - p.x,
         dy = sy(d.y) - p.y;
       const dist = Math.hypot(dx, dy);
@@ -42855,6 +43076,7 @@ function TrendChart(props) {
   const textIn = t => Math.max(0, Math.min(1, (t - 0.3) / 0.7));
   const wiping = new Set(series.filter(s => s.wipe != null && s.wipe > 0 && s.wipe < 1).map(s => s.id));
   const wipedOut = new Set(series.filter(s => s.wipe != null && s.wipe >= 1).map(s => s.id));
+  const switching = !!mf || fade < 1 || !!(eventsFrom && eventMix < 1) || !!zoomY || travelling.current || driven;
   const refKey = r => r.y + "|" + (r.label || "");
   const refAll = !mf ? refLines : (() => {
     const was = new Map((mf.refLines || []).map(r => [refKey(r), r]));
@@ -43023,15 +43245,25 @@ function TrendChart(props) {
     }, face)));
   })() : null;
   const outDots = React.useMemo(() => dotEls(scatterOut, false), [scatterOut, geom]);
-  const moveDots = scatterMove.map((d, i) => React.createElement("circle", {
-    key: "m" + i,
-    cx: sx(d.x),
-    cy: sy(d.y),
-    r: DOT_R,
-    className: "scatter-dot",
-    fill: d.color,
-    fillOpacity: DOT_OP * (d.op != null ? d.op : 1)
-  }));
+  const moveDots = scatterMove.map((d, i) => {
+    const cx = sx(d.x),
+      cy = sy(d.y),
+      p = dotPath(d.shape, cx, cy, DOT_R);
+    const common = {
+      className: "scatter-dot",
+      fill: d.color,
+      fillOpacity: DOT_OP * (d.op != null ? d.op : 1)
+    };
+    return p ? React.createElement("path", _extends({
+      key: "m" + i,
+      d: p
+    }, common)) : React.createElement("circle", _extends({
+      key: "m" + i,
+      cx: cx,
+      cy: cy,
+      r: DOT_R
+    }, common));
+  });
   const copying = !!(ref.current && ref.current.hasAttribute("data-copying"));
   const placeEvents = list => {
     const evs = list.map(e => copying && e.badge != null ? {
@@ -43161,7 +43393,7 @@ function TrendChart(props) {
     "data-copy": copy ? JSON.stringify(copy) : undefined
   }, React.createElement("svg", {
     viewBox: `0 0 ${W} ${H}`,
-    className: "chart-svg",
+    className: "chart-svg" + (switching ? " switching" : ""),
     onPointerMove: onPointerMove,
     onPointerDown: onPointerDown,
     onPointerUp: onPointerUp,
@@ -43259,7 +43491,10 @@ function TrendChart(props) {
       }, React.createElement("g", {
         clipPath: a.clipX ? `url(#${clipId + "a" + a.id})` : undefined,
         mask: a.wipeOf != null && wiping.has(a.wipeOf) ? `url(#${wipeId + a.wipeOf})` : undefined,
-        style: a.fade != null && a.fade < 1 ? {
+        className: a.hidden != null ? "fade-mark" : undefined,
+        style: a.hidden ? {
+          opacity: 0
+        } : a.fade != null && a.fade < 1 ? {
           opacity: a.fade
         } : null
       }, React.createElement("path", {
@@ -43617,6 +43852,7 @@ function TrendChart(props) {
       cy: 0,
       r: rd ? PX(4.5) : 5,
       className: "hover-marker",
+      "data-series": s.id,
       style: {
         transform: `translate(${sx(at.x).toFixed(2)}px, ${sy(at.y).toFixed(2)}px)`,
         opacity: p ? 1 : 0
@@ -43632,6 +43868,7 @@ function TrendChart(props) {
     return React.createElement("circle", {
       key: "e" + s.id,
       className: "end-cap",
+      "data-series": s.id,
       cx: sx(last.x),
       cy: sy(last.y),
       r: rd ? PX(s.rdCap || 3.5) : 4.5,
@@ -43643,8 +43880,10 @@ function TrendChart(props) {
     });
   }), marks.map((m, i) => m.x < win[0] || m.x > win[1] ? null : React.createElement("g", {
     key: "mk" + i,
-    className: "rd-mark",
-    style: m.opacity != null ? {
+    className: "rd-mark" + (m.hidden != null ? " fade-mark" : ""),
+    style: m.hidden ? {
+      opacity: 0
+    } : m.opacity != null ? {
       opacity: m.opacity
     } : null
   }, React.createElement("circle", {
@@ -43753,17 +43992,47 @@ function TrendChart(props) {
       if (!merged) break;
       settle();
     }
-    return groups.flat().map((l, i) => React.createElement("text", {
-      key: "el" + i,
+    const tNow = performance.now();
+    const seenL = new Set();
+    for (const l of labs) {
+      seenL.add(l.sid);
+      const want = l.y - l.ideal,
+        was = labOff.current.get(l.sid);
+      let off = want;
+      if (switching && was) off = was.off + (want - was.off) * (1 - Math.exp(-Math.min(100, tNow - was.t) / 45));
+      labOff.current.set(l.sid, {
+        off,
+        t: tNow
+      });
+      l.y = l.ideal + off;
+    }
+    labOff.current.forEach((_, k) => {
+      if (!seenL.has(k)) labOff.current.delete(k);
+    });
+    const gone = series.filter(s => s.endLabel && s.points.length && s.opacity === 0).map(s => {
+      const last = visEnd(s);
+      return {
+        sid: s.id,
+        text: s.endLabel,
+        x: sx(last.x) + (rd ? 12 : 7) / scale,
+        y: sy(last.y),
+        op: 0,
+        color: /var\(--(alp|lnp|grn|onp|oth|mood-pos|mood-neg|ink[-\w]*)\)/.test(s.color) ? inkOf(s.color) : "color-mix(in oklch, " + s.color + " 62%, var(--ink))"
+      };
+    });
+    const bySid = new Map(groups.flat().concat(gone).map(l => [l.sid, l]));
+    return series.map(s => bySid.get(s.id)).filter(Boolean).map(l => React.createElement("text", {
+      key: "el" + l.sid,
       x: l.x,
-      y: l.y,
+      y: 0,
       className: "end-label",
       "data-series": l.sid,
       dominantBaseline: "middle",
       style: {
         fontSize: elFs,
         strokeWidth: refUnits * 0.34,
-        opacity: l.op
+        opacity: l.op,
+        transform: "translateY(" + l.y.toFixed(2) + "px)"
       },
       fill: l.color
     }, l.text));
@@ -56737,6 +57006,58 @@ function RdCrossfade({
     inert: ""
   }, f.node)));
 }
+function RdSwap({
+  k,
+  children,
+  className
+}) {
+  const was = React.useRef({
+    k,
+    node: children
+  });
+  const fading = React.useRef(null);
+  const timer = React.useRef(0);
+  const [, force] = React.useReducer(x => x + 1, 0);
+  const AP = window.AP || {};
+  if (was.current.k !== k) {
+    const still = AP.reduceMotion && AP.reduceMotion();
+    fading.current = still ? null : {
+      k: was.current.k,
+      node: was.current.node,
+      id: (fading.current ? fading.current.id : 0) + 1
+    };
+  }
+  was.current = {
+    k,
+    node: children
+  };
+  React.useEffect(() => {
+    const f = fading.current;
+    if (!f || f.timed) return undefined;
+    f.timed = true;
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      if (fading.current === f) {
+        fading.current = null;
+        force();
+      }
+    }, (AP.MORPH_MS || 320) + 40);
+    return undefined;
+  });
+  React.useEffect(() => () => clearTimeout(timer.current), []);
+  const f = fading.current;
+  return React.createElement("div", {
+    className: "rd-swap" + (className ? " " + className : "")
+  }, React.createElement("div", {
+    className: "rd-swap-now" + (f ? " in" : ""),
+    key: "now-" + k
+  }, children), f && React.createElement("div", {
+    className: "rd-swap-was",
+    key: "was-" + f.k + "-" + f.id,
+    "aria-hidden": "true",
+    inert: ""
+  }, f.node));
+}
 if (typeof window !== "undefined" && !window.__rdInputWatch) {
   window.__rdInputWatch = true;
   const note = () => {
@@ -58114,29 +58435,36 @@ function RdPrimary({
     endLabel: narrow ? ABBR[p.id] : SHORT[p.id],
     rdCap: 4
   }));
-  const areas = visible.map(p => ({
+  const areas = parts.map(p => ({
     id: "ci-" + p.id,
     color: p.color,
     className: "ci-band",
     edge: false,
+    hidden: !!hidden[p.id],
     points: pts.filter(d => d.ci && d.ci[p.id] != null && d[p.id] != null).map(d => ({
       x: d.x,
       y0: d[p.id] - d.ci[p.id],
       y1: d[p.id] + d.ci[p.id]
     }))
   })).filter(a => a.points.length >= 2);
-  const scatter = D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).flatMap(q => visible.filter(p => q.p && q.p[p.id] != null).map(p => ({
+  const scatter = React.useMemo(() => D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).flatMap(q => parts.filter(p => q.p && q.p[p.id] != null).map(p => ({
     x: q.x,
     y: q.p[p.id],
     color: p.color,
     label: p.name,
-    meta: q
-  })));
-  const marks = base ? visible.map(p => ({
+    meta: q,
+    party: p.id
+  }))), [xDomain[0], xDomain[1]]);
+  const shownScatter = React.useMemo(() => scatter.map(d => hidden[d.party] ? {
+    ...d,
+    op: 0
+  } : d), [scatter, hidden]);
+  const marks = base ? parts.map(p => ({
     x: base.x,
     y: base[p.id],
     color: p.color,
-    r: 4.5
+    r: 4.5,
+    hidden: !!hidden[p.id]
   })) : [];
   const evs = (D.events || []).filter(e => e.major);
   const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
@@ -58230,7 +58558,7 @@ function RdPrimary({
     series: chartSeries,
     spine: series(pts, "alp"),
     areas: areas,
-    scatter: scatter,
+    scatter: shownScatter,
     pollFacet: "primary",
     marks: marks,
     events: badges ? badges.events : evs,
@@ -59922,10 +60250,15 @@ function RdDemographics({
       const bl = la ? blend(la.pts, l.pts) : null;
       return {
         l,
+        la,
         clip: bl ? bl.clip : undefined,
+        ciClip: bl ? bl.clips.ci : undefined,
         rows: (bl ? bl.rows : l.pts).filter(d => d.y != null)
       };
     });
+    const mixC = window.AP.mixC;
+    const colorOf = r => A && r.la ? mixC(r.la.color, r.l.color, t) : r.l.color;
+    const pColorNow = pm ? mixC(D.PARTIES[pm.from].color, pColor, t) : pColor;
     const lineOf = (r, color, over) => ({
       id: r.l.g.label,
       label: r.l.g.label,
@@ -59945,8 +60278,12 @@ function RdDemographics({
       color,
       className: "ci-band",
       edge: false,
-      clipX: r.clip,
-      points: r.rows.filter(d => d.ci != null).map(d => ({
+      clipX: r.ciClip || r.clip,
+      points: r.rows.some(d => d.ciHi != null) ? r.rows.filter(d => d.ciHi != null && d.ciLo != null).map(d => ({
+        x: d.x,
+        y0: Math.max(0, d.ciLo),
+        y1: d.ciHi
+      })) : r.rows.filter(d => d.ci != null).map(d => ({
         x: d.x,
         y0: Math.max(0, d.y - d.ci),
         y1: d.y + d.ci
@@ -59976,7 +60313,7 @@ function RdDemographics({
     if (panelled(c)) {
       const mine = (arr, label) => (arr || []).filter(d => d.label === label).map(d => ({
         ...d,
-        color: pColor
+        color: pColorNow
       }));
       return React.createElement("div", {
         className: "card rd-card rd-wv-chart",
@@ -60014,11 +60351,11 @@ function RdDemographics({
             ...allSeries,
             rdWidth: 1.25,
             endLabel: null
-          }, lineOf(r, pColor, {
+          }, lineOf(r, pColorNow, {
             rdWidth: 2.25,
             endLabel: null
           })],
-          areas: [bandOf(r, pColor)].filter(a => a.points.length >= 2),
+          areas: [bandOf(r, pColorNow)].filter(a => a.points.length >= 2),
           spine: c.allPts.map(d => ({
             x: d.x,
             y: d.y
@@ -60080,8 +60417,8 @@ function RdDemographics({
       xTicks: rdXTicks(c.x0, c.x1, narrow || c.span < 0.8),
       baseline: true,
       driven: !!A,
-      series: [allSeries, ...rowsOf.map(r => lineOf(r, r.l.color))],
-      areas: rowsOf.map(r => bandOf(r, r.l.color)).filter(a => a.points.length >= 2),
+      series: [allSeries, ...rowsOf.map(r => lineOf(r, colorOf(r)))],
+      areas: rowsOf.map(r => bandOf(r, colorOf(r))).filter(a => a.points.length >= 2),
       spine: c.allPts.map(d => ({
         x: d.x,
         y: d.y
@@ -61057,7 +61394,9 @@ function RdIssues({
     cls: "rd-is",
     title: "The issues",
     meta: "What voters say matters most, and who they think is best on it, " + rdList(I.houses) + ", last " + I.window
-  }, tabs, view === "trust" ? React.createElement(React.Fragment, null, React.createElement(RdHed, {
+  }, tabs, React.createElement(RdCrossfade, {
+    k: view
+  }, view === "trust" ? React.createElement(React.Fragment, null, React.createElement(RdHed, {
     head: trustHead,
     dek: trustDek
   }), React.createElement("div", {
@@ -61266,7 +61605,7 @@ function RdIssues({
       term: "issues",
       from: "The issues"
     }
-  }, "Only ", G ? G.house : "RedBridge", " publishes what matters by group, and only for these ", gtab ? rdNumWord(gtab.issues.length) : "", " issues, so its all-voters row can differ from the pooled figures in Who\u2019s trusted. A group\u2019s margin depends on its share of the sample.")));
+  }, "Only ", G ? G.house : "RedBridge", " publishes what matters by group, and only for these ", gtab ? rdNumWord(gtab.issues.length) : "", " issues, so its all-voters row can differ from the pooled figures in Who\u2019s trusted. A group\u2019s margin depends on its share of the sample."))));
 }
 const RD_ONE_IN = [3, 4, 5, 10, 20, 50, 100];
 const RD_BIG_WORDS = {
@@ -61662,7 +62001,9 @@ function RdUndecided({
     options: views,
     ariaLabel: "Undecided among",
     className: "rd-un-tabs"
-  }), view === "all" && React.createElement(React.Fragment, null, React.createElement("div", {
+  }), React.createElement(RdCrossfade, {
+    k: view
+  }, view === "all" && React.createElement(React.Fragment, null, React.createElement("div", {
     className: "card rd-card rd-un-100"
   }, React.createElement("div", {
     className: "rd-un-100h"
@@ -61955,7 +62296,7 @@ function RdUndecided({
       term: "undecided",
       from: "Undecided"
     }
-  }, "Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined.")));
+  }, "Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined."))));
 }
 Object.assign(window, {
   RdPrimary,
@@ -62648,7 +62989,9 @@ function RdPolls({
   }, caret("latest")))), React.createElement("span", {
     role: "columnheader",
     className: "rd-pl-c-figs"
-  }, figHead), React.createElement("span", {
+  }, React.createElement(RdSwap, {
+    k: facet
+  }, figHead)), React.createElement("span", {
     role: "columnheader",
     className: "rd-pl-c-tl"
   }, React.createElement("span", {
@@ -62713,7 +63056,9 @@ function RdPolls({
     }, r.field, r.sample ? ", " + r.sample.toLocaleString() : "")), React.createElement("span", {
       role: "cell",
       className: "rd-pl-c-figs"
-    }, figCell(e)), React.createElement("span", {
+    }, React.createElement(RdSwap, {
+      k: facet
+    }, figCell(e))), React.createElement("span", {
       role: "cell",
       className: "rd-pl-c-tl"
     }, strip(e)), React.createElement("span", {
@@ -62796,6 +63141,41 @@ const RD_CYC_TITLE_CHG = {
   ppmm: "PM’s lead, change since the first reading",
   oppnet: "Opposition leader’s net approval, change since the first reading"
 };
+function rdUseOutgoing(k, value, ms = (window.AP && window.AP.MORPH_MS || 320) + 40) {
+  const cur = React.useRef({
+      k,
+      value
+    }),
+    out = React.useRef(null),
+    timer = React.useRef(0);
+  const [, force] = React.useReducer(x => x + 1, 0);
+  if (cur.current.k !== k) {
+    const still = window.AP && window.AP.reduceMotion && window.AP.reduceMotion();
+    out.current = still ? null : {
+      k: cur.current.k,
+      value: cur.current.value,
+      id: (out.current ? out.current.id : 0) + 1
+    };
+  }
+  cur.current = {
+    k,
+    value
+  };
+  React.useEffect(() => {
+    const o = out.current;
+    if (!o || o.timed) return;
+    o.timed = true;
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      if (out.current === o) {
+        out.current = null;
+        force();
+      }
+    }, ms);
+  });
+  React.useEffect(() => () => clearTimeout(timer.current), []);
+  return out.current;
+}
 const rdOrd = n => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th");
 const rdSgn = (v, unit) => (unit ? "" : v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
 function RdCycleChart({
@@ -62905,6 +63285,7 @@ function RdCycleChart({
     const frac = (curVal - domain[0]) / (domain[1] - domain[0]);
     const dys = frac < 0.22 ? [-24, -8] : frac > 0.82 ? [16, 32] : [-6, 10];
     notes.push({
+      k: "cur",
       x: nowM,
       y: curVal,
       dx: 10,
@@ -62915,6 +63296,7 @@ function RdCycleChart({
       size: 12.5
     });
     notes.push({
+      k: "gap",
       x: nowM,
       y: curVal,
       dx: 10,
@@ -62930,6 +63312,7 @@ function RdCycleChart({
     const taken = peer && curVal != null ? notes.slice(0, 2).map(n => pxOf(last.y) - pxOf(curVal) + n.dy) : [];
     const dy = [4, -8, 16, -20, 28, -32, 40].find(c => taken.every(t => Math.abs(c - t) >= 15)) ?? 4;
     notes.push({
+      k: s.id,
       x: last.x,
       y: last.y,
       dx: 10,
@@ -62958,15 +63341,20 @@ function RdCycleChart({
   }
   const marks = [];
   if (peer && curVal != null) marks.push({
+    k: "mean",
     x: nowM,
     y: peer.mean,
     r: 3.5,
     color: "var(--ink-2)"
   });
-  if (!chg && cur && !hidden.has(cur.year) && (M.key === "tpp" || M.key === "primary" || M.key === "oppr") && cur.base[M.key] != null) marks.push({
+  if (cur && !hidden.has(cur.year) && (M.key === "tpp" || M.key === "primary" || M.key === "oppr") && cur.base[M.key] != null) marks.push({
+    k: "base",
     x: 0,
-    y: cur.base[M.key],
-    r: 5
+    y: chg ? 0 : cur.base[M.key],
+    r: 5,
+    ...(chg ? {
+      opacity: 0
+    } : {})
   });
   const brackets = peer && curVal != null && Math.abs(d) >= 0.3 ? [{
     x: nowM,
@@ -63010,9 +63398,90 @@ function RdCycleChart({
   if (!tickSet.includes(domain[0])) tickSet.unshift(domain[0]);
   if (!tickSet.includes(domain[1])) tickSet.push(domain[1]);
   const title = (chg ? RD_CYC_TITLE_CHG : RD_CYC_TITLE)[M.key];
+  const viewKey = (chg ? "c" : "a") + "|" + [...hidden].sort().join(",") + "|" + (showOnp ? 1 : 0) + (showHan ? 1 : 0);
+  const cardRef = React.useRef(null);
+  const clk = window.AP.useKeyClock(viewKey, cardRef);
+  const shownScene = React.useRef(null),
+    fromScene = React.useRef(null);
+  const now = {
+    series,
+    areas: bandAreas || [],
+    scatter,
+    domain,
+    ticks: tickSet,
+    fmt: yTickFmt,
+    refLines,
+    notes,
+    brackets,
+    marks
+  };
+  if (clk && (!fromScene.current || fromScene.current.n !== clk.n)) fromScene.current = {
+    n: clk.n,
+    scene: shownScene.current
+  };
+  if (!clk) fromScene.current = null;
+  const was = clk && fromScene.current && fromScene.current.scene;
+  const drawn = was ? window.AP.blendScene(was, now, clk.t, d => (d.meta ? (d.meta.pollster || "") + "|" + (d.meta.released || d.meta.date || "") : "") + "|" + d.label + "|" + d.x) : null;
+  const glide = (a, b, t) => ({
+    ...b,
+    y: a.y + (b.y - a.y) * t,
+    dy: (a.dy || 0) + ((b.dy || 0) - (a.dy || 0)) * t
+  });
+  let notesNow = notes,
+    notesWas = was ? was.notes : null,
+    marksNow = marks,
+    bracketsNow = brackets,
+    bracketsWas = was ? was.brackets : null;
+  if (was) {
+    const t = clk.t;
+    const wk = new Map(was.notes.filter(n => n.k).map(n => [n.k, n])),
+      nk = new Map(notes.filter(n => n.k).map(n => [n.k, n]));
+    notesNow = notes.map(n => n.k && wk.has(n.k) ? glide(wk.get(n.k), n, t) : n);
+    notesWas = was.notes.map(n => n.k && nk.has(n.k) ? {
+      ...glide(n, nk.get(n.k), t),
+      text: n.text,
+      color: n.color,
+      weight: n.weight
+    } : n);
+    const mk = new Map((was.marks || []).filter(q => q.k).map(q => [q.k, q])),
+      mn = new Set(marks.map(q => q.k));
+    const opOf = q => q.opacity != null ? q.opacity : 1;
+    marksNow = marks.map(q => q.k && mk.has(q.k) ? {
+      ...q,
+      y: mk.get(q.k).y + (q.y - mk.get(q.k).y) * t,
+      opacity: opOf(mk.get(q.k)) + (opOf(q) - opOf(mk.get(q.k))) * t
+    } : {
+      ...q,
+      opacity: opOf(q) * t
+    }).concat((was.marks || []).filter(q => !mn.has(q.k)).map(q => ({
+      ...q,
+      opacity: opOf(q) * (1 - t)
+    })));
+    const b0 = was.brackets && was.brackets[0],
+      b1 = brackets[0];
+    if (b0 && b1) {
+      bracketsNow = [{
+        ...b1,
+        y0: b0.y0 + (b1.y0 - b0.y0) * t,
+        y1: b0.y1 + (b1.y1 - b0.y1) * t
+      }];
+      bracketsWas = bracketsNow;
+    }
+  }
+  shownScene.current = drawn ? {
+    ...now,
+    series: drawn.series,
+    areas: drawn.areas,
+    scatter: drawn.scatter.concat(drawn.scatterMove),
+    domain: drawn.domain,
+    notes: notesNow,
+    marks: marksNow,
+    brackets: bracketsNow
+  } : now;
   const copyTitle = M.key === "ppmm" ? "The PM’s lead as preferred prime minister, " + (chg ? "change since the first reading" : "points") : M.key === "oppnet" && !chg ? "Opposition leader’s net approval, points" : title;
   return React.createElement("div", {
-    className: "card rd-card rd-cyc-chart"
+    className: "card rd-card rd-cyc-chart",
+    ref: cardRef
   }, React.createElement("div", {
     className: "rd-chead"
   }, React.createElement("span", {
@@ -63024,7 +63493,7 @@ function RdCycleChart({
     checked: showHan,
     onChange: setHan
   }, "Pauline Hanson this term")), React.createElement(TrendChart, {
-    key: "rd-cyc-" + M.key + "-" + (chg ? "c" : "a"),
+    key: "rd-cyc-" + M.key,
     heightPx: narrow ? 260 : half ? 290 : 330,
     padPx: narrow ? {
       l: 34,
@@ -63038,7 +63507,7 @@ function RdCycleChart({
       b: 30
     },
     xDomain: CYC_XDOMAIN,
-    yDomain: domain,
+    yDomain: drawn ? drawn.domain : domain,
     yTicks: tickSet,
     yTickFmt: yTickFmt,
     xTicks: xTicks,
@@ -63047,14 +63516,25 @@ function RdCycleChart({
     vlines: nowM != null ? [{
       x: nowM
     }] : [],
-    series: series,
+    series: drawn ? drawn.series : series,
     spine: CYC_SPINE,
-    scatter: scatter,
-    areas: bandAreas || undefined,
+    scatter: drawn ? drawn.scatter : scatter,
+    scatterOut: drawn ? drawn.scatterOut : [],
+    scatterMove: drawn ? drawn.scatterMove : [],
+    fade: drawn ? clk.t : 1,
+    areas: drawn ? drawn.areas : bandAreas || undefined,
+    morphFrom: was ? {
+      yTicks: was.ticks,
+      yTickFmt: was.fmt,
+      refLines: was.refLines,
+      notes: notesWas,
+      brackets: bracketsWas
+    } : null,
+    morphT: clk ? clk.t : 1,
     events: badges ? badges.events : events,
-    notes: notes,
-    marks: marks,
-    brackets: brackets,
+    notes: notesNow,
+    marks: marksNow,
+    brackets: bracketsNow,
     tooltipTitle: i => cycMonthLabel(CYC_SPINE[i].x) + (tipCycle ? " – " + cycMonthOf(tipCycle.eDate, CYC_SPINE[i].x) : ""),
     extraRows: i => {
       const r = bandRows.find(b => b.m === CYC_SPINE[i].x);
@@ -63258,22 +63738,54 @@ function RdPastCycles(p) {
   };
   const X = (sc, v) => (v - sc.lo) / (sc.hi - sc.lo) * 100;
   const tickLab = (group, v) => group === "votes" && !chg ? v === SC.votes.hi ? v + "%" : String(v) : v === 0 ? chg ? "0" : "Even" : v > 0 ? "+" + v : "−" + Math.abs(v);
+  const scaleNow = {};
+  ["votes", "leaders"].forEach(g => {
+    const sc = SC[g];
+    scaleNow[g] = {
+      key: (chg ? "c" : "a") + sc.lo + "|" + sc.hi + "|" + sc.step,
+      ticks: rdYTicks(sc.lo, sc.hi, sc.step).map(v => ({
+        v,
+        left: X(sc, v),
+        lab: tickLab(g, v)
+      }))
+    };
+  });
+  const scaleWas = rdUseOutgoing(scaleNow.votes.key + "/" + scaleNow.leaders.key, scaleNow);
+  const scaleOut = g => scaleWas && scaleWas.value[g].key !== scaleNow[g].key ? scaleWas : null;
+  const dotsNow = {};
+  ROWS.forEach(r => {
+    dotsNow[r.key] = r.peers ? r.peers.vals.map(q => ({
+      yr: q.yr,
+      left: X(SC[r.group], q.v)
+    })) : [];
+  });
+  const dotsWas = rdUseOutgoing((chg ? "c" : "a") + "|" + [...hidden].sort().join(","), dotsNow);
   const R = {};
   ROWS.forEach(r => {
     R[r.key] = r;
   });
+  const pts1 = v => Math.abs(v).toFixed(1);
+  const upDown = v => (v < 0 ? "down " : "up ") + pts1(v);
   const pageStory = (() => {
     const g = R.primary,
       o = R.oppr,
       t = R.tpp;
     const gLow = g.rank && /^Lowest/.test(g.rank.main),
       oLow = o.rank && /^Lowest/.test(o.rank.main);
-    const head = gLow && oLow ? "Both major parties are at record lows for this point in a term" : gLow ? govName + "’s primary vote is the lowest of any government at this point in a term" : oLow ? rdCap(oppIn) + "’s primary vote is the lowest of any opposition at this point in a term" : t.peers ? govName + " sits " + (t.v >= t.peers.mean ? "above" : "below") + " the average government at this point in a term" : "Every term since 1972, lined up on its election day";
+    const moved = r => r.v < 0 ? "fallen further" : "risen less";
+    const head = chg ? gLow && oLow ? g.v < 0 && o.v < 0 ? "Both major parties have lost more of their vote than any before them at this point in a term" : "Both major parties are at record lows against their election results for this point in a term" : gLow ? govName + "’s primary vote has " + moved(g) + " than any government’s at this point in a term" : oLow ? rdCap(oppIn) + "’s primary vote has " + moved(o) + " than any opposition’s at this point in a term" : t.peers && t.v != null ? govName + "’s two-party vote has done " + (t.v >= t.peers.mean ? "better" : "worse") + " than the average government’s since its election" : "Every term since 1972, lined up on its election day" : gLow && oLow ? "Both major parties are at record lows for this point in a term" : gLow ? govName + "’s primary vote is the lowest of any government at this point in a term" : oLow ? rdCap(oppIn) + "’s primary vote is the lowest of any opposition at this point in a term" : t.peers && t.v != null ? govName + " sits " + (t.v >= t.peers.mean ? "above" : "below") + " the average government at this point in a term" : "Every term since 1972, lined up on its election day";
     let dek = monthsWord + " after the " + cur.year + " election, ";
     const bits = [];
-    if (gLow) bits.push(govName + "’s primary vote is the lowest of any government at the same point since " + cycles[0].year);
-    if (oLow) bits.push((gLow ? "and " + oppIn + "’s" : rdCap(oppIn) + "’s primary vote is") + " the lowest of any opposition");
-    dek += bits.length ? bits.join(", ") + "." : govName + "’s primary vote is " + (g.rank ? g.rank.main.toLowerCase() : "") + " past governments at this point.";
+    const extreme = r => r.v < 0 ? "the biggest fall" : "the smallest rise";
+    if (chg) {
+      if (gLow) bits.push(govName + "’s primary vote is " + upDown(g.v) + " points, " + extreme(g) + " for any government at that point since " + cycles[0].year);
+      if (oLow) bits.push((gLow ? "and " + oppIn + "’s is " : oppIn + "’s primary vote is ") + upDown(o.v) + " points, " + extreme(o) + " for any opposition");
+    } else {
+      if (gLow) bits.push(govName + "’s primary vote is the lowest of any government at the same point since " + cycles[0].year);
+      if (oLow) bits.push((gLow ? "and " + oppIn + "’s" : oppIn + "’s primary vote is") + " the lowest of any opposition");
+    }
+    const rankWords = r => (/^Middle/.test(r.rank.main) ? "in the " : "the ") + r.rank.main.toLowerCase().replace(/ of (\d+)$/, " of $1 governments");
+    dek += bits.length ? bits.join(", ") + "." : g.v == null || !g.rank ? govName + "’s primary vote has no reading to set against past governments yet." : chg ? govName + "’s primary vote is " + upDown(g.v) + " points since the election; past governments were " + (g.peers.mean < 0 ? "down " : "up ") + pts1(g.peers.mean) + " on average by now." : govName + "’s primary vote is " + rankWords(g) + " at this point.";
     if (t.peers && t.v != null && !chg) {
       const where = t.v >= t.peers.q1 && t.v <= t.peers.q3 ? "sits in the middle half of past governments" : t.v > t.peers.q3 ? "is above three in four past governments" : "is below three in four past governments";
       dek += " After preferences, " + (bits.length ? "though, " : "") + govName + "’s " + t.v.toFixed(1) + "% " + where + ".";
@@ -63299,9 +63811,10 @@ function RdPastCycles(p) {
       const nearRet = Math.abs(t.v - ret.mean) <= Math.abs(t.v - ous.mean);
       head = "After preferences, " + govName + " is on a par with governments that went on to be " + (nearRet ? "re-elected" : "ousted");
     } else head = "After preferences, " + govName + " is " + (dAvg >= 0 ? "above" : "below") + " the average government at this point";
+    if (chg && !(ret && ous)) head = "After preferences, " + govName + " has done " + (dAvg >= 0 ? "better" : "worse") + " than the average government since its election";
     const vs = rivalWord === "One Nation" ? " against One Nation" : "";
-    let dek = "Its " + fmtOf("tpp")(t.v) + (chg ? "" : "%") + vs + " is " + Math.abs(dAvg).toFixed(1) + " points " + (dAvg >= 0 ? "above" : "below") + " the average government " + m + " months in.";
-    if (ret && ous) dek += " Governments later re-elected averaged " + fmtOf("tpp")(ret.mean) + (chg ? "" : "%") + " at this point; the " + rdNumWord(ous.n) + " ousted averaged " + fmtOf("tpp")(ous.mean) + (chg ? "" : "%") + ".";
+    let dek = chg ? (vs ? "Against One Nation it is " : "It is ") + upDown(t.v) + " points on its election result, " + pts1(dAvg) + " " + (dAvg >= 0 ? "better" : "worse") + " than the average government " + m + " months in." : "Its " + fmtOf("tpp")(t.v) + "%" + vs + " is " + pts1(dAvg) + " points " + (dAvg >= 0 ? "above" : "below") + " the average government " + m + " months in.";
+    if (ret && ous) dek += chg ? " By this stage governments later re-elected were " + (ret.mean < 0 ? "down " : "up ") + pts1(ret.mean) + " points on average, and the " + rdNumWord(ous.n) + " ousted " + (ous.mean < 0 ? "down " : "up ") + pts1(ous.mean) + "." : " Governments later re-elected averaged " + fmtOf("tpp")(ret.mean) + "% at this point; the " + rdNumWord(ous.n) + " ousted averaged " + fmtOf("tpp")(ous.mean) + "%.";
     return {
       head,
       dek
@@ -63329,11 +63842,28 @@ function RdPastCycles(p) {
     if (!n.peers || n.v == null) return null;
     const rk = n.rank;
     const low = n.peers.vals[0];
-    const head = /^Lowest/.test(rk.main) ? pm + "’s net approval is the lowest of any prime minister at this point" : /^2nd lowest/.test(rk.main) ? pm + "’s net approval is the second lowest of any prime minister at this point, after " + low.who + "’s" : /^Highest/.test(rk.main) ? pm + "’s net approval is the highest of any prime minister at this point" : pm + "’s net approval is " + (n.v >= n.peers.mean ? "above" : "below") + " the average prime minister’s at this point";
     const dN = n.v - n.peers.mean;
-    let dek = "At " + fmtOf("net")(n.v) + " he is " + Math.abs(dN).toFixed(1) + " points " + (dN >= 0 ? "above" : "below") + " the average prime minister " + m + " months in.";
     const pp = R.ppmm,
       on = R.oppnet;
+    if (chg) {
+      const less = n.v < 0 ? "fallen further" : "risen less";
+      const head = /^Lowest/.test(rk.main) ? pm + "’s net approval has " + less + " than any prime minister’s at this point" : /^2nd lowest/.test(rk.main) ? pm + "’s net approval has " + less + " than any prime minister’s at this point but " + low.who + "’s" : /^Highest/.test(rk.main) ? pm + "’s net approval has " + (n.v >= 0 ? "risen more" : "fallen less") + " than any prime minister’s at this point" : pm + "’s net approval has done " + (dN >= 0 ? "better" : "worse") + " than the average prime minister’s since the term’s first reading";
+      let dek = "It is " + upDown(n.v) + " points on the term’s first reading, " + pts1(dN) + " " + (dN >= 0 ? "better" : "worse") + " than the average prime minister " + m + " months in.";
+      if (pp.peers && pp.v != null) {
+        const dP = pp.v - pp.peers.mean;
+        dek += " His lead as preferred PM is " + upDown(pp.v) + ", " + (Math.abs(dP) <= 3 ? "close to the average" : pts1(dP) + " " + (dP > 0 ? "better" : "worse") + " than the average");
+        if (on.peers && on.v != null) {
+          const dO = on.v - on.peers.mean;
+          dek += ", and " + oppL + " is " + upDown(on.v) + (Math.abs(dO) <= 4 ? ", about as opposition leaders usually are by now." : ", " + (dO > 0 ? "better" : "worse") + " than opposition leaders usually do.");
+        } else dek += ".";
+      }
+      return {
+        head,
+        dek
+      };
+    }
+    const head = /^Lowest/.test(rk.main) ? pm + "’s net approval is the lowest of any prime minister at this point" : /^2nd lowest/.test(rk.main) ? pm + "’s net approval is the second lowest of any prime minister at this point, after " + low.who + "’s" : /^Highest/.test(rk.main) ? pm + "’s net approval is the highest of any prime minister at this point" : pm + "’s net approval is " + (n.v >= n.peers.mean ? "above" : "below") + " the average prime minister’s at this point";
+    let dek = "At " + fmtOf("net")(n.v) + " he is " + Math.abs(dN).toFixed(1) + " points " + (dN >= 0 ? "above" : "below") + " the average prime minister " + m + " months in.";
     if (pp.peers && pp.v != null) {
       const dP = pp.v - pp.peers.mean;
       dek += " He " + (pp.v >= 0 ? "still leads" : "trails") + " as preferred PM by " + Math.abs(pp.v).toFixed(1) + " points, " + (Math.abs(dP) <= 3 ? "close to the average" : Math.abs(dP).toFixed(1) + " " + (dP > 0 ? "above" : "below") + " the average");
@@ -63387,12 +63917,20 @@ function RdPastCycles(p) {
     role: "row"
   }, React.createElement("span", null, React.createElement("b", null, g === "votes" ? "Votes" : "Leaders"), " ", g === "votes" ? chg ? "points since the election" : "% of voters" : "net points"), React.createElement("span", null), React.createElement("span", {
     className: "rd-cs-scale"
-  }, rdYTicks(SC[g].lo, SC[g].hi, SC[g].step).map(v => React.createElement("span", {
-    key: v,
+  }, scaleOut(g) && scaleOut(g).value[g].ticks.map(q => React.createElement("span", {
+    key: "o" + scaleOut(g).id + "-" + q.v,
+    className: "out",
+    "aria-hidden": "true",
     style: {
-      left: X(SC[g], v) + "%"
+      left: q.left + "%"
     }
-  }, tickLab(g, v)))), React.createElement("span", null), React.createElement("span", null), React.createElement("span", null)), ROWS.filter(r => r.group === g).map(r => {
+  }, q.lab)), scaleNow[g].ticks.map(q => React.createElement("span", {
+    key: scaleNow[g].key + "-" + q.v,
+    className: scaleOut(g) ? "in" : undefined,
+    style: {
+      left: q.left + "%"
+    }
+  }, q.lab))), React.createElement("span", null), React.createElement("span", null), React.createElement("span", null)), ROWS.filter(r => r.group === g).map(r => {
     const sc = SC[g],
       P = r.peers;
     const dd = P && r.v != null ? r.v - P.mean : null;
@@ -63412,11 +63950,17 @@ function RdPastCycles(p) {
     }, r.v != null ? r.fmt(r.v) : "—", r.v != null && Mby[r.key].unit === "%" && !chg ? React.createElement("small", null, "%") : null), React.createElement("span", {
       className: "rd-cs-strip",
       "aria-hidden": "true"
-    }, rdYTicks(sc.lo, sc.hi, sc.step).map(v => React.createElement("i", {
-      key: v,
-      className: "rd-cs-gl",
+    }, scaleOut(g) && scaleOut(g).value[g].ticks.map(q => React.createElement("i", {
+      key: "o" + scaleOut(g).id + "-" + q.v,
+      className: "rd-cs-gl out",
       style: {
-        left: X(sc, v) + "%"
+        left: q.left + "%"
+      }
+    })), scaleNow[g].ticks.map(q => React.createElement("i", {
+      key: scaleNow[g].key + "-" + q.v,
+      className: "rd-cs-gl" + (scaleOut(g) ? " in" : ""),
+      style: {
+        left: q.left + "%"
       }
     })), P && P.n >= 3 && React.createElement("i", {
       className: "rd-cs-b80",
@@ -63430,9 +63974,16 @@ function RdPastCycles(p) {
         left: X(sc, P.q1) + "%",
         width: X(sc, P.q3) - X(sc, P.q1) + "%"
       }
-    }), P && P.vals.map((q, qi) => React.createElement("i", {
+    }), dotsWas && dotsWas.value[r.key].filter(q => !dotsNow[r.key].some(d => d.yr === q.yr)).map(q => React.createElement("i", {
+      key: "o" + dotsWas.id + "-" + q.yr,
+      className: "rd-cs-dot out",
+      "aria-hidden": "true",
+      style: {
+        left: q.left + "%"
+      }
+    })), P && P.vals.map((q, qi) => React.createElement("i", {
       key: q.yr,
-      className: "rd-cs-dot" + (tip && tip.key === r.key && tip.i === qi ? " on" : ""),
+      className: "rd-cs-dot" + (tip && tip.key === r.key && tip.i === qi ? " on" : "") + (dotsWas && !dotsWas.value[r.key].some(d => d.yr === q.yr) ? " in" : ""),
       style: {
         left: X(sc, q.v) + "%"
       },
@@ -63726,6 +64277,7 @@ function RdPastCycles(p) {
     kind: "ring"
   }), cur.year, " election result"));
   const navs = [["cyc-tpp", "Two-party preferred"], ["cyc-primary", "Primary vote"], ["cyc-leaders", "Leadership"], ["final-polls", "How the final polls did"]];
+  const accuracy = React.useMemo(() => React.createElement(AccuracyPanel, null), []);
   return React.createElement("div", {
     className: "view view-cycles rd-cycles"
   }, React.createElement("section", {
@@ -63825,7 +64377,7 @@ function RdPastCycles(p) {
       term: "approval",
       from: "Past cycles"
     }
-  }, "Where a term changed leader its line follows whoever held the office. The earliest terms\u2019 ratings are the Morgan Gallup Poll\u2019s; later terms pool every pollster that asked, each corrected for its lean. Favourability ratings are left out.")), React.createElement(AccuracyPanel, null));
+  }, "Where a term changed leader its line follows whoever held the office. The earliest terms\u2019 ratings are the Morgan Gallup Poll\u2019s; later terms pool every pollster that asked, each corrected for its lean. Favourability ratings are left out.")), accuracy);
 }
 Object.assign(window, {
   RdCycleChart,
@@ -64974,12 +65526,18 @@ function RdAllPolls(P) {
     id: "direction",
     label: "Direction"
   }];
+  const facetWas = useRef(facet),
+    facetSwaps = useRef(0);
+  if (facetWas.current !== facet) {
+    facetWas.current = facet;
+    facetSwaps.current += 1;
+  }
   const cls = {
     twopp: "rd-ap-c2pp",
     primary: "rd-ap-cprim",
     leadership: "rd-ap-clead",
     direction: "rd-ap-cdir"
-  }[facet];
+  }[facet] + (facetSwaps.current ? " rd-ap-sw" : "");
   const th = (label, k, o) => {
     const on = sort.key === k;
     const opt = o || {};

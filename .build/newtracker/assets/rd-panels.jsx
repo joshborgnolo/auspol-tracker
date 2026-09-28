@@ -97,16 +97,20 @@ function RdPrimary({ rangeId }) {
     rdWidth: p.id === "oth" ? 2 : 2.5, dashed: p.id === "oth", dash: p.id === "oth" ? "6 4" : undefined,
     opacity: hidden[p.id] ? 0 : 1, endLabel: narrow ? ABBR[p.id] : SHORT[p.id], rdCap: 4,
   }));
-  const areas = visible.map((p) => ({
-    id: "ci-" + p.id, color: p.color, className: "ci-band", edge: false,
+  /* a party toggled off keeps its band, its dots and its election ring on
+     the chart at nothing, so they fade out with its line (and back in),
+     rather than vanishing the frame the line starts to fade */
+  const areas = parts.map((p) => ({
+    id: "ci-" + p.id, color: p.color, className: "ci-band", edge: false, hidden: !!hidden[p.id],
     points: pts.filter((d) => d.ci && d.ci[p.id] != null && d[p.id] != null)
       .map((d) => ({ x: d.x, y0: d[p.id] - d.ci[p.id], y1: d[p.id] + d.ci[p.id] })),
   })).filter((a) => a.points.length >= 2);
-  const scatter = D.individualPolls
+  const scatter = React.useMemo(() => D.individualPolls
     .filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
-    .flatMap((q) => visible.filter((p) => q.p && q.p[p.id] != null)
-      .map((p) => ({ x: q.x, y: q.p[p.id], color: p.color, label: p.name, meta: q })));
-  const marks = base ? visible.map((p) => ({ x: base.x, y: base[p.id], color: p.color, r: 4.5 })) : [];
+    .flatMap((q) => parts.filter((p) => q.p && q.p[p.id] != null)
+      .map((p) => ({ x: q.x, y: q.p[p.id], color: p.color, label: p.name, meta: q, party: p.id }))), [xDomain[0], xDomain[1]]);
+  const shownScatter = React.useMemo(() => scatter.map((d) => (hidden[d.party] ? { ...d, op: 0 } : d)), [scatter, hidden]);
+  const marks = base ? parts.map((p) => ({ x: base.x, y: base[p.id], color: p.color, r: 4.5, hidden: !!hidden[p.id] })) : [];
   const evs = (D.events || []).filter((e) => e.major);
   const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
   const eDate = (D.cycles.find((c) => c.current) || {}).eDate;
@@ -171,7 +175,7 @@ function RdPrimary({ rangeId }) {
           yTickFmt={(v) => (v === 0 ? "" : v + "%")} baseline
           xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)}
           series={chartSeries} spine={series(pts, "alp")} areas={areas}
-          scatter={scatter} pollFacet="primary" marks={marks}
+          scatter={shownScatter} pollFacet="primary" marks={marks}
           events={badges ? badges.events : evs}
           tooltipTitle={(i) => (pts[i] ? monthLabelFull(pts[i].ym) : "")}
           extraRows={(i) => {
@@ -1222,17 +1226,23 @@ function RdDemographics({ rangeId = "all" }) {
     const rowsOf = c.drawn.map((l) => {
       const la = A && A.drawn.find((x) => x.g.label === l.g.label);
       const bl = la ? blend(la.pts, l.pts) : null;
-      return { l, clip: bl ? bl.clip : undefined, rows: (bl ? bl.rows : l.pts).filter((d) => d.y != null) };
+      return { l, la, clip: bl ? bl.clip : undefined, ciClip: bl ? bl.clips.ci : undefined, rows: (bl ? bl.rows : l.pts).filter((d) => d.y != null) };
     });
-    /* the new party's colour from the first frame: .series-line eases its
-       stroke in CSS, and a colour re-mixed every frame restarted that ease
-       each frame and snapped at the end */
+    /* A group's colour travels to the new party's round the hue circle on
+       the switch's own clock (the lines no longer ease their stroke in CSS,
+       which every re-mixed frame restarted and which snapped at the end). */
+    const mixC = window.AP.mixC;
+    const colorOf = (r) => (A && r.la ? mixC(r.la.color, r.l.color, t) : r.l.color);
+    const pColorNow = pm ? mixC(D.PARTIES[pm.from].color, pColor, t) : pColor;
     const lineOf = (r, color, over) => ({ id: r.l.g.label, label: r.l.g.label, color, rdWidth: 2.2, endCap: false,
       clipX: r.clip, points: r.rows.map((d) => ({ x: d.x, y: d.y })), endLabel: r.l.g.label, ...over });
     /* a month rests on a few hundred of a group's respondents, so its band
-       is what says whether two groups, or two months, can be told apart */
-    const bandOf = (r, color) => ({ id: "ci-" + r.l.g.label, color, className: "ci-band", edge: false, clipX: r.clip,
-      points: r.rows.filter((d) => d.ci != null).map((d) => ({ x: d.x, y0: Math.max(0, d.y - d.ci), y1: d.y + d.ci })) });
+       is what says whether two groups, or two months, can be told apart;
+       mid-switch it is drawn from the blend's own edges (see blendRows) */
+    const bandOf = (r, color) => ({ id: "ci-" + r.l.g.label, color, className: "ci-band", edge: false, clipX: r.ciClip || r.clip,
+      points: r.rows.some((d) => d.ciHi != null)
+        ? r.rows.filter((d) => d.ciHi != null && d.ciLo != null).map((d) => ({ x: d.x, y0: Math.max(0, d.ciLo), y1: d.ciHi }))
+        : r.rows.filter((d) => d.ci != null).map((d) => ({ x: d.x, y0: Math.max(0, d.y - d.ci), y1: d.y + d.ci })) });
     const ciRows = (rs, label) => (i) => {
       const ym = c.allPts[i] && c.allPts[i].ym;
       const cs = rs.map((r) => { const d = r.l.pts.find((q) => q.ym === ym); return d && d.ci != null ? (rs.length > 1 ? r.l.g.label + " " : "") + "±" + d.ci.toFixed(1) : null; }).filter(Boolean);
@@ -1245,7 +1255,7 @@ function RdDemographics({ rangeId = "all" }) {
       <div className="rd-chead"><span className="rd-chead-t">{c.st.label || "By " + tab.label.toLowerCase()}<span className="rd-chead-meta">since {rdMonthYear(c.drawn.reduce((m, l) => (l.pts[0].ym < m ? l.pts[0].ym : m), "9999"))}</span></span></div>
     );
     if (panelled(c)) {
-      const mine = (arr, label) => (arr || []).filter((d) => d.label === label).map((d) => ({ ...d, color: pColor }));
+      const mine = (arr, label) => (arr || []).filter((d) => d.label === label).map((d) => ({ ...d, color: pColorNow }));
       return (
         <div className="card rd-card rd-wv-chart" key={c.st.id} style={{ flex: "1 1 0" }}>
           {head}
@@ -1259,8 +1269,8 @@ function RdDemographics({ rangeId = "all" }) {
                     padPx={{ l: 30, r: 6, t: 8, b: 24 }}
                     xDomain={xDom} yDomain={yDom} yTicks={rdYTicks(0, yMax, 20)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
                     xTicks={rdXTicks(c.x0, c.x1, true)} baseline driven={!!A}
-                    series={[{ ...allSeries, rdWidth: 1.25, endLabel: null }, lineOf(r, pColor, { rdWidth: 2.25, endLabel: null })]}
-                    areas={[bandOf(r, pColor)].filter((a) => a.points.length >= 2)}
+                    series={[{ ...allSeries, rdWidth: 1.25, endLabel: null }, lineOf(r, pColorNow, { rdWidth: 2.25, endLabel: null })]}
+                    areas={[bandOf(r, pColorNow)].filter((a) => a.points.length >= 2)}
                     spine={c.allPts.map((d) => ({ x: d.x, y: d.y }))}
                     scatter={mine(cross ? cross.scatter : c.dots, g.label)} scatterOut={mine(cross ? cross.scatterOut : [], g.label)}
                     scatterMove={mine(cross ? cross.scatterMove : [], g.label)}
@@ -1285,8 +1295,8 @@ function RdDemographics({ rangeId = "all" }) {
         padPx={narrow ? { l: 34, r: 8, t: 12, b: 28 } : { l: 40, r: 12, t: 12, b: 30 }}
         xDomain={xDom} yDomain={yDom} yTicks={rdYTicks(0, yMax, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
         xTicks={rdXTicks(c.x0, c.x1, narrow || c.span < 0.8)} baseline driven={!!A}
-        series={[allSeries, ...rowsOf.map((r) => lineOf(r, r.l.color))]}
-        areas={rowsOf.map((r) => bandOf(r, r.l.color)).filter((a) => a.points.length >= 2)}
+        series={[allSeries, ...rowsOf.map((r) => lineOf(r, colorOf(r)))]}
+        areas={rowsOf.map((r) => bandOf(r, colorOf(r))).filter((a) => a.points.length >= 2)}
         spine={c.allPts.map((d) => ({ x: d.x, y: d.y }))}
         scatter={cross ? cross.scatter : c.dots} scatterOut={cross ? cross.scatterOut : []} scatterMove={cross ? cross.scatterMove : []}
         fade={A ? t : 1} pollFacet="primary"
@@ -1832,6 +1842,9 @@ function RdIssues({ rangeId = "all" }) {
     <RdSec id="issues" cls="rd-is" title="The issues"
            meta={"What voters say matters most, and who they think is best on it, " + rdList(I.houses) + ", last " + I.window}>
       {tabs}
+      {/* the two views ask different things of different charts, so a
+          switch crossfades them (RdCrossfade) rather than cutting */}
+      <RdCrossfade k={view}>
       {view === "trust" ? (
         <>
           <RdHed head={trustHead} dek={trustDek} />
@@ -1942,6 +1955,7 @@ function RdIssues({ rangeId = "all" }) {
           </RdFoot>
         </>
       )}
+      </RdCrossfade>
     </RdSec>
   );
 }
@@ -2148,6 +2162,9 @@ function RdUndecided({ rangeId }) {
     <RdSec id="undecided" cls="rd-un" title="Undecided" meta={rdList(U.houses) + ", since the 2025 election"}>
       {story && <RdHed head={story.head} dek={story.dek} />}
       <RdTabs value={view} onChange={setView} options={views} ariaLabel="Undecided among" className="rd-un-tabs" />
+      {/* each view is its own measure from its own pollsters: a switch
+          crossfades them (RdCrossfade) */}
+      <RdCrossfade k={view}>
       {view === "all" && (
         <>
           <div className="card rd-card rd-un-100">
@@ -2254,6 +2271,7 @@ function RdUndecided({ rangeId }) {
           <RdFoot how={{ term: "undecided", from: "Undecided" }}>Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined.</RdFoot>
         </>
       )}
+      </RdCrossfade>
     </RdSec>
   );
 }

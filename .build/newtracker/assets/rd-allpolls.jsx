@@ -716,7 +716,15 @@ function RdAllPolls(P) {
   const [tip, setTip] = useState(null);
   const FACETS = [{ id: "twopp", label: "2PP" }, { id: "primary", label: "Primary" },
                   { id: "leadership", label: phone ? "Leaders" : "Leadership" }, { id: "direction", label: "Direction" }];
-  const cls = { twopp: "rd-ap-c2pp", primary: "rd-ap-cprim", leadership: "rd-ap-clead", direction: "rd-ap-cdir" }[facet];
+  /* A facet tab's figures fade in rather than cut in (rd.css): once a tab
+     has been pressed, each row carries rd-ap-sw, and its facet class names
+     the fade, so a new facet is a new fade and it restarts on every row.
+     On the rows, not the section: a change on the section restyled the whole
+     table inside the press, tripling what it cost. */
+  const facetWas = useRef(facet), facetSwaps = useRef(0);
+  if (facetWas.current !== facet) { facetWas.current = facet; facetSwaps.current += 1; }
+  const cls = { twopp: "rd-ap-c2pp", primary: "rd-ap-cprim", leadership: "rd-ap-clead", direction: "rd-ap-cdir" }[facet]
+    + (facetSwaps.current ? " rd-ap-sw" : "");
   const th = (label, k, o) => {
     const on = sort.key === k;
     const opt = o || {};

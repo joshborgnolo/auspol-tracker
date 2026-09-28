@@ -420,7 +420,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
             <button type="button" className="rd-pl-sort" onClick={() => onSort("pollster")}>Pollster</button></span>
           <span role="columnheader" className="rd-pl-c-latest">
             <button type="button" className={"rd-pl-sort" + (sort.key === "latest" ? " on" : "")} onClick={() => onSort("latest")}>Latest <span aria-hidden="true">{caret("latest")}</span></button></span>
-          <span role="columnheader" className="rd-pl-c-figs">{figHead}</span>
+          <span role="columnheader" className="rd-pl-c-figs"><RdSwap k={facet}>{figHead}</RdSwap></span>
           <span role="columnheader" className="rd-pl-c-tl">
             <span className="rd-pl-tlcap">Releases, next</span>
             <span className="rd-pl-ticks">{ticks.map((t) => <span key={t.label} className={t.today ? "today" : ""} style={{ left: t.x + "%" }}>{t.label}</span>)}</span>
@@ -447,7 +447,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                   <span className="rd-pl-main">{r.publishedLabel || r.releasedLabel}</span>
                   <span className="rd-pl-sub">{r.field}{r.sample ? ", " + r.sample.toLocaleString() : ""}</span>
                 </span>
-                <span role="cell" className="rd-pl-c-figs">{figCell(e)}</span>
+                <span role="cell" className="rd-pl-c-figs"><RdSwap k={facet}>{figCell(e)}</RdSwap></span>
                 <span role="cell" className="rd-pl-c-tl">{strip(e)}</span>
                 <span role="cell" className={"rd-pl-c-next" + (nx.missed ? " missed" : "")}>
                   <span className="rd-pl-main"><span className="rd-pl-short">Next </span>{nx.date}</span>

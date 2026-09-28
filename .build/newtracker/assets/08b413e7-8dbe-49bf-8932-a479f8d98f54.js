@@ -366,6 +366,7 @@ function TrendChart(props) {
 
   const ref = useRef(null);
   const badgeAt = useRef({});                // the redesign's spread event badges, by event
+  const labOff = useRef(new Map());          // each end name's dodge, eased mid-switch
   // axis text in real on-screen px – normalise by measured width so every
   // chart's labels match regardless of column width / responsive stacking
   const [cw, setCw] = useState(VB.W);
@@ -618,6 +619,7 @@ function TrendChart(props) {
     const rPx = radiusPx / Math.max(scale, 0.0001);   // px -> user units
     let near = null, nearD = Infinity;
     scatter.forEach((d) => {
+      if (d.op === 0) return;                    // a dot faded out with its hidden line
       const dx = sx(d.x) - p.x, dy = sy(d.y) - p.y;
       const dist = Math.hypot(dx, dy);
       if (dist < nearD) { nearD = dist; near = d; }
@@ -758,6 +760,8 @@ function TrendChart(props) {
   // lines being rubbed out (see `wipe`): their masks, and the ones fully gone
   const wiping = new Set(series.filter((s) => s.wipe != null && s.wipe > 0 && s.wipe < 1).map((s) => s.id));
   const wipedOut = new Set(series.filter((s) => s.wipe != null && s.wipe >= 1).map((s) => s.id));
+  // is this frame part of a switch? (a morph, a crossfade, a zoom, or a window the caller moves)
+  const switching = !!mf || fade < 1 || !!(eventsFrom && eventMix < 1) || !!zoomY || travelling.current || driven;
   /* a rule both views draw holds; one only the old view draws fades out and
      one only the new view draws fades in. Notes and brackets simply cross. */
   const refKey = (r) => r.y + "|" + (r.label || "");
@@ -954,10 +958,11 @@ function TrendChart(props) {
      a different position and colour on every frame. Deliberately the small
      group: only the polls that published both matchups move, so this is ~90
      circles a frame rather than the ~330 on the chart. */
-  const moveDots = scatterMove.map((d, i) => (
-    <circle key={"m" + i} cx={sx(d.x)} cy={sy(d.y)} r={DOT_R}
-            className="scatter-dot" fill={d.color} fillOpacity={DOT_OP * (d.op != null ? d.op : 1)} />
-  ));
+  const moveDots = scatterMove.map((d, i) => {
+    const cx = sx(d.x), cy = sy(d.y), p = dotPath(d.shape, cx, cy, DOT_R);
+    const common = { className: "scatter-dot", fill: d.color, fillOpacity: DOT_OP * (d.op != null ? d.op : 1) };
+    return p ? <path key={"m" + i} d={p} {...common} /> : <circle key={"m" + i} cx={cx} cy={cy} r={DOT_R} {...common} />;
+  });
 
   /* ---- key events ---------------------------------------------------------
      A busy set (the hero's history) shows only when the chart is genuinely
@@ -1074,7 +1079,7 @@ function TrendChart(props) {
 
   return (
     <div className="chart" ref={ref} data-copy={copy ? JSON.stringify(copy) : undefined}>
-      <svg viewBox={`0 0 ${W} ${H}`} className="chart-svg"
+      <svg viewBox={`0 0 ${W} ${H}`} className={"chart-svg" + (switching ? " switching" : "")}
            onPointerMove={onPointerMove} onPointerDown={onPointerDown}
            onPointerUp={onPointerUp} onPointerCancel={onPointerCancel}
            onMouseLeave={handleLeave} onClick={handleClick}
@@ -1175,7 +1180,8 @@ function TrendChart(props) {
             <g key={"a" + a.id} clipPath={`url(#${clipId})`}>
              <g clipPath={a.clipX ? `url(#${clipId + "a" + a.id})` : undefined}
                 mask={a.wipeOf != null && wiping.has(a.wipeOf) ? `url(#${wipeId + a.wipeOf})` : undefined}
-                style={a.fade != null && a.fade < 1 ? { opacity: a.fade } : null}>
+                className={a.hidden != null ? "fade-mark" : undefined}
+                style={a.hidden ? { opacity: 0 } : a.fade != null && a.fade < 1 ? { opacity: a.fade } : null}>
               {/* `opacity` is a presentation ATTRIBUTE, so a class rule beats
                   it – which is how a themed area gets a different weight in
                   dark without the component knowing the theme */}
@@ -1434,7 +1440,7 @@ function TrendChart(props) {
           if (!at) return null;
           return (
             <circle key={"h" + s.id} cx={0} cy={0} r={rd ? PX(4.5) : 5}
-                    className="hover-marker"
+                    className="hover-marker" data-series={s.id}
                     style={{
                       transform: `translate(${sx(at.x).toFixed(2)}px, ${sy(at.y).toFixed(2)}px)`,
                       opacity: p ? 1 : 0,
@@ -1450,13 +1456,13 @@ function TrendChart(props) {
           const last = visEnd(s);
           if (!last || s.endCap === false || (s.wipe != null && s.wipe >= 1)) return null;
           const op = (s.opacity != null ? s.opacity : 1) * (s.endCapOpacity != null ? s.endCapOpacity : 1);
-          return <circle key={"e" + s.id} className="end-cap" cx={sx(last.x)} cy={sy(last.y)} r={rd ? PX(s.rdCap || 3.5) : 4.5}
+          return <circle key={"e" + s.id} className="end-cap" data-series={s.id} cx={sx(last.x)} cy={sy(last.y)} r={rd ? PX(s.rdCap || 3.5) : 4.5}
                          fill={s.color} style={op < 1 || s.opacity != null ? { opacity: op } : null}
                          mask={s.wipe != null && s.wipe > 0 ? `url(#${wipeId + s.id})` : undefined} />;
         })}
         {/* rings: a point that is a count, not a poll (the election result) */}
         {marks.map((m, i) => (m.x < win[0] || m.x > win[1]) ? null : (
-          <g key={"mk" + i} className="rd-mark" style={m.opacity != null ? { opacity: m.opacity } : null}>
+          <g key={"mk" + i} className={"rd-mark" + (m.hidden != null ? " fade-mark" : "")} style={m.hidden ? { opacity: 0 } : m.opacity != null ? { opacity: m.opacity } : null}>
             <circle cx={sx(m.x)} cy={sy(m.y)} r={PX(m.r || 5)} className="rd-ring"
                     style={m.color ? { stroke: m.color } : null} />
             {m.label && (
@@ -1612,9 +1618,41 @@ function TrendChart(props) {
             if (!merged) break;
             settle();
           }
-          return groups.flat().map((l, i) => (
-            <text key={"el" + i} x={l.x} y={l.y} className="end-label" data-series={l.sid} dominantBaseline="middle"
-                  style={{ fontSize: elFs, strokeWidth: refUnits * 0.34, opacity: l.op }}
+          /* Mid-switch, lines cross, and two names that must not overlap
+             trade places the frame their ends pass - a line height at once,
+             which read as a twitch. While a chart is switching, each name's
+             dodge (its distance from its own line's end, not its position)
+             eases to the new one in ~45ms, so the pair slide past each other
+             and the names stay on their lines; at rest the dodge is exact. */
+          const tNow = performance.now();
+          const seenL = new Set();
+          for (const l of labs) {
+            seenL.add(l.sid);
+            const want = l.y - l.ideal, was = labOff.current.get(l.sid);
+            let off = want;
+            if (switching && was) off = was.off + (want - was.off) * (1 - Math.exp(-Math.min(100, tNow - was.t) / 45));
+            labOff.current.set(l.sid, { off, t: tNow });
+            l.y = l.ideal + off;
+          }
+          labOff.current.forEach((_, k) => { if (!seenL.has(k)) labOff.current.delete(k); });
+          /* A line a reader hides keeps its name, at nothing, where the line
+             ends: it fades out with the line (and back in) instead of
+             vanishing on the press. Names sit by transform, so one that moves
+             when the set changes - a neighbour taking back the room the
+             hidden name had pushed it out of - glides there at rest; a switch
+             places them frame by frame (.switching turns the easing off). */
+          const gone = series.filter((s) => s.endLabel && s.points.length && s.opacity === 0).map((s) => {
+            const last = visEnd(s);
+            return { sid: s.id, text: s.endLabel, x: sx(last.x) + (rd ? 12 : 7) / scale, y: sy(last.y), op: 0,
+                     color: /var\(--(alp|lnp|grn|onp|oth|mood-pos|mood-neg|ink[-\w]*)\)/.test(s.color)
+                       ? inkOf(s.color) : "color-mix(in oklch, " + s.color + " 62%, var(--ink))" };
+          });
+          /* in the series' own order, whatever the dodge did: a name moved
+             within the list is re-inserted, and re-inserted it skips its fade */
+          const bySid = new Map(groups.flat().concat(gone).map((l) => [l.sid, l]));
+          return series.map((s) => bySid.get(s.id)).filter(Boolean).map((l) => (
+            <text key={"el" + l.sid} x={l.x} y={0} className="end-label" data-series={l.sid} dominantBaseline="middle"
+                  style={{ fontSize: elFs, strokeWidth: refUnits * 0.34, opacity: l.op, transform: "translateY(" + l.y.toFixed(2) + "px)" }}
                   fill={l.color}>{l.text}</text>
           ));
         })()}

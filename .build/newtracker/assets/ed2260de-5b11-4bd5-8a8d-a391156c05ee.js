@@ -465,6 +465,104 @@ window.AP = (function () {
     return m ? { from: m.from, to: m.to, t: m.t } : null;
   }
 
+  /* A clock for a chart that morphs from whatever it last DREW to what its
+     props now say, whenever `key` (what the reader chose) changes: the
+     component keeps its own snapshot of the picture on screen, so a second
+     press mid-flight simply starts again from there. Returns { t, n } while
+     running (n counts the switches, so the component can tell a new one
+     began), else null. */
+  /* `ref`, if given, is the element the clock animates: one that is off the
+     screen when its key changes lands at once, since nobody would see the
+     morph and a page of charts morphing unseen costs the frames of the one
+     that is seen. Whether it is on screen is kept by an IntersectionObserver
+     rather than measured at the press: measuring then forced a layout of the
+     whole page inside the click (7ms on a desktop, four times that on a
+     slow phone). */
+  function useKeyClock(key, ref) {
+    const st = React.useRef({ key, n: 0, run: null });
+    const raf = React.useRef(0), land = React.useRef(0);
+    const seen = React.useRef(true);
+    const [, force] = React.useReducer((x) => x + 1, 0);
+    const s = st.current;
+    if (key !== s.key) {
+      s.key = key;
+      s.n++;
+      s.run = reduceMotion() || !seen.current ? null : { t: morphEase(FRAME_MS / MORPH_MS), n: s.n, pending: true };
+    }
+    React.useEffect(() => {
+      const el = ref && ref.current;
+      if (!el || !window.IntersectionObserver) return undefined;
+      const io = new IntersectionObserver((es) => { es.forEach((e) => { seen.current = e.isIntersecting; }); });
+      io.observe(el);
+      return () => io.disconnect();
+    }, [ref]);
+    React.useLayoutEffect(() => {
+      const r = st.current.run;
+      if (!r || !r.pending) return;
+      r.pending = false;
+      clearTimeout(land.current);
+      morphClock(raf, (t) => { if (st.current.run === r) { r.t = t; force(); } },
+                 () => { if (st.current.run === r) { st.current.run = null; force(); } });
+      land.current = setTimeout(() => { cancelAnimationFrame(raf.current); if (st.current.run === r) { st.current.run = null; force(); } }, MORPH_MS + 200);
+    });
+    React.useEffect(() => () => { cancelAnimationFrame(raf.current); clearTimeout(land.current); }, []);
+    return s.run ? { t: s.run.t, n: s.run.n } : null;
+  }
+
+  /* One chart's picture - its lines, bands, dots and window - blended from
+     one it drew to one it is about to draw. Lines and bands are matched by
+     id and reshape (blendRows); a line or band with no counterpart fades;
+     dots cross over (crossClouds, by `dotKey`). Points are {x, y}. */
+  /* A point's month as a key that sorts as its number does: the rows are
+     lined up by sorting their keys as text, and a bare decimal sorts 10
+     before 2 - which zig-zagged every line and band back and forth across
+     the chart. Each points array is turned into rows once and kept, so the
+     alignment (itself kept per pair of row arrays) is worked out once per
+     switch rather than on every frame. */
+  const sceneYm = (x) => String(Math.round((x + 1e4) * 1e4)).padStart(12, "0");
+  const sceneRows = new WeakMap();
+  const rowsOfPts = (pts, area) => {
+    let r = sceneRows.get(pts);
+    if (!r) {
+      r = area ? pts.filter((p) => p.y0 != null && p.y1 != null).map((p) => ({ ym: sceneYm(p.x), x: p.x, y0: p.y0, y1: p.y1 }))
+        : pts.filter((p) => p.y != null).map((p) => ({ ...p, ym: sceneYm(p.x) }));
+      sceneRows.set(pts, r);
+    }
+    return r;
+  };
+  function blendScene(A, B, t, dotKey) {
+    const rows = (pts) => rowsOfPts(pts, false);
+    const byId = (arr) => new Map((arr || []).map((s) => [s.id, s]));
+    const lerp = (a, b) => a + (b - a) * t;
+    const sa = byId(A.series), sb = byId(B.series);
+    const series = [];
+    (B.series || []).forEach((s) => {
+      const a = sa.get(s.id);
+      if (!a) { series.push({ ...s, opacity: (s.opacity != null ? s.opacity : 1) * t, endLabelOpacity: (s.endLabelOpacity != null ? s.endLabelOpacity : 1) * t }); return; }
+      const bl = a.points.length && s.points.length ? blendRows(rows(a.points), rows(s.points), t, ["y"]) : null;
+      const oa = a.opacity != null ? a.opacity : 1, ob = s.opacity != null ? s.opacity : 1;
+      series.push({ ...s, points: bl ? bl.rows.map((r) => ({ x: r.x, y: r.y })) : s.points, clipX: bl ? bl.clip : s.clipX,
+                    opacity: lerp(oa, ob), endCap: s.endCap });
+    });
+    (A.series || []).forEach((a) => {
+      if (sb.has(a.id)) return;
+      series.push({ ...a, opacity: (a.opacity != null ? a.opacity : 1) * (1 - t), endLabelOpacity: (a.endLabelOpacity != null ? a.endLabelOpacity : 1) * (1 - t) });
+    });
+    const aa = byId(A.areas), ab = byId(B.areas);
+    const areas = [];
+    (B.areas || []).forEach((z) => {
+      const a = aa.get(z.id);
+      if (!a) { areas.push({ ...z, fade: t }); return; }
+      const toRows = (pts) => rowsOfPts(pts, true);
+      const bl = a.points.length && z.points.length ? blendRows(toRows(a.points), toRows(z.points), t, ["y0", "y1"]) : null;
+      areas.push({ ...z, points: bl ? bl.rows.filter((r) => r.y0 != null && r.y1 != null).map((r) => ({ x: r.x, y0: r.y0, y1: r.y1 })) : z.points, clipX: bl ? bl.clip : z.clipX });
+    });
+    (A.areas || []).forEach((a) => { if (!ab.has(a.id)) areas.push({ ...a, fade: 1 - t }); });
+    const cross = crossClouds(A.scatter || [], B.scatter || [], t, dotKey);
+    return { series, areas, scatter: cross.scatter, scatterOut: cross.scatterOut, scatterMove: cross.scatterMove,
+             domain: blendDomain(A.domain, B.domain, t) };
+  }
+
   /* Two versions of one set of rows on ONE grid of months, so the paths carry
      the same shape of command and can be interpolated point for point. A month
      only one side runs in holds that side's nearest end value, and the clip
@@ -656,21 +754,32 @@ window.AP = (function () {
      collected. Split three ways so only the travelling group is rebuilt per
      frame. `keyOf` decides what counts as the same reading; the first dot to
      claim a key keeps it. */
+  const crossMemo = new WeakMap();
   function crossClouds(A, B, t, keyOf) {
-    const claim = (arr) => {
-      const m = new Map();
-      arr.forEach((d) => { const k = keyOf(d); if (!m.has(k)) m.set(k, d); });
-      return m;
-    };
-    const ia = claim(A), ib = claim(B);
-    const travel = [], leaving = [], arriving = [];
-    ia.forEach((d, k) => (ib.has(k) ? travel.push([d, ib.get(k)]) : leaving.push(d)));
-    ib.forEach((d, k) => { if (!ia.has(k)) arriving.push(d); });
+    /* kept per pair of clouds: a switch asks for the same pair every frame
+       (each call site keys its own clouds one way, so the pair decides it) */
+    let byB = crossMemo.get(A), hit = byB && byB.get(B);
+    if (!hit) {
+      const claim = (arr) => {
+        const m = new Map();
+        arr.forEach((d) => { const k = keyOf(d); if (!m.has(k)) m.set(k, d); });
+        return m;
+      };
+      const ia = claim(A), ib = claim(B);
+      const travel = [], leaving = [], arriving = [];
+      ia.forEach((d, k) => (ib.has(k) ? travel.push([d, ib.get(k)]) : leaving.push(d)));
+      ib.forEach((d, k) => { if (!ia.has(k)) arriving.push(d); });
+      hit = { travel, leaving, arriving };
+      if (!byB) { byB = new WeakMap(); crossMemo.set(A, byB); }
+      byB.set(B, hit);
+    }
+    const { travel, leaving, arriving } = hit;
     return {
       scatter: arriving, scatterOut: leaving,
       scatterMove: travel.map(([a, b]) => ({
-        x: a.x, y: a.y + (b.y - a.y) * t,
-        color: mixC(a.color, b.color, t), label: b.label, meta: b.meta,
+        x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t,
+        color: mixC(a.color, b.color, t), label: b.label, meta: b.meta, shape: b.shape,
+        op: a.op != null || b.op != null ? (a.op != null ? a.op : 1) + ((b.op != null ? b.op : 1) - (a.op != null ? a.op : 1)) * t : undefined,
       })),
     };
   }
@@ -691,6 +800,7 @@ window.AP = (function () {
 
   return { D, rangeDomain, filterPts, buildXTicks, series, monthLabelFull, latestX,
            pollRowKey, morphEase, MORPH_MS, MORPH_CSS, morphClock, morphRawOf, reduceMotion, useMorph, useValueMorph,
+           useKeyClock, blendScene,
            blendRows, crossClouds, mixC, blendDomain,
            discord, discordFacet, discordRead, DISCORD_MEASURES, DISC };
 })();
