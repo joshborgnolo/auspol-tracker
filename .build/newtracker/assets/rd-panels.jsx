@@ -1422,12 +1422,15 @@ function RdSwitching({ rangeId }) {
   const top = cols.slice().sort((a, b) => b.gain - a.gain)[0];
   const lnp = cols.find((c) => c.id === "lnp"), alp = cols.find((c) => c.id === "alp");
   const head = top ? rdCap(rdFraction(top.gain)) + " of One Nation’s new voters backed " + (top.id === "lnp" ? "the Coalition" : top.id === "alp" ? "Labor" : top.id === "grn" ? "the Greens" : "another party") + " in 2025" : null;
-  /* Hand-curated dek (user's wording, 2026-09-28), same convention as
-     RD_DEMO_HOME: refresh by hand when the pooled rates move — the figures
-     no longer regenerate. */
-  const dek = (!lnp || !alp) ? null
-    : "Coalition voters have flocked to One Nation at about 2.75 times the rate of Labor voters. "
-    + "Almost two in five 2025 Coalition voters now say they’d vote for One Nation.";
+  /* Curated wording (user's, 2026-09-28) with every figure LINKED to the
+     pooled rates: parties follow whichever of lnp/alp is higher, share via
+     plainShare, ratio rounded to the nearest quarter. */
+  const hiC = lnp && alp ? (lnp.rate >= alp.rate ? lnp : alp) : null;
+  const loC = hiC ? (hiC === lnp ? alp : lnp) : null;
+  const nm = (c) => (c.id === "lnp" ? "Coalition" : "Labor");
+  const dek = (!hiC || !loC) ? null
+    : nm(hiC) + " voters have flocked to One Nation at about " + (Math.round(hiC.rate / loC.rate * 4) / 4) + " times the rate of " + nm(loC) + " voters. "
+    + plainShare(hiC.rate) + " 2025 " + nm(hiC) + " voters now say they’d vote for One Nation.";
 
   /* ---- the rates, month by month -------------------------------------------- */
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
