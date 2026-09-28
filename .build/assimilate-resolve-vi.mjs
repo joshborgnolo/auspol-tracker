@@ -166,7 +166,7 @@ const report = { vi: { added: [], skipped: null }, ppm: { added: [], skipped: nu
     const row = {
       date,
       pollster: "Resolve",
-      client: "SMH / Age",
+      client: "SMH/Age",
       sample: null,
       alp: r0(a["ALP"]),
       lnp: a["LNP"] != null ? r0(a["LNP"]) : (lib == null && natl == null ? null : r0((lib ?? 0) + (natl ?? 0))),
