@@ -1,6 +1,6 @@
 ---
 name: auspol-rdtabs-arrow-walk
-description: auspol-tracker — the page-wide left/right arrow-key tab walk (shipped 5d374ed, 2026-09-29): one rdTabsKey factory in rd.jsx wired into the shared RdTabs group covers ~12 tab rows free, and the hand-rolled rows (past-cycles Compare/Measure, all-polls pinbar, issues narrow chips) attach it themselves. Invariants (options in DOM order, focus follows selection, clamp, arrows only when a tab has focus), and the probe lesson that All polls and Past cycles are hash-driven page views whose rows don't exist on the Snapshot view.
+description: auspol-tracker — the page-wide left/right arrow-key tab walk (shipped 5d374ed, 2026-09-29; made CIRCULAR d57fdfe same day): one rdTabsKey factory in rd.jsx wired into the shared RdTabs group covers ~12 tab rows free, and the hand-rolled rows (past-cycles Compare/Measure, all-polls pinbar, issues narrow chips) attach it themselves. Invariants (options in DOM order, focus follows selection, wraps at the ends, arrows only when a tab has focus), and the probe lesson that All polls and Past cycles are hash-driven page views whose rows don't exist on the Snapshot view.
 source: auto-skill
 extracted_at: '2026-09-29'
 ---
@@ -20,8 +20,10 @@ Up/Down row walk (a398185) to extend across all of the site's tab rows.
 - **options must be in button DOM order** — the walk uses one index for
   both the option list and the live button list. Never pass a reordered or
   filtered copy that doesn't match the rendered buttons.
-- Focus travels with selection, so a held arrow key keeps walking; clamps
-  at both ends (no wrap); preventDefault suppresses horizontal scroll.
+- Focus travels with selection, so a held arrow key keeps walking; WRAPS
+  round the ends (rightmost -> leftmost and back, `(i ± 1 + n) % n`,
+  d57fdfe 2026-09-29 — the user asked for the who-votes Age…Home row to
+  circle); preventDefault suppresses horizontal scroll.
 - It only fires when a button of that row has focus (handler lives on the
   row container, no global key listener) — reading the page with arrows is
   unaffected elsewhere.
@@ -78,12 +80,12 @@ Two more walk families ride the same ideas:
   2px outline inset -2px), mirroring `.rd-is-row:focus-visible`. Probe
   gotcha: a probe that clicks a row must expect the click to OPEN it —
   click is the row's toggle.
-- **Poll-row Left/Right facet walk** (e22b9e2, 2026-09-29) — a focused
-  poll row ALSO takes ArrowLeft/ArrowRight: it steps the table's own facet
-  tabs (Latest: `RD_PL_FACETS` via local `setFacet`; All polls: `FACETS`
-  — hoisted above `rowNav` so rowNav, the pinbar and `RdTabs` share the
-  one array — via the `onFacet` prop), clamped at the ends, focus never
-  moves to the tab row. **All-polls focus-loss trap:** the leadership and
+- **Poll-row Left/Right facet walk** (e22b9e2, 2026-09-29; circular
+  d57fdfe) — a focused poll row ALSO takes ArrowLeft/ArrowRight: it steps
+  the table's own facet tabs (Latest: `RD_PL_FACETS` via local `setFacet`;
+  All polls: `FACETS` — hoisted above `rowNav` so rowNav, the pinbar and
+  `RdTabs` share the one array — via the `onFacet` prop), WRAPPING round
+  the ends, focus never moves to the tab row. **All-polls focus-loss trap:** the leadership and
   direction facets self-arm a "has the numbers" FACET_SCOPE filter, so the
   facet hop can filter the FOCUSED POLL out of the table — React drops its
   node, focus falls to body, and the next arrow would fire the page-level
@@ -102,20 +104,25 @@ Two more walk families ride the same ideas:
   when EVERY out holds — no modifiers, `defaultPrevented` clear,
   `document.activeElement` is body/html, no `.rd-qpanel`/`.term-pop` open,
   text selection collapsed — then walks `TABS` ids through `goTab`,
-  clamped. The navbar's own `Tabs.onTabKeyDown` covers the focused-tab
-  case, so the focused-control bail is correct everywhere else.
+  WRAPPING round the ends (d57fdfe — the finger swipe still clamps; a
+  swipe off the last page should do nothing). The navbar's own
+  `Tabs.onTabKeyDown` (which always wrapped, `(i ± 1 + n) % n`) covers
+  the focused-tab case, so the focused-control bail is correct everywhere
+  else.
 
 Probe: `.matilda/probe-pollrows-keys.mjs` walks both tables' rows (incl.
 phone cards at 480px), the row-level facet walk (tab `aria-pressed` index
-+ focus never leaving the table), and the page walk incl. clamp +
-meta+arrow no-op. `.matilda/` is gitignored — probes stay local.
++ focus never leaving the table, wrapRight/wrapLeft at the ends), and the
+page walk incl. wrap + meta+arrow no-op. `.matilda/` is gitignored —
+probes stay local.
 
 ## Probe: .matilda/probe-rdtabs-keys.mjs
 
 Walks all ten rows at 1440px plus the whom chip row at 900px: focuses each
 row's first tab, ArrowsRight across asserting `aria-pressed` AND
-`document.activeElement` indices agree at each step, clamps right, walks
-back left, clamps left.
+`document.activeElement` indices agree at each step, wraps right back to
+the first tab, wraps left to the last, walks back left to the first
+(`.matilda/probe-issues-keys.mjs`'s Up/Down walk still clamps).
 
 **The view gate that bit us:** All polls and Past cycles are hash-driven
 page views (`TABS` snapshot/cycles/allpolls/info in the header layer;
