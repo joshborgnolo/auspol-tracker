@@ -78,6 +78,25 @@ Two more walk families ride the same ideas:
   2px outline inset -2px), mirroring `.rd-is-row:focus-visible`. Probe
   gotcha: a probe that clicks a row must expect the click to OPEN it —
   click is the row's toggle.
+- **Poll-row Left/Right facet walk** (e22b9e2, 2026-09-29) — a focused
+  poll row ALSO takes ArrowLeft/ArrowRight: it steps the table's own facet
+  tabs (Latest: `RD_PL_FACETS` via local `setFacet`; All polls: `FACETS`
+  — hoisted above `rowNav` so rowNav, the pinbar and `RdTabs` share the
+  one array — via the `onFacet` prop), clamped at the ends, focus never
+  moves to the tab row. **All-polls focus-loss trap:** the leadership and
+  direction facets self-arm a "has the numbers" FACET_SCOPE filter, so the
+  facet hop can filter the FOCUSED POLL out of the table — React drops its
+  node, focus falls to body, and the next arrow would fire the page-level
+  walk (probe symptom: facet correct but `focus: -1`, then the whole view
+  unmounts as subsequent keys turn pages). rowNav now snapshots the row's
+  index, and a `requestAnimationFrame` after `onFacet` re-seats focus on
+  the row at the clamped position if the old node is gone (no-op when it
+  survived — React keeps keyed-node focus). The Latest table's facets
+  never filter rows, so rd-polls.jsx needs no rAF. Probe flow lesson:
+  walking DOWN from the last shown row can't grow the page (`visRows` is
+  render-time), so clamp-bottom reaches the initially-shown count, not the
+  archive total; and the facet walk steps ONE tab per keypress — asserting
+  a multi-step jump fails.
 - **Page-level Left/Right walk** — beside the phone swipe effect in the
   header layer (73de0c58, `swipeRef`): a document keydown that only fires
   when EVERY out holds — no modifiers, `defaultPrevented` clear,
@@ -86,9 +105,10 @@ Two more walk families ride the same ideas:
   clamped. The navbar's own `Tabs.onTabKeyDown` covers the focused-tab
   case, so the focused-control bail is correct everywhere else.
 
-Probe: `.matilda/probe-pollrows-keys.mjs` walks both tables (incl. phone
-cards at 480px) and the page walk incl. clamp + meta+arrow no-op.
-`.matilda/` is gitignored — probes stay local.
+Probe: `.matilda/probe-pollrows-keys.mjs` walks both tables' rows (incl.
+phone cards at 480px), the row-level facet walk (tab `aria-pressed` index
++ focus never leaving the table), and the page walk incl. clamp +
+meta+arrow no-op. `.matilda/` is gitignored — probes stay local.
 
 ## Probe: .matilda/probe-rdtabs-keys.mjs
 
