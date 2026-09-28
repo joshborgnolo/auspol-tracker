@@ -58782,8 +58782,6 @@ function RdDirection({
   const netWord = d => d > 0 ? "improved" : "worsened";
   const upDown = d => d > 0 ? "up " : "down ";
   const dek = (small < 30 ? "Only " : "") + Math.round(small) + "% say we’re " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". " + (now.chg == null ? "" : now.changeSig ? "Net mood has " + netVerb(Math.round(Math.abs(now.chg)), now.chg > 0) + ", " + upDown(now.chg) + Math.round(Math.abs(now.chg)) + " points in a month" : "Net mood has held steady for a month") + (Math.abs(sinceFirst) >= 5 ? now.chg == null ? "Net mood has " + netWord(sinceFirst) + ", " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since May 2025." : now.changeSig ? (Math.sign(sinceFirst) === Math.sign(now.chg) ? " and " : " but " + upDown(sinceFirst)) + rdRoughPts(sinceFirst) + " points since May 2025." : ", though it is " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since May 2025." : ".");
-  const lowest = now.net <= Math.min(...M.map(d => d.net)) + 0.05;
-  const highest = now.net >= Math.max(...M.map(d => d.net)) - 0.05;
   const signedP = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
   const dots = (D.directionPolls || []).filter(d => d.x >= xDomain[0] && d.x <= xDomain[1]).flatMap(d => [{
     x: d.x,
@@ -58909,7 +58907,7 @@ function RdDirection({
     }
   })), React.createElement("p", {
     className: "rd-dir-net"
-  }, React.createElement("b", null, "Net ", signedP(now.net), " points"), now.chg != null && React.createElement(React.Fragment, null, " \xB7 ", rdArrow(now.chg), " ", Math.abs(now.chg).toFixed(1), " on a month ago", now.changeSig ? ", a significant " + (now.chg < 0 ? "fall" : "rise") : now.changeSig === false ? ", within the margin" : ""), lowest ? " · the lowest since May 2025" : highest ? " · the highest since May 2025" : ""), React.createElement("div", {
+  }, React.createElement("b", null, "Net ", signedP(now.net), " points"), now.chg != null && React.createElement(React.Fragment, null, ", ", rdArrow(now.chg), " ", Math.abs(now.chg).toFixed(1), " on a month ago")), React.createElement("div", {
     className: "card rd-card rd-dir-chart"
   }, React.createElement("div", {
     className: "rd-chead"
