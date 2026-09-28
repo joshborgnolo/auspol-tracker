@@ -1419,7 +1419,7 @@ function RdSwitching({ rangeId }) {
      RD_DEMO_HOME: refresh by hand when the pooled rates move — the figures
      no longer regenerate. */
   const dek = (!lnp || !alp) ? null
-    : "Coalition voters have flocked to One Nation at about 2.5 times the rate of Labor voters. "
+    : "Coalition voters have flocked to One Nation at about 2.75 times the rate of Labor voters. "
     + "Almost two in five 2025 Coalition voters now say they’d vote for One Nation.";
 
   /* ---- the rates, month by month -------------------------------------------- */
