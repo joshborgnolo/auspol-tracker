@@ -3650,8 +3650,9 @@ body.rd .rd-dir-bar > span { flex-grow: 0; flex-shrink: 1; min-width: 0; positio
 body.rd .rd-dir-pos { background: var(--mood-pos); border-radius: 9px 0 0 9px; }
 body.rd .rd-dir-neg { background: var(--mood-neg); border-radius: 0 9px 9px 0; }
 body.rd .rd-dir-uns { background: var(--line); }
-body.rd .rd-dir-uns > span { position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 13px; color: var(--ink-3); }
-body.rd .rd-dir-net { margin: 36px 0 0; font-size: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+body.rd .rd-dir-uns > span { position: absolute; bottom: calc(100% + 14px); left: calc(50% + 6px); white-space: nowrap; font-size: 13px; color: var(--ink-3); }
+body.rd .rd-dir-uns > span::before { content: ""; position: absolute; left: -6px; top: calc(100% - 2px); height: 16px; border-left: 1px solid var(--ink-3); }
+body.rd .rd-dir-net { margin: 32px 0 0; font-size: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 body.rd .rd-dir-net b { font-weight: 600; color: var(--ink); }
 body.rd .rd-dir-chart { margin-top: 40px; }
 body.rd .view-how { margin-top: 16px; }
@@ -3663,8 +3664,6 @@ body.rd .view-how { margin-top: 16px; }
   body.rd .rd-dir-bar { height: 14px; }
   body.rd .rd-dir-net { margin-top: 32px; font-size: 14px; }
   body.rd .rd-dir-chart { margin-top: 28px; }
-  body.rd .rd-dir-uns > span { top: auto; bottom: calc(100% + 14px); left: calc(50% + 6px); transform: none; }
-  body.rd .rd-dir-uns > span::before { content: ""; position: absolute; left: -6px; top: calc(100% - 2px); height: 16px; border-left: 1px solid var(--ink-3); }
 }
 body.rd .rd-wv-tabs { margin-top: 28px; }
 body.rd .rd-chips { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
