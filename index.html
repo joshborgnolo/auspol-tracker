@@ -3853,7 +3853,11 @@ body.rd .rd-is-row { min-height: 52px; padding: 0 12px; border-bottom: 1px solid
 body.rd .rd-is-row:hover { background: var(--surface-2); }
 body.rd .rd-is-row.sel { background: color-mix(in oklab, var(--ink) 6%, var(--bg)); border-left-color: var(--ink); border-radius: 4px 4px 0 0; }
 body.rd .rd-is-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+body.rd .rd-is-row.rd-is-tally { min-height: 0; cursor: default; border-bottom: 0; }
+body.rd .rd-is-row.rd-is-tally:hover { background: none; }
+body.rd .rd-is-row.rd-is-tally .rd-is-dots { height: 0; }
 body.rd .rd-is-lab { font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.25; }
+body.rd .rd-is-row.rd-is-tally .rd-is-lab { font-size: 12px; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-is-imp { display: flex; align-items: center; gap: 8px; }
 body.rd .rd-is-bar { flex: 0 0 60px; height: 8px; border-radius: 4px; background: var(--line-2); overflow: hidden; }
 body.rd .rd-is-bar span { display: block; height: 100%; background: var(--ink-3); border-radius: 4px; }
@@ -61364,6 +61368,12 @@ function RdIssues({
       d: hi.v - lo.v
     };
   }).sort((a, b) => b.d - a.d).find(w => w.d >= 5);
+  const tally = (() => {
+    const rows = list.filter(x => x.own && x.imp);
+    const wsum = rows.reduce((a, x) => a + x.imp.v, 0);
+    if (!wsum) return null;
+    return Object.fromEntries(P.map(q => [q, rows.reduce((a, x) => a + x.imp.v * x.own.v[q], 0) / wsum]));
+  })();
   const G = I.groups;
   const gtab = G && (G.tabs.find(x => x.id === gsetId) || G.tabs[0]);
   const allOf = k => G && G.all && G.all[k] || null;
@@ -61488,7 +61498,22 @@ function RdIssues({
     style: {
       background: pColor(q)
     }
-  }), ISS_PARTY_CAP[q]))))), list.map(row), React.createElement("div", {
+  }), ISS_PARTY_CAP[q]))))), list.map(row), tally && React.createElement("div", {
+    className: "rd-is-row rd-is-tally",
+    "aria-label": "Weighted by importance: " + P.map(q => pName(q) + " " + Math.round(tally[q])).join(", ")
+  }, React.createElement("span", {
+    className: "rd-is-lab"
+  }, "Weighted by importance"), React.createElement("span", null), React.createElement("span", {
+    className: "rd-is-dots",
+    "aria-hidden": "true"
+  }), React.createElement("span", {
+    className: "rd-is-nums"
+  }, P.map(q => React.createElement("b", {
+    key: q,
+    style: {
+      color: inkOf(pColor(q))
+    }
+  }, Math.round(tally[q])))), React.createElement("span", null)), React.createElement("div", {
     className: "rd-is-axis",
     "aria-hidden": "true"
   }, React.createElement("span", null), React.createElement("span", null), React.createElement("span", {
@@ -61578,7 +61603,7 @@ function RdIssues({
       term: "issues",
       from: "The issues"
     }
-  }, "Figures pool the last ", I.window, " of polls, newer and larger polls counting for more. \u201CAhead\u201D means a lead larger than its own 95% margin; \u201Cbehind\u201D names a party clearly third. Pick an issue to follow it in the chart.")) : React.createElement(React.Fragment, null, React.createElement(RdHed, {
+  }, "Figures pool the last ", I.window, " of polls, newer and larger polls counting for more. \u201CAhead\u201D means a lead larger than its own 95% margin; \u201Cbehind\u201D names a party clearly third. The weighted row sums each party\u2019s share in proportion to how important voters say the issue is. Pick an issue to follow it in the chart.")) : React.createElement(React.Fragment, null, React.createElement(RdHed, {
     head: whomHead,
     dek: gVerdicts.length ? gVerdicts.map(v => v.text).join(" ") : "No two groups differ significantly on any of these issues."
   }), gtab ? React.createElement("div", {

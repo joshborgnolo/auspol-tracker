@@ -1788,6 +1788,16 @@ function RdIssues({ rangeId = "all" }) {
   const wide = list.filter((x) => x.imp && x.imp.gap && x.imp.by.length === 2)
     .map((x) => { const [hi, lo] = [...x.imp.by].sort((a, b) => b.v - a.v); return { x, hi, lo, d: hi.v - lo.v }; })
     .sort((a, b) => b.d - a.d).find((w) => w.d >= 5);
+  /* the tally its reader is really after - one three-party split for the
+     table: each issue's "best on it" shares weighted by how many voters put
+     it in their top three (importance x perceived competence), summed to a
+     split across the asked issues */
+  const tally = (() => {
+    const rows = list.filter((x) => x.own && x.imp);
+    const wsum = rows.reduce((a, x) => a + x.imp.v, 0);
+    if (!wsum) return null;
+    return Object.fromEntries(P.map((q) => [q, rows.reduce((a, x) => a + x.imp.v * x.own.v[q], 0) / wsum]));
+  })();
 
   /* ---- what matters to whom ------------------------------------------------ */
   const G = I.groups;
@@ -1879,6 +1889,16 @@ function RdIssues({ rangeId = "all" }) {
                 </span>
               </div>
               {list.map(row)}
+              {tally && (
+                <div className="rd-is-row rd-is-tally"
+                     aria-label={"Weighted by importance: " + P.map((q) => pName(q) + " " + Math.round(tally[q])).join(", ")}>
+                  <span className="rd-is-lab">Weighted by importance</span>
+                  <span></span>
+                  <span className="rd-is-dots" aria-hidden="true"></span>
+                  <span className="rd-is-nums">{P.map((q) => <b key={q} style={{ color: inkOf(pColor(q)) }}>{Math.round(tally[q])}</b>)}</span>
+                  <span></span>
+                </div>
+              )}
               <div className="rd-is-axis" aria-hidden="true">
                 <span></span><span></span>
                 <span className="rd-is-dots" ref={stripRef}>{[20, 30, 40, 50].map((g) => <span key={g} style={{ left: dx(g) + "%" }}>{g === 50 ? "50%" : g}</span>)}
@@ -1911,7 +1931,7 @@ function RdIssues({ rangeId = "all" }) {
             )}
           </div>
           <RdFoot how={{ term: "issues", from: "The issues" }}>
-            Figures pool the last {I.window} of polls, newer and larger polls counting for more. “Ahead” means a lead larger than its own 95% margin; “behind” names a party clearly third. Pick an issue to follow it in the chart.
+            Figures pool the last {I.window} of polls, newer and larger polls counting for more. “Ahead” means a lead larger than its own 95% margin; “behind” names a party clearly third. The weighted row sums each party’s share in proportion to how important voters say the issue is. Pick an issue to follow it in the chart.
           </RdFoot>
         </>
       ) : (
