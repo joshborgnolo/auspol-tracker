@@ -838,7 +838,7 @@ function RdDirection({ rangeId }) {
   const dek = (small < 30 ? "Only " : "") + Math.round(small) + "% say it is " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". "
     + (now.chg == null ? ""
       : now.changeSig ? "Net mood has " + netVerb(Math.round(Math.abs(now.chg)), now.chg > 0) + ", " + upDown(now.chg) + Math.round(Math.abs(now.chg)) + " points in a month"
-      : "Net mood has not shifted significantly in a month")
+      : "Net mood has held steady for a month")
     + (Math.abs(sinceFirst) >= 5 ? (now.chg == null
       ? "Net mood has " + netWord(sinceFirst) + ", " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since the 2025 election."
       : now.changeSig

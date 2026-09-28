@@ -51,9 +51,8 @@ const upDown  = (d) => (d > 0 ? "up " : "down ");
 - Branches: `chg == null` → no month clause; `changeSig` →
   "Net mood has ‹verb›, down N points in a month" (N = `Math.round(|chg|)`
   — the MONTH figure is an exact round, only the election figure uses
-  rdRoughPts); insignificant → "Net mood has not shifted significantly in
-  a month" (NOT "soured slightly" — an insignificant move gets no
-  directional verb at all).
+  rdRoughPts); insignificant → "Net mood has held steady for a month"
+  (no vivid verb — the ladder lives inside the changeSig branch only).
 - Election clause fires when `|sinceFirst| >= 5`: after a significant month
   with the same sign it renders bare `" and " + M + " points…"` (the down/up
   adverb carries); a month/term **sign flip** gets `" but up " + M + …` so
