@@ -989,7 +989,7 @@ const RD_DEMO_HOME = {
   onp: "One Nation voters are more likely to be 55+, TAFE- or trade-qualified, English-only-speaking, rural, and non-Victorian",
   alp: "Labor voters are more likely to be under 55, university-educated, and inner-metro",
   lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
-  grn: "Greens voters are more likely to be 18–34, women, and renters",
+  grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
 };
 /* the state panels' titles, as the board wrote them */
 const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };
@@ -1030,17 +1030,25 @@ function RdDemographics({ rangeId = "all" }) {
   const story = (() => {
     let finding;
     const m = /^Support for .* (rises|falls) significantly (.*)\.$/.exec(verdict);
+    const noDiff = /no significant difference/.test(verdict);
     if (m && st0.id === "age") finding = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with age";
     else if (m && st0.id === "generation") finding = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";
     else if (m && st0.id === "location") finding = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";
-    else if (/no significant difference/.test(verdict)) finding = pName + "’s vote is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");
+    else if (noDiff) finding = pName + "’s vote is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");
     else finding = verdict.replace(/ significantly/, "").replace(/\.$/, "");
     const gs = st0.groups.filter((g) => g.v[party] != null);
     const byV = gs.slice().sort((a, b) => b.v[party] - a.v[party]);
     const top = byV[0], bot = byV[byV.length - 1];
-    let dek = top && bot && top !== bot
-      ? rdCap(rdFraction(top.v[party])) + " " + short(top) + " back " + pName + ", against " + rdFraction(bot.v[party]) + " " + short(bot) + "."
-      : "";
+    /* when the polls can't split the groups, quote one fraction for the
+       whole set: the rounded top/bottom contrast can draw a gap twice as
+       wide as the real one (28.1 v 26.1 reads as three-in-ten v one-in-four) */
+    const words = DEMO_SET_WORDS[st0.id] || {};
+    const both = words.all === "men and women" || words.all === "owners and renters";
+    let dek = noDiff
+      ? rdCap(rdFraction(all)) + (both ? " " + words.all + " alike" : " of every " + (words.one || "group")) + " back " + pName + "."
+      : top && bot && top !== bot
+        ? rdCap(rdFraction(top.v[party])) + " " + short(top) + " back " + pName + ", against " + rdFraction(bot.v[party]) + " " + short(bot) + "."
+        : "";
     const st1 = tab.sets[1];
     if (st1) {
       const out = st1.groups.filter((g) => g.v[party] != null)
