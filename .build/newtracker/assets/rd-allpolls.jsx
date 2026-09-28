@@ -676,12 +676,38 @@ function RdAllPolls(P) {
 
   /* up/down poll to poll: with a row focused, an arrow steps the focus to the
      next poll (month dividers don't count, and the walk clamps at the last
-     shown row); when the row was open, the open detail travels with the focus */
+     shown row); when the row was open, the open detail travels with the
+     focus. Left and right walk the facet views, the tab row's own walk via
+     onFacet, the focus re-seated at the same position when the new facet's
+     scope hides the poll it sat on; Enter or space toggles. */
   const visRows = byDate ? groups.flatMap((g) => g.list) : flat;
+  const FACETS = [{ id: "twopp", label: "2PP" }, { id: "primary", label: "Primary" },
+                  { id: "leadership", label: phone ? "Leaders" : "Leadership" }, { id: "direction", label: "Direction" }];
   const rowNav = (e, p) => {
     if (e.target !== e.currentTarget) return;
     const id = rowKey(p);
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(open === id ? null : id); return; }
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      const f = FACETS.findIndex((x) => x.id === facet) + (e.key === "ArrowRight" ? 1 : -1);
+      if (!FACETS[f]) return;
+      const rowSel = phone ? ".rd-ap-card" : ".rd-ap-row";
+      const at = [...(bodyRef.current ? bodyRef.current.querySelectorAll(rowSel) : [])].indexOf(e.currentTarget);
+      onFacet(FACETS[f].id);
+      /* the leadership and direction facets self-arm a "has the numbers"
+         scope, so the hop can filter the focused poll out of the table –
+         React then drops its node, the focus falls to the page, and the
+         next arrow would turn pages instead of views. Once the new facet
+         has rendered, re-seat the focus on the row at the same position. */
+      requestAnimationFrame(() => {
+        const act = document.activeElement;
+        if (act && act.closest && act.closest(rowSel)) return;
+        const rows = bodyRef.current ? bodyRef.current.querySelectorAll(rowSel) : [];
+        const nx = rows[Math.min(Math.max(at, 0), rows.length - 1)];
+        if (nx) nx.focus();
+      });
+      return;
+    }
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
     const j = visRows.indexOf(p) + (e.key === "ArrowDown" ? 1 : -1);
@@ -732,8 +758,6 @@ function RdAllPolls(P) {
 
   /* ---- the rows ------------------------------------------------------------ */
   const [tip, setTip] = useState(null);
-  const FACETS = [{ id: "twopp", label: "2PP" }, { id: "primary", label: "Primary" },
-                  { id: "leadership", label: phone ? "Leaders" : "Leadership" }, { id: "direction", label: "Direction" }];
   /* A facet tab's figures fade in rather than cut in (rd.css): once a tab
      has been pressed, each row carries rd-ap-sw, and its facet class names
      the fade, so a new facet is a new fade and it restarts on every row.

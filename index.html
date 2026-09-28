@@ -63122,6 +63122,12 @@ function RdPolls({
       setOpen(isOpen ? null : r.pollster);
       return;
     }
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      const f = RD_PL_FACETS.findIndex(x => x.id === facet) + (e.key === "ArrowRight" ? 1 : -1);
+      if (RD_PL_FACETS[f]) setFacet(RD_PL_FACETS[f].id);
+      return;
+    }
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
     const j = i + (e.key === "ArrowDown" ? 1 : -1);
@@ -65665,12 +65671,41 @@ function RdAllPolls(P) {
   }
   const more = nShown < sorted.length;
   const visRows = byDate ? groups.flatMap(g => g.list) : flat;
+  const FACETS = [{
+    id: "twopp",
+    label: "2PP"
+  }, {
+    id: "primary",
+    label: "Primary"
+  }, {
+    id: "leadership",
+    label: phone ? "Leaders" : "Leadership"
+  }, {
+    id: "direction",
+    label: "Direction"
+  }];
   const rowNav = (e, p) => {
     if (e.target !== e.currentTarget) return;
     const id = rowKey(p);
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       setOpen(open === id ? null : id);
+      return;
+    }
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      const f = FACETS.findIndex(x => x.id === facet) + (e.key === "ArrowRight" ? 1 : -1);
+      if (!FACETS[f]) return;
+      const rowSel = phone ? ".rd-ap-card" : ".rd-ap-row";
+      const at = [...(bodyRef.current ? bodyRef.current.querySelectorAll(rowSel) : [])].indexOf(e.currentTarget);
+      onFacet(FACETS[f].id);
+      requestAnimationFrame(() => {
+        const act = document.activeElement;
+        if (act && act.closest && act.closest(rowSel)) return;
+        const rows = bodyRef.current ? bodyRef.current.querySelectorAll(rowSel) : [];
+        const nx = rows[Math.min(Math.max(at, 0), rows.length - 1)];
+        if (nx) nx.focus();
+      });
       return;
     }
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
@@ -65745,19 +65780,6 @@ function RdAllPolls(P) {
     lab: rdApTagLab(f.k.slice(1))
   } : f);
   const [tip, setTip] = useState(null);
-  const FACETS = [{
-    id: "twopp",
-    label: "2PP"
-  }, {
-    id: "primary",
-    label: "Primary"
-  }, {
-    id: "leadership",
-    label: phone ? "Leaders" : "Leadership"
-  }, {
-    id: "direction",
-    label: "Direction"
-  }];
   const facetWas = useRef(facet),
     facetSwaps = useRef(0);
   if (facetWas.current !== facet) {
