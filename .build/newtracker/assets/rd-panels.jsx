@@ -1891,9 +1891,9 @@ function RdIssues({ rangeId = "all" }) {
               {list.map(row)}
               {tally && (
                 <div className="rd-is-row rd-is-tally"
-                     aria-label={"Weighted by importance: " + P.map((q) => pName(q) + " " + Math.round(tally[q])).join(", ")}>
+                     aria-label={"Issue-importance-weighted trust score: " + P.map((q) => pName(q) + " " + Math.round(tally[q])).join(", ")}>
                   <span className="rd-is-tallab">
-                    <b>Weighted by importance</b>
+                    <b>Issue-importance-weighted trust score</b>
                     <small>Each issue counts in proportion to how many voters rank it in their top three</small>
                   </span>
                   <span className="rd-is-tallynums">{P.map((q) => (

@@ -1138,7 +1138,7 @@ body.rd .rd-is-row:focus-visible { outline: 2px solid var(--accent); outline-off
 body.rd .rd-is-row.rd-is-tally { min-height: 0; padding: 14px 12px 16px; cursor: default; border-bottom: 0; }
 body.rd .rd-is-row.rd-is-tally:hover { background: none; }
 body.rd .rd-is-tallab { grid-column: 1 / span 3; }
-body.rd .rd-is-tallab b { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
+body.rd .rd-is-tallab b { display: block; font-size: 14px; font-weight: 600; color: var(--ink); }
 body.rd .rd-is-tallab small { display: block; max-width: 32em; margin-top: 3px; font-size: 13px; line-height: 1.45; color: var(--ink-3); }
 body.rd .rd-is-tallynums { grid-column: 4 / span 2; display: flex; gap: 6px; }
 body.rd .rd-is-score { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 8px 5px 5px; border-radius: 8px; font-variant-numeric: tabular-nums; }
