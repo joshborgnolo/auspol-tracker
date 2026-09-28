@@ -805,14 +805,14 @@ function RdLeadership({ rangeId }) {
                 wrapper per row of the panel's subgrid, which lines the two
                 panels' rows up; the chart cards stay unwrapped, since their
                 spacing reads the key that follows them. */}
-            <RdGlide watch={ppmView}>
+            <RdGlide watch={ppmView} className="rd-ld-bars-g">
               <div className="rd-hbs" ref={hbsRef}>
                 {ppmView !== "three" && two && headBar(two)}
                 {ppmView !== "three" && twoH && headBar(twoH)}
                 {ppmView !== "two" && threeBar}
               </div>
             </RdGlide>
-            {ppmNote && <RdGlide watch={ppmNote} className={ppmView === "three" ? "rd-ld-noteup" : undefined}><p className="rd-note rd-ld-note">{ppmNote}</p></RdGlide>}
+            {ppmNote && <RdGlide watch={ppmNote} className={"rd-ld-note-g" + (ppmView === "three" ? " rd-ld-noteup" : "")}><p className="rd-note rd-ld-note">{ppmNote}</p></RdGlide>}
             {mainPpmChart}
             {ppmView === "both" && threeChart}
             <RdKey className="rd-ckey" items={[]}>
@@ -830,9 +830,9 @@ function RdLeadership({ rangeId }) {
             {!narrow && expandBtn("appr", "leader ratings")}
           </RdTabs>,
           <>
-            <RdGlide watch={metric}>{dotPlot(metric)}</RdGlide>
+            <RdGlide watch={metric} className="rd-ld-dp-g">{dotPlot(metric)}</RdGlide>
             {metric === "both" && <RdKey className="rd-dp-key" items={[{ kind: "dot-solid", color: "var(--ink-3)", label: "Approval: the job they’re doing" }, { kind: "dot-open", color: "var(--ink-3)", label: "Favourability: views of them as a person" }]} />}
-            <RdGlide watch={apprNote}><p className="rd-note rd-ld-note">{apprNote}</p></RdGlide>
+            <RdGlide watch={apprNote} className="rd-ld-note-g"><p className="rd-note rd-ld-note">{apprNote}</p></RdGlide>
             {apprChart}
             {metric === "both" && apprFavChart}
             <RdKey className="rd-ckey" items={[

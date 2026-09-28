@@ -795,8 +795,11 @@ body.rd .rd-ld-grid.one { grid-template-columns: minmax(0, 1fr); }
   body.rd .rd-ld-grid > .rd-ld-panel .rd-sub { margin-top: 20px; }
   /* the three-way note runs a line longer than the approval panel's beside
      it, and the paired notes close on the same line: the longer note climbs
-     into the bars' slack above (one 19.5px line) rather than hanging low */
-  body.rd .rd-ld-grid:not(.one) .rd-ld-noteup .rd-ld-note { margin-top: calc(12px - 19.5px); }
+     into the bars' slack above (one 19.5px line) rather than hanging low.
+     The lift is the glide item's OWN margin - never a margin on the note
+     inside it: RdGlide's overflow clip would slice a collapsed-through
+     margin's reach (it decapitated the note's top line mid-morph) */
+  body.rd .rd-ld-grid:not(.one) .rd-ld-noteup { margin-top: -19.5px; }
 }
 body.rd .rd-ld-panel.rd-hidden { display: none; }
 body.rd .rd-ld-panel .rd-sub { margin-top: 48px; }
@@ -830,6 +833,30 @@ body.rd .rd-hb-cis > span { padding-left: 10px; flex-shrink: 1; min-width: 0; }
 /* a two-way's far leader reads from the right end, as its segment does */
 body.rd .rd-hb-cis > span.end { padding-left: 0; padding-right: 10px; text-align: right; }
 body.rd .rd-ld-note { margin-top: 12px; min-height: 40px; }
+/* a glided note's spacing is inner padding, not margin: the glide's rest
+   state collapses the paragraph's margin through the wrapper, its gliding
+   state (overflow clip) contains it inside the clipped box - one geometry
+   lives outside the box, the other inside, and the switch between them is
+   what bounced the shared note row and clipped the note. Padding reads the
+   same in both modes, so the glide is one clean ease from where the block is */
+body.rd .rd-ld-note-g .rd-glide-in { padding-top: 12px; }
+body.rd .rd-ld-note-g .rd-ld-note { margin-top: 0; }
+/* same rule for the figures rows the two panels' glides wrap (the head bars
+   and the dot plot): spacing moves to inner padding, and in the shared
+   subgrid the glide rests at its own content height - stretched to the
+   shared track it overshot the glide's measured target by up to 89px and
+   snapped to the taller row when the glide's inline styles cleared */
+body.rd .rd-ld-bars-g .rd-glide-in { padding-top: 20px; }
+body.rd .rd-ld-bars-g .rd-hbs { margin-top: 0; }
+body.rd .rd-ld-dp-g .rd-glide-in { padding-top: 18px; }
+body.rd .rd-ld-dp-g .rd-dp { margin-top: 0; }
+@media (min-width: 1001px) {
+  body.rd .rd-ld-grid:not(.one) > .rd-ld-panel > .rd-ld-note-g,
+  body.rd .rd-ld-grid:not(.one) > .rd-ld-panel > .rd-ld-bars-g,
+  body.rd .rd-ld-grid:not(.one) > .rd-ld-panel > .rd-ld-dp-g { align-self: start; }
+  body.rd .rd-ld-grid:not(.one) .rd-ld-dp-g .rd-glide-in { padding-top: 20px; }
+  body.rd .rd-ld-grid:not(.one) .rd-ld-dp-g .rd-dp { margin-top: 0; }
+}
 body.rd .rd-ld-chart { margin-top: 20px; }
 /* the copy button joins the key row under the chart, as on every other chart */
 body.rd .rd-ld-chart:has(+ .rd-ckey) .chart { padding-bottom: 0; }

@@ -3596,7 +3596,7 @@ body.rd .rd-ld-grid.one { grid-template-columns: minmax(0, 1fr); }
   body.rd .rd-ld-grid:not(.one) > .rd-ld-panel { display: grid; grid-row: span 9; grid-template-rows: subgrid; align-content: start; }
   body.rd .rd-ld-grid:not(.one) .rd-dp { margin-top: 20px; }
   body.rd .rd-ld-grid > .rd-ld-panel .rd-sub { margin-top: 20px; }
-  body.rd .rd-ld-grid:not(.one) .rd-ld-noteup .rd-ld-note { margin-top: calc(12px - 19.5px); }
+  body.rd .rd-ld-grid:not(.one) .rd-ld-noteup { margin-top: -19.5px; }
 }
 body.rd .rd-ld-panel.rd-hidden { display: none; }
 body.rd .rd-ld-panel .rd-sub { margin-top: 48px; }
@@ -3627,6 +3627,19 @@ body.rd .rd-hb-cis { display: flex; gap: 2px; margin-top: 4px; font-size: 11px; 
 body.rd .rd-hb-cis > span { padding-left: 10px; flex-shrink: 1; min-width: 0; }
 body.rd .rd-hb-cis > span.end { padding-left: 0; padding-right: 10px; text-align: right; }
 body.rd .rd-ld-note { margin-top: 12px; min-height: 40px; }
+body.rd .rd-ld-note-g .rd-glide-in { padding-top: 12px; }
+body.rd .rd-ld-note-g .rd-ld-note { margin-top: 0; }
+body.rd .rd-ld-bars-g .rd-glide-in { padding-top: 20px; }
+body.rd .rd-ld-bars-g .rd-hbs { margin-top: 0; }
+body.rd .rd-ld-dp-g .rd-glide-in { padding-top: 18px; }
+body.rd .rd-ld-dp-g .rd-dp { margin-top: 0; }
+@media (min-width: 1001px) {
+  body.rd .rd-ld-grid:not(.one) > .rd-ld-panel > .rd-ld-note-g,
+  body.rd .rd-ld-grid:not(.one) > .rd-ld-panel > .rd-ld-bars-g,
+  body.rd .rd-ld-grid:not(.one) > .rd-ld-panel > .rd-ld-dp-g { align-self: start; }
+  body.rd .rd-ld-grid:not(.one) .rd-ld-dp-g .rd-glide-in { padding-top: 20px; }
+  body.rd .rd-ld-grid:not(.one) .rd-ld-dp-g .rd-dp { margin-top: 0; }
+}
 body.rd .rd-ld-chart { margin-top: 20px; }
 body.rd .rd-ld-chart:has(+ .rd-ckey) .chart { padding-bottom: 0; }
 body.rd .rd-ld-chart:has(+ .rd-ckey) .chart > .chart-copy-btn { top: calc(100% + 13px); bottom: auto; right: -4px; width: 36px; height: 36px; }
@@ -59639,13 +59652,14 @@ function RdLeadership({
       label: "Both"
     }]
   }, !narrow && expandBtn("ppm", "preferred prime minister")), React.createElement(React.Fragment, null, React.createElement(RdGlide, {
-    watch: ppmView
+    watch: ppmView,
+    className: "rd-ld-bars-g"
   }, React.createElement("div", {
     className: "rd-hbs",
     ref: hbsRef
   }, ppmView !== "three" && two && headBar(two), ppmView !== "three" && twoH && headBar(twoH), ppmView !== "two" && threeBar)), ppmNote && React.createElement(RdGlide, {
     watch: ppmNote,
-    className: ppmView === "three" ? "rd-ld-noteup" : undefined
+    className: "rd-ld-note-g" + (ppmView === "three" ? " rd-ld-noteup" : "")
   }, React.createElement("p", {
     className: "rd-note rd-ld-note"
   }, ppmNote)), mainPpmChart, ppmView === "both" && threeChart, React.createElement(RdKey, {
@@ -59671,7 +59685,8 @@ function RdLeadership({
       label: "Both"
     }]
   }, !narrow && expandBtn("appr", "leader ratings")), React.createElement(React.Fragment, null, React.createElement(RdGlide, {
-    watch: metric
+    watch: metric,
+    className: "rd-ld-dp-g"
   }, dotPlot(metric)), metric === "both" && React.createElement(RdKey, {
     className: "rd-dp-key",
     items: [{
@@ -59684,7 +59699,8 @@ function RdLeadership({
       label: "Favourability: views of them as a person"
     }]
   }), React.createElement(RdGlide, {
-    watch: apprNote
+    watch: apprNote,
+    className: "rd-ld-note-g"
   }, React.createElement("p", {
     className: "rd-note rd-ld-note"
   }, apprNote)), apprChart, metric === "both" && apprFavChart, React.createElement(RdKey, {
