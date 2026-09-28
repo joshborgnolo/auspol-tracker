@@ -97,7 +97,7 @@ const ACC_CANON = {
   "Resolve Strategic": "Resolve", "Freshwater Strategy": "Freshwater",
   "RedBridge/Accent": "RedBridge", "Spectre Strategy": "Spectre",
 };
-const HE_WINDOW = 28, SHRINK_K = 8, SAMPLE_CAP = 3000, LN2 = Math.log(2);
+const HE_WINDOW = 28, SHRINK_K = 1.5, SAMPLE_CAP = 3000, LN2 = Math.log(2);
 const HL_DEFF = 1.6;
 const HE_HALF = 90;
 const HL_WINDOW = 21, HL_HALF = 7, HL_TAPER = 14;

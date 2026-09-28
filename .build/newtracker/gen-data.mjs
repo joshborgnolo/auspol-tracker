@@ -242,7 +242,7 @@ function fillSeries(known, idxs) {
 }
 
 /* ---- house effects (shrunk mean deviation from local consensus) -------- */
-const HE_WINDOW = 28, SHRINK_K = 8, SAMPLE_CAP = 3000, LN2 = Math.log(2);
+const HE_WINDOW = 28, SHRINK_K = 1.5, SAMPLE_CAP = 3000, LN2 = Math.log(2);
 /* Design effect for a live national sample – the one value both engines
    use. The node estimator consumes it directly (rowN, seFloor); the page's
    discord engine reads it from latest.method.deff in the data asset so
@@ -353,7 +353,14 @@ const tppRowsSynthOn = POLLS
    measured against the n-weighted consensus of OTHER HOUSES' polls around it
    in time (±HE_WINDOW days, at least 3, same-stratum only). Those deviations are
    pooled with recency decay (HE_HALF-day half-life) and shrunk toward zero by
-   SHRINK_K on the decayed count, and the lean is READ at the time it is
+   SHRINK_K on the decayed count – as if the house's polls were joined by
+   SHRINK_K more that sat exactly on the consensus. SHRINK_K was 8 until
+   2026-09-28, when predicting each poll from the polls before it (Sep 2025 on,
+   ~149 polls a measure) put the best value at 1–1.5 on the implied 2PP, every
+   primary and the One Nation–Coalition gap: 1.5 cut the error 5–7% against 8.
+   At 8 a house with five recent polls kept under 40% of its measured lean,
+   and houses that poll often kept far more than those that don't, which
+   reordered them. The lean is READ at the time it is
    applied: he.at(firm, t) is the house's lean as of t. A house whose method
    changes mid-cycle therefore settles on the new lean in a couple of months
    rather than being averaged with its old method forever – the all-time

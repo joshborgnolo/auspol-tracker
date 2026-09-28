@@ -5893,6 +5893,10 @@ function infoTerms(D) {
      formula or worked table is one tap away for whoever wants it. */
   const working = (children) => (
     <details className="info-working"><summary>Show the working</summary>{children}</details>);
+  /* the house-effect shrinkage, stated from the estimator's own setting */
+  const shrinkK = (L.method && L.method.shrinkK) || 1.5;
+  const shrinkWord = { 1: "one", 1.5: "one and a half", 2: "two", 3: "three" }[shrinkK] || String(shrinkK);
+  const shrinkKeep = (n) => Math.round((100 * n) / (n + shrinkK));
   const eff = <>n<sub>eff</sub></>;
 
   /* Last-election flows: the tables Past cycles reads each term through
@@ -6126,14 +6130,24 @@ function infoTerms(D) {
         <>A pollster’s consistent lean relative to the others. Each of its polls is compared with
         other pollsters’ polls taken around the same time, and those gaps are pooled with a
         90-day half-life, so the lean tracks the pollster’s current methods. While the evidence
-        is thin, it is shrunk toward zero. It is measured separately for each figure: a pollster
-        that leans to Labor on the two-party figure need not lean the same way on a primary vote.
-        The aggregate subtracts it before averaging.</>) },
+        is thin, it is shrunk toward zero, as if the pollster’s polls were joined by {shrinkWord} more
+        that sat exactly on the others: a pollster with one recent poll keeps {shrinkKeep(1)}% of its
+        measured lean, one with four keeps {shrinkKeep(4)}%, and one with ten keeps {shrinkKeep(10)}%. That
+        setting is the one that best predicts each new poll from the polls before it. The lean is
+        measured separately for each figure: a pollster that leans to Labor on the two-party
+        figure need not lean the same way on a primary vote. The aggregate subtracts it before
+        averaging.
+        {working(<span className="info-p">A pollster’s lean is Σvⱼgⱼ ÷ (Σvⱼ + {shrinkK}) over its
+          polls, where gⱼ is a poll’s gap to the sample-weighted average of other pollsters’ polls
+          within 28 days of it (at least three of them), and vⱼ = 2^(−a/90), with a the poll’s age
+          in days when the lean is read.</span>)}</>) },
       { id: "house-lean", term: "House lean", body: (
         <>A pollster’s {xref("house-effect", "house lean", "house effect")} traced month by month,
         so a change of method or ownership shows where it happened instead of being smeared across
         its history. The aggregate always subtracts the house effect as it stood at the time of
-        each figure.</>) },
+        each figure.{window.AP && window.AP.rd ? <> The One Nation v Coalition view is a
+        pollster’s lean on One Nation’s primary vote less its lean on the Coalition’s: how it
+        splits the right’s vote.</> : null}</>) },
       { id: "poll-lean", term: "Poll lean", body: (
         <>How far one poll sits from the aggregate for the month it was taken. It describes that
         poll, not the pollster: sampling luck alone can put a single poll off the pace. A pollster

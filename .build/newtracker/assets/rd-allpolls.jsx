@@ -1311,13 +1311,24 @@ function RdHouseLean({ measure, tppBasis }) {
   const [hover, setHover] = useState(null);
   const boxRef = useRef(null);
   const SW = useRdWidth(boxRef, 500);
-  const HL = D.houseLean || {};
+  const HL0 = D.houseLean || {};
+  /* One Nation against the Coalition: each pollster's lean on the gap
+     between the two primaries. The estimator is linear and all but one poll
+     files both, so that lean is its One Nation lean less its Coalition lean;
+     taken from the two series the tabs beside it draw, it always agrees
+     with them to the decimal. */
+  const HL = { ...HL0, split: Object.fromEntries(Object.keys(HL0.onp || {}).filter((h) => (HL0.lnp || {})[h]).map((h) => {
+    const co = Object.fromEntries(HL0.lnp[h].map((d) => [d.ym, d.v]));
+    return [h, HL0.onp[h].filter((d) => co[d.ym] != null)
+      .map((d) => ({ ym: d.ym, v: Math.round((d.v - co[d.ym]) * 10) / 10, on: d.v, co: co[d.ym] }))];
+  })) };
   const HE = D.houseEffects || {};
   const tppKey = pub ? (onM ? "onpub" : "tpp") : (onM ? "onimp" : "imp");
   const key = view === "tpp" ? tppKey : view;
   const heKey = { onimp: "synthOn", imp: "synth", onpub: "alp_on", tpp: "tpp" }[key];
   const valOf = { onimp: (p) => p.alpOnImp, imp: (p) => p.alpImp, onpub: (p) => (p.tppAlt ? p.tppAlt.alp : null), tpp: (p) => p.alpN,
-                  alp: (p) => p.p && p.p.alp, lnp: (p) => p.p && p.p.lnp, onp: (p) => p.p && p.p.onp }[key];
+                  alp: (p) => p.p && p.p.alp, lnp: (p) => p.p && p.p.lnp, onp: (p) => p.p && p.p.onp,
+                  split: (p) => (p.p && p.p.onp != null && p.p.lnp != null ? p.p.onp - p.p.lnp : null) }[key];
   const nOf = (h) => {
     const he = heKey && HE[heKey] && HE[heKey][h];
     if (he && he.n) return he.n;
@@ -1330,7 +1341,17 @@ function RdHouseLean({ measure, tppBasis }) {
   const rows = rowsOf(key).map((r) => ({ ...r, n: nOf(r.h) })).sort((a, b) => b.v - a.v || b.n - a.n);
   /* the finding stays on the two-party lean, whichever tab is open */
   const tr = rowsOf(tppKey).sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
-  const rivalName = onM ? "One Nation" : "the Coalition";
+  /* where the pollsters part further on how the right's vote splits, the dek
+     adds that, in the terms of whichever of the two parties leads */
+  const sp = rowsOf("split").sort((a, b) => b.v - a.v);
+  const LP = (D.latest && D.latest.primary) || {};
+  let splitLine = "";
+  if (tr.length && sp.length > 1 && LP.onp != null && LP.lnp != null && sp[0].v >= 0.5 && sp[sp.length - 1].v <= -0.5
+      && Math.max(sp[0].v, -sp[sp.length - 1].v) >= Math.abs(tr[0].v) + 0.5) {
+    const onLeads = LP.onp >= LP.lnp;
+    const [a, b] = onLeads ? [sp[0], sp[sp.length - 1]] : [sp[sp.length - 1], sp[0]];
+    splitLine = ` They part further on how the right’s vote splits: ${a.h} finds ${onLeads ? "One Nation’s lead over the Coalition" : "the Coalition’s lead over One Nation"} ${Math.abs(a.v).toFixed(1)} points wider than the others do, ${b.h} ${Math.abs(b.v).toFixed(1)} points narrower.`;
+  }
   let head = null, dek = null;
   if (tr.length > 1) {
     const top = tr[0], rest = Math.max(...tr.slice(1).map((r) => Math.abs(r.v)));
@@ -1338,13 +1359,15 @@ function RdHouseLean({ measure, tppBasis }) {
     const pts = Math.abs(top.v).toFixed(1);
     head = Math.abs(top.v) < 0.05 ? "No pollster leans away from the pack"
       : `${top.h} leans furthest from the pack, and ${Math.abs(top.v) <= 1 ? "only " : ""}by ${pts} point${pts === "1.0" ? "" : "s"}`;
-    dek = Math.abs(top.v) < 0.05 ? "Every pollster’s polls sit level with the pollsters polling alongside it."
-      : `Its polls run ${pts} points more ${way} way than the pollsters polling alongside it, and no other pollster is more than ${rest.toFixed(1)} points off. The averages take each lean out before the polls are combined.`;
+    dek = Math.abs(top.v) < 0.05 ? "Every pollster’s polls sit level with the pollsters polling alongside it." + splitLine
+      : `Its polls run ${pts} point${pts === "1.0" ? "" : "s"} more ${way} way than the pollsters polling alongside it, and no other pollster is more than ${rest.toFixed(1)} points off.${splitLine} The averages take each lean out before the polls are combined.`;
   }
   /* the bar's scale: 1.2 points either way, wider only if a lean needs it */
   const maxAbs = Math.max(0, ...rows.map((r) => Math.abs(r.v)));
   const BM = maxAbs <= 1.1 ? 1.2 : Math.ceil((maxAbs + 0.1) * 2) / 2;
-  const bStep = BM <= 1.5 ? 0.5 : 1;
+  /* ticks every half point, point or two points: at a finer step the labels
+     beside the middle run into "The others" */
+  const bStep = BM <= 1.5 ? 0.5 : BM <= 3 ? 1 : 2;
   const bTicks = [];
   for (let v = bStep; v < BM - 1e-9; v += bStep) bTicks.push(+v.toFixed(2));
   const bx = (v) => ((Math.max(-BM, Math.min(BM, v)) + BM) / (2 * BM)) * 100;
@@ -1352,14 +1375,18 @@ function RdHouseLean({ measure, tppBasis }) {
   let SM = 1;
   rows.forEach((r) => r.s.forEach((d) => { SM = Math.max(SM, Math.ceil(Math.abs(d.v) - 0.05)); }));
   const ms = rdApMonths("2025-06");
-  const two = view === "tpp";
+  /* the two-ended measures: a lean is towards one side or the other */
+  const split = view === "split";
+  const two = view === "tpp" || split;
   const partyName = { alp: "Labor", lnp: "the Coalition", onp: "One Nation" }[view];
-  const pos = two ? "var(--alp)" : "var(--" + view + ")";
-  const neg = two ? (onM ? "var(--onp)" : "var(--lnp)") : "var(--" + view + ")";
-  const posInk = two ? "var(--alp-text)" : "var(--" + view + "-text)";
-  const negInk = two ? (onM ? "var(--onp-text)" : "var(--lnp-text)") : "var(--" + view + "-text)";
-  const lText = two ? (phone ? "◀ " : "◀ To ") + (onM ? "One Nation" : phone ? "Coalition" : "the Coalition") : "◀ Lower";
-  const rText = two ? (phone ? "Labor ▶" : "To Labor ▶") : "Higher ▶";
+  const [posP, negP] = split ? ["onp", "lnp"] : ["alp", onM ? "onp" : "lnp"];
+  const posName = split ? "One Nation" : "Labor", negName = split || !onM ? "the Coalition" : "One Nation";
+  const pos = two ? `var(--${posP})` : "var(--" + view + ")";
+  const neg = two ? `var(--${negP})` : "var(--" + view + ")";
+  const posInk = two ? `var(--${posP}-text)` : "var(--" + view + "-text)";
+  const negInk = two ? `var(--${negP}-text)` : "var(--" + view + "-text)";
+  const lText = two ? (phone ? "◀ " : "◀ To ") + (phone ? negName.replace("the ", "") : negName) : "◀ Lower";
+  const rText = two ? (phone ? "" : "To ") + posName + " ▶" : "Higher ▶";
   const SH = phone ? 26 : 44;
   const sx = (ym) => 6 + (ms.indexOf(ym) / (ms.length - 1)) * (SW - 14);
   const sy = (v) => SH / 2 - (Math.max(-SM, Math.min(SM, v)) / SM) * (SH / 2 - 3);
@@ -1393,7 +1420,9 @@ function RdHouseLean({ measure, tppBasis }) {
         {hv && (
           <span className="tip rd-hl-tip" style={{ left: Math.min(SW - 100, Math.max(100, sx(hv.ym))) }}>
             <span className="tip-title">{r.h} · {rdMonthYear(hv.ym)}</span>
-            <span className="tip-row"><span className="tip-label">Lean</span><span className="tip-val">{Math.abs(hv.v) < 0.05 ? "level" : rdSigned(hv.v, 1) + (two ? " to " + (hv.v > 0 ? "Labor" : onM ? "One Nation" : "Coalition") : "")}</span></span>
+            <span className="tip-row"><span className="tip-label">Lean</span><span className="tip-val">{Math.abs(hv.v) < 0.05 ? "level" : rdSigned(hv.v, 1) + (two ? " to " + (hv.v > 0 ? posName : negName).replace("the ", "") : "")}</span></span>
+            {split && <span className="tip-row"><span className="tip-label">On One Nation</span><span className="tip-val">{rdApSigned(hv.on)}</span></span>}
+            {split && <span className="tip-row"><span className="tip-label">On the Coalition</span><span className="tip-val">{rdApSigned(hv.co)}</span></span>}
             <span className="tip-row"><span className="tip-label">Its polls that month</span><span className="tip-val">{nThat}</span></span>
           </span>
         )}
@@ -1414,7 +1443,7 @@ function RdHouseLean({ measure, tppBasis }) {
     </span>
   );
   const bar = (v) => (
-    <span className="rd-hl-bar" role="img" aria-label={Math.abs(v) < 0.05 ? "Level with the other pollsters" : Math.abs(v).toFixed(1) + " points " + (two ? "towards " + (v > 0 ? "Labor" : rivalName) : v > 0 ? "higher than the others" : "lower than the others")}>
+    <span className="rd-hl-bar" role="img" aria-label={Math.abs(v) < 0.05 ? "Level with the other pollsters" : Math.abs(v).toFixed(1) + " points " + (two ? "towards " + (v > 0 ? posName : negName) : v > 0 ? "higher than the others" : "lower than the others")}>
       <span className="rd-ap-in">
         {bTicks.concat(bTicks.map((x) => -x)).map((x) => <i key={x} className="rd-ap-gl" style={{ left: bx(x) + "%" }}></i>)}
         {Math.abs(v) >= 0.05 && <i className="rd-hl-fill" style={{ left: Math.min(bx(0), bx(v)) + "%", width: Math.abs(bx(v) - bx(0)) + "%", background: v > 0 ? pos : neg }}></i>}
@@ -1422,8 +1451,12 @@ function RdHouseLean({ measure, tppBasis }) {
       </span>
     </span>
   );
-  const title = two ? `Each pollster’s lean on Labor v ${onM ? "One Nation" : "Coalition"}${pub ? " as published" : ""}, points`
+  const title = split ? "Each pollster’s lean on One Nation’s primary vote against the Coalition’s, points"
+    : two ? `Each pollster’s lean on Labor v ${onM ? "One Nation" : "Coalition"}${pub ? " as published" : ""}, points`
     : `Each pollster’s lean on ${partyName}’s primary vote, points`;
+  /* the size half of the finding, in words: added together, a pollster's two
+     leans on the right nearly cancel */
+  const sizeMax = split ? Math.max(0, ...rows.map((r) => { const e = r.s[r.s.length - 1]; return Math.abs(e.on + e.co); })) : 0;
   return (
     <section className="rd-sec rd-hl" id="house-lean" aria-labelledby="rd-hl-t">
       <div className="rd-eyebrow">
@@ -1432,7 +1465,8 @@ function RdHouseLean({ measure, tppBasis }) {
       </div>
       {head && <RdHed head={head} dek={dek} />}
       <RdTabs value={view} onChange={(v) => { setView(v); setHover(null); }} ariaLabel="Measure" className="rd-hl-tabs"
-              options={[{ id: "tpp", label: "Two-party" }, { id: "alp", label: "Labor" }, { id: "lnp", label: "Coalition" }, { id: "onp", label: "One Nation" }]} />
+              options={[{ id: "tpp", label: "Two-party" }, { id: "alp", label: "Labor" }, { id: "lnp", label: "Coalition" }, { id: "onp", label: "One Nation" },
+                        { id: "split", label: phone ? "Split" : "One Nation v Coalition", title: "One Nation’s primary vote against the Coalition’s" }]} />
       <h4 className="rd-ap-ct rd-hl-ct">{phone ? title.replace(", points", ", points; the line beneath each is its lean month by month since the election") : title}</h4>
       <div className="rd-hl-table" role="table" aria-label="Each pollster’s lean against the others, now and month by month since the election">
         <div className="rd-hl-hrow" role="row">
@@ -1459,7 +1493,8 @@ function RdHouseLean({ measure, tppBasis }) {
         ))}
       </div>
       <RdFoot how={{ term: "house-lean", from: "How each pollster leans" }}>
-        A pollster’s lean is its average gap to the other pollsters polling within four weeks of it{two && !pub ? ", all read through the same preference flows" : ""}, with recent polls counting most. One with few polls is pulled towards zero until its record builds.{two && !pub ? " Because every poll uses the same flows, a lean comes from a pollster’s primary votes, not from how it allocates preferences." : ""}
+        A pollster’s lean is its average gap to the other pollsters polling within four weeks of it{view === "tpp" && !pub ? ", all read through the same preference flows" : ""}, with recent polls counting most. One with few polls is pulled towards zero until its record builds.{view === "tpp" && !pub ? " Because every poll uses the same flows, a lean comes from a pollster’s primary votes, not from how it allocates preferences." : ""}
+        {split ? ` Here it is the pollster’s lean on One Nation’s vote less its lean on the Coalition’s${sizeMax < maxAbs / 2 ? `; added together, the two mostly cancel, and no pollster reads the parties’ combined vote more than ${sizeMax.toFixed(1)} points off the others` : ""}.` : null}
       </RdFoot>
     </section>
   );
