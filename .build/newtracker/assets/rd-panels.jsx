@@ -1794,9 +1794,10 @@ function RdIssues({ rangeId = "all" }) {
     const allRank = firstOf(Object.fromEntries(gtab.issues.map((k) => [k, allOf(k) || {}])));
     const ranks = gtab.groups.map((g) => firstOf(gtab.cells[g] || {}));
     const sameFirst = ranks.every((r) => r[0] === allRank[0]);
-    const secondDiffers = new Set(ranks.map((r) => r[1])).size > 1;
     const first = (ISS_PHRASE[allRank[0]] || allRank[0]);
-    if (sameFirst) return rdCap(first) + " comes first for everyone." + (secondDiffers ? " What comes second divides them." : "");
+    /* user trim, 2026-09-28: the "What comes second divides them." tail was
+       cut; the first sentence stays generated */
+    if (sameFirst) return rdCap(first) + " comes first for everyone.";
     return rdCap(first) + " comes first for most voters, but not all.";
   })();
   const newestPoll = G && G.newest ? D.individualPolls.find((q) => /^RedBridge/.test(q.pollster) && q.released === G.newest) : null;
