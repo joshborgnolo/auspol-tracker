@@ -1656,7 +1656,7 @@ body.rd .rd-apd-cell { display: flex; flex-direction: column; gap: 1px; min-widt
 body.rd .rd-apd-cell b { font-weight: 600; }
 body.rd .rd-apd-leaders { display: flex; flex-wrap: wrap; gap: 6px 28px; }
 body.rd .rd-apd-links { margin: 10px 0 0 -4px; padding-right: 40px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; }
-body.rd .rd-apd-ext { margin-left: 3px; font-size: 11px; color: var(--ink-faint); text-decoration: none; }
+body.rd .rd-apd-ext { display: inline-block; margin-left: 3px; font-size: 11px; color: var(--ink-faint); text-decoration: none; }
 body.rd .rd-apd-ct { margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--ink); }
 body.rd .rd-apd-mini { margin-top: 10px; position: relative; }
 body.rd .rd-apd-mini svg { display: block; overflow: visible; }

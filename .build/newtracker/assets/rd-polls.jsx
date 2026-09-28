@@ -349,8 +349,8 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
           </dl>
           <div className="rd-pld-links">
             {key && window.AP.openPoll && <button type="button" className="rd-link" onClick={(ev) => { ev.stopPropagation(); window.AP.openPoll(key, facet, "latest and next polls"); }}>Open in All polls →</button>}
-            {r.url && <a className="rd-link" href={r.url} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}>Read the release ↗</a>}
-            {r.methodUrl && <a className="rd-link" href={r.methodUrl} target="_blank" rel="noopener noreferrer" title={"This poll’s Australian Polling Council methodology statement" + (r.methodUrl === r.url ? ", part of the release" : "")} onClick={(ev) => ev.stopPropagation()}>APC methodology ↗</a>}
+            {r.url && <a className="rd-link" href={r.url} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}>Read the release <span className="rd-apd-ext" aria-hidden="true">↗</span></a>}
+            {r.methodUrl && <a className="rd-link" href={r.methodUrl} target="_blank" rel="noopener noreferrer" title={"This poll’s Australian Polling Council methodology statement" + (r.methodUrl === r.url ? ", part of the release" : "")} onClick={(ev) => ev.stopPropagation()}>APC methodology <span className="rd-apd-ext" aria-hidden="true">↗</span></a>}
           </div>
         </div>
         {pj && (
