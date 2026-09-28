@@ -1663,6 +1663,9 @@ function RdIssues({ rangeId = "all" }) {
   /* the dot strip's width on screen, so dots that would print over one
      another can be told apart (see dodge, below) */
   const stripRef = React.useRef(null);
+  /* the issues rows' container, so an arrow key can hand focus to the row it
+     just selected */
+  const rowsRef = React.useRef(null);
   const stripW = useRdWidth(stripRef, 150);
   if (!I || !I.list || !I.list.length) return null;
   const P = I.parties;
@@ -1765,12 +1768,26 @@ function RdIssues({ rangeId = "all" }) {
     ? { text: ISS_PARTY_CAP[x.own.lead] + " ahead", color: inkOf(pColor(x.own.lead)), strong: true }
     : x.own.pairSig ? { text: ISS_PARTY_CAP[x.own.third] + " behind", strong: true }
     : { text: "No clear lead" };
+  /* keyboard walk over the issue rows: with a row focused, ArrowDown/ArrowUp
+     step the selection a row at a time, focus following (a held key keeps
+     walking), clamped at the list's ends */
+  const rowKey = (e, x) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSel(x.id); return; }
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const i = list.findIndex((y) => y.id === x.id);
+    const j = i + (e.key === "ArrowDown" ? 1 : -1);
+    if (j < 0 || j >= list.length) return;
+    setSel(list[j].id);
+    const rows = rowsRef.current ? rowsRef.current.querySelectorAll(".rd-is-row:not(.rd-is-tally)") : [];
+    if (rows[j]) rows[j].focus();
+  };
   const row = (x) => {
     const v = verdictOf(x), sel = x.id === it.id;
     const off = x.own ? dodge(x.own) : {};
     return (
       <div key={x.id} className={"rd-is-row" + (sel ? " sel" : "")} role="button" tabIndex={0} aria-pressed={sel}
-           onClick={() => setSel(x.id)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSel(x.id); } }}
+           onClick={() => setSel(x.id)} onKeyDown={(e) => rowKey(e, x)}
            aria-label={x.label + ": " + (x.imp ? Math.round(x.imp.v) + "% put it in their top three" : "not asked") + "; " + (x.own ? pOrd.map((q) => pName(q) + " " + Math.round(x.own.v[q])).join(", ") + "; " + v.text : "no three-way figures")}>
         <span className="rd-is-lab">{x.label}</span>
         <span className="rd-is-imp">{x.imp ? <><span className="rd-is-bar"><span style={{ width: x.imp.v + "%" }}></span></span><b>{Math.round(x.imp.v)}%</b><span className="rd-is-impw"> rank it top three</span></> : <span className="rd-is-na">not asked</span>}</span>
@@ -1880,7 +1897,7 @@ function RdIssues({ rangeId = "all" }) {
         <>
           <RdHed head={trustHead} dek={trustDek} />
           <div className="rd-is-grid">
-            <div className="rd-is-left">
+            <div className="rd-is-left" ref={rowsRef}>
               {/* Each head sits over its own column: the strip's words over the
                   strip, the key over the three figures it colours (a phone stacks
                   the words and the key over the scale). */}

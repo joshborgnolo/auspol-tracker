@@ -61156,6 +61156,7 @@ function RdIssues({
   const [whomK, setWhomK] = useState(null);
   const whomList = useNarrow("(max-width: 1000px)");
   const stripRef = React.useRef(null);
+  const rowsRef = React.useRef(null);
   const stripW = useRdWidth(stripRef, 150);
   if (!I || !I.list || !I.list.length) return null;
   const P = I.parties;
@@ -61315,6 +61316,21 @@ function RdIssues({
   } : {
     text: "No clear lead"
   };
+  const rowKey = (e, x) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setSel(x.id);
+      return;
+    }
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const i = list.findIndex(y => y.id === x.id);
+    const j = i + (e.key === "ArrowDown" ? 1 : -1);
+    if (j < 0 || j >= list.length) return;
+    setSel(list[j].id);
+    const rows = rowsRef.current ? rowsRef.current.querySelectorAll(".rd-is-row:not(.rd-is-tally)") : [];
+    if (rows[j]) rows[j].focus();
+  };
   const row = x => {
     const v = verdictOf(x),
       sel = x.id === it.id;
@@ -61326,12 +61342,7 @@ function RdIssues({
       tabIndex: 0,
       "aria-pressed": sel,
       onClick: () => setSel(x.id),
-      onKeyDown: e => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          setSel(x.id);
-        }
-      },
+      onKeyDown: e => rowKey(e, x),
       "aria-label": x.label + ": " + (x.imp ? Math.round(x.imp.v) + "% put it in their top three" : "not asked") + "; " + (x.own ? pOrd.map(q => pName(q) + " " + Math.round(x.own.v[q])).join(", ") + "; " + v.text : "no three-way figures")
     }, React.createElement("span", {
       className: "rd-is-lab"
@@ -61505,7 +61516,8 @@ function RdIssues({
   }), React.createElement("div", {
     className: "rd-is-grid"
   }, React.createElement("div", {
-    className: "rd-is-left"
+    className: "rd-is-left",
+    ref: rowsRef
   }, React.createElement("div", {
     className: "rd-is-head",
     "aria-hidden": "true"
