@@ -288,7 +288,7 @@ function RdHero(p) {
     { x: "left", y: 50, dy: -7, text: "▲ " + aName + " ahead", size: narrow ? 11 : 12 },
     { x: "left", y: 50, dy: 16, text: "▼ " + rival + " ahead", size: narrow ? 11 : 12 },
   ];
-  const chartTitle = M[matchup].vsLabor ? "Labor’s two-party share, %" : "The Coalition’s two-party share against One Nation, %";
+  const chartTitle = M[matchup].vsLabor ? "Labor’s two-party-preferred vote, %" : "The Coalition’s two-party share against One Nation, %";
   const flowsBand = matchup === "alp_on" && onImp;
   /* The hover guide steps along the main line's months, and on the default
      contest (v One Nation, first asked months after polling day) that left
@@ -318,7 +318,7 @@ function RdHero(p) {
       : "The Coalition still runs Labor closer than One Nation does";
     const verb = (a, b) => (b < a ? "fallen" : "risen");
     const pc = (v) => Math.round(v) + "%";
-    let dek = "Labor’s share against One Nation has " + verb(on0, on1) + " from " + pc(on0) + " in " + rdMonthYear(f.ym)
+    let dek = "Labor’s 2PP against One Nation has " + verb(on0, on1) + " from " + pc(on0) + " in " + rdMonthYear(f.ym)
       + " to " + pc(on1) + "; against the Coalition, " + (Math.round(co0) === Math.round(co1) ? "it has held near " + pc(co1) : "from " + pc(co0) + " to " + pc(co1)) + ".";
     /* the longest recent run the two have stayed close */
     let k = both.length - 1, worst = Math.abs(gap);

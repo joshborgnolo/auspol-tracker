@@ -57176,7 +57176,7 @@ function RdHero(p) {
     text: "▼ " + rival + " ahead",
     size: narrow ? 11 : 12
   }];
-  const chartTitle = M[matchup].vsLabor ? "Labor’s two-party share, %" : "The Coalition’s two-party share against One Nation, %";
+  const chartTitle = M[matchup].vsLabor ? "Labor’s two-party-preferred vote, %" : "The Coalition’s two-party share against One Nation, %";
   const flowsBand = matchup === "alp_on" && onImp;
   const spineRows = (ringOn && elec.x >= xDomain[0] && mainRows.length && mainRows[0].x > elec.x + 1e-6 ? [{
     ...elec,
@@ -57207,7 +57207,7 @@ function RdHero(p) {
     const head = Math.abs(gap) < 1 ? "One Nation now runs Labor as close as the Coalition does" : gap < 0 ? "One Nation now runs Labor closer than the Coalition does" : "The Coalition still runs Labor closer than One Nation does";
     const verb = (a, b) => b < a ? "fallen" : "risen";
     const pc = v => Math.round(v) + "%";
-    let dek = "Labor’s share against One Nation has " + verb(on0, on1) + " from " + pc(on0) + " in " + rdMonthYear(f.ym) + " to " + pc(on1) + "; against the Coalition, " + (Math.round(co0) === Math.round(co1) ? "it has held near " + pc(co1) : "from " + pc(co0) + " to " + pc(co1)) + ".";
+    let dek = "Labor’s 2PP against One Nation has " + verb(on0, on1) + " from " + pc(on0) + " in " + rdMonthYear(f.ym) + " to " + pc(on1) + "; against the Coalition, " + (Math.round(co0) === Math.round(co1) ? "it has held near " + pc(co1) : "from " + pc(co0) + " to " + pc(co1)) + ".";
     let k = both.length - 1,
       worst = Math.abs(gap);
     while (k > 0) {
