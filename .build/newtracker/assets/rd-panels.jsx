@@ -832,12 +832,17 @@ function RdDirection({ rangeId }) {
     + (most ? ", the most this term" : "");
   const first = M[0];
   const sinceFirst = now.net - first.net;
-  const gapWord = (d) => ((wrongLeads ? -d : d) > 0 ? "widened" : "narrowed");
+  const netWord = (d) => (d > 0 ? "improved" : "worsened");
+  const upDown = (d) => (d > 0 ? "up " : "down ");
   const dek = (small < 30 ? "Only " : "") + Math.round(small) + "% say it is " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". "
     + (now.chg == null ? ""
-      : now.changeSig ? "The gap between the two has " + gapWord(now.chg) + " significantly in a month, by " + Math.round(Math.abs(now.chg)) + " points"
-      : "The gap between the two has not changed significantly in a month")
-    + (Math.abs(sinceFirst) >= 5 ? (now.chg == null ? "The gap has " + gapWord(sinceFirst) + " by " : ", and " + (now.changeSig ? "by " : "it has " + gapWord(sinceFirst) + " by ")) + rdRoughPts(sinceFirst) + " since just after the 2025 election." : ".");
+      : now.changeSig ? "Net mood has " + netWord(now.chg) + " significantly, " + upDown(now.chg) + Math.round(Math.abs(now.chg)) + " points in a month"
+      : "Net mood has not shifted significantly in a month")
+    + (Math.abs(sinceFirst) >= 5 ? (now.chg == null
+      ? "Net mood has " + netWord(sinceFirst) + ", " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since the 2025 election."
+      : now.changeSig
+        ? (Math.sign(sinceFirst) === Math.sign(now.chg) ? " and " : " but " + upDown(sinceFirst)) + rdRoughPts(sinceFirst) + " points since the 2025 election."
+        : ", though it is " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since the 2025 election.") : ".");
   const lowest = now.net <= Math.min(...M.map((d) => d.net)) + 0.05;
   const highest = now.net >= Math.max(...M.map((d) => d.net)) - 0.05;
   const signedP = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
