@@ -1258,6 +1258,20 @@ const directionHouses = creditHouses(
 const directionHousesAll = creditHousesWithStopped(
   DIR.filter((d) => MONTH_SET.has(ymOf(d.date))),
   (d) => d.pollster, (d) => Date.parse(d.date));
+// The month each STOPPED house went quiet on this question - one past its
+// last direction reading - so the caption can date "became inactive in …"
+// instead of a bare "has stopped asking". Keyed by firm, "YYYY-MM".
+const dirLastYm = {};
+for (const d of DIR) {
+  if (!MONTH_SET.has(ymOf(d.date)) || !STOPPED_HOUSES.has(d.pollster)) continue;
+  const ym = ymOf(d.date);
+  if (!(d.pollster in dirLastYm) || ym > dirLastYm[d.pollster]) dirLastYm[d.pollster] = ym;
+}
+const directionStoppedSince = {};
+for (const [f, ym] of Object.entries(dirLastYm)) {
+  const y = Number(ym.slice(0, 4)), m = Number(ym.slice(5));
+  directionStoppedSince[f] = m === 12 ? (y + 1) + "-01" : y + "-" + String(m + 1).padStart(2, "0");
+}
 // The favourability houses present in the approval series (favFirms are the
 // ones asking positive/negative, not approve/disapprove): the approval
 // card's fav-mode subtitle names them. Same treatment – current houses in
@@ -4104,6 +4118,10 @@ window.AUSPOL = (function () {
      STOPPED contributor, listed last, labelled "(inactive)". Keep counting
      active houses off directionHouses (the How-to-read line). */
   const directionHousesAll = ${JSON.stringify(directionHousesAll)};
+  /* per stopped house, the month it went quiet on the direction question
+     ("YYYY-MM", one past its last reading) – the caption's "became inactive
+     in <Month YYYY>" date */
+  const directionStoppedSince = ${JSON.stringify(directionStoppedSince)};
   /* the net-FAVOURABILITY houses in the approval series, active first, a
      stopped house last as "Name (inactive)" – the approval card's fav-mode
      subtitle names them, so it can't drop a house that started (Spectre) */
@@ -4208,7 +4226,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, favHouses, directionPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoGroups, issues, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved

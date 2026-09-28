@@ -885,9 +885,21 @@ function RdDirection({ rangeId }) {
   const active = houses.filter((h) => !inactive.includes(h));
   const top = houses[0];
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
+  /* a stopped house is dated by its first quiet month (gen-data's
+     directionStoppedSince); houses quiet from the same month share a clause */
+  const sinceGroups = new Map();
+  inactive.forEach((h) => {
+    const ym = (D.directionStoppedSince || {})[h];
+    sinceGroups.set(ym, (sinceGroups.get(ym) || []).concat(h));
+  });
+  const inactiveClause = inactive.length ? "; " + [...sinceGroups.entries()].map(([ym, hs]) =>
+    rdList(hs) + (ym
+      ? " became inactive in " + D.monthNameFull(Number(ym.slice(5))) + " " + ym.slice(0, 4)
+      : (hs.length > 1 ? " have" : " has") + " stopped asking")
+  ).join("; ") : "";
   const foot = top ? "Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + counts[top] + " of the " + total + " since May 2025. "
     + (active.filter((h) => h !== top).length ? rdList(active.filter((h) => h !== top)) + " supply the rest" : "")
-    + (inactive.length ? "; " + rdList(inactive) + " " + (inactive.length > 1 ? "have" : "has") + " stopped asking" : "") + ". "
+    + inactiveClause + ". "
     + "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";

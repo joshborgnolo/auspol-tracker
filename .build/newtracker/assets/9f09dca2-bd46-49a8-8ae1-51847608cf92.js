@@ -101,6 +101,10 @@ window.AUSPOL = (function () {
      STOPPED contributor, listed last, labelled "(inactive)". Keep counting
      active houses off directionHouses (the How-to-read line). */
   const directionHousesAll = ["Roy Morgan","Essential","Spectre Strategy","RedBridge/Accent","Freshwater (inactive)"];
+  /* per stopped house, the month it went quiet on the direction question
+     ("YYYY-MM", one past its last reading) – the caption's "became inactive
+     in <Month YYYY>" date */
+  const directionStoppedSince = {"Freshwater":"2025-11"};
   /* the net-FAVOURABILITY houses in the approval series, active first, a
      stopped house last as "Name (inactive)" – the approval card's fav-mode
      subtitle names them, so it can't drop a house that started (Spectre) */
@@ -205,7 +209,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, favHouses, directionPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoGroups, issues, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
