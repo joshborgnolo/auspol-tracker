@@ -61332,7 +61332,7 @@ function RdIssues({
           setSel(x.id);
         }
       },
-      "aria-label": x.label + ": " + (x.imp ? Math.round(x.imp.v) + "% put it in their top three" : "not asked") + "; " + (x.own ? P.map(q => pName(q) + " " + Math.round(x.own.v[q])).join(", ") + "; " + v.text : "no three-way figures")
+      "aria-label": x.label + ": " + (x.imp ? Math.round(x.imp.v) + "% put it in their top three" : "not asked") + "; " + (x.own ? pOrd.map(q => pName(q) + " " + Math.round(x.own.v[q])).join(", ") + "; " + v.text : "no three-way figures")
     }, React.createElement("span", {
       className: "rd-is-lab"
     }, x.label), React.createElement("span", {
@@ -61371,7 +61371,7 @@ function RdIssues({
       }
     }))), React.createElement("span", {
       className: "rd-is-nums"
-    }, x.own ? P.map(q => React.createElement("b", {
+    }, x.own ? pOrd.map(q => React.createElement("b", {
       key: q,
       style: {
         color: inkOf(pColor(q))
@@ -61398,6 +61398,7 @@ function RdIssues({
     if (!wsum) return null;
     return Object.fromEntries(P.map(q => [q, rows.reduce((a, x) => a + x.imp.v * x.own.v[q], 0) / wsum]));
   })();
+  const pOrd = tally ? P.slice().sort((a, b) => tally[b] - tally[a]) : P;
   const G = I.groups;
   const gtab = G && (G.tabs.find(x => x.id === gsetId) || G.tabs[0]);
   const allOf = k => G && G.all && G.all[k] || null;
@@ -61516,7 +61517,7 @@ function RdIssues({
     className: "rd-is-cap"
   }, "Best on it, % of voters naming one of these three"), React.createElement("span", {
     className: "rd-is-leg"
-  }, P.map(q => React.createElement("span", {
+  }, pOrd.map(q => React.createElement("span", {
     key: q
   }, React.createElement("i", {
     style: {
@@ -61524,12 +61525,12 @@ function RdIssues({
     }
   }), ISS_PARTY_CAP[q]))))), list.map(row), tally && React.createElement("div", {
     className: "rd-is-row rd-is-tally",
-    "aria-label": "Issue-importance-weighted trust score: " + P.map(q => pName(q) + " " + Math.round(tally[q])).join(", ")
+    "aria-label": "Issue-importance-weighted trust score: " + pOrd.map(q => pName(q) + " " + Math.round(tally[q])).join(", ")
   }, React.createElement("span", {
     className: "rd-is-tallab"
   }, React.createElement("b", null, "Issue-importance-weighted trust score"), React.createElement("small", null, "Each issue counts in proportion to how many voters rank it in their top three")), React.createElement("span", {
     className: "rd-is-tallynums"
-  }, P.map(q => React.createElement("span", {
+  }, pOrd.map(q => React.createElement("span", {
     key: q,
     className: "rd-is-score",
     style: {

@@ -1771,7 +1771,7 @@ function RdIssues({ rangeId = "all" }) {
     return (
       <div key={x.id} className={"rd-is-row" + (sel ? " sel" : "")} role="button" tabIndex={0} aria-pressed={sel}
            onClick={() => setSel(x.id)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSel(x.id); } }}
-           aria-label={x.label + ": " + (x.imp ? Math.round(x.imp.v) + "% put it in their top three" : "not asked") + "; " + (x.own ? P.map((q) => pName(q) + " " + Math.round(x.own.v[q])).join(", ") + "; " + v.text : "no three-way figures")}>
+           aria-label={x.label + ": " + (x.imp ? Math.round(x.imp.v) + "% put it in their top three" : "not asked") + "; " + (x.own ? pOrd.map((q) => pName(q) + " " + Math.round(x.own.v[q])).join(", ") + "; " + v.text : "no three-way figures")}>
         <span className="rd-is-lab">{x.label}</span>
         <span className="rd-is-imp">{x.imp ? <><span className="rd-is-bar"><span style={{ width: x.imp.v + "%" }}></span></span><b>{Math.round(x.imp.v)}%</b><span className="rd-is-impw"> rank it top three</span></> : <span className="rd-is-na">not asked</span>}</span>
         <span className="rd-is-dots" aria-hidden="true">
@@ -1779,7 +1779,7 @@ function RdIssues({ rangeId = "all" }) {
           <span className="rd-is-third" style={{ left: dx(100 / 3) + "%" }}></span>
           {x.own && P.map((q) => <span key={q} className="rd-is-dot" style={{ left: dx(x.own.v[q]) + "%", top: "calc(50% + " + off[q] + "px)", background: pColor(q) }}></span>)}
         </span>
-        <span className="rd-is-nums">{x.own ? P.map((q) => <b key={q} style={{ color: inkOf(pColor(q)) }}>{Math.round(x.own.v[q])}</b>) : null}</span>
+        <span className="rd-is-nums">{x.own ? pOrd.map((q) => <b key={q} style={{ color: inkOf(pColor(q)) }}>{Math.round(x.own.v[q])}</b>) : null}</span>
         <span className={"rd-is-verdict" + (v && v.strong ? " strong" : "")} style={v && v.color ? { color: v.color } : undefined}>
           {v ? v.text : ""}{x.grnTop && <small>Greens first where offered</small>}</span>
       </div>
@@ -1798,6 +1798,10 @@ function RdIssues({ rangeId = "all" }) {
     if (!wsum) return null;
     return Object.fromEntries(P.map((q) => [q, rows.reduce((a, x) => a + x.imp.v * x.own.v[q], 0) / wsum]));
   })();
+  /* every three-party listing on the trust side (head legend, each row's
+     figures, the scoreboard chips) reads in scoreboard order, highest first;
+     the data arrays stay keyed to P, this is presentation only */
+  const pOrd = tally ? P.slice().sort((a, b) => tally[b] - tally[a]) : P;
 
   /* ---- what matters to whom ------------------------------------------------ */
   const G = I.groups;
@@ -1885,18 +1889,18 @@ function RdIssues({ rangeId = "all" }) {
                 <span className="rd-is-imph">In voters’ top three</span>
                 <span className="rd-is-dotsh">
                   <span className="rd-is-cap">Best on it, % of voters naming one of these three</span>
-                  <span className="rd-is-leg">{P.map((q) => <span key={q}><i style={{ background: pColor(q) }}></i>{ISS_PARTY_CAP[q]}</span>)}</span>
+                  <span className="rd-is-leg">{pOrd.map((q) => <span key={q}><i style={{ background: pColor(q) }}></i>{ISS_PARTY_CAP[q]}</span>)}</span>
                 </span>
               </div>
               {list.map(row)}
               {tally && (
                 <div className="rd-is-row rd-is-tally"
-                     aria-label={"Issue-importance-weighted trust score: " + P.map((q) => pName(q) + " " + Math.round(tally[q])).join(", ")}>
+                     aria-label={"Issue-importance-weighted trust score: " + pOrd.map((q) => pName(q) + " " + Math.round(tally[q])).join(", ")}>
                   <span className="rd-is-tallab">
                     <b>Issue-importance-weighted trust score</b>
                     <small>Each issue counts in proportion to how many voters rank it in their top three</small>
                   </span>
-                  <span className="rd-is-tallynums">{P.map((q) => (
+                  <span className="rd-is-tallynums">{pOrd.map((q) => (
                     <span key={q} className="rd-is-score" style={{ background: "color-mix(in oklab, " + pColor(q) + " 12%, transparent)" }}>
                       <b style={{ color: inkOf(pColor(q)) }}>{Math.round(tally[q])}</b>
                       <i style={{ color: inkOf(pColor(q)) }}>{ISS_PARTY_CAP[q]}</i>
