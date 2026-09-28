@@ -1143,7 +1143,7 @@ body.rd .rd-is-tallab small { display: block; max-width: 32em; margin-top: 3px; 
 body.rd .rd-is-tallynums { grid-column: 4 / span 2; display: flex; gap: 6px; }
 body.rd .rd-is-score { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 8px 5px 5px; border-radius: 8px; font-variant-numeric: tabular-nums; }
 body.rd .rd-is-score b { font-size: 24px; font-weight: 700; line-height: 1.15; }
-body.rd .rd-is-score i { font-style: normal; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+body.rd .rd-is-score i { font-style: normal; font-size: 10px; font-weight: 700; }
 body.rd .rd-is-lab { font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.25; }
 body.rd .rd-is-imp { display: flex; align-items: center; gap: 8px; }
 body.rd .rd-is-bar { flex: 0 0 60px; height: 8px; border-radius: 4px; background: var(--line-2); overflow: hidden; }
