@@ -120,6 +120,15 @@ extracted_at: '2026-09-26'
   `issTrendVerdict` = withinHouseSlope per party, Holm. Under the rows: the
   issue where the two salience houses' latest polls differ most (≥5
   points), then the Greens note.
+- With the redesign on (`window.AP.rd`), a11e1559 defers to `RdIssues`
+  (rd-panels.jsx ~:1617) and its head/dek come from `trustHead`/`trustDek`
+  (~:1700). `trustHead` stays data-driven; `trustDek` has been
+  HAND-CURATED since 2026-09-28 (the user's verbatim wording: "The cost of
+  living is by far the issue most important to voters… The Coalition
+  retains its age-old lead on economic management."), same convention as
+  RD_DEMO_HOME — every lead it names must be a currently-significant
+  pooled gap, refreshed by hand when the pool moves; it no longer
+  regenerates from the data.
 - "What matters to whom": table of top-three shares by group, sentences from
   `issGroupVerdict` (the vote-by-group test).
 - Layout keys off the panel's own width: two columns from 1080px of panel

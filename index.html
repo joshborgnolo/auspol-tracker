@@ -60848,24 +60848,7 @@ function RdIssues({
   const trTop = chTop && chTop.trend;
   const minor = trTop && trTop.up.length === 1 && trTop.up[0] === "onp" ? "onp" : null;
   const trustHead = !own ? rdCap(phrase.replace(/^the /, "")) + " tops voters’ concerns" : own.leadSig ? rdPartyStart(own.lead) + " is most trusted on " + phrase + ", voters’ top concern" : minor ? "One Nation has drawn level with the major parties on " + phrase : "No party is clearly trusted most on " + phrase + ", voters’ top concern";
-  const trustDek = (() => {
-    if (!top.imp) return null;
-    let s = plainShare(top.imp.v) + " voters put " + phrase + " among their three most important issues.";
-    if (own && minor && chTop.pts.length) {
-      const first = chTop.pts.find(d => d.ym >= trTop.ym) || chTop.pts[0];
-      s += " " + rdCap(rdShareWords(own.v.onp / 100)) + " of those naming Labor, the Coalition or One Nation as best on it now pick One Nation, up from " + rdShareWords(first.onp / 100) + " in " + D.monthNameFull(+first.ym.slice(5)) + (own.leadSig ? "." : ", and none of the three is clearly ahead.");
-    } else if (own && !own.leadSig) s += " None of the three parties is clearly more trusted with it than the others.";
-    const leads = {};
-    list.filter(x => x.own && x.own.leadSig).forEach(x => {
-      (leads[x.own.lead] = leads[x.own.lead] || []).push(ISS_PHRASE[x.id] || x.label.toLowerCase());
-    });
-    const order = Object.keys(leads).sort((a, b) => leads[b].length - leads[a].length);
-    if (order.length) {
-      const bits = order.map((q, i) => (i === 0 ? rdPartyStart(q) + " leads on " : rdPartyIn(q) + (leads[q].length === 1 && order.length > 1 && leads[order[0]].length > 1 ? " only" : "") + " on ") + rdList(leads[q]));
-      s += " " + (bits.length === 1 ? bits[0] : bits.slice(0, -1).join(", ") + ", and " + bits[bits.length - 1]) + ".";
-    }
-    return s;
-  })();
+  const trustDek = !top.imp ? null : "The cost of living is by far the issue most important to voters, but neither party is more trusted on it than the other. " + "Labor leads on housing, health, and climate change, while One Nation leads on crime and immigration. " + "The Coalition retains its age-old lead on economic management.";
   const dotLo = 20,
     dotHi = 50;
   const dx = v => (Math.max(dotLo, Math.min(dotHi, v)) - dotLo) / (dotHi - dotLo) * 100;
