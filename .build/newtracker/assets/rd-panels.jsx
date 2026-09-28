@@ -1811,9 +1811,9 @@ function RdIssues({ rangeId = "all" }) {
           <RdHed head={trustHead} dek={trustDek} />
           <div className="rd-is-grid">
             <div className="rd-is-left">
-              {/* The strip's words run from the strip across the columns to its
-                  right, the key under them, so neither runs back over "In
-                  voters' top three" when a laptop's strip is narrow. */}
+              {/* Each head sits over its own column: the strip's words over the
+                  strip, the key over the three figures it colours (a phone stacks
+                  the words and the key over the scale). */}
               <div className="rd-is-head" aria-hidden="true">
                 <span></span>
                 <span className="rd-is-imph">In voters’ top three</span>

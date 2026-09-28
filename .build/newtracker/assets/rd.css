@@ -1022,13 +1022,13 @@ body.rd .rd-is-head, body.rd .rd-is-row, body.rd .rd-is-axis {
   display: grid; grid-template-columns: 150px 104px minmax(0, 1fr) 88px 120px; column-gap: 10px; align-items: center;
 }
 body.rd .rd-is-head { font-size: 12px; color: var(--ink-3); align-items: end; min-height: 40px; padding: 0 12px 6px; }
-body.rd .rd-is-imph { white-space: nowrap; }
-/* the strip's words start over the strip and run on over the figures and the
-   verdict, the key under them - centred on a laptop's narrow strip, they ran
-   back over "In voters' top three" */
-body.rd .rd-is-dotsh { grid-column: 3 / span 3; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
-body.rd .rd-is-cap { white-space: nowrap; }
-body.rd .rd-is-leg { display: flex; gap: 12px; white-space: nowrap; }
+body.rd .rd-is-imph { line-height: 1.3; text-wrap: balance; }
+/* each head over its own column, on one line: the strip's words over the
+   strip (wrapping in it, not running on), the key over the three figures it
+   colours - on the key's line, "In voters' top three" read as a fourth key */
+body.rd .rd-is-dotsh { display: contents; }
+body.rd .rd-is-cap { grid-column: 3; line-height: 1.3; text-wrap: balance; }
+body.rd .rd-is-leg { grid-column: 4 / span 2; display: flex; gap: 10px; white-space: nowrap; }
 body.rd .rd-is-leg i { display: inline-block; width: 8px; height: 8px; border-radius: 4px; margin-right: 5px; }
 body.rd .rd-is-row { min-height: 52px; padding: 0 12px; border-bottom: 1px solid var(--line); cursor: pointer; font-variant-numeric: tabular-nums; border-left: 3px solid transparent; }
 body.rd .rd-is-row:hover { background: var(--surface-2); }
@@ -1144,7 +1144,6 @@ body.rd .rd-iw-keybar i { position: absolute; right: -3px; top: -3px; bottom: -3
 @media (max-width: 900px) {
   body.rd .rd-is-head, body.rd .rd-is-row, body.rd .rd-is-axis { grid-template-columns: 120px 96px minmax(0, 1fr) 88px 104px; column-gap: 10px; }
   body.rd .rd-is-bar { flex-basis: 40px; }
-  body.rd .rd-is-cap { white-space: normal; line-height: 1.3; }
   body.rd .rd-is-leg { gap: 8px; }
   body.rd .rd-un-long { display: none; }
 }
@@ -1156,7 +1155,7 @@ body.rd .rd-is-impw { display: none; }
   body.rd .rd-is-left { display: flex; flex-direction: column; }
   body.rd .rd-is-head { display: flex; flex-direction: column; align-items: flex-start; order: -2; min-height: 0; padding: 0 0 6px; }
   body.rd .rd-is-head > span:not(.rd-is-dotsh) { display: none; }
-  body.rd .rd-is-dotsh { grid-column: auto; }
+  body.rd .rd-is-dotsh { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
   body.rd .rd-is-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "lab imp" "dots dots" "nums verdict"; row-gap: 6px; padding: 10px 8px; min-height: 0; }
   body.rd .rd-is-lab { grid-area: lab; }
   body.rd .rd-is-verdict { grid-area: verdict; text-align: right; font-size: 13px; }
