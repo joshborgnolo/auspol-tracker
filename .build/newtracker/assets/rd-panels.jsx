@@ -982,6 +982,15 @@ const RD_DEMO_SHORT = {
   "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
   "English only": "English-only speakers", "Other language": "voters who speak another language at home",
 };
+/* one constant headline per switcher party, hand-curated against the pooled
+   significances — every trait listed is a significant gap in the current
+   pool, so refresh these by hand when the pool moves, as with RD_DEMO_SHORT */
+const RD_DEMO_HOME = {
+  onp: "One Nation voters are more likely to be 55+, TAFE- or trade-qualified, English-only-speaking, rural, and non-Victorian",
+  alp: "Labor voters are more likely to be under 55, university-educated, and inner-metro",
+  lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
+  grn: "Greens voters are more likely to be 18–34, women, and renters",
+};
 /* the state panels' titles, as the board wrote them */
 const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };
 const RD_DEMO_NOUN = { age: "age", gender: "gender", education: "education" };
@@ -1019,13 +1028,13 @@ function RdDemographics({ rangeId = "all" }) {
   const st0 = tab.sets[0];
   const verdict = demoVerdict(st0, party) || "";
   const story = (() => {
-    let head;
+    let finding;
     const m = /^Support for .* (rises|falls) significantly (.*)\.$/.exec(verdict);
-    if (m && st0.id === "age") head = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with age";
-    else if (m && st0.id === "generation") head = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";
-    else if (m && st0.id === "location") head = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";
-    else if (/no significant difference/.test(verdict)) head = pName + "’s vote is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");
-    else head = verdict.replace(/ significantly/, "").replace(/\.$/, "");
+    if (m && st0.id === "age") finding = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with age";
+    else if (m && st0.id === "generation") finding = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";
+    else if (m && st0.id === "location") finding = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";
+    else if (/no significant difference/.test(verdict)) finding = pName + "’s vote is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");
+    else finding = verdict.replace(/ significantly/, "").replace(/\.$/, "");
     const gs = st0.groups.filter((g) => g.v[party] != null);
     const byV = gs.slice().sort((a, b) => b.v[party] - a.v[party]);
     const top = byV[0], bot = byV[byV.length - 1];
@@ -1039,7 +1048,11 @@ function RdDemographics({ rangeId = "all" }) {
         .sort((a, b) => Math.abs(b.d) - Math.abs(a.d))[0];
       if (out && out.sig) dek += " " + rdCap(short(out.g)) + " " + (/s$/.test(short(out.g)) && !/^Gen/.test(out.g.label) ? "are" : "is") + " the outlier, at " + rdFraction(out.g.v[party]) + ".";
     }
-    return { head, dek };
+    /* the headline stays put as the grouping tab flips: the per-grouping
+       finding leads the dek instead, the figures sentences after it */
+    const home = RD_DEMO_HOME[party];
+    if (home) dek = dek ? finding + ". " + dek : finding + ".";
+    return { head: home || finding, dek };
   })();
 
   /* ---- the dot plot, every set on one scale -------------------------------- */
