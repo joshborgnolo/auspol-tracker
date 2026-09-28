@@ -29,7 +29,32 @@ function RdSec({ id, cls, first, title, meta, tools, children, labelledBy, facet
 /* A section's finding is written from the data on show, so a switch can
    rewrite it - a line longer or shorter - and it glides to its new height
    rather than moving the section under it in one frame (RdGlide). */
-const rdWords = (v) => (v == null || typeof v === "string" || typeof v === "number" ? String(v) : undefined);
+/* What a block's words are made of, as a key for RdGlide's `watch`: its text,
+   read through any elements it is written with, and their plain props (a
+   RollNum's value). A block keyed this way reads no layout on a render that
+   left its words alone, which is every frame of a chart's morph; one it
+   cannot key (undefined) is measured on every render - a forced layout a
+   frame, which footers written with a link or a figure in them used to cost. */
+const rdWords = (v) => {
+  if (v == null || typeof v === "boolean") return "";
+  if (typeof v === "string" || typeof v === "number") return String(v);
+  if (Array.isArray(v)) {
+    let s = "";
+    for (const x of v) { const w = rdWords(x); if (w === undefined) return undefined; s += w; }
+    return s;
+  }
+  if (typeof v === "object" && v.props) {
+    const t = v.type;
+    let s = "<" + (typeof t === "string" ? t : (t && (t.displayName || t.name)) || "?");
+    for (const k in v.props) {
+      const p = v.props[k];
+      if (k !== "children" && (typeof p === "string" || typeof p === "number")) s += " " + k + "=" + p;
+    }
+    const c = rdWords(v.props.children);
+    return c === undefined ? undefined : s + ">" + c + "</>";
+  }
+  return undefined;
+};
 function RdHed({ head, dek, level = 3 }) {
   const H = "h" + level;
   const w0 = rdWords(head), w1 = rdWords(dek);

@@ -417,7 +417,7 @@ function RdHero(p) {
         {/* a phone has no room for the way back on the line itself, so it
             opens a line of its own, gliding (RdGlide) */}
         {narrow && (
-          <RdGlide className="rd-tpp-back">
+          <RdGlide className="rd-tpp-back" watch={hasBases && !onImp ? "back" : ""}>
             {hasBases && !onImp ? <button type="button" className="rd-link" onClick={chooseBasis}>Back to implied flows</button> : null}
           </RdGlide>
         )}
