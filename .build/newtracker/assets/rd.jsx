@@ -490,6 +490,7 @@ function RdTerm({ id, from, children, title }) {
 function RdQPop({ label, children, align }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef(null);
+  const panel = React.useRef(null);
   window.useDismissOutside(ref, open, () => setOpen(false));
   React.useEffect(() => {
     if (!open) return undefined;
@@ -497,11 +498,24 @@ function RdQPop({ label, children, align }) {
     document.addEventListener("keydown", esc);
     return () => document.removeEventListener("keydown", esc);
   }, [open]);
+  /* the "?" can sit near either screen edge; nudge an overhanging panel
+     back inside the same 8px page gutter the archive's tooltips keep */
+  React.useLayoutEffect(() => {
+    const el = panel.current;
+    if (!open || !el) return undefined;
+    el.style.translate = "";
+    const r = el.getBoundingClientRect();
+    let dx = 0;
+    if (r.right > window.innerWidth - 8) dx = window.innerWidth - 8 - r.right;
+    if (r.left + dx < 8) dx += 8 - (r.left + dx);
+    if (dx) el.style.translate = dx + "px 0";
+    return undefined;
+  }, [open]);
   return (
     <span className="rd-qpop" ref={ref}>
       <button type="button" className="rd-qbtn" aria-label={label} aria-expanded={open}
               onClick={() => setOpen((o) => !o)}><span>?</span></button>
-      {open && <div className={"rd-qpanel" + (align ? " " + align : "")} role="dialog" aria-label={label}>{children}</div>}
+      {open && <div ref={panel} className={"rd-qpanel" + (align ? " " + align : "")} role="dialog" aria-label={label}>{children}</div>}
     </span>
   );
 }

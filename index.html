@@ -57566,6 +57566,7 @@ function RdQPop({
 }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef(null);
+  const panel = React.useRef(null);
   window.useDismissOutside(ref, open, () => setOpen(false));
   React.useEffect(() => {
     if (!open) return undefined;
@@ -57574,6 +57575,17 @@ function RdQPop({
     };
     document.addEventListener("keydown", esc);
     return () => document.removeEventListener("keydown", esc);
+  }, [open]);
+  React.useLayoutEffect(() => {
+    const el = panel.current;
+    if (!open || !el) return undefined;
+    el.style.translate = "";
+    const r = el.getBoundingClientRect();
+    let dx = 0;
+    if (r.right > window.innerWidth - 8) dx = window.innerWidth - 8 - r.right;
+    if (r.left + dx < 8) dx += 8 - (r.left + dx);
+    if (dx) el.style.translate = dx + "px 0";
+    return undefined;
   }, [open]);
   return React.createElement("span", {
     className: "rd-qpop",
@@ -57585,6 +57597,7 @@ function RdQPop({
     "aria-expanded": open,
     onClick: () => setOpen(o => !o)
   }, React.createElement("span", null, "?")), open && React.createElement("div", {
+    ref: panel,
     className: "rd-qpanel" + (align ? " " + align : ""),
     role: "dialog",
     "aria-label": label
@@ -57815,7 +57828,8 @@ function RdHero(p) {
   const otherSays = other && other.a != null ? other.a >= other.b ? m.a.name + " ahead " + other.a.toFixed(1) + "–" + other.b.toFixed(1) : m.b.name + " ahead " + other.b.toFixed(1) + "–" + other.a.toFixed(1) : null;
   const howCounted = !hasBases ? "The pollsters’ own head-to-head figures, averaged. Too few pollsters ask this pairing for it to be weighted or corrected for each one’s lean." : !onImp ? "The pollsters’ own two-party figures, from where their respondents say their preferences would go, weighted towards the most recent and adjusted for each pollster’s lean. The ± is the 95% margin." : matchup === "alp_on" ? "Each poll’s primary votes, run through preference flows taken from counted ballots. No federal election has counted Labor against One Nation, so for that pairing the site builds the flows itself, and the ± is the doubt about them." : "Each poll’s primary votes, run through the preference flows counted at the 2025 election. The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error.";
   const qPanel = React.createElement(RdQPop, {
-    label: "How this is counted, and the pollsters\u2019 published figures"
+    label: "How this is counted, and the pollsters\u2019 published figures",
+    align: "left"
   }, React.createElement("h4", null, "How this is counted"), React.createElement("p", null, howCounted), hasBases && React.createElement(React.Fragment, null, React.createElement("div", {
     className: "rd-qrow"
   }, React.createElement("span", null, "Show the pollsters\u2019 published figures"), React.createElement(RdSwitch, {
@@ -58079,7 +58093,7 @@ function RdHero(p) {
     const head = Math.abs(gap) < 1 ? "One Nation now runs Labor as close as the Coalition does" : gap < 0 ? "One Nation now runs Labor closer than the Coalition does" : "The Coalition still runs Labor closer than One Nation does";
     const verb = (a, b) => b < a ? "fallen" : "risen";
     const pc = v => Math.round(v) + "%";
-    let dek = "Labor’s 2PP against One Nation has " + verb(on0, on1) + " from " + pc(on0) + " in " + rdMonthYear(f.ym) + " to " + pc(on1) + "; against the Coalition, " + (Math.round(co0) === Math.round(co1) ? "it has held near " + pc(co1) : "from " + pc(co0) + " to " + pc(co1)) + ".";
+    let dek = "Labor’s 2PP against One Nation has " + verb(on0, on1) + " from " + pc(on0) + " in " + rdMonthYear(f.ym) + " to " + pc(on1) + " now; against the Coalition, " + (Math.round(co0) === Math.round(co1) ? "it has held near " + pc(co1) : "from " + pc(co0) + " to " + pc(co1)) + ".";
     let k = both.length - 1,
       worst = Math.abs(gap);
     while (k > 0) {

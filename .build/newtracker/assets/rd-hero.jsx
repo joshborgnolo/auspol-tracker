@@ -132,7 +132,7 @@ function RdHero(p) {
         ? "Each poll’s primary votes, run through preference flows taken from counted ballots. No federal election has counted Labor against One Nation, so for that pairing the site builds the flows itself, and the ± is the doubt about them."
         : "Each poll’s primary votes, run through the preference flows counted at the 2025 election. The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error.";
   const qPanel = (
-    <RdQPop label="How this is counted, and the pollsters’ published figures">
+    <RdQPop label="How this is counted, and the pollsters’ published figures" align="left">
       <h4>How this is counted</h4>
       <p>{howCounted}</p>
       {hasBases && (
@@ -329,7 +329,7 @@ function RdHero(p) {
     const verb = (a, b) => (b < a ? "fallen" : "risen");
     const pc = (v) => Math.round(v) + "%";
     let dek = "Labor’s 2PP against One Nation has " + verb(on0, on1) + " from " + pc(on0) + " in " + rdMonthYear(f.ym)
-      + " to " + pc(on1) + "; against the Coalition, " + (Math.round(co0) === Math.round(co1) ? "it has held near " + pc(co1) : "from " + pc(co0) + " to " + pc(co1)) + ".";
+      + " to " + pc(on1) + " now; against the Coalition, " + (Math.round(co0) === Math.round(co1) ? "it has held near " + pc(co1) : "from " + pc(co0) + " to " + pc(co1)) + ".";
     /* the longest recent run the two have stayed close */
     let k = both.length - 1, worst = Math.abs(gap);
     while (k > 0) {
