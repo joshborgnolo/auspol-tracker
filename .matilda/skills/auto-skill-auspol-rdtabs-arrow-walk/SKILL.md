@@ -58,6 +58,38 @@ rd-dis-tabs/rd-hl-tabs rows incidentally.
 A newly hand-rolled tab row gets the walk by adding the same one-line prop;
 check it renders buttons in the same order as the array passed.
 
+## Beyond tab rows (5219307, 2026-09-29)
+
+Two more walk families ride the same ideas:
+
+- **Poll-row Up/Down walk** — every expandable table row is `tabIndex={0}`
+  (divs click-focus in every browser, so no rdTabFocus needed) with a
+  `rowNav` keydown: Enter/Space toggles the row, ArrowDown/Up moves focus
+  to the row above/below and, if the row being left was open, moves the
+  `open` state too — the expanded poll travels with the focus. Clamped;
+  `if (e.target !== e.currentTarget) return` keeps nested links/buttons
+  native. Three homes: Latest table `.rd-pl-item > .rd-pl-row`
+  (rd-polls.jsx, identity = pollster name, order array `sorted`, needed a
+  new `plRef` on `.rd-pl`), All-polls desktop `.rd-ap-row` and phone
+  `.rd-ap-card` (rd-allpolls.jsx, identity = `rowKey(p)`, order array
+  `visRows` = ONLY the rendered page of rows, so clamping happens at the
+  "Show earlier months" boundary, reuses the existing `bodyRef`).
+  Focus ring: one `:focus-visible` rule per row class in rd.css (accent
+  2px outline inset -2px), mirroring `.rd-is-row:focus-visible`. Probe
+  gotcha: a probe that clicks a row must expect the click to OPEN it —
+  click is the row's toggle.
+- **Page-level Left/Right walk** — beside the phone swipe effect in the
+  header layer (73de0c58, `swipeRef`): a document keydown that only fires
+  when EVERY out holds — no modifiers, `defaultPrevented` clear,
+  `document.activeElement` is body/html, no `.rd-qpanel`/`.term-pop` open,
+  text selection collapsed — then walks `TABS` ids through `goTab`,
+  clamped. The navbar's own `Tabs.onTabKeyDown` covers the focused-tab
+  case, so the focused-control bail is correct everywhere else.
+
+Probe: `.matilda/probe-pollrows-keys.mjs` walks both tables (incl. phone
+cards at 480px) and the page walk incl. clamp + meta+arrow no-op.
+`.matilda/` is gitignored — probes stay local.
+
 ## Probe: .matilda/probe-rdtabs-keys.mjs
 
 Walks all ten rows at 1440px plus the whom chip row at 900px: focuses each
