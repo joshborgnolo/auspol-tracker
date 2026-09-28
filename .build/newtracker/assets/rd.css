@@ -522,7 +522,10 @@ body.rd .rd-lg-tied { font-weight: 600; color: var(--ink-2); }
 }
 body.rd .rd-sens { opacity: 0.1; }
 
-@media (max-width: 640px) {
+/* a touch over the phone rung the row of odometer figure and party name still
+   noses past the right edge (an "One Nation" name plus its four-column figure
+   is wider than the track it shares) - the phone's stacked layout reaches up */
+@media (max-width: 700px) {
   body.rd .rd-tpp-top { margin-top: 18px; }
   body.rd .rd-tpp-read { column-gap: 16px; }
   body.rd .rd-tpp-side { flex-direction: column; gap: 4px; }
@@ -1065,6 +1068,12 @@ body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
   /* the four party chips share one row, as drawn */
   body.rd .rd-chips-row { display: flex; flex-wrap: nowrap; gap: 6px; }
   body.rd .rd-chips-row .rd-chip { flex: 1 1 auto; justify-content: center; min-height: 44px; padding: 0 8px; gap: 5px; font-size: 13px; }
+}
+/* the narrowest phones keep the chips' one row by shaving type and padding
+   rather than wrapping */
+@media (max-width: 360px) {
+  body.rd .rd-chips-row { gap: 4px; }
+  body.rd .rd-chips-row .rd-chip { padding: 0 5px; gap: 4px; font-size: 12px; }
 }
 
 /* ---------- where One Nation's voters came from ------------------------------ */

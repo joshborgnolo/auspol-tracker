@@ -3364,7 +3364,7 @@ body.rd .rd-lg-tied { font-weight: 600; color: var(--ink-2); }
   body.rd .rd-lg-span, body.rd .rd-lg-cap, body.rd .rd-lg-dot, body.rd .rd-tpp-dot { transition: none; }
 }
 body.rd .rd-sens { opacity: 0.1; }
-@media (max-width: 640px) {
+@media (max-width: 700px) {
   body.rd .rd-tpp-top { margin-top: 18px; }
   body.rd .rd-tpp-read { column-gap: 16px; }
   body.rd .rd-tpp-side { flex-direction: column; gap: 4px; }
@@ -3800,6 +3800,10 @@ body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
   body.rd .rd-wv-charts { flex-direction: column; gap: 28px; }
   body.rd .rd-chips-row { display: flex; flex-wrap: nowrap; gap: 6px; }
   body.rd .rd-chips-row .rd-chip { flex: 1 1 auto; justify-content: center; min-height: 44px; padding: 0 8px; gap: 5px; font-size: 13px; }
+}
+@media (max-width: 360px) {
+  body.rd .rd-chips-row { gap: 4px; }
+  body.rd .rd-chips-row .rd-chip { padding: 0 5px; gap: 4px; font-size: 12px; }
 }
 body.rd .rd-mo-wrap { margin-top: 36px; }
 body.rd .rd-mo { display: block; overflow: visible; font-variant-numeric: tabular-nums; }
