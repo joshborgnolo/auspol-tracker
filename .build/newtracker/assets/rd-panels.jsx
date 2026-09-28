@@ -987,7 +987,7 @@ const RD_DEMO_SHORT = {
    pool, so refresh these by hand when the pool moves, as with RD_DEMO_SHORT */
 const RD_DEMO_HOME = {
   onp: "One Nation voters are more likely to be 55+, TAFE- or trade-qualified, English-only-speaking, rural, and non-Victorian",
-  alp: "Labor voters are more likely to be under 55, university-educated, and inner-metro",
+  alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial",
   lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
   grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
 };

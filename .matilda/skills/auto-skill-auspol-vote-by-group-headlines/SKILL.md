@@ -1,6 +1,6 @@
 ---
 name: auspol-vote-by-group-headlines
-description: auspol-tracker — the "Who votes for whom" panel headline is now a CONSTANT per party (RD_DEMO_HOME in rd-panels.jsx, right after RD_DEMO_SHORT, shipped 0d91b2e on 2026-09-28; grn line amended same day to add "from cities"): one hand-curated sentence per switcher party ("One Nation voters are more likely to be …"), refreshed BY HAND from the current pooled significances; the per-grouping finding sentence that used to BE the headline now leads the dek ahead of the top/bottom figures. Switcher DEMO_PARTIES = four chips (onp/alp/lnp/grn, no oth). Curate against window.AUSPOL.demographics with the panel's own simple |g.v − all| > g.ci margin test (NOT demoVerdict's Holm correction). ONP line is user-verbatim ("55+, TAFE- or trade-qualified, English-only-speaking, rural, and non-Victorian") — "English-only" kept per user override. KNOWN UNRESOLVED TRAP: the dek's top/bottom figures sentence snaps each group's share independently via rdFraction and can DISPLAY a far wider gap than a non-significant pool has (ONP gender case: true 2.0pt gap rendered "about three in ten … against one in four"). Regression probe .matilda/demo-head-probe.mjs (gitignored).
+description: auspol-tracker — the "Who votes for whom" panel headline is now a CONSTANT per party (RD_DEMO_HOME in rd-panels.jsx, right after RD_DEMO_SHORT, shipped 0d91b2e on 2026-09-28; grn and alp lines amended same day to an "urban or provincial" non-rural trait): one hand-curated sentence per switcher party ("One Nation voters are more likely to be …"), refreshed BY HAND from the current pooled significances; the per-grouping finding sentence that used to BE the headline now leads the dek ahead of the two-form figures sentence (contrast when a split is significant, ONE shared fraction when not — shipped e87f1f9 after the ONP gender trap, where independent rdFraction snaps drew a 2.0pt pool as a 5-point "about three in ten … against one in four" gap). Switcher DEMO_PARTIES = four chips (onp/alp/lnp/grn, no oth). Curate against window.AUSPOL.demographics with the panel's own simple |g.v − all| > g.ci margin test (NOT demoVerdict's Holm correction). ONP line is user-verbatim ("55+, TAFE- or trade-qualified, English-only-speaking, rural, and non-Victorian") — "English-only" kept per user override. Regression probe .matilda/demo-head-probe.mjs (gitignored).
 source: auto-skill
 extracted_at: '2026-09-28T07:14:51.777Z'
 ---
@@ -78,8 +78,13 @@ The 0d91b2e set and its significance basis (all-voters in parens):
   · non-Victorian (Vic −3.1, the only sig-below state; Qld-vs-NSW is
   inside subgroup noise — Qld leads in only 14/25 waves, mean edge
   0.7pt ≪ ±3–4.5).
-- alp (26.8): 55+ −5.0 → "under 55" · University +3.8 · inner metro
-  +4.0. True but unused: Rest-of-Australia +4.7, rural −10.6.
+- alp (26.8): 55+ −5.0 → "under 55" · University +3.8 · urban-or-
+  provincial — all three non-rural groups sit above the anchor (inner
+  metro +4.0 SIG, outer metro +1.6, provincial +3.1) and rural is
+  −10.6 SIG below, the same non-rural inversion as grn; the wording
+  was extended from the grn line at the user's direction 2026-09-28,
+  replacing the "inner-metro" trait the inner-metro +4.0 alone
+  supported. True but unused: Rest-of-Australia +4.7 (SIG).
 - lnp (21.3): 55+ +4.2 · University +4.3 · inner metro +4.5 · own
   outright +8.1.
 - grn (13.2): 18–34 +12.5 · women +1.7 · renting +5.1 · urban-or-
@@ -97,20 +102,21 @@ user chose hand-written lines. If the pooled significances shift
 enough that a listed trait goes non-significant, rewrite the line in
 this map and nowhere else; the commit should cite the new pool.
 
-## The dek's figures sentence can outrun the finding (flagged 2026-09-28, UNRESOLVED)
+## The dek's figures sentence could outrun the finding (flagged and fixed 2026-09-28, e87f1f9)
 
-The dek's top/bottom figures sentence is emitted for EVERY grouping
-tab — even one whose finding is "no significant difference" — and
-quotes each extreme group's share via rdFraction (rd.jsx ~:157), which
-snaps each value INDEPENDENTLY to the nearest candidate fraction from
-a fixed list. When the two snaps diverge, the displayed gap far
-exceeds the pool. Worked case, ONP gender tab: men 28.1±1.7 vs women
-26.1±1.6 (all-voters 27.3; true gap 2.0pt; demoVerdict's pair test
-z≈1.68, p≈0.09 → "One Nation's vote is much the same across men and
-women") — yet the dek's second sentence read "About three in ten men
-back One Nation, against one in four women", a 5-POINT display gap
-flatly contradicting the finding above it. Two rdFraction mechanics to
-know before trusting such a sentence:
+Pre-e87f1f9 the dek's top/bottom figures sentence was emitted for
+EVERY grouping tab — even one whose finding was "no significant
+difference" — quoting each extreme group's share via rdFraction
+(rd.jsx ~:157), which snaps each value INDEPENDENTLY to the nearest
+candidate fraction from a fixed list. When the two snaps diverged, the
+displayed gap far exceeded the pool. Worked case, ONP gender tab: men
+28.1±1.7 vs women 26.1±1.6 (all-voters 27.3; true gap 2.0pt;
+demoVerdict's pair test z≈1.68, p≈0.09 → "One Nation's vote is much
+the same across men and women") — yet the dek's second sentence read
+"About three in ten men back One Nation, against one in four women", a
+5-POINT display gap flatly contradicting the finding above it. Two
+rdFraction mechanics to know before trusting the contrast form (still
+the emitted form on sets WITH a significant split):
 
 1. each group snaps independently, so rounding errors stack in
    opposite directions (28.1 snapped UP to 3/10, 26.1 DOWN to 1/4);
@@ -120,11 +126,11 @@ know before trusting such a sentence:
 
 demoVerdict for reference (a11e1559 asset, demoVerdict): z =
 1.96·(vₐ−v_b)/hypot(ciₐ,ci_b) per pair, Holm-corrected across all
-N(N−1)/2 pairs. Two fixes were offered to the user — quote the SHARED
-fraction for the no-difference case ("About one in four of both men
-and women …"), or suppress the figures sentence there — decision
-pending. If either ships, UPDATE this section and check the regression
-probe's dek-shape assertions still hold.
+N(N−1)/2 pairs. The shipped fix (e87f1f9, the user picked the first of
+the two offered): the no-difference figures sentence quotes ONE SHARED
+fraction for the whole set — "About one in four men and women alike
+back One Nation." See the "TWO forms" bullet in Machinery for the
+resulting wording rules.
 
 ## Regression probe
 
