@@ -613,10 +613,25 @@ window.AP = (function () {
       if (n === 2) return ys[0] + (ys[1] - ys[0]) * u;
       if (m) return (2 * u3 - 3 * u2 + 1) * ys[i] + (u3 - 2 * u2 + u) * h * m[i]
         + (-2 * u3 + 3 * u2) * ys[i + 1] + (u3 - u2) * h * m[i + 1];
-      // the old design's Catmull-Rom spline (charts' smoothPath), months evenly spaced
+      /* The old design's Catmull-Rom spline (charts' smoothPath) is a Bezier
+         in x as well as y, and x runs evenly along it only where the months
+         either side are evenly spaced - not at a line's two ends, nor across
+         a month a question skipped. So the point on the curve AT x is found
+         first (x rises along the segment, so halving the interval finds it),
+         and y read there: taking u as the fraction of the way across put the
+         in-between readings off the drawn line, and a leader's lines and
+         bands shifted a few pixels as the switch landed. */
       const y0 = ys[i - 1] != null ? ys[i - 1] : ys[i], y3 = ys[i + 2] != null ? ys[i + 2] : ys[i + 1];
-      const c1 = ys[i] + (ys[i + 1] - y0) / 6, c2 = ys[i + 1] - (y3 - ys[i]) / 6, v = 1 - u;
-      return v * v * v * ys[i] + 3 * v * v * u * c1 + 3 * v * u * u * c2 + u3 * ys[i + 1];
+      const x0 = xs[i - 1] != null ? xs[i - 1] : xs[i], x3 = xs[i + 2] != null ? xs[i + 2] : xs[i + 1];
+      const c1 = ys[i] + (ys[i + 1] - y0) / 6, c2 = ys[i + 1] - (y3 - ys[i]) / 6;
+      const k1 = xs[i] + (xs[i + 1] - x0) / 6, k2 = xs[i + 1] - (x3 - xs[i]) / 6;
+      const bez = (a, b, c, d, w) => { const q = 1 - w; return q * q * q * a + 3 * q * q * w * b + 3 * q * w * w * c + w * w * w * d; };
+      let lo = 0, hi = 1, w = u;
+      for (let it = 0; it < 30; it++) {
+        if (bez(xs[i], k1, k2, xs[i + 1], w) < x) lo = w; else hi = w;
+        w = (lo + hi) / 2;
+      }
+      return bez(ys[i], c1, c2, ys[i + 1], w);
     };
   };
 

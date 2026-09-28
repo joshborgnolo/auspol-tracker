@@ -754,10 +754,12 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
       }).filter((d) => d.pts.length);
   /* Each line's 95% interval (gen-data's *_pref*Ci: the houses' spread or
      the sampling floor, whichever is wider), travelling with its line. A
-     line being rubbed out on a switch takes its band with it rather than
-     leaving it behind. */
-  const ciAreas = drawRows.filter((d) => d.wipe == null).map((d) => ({
+     line being rubbed out on a switch takes its band with it under the same
+     mask (wipeOf) - dropped for the switch instead, a line's band blinked
+     out on the first frame, or in on the last, 47px of band at once. */
+  const ciAreas = drawRows.map((d) => ({
     id: "ci-" + (d.era ? d.r.mk + "-" + d.era : d.r.mk), color: d.r.L.color, className: "ci-band", edge: false, smooth: true,
+    wipeOf: d.wipe != null ? (d.era ? d.r.mk + "-" + d.era : d.r.mk) : undefined,
     clipX: d.clip, points: d.pts.filter((p) => p.ci != null).map((p) => ({ x: p.x, y0: p.v - p.ci, y1: p.v + p.ci })),
   })).filter((a) => a.points.length >= 2);
 

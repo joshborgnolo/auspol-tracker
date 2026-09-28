@@ -1076,25 +1076,26 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
     // pins from/to to their own bases while from/to matchup ids coincide
     const A = ptsOf(morph.from, morph.fromBasis), B = ptsOf(morph.to, morph.toBasis);
     if (!A.length || !B.length) return null;
-    const t = morph.t, lerp = (p, q) => p + (q - p) * t;
-    const index = (arr) => { const o = {}; arr.forEach((d) => (o[d.ym] = d)); return o; };
-    const ia = index(A), ib = index(B);
-    const hold = (idx, arr, ym) => idx[ym] || (ym < arr[0].ym ? arr[0] : arr[arr.length - 1]);
-    const yms = [...new Set(A.concat(B).map((d) => d.ym))].sort();
+    const t = morph.t;
+    /* The shared blend (AP.blendRows), as the redesign's hero uses: both
+       lines read off the curves they are drawn with between the months, and
+       the interval as a soft key with its own edges, so the band grows from
+       or closes onto its line where one side has none. Held month by month
+       here, a gap month bent the line and a month one side had no interval
+       for dropped its band piece, and the switch landed with a 15px jump. */
+    const bl = window.AP.blendRows(A, B, t, ["a", "b", "ci95"]);
+    if (!bl) return null;
     return {
-      pts: yms.map((ym) => {
-        const da = hold(ia, A, ym), db = hold(ib, B, ym);
-        return { ym, x: (ia[ym] || ib[ym]).x, a: lerp(da.a, db.a), b: lerp(da.b, db.b),
-                 // a ribbon that vanished mid-morph would read as the switch
-                 // having made the estimate certain for 320ms
-                 ci95: (da.ci95 == null || db.ci95 == null) ? null : lerp(da.ci95, db.ci95) };
-      }),
-      clip: [lerp(A[0].x, B[0].x), lerp(A[A.length - 1].x, B[B.length - 1].x)],
+      pts: bl.rows,
+      clip: bl.clip,
       a: mixC(MATCHUPS[morph.from].a.color, MATCHUPS[morph.to].a.color, t),
       b: mixC(MATCHUPS[morph.from].b.color, MATCHUPS[morph.to].b.color, t),
     };
   })();
-  const drawPts = blend ? blend.pts : pts;
+  /* mid-switch the blend carries readings between the months (`mid`), drawn
+     for the curve; the spine and the readout go by whole months */
+  const drawRows = blend ? blend.pts : pts;
+  const drawPts = blend ? blend.pts.filter((d) => !d.mid) : pts;
   const colA = blend ? blend.a : m.a.color;
   const colB = blend ? blend.b : m.b.color;
   // Headline readout: for the REAL ALP v L/NP measure this is the trailing
@@ -1190,8 +1191,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   // really noise. Where the series is too thin to weight, plot the readings
   // only and let the reader see the scatter for what it is.
   const heroSeries = !adjusted ? [] : [
-    { id: "a", label: m.a.name, color: colA, points: series(drawPts, "a"), width: 3.6, endLabel: m.a.abbr },
-    { id: "b", label: m.b.name, color: colB, points: series(drawPts, "b"), width: 3.6, endLabel: m.b.abbr },
+    { id: "a", label: m.a.name, color: colA, points: series(drawRows, "a"), width: 3.6, endLabel: m.a.abbr },
+    { id: "b", label: m.b.name, color: colB, points: series(drawRows, "b"), width: 3.6, endLabel: m.b.abbr },
   ];
   /* The compare overlay is the OTHER basis: by default (implied) the dashed
      line is the published-basis aggregate, gen-data's agg2pp; on the
@@ -1244,10 +1245,21 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
      in which the lead cannot be told apart from a tie. That overlap is the
      single most useful thing on this chart and it is not otherwise drawn.
      No ribbon where there is no line, for the same reason there is no line. */
-  const bandPts = (key) => drawPts
-    .filter((d) => d.ci95 != null)
+  /* Mid-switch the band is the line plus and minus the interval at every
+     row the blend reads, the months and the readings between them. This
+     design draws with a Catmull-Rom spline, which is linear in its values,
+     so the curve through line +/- interval IS the line's curve +/- the
+     interval's: at either end of the switch this is the band that view
+     draws, down to its taper into the election point at no width. (The
+     redesign's monotone curve is not linear, which is why it reads the
+     edges off curves of their own.) */
+  const bandPts = (key) => drawRows.filter((d) => d.ci95 != null)
     .map((d) => ({ x: d.x, y0: d[key] - d.ci95, y1: d[key] + d.ci95 }));
   const heroAreas = !heroSeries.length ? [] : [
+    /* no window of their own: this design's band runs from the election
+       point at no width, as the line does, so it travels in the line's window
+       (the chart's clipX) - clipped to where the interval is wider than zero,
+       it lost its first month for the switch and grew it back on landing */
     { id: "ci-a", color: colA, className: "ci-band", edge: false, smooth: true, points: bandPts("a") },
     { id: "ci-b", color: colB, className: "ci-band", edge: false, smooth: true, points: bandPts("b") },
   ].filter((a) => a.points.length >= 2);
@@ -1265,15 +1277,21 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   // Pulled from the dataset BY DATE (the same discipline eventOn() keeps in
   // the leadership panels), so the marker and its panel can't drift from the
   // event rail; restating one here would fork the copy.
-  const heroEvents = (!heroSeries.length || !pts.length) ? [] : (() => {
-    const x0 = pts[0].x, x1 = pts[pts.length - 1].x;
-    // markers stay with the scene being drawn: mid-morph that is still the
-    // departed matchup, so its marker rides the blend out and the
-    // destination's lands with the last frame
-    const shown = morph ? morph.from : matchup;
-    const own = { alp_lnp: "2026-02-12", alp_on: "2025-12-08" }[shown];
+  /* Each matchup's markers over the months it plots. Mid-switch the chart
+     is handed both sets and slides one into the other (TrendChart's
+     eventsFrom, as the redesign's hero does): the departed matchup's markers
+     used to ride the blend out and the destination's to land with the last
+     frame, a Coalition marker swapped for a One Nation one in a single frame
+     as the lines settled. */
+  const eventsFor = (id, basis) => {
+    const P = id === matchup && basis === undefined ? pts : ptsOf(id, basis);
+    if (!P.length) return [];
+    const x0 = P[0].x, x1 = P[P.length - 1].x;
+    const own = { alp_lnp: "2026-02-12", alp_on: "2025-12-08" }[id];
     return (D.events || []).filter((e) => (e.major || e.date === own) && e.x >= x0 && e.x <= x1);
-  })();
+  };
+  const heroEvents = (!heroSeries.length || !pts.length) ? [] : morph ? eventsFor(morph.to, morph.toBasis) : eventsFor(matchup);
+  const heroEventsFrom = morph && heroSeries.length && pts.length ? eventsFor(morph.from, morph.fromBasis) : null;
 
   /* One word, and not "50% – majority line". The axis already prints 50% 18px
      to the left, so the number was said twice in adjacent space; and 50 is a
@@ -1675,7 +1693,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
         pad={narrow ? { l: 74, r: 16, t: 26, b: 54 } : { l: 58, r: 22, t: 30, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         refLines={heroRefLines}
-        events={heroEvents}
+        events={heroEvents} eventsFrom={heroEventsFrom} eventMix={morph ? morph.t : 1}
         scatter={scatter} series={heroSeriesAll} spine={heroSpine} pollFacet="twopp"
         scatterOut={scatterOut} scatterMove={scatterMove}
         areas={sensAreas.length ? heroAreas.concat(sensAreas) : heroAreas}

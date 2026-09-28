@@ -40421,10 +40421,24 @@ window.AP = function () {
       if (m) return (2 * u3 - 3 * u2 + 1) * ys[i] + (u3 - 2 * u2 + u) * h * m[i] + (-2 * u3 + 3 * u2) * ys[i + 1] + (u3 - u2) * h * m[i + 1];
       const y0 = ys[i - 1] != null ? ys[i - 1] : ys[i],
         y3 = ys[i + 2] != null ? ys[i + 2] : ys[i + 1];
+      const x0 = xs[i - 1] != null ? xs[i - 1] : xs[i],
+        x3 = xs[i + 2] != null ? xs[i + 2] : xs[i + 1];
       const c1 = ys[i] + (ys[i + 1] - y0) / 6,
-        c2 = ys[i + 1] - (y3 - ys[i]) / 6,
-        v = 1 - u;
-      return v * v * v * ys[i] + 3 * v * v * u * c1 + 3 * v * u * u * c2 + u3 * ys[i + 1];
+        c2 = ys[i + 1] - (y3 - ys[i]) / 6;
+      const k1 = xs[i] + (xs[i + 1] - x0) / 6,
+        k2 = xs[i + 1] - (x3 - xs[i]) / 6;
+      const bez = (a, b, c, d, w) => {
+        const q = 1 - w;
+        return q * q * q * a + 3 * q * q * w * b + 3 * q * w * w * c + w * w * w * d;
+      };
+      let lo = 0,
+        hi = 1,
+        w = u;
+      for (let it = 0; it < 30; it++) {
+        if (bez(xs[i], k1, k2, xs[i + 1], w) < x) lo = w;else hi = w;
+        w = (lo + hi) / 2;
+      }
+      return bez(ys[i], c1, c2, ys[i + 1], w);
     };
   };
   const SUBSTEPS = 4;
@@ -45473,12 +45487,13 @@ function PreferredPMPanel({
       wipe: a ? morph.t : 1 - morph.t
     };
   }).filter(d => d.pts.length);
-  const ciAreas = drawRows.filter(d => d.wipe == null).map(d => ({
+  const ciAreas = drawRows.map(d => ({
     id: "ci-" + (d.era ? d.r.mk + "-" + d.era : d.r.mk),
     color: d.r.L.color,
     className: "ci-band",
     edge: false,
     smooth: true,
+    wipeOf: d.wipe != null ? d.era ? d.r.mk + "-" + d.era : d.r.mk : undefined,
     clipX: d.clip,
     points: d.pts.filter(p => p.ci != null).map(p => ({
       x: p.x,
@@ -68672,35 +68687,18 @@ function Hero({
     const A = ptsOf(morph.from, morph.fromBasis),
       B = ptsOf(morph.to, morph.toBasis);
     if (!A.length || !B.length) return null;
-    const t = morph.t,
-      lerp = (p, q) => p + (q - p) * t;
-    const index = arr => {
-      const o = {};
-      arr.forEach(d => o[d.ym] = d);
-      return o;
-    };
-    const ia = index(A),
-      ib = index(B);
-    const hold = (idx, arr, ym) => idx[ym] || (ym < arr[0].ym ? arr[0] : arr[arr.length - 1]);
-    const yms = [...new Set(A.concat(B).map(d => d.ym))].sort();
+    const t = morph.t;
+    const bl = window.AP.blendRows(A, B, t, ["a", "b", "ci95"]);
+    if (!bl) return null;
     return {
-      pts: yms.map(ym => {
-        const da = hold(ia, A, ym),
-          db = hold(ib, B, ym);
-        return {
-          ym,
-          x: (ia[ym] || ib[ym]).x,
-          a: lerp(da.a, db.a),
-          b: lerp(da.b, db.b),
-          ci95: da.ci95 == null || db.ci95 == null ? null : lerp(da.ci95, db.ci95)
-        };
-      }),
-      clip: [lerp(A[0].x, B[0].x), lerp(A[A.length - 1].x, B[B.length - 1].x)],
+      pts: bl.rows,
+      clip: bl.clip,
       a: mixC(MATCHUPS[morph.from].a.color, MATCHUPS[morph.to].a.color, t),
       b: mixC(MATCHUPS[morph.from].b.color, MATCHUPS[morph.to].b.color, t)
     };
   })();
-  const drawPts = blend ? blend.pts : pts;
+  const drawRows = blend ? blend.pts : pts;
+  const drawPts = blend ? blend.pts.filter(d => !d.mid) : pts;
   const colA = blend ? blend.a : m.a.color;
   const colB = blend ? blend.b : m.b.color;
   const latestOf = id => tppLatest(id, basis);
@@ -68764,14 +68762,14 @@ function Hero({
     id: "a",
     label: m.a.name,
     color: colA,
-    points: series(drawPts, "a"),
+    points: series(drawRows, "a"),
     width: 3.6,
     endLabel: m.a.abbr
   }, {
     id: "b",
     label: m.b.name,
     color: colB,
-    points: series(drawPts, "b"),
+    points: series(drawRows, "b"),
     width: 3.6,
     endLabel: m.b.abbr
   }];
@@ -68803,7 +68801,7 @@ function Hero({
   }] : [];
   const heroSeriesAll = synthOverlay.length ? heroSeries.concat(synthOverlay) : heroSeries;
   const heroSpine = heroSeries.length ? series(drawPts, "a") : [];
-  const bandPts = key => drawPts.filter(d => d.ci95 != null).map(d => ({
+  const bandPts = key => drawRows.filter(d => d.ci95 != null).map(d => ({
     x: d.x,
     y0: d[key] - d.ci95,
     y1: d[key] + d.ci95
@@ -68823,16 +68821,19 @@ function Hero({
     smooth: true,
     points: bandPts("b")
   }].filter(a => a.points.length >= 2);
-  const heroEvents = !heroSeries.length || !pts.length ? [] : (() => {
-    const x0 = pts[0].x,
-      x1 = pts[pts.length - 1].x;
-    const shown = morph ? morph.from : matchup;
+  const eventsFor = (id, basis) => {
+    const P = id === matchup && basis === undefined ? pts : ptsOf(id, basis);
+    if (!P.length) return [];
+    const x0 = P[0].x,
+      x1 = P[P.length - 1].x;
     const own = {
       alp_lnp: "2026-02-12",
       alp_on: "2025-12-08"
-    }[shown];
+    }[id];
     return (D.events || []).filter(e => (e.major || e.date === own) && e.x >= x0 && e.x <= x1);
-  })();
+  };
+  const heroEvents = !heroSeries.length || !pts.length ? [] : morph ? eventsFor(morph.to, morph.toBasis) : eventsFor(matchup);
+  const heroEventsFrom = morph && heroSeries.length && pts.length ? eventsFor(morph.from, morph.fromBasis) : null;
   const heroRefLines = [{
     y: 50,
     label: "tie",
@@ -69134,6 +69135,8 @@ function Hero({
     xTicks: buildXTicks(xDomain[0], xDomain[1]),
     refLines: heroRefLines,
     events: heroEvents,
+    eventsFrom: heroEventsFrom,
+    eventMix: morph ? morph.t : 1,
     scatter: scatter,
     series: heroSeriesAll,
     spine: heroSpine,
