@@ -956,6 +956,8 @@ const RD_DEMO_SHORT = {
   "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
   "English only": "English-only speakers", "Other language": "voters who speak another language at home",
 };
+/* the state panels' titles, as the board wrote them */
+const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };
 const RD_DEMO_NOUN = { age: "age", gender: "gender", education: "education" };
 /* groups in order as one party colour's ramp, pale to dark (dark mode runs
    the other way, so the last group keeps the most contrast in both) */
@@ -1062,7 +1064,8 @@ function RdDemographics({ rangeId = "all" }) {
     const allAt = new Map(T.allMonthly.map((m) => [m[0], m[1 + ki]]));
     const setLines = (st) => st.groups.map((g, i) => ({
       g, color: rdRamp(pty, st.groups.length, i),
-      pts: (g.monthly || []).filter((m) => m[1 + ki] != null).map((m) => ({ ym: m[0], x: D.mx(m[0]), y: m[1 + ki] })),
+      pts: (g.monthly || []).filter((m) => m[1 + ki] != null)
+        .map((m) => ({ ym: m[0], x: D.mx(m[0]), y: m[1 + ki], ci: m[1 + T.order.length + ki] ?? null })),
     })).filter((l) => l.pts.length);
     return tab.sets.map((st) => {
       const lines = setLines(st);
@@ -1081,7 +1084,7 @@ function RdDemographics({ rangeId = "all" }) {
       return { st, drawn, allPts, dots, x0, x1, span: x1 - x0 };
     }).filter(Boolean);
   };
-  const yMaxOf = (cs) => Math.max(10, Math.ceil(Math.max(...cs.flatMap((c) => c.drawn.flatMap((l) => l.pts.map((p) => p.y)).concat(c.dots.map((d) => d.y)))) / 10) * 10);
+  const yMaxOf = (cs) => Math.max(10, Math.ceil(Math.max(...cs.flatMap((c) => c.drawn.flatMap((l) => l.pts.map((p) => p.y + (p.ci || 0))).concat(c.dots.map((d) => d.y)))) / 10) * 10);
   const chartsCached = (pty) => {
     const k = pty + "|" + tab.id + "|" + rangeLo + "|" + rangeHi;
     return chartCache.current[k] || (chartCache.current[k] = chartsFor(pty));
@@ -1115,42 +1118,99 @@ function RdDemographics({ rangeId = "all" }) {
         + " from about " + Math.round(gap0) + " points in " + rdMonthYear(firstYm) + " to about " + Math.round(gap1) + " now.");
     return { head, dek };
   })();
+  /* Place draws its states as the board drew them: a small panel each, the
+     state's line inside its 95% interval against the dashed all-voters line.
+     Four states on one plot, each banded, were one brown cloud. The panels
+     then share the row evenly with the location chart. */
+  const panelled = (c) => c.st.id === "state";
+  const even = charts.some(panelled);
   const chartOf = (c) => {
     const A = fromCharts && fromCharts.find((x) => x.st.id === c.st.id);
     const t = pm ? pm.t : 1;
-    const blend = (a, b) => (A && a && b && a.length && b.length ? window.AP.blendRows(a, b, t, ["y"]) : null);
+    const blend = (a, b) => (A && a && b && a.length && b.length ? window.AP.blendRows(a, b, t, ["y", "ci"]) : null);
     const allBl = A ? blend(A.allPts, c.allPts) : null;
-    const lineSeries = c.drawn.map((l) => {
+    const allSeries = { id: "all", label: "All voters", color: "var(--ink)", dash: "4 3", dashed: true, rdWidth: 1.5, endCap: false, clipX: allBl ? allBl.clip : undefined,
+                        points: (allBl ? allBl.rows : c.allPts).filter((d) => d.y != null).map((d) => ({ x: d.x, y: d.y })), endLabel: narrow ? null : "All voters" };
+    /* each group's rows, blended mid-switch; its interval travels with it */
+    const rowsOf = c.drawn.map((l) => {
       const la = A && A.drawn.find((x) => x.g.label === l.g.label);
       const bl = la ? blend(la.pts, l.pts) : null;
-      /* the new party's colour from the first frame: .series-line eases its
-         stroke in CSS, and a colour re-mixed every frame restarted that
-         ease each frame and snapped at the end */
-      return { id: l.g.label, label: l.g.label, color: l.color, rdWidth: 2.2, endCap: false,
-               clipX: bl ? bl.clip : undefined, points: (bl ? bl.rows : l.pts).filter((d) => d.y != null).map((d) => ({ x: d.x, y: d.y })), endLabel: l.g.label };
+      return { l, clip: bl ? bl.clip : undefined, rows: (bl ? bl.rows : l.pts).filter((d) => d.y != null) };
     });
+    /* the new party's colour from the first frame: .series-line eases its
+       stroke in CSS, and a colour re-mixed every frame restarted that ease
+       each frame and snapped at the end */
+    const lineOf = (r, color, over) => ({ id: r.l.g.label, label: r.l.g.label, color, rdWidth: 2.2, endCap: false,
+      clipX: r.clip, points: r.rows.map((d) => ({ x: d.x, y: d.y })), endLabel: r.l.g.label, ...over });
+    /* a month rests on a few hundred of a group's respondents, so its band
+       is what says whether two groups, or two months, can be told apart */
+    const bandOf = (r, color) => ({ id: "ci-" + r.l.g.label, color, className: "ci-band", edge: false, clipX: r.clip,
+      points: r.rows.filter((d) => d.ci != null).map((d) => ({ x: d.x, y0: Math.max(0, d.y - d.ci), y1: d.y + d.ci })) });
+    const ciRows = (rs, label) => (i) => {
+      const ym = c.allPts[i] && c.allPts[i].ym;
+      const cs = rs.map((r) => { const d = r.l.pts.find((q) => q.ym === ym); return d && d.ci != null ? (rs.length > 1 ? r.l.g.label + " " : "") + "±" + d.ci.toFixed(1) : null; }).filter(Boolean);
+      return cs.length ? [{ label: label, value: cs.join(", ") }] : [];
+    };
     const cross = A ? window.AP.crossClouds(A.dots, c.dots, t, (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.label) : null;
     const xDom = A ? window.AP.blendDomain([A.x0, A.x1], [c.x0, c.x1], t) : [c.x0, c.x1];
     const yDom = A ? window.AP.blendDomain([0, fromYMax], [0, yMax], t) : [0, yMax];
-    return (
-    <div className="card rd-card rd-wv-chart" key={c.st.id} style={{ flexGrow: narrow ? 1 : Math.max(0.35, c.span) }}>
+    const head = (
       <div className="rd-chead"><span className="rd-chead-t">{c.st.label || "By " + tab.label.toLowerCase()}<span className="rd-chead-meta">since {rdMonthYear(c.drawn.reduce((m, l) => (l.pts[0].ym < m ? l.pts[0].ym : m), "9999"))}</span></span></div>
+    );
+    if (panelled(c)) {
+      const mine = (arr, label) => (arr || []).filter((d) => d.label === label).map((d) => ({ ...d, color: pColor }));
+      return (
+        <div className="card rd-card rd-wv-chart" key={c.st.id} style={{ flex: "1 1 0" }}>
+          {head}
+          <div className="rd-wv-panels">
+            {rowsOf.map((r) => {
+              const g = r.l.g, name = RD_STATE_NAME[g.label] || g.label;
+              return (
+                <div key={g.label} className="rd-sm rd-wv-panel">
+                  <div className="rd-sm-top"><span>{name}</span><b>{g.v[party] != null ? g.v[party].toFixed(1) + "%" : ""}</b></div>
+                  <TrendChart key={"rd-wv-" + c.st.id + "-" + g.label} heightPx={narrow ? 120 : 140}
+                    padPx={{ l: 30, r: 6, t: 8, b: 24 }}
+                    xDomain={xDom} yDomain={yDom} yTicks={rdYTicks(0, yMax, 20)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
+                    xTicks={rdXTicks(c.x0, c.x1, true)} baseline driven={!!A}
+                    series={[{ ...allSeries, rdWidth: 1.25, endLabel: null }, lineOf(r, pColor, { rdWidth: 2.25, endLabel: null })]}
+                    areas={[bandOf(r, pColor)].filter((a) => a.points.length >= 2)}
+                    spine={c.allPts.map((d) => ({ x: d.x, y: d.y }))}
+                    scatter={mine(cross ? cross.scatter : c.dots, g.label)} scatterOut={mine(cross ? cross.scatterOut : [], g.label)}
+                    scatterMove={mine(cross ? cross.scatterMove : [], g.label)}
+                    fade={A ? t : 1} pollFacet="primary"
+                    tooltipTitle={(i) => (c.allPts[i] ? monthLabelFull(c.allPts[i].ym) : "")}
+                    extraRows={ciRows([r], "95% interval")}
+                    fmt={(v) => v.toFixed(1)}
+                    copy={{ title: "Who votes for whom", sub: pName + "’s share of the vote in " + name + ", month by month",
+                            legend: [{ label: name, color: pColor, kind: "line" }, { label: "95% interval", color: pColor, kind: "band" }, { label: "All voters", color: "var(--ink)", kind: "dashed" }] }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+    return (
+    <div className="card rd-card rd-wv-chart" key={c.st.id} style={even ? { flex: "1 1 0" } : { flexGrow: narrow ? 1 : Math.max(0.35, c.span) }}>
+      {head}
       <TrendChart key={"rd-wv-" + c.st.id + "-" + tab.id} heightPx={narrow ? 240 : 260}
         padPx={narrow ? { l: 34, r: 8, t: 12, b: 28 } : { l: 40, r: 12, t: 12, b: 30 }}
         xDomain={xDom} yDomain={yDom} yTicks={rdYTicks(0, yMax, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
         xTicks={rdXTicks(c.x0, c.x1, narrow || c.span < 0.8)} baseline driven={!!A}
-        series={[{ id: "all", label: "All voters", color: "var(--ink)", dash: "4 3", dashed: true, rdWidth: 1.5, endCap: false, clipX: allBl ? allBl.clip : undefined,
-                   points: (allBl ? allBl.rows : c.allPts).filter((d) => d.y != null).map((d) => ({ x: d.x, y: d.y })), endLabel: narrow ? null : "All voters" },
-                 ...lineSeries]}
+        series={[allSeries, ...rowsOf.map((r) => lineOf(r, r.l.color))]}
+        areas={rowsOf.map((r) => bandOf(r, r.l.color)).filter((a) => a.points.length >= 2)}
         spine={c.allPts.map((d) => ({ x: d.x, y: d.y }))}
         scatter={cross ? cross.scatter : c.dots} scatterOut={cross ? cross.scatterOut : []} scatterMove={cross ? cross.scatterMove : []}
         fade={A ? t : 1} pollFacet="primary"
         tooltipTitle={(i) => (c.allPts[i] ? monthLabelFull(c.allPts[i].ym) : "")}
+        extraRows={ciRows(rowsOf, "95% intervals")}
         fmt={(v) => v.toFixed(1)}
         /* keyed in full: a phone names no line at its end, and "All voters"
            loses its name wherever the groups crowd it */
         copy={{ title: "Who votes for whom", sub: pName + "’s share of the vote, " + (c.st.label || "By " + tab.label).toLowerCase() + ", month by month",
-                legend: c.drawn.map((l) => ({ label: l.g.label, color: l.color, kind: "line" })).concat([{ label: "All voters", color: "var(--ink)", kind: "dashed" }]) }}
+                legend: c.drawn.map((l) => ({ label: l.g.label, color: l.color, kind: "line" }))
+                  .concat([{ label: "95% interval", color: pColor, kind: "band" }, { label: "All voters", color: "var(--ink)", kind: "dashed" }]) }}
       />
     </div>
     );
@@ -1197,8 +1257,13 @@ function RdDemographics({ rangeId = "all" }) {
       {/* keyed on the grouping: a switch of it brings the charts in fresh,
           faded rather than cut (a party switch keeps them and morphs) */}
       <div className="rd-wv-charts rd-wv-enter" key={"wv-" + tab.id}>{charts.map(chartOf)}</div>
+      <RdKey className="rd-ckey rd-sm-key" items={[
+        { kind: "dot", color: "var(--ink-3)", label: "One poll" },
+        { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
+        { kind: "dash", color: "var(--ink)", label: "All voters" },
+      ]} />
       <RdFoot how={{ term: "vote-by-group", from: "Who votes for whom" }}>
-        Each dot is one poll; lines are monthly averages; the dashed line is all voters.{charts.length > 1 ? " Both panels share one scale, so each is only as wide as its data." : ""}
+        {charts.length > 1 ? (even ? "Every panel shares one scale." : "Both panels share one scale, so each is only as wide as its data.") : null}
       </RdFoot>
     </RdSec>
   );
