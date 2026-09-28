@@ -358,6 +358,12 @@ function RdHero(p) {
         <h2 className="rd-title" id="rd-tpp-t">Two-party preferred</h2>
         <span className="rd-meta">{meta}</span>
       </div>
+      {/* The section's headline under its heading, as every other section
+         has it, so the opening view reads down a left edge before the
+         centred figures. A phone keeps the figures first: there the
+         headline and its dek would push the verdict and scale off the first
+         screen, and the figure is what the page is opened for. */}
+      {story && !narrow && <RdHed head={story.head} dek={story.dek} />}
       <div className="rd-tpp-top">
         <div className="rd-tpp-read">
           <div className="rd-tpp-side rd-a">
@@ -394,7 +400,7 @@ function RdHero(p) {
         )}
       </div>
 
-      {story && <RdSub head={story.head} dek={story.dek} level={3} />}
+      {story && narrow && <RdSub head={story.head} dek={story.dek} level={3} />}
 
       <div className="card rd-card rd-tpp-chart">
         <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm">

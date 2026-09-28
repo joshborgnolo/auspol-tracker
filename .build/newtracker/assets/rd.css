@@ -436,6 +436,8 @@ body.rd .rd-chip-fig { font-weight: 600; font-variant-numeric: tabular-nums; }
 body.rd .rd-chip-dash { color: var(--ink-faint); }
 body.rd .rd-tpp .rd-sub { margin-top: 56px; }
 body.rd .rd-tpp-chart { margin-top: 16px; }
+/* with the headline moved above the figures, the chart follows them directly */
+body.rd .rd-tpp-top + .rd-tpp-chart { margin-top: 56px; }
 body.rd .rd-tabs-sm .rd-tab { font-size: 14px; padding: 0 10px; }
 body.rd .rd-tpp-legend { margin: 0 0 4px; }
 

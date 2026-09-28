@@ -3300,6 +3300,7 @@ body.rd .rd-chip-fig { font-weight: 600; font-variant-numeric: tabular-nums; }
 body.rd .rd-chip-dash { color: var(--ink-faint); }
 body.rd .rd-tpp .rd-sub { margin-top: 56px; }
 body.rd .rd-tpp-chart { margin-top: 16px; }
+body.rd .rd-tpp-top + .rd-tpp-chart { margin-top: 56px; }
 body.rd .rd-tabs-sm .rd-tab { font-size: 14px; padding: 0 10px; }
 body.rd .rd-tpp-legend { margin: 0 0 4px; }
 body.rd .rd-lg { position: relative; height: 82px; margin-top: 18px; font-size: 12px; font-variant-numeric: tabular-nums; }
@@ -56885,7 +56886,10 @@ function RdHero(p) {
     id: "rd-tpp-t"
   }, "Two-party preferred"), React.createElement("span", {
     className: "rd-meta"
-  }, meta)), React.createElement("div", {
+  }, meta)), story && !narrow && React.createElement(RdHed, {
+    head: story.head,
+    dek: story.dek
+  }), React.createElement("div", {
     className: "rd-tpp-top"
   }, React.createElement("div", {
     className: "rd-tpp-read"
@@ -56969,7 +56973,7 @@ function RdHero(p) {
     style: {
       color: inkOf(M[o.id].b.color)
     }
-  }, o.v.b.toFixed(1))))))), story && React.createElement(RdSub, {
+  }, o.v.b.toFixed(1))))))), story && narrow && React.createElement(RdSub, {
     head: story.head,
     dek: story.dek,
     level: 3
