@@ -24,7 +24,7 @@ tiers respectively.
 
 Rendered when wrong-track leads:
 
-> Only 23% say we're heading in the right direction. Net mood has
+> Only 23% say we’re heading in the right direction. Net mood has
 > plummeted, down 10 points in a month and more than 30 points since the
 > 2025 election.
 

@@ -835,7 +835,7 @@ function RdDirection({ rangeId }) {
   const netVerb = (n, up) => n >= 10 ? (up ? "soared" : "plummeted") : n >= 6 ? (up ? "lifted" : "soured") : (up ? "lifted slightly" : "soured slightly");
   const netWord = (d) => (d > 0 ? "improved" : "worsened");
   const upDown = (d) => (d > 0 ? "up " : "down ");
-  const dek = (small < 30 ? "Only " : "") + Math.round(small) + "% say we're " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". "
+  const dek = (small < 30 ? "Only " : "") + Math.round(small) + "% say we’re " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". "
     + (now.chg == null ? ""
       : now.changeSig ? "Net mood has " + netVerb(Math.round(Math.abs(now.chg)), now.chg > 0) + ", " + upDown(now.chg) + Math.round(Math.abs(now.chg)) + " points in a month"
       : "Net mood has held steady for a month")
