@@ -933,7 +933,7 @@ body.rd .rd-wv-ticks { position: relative; height: 20px; grid-column: 2; }
 body.rd .rd-wv-ticks > span { position: absolute; top: 4px; left: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)); font-size: 12px; color: var(--ink-3); }
 body.rd .rd-wv-key { margin-top: 16px; }
 body.rd .rd-wv-keytxt { color: var(--ink-3); }
-body.rd .rd-wv-charts { display: flex; gap: 48px; margin-top: 20px; }
+body.rd .rd-wv-charts { display: flex; gap: 32px; margin-top: 20px; }
 body.rd .rd-wv-chart { min-width: 0; }
 /* Place's states, a small panel each, two by two as the board set them */
 body.rd .rd-wv-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 30px; row-gap: 16px; margin-top: 8px; }
