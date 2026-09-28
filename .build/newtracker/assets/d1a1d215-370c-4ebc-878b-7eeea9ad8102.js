@@ -4853,12 +4853,28 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     setOpen(focus.key);
   }, [focus]);
   // …and once the row is actually on the page, put it under the reader's eye.
-  // Centred, because a row scrolled to the top would sit under the pinned bar.
+  // The row and its open detail are centred as one block - centring the
+  // skinny summary row alone leaves the whole breakdown hanging below the
+  // middle of the screen; a pair taller than the viewport tucks the row just
+  // under the pinned tab bar instead.
   const bodyRef = useRef(null);
   React.useEffect(() => {
     if (!focus || open !== focus.key || !bodyRef.current) return;
     const row = bodyRef.current.querySelector("tr.arch-row.open, .rd-ap-row.open, .rd-ap-card.open");
-    if (row) row.scrollIntoView({ block: "center", behavior: "auto" });
+    if (!row) return;
+    const d = row.nextElementSibling;
+    const pair = d && (d.classList.contains("rd-ap-open") || d.classList.contains("detail-row")) ? d : null;
+    const top = row.getBoundingClientRect().top + window.scrollY;
+    const h = (pair || row).getBoundingClientRect().bottom + window.scrollY - top;
+    // the bar's own height, not its viewport bottom: on a hash-trip landing
+    // at the top of the page the un-pinned bar could sit anywhere in flow
+    const bar = document.querySelector(".tabs.sticky");
+    const clear = (bar ? bar.getBoundingClientRect().height : 0) + 10;
+    // centred inside the usable viewport below the pinned bar …
+    let y = top - (window.innerHeight + clear - h) / 2;
+    // … but a group taller than that tucks the row just under the bar
+    if (y > top - clear) y = top - clear;
+    window.scrollTo({ top: Math.max(0, y), behavior: "auto" });
   }, [focus, open, facet]);
   const toggleTag = (id) => setTagSel((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const onMeasure = (mv) => { setMeasure(mv); setLead("all"); };

@@ -53445,8 +53445,17 @@ function AllPollsView({
   React.useEffect(() => {
     if (!focus || open !== focus.key || !bodyRef.current) return;
     const row = bodyRef.current.querySelector("tr.arch-row.open, .rd-ap-row.open, .rd-ap-card.open");
-    if (row) row.scrollIntoView({
-      block: "center",
+    if (!row) return;
+    const d = row.nextElementSibling;
+    const pair = d && (d.classList.contains("rd-ap-open") || d.classList.contains("detail-row")) ? d : null;
+    const top = row.getBoundingClientRect().top + window.scrollY;
+    const h = (pair || row).getBoundingClientRect().bottom + window.scrollY - top;
+    const bar = document.querySelector(".tabs.sticky");
+    const clear = (bar ? bar.getBoundingClientRect().height : 0) + 10;
+    let y = top - (window.innerHeight + clear - h) / 2;
+    if (y > top - clear) y = top - clear;
+    window.scrollTo({
+      top: Math.max(0, y),
       behavior: "auto"
     });
   }, [focus, open, facet]);
