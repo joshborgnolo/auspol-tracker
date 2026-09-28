@@ -1033,7 +1033,7 @@ const RD_DEMO_HOME = {
   alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial",
   lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
   grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
-  oth: "Others voters are more likely to be Gen Z, renting, and NSW-based, and less likely to be provincial or mortgage holders",
+  oth: "Voters for others/independents are more likely to be Gen Z, renting, and NSW-based, and less likely to be provincial or mortgage holders",
 };
 /* the state panels' titles, as the board wrote them */
 const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };
@@ -1063,7 +1063,10 @@ function RdDemographics({ rangeId = "all" }) {
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find((x) => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
-  const pName = P.name, pColor = P.color;
+  /* the prose names them "others/independents" (user dictate): a lower-case
+     description whose possessive takes a bare apostrophe */
+  const pName = party === "oth" ? "others/independents" : P.name;
+  const pPoss = pName + (/s$/.test(pName) ? "’" : "’s"), pColor = P.color;
   const all = T.all[party];
   const ki = T.order.indexOf(party), gpi = DEMO_GRP_PARTY.indexOf(party);
   const short = (g) => RD_DEMO_SHORT[g.label] || DEMO_WHO[g.label] || g.label;
@@ -1075,10 +1078,10 @@ function RdDemographics({ rangeId = "all" }) {
     let finding;
     const m = /^Support for .* (rises|falls) significantly (.*)\.$/.exec(verdict);
     const noDiff = /no significant difference/.test(verdict);
-    if (m && st0.id === "age") finding = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with age";
-    else if (m && st0.id === "generation") finding = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";
-    else if (m && st0.id === "location") finding = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";
-    else if (noDiff) finding = pName + "’s vote is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");
+    if (m && st0.id === "age") finding = pPoss + " vote " + (m[1] === "rises" ? "climbs" : "falls") + " with age";
+    else if (m && st0.id === "generation") finding = pPoss + " vote " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";
+    else if (m && st0.id === "location") finding = pPoss + " vote " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";
+    else if (noDiff) finding = pPoss + " vote is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");
     else finding = verdict.replace(/ significantly/, "").replace(/\.$/, "");
     const gs = st0.groups.filter((g) => g.v[party] != null);
     const byV = gs.slice().sort((a, b) => b.v[party] - a.v[party]);
@@ -1103,8 +1106,8 @@ function RdDemographics({ rangeId = "all" }) {
     /* the headline stays put as the grouping tab flips: the per-grouping
        finding leads the dek instead, the figures sentences after it */
     const home = RD_DEMO_HOME[party];
-    if (home) dek = dek ? finding + ". " + dek : finding + ".";
-    return { head: home || finding, dek };
+    if (home) dek = dek ? rdCap(finding) + ". " + dek : rdCap(finding) + ".";
+    return { head: home || rdCap(finding), dek };
   })();
 
   /* ---- the dot plot, every set on one scale -------------------------------- */
@@ -1113,7 +1116,7 @@ function RdDemographics({ rangeId = "all" }) {
   const xp = (v) => (Math.max(0, Math.min(hi, v)) / hi) * 100;
   const signedD = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
   const dotSet = (st, idx) => (
-    <div className="rd-wv-set" key={"s" + idx} role="table" aria-label={(st.label || tab.label) + ": " + pName + "’s share of each group’s vote"}>
+    <div className="rd-wv-set" key={"s" + idx} role="table" aria-label={(st.label || tab.label) + ": " + pPoss + " share of each group’s vote"}>
       <div className="rd-wv-sethead" role="row">
         <span role="columnheader"><b>{st.label || "By " + tab.label.toLowerCase()}</b> <span>{rdList((st.houses || []).map(demoHouse))}</span></span>
         <span className="rd-wv-allcap" aria-hidden="true">{idx === 0 && <span style={{ "--x": xp(all) }}>All voters <RollNum value={all.toFixed(1)} />%</span>}</span>
@@ -1292,7 +1295,7 @@ function RdDemographics({ rangeId = "all" }) {
                     tooltipTitle={(i) => (c.allPts[i] ? monthLabelFull(c.allPts[i].ym) : "")}
                     extraRows={ciRows([r], "95% interval")}
                     fmt={(v) => v.toFixed(1)}
-                    copy={{ title: "Who votes for whom", sub: pName + "’s share of the vote in " + name + ", month by month",
+                    copy={{ title: "Who votes for whom", sub: pPoss + " share of the vote in " + name + ", month by month",
                             legend: [{ label: name, color: pColor, kind: "line" }, { label: "95% interval", color: pColor, kind: "band" }, { label: "All voters", color: "var(--ink)", kind: "dashed" }] }}
                   />
                 </div>
@@ -1319,7 +1322,7 @@ function RdDemographics({ rangeId = "all" }) {
         fmt={(v) => v.toFixed(1)}
         /* keyed in full: a phone names no line at its end, and "All voters"
            loses its name wherever the groups crowd it */
-        copy={{ title: "Who votes for whom", sub: pName + "’s share of the vote, " + (c.st.label || "By " + tab.label).toLowerCase() + ", month by month",
+        copy={{ title: "Who votes for whom", sub: pPoss + " share of the vote, " + (c.st.label || "By " + tab.label).toLowerCase() + ", month by month",
                 legend: c.drawn.map((l) => ({ label: l.g.label, color: l.color, kind: "line" }))
                   .concat([{ label: "95% interval", color: pColor, kind: "band" }, { label: "All voters", color: "var(--ink)", kind: "dashed" }]) }}
       />
@@ -1855,7 +1858,7 @@ function RdIssues({ rangeId = "all" }) {
       </span>
     );
   };
-  const groupLong = (g) => rdCap(issWho(g).replace(/^voters for other parties and independents$/, "Others voters")
+  const groupLong = (g) => rdCap(issWho(g)
     .replace(/^Nationals, LNP and CLP voters$/, "Nationals, LNP, CLP voters"));
   const groupShort = (g) => g.replace(/^Nationals, LNP and CLP$/, "Nationals, LNP, CLP");
   /* the issue the one-issue list opens on: the reader's pick, else the one

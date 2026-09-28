@@ -46473,7 +46473,7 @@ const UND_VIEWS = [{
   label: "By age"
 }];
 const FIRM_ORDER = ["onp", "alp", "lnp", "grn", "oth"];
-const firmWho = k => k === "oth" ? "voters for independents and minor parties" : window.AP.D.PARTIES[k].name + " voters";
+const firmWho = k => k === "oth" ? "voters for others/independents" : window.AP.D.PARTIES[k].name + " voters";
 const firmApart = (a, b) => Math.abs(a.v - b.v) > Math.hypot(a.ci95, b.ci95);
 const firmSaid = (cls, t, sig) => React.createElement("p", {
   className: cls
@@ -47086,7 +47086,7 @@ const DEMO_VOTE_FOR = {
   lnp: "the Coalition",
   grn: "the Greens",
   onp: "One Nation",
-  oth: "a minor party or independent"
+  oth: "others/independents"
 };
 function zTail(z) {
   const x = Math.abs(z) / Math.SQRT2,
@@ -47561,7 +47561,7 @@ const ISS_WHO = {
   "Nationals, LNP and CLP": "Nationals, LNP and CLP voters",
   "One Nation": "One Nation voters",
   Greens: "Greens voters",
-  Others: "voters for other parties and independents",
+  Others: "voters for others/independents",
   Undecided: "undecided voters",
   "Below Year 12": "voters who left school before Year 12",
   "Year 12": "voters who finished Year 12",
@@ -60094,7 +60094,7 @@ const RD_DEMO_HOME = {
   alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial",
   lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
   grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
-  oth: "Others voters are more likely to be Gen Z, renting, and NSW-based, and less likely to be provincial or mortgage holders"
+  oth: "Voters for others/independents are more likely to be Gen Z, renting, and NSW-based, and less likely to be provincial or mortgage holders"
 };
 const RD_STATE_NAME = {
   Vic: "Victoria",
@@ -60124,7 +60124,8 @@ function RdDemographics({
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find(x => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
-  const pName = P.name,
+  const pName = party === "oth" ? "others/independents" : P.name;
+  const pPoss = pName + (/s$/.test(pName) ? "’" : "’s"),
     pColor = P.color;
   const all = T.all[party];
   const ki = T.order.indexOf(party),
@@ -60136,7 +60137,7 @@ function RdDemographics({
     let finding;
     const m = /^Support for .* (rises|falls) significantly (.*)\.$/.exec(verdict);
     const noDiff = /no significant difference/.test(verdict);
-    if (m && st0.id === "age") finding = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with age";else if (m && st0.id === "generation") finding = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";else if (m && st0.id === "location") finding = pName + "’s vote " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";else if (noDiff) finding = pName + "’s vote is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");else finding = verdict.replace(/ significantly/, "").replace(/\.$/, "");
+    if (m && st0.id === "age") finding = pPoss + " vote " + (m[1] === "rises" ? "climbs" : "falls") + " with age";else if (m && st0.id === "generation") finding = pPoss + " vote " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";else if (m && st0.id === "location") finding = pPoss + " vote " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";else if (noDiff) finding = pPoss + " vote is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");else finding = verdict.replace(/ significantly/, "").replace(/\.$/, "");
     const gs = st0.groups.filter(g => g.v[party] != null);
     const byV = gs.slice().sort((a, b) => b.v[party] - a.v[party]);
     const top = byV[0],
@@ -60154,9 +60155,9 @@ function RdDemographics({
       if (out && out.sig) dek += " " + rdCap(short(out.g)) + " " + (/s$/.test(short(out.g)) && !/^Gen/.test(out.g.label) ? "are" : "is") + " the outlier, at " + rdFraction(out.g.v[party]) + ".";
     }
     const home = RD_DEMO_HOME[party];
-    if (home) dek = dek ? finding + ". " + dek : finding + ".";
+    if (home) dek = dek ? rdCap(finding) + ". " + dek : rdCap(finding) + ".";
     return {
-      head: home || finding,
+      head: home || rdCap(finding),
       dek
     };
   })();
@@ -60168,7 +60169,7 @@ function RdDemographics({
     className: "rd-wv-set",
     key: "s" + idx,
     role: "table",
-    "aria-label": (st.label || tab.label) + ": " + pName + "’s share of each group’s vote"
+    "aria-label": (st.label || tab.label) + ": " + pPoss + " share of each group’s vote"
   }, React.createElement("div", {
     className: "rd-wv-sethead",
     role: "row"
@@ -60495,7 +60496,7 @@ function RdDemographics({
           fmt: v => v.toFixed(1),
           copy: {
             title: "Who votes for whom",
-            sub: pName + "’s share of the vote in " + name + ", month by month",
+            sub: pPoss + " share of the vote in " + name + ", month by month",
             legend: [{
               label: name,
               color: pColor,
@@ -60558,7 +60559,7 @@ function RdDemographics({
       fmt: v => v.toFixed(1),
       copy: {
         title: "Who votes for whom",
-        sub: pName + "’s share of the vote, " + (c.st.label || "By " + tab.label).toLowerCase() + ", month by month",
+        sub: pPoss + " share of the vote, " + (c.st.label || "By " + tab.label).toLowerCase() + ", month by month",
         legend: c.drawn.map(l => ({
           label: l.g.label,
           color: l.color,
@@ -61483,7 +61484,7 @@ function RdIssues({
       value: String(Math.round(c.v))
     }), sig ? React.createElement("em", null, diff > 0 ? "▲" : "▼") : null));
   };
-  const groupLong = g => rdCap(issWho(g).replace(/^voters for other parties and independents$/, "Others voters").replace(/^Nationals, LNP and CLP voters$/, "Nationals, LNP, CLP voters"));
+  const groupLong = g => rdCap(issWho(g).replace(/^Nationals, LNP and CLP voters$/, "Nationals, LNP, CLP voters"));
   const groupShort = g => g.replace(/^Nationals, LNP and CLP$/, "Nationals, LNP, CLP");
   const whomIssue = !gtab ? null : whomK && gtab.issues.includes(whomK) ? whomK : (gtab.issues.map(k => ({
     k,
