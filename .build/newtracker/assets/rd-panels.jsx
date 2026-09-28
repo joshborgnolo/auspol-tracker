@@ -1892,11 +1892,16 @@ function RdIssues({ rangeId = "all" }) {
               {tally && (
                 <div className="rd-is-row rd-is-tally"
                      aria-label={"Weighted by importance: " + P.map((q) => pName(q) + " " + Math.round(tally[q])).join(", ")}>
-                  <span className="rd-is-lab">Weighted by importance</span>
-                  <span></span>
-                  <span className="rd-is-dots" aria-hidden="true"></span>
-                  <span className="rd-is-nums">{P.map((q) => <b key={q} style={{ color: inkOf(pColor(q)) }}>{Math.round(tally[q])}</b>)}</span>
-                  <span></span>
+                  <span className="rd-is-tallab">
+                    <b>Weighted by importance</b>
+                    <small>Each issue counts in proportion to how many voters rank it in their top three</small>
+                  </span>
+                  <span className="rd-is-tallynums">{P.map((q) => (
+                    <span key={q} className="rd-is-score" style={{ background: "color-mix(in oklab, " + pColor(q) + " 12%, transparent)" }}>
+                      <b style={{ color: inkOf(pColor(q)) }}>{Math.round(tally[q])}</b>
+                      <i style={{ color: inkOf(pColor(q)) }}>{ISS_PARTY_CAP[q]}</i>
+                    </span>))}
+                  </span>
                 </div>
               )}
               <div className="rd-is-axis" aria-hidden="true">
@@ -1931,7 +1936,7 @@ function RdIssues({ rangeId = "all" }) {
             )}
           </div>
           <RdFoot how={{ term: "issues", from: "The issues" }}>
-            Figures pool the last {I.window} of polls, newer and larger polls counting for more. “Ahead” means a lead larger than its own 95% margin; “behind” names a party clearly third. The weighted row sums each party’s share in proportion to how important voters say the issue is. Pick an issue to follow it in the chart.
+            Figures pool the last {I.window} of polls, newer and larger polls counting for more. “Ahead” means a lead larger than its own 95% margin; “behind” names a party clearly third. Pick an issue to follow it in the chart.
           </RdFoot>
         </>
       ) : (
