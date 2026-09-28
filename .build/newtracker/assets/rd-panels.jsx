@@ -885,22 +885,35 @@ function RdDirection({ rangeId }) {
   const active = houses.filter((h) => !inactive.includes(h));
   const top = houses[0];
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
-  /* a stopped house is dated by its first quiet month (gen-data's
-     directionStoppedSince); houses quiet from the same month share a clause */
+  const ymLong = (ym) => D.monthNameFull(Number(ym.slice(5))) + " " + ym.slice(0, 4);
+  const topYM = (D.directionPolls || []);
+  const others = active.filter((h) => h !== top);
+  /* an Oxford comma only here: the house list closes a sentence of its own,
+     every other list in the panel keeps rdList's bare "and" */
+  const rdListOx = (arr) => arr.length > 2 ? arr.slice(0, -1).join(", ") + ", and " + arr[arr.length - 1] : rdList(arr);
+  const othersClause = others.length ? rdListOx(others) + " supply the rest" : "";
+  /* a house on a lone reading says so, dated; a stopped house is dated by its
+     first quiet month (gen-data's directionStoppedSince). Both share one
+     sentence, closing the footer before the headline note */
+  const sparseBits = others.filter((h) => counts[h] === 1).map((h) => {
+    const row = topYM.find((d) => d.pollster === h);
+    return h + " has supplied only one direction reading, in " + ymLong(row.ym);
+  });
   const sinceGroups = new Map();
   inactive.forEach((h) => {
     const ym = (D.directionStoppedSince || {})[h];
     sinceGroups.set(ym, (sinceGroups.get(ym) || []).concat(h));
   });
-  const inactiveClause = inactive.length ? "; " + [...sinceGroups.entries()].map(([ym, hs]) =>
+  const inactiveBits = [...sinceGroups.entries()].map(([ym, hs]) =>
     rdList(hs) + (ym
-      ? " became inactive in " + D.monthNameFull(Number(ym.slice(5))) + " " + ym.slice(0, 4)
+      ? " became inactive in " + ymLong(ym)
       : (hs.length > 1 ? " have" : " has") + " stopped asking")
-  ).join("; ") : "";
-  const foot = top ? "Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + counts[top] + " of the " + total + " since May 2025. "
-    + (active.filter((h) => h !== top).length ? rdList(active.filter((h) => h !== top)) + " supply the rest" : "")
-    + inactiveClause + ". "
-    + "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
+  );
+  const tail = sparseBits.concat(inactiveBits).join("; ");
+  const foot = top ? "Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + counts[top] + " of the " + total + " since May 2025."
+    + (othersClause ? " " + othersClause + "." : "")
+    + (tail ? " " + tail + "." : "")
+    + " The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   return (

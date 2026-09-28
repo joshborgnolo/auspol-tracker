@@ -58873,13 +58873,23 @@ function RdDirection({
   const active = houses.filter(h => !inactive.includes(h));
   const top = houses[0];
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
+  const ymLong = ym => D.monthNameFull(Number(ym.slice(5))) + " " + ym.slice(0, 4);
+  const topYM = D.directionPolls || [];
+  const others = active.filter(h => h !== top);
+  const rdListOx = arr => arr.length > 2 ? arr.slice(0, -1).join(", ") + ", and " + arr[arr.length - 1] : rdList(arr);
+  const othersClause = others.length ? rdListOx(others) + " supply the rest" : "";
+  const sparseBits = others.filter(h => counts[h] === 1).map(h => {
+    const row = topYM.find(d => d.pollster === h);
+    return h + " has supplied only one direction reading, in " + ymLong(row.ym);
+  });
   const sinceGroups = new Map();
   inactive.forEach(h => {
     const ym = (D.directionStoppedSince || {})[h];
     sinceGroups.set(ym, (sinceGroups.get(ym) || []).concat(h));
   });
-  const inactiveClause = inactive.length ? "; " + [...sinceGroups.entries()].map(([ym, hs]) => rdList(hs) + (ym ? " became inactive in " + D.monthNameFull(Number(ym.slice(5))) + " " + ym.slice(0, 4) : (hs.length > 1 ? " have" : " has") + " stopped asking")).join("; ") : "";
-  const foot = top ? "Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + counts[top] + " of the " + total + " since May 2025. " + (active.filter(h => h !== top).length ? rdList(active.filter(h => h !== top)) + " supply the rest" : "") + inactiveClause + ". " + "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
+  const inactiveBits = [...sinceGroups.entries()].map(([ym, hs]) => rdList(hs) + (ym ? " became inactive in " + ymLong(ym) : (hs.length > 1 ? " have" : " has") + " stopped asking"));
+  const tail = sparseBits.concat(inactiveBits).join("; ");
+  const foot = top ? "Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + counts[top] + " of the " + total + " since May 2025." + (othersClause ? " " + othersClause + "." : "") + (tail ? " " + tail + "." : "") + " The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   return React.createElement(RdSec, {
