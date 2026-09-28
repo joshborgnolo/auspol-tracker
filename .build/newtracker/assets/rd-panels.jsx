@@ -840,10 +840,10 @@ function RdDirection({ rangeId }) {
       : now.changeSig ? "Net mood has " + netVerb(Math.round(Math.abs(now.chg)), now.chg > 0) + ", " + upDown(now.chg) + Math.round(Math.abs(now.chg)) + " points in a month"
       : "Net mood has held steady for a month")
     + (Math.abs(sinceFirst) >= 5 ? (now.chg == null
-      ? "Net mood has " + netWord(sinceFirst) + ", " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since the 2025 election."
+      ? "Net mood has " + netWord(sinceFirst) + ", " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since May 2025."
       : now.changeSig
-        ? (Math.sign(sinceFirst) === Math.sign(now.chg) ? " and " : " but " + upDown(sinceFirst)) + rdRoughPts(sinceFirst) + " points since the 2025 election."
-        : ", though it is " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since the 2025 election.") : ".");
+        ? (Math.sign(sinceFirst) === Math.sign(now.chg) ? " and " : " but " + upDown(sinceFirst)) + rdRoughPts(sinceFirst) + " points since May 2025."
+        : ", though it is " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since May 2025.") : ".");
   const lowest = now.net <= Math.min(...M.map((d) => d.net)) + 0.05;
   const highest = now.net >= Math.max(...M.map((d) => d.net)) - 0.05;
   const signedP = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);

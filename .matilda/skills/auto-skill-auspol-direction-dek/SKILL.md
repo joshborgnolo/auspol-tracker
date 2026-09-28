@@ -1,6 +1,6 @@
 ---
 name: auspol-direction-dek
-description: "auspol-tracker — the National-direction panel's head+dek generator (RdDirection in rd-panels.jsx ~:820-845; dek's NET framing shipped 464b57c, 2026-09-28, vivid-verb ladder added same day: 'Net mood has plummeted, down N points in a month and M points since the 2025 election'): now.chg/sinceFirst are NET changes (right minus wrong), netVerb grades plummeted/soured/soured slightly (up: soared/lifted/lifted slightly) by N>=10|6|<6 inside the changeSig gate only, netWord/upDown keep wording leadership-agnostic, rdRoughPts owns the election figure ('more than 30', never a hard-coded flat 30), the old-design DirectionPanel carries DIFFERENT legacy copy — the dek is a SINGLE home, not a two-homes pair."
+description: "auspol-tracker — the National-direction panel's head+dek generator (RdDirection in rd-panels.jsx ~:820-845; dek's NET framing shipped 464b57c, 2026-09-28, vivid-verb ladder added same day: 'Net mood has plummeted, down N points in a month and M points since May 2025'): now.chg/sinceFirst are NET changes (right minus wrong), netVerb grades plummeted/soured/soured slightly (up: soared/lifted/lifted slightly) by N>=10|6|<6 inside the changeSig gate only, netWord/upDown keep wording leadership-agnostic, rdRoughPts owns the election figure ('more than 30', never a hard-coded flat 30), the old-design DirectionPanel carries DIFFERENT legacy copy — the dek is a SINGLE home, not a two-homes pair."
 source: auto-skill
 extracted_at: '2026-09-28T01:45:57.762Z'
 ---
@@ -25,8 +25,8 @@ tiers respectively.
 Rendered when wrong-track leads:
 
 > Only 23% say we’re heading in the right direction. Net mood has
-> plummeted, down 10 points in a month and more than 30 points since the
-> 2025 election.
+> plummeted, down 10 points in a month and more than 30 points since
+> May 2025.
 
 Template at ~:835-845:
 
@@ -63,12 +63,12 @@ const upDown  = (d) => (d > 0 ? "up " : "down ");
   adverb carries); a month/term **sign flip** gets `" but up " + M + …` so
   false copy is impossible; an insignificant month gets `", though it is
   down " + M + …`; `chg == null` gets a standalone
-  "Net mood has worsened, down M points since the 2025 election."
+  "Net mood has worsened, down M points since May 2025."
 - `rdRoughPts(v)` (~:814) owns the ELECTION magnitude as "a count of points
   as a reader rounds it": <12 exact rounds, else tens with a ±2 band
   ("more than 30" for 32.x, "about 10". Do not flatten it to a user's quoted
   "30 points" — flag the deviation instead (see the workflow note); and the
-  phrase is now "since the 2025 election", not "since just after…".
+  phrase is now "since May 2025", not "since the 2025 election".
 
 ## Workflow: user copy-edits against this generated sentence
 
