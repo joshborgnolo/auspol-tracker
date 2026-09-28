@@ -72,7 +72,7 @@ function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
 function RdHero(p) {
   const { rangeId, setRangeId, matchup, basis, morph, chooseMatchup, chooseBasis, orderedMatchups,
           latest, unc, monthDelta, leadSwing, impOffered, impOnOffered, impBasis, impOnBasis, adjusted,
-          iDataOf, iScatOf, showScatter, showSynth, setShowSynth, otherContests, xDomain } = p;
+          iDataOf, iScatOf, showScatter, showSynth, setShowSynth, otherContests, xDomain, domainRef } = p;
   const { D, filterPts, blendRows, mixC, blendDomain, monthLabelFull } = window.AP;
   const M = window.AP.tppMatchups;
   const m = M[matchup];
@@ -149,12 +149,19 @@ function RdHero(p) {
   /* ---- the chart: Labor's share against both rivals -------------------- */
   const laborIds = orderedMatchups.filter((id) => M[id].vsLabor);
   const otherOf = (id) => (M[id] && M[id].vsLabor ? laborIds.find((x) => x !== id) || null : null);
-  const ptsOf = (id, b) => filterPts(iDataOf(id, b), xDomain[0]);
-  const scene = (id, b) => {
+  /* A switch draws two scenes on every frame, and a scene's rows, its window
+     and its dots only change with the range or the dots toggle - so each is
+     worked out once per scene and kept. Only the blend is new per frame. */
+  const memo = React.useRef({ key: null, m: new Map() });
+  const memoKey = xDomain[0] + "|" + xDomain[1] + "|" + showScatter;
+  if (memo.current.key !== memoKey) memo.current = { key: memoKey, m: new Map() };
+  const kept = (k, f) => { const m = memo.current.m; if (!m.has(k)) m.set(k, f()); return m.get(k); };
+  const ptsOf = (id, b) => kept("p" + id + b, () => filterPts(iDataOf(id, b), xDomain[0]));
+  const scene = (id, b) => kept("s" + id + b, () => {
     const o = otherOf(id);
     return { id, o, main: ptsOf(id, b), other: o ? ptsOf(o, b) : null,
              mc: M[id].b.color, oc: o ? M[o].b.color : null };
-  };
+  });
   const fromB = morph ? (morph.fromBasis || b0) : b0, toB = morph ? (morph.toBasis || b0) : b0;
   const S = scene(matchup, b0);
   const A = morph ? scene(morph.from, fromB) : null, B = morph ? scene(morph.to, toB) : null;
@@ -196,9 +203,12 @@ function RdHero(p) {
                   points: mainRows.map((d) => ({ x: d.x, y: d.a })),
                   clipX: mainBl ? mainBl.clip : null, endLabel: narrow ? null : labelMain });
   const areas = [];
-  const bandPts = mainRows.filter((d) => d.ci95 != null && d.ci95 > 0).map((d) => ({ x: d.x, y0: d.a - d.ci95, y1: d.a + d.ci95 }));
+  /* mid-switch the band is drawn from the blend's own edges (see blendRows) */
+  const bandPts = mainBl
+    ? mainRows.filter((d) => d.ci95Hi != null && d.ci95Lo != null).map((d) => ({ x: d.x, y0: d.ci95Lo, y1: d.ci95Hi }))
+    : mainRows.filter((d) => d.ci95 != null && d.ci95 > 0).map((d) => ({ x: d.x, y0: d.a - d.ci95, y1: d.a + d.ci95 }));
   if (bandPts.length >= 2)
-    areas.push({ id: "band", color: mainCol, className: "ci-band", edge: false, clipX: mainBl ? mainBl.clip : null, points: bandPts });
+    areas.push({ id: "band", color: mainCol, className: "ci-band", edge: false, clipX: mainBl ? mainBl.clips.ci95 : null, points: bandPts });
   if (sensOn)
     areas.push({ id: "sens", color: "var(--lnp)", className: "rd-sens", edge: true,
                  points: filterPts(D.flowSens.map((d) => ({ x: d.x, y0: d.lo, y1: d.hi })), xDomain[0]) });
@@ -234,7 +244,7 @@ function RdHero(p) {
   const marks = ringOn ? [{ x: elec.x, y: elec.alp, label: narrow ? null : "2025 election: " + elec.alp.toFixed(1) }] : [];
 
   /* the window fits everything drawn, both contests, their dots and interval */
-  const domainOf = (id, b) => {
+  const domainOf = (id, b) => kept("d" + id + b + ringOn, () => {
     const v = [50];
     const sc = scene(id, b);
     sc.main.forEach((d) => { v.push(d.a); if (d.ci95) v.push(d.a - d.ci95, d.a + d.ci95); });
@@ -248,18 +258,30 @@ function RdHero(p) {
     /* a stray dot may sit a hair past a gridline without buying a whole
        empty band of window */
     return [Math.floor((Math.min(...v) + 0.3) / 5) * 5, Math.ceil((Math.max(...v) - 0.3) / 5) * 5];
-  };
+  });
   const yTarget = domainOf(matchup, b0);
-  const yDomain = morph ? blendDomain(domainOf(morph.from, fromB), yTarget, t) : yTarget;
+  /* a switch that took over from another starts from the window on screen */
+  const yDomain = morph ? blendDomain(morph.fromDomain || domainOf(morph.from, fromB), yTarget, t) : yTarget;
+  if (domainRef) domainRef.current = yDomain;
   const yTicks = rdYTicks(yTarget[0], yTarget[1], 5);
 
-  /* events: the major ones, and the chosen contest's own change of hands */
-  const x0 = Math.min(...[mainRows, otherRows].filter((r) => r && r.length).map((r) => r[0].x));
-  const x1 = Math.max(...[mainRows, otherRows].filter((r) => r && r.length).map((r) => r[r.length - 1].x));
-  const own = { alp_lnp: "2026-02-12", alp_on: "2025-12-08" }[morph ? morph.from : matchup];
-  const evsAll = (D.events || []).filter((e) => (e.major || e.date === own) && e.x >= x0 - 0.02 && e.x <= x1 + 0.02);
+  /* events: the major ones, and the chosen contest's own change of hands,
+     over the months that contest's lines run. Mid-switch the chart is handed
+     both scenes' events and slides one set into the other (TrendChart's
+     eventsFrom), so the markers change with the lines, not after them. */
+  const evsOf = (sc) => {
+    const rows = [sc.main, sc.other].filter((r) => r && r.length);
+    if (!rows.length) return [];
+    const x0 = Math.min(...rows.map((r) => r[0].x)), x1 = Math.max(...rows.map((r) => r[r.length - 1].x));
+    const own = { alp_lnp: "2026-02-12", alp_on: "2025-12-08" }[sc.id];
+    return (D.events || []).filter((e) => (e.major || e.date === own) && e.x >= x0 - 0.02 && e.x <= x1 + 0.02);
+  };
+  const evsAll = evsOf(morph ? B : S);
+  const evsWas = morph ? evsOf(A) : null;
   const badges = narrow ? rdEventBadges(evsAll, xDomain[0], xDomain[1]) : null;
+  const badgesWas = narrow && evsWas ? rdEventBadges(evsWas, xDomain[0], xDomain[1]) : null;
   const events = badges ? badges.events : evsAll;
+  const eventsWas = evsWas ? (badgesWas ? badgesWas.events : evsWas) : null;
 
   const aName = m.a.name, rival = M[matchup].vsLabor ? "Rival" : m.b.name;
   const notes = [
@@ -275,14 +297,14 @@ function RdHero(p) {
      after it, the election is the guide's first stop, as it is on the
      primary-vote chart, and says what it is. */
   const spineRows = (ringOn && elec.x >= xDomain[0] && mainRows.length && mainRows[0].x > elec.x + 1e-6
-    ? [{ ...elec, a: elec.alp }] : []).concat(mainRows);
+    ? [{ ...elec, a: elec.alp }] : []).concat(mainRows.filter((d) => !d.mid));
   const spine = spineRows.map((d) => ({ x: d.x, y: d.a, ym: d.ym }));
 
   /* ---- the finding over the chart --------------------------------------
      About the two Labor contests together, whichever one the chart is set
      to: how far each has moved since both were first asked, and whether they
      have converged. Written from the monthly figures on the chosen basis. */
-  const story = (() => {
+  const story = kept("story" + b0, () => {
     const on = iDataOf("alp_on", b0).filter((d) => !d.election), co = iDataOf("alp_lnp", b0).filter((d) => !d.election);
     if (!on.length || !co.length || !M.alp_on || !laborIds.includes("alp_on")) return null;
     const coBy = {}; co.forEach((d) => { coBy[d.ym] = d; });
@@ -313,7 +335,7 @@ function RdHero(p) {
       dek += " Since " + since + " the two contests have run within " + phrase + " of each other.";
     }
     return { head, dek };
-  })();
+  });
 
   /* ---- the key ---------------------------------------------------------- */
   const keyItems = [
@@ -422,7 +444,7 @@ function RdHero(p) {
           yTickFmt={(v) => (v === yTarget[1] ? v + "%" : String(v))}
           xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline
           refLines={[{ y: 50, color: "var(--ink-faint)" }]}
-          notes={notes} marks={marks} events={events}
+          notes={notes} marks={marks} events={events} eventsFrom={eventsWas} eventMix={t}
           series={series} spine={spine}
           scatter={scatter} scatterOut={scatterOut} scatterMove={scatterMove}
           areas={areas} fade={morph ? t : 1}
@@ -433,7 +455,7 @@ function RdHero(p) {
                   sub: basisWords.replace(/^Implied flows$/, "Implied preference flows") + (unc ? " · weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
                   legend: copyKey.map((k) => ({ label: k.label, color: k.color, kind: k.kind })) }}
         />
-        {badges && <RdEventList list={badges.list} />}
+        {badges && <RdEventList list={badges.list} from={badgesWas ? badgesWas.list : null} mix={t} />}
         <RdKey className="rd-ckey" items={keyItems} />
         {narrow && cmpAvail && <RdCheck checked={showSynth} onChange={setShowSynth}>{cmpBox}</RdCheck>}
       </div>

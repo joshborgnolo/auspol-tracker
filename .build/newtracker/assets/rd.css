@@ -271,6 +271,9 @@ body.rd .rd-evlist { list-style: none; margin: 12px 0 0; padding: 0; font-size: 
 /* straight under its chart the list starts in the band the copy button
    keeps, so the numbers sit next to the badges they decode */
 body.rd .chart:has(> .chart-copy-btn) + .rd-evlist { margin-top: 0; }
+/* two lists in one cell while a switch crossfades them (RdEventList) */
+body.rd .rd-evstack { display: grid; }
+body.rd .rd-evstack > .rd-evlist { grid-area: 1 / 1; }
 body.rd .rd-evlist + .rd-ckey { margin-top: 16px; }
 body.rd .rd-evlist li { display: flex; align-items: baseline; gap: 12px; padding: 3px 0; }
 body.rd .rd-evlist-n { width: 14px; flex-shrink: 0; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
@@ -428,7 +431,7 @@ body.rd .rd-tpp-read {
 body.rd .rd-tpp-side { display: flex; align-items: center; gap: 14px; min-width: 0; }
 body.rd .rd-tpp-side.rd-a { justify-content: flex-end; }
 body.rd .rd-tpp-name { display: inline-flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 600; white-space: nowrap; }
-body.rd .rd-tpp-dot { width: 14px; height: 14px; border-radius: 7px; flex-shrink: 0; transition: background-color .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-tpp-dot { width: 14px; height: 14px; border-radius: 7px; flex-shrink: 0; transition: background-color .32s var(--morph-ease); }
 body.rd .rd-tpp-num { font-family: var(--sans); font-size: 88px; font-weight: 500; letter-spacing: -0.03em; line-height: 1; }
 body.rd .rd-tpp-rule { width: 2px; height: 72px; background: var(--ink-faint); }
 body.rd .rd-tpp-verdict { margin: 14px 0 0; font-size: 17px; line-height: 1.5; color: var(--ink-2); text-wrap: balance; }
@@ -453,7 +456,7 @@ body.rd .rd-lg-side { top: 0; line-height: 16px; font-weight: 600; white-space: 
 body.rd .rd-lg-grid { top: 20px; height: 38px; width: 1px; background: var(--line); transform: translateX(-0.5px); }
 body.rd .rd-lg-tie { top: 16px; height: 44px; width: 1.5px; background: var(--ink-faint); transform: translateX(-0.75px); }
 body.rd .rd-lg-span, body.rd .rd-lg-cap, body.rd .rd-lg-dot {
-  transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease;
+  transition: left .32s var(--morph-ease), width .32s var(--morph-ease), background-color .32s ease;
 }
 body.rd .rd-lg-span { top: 28px; height: 16px; border-radius: 2px; opacity: 0.2; }
 body.rd .rd-lg-cap { top: 28px; height: 16px; width: 2px; transform: translateX(-1px); }
@@ -747,7 +750,7 @@ body.rd .rd-hb-bar { display: flex; height: 28px; gap: 2px; font-variant-numeric
 body.rd .rd-hb-seg {
   flex-grow: 0; flex-shrink: 1; min-width: 0; display: flex; align-items: center; gap: 6px; padding: 0 10px;
   font-size: 13px; white-space: nowrap; overflow: hidden;
-  transition: flex-basis .32s cubic-bezier(.4, .1, .25, 1);
+  transition: flex-basis .32s var(--morph-ease);
 }
 body.rd .rd-hb-seg b { font-size: 15px; font-weight: 600; }
 body.rd .rd-hb-seg.end { justify-content: flex-end; }
@@ -781,9 +784,9 @@ body.rd .rd-dp-name { display: flex; align-items: center; gap: 10px; font-size: 
 body.rd .rd-dp-sw { width: 10px; height: 10px; border-radius: 5px; flex-shrink: 0; }
 body.rd .rd-dp-track { position: relative; height: 34px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
 body.rd .rd-dp-zero { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px dashed var(--ink-faint); }
-body.rd .rd-dp-ci { position: absolute; top: 50%; height: 2.5px; transform: translateY(-50%); border-radius: 2px; transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
-body.rd .rd-dp-link { position: absolute; top: 50%; height: 2px; transform: translateY(-50%); opacity: 0.6; transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
-body.rd .rd-dp-dot { position: absolute; top: 50%; width: 11px; height: 11px; box-sizing: border-box; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 2px var(--bg); transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-dp-ci { position: absolute; top: 50%; height: 2.5px; transform: translateY(-50%); border-radius: 2px; transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
+body.rd .rd-dp-link { position: absolute; top: 50%; height: 2px; transform: translateY(-50%); opacity: 0.6; transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
+body.rd .rd-dp-dot { position: absolute; top: 50%; width: 11px; height: 11px; box-sizing: border-box; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 2px var(--bg); transition: left .32s var(--morph-ease); }
 body.rd .rd-dp-dot.open { background: var(--bg); border: 2px solid; }
 body.rd .rd-dp-now { text-align: right; font-size: 15px; font-weight: 600; color: var(--ink); }
 body.rd .rd-dp-chg { text-align: right; font-size: 14px; color: var(--ink-3); }
@@ -902,9 +905,9 @@ body.rd .rd-wv-dot { position: absolute; top: 50%; left: 0; width: 13px; height:
 /* a party switch (or a grouping switch's rows, which are keyed by place)
    glides each mark to its new value, the leadership bars' ease and length,
    colours easing with them; the scale's ticks slide if its top changes */
-body.rd .rd-wv-dot { transition: transform .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease, border-color .32s ease; }
+body.rd .rd-wv-dot { transition: transform .32s var(--morph-ease), background-color .32s ease, border-color .32s ease; }
 body.rd .rd-wv-ci { transition: color .32s ease; }
-body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: transform .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: transform .32s var(--morph-ease); }
 /* a grouping switch brings the charts in fresh: faded in, not cut */
 body.rd .rd-wv-enter > .rd-wv-chart { animation: rd-wv-in .32s ease both; }
 @keyframes rd-wv-in { from { opacity: 0; } }
@@ -972,7 +975,7 @@ body.rd .rd-mo-onfill { fill: var(--on-fill-onp); }
 body.rd .rd-mo-pts { font-size: 15px; font-weight: 600; fill: var(--ink); }
 body.rd .rd-mo-sh { font-size: 12px; fill: var(--ink-3); }
 body.rd .rd-mo-base { stroke: var(--ink-faint); stroke-width: 1; }
-body.rd .rd-mo-fill { transition: y .32s cubic-bezier(.4, .1, .25, 1), height .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-mo-fill { transition: y .32s var(--morph-ease), height .32s var(--morph-ease); }
 body.rd .rd-mo-note { margin-top: 4px; }
 body.rd .rd-mo-key { margin-top: 12px; }
 body.rd .rd-mo-howread { color: var(--ink-3); }
@@ -1112,8 +1115,8 @@ body.rd .rd-iw-lrow.all .rd-iw-lbar > span { background: var(--ink); }
 body.rd .rd-iw-lbar > i { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); transform: translateX(-1px); }
 /* a switch of grouping or issue slides each bar to its new share, the
    leadership bars' ease and length, while the figure beside it rolls */
-body.rd .rd-iw-bar > span, body.rd .rd-iw-lbar > span { transition: width .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease; }
-body.rd .rd-iw-bar > i, body.rd .rd-iw-lbar > i { transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-iw-bar > span, body.rd .rd-iw-lbar > span { transition: width .32s var(--morph-ease), background-color .32s ease; }
+body.rd .rd-iw-bar > i, body.rd .rd-iw-lbar > i { transition: left .32s var(--morph-ease); }
 @media (prefers-reduced-motion: reduce) {
   body.rd .rd-iw-bar > span, body.rd .rd-iw-lbar > span, body.rd .rd-iw-bar > i, body.rd .rd-iw-lbar > i { transition: none; }
 }

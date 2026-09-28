@@ -843,7 +843,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
     const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (still) return;
     const MS = (window.AP && window.AP.MORPH_MS) || 320;
-    const EASE = "cubic-bezier(.4, .1, .25, 1)";
+    const EASE = window.AP.MORPH_CSS;
     /* Every start state is set, then committed ONCE, then every end state -
        rather than a reflow per element. The usual FLIP waits a frame before
        releasing, and a frame is exactly what a hidden tab never gets: the

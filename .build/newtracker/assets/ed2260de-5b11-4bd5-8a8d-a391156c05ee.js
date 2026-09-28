@@ -305,20 +305,27 @@ window.AP = (function () {
 
   /* ONE motion curve and ONE duration for every transition that moves data
      rather than chrome: the matchup morph in the hero, the digit reels (which
-     animate it in CSS - keep the cubic-bezier in template.html the same), and
+     animate it in CSS - template.html's --morph-ease is this same curve), and
      the chart's own travelling x window. They were on separate curves once and
      it showed: a figure whose colour crawled on one ease while its digits
      crawled on another read as sticking.
 
-     Accelerates, holds a real middle, settles without a tail: 16% / 37% / 60%
-     / 77% at a fifth, a third, two fifths and half the duration. */
+     An ease-out that is moving from the first frame: 12% of the way after one
+     frame, a quarter after two, half by 70ms, and it settles without a tail.
+     The curve it replaced accelerated first - 2% after one frame, 5% after
+     two - so every switch sat still for the first 50ms after a press and
+     read as lag. The top speed is the same (13% of the distance per frame). */
   const MORPH_MS = 320;
+  const MORPH_BEZ = [0.3, 0.7, 0.3, 1];
+  const MORPH_CSS = "cubic-bezier(" + MORPH_BEZ.join(", ") + ")";
   const morphEase = (() => {
-    const [p1x, p1y, p2x, p2y] = [0.4, 0.1, 0.25, 1];
+    const [p1x, p1y, p2x, p2y] = MORPH_BEZ;
     const A = (a, b) => 1 - 3 * b + 3 * a, B = (a, b) => 3 * b - 6 * a, C = (a) => 3 * a;
     const f = (t, a, b) => ((A(a, b) * t + B(a, b)) * t + C(a)) * t;
     const df = (t, a, b) => 3 * A(a, b) * t * t + 2 * B(a, b) * t + C(a);
     return (x) => {
+      if (x <= 0) return 0;
+      if (x >= 1) return 1;
       let t = x;
       for (let i = 0; i < 8; i++) {
         const d = df(t, p1x, p2x);
@@ -328,6 +335,51 @@ window.AP = (function () {
       return f(t, p1y, p2y);
     };
   })();
+  const reduceMotion = () => !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  /* The clock every data switch runs on.
+
+     The press's own render already carries the first frame of motion: by the
+     time it reaches the screen a frame has passed, so the clock starts one
+     frame back and the first thing the reader sees is the chart moving, not
+     a repeat of the picture they pressed. It used to open on t = 0 - an
+     unchanged frame - and then ease in, which was 50ms of nothing.
+
+     Each later frame is rendered INSIDE its animation frame (flushSync), so
+     the frame the browser paints is the one just computed. Left to React's
+     scheduler, the update rendered in a task after that paint - a frame late,
+     and split across two tasks that a phone could not fit into one frame.
+     Progress never runs backwards, whatever the timestamps do.
+
+     `frame(t)` sets the state for eased progress t, `land()` the settled
+     view; `from` (0..1) resumes part-way, for a switch reversed mid-flight.
+     Returns the t to render with now. */
+  const FRAME_MS = 1000 / 60;
+  function morphClock(raf, frame, land, from) {
+    cancelAnimationFrame(raf.current);
+    const start = Math.min(1, (from || 0) + FRAME_MS / MORPH_MS);
+    const t0 = performance.now() - start * MORPH_MS;
+    let last = start;
+    const flush = window.ReactDOM && window.ReactDOM.flushSync ? window.ReactDOM.flushSync : (fn) => fn();
+    const step = (now) => {
+      const raw = Math.max(last, Math.min(1, (now - t0) / MORPH_MS));
+      last = raw;
+      if (raw >= 1) { raf.current = 0; flush(land); return; }
+      flush(() => frame(morphEase(raw)));
+      raf.current = requestAnimationFrame(step);
+    };
+    raf.current = requestAnimationFrame(step);
+    return { t: morphEase(start), raw: start };
+  }
+  /* Where a running switch is, as raw time (0..1) rather than eased progress,
+     so a reversal can pick the clock up at the matching point. */
+  const morphRawOf = (t) => {
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+    let lo = 0, hi = 1;
+    for (let i = 0; i < 24; i++) { const mid = (lo + hi) / 2; if (morphEase(mid) < t) lo = mid; else hi = mid; }
+    return (lo + hi) / 2;
+  };
 
   /* ---- one switch, three things in motion --------------------------------
      A control that changes the QUESTION a chart is asking is the same gesture
@@ -339,33 +391,36 @@ window.AP = (function () {
      here, because a switch that animates in one panel and cuts in the next
      reads as two different kinds of control.
 
+     A switch pressed again mid-flight: straight back to where it came from
+     reverses from the point it had reached, since a blend of A into B at t is
+     B into A at 1 - t, so nothing jumps. On to a third view, the new switch
+     starts from whichever of the two views the chart was nearer.
+
      Honours prefers-reduced-motion by landing on the new view immediately. */
   function useMorph(value, apply, canMorph) {
     const [morph, setMorph] = React.useState(null);      // { from, to, t }
     const raf = React.useRef(0);
     const land = React.useRef(0);
+    const live = React.useRef(null);                      // the morph on screen
     React.useEffect(() => () => { cancelAnimationFrame(raf.current); clearTimeout(land.current); }, []);
+    const put = (m) => { live.current = m; setMorph(m); };
     const choose = (next) => {
-      const from = value;
+      const cur = live.current;
+      let from = value, resume = 0;
+      if (cur && next === cur.from) { from = cur.to; resume = morphRawOf(1 - cur.t); }
+      else if (cur && cur.t < 0.5 && next !== cur.to) from = cur.from;
       apply(next);
-      const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (next === from || still || (canMorph && !canMorph(from, next))) { setMorph(null); return; }
-      cancelAnimationFrame(raf.current); clearTimeout(land.current);
-      const t0 = performance.now();
-      setMorph({ from, to: next, t: 0 });
-      const step = (now) => {
-        const raw = Math.min(1, (now - t0) / MORPH_MS);
-        if (raw >= 1) { setMorph(null); return; }         // land on the real thing
-        setMorph({ from, to: next, t: morphEase(raw) });
-        raf.current = requestAnimationFrame(step);
-      };
-      raf.current = requestAnimationFrame(step);
+      cancelAnimationFrame(raf.current);
+      clearTimeout(land.current);
+      if (next === from || reduceMotion() || (canMorph && !canMorph(from, next))) { put(null); return; }
+      const c = morphClock(raf, (t) => put({ from, to: next, t }), () => put(null), resume);
+      put({ from, to: next, t: c.t });
       /* A backstop, because frames are not guaranteed: a browser stops serving
          them to a hidden tab, and a morph whose driver stopped would leave the
          chart holding a half-interpolated shape that is not either answer.
          Whatever happens to the frames, the view lands on the truth. */
-      land.current = setTimeout(() => { cancelAnimationFrame(raf.current); setMorph(null); },
-                                MORPH_MS + 200);
+      land.current = setTimeout(() => { cancelAnimationFrame(raf.current); put(null); },
+                                (1 - c.raw) * MORPH_MS + 200);
     };
     return [morph, choose];
   }
@@ -376,39 +431,170 @@ window.AP = (function () {
      window travels with the morph — so a line retreats to the months its new
      question was actually asked in rather than being drawn across months
      nobody polled. Rows are {ym, x, ...}; `keys` are the numeric fields to
-     interpolate, and a key null on either side stays null. */
+     interpolate, and a key null on either side stays null - except an
+     interval ("ci", "ci95", "ci_alp"...), which one side lacking is read as
+     no width there, so a band grows out of its line or thins back into it.
+     Held to "both sides or nothing", a band covering months the other view
+     had no interval for appeared or vanished whole on the frame the switch
+     landed. */
+  const softKey = (k) => /^ci/.test(k);
+
+  /* A reading one side doesn't have, inside its span, is read off the curve
+     that side is DRAWN with - the redesign's monotone cubic, the old design's
+     spline - not off a straight chord between its neighbours. The blend adds
+     that month to the line's points; read off a chord, the extra point bent
+     the line away from the shape it lands on, and the gap months snapped by
+     several pixels on the switch's last frame. On the drawn curve the extra
+     point sits where the line already runs. */
+  const monoTangents = (xs, ys) => {
+    const n = xs.length, h = [], s = [], m = new Array(n).fill(0);
+    for (let i = 0; i < n - 1; i++) { h[i] = xs[i + 1] - xs[i]; s[i] = h[i] ? (ys[i + 1] - ys[i]) / h[i] : 0; }
+    const sign = (v) => (v > 0) - (v < 0);
+    for (let i = 1; i < n - 1; i++) {
+      const q = (s[i - 1] * h[i] + s[i] * h[i - 1]) / (h[i - 1] + h[i] || 1);
+      m[i] = (sign(s[i - 1]) + sign(s[i])) * Math.min(Math.abs(s[i - 1]), Math.abs(s[i]), 0.5 * Math.abs(q)) || 0;
+    }
+    if (n > 2) { m[0] = (3 * s[0] - m[1]) / 2; m[n - 1] = (3 * s[n - 2] - m[n - 2]) / 2; }
+    return m;
+  };
+  /* the curve through one key's non-null readings, as a function of x (or
+     through any readings `pick` returns a value for) */
+  const curveOf = (arr, k, pick) => {
+    const xs = [], ys = [];
+    arr.forEach((d) => { const v = pick ? pick(d) : d[k]; if (v != null) { xs.push(d.x); ys.push(v); } });
+    const n = xs.length, mono = !!(window.AP && window.AP.rd);
+    const m = mono && n > 2 ? monoTangents(xs, ys) : null;
+    return (x) => {
+      if (!n || x < xs[0] || x > xs[n - 1]) return null;
+      let i = 0;
+      while (i < n - 2 && xs[i + 1] < x) i++;
+      if (n === 1) return ys[0];
+      const h = xs[i + 1] - xs[i];
+      if (!h) return ys[i];
+      const u = (x - xs[i]) / h, u2 = u * u, u3 = u2 * u;
+      if (n === 2) return ys[0] + (ys[1] - ys[0]) * u;
+      if (m) return (2 * u3 - 3 * u2 + 1) * ys[i] + (u3 - 2 * u2 + u) * h * m[i]
+        + (-2 * u3 + 3 * u2) * ys[i + 1] + (u3 - u2) * h * m[i + 1];
+      // the old design's Catmull-Rom spline (charts' smoothPath), months evenly spaced
+      const y0 = ys[i - 1] != null ? ys[i - 1] : ys[i], y3 = ys[i + 2] != null ? ys[i + 2] : ys[i + 1];
+      const c1 = ys[i] + (ys[i + 1] - y0) / 6, c2 = ys[i + 1] - (y3 - ys[i]) / 6, v = 1 - u;
+      return v * v * v * ys[i] + 3 * v * v * u * c1 + 3 * v * u * u * c2 + u3 * ys[i + 1];
+    };
+  };
+
+  /* The months of two views lined up, each side's reading at each - worked
+     out once per pair of views and kept, since a switch asks for the same
+     pair on every frame and only the mix changes.
+
+     Between the months the blend carries SUBSTEPS readings more, each taken
+     off the curve its side is drawn with. A blended line drawn through the
+     months alone was a different curve from either view's: a month one view
+     skipped, or the flat run a view holds before it starts, changed the
+     curve's bend at its neighbours, so the first and last frames of a switch
+     were not the charts it went from and to, and the line snapped as it
+     landed. Drawn through its own curve, densely, each end of the blend IS
+     that view's line. The in-between readings carry `mid`, so a spine or a
+     readout can skip them. */
+  const SUBSTEPS = 4;
+  const alignMemo = new WeakMap();
+  function alignRows(A, B, keys) {
+    const kk = keys.join(",") + (window.AP && window.AP.rd ? "|m" : "|c");
+    let byB = alignMemo.get(A);
+    if (!byB) { byB = new WeakMap(); alignMemo.set(A, byB); }
+    const hit = byB.get(B);
+    if (hit && hit.kk === kk) return hit;
+    const index = (arr) => { const o = {}; arr.forEach((d) => (o[d.ym] = d)); return o; };
+    const ia = index(A), ib = index(B);
+    /* An interval is drawn as a band whose two EDGES are curves of their own,
+       through each month's value plus and minus its width - not the line's
+       curve plus the width's curve, which bend differently. So each interval
+       also gets its edges read off those edge curves (`<key>Lo`, `<key>Hi`),
+       collapsing onto the line where that side has no width; a band drawn
+       from them is, at each end of a switch, the band that view draws. */
+    const soft = keys.filter(softKey);
+    const centreOf = (k) => (/^ci_/.test(k) ? k.slice(3) : keys.find((c) => !softKey(c)));
+    const curves = (arr) => {
+      const c = {};
+      keys.forEach((k) => { c[k] = curveOf(arr, k); });
+      soft.forEach((k) => {
+        const cen = centreOf(k);
+        if (!cen) return;
+        const w = (d) => (d[k] != null && d[k] > 0 && d[cen] != null ? d[k] : null);
+        c[k + "Hi"] = curveOf(arr, null, (d) => (w(d) == null ? null : d[cen] + d[k]));
+        c[k + "Lo"] = curveOf(arr, null, (d) => (w(d) == null ? null : d[cen] - d[k]));
+        c[k + "C"] = cen;
+      });
+      return c;
+    };
+    const ca = curves(A), cb = curves(B);
+    /* What one side reads where it has no reading. OUTSIDE its span it holds
+       its nearest end - those stretches are clipped away, and the clip is what
+       makes the line grow and retreat. INSIDE, it is read off its own curve:
+       leadership series are gap-aware, so a month one question skipped is
+       common, and holding the last value there put a spike in the middle of a
+       line that was supposed to be bending into shape. */
+    const readAt = (idx, arr, cv, ym, x) => {
+      const row = ym && idx[ym];
+      const held = !row && (x <= arr[0].x ? arr[0] : x >= arr[arr.length - 1].x ? arr[arr.length - 1] : null);
+      const o = row || held ? { ...(row || held) } : { x };
+      if (!row && !held) keys.forEach((k) => { o[k] = cv[k](x); });
+      soft.forEach((k) => {
+        const cen = cv[k + "C"];
+        if (!cen) return;
+        const at = held ? held.x : x;
+        const hi = cv[k + "Hi"](at), lo = cv[k + "Lo"](at);
+        // no width there: the band closes onto its line
+        o[k + "Hi"] = hi != null ? hi : o[cen];
+        o[k + "Lo"] = lo != null ? lo : o[cen];
+      });
+      return o;
+    };
+    const months = [...new Set(A.concat(B).map((d) => d.ym))].sort()
+      .map((ym) => ({ ym, x: (ia[ym] || ib[ym]).x }));
+    const pairs = [];
+    months.forEach((m, i) => {
+      pairs.push({ ym: m.ym, x: m.x, da: readAt(ia, A, ca, m.ym, m.x), db: readAt(ib, B, cb, m.ym, m.x) });
+      const n = months[i + 1];
+      if (!n) return;
+      for (let j = 1; j < SUBSTEPS; j++) {
+        const x = m.x + ((n.x - m.x) * j) / SUBSTEPS;
+        pairs.push({ x, mid: true, da: readAt(ia, A, ca, null, x), db: readAt(ib, B, cb, null, x) });
+      }
+    });
+    /* An interval's own reach, which can be shorter than its line's (a month
+       with no width - an election result - carries no band), so a band
+       travels in its own window rather than its line's. */
+    const reach = (arr, k) => {
+      const on = arr.filter((d) => d[k] != null && d[k] > 0);
+      return on.length ? [on[0].x, on[on.length - 1].x] : null;
+    };
+    const reaches = {};
+    keys.filter(softKey).forEach((k) => { reaches[k] = [reach(A, k), reach(B, k)]; });
+    const out = { kk, pairs, reaches, a0: A[0].x, a1: A[A.length - 1].x, b0: B[0].x, b1: B[B.length - 1].x };
+    byB.set(B, out);
+    return out;
+  }
   function blendRows(A, B, t, keys) {
     if (!A.length || !B.length) return null;
     const lerp = (p, q) => p + (q - p) * t;
-    const index = (arr) => { const o = {}; arr.forEach((d) => (o[d.ym] = d)); return o; };
-    const ia = index(A), ib = index(B);
-    /* What one side reads at a month it doesn't have a reading for. OUTSIDE its
-       span it holds its nearest end — those months are clipped away anyway, and
-       the clip is what makes the line grow and retreat. INSIDE its span it is
-       interpolated between the readings either side: leadership series are
-       gap-aware, so a month one question skipped is common, and holding the
-       series' final value there put a spike in the middle of a line that was
-       supposed to be bending into shape. */
-    const readAt = (idx, arr, ym, x) => {
-      const hit = idx[ym];
-      if (hit) return hit;
-      if (x <= arr[0].x) return arr[0];
-      if (x >= arr[arr.length - 1].x) return arr[arr.length - 1];
-      let i = 0;
-      while (i < arr.length - 2 && arr[i + 1].x < x) i++;
-      const a = arr[i], b = arr[i + 1], f = (x - a.x) / (b.x - a.x);
-      const o = { ym, x };
-      keys.forEach((k) => { o[k] = (a[k] == null || b[k] == null) ? null : a[k] + (b[k] - a[k]) * f; });
-      return o;
-    };
-    const yms = [...new Set(A.concat(B).map((d) => d.ym))].sort();
+    const al = alignRows(A, B, keys);
+    const clip = [lerp(al.a0, al.b0), lerp(al.a1, al.b1)];
+    const clips = {};
+    Object.keys(al.reaches).forEach((k) => {
+      const [ra, rb] = al.reaches[k];
+      clips[k] = ra && rb ? [lerp(ra[0], rb[0]), lerp(ra[1], rb[1])] : clip;
+    });
     return {
-      rows: yms.map((ym) => {
-        const x = (ia[ym] || ib[ym]).x;
-        const da = readAt(ia, A, ym, x), db = readAt(ib, B, ym, x);
-        const o = { ym, x };
+      rows: al.pairs.map(({ ym, x, mid, da, db }) => {
+        const o = mid ? { x, mid } : { ym, x };
         keys.forEach((k) => {
-          o[k] = (da[k] == null || db[k] == null) ? null : lerp(da[k], db[k]);
+          o[k] = (da[k] == null || db[k] == null)
+            ? (softKey(k) && (da[k] != null || db[k] != null) ? lerp(da[k] || 0, db[k] || 0) : null)
+            : lerp(da[k], db[k]);
+          if (softKey(k)) ["Hi", "Lo"].forEach((e) => {
+            const p = da[k + e], q = db[k + e];
+            if (p != null && q != null) o[k + e] = lerp(p, q);
+          });
         });
         return o;
       }),
@@ -416,8 +602,9 @@ window.AP = (function () {
          span to its own. Per line, not per chart: Hanson is rated on
          favourability months before anyone asked about approving of her, and a
          single chart-wide window cannot express three different retreats — the
-         lines whose span it did not describe simply appeared at full length. */
-      clip: [lerp(A[0].x, B[0].x), lerp(A[A.length - 1].x, B[B.length - 1].x)],
+         lines whose span it did not describe simply appeared at full length.
+         `clips` holds each interval's window the same way. */
+      clip, clips,
     };
   }
 
@@ -463,6 +650,7 @@ window.AP = (function () {
                                         from[1] + (to[1] - from[1]) * t];
 
   return { D, rangeDomain, filterPts, buildXTicks, series, monthLabelFull, latestX,
-           pollRowKey, morphEase, MORPH_MS, useMorph, blendRows, crossClouds, mixC, blendDomain,
+           pollRowKey, morphEase, MORPH_MS, MORPH_CSS, morphClock, morphRawOf, reduceMotion, useMorph,
+           blendRows, crossClouds, mixC, blendDomain,
            discord, discordFacet, discordRead, DISCORD_MEASURES, DISC };
 })();

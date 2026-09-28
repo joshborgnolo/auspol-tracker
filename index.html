@@ -104,6 +104,7 @@
 </style>
   <style>
 :root {
+  --morph-ease: cubic-bezier(.3, .7, .3, 1);
   --bg:        oklch(0.970 0.008 78);
   --surface:   oklch(0.992 0.004 85);
   --surface-2: oklch(0.980 0.006 80);
@@ -799,10 +800,10 @@ body { --bar-track: color-mix(in oklch, var(--ink) 8%, var(--bg)); }
 .roll-reel {
   display: block;
   transform: translateY(calc(var(--d) * -1em));
-  transition: transform .32s cubic-bezier(.4, .1, .25, 1);
+  transition: transform .32s var(--morph-ease);
 }
 .roll-reel > span, .roll-sep { display: block; height: 1em; line-height: 1em; }
-.roll-sep { transition: margin .32s cubic-bezier(.4, .1, .25, 1); }
+.roll-sep { transition: margin .32s var(--morph-ease); }
 .roll-d, .roll-sep, .roll-anchor { -webkit-user-select: none; user-select: none; }
 .hero-sub { display: flex; align-items: center; gap: 6px 3px; margin-top: 10px; flex-wrap: wrap; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap;
@@ -832,7 +833,7 @@ body { --bar-track: color-mix(in oklch, var(--ink) 8%, var(--bg)); }
 }
 .hg-grad { position: absolute; bottom: 2px; height: 2px; width: 1px; background: var(--hg-grad); }
 .hg-span { position: absolute; top: 2px; height: 4px; border-radius: 999px;
-  transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
+  transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
 .hg-tie { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; margin-left: -0.5px;
   background: var(--hg-tie-cut); box-shadow: 1px 0 0 var(--hg-lip); }
 .hg-over { position: absolute; top: 2px; bottom: 2px; width: 3px; background: var(--hg-cut); }
@@ -1015,8 +1016,8 @@ body.dark .sens-band { opacity: 0.10; }
 .axis-label { font-family: var(--sans); fill: var(--ink-3); font-size: 13px; transition: fill .35s ease; }
 .axis-label.y { text-anchor: end; font-weight: 500; }
 .axis-label.x { font-weight: 500; }
-.scatter-dot { transition: r .12s ease, opacity .12s ease, fill .35s ease; cursor: pointer; }
-.series-line { transition: opacity .2s ease, stroke .35s ease; }
+.scatter-dot { transition: r .12s ease, opacity .12s ease, fill-opacity .12s ease; cursor: pointer; }
+.series-line { transition: opacity .2s ease; }
 .grid, .refline { transition: stroke .35s ease; }
 .tip {
   position: absolute; pointer-events: none; z-index: 5;
@@ -1156,7 +1157,7 @@ body.editorial .leadership .card-title { font-size: 19px; font-weight: 600; lett
 .ppm-readout { position: relative; }
 .ppm-ghost {
   position: absolute; pointer-events: none; opacity: 1;
-  transition: opacity .32s cubic-bezier(.4, .1, .25, 1);
+  transition: opacity .32s var(--morph-ease);
 }
 @media (prefers-reduced-motion: reduce) { .ppm-ghost { display: none; } }
 .ppm-pairs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
@@ -1210,7 +1211,7 @@ body.editorial .leadership .card-title { font-size: 19px; font-weight: 600; lett
 .appr-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
 .appr-top .leader-name { font-size: 13px; }
 .net { margin-left: auto; font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums;
-  transition: color .32s cubic-bezier(.4, .1, .25, 1); }
+  transition: color .32s var(--morph-ease); }
 .net.pos { color: var(--mood-pos); }
 .net.neg { color: var(--mood-neg); }
 .fav-mark {
@@ -1228,7 +1229,7 @@ body.editorial .leadership .card-title { font-size: 19px; font-weight: 600; lett
 .appr-netbar { position: relative; height: 8px; border-radius: 4px; overflow: hidden; }
 .anb-mid { position: absolute; left: calc(50% - 0.5px); top: 0; bottom: 0; width: 1px; z-index: 2; }
 .anb-fill { position: absolute; top: 0; bottom: 0; border-radius: 4px;
-  transition: width .32s cubic-bezier(.4, .1, .25, 1); }
+  transition: width .32s var(--morph-ease); }
 .anb-pos { left: 50%; background: var(--mood-pos); }
 .anb-neg { right: 50%; background: var(--mood-neg); }
 @media (prefers-reduced-motion: reduce) { .anb-fill { transition: none; } }
@@ -3169,6 +3170,8 @@ body.rd .rd-badge text { font-family: var(--sans); font-weight: 600; fill: var(-
 body.rd .rd-badge-tie { fill: none; stroke: var(--ink-faint); stroke-width: 1; vector-effect: non-scaling-stroke; }
 body.rd .rd-evlist { list-style: none; margin: 12px 0 0; padding: 0; font-size: 13px; color: var(--ink-2); }
 body.rd .chart:has(> .chart-copy-btn) + .rd-evlist { margin-top: 0; }
+body.rd .rd-evstack { display: grid; }
+body.rd .rd-evstack > .rd-evlist { grid-area: 1 / 1; }
 body.rd .rd-evlist + .rd-ckey { margin-top: 16px; }
 body.rd .rd-evlist li { display: flex; align-items: baseline; gap: 12px; padding: 3px 0; }
 body.rd .rd-evlist-n { width: 14px; flex-shrink: 0; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
@@ -3289,7 +3292,7 @@ body.rd .rd-tpp-read {
 body.rd .rd-tpp-side { display: flex; align-items: center; gap: 14px; min-width: 0; }
 body.rd .rd-tpp-side.rd-a { justify-content: flex-end; }
 body.rd .rd-tpp-name { display: inline-flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 600; white-space: nowrap; }
-body.rd .rd-tpp-dot { width: 14px; height: 14px; border-radius: 7px; flex-shrink: 0; transition: background-color .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-tpp-dot { width: 14px; height: 14px; border-radius: 7px; flex-shrink: 0; transition: background-color .32s var(--morph-ease); }
 body.rd .rd-tpp-num { font-family: var(--sans); font-size: 88px; font-weight: 500; letter-spacing: -0.03em; line-height: 1; }
 body.rd .rd-tpp-rule { width: 2px; height: 72px; background: var(--ink-faint); }
 body.rd .rd-tpp-verdict { margin: 14px 0 0; font-size: 17px; line-height: 1.5; color: var(--ink-2); text-wrap: balance; }
@@ -3311,7 +3314,7 @@ body.rd .rd-lg-side { top: 0; line-height: 16px; font-weight: 600; white-space: 
 body.rd .rd-lg-grid { top: 20px; height: 38px; width: 1px; background: var(--line); transform: translateX(-0.5px); }
 body.rd .rd-lg-tie { top: 16px; height: 44px; width: 1.5px; background: var(--ink-faint); transform: translateX(-0.75px); }
 body.rd .rd-lg-span, body.rd .rd-lg-cap, body.rd .rd-lg-dot {
-  transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease;
+  transition: left .32s var(--morph-ease), width .32s var(--morph-ease), background-color .32s ease;
 }
 body.rd .rd-lg-span { top: 28px; height: 16px; border-radius: 2px; opacity: 0.2; }
 body.rd .rd-lg-cap { top: 28px; height: 16px; width: 2px; transform: translateX(-1px); }
@@ -3570,7 +3573,7 @@ body.rd .rd-hb-bar { display: flex; height: 28px; gap: 2px; font-variant-numeric
 body.rd .rd-hb-seg {
   flex-grow: 0; flex-shrink: 1; min-width: 0; display: flex; align-items: center; gap: 6px; padding: 0 10px;
   font-size: 13px; white-space: nowrap; overflow: hidden;
-  transition: flex-basis .32s cubic-bezier(.4, .1, .25, 1);
+  transition: flex-basis .32s var(--morph-ease);
 }
 body.rd .rd-hb-seg b { font-size: 15px; font-weight: 600; }
 body.rd .rd-hb-seg.end { justify-content: flex-end; }
@@ -3599,9 +3602,9 @@ body.rd .rd-dp-name { display: flex; align-items: center; gap: 10px; font-size: 
 body.rd .rd-dp-sw { width: 10px; height: 10px; border-radius: 5px; flex-shrink: 0; }
 body.rd .rd-dp-track { position: relative; height: 34px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
 body.rd .rd-dp-zero { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px dashed var(--ink-faint); }
-body.rd .rd-dp-ci { position: absolute; top: 50%; height: 2.5px; transform: translateY(-50%); border-radius: 2px; transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
-body.rd .rd-dp-link { position: absolute; top: 50%; height: 2px; transform: translateY(-50%); opacity: 0.6; transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
-body.rd .rd-dp-dot { position: absolute; top: 50%; width: 11px; height: 11px; box-sizing: border-box; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 2px var(--bg); transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-dp-ci { position: absolute; top: 50%; height: 2.5px; transform: translateY(-50%); border-radius: 2px; transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
+body.rd .rd-dp-link { position: absolute; top: 50%; height: 2px; transform: translateY(-50%); opacity: 0.6; transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
+body.rd .rd-dp-dot { position: absolute; top: 50%; width: 11px; height: 11px; box-sizing: border-box; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 2px var(--bg); transition: left .32s var(--morph-ease); }
 body.rd .rd-dp-dot.open { background: var(--bg); border: 2px solid; }
 body.rd .rd-dp-now { text-align: right; font-size: 15px; font-weight: 600; color: var(--ink); }
 body.rd .rd-dp-chg { text-align: right; font-size: 14px; color: var(--ink-3); }
@@ -3692,9 +3695,9 @@ body.rd .rd-wv-ci > i { position: absolute; top: 0; bottom: 0; left: 0; width: 2
 body.rd .rd-wv-ci > i.lo { transform: translateX(calc(var(--lo) * 1cqw)); }
 body.rd .rd-wv-ci > i.hi { transform: translateX(calc(var(--hi) * 1cqw - 2px)); }
 body.rd .rd-wv-dot { position: absolute; top: 50%; left: 0; width: 13px; height: 13px; box-sizing: border-box; border-radius: 50%; border: 2px solid; transform: translate(calc(var(--x) * 1cqw - 50%), -50%); z-index: 3; box-shadow: 0 0 0 2px var(--bg); }
-body.rd .rd-wv-dot { transition: transform .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease, border-color .32s ease; }
+body.rd .rd-wv-dot { transition: transform .32s var(--morph-ease), background-color .32s ease, border-color .32s ease; }
 body.rd .rd-wv-ci { transition: color .32s ease; }
-body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: transform .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: transform .32s var(--morph-ease); }
 body.rd .rd-wv-enter > .rd-wv-chart { animation: rd-wv-in .32s ease both; }
 @keyframes rd-wv-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
@@ -3750,7 +3753,7 @@ body.rd .rd-mo-onfill { fill: var(--on-fill-onp); }
 body.rd .rd-mo-pts { font-size: 15px; font-weight: 600; fill: var(--ink); }
 body.rd .rd-mo-sh { font-size: 12px; fill: var(--ink-3); }
 body.rd .rd-mo-base { stroke: var(--ink-faint); stroke-width: 1; }
-body.rd .rd-mo-fill { transition: y .32s cubic-bezier(.4, .1, .25, 1), height .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-mo-fill { transition: y .32s var(--morph-ease), height .32s var(--morph-ease); }
 body.rd .rd-mo-note { margin-top: 4px; }
 body.rd .rd-mo-key { margin-top: 12px; }
 body.rd .rd-mo-howread { color: var(--ink-3); }
@@ -3867,8 +3870,8 @@ body.rd .rd-iw-lbar > span { position: absolute; left: 0; top: 0; bottom: 0; bor
 body.rd .rd-iw-lrow.sig .rd-iw-lbar > span { background: var(--ink-2); }
 body.rd .rd-iw-lrow.all .rd-iw-lbar > span { background: var(--ink); }
 body.rd .rd-iw-lbar > i { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); transform: translateX(-1px); }
-body.rd .rd-iw-bar > span, body.rd .rd-iw-lbar > span { transition: width .32s cubic-bezier(.4, .1, .25, 1), background-color .32s ease; }
-body.rd .rd-iw-bar > i, body.rd .rd-iw-lbar > i { transition: left .32s cubic-bezier(.4, .1, .25, 1); }
+body.rd .rd-iw-bar > span, body.rd .rd-iw-lbar > span { transition: width .32s var(--morph-ease), background-color .32s ease; }
+body.rd .rd-iw-bar > i, body.rd .rd-iw-lbar > i { transition: left .32s var(--morph-ease); }
 @media (prefers-reduced-motion: reduce) {
   body.rd .rd-iw-bar > span, body.rd .rd-iw-lbar > span, body.rd .rd-iw-bar > i, body.rd .rd-iw-lbar > i { transition: none; }
 }
@@ -39888,14 +39891,18 @@ window.AP = function () {
     return ROW_KEYS.has(k) ? k : null;
   };
   const MORPH_MS = 320;
+  const MORPH_BEZ = [0.3, 0.7, 0.3, 1];
+  const MORPH_CSS = "cubic-bezier(" + MORPH_BEZ.join(", ") + ")";
   const morphEase = (() => {
-    const [p1x, p1y, p2x, p2y] = [0.4, 0.1, 0.25, 1];
+    const [p1x, p1y, p2x, p2y] = MORPH_BEZ;
     const A = (a, b) => 1 - 3 * b + 3 * a,
       B = (a, b) => 3 * b - 6 * a,
       C = a => 3 * a;
     const f = (t, a, b) => ((A(a, b) * t + B(a, b)) * t + C(a)) * t;
     const df = (t, a, b) => 3 * A(a, b) * t * t + 2 * B(a, b) * t + C(a);
     return x => {
+      if (x <= 0) return 0;
+      if (x >= 1) return 1;
       let t = x;
       for (let i = 0; i < 8; i++) {
         const d = df(t, p1x, p2x);
@@ -39905,54 +39912,152 @@ window.AP = function () {
       return f(t, p1y, p2y);
     };
   })();
+  const reduceMotion = () => !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const FRAME_MS = 1000 / 60;
+  function morphClock(raf, frame, land, from) {
+    cancelAnimationFrame(raf.current);
+    const start = Math.min(1, (from || 0) + FRAME_MS / MORPH_MS);
+    const t0 = performance.now() - start * MORPH_MS;
+    let last = start;
+    const flush = window.ReactDOM && window.ReactDOM.flushSync ? window.ReactDOM.flushSync : fn => fn();
+    const step = now => {
+      const raw = Math.max(last, Math.min(1, (now - t0) / MORPH_MS));
+      last = raw;
+      if (raw >= 1) {
+        raf.current = 0;
+        flush(land);
+        return;
+      }
+      flush(() => frame(morphEase(raw)));
+      raf.current = requestAnimationFrame(step);
+    };
+    raf.current = requestAnimationFrame(step);
+    return {
+      t: morphEase(start),
+      raw: start
+    };
+  }
+  const morphRawOf = t => {
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+    let lo = 0,
+      hi = 1;
+    for (let i = 0; i < 24; i++) {
+      const mid = (lo + hi) / 2;
+      if (morphEase(mid) < t) lo = mid;else hi = mid;
+    }
+    return (lo + hi) / 2;
+  };
   function useMorph(value, apply, canMorph) {
     const [morph, setMorph] = React.useState(null);
     const raf = React.useRef(0);
     const land = React.useRef(0);
+    const live = React.useRef(null);
     React.useEffect(() => () => {
       cancelAnimationFrame(raf.current);
       clearTimeout(land.current);
     }, []);
+    const put = m => {
+      live.current = m;
+      setMorph(m);
+    };
     const choose = next => {
-      const from = value;
+      const cur = live.current;
+      let from = value,
+        resume = 0;
+      if (cur && next === cur.from) {
+        from = cur.to;
+        resume = morphRawOf(1 - cur.t);
+      } else if (cur && cur.t < 0.5 && next !== cur.to) from = cur.from;
       apply(next);
-      const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (next === from || still || canMorph && !canMorph(from, next)) {
-        setMorph(null);
-        return;
-      }
       cancelAnimationFrame(raf.current);
       clearTimeout(land.current);
-      const t0 = performance.now();
-      setMorph({
+      if (next === from || reduceMotion() || canMorph && !canMorph(from, next)) {
+        put(null);
+        return;
+      }
+      const c = morphClock(raf, t => put({
         from,
         to: next,
-        t: 0
+        t
+      }), () => put(null), resume);
+      put({
+        from,
+        to: next,
+        t: c.t
       });
-      const step = now => {
-        const raw = Math.min(1, (now - t0) / MORPH_MS);
-        if (raw >= 1) {
-          setMorph(null);
-          return;
-        }
-        setMorph({
-          from,
-          to: next,
-          t: morphEase(raw)
-        });
-        raf.current = requestAnimationFrame(step);
-      };
-      raf.current = requestAnimationFrame(step);
       land.current = setTimeout(() => {
         cancelAnimationFrame(raf.current);
-        setMorph(null);
-      }, MORPH_MS + 200);
+        put(null);
+      }, (1 - c.raw) * MORPH_MS + 200);
     };
     return [morph, choose];
   }
-  function blendRows(A, B, t, keys) {
-    if (!A.length || !B.length) return null;
-    const lerp = (p, q) => p + (q - p) * t;
+  const softKey = k => /^ci/.test(k);
+  const monoTangents = (xs, ys) => {
+    const n = xs.length,
+      h = [],
+      s = [],
+      m = new Array(n).fill(0);
+    for (let i = 0; i < n - 1; i++) {
+      h[i] = xs[i + 1] - xs[i];
+      s[i] = h[i] ? (ys[i + 1] - ys[i]) / h[i] : 0;
+    }
+    const sign = v => (v > 0) - (v < 0);
+    for (let i = 1; i < n - 1; i++) {
+      const q = (s[i - 1] * h[i] + s[i] * h[i - 1]) / (h[i - 1] + h[i] || 1);
+      m[i] = (sign(s[i - 1]) + sign(s[i])) * Math.min(Math.abs(s[i - 1]), Math.abs(s[i]), 0.5 * Math.abs(q)) || 0;
+    }
+    if (n > 2) {
+      m[0] = (3 * s[0] - m[1]) / 2;
+      m[n - 1] = (3 * s[n - 2] - m[n - 2]) / 2;
+    }
+    return m;
+  };
+  const curveOf = (arr, k, pick) => {
+    const xs = [],
+      ys = [];
+    arr.forEach(d => {
+      const v = pick ? pick(d) : d[k];
+      if (v != null) {
+        xs.push(d.x);
+        ys.push(v);
+      }
+    });
+    const n = xs.length,
+      mono = !!(window.AP && window.AP.rd);
+    const m = mono && n > 2 ? monoTangents(xs, ys) : null;
+    return x => {
+      if (!n || x < xs[0] || x > xs[n - 1]) return null;
+      let i = 0;
+      while (i < n - 2 && xs[i + 1] < x) i++;
+      if (n === 1) return ys[0];
+      const h = xs[i + 1] - xs[i];
+      if (!h) return ys[i];
+      const u = (x - xs[i]) / h,
+        u2 = u * u,
+        u3 = u2 * u;
+      if (n === 2) return ys[0] + (ys[1] - ys[0]) * u;
+      if (m) return (2 * u3 - 3 * u2 + 1) * ys[i] + (u3 - 2 * u2 + u) * h * m[i] + (-2 * u3 + 3 * u2) * ys[i + 1] + (u3 - u2) * h * m[i + 1];
+      const y0 = ys[i - 1] != null ? ys[i - 1] : ys[i],
+        y3 = ys[i + 2] != null ? ys[i + 2] : ys[i + 1];
+      const c1 = ys[i] + (ys[i + 1] - y0) / 6,
+        c2 = ys[i + 1] - (y3 - ys[i]) / 6,
+        v = 1 - u;
+      return v * v * v * ys[i] + 3 * v * v * u * c1 + 3 * v * u * u * c2 + u3 * ys[i + 1];
+    };
+  };
+  const SUBSTEPS = 4;
+  const alignMemo = new WeakMap();
+  function alignRows(A, B, keys) {
+    const kk = keys.join(",") + (window.AP && window.AP.rd ? "|m" : "|c");
+    let byB = alignMemo.get(A);
+    if (!byB) {
+      byB = new WeakMap();
+      alignMemo.set(A, byB);
+    }
+    const hit = byB.get(B);
+    if (hit && hit.kk === kk) return hit;
     const index = arr => {
       const o = {};
       arr.forEach(d => o[d.ym] = d);
@@ -39960,41 +40065,128 @@ window.AP = function () {
     };
     const ia = index(A),
       ib = index(B);
-    const readAt = (idx, arr, ym, x) => {
-      const hit = idx[ym];
-      if (hit) return hit;
-      if (x <= arr[0].x) return arr[0];
-      if (x >= arr[arr.length - 1].x) return arr[arr.length - 1];
-      let i = 0;
-      while (i < arr.length - 2 && arr[i + 1].x < x) i++;
-      const a = arr[i],
-        b = arr[i + 1],
-        f = (x - a.x) / (b.x - a.x);
-      const o = {
-        ym,
+    const soft = keys.filter(softKey);
+    const centreOf = k => /^ci_/.test(k) ? k.slice(3) : keys.find(c => !softKey(c));
+    const curves = arr => {
+      const c = {};
+      keys.forEach(k => {
+        c[k] = curveOf(arr, k);
+      });
+      soft.forEach(k => {
+        const cen = centreOf(k);
+        if (!cen) return;
+        const w = d => d[k] != null && d[k] > 0 && d[cen] != null ? d[k] : null;
+        c[k + "Hi"] = curveOf(arr, null, d => w(d) == null ? null : d[cen] + d[k]);
+        c[k + "Lo"] = curveOf(arr, null, d => w(d) == null ? null : d[cen] - d[k]);
+        c[k + "C"] = cen;
+      });
+      return c;
+    };
+    const ca = curves(A),
+      cb = curves(B);
+    const readAt = (idx, arr, cv, ym, x) => {
+      const row = ym && idx[ym];
+      const held = !row && (x <= arr[0].x ? arr[0] : x >= arr[arr.length - 1].x ? arr[arr.length - 1] : null);
+      const o = row || held ? {
+        ...(row || held)
+      } : {
         x
       };
-      keys.forEach(k => {
-        o[k] = a[k] == null || b[k] == null ? null : a[k] + (b[k] - a[k]) * f;
+      if (!row && !held) keys.forEach(k => {
+        o[k] = cv[k](x);
+      });
+      soft.forEach(k => {
+        const cen = cv[k + "C"];
+        if (!cen) return;
+        const at = held ? held.x : x;
+        const hi = cv[k + "Hi"](at),
+          lo = cv[k + "Lo"](at);
+        o[k + "Hi"] = hi != null ? hi : o[cen];
+        o[k + "Lo"] = lo != null ? lo : o[cen];
       });
       return o;
     };
-    const yms = [...new Set(A.concat(B).map(d => d.ym))].sort();
+    const months = [...new Set(A.concat(B).map(d => d.ym))].sort().map(ym => ({
+      ym,
+      x: (ia[ym] || ib[ym]).x
+    }));
+    const pairs = [];
+    months.forEach((m, i) => {
+      pairs.push({
+        ym: m.ym,
+        x: m.x,
+        da: readAt(ia, A, ca, m.ym, m.x),
+        db: readAt(ib, B, cb, m.ym, m.x)
+      });
+      const n = months[i + 1];
+      if (!n) return;
+      for (let j = 1; j < SUBSTEPS; j++) {
+        const x = m.x + (n.x - m.x) * j / SUBSTEPS;
+        pairs.push({
+          x,
+          mid: true,
+          da: readAt(ia, A, ca, null, x),
+          db: readAt(ib, B, cb, null, x)
+        });
+      }
+    });
+    const reach = (arr, k) => {
+      const on = arr.filter(d => d[k] != null && d[k] > 0);
+      return on.length ? [on[0].x, on[on.length - 1].x] : null;
+    };
+    const reaches = {};
+    keys.filter(softKey).forEach(k => {
+      reaches[k] = [reach(A, k), reach(B, k)];
+    });
+    const out = {
+      kk,
+      pairs,
+      reaches,
+      a0: A[0].x,
+      a1: A[A.length - 1].x,
+      b0: B[0].x,
+      b1: B[B.length - 1].x
+    };
+    byB.set(B, out);
+    return out;
+  }
+  function blendRows(A, B, t, keys) {
+    if (!A.length || !B.length) return null;
+    const lerp = (p, q) => p + (q - p) * t;
+    const al = alignRows(A, B, keys);
+    const clip = [lerp(al.a0, al.b0), lerp(al.a1, al.b1)];
+    const clips = {};
+    Object.keys(al.reaches).forEach(k => {
+      const [ra, rb] = al.reaches[k];
+      clips[k] = ra && rb ? [lerp(ra[0], rb[0]), lerp(ra[1], rb[1])] : clip;
+    });
     return {
-      rows: yms.map(ym => {
-        const x = (ia[ym] || ib[ym]).x;
-        const da = readAt(ia, A, ym, x),
-          db = readAt(ib, B, ym, x);
-        const o = {
+      rows: al.pairs.map(({
+        ym,
+        x,
+        mid,
+        da,
+        db
+      }) => {
+        const o = mid ? {
+          x,
+          mid
+        } : {
           ym,
           x
         };
         keys.forEach(k => {
-          o[k] = da[k] == null || db[k] == null ? null : lerp(da[k], db[k]);
+          o[k] = da[k] == null || db[k] == null ? softKey(k) && (da[k] != null || db[k] != null) ? lerp(da[k] || 0, db[k] || 0) : null : lerp(da[k], db[k]);
+          if (softKey(k)) ["Hi", "Lo"].forEach(e => {
+            const p = da[k + e],
+              q = db[k + e];
+            if (p != null && q != null) o[k + e] = lerp(p, q);
+          });
         });
         return o;
       }),
-      clip: [lerp(A[0].x, B[0].x), lerp(A[A.length - 1].x, B[B.length - 1].x)]
+      clip,
+      clips
     };
   }
   function crossClouds(A, B, t, keyOf) {
@@ -40044,6 +40236,10 @@ window.AP = function () {
     pollRowKey,
     morphEase,
     MORPH_MS,
+    MORPH_CSS,
+    morphClock,
+    morphRawOf,
+    reduceMotion,
     useMorph,
     blendRows,
     crossClouds,
@@ -40059,11 +40255,12 @@ window.AP = function () {
   <script>const DAY_MS = 86400000;
 const NP_HORIZON_DAYS = 28;
 const NP_UNTIMED_MINS = 24 * 60;
+let npEastFmt = null;
 function easternNow() {
   const d = new Date();
   try {
     const p = {};
-    for (const x of new Intl.DateTimeFormat("en-AU", {
+    npEastFmt = npEastFmt || new Intl.DateTimeFormat("en-AU", {
       timeZone: "Australia/Sydney",
       year: "numeric",
       month: "2-digit",
@@ -40071,7 +40268,8 @@ function easternNow() {
       hour: "2-digit",
       minute: "2-digit",
       hourCycle: "h23"
-    }).formatToParts(d)) p[x.type] = x.value;
+    });
+    for (const x of npEastFmt.formatToParts(d)) p[x.type] = x.value;
     return {
       day: Date.UTC(+p.year, +p.month - 1, +p.day),
       mins: +p.hour % 24 * 60 + +p.minute
@@ -40105,7 +40303,22 @@ function npMonthEndSlot(fromMs, dow) {
 function spreadDays(c, sp) {
   return c.releaseDow != null && !c.loose ? 7 * Math.floor((sp + 3) / 7) : sp;
 }
+let npProjMemo = null;
 function npProject(nowOverride) {
+  if (!nowOverride) {
+    const e = easternNow(),
+      k = e.day + e.mins * 60000;
+    if (npProjMemo && npProjMemo.k === k) return npProjMemo.v;
+    const v = npProjectAt(e);
+    npProjMemo = {
+      k,
+      v
+    };
+    return v;
+  }
+  return npProjectAt(nowOverride);
+}
+function npProjectAt(nowOverride) {
   const {
     D
   } = window.AP;
@@ -41984,6 +42197,8 @@ function TrendChart(props) {
     scatterMove = [],
     fade = 1,
     clipX,
+    eventsFrom = null,
+    eventMix = 1,
     driven = false,
     pollFacet,
     marks = [],
@@ -42004,7 +42219,7 @@ function TrendChart(props) {
   const prev = useRef(null);
   const travelling = useRef(false);
   React.useEffect(() => () => cancelAnimationFrame(winRaf.current), []);
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     const from = winRef.current,
       to = xDomain;
     if (from[0] === to[0] && from[1] === to[1]) return;
@@ -42024,24 +42239,18 @@ function TrendChart(props) {
       setWin(to);
       return;
     }
-    cancelAnimationFrame(winRaf.current);
     travelling.current = true;
-    const a = from.slice(),
-      t0 = performance.now();
-    const step = now => {
-      const raw = Math.min(1, (now - t0) / window.AP.MORPH_MS);
-      if (raw >= 1) {
-        winRef.current = to;
-        travelling.current = false;
-        setWin(to);
-        return;
-      }
-      const e = window.AP.morphEase(raw);
+    const a = from.slice();
+    const at = e => {
       winRef.current = [a[0] + (to[0] - a[0]) * e, a[1] + (to[1] - a[1]) * e];
       setWin(winRef.current);
-      winRaf.current = requestAnimationFrame(step);
     };
-    winRaf.current = requestAnimationFrame(step);
+    const c = window.AP.morphClock(winRaf, at, () => {
+      winRef.current = to;
+      travelling.current = false;
+      setWin(to);
+    });
+    at(c.t);
   }, [xDomain[0], xDomain[1]]);
   const fresh = {
     series: seriesProp,
@@ -42233,6 +42442,7 @@ function TrendChart(props) {
     let near = null,
       nearD = Infinity;
     for (const q of evPlaced) {
+      if (q.leaving) continue;
       let d = p.y >= q.y - rU && p.y <= H - pad.b + rU ? Math.abs(p.x - q.ex) : Infinity;
       if (q.row != null) {
         const dx = p.x < q.x ? q.x - p.x : p.x > q.x + q.w ? p.x - (q.x + q.w) : 0;
@@ -42491,7 +42701,7 @@ function TrendChart(props) {
     } : {
       className: "scatter-dot",
       fill: d.color,
-      opacity: (live && dot && dot !== d ? 0.25 : DOT_OP) * (d.op != null ? d.op : 1)
+      fillOpacity: (live && dot && dot !== d ? 0.25 : DOT_OP) * (d.op != null ? d.op : 1)
     };
     const p = dotPath(d.shape, cx, cy, r);
     return p ? React.createElement("path", _extends({
@@ -42541,11 +42751,11 @@ function TrendChart(props) {
     r: DOT_R,
     className: "scatter-dot",
     fill: d.color,
-    opacity: DOT_OP * (d.op != null ? d.op : 1)
+    fillOpacity: DOT_OP * (d.op != null ? d.op : 1)
   }));
   const copying = !!(ref.current && ref.current.hasAttribute("data-copying"));
-  const evPlaced = (() => {
-    const evs = events.map(e => copying && e.badge != null ? {
+  const placeEvents = list => {
+    const evs = list.map(e => copying && e.badge != null ? {
       ...e,
       badge: null,
       badgeLead: false
@@ -42632,6 +42842,39 @@ function TrendChart(props) {
         y: rowY(null)
       };
     });
+  };
+  const evKey = e => e.date + "|" + (e.short || e.label);
+  const evPlaced = (() => {
+    const to = placeEvents(events);
+    if (!eventsFrom || eventMix >= 1) return to;
+    const from = placeEvents(eventsFrom),
+      t = eventMix;
+    const byKey = new Map(from.map(p => [evKey(p.e), p]));
+    const lerp = (a, b) => a + (b - a) * t;
+    const out = to.map(p => {
+      const q = byKey.get(evKey(p.e));
+      if (!q) return {
+        ...p,
+        op: t
+      };
+      byKey.delete(evKey(p.e));
+      if (p.row == null || q.row == null) return {
+        ...p,
+        prev: q
+      };
+      return {
+        ...p,
+        x: lerp(q.x, p.x),
+        y: lerp(q.y, p.y),
+        prev: q
+      };
+    });
+    byKey.forEach(q => out.push({
+      ...q,
+      op: 1 - t,
+      leaving: true
+    }));
+    return out.sort((a, b) => a.ex - b.ex);
   })();
   return React.createElement("div", {
     className: "chart",
@@ -42809,44 +43052,57 @@ function TrendChart(props) {
     textAnchor: "middle"
   }, t.label)), (() => {
     if (!rd) return null;
-    const lead = evPlaced.map((p, i) => ({
-      i,
-      ex: p.ex,
-      p
-    })).filter(b => b.p.row == null && b.p.e.badge != null && b.p.e.badgeLead);
-    const gap = PX(17);
-    let runs = lead.map(b => ({
-      items: [b],
-      x0: b.ex
-    }));
-    for (let moved = true, guard = 0; moved && guard < 20; guard++) {
-      moved = false;
-      runs.forEach(r => {
-        const mid = r.items.reduce((s, b) => s + b.ex, 0) / r.items.length;
-        r.x0 = mid - (r.items.length - 1) * gap / 2;
-      });
-      for (let k = 1; k < runs.length; k++) {
-        const a = runs[k - 1],
-          b = runs[k];
-        if (a.x0 + (a.items.length - 1) * gap + gap > b.x0) {
-          a.items = a.items.concat(b.items);
-          runs.splice(k, 1);
-          moved = true;
-          break;
+    const spread = placed => {
+      const at = new Map();
+      const lead = placed.filter(p => p.row == null && p.e.badge != null && p.e.badgeLead).map(p => ({
+        ex: p.ex,
+        p
+      }));
+      const gap = PX(17);
+      let runs = lead.map(b => ({
+        items: [b],
+        x0: b.ex
+      }));
+      for (let moved = true, guard = 0; moved && guard < 20; guard++) {
+        moved = false;
+        runs.forEach(r => {
+          const mid = r.items.reduce((s, b) => s + b.ex, 0) / r.items.length;
+          r.x0 = mid - (r.items.length - 1) * gap / 2;
+        });
+        for (let k = 1; k < runs.length; k++) {
+          const a = runs[k - 1],
+            b = runs[k];
+          if (a.x0 + (a.items.length - 1) * gap + gap > b.x0) {
+            a.items = a.items.concat(b.items);
+            runs.splice(k, 1);
+            moved = true;
+            break;
+          }
         }
       }
-    }
-    const lo = pad.l + PX(8),
-      hi = W - pad.r - PX(8);
-    badgeAt.current = {};
-    runs.forEach(r => {
-      let x0 = r.x0;
-      const span = (r.items.length - 1) * gap;
-      if (x0 < lo) x0 = lo;
-      if (x0 + span > hi) x0 = hi - span;
-      r.items.forEach((b, k) => {
-        badgeAt.current[b.i] = x0 + k * gap;
+      const lo = pad.l + PX(8),
+        hi = W - pad.r - PX(8);
+      runs.forEach(r => {
+        let x0 = r.x0;
+        const span = (r.items.length - 1) * gap;
+        if (x0 < lo) x0 = lo;
+        if (x0 + span > hi) x0 = hi - span;
+        r.items.forEach((b, k) => {
+          at.set(evKey(b.p.e), x0 + k * gap);
+        });
       });
+      return at;
+    };
+    const now = spread(evPlaced.filter(p => !p.leaving));
+    const was = eventsFrom && eventMix < 1 ? spread(placeEvents(eventsFrom)) : null;
+    badgeAt.current = {};
+    evPlaced.forEach((p, i) => {
+      const k = evKey(p.e),
+        b = now.get(k),
+        a = was ? was.get(k) : null;
+      const x = p.leaving ? a : b;
+      if (x == null) return;
+      badgeAt.current[i] = a != null && b != null && !p.leaving ? a + (b - a) * eventMix : x;
     });
     return null;
   })(), evPlaced.map((p, i) => {
@@ -42863,11 +43119,17 @@ function TrendChart(props) {
     const aDate = fmtEventDate(e.date);
     const aria = e.label + (e.desc ? " – " + e.desc : "") + (aDate ? " · " + aDate : "");
     const cls = "evt" + (evt && evt.e === e ? " on" : "");
+    const fadeSt = p.op != null && p.op < 1 ? {
+      opacity: p.op
+    } : null;
+    const k = evKey(e) + (p.leaving ? "|out" : "");
     if (row == null) return React.createElement("g", {
-      key: "ev" + i,
+      key: k,
       className: cls,
       role: "img",
-      "aria-label": aria
+      "aria-label": aria,
+      style: fadeSt,
+      "data-ev": k
     }, React.createElement("line", {
       x1: ex,
       x2: ex,
@@ -42891,13 +43153,23 @@ function TrendChart(props) {
         cx: bx,
         cy: pad.t - PX(13),
         r: PX(7.5)
-      }), React.createElement("text", {
+      }), p.prev && p.prev.e.badge != null && p.prev.e.badge !== e.badge && eventMix < 1 && React.createElement("text", {
         x: bx,
         y: pad.t - PX(13),
         dominantBaseline: "central",
         textAnchor: "middle",
         style: {
-          fontSize: PX(10)
+          fontSize: PX(10),
+          opacity: 1 - eventMix
+        }
+      }, p.prev.e.badge), React.createElement("text", {
+        x: bx,
+        y: pad.t - PX(13),
+        dominantBaseline: "central",
+        textAnchor: "middle",
+        style: {
+          fontSize: PX(10),
+          opacity: p.prev && p.prev.e.badge != null && p.prev.e.badge !== e.badge && eventMix < 1 ? eventMix : undefined
         }
       }, e.badge));
     })());
@@ -42905,10 +43177,12 @@ function TrendChart(props) {
     const ruleTop = rd ? yRow + PX(5) : yRow;
     const displaced = !rd || !!p.disp;
     return React.createElement("g", {
-      key: "ev" + i,
+      key: k,
       className: cls,
       role: "img",
-      "aria-label": aria
+      "aria-label": aria,
+      style: fadeSt,
+      "data-ev": k
     }, React.createElement("line", {
       x1: ex,
       x2: ex,
@@ -42938,9 +43212,13 @@ function TrendChart(props) {
       }
     }, e.short));
   }), rd && evPlaced.map((p, i) => p.row == null ? null : React.createElement("g", {
-    key: "evl" + i,
+    key: "evl" + evKey(p.e) + (p.leaving ? "|out" : ""),
+    "data-ev": "l" + evKey(p.e) + (p.leaving ? "|out" : ""),
     className: "evt" + (evt && evt.e === p.e ? " on" : ""),
-    "aria-hidden": "true"
+    "aria-hidden": "true",
+    style: p.op != null && p.op < 1 ? {
+      opacity: p.op
+    } : null
   }, React.createElement("text", {
     x: p.x,
     y: p.y,
@@ -44645,7 +44923,7 @@ function PreferredPMPanel({
     const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (still) return;
     const MS = window.AP && window.AP.MORPH_MS || 320;
-    const EASE = "cubic-bezier(.4, .1, .25, 1)";
+    const EASE = window.AP.MORPH_CSS;
     const release = [];
     const seed = (n, sel, was) => {
       if (!was || !was.length) return;
@@ -56312,12 +56590,16 @@ function rdEventBadges(events, x0, x1) {
 }
 function RdEventList({
   list,
-  inline
+  inline,
+  from,
+  mix
 }) {
   if (!list || !list.length) return null;
-  return React.createElement("ol", {
-    className: "rd-evlist" + (inline ? " inline" : "")
-  }, list.map(l => React.createElement("li", {
+  const ol = (l0, st, hidden) => React.createElement("ol", {
+    className: "rd-evlist" + (inline ? " inline" : ""),
+    style: st,
+    "aria-hidden": hidden || undefined
+  }, l0.map(l => React.createElement("li", {
     key: l.n
   }, React.createElement("span", {
     className: "rd-evlist-n"
@@ -56326,6 +56608,15 @@ function RdEventList({
   }, l.labels.join(" · ")), React.createElement("span", {
     className: "rd-evlist-d"
   }, window.AUSPOL.monthName(Number(l.ym.slice(5))) + " " + l.ym.slice(0, 4)))));
+  const same = from && from.length === list.length && from.every((l, i) => l.n === list[i].n && l.ym === list[i].ym && l.labels.join() === list[i].labels.join());
+  if (!from || same || mix >= 1) return ol(list);
+  return React.createElement("div", {
+    className: "rd-evstack"
+  }, ol(from, {
+    opacity: 1 - mix
+  }, true), ol(list, {
+    opacity: mix
+  }));
 }
 function RdCheck({
   checked,
@@ -56575,7 +56866,8 @@ function RdHero(p) {
     showSynth,
     setShowSynth,
     otherContests,
-    xDomain
+    xDomain,
+    domainRef
   } = p;
   const {
     D,
@@ -56639,8 +56931,22 @@ function RdHero(p) {
   }, "Read the full explainer \u2192"));
   const laborIds = orderedMatchups.filter(id => M[id].vsLabor);
   const otherOf = id => M[id] && M[id].vsLabor ? laborIds.find(x => x !== id) || null : null;
-  const ptsOf = (id, b) => filterPts(iDataOf(id, b), xDomain[0]);
-  const scene = (id, b) => {
+  const memo = React.useRef({
+    key: null,
+    m: new Map()
+  });
+  const memoKey = xDomain[0] + "|" + xDomain[1] + "|" + showScatter;
+  if (memo.current.key !== memoKey) memo.current = {
+    key: memoKey,
+    m: new Map()
+  };
+  const kept = (k, f) => {
+    const m = memo.current.m;
+    if (!m.has(k)) m.set(k, f());
+    return m.get(k);
+  };
+  const ptsOf = (id, b) => kept("p" + id + b, () => filterPts(iDataOf(id, b), xDomain[0]));
+  const scene = (id, b) => kept("s" + id + b, () => {
     const o = otherOf(id);
     return {
       id,
@@ -56650,7 +56956,7 @@ function RdHero(p) {
       mc: M[id].b.color,
       oc: o ? M[o].b.color : null
     };
-  };
+  });
   const fromB = morph ? morph.fromBasis || b0 : b0,
     toB = morph ? morph.toBasis || b0 : b0;
   const S = scene(matchup, b0);
@@ -56714,7 +57020,11 @@ function RdHero(p) {
     endLabel: narrow ? null : labelMain
   });
   const areas = [];
-  const bandPts = mainRows.filter(d => d.ci95 != null && d.ci95 > 0).map(d => ({
+  const bandPts = mainBl ? mainRows.filter(d => d.ci95Hi != null && d.ci95Lo != null).map(d => ({
+    x: d.x,
+    y0: d.ci95Lo,
+    y1: d.ci95Hi
+  })) : mainRows.filter(d => d.ci95 != null && d.ci95 > 0).map(d => ({
     x: d.x,
     y0: d.a - d.ci95,
     y1: d.a + d.ci95
@@ -56724,7 +57034,7 @@ function RdHero(p) {
     color: mainCol,
     className: "ci-band",
     edge: false,
-    clipX: mainBl ? mainBl.clip : null,
+    clipX: mainBl ? mainBl.clips.ci95 : null,
     points: bandPts
   });
   if (sensOn) areas.push({
@@ -56785,7 +57095,7 @@ function RdHero(p) {
     y: elec.alp,
     label: narrow ? null : "2025 election: " + elec.alp.toFixed(1)
   }] : [];
-  const domainOf = (id, b) => {
+  const domainOf = (id, b) => kept("d" + id + b + ringOn, () => {
     const v = [50];
     const sc = scene(id, b);
     sc.main.forEach(d => {
@@ -56800,19 +57110,28 @@ function RdHero(p) {
     });
     if (ringOn && elec.x >= xDomain[0]) v.push(elec.alp);
     return [Math.floor((Math.min(...v) + 0.3) / 5) * 5, Math.ceil((Math.max(...v) - 0.3) / 5) * 5];
-  };
+  });
   const yTarget = domainOf(matchup, b0);
-  const yDomain = morph ? blendDomain(domainOf(morph.from, fromB), yTarget, t) : yTarget;
+  const yDomain = morph ? blendDomain(morph.fromDomain || domainOf(morph.from, fromB), yTarget, t) : yTarget;
+  if (domainRef) domainRef.current = yDomain;
   const yTicks = rdYTicks(yTarget[0], yTarget[1], 5);
-  const x0 = Math.min(...[mainRows, otherRows].filter(r => r && r.length).map(r => r[0].x));
-  const x1 = Math.max(...[mainRows, otherRows].filter(r => r && r.length).map(r => r[r.length - 1].x));
-  const own = {
-    alp_lnp: "2026-02-12",
-    alp_on: "2025-12-08"
-  }[morph ? morph.from : matchup];
-  const evsAll = (D.events || []).filter(e => (e.major || e.date === own) && e.x >= x0 - 0.02 && e.x <= x1 + 0.02);
+  const evsOf = sc => {
+    const rows = [sc.main, sc.other].filter(r => r && r.length);
+    if (!rows.length) return [];
+    const x0 = Math.min(...rows.map(r => r[0].x)),
+      x1 = Math.max(...rows.map(r => r[r.length - 1].x));
+    const own = {
+      alp_lnp: "2026-02-12",
+      alp_on: "2025-12-08"
+    }[sc.id];
+    return (D.events || []).filter(e => (e.major || e.date === own) && e.x >= x0 - 0.02 && e.x <= x1 + 0.02);
+  };
+  const evsAll = evsOf(morph ? B : S);
+  const evsWas = morph ? evsOf(A) : null;
   const badges = narrow ? rdEventBadges(evsAll, xDomain[0], xDomain[1]) : null;
+  const badgesWas = narrow && evsWas ? rdEventBadges(evsWas, xDomain[0], xDomain[1]) : null;
   const events = badges ? badges.events : evsAll;
+  const eventsWas = evsWas ? badgesWas ? badgesWas.events : evsWas : null;
   const aName = m.a.name,
     rival = M[matchup].vsLabor ? "Rival" : m.b.name;
   const notes = [{
@@ -56833,13 +57152,13 @@ function RdHero(p) {
   const spineRows = (ringOn && elec.x >= xDomain[0] && mainRows.length && mainRows[0].x > elec.x + 1e-6 ? [{
     ...elec,
     a: elec.alp
-  }] : []).concat(mainRows);
+  }] : []).concat(mainRows.filter(d => !d.mid));
   const spine = spineRows.map(d => ({
     x: d.x,
     y: d.a,
     ym: d.ym
   }));
-  const story = (() => {
+  const story = kept("story" + b0, () => {
     const on = iDataOf("alp_on", b0).filter(d => !d.election),
       co = iDataOf("alp_lnp", b0).filter(d => !d.election);
     if (!on.length || !co.length || !M.alp_on || !laborIds.includes("alp_on")) return null;
@@ -56879,7 +57198,7 @@ function RdHero(p) {
       head,
       dek
     };
-  })();
+  });
   const keyItems = [showScatter && settled.length ? {
     kind: "dot",
     color: mainCol,
@@ -57101,6 +57420,8 @@ function RdHero(p) {
     notes: notes,
     marks: marks,
     events: events,
+    eventsFrom: eventsWas,
+    eventMix: t,
     series: series,
     spine: spine,
     scatter: scatter,
@@ -57122,7 +57443,9 @@ function RdHero(p) {
       }))
     }
   }), badges && React.createElement(RdEventList, {
-    list: badges.list
+    list: badges.list,
+    from: badgesWas ? badgesWas.list : null,
+    mix: t
   }), React.createElement(RdKey, {
     className: "rd-ckey",
     items: keyItems
@@ -57651,7 +57974,7 @@ function RdLeadership({
     if (!prev || !root) return;
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const MS = window.AP.MORPH_MS || 320,
-      EASE = "cubic-bezier(.4, .1, .25, 1)";
+      EASE = window.AP.MORPH_CSS;
     const alias = k => k.startsWith("3:") ? k.slice(2) : "3:" + k;
     const nodes = [...root.querySelectorAll("[data-mk]")];
     const here = new Set(nodes.map(n => n.dataset.mk));
@@ -66812,6 +67135,22 @@ function HeroGauge({
     })))
   );
 }
+const HERO_VIEWS = {};
+const HERO_PAIRS = {};
+function heroPairs(key, fn) {
+  const memo = HERO_PAIRS[key] || (HERO_PAIRS[key] = {
+    fn,
+    map: new WeakMap()
+  });
+  return p => {
+    let v = memo.map.get(p);
+    if (v === undefined) {
+      v = memo.fn(p);
+      memo.map.set(p, v);
+    }
+    return v;
+  };
+}
 function Hero({
   rangeId,
   setRangeId,
@@ -66906,73 +67245,54 @@ function Hero({
       if (document.fonts) document.fonts.removeEventListener("loadingdone", fontsDone);
     };
   }, []);
+  const liveMorph = useRef(null);
+  const shownDomain = useRef(null);
+  const putMorph = m => {
+    liveMorph.current = m;
+    setMorph(m);
+  };
+  const runMorph = (make, resume) => {
+    const c = window.AP.morphClock(morphRaf, t => putMorph(make(t)), () => putMorph(null), resume);
+    putMorph(make(c.t));
+  };
   const chooseMatchup = id => {
-    const from = matchup;
+    const from = matchup,
+      cur = liveMorph.current;
     setMatchup(id);
-    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (id === from || still || !MATCHUPS[from] || !MATCHUPS[id]) {
-      setMorph(null);
+    cancelAnimationFrame(morphRaf.current);
+    if (id === from || window.AP.reduceMotion() || !MATCHUPS[from] || !MATCHUPS[id]) {
+      putMorph(null);
       return;
     }
-    cancelAnimationFrame(morphRaf.current);
-    const t0 = performance.now();
-    setMorph({
+    const back = !!cur && !cur.fromBasis && cur.from === id && cur.to === from;
+    const fromDomain = cur && !back ? shownDomain.current : null;
+    runMorph(t => ({
       from,
       to: id,
-      t: 0
-    });
-    const step = now => {
-      const raw = Math.min(1, (now - t0) / MORPH_MS);
-      if (raw >= 1) {
-        setMorph(null);
-        return;
-      }
-      setMorph({
-        from,
-        to: id,
-        t: MORPH_EASE(raw)
-      });
-      morphRaf.current = requestAnimationFrame(step);
-    };
-    morphRaf.current = requestAnimationFrame(step);
+      fromDomain,
+      t
+    }), back ? window.AP.morphRawOf(1 - cur.t) : 0);
   };
   const chooseBasis = () => {
     const bFrom = basis || "imp",
-      bTo = bFrom === "imp" ? "resp" : "imp";
-    const fromDomain = morph ? yDomain : null;
+      bTo = bFrom === "imp" ? "resp" : "imp",
+      cur = liveMorph.current;
     setBasis(bTo);
     cancelAnimationFrame(morphRaf.current);
-    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (still) {
-      setMorph(null);
+    if (window.AP.reduceMotion()) {
+      putMorph(null);
       return;
     }
-    const t0 = performance.now();
-    setMorph({
+    const back = !!cur && cur.fromBasis === bTo && cur.toBasis === bFrom && cur.from === matchup && cur.to === matchup;
+    const fromDomain = cur && !back ? shownDomain.current : null;
+    runMorph(t => ({
       from: matchup,
       to: matchup,
       fromBasis: bFrom,
       toBasis: bTo,
       fromDomain,
-      t: 0
-    });
-    const step = now => {
-      const raw = Math.min(1, (now - t0) / MORPH_MS);
-      if (raw >= 1) {
-        setMorph(null);
-        return;
-      }
-      setMorph({
-        from: matchup,
-        to: matchup,
-        fromBasis: bFrom,
-        toBasis: bTo,
-        fromDomain,
-        t: MORPH_EASE(raw)
-      });
-      morphRaf.current = requestAnimationFrame(step);
-    };
-    morphRaf.current = requestAnimationFrame(step);
+      t
+    }), back ? window.AP.morphRawOf(1 - cur.t) : 0);
   };
   const cmpCopy = matchup === "alp_on" ? impOnBasis ? {
     term: "published head-to-head",
@@ -67012,16 +67332,16 @@ function Hero({
     }
   }, cmpCopy.term)));
   const m = MATCHUPS[matchup];
-  const impDataFor = b => impOffered && (b === undefined ? basis : b) === "imp" ? D.synth2pp.map(d => ({
+  const impDataFor = b => impOffered && (b === undefined ? basis : b) === "imp" ? HERO_VIEWS.imp || (HERO_VIEWS.imp = D.synth2pp.map(d => ({
     ym: d.ym,
     x: d.x,
     a: d.alp,
     b: d.lnp,
     ci95: d.ci95,
     k: d.k
-  })) : null;
+  }))) : null;
   const impData = impDataFor();
-  const impScatter = p => p.alpImp == null ? null : [{
+  const impScatter = heroPairs("imp", p => p.alpImp == null ? null : [{
     y: p.alpImp,
     color: "var(--alp)",
     label: "ALP implied"
@@ -67029,17 +67349,17 @@ function Hero({
     y: +(100 - p.alpImp).toFixed(1),
     color: "var(--lnp)",
     label: "L/NP implied"
-  }];
-  const impOnDataFor = b => impOnOffered && (b === undefined ? basis : b) === "imp" ? D.synthOn.map(d => ({
+  }]);
+  const impOnDataFor = b => impOnOffered && (b === undefined ? basis : b) === "imp" ? HERO_VIEWS.impOn || (HERO_VIEWS.impOn = D.synthOn.map(d => ({
     ym: d.ym,
     x: d.x,
     a: d.a,
     b: d.b,
     ci95: d.ci95,
     k: d.k
-  })) : null;
+  }))) : null;
   const impOnData = impOnDataFor();
-  const impOnScatter = p => p.alpOnImp == null ? null : [{
+  const impOnScatter = heroPairs("impOn", p => p.alpOnImp == null ? null : [{
     y: p.alpOnImp,
     color: "var(--alp)",
     label: "ALP implied"
@@ -67047,19 +67367,20 @@ function Hero({
     y: +(100 - p.alpOnImp).toFixed(1),
     color: "var(--onp)",
     label: "ON implied"
-  }];
+  }]);
   const iDataOf = (id, b) => {
     const imp = id === "alp_lnp" && impDataFor(b) || id === "alp_on" && impOnDataFor(b);
     return imp || MATCHUPS[id].data;
   };
   const iScatOf = (id, b) => {
     const imp = id === "alp_lnp" && impDataFor(b) || id === "alp_on" && impOnDataFor(b);
-    return imp ? id === "alp_on" ? impOnScatter : impScatter : MATCHUPS[id].scatter;
+    return imp ? id === "alp_on" ? impOnScatter : impScatter : heroPairs(id, MATCHUPS[id].scatter);
   };
   const ptsOf = (id, b) => filterPts(iDataOf(id, b), xDomain[0]);
   const pts = ptsOf(matchup);
+  const rdOn = !!window.AP.rd;
   const blend = (() => {
-    if (!morph) return null;
+    if (!morph || rdOn) return null;
     const A = ptsOf(morph.from, morph.fromBasis),
       B = ptsOf(morph.to, morph.toBasis);
     if (!A.length || !B.length) return null;
@@ -67120,9 +67441,9 @@ function Hero({
       side
     })) : [];
   });
-  const settledCloud = React.useMemo(() => cloudFor(matchup), [matchup, rangeId, showScatter, basis]);
+  const settledCloud = React.useMemo(() => rdOn ? [] : cloudFor(matchup), [matchup, rangeId, showScatter, basis, rdOn]);
   const morphClouds = React.useMemo(() => {
-    if (!morph) return null;
+    if (!morph || rdOn) return null;
     const key = d => d.meta.pollster + "|" + d.meta.released + "|" + d.side;
     const A = cloudFor(morph.from, morph.fromBasis),
       B = cloudFor(morph.to, morph.toBasis);
@@ -67140,7 +67461,7 @@ function Hero({
       leaving,
       arriving
     };
-  }, [morph ? morph.from : null, morph ? morph.to : null, morph ? morph.fromBasis : null, morph ? morph.toBasis : null, rangeId, showScatter, basis]);
+  }, [morph ? morph.from : null, morph ? morph.to : null, morph ? morph.fromBasis : null, morph ? morph.toBasis : null, rangeId, showScatter, basis, rdOn]);
   const scatter = morphClouds ? morphClouds.arriving : settledCloud;
   const scatterOut = morphClouds ? morphClouds.leaving : [];
   const scatterMove = !morphClouds ? [] : morphClouds.travel.map(([a, b]) => ({
@@ -67249,12 +67570,13 @@ function Hero({
       padDot = 0.5;
     return [Math.floor((lo - padDot) / 5) * 5, Math.ceil((hi + padDot) / 5) * 5];
   };
-  const yTarget = domainOf(matchup);
+  const yTarget = rdOn ? [0, 100] : domainOf(matchup);
   const yDomain = blend ? (() => {
     const f = morph.fromDomain || domainOf(morph.from, morph.fromBasis),
       t = morph.t;
     return [f[0] + (yTarget[0] - f[0]) * t, f[1] + (yTarget[1] - f[1]) * t];
   })() : yTarget;
+  if (!rdOn) shownDomain.current = yDomain;
   const yTicks = [];
   for (let v = yTarget[0]; v <= yTarget[1]; v += 5) if (v > yTarget[0] && v < yTarget[1]) yTicks.push(v);
   const lead = +(latest.a - latest.b).toFixed(1);
@@ -67333,7 +67655,8 @@ function Hero({
     showSynth: showSynth,
     setShowSynth: setShowSynth,
     otherContests: otherContests,
-    xDomain: xDomain
+    xDomain: xDomain,
+    domainRef: shownDomain
   });
   return React.createElement("section", {
     className: "card hero"
@@ -67649,6 +67972,14 @@ const TABS = [{
   tip: "About this site – how it works, what it tracks, and the terms it uses"
 }];
 const TAB_IDS = TABS.map(t => t.id);
+const PrimaryVoteMemo = React.memo(PrimaryVotePanel);
+const NextPollsMemo = React.memo(NextPollsPanel);
+const LeadershipMemo = React.memo(LeadershipSection);
+const DirectionMemo = React.memo(DirectionPanel);
+const DemographicsMemo = React.memo(DemographicsPanel);
+const OnSourcesMemo = React.memo(OnSourcesPanel);
+const IssuesMemo = React.memo(IssuesPanel);
+const UndecidedMemo = React.memo(UndecidedPanel);
 function SnapshotView({
   rangeId: heroRange,
   setRangeId,
@@ -67667,24 +67998,24 @@ function SnapshotView({
     setMatchup: setTppMatchup,
     basis: tppBasis,
     setBasis: setTppBasis
-  }), React.createElement(PrimaryVotePanel, {
+  }), React.createElement(PrimaryVoteMemo, {
     rangeId: rangeId
   }), React.createElement(PollsterTable, {
     tppBasis: tppBasis,
     setTppBasis: setTppBasis,
     tppMatchup: tppMatchup,
     setTppMatchup: setTppMatchup
-  }), React.createElement(NextPollsPanel, null), React.createElement(LeadershipSection, {
+  }), React.createElement(NextPollsMemo, null), React.createElement(LeadershipMemo, {
     rangeId: rangeId
-  }), React.createElement(DirectionPanel, {
+  }), React.createElement(DirectionMemo, {
     rangeId: rangeId
-  }), React.createElement(DemographicsPanel, {
+  }), React.createElement(DemographicsMemo, {
     rangeId: rangeId
-  }), React.createElement(OnSourcesPanel, {
+  }), React.createElement(OnSourcesMemo, {
     rangeId: rangeId
-  }), React.createElement(IssuesPanel, {
+  }), React.createElement(IssuesMemo, {
     rangeId: rangeId
-  }), React.createElement(UndecidedPanel, {
+  }), React.createElement(UndecidedMemo, {
     rangeId: rangeId
   }));
 }

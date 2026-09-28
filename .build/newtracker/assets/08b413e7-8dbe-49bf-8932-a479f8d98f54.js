@@ -195,6 +195,13 @@ function TrendChart(props) {
        to draw in, which travels with the morph so a series is never drawn over
        months it was never asked in. */
     scatterOut: scatterOutProp = [], scatterMove = [], fade = 1, clipX,
+    /* `eventsFrom`: mid-switch, the events of the view being left, with
+       `eventMix` how far the switch has run. An event both views mark slides
+       from where the old layout put its name to where the new one does; one
+       only the old view marks fades out, one only the new marks fades in.
+       Without it the set changed on the switch's last frame and every name
+       re-laid itself out at once. */
+    eventsFrom = null, eventMix = 1,
     /* `driven`: the caller is moving xDomain itself, frame by frame (a
        switch that blends one view's window into another's). The chart then
        draws in exactly the window it is handed - no travel of its own on
@@ -264,7 +271,10 @@ function TrendChart(props) {
   const prev = useRef(null);                 // the props of the last SETTLED render
   const travelling = useRef(false);
   React.useEffect(() => () => cancelAnimationFrame(winRaf.current), []);
-  React.useEffect(() => {
+  /* A LAYOUT effect: the travel's first step is set before the frame that
+     carries the new range is painted, so the press is answered by motion in
+     that frame rather than by a frame of the old window. */
+  React.useLayoutEffect(() => {
     const from = winRef.current, to = xDomain;
     if (from[0] === to[0] && from[1] === to[1]) return;
     if (driven) { cancelAnimationFrame(winRaf.current); winRef.current = to; travelling.current = false; setWin(to); return; }
@@ -281,18 +291,11 @@ function TrendChart(props) {
     const still = (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
       || document.visibilityState === "hidden" || !onScreen;
     if (still) { winRef.current = to; travelling.current = false; setWin(to); return; }
-    cancelAnimationFrame(winRaf.current);
     travelling.current = true;
-    const a = from.slice(), t0 = performance.now();
-    const step = (now) => {
-      const raw = Math.min(1, (now - t0) / window.AP.MORPH_MS);
-      if (raw >= 1) { winRef.current = to; travelling.current = false; setWin(to); return; }
-      const e = window.AP.morphEase(raw);
-      winRef.current = [a[0] + (to[0] - a[0]) * e, a[1] + (to[1] - a[1]) * e];
-      setWin(winRef.current);
-      winRaf.current = requestAnimationFrame(step);
-    };
-    winRaf.current = requestAnimationFrame(step);
+    const a = from.slice();
+    const at = (e) => { winRef.current = [a[0] + (to[0] - a[0]) * e, a[1] + (to[1] - a[1]) * e]; setWin(winRef.current); };
+    const c = window.AP.morphClock(winRaf, at, () => { winRef.current = to; travelling.current = false; setWin(to); });
+    at(c.t);
   }, [xDomain[0], xDomain[1]]);
 
   /* tooltipTitle and extraRows read the panel's OWN points by index, so they
@@ -529,6 +532,7 @@ function TrendChart(props) {
     const rU = radiusPx / Math.max(scale, 0.0001);
     let near = null, nearD = Infinity;
     for (const q of evPlaced) {
+      if (q.leaving) continue;
       // the rule, from the label's baseline down to the axis
       let d = (p.y >= q.y - rU && p.y <= H - pad.b + rU) ? Math.abs(p.x - q.ex) : Infinity;
       // …and the label itself, a far bigger and more obvious target
@@ -823,11 +827,17 @@ function TrendChart(props) {
        a cloud that must read apart from another in the same colour (the
        Undecided panel's after-preference polls, whose line is dashed). A
        ring is less ink than a disc, so it carries more of its own. */
+    /* fill-opacity, not opacity, on a plain dot: the two draw a filled disc
+       identically, but `opacity` makes every dot a compositing group of its
+       own - two thousand of them on this page - and the browser re-sorted
+       all of them into layers on every frame of every switch, a third of a
+       phone's frame spent on dots that were not moving. A ring keeps
+       `opacity`, which is what fades its fill and outline as one. */
     const common = d.hollow
       ? { className: "scatter-dot", fill: "var(--chart-bg)", stroke: d.color, strokeWidth: PX(1.25),
           opacity: (live && dot && dot !== d ? 0.35 : Math.min(1, DOT_OP * 1.7)) * (d.op != null ? d.op : 1) }
       : { className: "scatter-dot", fill: d.color,
-          opacity: (live && dot && dot !== d ? 0.25 : DOT_OP) * (d.op != null ? d.op : 1) };
+          fillOpacity: (live && dot && dot !== d ? 0.25 : DOT_OP) * (d.op != null ? d.op : 1) };
     const p = dotPath(d.shape, cx, cy, r);
     return p ? <path key={"s" + i} d={p} {...common} />
              : <circle key={"s" + i} cx={cx} cy={cy} r={r} {...common} />;
@@ -851,7 +861,7 @@ function TrendChart(props) {
      circles a frame rather than the ~330 on the chart. */
   const moveDots = scatterMove.map((d, i) => (
     <circle key={"m" + i} cx={sx(d.x)} cy={sy(d.y)} r={DOT_R}
-            className="scatter-dot" fill={d.color} opacity={DOT_OP * (d.op != null ? d.op : 1)} />
+            className="scatter-dot" fill={d.color} fillOpacity={DOT_OP * (d.op != null ? d.op : 1)} />
   ));
 
   /* ---- key events ---------------------------------------------------------
@@ -881,8 +891,8 @@ function TrendChart(props) {
      on its events are keyed by a list under the chart, which the image does
      not carry, and at that width the names fit - so the copy names them. */
   const copying = !!(ref.current && ref.current.hasAttribute("data-copying"));
-  const evPlaced = (() => {
-    const evs = events
+  const placeEvents = (list) => {
+    const evs = list
       .map((e) => (copying && e.badge != null ? { ...e, badge: null, badgeLead: false } : e))
       .filter((e) => e.x >= win[0] && e.x <= win[1])
       .sort((a, b) => a.x - b.x);
@@ -948,6 +958,23 @@ function TrendChart(props) {
       }
       return { e, ex, w, fsz, row: null, y: rowY(null) };   // genuinely nowhere to put it
     });
+  };
+  const evKey = (e) => e.date + "|" + (e.short || e.label);
+  const evPlaced = (() => {
+    const to = placeEvents(events);
+    if (!eventsFrom || eventMix >= 1) return to;
+    const from = placeEvents(eventsFrom), t = eventMix;
+    const byKey = new Map(from.map((p) => [evKey(p.e), p]));
+    const lerp = (a, b) => a + (b - a) * t;
+    const out = to.map((p) => {
+      const q = byKey.get(evKey(p.e));
+      if (!q) return { ...p, op: t };
+      byKey.delete(evKey(p.e));
+      if (p.row == null || q.row == null) return { ...p, prev: q };
+      return { ...p, x: lerp(q.x, p.x), y: lerp(q.y, p.y), prev: q };
+    });
+    byKey.forEach((q) => out.push({ ...q, op: 1 - t, leaving: true }));
+    return out.sort((a, b) => a.ex - b.ex);
   })();
 
   return (
@@ -1111,25 +1138,39 @@ function TrendChart(props) {
              way: runs that would overlap are centred on their events a badge's
              width apart, and each keeps a short tie down to its own rule. */
           if (!rd) return null;
-          const lead = evPlaced.map((p, i) => ({ i, ex: p.ex, p })).filter((b) => b.p.row == null && b.p.e.badge != null && b.p.e.badgeLead);
-          const gap = PX(17);
-          let runs = lead.map((b) => ({ items: [b], x0: b.ex }));
-          for (let moved = true, guard = 0; moved && guard < 20; guard++) {
-            moved = false;
-            runs.forEach((r) => { const mid = r.items.reduce((s, b) => s + b.ex, 0) / r.items.length; r.x0 = mid - ((r.items.length - 1) * gap) / 2; });
-            for (let k = 1; k < runs.length; k++) {
-              const a = runs[k - 1], b = runs[k];
-              if (a.x0 + (a.items.length - 1) * gap + gap > b.x0) { a.items = a.items.concat(b.items); runs.splice(k, 1); moved = true; break; }
+          /* spread one view's badges; mid-switch each view's spread is worked
+             out on its own and a badge both carry slides between the two */
+          const spread = (placed) => {
+            const at = new Map();
+            const lead = placed.filter((p) => p.row == null && p.e.badge != null && p.e.badgeLead).map((p) => ({ ex: p.ex, p }));
+            const gap = PX(17);
+            let runs = lead.map((b) => ({ items: [b], x0: b.ex }));
+            for (let moved = true, guard = 0; moved && guard < 20; guard++) {
+              moved = false;
+              runs.forEach((r) => { const mid = r.items.reduce((s, b) => s + b.ex, 0) / r.items.length; r.x0 = mid - ((r.items.length - 1) * gap) / 2; });
+              for (let k = 1; k < runs.length; k++) {
+                const a = runs[k - 1], b = runs[k];
+                if (a.x0 + (a.items.length - 1) * gap + gap > b.x0) { a.items = a.items.concat(b.items); runs.splice(k, 1); moved = true; break; }
+              }
             }
-          }
-          const lo = pad.l + PX(8), hi = W - pad.r - PX(8);
+            const lo = pad.l + PX(8), hi = W - pad.r - PX(8);
+            runs.forEach((r) => {
+              let x0 = r.x0;
+              const span = (r.items.length - 1) * gap;
+              if (x0 < lo) x0 = lo;
+              if (x0 + span > hi) x0 = hi - span;
+              r.items.forEach((b, k) => { at.set(evKey(b.p.e), x0 + k * gap); });
+            });
+            return at;
+          };
+          const now = spread(evPlaced.filter((p) => !p.leaving));
+          const was = eventsFrom && eventMix < 1 ? spread(placeEvents(eventsFrom)) : null;
           badgeAt.current = {};
-          runs.forEach((r) => {
-            let x0 = r.x0;
-            const span = (r.items.length - 1) * gap;
-            if (x0 < lo) x0 = lo;
-            if (x0 + span > hi) x0 = hi - span;
-            r.items.forEach((b, k) => { badgeAt.current[b.i] = x0 + k * gap; });
+          evPlaced.forEach((p, i) => {
+            const k = evKey(p.e), b = now.get(k), a = was ? was.get(k) : null;
+            const x = p.leaving ? a : b;
+            if (x == null) return;
+            badgeAt.current[i] = a != null && b != null && !p.leaving ? a + (b - a) * eventMix : x;
           });
           return null;
         })()}
@@ -1148,9 +1189,11 @@ function TrendChart(props) {
              what marks it – CSS :hover no longer has to agree with the pick to
              keep the label lit. */
           const cls = "evt" + (evt && evt.e === e ? " on" : "");
+          const fadeSt = p.op != null && p.op < 1 ? { opacity: p.op } : null;
+          const k = evKey(e) + (p.leaving ? "|out" : "");
           // no room for a label: the reference line still earns its place
           if (row == null) return (
-            <g key={"ev" + i} className={cls} role="img" aria-label={aria}>
+            <g key={k} className={cls} role="img" aria-label={aria} style={fadeSt} data-ev={k}>
               {/* a 1px dashed rule is a poor hover target; an invisible wide
                   line over it makes the annotation reachable */}
               <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-hit" />
@@ -1163,8 +1206,13 @@ function TrendChart(props) {
                   <g className="rd-badge">
                     {Math.abs(bx - ex) > PX(1) && <path d={`M${bx} ${pad.t - PX(5.5)}L${ex} ${pad.t}`} className="rd-badge-tie" />}
                     <circle cx={bx} cy={pad.t - PX(13)} r={PX(7.5)} />
+                    {/* a badge renumbered by the switch crossfades its figure */}
+                    {p.prev && p.prev.e.badge != null && p.prev.e.badge !== e.badge && eventMix < 1 && (
+                      <text x={bx} y={pad.t - PX(13)} dominantBaseline="central" textAnchor="middle"
+                            style={{ fontSize: PX(10), opacity: 1 - eventMix }}>{p.prev.e.badge}</text>
+                    )}
                     <text x={bx} y={pad.t - PX(13)} dominantBaseline="central" textAnchor="middle"
-                          style={{ fontSize: PX(10) }}>{e.badge}</text>
+                          style={{ fontSize: PX(10), opacity: p.prev && p.prev.e.badge != null && p.prev.e.badge !== e.badge && eventMix < 1 ? eventMix : undefined }}>{e.badge}</text>
                   </g>
                 );
               })()}
@@ -1174,7 +1222,7 @@ function TrendChart(props) {
           const ruleTop = rd ? yRow + PX(5) : yRow;
           const displaced = !rd || !!p.disp;
           return (
-            <g key={"ev" + i} className={cls} role="img" aria-label={aria}>
+            <g key={k} className={cls} role="img" aria-label={aria} style={fadeSt} data-ev={k}>
               <line x1={ex} x2={ex} y1={ruleTop} y2={H - pad.b} className="evt-hit" />
               <line x1={ex} x2={ex} y1={ruleTop} y2={H - pad.b} className="evt-line" />
               {/* elbow: reads as a lead-in rule at the label's baseline */}
@@ -1192,7 +1240,8 @@ function TrendChart(props) {
           );
         })}
         {rd && evPlaced.map((p, i) => p.row == null ? null : (
-          <g key={"evl" + i} className={"evt" + (evt && evt.e === p.e ? " on" : "")} aria-hidden="true">
+          <g key={"evl" + evKey(p.e) + (p.leaving ? "|out" : "")} data-ev={"l" + evKey(p.e) + (p.leaving ? "|out" : "")} className={"evt" + (evt && evt.e === p.e ? " on" : "")} aria-hidden="true"
+             style={p.op != null && p.op < 1 ? { opacity: p.op } : null}>
             <text x={p.x} y={p.y} className="evt-label" textAnchor="start"
                   style={{ fontSize: p.fsz, strokeWidth: PX(4) }}>
               {p.e.short}

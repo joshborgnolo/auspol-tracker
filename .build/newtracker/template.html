@@ -25,6 +25,9 @@
    auspol tracker – design tokens & styles
    ============================================================ */
 :root {
+  /* the one curve every switch that moves data runs on - lines, dots, bars,
+     rolling digits - the same one AP.morphEase samples for the charts */
+  --morph-ease: cubic-bezier(.3, .7, .3, 1);
   /* surfaces – warm paper */
   --bg:        oklch(0.970 0.008 78);
   --surface:   oklch(0.992 0.004 85);
@@ -1117,9 +1120,10 @@ body { --bar-track: color-mix(in oklch, var(--ink) 8%, var(--bg)); }
 .roll-reel {
   display: block;
   transform: translateY(calc(var(--d) * -1em));
-  /* the same curve and duration MORPH_EASE samples in views.jsx – digits,
-     colour, lines and dots all move as one thing or they look like four */
-  transition: transform .32s cubic-bezier(.4, .1, .25, 1);
+  /* the same curve and duration AP.morphEase samples for the charts –
+     digits, colour, lines and dots all move as one thing or they look like
+     four */
+  transition: transform .32s var(--morph-ease);
 }
 .roll-reel > span, .roll-sep { display: block; height: 1em; line-height: 1em; }
 /* Crimson's 1 leaves its reel slot three-quarters empty - 0.371em of glyph
@@ -1129,7 +1133,7 @@ body { --bar-track: color-mix(in oklch, var(--ink) 8%, var(--bg)); }
    the 1's empty shoulder and breathes back out for the wide digits. The
    margins ride the reel's own curve and length, so figure and gap settle as
    one thing. */
-.roll-sep { transition: margin .32s cubic-bezier(.4, .1, .25, 1); }
+.roll-sep { transition: margin .32s var(--morph-ease); }
 /* The reel is nine digits the reader never sees, and aria-hidden keeps them out
    of the accessibility tree – but a SELECTION doesn't consult aria, so without
    this, copying "Labor leads by 2.2 points" would paste every digit on every reel.
@@ -1193,7 +1197,7 @@ body { --bar-track: color-mix(in oklch, var(--ink) 8%, var(--bg)); }
    mercury rather than cutting it, and on load the component lets it fill
    out from the tie (see HeroGauge). */
 .hg-span { position: absolute; top: 2px; height: 4px; border-radius: 999px;
-  transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
+  transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
 /* The tie is the whole point of the instrument - whether the span clears it -
    so it is cut into the housing rather than drawn over it: a dark cut with a
    lit lip on its lower right, the page's one light direction, the same pair
@@ -1553,8 +1557,12 @@ body.dark .sens-band { opacity: 0.10; }
 .axis-label { font-family: var(--sans); fill: var(--ink-3); font-size: 13px; transition: fill .35s ease; }
 .axis-label.y { text-anchor: end; font-weight: 500; }
 .axis-label.x { font-weight: 500; }
-.scatter-dot { transition: r .12s ease, opacity .12s ease, fill .35s ease; cursor: pointer; }
-.series-line { transition: opacity .2s ease, stroke .35s ease; }
+/* No colour transitions on the marks: a switch moves their colour on its
+   own clock, frame by frame, and a CSS transition restarted by every one of
+   those frames dragged the colour behind the line and was still settling
+   after the line had landed. (The theme crossfade is a view transition.) */
+.scatter-dot { transition: r .12s ease, opacity .12s ease, fill-opacity .12s ease; cursor: pointer; }
+.series-line { transition: opacity .2s ease; }
 .grid, .refline { transition: stroke .35s ease; }
 
 /* tooltip */
@@ -1776,7 +1784,7 @@ body.editorial .leadership .card-title { font-size: 19px; font-weight: 600; lett
    pointer, since the thing it is a picture of no longer exists. */
 .ppm-ghost {
   position: absolute; pointer-events: none; opacity: 1;
-  transition: opacity .32s cubic-bezier(.4, .1, .25, 1);
+  transition: opacity .32s var(--morph-ease);
 }
 @media (prefers-reduced-motion: reduce) { .ppm-ghost { display: none; } }
 .ppm-pairs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
@@ -1910,7 +1918,7 @@ body.editorial .leadership .card-title { font-size: 19px; font-weight: 600; lett
      on one and 0 on the other, and the red became green in a single frame
      while her digits were still turning. Same curve and duration as the reel,
      so the number and its verdict arrive together. */
-  transition: color .32s cubic-bezier(.4, .1, .25, 1); }
+  transition: color .32s var(--morph-ease); }
 /* the mood pair, as every other net on the page: party colours here made a
    negative net a Labor mark and a positive one a Greens mark */
 .net.pos { color: var(--mood-pos); }
@@ -1944,7 +1952,7 @@ body.editorial .leadership .card-title { font-size: 19px; font-weight: 600; lett
    a bar that crosses zero swaps which side of the midline it hangs from, and
    at that moment it has no width to see the swap happen in. */
 .anb-fill { position: absolute; top: 0; bottom: 0; border-radius: 4px;
-  transition: width .32s cubic-bezier(.4, .1, .25, 1); }
+  transition: width .32s var(--morph-ease); }
 /* Side and colour belong to the ELEMENT, not to the reading: a bar that had to
    change both mid-transition showed the wrong colour on the wrong side of the
    midline for as long as the contraction lasted. */

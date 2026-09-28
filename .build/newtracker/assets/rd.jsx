@@ -233,18 +233,29 @@ function rdEventBadges(events, x0, x1) {
   });
   return { events: out, list };
 }
-function RdEventList({ list, inline }) {
+function RdEventList({ list, inline, from, mix }) {
   if (!list || !list.length) return null;
   /* `inline` runs the list across the page, as the canvas set the one shared
      by a pair of half-width charts; a phone always stacks it */
-  return (
-    <ol className={"rd-evlist" + (inline ? " inline" : "")}>
-      {list.map((l) => (
+  const ol = (l0, st, hidden) => (
+    <ol className={"rd-evlist" + (inline ? " inline" : "")} style={st} aria-hidden={hidden || undefined}>
+      {l0.map((l) => (
         <li key={l.n}><span className="rd-evlist-n">{l.n}</span>
           <span className="rd-evlist-l">{l.labels.join(" · ")}</span>
           <span className="rd-evlist-d">{window.AUSPOL.monthName(Number(l.ym.slice(5))) + " " + l.ym.slice(0, 4)}</span></li>
       ))}
     </ol>
+  );
+  /* mid-switch (`from`, `mix`): the list being left fades out over the list
+     arriving, both in one cell, so the names change with the chart's badges
+     and the page below does not move on the switch's last frame */
+  const same = from && from.length === list.length && from.every((l, i) => l.n === list[i].n && l.ym === list[i].ym && l.labels.join() === list[i].labels.join());
+  if (!from || same || mix >= 1) return ol(list);
+  return (
+    <div className="rd-evstack">
+      {ol(from, { opacity: 1 - mix }, true)}
+      {ol(list, { opacity: mix })}
+    </div>
   );
 }
 

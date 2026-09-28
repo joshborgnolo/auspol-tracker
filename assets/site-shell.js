@@ -93,14 +93,18 @@ const NP_UNTIMED_MINS = 24 * 60;
    was "tomorrow". The day comes back as UTC midnight, which is the frame
    Date.parse("YYYY-MM-DD") produces and the frame everything here compares
    in, and the clock as minutes past it. */
+/* one formatter, made once: building an Intl formatter is the slow part of
+   asking the time, and every render of the tab bar and the polls table asks */
+let npEastFmt = null;
 function easternNow() {
   const d = new Date();
   try {
     const p = {};
-    for (const x of new Intl.DateTimeFormat("en-AU", {
+    npEastFmt = npEastFmt || new Intl.DateTimeFormat("en-AU", {
       timeZone: "Australia/Sydney", year: "numeric", month: "2-digit",
       day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
-    }).formatToParts(d)) p[x.type] = x.value;
+    });
+    for (const x of npEastFmt.formatToParts(d)) p[x.type] = x.value;
     // some engines still render midnight as hour 24 rather than 0
     return { day: Date.UTC(+p.year, +p.month - 1, +p.day), mins: (+p.hour % 24) * 60 + +p.minute };
   } catch (e) {
@@ -172,7 +176,21 @@ function spreadDays(c, sp) {
    has to be the same claim the panel makes. Moved, not rewritten.
    `nowOverride` ({day, mins}) is the sim/health-check seam: the page never
    passes it and always reads the live Sydney clock. */
+/* The same minute gives the same answer, and nothing downstream edits it, so
+   the page's clock keeps one projection per minute: a switch re-renders the
+   tab bar and the polls table, and each used to work the schedule out afresh. */
+let npProjMemo = null;
 function npProject(nowOverride) {
+  if (!nowOverride) {
+    const e = easternNow(), k = e.day + e.mins * 60000;
+    if (npProjMemo && npProjMemo.k === k) return npProjMemo.v;
+    const v = npProjectAt(e);
+    npProjMemo = { k, v };
+    return v;
+  }
+  return npProjectAt(nowOverride);
+}
+function npProjectAt(nowOverride) {
   const { D } = window.AP;
   const cad = D.pollCadence || [];
   if (!cad.length) return { rows: [], t0: 0, nowMs: 0 };

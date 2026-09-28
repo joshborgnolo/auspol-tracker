@@ -372,7 +372,7 @@ function RdLeadership({ rangeId }) {
     hbSnap.current = null;
     if (!prev || !root) return;
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const MS = window.AP.MORPH_MS || 320, EASE = "cubic-bezier(.4, .1, .25, 1)";
+    const MS = window.AP.MORPH_MS || 320, EASE = window.AP.MORPH_CSS;
     const alias = (k) => (k.startsWith("3:") ? k.slice(2) : "3:" + k);
     const nodes = [...root.querySelectorAll("[data-mk]")];
     const here = new Set(nodes.map((n) => n.dataset.mk));
