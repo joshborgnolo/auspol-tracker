@@ -1033,6 +1033,7 @@ const RD_DEMO_HOME = {
   alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial",
   lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
   grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
+  oth: "Others voters are more likely to be Gen Z, renting, and NSW-based, and less likely to be provincial or mortgage holders",
 };
 /* the state panels' titles, as the board wrote them */
 const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };

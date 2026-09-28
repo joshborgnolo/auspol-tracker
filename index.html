@@ -2971,6 +2971,10 @@ body.rd {
   --ramp-lnp-2: oklch(0.50 0.095 250);
   --ramp-lnp-3: oklch(0.40 0.085 250);
   --ramp-lnp-4: oklch(0.31 0.070 250);
+  --ramp-oth-1: oklch(0.70 0.018 70);
+  --ramp-oth-2: oklch(0.60 0.016 70);
+  --ramp-oth-3: oklch(0.47 0.014 70);
+  --ramp-oth-4: oklch(0.35 0.012 70);
   --on-fill-alp: #ffffff;
   --on-fill-lnp: #ffffff;
   --on-fill-onp: oklch(0.25 0.050 58);
@@ -3004,6 +3008,10 @@ body.rd.dark {
   --ramp-lnp-2: oklch(0.62 0.115 252);
   --ramp-lnp-3: oklch(0.72 0.120 252);
   --ramp-lnp-4: oklch(0.81 0.100 252);
+  --ramp-oth-1: oklch(0.58 0.012 70);
+  --ramp-oth-2: oklch(0.66 0.014 70);
+  --ramp-oth-3: oklch(0.74 0.015 70);
+  --ramp-oth-4: oklch(0.82 0.016 70);
   --on-fill-alp: oklch(0.20 0.020 28);
   --on-fill-lnp: oklch(0.20 0.020 252);
   --on-fill-onp: oklch(0.20 0.030 58);
@@ -3800,6 +3808,10 @@ body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
   body.rd .rd-wv-charts { flex-direction: column; gap: 28px; }
   body.rd .rd-chips-row { display: flex; flex-wrap: nowrap; gap: 6px; }
   body.rd .rd-chips-row .rd-chip { flex: 1 1 auto; justify-content: center; min-height: 44px; padding: 0 8px; gap: 5px; font-size: 13px; }
+}
+@media (max-width: 480px) {
+  body.rd .rd-chips-row { flex-wrap: wrap; }
+  body.rd .rd-chips-row .rd-chip { flex: 1 1 calc(33.34% - 6px); }
 }
 @media (max-width: 360px) {
   body.rd .rd-chips-row { gap: 4px; }
@@ -46987,6 +46999,9 @@ const DEMO_PARTIES = [{
 }, {
   id: "grn",
   label: "Greens"
+}, {
+  id: "oth",
+  label: "Others"
 }];
 const demoHouse = h => h === "RedBridge/Accent" ? "RedBridge" : h;
 const DEMO_GRP_PARTY = ["alp", "lnp", "grn", "onp", "oth"];
@@ -60063,7 +60078,8 @@ const RD_DEMO_HOME = {
   onp: "One Nation voters are more likely to be 55+, TAFE- or trade-qualified, English-only-speaking, rural, and non-Victorian",
   alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial",
   lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
-  grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial"
+  grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
+  oth: "Others voters are more likely to be Gen Z, renting, and NSW-based, and less likely to be provincial or mortgage holders"
 };
 const RD_STATE_NAME = {
   Vic: "Victoria",

@@ -2121,6 +2121,7 @@ function OnSourcesPanel({ rangeId }) {
 const DEMO_PARTIES = [
   { id: "onp", label: "One Nation" }, { id: "alp", label: "Labor" },
   { id: "lnp", label: "Coalition" }, { id: "grn", label: "Greens" },
+  { id: "oth", label: "Others" },
 ];
 const demoHouse = (h) => (h === "RedBridge/Accent" ? "RedBridge" : h);
 // a poll row's grp.v party order (gen-data DEMO_BY_POLL; the export's columns)
