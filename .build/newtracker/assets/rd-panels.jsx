@@ -1450,7 +1450,7 @@ function RdSwitching({ rangeId }) {
     .concat(c.sr.rate.monthly.map((m) => m.v + (m.ci95 || 0))))) / 25) * 25);
 
   /* ---- the mosaic ------------------------------------------------------------ */
-  const GAP = 4, H = narrow ? 0 : 300;
+  const GAP = 4, H = narrow ? 0 : 240;
   const all = cols.concat(onpW ? [{ id: "onp", w: onpW, rate: keptPct, kept: true, color: "var(--onp-deep)", tint: "var(--line-2)", ink: "var(--onp-text)" }] : []);
   const totW = all.reduce((s, c) => s + c.w, 0);
   const usable = W - GAP * (all.length - 1);
@@ -1528,7 +1528,7 @@ function RdSwitching({ rangeId }) {
         <div key={c.id} className="rd-mo-row">
           <div className="rd-mo-rtop"><b style={{ color: c.ink }}>{c.kept ? "One Nation" : c.id === "oth" ? "Others & independents" : NAME[c.id]}</b><b>≈ {fmt1(c.kept ? keptPts : c.pts)} pts</b></div>
           <div className="rd-mo-rsub"><span>{fmt1(c.w)}% of 2025 voters</span><span>{c.kept ? Math.round(c.rate) + "% still back it" : Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + " of the gain"}</span></div>
-          <div className="rd-mo-rbar" style={{ height: Math.max(22, c.w * 3.6), background: c.tint }}>
+          <div className="rd-mo-rbar" style={{ height: Math.max(16, c.w * 2.6), background: c.tint }}>
             <span style={{ width: c.rate + "%", background: c.kept ? "var(--onp-deep)" : "var(--onp)" }}></span>
             {!c.kept && i === 0 ? (
               <em className="rd-mo-first" style={{ left: "calc(" + c.rate + "% + 8px)" }}>

@@ -3780,7 +3780,7 @@ body.rd .rd-mo-rbar > em { position: absolute; top: 50%; transform: translateY(-
 body.rd .rd-mo-rbar > em.rd-mo-first { display: flex; flex-direction: column; gap: 2px; line-height: 1.15; }
 body.rd .rd-mo-big { font-size: 22px; font-weight: 600; }
 body.rd .rd-mo-nb { font-size: 12px; font-weight: 400; }
-body.rd .rd-mo-rbar > i.rd-mo-else { position: absolute; right: 8px; bottom: 6px; font-style: normal; font-size: 11px; }
+body.rd .rd-mo-rbar > i.rd-mo-else { position: absolute; right: 8px; top: 6px; font-style: normal; font-size: 11px; }
 body.rd .rd-sm-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px; margin-top: 24px; }
 body.rd .rd-sm-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; font-weight: 600; }
 body.rd .rd-sm-top b { font-size: 18px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -60351,7 +60351,7 @@ function RdSwitching({
   })) : [];
   const smTop = Math.max(50, Math.ceil(Math.max(...cols.flatMap(c => pollRate(c.id).map(d => d.y).concat(c.sr.rate.monthly.map(m => m.v + (m.ci95 || 0))))) / 25) * 25);
   const GAP = 4,
-    H = narrow ? 0 : 300;
+    H = narrow ? 0 : 240;
   const all = cols.concat(onpW ? [{
     id: "onp",
     w: onpW,
@@ -60510,7 +60510,7 @@ function RdSwitching({
   }, React.createElement("span", null, fmt1(c.w), "% of 2025 voters"), React.createElement("span", null, c.kept ? Math.round(c.rate) + "% still back it" : Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + " of the gain")), React.createElement("div", {
     className: "rd-mo-rbar",
     style: {
-      height: Math.max(22, c.w * 3.6),
+      height: Math.max(16, c.w * 2.6),
       background: c.tint
     }
   }, React.createElement("span", {
