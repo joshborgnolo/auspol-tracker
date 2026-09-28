@@ -2036,19 +2036,10 @@ function RdUndecided({ rangeId }) {
     const head = rdCap(rdOneIn(u)) + " is undecided." + (sf != null ? " " + rdCap(rdShareWords(sf / 100)) + " of the rest could still switch." : "");
     const moves = [["undecided", first], ["not firm", soft]].map(([nm, s]) => ({ nm, s, f: slopeOf(s) })).filter((m) => m.f);
     const movedSig = moves.filter((m) => m.f.p < 0.05 / moves.length);
-    let dek = !movedSig.length ? (moves.length > 1 ? "Neither share has" : "The share has") + " moved significantly since the 2025 election."
+    /* the dek is the movement verdict alone (user trim, 2026-09-28): the
+       house range and latest-figure sentences it used to append were cut */
+    const dek = !movedSig.length ? (moves.length > 1 ? "Neither share has" : "The share has") + " moved significantly since the 2025 election."
       : movedSig.map((m) => "The " + m.nm + " share has " + (m.f.b > 0 ? "risen" : "fallen") + " significantly since the 2025 election.").join(" ");
-    const house = first.houses[0];
-    const hp = first.polls.filter((d) => d.pollster === house).map((d) => d.v).sort((a, b) => a - b);
-    if (hp.length >= 8) {
-      const q = (f) => hp[Math.floor(f * (hp.length - 1))];
-      const lo = Math.round(q(0.25)), hi = Math.round(q(0.75));
-      dek += " Undecided voters have mostly run between " + lo + "% and " + hi + "% in " + house + "’s " + (house === "Roy Morgan" ? "weekly " : "") + "polls";
-      const last = first.latest;
-      if (u < lo - 0.3 && last && last.v < lo - 2 && last.firm === house)
-        dek += "; the latest pooled figure, " + u.toFixed(1) + "%, is lower mainly because of a single " + (+last.v.toFixed(1)) + "% reading.";
-      else dek += "; the latest pooled figure is " + u.toFixed(1) + "%.";
-    }
     return { head, dek };
   })();
 
