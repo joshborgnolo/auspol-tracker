@@ -157,12 +157,16 @@ function straightPath(pts, sx, sy) {
  *           lands on the rect so CSS can theme the fill – same contract as the
  *           areas below, and how the house-lean panel's red/blue ground is
  *           themed without passing a colour through the component
- *  areas:   [{id,color,opacity?,smooth?,edge?,clipX?,points:[{x,y0,y1}]}]  shaded
+ *  areas:   [{id,color,opacity?,smooth?,edge?,edgeWidth?,edgeDash?,edgeOpacity?,
+ *           clipX?,points:[{x,y0,y1}]}]  shaded
  *           region whose edges VARY with x – e.g. a sampling-error floor that
  *           moves as the polls behind it change size, or the interval around a
  *           trend line (bands can't do either, they're rectangles). `smooth`
  *           curves the edges like a trend line; `edge:false` drops the dashed
- *           outline, which an interval ribbon does not want; `className` lands
+ *           outline, which an interval ribbon does not want; the edge* options
+ *           restyle that outline (default 1.6px, "4 4", 0.85) where the standard
+ *           hand would read as another trend line instead of a bracket's bound;
+ *           `className` lands
  *           on the fill so CSS can theme it; `clipX` is its own travelling
  *           window, which an interval belonging to ONE line needs for the same
  *           reason the line does.
@@ -1083,8 +1087,9 @@ function TrendChart(props) {
                   dark without the component knowing the theme */}
               <path className={a.className} d={`${top} ${bot} Z`} fill={a.color}
                     opacity={a.opacity != null ? a.opacity : 1} />
-              {a.edge !== false && <path d={top} fill="none" stroke={a.color} strokeWidth={1.6}
-                                         strokeDasharray="4 4" opacity={0.85} />}
+              {a.edge !== false && <path d={top} fill="none" stroke={a.color} strokeWidth={a.edgeWidth || 1.6}
+                                         strokeDasharray={a.edgeDash || "4 4"}
+                                         opacity={a.edgeOpacity != null ? a.edgeOpacity : 0.85} />}
              </g>
             </g>
           );

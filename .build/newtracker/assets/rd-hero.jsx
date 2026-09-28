@@ -184,9 +184,7 @@ function RdHero(p) {
     : (onImp ? D.agg2pp : D.synth2pp);
   const cmpOn = showSynth && cmpAvail && !morph && cmpData && cmpData.length > 1;
   const cmpName = onImp ? "As published" : "Implied";
-  const cmpBox = matchup === "alp_on"
-    ? (onImp ? "Compare published head-to-heads" : "Compare implied 2PP")
-    : (onImp ? "Compare published 2PP" : "Compare implied 2PP");
+  const cmpBox = onImp ? "Compare published 2PP" : "Compare implied 2PP";
   const sensOn = cmpOn && matchup === "alp_lnp" && D.flowSens && D.flowSens.length > 1;
 
   const series = [];
@@ -210,7 +208,10 @@ function RdHero(p) {
   if (bandPts.length >= 2)
     areas.push({ id: "band", color: mainCol, className: "ci-band", edge: false, clipX: mainBl ? mainBl.clips.ci95 : null, points: bandPts });
   if (sensOn)
+    /* a bracket's bound, not a third line: dotted and faint, so beside the
+       compare dash in the same colour it never reads as another series */
     areas.push({ id: "sens", color: "var(--lnp)", className: "rd-sens", edge: true,
+                 edgeWidth: 1, edgeDash: "1.8 3", edgeOpacity: 0.35,
                  points: filterPts(D.flowSens.map((d) => ({ x: d.x, y0: d.lo, y1: d.hi })), xDomain[0]) });
 
   /* the dots: each poll's reading of Labor's share in the chosen contest,
@@ -265,16 +266,18 @@ function RdHero(p) {
   if (domainRef) domainRef.current = yDomain;
   const yTicks = rdYTicks(yTarget[0], yTarget[1], 5);
 
-  /* events: the major ones, and the chosen contest's own change of hands,
-     over the months that contest's lines run. Mid-switch the chart is handed
-     both scenes' events and slides one set into the other (TrendChart's
-     eventsFrom), so the markers change with the lines, not after them. */
+  /* events: the major ones, plus both recent changes of hand – Taylor
+     replacing Ley, Joyce joining One Nation – on EVERY contest's view, so
+     the markers are identical whichever matchup pill is up, over the months
+     that contest's lines run. Mid-switch the chart is handed both scenes'
+     events and slides one set into the other (TrendChart's eventsFrom), so
+     the markers change with the lines, not after them. */
+  const keptEvents = ["2026-02-12", "2025-12-08"];
   const evsOf = (sc) => {
     const rows = [sc.main, sc.other].filter((r) => r && r.length);
     if (!rows.length) return [];
     const x0 = Math.min(...rows.map((r) => r[0].x)), x1 = Math.max(...rows.map((r) => r[r.length - 1].x));
-    const own = { alp_lnp: "2026-02-12", alp_on: "2025-12-08" }[sc.id];
-    return (D.events || []).filter((e) => (e.major || e.date === own) && e.x >= x0 - 0.02 && e.x <= x1 + 0.02);
+    return (D.events || []).filter((e) => (e.major || keptEvents.includes(e.date)) && e.x >= x0 - 0.02 && e.x <= x1 + 0.02);
   };
   const evsAll = evsOf(morph ? B : S);
   const evsWas = morph ? evsOf(A) : null;

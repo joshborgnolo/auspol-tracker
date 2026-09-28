@@ -43099,9 +43099,9 @@ function TrendChart(props) {
         d: top,
         fill: "none",
         stroke: a.color,
-        strokeWidth: 1.6,
-        strokeDasharray: "4 4",
-        opacity: 0.85
+        strokeWidth: a.edgeWidth || 1.6,
+        strokeDasharray: a.edgeDash || "4 4",
+        opacity: a.edgeOpacity != null ? a.edgeOpacity : 0.85
       })))
     );
   }), yTicks.map(t => React.createElement("g", {
@@ -57089,7 +57089,7 @@ function RdHero(p) {
   const cmpData = !cmpAvail ? null : matchup === "alp_on" ? onImp ? M.alp_on.data : D.synthOn : onImp ? D.agg2pp : D.synth2pp;
   const cmpOn = showSynth && cmpAvail && !morph && cmpData && cmpData.length > 1;
   const cmpName = onImp ? "As published" : "Implied";
-  const cmpBox = matchup === "alp_on" ? onImp ? "Compare published head-to-heads" : "Compare implied 2PP" : onImp ? "Compare published 2PP" : "Compare implied 2PP";
+  const cmpBox = onImp ? "Compare published 2PP" : "Compare implied 2PP";
   const sensOn = cmpOn && matchup === "alp_lnp" && D.flowSens && D.flowSens.length > 1;
   const series = [];
   if (otherRows && otherRows.length > 1) series.push({
@@ -57150,16 +57150,19 @@ function RdHero(p) {
     points: bandPts
   });
   if (sensOn) areas.push({
-    id: "sens",
-    color: "var(--lnp)",
-    className: "rd-sens",
-    edge: true,
-    points: filterPts(D.flowSens.map(d => ({
-      x: d.x,
-      y0: d.lo,
-      y1: d.hi
-    })), xDomain[0])
-  });
+      id: "sens",
+      color: "var(--lnp)",
+      className: "rd-sens",
+      edge: true,
+      edgeWidth: 1,
+      edgeDash: "1.8 3",
+      edgeOpacity: 0.35,
+      points: filterPts(D.flowSens.map(d => ({
+        x: d.x,
+        y0: d.lo,
+        y1: d.hi
+      })), xDomain[0])
+    });
   const cloudFor = (id, b) => !showScatter ? [] : D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).map(q => {
     const pair = iScatOf(id, b)(q);
     return pair ? {
@@ -57227,16 +57230,13 @@ function RdHero(p) {
   const yDomain = morph ? blendDomain(morph.fromDomain || domainOf(morph.from, fromB), yTarget, t) : yTarget;
   if (domainRef) domainRef.current = yDomain;
   const yTicks = rdYTicks(yTarget[0], yTarget[1], 5);
+  const keptEvents = ["2026-02-12", "2025-12-08"];
   const evsOf = sc => {
     const rows = [sc.main, sc.other].filter(r => r && r.length);
     if (!rows.length) return [];
     const x0 = Math.min(...rows.map(r => r[0].x)),
       x1 = Math.max(...rows.map(r => r[r.length - 1].x));
-    const own = {
-      alp_lnp: "2026-02-12",
-      alp_on: "2025-12-08"
-    }[sc.id];
-    return (D.events || []).filter(e => (e.major || e.date === own) && e.x >= x0 - 0.02 && e.x <= x1 + 0.02);
+    return (D.events || []).filter(e => (e.major || keptEvents.includes(e.date)) && e.x >= x0 - 0.02 && e.x <= x1 + 0.02);
   };
   const evsAll = evsOf(morph ? B : S);
   const evsWas = morph ? evsOf(A) : null;
