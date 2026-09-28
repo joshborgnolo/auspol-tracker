@@ -788,7 +788,10 @@ body.rd .rd-ld-grid.one { grid-template-columns: minmax(0, 1fr); }
    canvas drew them. Left to themselves, the net-approval dot plot ran 24px
    taller than the head-to-head bars and every row below it slipped. */
 @media (min-width: 1001px) {
-  body.rd .rd-ld-grid:not(.one) > .rd-ld-panel { display: grid; grid-row: span 9; grid-template-rows: subgrid; align-content: start; }
+  /* rows pair up only while both panels show the same shape of content;
+     .free (either panel on "Both", which adds rows of its own) leaves each
+     panel to stack its own rows */
+  body.rd .rd-ld-grid:not(.one):not(.free) > .rd-ld-panel { display: grid; grid-row: span 9; grid-template-rows: subgrid; align-content: start; }
   body.rd .rd-ld-grid:not(.one) .rd-dp { margin-top: 20px; }
   /* here too the panel heads sit straight under the dek, as they do stacked:
      the 48px below belongs between the two panels once one follows the other */
@@ -798,8 +801,10 @@ body.rd .rd-ld-grid.one { grid-template-columns: minmax(0, 1fr); }
      into the bars' slack above (one 19.5px line) rather than hanging low.
      The lift is the glide item's OWN margin - never a margin on the note
      inside it: RdGlide's overflow clip would slice a collapsed-through
-     margin's reach (it decapitated the note's top line mid-morph) */
-  body.rd .rd-ld-grid:not(.one) .rd-ld-noteup { margin-top: -19.5px; }
+     margin's reach (it decapitated the note's top line mid-morph). Only
+     shared rows leave the slack it climbs into - off the shared grid it
+     would pull the note up against the bars */
+  body.rd .rd-ld-grid:not(.one):not(.free) .rd-ld-noteup { margin-top: -19.5px; }
 }
 body.rd .rd-ld-panel.rd-hidden { display: none; }
 body.rd .rd-ld-panel .rd-sub { margin-top: 48px; }

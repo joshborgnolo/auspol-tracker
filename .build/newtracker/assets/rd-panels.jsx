@@ -793,7 +793,13 @@ function RdLeadership({ rangeId }) {
   return (
     <RdSec id="leadership" cls="rd-lead" title="Leadership" meta="Preferred PM and net approval, Newspoll, YouGov, Resolve, Essential and others">
       {story && <RdHed head={story.head} dek={story.dek} />}
-      <div className={"rd-ld-grid" + (expanded ? " one" : "")}>
+      {/* "free" frees the panels from the shared desktop row grid: a "Both"
+          view gives its panel extra children (a second chart, the dot-plot
+          key), so the two panels' rows no longer pair up - the other panel's
+          keys and notes would get parked against this panel's tall chart
+          rows, centre themselves in the stretched track and hang in space
+          above or below their own charts. Not shared, each panel stacks. */}
+      <div className={"rd-ld-grid" + (expanded ? " one" : ppmView === "both" || metric === "both" ? " free" : "")}>
         {panel("ppm", "Preferred prime minister", "“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.",
           <RdTabs swipe value={ppmView} onChange={ppmPick} ariaLabel="Preferred prime minister question"
                   options={[{ id: "two", label: "Two-way" }, { id: "three", label: "Three-way" }, { id: "both", label: "Both" }]}>
