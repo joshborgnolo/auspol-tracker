@@ -4376,7 +4376,7 @@ body.rd .rd-apd-leaders { display: flex; flex-wrap: wrap; gap: 6px 28px; }
 body.rd .rd-apd-links { margin: 10px 0 0 -4px; padding-right: 40px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; }
 body.rd .rd-apd-ext { margin-left: 3px; font-size: 11px; color: var(--ink-faint); text-decoration: none; }
 body.rd .rd-apd-ct { margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--ink); }
-body.rd .rd-apd-mini { margin-top: 10px; }
+body.rd .rd-apd-mini { margin-top: 10px; position: relative; }
 body.rd .rd-apd-mini svg { display: block; overflow: visible; }
 body.rd .rd-apd-gl { stroke: var(--line); stroke-width: 1; }
 body.rd .rd-apd-even { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 3 3; }
@@ -4388,6 +4388,11 @@ body.rd .rd-apd-lab, body.rd .rd-apd-thislab {
 body.rd .rd-apd-lab { fill: var(--ink-3); }
 body.rd .rd-apd-thislab { fill: var(--ink); }
 body.rd .rd-apd-dot { fill: var(--ink-3); opacity: 0.75; }
+body.rd .rd-apd-hit { fill: none; stroke: none; pointer-events: all; touch-action: manipulation; }
+body.rd .rd-apd-hit.link { cursor: pointer; }
+body.rd .rd-apd-hit:focus-visible { outline: 2px solid var(--accent); }
+body.rd .rd-apd-dothi { fill: none; stroke: var(--accent); stroke-width: 1.5; }
+body.rd .rd-apd-tip { position: absolute; top: -6px; bottom: auto; transform: translate(-50%, -100%); z-index: 20; white-space: nowrap; text-align: left; pointer-events: none; }
 body.rd .rd-apd-ring { fill: none; stroke: var(--ink); stroke-width: 1.5; }
 body.rd .rd-apd-this { fill: var(--ink); }
 body.rd .rd-apd-base { stroke: var(--ink-faint); stroke-width: 1; }
@@ -41390,6 +41395,26 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
     }
     return () => {};
   };
+  const retitlePollHead = (panel, house) => {
+    const head = house && panel.querySelector(".rd-apd-h") || null;
+    if (!head) return () => {};
+    const by = "Published by " + house;
+    const edits = [];
+    Array.prototype.forEach.call(head.childNodes, n => {
+      if (n.nodeType !== 3) return;
+      const from = n.nodeValue;
+      let to = from.replace("This poll", house);
+      if (to.indexOf(by) !== -1) to = to.replace(by, "self-published");
+      if (to !== from) edits.push([n, from, to]);
+    });
+    if (!edits.length) return () => {};
+    edits.forEach(([n,, to]) => {
+      n.nodeValue = to;
+    });
+    return () => edits.forEach(([n, from]) => {
+      n.nodeValue = from;
+    });
+  };
   const readModel = panel => {
     const root = panel.getBoundingClientRect();
     const els = [];
@@ -41648,7 +41673,10 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
     const tr = panel.closest("tr");
     const row = tr && tr.previousElementSibling;
     const nameEl = row && row.querySelector(".pollster-name");
-    return nameEl ? (nameEl.textContent || "").replace(/↗/g, "").replace(/\s+/g, " ").trim() : "";
+    if (nameEl) {
+      return (nameEl.textContent || "").replace(/↗/g, "").replace(/\s+/g, " ").trim();
+    }
+    return (panel.getAttribute("data-pollster") || "").trim();
   };
   const metaValue = (panel, key) => {
     const ks = panel.querySelectorAll(".pd-meta-k");
@@ -41658,6 +41686,11 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
       const v = item && item.querySelector(".pd-meta-v");
       if (v) return (v.textContent || "").replace(/\s+/g, " ").trim();
     }
+    if (key === "Fieldwork") {
+      const head = panel.querySelector(".rd-apd-h");
+      const m = head && /Fieldwork ([^·]+)/.exec(head.textContent || "");
+      if (m) return m[1].replace(/\s+/g, " ").trim();
+    }
     return "";
   };
   const idLine = panel => [houseName(panel), metaValue(panel, "Fieldwork")].filter(Boolean).join(" · ");
@@ -41666,8 +41699,10 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
     return "auspol-breakdown-" + (label || "poll") + ".png";
   };
   const compose = panel => {
+    const house = houseName(panel);
     let restore = widenPanel(panel, CONTENT_MAX);
-    let untitle = retitleFieldworkRow(panel, houseName(panel));
+    let untitle = retitleFieldworkRow(panel, house);
+    let unhead = retitlePollHead(panel, house);
     try {
       panel.getBoundingClientRect();
       const wide = readModel(panel);
@@ -41675,15 +41710,18 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
       const want = Math.min(CONTENT_MAX, Math.max(CONTENT_MIN, Math.ceil(wide.inkRight + wide.padRight) + SLACK));
       let model = wide;
       if (want < wide.rootW) {
+        unhead();
         untitle();
         restore();
         restore = widenPanel(panel, want);
-        untitle = retitleFieldworkRow(panel, houseName(panel));
+        untitle = retitleFieldworkRow(panel, house);
+        unhead = retitlePollHead(panel, house);
         panel.getBoundingClientRect();
         model = readModel(panel);
       }
       return paintCard(model);
     } finally {
+      unhead();
       untitle();
       restore();
     }
@@ -62990,6 +63028,17 @@ function RdApMini({
     t: rdApDays(ym + "-15")
   }));
   const vals = mine.map(valOf).concat(avg.map(a => a.v));
+  const [tip, setTip] = useState(null);
+  const tipBox = React.useRef(null);
+  const ptr = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = tipBox.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip]);
   if (!vals.length || valOf(p) == null) return React.createElement("div", {
     ref: box
   });
@@ -63011,6 +63060,33 @@ function RdApMini({
   const cx = X(rdApDays(p.released)),
     cy = Y(valOf(p));
   const labLeft = cx > W * 0.45;
+  const rival = onM ? "One Nation" : "Coalition";
+  const outLabel = q => {
+    const d = new Date(rdApDays(q.released));
+    return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1);
+  };
+  const show = (id, src) => setTip({
+    id,
+    src
+  });
+  const hide = (id, src) => setTip(t => t && t.id === id && (!src || t.src === src) ? null : t);
+  const dots = mine.filter(q => q.released !== p.released).map((q, i) => {
+    const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+      pollster: q.pollster,
+      released: q.released
+    }) : null;
+    const dup = mine.some(z => z !== q && z.pollster === q.pollster && z.released === q.released);
+    const key = !raw || dup ? null : raw;
+    return {
+      q,
+      key,
+      id: key || "d" + i,
+      cx: X(rdApDays(q.released)),
+      cy: Y(valOf(q)),
+      a: valOf(q)
+    };
+  });
+  const dotTip = tip && (dots.find(d => d.id === tip.id) || null);
   return React.createElement("div", {
     ref: box,
     className: "rd-apd-mini"
@@ -63037,13 +63113,70 @@ function RdApMini({
     x: X(avg[0].t),
     y: Y(avg[0].v) - 9,
     className: "rd-apd-lab"
-  }, "Monthly average"), mine.filter(q => q.released !== p.released).map((q, i) => React.createElement("circle", {
-    key: i,
-    cx: X(rdApDays(q.released)),
-    cy: Y(valOf(q)),
-    r: "4",
-    className: "rd-apd-dot"
-  })), React.createElement("circle", {
+  }, "Monthly average"), dots.map(d => {
+    const {
+      id,
+      key
+    } = d;
+    const open = () => {
+      if (key && window.AP.openPoll) {
+        setTip(null);
+        window.AP.openPoll(key, "twopp", "the poll you were reading");
+      }
+    };
+    return React.createElement("g", {
+      key: id
+    }, tip && tip.id === id && React.createElement("circle", {
+      cx: d.cx,
+      cy: d.cy,
+      r: "7.5",
+      className: "rd-apd-dothi"
+    }), React.createElement("circle", {
+      cx: d.cx,
+      cy: d.cy,
+      r: "4",
+      className: "rd-apd-dot"
+    }), React.createElement("circle", {
+      cx: d.cx,
+      cy: d.cy,
+      r: "9",
+      className: "rd-apd-hit" + (key ? " link" : ""),
+      tabIndex: "0",
+      role: key ? "button" : "img",
+      "aria-label": (pub ? "Published" : "Implied") + " Labor two-party " + d.a.toFixed(1) + " against " + rival + ", " + p.pollster + "’s poll of " + outLabel(d.q) + (key ? "; press Enter to open it" : ""),
+      onPointerDown: ev => {
+        ptr.current = ev.pointerType;
+      },
+      onPointerEnter: ev => {
+        if (ev.pointerType === "mouse") show(id, "mouse");
+      },
+      onPointerLeave: ev => {
+        if (ev.pointerType === "mouse") hide(id, "mouse");
+      },
+      onFocus: ev => {
+        if (ev.target.matches(":focus-visible")) show(id, "focus");
+      },
+      onBlur: () => hide(id, "focus"),
+      onClick: ev => {
+        ev.stopPropagation();
+        const pt = ev.detail === 0 ? "key" : ptr.current;
+        ptr.current = null;
+        if (pt === "mouse" || pt === "key") {
+          open();
+          return;
+        }
+        if (tip && tip.id === id) setTip(null);else setTip({
+          id,
+          src: "touch"
+        });
+      },
+      onKeyDown: ev => {
+        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+        ev.preventDefault();
+        open();
+      }
+    }));
+  }), React.createElement("circle", {
     cx: cx,
     cy: cy,
     r: "8",
@@ -63067,7 +63200,27 @@ function RdApMini({
     y: bot + 18,
     className: "rd-apd-ax",
     textAnchor: "middle"
-  }, D.monthName(Number(ym.slice(5)))) : null)));
+  }, D.monthName(Number(ym.slice(5)))) : null)), dotTip && (() => {
+    const d = dotTip;
+    return React.createElement("div", {
+      ref: tipBox,
+      className: "tip rd-apd-tip",
+      style: {
+        left: d.cx + "px"
+      },
+      "aria-hidden": "true"
+    }, React.createElement("div", {
+      className: "tip-title"
+    }, "Fieldwork ", d.q.field || d.q.released), React.createElement("div", {
+      className: "tip-sub"
+    }, "Labor ", d.a.toFixed(1), " \u2013 ", (100 - d.a).toFixed(1), " ", rival, pub ? " · as published" : ""), d.q.sample != null && React.createElement("div", {
+      className: "tip-sub"
+    }, "n = ", d.q.sample.toLocaleString(), d.q.sampleEff != null ? " (eff. " + d.q.sampleEff.toLocaleString() + ")" : ""), tip.src !== "touch" && (d.key ? React.createElement("div", {
+      className: "tip-hint"
+    }, tip.src === "focus" ? "Press Enter to open this poll" : "Click to open this poll") : React.createElement("div", {
+      className: "tip-hint"
+    }, "Released ", outLabel(d.q))));
+  })());
 }
 function RdApDetail({
   p,
@@ -63184,7 +63337,8 @@ function RdApDetail({
   return React.createElement("div", {
     className: "rd-apd"
   }, React.createElement("div", {
-    className: "rd-apd-l poll-detail"
+    className: "rd-apd-l poll-detail",
+    "data-pollster": p.pollster
   }, React.createElement("span", {
     className: "rd-apd-h"
   }, rdPollHead(p)), prim.length > 0 && React.createElement("div", {

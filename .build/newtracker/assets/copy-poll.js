@@ -150,6 +150,31 @@
     return () => {};
   };
 
+  /* The redesign's opened detail has no meta band to re-title: its head
+     line reads "This poll · Fieldwork … · Published by ‹name›, …" because
+     the row above it on screen already says the house. The card travels
+     alone, so for the measure the head names the house instead ("YouGov
+     · Fieldwork …"); and where the by-name IS the house (it publishes its
+     own work) the tail just says "self-published" rather than name the
+     house twice. Text values only: no swap, no size change against the
+     measure, and the originals go back afterwards. */
+  const retitlePollHead = (panel, house) => {
+    const head = (house && panel.querySelector(".rd-apd-h")) || null;
+    if (!head) return () => {};
+    const by = "Published by " + house;
+    const edits = [];
+    Array.prototype.forEach.call(head.childNodes, (n) => {
+      if (n.nodeType !== 3) return;
+      const from = n.nodeValue;
+      let to = from.replace("This poll", house);
+      if (to.indexOf(by) !== -1) to = to.replace(by, "self-published");
+      if (to !== from) edits.push([n, from, to]);
+    });
+    if (!edits.length) return () => {};
+    edits.forEach(([n, , to]) => { n.nodeValue = to; });
+    return () => edits.forEach(([n, from]) => { n.nodeValue = from; });
+  };
+
   /* ---- the measure --------------------------------------------------
      Read the parked panel into a plain model: element backgrounds and
      hairlines first, then every text node as per-glyph runs. Executed
@@ -421,9 +446,11 @@
     const tr = panel.closest("tr");
     const row = tr && tr.previousElementSibling;
     const nameEl = row && row.querySelector(".pollster-name");
-    return nameEl
-      ? (nameEl.textContent || "").replace(/↗/g, "").replace(/\s+/g, " ").trim()
-      : "";
+    if (nameEl) {
+      return (nameEl.textContent || "").replace(/↗/g, "").replace(/\s+/g, " ").trim();
+    }
+    /* the redesign's panel carries its house on data-pollster */
+    return (panel.getAttribute("data-pollster") || "").trim();
   };
 
   const metaValue = (panel, key) => {
@@ -433,6 +460,12 @@
       const item = k.parentElement;
       const v = item && item.querySelector(".pd-meta-v");
       if (v) return (v.textContent || "").replace(/\s+/g, " ").trim();
+    }
+    /* the redesign packs the facts into the head line instead of a band */
+    if (key === "Fieldwork") {
+      const head = panel.querySelector(".rd-apd-h");
+      const m = head && /Fieldwork ([^·]+)/.exec(head.textContent || "");
+      if (m) return m[1].replace(/\s+/g, " ").trim();
     }
     return "";
   };
@@ -457,8 +490,10 @@
        the text instead of running on past it.
        re-titling happens inside each widen window, so the one swapped row is
        measured under the desktop ladder with everything else. */
+    const house = houseName(panel);
     let restore = widenPanel(panel, CONTENT_MAX);
-    let untitle = retitleFieldworkRow(panel, houseName(panel));
+    let untitle = retitleFieldworkRow(panel, house);
+    let unhead = retitlePollHead(panel, house);
     try {
       panel.getBoundingClientRect(); /* reflow */
       const wide = readModel(panel);
@@ -471,14 +506,16 @@
         Math.ceil(wide.inkRight + wide.padRight) + SLACK));
       let model = wide;
       if (want < wide.rootW) {
-        untitle(); restore();
+        unhead(); untitle(); restore();
         restore = widenPanel(panel, want);
-        untitle = retitleFieldworkRow(panel, houseName(panel));
+        untitle = retitleFieldworkRow(panel, house);
+        unhead = retitlePollHead(panel, house);
         panel.getBoundingClientRect(); /* reflow */
         model = readModel(panel);
       }
       return paintCard(model);
     } finally {
+      unhead();
       untitle();
       restore();
     }

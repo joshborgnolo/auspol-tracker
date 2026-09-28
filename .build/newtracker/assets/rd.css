@@ -1658,7 +1658,7 @@ body.rd .rd-apd-leaders { display: flex; flex-wrap: wrap; gap: 6px 28px; }
 body.rd .rd-apd-links { margin: 10px 0 0 -4px; padding-right: 40px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; }
 body.rd .rd-apd-ext { margin-left: 3px; font-size: 11px; color: var(--ink-faint); text-decoration: none; }
 body.rd .rd-apd-ct { margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--ink); }
-body.rd .rd-apd-mini { margin-top: 10px; }
+body.rd .rd-apd-mini { margin-top: 10px; position: relative; }
 body.rd .rd-apd-mini svg { display: block; overflow: visible; }
 body.rd .rd-apd-gl { stroke: var(--line); stroke-width: 1; }
 body.rd .rd-apd-even { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 3 3; }
@@ -1670,6 +1670,11 @@ body.rd .rd-apd-lab, body.rd .rd-apd-thislab {
 body.rd .rd-apd-lab { fill: var(--ink-3); }
 body.rd .rd-apd-thislab { fill: var(--ink); }
 body.rd .rd-apd-dot { fill: var(--ink-3); opacity: 0.75; }
+body.rd .rd-apd-hit { fill: none; stroke: none; pointer-events: all; touch-action: manipulation; }
+body.rd .rd-apd-hit.link { cursor: pointer; }
+body.rd .rd-apd-hit:focus-visible { outline: 2px solid var(--accent); }
+body.rd .rd-apd-dothi { fill: none; stroke: var(--accent); stroke-width: 1.5; }
+body.rd .rd-apd-tip { position: absolute; top: -6px; bottom: auto; transform: translate(-50%, -100%); z-index: 20; white-space: nowrap; text-align: left; pointer-events: none; }
 body.rd .rd-apd-ring { fill: none; stroke: var(--ink); stroke-width: 1.5; }
 body.rd .rd-apd-this { fill: var(--ink); }
 body.rd .rd-apd-base { stroke: var(--ink-faint); stroke-width: 1; }

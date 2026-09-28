@@ -212,6 +212,21 @@ function RdApMini({ p, onM, pub, avgBy }) {
     && rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1);
   const avg = ms.filter((ym) => avgBy[ym] != null).map((ym) => ({ ym, v: avgBy[ym], t: rdApDays(ym + "-15") }));
   const vals = mine.map(valOf).concat(avg.map((a) => a.v));
+  /* the past dots behave as a Latest-and-next-polls release dot does: point
+     at one (or put it into focus) and it shows the poll it sits on; a mouse
+     click then opens it, a tap only shows it - a tap is the only way to read
+     a dot on a touch screen, so it can't also be the trip. */
+  const [tip, setTip] = useState(null);
+  const tipBox = React.useRef(null);
+  const ptr = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = tipBox.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip]);
   if (!vals.length || valOf(p) == null) return <div ref={box}></div>;
   let lo = Math.floor(Math.min(...vals) / 2) * 2, hi = Math.ceil(Math.max(...vals) / 2) * 2;
   if (hi - lo < 6) { const c = (hi + lo) / 2; lo = Math.floor((c - 3) / 2) * 2; hi = lo + 6; }
@@ -222,6 +237,22 @@ function RdApMini({ p, onM, pub, avgBy }) {
   for (let v = lo; v <= hi + 1e-9; v += 2) yt.push(v);
   const cx = X(rdApDays(p.released)), cy = Y(valOf(p));
   const labLeft = cx > W * 0.45;
+  const rival = onM ? "One Nation" : "Coalition";
+  const outLabel = (q) => {
+    const d = new Date(rdApDays(q.released));
+    return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1);
+  };
+  const show = (id, src) => setTip({ id, src });
+  const hide = (id, src) => setTip((t) => (t && t.id === id && (!src || t.src === src) ? null : t));
+  /* keyed or not (a pollster can file a day's wave twice in seven months),
+     the dot still reads; only the keyed ones open */
+  const dots = mine.filter((q) => q.released !== p.released).map((q, i) => {
+    const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: q.pollster, released: q.released }) : null;
+    const dup = mine.some((z) => z !== q && z.pollster === q.pollster && z.released === q.released);
+    const key = (!raw || dup) ? null : raw;
+    return { q, key, id: key || "d" + i, cx: X(rdApDays(q.released)), cy: Y(valOf(q)), a: valOf(q) };
+  });
+  const dotTip = tip && (dots.find((d) => d.id === tip.id) || null);
   return (
     <div ref={box} className="rd-apd-mini">
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
@@ -230,9 +261,38 @@ function RdApMini({ p, onM, pub, avgBy }) {
         {yt.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{v}</text>)}
         {avg.length > 1 && <path d={monotoneXY(avg.map((a) => [X(a.t), Y(a.v)]))} className="rd-apd-avgline"></path>}
         {avg.length > 0 && <text x={X(avg[0].t)} y={Y(avg[0].v) - 9} className="rd-apd-lab">Monthly average</text>}
-        {mine.filter((q) => q.released !== p.released).map((q, i) => (
-          <circle key={i} cx={X(rdApDays(q.released))} cy={Y(valOf(q))} r="4" className="rd-apd-dot"></circle>
-        ))}
+        {dots.map((d) => {
+          const { id, key } = d;
+          const open = () => { if (key && window.AP.openPoll) { setTip(null); window.AP.openPoll(key, "twopp", "the poll you were reading"); } };
+          return (
+            <g key={id}>
+              {tip && tip.id === id && <circle cx={d.cx} cy={d.cy} r="7.5" className="rd-apd-dothi"></circle>}
+              <circle cx={d.cx} cy={d.cy} r="4" className="rd-apd-dot"></circle>
+              <circle cx={d.cx} cy={d.cy} r="9" className={"rd-apd-hit" + (key ? " link" : "")}
+                      tabIndex="0" role={key ? "button" : "img"}
+                      aria-label={(pub ? "Published" : "Implied") + " Labor two-party " + d.a.toFixed(1)
+                        + " against " + rival + ", " + p.pollster + "’s poll of " + outLabel(d.q)
+                        + (key ? "; press Enter to open it" : "")}
+                      onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+                      onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(id, "mouse"); }}
+                      onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(id, "mouse"); }}
+                      onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show(id, "focus"); }}
+                      onBlur={() => hide(id, "focus")}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        const pt = ev.detail === 0 ? "key" : ptr.current;
+                        ptr.current = null;
+                        if (pt === "mouse" || pt === "key") { open(); return; }
+                        if (tip && tip.id === id) setTip(null); else setTip({ id, src: "touch" });
+                      }}
+                      onKeyDown={(ev) => {
+                        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+                        ev.preventDefault();
+                        open();
+                      }}></circle>
+            </g>
+          );
+        })}
         <circle cx={cx} cy={cy} r="8" className="rd-apd-ring"></circle>
         <circle cx={cx} cy={cy} r="4.5" className="rd-apd-this"></circle>
         <text x={labLeft ? cx - 12 : cx + 12} y={cy - 12} className="rd-apd-thislab" textAnchor={labLeft ? "end" : "start"}>This poll {valOf(p).toFixed(1)}</text>
@@ -241,6 +301,16 @@ function RdApMini({ p, onM, pub, avgBy }) {
           <text key={ym} x={X(rdApDays(ym + "-01"))} y={bot + 18} className="rd-apd-ax" textAnchor="middle">{D.monthName(Number(ym.slice(5)))}</text>
         ) : null))}
       </svg>
+      {dotTip && (() => { const d = dotTip; return (
+        <div ref={tipBox} className="tip rd-apd-tip" style={{ left: d.cx + "px" }} aria-hidden="true">
+          <div className="tip-title">Fieldwork {d.q.field || d.q.released}</div>
+          <div className="tip-sub">Labor {d.a.toFixed(1)} – {(100 - d.a).toFixed(1)} {rival}{pub ? " · as published" : ""}</div>
+          {d.q.sample != null && <div className="tip-sub">n = {d.q.sample.toLocaleString()}{d.q.sampleEff != null ? " (eff. " + d.q.sampleEff.toLocaleString() + ")" : ""}</div>}
+          {tip.src !== "touch" && (d.key
+            ? <div className="tip-hint">{tip.src === "focus" ? "Press Enter to open this poll" : "Click to open this poll"}</div>
+            : <div className="tip-hint">Released {outLabel(d.q)}</div>)}
+        </div>
+      ); })()}
     </div>
   );
 }
@@ -319,7 +389,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, onBack, backLabel }) {
 
   return (
     <div className="rd-apd">
-      <div className="rd-apd-l poll-detail">
+      <div className="rd-apd-l poll-detail" data-pollster={p.pollster}>
         <span className="rd-apd-h">{rdPollHead(p)}</span>
         {prim.length > 0 && (
           <div className="rd-apd-prim">
