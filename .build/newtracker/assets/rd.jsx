@@ -241,7 +241,7 @@ function RdEventList({ list, inline, from, mix }) {
     <ol className={"rd-evlist" + (inline ? " inline" : "")} style={st} aria-hidden={hidden || undefined}>
       {l0.map((l) => (
         <li key={l.n}><span className="rd-evlist-n">{l.n}</span>
-          <span className="rd-evlist-l">{l.labels.join(" · ")}</span>
+          <span className="rd-evlist-l">{l.labels.join(", ")}</span>
           <span className="rd-evlist-d">{window.AUSPOL.monthName(Number(l.ym.slice(5))) + " " + l.ym.slice(0, 4)}</span></li>
       ))}
     </ol>

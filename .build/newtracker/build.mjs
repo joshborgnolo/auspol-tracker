@@ -554,9 +554,9 @@ function buildStaticSummary() {
         ${L.pollsTracked} published polls across ${L.housesTracked} polling houses. Next election due ${esc(L.nextElectionDue[0].toLowerCase() + L.nextElectionDue.slice(1))}.</p>
 
       <h2>Two-party preferred</h2>
-      <p class="ss-lead"><b>Labor ${L.alp2pp.toFixed(1)}%</b> &#183; <b>Coalition ${L.lnp2pp.toFixed(1)}%</b>${L.basis === "imp" ? `
+      <p class="ss-lead"><b>Labor ${L.alp2pp.toFixed(1)}%</b>, <b>Coalition ${L.lnp2pp.toFixed(1)}%</b>${L.basis === "imp" ? `
         on implied preference flows &#8212; the pollsters&#8217; own respondent-allocated
-        figures read <b>Labor ${L.pub.alp2pp.toFixed(1)}%</b> &#183; <b>Coalition ${L.pub.lnp2pp.toFixed(1)}%</b>` : ""}</p>
+        figures read <b>Labor ${L.pub.alp2pp.toFixed(1)}%</b>, <b>Coalition ${L.pub.lnp2pp.toFixed(1)}%</b>` : ""}</p>
       <p>${who} leads by ${Math.abs(lead).toFixed(1)} points
         (&#177;${(2 * L.alp2ppCi95).toFixed(1)} on the lead)${L.basis === "imp" ? `
         on implied preference flows &#8211; every poll&#8217;s primary votes
@@ -578,7 +578,7 @@ function buildStaticSummary() {
            its basis is the first-principles set, not the 2025 flows – the
            sentence has to say both, since the classic pair above is. */
       L.onImp ? `<p>Against One Nation the implied reading is
-        <b>Labor ${L.onImp.a.toFixed(1)}%</b> &#183; <b>One Nation ${L.onImp.b.toFixed(1)}%</b>
+        <b>Labor ${L.onImp.a.toFixed(1)}%</b>, <b>One Nation ${L.onImp.b.toFixed(1)}%</b>
         (&#177;${L.onImp.band.toFixed(1)} on the flow table, not the sample). No election
         night has ever counted a Labor v One Nation finish, so that figure runs on the
         site&#8217;s own first-principles preference set rather than the 2025

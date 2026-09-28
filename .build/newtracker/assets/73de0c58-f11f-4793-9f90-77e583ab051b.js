@@ -10,7 +10,7 @@ const REDUCED_MOTION = typeof window !== "undefined" && window.matchMedia &&
 
 // relative freshness for the "last poll" stamp, which is measured off the
 // date that stamp SHOWS - the last publication, not the last fieldwork end,
-// or the page would read "26 Aug 2026 · 2 days ago" on 26 August
+// or the page would read "26 Aug 2026, 2 days ago" on 26 August
 function freshness(iso) {
   /* Whole calendar days, both ends in the frame the stamp is written in -
      these are Australian dates, so the comparison is against Sydney's today
@@ -64,7 +64,7 @@ function GlyphDial({ className, svgRef, width, height }) {
   glyph.forEach((p) => {
     p.h = gmax === gmin ? MAX_H : MIN_H + ((p.v - gmin) / (gmax - gmin)) * (MAX_H - MIN_H);
   });
-  const glyphTitle = "Primary vote aggregate · " +
+  const glyphTitle = "Primary vote aggregate, " +
     glyph.map((p) => `${D.PARTIES[p.id].short} ${p.v.toFixed(1)}`).join(", ");
 
   // pendulum = the LIVE implied head-to-head against Labor's STRONGEST
@@ -88,7 +88,7 @@ function GlyphDial({ className, svgRef, width, height }) {
   // ±12 pts → full ±34° deflection. Labor (positive margin) swings LEFT,
   // the challenger swings RIGHT – matching the hero's Labor-left / opp-right order.
   const pendDeg = Math.max(-1, Math.min(1, pMargin / 12)) * 34;
-  const pendTitle = `Implied 2PP · ALP v ${topOpp.abbr} · ` +
+  const pendTitle = `Implied 2PP, ALP v ${topOpp.abbr}, ` +
     (labLeads ? "Labor" : topOpp.abbr) + ` +${Math.abs(pMargin).toFixed(1)}`;
 
   // settle the needle in from vertical on load (skip the swing for reduced motion)
@@ -130,7 +130,7 @@ function GlyphDial({ className, svgRef, width, height }) {
     <svg className={className} ref={svgRef || null}
          viewBox="0.58 0.07 38.39 26.73" width={width} height={height}
          aria-hidden="true">
-      <title>{glyphTitle + " · " + pendTitle}</title>
+      <title>{glyphTitle + ", " + pendTitle}</title>
       {/* half-circle two-tone swing arc: Labor left, strongest challenger right */}
       <path d={arcPath(-90, 0)} className="wm-arc" stroke="var(--alp)"></path>
       <path d={arcPath(0, 90)} className="wm-arc" stroke={oppColor}></path>
@@ -397,7 +397,7 @@ function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot fresh-toggle " + fresh.state}
                 onClick={() => setStaticView(true)}></span>{" "}
-          Updated {D.latest.published} · {D.latest.pollsTracked} polls
+          Updated {D.latest.published}, {D.latest.pollsTracked} polls
         </div>
       </div>
       {rd && (
@@ -407,7 +407,7 @@ function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
            the phone 20px above the headline figure. */
         <div className="rd-head-compact">
           <span className={"fresh-dot " + fresh.state}></span>
-          <span><b>Latest poll</b> {rdLatest ? rdLatest.pollster + ", " + rdLatest.field : D.latest.published} · {fresh.label.toLowerCase()} · {D.latest.pollsTracked} polls</span>
+          <span><b>Latest poll</b> {rdLatest ? rdLatest.pollster + ", " + rdLatest.field : D.latest.published}, {fresh.label.toLowerCase()}, {D.latest.pollsTracked} polls</span>
         </div>
       )}
       <div className="head-right">
@@ -447,7 +447,7 @@ function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
                       aria-label="Read this page as a plain, static article"
                       title="Read this page as a plain, static article"></button>
               {D.latest.published}
-              <span className="fresh-rel">· {fresh.label}</span>
+              <span className="fresh-rel">, {fresh.label}</span>
             </span>
           </div>
           <div className="meta-divide"></div>
@@ -458,7 +458,7 @@ function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
           <div className="meta-divide meta-divide-polls"></div>
           <div className="meta-item meta-polls">
             <span className="meta-k">Polls tracked</span>
-            <span className="meta-v">{D.latest.pollsTracked} · {D.latest.housesTracked} pollsters</span>
+            <span className="meta-v">{D.latest.pollsTracked}, {D.latest.housesTracked} pollsters</span>
           </div>
         </div>
         )}
@@ -1688,7 +1688,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
           const d = drawPts[i];
           if (!d || d.ci95 == null || !d.ci95) return [];
           return [{ label: "95% interval", value: "± " + d.ci95.toFixed(1) + " pts"
-                    + (d.k ? " · " + d.k + " poll" + (d.k === 1 ? "" : "s") : "") }];
+                    + (d.k ? ", " + d.k + " poll" + (d.k === 1 ? "" : "s") : "") }];
         }}
         fmt={(v) => v.toFixed(1)}
       />
@@ -1709,11 +1709,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
           {synthOverlay.length > 0 && (
             <span className="hl-item"><span className="hl-dashed" style={{ borderColor: "var(--alp)" }}></span>{m.altKey === "alp_on"
               ? (impOnBasis
-                  ? <>Published (respondent-allocated){D.altLatest && D.altLatest.alp_on ? ` · ${D.altLatest.alp_on.a.toFixed(1)}` : ""}</>
-                  : <>Implied from primaries at fixed flows{D.latest.onImp ? ` · ${D.latest.onImp.a.toFixed(1)}` : ""}</>)
+                  ? <>Published (respondent-allocated){D.altLatest && D.altLatest.alp_on ? `, ${D.altLatest.alp_on.a.toFixed(1)}` : ""}</>
+                  : <>Implied from primaries at fixed flows{D.latest.onImp ? `, ${D.latest.onImp.a.toFixed(1)}` : ""}</>)
               : (impBasis
-                  ? <>Published (respondent-allocated){D.latest && D.latest.alp2pp != null ? ` · ${D.latest.alp2pp.toFixed(1)}` : ""}</>
-                  : <>Implied from primaries at 2025 flows{D.synthLatest && D.synthLatest.alp != null ? ` · ${D.synthLatest.alp.toFixed(1)}` : ""}</>)}
+                  ? <>Published (respondent-allocated){D.latest && D.latest.alp2pp != null ? `, ${D.latest.alp2pp.toFixed(1)}` : ""}</>
+                  : <>Implied from primaries at 2025 flows{D.synthLatest && D.synthLatest.alp != null ? `, ${D.synthLatest.alp.toFixed(1)}` : ""}</>)}
             </span>
           )}
           {sensAreas.length > 0 && (

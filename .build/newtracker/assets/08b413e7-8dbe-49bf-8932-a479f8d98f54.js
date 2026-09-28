@@ -1183,7 +1183,7 @@ function TrendChart(props) {
              dangling " · " - only reachable when an event is built by hand
              rather than taken from the dataset, which is no longer done */
           const aDate = fmtEventDate(e.date);
-          const aria = e.label + (e.desc ? " – " + e.desc : "") + (aDate ? " · " + aDate : "");
+          const aria = e.label + (e.desc ? " – " + e.desc : "") + (aDate ? ", " + aDate : "");
           /* No pointer listeners of its own. Hover and tap are both picked
              from the svg root, so the open annotation is state, and `on` is
              what marks it – CSS :hover no longer has to agree with the pick to

@@ -151,10 +151,10 @@
   };
 
   /* The redesign's opened detail has no meta band to re-title: its head
-     line reads "This poll · Fieldwork … · Published by ‹name›, …" because
+     line reads "This poll, Fieldwork …, published by ‹name›, …" because
      the row above it on screen already says the house. The card travels
-     alone, so for the measure the head names the house instead ("YouGov
-     · Fieldwork …"); and where the by-name IS the house (it publishes its
+     alone, so for the measure the head names the house instead ("YouGov,
+     Fieldwork …"); and where the by-name IS the house (it publishes its
      own work) the tail just says "self-published" rather than name the
      house twice. Text values only: no swap, no size change against the
      measure, and the originals go back afterwards. */
@@ -464,14 +464,14 @@
     /* the redesign packs the facts into the head line instead of a band */
     if (key === "Fieldwork") {
       const head = panel.querySelector(".rd-apd-h");
-      const m = head && /Fieldwork ([^·]+)/.exec(head.textContent || "");
+      const m = head && /Fieldwork ([^,]+)/.exec(head.textContent || "");
       if (m) return m[1].replace(/\s+/g, " ").trim();
     }
     return "";
   };
 
   const idLine = (panel) => [houseName(panel), metaValue(panel, "Fieldwork")]
-    .filter(Boolean).join(" · ");
+    .filter(Boolean).join(", ");
 
   const fileName = (panel) => {
     const label = idLine(panel).toLowerCase()

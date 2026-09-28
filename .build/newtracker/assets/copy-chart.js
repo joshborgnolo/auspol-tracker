@@ -504,7 +504,7 @@
     }));
     /* Read before the legend, which needs the title to tell an opposition
        chart from a government one. */
-    /* a board names the measure the panel is set to ("House lean · ALP v ON,
+    /* a board names the measure the panel is set to ("House lean, ALP v ON,
        implied"), which the h3 alone does not, and its caption is the
        panel's own ground note */
     const board0 = (target.classList.contains("ap-lean") && window.AP_LEAN_BOARD)
@@ -760,7 +760,7 @@
        parenthetical, whose textContent already carries the interval label
        (the .hi-note button is nested inside it). */
     const meta = [txt(target.querySelector(".hi-method")),
-                  txt(target.querySelector(".hi-count"))].filter(Boolean).join("  ·  ");
+                  txt(target.querySelector(".hi-count"))].filter(Boolean).join(", ");
     const lead = [txt(target.querySelector(".lead-tag")), txt(target.querySelector(".delta")),
                   txt(target.querySelector(".hero-sub-note"))].filter(Boolean).join("  ");
     const hero = isHero && parties.length === 2;

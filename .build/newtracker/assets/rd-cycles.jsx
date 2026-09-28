@@ -54,7 +54,7 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
     if (s.id === "cyc-onp" || s.id === "cyc-han")
       return { ...s, smooth: undefined, dash: null, dashed: false, rdWidth: 2, endLabel: null,
                opacity: s.opacity != null && s.opacity < 0.5 ? s.opacity : 1 };
-    if (s.endLabel && s.label) return { ...s, rdWidth: s.width >= 3 ? 2.2 : 1.4, endLabel: half ? null : s.label.replace(" · ", " ") };
+    if (s.endLabel && s.label) return { ...s, rdWidth: s.width >= 3 ? 2.2 : 1.4, endLabel: half ? null : s.label.replace(", ", " ") };
     return s;
   });
   /* The window fits what this chart draws - the band, the lines, the dots -
@@ -424,7 +424,7 @@ function RdPastCycles(p) {
       {board && (
         <div className="rd-cc-board" role="dialog" aria-label="Past terms">
           <div className="rd-cc-bhead">
-            <b>Past terms</b><span>{cycles.length - hidden.size - 1} on the board · {liftedList.length} drawn as their own line</span>
+            <b>Past terms</b><span>{cycles.length - hidden.size - 1} on the board, {liftedList.length} drawn as their own line</span>
             <span className="rd-grow"></span>
             <button type="button" className="rd-link" onClick={() => { cycles.forEach((c) => { if (!c.current && !lifted.has(c.year) && !hidden.has(c.year)) toggle(c.year); }); }}>Only the drawn terms</button>
             <button type="button" className="rd-link" onClick={() => liftedList.forEach((c) => unlift(c.year))}>Clear lines</button>

@@ -140,11 +140,11 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       const edge = r.release + r.winHalf * DAY_MS;
       /* past its hour on the day itself it isn't "due 0 days ago": it is
          simply not out yet */
-      return { date: wdm(edge), sub: when(r.closesIn) + (r.inDays === 0 ? " · not out yet"
-        : " · due " + (r.inDays === -1 ? "yesterday" : -r.inDays + " days ago")) };
+      return { date: wdm(edge), sub: when(r.closesIn) + (r.inDays === 0 ? ", not out yet"
+        : ", due " + (r.inDays === -1 ? "yesterday" : -r.inDays + " days ago")) };
     }
     const alt = altOf(r), hr = hourWords(r);
-    return { date: wdm(r.release), sub: (inHours(r) || when(r.inDays)) + (alt ? " · or " + dm(alt) : hr ? " · " + hr : "") };
+    return { date: wdm(r.release), sub: (inHours(r) || when(r.inDays)) + (alt ? ", or " + dm(alt) : hr ? ", " + hr : "") };
   };
 
   /* ---- the figures ------------------------------------------------------- */
@@ -188,7 +188,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       return (
         <div className="rd-pl-lead">
           <span className="rd-pl-main">{ppmTxt || <span className="rd-pl-none">No preferred-PM question</span>}</span>
-          <span className="rd-pl-sub">Net: Albanese {net(a.albNet)} · {opp} {net(a.taylorNet)}{a.hansonNet != null ? " · Hanson " + net(a.hansonNet) : ""}</span>
+          <span className="rd-pl-sub">Net: Albanese {net(a.albNet)}, {opp} {net(a.taylorNet)}{a.hansonNet != null ? ", Hanson " + net(a.hansonNet) : ""}</span>
         </div>
       );
     }
@@ -218,7 +218,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const figHead = facet === "primary"
     ? <div className="rd-pl-prim rd-pl-primh">{RD_PL_PARTIES.map(([id, lab]) => (
         <span key={id} style={{ color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")") }}>{lab}</span>))}</div>
-    : facet === "leadership" ? "Preferred PM · net approval" : "Labor v " + rivalName;
+    : facet === "leadership" ? "Preferred PM, net approval" : "Labor v " + rivalName;
 
   /* ---- the release strip -------------------------------------------------- */
   const L = t0 - 43 * DAY_MS, R = t0 + 23 * DAY_MS;
@@ -233,7 +233,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     return (
       <div ref={tlTipRef} className="tip tip-dot rd-tl-tip" style={{ left: t.left + "%", top: "50%" }} aria-hidden="true">
         <div className="tip-title">{q.pollster}</div>
-        <div className="rd-tl-tipdate">Fieldwork {pr.field} · published {pr.publishedLabel}</div>
+        <div className="rd-tl-tipdate">Fieldwork {pr.field}, published {pr.publishedLabel}</div>
         {figCell({ poll: pr })}
         {q.sample ? <div className="tip-sub">n = {q.sample.toLocaleString()}</div> : null}
         {t.src !== "touch" && <div className="tip-hint">{t.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"}</div>}
@@ -313,18 +313,18 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     const r = e.poll, pj = e.next;
     const f = figOf(r);
     const imp = [r.alpOnImp != null ? "Labor " + r.alpOnImp.toFixed(1) + " – " + (100 - r.alpOnImp).toFixed(1) + " One Nation" : null,
-                 r.alpImp != null ? "Labor " + r.alpImp.toFixed(1) + " – " + (100 - r.alpImp).toFixed(1) + " Coalition" : null].filter(Boolean).join(" · ");
+                 r.alpImp != null ? "Labor " + r.alpImp.toFixed(1) + " – " + (100 - r.alpImp).toFixed(1) + " Coalition" : null].filter(Boolean).join(", ");
     const pub = [r.tppAlt ? "Labor " + r.tppAlt.alp + " – " + r.tppAlt.onp + " One Nation" : null,
-                 r.alp2pp != null ? "Labor " + r.alp2pp + " – " + (r.lnp2pp != null ? r.lnp2pp : 100 - r.alp2pp) + " Coalition" : null].filter(Boolean).join(" · ");
+                 r.alp2pp != null ? "Labor " + r.alp2pp + " – " + (r.lnp2pp != null ? r.lnp2pp : 100 - r.alp2pp) + " Coalition" : null].filter(Boolean).join(", ");
     const ppm = ppmContests(r).map((s) => {
       const o = Object.keys(s).find((k) => k !== "alb" && k !== "unc");
       const Lm = (window.LEADER_META || {})[o];
-      return "Albanese " + s.alb + " · " + (Lm ? Lm.label : rdCap(o)) + " " + s[o];
+      return "Albanese " + s.alb + ", " + (Lm ? Lm.label : rdCap(o)) + " " + s[o];
     }).join("; ");
     const a = r.appr || {};
     const net = (v) => (v == null ? null : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v));
     const nets = [["Albanese", a.albNet], [a.oppName || "Taylor", a.taylorNet], ["Hanson", a.hansonNet]]
-      .filter(([, v]) => v != null).map(([n, v]) => n + " " + net(v)).join(" · ");
+      .filter(([, v]) => v != null).map(([n, v]) => n + " " + net(v)).join(", ");
     const key = window.AP.pollRowKey && window.AP.pollRowKey({ pollster: r.pollster, released: r.released });
     const recent = ((pj && pj.recent) || []).slice(-5).reverse();
     const nx = nextWords(e);
@@ -355,7 +355,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
         </div>
         {pj && (
           <div className="rd-pld-rhythm">
-            <div className="rd-pld-h">{r.pollster}’s rhythm · last {rdNumWord(recent.length)} releases</div>
+            <div className="rd-pld-h">{r.pollster}’s rhythm, last {rdNumWord(recent.length)} releases</div>
             <table className="rd-pld-tab">
               <thead><tr><th>Field to</th><th>Published</th><th>Gap</th></tr></thead>
               <tbody>
@@ -389,7 +389,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       <button type="button" className="rd-pl-flip" onClick={() => setTppMatchup && setTppMatchup(onMatch ? "alp_lnp" : "alp_on")}
               title={"Show Labor v " + (onMatch ? "the Coalition" : "One Nation") + " instead"}>
         Labor v {rivalName} <span aria-hidden="true">⇄</span></button>
-      <span className="rd-pl-ctl-l">· {narrow ? (basis === "resp" ? "published" : "implied") : basisWord}</span>
+      <span className="rd-pl-ctl-l">, {narrow ? (basis === "resp" ? "published" : "implied") : basisWord}</span>
       <RdQPop label="How the two-party figures are counted" align="left">
         <h4>How the two-party figures are counted</h4>
         <p>{basis === "resp"
@@ -404,7 +404,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
 
   return (
     <RdSec id="latest-polls" cls="rd-polls" facet={facet} title="Latest and next polls"
-           meta={entries.length + " pollsters · latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))}>
+           meta={entries.length + " pollsters, latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))}>
       <p className="rd-dek rd-pl-dek">
         {phone ? "The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll."
           : "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm." + (narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection.")}
@@ -422,7 +422,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
             <button type="button" className={"rd-pl-sort" + (sort.key === "latest" ? " on" : "")} onClick={() => onSort("latest")}>Latest <span aria-hidden="true">{caret("latest")}</span></button></span>
           <span role="columnheader" className="rd-pl-c-figs">{figHead}</span>
           <span role="columnheader" className="rd-pl-c-tl">
-            <span className="rd-pl-tlcap">Releases · next</span>
+            <span className="rd-pl-tlcap">Releases, next</span>
             <span className="rd-pl-ticks">{ticks.map((t) => <span key={t.label} className={t.today ? "today" : ""} style={{ left: t.x + "%" }}>{t.label}</span>)}</span>
           </span>
           <span role="columnheader" className="rd-pl-c-next">
@@ -441,11 +441,11 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                       ? <a href={e.next.site} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()} title={"Where " + r.pollster + " publishes"}>{r.pollster}<span className="plink-mark" aria-hidden="true">↗</span></a>
                       : r.pollster}
                   </span>
-                  <span className="rd-pl-sub">{r.client}{cad ? " · " + cad : ""}{e.stale ? <span className="rd-pl-long"> · no poll in six weeks</span> : null}</span>
+                  <span className="rd-pl-sub">{r.client}{cad ? ", " + cad : ""}{e.stale ? <span className="rd-pl-long">, no poll in six weeks</span> : null}</span>
                 </span>
                 <span role="cell" className="rd-pl-c-latest">
                   <span className="rd-pl-main">{r.publishedLabel || r.releasedLabel}</span>
-                  <span className="rd-pl-sub">{r.field}{r.sample ? " · " + r.sample.toLocaleString() : ""}</span>
+                  <span className="rd-pl-sub">{r.field}{r.sample ? ", " + r.sample.toLocaleString() : ""}</span>
                 </span>
                 <span role="cell" className="rd-pl-c-figs">{figCell(e)}</span>
                 <span role="cell" className="rd-pl-c-tl">{strip(e)}</span>
@@ -459,8 +459,8 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                           onClick={(ev) => { ev.stopPropagation(); setOpen(isOpen ? null : r.pollster); }}><svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 1.5L7.5 5 3 8.5z"></path></svg></button>
                 </span>
                 <span className="rd-pl-foot1" aria-hidden="true">
-                  <span><b>{r.publishedLabel || r.releasedLabel}</b> · {r.field}</span>
-                  <span className={nx.missed ? "missed" : ""}>Next <b>{nx.date}</b>{nx.sub ? " · " + nx.sub.replace(/ · .*$/, "") : ""}</span>
+                  <span><b>{r.publishedLabel || r.releasedLabel}</b>, {r.field}</span>
+                  <span className={nx.missed ? "missed" : ""}>Next <b>{nx.date}</b>{nx.sub ? ", " + nx.sub.replace(/, .*$/, "") : ""}</span>
                 </span>
               </div>
               {isOpen && detail(e)}

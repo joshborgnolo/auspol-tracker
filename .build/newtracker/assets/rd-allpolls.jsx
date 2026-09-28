@@ -122,7 +122,7 @@ function rdPollHead(p) {
   // a self-published poll is published by its pollster, and says so
   const by = "Published by " + (p.client && !/^self/i.test(p.client) ? p.client : p.pollster);
   const field = p.field || p.dateLabel;
-  return <>This poll{field ? " · Fieldwork " + field : ""} · <span className="rd-nocaps">{n}</span>{" · " + by + (out ? ", " + out : "")}</>;
+  return <>This poll{field ? ", Fieldwork " + field : ""}, <span className="rd-nocaps">{n}</span>{", " + by + (out ? ", " + out : "")}</>;
 }
 
 /* The primary columns in the order every table on the site keeps. */
@@ -304,7 +304,7 @@ function RdApMini({ p, onM, pub, avgBy }) {
       {dotTip && (() => { const d = dotTip; return (
         <div ref={tipBox} className="tip rd-apd-tip" style={{ left: d.cx + "px" }} aria-hidden="true">
           <div className="tip-title">Fieldwork {d.q.field || d.q.released}</div>
-          <div className="tip-sub">Labor {d.a.toFixed(1)} – {(100 - d.a).toFixed(1)} {rival}{pub ? " · as published" : ""}</div>
+          <div className="tip-sub">Labor {d.a.toFixed(1)} – {(100 - d.a).toFixed(1)} {rival}{pub ? ", as published" : ""}</div>
           {d.q.sample != null && <div className="tip-sub">n = {d.q.sample.toLocaleString()}{d.q.sampleEff != null ? " (eff. " + d.q.sampleEff.toLocaleString() + ")" : ""}</div>}
           {tip.src !== "touch" && (d.key
             ? <div className="tip-hint">{tip.src === "focus" ? "Press Enter to open this poll" : "Click to open this poll"}</div>
@@ -346,7 +346,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, onBack, backLabel }) {
   const ppmCell = (s, three) => (
     <span className="rd-apd-cell">
       <span>{["alb", "taylor", "ley", "hanson"].filter((k) => s[k] != null).map((k, i) => (
-        <React.Fragment key={k}>{i > 0 ? " · " : ""}{NAME[k]} <b style={{ color: INK[k] }}>{s[k]}</b></React.Fragment>
+        <React.Fragment key={k}>{i > 0 ? ", " : ""}{NAME[k]} <b style={{ color: INK[k] }}>{s[k]}</b></React.Fragment>
       ))}</span>
       <span className="rd-apd-sub">{three ? "three-way" + (s.unc != null ? ", " + s.unc + " undecided" : "") : s.unc != null ? s.unc + " undecided" : ""}</span>
     </span>
@@ -433,13 +433,13 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, onBack, backLabel }) {
         {d && (
           <div className="rd-apd-grid rd-apd-grid1">
             <span className="rd-apd-k">The country is heading</span>
-            <span className="rd-apd-cell"><span>In the right direction <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b> · on the wrong track <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b> · unsure {rdApNum(d.unsure)}</span></span>
+            <span className="rd-apd-cell"><span>In the right direction <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>, on the wrong track <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>, unsure {rdApNum(d.unsure)}</span></span>
           </div>
         )}
         {seats.length > 0 && (
           <div className="rd-apd-grid rd-apd-grid1">
             <span className="rd-apd-k">Seats, modelled</span>
-            <span className="rd-apd-cell"><span>{seats.map((k, i) => <React.Fragment key={k.id}>{i > 0 ? " · " : ""}{k.lab} <b style={{ color: k.ink }}>{p.seats.p[k.id].est}</b></React.Fragment>)}</span></span>
+            <span className="rd-apd-cell"><span>{seats.map((k, i) => <React.Fragment key={k.id}>{i > 0 ? ", " : ""}{k.lab} <b style={{ color: k.ink }}>{p.seats.p[k.id].est}</b></React.Fragment>)}</span></span>
           </div>
         )}
         <div className="rd-apd-links">
@@ -805,9 +805,9 @@ function RdAllPolls(P) {
       const oppN = (s) => (s.taylor != null ? "Taylor" : "Ley");
       const two = (x, y, yInk) => <b className="rd-ap-pairfig"><span style={{ color: "var(--alp-text)" }}>{x}</span><span className="rd-ap-dash"> – </span><span style={{ color: yInk }}>{y}</span></b>;
       let main, sub;
-      if (opp) { main = two(opp.alb, oppV(opp), "var(--lnp-text)"); sub = han ? "v " + oppN(opp) + " · " + han.alb + "–" + han.hanson + " v Hanson" : "Albanese v " + oppN(opp); }
+      if (opp) { main = two(opp.alb, oppV(opp), "var(--lnp-text)"); sub = han ? "v " + oppN(opp) + ", " + han.alb + "–" + han.hanson + " v Hanson" : "Albanese v " + oppN(opp); }
       else if (three) {
-        main = <b className="rd-ap-pairfig"><span style={{ color: "var(--alp-text)" }}>{three.alb}</span><span className="rd-ap-dash"> · </span><span style={{ color: "var(--lnp-text)" }}>{oppV(three)}</span><span className="rd-ap-dash"> · </span><span style={{ color: "var(--onp-text)" }}>{three.hanson}</span></b>;
+        main = <b className="rd-ap-pairfig"><span style={{ color: "var(--alp-text)" }}>{three.alb}</span><span className="rd-ap-dash"> – </span><span style={{ color: "var(--lnp-text)" }}>{oppV(three)}</span><span className="rd-ap-dash"> – </span><span style={{ color: "var(--onp-text)" }}>{three.hanson}</span></b>;
         sub = "three-way";
       } else if (han) { main = two(han.alb, han.hanson, "var(--onp-text)"); sub = "Albanese v Hanson"; }
       else { main = <span className="rd-ap-none">—</span>; sub = "not asked"; }
@@ -857,7 +857,7 @@ function RdAllPolls(P) {
       val = <span role="cell" className="rd-ap-val">{d ? rdSigned(d.net, 0) : "—"}</span>;
       right1 = d ? <b className="rd-ap-pairfig">Net {rdSigned(d.net, 0)}</b> : <span className="rd-ap-none">—</span>;
       body = d ? <><div className="rd-ap-cpic">{pic}</div>
-        <div className="rd-ap-csub">Right <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b> · wrong <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b> · unsure {rdApNum(d.unsure)}</div></> : null;
+        <div className="rd-ap-csub">Right <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>, wrong <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>, unsure {rdApNum(d.unsure)}</div></> : null;
     }
     const detail = isOpen && (
       <div className="rd-ap-open" role="row">
@@ -866,7 +866,7 @@ function RdAllPolls(P) {
       </div>
     );
     if (phone) {
-      const sub = [p.client, fieldTxt(p), p.sample != null ? p.sample.toLocaleString() : null].filter(Boolean).join(" · ");
+      const sub = [p.client, fieldTxt(p), p.sample != null ? p.sample.toLocaleString() : null].filter(Boolean).join(", ");
       return (
         <React.Fragment key={id}>
           <div className={"rd-ap-card " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle}>
@@ -901,7 +901,7 @@ function RdAllPolls(P) {
     const count = n + " poll" + (n === 1 ? "" : "s");
     if (facet === "twopp") {
       const k = g.list.filter(inToday).length;
-      const note = count + (todayTxt && k ? (k === n ? ", all in today’s " + todayTxt : " · " + k + " in today’s " + todayTxt) : "");
+      const note = count + (todayTxt && k ? (k === n ? ", all in today’s " + todayTxt : ", " + k + " in today’s " + todayTxt) : "");
       const avg = avgBy[g.ym];
       return (
         <div className={"rd-ap-mrow " + cls} role="row" key={"m" + g.ym}>
@@ -936,7 +936,7 @@ function RdAllPolls(P) {
       {facet === "twopp" && <span className="rd-ap-hpic"><RdApScale onM={onM} phone /></span>}
       {facet === "primary" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Primary vote, %</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
       {facet === "leadership" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Net rating: approve minus disapprove</span><span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span></span>}
-      {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span> · unsure · <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
+      {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span>, unsure, <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
     </div>
   );
   const NAV = phone || tight
@@ -950,7 +950,7 @@ function RdAllPolls(P) {
       {phone ? (
         <button type="button" className="rd-ap-pinf" tabIndex={pinned ? 0 : -1} onClick={() => setSheet(true)}>
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
-          Filters{nFilters ? " · " + nFilters : ""}
+          Filters{nFilters ? ", " + nFilters : ""}
         </button>
       ) : <>
         <span className="rd-ap-pintabs" role="group" aria-label="Figures">
@@ -996,12 +996,12 @@ function RdAllPolls(P) {
         {facet === "twopp" && !phone && (
           <span className="rd-pl-ctl">
             <span className="rd-pl-ctl-l">Two-party:</span>{flip}
-            <span className="rd-pl-ctl-l">· {pub ? "as published" : "implied flows"}</span>{qpop}
+            <span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span>{qpop}
           </span>
         )}
       </RdTabs>
       {facet === "twopp" && phone && (
-        <div className="rd-ap-pctl">{flip}<span className="rd-pl-ctl-l">· {pub ? "as published" : "implied flows"}</span><span className="rd-grow"></span>{qpop}</div>
+        <div className="rd-ap-pctl">{flip}<span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span><span className="rd-grow"></span>{qpop}</div>
       )}
 
       <div className="rd-ap-bar">
@@ -1013,7 +1013,7 @@ function RdAllPolls(P) {
         </label>
         <span className="rd-ap-pops">
           <FilterPop id="who" label="Pollster" open={pop} setOpen={setPop} summary={sel.size === 0 ? null : sel.size === 1 ? [...sel][0] : sel.size + " selected"}>
-            <div className="ap-pop-head"><span>{houses.length} pollsters · tick any number</span>{sel.size > 0 && <button className="ap-clear" onClick={() => setSel(new Set())}>Clear</button>}</div>
+            <div className="ap-pop-head"><span>{houses.length} pollsters, tick any number</span>{sel.size > 0 && <button className="ap-clear" onClick={() => setSel(new Set())}>Clear</button>}</div>
             <div className="ap-poplist" role="group" aria-label="Pollsters">{houseRank.map((h) => <PopRow key={h} on={sel.has(h)} label={h} n={houseN[h] || 0} onClick={() => toggleHouse(h)} />)}</div>
           </FilterPop>
           <FilterPop id="when" label="Time" open={pop} setOpen={setPop} summary={range === "all" ? null : RANGE_LAB[range]}>
@@ -1254,7 +1254,7 @@ function RdDisagree() {
               <span className="rd-dis-name" style={{ color: pn.ink }}>{pn.name}</span>
               {e ? <>
                 <span className="rd-dis-big"><b>{e.sigma.toFixed(1)}</b><span>pts</span></span>
-                <span className="rd-dis-sub">Chance alone {e.floor.toFixed(1)} · {e.R.toFixed(1)}×</span>
+                <span className="rd-dis-sub">Chance alone {e.floor.toFixed(1)}, {e.R.toFixed(1)}×</span>
                 <span className="rd-dis-verdict">{rdDisVerdict(e.R)}</span>
               </> : <span className="rd-dis-sub">Too few polls to measure</span>}
               <div className="rd-dis-chart">
@@ -1262,7 +1262,7 @@ function RdDisagree() {
                             hover={hv ? hv.ym : null} setHover={(ym) => setHover(ym ? { id: pn.id, ym } : null)} />
                 {hv && (
                   <span className="tip rd-dis-tip" style={{ left: Math.min(pw - 70, Math.max(70, hx)) }}>
-                    <span className="tip-title">{rdMonthYear(hv.ym)} · {pn.name}</span>
+                    <span className="tip-title">{rdMonthYear(hv.ym)}, {pn.name}</span>
                     <span className="tip-row"><span className="tip-label">Spread</span><span className="tip-val">{hv.sigma.toFixed(1)} pts</span></span>
                     <span className="tip-row"><span className="tip-label">Chance alone</span><span className="tip-val">{hv.floor.toFixed(1)} pts</span></span>
                     <span className="tip-row"><span className="tip-label">Ratio</span><span className="tip-val">{hv.R.toFixed(1)}×</span></span>
@@ -1284,7 +1284,7 @@ function RdDisagree() {
           <span className="rd-key-item"><span className="rd-dis-keyfloor" aria-hidden="true"></span>What sampling error alone would produce</span>
         </RdKey>
       )}
-      <p className="rd-dis-scale">Within chance: under 1.2 times sampling error · A little beyond: 1.2 to 1.6 · Well beyond: 1.6 or more · Under 0.8, tighter than chance, would suggest pollsters were steering towards each other.</p>
+      <p className="rd-dis-scale">Within chance: under 1.2 times sampling error, A little beyond: 1.2 to 1.6, Well beyond: 1.6 or more, Under 0.8, tighter than chance, would suggest pollsters were steering towards each other.</p>
       <HowTo label="How to read these charts" paras={[
         <>Each chart follows one figure month by month. The line is how far a typical poll sits from the trend through all the polls around it; the shaded floor is how far it would sit if the pollsters all measured the same thing and differed only by the luck of who they reached.</>,
         <>A line on the floor means the polls agree as well as their samples allow; a line well above it means they genuinely differ, in who they reach or how they weight. {view === "primary"
@@ -1419,7 +1419,7 @@ function RdHouseLean({ measure, tppBasis }) {
         </svg>
         {hv && (
           <span className="tip rd-hl-tip" style={{ left: Math.min(SW - 100, Math.max(100, sx(hv.ym))) }}>
-            <span className="tip-title">{r.h} · {rdMonthYear(hv.ym)}</span>
+            <span className="tip-title">{r.h}, {rdMonthYear(hv.ym)}</span>
             <span className="tip-row"><span className="tip-label">Lean</span><span className="tip-val">{Math.abs(hv.v) < 0.05 ? "level" : rdSigned(hv.v, 1) + (two ? " to " + (hv.v > 0 ? posName : negName).replace("the ", "") : "")}</span></span>
             {split && <span className="tip-row"><span className="tip-label">On One Nation</span><span className="tip-val">{rdApSigned(hv.on)}</span></span>}
             {split && <span className="tip-row"><span className="tip-label">On the Coalition</span><span className="tip-val">{rdApSigned(hv.co)}</span></span>}
@@ -1476,7 +1476,7 @@ function RdHouseLean({ measure, tppBasis }) {
           {!phone && <span></span>}
           {!phone && (
             <span className="rd-hl-shead" role="columnheader" ref={boxRef}>
-              <span className="rd-ap-cap">Since the election <em><span className="rd-hl-sep">· </span>each row’s height is {SM === 1 ? "a point" : SM + " points"} either way</em></span>
+              <span className="rd-ap-cap">Since the election <em><span className="rd-hl-sep">, </span>each row’s height is {SM === 1 ? "a point" : SM + " points"} either way</em></span>
               {rdApMonthTicks(ms, tStep).map((t) => <span key={t.ym} className={"rd-ap-tk " + t.a} style={{ left: sx(t.ym) }}>{t.lab}</span>)}
             </span>
           )}

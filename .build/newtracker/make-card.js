@@ -205,7 +205,7 @@
      the whole middle of the card, and this is the only place the standfirst
      fits without taking it from them. */
   const marg = L.alp2pp - L.lnp2pp, chg = L.alp2pp - L.alp2ppPrev;
-  const basisTag = IS_IMP ? " · implied preference flows" : "";
+  const basisTag = IS_IMP ? ", implied preference flows" : "";
   c.textAlign = "right";
   /* The PUBLICATION date of the most recent poll, which is what the site's own
      "Updated" stamp shows - not `updated`, the end of its fieldwork. The two
@@ -221,8 +221,8 @@
   // one line, not two: the caveats belong beside the sentence they qualify.
   // The page will not call a move real unless it clears its own interval.
   c.font = '400 15px "IBM Plex Sans", sans-serif'; c.fillStyle = T.ink3;
-  c.fillText("95% interval ±" + L.alp2ppCi95.toFixed(1) + " pts · "
-             + L.method.nPolls + " polls in " + L.method.windowDays + " days · "
+  c.fillText("95% interval ±" + L.alp2ppCi95.toFixed(1) + " pts, "
+             + L.method.nPolls + " polls in " + L.method.windowDays + " days, "
              + (chg > 0 ? "+" : "−") + Math.abs(chg).toFixed(1) + " vs 1 month ago"
              + (L.changeSig ? "" : ", within the margin")
              + basisTag, W - PAD, 142);
@@ -338,7 +338,7 @@
      caps legible and what makes lowercase look pulled apart. The right-hand
      label takes the chart axis's own form - month, curly apostrophe, two
      digits - the same string buildXTicks writes on the site. */
-  caps("2025 election · Labor " + D.agg2pp[0].alp.toFixed(1), PAD, 604, 13.5, 0, T.ink3, 600);
+  caps("2025 election, Labor " + D.agg2pp[0].alp.toFixed(1), PAD, 604, 13.5, 0, T.ink3, 600);
   c.textAlign = "right"; caps("Aug \u201926", W - PAD, 604, 13.5, 0, T.ink3, 600); c.textAlign = "left";
 
   /* ---- footer ------------------------------------------------------------ */

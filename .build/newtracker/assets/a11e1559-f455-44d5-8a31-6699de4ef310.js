@@ -213,7 +213,7 @@ function Delta({ value, suffix = "", goodUp = true, neutral, small, title, roll,
   const figure = `${up ? "+" : ""}${value.toFixed(1)}`;
   const Roll = window.RollNum;
   return (
-    <span className={"delta " + cls + (small ? " delta-sm" : "")} title={flat && roll ? "No change" + (title ? " · " + title : "") : title}>
+    <span className={"delta " + cls + (small ? " delta-sm" : "")} title={flat && roll ? "No change" + (title ? ", " + title : "") : title}>
       <span className="delta-arrow">{arrow}</span>
       {/* in a readout row a flat move prints as a figure like its
           neighbours: "no change" was twice their width and, on a phone, broke
@@ -940,7 +940,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         <div className="leader-dot" style={{ background: r.L.color }}></div>
         {/* named so the narrow-screen grid can place it – see .leader-vals */}
         <div className="leader-vals">
-          <div className="leader-name">{r.L.short}{tag && <span className="stale-tag" title={"Latest published reading · " + tag}> {tag}</span>}</div>
+          <div className="leader-name">{r.L.short}{tag && <span className="stale-tag" title={"Latest published reading, " + tag}> {tag}</span>}</div>
           <div className="leader-num">
             {rd ? (Roll ? <Roll value={rd.v.toFixed(1)} /> : rd.v.toFixed(1)) : "—"}
             {rd && <span className="pct">%</span>}
@@ -1247,7 +1247,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
             <div className="appr" key={L.id}>
               <div className="appr-top">
                 <span className="leader-dot" style={{ background: L.color }}></span>
-                <span className="leader-name">{L.short}{tag && <span className="stale-tag" title={"Latest published reading · " + tag}> {tag}</span>}</span>
+                <span className="leader-name">{L.short}{tag && <span className="stale-tag" title={"Latest published reading, " + tag}> {tag}</span>}</span>
                 {/* Rolls to its new value, the way the hero's 2PP pair does.
                     Earned here for the hero's own reason: Approval and
                     Favourability are the same three people asked a different
@@ -1480,7 +1480,7 @@ function DirectionPanel({ rangeId }) {
           <span className="dir-k" style={{ color: "var(--mood-neg)" }}>Wrong track</span>
         </div>
       </div>
-      <div className="dir-bar" title={`Right direction ${latest.right}% · Unsure ${latest.unsure}% · Wrong track ${latest.wrong}%`}>
+      <div className="dir-bar" title={`Right direction ${latest.right}%, Unsure ${latest.unsure}%, Wrong track ${latest.wrong}%`}>
         <span className="dir-pos" style={{ width: latest.right + "%" }}></span>
         <span className="dir-uns" style={{ width: latest.unsure + "%" }}></span>
         <span className="dir-neg" style={{ width: latest.wrong + "%" }}></span>
@@ -1792,7 +1792,7 @@ function FirmnessView({ F, rangeId }) {
         scatter={dots} pollFacet="twopp"
         tooltipTitle={(i) => waves[i] && waves[i].dateLabel}
         fmt={(v) => v.toFixed(0)}
-        copy={{ sub: `Share of each party’s voters certain of their vote, wave by wave · ${houseList(F.houses.map(demoHouse))}`,
+        copy={{ sub: `Share of each party’s voters certain of their vote, wave by wave, ${houseList(F.houses.map(demoHouse))}`,
                 legend: parties.map((k) => ({ label: `${D.PARTIES[k].name}  ${F.now[k].v.toFixed(1)}%`, color: D.PARTIES[k].color, kind: "line" })) }}
       />
       {firmSaid("demo-verdict", shift[0], shift[1])}
@@ -1910,7 +1910,7 @@ function AgeFirmView({ A, rangeId }) {
         scatter={dots} pollFacet="twopp"
         tooltipTitle={(i) => waves[i] && waves[i].dateLabel}
         fmt={(v) => v.toFixed(0)}
-        copy={{ sub: `Share of each age group not firm in its vote, wave by wave · ${houseList(A.houses)}`,
+        copy={{ sub: `Share of each age group not firm in its vote, wave by wave, ${houseList(A.houses)}`,
                 legend: AGE_BANDS.map((b, i) => ({ label: `${b.label}  ${A.now[b.id].v.toFixed(1)}%`, color: col(i), kind: "line" })) }}
       />
       {firmSaid("demo-verdict", shift[0], shift[1])}
@@ -2436,7 +2436,7 @@ function DemographicsPanel({ rangeId = "all" }) {
           fmt={signed}
           ariaLabel={`${name} by ${by}: how much higher or lower each group's vote is than all voters', in percent, month by month`}
           copy={{
-            sub: `How much higher or lower ${name}’s vote is in each group than among all voters, by ${by} · the latest figures pool the last ${T.window} of polls`,
+            sub: `How much higher or lower ${name}’s vote is in each group than among all voters, by ${by}, the latest figures pool the last ${T.window} of polls`,
             legend: [{ label: `All voters  ${all.toFixed(1)}%`, color: "var(--ink-3)", kind: "dashed" },
                      ...st.groups.map((g, i) => ({ label: `${g.label}  ${signed(rel(g.v[party], all))}%`,
                                                    color: demoRamp(color, n, i), kind: "line" })),
@@ -2487,7 +2487,7 @@ function DemographicsPanel({ rangeId = "all" }) {
             )}
             {row("All voters", all, null, true, "The site’s current figure for all voters – the headline’s own estimate", "dash")}
             {st.groups.map((g, i) => row(g.label, g.v[party], g.ci[party], false,
-              `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"} · ${houseList(g.houses.map(demoHouse))} · ± ${g.ci[party].toFixed(1)} is the 95% margin`,
+              `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"}, ${houseList(g.houses.map(demoHouse))}, ± ${g.ci[party].toFixed(1)} is the 95% margin`,
               demoRamp(color, st.groups.length, i)))}
             {demoSaid(demoVerdict(st, party))}
             </div>
@@ -2882,7 +2882,7 @@ function IssuesPanel({ rangeId = "all" }) {
                   fmt={(v) => Math.round(v) + ""}
                   ariaLabel={`${it.label}: the share of voters naming Labor, the Coalition or One Nation who think each is best on it, month by month`}
                   copy={{
-                    sub: `${it.label}: who voters think is best, of those naming Labor, the Coalition or One Nation · pooled from ${houseList((it.own && it.own.houses) || I.houses)}`,
+                    sub: `${it.label}: who voters think is best, of those naming Labor, the Coalition or One Nation, pooled from ${houseList((it.own && it.own.houses) || I.houses)}`,
                     legend: [...P.map((q) => ({ label: `${pName(q)}  ${it.own ? Math.round(it.own.v[q]) + "%" : ""}`, color: pColor(q), kind: "line" })),
                              ...(chart.areas.length ? [{ label: "95% interval (shaded)", color: "var(--ink-faint)", kind: "shade" }] : [])],
                   }}
@@ -3019,11 +3019,11 @@ function tppContests(r) {
   const mirror = (d) => (d ? { v: +(-d.v).toFixed(1), refDate: d.refDate } : null);
   const dAltAlp = segDelta(r.chg, "altAlpOn");
   const dAlt2Lnp = segDelta(r.chg, "altLnpOn");
-  if (alp != null) out.push({ kind: "2pp", lab: "2PP · ALP v L/NP", flag: null, segs: [
+  if (alp != null) out.push({ kind: "2pp", lab: "2PP, ALP v L/NP", flag: null, segs: [
     { label: "ALP", value: alp, color: PARTY_C.alp, delta: dAlp },
     { label: "L/NP", value: lnp, color: PARTY_C.lnp, delta: dLnp },
   ] });
-  if (r.tppAlt) out.push({ kind: "alt", lab: "2PP · ALP v ON", flag: "+ALP v ON", segs: [
+  if (r.tppAlt) out.push({ kind: "alt", lab: "2PP, ALP v ON", flag: "+ALP v ON", segs: [
     { label: "ALP", value: r.tppAlt.alp, color: PARTY_C.alp, delta: dAltAlp },
     { label: "ON", value: r.tppAlt.onp, color: PARTY_C.onp, delta: mirror(dAltAlp) },
   ] });
@@ -3031,12 +3031,12 @@ function tppContests(r) {
      as "ALP vs its strongest challenger", like every other detail: order the
      ALP match-ups by how well the challenger does. */
   if (r.tppKind === "3cp" && r.tpp3) out.sort((a, b) => a.segs[0].value - b.segs[0].value);
-  if (r.tppAlt2) out.push({ kind: "alt2", lab: "2PP · L/NP v ON", flag: "+L/NP v ON", segs: [
+  if (r.tppAlt2) out.push({ kind: "alt2", lab: "2PP, L/NP v ON", flag: "+L/NP v ON", segs: [
     { label: "L/NP", value: r.tppAlt2.lnp, color: PARTY_C.lnp, delta: dAlt2Lnp },
     { label: "ON", value: r.tppAlt2.onp, color: PARTY_C.onp, delta: mirror(dAlt2Lnp) },
   ] });
   if (r.tppKind === "3cp" && r.tpp3) {
-    out.push({ kind: "3cp", lab: "3-cornered · ALP v L/NP v ON", flag: "3-cornered", segs: [
+    out.push({ kind: "3cp", lab: "3-cornered, ALP v L/NP v ON", flag: "3-cornered", segs: [
       { label: "ALP", value: r.tpp3.alp, color: PARTY_C.alp },
       { label: "L/NP", value: r.tpp3.lnp, color: PARTY_C.lnp },
       { label: "ON", value: r.tpp3.onp, color: PARTY_C.onp },
@@ -3044,10 +3044,10 @@ function tppContests(r) {
   }
   return out;
 }
-// flag text for the compact voting-intention cell ("+ALP v ON · 3-cornered")
+// flag text for the compact voting-intention cell ("+ALP v ON, 3-cornered")
 function tppFlag(r) {
   const f = tppContests(r).map((c) => c.flag).filter(Boolean);
-  return f.length ? f.join(" · ") : null;
+  return f.length ? f.join(", ") : null;
 }
 /* Heading for the published group. It names the CATEGORY, never the
    measure – "Two-party preferred / Not published" once announced the very
@@ -3101,7 +3101,7 @@ function tppLines(cs, r) {
                 onClick={() => window.AP.openTerm &&
                   window.AP.openTerm("preference-flows", "poll breakdown")}>preference flows</button></>
     ), c: {
-      kind: "flows", lab: "2PP · ALP v L/NP", flag: null,
+      kind: "flows", lab: "2PP, ALP v L/NP", flag: null,
       segs: [
         { label: "ALP", value: r.tppFlows, color: PARTY_C.alp, delta: dFlows },
         { label: "L/NP", value: Math.round((100 - r.tppFlows) * 10) / 10, color: PARTY_C.lnp,
@@ -3127,7 +3127,7 @@ function impliedLines(r) {
   const dOnImp = segDelta(r.chg, "impOn");
   if (r.alpImp != null) out.push({
     c: {
-      kind: "flows", lab: "2PP · ALP v L/NP", flag: null,
+      kind: "flows", lab: "2PP, ALP v L/NP", flag: null,
       segs: [
         { label: "ALP", value: r.alpImp, color: PARTY_C.alp, delta: dImp },
         { label: "L/NP", value: Math.round((100 - r.alpImp) * 10) / 10, color: PARTY_C.lnp,
@@ -3143,7 +3143,7 @@ function impliedLines(r) {
   });
   if (r.alpOnImp != null) out.push({
     c: {
-      kind: "flows", lab: "2PP · ALP v ON", flag: null,
+      kind: "flows", lab: "2PP, ALP v ON", flag: null,
       segs: [
         { label: "ALP", value: r.alpOnImp, color: PARTY_C.alp, delta: dOnImp },
         { label: "ON", value: Math.round((100 - r.alpOnImp) * 10) / 10, color: PARTY_C.onp,
@@ -3244,7 +3244,7 @@ function PollsterName({ name, url }) {
     <a className="pollster-name pollster-link" href={url}
        target="_blank" rel="noopener noreferrer"
        onClick={(e) => e.stopPropagation()}
-       title={host ? `Read the published poll · ${host}` : "Read the published poll"}>
+       title={host ? `Read the published poll, ${host}` : "Read the published poll"}>
       {name}<span className="plink-mark" aria-hidden="true">↗</span>
     </a>
   );
@@ -3262,7 +3262,7 @@ function MethodLink({ url }) {
     <a className="pollster-method" href={url}
        target="_blank" rel="noopener noreferrer"
        onClick={(e) => e.stopPropagation()}
-       title={host ? `Read the wave's APC methodology statement · ${host}` : "Read the wave's APC methodology statement"}>
+       title={host ? `Read the wave's APC methodology statement, ${host}` : "Read the wave's APC methodology statement"}>
       APC methodology<span className="plink-mark" aria-hidden="true">↗</span>
     </a>
   );
@@ -3372,7 +3372,7 @@ function SeatProjection({ seats }) {
         </div>
         <p className="seat-basis">
           Published as a range, with no central estimate
-          {seats.method ? " · " + seats.method : ""}
+          {seats.method ? ", " + seats.method : ""}
         </p>
       </div>
     );
@@ -3403,8 +3403,8 @@ function SeatProjection({ seats }) {
         )}
       </div>
       <p className="seat-basis">
-        Modelled seat estimate with range · {sum} of {total} seats allocated
-        {seats.basis ? ` · Change vs the ${seats.basis}, not this pollster’s previous poll` : ""}
+        Modelled seat estimate with range, {sum} of {total} seats allocated
+        {seats.basis ? `, Change vs the ${seats.basis}, not this pollster’s previous poll` : ""}
       </p>
     </div>
   );
@@ -3532,7 +3532,7 @@ function PdSec({ label, absent, lead, mid, children }) {
    appears. */
 function TppLine({ c, prefixed, note, hero, alt }) {
   const segs = c.segs.filter((x) => x.value != null);
-  const mat = c.lab.replace(/^2PP · /, "").replace(/^3-cornered · /, "");
+  const mat = c.lab.replace(/^2PP, /, "").replace(/^3-cornered, /, "");
   return (
     <React.Fragment>
       <p className={"pd-s" + (hero ? " pd-s-hero" : "")}>
@@ -3547,7 +3547,7 @@ function TppLine({ c, prefixed, note, hero, alt }) {
           <React.Fragment key={i}>
             {i > 0 && (segs.length === 2
               ? <span className="pd-vs"> vs </span>
-              : " · ")}
+              : ", ")}
             <span className="pd-grp">
               <b>{x.value}%</b> <span className="pd-lab">{x.label}</span><ChgParen d={x.delta} />
             </span>
@@ -3730,7 +3730,7 @@ function ApprLine({ id, appr, chg }) {
       {alt && (
         <span className="pd-s-note"
               title="This pollster asked both questions of this leader in the same wave – favourability (positive minus negative) is not directly comparable with approval">
-          {" "}· also {alt.metric === "fav" ? "favourability" : "approval"} <NetVal v={alt.net} />
+          {", also "}{alt.metric === "fav" ? "favourability" : "approval"} <NetVal v={alt.net} />
         </span>
       )}
     </p>
@@ -4363,7 +4363,7 @@ function NextPollsPanel() {
                   onClick={() => window.AP.openTerm &&
                     window.AP.openTerm("next-polls", "Next expected polls")}>
             Projected from each house’s recent publication intervals
-          </button>{" · "}Open a row for the releases behind it
+          </button>{", "}Open a row for the releases behind it
         </p>
       </div>
 
@@ -4443,7 +4443,7 @@ function NextPollsPanel() {
               {cadenceLabel(r.cadence)}
               {/* the wave count is the evidence for the estimate – worth stating
                   once per house, not four times for a weekly one */}
-              {r.ahead === 0 && <> · {r.waves} waves</>}
+              {r.ahead === 0 && <>, {r.waves} waves</>}
             </span>
             </div>
 
@@ -4670,7 +4670,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
         <div>
           <h2 className="card-title">Latest polls</h2>
           <p className="card-sub">
-            The most recent poll from each active pollster · {windowLabel} · {rows.length} pollsters
+            The most recent poll from each active pollster, {windowLabel}, {rows.length} pollsters
           </p>
         </div>
         <TextToggle value={facet} onChange={setFacet} options={FACETS}
@@ -4722,7 +4722,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSort("alp"); } }}
                       aria-sort={active ? (sort.dir < 0 ? "descending" : "ascending") : "none"}>
                     <span className="th-in">
-                      <span className="lbl-l">Lead ·</span><span className="lbl-s">Lead</span>
+                      <span className="lbl-l">Lead,</span><span className="lbl-s">Lead</span>
                       <button type="button" className="th-basis lbl-l"
                               onClick={(e) => { e.stopPropagation(); flipMatchup(); }}
                               onKeyDown={(e) => e.stopPropagation()}
@@ -4833,7 +4833,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       {(() => { const act = typeof CANT_HOVER !== "undefined" && CANT_HOVER ? "Tap" : "Click";
         return (<>
           <p className="table-hint">
-            Tap any poll to see its full breakdown · {act} a column heading to sort.
+            Tap any poll to see its full breakdown, {act} a column heading to sort.
           </p>
           {/* The basis switch is the 2PP column's heading, and that column is
               .hide-md: below 1000px the sentence points at the hero's own

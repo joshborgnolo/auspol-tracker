@@ -101,7 +101,7 @@ function RdHero(p) {
       {m.a.name} {moved ? <>{rdArrow(monthDelta)} <RollNum value={Math.abs(monthDelta).toFixed(1)} /> on a month ago</> : "unchanged on a month ago"}
       {moved && sig === false && <>, within the <RdTerm id="margin-of-error" from="two-party preferred">margin</RdTerm></>}
       {moved && sig === true && <>, a significant {monthDelta > 0 ? "rise" : "fall"}</>}
-      {leadSwing != null && Math.abs(leadSwing) >= 0.05 && <> · {rdArrow(leadSwing)} {Math.abs(leadSwing).toFixed(1)} since the 2025 election</>}
+      {leadSwing != null && Math.abs(leadSwing) >= 0.05 && <>, {rdArrow(leadSwing)} {Math.abs(leadSwing).toFixed(1)} since the 2025 election</>}
     </>
   );
   const hasBases = (matchup === "alp_lnp" && impOffered) || (matchup === "alp_on" && impOnOffered);
@@ -110,7 +110,7 @@ function RdHero(p) {
     : onImp ? (narrow ? "Implied flows" : "Implied preference flows") : "Pollsters’ published figures";
   const provenance = (
     <>
-      {basisWords} · <RdTerm id={adjusted ? "weighted-aggregate" : "monthly-average"} from="two-party preferred"
+      {basisWords}, <RdTerm id={adjusted ? "weighted-aggregate" : "monthly-average"} from="two-party preferred"
         title={"What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means"}>
         {adjusted ? "weighted aggregate" : "monthly average"}</RdTerm>
       {unc && <>{" "}of {unc.n} poll{unc.n === 1 ? "" : "s"} {narrow ? "to " : "in the " + D.latest.method.windowDays + " days to "}{rdDate(D.latest.updatedISO)}</>}
@@ -367,12 +367,12 @@ function RdHero(p) {
     // by date, not flag: the Coalition line's own first row is the result too
     if (d && ringOn && Math.abs(d.x - elec.x) < 1e-6) return [{ label: "", value: "The election result" }];
     if (!d || !d.ci95) return [];
-    return [{ label: flowsBand ? "Flow range" : "95% interval", value: "± " + d.ci95.toFixed(1) + " pts" + (d.k ? " · " + d.k + " poll" + (d.k === 1 ? "" : "s") : "") }];
+    return [{ label: flowsBand ? "Flow range" : "95% interval", value: "± " + d.ci95.toFixed(1) + " pts" + (d.k ? ", " + d.k + " poll" + (d.k === 1 ? "" : "s") : "") }];
   };
 
   const meta = narrow
-    ? "After preferences · updated " + rdDate(D.latest.updatedISO, true)
-    : "After preferences · " + D.latest.pollsTracked + " polls from " + D.latest.housesTracked + " pollsters · updated " + rdDate(D.latest.updatedISO, true);
+    ? "After preferences, updated " + rdDate(D.latest.updatedISO, true)
+    : "After preferences, " + D.latest.pollsTracked + " polls from " + D.latest.housesTracked + " pollsters, updated " + rdDate(D.latest.updatedISO, true);
 
   return (
     <section className="rd-sec rd-first rd-tpp" id="two-party" aria-labelledby="rd-tpp-t">
@@ -402,7 +402,7 @@ function RdHero(p) {
         <p className="rd-tpp-verdict">{verdict}</p>
         <p className="rd-tpp-change">{change}</p>
         <p className="rd-tpp-prov">{provenance}{qPanel}
-          {hasBases && !onImp && <> · <button type="button" className="rd-link" onClick={chooseBasis}>Back to implied flows</button></>}
+          {hasBases && !onImp && <>, <button type="button" className="rd-link" onClick={chooseBasis}>Back to implied flows</button></>}
         </p>
         {otherContests.length > 0 && (
           <div className="rd-tpp-switch">
@@ -452,7 +452,7 @@ function RdHero(p) {
           tooltipTitle={tooltipTitle} extraRows={extraRows}
           fmt={(v) => v.toFixed(1)}
           copy={{ title: chartTitle.replace(/, %$/, ""),
-                  sub: basisWords.replace(/^Implied flows$/, "Implied preference flows") + (unc ? " · weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
+                  sub: basisWords.replace(/^Implied flows$/, "Implied preference flows") + (unc ? ", weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
                   legend: copyKey.map((k) => ({ label: k.label, color: k.color, kind: k.kind })) }}
         />
         {badges && <RdEventList list={badges.list} from={badgesWas ? badgesWas.list : null} mix={t} />}

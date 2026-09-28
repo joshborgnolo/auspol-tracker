@@ -596,7 +596,7 @@ function DialStory({ originRect, onClose }) {
               <span style={{ color: inkOf(cur.oppColor) }}>{cur.oppName} {cur.opp.toFixed(1)}</span>
             </div>
             <div className="dl-note">
-              implied two-party preferred · Needle leans to whoever leads
+              implied two-party preferred, needle leans to whoever leads
             </div>
           </figcaption>
         </figure>

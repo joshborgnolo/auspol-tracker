@@ -1530,7 +1530,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
         .map((p) => ({ x: p.x, y: chg ? +(p.y - base).toFixed(2) : p.y }));
       // an unsegmented ppm line names its single pairing, never a lone office
       const leadName = s.name || (M.key === "ppmm" ? c.raw.ppmPair : (isOpp ? c.oppLead : c.lead));
-      const label = solo ? leadName : c.year + " · " + leadName;
+      const label = solo ? leadName : c.year + ", " + leadName;
       /* Months are the x values, and `months` is 0..n, but look the index up
          rather than assume it: the flags have to describe the same month the
          point does or the dash lands on the wrong segment. Absent obs data
@@ -1546,7 +1546,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
          month nobody polled, which is the whole thing being marked. Only the
          unpolled month itself is annotated - the readings either side of it are
          real, and the dedupe hands each boundary month to its solid run first. */
-      if (flags) pts.forEach((p) => { if (!observed(p.x)) p.note = "no poll · Interpolated"; });
+      if (flags) pts.forEach((p) => { if (!observed(p.x)) p.note = "no poll, Interpolated"; });
       const runs = obsRuns(pts, observed);
       const termEnd = si === seriesIn.length - 1;
       return runs.map((run, i) => ({
@@ -1704,7 +1704,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
   const scatter = React.useMemo(() => (!dotsOn ? [] : shown.flatMap((c) => {
     const base = cycBase(c, M.key);
     const leadName = M.key === "ppmm" ? c.raw.ppmPair : (isOpp ? c.oppLead : c.lead);
-    const label = solo ? leadName : c.year + " · " + leadName;
+    const label = solo ? leadName : c.year + ", " + leadName;
     // a term that changed holders names the holder at the dot's own date,
     // matching the per-person runs drawn under it
     const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || (M.key === "ppmm" && c.raw.ppmEras) || (M.key === "tpp" && c.raw.tppEras) || null;
@@ -1720,7 +1720,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       return {
         x: p.x, y: chg ? +(p.y - base).toFixed(2) : p.y,
         color: colorOf(c), shape: shapes[c.year],
-        label: n ? (solo ? n : c.year + " · " + n) : label, meta: p.meta, op: dim ? 0.3 : 1,
+        label: n ? (solo ? n : c.year + ", " + n) : label, meta: p.meta, op: dim ? 0.3 : 1,
       };
     });
   })), [dotsOn, shownKey, M.key, isOpp, chg, hi, liftKey, srcTerms]);
@@ -1739,7 +1739,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       .map((p) => ({ x: p.x, y: chg ? +(p.y - hBase).toFixed(2) : p.y }));
     const dimmed = hi != null && !hanCycle.current;
     built.push({
-      id: "cyc-han", label: "Hanson · One Nation", color: HAN_COLOR,
+      id: "cyc-han", label: "Hanson, One Nation", color: HAN_COLOR,
       width: 2.2, points: pts, weight: 2.5, smooth: false, dashed: true,
       opacity: dimmed ? 0.2 : 0.9,
       endLabel: "PH", endLabelOpacity: dimmed ? 0.2 : 0.85,
@@ -2176,7 +2176,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
                        const withData = hasData ? cycles.filter((c) => c.current || hasData(c)) : cycles;
                        return withData.length + " terms since " + withData[0].year;
                      })())
-                  + (lifted.size ? " · " + drawnN + " drawn" : "");
+                  + (lifted.size ? ", " + drawnN + " drawn" : "");
 
   /* The board cut by what each government did at its own election - the
      comparison the tab exists for, and one nobody can assemble by eye from
@@ -2640,7 +2640,7 @@ function AccuracyPanel() {
           <h2 className="card-title">How the final polls did</h2>
           <p className="card-sub">
             Each house’s last two-party figure in the {A.windowDays} days before polling day,
-            against the result · One row per election
+            against the result, One row per election
           </p>
         </div>
         <div className="dir-net">
@@ -3228,7 +3228,7 @@ function ArchDirCell({ d }) {
   if (!d) return <span className="dash" title="This poll didn’t ask the direction question">—</span>;
   return (
     <div className="arch-appr"
-         title={`Right direction ${d.right} · Unsure ${d.unsure} · Wrong track ${d.wrong}`}>
+         title={`Right direction ${d.right}, Unsure ${d.unsure}, Wrong track ${d.wrong}`}>
       <span><NetVal v={d.net} /></span>
       <div className="arch-appr-bar" aria-hidden="true">
         <span className="arch-dir-right" style={{ width: d.right + "%" }}></span>
@@ -3246,7 +3246,7 @@ function ArchApprCell({ s, net, metric }) {
   const fav = metric === "fav";
   return (
     <div className="arch-appr"
-         title={s ? (fav ? `Positive ${s.app} · Neutral ${dk} · Negative ${s.dis}` : `Approve ${s.app} · Don't know / never heard of ${dk} · Disapprove ${s.dis}`) : undefined}>
+         title={s ? (fav ? `Positive ${s.app}, Neutral ${dk}, Negative ${s.dis}` : `Approve ${s.app}, Don't know / never heard of ${dk}, Disapprove ${s.dis}`) : undefined}>
       <span><NetVal v={net} /><FavMark metric={metric} /></span>
       {s && (
         <div className="arch-appr-bar" aria-hidden="true">
@@ -3914,7 +3914,7 @@ function VariancePanel({ facet, rangeId }) {
               <button key={m.id} type="button"
                       className={"legend-chip" + (hidden[m.id] ? " off" : "") + (m.dashed ? " dashed" : "")}
                       aria-pressed={!hidden[m.id]}
-                      title={m.label + " – " + d.sigma.toFixed(2) + "pp spread vs a " + d.floor.toFixed(2) + "pp floor · " + read.label.replace(/^./, (ch) => ch.toUpperCase())}
+                      title={m.label + " – " + d.sigma.toFixed(2) + "pp spread vs a " + d.floor.toFixed(2) + "pp floor, " + read.label.replace(/^./, (ch) => ch.toUpperCase())}
                       onClick={() => setHidden((h) => ({ ...h, [m.id]: !h[m.id] }))}>
                 {/* a dashed series gets a dashed swatch, in its own colour */}
                 <span className="legend-swatch" style={m.dashed ? { borderTopColor: m.color } : { background: m.color }}></span>
@@ -3968,7 +3968,7 @@ function VariancePanel({ facet, rangeId }) {
               )}
               <span className="vr-sub">
                 {d.R.toFixed(2)}× the {d.floor.toFixed(2)}pp floor
-                {d.excess > 0.05 && <> · {d.excess.toFixed(2)}pp unexplained</>}
+                {d.excess > 0.05 && <>, {d.excess.toFixed(2)}pp unexplained</>}
               </span>
             </div>
           );
@@ -3976,8 +3976,8 @@ function VariancePanel({ facet, rangeId }) {
       </div>
 
       <p className="table-hint ap-var-note">
-        The ratio of spread to floor reads: under 0.80× herded · around 1× as close as sampling
-        allows · over 1.20× genuinely apart.
+        The ratio of spread to floor reads: under 0.80× herded, around 1× as close as sampling
+        allows, over 1.20× genuinely apart.
       </p>
       <HowTo cls="table-hint ap-var-note" paras={[
         <>Spread is the recency-weighted standard deviation of each poll’s distance from a local trend,
@@ -4157,7 +4157,7 @@ function HouseLeanPanel({ rangeId }) {
   const leaners = latest.filter((e) => Math.abs(e.v) >= LEAN_SURFACE)
     .sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
   boardRef.current = {
-    title: "House lean · " + (contest ? contest.label + ", " + (basis === "imp" ? "implied" : "published")
+    title: "House lean, " + (contest ? contest.label + ", " + (basis === "imp" ? "implied" : "published")
                                           : LEAN_MEASURES.find((m) => m.id === measure).label + " primary"),
     items: latest.map((e) => ({ name: e.firm, color: e.color, value: leanStr(e.v), off: !!hidden[e.firm] })),
     caption: meta.ground,
@@ -4293,7 +4293,7 @@ function SeriesBoard({ id, label, items, hidden, setHidden, quick, surfaced = []
   const [pop, setPop] = useState(null);
   /* The summary counts what the LABEL names, which is not always every row:
      the drift board carries a pooled line above its nine houses, and a button
-     reading "Houses · all 10" would be counting the thing the houses are
+     reading "Houses, all 10" would be counting the thing the houses are
      pooled into as one of them. */
   const counted = countIds ? items.filter((i) => countIds.includes(i.id)) : items;
   const shown = counted.filter((i) => !hidden[i.id]).length;
@@ -4364,7 +4364,7 @@ function FlowLegend({ pooledId, pooled, houseRows, hidden, setHidden, sgn, kind 
   const sectionId = kind === "alp-on" ? "flow-drift-on" : "flow-drift";
   React.useEffect(() => {
     window.AP_FLOW_BOARD = Object.assign(window.AP_FLOW_BOARD || {}, { [sectionId]: {
-      title: "Preference-flow drift" + (kind === "alp-on" ? " · ALP v ON" : " · ALP v L/NP"),
+      title: "Preference-flow drift" + (kind === "alp-on" ? ", ALP v ON" : ", ALP v L/NP"),
       pooled: { name: "Pooled, " + total + " houses",
                 value: band != null ? sgn(pooled.v) + " ± " + pooled.ci95.toFixed(1) + "pp" : "",
                 off: !pooledOn, interval: band != null },
@@ -4605,7 +4605,7 @@ function FlowDriftOnPanel({ rangeId }) {
     <section className="ap-flow" id="flow-drift-on">
       <div className="ap-var-head">
         <div>
-          <h3 className="ap-var-title">Preference-flow drift · Labor vs One Nation</h3>
+          <h3 className="ap-var-title">Preference-flow drift, Labor vs One Nation</h3>
           <p className="card-sub">
             The same read on the Labor–One Nation head-to-heads: how far published shares sit
             from what the same polls’ primaries would read as under a
@@ -4642,7 +4642,7 @@ function FlowDriftOnPanel({ rangeId }) {
           Nation waves to fit (Roy Morgan 18, YouGov 17), which buys standard
           errors of ±5.7 to ±9.6 on cells whose whole range of interest is
           maybe fifteen points. Tested against the reference row, NOT ONE of
-          the six fitted cells clears 1.96·se — the largest is YouGov's
+          the six fitted cells clears 1.96×se — the largest is YouGov's
           "other" at t = 1.36 — and no pair of houses separates either. A
           table where nothing can be distinguished from the assumption it was
           shrunk toward is not a diagnostic; it is six numbers and an implied
@@ -4823,7 +4823,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const [q, setQ] = useState(urlInit.q);
   const [sel, setSel] = useState(new Set(urlInit.who)); // pollster filter; empty = all
   const [lead, setLead] = useState(urlInit.lead);        // all | alp | lnp/onp (per matchup)
-  const [measure, setMeasure] = useState(urlInit.measure); // lead matchup: lnp = ALP v L/NP · onp = ALP v ON
+  const [measure, setMeasure] = useState(urlInit.measure); // lead matchup: lnp = ALP v L/NP, onp = ALP v ON
   const [range, setRange] = useState(urlInit.range);    // all | 12 | 6 | 3
   const [tagSel, setTagSel] = useState(new Set(urlInit.has)); // data-content tags; empty = all
   const [sort, setSort] = useState({ key: "date", dir: -1 });
@@ -5250,7 +5250,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         <div>
           <h2 className="card-title">All polls</h2>
           <p className="card-sub">
-            Every individual national poll in the archive · {total} polls from {houses.length} pollsters,
+            Every individual national poll in the archive, {total} polls from {houses.length} pollsters,
             {" "}{(() => {  // span computed from the data, so it stays honest as polls are added
               const f = D.individualPolls[0], l = D.individualPolls[D.individualPolls.length - 1];
               const lab = (ym) => { const [y, m] = ym.split("-").map(Number); return D.monthNameFull(m) + " " + y; };
@@ -5384,7 +5384,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         {facet === "twopp" && (
           <div className="ap-2line">
             <FilterPop id="lead" label="Contest" open={pop} setOpen={setPop}
-              summary={[measure !== DEFAULT_MEASURE ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null}>
+              summary={[measure !== DEFAULT_MEASURE ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(", ") || null}>
             <div className="ap-pop-head"><span>Two-party contest</span></div>
             <div className="ap-poplist" role="radiogroup" aria-label="Two-party contest">
               {/* the two Labor contests lead the list in the order of the
@@ -5484,7 +5484,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                     <span className="th-basis-swap" aria-hidden="true">⇄</span>
                   </button>
                 </th>
-                <ArchSortTh label={({ lnp: "Lead · ALP v L/NP", onp: "Lead · ALP v ON", lnponp: "Lead · L/NP v ON", "3cp": "Lead · 3-cornered" })[measure]} short="Lead" k="alp" sort={sort} onSort={onSort} />
+                <ArchSortTh label={({ lnp: "Lead, ALP v L/NP", onp: "Lead, ALP v ON", lnponp: "Lead, L/NP v ON", "3cp": "Lead, 3-cornered" })[measure]} short="Lead" k="alp" sort={sort} onSort={onSort} />
                 {/* hide-sm: the last column to go on a phone – see the .hide-sm
                     note in the stylesheet. The row detail carries "Poll lean". */}
                 <ArchSortTh label="Poll lean" short="Lean" k="lean" sort={sort} onSort={onSort} className="hide-sm" />
@@ -5644,7 +5644,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         </div>
       )}
       <p className="table-hint">
-        Tap any poll for its full breakdown · Search matches anything in a row ·{" "}
+        Tap any poll for its full breakdown, Search matches anything in a row,{" "}
         {CANT_HOVER ? "Tap" : "Click"} any column heading to sort.
       </p>
       <HowTo label="How to read this table" paras={[
@@ -5834,13 +5834,13 @@ function infoTerms(D) {
             </tr>
           ))}
           <tr className="info-work-sum"><td colSpan="10">
-            Σwᵢ = {F(swP.sw)} · Σwᵢxᵢ = {F(swP.swx)} · the mean is {F(swP.swx)} ÷ {F(swP.sw)} = {F(swP.mean)}
+            Σwᵢ = {F(swP.sw)}, Σwᵢxᵢ = {F(swP.swx)}, the mean is {F(swP.swx)} ÷ {F(swP.sw)} = {F(swP.mean)}
             {" "}→ {swP.v.toFixed(1)} for Labor, from the {swP.k} polls in the 21 days to {swP.ref}.
           </td></tr>
         </tbody>
       </table>
       <p className="info-work-note">The five-party check: debiased, the parties sum to {swP.adjTotal}
-        {" "}({["alp", "lnp", "grn", "onp", "oth"].filter((k) => swP.parties[k]).map((k) => swP.parties[k].adj.toFixed(2)).join(" · ")})
+        {" "}({["alp", "lnp", "grn", "onp", "oth"].filter((k) => swP.parties[k]).map((k) => swP.parties[k].adj.toFixed(2)).join(", ")})
         {" "}against {swP.plainTotal} unweighted
         {swP.rescaled
           ? ` – past the half-point tolerance, so all five are scaled by ${swP.plainTotal} ÷ ${swP.adjTotal}, which is how the Labor figure above lands at ${swP.v.toFixed(1)}.`
@@ -5863,7 +5863,7 @@ function infoTerms(D) {
             </tr>
           ))}
           <tr className="info-work-sum"><td colSpan="11">
-            Σwᵢ = {F(swT.sw)} · Σwᵢxᵢ = {F(swT.swx)} · the published figure is {F(swT.swx)} ÷ {F(swT.sw)} = {F(swT.mean)}
+            Σwᵢ = {F(swT.sw)}, Σwᵢxᵢ = {F(swT.swx)}, the published figure is {F(swT.swx)} ÷ {F(swT.sw)} = {F(swT.mean)}
             {" "}→ {swT.v.toFixed(1)}, from the {swT.k} polls in the window.
           </td></tr>
         </tbody>

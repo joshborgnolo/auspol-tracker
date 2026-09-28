@@ -111,8 +111,8 @@ function RdPrimary({ rangeId }) {
   const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
   const eDate = (D.cycles.find((c) => c.current) || {}).eDate;
   const meta = narrow
-    ? D.latest.pollsTracked + " national polls · latest fieldwork " + rdDate(D.latest.updatedISO)
-    : D.latest.pollsTracked + " national polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election · latest fieldwork " + rdDate(D.latest.updatedISO, true);
+    ? D.latest.pollsTracked + " national polls, latest fieldwork " + rdDate(D.latest.updatedISO)
+    : D.latest.pollsTracked + " national polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true);
   const toggle = (id) => setHidden((h) => {
     const next = { ...h, [id]: !h[id] };
     return parts.every((p) => next[p.id]) ? {} : next;   // never an empty chart
@@ -760,7 +760,7 @@ function RdLeadership({ rangeId }) {
   );
 
   return (
-    <RdSec id="leadership" cls="rd-lead" title="Leadership" meta="Preferred PM and net approval · Newspoll, YouGov, Resolve, Essential and others">
+    <RdSec id="leadership" cls="rd-lead" title="Leadership" meta="Preferred PM and net approval, Newspoll, YouGov, Resolve, Essential and others">
       {story && <RdHed head={story.head} dek={story.dek} />}
       <div className={"rd-ld-grid" + (expanded ? " one" : "")}>
         {panel("ppm", "Preferred prime minister", "“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.",
@@ -892,7 +892,7 @@ function RdDirection({ rangeId }) {
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   return (
-    <RdSec id="direction" cls="rd-dir" title="National direction" meta={narrow ? question : question + (asked ? " · " + asked : "")}>
+    <RdSec id="direction" cls="rd-dir" title="National direction" meta={narrow ? question : question + (asked ? ", " + asked : "")}>
       <RdHed head={head} dek={dek} />
       <div className="rd-dir-figs">
         <div className="rd-dir-fig"><span className="rd-dir-v" style={{ color: "var(--mood-pos)" }}>{now.right.toFixed(1)}<span className="rd-dir-pct">%</span></span>
@@ -1033,7 +1033,7 @@ function RdDemographics({ rangeId = "all" }) {
         const v = g.v[party], ci = g.ci[party] || 0, d = v - all, sig = Math.abs(d) > ci;
         return (
           <div key={"r" + gi} className="rd-wv-row" role="row"
-               title={"Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + " · " + rdList((g.houses || []).map(demoHouse)) + " · ± is the 95% margin"}>
+               title={"Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + ", " + rdList((g.houses || []).map(demoHouse)) + ", ± is the 95% margin"}>
             <span role="cell" className="rd-wv-lab">{g.label}</span>
             <span className="rd-wv-track" aria-hidden="true">
               {/* positions go to CSS as --x/--lo/--hi (percent of the track)
@@ -1464,7 +1464,7 @@ function RdSwitching({ rangeId }) {
 
   return (
     <RdSec id="switching" cls="rd-sw" title="Where One Nation’s voters came from"
-           meta={"How 2025 voters say they’d vote now · " + rdList(S.houses || []) + ", last " + (S.now ? S.now.window : "six weeks")}>
+           meta={"How 2025 voters say they’d vote now, " + rdList(S.houses || []) + ", last " + (S.now ? S.now.window : "six weeks")}>
       {head && <RdHed head={head} dek={dek} />}
       <div className="card rd-card rd-mo-wrap" ref={boxRef}>
         {mosaic}
@@ -1472,7 +1472,7 @@ function RdSwitching({ rangeId }) {
         <div className="rd-key rd-mo-key">
           <span className="rd-key-item"><RdSwatch kind="square" color="var(--onp)" />Switched to One Nation</span>
           <span className="rd-key-item"><RdSwatch kind="square" color="var(--onp-deep)" />Already One Nation in 2025</span>
-          {!narrow && <span className="rd-key-item rd-mo-howread">Width: share of the 2025 vote · Height: share now backing One Nation · Area: voters gained</span>}
+          {!narrow && <span className="rd-key-item rd-mo-howread">Width: share of the 2025 vote, Height: share now backing One Nation, Area: voters gained</span>}
         </div>
         {narrow && <p className="rd-note">Bar height: that party’s share of the 2025 vote. Filled width: share now backing One Nation. Filled area: voters One Nation gained.</p>}
       </div>
@@ -1758,7 +1758,7 @@ function RdIssues({ rangeId = "all" }) {
   );
   return (
     <RdSec id="issues" cls="rd-is" title="The issues"
-           meta={"What voters say matters most, and who they think is best on it · " + rdList(I.houses) + ", last " + I.window}>
+           meta={"What voters say matters most, and who they think is best on it, " + rdList(I.houses) + ", last " + I.window}>
       {tabs}
       {view === "trust" ? (
         <>
@@ -1772,7 +1772,7 @@ function RdIssues({ rangeId = "all" }) {
                 <span></span>
                 <span className="rd-is-imph">In voters’ top three</span>
                 <span className="rd-is-dotsh">
-                  <span className="rd-is-cap">Best on it · % of voters naming one of these three</span>
+                  <span className="rd-is-cap">Best on it, % of voters naming one of these three</span>
                   <span className="rd-is-leg">{P.map((q) => <span key={q}><i style={{ background: pColor(q) }}></i>{ISS_PARTY_CAP[q]}</span>)}</span>
                 </span>
               </div>
@@ -1790,7 +1790,7 @@ function RdIssues({ rangeId = "all" }) {
               <div className="card rd-card rd-is-chart">
                 <div className="rd-is-ctop"><span>{it.label}</span></div>
                 {trendHead(it, ch) && <h4 className="rd-is-chead">{trendHead(it, ch)}</h4>}
-                <p className="rd-is-csub">Who voters think is best, month by month · % of those naming Labor, the Coalition or One Nation</p>
+                <p className="rd-is-csub">Who voters think is best, month by month, % of those naming Labor, the Coalition or One Nation</p>
                 <TrendChart key="rd-is-chart" heightPx={narrow ? 240 : 260} padPx={{ l: 36, r: 10, t: 12, b: 28 }}
                   xDomain={chDraw.xDomain} yDomain={chDraw.domain} yTicks={rdYTicks(ch.domain[0], ch.domain[1], 10)}
                   yTickFmt={(v) => (v === ch.domain[1] ? v + "%" : String(v))} xTicks={rdXTicks(ch.xDomain[0], ch.xDomain[1], true)} baseline
@@ -1841,7 +1841,7 @@ function RdIssues({ rangeId = "all" }) {
                     <span className="rd-iw-by">Group voters by</span>
                     <RdTabs value={gtab.id} onChange={setGset} options={G.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-tabs-sm rd-iw-tabs" />
                   </div>
-                  <p className="rd-iw-src"><b>Share of each group putting each issue in its top three, %</b> · {gSource}</p>
+                  <p className="rd-iw-src"><b>Share of each group putting each issue in its top three, %</b>, {gSource}</p>
                   {/* a fixed layout, as the canvas's grid was: the label column
                       set, the six issues sharing the rest equally. Sized by
                       their words, short heads like "Housing" took columns
@@ -1988,7 +1988,7 @@ function RdUndecided({ rangeId }) {
           series={drawn.map((d) => ({ id: d.s.id, label: d.s.label, color: COL(d.s), rdWidth: 2, dashed: d.s.dashed, rdCap: 3.5, points: series(d.pts, "v") }))}
           spine={series(drawn[0].pts, "v")}
           scatter={drawn.flatMap((d) => d.dots.map((q) => ({ x: q.x, y: q.v, color: COL(d.s), hollow: d.s.id === "tpp", label: d.s.label, meta: q })))} pollFacet="twopp"
-          notes={outlier ? [{ x: outlier.x, y: outlier.v, dy: -8, text: (+outlier.v.toFixed(1)) + "% · " + outlier.pollster + ", " + outlier.dateLabel, anchor: "end", size: 11 }] : []}
+          notes={outlier ? [{ x: outlier.x, y: outlier.v, dy: -8, text: (+outlier.v.toFixed(1)) + "%, " + outlier.pollster + ", " + outlier.dateLabel, anchor: "end", size: 11 }] : []}
           tooltipTitle={(i) => { const p = drawn[0].pts[i]; return p ? monthLabelFull(p.ym) : ""; }}
           fmt={(v) => v.toFixed(1)}
           /* the readouts over the chart say which line is which; the copy
@@ -2073,7 +2073,7 @@ function RdUndecided({ rangeId }) {
 
   const views = [{ id: "all", label: "All voters" }].concat(F ? [{ id: "party", label: "By party" }] : [], A ? [{ id: "age", label: "By age" }] : []);
   return (
-    <RdSec id="undecided" cls="rd-un" title="Undecided" meta={rdList(U.houses) + " · since the 2025 election"}>
+    <RdSec id="undecided" cls="rd-un" title="Undecided" meta={rdList(U.houses) + ", since the 2025 election"}>
       {story && <RdHed head={story.head} dek={story.dek} />}
       <RdTabs value={view} onChange={setView} options={views} ariaLabel="Undecided among" className="rd-un-tabs" />
       {view === "all" && (
@@ -2118,7 +2118,7 @@ function RdUndecided({ rangeId }) {
         <>
           <div className="card rd-card rd-un-sp">
             <RdShiftPlot rows={partyView.rows} all={F.now.all.v} lo={partyView.lo} hi={partyView.hi}
-                         title="Share who call their vote solid" source={"RedBridge · mid-2025 → now"} allLabel={"All voters " + F.now.all.v.toFixed(1) + "%"} />
+                         title="Share who call their vote solid" source={"RedBridge, mid-2025 → now"} allLabel={"All voters " + F.now.all.v.toFixed(1) + "%"} />
             <RdKey className="rd-ckey" items={[{ kind: "dot-open", color: "var(--ink-3)", label: "Mid-2025 (" + F.base.from + " to " + F.base.to + ")" },
                                                 { kind: "dot-solid", color: "var(--ink-3)", label: "Now (" + F.now.from + " to " + F.now.to + ")" }]}>
               <span className="rd-key-item" style={{ color: "var(--ink-3)" }}>Change in bold: significant</span>
@@ -2153,7 +2153,7 @@ function RdUndecided({ rangeId }) {
         <>
           <div className="card rd-card rd-un-sp">
             <RdShiftPlot rows={ageView.rows} all={ageView.allNow} lo={ageView.lo} hi={ageView.hi}
-                         title="Share not firm, by age" source="Resolve · mid-2025 → now" allLabel={"All voters " + Math.round(ageView.allNow) + "%"} />
+                         title="Share not firm, by age" source="Resolve, mid-2025 → now" allLabel={"All voters " + Math.round(ageView.allNow) + "%"} />
             <RdKey className="rd-ckey" items={[{ kind: "dot-open", color: "var(--ink-3)", label: "Mid-2025 (" + A.base.from + " to " + A.base.to + ")" },
                                                 { kind: "dot-solid", color: "var(--ink-3)", label: "Now (" + A.now.from + " to " + A.now.to + ")" }]}>
               <span className="rd-key-item" style={{ color: "var(--ink-3)" }}>Change in bold: significant</span>
