@@ -313,9 +313,10 @@ function RdFoot({ children, how }) {
 /* ---------------------------------------------------------------- tabs
    The views inside a section: a row of words, the chosen one underlined. */
 /* left/right walking for a tab row: with one of its tabs focused, an arrow
-   moves the selection and focus a tab at a time, clamped at the ends (no
-   wrap). RdTabs rows get it built in; a hand-rolled row attaches the factory
-   to its role=group div. Options must sit in the buttons' DOM order. */
+   moves the selection and focus a tab at a time, wrapping around the ends
+   (rightmost -> leftmost and back). RdTabs rows get it built in; a
+   hand-rolled row attaches the factory to its role=group div. Options must
+   sit in the buttons' DOM order. */
 /* Safari and Firefox on macOS never focus a <button> on click (only Chrome
    does), which would leave the walk dead for a pointer user - a click lands
    the button's focus explicitly. */
@@ -330,7 +331,7 @@ function rdTabsKey(options, onChange) {
     if (!btn) return;
     e.preventDefault();
     const btns = [...e.currentTarget.querySelectorAll("button")];
-    const j = btns.indexOf(btn) + (e.key === "ArrowRight" ? 1 : -1);
+    const j = (btns.indexOf(btn) + (e.key === "ArrowRight" ? 1 : -1) + btns.length) % btns.length;
     if (!btns[j] || !options[j]) return;
     onChange(options[j].id);
     btns[j].focus();

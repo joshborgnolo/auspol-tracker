@@ -689,8 +689,7 @@ function RdAllPolls(P) {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(open === id ? null : id); return; }
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
       e.preventDefault();
-      const f = FACETS.findIndex((x) => x.id === facet) + (e.key === "ArrowRight" ? 1 : -1);
-      if (!FACETS[f]) return;
+      const f = (FACETS.findIndex((x) => x.id === facet) + (e.key === "ArrowRight" ? 1 : -1) + FACETS.length) % FACETS.length;
       const rowSel = phone ? ".rd-ap-card" : ".rd-ap-row";
       const at = [...(bodyRef.current ? bodyRef.current.querySelectorAll(rowSel) : [])].indexOf(e.currentTarget);
       onFacet(FACETS[f].id);

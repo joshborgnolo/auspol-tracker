@@ -2187,7 +2187,9 @@ function App() {
      keeps its own arrows (its handler ran first if it had one; the navbar's
      tab walk and every rdTabsKey row cover the rest), an open "?" or
      glossary panel keeps the page put, and a live text selection keeps the
-     collapse-to-end behaviour. Clamps at either end, like the swipe. */
+     collapse-to-end behaviour. Wraps round the ends, like the navbar's own
+     walk (the finger swipe still clamps - a swipe off the last page should
+     do nothing). */
   React.useEffect(() => {
     const onKey = (e) => {
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
@@ -2199,7 +2201,7 @@ function App() {
       if (sel && !sel.isCollapsed) return;
       const { tab: cur, goTab: go } = swipeRef.current;
       const ids = TABS.map((x) => x.id);
-      const next = ids[ids.indexOf(cur) + (e.key === "ArrowRight" ? 1 : -1)];
+      const next = ids[(ids.indexOf(cur) + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
       if (next) { e.preventDefault(); go(next); }
     };
     document.addEventListener("keydown", onKey);

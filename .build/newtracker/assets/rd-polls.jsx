@@ -405,8 +405,8 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   /* up/down pollster to pollster: with a row focused, an arrow steps the
      focus a row; when the row was open, the expanded readout travels with it
      (clamped at the ends). Left and right walk the facet views, the tab
-     row's own walk, with the focus staying on the row. Enter or space
-     opens and closes from the keyboard. */
+     row's own walk (wrapping round the ends), with the focus staying on
+     the row. Enter or space opens and closes from the keyboard. */
   const plRef = React.useRef(null);
   const rowNav = (e, i) => {
     if (e.target !== e.currentTarget) return;
@@ -414,8 +414,8 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(isOpen ? null : r.pollster); return; }
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
       e.preventDefault();
-      const f = RD_PL_FACETS.findIndex((x) => x.id === facet) + (e.key === "ArrowRight" ? 1 : -1);
-      if (RD_PL_FACETS[f]) setFacet(RD_PL_FACETS[f].id);
+      const f = (RD_PL_FACETS.findIndex((x) => x.id === facet) + (e.key === "ArrowRight" ? 1 : -1) + RD_PL_FACETS.length) % RD_PL_FACETS.length;
+      setFacet(RD_PL_FACETS[f].id);
       return;
     }
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
