@@ -1731,7 +1731,7 @@ function RdIssues({ rangeId = "all" }) {
      RD_DEMO_HOME: every lead named is a currently-significant pooled gap,
      refreshed by hand when the pool moves — it no longer regenerates. */
   const trustDek = !top.imp ? null
-    : "The cost of living is by far the issue most important to voters, but neither party is more trusted on it than the other. "
+    : "The cost of living is by far the issue most important to voters, but no party is more trusted on it than another. "
     + "Labor leads on housing, health, and climate change, while One Nation leads on crime and immigration. "
     + "The Coalition retains its age-old lead on economic management.";
 

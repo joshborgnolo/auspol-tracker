@@ -61231,7 +61231,7 @@ function RdIssues({
   const trTop = chTop && chTop.trend;
   const minor = trTop && trTop.up.length === 1 && trTop.up[0] === "onp" ? "onp" : null;
   const trustHead = !own ? rdCap(phrase.replace(/^the /, "")) + " tops voters’ concerns" : own.leadSig ? rdPartyStart(own.lead) + " is most trusted on " + phrase + ", voters’ top concern" : minor ? "One Nation has drawn level with the major parties on " + phrase : "No party is clearly trusted most on " + phrase + ", voters’ top concern";
-  const trustDek = !top.imp ? null : "The cost of living is by far the issue most important to voters, but neither party is more trusted on it than the other. " + "Labor leads on housing, health, and climate change, while One Nation leads on crime and immigration. " + "The Coalition retains its age-old lead on economic management.";
+  const trustDek = !top.imp ? null : "The cost of living is by far the issue most important to voters, but no party is more trusted on it than another. " + "Labor leads on housing, health, and climate change, while One Nation leads on crime and immigration. " + "The Coalition retains its age-old lead on economic management.";
   const dotLo = 20,
     dotHi = 50;
   const dx = v => (Math.max(dotLo, Math.min(dotHi, v)) - dotLo) / (dotHi - dotLo) * 100;
