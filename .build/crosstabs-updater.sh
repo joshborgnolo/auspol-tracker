@@ -9,7 +9,10 @@
 # chart id the laptop's Chrome run records after the CI run, a report PDF a
 # fetch didn't get, a table that didn't read cleanly. It also fetches Ipsos's
 # Issues Monitor again behind the daily Ipsos run (.build/ipsos-updater.sh),
-# as the backstop (extract-ipsos.mjs caches it, issues.mjs reads it). And it
+# as the backstop (extract-ipsos.mjs caches it, issues.mjs reads it), and
+# likewise runs SEC Newgate's extractor again behind the daily
+# secnewgate-updater.sh, as the direction panel's backstop and quiet alarm.
+# And it
 # is the alarm for anything that stays unread: a wave still pending
 # STALE_DAYS after its fieldwork closed (listed as `stale` in the scripts'
 # status lines) fails the run – after committing whatever did land – so the
@@ -58,6 +61,23 @@ UNKNOWN=""
 # included) is never left dirty.
 IPS="$(node .build/extract-ipsos.mjs 2>&1)"
 log "$(echo "$IPS" | tail -1)"
+# SEC Newgate's bi-monthly Mood of the Nation (national direction) is
+# fetched daily by .build/secnewgate-updater.sh; this weekly pass runs the
+# extractor again, as the backstop, and is the alarm for the house gone
+# quiet (QUIET_DAYS), which the extractor lists as `stale` in its status
+# line. A page that won't load is a warning here – the cache stays.
+SEC="$(node .build/extract-secnewgate.mjs 2>&1)"
+SECLAST="$(echo "$SEC" | tail -1)"
+log "$SECLAST"
+case "$SECLAST" in
+  SECNEWGATE_STATUS*)
+    S="$(echo "$SECLAST" | sed -n 's/.*"stale":\[\([^]]*\)\].*/\1/p')"
+    if [ -n "$S" ]; then STALE="$STALE secnewgate: $S"; fi
+    ;;
+  *)
+    UNFINISHED="$UNFINISHED secnewgate"
+    ;;
+esac
 for b in vote-switching demographics issues; do
   OUT="$(node ".build/$b.mjs" 2>&1)"
   CODE=$?
@@ -82,7 +102,7 @@ for b in vote-switching demographics issues; do
   U="$(echo "$LAST" | sed -n 's/.*"unknown":\[\([^]]*\)\].*/\1/p')"
   if [ -n "$U" ]; then UNKNOWN="$UNKNOWN $b: $U"; fi
 done
-if [ -n "$(git status --porcelain -- .build/ipsos-src)" ]; then CHANGED=true; fi
+if [ -n "$(git status --porcelain -- .build/ipsos-src .build/secnewgate-src data/polls.json)" ]; then CHANGED=true; fi
 
 if $CHANGED; then
   log "crosstab tables changed; running validate/build/commit/push"
@@ -96,7 +116,7 @@ if $CHANGED; then
     log "FAIL build; no commit made"
     exit 1
   fi
-  FILES=(data/vote-switching.json data/demographics.json data/issues.json .build/ipsos-src "${SITE_FILES[@]}")
+  FILES=(data/vote-switching.json data/demographics.json data/issues.json data/polls.json .build/ipsos-src .build/secnewgate-src "${SITE_FILES[@]}")
   git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
   MSG="Update crosstab tables $(date '+%Y-%m-%d')"
   if ! git commit -m "$MSG" >> "$LOG" 2>&1; then

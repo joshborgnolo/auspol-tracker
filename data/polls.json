@@ -680,6 +680,14 @@
       "unsure": 22
     },
     {
+      "date": "2025-07-16",
+      "dateStart": "2025-07-08",
+      "pollster": "SEC Newgate",
+      "right": 44,
+      "wrong": 56,
+      "unsure": 0
+    },
+    {
       "date": "2025-07-27",
       "dateStart": "2025-06-30",
       "pollster": "Roy Morgan",
@@ -710,6 +718,14 @@
       "right": 38,
       "wrong": 47,
       "unsure": 16
+    },
+    {
+      "date": "2025-09-15",
+      "dateStart": "2025-09-09",
+      "pollster": "SEC Newgate",
+      "right": 41,
+      "wrong": 59,
+      "unsure": 0
     },
     {
       "date": "2025-09-21",
@@ -750,6 +766,14 @@
       "right": 35,
       "wrong": 46,
       "unsure": 19
+    },
+    {
+      "date": "2025-11-03",
+      "dateStart": "2025-10-29",
+      "pollster": "SEC Newgate",
+      "right": 39,
+      "wrong": 61,
+      "unsure": 0
     },
     {
       "date": "2025-11-16",
@@ -838,6 +862,14 @@
       "right": 28,
       "wrong": 58,
       "unsure": 14
+    },
+    {
+      "date": "2026-02-09",
+      "dateStart": "2026-02-02",
+      "pollster": "SEC Newgate",
+      "right": 37,
+      "wrong": 63,
+      "unsure": 0
     },
     {
       "date": "2026-02-13",
@@ -992,6 +1024,14 @@
       "unsure": 15
     },
     {
+      "date": "2026-05-18",
+      "dateStart": "2026-05-13",
+      "pollster": "SEC Newgate",
+      "right": 34,
+      "wrong": 66,
+      "unsure": 0
+    },
+    {
       "date": "2026-05-24",
       "dateStart": "2026-05-20",
       "pollster": "Essential",
@@ -1078,6 +1118,14 @@
       "right": 23.5,
       "wrong": 62.5,
       "unsure": 14
+    },
+    {
+      "date": "2026-07-13",
+      "dateStart": "2026-07-02",
+      "pollster": "SEC Newgate",
+      "right": 32,
+      "wrong": 68,
+      "unsure": 0
     },
     {
       "date": "2026-07-19",
@@ -1174,6 +1222,14 @@
       "right": 23,
       "wrong": 64,
       "unsure": 13
+    },
+    {
+      "date": "2026-09-14",
+      "dateStart": "2026-09-08",
+      "pollster": "SEC Newgate",
+      "right": 32,
+      "wrong": 68,
+      "unsure": 0
     },
     {
       "date": "2026-09-20",
