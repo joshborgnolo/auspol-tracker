@@ -1008,6 +1008,14 @@
       "unsure": 14
     },
     {
+      "date": "2026-05-28",
+      "dateStart": "2026-05-25",
+      "pollster": "RedBridge/Accent",
+      "right": 25,
+      "wrong": 63,
+      "unsure": 12
+    },
+    {
       "date": "2026-05-31",
       "dateStart": "2026-05-25",
       "pollster": "Roy Morgan",
