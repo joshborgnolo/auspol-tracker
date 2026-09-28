@@ -883,7 +883,7 @@ function RdDirection({ rangeId }) {
   const active = houses.filter((h) => !inactive.includes(h));
   const top = houses[0];
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
-  const foot = top ? "Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + counts[top] + " of the " + total + " since the election. "
+  const foot = top ? "Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + counts[top] + " of the " + total + " since May 2025. "
     + (active.filter((h) => h !== top).length ? rdList(active.filter((h) => h !== top)) + " supply the rest" : "")
     + (inactive.length ? "; " + rdList(inactive) + " " + (inactive.length > 1 ? "have" : "has") + " stopped asking" : "") + ". "
     + "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
@@ -905,7 +905,7 @@ function RdDirection({ rangeId }) {
       </div>
       <p className="rd-dir-net"><b>Net {signedP(now.net)} points</b>
         {now.chg != null && <> · {rdArrow(now.chg)} {Math.abs(now.chg).toFixed(1)} on a month ago{now.changeSig ? ", a significant " + (now.chg < 0 ? "fall" : "rise") : now.changeSig === false ? ", within the margin" : ""}</>}
-        {lowest ? " · the lowest since the 2025 election" : highest ? " · the highest since the 2025 election" : ""}</p>
+        {lowest ? " · the lowest since May 2025" : highest ? " · the highest since May 2025" : ""}</p>
       <div className="card rd-card rd-dir-chart">
         <div className="rd-chead"><span className="rd-chead-t">{narrow ? "Right direction and wrong track, %" : "Right direction and wrong track, % of voters, month by month"}</span></div>
         {narrow && <RdKey items={[{ kind: "line", color: "var(--mood-neg)", label: "Wrong track" }, { kind: "line", color: "var(--mood-pos)", label: "Right direction" }]} className="rd-tpp-legend" />}

@@ -58849,7 +58849,7 @@ function RdDirection({
   const active = houses.filter(h => !inactive.includes(h));
   const top = houses[0];
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
-  const foot = top ? "Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + counts[top] + " of the " + total + " since the election. " + (active.filter(h => h !== top).length ? rdList(active.filter(h => h !== top)) + " supply the rest" : "") + (inactive.length ? "; " + rdList(inactive) + " " + (inactive.length > 1 ? "have" : "has") + " stopped asking" : "") + ". " + "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
+  const foot = top ? "Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + counts[top] + " of the " + total + " since May 2025. " + (active.filter(h => h !== top).length ? rdList(active.filter(h => h !== top)) + " supply the rest" : "") + (inactive.length ? "; " + rdList(inactive) + " " + (inactive.length > 1 ? "have" : "has") + " stopped asking" : "") + ". " + "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   return React.createElement(RdSec, {
@@ -58911,7 +58911,7 @@ function RdDirection({
     }
   })), React.createElement("p", {
     className: "rd-dir-net"
-  }, React.createElement("b", null, "Net ", signedP(now.net), " points"), now.chg != null && React.createElement(React.Fragment, null, " \xB7 ", rdArrow(now.chg), " ", Math.abs(now.chg).toFixed(1), " on a month ago", now.changeSig ? ", a significant " + (now.chg < 0 ? "fall" : "rise") : now.changeSig === false ? ", within the margin" : ""), lowest ? " · the lowest since the 2025 election" : highest ? " · the highest since the 2025 election" : ""), React.createElement("div", {
+  }, React.createElement("b", null, "Net ", signedP(now.net), " points"), now.chg != null && React.createElement(React.Fragment, null, " \xB7 ", rdArrow(now.chg), " ", Math.abs(now.chg).toFixed(1), " on a month ago", now.changeSig ? ", a significant " + (now.chg < 0 ? "fall" : "rise") : now.changeSig === false ? ", within the margin" : ""), lowest ? " · the lowest since May 2025" : highest ? " · the highest since May 2025" : ""), React.createElement("div", {
     className: "card rd-card rd-dir-chart"
   }, React.createElement("div", {
     className: "rd-chead"

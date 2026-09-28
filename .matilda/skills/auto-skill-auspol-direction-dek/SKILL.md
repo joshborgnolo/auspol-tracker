@@ -92,7 +92,7 @@ movement wording.
   "up from M.M in ‹base›, before Bondi" — GAP (distance-between-lines)
   framing, which the net-framed dek does not replace; don't "align" the two.
 - Footer (~:881): house-credit counts ("Most readings are ‹top›'s weekly
-  poll: n of the m since the election").
+  poll: n of the m since May 2025").
 
 ## Single home — legacy panel is different copy
 
