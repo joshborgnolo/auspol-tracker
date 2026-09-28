@@ -443,8 +443,8 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, onBack, backLabel }) {
           </div>
         )}
         <div className="rd-apd-links">
-          {relUrl && <a className="rd-link" href={relUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>Read the release <span aria-hidden="true" className="rd-apd-ext">↗</span></a>}
-          {p.methodUrl && <a className="rd-link" href={p.methodUrl} target="_blank" rel="noopener noreferrer" title={"This poll’s Australian Polling Council methodology statement" + (p.methodUrl === relUrl ? ", part of the release" : "")} onClick={(e) => e.stopPropagation()}>APC methodology <span aria-hidden="true" className="rd-apd-ext">↗</span></a>}
+          {relUrl && <a className="rd-link rd-link-ext" href={relUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}><span className="rd-link-t">Read the release</span> <span aria-hidden="true" className="rd-apd-ext">↗</span></a>}
+          {p.methodUrl && <a className="rd-link rd-link-ext" href={p.methodUrl} target="_blank" rel="noopener noreferrer" title={"This poll’s Australian Polling Council methodology statement" + (p.methodUrl === relUrl ? ", part of the release" : "")} onClick={(e) => e.stopPropagation()}><span className="rd-link-t">APC methodology</span> <span aria-hidden="true" className="rd-apd-ext">↗</span></a>}
           <a className="rd-link" href={report} onClick={(e) => e.stopPropagation()}>Report an error</a>
           {onBack && <button type="button" className="rd-link" onClick={(e) => { e.stopPropagation(); onBack(); }}>Back to {backLabel || "the chart"}</button>}
         </div>

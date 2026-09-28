@@ -3217,6 +3217,8 @@ body.rd .rd-qpanel .rd-qnote { font-size: 12px; color: var(--ink-3); margin-top:
 body.rd .rd-qpanel a { display: inline-flex; min-height: 44px; align-items: center; font-weight: 500; color: var(--ink); }
 body.rd .rd-link { all: unset; cursor: pointer; min-height: 44px; padding: 0 4px; display: inline-flex; align-items: center; font-weight: 500; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 body.rd .rd-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+body.rd .rd-link-ext { text-decoration: none; }
+body.rd .rd-link-ext .rd-link-t { text-decoration: underline; text-underline-offset: 3px; }
 body.rd .site-head { border-bottom: 0; padding-bottom: 0; margin-bottom: 16px; align-items: flex-start; }
 body.rd .wordmark, body.rd .wm-name, body.rd .wordmark.stacked .wm-track { font-size: 34px; }
 body.rd .wordmark.stacked .wm-track { color: var(--ink-2); }
@@ -58440,9 +58442,10 @@ function RdDirection({
   const head = plainShare(big) + " say the country is " + (wrongLeads ? "on the wrong track" : "heading in the right direction") + (most ? ", the most this term" : "");
   const first = M[0];
   const sinceFirst = now.net - first.net;
+  const netVerb = d => d > 0 ? "soared" : "plummeted";
   const netWord = d => d > 0 ? "improved" : "worsened";
   const upDown = d => d > 0 ? "up " : "down ";
-  const dek = (small < 30 ? "Only " : "") + Math.round(small) + "% say it is " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". " + (now.chg == null ? "" : now.changeSig ? "Net mood has " + netWord(now.chg) + " significantly, " + upDown(now.chg) + Math.round(Math.abs(now.chg)) + " points in a month" : "Net mood has not shifted significantly in a month") + (Math.abs(sinceFirst) >= 5 ? now.chg == null ? "Net mood has " + netWord(sinceFirst) + ", " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since the 2025 election." : now.changeSig ? (Math.sign(sinceFirst) === Math.sign(now.chg) ? " and " : " but " + upDown(sinceFirst)) + rdRoughPts(sinceFirst) + " points since the 2025 election." : ", though it is " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since the 2025 election." : ".");
+  const dek = (small < 30 ? "Only " : "") + Math.round(small) + "% say it is " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". " + (now.chg == null ? "" : now.changeSig ? "Net mood has " + netVerb(now.chg) + ", " + upDown(now.chg) + Math.round(Math.abs(now.chg)) + " points in a month" : "Net mood has not shifted significantly in a month") + (Math.abs(sinceFirst) >= 5 ? now.chg == null ? "Net mood has " + netWord(sinceFirst) + ", " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since the 2025 election." : now.changeSig ? (Math.sign(sinceFirst) === Math.sign(now.chg) ? " and " : " but " + upDown(sinceFirst)) + rdRoughPts(sinceFirst) + " points since the 2025 election." : ", though it is " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since the 2025 election." : ".");
   const lowest = now.net <= Math.min(...M.map(d => d.net)) + 0.05;
   const highest = now.net >= Math.max(...M.map(d => d.net)) - 0.05;
   const signedP = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
@@ -61471,22 +61474,26 @@ function RdPolls({
         window.AP.openPoll(key, facet, "latest and next polls");
       }
     }, "Open in All polls \u2192"), r.url && React.createElement("a", {
-      className: "rd-link",
+      className: "rd-link rd-link-ext",
       href: r.url,
       target: "_blank",
       rel: "noopener noreferrer",
       onClick: ev => ev.stopPropagation()
-    }, "Read the release ", React.createElement("span", {
+    }, React.createElement("span", {
+      className: "rd-link-t"
+    }, "Read the release"), " ", React.createElement("span", {
       className: "rd-apd-ext",
       "aria-hidden": "true"
     }, "\u2197")), r.methodUrl && React.createElement("a", {
-      className: "rd-link",
+      className: "rd-link rd-link-ext",
       href: r.methodUrl,
       target: "_blank",
       rel: "noopener noreferrer",
       title: "This poll’s Australian Polling Council methodology statement" + (r.methodUrl === r.url ? ", part of the release" : ""),
       onClick: ev => ev.stopPropagation()
-    }, "APC methodology ", React.createElement("span", {
+    }, React.createElement("span", {
+      className: "rd-link-t"
+    }, "APC methodology"), " ", React.createElement("span", {
       className: "rd-apd-ext",
       "aria-hidden": "true"
     }, "\u2197")))), pj && React.createElement("div", {
@@ -63441,22 +63448,26 @@ function RdApDetail({
   }, p.seats.p[k.id].est)))))), React.createElement("div", {
     className: "rd-apd-links"
   }, relUrl && React.createElement("a", {
-    className: "rd-link",
+    className: "rd-link rd-link-ext",
     href: relUrl,
     target: "_blank",
     rel: "noopener noreferrer",
     onClick: e => e.stopPropagation()
-  }, "Read the release ", React.createElement("span", {
+  }, React.createElement("span", {
+    className: "rd-link-t"
+  }, "Read the release"), " ", React.createElement("span", {
     "aria-hidden": "true",
     className: "rd-apd-ext"
   }, "\u2197")), p.methodUrl && React.createElement("a", {
-    className: "rd-link",
+    className: "rd-link rd-link-ext",
     href: p.methodUrl,
     target: "_blank",
     rel: "noopener noreferrer",
     title: "This poll’s Australian Polling Council methodology statement" + (p.methodUrl === relUrl ? ", part of the release" : ""),
     onClick: e => e.stopPropagation()
-  }, "APC methodology ", React.createElement("span", {
+  }, React.createElement("span", {
+    className: "rd-link-t"
+  }, "APC methodology"), " ", React.createElement("span", {
     "aria-hidden": "true",
     className: "rd-apd-ext"
   }, "\u2197")), React.createElement("a", {
