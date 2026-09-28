@@ -3663,6 +3663,8 @@ body.rd .view-how { margin-top: 16px; }
   body.rd .rd-dir-bar { height: 14px; }
   body.rd .rd-dir-net { margin-top: 32px; font-size: 14px; }
   body.rd .rd-dir-chart { margin-top: 28px; }
+  body.rd .rd-dir-uns > span { top: auto; bottom: calc(100% + 14px); left: calc(50% + 6px); transform: none; }
+  body.rd .rd-dir-uns > span::before { content: ""; position: absolute; left: -6px; top: calc(100% - 2px); height: 16px; border-left: 1px solid var(--ink-3); }
 }
 body.rd .rd-wv-tabs { margin-top: 28px; }
 body.rd .rd-chips { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
