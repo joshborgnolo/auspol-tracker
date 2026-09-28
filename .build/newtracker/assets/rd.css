@@ -730,6 +730,9 @@ body.rd .rd-ld-grid.one { grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 1001px) {
   body.rd .rd-ld-grid:not(.one) > .rd-ld-panel { display: grid; grid-row: span 9; grid-template-rows: subgrid; align-content: start; }
   body.rd .rd-ld-grid:not(.one) .rd-dp { margin-top: 20px; }
+  /* here too the panel heads sit straight under the dek, as they do stacked:
+     the 48px below belongs between the two panels once one follows the other */
+  body.rd .rd-ld-grid > .rd-ld-panel .rd-sub { margin-top: 20px; }
 }
 body.rd .rd-ld-panel.rd-hidden { display: none; }
 body.rd .rd-ld-panel .rd-sub { margin-top: 48px; }

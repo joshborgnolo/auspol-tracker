@@ -301,19 +301,23 @@ function RdLeadership({ rangeId }) {
     if (a == null || o == null || net == null || !first) return null;
     const fall = first.alb_net - net;
     const leads = a > o;
-    const nets = RD_LEAD_ORDER.map((id) => ({ id, v: get(id + "_net") })).filter((x) => x.v != null);
-    const lowest = nets.length === 3 && nets.every((x) => x.v >= net);
     const round5 = (v) => Math.round(v / 5) * 5;
     const head = (leads ? pm.short + " still leads as preferred PM" : opp.short + " leads as preferred PM")
       + (Math.abs(fall) >= 10 ? ", but his net approval has " + (fall > 0 ? "fallen " : "risen ") + round5(Math.abs(fall)) + " points" : "");
     const leyRows = LM.filter((r) => r.alb_pref != null && r.ley_pref != null);
     const leyLead = leyRows.length ? leyRows.reduce((s, r) => s + r.alb_pref - r.ley_pref, 0) / leyRows.length : null;
-    let dek = (leads ? "He leads " : "He trails ") + opp.short + " " + r1(Math.max(a, o)) + "–" + r1(Math.min(a, o))
-      + (aH != null && h != null ? " and " + han.short + " " + r1(Math.max(aH, h)) + "–" + r1(Math.min(aH, h)) : "") + " head to head";
-    if (leyLead != null && leads && leyLead - (a - o) >= 4)
-      dek += ", but his lead over the Coalition leader has shrunk from about " + r1(leyLead) + " points under Ley to about " + r1(a - o) + " under " + opp.short;
-    dek += ". His net approval is " + (fall > 0 ? "down" : "up") + " about " + round5(Math.abs(fall)) + " points since the election, to " + signed0(net)
-      + (lowest ? ", the lowest of the three." : ".");
+    const hanLead = aH != null && h != null ? aH - h : null;
+    /* "held steady since it was first measured": the running lead sits within
+       a poll's noise of the contest's first monthly reading */
+    const hanRows = LM.filter((r) => r.alb_prefH != null && r.hanson_prefH != null);
+    const hanSteady = hanLead != null && hanRows.length > 0 && Math.abs(hanLead - (hanRows[0].alb_prefH - hanRows[0].hanson_prefH)) <= 4;
+    let dek = leyLead != null && leads && leyLead - (a - o) >= 4
+      ? "His lead over the opposition leader has narrowed from " + signed0(leyLead) + " under Ley to " + signed0(a - o) + " under " + opp.short + "."
+      : ((leads ? "He leads " : "He trails ") + opp.short + " " + r1(Math.max(a, o)) + "–" + r1(Math.min(a, o)) + " head to head.");
+    if (hanLead != null && hanLead > 0)
+      dek += " Over " + han.short + (hanLead > a - o ? " his lead is greater (" : " he leads by ")
+        + signed0(hanLead) + (hanLead > a - o ? ")" : " points")
+        + (hanSteady ? ", and has held steady since it was first measured." : ".");
     return { head, dek };
   })();
 
