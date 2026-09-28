@@ -14,7 +14,14 @@ extracted_at: '2026-09-24T06:59:15.806Z'
   + `onSourceWaves` for the per-wave rates).
 - **Panel JSX:** `a11e1559` asset ~:1540-1660 (h2 "Where One Nation's new
   voters came from"; verdict line "{a}% of One Nation's gain came from people
-  who voted for X in 2025"; `openTerm("vote-switching", …)`).
+  who voted for X in 2025"; `openTerm("vote-switching", …)`). With the
+  redesign on, `RdSwitching` in rd-panels.jsx (~:1377) renders instead; its
+  dek has been HAND-CURATED since 2026-09-28 (user's wording: "Coalition
+  voters have flocked to One Nation at about 2.5 times the rate of Labor
+  voters. Almost two in five 2025 Coalition voters now say they'd vote for
+  One Nation."), same RD_DEMO_HOME convention — refresh by hand when the
+  pooled rates move; the figures no longer regenerate. The `head` above it
+  stays data-driven.
 - **Glossary / Info:** `d1a1d215` ~:5212-5216 (all-polls table columns for
   `p.sw.{lnp,alp,grn,oth,onp}`), and the `vote-switching` term + "A check."
   paragraph (~:6280-6296) whose identity is kept-ON + each group's switch

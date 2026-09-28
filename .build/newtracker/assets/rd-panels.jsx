@@ -1405,15 +1405,12 @@ function RdSwitching({ rangeId }) {
   const top = cols.slice().sort((a, b) => b.gain - a.gain)[0];
   const lnp = cols.find((c) => c.id === "lnp"), alp = cols.find((c) => c.id === "alp");
   const head = top ? rdCap(rdFraction(top.gain)) + " of One Nation’s new voters backed " + (top.id === "lnp" ? "the Coalition" : top.id === "alp" ? "Labor" : top.id === "grn" ? "the Greens" : "another party") + " in 2025" : null;
-  const dek = (() => {
-    if (!lnp || !alp) return null;
-    const hiC = lnp.rate >= alp.rate ? lnp : alp, loC = hiC === lnp ? alp : lnp;
-    const nm = (c) => (c.id === "lnp" ? "Coalition" : "Labor");
-    let s = plainShare(hiC.rate) + " 2025 " + nm(hiC) + " voters now say they’d vote One Nation, " + timesWords(hiC.rate / loC.rate) + " " + nm(loC) + "’s rate.";
-    if (Math.abs(lnp.w - alp.w) / Math.max(lnp.w, alp.w) < 0.15)
-      s += " The two parties won similar shares in 2025, so that difference in rates accounts for almost the whole gap.";
-    return s;
-  })();
+  /* Hand-curated dek (user's wording, 2026-09-28), same convention as
+     RD_DEMO_HOME: refresh by hand when the pooled rates move — the figures
+     no longer regenerate. */
+  const dek = (!lnp || !alp) ? null
+    : "Coalition voters have flocked to One Nation at about 2.5 times the rate of Labor voters. "
+    + "Almost two in five 2025 Coalition voters now say they’d vote for One Nation.";
 
   /* ---- the rates, month by month -------------------------------------------- */
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
