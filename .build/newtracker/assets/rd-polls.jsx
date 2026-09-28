@@ -402,6 +402,24 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     </span>
   );
 
+  /* up/down pollster to pollster: with a row focused, an arrow steps the
+     focus a row; when the row was open, the expanded readout travels with it
+     (clamped at the ends). Enter or space opens and closes from the keyboard. */
+  const plRef = React.useRef(null);
+  const rowNav = (e, i) => {
+    if (e.target !== e.currentTarget) return;
+    const r = sorted[i].poll, isOpen = open === r.pollster;
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(isOpen ? null : r.pollster); return; }
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const j = i + (e.key === "ArrowDown" ? 1 : -1);
+    const nx = sorted[j];
+    if (!nx) return;
+    if (isOpen) setOpen(nx.poll.pollster);
+    const rows = plRef.current ? plRef.current.querySelectorAll(".rd-pl-item > .rd-pl-row") : [];
+    if (rows[j]) rows[j].focus();
+  };
+
   return (
     <RdSec id="latest-polls" cls="rd-polls" facet={facet} title="Latest and next polls"
            meta={entries.length + " pollsters, latest release " + (narrow ? dm(newest.pubMs) : wdm(newest.pubMs))}>
@@ -414,7 +432,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
         {!narrow && controls}
       </RdTabs>
       {narrow && controls && <div className="rd-pl-ctlrow">{controls}</div>}
-      <div className="rd-pl" role="table" aria-label="Latest poll and next expected release, by pollster">
+      <div className="rd-pl" role="table" aria-label="Latest poll and next expected release, by pollster" ref={plRef}>
         <div className="rd-pl-head" role="row">
           <span role="columnheader" className="rd-pl-c-name">
             <button type="button" className="rd-pl-sort" onClick={() => onSort("pollster")}>Pollster</button></span>
@@ -429,12 +447,12 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
             <button type="button" className={"rd-pl-sort" + (sort.key === "next" ? " on" : "")} onClick={() => onSort("next")}>Next, at the earliest <span aria-hidden="true">{caret("next")}</span></button></span>
           <span className="rd-pl-c-exp" aria-hidden="true"></span>
         </div>
-        {sorted.map((e) => {
+        {sorted.map((e, i) => {
           const r = e.poll, isOpen = open === r.pollster, nx = nextWords(e);
           const cad = cadWords(e);
           return (
             <div key={r.pollster} className={"rd-pl-item" + (isOpen ? " open" : "") + (e.stale ? " stale" : "")}>
-              <div className="rd-pl-row" role="row" onClick={() => setOpen(isOpen ? null : r.pollster)}>
+              <div className="rd-pl-row" role="row" onClick={() => setOpen(isOpen ? null : r.pollster)} tabIndex={0} aria-expanded={isOpen} onKeyDown={(ev) => rowNav(ev, i)}>
                 <span role="cell" className="rd-pl-c-name">
                   <span className="rd-pl-main">
                     {e.next && e.next.site

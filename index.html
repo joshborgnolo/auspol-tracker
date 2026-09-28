@@ -3478,6 +3478,7 @@ body.rd .rd-pl-primh { font-size: 12px; letter-spacing: 0.02em; }
 body.rd .rd-pl-item { border-bottom: 1px solid var(--line); }
 body.rd .rd-pl-row { padding: 0 8px; min-height: 64px; cursor: pointer; }
 body.rd .rd-pl-row:hover { background: var(--surface-2); }
+body.rd .rd-pl-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 body.rd .rd-pl-item.open > .rd-pl-row { background: var(--surface-2); }
 body.rd .rd-pl-row > [role="cell"] { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 10px 0; }
 body.rd .rd-pl-row > .rd-pl-c-tl { align-self: stretch; padding: 0; justify-content: center; }
@@ -4376,6 +4377,7 @@ body.rd .rd-ap-mpic { grid-column: 6; align-self: stretch; min-height: 22px; }
 body.rd .rd-ap-row { display: grid; align-items: center; min-height: 58px; border-bottom: 1px solid var(--line-2); cursor: pointer; }
 body.rd .rd-ap-row > * { min-width: 0; }
 body.rd .rd-ap-row:hover, body.rd .rd-ap-row.open { background: var(--surface-2); --rd-rowbg: var(--surface-2); }
+body.rd .rd-ap-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 body.rd .rd-ap-row.open { border-bottom-color: transparent; }
 body.rd .rd-ap-row.arrived { box-shadow: inset 3px 0 0 var(--accent); }
 body.rd .rd-ap-who, body.rd .rd-ap-when, body.rd .rd-ap-fig { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
@@ -4564,6 +4566,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-mlab span { font-size: 12px; }
   body.rd .rd-ap-mavg { margin-left: auto; font-size: 12px; }
   body.rd .rd-ap-card { padding: 11px 0 8px; border-bottom: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
+  body.rd .rd-ap-card:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   body.rd .rd-ap-card.open { border-bottom-color: transparent; }
   body.rd .rd-ap-card.arrived { box-shadow: inset 3px 0 0 var(--accent); padding-left: 8px; }
   body.rd .rd-ap-c1, body.rd .rd-ap-c2 { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
@@ -63109,6 +63112,25 @@ function RdPolls({
   })), React.createElement("p", {
     className: "rd-qnote"
   }, "The switch changes the whole page, the headline figures included.")));
+  const plRef = React.useRef(null);
+  const rowNav = (e, i) => {
+    if (e.target !== e.currentTarget) return;
+    const r = sorted[i].poll,
+      isOpen = open === r.pollster;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setOpen(isOpen ? null : r.pollster);
+      return;
+    }
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const j = i + (e.key === "ArrowDown" ? 1 : -1);
+    const nx = sorted[j];
+    if (!nx) return;
+    if (isOpen) setOpen(nx.poll.pollster);
+    const rows = plRef.current ? plRef.current.querySelectorAll(".rd-pl-item > .rd-pl-row") : [];
+    if (rows[j]) rows[j].focus();
+  };
   return React.createElement(RdSec, {
     id: "latest-polls",
     cls: "rd-polls",
@@ -63132,7 +63154,8 @@ function RdPolls({
   }, controls), React.createElement("div", {
     className: "rd-pl",
     role: "table",
-    "aria-label": "Latest poll and next expected release, by pollster"
+    "aria-label": "Latest poll and next expected release, by pollster",
+    ref: plRef
   }, React.createElement("div", {
     className: "rd-pl-head",
     role: "row"
@@ -63182,7 +63205,7 @@ function RdPolls({
   }, caret("next")))), React.createElement("span", {
     className: "rd-pl-c-exp",
     "aria-hidden": "true"
-  })), sorted.map(e => {
+  })), sorted.map((e, i) => {
     const r = e.poll,
       isOpen = open === r.pollster,
       nx = nextWords(e);
@@ -63193,7 +63216,10 @@ function RdPolls({
     }, React.createElement("div", {
       className: "rd-pl-row",
       role: "row",
-      onClick: () => setOpen(isOpen ? null : r.pollster)
+      onClick: () => setOpen(isOpen ? null : r.pollster),
+      tabIndex: 0,
+      "aria-expanded": isOpen,
+      onKeyDown: ev => rowNav(ev, i)
     }, React.createElement("span", {
       role: "cell",
       className: "rd-pl-c-name"
@@ -65638,6 +65664,24 @@ function RdAllPolls(P) {
     nShown = flat.length;
   }
   const more = nShown < sorted.length;
+  const visRows = byDate ? groups.flatMap(g => g.list) : flat;
+  const rowNav = (e, p) => {
+    if (e.target !== e.currentTarget) return;
+    const id = rowKey(p);
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setOpen(open === id ? null : id);
+      return;
+    }
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const j = visRows.indexOf(p) + (e.key === "ArrowDown" ? 1 : -1);
+    const nx = visRows[j];
+    if (!nx) return;
+    if (open === id) setOpen(rowKey(nx));
+    const rows = bodyRef.current ? bodyRef.current.querySelectorAll(phone ? ".rd-ap-card" : ".rd-ap-row") : [];
+    if (rows[j]) rows[j].focus();
+  };
   const sentRef = useRef(null),
     headRef = useRef(null),
     searchRef = useRef(null);
@@ -66241,7 +66285,9 @@ function RdAllPolls(P) {
         className: "rd-ap-card " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : ""),
         role: "row",
         "aria-expanded": isOpen,
-        onClick: toggle
+        onClick: toggle,
+        tabIndex: 0,
+        onKeyDown: e => rowNav(e, p)
       }, React.createElement("div", {
         className: "rd-ap-c1"
       }, React.createElement("span", {
@@ -66270,7 +66316,9 @@ function RdAllPolls(P) {
       className: "rd-ap-row " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : ""),
       role: "row",
       "aria-expanded": isOpen,
-      onClick: toggle
+      onClick: toggle,
+      tabIndex: 0,
+      onKeyDown: e => rowNav(e, p)
     }, pollsterCell(p), fieldCell(p), sampleCell(p), React.createElement("span", null), figs, pic, val, facet === "twopp" && React.createElement("span", null), React.createElement("button", {
       type: "button",
       className: "rd-ap-chev" + (isOpen ? " open" : ""),
@@ -69694,6 +69742,29 @@ function App() {
       document.removeEventListener("touchend", onEnd);
       document.removeEventListener("touchcancel", onCancel);
     };
+  }, []);
+  React.useEffect(() => {
+    const onKey = e => {
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      const a = document.activeElement;
+      if (a && a !== document.body && a !== document.documentElement) return;
+      if (document.querySelector(".rd-qpanel, .term-pop")) return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const {
+        tab: cur,
+        goTab: go
+      } = swipeRef.current;
+      const ids = TABS.map(x => x.id);
+      const next = ids[ids.indexOf(cur) + (e.key === "ArrowRight" ? 1 : -1)];
+      if (next) {
+        e.preventDefault();
+        go(next);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
   }, []);
   const npJumpRef = useRef(false);
   const npScrollNow = () => {

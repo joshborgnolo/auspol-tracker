@@ -2182,6 +2182,30 @@ function App() {
     };
   }, []);
 
+  /* The same page turn, from the keyboard: left and right arrows walk the
+     four pages when nothing on the page holds the focus. A focused control
+     keeps its own arrows (its handler ran first if it had one; the navbar's
+     tab walk and every rdTabsKey row cover the rest), an open "?" or
+     glossary panel keeps the page put, and a live text selection keeps the
+     collapse-to-end behaviour. Clamps at either end, like the swipe. */
+  React.useEffect(() => {
+    const onKey = (e) => {
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      const a = document.activeElement;
+      if (a && a !== document.body && a !== document.documentElement) return;
+      if (document.querySelector(".rd-qpanel, .term-pop")) return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const { tab: cur, goTab: go } = swipeRef.current;
+      const ids = TABS.map((x) => x.id);
+      const next = ids[ids.indexOf(cur) + (e.key === "ArrowRight" ? 1 : -1)];
+      if (next) { e.preventDefault(); go(next); }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   /* The navbar's "Next" label is a jump to the NextPollsPanel, which sits
      second-to-last on the snapshot view (undecided is the foot). When the
      reader is on another tab the scroll has to wait for the snapshot to

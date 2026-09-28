@@ -674,6 +674,24 @@ function RdAllPolls(P) {
   }
   const more = nShown < sorted.length;
 
+  /* up/down poll to poll: with a row focused, an arrow steps the focus to the
+     next poll (month dividers don't count, and the walk clamps at the last
+     shown row); when the row was open, the open detail travels with the focus */
+  const visRows = byDate ? groups.flatMap((g) => g.list) : flat;
+  const rowNav = (e, p) => {
+    if (e.target !== e.currentTarget) return;
+    const id = rowKey(p);
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(open === id ? null : id); return; }
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const j = visRows.indexOf(p) + (e.key === "ArrowDown" ? 1 : -1);
+    const nx = visRows[j];
+    if (!nx) return;
+    if (open === id) setOpen(rowKey(nx));
+    const rows = bodyRef.current ? bodyRef.current.querySelectorAll(phone ? ".rd-ap-card" : ".rd-ap-row") : [];
+    if (rows[j]) rows[j].focus();
+  };
+
   /* ---- the pinned bar: the headings stay in view all the way down ---------- */
   const sentRef = useRef(null), headRef = useRef(null), searchRef = useRef(null);
   const [pinned, setPinned] = useState(false);
@@ -939,7 +957,7 @@ function RdAllPolls(P) {
       const sub = [p.client, fieldTxt(p), p.sample != null ? p.sample.toLocaleString() : null].filter(Boolean).join(", ");
       return (
         <React.Fragment key={id}>
-          <div className={"rd-ap-card " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle}>
+          <div className={"rd-ap-card " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle} tabIndex={0} onKeyDown={(e) => rowNav(e, p)}>
             <div className="rd-ap-c1">
               <span className="rd-ap-firm">{p.url ? <a href={p.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{p.pollster}<span className="rd-ap-ext" aria-hidden="true">↗</span></a> : p.pollster}</span>
               <span className="rd-grow"></span>{right1}
@@ -953,7 +971,7 @@ function RdAllPolls(P) {
     }
     return (
       <React.Fragment key={id}>
-        <div className={"rd-ap-row " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle}>
+        <div className={"rd-ap-row " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle} tabIndex={0} onKeyDown={(e) => rowNav(e, p)}>
           {pollsterCell(p)}{fieldCell(p)}{sampleCell(p)}<span></span>
           {figs}{pic}{val}{facet === "twopp" && <span></span>}
           <button type="button" className={"rd-ap-chev" + (isOpen ? " open" : "")} aria-expanded={isOpen}
