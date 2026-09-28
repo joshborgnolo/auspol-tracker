@@ -457,15 +457,28 @@ function RdLeadership({ rangeId }) {
 
   /* ---- preferred PM: the charts ----------------------------------------- */
   const pts = filterPts(LM, xDomain[0]);
+  /* The charts' data only changes with the range and the screen, and a
+     switch re-renders this panel on every frame, so each set of lines and
+     dots is built once and kept - which also lets a switch's blend find the
+     pair of views it lined up on the frame before. */
+  const memo = React.useRef({ key: null, m: new Map() });
+  const memoKey = xDomain[0] + "|" + xDomain[1] + "|" + narrow;
+  if (memo.current.key !== memoKey) memo.current = { key: memoKey, m: new Map() };
+  const kept = (k, f) => { const mm = memo.current.m; if (!mm.has(k)) mm.set(k, f()); return mm.get(k); };
   const handover = (D.events || []).find((e) => e.date === "2026-02-12");
   const evs = handover ? [{ ...handover, short: "Ley → Taylor" }] : [];
   /* each month's lead is its polls' own margins averaged (gen-data's
      lead_*), so its 95% band carries a margin's variance rather than two
      shares' bands stacked as if they were independent */
   const run = (k) => pts.filter((r) => r[k] != null).map((r) => ({ x: r.x, y: r[k], ym: r.ym, ci: r[k + "Ci"] }));
+  /* mid-switch a line's points carry its band's own edges (ciLo/ciHi, see
+     blendRows), which the band is drawn from */
   const bandsOf = (series) => series.map((s) => ({
-    id: "ci-" + s.id, color: s.color, className: "ci-band", edge: false, clipX: s.clipX,
-    points: s.points.filter((p) => p.ci != null).map((p) => ({ x: p.x, y0: p.y - p.ci, y1: p.y + p.ci })),
+    id: "ci-" + s.id, color: s.color, className: "ci-band", edge: false, clipX: s.ciClip || s.clipX,
+    wipeOf: s.wipe != null ? s.id : undefined,
+    points: s.points.some((p) => p.ciHi != null)
+      ? s.points.filter((p) => p.ciHi != null && p.ciLo != null).map((p) => ({ x: p.x, y0: p.ciLo, y1: p.ciHi }))
+      : s.points.filter((p) => p.ci != null).map((p) => ({ x: p.x, y0: p.y - p.ci, y1: p.y + p.ci })),
   })).filter((a) => a.points.length >= 2);
   const ciRows = (series, i, spine) => {
     const r = spine[i];
@@ -473,16 +486,16 @@ function RdLeadership({ rangeId }) {
     const cs = series.map((s) => { const p = s.points.find((q) => q.ym === r.ym); return p && p.ci != null ? s.label + " ±" + p.ci.toFixed(1) : null; }).filter(Boolean);
     return cs.length ? [{ label: "95% intervals", value: cs.join(", ") }] : [];
   };
-  const leadSeries = [
+  const leadSeries = kept("leadSeries", () => [
     { id: "ley", label: "over Ley", color: opp.color, points: run("lead_ley"), rdWidth: 2.5, endCap: false },
     /* the lines are named at their ends on a phone too, as the canvas drew
        them: no key under the chart names them */
     { id: "taylor", label: "over " + opp.short, color: opp.color, points: run("lead_taylor"), rdWidth: 2.5, endLabel: "over " + opp.short },
     { id: "hanson", label: "over " + han.short, color: han.color, points: run("lead_hanson"), rdWidth: 2.5, endLabel: "over " + han.short },
-  ].filter((s) => s.points.length);
+  ].filter((s) => s.points.length));
   /* each poll's own lead in each head-to-head it asked: the opposition
      leader ("at") and Hanson ("ah"), never the three-way */
-  const leadDots = D.individualPolls.filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
+  const leadDots = kept("leadDots", () => D.individualPolls.filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
     .flatMap((q) => ["at", "ah"].map((mode) => {
       const c = ppmMatch(q, mode);
       if (!c || c.alb == null) return null;
@@ -490,7 +503,7 @@ function RdLeadership({ rangeId }) {
       if (!o || c[o] == null) return null;
       return { x: q.x, y: c.alb - c[o], color: o === "hanson" ? han.color : opp.color, who: o,
                label: "Albanese over " + (o === "hanson" ? "Hanson" : o === "ley" ? "Ley" : opp.short), meta: q };
-    })).filter(Boolean);
+    })).filter(Boolean));
   const bandVals = (series) => series.flatMap((s) => s.points.flatMap((p) => (p.ci != null ? [p.y - p.ci, p.y + p.ci] : [p.y])));
   const leadVals = bandVals(leadSeries).concat(leadDots.map((d) => d.y));
   const leadFit = fitDomain(leadVals.length ? leadVals : [0, 20], 10, 0);
@@ -499,18 +512,18 @@ function RdLeadership({ rangeId }) {
     const pk = leyPeak.points.reduce((m, p) => (p.y > m.y ? p : m), leyPeak.points[0]);
     return [{ x: pk.x, y: pk.y, dy: -9, text: "over Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 }];
   })() : [];
-  const threeSeries = (() => {
+  const threeSeries = kept("threeSeries", () => {
     return [
       { id: "alb", label: pm.short, color: pm.color, points: run("alb_pref3"), rdWidth: 2.5, endLabel: pm.short },
       { id: "hanson", label: han.short, color: han.color, points: run("hanson_pref3"), rdWidth: 2.5, endLabel: han.short },
       { id: "ley", label: "Ley", color: opp.color, points: run("ley_pref3"), rdWidth: 2.5, endCap: true },
       { id: "taylor", label: opp.short, color: opp.color, points: run("taylor_pref3"), rdWidth: 2.5, endLabel: opp.short },
     ].filter((s) => s.points.length);
-  })();
+  });
   const firstThree = threeSeries.length ? Math.min(...threeSeries.map((s) => s.points[0].x)) : null;
   /* each poll's three-way shares, one dot per leader in his or her colour -
      the spread the key tells readers to expect, shown rather than asserted */
-  const threeDots = D.individualPolls.filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
+  const threeDots = kept("threeDots", () => D.individualPolls.filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
     .flatMap((q) => {
       const c = ppmMatch(q, "3");
       if (!c) return [];
@@ -518,7 +531,7 @@ function RdLeadership({ rangeId }) {
       return [["alb", pm.color, pm.short], [oppK, opp.color, oppK === "ley" ? "Ley" : opp.short], ["hanson", han.color, han.short]]
         .filter(([k]) => k && c[k] != null)
         .map(([k, color, label]) => ({ x: q.x, y: c[k], color, label, meta: q, who: k }));
-    });
+    }));
   const threeTop = Math.max(40, Math.ceil(Math.max(...bandVals(threeSeries), ...threeDots.map((d) => d.y), 0) / 10) * 10);
   const leyRun = threeSeries.find((s) => s.id === "ley");
   /* the note on the empty months before the question was first asked sits
@@ -527,7 +540,7 @@ function RdLeadership({ rangeId }) {
      ran it across January and over Hanson's line */
   const threeFrom = (() => { const r = LM.find((m) => m.alb_pref3 != null); return r ? rdMonthYear(r.ym).replace(" ", "\u00a0") : ""; })();
   const threeNotes = [
-    firstThree != null && firstThree - xDomain[0] > 0.2 ? { span: ["left", "data"], y: threeTop * 0.62, text: ["Three-way questions began in " + threeFrom, "First asked in " + threeFrom], cls: "rd-note-it" } : null,
+    firstThree != null && firstThree - xDomain[0] > 0.2 ? { span: ["left", { data: Math.min(firstThree, ...threeDots.filter((d) => d.x >= xDomain[0]).map((d) => d.x)) }], y: threeTop * 0.62, text: ["Three-way questions began in " + threeFrom, "First asked in " + threeFrom], cls: "rd-note-it" } : null,
     leyRun && leyRun.points.length ? { x: leyRun.points[leyRun.points.length - 1].x, y: leyRun.points[leyRun.points.length - 1].y, dy: 18, text: "Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 } : null,
   ].filter(Boolean);
   /* a phone's title runs the chart's width, so the Ley → Taylor flag needs
@@ -591,24 +604,28 @@ function RdLeadership({ rangeId }) {
           const bl = window.AP.blendRows(a[id].points, b[id].points, t, ["y", "ci"]);
           const own = t < 0.5 ? a[id] : b[id];
           // the name fades out and the other view's fades in, crossing at halfway
-          return { ...own, points: bl ? bl.rows : own.points, clipX: bl ? bl.clip : null, endCap: false, endLabelOpacity: Math.abs(1 - 2 * t) };
+          return { ...own, points: bl ? bl.rows : own.points, clipX: bl ? bl.clip : null, ciClip: bl ? bl.clips.ci : null, endLabelOpacity: Math.abs(1 - 2 * t) };
         }
-        return { ...(a[id] || b[id]), wipe: a[id] ? t : 1 - t, endCap: false, endLabelOpacity: a[id] ? 1 - t : t };
+        return { ...(a[id] || b[id]), wipe: a[id] ? t : 1 - t, endLabelOpacity: a[id] ? 1 - t : t };
       });
       cross = window.AP.crossClouds(A.dots, B.dots, t, (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.who);
       dom = window.AP.blendDomain(A.domain, B.domain, t);
     }
+    const A0 = m ? ppmModel(ppmSlot(m.from)) : null;
     return lchart(key, B.title, {
       padPx: ppmPad, yDomain: dom, yTicks: B.yTicks, yTickFmt: B.yTickFmt, refLines: B.refLines,
-      series, areas: bandsOf(series.filter((x) => x.wipe == null)), notes: m ? [] : B.notes,
+      series, areas: bandsOf(series), notes: B.notes,
+      morphFrom: A0 ? { yTicks: A0.yTicks, yTickFmt: A0.yTickFmt, refLines: A0.refLines, notes: A0.notes } : null, morphT: m ? m.t : 1,
       scatter: cross ? cross.scatter : B.dots, scatterOut: cross ? cross.scatterOut : [], scatterMove: cross ? cross.scatterMove : [],
       fade: m ? m.t : 1, pollFacet: "leadership", spine: B.spine, copy: B.copy,
       extraRows: (i) => ciRows(B.series, i, B.spine),
     });
   };
   // one persistent slot, so the chart morphs in place rather than remounting
-  const mainPpmChart = ppmChart("rd-ppm", ppmSlot(ppmView), ppmMorph);
-  const threeChart = ppmChart("rd-three", "three", null);
+  /* each chart element is kept while nothing it draws changes, so a switch
+     in one panel does not rebuild the other panel's chart on every frame */
+  const mainPpmChart = React.useMemo(() => ppmChart("rd-ppm", ppmSlot(ppmView), ppmMorph), [ppmView, ppmMorph, memoKey]);
+  const threeChart = React.useMemo(() => ppmChart("rd-three", "three", null), [memoKey]);
 
   /* ---- net approval and favourability ------------------------------------ */
   const leaders = RD_LEAD_ORDER.map((id) => L[id]).filter(Boolean);
@@ -631,11 +648,11 @@ function RdLeadership({ rangeId }) {
       }));
   };
   const netChart = (mt, key) => {
-    const m = key === "main" ? morph : null;
+    const m = key === "main" || key === "a" ? morph : null;
     const runs = (Ld) => erasOf(Ld).map((era) => {
       if (!m) return { era, rows: lineFor(Ld, mt, era), clip: null };
       const b = window.AP.blendRows(lineFor(Ld, m.from, era), lineFor(Ld, m.to, era), m.t, ["v", "ci"]);
-      return b ? { era, rows: b.rows, clip: b.clip } : { era, rows: lineFor(Ld, mt, era), clip: null };
+      return b ? { era, rows: b.rows, clip: b.clip, ciClip: b.clips.ci } : { era, rows: lineFor(Ld, mt, era), clip: null };
     }).filter((d) => d.rows.length);
     const drawn = leaders.map((Ld) => ({ Ld, runs: runs(Ld) }));
     const series = drawn.flatMap(({ Ld, runs: rs }) => rs.map((d) => ({
@@ -644,8 +661,10 @@ function RdLeadership({ rangeId }) {
       endCap: d.era !== "ley", endLabel: d.era === "ley" ? null : Ld.short,
     })));
     const areas = drawn.flatMap(({ Ld, runs: rs }) => rs.map((d) => ({
-      id: "ci-" + Ld.id + (d.era ? "-" + d.era : ""), color: Ld.color, className: "ci-band", edge: false, clipX: d.clip,
-      points: d.rows.filter((r) => r.ci != null).map((r) => ({ x: r.x, y0: r.v - r.ci, y1: r.v + r.ci })) }))).filter((a) => a.points.length >= 2);
+      id: "ci-" + Ld.id + (d.era ? "-" + d.era : ""), color: Ld.color, className: "ci-band", edge: false, clipX: d.ciClip || d.clip,
+      points: d.ciClip
+        ? d.rows.filter((r) => r.ciHi != null && r.ciLo != null).map((r) => ({ x: r.x, y0: r.ciLo, y1: r.ciHi }))
+        : d.rows.filter((r) => r.ci != null).map((r) => ({ x: r.x, y0: r.v - r.ci, y1: r.v + r.ci })) }))).filter((a) => a.points.length >= 2);
     const cross = m ? window.AP.crossClouds(cloudFor(m.from), cloudFor(m.to), m.t, (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.leader) : null;
     const valsFor = (mm) => leaders.flatMap((Ld) => erasOf(Ld).flatMap((era) => lineFor(Ld, mm, era)).flatMap((d) => d.ci != null ? [d.v - d.ci, d.v + d.ci] : [d.v]))
       .concat(cloudFor(mm).map((d) => d.y));
@@ -655,10 +674,15 @@ function RdLeadership({ rangeId }) {
     const leyRun = drawn.find((d) => d.Ld.id === "taylor");
     const ley = leyRun && leyRun.runs.find((r) => r.era === "ley");
     const notes = ley && ley.rows.length ? [{ x: ley.rows[ley.rows.length - 1].x, y: ley.rows[ley.rows.length - 1].v, dy: 18, text: "Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 }] : [];
-    const spine = (drawn[0] && drawn[0].runs[0] ? drawn[0].runs[0].rows : []);
+    const spine = (drawn[0] && drawn[0].runs[0] ? drawn[0].runs[0].rows.filter((r) => !r.mid) : []);
     const title = (mt === "fav" ? "Favourability" : "Net approval") + ", month by month";
-    return lchart("rd-" + mt + "-" + key, title, {
+    const was = m ? fitFor(m.from).domain : null;
+    /* keyed by its SLOT, not its metric: keyed by metric, an approval <->
+       favourability switch remounted the chart - which fades in from blank -
+       under the very morph that was meant to carry it across */
+    return lchart("rd-appr-" + (key === "b" ? "b" : "main"), title, {
       yDomain: dom, yTicks: rdYTicks(tgt.domain[0], tgt.domain[1], 20),
+      morphFrom: was ? { yTicks: rdYTicks(was[0], was[1], 20), refLines: [{ y: 0, color: "var(--ink-faint)" }], notes: [] } : null, morphT: m ? m.t : 1,
       yTickFmt: (v) => (v === 0 ? "Even" : v > 0 ? "+" + v : "−" + Math.abs(v)),
       refLines: [{ y: 0, color: "var(--ink-faint)" }], series, areas, notes,
       scatter: cross ? cross.scatter : cloudFor(mt), scatterOut: cross ? cross.scatterOut : [], scatterMove: cross ? cross.scatterMove : [],
@@ -672,6 +696,9 @@ function RdLeadership({ rangeId }) {
       extraRows: (i) => { const r = spine[i]; if (!r) return []; const cs = leaders.map((Ld) => { const row = pts.find((p) => p.ym === r.ym); const k = (Ld.id === "taylor" && row && row.taylor_net == null && row.ley_net != null ? "ley" : Ld.id) + "_" + mt + "Ci"; return row && row[k] != null ? "±" + row[k].toFixed(1) : null; }).filter(Boolean); return cs.length ? [{ label: "95% intervals", value: cs.join(", ") }] : []; },
     });
   };
+
+  const apprChart = React.useMemo(() => netChart(metric === "fav" ? "fav" : "net", metric === "both" ? "a" : "main"), [metric, morph, memoKey]);
+  const apprFavChart = React.useMemo(() => netChart("fav", "b"), [memoKey]);
 
   /* the dot plot: now, its 95% interval, and the change */
   const dotRows = (mt) => leaders.map((Ld) => ({ Ld, n: N[Ld.id + "_" + mt] })).filter((r) => r.n);
@@ -769,12 +796,19 @@ function RdLeadership({ rangeId }) {
             {!narrow && expandBtn("ppm", "preferred prime minister")}
           </RdTabs>,
           <>
-            <div className="rd-hbs" ref={hbsRef}>
-              {ppmView !== "three" && two && headBar(two)}
-              {ppmView !== "three" && twoH && headBar(twoH)}
-              {ppmView !== "two" && threeBar}
-            </div>
-            {ppmNote && <p className="rd-note rd-ld-note">{ppmNote}</p>}
+            {/* two bars or one, a note a line longer or shorter: each glides
+                to its height (RdGlide), so the chart under it slides. One
+                wrapper per row of the panel's subgrid, which lines the two
+                panels' rows up; the chart cards stay unwrapped, since their
+                spacing reads the key that follows them. */}
+            <RdGlide watch={ppmView}>
+              <div className="rd-hbs" ref={hbsRef}>
+                {ppmView !== "three" && two && headBar(two)}
+                {ppmView !== "three" && twoH && headBar(twoH)}
+                {ppmView !== "two" && threeBar}
+              </div>
+            </RdGlide>
+            {ppmNote && <RdGlide watch={ppmNote}><p className="rd-note rd-ld-note">{ppmNote}</p></RdGlide>}
             {mainPpmChart}
             {ppmView === "both" && threeChart}
             <RdKey className="rd-ckey" items={[]}>
@@ -792,12 +826,11 @@ function RdLeadership({ rangeId }) {
             {!narrow && expandBtn("appr", "leader ratings")}
           </RdTabs>,
           <>
-            {dotPlot(metric)}
+            <RdGlide watch={metric}>{dotPlot(metric)}</RdGlide>
             {metric === "both" && <RdKey className="rd-dp-key" items={[{ kind: "dot-solid", color: "var(--ink-3)", label: "Approval: the job they’re doing" }, { kind: "dot-open", color: "var(--ink-3)", label: "Favourability: views of them as a person" }]} />}
-            <p className="rd-note rd-ld-note">{apprNote}</p>
-            {metric !== "fav" && netChart(metric === "both" ? "net" : "net", metric === "both" ? "a" : "main")}
-            {metric === "fav" && netChart("fav", "main")}
-            {metric === "both" && netChart("fav", "b")}
+            <RdGlide watch={apprNote}><p className="rd-note rd-ld-note">{apprNote}</p></RdGlide>
+            {apprChart}
+            {metric === "both" && apprFavChart}
             <RdKey className="rd-ckey" items={[
               { kind: "dot", color: "var(--ink-3)", label: "One poll" },
               { kind: "lineband", color: "var(--ink-3)", label: "Monthly average and its 95% interval" },

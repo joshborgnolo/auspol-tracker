@@ -106,8 +106,10 @@ function RdHero(p) {
   );
   const hasBases = (matchup === "alp_lnp" && impOffered) || (matchup === "alp_on" && impOnOffered);
   const onImp = hasBases && b0 === "imp";
+  /* a phone's words are the short ones either way, so flipping the basis
+     keeps the line to one line */
   const basisWords = !hasBases ? (m.real ? "Pollsters’ published figures" : "Published head-to-heads")
-    : onImp ? (narrow ? "Implied flows" : "Implied preference flows") : "Pollsters’ published figures";
+    : onImp ? (narrow ? "Implied flows" : "Implied preference flows") : (narrow ? "As published" : "Pollsters’ published figures");
   const provenance = (
     <>
       {basisWords}, <RdTerm id={adjusted ? "weighted-aggregate" : "monthly-average"} from="two-party preferred"
@@ -262,9 +264,14 @@ function RdHero(p) {
   });
   const yTarget = domainOf(matchup, b0);
   /* a switch that took over from another starts from the window on screen */
-  const yDomain = morph ? blendDomain(morph.fromDomain || domainOf(morph.from, fromB), yTarget, t) : yTarget;
+  const yFrom = morph ? (morph.fromDomain || domainOf(morph.from, fromB)) : null;
+  const yDomain = morph ? blendDomain(yFrom, yTarget, t) : yTarget;
   if (domainRef) domainRef.current = yDomain;
   const yTicks = rdYTicks(yTarget[0], yTarget[1], 5);
+  /* the window being left keeps its own labels until they slide out, "%" on
+     its top one (TrendChart crossfades the two sets) */
+  const yTop = (dm) => Math.floor(dm[1] / 5 + 1e-9) * 5;
+  const yFromTicks = yFrom ? rdYTicks(Math.ceil(yFrom[0] / 5 - 1e-9) * 5, yTop(yFrom), 5) : null;
 
   /* events: the major ones, plus both recent changes of hand – Taylor
      replacing Ley, Joyce joining One Nation – on EVERY contest's view, so
@@ -405,8 +412,15 @@ function RdHero(p) {
         <p className="rd-tpp-verdict">{verdict}</p>
         <p className="rd-tpp-change">{change}</p>
         <p className="rd-tpp-prov">{provenance}{qPanel}
-          {hasBases && !onImp && <>, <button type="button" className="rd-link" onClick={chooseBasis}>Back to implied flows</button></>}
+          {hasBases && !onImp && !narrow && <>, <button type="button" className="rd-link" onClick={chooseBasis}>Back to implied flows</button></>}
         </p>
+        {/* a phone has no room for the way back on the line itself, so it
+            opens a line of its own, gliding (RdGlide) */}
+        {narrow && (
+          <RdGlide className="rd-tpp-back">
+            {hasBases && !onImp ? <button type="button" className="rd-link" onClick={chooseBasis}>Back to implied flows</button> : null}
+          </RdGlide>
+        )}
         {otherContests.length > 0 && (
           <div className="rd-tpp-switch">
             <span className="rd-tpp-switch-l">Switch 2PP</span>
@@ -425,7 +439,7 @@ function RdHero(p) {
         )}
       </div>
 
-      {story && narrow && <RdSub head={story.head} dek={story.dek} level={3} />}
+      {story && narrow && <RdSub head={story.head} dek={story.dek} level={3} glide />}
 
       <div className="card rd-card rd-tpp-chart">
         <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm">
@@ -445,6 +459,8 @@ function RdHero(p) {
           padPx={narrow ? { l: 30, r: 6, t: 34, b: 28 } : { l: 40, r: 16, t: 52, b: 30 }}
           xDomain={xDomain} yDomain={yDomain} yTicks={yTicks}
           yTickFmt={(v) => (v === yTarget[1] ? v + "%" : String(v))}
+          morphFrom={yFrom ? { yTicks: yFromTicks, yTickFmt: (v) => (v === yTop(yFrom) ? v + "%" : String(v)),
+                               refLines: [{ y: 50, color: "var(--ink-faint)" }], notes } : null} morphT={t}
           xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline
           refLines={[{ y: 50, color: "var(--ink-faint)" }]}
           notes={notes} marks={marks} events={events} eventsFrom={eventsWas} eventMix={t}
@@ -455,7 +471,7 @@ function RdHero(p) {
           tooltipTitle={tooltipTitle} extraRows={extraRows}
           fmt={(v) => v.toFixed(1)}
           copy={{ title: chartTitle.replace(/, %$/, ""),
-                  sub: basisWords.replace(/^Implied flows$/, "Implied preference flows") + (unc ? ", weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
+                  sub: basisWords.replace(/^Implied flows$/, "Implied preference flows").replace(/^As published$/, "Pollsters’ published figures") + (unc ? ", weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
                   legend: copyKey.map((k) => ({ label: k.label, color: k.color, kind: k.kind })) }}
         />
         {badges && <RdEventList list={badges.list} from={badgesWas ? badgesWas.list : null} mix={t} />}

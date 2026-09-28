@@ -2820,15 +2820,15 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   .view-lede { font-size: 15px; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .view-enter { animation: view-in .32s cubic-bezier(.25,.6,.3,1) both; }
+  .view-enter { animation: view-in .32s cubic-bezier(.25,.6,.3,1) backwards; }
   @keyframes view-in {
     from { opacity: 0; transform: translateY(7px); }
     to   { opacity: 1; transform: none; }
   }
-  .chart { animation: chart-in .3s ease both; }
+  .chart { animation: chart-in .3s ease backwards; }
   @keyframes chart-in { from { opacity: 0; } to { opacity: 1; } }
   .end-cap { transition: opacity .25s ease, fill .35s ease; }
-  .poll-detail { animation: detail-in .26s cubic-bezier(.25,.6,.3,1) both; }
+  .poll-detail { animation: detail-in .26s cubic-bezier(.25,.6,.3,1) backwards; }
   @keyframes detail-in {
     from { opacity: 0; transform: translateY(-4px); }
     to   { opacity: 1; transform: none; }
@@ -3170,6 +3170,12 @@ body.rd .rd-badge text { font-family: var(--sans); font-weight: 600; fill: var(-
 body.rd .rd-badge-tie { fill: none; stroke: var(--ink-faint); stroke-width: 1; vector-effect: non-scaling-stroke; }
 body.rd .rd-evlist { list-style: none; margin: 12px 0 0; padding: 0; font-size: 13px; color: var(--ink-2); }
 body.rd .chart:has(> .chart-copy-btn) + .rd-evlist { margin-top: 0; }
+body.rd .rd-xf { position: relative; }
+body.rd .rd-xf-was { position: absolute; inset: 0 0 auto 0; pointer-events: none; animation: rd-xf-out .32s var(--morph-ease) both; }
+body.rd .rd-xf-now.in { animation: rd-xf-in .32s var(--morph-ease) both; }
+@keyframes rd-xf-out { to { opacity: 0; } }
+@keyframes rd-xf-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { body.rd .rd-xf-was { display: none; } body.rd .rd-xf-now.in { animation: none; } }
 body.rd .rd-evstack { display: grid; }
 body.rd .rd-evstack > .rd-evlist { grid-area: 1 / 1; }
 body.rd .rd-evlist + .rd-ckey { margin-top: 16px; }
@@ -3299,6 +3305,9 @@ body.rd .rd-tpp-verdict { margin: 14px 0 0; font-size: 17px; line-height: 1.5; c
 body.rd .rd-tpp-verdict b { font-weight: 600; color: var(--ink); }
 body.rd .rd-tpp-change { margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 body.rd .rd-tpp-prov { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-3); }
+body.rd .rd-tpp-prov .rd-link { margin-block: -12px; }
+body.rd .rd-tpp-back { text-align: center; font-size: 12px; }
+body.rd .rd-tpp-back .rd-link { min-height: 32px; }
 body.rd .rd-tpp-switch { margin-top: 12px; display: flex; align-items: center; gap: 12px; }
 body.rd .rd-tpp-switch-l { font-size: 13px; color: var(--ink-3); }
 body.rd .rd-chip-fig { font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -3701,7 +3710,7 @@ body.rd .rd-wv-dot { position: absolute; top: 50%; left: 0; width: 13px; height:
 body.rd .rd-wv-dot { transition: transform .32s var(--morph-ease), background-color .32s ease, border-color .32s ease; }
 body.rd .rd-wv-ci { transition: color .32s ease; }
 body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: transform .32s var(--morph-ease); }
-body.rd .rd-wv-enter > .rd-wv-chart { animation: rd-wv-in .32s ease both; }
+body.rd .rd-wv-enter > .rd-wv-chart { animation: rd-wv-in .32s ease backwards; }
 @keyframes rd-wv-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
   body.rd .rd-wv-dot, body.rd .rd-wv-ci, body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: none; }
@@ -4317,13 +4326,19 @@ body.rd .rd-ap-chev:focus-visible { outline: 2px solid var(--accent); outline-of
 body.rd .rd-ap-pic { position: relative; align-self: stretch; display: block; min-height: 28px; }
 body.rd .rd-ap-gl { top: 0; bottom: 0; width: 1px; margin-left: -0.5px; background: var(--line-2); }
 body.rd .rd-ap-avg { top: 0; bottom: 0; width: 1.5px; margin-left: -0.75px; background: var(--rd-avgline); }
-body.rd .rd-ap-wh { top: 50%; height: 2px; margin-top: -1px; border-radius: 1px; background: var(--rd-whisker); }
-body.rd .rd-ap-clip { top: 50%; width: 0; height: 0; margin-top: -4px; border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+body.rd .rd-ap-wh { top: 50%; height: 2px; margin-top: -1px; border-radius: 1px; background: var(--rd-whisker);
+  transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
+body.rd .rd-ap-clip { top: 50%; width: 0; height: 0; margin-top: -4px; border-top: 4px solid transparent; border-bottom: 4px solid transparent;
+  opacity: 0; transition: opacity .2s ease; }
+body.rd .rd-ap-clip.on { opacity: 1; }
 body.rd .rd-ap-clip.l { left: -7px; border-right: 6px solid var(--rd-whisker); }
 body.rd .rd-ap-clip.r { right: -7px; border-left: 6px solid var(--rd-whisker); }
 body.rd .rd-ap-dot {
   top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%;
-  box-shadow: 0 0 0 1.5px var(--rd-rowbg); transition: left .32s cubic-bezier(.3,.7,.3,1), background-color .32s ease;
+  box-shadow: 0 0 0 1.5px var(--rd-rowbg); transition: left .32s var(--morph-ease), background-color .32s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  body.rd .rd-ap-dot, body.rd .rd-ap-wh, body.rd .rd-ap-clip { transition: none; }
 }
 body.rd .rd-ap-ring {
   top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; box-sizing: border-box;
@@ -40101,6 +40116,68 @@ window.AP = function () {
     };
     return [morph, choose];
   }
+  function useValueMorph(value) {
+    const st = React.useRef({
+      value,
+      morph: null
+    });
+    const raf = React.useRef(0);
+    const land = React.useRef(0);
+    const [, force] = React.useReducer(x => x + 1, 0);
+    const s = st.current;
+    if (value !== s.value) {
+      const cur = s.morph;
+      let from = s.value,
+        resume = 0;
+      if (cur && value === cur.from) {
+        from = cur.to;
+        resume = morphRawOf(1 - cur.t);
+      } else if (cur && cur.t < 0.5 && value !== cur.to) from = cur.from;
+      s.value = value;
+      const start = Math.min(1, resume + FRAME_MS / MORPH_MS);
+      s.morph = reduceMotion() || from === value ? null : {
+        from,
+        to: value,
+        t: morphEase(start),
+        resume,
+        pending: true
+      };
+    }
+    React.useLayoutEffect(() => {
+      const m = st.current.morph;
+      if (!m || !m.pending) return;
+      m.pending = false;
+      clearTimeout(land.current);
+      morphClock(raf, t => {
+        if (st.current.morph === m) {
+          m.t = t;
+          force();
+        }
+      }, () => {
+        if (st.current.morph === m) {
+          st.current.morph = null;
+          force();
+        }
+      }, m.resume);
+      land.current = setTimeout(() => {
+        cancelAnimationFrame(raf.current);
+        if (st.current.morph === m) {
+          st.current.morph = null;
+          force();
+        }
+      }, (1 - m.resume) * MORPH_MS + 200);
+    });
+    React.useEffect(() => () => {
+      cancelAnimationFrame(raf.current);
+      clearTimeout(land.current);
+    }, []);
+    const m = st.current.morph;
+    return m ? {
+      from: m.from,
+      to: m.to,
+      t: m.t
+    } : null;
+  }
   const softKey = k => /^ci/.test(k);
   const monoTangents = (xs, ys) => {
     const n = xs.length,
@@ -40349,6 +40426,7 @@ window.AP = function () {
     morphRawOf,
     reduceMotion,
     useMorph,
+    useValueMorph,
     blendRows,
     crossClouds,
     mixC,
@@ -42310,6 +42388,8 @@ function TrendChart(props) {
     clipX,
     eventsFrom = null,
     eventMix = 1,
+    morphFrom = null,
+    morphT = 1,
     driven = false,
     pollFacet,
     marks = [],
@@ -42323,12 +42403,34 @@ function TrendChart(props) {
     for (let i = 0; i < s.points.length; i++) if (s.points[i].x === x) return s.points[i];
     return null;
   };
+  const visEnd = s => {
+    const pts = s.points,
+      last = pts[pts.length - 1];
+    if (!last || !s.clipX || last.x <= s.clipX[1]) return last;
+    const x = s.clipX[1];
+    for (let i = pts.length - 1; i > 0; i--) {
+      if (pts[i - 1].x <= x) {
+        const a = pts[i - 1],
+          b = pts[i],
+          f = b.x - a.x ? (x - a.x) / (b.x - a.x) : 0;
+        return {
+          x,
+          y: a.y + (b.y - a.y) * f
+        };
+      }
+    }
+    return pts[0];
+  };
   const [winState, setWin] = useState(xDomain);
   const win = driven ? xDomain : winState;
   const winRef = useRef(xDomain);
   const winRaf = useRef(0);
   const prev = useRef(null);
   const travelling = useRef(false);
+  const [winE, setWinE] = useState(1);
+  const yShown = useRef(yDomain);
+  const yTrav = useRef(null);
+  const axisNow = useRef(null);
   React.useEffect(() => () => cancelAnimationFrame(winRaf.current), []);
   React.useLayoutEffect(() => {
     const from = winRef.current,
@@ -42347,22 +42449,36 @@ function TrendChart(props) {
     if (still) {
       winRef.current = to;
       travelling.current = false;
+      yTrav.current = null;
+      setWinE(1);
       setWin(to);
       return;
     }
     travelling.current = true;
     const a = from.slice();
+    const was = axisNow.current;
+    yTrav.current = {
+      from: yShown.current.slice(),
+      ticks: was ? was.yTicks : null,
+      fmt: was ? was.yTickFmt : null,
+      xTicks: was ? was.xTicks : null
+    };
     const at = e => {
       winRef.current = [a[0] + (to[0] - a[0]) * e, a[1] + (to[1] - a[1]) * e];
       setWin(winRef.current);
+      setWinE(e);
     };
     const c = window.AP.morphClock(winRaf, at, () => {
       winRef.current = to;
       travelling.current = false;
+      yTrav.current = null;
+      setWinE(1);
       setWin(to);
     });
     at(c.t);
   }, [xDomain[0], xDomain[1]]);
+  const zoomY = !driven && yTrav.current && winE < 1 ? yTrav.current : null;
+  const yDom = zoomY ? [zoomY.from[0] + (yDomain[0] - zoomY.from[0]) * winE, zoomY.from[1] + (yDomain[1] - zoomY.from[1]) * winE] : yDomain;
   const fresh = {
     series: seriesProp,
     scatter: scatterProp,
@@ -42385,7 +42501,7 @@ function TrendChart(props) {
   const ref = useRef(null);
   const badgeAt = useRef({});
   const [cw, setCw] = useState(VB.W);
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
     const update = () => setCw(el.getBoundingClientRect().width || VB.W);
@@ -42425,8 +42541,16 @@ function TrendChart(props) {
   } = makeScales({
     height,
     xDomain: win,
-    yDomain,
+    yDomain: yDom,
     pad
+  });
+  React.useLayoutEffect(() => {
+    yShown.current = yDom;
+    if (!zoomY && !travelling.current) axisNow.current = {
+      yTicks,
+      yTickFmt,
+      xTicks
+    };
   });
   const [hover, setHover] = useState(null);
   const [dot, setDot] = useState(null);
@@ -42471,8 +42595,10 @@ function TrendChart(props) {
   const spanEdge = (v, j) => {
     if (v === "left") return pad.l + PX(6);
     if (v === "right") return W - pad.r - PX(6);
+    if (v && typeof v === "object" && v.data != null) return j ? sx(v.data) - PX(12) : sx(v.data) + PX(12);
     if (v !== "data") return sx(v);
-    const xs = series.filter(s => s.opacity !== 0 && !(s.wipe >= 1)).flatMap(s => s.points.map(p => p.x)).concat(scatter.map(d => d.x), areas.flatMap(a => (a.points || []).map(p => p.x))).filter(x => x >= win[0] && x <= win[1]);
+    const shown = (x, c) => !c || x >= c[0] && x <= c[1];
+    const xs = series.filter(s => s.opacity !== 0 && !(s.wipe > 0.5)).flatMap(s => s.points.map(p => p.x).filter(x => shown(x, s.clipX))).concat(scatter.map(d => d.x), areas.flatMap(a => (a.points || []).map(p => p.x).filter(x => shown(x, a.clipX)))).filter(x => x >= win[0] && x <= win[1]);
     if (!xs.length) return j ? W - pad.r - PX(6) : pad.l + PX(6);
     return j ? sx(Math.min(...xs)) - PX(12) : sx(Math.max(...xs)) + PX(12);
   };
@@ -42702,12 +42828,12 @@ function TrendChart(props) {
   };
   const hi = hover ? Math.min(hover.index, spinePts.length - 1) : null;
   const hoverX = hi != null && spinePts[hi] ? sx(spinePts[hi].x) : null;
-  const yLabelled = (() => {
-    if (!cw || yTicks.length < 2) return new Set(yTicks);
+  const yLabelledOf = ticks => {
+    if (!cw || ticks.length < 2) return new Set(ticks);
     const NEED = 15;
     const keep = new Set();
     let lastPx = null;
-    for (const t of yTicks.slice().sort((a, b) => b - a)) {
+    for (const t of ticks.slice().sort((a, b) => b - a)) {
       const px = sy(t) * scale;
       if (lastPx == null || Math.abs(px - lastPx) >= NEED) {
         keep.add(t);
@@ -42715,7 +42841,49 @@ function TrendChart(props) {
       }
     }
     return keep;
+  };
+  const yLabelled = yLabelledOf(yTicks);
+  const mf = morphFrom && morphT < 1 ? morphFrom : zoomY && zoomY.ticks ? {
+    yTicks: zoomY.ticks,
+    yTickFmt: zoomY.fmt,
+    refLines,
+    notes,
+    brackets
+  } : null;
+  const mT = !mf ? 1 : morphFrom && morphT < 1 ? morphT : winE;
+  const textOut = t => Math.max(0, Math.min(1, 1 - t / 0.45));
+  const textIn = t => Math.max(0, Math.min(1, (t - 0.3) / 0.7));
+  const wiping = new Set(series.filter(s => s.wipe != null && s.wipe > 0 && s.wipe < 1).map(s => s.id));
+  const wipedOut = new Set(series.filter(s => s.wipe != null && s.wipe >= 1).map(s => s.id));
+  const refKey = r => r.y + "|" + (r.label || "");
+  const refAll = !mf ? refLines : (() => {
+    const was = new Map((mf.refLines || []).map(r => [refKey(r), r]));
+    const out = refLines.map(r => was.has(refKey(r)) ? (was.delete(refKey(r)), r) : {
+      ...r,
+      op: r.label ? textIn(mT) : mT
+    });
+    was.forEach(r => out.push({
+      ...r,
+      op: r.label ? textOut(mT) : 1 - mT,
+      was: true
+    }));
+    return out;
   })();
+  const crossWords = (was0, now0, key) => {
+    if (!mf) return now0;
+    const nowK = new Set(now0.map(key)),
+      wasK = new Set((was0 || []).map(key));
+    return (was0 || []).filter(n => !nowK.has(key(n))).map(n => ({
+      ...n,
+      op: textOut(mT),
+      was: true
+    })).concat(now0.map(n => wasK.has(key(n)) ? n : {
+      ...n,
+      op: textIn(mT)
+    }));
+  };
+  const noteAll = crossWords(mf && mf.notes, notes, n => [].concat(n.text).join("/") + "|" + n.x + "|" + n.y + "|" + (n.dy || 0) + "|" + (n.span ? n.span.join() : ""));
+  const bracketAll = crossWords(mf && mf.brackets, brackets, b => (b.lines || []).join("/") + "|" + b.x + "|" + b.y0 + "|" + b.y1);
   let tip = null;
   if (evt) {
     tip = {
@@ -42782,7 +42950,7 @@ function TrendChart(props) {
   const spanTo = tooltipTitle && spinePts.length ? tooltipTitle(spinePts.length - 1) : "";
   const a11yLabel = ariaLabel || [namedSeries.length ? namedSeries.join(", ") : "Polling trend", spanFrom && spanTo ? `${spanFrom} to ${spanTo}` : "", scatter.length ? `${scatter.length} individual polls plotted` : "", spinePts.length > 1 ? "Use arrow keys to read each point" : ""].filter(Boolean).map(s => s.replace(/\.$/, "")).join(". ") + ".";
   const liveText = !tip ? "" : [tip.title, tip.date || "", ...(tip.rows || []).map(r => `${r.label} ${r.value}`), tip.sub || ""].filter(Boolean).join(", ");
-  const geom = [W, H, pad.l, pad.r, pad.t, pad.b, win[0], win[1], yDomain[0], yDomain[1]].join("|");
+  const geom = [W, H, pad.l, pad.r, pad.t, pad.b, win[0], win[1], yDom[0], yDom[1]].join("|");
   const dotPath = (shape, cx, cy, r) => {
     if (shape === "triangle") {
       const s = r * 1.35;
@@ -43034,7 +43202,7 @@ function TrendChart(props) {
       width: Math.max(0, x1 - x0),
       height: H
     }));
-  }), series.filter(s => s.wipe != null && s.wipe > 0).map(s => {
+  }), series.filter(s => s.wipe != null && s.wipe > 0 && s.wipe < 1).map(s => {
     const SOFT = 0.09;
     const edge = s.wipe * (1 + 2 * SOFT) - SOFT;
     const cl = v => Math.max(0, Math.min(1, v));
@@ -43078,6 +43246,7 @@ function TrendChart(props) {
     fill: b.color
   })), areas.map(a => {
     if (!a.points || a.points.length < 2) return null;
+    if (a.wipeOf != null && wipedOut.has(a.wipeOf)) return null;
     const edgePath = (pts, key, lead) => rd && a.smooth !== false ? monotoneXY(pts.map(d => [sx(d.x), sy(d[key])]), lead) : a.smooth ? smoothPath(pts.map(d => ({
       x: d.x,
       y: d[key]
@@ -43088,7 +43257,11 @@ function TrendChart(props) {
         key: "a" + a.id,
         clipPath: `url(#${clipId})`
       }, React.createElement("g", {
-        clipPath: a.clipX ? `url(#${clipId + "a" + a.id})` : undefined
+        clipPath: a.clipX ? `url(#${clipId + "a" + a.id})` : undefined,
+        mask: a.wipeOf != null && wiping.has(a.wipeOf) ? `url(#${wipeId + a.wipeOf})` : undefined,
+        style: a.fade != null && a.fade < 1 ? {
+          opacity: a.fade
+        } : null
       }, React.createElement("path", {
         className: a.className,
         d: `${top} ${bot} Z`,
@@ -43103,65 +43276,112 @@ function TrendChart(props) {
         opacity: a.edgeOpacity != null ? a.edgeOpacity : 0.85
       })))
     );
-  }), yTicks.map(t => React.createElement("g", {
-    key: "y" + t
-  }, React.createElement("line", {
-    x1: pad.l,
-    x2: W - pad.r,
-    y1: sy(t),
-    y2: sy(t),
-    className: "grid"
-  }), yLabelled.has(t) && React.createElement("text", {
-    x: pad.l - (rd ? PX(8) : 10),
-    y: sy(t),
-    className: "axis-label y",
-    style: {
-      fontSize: axisUnits
-    },
-    dominantBaseline: "middle"
-  }, yTickFmt ? yTickFmt(t) : t + unit))), baseline && React.createElement("g", {
+  }), (() => {
+    const lab = (fmt, t) => fmt ? fmt(t) : t + unit;
+    const edgeOp = t => {
+      const y = sy(t),
+        lo = pad.t,
+        hi = H - pad.b,
+        band = PX(14);
+      return y < lo - 0.5 ? Math.max(0, 1 - (lo - y) / band) : y > hi + 0.5 ? Math.max(0, 1 - (y - hi) / band) : 1;
+    };
+    const was = mf ? new Set(mf.yTicks || []) : null,
+      now = new Set(yTicks);
+    const all = was ? [...new Set(yTicks.concat(mf.yTicks || []))] : yTicks;
+    const labWas = was ? yLabelledOf(mf.yTicks || []) : null;
+    return all.map(t => {
+      const e = edgeOp(t);
+      if (e <= 0) return null;
+      const inNow = now.has(t),
+        inWas = !!was && was.has(t);
+      const gOp = e * (was ? inNow && inWas ? 1 : inNow ? mT : 1 - mT : 1);
+      const tNow = inNow && yLabelled.has(t) ? lab(yTickFmt, t) : null;
+      const tWas = inWas && labWas.has(t) ? lab(mf.yTickFmt || yTickFmt, t) : null;
+      const txt = (s0, op) => s0 == null || op <= 0 ? null : React.createElement("text", {
+        x: pad.l - (rd ? PX(8) : 10),
+        y: sy(t),
+        className: "axis-label y",
+        dominantBaseline: "middle",
+        style: op < 1 ? {
+          fontSize: axisUnits,
+          opacity: op
+        } : {
+          fontSize: axisUnits
+        }
+      }, s0);
+      return React.createElement("g", {
+        key: "y" + t,
+        "data-k": "y" + t
+      }, React.createElement("line", {
+        x1: pad.l,
+        x2: W - pad.r,
+        y1: sy(t),
+        y2: sy(t),
+        className: "grid",
+        style: gOp < 1 ? {
+          opacity: gOp
+        } : null
+      }), was && tWas !== tNow ? React.createElement(React.Fragment, null, txt(tWas, e * textOut(mT)), txt(tNow, e * textIn(mT))) : txt(tNow, e));
+    });
+  })(), baseline && React.createElement("g", {
     className: "rd-axis"
   }, React.createElement("line", {
     x1: pad.l,
     x2: W - pad.r,
-    y1: sy(yDomain[0]),
-    y2: sy(yDomain[0]),
+    y1: sy(yDom[0]),
+    y2: sy(yDom[0]),
     className: "rd-base"
   }), xTicks.filter(t => t.x >= win[0] && t.x <= win[1]).map(t => React.createElement("line", {
     key: "xt" + t.x,
     x1: sx(t.x),
     x2: sx(t.x),
-    y1: sy(yDomain[0]),
-    y2: sy(yDomain[0]) + PX(4),
+    y1: sy(yDom[0]),
+    y2: sy(yDom[0]) + PX(4),
     className: "rd-base"
-  }))), refLines.map((r, i) => React.createElement("line", {
-    key: "r" + i,
+  }))), refAll.map((r, i) => React.createElement("line", {
+    key: "r" + r.y + (r.label || "") + (r.op != null ? "|" + (r.was ? "w" : "n") : ""),
     x1: pad.l,
     x2: W - pad.r,
     y1: sy(r.y),
     y2: sy(r.y),
     className: "refline",
-    stroke: r.color || "currentColor"
+    stroke: r.color || "currentColor",
+    style: r.op != null ? {
+      opacity: r.op
+    } : null
   })), (() => {
-    if (xTicks.length < 3) return xTicks;
-    const pxOf = t => [...t.label].length * 6.3 + 10;
-    const fits = ts => ts.every((t, i) => i === 0 || (sx(t.x) - sx(ts[i - 1].x)) * scale >= (pxOf(t) + pxOf(ts[i - 1])) / 2);
-    let ts = xTicks;
-    for (let k = 2; !fits(ts) && k <= 6; k++) {
-      const anchor = Math.max(0, xTicks.findIndex(t => /’/.test(t.label) && t !== xTicks[0]));
-      ts = xTicks.filter((_, i) => (i - anchor) % k === 0);
-    }
-    return ts;
-  })().map((t, i) => React.createElement("text", {
-    key: "x" + t.x,
-    x: sx(t.x),
-    y: rd ? H - pad.b + PX(20) : H - 10,
-    className: "axis-label x" + (t.strong ? " strong" : ""),
-    style: {
-      fontSize: axisUnits
-    },
-    textAnchor: "middle"
-  }, t.label)), (() => {
+    const thin = list => {
+      if (list.length < 3) return list;
+      const pxOf = t => [...t.label].length * 6.3 + 10;
+      const fits = ts => ts.every((t, i) => i === 0 || (sx(t.x) - sx(ts[i - 1].x)) * scale >= (pxOf(t) + pxOf(ts[i - 1])) / 2);
+      let ts = list;
+      for (let k = 2; !fits(ts) && k <= 6; k++) {
+        const anchor = Math.max(0, list.findIndex(t => /’/.test(t.label) && t !== list[0]));
+        ts = list.filter((_, i) => (i - anchor) % k === 0);
+      }
+      return ts;
+    };
+    const lab = (t, op, k) => React.createElement("text", {
+      key: k,
+      x: sx(t.x),
+      y: rd ? H - pad.b + PX(20) : H - 10,
+      className: "axis-label x" + (t.strong ? " strong" : ""),
+      style: op != null && op < 1 ? {
+        fontSize: axisUnits,
+        opacity: op
+      } : {
+        fontSize: axisUnits
+      },
+      textAnchor: "middle"
+    }, t.label);
+    const now = thin(xTicks);
+    const was = zoomY && zoomY.xTicks ? thin(zoomY.xTicks) : null;
+    if (!was) return now.map(t => lab(t, null, "x" + t.x));
+    const key = t => t.x + "|" + t.label;
+    const nowK = new Set(now.map(key)),
+      wasK = new Set(was.map(key));
+    return was.filter(t => !nowK.has(key(t))).map(t => lab(t, textOut(winE), "xw" + t.x)).concat(now.map(t => lab(t, wasK.has(key(t)) ? null : textIn(winE), "x" + t.x)));
+  })(), (() => {
     if (!rd) return null;
     const spread = placed => {
       const at = new Map();
@@ -43388,7 +43608,7 @@ function TrendChart(props) {
     if (s.opacity === 0 || s.wipe != null && s.wipe >= 1) return null;
     const spx = hi != null && !dot && !evt && spinePts[hi] ? spinePts[hi].x : null;
     const p = spx != null ? ptAtX(s, spx) : null;
-    const last = s.points[s.points.length - 1];
+    const last = visEnd(s);
     const at = p || last;
     if (!at) return null;
     return React.createElement("circle", {
@@ -43406,8 +43626,9 @@ function TrendChart(props) {
       strokeWidth: rd ? 2 : 3
     });
   }), series.map(s => {
-    const last = s.points[s.points.length - 1];
-    if (!last || s.endCap === false) return null;
+    const last = visEnd(s);
+    if (!last || s.endCap === false || s.wipe != null && s.wipe >= 1) return null;
+    const op = (s.opacity != null ? s.opacity : 1) * (s.endCapOpacity != null ? s.endCapOpacity : 1);
     return React.createElement("circle", {
       key: "e" + s.id,
       className: "end-cap",
@@ -43415,9 +43636,10 @@ function TrendChart(props) {
       cy: sy(last.y),
       r: rd ? PX(s.rdCap || 3.5) : 4.5,
       fill: s.color,
-      style: s.opacity != null ? {
-        opacity: s.opacity
-      } : null
+      style: op < 1 || s.opacity != null ? {
+        opacity: op
+      } : null,
+      mask: s.wipe != null && s.wipe > 0 ? `url(#${wipeId + s.id})` : undefined
     });
   }), marks.map((m, i) => m.x < win[0] || m.x > win[1] ? null : React.createElement("g", {
     key: "mk" + i,
@@ -43444,7 +43666,7 @@ function TrendChart(props) {
     }
   }, m.label))), (() => {
     const labs = series.filter(s => s.endLabel && s.points.length && s.opacity !== 0).map(s => {
-      const last = s.points[s.points.length - 1];
+      const last = visEnd(s);
       return {
         sid: s.id,
         text: s.endLabel,
@@ -43545,18 +43767,22 @@ function TrendChart(props) {
       },
       fill: l.color
     }, l.text));
-  })(), refLines.map((r, i) => r.label && React.createElement("text", {
-    key: "rl" + i,
+  })(), refAll.map((r, i) => r.label && React.createElement("text", {
+    key: "rl" + r.y + r.label + (r.op != null ? "|" + (r.was ? "w" : "n") : ""),
+    style: r.op != null ? {
+      fontSize: refUnits,
+      strokeWidth: refUnits * 0.34,
+      opacity: r.op
+    } : {
+      fontSize: refUnits,
+      strokeWidth: refUnits * 0.34
+    },
     x: r.align === "left" ? pad.l + refUnits * 0.5 : W - pad.r,
     y: sy(r.y) - refUnits * 0.5,
     className: "refline-label",
     textAnchor: r.align === "left" ? "start" : "end",
-    style: {
-      fontSize: refUnits,
-      strokeWidth: refUnits * 0.34
-    },
     fill: r.labelColor || "var(--ink-3)"
-  }, r.label)), brackets.map((b, i) => {
+  }, r.label)), bracketAll.map((b, i) => {
     if (b.x < win[0] || b.x > win[1]) return null;
     const bx = sx(b.x) + PX(b.dx != null ? b.dx : 7),
       ya = sy(b.y0),
@@ -43566,8 +43792,11 @@ function TrendChart(props) {
       lh = PX(17);
     const lines = b.lines || [];
     return React.createElement("g", {
-      key: "bk" + i,
-      className: "rd-bracket"
+      key: "bk" + i + (b.op != null ? b.was ? "w" : "n" : ""),
+      className: "rd-bracket",
+      style: b.op != null ? {
+        opacity: b.op
+      } : null
     }, React.createElement("path", {
       d: `M${bx - tk} ${ya}H${bx}V${yb}H${bx - tk}`,
       className: "rd-bracket-line"
@@ -43583,14 +43812,16 @@ function TrendChart(props) {
         strokeWidth: PX(4)
       }
     }, ln)));
-  }), hotDot, notes.map((n, i) => {
+  }), hotDot, noteAll.map((n, i) => {
     const cls = "rd-note-text" + (n.cls ? " " + n.cls : "");
     const style = {
       fontSize: PX(n.size || 12),
       strokeWidth: PX(4),
       fill: n.color || undefined,
-      fontWeight: n.weight || undefined
+      fontWeight: n.weight || undefined,
+      opacity: n.op != null && n.op < 1 ? n.op : undefined
     };
+    if (n.op != null && n.op <= 0) return null;
     if (n.span) {
       const [a, b] = n.span.map(spanEdge),
         base = n.size || 12;
@@ -43606,7 +43837,7 @@ function TrendChart(props) {
       const lh = PX(fit.size * 1.3),
         mid = sy(n.y) + PX(n.dy || 0);
       return React.createElement("g", {
-        key: "nt" + i
+        key: "nt" + i + (n.was ? "w" : "")
       }, fit.lines.map((ln, j) => React.createElement("text", {
         key: j,
         x: (a + b) / 2,
@@ -43622,7 +43853,7 @@ function TrendChart(props) {
     }
     const x = (n.x === "left" ? pad.l + PX(6) : n.x === "right" ? W - pad.r - PX(6) : sx(n.x)) + PX(n.dx || 0);
     return React.createElement("text", {
-      key: "nt" + i,
+      key: "nt" + i + (n.was ? "w" : ""),
       x: x,
       y: sy(n.y) + PX(n.dy || 0),
       className: cls,
@@ -56328,13 +56559,18 @@ Object.assign(window, {
     className: "rd-eyebrow-tools"
   }, tools) : null), children);
 }
+const rdWords = v => v == null || typeof v === "string" || typeof v === "number" ? String(v) : undefined;
 function RdHed({
   head,
   dek,
   level = 3
 }) {
   const H = "h" + level;
-  return React.createElement(React.Fragment, null, head ? React.createElement(H, {
+  const w0 = rdWords(head),
+    w1 = rdWords(dek);
+  return React.createElement(RdGlide, {
+    watch: w0 !== undefined && w1 !== undefined ? w0 + "\u0000" + w1 : undefined
+  }, head ? React.createElement(H, {
     className: "rd-hed"
   }, head) : null, dek ? React.createElement("p", {
     className: "rd-dek"
@@ -56343,14 +56579,171 @@ function RdHed({
 function RdSub({
   head,
   dek,
-  level = 4
+  level = 4,
+  glide
 }) {
   const H = "h" + level;
-  return React.createElement(React.Fragment, null, head ? React.createElement(H, {
+  const body = React.createElement(React.Fragment, null, head ? React.createElement(H, {
     className: "rd-sub"
   }, head) : null, dek ? React.createElement("p", {
     className: "rd-subdek"
   }, dek) : null);
+  if (!glide) return body;
+  const w0 = rdWords(head),
+    w1 = rdWords(dek);
+  return React.createElement(RdGlide, {
+    watch: w0 !== undefined && w1 !== undefined ? w0 + "\u0000" + w1 : undefined
+  }, body);
+}
+function rdHoldSection(el, dh, ms) {
+  const sec = el.closest(".rd-sec") || null;
+  if (!sec) return;
+  const h = sec.getBoundingClientRect().height;
+  const need = Math.max(h, h + dh);
+  const hold = sec.__rdHold || (sec.__rdHold = {
+    h: 0,
+    t: 0
+  });
+  hold.h = Math.max(hold.h, need);
+  sec.style.minHeight = hold.h + "px";
+  clearTimeout(hold.t);
+  hold.t = setTimeout(() => {
+    sec.style.minHeight = "";
+    sec.__rdHold = null;
+  }, ms);
+}
+function RdGlide({
+  children,
+  className,
+  as,
+  watch
+}) {
+  const Tag = as || "div";
+  const outer = React.useRef(null),
+    inner = React.useRef(null),
+    last = React.useRef(null),
+    timer = React.useRef(0);
+  const seen = React.useRef({});
+  React.useLayoutEffect(() => {
+    const o = outer.current,
+      i = inner.current;
+    if (!o || !i) return;
+    if (watch !== undefined && seen.current.w === watch && last.current != null) return;
+    seen.current.w = watch;
+    const h = i.getBoundingClientRect().height;
+    const prev = last.current;
+    last.current = h;
+    if (prev == null || Math.abs(prev - h) < 1) return;
+    const AP = window.AP || {};
+    if (AP.reduceMotion && AP.reduceMotion() || performance.now() - (window.__rdInput || 0) > 600) return;
+    const cur = o.style.height ? o.getBoundingClientRect().height : prev;
+    rdHoldSection(o, h - cur, (AP.MORPH_MS || 320) + 80);
+    clearTimeout(timer.current);
+    o.style.transition = "none";
+    o.style.overflowY = "clip";
+    o.style.height = cur + "px";
+    void o.offsetHeight;
+    o.style.transition = "height " + (AP.MORPH_MS || 320) + "ms " + (AP.MORPH_CSS || "ease");
+    o.style.height = h + "px";
+    timer.current = setTimeout(() => {
+      o.style.transition = "";
+      o.style.height = "";
+      o.style.overflowY = "";
+    }, (AP.MORPH_MS || 320) + 60);
+  });
+  React.useEffect(() => {
+    const i = inner.current,
+      o = outer.current;
+    if (!i || typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver(() => {
+      const h = i.getBoundingClientRect().height;
+      if (o && o.style.height && Math.abs(h - (last.current || 0)) >= 1) {
+        const AP = window.AP || {};
+        o.style.height = h + "px";
+        clearTimeout(timer.current);
+        timer.current = setTimeout(() => {
+          o.style.transition = "";
+          o.style.height = "";
+          o.style.overflowY = "";
+        }, (AP.MORPH_MS || 320) + 60);
+      }
+      last.current = h;
+    });
+    ro.observe(i);
+    return () => {
+      ro.disconnect();
+      clearTimeout(timer.current);
+    };
+  }, []);
+  return React.createElement(Tag, {
+    ref: outer,
+    className: className
+  }, React.createElement("div", {
+    ref: inner,
+    className: "rd-glide-in"
+  }, children));
+}
+function RdCrossfade({
+  k,
+  children,
+  className
+}) {
+  const was = React.useRef({
+    k,
+    node: children
+  });
+  const fading = React.useRef(null);
+  const timer = React.useRef(0);
+  const [, force] = React.useReducer(x => x + 1, 0);
+  const AP = window.AP || {};
+  if (was.current.k !== k) {
+    const still = AP.reduceMotion && AP.reduceMotion();
+    fading.current = still ? null : {
+      k: was.current.k,
+      node: was.current.node,
+      id: (fading.current ? fading.current.id : 0) + 1
+    };
+  }
+  was.current = {
+    k,
+    node: children
+  };
+  React.useEffect(() => {
+    const f = fading.current;
+    if (!f || f.timed) return undefined;
+    f.timed = true;
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      if (fading.current === f) {
+        fading.current = null;
+        force();
+      }
+    }, (AP.MORPH_MS || 320) + 40);
+    return undefined;
+  });
+  React.useEffect(() => () => clearTimeout(timer.current), []);
+  const f = fading.current;
+  return React.createElement(RdGlide, {
+    watch: k
+  }, React.createElement("div", {
+    className: "rd-xf" + (className ? " " + className : "")
+  }, React.createElement("div", {
+    className: "rd-xf-now" + (f ? " in" : ""),
+    key: "now-" + k
+  }, children), f && React.createElement("div", {
+    className: "rd-xf-was",
+    key: "was-" + f.k + "-" + f.id,
+    "aria-hidden": "true",
+    inert: ""
+  }, f.node)));
+}
+if (typeof window !== "undefined" && !window.__rdInputWatch) {
+  window.__rdInputWatch = true;
+  const note = () => {
+    window.__rdInput = performance.now();
+  };
+  window.addEventListener("pointerdown", note, true);
+  window.addEventListener("keydown", note, true);
 }
 function RdSwatch({
   kind = "line",
@@ -56563,13 +56956,15 @@ function RdFoot({
   children,
   how
 }) {
-  return React.createElement("div", {
+  return React.createElement(RdGlide, {
+    watch: rdWords(children)
+  }, React.createElement("div", {
     className: "rd-foot"
   }, children ? React.createElement("span", {
     className: "rd-foot-text"
   }, children) : null, React.createElement("span", {
     className: "rd-grow"
-  }), how ? React.createElement(RdHow, how) : null);
+  }), how ? React.createElement(RdHow, how) : null));
 }
 function RdTabs({
   value,
@@ -56814,6 +57209,8 @@ Object.assign(window, {
   RdHow,
   RdFoot,
   RdTabs,
+  RdGlide,
+  RdCrossfade,
   rdNumWord,
   rdCap,
   rdFraction,
@@ -57018,7 +57415,7 @@ function RdHero(p) {
   }, "margin")), moved && sig === true && React.createElement(React.Fragment, null, ", a significant ", monthDelta > 0 ? "rise" : "fall"), leadSwing != null && Math.abs(leadSwing) >= 0.05 && React.createElement(React.Fragment, null, ", ", rdArrow(leadSwing), " ", Math.abs(leadSwing).toFixed(1), " since the 2025 election"));
   const hasBases = matchup === "alp_lnp" && impOffered || matchup === "alp_on" && impOnOffered;
   const onImp = hasBases && b0 === "imp";
-  const basisWords = !hasBases ? m.real ? "Pollsters’ published figures" : "Published head-to-heads" : onImp ? narrow ? "Implied flows" : "Implied preference flows" : "Pollsters’ published figures";
+  const basisWords = !hasBases ? m.real ? "Pollsters’ published figures" : "Published head-to-heads" : onImp ? narrow ? "Implied flows" : "Implied preference flows" : narrow ? "As published" : "Pollsters’ published figures";
   const provenance = React.createElement(React.Fragment, null, basisWords, ", ", React.createElement(RdTerm, {
     id: adjusted ? "weighted-aggregate" : "monthly-average",
     from: "two-party preferred",
@@ -57226,9 +57623,12 @@ function RdHero(p) {
     return [Math.floor((Math.min(...v) + 0.3) / 5) * 5, Math.ceil((Math.max(...v) - 0.3) / 5) * 5];
   });
   const yTarget = domainOf(matchup, b0);
-  const yDomain = morph ? blendDomain(morph.fromDomain || domainOf(morph.from, fromB), yTarget, t) : yTarget;
+  const yFrom = morph ? morph.fromDomain || domainOf(morph.from, fromB) : null;
+  const yDomain = morph ? blendDomain(yFrom, yTarget, t) : yTarget;
   if (domainRef) domainRef.current = yDomain;
   const yTicks = rdYTicks(yTarget[0], yTarget[1], 5);
+  const yTop = dm => Math.floor(dm[1] / 5 + 1e-9) * 5;
+  const yFromTicks = yFrom ? rdYTicks(Math.ceil(yFrom[0] / 5 - 1e-9) * 5, yTop(yFrom), 5) : null;
   const keptEvents = ["2026-02-12", "2025-12-08"];
   const evsOf = sc => {
     const rows = [sc.main, sc.other].filter(r => r && r.length);
@@ -57444,11 +57844,17 @@ function RdHero(p) {
     className: "rd-tpp-change"
   }, change), React.createElement("p", {
     className: "rd-tpp-prov"
-  }, provenance, qPanel, hasBases && !onImp && React.createElement(React.Fragment, null, ", ", React.createElement("button", {
+  }, provenance, qPanel, hasBases && !onImp && !narrow && React.createElement(React.Fragment, null, ", ", React.createElement("button", {
     type: "button",
     className: "rd-link",
     onClick: chooseBasis
-  }, "Back to implied flows"))), otherContests.length > 0 && React.createElement("div", {
+  }, "Back to implied flows"))), narrow && React.createElement(RdGlide, {
+    className: "rd-tpp-back"
+  }, hasBases && !onImp ? React.createElement("button", {
+    type: "button",
+    className: "rd-link",
+    onClick: chooseBasis
+  }, "Back to implied flows") : null), otherContests.length > 0 && React.createElement("div", {
     className: "rd-tpp-switch"
   }, React.createElement("span", {
     className: "rd-tpp-switch-l"
@@ -57473,7 +57879,8 @@ function RdHero(p) {
   }, o.v.b.toFixed(1))))))), story && narrow && React.createElement(RdSub, {
     head: story.head,
     dek: story.dek,
-    level: 3
+    level: 3,
+    glide: true
   }), React.createElement("div", {
     className: "card rd-card rd-tpp-chart"
   }, React.createElement(RdTabs, {
@@ -57522,6 +57929,16 @@ function RdHero(p) {
     yDomain: yDomain,
     yTicks: yTicks,
     yTickFmt: v => v === yTarget[1] ? v + "%" : String(v),
+    morphFrom: yFrom ? {
+      yTicks: yFromTicks,
+      yTickFmt: v => v === yTop(yFrom) ? v + "%" : String(v),
+      refLines: [{
+        y: 50,
+        color: "var(--ink-faint)"
+      }],
+      notes
+    } : null,
+    morphT: t,
     xTicks: rdXTicks(xDomain[0], xDomain[1], narrow),
     baseline: true,
     refLines: [{
@@ -57546,7 +57963,7 @@ function RdHero(p) {
     fmt: v => v.toFixed(1),
     copy: {
       title: chartTitle.replace(/, %$/, ""),
-      sub: basisWords.replace(/^Implied flows$/, "Implied preference flows") + (unc ? ", weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
+      sub: basisWords.replace(/^Implied flows$/, "Implied preference flows").replace(/^As published$/, "Pollsters’ published figures") + (unc ? ", weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
       legend: copyKey.map(k => ({
         label: k.label,
         color: k.color,
@@ -58168,6 +58585,20 @@ function RdLeadership({
     return (beats ? "Head to head, " + pm.short + " beats both." : "") + (secondIsHanson ? " In the three-way question " + han.short + ", not " + opp.short + ", runs second." : "");
   })();
   const pts = filterPts(LM, xDomain[0]);
+  const memo = React.useRef({
+    key: null,
+    m: new Map()
+  });
+  const memoKey = xDomain[0] + "|" + xDomain[1] + "|" + narrow;
+  if (memo.current.key !== memoKey) memo.current = {
+    key: memoKey,
+    m: new Map()
+  };
+  const kept = (k, f) => {
+    const mm = memo.current.m;
+    if (!mm.has(k)) mm.set(k, f());
+    return mm.get(k);
+  };
   const handover = (D.events || []).find(e => e.date === "2026-02-12");
   const evs = handover ? [{
     ...handover,
@@ -58184,8 +58615,13 @@ function RdLeadership({
     color: s.color,
     className: "ci-band",
     edge: false,
-    clipX: s.clipX,
-    points: s.points.filter(p => p.ci != null).map(p => ({
+    clipX: s.ciClip || s.clipX,
+    wipeOf: s.wipe != null ? s.id : undefined,
+    points: s.points.some(p => p.ciHi != null) ? s.points.filter(p => p.ciHi != null && p.ciLo != null).map(p => ({
+      x: p.x,
+      y0: p.ciLo,
+      y1: p.ciHi
+    })) : s.points.filter(p => p.ci != null).map(p => ({
       x: p.x,
       y0: p.y - p.ci,
       y1: p.y + p.ci
@@ -58203,7 +58639,7 @@ function RdLeadership({
       value: cs.join(", ")
     }] : [];
   };
-  const leadSeries = [{
+  const leadSeries = kept("leadSeries", () => [{
     id: "ley",
     label: "over Ley",
     color: opp.color,
@@ -58224,8 +58660,8 @@ function RdLeadership({
     points: run("lead_hanson"),
     rdWidth: 2.5,
     endLabel: "over " + han.short
-  }].filter(s => s.points.length);
-  const leadDots = D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).flatMap(q => ["at", "ah"].map(mode => {
+  }].filter(s => s.points.length));
+  const leadDots = kept("leadDots", () => D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).flatMap(q => ["at", "ah"].map(mode => {
     const c = ppmMatch(q, mode);
     if (!c || c.alb == null) return null;
     const o = mode === "ah" ? "hanson" : c.taylor != null ? "taylor" : c.ley != null ? "ley" : null;
@@ -58238,7 +58674,7 @@ function RdLeadership({
       label: "Albanese over " + (o === "hanson" ? "Hanson" : o === "ley" ? "Ley" : opp.short),
       meta: q
     };
-  })).filter(Boolean);
+  })).filter(Boolean));
   const bandVals = series => series.flatMap(s => s.points.flatMap(p => p.ci != null ? [p.y - p.ci, p.y + p.ci] : [p.y]));
   const leadVals = bandVals(leadSeries).concat(leadDots.map(d => d.y));
   const leadFit = fitDomain(leadVals.length ? leadVals : [0, 20], 10, 0);
@@ -58255,7 +58691,7 @@ function RdLeadership({
       weight: 600
     }];
   })() : [];
-  const threeSeries = (() => {
+  const threeSeries = kept("threeSeries", () => {
     return [{
       id: "alb",
       label: pm.short,
@@ -58285,9 +58721,9 @@ function RdLeadership({
       rdWidth: 2.5,
       endLabel: opp.short
     }].filter(s => s.points.length);
-  })();
+  });
   const firstThree = threeSeries.length ? Math.min(...threeSeries.map(s => s.points[0].x)) : null;
-  const threeDots = D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).flatMap(q => {
+  const threeDots = kept("threeDots", () => D.individualPolls.filter(q => q.x >= xDomain[0] && q.x <= xDomain[1]).flatMap(q => {
     const c = ppmMatch(q, "3");
     if (!c) return [];
     const oppK = c.taylor != null ? "taylor" : c.ley != null ? "ley" : null;
@@ -58299,7 +58735,7 @@ function RdLeadership({
       meta: q,
       who: k
     }));
-  });
+  }));
   const threeTop = Math.max(40, Math.ceil(Math.max(...bandVals(threeSeries), ...threeDots.map(d => d.y), 0) / 10) * 10);
   const leyRun = threeSeries.find(s => s.id === "ley");
   const threeFrom = (() => {
@@ -58307,7 +58743,9 @@ function RdLeadership({
     return r ? rdMonthYear(r.ym).replace(" ", "\u00a0") : "";
   })();
   const threeNotes = [firstThree != null && firstThree - xDomain[0] > 0.2 ? {
-    span: ["left", "data"],
+    span: ["left", {
+      data: Math.min(firstThree, ...threeDots.filter(d => d.x >= xDomain[0]).map(d => d.x))
+    }],
     y: threeTop * 0.62,
     text: ["Three-way questions began in " + threeFrom, "First asked in " + threeFrom],
     cls: "rd-note-it"
@@ -58426,20 +58864,20 @@ function RdLeadership({
             ...own,
             points: bl ? bl.rows : own.points,
             clipX: bl ? bl.clip : null,
-            endCap: false,
+            ciClip: bl ? bl.clips.ci : null,
             endLabelOpacity: Math.abs(1 - 2 * t)
           };
         }
         return {
           ...(a[id] || b[id]),
           wipe: a[id] ? t : 1 - t,
-          endCap: false,
           endLabelOpacity: a[id] ? 1 - t : t
         };
       });
       cross = window.AP.crossClouds(A.dots, B.dots, t, d => d.meta.pollster + "|" + d.meta.released + "|" + d.who);
       dom = window.AP.blendDomain(A.domain, B.domain, t);
     }
+    const A0 = m ? ppmModel(ppmSlot(m.from)) : null;
     return lchart(key, B.title, {
       padPx: ppmPad,
       yDomain: dom,
@@ -58447,8 +58885,15 @@ function RdLeadership({
       yTickFmt: B.yTickFmt,
       refLines: B.refLines,
       series,
-      areas: bandsOf(series.filter(x => x.wipe == null)),
-      notes: m ? [] : B.notes,
+      areas: bandsOf(series),
+      notes: B.notes,
+      morphFrom: A0 ? {
+        yTicks: A0.yTicks,
+        yTickFmt: A0.yTickFmt,
+        refLines: A0.refLines,
+        notes: A0.notes
+      } : null,
+      morphT: m ? m.t : 1,
       scatter: cross ? cross.scatter : B.dots,
       scatterOut: cross ? cross.scatterOut : [],
       scatterMove: cross ? cross.scatterMove : [],
@@ -58459,8 +58904,8 @@ function RdLeadership({
       extraRows: i => ciRows(B.series, i, B.spine)
     });
   };
-  const mainPpmChart = ppmChart("rd-ppm", ppmSlot(ppmView), ppmMorph);
-  const threeChart = ppmChart("rd-three", "three", null);
+  const mainPpmChart = React.useMemo(() => ppmChart("rd-ppm", ppmSlot(ppmView), ppmMorph), [ppmView, ppmMorph, memoKey]);
+  const threeChart = React.useMemo(() => ppmChart("rd-three", "three", null), [memoKey]);
   const leaders = RD_LEAD_ORDER.map(id => L[id]).filter(Boolean);
   const erasOf = Ld => Ld.id === "taylor" ? ["ley", "taylor"] : [null];
   const lineFor = (Ld, mt, era) => {
@@ -58493,7 +58938,7 @@ function RdLeadership({
     }));
   };
   const netChart = (mt, key) => {
-    const m = key === "main" ? morph : null;
+    const m = key === "main" || key === "a" ? morph : null;
     const runs = Ld => erasOf(Ld).map(era => {
       if (!m) return {
         era,
@@ -58504,7 +58949,8 @@ function RdLeadership({
       return b ? {
         era,
         rows: b.rows,
-        clip: b.clip
+        clip: b.clip,
+        ciClip: b.clips.ci
       } : {
         era,
         rows: lineFor(Ld, mt, era),
@@ -58539,8 +58985,12 @@ function RdLeadership({
       color: Ld.color,
       className: "ci-band",
       edge: false,
-      clipX: d.clip,
-      points: d.rows.filter(r => r.ci != null).map(r => ({
+      clipX: d.ciClip || d.clip,
+      points: d.ciClip ? d.rows.filter(r => r.ciHi != null && r.ciLo != null).map(r => ({
+        x: r.x,
+        y0: r.ciLo,
+        y1: r.ciHi
+      })) : d.rows.filter(r => r.ci != null).map(r => ({
         x: r.x,
         y0: r.v - r.ci,
         y1: r.v + r.ci
@@ -58565,11 +59015,21 @@ function RdLeadership({
       color: inkOf(opp.color),
       weight: 600
     }] : [];
-    const spine = drawn[0] && drawn[0].runs[0] ? drawn[0].runs[0].rows : [];
+    const spine = drawn[0] && drawn[0].runs[0] ? drawn[0].runs[0].rows.filter(r => !r.mid) : [];
     const title = (mt === "fav" ? "Favourability" : "Net approval") + ", month by month";
-    return lchart("rd-" + mt + "-" + key, title, {
+    const was = m ? fitFor(m.from).domain : null;
+    return lchart("rd-appr-" + (key === "b" ? "b" : "main"), title, {
       yDomain: dom,
       yTicks: rdYTicks(tgt.domain[0], tgt.domain[1], 20),
+      morphFrom: was ? {
+        yTicks: rdYTicks(was[0], was[1], 20),
+        refLines: [{
+          y: 0,
+          color: "var(--ink-faint)"
+        }],
+        notes: []
+      } : null,
+      morphT: m ? m.t : 1,
       yTickFmt: v => v === 0 ? "Even" : v > 0 ? "+" + v : "−" + Math.abs(v),
       refLines: [{
         y: 0,
@@ -58610,6 +59070,8 @@ function RdLeadership({
       }
     });
   };
+  const apprChart = React.useMemo(() => netChart(metric === "fav" ? "fav" : "net", metric === "both" ? "a" : "main"), [metric, morph, memoKey]);
+  const apprFavChart = React.useMemo(() => netChart("fav", "b"), [memoKey]);
   const dotRows = mt => leaders.map(Ld => ({
     Ld,
     n: N[Ld.id + "_" + mt]
@@ -58801,12 +59263,16 @@ function RdLeadership({
       id: "both",
       label: "Both"
     }]
-  }, !narrow && expandBtn("ppm", "preferred prime minister")), React.createElement(React.Fragment, null, React.createElement("div", {
+  }, !narrow && expandBtn("ppm", "preferred prime minister")), React.createElement(React.Fragment, null, React.createElement(RdGlide, {
+    watch: ppmView
+  }, React.createElement("div", {
     className: "rd-hbs",
     ref: hbsRef
-  }, ppmView !== "three" && two && headBar(two), ppmView !== "three" && twoH && headBar(twoH), ppmView !== "two" && threeBar), ppmNote && React.createElement("p", {
+  }, ppmView !== "three" && two && headBar(two), ppmView !== "three" && twoH && headBar(twoH), ppmView !== "two" && threeBar)), ppmNote && React.createElement(RdGlide, {
+    watch: ppmNote
+  }, React.createElement("p", {
     className: "rd-note rd-ld-note"
-  }, ppmNote), mainPpmChart, ppmView === "both" && threeChart, React.createElement(RdKey, {
+  }, ppmNote)), mainPpmChart, ppmView === "both" && threeChart, React.createElement(RdKey, {
     className: "rd-ckey",
     items: []
   }, React.createElement("span", {
@@ -58828,7 +59294,9 @@ function RdLeadership({
       id: "both",
       label: "Both"
     }]
-  }, !narrow && expandBtn("appr", "leader ratings")), React.createElement(React.Fragment, null, dotPlot(metric), metric === "both" && React.createElement(RdKey, {
+  }, !narrow && expandBtn("appr", "leader ratings")), React.createElement(React.Fragment, null, React.createElement(RdGlide, {
+    watch: metric
+  }, dotPlot(metric)), metric === "both" && React.createElement(RdKey, {
     className: "rd-dp-key",
     items: [{
       kind: "dot-solid",
@@ -58839,9 +59307,11 @@ function RdLeadership({
       color: "var(--ink-3)",
       label: "Favourability: views of them as a person"
     }]
-  }), React.createElement("p", {
+  }), React.createElement(RdGlide, {
+    watch: apprNote
+  }, React.createElement("p", {
     className: "rd-note rd-ld-note"
-  }, apprNote), metric !== "fav" && netChart(metric === "both" ? "net" : "net", metric === "both" ? "a" : "main"), metric === "fav" && netChart("fav", "main"), metric === "both" && netChart("fav", "b"), React.createElement(RdKey, {
+  }, apprNote)), apprChart, metric === "both" && apprFavChart, React.createElement(RdKey, {
     className: "rd-ckey",
     items: [{
       kind: "dot",
@@ -63601,10 +64071,10 @@ function RdApStrip({
       left: rdApX(lo) + "%",
       width: rdApX(hi) - rdApX(lo) + "%"
     }
-  }), lo != null && lo < -RD_AP_M && React.createElement("i", {
-    className: "rd-ap-clip l"
-  }), hi != null && hi > RD_AP_M && React.createElement("i", {
-    className: "rd-ap-clip r"
+  }), lo != null && React.createElement("i", {
+    className: "rd-ap-clip l" + (lo < -RD_AP_M ? " on" : "")
+  }), hi != null && React.createElement("i", {
+    className: "rd-ap-clip r" + (hi > RD_AP_M ? " on" : "")
   }), lean != null && React.createElement("i", {
     className: "rd-ap-dot",
     style: {
@@ -63651,7 +64121,7 @@ function RdApMini({
   p,
   onM,
   pub,
-  avgBy
+  avgFor
 }) {
   const D = window.AUSPOL;
   const box = React.useRef(null);
@@ -63659,17 +64129,42 @@ function RdApMini({
   const H = 176;
   const iM = D.MONTHS.indexOf(p.ym);
   const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
-  const valOf = q => pub ? onM ? q.tppAlt ? q.tppAlt.alp : null : q.alpN : onM ? q.alpOnImp : q.alpImp;
   const t0 = rdApDays(ms[0] + "-01");
   const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
   const t1 = Date.UTC(ly, lm, 1) - 864e5;
-  const mine = D.individualPolls.filter(q => q.pollster === p.pollster && valOf(q) != null && rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1);
-  const avg = ms.filter(ym => avgBy[ym] != null).map(ym => ({
-    ym,
-    v: avgBy[ym],
-    t: rdApDays(ym + "-15")
-  }));
-  const vals = mine.map(valOf).concat(avg.map(a => a.v));
+  const sceneOf = key => {
+    const [o, pb] = key.split("|").map(v => v === "1");
+    const valOf = q => pb ? o ? q.tppAlt ? q.tppAlt.alp : null : q.alpN : o ? q.alpOnImp : q.alpImp;
+    const avgBy = avgFor(o, pb);
+    const mine = D.individualPolls.filter(q => q.pollster === p.pollster && valOf(q) != null && rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1);
+    const avg = ms.filter(ym => avgBy[ym] != null).map(ym => ({
+      ym,
+      x: rdApDays(ym + "-15"),
+      v: avgBy[ym]
+    }));
+    const vals = mine.map(valOf).concat(avg.map(a => a.v));
+    const own = valOf(p);
+    if (!vals.length || own == null) return null;
+    let lo = Math.floor(Math.min(...vals) / 2) * 2,
+      hi = Math.ceil(Math.max(...vals) / 2) * 2;
+    if (hi - lo < 6) {
+      const c = (hi + lo) / 2;
+      lo = Math.floor((c - 3) / 2) * 2;
+      hi = lo + 6;
+    }
+    return {
+      o,
+      pb,
+      valOf,
+      mine,
+      avg,
+      own,
+      lo,
+      hi
+    };
+  };
+  const key = (onM ? "1" : "0") + "|" + (pub ? "1" : "0");
+  const m = window.AP.useValueMorph(key);
   const [tip, setTip] = useState(null);
   const tipBox = React.useRef(null);
   const ptr = React.useRef(null);
@@ -63681,26 +64176,31 @@ function RdApMini({
     const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
     if (off) el.style.marginLeft = off + "px";
   }, [tip]);
-  if (!vals.length || valOf(p) == null) return React.createElement("div", {
+  const S = sceneOf(key);
+  const A = m ? sceneOf(m.from) : null;
+  const t = m && A ? m.t : 1;
+  if (!S) return React.createElement("div", {
     ref: box
   });
-  let lo = Math.floor(Math.min(...vals) / 2) * 2,
-    hi = Math.ceil(Math.max(...vals) / 2) * 2;
-  if (hi - lo < 6) {
-    const c = (hi + lo) / 2;
-    lo = Math.floor((c - 3) / 2) * 2;
-    hi = lo + 6;
-  }
+  const mix = (a, b) => A ? a + (b - a) * t : b;
+  const lo = mix(A ? A.lo : 0, S.lo),
+    hi = mix(A ? A.hi : 0, S.hi);
   const x0 = 30,
     x1 = W - 16,
     top = 10,
     bot = H - 26;
-  const X = t => x0 + (t - t0) / (t1 - t0) * (x1 - x0);
+  const X = tt => x0 + (tt - t0) / (t1 - t0) * (x1 - x0);
   const Y = v => bot - (v - lo) / (hi - lo) * (bot - top);
-  const yt = [];
-  for (let v = lo; v <= hi + 1e-9; v += 2) yt.push(v);
+  const ticks = [];
+  for (let v = S.lo; v <= S.hi + 1e-9; v += 2) ticks.push(v);
+  if (A) for (let v = A.lo; v <= A.hi + 1e-9; v += 2) if (!ticks.includes(v)) ticks.push(v);
+  const tickOp = v => {
+    const y = Y(v);
+    return y < top - 0.5 ? Math.max(0, 1 - (top - y) / 14) : y > bot + 0.5 ? Math.max(0, 1 - (y - bot) / 14) : 1;
+  };
+  const own = mix(A ? A.own : 0, S.own);
   const cx = X(rdApDays(p.released)),
-    cy = Y(valOf(p));
+    cy = Y(own);
   const labLeft = cx > W * 0.45;
   const rival = onM ? "One Nation" : "Coalition";
   const outLabel = q => {
@@ -63711,24 +64211,63 @@ function RdApMini({
     id,
     src
   });
-  const hide = (id, src) => setTip(t => t && t.id === id && (!src || t.src === src) ? null : t);
-  const dots = mine.filter(q => q.released !== p.released).map((q, i) => {
-    const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
-      pollster: q.pollster,
-      released: q.released
-    }) : null;
-    const dup = mine.some(z => z !== q && z.pollster === q.pollster && z.released === q.released);
-    const key = !raw || dup ? null : raw;
+  const hide = (id, src) => setTip(tp => tp && tp.id === id && (!src || tp.src === src) ? null : tp);
+  const dotsOf = sc => {
+    const seen = {};
+    return sc.mine.filter(q => q.released !== p.released).map(q => {
+      const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+        pollster: q.pollster,
+        released: q.released
+      }) : null;
+      const dup = sc.mine.some(z => z !== q && z.pollster === q.pollster && z.released === q.released);
+      const key2 = !raw || dup ? null : raw;
+      const id = q.pollster + "|" + q.released + "#" + (seen[q.released] = (seen[q.released] || 0) + 1);
+      return {
+        q,
+        key: key2,
+        id,
+        cx: X(rdApDays(q.released)),
+        a: sc.valOf(q)
+      };
+    });
+  };
+  const now = dotsOf(S);
+  const was = A ? new Map(dotsOf(A).map(d => [d.id, d])) : null;
+  const dots = now.map(d => {
+    const w = was && was.get(d.id);
+    if (was) was.delete(d.id);
     return {
-      q,
-      key,
-      id: key || "d" + i,
-      cx: X(rdApDays(q.released)),
-      cy: Y(valOf(q)),
-      a: valOf(q)
+      ...d,
+      cy: Y(w ? w.a + (d.a - w.a) * t : d.a),
+      op: was && !w ? t : 1
     };
   });
-  const dotTip = tip && (dots.find(d => d.id === tip.id) || null);
+  if (was) was.forEach(d => dots.push({
+    ...d,
+    key: null,
+    cy: Y(d.a),
+    op: 1 - t,
+    leaving: true
+  }));
+  const avgBl = A && A.avg.length && S.avg.length ? window.AP.blendRows(A.avg, S.avg, t, ["v"]) : null;
+  const avgPts = avgBl ? avgBl.rows : S.avg;
+  const avgClip = avgBl ? avgBl.clip : null;
+  const clipId = "apm" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const avgFirst = avgBl ? {
+    x: avgClip[0],
+    v: avgPts.find(r => r.x >= avgClip[0] - 1) ? avgPts.find(r => r.x >= avgClip[0] - 1).v : avgPts[0].v
+  } : S.avg[0];
+  const dotTip = tip && !m && (dots.find(d => d.id === tip.id && !d.leaving) || null);
+  const ownTxt = sc => "This poll " + sc.own.toFixed(1);
+  const ownLab = (txt, op) => React.createElement("text", {
+    x: labLeft ? cx - 12 : cx + 12,
+    y: cy - 12,
+    className: "rd-apd-thislab",
+    textAnchor: labLeft ? "end" : "start",
+    style: op < 1 ? {
+      opacity: op
+    } : null
+  }, txt);
   return React.createElement("div", {
     ref: box,
     className: "rd-apd-mini"
@@ -63737,37 +64276,71 @@ function RdApMini({
     height: H,
     viewBox: `0 0 ${W} ${H}`,
     role: "img",
-    "aria-label": `${p.pollster}’s polls since ${rdMonthYear(ms[0])} against the monthly average; this poll ${valOf(p).toFixed(1)}.`
-  }, yt.map(v => React.createElement("path", {
-    key: v,
-    d: `M${x0} ${Y(v)}H${x1}`,
-    className: v === 50 ? "rd-apd-even" : "rd-apd-gl"
-  })), yt.map(v => React.createElement("text", {
-    key: "t" + v,
-    x: x0 - 6,
-    y: Y(v) + 4,
-    className: "rd-apd-ax",
-    textAnchor: "end"
-  }, v)), avg.length > 1 && React.createElement("path", {
-    d: monotoneXY(avg.map(a => [X(a.t), Y(a.v)])),
-    className: "rd-apd-avgline"
-  }), avg.length > 0 && React.createElement("text", {
-    x: X(avg[0].t),
-    y: Y(avg[0].v) - 9,
+    "aria-label": `${p.pollster}’s polls since ${rdMonthYear(ms[0])} against the monthly average; this poll ${S.own.toFixed(1)}.`
+  }, avgClip && React.createElement("defs", null, React.createElement("clipPath", {
+    id: clipId
+  }, React.createElement("rect", {
+    x: X(avgClip[0]) - 2,
+    y: -20,
+    width: Math.max(0, X(avgClip[1]) - X(avgClip[0]) + 4),
+    height: H + 40
+  }))), ticks.map(v => {
+    const op = tickOp(v);
+    return op <= 0 ? null : React.createElement("path", {
+      key: v,
+      d: `M${x0} ${Y(v)}H${x1}`,
+      className: v === 50 ? "rd-apd-even" : "rd-apd-gl",
+      style: op < 1 ? {
+        opacity: op
+      } : null
+    });
+  }), ticks.map(v => {
+    const op = tickOp(v);
+    return op <= 0 ? null : React.createElement("text", {
+      key: "t" + v,
+      x: x0 - 6,
+      y: Y(v) + 4,
+      className: "rd-apd-ax",
+      textAnchor: "end",
+      style: op < 1 ? {
+        opacity: op
+      } : null
+    }, v);
+  }), avgPts.length > 1 && React.createElement("path", {
+    d: monotoneXY(avgPts.map(a => [X(a.x), Y(a.v)])),
+    className: "rd-apd-avgline",
+    clipPath: avgClip ? `url(#${clipId})` : undefined
+  }), avgFirst && React.createElement("text", {
+    x: X(avgFirst.x),
+    y: Y(avgFirst.v) - 9,
     className: "rd-apd-lab"
   }, "Monthly average"), dots.map(d => {
     const {
       id,
-      key
+      key: k
     } = d;
     const open = () => {
-      if (key && window.AP.openPoll) {
+      if (k && window.AP.openPoll) {
         setTip(null);
-        window.AP.openPoll(key, "twopp", "the poll you were reading");
+        window.AP.openPoll(k, "twopp", "the poll you were reading");
       }
     };
+    if (d.leaving) return React.createElement("g", {
+      key: id + "|out",
+      style: {
+        opacity: d.op
+      }
+    }, React.createElement("circle", {
+      cx: d.cx,
+      cy: d.cy,
+      r: "4",
+      className: "rd-apd-dot"
+    }));
     return React.createElement("g", {
-      key: id
+      key: id,
+      style: d.op < 1 ? {
+        opacity: d.op
+      } : null
     }, tip && tip.id === id && React.createElement("circle", {
       cx: d.cx,
       cy: d.cy,
@@ -63782,10 +64355,10 @@ function RdApMini({
       cx: d.cx,
       cy: d.cy,
       r: "9",
-      className: "rd-apd-hit" + (key ? " link" : ""),
+      className: "rd-apd-hit" + (k ? " link" : ""),
       tabIndex: "0",
-      role: key ? "button" : "img",
-      "aria-label": (pub ? "Published" : "Implied") + " Labor two-party " + d.a.toFixed(1) + " against " + rival + ", " + p.pollster + "’s poll of " + outLabel(d.q) + (key ? "; press Enter to open it" : ""),
+      role: k ? "button" : "img",
+      "aria-label": (pub ? "Published" : "Implied") + " Labor two-party " + d.a.toFixed(1) + " against " + rival + ", " + p.pollster + "’s poll of " + outLabel(d.q) + (k ? "; press Enter to open it" : ""),
       onPointerDown: ev => {
         ptr.current = ev.pointerType;
       },
@@ -63828,12 +64401,7 @@ function RdApMini({
     cy: cy,
     r: "4.5",
     className: "rd-apd-this"
-  }), React.createElement("text", {
-    x: labLeft ? cx - 12 : cx + 12,
-    y: cy - 12,
-    className: "rd-apd-thislab",
-    textAnchor: labLeft ? "end" : "start"
-  }, "This poll ", valOf(p).toFixed(1)), React.createElement("path", {
+  }), A && A.own !== S.own ? React.createElement(React.Fragment, null, ownLab(ownTxt(A), 1 - t), ownLab(ownTxt(S), t)) : ownLab(ownTxt(S), 1), React.createElement("path", {
     d: `M${x0} ${bot}H${x1}`,
     className: "rd-apd-base"
   }), ms.map((ym, i) => i % 2 === (ms.length - 1) % 2 ? React.createElement("text", {
@@ -63871,6 +64439,7 @@ function RdApDetail({
   today,
   winN,
   avgBy,
+  avgFor,
   onBack,
   backLabel
 }) {
@@ -64110,7 +64679,7 @@ function RdApDetail({
     p: p,
     onM: onM,
     pub: pub,
-    avgBy: avgBy
+    avgFor: avgFor
   })), React.createElement("div", {
     className: "rd-apd-facts"
   }, lean != null && avg != null && React.createElement(React.Fragment, null, React.createElement("span", {
@@ -64278,7 +64847,8 @@ function RdAllPolls(P) {
   const contest = onM ? "onp" : "lnp";
   const rival = onM ? "One Nation" : "the Coalition";
   const rivalInk = onM ? "var(--onp-text)" : "var(--lnp-text)";
-  const avgBy = pub ? onM ? altOnByYm : aggByYm : onM ? synthOnByYm : synthByYm;
+  const avgFor = (o, pb) => pb ? o ? altOnByYm : aggByYm : o ? synthOnByYm : synthByYm;
+  const avgBy = avgFor(onM, pub);
   const figOf = p => rdApFig(p, onM, pub);
   React.useEffect(() => {
     if (measure !== "lnp" && measure !== "onp") onMeasure("onp");
@@ -64931,6 +65501,7 @@ function RdAllPolls(P) {
       today: today,
       winN: win.length,
       avgBy: avgBy,
+      avgFor: avgFor,
       onBack: arrived ? onBack : null,
       backLabel: backLabel
     }));
@@ -65737,7 +66308,9 @@ function RdDisagree() {
     }]
   }), React.createElement("h4", {
     className: "rd-ap-ct rd-dis-ct"
-  }, "How far polls typically sit from ", phone ? "their trend" : "the trend through them", ", points"), React.createElement("div", {
+  }, "How far polls typically sit from ", phone ? "their trend" : "the trend through them", ", points"), React.createElement(RdCrossfade, {
+    k: view
+  }, React.createElement("div", {
     ref: box,
     className: "rd-dis-grid",
     style: {
@@ -65821,7 +66394,7 @@ function RdDisagree() {
   }, React.createElement("span", {
     className: "rd-dis-keyfloor",
     "aria-hidden": "true"
-  }), "What sampling error alone would produce"))), !phone && React.createElement(RdKey, {
+  }), "What sampling error alone would produce")))), !phone && React.createElement(RdKey, {
     className: "rd-ckey rd-dis-key",
     items: [{
       kind: "line",
@@ -65835,10 +66408,12 @@ function RdDisagree() {
     "aria-hidden": "true"
   }), "What sampling error alone would produce")), React.createElement("p", {
     className: "rd-dis-scale"
-  }, "Within chance: under 1.2 times sampling error, A little beyond: 1.2 to 1.6, Well beyond: 1.6 or more, Under 0.8, tighter than chance, would suggest pollsters were steering towards each other."), React.createElement(HowTo, {
+  }, "Within chance: under 1.2 times sampling error, A little beyond: 1.2 to 1.6, Well beyond: 1.6 or more, Under 0.8, tighter than chance, would suggest pollsters were steering towards each other."), React.createElement(RdGlide, {
+    watch: view
+  }, React.createElement(HowTo, {
     label: "How to read these charts",
     paras: [React.createElement(React.Fragment, null, "Each chart follows one figure month by month. The line is how far a typical poll sits from the trend through all the polls around it; the shaded floor is how far it would sit if the pollsters all measured the same thing and differed only by the luck of who they reached."), React.createElement(React.Fragment, null, "A line on the floor means the polls agree as well as their samples allow; a line well above it means they genuinely differ, in who they reach or how they weight. ", view === "primary" ? "The One Nation and Coalition vote added together gets its own chart because that is the finding: the pollsters split the right’s vote differently while agreeing on its size." : "The implied figures read every poll through the same flows, so their spread is the pollsters disagreeing about primary votes; the published figures add each pollster’s own way of allocating preferences.")]
-  }), React.createElement(RdFoot, {
+  })), React.createElement(RdFoot, {
     how: {
       term: "poll-disagreement",
       from: "How much the polls disagree"

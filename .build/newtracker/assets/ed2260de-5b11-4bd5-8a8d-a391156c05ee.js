@@ -425,6 +425,46 @@ window.AP = (function () {
     return [morph, choose];
   }
 
+  /* The same switch for a chart that doesn't own the control: the value it
+     draws (the page's contest, the table's basis) arrives as a prop, and when
+     it changes the chart morphs from the old value's picture to the new one.
+     The change is seen DURING the render that carries it, so that render is
+     already the switch's first frame - a chart that waited for an effect
+     would paint the new picture once, whole, before starting to move to it.
+     Returns { from, to, t } while a switch runs, else null; pressed back
+     mid-flight it reverses from where it was, as useMorph does. */
+  function useValueMorph(value) {
+    const st = React.useRef({ value, morph: null });
+    const raf = React.useRef(0);
+    const land = React.useRef(0);
+    const [, force] = React.useReducer((x) => x + 1, 0);
+    const s = st.current;
+    if (value !== s.value) {
+      const cur = s.morph;
+      let from = s.value, resume = 0;
+      if (cur && value === cur.from) { from = cur.to; resume = morphRawOf(1 - cur.t); }
+      else if (cur && cur.t < 0.5 && value !== cur.to) from = cur.from;
+      s.value = value;
+      const start = Math.min(1, resume + FRAME_MS / MORPH_MS);
+      s.morph = reduceMotion() || from === value ? null : { from, to: value, t: morphEase(start), resume, pending: true };
+    }
+    React.useLayoutEffect(() => {
+      const m = st.current.morph;
+      if (!m || !m.pending) return;
+      m.pending = false;
+      clearTimeout(land.current);
+      morphClock(raf, (t) => { if (st.current.morph === m) { m.t = t; force(); } },
+                 () => { if (st.current.morph === m) { st.current.morph = null; force(); } }, m.resume);
+      land.current = setTimeout(() => {
+        cancelAnimationFrame(raf.current);
+        if (st.current.morph === m) { st.current.morph = null; force(); }
+      }, (1 - m.resume) * MORPH_MS + 200);
+    });
+    React.useEffect(() => () => { cancelAnimationFrame(raf.current); clearTimeout(land.current); }, []);
+    const m = st.current.morph;
+    return m ? { from: m.from, to: m.to, t: m.t } : null;
+  }
+
   /* Two versions of one set of rows on ONE grid of months, so the paths carry
      the same shape of command and can be interpolated point for point. A month
      only one side runs in holds that side's nearest end value, and the clip
@@ -650,7 +690,7 @@ window.AP = (function () {
                                         from[1] + (to[1] - from[1]) * t];
 
   return { D, rangeDomain, filterPts, buildXTicks, series, monthLabelFull, latestX,
-           pollRowKey, morphEase, MORPH_MS, MORPH_CSS, morphClock, morphRawOf, reduceMotion, useMorph,
+           pollRowKey, morphEase, MORPH_MS, MORPH_CSS, morphClock, morphRawOf, reduceMotion, useMorph, useValueMorph,
            blendRows, crossClouds, mixC, blendDomain,
            discord, discordFacet, discordRead, DISCORD_MEASURES, DISC };
 })();

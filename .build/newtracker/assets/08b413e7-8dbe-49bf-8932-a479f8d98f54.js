@@ -206,6 +206,14 @@ function TrendChart(props) {
        Without it the set changed on the switch's last frame and every name
        re-laid itself out at once. */
     eventsFrom = null, eventMix = 1,
+    /* `morphFrom`: mid-switch, what the view being left draws besides its
+       lines and dots - { yTicks, yTickFmt, refLines, notes, brackets } - with
+       `morphT` how far the switch has run. The two views' axis labels, rules
+       and notes crossfade where they differ and hold where they agree, so a
+       switch between questions measured in different units ("+10", "Tied" to
+       "20%") no longer swaps every label on its first frame, and a note the
+       old view carried fades rather than vanishing for the whole switch. */
+    morphFrom = null, morphT = 1,
     /* `driven`: the caller is moving xDomain itself, frame by frame (a
        switch that blends one view's window into another's). The chart then
        draws in exactly the window it is handed - no travel of its own on
@@ -255,6 +263,23 @@ function TrendChart(props) {
     for (let i = 0; i < s.points.length; i++) if (s.points[i].x === x) return s.points[i];
     return null;
   };
+  /* Where a line visibly ends. Mid-switch its points run on under its
+     travelling window (clipX), so its end cap and its name sit where the
+     window cuts it - and arrive, with the last frame, exactly where the
+     settled line ends. They used to wait for the switch to land and appear
+     there. */
+  const visEnd = (s) => {
+    const pts = s.points, last = pts[pts.length - 1];
+    if (!last || !s.clipX || last.x <= s.clipX[1]) return last;
+    const x = s.clipX[1];
+    for (let i = pts.length - 1; i > 0; i--) {
+      if (pts[i - 1].x <= x) {
+        const a = pts[i - 1], b = pts[i], f = b.x - a.x ? (x - a.x) / (b.x - a.x) : 0;
+        return { x, y: a.y + (b.y - a.y) * f };
+      }
+    }
+    return pts[0];
+  };
 
   /* ---- the x window travels ------------------------------------------------
      Switching 3M / 12M / All used to be a cut: every chart was keyed on the
@@ -274,6 +299,16 @@ function TrendChart(props) {
   const winRaf = useRef(0);
   const prev = useRef(null);                 // the props of the last SETTLED render
   const travelling = useRef(false);
+  /* A zoom changes the y window too - three months of polls need less
+     height than a year - and it used to take the new one on the first frame
+     while the x window glided, so the months still sliding out were drawn
+     off the top of the plot for the whole zoom. The y window now travels on
+     the same clock (winE, the eased progress), from the one last drawn, with
+     the axis labels handing over as a switch's do. */
+  const [winE, setWinE] = useState(1);
+  const yShown = useRef(yDomain);            // the y window last drawn
+  const yTrav = useRef(null);                // { from, ticks, fmt, xTicks } while a zoom runs
+  const axisNow = useRef(null);              // the axis the last settled render drew
   React.useEffect(() => () => cancelAnimationFrame(winRaf.current), []);
   /* A LAYOUT effect: the travel's first step is set before the frame that
      carries the new range is painted, so the press is answered by motion in
@@ -294,13 +329,19 @@ function TrendChart(props) {
     const onScreen = !!box && box.bottom > 0 && box.top < (window.innerHeight || 0);
     const still = (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
       || document.visibilityState === "hidden" || !onScreen;
-    if (still) { winRef.current = to; travelling.current = false; setWin(to); return; }
+    if (still) { winRef.current = to; travelling.current = false; yTrav.current = null; setWinE(1); setWin(to); return; }
     travelling.current = true;
     const a = from.slice();
-    const at = (e) => { winRef.current = [a[0] + (to[0] - a[0]) * e, a[1] + (to[1] - a[1]) * e]; setWin(winRef.current); };
-    const c = window.AP.morphClock(winRaf, at, () => { winRef.current = to; travelling.current = false; setWin(to); });
+    const was = axisNow.current;
+    yTrav.current = { from: yShown.current.slice(), ticks: was ? was.yTicks : null, fmt: was ? was.yTickFmt : null,
+                      xTicks: was ? was.xTicks : null };
+    const at = (e) => { winRef.current = [a[0] + (to[0] - a[0]) * e, a[1] + (to[1] - a[1]) * e]; setWin(winRef.current); setWinE(e); };
+    const c = window.AP.morphClock(winRaf, at, () => { winRef.current = to; travelling.current = false; yTrav.current = null; setWinE(1); setWin(to); });
     at(c.t);
   }, [xDomain[0], xDomain[1]]);
+  // the y window this frame draws in: the prop, or on its way to it mid-zoom
+  const zoomY = !driven && yTrav.current && winE < 1 ? yTrav.current : null;
+  const yDom = zoomY ? [zoomY.from[0] + (yDomain[0] - zoomY.from[0]) * winE, zoomY.from[1] + (yDomain[1] - zoomY.from[1]) * winE] : yDomain;
 
   /* tooltipTitle and extraRows read the panel's OWN points by index, so they
      belong to the same bundle: holding a 16-month spine while the readout had
@@ -328,7 +369,11 @@ function TrendChart(props) {
   // axis text in real on-screen px – normalise by measured width so every
   // chart's labels match regardless of column width / responsive stacking
   const [cw, setCw] = useState(VB.W);
-  React.useEffect(() => {
+  /* measured before the chart is first painted (a LAYOUT effect): measured
+     after it, a chart that mounts - a second chart under "Both", a tab
+     opening - painted once at the viewBox's width, a third of its height on
+     a phone, and grew into place a frame later */
+  React.useLayoutEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
     const update = () => setCw(el.getBoundingClientRect().width || VB.W);
@@ -360,7 +405,14 @@ function TrendChart(props) {
     const px = Math.max(0, ...need);
     return px <= padProp.r * k ? padProp : { ...padProp, r: px / k };
   })();
-  const { sx, sy, W, H } = makeScales({ height, xDomain: win, yDomain, pad });
+  const { sx, sy, W, H } = makeScales({ height, xDomain: win, yDomain: yDom, pad });
+  /* what this render drew, noted AFTER the zoom effect above has read what
+     the last one drew (effects run in order) - noted during the render, the
+     render carrying a new range recorded its own destination as the start */
+  React.useLayoutEffect(() => {
+    yShown.current = yDom;
+    if (!zoomY && !travelling.current) axisNow.current = { yTicks, yTickFmt, xTicks };
+  });
   const [hover, setHover] = useState(null);     // {index, clientX}
   const [dot, setDot] = useState(null);         // hovered scatter point
   const [evt, setEvt] = useState(null);         // hovered key event {e, x, y}
@@ -426,9 +478,16 @@ function TrendChart(props) {
   const spanEdge = (v, j) => {
     if (v === "left") return pad.l + PX(6);
     if (v === "right") return W - pad.r - PX(6);
+    /* { data: x } - where the data begins or ends, named by the panel rather
+       than read off the marks: mid-switch the marks are on their way, and a
+       note sized to them changed its wording as the space it sat in grew */
+    if (v && typeof v === "object" && v.data != null) return j ? sx(v.data) - PX(12) : sx(v.data) + PX(12);
     if (v !== "data") return sx(v);
-    const xs = series.filter((s) => s.opacity !== 0 && !(s.wipe >= 1)).flatMap((s) => s.points.map((p) => p.x))
-      .concat(scatter.map((d) => d.x), areas.flatMap((a) => (a.points || []).map((p) => p.x)))
+    /* where the data is SHOWN: mid-switch a line's points run on under its
+       travelling window, and a line more than half rubbed out is leaving */
+    const shown = (x, c) => !c || (x >= c[0] && x <= c[1]);
+    const xs = series.filter((s) => s.opacity !== 0 && !(s.wipe > 0.5)).flatMap((s) => s.points.map((p) => p.x).filter((x) => shown(x, s.clipX)))
+      .concat(scatter.map((d) => d.x), areas.flatMap((a) => (a.points || []).map((p) => p.x).filter((x) => shown(x, a.clipX))))
       .filter((x) => x >= win[0] && x <= win[1]);
     if (!xs.length) return j ? W - pad.r - PX(6) : pad.l + PX(6);
     return j ? sx(Math.min(...xs)) - PX(12) : sx(Math.max(...xs)) + PX(12);
@@ -674,17 +733,49 @@ function TrendChart(props) {
      comfortable at 1100px runs its labels into each other at 340px. Keep every
      GRIDLINE, since the grid is what makes the chart readable, and label only
      the ticks with room. Greedy from the bottom, measured in real pixels. */
-  const yLabelled = (() => {
-    if (!cw || yTicks.length < 2) return new Set(yTicks);
+  const yLabelledOf = (ticks) => {
+    if (!cw || ticks.length < 2) return new Set(ticks);
     const NEED = 15;                      // px between label centres
     const keep = new Set();
     let lastPx = null;
-    for (const t of yTicks.slice().sort((a, b) => b - a)) {
+    for (const t of ticks.slice().sort((a, b) => b - a)) {
       const px = sy(t) * scale;
       if (lastPx == null || Math.abs(px - lastPx) >= NEED) { keep.add(t); lastPx = px; }
     }
     return keep;
+  };
+  const yLabelled = yLabelledOf(yTicks);
+  // the view being left, mid-switch (see morphFrom)
+  const mf = morphFrom && morphT < 1 ? morphFrom
+    : zoomY && zoomY.ticks ? { yTicks: zoomY.ticks, yTickFmt: zoomY.fmt, refLines, notes, brackets } : null;
+  const mT = !mf ? 1 : morphFrom && morphT < 1 ? morphT : winE;
+  /* Words that give way to other words in the same place go out, then in:
+     the old wording is gone by 45% of the switch and the new one arrives
+     from 30%, so "+40" and "40%" are never drawn over each other half-seen,
+     which read as "4040". */
+  const textOut = (t) => Math.max(0, Math.min(1, 1 - t / 0.45));
+  const textIn = (t) => Math.max(0, Math.min(1, (t - 0.3) / 0.7));
+  // lines being rubbed out (see `wipe`): their masks, and the ones fully gone
+  const wiping = new Set(series.filter((s) => s.wipe != null && s.wipe > 0 && s.wipe < 1).map((s) => s.id));
+  const wipedOut = new Set(series.filter((s) => s.wipe != null && s.wipe >= 1).map((s) => s.id));
+  /* a rule both views draw holds; one only the old view draws fades out and
+     one only the new view draws fades in. Notes and brackets simply cross. */
+  const refKey = (r) => r.y + "|" + (r.label || "");
+  const refAll = !mf ? refLines : (() => {
+    const was = new Map((mf.refLines || []).map((r) => [refKey(r), r]));
+    const out = refLines.map((r) => (was.has(refKey(r)) ? (was.delete(refKey(r)), r) : { ...r, op: r.label ? textIn(mT) : mT }));
+    was.forEach((r) => out.push({ ...r, op: r.label ? textOut(mT) : 1 - mT, was: true }));
+    return out;
   })();
+  /* a note both views carry, word for word and in the same place, holds */
+  const crossWords = (was0, now0, key) => {
+    if (!mf) return now0;
+    const nowK = new Set(now0.map(key)), wasK = new Set((was0 || []).map(key));
+    return (was0 || []).filter((n) => !nowK.has(key(n))).map((n) => ({ ...n, op: textOut(mT), was: true }))
+      .concat(now0.map((n) => (wasK.has(key(n)) ? n : { ...n, op: textIn(mT) })));
+  };
+  const noteAll = crossWords(mf && mf.notes, notes, (n) => [].concat(n.text).join("/") + "|" + n.x + "|" + n.y + "|" + (n.dy || 0) + "|" + (n.span ? n.span.join() : ""));
+  const bracketAll = crossWords(mf && mf.brackets, brackets, (b) => (b.lines || []).join("/") + "|" + b.x + "|" + b.y0 + "|" + b.y1);
 
   // tooltip content. Precedence: a hovered EVENT, then a scatter dot, then the
   // guide. Without the first case the svg's own onMouseMove kept firing while
@@ -791,7 +882,7 @@ function TrendChart(props) {
   /* Dot clouds, memoised: identity is what lets React skip them entirely on a
      morph frame. `geom` covers everything that would move a dot – the scales
      are rebuilt every render but produce the same pixels while it holds. */
-  const geom = [W, H, pad.l, pad.r, pad.t, pad.b, win[0], win[1], yDomain[0], yDomain[1]].join("|");
+  const geom = [W, H, pad.l, pad.r, pad.t, pad.b, win[0], win[1], yDom[0], yDom[1]].join("|");
   /* A dot's SHAPE carries what its colour cannot. Two Coalition terms on the
      Past-cycles chart are the same blue, so their clouds are one cloud until
      something other than colour separates them. Circle stays the default and
@@ -1036,7 +1127,7 @@ function TrendChart(props) {
               it out from the left – soft edge, so it is an eraser and not a
               shutter – gives the eye something to follow, and the same mask run
               backwards draws the line back in when the switch is reversed. */}
-          {series.filter((s) => s.wipe != null && s.wipe > 0).map((s) => {
+          {series.filter((s) => s.wipe != null && s.wipe > 0 && s.wipe < 1).map((s) => {
             const SOFT = 0.09;                       // edge width, as a fraction
             const edge = s.wipe * (1 + 2 * SOFT) - SOFT;
             const cl = (v) => Math.max(0, Math.min(1, v));
@@ -1063,6 +1154,7 @@ function TrendChart(props) {
         {/* x-varying shaded areas – drawn under everything, clipped to the plot */}
         {areas.map((a) => {
           if (!a.points || a.points.length < 2) return null;
+          if (a.wipeOf != null && wipedOut.has(a.wipeOf)) return null;
           /* `smooth` follows the same curve the trend lines use (the spline,
              or the redesign's monotone). An interval ribbon has to be drawn
              with the curve it belongs to – straight edges under a curved line
@@ -1081,7 +1173,9 @@ function TrendChart(props) {
                that belongs to one line has to grow and retreat with it, or it
                arrives at full width while the line is still travelling */
             <g key={"a" + a.id} clipPath={`url(#${clipId})`}>
-             <g clipPath={a.clipX ? `url(#${clipId + "a" + a.id})` : undefined}>
+             <g clipPath={a.clipX ? `url(#${clipId + "a" + a.id})` : undefined}
+                mask={a.wipeOf != null && wiping.has(a.wipeOf) ? `url(#${wipeId + a.wipeOf})` : undefined}
+                style={a.fade != null && a.fade < 1 ? { opacity: a.fade } : null}>
               {/* `opacity` is a presentation ATTRIBUTE, so a class rule beats
                   it – which is how a themed area gets a different weight in
                   dark without the component knowing the theme */}
@@ -1094,48 +1188,87 @@ function TrendChart(props) {
             </g>
           );
         })}
-        {/* y gridlines + labels */}
-        {yTicks.map((t) => (
-          <g key={"y" + t}>
-            <line x1={pad.l} x2={W - pad.r} y1={sy(t)} y2={sy(t)} className="grid" />
-            {yLabelled.has(t) && (
-              <text x={pad.l - (rd ? PX(8) : 10)} y={sy(t)} className="axis-label y" style={{ fontSize: axisUnits }} dominantBaseline="middle">{yTickFmt ? yTickFmt(t) : t + unit}</text>
-            )}
-          </g>
-        ))}
+        {/* y gridlines + labels. A tick the window has slid past the plot's
+            edge (mid-switch) fades out over a few pixels rather than hanging
+            over the event names or the months; mid-switch the two views'
+            ticks are drawn together, each label fading between its old and
+            new wording where they differ. */}
+        {(() => {
+          const lab = (fmt, t) => (fmt ? fmt(t) : t + unit);
+          const edgeOp = (t) => {
+            const y = sy(t), lo = pad.t, hi = H - pad.b, band = PX(14);
+            return y < lo - 0.5 ? Math.max(0, 1 - (lo - y) / band) : y > hi + 0.5 ? Math.max(0, 1 - (y - hi) / band) : 1;
+          };
+          const was = mf ? new Set(mf.yTicks || []) : null, now = new Set(yTicks);
+          const all = was ? [...new Set(yTicks.concat(mf.yTicks || []))] : yTicks;
+          const labWas = was ? yLabelledOf(mf.yTicks || []) : null;
+          return all.map((t) => {
+            const e = edgeOp(t);
+            if (e <= 0) return null;
+            const inNow = now.has(t), inWas = !!was && was.has(t);
+            const gOp = e * (was ? (inNow && inWas ? 1 : inNow ? mT : 1 - mT) : 1);
+            const tNow = inNow && yLabelled.has(t) ? lab(yTickFmt, t) : null;
+            const tWas = inWas && labWas.has(t) ? lab(mf.yTickFmt || yTickFmt, t) : null;
+            const txt = (s0, op) => (s0 == null || op <= 0 ? null : (
+              <text x={pad.l - (rd ? PX(8) : 10)} y={sy(t)} className="axis-label y" dominantBaseline="middle"
+                    style={op < 1 ? { fontSize: axisUnits, opacity: op } : { fontSize: axisUnits }}>{s0}</text>
+            ));
+            return (
+              <g key={"y" + t} data-k={"y" + t}>
+                <line x1={pad.l} x2={W - pad.r} y1={sy(t)} y2={sy(t)} className="grid" style={gOp < 1 ? { opacity: gOp } : null} />
+                {was && tWas !== tNow
+                  ? <>{txt(tWas, e * textOut(mT))}{txt(tNow, e * textIn(mT))}</>
+                  : txt(tNow, e)}
+              </g>
+            );
+          });
+        })()}
         {/* the redesign's x axis: a solid rule at the floor of the window,
             and a short tick under each month it names */}
         {baseline && (
           <g className="rd-axis">
-            <line x1={pad.l} x2={W - pad.r} y1={sy(yDomain[0])} y2={sy(yDomain[0])} className="rd-base" />
+            <line x1={pad.l} x2={W - pad.r} y1={sy(yDom[0])} y2={sy(yDom[0])} className="rd-base" />
             {xTicks.filter((t) => t.x >= win[0] && t.x <= win[1]).map((t) => (
-              <line key={"xt" + t.x} x1={sx(t.x)} x2={sx(t.x)} y1={sy(yDomain[0])} y2={sy(yDomain[0]) + PX(4)} className="rd-base" />
+              <line key={"xt" + t.x} x1={sx(t.x)} x2={sx(t.x)} y1={sy(yDom[0])} y2={sy(yDom[0]) + PX(4)} className="rd-base" />
             ))}
           </g>
         )}
         {/* reference lines (e.g. 50% / 0 net) – labels drawn last, on top */}
-        {refLines.map((r, i) => (
-          <line key={"r" + i} x1={pad.l} x2={W - pad.r} y1={sy(r.y)} y2={sy(r.y)}
-                className="refline" stroke={r.color || "currentColor"} />
+        {refAll.map((r, i) => (
+          <line key={"r" + r.y + (r.label || "") + (r.op != null ? "|" + (r.was ? "w" : "n") : "")} x1={pad.l} x2={W - pad.r} y1={sy(r.y)} y2={sy(r.y)}
+                className="refline" stroke={r.color || "currentColor"} style={r.op != null ? { opacity: r.op } : null} />
         ))}
         {/* x ticks – thinned until neighbours clear each other on SCREEN: a
             phone kept every second month and still ran "Nov Jan ’26 Mar"
             into one another. Year-bearing labels win a thinning; the rest
             keep their spacing from them. */}
         {(() => {
-          if (xTicks.length < 3) return xTicks;
-          const pxOf = (t) => [...t.label].length * 6.3 + 10;           // ~11px sans, plus air
-          const fits = (ts) => ts.every((t, i) => i === 0
-            || (sx(t.x) - sx(ts[i - 1].x)) * scale >= (pxOf(t) + pxOf(ts[i - 1])) / 2);
-          let ts = xTicks;
-          for (let k = 2; !fits(ts) && k <= 6; k++) {
-            const anchor = Math.max(0, xTicks.findIndex((t) => /’/.test(t.label) && t !== xTicks[0]));
-            ts = xTicks.filter((_, i) => (i - anchor) % k === 0);
-          }
-          return ts;
-        })().map((t, i) => (
-          <text key={"x" + t.x} x={sx(t.x)} y={rd ? H - pad.b + PX(20) : H - 10} className={"axis-label x" + (t.strong ? " strong" : "")} style={{ fontSize: axisUnits }} textAnchor="middle">{t.label}</text>
-        ))}
+          const thin = (list) => {
+            if (list.length < 3) return list;
+            const pxOf = (t) => [...t.label].length * 6.3 + 10;           // ~11px sans, plus air
+            const fits = (ts) => ts.every((t, i) => i === 0
+              || (sx(t.x) - sx(ts[i - 1].x)) * scale >= (pxOf(t) + pxOf(ts[i - 1])) / 2);
+            let ts = list;
+            for (let k = 2; !fits(ts) && k <= 6; k++) {
+              const anchor = Math.max(0, list.findIndex((t) => /’/.test(t.label) && t !== list[0]));
+              ts = list.filter((_, i) => (i - anchor) % k === 0);
+            }
+            return ts;
+          };
+          const lab = (t, op, k) => (
+            <text key={k} x={sx(t.x)} y={rd ? H - pad.b + PX(20) : H - 10} className={"axis-label x" + (t.strong ? " strong" : "")}
+                  style={op != null && op < 1 ? { fontSize: axisUnits, opacity: op } : { fontSize: axisUnits }} textAnchor="middle">{t.label}</text>
+          );
+          const now = thin(xTicks);
+          /* mid-zoom, the months the old window named hand over to the new
+             window's: a month both name, in the same words, holds */
+          const was = zoomY && zoomY.xTicks ? thin(zoomY.xTicks) : null;
+          if (!was) return now.map((t) => lab(t, null, "x" + t.x));
+          const key = (t) => t.x + "|" + t.label;
+          const nowK = new Set(now.map(key)), wasK = new Set(was.map(key));
+          return was.filter((t) => !nowK.has(key(t))).map((t) => lab(t, textOut(winE), "xw" + t.x))
+            .concat(now.map((t) => lab(t, wasK.has(key(t)) ? null : textIn(winE), "x" + t.x)));
+        })()}
         {/* Key events – geometry from evPlaced above; this only draws it. */}
         {(() => {
           /* The redesign's numbered badges sit a month apart on a phone, closer
@@ -1296,7 +1429,7 @@ function TrendChart(props) {
           if (s.opacity === 0 || (s.wipe != null && s.wipe >= 1)) return null;
           const spx = hi != null && !dot && !evt && spinePts[hi] ? spinePts[hi].x : null;
           const p = spx != null ? ptAtX(s, spx) : null;
-          const last = s.points[s.points.length - 1];
+          const last = visEnd(s);
           const at = p || last;
           if (!at) return null;
           return (
@@ -1314,10 +1447,12 @@ function TrendChart(props) {
             it a cycle line split at an interpolated month grew a cap at each
             run boundary, i.e. a dot in the middle of the line. */}
         {series.map((s) => {
-          const last = s.points[s.points.length - 1];
-          if (!last || s.endCap === false) return null;
+          const last = visEnd(s);
+          if (!last || s.endCap === false || (s.wipe != null && s.wipe >= 1)) return null;
+          const op = (s.opacity != null ? s.opacity : 1) * (s.endCapOpacity != null ? s.endCapOpacity : 1);
           return <circle key={"e" + s.id} className="end-cap" cx={sx(last.x)} cy={sy(last.y)} r={rd ? PX(s.rdCap || 3.5) : 4.5}
-                         fill={s.color} style={s.opacity != null ? { opacity: s.opacity } : null} />;
+                         fill={s.color} style={op < 1 || s.opacity != null ? { opacity: op } : null}
+                         mask={s.wipe != null && s.wipe > 0 ? `url(#${wipeId + s.id})` : undefined} />;
         })}
         {/* rings: a point that is a count, not a poll (the election result) */}
         {marks.map((m, i) => (m.x < win[0] || m.x > win[1]) ? null : (
@@ -1338,7 +1473,7 @@ function TrendChart(props) {
           const labs = series
             .filter((s) => s.endLabel && s.points.length && s.opacity !== 0)
             .map((s) => {
-              const last = s.points[s.points.length - 1];
+              const last = visEnd(s);
               /* inkOf, not the series colour: the label is a GLYPH, and the
                  mark values for Greens/One Nation/Others fail the text
                  threshold on paper (see the -text tokens in the template) */
@@ -1497,12 +1632,11 @@ function TrendChart(props) {
             the callback's parenthesised return is a second sibling expression,
             which does not parse — it broke the build for a whole commit while
             a stale index.html kept the page looking fine. */}
-        {refLines.map((r, i) => r.label && (
-          <text key={"rl" + i}
+        {refAll.map((r, i) => r.label && (
+          <text key={"rl" + r.y + r.label + (r.op != null ? "|" + (r.was ? "w" : "n") : "")} style={r.op != null ? { fontSize: refUnits, strokeWidth: refUnits * 0.34, opacity: r.op } : { fontSize: refUnits, strokeWidth: refUnits * 0.34 }}
                 x={r.align === "left" ? pad.l + refUnits * 0.5 : W - pad.r}
                 y={sy(r.y) - refUnits * 0.5}
                 className="refline-label" textAnchor={r.align === "left" ? "start" : "end"}
-                style={{ fontSize: refUnits, strokeWidth: refUnits * 0.34 }}
                 /* The label is TEXT and the rule is a hairline, so they cannot
                    share one colour: r.color is a rules token (--ink-faint) that
                    sits below the contrast threshold on purpose. Labels default
@@ -1510,13 +1644,13 @@ function TrendChart(props) {
                    the escape hatch for a party-coloured one. */
                 fill={r.labelColor || "var(--ink-3)"}>{r.label}</text>
         ))}
-        {brackets.map((b, i) => {
+        {bracketAll.map((b, i) => {
           if (b.x < win[0] || b.x > win[1]) return null;
           const bx = sx(b.x) + PX(b.dx != null ? b.dx : 7), ya = sy(b.y0), yb = sy(b.y1), tk = PX(5);
           const mid = (ya + yb) / 2, lh = PX(17);
           const lines = b.lines || [];
           return (
-            <g key={"bk" + i} className="rd-bracket">
+            <g key={"bk" + i + (b.op != null ? (b.was ? "w" : "n") : "")} className="rd-bracket" style={b.op != null ? { opacity: b.op } : null}>
               <path d={`M${bx - tk} ${ya}H${bx}V${yb}H${bx - tk}`} className="rd-bracket-line" />
               {lines.map((ln, j) => (
                 <text key={j} x={bx - PX(10)} y={mid + (j - (lines.length - 1) / 2) * lh}
@@ -1528,10 +1662,12 @@ function TrendChart(props) {
           );
         })}
         {hotDot}
-        {notes.map((n, i) => {
+        {noteAll.map((n, i) => {
           const cls = "rd-note-text" + (n.cls ? " " + n.cls : "");
           const style = { fontSize: PX(n.size || 12), strokeWidth: PX(4),
-                          fill: n.color || undefined, fontWeight: n.weight || undefined };
+                          fill: n.color || undefined, fontWeight: n.weight || undefined,
+                          opacity: n.op != null && n.op < 1 ? n.op : undefined };
+          if (n.op != null && n.op <= 0) return null;
           if (n.span) {
             const [a, b] = n.span.map(spanEdge), base = n.size || 12;
             let fit = null;
@@ -1543,7 +1679,7 @@ function TrendChart(props) {
             if (!fit) return null;
             const lh = PX(fit.size * 1.3), mid = sy(n.y) + PX(n.dy || 0);
             return (
-              <g key={"nt" + i}>
+              <g key={"nt" + i + (n.was ? "w" : "")}>
                 {fit.lines.map((ln, j) => (
                   <text key={j} x={(a + b) / 2} y={mid + (j - (fit.lines.length - 1) / 2) * lh}
                         className={cls} textAnchor="middle" dominantBaseline="middle"
@@ -1554,7 +1690,7 @@ function TrendChart(props) {
           }
           const x = (n.x === "left" ? pad.l + PX(6) : n.x === "right" ? W - pad.r - PX(6) : sx(n.x)) + PX(n.dx || 0);
           return (
-            <text key={"nt" + i} x={x} y={sy(n.y) + PX(n.dy || 0)}
+            <text key={"nt" + i + (n.was ? "w" : "")} x={x} y={sy(n.y) + PX(n.dy || 0)}
                   className={cls}
                   textAnchor={n.anchor || (n.x === "right" ? "end" : "start")}
                   dominantBaseline={n.baseline || "auto"}

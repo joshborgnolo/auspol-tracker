@@ -174,8 +174,8 @@ function RdApStrip({ lean, moe, onM, tip, phone }) {
       {grid.map((v) => <i key={v} className="rd-ap-gl" style={{ left: rdApX(v) + "%" }}></i>)}
       <i className="rd-ap-avg" style={{ left: "50%" }}></i>
       {lo != null && <i className="rd-ap-wh" style={{ left: rdApX(lo) + "%", width: rdApX(hi) - rdApX(lo) + "%" }}></i>}
-      {lo != null && lo < -RD_AP_M && <i className="rd-ap-clip l"></i>}
-      {hi != null && hi > RD_AP_M && <i className="rd-ap-clip r"></i>}
+      {lo != null && <i className={"rd-ap-clip l" + (lo < -RD_AP_M ? " on" : "")}></i>}
+      {hi != null && <i className={"rd-ap-clip r" + (hi > RD_AP_M ? " on" : "")}></i>}
       {lean != null && <i className="rd-ap-dot" style={{ left: rdApX(lean) + "%", background: rdApLeanDot(lean, onM) }}></i>}
       {tip}
     </span>
@@ -205,21 +205,37 @@ function RdApScale({ onM, phone }) {
    poll; on the right, how it counts: its pollster's recent record against the
    average, its place against its month, the pollster's usual lean, and what
    it does to today's figure. */
-function RdApMini({ p, onM, pub, avgBy }) {
+function RdApMini({ p, onM, pub, avgFor }) {
   const D = window.AUSPOL;
   const box = React.useRef(null);
   const W = useRdWidth(box, 470);
   const H = 176;
   const iM = D.MONTHS.indexOf(p.ym);
   const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
-  const valOf = (q) => (pub ? (onM ? (q.tppAlt ? q.tppAlt.alp : null) : q.alpN) : (onM ? q.alpOnImp : q.alpImp));
   const t0 = rdApDays(ms[0] + "-01");
   const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
   const t1 = Date.UTC(ly, lm, 1) - 864e5;
-  const mine = D.individualPolls.filter((q) => q.pollster === p.pollster && valOf(q) != null
-    && rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1);
-  const avg = ms.filter((ym) => avgBy[ym] != null).map((ym) => ({ ym, v: avgBy[ym], t: rdApDays(ym + "-15") }));
-  const vals = mine.map(valOf).concat(avg.map((a) => a.v));
+  /* One picture per contest and basis. Switching either redraws this chart
+     as the same chart asking the other question (useValueMorph): the y range
+     glides, the average reshapes, a release that has a figure both ways
+     travels between them, one that has only one fades, and "This poll"
+     crossfades its figure as it moves. It used to cut. */
+  const sceneOf = (key) => {
+    const [o, pb] = key.split("|").map((v) => v === "1");
+    const valOf = (q) => (pb ? (o ? (q.tppAlt ? q.tppAlt.alp : null) : q.alpN) : (o ? q.alpOnImp : q.alpImp));
+    const avgBy = avgFor(o, pb);
+    const mine = D.individualPolls.filter((q) => q.pollster === p.pollster && valOf(q) != null
+      && rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1);
+    const avg = ms.filter((ym) => avgBy[ym] != null).map((ym) => ({ ym, x: rdApDays(ym + "-15"), v: avgBy[ym] }));
+    const vals = mine.map(valOf).concat(avg.map((a) => a.v));
+    const own = valOf(p);
+    if (!vals.length || own == null) return null;
+    let lo = Math.floor(Math.min(...vals) / 2) * 2, hi = Math.ceil(Math.max(...vals) / 2) * 2;
+    if (hi - lo < 6) { const c = (hi + lo) / 2; lo = Math.floor((c - 3) / 2) * 2; hi = lo + 6; }
+    return { o, pb, valOf, mine, avg, own, lo, hi };
+  };
+  const key = (onM ? "1" : "0") + "|" + (pub ? "1" : "0");
+  const m = window.AP.useValueMorph(key);
   /* the past dots behave as a Latest-and-next-polls release dot does: point
      at one (or put it into focus) and it shows the poll it sits on; a mouse
      click then opens it, a tap only shows it - a tap is the only way to read
@@ -235,15 +251,23 @@ function RdApMini({ p, onM, pub, avgBy }) {
     const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
     if (off) el.style.marginLeft = off + "px";
   }, [tip]);
-  if (!vals.length || valOf(p) == null) return <div ref={box}></div>;
-  let lo = Math.floor(Math.min(...vals) / 2) * 2, hi = Math.ceil(Math.max(...vals) / 2) * 2;
-  if (hi - lo < 6) { const c = (hi + lo) / 2; lo = Math.floor((c - 3) / 2) * 2; hi = lo + 6; }
+  const S = sceneOf(key);
+  const A = m ? sceneOf(m.from) : null;
+  const t = m && A ? m.t : 1;
+  if (!S) return <div ref={box}></div>;
+  const mix = (a, b) => (A ? a + (b - a) * t : b);
+  const lo = mix(A ? A.lo : 0, S.lo), hi = mix(A ? A.hi : 0, S.hi);
   const x0 = 30, x1 = W - 16, top = 10, bot = H - 26;
-  const X = (t) => x0 + ((t - t0) / (t1 - t0)) * (x1 - x0);
+  const X = (tt) => x0 + ((tt - t0) / (t1 - t0)) * (x1 - x0);
   const Y = (v) => bot - ((v - lo) / (hi - lo)) * (bot - top);
-  const yt = [];
-  for (let v = lo; v <= hi + 1e-9; v += 2) yt.push(v);
-  const cx = X(rdApDays(p.released)), cy = Y(valOf(p));
+  /* the target's ticks, with the ones leaving; each fades as it slides out
+     past the plot's edge */
+  const ticks = [];
+  for (let v = S.lo; v <= S.hi + 1e-9; v += 2) ticks.push(v);
+  if (A) for (let v = A.lo; v <= A.hi + 1e-9; v += 2) if (!ticks.includes(v)) ticks.push(v);
+  const tickOp = (v) => { const y = Y(v); return y < top - 0.5 ? Math.max(0, 1 - (top - y) / 14) : y > bot + 0.5 ? Math.max(0, 1 - (y - bot) / 14) : 1; };
+  const own = mix(A ? A.own : 0, S.own);
+  const cx = X(rdApDays(p.released)), cy = Y(own);
   const labLeft = cx > W * 0.45;
   const rival = onM ? "One Nation" : "Coalition";
   const outLabel = (q) => {
@@ -251,36 +275,65 @@ function RdApMini({ p, onM, pub, avgBy }) {
     return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1);
   };
   const show = (id, src) => setTip({ id, src });
-  const hide = (id, src) => setTip((t) => (t && t.id === id && (!src || t.src === src) ? null : t));
+  const hide = (id, src) => setTip((tp) => (tp && tp.id === id && (!src || tp.src === src) ? null : tp));
   /* keyed or not (a pollster can file a day's wave twice in seven months),
-     the dot still reads; only the keyed ones open */
-  const dots = mine.filter((q) => q.released !== p.released).map((q, i) => {
-    const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: q.pollster, released: q.released }) : null;
-    const dup = mine.some((z) => z !== q && z.pollster === q.pollster && z.released === q.released);
-    const key = (!raw || dup) ? null : raw;
-    return { q, key, id: key || "d" + i, cx: X(rdApDays(q.released)), cy: Y(valOf(q)), a: valOf(q) };
+     the dot still reads; only the keyed ones open. Mid-switch a dot is the
+     same release in both pictures, matched by that identity. */
+  const dotsOf = (sc) => {
+    const seen = {};
+    return sc.mine.filter((q) => q.released !== p.released).map((q) => {
+      const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: q.pollster, released: q.released }) : null;
+      const dup = sc.mine.some((z) => z !== q && z.pollster === q.pollster && z.released === q.released);
+      const key2 = (!raw || dup) ? null : raw;
+      const id = q.pollster + "|" + q.released + "#" + (seen[q.released] = (seen[q.released] || 0) + 1);
+      return { q, key: key2, id, cx: X(rdApDays(q.released)), a: sc.valOf(q) };
+    });
+  };
+  const now = dotsOf(S);
+  const was = A ? new Map(dotsOf(A).map((d) => [d.id, d])) : null;
+  const dots = now.map((d) => {
+    const w = was && was.get(d.id);
+    if (was) was.delete(d.id);
+    return { ...d, cy: Y(w ? w.a + (d.a - w.a) * t : d.a), op: was && !w ? t : 1 };
   });
-  const dotTip = tip && (dots.find((d) => d.id === tip.id) || null);
+  if (was) was.forEach((d) => dots.push({ ...d, key: null, cy: Y(d.a), op: 1 - t, leaving: true }));
+  /* the average: the two contests' monthly figures blended as every chart
+     on the page blends a line, and clipped to the months it runs over */
+  const avgBl = A && A.avg.length && S.avg.length ? window.AP.blendRows(A.avg, S.avg, t, ["v"]) : null;
+  const avgPts = avgBl ? avgBl.rows : S.avg;
+  const avgClip = avgBl ? avgBl.clip : null;
+  const clipId = "apm" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const avgFirst = avgBl ? { x: avgClip[0], v: avgPts.find((r) => r.x >= avgClip[0] - 1) ? avgPts.find((r) => r.x >= avgClip[0] - 1).v : avgPts[0].v } : S.avg[0];
+  const dotTip = tip && !m && (dots.find((d) => d.id === tip.id && !d.leaving) || null);
+  const ownTxt = (sc) => "This poll " + sc.own.toFixed(1);
+  const ownLab = (txt, op) => (
+    <text x={labLeft ? cx - 12 : cx + 12} y={cy - 12} className="rd-apd-thislab" textAnchor={labLeft ? "end" : "start"}
+          style={op < 1 ? { opacity: op } : null}>{txt}</text>
+  );
   return (
     <div ref={box} className="rd-apd-mini">
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
-           aria-label={`${p.pollster}’s polls since ${rdMonthYear(ms[0])} against the monthly average; this poll ${valOf(p).toFixed(1)}.`}>
-        {yt.map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === 50 ? "rd-apd-even" : "rd-apd-gl"}></path>)}
-        {yt.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{v}</text>)}
-        {avg.length > 1 && <path d={monotoneXY(avg.map((a) => [X(a.t), Y(a.v)]))} className="rd-apd-avgline"></path>}
-        {avg.length > 0 && <text x={X(avg[0].t)} y={Y(avg[0].v) - 9} className="rd-apd-lab">Monthly average</text>}
+           aria-label={`${p.pollster}’s polls since ${rdMonthYear(ms[0])} against the monthly average; this poll ${S.own.toFixed(1)}.`}>
+        {avgClip && (
+          <defs><clipPath id={clipId}><rect x={X(avgClip[0]) - 2} y={-20} width={Math.max(0, X(avgClip[1]) - X(avgClip[0]) + 4)} height={H + 40} /></clipPath></defs>
+        )}
+        {ticks.map((v) => { const op = tickOp(v); return op <= 0 ? null : <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === 50 ? "rd-apd-even" : "rd-apd-gl"} style={op < 1 ? { opacity: op } : null}></path>; })}
+        {ticks.map((v) => { const op = tickOp(v); return op <= 0 ? null : <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end" style={op < 1 ? { opacity: op } : null}>{v}</text>; })}
+        {avgPts.length > 1 && <path d={monotoneXY(avgPts.map((a) => [X(a.x), Y(a.v)]))} className="rd-apd-avgline" clipPath={avgClip ? `url(#${clipId})` : undefined}></path>}
+        {avgFirst && <text x={X(avgFirst.x)} y={Y(avgFirst.v) - 9} className="rd-apd-lab">Monthly average</text>}
         {dots.map((d) => {
-          const { id, key } = d;
-          const open = () => { if (key && window.AP.openPoll) { setTip(null); window.AP.openPoll(key, "twopp", "the poll you were reading"); } };
+          const { id, key: k } = d;
+          const open = () => { if (k && window.AP.openPoll) { setTip(null); window.AP.openPoll(k, "twopp", "the poll you were reading"); } };
+          if (d.leaving) return <g key={id + "|out"} style={{ opacity: d.op }}><circle cx={d.cx} cy={d.cy} r="4" className="rd-apd-dot"></circle></g>;
           return (
-            <g key={id}>
+            <g key={id} style={d.op < 1 ? { opacity: d.op } : null}>
               {tip && tip.id === id && <circle cx={d.cx} cy={d.cy} r="7.5" className="rd-apd-dothi"></circle>}
               <circle cx={d.cx} cy={d.cy} r="4" className="rd-apd-dot"></circle>
-              <circle cx={d.cx} cy={d.cy} r="9" className={"rd-apd-hit" + (key ? " link" : "")}
-                      tabIndex="0" role={key ? "button" : "img"}
+              <circle cx={d.cx} cy={d.cy} r="9" className={"rd-apd-hit" + (k ? " link" : "")}
+                      tabIndex="0" role={k ? "button" : "img"}
                       aria-label={(pub ? "Published" : "Implied") + " Labor two-party " + d.a.toFixed(1)
                         + " against " + rival + ", " + p.pollster + "’s poll of " + outLabel(d.q)
-                        + (key ? "; press Enter to open it" : "")}
+                        + (k ? "; press Enter to open it" : "")}
                       onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
                       onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(id, "mouse"); }}
                       onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(id, "mouse"); }}
@@ -303,7 +356,7 @@ function RdApMini({ p, onM, pub, avgBy }) {
         })}
         <circle cx={cx} cy={cy} r="8" className="rd-apd-ring"></circle>
         <circle cx={cx} cy={cy} r="4.5" className="rd-apd-this"></circle>
-        <text x={labLeft ? cx - 12 : cx + 12} y={cy - 12} className="rd-apd-thislab" textAnchor={labLeft ? "end" : "start"}>This poll {valOf(p).toFixed(1)}</text>
+        {A && A.own !== S.own ? <>{ownLab(ownTxt(A), 1 - t)}{ownLab(ownTxt(S), t)}</> : ownLab(ownTxt(S), 1)}
         <path d={`M${x0} ${bot}H${x1}`} className="rd-apd-base"></path>
         {ms.map((ym, i) => (i % 2 === (ms.length - 1) % 2 ? (
           <text key={ym} x={X(rdApDays(ym + "-01"))} y={bot + 18} className="rd-apd-ax" textAnchor="middle">{D.monthName(Number(ym.slice(5)))}</text>
@@ -323,7 +376,7 @@ function RdApMini({ p, onM, pub, avgBy }) {
   );
 }
 
-function RdApDetail({ p, onM, pub, today, winN, avgBy, onBack, backLabel }) {
+function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, onBack, backLabel }) {
   const D = window.AUSPOL;
   const q = p.p || {};
   const c = (p.chg && p.chg.d) || {};
@@ -462,7 +515,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, onBack, backLabel }) {
         {fig.a != null && (
           <>
             <span className="rd-apd-ct">{p.pollster}’s polls since {D.monthNameFull(Number(from.slice(5)))} against the average, Labor v {onM ? "One Nation" : "Coalition"}{pub ? " as published" : ""}</span>
-            <RdApMini p={p} onM={onM} pub={pub} avgBy={avgBy} />
+            <RdApMini p={p} onM={onM} pub={pub} avgFor={avgFor} />
           </>
         )}
         <div className="rd-apd-facts">
@@ -555,7 +608,8 @@ function RdAllPolls(P) {
   const contest = onM ? "onp" : "lnp";
   const rival = onM ? "One Nation" : "the Coalition";
   const rivalInk = onM ? "var(--onp-text)" : "var(--lnp-text)";
-  const avgBy = pub ? (onM ? altOnByYm : aggByYm) : (onM ? synthOnByYm : synthByYm);
+  const avgFor = (o, pb) => (pb ? (o ? altOnByYm : aggByYm) : (o ? synthOnByYm : synthByYm));
+  const avgBy = avgFor(onM, pub);
   const figOf = (p) => rdApFig(p, onM, pub);
 
   /* a published-only matchup from an old link has no place in the redesign's
@@ -869,7 +923,7 @@ function RdAllPolls(P) {
     }
     const detail = isOpen && (
       <div className="rd-ap-open" role="row">
-        <RdApDetail p={p} onM={onM} pub={pub} today={today} winN={win.length} avgBy={avgBy}
+        <RdApDetail p={p} onM={onM} pub={pub} today={today} winN={win.length} avgBy={avgBy} avgFor={avgFor}
                     onBack={arrived ? onBack : null} backLabel={backLabel} />
       </div>
     );
@@ -1249,6 +1303,9 @@ function RdDisagree() {
       <RdTabs value={view} onChange={(v) => { setView(v); setHover(null); }} ariaLabel="Measure" className="rd-dis-tabs"
               options={[{ id: "primary", label: "Primary vote" }, { id: "twopp", label: "Two-party" }]} />
       <h4 className="rd-ap-ct rd-dis-ct">How far polls typically sit from {phone ? "their trend" : "the trend through them"}, points</h4>
+      {/* primary vote and two-party are different measures, so a switch
+          crossfades the panels rather than turning one into the other */}
+      <RdCrossfade k={view}>
       <div ref={box} className="rd-dis-grid" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, columnGap: gap }}>
         {panels.map((pn, i) => {
           const s = AP.discord(pn.id);
@@ -1287,18 +1344,19 @@ function RdDisagree() {
           </div>
         )}
       </div>
+      </RdCrossfade>
       {!phone && (
         <RdKey className="rd-ckey rd-dis-key" items={[{ kind: "line", color: "var(--ink-2)", label: "Typical distance of a poll from the trend through the polls" }]}>
           <span className="rd-key-item"><span className="rd-dis-keyfloor" aria-hidden="true"></span>What sampling error alone would produce</span>
         </RdKey>
       )}
       <p className="rd-dis-scale">Within chance: under 1.2 times sampling error, A little beyond: 1.2 to 1.6, Well beyond: 1.6 or more, Under 0.8, tighter than chance, would suggest pollsters were steering towards each other.</p>
-      <HowTo label="How to read these charts" paras={[
+      <RdGlide watch={view}><HowTo label="How to read these charts" paras={[
         <>Each chart follows one figure month by month. The line is how far a typical poll sits from the trend through all the polls around it; the shaded floor is how far it would sit if the pollsters all measured the same thing and differed only by the luck of who they reached.</>,
         <>A line on the floor means the polls agree as well as their samples allow; a line well above it means they genuinely differ, in who they reach or how they weight. {view === "primary"
           ? "The One Nation and Coalition vote added together gets its own chart because that is the finding: the pollsters split the right’s vote differently while agreeing on its size."
           : "The implied figures read every poll through the same flows, so their spread is the pollsters disagreeing about primary votes; the published figures add each pollster’s own way of allocating preferences."}</>,
-      ]} />
+      ]} /></RdGlide>
       <RdFoot how={{ term: "poll-disagreement", from: "How much the polls disagree" }}>
         Spread is how far each poll typically sits from the trend through the polls around it, with recent polls counting more; weighting by sample size would mute the small polls whose divergence is being measured. Sampling error is what each poll’s own sample predicts, with a design effect of {rdApDeff()}{view === "twopp" ? ", and for the implied figures from the spread of each respondent’s flow to Labor rather than a simple share" : ""}. Measured across all {D.individualPolls.length} polls; the table’s filters don’t narrow it.
       </RdFoot>

@@ -271,6 +271,13 @@ body.rd .rd-evlist { list-style: none; margin: 12px 0 0; padding: 0; font-size: 
 /* straight under its chart the list starts in the band the copy button
    keeps, so the numbers sit next to the badges they decode */
 body.rd .chart:has(> .chart-copy-btn) + .rd-evlist { margin-top: 0; }
+/* RdCrossfade: the view being left lies over the one arriving and fades */
+body.rd .rd-xf { position: relative; }
+body.rd .rd-xf-was { position: absolute; inset: 0 0 auto 0; pointer-events: none; animation: rd-xf-out .32s var(--morph-ease) both; }
+body.rd .rd-xf-now.in { animation: rd-xf-in .32s var(--morph-ease) both; }
+@keyframes rd-xf-out { to { opacity: 0; } }
+@keyframes rd-xf-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { body.rd .rd-xf-was { display: none; } body.rd .rd-xf-now.in { animation: none; } }
 /* two lists in one cell while a switch crossfades them (RdEventList) */
 body.rd .rd-evstack { display: grid; }
 body.rd .rd-evstack > .rd-evlist { grid-area: 1 / 1; }
@@ -438,6 +445,12 @@ body.rd .rd-tpp-verdict { margin: 14px 0 0; font-size: 17px; line-height: 1.5; c
 body.rd .rd-tpp-verdict b { font-weight: 600; color: var(--ink); }
 body.rd .rd-tpp-change { margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 body.rd .rd-tpp-prov { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-3); }
+/* the published basis adds "Back to implied flows" to this line: its 44px
+   target hangs over the line as the "?" button's does, rather than making
+   the line 44px tall and dropping the chart 24px on the flip */
+body.rd .rd-tpp-prov .rd-link { margin-block: -12px; }
+body.rd .rd-tpp-back { text-align: center; font-size: 12px; }
+body.rd .rd-tpp-back .rd-link { min-height: 32px; }
 body.rd .rd-tpp-switch { margin-top: 12px; display: flex; align-items: center; gap: 12px; }
 body.rd .rd-tpp-switch-l { font-size: 13px; color: var(--ink-3); }
 body.rd .rd-chip-fig { font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -917,7 +930,7 @@ body.rd .rd-wv-dot { transition: transform .32s var(--morph-ease), background-co
 body.rd .rd-wv-ci { transition: color .32s ease; }
 body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: transform .32s var(--morph-ease); }
 /* a grouping switch brings the charts in fresh: faded in, not cut */
-body.rd .rd-wv-enter > .rd-wv-chart { animation: rd-wv-in .32s ease both; }
+body.rd .rd-wv-enter > .rd-wv-chart { animation: rd-wv-in .32s ease backwards; }
 @keyframes rd-wv-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
   body.rd .rd-wv-dot, body.rd .rd-wv-ci, body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: none; }
@@ -1607,13 +1620,22 @@ body.rd .rd-ap-chev:focus-visible { outline: 2px solid var(--accent); outline-of
 body.rd .rd-ap-pic { position: relative; align-self: stretch; display: block; min-height: 28px; }
 body.rd .rd-ap-gl { top: 0; bottom: 0; width: 1px; margin-left: -0.5px; background: var(--line-2); }
 body.rd .rd-ap-avg { top: 0; bottom: 0; width: 1.5px; margin-left: -0.75px; background: var(--rd-avgline); }
-body.rd .rd-ap-wh { top: 50%; height: 2px; margin-top: -1px; border-radius: 1px; background: var(--rd-whisker); }
-body.rd .rd-ap-clip { top: 50%; width: 0; height: 0; margin-top: -4px; border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+/* A switch of contest or basis moves every poll's lean: the dot, its margin
+   and the arrow that says the margin runs off the scale all travel on the
+   switch's curve, so the whisker no longer jumps while its dot glides. */
+body.rd .rd-ap-wh { top: 50%; height: 2px; margin-top: -1px; border-radius: 1px; background: var(--rd-whisker);
+  transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
+body.rd .rd-ap-clip { top: 50%; width: 0; height: 0; margin-top: -4px; border-top: 4px solid transparent; border-bottom: 4px solid transparent;
+  opacity: 0; transition: opacity .2s ease; }
+body.rd .rd-ap-clip.on { opacity: 1; }
 body.rd .rd-ap-clip.l { left: -7px; border-right: 6px solid var(--rd-whisker); }
 body.rd .rd-ap-clip.r { right: -7px; border-left: 6px solid var(--rd-whisker); }
 body.rd .rd-ap-dot {
   top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%;
-  box-shadow: 0 0 0 1.5px var(--rd-rowbg); transition: left .32s cubic-bezier(.3,.7,.3,1), background-color .32s ease;
+  box-shadow: 0 0 0 1.5px var(--rd-rowbg); transition: left .32s var(--morph-ease), background-color .32s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  body.rd .rd-ap-dot, body.rd .rd-ap-wh, body.rd .rd-ap-clip { transition: none; }
 }
 body.rd .rd-ap-ring {
   top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; box-sizing: border-box;

@@ -4658,19 +4658,23 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
 
 /* tab views rise in gently when switched */
 @media (prefers-reduced-motion: no-preference) {
-  .view-enter { animation: view-in .32s cubic-bezier(.25,.6,.3,1) both; }
+  /* `backwards`, not `both`: a fill kept after the entrance holds the
+     animation "active", and the browser kept the whole view, and each chart,
+     on a compositing layer of its own for the life of the page - layers every
+     later frame of every switch then had to sort */
+  .view-enter { animation: view-in .32s cubic-bezier(.25,.6,.3,1) backwards; }
   @keyframes view-in {
     from { opacity: 0; transform: translateY(7px); }
     to   { opacity: 1; transform: none; }
   }
 
   /* charts crossfade in when their window / matchup / leader set changes */
-  .chart { animation: chart-in .3s ease both; }
+  .chart { animation: chart-in .3s ease backwards; }
   @keyframes chart-in { from { opacity: 0; } to { opacity: 1; } }
   .end-cap { transition: opacity .25s ease, fill .35s ease; }
 
   /* expanded poll breakdown settles in */
-  .poll-detail { animation: detail-in .26s cubic-bezier(.25,.6,.3,1) both; }
+  .poll-detail { animation: detail-in .26s cubic-bezier(.25,.6,.3,1) backwards; }
   @keyframes detail-in {
     from { opacity: 0; transform: translateY(-4px); }
     to   { opacity: 1; transform: none; }

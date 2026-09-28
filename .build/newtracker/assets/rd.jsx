@@ -26,24 +26,159 @@ function RdSec({ id, cls, first, title, meta, tools, children, labelledBy, facet
   );
 }
 
+/* A section's finding is written from the data on show, so a switch can
+   rewrite it - a line longer or shorter - and it glides to its new height
+   rather than moving the section under it in one frame (RdGlide). */
+const rdWords = (v) => (v == null || typeof v === "string" || typeof v === "number" ? String(v) : undefined);
 function RdHed({ head, dek, level = 3 }) {
   const H = "h" + level;
+  const w0 = rdWords(head), w1 = rdWords(dek);
   return (
-    <>
+    <RdGlide watch={w0 !== undefined && w1 !== undefined ? w0 + "\u0000" + w1 : undefined}>
       {head ? <H className="rd-hed">{head}</H> : null}
       {dek ? <p className="rd-dek">{dek}</p> : null}
-    </>
+    </RdGlide>
   );
 }
 
-function RdSub({ head, dek, level = 4 }) {
+/* a panel's own head and dek are rows of its layout (Leadership lines its
+   two panels' rows up on a subgrid), so they stay unwrapped */
+function RdSub({ head, dek, level = 4, glide }) {
   const H = "h" + level;
-  return (
+  const body = (
     <>
       {head ? <H className="rd-sub">{head}</H> : null}
       {dek ? <p className="rd-subdek">{dek}</p> : null}
     </>
   );
+  // `glide`: one set in the page's flow, whose words a switch rewrites
+  if (!glide) return body;
+  const w0 = rdWords(head), w1 = rdWords(dek);
+  return <RdGlide watch={w0 !== undefined && w1 !== undefined ? w0 + "\u0000" + w1 : undefined}>{body}</RdGlide>;
+}
+
+/* ---------------------------------------------------------------- glide
+   Words that a switch rewrites can change how many lines they take, and a
+   block that grows or shrinks at once moves everything under it in one
+   frame - the chart the reader is watching jumps. Wrapped in RdGlide, a
+   block whose height a press changes eases to its new height on the
+   switch's own curve, so what is under it slides instead. Only a height
+   change a press caused (within ~0.6s of a pointer or key press) glides; a
+   resize, a font arriving or the page loading simply lays out.
+   Clipped only vertically, and with `clip` rather than hidden: clip makes no
+   new formatting context, so margins collapse through the wrapper exactly as
+   they do at rest and nothing shifts when the glide starts or ends, and a
+   chart's labels hanging past its sides are not cut off meanwhile. */
+/* While a block glides its section keeps the taller of its two heights, so
+   the page under the section does not move on every frame of the glide - a
+   glide moved, and made the browser repaint, everything down to the foot of
+   the page each frame. The section lets go when the last glide in it ends;
+   a section that shrank closes up once, then, usually below the screen. */
+function rdHoldSection(el, dh, ms) {
+  const sec = el.closest(".rd-sec") || null;
+  if (!sec) return;
+  const h = sec.getBoundingClientRect().height;
+  const need = Math.max(h, h + dh);
+  const hold = sec.__rdHold || (sec.__rdHold = { h: 0, t: 0 });
+  hold.h = Math.max(hold.h, need);
+  sec.style.minHeight = hold.h + "px";
+  clearTimeout(hold.t);
+  hold.t = setTimeout(() => { sec.style.minHeight = ""; sec.__rdHold = null; }, ms);
+}
+function RdGlide({ children, className, as, watch }) {
+  const Tag = as || "div";
+  const outer = React.useRef(null), inner = React.useRef(null), last = React.useRef(null), timer = React.useRef(0);
+  const seen = React.useRef({});
+  React.useLayoutEffect(() => {
+    const o = outer.current, i = inner.current;
+    if (!o || !i) return;
+    /* `watch`: what the block's words are made of - while it is unchanged a
+       re-render (a morph's frames) reads no layout */
+    if (watch !== undefined && seen.current.w === watch && last.current != null) return;
+    seen.current.w = watch;
+    const h = i.getBoundingClientRect().height;
+    const prev = last.current;
+    last.current = h;
+    if (prev == null || Math.abs(prev - h) < 1) return;
+    const AP = window.AP || {};
+    if ((AP.reduceMotion && AP.reduceMotion()) || performance.now() - (window.__rdInput || 0) > 600) return;
+    const cur = o.style.height ? o.getBoundingClientRect().height : prev;
+    rdHoldSection(o, h - cur, (AP.MORPH_MS || 320) + 80);
+    clearTimeout(timer.current);
+    o.style.transition = "none";
+    o.style.overflowY = "clip";
+    o.style.height = cur + "px";
+    void o.offsetHeight;
+    o.style.transition = "height " + (AP.MORPH_MS || 320) + "ms " + (AP.MORPH_CSS || "ease");
+    o.style.height = h + "px";
+    timer.current = setTimeout(() => { o.style.transition = ""; o.style.height = ""; o.style.overflowY = ""; }, (AP.MORPH_MS || 320) + 60);
+  });
+  /* a height that changes for any other reason - a resize, a font arriving -
+     is simply noted, so the next glide starts from where the block is */
+  React.useEffect(() => {
+    const i = inner.current, o = outer.current;
+    if (!i || typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver(() => {
+      const h = i.getBoundingClientRect().height;
+      /* content that settles to another height while it glides (a chart
+         sizing itself) - the glide takes it as its new end, from wherever
+         it has got to, rather than snapping there when it finishes */
+      if (o && o.style.height && Math.abs(h - (last.current || 0)) >= 1) {
+        const AP = window.AP || {};
+        o.style.height = h + "px";
+        clearTimeout(timer.current);
+        timer.current = setTimeout(() => { o.style.transition = ""; o.style.height = ""; o.style.overflowY = ""; }, (AP.MORPH_MS || 320) + 60);
+      }
+      last.current = h;
+    });
+    ro.observe(i);
+    return () => { ro.disconnect(); clearTimeout(timer.current); };
+  }, []);
+  return <Tag ref={outer} className={className}><div ref={inner} className="rd-glide-in">{children}</div></Tag>;
+}
+/* ---------------------------------------------------------------- crossfade
+   Two views of a panel that are different things - other measures, other
+   groups of voters - rather than one thing asked another way: the view being
+   left fades out over the one arriving instead of being swapped for it in a
+   frame. The old view is kept as it was drawn, laid over the new one, for
+   the length of a switch; the pair sits in an RdGlide, so the panel eases to
+   the new view's height. `k` names the view. */
+function RdCrossfade({ k, children, className }) {
+  const was = React.useRef({ k, node: children });
+  const fading = React.useRef(null);
+  const timer = React.useRef(0);
+  const [, force] = React.useReducer((x) => x + 1, 0);
+  const AP = window.AP || {};
+  if (was.current.k !== k) {
+    const still = AP.reduceMotion && AP.reduceMotion();
+    fading.current = still ? null : { k: was.current.k, node: was.current.node, id: (fading.current ? fading.current.id : 0) + 1 };
+  }
+  was.current = { k, node: children };
+  React.useEffect(() => {
+    const f = fading.current;
+    if (!f || f.timed) return undefined;
+    f.timed = true;
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => { if (fading.current === f) { fading.current = null; force(); } }, (AP.MORPH_MS || 320) + 40);
+    return undefined;
+  });
+  React.useEffect(() => () => clearTimeout(timer.current), []);
+  const f = fading.current;
+  return (
+    <RdGlide watch={k}>
+      <div className={"rd-xf" + (className ? " " + className : "")}>
+        <div className={"rd-xf-now" + (f ? " in" : "")} key={"now-" + k}>{children}</div>
+        {f && <div className="rd-xf-was" key={"was-" + f.k + "-" + f.id} aria-hidden="true" inert="">{f.node}</div>}
+      </div>
+    </RdGlide>
+  );
+}
+
+if (typeof window !== "undefined" && !window.__rdInputWatch) {
+  window.__rdInputWatch = true;
+  const note = () => { window.__rdInput = performance.now(); };
+  window.addEventListener("pointerdown", note, true);
+  window.addEventListener("keydown", note, true);
 }
 
 /* ---------------------------------------------------------------- keys
@@ -102,12 +237,15 @@ function RdHow({ term, from, label = "How it’s built", href }) {
 }
 
 function RdFoot({ children, how }) {
+  // a foot a switch rewrites glides to its new height, as a headline does
   return (
-    <div className="rd-foot">
-      {children ? <span className="rd-foot-text">{children}</span> : null}
-      <span className="rd-grow"></span>
-      {how ? <RdHow {...how} /> : null}
-    </div>
+    <RdGlide watch={rdWords(children)}>
+      <div className="rd-foot">
+        {children ? <span className="rd-foot-text">{children}</span> : null}
+        <span className="rd-grow"></span>
+        {how ? <RdHow {...how} /> : null}
+      </div>
+    </RdGlide>
   );
 }
 
@@ -307,7 +445,7 @@ function RdQPop({ label, children, align }) {
   );
 }
 
-Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs,
+Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdGlide, RdCrossfade,
                         rdNumWord, rdCap, rdFraction, rdSigned, rdArrow,
                         rdDate, rdMonthYear, rdPointsPhrase, rdXTicks, rdYTicks,
                         rdEventBadges, RdEventList, RdCheck, RdSwitch, RdTerm, RdQPop });
