@@ -130,7 +130,11 @@ extracted_at: '2026-09-26'
   pooled gap, refreshed by hand when the pool moves; it no longer
   regenerates from the data.
 - "What matters to whom": table of top-three shares by group, sentences from
-  `issGroupVerdict` (the vote-by-group test).
+  `issGroupVerdict` (the vote-by-group test). Its gist line is `whomHead`
+  (rd-panels.jsx ~:1790, per-tab generated) — user-trimmed 2026-09-28 to the
+  first sentence ("‹issue› comes first for everyone."); the conditional
+  "What comes second divides them." tail and its `secondDiffers` check were
+  cut (8a7d389), don't restore.
 - Layout keys off the panel's own width: two columns from 1080px of panel
   (= 1136px viewport; the chart's height follows via `useNarrow`). Verified at
   1440/1024/860/390, light and dark, with a pageerror probe
