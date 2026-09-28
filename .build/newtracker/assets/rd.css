@@ -800,6 +800,9 @@ body.rd .rd-dp-key { margin-top: 10px; }
      panel expanded on a wider screen doesn't hide the other one here */
   body.rd .rd-ld-panel .rd-iconbtn { display: none; }
   body.rd .rd-ld-panel.rd-hidden { display: block; }
+  /* stacked, the first panel's head sits straight under the dek: the room
+     that parts the second panel from the first would leave a hole there */
+  body.rd .rd-ld-grid > .rd-ld-panel:first-child .rd-sub { margin-top: 20px; }
 }
 /* A phone sets each leader as the canvas drew it: the name, the rating and
    its change on one line, the dot and its interval on a full-width track
