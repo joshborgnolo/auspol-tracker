@@ -1183,13 +1183,17 @@ function RdDemographics({ rangeId = "all" }) {
   const sub = (() => {
     const c = charts[0];
     if (!c || c.drawn.length < 2) return null;
+    /* "now" is each group's pooled figure, the one its row above quotes, so
+       the gap these words give is the gap a reader can take off the rows (the
+       lines' last month said "about 18" beside rows of 34.0 and 17.1) */
+    const nowOf = (e) => (e.l.g.v && e.l.g.v[party] != null ? e.l.g.v[party] : e.last.y);
     const ends = c.drawn.map((l) => ({ l, first: l.pts[0], last: l.pts[l.pts.length - 1] }));
-    const byNow = ends.slice().sort((a, b) => b.last.y - a.last.y);
+    const byNow = ends.slice().sort((a, b) => nowOf(b) - nowOf(a));
     const hiL = byNow[0], loL = byNow[byNow.length - 1];
     const firstYm = [hiL.first.ym, loL.first.ym].sort().pop();
     const fHi = hiL.l.pts.find((p) => p.ym === firstYm), fLo = loL.l.pts.find((p) => p.ym === firstYm);
     if (!fHi || !fLo) return null;
-    const gap0 = fHi.y - fLo.y, gap1 = hiL.last.y - loL.last.y;
+    const gap0 = fHi.y - fLo.y, gap1 = nowOf(hiL) - nowOf(loL);
     const pts = (g) => Math.abs(Math.round(g)) + (Math.abs(Math.round(g)) === 1 ? " point" : " points");
     const noun = RD_DEMO_NOUN[tab.id];
     const grew = (allPts) => allPts.length > 1 && allPts[allPts.length - 1].y - allPts[0].y >= 3;
@@ -1201,11 +1205,14 @@ function RdDemographics({ rangeId = "all" }) {
     const head = (noun ? "The " + noun + " gap" : "The gap between " + short(hiL.l.g) + " and " + short(loL.l.g)) + " has " + move
       + (move === "widened" && pGrew ? " as " + pName + " has grown" : "");
     const trend = demoTrendVerdict(D, c.st, party, (x) => x >= c.x0 && x <= c.x1);
-    const dek = (trend ? trend + " " : "") + (move === "held steady" ? "In percentage points the gap between " + short(hiL.l.g) + " and " + short(loL.l.g) + " has stayed near " + Math.round(gap1) + "."
+    /* a sentence before this one that already named the gap (two groups) is
+       followed by "it", not the same seven words again */
+    const theGap = trend && /the gap between /i.test(trend) ? "it" : "the gap between " + short(hiL.l.g) + " and " + short(loL.l.g);
+    const dek = (trend ? trend + " " : "") + (move === "held steady" ? "In percentage points " + theGap + " has stayed near " + Math.round(gap1) + "."
       : move === "reversed"
         ? "In percentage points, though, " + short(hiL.l.g) + " were about " + pts(gap0) + " less likely than " + short(loL.l.g) + " to back " + DEMO_VOTE_FOR[party]
           + " in " + rdMonthYear(firstYm) + "; now they are about " + pts(gap1) + " more likely."
-        : "In percentage points, though, the gap between " + short(hiL.l.g) + " and " + short(loL.l.g) + " has " + (move === "widened" ? "grown" : "shrunk")
+        : "In percentage points, though, " + theGap + " has " + (move === "widened" ? "grown" : "shrunk")
           + " from about " + pts(gap0) + " in " + rdMonthYear(firstYm) + " to about " + Math.round(gap1) + " now.");
     return { head, dek };
   })();

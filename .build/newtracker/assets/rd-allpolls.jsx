@@ -1550,7 +1550,7 @@ function RdHouseLean({ measure, tppBasis }) {
           {!phone && <span></span>}
           {!phone && (
             <span className="rd-hl-shead" role="columnheader" ref={boxRef}>
-              <span className="rd-ap-cap">Since the election <em><span className="rd-hl-sep">, </span>each row’s height is {SM === 1 ? "a point" : SM + " points"} either way</em></span>
+              <span className="rd-ap-cap">Since the election<em><span className="rd-hl-sep">, </span>each row’s height is {SM === 1 ? "a point" : SM + " points"} either way</em></span>
               {rdApMonthTicks(ms, tStep).map((t) => <span key={t.ym} className={"rd-ap-tk " + t.a} style={{ left: sx(t.ym) }}>{t.lab}</span>)}
             </span>
           )}

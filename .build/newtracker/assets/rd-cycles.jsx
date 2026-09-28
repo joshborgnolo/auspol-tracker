@@ -47,7 +47,7 @@ const rdSgn = (v, unit) => (unit ? "" : v > 0 ? "+" : v < 0 ? "−" : "") + Math
 
 /* ---- one chart, in the redesign's frame --------------------------------- */
 function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evIn, badged, domain, ticks, cur, hidden, narrow, half,
-                        hanCtl, showHan, setHan, showOnp, setOnp, tipCycle, banded, bandN, isOpp, terms }) {
+                        hanCtl, showHan, setHan, showOnp, setOnp, tipCycle, banded, bandN, isOpp, terms, outcomeShown }) {
   const { D } = window.AP;
   /* the sitting term's change of contest, said as the headline says it */
   const events = evIn.map((e) => (/^Now v /.test(e.short || "")
@@ -222,7 +222,8 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
           return r && banded ? [{ label: "Middle half", value: fmt(r.q1) + "–" + fmt(r.q3) }, { label: "Middle 80%", value: fmt(r.p10) + "–" + fmt(r.p90) }] : [];
         }}
         fmt={(v) => fmt(v)} pollFacet={M.key === "tpp" ? "twopp" : M.key === "primary" || M.key === "oppr" ? "primary" : "leadership"}
-        copy={{ title: copyTitle, sub: banded ? "Against the middle half and middle 80% of " + bandN + " past terms" : "", terms }}
+        copy={{ title: copyTitle, sub: banded ? "Against the middle half and middle 80% of " + bandN + " past terms"
+          + (outcomeShown === "returned" ? " whose government was re-elected" : outcomeShown === "ousted" ? " whose government was ousted" : "") : "", terms }}
       />
       {badges && badges.list && <RdEventList list={badges.list} />}
     </div>
@@ -287,7 +288,16 @@ function RdPastCycles(p) {
   const nPast = cycles.filter((c) => !c.current).length;
   const nRet = cycles.filter((c, i) => outcomeOf(i) === "returned").length, nOus = cycles.filter((c, i) => outcomeOf(i) === "ousted").length;
   const compare = hidden.size === 0 ? "all" : outcomeShown || null;
-  const setCompare = (id) => (id === "all" ? showAll() : showOutcome(id));
+  /* "Compare with" picks the PAST terms this one is set against, so the
+     sitting term stays on the charts whichever set is picked. The board's
+     showOutcome takes "only" to mean only and hides it too - every chart lost
+     its Labor line while the table and headlines beside it still quoted it -
+     so it is put straight back (toggle's update runs after showOutcome's). */
+  const setCompare = (id) => {
+    if (id === "all") { showAll(); return; }
+    showOutcome(id);
+    if (cur) toggle(cur.year);
+  };
 
   /* ---- the rows -------------------------------------------------------------- */
   const ROWS = [
@@ -339,42 +349,51 @@ function RdPastCycles(p) {
      at its lowest level on the strength of how far it had fallen. */
   const pts1 = (v) => Math.abs(v).toFixed(1);
   const upDown = (v) => (v < 0 ? "down " : "up ") + pts1(v);
+  /* The findings rank this term against the past terms in the comparison,
+     so a superlative says which ones: with Re-elected picked, "the lowest of
+     any prime minister" left out Whitlam, who was lower. `tail` closes the
+     sentence that makes the claim; "since 1972" belongs to the full set. */
+  const tail = compare === "all" ? "" : compare === "returned" ? ", among terms whose government was re-elected"
+    : compare === "ousted" ? ", among terms whose government was ousted" : ", among the terms on the board";
+  const since = compare === "all" ? " since " + cycles[0].year : "";
   const pageStory = (() => {
     const g = R.primary, o = R.oppr, t = R.tpp;
     const gLow = g.rank && /^Lowest/.test(g.rank.main), oLow = o.rank && /^Lowest/.test(o.rank.main);
     const moved = (r) => (r.v < 0 ? "fallen further" : "risen less");
-    const head = chg
+    const found = chg
       ? (gLow && oLow ? (g.v < 0 && o.v < 0 ? "Both major parties have lost more of their vote than any before them at this point in a term"
-          : "Both major parties are at record lows against their election results for this point in a term")
+          : "Both major parties have done worse since the election than any before them at this point in a term")
         : gLow ? govName + "’s primary vote has " + moved(g) + " than any government’s at this point in a term"
         : oLow ? rdCap(oppIn) + "’s primary vote has " + moved(o) + " than any opposition’s at this point in a term"
         : t.peers && t.v != null ? govName + "’s two-party vote has done " + (t.v >= t.peers.mean ? "better" : "worse") + " than the average government’s since its election"
-        : "Every term since 1972, lined up on its election day")
+        : null)
       : gLow && oLow ? "Both major parties are at record lows for this point in a term"
       : gLow ? govName + "’s primary vote is the lowest of any government at this point in a term"
       : oLow ? rdCap(oppIn) + "’s primary vote is the lowest of any opposition at this point in a term"
-      : t.peers && t.v != null ? govName + " sits " + (t.v >= t.peers.mean ? "above" : "below") + " the average government at this point in a term" : "Every term since 1972, lined up on its election day";
+      : t.peers && t.v != null ? govName + " sits " + (t.v >= t.peers.mean ? "above" : "below") + " the average government at this point in a term" : null;
+    const head = found ? found + tail : "Every term since " + cycles[0].year + ", lined up on its election day";
     let dek = monthsWord + " after the " + cur.year + " election, ";
     const bits = [];
     const extreme = (r) => (r.v < 0 ? "the biggest fall" : "the smallest rise");
     if (chg) {
-      if (gLow) bits.push(govName + "’s primary vote is " + upDown(g.v) + " points, " + extreme(g) + " for any government at that point since " + cycles[0].year);
+      if (gLow) bits.push(govName + "’s primary vote is " + upDown(g.v) + " points, " + extreme(g) + " for any government at that point" + since);
       if (oLow) bits.push((gLow ? "and " + oppIn + "’s is " : oppIn + "’s primary vote is ") + upDown(o.v) + " points, " + extreme(o) + " for any opposition");
     } else {
-      if (gLow) bits.push(govName + "’s primary vote is the lowest of any government at the same point since " + cycles[0].year);
+      if (gLow) bits.push(govName + "’s primary vote is the lowest of any government at the same point" + since);
       if (oLow) bits.push((gLow ? "and " + oppIn + "’s" : oppIn + "’s primary vote is") + " the lowest of any opposition");
     }
     /* a rank counts this term among its peers, so "of 21" is 21 governments,
        twenty of them past */
     const rankWords = (r) => (/^Middle/.test(r.rank.main) ? "in the " : "the ") + r.rank.main.toLowerCase().replace(/ of (\d+)$/, " of $1 governments");
-    dek += bits.length ? bits.join(", ") + "."
+    dek += bits.length ? bits.join(", ") + tail + "."
       : g.v == null || !g.rank ? govName + "’s primary vote has no reading to set against past governments yet."
       : chg ? govName + "’s primary vote is " + upDown(g.v) + " points since the election; past governments were "
-          + (g.peers.mean < 0 ? "down " : "up ") + pts1(g.peers.mean) + " on average by now."
-      : govName + "’s primary vote is " + rankWords(g) + " at this point.";
+          + (g.peers.mean < 0 ? "down " : "up ") + pts1(g.peers.mean) + " on average by now" + tail + "."
+      : govName + "’s primary vote is " + rankWords(g) + " at this point" + tail + ".";
     if (t.peers && t.v != null && !chg) {
-      const where = t.v >= t.peers.q1 && t.v <= t.peers.q3 ? "sits in the middle half of past governments"
-        : t.v > t.peers.q3 ? "is above three in four past governments" : "is below three in four past governments";
+      const past = tail ? "those governments" : "past governments";
+      const where = t.v >= t.peers.q1 && t.v <= t.peers.q3 ? "sits in the middle half of " + past
+        : t.v > t.peers.q3 ? "is above three in four of " + past : "is below three in four of " + past;
       dek += " After preferences, " + (bits.length ? "though, " : "") + govName + "’s " + t.v.toFixed(1) + "% " + where + ".";
     }
     return { head, dek };
@@ -394,13 +413,13 @@ function RdPastCycles(p) {
     if (ret && ous) {
       const nearRet = Math.abs(t.v - ret.mean) <= Math.abs(t.v - ous.mean);
       head = "After preferences, " + govName + " is on a par with governments that went on to be " + (nearRet ? "re-elected" : "ousted");
-    } else head = "After preferences, " + govName + " is " + (dAvg >= 0 ? "above" : "below") + " the average government at this point";
-    if (chg && !(ret && ous)) head = "After preferences, " + govName + " has done " + (dAvg >= 0 ? "better" : "worse") + " than the average government since its election";
+    } else head = "After preferences, " + govName + " is " + (dAvg >= 0 ? "above" : "below") + " the average government at this point" + tail;
+    if (chg && !(ret && ous)) head = "After preferences, " + govName + " has done " + (dAvg >= 0 ? "better" : "worse") + " than the average government since its election" + tail;
     const vs = rivalWord === "One Nation" ? " against One Nation" : "";
     /* in change mode the figure is a move from the election result, said as one */
     let dek = chg
-      ? (vs ? "Against One Nation it is " : "It is ") + upDown(t.v) + " points on its election result, " + pts1(dAvg) + " " + (dAvg >= 0 ? "better" : "worse") + " than the average government " + m + " months in."
-      : "Its " + fmtOf("tpp")(t.v) + "%" + vs + " is " + pts1(dAvg) + " points " + (dAvg >= 0 ? "above" : "below") + " the average government " + m + " months in.";
+      ? (vs ? "Against One Nation it is " : "It is ") + upDown(t.v) + " points on its election result, " + pts1(dAvg) + " " + (dAvg >= 0 ? "better" : "worse") + " than the average government " + m + " months in" + tail + "."
+      : "Its " + fmtOf("tpp")(t.v) + "%" + vs + " is " + pts1(dAvg) + " points " + (dAvg >= 0 ? "above" : "below") + " the average government " + m + " months in" + tail + ".";
     if (ret && ous) dek += chg
       ? " By this stage governments later re-elected were " + (ret.mean < 0 ? "down " : "up ") + pts1(ret.mean) + " points on average, and the " + rdNumWord(ous.n) + " ousted " + (ous.mean < 0 ? "down " : "up ") + pts1(ous.mean) + "."
       : " Governments later re-elected averaged " + fmtOf("tpp")(ret.mean) + "% at this point; the " + rdNumWord(ous.n) + " ousted averaged " + fmtOf("tpp")(ous.mean) + "%.";
@@ -414,13 +433,13 @@ function RdPastCycles(p) {
     const gNow = cur.end.primary - cycBase(cur, "primary"), oNow = cur.end.oppr - cycBase(cur, "oppr");
     const oWorst = oC.vals.every((q) => q.v > oNow);
     const gWorse = gC.vals.filter((q) => q.v < gNow);
-    const head = oWorst ? "No opposition has lost as much of its vote this early as " + oppIn + " has"
-      : gC.vals.every((q) => q.v > gNow) ? "No government has lost as much of its vote this early as " + govName + " has"
+    const head = oWorst ? "No opposition has lost as much of its vote this early as " + oppIn + " has" + tail
+      : gC.vals.every((q) => q.v > gNow) ? "No government has lost as much of its vote this early as " + govName + " has" + tail
       : rdCap(oppIn) + " has " + (oNow < 0 ? "lost" : "gained") + " " + Math.abs(oNow).toFixed(1) + " points since the election";
     let dek = rdCap(oppIn) + " is " + (oNow < 0 ? "down " : "up ") + Math.abs(oNow).toFixed(1) + " points since the election, to " + cur.end.oppr.toFixed(1) + "%; by this stage the average opposition had "
-      + (oC.mean >= 0 ? "gained " : "lost ") + Math.abs(oC.mean).toFixed(1) + ". " + govName + " is " + (gNow < 0 ? "down " : "up ") + Math.abs(gNow).toFixed(1) + ", to " + cur.end.primary.toFixed(1) + "%.";
-    if (gWorse.length === 1) dek += " Only " + gWorse[0].who + "’s government, in " + gWorse[0].yr + ", had lost more by now.";
-    else if (gWorse.length > 1 && gWorse.length <= 4) dek += " " + rdCap(rdNumWord(gWorse.length)) + " governments had lost more by now.";
+      + (oC.mean >= 0 ? "gained " : "lost ") + Math.abs(oC.mean).toFixed(1) + tail + ". " + govName + " is " + (gNow < 0 ? "down " : "up ") + Math.abs(gNow).toFixed(1) + ", to " + cur.end.primary.toFixed(1) + "%.";
+    if (gWorse.length === 1) dek += (tail ? " Of those, only " : " Only ") + gWorse[0].who + "’s government, in " + gWorse[0].yr + ", had lost more by now.";
+    else if (gWorse.length > 1 && gWorse.length <= 4) dek += (tail ? " Of those, " + rdNumWord(gWorse.length) : " " + rdCap(rdNumWord(gWorse.length))) + " governments had lost more by now.";
     return { head, dek };
   })();
   const leadStory = (() => {
@@ -432,12 +451,12 @@ function RdPastCycles(p) {
     const pp = R.ppmm, on = R.oppnet;
     if (chg) {
       const less = n.v < 0 ? "fallen further" : "risen less";
-      const head = /^Lowest/.test(rk.main) ? pm + "’s net approval has " + less + " than any prime minister’s at this point"
+      const head = (/^Lowest/.test(rk.main) ? pm + "’s net approval has " + less + " than any prime minister’s at this point"
         : /^2nd lowest/.test(rk.main) ? pm + "’s net approval has " + less + " than any prime minister’s at this point but " + low.who + "’s"
         : /^Highest/.test(rk.main) ? pm + "’s net approval has " + (n.v >= 0 ? "risen more" : "fallen less") + " than any prime minister’s at this point"
-        : pm + "’s net approval has done " + (dN >= 0 ? "better" : "worse") + " than the average prime minister’s since the term’s first reading";
+        : pm + "’s net approval has done " + (dN >= 0 ? "better" : "worse") + " than the average prime minister’s since the term’s first reading") + tail;
       /* the leaders' measures count from the term's first reading, not the election */
-      let dek = "It is " + upDown(n.v) + " points on the term’s first reading, " + pts1(dN) + " " + (dN >= 0 ? "better" : "worse") + " than the average prime minister " + m + " months in.";
+      let dek = "It is " + upDown(n.v) + " points on the term’s first reading, " + pts1(dN) + " " + (dN >= 0 ? "better" : "worse") + " than the average prime minister " + m + " months in" + tail + ".";
       if (pp.peers && pp.v != null) {
         const dP = pp.v - pp.peers.mean;
         dek += " His lead as preferred PM is " + upDown(pp.v) + ", " + (Math.abs(dP) <= 3 ? "close to the average" : pts1(dP) + " " + (dP > 0 ? "better" : "worse") + " than the average");
@@ -448,11 +467,11 @@ function RdPastCycles(p) {
       }
       return { head, dek };
     }
-    const head = /^Lowest/.test(rk.main) ? pm + "’s net approval is the lowest of any prime minister at this point"
+    const head = (/^Lowest/.test(rk.main) ? pm + "’s net approval is the lowest of any prime minister at this point"
       : /^2nd lowest/.test(rk.main) ? pm + "’s net approval is the second lowest of any prime minister at this point, after " + low.who + "’s"
       : /^Highest/.test(rk.main) ? pm + "’s net approval is the highest of any prime minister at this point"
-      : pm + "’s net approval is " + (n.v >= n.peers.mean ? "above" : "below") + " the average prime minister’s at this point";
-    let dek = "At " + fmtOf("net")(n.v) + " he is " + Math.abs(dN).toFixed(1) + " points " + (dN >= 0 ? "above" : "below") + " the average prime minister " + m + " months in.";
+      : pm + "’s net approval is " + (n.v >= n.peers.mean ? "above" : "below") + " the average prime minister’s at this point") + tail;
+    let dek = "At " + fmtOf("net")(n.v) + " he is " + Math.abs(dN).toFixed(1) + " points " + (dN >= 0 ? "above" : "below") + " the average prime minister " + m + " months in" + tail + ".";
     if (pp.peers && pp.v != null) {
       const dP = pp.v - pp.peers.mean;
       dek += " He " + (pp.v >= 0 ? "still leads" : "trails") + " as preferred PM by " + Math.abs(pp.v).toFixed(1) + " points, " + (Math.abs(dP) <= 3 ? "close to the average" : Math.abs(dP).toFixed(1) + " " + (dP > 0 ? "above" : "below") + " the average");
