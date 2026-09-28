@@ -15,11 +15,16 @@ points (right − wrong)**, like `sinceFirst = now.net - first.net` vs the
 term's first monthly mean. `wrong`/`right` absolute shares feed `head`, the
 scatter and the bracket, never the dek's direction words.
 
-## The dek (NET framing since 464b57c, vivid verbs since cb17179/next commit, 2026-09-28)
+## The dek (NET framing 464b57c, vivid-verb ladder 3b2e60b, held-steady copy 41da3ef — all 2026-09-28)
+
+User-confirmed full ladder (in their words): **plummeted → soured → soured
+slightly → held steady → lifted slightly → lifted → soared** — the rungs
+map to netVerb's down tiers, the insignificant-month sentence, and the up
+tiers respectively.
 
 Rendered when wrong-track leads:
 
-> Only 23% say it is heading in the right direction. Net mood has
+> Only 23% say we're heading in the right direction. Net mood has
 > plummeted, down 10 points in a month and more than 30 points since the
 > 2025 election.
 
