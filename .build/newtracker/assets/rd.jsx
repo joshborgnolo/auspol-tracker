@@ -337,13 +337,28 @@ function rdTabsKey(options, onChange) {
     btns[j].focus();
   };
 }
-function RdTabs({ value, onChange, options, ariaLabel, children, className, swipe }) {
+/* number-key hotkeys over a row: with focus anywhere in the row, 1..9 picks
+   the item that many places along the given list (the who-votes party
+   chips' 1..5). Modifier chords are the browser's own (Cmd+1 picks the
+   browser's tab), so they pass through. */
+function rdDigitKey(items, onChange) {
+  return (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const n = e.key >= "1" && e.key <= "9" ? e.key.charCodeAt(0) - 48 : 0;
+    if (!n || !items[n - 1]) return;
+    e.preventDefault();
+    onChange(items[n - 1].id);
+  };
+}
+function RdTabs({ value, onChange, options, ariaLabel, children, className, swipe, onDigits }) {
   /* `swipe`: the views are pages of their own (All polls' figures, preferred
      PM's questions, who votes by age or by place…), so on a phone a sideways
      swipe on or just under the row steps through them - the app's swipe
      handler finds the row by data-rd-swipe and calls its step. Views that
      only re-cut one figure (a time range, a filter) leave it off, and a
-     swipe near them turns the page instead. */
+     swipe near them turns the page instead.
+     `onDigits`: a row-wide number-key handler (rdDigitKey) hung on the outer
+     div, so it hears a focused view tab or a focused row child alike. */
   const live = React.useRef(null);
   live.current = (dir) => {
     const i = options.findIndex((o) => o.id === value);
@@ -355,7 +370,8 @@ function RdTabs({ value, onChange, options, ariaLabel, children, className, swip
   const mark = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => live.current(dir); }, []);
   return (
     <div className={"rd-tabs" + (className ? " " + className : "")}
-         ref={swipe ? mark : undefined} data-rd-swipe={swipe ? "" : undefined}>
+         ref={swipe ? mark : undefined} data-rd-swipe={swipe ? "" : undefined}
+         onKeyDown={onDigits || undefined}>
       <div role="group" aria-label={ariaLabel} style={{ display: "flex", gap: 4 }}
            onKeyDown={rdTabsKey(options, onChange)} onClick={rdTabFocus}>
         {options.map((o) => (
@@ -547,7 +563,7 @@ function RdQPop({ label, children, align }) {
 }
 
 Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdGlide, RdCrossfade,
-                        rdTabsKey, rdTabFocus,
+                        rdTabsKey, rdTabFocus, rdDigitKey,
                         rdNumWord, rdCap, rdFraction, rdSigned, rdArrow,
                         rdDate, rdMonthYear, rdPointsPhrase, rdXTicks, rdYTicks,
                         rdEventBadges, RdEventList, RdCheck, RdSwitch, RdTerm, RdQPop });

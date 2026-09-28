@@ -1333,9 +1333,12 @@ function RdDemographics({ rangeId = "all" }) {
   return (
     <RdSec id="who-votes" cls="rd-wv" title="Who votes for whom" meta={"Pooled from the last " + T.window + " of " + rdList(T.houses.map(demoHouse)) + " polls"}>
       <RdHed head={story.head} dek={story.dek} />
-      <RdTabs swipe value={tab.id} onChange={setTab} options={T.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-wv-tabs">
+      {/* the party picks itself by number key: 1 One Nation, 2 Labor,
+          3 Coalition, 4 Greens, 5 Others - the chips' left-to-right order */}
+      <RdTabs swipe value={tab.id} onChange={setTab} options={T.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-wv-tabs"
+              onDigits={rdDigitKey(DEMO_PARTIES, chooseParty)}>
         {!narrow && (
-          <span className="rd-chips" role="group" aria-label="Party">
+          <span className="rd-chips" role="group" aria-label="Party" onClick={rdTabFocus}>
             {DEMO_PARTIES.map((pp) => (
               <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => chooseParty(pp.id)}
                       style={party === pp.id ? { background: "var(--tint-" + pp.id + ")", borderColor: D.PARTIES[pp.id].color } : undefined}>
@@ -1345,7 +1348,8 @@ function RdDemographics({ rangeId = "all" }) {
         )}
       </RdTabs>
       {narrow && (
-        <div className="rd-chips rd-chips-row" role="group" aria-label="Party">
+        <div className="rd-chips rd-chips-row" role="group" aria-label="Party" onClick={rdTabFocus}
+             onKeyDown={rdDigitKey(DEMO_PARTIES, chooseParty)}>
           {DEMO_PARTIES.map((pp) => (
             <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => chooseParty(pp.id)}
                     style={party === pp.id ? { background: "var(--tint-" + pp.id + ")", borderColor: D.PARTIES[pp.id].color } : undefined}>

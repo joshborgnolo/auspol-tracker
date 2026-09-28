@@ -57395,6 +57395,15 @@ function rdTabsKey(options, onChange) {
     btns[j].focus();
   };
 }
+function rdDigitKey(items, onChange) {
+  return e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const n = e.key >= "1" && e.key <= "9" ? e.key.charCodeAt(0) - 48 : 0;
+    if (!n || !items[n - 1]) return;
+    e.preventDefault();
+    onChange(items[n - 1].id);
+  };
+}
 function RdTabs({
   value,
   onChange,
@@ -57402,7 +57411,8 @@ function RdTabs({
   ariaLabel,
   children,
   className,
-  swipe
+  swipe,
+  onDigits
 }) {
   const live = React.useRef(null);
   live.current = dir => {
@@ -57418,7 +57428,8 @@ function RdTabs({
   return React.createElement("div", {
     className: "rd-tabs" + (className ? " " + className : ""),
     ref: swipe ? mark : undefined,
-    "data-rd-swipe": swipe ? "" : undefined
+    "data-rd-swipe": swipe ? "" : undefined,
+    onKeyDown: onDigits || undefined
   }, React.createElement("div", {
     role: "group",
     "aria-label": ariaLabel,
@@ -57657,6 +57668,7 @@ Object.assign(window, {
   RdCrossfade,
   rdTabsKey,
   rdTabFocus,
+  rdDigitKey,
   rdNumWord,
   rdCap,
   rdFraction,
@@ -60602,11 +60614,13 @@ function RdDemographics({
       label: x.label
     })),
     ariaLabel: "Group voters by",
-    className: "rd-wv-tabs"
+    className: "rd-wv-tabs",
+    onDigits: rdDigitKey(DEMO_PARTIES, chooseParty)
   }, !narrow && React.createElement("span", {
     className: "rd-chips",
     role: "group",
-    "aria-label": "Party"
+    "aria-label": "Party",
+    onClick: rdTabFocus
   }, DEMO_PARTIES.map(pp => React.createElement("button", {
     key: pp.id,
     type: "button",
@@ -60625,7 +60639,9 @@ function RdDemographics({
   }), pp.label)))), narrow && React.createElement("div", {
     className: "rd-chips rd-chips-row",
     role: "group",
-    "aria-label": "Party"
+    "aria-label": "Party",
+    onClick: rdTabFocus,
+    onKeyDown: rdDigitKey(DEMO_PARTIES, chooseParty)
   }, DEMO_PARTIES.map(pp => React.createElement("button", {
     key: pp.id,
     type: "button",
