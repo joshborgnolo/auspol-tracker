@@ -312,6 +312,23 @@ function RdFoot({ children, how }) {
 
 /* ---------------------------------------------------------------- tabs
    The views inside a section: a row of words, the chosen one underlined. */
+/* left/right walking for a tab row: with one of its tabs focused, an arrow
+   moves the selection and focus a tab at a time, clamped at the ends (no
+   wrap). RdTabs rows get it built in; a hand-rolled row attaches the factory
+   to its role=group div. Options must sit in the buttons' DOM order. */
+function rdTabsKey(options, onChange) {
+  return (e) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const btn = e.target && e.target.closest ? e.target.closest("button") : null;
+    if (!btn) return;
+    e.preventDefault();
+    const btns = [...e.currentTarget.querySelectorAll("button")];
+    const j = btns.indexOf(btn) + (e.key === "ArrowRight" ? 1 : -1);
+    if (!btns[j] || !options[j]) return;
+    onChange(options[j].id);
+    btns[j].focus();
+  };
+}
 function RdTabs({ value, onChange, options, ariaLabel, children, className, swipe }) {
   /* `swipe`: the views are pages of their own (All polls' figures, preferred
      PM's questions, who votes by age or by place…), so on a phone a sideways
@@ -331,7 +348,7 @@ function RdTabs({ value, onChange, options, ariaLabel, children, className, swip
   return (
     <div className={"rd-tabs" + (className ? " " + className : "")}
          ref={swipe ? mark : undefined} data-rd-swipe={swipe ? "" : undefined}>
-      <div role="group" aria-label={ariaLabel} style={{ display: "flex", gap: 4 }}>
+      <div role="group" aria-label={ariaLabel} style={{ display: "flex", gap: 4 }} onKeyDown={rdTabsKey(options, onChange)}>
         {options.map((o) => (
           <button key={o.id} type="button" className="rd-tab" aria-pressed={value === o.id}
                   onClick={() => onChange(o.id)} title={o.title}>
@@ -521,6 +538,7 @@ function RdQPop({ label, children, align }) {
 }
 
 Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdGlide, RdCrossfade,
+                        rdTabsKey,
                         rdNumWord, rdCap, rdFraction, rdSigned, rdArrow,
                         rdDate, rdMonthYear, rdPointsPhrase, rdXTicks, rdYTicks,
                         rdEventBadges, RdEventList, RdCheck, RdSwitch, RdTerm, RdQPop });

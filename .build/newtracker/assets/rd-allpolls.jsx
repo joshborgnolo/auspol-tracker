@@ -1023,7 +1023,8 @@ function RdAllPolls(P) {
           Filters{nFilters ? ", " + nFilters : ""}
         </button>
       ) : <>
-        <span className="rd-ap-pintabs" role="group" aria-label="Figures">
+        <span className="rd-ap-pintabs" role="group" aria-label="Figures"
+              onKeyDown={rdTabsKey(FACETS, onFacet)}>
           {FACETS.map((f) => <button key={f.id} type="button" className="rd-ap-pint" aria-pressed={facet === f.id} tabIndex={pinned ? 0 : -1} onClick={() => onFacet(f.id)}>{f.label}</button>)}
         </span>
         <span className="rd-ap-pinsep" aria-hidden="true"></span>

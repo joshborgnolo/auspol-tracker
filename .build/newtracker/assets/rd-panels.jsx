@@ -1971,7 +1971,8 @@ function RdIssues({ rangeId = "all" }) {
                    every group's share of that one issue down a single scale */
                 <>
                   <span className="rd-iw-k">Group voters by</span>
-                  <div className="rd-iw-chips" role="group" aria-label="Group voters by">
+                  <div className="rd-iw-chips" role="group" aria-label="Group voters by"
+                       onKeyDown={rdTabsKey(G.tabs, setGset)}>
                     {G.tabs.map((x) => <button key={x.id} type="button" className="rd-iw-chip" aria-pressed={gtab.id === x.id} onClick={() => setGset(x.id)}>{x.label}</button>)}
                   </div>
                   <span className="rd-iw-k">Issue</span>

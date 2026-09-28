@@ -55897,11 +55897,11 @@ function infoTerms(D) {
     }, {
       id: "vote-by-group",
       term: "Breakdowns by group",
-      body: React.createElement(React.Fragment, null, "How each group \u2013 men and women, age groups, education levels, states, where people live, whether they own or rent, the language they speak at home, and how certain of their choice they are \u2013 says it will vote, from the tables pollsters publish with their polls. The panel \u201CWho votes for whom\u201D pools them into one figure per group.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "How each group \u2013 men and women, age groups, education levels, states, where people live, whether they own or rent, and the language they speak at home \u2013 says it will vote, from the tables pollsters publish with their polls. The panel \u201CWho votes for whom\u201D pools them into one figure per group.", React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "How it\u2019s built."), " Each poll says how far a group sits from that poll\u2019s own overall figure: One Nation ten points lower among 18\u201334s, say. Those gaps are pooled over the last six weeks of polls, weighted as the headline\u2019s polls are, so newer and larger polls count for more. They are then added to the site\u2019s current figure for all voters. Measuring each poll against its own total removes its pollster\u2019s lean, and puts every group on the same level as the headline. The charts under the figures follow each group month by month, built the same way: each month\u2019s pooled gaps are added to that month\u2019s figure for all voters, as every monthly line on the site is built. They show each group as a percentage above or below all voters."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Which pollsters count where."), " Groups pool only where the pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov, and RedBridge. 18\u201334: Resolve, DemosAU, and YouGov. 35\u201354 and 55+: Resolve and DemosAU, since YouGov\u2019s bands are 35\u201349 and 50+. ", xref("generations", "breakdowns by group", "Generations"), ": YouGov and RedBridge. Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge\u2019s two school rows combined in proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the rest of Australia at their shares of the 2025 vote. Where people live: YouGov and RedBridge, which draw the same four areas, and DemosAU for the two metropolitan ones, since its third combines provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its renters include others who don\u2019t own. Language at home: YouGov and DemosAU. Softness of the vote \u2013 certain of the choice, may change it, or only named it when pressed (or says they will probably change it) \u2013 is RedBridge\u2019s own question, asked by no other pollster."), React.createElement("span", {
+      }, React.createElement("b", null, "Which pollsters count where."), " Groups pool only where the pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov, and RedBridge. 18\u201334: Resolve, DemosAU, and YouGov. 35\u201354 and 55+: Resolve and DemosAU, since YouGov\u2019s bands are 35\u201349 and 50+. ", xref("generations", "breakdowns by group", "Generations"), ": YouGov and RedBridge. Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge\u2019s two school rows combined in proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the rest of Australia at their shares of the 2025 vote. Where people live: YouGov and RedBridge, which draw the same four areas, and DemosAU for the two metropolitan ones, since its third combines provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its renters include others who don\u2019t own. Language at home: YouGov and DemosAU."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Reading a gap."), " Each figure carries its 95% margin, usually 2 to 5 points. It is the ", xref("interval", "breakdowns by group", "95% interval"), " taken over the group\u2019s pooled gaps, with each poll\u2019s sample for the group estimated as the poll\u2019s sample times the group\u2019s share of adults: 18\u201334s are about 28%."), React.createElement("span", {
         className: "info-p"
@@ -57375,6 +57375,19 @@ function RdFoot({
     className: "rd-grow"
   }), how ? React.createElement(RdHow, how) : null));
 }
+function rdTabsKey(options, onChange) {
+  return e => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const btn = e.target && e.target.closest ? e.target.closest("button") : null;
+    if (!btn) return;
+    e.preventDefault();
+    const btns = [...e.currentTarget.querySelectorAll("button")];
+    const j = btns.indexOf(btn) + (e.key === "ArrowRight" ? 1 : -1);
+    if (!btns[j] || !options[j]) return;
+    onChange(options[j].id);
+    btns[j].focus();
+  };
+}
 function RdTabs({
   value,
   onChange,
@@ -57405,7 +57418,8 @@ function RdTabs({
     style: {
       display: "flex",
       gap: 4
-    }
+    },
+    onKeyDown: rdTabsKey(options, onChange)
   }, options.map(o => React.createElement("button", {
     key: o.id,
     type: "button",
@@ -57633,6 +57647,7 @@ Object.assign(window, {
   RdTabs,
   RdGlide,
   RdCrossfade,
+  rdTabsKey,
   rdNumWord,
   rdCap,
   rdFraction,
@@ -61672,7 +61687,8 @@ function RdIssues({
   }, "Group voters by"), React.createElement("div", {
     className: "rd-iw-chips",
     role: "group",
-    "aria-label": "Group voters by"
+    "aria-label": "Group voters by",
+    onKeyDown: rdTabsKey(G.tabs, setGset)
   }, G.tabs.map(x => React.createElement("button", {
     key: x.id,
     type: "button",
@@ -64218,6 +64234,8 @@ function RdPastCycles(p) {
   }), "The ", cur.year, " term")));
   const liftedList = cycles.filter(c => lifted.has(c.year) && !hidden.has(c.year));
   const pmNames = c => c.raw.netEras && c.raw.netEras.length > 1 ? c.raw.netEras.map(e => e.name).join("–") : c.lead;
+  const CMP_ROWS = [["all", "All past terms", nPast], ["returned", "Re-elected", nRet], ["ousted", "Ousted", nOus]];
+  const MODE_ROWS = ["abs", "chg"];
   const controls = React.createElement("div", {
     className: "rd-cc",
     ref: boardRef
@@ -64228,8 +64246,11 @@ function RdPastCycles(p) {
   }, "Compare with"), React.createElement("div", {
     className: "rd-tabs rd-cc-tabs",
     role: "group",
-    "aria-label": "Compare with"
-  }, [["all", "All past terms", nPast], ["returned", "Re-elected", nRet], ["ousted", "Ousted", nOus]].map(([id, lab, n]) => React.createElement("button", {
+    "aria-label": "Compare with",
+    onKeyDown: rdTabsKey(CMP_ROWS.map(([id]) => ({
+      id
+    })), setCompare)
+  }, CMP_ROWS.map(([id, lab, n]) => React.createElement("button", {
     key: id,
     type: "button",
     className: "rd-tab",
@@ -64243,7 +64264,10 @@ function RdPastCycles(p) {
   }), React.createElement("div", {
     className: "rd-tabs rd-cc-tabs",
     role: "group",
-    "aria-label": "Measure"
+    "aria-label": "Measure",
+    onKeyDown: rdTabsKey(MODE_ROWS.map(id => ({
+      id
+    })), setMode)
   }, React.createElement("button", {
     type: "button",
     className: "rd-tab",
@@ -66387,7 +66411,8 @@ function RdAllPolls(P) {
   })), "Filters", nFilters ? ", " + nFilters : "") : React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-ap-pintabs",
     role: "group",
-    "aria-label": "Figures"
+    "aria-label": "Figures",
+    onKeyDown: rdTabsKey(FACETS, onFacet)
   }, FACETS.map(f => React.createElement("button", {
     key: f.id,
     type: "button",
