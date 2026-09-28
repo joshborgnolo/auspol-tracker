@@ -832,12 +832,12 @@ function RdDirection({ rangeId }) {
     + (most ? ", the most this term" : "");
   const first = M[0];
   const sinceFirst = now.net - first.net;
-  const netVerb = (d) => (d > 0 ? "soared" : "plummeted");
+  const netVerb = (n, up) => n >= 10 ? (up ? "soared" : "plummeted") : n >= 6 ? (up ? "lifted" : "soured") : (up ? "lifted slightly" : "soured slightly");
   const netWord = (d) => (d > 0 ? "improved" : "worsened");
   const upDown = (d) => (d > 0 ? "up " : "down ");
   const dek = (small < 30 ? "Only " : "") + Math.round(small) + "% say it is " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". "
     + (now.chg == null ? ""
-      : now.changeSig ? "Net mood has " + netVerb(now.chg) + ", " + upDown(now.chg) + Math.round(Math.abs(now.chg)) + " points in a month"
+      : now.changeSig ? "Net mood has " + netVerb(Math.round(Math.abs(now.chg)), now.chg > 0) + ", " + upDown(now.chg) + Math.round(Math.abs(now.chg)) + " points in a month"
       : "Net mood has not shifted significantly in a month")
     + (Math.abs(sinceFirst) >= 5 ? (now.chg == null
       ? "Net mood has " + netWord(sinceFirst) + ", " + upDown(sinceFirst) + rdRoughPts(sinceFirst) + " points since the 2025 election."
