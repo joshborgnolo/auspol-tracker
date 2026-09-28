@@ -1499,12 +1499,18 @@ function RdSwitching({ rangeId }) {
             <rect x={c.x} y={48} width={c.cw} height={H} style={{ fill: c.tint }} />
             <rect className="rd-mo-fill" x={c.x} y={48 + H - fillH} width={c.cw} height={fillH} style={{ fill: c.kept ? "var(--onp-deep)" : "var(--onp)" }} />
             {i === 0 && <text className="rd-mo-sz" x={c.x + 12} y={48 + 22} style={{ fill: c.ink }}>Stayed or went elsewhere</text>}
-            {c.kept ? (
-              <>
-                <text className="rd-mo-rates" x={c.x + 10} y={48 + H - fillH + 24} style={{ fill: "var(--bg)" }}>{Math.round(c.rate)}%</text>
-                <text className="rd-mo-sz" x={c.x + 10} y={48 + H - fillH + 40} style={{ fill: "var(--bg)" }}>kept</text>
-              </>
-            ) : i === 0 ? (
+            {c.kept ? (() => {
+              /* a tablet's One Nation column is barely wider than "94%": set
+                 in from its edge, the figure ran off the drawing - centred there */
+              const fit = c.cw >= textWidth(Math.round(c.rate) + "%", 15, 600) + 20;
+              const kx = fit ? c.x + 10 : c.x + c.cw / 2, ka = fit ? "start" : "middle";
+              return (
+                <>
+                  <text className="rd-mo-rates" x={kx} y={48 + H - fillH + 24} textAnchor={ka} style={{ fill: "var(--bg)" }}>{Math.round(c.rate)}%</text>
+                  <text className="rd-mo-sz" x={kx} y={48 + H - fillH + 40} textAnchor={ka} style={{ fill: "var(--bg)" }}>kept</text>
+                </>
+              );
+            })() : i === 0 ? (
               <>
                 <text className="rd-mo-rate" x={c.x + 14} y={48 + H - fillH + 30}>{fmt1(c.rate)}%</text>
                 <text className="rd-mo-sz rd-mo-onfill" x={c.x + 14} y={48 + H - fillH + 48}>now back One Nation</text>

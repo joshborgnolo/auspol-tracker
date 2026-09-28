@@ -60448,21 +60448,28 @@ function RdSwitching({
       style: {
         fill: c.ink
       }
-    }, "Stayed or went elsewhere"), c.kept ? React.createElement(React.Fragment, null, React.createElement("text", {
-      className: "rd-mo-rates",
-      x: c.x + 10,
-      y: 48 + H - fillH + 24,
-      style: {
-        fill: "var(--bg)"
-      }
-    }, Math.round(c.rate), "%"), React.createElement("text", {
-      className: "rd-mo-sz",
-      x: c.x + 10,
-      y: 48 + H - fillH + 40,
-      style: {
-        fill: "var(--bg)"
-      }
-    }, "kept")) : i === 0 ? React.createElement(React.Fragment, null, React.createElement("text", {
+    }, "Stayed or went elsewhere"), c.kept ? (() => {
+      const fit = c.cw >= textWidth(Math.round(c.rate) + "%", 15, 600) + 20;
+      const kx = fit ? c.x + 10 : c.x + c.cw / 2,
+        ka = fit ? "start" : "middle";
+      return React.createElement(React.Fragment, null, React.createElement("text", {
+        className: "rd-mo-rates",
+        x: kx,
+        y: 48 + H - fillH + 24,
+        textAnchor: ka,
+        style: {
+          fill: "var(--bg)"
+        }
+      }, Math.round(c.rate), "%"), React.createElement("text", {
+        className: "rd-mo-sz",
+        x: kx,
+        y: 48 + H - fillH + 40,
+        textAnchor: ka,
+        style: {
+          fill: "var(--bg)"
+        }
+      }, "kept"));
+    })() : i === 0 ? React.createElement(React.Fragment, null, React.createElement("text", {
       className: "rd-mo-rate",
       x: c.x + 14,
       y: 48 + H - fillH + 30
