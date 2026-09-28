@@ -316,6 +316,13 @@ function RdFoot({ children, how }) {
    moves the selection and focus a tab at a time, clamped at the ends (no
    wrap). RdTabs rows get it built in; a hand-rolled row attaches the factory
    to its role=group div. Options must sit in the buttons' DOM order. */
+/* Safari and Firefox on macOS never focus a <button> on click (only Chrome
+   does), which would leave the walk dead for a pointer user - a click lands
+   the button's focus explicitly. */
+function rdTabFocus(e) {
+  const b = e.target && e.target.closest ? e.target.closest("button") : null;
+  if (b) b.focus();
+}
 function rdTabsKey(options, onChange) {
   return (e) => {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
@@ -348,7 +355,8 @@ function RdTabs({ value, onChange, options, ariaLabel, children, className, swip
   return (
     <div className={"rd-tabs" + (className ? " " + className : "")}
          ref={swipe ? mark : undefined} data-rd-swipe={swipe ? "" : undefined}>
-      <div role="group" aria-label={ariaLabel} style={{ display: "flex", gap: 4 }} onKeyDown={rdTabsKey(options, onChange)}>
+      <div role="group" aria-label={ariaLabel} style={{ display: "flex", gap: 4 }}
+           onKeyDown={rdTabsKey(options, onChange)} onClick={rdTabFocus}>
         {options.map((o) => (
           <button key={o.id} type="button" className="rd-tab" aria-pressed={value === o.id}
                   onClick={() => onChange(o.id)} title={o.title}>
@@ -538,7 +546,7 @@ function RdQPop({ label, children, align }) {
 }
 
 Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdGlide, RdCrossfade,
-                        rdTabsKey,
+                        rdTabsKey, rdTabFocus,
                         rdNumWord, rdCap, rdFraction, rdSigned, rdArrow,
                         rdDate, rdMonthYear, rdPointsPhrase, rdXTicks, rdYTicks,
                         rdEventBadges, RdEventList, RdCheck, RdSwitch, RdTerm, RdQPop });

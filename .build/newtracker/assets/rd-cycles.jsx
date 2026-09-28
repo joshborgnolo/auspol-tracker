@@ -564,14 +564,14 @@ function RdPastCycles(p) {
       <div className="rd-cc-row">
         <span className="rd-cc-l">Compare with</span>
         <div className="rd-tabs rd-cc-tabs" role="group" aria-label="Compare with"
-             onKeyDown={rdTabsKey(CMP_ROWS.map(([id]) => ({ id })), setCompare)}>
+             onKeyDown={rdTabsKey(CMP_ROWS.map(([id]) => ({ id })), setCompare)} onClick={rdTabFocus}>
           {CMP_ROWS.map(([id, lab, n]) => (
             <button key={id} type="button" className="rd-tab" aria-pressed={compare === id} onClick={() => setCompare(id)}>{narrow && id === "all" ? "All" : lab}<span className="rd-cc-n">{n}</span></button>
           ))}
         </div>
         <span className="rd-cc-sep" aria-hidden="true"></span>
         <div className="rd-tabs rd-cc-tabs" role="group" aria-label="Measure"
-             onKeyDown={rdTabsKey(MODE_ROWS.map((id) => ({ id })), setMode)}>
+             onKeyDown={rdTabsKey(MODE_ROWS.map((id) => ({ id })), setMode)} onClick={rdTabFocus}>
           <button type="button" className="rd-tab" aria-pressed={!chg} onClick={() => setMode("abs")}>Level</button>
           <button type="button" className="rd-tab" aria-pressed={chg} onClick={() => setMode("chg")}>{narrow ? "Change" : "Change since election"}</button>
         </div>

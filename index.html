@@ -57375,6 +57375,10 @@ function RdFoot({
     className: "rd-grow"
   }), how ? React.createElement(RdHow, how) : null));
 }
+function rdTabFocus(e) {
+  const b = e.target && e.target.closest ? e.target.closest("button") : null;
+  if (b) b.focus();
+}
 function rdTabsKey(options, onChange) {
   return e => {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
@@ -57419,7 +57423,8 @@ function RdTabs({
       display: "flex",
       gap: 4
     },
-    onKeyDown: rdTabsKey(options, onChange)
+    onKeyDown: rdTabsKey(options, onChange),
+    onClick: rdTabFocus
   }, options.map(o => React.createElement("button", {
     key: o.id,
     type: "button",
@@ -57648,6 +57653,7 @@ Object.assign(window, {
   RdGlide,
   RdCrossfade,
   rdTabsKey,
+  rdTabFocus,
   rdNumWord,
   rdCap,
   rdFraction,
@@ -61689,7 +61695,8 @@ function RdIssues({
     className: "rd-iw-chips",
     role: "group",
     "aria-label": "Group voters by",
-    onKeyDown: rdTabsKey(G.tabs, setGset)
+    onKeyDown: rdTabsKey(G.tabs, setGset),
+    onClick: rdTabFocus
   }, G.tabs.map(x => React.createElement("button", {
     key: x.id,
     type: "button",
@@ -64250,7 +64257,8 @@ function RdPastCycles(p) {
     "aria-label": "Compare with",
     onKeyDown: rdTabsKey(CMP_ROWS.map(([id]) => ({
       id
-    })), setCompare)
+    })), setCompare),
+    onClick: rdTabFocus
   }, CMP_ROWS.map(([id, lab, n]) => React.createElement("button", {
     key: id,
     type: "button",
@@ -64268,7 +64276,8 @@ function RdPastCycles(p) {
     "aria-label": "Measure",
     onKeyDown: rdTabsKey(MODE_ROWS.map(id => ({
       id
-    })), setMode)
+    })), setMode),
+    onClick: rdTabFocus
   }, React.createElement("button", {
     type: "button",
     className: "rd-tab",
@@ -66413,7 +66422,8 @@ function RdAllPolls(P) {
     className: "rd-ap-pintabs",
     role: "group",
     "aria-label": "Figures",
-    onKeyDown: rdTabsKey(FACETS, onFacet)
+    onKeyDown: rdTabsKey(FACETS, onFacet),
+    onClick: rdTabFocus
   }, FACETS.map(f => React.createElement("button", {
     key: f.id,
     type: "button",
