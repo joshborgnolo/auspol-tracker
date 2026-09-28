@@ -828,7 +828,7 @@ function RdDirection({ rangeId }) {
   const wrongLeads = now.wrong >= now.right;
   const big = wrongLeads ? now.wrong : now.right, small = wrongLeads ? now.right : now.wrong;
   const most = wrongLeads ? now.wrong >= Math.max(...M.map((d) => d.wrong)) - 0.05 : now.right >= Math.max(...M.map((d) => d.right)) - 0.05;
-  const head = plainShare(big) + " say the country is " + (wrongLeads ? "on the wrong track" : "heading in the right direction")
+  const head = plainShare(big) + " say Australia is " + (wrongLeads ? "on the wrong track" : "heading in the right direction")
     + (most ? ", the most this term" : "");
   const first = M[0];
   const sinceFirst = now.net - first.net;

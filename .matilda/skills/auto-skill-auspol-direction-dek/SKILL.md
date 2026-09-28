@@ -84,8 +84,10 @@ movement wording.
 
 ## Neighbour machinery that is deliberately NOT net-framed
 
-- `head` (~:831): `plainShare(big) + " say the country is " + …` with
-  ", the most this term".
+- `head` (~:831): `plainShare(big) + " say Australia is " + …` with
+  ", the most this term" ("Australia", not "the country", since 2026-09-28;
+  the quoted-question string at ~:891 and the legacy panel below keep the
+  pollsters' "the country").
 - Right-edge bracket (~:860s, `brackets`): "N.N points apart in ‹Month›" /
   "up from M.M in ‹base›, before Bondi" — GAP (distance-between-lines)
   framing, which the net-framed dek does not replace; don't "align" the two.
