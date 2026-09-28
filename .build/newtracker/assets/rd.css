@@ -1555,6 +1555,9 @@ body.rd .rd-ap-who a, body.rd .rd-ap-firm a { color: inherit; text-decoration: n
 body.rd .rd-ap-who a:hover, body.rd .rd-ap-firm a:hover { text-decoration: underline; text-underline-offset: 3px; }
 body.rd .rd-ap-ext { margin-left: 1px; font-size: 11px; font-weight: 400; color: var(--ink-faint); }
 body.rd .rd-ap-sub { font-size: 12px; line-height: 1.35; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.rd .rd-tbc { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; }
+body.rd .rd-tbc:hover { text-decoration-style: solid; }
+body.rd .rd-tbc:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 body.rd .rd-ap-when b { font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-ap-n { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; font-size: 15px; color: var(--ink); }
 body.rd .rd-ap-pairfig { font-size: 15px; font-weight: 600; white-space: nowrap; }

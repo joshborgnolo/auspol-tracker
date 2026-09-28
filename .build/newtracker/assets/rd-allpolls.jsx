@@ -96,6 +96,15 @@ function rdEffTbc(p) {
     .sort((a, b) => (a.released < b.released ? -1 : 1)).pop();
   return !!(prev && prev.sampleEff != null);
 }
+/* "TBC" links to the house's APC methodology page, where the house keeps one —
+   YouGov's sets out why the effective sample trails the release. */
+function rdEffTbcNote(p) {
+  const note = "The pollster publishes an effective sample, but not yet for this poll";
+  const url = p.pollster === "YouGov" ? "https://yougov.com/about/methodology/australian-polling-council" : null;
+  return <>eff. {url
+    ? <a className="rd-tbc" href={url} target="_blank" rel="noopener noreferrer" title={note} onClick={(e) => e.stopPropagation()}>TBC</a>
+    : <span title={note}>TBC</span>}</>;
+}
 /* A poll's header, one wording wherever a poll is opened (All polls, Latest
    and next polls): when it was in the field, how many were asked, and who
    published it when (a self-published poll names its pollster). "n = 1,500" rather than "1,500 voters", with the
@@ -107,7 +116,7 @@ function rdEffTbc(p) {
 function rdPollHead(p) {
   const tbc = rdEffTbc(p);
   const n = p.sample != null
-    ? "n = " + p.sample.toLocaleString() + (p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? " (eff. TBC)" : "")
+    ? <>n = {p.sample.toLocaleString()}{p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? <> ({rdEffTbcNote(p)})</> : ""}</>
     : "sample not published";
   const out = rdApOut(p.published);
   // a self-published poll is published by its pollster, and says so
@@ -657,7 +666,7 @@ function RdAllPolls(P) {
   );
   const sampleCell = (p) => (
     <span role="cell" className="rd-ap-n"><span>{p.sample != null ? p.sample.toLocaleString() : "—"}</span>{p.sampleEff != null ? <span className="rd-ap-sub">eff. {p.sampleEff.toLocaleString()}</span>
-      : rdEffTbc(p) ? <span className="rd-ap-sub" title="The pollster publishes an effective sample, but not yet for this poll">eff. TBC</span> : null}</span>
+      : rdEffTbc(p) ? <span className="rd-ap-sub">{rdEffTbcNote(p)}</span> : null}</span>
   );
   const tipCard = (p, f, m) => {
     const lean = p.lean;
