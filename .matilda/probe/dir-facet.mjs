@@ -12,8 +12,9 @@
 //  5. The Snapshot direction chart's dot tooltip says "n = 1,659"
 //  6. VW=390 VH=844 re-run: same rows mount on the phone rung
 //  7. A wave without an unsure share drops the direction bar's middle
-//     segment entirely — a zero-width strip would still take the bar's
-//     2px flex gaps on both sides, doubling the right/wrong divider
+//     segment entirely — and with it every line-coloured separator: a
+//     no-unsure bar is its two answers meeting, with nothing painted
+//     between them (the separators frame the strip, and only the strip)
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -260,16 +261,15 @@ check("Direction facet counts against the archive's full extent",
 
 await showAll(page4);
 
-// --- direction-bar: a no-unsure reading renders no middle segment ------
-// SEC's right+wrong sum to 100. A zero-width unsure strip between them
-// still took the bar's 2px flex gaps on BOTH sides, doubling the white
-// divider — the strip must render not at all. And the separator itself is
-// a pixel-snapped left BORDER on each following segment, not a
-// transparent flex gap: proportional segment widths are fractional, so a
-// 2px gap landed at fractional device-pixel offsets and anti-aliased into
-// visibly different thicknesses across rows (and within one bar).
-// Borders snap to the device pixel grid, so every divider paints the
-// same 2 device px.
+// --- direction-bar: a no-unsure reading shows nothing between its answers
+// SEC's right+wrong sum to 100 and its strip renders not at all (a
+// zero-width <i> would still take the 2px borders on both sides). The
+// separators themselves are pixel-snapped left BORDERS, never flex gaps —
+// a gap lands on fractional device-pixel offsets off the proportional
+// segment widths and anti-aliases into visibly different thicknesses,
+// while borders snap to the device pixel grid. And they frame the unsure
+// strip alone: with no strip there is nothing to frame, so the two
+// answers meet directly and the bar carries no line-coloured ink at all.
 const bars = await page4.evaluate(() => {
   const rows = [...document.querySelectorAll(".rd-ap-row, .rd-ap-card")];
   const all = [...document.querySelectorAll(".rd-ap-dbar")];
@@ -289,12 +289,18 @@ const bars = await page4.evaluate(() => {
     }),
     withU: all.filter((b) => b.querySelector("i.u")).length,
     gaps: [...new Set(all.map((b) => getComputedStyle(b).columnGap))],
-    bad: all.flatMap((b, bi) =>
-      [...b.querySelectorAll("i")].slice(1).flatMap((k, ki) => {
+    bad: all.flatMap((b, bi) => {
+      const segs = [...b.querySelectorAll("i")];
+      const hasU = segs.some((s) => s.classList.contains("u"));
+      return segs.flatMap((k, ki) => {
         const cs = getComputedStyle(k);
-        return cs.borderLeftWidth === "2px" && cs.borderLeftColor === line
-          ? [] : [`bar${bi}.seg${ki + 1}:${cs.borderLeftWidth}/${cs.borderLeftColor}`];
-      })),
+        const framed = hasU && (k.classList.contains("u") || segs[ki - 1]?.classList.contains("u"));
+        const okSep = framed
+          ? cs.borderLeftWidth === "2px" && cs.borderLeftColor === line
+          : cs.borderLeftWidth === "0px";
+        return okSep ? [] : [`bar${bi}.seg${ki}:${cs.borderLeftWidth} framed=${framed}`];
+      });
+    }),
     line,
   };
 });
@@ -307,8 +313,8 @@ check("readings with an unsure share keep the middle strip", bars.withU > 0,
 check("bars carry no flex gap (separator is a border)",
   bars.gaps.length === 1 && (bars.gaps[0] === "0px" || bars.gaps[0] === "normal"),
   bars.gaps.join(", "));
-check("every segment border is one 2px line-coloured divider", bars.bad.length === 0,
-  bars.bad.slice(0, 3).join("; ") || `all 2px ${bars.line}`);
+check("separators frame the unsure strip only; a no-unsure bar paints none", bars.bad.length === 0,
+  bars.bad.slice(0, 3).join("; ") || `framing only on i.u and its follower`);
 
 // open a SEC Newgate row and interrogate the row cell + the detail
 async function openRow(pageRe) {

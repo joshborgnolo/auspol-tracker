@@ -1784,7 +1784,9 @@ body.rd .rd-ap-dnum { display: flex; flex-direction: column; gap: 1px; font-size
 body.rd .rd-ap-dnum b { font-weight: 600; }
 body.rd .rd-ap-dbar { position: absolute; left: 14px; right: 14px; top: 50%; height: 16px; margin-top: -8px; display: flex; }
 body.rd .rd-ap-dbar i { display: block; flex-basis: 0; min-width: 0; }
-body.rd .rd-ap-dbar i + i { border-left: 2px solid var(--line); }
+/* the separators frame the unsure strip and only that strip – a reading
+   without one (SEC Newgate) is its two answers, meeting directly */
+body.rd .rd-ap-dbar i.u, body.rd .rd-ap-dbar i.u + i { border-left: 2px solid var(--line); }
 body.rd .rd-ap-dbar i:first-child { border-radius: 2px 0 0 2px; }
 body.rd .rd-ap-dbar i:last-child { border-radius: 0 2px 2px 0; }
 body.rd .rd-ap-dbar i.u { background: var(--line); }
