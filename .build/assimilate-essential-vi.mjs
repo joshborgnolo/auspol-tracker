@@ -332,10 +332,13 @@ for (const waveDate of [...vi.keys()].sort()) {
   /* the report page is the release a direction row links out to (there's no
      Guardian write-up for a mood-only wave), and the publish stamp is the
      same UTC-record-dating rule the poll rows carry; both wait for the
-     page to be indexed, which the heal below completes on a later run */
+     page to be indexed, which the heal below completes on a later run.
+     The stamp defers past the embargo day exactly as the poll rows do. */
   const rel = releaseFor(waveDate);
+  const stamp = publishedFor(waveDate);
   const row = { date, dateStart: fieldworkStart(date), pollster: "Essential", right, wrong, unsure,
-    ...(rel ? { url: rel, published: publishedFor(waveDate) } : {}) };
+    ...(rel ? { url: rel } : {}),
+    ...(rel && embargoed(stamp) ? { published: stamp } : {}) };
   if (existingDir.some((r) => daysApart(r.date, date) <= 2)) { skippedDirDateDup.push(waveDate); continue; }
   const figDup = existingDir.find((r) => daysApart(r.date, date) <= 10
     && r.right === row.right && r.wrong === row.wrong && r.unsure === row.unsure);
@@ -347,15 +350,18 @@ for (const waveDate of [...vi.keys()].sort()) {
 }
 /* heal: file the report-page link and publish stamp onto direction rows
    written before either existed, as the report index catches up (the three
-   2025 mood-only waves among them) */
+   2025 mood-only waves among them). The stamp defers past the embargo day,
+   so the link can land a run before its stamp */
 const healedDir = [];
-for (const r of D.direction.filter((r) => r.pollster === "Essential" && r.url == null)) {
+for (const r of D.direction.filter((r) => r.pollster === "Essential" && (r.url == null || r.published == null))) {
   const csvWave = iso(Date.parse(r.date) + DAY);
   const rel = releaseFor(csvWave);
   if (!rel) continue;
-  r.url = rel;
-  r.published = publishedFor(csvWave);
-  healedDir.push(r.date);
+  let touchedRow = false;
+  if (r.url == null) { r.url = rel; touchedRow = true; }
+  const stamp = publishedFor(csvWave);
+  if (r.published == null && embargoed(stamp)) { r.published = stamp; touchedRow = true; }
+  if (touchedRow) healedDir.push(r.date);
 }
 
 console.log(`mode: ${APPLY ? "APPLY" : "dry-run"}`);
