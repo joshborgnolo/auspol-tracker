@@ -70717,7 +70717,9 @@ function RdApIssMini({
   if (rows.length < 2) return React.createElement("div", {
     ref: box
   });
-  const own = iss.own && iss.own[iss.top] ? iss.own[iss.top] : null;
+  const wown = iss.own && iss.own[iss.top] ? iss.own[iss.top] : null;
+  const nown = wown ? wown.alp + wown.lnp + wown.onp : 0;
+  const own = wown && nown > 0 ? Object.fromEntries(["alp", "lnp", "onp"].map(q => [q, wown[q] * 100 / nown])) : null;
   const vals = rows.flatMap(r => [r[1], r[2], r[3]]).concat(own ? [own.alp, own.lnp, own.onp].filter(v => v != null) : []);
   let lo = Math.floor(Math.min(...vals) / 5) * 5,
     hi = Math.ceil(Math.max(...vals) / 5) * 5;
@@ -70745,7 +70747,7 @@ function RdApIssMini({
     height: H,
     viewBox: `0 0 ${W} ${H}`,
     role: "img",
-    "aria-label": `The share rating each of Labor, the Coalition and One Nation best on ${lab}, month by month, and this wave’s printed figures.`
+    "aria-label": `The share of those naming one of the three parties rating each of Labor, the Coalition and One Nation best on ${lab}, month by month, and this wave’s own figures on the same basis.`
   }, ticks.map(v => React.createElement("path", {
     key: v,
     d: `M${x0} ${Y(v)}H${x1}`,
@@ -70906,7 +70908,9 @@ function RdApDetail({
     };
     const own = topId && iss.own && iss.own[topId] ? iss.own[topId] : null;
     if (own) {
-      const rows = ["alp", "lnp", "onp"].filter(q => own[q] != null).map(q => rowOf(q, own));
+      const nm3 = own.alp + own.lnp + own.onp;
+      const o3 = nm3 > 0 ? Object.fromEntries(["alp", "lnp", "onp"].map(q => [q, own[q] * 100 / nm3])) : own;
+      const rows = ["alp", "lnp", "onp"].filter(q => o3[q] != null).map(q => rowOf(q, o3));
       if (rows.length > 1) return {
         title: lab || "the top issue",
         rows,
@@ -71165,7 +71169,7 @@ function RdApDetail({
     p: p
   })), isIss && D.issues && iss && iss.own && iss.own[iss.top] && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-ct"
-  }, "Who voters rate best on ", D.issues.labels && D.issues.labels[iss.top] || iss.top, " since ", D.monthNameFull(Number(from.slice(5))), ", the monthly pooled line and this wave\u2019s own figures"), React.createElement(RdApIssMini, {
+  }, "Who voters rate best on ", D.issues.labels && D.issues.labels[iss.top] || iss.top, " since ", D.monthNameFull(Number(from.slice(5))), ", the monthly pooled line and this wave\u2019s own figures on the same basis \u2014 shares of those naming one of the three parties"), React.createElement(RdApIssMini, {
     p: p
   })), React.createElement("div", {
     className: "rd-apd-facts"

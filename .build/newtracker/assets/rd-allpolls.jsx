@@ -506,7 +506,11 @@ function RdApIssMini({ p }) {
   /* [ym, alp, lnp, onp, ±alp, ±lnp, ±onp] */
   const rows = item.monthly.filter((r) => rdApDays(r[0] + "-15") >= t0 && rdApDays(r[0] + "-15") <= t1);
   if (rows.length < 2) return <div ref={box}></div>;
-  const own = iss.own && iss.own[iss.top] ? iss.own[iss.top] : null;
+  /* as-printed → three-party split: the wave's own shares go onto the
+     pooled line's basis (of those naming one of the three parties) */
+  const wown = iss.own && iss.own[iss.top] ? iss.own[iss.top] : null;
+  const nown = wown ? wown.alp + wown.lnp + wown.onp : 0;
+  const own = wown && nown > 0 ? Object.fromEntries(["alp", "lnp", "onp"].map((q) => [q, wown[q] * 100 / nown])) : null;
   const vals = rows.flatMap((r) => [r[1], r[2], r[3]]).concat(own ? [own.alp, own.lnp, own.onp].filter((v) => v != null) : []);
   let lo = Math.floor(Math.min(...vals) / 5) * 5, hi = Math.ceil(Math.max(...vals) / 5) * 5;
   if (hi - lo < 15) { const c = (lo + hi) / 2; lo = Math.max(0, Math.floor((c - 8) / 5) * 5); hi = lo + (lo === 0 ? 20 : 16); }
@@ -521,7 +525,7 @@ function RdApIssMini({ p }) {
   return (
     <div ref={box} className="rd-apd-mini">
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
-           aria-label={`The share rating each of Labor, the Coalition and One Nation best on ${lab}, month by month, and this wave’s printed figures.`}>
+           aria-label={`The share of those naming one of the three parties rating each of Labor, the Coalition and One Nation best on ${lab}, month by month, and this wave’s own figures on the same basis.`}>
         {ticks.map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === 0 ? "rd-apd-even" : "rd-apd-gl"}></path>)}
         {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{v}</text>)}
         {PARTIES.map(([i, , ink]) => (
@@ -609,7 +613,13 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
     };
     const own = topId && iss.own && iss.own[topId] ? iss.own[topId] : null;
     if (own) {
-      const rows = ["alp", "lnp", "onp"].filter((q) => own[q] != null).map((q) => rowOf(q, own));
+      /* as-printed → shares of those naming one of the three parties,
+         the pooled ownership series’ basis (see §5i) */
+      const nm3 = own.alp + own.lnp + own.onp;
+      const o3 = nm3 > 0
+        ? Object.fromEntries(["alp", "lnp", "onp"].map((q) => [q, own[q] * 100 / nm3]))
+        : own;
+      const rows = ["alp", "lnp", "onp"].filter((q) => o3[q] != null).map((q) => rowOf(q, o3));
       if (rows.length > 1) return { title: lab || "the top issue", rows, cap: "Shares of those naming one of these three, %" };
     }
     if (iss.bp) {
@@ -801,7 +811,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
         )}
         {isIss && D.issues && iss && iss.own && iss.own[iss.top] && (
           <>
-            <span className="rd-apd-ct">Who voters rate best on {(D.issues.labels && D.issues.labels[iss.top]) || iss.top} since {D.monthNameFull(Number(from.slice(5)))}, the monthly pooled line and this wave’s own figures</span>
+            <span className="rd-apd-ct">Who voters rate best on {(D.issues.labels && D.issues.labels[iss.top]) || iss.top} since {D.monthNameFull(Number(from.slice(5)))}, the monthly pooled line and this wave’s own figures on the same basis — shares of those naming one of the three parties</span>
             <RdApIssMini p={p} />
           </>
         )}
