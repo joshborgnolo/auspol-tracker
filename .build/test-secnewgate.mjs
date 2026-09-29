@@ -6,7 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
-import { titleMonthOf, pickReports, methodologyOf, directionPageOf, directionChartOf, stateTableOf }
+import { titleMonthOf, pickReports, methodologyOf, directionPageOf, directionChartOf, stateTableOf, concernTableOf }
   from "./extract-secnewgate.mjs";
 
 const SRC = ".build/secnewgate-src";
@@ -171,6 +171,59 @@ for (const [st, months] of Object.entries(stateRights))
   for (const st of banked.states)
     for (const e of banked.series[st])
       if (e.wrong != null) assert.equal(e.right + e.wrong, 100, `${st} ${e.month}: pair sums to 100`);
+}
+
+// ---- concernTableOf against the cache: the B1 unprompted-concerns table --------
+// each report's grid = a MAR ’22 anchor + the wave's own and its two
+// predecessors' B1 months; unlike direction, the April 2026 special DID
+// ask B1, so 2026-04 appears in the May and July 2026 grids
+const CONCERN_COLUMNS = {
+  21: ["2022-03", "2025-02", "2025-04", "2025-07"],
+  22: ["2022-03", "2025-04", "2025-07", "2025-09"],
+  23: ["2022-03", "2025-07", "2025-09", "2025-11"],
+  24: ["2022-03", "2025-09", "2025-11", "2026-02"],
+  25: ["2022-03", "2026-02", "2026-04", "2026-05"],
+  26: ["2022-03", "2026-04", "2026-05", "2026-07"],
+  27: ["2022-03", "2026-05", "2026-07", "2026-09"],
+};
+const concernMentions = {};   // label -> ym -> [mention...]
+for (const { slug, sidecar } of reports) {
+  const t = concernTableOf(fs.readFileSync(path.join(SRC, slug + ".txt"), "utf8"));
+  assert.deepEqual(t.problems, [], `${slug}: concerns table clean`);
+  assert.deepEqual(t.columns, CONCERN_COLUMNS[sidecar.wave], `${slug}: anchor + trailing B1 months (2026-04 included)`);
+  assert.equal(t.columns[t.columns.length - 1], sidecar.date.slice(0, 7), `${slug}: last column is its own wave's month`);
+  assert.ok(Object.keys(t.concerns).length >= 9 && Object.keys(t.concerns).length <= 12,
+    `${slug}: the top ten-or-so issues`);
+  for (const [lbl, cells] of Object.entries(t.concerns)) {
+    assert.deepEqual(Object.keys(cells).sort(), [...t.columns].sort(), `${slug} '${lbl}': one cell per column`);
+    for (const [ym, v] of Object.entries(cells)) ((concernMentions[lbl] ||= {})[ym] ||= []).push(v);
+  }
+}
+// every sighting of the same issue-month agrees – no B1 revisions on file
+for (const [lbl, months] of Object.entries(concernMentions))
+  for (const [ym, vals] of Object.entries(months))
+    assert.equal(new Set(vals).size, 1, `${lbl} ${ym}: every reprint agrees`);
+
+// data/sec-issues.json carries exactly what the cached reports print,
+// merged the way the extractor merges it
+{
+  const expectSeries = {};
+  for (const lbl of Object.keys(concernMentions).sort())
+    expectSeries[lbl] = Object.keys(concernMentions[lbl]).sort()
+      .map((ym) => ({ month: ym, mention: concernMentions[lbl][ym][concernMentions[lbl][ym].length - 1] }));
+  const banked = JSON.parse(fs.readFileSync("data/sec-issues.json", "utf8"));
+  assert.deepEqual(banked.issues, Object.keys(expectSeries), "the alphabetical issue list");
+  assert.deepEqual(banked.series, expectSeries,
+    "the banked concerns series matches the cached reports (rerun extract-secnewgate.mjs)");
+  assert.deepEqual(banked.series["Cost of living"].map((e) => e.month), [
+    "2022-03", "2025-02", "2025-04", "2025-07", "2025-09", "2025-11",
+    "2026-02", "2026-04", "2026-05", "2026-07", "2026-09",
+  ], "all eleven B1 months incl. 2026-04 (the special's, via reprint)");
+  assert.deepEqual(banked.series["Cost of living"][banked.series["Cost of living"].length - 1],
+    { month: "2026-09", mention: 68 }, "September 2026's top concern");
+  assert.equal(banked.series["Crime"][banked.series["Crime"].length - 1].mention, 20, "crime second at 20");
+  assert.equal(banked.series["Immigration & population"].find((e) => e.month === "2025-11").mention, 13,
+    "immigration & population, Nov 2025");
 }
 
 // a special asks no direction question at all

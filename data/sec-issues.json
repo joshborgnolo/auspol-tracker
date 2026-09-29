@@ -1,0 +1,607 @@
+{
+ "_about": "Unprompted issue concerns from SEC Newgate's Mood of the Nation tracking study – the B1 table ('What are the main issues facing Australians that are most important to you right now?'), an OPEN-ENDED question taking any number of mentions in the voter's own words, printed per wave as '% MENTIONING EACH' for the wave's top issues (so shares don't sum to 100, and levels sit well above the forced top-three salience the Issues panel pools – which is why nothing there reads this; banked by .build/extract-secnewgate.mjs as waves land, as a reference series). Each wave's report carries its own column and reprints its two predecessors (plus a MAR '22 anchor); sightings of a month across reports must agree. Unlike the direction question, the April 2026 Special Edition asked B1, so 2026-04 enters from the May and July 2026 reprints. The B5/B6 objective-priority ratings later in each report are not banked. month = fieldwork-end month, keying the wave's direction[] row in data/polls.json.",
+ "issues": [
+  "Climate change",
+  "Cost of living",
+  "Crime",
+  "Economy",
+  "Energy prices",
+  "Government performance",
+  "Grocery prices",
+  "Healthcare",
+  "Housing affordability",
+  "Immigration & population",
+  "Inflation",
+  "Interest rates",
+  "Petrol prices",
+  "Social equality",
+  "Tax",
+  "Unemployment"
+ ],
+ "series": {
+  "Climate change": [
+   {
+    "month": "2022-03",
+    "mention": 20
+   },
+   {
+    "month": "2025-02",
+    "mention": 11
+   },
+   {
+    "month": "2025-04",
+    "mention": 10
+   },
+   {
+    "month": "2025-07",
+    "mention": 10
+   },
+   {
+    "month": "2025-09",
+    "mention": 10
+   },
+   {
+    "month": "2025-11",
+    "mention": 13
+   },
+   {
+    "month": "2026-02",
+    "mention": 10
+   },
+   {
+    "month": "2026-04",
+    "mention": 7
+   },
+   {
+    "month": "2026-05",
+    "mention": 7
+   },
+   {
+    "month": "2026-07",
+    "mention": 7
+   },
+   {
+    "month": "2026-09",
+    "mention": 9
+   }
+  ],
+  "Cost of living": [
+   {
+    "month": "2022-03",
+    "mention": 29
+   },
+   {
+    "month": "2025-02",
+    "mention": 71
+   },
+   {
+    "month": "2025-04",
+    "mention": 73
+   },
+   {
+    "month": "2025-07",
+    "mention": 68
+   },
+   {
+    "month": "2025-09",
+    "mention": 62
+   },
+   {
+    "month": "2025-11",
+    "mention": 64
+   },
+   {
+    "month": "2026-02",
+    "mention": 61
+   },
+   {
+    "month": "2026-04",
+    "mention": 64
+   },
+   {
+    "month": "2026-05",
+    "mention": 64
+   },
+   {
+    "month": "2026-07",
+    "mention": 67
+   },
+   {
+    "month": "2026-09",
+    "mention": 68
+   }
+  ],
+  "Crime": [
+   {
+    "month": "2022-03",
+    "mention": 8
+   },
+   {
+    "month": "2025-02",
+    "mention": 18
+   },
+   {
+    "month": "2025-04",
+    "mention": 14
+   },
+   {
+    "month": "2025-07",
+    "mention": 17
+   },
+   {
+    "month": "2025-09",
+    "mention": 22
+   },
+   {
+    "month": "2025-11",
+    "mention": 20
+   },
+   {
+    "month": "2026-02",
+    "mention": 17
+   },
+   {
+    "month": "2026-04",
+    "mention": 10
+   },
+   {
+    "month": "2026-05",
+    "mention": 16
+   },
+   {
+    "month": "2026-07",
+    "mention": 18
+   },
+   {
+    "month": "2026-09",
+    "mention": 20
+   }
+  ],
+  "Economy": [
+   {
+    "month": "2022-03",
+    "mention": 19
+   },
+   {
+    "month": "2025-02",
+    "mention": 6
+   },
+   {
+    "month": "2025-04",
+    "mention": 6
+   },
+   {
+    "month": "2025-07",
+    "mention": 5
+   }
+  ],
+  "Energy prices": [
+   {
+    "month": "2022-03",
+    "mention": 2
+   },
+   {
+    "month": "2025-02",
+    "mention": 4
+   },
+   {
+    "month": "2025-04",
+    "mention": 9
+   },
+   {
+    "month": "2025-07",
+    "mention": 7
+   },
+   {
+    "month": "2025-09",
+    "mention": 5
+   },
+   {
+    "month": "2025-11",
+    "mention": 6
+   }
+  ],
+  "Government performance": [
+   {
+    "month": "2022-03",
+    "mention": 19
+   },
+   {
+    "month": "2025-02",
+    "mention": 11
+   },
+   {
+    "month": "2025-04",
+    "mention": 7
+   },
+   {
+    "month": "2025-07",
+    "mention": 8
+   },
+   {
+    "month": "2025-09",
+    "mention": 8
+   },
+   {
+    "month": "2025-11",
+    "mention": 8
+   },
+   {
+    "month": "2026-02",
+    "mention": 10
+   },
+   {
+    "month": "2026-04",
+    "mention": 8
+   },
+   {
+    "month": "2026-05",
+    "mention": 13
+   },
+   {
+    "month": "2026-07",
+    "mention": 12
+   },
+   {
+    "month": "2026-09",
+    "mention": 11
+   }
+  ],
+  "Grocery prices": [
+   {
+    "month": "2022-03",
+    "mention": 5
+   },
+   {
+    "month": "2025-02",
+    "mention": 8
+   },
+   {
+    "month": "2025-04",
+    "mention": 8
+   },
+   {
+    "month": "2025-07",
+    "mention": 8
+   },
+   {
+    "month": "2025-09",
+    "mention": 5
+   },
+   {
+    "month": "2025-11",
+    "mention": 6
+   },
+   {
+    "month": "2026-02",
+    "mention": 6
+   },
+   {
+    "month": "2026-04",
+    "mention": 8
+   },
+   {
+    "month": "2026-05",
+    "mention": 5
+   },
+   {
+    "month": "2026-07",
+    "mention": 7
+   },
+   {
+    "month": "2026-09",
+    "mention": 5
+   }
+  ],
+  "Healthcare": [
+   {
+    "month": "2022-03",
+    "mention": 20
+   },
+   {
+    "month": "2025-02",
+    "mention": 13
+   },
+   {
+    "month": "2025-04",
+    "mention": 19
+   },
+   {
+    "month": "2025-07",
+    "mention": 14
+   },
+   {
+    "month": "2025-09",
+    "mention": 13
+   },
+   {
+    "month": "2025-11",
+    "mention": 13
+   },
+   {
+    "month": "2026-02",
+    "mention": 14
+   },
+   {
+    "month": "2026-04",
+    "mention": 9
+   },
+   {
+    "month": "2026-05",
+    "mention": 12
+   },
+   {
+    "month": "2026-07",
+    "mention": 11
+   },
+   {
+    "month": "2026-09",
+    "mention": 13
+   }
+  ],
+  "Housing affordability": [
+   {
+    "month": "2022-03",
+    "mention": 18
+   },
+   {
+    "month": "2025-02",
+    "mention": 32
+   },
+   {
+    "month": "2025-04",
+    "mention": 34
+   },
+   {
+    "month": "2025-07",
+    "mention": 36
+   },
+   {
+    "month": "2025-09",
+    "mention": 36
+   },
+   {
+    "month": "2025-11",
+    "mention": 37
+   },
+   {
+    "month": "2026-02",
+    "mention": 33
+   },
+   {
+    "month": "2026-04",
+    "mention": 24
+   },
+   {
+    "month": "2026-05",
+    "mention": 36
+   },
+   {
+    "month": "2026-07",
+    "mention": 34
+   },
+   {
+    "month": "2026-09",
+    "mention": 32
+   }
+  ],
+  "Immigration & population": [
+   {
+    "month": "2022-03",
+    "mention": 2
+   },
+   {
+    "month": "2025-02",
+    "mention": 8
+   },
+   {
+    "month": "2025-04",
+    "mention": 8
+   },
+   {
+    "month": "2025-07",
+    "mention": 7
+   },
+   {
+    "month": "2025-09",
+    "mention": 16
+   },
+   {
+    "month": "2025-11",
+    "mention": 13
+   },
+   {
+    "month": "2026-02",
+    "mention": 16
+   },
+   {
+    "month": "2026-04",
+    "mention": 9
+   },
+   {
+    "month": "2026-05",
+    "mention": 16
+   },
+   {
+    "month": "2026-07",
+    "mention": 15
+   },
+   {
+    "month": "2026-09",
+    "mention": 17
+   }
+  ],
+  "Inflation": [
+   {
+    "month": "2022-03",
+    "mention": 3
+   },
+   {
+    "month": "2025-02",
+    "mention": 6
+   },
+   {
+    "month": "2025-04",
+    "mention": 5
+   },
+   {
+    "month": "2025-07",
+    "mention": 4
+   },
+   {
+    "month": "2025-09",
+    "mention": 3
+   },
+   {
+    "month": "2025-11",
+    "mention": 6
+   },
+   {
+    "month": "2026-02",
+    "mention": 6
+   },
+   {
+    "month": "2026-05",
+    "mention": 7
+   },
+   {
+    "month": "2026-07",
+    "mention": 4
+   },
+   {
+    "month": "2026-09",
+    "mention": 5
+   }
+  ],
+  "Interest rates": [
+   {
+    "month": "2022-03",
+    "mention": 2
+   },
+   {
+    "month": "2025-02",
+    "mention": 8
+   },
+   {
+    "month": "2025-04",
+    "mention": 8
+   },
+   {
+    "month": "2025-07",
+    "mention": 6
+   },
+   {
+    "month": "2025-09",
+    "mention": 3
+   },
+   {
+    "month": "2025-11",
+    "mention": 3
+   },
+   {
+    "month": "2026-02",
+    "mention": 8
+   },
+   {
+    "month": "2026-04",
+    "mention": 4
+   },
+   {
+    "month": "2026-05",
+    "mention": 7
+   }
+  ],
+  "Petrol prices": [
+   {
+    "month": "2022-03",
+    "mention": 9
+   },
+   {
+    "month": "2026-02",
+    "mention": 2
+   },
+   {
+    "month": "2026-04",
+    "mention": 22
+   },
+   {
+    "month": "2026-05",
+    "mention": 9
+   },
+   {
+    "month": "2026-07",
+    "mention": 5
+   },
+   {
+    "month": "2026-09",
+    "mention": 6
+   }
+  ],
+  "Social equality": [
+   {
+    "month": "2022-03",
+    "mention": 1
+   },
+   {
+    "month": "2026-04",
+    "mention": 2
+   },
+   {
+    "month": "2026-05",
+    "mention": 7
+   },
+   {
+    "month": "2026-07",
+    "mention": 7
+   }
+  ],
+  "Tax": [
+   {
+    "month": "2022-03",
+    "mention": 1
+   },
+   {
+    "month": "2026-02",
+    "mention": 3
+   },
+   {
+    "month": "2026-04",
+    "mention": 1
+   },
+   {
+    "month": "2026-05",
+    "mention": 7
+   }
+  ],
+  "Unemployment": [
+   {
+    "month": "2022-03",
+    "mention": 12
+   },
+   {
+    "month": "2025-04",
+    "mention": 5
+   },
+   {
+    "month": "2025-07",
+    "mention": 4
+   },
+   {
+    "month": "2025-09",
+    "mention": 5
+   },
+   {
+    "month": "2026-04",
+    "mention": 4
+   },
+   {
+    "month": "2026-05",
+    "mention": 5
+   },
+   {
+    "month": "2026-07",
+    "mention": 6
+   }
+  ]
+ }
+}

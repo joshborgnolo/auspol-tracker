@@ -184,3 +184,72 @@ env var redirects the output. The bank is committed by BOTH wrappers —
 FILES lists) and `crosstabs-updater.sh` (CHANGED check + FILES) — and
 pinned in test-secnewgate.mjs (per-report columns, pair==own-cell,
 reprint-agreement, merged series == the file).
+
+## Issue questions in the report (assessed 2026-09-29 — NOT pooled)
+
+The user asked whether MotN's issues data could join the issues panel;
+answer given: no pooling, banking proposed. Each report carries THREE
+issue measures, none top-3-compatible:
+
+- **B1 Unprompted concerns and priorities** (txt "Unprompted concerns
+  and priorities", p.6): open-ended "main issues facing Australians
+  most important to you right now" — % MENTIONING each of 10 printed
+  issues (cost of living, housing affordability, crime, immigration &
+  population, healthcare, government performance, climate change,
+  petrol prices, inflation, grocery prices), tracked MAR '22 + the
+  wave's own and two predecessors' tracking waves (same header
+  geometry as the state direction table, col x≈MON 'YY pairs).
+  Multiple mentions allowed (shares ≈300 sum) — unpooled like DemosAU's
+  open-ended question, but a good level-check: Sep '26 COL 68, housing
+  32, crime 20, immigration 17 (record).
+- **B5 36 national priorities** ("Australia's national priorities (%)",
+  pp.10+): "How important are these things to you personally" rated
+  Extremely-important % across 36 granular items (tops ~70 vs a top-3
+  share's ~40 — unmixable scale; a txt `-` marks a not-asked wave).
+- **B6 Political Heat Score** (same tiles, small lone number under
+  each label): "Next please select the 3 of these things that are most
+  important" — this IS RedBridge/Ipsos top-3 format, but off a 36-item
+  choice set (dilutes every share vs their 14/19), printed for the
+  current wave only, and many-to-one onto the issues-panel keys; see
+  the auspol-issues-panel skill for the full not-pooled reasoning.
+
+No party-handling/best-party question exists anywhere in MotN. B5/B6
+live on tile pages (6 tiles/page, label + 4 tracking values + one heat
+number) — pdftotext -layout interleaves them loosely, so bbox geometry
+would be needed if they're ever read. B5/B6 were deliberately NOT
+banked: B5's extremely-important scale mixes with nothing, and B6's
+heat scores print only the current wave (no tracking grid, so no
+reprint-verifiability) off a 36-item choice set.
+
+## Unprompted-concerns bank (data/sec-issues.json, shipped 2026-09-29)
+
+B1 is banked parse-only, exactly like the state direction bank — nothing
+on the site reads it; the issues panel keeps pooling RedBridge+Ipsos
+alone. `concernTableOf(text)` in the extractor reads the B1 "% MENTIONING
+EACH" table straight from the WHOLE-REPORT `-layout` text (no bbox
+needed): the `MENTIONING EACH` line anchors a scan for a MON header row
+(≥2 lone month tokens) with its `’YY` row below (each year token within
+6 chars of a month start), column key = MON end index; rows are a label
+at col ~133 plus one bare integer per column right-aligned within 5
+chars of the column edge; blank lines separate, and the scan stops at `\f`,
+`B\d.`, or `Base:` (footer prose carries no digit tokens). Value guard
+≤90; want ≥5 rows, ≥2 columns, no duplicated labels. Per report the grid
+= MAR ’22 anchor + the wave's own month + its two predecessors' B1
+months — and here the April 2026 special DIFFERS from direction: the
+special DID ask B1, so 2026-04 enters the May/July 2026 grids and the
+bank carries 11 core months, the special's own reading (e.g. petrol
+prices spiked to 22 in 2026-04) visible only via reprint. Merge is
+sightings-newest-wins with a `warnings` line on any reprint conflict
+(SEC Newgate revised a wave), `SECNEWGATE_ISSUES` env redirects the
+output, writeAtomic only on content change, and a per-wave misread lands
+in `status.pending` (the wave's national row is NOT held back — it never
+was; concerns are decorative to the pipeline). Both wrappers carry
+`data/sec-issues.json` (secnewgate-updater: porcelain gate + cache-only
+FILES + full FILES; crosstabs: CHANGED check + FILES), and
+test-secnewgate.mjs pins per-report columns (2026-04 in waves 25/26),
+per-label one-cell-per-column, reprint agreement, and the merged bank
+== the file. The issues Info entry's check sentence now names SEC
+Newgate as the third check house ("Every two months SEC Newgate asks the
+same kind of open question … None of the three can be pooled with the
+others …"), text edited in the d1a1d215 asset per the auspol-glossary-terms
+skill.

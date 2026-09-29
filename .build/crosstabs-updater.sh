@@ -102,7 +102,7 @@ for b in vote-switching demographics issues; do
   U="$(echo "$LAST" | sed -n 's/.*"unknown":\[\([^]]*\)\].*/\1/p')"
   if [ -n "$U" ]; then UNKNOWN="$UNKNOWN $b: $U"; fi
 done
-if [ -n "$(git status --porcelain -- .build/ipsos-src .build/secnewgate-src data/polls.json data/sec-direction-states.json)" ]; then CHANGED=true; fi
+if [ -n "$(git status --porcelain -- .build/ipsos-src .build/secnewgate-src data/polls.json data/sec-direction-states.json data/sec-issues.json)" ]; then CHANGED=true; fi
 
 if $CHANGED; then
   log "crosstab tables changed; running validate/build/commit/push"
@@ -116,7 +116,7 @@ if $CHANGED; then
     log "FAIL build; no commit made"
     exit 1
   fi
-  FILES=(data/vote-switching.json data/demographics.json data/issues.json data/polls.json data/sec-direction-states.json .build/ipsos-src .build/secnewgate-src "${SITE_FILES[@]}")
+  FILES=(data/vote-switching.json data/demographics.json data/issues.json data/polls.json data/sec-direction-states.json data/sec-issues.json .build/ipsos-src .build/secnewgate-src "${SITE_FILES[@]}")
   git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
   MSG="Update crosstab tables $(date '+%Y-%m-%d')"
   if ! git commit -m "$MSG" >> "$LOG" 2>&1; then

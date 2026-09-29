@@ -62,7 +62,7 @@ WARN="$(node -e 'const s = JSON.parse(process.argv[1].replace(/^SECNEWGATE_STATU
 # a cached report that didn't read (its methodology page or its chart)
 SECBAD="$(node -e 'const s = JSON.parse(process.argv[1].replace(/^SECNEWGATE_STATUS /, "")); console.log((s.pending || []).join("; "))' "$LAST")"
 
-if [ -z "$(git status --porcelain -- .build/secnewgate-src data/polls.json data/sec-direction-states.json)" ]; then
+if [ -z "$(git status --porcelain -- .build/secnewgate-src data/polls.json data/sec-direction-states.json data/sec-issues.json)" ]; then
   if [ -n "$WARN" ] || [ -n "$SECBAD" ]; then
     [ -n "$WARN" ] && log "FAIL extract-secnewgate (exit 1): $WARN"
     [ -n "$SECBAD" ] && log "FAIL extract-secnewgate (exit 1): SEC Newgate report didn't read: $SECBAD"
@@ -73,9 +73,9 @@ fi
 
 if [ -z "$(git status --porcelain -- data/polls.json)" ]; then
   # a cached file that moves no figure (a wave's re-hosted variant), or a
-  # state-bank rewrite with no national change: keep the file so it isn't
-  # fetched again / the bank isn't left dirty
-  FILES=(.build/secnewgate-src data/sec-direction-states.json)
+  # state/concerns-bank rewrite with no national change: keep the file so
+  # it isn't fetched again / the bank isn't left dirty
+  FILES=(.build/secnewgate-src data/sec-direction-states.json data/sec-issues.json)
   MSG="Cache SEC Newgate Mood of the Nation files $(date '+%Y-%m-%d')"
 else
   log "new SEC Newgate direction figures; running validate/build/commit/push"
@@ -89,7 +89,7 @@ else
     log "FAIL build; no commit made"
     exit 1
   fi
-  FILES=(data/polls.json data/sec-direction-states.json .build/secnewgate-src "${SITE_FILES[@]}")
+  FILES=(data/polls.json data/sec-direction-states.json data/sec-issues.json .build/secnewgate-src "${SITE_FILES[@]}")
   MSG="Update SEC Newgate Mood of the Nation $(date '+%Y-%m-%d')"
 fi
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }

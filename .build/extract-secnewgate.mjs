@@ -50,6 +50,15 @@
    failure: the cache stays; a report that IS cached but won't read is
    pending and fails the run that landed it, once anything else is pushed.
 
+   Two parse-only banks are rebuilt from the cache each run (nothing on
+   the site reads either): data/sec-direction-states.json banks the
+   per-state direction table off the bbox (SECNEWGATE_STATES redirects),
+   and data/sec-issues.json banks B1's "% MENTIONING EACH"
+   unprompted-concerns table off the whole-report -layout text
+   (SECNEWGATE_ISSUES redirects; the B5/B6 priority tiles are not
+   banked). Each reprints its trailing waves, so a conflict between
+   reports for one month is a revision and goes to warnings.
+
    Usage: node .build/extract-secnewgate.mjs [--force]  (--force refetches)
    SECNEWGATE_SRC_DIR redirects the cache.
    Last line: SECNEWGATE_STATUS {"changed":…,"added":[…],"healed":[…],
@@ -66,6 +75,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = process.env.SECNEWGATE_SRC_DIR || path.join(ROOT, ".build", "secnewgate-src");
 const POLLS = process.env.SECNEWGATE_POLLS || path.join(ROOT, "data", "polls.json");
 const STATES_OUT = process.env.SECNEWGATE_STATES || path.join(ROOT, "data", "sec-direction-states.json");
+const ISSUES_OUT = process.env.SECNEWGATE_ISSUES || path.join(ROOT, "data", "sec-issues.json");
 const API = "https://www.secnewgate.com.au/wp-json/wp/v2/media?search=Mood&per_page=100";
 const SEC_FIRST = "2025-07";   // waves on file run Jul 2025 on; older reports stay untouched
 const QUIET_DAYS = 75;         // bi-monthly cadence plus slack before the house counts as quiet
@@ -298,6 +308,78 @@ export function stateTableOf(bboxHtml) {
   return { columns: columns.map((c) => c.ym), states, problems };
 }
 
+/* The "Unprompted concerns and priorities" page's B1 table, banked into
+   data/sec-issues.json (no panel reads it yet – the Issues panel pools
+   forced top-three salience, and this is an open-ended multi-mention
+   measure, so the two never mix). B1 asks "What are the main issues facing
+   Australians that are most important to you right now…?", takes any
+   number of mentions in the voter's own words, and prints the top
+   ten-or-so as "% MENTIONING EACH" against a MAR ’22 anchor column plus
+   the wave's own and its two predecessors’ tracking waves (the April 2026
+   Special Edition DID ask B1, unlike direction, so 2026-04 enters from the
+   May and July 2026 reprints – the special itself is never cached). The
+   table is read from the whole-report -layout TEXT – the bbox cache holds
+   only the direction page – where each MON column header trailed by its
+   ’YY on a line below gives the column's right edge, and each row prints
+   its label then one bare-integer cell right-aligned on every column.
+   The B5/B6 objective-priority ratings on later pages are NOT banked. */
+export function concernTableOf(text) {
+  const lines = String(text).split("\n");
+  const problems = [];
+  const empty = { columns: [], concerns: {}, problems };
+  const head = lines.findIndex((l) => /mentioning each/i.test(l));
+  if (head < 0) { problems.push("no '% MENTIONING EACH' concerns table in the report"); return empty; }
+  let monIdx = -1, monToks = [];
+  for (let i = head + 1; i < Math.min(head + 10, lines.length); i++) {
+    const toks = [...lines[i].matchAll(/(?<![A-Za-z])(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)(?![A-Za-z])/gi)];
+    if (toks.length >= 2) { monIdx = i; monToks = toks; break; }
+  }
+  if (monIdx < 0) { problems.push("no MON column header under '% MENTIONING EACH'"); return empty; }
+  let yrIdx = -1, yrToks = [];
+  for (let i = monIdx + 1; i < Math.min(monIdx + 8, lines.length); i++) {
+    const toks = [...lines[i].matchAll(/[‘’'`](\d{2})(?!\d)/g)];
+    if (toks.length >= monToks.length) { yrIdx = i; yrToks = toks; break; }
+  }
+  if (yrIdx < 0) { problems.push("no ’YY year line under the MON column header"); return empty; }
+  const columns = [];
+  for (const m of monToks) {
+    const yr = yrToks.find((y) => Math.abs(y.index - m.index) <= 6);
+    if (!yr) { problems.push(`${m[0]} column header: no ’YY token beside it`); continue; }
+    const ym = `${2000 + +yr[1]}-${String(MON3[m[0].toUpperCase()] + 1).padStart(2, "0")}`;
+    columns.push({ ym, edge: m.index + m[0].length - 1 });
+  }
+  if (columns.length < 2) { problems.push(`only ${columns.length} concerns-table column(s) read`); return empty; }
+  if (new Set(columns.map((c) => c.ym)).size !== columns.length) problems.push("a month column appears twice in the concerns table header");
+  const concerns = {};
+  for (let i = yrIdx + 1; i < Math.min(yrIdx + 100, lines.length); i++) {
+    const line = lines[i];
+    if (line.includes("\f") || /\bB\d\./.test(line) || /Base:/.test(line)) break;
+    if (!/[A-Za-z0-9]/.test(line)) continue;   // the space-run separators
+    const toks = [...line.matchAll(/(?<![\w%.,])\d{1,3}(?![\w%.,’])/g)];
+    if (!toks.length) {
+      if (Object.keys(concerns).length) break;   // the footnote copy after the table
+      continue;
+    }
+    const label = line.slice(0, toks[0].index).trim().replace(/\s+/g, " ");
+    if (label.length < 3) { problems.push(`row ${i - yrIdx}: no issue label before its cells`); continue; }
+    if (concerns[label]) { problems.push(`issue row '${label}' appears twice`); continue; }
+    if (toks.length !== columns.length) { problems.push(`'${label}' row: ${toks.length} cell value(s) for ${columns.length} columns`); continue; }
+    const cells = {};
+    let ok = true;
+    for (const tok of toks) {
+      const edge = tok.index + tok[0].length - 1;
+      const col = columns.reduce((best, c) => Math.abs(c.edge - edge) < Math.abs(best.edge - edge) ? c : best, columns[0]);
+      if (Math.abs(col.edge - edge) > 5 || cells[col.ym] != null) { problems.push(`'${label}' row: a cell doesn't land on its own column`); ok = false; break; }
+      const v = +tok[0];
+      if (v > 90) { problems.push(`'${label}' row: ${v} outside 0–90`); ok = false; break; }
+      cells[col.ym] = v;
+    }
+    if (ok) concerns[label] = cells;
+  }
+  if (Object.keys(concerns).length < 5) problems.push(`only ${Object.keys(concerns).length} issue row(s) read – has the table changed?`);
+  return { columns: columns.map((c) => c.ym), concerns, problems };
+}
+
 const slugOf = (url) => decodeURIComponent(url.split("/").pop())
   .replace(/\.pdf$/i, "").replace(/[^A-Za-z0-9._-]+/g, "_");
 
@@ -376,7 +458,17 @@ async function main() {
         status.pending.push(`${g.ym}: the state table's own column is ${table.columns[table.columns.length - 1]}, not the wave's ${meta.date.slice(0, 7)}`);
         table = null;
       }
-      waves.set(meta.wave, { slug, meta, cols: chart.columns, page: cand.page, published: cand.published, table });
+      // the B1 concerns table banks the same way: a misread alarms without
+      // holding the national row back
+      let concerns = concernTableOf(text);
+      if (concerns.problems.length) {
+        status.pending.push(`${g.ym}: the concerns table didn't read (${concerns.problems[0]})`);
+        concerns = null;
+      } else if (concerns.columns[concerns.columns.length - 1] !== meta.date.slice(0, 7)) {
+        status.pending.push(`${g.ym}: the concerns table's own column is ${concerns.columns[concerns.columns.length - 1]}, not the wave's ${meta.date.slice(0, 7)}`);
+        concerns = null;
+      }
+      waves.set(meta.wave, { slug, meta, cols: chart.columns, page: cand.page, published: cand.published, table, concerns });
       done = true;
     }
     if (!done && ![...waves.values()].some((w) => w.meta.date.startsWith(g.ym))) {
@@ -455,6 +547,59 @@ async function main() {
     if (!fs.existsSync(STATES_OUT) || fs.readFileSync(STATES_OUT, "utf8") !== outJson) {
       writeAtomic(STATES_OUT, outJson);
       console.log("wrote " + path.relative(ROOT, STATES_OUT));
+    }
+  }
+
+  // the B1 concerns tables bank into data/sec-issues.json. Each wave's
+  // table contributes its own column and reprints its two predecessors as
+  // its trailing columns, so every month is sighted from several reports
+  // and the sightings must agree. Reports cached but no longer listed by
+  // the media API still count, so the banked series never shrinks.
+  {
+    const byWave = new Map([...waves.entries()].filter(([, x]) => x.concerns)
+      .map(([w, x]) => [w, { concerns: x.concerns, ym: x.meta.date.slice(0, 7) }]));
+    for (const f of fs.readdirSync(SRC).filter((f) => f.endsWith(".json")).sort()) {
+      let side;
+      try { side = JSON.parse(fs.readFileSync(path.join(SRC, f), "utf8")); } catch { continue; }
+      if (!side || side.wave == null || side.date == null || waves.has(side.wave) || byWave.has(side.wave)) continue;
+      const slug = f.replace(/\.json$/, "");
+      const txtPath = path.join(SRC, slug + ".txt");
+      if (!fs.existsSync(txtPath)) continue;
+      const concerns = concernTableOf(fs.readFileSync(txtPath, "utf8"));
+      if (concerns.problems.length) { status.pending.push(`${slug}: the cached concerns table didn't read (${concerns.problems[0]})`); continue; }
+      if (concerns.columns[concerns.columns.length - 1] !== side.date.slice(0, 7)) {
+        status.pending.push(`${slug}: the cached concerns table's own column is ${concerns.columns[concerns.columns.length - 1]}, not the wave's ${side.date.slice(0, 7)}`);
+        continue;
+      }
+      byWave.set(side.wave, { concerns, ym: side.date.slice(0, 7) });
+    }
+    const sightings = {};   // label -> ym -> mention, wave order
+    for (const [, x] of [...byWave.entries()].sort((a, b) => a[0] - b[0])) {
+      for (const [lbl, cells] of Object.entries(x.concerns.concerns)) {
+        for (const ym of x.concerns.columns) {
+          if (cells[ym] == null) continue;
+          ((sightings[lbl] ||= {})[ym] ||= []).push(cells[ym]);
+        }
+      }
+    }
+    const series = {};
+    for (const lbl of Object.keys(sightings).sort()) {
+      series[lbl] = Object.keys(sightings[lbl]).sort().map((ym) => {
+        const vals = sightings[lbl][ym];
+        if (new Set(vals).size > 1)
+          status.warnings.push(`concerns table ${lbl} ${ym}: reprinted as ${vals.join(", then ")} – SEC Newgate revised a wave`);
+        return { month: ym, mention: vals[vals.length - 1] };
+      });
+    }
+    const out = {
+      _about: "Unprompted issue concerns from SEC Newgate's Mood of the Nation tracking study – the B1 table ('What are the main issues facing Australians that are most important to you right now?'), an OPEN-ENDED question taking any number of mentions in the voter's own words, printed per wave as '% MENTIONING EACH' for the wave's top issues (so shares don't sum to 100, and levels sit well above the forced top-three salience the Issues panel pools – which is why nothing there reads this; banked by .build/extract-secnewgate.mjs as waves land, as a reference series). Each wave's report carries its own column and reprints its two predecessors (plus a MAR '22 anchor); sightings of a month across reports must agree. Unlike the direction question, the April 2026 Special Edition asked B1, so 2026-04 enters from the May and July 2026 reprints. The B5/B6 objective-priority ratings later in each report are not banked. month = fieldwork-end month, keying the wave's direction[] row in data/polls.json.",
+      issues: Object.keys(series),
+      series,
+    };
+    const outJson = JSON.stringify(out, null, 1) + "\n";
+    if (!fs.existsSync(ISSUES_OUT) || fs.readFileSync(ISSUES_OUT, "utf8") !== outJson) {
+      writeAtomic(ISSUES_OUT, outJson);
+      console.log("wrote " + path.relative(ROOT, ISSUES_OUT));
     }
   }
 
