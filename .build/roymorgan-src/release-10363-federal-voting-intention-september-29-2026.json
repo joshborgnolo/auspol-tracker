@@ -1,0 +1,286 @@
+{
+  "id": "cG9zdDo1NDU3OA==",
+  "__typename": "Post",
+  "findingTopics": {
+    "nodes": [
+      {
+        "name": "Federal Poll"
+      },
+      {
+        "name": "Press Release"
+      }
+    ]
+  },
+  "findings": {
+    "findingNumber": 10363,
+    "hideMarginOfError": null,
+    "listingImage": {
+      "sourceUrl": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/20073840/9796-328x288-1.png",
+      "mediaDetails": {
+        "height": 288,
+        "width": 328,
+        "meta": {
+          "title": ""
+        }
+      }
+    },
+    "pdfDownload": {
+      "mediaItemUrl": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29053832/10363-Federal-Voting-Intention-September-29-2026.pdf",
+      "slug": "10363-federal-voting-intention-september-29-2026"
+    },
+    "pdfDownloadCustomLabel": {
+      "useCustomLabel": true,
+      "customLabel": "Download PDF"
+    },
+    "additionalPdfs": null,
+    "summary": "Over the past fortnight the ALP maintains an election winning lead with 26% of the primary vote, ahead of One Nation on 25.5%. The L-NP Coalition primary is 22.5% (20% Liberal, 2.5% Nationals); Greens 14.5% and Independent/Others 11%. ",
+    "releaseDate": "29/09/2026",
+    "relatedFindings": [
+      {
+        "finding": {
+          "id": "cG9zdDo1NDUzMA==",
+          "title": "One Nation takes the lead on primary in a week where One Nation and Labor both announced immigration policies; ALP maintains an election winning two-party preferred lead  ",
+          "slug": "10353-federal-voting-intention-september-21-2026",
+          "findings": {
+            "releaseDate": "21/09/2026",
+            "findingNumber": 10353
+          }
+        }
+      },
+      {
+        "finding": {
+          "id": "cG9zdDo1NDQxNQ==",
+          "title": "ALP and One Nation both lose support as Prime Minister Albanese and One Nation Leader Pauline Hanson trade insults",
+          "slug": "10343-federal-voting-intention-september-14-2026",
+          "findings": {
+            "releaseDate": "14/09/2026",
+            "findingNumber": 10343
+          }
+        }
+      },
+      {
+        "finding": {
+          "id": "cG9zdDo1NDM0OA==",
+          "title": "ALP retains lead, but One Nation builds support after stunning victory in Secret Harbour by-election in Western Australia",
+          "slug": "10333-federal-voting-intention-september-7-2026",
+          "findings": {
+            "releaseDate": "07/09/2026",
+            "findingNumber": 10333
+          }
+        }
+      }
+    ],
+    "relatedProducts": [
+      {
+        "product": {
+          "id": "cG9zdDoyMDE2NA==",
+          "title": "Helix Personas",
+          "excerpt": "<p>Unlock the DNA of Australia to discover the Why and What Next of consumer behaviour. Helix Personas is a powerful psychographic consumer segmentation and data integration tool that combines sophisticated psychographic, attitudinal and behavioural data to classify the Australian population.</p>\n",
+          "slug": "helix-personas",
+          "featuredImage": {
+            "node": {
+              "sourceUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/08/02005349/Helix-Personas-2.png",
+              "mediaDetails": {
+                "height": 714,
+                "width": 896,
+                "meta": {
+                  "title": ""
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "product": {
+          "id": "cG9zdDoyMDIxMQ==",
+          "title": "Single Source",
+          "excerpt": "<p>Single Source delivers an atlas of truthful, concrete networks between and within target customers. Connect purchase behaviour to media preference. Put ad awareness in the context of lifestyle goals. Correlate specific product attitudes to credit cards, technology adoption, or ‘No Junk Mail’ stickers. Explore. Discover. Know.   </p>\n",
+          "slug": "single-source",
+          "featuredImage": {
+            "node": {
+              "sourceUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2022/08/02011129/SIngle-Source-1.png",
+              "mediaDetails": {
+                "height": 714,
+                "width": 896,
+                "meta": {
+                  "title": ""
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "product": {
+          "id": "cG9zdDo5MQ==",
+          "title": "Asteroid",
+          "excerpt": "<p>ASTEROID gives researchers the speed, creativity and power to extract maximum value from their survey data. With minimal experience and training users can explore data, generate and test hypotheses, follow up ideas, search for supporting evidence, and transform simple data into usable market intelligence.</p>\n",
+          "slug": "asteroid",
+          "featuredImage": {
+            "node": {
+              "sourceUrl": "https://roymorgan-cms-dev.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2021/10/25012021/product-asteroid2.png",
+              "mediaDetails": {
+                "height": 357,
+                "width": 448,
+                "meta": {
+                  "title": ""
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "excerpt": "",
+  "archiveName": "Findings",
+  "archiveUri": "/findings",
+  "content": "\n<p><strong><a href=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29053832/10363-Federal-Voting-Intention-September-29-2026.pdf\">View full tables and cross-tabulations of the results here.</a></strong></p>\n\n\n\n<p><strong>Over the past fortnight the ALP maintains an election winning lead with 26% of the primary vote, ahead of One Nation on 25.5%. The L-NP Coalition primary is 22.5% (20% Liberal, 2.5% Nationals); Greens 14.5% and Independent/Others 11%.</strong></p>\n\n\n\n<p>This result comes in a fortnight where both Labor and One Nation announced their immigration policies and Prime Minister Anthony Albanese spoke at the UN General Assembly in New York. Albanese also announced a taskforce to review an incident of AI hacking into Australia’s Medicare statistics portal. Next week’s Roy Morgan&nbsp;poll&nbsp;will show the impact of&nbsp;the Reserve Bank’s interest rate decision today.</p>\n\n\n\n<p>These results are according to the Roy Morgan&nbsp;Poll&nbsp;conducted from&nbsp;September&nbsp;14-27, 2026, with a representative Australia-wide cross-section of 2,569&nbsp;electors.&nbsp;</p>\n\n\n\n<p><strong>If a Federal Election were held now the&nbsp;ALP would win a majority against either One Nation or L-NP Coalition</strong><strong>&nbsp;</strong></p>\n\n\n\n<p>In many electorates at the&nbsp;Election&nbsp;the contest is set to be between the ALP and One Nation. When preferences are&nbsp;allocated&nbsp;for Coalition, Greens, Independent, and Other Party supporters between the ALP and One Nation, Roy Morgan&nbsp;estimates the&nbsp;<strong>ALP&nbsp;53.5% in front of One&nbsp;Nation&nbsp;46.5%.</strong><strong>&nbsp;</strong></p>\n\n\n\n<p>If the contest is between the&nbsp;ALP&nbsp;and&nbsp;L-NP, on a&nbsp;two-party preferred basis (based on how electors said they’d ’vote’ their preferences), the&nbsp;ALP&nbsp;is&nbsp;also&nbsp;ahead&nbsp;–&nbsp;<strong>ALP&nbsp;52.5% cf.&nbsp;L-NP&nbsp;47.5%.</strong>&nbsp;However,&nbsp;when preferences are&nbsp;allocated&nbsp;based on how Australians voted at the 2025 Federal Election&nbsp;the gap is closer, ALP&nbsp;52% leads L-NP 48%.&nbsp;</p>\n\n\n\n<p>The complicated nature of the next Federal Election&nbsp;means there will be contests between the ALP and One Nation, the ALP and L-NP Coalition, One Nation and the L-NP Coalition, and any three of these parties against the Greens, Teal Independents, and other minor parties such as Katter’s Australian Party (KAP).&nbsp;</p>\n\n\n\n<p><strong>One Nation’s vote is highest in Queensland (32.5%) and lowest in South Australia (18.5%).</strong></p>\n\n\n\n<p>Among the five mainland states,<strong> One Nation</strong> records its highest vote in Queensland (32.5) and lowest vote in South Australia (18.5%) while <strong>Labor</strong> is strongest in New South Wales (28.5%) and weakest in Queensland (20.5%). The <strong>L-NP Coalition</strong> polls best in South Australia (26.5%) and Victoria (26.5%), while the <strong>Greens’</strong> best state is Victoria (16.5%) and their worst state is New South Wales (12%).</p>\n\n\n\n<p><strong>Large&nbsp;majority of&nbsp;63.5% of electors say Australia is ‘going in the wrong direction’</strong><strong>&nbsp;</strong></p>\n\n\n\n<p>A&nbsp;large&nbsp;majority of&nbsp;Australians,&nbsp;63.5%,&nbsp;say the country is ‘going in the wrong direction’. Only&nbsp;21.5% say the country is ‘going in the right direction’.&nbsp;</p>\n\n\n\n<p>Analysis by state shows a majority in all states believe the country is going in the wrong direction. This is highest in Western Australia, where 70.5% believe this, and lowest in South Australia (56.5%).</p>\n\n\n\n<p><strong><u>Roy Morgan Interviewing 14-27 September 2026: Primary Vote by City/Country</u></strong></p>\n\n\n\n<figure class=\"wp-block-image size-full\"><img loading=\"lazy\" decoding=\"async\" width=\"421\" height=\"224\" src=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29052148/image-31.png\" alt=\"\" class=\"wp-image-54609\" srcset=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29052148/image-31.png 421w, https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29052148/image-31-300x160.png 300w\" sizes=\"auto, (max-width: 421px) 100vw, 421px\" /></figure>\n\n\n\n<p><strong><u>Roy Morgan Interviewing 14-27 September 2026: Primary Vote by State</u></strong></p>\n\n\n\n<figure class=\"wp-block-image size-full\"><img loading=\"lazy\" decoding=\"async\" width=\"611\" height=\"264\" src=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29052212/image-32.png\" alt=\"\" class=\"wp-image-54610\" srcset=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29052212/image-32.png 611w, https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29052212/image-32-300x130.png 300w\" sizes=\"auto, (max-width: 611px) 100vw, 611px\" /></figure>\n\n\n\n<p>Interviewing dates&nbsp;of Australian electors aged 18+:&nbsp;<strong>Sep. 14-27, 2026&nbsp;</strong>(n=2,569),&nbsp;<br><strong>NSW </strong>(n=765), <strong>Vic</strong> (n=626), <strong>Qld</strong> (n=506), <strong>SA</strong> (n=228), <strong>WA </strong>(n=235).&nbsp;<strong>Capital city </strong>(n=1638), <strong>country areas </strong>(n=931). This&nbsp;fortnight 7%&nbsp;of those surveyed&nbsp;can’t&nbsp;say who they would vote for.&nbsp;</p>\n\n\n\n<p><strong>Further details will be released in </strong><a href=\"https://www.youtube.com/c/roymorganaus\"><strong>Roy Morgan’s weekly video update</strong></a><strong> presented by Roy Morgan Chief Executive Officer Michele Levine</strong>.</p>\n\n\n\n<p><strong>For detailed analysis such as by States, capital cities/country areas, age, gender, occupation, and education contact Julian McCrann on (03) 9224 5365 or email </strong><a href=\"mailto:julian.mccrann@roymorgan.com\"><strong>julian.mccrann@roymorgan.com</strong></a><strong>.</strong></p>\n\n\n\n<p><strong>About Roy Morgan</strong><strong></strong></p>\n\n\n\n<p><a></a>Roy Morgan is Australia’s largest independent Australian research company, with offices in each state, as well as in the U.S. and U.K. A full-service research organisation, Roy Morgan has over 80 years’ experience collecting objective, independent information on consumers.</p>\n",
+  "date": "2026-09-29T05:25:21",
+  "featuredImage": {
+    "node": {
+      "sourceUrl": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/20073912/9796-670x450-1.png",
+      "mediaDetails": {
+        "height": 450,
+        "width": 670
+      }
+    }
+  },
+  "seo": {
+    "metaDesc": "Over the past fortnight the ALP maintains an election winning lead with 26% of the primary vote, ahead of One Nation on 25.5%. The L-NP Coalition primary is 22.5% (20% Liberal, 2.5% Nationals); Greens 14.5% and Independent/Others 11%.",
+    "title": "ALP holds an election winning lead; One Nation strongest in Queensland, Labor strongest in New South Wales - Roy Morgan Research",
+    "opengraphAuthor": "",
+    "opengraphTitle": "ALP holds an election winning lead; One Nation strongest in Queensland, Labor strongest in New South Wales - Roy Morgan Research",
+    "opengraphDescription": "Over the past fortnight the ALP maintains an election winning lead with 26% of the primary vote, ahead of One Nation on 25.5%. The L-NP Coalition primary is 22.5% (20% Liberal, 2.5% Nationals); Greens 14.5% and Independent/Others 11%.",
+    "opengraphImage": {
+      "altText": "",
+      "sourceUrl": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/20073912/9796-670x450-1.png",
+      "srcSet": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/20073912/9796-670x450-1-300x201.png 300w, https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2025/01/20073912/9796-670x450-1.png 670w"
+    },
+    "opengraphUrl": "https://www.roymorgan.com/findings/10363-federal-voting-intention-september-29-2026/",
+    "opengraphSiteName": "Roy Morgan Research",
+    "opengraphPublishedTime": "2026-09-29T05:25:21+00:00",
+    "opengraphModifiedTime": "2026-09-29T05:44:46+00:00",
+    "twitterTitle": "",
+    "twitterDescription": "",
+    "twitterImage": null
+  },
+  "template": {
+    "templateName": "Default"
+  },
+  "title": "ALP holds an election winning lead; One Nation strongest in Queensland, Labor strongest in New South Wales",
+  "slug": "10363-federal-voting-intention-september-29-2026",
+  "blocks": [
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p><strong><a href=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29053832/10363-Federal-Voting-Intention-September-29-2026.pdf\">View full tables and cross-tabulations of the results here.</a></strong></p>",
+      "originalContent": "<p><strong><a href=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29053832/10363-Federal-Voting-Intention-September-29-2026.pdf\">View full tables and cross-tabulations of the results here.</a></strong></p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p><strong>Over the past fortnight the ALP maintains an election winning lead with 26% of the primary vote, ahead of One Nation on 25.5%. The L-NP Coalition primary is 22.5% (20% Liberal, 2.5% Nationals); Greens 14.5% and Independent/Others 11%.</strong></p>",
+      "originalContent": "<p><strong>Over the past fortnight the ALP maintains an election winning lead with 26% of the primary vote, ahead of One Nation on 25.5%. The L-NP Coalition primary is 22.5% (20% Liberal, 2.5% Nationals); Greens 14.5% and Independent/Others 11%.</strong></p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p>This result comes in a fortnight where both Labor and One Nation announced their immigration policies and Prime Minister Anthony Albanese spoke at the UN General Assembly in New York. Albanese also announced a taskforce to review an incident of AI hacking into Australia’s Medicare statistics portal. Next week’s Roy Morgan&nbsp;poll&nbsp;will show the impact of&nbsp;the Reserve Bank’s interest rate decision today.</p>",
+      "originalContent": "<p>This result comes in a fortnight where both Labor and One Nation announced their immigration policies and Prime Minister Anthony Albanese spoke at the UN General Assembly in New York. Albanese also announced a taskforce to review an incident of AI hacking into Australia’s Medicare statistics portal. Next week’s Roy Morgan&nbsp;poll&nbsp;will show the impact of&nbsp;the Reserve Bank’s interest rate decision today.</p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p>These results are according to the Roy Morgan&nbsp;Poll&nbsp;conducted from&nbsp;September&nbsp;14-27, 2026, with a representative Australia-wide cross-section of 2,569&nbsp;electors.&nbsp;</p>",
+      "originalContent": "<p>These results are according to the Roy Morgan&nbsp;Poll&nbsp;conducted from&nbsp;September&nbsp;14-27, 2026, with a representative Australia-wide cross-section of 2,569&nbsp;electors.&nbsp;</p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p><strong>If a Federal Election were held now the&nbsp;ALP would win a majority against either One Nation or L-NP Coalition</strong><strong>&nbsp;</strong></p>",
+      "originalContent": "<p><strong>If a Federal Election were held now the&nbsp;ALP would win a majority against either One Nation or L-NP Coalition</strong><strong>&nbsp;</strong></p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p>In many electorates at the&nbsp;Election&nbsp;the contest is set to be between the ALP and One Nation. When preferences are&nbsp;allocated&nbsp;for Coalition, Greens, Independent, and Other Party supporters between the ALP and One Nation, Roy Morgan&nbsp;estimates the&nbsp;<strong>ALP&nbsp;53.5% in front of One&nbsp;Nation&nbsp;46.5%.</strong><strong>&nbsp;</strong></p>",
+      "originalContent": "<p>In many electorates at the&nbsp;Election&nbsp;the contest is set to be between the ALP and One Nation. When preferences are&nbsp;allocated&nbsp;for Coalition, Greens, Independent, and Other Party supporters between the ALP and One Nation, Roy Morgan&nbsp;estimates the&nbsp;<strong>ALP&nbsp;53.5% in front of One&nbsp;Nation&nbsp;46.5%.</strong><strong>&nbsp;</strong></p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p>If the contest is between the&nbsp;ALP&nbsp;and&nbsp;L-NP, on a&nbsp;two-party preferred basis (based on how electors said they’d ’vote’ their preferences), the&nbsp;ALP&nbsp;is&nbsp;also&nbsp;ahead&nbsp;–&nbsp;<strong>ALP&nbsp;52.5% cf.&nbsp;L-NP&nbsp;47.5%.</strong>&nbsp;However,&nbsp;when preferences are&nbsp;allocated&nbsp;based on how Australians voted at the 2025 Federal Election&nbsp;the gap is closer, ALP&nbsp;52% leads L-NP 48%.&nbsp;</p>",
+      "originalContent": "<p>If the contest is between the&nbsp;ALP&nbsp;and&nbsp;L-NP, on a&nbsp;two-party preferred basis (based on how electors said they’d ’vote’ their preferences), the&nbsp;ALP&nbsp;is&nbsp;also&nbsp;ahead&nbsp;–&nbsp;<strong>ALP&nbsp;52.5% cf.&nbsp;L-NP&nbsp;47.5%.</strong>&nbsp;However,&nbsp;when preferences are&nbsp;allocated&nbsp;based on how Australians voted at the 2025 Federal Election&nbsp;the gap is closer, ALP&nbsp;52% leads L-NP 48%.&nbsp;</p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p>The complicated nature of the next Federal Election&nbsp;means there will be contests between the ALP and One Nation, the ALP and L-NP Coalition, One Nation and the L-NP Coalition, and any three of these parties against the Greens, Teal Independents, and other minor parties such as Katter’s Australian Party (KAP).&nbsp;</p>",
+      "originalContent": "<p>The complicated nature of the next Federal Election&nbsp;means there will be contests between the ALP and One Nation, the ALP and L-NP Coalition, One Nation and the L-NP Coalition, and any three of these parties against the Greens, Teal Independents, and other minor parties such as Katter’s Australian Party (KAP).&nbsp;</p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p><strong>One Nation’s vote is highest in Queensland (32.5%) and lowest in South Australia (18.5%).</strong></p>",
+      "originalContent": "<p><strong>One Nation’s vote is highest in Queensland (32.5%) and lowest in South Australia (18.5%).</strong></p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p>Among the five mainland states,<strong> One Nation</strong> records its highest vote in Queensland (32.5) and lowest vote in South Australia (18.5%) while <strong>Labor</strong> is strongest in New South Wales (28.5%) and weakest in Queensland (20.5%). The <strong>L-NP Coalition</strong> polls best in South Australia (26.5%) and Victoria (26.5%), while the <strong>Greens’</strong> best state is Victoria (16.5%) and their worst state is New South Wales (12%).</p>",
+      "originalContent": "<p>Among the five mainland states,<strong> One Nation</strong> records its highest vote in Queensland (32.5) and lowest vote in South Australia (18.5%) while <strong>Labor</strong> is strongest in New South Wales (28.5%) and weakest in Queensland (20.5%). The <strong>L-NP Coalition</strong> polls best in South Australia (26.5%) and Victoria (26.5%), while the <strong>Greens’</strong> best state is Victoria (16.5%) and their worst state is New South Wales (12%).</p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p><strong>Large&nbsp;majority of&nbsp;63.5% of electors say Australia is ‘going in the wrong direction’</strong><strong>&nbsp;</strong></p>",
+      "originalContent": "<p><strong>Large&nbsp;majority of&nbsp;63.5% of electors say Australia is ‘going in the wrong direction’</strong><strong>&nbsp;</strong></p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p>A&nbsp;large&nbsp;majority of&nbsp;Australians,&nbsp;63.5%,&nbsp;say the country is ‘going in the wrong direction’. Only&nbsp;21.5% say the country is ‘going in the right direction’.&nbsp;</p>",
+      "originalContent": "<p>A&nbsp;large&nbsp;majority of&nbsp;Australians,&nbsp;63.5%,&nbsp;say the country is ‘going in the wrong direction’. Only&nbsp;21.5% say the country is ‘going in the right direction’.&nbsp;</p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p>Analysis by state shows a majority in all states believe the country is going in the wrong direction. This is highest in Western Australia, where 70.5% believe this, and lowest in South Australia (56.5%).</p>",
+      "originalContent": "<p>Analysis by state shows a majority in all states believe the country is going in the wrong direction. This is highest in Western Australia, where 70.5% believe this, and lowest in South Australia (56.5%).</p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p><strong><u>Roy Morgan Interviewing 14-27 September 2026: Primary Vote by City/Country</u></strong></p>",
+      "originalContent": "<p><strong><u>Roy Morgan Interviewing 14-27 September 2026: Primary Vote by City/Country</u></strong></p>"
+    },
+    {
+      "name": "core/image",
+      "saveContent": "<figure class=\"wp-block-image size-full\"><img src=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29052148/image-31.png\" alt=\"\" class=\"wp-image-54609\"/></figure>",
+      "originalContent": "<figure class=\"wp-block-image size-full\"><img src=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29052148/image-31.png\" alt=\"\" class=\"wp-image-54609\"/></figure>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p><strong><u>Roy Morgan Interviewing 14-27 September 2026: Primary Vote by State</u></strong></p>",
+      "originalContent": "<p><strong><u>Roy Morgan Interviewing 14-27 September 2026: Primary Vote by State</u></strong></p>"
+    },
+    {
+      "name": "core/image",
+      "saveContent": "<figure class=\"wp-block-image size-full\"><img src=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29052212/image-32.png\" alt=\"\" class=\"wp-image-54610\"/></figure>",
+      "originalContent": "<figure class=\"wp-block-image size-full\"><img src=\"https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29052212/image-32.png\" alt=\"\" class=\"wp-image-54610\"/></figure>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p>Interviewing dates&nbsp;of Australian electors aged 18+:&nbsp;<strong>Sep. 14-27, 2026&nbsp;</strong>(n=2,569),&nbsp;<br><strong>NSW </strong>(n=765), <strong>Vic</strong> (n=626), <strong>Qld</strong> (n=506), <strong>SA</strong> (n=228), <strong>WA </strong>(n=235).&nbsp;<strong>Capital city </strong>(n=1638), <strong>country areas </strong>(n=931). This&nbsp;fortnight 7%&nbsp;of those surveyed&nbsp;can’t&nbsp;say who they would vote for.&nbsp;</p>",
+      "originalContent": "<p>Interviewing dates&nbsp;of Australian electors aged 18+:&nbsp;<strong>Sep. 14-27, 2026&nbsp;</strong>(n=2,569),&nbsp;<br><strong>NSW </strong>(n=765), <strong>Vic</strong> (n=626), <strong>Qld</strong> (n=506), <strong>SA</strong> (n=228), <strong>WA </strong>(n=235).&nbsp;<strong>Capital city </strong>(n=1638), <strong>country areas </strong>(n=931). This&nbsp;fortnight 7%&nbsp;of those surveyed&nbsp;can’t&nbsp;say who they would vote for.&nbsp;</p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p><strong>Further details will be released in </strong><a href=\"https://www.youtube.com/c/roymorganaus\"><strong>Roy Morgan’s weekly video update</strong></a><strong> presented by Roy Morgan Chief Executive Officer Michele Levine</strong>.</p>",
+      "originalContent": "<p><strong>Further details will be released in </strong><a href=\"https://www.youtube.com/c/roymorganaus\"><strong>Roy Morgan’s weekly video update</strong></a><strong> presented by Roy Morgan Chief Executive Officer Michele Levine</strong>.</p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p><strong>For detailed analysis such as by States, capital cities/country areas, age, gender, occupation, and education contact Julian McCrann on (03) 9224 5365 or email </strong><a href=\"mailto:julian.mccrann@roymorgan.com\"><strong>julian.mccrann@roymorgan.com</strong></a><strong>.</strong></p>",
+      "originalContent": "<p><strong>For detailed analysis such as by States, capital cities/country areas, age, gender, occupation, and education contact Julian McCrann on (03) 9224 5365 or email </strong><a href=\"mailto:julian.mccrann@roymorgan.com\"><strong>julian.mccrann@roymorgan.com</strong></a><strong>.</strong></p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p><strong>About Roy Morgan</strong><strong></strong></p>",
+      "originalContent": "<p><strong>About Roy Morgan</strong><strong></strong></p>"
+    },
+    {
+      "name": "core/paragraph",
+      "saveContent": "<p><a></a>Roy Morgan is Australia’s largest independent Australian research company, with offices in each state, as well as in the U.S. and U.K. A full-service research organisation, Roy Morgan has over 80 years’ experience collecting objective, independent information on consumers.</p>",
+      "originalContent": "<p><a></a>Roy Morgan is Australia’s largest independent Australian research company, with offices in each state, as well as in the U.S. and U.K. A full-service research organisation, Roy Morgan has over 80 years’ experience collecting objective, independent information on consumers.</p>"
+    }
+  ]
+}

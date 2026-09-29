@@ -1283,6 +1283,14 @@
       "right": 21,
       "wrong": 65,
       "unsure": 14
+    },
+    {
+      "date": "2026-09-27",
+      "dateStart": "2026-09-14",
+      "pollster": "Roy Morgan",
+      "right": 21.5,
+      "wrong": 63.5,
+      "unsure": 15
     }
   ],
   "polls": [
@@ -5278,6 +5286,29 @@
       "tpp_lnp": 48,
       "url": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209",
       "published": "2026-09-23T05:00"
+    },
+    {
+      "date": "2026-09-27",
+      "published": "2026-09-29T15:25",
+      "dateStart": "2026-09-14",
+      "pollster": "Roy Morgan",
+      "client": "—",
+      "sample": 2569,
+      "undecided": 7,
+      "alp": 26,
+      "lnp": 22.5,
+      "grn": 14.5,
+      "onp": 25.5,
+      "ind": 11,
+      "oth": null,
+      "tpp_alp": 52.5,
+      "tpp_lnp": 47.5,
+      "tpp_flows": 52,
+      "lnpSplit": {
+        "Lib": 20,
+        "Nat": 2.5
+      },
+      "url": "https://www.roymorgan.com/findings/10363-federal-voting-intention-september-29-2026"
     }
   ],
   "ppm": [
@@ -8174,6 +8205,12 @@
       "date": "2026-09-21",
       "firm": "YouGov",
       "alpVsOnp_alp": 55,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-09-27",
+      "firm": "Roy Morgan",
+      "alpVsOnp_alp": 53.5,
       "lnpVsOnp_lnp": null
     }
   ],
