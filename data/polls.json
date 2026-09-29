@@ -685,7 +685,8 @@
       "pollster": "SEC Newgate",
       "right": 44,
       "wrong": 56,
-      "unsure": 0
+      "unsure": 0,
+      "sample": 1855
     },
     {
       "date": "2025-07-27",
@@ -725,7 +726,8 @@
       "pollster": "SEC Newgate",
       "right": 41,
       "wrong": 59,
-      "unsure": 0
+      "unsure": 0,
+      "sample": 1212
     },
     {
       "date": "2025-09-21",
@@ -773,7 +775,8 @@
       "pollster": "SEC Newgate",
       "right": 39,
       "wrong": 61,
-      "unsure": 0
+      "unsure": 0,
+      "sample": 1208
     },
     {
       "date": "2025-11-16",
@@ -869,7 +872,8 @@
       "pollster": "SEC Newgate",
       "right": 37,
       "wrong": 63,
-      "unsure": 0
+      "unsure": 0,
+      "sample": 2166
     },
     {
       "date": "2026-02-13",
@@ -1029,7 +1033,8 @@
       "pollster": "SEC Newgate",
       "right": 34,
       "wrong": 66,
-      "unsure": 0
+      "unsure": 0,
+      "sample": 1210
     },
     {
       "date": "2026-05-24",
@@ -1125,7 +1130,8 @@
       "pollster": "SEC Newgate",
       "right": 32,
       "wrong": 68,
-      "unsure": 0
+      "unsure": 0,
+      "sample": 1975
     },
     {
       "date": "2026-07-19",
@@ -1229,7 +1235,8 @@
       "pollster": "SEC Newgate",
       "right": 32,
       "wrong": 68,
-      "unsure": 0
+      "unsure": 0,
+      "sample": 1659
     },
     {
       "date": "2026-09-20",

@@ -119,6 +119,7 @@ assert.equal(directionPageOf(special), 0, "a special: no direction page");
     date: r.sidecar.date, dateStart: r.sidecar.dateStart, pollster: "SEC Newgate",
     right: r.sidecar.endpoint.right, wrong: r.sidecar.endpoint.wrong,
     unsure: 100 - r.sidecar.endpoint.right - r.sidecar.endpoint.wrong,
+    ...(r.sidecar.sample != null ? { sample: r.sidecar.sample } : {}),
   })), "the SEC Newgate direction rows, date-sorted, match the cached reports");
 }
 

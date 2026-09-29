@@ -1235,9 +1235,13 @@ const creditHousesWithStopped = (items, firmOf, xOf, display = (f) => f) => {
    `unsure` is taken as the remainder so the three shares always total 100
    and the readout bar can't leave a gap. */
 const DIR = D.direction || [];
+/* The wave's weight on the series: the joined poll row's n where the same
+   wave measured voting intention, the direction row's own n where the
+   wave's writer filed one (SEC Newgate), else the standing 1200 default. */
 const dirSample = (d) => {
   const p = POLL_BY_KEY.get(d.date + "|" + d.pollster);
-  return rowN(p);
+  if (p) return rowN(p);
+  return Math.min(d.sample || 1200, SAMPLE_CAP);
 };
 const dirRows = (field) => DIR.filter((d) => d[field] != null).map((d) => ({
   ym: ymOf(d.date), mid: midMs(d), x: d[field], n: dirSample(d), firm: d.pollster,
@@ -1287,7 +1291,9 @@ const favHouses = creditHousesWithStopped(
 // Field names match what the chart tooltip reads off a scatter point
 // (pollster / dateLabel / sample), so a direction dot identifies its poll the
 // same way a 2PP or primary dot does. Sample is joined from the voting-intention
-// poll where there is one – the few direction-only waves simply have none.
+// poll where there is one; direction-only waves carry what their writer filed
+// (SEC Newgate publishes its n in the methodology block), null where neither
+// has it.
 const directionPolls = DIR
   .filter((d) => MONTH_SET.has(ymOf(d.date)))
   .map((d) => {
@@ -1295,7 +1301,7 @@ const directionPolls = DIR
     return {
       x: dx(d.date), ym: ymOf(d.date), pollster: d.pollster,
       dateLabel: fwLabel(d.dateStart, d.date), released: d.date,
-      sample: (p && p.sample) || null,
+      sample: (p && p.sample) || d.sample || null,
       right: d.right, wrong: d.wrong, unsure: d.unsure,
     };
   })
@@ -1307,8 +1313,9 @@ const dirWrongBy = new Map(dirWrong.map((m) => [m.ym, m]));
    table can show the rows the monthly line above is built from, each with the
    firm's movement on its OWN previous reading (houses differ enough that a
    cross-house change would be noise). Readings from waves that published no
-   voting intention have no row to key onto – the archive's row set is polls
-   that measured voting intention – so those show up only in the series. */
+   voting intention have no poll row to key onto – the archive's row set is
+   polls that measured voting intention – so those become rows of their own on
+   the direction facet (directionOnlyPolls below). */
 const DIR_BY = new Map();
 {
   const last = {};
@@ -1323,6 +1330,41 @@ const DIR_BY = new Map();
     last[d.pollster] = { net, right: d.right, wrong: d.wrong, date: d.date };
   }
 }
+
+/* Each house's client as the archive table prints it, off its polls[] rows
+   (latest wave's figure wins); self-published houses fall to the views'
+   "Self-published" wording below. Needed here because a direction-only wave
+   has no poll row to copy the label from. */
+const CLIENT_BY_HOUSE = new Map();
+for (const p of POLLS)
+  if (p.client && p.client !== "—") CLIENT_BY_HOUSE.set(p.pollster, p.client);
+
+/* The readings above from waves with no voting-intention poll to join onto,
+   as rows of their own for the archive table's direction facet – SEC Newgate,
+   which asks only this question, is on file for exactly this, and Essential's
+   three national-mood-only waves of May–Aug 2025 (its VI series paused
+   between the election and the 2025-09-30 wave) join by the same rule.
+   Shaped like an individualPolls row, with empty stubs where the wave
+   measured nothing (p / appr), so the views' per-row readers never
+   special-case them; the facet itself keeps them out of the voting and
+   leadership tabs. */
+const directionOnlyPolls = DIR
+  .filter((d) => MONTH_SET.has(ymOf(d.date)))
+  .filter((d) => !POLL_BY_KEY.has(d.date + "|" + d.pollster))
+  .map((d) => {
+    const ym = ymOf(d.date), fym = d.dateStart ? ymOf(d.dateStart) : null;
+    const field = fwLabel(d.dateStart, d.date);
+    return {
+      ym, x: mx(ym) + (dayOf(d.date) - 15) / 365, day: dayOf(d.date),
+      pollster: d.pollster,
+      ...(fym != null && fym !== ym ? { fym } : {}),
+      field, dateLabel: field, released: d.date, sample: d.sample ?? null,
+      client: CLIENT_BY_HOUSE.get(d.pollster) || "Self-published",
+      p: {}, appr: {}, chg: null,
+      dir: DIR_BY.get(d.date + "|" + d.pollster),
+    };
+  })
+  .sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
 
 /* Both lines carry their interval, on the same terms as the 2PP: the spread
    between the houses that asked, floored by sampling error. Three houses ask
@@ -4127,6 +4169,10 @@ window.AUSPOL = (function () {
      subtitle names them, so it can't drop a house that started (Spectre) */
   const favHouses = ${JSON.stringify(favHouses)};
   const directionPolls = ${JSON.stringify(directionPolls)};
+  /* direction readings with no voting-intention poll to join onto (SEC
+     Newgate asks only this question), shaped as archive-table rows – the
+     All-polls table's direction facet lists these beside the joined ones */
+  const directionOnlyPolls = ${JSON.stringify(directionOnlyPolls)};
   const directionAvailable = ${direction.length > 0};
   const undecided = ${JSON.stringify(undecided)};
   /* How firm each party's vote is (§5c2): RedBridge's vote-softness table,
@@ -4226,7 +4272,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoGroups, issues, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved

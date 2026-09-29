@@ -31,9 +31,11 @@
 
    Rows are written to D.direction as
    { date = fieldwork END, dateStart, pollster: "SEC Newgate",
-     right, wrong, unsure = 100 − right − wrong }
+     right, wrong, unsure = 100 − right − wrong,
+     sample = the wave's n from the report's methodology block }
    and the array re-sorted by date, like every house's writer. A rerun
-   heals a row of the same wave within HEAL_DAYS of a prior entry. The
+   heals a row of the same wave within HEAL_DAYS of a prior entry, and
+   rewrites any row of an exact date whose figures, span or n moved. The
    newest report's full series is cross-checked against every earlier
    wave's own endpoint (the series only reprints history; a publish-day
    correction to an old point would show here).
@@ -310,12 +312,13 @@ async function main() {
     const { meta, cols } = x;
     const last = cols[cols.length - 1];
     const row = { date: meta.date, dateStart: meta.dateStart, pollster: POLLSTER,
-                  right: last.right, wrong: last.wrong, unsure: 100 - last.right - last.wrong };
+                  right: last.right, wrong: last.wrong, unsure: 100 - last.right - last.wrong,
+                  ...(meta.sample != null ? { sample: meta.sample } : {}) };
     const exact = dir.findIndex((d) => d.pollster === POLLSTER && d.date === row.date);
     if (exact >= 0) {
       const cur = dir[exact];
       if (cur.right !== row.right || cur.wrong !== row.wrong || cur.unsure !== row.unsure
-          || cur.dateStart !== row.dateStart) {
+          || cur.dateStart !== row.dateStart || cur.sample !== row.sample) {
         dir[exact] = row;
         status.healed.push(row.date);
       }

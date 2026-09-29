@@ -3669,7 +3669,7 @@ const POLL_TAG_META = Object.fromEntries(POLL_TAGS.map((t) => [t.id, t]));
 const URL_HOUSES = [
   "Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater",
   "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy",
-  "Wolf & Smith", "YouGov",
+  "Wolf & Smith", "YouGov", "SEC Newgate",
 ];
 const archMask = (order, set) => {
   let m = 0;
@@ -4684,6 +4684,16 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const houses = [];
   D.individualPolls.forEach((p) => { const b = baseHouse(p.pollster); if (!houses.includes(b)) houses.push(b); });
   houses.sort();
+  /* SEC Newgate asks the direction question and nothing else, so its waves
+     carry no row in individualPolls – gen-data files them as
+     directionOnlyPolls, shaped for this table. They join the row set (and
+     the house joins the Pollster panel and the URL's valid-who set) on the
+     direction facet ONLY: off it a SEC row is a row of dashes, and an
+     "SEC Newgate" chip would select an empty table. */
+  const dirOnlyAll = D.directionOnlyPolls || [];
+  const housesDir = [...houses];
+  dirOnlyAll.forEach((p) => { const b = baseHouse(p.pollster); if (!housesDir.includes(b)) housesDir.push(b); });
+  housesDir.sort();
 
   /* What each view needs a poll to have published. Primary vote is on every
      poll in the archive, so it has nothing to scope and gets no pill. It sits
@@ -4793,7 +4803,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       who: (() => {
         const raw = get("w", "who") || "";
         const mask = archUnpack(raw, URL_HOUSES);
-        return (mask ? [...mask] : raw.split(",").map(baseHouse)).filter((h) => houses.includes(h));
+        /* the valid set follows the facet the link restores: a direction-only
+           house's rows exist only on the direction facet, so its selection is
+           stale anywhere else */
+        const known = view === "direction" ? housesDir : houses;
+        return (mask ? [...mask] : raw.split(",").map(baseHouse)).filter((h) => known.includes(h));
       })(),
       has: (() => {
         const raw = get("h", "has") || "";
@@ -4948,7 +4962,13 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      "25–30 Sep" looks like next week. Rows outside the current calendar
      year get a two-digit suffix ("… ’25"); current-year rows stay clean. */
   const NOW_YEAR = new Date().getFullYear();
-  const rows = D.individualPolls.map((p) => {
+  /* The direction-only rows land here (why/what they are is at dirOnlyAll
+     above): every count, panel option and filter below derives from this
+     one merged list, so a SEC Newgate wave is rankable, searchable and
+     self-scoping on its facet and invisible everywhere else. */
+  const dirOnly = facet === "direction" ? dirOnlyAll : [];
+  const housesV = dirOnly.length ? housesDir : houses;
+  const rows = [...D.individualPolls, ...dirOnly].map((p) => {
     const [y, mo] = p.ym.split("-").map(Number);
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
     const fieldLabel = y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
@@ -5066,7 +5086,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      the count IN VIEW, which doesn't reshuffle under the reader's hand –
      selecting a pollster can't change a number computed with the pollster
      filter lifted out, so the order only moves when another panel does. */
-  const houseRank = [...houses].sort((a, b) => (houseN[b] || 0) - (houseN[a] || 0) || a.localeCompare(b));
+  const houseRank = [...housesV].sort((a, b) => (houseN[b] || 0) - (houseN[a] || 0) || a.localeCompare(b));
 
   const getVal = (p, key) => {
     switch (key) {
@@ -5230,7 +5250,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      the open row, the export - is shared with it. */
   if (window.AP.rd) return (
     <div className="view view-allpolls">
-      <RdAllPolls rows={rows} sorted={sorted} total={total} houses={houses} houseRank={houseRank} houseN={houseN}
+      <RdAllPolls rows={rows} sorted={sorted} total={total} houses={housesV} houseRank={houseRank} houseN={houseN}
         tagN={tagN} shownTags={shownTags} rangeN={rangeN} RANGE_LAB={RANGE_LAB}
         facet={facet} onFacet={onFacet} measure={measure} onMeasure={onMeasure} tppBasis={tppBasis} setTppBasis={setTppBasis}
         q={q} setQ={setQ} sel={sel} setSel={setSel} toggleHouse={toggleHouse} range={range} setRange={setRange}
@@ -5250,7 +5270,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         <div>
           <h2 className="card-title">All polls</h2>
           <p className="card-sub">
-            Every individual national poll in the archive, {total} polls from {houses.length} pollsters,
+            Every individual national poll in the archive, {total} polls from {housesV.length} pollsters,
             {" "}{(() => {  // span computed from the data, so it stays honest as polls are added
               const f = D.individualPolls[0], l = D.individualPolls[D.individualPolls.length - 1];
               const lab = (ym) => { const [y, m] = ym.split("-").map(Number); return D.monthNameFull(m) + " " + y; };
@@ -5337,7 +5357,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         <FilterPop id="who" label="Pollster" open={pop} setOpen={setPop}
           summary={sel.size === 0 ? null : sel.size === 1 ? [...sel][0] : sel.size + " selected"}>
           <div className="ap-pop-head">
-            <span>{houses.length} pollsters</span>
+            <span>{housesV.length} pollsters</span>
             {sel.size > 0 && <button className="ap-clear" onClick={() => setSel(new Set())}>Clear</button>}
           </div>
           <div className="ap-poplist" role="group" aria-label="Pollsters">
