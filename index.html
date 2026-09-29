@@ -43039,6 +43039,7 @@ function TrendChart(props) {
       scrub: false,
       dead: false
     };
+    if (e.target.closest && e.target.closest("[data-rd-swipe-exact]")) gesture.current.swiped = true;
   };
   const onPointerMove = e => {
     if (e.pointerType === "mouse") {
@@ -43048,6 +43049,13 @@ function TrendChart(props) {
     const g = gesture.current;
     if (!g || g.dead) return;
     if (e.buttons === 0 && e.pressure === 0) return;
+    if (g.swiped) {
+      if (!g.swept) {
+        g.swept = true;
+        handleLeave();
+      }
+      return;
+    }
     if (!g.scrub) {
       const dx = Math.abs(e.clientX - g.x),
         dy = Math.abs(e.clientY - g.y);

@@ -667,12 +667,23 @@ function TrendChart(props) {
     // keep the gesture coming to this element even if the finger drifts off it
     try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {}
     gesture.current = { x: e.clientX, y: e.clientY, scrub: false, dead: false };
+    /* An element marked data-rd-swipe-exact (the hero's 2PP card) is an exact
+       claim of the page swipe: every sideways drag that lands on it is the
+       matchup switch, never this chart's scrub - else a readout would open
+       mid-swipe and a touch-picked dot could outstay the switch. Taps stay
+       the chart's own (they still read a poll), so the flag only gates the
+       drag branch, and first movement is also when an earlier readout goes. */
+    if (e.target.closest && e.target.closest("[data-rd-swipe-exact]")) gesture.current.swiped = true;
   };
   const onPointerMove = (e) => {
     if (e.pointerType === "mouse") { handleMove(e); return; }
     const g = gesture.current;
     if (!g || g.dead) return;
     if (e.buttons === 0 && e.pressure === 0) return;   // not an active drag
+    if (g.swiped) {
+      if (!g.swept) { g.swept = true; handleLeave(); }
+      return;                                          // the page swipe owns every drag here
+    }
     if (!g.scrub) {
       const dx = Math.abs(e.clientX - g.x), dy = Math.abs(e.clientY - g.y);
       if (dy > dx && dy > TAP_SLOP_PX) { g.dead = true; return; }   // the page is scrolling
