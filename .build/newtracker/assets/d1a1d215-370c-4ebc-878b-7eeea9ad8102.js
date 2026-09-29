@@ -6644,6 +6644,22 @@ function infoTerms(D) {
         sample size, with no adjustment for house effects. The figure beside each leader pools the
         last six weeks of polls, newer ones counting for more.</>) },
     ] },
+    { id: "g-mood", title: "The national mood", entries: [
+      { id: "direction", term: "National direction", body: (
+        <>Whether voters think the country is heading in the right direction or is on the wrong
+        track. Only {(D.directionHouses || []).length} pollsters ask it
+        ({(D.directionHouses || []).join(", ")}), with slightly different wording, and not every
+        poll includes it.
+        <span className="info-p">Right direction and wrong track are each averaged separately and
+        adjusted for each pollster’s {xref("house-lean", "direction", "lean")}, as the vote is. The
+        undecided share is whatever is left. SEC Newgate makes everyone choose, so its readings have
+        no undecided share and sit higher on both lines; the lean adjustment takes this out.</span>
+        <span className="info-p">The figures at the top are built like the headline, from the last
+        three weeks of polls with newer ones counting for more (see
+        {" "}{xref("weighted-aggregate", "direction", "Weighted aggregate")}). The chart has one
+        point per month. Because so few pollsters ask, some months rest on a single poll, and their
+        {" "}{xref("interval", "direction", "95% intervals")} are wider for it.</span></>) },
+    ] },
   ];
 
   /* Questions whose answers ARE the explanation, in the plainest words the
@@ -6845,6 +6861,7 @@ const INFO_ALIAS = {
   "chance-consistent": "poll-disagreement",
   "mild-divergence": "poll-disagreement",
   "real-disagreement": "poll-disagreement",
+  "leadership": "approval",
 };
 
 function InfoView({ focus, onBack, backLabel }) {
