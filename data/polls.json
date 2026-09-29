@@ -1291,6 +1291,14 @@
       "right": 21.5,
       "wrong": 63.5,
       "unsure": 15
+    },
+    {
+      "date": "2026-09-29",
+      "dateStart": "2026-09-24",
+      "pollster": "Essential",
+      "right": 25,
+      "wrong": 60,
+      "unsure": 15
     }
   ],
   "polls": [
@@ -5309,6 +5317,22 @@
         "Nat": 2.5
       },
       "url": "https://www.roymorgan.com/findings/10363-federal-voting-intention-september-29-2026"
+    },
+    {
+      "date": "2026-09-29",
+      "dateStart": "2026-09-24",
+      "pollster": "Essential",
+      "client": "The Guardian",
+      "sample": null,
+      "alp": 29,
+      "lnp": 22,
+      "grn": 12,
+      "onp": 25,
+      "ind": 12,
+      "oth": null,
+      "tpp_alp": 48,
+      "tpp_lnp": 46,
+      "assimilated": true
     }
   ],
   "ppm": [
@@ -7768,6 +7792,24 @@
         "opp": {
           "app": 36,
           "dis": 48
+        }
+      }
+    },
+    {
+      "date": "2026-09-29",
+      "firm": "Essential",
+      "alb": -17,
+      "opp": -12,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 37,
+          "dis": 54
+        },
+        "opp": {
+          "app": 31,
+          "dis": 43
         }
       }
     }

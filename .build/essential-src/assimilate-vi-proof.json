@@ -1,10 +1,65 @@
 {
-  "generatedAt": "2026-09-29T03:16:00.812Z",
+  "generatedAt": "2026-09-29T15:15:42.939Z",
   "horizon": "2025-09-29",
   "retro": [],
-  "added": [],
-  "addedAppr": [],
-  "addedDir": [],
+  "added": [
+    {
+      "csvWave": "2026-09-30",
+      "tppWave": "2026-09-30",
+      "row": {
+        "date": "2026-09-29",
+        "dateStart": "2026-09-24",
+        "pollster": "Essential",
+        "client": "The Guardian",
+        "sample": null,
+        "alp": 29,
+        "lnp": 22,
+        "grn": 12,
+        "onp": 25,
+        "ind": 12,
+        "oth": null,
+        "tpp_alp": 48,
+        "tpp_lnp": 46,
+        "assimilated": true
+      }
+    }
+  ],
+  "addedAppr": [
+    {
+      "csvWave": "2026-09-30",
+      "row": {
+        "date": "2026-09-29",
+        "firm": "Essential",
+        "alb": -17,
+        "opp": -12,
+        "oppName": "Taylor",
+        "han": null,
+        "detail": {
+          "alb": {
+            "app": 37,
+            "dis": 54
+          },
+          "opp": {
+            "app": 31,
+            "dis": 43
+          }
+        }
+      }
+    }
+  ],
+  "addedDir": [
+    {
+      "csvWave": "2026-09-30",
+      "row": {
+        "date": "2026-09-29",
+        "dateStart": "2026-09-24",
+        "pollster": "Essential",
+        "right": 25,
+        "wrong": 60,
+        "unsure": 15
+      }
+    }
+  ],
   "skippedDateDup": [
     "2025-10-29",
     "2025-11-26",
