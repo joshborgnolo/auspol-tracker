@@ -4444,9 +4444,7 @@ body.rd .rd-ap-dbar i.u, body.rd .rd-ap-dbar i.u + i { border-left: 2px solid va
 body.rd .rd-ap-dbar i:first-child { border-radius: 2px 0 0 2px; }
 body.rd .rd-ap-dbar i:last-child { border-radius: 0 2px 2px 0; }
 body.rd .rd-ap-dbar i.u { background: var(--line); }
-body.rd .rd-ap-ibar { position: absolute; top: 50%; left: 14px; right: 14px; transform: translateY(-50%); display: flex; flex-direction: column; justify-content: center; gap: 3px; }
-body.rd .rd-ap-ibar-r { display: block; height: 5px; border-radius: 2.5px; background: var(--ink-3); }
-body.rd .rd-ap-ibar-r:first-child { background: var(--ink-2); }
+body.rd .rd-ap-d2i { display: flex; flex-direction: column; justify-content: center; gap: 6px; min-width: 0; }
 body.rd .rd-ap-ciss .rd-ap-dnum > .rd-ap-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 body.rd .rd-ap-empty { padding: 28px 12px; font-size: 14px; color: var(--ink-2); }
 body.rd .rd-ap-tip {
@@ -4600,7 +4598,6 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }
   body.rd .rd-ap-card .rd-ap-dbar { left: 0; right: 0; height: 14px; margin-top: -7px; }
-  body.rd .rd-ap-card .rd-ap-ibar { left: 0; right: 0; }
   body.rd .rd-ap-open { padding: 16px 12px 18px; }
   body.rd .rd-apd-issrow { grid-template-columns: minmax(0, 1fr) 40px; }
   body.rd .rd-apd-issrow .rd-apd-issbar { grid-column: 1 / -1; grid-row: 2; }
@@ -71909,10 +71906,9 @@ function RdAllPolls(P) {
   }), th("Best on it", "iss.bestv", {
     title: "The party most voters rate best on that issue"
   }), React.createElement("span", {
-    className: "rd-ap-hpic"
-  }, React.createElement("span", {
-    className: "rd-ap-cap"
-  }, "Share naming each issue as one that matters, %")), React.createElement("span", null)), React.createElement("span", null));
+    className: "rd-ap-th",
+    title: "The 2nd- and 3rd-most-named issues voters said matter most, with the share naming each"
+  }, "2nd and 3rd top issues"), React.createElement("span", null)), React.createElement("span", null));
   const pollsterCell = p => React.createElement("span", {
     role: "rowheader",
     className: "rd-ap-who"
@@ -72285,6 +72281,7 @@ function RdAllPolls(P) {
     } else if (facet === "issues") {
       const iss = p.iss || null;
       const top3 = iss ? (iss.sal || iss.conc || []).slice(0, 3) : [];
+      const nxt = top3.slice(1, 3);
       const it = iss ? window.issTopOf(iss) : null;
       const ib = iss ? window.issBestOf(iss) : null;
       const im = ib ? window.ISS_PARTY_META[ib.who] || [ib.who, ib.who, null] : null;
@@ -72307,20 +72304,15 @@ function RdAllPolls(P) {
       }, rdApNum(ib.v), " on it")) : React.createElement("span", {
         className: "rd-ap-none"
       }, "\u2014")));
-      pic = top3.length ? React.createElement("span", {
-        className: "rd-ap-pic",
-        role: "img",
-        "aria-label": "Most-named issues: " + top3.map(x => x[0] + " " + rdApNum(x[1]) + "%").join(", ")
-      }, React.createElement("span", {
-        className: "rd-ap-ibar"
-      }, top3.map(x => React.createElement("span", {
-        key: x[0],
-        className: "rd-ap-ibar-r",
-        title: x[0] + " " + rdApNum(x[1]) + "%",
-        style: {
-          width: Math.max(1.5, Math.min(100, x[1])) + "%"
-        }
-      })))) : React.createElement("span", {
+      pic = nxt.length ? React.createElement("span", {
+        role: "cell",
+        className: "rd-ap-d2i"
+      }, nxt.map(nx => React.createElement("span", {
+        key: nx[0],
+        className: "rd-ap-dnum"
+      }, React.createElement("b", null, rdApNum(nx[1])), React.createElement("span", {
+        className: "rd-ap-sub"
+      }, nx[0])))) : React.createElement("span", {
         className: "rd-ap-pic"
       });
       right1 = it ? React.createElement("b", {
@@ -72328,11 +72320,11 @@ function RdAllPolls(P) {
       }, rdApNum(it[1])) : React.createElement("span", {
         className: "rd-ap-none"
       }, "\u2014");
-      body = React.createElement(React.Fragment, null, React.createElement("div", {
-        className: "rd-ap-cpic"
-      }, pic), it && React.createElement("div", {
+      body = React.createElement(React.Fragment, null, it && React.createElement("div", {
         className: "rd-ap-csub"
-      }, it[0], " ", React.createElement("b", null, rdApNum(it[1]))), ib && React.createElement("div", {
+      }, it[0], " ", React.createElement("b", null, rdApNum(it[1]))), nxt.length > 0 && React.createElement("div", {
+        className: "rd-ap-csub"
+      }, nxt.map((x, i) => `${i === 0 ? "2nd" : "3rd"} ${x[0]} `).join(""), React.createElement("b", null, nxt.map(x => rdApNum(x[1])).join(", "))), ib && React.createElement("div", {
         className: "rd-ap-csub"
       }, "Best on it: ", React.createElement("b", {
         style: im[2] ? {

@@ -1793,11 +1793,9 @@ body.rd .rd-ap-dbar i.u, body.rd .rd-ap-dbar i.u + i { border-left: 2px solid va
 body.rd .rd-ap-dbar i:first-child { border-radius: 2px 0 0 2px; }
 body.rd .rd-ap-dbar i:last-child { border-radius: 0 2px 2px 0; }
 body.rd .rd-ap-dbar i.u { background: var(--line); }
-/* an issues row's share bars: one short bar per named issue, sized to its
-   share of voters and stacked inside the poll's picture cell */
-body.rd .rd-ap-ibar { position: absolute; top: 50%; left: 14px; right: 14px; transform: translateY(-50%); display: flex; flex-direction: column; justify-content: center; gap: 3px; }
-body.rd .rd-ap-ibar-r { display: block; height: 5px; border-radius: 2.5px; background: var(--ink-3); }
-body.rd .rd-ap-ibar-r:first-child { background: var(--ink-2); }
+/* an issues row's 2nd/3rd-issue cell: the top-issue figure cell stacked
+   once per runner-up issue inside the poll's picture track */
+body.rd .rd-ap-d2i { display: flex; flex-direction: column; justify-content: center; gap: 6px; min-width: 0; }
 body.rd .rd-ap-ciss .rd-ap-dnum > .rd-ap-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 body.rd .rd-ap-empty { padding: 28px 12px; font-size: 14px; color: var(--ink-2); }
 body.rd .rd-ap-tip {
@@ -1964,7 +1962,6 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }
   body.rd .rd-ap-card .rd-ap-dbar { left: 0; right: 0; height: 14px; margin-top: -7px; }
-  body.rd .rd-ap-card .rd-ap-ibar { left: 0; right: 0; }
   body.rd .rd-ap-open { padding: 16px 12px 18px; }
   /* an opened poll's issue rows stack: label and figure over a full-width bar */
   body.rd .rd-apd-issrow { grid-template-columns: minmax(0, 1fr) 40px; }

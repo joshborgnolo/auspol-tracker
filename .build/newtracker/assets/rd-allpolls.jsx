@@ -1191,7 +1191,7 @@ function RdAllPolls(P) {
       {facet === "issues" && <>
         {th("Top issue", "iss.topv", { title: "The issue most voters said matters most" })}
         {th("Best on it", "iss.bestv", { title: "The party most voters rate best on that issue" })}
-        <span className="rd-ap-hpic"><span className="rd-ap-cap">Share naming each issue as one that matters, %</span></span>
+        <span className="rd-ap-th" title="The 2nd- and 3rd-most-named issues voters said matter most, with the share naming each">2nd and 3rd top issues</span>
         <span></span>
       </>}
       <span></span>
@@ -1341,6 +1341,7 @@ function RdAllPolls(P) {
          from the d1a1 asset's archive layer) so the cells here, the classic
          table and the CSV export always tell one story */
       const top3 = iss ? (iss.sal || iss.conc || []).slice(0, 3) : [];
+      const nxt = top3.slice(1, 3);
       const it = iss ? window.issTopOf(iss) : null;
       const ib = iss ? window.issBestOf(iss) : null;
       const im = ib ? (window.ISS_PARTY_META[ib.who] || [ib.who, ib.who, null]) : null;
@@ -1352,17 +1353,20 @@ function RdAllPolls(P) {
           {ib ? <><b style={im[2] ? { color: im[2] } : null}>{im[1]}</b><span className="rd-ap-sub">{rdApNum(ib.v)} on it</span></> : <span className="rd-ap-none">—</span>}
         </span>
       </>;
-      pic = top3.length ? (
-        <span className="rd-ap-pic" role="img" aria-label={"Most-named issues: " + top3.map((x) => x[0] + " " + rdApNum(x[1]) + "%").join(", ")}>
-          <span className="rd-ap-ibar">
-            {top3.map((x) => <span key={x[0]} className="rd-ap-ibar-r" title={x[0] + " " + rdApNum(x[1]) + "%"} style={{ width: Math.max(1.5, Math.min(100, x[1])) + "%" }}></span>)}
-          </span>
+      pic = nxt.length ? (
+        <span role="cell" className="rd-ap-d2i">
+          {nxt.map((nx) => (
+            <span key={nx[0]} className="rd-ap-dnum">
+              <b>{rdApNum(nx[1])}</b>
+              <span className="rd-ap-sub">{nx[0]}</span>
+            </span>
+          ))}
         </span>
       ) : <span className="rd-ap-pic"></span>;
       right1 = it ? <b className="rd-ap-pairfig">{rdApNum(it[1])}</b> : <span className="rd-ap-none">—</span>;
       body = <>
-        <div className="rd-ap-cpic">{pic}</div>
         {it && <div className="rd-ap-csub">{it[0]} <b>{rdApNum(it[1])}</b></div>}
+        {nxt.length > 0 && <div className="rd-ap-csub">{nxt.map((x, i) => `${i === 0 ? "2nd" : "3rd"} ${x[0]} `).join("")}<b>{nxt.map((x) => rdApNum(x[1])).join(", ")}</b></div>}
         {ib && <div className="rd-ap-csub">Best on it: <b style={im[2] ? { color: im[2] } : null}>{im[0]}</b>, {rdApNum(ib.v)}</div>}
       </>;
     }
