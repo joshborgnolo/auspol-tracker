@@ -185,6 +185,11 @@ const sameFigures = (p, r) =>
   ["alp", "lnp", "grn", "onp", "ind", "tpp_alp", "tpp_lnp"].every((k) => close(p[k], r[k]));
 const daysApart = (a, b) => Math.abs(Date.parse(a) - Date.parse(b)) / DAY;
 const publishedFor = (csvWave) => iso(Date.parse(csvWave) + DAY) + "T01:00";
+// the validator refuses `published` stamps in the future (its TOMORROW is
+// now+24h, UTC). When a wave's charts go live ahead of the Guardian embargo,
+// csvDate + 1 is still a day away — defer the stamp rather than clamp it;
+// retro-fill files it on a later run, as it does for releaseUrl
+const embargoed = (stamp) => stamp.slice(0, 10) <= iso(Date.now() + DAY);
 const fieldworkStart = (date) => iso(Date.parse(date) - 5 * DAY);
 
 // canonical curated poll-row key order, used to rebuild retro-filled rows
@@ -209,7 +214,10 @@ for (let i = 0; i < D.polls.length; i++) {
     console.log(`WARNING: assimilated row ${p.date} has no matching CSV wave ${csvWave}; retro-fill skipped`);
     continue;
   }
-  if (p.published == null) { p.published = publishedFor(csvWave); fixes.push(`published ${p.published}`); }
+  if (p.published == null && embargoed(publishedFor(csvWave))) {
+    p.published = publishedFor(csvWave);
+    fixes.push(`published ${p.published}`);
+  }
   if (p.dateStart == null) { p.dateStart = fieldworkStart(p.date); fixes.push(`dateStart ${p.dateStart}`); }
   if (p.tpp_alp == null || p.tpp_lnp == null) {
     const tDate = near(tppDates, p.date);
@@ -247,9 +255,10 @@ for (const waveDate of [...vi.keys()].sort()) {
   const tDate = near(tppDates, date);
   const t = tDate ? tpp.get(tDate) : null;
   const indep = a["Independent or Other Party"], und = a["Undecided"];
+  const stamp = publishedFor(waveDate);
   const row = {
     date,
-    published: publishedFor(waveDate),
+    ...(embargoed(stamp) ? { published: stamp } : {}),
     dateStart: fieldworkStart(date),
     pollster: "Essential",
     client: "The Guardian",
