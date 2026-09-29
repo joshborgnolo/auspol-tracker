@@ -2118,10 +2118,12 @@ function OnSourcesPanel({ rangeId }) {
    two-thirds of the national rate sits 3 points under at 8% and 9 under at
    27%, so points read growth as a deepening divide. The percent difference
    holds still unless the group really moves apart. */
+/* short forms let a phone keep all five chips on one line (the primary
+   votes-by-party panel's end labels use the same set) */
 const DEMO_PARTIES = [
-  { id: "onp", label: "One Nation" }, { id: "alp", label: "Labor" },
-  { id: "lnp", label: "Coalition" }, { id: "grn", label: "Greens" },
-  { id: "oth", label: "Others" },
+  { id: "onp", label: "One Nation", short: "ON" }, { id: "alp", label: "Labor", short: "ALP" },
+  { id: "lnp", label: "Coalition", short: "L/NP" }, { id: "grn", label: "Greens", short: "GRN" },
+  { id: "oth", label: "Others", short: "OTH" },
 ];
 const demoHouse = (h) => (h === "RedBridge/Accent" ? "RedBridge" : h);
 // a poll row's grp.v party order (gen-data DEMO_BY_POLL; the export's columns)

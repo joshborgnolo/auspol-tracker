@@ -1080,13 +1080,9 @@ body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
   body.rd .rd-chips-row { display: flex; flex-wrap: nowrap; gap: 6px; }
   body.rd .rd-chips-row .rd-chip { flex: 1 1 auto; justify-content: center; min-height: 44px; padding: 0 8px; gap: 5px; font-size: 13px; }
 }
-/* five chips + swatches need ~460px even with the short "Others" label, so
-   below that the row wraps 3-over-2 instead of pushing the page wide */
-@media (max-width: 480px) {
-  body.rd .rd-chips-row { flex-wrap: wrap; }
-  body.rd .rd-chips-row .rd-chip { flex: 1 1 calc(33.34% - 6px); }
-}
-/* the narrowest phones keep the chips full-width by shaving type and padding */
+/* the phone chips abbreviate (ON ALP L/NP GRN OTH) and so always fit one
+   line — the wrap below 480px went out with the full labels */
+/* the narrowest phones keep the chips on one line by shaving type and padding */
 @media (max-width: 360px) {
   body.rd .rd-chips-row { gap: 4px; }
   body.rd .rd-chips-row .rd-chip { padding: 0 5px; gap: 4px; font-size: 12px; }

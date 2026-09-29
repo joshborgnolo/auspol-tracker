@@ -1315,12 +1315,15 @@ function RdDemographics({ rangeId = "all" }) {
         )}
       </RdTabs>
       {narrow && (
+        /* phone chips abbreviate (ON ALP L/NP GRN OTH) so the five of them
+           share one line; the full name stays on the accessible label */
         <div className="rd-chips rd-chips-row" role="group" aria-label="Party" onClick={rdTabFocus}
              onKeyDown={rdDigitKey(DEMO_PARTIES, chooseParty)}>
           {DEMO_PARTIES.map((pp) => (
-            <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => chooseParty(pp.id)}
+            <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} aria-label={pp.label}
+                    onClick={() => chooseParty(pp.id)}
                     style={party === pp.id ? { background: "var(--tint-" + pp.id + ")", borderColor: D.PARTIES[pp.id].color } : undefined}>
-              <span className="rd-sw" style={{ background: D.PARTIES[pp.id].color }}></span>{pp.label}</button>
+              <span className="rd-sw" style={{ background: D.PARTIES[pp.id].color }}></span>{pp.short}</button>
           ))}
         </div>
       )}

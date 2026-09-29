@@ -3810,10 +3810,6 @@ body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
   body.rd .rd-chips-row { display: flex; flex-wrap: nowrap; gap: 6px; }
   body.rd .rd-chips-row .rd-chip { flex: 1 1 auto; justify-content: center; min-height: 44px; padding: 0 8px; gap: 5px; font-size: 13px; }
 }
-@media (max-width: 480px) {
-  body.rd .rd-chips-row { flex-wrap: wrap; }
-  body.rd .rd-chips-row .rd-chip { flex: 1 1 calc(33.34% - 6px); }
-}
 @media (max-width: 360px) {
   body.rd .rd-chips-row { gap: 4px; }
   body.rd .rd-chips-row .rd-chip { padding: 0 5px; gap: 4px; font-size: 12px; }
@@ -46992,19 +46988,24 @@ function OnSourcesPanel({
 }
 const DEMO_PARTIES = [{
   id: "onp",
-  label: "One Nation"
+  label: "One Nation",
+  short: "ON"
 }, {
   id: "alp",
-  label: "Labor"
+  label: "Labor",
+  short: "ALP"
 }, {
   id: "lnp",
-  label: "Coalition"
+  label: "Coalition",
+  short: "L/NP"
 }, {
   id: "grn",
-  label: "Greens"
+  label: "Greens",
+  short: "GRN"
 }, {
   id: "oth",
-  label: "Others"
+  label: "Others",
+  short: "OTH"
 }];
 const demoHouse = h => h === "RedBridge/Accent" ? "RedBridge" : h;
 const DEMO_GRP_PARTY = ["alp", "lnp", "grn", "onp", "oth"];
@@ -60670,6 +60671,7 @@ function RdDemographics({
     type: "button",
     className: "rd-chip",
     "aria-pressed": party === pp.id,
+    "aria-label": pp.label,
     onClick: () => chooseParty(pp.id),
     style: party === pp.id ? {
       background: "var(--tint-" + pp.id + ")",
@@ -60680,7 +60682,7 @@ function RdDemographics({
     style: {
       background: D.PARTIES[pp.id].color
     }
-  }), pp.label))), React.createElement("div", {
+  }), pp.short))), React.createElement("div", {
     className: "card rd-card rd-wv-dots"
   }, React.createElement("div", {
     className: "rd-wv-plot"
