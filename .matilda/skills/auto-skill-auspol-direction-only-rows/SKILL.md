@@ -117,15 +117,29 @@ placeholder dash `—` where not.
   unaffected; the non-redesign ArchPollDetail in d1a1d215 never had the
   grid (meta band + PollLedger), so it needed no co-edit.
 - The row's direction-bar picture `.rd-ap-dbar` (rd-allpolls.jsx
-  ~:1133-1141; css rd.css :1785-1789 + phone :1944) is `display:flex;
-  gap: 2px` over `flexGrow: d.right/unsure/wrong` items. `gap` applies
-  on BOTH sides of a contained item even at zero width, so SEC's
-  `unsure: 0` strip left 2px+2px=4px of white dividing right-direction
-  from wrong-track while bars carrying an unsure share show single 2px
-  separators. The middle `<i className="u">` renders only when
-  `d.unsure > 0` — one uniform 2px separator in every case, and the
-  first/last-child border-radius ends never move. The DOM tell of the
-  bug: a mounted `i.u` whose inline `flexGrow` is 0.
+  ~:1133-1141; css rd.css :1785-1790 + phone :1945) is `display:flex`
+  over `flexGrow: d.right/unsure/wrong` items. Two separator lessons,
+  both pinned by the probe:
+  - A zero-width item still took the flex `gap: 2px` on BOTH sides, so
+    SEC's `unsure: 0` strip left 2px+2px=4px of white dividing
+    right-direction from wrong-track while bars carrying an unsure
+    share showed single 2px separators. The middle `<i className="u">`
+    renders only when `d.unsure > 0` — one separator in every case, and
+    the first/last-child border-radius ends never move. The DOM tell
+    of the bug: a mounted `i.u` whose inline `flexGrow` is 0.
+  - Even then the gaps did not RENDER uniformly: segment widths are
+    fractional (percent splits across an absolute-width bar), so each
+    transparent 2px gap landed at a different fractional device-pixel
+    offset and anti-aliased into a visibly different thickness across
+    rows — and between the two dividers inside one bar (user report
+    2026-09-29; headless dump confirmed every gap measured 2.00 CSS px
+    in layout). The separator is therefore an OPAQUE `border-left: 2px
+    solid var(--line)` on every `i + i` (no `gap` on the bar):
+    border-boxes pixel-snap to the device grid, so every divider paints
+    the same thickness. With content-box sizing and `flex-basis: 0`
+    the border sits between segments exactly where the gap did.
+    Never reintroduce a transparent-gap separator in a bar with
+    proportional widths — on any facet.
 
 ## Tally denominators — the archive extent, not the facet's rows
 
@@ -193,8 +207,11 @@ and no "Implied, on 2025 flows" anywhere, while a poll opened on the
 2PP facet pins 2 th WITH the Implied row. The direction-bar checks run
 off the mounted rows: no `i.u` survives with a non-positive inline
 flexGrow, every SEC row's `.rd-ap-dbar` is exactly two `<i>` children,
-and the facet still mounts the middle strip where a reading carries an
-unsure share. Two traps hit live: (1) the 2025-05-11 Essential
+the facet still mounts the middle strip where a reading carries an
+unsure share, every bar's computed `column-gap` is `normal`/`0px`, and
+every non-first segment carries the one computed `2px` `border-left`
+in the resolved `--line` colour (resolving the var through a scratch
+element). Two traps hit live: (1) the 2025-05-11 Essential
 mood-only wave must be opened via /Essential[\s\S]*7–11 May/ —
 plain /Essential/ matches a VI
 row first and its detail has no direction rail; (2) the head credits

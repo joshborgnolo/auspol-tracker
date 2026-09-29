@@ -263,10 +263,21 @@ await showAll(page4);
 // --- direction-bar: a no-unsure reading renders no middle segment ------
 // SEC's right+wrong sum to 100. A zero-width unsure strip between them
 // still took the bar's 2px flex gaps on BOTH sides, doubling the white
-// divider — the strip must render not at all, leaving one 2px separator.
+// divider — the strip must render not at all. And the separator itself is
+// a pixel-snapped left BORDER on each following segment, not a
+// transparent flex gap: proportional segment widths are fractional, so a
+// 2px gap landed at fractional device-pixel offsets and anti-aliased into
+// visibly different thicknesses across rows (and within one bar).
+// Borders snap to the device pixel grid, so every divider paints the
+// same 2 device px.
 const bars = await page4.evaluate(() => {
   const rows = [...document.querySelectorAll(".rd-ap-row, .rd-ap-card")];
   const all = [...document.querySelectorAll(".rd-ap-dbar")];
+  const scratch = document.createElement("span");
+  scratch.style.color = "var(--line)";
+  document.body.appendChild(scratch);
+  const line = getComputedStyle(scratch).color;
+  scratch.remove();
   return {
     collapsed: all.filter((b) => {
       const u = b.querySelector("i.u");
@@ -277,6 +288,14 @@ const bars = await page4.evaluate(() => {
       return b ? `${b.querySelectorAll("i").length}${b.querySelector("i.u") ? "+u" : ""}` : "none";
     }),
     withU: all.filter((b) => b.querySelector("i.u")).length,
+    gaps: [...new Set(all.map((b) => getComputedStyle(b).columnGap))],
+    bad: all.flatMap((b, bi) =>
+      [...b.querySelectorAll("i")].slice(1).flatMap((k, ki) => {
+        const cs = getComputedStyle(k);
+        return cs.borderLeftWidth === "2px" && cs.borderLeftColor === line
+          ? [] : [`bar${bi}.seg${ki + 1}:${cs.borderLeftWidth}/${cs.borderLeftColor}`];
+      })),
+    line,
   };
 });
 check("no direction bar keeps a collapsed unsure strip", bars.collapsed === 0,
@@ -285,6 +304,11 @@ check("every SEC row's bar is the two-answer pair", bars.sec.length === 7 && bar
   bars.sec.join(", "));
 check("readings with an unsure share keep the middle strip", bars.withU > 0,
   `${bars.withU} bar(s) carry i.u`);
+check("bars carry no flex gap (separator is a border)",
+  bars.gaps.length === 1 && (bars.gaps[0] === "0px" || bars.gaps[0] === "normal"),
+  bars.gaps.join(", "));
+check("every segment border is one 2px line-coloured divider", bars.bad.length === 0,
+  bars.bad.slice(0, 3).join("; ") || `all 2px ${bars.line}`);
 
 // open a SEC Newgate row and interrogate the row cell + the detail
 async function openRow(pageRe) {
