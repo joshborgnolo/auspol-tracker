@@ -34,6 +34,28 @@ All pointer int the TrendChart component
    openable, and the dot tooltip shows the `.tip-hint` line "Click to open
    this poll in All polls".
 
+## Touch gestures: tap reads, drag scrubs, + the swipe-exact exception (77bbc63, 2026-09-29)
+
+A touch commits to nothing until the gesture says what it is
+(`gesture` ref, TAP_SLOP_PX=10, SCRUB_PX=8): a TAP opens the readout on
+RELEASE (`pickTouch(e,true)`; tapping the open dot closes it), a mostly-H
+drag ≥8px commits to scrub (`pickTouch(e,false)` each move), a mostly-V
+one marks `dead` (page scrolling). Touch-picked dots survive finger-up —
+the only way a phone can hold a poll to read it.
+
+**The swipe-exact exception:** a touch that lands inside
+`[data-rd-swipe-exact]` (the hero's 2PP card — page swipe flips the
+matchup) sets `g.swiped`, which gates the drag branch off entirely:
+no scrub commit, so no readout can open mid-swipe or stick after
+liftoff (previously the chart and the page-swipe read the SAME gesture,
+opening a tooltip during the matchup flip). Taps still read polls (the
+flag only gates drags), and the drag's first movement calls
+`handleLeave()` once so an already-open readout goes away as the switch
+begins — done on first MOVE, not pointerdown, so the tap-toggle (tap the
+open dot to close it) survives. Probe `.matilda/probe-swipe-notip.mjs`
+pins it: tap opens, swipe switches matchup with nothing open during or
+after, return swipe likewise, tap-after-swiping still works.
+
 ## The toVB gotcha that made dots unclickable (fixed 0c3d9b7, 2026-09-24)
 
 `toVB(e)` converts client px → viewBox units. It must measure **the
