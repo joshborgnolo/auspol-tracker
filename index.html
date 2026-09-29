@@ -65611,13 +65611,15 @@ function RdDemographics({
     const dt = D.demoTrend && D.demoTrend[party];
     if (!dt || !dt.windowYm) return null;
     const moves = dt.moves || [];
+    const solid = moves.filter(m => !m.thin);
+    const thin = moves.filter(m => m.thin);
     const nameT = RD_TREND_NAME[party] || P.name;
     const nameD = RD_TREND_NAME_DEK[party] || pName;
     const isAre = party === "oth" ? "are" : "is";
     const poss = s => s + (/s$/.test(s) ? "’" : "’s");
     const serial = ls => ls.length < 2 ? ls[0] || "" : ls.length === 2 ? ls[0] + " and " + ls[1] : ls.slice(0, -1).join(", ") + ", and " + ls[ls.length - 1];
     const since = "Since " + rdMonthYear(dt.windowYm) + ", ";
-    if (!moves.length) {
+    if (!solid.length) {
       const skew = RD_TREND_SKEW[party];
       return {
         head: "The composition of " + poss(nameT) + " vote is unchanged",
@@ -65631,7 +65633,7 @@ function RdDemographics({
       return st ? st.groups.map(g => g.label) : [];
     };
     const bestOf = ms => ms.slice().sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR))[0];
-    const stateDek = ms => {
+    const stateDek = (ms, hedged) => {
       const toward = ms.filter(m => m.dir > 0).map(m => m.group);
       const away = ms.filter(m => m.dir < 0).map(m => m.group);
       const others = ms.length ? setGroupsOf(ms[0]) : [];
@@ -65645,7 +65647,7 @@ function RdDemographics({
       return {
         pole: a.length ? eastern(a) ? "the eastern-mainland states" : serial(named(a)) : eastern(t) ? "the eastern-mainland states" : serial(named(t)),
         toward: !a.length,
-        dek: "the composition of " + poss(nameD) + " vote has shifted away from " + serial(named(a)) + ", and towards " + serial(named(t))
+        dek: "the composition of " + poss(nameD) + " vote " + (hedged ? "appears to have" : "has") + " shifted away from " + serial(named(a)) + ", and towards " + serial(named(t))
       };
     };
     const locDek = m => {
@@ -65653,6 +65655,7 @@ function RdDemographics({
         adj: m.group.toLowerCase(),
         ref: m.group
       };
+      if (m.thin) return [poss(nameD) + " voter base appears to have become " + (m.dir > 0 ? "more " : "less ") + loc.adj];
       const flat = Math.abs(m.a1 - m.a0) < 1;
       const national = flat ? ", even as the national vote has remained flat" : ", while the national vote has " + (m.a1 < m.a0 ? "fallen" : "risen") + " from " + pct(m.a0) + "% to " + pct(m.a1) + "%";
       const support = party === "oth" ? "Support for others/independents" : (RD_TREND_BARE[party] || nameT) + " support";
@@ -65670,7 +65673,7 @@ function RdDemographics({
       return poss(nameD) + " " + strength + noun + " among " + (RD_TREND_GROUP[m.group] || m.group) + " " + hedge + motion;
     };
     const bySet = new Map();
-    for (const m of moves) {
+    for (const m of solid) {
       const k = m.tab + "|" + m.set;
       if (!bySet.has(k)) bySet.set(k, []);
       bySet.get(k).push(m);
@@ -65702,6 +65705,25 @@ function RdDemographics({
         parts.push(groupDek(m));
       }
     }
+    const carried = new Set(setsRanked.map(({
+      ms
+    }) => ms[0].tab + "|" + ms[0].set));
+    const thinSets = new Map();
+    for (const m of thin) {
+      const k = m.tab + "|" + m.set;
+      if (carried.has(k)) continue;
+      if (!thinSets.has(k)) thinSets.set(k, []);
+      thinSets.get(k).push(m);
+    }
+    [...thinSets.values()].map(ms => ({
+      ms,
+      top: Math.max(...ms.map(m => Math.abs(m.tLR)))
+    })).sort((a, b) => b.top - a.top).slice(0, 2).forEach(({
+      ms
+    }) => {
+      const m0 = ms[0];
+      if (m0.set === "state") parts.push(stateDek(ms, true).dek);else if (m0.set === "location") parts.push(...locDek(bestOf(ms)));else parts.push(groupDek(bestOf(ms)));
+    });
     return {
       head,
       dek: since + parts.map((s, i) => i === 0 ? s : rdCap(s)).join(". ") + "."

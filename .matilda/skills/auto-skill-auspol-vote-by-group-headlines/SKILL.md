@@ -237,11 +237,21 @@ Mechanics to know before touching it:
 - Sets rank by their strongest move's |t(log-ratio)|; the dek carries the
   top TWO sets and the head comes only from the first-ranked set —
   state → "… is losing voters faster in …", location → "… is gaining in
-  …", anything else → "The composition of …'s vote is shifting". No
-  moves at all → "… is unchanged" + the no-significant-move sentence and
-  the party's RD_TREND_SKEW tail (skipped for parties without one).
+  …", anything else → "The composition of …'s vote is shifting".
+- THE SIGNIFICANCE GATE (user dictate 2026-09-29, "it must be
+  significantly significant to make it" — ONP's renters move, t 2.39 on
+  7 monthly points, had displaced the dictated ONP unchanged text): the
+  shift IIFE splits moves into solid (!thin) and thin. Only solid moves
+  rank sets, carry claims and make heads; a thin move TRAILS the solid
+  claim as a hedged "appears to …" sentence — groupDek's thin hedge,
+  a single-sentence figureless locDek branch, and a hedged stateDek
+  flag cover the set types — one sentence per set the claim doesn't
+  already carry, at most two. No solid moves at all (none, or every
+  move thin) → "… is unchanged" + the no-significant-move sentence and
+  the party's RD_TREND_SKEW tail (skipped for parties without one),
+  with NO trailing hedged sentence.
 - Sentence figures are the payload's FITTED start→end levels, `pct()`
-  capped at one decimal; thin moves hedge "appears to be"; later dek
+  capped at one decimal (thin trailers quote none); later dek
   sentences pass rdCap so a lower-case party description still opens
   capitalised ("Others/independents' lead among …").
 - With the corrected precision weights the rendered texts moved AWAY from

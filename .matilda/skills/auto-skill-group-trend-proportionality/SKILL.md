@@ -101,6 +101,17 @@ word snapshot). The two scratch auditors .matilda/demo-trend-test.mjs
 and .matilda/demo-trend-test-ratio.mjs were updated to the same
 weights so all three agree.
 
+The 2026-09-29 significance gate (user dictate "it must be significantly
+significant to make it", prompted by ONP renters t 2.39 on 7 months
+displacing the dictated unchanged pair): the shift IIFE splits moves
+into solid (!thin) and thin; only SOLID moves rank sets, carry claims
+and make the head — a thin move trails a solid claim as a hedged
+"appears to" sentence (groupDek's thin branch, the thin single-sentence
+locDek, stateDek's hedged flag), one per non-carried set and at most
+two, and a party whose moves are all thin renders the unchanged pair
+with NO trailer. Thin moves in a set already carried by a solid move
+stay silent.
+
 ## Adjacent facts from the same session
 
 - The vote-by-group party switcher is a FIVE-chip array (DEMO_PARTIES)

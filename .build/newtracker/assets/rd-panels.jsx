@@ -1113,19 +1113,27 @@ function RdDemographics({ rangeId = "all" }) {
      towards" means beyond what the party's own national trend hands a group
      merely for its starting level. Sets rank by their strongest move's
      |t(log-ratio)|; the dek carries the top two. Figures quoted are the
-     fitted start/end levels, and a move on seven or fewer monthly points
-     hedges "appears to be". */
+     fitted start/end levels, a move on seven or fewer monthly points
+     hedges "appears to be", and (user dictate 2026-09-29: "it must be
+     significantly significant to make it") a thin move never CARRIES a
+     claim — it trails a solid one as a hedged sentence, and a party
+     whose moves are all thin renders the unchanged pair. */
   const shift = (() => {
     const dt = D.demoTrend && D.demoTrend[party];
     if (!dt || !dt.windowYm) return null;
     const moves = dt.moves || [];
+    /* the significance gate: thin moves (seven or fewer monthly points, the
+       t optimistic on shared samples) trail a solid claim as hedged
+       sentences but never make one */
+    const solid = moves.filter((m) => !m.thin);
+    const thin = moves.filter((m) => m.thin);
     const nameT = RD_TREND_NAME[party] || P.name;
     const nameD = RD_TREND_NAME_DEK[party] || pName;
     const isAre = party === "oth" ? "are" : "is";
     const poss = (s) => s + (/s$/.test(s) ? "’" : "’s");
     const serial = (ls) => ls.length < 2 ? (ls[0] || "") : ls.length === 2 ? ls[0] + " and " + ls[1] : ls.slice(0, -1).join(", ") + ", and " + ls[ls.length - 1];
     const since = "Since " + rdMonthYear(dt.windowYm) + ", ";
-    if (!moves.length) {
+    if (!solid.length) {
       const skew = RD_TREND_SKEW[party];
       return {
         head: "The composition of " + poss(nameT) + " vote is unchanged",
@@ -1139,7 +1147,7 @@ function RdDemographics({ rangeId = "all" }) {
       return st ? st.groups.map((g) => g.label) : [];
     };
     const bestOf = (ms) => ms.slice().sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR))[0];
-    const stateDek = (ms) => {
+    const stateDek = (ms, hedged) => {
       /* a side with no significant move of its own names the other side's
          complement: "away from NSW, Victoria, and Queensland, and towards
          the rest of Australia" is rest-of-Australia's single move read the
@@ -1157,11 +1165,12 @@ function RdDemographics({ rangeId = "all" }) {
         // the title's pole: the three eastern states together name as one
         pole: a.length ? (eastern(a) ? "the eastern-mainland states" : serial(named(a))) : (eastern(t) ? "the eastern-mainland states" : serial(named(t))),
         toward: !a.length,
-        dek: "the composition of " + poss(nameD) + " vote has shifted away from " + serial(named(a)) + ", and towards " + serial(named(t)),
+        dek: "the composition of " + poss(nameD) + " vote " + (hedged ? "appears to have" : "has") + " shifted away from " + serial(named(a)) + ", and towards " + serial(named(t)),
       };
     };
     const locDek = (m) => {
       const loc = RD_TREND_LOC[m.group] || { adj: m.group.toLowerCase(), ref: m.group };
+      if (m.thin) return [poss(nameD) + " voter base appears to have become " + (m.dir > 0 ? "more " : "less ") + loc.adj];
       const flat = Math.abs(m.a1 - m.a0) < 1;
       const national = flat ? ", even as the national vote has remained flat"
         : ", while the national vote has " + (m.a1 < m.a0 ? "fallen" : "risen") + " from " + pct(m.a0) + "% to " + pct(m.a1) + "%";
@@ -1182,7 +1191,7 @@ function RdDemographics({ rangeId = "all" }) {
       return poss(nameD) + " " + strength + noun + " among " + (RD_TREND_GROUP[m.group] || m.group) + " " + hedge + motion;
     };
     const bySet = new Map();
-    for (const m of moves) {
+    for (const m of solid) {
       const k = m.tab + "|" + m.set;
       if (!bySet.has(k)) bySet.set(k, []);
       bySet.get(k).push(m);
@@ -1209,6 +1218,27 @@ function RdDemographics({ rangeId = "all" }) {
         parts.push(groupDek(m));
       }
     }
+    /* thin moves trail the solid claim as hedged sentences (groupDek, the
+       thin locDek and the hedged stateDek all render "appears to"); a set
+       already carried by a solid move stays out */
+    const carried = new Set(setsRanked.map(({ ms }) => ms[0].tab + "|" + ms[0].set));
+    const thinSets = new Map();
+    for (const m of thin) {
+      const k = m.tab + "|" + m.set;
+      if (carried.has(k)) continue;
+      if (!thinSets.has(k)) thinSets.set(k, []);
+      thinSets.get(k).push(m);
+    }
+    [...thinSets.values()]
+      .map((ms) => ({ ms, top: Math.max(...ms.map((m) => Math.abs(m.tLR))) }))
+      .sort((a, b) => b.top - a.top)
+      .slice(0, 2)
+      .forEach(({ ms }) => {
+        const m0 = ms[0];
+        if (m0.set === "state") parts.push(stateDek(ms, true).dek);
+        else if (m0.set === "location") parts.push(...locDek(bestOf(ms)));
+        else parts.push(groupDek(bestOf(ms)));
+      });
     /* sentences after the first start a sentence of their own, so a
        lower-case name ("others/independents") still opens capitalised */
     return { head, dek: since + parts.map((s, i) => (i === 0 ? s : rdCap(s))).join(". ") + "." };

@@ -160,7 +160,18 @@ Two consequences worth keeping:
   the user chose data-corrected dynamics: compositor output outranks the
   snapshot wording, and choice-varying items (an ONP renters move going
   away and coming back) may legitimately flip the TITLE between
-  "unchanged" and "shifting" build to build.
+  "unchanged" and "shifting" build to build. A related user paste (five
+  dictated title+dek pairs) is a payload-DEPENDENT INSTANCE of the
+  compositor, not five static copy versions — the shapes live in the
+  RD_TREND_* phrase-pieces and recompose per build (heads shifted when
+  the payload stopped flagging the moves the paste quoted, e.g. the ALP
+  non-English sentence and QLD/VIC state flags).
+- The 2026-09-29 significance gate ("it must be significantly
+  significant to make it"): a thin move (≤7 monthly points) never
+  CARRIES a claim — only solid moves rank sets and make heads; a thin
+  move trails a solid one as a hedged "appears to …" sentence (max two,
+  one per set, none from sets the solid claim already carries), and an
+  all-thin party renders the unchanged pair with no trailer.
 - The regression probe asserts mechanics (window opener, branch
   selection, hedging, quoted figures ⊆ payload levels), never the exact
   words — see .matilda/demo-trend-probe.mjs.
