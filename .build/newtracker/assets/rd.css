@@ -736,7 +736,7 @@ body.rd .rd-pl-detail {
   display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 48px; row-gap: 24px;
   padding: 16px 16px 20px; background: var(--surface-2); font-size: 13px; color: var(--ink-2);
 }
-body.rd .rd-pld-h { font-size: 11px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-3); margin-bottom: 10px; }
+body.rd .rd-pld-h { font-size: 11px; font-weight: 600; color: var(--ink-3); margin-bottom: 10px; }
 body.rd .rd-pld-prim { display: flex; gap: 22px; margin-bottom: 12px; }
 body.rd .rd-pld-prim > span { display: flex; flex-direction: column; gap: 2px; }
 body.rd .rd-pld-prim b { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
@@ -1820,8 +1820,8 @@ body.rd .rd-apd-l .poll-copy-btn { bottom: 8px; right: 0; }
 body.rd .rd-apd-r { display: flex; flex-direction: column; min-width: 0; }
 /* a poll header's "n = 1,500 (eff. 1,053)": n is a sample's letter, and
    capitals would make it N, the population's */
-body.rd .rd-pld-h .rd-nocaps, body.rd .rd-apd-h .rd-nocaps { text-transform: none; letter-spacing: 0.02em; white-space: nowrap; }
-body.rd .rd-apd-h { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; line-height: 1.5; color: var(--ink-3); }
+body.rd .rd-pld-h .rd-nocaps, body.rd .rd-apd-h .rd-nocaps { text-transform: none; white-space: nowrap; }
+body.rd .rd-apd-h { font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--ink-3); }
 body.rd .rd-apd-prim { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
 body.rd .rd-apd-prim > span { width: 64px; display: flex; flex-direction: column; gap: 1px; }
 body.rd .rd-apd-prim b { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
