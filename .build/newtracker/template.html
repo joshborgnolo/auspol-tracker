@@ -463,6 +463,13 @@ body.js.ss-view #root { display: none; }
    hit target as well as the paint, so the corners' dead air no longer
    fires the player either. */
 button.wm-glyph { border-radius: 50%; }
+/* …and the dial grows NO hover shape: clipped to the ellipse, the shared
+   6% ink wash reads as a grey oval swimming behind the gauge, so the main
+   page fills the button with nothing on hover and lets the scale alone
+   answer the pointer. The satellites keep their wash on the whole-lockup
+   pill (inside the markers above); :focus-visible's ring stays — that is
+   the keyboard user's pointer, not a hover shape. */
+button.wm-glyph:hover { background: transparent; }
 
 /* ---------- the dial, wound back ---------- */
 /* Paper, not a lightbox: this is a printed instrument being demonstrated, so

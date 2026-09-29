@@ -342,6 +342,7 @@ body.js.ss-view #root { display: none; }
 .wm-glyph:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
 .lockup { display: flex; align-items: center; gap: 12px; }
 button.wm-glyph { border-radius: 50%; }
+button.wm-glyph:hover { background: transparent; }
 .dl-backdrop {
   position: fixed; inset: 0; z-index: 200;
   display: flex; align-items: center; justify-content: center; padding: 24px;
@@ -65767,6 +65768,10 @@ const RD_AP_TAGS = {
   },
   dir: {
     label: "Right direction or wrong track"
+  },
+  iss: {
+    label: "Issues",
+    note: "What voters say matters, and the party rated best on each"
   }
 };
 const rdApTagLab = id => RD_AP_TAGS[id] ? RD_AP_TAGS[id].label : id;
