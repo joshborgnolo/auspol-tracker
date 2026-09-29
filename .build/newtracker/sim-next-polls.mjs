@@ -368,12 +368,20 @@ function eq(name, got, want) {
 }
 
 // S5 – the poll is recorded. Written when the 2 Sep wave still needed a
-// simulated `last`, but that is now the REAL data (Essential recorded
-// 2026-09-02, projecting Wed 30 Sep): the projection re-anchored and the
-// red cleared by itself, so this runs on `cad` untouched.
+// simulated `last`; it became the REAL data (Essential recorded
+// 2026-09-02, projecting Wed 30 Sep), the projection re-anchored and the
+// red cleared by itself, so this first ran on `cad` untouched. The record
+// has since moved to the 29 Sep wave (published stamp still deferred, so
+// the row's basis flipped to fieldwork and the cadence and spreads
+// re-measured), silently re-breaking every expectation below — the row is
+// now pinned to the 2 Sep record the scenario was written against.
 {
+  const cad5 = JSON.parse(JSON.stringify(cad));
+  Object.assign(cad5.find((c) => c.pollster === "Essential"),
+    { last: "2026-09-02", cadence: 31.5, spread: 4, spreadEarly: 3.5, spreadLate: 3.5,
+      basis: "published", lag: 0, lagMeasured: 0, waves: 12 });
   const { label, t0, nowMs } = scen("Thu 3 Sep, recorded", "2026-09-03", 600);
-  const rows = project(cad, t0, nowMs);
+  const rows = project(cad5, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const es = firm(rows, "Essential");
@@ -490,14 +498,19 @@ function eq(name, got, want) {
 }
 
 // S8d – Wed 23 Sep, against the SHIPPED cadence table exactly as built (no
-// re-anchoring): the horizon bounds only FURTHER slots. Spectre Strategy's
-// 139-day cadence puts its next slot ~eleven weeks out, and that one slot
-// still stands - on the panel as Thu 10 Dec ± 18 days counting from 78, on
-// the bar as a maybe-hedged countdown to the window's open 60 days away -
-// while the weekly house's walk still stops where the horizon says.
+// re-anchoring): the horizon bounds only FURTHER slots. Roy Morgan's `last`
+// is pinned to the 21 Sep wave the walk count was written against - the
+// shipped stamp advances every week and silently shrinks it. Spectre
+// Strategy's 139-day cadence puts its next slot ~eleven weeks out, and that
+// one slot still stands - on the panel as Thu 10 Dec ± 18 days counting
+// from 78, on the bar as a maybe-hedged countdown to the window's open 60
+// days away - while the weekly house's walk still stops where the horizon
+// says.
 {
+  const cad8 = JSON.parse(JSON.stringify(D.pollCadence));
+  cad8.find((c) => c.pollster === "Roy Morgan").last = "2026-09-21";
   const { t0, nowMs, label } = scen("Wed 23 Sep, the slow house stands", "2026-09-23", 600);
-  const rows = project(D.pollCadence, t0, nowMs);
+  const rows = project(cad8, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const sp = firm(rows, "Spectre Strategy");
