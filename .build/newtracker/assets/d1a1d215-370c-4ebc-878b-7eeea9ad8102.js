@@ -5640,7 +5640,6 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                   title="The issue most voters named, and the share naming it" />
                 <ArchSortTh label="Best on it" k="iss.bestv" sort={sort} onSort={onSort}
                   title="The party voters trust most on that issue, and its share" />
-                <ArchSortTh label="Net direction" short="Net" k="dir.net" sort={sort} onSort={onSort} className="hide-md" />
               </>)}
             </tr>
           </thead>
@@ -5654,7 +5653,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
               const rowId = p.pollster + "|" + p.released;
               const arrived = !!focus && focus.key === rowId;
               const isOpen = open === rowId;
-              const colCount = facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "direction" ? 9 : 9;
+              const colCount = facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "direction" ? 9 : facet === "issues" ? 8 : 9;
               return (
                 <React.Fragment key={rowId}>
                 <tr className={"poll-row arch-row" + (isOpen ? " open" : "") + (arrived ? " arrived" : "")}
@@ -5746,7 +5745,6 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                   {facet === "issues" && (<>
                   <td className="ta-l"><ArchIssTop iss={p.iss} /></td>
                   <td className="num"><ArchIssBest iss={p.iss} /></td>
-                  <td className="num hide-md"><ArchDirCell d={p.dir} /></td>
                   </>)}
                 </tr>
                 {isOpen && (
@@ -5761,7 +5759,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
             })}
             {sorted.length === 0 && (
               <tr className="arch-empty">
-                <td colSpan={facet === "primary" ? 10 : facet === "leadership" ? 9 : 9}>
+                <td colSpan={facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "issues" ? 8 : 9}>
                   No polls match these filters. <button className="ap-clear" onClick={clearAll}>Clear filters</button>
                 </td>
               </tr>

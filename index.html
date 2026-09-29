@@ -4541,7 +4541,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
-  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 148px) minmax(0, 148px) minmax(0, 1fr) 44px 28px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 148px) minmax(0, 148px) minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-n, body.rd .rd-ap-hrow > .rd-ap-th:nth-child(3) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
@@ -60535,13 +60535,6 @@ function AllPollsView({
     sort: sort,
     onSort: onSort,
     title: "The party voters trust most on that issue, and its share"
-  }), React.createElement(ArchSortTh, {
-    label: "Net direction",
-    short: "Net",
-    k: "dir.net",
-    sort: sort,
-    onSort: onSort,
-    className: "hide-md"
   })))), React.createElement("tbody", {
     ref: bodyRef
   }, shownRows.map((p, i) => {
@@ -60549,7 +60542,7 @@ function AllPollsView({
     const rowId = p.pollster + "|" + p.released;
     const arrived = !!focus && focus.key === rowId;
     const isOpen = open === rowId;
-    const colCount = facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "direction" ? 9 : 9;
+    const colCount = facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "direction" ? 9 : facet === "issues" ? 8 : 9;
     return React.createElement(React.Fragment, {
       key: rowId
     }, React.createElement("tr", {
@@ -60680,10 +60673,6 @@ function AllPollsView({
       className: "num"
     }, React.createElement(ArchIssBest, {
       iss: p.iss
-    })), React.createElement("td", {
-      className: "num hide-md"
-    }, React.createElement(ArchDirCell, {
-      d: p.dir
     })))), isOpen && React.createElement("tr", {
       className: "detail-row"
     }, React.createElement("td", {
@@ -60696,7 +60685,7 @@ function AllPollsView({
   }), sorted.length === 0 && React.createElement("tr", {
     className: "arch-empty"
   }, React.createElement("td", {
-    colSpan: facet === "primary" ? 10 : facet === "leadership" ? 9 : 9
+    colSpan: facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "issues" ? 8 : 9
   }, "No polls match these filters. ", React.createElement("button", {
     className: "ap-clear",
     onClick: clearAll
@@ -71901,10 +71890,7 @@ function RdAllPolls(P) {
     className: "rd-ap-hpic"
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Share naming each issue as one that matters, %")), th("Net direction", "dir.net", {
-    right: true,
-    title: "Net national mood, if the poll asked it"
-  })), React.createElement("span", null));
+  }, "Share naming each issue as one that matters, %")), React.createElement("span", null)), React.createElement("span", null));
   const pollsterCell = p => React.createElement("span", {
     role: "rowheader",
     className: "rd-ap-who"
@@ -72276,7 +72262,6 @@ function RdAllPolls(P) {
       }, rdApNum(d.wrong)), ", unsure ", rdApNum(d.unsure))) : null;
     } else if (facet === "issues") {
       const iss = p.iss || null;
-      const d = p.dir;
       const top3 = iss ? (iss.sal || iss.conc || []).slice(0, 3) : [];
       const it = iss ? window.issTopOf(iss) : null;
       const ib = iss ? window.issBestOf(iss) : null;
@@ -72316,10 +72301,6 @@ function RdAllPolls(P) {
       })))) : React.createElement("span", {
         className: "rd-ap-pic"
       });
-      val = React.createElement("span", {
-        role: "cell",
-        className: "rd-ap-val"
-      }, d ? rdSigned(d.net, 0) : "—");
       right1 = it ? React.createElement("b", {
         className: "rd-ap-pairfig"
       }, rdApNum(it[1])) : React.createElement("span", {
@@ -72335,17 +72316,7 @@ function RdAllPolls(P) {
         style: im[2] ? {
           color: im[2]
         } : null
-      }, im[0]), ", ", rdApNum(ib.v)), d && React.createElement("div", {
-        className: "rd-ap-csub"
-      }, "Right ", React.createElement("b", {
-        style: {
-          color: "var(--mood-pos)"
-        }
-      }, rdApNum(d.right)), ", wrong ", React.createElement("b", {
-        style: {
-          color: "var(--mood-neg)"
-        }
-      }, rdApNum(d.wrong)), ", unsure ", rdApNum(d.unsure)));
+      }, im[0]), ", ", rdApNum(ib.v)));
     }
     const detail = isOpen && React.createElement("div", {
       className: "rd-ap-open",

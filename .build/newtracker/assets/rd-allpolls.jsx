@@ -1192,7 +1192,7 @@ function RdAllPolls(P) {
         {th("Top issue", "iss.topv", { title: "The issue most voters said matters most" })}
         {th("Best on it", "iss.bestv", { title: "The party most voters rate best on that issue" })}
         <span className="rd-ap-hpic"><span className="rd-ap-cap">Share naming each issue as one that matters, %</span></span>
-        {th("Net direction", "dir.net", { right: true, title: "Net national mood, if the poll asked it" })}
+        <span></span>
       </>}
       <span></span>
     </div>
@@ -1337,7 +1337,6 @@ function RdAllPolls(P) {
         <div className="rd-ap-csub">Right <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>, wrong <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>, unsure {rdApNum(d.unsure)}</div></> : null;
     } else if (facet === "issues") {
       const iss = p.iss || null;
-      const d = p.dir;
       /* quote the window-shared readouts (issTopOf/issBestOf/ISS_PARTY_META come
          from the d1a1 asset's archive layer) so the cells here, the classic
          table and the CSV export always tell one story */
@@ -1360,13 +1359,11 @@ function RdAllPolls(P) {
           </span>
         </span>
       ) : <span className="rd-ap-pic"></span>;
-      val = <span role="cell" className="rd-ap-val">{d ? rdSigned(d.net, 0) : "—"}</span>;
       right1 = it ? <b className="rd-ap-pairfig">{rdApNum(it[1])}</b> : <span className="rd-ap-none">—</span>;
       body = <>
         <div className="rd-ap-cpic">{pic}</div>
         {it && <div className="rd-ap-csub">{it[0]} <b>{rdApNum(it[1])}</b></div>}
         {ib && <div className="rd-ap-csub">Best on it: <b style={im[2] ? { color: im[2] } : null}>{im[0]}</b>, {rdApNum(ib.v)}</div>}
-        {d && <div className="rd-ap-csub">Right <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>, wrong <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>, unsure {rdApNum(d.unsure)}</div>}
       </>;
     }
     const detail = isOpen && (
