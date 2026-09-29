@@ -1298,7 +1298,8 @@
       "pollster": "Essential",
       "right": 25,
       "wrong": 60,
-      "unsure": 15
+      "unsure": 15,
+      "url": "https://essentialreport.com.au/reports/30-september-2026"
     }
   ],
   "polls": [
@@ -5332,6 +5333,7 @@
       "oth": null,
       "tpp_alp": 48,
       "tpp_lnp": 46,
+      "releaseUrl": "https://essentialreport.com.au/reports/30-september-2026",
       "assimilated": true
     }
   ],

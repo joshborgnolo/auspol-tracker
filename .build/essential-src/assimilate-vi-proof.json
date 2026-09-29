@@ -1,65 +1,18 @@
 {
-  "generatedAt": "2026-09-29T15:15:42.939Z",
+  "generatedAt": "2026-09-29T23:14:58.309Z",
   "horizon": "2025-09-29",
-  "retro": [],
-  "added": [
+  "retro": [
     {
-      "csvWave": "2026-09-30",
-      "tppWave": "2026-09-30",
-      "row": {
-        "date": "2026-09-29",
-        "dateStart": "2026-09-24",
-        "pollster": "Essential",
-        "client": "The Guardian",
-        "sample": null,
-        "alp": 29,
-        "lnp": 22,
-        "grn": 12,
-        "onp": 25,
-        "ind": 12,
-        "oth": null,
-        "tpp_alp": 48,
-        "tpp_lnp": 46,
-        "assimilated": true
-      }
+      "date": "2026-09-29",
+      "fixes": [
+        "releaseUrl https://essentialreport.com.au/reports/30-september-2026",
+        "url still unset — hand-set the Guardian write-up URL"
+      ]
     }
   ],
-  "addedAppr": [
-    {
-      "csvWave": "2026-09-30",
-      "row": {
-        "date": "2026-09-29",
-        "firm": "Essential",
-        "alb": -17,
-        "opp": -12,
-        "oppName": "Taylor",
-        "han": null,
-        "detail": {
-          "alb": {
-            "app": 37,
-            "dis": 54
-          },
-          "opp": {
-            "app": 31,
-            "dis": 43
-          }
-        }
-      }
-    }
-  ],
-  "addedDir": [
-    {
-      "csvWave": "2026-09-30",
-      "row": {
-        "date": "2026-09-29",
-        "dateStart": "2026-09-24",
-        "pollster": "Essential",
-        "right": 25,
-        "wrong": 60,
-        "unsure": 15
-      }
-    }
-  ],
+  "added": [],
+  "addedAppr": [],
+  "addedDir": [],
   "skippedDateDup": [
     "2025-10-29",
     "2025-11-26",
@@ -70,7 +23,8 @@
     "2026-05-27",
     "2026-06-30",
     "2026-07-28",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-30"
   ],
   "skippedFigureDup": [
     {
@@ -122,7 +76,8 @@
     "2026-05-27",
     "2026-06-30",
     "2026-07-28",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-30"
   ],
   "skippedApprFigureDup": [
     {
@@ -140,7 +95,8 @@
     "2026-05-27",
     "2026-06-30",
     "2026-07-28",
-    "2026-09-01"
+    "2026-09-01",
+    "2026-09-30"
   ],
   "skippedDirFigureDup": [
     {
