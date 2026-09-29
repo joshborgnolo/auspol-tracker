@@ -1002,6 +1002,37 @@ const RD_DEMO_HOME = {
   grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
   oth: "Voters for others/independents are more likely to be Gen Z, renting, and NSW-based, and less likely to be provincial or mortgage holders",
 };
+/* the composition-trend block's wording slots (shapes are the user's, dictated
+   2026-09-29; the SENTENCES are generated from D.demoTrend — gen-data §7gb —
+   and re-word themselves as significances move, so only these phrase pieces
+   are curated). Titles: "… is losing voters faster in …", "The composition of
+   …'s vote is unchanged". Deks: "… shifted away from … and towards …", "…
+   voter base has become more inner-metro", "… once-large lead … appears to be
+   shrinking". */
+const RD_TREND_NAME = { onp: "One Nation", alp: "Labor", lnp: "The Coalition", grn: "the Greens", oth: "Others/independents" };
+const RD_TREND_NAME_DEK = { onp: "One Nation", alp: "Labor", lnp: "the Coalition", grn: "the Greens", oth: "others/independents" };
+const RD_TREND_BARE = { onp: "One Nation", alp: "Labor", lnp: "Coalition", grn: "Greens" };
+const RD_TREND_SKEW = {
+  onp: "Its older, regional skew is no stronger now than it was then.",
+  grn: "Its younger, urban skew remains.",
+};
+const RD_TREND_STATE = { NSW: "NSW", Vic: "Victoria", Qld: "Queensland", "Rest of Australia": "the rest of Australia" };
+const RD_TREND_STATE_ORDER = ["NSW", "Vic", "Qld", "Rest of Australia"];
+const RD_TREND_EASTERN = ["NSW", "Vic", "Qld"];
+const RD_TREND_LOC = {
+  "Inner metro": { adj: "inner-metro", ref: "the inner metros" },
+  "Outer metro": { adj: "outer-metro", ref: "the outer metros" },
+  Provincial: { adj: "provincial", ref: "provincial areas" },
+  Rural: { adj: "rural", ref: "rural areas" },
+};
+const RD_TREND_GROUP = {
+  "Other language": "voters in non-English-speaking households", "English only": "English-only speakers",
+  "18–34": "18–34s", "35–54": "35–54s", "55+": "over-55s",
+  "Gen Z": "Gen Z", Millennials: "Millennials", "Gen X": "Gen X", Boomers: "Boomers",
+  Men: "men", Women: "women",
+  University: "university graduates", "TAFE or trade": "TAFE-qualified voters", "Year 12 or less": "voters with Year 12 or less",
+  "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
+};
 /* the state panels' titles, as the board wrote them */
 const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };
 const RD_DEMO_NOUN = { age: "age", gender: "gender", education: "education" };
@@ -1075,6 +1106,113 @@ function RdDemographics({ rangeId = "all" }) {
     const home = RD_DEMO_HOME[party];
     if (home) dek = dek ? rdCap(finding) + ". " + dek : rdCap(finding) + ".";
     return { head: home || rdCap(finding), dek };
+  })();
+
+  /* ---- the composition trend: which groups have moved out of proportion ---
+     Titled and deked from D.demoTrend (gen-data's two-stage test, §7gb), on
+     the user's dictated shapes (2026-09-29): proportionality, so "away from /
+     towards" means beyond what the party's own national trend hands a group
+     merely for its starting level. Sets rank by their strongest move's
+     |t(log-ratio)|; the dek carries the top two. Figures quoted are the
+     fitted start/end levels, and a move on seven or fewer monthly points
+     hedges "appears to be". */
+  const shift = (() => {
+    const dt = D.demoTrend && D.demoTrend[party];
+    if (!dt || !dt.windowYm) return null;
+    const moves = dt.moves || [];
+    const nameT = RD_TREND_NAME[party] || P.name;
+    const nameD = RD_TREND_NAME_DEK[party] || pName;
+    const isAre = party === "oth" ? "are" : "is";
+    const poss = (s) => s + (/s$/.test(s) ? "’" : "’s");
+    const serial = (ls) => ls.length < 2 ? (ls[0] || "") : ls.length === 2 ? ls[0] + " and " + ls[1] : ls.slice(0, -1).join(", ") + ", and " + ls[ls.length - 1];
+    const since = "Since " + rdMonthYear(dt.windowYm) + ", ";
+    if (!moves.length) {
+      const skew = RD_TREND_SKEW[party];
+      return {
+        head: "The composition of " + poss(nameT) + " vote is unchanged",
+        dek: since + "no group has moved significantly towards or away from " + nameD + " relative to all voters" + (skew ? ". " + skew : "."),
+      };
+    }
+    const pct = (v) => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
+    const setGroupsOf = (m) => {
+      const tb = T.tabs.find((t) => t.id === m.tab);
+      const st = tb && tb.sets.find((s) => s.id === m.set);
+      return st ? st.groups.map((g) => g.label) : [];
+    };
+    const bestOf = (ms) => ms.slice().sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR))[0];
+    const stateDek = (ms) => {
+      /* a side with no significant move of its own names the other side's
+         complement: "away from NSW, Victoria, and Queensland, and towards
+         the rest of Australia" is rest-of-Australia's single move read the
+         other way */
+      const toward = ms.filter((m) => m.dir > 0).map((m) => m.group);
+      const away = ms.filter((m) => m.dir < 0).map((m) => m.group);
+      const others = ms.length ? setGroupsOf(ms[0]) : [];
+      if (!toward.length) toward.push(...others.filter((l) => !away.includes(l)));
+      if (!away.length) away.push(...others.filter((l) => !toward.includes(l)));
+      const order = (ls) => RD_TREND_STATE_ORDER.filter((l) => ls.includes(l));
+      const eastern = (ls) => ls.length === RD_TREND_EASTERN.length && RD_TREND_EASTERN.every((l) => ls.includes(l));
+      const named = (ls) => ls.map((l) => RD_TREND_STATE[l] || l);
+      const a = order(away), t = order(toward);
+      return {
+        // the title's pole: the three eastern states together name as one
+        pole: a.length ? (eastern(a) ? "the eastern-mainland states" : serial(named(a))) : (eastern(t) ? "the eastern-mainland states" : serial(named(t))),
+        toward: !a.length,
+        dek: "the composition of " + poss(nameD) + " vote has shifted away from " + serial(named(a)) + ", and towards " + serial(named(t)),
+      };
+    };
+    const locDek = (m) => {
+      const loc = RD_TREND_LOC[m.group] || { adj: m.group.toLowerCase(), ref: m.group };
+      const flat = Math.abs(m.a1 - m.a0) < 1;
+      const national = flat ? ", even as the national vote has remained flat"
+        : ", while the national vote has " + (m.a1 < m.a0 ? "fallen" : "risen") + " from " + pct(m.a0) + "% to " + pct(m.a1) + "%";
+      const support = party === "oth" ? "Support for others/independents" : (RD_TREND_BARE[party] || nameT) + " support";
+      return [
+        poss(nameD) + " voter base has become " + (m.dir > 0 ? "more " : "less ") + loc.adj,
+        support + " in " + loc.ref + " has " + (m.dir > 0 ? "risen" : "fallen") + " from " + pct(m.g0) + "% to about " + pct(m.g1) + "%" + national,
+      ];
+    };
+    const groupDek = (m) => {
+      const gap0 = m.g0 - m.a0, gap1 = m.g1 - m.a1;
+      const lead = gap1 >= 0;
+      const noun = lead ? "lead" : "deficit";
+      const motion = gap1 > gap0 ? (lead ? "growing" : "narrowing") : (lead ? "shrinking" : "growing");
+      const mag = motion === "shrinking" || motion === "narrowing" ? Math.abs(gap0) : Math.abs(gap1);
+      const strength = mag >= 8 ? "once-large " : mag >= 3 ? "considerable " : "";
+      const hedge = m.thin ? "appears to be " : "is ";
+      return poss(nameD) + " " + strength + noun + " among " + (RD_TREND_GROUP[m.group] || m.group) + " " + hedge + motion;
+    };
+    const bySet = new Map();
+    for (const m of moves) {
+      const k = m.tab + "|" + m.set;
+      if (!bySet.has(k)) bySet.set(k, []);
+      bySet.get(k).push(m);
+    }
+    const setsRanked = [...bySet.values()]
+      .map((ms) => ({ ms, top: Math.max(...ms.map((m) => Math.abs(m.tLR))) }))
+      .sort((a, b) => b.top - a.top)
+      .slice(0, 2);
+    let head = null;
+    const parts = [];
+    for (const { ms } of setsRanked) {
+      const m0 = ms[0];
+      if (m0.set === "state") {
+        const b = stateDek(ms);
+        if (!head) head = nameT + " " + isAre + " " + (b.toward ? "gaining" : "losing") + " voters faster in " + b.pole;
+        parts.push(b.dek);
+      } else if (m0.set === "location") {
+        const m = bestOf(ms), loc = RD_TREND_LOC[m.group] || { ref: m.group };
+        if (!head) head = nameT + " " + isAre + " " + (m.dir > 0 ? "gaining in " : "losing voters faster in ") + loc.ref;
+        parts.push(...locDek(m));
+      } else {
+        const m = bestOf(ms);
+        if (!head) head = "The composition of " + poss(nameT) + " vote is shifting";
+        parts.push(groupDek(m));
+      }
+    }
+    /* sentences after the first start a sentence of their own, so a
+       lower-case name ("others/independents") still opens capitalised */
+    return { head, dek: since + parts.map((s, i) => (i === 0 ? s : rdCap(s))).join(". ") + "." };
   })();
 
   /* ---- the dot plot, every set on one scale -------------------------------- */
@@ -1300,6 +1438,7 @@ function RdDemographics({ rangeId = "all" }) {
   return (
     <RdSec id="who-votes" cls="rd-wv" title="Who votes for whom" meta={"Pooled from the last " + T.window + " of " + rdList(T.houses.map(demoHouse)) + " polls"}>
       <RdHed head={story.head} dek={story.dek} />
+      {shift && <RdSub head={shift.head} dek={shift.dek} glide />}
       {/* the party picks itself by number key: 1 One Nation, 2 Labor,
           3 Coalition, 4 Greens, 5 Others - the chips' left-to-right order */}
       <RdTabs swipe value={tab.id} onChange={setTab} options={T.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-wv-tabs"

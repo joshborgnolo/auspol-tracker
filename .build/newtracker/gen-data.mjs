@@ -1429,6 +1429,118 @@ const directionOnlyPolls = DIR
   })
   .sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
 
+/* ---- 5i. issues waves – per-wave what-matters / who's-best data, keyed to
+   the archive row the question was asked in. Same join convention as
+   direction above: each salience/ownership wave in data/issues.json carries
+   its poll's (or direction row's) date|pollster key, so it rides that row
+   where one exists (RedBridge/Accent, Resolve, YouGov, DemosAU) and the
+   direction-only row where that's the wave's only home (SEC Newgate – the
+   G4 ownership waves date off its direction[] rows). SEC's unprompted-
+   concerns and best-party banks ride its direction rows too, straight from
+   data/sec-issues.json by survey month. Ipsos asks issues and nothing
+   else, so its waves become rows of their own below (issuesOnlyPolls),
+   shaped like directionOnlyPolls. A wave that attached to no row would
+   vanish from the issues facet silently, so any wave outside the known
+   join classes fails the build here. ISSUES_FILE is hoisted out of §7h,
+   which pools the same file. */
+const ISSUES_FILE = (() => {
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "issues.json"), "utf8")); }
+  catch { return null; }
+})();
+const SEC_ISSUES_FILE = (() => {
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "sec-issues.json"), "utf8")); }
+  catch { return null; }
+})();
+const ISSUE_SHARED = ["col", "housing", "health", "economy", "immigration", "climate", "crime", "security"];
+const ISS_ONLY = new Set(["Ipsos"]);   // issues houses with no poll/direction rows to join
+const ISS_BY = new Map();              // "date|pollster" → the wave's issues payload
+{
+  const labelOf = (k) => ((ISSUES_FILE && ISSUES_FILE.issues) || {})[k] || k;
+  const put = (key, patch) => ISS_BY.set(key, { ...(ISS_BY.get(key) || {}), ...patch });
+  const unhomed = [];
+  if (ISSUES_FILE) {
+    /* The issues file's history runs further back than the archive (Resolve
+       has ownership waves from 2021; the All-polls table starts with the
+       current term): a wave in a month the archive doesn't cover simply has
+       no row to join and is pooled by §7h only. A wave inside the archive's
+       months with no row to join is a broken join and fails the build. */
+    const homeless = (w) => {
+      if (!MONTH_SET.has(ymOf(w.date))) return false;
+      unhomed.push(w.date + "|" + w.pollster);
+      return true;
+    };
+    for (const w of ISSUES_FILE.salience) {
+      const key = w.date + "|" + w.pollster;
+      if (w.pollster !== "Ipsos" && !POLL_BY_KEY.has(key) && !DIR_BY.has(key)) { homeless(w); continue; }
+      const entries = Object.entries(w.issues).filter(([, v]) => v && v.top3 != null)
+        .sort((a, b) => b[1].top3 - a[1].top3);
+      const patch = { sal: entries.slice(0, 8).map(([k, v]) => v.r1 != null ? [labelOf(k), v.top3, v.r1] : [labelOf(k), v.top3]) };
+      if (entries.length) patch.top = entries[0][0];
+      put(key, patch);
+    }
+    for (const w of ISSUES_FILE.ownership) {
+      const key = w.date + "|" + w.pollster;
+      if (w.pollster !== "Ipsos" && !POLL_BY_KEY.has(key) && !DIR_BY.has(key)) { homeless(w); continue; }
+      const cur = ISS_BY.get(key) || {};
+      put(key, {
+        own: w.issues,
+        ...(w.options ? { opts: w.options } : {}),
+        ...(w.question ? { q: w.question } : {}),
+        ...(cur.top ? {} : { top: ISSUE_SHARED.find((k) => w.issues[k]) || Object.keys(w.issues)[0] }),
+      });
+    }
+  }
+  if (SEC_ISSUES_FILE && SEC_ISSUES_FILE.series) {
+    const byMonth = {};
+    for (const [label, sights] of Object.entries(SEC_ISSUES_FILE.series))
+      for (const s of sights || []) if (s && s.mention != null) (byMonth[s.month] ||= {})[label] = s.mention;
+    const bp = SEC_ISSUES_FILE.bestParty || {};
+    for (const d of DIR.filter((x) => x.pollster === "SEC Newgate")) {
+      const ym = ymOf(d.date), key = d.date + "|" + d.pollster;
+      const m = byMonth[ym], b = bp[ym];
+      if (m) put(key, { conc: Object.entries(m).sort((a, b2) => b2[1] - a[1]).slice(0, 8)
+        .map(([l, v]) => [l, v]), top: (ISS_BY.get(key) || {}).top || "col" });
+      if (b) put(key, { bp: b, top: (ISS_BY.get(key) || {}).top || "col" });
+    }
+  }
+  if (unhomed.length)
+    throw new Error(`issues waves with no archive row to join: ${unhomed.join(", ")}`);
+  /* …and onto the direction-only rows, which were emitted just above this
+     block: SEC Newgate's waves are exactly the ones carrying conc/bp. */
+  for (const p of directionOnlyPolls) {
+    const iss = ISS_BY.get(p.released + "|" + p.pollster);
+    if (iss) p.iss = iss;
+  }
+}
+
+/* Ipsos's waves, as rows of their own for the archive's issues facet – the
+   one house that publishes its issue questions with no voting-intention or
+   direction row for them to ride on. Empty stubs (p / appr) as with
+   directionOnlyPolls; its release link is the wave's report PDF, its
+   publish stamp unknown (Ipsos re-uploads move the file dates), so the
+   detail head shows the fieldwork only. */
+const issuesOnlyPolls = (() => {
+  if (!ISSUES_FILE) return [];
+  const byDate = new Map();
+  for (const w of [...ISSUES_FILE.salience, ...ISSUES_FILE.ownership])
+    if (ISS_ONLY.has(w.pollster) && MONTH_SET.has(ymOf(w.date))) byDate.set(w.date, w);
+  return [...byDate.values()].map((w) => {
+    const ym = ymOf(w.date), fym = w.dateStart ? ymOf(w.dateStart) : null;
+    const field = fwLabel(w.dateStart, w.date);
+    return {
+      ym, x: mx(ym) + (dayOf(w.date) - 15) / 365, day: dayOf(w.date),
+      pollster: w.pollster,
+      ...(fym != null && fym !== ym ? { fym } : {}),
+      field, dateLabel: field, released: w.date, sample: w.sample ?? null,
+      ...(w.sampleEff != null ? { sampleEff: w.sampleEff } : {}),
+      ...(w.source ? { url: w.source } : {}),
+      client: "Self-published",
+      p: {}, appr: {}, chg: null,
+      iss: ISS_BY.get(w.date + "|" + w.pollster),
+    };
+  }).sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
+})();
+
 /* Both lines carry their interval, on the same terms as the 2PP: the spread
    between the houses that asked, floored by sampling error. Three houses ask
    this question and some months rest on one of them, so these are the widest
@@ -2072,6 +2184,8 @@ const individualPolls = POLLS.map((p) => {
         ? { provisional: "Poll Bludger", provisionalScope: "leaders", provisionalUrl: "https://www.pollbludger.net/fed2028/bludgertrack/polldata.htm" } : {}),
     // right-track / wrong-track, where this poll asked it
     ...(DIR_BY.has(p.date + "|" + p.pollster) ? { dir: DIR_BY.get(p.date + "|" + p.pollster) } : {}),
+    // this wave's issue salience / best-party figures, where it asked them
+    ...(ISS_BY.has(p.date + "|" + p.pollster) ? { iss: ISS_BY.get(p.date + "|" + p.pollster) } : {}),
     // seat projections – MRPs only. Carried verbatim; their change basis is the
     // last ELECTION, not the pollster's previous poll, so it travels with the
     // data rather than being inferred by the views.
@@ -2144,6 +2258,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     // APC methodology statement link (YouGov/Newspoll only)
     ...(p.methodUrl ? { methodUrl: p.methodUrl } : {}),
     ...(DIR_BY.has(p.date + "|" + p.pollster) ? { dir: DIR_BY.get(p.date + "|" + p.pollster) } : {}),
+    ...(ISS_BY.has(p.date + "|" + p.pollster) ? { iss: ISS_BY.get(p.date + "|" + p.pollster) } : {}),
     // a modelled chamber travels with the poll here too, not only into the
     // archive – a projection published this week belongs in Latest polls
     ...(p.seats ? { seats: p.seats } : {}),
@@ -2552,6 +2667,94 @@ if (demographics) {
   if (off.length) throw new Error(`vote-by-group all voters != the quoted primaries at ${off.map(([w]) => w).join(", ")} – the panel would contradict the hero and the primary chart`);
 }
 
+/* ---- 7gb. the composition of each party's vote, moving or not --------------
+   The Who-votes trend block's statistics. Per set x group x party combo, a
+   two-stage test on the group's monthly line against the all-voters line:
+   first a weighted least squares slope of the group's GAP from the average,
+   then the same fit on ln(group/all) – a group merely keeping its share of
+   a party that has grown everywhere holds a constant RATIO to the average,
+   so an absolute-gap slope alone reads pace-keeping as divergence. Only
+   combos significant on both count as a proportionality break, and only
+   they reach the renderer, which titles and deks the block from this list.
+   Monthly rows carry no n – their last five members are each party's 95%
+   margin, monthWithSe's sampling-floor-aware interval – so each month is
+   weighted by the party margin's precision, 1/se². Adjacent pooled months
+   share polls, so every t-stat is optimistic on its face; combos on seven
+   or fewer monthly points are marked thin so the copy can hedge them. */
+const demoTrend = (() => {
+  if (!demographics || !demographics.tabs) return null;
+  const KEYS = demographics.order;
+  const anchor = new Map(demographics.allMonthly.map((r) => [r[0], r]));
+  const ymIdx = new Map(demographics.allMonthly.map((r, i) => [r[0], i]));
+  const wls = (xs, ys, ws) => {
+    const n = xs.length;
+    const W = ws.reduce((a, b) => a + b, 0);
+    let xm = 0, ym = 0;
+    for (let i = 0; i < n; i++) { xm += ws[i] * xs[i]; ym += ws[i] * ys[i]; }
+    xm /= W; ym /= W;
+    let Sxx = 0, Sxy = 0;
+    for (let i = 0; i < n; i++) { const dx = xs[i] - xm; Sxx += ws[i] * dx * dx; Sxy += ws[i] * dx * (ys[i] - ym); }
+    const slope = Sxy / Sxx;
+    let sse = 0;
+    for (let i = 0; i < n; i++) { const d = ys[i] - (ym + slope * (xs[i] - xm)); sse += ws[i] * d * d; }
+    if (n - 2 < 3) return null;
+    const at = (x) => ym + slope * (x - xm);
+    return { slope, t: slope / Math.sqrt((sse / (n - 2)) / Sxx), at };
+  };
+  const rr = (v) => Math.round(v * 100) / 100;
+  const out = {};
+  for (let pid = 0; pid < KEYS.length; pid++) {
+    const party = KEYS[pid];
+    const moves = [];
+    let windowYm = null;
+    for (const tab of demographics.tabs) {
+      for (const st of tab.sets) {
+        for (const g of st.groups) {
+          const xs = [], gs = [], as = [], ws = [];
+          for (const row of g.monthly || []) {
+            const a = anchor.get(row[0]);
+            if (!a) continue;
+            xs.push(ymIdx.get(row[0]));
+            gs.push(row[1 + pid]);
+            as.push(a[1 + pid]);
+            // precision weight from the party's own 95% margin this month
+            const se = Math.max(0.5, row[6 + pid]) / 1.96;
+            ws.push(1 / (se * se));
+          }
+          if (xs.length < 5) continue;
+          const firstYm = (g.monthly || [])[0]?.[0];
+          if (firstYm && (!windowYm || firstYm < windowYm)) windowYm = firstYm;
+          const f1 = wls(xs, gs.map((v, i) => v - as[i]), ws);
+          if (!f1 || Math.abs(f1.t) < 1.96) continue;
+          const lx = [], ly = [], lw = [];
+          for (let i = 0; i < xs.length; i++) {
+            if (gs[i] <= 0.05 || as[i] <= 0.05) continue;
+            lx.push(xs[i]); ly.push(Math.log(gs[i] / as[i])); lw.push(ws[i]);
+          }
+          if (lx.length < 5) continue;
+          const f2 = wls(lx, ly, lw);
+          if (!f2 || Math.abs(f2.t) < 1.96) continue;
+          const lo = Math.min(...xs), hi = Math.max(...xs);
+          const gl = wls(xs, gs, ws), al = wls(xs, as, ws);
+          const llo = Math.min(...lx), lhi = Math.max(...lx);
+          moves.push({
+            tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label,
+            dir: f2.t > 0 ? 1 : -1,
+            tAbs: rr(f1.t), tLR: rr(f2.t),
+            // seven or fewer monthly points: a handful of waves, one or two houses
+            thin: xs.length <= 7, months: xs.length,
+            g0: rr(gl.at(lo)), g1: rr(gl.at(hi)), a0: rr(al.at(lo)), a1: rr(al.at(hi)),
+            r0: rr(Math.exp(f2.at(llo))), r1: rr(Math.exp(f2.at(lhi))),
+          });
+        }
+      }
+    }
+    moves.sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR));
+    out[party] = { windowYm, moves };
+  }
+  return out;
+})();
+
 /* ---- 7h. the issues: what matters, and who is trusted with it --------------
    data/issues.json (.build/issues.mjs) – each house's issue questions, per
    wave, as published. Three figures come out of it, each built as the
@@ -2597,12 +2800,9 @@ if (demographics) {
    gender, place, education and home, the group's sample taken as the
    poll's times the group's rough share of voters (only its sampling floor
    depends on that share), beside RedBridge's own all-voters figure – the
-   groups are its alone, so the row above them must be too. */
-const ISSUES_FILE = (() => {
-  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "issues.json"), "utf8")); }
-  catch { return null; }
-})();
-const ISSUE_SHARED = ["col", "housing", "health", "economy", "immigration", "climate", "crime", "security"];
+   groups are its alone, so the row above them must be too. ISSUES_FILE and
+   ISSUE_SHARED are read and keyed up in §5i, which hangs each wave on its
+   archive row before the pooling below runs. */
 const OWN3 = ["alp", "lnp", "onp"];
 const ISSUE_GROUP_SETS = [
   { id: "vote", label: "Vote" }, { id: "generation", label: "Age" }, { id: "gender", label: "Gender" },
@@ -2789,6 +2989,47 @@ const issues = (() => {
      newest poll sets the grey bars' level through its gap to the other,
      even once that poll has left the window (Ipsos's, for part of each month) */
   const salCredit = [...new Map(list.flatMap((it) => (it.imp?.gap ? it.imp.by : []).map((b) => [b.house, b]))).values()];
+  /* Enrich the archive rows' iss payloads (hung on their rows in §5i) with
+     what the expanded poll's "How it counts" rail quotes: whether the wave
+     sits in the window today's estimate draws on, and this house's measured
+     lean on the figure the rail headlines. Ownership takes the leading
+     party's share lean (the ownHE estimator above); salience takes the
+     pair's wording gap, oriented so this house's reading minus the other's
+     is the sign (pairLeanFor splits it half each – the rail prints this
+     house's half). SEC Newgate's concerns bank and every house's raw
+     as-filed shares aren't pooled series, so their rows carry no lean. */
+  /* …two passes, one per question family: a wave that asked both (every
+     RedBridge and Ipsos wave) collects both leans onto the one plus. The w
+     flag says the wave counts toward today's estimate in AT LEAST ONE
+     family, mirroring the pooling above: salience waves always pool,
+     ownership waves only when some issue asked the three-way figures. */
+  for (const w of F.salience) {
+    const iss = ISS_BY.get(w.date + "|" + w.pollster);
+    if (!iss || !iss.top || !iss.sal) continue;
+    const p = pollOf(w) || { date: w.date, dateStart: w.dateStart };
+    const plus = iss.plus || (iss.plus = { w: inWin(midMs(p)) ? 1 : 0 });
+    const lean = salLean[iss.top];
+    if (lean) {
+      const i = lean.firms.indexOf(w.pollster);
+      const g = i >= 0 ? lean.gapAt(refNow) : null;
+      if (g != null) plus.pair = i === 0 ? r1(g) : r1(-g);
+    }
+  }
+  for (const w of F.ownership) {
+    const iss = ISS_BY.get(w.date + "|" + w.pollster);
+    if (!iss || !iss.own) continue;
+    const p = pollOf(w) || { date: w.date, dateStart: w.dateStart };
+    const used = ISSUE_SHARED.some((k) => { const s = w.issues[k];
+      return s && s.alp != null && s.lnp != null && s.onp != null; });
+    const plus = iss.plus || (iss.plus = { w: used && inWin(midMs(p)) ? 1 : 0 });
+    const k = iss.top, sh = k && w.issues[k];
+    if (sh && OWN3.every((q) => sh[q] != null)) {
+      const q = OWN3.reduce((a, b) => (sh[b] > sh[a] ? b : a));
+      const v = heV(ownHE[k][q], w.pollster, refNow);
+      plus.lead = q;
+      if (Math.abs(v) >= 0.05) plus.lean = r1(v);
+    }
+  }
   return {
     window: SPARSE_K.label, parties: OWN3, list, labels: F.issues, leanMax,
     houses: creditHouses([...wavesIn.map((r) => ({ f: houseName(r.w.pollster), t: Date.parse(r.w.date) })),
@@ -4235,6 +4476,11 @@ window.AUSPOL = (function () {
      Newgate asks only this question), shaped as archive-table rows – the
      All-polls table's direction facet lists these beside the joined ones */
   const directionOnlyPolls = ${JSON.stringify(directionOnlyPolls)};
+  /* Ipsos's issues waves (§5i): the one house on the page with no voting-
+     intention or direction row for its issue questions to ride on, so they
+     are rows of their own for the All-polls table's issues facet – every
+     other house's issues data hangs off its poll/direction rows via iss */
+  const issuesOnlyPolls = ${JSON.stringify(issuesOnlyPolls)};
   const directionAvailable = ${direction.length > 0};
   const undecided = ${JSON.stringify(undecided)};
   /* How firm each party's vote is (§5c2): RedBridge's vote-softness table,
@@ -4251,6 +4497,9 @@ window.AUSPOL = (function () {
   /* The vote by group (§7g): per tab, each common group's
      pooled figure per party, with its margin, beside the current primaries. */
   const demographics = ${JSON.stringify(demographics)};
+  /* Composition trend (§7gb): per party, the groups that have moved toward
+     or away from it out of proportion to the all-voters line. */
+  const demoTrend = ${JSON.stringify(demoTrend)};
   /* The issues (§7h): per issue, who voters think is best (three-way,
      pooled) and how many put it in their top three, plus the top three by
      group. */
@@ -4334,7 +4583,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoTrend, demoGroups, issues, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved

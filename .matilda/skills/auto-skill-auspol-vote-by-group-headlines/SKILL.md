@@ -1,6 +1,6 @@
 ---
 name: auspol-vote-by-group-headlines
-description: auspol-tracker — the "Who votes for whom" panel headline is now a CONSTANT per party (RD_DEMO_HOME in rd-panels.jsx, right after RD_DEMO_SHORT, shipped 0d91b2e on 2026-09-28; grn and alp lines amended same day to an "urban or provincial" non-rural trait): one hand-curated sentence per switcher party ("One Nation voters are more likely to be …"), refreshed BY HAND from the current pooled significances; the per-grouping finding sentence that used to BE the headline now leads the dek ahead of the two-form figures sentence (contrast when a split is significant, ONE shared fraction when not — shipped e87f1f9 after the ONP gender trap, where independent rdFraction snaps drew a 2.0pt pool as a 5-point "about three in ten … against one in four" gap). Switcher DEMO_PARTIES = four chips (onp/alp/lnp/grn, no oth). Curate against window.AUSPOL.demographics with the panel's own simple |g.v − all| > g.ci margin test (NOT demoVerdict's Holm correction). ONP line is user-verbatim ("55+, TAFE- or trade-qualified, English-only-speaking, rural, and non-Victorian") — "English-only" kept per user override. Regression probe .matilda/demo-head-probe.mjs (gitignored).
+description: auspol-tracker — the "Who votes for whom" panel headline is now a CONSTANT per party (RD_DEMO_HOME in rd-panels.jsx, right after RD_DEMO_SHORT, shipped 0d91b2e on 2026-09-28; grn and alp lines amended same day to an "urban or provincial" non-rural trait): one hand-curated sentence per switcher party ("One Nation voters are more likely to be …"), refreshed BY HAND from the current pooled significances; the per-grouping finding sentence that used to BE the headline now leads the dek ahead of the two-form figures sentence (contrast when a split is significant, ONE shared fraction when not — shipped e87f1f9 after the ONP gender trap, where independent rdFraction snaps drew a 2.0pt pool as a 5-point "about three in ten … against one in four" gap). Switcher DEMO_PARTIES = FIVE chips since 69f467e (2026-09-29): oth joined as "Others" (short chip label; PARTIES.oth.name stays "Others / Ind." for table cells) with a curated oth RD_DEMO_HOME line, and the phone chip row wraps 3-over-2 at ≤480px because five chips+swatches overflow one nowrap row. oth's RUNNING-PROSE name is lowercase "others/independents" and its supporters "voters for others/independents" (user dictate 2026-09-29) — five name constants split across the a11e1559 asset and rd-panels plus a pName/pPoss plumbing in RdDemographics (s-ending name takes a bare ’ possessive; rdCap at sentence starts); PARTIES.oth.name "Others / Ind." still owns table cells, chip label "Others". Curate against window.AUSPOL.demographics with the panel's own simple |g.v − all| > g.ci margin test (NOT demoVerdict's Holm correction). ONP line is user-verbatim ("55+, TAFE- or trade-qualified, English-only-speaking, rural, and non-Victorian") — "English-only" kept per user override. The composition TREND block under it (a third head/dek pair, RdSub at ~:1441) is wholly GENERATED from gen-data §7gb's demoTrend payload (two-stage proportionality test, shipped 2026-09-29): curated RD_TREND_* phrase-pieces at ~:1006-1032, the shift IIFE compositor at ~:1111-1217, probe .matilda/demo-trend-probe.mjs. Regression probes .matilda/demo-head-probe.mjs and .matilda/demo-oth-copy-probe.mjs (gitignored).
 source: auto-skill
 extracted_at: '2026-09-28T07:14:51.777Z'
 ---
@@ -21,11 +21,15 @@ curation for every switcher party over auto-generation.
 
 ## Machinery (.build/newtracker/assets/rd-panels.jsx)
 
-- `RD_DEMO_HOME` sits directly below `RD_DEMO_SHORT`: exactly four
-  entries {onp, alp, lnp, grn} — DEMO_PARTIES renders four chips and no
-  "oth" chip, so there is no oth line to write. The story IIFE returns
-  `head: home || finding`, so any future party added without a curated
-  line gracefully falls back to the old computed-title behaviour.
+- `RD_DEMO_HOME` sits directly below `RD_DEMO_SHORT`: now FIVE
+  entries {onp, alp, lnp, grn, oth} — oth joined 69f467e (2026-09-29)
+  when the panel gained its fifth chip. The story IIFE returns
+  `head: home || finding`, so a party added without a curated line
+  gracefully falls back to the old computed-title behaviour.
+  DEMO_PARTIES (a11e1559 ~:2121) labels oth "Others" — the SHORT
+  form: "Others / Ind." stays PARTIES.oth.name for table cells, but
+  five full chips won't fit a phone row (see the chips-wrap section
+  below).
 - The per-grouping `finding` (the OLD headline text) is now PREPENDED
   to the dek: `{finding}. {figures sentence}. {optional
   st1 outlier sentence}.` An empty figures case degrades to
@@ -65,6 +69,17 @@ auto-skill-auspol-bundle-data-probe):
 - T = window.AUSPOL.demographics; per tab → set → group:
   d = g.v[party] − T.all[party]; significant when |d| > g.ci[party].
 
+The payload's exact shape, whichever extraction route (pinned
+2026-09-28 after three no-match shell probes guessed it wrong): TOP
+LEVEL IS ONLY {"all": {<party>: share}, "tabs": [...]} — tabs is an
+ARRAY of 5, not a keyed map, so filtering Object.keys(T) for entries
+with a .sets shape finds nothing. Walk T.tabs[i] ({id, sets}) →
+tab.sets[j] ({id, groups}) → g = st.groups[k] ({id, v, ci}); locations
+live in the Place tab's `location` set as groups inner-metro,
+outer-metro, provincial, rural. The regex-extraction route:
+html.match(/const demographics = (\{.*?\});/s) — the interpolation is
+already plain JSON, so JSON.parse(match[1]) directly (no eval).
+
 Write POSITIVE-side traits ("more likely to be X"), using inversions
 only where the negative side is the significant one (e.g.
 "non-Victorian" because Vic is the only state significantly BELOW the
@@ -96,6 +111,15 @@ The 0d91b2e set and its significance basis (all-voters in parens):
   non-rural group (the line is FOUR traits now): "…18–34, women,
   renters, and urban or provincial". True but unused: other-language
   +3.6.
+- oth (~14): curated 69f467e (2026-09-29) from the oth pool's few
+  significant splits — Gen Z (15.7±3.5 v all 11.1), renting, NSW on
+  the positive side; provincial and mortgage holders significantly
+  BELOW. The oth story is evenness (it is the residual bucket), so
+  the line mixes both directions: "Voters for others/independents
+  are more likely to be Gen Z, renting, and NSW-based, and less
+  likely to be provincial or mortgage holders" (line was
+  "Others voters are more likely…" at 69f467e; renamed later on
+  2026-09-29 per the prose-name dictate in the next section).
 
 Do NOT build a generator for this: auto-generation was offered and the
 user chose hand-written lines. If the pooled significances shift
@@ -131,6 +155,99 @@ the two offered): the no-difference figures sentence quotes ONE SHARED
 fraction for the whole set — "About one in four men and women alike
 back One Nation." See the "TWO forms" bullet in Machinery for the
 resulting wording rules.
+
+## oth's running-prose name: "others/independents" (user dictate 2026-09-29)
+
+User quote: "replace 'Others / Ind.' with 'others/independents'. and
+call them 'voters for others/independents'". Scope is RUNNING PROSE
+only — the chip label stays "Others" (DEMO_PARTIES) and PARTIES.oth.name
+stays "Others / Ind." for table cells; the rename lives in FIVE name
+constants across the two assets, plus plumbing:
+
+- a11e1559 asset: `DEMO_VOTE_FOR.oth` (~:2177, dek "back X" wording),
+  `firmWho` oth case (~:1710, firmness panel noun), `ISS_WHO.Others`
+  (~:2590, issues-panel group noun).
+- rd-panels.jsx: `RD_DEMO_HOME.oth` (the curated line, now starting
+  "Voters for others/independents …"), and the RdDemographics
+  generator plumbing ~:1064 — one `pName = party === "oth" ?
+  "others/independents" : P.name` feeds every finding/dek/aria
+  template so future prose renames are a one-place change.
+- rd-panels.jsx groupLong (~:1858): the old
+  `.replace(/^voters for other parties and independents$/, …)` mapping
+  was REMOVED — ISS_WHO now emits the target phrasing directly.
+
+Two grammar consequences of a LOWERCASE name worth keeping:
+
+1. POSSESSIVE: `pPoss = pName + (/s$/.test(pName) ? "’" : "’s")` — an
+   s-ending name takes the BARE apostrophe ("others/independents’
+   vote"). (The user's example sentence happened to be written with
+   the OLD name "Others / Ind.’s"; the bare form for the new name was
+   flagged to the user, not yet confirmed.)
+2. SENTENCE STARTS: findings and heads run through `rdCap` (rd.jsx
+   ~:370) so a lowercase name still opens capitalised —
+   `head: home || rdCap(finding)`, dek `rdCap(finding) + ". " + …`.
+
+Verification: `.matilda/demo-oth-copy-probe.mjs` (gitignored) clicks
+the "Others" chip over file:// index.html and asserts head
+`#who-votes .rd-hed` starts "Voters for others/independents are" and
+dek `#who-votes .rd-dek` carries "others/independents’ vote",
+"back others/independents.", and never "independents’s". Probe
+selector lesson (burned one run): read `.rd-hed`/`.rd-dek` TEXT off
+`#who-votes`, don't guess sub-selectors — the same selector pair as
+demo-head-probe.mjs.
+
+## The trend block below it: composed, not curated (§7gb demoTrend, 2026-09-29)
+
+Under the constant curated headline and its finding dek the panel mounts a
+THIRD head/dek pair, `{shift && <RdSub head={shift.head} dek={shift.dek}
+glide />}` at rd-panels.jsx ~:1441 — this is the composition TREND block,
+and unlike the headline it is fully GENERATED. The user dictated five
+full per-party titles+deks, then said "keeping the titles and deks dynamic
+to changing statistical significance", so the dictated shapes live on as
+curated PHRASE-PIECES in `RD_TREND_*` (~:1006-1032, right after
+RD_DEMO_HOME): name forms (RD_TREND_NAME/_DEK/_BARE), the no-move skew
+tails (RD_TREND_SKEW, onp "Its older, regional skew…" / grn "Its younger,
+urban skew remains."), state naming with the eastern-mainland collapse
+(NSW+Vic+Qld → "the eastern-mainland states") and complement naming when
+one side has no significant move of its own, location
+adjective/reference pairs (RD_TREND_LOC), and the group prose forms
+(RD_TREND_GROUP). The `shift` IIFE at ~:1111-1217 assembles sentences
+from `D.demoTrend[party]` around those pieces.
+
+Mechanics to know before touching it:
+
+- §7gb (gen-data ~:2684, exported as window.AUSPOL.demoTrend and returned
+  through the window list) runs the two-stage proportionality test per
+  set×group×party — WLS slope of the group's gap from the all-voters
+  anchor, re-fit on ln(group/anchor); only combos significant on BOTH
+  reach the payload. Weights are the precision of each month's margin
+  (rows carry no n — see auto-skill-group-trend-proportionality for the
+  row[11] accident and the 1/se² fix). Moves on ≤7 monthly points carry
+  `thin: true`.
+- Sets rank by their strongest move's |t(log-ratio)|; the dek carries the
+  top TWO sets and the head comes only from the first-ranked set —
+  state → "… is losing voters faster in …", location → "… is gaining in
+  …", anything else → "The composition of …'s vote is shifting". No
+  moves at all → "… is unchanged" + the no-significant-move sentence and
+  the party's RD_TREND_SKEW tail (skipped for parties without one).
+- Sentence figures are the payload's FITTED start→end levels, `pct()`
+  capped at one decimal; thin moves hedge "appears to be"; later dek
+  sentences pass rdCap so a lower-case party description still opens
+  capitalised ("Others/independents' lead among …").
+- With the corrected precision weights the rendered texts moved AWAY from
+  the user's dictated examples where those examples had been written
+  against junk-weight runs (onp gained a thin renters move, alp's
+  language sentence dropped out); the user chose data-corrected dynamics
+  over the snapshot wording when this was flagged, so the compositor's
+  verdict stands.
+- Probe: `.matilda/demo-trend-probe.mjs` (gitignored) clicks all five
+  chips in the BUILT page and asserts MECHANICS against the live payload
+  — the "Since {window} ," opener, unchanged-vs-shifting branch
+  selection, thin hedging, every quoted % being a fitted payload level,
+  and capitalised sentence starts — not a frozen word snapshot, so it
+  keeps passing as significances move. Selector: the trend block is
+  `#who-votes .rd-sub` / `.rd-subdek` (RdSub), distinct from the panel's
+  own `.rd-hed` / `.rd-dek`. Run it after any §7gb or shift-IIFE change.
 
 ## Regression probe
 
