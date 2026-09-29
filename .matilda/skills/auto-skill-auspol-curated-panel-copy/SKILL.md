@@ -143,6 +143,16 @@ auto-skill-auspol-vote-by-group-headlines; the weighting lesson
 (margins-not-n → 1/se² precision weights) in
 auto-skill-group-trend-proportionality.
 
+A same-day 2026-09-29 follow-up correction moved the compositor's home:
+its first mount sat directly under the panel's curated headline, but the
+user's dictate had meant the change-over-time slot BETWEEN the dot-plot
+card and the monthly charts, so the shift IIFE's render came down and
+the slot's prior per-tab compositor (a `sub` IIFE cutting 25
+Age/Gender/Home gap pairs — "The age gap has widened as One Nation has
+grown" et al., figures user-verbatim per tab) was RETIRED with its
+RD_DEMO_NOUN map; see auto-skill-auspol-vote-by-group-headlines's
+trend-block section.
+
 Two consequences worth keeping:
 
 - The dictation snapshot and the corrected statistics can disagree — the

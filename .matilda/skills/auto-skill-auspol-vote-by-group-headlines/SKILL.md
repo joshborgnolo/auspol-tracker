@@ -1,6 +1,6 @@
 ---
 name: auspol-vote-by-group-headlines
-description: auspol-tracker — the "Who votes for whom" panel headline is now a CONSTANT per party (RD_DEMO_HOME in rd-panels.jsx, right after RD_DEMO_SHORT, shipped 0d91b2e on 2026-09-28; grn and alp lines amended same day to an "urban or provincial" non-rural trait): one hand-curated sentence per switcher party ("One Nation voters are more likely to be …"), refreshed BY HAND from the current pooled significances; the per-grouping finding sentence that used to BE the headline now leads the dek ahead of the two-form figures sentence (contrast when a split is significant, ONE shared fraction when not — shipped e87f1f9 after the ONP gender trap, where independent rdFraction snaps drew a 2.0pt pool as a 5-point "about three in ten … against one in four" gap). Switcher DEMO_PARTIES = FIVE chips since 69f467e (2026-09-29): oth joined as "Others" (short chip label; PARTIES.oth.name stays "Others / Ind." for table cells) with a curated oth RD_DEMO_HOME line, and the phone chip row wraps 3-over-2 at ≤480px because five chips+swatches overflow one nowrap row. oth's RUNNING-PROSE name is lowercase "others/independents" and its supporters "voters for others/independents" (user dictate 2026-09-29) — five name constants split across the a11e1559 asset and rd-panels plus a pName/pPoss plumbing in RdDemographics (s-ending name takes a bare ’ possessive; rdCap at sentence starts); PARTIES.oth.name "Others / Ind." still owns table cells, chip label "Others". Curate against window.AUSPOL.demographics with the panel's own simple |g.v − all| > g.ci margin test (NOT demoVerdict's Holm correction). ONP line is user-verbatim ("55+, TAFE- or trade-qualified, English-only-speaking, rural, and non-Victorian") — "English-only" kept per user override. The composition TREND block under it (a third head/dek pair, RdSub at ~:1441) is wholly GENERATED from gen-data §7gb's demoTrend payload (two-stage proportionality test, shipped 2026-09-29): curated RD_TREND_* phrase-pieces at ~:1006-1032, the shift IIFE compositor at ~:1111-1217, probe .matilda/demo-trend-probe.mjs. Regression probes .matilda/demo-head-probe.mjs and .matilda/demo-oth-copy-probe.mjs (gitignored).
+description: auspol-tracker — the "Who votes for whom" panel headline is now a CONSTANT per party (RD_DEMO_HOME in rd-panels.jsx, right after RD_DEMO_SHORT, shipped 0d91b2e on 2026-09-28; grn and alp lines amended same day to an "urban or provincial" non-rural trait): one hand-curated sentence per switcher party ("One Nation voters are more likely to be …"), refreshed BY HAND from the current pooled significances; the per-grouping finding sentence that used to BE the headline now leads the dek ahead of the two-form figures sentence (contrast when a split is significant, ONE shared fraction when not — shipped e87f1f9 after the ONP gender trap, where independent rdFraction snaps drew a 2.0pt pool as a 5-point "about three in ten … against one in four" gap). Switcher DEMO_PARTIES = FIVE chips since 69f467e (2026-09-29): oth joined as "Others" (short chip label; PARTIES.oth.name stays "Others / Ind." for table cells) with a curated oth RD_DEMO_HOME line, and the phone chip row wraps 3-over-2 at ≤480px because five chips+swatches overflow one nowrap row. oth's RUNNING-PROSE name is lowercase "others/independents" and its supporters "voters for others/independents" (user dictate 2026-09-29) — five name constants split across the a11e1559 asset and rd-panels plus a pName/pPoss plumbing in RdDemographics (s-ending name takes a bare ’ possessive; rdCap at sentence starts); PARTIES.oth.name "Others / Ind." still owns table cells, chip label "Others". Curate against window.AUSPOL.demographics with the panel's own simple |g.v − all| > g.ci margin test (NOT demoVerdict's Holm correction). ONP line is user-verbatim ("55+, TAFE- or trade-qualified, English-only-speaking, rural, and non-Victorian") — "English-only" kept per user override. The composition TREND block IS the change-over-time head/dek slot between the dot-plot card and the monthly charts (RdSub at rd-panels.jsx ~:1447, relocated same date from under the panel headline — user correction 2026-09-29, see the trend-block section) is wholly GENERATED from gen-data §7gb's demoTrend payload (two-stage proportionality test, shipped 2026-09-29): curated RD_TREND_* phrase-pieces at ~:1006-1032, the shift IIFE compositor at ~:1119-1217, probe .matilda/demo-trend-probe.mjs. Regression probes .matilda/demo-head-probe.mjs and .matilda/demo-oth-copy-probe.mjs (gitignored).
 source: auto-skill
 extracted_at: '2026-09-28T07:14:51.777Z'
 ---
@@ -198,10 +198,20 @@ demo-head-probe.mjs.
 
 ## The trend block below it: composed, not curated (§7gb demoTrend, 2026-09-29)
 
-Under the constant curated headline and its finding dek the panel mounts a
-THIRD head/dek pair, `{shift && <RdSub head={shift.head} dek={shift.dek}
-glide />}` at rd-panels.jsx ~:1441 — this is the composition TREND block,
-and unlike the headline it is fully GENERATED. The user dictated five
+Under the constant curated headline and its finding dek — between the
+`rd-wv-dots` dot-plot card and the `rd-wv-charts` monthly charts — the
+panel mounts its change-over-time head/dek pair, `{shift && <RdSub
+head={shift.head} dek={shift.dek} glide />}` at rd-panels.jsx ~:1447.
+(That slot is the change-over-time slot; a same-day user correction —
+2026-09-29 — moved the composition-trend shift IIFE's render DOWN into it
+from its first home directly under the panel headline, retiring with it
+the previous per-tab change-over-time compositor, the `sub` IIFE
+(~37 lines, deleted with its RD_DEMO_NOUN map), which had cut the same
+25 Age/Gender/Education/Place/Home × onp/alp/lnp/grn/oth gap-pairs as
+the live page had shown — "The age gap has widened as One Nation has
+grown" and its sisters. The bloc's figures are now data-driven
+compositions, not user-verbatim copied per-tab statistics.). Unlike the
+curated headline it is fully GENERATED. The user dictated five
 full per-party titles+deks, then said "keeping the titles and deks dynamic
 to changing statistical significance", so the dictated shapes live on as
 curated PHRASE-PIECES in `RD_TREND_*` (~:1006-1032, right after

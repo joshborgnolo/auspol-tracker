@@ -91,8 +91,12 @@ language call dropped out, and several t-statistics moved ~0.5.
 The recipe now SHIPS in gen-data: §7gb `demoTrend` (exported onto
 window.AUSPOL) runs the same two-stage WLS with the margins-precision
 weights, flags moves on ≤7 monthly points as `thin` for hedged copy,
-and feeds the Who-votes trend block (shift IIFE in rd-panels.jsx,
-probe .matilda/demo-trend-probe.mjs — pins rendered mechanics, not a
+and feeds the Who-votes trend block (shift IIFE in rd-panels.jsx, its
+render now mounted in the change-over-time slot between the dot-plot
+card and the monthly charts since a same-day 2026-09-29 user
+correction — the replaced change-over-time per-tab compositor and its
+RD_DEMO_NOUN map were deleted in that edit; probe
+.matilda/demo-trend-probe.mjs — pins rendered mechanics, not a
 word snapshot). The two scratch auditors .matilda/demo-trend-test.mjs
 and .matilda/demo-trend-test-ratio.mjs were updated to the same
 weights so all three agree.

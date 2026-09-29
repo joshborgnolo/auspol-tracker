@@ -1035,7 +1035,6 @@ const RD_TREND_GROUP = {
 };
 /* the state panels' titles, as the board wrote them */
 const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };
-const RD_DEMO_NOUN = { age: "age", gender: "gender", education: "education" };
 /* groups in order as one party colour's ramp, pale to dark (dark mode runs
    the other way, so the last group keeps the most contrast in both) */
 const rdRamp = (party, n, i) => (n < 2 ? "var(--" + party + ")" : "var(--ramp-" + party + "-" + (1 + Math.round((i * 3) / (n - 1))) + ")");
@@ -1294,43 +1293,6 @@ function RdDemographics({ rangeId = "all" }) {
   const pm = partyMorph && partyMorph.from !== party ? partyMorph : null;
   const fromCharts = pm ? chartsCached(pm.from) : null;
   const fromYMax = fromCharts ? yMaxOf(fromCharts) : yMax;
-  /* the points gap between the first set's top and bottom groups, then and now */
-  const sub = (() => {
-    const c = charts[0];
-    if (!c || c.drawn.length < 2) return null;
-    /* "now" is each group's pooled figure, the one its row above quotes, so
-       the gap these words give is the gap a reader can take off the rows (the
-       lines' last month said "about 18" beside rows of 34.0 and 17.1) */
-    const nowOf = (e) => (e.l.g.v && e.l.g.v[party] != null ? e.l.g.v[party] : e.last.y);
-    const ends = c.drawn.map((l) => ({ l, first: l.pts[0], last: l.pts[l.pts.length - 1] }));
-    const byNow = ends.slice().sort((a, b) => nowOf(b) - nowOf(a));
-    const hiL = byNow[0], loL = byNow[byNow.length - 1];
-    const firstYm = [hiL.first.ym, loL.first.ym].sort().pop();
-    const fHi = hiL.l.pts.find((p) => p.ym === firstYm), fLo = loL.l.pts.find((p) => p.ym === firstYm);
-    if (!fHi || !fLo) return null;
-    const gap0 = fHi.y - fLo.y, gap1 = nowOf(hiL) - nowOf(loL);
-    const pts = (g) => Math.abs(Math.round(g)) + (Math.abs(Math.round(g)) === 1 ? " point" : " points");
-    const noun = RD_DEMO_NOUN[tab.id];
-    const grew = (allPts) => allPts.length > 1 && allPts[allPts.length - 1].y - allPts[0].y >= 3;
-    const pGrew = grew(c.allPts);
-    /* a gap that has changed sides has reversed, not grown: the group ahead
-       now was behind then. (The one ahead now can't be behind by more than
-       it leads, so a reversal only ever shows as a signed widening.) */
-    const move = gap1 - gap0 >= 4 ? (Math.round(gap0) < 0 ? "reversed" : "widened") : gap0 - gap1 >= 4 ? "narrowed" : "held steady";
-    const head = (noun ? "The " + noun + " gap" : "The gap between " + short(hiL.l.g) + " and " + short(loL.l.g)) + " has " + move
-      + (move === "widened" && pGrew ? " as " + pName + " has grown" : "");
-    const trend = demoTrendVerdict(D, c.st, party, (x) => x >= c.x0 && x <= c.x1);
-    /* a sentence before this one that already named the gap (two groups) is
-       followed by "it", not the same seven words again */
-    const theGap = trend && /the gap between /i.test(trend) ? "it" : "the gap between " + short(hiL.l.g) + " and " + short(loL.l.g);
-    const dek = (trend ? trend + " " : "") + (move === "held steady" ? "In percentage points " + theGap + " has stayed near " + Math.round(gap1) + "."
-      : move === "reversed"
-        ? "In percentage points, though, " + short(hiL.l.g) + " were about " + pts(gap0) + " less likely than " + short(loL.l.g) + " to back " + DEMO_VOTE_FOR[party]
-          + " in " + rdMonthYear(firstYm) + "; now they are about " + pts(gap1) + " more likely."
-        : "In percentage points, though, " + theGap + " has " + (move === "widened" ? "grown" : "shrunk")
-          + " from about " + pts(gap0) + " in " + rdMonthYear(firstYm) + " to about " + Math.round(gap1) + " now.");
-    return { head, dek };
-  })();
   /* Place draws its states as the board drew them: a small panel each, the
      state's line inside its 95% interval against the dashed all-voters line.
      Four states on one plot, each banded, were one brown cloud. The panels
@@ -1438,7 +1400,6 @@ function RdDemographics({ rangeId = "all" }) {
   return (
     <RdSec id="who-votes" cls="rd-wv" title="Who votes for whom" meta={"Pooled from the last " + T.window + " of " + rdList(T.houses.map(demoHouse)) + " polls"}>
       <RdHed head={story.head} dek={story.dek} />
-      {shift && <RdSub head={shift.head} dek={shift.dek} glide />}
       {/* the party picks itself by number key: 1 One Nation, 2 Labor,
           3 Coalition, 4 Greens, 5 Others - the chips' left-to-right order */}
       <RdTabs swipe value={tab.id} onChange={setTab} options={T.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-wv-tabs"
@@ -1480,7 +1441,10 @@ function RdDemographics({ rangeId = "all" }) {
           { kind: "whisker", color: pColor, label: "95% interval" },
         ]}><span className="rd-key-item rd-wv-keytxt">Right-hand column: difference from all voters, in points</span></RdKey>
       </div>
-      {sub && <RdSub head={sub.head} dek={sub.dek} />}
+      {/* the composition trend IS the change-over-time line here (it came
+          down from under the headline and the per-tab gap pairs retired with
+          it - user correction, 2026-09-29) */}
+      {shift && <RdSub head={shift.head} dek={shift.dek} glide />}
       {/* keyed on the grouping: a switch of it brings the charts in fresh,
           faded rather than cut (a party switch keeps them and morphs) */}
       <div className="rd-wv-charts rd-wv-enter" key={"wv-" + tab.id}>{charts.map(chartOf)}</div>
