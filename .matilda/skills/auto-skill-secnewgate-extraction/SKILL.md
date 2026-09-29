@@ -1,6 +1,6 @@
 ---
 name: secnewgate-extraction
-description: SEC Newgate "Mood of the Nation" bi-monthly survey — direction-only house (no VI). Discovery via the WP REST media API (predictable-URL probing fails), report PDFs carry "Fieldwork dates" + n on page 2, national-direction figures come from a 27-column geometry chart parsed with pdftotext -bbox; April 2026 Special Edition has NO direction question and must be skipped. auspol-tracker.
+description: SEC Newgate "Mood of the Nation" bi-monthly survey — direction-only house (no VI). Discovery via the WP REST media API (predictable-URL probing fails), report PDFs carry "Fieldwork dates" + n on page 2, direction rows carry url (the item's article-page link, not the PDF source_url) + published (the media date, site-local) picked up in pickReports and healed onto older rows. April 2026 Special Edition has NO direction question and must be skipped. auspol-tracker.
 source: auto-skill
 extracted_at: '2026-09-28T05:26:18.764Z'
 ---
@@ -101,6 +101,15 @@ the automation then keeps it current:
   `.build/secnewgate-src/<slug>.{txt,bbox.html,json}`, and it writes the
   `direction[]` rows ITSELF straight into `data/polls.json` (Roy-Morgan
   model — NOT the Ipsos model where a second script reads the cache).
+  Each media item also yields `page` (the item's `link` — the WP ARTICLE
+  page, never the PDF `source_url`) and `published`
+  (`date.slice(0,16)`, site-local UTC+10 — the upload stamp trails the
+  fieldwork by days); the sidecar carries `url`/`published`, the
+  direction row spreads them in, and the heal condition treats a missing
+  link/stamp as a heal target so rows filed before the fields existed get
+  back-filled (all 7 healed 2026-09-29; an item with no link/date yields
+  nulls, not a crash — pinned). Synthetic test items ride a
+  `(rendered, url, rest)` factory — `link`/`date` go in `rest`.
   `SEC_FIRST="2025-07"` (backfill floor), `QUIET_DAYS=75`, `HEAL_DAYS=8`,
   `unsure = 100 − right − wrong` (=0 on all waves so far, stored as int).
   Last line `SECNEWGATE_STATUS {…,"added","healed","pending","stale",
@@ -116,11 +125,11 @@ the automation then keeps it current:
   mismatch = SEC Newgate revised a wave = question for a person).
 - `.build/secnewgate-updater.sh` mirrors `ipsos-updater.sh` but its
   change-detection is `git status --porcelain -- .build/secnewgate-src
-  data/polls.json` — BOTH paths, because the extractor writes rows
-  itself. A new cache file with unmoved polls.json commits cache-only
-  ("Cache SEC Newgate … files"). Alarms are FAIL-last, after the push;
-  pending (defect) logs AFTER warnings so classify-failure names the
-  defect.
+  data/polls.json data/sec-direction-states.json` — all three, because
+  the extractor writes rows and the state bank itself. A new cache file
+  with unmoved polls.json commits cache-only ("Cache SEC Newgate …
+  files"). Alarms are FAIL-last, after the push; pending (defect) logs
+  AFTER warnings so classify-failure names the defect.
 - `.github/workflows/secnewgate-update.yml` — poll-agent.yml caller,
   cron `25 10 * * *` (20:25 AEST, clear of Ipsos's :10), NO
   tune-schedules block and NO dispatch-clock slot: the tuner/clock only
@@ -128,8 +137,8 @@ the automation then keeps it current:
   poppler-utils`; permissions ceiling contents:write + actions:read.
 - `crosstabs-updater.sh` runs the extractor weekly as backstop, parses
   `"stale":[…]` (the `SEC Newgate|quiet` alarm) into its STALE exit, and
-  carries `.build/secnewgate-src data/polls.json` in its CHANGED check
-  and FILES list.
+  carries `.build/secnewgate-src data/polls.json
+  data/sec-direction-states.json` in its CHANGED check and FILES list.
 - Agent-repair: `secnewgate-update` in agent-repair.yml's watch list +
   `secnewgate-repair-prompt.md`; the gate's forbidden-path regex
   (`\.build/[a-z0-9-]*repair-prompt\.md$`) fits the filename.
@@ -146,3 +155,32 @@ the automation then keeps it current:
      post-floor month for synthetic reports.
   3. Every cached bbox parses clean — do NOT pin an expected wave-1
      problem column that doesn't occur.
+
+## State direction bank (data/sec-direction-states.json, 2026-09-29)
+
+The "Perceived direction of individual states (%)" table on the direction
+page is now BANKED (parse-only, nothing on the site reads it — the
+2026-09-29 call was: too noisy and too one-house to chart, but too cheap
+to let evaporate). `stateTableOf(bbox)` in the extractor reads it:
+five mainland states (NSW/VIC/QLD/SA/WA), each row carrying the CURRENT
+wave's right/wrong pair left of the column block, then % right-direction
+cells under MON ’YY headers — a MAR ’22 anchor plus the wave's own and
+its two predecessors' tracking waves (so the union of all cached reports
+stitches a series from Feb 2025, one wave beyond the SEC_FIRST national
+floor; Feb/Apr 2025 and the 2022-03 anchor are right-direction-only —
+wrong is only ever printed for a report's own wave, so each wave's pair
+is captured exactly once, from its own report). Geometry notes: pair
+splits from cells at first-column-centre−25, cells match column centres
+(minX+6 within 20px), state labels are required BELOW the column header
+row because the dek copy above can carry a stray "NSW" token (Sep-25
+report, y≈74), and May'26's window reaches NOV ’25 not APR ’26 because
+the April special asked no direction question. The extractor merges
+sightings newest-report-wins, warns on any reprint conflict (a state
+revision), treats a state-table misread as `pending` WITHOUT holding the
+wave's national row back, and re-reads every cached report each run so a
+wave dropped from the media API never shrinks the bank. `SECNEWGATE_STATES`
+env var redirects the output. The bank is committed by BOTH wrappers —
+`.build/secnewgate-updater.sh` (no-change gate + cache-only and full
+FILES lists) and `crosstabs-updater.sh` (CHANGED check + FILES) — and
+pinned in test-secnewgate.mjs (per-report columns, pair==own-cell,
+reprint-agreement, merged series == the file).

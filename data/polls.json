@@ -645,7 +645,9 @@
       "pollster": "Essential",
       "right": 37,
       "wrong": 42,
-      "unsure": 21
+      "unsure": 21,
+      "url": "https://essentialreport.com.au/reports/13-may-2025",
+      "published": "2025-05-13T01:00"
     },
     {
       "date": "2025-06-01",
@@ -686,7 +688,9 @@
       "right": 44,
       "wrong": 56,
       "unsure": 0,
-      "sample": 1855
+      "sample": 1855,
+      "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-july-2025/",
+      "published": "2025-07-29T16:58"
     },
     {
       "date": "2025-07-27",
@@ -702,7 +706,9 @@
       "pollster": "Essential",
       "right": 38,
       "wrong": 45,
-      "unsure": 17
+      "unsure": 17,
+      "url": "https://essentialreport.com.au/reports/30-july-2025",
+      "published": "2025-07-31T01:00"
     },
     {
       "date": "2025-08-24",
@@ -718,7 +724,9 @@
       "pollster": "Essential",
       "right": 38,
       "wrong": 47,
-      "unsure": 16
+      "unsure": 16,
+      "url": "https://essentialreport.com.au/reports/27-august-2025",
+      "published": "2025-08-28T01:00"
     },
     {
       "date": "2025-09-15",
@@ -727,7 +735,9 @@
       "right": 41,
       "wrong": 59,
       "unsure": 0,
-      "sample": 1212
+      "sample": 1212,
+      "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-september-2025/",
+      "published": "2025-09-24T11:16"
     },
     {
       "date": "2025-09-21",
@@ -743,7 +753,9 @@
       "pollster": "Essential",
       "right": 34,
       "wrong": 50,
-      "unsure": 16
+      "unsure": 16,
+      "url": "https://essentialreport.com.au/reports/30-september-2025",
+      "published": "2025-10-01T01:00"
     },
     {
       "date": "2025-10-19",
@@ -767,7 +779,9 @@
       "pollster": "Essential",
       "right": 35,
       "wrong": 46,
-      "unsure": 19
+      "unsure": 19,
+      "url": "https://essentialreport.com.au/reports/29-october-2025",
+      "published": "2025-10-29T01:00"
     },
     {
       "date": "2025-11-03",
@@ -776,7 +790,9 @@
       "right": 39,
       "wrong": 61,
       "unsure": 0,
-      "sample": 1208
+      "sample": 1208,
+      "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-november-2025/",
+      "published": "2025-11-10T17:24"
     },
     {
       "date": "2025-11-16",
@@ -800,7 +816,9 @@
       "pollster": "Essential",
       "right": 35,
       "wrong": 47,
-      "unsure": 18
+      "unsure": 18,
+      "url": "https://essentialreport.com.au/reports/26-november-2025",
+      "published": "2025-11-26T01:00"
     },
     {
       "date": "2025-12-08",
@@ -873,7 +891,9 @@
       "right": 37,
       "wrong": 63,
       "unsure": 0,
-      "sample": 2166
+      "sample": 2166,
+      "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-february-2026-1/",
+      "published": "2026-02-17T16:51"
     },
     {
       "date": "2026-02-13",
@@ -905,7 +925,9 @@
       "pollster": "Essential",
       "right": 34,
       "wrong": 49,
-      "unsure": 18
+      "unsure": 18,
+      "url": "https://essentialreport.com.au/reports/25-february-2026",
+      "published": "2026-02-25T01:00"
     },
     {
       "date": "2026-03-01",
@@ -945,7 +967,9 @@
       "pollster": "Essential",
       "right": 33,
       "wrong": 53,
-      "unsure": 14
+      "unsure": 14,
+      "url": "https://essentialreport.com.au/reports/25-march-2026",
+      "published": "2026-03-25T01:00"
     },
     {
       "date": "2026-03-29",
@@ -1001,7 +1025,9 @@
       "pollster": "Essential",
       "right": 30,
       "wrong": 54,
-      "unsure": 15
+      "unsure": 15,
+      "url": "https://essentialreport.com.au/reports/29-april-2026",
+      "published": "2026-04-29T01:00"
     },
     {
       "date": "2026-05-03",
@@ -1034,7 +1060,9 @@
       "right": 34,
       "wrong": 66,
       "unsure": 0,
-      "sample": 1210
+      "sample": 1210,
+      "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-may-2026-2/",
+      "published": "2026-05-27T13:03"
     },
     {
       "date": "2026-05-24",
@@ -1106,7 +1134,9 @@
       "pollster": "Essential",
       "right": 32,
       "wrong": 53,
-      "unsure": 15
+      "unsure": 15,
+      "url": "https://essentialreport.com.au/reports/30-june-2026",
+      "published": "2026-07-01T01:00"
     },
     {
       "date": "2026-07-05",
@@ -1131,7 +1161,9 @@
       "right": 32,
       "wrong": 68,
       "unsure": 0,
-      "sample": 1975
+      "sample": 1975,
+      "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-july-2026/",
+      "published": "2026-07-21T16:50"
     },
     {
       "date": "2026-07-19",
@@ -1163,7 +1195,9 @@
       "pollster": "Essential",
       "right": 28,
       "wrong": 53,
-      "unsure": 19
+      "unsure": 19,
+      "url": "https://essentialreport.com.au/reports/28-july-2026",
+      "published": "2026-07-29T01:00"
     },
     {
       "date": "2026-08-02",
@@ -1211,7 +1245,9 @@
       "pollster": "Essential",
       "right": 23,
       "wrong": 59,
-      "unsure": 19
+      "unsure": 19,
+      "url": "https://essentialreport.com.au/reports/01-september-2026",
+      "published": "2026-09-02T01:00"
     },
     {
       "date": "2026-09-06",
@@ -1236,7 +1272,9 @@
       "right": 32,
       "wrong": 68,
       "unsure": 0,
-      "sample": 1659
+      "sample": 1659,
+      "url": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-september-2026-report/",
+      "published": "2026-09-22T15:29"
     },
     {
       "date": "2026-09-20",

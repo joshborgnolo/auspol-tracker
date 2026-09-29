@@ -1,6 +1,6 @@
 ---
 name: auspol-direction-only-rows
-description: "auspol-tracker — the All-polls Direction facet's direction-only rows (SEC Newgate's waves + Essential's three 2025 national-mood-only waves, shipped 2026-09-29): extract-secnewgate files n in the direction row, gen-data emits directionOnlyPolls (sample carried over from the VI join or the house's own n) + directionPolls dots, d1a1d215 merges dirOnly on facet==='direction' only (housesDir, housesV, URL_HOUSES append), ed2260de ROW_KEYS joins them so Snapshot dots can 'open this poll', ?f=d URL state, phone-card field/sample join quirks ('Leaders' tab label), and the dir-facet.mjs acceptance probe."
+description: "auspol-tracker — the All-polls Direction facet's direction-only rows (SEC Newgate's waves + Essential's three 2025 national-mood-only waves, shipped 2026-09-29): extract-secnewgate files sample+url+published in the direction row (Essential's assimilator heals url/published onto all its direction rows), gen-data emits directionOnlyPolls (sample carried over from the VI join or the house's own n, dir.eff footprint) + directionPolls dots, d1a1d215 merges dirOnly on facet==='direction' only (housesDir, housesV, URL_HOUSES append), EVERY facet's tally denominates against totalAll ('163 of 173'), the RdApDetail direction 'How it counts' rail (net mini chart + usual lean + today's net, release link and publish stamp in the head), ed2260de ROW_KEYS joins them so Snapshot dots can 'open this poll', ?f=d URL state, phone-card field/sample join quirks ('Leaders' tab label), and the dir-facet.mjs acceptance probe."
 source: auto-skill
 extracted_at: '2026-09-29T01:00:00.000Z'
 ---
@@ -20,10 +20,20 @@ placeholder dash `—` where not.
 
 - `.build/extract-secnewgate.mjs` — pulls the wave's n from the report's
   methodology block into the `direction[]` row as `sample` (spread-optional:
-  no `sample` key when the report has none). Its heal path now replaces an
-  exact-date row whose figures, span OR `sample` moved — a back-filled n is
-  picked up on the next run. Pinned in `.build/test-secnewgate.mjs` (the
-  direction-rows expectation includes the optional sample).
+  no `sample` key when the report has none), plus `url` = the WP ARTICLE
+  page (the media item's `link`, NOT the PDF `source_url`) and `published` =
+  the media item's site-local upload stamp (`date.slice(0,16)`, UTC+10 —
+  it trails the fieldwork by days). Essential's direction rows carry the
+  same pair from `assimilate-essential-vi.mjs` (`url` = the
+  essentialreport.com.au report page — a mood-only wave has no Guardian
+  write-up — and `published` = the wave date + 1d "T01:00" stamp); its heal
+  block back-fills the pair onto ANY Essential direction row lacking `url`,
+  so all twelve carry the link (healed 2026-09-29), and SEC's heal path
+  recovers rows filed before the fields existed. Pinned in
+  `.build/test-secnewgate.mjs` (the direction-rows expectation includes
+  the optional sample/link/stamp). validate.mjs's direction block gates
+  `published` (ISO "YYYY-MM-DDTHH:MM", not future, not before the
+  fieldwork) exactly like the poll-row check.
 - `gen-data.mjs` §5:
   - `dirSample` — a direction reading's series weight is the joined VI poll
     row's n where the same wave has one, else the direction row's own
@@ -38,7 +48,10 @@ placeholder dash `—` where not.
     downstream per-row reader needs no special case. Client label comes
     from `CLIENT_BY_HOUSE` (latest wave's `client`, "Self-published" in the
     views when absent) — a direction-only house has no poll row to copy
-    it from.
+    it from. `url` and `published` pass straight through from the
+    direction row (the detail head and "Read the release" need them), and
+    like every direction row on ALL facets it carries `sample` plus
+    `dir.eff` (the nowcast footprint `{lo,hi,w,t?}` the detail rail reads).
 - `d1a1d215` (`AllPollsView`):
   - `dirOnlyAll = D.directionOnlyPolls || []`; `housesDir` = houses + the
     direction-only ones. Rows merge as `dirOnly = facet === "direction" ?
@@ -60,6 +73,50 @@ placeholder dash `—` where not.
   AP.openPoll → `#allpolls?…`) has a row to land on. Before this join the
   three Essential dashed dots went nowhere; `pollRowKey` still returns null
   for keys outside the set, so a chart asks first.
+
+## Direction detail rail + head (facet === "direction")
+
+- RdApDetail in rd-allpolls.jsx (~559-682): on the Direction facet the
+  "How it counts" rail answers the same question against the DIRECTION
+  headline figures — the descriptor line reads "{pollster}'s readings
+  since {Month} against the monthly average, net right direction minus
+  wrong track" over RdApDirMini (the house's nets vs the monthly-average
+  net line, mood-pos/mood-neg), and the facts list "Against {Month}"
+  (the reading's net vs dirAvgRow.net, "level with"/"N more
+  right-direction/wrong-track than the month's average net of ±X",
+  ±dirMoe margin from the row's own pq/sample), "{pollster}'s usual lean"
+  (directionHouseEffects.net — "N more right-direction/wrong-track, taken
+  out before the readings are averaged"), and "In today's {dirNow.net}
+  net" (dir.eff footprint: one of the rdNumWord(dirNow.n) readings it is
+  built from and how much it moves the figure, or "not one of them" once
+  the wave ages out of the three-week window). The 2PP rail facts are
+  wrapped `{!isDir && …}` so no 2PP copy leaks onto the facet; a
+  `isDir && !d` fallback sentence stands in when a poll asked no
+  direction question.
+- The detail head (rdPollHead :115-134) ends "published by
+  {the Client|pollster} on {rdApOut(published)}" when the row carries
+  `published` — rdApOut renders "Tue 22 Sep, 3 pm". The client keeps its
+  own capitalisation: "The Guardian", never "the Guardian" (rdApThe only
+  ADDS "the" when the label lacks one).
+- The pollster-cell ↗ (p.url) and the detail's "Read the release"
+  (p.releaseUrl || p.url) need no direction special case — the fields
+  ride the emitted row.
+
+## Tally denominators — the archive extent, not the facet's rows
+
+`totalAll = D.individualPolls.length + dirOnlyAll.length` (d1a1d215) is
+passed into RdAllPolls as `ofTotal`; rd-allpolls.jsx renders
+`ofTxt = ofTotal != null && ofTotal !== total ? " of "+ofTotal : ""`.
+Sorting/paging/shuffling cuts the VISIBLE count but the denominator is
+always the ARCHIVE EXTENT, not the facet's own total — so with 10
+direction-only rows filed, 2PP and Primary read "163 of 173 polls",
+Leaders "97 of 173", Direction "75 of 173". The Direction facet's scope
+filter legitimately drops the 98 individual polls with no direction
+reading: it must NOT read plain "173". The non-redesign fallback in
+d1a1d215 uses the same totalAll at its four count sites (ap-head-side
+ap-count, ap-jumps-count, ap-bar-end ap-count, the sr-only table caption
+— the bar's "{h} of {t} houses" line is forever fragment-shaped and its
+`{t}` is a house count, NOT this poll total).
 
 ## URL state
 
@@ -96,3 +153,17 @@ POINTER picking, so synthesise `new PointerEvent("pointermove",
 (`MouseEvent("mousemove")` never raises the tip); scope that sweep to
 `section#direction .rd-dir-chart` — the text match /national direction/i
 catches an outer section with 150+ circles from every chart on the page.
+
+The probe also walks each direction-only row's OWN affordances
+(`.matilda/probe/dir-facet.mjs`'s page4 section): tallies parse
+`.rd-ap-count` as /^(\d+)(?: of (\d+))? polls$/ on every facet (163 of
+173 / 163 of 173 / 97 of 173 / 75 of 173 — numerator AND denominator
+both pinned); `openRow(regex)` clicks the row and reads the mounted
+`.rd-ap-open .rd-apd` — `rowHref` off `.rd-ap-row.open [role='rowheader']
+b a` / `.rd-ap-card.open .rd-ap-firm a`, the head sentence, the
+`.rd-apd-links` anchors, the rail text + whether it carries an svg. Two
+traps hit live: (1) the 2025-05-11 Essential mood-only wave must be
+opened via /Essential[\s\S]*7–11 May/ — plain /Essential/ matches a VI
+row first and its detail has no direction rail; (2) the head credits
+"published by The Guardian" with a capital T (rdApThe ADDS "the", never
+lowercases the client), so a /the Guardian/ expectation fails.

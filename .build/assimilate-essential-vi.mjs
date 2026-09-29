@@ -320,7 +320,13 @@ for (const waveDate of [...vi.keys()].sort()) {
   const m = mDate ? mood.get(mDate) : null;
   const right = m?.["Right direction"], wrong = m?.["Wrong track"], unsure = m?.["Unsure"];
   if (right == null || wrong == null || unsure == null) continue;
-  const row = { date, dateStart: fieldworkStart(date), pollster: "Essential", right, wrong, unsure };
+  /* the report page is the release a direction row links out to (there's no
+     Guardian write-up for a mood-only wave), and the publish stamp is the
+     same UTC-record-dating rule the poll rows carry; both wait for the
+     page to be indexed, which the heal below completes on a later run */
+  const rel = releaseFor(waveDate);
+  const row = { date, dateStart: fieldworkStart(date), pollster: "Essential", right, wrong, unsure,
+    ...(rel ? { url: rel, published: publishedFor(waveDate) } : {}) };
   if (existingDir.some((r) => daysApart(r.date, date) <= 2)) { skippedDirDateDup.push(waveDate); continue; }
   const figDup = existingDir.find((r) => daysApart(r.date, date) <= 10
     && r.right === row.right && r.wrong === row.wrong && r.unsure === row.unsure);
@@ -329,6 +335,18 @@ for (const waveDate of [...vi.keys()].sort()) {
   D.direction.splice(at === -1 ? D.direction.length : at, 0, row);
   existingDir.push(row);
   addedDir.push({ csvWave: waveDate, row });
+}
+/* heal: file the report-page link and publish stamp onto direction rows
+   written before either existed, as the report index catches up (the three
+   2025 mood-only waves among them) */
+const healedDir = [];
+for (const r of D.direction.filter((r) => r.pollster === "Essential" && r.url == null)) {
+  const csvWave = iso(Date.parse(r.date) + DAY);
+  const rel = releaseFor(csvWave);
+  if (!rel) continue;
+  r.url = rel;
+  r.published = publishedFor(csvWave);
+  healedDir.push(r.date);
 }
 
 console.log(`mode: ${APPLY ? "APPLY" : "dry-run"}`);
@@ -340,13 +358,14 @@ console.log(`added rows: ${added.length}`);
 added.forEach((x) => console.log(`  + ${x.row.date} (csv ${x.csvWave}): alp ${x.row.alp} lnp ${x.row.lnp} grn ${x.row.grn} onp ${x.row.onp} ind ${x.row.ind} | tpp ${x.row.tpp_alp}/${x.row.tpp_lnp} | rel ${x.row.releaseUrl ?? "–"}`));
 addedAppr.forEach((x) => console.log(`  + approval ${x.row.date} (csv ${x.csvWave}): alb ${x.row.alb} (${x.row.detail.alb.app}/${x.row.detail.alb.dis}) · ${x.row.oppName} ${x.row.opp} (${x.row.detail.opp.app}/${x.row.detail.opp.dis})`));
 addedDir.forEach((x) => console.log(`  + direction ${x.row.date} (csv ${x.csvWave}): right ${x.row.right} wrong ${x.row.wrong} unsure ${x.row.unsure}`));
+healedDir.forEach((d) => console.log(`  ~ direction ${d}: url + published`));
 skippedFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} duplicates curated row ${x.matchesRow} (same figures)`));
 skippedApprFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} approval duplicates ${x.matchesRow} (same figures)`));
 skippedDirFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} direction duplicates ${x.matchesRow} (same figures)`));
 console.log(`skipped: ${skippedDateDup.length} date-dup, ${skippedFigureDup.length} figure-dup, ${skippedPreHorizon.length} at/before horizon ${horizon}`);
 console.log(`skipped approval: ${skippedApprDateDup.length} date-dup, ${skippedApprFigureDup.length} figure-dup · direction: ${skippedDirDateDup.length} date-dup, ${skippedDirFigureDup.length} figure-dup`);
 
-const touched = added.length + retro.length + addedAppr.length + addedDir.length;
+const touched = added.length + retro.length + addedAppr.length + addedDir.length + healedDir.length;
 if (APPLY && touched) {
   const out = JSON.stringify(D, null, 2) + "\n";
   writeAtomic("data/polls.json", out);

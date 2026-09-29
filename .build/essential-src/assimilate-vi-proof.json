@@ -1,14 +1,7 @@
 {
-  "generatedAt": "2026-09-01T23:41:06.255Z",
+  "generatedAt": "2026-09-29T03:16:00.812Z",
   "horizon": "2025-09-29",
-  "retro": [
-    {
-      "date": "2026-08-31",
-      "fixes": [
-        "releaseUrl https://essentialreport.com.au/reports/01-september-2026"
-      ]
-    }
-  ],
+  "retro": [],
   "added": [],
   "addedAppr": [],
   "addedDir": [],

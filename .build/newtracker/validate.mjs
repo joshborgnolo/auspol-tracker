@@ -347,10 +347,21 @@ export function validate(D) {
                     detail: "assimilated row from a house with no adjudicated implicit-n convention" });
   });
 
-  // 6. direction rows are a proportion split
+  // 6. direction rows are a proportion split; a `published` stamp on one
+  // follows the same rules as the poll rows' (format, order, future)
   (D.direction || []).forEach((d, i) => {
     if (d.date != null && !ISO_DAY.test(d.date))
       errors.push({ type: "date-format", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `date "${d.date}" is not YYYY-MM-DD` });
+    if (d.published != null) {
+      if (typeof d.published !== "string" || !ISO_PUBLISHED.test(d.published))
+        errors.push({ type: "published-format", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `published = ${JSON.stringify(d.published)}` });
+      else {
+        if (d.published.slice(0, 10) > TOMORROW)
+          errors.push({ type: "future-date", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `published ${d.published} is after today` });
+        if (ISO_DAY.test(d.date) && d.published.slice(0, 10) < d.date)
+          errors.push({ type: "published-order", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `published ${d.published} precedes fieldwork-end ${d.date}` });
+      }
+    }
     const sum = n0(d.right) + n0(d.wrong) + n0(d.unsure);
     if (Math.abs(sum - 100) > 1)
       errors.push({ type: "direction-sum", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `Σ = ${sum.toFixed(1)}` });

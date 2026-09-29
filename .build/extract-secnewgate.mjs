@@ -32,7 +32,8 @@
    Rows are written to D.direction as
    { date = fieldwork END, dateStart, pollster: "SEC Newgate",
      right, wrong, unsure = 100 − right − wrong,
-     sample = the wave's n from the report's methodology block }
+     sample = the wave's n from the report's methodology block,
+     url = the report's article page, published = its upload time }
    and the array re-sorted by date, like every house's writer. A rerun
    heals a row of the same wave within HEAL_DAYS of a prior entry, and
    rewrites any row of an exact date whose figures, span or n moved. The
@@ -42,7 +43,8 @@
 
    Cache: .build/secnewgate-src/<slug>.txt (pdftotext -layout, the whole
    report), <slug>.bbox.html (pdftotext -bbox, the direction page only),
-   <slug>.json ({ pdf, wave, date, dateStart, sample }). Written once when
+   <slug>.json ({ pdf, wave, date, dateStart, sample, url, published }).
+   Written once when
    first fetched and never touched again, so a run that finds nothing new
    changes nothing. A page or PDF that won't load is a warning, not a
    failure: the cache stays; a report that IS cached but won't read is
@@ -63,6 +65,7 @@ const FORCE = process.argv.includes("--force");
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = process.env.SECNEWGATE_SRC_DIR || path.join(ROOT, ".build", "secnewgate-src");
 const POLLS = process.env.SECNEWGATE_POLLS || path.join(ROOT, "data", "polls.json");
+const STATES_OUT = process.env.SECNEWGATE_STATES || path.join(ROOT, "data", "sec-direction-states.json");
 const API = "https://www.secnewgate.com.au/wp-json/wp/v2/media?search=Mood&per_page=100";
 const SEC_FIRST = "2025-07";   // waves on file run Jul 2025 on; older reports stay untouched
 const QUIET_DAYS = 75;         // bi-monthly cadence plus slack before the house counts as quiet
@@ -110,10 +113,12 @@ export function titleMonthOf(title) {
   return `${y}-${String(mo + 1).padStart(2, "0")}`;
 }
 
-/* Media API items → the report candidates, one ordered list of URLs per
-   wave month: "Mood of the Nation … report … .pdf", the Queensland edition
+/* Media API items → the report candidates, one ordered list per wave
+   month: "Mood of the Nation … report … .pdf", the Queensland edition
    and the one-off specials set aside, a non-embargoed upload preferred over
-   its "-Embargoed" twin, and whichever variant is then first. */
+   its "-Embargoed" twin, and whichever variant is then first. Each
+   candidate carries the item's article page and upload time (site-local)
+   for the wave's release link and publish stamp. */
 export function pickReports(items) {
   const byMonth = new Map();
   for (const it of items) {
@@ -125,8 +130,10 @@ export function pickReports(items) {
     const ym = titleMonthOf(title);
     if (!ym || ym < SEC_FIRST) continue;
     const embargo = /embargo/i.test(title) || /embargo/i.test(url);
+    const page = it.link || null;
+    const published = it.date ? String(it.date).slice(0, 16) : null;
     const g = byMonth.get(ym) || [];
-    g.push({ url, embargo });
+    g.push({ url, embargo, page, published });
     byMonth.set(ym, g);
   }
   for (const g of byMonth.values()) {
@@ -135,7 +142,7 @@ export function pickReports(items) {
     if (clean.length) g.length = 0, g.push(...clean);
   }
   return [...byMonth.entries()].sort(([a], [b]) => (a < b ? -1 : 1))
-    .map(([ym, urls]) => ({ ym, urls: urls.map((u) => u.url) }));
+    .map(([ym, urls]) => ({ ym, urls: urls.map(({ url, page, published }) => ({ url, page, published })) }));
 }
 
 /* The methodology page facts of a tracking wave: its ordinal, fieldwork
@@ -213,6 +220,84 @@ export function directionChartOf(bboxHtml) {
   return { columns, problems };
 }
 
+/* The "Perceived direction of individual states (%)" table lower on the
+   same page – banked into data/sec-direction-states.json (no panel reads
+   it yet). Each state row prints the current wave's right/wrong pair, then
+   one % right-direction cell per column (a MAR ’22 anchor plus the wave's
+   own and its two predecessors’ tracking waves – the April 2026 special
+   asked no direction question, so May 2026's window reaches back to Nov
+   2025). The pair sits left of every column; cells centre under their
+   MON ’YY header pair. Only the pair prints wrong-direction, so past-wave
+   cells are right-only; every wave's own pair is captured from its own
+   report. Stray state tokens in the dek copy above the table are kept
+   out by requiring labels to sit BELOW the column header row. */
+const DIR_STATES = ["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"];
+const MON3 = { JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5, JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11 };
+
+export function stateTableOf(bboxHtml) {
+  const words = [...bboxHtml.matchAll(/<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)<\/word>/g)]
+    .map((m) => ({ x: +m[1], xm: +m[3], y: +m[2], t: m[5].replace(/&apos;|&#039;/g, "’") }));
+  const problems = [];
+  const onLine = (w, y, tol) => Math.abs(w.y - y) <= tol;
+  const head = words.find((w) => w.t === "Perceived"
+    && words.some((o) => o.t === "individual" && onLine(o, w.y, 6))
+    && words.some((o) => o.t === "states" && onLine(o, w.y, 6)));
+  if (!head) return { columns: [], states: {}, problems: ["no 'Perceived direction of individual states' table on the direction page"] };
+  // the column header row: MON tokens just below the table header, each
+  // trailed by its ’YY token; the (month,year) token pair's span centres
+  // the column
+  const colHdrY = (() => {
+    const tally = {};
+    for (const w of words) {
+      if (!(w.t in MON3) || w.y <= head.y + 4 || w.y > head.y + 40) continue;
+      if (!words.some((o) => /^[‘’']\d{2}$/.test(o.t) && onLine(o, w.y, 4) && o.x >= w.xm && o.x - w.xm < 12)) continue;
+      const k = Math.round(w.y / 8) * 8;
+      tally[k] = (tally[k] || 0) + 1;
+    }
+    const best = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
+    return best && best[1] >= 2 ? +best[0] : null;
+  })();
+  if (colHdrY == null) return { columns: [], states: {}, problems: ["no MON ’YY column header row on the state direction table"] };
+  const columns = [];
+  for (const w of words.filter((o) => o.t in MON3 && onLine(o, colHdrY, 8)).sort((a, b) => a.x - b.x)) {
+    const yr = words.find((o) => /^[‘’'](\d{2})$/.test(o.t) && onLine(o, w.y, 4) && o.x >= w.xm && o.x - w.xm < 12);
+    if (!yr) { problems.push(`${w.t} column header: no ’YY token beside it`); continue; }
+    const ym = `${2000 + +yr.t.slice(-2)}-${String(MON3[w.t] + 1).padStart(2, "0")}`;
+    columns.push({ ym, c: (w.x + yr.xm) / 2 });
+  }
+  if (columns.length < 2) problems.push(`only ${columns.length} state-table column(s) read`);
+  const firstCell = columns.length ? columns[0].c - 25 : null;
+  // state rows: labels below the column headers; numerics left of the
+  // first column centre are the pair, the rest sit on column centres
+  const states = {};
+  for (const lbl of words.filter((w) => DIR_STATES.includes(w.t) && w.y > colHdrY + 10 && w.y < colHdrY + 220).sort((a, b) => a.y - b.y)) {
+    if (states[lbl.t]) continue;    // one row per state; a doubled label is dek copy
+    const nums = words.filter((w) => /^\d{1,3}$/.test(w.t) && onLine(w, lbl.y, 8) && w.x >= 60)
+      .map((w) => ({ x: w.x, v: +w.t })).sort((a, b) => a.x - b.x);
+    if (!nums.length) continue;     // a stray label with no readings beside it
+    const pair = nums.filter((n) => n.x < firstCell);
+    const cells = nums.filter((n) => n.x >= firstCell);
+    if (pair.length !== 2) { problems.push(`${lbl.t} row: ${pair.length} pair token(s), expected 2 (right, wrong)`); continue; }
+    if (cells.length !== columns.length) { problems.push(`${lbl.t} row: ${cells.length} cell value(s) for ${columns.length} columns`); continue; }
+    const byCol = {};
+    let ok = true;
+    for (const cell of cells) {
+      const col = columns.reduce((best, c) => Math.abs(c.c - (cell.x + 6)) < Math.abs(best.c - (cell.x + 6)) ? c : best, columns[0]);
+      if (Math.abs(col.c - (cell.x + 6)) > 20 || byCol[col.ym] != null) { problems.push(`${lbl.t} row: a cell doesn't land on its own column`); ok = false; break; }
+      byCol[col.ym] = cell.v;
+    }
+    if (!ok) continue;
+    const right = pair[0].v, wrong = pair[1].v;
+    const lastYm = columns[columns.length - 1].ym;
+    if (byCol[lastYm] !== right) problems.push(`${lbl.t} row: pair right ${right} ≠ the wave's own column ${byCol[lastYm]}`);
+    if (Math.abs(right + wrong - 100) > 1) problems.push(`${lbl.t} row: ${right} + ${wrong} ≠ 100`);
+    for (const v of [right, wrong, ...Object.values(byCol)]) if (v < 10 || v > 85) problems.push(`${lbl.t} row: ${v} outside 10–85`);
+    states[lbl.t] = { right, wrong, cells: byCol };
+  }
+  if (Object.keys(states).length < 5) problems.push(`only ${Object.keys(states).length} state row(s) read – has the table changed?`);
+  return { columns: columns.map((c) => c.ym), states, problems };
+}
+
 const slugOf = (url) => decodeURIComponent(url.split("/").pop())
   .replace(/\.pdf$/i, "").replace(/[^A-Za-z0-9._-]+/g, "_");
 
@@ -236,10 +321,11 @@ async function main() {
   const groups = pickReports(items);
   if (groups.length < 5) status.warnings.push(`only ${groups.length} report wave(s) found from ${SEC_FIRST} on – has the media library changed?`);
 
-  const waves = new Map();   // wave ordinal -> { slug, meta, cols: […] }
+  const waves = new Map();   // wave ordinal -> { slug, meta, cols: […], page, published }
   for (const g of groups) {
     let done = false;
-    for (const url of done ? [] : g.urls) {
+    for (const cand of done ? [] : g.urls) {
+      const url = cand.url;
       const slug = slugOf(url);
       const txtPath = path.join(SRC, slug + ".txt");
       const bboxPath = path.join(SRC, slug + ".bbox.html");
@@ -278,8 +364,19 @@ async function main() {
         done = true; break;
       }
       fs.writeFileSync(path.join(SRC, slug + ".json"),
-        JSON.stringify({ pdf: url, wave: meta.wave, date: meta.date, dateStart: meta.dateStart, sample: meta.sample }, null, 1) + "\n");
-      waves.set(meta.wave, { slug, meta, cols: chart.columns });
+        JSON.stringify({ pdf: url, wave: meta.wave, date: meta.date, dateStart: meta.dateStart, sample: meta.sample,
+          ...(cand.page ? { url: cand.page } : {}), ...(cand.published ? { published: cand.published } : {}) }, null, 1) + "\n");
+      // the per-state direction table banks separately from the national
+      // rows: a state misread alarms WITHOUT holding the national row back
+      let table = stateTableOf(bbox);
+      if (table.problems.length) {
+        status.pending.push(`${g.ym}: the state direction table didn't read (${table.problems[0]})`);
+        table = null;
+      } else if (table.columns[table.columns.length - 1] !== meta.date.slice(0, 7)) {
+        status.pending.push(`${g.ym}: the state table's own column is ${table.columns[table.columns.length - 1]}, not the wave's ${meta.date.slice(0, 7)}`);
+        table = null;
+      }
+      waves.set(meta.wave, { slug, meta, cols: chart.columns, page: cand.page, published: cand.published, table });
       done = true;
     }
     if (!done && ![...waves.values()].some((w) => w.meta.date.startsWith(g.ym))) {
@@ -304,6 +401,63 @@ async function main() {
     }
   }
 
+  // the per-state direction tables bank into data/sec-direction-states.json.
+  // A wave's own report contributes its right/wrong pair; its trailing
+  // columns reprint the two previous tracking waves (right-direction only)
+  // as cross-checks. Reports cached but no longer listed by the media API
+  // still count, so the banked series never shrinks.
+  {
+    const byWave = new Map([...waves.entries()].filter(([, x]) => x.table)
+      .map(([w, x]) => [w, { table: x.table, ym: x.meta.date.slice(0, 7) }]));
+    for (const f of fs.readdirSync(SRC).filter((f) => f.endsWith(".json")).sort()) {
+      let side;
+      try { side = JSON.parse(fs.readFileSync(path.join(SRC, f), "utf8")); } catch { continue; }
+      if (!side || side.wave == null || side.date == null || waves.has(side.wave) || byWave.has(side.wave)) continue;
+      const slug = f.replace(/\.json$/, "");
+      const bboxPath = path.join(SRC, slug + ".bbox.html");
+      if (!fs.existsSync(bboxPath)) continue;
+      const table = stateTableOf(fs.readFileSync(bboxPath, "utf8"));
+      if (table.problems.length) { status.pending.push(`${slug}: the cached state direction table didn't read (${table.problems[0]})`); continue; }
+      if (table.columns[table.columns.length - 1] !== side.date.slice(0, 7)) {
+        status.pending.push(`${slug}: the cached state table's own column is ${table.columns[table.columns.length - 1]}, not the wave's ${side.date.slice(0, 7)}`);
+        continue;
+      }
+      byWave.set(side.wave, { table, ym: side.date.slice(0, 7) });
+    }
+    const rights = {};   // state -> ym -> [{ wave, right }] sightings, wave order
+    const pairs = {};    // state -> ym -> { right, wrong } from the wave's own report
+    for (const [wave, x] of [...byWave.entries()].sort((a, b) => a[0] - b[0])) {
+      for (const [st, row] of Object.entries(x.table.states)) {
+        for (const ym of x.table.columns) {
+          if (row.cells[ym] == null) continue;
+          ((rights[st] ||= {})[ym] ||= []).push({ wave, right: row.cells[ym] });
+        }
+        (pairs[st] ||= {})[x.ym] = { right: row.right, wrong: row.wrong };
+      }
+    }
+    const series = {};
+    for (const st of DIR_STATES.filter((s) => rights[s]).concat(Object.keys(rights).filter((s) => !DIR_STATES.includes(s)).sort())) {
+      series[st] = Object.keys(rights[st]).sort().map((ym) => {
+        const vals = rights[st][ym].map((s) => s.right);
+        if (new Set(vals).size > 1)
+          status.warnings.push(`state table ${st} ${ym}: reprinted as ${vals.join(", then ")} – SEC Newgate revised a wave`);
+        const pair = (pairs[st] || {})[ym];
+        return pair ? { month: ym, right: pair.right, wrong: pair.wrong }
+                    : { month: ym, right: vals[vals.length - 1] };
+      });
+    }
+    const out = {
+      _about: "Per-state right-direction/wrong-track readings from SEC Newgate's Mood of the Nation tracking study – the 'Perceived direction of individual states' tables in each wave's report (the five mainland states only; per-state subsamples of the national wave, so several points of noise either way). Banked by .build/extract-secnewgate.mjs as waves land; nothing on the site reads this yet. Each wave's entry carries right/wrong from its own report's row pair; entries before the cache horizon (Feb/Apr 2025) and the 2022-03 anchor column come from later reports' trailing reprint columns and carry right-direction only. month = fieldwork-end month, keying the wave's direction[] row in data/polls.json.",
+      states: Object.keys(series),
+      series,
+    };
+    const outJson = JSON.stringify(out, null, 1) + "\n";
+    if (!fs.existsSync(STATES_OUT) || fs.readFileSync(STATES_OUT, "utf8") !== outJson) {
+      writeAtomic(STATES_OUT, outJson);
+      console.log("wrote " + path.relative(ROOT, STATES_OUT));
+    }
+  }
+
   const orig = fs.readFileSync(POLLS, "utf8");
   const D = JSON.parse(orig);
   const dir = D.direction || [];
@@ -313,12 +467,15 @@ async function main() {
     const last = cols[cols.length - 1];
     const row = { date: meta.date, dateStart: meta.dateStart, pollster: POLLSTER,
                   right: last.right, wrong: last.wrong, unsure: 100 - last.right - last.wrong,
-                  ...(meta.sample != null ? { sample: meta.sample } : {}) };
+                  ...(meta.sample != null ? { sample: meta.sample } : {}),
+                  ...(x.page ? { url: x.page } : {}),
+                  ...(x.published ? { published: x.published } : {}) };
     const exact = dir.findIndex((d) => d.pollster === POLLSTER && d.date === row.date);
     if (exact >= 0) {
       const cur = dir[exact];
       if (cur.right !== row.right || cur.wrong !== row.wrong || cur.unsure !== row.unsure
-          || cur.dateStart !== row.dateStart || cur.sample !== row.sample) {
+          || cur.dateStart !== row.dateStart || cur.sample !== row.sample
+          || cur.url !== row.url || cur.published !== row.published) {
         dir[exact] = row;
         status.healed.push(row.date);
       }

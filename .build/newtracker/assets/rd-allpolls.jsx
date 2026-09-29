@@ -376,7 +376,116 @@ function RdApMini({ p, onM, pub, avgFor }) {
   );
 }
 
-function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, onBack, backLabel }) {
+/* A direction wave's version of RdApMini: the firm's readings over seven
+   months as a NET (right direction minus wrong track) against the monthly
+   net, a dashed zero splitting right-direction from wrong-track country.
+   No basis to morph between, so no useValueMorph - one static scene. */
+function RdApDirMini({ p }) {
+  const D = window.AUSPOL;
+  const box = React.useRef(null);
+  const W = useRdWidth(box, 470);
+  const H = 176;
+  const iM = D.MONTHS.indexOf(p.ym);
+  const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
+  const t0 = rdApDays(ms[0] + "-01");
+  const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
+  const t1 = Date.UTC(ly, lm, 1) - 864e5;
+  const netOf = (q) => q.right - q.wrong;
+  const mine = (D.directionPolls || []).filter((q) => q.pollster === p.pollster
+    && q.right != null && q.wrong != null && rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1);
+  const avg = (D.direction || []).filter((a) => a.net != null && rdApDays(a.ym + "-15") >= t0 && rdApDays(a.ym + "-15") <= t1)
+    .map((a) => ({ ym: a.ym, x: rdApDays(a.ym + "-15"), v: a.net }));
+  const own = p.dir ? p.dir.net : null;
+  if (!mine.length || own == null) return <div ref={box}></div>;
+  const vals = mine.map(netOf).concat(avg.map((a) => a.v), [0]);
+  let lo = Math.floor(Math.min(...vals) / 4) * 4, hi = Math.ceil(Math.max(...vals) / 4) * 4;
+  if (hi - lo < 8) { const c = (lo + hi) / 2; lo = Math.floor((c - 4) / 4) * 4; hi = lo + 8; }
+  const x0 = 30, x1 = W - 16, top = 10, bot = H - 26;
+  const X = (tt) => x0 + ((tt - t0) / (t1 - t0)) * (x1 - x0);
+  const Y = (v) => bot - ((v - lo) / (hi - lo)) * (bot - top);
+  const ticks = [];
+  for (let v = lo; v <= hi + 1e-9; v += 4) ticks.push(v);
+  const cx = X(rdApDays(p.released)), cy = Y(own);
+  const labLeft = cx > W * 0.45;
+  const [tip, setTip] = useState(null);
+  const tipBox = React.useRef(null);
+  const ptr = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = tipBox.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip]);
+  const dots = mine.filter((q) => q.released !== p.released).map((q) => {
+    const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: q.pollster, released: q.released }) : null;
+    const dup = mine.some((z) => z !== q && z.released === q.released);
+    return { q, key: (!raw || dup) ? null : raw, id: q.pollster + "|" + q.released, cx: X(rdApDays(q.released)), a: netOf(q) };
+  });
+  const show = (id, src) => setTip({ id, src });
+  const hide = (id, src) => setTip((tp) => (tp && tp.id === id && (!src || tp.src === src) ? null : tp));
+  const dotTip = tip && dots.find((d) => d.id === tip.id);
+  return (
+    <div ref={box} className="rd-apd-mini">
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
+           aria-label={`${p.pollster}’s national-direction readings since ${rdMonthYear(ms[0])} as a net, right direction minus wrong track, against the monthly average; this reading ${rdApSigned(own)}.`}>
+        {ticks.map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === 0 ? "rd-apd-even" : "rd-apd-gl"}></path>)}
+        {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{v}</text>)}
+        {avg.length > 1 && <path d={monotoneXY(avg.map((a) => [X(a.x), Y(a.v)]))} className="rd-apd-avgline"></path>}
+        {avg.length > 0 && <text x={X(avg[0].x)} y={Y(avg[0].v) - 9} className="rd-apd-lab">Monthly average</text>}
+        {dots.map((d) => {
+          const open = () => { if (d.key && window.AP.openPoll) { setTip(null); window.AP.openPoll(d.key, "direction", "the reading you were looking at"); } };
+          return (
+            <g key={d.id}>
+              {tip && tip.id === d.id && <circle cx={d.cx} cy={Y(d.a)} r="7.5" className="rd-apd-dothi"></circle>}
+              <circle cx={d.cx} cy={Y(d.a)} r="4" className="rd-apd-dot"></circle>
+              <circle cx={d.cx} cy={Y(d.a)} r="9" className={"rd-apd-hit" + (d.key ? " link" : "")}
+                      tabIndex="0" role={d.key ? "button" : "img"}
+                      aria-label={`Net ${rdApSigned(d.a)}, ${p.pollster}’s reading of ${d.q.dateLabel || d.q.released}` + (d.key ? "; press Enter to open it" : "")}
+                      onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+                      onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(d.id, "mouse"); }}
+                      onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(d.id, "mouse"); }}
+                      onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show(d.id, "focus"); }}
+                      onBlur={() => hide(d.id, "focus")}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        const pt = ev.detail === 0 ? "key" : ptr.current;
+                        ptr.current = null;
+                        if (pt === "mouse" || pt === "key") { open(); return; }
+                        if (tip && tip.id === d.id) setTip(null); else setTip({ id: d.id, src: "touch" });
+                      }}
+                      onKeyDown={(ev) => {
+                        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+                        ev.preventDefault();
+                        open();
+                      }}></circle>
+            </g>
+          );
+        })}
+        <circle cx={cx} cy={cy} r="8" className="rd-apd-ring"></circle>
+        <circle cx={cx} cy={cy} r="4.5" className="rd-apd-this"></circle>
+        <text x={labLeft ? cx - 12 : cx + 12} y={cy - 12} className="rd-apd-thislab" textAnchor={labLeft ? "end" : "start"}>{"This reading " + rdApSigned(own)}</text>
+        <path d={`M${x0} ${bot}H${x1}`} className="rd-apd-base"></path>
+        {ms.map((ym, i) => (i % 2 === (ms.length - 1) % 2 ? (
+          <text key={ym} x={X(rdApDays(ym + "-01"))} y={bot + 18} className="rd-apd-ax" textAnchor="middle">{D.monthName(Number(ym.slice(5)))}</text>
+        ) : null))}
+      </svg>
+      {dotTip && (
+        <div ref={tipBox} className="tip rd-apd-tip" style={{ left: dotTip.cx + "px" }} aria-hidden="true">
+          <div className="tip-title">Fieldwork {dotTip.q.dateLabel || dotTip.q.released}</div>
+          <div className="tip-sub">Right direction {rdApNum(dotTip.q.right)}, wrong track {rdApNum(dotTip.q.wrong)}: net {rdApSigned(dotTip.a)}</div>
+          {dotTip.q.sample != null && <div className="tip-sub">n = {dotTip.q.sample.toLocaleString()}</div>}
+          {tip.src !== "touch" && (dotTip.key
+            ? <div className="tip-hint">{tip.src === "focus" ? "Press Enter to open this reading" : "Click to open this reading"}</div>
+            : null)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, backLabel }) {
   const D = window.AUSPOL;
   const q = p.p || {};
   const c = (p.chg && p.chg.d) || {};
@@ -442,6 +551,24 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, onBack, backLabel
   const yr = p.year != null ? p.year : Number(String(p.released).slice(0, 4));
   const report = "/feedback/?msg=" + encodeURIComponent(`${p.pollster}, ${p.field} ${yr} – `);
   const from = D.MONTHS[Math.max(0, D.MONTHS.indexOf(p.ym) - 6)];
+  /* on the direction facet the rail counts toward the DIRECTION headline
+     instead: same three facts, read off the national-direction series -
+     the month's net is the average, the house lean is measured on the net,
+     and the footprint is the wave's share of today's net nowcast (gen-data's
+     dir.eff). The margin reuses the estimator's pq for a net. */
+  const isDir = facet === "direction";
+  const dirNow = isDir ? D.directionNow || null : null;
+  const dEff = isDir && d ? d.eff || null : null;
+  const dirAvgRow = isDir && d ? (D.direction || []).find((x) => x.ym === p.ym && x.net != null) : null;
+  const dirLean = d && dirAvgRow ? d.net - dirAvgRow.net : null;
+  const dirMoe = (() => {
+    if (!d || !p.sample) return null;
+    const pq = Math.max(0, 100 * (d.right + d.wrong) - d.net * d.net);
+    return 1.96 * Math.sqrt(pq / (p.sample / rdApDeff()));
+  })();
+  const insideD = dirLean == null || dirMoe == null ? null
+    : Math.abs(dirLean) < dirMoe / 2 ? "well inside" : Math.abs(dirLean) <= dirMoe ? "inside" : "outside";
+  const dirHl = isDir && d ? (((D.directionHouseEffects || {}).net || {})[p.pollster] || null) : null;
   /* the release, and beside it the poll's APC methodology statement where the
      pollster published one. Where the release is itself the statement
      (DemosAU's reports), both links open the same file and the statement
@@ -512,13 +639,44 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, onBack, backLabel
       </div>
       <div className="rd-apd-r">
         <span className="rd-apd-h">How it counts</span>
-        {fig.a != null && (
+        {!isDir && fig.a != null && (
           <>
             <span className="rd-apd-ct">{p.pollster}’s polls since {D.monthNameFull(Number(from.slice(5)))} against the average, Labor v {onM ? "One Nation" : "Coalition"}{pub ? " as published" : ""}</span>
             <RdApMini p={p} onM={onM} pub={pub} avgFor={avgFor} />
           </>
         )}
+        {isDir && d && (
+          <>
+            <span className="rd-apd-ct">{p.pollster}’s readings since {D.monthNameFull(Number(from.slice(5)))} against the monthly average, net right direction minus wrong track</span>
+            <RdApDirMini p={p} />
+          </>
+        )}
         <div className="rd-apd-facts">
+          {isDir && d && <>
+            {dirLean != null && dirAvgRow != null && <>
+              <span className="rd-apd-k">Against {D.monthNameFull(Number(p.ym.slice(5)))}</span>
+              <span>{Math.abs(dirLean) < 0.05
+                ? <>Level with the month’s average net of {rdApSigned(dirAvgRow.net)}{dirMoe != null ? ", inside its ±" + dirMoe.toFixed(1) + " margin" : ""}</>
+                : <><b style={{ color: dirLean > 0 ? "var(--mood-pos)" : "var(--mood-neg)" }}>{Math.abs(dirLean).toFixed(1)}</b> more {dirLean > 0 ? "right-direction" : "wrong-track"} than the month’s average net of {rdApSigned(dirAvgRow.net)}{dirMoe != null ? ", " + insideD + " its ±" + dirMoe.toFixed(1) + " margin" : ""}</>}</span>
+            </>}
+            <span className="rd-apd-k">{p.pollster}’s usual lean</span>
+            <span>{dirHl == null ? "Not measured yet: too few readings on the series"
+              : Math.abs(dirHl.v) < 0.05 ? "None to speak of: its readings sit level with the other pollsters’"
+              : <><b>{Math.abs(dirHl.v).toFixed(1)}</b> more {dirHl.v > 0 ? "right-direction" : "wrong-track"}, taken out before the readings are averaged</>}</span>
+            {dirNow && <>
+              <span className="rd-apd-k">In today’s {rdApSigned(dirNow.net)} net</span>
+              <span>{dEff && dEff.w
+                ? <>One of the {rdNumWord(dirNow.n)} readings it’s built from; this one moves it <b>{move(dEff)}</b></>
+                : dEff && dEff.t
+                  ? <>Not one of them: today’s figure uses the last three weeks of readings. When it came out, it moved the figure <b>{move(dEff.t)}</b></>
+                  : <>Not one of them: today’s figure uses the last three weeks of readings</>}</span>
+            </>}
+          </>}
+          {isDir && !d && <>
+            <span className="rd-apd-k">National direction</span>
+            <span>{p.pollster} didn’t ask the direction question in this poll, so there’s no reading to set against the direction figures.</span>
+          </>}
+          {!isDir && <>
           {lean != null && avg != null && <>
             <span className="rd-apd-k">Against {D.monthNameFull(Number(p.ym.slice(5)))}</span>
             <span>{Math.abs(lean) < 0.05
@@ -540,6 +698,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, onBack, backLabel
               : eff && eff.t
                 ? <>Not one of them: today’s figure uses the last three weeks of polls. When it came out, it moved the figure <b>{move(eff.t)}</b></>
                 : <>Not one of them: today’s figure uses the last three weeks of polls</>}</span>
+          </>}
           </>}
         </div>
       </div>
@@ -597,8 +756,13 @@ function RdAllPolls(P) {
           facet, onFacet, measure, onMeasure, tppBasis, setTppBasis,
           q, setQ, sel, setSel, toggleHouse, range, setRange, tagSel, setTagSel, toggleTag, pop, setPop,
           pills, clearAll, sort, onSort, open, setOpen, focus, onBack, backLabel, exportCsv, bodyRef,
-          synthByYm, aggByYm, synthOnByYm, altOnByYm } = P;
+          synthByYm, aggByYm, synthOnByYm, altOnByYm, ofTotal, ofHouses } = P;
   const D = window.AUSPOL;
+  /* the direction-only waves sit outside every other facet's rows; ofTotal
+     is the archive's full extent so an unfiltered count can acknowledge them
+     ("163 of 173 polls") instead of implying the facet's rows are everything */
+  const ofT = ofTotal != null && ofTotal !== total ? ofTotal : null;
+  const ofTxt = ofT ? " of " + ofT : "";
   const phone = useNarrow("(max-width: 760px)");
   /* the pinned bar's section links take their short names wherever the long
      ones would crowd the figures' tabs */
@@ -623,7 +787,7 @@ function RdAllPolls(P) {
   const inToday = (p) => { const t = rdApDays(p.released); return t > upd - winDays * 864e5 && t <= upd && figOf(p).a != null; };
   const win = rows.filter(inToday);
   let head = null, dek = null;
-  if (today && win.length) {
+  if (facet === "twopp" && today && win.length) {
     const vals = win.map((p) => figOf(p).a);
     const lo = Math.min(...vals), hi = Math.max(...vals);
     const f = (v) => (pub ? rdApNum(v) : v.toFixed(1));
@@ -973,7 +1137,7 @@ function RdAllPolls(P) {
     const detail = isOpen && (
       <div className="rd-ap-open" role="row">
         <RdApDetail p={p} onM={onM} pub={pub} today={today} winN={win.length} avgBy={avgBy} avgFor={avgFor}
-                    onBack={arrived ? onBack : null} backLabel={backLabel} />
+                    facet={facet} onBack={arrived ? onBack : null} backLabel={backLabel} />
       </div>
     );
     if (phone) {
@@ -1072,7 +1236,7 @@ function RdAllPolls(P) {
         <button type="button" className="rd-ap-pins" aria-label="Search the polls" tabIndex={pinned ? 0 : -1} onClick={toSearch}>
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
         </button>
-        <span className="rd-ap-pinn"><b>{sorted.length}</b>{sorted.length !== total ? " of " + total : ""} polls</span>
+        <span className="rd-ap-pinn"><b>{sorted.length}</b>{sorted.length !== total ? " of " + (ofT || total) : ofTxt} polls</span>
       </>}
     </div>
   );
@@ -1093,7 +1257,7 @@ function RdAllPolls(P) {
     <section className="rd-sec rd-first rd-ap" id="rd-ap-top" aria-labelledby="rd-ap-t" data-facet={facet}>
       <div className="rd-eyebrow">
         <h2 className="rd-title" id="rd-ap-t">All polls</h2>
-        <span className="rd-meta">Every national poll since the 2025 election, {total} from {houses.length} pollsters</span>
+        <span className="rd-meta">Every national poll since the 2025 election, {total}{ofTxt} from {ofHouses || houses.length} pollsters</span>
         {!phone && (
           <nav className="rd-eyebrow-tools rd-ap-nav" aria-label="On this page">
             <button type="button" onClick={() => jump("poll-disagreement")}>How much the polls disagree</button>
@@ -1142,7 +1306,7 @@ function RdAllPolls(P) {
           </FilterPop>
         </span>
         <span className="rd-grow"></span>
-        <span className="rd-ap-count"><b>{sorted.length}</b>{sorted.length !== total ? " of " + total : ""} polls</span>
+        <span className="rd-ap-count"><b>{sorted.length}</b>{sorted.length !== total ? " of " + (ofT || total) : ofTxt} polls</span>
         <button type="button" className={phone ? "rd-link rd-ap-csv" : "rd-chip rd-ap-csv"} onClick={exportCsv} aria-label={"Download these " + sorted.length + " polls as a CSV file"}>
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
           Download CSV
@@ -1156,7 +1320,7 @@ function RdAllPolls(P) {
         </div>
       )}
 
-      <div className="rd-ap-table" role="table" aria-label={"Every national poll since the 2025 election, " + (byDate ? "newest first" : "sorted") + (sorted.length !== total ? ", " + sorted.length + " of " + total : "")} ref={bodyRef}>
+      <div className="rd-ap-table" role="table" aria-label={"Every national poll since the 2025 election, " + (byDate ? "newest first" : "sorted") + (sorted.length !== total ? ", " + sorted.length + " of " + (ofT || total) : ofT ? ", " + sorted.length + ofTxt : "")} ref={bodyRef}>
         <span ref={sentRef} className="rd-ap-sent" aria-hidden="true"></span>
         <div ref={headRef} className={"rd-ap-headwrap" + (pinned ? " pinned" : "")}>
           {pinBar}

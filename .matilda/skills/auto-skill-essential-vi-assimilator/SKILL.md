@@ -1,6 +1,6 @@
 ---
 name: essential-vi-assimilator
-description: The Essential VI assimilator (.build/assimilate-essential-vi.mjs) — converts data/essential-report.csv waves into polls.json poll rows + approval/direction series; CSV vocab (Trend visual TOTAL: Approve/Disapprove, dataset-id-keyed approvals because question labels retitle on leadership changes), the Retro-fill self-repair pass, dup-guard tolerances (±2d date / ±10d figures), published/dateStart conventions, the KNOWN_OTHER_APPROVALS warning gate, and the wrapper's two-run trigger model (CSV-change OR report-index drift) with --apply no-op hygiene (notes vs fixes; proof only when touched). Assimilator 62b0179 + wrapper gating 9cf8a9a (2026-09-02).
+description: The Essential VI assimilator (.build/assimilate-essential-vi.mjs) — converts data/essential-report.csv waves into polls.json poll rows + approval/direction series; CSV vocab (Trend visual TOTAL: Approve/Disapprove, dataset-id-keyed approvals because question labels retitle on leadership changes), the Retro-fill self-repair pass, dup-guard tolerances (±2d date / ±10d figures), published/dateStart conventions, direction rows filing url (the report page — mood-only waves have no Guardian write-up) + published (T01:00 stamp) at insert with a url-null heal that back-fills every Essential direction row, the KNOWN_OTHER_APPROVALS warning gate, and the wrapper's two-run trigger model (CSV-change OR report-index drift) with --apply no-op hygiene (notes vs fixes; proof only when touched). Assimilator 62b0179 + wrapper gating 9cf8a9a (2026-09-02).
 source: auto-skill
 extracted_at: '2026-09-02T00:00:00.000Z'
 ---
@@ -36,8 +36,13 @@ the releaseUrl retro-fill land hours apart, never in the same run.
 2. **Insert** — new VI waves (tracker date = csvDate − 1 day; waves at/before the
    earliest Essential row ignored — no pre-curation backfill), plus leader-approval rows
    (nets `app−dis` + `detail:{alb:{app,dis},opp:{app,dis}}`, `oppName`, `han:null`) and
-   national-mood rows (`{date,dateStart,pollster,right,wrong,unsure}`), each spliced
-   date-sorted with `findIndex`.
+   national-mood rows (`{date,dateStart,pollster,right,wrong,unsure}` + `url` =
+   `releaseFor(wave)` of the report page — a mood-only wave has no Guardian write-up, so
+   the report page IS the release link — and `published` = `publishedFor(waveDate)`, the
+   wave's date + 1d "T01:00" stamp), each spliced date-sorted with `findIndex`. A heal
+   block back-fills `url`/`published` onto any Essential direction row with
+   `url == null` — all twelve current rows gained them 2026-09-29, not just the three
+   mood-only waves.
 
 ## CSV vocab (data/essential-report.csv rows that matter)
 

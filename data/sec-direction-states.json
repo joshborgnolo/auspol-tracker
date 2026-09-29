@@ -1,0 +1,257 @@
+{
+ "_about": "Per-state right-direction/wrong-track readings from SEC Newgate's Mood of the Nation tracking study – the 'Perceived direction of individual states' tables in each wave's report (the five mainland states only; per-state subsamples of the national wave, so several points of noise either way). Banked by .build/extract-secnewgate.mjs as waves land; nothing on the site reads this yet. Each wave's entry carries right/wrong from its own report's row pair; entries before the cache horizon (Feb/Apr 2025) and the 2022-03 anchor column come from later reports' trailing reprint columns and carry right-direction only. month = fieldwork-end month, keying the wave's direction[] row in data/polls.json.",
+ "states": [
+  "NSW",
+  "VIC",
+  "QLD",
+  "SA",
+  "WA"
+ ],
+ "series": {
+  "NSW": [
+   {
+    "month": "2022-03",
+    "right": 50
+   },
+   {
+    "month": "2025-02",
+    "right": 48
+   },
+   {
+    "month": "2025-04",
+    "right": 52
+   },
+   {
+    "month": "2025-07",
+    "right": 51,
+    "wrong": 49
+   },
+   {
+    "month": "2025-09",
+    "right": 44,
+    "wrong": 56
+   },
+   {
+    "month": "2025-11",
+    "right": 49,
+    "wrong": 51
+   },
+   {
+    "month": "2026-02",
+    "right": 48,
+    "wrong": 52
+   },
+   {
+    "month": "2026-05",
+    "right": 39,
+    "wrong": 61
+   },
+   {
+    "month": "2026-07",
+    "right": 38,
+    "wrong": 62
+   },
+   {
+    "month": "2026-09",
+    "right": 43,
+    "wrong": 57
+   }
+  ],
+  "VIC": [
+   {
+    "month": "2022-03",
+    "right": 59
+   },
+   {
+    "month": "2025-02",
+    "right": 38
+   },
+   {
+    "month": "2025-04",
+    "right": 37
+   },
+   {
+    "month": "2025-07",
+    "right": 39,
+    "wrong": 61
+   },
+   {
+    "month": "2025-09",
+    "right": 30,
+    "wrong": 70
+   },
+   {
+    "month": "2025-11",
+    "right": 27,
+    "wrong": 73
+   },
+   {
+    "month": "2026-02",
+    "right": 30,
+    "wrong": 70
+   },
+   {
+    "month": "2026-05",
+    "right": 26,
+    "wrong": 74
+   },
+   {
+    "month": "2026-07",
+    "right": 30,
+    "wrong": 70
+   },
+   {
+    "month": "2026-09",
+    "right": 26,
+    "wrong": 74
+   }
+  ],
+  "QLD": [
+   {
+    "month": "2022-03",
+    "right": 56
+   },
+   {
+    "month": "2025-02",
+    "right": 39
+   },
+   {
+    "month": "2025-04",
+    "right": 52
+   },
+   {
+    "month": "2025-07",
+    "right": 53,
+    "wrong": 47
+   },
+   {
+    "month": "2025-09",
+    "right": 48,
+    "wrong": 52
+   },
+   {
+    "month": "2025-11",
+    "right": 42,
+    "wrong": 58
+   },
+   {
+    "month": "2026-02",
+    "right": 54,
+    "wrong": 46
+   },
+   {
+    "month": "2026-05",
+    "right": 52,
+    "wrong": 48
+   },
+   {
+    "month": "2026-07",
+    "right": 46,
+    "wrong": 54
+   },
+   {
+    "month": "2026-09",
+    "right": 46,
+    "wrong": 54
+   }
+  ],
+  "SA": [
+   {
+    "month": "2022-03",
+    "right": 60
+   },
+   {
+    "month": "2025-02",
+    "right": 54
+   },
+   {
+    "month": "2025-04",
+    "right": 56
+   },
+   {
+    "month": "2025-07",
+    "right": 62,
+    "wrong": 38
+   },
+   {
+    "month": "2025-09",
+    "right": 60,
+    "wrong": 40
+   },
+   {
+    "month": "2025-11",
+    "right": 53,
+    "wrong": 47
+   },
+   {
+    "month": "2026-02",
+    "right": 55,
+    "wrong": 45
+   },
+   {
+    "month": "2026-05",
+    "right": 50,
+    "wrong": 50
+   },
+   {
+    "month": "2026-07",
+    "right": 57,
+    "wrong": 43
+   },
+   {
+    "month": "2026-09",
+    "right": 52,
+    "wrong": 48
+   }
+  ],
+  "WA": [
+   {
+    "month": "2022-03",
+    "right": 68
+   },
+   {
+    "month": "2025-02",
+    "right": 58
+   },
+   {
+    "month": "2025-04",
+    "right": 68
+   },
+   {
+    "month": "2025-07",
+    "right": 62,
+    "wrong": 38
+   },
+   {
+    "month": "2025-09",
+    "right": 61,
+    "wrong": 39
+   },
+   {
+    "month": "2025-11",
+    "right": 54,
+    "wrong": 46
+   },
+   {
+    "month": "2026-02",
+    "right": 50,
+    "wrong": 50
+   },
+   {
+    "month": "2026-05",
+    "right": 50,
+    "wrong": 50
+   },
+   {
+    "month": "2026-07",
+    "right": 43,
+    "wrong": 57
+   },
+   {
+    "month": "2026-09",
+    "right": 47,
+    "wrong": 53
+   }
+  ]
+ }
+}

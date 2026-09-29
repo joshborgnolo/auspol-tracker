@@ -1247,6 +1247,66 @@ const dirRows = (field) => DIR.filter((d) => d[field] != null).map((d) => ({
   ym: ymOf(d.date), mid: midMs(d), x: d[field], n: dirSample(d), firm: d.pollster,
 }));
 const dirHe = { right: houseEffectsFor(dirRows("right")), wrong: houseEffectsFor(dirRows("wrong")) };
+/* Hoisted from below: the net series and its own house effects (a net's
+   variance is a difference of two proportions', never a borrowed share's)
+   serve both the headline's change test and the per-reading footprint, so
+   one construction feeds every user. */
+const dirNetRows = DIR.filter((d) => d.right != null && d.wrong != null).map((d) => ({
+  mid: midMs(d), x: d.right - d.wrong, n: dirSample(d), firm: d.pollster,
+  pq: Math.max(0, 100 * (d.right + d.wrong) - (d.right - d.wrong) ** 2),
+}));
+const dirHeNet = houseEffectsFor(dirNetRows);
+/* What one reading does to today's national-direction figure, keyed
+   date|pollster exactly as the poll rows' effByKey is. The headline net is a
+   difference of two SHARE nowcasts, so the footprint is the difference of
+   their two leave-one-out recomputes; the at-day pair (for readings outside
+   today's window) works the same way on the release day itself. */
+const dirEffByKey = (() => {
+  const ms = new Set(MONTHS);            // current-term months only: older
+                                         // readings never surface as rows
+  const keyed = (field) => DIR.filter((d) => d[field] != null).map((d) =>
+    ({ key: d.date + "|" + d.pollster, mid: midMs(d), x: d[field], n: dirSample(d), firm: d.pollster }));
+  const rowsR = keyed("right"), rowsW = keyed("wrong");
+  const curR = nowcastAdj(rowsR, dirHe.right, refNow), curW = nowcastAdj(rowsW, dirHe.wrong, refNow);
+  if (!curR || !curW) return new Map();
+  const hi = r1(curR.v - curW.v);
+  const inWin = (key) => rowsR.some((r) => r.key === key
+    && ddays(refNow, r.mid) >= 0 && ddays(refNow, r.mid) <= HL_WINDOW);
+  const netAt = (rows, he, key, at) => {
+    const yes = nowcastAdj(rows, he, at), no = nowcastAdj(rows.filter((q) => q.key !== key), he, at);
+    return yes && no ? { yes, no } : null;
+  };
+  const out = new Map();
+  for (const d of DIR) {
+    if (d.right == null || d.wrong == null || !ms.has(ymOf(d.date))) continue;
+    const key = d.date + "|" + d.pollster;
+    const loR = netAt(rowsR, dirHe.right, key, refNow), loW = netAt(rowsW, dirHe.wrong, key, refNow);
+    if (!loR || !loW) continue;          // the reading is the window's only one
+    const eff = { lo: r1(loR.no.v - loW.no.v), hi, w: inWin(key) ? 1 : 0 };
+    /* the at-day "it moved the figure when it came out" pair only when the
+       day held a figure to move: this series is thin, and against a window
+       of one or two readings that number would measure the window's
+       turnover, not the wave's weight */
+    if (!eff.w) {
+      const at = new Date(d.date).getTime();
+      const tR = netAt(rowsR, dirHe.right, key, at), tW = netAt(rowsW, dirHe.wrong, key, at);
+      if (tR && tW && tR.yes.n >= 3 && tW.yes.n >= 3)
+        eff.t = { lo: r1(tR.no.v - tW.no.v), hi: r1(tR.yes.v - tW.yes.v) };
+    }
+    out.set(key, eff);
+  }
+  return out;
+})();
+/* a lone wave carries real weight in a 21-day window of this thin series:
+   its post-election window legitimately swung 8 points on one wave. Unlike
+   the 2PP footprint's ±4 (ten-poll windows), the tripwire here only catches
+   arithmetic pathology – past ±10 the estimator itself is suspect. */
+for (const [k, eff] of dirEffByKey) {
+  for (const e of [eff, ...(eff.t ? [eff.t] : [])]) {
+    if (!Number.isFinite(e.lo) || !Number.isFinite(e.hi) || Math.abs(e.hi - e.lo) > 10)
+      throw new Error(`direction footprint out of range (${k}): ${JSON.stringify(e)}`);
+  }
+}
 // Who actually asks this question, most-active first – derived rather than
 // written into the copy, so the panel can't claim a house that has stopped
 // polling it (or miss one that has started). Recency-scoped via creditHouses:
@@ -1324,6 +1384,7 @@ const DIR_BY = new Map();
     const prev = last[d.pollster];
     DIR_BY.set(d.date + "|" + d.pollster, {
       right: d.right, wrong: d.wrong, unsure: d.unsure, net,
+      ...(dirEffByKey.has(d.date + "|" + d.pollster) ? { eff: dirEffByKey.get(d.date + "|" + d.pollster) } : {}),
       ...(prev ? { chg: { net: r1(net - prev.net), right: r1(d.right - prev.right),
                           wrong: r1(d.wrong - prev.wrong) }, ref: prev.date } : {}),
     });
@@ -1359,6 +1420,8 @@ const directionOnlyPolls = DIR
       pollster: d.pollster,
       ...(fym != null && fym !== ym ? { fym } : {}),
       field, dateLabel: field, released: d.date, sample: d.sample ?? null,
+      ...(d.url ? { url: d.url } : {}),
+      ...(d.published ? { published: d.published } : {}),
       client: CLIENT_BY_HOUSE.get(d.pollster) || "Self-published",
       p: {}, appr: {}, chg: null,
       dir: DIR_BY.get(d.date + "|" + d.pollster),
@@ -1391,13 +1454,9 @@ const direction = dirRight.map((m) => {
    on its own series with its own house effects (never borrowed between
    measures): a net is a difference of two proportions, with the net's
    sampling variance, not a share's. */
-const dirNetRows = DIR.filter((d) => d.right != null && d.wrong != null).map((d) => ({
-  mid: midMs(d), x: d.right - d.wrong, n: dirSample(d), firm: d.pollster,
-  pq: Math.max(0, 100 * (d.right + d.wrong) - (d.right - d.wrong) ** 2),
-}));
 const directionNow = (() => {
   const r = currentReading(dirRightRows, dirHe.right), w = currentReading(dirWrongRows, dirHe.wrong);
-  const net = currentReading(dirNetRows, houseEffectsFor(dirNetRows));
+  const net = currentReading(dirNetRows, dirHeNet);
   if (!r || !w) return null;
   const out = { right: r.v, wrong: w.v, unsure: r1(100 - r.v - w.v), net: r1(r.v - w.v),
                 rightCi: r.ci95, wrongCi: w.ci95, n: Math.max(r.n, w.n) };
@@ -4154,7 +4213,7 @@ window.AUSPOL = (function () {
   const flowDriftOn = ${JSON.stringify(flowDriftOn)};
   const leaderMonths = ${JSON.stringify(leaderMonths)};
   const direction = ${JSON.stringify(direction)};
-  const directionHouseEffects = ${JSON.stringify({ right: dirHe.right.snapshot(Infinity), wrong: dirHe.wrong.snapshot(Infinity) })};
+  const directionHouseEffects = ${JSON.stringify({ right: dirHe.right.snapshot(Infinity), wrong: dirHe.wrong.snapshot(Infinity), net: dirHeNet.snapshot(Infinity) })};
   const directionHouses = ${JSON.stringify(directionHouses)};
   /* name-list for the direction card's caption: the active houses plus any
      STOPPED contributor, listed last, labelled "(inactive)". Keep counting

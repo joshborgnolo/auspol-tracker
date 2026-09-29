@@ -5132,6 +5132,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
 
   const total = rows.length;
+  /* the archive's full extent, direction-only waves included: on the facets
+     those waves don't sit in, the counts acknowledge them ("163 of 173
+     polls") rather than imply the view's rows are everything there is */
+  const totalAll = D.individualPolls.length + dirOnlyAll.length;
   const clearAll = () => {
     setQ(""); setSel(new Set()); setLead("all"); setMeasure(DEFAULT_MEASURE); setRange("all");
     setTagSel(new Set()); setScope(false); setPop(null);
@@ -5257,7 +5261,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         tagSel={tagSel} setTagSel={setTagSel} toggleTag={toggleTag} pop={pop} setPop={setPop}
         pills={pills} clearAll={clearAll} sort={sort} onSort={onSort} open={open} setOpen={setOpen}
         focus={focus} onBack={onBack} backLabel={backLabel} exportCsv={exportCsv} bodyRef={bodyRef}
-        synthByYm={synthByYm} aggByYm={aggByYm} synthOnByYm={synthOnByYm} altOnByYm={altOnByYm} />
+        synthByYm={synthByYm} aggByYm={aggByYm} synthOnByYm={synthOnByYm} altOnByYm={altOnByYm}
+        ofTotal={totalAll} ofHouses={housesDir.length} />
       <RdDisagree />
       <RdHouseLean measure={measure} tppBasis={tppBasis} />
       <RdFlows />
@@ -5270,7 +5275,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         <div>
           <h2 className="card-title">All polls</h2>
           <p className="card-sub">
-            Every individual national poll in the archive, {total} polls from {housesV.length} pollsters,
+            Every individual national poll in the archive, {total}{totalAll !== total ? " of " + totalAll : ""} polls from {housesDir.length} pollsters,
             {" "}{(() => {  // span computed from the data, so it stays honest as polls are added
               const f = D.individualPolls[0], l = D.individualPolls[D.individualPolls.length - 1];
               const lab = (ym) => { const [y, m] = ym.split("-").map(Number); return D.monthNameFull(m) + " " + y; };
@@ -5288,7 +5293,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
           <TextToggle value={facet} onChange={onFacet} options={FACETS}
             ariaLabel="Archive table view" caps />
           <span className="ap-count">
-            <strong>{sorted.length}</strong>{sorted.length !== total ? " of " + total : ""} {sorted.length === 1 ? "poll" : "polls"}
+            <strong>{sorted.length}</strong>{sorted.length !== total ? " of " + totalAll : ""} {sorted.length === 1 ? "poll" : "polls"}
           </span>
         </div>
       </div>
@@ -5324,7 +5329,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         <TextToggle value={facet} onChange={onFacet} options={FACETS}
           ariaLabel="Archive table view" caps className="ap-facet" />
         <span className="ap-jumps-count">
-          <strong>{sorted.length}</strong>{sorted.length !== total ? " of " + total : ""} {sorted.length === 1 ? "poll" : "polls"}
+          <strong>{sorted.length}</strong>{sorted.length !== total ? " of " + totalAll : ""} {sorted.length === 1 ? "poll" : "polls"}
         </span>
       </div>
 
@@ -5441,7 +5446,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
 
         <div className="ap-bar-end">
           <span className="ap-count">
-            <strong>{sorted.length}</strong>{sorted.length !== total ? " of " + total : ""} {sorted.length === 1 ? "poll" : "polls"}
+            <strong>{sorted.length}</strong>{sorted.length !== total ? " of " + totalAll : ""} {sorted.length === 1 ? "poll" : "polls"}
           </span>
           {/* big screens only – a spreadsheet export is a desktop task, and the
               button would crowd the narrow filter stack on phones */}
@@ -5476,7 +5481,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
               knowing what it is and how much of it the filters left. */}
           <caption className="sr-only">
             All polls, {(FACETS.find((f) => f.id === facet) || {}).label} columns –
-            {" "}{sorted.length} of {total} polls
+            {" "}{sorted.length} of {totalAll} polls
           </caption>
           <thead>
             <tr>
