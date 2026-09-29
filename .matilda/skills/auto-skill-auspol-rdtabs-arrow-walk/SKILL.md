@@ -73,7 +73,15 @@ party chip focused, 1..5 = One Nation, Labor, Coalition, Greens, Others -
 the RdTabs row carries `onDigits={rdDigitKey(DEMO_PARTIES, chooseParty)}`
 and the phone's separate `.rd-chips-row` attaches the same handler itself;
 both chips rows also got `onClick={rdTabFocus}` so a pointer click lands
-focus where the keys can hear it. Probe: `.matilda/probe-whovotes-numkeys.mjs`
+focus where the keys can hear it. The phone row's chips ABBREVIATE
+(9fdd62a, 2026-09-29): `DEMO_PARTIES[].short` — ON, ALP, L/NP, GRN, OTH,
+the same short forms the votes-by-party panel's `ABBR` end labels use —
+with the full name kept on each chip's `aria-label`, so the five chips
+always fit one line (the ≤480px 3-over-2 wrap rung in rd.css was deleted
+with the full labels; probe `.matilda/probe-chips-oneline.mjs` pins
+one-line geometry + abbreviations at 320/360/480/640px, and the 2px
+document overflow it surfaced at 320px is PRE-EXISTING from `.ss-table`,
+not the chips). Probe: `.matilda/probe-whovotes-numkeys.mjs`
 (digit picks from a view tab and from a chip, desktop + phone chips row, the
 figure itself switching, inert keys, Meta+digit, no-row-focus dead air).
 
