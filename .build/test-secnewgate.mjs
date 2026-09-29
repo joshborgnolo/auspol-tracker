@@ -6,7 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
-import { titleMonthOf, pickReports, methodologyOf, directionPageOf, directionChartOf, stateTableOf, concernTableOf }
+import { titleMonthOf, pickReports, methodologyOf, directionPageOf, directionChartOf, stateTableOf, concernTableOf, g4BestPartyOf }
   from "./extract-secnewgate.mjs";
 
 const SRC = ".build/secnewgate-src";
@@ -224,6 +224,47 @@ for (const [lbl, months] of Object.entries(concernMentions))
   assert.equal(banked.series["Crime"][banked.series["Crime"].length - 1].mention, 20, "crime second at 20");
   assert.equal(banked.series["Immigration & population"].find((e) => e.month === "2025-11").mention, 13,
     "immigration & population, Nov 2025");
+}
+
+// ---- g4BestPartyOf against the cache: the G4 best-party-on-cost-of-living
+// table. The printed rows change with the era: Labor/Coalition only (to Sep
+// 2025), + a "Neither / someone else" row (Nov 2025, Feb 2026), the four
+// parties only (May 2026 on, when One Nation and the Greens joined the
+// options). "Can't say" never prints; rest balances 100. Each table prints
+// its own wave only – no reprints, no 2026-04 from the special.
+const G4_SHAPES = {
+  21: { alp: 38, lnp: 21, rest: 41 },
+  22: { alp: 35, lnp: 22, rest: 43 },
+  23: { alp: 33, lnp: 22, oth: 30, rest: 15 },
+  24: { alp: 29, lnp: 22, oth: 31, rest: 18 },
+  25: { alp: 23, onp: 20, lnp: 17, grn: 9, rest: 31 },
+  26: { alp: 24, onp: 23, lnp: 14, grn: 10, rest: 29 },
+  27: { alp: 23, onp: 22, lnp: 16, grn: 12, rest: 27 },
+};
+const g4ByMonth = {};  // ym -> shares
+for (const { slug, sidecar } of reports) {
+  const g4 = g4BestPartyOf(fs.readFileSync(path.join(SRC, slug + ".txt"), "utf8"));
+  assert.deepEqual(g4.problems, [], `${slug}: G4 table clean`);
+  assert.equal(g4.ym, sidecar.date.slice(0, 7), `${slug}: the G4 header month is the wave's`);
+  assert.deepEqual(g4.shares, G4_SHAPES[sidecar.wave], `${slug}: the G4 TOTAL column`);
+  assert.equal(Object.values(g4.shares).reduce((s, v) => s + v, 0), 100, `${slug}: G4 sums to 100`);
+  assert.equal("unsure" in g4.shares, false, `${slug}: "Can't say" never prints`);
+  if (g4.ym < "2026-05") assert.ok(!("onp" in g4.shares) && !("grn" in g4.shares),
+    `${slug}: One Nation and the Greens are not options before May 2026`);
+  else assert.ok("onp" in g4.shares && "grn" in g4.shares && !("oth" in g4.shares),
+    `${slug}: the four-party table from May 2026 on`);
+  g4ByMonth[g4.ym] = g4.shares;
+}
+
+// data/sec-issues.json's bestParty block carries exactly what the cached
+// reports print, keyed in month order across all seven waves
+{
+  const banked = JSON.parse(fs.readFileSync("data/sec-issues.json", "utf8"));
+  assert.deepEqual(banked.bestParty, g4ByMonth,
+    "the banked bestParty block matches the cached reports (rerun extract-secnewgate.mjs)");
+  assert.deepEqual(Object.keys(banked.bestParty).sort(), Object.keys(g4ByMonth).sort(),
+    "all seven wave months – and nothing from the April 2026 special");
+  assert.equal("2026-04" in banked.bestParty, false, "the special prints no G4 column");
 }
 
 // a special asks no direction question at all

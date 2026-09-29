@@ -16876,6 +16876,34 @@
    }
   },
   {
+   "pollster": "SEC Newgate",
+   "date": "2026-05-18",
+   "dateStart": "2026-05-13",
+   "sample": 1210,
+   "sampleEff": null,
+   "source": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-may-2026-2/",
+   "read": "report",
+   "question": "best party to manage the cost of living",
+   "options": [
+    "alp",
+    "lnp",
+    "onp",
+    "grn",
+    "oth",
+    "unsure"
+   ],
+   "note": "One Nation and the Greens options from this wave; 'neither/someone else' and 'can't say' are not shown separately – oth is the two combined",
+   "issues": {
+    "col": {
+     "alp": 23,
+     "lnp": 17,
+     "onp": 20,
+     "grn": 9,
+     "oth": 31
+    }
+   }
+  },
+  {
    "pollster": "Ipsos",
    "date": "2026-05-20",
    "dateStart": "2026-05-14",
@@ -17476,6 +17504,34 @@
      "oth": 11.17,
      "unsure": 16,
      "onp": 23.83
+    }
+   }
+  },
+  {
+   "pollster": "SEC Newgate",
+   "date": "2026-07-13",
+   "dateStart": "2026-07-02",
+   "sample": 1975,
+   "sampleEff": null,
+   "source": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-july-2026/",
+   "read": "report",
+   "question": "best party to manage the cost of living",
+   "options": [
+    "alp",
+    "lnp",
+    "onp",
+    "grn",
+    "oth",
+    "unsure"
+   ],
+   "note": "One Nation and the Greens options from this wave; 'neither/someone else' and 'can't say' are not shown separately – oth is the two combined",
+   "issues": {
+    "col": {
+     "alp": 24,
+     "lnp": 14,
+     "onp": 23,
+     "grn": 10,
+     "oth": 29
     }
    }
   },
@@ -18207,6 +18263,34 @@
      "oth": 9.22,
      "unsure": 23.96,
      "onp": 24.19
+    }
+   }
+  },
+  {
+   "pollster": "SEC Newgate",
+   "date": "2026-09-14",
+   "dateStart": "2026-09-08",
+   "sample": 1659,
+   "sampleEff": null,
+   "source": "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-september-2026-report/",
+   "read": "report",
+   "question": "best party to manage the cost of living",
+   "options": [
+    "alp",
+    "lnp",
+    "onp",
+    "grn",
+    "oth",
+    "unsure"
+   ],
+   "note": "One Nation and the Greens options from this wave; 'neither/someone else' and 'can't say' are not shown separately – oth is the two combined",
+   "issues": {
+    "col": {
+     "alp": 23,
+     "lnp": 16,
+     "onp": 22,
+     "grn": 12,
+     "oth": 27
     }
    }
   }

@@ -185,11 +185,11 @@ FILES lists) and `crosstabs-updater.sh` (CHANGED check + FILES) — and
 pinned in test-secnewgate.mjs (per-report columns, pair==own-cell,
 reprint-agreement, merged series == the file).
 
-## Issue questions in the report (assessed 2026-09-29 — NOT pooled)
+## Issue questions in the report (assessed 2026-09-29 — salience NOT pooled, G4 ownership pooled)
 
 The user asked whether MotN's issues data could join the issues panel;
-answer given: no pooling, banking proposed. Each report carries THREE
-issue measures, none top-3-compatible:
+answer: salience stays out, but G4's best-party question pools for
+ownership (`col`). Each report carries FOUR issue measures:
 
 - **B1 Unprompted concerns and priorities** (txt "Unprompted concerns
   and priorities", p.6): open-ended "main issues facing Australians
@@ -212,9 +212,16 @@ issue measures, none top-3-compatible:
   choice set (dilutes every share vs their 14/19), printed for the
   current wave only, and many-to-one onto the issues-panel keys; see
   the auspol-issues-panel skill for the full not-pooled reasoning.
+- **G4 best party on cost of living** ("Now turning to the cost of
+  living. Which of the following do you think would be the best party
+  to manage the cost of living?"): asked EVERY wave, one issue only,
+  with an APR '22 tracking chart and a demographics table whose TOTAL
+  column is the national share. Banks and POOLS (May 2026 on) — see
+  the next two sections. The option list changed at the May 2026
+  "METHODOLOGY CHANGE" wave: One Nation and the Greens joined, and
+  "neither"/"can't say" stopped printing as separate figures.
 
-No party-handling/best-party question exists anywhere in MotN. B5/B6
-live on tile pages (6 tiles/page, label + 4 tracking values + one heat
+B5/B6 live on tile pages (6 tiles/page, label + 4 tracking values + one heat
 number) — pdftotext -layout interleaves them loosely, so bbox geometry
 would be needed if they're ever read. B5/B6 were deliberately NOT
 banked: B5's extremely-important scale mixes with nothing, and B6's
@@ -253,3 +260,42 @@ Newgate as the third check house ("Every two months SEC Newgate asks the
 same kind of open question … None of the three can be pooled with the
 others …"), text edited in the d1a1d215 asset per the auspol-glossary-terms
 skill.
+
+## G4 best-party bank (data/sec-issues.json `bestParty`, shipped 2026-09-29)
+
+G4's demographics table is banked parse-only beside B1 — `g4BestPartyOf(text)`
+in the extractor reads the whole-report `-layout` text: the "G4. Now turning
+to the cost of living" question line anchors an UPWARD scan (≤16 lines, stop
+at `\f`) for the `MON ['’]YY (%)  TOTAL` header (May 2026 uses a curly
+apostrophe, "MAY ‘26 (%)"; year 2 or 4 digits), then reads label+value rows
+BELOW the header (cells split on 2+ spaces, first cell the label, second a
+bare integer ≤60). Printed row sets VARY BY ERA — do not assume uniformity:
+- Jul/Sep 2025: Labor Party + Coalition only (neither/can't-say exist only
+  in the chart legend);
+- Nov 2025/Feb 2026: adds "Neither / someone else" (`oth`); Feb 2026's
+  Coalition row reads "Liberal / National*";
+- May 2026 on ("METHODOLOGY CHANGE" wave): the four party rows only —
+  Labor Party, One Nation, Liberal/Nationals Coalition, The Greens.
+"Can't say" never prints as a row in any wave (it's remainder). Guards: the
+header month must equal the wave's month; alp+lnp required; onp/grn appear
+together; a "Can't say" row would be an explicit problem; `rest` = 100 −
+printed sum, bounded [5, 60]. The bank = `{ "2025-07": {alp, lnp, rest},
+"2025-11": {alp, lnp, oth, rest}, "2026-05": {alp, onp, lnp, grn, rest},
+…}` — printed parties plus `rest`, one sighting per wave (no reprints to
+cross-check, unlike B1; the April 2026 special prints no G4 column).
+.build/issues.mjs turns the May-2026-on months into ownership rows
+(issues.col = alp/lnp/onp/grn + oth:=rest = neither + can't-say combined;
+an options override lists unsure even though it never prints separately,
+matching the question's option set; the wave's dates/sample/link come from
+its polls.json direction row — SEC Newgate has no poll rows). Only the ON-era
+waves pool: before May 2026 neither One Nation nor the Greens was an option,
+so the shared three-party question doesn't exist. The secnewgate updater
+runs issues.mjs via `refresh_crosstabs issues` after the extractor; both
+FILES lists carry data/issues.json. gen-data §7h needed NO code change — its
+pollOf fallback takes dates/sample off the ownership row itself when no
+poll row matches — only its prose comment lists the house. test-secnewgate.mjs
+pins every wave's G4 shares, the era shapes, and the merged bank == the file;
+test-issues.mjs pins the three pooled rows (dates, shares, options, gate).
+Verified figures: w21 alp38/lnp21/rest41, w22 35/22/43, w23 33/22/oth30/15,
+w24 29/22/oth31/18, w25 alp23/onp20/lnp17/grn9/rest31,
+w26 24/23/14/10/29, w27 23/22/16/12/27.

@@ -209,6 +209,42 @@ assert.ok(da.issues.inflation && da.issues.agedcare, "inflation and aged care ke
 for (const [k, sh] of Object.entries(da.issues)) assert.equal(ownershipProblem(sh), null, `DemosAU ${k} passes the gate`);
 assert.equal(daOwnership(daRep("Capital-BriefDemosAU-Federal-Poll-August-2026")), null, "a report without the table");
 
+// ---- SEC Newgate: the G4 best-party-on-cost-of-living bank feeds ownership ------
+// one pooled row per Wave-25-era month onward (May 2026 on, when One Nation and
+// the Greens became options); the dates come from the house's direction rows in
+// polls.json, the shares from data/sec-issues.json's bestParty block (its rest
+// balance rides as oth), all pinned in detail by test-secnewgate.mjs
+{
+  const bank = JSON.parse(fs.readFileSync("data/sec-issues.json", "utf8")).bestParty;
+  const dirs = JSON.parse(fs.readFileSync("data/polls.json", "utf8"))
+    .direction.filter((d) => d.pollster === "SEC Newgate");
+  const data = JSON.parse(fs.readFileSync("data/issues.json", "utf8"));
+  const rows = data.ownership.filter((r) => r.pollster === "SEC Newgate");
+  const eras = Object.keys(bank).filter((ym) => ym >= "2026-05");
+  assert.deepEqual(eras, ["2026-05", "2026-07", "2026-09"], "the One-Nation-era bank months");
+  assert.equal(rows.length, eras.length, "one ownership row per pooled wave");
+  for (const ym of eras) {
+    const dir = dirs.find((d) => d.date.slice(0, 7) === ym);
+    assert.ok(dir, `${ym}: a direction row carries the wave's dates`);
+    const row = rows.find((r) => r.date === dir.date);
+    assert.ok(row, `${ym}: its ownership row exists`);
+    assert.deepEqual([row.dateStart, row.sample, row.source], [dir.dateStart, dir.sample, dir.url],
+      `${ym}: dates, sample and link are the direction row's`);
+    assert.equal(row.sampleEff, null, `${ym}: SEC Newgate publishes no effective sample`);
+    assert.deepEqual(Object.keys(row.issues), ["col"], `${ym}: the one issue it asks about`);
+    const b = bank[ym];
+    assert.deepEqual(row.issues.col, { alp: b.alp, lnp: b.lnp, onp: b.onp, grn: b.grn, oth: b.rest },
+      `${ym}: the bank's shares with 'neither/can't say' riding as oth`);
+    assert.equal(Object.values(row.issues.col).reduce((s, v) => s + v, 0), 100, `${ym}: shares sum to 100`);
+    assert.equal(ownershipProblem(row.issues.col), null, `${ym}: the gate passes`);
+    assert.equal(row.read, "report");
+    assert.equal(row.question, "best party to manage the cost of living");
+    assert.deepEqual(row.options, ["alp", "lnp", "onp", "grn", "oth", "unsure"]);
+    assert.ok(!("unsure" in row.issues.col) && !("rest" in row.issues.col),
+      `${ym}: no separate can't-say or rest key leaks into the row`);
+  }
+}
+
 // a top three with no ranks
 assert.equal(salienceProblem({ top3: 63 }), null);
 assert.match(salienceProblem({ top3: 130 }), /outside/);

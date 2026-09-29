@@ -73,6 +73,31 @@ extracted_at: '2026-09-26'
 - **Spectre**: up to 3 of 14 issues (+ other, unsure), bundled ("health &
   aged care", "immigration & population growth"), ~every three months.
   Not pooled; cited as a check. Its levels match Ipsos within ~4 points.
+- **SEC Newgate** MotN (salience NOT pooled; ownership pooled from
+  2026-09-29, `col` only – the user asked "can they be worked in" and
+  spotted G4 on the live report): the report carries FOUR issue
+  measures (details in the secnewgate-extraction skill) – B1
+  open-ended unprompted concerns (% mentioning, 10 issues, tracked
+  MAR '22 + 3 waves; banked parse-only 2026-09-29), B5 the 36-priority
+  "extremely important" rating scale (tops ~70 vs a top-3 share's ~40,
+  unmixable), B6 the "Political Heat Score" pick-3 of 36, and G4
+  "best party to manage the cost of living". Salience stays out:
+  B1 is % mentioning (different scale from RedBridge's top-3 /
+  Ipsos's pick-3), B5 is ratings, and even B6's 36-item choice set
+  dilutes every share vs RedBridge's 14 / Ipsos's 19. Ownership DOES
+  take G4: asked every wave, with One Nation and the Greens options
+  from the May 2026 wave – only those waves pool (a three-party
+  question needs them on the list). extract-secnewgate.mjs banks the
+  G4 TOTAL column into data/sec-issues.json `bestParty` (keyed by
+  month; printed parties + `rest` balancing 100; "can't say" never
+  prints, "neither/someone else" prints only Nov 2025–Feb 2026 as
+  `oth`); .build/issues.mjs reads the May-2026-on bank months into
+  ownership rows whose dates come from the house's polls.json
+  direction rows (it has no poll rows), with an options override
+  (alp/lnp/onp/grn/oth/unsure) and `rest` riding as oth = neither +
+  can't-say combined. The secnewgate updater runs issues.mjs via
+  refresh_crosstabs. Pre-May waves keep the older two- or
+  three-row option sets in the bank but stay out of the pool.
 
 ## Pooling (gen-data §7h)
 

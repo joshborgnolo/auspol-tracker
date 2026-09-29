@@ -6590,18 +6590,22 @@ function infoTerms(D) {
         can be pooled with the others, but the first two side with Ipsos on health. In 2026 Spectre
         had it at 18 to 20%, and 1 to 3% named it the biggest issue at DemosAU, where 7 to 10% put
         it first at RedBridge.</span>
-        <span className="info-p"><b>Who’s best.</b> Five pollsters ask which party would handle an
+        <span className="info-p"><b>Who’s best.</b> Six pollsters ask which party would handle an
         issue best, each in its own words. Resolve asks every month, “Which party do you think would
         perform best in each of these areas?” RedBridge asks every month, “Which of the following do
         you believe is best able to deal with…” Ipsos asks every month, “Please select the political
         party that you believe is most capable of managing each of the following issues,” for its
-        month’s five top issues. YouGov asked in August 2026, “Which party is best at handling…”, and
+        month’s five top issues. YouGov asked in August 2026, “Which party is best at handling…”,
         DemosAU in February 2026, “Which political party do you trust more to handle the following
-        issues?” Each offers different answers. Resolve offers the Liberals, Labor, One Nation (since July
-        2026), someone else, and undecided. RedBridge offers Labor, the Liberals, the Nationals, the
-        Greens, One Nation, all about equal, none of these, and not sure. Ipsos offers Labor, the
-        Coalition, the Greens, One Nation (since June 2026), other, don’t know, and none. YouGov
-        and DemosAU offer Labor, the Coalition, One Nation, the Greens, and don’t know.</span>
+        issues?”, and every two months SEC Newgate asks, “Which of the following do you think would be
+        the best party to manage the cost of living?” Each offers different answers. Resolve offers the
+        Liberals, Labor, One Nation (since July 2026), someone else, and undecided. RedBridge offers
+        Labor, the Liberals, the Nationals, the Greens, One Nation, all about equal, none of these,
+        and not sure. Ipsos offers Labor, the Coalition, the Greens, One Nation (since June 2026),
+        other, don’t know, and none. YouGov and DemosAU offer Labor, the Coalition, One Nation, the
+        Greens, and don’t know. SEC Newgate lists all four from May 2026, when One Nation and the
+        Greens joined and “neither” and “can’t say” disappeared from the printed table; its pooled
+        waves are those from that month on.</span>
         <span className="info-p"><b>How it’s built.</b> The part every question shares is the choice
         between Labor, the Coalition and One Nation. So each poll is read as those three parties’
         shares of the voters who named one of them: 25, 20 and 20 of all voters become 38, 31 and 31.

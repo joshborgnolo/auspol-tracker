@@ -23,6 +23,11 @@
 #     read cleanly (pending). The run that lands it fails; the weekly run
 #     keeps the quiet alarm up meanwhile.
 #
+# The wave's G4 best-party table (banked in data/sec-issues.json) feeds
+# data/issues.json: issues.mjs runs here via refresh_crosstabs so the
+# ownership rows land in the same commit as the wave (non-fatal; see
+# git-push-main.sh).
+#
 # Every step logs one line to .build/logs/secnewgate.log.
 set -uo pipefail
 
@@ -62,6 +67,10 @@ WARN="$(node -e 'const s = JSON.parse(process.argv[1].replace(/^SECNEWGATE_STATU
 # a cached report that didn't read (its methodology page or its chart)
 SECBAD="$(node -e 'const s = JSON.parse(process.argv[1].replace(/^SECNEWGATE_STATUS /, "")); console.log((s.pending || []).join("; "))' "$LAST")"
 
+# the wave's G4 best-party rows join data/issues.json in this same commit
+# (non-fatal; see refresh_crosstabs in git-push-main.sh)
+refresh_crosstabs issues
+
 if [ -z "$(git status --porcelain -- .build/secnewgate-src data/polls.json data/sec-direction-states.json data/sec-issues.json)" ]; then
   if [ -n "$WARN" ] || [ -n "$SECBAD" ]; then
     [ -n "$WARN" ] && log "FAIL extract-secnewgate (exit 1): $WARN"
@@ -75,7 +84,7 @@ if [ -z "$(git status --porcelain -- data/polls.json)" ]; then
   # a cached file that moves no figure (a wave's re-hosted variant), or a
   # state/concerns-bank rewrite with no national change: keep the file so
   # it isn't fetched again / the bank isn't left dirty
-  FILES=(.build/secnewgate-src data/sec-direction-states.json data/sec-issues.json)
+  FILES=(.build/secnewgate-src data/sec-direction-states.json data/sec-issues.json data/issues.json)
   MSG="Cache SEC Newgate Mood of the Nation files $(date '+%Y-%m-%d')"
 else
   log "new SEC Newgate direction figures; running validate/build/commit/push"
@@ -89,7 +98,7 @@ else
     log "FAIL build; no commit made"
     exit 1
   fi
-  FILES=(data/polls.json data/sec-direction-states.json data/sec-issues.json .build/secnewgate-src "${SITE_FILES[@]}")
+  FILES=(data/polls.json data/sec-direction-states.json data/sec-issues.json data/issues.json .build/secnewgate-src "${SITE_FILES[@]}")
   MSG="Update SEC Newgate Mood of the Nation $(date '+%Y-%m-%d')"
 fi
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }

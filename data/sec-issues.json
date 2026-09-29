@@ -1,5 +1,5 @@
 {
- "_about": "Unprompted issue concerns from SEC Newgate's Mood of the Nation tracking study – the B1 table ('What are the main issues facing Australians that are most important to you right now?'), an OPEN-ENDED question taking any number of mentions in the voter's own words, printed per wave as '% MENTIONING EACH' for the wave's top issues (so shares don't sum to 100, and levels sit well above the forced top-three salience the Issues panel pools – which is why nothing there reads this; banked by .build/extract-secnewgate.mjs as waves land, as a reference series). Each wave's report carries its own column and reprints its two predecessors (plus a MAR '22 anchor); sightings of a month across reports must agree. Unlike the direction question, the April 2026 Special Edition asked B1, so 2026-04 enters from the May and July 2026 reprints. The B5/B6 objective-priority ratings later in each report are not banked. month = fieldwork-end month, keying the wave's direction[] row in data/polls.json.",
+ "_about": "Unprompted issue concerns from SEC Newgate's Mood of the Nation tracking study – the B1 table ('What are the main issues facing Australians that are most important to you right now?'), an OPEN-ENDED question taking any number of mentions in the voter's own words, printed per wave as '% MENTIONING EACH' for the wave's top issues (so shares don't sum to 100, and levels sit well above the forced top-three salience the Issues panel pools – which is why nothing there reads this; banked by .build/extract-secnewgate.mjs as waves land, as a reference series). Each wave's report carries its own column and reprints its two predecessors (plus a MAR '22 anchor); sightings of a month across reports must agree. Unlike the direction question, the April 2026 Special Edition asked B1, so 2026-04 enters from the May and July 2026 reprints. The B5/B6 objective-priority ratings later in each report are not banked. bestParty banks the G4 question, asked every wave: 'Which of the following do you think would be the best party to manage the cost of living?' – per fieldwork month the shares its table prints (alp, lnp the Coalition under the wave's own label, onp/grn options from May 2026, oth the 'Neither / someone else' row where printed) plus rest, the balance of 100: 'Can't say' alone once oth is printed, 'Neither/someone else' and 'Can't say' combined otherwise, and both inside oth before. The Issues panel's ownership pool reads the May 2026-on rows via .build/issues.mjs. month = fieldwork-end month, keying the wave's direction[] row in data/polls.json.",
  "issues": [
   "Climate change",
   "Cost of living",
@@ -603,5 +603,50 @@
     "mention": 6
    }
   ]
+ },
+ "bestParty": {
+  "2025-07": {
+   "alp": 38,
+   "lnp": 21,
+   "rest": 41
+  },
+  "2025-09": {
+   "alp": 35,
+   "lnp": 22,
+   "rest": 43
+  },
+  "2025-11": {
+   "alp": 33,
+   "lnp": 22,
+   "oth": 30,
+   "rest": 15
+  },
+  "2026-02": {
+   "alp": 29,
+   "lnp": 22,
+   "oth": 31,
+   "rest": 18
+  },
+  "2026-05": {
+   "alp": 23,
+   "onp": 20,
+   "lnp": 17,
+   "grn": 9,
+   "rest": 31
+  },
+  "2026-07": {
+   "alp": 24,
+   "onp": 23,
+   "lnp": 14,
+   "grn": 10,
+   "rest": 29
+  },
+  "2026-09": {
+   "alp": 23,
+   "onp": 22,
+   "lnp": 16,
+   "grn": 12,
+   "rest": 27
+  }
  }
 }

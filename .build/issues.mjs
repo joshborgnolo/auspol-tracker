@@ -45,6 +45,14 @@
                  2026 (12 issues). Every cached report is read, so a wave
                  that asks it again joins by itself; the DemosAU updater
                  runs this script too.
+     SEC Newgate – the Mood of the Nation bi-monthly. G4 asks the best
+                 party to manage the cost of living every wave; One Nation
+                 and the Greens became options at the May 2026 wave, and
+                 only those waves pool. Shares come from extract-secnewgate.mjs's
+                 bank in data/sec-issues.json ('can't say' and 'neither /
+                 someone else' print combined from that wave; oth carries
+                 the two); the wave's dates come from its direction row.
+                 The secnewgate updater runs this script too.
    Shares are stored as published, each house's options as it offers them
    (see issues-parse.mjs for the keys). Nothing is saved on a guess: every
    row passes the gate in issues-parse.mjs, a wave printed twice (a report's
@@ -315,6 +323,36 @@ for (const f of fs.existsSync(daDir) ? fs.readdirSync(daDir).filter((x) => x.end
   daSeen.add(p.date);
   ownership.push(base(p, { read: "report", question: "trust more to handle",
     options: ["alp", "lnp", "onp", "grn", "unsure"], issues: tb.issues }));
+}
+
+// ---- SEC Newgate ----------------------------------------------------------------------
+/* the Mood of the Nation tracking study's G4, "best party to manage the
+   cost of living", asked every (bi-monthly) wave. Shares come from
+   extract-secnewgate.mjs's bank of the cached reports (data/sec-issues.json),
+   the wave's dates, n and link from its direction row in data/polls.json
+   (the house asks no voting intention). One Nation and the Greens became
+   options at the May 2026 wave; only those waves pool – the waves before
+   aren't on the three-party answer set the ownership shares are pooled on. */
+const SEC = "SEC Newgate";
+const SEC_ON_ERA = "2026-05";
+try {
+  const sec = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "sec-issues.json"), "utf8"));
+  const secDir = (JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8")).direction || [])
+    .filter((d) => d.pollster === SEC && d.date >= SEC_ON_ERA);
+  for (const [ym, sh] of Object.entries(sec.bestParty || {})) {
+    if (ym < SEC_ON_ERA) continue;
+    const d = secDir.find((x) => x.date.slice(0, 7) === ym);
+    if (!d) { pending.push(`${SEC}|${ym}: no direction row for a wave the report bank carried`); continue; }
+    const col = { alp: sh.alp, lnp: sh.lnp, onp: sh.onp, grn: sh.grn, oth: sh.rest };
+    const e = ownershipProblem(col);
+    if (e) { pending.push(`${SEC}|${d.date}: cost of living (best party): ${e}`); continue; }
+    ownership.push(base({ ...d, pollster: SEC }, { read: "report", question: "best party to manage the cost of living",
+      options: ["alp", "lnp", "onp", "grn", "oth", "unsure"],
+      note: "One Nation and the Greens options from this wave; 'neither/someone else' and 'can't say' are not shown separately – oth is the two combined",
+      issues: { col } }));
+  }
+} catch (e) {
+  pending.push(`${SEC}: ${String(e.message || e).slice(0, 160)}`);
 }
 
 // ---- write -----------------------------------------------------------------------------

@@ -50,14 +50,16 @@
    failure: the cache stays; a report that IS cached but won't read is
    pending and fails the run that landed it, once anything else is pushed.
 
-   Two parse-only banks are rebuilt from the cache each run (nothing on
-   the site reads either): data/sec-direction-states.json banks the
-   per-state direction table off the bbox (SECNEWGATE_STATES redirects),
-   and data/sec-issues.json banks B1's "% MENTIONING EACH"
-   unprompted-concerns table off the whole-report -layout text
-   (SECNEWGATE_ISSUES redirects; the B5/B6 priority tiles are not
-   banked). Each reprints its trailing waves, so a conflict between
-   reports for one month is a revision and goes to warnings.
+   Two parse-only bank files are rebuilt from the cache each run:
+   data/sec-direction-states.json banks the per-state direction table
+   off the bbox (SECNEWGATE_STATES redirects), and data/sec-issues.json
+   banks two blocks off the whole-report -layout text: B1's "% MENTIONING
+   EACH" unprompted-concerns table (a reference series; the B5/B6
+   priority tiles are not banked) and G4's best-party-on-the-cost-of-
+   living table, whose May 2026-on rows .build/issues.mjs pools into
+   data/issues.json. Direction and concerns reprint their trailing
+   waves, so a conflict between reports for one month is a revision and
+   goes to warnings.
 
    Usage: node .build/extract-secnewgate.mjs [--force]  (--force refetches)
    SECNEWGATE_SRC_DIR redirects the cache.
@@ -380,6 +382,63 @@ export function concernTableOf(text) {
   return { columns: columns.map((c) => c.ym), concerns, problems };
 }
 
+/* G4 ("Which of the following do you think would be the best party to
+   manage the cost of living?") asks every wave; its page carries a tracking
+   chart back to APR '22 and a demographics table whose TOTAL column is the
+   national reading banked here. The table prints only its own wave: the
+   "MONTH 'YY (%) TOTAL MEN WOMEN …" header, then labelled rows of one bare
+   integer per column, then the G4. question line. What it prints changed
+   with the question: waves 21–22 (Jul/Sep 2025) print Labor and the
+   Coalition only, waves 23–24 add a "Neither / someone else" row ("Can't
+   say" is never a row), and from wave 25 (May 2026) – when One Nation and
+   the Greens became response options (the page flags the "METHODOLOGY
+   CHANGE") – it prints the four parties only, "None/someone else" and
+   "can't say" no longer shown. `rest` banks the balance of 100: Can't say
+   alone where Neither is printed, otherwise Neither and Can't say
+   combined. */
+export function g4BestPartyOf(text) {
+  const lines = String(text).split("\n");
+  const problems = [];
+  const empty = { ym: null, shares: null, problems };
+  const q = lines.findIndex((l) => /G4\.\s*Now turning to the cost of living/i.test(l) && /best party/i.test(l));
+  if (q < 0) { problems.push("no 'G4.' best-party question in the report"); return empty; }
+  const MON = "JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER";
+  let head = -1, ym = null;
+  for (let i = q - 1; i >= Math.max(0, q - 16); i--) {
+    if (lines[i].includes("\f")) break;
+    const m = lines[i].match(new RegExp(`^\\s*(${MON})\\s*[‘'']?(\\d{2,4})\\s*\\(%\\)\\s+TOTAL\\b`, "i"));
+    if (!m) continue;
+    head = i;
+    const yr = m[2].length === 2 ? 2000 + +m[2] : +m[2];
+    ym = `${yr}-${String(MON3[m[1].slice(0, 3).toUpperCase()] + 1).padStart(2, "0")}`;
+    break;
+  }
+  if (head < 0) { problems.push("no MONTH 'YY (%) TOTAL header above the G4 question"); return empty; }
+  const shares = {};
+  for (let i = head + 1; i < Math.min(head + 14, q + 1); i++) {
+    const cells = lines[i].trim().split(/\s{2,}/).filter(Boolean);
+    if (cells.length < 2 || !/^\d{1,2}$/.test(cells[1])) continue;
+    const key = /^Labor Party$/i.test(cells[0]) ? "alp"
+      : /^(Coalition|Liberal ?\/ ?Nationals? ?Coalition|Liberal ?\/ ?National\*?)$/i.test(cells[0]) ? "lnp"
+      : /^One Nation$/i.test(cells[0]) ? "onp"
+      : /^The Greens$/i.test(cells[0]) ? "grn"
+      : /^Neither ?\/ ?someone else$/i.test(cells[0]) ? "oth"
+      : /^Can['’]t say$/i.test(cells[0]) ? "unsure" : null;
+    if (!key) continue;
+    if (shares[key] != null) { problems.push(`G4 row '${cells[0]}' appears twice`); continue; }
+    const v = +cells[1];
+    if (v > 60) { problems.push(`G4 '${cells[0]}' TOTAL reads ${v} – implausible`); continue; }
+    shares[key] = v;
+  }
+  if (shares.alp == null || shares.lnp == null) { problems.push("no Labor/Coalition TOTAL row under the G4 header"); return empty; }
+  if ((shares.onp == null) !== (shares.grn == null)) problems.push("only one of the One Nation / The Greens rows read");
+  if (shares.unsure != null) problems.push("a 'Can't say' row read – the table has never printed one; has the layout changed?");
+  const rest = 100 - Object.values(shares).reduce((a, b) => a + b, 0);
+  if (rest < 5 || rest > 60) problems.push(`the G4 rows leave rest ${rest} of 100 – implausible`);
+  if (problems.length) return empty;
+  return { ym, shares: { ...shares, rest }, problems };
+}
+
 const slugOf = (url) => decodeURIComponent(url.split("/").pop())
   .replace(/\.pdf$/i, "").replace(/[^A-Za-z0-9._-]+/g, "_");
 
@@ -468,7 +527,16 @@ async function main() {
         status.pending.push(`${g.ym}: the concerns table's own column is ${concerns.columns[concerns.columns.length - 1]}, not the wave's ${meta.date.slice(0, 7)}`);
         concerns = null;
       }
-      waves.set(meta.wave, { slug, meta, cols: chart.columns, page: cand.page, published: cand.published, table, concerns });
+      // the G4 best-party table banks the same way
+      let g4 = g4BestPartyOf(text);
+      if (g4.problems.length) {
+        status.pending.push(`${g.ym}: the G4 best-party table didn't read (${g4.problems[0]})`);
+        g4 = null;
+      } else if (g4.ym !== meta.date.slice(0, 7)) {
+        status.pending.push(`${g.ym}: the G4 table's month is ${g4.ym}, not the wave's ${meta.date.slice(0, 7)}`);
+        g4 = null;
+      }
+      waves.set(meta.wave, { slug, meta, cols: chart.columns, page: cand.page, published: cand.published, table, concerns, g4 });
       done = true;
     }
     if (!done && ![...waves.values()].some((w) => w.meta.date.startsWith(g.ym))) {
@@ -591,10 +659,33 @@ async function main() {
         return { month: ym, mention: vals[vals.length - 1] };
       });
     }
+    // the G4 best-party tables bank beside the concerns: each wave's table
+    // prints its own wave only (no reprints), so a month is sighted once,
+    // from its own report's TOTAL column
+    const byWaveG4 = new Map([...waves.entries()].filter(([, x]) => x.g4)
+      .map(([w, x]) => [w, x.g4]));
+    for (const f of fs.readdirSync(SRC).filter((f) => f.endsWith(".json")).sort()) {
+      let side;
+      try { side = JSON.parse(fs.readFileSync(path.join(SRC, f), "utf8")); } catch { continue; }
+      if (!side || side.wave == null || side.date == null || waves.has(side.wave) || byWaveG4.has(side.wave)) continue;
+      const slug = f.replace(/\.json$/, "");
+      const txtPath = path.join(SRC, slug + ".txt");
+      if (!fs.existsSync(txtPath)) continue;
+      const g4 = g4BestPartyOf(fs.readFileSync(txtPath, "utf8"));
+      if (g4.problems.length) { status.pending.push(`${slug}: the cached G4 best-party table didn't read (${g4.problems[0]})`); continue; }
+      if (g4.ym !== side.date.slice(0, 7)) {
+        status.pending.push(`${slug}: the cached G4 table's month is ${g4.ym}, not the wave's ${side.date.slice(0, 7)}`);
+        continue;
+      }
+      byWaveG4.set(side.wave, g4);
+    }
+    const bestParty = {};
+    for (const [, x] of [...byWaveG4.entries()].sort((a, b) => a[0] - b[0])) bestParty[x.ym] = x.shares;
     const out = {
-      _about: "Unprompted issue concerns from SEC Newgate's Mood of the Nation tracking study – the B1 table ('What are the main issues facing Australians that are most important to you right now?'), an OPEN-ENDED question taking any number of mentions in the voter's own words, printed per wave as '% MENTIONING EACH' for the wave's top issues (so shares don't sum to 100, and levels sit well above the forced top-three salience the Issues panel pools – which is why nothing there reads this; banked by .build/extract-secnewgate.mjs as waves land, as a reference series). Each wave's report carries its own column and reprints its two predecessors (plus a MAR '22 anchor); sightings of a month across reports must agree. Unlike the direction question, the April 2026 Special Edition asked B1, so 2026-04 enters from the May and July 2026 reprints. The B5/B6 objective-priority ratings later in each report are not banked. month = fieldwork-end month, keying the wave's direction[] row in data/polls.json.",
+      _about: "Unprompted issue concerns from SEC Newgate's Mood of the Nation tracking study – the B1 table ('What are the main issues facing Australians that are most important to you right now?'), an OPEN-ENDED question taking any number of mentions in the voter's own words, printed per wave as '% MENTIONING EACH' for the wave's top issues (so shares don't sum to 100, and levels sit well above the forced top-three salience the Issues panel pools – which is why nothing there reads this; banked by .build/extract-secnewgate.mjs as waves land, as a reference series). Each wave's report carries its own column and reprints its two predecessors (plus a MAR '22 anchor); sightings of a month across reports must agree. Unlike the direction question, the April 2026 Special Edition asked B1, so 2026-04 enters from the May and July 2026 reprints. The B5/B6 objective-priority ratings later in each report are not banked. bestParty banks the G4 question, asked every wave: 'Which of the following do you think would be the best party to manage the cost of living?' – per fieldwork month the shares its table prints (alp, lnp the Coalition under the wave's own label, onp/grn options from May 2026, oth the 'Neither / someone else' row where printed) plus rest, the balance of 100: 'Can't say' alone once oth is printed, 'Neither/someone else' and 'Can't say' combined otherwise, and both inside oth before. The Issues panel's ownership pool reads the May 2026-on rows via .build/issues.mjs. month = fieldwork-end month, keying the wave's direction[] row in data/polls.json.",
       issues: Object.keys(series),
       series,
+      bestParty,
     };
     const outJson = JSON.stringify(out, null, 1) + "\n";
     if (!fs.existsSync(ISSUES_OUT) || fs.readFileSync(ISSUES_OUT, "utf8") !== outJson) {

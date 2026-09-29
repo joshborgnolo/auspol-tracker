@@ -2559,10 +2559,13 @@ if (demographics) {
    headline's three weeks would often hold one poll or none).
    Who is best on each issue (ownership). Resolve, RedBridge and Ipsos ask
    which party is best on an issue every month, YouGov (Aug 2026) and
-   DemosAU (Feb 2026) once each, and they offer different options: Resolve
-   no Greens and, until July 2026, no One Nation; Ipsos no One Nation until
-   June 2026; RedBridge "all about equal" and the Liberals and Nationals
-   apart; YouGov and DemosAU a single don't-know. DemosAU's February poll
+   DemosAU (Feb 2026) once each, SEC Newgate the best party to manage the
+   cost of living every two months, and they offer different options:
+   Resolve no Greens and, until July 2026, no One Nation; Ipsos no One
+   Nation until June 2026; RedBridge "all about equal" and the Liberals and
+   Nationals apart; YouGov and DemosAU a single don't-know; SEC Newgate
+   One Nation and the Greens only from May 2026, "neither" and "can't say"
+   not shown separately from then. DemosAU's February poll
    has too few other houses' polls around it for a lean to be measured, so
    it pools as published. The part every current
    question shares is the choice between Labor, the Coalition and One
