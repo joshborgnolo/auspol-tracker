@@ -968,7 +968,9 @@ body.rd .view-how { margin-top: 16px; }
   body.rd .rd-dir-pct { font-size: 20px; }
   body.rd .rd-dir-k { font-size: 13px; }
   body.rd .rd-dir-bar { height: 14px; }
-  body.rd .rd-dir-net { margin-top: 32px; font-size: 14px; }
+  /* the net reading is the bar's caption on a phone: centred under it at a
+     caption's gap, well inside the 28px the section then steps to the chart */
+  body.rd .rd-dir-net { margin-top: 14px; font-size: 14px; text-align: center; }
   body.rd .rd-dir-chart { margin-top: 28px; }
 }
 
