@@ -3545,7 +3545,7 @@ body.rd .rd-pl-detail {
   display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 48px; row-gap: 24px;
   padding: 16px 16px 20px; background: var(--surface-2); font-size: 13px; color: var(--ink-2);
 }
-body.rd .rd-pld-h { font-size: 11px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-3); margin-bottom: 10px; }
+body.rd .rd-pld-h { font-size: 11px; font-weight: 600; color: var(--ink-3); margin-bottom: 10px; }
 body.rd .rd-pld-prim { display: flex; gap: 22px; margin-bottom: 12px; }
 body.rd .rd-pld-prim > span { display: flex; flex-direction: column; gap: 2px; }
 body.rd .rd-pld-prim b { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
@@ -4464,8 +4464,8 @@ body.rd .rd-apd-l.poll-detail { padding: 0; background: transparent; font-family
 body.rd .rd-apd-l.poll-detail.copy-wide { padding: 28px 24px; background: var(--surface-2); }
 body.rd .rd-apd-l .poll-copy-btn { bottom: 8px; right: 0; }
 body.rd .rd-apd-r { display: flex; flex-direction: column; min-width: 0; }
-body.rd .rd-pld-h .rd-nocaps, body.rd .rd-apd-h .rd-nocaps { text-transform: none; letter-spacing: 0.02em; white-space: nowrap; }
-body.rd .rd-apd-h { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; line-height: 1.5; color: var(--ink-3); }
+body.rd .rd-pld-h .rd-nocaps, body.rd .rd-apd-h .rd-nocaps { text-transform: none; white-space: nowrap; }
+body.rd .rd-apd-h { font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--ink-3); }
 body.rd .rd-apd-prim { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
 body.rd .rd-apd-prim > span { width: 64px; display: flex; flex-direction: column; gap: 1px; }
 body.rd .rd-apd-prim b { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; }
@@ -55497,6 +55497,30 @@ function infoTerms(D) {
     houseCounts[baseHouse(h)] = (houseCounts[baseHouse(h)] || 0) + counts[h];
   });
   const sources = Object.keys(houseCounts).sort((a, b) => houseCounts[b] - houseCounts[a]).join(", ");
+  const dirSources = (() => {
+    const polls = D.directionPolls || [],
+      n = {};
+    polls.forEach(d => {
+      n[d.pollster] = (n[d.pollster] || 0) + 1;
+    });
+    const ymLong = ym => D.monthNameFull(Number(ym.slice(5))) + " " + ym.slice(0, 4);
+    const list = a => a.length > 2 ? a.slice(0, -1).join(", ") + ", and " + a[a.length - 1] : a.join(" and ");
+    const inactive = (D.directionHousesAll || []).filter(h => /inactive/.test(h)).map(h => h.replace(/ \(inactive\)/, ""));
+    const active = Object.keys(n).filter(h => !inactive.includes(h)).sort((a, b) => n[b] - n[a]);
+    const top = active[0];
+    if (!top) return "";
+    const rest = active.slice(1);
+    const out = ["Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + n[top] + " of the " + polls.length + " since May 2025."];
+    if (rest.length) out.push(list(rest) + " supply the rest.");
+    rest.filter(h => n[h] === 1).forEach(h => {
+      out.push(h + " has asked it only once, in " + ymLong(polls.find(d => d.pollster === h).ym) + ".");
+    });
+    inactive.forEach(h => {
+      const ym = (D.directionStoppedSince || {})[h];
+      out.push(h + " asked it too" + (ym ? " until it became inactive in " + ymLong(ym) : ", but has stopped") + ".");
+    });
+    return out.join(" ");
+  })();
   const SL = D.synthLatest;
   const hl = SL && SL.ci95 != null ? {
     ci: SL.ci95,
@@ -55994,7 +56018,7 @@ function infoTerms(D) {
     entries: [{
       id: "direction",
       term: "National direction",
-      body: React.createElement(React.Fragment, null, "Whether voters think the country is heading in the right direction or is on the wrong track. Only ", (D.directionHouses || []).length, " pollsters ask it (", (D.directionHouses || []).join(", "), "), with slightly different wording, and not every poll includes it.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "Whether voters think the country is heading in the right direction or is on the wrong track. Only ", (D.directionHouses || []).length, " pollsters ask it, with slightly different wording, and not every poll includes it. ", dirSources, React.createElement("span", {
         className: "info-p"
       }, "Right direction and wrong track are each averaged separately and adjusted for each pollster\u2019s ", xref("house-lean", "direction", "lean"), ", as the vote is. The undecided share is whatever is left. SEC Newgate makes everyone choose, so its readings have no undecided share and sit higher on both lines; the lean adjustment takes this out."), React.createElement("span", {
         className: "info-p"
@@ -59910,33 +59934,8 @@ function RdDirection({
   }];
   const evs = bondi ? [bondi] : [];
   const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
-  const counts = {};
-  (D.directionPolls || []).forEach(d => {
-    counts[d.pollster] = (counts[d.pollster] || 0) + 1;
-  });
-  const total = (D.directionPolls || []).length;
-  const houses = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
-  const inactive = (D.directionHousesAll || []).filter(h => /inactive/.test(h)).map(h => h.replace(/ \(inactive\)/, ""));
-  const active = houses.filter(h => !inactive.includes(h));
-  const top = houses[0];
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
-  const ymLong = ym => D.monthNameFull(Number(ym.slice(5))) + " " + ym.slice(0, 4);
-  const topYM = D.directionPolls || [];
-  const others = active.filter(h => h !== top);
-  const rdListOx = arr => arr.length > 2 ? arr.slice(0, -1).join(", ") + ", and " + arr[arr.length - 1] : rdList(arr);
-  const othersClause = others.length ? rdListOx(others) + " supply the rest" : "";
-  const sparseBits = others.filter(h => counts[h] === 1).map(h => {
-    const row = topYM.find(d => d.pollster === h);
-    return h + " has supplied only one direction reading, in " + ymLong(row.ym);
-  });
-  const sinceGroups = new Map();
-  inactive.forEach(h => {
-    const ym = (D.directionStoppedSince || {})[h];
-    sinceGroups.set(ym, (sinceGroups.get(ym) || []).concat(h));
-  });
-  const inactiveBits = [...sinceGroups.entries()].map(([ym, hs]) => rdList(hs) + (ym ? " became inactive in " + ymLong(ym) : (hs.length > 1 ? " have" : " has") + " stopped asking"));
-  const tail = sparseBits.concat(inactiveBits).join("; ");
-  const foot = top ? "Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + counts[top] + " of the " + total + " since May 2025." + (othersClause ? " " + othersClause + "." : "") + (tail ? " " + tail + "." : "") + " The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
+  const foot = last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   return React.createElement(RdSec, {

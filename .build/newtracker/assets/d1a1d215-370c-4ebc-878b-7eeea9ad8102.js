@@ -5809,6 +5809,31 @@ function infoTerms(D) {
   const houseCounts = {};
   Object.keys(counts).forEach((h) => { houseCounts[baseHouse(h)] = (houseCounts[baseHouse(h)] || 0) + counts[h]; });
   const sources = Object.keys(houseCounts).sort((a, b) => houseCounts[b] - houseCounts[a]).join(", ");
+  /* National direction's sources, as the panel's foot used to give them: the
+     main supplier and its share, the rest, any house on a lone reading
+     (dated), and any house that has stopped (by its first quiet month). */
+  const dirSources = (() => {
+    const polls = D.directionPolls || [], n = {};
+    polls.forEach((d) => { n[d.pollster] = (n[d.pollster] || 0) + 1; });
+    const ymLong = (ym) => D.monthNameFull(Number(ym.slice(5))) + " " + ym.slice(0, 4);
+    const list = (a) => a.length > 2 ? a.slice(0, -1).join(", ") + ", and " + a[a.length - 1] : a.join(" and ");
+    const inactive = (D.directionHousesAll || []).filter((h) => /inactive/.test(h)).map((h) => h.replace(/ \(inactive\)/, ""));
+    const active = Object.keys(n).filter((h) => !inactive.includes(h)).sort((a, b) => n[b] - n[a]);
+    const top = active[0];
+    if (!top) return "";
+    const rest = active.slice(1);
+    const out = ["Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": "
+      + n[top] + " of the " + polls.length + " since May 2025."];
+    if (rest.length) out.push(list(rest) + " supply the rest.");
+    rest.filter((h) => n[h] === 1).forEach((h) => {
+      out.push(h + " has asked it only once, in " + ymLong(polls.find((d) => d.pollster === h).ym) + ".");
+    });
+    inactive.forEach((h) => {
+      const ym = (D.directionStoppedSince || {})[h];
+      out.push(h + " asked it too" + (ym ? " until it became inactive in " + ymLong(ym) : ", but has stopped") + ".");
+    });
+    return out.join(" ");
+  })();
   /* The 2PP the hero leads with is the implied one (tppBasis defaults to
      "imp"), so every figure quoted "beside the headline" is read off that
      nowcast; the published one stands in only if the implied window is empty. */
@@ -6647,9 +6672,8 @@ function infoTerms(D) {
     { id: "g-mood", title: "The national mood", entries: [
       { id: "direction", term: "National direction", body: (
         <>Whether voters think the country is heading in the right direction or is on the wrong
-        track. Only {(D.directionHouses || []).length} pollsters ask it
-        ({(D.directionHouses || []).join(", ")}), with slightly different wording, and not every
-        poll includes it.
+        track. Only {(D.directionHouses || []).length} pollsters ask it, with slightly different
+        wording, and not every poll includes it. {dirSources}
         <span className="info-p">Right direction and wrong track are each averaged separately and
         adjusted for each pollster’s {xref("house-lean", "direction", "lean")}, as the vote is. The
         undecided share is whatever is left. SEC Newgate makes everyone choose, so its readings have

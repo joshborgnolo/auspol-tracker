@@ -920,43 +920,10 @@ function RdDirection({ rangeId }) {
   ].filter(Boolean) }];
   const evs = bondi ? [bondi] : [];
   const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
-  const counts = {};
-  (D.directionPolls || []).forEach((d) => { counts[d.pollster] = (counts[d.pollster] || 0) + 1; });
-  const total = (D.directionPolls || []).length;
-  const houses = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
-  const inactive = (D.directionHousesAll || []).filter((h) => /inactive/.test(h)).map((h) => h.replace(/ \(inactive\)/, ""));
-  const active = houses.filter((h) => !inactive.includes(h));
-  const top = houses[0];
+  /* who supplies the readings, and how many, lives in Info's National
+     direction entry; the foot keeps only the note about the figures above */
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
-  const ymLong = (ym) => D.monthNameFull(Number(ym.slice(5))) + " " + ym.slice(0, 4);
-  const topYM = (D.directionPolls || []);
-  const others = active.filter((h) => h !== top);
-  /* an Oxford comma only here: the house list closes a sentence of its own,
-     every other list in the panel keeps rdList's bare "and" */
-  const rdListOx = (arr) => arr.length > 2 ? arr.slice(0, -1).join(", ") + ", and " + arr[arr.length - 1] : rdList(arr);
-  const othersClause = others.length ? rdListOx(others) + " supply the rest" : "";
-  /* a house on a lone reading says so, dated; a stopped house is dated by its
-     first quiet month (gen-data's directionStoppedSince). Both share one
-     sentence, closing the footer before the headline note */
-  const sparseBits = others.filter((h) => counts[h] === 1).map((h) => {
-    const row = topYM.find((d) => d.pollster === h);
-    return h + " has supplied only one direction reading, in " + ymLong(row.ym);
-  });
-  const sinceGroups = new Map();
-  inactive.forEach((h) => {
-    const ym = (D.directionStoppedSince || {})[h];
-    sinceGroups.set(ym, (sinceGroups.get(ym) || []).concat(h));
-  });
-  const inactiveBits = [...sinceGroups.entries()].map(([ym, hs]) =>
-    rdList(hs) + (ym
-      ? " became inactive in " + ymLong(ym)
-      : (hs.length > 1 ? " have" : " has") + " stopped asking")
-  );
-  const tail = sparseBits.concat(inactiveBits).join("; ");
-  const foot = top ? "Most readings are " + top + (top === "Roy Morgan" ? "’s weekly poll" : "’s") + ": " + counts[top] + " of the " + total + " since May 2025."
-    + (othersClause ? " " + othersClause + "." : "")
-    + (tail ? " " + tail + "." : "")
-    + " The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
+  const foot = last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
   const asked = rdList(D.directionHouses || []);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   return (
