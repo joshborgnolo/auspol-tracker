@@ -121,8 +121,7 @@ Two more walk families ride the same ideas:
   when EVERY out holds — no modifiers, `defaultPrevented` clear,
   `document.activeElement` is body/html, no `.rd-qpanel`/`.term-pop` open,
   text selection collapsed — then walks `TABS` ids through `goTab`,
-  WRAPPING round the ends (d57fdfe — the finger swipe still clamps; a
-  swipe off the last page should do nothing). The navbar's own
+  WRAPPING round the ends (d57fdfe). The navbar's own
   `Tabs.onTabKeyDown` (which always wrapped, `(i ± 1 + n) % n`) covers
   the focused-tab case, so the focused-control bail is correct everywhere
   else.
@@ -132,6 +131,42 @@ phone cards at 480px), the row-level facet walk (tab `aria-pressed` index
 + focus never leaving the table, wrapRight/wrapLeft at the ends), and the
 page walk incl. wrap + meta+arrow no-op. `.matilda/` is gitignored —
 probes stay local.
+
+## Phone swipes WRAP too, and the hero chart takes one (4b901b0, 2026-09-29)
+
+The touch layer beside the keydown (`swipeRef` effect, 73de0c58 ~:2100-2190;
+phone-only ≤640px, 60px min flick, 800ms cap, 24px system-edge guard,
+≤12px scroll drift, collapsed-selection guard) drives two steppers, and
+since 4b901b0 BOTH wrap round the ends `(i + dir + len) % len`, matching
+the arrow-key walks (user ask the same day; an earlier deliberate clamp —
+"a swipe off the last page should do nothing" — is obsolete):
+
+- **A swipe tab row** (`RdTabs swipe` prop → element `data-rd-swipe` +
+  `__rdSwipe(dir)` on the DOM node) — its `live.current` closure now steps
+  with wrap. Swiping anywhere in the row's ownership window (row rect
+  bottom + 120px, or its owner section bottom, whichever is lower) fires it.
+- **The page turn** (no row owns the touch point) — `go(ids[i±1 mod n])`
+  turns the main view and wraps snapshot↔info both ways.
+
+The exact-claim exception: a touch starting inside an element marked
+`data-rd-swipe-exact` skips the `claimsSideways(e.target)` ancestor-walk
+bail (inputs/sliders, `touch-action` outside auto/manipulation/pan-x,
+overflow-x scrollers) and the row nearest-search — the element's own
+`__rdSwipe` gets the gesture. The ONE claimer is the hero's
+`.rd-tpp-chart` card (rd-hero.jsx): a sideways swipe on the 2PP chart
+flips the hero matchup circularly through `orderedMatchups` via
+`chooseMatchup` (`swipeLive`/`swipeMark` refs set beside `orderedMatchups`),
+which is needed because the TrendChart svg's own `touch-action` for its
+scrub rectangle made `claimsSideways` reject touches beginning on the
+chart — the card itself registering `__rdSwipe` keeps the rest of the
+page's claim logic untouched (a swipe on the hero's range tabs row still
+steps views).
+
+Probe: `.matilda/probe-swipe-wrap.mjs` (480×900, `page.touchscreen`
+touchStart/Move/End flicks) — hero card swipes cycle every matchup and
+wrap both directions without turning the page; the who-votes view row
+swipes wrap Home→Age and Age→Home; the page turn wraps snapshot→info and
+info→snapshot swiping on the verdict strip, which no row owns.
 
 ## Probe: .matilda/probe-rdtabs-keys.mjs
 
