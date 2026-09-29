@@ -3239,6 +3239,71 @@ function ArchDirCell({ d }) {
   );
 }
 
+// issues facet – the two row-level readouts, shared by the archive table's
+// cells and the CSV export. `top` quotes whichever what-matters question the
+// wave asked: the forced top-three salience list first (every house but SEC
+// Newgate), else SEC's unprompted most-mentioned concern (a mention share,
+// not a top-three share – the two never mix in the same cell without a say).
+function issTopOf(iss) {
+  if (!iss) return null;
+  if (iss.sal && iss.sal.length) return [iss.sal[0][0], iss.sal[0][1], iss.sal[0][2] ?? null];
+  if (iss.conc && iss.conc.length) return [iss.conc[0][0], iss.conc[0][1], null];
+  return null;
+}
+/* …and `best` answers "who do voters trust with it", in confidence order:
+   the pool's lean-adjusted verdict (iss.plus.lead, quoted at the wave's own
+   share), then the wave's own printed three-way figures at its top issue,
+   then SEC Newgate's printed best-party table (its one standing issue
+   question). The cell titles say which tier the number came from. */
+const ISS_PARTY_META = {
+  alp: ["Labor", "ALP", "var(--alp-text)"],
+  lnp: ["the Coalition", "L/NP", "var(--lnp-text)"],
+  onp: ["One Nation", "ON", "var(--onp-text)"],
+  grn: ["the Greens", "GRN", "var(--grn-text)"],
+  rest: ["the rest", "rest", null],
+  oth: ["the rest", "rest", null],
+};
+function issBestOf(iss) {
+  if (!iss) return null;
+  const argmax = (sh, keys) => {
+    let best = null;
+    for (const k of keys) if (sh && sh[k] != null && (!best || sh[k] > best.v)) best = { k, v: sh[k] };
+    return best;
+  };
+  if (iss.plus && iss.plus.lead && iss.own && iss.own[iss.top] && iss.own[iss.top][iss.plus.lead] != null)
+    return { who: iss.plus.lead, v: iss.own[iss.top][iss.plus.lead], src: "plus", lean: iss.plus.lean ?? null };
+  const own = iss.own && iss.own[iss.top] ? argmax(iss.own[iss.top], ["alp", "lnp", "onp", "grn"]) : null;
+  if (own) return { who: own.k, v: own.v, src: "own" };
+  const g4 = iss.bp ? argmax(iss.bp, ["alp", "lnp", "onp", "grn", "rest"]) : null;
+  if (g4) return { who: g4.k, v: g4.v, src: "g4" };
+  return null;
+}
+
+// the top-issue cell: the issue most voters name first, and the share naming
+// it. SEC's unprompted concern reading is flagged, since its answer set
+// ("any mention") isn't the pooled question's.
+function ArchIssTop({ iss }) {
+  const t = issTopOf(iss);
+  if (!t) return <span className="dash" title="No issues questions this wave">—</span>;
+  const unprompted = !(iss && iss.sal);
+  return <span className="arch-iss-top" title={unprompted ? "SEC Newgate's unprompted most-mentioned concern – shares of any mentions, not a forced top three" : null}>{t[0]} <b>{t[1]}</b></span>;
+}
+
+// best-on-it: a party-tinted chip plus the share, so the verdict reads
+// without expanding the row. `rest` waves (SEC's early printed eras) keep
+// the site-neutral ink rather than a party's.
+function ArchIssBest({ iss }) {
+  const b = issBestOf(iss);
+  if (!b) return <span className="dash" title="No best-party question this wave">—</span>;
+  const meta = ISS_PARTY_META[b.who] || [b.who, b.who, null];
+  const title = b.src === "plus"
+    ? "Best party on " + ((iss && iss.top) || "the issue") + ", house-lean-adjusted (this house's own share quoted)"
+    : b.src === "g4"
+      ? "SEC Newgate's printed best-party-on-the-cost-of-living figures"
+      : "This wave's own printed best-party figures";
+  return <span className="arch-iss-best" title={title}><b style={meta[2] ? { color: meta[2] } : undefined}>{meta[1]}</b>{" "}{b.v}</span>;
+}
+
 function ArchApprCell({ s, net, metric }) {
   const { NetVal, FavMark } = window;
   if (net == null) return <span className="dash" title="Not asked by this pollster">—</span>;
@@ -3654,6 +3719,7 @@ const POLL_TAGS = [
   { id: "fav",   label: "Fav",   title: "Leader favourability (positive − negative)" },
   { id: "seats", label: "Seats", title: "Modelled seat projection with range – MRP polls only" },
   { id: "dir",   label: "Dir",   title: "National direction – right direction / wrong track" },
+  { id: "iss",   label: "Iss",   title: "Issues – what voters say matters, and the party rated best on it" },
 ];
 const POLL_TAG_META = Object.fromEntries(POLL_TAGS.map((t) => [t.id, t]));
 /* URL state for the archive's two multi-selects (pollsters w=, tags h=) rides
@@ -3669,7 +3735,7 @@ const POLL_TAG_META = Object.fromEntries(POLL_TAGS.map((t) => [t.id, t]));
 const URL_HOUSES = [
   "Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater",
   "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy",
-  "Wolf & Smith", "YouGov", "SEC Newgate",
+  "Wolf & Smith", "YouGov", "SEC Newgate", "Ipsos",
 ];
 const archMask = (order, set) => {
   let m = 0;
@@ -3712,6 +3778,7 @@ function pollTagIds(p) {
   if (anyFav) t.push("fav");
   if (p.seats && p.seats.p) t.push("seats");
   if (p.dir) t.push("dir");
+  if (p.iss) t.push("iss");
   return t;
 }
 
@@ -4694,6 +4761,18 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const housesDir = [...houses];
   dirOnlyAll.forEach((p) => { const b = baseHouse(p.pollster); if (!housesDir.includes(b)) housesDir.push(b); });
   housesDir.sort();
+  /* Ipsos is the direction-only case one question further still: it asks
+     issues and nothing else, so its waves come as issuesOnlyPolls and join
+     the row set (and its house the panel and URL set) on the issues facet
+     only. SEC Newgate's direction-only rows ride there too – they carry the
+     wave's concerns and best-party readings in their iss payload. */
+  const issOnlyAll = D.issuesOnlyPolls || [];
+  const housesIss = [...housesDir];
+  issOnlyAll.forEach((p) => { const b = baseHouse(p.pollster); if (!housesIss.includes(b)) housesIss.push(b); });
+  housesIss.sort();
+  /* every house appearing on ANY facet – the "of N pollsters" tallies count
+     the archive's full house list, not the facet the reader is standing on */
+  const housesAll = [...housesIss];
 
   /* What each view needs a poll to have published. Primary vote is on every
      poll in the archive, so it has nothing to scope and gets no pill. It sits
@@ -4718,6 +4797,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     primary: null,
     leadership: { has: (p) => window.ppmContests(p).length > 0 || (p.appr && (p.appr.albNet != null || p.appr.taylorNet != null || p.appr.hansonNet != null)), label: "With leadership numbers" },
     direction: { has: (p) => !!p.dir, label: "With a direction reading" },
+    issues: { has: (p) => !!p.iss, label: "With issues figures" },
   };
   /* The two published-only matchups are measured by almost no wave – five
      waves print an L/NP v ON figure, four a three-cornered one – so
@@ -4744,6 +4824,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     { id: "primary", label: "Primary" },
     { id: "leadership", label: "Leadership" },
     { id: "direction", label: "Direction" },
+    { id: "issues", label: "Issues" },
   ];
   /* Party columns rank by the aggregate (gen-data's latest.primaryOrder –
      highest leftmost, a party only overtaking once it leads by a full point,
@@ -4780,7 +4861,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      and tag values out as comma-joined names. All spellings are still read
      here, the short key winning if a hand-edited URL carries both; only
      the short keys and mask values are ever written. */
-  const FACET_BY_URL = { p: "primary", l: "leadership", d: "direction", primary: "primary", leadership: "leadership", direction: "direction" };
+  const FACET_BY_URL = { p: "primary", l: "leadership", d: "direction", i: "issues", primary: "primary", leadership: "leadership", direction: "direction", issues: "issues" };
   const MEAS_BY_URL = { o: "onp", lo: "lnponp", "3": "3cp", c: "lnp", onp: "onp", lnponp: "lnponp", "3cp": "3cp", lnp: "lnp" };
   /* The lead column opens on the rival Labor is doing WORST against – the
      hero's own ruling (latest.rivalLead, deadbanded in gen-data so it
@@ -4804,9 +4885,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         const raw = get("w", "who") || "";
         const mask = archUnpack(raw, URL_HOUSES);
         /* the valid set follows the facet the link restores: a direction-only
-           house's rows exist only on the direction facet, so its selection is
-           stale anywhere else */
-        const known = view === "direction" ? housesDir : houses;
+           house's rows exist only on the direction facet (an issues-only one
+           likewise on the issues facet), so its selection is stale anywhere
+           else */
+        const known = view === "direction" ? housesDir : view === "issues" ? housesIss : houses;
         return (mask ? [...mask] : raw.split(",").map(baseHouse)).filter((h) => known.includes(h));
       })(),
       has: (() => {
@@ -4966,9 +5048,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      above): every count, panel option and filter below derives from this
      one merged list, so a SEC Newgate wave is rankable, searchable and
      self-scoping on its facet and invisible everywhere else. */
-  const dirOnly = facet === "direction" ? dirOnlyAll : [];
-  const housesV = dirOnly.length ? housesDir : houses;
-  const rows = [...D.individualPolls, ...dirOnly].map((p) => {
+  const dirOnly = facet === "direction" ? dirOnlyAll
+    : facet === "issues" ? dirOnlyAll.filter((p) => p.iss) : [];
+  const issOnly = facet === "issues" ? issOnlyAll : [];
+  const housesV = facet === "issues" ? housesIss : dirOnly.length ? housesDir : houses;
+  const rows = [...D.individualPolls, ...dirOnly, ...issOnly].map((p) => {
     const [y, mo] = p.ym.split("-").map(Number);
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
     const fieldLabel = y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
@@ -5030,6 +5114,12 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       hayParts.push("direction right track wrong track",
         f1(p.dir.right), f1(p.dir.wrong), f1(p.dir.unsure),
         (p.dir.net > 0 ? "+" : "") + p.dir.net);
+    }
+    if (p.iss) {
+      hayParts.push("issues salience best party");
+      (p.iss.sal || []).concat(p.iss.conc || []).forEach(([lab, v]) => hayParts.push(lab, String(v)));
+      const ib = issBestOf(p.iss);
+      if (ib) hayParts.push(ib.who, String(ib.v));
     }
     hayParts.push(...tags);   // so "fav", "ppm" etc. match in the search box too
     const hay = hayParts.join(" ").toLowerCase();
@@ -5110,6 +5200,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       case "dir.right": return p.dir ? p.dir.right : -Infinity;
       case "dir.wrong": return p.dir ? p.dir.wrong : -Infinity;
       case "dir.net": return p.dir ? p.dir.net : -Infinity;
+      case "iss.topv": { const t = issTopOf(p.iss); return t ? t[1] : -Infinity; }
+      case "iss.bestv": { const b = issBestOf(p.iss); return b ? b.v : -Infinity; }
       default: return 0;
     }
   };
@@ -5132,10 +5224,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
 
   const total = rows.length;
-  /* the archive's full extent, direction-only waves included: on the facets
-     those waves don't sit in, the counts acknowledge them ("163 of 173
-     polls") rather than imply the view's rows are everything there is */
-  const totalAll = D.individualPolls.length + dirOnlyAll.length;
+  /* the archive's full extent, direction-only and issues-only waves
+     included: on the facets those waves don't sit in, the counts acknowledge
+     them ("163 of 182 polls") rather than imply the view's rows are
+     everything there is */
+  const totalAll = D.individualPolls.length + dirOnlyAll.length + issOnlyAll.length;
   const clearAll = () => {
     setQ(""); setSel(new Set()); setLead("all"); setMeasure(DEFAULT_MEASURE); setRange("all");
     setTagSel(new Set()); setScope(false); setPop(null);
@@ -5171,7 +5264,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      can never clobber each other. The guard against a no-op write matters:
      without it the URL was normalised every render, and this effect also
      runs for the reader who typed a stale or partial query by hand. */
-  const FACET_BY_ID = { primary: "p", leadership: "l", direction: "d" };  // facet → URL letter (inverse of the restore map)
+  const FACET_BY_ID = { primary: "p", leadership: "l", direction: "d", issues: "i" };  // facet → URL letter (inverse of the restore map)
   const MEAS_BY_ID = { lnp: "c", onp: "o", lnponp: "lo", "3cp": "3" };    // matchup → URL letter; the page's default matchup is omitted
   const LEAD_BY_ID = { alp: "a", lnp: "l", onp: "o" };                    // holder → URL letter; "all" is the omitted default
   React.useEffect(() => {
@@ -5244,6 +5337,13 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     ["2025 GRN now ON", (p) => (p.sw && p.sw.grn != null ? p.sw.grn : "")],
     ["2025 OTH now ON", (p) => (p.sw && p.sw.oth != null ? p.sw.oth : "")],
     ["2025 ON still ON", (p) => (p.sw && p.sw.onp != null ? p.sw.onp : "")],
+    // issues waves: the top what-matters reading (salience share, or SEC
+    // Newgate's unprompted most-mentioned concern) and the best-party verdict
+    // the same confidence tiers pick (pool-adjusted, else the wave's own)
+    ["Top issue", (p) => { const t = issTopOf(p.iss); return t ? t[0] : ""; }],
+    ["Top issue %", (p) => { const t = issTopOf(p.iss); return t ? t[1] : ""; }],
+    ["Best on it", (p) => { const b = issBestOf(p.iss); return b ? (ISS_PARTY_META[b.who] || [b.who])[0] : ""; }],
+    ["Best on it %", (p) => { const b = issBestOf(p.iss); return b ? b.v : ""; }],
   ];
   const exportCsv = () => downloadCsv(
     `auspol-tracker-polls-${D.latest.updatedISO}.csv`,
@@ -5262,7 +5362,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         pills={pills} clearAll={clearAll} sort={sort} onSort={onSort} open={open} setOpen={setOpen}
         focus={focus} onBack={onBack} backLabel={backLabel} exportCsv={exportCsv} bodyRef={bodyRef}
         synthByYm={synthByYm} aggByYm={aggByYm} synthOnByYm={synthOnByYm} altOnByYm={altOnByYm}
-        ofTotal={totalAll} ofHouses={housesDir.length} />
+        ofTotal={totalAll} ofHouses={housesAll.length} />
       <RdDisagree />
       <RdHouseLean measure={measure} tppBasis={tppBasis} />
       <RdFlows />
@@ -5275,7 +5375,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         <div>
           <h2 className="card-title">All polls</h2>
           <p className="card-sub">
-            Every individual national poll in the archive, {total}{totalAll !== total ? " of " + totalAll : ""} polls from {housesDir.length} pollsters,
+            Every individual national poll in the archive, {total}{totalAll !== total ? " of " + totalAll : ""} polls from {housesAll.length} pollsters,
             {" "}{(() => {  // span computed from the data, so it stays honest as polls are added
               const f = D.individualPolls[0], l = D.individualPolls[D.individualPolls.length - 1];
               const lab = (ym) => { const [y, m] = ym.split("-").map(Number); return D.monthNameFull(m) + " " + y; };
@@ -5535,6 +5635,13 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                 <th scope="col" className="hide-md">Unsure</th>
                 <ArchSortTh label="Net" k="dir.net" sort={sort} onSort={onSort} />
               </>)}
+              {facet === "issues" && (<>
+                <ArchSortTh label="Top issue" k="iss.topv" sort={sort} onSort={onSort} className="ta-l"
+                  title="The issue most voters named, and the share naming it" />
+                <ArchSortTh label="Best on it" k="iss.bestv" sort={sort} onSort={onSort}
+                  title="The party voters trust most on that issue, and its share" />
+                <ArchSortTh label="Net direction" short="Net" k="dir.net" sort={sort} onSort={onSort} className="hide-md" />
+              </>)}
             </tr>
           </thead>
           <tbody ref={bodyRef}>
@@ -5635,6 +5742,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                   </td>
                   <td className="num muted hide-md">{p.dir ? p.dir.unsure.toFixed(1) : "—"}</td>
                   <td className="num"><ArchDirCell d={p.dir} /></td>
+                  </>)}
+                  {facet === "issues" && (<>
+                  <td className="ta-l"><ArchIssTop iss={p.iss} /></td>
+                  <td className="num"><ArchIssBest iss={p.iss} /></td>
+                  <td className="num hide-md"><ArchDirCell d={p.dir} /></td>
                   </>)}
                 </tr>
                 {isOpen && (
@@ -7009,4 +7121,6 @@ function TermPop({ id, onClose, onMore }) {
 
 Object.assign(window, { Tabs, PastCyclesView, AllPollsView, InfoView, TermPop,
   // shared cell renderers reused by the latest-polls table
-  ArchSortTh, ArchImplied, ArchPublished, ArchTpp, ArchLead, ArchApprCell, ArchDirCell, archLeadInfo });
+  ArchSortTh, ArchImplied, ArchPublished, ArchTpp, ArchLead, ArchApprCell, ArchDirCell, archLeadInfo,
+  // issues facet readouts, shared with the redesign's table
+  issTopOf, issBestOf, ISS_PARTY_META, ArchIssTop, ArchIssBest });

@@ -233,10 +233,14 @@ const tallyOf = async () => {
   const m = el.match(/^(\d+)(?: of (\d+))? polls$/);
   return m ? { shown: +m[1], of: m[2] ? +m[2] : null, text: el } : { raw: el };
 };
+const extraRows = await page4.evaluate(() => {
+  const D = window.AUSPOL;
+  return (D.directionOnlyPolls || []).length + (D.issuesOnlyPolls || []).length;
+});
 const tppTally = await tallyOf();
 check("2PP facet counts the direction-only rows in its total",
-  !!tppTally && tppTally.of === tppTally.shown + 10,
-  tppTally ? tppTally.text : "no .rd-ap-count");
+  !!tppTally && tppTally.of === tppTally.shown + extraRows,
+  tppTally ? `${tppTally.text} (extra ${extraRows})` : "no .rd-ap-count");
 for (const [facet, re] of [["Primary", /^Primary$/], ["Leaders", /^Leaders(?:hip)?$/]]) {
   await page4.evaluate((reSrc) => {
     const rx = new RegExp(reSrc);

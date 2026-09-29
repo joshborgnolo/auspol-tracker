@@ -3201,10 +3201,12 @@ body.rd .rd-swap-now.in { animation: rd-xf-in .2s ease-out .12s both; }
 @keyframes rd-ap-in-cprim { from { opacity: 0; } }
 @keyframes rd-ap-in-clead { from { opacity: 0; } }
 @keyframes rd-ap-in-cdir { from { opacity: 0; } }
+@keyframes rd-ap-in-ciss { from { opacity: 0; } }
 body.rd .rd-ap-sw.rd-ap-c2pp { --rd-ap-in: rd-ap-in-c2pp; }
 body.rd .rd-ap-sw.rd-ap-cprim { --rd-ap-in: rd-ap-in-cprim; }
 body.rd .rd-ap-sw.rd-ap-clead { --rd-ap-in: rd-ap-in-clead; }
 body.rd .rd-ap-sw.rd-ap-cdir { --rd-ap-in: rd-ap-in-cdir; }
+body.rd .rd-ap-sw.rd-ap-ciss { --rd-ap-in: rd-ap-in-ciss; }
 body.rd :is(.rd-ap-row, .rd-ap-hrow).rd-ap-sw > :nth-child(n+5):not(.rd-ap-chev),
 body.rd .rd-ap-card.rd-ap-sw > :is(.rd-ap-c1, .rd-ap-c2) > :last-child,
 body.rd .rd-ap-card.rd-ap-sw > :nth-child(n+3),
@@ -4332,6 +4334,7 @@ body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 208px) minmax(0, 208px) minmax(0, 300px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint); }
 body.rd .rd-ap-hrow > * { min-width: 0; }
 body.rd .rd-ap-hc1 { padding-left: 12px; }
@@ -4441,6 +4444,10 @@ body.rd .rd-ap-dbar i.u, body.rd .rd-ap-dbar i.u + i { border-left: 2px solid va
 body.rd .rd-ap-dbar i:first-child { border-radius: 2px 0 0 2px; }
 body.rd .rd-ap-dbar i:last-child { border-radius: 0 2px 2px 0; }
 body.rd .rd-ap-dbar i.u { background: var(--line); }
+body.rd .rd-ap-ibar { position: absolute; top: 50%; left: 14px; right: 14px; transform: translateY(-50%); display: flex; flex-direction: column; justify-content: center; gap: 3px; }
+body.rd .rd-ap-ibar-r { display: block; height: 5px; border-radius: 2.5px; background: var(--ink-3); }
+body.rd .rd-ap-ibar-r:first-child { background: var(--ink-2); }
+body.rd .rd-ap-ciss .rd-ap-dnum > .rd-ap-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 body.rd .rd-ap-empty { padding: 28px 12px; font-size: 14px; color: var(--ink-2); }
 body.rd .rd-ap-tip {
   position: absolute; bottom: calc(50% + 14px); top: auto; transform: translateX(-50%); z-index: 20;
@@ -4513,11 +4520,19 @@ body.rd .rd-apd-facts {
   font-size: 14px; line-height: 1.45; color: var(--ink-2);
 }
 body.rd .rd-apd-facts b { font-weight: 600; color: var(--ink); }
+body.rd .rd-apd-isslist { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+body.rd .rd-apd-issrow { display: grid; grid-template-columns: minmax(0, 172px) minmax(0, 1fr) 36px; align-items: center; column-gap: 12px; row-gap: 2px; min-width: 0; }
+body.rd .rd-apd-issrow > .rd-apd-sub { grid-column: 1 / -1; }
+body.rd .rd-apd-isslab { font-size: 13px; line-height: 1.35; color: var(--ink-2); }
+body.rd .rd-apd-issbar { position: relative; height: 8px; border-radius: 4px; background: var(--line-2); overflow: hidden; }
+body.rd .rd-apd-issbar i { display: block; height: 100%; border-radius: 4px; background: var(--ink-3); }
+body.rd .rd-apd-issrow > b { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
 @media (max-width: 1240px) {
   body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 176px) minmax(0, 176px) minmax(0, 260px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-long { display: none; }
 }
 body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
@@ -4526,6 +4541,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 148px) minmax(0, 148px) minmax(0, 1fr) 44px 28px; }
   body.rd .rd-ap-n, body.rd .rd-ap-hrow > .rd-ap-th:nth-child(3) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
@@ -4560,7 +4576,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-phead.rd-ap-c2pp .rd-ap-in, body.rd .rd-ap-card.rd-ap-c2pp .rd-ap-in { right: 46px; }
   body.rd .rd-ap-phead .rd-ap-cap { left: 8px; }
   body.rd .rd-ap-hdir { min-height: 20px; }
-  body.rd .rd-ap-c2pp, body.rd .rd-ap-cprim, body.rd .rd-ap-clead, body.rd .rd-ap-cdir { grid-template-columns: none; }
+  body.rd .rd-ap-c2pp, body.rd .rd-ap-cprim, body.rd .rd-ap-clead, body.rd .rd-ap-cdir, body.rd .rd-ap-ciss { grid-template-columns: none; }
   body.rd .rd-ap-mrow { display: flex; align-items: baseline; gap: 8px; padding: 22px 0 6px; }
   body.rd .rd-ap-mlab { padding-left: 0; gap: 8px; }
   body.rd .rd-ap-mlab span { font-size: 12px; }
@@ -4584,7 +4600,10 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }
   body.rd .rd-ap-card .rd-ap-dbar { left: 0; right: 0; height: 14px; margin-top: -7px; }
+  body.rd .rd-ap-card .rd-ap-ibar { left: 0; right: 0; }
   body.rd .rd-ap-open { padding: 16px 12px 18px; }
+  body.rd .rd-apd-issrow { grid-template-columns: minmax(0, 1fr) 40px; }
+  body.rd .rd-apd-issrow .rd-apd-issbar { grid-column: 1 / -1; grid-row: 2; }
   body.rd .rd-apd-prim > span { width: 54px; }
   body.rd .rd-apd-big { font-size: 22px; }
   body.rd .rd-apd-grid { grid-template-columns: 104px minmax(0, 1fr) minmax(0, 1fr); column-gap: 10px; font-size: 13px; }
@@ -57462,6 +57481,83 @@ function ArchDirCell({
     }
   })));
 }
+function issTopOf(iss) {
+  if (!iss) return null;
+  if (iss.sal && iss.sal.length) return [iss.sal[0][0], iss.sal[0][1], iss.sal[0][2] ?? null];
+  if (iss.conc && iss.conc.length) return [iss.conc[0][0], iss.conc[0][1], null];
+  return null;
+}
+const ISS_PARTY_META = {
+  alp: ["Labor", "ALP", "var(--alp-text)"],
+  lnp: ["the Coalition", "L/NP", "var(--lnp-text)"],
+  onp: ["One Nation", "ON", "var(--onp-text)"],
+  grn: ["the Greens", "GRN", "var(--grn-text)"],
+  rest: ["the rest", "rest", null],
+  oth: ["the rest", "rest", null]
+};
+function issBestOf(iss) {
+  if (!iss) return null;
+  const argmax = (sh, keys) => {
+    let best = null;
+    for (const k of keys) if (sh && sh[k] != null && (!best || sh[k] > best.v)) best = {
+      k,
+      v: sh[k]
+    };
+    return best;
+  };
+  if (iss.plus && iss.plus.lead && iss.own && iss.own[iss.top] && iss.own[iss.top][iss.plus.lead] != null) return {
+    who: iss.plus.lead,
+    v: iss.own[iss.top][iss.plus.lead],
+    src: "plus",
+    lean: iss.plus.lean ?? null
+  };
+  const own = iss.own && iss.own[iss.top] ? argmax(iss.own[iss.top], ["alp", "lnp", "onp", "grn"]) : null;
+  if (own) return {
+    who: own.k,
+    v: own.v,
+    src: "own"
+  };
+  const g4 = iss.bp ? argmax(iss.bp, ["alp", "lnp", "onp", "grn", "rest"]) : null;
+  if (g4) return {
+    who: g4.k,
+    v: g4.v,
+    src: "g4"
+  };
+  return null;
+}
+function ArchIssTop({
+  iss
+}) {
+  const t = issTopOf(iss);
+  if (!t) return React.createElement("span", {
+    className: "dash",
+    title: "No issues questions this wave"
+  }, "\u2014");
+  const unprompted = !(iss && iss.sal);
+  return React.createElement("span", {
+    className: "arch-iss-top",
+    title: unprompted ? "SEC Newgate's unprompted most-mentioned concern – shares of any mentions, not a forced top three" : null
+  }, t[0], " ", React.createElement("b", null, t[1]));
+}
+function ArchIssBest({
+  iss
+}) {
+  const b = issBestOf(iss);
+  if (!b) return React.createElement("span", {
+    className: "dash",
+    title: "No best-party question this wave"
+  }, "\u2014");
+  const meta = ISS_PARTY_META[b.who] || [b.who, b.who, null];
+  const title = b.src === "plus" ? "Best party on " + (iss && iss.top || "the issue") + ", house-lean-adjusted (this house's own share quoted)" : b.src === "g4" ? "SEC Newgate's printed best-party-on-the-cost-of-living figures" : "This wave's own printed best-party figures";
+  return React.createElement("span", {
+    className: "arch-iss-best",
+    title: title
+  }, React.createElement("b", {
+    style: meta[2] ? {
+      color: meta[2]
+    } : undefined
+  }, meta[1]), " ", b.v);
+}
 function ArchApprCell({
   s,
   net,
@@ -57973,9 +58069,13 @@ const POLL_TAGS = [{
   id: "dir",
   label: "Dir",
   title: "National direction – right direction / wrong track"
+}, {
+  id: "iss",
+  label: "Iss",
+  title: "Issues – what voters say matters, and the party rated best on it"
 }];
 const POLL_TAG_META = Object.fromEntries(POLL_TAGS.map(t => [t.id, t]));
-const URL_HOUSES = ["Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater", "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy", "Wolf & Smith", "YouGov", "SEC Newgate"];
+const URL_HOUSES = ["Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater", "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy", "Wolf & Smith", "YouGov", "SEC Newgate", "Ipsos"];
 const archMask = (order, set) => {
   let m = 0;
   order.forEach((name, i) => {
@@ -58015,6 +58115,7 @@ function pollTagIds(p) {
   if (anyFav) t.push("fav");
   if (p.seats && p.seats.p) t.push("seats");
   if (p.dir) t.push("dir");
+  if (p.iss) t.push("iss");
   return t;
 }
 function FilterPop({
@@ -59138,6 +59239,14 @@ function AllPollsView({
     if (!housesDir.includes(b)) housesDir.push(b);
   });
   housesDir.sort();
+  const issOnlyAll = D.issuesOnlyPolls || [];
+  const housesIss = [...housesDir];
+  issOnlyAll.forEach(p => {
+    const b = baseHouse(p.pollster);
+    if (!housesIss.includes(b)) housesIss.push(b);
+  });
+  housesIss.sort();
+  const housesAll = [...housesIss];
   const FACET_SCOPE = {
     twopp: {
       has: p => (pubBasis ? p.alp != null : p.alpImp != null) || p.tppAlt || p.tppAlt2 || p.tpp3,
@@ -59151,6 +59260,10 @@ function AllPollsView({
     direction: {
       has: p => !!p.dir,
       label: "With a direction reading"
+    },
+    issues: {
+      has: p => !!p.iss,
+      label: "With issues figures"
     }
   };
   const CONTEST_SCOPE = {
@@ -59176,6 +59289,9 @@ function AllPollsView({
   }, {
     id: "direction",
     label: "Direction"
+  }, {
+    id: "issues",
+    label: "Issues"
   }];
   const pOrder = D.latest && D.latest.primaryOrder || ["alp", "lnp", "grn", "onp", "oth"];
   const PCOLS = {
@@ -59219,9 +59335,11 @@ function AllPollsView({
     p: "primary",
     l: "leadership",
     d: "direction",
+    i: "issues",
     primary: "primary",
     leadership: "leadership",
-    direction: "direction"
+    direction: "direction",
+    issues: "issues"
   };
   const MEAS_BY_URL = {
     o: "onp",
@@ -59259,7 +59377,7 @@ function AllPollsView({
       who: (() => {
         const raw = get("w", "who") || "";
         const mask = archUnpack(raw, URL_HOUSES);
-        const known = view === "direction" ? housesDir : houses;
+        const known = view === "direction" ? housesDir : view === "issues" ? housesIss : houses;
         return (mask ? [...mask] : raw.split(",").map(baseHouse)).filter(h => known.includes(h));
       })(),
       has: (() => {
@@ -59410,9 +59528,10 @@ function AllPollsView({
     altOnByYm[d.ym] = d.a;
   });
   const NOW_YEAR = new Date().getFullYear();
-  const dirOnly = facet === "direction" ? dirOnlyAll : [];
-  const housesV = dirOnly.length ? housesDir : houses;
-  const rows = [...D.individualPolls, ...dirOnly].map(p => {
+  const dirOnly = facet === "direction" ? dirOnlyAll : facet === "issues" ? dirOnlyAll.filter(p => p.iss) : [];
+  const issOnly = facet === "issues" ? issOnlyAll : [];
+  const housesV = facet === "issues" ? housesIss : dirOnly.length ? housesDir : houses;
+  const rows = [...D.individualPolls, ...dirOnly, ...issOnly].map(p => {
     const [y, mo] = p.ym.split("-").map(Number);
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
     const fieldLabel = y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
@@ -59438,6 +59557,12 @@ function AllPollsView({
     }
     if (p.dir) {
       hayParts.push("direction right track wrong track", f1(p.dir.right), f1(p.dir.wrong), f1(p.dir.unsure), (p.dir.net > 0 ? "+" : "") + p.dir.net);
+    }
+    if (p.iss) {
+      hayParts.push("issues salience best party");
+      (p.iss.sal || []).concat(p.iss.conc || []).forEach(([lab, v]) => hayParts.push(lab, String(v)));
+      const ib = issBestOf(p.iss);
+      if (ib) hayParts.push(ib.who, String(ib.v));
     }
     hayParts.push(...tags);
     const hay = hayParts.join(" ").toLowerCase();
@@ -59529,6 +59654,16 @@ function AllPollsView({
         return p.dir ? p.dir.wrong : -Infinity;
       case "dir.net":
         return p.dir ? p.dir.net : -Infinity;
+      case "iss.topv":
+        {
+          const t = issTopOf(p.iss);
+          return t ? t[1] : -Infinity;
+        }
+      case "iss.bestv":
+        {
+          const b = issBestOf(p.iss);
+          return b ? b.v : -Infinity;
+        }
       default:
         return 0;
     }
@@ -59548,7 +59683,7 @@ function AllPollsView({
   const openIdx = open ? sorted.findIndex(p => p.pollster + "|" + p.released === open) : -1;
   const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
   const total = rows.length;
-  const totalAll = D.individualPolls.length + dirOnlyAll.length;
+  const totalAll = D.individualPolls.length + dirOnlyAll.length + issOnlyAll.length;
   const clearAll = () => {
     setQ("");
     setSel(new Set());
@@ -59611,7 +59746,8 @@ function AllPollsView({
   const FACET_BY_ID = {
     primary: "p",
     leadership: "l",
-    direction: "d"
+    direction: "d",
+    issues: "i"
   };
   const MEAS_BY_ID = {
     lnp: "c",
@@ -59653,7 +59789,19 @@ function AllPollsView({
   }], ["Albanese metric", p => p.appr.metricBy ? p.appr.metricBy.alb : ""], ["Opp. ldr metric", p => p.appr.metricBy ? p.appr.metricBy.taylor : ""], ["Hanson metric", p => p.appr.metricBy ? p.appr.metricBy.hanson : ""], ["Albanese net", p => p.appr.albNet], ["Opp. ldr net", p => p.appr.taylorNet], ["Hanson net", p => p.appr.hansonNet], ["Seats ALP", p => p.seats && p.seats.p.alp ? p.seats.p.alp.est : ""], ["Seats L/NP", p => p.seats && p.seats.p.lnp ? p.seats.p.lnp.est : ""], ["Seats GRN", p => p.seats && p.seats.p.grn ? p.seats.p.grn.est : ""], ["Seats ON", p => p.seats && p.seats.p.onp ? p.seats.p.onp.est : ""], ["Seats OTH", p => p.seats && p.seats.p.oth ? p.seats.p.oth.est : ""], ["Right direction", p => p.dir ? p.dir.right : ""], ["Wrong track", p => p.dir ? p.dir.wrong : ""], ["Direction unsure", p => p.dir ? p.dir.unsure : ""], ["Direction net", p => p.dir ? p.dir.net : ""], ["Contains", p => p.tags.join(" ")], ["Groups read from", p => p.grp ? p.grp.r : ""], ...(D.demoGroups || []).flatMap((g, gi) => ["ALP", "L/NP", "GRN", "ON", "OTH"].map((lab, k) => [g + " " + lab, p => {
     const v = p.grp && p.grp.v[gi];
     return v ? v[k] : "";
-  }])), ["2025 L/NP now ON", p => p.sw && p.sw.lnp != null ? p.sw.lnp : ""], ["2025 ALP now ON", p => p.sw && p.sw.alp != null ? p.sw.alp : ""], ["2025 GRN now ON", p => p.sw && p.sw.grn != null ? p.sw.grn : ""], ["2025 OTH now ON", p => p.sw && p.sw.oth != null ? p.sw.oth : ""], ["2025 ON still ON", p => p.sw && p.sw.onp != null ? p.sw.onp : ""]];
+  }])), ["2025 L/NP now ON", p => p.sw && p.sw.lnp != null ? p.sw.lnp : ""], ["2025 ALP now ON", p => p.sw && p.sw.alp != null ? p.sw.alp : ""], ["2025 GRN now ON", p => p.sw && p.sw.grn != null ? p.sw.grn : ""], ["2025 OTH now ON", p => p.sw && p.sw.oth != null ? p.sw.oth : ""], ["2025 ON still ON", p => p.sw && p.sw.onp != null ? p.sw.onp : ""], ["Top issue", p => {
+    const t = issTopOf(p.iss);
+    return t ? t[0] : "";
+  }], ["Top issue %", p => {
+    const t = issTopOf(p.iss);
+    return t ? t[1] : "";
+  }], ["Best on it", p => {
+    const b = issBestOf(p.iss);
+    return b ? (ISS_PARTY_META[b.who] || [b.who])[0] : "";
+  }], ["Best on it %", p => {
+    const b = issBestOf(p.iss);
+    return b ? b.v : "";
+  }]];
   const exportCsv = () => downloadCsv(`auspol-tracker-polls-${D.latest.updatedISO}.csv`, [CSV_COLS.map(c => c[0]), ...sorted.map(p => CSV_COLS.map(c => c[1](p)))]);
   if (window.AP.rd) return React.createElement("div", {
     className: "view view-allpolls"
@@ -59702,7 +59850,7 @@ function AllPollsView({
     synthOnByYm: synthOnByYm,
     altOnByYm: altOnByYm,
     ofTotal: totalAll,
-    ofHouses: housesDir.length
+    ofHouses: housesAll.length
   }), React.createElement(RdDisagree, null), React.createElement(RdHouseLean, {
     measure: measure,
     tppBasis: tppBasis
@@ -59715,7 +59863,7 @@ function AllPollsView({
     className: "card-title"
   }, "All polls"), React.createElement("p", {
     className: "card-sub"
-  }, "Every individual national poll in the archive, ", total, totalAll !== total ? " of " + totalAll : "", " polls from ", housesDir.length, " pollsters,", " ", (() => {
+  }, "Every individual national poll in the archive, ", total, totalAll !== total ? " of " + totalAll : "", " polls from ", housesAll.length, " pollsters,", " ", (() => {
     const f = D.individualPolls[0],
       l = D.individualPolls[D.individualPolls.length - 1];
     const lab = ym => {
@@ -60119,6 +60267,26 @@ function AllPollsView({
     k: "dir.net",
     sort: sort,
     onSort: onSort
+  })), facet === "issues" && React.createElement(React.Fragment, null, React.createElement(ArchSortTh, {
+    label: "Top issue",
+    k: "iss.topv",
+    sort: sort,
+    onSort: onSort,
+    className: "ta-l",
+    title: "The issue most voters named, and the share naming it"
+  }), React.createElement(ArchSortTh, {
+    label: "Best on it",
+    k: "iss.bestv",
+    sort: sort,
+    onSort: onSort,
+    title: "The party voters trust most on that issue, and its share"
+  }), React.createElement(ArchSortTh, {
+    label: "Net direction",
+    short: "Net",
+    k: "dir.net",
+    sort: sort,
+    onSort: onSort,
+    className: "hide-md"
   })))), React.createElement("tbody", {
     ref: bodyRef
   }, shownRows.map((p, i) => {
@@ -60247,6 +60415,18 @@ function AllPollsView({
       className: "num muted hide-md"
     }, p.dir ? p.dir.unsure.toFixed(1) : "—"), React.createElement("td", {
       className: "num"
+    }, React.createElement(ArchDirCell, {
+      d: p.dir
+    }))), facet === "issues" && React.createElement(React.Fragment, null, React.createElement("td", {
+      className: "ta-l"
+    }, React.createElement(ArchIssTop, {
+      iss: p.iss
+    })), React.createElement("td", {
+      className: "num"
+    }, React.createElement(ArchIssBest, {
+      iss: p.iss
+    })), React.createElement("td", {
+      className: "num hide-md"
     }, React.createElement(ArchDirCell, {
       d: p.dir
     })))), isOpen && React.createElement("tr", {
@@ -61218,7 +61398,12 @@ Object.assign(window, {
   ArchLead,
   ArchApprCell,
   ArchDirCell,
-  archLeadInfo
+  archLeadInfo,
+  issTopOf,
+  issBestOf,
+  ISS_PARTY_META,
+  ArchIssTop,
+  ArchIssBest
 });</script>
   <script>const WM_GC = {
   cx: 22,
@@ -69913,6 +70098,10 @@ const RD_AP_TAGS = {
   },
   dir: {
     label: "Right direction or wrong track"
+  },
+  iss: {
+    label: "Issues",
+    note: "What voters say matters, and the party rated best on each"
   }
 };
 const rdApTagLab = id => RD_AP_TAGS[id] ? RD_AP_TAGS[id].label : id;
@@ -70507,6 +70696,102 @@ function RdApDirMini({
     className: "tip-hint"
   }, tip.src === "focus" ? "Press Enter to open this reading" : "Click to open this reading") : null)));
 }
+function RdApIssMini({
+  p
+}) {
+  const D = window.AUSPOL;
+  const box = React.useRef(null);
+  const W = useRdWidth(box, 470);
+  const H = 176;
+  const iss = p.iss || {};
+  const item = iss.top && D.issues && D.issues.list ? (Array.isArray(D.issues.list) ? D.issues.list.find(it => it.id === iss.top) : D.issues.list[iss.top]) || null : null;
+  if (!item || !item.monthly || item.monthly.length < 2) return React.createElement("div", {
+    ref: box
+  });
+  const iM = D.MONTHS.indexOf(p.ym);
+  const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
+  const t0 = rdApDays(ms[0] + "-01");
+  const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
+  const t1 = Date.UTC(ly, lm, 1) - 864e5;
+  const rows = item.monthly.filter(r => rdApDays(r[0] + "-15") >= t0 && rdApDays(r[0] + "-15") <= t1);
+  if (rows.length < 2) return React.createElement("div", {
+    ref: box
+  });
+  const own = iss.own && iss.own[iss.top] ? iss.own[iss.top] : null;
+  const vals = rows.flatMap(r => [r[1], r[2], r[3]]).concat(own ? [own.alp, own.lnp, own.onp].filter(v => v != null) : []);
+  let lo = Math.floor(Math.min(...vals) / 5) * 5,
+    hi = Math.ceil(Math.max(...vals) / 5) * 5;
+  if (hi - lo < 15) {
+    const c = (lo + hi) / 2;
+    lo = Math.max(0, Math.floor((c - 8) / 5) * 5);
+    hi = lo + (lo === 0 ? 20 : 16);
+  }
+  const x0 = 30,
+    x1 = W - 16,
+    top = 10,
+    bot = H - 26;
+  const X = tt => x0 + (tt - t0) / (t1 - t0) * (x1 - x0);
+  const Y = v => bot - (v - lo) / (hi - lo) * (bot - top);
+  const ticks = [];
+  for (let v = lo; v <= hi + 1e-9; v += hi - lo > 30 ? 10 : 5) ticks.push(v);
+  const PARTIES = [[1, "alp", "var(--alp)"], [2, "lnp", "var(--lnp)"], [3, "onp", "var(--onp)"]];
+  const cx = X(rdApDays(p.released || p.published || t1));
+  const lab = D.issues.labels && D.issues.labels[iss.top] || iss.top;
+  return React.createElement("div", {
+    ref: box,
+    className: "rd-apd-mini"
+  }, React.createElement("svg", {
+    width: W,
+    height: H,
+    viewBox: `0 0 ${W} ${H}`,
+    role: "img",
+    "aria-label": `The share rating each of Labor, the Coalition and One Nation best on ${lab}, month by month, and this wave’s printed figures.`
+  }, ticks.map(v => React.createElement("path", {
+    key: v,
+    d: `M${x0} ${Y(v)}H${x1}`,
+    className: v === 0 ? "rd-apd-even" : "rd-apd-gl"
+  })), ticks.map(v => React.createElement("text", {
+    key: "t" + v,
+    x: x0 - 6,
+    y: Y(v) + 4,
+    className: "rd-apd-ax",
+    textAnchor: "end"
+  }, v)), PARTIES.map(([i,, ink]) => React.createElement("path", {
+    key: i,
+    d: monotoneXY(rows.map(r => [X(rdApDays(r[0] + "-15")), Y(r[i])])),
+    className: "rd-apd-avgline",
+    style: ink ? {
+      stroke: `color-mix(in oklab, ${ink} 78%, transparent)`
+    } : null
+  })), own && PARTIES.map(([, k, ink]) => own[k] != null && React.createElement("g", {
+    key: k
+  }, React.createElement("circle", {
+    cx: cx,
+    cy: Y(own[k]),
+    r: "7",
+    className: "rd-apd-ring",
+    style: ink ? {
+      stroke: ink
+    } : null
+  }), React.createElement("circle", {
+    cx: cx,
+    cy: Y(own[k]),
+    r: "3.5",
+    className: "rd-apd-this",
+    style: ink ? {
+      fill: ink
+    } : null
+  }))), React.createElement("path", {
+    d: `M${x0} ${bot}H${x1}`,
+    className: "rd-apd-base"
+  }), ms.map((ym, i) => i % 2 === (ms.length - 1) % 2 ? React.createElement("text", {
+    key: ym,
+    x: X(rdApDays(ym + "-01")),
+    y: bot + 18,
+    className: "rd-apd-ax",
+    textAnchor: "middle"
+  }, D.monthName(Number(ym.slice(5)))) : null)));
+}
 function RdApDetail({
   p,
   onM,
@@ -70605,6 +70890,39 @@ function RdApDetail({
   const allFav = leaders.length > 0 && leaders.every(([id]) => mb[id] === "fav");
   const d = p.dir;
   const seats = p.seats && p.seats.p ? RD_AP_PRIM.filter(k => p.seats.p[k.id]) : [];
+  const issBestBlock = (() => {
+    const iss = p.iss;
+    if (!iss) return null;
+    const topId = iss.top;
+    const lab = D.issues && D.issues.labels && D.issues.labels[topId] || null;
+    const rowOf = (q, sh) => {
+      const meta = window.ISS_PARTY_META[q] || [q, q, null];
+      return {
+        k: q,
+        v: sh[q],
+        lab: q === "rest" || q === "oth" ? "the rest" : meta[0],
+        ink: meta[2]
+      };
+    };
+    const own = topId && iss.own && iss.own[topId] ? iss.own[topId] : null;
+    if (own) {
+      const rows = ["alp", "lnp", "onp"].filter(q => own[q] != null).map(q => rowOf(q, own));
+      if (rows.length > 1) return {
+        title: lab || "the top issue",
+        rows,
+        cap: "Shares of those naming one of these three, %"
+      };
+    }
+    if (iss.bp) {
+      const rows = ["alp", "lnp", "grn", "onp", "rest"].filter(q => iss.bp[q] != null).map(q => rowOf(q, iss.bp));
+      if (rows.length > 1) return {
+        title: lab || "the top issue",
+        rows,
+        cap: "SEC Newgate’s printed best-party figures, %"
+      };
+    }
+    return null;
+  })();
   const contest = onM ? "onp" : "lnp";
   const fig = rdApFig(p, onM, pub);
   const avg = avgBy[p.ym];
@@ -70633,6 +70951,12 @@ function RdApDetail({
   })();
   const insideD = dirLean == null || dirMoe == null ? null : Math.abs(dirLean) < dirMoe / 2 ? "well inside" : Math.abs(dirLean) <= dirMoe ? "inside" : "outside";
   const dirHl = isDir && d ? ((D.directionHouseEffects || {}).net || {})[p.pollster] || null : null;
+  const isIss = facet === "issues";
+  const iss = isIss ? p.iss || null : null;
+  const issPlus = iss && iss.plus ? iss.plus : null;
+  const issPair = issPlus && issPlus.pair != null ? issPlus.pair : null;
+  const issLeadMeta = issPlus && issPlus.lead ? window.ISS_PARTY_META[issPlus.lead] || null : null;
+  const issPrompted = !!(iss && iss.sal && iss.sal.length);
   const relUrl = p.releaseUrl || p.url;
   return React.createElement("div", {
     className: "rd-apd"
@@ -70710,7 +71034,73 @@ function RdApDetail({
     style: {
       color: "var(--mood-neg)"
     }
-  }, rdApNum(d.wrong)), ", unsure ", rdApNum(d.unsure)))), seats.length > 0 && React.createElement("div", {
+  }, rdApNum(d.wrong)), ", unsure ", rdApNum(d.unsure)))), p.iss && (p.iss.sal || []).length > 0 && React.createElement("div", {
+    className: "rd-apd-grid rd-apd-grid1 rd-apd-iss"
+  }, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "The issues voters name"), React.createElement("span", {
+    className: "rd-apd-cell rd-apd-isslist"
+  }, p.iss.sal.map(([label, v, r1]) => React.createElement("span", {
+    key: label,
+    className: "rd-apd-issrow"
+  }, React.createElement("span", {
+    className: "rd-apd-isslab"
+  }, label), React.createElement("span", {
+    className: "rd-apd-issbar",
+    "aria-hidden": "true"
+  }, React.createElement("i", {
+    style: {
+      width: Math.min(100, v) + "%"
+    }
+  })), React.createElement("b", null, rdApNum(v)), r1 != null && React.createElement("span", {
+    className: "rd-apd-sub"
+  }, rdApNum(r1), " rank it first of all"))))), p.iss && (p.iss.sal || []).length > 0 && React.createElement("span", {
+    className: "rd-apd-sub rd-apd-note"
+  }, "Share naming each issue in the three that matter most, %.", prev ? " Changes are on " + p.pollster + "’s " + prev.field + " poll." : ""), p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && React.createElement("div", {
+    className: "rd-apd-grid rd-apd-grid1 rd-apd-iss"
+  }, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Named without prompting"), React.createElement("span", {
+    className: "rd-apd-cell rd-apd-isslist"
+  }, p.iss.conc.map(([label, v]) => React.createElement("span", {
+    key: label,
+    className: "rd-apd-issrow"
+  }, React.createElement("span", {
+    className: "rd-apd-isslab"
+  }, label), React.createElement("span", {
+    className: "rd-apd-issbar",
+    "aria-hidden": "true"
+  }, React.createElement("i", {
+    style: {
+      width: Math.min(100, v) + "%"
+    }
+  })), React.createElement("b", null, rdApNum(v)))))), p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && React.createElement("span", {
+    className: "rd-apd-sub rd-apd-note"
+  }, "Shares of any mentions, not a forced pick \u2013 these can\u2019t sit beside the top-three numbers."), p.iss && issBestBlock && React.createElement("div", {
+    className: "rd-apd-grid rd-apd-grid1 rd-apd-iss"
+  }, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Rated best on ", issBestBlock.title), React.createElement("span", {
+    className: "rd-apd-cell rd-apd-isslist"
+  }, issBestBlock.rows.map(r => React.createElement("span", {
+    key: r.k,
+    className: "rd-apd-issrow"
+  }, React.createElement("span", {
+    className: "rd-apd-isslab",
+    style: r.ink ? {
+      color: r.ink
+    } : null
+  }, r.lab), React.createElement("span", {
+    className: "rd-apd-issbar",
+    "aria-hidden": "true"
+  }, React.createElement("i", {
+    style: {
+      width: Math.min(100, r.v) + "%",
+      background: r.ink || undefined
+    }
+  })), React.createElement("b", null, rdApNum(r.v)))))), p.iss && issBestBlock && React.createElement("span", {
+    className: "rd-apd-sub rd-apd-note"
+  }, issBestBlock.cap), seats.length > 0 && React.createElement("div", {
     className: "rd-apd-grid rd-apd-grid1"
   }, React.createElement("span", {
     className: "rd-apd-k"
@@ -70762,7 +71152,7 @@ function RdApDetail({
     className: "rd-apd-r"
   }, React.createElement("span", {
     className: "rd-apd-h"
-  }, "How it counts"), !isDir && fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, "How it counts"), !isDir && !isIss && fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-ct"
   }, p.pollster, "\u2019s polls since ", D.monthNameFull(Number(from.slice(5))), " against the average, Labor v ", onM ? "One Nation" : "Coalition", pub ? " as published" : ""), React.createElement(RdApMini, {
     p: p,
@@ -70773,9 +71163,21 @@ function RdApDetail({
     className: "rd-apd-ct"
   }, p.pollster, "\u2019s readings since ", D.monthNameFull(Number(from.slice(5))), " against the monthly average, net right direction minus wrong track"), React.createElement(RdApDirMini, {
     p: p
+  })), isIss && D.issues && iss && iss.own && iss.own[iss.top] && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-ct"
+  }, "Who voters rate best on ", D.issues.labels && D.issues.labels[iss.top] || iss.top, " since ", D.monthNameFull(Number(from.slice(5))), ", the monthly pooled line and this wave\u2019s own figures"), React.createElement(RdApIssMini, {
+    p: p
   })), React.createElement("div", {
     className: "rd-apd-facts"
-  }, isDir && d && React.createElement(React.Fragment, null, dirLean != null && dirAvgRow != null && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, isIss && iss && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Asked"), React.createElement("span", null, issPrompted ? React.createElement(React.Fragment, null, "Voters picked the three issues that matter most", iss.q ? React.createElement(React.Fragment, null, " \u2013 ", p.pollster, "\u2019s wording: \u201C", iss.q, "\u201D") : p.pollster === "Ipsos" ? " – Ipsos asks its standing list of 19 issues, best party on the month’s five leaders" : "", ". SEC Newgate\u2019s mentions count can\u2019t sit in the same series, so each house\u2019s wording is pooled against its pair first.") : React.createElement(React.Fragment, null, "SEC Newgate asks what concerns Australians, unprompted \u2013 anyone can name anything, so the shares are any-mentions, not forced picks. That reading can\u2019t mix with the top-three series the issues panel pools, so it isn\u2019t counted toward it.")), issPair != null && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Between the question forms"), React.createElement("span", null, "RedBridge\u2019s and Ipsos\u2019s wordings for what matters sit a measured ", React.createElement("b", null, Math.abs(issPair).toFixed(1)), " points apart on ", D.issues.labels && D.issues.labels[iss.top] || iss.top, "; this wave\u2019s reading was moved half that gap toward the other house\u2019s before it entered any average.")), issLeadMeta && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-k"
+  }, p.pollster, "\u2019s usual lean"), React.createElement("span", null, issPlus.lean == null ? "None to speak of: its figures sit level with the other pollsters’" : React.createElement(React.Fragment, null, "About ", React.createElement("b", null, Math.abs(issPlus.lean).toFixed(1)), " ", issPlus.lean > 0 ? "richer" : "poorer", " for ", issLeadMeta[0], " on ", D.issues.labels && D.issues.labels[iss.top] || iss.top, ", taken out before the figures are pooled"))), issPlus && D.issues.window && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "In today\u2019s panel"), React.createElement("span", null, issPlus.w ? React.createElement(React.Fragment, null, "One of the waves the issues panel\u2019s current figures draw on (the last ", D.issues.window, ").") : React.createElement(React.Fragment, null, "Outside the ", D.issues.window, " the panel\u2019s current figures draw on.")))), isDir && d && React.createElement(React.Fragment, null, dirLean != null && dirAvgRow != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
   }, "Against ", D.monthNameFull(Number(p.ym.slice(5)))), React.createElement("span", null, Math.abs(dirLean) < 0.05 ? React.createElement(React.Fragment, null, "Level with the month\u2019s average net of ", rdApSigned(dirAvgRow.net), dirMoe != null ? ", inside its ±" + dirMoe.toFixed(1) + " margin" : "") : React.createElement(React.Fragment, null, React.createElement("b", {
     style: {
@@ -70787,7 +71189,7 @@ function RdApDetail({
     className: "rd-apd-k"
   }, "In today\u2019s ", rdApSigned(dirNow.net), " net"), React.createElement("span", null, dEff && dEff.w ? React.createElement(React.Fragment, null, "One of the ", rdNumWord(dirNow.n), " readings it\u2019s built from; this one moves it ", React.createElement("b", null, move(dEff))) : dEff && dEff.t ? React.createElement(React.Fragment, null, "Not one of them: today\u2019s figure uses the last three weeks of readings. When it came out, it moved the figure ", React.createElement("b", null, move(dEff.t))) : React.createElement(React.Fragment, null, "Not one of them: today\u2019s figure uses the last three weeks of readings")))), isDir && !d && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
-  }, "National direction"), React.createElement("span", null, p.pollster, " didn\u2019t ask the direction question in this poll, so there\u2019s no reading to set against the direction figures.")), !isDir && React.createElement(React.Fragment, null, lean != null && avg != null && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, "National direction"), React.createElement("span", null, p.pollster, " didn\u2019t ask the direction question in this poll, so there\u2019s no reading to set against the direction figures.")), !isDir && !isIss && React.createElement(React.Fragment, null, lean != null && avg != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
   }, "Against ", D.monthNameFull(Number(p.ym.slice(5)))), React.createElement("span", null, Math.abs(lean) < 0.05 ? React.createElement(React.Fragment, null, "Level with the month\u2019s average of ", avg.toFixed(1), moe != null ? ", inside its ±" + moe.toFixed(1) + " margin" : "") : React.createElement(React.Fragment, null, React.createElement("b", {
     style: {
@@ -71038,6 +71440,9 @@ function RdAllPolls(P) {
   }, {
     id: "direction",
     label: "Direction"
+  }, {
+    id: "issues",
+    label: "Issues"
   }];
   const rowNav = (e, p) => {
     if (e.target !== e.currentTarget) return;
@@ -71144,7 +71549,8 @@ function RdAllPolls(P) {
     twopp: "rd-ap-c2pp",
     primary: "rd-ap-cprim",
     leadership: "rd-ap-clead",
-    direction: "rd-ap-cdir"
+    direction: "rd-ap-cdir",
+    issues: "rd-ap-ciss"
   }[facet] + (facetSwaps.current ? " rd-ap-sw" : "");
   const th = (label, k, o) => {
     const on = sort.key === k;
@@ -71268,6 +71674,17 @@ function RdAllPolls(P) {
     className: "rd-ap-cap"
   }, "Right direction or wrong track, %")), th("Net", "dir.net", {
     right: true
+  })), facet === "issues" && React.createElement(React.Fragment, null, th("Top issue", "iss.topv", {
+    title: "The issue most voters said matters most"
+  }), th("Best on it", "iss.bestv", {
+    title: "The party most voters rate best on that issue"
+  }), React.createElement("span", {
+    className: "rd-ap-hpic"
+  }, React.createElement("span", {
+    className: "rd-ap-cap"
+  }, "Share naming each issue as one that matters, %")), th("Net direction", "dir.net", {
+    right: true,
+    title: "Net national mood, if the poll asked it"
   })), React.createElement("span", null));
   const pollsterCell = p => React.createElement("span", {
     role: "rowheader",
@@ -71564,7 +71981,7 @@ function RdAllPolls(P) {
       }, "Net rating", fav ? ", favourability" : ""), React.createElement("span", {
         className: "rd-grow"
       }), nets));
-    } else {
+    } else if (facet === "direction") {
       const d = p.dir;
       const dc = d && d.chg || {};
       figs = d ? React.createElement(React.Fragment, null, React.createElement("span", {
@@ -71638,6 +72055,78 @@ function RdAllPolls(P) {
           color: "var(--mood-neg)"
         }
       }, rdApNum(d.wrong)), ", unsure ", rdApNum(d.unsure))) : null;
+    } else if (facet === "issues") {
+      const iss = p.iss || null;
+      const d = p.dir;
+      const top3 = iss ? (iss.sal || iss.conc || []).slice(0, 3) : [];
+      const it = iss ? window.issTopOf(iss) : null;
+      const ib = iss ? window.issBestOf(iss) : null;
+      const im = ib ? window.ISS_PARTY_META[ib.who] || [ib.who, ib.who, null] : null;
+      figs = React.createElement(React.Fragment, null, React.createElement("span", {
+        role: "cell",
+        className: "rd-ap-dnum"
+      }, it ? React.createElement(React.Fragment, null, React.createElement("b", null, rdApNum(it[1])), React.createElement("span", {
+        className: "rd-ap-sub"
+      }, it[0], !(iss && iss.sal) && iss && iss.conc ? ", unprompted" : "")) : React.createElement("span", {
+        className: "rd-ap-none"
+      }, "\u2014")), React.createElement("span", {
+        role: "cell",
+        className: "rd-ap-dnum"
+      }, ib ? React.createElement(React.Fragment, null, React.createElement("b", {
+        style: im[2] ? {
+          color: im[2]
+        } : null
+      }, im[1]), React.createElement("span", {
+        className: "rd-ap-sub"
+      }, rdApNum(ib.v), " on it")) : React.createElement("span", {
+        className: "rd-ap-none"
+      }, "\u2014")));
+      pic = top3.length ? React.createElement("span", {
+        className: "rd-ap-pic",
+        role: "img",
+        "aria-label": "Most-named issues: " + top3.map(x => x[0] + " " + rdApNum(x[1]) + "%").join(", ")
+      }, React.createElement("span", {
+        className: "rd-ap-ibar"
+      }, top3.map(x => React.createElement("span", {
+        key: x[0],
+        className: "rd-ap-ibar-r",
+        title: x[0] + " " + rdApNum(x[1]) + "%",
+        style: {
+          width: Math.max(1.5, Math.min(100, x[1])) + "%"
+        }
+      })))) : React.createElement("span", {
+        className: "rd-ap-pic"
+      });
+      val = React.createElement("span", {
+        role: "cell",
+        className: "rd-ap-val"
+      }, d ? rdSigned(d.net, 0) : "—");
+      right1 = it ? React.createElement("b", {
+        className: "rd-ap-pairfig"
+      }, rdApNum(it[1])) : React.createElement("span", {
+        className: "rd-ap-none"
+      }, "\u2014");
+      body = React.createElement(React.Fragment, null, React.createElement("div", {
+        className: "rd-ap-cpic"
+      }, pic), it && React.createElement("div", {
+        className: "rd-ap-csub"
+      }, it[0], " ", React.createElement("b", null, rdApNum(it[1]))), ib && React.createElement("div", {
+        className: "rd-ap-csub"
+      }, "Best on it: ", React.createElement("b", {
+        style: im[2] ? {
+          color: im[2]
+        } : null
+      }, im[0]), ", ", rdApNum(ib.v)), d && React.createElement("div", {
+        className: "rd-ap-csub"
+      }, "Right ", React.createElement("b", {
+        style: {
+          color: "var(--mood-pos)"
+        }
+      }, rdApNum(d.right)), ", wrong ", React.createElement("b", {
+        style: {
+          color: "var(--mood-neg)"
+        }
+      }, rdApNum(d.wrong)), ", unsure ", rdApNum(d.unsure)));
     }
     const detail = isOpen && React.createElement("div", {
       className: "rd-ap-open",
@@ -71813,7 +72302,11 @@ function RdAllPolls(P) {
     style: {
       color: "var(--mood-neg)"
     }
-  }, "wrong track"), ", %")));
+  }, "wrong track"), ", %")), facet === "issues" && React.createElement("span", {
+    className: "rd-ap-hpic rd-ap-hdir"
+  }, React.createElement("span", {
+    className: "rd-ap-cap"
+  }, "Share naming each issue as one that matters, %")));
   const NAV = phone || tight ? [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagreement"], ["house-lean", "Lean"], ["flow-drift", "Flows"]] : [["rd-ap-top", "The polls"], ["poll-disagreement", "How much they disagree"], ["house-lean", "How each pollster leans"], ["flow-drift", "Preference flows"]];
   const pinBar = React.createElement("div", {
     className: "rd-ap-pinbar" + (pinned ? " on" : ""),

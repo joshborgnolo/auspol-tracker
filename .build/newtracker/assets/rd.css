@@ -311,10 +311,12 @@ body.rd .rd-swap-now.in { animation: rd-xf-in .2s ease-out .12s both; }
 @keyframes rd-ap-in-cprim { from { opacity: 0; } }
 @keyframes rd-ap-in-clead { from { opacity: 0; } }
 @keyframes rd-ap-in-cdir { from { opacity: 0; } }
+@keyframes rd-ap-in-ciss { from { opacity: 0; } }
 body.rd .rd-ap-sw.rd-ap-c2pp { --rd-ap-in: rd-ap-in-c2pp; }
 body.rd .rd-ap-sw.rd-ap-cprim { --rd-ap-in: rd-ap-in-cprim; }
 body.rd .rd-ap-sw.rd-ap-clead { --rd-ap-in: rd-ap-in-clead; }
 body.rd .rd-ap-sw.rd-ap-cdir { --rd-ap-in: rd-ap-in-cdir; }
+body.rd .rd-ap-sw.rd-ap-ciss { --rd-ap-in: rd-ap-in-ciss; }
 body.rd :is(.rd-ap-row, .rd-ap-hrow).rd-ap-sw > :nth-child(n+5):not(.rd-ap-chev),
 body.rd .rd-ap-card.rd-ap-sw > :is(.rd-ap-c1, .rd-ap-c2) > :last-child,
 body.rd .rd-ap-card.rd-ap-sw > :nth-child(n+3),
@@ -1670,6 +1672,7 @@ body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 208px) minmax(0, 208px) minmax(0, 300px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint); }
 body.rd .rd-ap-hrow > * { min-width: 0; }
 body.rd .rd-ap-hc1 { padding-left: 12px; }
@@ -1790,6 +1793,12 @@ body.rd .rd-ap-dbar i.u, body.rd .rd-ap-dbar i.u + i { border-left: 2px solid va
 body.rd .rd-ap-dbar i:first-child { border-radius: 2px 0 0 2px; }
 body.rd .rd-ap-dbar i:last-child { border-radius: 0 2px 2px 0; }
 body.rd .rd-ap-dbar i.u { background: var(--line); }
+/* an issues row's share bars: one short bar per named issue, sized to its
+   share of voters and stacked inside the poll's picture cell */
+body.rd .rd-ap-ibar { position: absolute; top: 50%; left: 14px; right: 14px; transform: translateY(-50%); display: flex; flex-direction: column; justify-content: center; gap: 3px; }
+body.rd .rd-ap-ibar-r { display: block; height: 5px; border-radius: 2.5px; background: var(--ink-3); }
+body.rd .rd-ap-ibar-r:first-child { background: var(--ink-2); }
+body.rd .rd-ap-ciss .rd-ap-dnum > .rd-ap-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 body.rd .rd-ap-empty { padding: 28px 12px; font-size: 14px; color: var(--ink-2); }
 body.rd .rd-ap-tip {
   position: absolute; bottom: calc(50% + 14px); top: auto; transform: translateX(-50%); z-index: 20;
@@ -1868,6 +1877,14 @@ body.rd .rd-apd-facts {
   font-size: 14px; line-height: 1.45; color: var(--ink-2);
 }
 body.rd .rd-apd-facts b { font-weight: 600; color: var(--ink); }
+/* the issues readouts inside an opened poll: label, share bar, figure */
+body.rd .rd-apd-isslist { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+body.rd .rd-apd-issrow { display: grid; grid-template-columns: minmax(0, 172px) minmax(0, 1fr) 36px; align-items: center; column-gap: 12px; row-gap: 2px; min-width: 0; }
+body.rd .rd-apd-issrow > .rd-apd-sub { grid-column: 1 / -1; }
+body.rd .rd-apd-isslab { font-size: 13px; line-height: 1.35; color: var(--ink-2); }
+body.rd .rd-apd-issbar { position: relative; height: 8px; border-radius: 4px; background: var(--line-2); overflow: hidden; }
+body.rd .rd-apd-issbar i { display: block; height: 100%; border-radius: 4px; background: var(--ink-3); }
+body.rd .rd-apd-issrow > b { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
 
 /* a laptop's narrower column: shorter words over the scale */
 @media (max-width: 1240px) {
@@ -1875,6 +1892,7 @@ body.rd .rd-apd-facts b { font-weight: 600; color: var(--ink); }
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 176px) minmax(0, 176px) minmax(0, 260px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-long { display: none; }
 }
 body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
@@ -1885,6 +1903,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 148px) minmax(0, 148px) minmax(0, 1fr) 44px 28px; }
   body.rd .rd-ap-n, body.rd .rd-ap-hrow > .rd-ap-th:nth-child(3) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
@@ -1921,7 +1940,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-phead.rd-ap-c2pp .rd-ap-in, body.rd .rd-ap-card.rd-ap-c2pp .rd-ap-in { right: 46px; }
   body.rd .rd-ap-phead .rd-ap-cap { left: 8px; }
   body.rd .rd-ap-hdir { min-height: 20px; }
-  body.rd .rd-ap-c2pp, body.rd .rd-ap-cprim, body.rd .rd-ap-clead, body.rd .rd-ap-cdir { grid-template-columns: none; }
+  body.rd .rd-ap-c2pp, body.rd .rd-ap-cprim, body.rd .rd-ap-clead, body.rd .rd-ap-cdir, body.rd .rd-ap-ciss { grid-template-columns: none; }
   body.rd .rd-ap-mrow { display: flex; align-items: baseline; gap: 8px; padding: 22px 0 6px; }
   body.rd .rd-ap-mlab { padding-left: 0; gap: 8px; }
   body.rd .rd-ap-mlab span { font-size: 12px; }
@@ -1945,7 +1964,11 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }
   body.rd .rd-ap-card .rd-ap-dbar { left: 0; right: 0; height: 14px; margin-top: -7px; }
+  body.rd .rd-ap-card .rd-ap-ibar { left: 0; right: 0; }
   body.rd .rd-ap-open { padding: 16px 12px 18px; }
+  /* an opened poll's issue rows stack: label and figure over a full-width bar */
+  body.rd .rd-apd-issrow { grid-template-columns: minmax(0, 1fr) 40px; }
+  body.rd .rd-apd-issrow .rd-apd-issbar { grid-column: 1 / -1; grid-row: 2; }
   body.rd .rd-apd-prim > span { width: 54px; }
   body.rd .rd-apd-big { font-size: 22px; }
   body.rd .rd-apd-grid { grid-template-columns: 104px minmax(0, 1fr) minmax(0, 1fr); column-gap: 10px; font-size: 13px; }
