@@ -227,6 +227,16 @@ function fwLabel(startISO, endISO) {
   return m1 === m2 ? `${d1}–${d2} ${monthName(m2)}` : `${d1} ${monthName(m1)}–${d2} ${monthName(m2)}`;
 }
 
+/* the ISO date of a fieldwork window's middle day – "14–20 May" →
+   2026-05-17. The detail mini-charts plot the wave's own marker at this,
+   not `released` (fieldwork's last day, or the publish stamp – both to the
+   right of the window the marker claims). */
+const fmidIso = (startISO, endISO) => {
+  const mid = (Date.parse(startISO.slice(0, 10) + "T00:00:00Z") + Date.parse(endISO.slice(0, 10) + "T00:00:00Z")) / 2;
+  const d = new Date(mid);
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+};
+
 function fillSeries(known, idxs) {
   const ks = idxs.filter((i) => known[i] != null);
   if (!ks.length) return idxs.map(() => null);
@@ -1361,6 +1371,7 @@ const directionPolls = DIR
     return {
       x: dx(d.date), ym: ymOf(d.date), pollster: d.pollster,
       dateLabel: fwLabel(d.dateStart, d.date), released: d.date,
+      ...(d.dateStart ? { fmid: fmidIso(d.dateStart, d.date) } : {}),
       sample: (p && p.sample) || d.sample || null,
       right: d.right, wrong: d.wrong, unsure: d.unsure,
     };
@@ -1420,6 +1431,7 @@ const directionOnlyPolls = DIR
       pollster: d.pollster,
       ...(fym != null && fym !== ym ? { fym } : {}),
       field, dateLabel: field, released: d.date, sample: d.sample ?? null,
+      ...(d.dateStart ? { fmid: fmidIso(d.dateStart, d.date) } : {}),
       ...(d.url ? { url: d.url } : {}),
       ...(d.published ? { published: d.published } : {}),
       client: CLIENT_BY_HOUSE.get(d.pollster) || "Self-published",
@@ -1532,6 +1544,7 @@ const issuesOnlyPolls = (() => {
       pollster: w.pollster,
       ...(fym != null && fym !== ym ? { fym } : {}),
       field, dateLabel: field, released: w.date, sample: w.sample ?? null,
+      ...(w.dateStart ? { fmid: fmidIso(w.dateStart, w.date) } : {}),
       ...(w.sampleEff != null ? { sampleEff: w.sampleEff } : {}),
       ...(w.source ? { url: w.source } : {}),
       client: "Self-published",
@@ -2129,6 +2142,10 @@ const individualPolls = POLLS.map((p) => {
        differs from ym, so the byte cost lands only on straddling waves. */
     ...(fym != null && fym !== ym ? { fym } : {}),
     field, dateLabel: field, released: p.date, sample: p.sample ?? null,
+    /* fieldwork mid-date ISO (see fmidIso) – the x basis every detail
+       mini-chart draws the wave's own marker on; `released` is fieldwork's
+       last day, so a marker at it sits right of the window it claims */
+    ...(p.dateStart ? { fmid: fmidIso(p.dateStart, p.date) } : {}),
     // the commissioning publisher, exactly as the Latest-polls table shows
     // it – "Self-published" where the wave reported under no client
     client: p.client && p.client !== "—" ? p.client : "Self-published",

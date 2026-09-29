@@ -268,7 +268,11 @@ function RdApMini({ p, onM, pub, avgFor }) {
   if (A) for (let v = A.lo; v <= A.hi + 1e-9; v += 2) if (!ticks.includes(v)) ticks.push(v);
   const tickOp = (v) => { const y = Y(v); return y < top - 0.5 ? Math.max(0, 1 - (top - y) / 14) : y > bot + 0.5 ? Math.max(0, 1 - (y - bot) / 14) : 1; };
   const own = mix(A ? A.own : 0, S.own);
-  const cx = X(rdApDays(p.released)), cy = Y(own);
+  /* every wave marker sits at its FIELDWORK midpoint (gen-data's fmid):
+     the pooled line is fieldwork-timed, and `released` is fieldwork's last
+     day (or below it under older data), so release-date x positions the
+     dot right of the window it claims and off the line's slope */
+  const cx = X(rdApDays(p.fmid || p.released)), cy = Y(own);
   const labLeft = cx > W * 0.45;
   const rival = onM ? "One Nation" : "Coalition";
   const outLabel = (q) => {
@@ -287,7 +291,7 @@ function RdApMini({ p, onM, pub, avgFor }) {
       const dup = sc.mine.some((z) => z !== q && z.pollster === q.pollster && z.released === q.released);
       const key2 = (!raw || dup) ? null : raw;
       const id = q.pollster + "|" + q.released + "#" + (seen[q.released] = (seen[q.released] || 0) + 1);
-      return { q, key: key2, id, cx: X(rdApDays(q.released)), a: sc.valOf(q) };
+      return { q, key: key2, id, cx: X(rdApDays(q.fmid || q.released)), a: sc.valOf(q) };
     });
   };
   const now = dotsOf(S);
@@ -406,7 +410,7 @@ function RdApDirMini({ p }) {
   const Y = (v) => bot - ((v - lo) / (hi - lo)) * (bot - top);
   const ticks = [];
   for (let v = lo; v <= hi + 1e-9; v += 4) ticks.push(v);
-  const cx = X(rdApDays(p.released)), cy = Y(own);
+  const cx = X(rdApDays(p.fmid || p.released)), cy = Y(own);
   const labLeft = cx > W * 0.45;
   const [tip, setTip] = useState(null);
   const tipBox = React.useRef(null);
@@ -422,7 +426,7 @@ function RdApDirMini({ p }) {
   const dots = mine.filter((q) => q.released !== p.released).map((q) => {
     const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: q.pollster, released: q.released }) : null;
     const dup = mine.some((z) => z !== q && z.released === q.released);
-    return { q, key: (!raw || dup) ? null : raw, id: q.pollster + "|" + q.released, cx: X(rdApDays(q.released)), a: netOf(q) };
+    return { q, key: (!raw || dup) ? null : raw, id: q.pollster + "|" + q.released, cx: X(rdApDays(q.fmid || q.released)), a: netOf(q) };
   });
   const show = (id, src) => setTip({ id, src });
   const hide = (id, src) => setTip((tp) => (tp && tp.id === id && (!src || tp.src === src) ? null : tp));
@@ -520,7 +524,10 @@ function RdApIssMini({ p }) {
   const ticks = [];
   for (let v = lo; v <= hi + 1e-9; v += (hi - lo) > 30 ? 10 : 5) ticks.push(v);
   const PARTIES = [[1, "alp", "var(--alp)"], [2, "lnp", "var(--lnp)"], [3, "onp", "var(--onp)"]];
-  const cx = X(rdApDays(p.released || p.published || t1));
+  /* the wave's own marker goes at its fieldwork midpoint (gen-data's
+     fmid), not its release stamp – the line is fieldwork-timed, so the
+     dot must be too; release dates sit right of every fieldwork window */
+  const cx = X(rdApDays(p.fmid || p.released || p.published || t1));
   const lab = (D.issues.labels && D.issues.labels[iss.top]) || iss.top;
   return (
     <div ref={box} className="rd-apd-mini">
