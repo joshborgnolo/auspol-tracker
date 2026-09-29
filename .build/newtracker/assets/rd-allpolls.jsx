@@ -525,6 +525,12 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
   const setOpp = sets.find((s) => (s.taylor != null || s.ley != null) && s.hanson == null);
   const setThree = sets.find((s) => s.hanson != null && (s.taylor != null || s.ley != null));
   const ppmBy = { onp: setHan ? ppmCell(setHan) : null, lnp: setOpp ? ppmCell(setOpp) : setThree ? ppmCell(setThree, true) : null };
+  /* a wave with no voting intention behind it (SEC Newgate's direction-only
+     surveys, Essential's three mood-only waves of 2025) leaves every matchup
+     cell a dash — nothing to imply from, nothing published, no better-PM — so
+     the grid removes itself entirely */
+  const hasMatchup = p.alpOnImp != null || p.alpImp != null || !!ta
+    || (p.alp != null && p.lnp != null) || ppmBy.onp != null || ppmBy.lnp != null;
   const a = p.appr || {};
   const mb = a.metricBy || {};
   const leaders = [["alb", "albNet", "Albanese"], ["taylor", "taylorNet", a.oppName || "Taylor"], ["hanson", "hansonNet", "Hanson"]]
@@ -591,15 +597,17 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
           </div>
         )}
         {prim.length > 0 && <span className="rd-apd-sub rd-apd-note">Primary vote, %.{prev ? " Changes are on " + p.pollster + "’s " + prev.field + " poll." : ""}</span>}
-        <div className="rd-apd-grid">
-          <span></span>{cols.map((k) => <span key={k.id} className="rd-apd-th">{k.head}</span>)}
-          <span className="rd-apd-k">Implied, on 2025 flows</span>{cols.map((k) => <span key={k.id}>{k.imp}</span>)}
-          <span className="rd-apd-k">As {p.pollster} published</span>{cols.map((k) => <span key={k.id}>{k.pub}</span>)}
-          {(ppmBy.onp || ppmBy.lnp) && <>
-            <span className="rd-apd-k">Better prime minister</span>
-            {cols.map((k) => <span key={k.id}>{ppmBy[k.id] || none}</span>)}
-          </>}
-        </div>
+        {hasMatchup && (
+          <div className="rd-apd-grid">
+            <span></span>{cols.map((k) => <span key={k.id} className="rd-apd-th">{k.head}</span>)}
+            <span className="rd-apd-k">Implied, on 2025 flows</span>{cols.map((k) => <span key={k.id}>{k.imp}</span>)}
+            <span className="rd-apd-k">As {p.pollster} published</span>{cols.map((k) => <span key={k.id}>{k.pub}</span>)}
+            {(ppmBy.onp || ppmBy.lnp) && <>
+              <span className="rd-apd-k">Better prime minister</span>
+              {cols.map((k) => <span key={k.id}>{ppmBy[k.id] || none}</span>)}
+            </>}
+          </div>
+        )}
         {leaders.length > 0 && (
           <div className="rd-apd-grid rd-apd-grid1">
             <span className="rd-apd-k">{allFav ? "Net favourability" : "Net approval"}</span>
@@ -1124,7 +1132,10 @@ function RdAllPolls(P) {
         <span className="rd-ap-pic" role="img" aria-label={`Right direction ${rdApNum(d.right)}%, unsure ${rdApNum(d.unsure)}%, wrong track ${rdApNum(d.wrong)}%`}>
           <span className="rd-ap-dbar">
             <i style={{ flexGrow: d.right, background: "var(--mood-pos)" }}></i>
-            <i style={{ flexGrow: d.unsure }} className="u"></i>
+            {/* a collapsed unsure strip still takes the flex gaps both sides,
+                doubling the divider — a no-unsure reading renders the middle
+                segment not at all, so one 2px separator divides the bar */}
+            {d.unsure > 0 && <i style={{ flexGrow: d.unsure }} className="u"></i>}
             <i style={{ flexGrow: d.wrong, background: "var(--mood-neg)" }}></i>
           </span>
         </span>

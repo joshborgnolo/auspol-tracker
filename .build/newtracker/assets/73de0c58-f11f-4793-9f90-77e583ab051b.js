@@ -363,19 +363,25 @@ function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
   return (
     <header className="site-head">
       <div className="brand">
-        <h1 className="wordmark stacked">
-          {/* The button takes its NAME from the wordmark and describes its
-              action separately. An aria-label here used to replace the
-              wordmark, so the page's h1 was announced as "Wind the dial
-              back: replay the term…" and the site's name was never read. */}
-          <button className="wm-glyph" onClick={openStory}
-                  title="Wind the dial back through the term"
-                  aria-describedby="wm-action">
+        <div className="lockup">
+          <h1 className="wordmark stacked">
             <span className="wm-textcol">
               <span className="wm-name" ref={wmName}>auspol</span>
               <span className="sr-only"> </span>
               <span className="wm-track" ref={wmTrack}>tracker</span>
             </span>
+            <span className="wm-sr">– Australian federal polling</span>
+          </h1>
+          {/* The story player is wired to the DIAL alone - the wordmark
+              carries no click. With the words out of the button the old
+              accessibility puzzle inverts: the h1 names itself "auspol
+              tracker" plainly and the button names itself by its action,
+              so a plain aria-label does the job the words-on-the-button
+              trick once did. */}
+          <button className="wm-glyph" onClick={openStory}
+                  title="Wind the dial back through the term"
+                  aria-label="Wind the dial back through the term"
+                  aria-describedby="wm-action">
             {/* 57px sizes the ink to 74% of the wordmark's height, the
                 proportion the lockup was drawn with before both words went
                 to 30px. glyphRef stays on THIS instance - the story
@@ -383,9 +389,8 @@ function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
                 bar's placeholder. */}
             <GlyphDial className="wm-dial" svgRef={glyphRef} width="57" height="39.7" />
           </button>
-          <span className="wm-sr">– Australian federal polling</span>
           <span id="wm-action" hidden>Replays the term on the masthead dial</span>
-        </h1>
+        </div>
         {/* "last" is the way between the two designs: the new one by
             default, the one it replaced a press away, and a second press
             back again. A button that reads as the word it is, so the

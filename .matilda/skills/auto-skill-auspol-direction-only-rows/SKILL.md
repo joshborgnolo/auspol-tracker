@@ -1,6 +1,6 @@
 ---
 name: auspol-direction-only-rows
-description: "auspol-tracker — the All-polls Direction facet's direction-only rows (SEC Newgate's waves + Essential's three 2025 national-mood-only waves, shipped 2026-09-29): extract-secnewgate files sample+url+published in the direction row (Essential's assimilator heals url/published onto all its direction rows), gen-data emits directionOnlyPolls (sample carried over from the VI join or the house's own n, dir.eff footprint) + directionPolls dots, d1a1d215 merges dirOnly on facet==='direction' only (housesDir, housesV, URL_HOUSES append), EVERY facet's tally denominates against totalAll ('163 of 173'), the RdApDetail direction 'How it counts' rail (net mini chart + usual lean + today's net, release link and publish stamp in the head), ed2260de ROW_KEYS joins them so Snapshot dots can 'open this poll', ?f=d URL state, phone-card field/sample join quirks ('Leaders' tab label), and the dir-facet.mjs acceptance probe."
+description: "auspol-tracker — the All-polls Direction facet's direction-only rows (SEC Newgate's waves + Essential's three 2025 national-mood-only waves, shipped 2026-09-29): extract-secnewgate files sample+url+published in the direction row (Essential's assimilator heals url/published onto all its direction rows), gen-data emits directionOnlyPolls (sample carried over from the VI join or the house's own n, dir.eff footprint) + directionPolls dots, d1a1d215 merges dirOnly on facet==='direction' only (housesDir, housesV, URL_HOUSES append), EVERY facet's tally denominates against totalAll ('163 of 173'), the RdApDetail direction 'How it counts' rail (net mini chart + usual lean + today's net, release link and publish stamp in the head), ed2260de ROW_KEYS joins them so Snapshot dots can 'open this poll', ?f=d URL state, phone-card field/sample join quirks ('Leaders' tab label), no-VI waves drop the RdApDetail 2PP matchup grid wholesale (hasMatchup OR of every matchup cell's nulls), the rd-ap-dbar drops its zero-width unsure strip (the flex gaps each side of it doubled the divider), and the dir-facet.mjs acceptance probe."
 source: auto-skill
 extracted_at: '2026-09-29T01:00:00.000Z'
 ---
@@ -102,6 +102,31 @@ placeholder dash `—` where not.
   (p.releaseUrl || p.url) need no direction special case — the fields
   ride the emitted row.
 
+## No matchup grid when there's no VI; the direction bar's separator stays 2px
+
+- RdApDetail's 2PP matchup block (rd-allpolls.jsx, the `.rd-apd-grid`
+  with its `.rd-apd-th` "v One Nation" / "v Coalition" heads and the
+  "Implied, on 2025 flows" / "As {pollster} published" / "Better prime
+  minister" rows) renders only when the wave measured something the
+  grid can quote: `hasMatchup` (:528-533) is the OR of the same nulls
+  that already dash each cell — the implied pair (alpOnImp/alpImp), the
+  alt matchup (ta), the printed pair (alp && lnp), and any better-PM
+  cell. SEC Newgate and the mood-only Essential waves publish none of
+  those, so NO grid at all renders — not a head row over dashes. The
+  leaders/direction/seats `.rd-apd-grid1` grids are separate and
+  unaffected; the non-redesign ArchPollDetail in d1a1d215 never had the
+  grid (meta band + PollLedger), so it needed no co-edit.
+- The row's direction-bar picture `.rd-ap-dbar` (rd-allpolls.jsx
+  ~:1133-1141; css rd.css :1785-1789 + phone :1944) is `display:flex;
+  gap: 2px` over `flexGrow: d.right/unsure/wrong` items. `gap` applies
+  on BOTH sides of a contained item even at zero width, so SEC's
+  `unsure: 0` strip left 2px+2px=4px of white dividing right-direction
+  from wrong-track while bars carrying an unsure share show single 2px
+  separators. The middle `<i className="u">` renders only when
+  `d.unsure > 0` — one uniform 2px separator in every case, and the
+  first/last-child border-radius ends never move. The DOM tell of the
+  bug: a mounted `i.u` whose inline `flexGrow` is 0.
+
 ## Tally denominators — the archive extent, not the facet's rows
 
 `totalAll = D.individualPolls.length + dirOnlyAll.length` (d1a1d215) is
@@ -161,9 +186,17 @@ The probe also walks each direction-only row's OWN affordances
 both pinned); `openRow(regex)` clicks the row and reads the mounted
 `.rd-ap-open .rd-apd` — `rowHref` off `.rd-ap-row.open [role='rowheader']
 b a` / `.rd-ap-card.open .rd-ap-firm a`, the head sentence, the
-`.rd-apd-links` anchors, the rail text + whether it carries an svg. Two
-traps hit live: (1) the 2025-05-11 Essential mood-only wave must be
-opened via /Essential[\s\S]*7–11 May/ — plain /Essential/ matches a VI
+`.rd-apd-links` anchors, the rail text + whether it carries an svg, and
+(since the grid suppression) `grids` (each mounted `.rd-apd-grid`'s
+text) + `thCount` — SEC's and the May Essential wave's details pin 0 th
+and no "Implied, on 2025 flows" anywhere, while a poll opened on the
+2PP facet pins 2 th WITH the Implied row. The direction-bar checks run
+off the mounted rows: no `i.u` survives with a non-positive inline
+flexGrow, every SEC row's `.rd-ap-dbar` is exactly two `<i>` children,
+and the facet still mounts the middle strip where a reading carries an
+unsure share. Two traps hit live: (1) the 2025-05-11 Essential
+mood-only wave must be opened via /Essential[\s\S]*7–11 May/ —
+plain /Essential/ matches a VI
 row first and its detail has no direction rail; (2) the head credits
 "published by The Guardian" with a capital T (rdApThe ADDS "the", never
 lowercases the client), so a /the Guardian/ expectation fails.

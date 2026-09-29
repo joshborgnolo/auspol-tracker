@@ -11,6 +11,9 @@
 //  4. ?f=d opens the page straight onto the Direction facet
 //  5. The Snapshot direction chart's dot tooltip says "n = 1,659"
 //  6. VW=390 VH=844 re-run: same rows mount on the phone rung
+//  7. A wave without an unsure share drops the direction bar's middle
+//     segment entirely — a zero-width strip would still take the bar's
+//     2px flex gaps on both sides, doubling the right/wrong divider
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -257,6 +260,32 @@ check("Direction facet counts against the archive's full extent",
 
 await showAll(page4);
 
+// --- direction-bar: a no-unsure reading renders no middle segment ------
+// SEC's right+wrong sum to 100. A zero-width unsure strip between them
+// still took the bar's 2px flex gaps on BOTH sides, doubling the white
+// divider — the strip must render not at all, leaving one 2px separator.
+const bars = await page4.evaluate(() => {
+  const rows = [...document.querySelectorAll(".rd-ap-row, .rd-ap-card")];
+  const all = [...document.querySelectorAll(".rd-ap-dbar")];
+  return {
+    collapsed: all.filter((b) => {
+      const u = b.querySelector("i.u");
+      return u && !(parseFloat(u.style.flexGrow) > 0);
+    }).length,
+    sec: rows.filter((r) => r.textContent.includes("SEC Newgate")).map((r) => {
+      const b = r.querySelector(".rd-ap-dbar");
+      return b ? `${b.querySelectorAll("i").length}${b.querySelector("i.u") ? "+u" : ""}` : "none";
+    }),
+    withU: all.filter((b) => b.querySelector("i.u")).length,
+  };
+});
+check("no direction bar keeps a collapsed unsure strip", bars.collapsed === 0,
+  `${bars.collapsed} zero-width strip(s) still mounted`);
+check("every SEC row's bar is the two-answer pair", bars.sec.length === 7 && bars.sec.every((s) => s === "2"),
+  bars.sec.join(", "));
+check("readings with an unsure share keep the middle strip", bars.withU > 0,
+  `${bars.withU} bar(s) carry i.u`);
+
 // open a SEC Newgate row and interrogate the row cell + the detail
 async function openRow(pageRe) {
   await page4.evaluate((src) => {
@@ -275,7 +304,11 @@ async function openRow(pageRe) {
     const links = [...detail.querySelectorAll(".rd-apd-links a")].map((a) => ({ t: a.textContent.trim(), href: a.href }));
     const rail = (detail.querySelector(".rd-apd-r") || {}).textContent || "";
     const railSvg = !!detail.querySelector(".rd-apd-r svg");
-    return { rowHref, head, links, rail, railSvg };
+    return {
+      rowHref, head, links, rail, railSvg,
+      grids: [...detail.querySelectorAll(".rd-apd-grid")].map((g) => g.textContent.replace(/\s+/g, " ").trim()),
+      thCount: detail.querySelectorAll(".rd-apd-th").length,
+    };
   });
 }
 
@@ -293,6 +326,11 @@ check("SEC rail counts toward the direction headline, not the 2PP",
     && (/more (right-direction|wrong-track) than the month’s average/.test(secD.rail) || /Level with the month’s average/.test(secD.rail))
     && !/Labor’s/.test(secD.rail) && secD.railSvg,
   secD ? secD.rail.replace(/\s+/g, " ").slice(0, 160) : "no detail");
+// a house with no voting intention behind it shows no matchup grid at all:
+// no "v …"/"v Coalition" head row (.rd-apd-th), no Implied/as-published rows
+check("SEC detail hides the matchup grid (no VI behind the wave)",
+  !!secD && secD.thCount === 0 && !secD.grids.join(" ").includes("Implied, on 2025 flows"),
+  secD ? `${secD.thCount} th, grids: ${secD.grids.length}` : "no detail");
 
 const essD = await openRow(/Essential[\s\S]*7–11 May/);   // the 2025-05-11 mood-only wave
 check("the May 2025 direction-only Essential row opens with its report link",
@@ -300,6 +338,20 @@ check("the May 2025 direction-only Essential row opens with its report link",
   essD && JSON.stringify(essD.links.map((l) => l.t)));
 check("its head sentence carries the publish stamp",
   !!essD && /published by The Guardian on Tue 13 May, 1 am/.test(essD.head), essD && essD.head);
+check("its detail hides the matchup grid too",
+  !!essD && essD.thCount === 0 && !essD.grids.join(" ").includes("Implied, on 2025 flows"),
+  essD ? `${essD.thCount} th, grids: ${essD.grids.length}` : "no detail");
+
+// and the same grid must stay on a poll WITH voting intention behind it
+await page4.evaluate(() => {
+  const t = [...document.querySelectorAll(".rd-ap-tabs button")].find((n) => /^2PP$/.test(n.textContent.trim()));
+  t.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+});
+await new Promise((r) => setTimeout(r, 800));
+const viD = await openRow(/./);
+check("a poll with voting intention keeps the matchup grid",
+  !!viD && viD.thCount === 2 && viD.grids.join(" ").includes("Implied, on 2025 flows"),
+  viD ? `${viD.thCount} th` : "no detail");
 
 check("no page errors in this section", errs4.length === 0, errs4[0] || "");
 await page4.close();

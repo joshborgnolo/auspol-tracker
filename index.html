@@ -66444,6 +66444,7 @@ function RdApDetail({
     onp: setHan ? ppmCell(setHan) : null,
     lnp: setOpp ? ppmCell(setOpp) : setThree ? ppmCell(setThree, true) : null
   };
+  const hasMatchup = p.alpOnImp != null || p.alpImp != null || !!ta || p.alp != null && p.lnp != null || ppmBy.onp != null || ppmBy.lnp != null;
   const a = p.appr || {};
   const mb = a.metricBy || {};
   const leaders = [["alb", "albNet", "Albanese"], ["taylor", "taylorNet", a.oppName || "Taylor"], ["hanson", "hansonNet", "Hanson"]].filter(([, nk]) => a[nk] != null);
@@ -66503,7 +66504,7 @@ function RdApDetail({
     className: "rd-apd-sub"
   }, rdApChg(c[CK[k.id]], 0) || " ")))), prim.length > 0 && React.createElement("span", {
     className: "rd-apd-sub rd-apd-note"
-  }, "Primary vote, %.", prev ? " Changes are on " + p.pollster + "’s " + prev.field + " poll." : ""), React.createElement("div", {
+  }, "Primary vote, %.", prev ? " Changes are on " + p.pollster + "’s " + prev.field + " poll." : ""), hasMatchup && React.createElement("div", {
     className: "rd-apd-grid"
   }, React.createElement("span", null), cols.map(k => React.createElement("span", {
     key: k.id,
@@ -67448,7 +67449,7 @@ function RdAllPolls(P) {
           flexGrow: d.right,
           background: "var(--mood-pos)"
         }
-      }), React.createElement("i", {
+      }), d.unsure > 0 && React.createElement("i", {
         style: {
           flexGrow: d.unsure
         },
