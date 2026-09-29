@@ -430,15 +430,17 @@ body.js.ss-view #root { display: none; }
      them is a construction line nobody can see. */
   background: none; border: 0; padding: 3px; margin: -3px; cursor: pointer;
   text-decoration: none;   /* the satellites wear the same rule on an <a> */
-  /* The words live inside this button - the whole lockup is the way into the
-     replay - so it has to carry the wordmark's typography onward to them
-     rather than fall back to the button UA face. */
+  /* The words live inside the button only on the satellites, whose
+     whole-lockup <a> is the way home; the main page's button wraps the dial
+     alone (see .lockup below). The inheriting declarations earn their keep
+     either way. */
   font: inherit; letter-spacing: inherit; text-align: left; color: inherit;
   /* 12px, not 7: the dial's nearest ink is the tallest graduation's tip,
      which reaches to within 0.9px of the box edge, so the clear space a
      reader sees is the gap plus almost nothing. 12px puts it at 12.9px - a
      third of the mark's own height, and it opens to 25px beside the letters
-     themselves. */
+     themselves. (Single-child on the main page, where the gap lives on
+     .lockup instead.) */
   gap: 12px;
   /* A hover scale is a surface responding to a pointer, not a mass with
      momentum, so it decelerates rather than overshooting - the old curve
@@ -451,6 +453,16 @@ body.js.ss-view #root { display: none; }
 .wm-glyph:active { transform: scale(0.97); }
 .wm-glyph:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
 /* /shell-copy */
+
+/* Main page only: the lockup's row of word + dial, with the 12px the
+   satellites still carry inside their whole-lockup anchor. */
+.lockup { display: flex; align-items: center; gap: 12px; }
+/* …and the player click is wired to the DIAL'S OWN contour, not a box
+   around the lockup: the satellites' 8px pill would sit square on a
+   dial-only button, so the ellipse replaces it. border-radius shapes the
+   hit target as well as the paint, so the corners' dead air no longer
+   fires the player either. */
+button.wm-glyph { border-radius: 50%; }
 
 /* ---------- the dial, wound back ---------- */
 /* Paper, not a lightbox: this is a printed instrument being demonstrated, so
@@ -3233,10 +3245,10 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
   /* stack header; pin the theme toggle to the top-right corner so it never
      wraps down beside the meta on narrow screens */
   .site-head { flex-direction: column; align-items: flex-start; gap: 13px; }
-  /* reserve toggle space on the wordmark row only – not the brand wrapper –
+  /* reserve toggle space on the lockup row only – not the brand wrapper –
      so the tagline below the (top-pinned) toggle can use the full width */
   .brand { padding-right: 0; }
-  .wordmark { padding-right: 92px; }
+  .lockup { padding-right: 92px; }
   /* head-right's own box leaves the flow (meta is hidden, the toggle is
      absolutely pinned) so it can't add phantom column-gap above the rule */
   .head-right { display: contents; }
