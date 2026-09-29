@@ -384,6 +384,18 @@ function RdHero(p) {
     ? "After preferences, updated " + rdDate(D.latest.updatedISO, true)
     : "After preferences, " + D.latest.pollsTracked + " polls from " + D.latest.housesTracked + " pollsters, updated " + rdDate(D.latest.updatedISO, true);
 
+  /* a sideways swipe on the chart flips the 2PP contest, wrapping round the
+     matchups like the computer's arrow keys wrap a row - the card bears the
+     exact claim so the gesture reaches it past the chart's own scrub */
+  const swipeLive = React.useRef(null);
+  swipeLive.current = (dir) => {
+    const i = orderedMatchups.indexOf(matchup);
+    if (i < 0 || orderedMatchups.length < 2) return false;
+    chooseMatchup(orderedMatchups[(i + dir + orderedMatchups.length) % orderedMatchups.length]);
+    return true;
+  };
+  const swipeMark = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => swipeLive.current(dir); }, []);
+
   return (
     <section className="rd-sec rd-first rd-tpp" id="two-party" aria-labelledby="rd-tpp-t">
       <div className="rd-eyebrow">
@@ -441,7 +453,7 @@ function RdHero(p) {
 
       {story && narrow && <RdSub head={story.head} dek={story.dek} level={3} glide />}
 
-      <div className="card rd-card rd-tpp-chart">
+      <div className="card rd-card rd-tpp-chart" ref={swipeMark} data-rd-swipe-exact="">
         <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm">
           {!narrow && cmpAvail && <RdCheck checked={showSynth} onChange={setShowSynth}>{cmpBox}</RdCheck>}
         </RdTabs>

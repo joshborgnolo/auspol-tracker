@@ -2094,10 +2094,16 @@ function App() {
      its panel or section, so the table or chart under the row too - steps
      through ITS views instead, the nearest row winning. Rows that only re-cut one figure (the time range,
      Past cycles' re-elected/ousted) aren't marked, so the page turns there.
+     Both the page turn and every row step wrap round the ends, as the
+     arrow-key walks on a computer do: a swipe off the last page or the last
+     tab comes back round to the first.
 
      It only ever reads a finished gesture, and leaves alone anything that
      claims sideways drags for itself: a chart scrubs (touch-action: pan-y),
-     a slider drags (none), a wide table scrolls. So do the edges, where iOS
+     a slider drags (none), a wide table scrolls. One exact exception: an
+     element marked data-rd-swipe-exact (the hero's 2PP card, which flips
+     the contest) keeps a touch that lands on it no matter what it would
+     otherwise claim. So do the edges, where iOS
      and Android put their own back gesture, a zoomed-in page (the finger is
      panning it) and a second finger (a pinch). Passive throughout: the page
      never waits on this to scroll. */
@@ -2145,8 +2151,11 @@ function App() {
       if (window.visualViewport && window.visualViewport.scale > 1.01) return;
       const t = e.touches[0];
       if (t.clientX < EDGE || t.clientX > window.innerWidth - EDGE) return;
-      if (claimsSideways(e.target)) return;
-      g = { x: t.clientX, y: t.clientY, t: Date.now(), sy: window.scrollY, row: rowAt(t.clientY) };
+      /* an exact claimer (the hero's 2PP card) takes a touch that lands on
+         it, whatever sideways claims stand between it and the page */
+      const own = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-exact]") : null;
+      if (!own && claimsSideways(e.target)) return;
+      g = { x: t.clientX, y: t.clientY, t: Date.now(), sy: window.scrollY, row: own || rowAt(t.clientY) };
     };
     const onMove = (e) => { if (g && e.touches.length > 1) g = null; };
     const onCancel = () => { g = null; };
@@ -2167,8 +2176,7 @@ function App() {
       }
       const { tab: cur, goTab: go } = swipeRef.current;
       const ids = TABS.map((x) => x.id);
-      const next = ids[ids.indexOf(cur) + dir];
-      if (next) go(next);
+      go(ids[(ids.indexOf(cur) + dir + ids.length) % ids.length]);
     };
     document.addEventListener("touchstart", onStart, { passive: true });
     document.addEventListener("touchmove", onMove, { passive: true });
@@ -2188,8 +2196,7 @@ function App() {
      tab walk and every rdTabsKey row cover the rest), an open "?" or
      glossary panel keeps the page put, and a live text selection keeps the
      collapse-to-end behaviour. Wraps round the ends, like the navbar's own
-     walk (the finger swipe still clamps - a swipe off the last page should
-     do nothing). */
+     walk - and the finger swipe walks the pages the same way now. */
   React.useEffect(() => {
     const onKey = (e) => {
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;

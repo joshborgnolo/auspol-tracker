@@ -353,18 +353,18 @@ function rdDigitKey(items, onChange) {
 function RdTabs({ value, onChange, options, ariaLabel, children, className, swipe, onDigits }) {
   /* `swipe`: the views are pages of their own (All polls' figures, preferred
      PM's questions, who votes by age or by place…), so on a phone a sideways
-     swipe on or just under the row steps through them - the app's swipe
-     handler finds the row by data-rd-swipe and calls its step. Views that
-     only re-cut one figure (a time range, a filter) leave it off, and a
-     swipe near them turns the page instead.
+     swipe on or just under the row steps through them, wrapping round the
+     ends as the arrow-key walk does - the app's swipe handler finds the row
+     by data-rd-swipe and calls its step. Views that only re-cut one figure
+     (a time range, a filter) leave it off, and a swipe near them turns the
+     page instead.
      `onDigits`: a row-wide number-key handler (rdDigitKey) hung on the outer
      div, so it hears a focused view tab or a focused row child alike. */
   const live = React.useRef(null);
   live.current = (dir) => {
     const i = options.findIndex((o) => o.id === value);
-    const next = options[i + dir];
-    if (i < 0 || !next) return false;
-    onChange(next.id);
+    if (i < 0 || options.length < 2) return false;
+    onChange(options[(i + dir + options.length) % options.length].id);
     return true;
   };
   const mark = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => live.current(dir); }, []);

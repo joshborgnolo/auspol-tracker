@@ -57417,9 +57417,8 @@ function RdTabs({
   const live = React.useRef(null);
   live.current = dir => {
     const i = options.findIndex(o => o.id === value);
-    const next = options[i + dir];
-    if (i < 0 || !next) return false;
-    onChange(next.id);
+    if (i < 0 || options.length < 2) return false;
+    onChange(options[(i + dir + options.length) % options.length].id);
     return true;
   };
   const mark = React.useCallback(el => {
@@ -58231,6 +58230,16 @@ function RdHero(p) {
     }];
   };
   const meta = narrow ? "After preferences, updated " + rdDate(D.latest.updatedISO, true) : "After preferences, " + D.latest.pollsTracked + " polls from " + D.latest.housesTracked + " pollsters, updated " + rdDate(D.latest.updatedISO, true);
+  const swipeLive = React.useRef(null);
+  swipeLive.current = dir => {
+    const i = orderedMatchups.indexOf(matchup);
+    if (i < 0 || orderedMatchups.length < 2) return false;
+    chooseMatchup(orderedMatchups[(i + dir + orderedMatchups.length) % orderedMatchups.length]);
+    return true;
+  };
+  const swipeMark = React.useCallback(el => {
+    if (el) el.__rdSwipe = dir => swipeLive.current(dir);
+  }, []);
   return React.createElement("section", {
     className: "rd-sec rd-first rd-tpp",
     id: "two-party",
@@ -58342,7 +58351,9 @@ function RdHero(p) {
     level: 3,
     glide: true
   }), React.createElement("div", {
-    className: "card rd-card rd-tpp-chart"
+    className: "card rd-card rd-tpp-chart",
+    ref: swipeMark,
+    "data-rd-swipe-exact": ""
   }, React.createElement(RdTabs, {
     value: rangeId,
     onChange: setRangeId,
@@ -69722,13 +69733,14 @@ function App() {
       if (window.visualViewport && window.visualViewport.scale > 1.01) return;
       const t = e.touches[0];
       if (t.clientX < EDGE || t.clientX > window.innerWidth - EDGE) return;
-      if (claimsSideways(e.target)) return;
+      const own = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-exact]") : null;
+      if (!own && claimsSideways(e.target)) return;
       g = {
         x: t.clientX,
         y: t.clientY,
         t: Date.now(),
         sy: window.scrollY,
-        row: rowAt(t.clientY)
+        row: own || rowAt(t.clientY)
       };
     };
     const onMove = e => {
@@ -69758,8 +69770,7 @@ function App() {
         goTab: go
       } = swipeRef.current;
       const ids = TABS.map(x => x.id);
-      const next = ids[ids.indexOf(cur) + dir];
-      if (next) go(next);
+      go(ids[(ids.indexOf(cur) + dir + ids.length) % ids.length]);
     };
     document.addEventListener("touchstart", onStart, {
       passive: true
