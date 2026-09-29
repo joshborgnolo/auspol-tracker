@@ -165,13 +165,14 @@ function normaliseLead(lead) {
     .replace(/\b(?:up|down|rose|fell|increased|decreased|dropped|declined|grew)\s+(?:support\s+|by\s+)?[\d.]+\s*%\s*(?:points?\s*)?(?=\s*(?:to|at)\s)/gi, "")
     .replace(/\bunchanged\s+(?=(?:at|on)\s+[\d.])/gi, "");
 }
-const BOUND = "(?:to|at|on|is|was|were|are)";
+const BOUND = "(?:to|at|on|is|was|were|are|with)";
 const toValIn = (scope, name) => {
   const m = scope.match(new RegExp("\\b" + name + "\\b\\s+(?:on\\s+)?([\\d.]+)\\s*%", "i"))
-       ?? scope.match(new RegExp("\\b" + name + "\\b[^%]{0,60}?\\b" + BOUND + "\\s+([\\d.]+)\\s*%", "i"));
+       ?? scope.match(new RegExp("\\b" + name + "\\b[^%]{0,60}?\\b" + BOUND + "\\s+([\\d.]+)\\s*%", "i"))
+       ?? scope.match(new RegExp("([\\d.]+)\\s*%\\s*" + name, "i")); // "(20% Liberal, 2.5% Nationals)"
   return m ? parseFloat(m[1]) : null;
 };
-const IND_NAME = "(?:Independents?\\s*\\/\\s*Other Parties|Other Parties\\s*\\/\\s*Independents?)";
+const IND_NAME = "(?:Independents?\\s*\\/\\s*Others?(?:\\s+Parties)?|Others?(?:\\s+Parties)?\\s*\\/\\s*Independents?)";
 
 const iso = (y, m, d) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 const DAY = 86400000;
