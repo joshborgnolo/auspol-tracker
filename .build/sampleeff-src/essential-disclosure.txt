@@ -378,11 +378,13 @@ Page 6 / 19
 
    01-Sep-26    26-Aug-26    31-Aug-26   National   1,017      63%          645       ±3.9%
 
+   30-Sep-26    23-Sep-26    28-Sep-26   National   1,008      86%          865       ±3.3%
+
 
 
 
 Page 7 / 19
-Questionnaire Content (26 August 2026)
+Questionnaire Content (23 September 2026)
 
 
 SCREENERS
@@ -469,6 +471,21 @@ D12.     And which of the following best describes the type of household you cur
          8.   Single or couple whose children have left home
          9.   Other
 
+D14.     What is the highest level of education you have attained?
+
+
+         SINGLE RESPONSE
+
+
+         1.   Year 9 and below
+         2.   Year 10 and above
+         3.   Certificate levels I-IV
+         4.   Diploma or advanced diploma
+         5.   Graduate diploma or certificate
+         6.   Bachelor or honours degree
+         7.   Post-graduate degree
+         8.   Other (please specify)
+         9.   I prefer not to answer
 
 
 
@@ -480,7 +497,9 @@ Q41.     Are you enrolled to vote in the next Australian federal election?
 
 
 
-ASK IF Q41=1
+
+Page 9 / 19
+ASK IF Q41=1
 Q43.     Did you vote in the May 2025 federal election, or were you unable to do so for some reason?
 
 
@@ -492,11 +511,7 @@ Q43.     Did you vote in the May 2025 federal election, or were you unable to do
 
 
 ASK IF Q41=1 or 2
-
-
-
-Page 9 / 19
-Q21.     If a federal election was held tomorrow, to which party would you give your first preference vote in
+Q21.     If a federal election was held tomorrow, to which party would you give your first preference vote in
          the House of Representatives (Lower House)?
 
 
@@ -528,16 +543,19 @@ Q23.     Well which party are you currently leaning towards?
          STATEMENTS 1 & 2/3/4/5
 
 
-         1. Labor
-         2. Liberal (Do not show in QLD or NT)
-         3. National (Do not show in QLD or NT)
-         4. Liberal National Party (Only show in QLD)
-         5. Country Liberals (Only show in NT)
-         6. Greens
-         7. Pauline Hanson’s One Nation
-         8. Trumpet of Patriots
-         9. Independent or other party
-         10. Don’t know
+         1.    Labor
+         2.    Liberal (Do not show in QLD or NT)
+         3.    National (Do not show in QLD or NT)
+         4.    Liberal National Party (Only show in QLD)
+         5.    Country Liberals (Only show in NT)
+         6.    Greens
+
+
+
+Page 10 / 19
+         7. Pauline Hanson’s One Nation
+         8. Independent or other party
+         9. Don’t know
 
 ASK IF Q21=6-9 OR Q23=6-9
 Q24.     Following your first preference vote, which of the following would you preference higher in the House
@@ -547,10 +565,7 @@ Q24.     Following your first preference vote, which of the following would you 
          SINGLE RESPONSE. RANDOMISE 1 & 2
 
 
-
-
-Page 10 / 19
-         1. Labor
+         1. Labor
          2. Liberal/National Coalition
          3. Unsure
 
@@ -592,15 +607,17 @@ Q17.     At the most recent Federal election (held on 3 May 2025), to which part
          4.    Liberal National Party (Only show in QLD)
          5.    Country Liberals (Only show in NT)
          6.    Greens
-         7.    Pauline Hanson’s One Nation
-         8.    Independent or other party
-         9.    Don’t know
-
 
 
 
 Page 11 / 19
-AD HOC
+         7. Pauline Hanson’s One Nation
+         8. Independent or other party
+         9. Don’t know
+
+
+
+AD HOC
 
 
 Q37.     Do you approve or disapprove of the job Anthony Albanese is doing as Prime Minister?
@@ -644,11 +661,7 @@ E563.    In general, would you say that Australia is heading in the right direct
 
 
 ASK IF CODE 1 SELECTED AT E563
-
-
 E563A. Why do you think that Australia is heading in the right direction?
-
-
 OPEN ENDED
 
 
@@ -656,247 +669,205 @@ OPEN ENDED
 
 Page 12 / 19
 ASK IF CODE 2 SELECTED AT E563
-
-
 E563B. Why do you think that Australia is heading in the wrong direction?
-
-
 OPEN ENDED
 
 
-E1096. How important are the following issues to you?
-
-Please rank your top 3 issues where 1=Most important, 2=Second most important and 3=Third most
-important.
-
-         RANK FROM 1 TO 3. RANDOMISE
-
-         1. Inflation and cost of living
-         2. Managing technology change and AI
-         3. Climate change and the energy transition
-         4. Crime
-         5. Medicare and health services
-         6. Aged care
-         7. Childcare
-         8. Workers’ rights and job security
-         9. Immigration
-         10. Defence and international relations
-
-E0. Are you currently a member or have you ever been a member of any of the following groups?
+E74.     Do you think immigration to Australia is generally positive or generally negative for the country?
 
 
-         a. Currently a member
-         b. Previously a member
-         c. Never been a member
+         SINGLE RESPONSE. RANDOMISE 1 & 2
+               1. Generally positive
+               2. Generally negative
+               3. Unsure
 
 
-         SINGLE RESPONSE FOR EACH OPTION. RANDOMISE STATEMENTS 1-9. CAROUSEL
-        DISPLAY
+
+E1094. To what extent would you like to see Australia’s yearly immigration intake increase, decrease or stay
+about the same?
 
 
-    1. Active member of a Church
-    2. Business/industry association
-    3. Environment group
-    4. Local community organisation (Lions, Rotary, etc)
-    5. Local Sporting clubs
-    6. Political party
-    7. Professional sporting clubs (AFL, NRL, etc.)
-    8. School council or parents group
-    9. Union
-    10. Other voluntary organisation
+         SINGLE RESPONSE
+               1.   Increase significantly
+               2.   Increase moderately
+               3.   Stay about the same
+               4.   Decrease moderately
+               5.   Decrease significantly
+
+
+
+ASK IF CODE 4 OR 5 AT E1094
+E1198. You said you think immigration to Australia should be decreased. Thinking about where those
+reductions should come from, imagine you have 100 points to allocate across the groups below. Put more
+points on the groups you would cut the most, and fewer or zero points on the groups you would
+protect from cuts. Your points should add up to 100.
+
+
+RANDOMISE ROWS. CONSTANT SUM.
+    1.   Skilled workers
+    2.   International students
+    3.   Family members of people already living in Australia
+    4.   Refugees and people admitted on humanitarian grounds
+    5.   Working holidaymakers and seasonal or temporary workers
+
+
+
+(Total must equal 100)
 
 
 
 
 Page 13 / 19
-E274.     How important are unions for Australian working people today?
+ASK ALL
+E967. From your perspective, what sort of impact does immigration have on:
 
 
-         SINGLE RESPONSE
-         1.    Very important
-         2.    Quite important
-         3.    Not very important
-         4.    Not at all important
-         5.    Unsure
+CARROUSEL. UNSURE ON BOTTOM ROW.
 
 
-
-E276.     Overall, would workers be better off or worse off if unions in Australia were stronger?
-
-
-         SINGLE RESPONSE
-         1.    A lot better off
-         2.    A little better off
-         3.    A little worse off
-         4.    A lot worse off
-         5.    Unsure / Makes no difference
+    1.   Very positive impact
+    2.   Somewhat positive impact
+    3.   No impact
+    4.   Somewhat negative impact
+    5.   Very negative impact
+    6.   Unsure
 
 
 
-E1189. Do you agree or disagree with the following statements?
+         SINGLE RESPONSE PER STATEMENT. RANDOMISE STATEMENTS
 
 
-    1.    Strongly disagree
-    2.    Somewhat disagree
-    3.    Somewhat agree
-    4.    Strongly agree
-    5.    Unsure
-
-
-          SINGLE RESPONSE FOR EACH OPTION. RANDOMISE STATEMENTS. CAROUSEL DISPLAY
-
-
-    a.    I just don’t like joining groups
-    b.    I find it impossible to give my time to things outside of work and home
-    c.    I can’t commit to groups because if don’t work regular hours
-    d.    There are fewer people available to be part of local groups
-    e.    The decline in membership of organisations is not a positive development
-    f.    People just aren’t interested in joining things anymore
+         1.    The Australian economy
+         2.    Housing availability and affordability
+         3.    The environment
+         4.    Job opportunities and the unemployment rate
+         5.    Filling worker shortages in essential industries
+         6.    Availability of essential services such as schools and hospitals
+         7.    Community safety
+         8.    How well people from different backgrounds get along
 
 
 
-E1190. To what extent do you agree or disagree with the following statements:
+ASK ALL
+E1199. To what extent do you support or oppose each of the following?
+    a.   Strongly support
+    b.   Somewhat support
+    c.   Neutral
+    d.   Somewhat oppose
+    e.   Strongly oppose
+    f.   Unsure
+
+CARROUSEL. RANDOMISE STATEMENTS. PUT “Unsure” ON ROW BELOW
 
 
-    1. Workers under 18 should receive superannuation for every hour they work, just like adults
-    2. Australians should be able to access their superannuation to support their financial stability including
-       if they are under financial stress
-    3. Australians should be able to access their superannuation for a house deposit
+    1. Greater scrutiny of people seeking protection or asylum visas
+    2. Forced deportation of people who have overstayed their visa
+    3. Making it harder for temporary migrants to move between different types of visas to extend their stay
+    4. Directing skilled worker visas towards industries with shortages, such as healthcare, construction
+       and education
+    5. Introducing a ballot (random selection) system for backpackers (working holiday visa holders)
+       wanting to stay for a second or third year
+    6. Preventing most international students from bringing family members with them to Australia
+
 
 
 
 Page 14 / 19
-    4. Australians should only be able to access their superannuation at retirement
-    5. Australia should increase the mandatory superannuation contribution for employers to help make
-       workers more secure in retirement
-
-SINGLE RESPONSE FOR EACH OPTION. RANDOMISE STATEMENTS. CAROUSEL DISPLAY
-    1.   Strongly disagree
-    2.   Somewhat disagree
-    3.   Somewhat agree
-    4.   Strongly agree
-    5.   Unsure
+ASK ALL
+E1200. Below are four different views on immigration into Australia. Please select the one statement that
+best reflects your own opinion.
 
 
-
-E1191. Thinking about your working life over the next five years, to what extent are you concerned about the
-following?
+SINGLE RESPONSE. RANDOMISE ROWS
 
 
-    1.   Not concerned at all
-    2.   Not that concerned
-    3.   Somewhat concerned
-    4.   Very concerned
-    5.   Unsure
+1. Immigration is good for Australia and we should keep welcoming people, with the focus on supporting
+   refugees and reuniting families rather than cutting the numbers.
+
+2. Immigration overall benefits Australia, but the numbers have been too high and should be gradually
+   brought down to a more manageable level, while still bringing in the skilled workers the economy needs.
 
 
-   SINGLE RESPONSE FOR EACH OPTION. RANDOMISE STATEMENTS. CAROUSEL DISPLAY
+3. Immigration is currently too high and is putting real pressure on housing and services. It should be cut
+   further and as fast as possible.
 
 
-    a.   Wages not keeping up with the cost of living
-    b.   Housing affordability
-    c.   Job security
-    d.   Artificial intelligence and automation
-    e.   Workload and working hours
-    f.   Having enough superannuation for retirement
-    g.   Workplace safety
-    h.   Finding secure, well-paid work
-    i.   Workers' rights
-    j.   Job satisfaction
+4. Immigration is far too high and is the main cause of problems like housing shortages. It should be cut
+   dramatically, to the point where more people should be leaving Australia than arriving.
 
+5. None of these reflects my view
 
-E1192. How confident are you that current worker and union protections will safeguard jobs as employers
-introduce new AI technologies?
-
-
-    1.   Not confident at all
-    2.   Not that confident
-    3.   Somewhat confident
-    4.   Very confident
-    5.   Unsure
+6. Unsure
 
 
 
-E1193. To what extent do you agree or disagree with the following statements?
+
+ASK IF CODE 4 OR 5 AT E1094
+E1201. If governments built enough homes and expanded public services to keep pace with population
+growth, would you still want immigration reduced?
+               1. Yes
+               2. No
+               3. Unsure
+
+
+
+E1202. Which of the following is closest to your view about artists and celebrities expressing political
+opinions?
+SINGLE RESPONSE. ROTATE 1 AND 3
+    1. They should feel free to share their political views, including during their performances or events
+    2. They can share their political views in general, but performances and events are not the right place
+       for it
+    3. They should stay out of politics altogether
+    4. Unsure
+
 
 
 
 Page 15 / 19
-         1.    Strongly disagree
-         2.    Somewhat disagree
-         3.    Somewhat agree
-         4.    Strongly agree
-         5.    Unsure
+E1203. Thinking about gambling advertising in Australia, which of the following comes closest to what you
+think the rules should be?
 
 
-   SINGLE RESPONSE FOR EACH OPTION. RANDOMISE STATEMENTS. CAROUSEL DISPLAY
-
-    a) Employers should be required to consult their workers before introducing AI that will alter their jobs.
-    b) Australia should have regulation around how an employer can use AI to automate HR decisions
-       including hiring, firing and performance management
-    c) Australia should not place regulations on employers' use of AI because it will reduce innovation
+SINGLE RESPONSE
 
 
-
-E1194. To what extent do you agree/ disagree with the following statement:
-
-
-I want more control over what comes up in my social media feeds
-
-
-    1.   Strongly disagree
-    2.   Somewhat disagree
-    3.   Neither agree nor disagree
-    4.   Somewhat agree
-    5.   Strongly agree
-    6.   Unsure
-
-
-E1195. Over the past few years, do you think violence against women in Australia has:
-
-
-         1.    Increased a lot
-         2.    Increased a little
-         3.    Stayed about the same
-         4.    Decreased a little
-         5.    Decreased a lot
-         6.    Unsure
+    1. There should be no restrictions on gambling advertising
+    2. There should be restrictions on gambling advertising only during live sport broadcasts
+    3. There should be restrictions on gambling advertising during live sport and a ban on gambling ads on
+       social media and online
+    4. There should be ban on all gambling advertising on TV, radio, on social media and online, at all
+       times
+    5. Unsure
 
 
 
 
-E1196. Have you seen or heard the term "the manosphere"?
+E82.     How happy or unhappy are you with each of the following parts of your personal situation?
 
 
-         1. Yes, and I could explain what it means
-         2. Yes, but I'm not sure what it means
-         3. No, I haven't heard of it
+         a. 0 – Extremely unhappy
+         b.    1
+         c.    2
+         d.    3
+         e.    4
+         f.    5
+         g.    6
+         h.    7
+         i.    8
+         j.    9
+         k.    10 – Extremely happy
 
 
+         SINGLE RESPONSE FOR EACH ROW. RANDOMISE STATEMENTS 2-6. USE 11 POINT SCALE,
+         LABELLING TOP AND BOTTOM POINTS ONLY. SHOW AS SLIDER SCALE
 
 
-Page 16 / 19
-E1197. The term manosphere refers to online influencers and communities that promote traditional male
-roles, opposition to feminism and hostility towards women.
-
-To what extent do you agree / disagree with the following statements?
-
-
-      1.   Strongly disagree
-      2.   Somewhat disagree
-      3.   Neither agree nor disagree
-      4.   Somewhat agree
-      5.   Strongly agree
-      6.   Unsure
-
-
-   SINGLE RESPONSE FOR EACH OPTION. RANDOMISE STATEMENTS. CAROUSEL DISPLAY
-
-
-      a.   Online content like this is contributing to violence against women in Australia
-      b.   It's almost impossible for teenage boys in Australia to avoid seeing this kind of content online
-      c.   I am concerned about the influence this type of content is having on someone in my life
-      d.   The concern about online influencers and young men has been exaggerated
+         1.    My life overall
+         2.    My personal/family life
+         3.    My social life
+         4.    My spiritual life
+         5.    My work life
+         6.    My financial situation
 
 
 
@@ -906,36 +877,35 @@ DEMOGRAPHICS
 Thank you for your time so far, we only have a few more questions.
 
 
-ASK ALL
-D23.       In what year were you born?
 
 
-           FOUR DIGIT TEXT BOX. RANGE BETWEEN 1920-2008
+Page 16 / 19
+ASK ALL
+D23.     In what year were you born?
 
 
-
-
-D6.        What is the total of all wages/salaries, government benefits, pensions, allowances, and other income
-           that your household usually receives (GROSS – before tax and superannuation deductions)?
-
-
-           SINGLE RESPONSE
-
-
-           1.   $3,500 or more per week ($182,000 or more per year)
-           2.   $3,000-$3,499 per week ($156,000-$181,999 per year)
-           3.   $2,500-$2,999 per week ($130,000-$155,999 per year)
-           4.   $2,000-$2,499 per week ($104,000-$129,999 per year)
-           5.   $1,500-$1,999 per week ($78,000-$103,999 per year)
-           6.   $1,250-$1,499 per week ($65,000-$77,999 per year)
-           7.   $1,000-$1,249 per week ($52,000-$64,999 per year)
-           8.   $800-$999 per week ($41,600-$51,999 per year)
-           9.   $600-$799 per week ($31,200-$41,599 per year)
+         FOUR DIGIT TEXT BOX. RANGE BETWEEN 1920-2008
 
 
 
-Page 17 / 19
-         10. $400-$599 per week ($20,800-$31,199 per year)
+
+D6.      What is the total of all wages/salaries, government benefits, pensions, allowances, and other income
+         that your household usually receives (GROSS – before tax and superannuation deductions)?
+
+
+         SINGLE RESPONSE
+
+
+         1. $3,500 or more per week ($182,000 or more per year)
+         2. $3,000-$3,499 per week ($156,000-$181,999 per year)
+         3. $2,500-$2,999 per week ($130,000-$155,999 per year)
+         4. $2,000-$2,499 per week ($104,000-$129,999 per year)
+         5. $1,500-$1,999 per week ($78,000-$103,999 per year)
+         6. $1,250-$1,499 per week ($65,000-$77,999 per year)
+         7. $1,000-$1,249 per week ($52,000-$64,999 per year)
+         8. $800-$999 per week ($41,600-$51,999 per year)
+         9. $600-$799 per week ($31,200-$41,599 per year)
+         10. $400-$599 per week ($20,800-$31,199 per year)
          11. $300-$399 per week ($15,600-$20,799 per year)
          12. $200-$299 per week ($10,400-$15,599 per year)
          13. $1-$199 per week ($1-$10,399 per year)
@@ -966,7 +936,9 @@ D7.      What is your current employment status?
 
 
 
-D24.     Which of the following best describes how you feel about your current financial circumstances?
+
+Page 17 / 19
+D24.     Which of the following best describes how you feel about your current financial circumstances?
 
 
          SINGLE RESPONSE
@@ -990,9 +962,7 @@ D22.     Which of the following best describes your current living situation?
 
 
 
-
-Page 18 / 19
-D25.     Are you currently paying off a mortgage/home loan?
+D25.     Are you currently paying off a mortgage/home loan?
 
 
          SINGLE RESPONSE
@@ -1000,24 +970,6 @@ Page 18 / 19
 
          1. Yes
          2. No
-
-
-
-D14.     What is the highest level of education you have attained?
-
-
-         SINGLE RESPONSE
-
-
-         1.    Year 9 and below
-         2.    Year 10 and above
-         3.    Certificate levels I-IV
-         4.    Diploma or advanced diploma
-         5.    Graduate diploma or certificate
-         6.    Bachelor or honours degree
-         7.    Post-graduate degree
-         8.    Other (please specify)
-         9.    I prefer not to answer
 
 
 
@@ -1040,5 +992,6 @@ D21.     Which of the following applies to you?
 
 
 
-Page 19 / 19
+Page 18 / 19
+Page 19 / 19
 

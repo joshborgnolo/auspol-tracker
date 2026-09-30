@@ -1,12 +1,11 @@
 {
-  "generatedAt": "2026-09-29T23:14:58.309Z",
+  "generatedAt": "2026-09-30T00:00:03.214Z",
   "horizon": "2025-09-29",
   "retro": [
     {
       "date": "2026-09-29",
       "fixes": [
-        "releaseUrl https://essentialreport.com.au/reports/30-september-2026",
-        "url still unset — hand-set the Guardian write-up URL"
+        "published 2026-10-01T01:00"
       ]
     }
   ],

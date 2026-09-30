@@ -1299,7 +1299,8 @@
       "right": 25,
       "wrong": 60,
       "unsure": 15,
-      "url": "https://essentialreport.com.au/reports/30-september-2026"
+      "url": "https://essentialreport.com.au/reports/30-september-2026",
+      "published": "2026-10-01T01:00"
     }
   ],
   "polls": [
@@ -5321,10 +5322,11 @@
     },
     {
       "date": "2026-09-29",
+      "published": "2026-10-01T01:00",
       "dateStart": "2026-09-24",
       "pollster": "Essential",
       "client": "The Guardian",
-      "sample": null,
+      "sample": 1008,
       "alp": 29,
       "lnp": 22,
       "grn": 12,
@@ -5335,7 +5337,9 @@
       "tpp_lnp": 46,
       "url": "https://www.theguardian.com/australia-news/2026/sep/29/guardian-essential-poll-coalitions-primary-vote-sinks-to-lowest-ever-as-majority-support-hardline-immigration-ideas",
       "releaseUrl": "https://essentialreport.com.au/reports/30-september-2026",
-      "assimilated": true
+      "assimilated": true,
+      "sampleEff": 865,
+      "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/09/Essential-Report-Disclosure-Statement-Full-Questionnaire-2.pdf"
     }
   ],
   "ppm": [
