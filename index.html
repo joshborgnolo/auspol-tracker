@@ -4780,6 +4780,7 @@ body.rd .info-h {
   margin: 10px 0 16px; padding-top: 12px; border-top: 2px solid var(--rd-rule);
   font-family: var(--sans); font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em;
 }
+body.rd .info-h#info-about { padding-top: 0; border-top: 0; }
 body.rd .info-h-faq { margin-top: 44px; }
 body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 600; letter-spacing: -0.005em; }
 @media (max-width: 640px) {
@@ -66384,8 +66385,8 @@ const RD_DEMO_SHORT = {
 const RD_DEMO_HOME = {
   onp: "One Nation voters are more likely to be 55+, TAFE- or trade-qualified, and rural; less likely to live in Victoria or speak a language other than English at home",
   alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial; less likely to live in the eastern mainland states, especially Queensland",
-  lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
-  grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
+  lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, Victorian, and outright homeowners; less likely to live in an outer metro",
+  grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial; less likely to be TAFE- or trade-qualified",
   oth: "Voters for others & independents are more likely to be Gen Z and renting; less likely to live in provincial areas"
 };
 const RD_GEN_BORN = {
@@ -66562,7 +66563,7 @@ function RdDemographics({
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find(x => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
-  const pName = party === "oth" ? "others & independents" : P.name;
+  const pName = party === "oth" ? "others & independents" : party === "lnp" ? "the Coalition" : party === "grn" ? "the Greens" : P.name;
   const pPoss = pName + (/s$/.test(pName) ? "’" : "’s"),
     pColor = P.color;
   const all = T.all[party];
@@ -73114,7 +73115,9 @@ function RdAllPolls(P) {
         if (act && act.closest && act.closest(rowSel)) return;
         const rows = bodyRef.current ? bodyRef.current.querySelectorAll(rowSel) : [];
         const nx = rows[Math.min(Math.max(at, 0), rows.length - 1)];
-        if (nx) nx.focus();
+        if (nx) nx.focus({
+          preventScroll: true
+        });
       });
       return;
     }

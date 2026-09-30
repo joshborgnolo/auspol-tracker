@@ -2197,6 +2197,8 @@ body.rd .info-h {
   margin: 10px 0 16px; padding-top: 12px; border-top: 2px solid var(--rd-rule);
   font-family: var(--sans); font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em;
 }
+/* the rule marks a section break; About opens the page, so it wears none */
+body.rd .info-h#info-about { padding-top: 0; border-top: 0; }
 body.rd .info-h-faq { margin-top: 44px; }
 body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 600; letter-spacing: -0.005em; }
 @media (max-width: 640px) {
