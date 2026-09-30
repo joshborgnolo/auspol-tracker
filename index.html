@@ -20,7 +20,7 @@
   <meta property="og:site_name" content="auspoltracker.com">
   <meta property="og:locale" content="en_AU">
   <meta property="og:url" content="https://auspoltracker.com/">
-  <meta property="og:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-09-29-2f930f2f">
+  <meta property="og:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-01-809499d0">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="auspol tracker: Labor 52.0, Coalition 48.0 two-party preferred on implied preference flows, ±1.4 points, updated 29 September 2026, with the trend since the 2025 election">
@@ -18513,6 +18513,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "r0": 1.15,
         "r1": 1.4
       }]
+    }
+  };
+  const demoStateElection = {
+    "x": 2025.375,
+    "groups": {
+      "NSW": [35.2, 31.53, 6.02, 11.06, 16.19],
+      "Vic": [33.95, 32.2, 5.79, 13.59, 14.48],
+      "Qld": [30.98, 34.91, 7.84, 11.76, 14.5],
+      "Rest of Australia": [37.64, 29.01, 6.34, 12.55, 14.45]
     }
   };
   const issues = {
@@ -45162,6 +45171,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     onSources,
     demographics,
     demoTrend,
+    demoStateElection,
     demoGroups,
     issues,
     accuracy,
@@ -66275,6 +66285,8 @@ function RdDemographics({
         ...d,
         color: pColorNow
       }));
+      const se = D.demoStateElection;
+      const seI = se && !pm ? T.order.indexOf(pty) : -1;
       return React.createElement("div", {
         className: "card rd-card rd-wv-chart",
         key: c.st.id,
@@ -66286,6 +66298,17 @@ function RdDemographics({
       }, rowsOf.map(r => {
         const g = r.l.g,
           name = RD_STATE_NAME[g.label] || g.label;
+        const seY = seI >= 0 && se.groups[g.label] && se.x >= xDom[0] - 1e-6 && se.x < c.allPts[0].x ? se.groups[g.label][seI] : null;
+        const spine = seY != null ? [{
+          x: se.x,
+          y: seY
+        }].concat(c.allPts.map(d => ({
+          x: d.x,
+          y: d.y
+        }))) : c.allPts.map(d => ({
+          x: d.x,
+          y: d.y
+        }));
         return React.createElement("div", {
           key: g.label,
           className: "rd-sm rd-wv-panel"
@@ -66316,16 +66339,20 @@ function RdDemographics({
             endLabel: null
           })],
           areas: [bandOf(r, pColorNow)].filter(a => a.points.length >= 2),
-          spine: c.allPts.map(d => ({
-            x: d.x,
-            y: d.y
-          })),
+          spine: spine,
+          marks: seY != null ? [{
+            x: se.x,
+            y: seY,
+            color: pColorNow,
+            label: "2025 election: " + seY.toFixed(1)
+          }] : [],
+          ringAtX: seY != null ? se.x : null,
           scatter: mine(cross ? cross.scatter : c.dots, g.label),
           scatterOut: mine(cross ? cross.scatterOut : [], g.label),
           scatterMove: mine(cross ? cross.scatterMove : [], g.label),
           fade: A ? t : 1,
           pollFacet: "primary",
-          tooltipTitle: i => c.allPts[i] ? monthLabelFull(c.allPts[i].ym) : "",
+          tooltipTitle: i => seY != null && i === 0 ? monthLabelFull("2025-05") : c.allPts[seY != null ? i - 1 : i] ? monthLabelFull(c.allPts[seY != null ? i - 1 : i].ym) : "",
           extraRows: ciRows([r], "95% interval"),
           fmt: v => v.toFixed(1),
           copy: {

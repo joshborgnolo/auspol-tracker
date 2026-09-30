@@ -425,10 +425,15 @@ function eq(name, got, want) {
   eq("DemosAU missed", da && da.missed, true);
   eq("panel no longer says 'open now'", da && panelWhen(da), "13 days overdue");
   /* the foot ties every missed row on Infinity and the sort is stable, so
-     the tail keeps cadence-TABLE order: DemosAU sits ahead of Essential in
-     the table now (the reverse pair dated to when DemosAU was the table's
-     last row) */
-  eq("missed rows park at the foot, cadence order", rows.slice(-2).map((r) => r.pollster), ["DemosAU", "Essential"]);
+     the tail keeps cadence-TABLE order. The Essential–DemosAU pair at the
+     table's tail keeps flipping on cadence re-measurement alone (this world
+     was pinned to Essential 30 vs DemosAU 29; 94df443's early `published`
+     fill flipped Essential's basis back to published → 28.5 and inverted
+     them again), so the assertion pins the CONTRACT against the live table
+     rather than one roll of the die: the missed pair in table order */
+  const missedTail = ["DemosAU", "Essential"].sort((a, b) =>
+    cadSlip.findIndex((c) => c.pollster === a) - cadSlip.findIndex((c) => c.pollster === b));
+  eq("missed rows park at the foot, cadence order", rows.slice(-2).map((r) => r.pollster), missedTail);
   // Essential's slipped 2 Sep slot past its own edge too (the frozen cadSlip
   // world can't run the 3 Sep confirmation that would have slipped it on), so
   // it leads the late roll, a week clear of Roy Morgan. RedBridge is a DATED
