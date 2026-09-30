@@ -179,6 +179,37 @@ function RdPrimary({ rangeId, setRangeId }) {
   };
   const chartMark = React.useCallback((el) => { cardEl.current = el; if (el) el.__rdSwipe = (dir) => rangeLive.current(dir); }, []);
 
+  /* The same walk answers on a computer wherever the pointer sits over
+     the card (the phone swipe's counterpart): bare presses on the page
+     itself step the window while a focused control (the menu's own row)
+     keeps its walk, and leaving the card hands the page turn back. */
+  const hoverKeys = React.useRef(false);
+  React.useEffect(() => {
+    const sec = cardEl.current;
+    if (!sec) return undefined;
+    const enter = () => { hoverKeys.current = true; };
+    const leave = () => { hoverKeys.current = false; };
+    hoverKeys.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const key = (e) => {
+      if (!hoverKeys.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      e.preventDefault();
+      rangeLive.current(e.key === "ArrowRight" ? 1 : -1);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
+
   return (
     <RdSec id="primary-vote" title="Primary vote" meta={meta}>
       <RdHed head={story.head} dek={story.dek} />

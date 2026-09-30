@@ -404,6 +404,44 @@ function RdHero(p) {
   };
   const swipeMark = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => swipeLive.current(dir); }, []);
 
+  /* Pointing at the chart card makes its range menu the arrow-key target
+     without moving DOM focus: the card claims bare presses on the page
+     itself, a focused control (the menu's own walk, the compare checkbox)
+     still wins, and leaving the card hands the page turn back. The pin
+     holds the card's screen spot while the shared range reflows the twin
+     card below it. */
+  const chartEl = React.useRef(null);
+  const hoverKeys = React.useRef(false);
+  const chartMark = React.useCallback((el) => { chartEl.current = el; if (el) el.__rdSwipe = (dir) => swipeLive.current(dir); }, []);
+  React.useEffect(() => {
+    const sec = chartEl.current;
+    if (!sec) return undefined;
+    const enter = () => { hoverKeys.current = true; };
+    const leave = () => { hoverKeys.current = false; };
+    hoverKeys.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const key = (e) => {
+      if (!hoverKeys.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const i = RD_RANGES.findIndex((o) => o.id === rangeId);
+      if (i < 0) return;
+      e.preventDefault();
+      rdPinScroll(sec);
+      setRangeId(RD_RANGES[(i + (e.key === "ArrowRight" ? 1 : -1) + RD_RANGES.length) % RD_RANGES.length].id);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [rangeId]);
+
   return (
     <section className="rd-sec rd-first rd-tpp" id="two-party" aria-labelledby="rd-tpp-t">
       <div className="rd-eyebrow">
@@ -465,7 +503,7 @@ function RdHero(p) {
 
       {story && narrow && <RdSub head={story.head} dek={story.dek} level={3} glide />}
 
-      <div className="card rd-card rd-tpp-chart" ref={swipeMark} data-rd-swipe-exact="">
+      <div className="card rd-card rd-tpp-chart" ref={chartMark} data-rd-swipe-exact="">
         <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm" swipeSelf pin>
           {!narrow && cmpAvail && <RdCheck checked={showSynth} onChange={setShowSynth}>{cmpBox}</RdCheck>}
         </RdTabs>

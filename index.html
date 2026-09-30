@@ -64240,6 +64240,44 @@ function RdHero(p) {
   const swipeMark = React.useCallback(el => {
     if (el) el.__rdSwipe = dir => swipeLive.current(dir);
   }, []);
+  const chartEl = React.useRef(null);
+  const hoverKeys = React.useRef(false);
+  const chartMark = React.useCallback(el => {
+    chartEl.current = el;
+    if (el) el.__rdSwipe = dir => swipeLive.current(dir);
+  }, []);
+  React.useEffect(() => {
+    const sec = chartEl.current;
+    if (!sec) return undefined;
+    const enter = () => {
+      hoverKeys.current = true;
+    };
+    const leave = () => {
+      hoverKeys.current = false;
+    };
+    hoverKeys.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const key = e => {
+      if (!hoverKeys.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const i = RD_RANGES.findIndex(o => o.id === rangeId);
+      if (i < 0) return;
+      e.preventDefault();
+      rdPinScroll(sec);
+      setRangeId(RD_RANGES[(i + (e.key === "ArrowRight" ? 1 : -1) + RD_RANGES.length) % RD_RANGES.length].id);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [rangeId]);
   return React.createElement("section", {
     className: "rd-sec rd-first rd-tpp",
     id: "two-party",
@@ -64354,7 +64392,7 @@ function RdHero(p) {
     glide: true
   }), React.createElement("div", {
     className: "card rd-card rd-tpp-chart",
-    ref: swipeMark,
+    ref: chartMark,
     "data-rd-swipe-exact": ""
   }, React.createElement(RdTabs, {
     value: rangeId,
@@ -64689,6 +64727,36 @@ function RdPrimary({
   const chartMark = React.useCallback(el => {
     cardEl.current = el;
     if (el) el.__rdSwipe = dir => rangeLive.current(dir);
+  }, []);
+  const hoverKeys = React.useRef(false);
+  React.useEffect(() => {
+    const sec = cardEl.current;
+    if (!sec) return undefined;
+    const enter = () => {
+      hoverKeys.current = true;
+    };
+    const leave = () => {
+      hoverKeys.current = false;
+    };
+    hoverKeys.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const key = e => {
+      if (!hoverKeys.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      e.preventDefault();
+      rangeLive.current(e.key === "ArrowRight" ? 1 : -1);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
   }, []);
   return React.createElement(RdSec, {
     id: "primary-vote",
