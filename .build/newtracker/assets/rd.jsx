@@ -121,6 +121,7 @@ function rdHoldSection(el, dh, ms) {
    change handler, before the state changes. */
 let rdPinRaf = 0;
 let rdPinAnchorSave = null;
+let rdPinRO = null;
 function rdPinScroll(row) {
   if (!row) return;
   const bar = document.querySelector(".tabs.sticky");
@@ -140,6 +141,7 @@ function rdPinScroll(row) {
   const want0 = row.getBoundingClientRect();
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
   cancelAnimationFrame(rdPinRaf);
+  if (rdPinRO) { rdPinRO.disconnect(); rdPinRO = null; }
   /* Chrome's scroll anchoring fights the pin when the click focused a
      control OUTSIDE the row (a party chip): the focused box becomes the
      anchor, the browser re-scrolls every frame to hold THAT still through
@@ -148,11 +150,33 @@ function rdPinScroll(row) {
   const html = document.documentElement;
   if (rdPinAnchorSave === null) rdPinAnchorSave = html.style.overflowAnchor;
   html.style.overflowAnchor = "none";
+  let want = want0.top, lastY = window.scrollY;
+  const fix = () => {
+    const drift = row.getBoundingClientRect().top - want;
+    if (drift) { window.scrollBy(0, drift); lastY = window.scrollY; }
+  };
+  /* A glide hands us its block through __rdPinObserve and we correct its
+     resizing frames from a ResizeObserver: RO runs after layout, BEFORE the
+     frame paints, so the row never leaves its spot on screen at all -
+     rAF-time corrections paint one frame late in Safari, which read as the
+     charts bouncing and stuttering under your finger through a swipe walk */
+  const hook = (el) => {
+    if (!el || typeof ResizeObserver === "undefined") return;
+    if (rdPinRO) rdPinRO.disconnect();
+    rdPinRO = new ResizeObserver(() => {
+      if (!row.isConnected) return;
+      window.__rdPinROn = (window.__rdPinROn || 0) + 1;
+      fix();
+    });
+    rdPinRO.observe(el);
+  };
+  window.__rdPinObserve = hook;
   const done = () => {
     rdPinRaf = 0;
+    if (rdPinRO) { rdPinRO.disconnect(); rdPinRO = null; }
+    if (window.__rdPinObserve === hook) window.__rdPinObserve = null;
     if (rdPinAnchorSave !== null) { html.style.overflowAnchor = rdPinAnchorSave; rdPinAnchorSave = null; }
   };
-  let want = want0.top, lastY = window.scrollY;
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
     if (!row.isConnected) { done(); return; }
@@ -168,8 +192,7 @@ function rdPinScroll(row) {
     if (Math.abs(dy) > window.innerHeight) { done(); return; }
     want -= dy;
     lastY = y;
-    const drift = row.getBoundingClientRect().top - want;
-    if (drift) { window.scrollBy(0, drift); lastY = window.scrollY; }
+    fix();
     if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);
     else done();
   };
@@ -201,6 +224,11 @@ function RdGlide({ children, className, as, watch }) {
     void o.offsetHeight;
     o.style.transition = "height " + (AP.MORPH_MS || 320) + "ms " + (AP.MORPH_CSS || "ease");
     o.style.height = h + "px";
+    /* an active rdPinScroll anchor corrects this block's resizing from a
+       ResizeObserver, where the correction lands in the same painted frame
+       its cause does (Safari paints an rAF-time scroll a frame late, and
+       the strip under the reader breathed with every frame of the glide) */
+    if (window.__rdPinObserve) window.__rdPinObserve(o);
     timer.current = setTimeout(() => { o.style.transition = ""; o.style.height = ""; o.style.overflowY = ""; }, (AP.MORPH_MS || 320) + 60);
   });
   /* a height that changes for any other reason - a resize, a font arriving -

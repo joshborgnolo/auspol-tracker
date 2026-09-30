@@ -62712,6 +62712,7 @@ function rdHoldSection(el, dh, ms) {
 }
 let rdPinRaf = 0;
 let rdPinAnchorSave = null;
+let rdPinRO = null;
 function rdPinScroll(row) {
   if (!row) return;
   const bar = document.querySelector(".tabs.sticky");
@@ -62728,18 +62729,45 @@ function rdPinScroll(row) {
   const want0 = row.getBoundingClientRect();
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
   cancelAnimationFrame(rdPinRaf);
+  if (rdPinRO) {
+    rdPinRO.disconnect();
+    rdPinRO = null;
+  }
   const html = document.documentElement;
   if (rdPinAnchorSave === null) rdPinAnchorSave = html.style.overflowAnchor;
   html.style.overflowAnchor = "none";
+  let want = want0.top,
+    lastY = window.scrollY;
+  const fix = () => {
+    const drift = row.getBoundingClientRect().top - want;
+    if (drift) {
+      window.scrollBy(0, drift);
+      lastY = window.scrollY;
+    }
+  };
+  const hook = el => {
+    if (!el || typeof ResizeObserver === "undefined") return;
+    if (rdPinRO) rdPinRO.disconnect();
+    rdPinRO = new ResizeObserver(() => {
+      if (!row.isConnected) return;
+      window.__rdPinROn = (window.__rdPinROn || 0) + 1;
+      fix();
+    });
+    rdPinRO.observe(el);
+  };
+  window.__rdPinObserve = hook;
   const done = () => {
     rdPinRaf = 0;
+    if (rdPinRO) {
+      rdPinRO.disconnect();
+      rdPinRO = null;
+    }
+    if (window.__rdPinObserve === hook) window.__rdPinObserve = null;
     if (rdPinAnchorSave !== null) {
       html.style.overflowAnchor = rdPinAnchorSave;
       rdPinAnchorSave = null;
     }
   };
-  let want = want0.top,
-    lastY = window.scrollY;
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
     if (!row.isConnected) {
@@ -62754,11 +62782,7 @@ function rdPinScroll(row) {
     }
     want -= dy;
     lastY = y;
-    const drift = row.getBoundingClientRect().top - want;
-    if (drift) {
-      window.scrollBy(0, drift);
-      lastY = window.scrollY;
-    }
+    fix();
     if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);else done();
   };
   rdPinRaf = requestAnimationFrame(step);
@@ -62796,6 +62820,7 @@ function RdGlide({
     void o.offsetHeight;
     o.style.transition = "height " + (AP.MORPH_MS || 320) + "ms " + (AP.MORPH_CSS || "ease");
     o.style.height = h + "px";
+    if (window.__rdPinObserve) window.__rdPinObserve(o);
     timer.current = setTimeout(() => {
       o.style.transition = "";
       o.style.height = "";
@@ -63586,7 +63611,8 @@ function RdLeadGauge({
     },
     role: "img",
     "aria-label": say,
-    title: say
+    title: say,
+    "data-rd-swipe-self": ""
   }, React.createElement("span", {
     className: "rd-lg-side",
     style: {
@@ -64107,7 +64133,16 @@ function RdHero(p) {
   }), React.createElement("div", {
     className: "rd-tpp-top"
   }, React.createElement("div", {
-    className: "rd-tpp-read"
+    className: "rd-tpp-read",
+    ref: swipeMark,
+    "data-rd-swipe-self": "",
+    onTouchStart: () => {
+      window.__rdScrollAnchor = true;
+      clearTimeout(window.__rdScrollAnchorT);
+      window.__rdScrollAnchorT = setTimeout(() => {
+        window.__rdScrollAnchor = false;
+      }, 700);
+    }
   }, React.createElement("div", {
     className: "rd-tpp-side rd-a"
   }, React.createElement("span", {
@@ -76439,6 +76474,29 @@ function App() {
       if (window.visualViewport && window.visualViewport.scale > 1.01) return;
       const t = e.touches[0];
       if (t.clientX < EDGE || t.clientX > window.innerWidth - EDGE) return;
+      const self = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-self]") : null;
+      if (self) {
+        if (!self.__rdSwipe) return;
+        g = {
+          x: t.clientX,
+          y: t.clientY,
+          t: Date.now(),
+          selfScroll: true,
+          row: self
+        };
+        return;
+      }
+      if (window.__rdScrollAnchor) {
+        g = {
+          x: t.clientX,
+          y: t.clientY,
+          t: Date.now(),
+          sy: window.scrollY,
+          row: null,
+          free: true
+        };
+        return;
+      }
       const own0 = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-exact]") : null;
       if (own0 && !e.target.closest(".chart")) return;
       const own = own0 || null;
@@ -76465,6 +76523,8 @@ function App() {
       const dx = t.clientX - s.x,
         dy = t.clientY - s.y;
       if (Math.abs(dx) < MIN_DX || Math.abs(dy) > Math.abs(dx) * 0.5) return;
+      if (s.selfScroll) s.sy = window.scrollY;
+      if (s.free) return;
       if (Date.now() - s.t > MAX_MS || Math.abs(window.scrollY - s.sy) > 12) return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
