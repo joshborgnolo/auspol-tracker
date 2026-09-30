@@ -110,6 +110,42 @@ function rdHoldSection(el, dh, ms) {
   clearTimeout(hold.t);
   hold.t = setTimeout(() => { sec.style.minHeight = ""; sec.__rdHold = null; }, ms);
 }
+/* A tab or chip row above a changing head and dek: the glide animates
+   their height over the morph window, and once the dek has slid up under
+   the sticky page tabs the user sees none of it - every step then drags
+   the row and the charts under it up or down out from under them. Pin
+   instead: hold the row at its spot on screen while the glide runs,
+   scrolling the difference back out (any scrolling of the user's own
+   folds into the anchor). Call from the row's change handler, before the
+   state changes. No-op while any of the dek still shows: there the words
+   change in view and nothing should move. */
+let rdPinRaf = 0;
+function rdPinScroll(row, dek) {
+  if (!row || !dek) return;
+  const bar = document.querySelector(".tabs.sticky");
+  /* the bar's box sits at its unstuck place whenever it isn't stuck (top of
+     the page), so its live bottom is 200px+ there - reserve only what the
+     bar takes up when it IS stuck (its height), else the gate never sees
+     the dek as gone */
+  const reserve = () => { const r = bar && bar.getBoundingClientRect(); return r ? Math.min(r.bottom, r.height) : 0; };
+  if (dek.getBoundingClientRect().bottom > reserve()) return;
+  const want0 = row.getBoundingClientRect();
+  if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
+  cancelAnimationFrame(rdPinRaf);
+  let want = want0.top, lastY = window.scrollY;
+  const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
+  const step = () => {
+    if (!row.isConnected) { rdPinRaf = 0; return; }
+    const y = window.scrollY;
+    want += y - lastY;
+    lastY = y;
+    const drift = row.getBoundingClientRect().top - want;
+    if (drift) { window.scrollBy(0, drift); lastY = window.scrollY; }
+    if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);
+    else rdPinRaf = 0;
+  };
+  rdPinRaf = requestAnimationFrame(step);
+}
 function RdGlide({ children, className, as, watch }) {
   const Tag = as || "div";
   const outer = React.useRef(null), inner = React.useRef(null), last = React.useRef(null), timer = React.useRef(0);

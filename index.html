@@ -49129,13 +49129,22 @@ function TrendChart(props) {
     } : null
   })), (() => {
     const thin = list => {
-      if (list.length < 3) return list;
       const pxOf = t => [...t.label].length * 6.3 + 10;
+      const clearOf = (t, w, i) => {
+        const l = list[i - 1],
+          r = list[i + 1];
+        return (!l || (sx(t.x) - sx(l.x)) * scale >= (w + pxOf(l)) / 2) && (!r || (sx(r.x) - sx(t.x)) * scale >= (w + pxOf(r)) / 2);
+      };
+      list = list.map((t, i) => t.short && !clearOf(t, pxOf(t), i) ? {
+        ...t,
+        label: t.short
+      } : t);
+      if (list.length < 3) return list;
       const fits = ts => ts.every((t, i) => i === 0 || (sx(t.x) - sx(ts[i - 1].x)) * scale >= (pxOf(t) + pxOf(ts[i - 1])) / 2);
       let ts = list;
       for (let k = 2; !fits(ts) && k <= 6; k++) {
         const anchor = Math.max(0, list.findIndex(t => /’/.test(t.label) && t !== list[0]));
-        ts = list.filter((_, i) => (i - anchor) % k === 0);
+        ts = list.filter((t, i) => t.short || (i - anchor) % k === 0);
       }
       return ts;
     };
@@ -62664,6 +62673,38 @@ function rdHoldSection(el, dh, ms) {
     sec.__rdHold = null;
   }, ms);
 }
+let rdPinRaf = 0;
+function rdPinScroll(row, dek) {
+  if (!row || !dek) return;
+  const bar = document.querySelector(".tabs.sticky");
+  const reserve = () => {
+    const r = bar && bar.getBoundingClientRect();
+    return r ? Math.min(r.bottom, r.height) : 0;
+  };
+  if (dek.getBoundingClientRect().bottom > reserve()) return;
+  const want0 = row.getBoundingClientRect();
+  if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
+  cancelAnimationFrame(rdPinRaf);
+  let want = want0.top,
+    lastY = window.scrollY;
+  const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
+  const step = () => {
+    if (!row.isConnected) {
+      rdPinRaf = 0;
+      return;
+    }
+    const y = window.scrollY;
+    want += y - lastY;
+    lastY = y;
+    const drift = row.getBoundingClientRect().top - want;
+    if (drift) {
+      window.scrollBy(0, drift);
+      lastY = window.scrollY;
+    }
+    if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);else rdPinRaf = 0;
+  };
+  rdPinRaf = requestAnimationFrame(step);
+}
 function RdGlide({
   children,
   className,
@@ -64196,9 +64237,11 @@ function rdElectionTicks(x0, x1, narrow, elecX) {
   return [{
     x: elecX,
     label: "Election",
-    strong: true
+    strong: true,
+    short: "E"
   }, ...rest];
 }
+const RD_ELECTION_LEAD = "0.5 4";
 function RdPrimary({
   rangeId
 }) {
@@ -65886,6 +65929,18 @@ function RdDemographics({
   const [tabId, setTab] = useState("age");
   const [party, setParty] = useState("onp");
   const [partyMorph, chooseParty] = window.AP.useMorph(party, v => setParty(v), (a, b) => a !== b);
+  const pinWv = () => {
+    const sec = document.getElementById("who-votes");
+    rdPinScroll(sec && sec.querySelector(".rd-wv-tabs"), sec && sec.querySelector(".rd-dek"));
+  };
+  const pickTab = id => {
+    pinWv();
+    setTab(id);
+  };
+  const pickParty = v => {
+    pinWv();
+    chooseParty(v);
+  };
   const chartCache = React.useRef({});
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find(x => x.id === tabId) || T.tabs[0];
@@ -66325,14 +66380,36 @@ function RdDemographics({
           y: d.y
         }));
         const xDomP = seY != null && se.x < xDom[0] ? [se.x - 0.05, xDom[1]] : xDom;
-        const allPtsS = seN != null ? [{
-          x: se.x,
-          y: seN
-        }].concat(allSeries.points) : allSeries.points;
-        const linePts = seY != null ? [{
-          x: se.x,
-          y: seY
-        }] : null;
+        const stPts = r.rows.map(d => ({
+          x: d.x,
+          y: d.y
+        }));
+        const stLead = seY != null && stPts.length ? {
+          id: "ld-" + g.label,
+          label: g.label,
+          color: pColorNow,
+          dash: RD_ELECTION_LEAD,
+          rdWidth: 2.25,
+          endCap: false,
+          clipX: r.clip,
+          points: [{
+            x: se.x,
+            y: seY
+          }, stPts[0]]
+        } : null;
+        const allLead = seN != null && allSeries.points.length ? {
+          id: "lead-all-" + g.label,
+          label: "All voters",
+          color: "var(--ink)",
+          dash: RD_ELECTION_LEAD,
+          dashed: true,
+          rdWidth: 1.25,
+          endCap: false,
+          points: [{
+            x: se.x,
+            y: seN
+          }, allSeries.points[0]]
+        } : null;
         const ciUnshifted = ciRows([r], "95% interval");
         return React.createElement("div", {
           key: g.label,
@@ -66352,24 +66429,17 @@ function RdDemographics({
           yDomain: yDom,
           yTicks: rdYTicks(0, yMax, 20),
           yTickFmt: v => v === 0 ? "0" : v + "%",
-          xTicks: rdXTicks(c.x0, c.x1, true),
+          xTicks: seY != null ? rdElectionTicks(xDomP[0], c.x1, true, se.x) : rdXTicks(c.x0, c.x1, true),
           baseline: true,
           driven: !!A,
           series: [{
             ...allSeries,
             rdWidth: 1.25,
-            endLabel: null,
-            points: allPtsS
+            endLabel: null
           }, lineOf(r, pColorNow, {
             rdWidth: 2.25,
-            endLabel: null,
-            ...(linePts ? {
-              points: linePts.concat(r.rows.map(d => ({
-                x: d.x,
-                y: d.y
-              })))
-            } : {})
-          })],
+            endLabel: null
+          })].concat(allLead ? [allLead] : [], stLead ? [stLead] : []),
           areas: [bandOf(r, pColorNow)].filter(a => a.points.length >= 2),
           spine: spine,
           marks: seY != null ? [{
@@ -66416,17 +66486,34 @@ function RdDemographics({
     const leY = g => leOn && le.groups[g.label] ? le.groups[g.label][leI] : null;
     const xDomL = leOn && le.x < xDom[0] ? [le.x - 0.05, xDom[1]] : xDom;
     const ciLoc = ciRows(rowsOf, "95% intervals");
-    const leRows = leOn ? rowsOf.filter(r => leY(r.l.g) != null).map(r => ({
+    const leLeads = leOn ? rowsOf.filter(r => leY(r.l.g) != null && r.rows.length).map(r => ({
+      id: "ld-" + r.l.g.label,
       label: r.l.g.label,
-      value: leY(r.l.g).toFixed(1) + "%",
       color: colorOf(r),
-      y: leY(r.l.g)
-    })).concat(leN != null ? [{
+      dash: RD_ELECTION_LEAD,
+      rdWidth: 2.2,
+      endCap: false,
+      clipX: r.clip,
+      points: [{
+        x: le.x,
+        y: leY(r.l.g)
+      }, {
+        x: r.rows[0].x,
+        y: r.rows[0].y
+      }]
+    })).concat(leN != null && allSeries.points.length ? [{
+      id: "lead-all-" + c.st.id,
       label: "All voters",
-      value: leN.toFixed(1) + "%",
       color: "var(--ink)",
-      y: leN
-    }] : []).sort((a, b) => b.y - a.y) : [];
+      dash: RD_ELECTION_LEAD,
+      dashed: true,
+      rdWidth: 1.5,
+      endCap: false,
+      points: [{
+        x: le.x,
+        y: leN
+      }, allSeries.points[0]]
+    }] : []) : [];
     return React.createElement("div", {
       className: "card rd-card rd-wv-chart",
       key: c.st.id,
@@ -66453,18 +66540,21 @@ function RdDemographics({
       yDomain: yDom,
       yTicks: rdYTicks(0, yMax, 10),
       yTickFmt: v => v === 0 ? "0" : v + "%",
-      xTicks: rdXTicks(c.x0, c.x1, narrow || c.span < 0.8),
+      xTicks: leOn ? rdElectionTicks(xDomL[0], c.x1, narrow || c.span < 0.8, le.x) : rdXTicks(c.x0, c.x1, narrow || c.span < 0.8),
       baseline: true,
       driven: !!A,
-      series: [allSeries, ...rowsOf.map(r => lineOf(r, colorOf(r)))],
+      series: [allSeries, ...rowsOf.map(r => lineOf(r, colorOf(r)))].concat(leLeads),
       areas: rowsOf.map(r => bandOf(r, colorOf(r))).filter(a => a.points.length >= 2),
-      spine: (leN != null ? [{
+      spine: leN != null ? [{
         x: le.x,
         y: leN
-      }] : []).concat(c.allPts.map(d => ({
+      }].concat(c.allPts.map(d => ({
         x: d.x,
         y: d.y
-      }))),
+      }))) : c.allPts.map(d => ({
+        x: d.x,
+        y: d.y
+      })),
       marks: leOn ? rowsOf.filter(r => leY(r.l.g) != null).map(r => ({
         x: le.x,
         y: leY(r.l.g),
@@ -66477,10 +66567,10 @@ function RdDemographics({
       fade: A ? t : 1,
       pollFacet: "primary",
       tooltipTitle: i => leOn && i === 0 ? monthLabelFull("2025-05") : c.allPts[leOn ? i - 1 : i] ? monthLabelFull(c.allPts[leOn ? i - 1 : i].ym) : "",
-      extraRows: leOn ? i => i === 0 ? leRows.concat({
+      extraRows: leOn ? i => i === 0 ? [{
         label: "",
         value: "The election result"
-      }) : ciLoc(i - 1) : ciLoc,
+      }] : ciLoc(i - 1) : ciLoc,
       fmt: v => v.toFixed(1),
       copy: {
         title: "Who votes for whom",
@@ -66512,14 +66602,14 @@ function RdDemographics({
   }), React.createElement(RdTabs, {
     swipe: true,
     value: tab.id,
-    onChange: setTab,
+    onChange: pickTab,
     options: T.tabs.map(x => ({
       id: x.id,
       label: x.label
     })),
     ariaLabel: "Group voters by",
     className: "rd-wv-tabs",
-    onDigits: rdDigitKey(DEMO_PARTIES, chooseParty)
+    onDigits: rdDigitKey(DEMO_PARTIES, pickParty)
   }, !narrow && React.createElement("span", {
     className: "rd-chips",
     role: "group",
@@ -66530,7 +66620,7 @@ function RdDemographics({
     type: "button",
     className: "rd-chip",
     "aria-pressed": party === pp.id,
-    onClick: () => chooseParty(pp.id),
+    onClick: () => pickParty(pp.id),
     style: party === pp.id ? {
       background: "var(--tint-" + pp.id + ")",
       borderColor: D.PARTIES[pp.id].color
@@ -66545,14 +66635,14 @@ function RdDemographics({
     role: "group",
     "aria-label": "Party",
     onClick: rdTabFocus,
-    onKeyDown: rdDigitKey(DEMO_PARTIES, chooseParty)
+    onKeyDown: rdDigitKey(DEMO_PARTIES, pickParty)
   }, DEMO_PARTIES.map(pp => React.createElement("button", {
     key: pp.id,
     type: "button",
     className: "rd-chip",
     "aria-pressed": party === pp.id,
     "aria-label": pp.label,
-    onClick: () => chooseParty(pp.id),
+    onClick: () => pickParty(pp.id),
     style: party === pp.id ? {
       background: "var(--tint-" + pp.id + ")",
       borderColor: D.PARTIES[pp.id].color
@@ -67452,6 +67542,18 @@ function RdIssues({
       value: String(Math.round(c.v))
     }), sig ? " " + (diff > 0 ? "▲" : "▼") : ""));
   };
+  const pinWhom = () => {
+    const sec = document.getElementById("issues");
+    rdPinScroll(sec && (sec.querySelector(".rd-iw-chips") || sec.querySelector(".rd-iw-ctl")), sec && sec.querySelector(".rd-dek"));
+  };
+  const pickGset = id => {
+    pinWhom();
+    setGset(id);
+  };
+  const pickWhom = k => {
+    pinWhom();
+    setWhomK(k);
+  };
   const tabs = React.createElement(RdTabs, {
     swipe: true,
     value: view,
@@ -67620,14 +67722,14 @@ function RdIssues({
     className: "rd-iw-chips",
     role: "group",
     "aria-label": "Group voters by",
-    onKeyDown: rdTabsKey(G.tabs, setGset),
+    onKeyDown: rdTabsKey(G.tabs, pickGset),
     onClick: rdTabFocus
   }, G.tabs.map(x => React.createElement("button", {
     key: x.id,
     type: "button",
     className: "rd-iw-chip",
     "aria-pressed": gtab.id === x.id,
-    onClick: () => setGset(x.id)
+    onClick: () => pickGset(x.id)
   }, x.label))), React.createElement("span", {
     className: "rd-iw-k"
   }, "Issue"), React.createElement("div", {
@@ -67639,7 +67741,7 @@ function RdIssues({
     type: "button",
     className: "rd-iw-chip",
     "aria-pressed": whomIssue === k,
-    onClick: () => setWhomK(k)
+    onClick: () => pickWhom(k)
   }, ISS_SHORT[k] || I.labels[k] || k))), React.createElement("p", {
     className: "rd-iw-ltitle"
   }, React.createElement("b", null, I.labels[whomIssue] || whomIssue, " in their top three, %"), React.createElement("br", null), gSource), React.createElement("div", {
@@ -67652,7 +67754,7 @@ function RdIssues({
     className: "rd-iw-by"
   }, "Group voters by"), React.createElement(RdTabs, {
     value: gtab.id,
-    onChange: setGset,
+    onChange: pickGset,
     options: G.tabs.map(x => ({
       id: x.id,
       label: x.label

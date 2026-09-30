@@ -24,7 +24,9 @@ const rdPartyIn = (id) => RD_PARTY_IN[id] || id;
 const rdPartyStart = (id) => rdCap(rdPartyIn(id));
 const rdPlural = (id) => id === "grn" || id === "oth";
 
-/* month ticks that open on the election itself */
+/* month ticks that open on the election itself. The tick carries a `short`
+   the chart may fall back to when the word cannot sit between its neighbours -
+   a small multiple's election tick never has room for "Election" */
 function rdElectionTicks(x0, x1, narrow, elecX) {
   const t = rdXTicks(x0, x1, narrow, { step: x1 - x0 > 1.1 ? (narrow ? 4 : 2) : undefined });
   if (elecX == null || elecX < x0 - 0.01) return t;
@@ -36,8 +38,15 @@ function rdElectionTicks(x0, x1, narrow, elecX) {
     const cut = lab.endsWith(" " + ey) ? ey.length + 1 : lab.endsWith(" ’" + ey.slice(2)) ? 4 : 0;
     if (cut) rest[0] = { ...rest[0], label: lab.slice(0, -cut) };
   }
-  return [{ x: elecX, label: "Election", strong: true }, ...rest];
+  return [{ x: elecX, label: "Election", strong: true, short: "E" }, ...rest];
 }
+
+/* the dotted stroke of a lead-in segment bridging an election mark to the
+   first month a chart actually polled - interpolation, drawn as the month's
+   interpolation is (the cycle charts dash a month nothing was polled in);
+   dots rather than the all-voters dashes so the two reference lines read as
+   different kinds of thing */
+const RD_ELECTION_LEAD = "0.5 4";
 
 /* ======================================================================
    Primary vote
@@ -1052,6 +1061,17 @@ function RdDemographics({ rangeId = "all" }) {
      nothing there is drawn as turning into anything: the dot plot's rows
      slide by place and the charts fade in. */
   const [partyMorph, chooseParty] = window.AP.useMorph(party, (v) => setParty(v), (a, b) => a !== b);
+  /* Walking the group tabs or party chips rewrites the head and dek above
+     them, and the whom-views' rows slide while the charts morph; once that
+     text is scrolled up under the sticky tabs each step would drag the row
+     and charts with it. rdPinScroll (rd.jsx) holds their spot through the
+     glide instead. */
+  const pinWv = () => {
+    const sec = document.getElementById("who-votes");
+    rdPinScroll(sec && sec.querySelector(".rd-wv-tabs"), sec && sec.querySelector(".rd-dek"));
+  };
+  const pickTab = (id) => { pinWv(); setTab(id); };
+  const pickParty = (v) => { pinWv(); chooseParty(v); };
   /* each party's charts, built once per grouping and range: a switch
      re-renders every frame, and rebuilding both parties' lines and poll
      dots (a pass over every poll) on each one starved the dot plot's own
@@ -1394,12 +1414,22 @@ function RdDemographics({ rangeId = "all" }) {
               const spine = seY != null ? [{ x: se.x, y: seY }].concat(c.allPts.map((d) => ({ x: d.x, y: d.y }))) : c.allPts.map((d) => ({ x: d.x, y: d.y }));
               const xDomP = seY != null && se.x < xDom[0] ? [se.x - 0.05, xDom[1]] : xDom;
               /* the guide tip reads a row off a series ONLY where the series
-                 has a point at that exact x, so both lines are led back to
-                 the election (as the hero's aggregate carries its election
-                 row): the state's to its own share here, the national
-                 line's to Nat in the data above */
-              const allPtsS = seN != null ? [{ x: se.x, y: seN }].concat(allSeries.points) : allSeries.points;
-              const linePts = seY != null ? [{ x: se.x, y: seY }] : null;
+                 has a point at that exact x, so the run back to the election
+                 is a dotted lead-in series of its own, sharing the line's
+                 label (the tooltip collapses shared labels back to one row)
+                 and carrying both endpoints: the election figure, and the
+                 first polled share where the lead meets the real line. Dotted
+                 rather than an unmarked straight segment because the month or
+                 two between was never polled */
+              const stPts = r.rows.map((d) => ({ x: d.x, y: d.y }));
+              const stLead = seY != null && stPts.length
+                ? { id: "ld-" + g.label, label: g.label, color: pColorNow, dash: RD_ELECTION_LEAD, rdWidth: 2.25,
+                    endCap: false, clipX: r.clip, points: [{ x: se.x, y: seY }, stPts[0]] }
+                : null;
+              const allLead = seN != null && allSeries.points.length
+                ? { id: "lead-all-" + g.label, label: "All voters", color: "var(--ink)", dash: RD_ELECTION_LEAD,
+                    dashed: true, rdWidth: 1.25, endCap: false, points: [{ x: se.x, y: seN }, allSeries.points[0]] }
+                : null;
               const ciUnshifted = ciRows([r], "95% interval");
               return (
                 <div key={g.label} className="rd-sm rd-wv-panel">
@@ -1407,8 +1437,9 @@ function RdDemographics({ rangeId = "all" }) {
                   <TrendChart key={"rd-wv-" + c.st.id + "-" + g.label} heightPx={narrow ? 120 : 140}
                     padPx={{ l: 30, r: 6, t: 8, b: 24 }}
                     xDomain={xDomP} yDomain={yDom} yTicks={rdYTicks(0, yMax, 20)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
-                    xTicks={rdXTicks(c.x0, c.x1, true)} baseline driven={!!A}
-                    series={[{ ...allSeries, rdWidth: 1.25, endLabel: null, points: allPtsS }, lineOf(r, pColorNow, { rdWidth: 2.25, endLabel: null, ...(linePts ? { points: linePts.concat(r.rows.map((d) => ({ x: d.x, y: d.y }))) } : {}) })]}
+                    xTicks={seY != null ? rdElectionTicks(xDomP[0], c.x1, true, se.x) : rdXTicks(c.x0, c.x1, true)} baseline driven={!!A}
+                    series={[{ ...allSeries, rdWidth: 1.25, endLabel: null }, lineOf(r, pColorNow, { rdWidth: 2.25, endLabel: null })]
+                      .concat(allLead ? [allLead] : [], stLead ? [stLead] : [])}
                     areas={[bandOf(r, pColorNow)].filter((a) => a.points.length >= 2)}
                     spine={spine}
                     marks={seY != null ? [{ x: se.x, y: seY, color: pColorNow }] : []}
@@ -1432,12 +1463,13 @@ function RdDemographics({ rangeId = "all" }) {
     /* By location gets the state panels' rings too - one per classification
        line at its own 2025 election result, named "The election result" in
        the hover. The monthly run only starts Feb 2026 though, nearly a year
-       after the election, so where the state ring leads its line back by a
-       month or two this one stands alone at the election x: the domain
-       widens to hold it and the hover's swatch rows come from the election
-       figures themselves. The stretch is kept to the all-range (and any
-       window whose left edge already reaches back that far); a short range
-       keeps its own window, and nothing is marked mid-party-switch */
+       after the election, so the domain widens to hold the rings (all-range,
+       and any window whose left edge already reaches back that far) and each
+       ring joins its line with the state panels' dotted lead-in: carrying the
+       line's label and both endpoints so the guide tip's election rows read
+       off it, and dotted because the nine months between were never polled -
+       a lead-in is interpolation, not data. A short range keeps its own
+       window, and nothing is marked mid-party-switch */
     const le = c.st.id === "location" && D.demoLocElection ? D.demoLocElection : null;
     const leI = le && !pm ? T.order.indexOf(party) : -1;
     const leOn = le != null && leI >= 0 && c.allPts.length && le.x < c.allPts[0].x
@@ -1446,26 +1478,29 @@ function RdDemographics({ rangeId = "all" }) {
     const leY = (g) => (leOn && le.groups[g.label] ? le.groups[g.label][leI] : null);
     const xDomL = leOn && le.x < xDom[0] ? [le.x - 0.05, xDom[1]] : xDom;
     const ciLoc = ciRows(rowsOf, "95% intervals");
-    const leRows = leOn ? rowsOf.filter((r) => leY(r.l.g) != null)
-      .map((r) => ({ label: r.l.g.label, value: leY(r.l.g).toFixed(1) + "%", color: colorOf(r), y: leY(r.l.g) }))
-      .concat(leN != null ? [{ label: "All voters", value: leN.toFixed(1) + "%", color: "var(--ink)", y: leN }] : [])
-      .sort((a, b) => b.y - a.y) : [];
+    const leLeads = leOn ? rowsOf.filter((r) => leY(r.l.g) != null && r.rows.length)
+      .map((r) => ({ id: "ld-" + r.l.g.label, label: r.l.g.label, color: colorOf(r), dash: RD_ELECTION_LEAD, rdWidth: 2.2,
+                      endCap: false, clipX: r.clip, points: [{ x: le.x, y: leY(r.l.g) }, { x: r.rows[0].x, y: r.rows[0].y }] }))
+      .concat(leN != null && allSeries.points.length
+        ? [{ id: "lead-all-" + c.st.id, label: "All voters", color: "var(--ink)", dash: RD_ELECTION_LEAD, dashed: true, rdWidth: 1.5,
+             endCap: false, points: [{ x: le.x, y: leN }, allSeries.points[0]] }]
+        : []) : [];
     return (
     <div className="card rd-card rd-wv-chart" key={c.st.id} style={even ? { flex: "1 1 0" } : { flexGrow: narrow ? 1 : Math.max(0.35, c.span) }}>
       {head}
       <TrendChart key={"rd-wv-" + c.st.id + "-" + tab.id} heightPx={narrow ? 240 : 260}
         padPx={narrow ? { l: 34, r: 8, t: 12, b: 28 } : { l: 40, r: 12, t: 12, b: 30 }}
         xDomain={xDomL} yDomain={yDom} yTicks={rdYTicks(0, yMax, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
-        xTicks={rdXTicks(c.x0, c.x1, narrow || c.span < 0.8)} baseline driven={!!A}
-        series={[allSeries, ...rowsOf.map((r) => lineOf(r, colorOf(r)))]}
+        xTicks={leOn ? rdElectionTicks(xDomL[0], c.x1, narrow || c.span < 0.8, le.x) : rdXTicks(c.x0, c.x1, narrow || c.span < 0.8)} baseline driven={!!A}
+        series={[allSeries, ...rowsOf.map((r) => lineOf(r, colorOf(r)))].concat(leLeads)}
         areas={rowsOf.map((r) => bandOf(r, colorOf(r))).filter((a) => a.points.length >= 2)}
-        spine={(leN != null ? [{ x: le.x, y: leN }] : []).concat(c.allPts.map((d) => ({ x: d.x, y: d.y })))}
+        spine={(leN != null ? [{ x: le.x, y: leN }].concat(c.allPts.map((d) => ({ x: d.x, y: d.y }))) : c.allPts.map((d) => ({ x: d.x, y: d.y })))}
         marks={leOn ? rowsOf.filter((r) => leY(r.l.g) != null).map((r) => ({ x: le.x, y: leY(r.l.g), color: colorOf(r) })) : []}
         ringAtX={leOn ? le.x : null}
         scatter={cross ? cross.scatter : c.dots} scatterOut={cross ? cross.scatterOut : []} scatterMove={cross ? cross.scatterMove : []}
         fade={A ? t : 1} pollFacet="primary"
         tooltipTitle={(i) => (leOn && i === 0 ? monthLabelFull("2025-05") : c.allPts[leOn ? i - 1 : i] ? monthLabelFull(c.allPts[leOn ? i - 1 : i].ym) : "")}
-        extraRows={leOn ? ((i) => (i === 0 ? leRows.concat({ label: "", value: "The election result" }) : ciLoc(i - 1))) : ciLoc}
+        extraRows={leOn ? ((i) => (i === 0 ? [{ label: "", value: "The election result" }] : ciLoc(i - 1))) : ciLoc}
         fmt={(v) => v.toFixed(1)}
         /* keyed in full: a phone names no line at its end, and "All voters"
            loses its name wherever the groups crowd it */
@@ -1482,12 +1517,12 @@ function RdDemographics({ rangeId = "all" }) {
       <RdHed head={story.head} dek={story.dek} />
       {/* the party picks itself by number key: 1 One Nation, 2 Labor,
           3 Coalition, 4 Greens, 5 Others - the chips' left-to-right order */}
-      <RdTabs swipe value={tab.id} onChange={setTab} options={T.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-wv-tabs"
-              onDigits={rdDigitKey(DEMO_PARTIES, chooseParty)}>
+      <RdTabs swipe value={tab.id} onChange={pickTab} options={T.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-wv-tabs"
+              onDigits={rdDigitKey(DEMO_PARTIES, pickParty)}>
         {!narrow && (
           <span className="rd-chips" role="group" aria-label="Party" onClick={rdTabFocus}>
             {DEMO_PARTIES.map((pp) => (
-              <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => chooseParty(pp.id)}
+              <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => pickParty(pp.id)}
                       style={party === pp.id ? { background: "var(--tint-" + pp.id + ")", borderColor: D.PARTIES[pp.id].color } : undefined}>
                 <span className="rd-sw" style={{ background: D.PARTIES[pp.id].color }}></span>{pp.label}</button>
             ))}
@@ -1498,10 +1533,10 @@ function RdDemographics({ rangeId = "all" }) {
         /* phone chips abbreviate (ON ALP L/NP GRN OTH) so the five of them
            share one line; the full name stays on the accessible label */
         <div className="rd-chips rd-chips-row" role="group" aria-label="Party" onClick={rdTabFocus}
-             onKeyDown={rdDigitKey(DEMO_PARTIES, chooseParty)}>
+             onKeyDown={rdDigitKey(DEMO_PARTIES, pickParty)}>
           {DEMO_PARTIES.map((pp) => (
             <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} aria-label={pp.label}
-                    onClick={() => chooseParty(pp.id)}
+                    onClick={() => pickParty(pp.id)}
                     style={party === pp.id ? { background: "var(--tint-" + pp.id + ")", borderColor: D.PARTIES[pp.id].color } : undefined}>
               <span className="rd-sw" style={{ background: D.PARTIES[pp.id].color }}></span>{pp.short}</button>
           ))}
@@ -2043,6 +2078,17 @@ function RdIssues({ rangeId = "all" }) {
     );
   };
 
+  /* Switching the grouping or the issue rewrites the head and dek above the
+     toggle row; scrolled past them, the toggle row and rows under it would
+     ride the story block's height glide. rdPinScroll holds the spot. */
+  const pinWhom = () => {
+    const sec = document.getElementById("issues");
+    rdPinScroll(sec && (sec.querySelector(".rd-iw-chips") || sec.querySelector(".rd-iw-ctl")),
+                sec && sec.querySelector(".rd-dek"));
+  };
+  const pickGset = (id) => { pinWhom(); setGset(id); };
+  const pickWhom = (k) => { pinWhom(); setWhomK(k); };
+
   const tabs = (
     <RdTabs swipe value={view} onChange={setView} ariaLabel="View" className="rd-is-tabs"
             options={[{ id: "trust", label: "Who’s trusted" }, { id: "whom", label: "What matters to whom" }]} />
@@ -2132,12 +2178,12 @@ function RdIssues({ rangeId = "all" }) {
                 <>
                   <span className="rd-iw-k">Group voters by</span>
                   <div className="rd-iw-chips" role="group" aria-label="Group voters by"
-                       onKeyDown={rdTabsKey(G.tabs, setGset)} onClick={rdTabFocus}>
-                    {G.tabs.map((x) => <button key={x.id} type="button" className="rd-iw-chip" aria-pressed={gtab.id === x.id} onClick={() => setGset(x.id)}>{x.label}</button>)}
+                       onKeyDown={rdTabsKey(G.tabs, pickGset)} onClick={rdTabFocus}>
+                    {G.tabs.map((x) => <button key={x.id} type="button" className="rd-iw-chip" aria-pressed={gtab.id === x.id} onClick={() => pickGset(x.id)}>{x.label}</button>)}
                   </div>
                   <span className="rd-iw-k">Issue</span>
                   <div className="rd-iw-chips" role="group" aria-label="Issue">
-                    {gtab.issues.map((k) => <button key={k} type="button" className="rd-iw-chip" aria-pressed={whomIssue === k} onClick={() => setWhomK(k)}>{ISS_SHORT[k] || I.labels[k] || k}</button>)}
+                    {gtab.issues.map((k) => <button key={k} type="button" className="rd-iw-chip" aria-pressed={whomIssue === k} onClick={() => pickWhom(k)}>{ISS_SHORT[k] || I.labels[k] || k}</button>)}
                   </div>
                   <p className="rd-iw-ltitle"><b>{I.labels[whomIssue] || whomIssue} in their top three, %</b><br />{gSource}</p>
                   <div className="rd-iw-list" role="table" aria-label={"Share of each group putting " + (ISS_PHRASE[whomIssue] || whomIssue) + " in its top three"}>
@@ -2149,7 +2195,7 @@ function RdIssues({ rangeId = "all" }) {
                 <>
                   <div className="rd-iw-ctl">
                     <span className="rd-iw-by">Group voters by</span>
-                    <RdTabs value={gtab.id} onChange={setGset} options={G.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-tabs-sm rd-iw-tabs" />
+                    <RdTabs value={gtab.id} onChange={pickGset} options={G.tabs.map((x) => ({ id: x.id, label: x.label }))} ariaLabel="Group voters by" className="rd-tabs-sm rd-iw-tabs" />
                   </div>
                   <p className="rd-iw-src"><b>Share of each group putting each issue in its top three, %</b>, {gSource}</p>
                   {/* a fixed layout, as the canvas's grid was: the label column

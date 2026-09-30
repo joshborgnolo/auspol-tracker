@@ -110,16 +110,29 @@ const readPanels = () => page.evaluate(() => {
       const name = (p.querySelector(".rd-sm-top span") || {}).textContent || "";
       const svgR = svg.getBoundingClientRect();
       const ring = p.querySelector("circle.rd-ring");
-      let ringBox = null, ringStroke = null, label = null;
+      let ringBox = null, ringStroke = null, label = null, ringAt = null;
       if (ring) {
         const r = ring.getBoundingClientRect();
         ringBox = { cx: r.x + r.width / 2, cy: r.y + r.height / 2 };
         ringStroke = getComputedStyle(ring).stroke;
+        /* the circle's cx/cy attributes are viewBox units - the same frame
+           the series paths' d strings live in, so lead-start vs ring-centre
+           compares directly */
+        ringAt = { x: +ring.getAttribute("cx"), y: +ring.getAttribute("cy") };
       }
       const lab = p.querySelector(".rd-mark text");
       if (lab) label = lab.textContent;
-      /* series lines in DOM order: all voters, then the state's */
+      /* series lines in DOM order: all voters, the state's, then the leads */
       const lines = [...p.querySelectorAll("path.series-line")].map((x) => getComputedStyle(x).stroke);
+      const paths = [...p.querySelectorAll("path.series-line")].map((x) => {
+        const m = /^M\s*([\d.eE+-]+)[ ,]([\d.eE+-]+)/.exec(x.getAttribute("d") || "");
+        return {
+          stroke: getComputedStyle(x).stroke,
+          dash: x.getAttribute("stroke-dasharray"),
+          fx: m ? +m[1] : null, fy: m ? +m[2] : null,
+        };
+      });
+      const strong = p.querySelector("text.axis-label.x.strong");
       /* y scale from the rendered tick labels: centre-y of each text vs its
          value, linear-fitted (no assumed pad/inner-height) */
       const tks = [...p.querySelectorAll("text.axis-label.y")].map((t) => {
@@ -127,7 +140,8 @@ const readPanels = () => page.evaluate(() => {
         return { v: parseFloat(t.textContent), cy: r.y + r.height / 2 };
       }).filter((t) => !isNaN(t.v));
       tks.sort((a, b) => a.v - b.v);
-      return { name, svgR: { x: svgR.x, y: svgR.y, w: svgR.width, h: svgR.height }, ringBox, ringStroke, label, lines, tks };
+      return { name, svgR: { x: svgR.x, y: svgR.y, w: svgR.width, h: svgR.height }, ringBox, ringStroke, ringAt, label, lines, paths,
+               axisStrong: strong ? strong.textContent : null, tks };
     }),
   };
 });
@@ -167,18 +181,26 @@ const readLoc = () => page.evaluate(() => {
   const svg = card.querySelector("svg");
   const svgR = svg.getBoundingClientRect();
   const lines = [...card.querySelectorAll("path.series-line")].map((x) => getComputedStyle(x).stroke);
+  const paths = [...card.querySelectorAll("path.series-line")].map((x) => {
+    const m = /^M\s*([\d.eE+-]+)[ ,]([\d.eE+-]+)/.exec(x.getAttribute("d") || "");
+    return { stroke: getComputedStyle(x).stroke, dash: x.getAttribute("stroke-dasharray"),
+             fx: m ? +m[1] : null, fy: m ? +m[2] : null };
+  });
   const rings = [...card.querySelectorAll("circle.rd-ring")].map((c) => {
     const r = c.getBoundingClientRect();
-    return { stroke: getComputedStyle(c).stroke, cx: r.x + r.width / 2, cy: r.y + r.height / 2 };
+    return { stroke: getComputedStyle(c).stroke, cx: r.x + r.width / 2, cy: r.y + r.height / 2,
+             vx: +c.getAttribute("cx"), vy: +c.getAttribute("cy") };
   }).filter((r) => r.cx > 0 || r.cy > 0);
   const lab = card.querySelector(".rd-mark text");
+  const strong = card.querySelector("text.axis-label.x.strong");
   const tks = [...card.querySelectorAll("text.axis-label.y")].map((t) => {
     const r = t.getBoundingClientRect();
     return { v: parseFloat(t.textContent), cy: r.y + r.height / 2 };
   }).filter((t) => !isNaN(t.v));
   tks.sort((a, b) => a.v - b.v);
   const head = (card.querySelector(".rd-chead") || {}).textContent || "";
-  return { found: true, head, svgR: { x: svgR.x, y: svgR.y, w: svgR.width, h: svgR.height }, lines, rings, label: lab ? lab.textContent : null, tks };
+  return { found: true, head, svgR: { x: svgR.x, y: svgR.y, w: svgR.width, h: svgR.height }, lines, paths, rings,
+           axisStrong: strong ? strong.textContent : null, label: lab ? lab.textContent : null, tks };
 });
 
 for (const party of ["alp", "lnp", "onp", "grn", "oth"]) {
@@ -210,6 +232,25 @@ for (const party of ["alp", "lnp", "onp", "grn", "oth"]) {
       p.ringBox ? "cy " + p.ringBox.cy.toFixed(1) + " vs " + y.toFixed(1) + " ticks" + JSON.stringify(p.tks.map((t) => t.v)) : "no ring, ticks" + JSON.stringify(p.tks.map((t) => t.v)));
     check(party + " " + PANELS[i] + ": ring carries no text label", !p.label,
       JSON.stringify(p.label));
+    /* at this width the small multiple fits the full word (53px to its
+       neighbour); the letter fallback is exercised in the phone pass below */
+    check(party + " " + PANELS[i] + ": axis names the election", p.axisStrong === "Election",
+      JSON.stringify(p.axisStrong));
+    /* two dotted lead-ins bridge the ring to the first polled month: the
+       state line's in its own colour, all-voters' in ink - each starting
+       exactly at its dot (the ring sits on the state one) */
+    const leads = (p.paths || []).filter((q) => q.dash === "0.5 4");
+    check(party + " " + PANELS[i] + ": two dotted leads", leads.length === 2,
+      JSON.stringify((p.paths || []).map((q) => q.dash)));
+    const stLead = leads.find((q) => q.stroke === p.lines[1]);
+    const alLead = leads.find((q) => q.stroke === p.lines[0]);
+    check(party + " " + PANELS[i] + ": lead in the state colour", !!stLead,
+      leads.map((q) => q.stroke).join(",") + " vs " + p.lines[1]);
+    check(party + " " + PANELS[i] + ": lead in ink for all voters", !!alLead,
+      leads.map((q) => q.stroke).join(",") + " vs " + p.lines[0]);
+    check(party + " " + PANELS[i] + ": state lead starts at the ring",
+      !!(stLead && p.ringAt) && Math.abs(stLead.fx - p.ringAt.x) < 0.75 && Math.abs(stLead.fy - p.ringAt.y) < 0.75,
+      JSON.stringify({ d: stLead ? [stLead.fx, stLead.fy] : null, ring: p.ringAt }));
   });
   /* hover Victoria's ring: guide tip, two ring swatches, both rows at the election share */
   const vic = P.panels[1];
@@ -264,6 +305,25 @@ for (const party of ["alp", "lnp", "onp", "grn", "oth"]) {
       rk.stroke + " in " + JSON.stringify(L.lines.slice(1)));
     check(party + " location ring " + ri + " not the all-voters ink", rk.stroke !== L.lines[0], "both " + rk.stroke);
   });
+  /* the full-width chart has room for the word where the panels only fit E */
+  check(party + " location: axis names the election", L.axisStrong === "Election", JSON.stringify(L.axisStrong));
+  /* five dotted leads out of the election column: one per classification
+     line in the line's colour, starting exactly at its own ring, plus the
+     all-voters figure in ink */
+  const lLeads = (L.paths || []).filter((q) => q.dash === "0.5 4");
+  check(party + " location: five dotted leads", lLeads.length === 5,
+    JSON.stringify((L.paths || []).map((q) => q.dash)));
+  check(party + " location: a lead per line colour",
+    L.lines.slice(1).some((s) => s !== L.lines[0] && lLeads.some((q) => q.stroke === s))
+      && lLeads.filter((q) => q.stroke !== L.lines[0]).length === 4,
+    lLeads.map((q) => q.stroke).join(","));
+  check(party + " location: an ink lead for all voters", lLeads.some((q) => q.stroke === L.lines[0]),
+    lLeads.map((q) => q.stroke).join(",") + " vs " + L.lines[0]);
+  L.rings.forEach((rk, ri) => {
+    check(party + " location ring " + ri + ": a lead starts at it",
+      lLeads.some((q) => Math.abs(q.fx - rk.vx) < 0.75 && Math.abs(q.fy - rk.vy) < 0.75),
+      "ring " + [rk.vx, rk.vy].map((v) => v.toFixed(1)) + " d-heads " + lLeads.map((q) => q.fx.toFixed(1) + "," + q.fy.toFixed(1)).join(" "));
+  });
   LOC.forEach((g, gi) => {
     const y = yOf(expL[gi], L.tks);
     check(party + " " + g + ": ring at the AEC share " + expL[gi],
@@ -296,6 +356,43 @@ for (const party of ["alp", "lnp", "onp", "grn", "oth"]) {
     if (t4.kind === "guide") break;
   }
   check(party + " location recent month: plain squares", t4.kind === "guide" && t4.nRing === 0, t4.kind);
+}
+
+/* the phone rung: "Election" no longer fits between its neighbours, so the
+   landmark tick falls back to its letter on both charts (measured: 132px
+   panels and a 280px location chart at 320px) */
+{
+  const page2 = await browser.newPage();
+  await page2.setViewport({ width: 320, height: 780 });
+  page2.on("pageerror", (e) => console.error("[pageerror]", e.message));
+  await page2.goto(`http://127.0.0.1:${port}/index.html`, { waitUntil: "networkidle0", timeout: 60000 });
+  await page2.waitForSelector("#who-votes", { timeout: 30000 });
+  await page2.evaluate(() => {
+    [...document.querySelectorAll(".rd-tabs button")]
+      .filter((b) => /^all$/i.test(b.textContent.trim()))
+      .forEach((b) => b.click());
+    const sec = document.getElementById("who-votes");
+    const tabs = [...sec.querySelectorAll(".rd-tabs button")];
+    const place = tabs.find((b) => b.textContent.trim() === "Place");
+    if (place && place.getAttribute("aria-selected") !== "true") place.click();
+    const chips = [...sec.querySelectorAll("button.rd-chip")];
+    const chip = chips.find((b) => b.textContent.trim().startsWith("Labor"));
+    if (chip && chip.getAttribute("aria-pressed") !== "true") chip.click();
+  });
+  await sleep(1400);
+  const phone = await page2.evaluate(() => {
+    const panes = [...document.querySelectorAll("#who-votes .rd-wv-panels .rd-wv-panel")];
+    const loc = [...document.querySelectorAll("#who-votes .rd-wv-charts > .rd-wv-chart")].find((x) => !x.querySelector(".rd-wv-panels"));
+    const strongOf = (el) => {
+      const t = el && el.querySelector("text.axis-label.x.strong");
+      return t ? t.textContent : null;
+    };
+    return { panels: panes.map(strongOf), loc: strongOf(loc) };
+  });
+  check("phone: every state panel falls back to E", phone.panels.length === 4 && phone.panels.every((s) => s === "E"),
+    JSON.stringify(phone.panels));
+  check("phone: location falls back to E", phone.loc === "E", JSON.stringify(phone.loc));
+  await page2.close();
 }
 
 await browser.close();

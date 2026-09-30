@@ -1266,14 +1266,25 @@ function TrendChart(props) {
             keep their spacing from them. */}
         {(() => {
           const thin = (list) => {
-            if (list.length < 3) return list;
+            /* A landmark tick ("Election") may carry a `short` ("E") for when
+               its long word cannot sit beside its neighbours: shortening keeps
+               its date on the axis where dropping it to the k-thinning below
+               would take it off altogether, so it is exempt from that
+               thinning instead */
             const pxOf = (t) => [...t.label].length * 6.3 + 10;           // ~11px sans, plus air
+            const clearOf = (t, w, i) => {
+              const l = list[i - 1], r = list[i + 1];
+              return (!l || (sx(t.x) - sx(l.x)) * scale >= (w + pxOf(l)) / 2)
+                  && (!r || (sx(r.x) - sx(t.x)) * scale >= (w + pxOf(r)) / 2);
+            };
+            list = list.map((t, i) => (t.short && !clearOf(t, pxOf(t), i) ? { ...t, label: t.short } : t));
+            if (list.length < 3) return list;
             const fits = (ts) => ts.every((t, i) => i === 0
               || (sx(t.x) - sx(ts[i - 1].x)) * scale >= (pxOf(t) + pxOf(ts[i - 1])) / 2);
             let ts = list;
             for (let k = 2; !fits(ts) && k <= 6; k++) {
               const anchor = Math.max(0, list.findIndex((t) => /’/.test(t.label) && t !== list[0]));
-              ts = list.filter((_, i) => (i - anchor) % k === 0);
+              ts = list.filter((t, i) => t.short || (i - anchor) % k === 0);
             }
             return ts;
           };
