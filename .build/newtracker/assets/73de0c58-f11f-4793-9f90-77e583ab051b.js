@@ -2159,11 +2159,12 @@ function App() {
       if (t.clientX < EDGE || t.clientX > window.innerWidth - EDGE) return;
       /* an exact claimer (the hero's 2PP card) takes a touch that lands on
          its chart, whatever sideways claims stand between it and the page;
-         the claim stops at the chart's frame - a swipe on the numbered
-         event list under it belongs to the page again (.rd-evlist's own
-         pan-y keeps it inert) */
+         the card absorbs the rest of its own surface too - a swipe on the
+         numbered event list under the chart, or on the card's tabs and
+         chrome, does nothing at all */
       const own0 = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-exact]") : null;
-      const own = own0 && e.target.closest(".chart") ? own0 : null;
+      if (own0 && !e.target.closest(".chart")) return;
+      const own = own0 || null;
       if (!own && claimsSideways(e.target)) return;
       g = { x: t.clientX, y: t.clientY, t: Date.now(), sy: window.scrollY, row: own || rowAt(t.clientY) };
     };

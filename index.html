@@ -76440,7 +76440,8 @@ function App() {
       const t = e.touches[0];
       if (t.clientX < EDGE || t.clientX > window.innerWidth - EDGE) return;
       const own0 = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-exact]") : null;
-      const own = own0 && e.target.closest(".chart") ? own0 : null;
+      if (own0 && !e.target.closest(".chart")) return;
+      const own = own0 || null;
       if (!own && claimsSideways(e.target)) return;
       g = {
         x: t.clientX,
