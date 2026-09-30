@@ -55,8 +55,14 @@ extracted_at: '2026-09-24T06:59:15.806Z'
     points row descends "… of One Nation's gain" → "… of ON's gain" →
     bare, the SECOND descends "… of the gain" → bare, all later columns
     are bare ("≈ 3.1 points"); the chains are SVG-column-label only —
-    the phone `.rd-mo-rows` variant still shows "≈ N pts". Pinned by
-    `.matilda/probe/switching-title-dek-swap.mjs` (13 checks, 1280 +
+    the phone `.rd-mo-rows` variant still shows "≈ N pts". The SHARE row
+    under the points row carries its tail on the FIRST column ONLY and
+    there as "of the gain" (never "of One Nation's gain" — that column's
+    pts row above already says it); the second column's share row is
+    bare for the same reason — each column says its counting tail once,
+    on exactly one of its two sub-rows (user's rule, 2026-09-30, two
+    follow-ups in a row). Pinned by
+    `.matilda/probe/switching-title-dek-swap.mjs` (15 checks, 1280 +
     390px; floats its own http server — map "/" → "/index.html", and use
     `new Function` on the 9f09dca2 asset for live expectations;
     `S.series` is an ARRAY of `{id,…}` entries, not a keyed object).

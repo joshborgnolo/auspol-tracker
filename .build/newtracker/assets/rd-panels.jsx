@@ -1886,7 +1886,11 @@ function RdSwitching({ rangeId }) {
       : i === 1
         ? ["≈ " + fmt1(c.pts) + " points of the gain", "≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)]
         : ["≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)],
-    sh: c.kept ? ["kept"] : [Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + (i === 0 ? " of One Nation’s gain" : i === 1 ? " of the gain" : ""),
+    /* the share row carries its counting tail on the FIRST column only, and
+       there as "of the gain" — the column's own "of One Nation's gain" sits
+       on the pts row above, so repeating it (or the second column's tail)
+       doubled the same tail down a column (user, 2026-09-30) */
+    sh: c.kept ? ["kept"] : [Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + (i === 0 ? " of the gain" : ""),
                             Math.round(c.gain) + "% ±" + fmt1(c.gainCi), Math.round(c.gain) + "%"],
   }));
   const lab = {};

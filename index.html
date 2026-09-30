@@ -67425,7 +67425,7 @@ function RdSwitching({
     nm: c.kept ? ["One Nation", "ON"] : [NAME[c.id]],
     sz: [fmt1(c.w) + "%" + (c.id === "lnp" || c.id === "alp" ? " of 2025 voters" : c.id === "oth" ? ", incl. independents" : ""), fmt1(c.w) + "%"],
     pts: c.kept ? ["≈ " + fmt1(keptPts)] : i === 0 ? ["≈ " + fmt1(c.pts) + " points of One Nation’s gain", "≈ " + fmt1(c.pts) + " points of ON’s gain", "≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)] : i === 1 ? ["≈ " + fmt1(c.pts) + " points of the gain", "≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)] : ["≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)],
-    sh: c.kept ? ["kept"] : [Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + (i === 0 ? " of One Nation’s gain" : i === 1 ? " of the gain" : ""), Math.round(c.gain) + "% ±" + fmt1(c.gainCi), Math.round(c.gain) + "%"]
+    sh: c.kept ? ["kept"] : [Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + (i === 0 ? " of the gain" : ""), Math.round(c.gain) + "% ±" + fmt1(c.gainCi), Math.round(c.gain) + "%"]
   }));
   const lab = {};
   [["nm", 15, 600], ["sz", 12, 400], ["pts", 15, 600], ["sh", 12, 400]].forEach(([key, size, wt]) => {

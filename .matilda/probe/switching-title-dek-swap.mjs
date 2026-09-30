@@ -66,6 +66,7 @@ const readPanel = async (width) => {
       dek: (sec.querySelector(".rd-dek") || {}).textContent || "",
       aria: (sec.querySelector("svg[aria-label]") || {}).getAttribute?.("aria-label") || "",
       pts: texts.filter((t) => t.startsWith("≈")),
+      shs: [...sec.querySelectorAll("text.rd-mo-sh")].map((t) => t.textContent),
       moRows: [...sec.querySelectorAll(".rd-mo-rows .rd-mo-rtop b:last-child")].map((b) => b.textContent),
       texts: texts.slice(0, 40),
     };
@@ -93,6 +94,8 @@ const readPanel = async (width) => {
     ok("first column ≈ pts carries the full gain suffix", /≈ .* points of One Nation.s gain/.test(first), JSON.stringify(first));
     ok("second column ≈ pts says “of the gain”", /≈ .* points of the gain/.test(p.pts[1] || ""), JSON.stringify(p.pts[1] || ""));
     ok("columns 3+ stay bare", p.pts.slice(2, 4).every((t) => /^≈ [\d.]+( points)?$/.test(t)), JSON.stringify(p.pts));
+    ok("first column share row says “of the gain” (not One Nation’s — the pts row above already has it)", /of the gain/.test(p.shs[0] || "") && !/of One Nation.s gain/.test(p.shs[0] || ""), JSON.stringify(p.shs[0]));
+    ok("second column share row is bare", !/of the gain|of One Nation.s gain/.test(p.shs[1] || "") && /±/.test(p.shs[1] || ""), JSON.stringify(p.shs));
   }
 }
 
