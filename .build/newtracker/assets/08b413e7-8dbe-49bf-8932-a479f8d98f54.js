@@ -190,6 +190,14 @@ function TrendChart(props) {
        margins however wide the column - and the viewBox follows the width */
     heightPx, padPx,
     series: seriesProp = [], scatter: scatterProp = [], yTicks = [], xTicks = [], refLines = [],
+    /* `padSeries`: extra series to reserve right margin for even though they
+       are not being drawn. The PPM switch's two views print different end
+       labels; priced per drawn set, each view would reserve its own margin
+       and the plot width would jolt through the morph. The caller hands the
+       union of both views' series in, and the engine's own measured formula
+       - live width, each series' inset from the right edge - applies to
+       both, which a caller-side constant cannot do (it never sees cw). */
+    padSeries = null,
     bands = [], areas = [], fmt = (v) => v.toFixed(1), unit = "", tooltipTitle: tooltipTitleProp,
     onHoverIndex, spine: spineProp, axisFont = 15, events = [], extraRows: extraRowsProp, ariaLabel,
     yTickFmt, copy,
@@ -407,10 +415,14 @@ function TrendChart(props) {
        one ending a month short needs less, a past term's year mid-plot none. */
     const k = cw / VB.W;                               // px per unit
     const innerPx = (VB.W - padProp.l - padProp.r) * k;
-    const need = seriesProp.filter((s) => s.endLabel && s.opacity !== 0 && s.points.length).map((s) => {
+    const need = (padSeries ? seriesProp.concat(padSeries) : seriesProp).filter((s) => s.endLabel && s.opacity !== 0 && s.points.length).map((s) => {
       const f = (s.points[s.points.length - 1].x - xDomain[0]) / (xDomain[1] - xDomain[0]);
-      const txt = [...s.endLabel].reduce((n, ch) => n + (ch >= "0" && ch <= "9" ? 0.55 : ch === " " ? 0.3 : 0.72), 0)
-        * ((window.AP && window.AP.rd) ? 13 : 10.5) * 0.95 + 12;
+      /* measured, not estimated: pricing every letter at 0.72em ran about a
+         quarter fat on the --sans labels (the by-generation chart left ~28px
+         of dead plot before its card's edge on "Millennials"), with no slack
+         for the narrow chars a name is mostly made of. Sizes are the ones the
+         labels draw at, weight is the template's 700. */
+      const txt = textWidth(s.endLabel, rd ? 13 : 10.5 * 0.95, 700) + (rd ? 12 : 7);
       return txt - Math.max(0, 1 - f) * innerPx;
     });
     if (!need.length) return padProp;
@@ -1589,9 +1601,12 @@ function TrendChart(props) {
              one cluster – those cycles end in different month columns at
              near-identical values, so years that never visually met were
              pushed a line height or more off their own line ends. */
-          const adv = (ch) => (ch >= "0" && ch <= "9" ? 0.55 : ch === " " ? 0.3 : ch === "’" ? 0.25 : 0.72);
+          /* measured textWidth, read at this font size so it lands in viewBox
+             units like everything below: the char-advance table priced every
+             letter at 0.72em, a quarter fat on this face, and chained labels
+             into collision domains their glyphs never overlapped */
           for (const l of labs)
-            l.w = [...l.text].reduce((t, ch) => t + adv(ch), 0) * elFs;
+            l.w = textWidth(l.text, elFs, 700);
           const xOverlap = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w;
           const comp = labs.map(() => -1);
           let nComp = 0;

@@ -48127,6 +48127,7 @@ function TrendChart(props) {
     yTicks = [],
     xTicks = [],
     refLines = [],
+    padSeries = null,
     bands = [],
     areas = [],
     fmt = v => v.toFixed(1),
@@ -48283,9 +48284,9 @@ function TrendChart(props) {
   const pad = (() => {
     const k = cw / VB.W;
     const innerPx = (VB.W - padProp.l - padProp.r) * k;
-    const need = seriesProp.filter(s => s.endLabel && s.opacity !== 0 && s.points.length).map(s => {
+    const need = (padSeries ? seriesProp.concat(padSeries) : seriesProp).filter(s => s.endLabel && s.opacity !== 0 && s.points.length).map(s => {
       const f = (s.points[s.points.length - 1].x - xDomain[0]) / (xDomain[1] - xDomain[0]);
-      const txt = [...s.endLabel].reduce((n, ch) => n + (ch >= "0" && ch <= "9" ? 0.55 : ch === " " ? 0.3 : 0.72), 0) * (window.AP && window.AP.rd ? 13 : 10.5) * 0.95 + 12;
+      const txt = textWidth(s.endLabel, rd ? 13 : 10.5 * 0.95, 700) + (rd ? 12 : 7);
       return txt - Math.max(0, 1 - f) * innerPx;
     });
     if (!need.length) return padProp;
@@ -49509,8 +49510,7 @@ function TrendChart(props) {
     const elFs = rd ? PX(13) : refUnits * 0.95;
     const gap = rd ? elFs * 1.22 : refUnits * 1.15;
     if ((labs.length - 1) * gap > (H - pad.t - pad.b) * 0.55) return null;
-    const adv = ch => ch >= "0" && ch <= "9" ? 0.55 : ch === " " ? 0.3 : ch === "’" ? 0.25 : 0.72;
-    for (const l of labs) l.w = [...l.text].reduce((t, ch) => t + adv(ch), 0) * elFs;
+    for (const l of labs) l.w = textWidth(l.text, elFs, 700);
     const xOverlap = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w;
     const comp = labs.map(() => -1);
     let nComp = 0;
@@ -62801,8 +62801,14 @@ function rdPinScroll(row) {
       html.style.overflowAnchor = rdPinAnchorSave;
       rdPinAnchorSave = null;
     }
+    const was = row.isConnected ? row.getBoundingClientRect().top : 0;
     rdPinThaw();
-    if (row.isConnected) fix();
+    if (!row.isConnected) return;
+    const shift = row.getBoundingClientRect().top - was;
+    if (shift) {
+      window.scrollBy(0, shift);
+      lastY = window.scrollY;
+    }
   };
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
@@ -64598,6 +64604,19 @@ function RdPrimary({
   }, "%")), p.was != null && React.createElement("span", {
     className: "rd-pv-chg"
   }, rdArrow(p.v - p.was), " ", Math.abs(p.v - p.was).toFixed(1), " since the election"));
+  const rangeLive = React.useRef(null);
+  const cardEl = React.useRef(null);
+  rangeLive.current = dir => {
+    const i = RD_RANGES.findIndex(o => o.id === rangeId);
+    if (i < 0) return false;
+    if (cardEl.current) rdPinScroll(cardEl.current);
+    setRangeId(RD_RANGES[(i + dir + RD_RANGES.length) % RD_RANGES.length].id);
+    return true;
+  };
+  const chartMark = React.useCallback(el => {
+    cardEl.current = el;
+    if (el) el.__rdSwipe = dir => rangeLive.current(dir);
+  }, []);
   return React.createElement(RdSec, {
     id: "primary-vote",
     title: "Primary vote",
@@ -64624,7 +64643,9 @@ function RdPrimary({
       gridColumn: "1 / span " + k
     }
   }, React.createElement("span", null), "Within the margin of uncertainty", React.createElement("span", null)), parts.map(stat)), React.createElement("div", {
-    className: "card rd-card rd-pv-chart"
+    className: "card rd-card rd-pv-chart",
+    ref: chartMark,
+    "data-rd-swipe-exact": ""
   }, React.createElement(RdTabs, {
     value: rangeId,
     onChange: setRangeId,
