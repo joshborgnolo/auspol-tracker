@@ -239,6 +239,10 @@ const rdPinThaw = () => {
 };
 function rdPinScroll(row) {
   if (!row) return;
+  /* the fixed view is a TOUCH-device contract: it exists to stop mid-
+     gesture drift on iOS Safari. On a computer (fine pointer - mouse,
+     trackpad, keyboard) a click or keypress just reflows live, no pin */
+  if (window.matchMedia && !window.matchMedia("(pointer: coarse)").matches) return;
   const bar = document.querySelector(".tabs.sticky");
   /* the bar's box sits at its unstuck place whenever it isn't stuck (top of
      the page), so its live bottom is 200px+ there - reserve only what the

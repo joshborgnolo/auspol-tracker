@@ -62812,6 +62812,7 @@ const rdPinThaw = () => {
 };
 function rdPinScroll(row) {
   if (!row) return;
+  if (window.matchMedia && !window.matchMedia("(pointer: coarse)").matches) return;
   const bar = document.querySelector(".tabs.sticky");
   const reserve = () => {
     const r = bar && bar.getBoundingClientRect();
