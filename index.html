@@ -67786,8 +67786,7 @@ function RdIssues({
     const list = I && I.list ? I.list : [];
     if (list.length < 2) return false;
     const cur = selNow && list.some(x => x.id === selNow) ? selNow : list[0].id;
-    const j = list.findIndex(x => x.id === cur) + dir;
-    if (j < 0 || j >= list.length) return false;
+    const j = (list.findIndex(x => x.id === cur) + dir + list.length) % list.length;
     setSel(list[j].id);
     return true;
   };
@@ -68018,8 +68017,7 @@ function RdIssues({
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
     const i = list.findIndex(y => y.id === x.id);
-    const j = i + (e.key === "ArrowDown" ? 1 : -1);
-    if (j < 0 || j >= list.length) return;
+    const j = (i + (e.key === "ArrowDown" ? 1 : -1) + list.length) % list.length;
     setSel(list[j].id);
     const rows = rowsRef.current ? rowsRef.current.querySelectorAll(".rd-is-row:not(.rd-is-tally)") : [];
     if (rows[j]) rows[j].focus();
