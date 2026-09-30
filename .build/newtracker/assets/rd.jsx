@@ -158,12 +158,15 @@ function rdPinScroll(row) {
     if (!row.isConnected) { done(); return; }
     const y = window.scrollY;
     /* a wheel or trackpad tick mid-glide folds into the anchor and the pin
-       follows it, but a jump of a screen or more (Home/End, a nav pill, a
-       scrollIntoView) is the user leaving - hand back rather than drag the
-       page to where the row was */
+       follows it: the row moves OPPOSITE the scroll on screen, so the
+       target follows it by -dy, not +dy (added, each tick re-scrolled
+       itself back out twice - a scroll mid-glide fought the user and
+       shoved the page up to its top). A jump of a screen or more
+       (Home/End, a nav pill, a scrollIntoView) is the user leaving - hand
+       back rather than drag the page to where the row was */
     const dy = y - lastY;
     if (Math.abs(dy) > window.innerHeight) { done(); return; }
-    want += dy;
+    want -= dy;
     lastY = y;
     const drift = row.getBoundingClientRect().top - want;
     if (drift) { window.scrollBy(0, drift); lastY = window.scrollY; }
