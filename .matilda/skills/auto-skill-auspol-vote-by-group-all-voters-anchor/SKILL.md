@@ -120,6 +120,14 @@ Gotchas:
   - The native `title` is gone from the dots (the row's pooled-figures
     `title` moved onto the .rd-wv-lab/.rd-wv-v/.rd-wv-d cells so the OS
     tooltip never pops over the custom one).
+  - Row z-ladder: line 1 (both forms — plot-overlay `.rd-wv-allline` on
+    desktop, per-row `.rd-wv-all` on phone), rug 2, whisker `.rd-wv-ci` 2,
+    centre dot 3, the tipped rug 4. The user asked the dots sit over the
+    dashed all-voters line exactly as the whisker and circle do
+    (2026-10-01) — the rug had drawn at z 1 like the line, which paints
+    AFTER it in tree order, so the dash scored through the dots. Don't
+    renumber without checking the whisker/dot tiers; the webkit probe's
+    `1b. stack` asserts the full ladder.
   Mouse click or Enter opens the poll row via
   `AP.pollRowKey({pollster: f, released: r})` → `AP.openPoll(key,
   "primary", "who votes for whom")`; a touch tap only tips (tap again to
