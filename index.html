@@ -3197,7 +3197,7 @@ body.rd .rd-swap-was { position: absolute; top: 0; left: 0; right: 0; min-width:
 @media (max-width: 900px) {
   body.rd .rd-pl .rd-swap-was { left: auto; right: 0; }
 }
-body.rd .rd-swap-now.in { animation: rd-xf-in .2s ease-out .12s both; }
+body.rd .rd-swap-now.in { animation: rd-xf-in .2s ease-out both; }
 @media (prefers-reduced-motion: reduce) { body.rd .rd-swap-was { display: none; } body.rd .rd-swap-now.in { animation: none; } }
 @keyframes rd-ap-in-c2pp { from { opacity: 0; } }
 @keyframes rd-ap-in-cprim { from { opacity: 0; } }
@@ -62897,9 +62897,9 @@ const rdPinThaw = () => {
     o.style.overflowY = "";
   });
 };
-function rdPinScroll(row) {
+function rdPinScroll(row, fine) {
   if (!row) return;
-  if (window.matchMedia && !window.matchMedia("(pointer: coarse)").matches) return;
+  if (!fine && window.matchMedia && !window.matchMedia("(pointer: coarse)").matches) return;
   const bar = document.querySelector(".tabs.sticky");
   const reserve = () => {
     const r = bar && bar.getBoundingClientRect();
@@ -73888,7 +73888,7 @@ function RdAllPolls(P) {
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
     if (!sec) return;
-    rdPinScroll([sec.querySelector(".rd-ap-bar"), sec.querySelector(".rd-ap-tabs"), sec.querySelector(".rd-ap-table .rd-ap-mrow, .rd-ap-table .rd-ap-row, .rd-ap-table .rd-ap-card")]);
+    rdPinScroll([sec.querySelector(".rd-ap-bar"), sec.querySelector(".rd-ap-tabs"), sec.querySelector(".rd-ap-table .rd-ap-mrow, .rd-ap-table .rd-ap-row, .rd-ap-table .rd-ap-card")], true);
   };
   const facetPick = id => {
     pinAp();

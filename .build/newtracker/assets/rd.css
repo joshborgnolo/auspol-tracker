@@ -302,7 +302,11 @@ body.rd .rd-swap-was { position: absolute; top: 0; left: 0; right: 0; min-width:
      content's right edge, not the line's left */
   body.rd .rd-pl .rd-swap-was { left: auto; right: 0; }
 }
-body.rd .rd-swap-now.in { animation: rd-xf-in .2s ease-out .12s both; }
+/* RdSwap is different from RdCrossfade: its cells are short figures, and
+   holding the incoming copy invisible for the ghost's whole exit read as the
+   column being slow to populate (All-polls' tab figures fade in at t=0 with
+   no delay). Let it arrive immediately; the ghost fades out underneath. */
+body.rd .rd-swap-now.in { animation: rd-xf-in .2s ease-out both; }
 @media (prefers-reduced-motion: reduce) { body.rd .rd-swap-was { display: none; } body.rd .rd-swap-now.in { animation: none; } }
 /* All polls: a facet tab's figures fade in (RdAllPolls marks the rows
    rd-ap-sw once a tab is pressed). Each facet names its own fade, so moving
