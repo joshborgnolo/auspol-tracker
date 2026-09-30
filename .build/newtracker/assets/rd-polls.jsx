@@ -419,6 +419,40 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     </span>
   );
 
+  /* Pointing at the card makes its facet row the arrow-key target without
+     moving DOM focus. Real keyboard focus still wins, and the capture phase
+     beats the page's own left/right page turn. */
+  const hoverKeys = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById("latest-polls");
+    if (!sec) return undefined;
+    const enter = () => { hoverKeys.current = true; };
+    const leave = () => { hoverKeys.current = false; };
+    hoverKeys.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const key = (e) => {
+      if (!hoverKeys.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      e.preventDefault();
+      setFacet((f) => {
+        const n = RD_PL_FACETS.length;
+        const i = RD_PL_FACETS.findIndex((x) => x.id === f);
+        return i < 0 ? f : RD_PL_FACETS[(i + (e.key === "ArrowRight" ? 1 : -1) + n) % n].id;
+      });
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
+
   /* up/down pollster to pollster: with a row focused, an arrow steps the
      focus a row; when the row was open, the expanded readout travels with it
      (clamped at the ends). Left and right walk the facet views, the tab
