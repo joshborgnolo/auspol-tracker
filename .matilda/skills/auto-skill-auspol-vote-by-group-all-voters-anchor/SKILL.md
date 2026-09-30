@@ -93,7 +93,16 @@ Gotchas:
   `demoTrend` payload emits the combos significant on both the
   absolute-gap and the log-ratio slope, and the Who-votes trend block
   composes its title and dek from that list.
-  Each group also carries pooled `v[party]`, `ci[party]`, `n`, `houses`.
+  Each group also carries pooled `v[party]`, `ci[party]`, `n`, `houses`,
+  plus the whisker-rug pair `pd`/`px` (2026-10-01): `pd` lists the
+  in-window waves as `{f: firm, l: fieldwork label, n: group-sample n}`,
+  and `px[party]` the same waves' readings on the display scale in the
+  SAME array order for every party (one filter+sort per key over the same
+  rows), so a party-chip switch glides dot-for-dot. rd-panels renders
+  `.rd-wv-rug` above the CI strip (party colour at .55, tooltipped
+  "Firm, dates · x.x% · n≈…"); the RdKey "dot" item explains it. CAVEAT:
+  `pd.n` is whole-poll n × DEMO_SHARE, like the group's pooled `n` — an
+  approximation of the published group n, not a crosstab read-back.
 - `oth` rides the full payload end-to-end (25/25 groups carry pooled
   `v.oth` + `ci.oth`, monthly rows included) and joined the panel as a
   fifth chip ("Others", 69f467e, 2026-09-29): `DEMO_PARTIES` is now the

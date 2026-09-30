@@ -1552,7 +1552,7 @@ function RdDemographics({ rangeId = "all" }) {
   })();
 
   /* ---- the dot plot, every set on one scale -------------------------------- */
-  const vals = tab.sets.flatMap((st) => st.groups.flatMap((g) => [g.v[party] + (g.ci[party] || 0), g.v[party] - (g.ci[party] || 0)])).concat([all]);
+  const vals = tab.sets.flatMap((st) => st.groups.flatMap((g) => [g.v[party] + (g.ci[party] || 0), g.v[party] - (g.ci[party] || 0)].concat((g.px && g.px[party]) || []))).concat([all]);
   const hi = Math.max(10, Math.ceil(Math.max(...vals) / 10) * 10);
   const xp = (v) => (Math.max(0, Math.min(hi, v)) / hi) * 100;
   const signedD = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
@@ -1567,13 +1567,20 @@ function RdDemographics({ rangeId = "all" }) {
         const v = g.v[party], ci = g.ci[party] || 0, d = v - all, sig = Math.abs(d) > ci;
         return (
           <div key={"r" + gi} className="rd-wv-row" role="row"
-               title={"Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + ", " + rdList((g.houses || []).map(demoHouse)) + ", ± is the 95% margin"}>
+               title={"Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + ", " + rdList((g.houses || []).map(demoHouse)) + ", ± is the 95% margin, small dots: each poll’s own reading"}>
             <span role="cell" className="rd-wv-lab">{g.label}<RdGenBorn label={g.label} /></span>
             <span className="rd-wv-track" aria-hidden="true">
               {/* positions go to CSS as --x/--lo/--hi (percent of the track)
                   and are drawn with transforms, so a switch glides them on
                   the compositor however busy the page's own frames are */}
               <span className="rd-wv-all" style={{ "--x": xp(all) }}></span>
+              {/* the rug: each wave in the window as a small dot at its own
+                  reading; px is wave-ordered for every party, so a party
+                  switch glides the dots rather than reshuffling them */}
+              {g.pd && g.px && g.px[party] && <span className="rd-wv-rug" aria-hidden="true">
+                {g.px[party].map((x, i) => <b key={i} style={{ "--x": xp(x), background: pColor }}
+                  title={(g.pd[i] ? g.pd[i].f + ", " + g.pd[i].l + " · " : "") + x.toFixed(1) + "%" + (g.pd[i] ? " · n≈" + g.pd[i].n : "")}></b>)}
+              </span>}
               <span className="rd-wv-ci" style={{ "--lo": xp(v - ci), "--hi": xp(v + ci), color: pColor }}><i className="lo"></i><i className="hi"></i><b></b></span>
               <span className={"rd-wv-dot" + (sig ? "" : " open")} style={{ "--x": xp(v), background: sig ? pColor : undefined, borderColor: pColor }}></span>
             </span>
@@ -1837,6 +1844,7 @@ function RdDemographics({ rangeId = "all" }) {
           { kind: "dot-solid", color: pColor, label: "Clearly above or below all voters" },
           { kind: "dot-open", color: pColor, label: "Within the margin" },
           { kind: "whisker", color: pColor, label: "95% interval" },
+          { kind: "dot", color: pColor, label: "One poll pooled" },
         ]}><span className="rd-key-item rd-wv-keytxt">Right-hand column: difference from all voters, in points</span></RdKey>
       </div>
       {/* the composition trend IS the change-over-time line here (it came

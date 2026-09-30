@@ -1030,6 +1030,11 @@ body.rd .rd-wv-allline > span { grid-column: 2; position: relative; }
 body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; bottom: 0; left: 0; width: 1.5px; transform: translateX(calc(var(--x) * 1cqw - 0.75px)); z-index: 1;
   background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); }
 body.rd .rd-wv-all { display: none; }
+/* the rug: each wave the window holds is a small dot along the top of the
+   track, the poll's own reading for the group, quieter than the whisker
+   so it reads as the working, not the figure */
+body.rd .rd-wv-rug { position: absolute; top: 1px; left: 0; right: 0; height: 6px; z-index: 1; }
+body.rd .rd-wv-rug b { position: absolute; top: 0; left: 0; width: 6px; height: 6px; border-radius: 50%; opacity: 0.55; transform: translateX(calc(var(--x) * 1cqw - 50%)); }
 /* the interval spans the track and draws its parts inside it: the bar
    shifted to --lo and stretched to --hi (a 2px-tall line can scale
    sideways without distorting), each end tick shifted on its own */
@@ -1049,12 +1054,12 @@ body.rd .rd-wv-dot { position: absolute; top: 50%; left: 0; width: 13px; height:
    colours easing with them; the scale's ticks slide if its top changes */
 body.rd .rd-wv-dot { transition: transform .32s var(--morph-ease), background-color .32s ease, border-color .32s ease; }
 body.rd .rd-wv-ci { transition: color .32s ease; }
-body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: transform .32s var(--morph-ease); }
+body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span, body.rd .rd-wv-rug b { transition: transform .32s var(--morph-ease); }
 /* a grouping switch brings the charts in fresh: faded in, not cut */
 body.rd .rd-wv-enter > .rd-wv-chart { animation: rd-wv-in .32s ease backwards; }
 @keyframes rd-wv-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  body.rd .rd-wv-dot, body.rd .rd-wv-ci, body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span { transition: none; }
+  body.rd .rd-wv-dot, body.rd .rd-wv-ci, body.rd .rd-wv-ci > b, body.rd .rd-wv-ci > i, body.rd .rd-wv-allline i, body.rd .rd-wv-all, body.rd .rd-wv-allcap > span, body.rd .rd-wv-ticks > span, body.rd .rd-wv-rug b { transition: none; }
   body.rd .rd-wv-enter > .rd-wv-chart { animation: none; }
 }
 body.rd .rd-wv-dot.open { background: var(--bg); }
@@ -1092,6 +1097,7 @@ body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
   body.rd .rd-wv-v { grid-area: v; font-size: 15px; }
   body.rd .rd-wv-d { grid-area: d; font-size: 13px; min-width: 38px; }
   body.rd .rd-wv-track { grid-area: track; height: 28px; }
+  body.rd .rd-wv-rug b { width: 5px; height: 5px; }
   body.rd .rd-wv-axis > span:not(.rd-wv-ticks) { display: none; }
   body.rd .rd-wv-axis .rd-wv-ticks { grid-column: 1 / -1; }
   body.rd .rd-wv-allline { display: none; }

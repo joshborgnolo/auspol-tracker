@@ -2652,6 +2652,8 @@ const demographics = (() => {
     if (!tot) continue;
     const mid = midMs(p || w), n = rowN(p || { sample: w.sample });
     const h = harmonize(w);
+    // the fieldwork label the Who-votes rug cites for each dot's poll
+    const lab = fwLabel(p ? p.dateStart : w.dateStart, p ? p.date : w.date);
     let used = false;
     for (const set of DEMO_SETS) for (const group of set.groups) {
       const g = h[set.id] && h[set.id][group] && demoNorm(h[set.id][group]);
@@ -2659,7 +2661,7 @@ const demographics = (() => {
       used = true;
       const ym = ymOf(p ? p.date : w.date), M = allByYm.get(ym);
       for (const k of DEMO_KEYS) {
-        (rows[set.id + "|" + group + "|" + k] ||= []).push({ mid, x: ALL[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster });
+        (rows[set.id + "|" + group + "|" + k] ||= []).push({ mid, x: ALL[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster, lab });
         if (M) (rowsM[set.id + "|" + group + "|" + k] ||= []).push({ ym, mid, x: M[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster });
       }
     }
@@ -2686,11 +2688,22 @@ const demographics = (() => {
         const T = total(allByYm.get(ym));
         return [ym, ...mv.map((v) => r1(T * v / mt)), ...m.map((e) => r1(1.96 * e.se * T / mt))];
       }).filter(Boolean);
+      /* the rug above the group's whisker: each wave the window holds, with
+         its own reading on the display scale. Waves push all five parties in
+         one loop, so the px arrays below stay identically ordered. */
+      const win = (rows[key("alp")] || [])
+        .filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; })
+        .sort((a, b) => a.mid - b.mid);
+      const pd = win.map((r) => ({ f: r.firm, l: r.lab, n: Math.round(r.n) }));
+      const px = Object.fromEntries(DEMO_KEYS.map((k) => [k,
+        (rows[key(k)] || []).filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; })
+          .sort((a, b) => a.mid - b.mid).map((r) => r1(ALL_T * r.x / t))]));
       return {
         label: group,
         v: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(ALL_T * raw[k] / t)])),
         ci: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(1.96 * est[k].se)])),
         n: est.alp.n, houses: housesIn(rows[key("alp")] || []), monthly,
+        pd, px,
       };
     }).filter(Boolean);
     return { tab: set.tab, id: set.id, label: set.label, groups,
