@@ -19,7 +19,10 @@ const RD_RANGES = [{ id: "3", label: "3 mo" }, { id: "6", label: "6 mo" },
    contest or basis changes, on the same curve the figures roll on. */
 function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
   const ref = React.useRef(null);
-  const [w, setW] = React.useState(760);
+  /* 0 = unmeasured: the 760 fallback must never paint, because the left-ed
+     transition then drags the dots across from 760px geometry to the real
+     width and, on a phone, one or two frames of that overshoot the viewport. */
+  const [w, setW] = React.useState(0);
   React.useLayoutEffect(() => {
     const el = ref.current;
     if (!el || !el.parentElement) return undefined;
@@ -48,7 +51,7 @@ function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
   const say = aName + (lead >= 0 ? " ahead by " : " behind by ") + Math.abs(lead).toFixed(1) + " points"
     + (margin != null ? ", give or take " + margin.toFixed(1) + (lo <= 0 && hi >= 0 ? ": a tie is inside that range." : ": a tie is outside that range.") : ".");
   return (
-    <div className="rd-lg" ref={ref} style={{ width: w }} role="img" aria-label={say} title={say}>
+    <div className="rd-lg" ref={ref} style={{ width: w || "auto", visibility: w ? "visible" : "hidden" }} role="img" aria-label={say} title={say}>
       <span className="rd-lg-side" style={{ left: sideX, color: inkOf(aColor) }}>◀ {aName} ahead</span>
       <span className="rd-lg-side" style={{ right: sideX, color: inkOf(bColor) }}>{bName} ahead ▶</span>
       {[-10, -5, 5, 10].map((v) => <span key={v} className="rd-lg-grid" style={{ left: X(v) }}></span>)}

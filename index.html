@@ -63623,7 +63623,7 @@ function RdLeadGauge({
   bColor
 }) {
   const ref = React.useRef(null);
-  const [w, setW] = React.useState(760);
+  const [w, setW] = React.useState(0);
   React.useLayoutEffect(() => {
     const el = ref.current;
     if (!el || !el.parentElement) return undefined;
@@ -63656,7 +63656,8 @@ function RdLeadGauge({
     className: "rd-lg",
     ref: ref,
     style: {
-      width: w
+      width: w || "auto",
+      visibility: w ? "visible" : "hidden"
     },
     role: "img",
     "aria-label": say,
