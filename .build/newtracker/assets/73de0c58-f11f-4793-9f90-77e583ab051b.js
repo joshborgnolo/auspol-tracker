@@ -1903,18 +1903,18 @@ const IssuesMemo = React.memo(IssuesPanel);
 const UndecidedMemo = React.memo(UndecidedPanel);
 
 function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup, setTppMatchup, tppBasis, setTppBasis }) {
-  /* The redesign sets its range tabs over the two-party chart, beside that
-     chart's own checkbox, so they read as the chart's - and every other
-     section's headline is written for the whole term. There the range zooms
-     the two-party chart alone; the design it replaced keeps its page-wide
-     range, set at the top of its hero. */
+  /* The redesign sets its range tabs over the two-party and primary-vote
+     charts - one range state, one menu above each chart, both moving it -
+     and every other section's headline is written for the whole term. The
+     design it replaced keeps its page-wide range, set at the top of its
+     hero. */
   const rangeId = window.AP.rd ? "all" : heroRange;
   return (
     <>
       <Hero rangeId={heroRange} setRangeId={setRangeId} showScatter={showScatter}
             matchup={tppMatchup} setMatchup={setTppMatchup}
             basis={tppBasis} setBasis={setTppBasis} />
-      <PrimaryVoteMemo rangeId={rangeId} />
+      <PrimaryVoteMemo rangeId={heroRange} setRangeId={setRangeId} />
       <PollsterTable tppBasis={tppBasis} setTppBasis={setTppBasis}
                      tppMatchup={tppMatchup} setTppMatchup={setTppMatchup} />
       {/* when the next ones land, straight after the latest ones - it sat
@@ -2097,8 +2097,10 @@ function App() {
      polls' figures, preferred PM's questions, who votes by age or place...):
      a swipe on it or anywhere in what it switches - down to the end of
      its panel or section, so the table or chart under the row too - steps
-     through ITS views instead, the nearest row winning. Rows that only re-cut one figure (the time range,
-     Past cycles' level/change measure) aren't marked, so the page turns there.
+     through ITS views instead, the nearest row winning. Rows that only re-cut one figure (Past cycles'
+     level/change measure) aren't marked, so the page turns there. The vote
+     charts' time-range rows are the in-between case, marked to step only on
+     a swipe that lands on the row itself (see the self-claim in onStart).
      Both the page turn and every row step wrap round the ends, as the
      arrow-key walks on a computer do: a swipe off the last page or the last
      tab comes back round to the first.
@@ -2160,8 +2162,9 @@ function App() {
       /* a piece of surface landing its own claim owns the touch outright:
          exact by target, so nothing measured - no row's reach and no
          card's chart - gets to second-guess where the finger meant. The
-         hero's 2PP figures flip the contest on it (they carry __rdSwipe);
-         the "ahead" scale directly under the figures claims nothing, so
+         hero's 2PP figures flip the contest on it, and either vote chart's
+         time-range row steps its window on it (both carry __rdSwipe); the
+         "ahead" scale directly under the figures claims nothing, so
          a swipe there keeps the page's plain turn */
       const self = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-self]") : null;
       if (self && self.__rdSwipe) {

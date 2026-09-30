@@ -51,7 +51,7 @@ const RD_ELECTION_LEAD = "0.5 4";
 /* ======================================================================
    Primary vote
    ====================================================================== */
-function RdPrimary({ rangeId }) {
+function RdPrimary({ rangeId, setRangeId }) {
   const { D, rangeDomain, filterPts, series, monthLabelFull } = window.AP;
   const xDomain = rangeDomain(rangeId);
   const narrow = useNarrow("(max-width: 640px)");
@@ -181,6 +181,10 @@ function RdPrimary({ rangeId }) {
         </div>
       )}
       <div className="card rd-card rd-pv-chart">
+        {/* the same window menu the two-party card carries over its chart:
+            the one range state drives both charts, a click arms the arrow
+            walk and a phone swipe on the row itself steps the windows */}
+        <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm" swipeSelf />
         <TrendChart
           key="rd-pv"
           heightPx={narrow ? 320 : 440}

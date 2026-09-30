@@ -119,9 +119,53 @@ function rdHoldSection(el, dh, ms) {
    row and the changed words spill upward, but what the user keeps is the
    control they touched and everything below it. Call from the row's
    change handler, before the state changes. */
+/* Even a perfectly timed correction is a visible lurch on iOS, whose
+   compositor paints a script's scroll a frame late during a touch - so
+   while a pin holds, nothing above the row resizes at all: each glide
+   block hanging entirely over it freezes at its current height, its new
+   words already inside, and takes the box's new height in one glide when
+   the pin lets go (usually off the screen by then). The corrector below
+   stays as the backstop; the freeze is why it has nothing to answer. */
 let rdPinRaf = 0;
 let rdPinAnchorSave = null;
 let rdPinRO = null;
+let rdPinHeld = null;
+let rdPinLive = 0;
+const rdPinClip = (rowTop) => {
+  const held = [];
+  document.querySelectorAll(".rd-glide-in").forEach((i) => {
+    const o = i.parentElement;
+    if (!o || o.__rdFrozen) return;
+    const r = o.getBoundingClientRect();
+    if (r.bottom > rowTop + 1) return;
+    o.__rdFrozen = true;
+    o.style.transition = "none";
+    o.style.overflowY = "clip";
+    o.style.height = r.height + "px";
+    held.push(o);
+  });
+  rdPinHeld = rdPinHeld ? rdPinHeld.concat(held) : held;
+};
+const rdPinThaw = () => {
+  if (!rdPinHeld) return;
+  const AP = window.AP || {};
+  const ms = AP.MORPH_MS || 320, css = AP.MORPH_CSS || "ease";
+  rdPinHeld.forEach((o) => {
+    o.__rdFrozen = false;
+    if (!o.isConnected) return;
+    const i = o.querySelector(".rd-glide-in");
+    const h = i ? i.getBoundingClientRect().height : o.getBoundingClientRect().height;
+    if (Math.abs(h - o.getBoundingClientRect().height) < 1) {
+      o.style.transition = ""; o.style.height = ""; o.style.overflowY = "";
+      return;
+    }
+    rdHoldSection(o, h - o.getBoundingClientRect().height, ms + 80);
+    o.style.transition = "height " + ms + "ms " + css;
+    o.style.height = h + "px";
+    setTimeout(() => { if (o.isConnected) { o.style.transition = ""; o.style.height = ""; o.style.overflowY = ""; } }, ms + 60);
+  });
+  rdPinHeld = null;
+};
 function rdPinScroll(row) {
   if (!row) return;
   const bar = document.querySelector(".tabs.sticky");
@@ -140,7 +184,11 @@ function rdPinScroll(row) {
   if (!row) return;
   const want0 = row.getBoundingClientRect();
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
+  /* a re-pin inside the window REPLACES the old one - its own step loop
+     never runs to done(), so it must not count as open */
+  if (rdPinRaf === 0) rdPinLive++;
   cancelAnimationFrame(rdPinRaf);
+  rdPinClip(want0.top);
   if (rdPinRO) { rdPinRO.disconnect(); rdPinRO = null; }
   /* Chrome's scroll anchoring fights the pin when the click focused a
      control OUTSIDE the row (a party chip): the focused box becomes the
@@ -175,7 +223,10 @@ function rdPinScroll(row) {
     rdPinRaf = 0;
     if (rdPinRO) { rdPinRO.disconnect(); rdPinRO = null; }
     if (window.__rdPinObserve === hook) window.__rdPinObserve = null;
+    if (--rdPinLive > 0) return;
+    rdPinLive = 0;
     if (rdPinAnchorSave !== null) { html.style.overflowAnchor = rdPinAnchorSave; rdPinAnchorSave = null; }
+    rdPinThaw();
   };
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
@@ -213,6 +264,10 @@ function RdGlide({ children, className, as, watch }) {
     const prev = last.current;
     last.current = h;
     if (prev == null || Math.abs(prev - h) < 1) return;
+    /* a row pinned below freezes this block (rdPinClip): its new words are
+       already in it, and the box keeps its height until the pin lifts,
+       when rdPinThaw walks it to them in one glide instead */
+    if (o.__rdFrozen) return;
     const AP = window.AP || {};
     if ((AP.reduceMotion && AP.reduceMotion()) || performance.now() - (window.__rdInput || 0) > 600) return;
     const cur = o.style.height ? o.getBoundingClientRect().height : prev;
@@ -240,8 +295,9 @@ function RdGlide({ children, className, as, watch }) {
       const h = i.getBoundingClientRect().height;
       /* content that settles to another height while it glides (a chart
          sizing itself) - the glide takes it as its new end, from wherever
-         it has got to, rather than snapping there when it finishes */
-      if (o && o.style.height && Math.abs(h - (last.current || 0)) >= 1) {
+         it has got to, rather than snapping there when it finishes. A
+         frozen block keeps its height for the pin instead. */
+      if (o && o.style.height && !o.__rdFrozen && Math.abs(h - (last.current || 0)) >= 1) {
         const AP = window.AP || {};
         o.style.height = h + "px";
         clearTimeout(timer.current);
@@ -443,14 +499,19 @@ function rdDigitKey(items, onChange) {
     onChange(items[n - 1].id);
   };
 }
-function RdTabs({ value, onChange, options, ariaLabel, children, className, swipe, onDigits }) {
+function RdTabs({ value, onChange, options, ariaLabel, children, className, swipe, swipeSelf, onDigits }) {
   /* `swipe`: the views are pages of their own (All polls' figures, preferred
      PM's questions, who votes by age or by place…), so on a phone a sideways
      swipe on or just under the row steps through them, wrapping round the
      ends as the arrow-key walk does - the app's swipe handler finds the row
      by data-rd-swipe and calls its step. Views that only re-cut one figure
-     (a time range, a filter) leave it off, and a swipe near them turns the
-     page instead.
+     (a filter) leave it off, and a swipe near them turns the page instead.
+     `swipeSelf`: the in-between case - a time-range row, which re-cuts the
+     chart beneath it but owns its own strip. A phone swipe that LANDS on
+     the row steps through the windows (data-rd-swipe-self, so the claim is
+     by touch target alone and nothing below the row reaches into it), and
+     a swipe under it does whatever the surface there does - the two-party
+     chart beneath its row keeps its contest flip.
      `onDigits`: a row-wide number-key handler (rdDigitKey) hung on the outer
      div, so it hears a focused view tab or a focused row child alike. */
   const live = React.useRef(null);
@@ -463,7 +524,8 @@ function RdTabs({ value, onChange, options, ariaLabel, children, className, swip
   const mark = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => live.current(dir); }, []);
   return (
     <div className={"rd-tabs" + (className ? " " + className : "")}
-         ref={swipe ? mark : undefined} data-rd-swipe={swipe ? "" : undefined}
+         ref={swipe || swipeSelf ? mark : undefined} data-rd-swipe={swipe ? "" : undefined}
+         data-rd-swipe-self={swipeSelf ? "" : undefined}
          onKeyDown={onDigits || undefined}>
       <div role="group" aria-label={ariaLabel} style={{ display: "flex", gap: 4 }}
            onKeyDown={rdTabsKey(options, onChange)} onClick={rdTabFocus}>

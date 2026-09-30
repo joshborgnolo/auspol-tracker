@@ -50580,10 +50580,12 @@ function Delta({
   }), suffix) : figure + suffix);
 }
 function PrimaryVotePanel({
-  rangeId
+  rangeId,
+  setRangeId
 }) {
   if (window.AP.rd) return React.createElement(RdPrimary, {
-    rangeId: rangeId
+    rangeId: rangeId,
+    setRangeId: setRangeId
   });
   const {
     D,
@@ -62713,6 +62715,52 @@ function rdHoldSection(el, dh, ms) {
 let rdPinRaf = 0;
 let rdPinAnchorSave = null;
 let rdPinRO = null;
+let rdPinHeld = null;
+let rdPinLive = 0;
+const rdPinClip = rowTop => {
+  const held = [];
+  document.querySelectorAll(".rd-glide-in").forEach(i => {
+    const o = i.parentElement;
+    if (!o || o.__rdFrozen) return;
+    const r = o.getBoundingClientRect();
+    if (r.bottom > rowTop + 1) return;
+    o.__rdFrozen = true;
+    o.style.transition = "none";
+    o.style.overflowY = "clip";
+    o.style.height = r.height + "px";
+    held.push(o);
+  });
+  rdPinHeld = rdPinHeld ? rdPinHeld.concat(held) : held;
+};
+const rdPinThaw = () => {
+  if (!rdPinHeld) return;
+  const AP = window.AP || {};
+  const ms = AP.MORPH_MS || 320,
+    css = AP.MORPH_CSS || "ease";
+  rdPinHeld.forEach(o => {
+    o.__rdFrozen = false;
+    if (!o.isConnected) return;
+    const i = o.querySelector(".rd-glide-in");
+    const h = i ? i.getBoundingClientRect().height : o.getBoundingClientRect().height;
+    if (Math.abs(h - o.getBoundingClientRect().height) < 1) {
+      o.style.transition = "";
+      o.style.height = "";
+      o.style.overflowY = "";
+      return;
+    }
+    rdHoldSection(o, h - o.getBoundingClientRect().height, ms + 80);
+    o.style.transition = "height " + ms + "ms " + css;
+    o.style.height = h + "px";
+    setTimeout(() => {
+      if (o.isConnected) {
+        o.style.transition = "";
+        o.style.height = "";
+        o.style.overflowY = "";
+      }
+    }, ms + 60);
+  });
+  rdPinHeld = null;
+};
 function rdPinScroll(row) {
   if (!row) return;
   const bar = document.querySelector(".tabs.sticky");
@@ -62728,7 +62776,9 @@ function rdPinScroll(row) {
   if (!row) return;
   const want0 = row.getBoundingClientRect();
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
+  if (rdPinRaf === 0) rdPinLive++;
   cancelAnimationFrame(rdPinRaf);
+  rdPinClip(want0.top);
   if (rdPinRO) {
     rdPinRO.disconnect();
     rdPinRO = null;
@@ -62763,10 +62813,13 @@ function rdPinScroll(row) {
       rdPinRO = null;
     }
     if (window.__rdPinObserve === hook) window.__rdPinObserve = null;
+    if (--rdPinLive > 0) return;
+    rdPinLive = 0;
     if (rdPinAnchorSave !== null) {
       html.style.overflowAnchor = rdPinAnchorSave;
       rdPinAnchorSave = null;
     }
+    rdPinThaw();
   };
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
@@ -62809,6 +62862,7 @@ function RdGlide({
     const prev = last.current;
     last.current = h;
     if (prev == null || Math.abs(prev - h) < 1) return;
+    if (o.__rdFrozen) return;
     const AP = window.AP || {};
     if (AP.reduceMotion && AP.reduceMotion() || performance.now() - (window.__rdInput || 0) > 600) return;
     const cur = o.style.height ? o.getBoundingClientRect().height : prev;
@@ -62833,7 +62887,7 @@ function RdGlide({
     if (!i || typeof ResizeObserver === "undefined") return undefined;
     const ro = new ResizeObserver(() => {
       const h = i.getBoundingClientRect().height;
-      if (o && o.style.height && Math.abs(h - (last.current || 0)) >= 1) {
+      if (o && o.style.height && !o.__rdFrozen && Math.abs(h - (last.current || 0)) >= 1) {
         const AP = window.AP || {};
         o.style.height = h + "px";
         clearTimeout(timer.current);
@@ -63228,6 +63282,7 @@ function RdTabs({
   children,
   className,
   swipe,
+  swipeSelf,
   onDigits
 }) {
   const live = React.useRef(null);
@@ -63242,8 +63297,9 @@ function RdTabs({
   }, []);
   return React.createElement("div", {
     className: "rd-tabs" + (className ? " " + className : ""),
-    ref: swipe ? mark : undefined,
+    ref: swipe || swipeSelf ? mark : undefined,
     "data-rd-swipe": swipe ? "" : undefined,
+    "data-rd-swipe-self": swipeSelf ? "" : undefined,
     onKeyDown: onDigits || undefined
   }, React.createElement("div", {
     role: "group",
@@ -64236,7 +64292,8 @@ function RdHero(p) {
     onChange: setRangeId,
     options: RD_RANGES,
     ariaLabel: "Time range",
-    className: "rd-tabs-sm"
+    className: "rd-tabs-sm",
+    swipeSelf: true
   }, !narrow && cmpAvail && React.createElement(RdCheck, {
     checked: showSynth,
     onChange: setShowSynth
@@ -64390,7 +64447,8 @@ function rdElectionTicks(x0, x1, narrow, elecX) {
 }
 const RD_ELECTION_LEAD = "0.5 4";
 function RdPrimary({
-  rangeId
+  rangeId,
+  setRangeId
 }) {
   const {
     D,
@@ -64576,7 +64634,14 @@ function RdPrimary({
     }
   }, React.createElement("span", null), "Within the margin of uncertainty", React.createElement("span", null)), parts.map(stat)), React.createElement("div", {
     className: "card rd-card rd-pv-chart"
-  }, React.createElement(TrendChart, {
+  }, React.createElement(RdTabs, {
+    value: rangeId,
+    onChange: setRangeId,
+    options: RD_RANGES,
+    ariaLabel: "Time range",
+    className: "rd-tabs-sm",
+    swipeSelf: true
+  }), React.createElement(TrendChart, {
     key: "rd-pv",
     heightPx: narrow ? 320 : 440,
     padPx: narrow ? {
@@ -76262,7 +76327,8 @@ function SnapshotView({
     basis: tppBasis,
     setBasis: setTppBasis
   }), React.createElement(PrimaryVoteMemo, {
-    rangeId: rangeId
+    rangeId: heroRange,
+    setRangeId: setRangeId
   }), React.createElement(PollsterTable, {
     tppBasis: tppBasis,
     setTppBasis: setTppBasis,

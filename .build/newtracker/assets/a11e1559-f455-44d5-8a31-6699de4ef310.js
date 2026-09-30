@@ -226,8 +226,8 @@ function Delta({ value, suffix = "", goodUp = true, neutral, small, title, roll,
 }
 
 // ---- Primary vote ---------------------------------------------------
-function PrimaryVotePanel({ rangeId }) {
-  if (window.AP.rd) return <RdPrimary rangeId={rangeId} />;
+function PrimaryVotePanel({ rangeId, setRangeId }) {
+  if (window.AP.rd) return <RdPrimary rangeId={rangeId} setRangeId={setRangeId} />;
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const [xDomain] = [rangeDomain(rangeId)];
   const [hidden, setHidden] = useState({});
