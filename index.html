@@ -65805,7 +65805,8 @@ function RdLeadership({
     return s;
   })();
   const panel = (id, head, dek, tabs, body) => React.createElement("div", {
-    className: "rd-ld-panel" + (expanded && expanded !== id ? " rd-hidden" : "")
+    className: "rd-ld-panel" + (expanded && expanded !== id ? " rd-hidden" : ""),
+    ref: id === "ppm" ? ppmEl : apprEl
   }, React.createElement(RdSub, {
     head: head,
     dek: dek
@@ -65833,6 +65834,57 @@ function RdLeadership({
     pinLd();
     if (v === "both" || own === "both") setOwn(v);else chooseMetric(v);
   };
+  const ppmEl = React.useRef(null),
+    apprEl = React.useRef(null);
+  const ldHover = React.useRef(null);
+  React.useEffect(() => {
+    const lists = {
+      ppm: ["two", "three", "both"],
+      appr: ["net", "fav", "both"]
+    };
+    const offs = [["ppm", ppmEl], ["appr", apprEl]].map(([id, ref]) => {
+      const sec = ref.current;
+      if (!sec) return undefined;
+      const enter = () => {
+        ldHover.current = id;
+      };
+      const leave = () => {
+        if (ldHover.current === id) ldHover.current = null;
+      };
+      if (sec.matches(":hover")) ldHover.current = id;
+      sec.addEventListener("pointerenter", enter);
+      sec.addEventListener("pointerleave", leave);
+      return () => {
+        sec.removeEventListener("pointerenter", enter);
+        sec.removeEventListener("pointerleave", leave);
+      };
+    });
+    const key = e => {
+      const id = ldHover.current;
+      if (!id || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const el = (id === "ppm" ? ppmEl : apprEl).current;
+      const live = el && el.isConnected && el.getClientRects().length > 0;
+      if (!live) {
+        ldHover.current = null;
+        return;
+      }
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const list = lists[id];
+      const i = list.indexOf(id === "ppm" ? ppmView : metric);
+      if (i < 0) return;
+      e.preventDefault();
+      (id === "ppm" ? ppmPick : pickMetric)(list[(i + (e.key === "ArrowRight" ? 1 : -1) + list.length) % list.length]);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      offs.forEach(off => off && off());
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [ppmView, metric]);
   return React.createElement(RdSec, {
     id: "leadership",
     cls: "rd-lead",

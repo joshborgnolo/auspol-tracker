@@ -851,7 +851,8 @@ function RdLeadership({ rangeId }) {
   })();
 
   const panel = (id, head, dek, tabs, body) => (
-    <div className={"rd-ld-panel" + (expanded && expanded !== id ? " rd-hidden" : "")}>
+    <div className={"rd-ld-panel" + (expanded && expanded !== id ? " rd-hidden" : "")}
+         ref={id === "ppm" ? ppmEl : apprEl}>
       <RdSub head={head} dek={dek} />
       {tabs}
       {body}
@@ -875,6 +876,53 @@ function RdLeadership({ rangeId }) {
     rdPinScroll(p && p.querySelector("[aria-label='Leader rating']"));
   };
   const pickMetric = (v) => { pinLd(); if (v === "both" || own === "both") setOwn(v); else chooseMetric(v); };
+
+  /* Pointing at a panel makes ITS row the arrow-key target without moving
+     DOM focus - the phone swipe's nearest-row claim for a computer, so
+     over the preferred-PM panel <-> walks the questions, over the ratings
+     panel the ratings. The pickers run as the row's own walk runs them
+     (the bars morph, the row pins), a focused control still wins, and
+     leaving the panel hands the page turn back. */
+  const ppmEl = React.useRef(null), apprEl = React.useRef(null);
+  const ldHover = React.useRef(null);
+  React.useEffect(() => {
+    const lists = { ppm: ["two", "three", "both"], appr: ["net", "fav", "both"] };
+    const offs = [["ppm", ppmEl], ["appr", apprEl]].map(([id, ref]) => {
+      const sec = ref.current;
+      if (!sec) return undefined;
+      const enter = () => { ldHover.current = id; };
+      const leave = () => { if (ldHover.current === id) ldHover.current = null; };
+      if (sec.matches(":hover")) ldHover.current = id;
+      sec.addEventListener("pointerenter", enter);
+      sec.addEventListener("pointerleave", leave);
+      return () => {
+        sec.removeEventListener("pointerenter", enter);
+        sec.removeEventListener("pointerleave", leave);
+      };
+    });
+    const key = (e) => {
+      const id = ldHover.current;
+      if (!id || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      const el = (id === "ppm" ? ppmEl : apprEl).current;
+      const live = el && el.isConnected && el.getClientRects().length > 0;
+      if (!live) { ldHover.current = null; return; }
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const list = lists[id];
+      const i = list.indexOf(id === "ppm" ? ppmView : metric);
+      if (i < 0) return;
+      e.preventDefault();
+      (id === "ppm" ? ppmPick : pickMetric)(list[(i + (e.key === "ArrowRight" ? 1 : -1) + list.length) % list.length]);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      offs.forEach((off) => off && off());
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [ppmView, metric]);
 
   return (
     <RdSec id="leadership" cls="rd-lead" title="Leadership" meta="Preferred PM and net approval, Newspoll, YouGov, Resolve, Essential and others">
