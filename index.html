@@ -3294,6 +3294,8 @@ body.rd .rd-head-meta .meta-v { font-size: 15px; font-weight: 600; color: var(--
 body.rd .rd-head-meta .meta-s { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-head-meta .meta-divide { height: auto; align-self: stretch; }
 body.rd .rd-head-compact { display: none; }
+body.rd a.mh-latest { color: inherit; text-decoration: none; }
+body.rd a.mh-latest:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
 body.rd .head-meta-compact { display: none !important; }
 body.rd .tabs { margin: 0 -4px 0; }
 body.rd .tabs-set { gap: 28px; }
@@ -74984,6 +74986,13 @@ function Header({
   const pastTerms = D.cycles.filter(c => !c.current).length;
   const pastWord = TAGLINE_N[pastTerms] || String(pastTerms);
   const rdLatest = rd ? (D.pollsterTable || []).slice().sort((a, b) => a.pubSort < b.pubSort ? 1 : -1)[0] : null;
+  const rdLatestUrl = rdLatest ? rdLatest.releaseUrl || rdLatest.url : null;
+  const rdLatestFact = rdLatest ? rdLatestUrl ? React.createElement("a", {
+    className: "mh-latest",
+    href: rdLatestUrl,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, rdLatest.pollster + ", " + rdLatest.field) : rdLatest.pollster + ", " + rdLatest.field : D.latest.published;
   const rdDue = (() => {
     const m = /(\d{1,2}) (\w+) (\d{4})/.exec(D.latest.nextElectionDue || "");
     if (!m) return null;
@@ -75045,7 +75054,7 @@ function Header({
     className: "rd-head-compact"
   }, React.createElement("span", {
     className: "fresh-dot " + fresh.state
-  }), React.createElement("span", null, React.createElement("b", null, "Latest poll"), " ", rdLatest ? rdLatest.pollster + ", " + rdLatest.field : D.latest.published, ", ", fresh.label.toLowerCase(), ", ", D.latest.pollsTracked, " polls")), React.createElement("div", {
+  }), React.createElement("span", null, React.createElement("b", null, "Latest poll"), " ", rdLatestFact, ", ", fresh.label.toLowerCase(), ", ", D.latest.pollsTracked, " polls")), React.createElement("div", {
     className: "head-right"
   }, rd ? React.createElement("div", {
     className: "head-meta rd-head-meta"
@@ -75062,7 +75071,7 @@ function Header({
     tabIndex: -1,
     "aria-label": "Read this page as a plain, static article",
     title: "Read this page as a plain, static article"
-  }), rdLatest ? rdLatest.pollster + ", " + rdLatest.field : D.latest.published), React.createElement("span", {
+  }), rdLatestFact), React.createElement("span", {
     className: "meta-s"
   }, "published ", fresh.label.toLowerCase())), React.createElement("div", {
     className: "meta-divide"

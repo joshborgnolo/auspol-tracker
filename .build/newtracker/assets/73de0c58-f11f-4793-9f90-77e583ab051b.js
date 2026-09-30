@@ -351,6 +351,16 @@ function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
      fieldwork, so the masthead and the sections' "to 21 Sep" agree; the
      election line counts the months left before it must be held. */
   const rdLatest = rd ? (D.pollsterTable || []).slice().sort((a, b) => (a.pubSort < b.pubSort ? 1 : -1))[0] : null;
+  /* The newest poll's name+fieldwork open the pollster's own release, as a
+     plain link styled invisible (a.mh-latest: no underline, no link icon -
+     only a click gives it away). releaseUrl over a media `url` citation,
+     the archive emitter's own precedence. */
+  const rdLatestUrl = rdLatest ? (rdLatest.releaseUrl || rdLatest.url) : null;
+  const rdLatestFact = rdLatest
+    ? (rdLatestUrl
+        ? <a className="mh-latest" href={rdLatestUrl} target="_blank" rel="noopener noreferrer">{rdLatest.pollster + ", " + rdLatest.field}</a>
+        : rdLatest.pollster + ", " + rdLatest.field)
+    : D.latest.published;
   const rdDue = (() => {
     const m = /(\d{1,2}) (\w+) (\d{4})/.exec(D.latest.nextElectionDue || "");
     if (!m) return null;
@@ -412,7 +422,7 @@ function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
            the phone 20px above the headline figure. */
         <div className="rd-head-compact">
           <span className={"fresh-dot " + fresh.state}></span>
-          <span><b>Latest poll</b> {rdLatest ? rdLatest.pollster + ", " + rdLatest.field : D.latest.published}, {fresh.label.toLowerCase()}, {D.latest.pollsTracked} polls</span>
+          <span><b>Latest poll</b> {rdLatestFact}, {fresh.label.toLowerCase()}, {D.latest.pollsTracked} polls</span>
         </div>
       )}
       <div className="head-right">
@@ -425,7 +435,7 @@ function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
                         onClick={() => setStaticView(true)} tabIndex={-1}
                         aria-label="Read this page as a plain, static article"
                         title="Read this page as a plain, static article"></button>
-                {rdLatest ? rdLatest.pollster + ", " + rdLatest.field : D.latest.published}
+                {rdLatestFact}
               </span>
               <span className="meta-s">published {fresh.label.toLowerCase()}</span>
             </div>
