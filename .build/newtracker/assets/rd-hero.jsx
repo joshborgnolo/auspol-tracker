@@ -334,7 +334,7 @@ function RdHero(p) {
     const head = Math.abs(gap) < 1 ? "One Nation now runs Labor as close as the Coalition does"
       : gap < 0 ? "One Nation now runs Labor closer than the Coalition does"
       : "The Coalition still runs Labor closer than One Nation does";
-    const verb = (a, b) => (b < a ? "fallen" : "risen");
+    const verb = (a, b) => (b < a ? (a - b >= 10 ? "plunged" : "fallen") : "risen");
     const pc = (v) => Math.round(v) + "%";
     let dek = "Labor’s 2PP against One Nation has " + verb(on0, on1) + " from " + pc(on0) + " in " + rdMonthYear(f.ym)
       + " to " + pc(on1) + " now; against the Coalition, " + (Math.round(co0) === Math.round(co1) ? "it has held near " + pc(co1) : "from " + pc(co0) + " to " + pc(co1)) + ".";
