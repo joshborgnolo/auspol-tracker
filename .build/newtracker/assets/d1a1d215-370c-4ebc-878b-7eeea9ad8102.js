@@ -375,7 +375,14 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                       ref={(el) => { btnRefs.current[t.id] = el; }}
                       className={"tab" + (active === t.id ? " active" : "")
                                  + (t.pinHide ? " tab-pinhide" : "")}
-                      onClick={() => onChange(t.id)}>
+                      /* Pointer-click navigation must not leave focus on the
+                         nav tab: Chrome focuses buttons on click, and the
+                         leftover focus then eats arrows as page turns and
+                         vetoes every hover claim (their activeElement
+                         guard). e.detail is 0 only for keyboard-activated
+                         clicks, so Enter/Space activation keeps focus per
+                         the ARIA tabs pattern. */
+                      onClick={(e) => { onChange(t.id); if (e.detail) e.currentTarget.blur(); }}>
                 <span className="tab-label">{t.short
                   ? <><span className="tab-label-long">{t.label}</span><span className="tab-label-short" aria-hidden="true">{t.short}</span></>
                   : t.label}</span>

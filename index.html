@@ -55632,7 +55632,10 @@ function Tabs({
       btnRefs.current[t.id] = el;
     },
     className: "tab" + (active === t.id ? " active" : "") + (t.pinHide ? " tab-pinhide" : ""),
-    onClick: () => onChange(t.id)
+    onClick: e => {
+      onChange(t.id);
+      if (e.detail) e.currentTarget.blur();
+    }
   }, React.createElement("span", {
     className: "tab-label"
   }, t.short ? React.createElement(React.Fragment, null, React.createElement("span", {
