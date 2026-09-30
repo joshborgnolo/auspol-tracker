@@ -1566,7 +1566,7 @@ function RdAllPolls(P) {
     <section className="rd-sec rd-first rd-ap" id="rd-ap-top" aria-labelledby="rd-ap-t" data-facet={facet}>
       <div className="rd-eyebrow">
         <h2 className="rd-title" id="rd-ap-t">All polls</h2>
-        <span className="rd-meta">Every national poll since the 2025 election, {total}{ofTxt} from {ofHouses || houses.length} pollsters</span>
+        <span className="rd-meta">Every national poll since the 2025 election</span>
         {!phone && (
           <nav className="rd-eyebrow-tools rd-ap-nav" aria-label="On this page">
             <button type="button" onClick={() => jump("poll-disagreement")}>How much the polls disagree</button>
