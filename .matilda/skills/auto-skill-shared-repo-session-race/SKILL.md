@@ -1,6 +1,6 @@
 ---
 name: shared-repo-session-race
-description: Shared auspol repo — sibling Matilda sessions can sweep YOUR uncommitted work into their commits (git add -A), overwrite your staged index entries, and even land their half-finished hunks INSIDE files you're editing. Locate vanished work by unique phrase; never rebase-split a sibling commit; for contaminated shared sources, re-derive clean copies (sed-revert their hunks, diff vs HEAD to prove) and commit your exact tree through a private GIT_INDEX_FILE without touching their staging area. Also: a fresh build at HEAD can fail to reproduce HEAD's own committed generated data asset (sibling shipped mid-WIP build output) — character-diff the drift, revert the regenerated asset in the worktree, never silently roll back live numbers. If index.html itself IS the deliverable while sibling dirt sits in build inputs: /tmp-snapshot foreign files byte-exact, checkout HEAD copies, rebuild, gate on `git diff -U0 index.html | grep '^@@'` listing only your hunks, PATHSPEC-commit (`git commit -m msg -- <paths>`), push, restore snapshots. Foreign STAGED revert in the index: staged blobs hash-equal HEAD~1 (diff the INDEX, not worktree), prepare HEAD+mine file versions in scratch, plumbing-commit via private GIT_INDEX_FILE (read-tree/write-tree/commit-tree/update-ref, explicit pathspecs never bare -A) so the revert stays staged — post-commit `git status` inversion showing your files as D/M is cosmetic when it's unstaged-direction, never `git reset` to fix THAT; but after HEAD moves past the sibling's stale index, STAGED deletions of your newly tracked files are NOT cosmetic (their next blind commit deletes your feature) — sweep with `git reset -q HEAD --` on exactly those paths, never their revert files. Sibling RESETS your committed work OFF main (survives on a dangling branch; committed files turn untracked while "up to date with origin" — reflog + merge-base confirm): re-land by cherry-picking the orphan inside a DETACHED scratch worktree (zero-drift rebuild is the gate), move main via plumbing update-ref, re-replay cheaply when origin races mid-landing. Sibling hunks staged INSIDE your data file (MM) + data-only deliverable: snapshot the commixed file, checkout HEAD copy, re-apply ONLY your rows, pathspec-commit (replaces that path's index entry — restore the snapshot post-push so their hunks return), and SKIP the index.html rebuild that would compile their template/gen-data WIP into the live site — a data-only commit keeps site-check green and the next pipeline build ships the rows. Sibling staged rollback in the SAME source file you must extend: park BOTH a patch and a same-version reference copy in /tmp, reset exactly that file, pathspec-commit your feature at HEAD, then restore their hunks — if `git apply` fails from drifting context, re-apply manually and prove reference-vs-worktree is exactly your feature before restaging. Origin ahead of local + dirt everywhere + tiny deliverable: detached worktree at the explicit REMOTE sha inside the workspace, build/validate/commit there, `git push origin HEAD:main` — local tree and shared index never touched; old git needs the sha (not `origin/main`) and has no worktree-remove. A crashed commit/amend/reset dance can roll the INDEX back instead (mixed reset = HEAD+index, worktree stays): a SHIPPED feature then masquerades as an uncommitted half-built one (`git diff HEAD` empty, staged diffstat exact-mirrors unstaged, feature commits found via `git log --oneline -- <file>`, reflog shows `reset: moving to`); unstage with `git reset -q HEAD -- <paths>`, never commit it. Machine git is 2.15.0: `git restore` is ABSENT, and `git checkout HEAD -- <paths>` repairs staged file deletions (index entry + worktree in one command). Sibling amend/reset/push races past YOUR pushed data commit while your build commit sits prepared in a detached worktree: survival check is `git merge-base --is-ancestor <yours> origin/main` + row greps on the pushed tree + blob equality (`git hash-object <worktree-output>` == `git rev-parse origin/main:<asset-path>`) — their own rebuild regenerated the content-addressed sidecar byte-identically, so the correct finish is NO commit: prune the worktree and report; amend+`reset: moving to HEAD` in the reflog does NOT mean your commit is gone, only ancestry proof settles it. Beware dead-worktree git-fallback (2026-09-05): a worktree that lost its .git gitdir FILE silently resolves all git commands against the MAIN repo (toplevel falls back to the parent through the gitignored `.matilda/worktrees/` gap) — status/diff then show foreign main-tree state as if it were worktree state, and a repo-wide `git reset --hard` from inside wipes EVERY sibling's uncommitted WIP; verify `git rev-parse --absolute-git-dir` contains `.git/worktrees/<name>` before any mutating command, and recover post-mortem via `git fsck --lost-found` (staged content survives as dangling blobs/commits; purely unstaged WIP is unrecoverable). Happy-path variant (2026-09-07): upstream commits landed coherently while YOUR feature sat uncommitted and your index.html was built pre-upstream — staging that stale artifact silently reverts their committed hunks, so `git show --stat` classify overlap (same-artifact or build-input touch = rebuild in place), marker-grep the rebuilt artifact BOTH directions (their method name from their commit subject survives; your feature string present), confirm `git diff --stat HEAD` is insertions-dominated, then stage explicit paths and push. In-place rebuild is correct ONLY because their work is committed; uncommitted dirt in build inputs still needs the isolation machinery.
+description: Shared auspol repo — sibling Matilda sessions can sweep YOUR uncommitted work into their commits (git add -A), overwrite your staged index entries, and even land their half-finished hunks INSIDE files you're editing. Locate vanished work by unique phrase; never rebase-split a sibling commit; for contaminated shared sources, re-derive clean copies (sed-revert their hunks, diff vs HEAD to prove) and commit your exact tree through a private GIT_INDEX_FILE without touching their staging area. Also: a fresh build at HEAD can fail to reproduce HEAD's own committed generated data asset (sibling shipped mid-WIP build output) — character-diff the drift, revert the regenerated asset in the worktree, never silently roll back live numbers. If index.html itself IS the deliverable while sibling dirt sits in build inputs: /tmp-snapshot foreign files byte-exact, checkout HEAD copies, rebuild, gate on `git diff -U0 index.html | grep '^@@'` listing only your hunks, PATHSPEC-commit (`git commit -m msg -- <paths>`), push, restore snapshots. Foreign STAGED revert in the index: staged blobs hash-equal HEAD~1 (diff the INDEX, not worktree), prepare HEAD+mine file versions in scratch, plumbing-commit via private GIT_INDEX_FILE (read-tree/write-tree/commit-tree/update-ref, explicit pathspecs never bare -A) so the revert stays staged — post-commit `git status` inversion showing your files as D/M is cosmetic when it's unstaged-direction, never `git reset` to fix THAT; but after HEAD moves past the sibling's stale index, STAGED deletions of your newly tracked files are NOT cosmetic (their next blind commit deletes your feature) — sweep with `git reset -q HEAD --` on exactly those paths, never their revert files. Sibling RESETS your committed work OFF main (survives on a dangling branch; committed files turn untracked while "up to date with origin" — reflog + merge-base confirm): re-land by cherry-picking the orphan inside a DETACHED scratch worktree (zero-drift rebuild is the gate), move main via plumbing update-ref, re-replay cheaply when origin races mid-landing. Sibling hunks staged INSIDE your data file (MM) + data-only deliverable: snapshot the commixed file, checkout HEAD copy, re-apply ONLY your rows, pathspec-commit (replaces that path's index entry — restore the snapshot post-push so their hunks return), and SKIP the index.html rebuild that would compile their template/gen-data WIP into the live site — a data-only commit keeps site-check green and the next pipeline build ships the rows. Sibling staged rollback in the SAME source file you must extend: park BOTH a patch and a same-version reference copy in /tmp, reset exactly that file, pathspec-commit your feature at HEAD, then restore their hunks — if `git apply` fails from drifting context, re-apply manually and prove reference-vs-worktree is exactly your feature before restaging. Origin ahead of local + dirt everywhere + tiny deliverable: detached worktree at the explicit REMOTE sha inside the workspace, build/validate/commit there, `git push origin HEAD:main` — local tree and shared index never touched; old git needs the sha (not `origin/main`) and has no worktree-remove. A crashed commit/amend/reset dance can roll the INDEX back instead (mixed reset = HEAD+index, worktree stays): a SHIPPED feature then masquerades as an uncommitted half-built one (`git diff HEAD` empty, staged diffstat exact-mirrors unstaged, feature commits found via `git log --oneline -- <file>`, reflog shows `reset: moving to`); unstage with `git reset -q HEAD -- <paths>`, never commit it. Machine git is 2.15.0: `git restore` is ABSENT, and `git checkout HEAD -- <paths>` repairs staged file deletions (index entry + worktree in one command). Sibling amend/reset/push races past YOUR pushed data commit while your build commit sits prepared in a detached worktree: survival check is `git merge-base --is-ancestor <yours> origin/main` + row greps on the pushed tree + blob equality (`git hash-object <worktree-output>` == `git rev-parse origin/main:<asset-path>`) — their own rebuild regenerated the content-addressed sidecar byte-identically, so the correct finish is NO commit: prune the worktree and report; amend+`reset: moving to HEAD` in the reflog does NOT mean your commit is gone, only ancestry proof settles it. Beware dead-worktree git-fallback (2026-09-05): a worktree that lost its .git gitdir FILE silently resolves all git commands against the MAIN repo (toplevel falls back to the parent through the gitignored `.matilda/worktrees/` gap) — status/diff then show foreign main-tree state as if it were worktree state, and a repo-wide `git reset --hard` from inside wipes EVERY sibling's uncommitted WIP; verify `git rev-parse --absolute-git-dir` contains `.git/worktrees/<name>` before any mutating command, and recover post-mortem via `git fsck --lost-found` (staged content survives as dangling blobs/commits; purely unstaged WIP is unrecoverable). Happy-path variant (2026-09-07): upstream commits landed coherently while YOUR feature sat uncommitted and your index.html was built pre-upstream — staging that stale artifact silently reverts their committed hunks, so `git show --stat` classify overlap (same-artifact or build-input touch = rebuild in place), marker-grep the rebuilt artifact BOTH directions (their method name from their commit subject survives; your feature string present), confirm `git diff --stat HEAD` is insertions-dominated, then stage explicit paths and push. In-place rebuild is correct ONLY because their work is committed; uncommitted dirt in build inputs still needs the isolation machinery. One-liner source change whose compiled form is known-exact: skip rebuilding entirely — scratch-copy `git show HEAD:<file>` + your hunk into .matilda/, hash-object, commit through a private GIT_INDEX_FILE (cacheinfo order is <mode>,<sha>,<path>); empty `git diff` + M-status means a sibling STAGED your files — read `git diff --cached` before anything else. Lightest isolation form (2026-09-29): ONE foreign tracked file in the build inputs — `git stash push -- <foreign>`, rebuild, commit your exact paths, `git stash pop`; git parks byte-exact and the sibling's WIP returns untouched. Scaled same day (21 foreign paths + a foreign-baked index.html to `git checkout --` discard before rebuilding, probes re-run on the CLEAN build): `git stash pop` can abort 'Entry … would be overwritten by merge' when the LIVE sibling re-writes a stashed file during the hold — never checkout-revert their live copies to force it; restore only uncontested paths with `git checkout stash@{0} -- <paths>` (this STAGES — `git reset -q --` them back to plain WIP), leave the sibling's fresh files alone, and keep stash@{0} as their parked superseded copies, reported in the summary. Inverse race same session: a user-requested `git push` reported "Everything up-to-date" because the sibling (or CI push_main) had committed their features and pushed — your still-unpushed commits ride along as fast-forward ancestors (your hashes appear UNDER foreign commits in `git log`; nothing to do but report whose push shipped them). Verifying in the live tree can BE the contaminator: npm test RUNS build.mjs, leaving index.html with sibling WIP compiled in — split verification from artifact production: fresh checkout-index at CURRENT HEAD (earlier scratch snapshots go stale when HEAD moves mid-task; in-repo scratch dirs resolve root node_modules by ancestor-walk, no install needed), gate on `git show HEAD:index.html | diff - <snap>/index.html` printing ONLY your hunks, then plumbing-commit both files via private GIT_INDEX_FILE. 2026-09-30: checkout-index is itself polluted — it reads the LIVE SHARED INDEX, so sibling-STAGED file versions silently overwrite HEAD copies in the snapshot (first clean room shipped 67 spurious diff lines incl. a deletion of the previous rung's hover block); snapshot with `git archive HEAD | tar -x -C <snap>` (HEAD tree only, index is irrelevant), pin the manifest by hashing every file pre/post build, and let the gate carry INTENTIONAL `^<` lines (enumerate them — one per deliberate in-place replacement like a ref prop swap) instead of requiring zero. Sources-only deliverable (2026-09-30, 89fde66) whose rebuild compiled a sibling's UNCOMMITTED build-input WIP (rd.jsx/rd-allpolls.jsx focus hunks) into index.html: audit the artefact first (`git diff index.html | grep '^[+-]'` — foreign hunks out themselves), then `git checkout -- index.html` the contaminated rebuild and pathspec-commit sources + probe alone (c7e06d7 precedent: the regenerated artefact legitimately lands with the sibling's or CI's next rebuild; report that the copy is not live until then). Push then rejected on a fresh CI data commit + rebase refused on the dirty tree (~26 foreign paths): plain `git stash push` (nothing staged of yours left), rebase, push, `git stash pop` — sibling WIP returns byte-exact.
 source: auto-skill
 extracted_at: '2026-09-04T04:00:29.830Z'
 ---
@@ -73,6 +73,62 @@ describe only the sibling's feature.
    `git diff -- <file> | awk '<pick hunks matching my phrase, keep file
    header>' | git apply --cached` then eyeball `git diff --cached` before
    committing. (Prepared here; pre-empted by the sibling commit.)
+   2026-09-28 working recipe (shipped in the 36e73c3 tally commit, kept a
+   sibling's RdHero hunk OUT of my index.html staging):
+   `git diff -- <paths> | awk 'BEGIN { keep = 1 } /^@@/ { keep = ($0 !~ /<foreign marker>/) } keep' > /tmp/x.diff`
+   — drop foreign hunks by their `@@ … @@` CONTEXT HEADER (e.g. the
+   sibling's `function RdHero(p)`), and the `BEGIN { keep = 1 }` seed is
+   load-bearing: awk booleans default falsy, so a naive flag swallows the
+   diff's file-header lines before the first hunk and `git apply` dies
+   "patch fragment without header at line 1". `git apply --check --cached`
+   first, then verify `git diff --cached | grep -c <marker>` == 0 and the
+   staged path list before committing.
+   2026-09-30 POSITIVE-match variant (foreign hunks outnumber yours —
+   sibling's whole RdDemographics state-ring feature in your file, you
+   have one line): keep only the hunks whose `@@` OFFSET matches yours —
+   `awk '/^diff --git|^index |^--- |^\\+\\+\\+ / { keep=1; print; next }
+   /^@@ / { keep = ($2 ~ /^-941,/ || $2 ~ /^-65643,/); if (keep) print; next }
+   keep { print }'` over the combined two-file diff. Two traps hit live:
+   (a) the `@@` header belongs to its hunk — printing it unconditionally
+   while skipping the body yields "corrupt patch" (a header with counts
+   promising lines that never come); (b) DON'T hand-type a single hunk
+   into a heredoc patch — a hand-copied `@@` header/context drifted and
+   `git apply` rejected at the hunk line; always generate the patch from
+   `git diff`, never reconstruct it. Applied hunks verified by
+   `git diff --cached --stat` showing exactly 2 files / 2 lines.
+   Flip-side observation same session: pushing does not just face
+   incoming races — your `git push` silently carries any sibling COMMIT
+   ahead of origin (8bdbf23 "Heal the tests run" sat unpushed locally)
+   as a fast-forward ancestor. That's expected ancestry
+   semantics, not a sweep — report whose commits rode along, don't try
+   to unpick them off a pushed main.
+
+## Resume-after-compaction in the shared tree (2026-09-29 variant)
+
+Resumed a compacted session whose summary's git snapshot ("Recent commits:
+a72a0d9…", status listing `template.html` and `rd.css` modified) was stale
+by TWO sibling commits — 4a8cc90 and 5f1d299 had landed in the compaction
+gap, so files the snapshot called dirty were now simply HEAD, and the tree
+held ~20 dirty paths of which only 13 were mine (the G4 SEC-Newgate
+feature). Working procedure that shipped a92c2c2:
+
+1. **Re-attribute ownership by diff CONTENT, never by the summary's path
+   list.** `git diff <path>` on each candidate and match hunks to the
+   feature intent — the d1a1d215 asset's 11-line hunk was MY Info
+   "Who's best" copy update; the rest (auto-skill SKILL.md churn +
+   untracked auto-skill-* dirs from sibling sessions' auto-extractor)
+   belonged to nobody's commit plan.
+2. **Siblings committing in the gap is not a sweep.** Vanished "modified"
+   paths + `git log` showing coherent feature commits in old-HEAD..HEAD
+   = normal parallel work; don't forensics it. (Mirror corollary: a
+   summary-listed modified path may also be a commit the summary's own
+   session already landed — check `git log -- <path>` before re-doing.)
+3. Commit the verified feature IMMEDIATELY on resume — every uncommitted
+   hour in the shared tree is exposure to a sibling `git add -A` sweep.
+   Pre-flight: `git diff --cached` must be empty (no foreign staged
+   state), stage the explicit path list, and post-commit
+   `git status --porcelain | grep -c '^'` should equal the known-foreign
+   count (20 here) — a lower number means your staging swept something.
 
 ## Push rejected mid-task (2026-09-03 variant): the quiet rebase, with autostash
 
@@ -156,8 +212,9 @@ unset GIT_INDEX_FILE && rm -f .git/fc-index
 
 For a generated `index.html` that must pair with the sources, build it
 clean-room FIRST (paths are `import.meta.url`-anchored, so builds run
-from anywhere): `git checkout-index --prefix=<snap>/ -a` into a scratch
-dir, overlay your clean source copies, `node <snap>/.build/newtracker/
+from anywhere): **2026-09-30 — use `git archive HEAD | tar -x -C <snap>`,
+NOT `git checkout-index --prefix=<snap>/ -a`** (see the trap section
+below). Overlay your clean source copies, `node <snap>/.build/newtracker/
 build.mjs` + validate there, then hash THAT output as the index.html
 blob entry. Verify the built file before staging: marker greps for your
 feature (watch babel unicode-escaping), zero sibling markers, and cycle/
@@ -167,6 +224,38 @@ Afterward `git status` shows your committed files as unstaged-modified
 (` M`) where the worktree still carries the sibling's hunks — correct;
 leave their work entirely alone. Then `git fetch && git push`; if raced,
 rebase as above.
+
+## checkout-index reads the polluted shared index (2026-09-30)
+
+The clean-room recipe above said `git checkout-index --prefix=<snap>/ -a`.
+That is WRONG in a repo with a live sibling: checkout-index materialises
+the SHARED INDEX, not HEAD, and sibling-staged versions silently replace
+HEAD copies inside the "clean" room. Caught live: the first hover-rung
+snapshot diffed 67 lines against HEAD's index.html including a spurious
+deletion of the previous rung's shipped block. `git archive HEAD | tar -x
+-C <snap>` is immune — it reads the HEAD tree only. Recipe that shipped
+`9730f02`/`0f163f6`:
+
+```bash
+SNAP=.matilda/<task>-$(openssl rand -hex 4)
+git archive HEAD | tar -x -C "$SNAP"
+cp <my edited sources> "$SNAP/<same paths>"
+find "$SNAP" -type f -not -path '*/node_modules/*' | xargs shasum | sort > /tmp/before
+(cd "$SNAP" && node .build/newtracker/build.mjs)   # resolves root node_modules by ancestor walk
+find "$SNAP" -type f -not -path '*/node_modules/*' | xargs shasum | sort > /tmp/after
+# manifest diff must list ONLY index.html (and any asset the feature legitimately regenerates)
+git show HEAD:index.html | diff - "$SNAP/index.html"
+```
+
+Gates, and an important generalisation: the '<'-line count need NOT be
+zero when the change deliberately replaces a line (the vote-cards rung
+swapped `ref={swipeMark}` → `ref={chartMark}` — compile → one
+`< ref: swipeMark,` / one `> ref: chartMark,` pair). Enumerate every
+`^<` line and confirm ONE per intentional replacement; additions still
+purely additive otherwise. Hash the two sources from the SNAP copies too,
+so sources and built artifact are provably from the same tree. Probe the
+SNAP build as well as the live tree (`PROBE_ROOT=<snap> node probe.mjs`)
+before plumbing-committing: it is the exact byte-set HEAD will carry.
 
 ## Post-commit sibling push mid-flight + regenerable assets (2026-09-03 late variant)
 
@@ -929,3 +1018,309 @@ sibling committing YOUR work under THEIR wording is the happy path — verify
 `git show --stat <their-commit>` matches your file set before treating it
 as yours, and remember your go-to defence (private GIT_INDEX_FILE etc.)
 is unneeded when their commit is clean.
+
+## Foreign feature compiled into MY rebuilt artifact — WAIT is an option (2026-09-29, others/independents copy)
+
+The 2026-09-03 "sibling WIP sits in build inputs" case, but discovered
+AFTER my rebuild: my copy-change deliverable (2 source files +
+index.html) was verified green, and the pre-commit census showed a
+sibling's UNCOMMITTED tab-arrow-key feature (rdTabsKey in rd.jsx +
+call sites in rd-allpolls/rd-cycles — plus, nastiest, one hunk inside
+rd-panels.jsx, one of MY files) had been compiled into my index.html,
+because build.mjs inlines working-tree sources. Committing my three
+paths would ship their unverified feature live with zero of their
+sources committed. Census procedure (fast, do it before staging):
+
+1. `git status --short` — every modified build source you don't
+   recognise is suspect;
+2. `git diff --stat` + the real diff on the foreign files to classify
+   the feature and judge completeness;
+3. `git diff <shared-file> | grep '^@@'` hunk census on files you BOTH
+   touched — attribute each hunk before claiming the file;
+4. grep the BUILT index.html for their feature's unique identifier
+   (`rdTabsKey`) — an artifact hit means YOUR rebuild already absorbed
+   their WIP and the clean/surgical machinery from the earlier
+   sections applies to committing at all.
+
+The established answers were snapshot-restore isolation or the
+private-index commit; the SIMPLER correct move when nothing on the
+site is broken and the sibling is live: present the user the choice
+(ship both / surgical separation / wait) — the user picked WAIT: my
+edits stay uncommitted in the tree, the sibling lands their feature
+commit first, then I rebuild-if-needed and commit my copy on top.
+Don't reflexively reach for the isolation machinery when waiting a
+turn costs nothing — surgery on a live sibling's WIP is the dangerous
+option, not the default.
+
+## ONE foreign build-input file: stash-park it, not /tmp (2026-09-29, swipe-wrap commit)
+
+Lightest form of the snapshot-restore isolation (here: a sibling's
+uncommitted rd.css work — centre the direction net under its bar on
+phones — would have been compiled into MY rebuilt index.html alongside
+my swipe feature). When the foreign dirt is exactly ONE tracked file,
+git does the parking for you, byte-exact, no manual snapshot/restore:
+
+```bash
+git stash push -- <foreign-file>        # parks ONLY that file's WIP
+node .build/newtracker/build.mjs        # rebuild now reads HEAD's copy
+git add <my sources> index.html         # exact paths as always
+git commit -m "…"                       # my commit carries zero foreign CSS
+git stash pop                           # their WIP returns to the worktree
+```
+
+`git stash pop` restores exactly what was parked even as the session
+continues (their next build re-absorbs their own WIP — correct). Verify
+post-pop that `git status` shows their file modified again before
+reporting "their work is untouched".
+
+**Sibling push lifts YOUR unpushed commits too.** Minutes later the user
+said "push" and `git push` said "Everything up-to-date" — a sibling
+session (or CI's push_main) had committed THREE of their own features and
+pushed; my two still-unpushed commits rode along as ancestors (fast-
+forward needs no permission from the commits' author). Signature: local
+branch not ahead, `git log --oneline` shows your hashes UNDER foreign
+commits (`git show <their-hash> --stat` confirms each is coherent);
+`git ls-remote origin main` equals local HEAD. Response: nothing to do —
+report whose push shipped your work, and that any sibling-flavoured
+leftovers in `git status` (here rd.css as `MM` = staged version +
+their newer unpushed edit) belong to the live session, so leave them.
+
+## Hand-increment the artifact + private-index commit (2026-09-29, rd-dir-net caption)
+
+Cheapest variant yet of the private-index family, for a ONE-LINER source
+change whose compiled form is known-exact. Situation: my phone-CSS rule
+(`text-align: center` + 14px on `.rd-dir-net`) was hours-old uncommitted
+in rd.css when a live sibling BOTH staged my files (mixing my hunk with
+their own `.rd-ap-card .rd-ap-cprim` scoping hunk) AND left unstaged
+d1a1d215-asset WIP in the tree — so (a) committing the staged state
+ships their hunk, (b) any `build.mjs` rebuild ships their unstaged
+inputs, and (c) HEAD was moving every ~2 min (`git log` churned between
+consecutive commands — four sibling commits inside ten minutes).
+
+- **New diagnostic: empty `git diff -- <file>` while `git status` shows
+  the file modified means the INDEX already equals the worktree** —
+  someone staged your files. The first letter of the `XY` status pair
+  carries it (`M ` = staged diff exists). Run `git diff --cached --
+  stat` before anything else; that listed THEIR hunk sitting inside my
+  two files for free.
+- **Recipe — no rebuild, no building anything.** For each of my files,
+  make `HEAD-version + my-hunk` in scratch and let git plumbing do the
+  rest:
+  1. `git show HEAD:.build/newtracker/assets/rd.css > .matilda/scratch/
+     <name>` (and `git show HEAD:index.html > …` — 70k-line file copies
+     fine, scratch lives in gitignored `.matilda/` since /tmp tool
+     writes are refused).
+  2. Apply exactly my hunk to each scratch copy: edit tool for the
+     source; one anchored `perl -pi -e 's/…old rule…/…new rule…/'` for
+     the compiled line in the index.html copy (grep-count the old
+     string == 1 first, so the substitution can't fan out).
+  3. `git hash-object -w` both scratch files, then
+     `GIT_INDEX_FILE=$PWD/.git/mine-idx git read-tree HEAD` and
+     `git update-index --cacheinfo "100644,<sha>,<path>"` per file —
+     **argument order is `<mode>,<sha>,<path>`**; the tempting
+     `<sha>,<mode>,<path>` fails "option 'cacheinfo' expects
+     <mode>,<sha1>,<path>" (and a prior `-w`-less `git hash-object`
+     also failed because the object didn't exist yet — write it once
+     and it stays resolvable within the turn).
+  4. `GIT_INDEX_FILE=… git commit -m "…"` — commits the private index
+     ONLY; remove the temp index file after. `git show --stat HEAD`
+     must list exactly your files (mine: 2 +4/-2); `git status` will
+     keep showing `MM` on them — that's the sibling's hunks still
+     sitting staged+worktree, i.e. their state preserved, NOT damage.
+- **Re-extract the scratch copies as late as possible.** Between my
+  failed cacheinfo attempt and the retry, HEAD had moved commit
+  `6e6c964`; a scratch file extracted from the stale HEAD and
+  plumbed in would have SILENTLY REVERTED the intervening commit's
+  content for that path. Extract → patch → hash → commit is a
+  seconds-long chain precisely so `read-tree HEAD` at step 3 and the
+  scratch files share one HEAD.
+- Push lifted the sibling's three coherent local commits along with
+  mine (normal; name them in the report per the 2026-09-24 section).
+
+## Stash-park at scale + pop FAILS on live sibling writes (2026-09-29, glyph-hover commit)
+
+Scale-up of the "ONE foreign build-input file" form above, with a new
+failure mode. Deliverable was a 7-line template.html CSS rule whose
+index.html is the paired artifact — but the tree held 21 foreign dirty
+paths (sibling issues-panel WIP: gen-data.mjs +172, two compiled
+assets, rd.css, a probe, 15 skills), AND the working index.html was a
+stale sibling rebuild that BAKED their uncommitted gen-data output in
+(their `iss:` blocks were greppable in its diff). Sequence that
+shipped cleanly:
+
+1. `git diff -- <each of my files>` to prove my dirt is only mine
+   (their template.html had zero foreign hunks).
+2. Stash ALL foreign paths by explicit pathspec —
+   `git stash push -m '…' -- <13 paths>`; untracked sibling skill dirs
+   don't stow (untracked isn't taken) and don't need it.
+3. **`git checkout -- index.html` to discard the foreign-baked
+   artifact** — it's generated, never hand-edited, so their output is
+   a deterministically regenerable file, not work (their SOURCES are
+   safely stashed). Then rebuild: the new index.html diff must show
+   only MY hunk. A small amount of unrelated drift (~5 lines) is
+   legitimate when an earlier sibling commit forgot to rebuild —
+   identify it as HEAD-source lag and let it ride at your discretion.
+4. Re-run the designed-for-purpose probes against the CLEAN build
+   before committing — a green probe run against the foreign-mixed
+   build proves nothing about the tree you're committing.
+5. Commit by pathspec (a gitignored `.matilda/probe/` file needs
+   `git add -f`), then push BEFORE the window widens.
+
+**The new failure mode**: minutes into the hold, `git stash pop`
+aborts with `error: Entry '<file>' would be overwritten by merge.
+Cannot merge.` — the LIVE sibling re-WROTE two of the stashed files
+themselves (their editor/agents are still running; stash reverted
+their files to HEAD under them mid-session, and they re-dirtied).
+The stash entry survives intact (`stash@{0}`). Recovery, in order:
+
+1. **Never `git checkout -- <their-file>` to force the pop** — that
+   discards live edits made seconds ago, real lost work (their own
+   session may just have re-created what it doesn't know you stashed).
+2. Verify scope: `git diff 'stash@{0}^' 'stash@{0}' -- <contested>` vs
+   fresh `git diff -- <contested>` — here the fresh edits were NEW
+   small hunks (a live `housesAll` fix) NOT present in the stash,
+   i.e. the sibling genuinely worked past the stashed state.
+3. Restore ONLY the uncontested paths:
+   `git checkout 'stash@{0}' -- <19 non-contested paths>`. NOTE this
+   STAGES them — follow with `git reset -q -- .build .matilda` (or
+   the path list) to return them to plain unstaged WIP, or your own
+   next commit (or any index consumer) sees them staged.
+4. LEAVE the live-edited files as the sibling wrote them; their
+   stashed older versions stay parked in `stash@{0}` — do NOT drop
+   the stash. Report to the user that stash@{0} holds the sibling's
+   superseded copies of exactly those files, available if their
+   session needs them back, so the user (or follow-up review) can
+   reconcile instead of discovering a mystery stash later.
+
+The generalised lesson: a stash hold across ACTIVE sibling minutes
+carries a pop-blocking probability that grows with the hold duration
+— keep holds short (commit+push immediately after the clean rebuild),
+and run `git stash list` before reporting done so no one's parked
+work sits silent.
+
+## Intentionally overwriting a sibling's PRE-STAGED entry for YOUR generated file (2026-09-29, demoTrend commit)
+
+A gentler `MM` form: the sibling had pre-staged a stale rebuild of
+`index.html` (+3784 vs HEAD) while their sources were still WIP —
+status showed `MM index.html` with the STAGED side theirs and the
+WORKTREE side my verified copy. Restaging the same path with
+`git add index.html` is not the accident this skill usually guards
+against; it's the mechanism — the index holds ONE version per path,
+so the last `git add` wins and my blob replaces theirs in the
+commit. The risk to manage is verification, since
+`git diff --cached --stat` shows only line counts. Prove the staged
+blob is the copy you verified BEFORE committing:
+
+```bash
+git show :index.html > /tmp/staged-index.html   # `:` syntax reads the INDEX, not the worktree
+grep -c "<my feature phrase>"  /tmp/staged-index.html   # present at expected count
+grep -c "<sibling breakage>"   /tmp/staged-index.html   # match HEAD's count, not zero
+```
+
+Two marker gotchas burned in this pass:
+
+- An identifier implicated in the sibling's breakage can still appear
+  legitimately many times in the committed inline app layer (one
+  declaration plus ~18 usages ×19). Judge by comparison with a
+  KNOWN-good copy's count (`git show HEAD:index.html | grep -c …` or
+  your isolated worktree build's), never against zero — the breakage
+  signal was a DUPLICATE declaration, not the identifier existing.
+- Runtime-composed copy (React assembles sentences client-side) does
+  NOT appear as rendered sentences in the built file: grep the SOURCE
+  phrase-pieces ×1 and expect the rendered strings to be absent.
+  "×0" is the PASS for a removed-bug phrase here, "×39" for a CSS
+  class is normal; static-looking copy that is really assembled pays
+  one failed grep per session otherwise.
+
+Post-commit, `git status` still lists the sibling's untouched WIP
+paths — correct. The check that matters is the staged set held no
+foreign path (`git show --stat HEAD` lists exactly your files) and
+the push fast-forwards (a sibling's coherent commit as your parent
+is fine — name it in the report).
+
+## Sibling `git restore` + rebuild wiped my uncommitted fix (2026-09-30)
+
+Newest, cheapest-to-hit variant: between two of MY OWN tool calls a
+sibling session committed three features (4d4d587/7410314/d409ee5),
+RESTORED shared tracked sources to HEAD (`rd.jsx` went clean-to-HEAD: my
+probe-green hunk gone, marker phrase nowhere in tree or index.html), and
+rebuilt the generated files over my build. Probes I had just re-greened
+were testing a STALE index.html the sibling promptly replaced. The
+signature checks are the same as ever (`git log` moved, marker-phrase
+grep ×0) — the lesson is the DEFENCE, because re-applying is cheap only
+if the diff is saved: **the moment an uncommitted edit passes its
+probes, `git diff -- <files> > .matilda/<name>.patch`** (gitignored
+probe space survives anything git does); then re-apply after sibling
+waves and verify marker grep in the SOURCE (the build output cannot be
+trusted until YOU last built). A sibling may also sweep your uncommitted
+source into their OWN feature commit mid-session (7410314 shipped my
+freeze/thaw) — fine and unrecoverable-and-OK (it ships), but confirm
+with `git log -- <file>` + marker grep on HEAD before deciding the work
+is lost, and note it in the report so nobody "fixes" the revert that
+isn't one.
+
+Related race shape: a `git pull --rebase` mid-session is NOT the only
+mutator — `git checkout/restore HEAD -- <file>`, a manual
+restore-then-build, and plain `git stash push -- <paths>` by a sibling
+all make the SAME surface (your file clean vs HEAD, phrase gone). When
+the working copy's mtime on your source is NEWER than your last edit
+but the content is older than your last edit, a sibling touched it —
+re-apply from the .matilda patch, never "git restore" yourself to
+"clean up".
+
+## npm test rebuilds index.html OVER sibling WIP — verification and commit artifact are different builds (2026-09-30, hover-arrow 8e305ae)
+
+Contamination trigger of a new colour: not a sibling's build, but YOUR
+OWN verification. Deliverable was one source hunk (`rd-polls.jsx`, +34
+transient hover-arrow scoping) plus its paired index.html; sibling WIP
+sat uncommitted in `d1a1d215` and `rd-cycles.jsx`. The final gate —
+full `npm test` in the live tree — RUNS `build.mjs`, so the index.html
+it leaves behind has the sibling hunks compiled in. Proof that flagged
+it: `git diff -- index.html` showed hunks inside functions nobody in my
+session touched (`function cycDomain`, a `showComb` destructure —
+rd-cycles-derived). That working copy was uncommittable no matter how
+green the suite was, and it could only be regenerated, never reverted
+(sibling dirt is live work, not a stray).
+
+Sequence that shipped, given the hazard was known BEFORE the commit:
+
+1. Verify as normal in the live tree (npm test + the DOM probe both
+   green) — and treat the built artifact as contaminated from then on.
+2. Fresh scratch checkout at CURRENT HEAD — never reuse an earlier
+   scratch snapshot after mid-task HEAD drift (the sibling pushed
+   `cd6cdd4` during verification, obsoleting a snapshot taken at the
+   previous HEAD): `SNAP=$(mktemp -d "$PWD/.matilda/<task>-XXXXXXXX")`
+   then `git checkout-index --prefix="$SNAP/" -a`, then `cp` ONLY your
+   edited source files into it. `.matilda/` is gitignored, so snapshots
+   never appear in status or get committed. Node fact that makes this
+   cheap: a checkout INSIDE the repo root resolves the root's
+   `node_modules` by ancestor-walk — no `npm install` needed (a
+   `ln -s "$PWD/node_modules" "$SNAP/node_modules"` is harmless
+   belt-and-braces only).
+3. `node "$SNAP/.build/newtracker/build.mjs"` — paths are
+   import.meta.url-anchored, cwd-free. Content-addressed sidecars must
+   match HEAD's (cycle-source stayed `4eb218d0`), or the commit needs
+   those too — here zero.
+4. GATE before staging anything:
+   `git show HEAD:index.html | diff - "$SNAP/index.html"` must print
+   ONLY your hunks (one 34-line transpiled block). Any sibling-derived
+   hunk means the snapshot itself is contaminated (wrong HEAD pin, or
+   you cp'd a dirty file).
+5. Commit the two files through a private GIT_INDEX_FILE exactly per
+   the 2026-09-03 recipe (read-tree HEAD; `hash-object -w` each file —
+   the worktree source is pure mine, the artifact comes from $SNAP;
+   update-index --cacheinfo; commit; `rm .git/fc-index`). Never
+   `git add`: the shared index held a stale STAGED copy of the same
+   source file, and post-commit its `MM` status is cosmetic — leave it
+   exactly as found.
+6. `git fetch` → 0-behind → `git push`. Post-commit `git status` must
+   list every sibling path untouched (theirs sat there, mutating
+   between my commands — d1/rd-cycles/copy-chart.js churn visible
+   command to command; nothing of theirs moved).
+
+Generalised rule: treat any verification command that runs the builder
+(npm test here) as a potential artifact-contaminator in the shared
+tree. When it is, verification and artifact-production are DIFFERENT
+builds — produce the commit copy LAST, in a HEAD-pinned scratch
+checkout, and prove it with a `git show HEAD:<artifact> | diff` gate
+before the plumbing commit.

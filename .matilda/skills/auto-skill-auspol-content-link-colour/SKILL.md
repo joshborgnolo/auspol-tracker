@@ -81,3 +81,12 @@ inside 12px `.rd-ap-sub` text has no room for the ↗ plink-mark, and
 `.rd-link` (rd.css:324, bold + standing solid underline) was considered and
 rejected as too loud for sub-text. Do not "fix" it to the plink-mark form
 without asking.
+
+2026-09-30 addition, `a.mh-latest` (rd.css ~:431, commit e00d2e6 — the
+masthead's latest-poll release link): pattern 1 via `color: inherit`.
+BY USER REQUEST it carries NO hover underline either ("make it invisible:
+there's no underline or link icon") — a recorded second exception: there
+is no ↗ plink-mark, no standing underline, and no hover underline; the
+only affordance is the `focus-visible` accent outline for keyboard
+users. Do not add the hover underline back without asking. See
+auspol-masthead-latest-status for the two-home wiring.

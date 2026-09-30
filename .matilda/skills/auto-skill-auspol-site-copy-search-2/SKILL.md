@@ -3,6 +3,7 @@ name: auspol-site-copy-search
 description: auspol-tracker — locating a piece of user-facing copy's source of truth before editing. Live copy homes are ONLY template.html, build.mjs, gen-data.mjs and .build/newtracker/assets/ (rd-*.jsx AND hashed-*.js are both source, concatenated by build.mjs ~:84-93); index.html hits are the compiled bundle. Repo-wide greps drown in OCR-corpus noise (data/trove-text.jsonl, .matilda/bulletin-gallup/issues/*.json) and stale DECOY clones under .matilda/ (redesign-port/ carries the same hashed-asset filenames + its own index.html, snap-faq-260905/, redesign-preview/) — scope the grep to the live homes, then verify on the rebuilt bundle (worked 2026-09-27, the turned-out→ousted rename)
 source: auto-skill
 extracted_at: '2026-09-27T13:12:56.766Z'
+updated_at: '2026-09-30'
 ---
 
 # Locating user-facing copy in auspol-tracker (grep recipe)
@@ -75,6 +76,37 @@ signal was 7 lines: two live assets plus duplicates inside stale
 - Plain-ASCII search words appear literally in the bundle; curly
   typography (’, —, “”) has been babel-escaped to `\uXXXX` — see
   auspol-built-html-verification before concluding anything is absent.
+
+## Standardising a term of art: the "others & independents" rename
+
+Worked 2026-09-30 (commit af96f41): `others/independents` →
+`others & independents` everywhere the site names the stray party.
+Three lessons beyond a plain word sweep:
+
+1. **The standard is permanent.** The party's prose name is now
+   `others & independents` — lower-case in deks and running prose
+   (`voters for others & independents`), capitalised
+   `Others & independents` in titles (`RD_TREND_NAME`). All FUTURE copy
+   naming that party takes this form; never reintroduce the slash.
+2. **The name is GENERATED in several spots, not just written in
+   prose** — a party-rename sweep must hit the generator functions too,
+   or the old form returns the day that panel renders a fresh wave.
+   2026-09-30 homes:
+   - `rd-panels.jsx` — `RD_DEMO_HOME` oth line (~:1137),
+     `RD_TREND_NAME` + `RD_TREND_NAME_DEK` (~:1173-4), `pName` in the
+     composition-trend story (~:1279), prose at ~:1395.
+   - asset `a11e1559-…js` — `firmWho(k)` (~:1710), `DEMO_VOTE_FOR.oth`
+     (~:2179), the demographics label map's `Others` entry (~:2592).
+   `replace_all` on both the lower- and capitalised forms catches the
+   lot; two passes.
+3. **Internal-only strings stay.** The Newspoll extractor's guard
+   `missing others/independents bucket` (.build/extract-newspoll.mjs:590)
+   is CI-log output, never user-facing — deliberately left with the old
+   spelling, same rule as the `TURNED OUT` comment above.
+
+Verified live: `grep -c "thers & independents"` on https://auspoltracker.com/
+→ 11, slash form → 0 (search the `thers` substring; it sidesteps
+worrying about how the ampersand/entity was emitted).
 
 ## Per-copy-stream skills to consult FIRST
 

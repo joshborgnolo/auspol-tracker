@@ -1,8 +1,8 @@
 ---
 name: roymorgan-release-extraction
-description: Extract new Roy Morgan federal-voting-intention releases from the live roymorgan.com/findings Next.js feed into data/polls.json — __NEXT_DATA__ data flow (no HTML scraping), candidate filtering by topic+slug, prose-lead normalisation parser, guard suite, sorted-insert row contract (.build/extract-roymorgan.mjs, GitHub Actions since 84509d1); includes the ALP-v-One-Nation head-to-head research (anchor, sentence shapes, verified series) for its altTpp extension, plus the national-direction (right/wrong track) series into polls.json's `direction` array with the same self-heal pattern.
+description: Extract new Roy Morgan federal-voting-intention releases from the live roymorgan.com/findings Next.js feed into data/polls.json — __NEXT_DATA__ data flow (no HTML scraping), candidate filtering by topic+slug, prose-lead normalisation parser, guard suite, sorted-insert row contract (.build/extract-roymorgan.mjs, GitHub Actions since 84509d1); includes the ALP-v-One-Nation head-to-head research (anchor, sentence shapes, verified series) for its altTpp extension, plus the national-direction (right/wrong track) series into polls.json's `direction` array with the same self-heal pattern. Also documents the state-breakdown tables (PDF-only, never in __NEXT_DATA__; first publicly published wave 10363 Sep-29-2026, all 35 releases back to Feb-2026 checked) for anyone adding state cuts to the Who-votes-for-whom pool.
 source: auto-skill
-extracted_at: '2026-09-23T00:00:00.000Z'
+extracted_at: '2026-09-30T00:00:00.000Z'
 ---
 
 # Roy Morgan live-release extraction (findings feed → polls.json)
@@ -197,6 +197,50 @@ Essential/Spectre (at 2026-08-31) for an unrelated environmental reason — the 
 wrappers all refused their slots on a dirty tracked tree (a compiled asset left dirty by an
 earlier session) from ~Sep 12. CI-side extractors were green the whole time. Check BOTH causes
 before concluding any one extractor broke; see poll-agent-no-show-triage.
+
+## State-breakdown tables: PDF-only, and only since wave 10363 (verified 2026-09-30)
+
+The per-release "Primary Vote by State" / "Primary Vote … by City/Country" tables are **not** in
+`__NEXT_DATA__` prose — they live only inside the release's linked PDF on S3. Verified by crawling
+all 35 `federal-voting-intention` releases on the feed back to Feb-2026
+(scratch: `.matilda/scratch/check-rm-state-tables.mjs` — classifies each release STATE-TABLE /
+mention-only / none and whether a PDF link exists):
+
+- **First release with public state tables: `10363-federal-voting-intention-september-29-2026`**
+  (wave dated 2026-09-27 — a special fortnight aggregate, field Sep 14–27, n=2,569, which is why
+  `sample` jumped from the usual ~1,5xx; dateStart 2026-09-14). Every 2026 release before it
+  carries single-week trend tables only; the state/age/gender breakdown sat behind the
+  "contact Julian McCrann for detailed analysis such as by States…" paywall line.
+- The PDF URL lives in the content HTML as the ONLY `<a>` ending in `.pdf`, pointing at
+  `roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/…/*.pdf`, lead sentence
+  "View full tables and cross-tabulations of the results here." In the web page the same tables
+  appear only as PNG `<figure>` images; the PDF text layer extracts cleanly with any PDF text
+  tool (worked: read the downloaded PDF directly; Skim/pdftotext-class extraction preserves the
+  columns well enough to regex rows).
+- 10363 PDF anatomy: prose paragraphs (same as the JSON content), then "Roy Morgan Interviewing
+  14-27 September 2026: Primary Vote by City/Country" and "…by State" tables. **State table
+  columns per state are `Last election %` then `Now %`** — pairs like `NSW/35.2/28.5/…`; the
+  state n's row sits in the footer ("NSW (n=765), Vic (n=626), Qld (n=506), SA (n=228),
+  WA (n=235); Capital city (n=1638), country areas (n=931)"). No Tas/ACT columns — "Rest of
+  Australia" is NOT derivable from this table (only the big three join the Who-votes-for-whom
+  state pool: NSW/Vic/Qld). State *direction* figures appear in earlier prose paragraphs as ONE
+  sentence each of right/wrong extremes (WA highest 70.5% wrong-way, SA lowest 56.5%) — no full
+  per-state direction table, so the direction series stays national-only.
+- Errand note: 10363's `date` in polls.json/`published` is the MONDAY 2026-09-29 (Article date
+  "Tuesday, 29 September 2026" — their label is wrong; the CMS timestamp governs) while the wave
+  `date` is the prior Sunday 2026-09-27. Normal for RM (release-day vs field-end), but the
+  fortnight aggregate means the NEXT weekly wave's dateStart overlaps 10363's field window —
+  overlapping RM waves are expected when specials appear; don't try to de-overlap them.
+- Hand-held copies from the verification session (gitignored): `.matilda/scratch/rm-10363.html`
+  (raw page), `rm-10363-content.{html,txt}` (the postBy.content field), `rm-10363-tables.pdf`,
+  `rm-10363-state-breakdowns.json` (state tables parsed to JSON), and trend-table PDFs for
+  10353/10343/10328 confirming the earlier no-state-table era.
+- The 10363 state table is now IN the Who-votes-for-whom pool as a one-off hand-entry
+  (`ROYMORGAN_STATE` in `.build/demographics.mjs`, commit ad87338 — durability trap, gate use,
+  and why Morgan stays out of HOUSES: see auspol-demographics-hand-entry). If a LATER release
+  also carries the table (watch ~Oct 6/13 2026), the format has proven recurring and a PDF
+  reader belongs in/beside this extractor, migrating the constant's entries over; until then
+  keep hand-entering.
 
 ## Verification recipe that caught the bugs
 

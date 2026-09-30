@@ -1,6 +1,6 @@
 ---
 name: auspol-vote-by-group-headlines
-description: auspol-tracker — the "Who votes for whom" panel headline is now a CONSTANT per party (RD_DEMO_HOME in rd-panels.jsx, right after RD_DEMO_SHORT, shipped 0d91b2e on 2026-09-28; grn and alp lines amended same day to an "urban or provincial" non-rural trait): one hand-curated sentence per switcher party ("One Nation voters are more likely to be …"), refreshed BY HAND from the current pooled significances; the per-grouping finding sentence that used to BE the headline now leads the dek ahead of the two-form figures sentence (contrast when a split is significant, ONE shared fraction when not — shipped e87f1f9 after the ONP gender trap, where independent rdFraction snaps drew a 2.0pt pool as a 5-point "about three in ten … against one in four" gap). Switcher DEMO_PARTIES = FIVE chips since 69f467e (2026-09-29): oth joined as "Others" (short chip label; PARTIES.oth.name stays "Others / Ind." for table cells) with a curated oth RD_DEMO_HOME line, and the phone chip row wraps 3-over-2 at ≤480px because five chips+swatches overflow one nowrap row. oth's RUNNING-PROSE name is lowercase "others/independents" and its supporters "voters for others/independents" (user dictate 2026-09-29) — five name constants split across the a11e1559 asset and rd-panels plus a pName/pPoss plumbing in RdDemographics (s-ending name takes a bare ’ possessive; rdCap at sentence starts); PARTIES.oth.name "Others / Ind." still owns table cells, chip label "Others". Curate against window.AUSPOL.demographics with the panel's own simple |g.v − all| > g.ci margin test (NOT demoVerdict's Holm correction). ONP line is user-verbatim ("55+, TAFE- or trade-qualified, English-only-speaking, rural, and non-Victorian") — "English-only" kept per user override. The composition TREND block IS the change-over-time head/dek slot between the dot-plot card and the monthly charts (RdSub at rd-panels.jsx ~:1447, relocated same date from under the panel headline — user correction 2026-09-29, see the trend-block section) is wholly GENERATED from gen-data §7gb's demoTrend payload (two-stage proportionality test, shipped 2026-09-29): curated RD_TREND_* phrase-pieces at ~:1006-1032, the shift IIFE compositor at ~:1119-1217, probe .matilda/demo-trend-probe.mjs. Regression probes .matilda/demo-head-probe.mjs and .matilda/demo-oth-copy-probe.mjs (gitignored).
+description: auspol-tracker — the "Who votes for whom" panel headline is now a CONSTANT per party (RD_DEMO_HOME in rd-panels.jsx, right after RD_DEMO_SHORT, shipped 0d91b2e on 2026-09-28; grn and alp lines amended same day to an "urban or provincial" non-rural trait): one hand-curated sentence per switcher party ("One Nation voters are more likely to be …"), refreshed BY HAND from the current pooled significances; the per-grouping finding sentence that used to BE the headline now leads the dek ahead of the two-form figures sentence (contrast when a split is significant, ONE shared fraction when not — shipped e87f1f9 after the ONP gender trap, where independent rdFraction snaps drew a 2.0pt pool as a 5-point "about three in ten … against one in four" gap). Switcher DEMO_PARTIES = FIVE chips since 69f467e (2026-09-29): oth joined as "Others" (short chip label; PARTIES.oth.name stays "Others / Ind." for table cells) with a curated oth RD_DEMO_HOME line, and the phone chip row wraps 3-over-2 at ≤480px because five chips+swatches overflow one nowrap row. oth's RUNNING-PROSE name is lowercase "others/independents" and its supporters "voters for others/independents" (user dictate 2026-09-29) — five name constants split across the a11e1559 asset and rd-panels plus a pName/pPoss plumbing in RdDemographics (s-ending name takes a bare ’ possessive; rdCap at sentence starts); PARTIES.oth.name "Others / Ind." still owns table cells, chip label "Others". Curate against window.AUSPOL.demographics with the panel's own simple |g.v − all| > g.ci margin test (NOT demoVerdict's Holm correction). ONP line was re-dictated 2026-09-30 (8ca5756) to the "more likely to be X, Y, and Z; less likely to …" shape: significant positive traits first, significant negative-side traits cast as "less likely to" verb phrases after a semicolon ("less likely to live in Victoria or speak a language other than English at home") — the pre-restyle inversion compounds "English-only-speaking" and "non-Victorian" are GONE, and oth's line was assimilated to the same shape ("…NSW-based; less likely to live in provincial areas or have a mortgage"); alp/lnp/grn untouched at that pass. A SECOND 2026-09-30 pass, under the user's restated rule "keep the copy here in this section dynamic, of course" (the margin test is a CONTINUING obligation — a listed trait that loses pool significance comes OUT at any curation pass, checked whenever the section's copy is touched or the pool is otherwise in doubt): alp gained "; less likely to live in the eastern mainland states, especially Queensland" (user dictate, anchored Qld −3.5±3.0 SIG + Rest-of-Australia +4.4±3.4 SIG on that day's pool; NSW +0.2±3.2 and Vic −0.5±2.6 flat, so the collapse rides Qld + the inversion), oth's "NSW-based" was DROPPED as pool-killed (+1.3±2.1 no longer SIG — shipped oth line reads "…Gen Z and renting; less likely to live in provincial areas") and "or have a mortgage" was DROPPED editorially despite still-SIG −2.3±1.7, as entailed by the kept "renting" +2.3 (user: "sorta entailed by more likely to be renting, so it doesn't add much information"). No trailing full stops on these constants, even when a dictated paste carries one. The composition TREND block IS the change-over-time head/dek slot between the dot-plot card and the monthly charts (RdSub at rd-panels.jsx ~:1447, relocated same date from under the panel headline — user correction 2026-09-29, see the trend-block section) is wholly GENERATED from gen-data §7gb's demoTrend payload (two-stage proportionality test, shipped 2026-09-29): curated RD_TREND_* phrase-pieces at ~:1006-1032, the shift IIFE compositor at ~:1119-1217, probe .matilda/demo-trend-probe.mjs. Since 2026-09-30 the shift dek's significance sentences carry a RELATIVE-POINTS parenthetical (user dictate: "after statements of significance … say '(−x points relative to all Labor voters)'. and then if there's a second … say '(−y points)'"): stateDek appends "(−x points relative to all Labor voters)" quoting the POLE (away) side's strongest move — never bestOf over the whole set, that quotes the complement ("the rest of Australia" +5.6 when named pole Qld moved −2.8) — and groupDek's lead/deficit sentence appends bare "(−y points)" = the change in gap; relPts(m) = (g1−g0)−(a1−a0) sits with sgnPts beside pct (~:1147-1150). Regression probes .matilda/demo-head-probe.mjs and .matilda/demo-oth-copy-probe.mjs, rel-points probe .matilda/verify-dek-relpoints.mjs (gitignored).
 source: auto-skill
 extracted_at: '2026-09-28T07:14:51.777Z'
 ---
@@ -17,7 +17,11 @@ retired per-tab titles integrated into "the pre-existing dek texts",
 supplied One Nation's line verbatim — "One Nation voters are more
 likely to be 55+, TAFE- or trade-qualified, English-only-speaking,
 rural, and non-Victorian" — and, invited to choose, picked HAND
-curation for every switcher party over auto-generation.
+curation for every switcher party over auto-generation. (That ONP
+wording was itself re-dictated on 2026-09-30, commit 8ca5756, to the
+two-part "more likely …; less likely to …" shape — see the structure
+convention in "Curating the lines" below; the inversion compounds
+"English-only-speaking" and "non-Victorian" no longer ship.)
 
 ## Machinery (.build/newtracker/assets/rd-panels.jsx)
 
@@ -125,6 +129,38 @@ Do NOT build a generator for this: auto-generation was offered and the
 user chose hand-written lines. If the pooled significances shift
 enough that a listed trait goes non-significant, rewrite the line in
 this map and nowhere else; the commit should cite the new pool.
+
+## Pool reading 2026-09-30 (first dynamic refresh — the baseline to beat)
+
+Restated by the user the day after the oth/ONP reshaping: "keep the
+copy here in this section dynamic, of course" — the margin test is a
+CONTINUING obligation on RD_DEMO_HOME, re-run whenever the copy is
+touched or the pool moves (the dek and the RdSub trend block stay
+fully GENERATED regardless; "dynamic" for the headline constants means
+hand-refreshed to the pool, not hand-frozen). Full re-probe after the
+2026-09-30 Essential wave, anchors onp 26.9 · alp 27.1 · lnp 21.2 ·
+grn 13.2 · oth 11.5:
+
+- onp — all five listed traits still SIG: 55+ +7.3 · TAFE +5.7 ·
+  rural +10.3 · Vic −2.9 · other-language −7.9. No change.
+- alp — existing three still SIG (55+ −5.3, University +3.7, rural
+  −10.9 vs inner-metro +3.9); user's dictated addition anchored on
+  Qld −3.5±3.0 SIG and Rest-of-Australia +4.4±3.4 SIG (NSW +0.2±3.2,
+  Vic −0.5±2.6 flat) → "…; less likely to live in the eastern
+  mainland states, especially Queensland". The Rest-of-Aus inversion
+  claim was already noted as true-but-unused at 0d91b2e; it is now
+  the line's second half.
+- lnp — all four traits still SIG: 55+ +4.1 · University +4.3 ·
+  inner-metro +4.7 · own outright +7.9. No change.
+- grn — all four traits still SIG: 18–34 +12.4 · women +1.7 (men
+  −1.6) · renting +4.7 · rural −3.5 (inversion). No change.
+- oth — Gen Z +5.3±3.9 and renting +2.3±2.3 still SIG, provincial
+  −5.2 still SIG. POOL-KILLED: NSW-based (+1.3±2.1, was SIG at the
+  69f467e curation) — dropped, line now "…Gen Z and renting; less
+  likely to live in provincial areas". Editorial drop alongside:
+  mortgage (still SIG −2.3±1.7) out as entailed by renting. True but
+  unused from this reading: Rest of Australia −2.2 SIG, mortgage,
+  Millennials +2.4 (±2.6, not SIG).
 
 ## The dek's figures sentence could outrun the finding (flagged and fixed 2026-09-28, e87f1f9)
 
@@ -251,9 +287,41 @@ Mechanics to know before touching it:
   the party's RD_TREND_SKEW tail (skipped for parties without one),
   with NO trailing hedged sentence.
 - Sentence figures are the payload's FITTED start→end levels, `pct()`
-  capped at one decimal (thin trailers quote none); later dek
-  sentences pass rdCap so a lower-case party description still opens
-  capitalised ("Others/independents' lead among …").
+  capped at one decimal (since 2026-09-30 also the RELATIVE-POINTS
+  parentheticals below — thin trailers quote only those, no
+  start→end levels); later dek sentences pass rdCap so a lower-case
+  party description still opens capitalised ("Others/independents'
+  lead among …").
+- RELATIVE-POINTS parentheticals (user dictate 2026-09-30: "after
+  statements of significance in the dek … say '(−x points relative to
+  all Labor voters)'. and then if there's a second … say
+  '(−y points)'."). New helpers beside `pct` (~:1147-1150):
+  `sgnPts(v)` = signed pct with a LITERAL − (U+2212, house style), and
+  `relPts(m) = sgnPts((m.g1 - m.g0) - (m.a1 - m.a0))` — the move's
+  points RELATIVE to the all-voters shift over the same window. Two
+  attachment rules, worked against the live 2025-07-onwards payload:
+  1. stateDek (the "composition … shifted away from X, and towards Y"
+     sentence) ends "("+relPts+" points relative to all "+nameD+"
+     voters)". Quote the POLE side: `bestOf(ms.filter(m => m.dir <
+     0).length ? …dir<0… : ms)` — the away side's strongest move, and
+     only if no away move is significant does the toward side
+     contribute (that side IS the significant mover then). The first
+     draft used plain `bestOf(ms)` and manufactured "…towards the rest
+     of Australia (+5.6 points…)" — reading out the COMPLEMENT's
+     number when the sentence and the head name Queensland (−2.8). A
+     complement-named side ("the rest of Australia") has no move of
+     its own and must never own the figure.
+  2. groupDek (the "lead/deficit among X is growing" sentence — the
+     dictate's "second") ends bare "("+relPts+" points)". relPts(m)
+     there IS the change in gap, (g1−g0)−(a1−a0) ≡ gap1−gap0, so one
+     helper serves both; shrinking/narrowing claims carry a POSITIVE
+     number because the gap moved toward zero.
+  locDek sentences were left alone (their second sentence already
+  quotes absolute fitted levels "risen from X% to about Y%"). Thin
+  trailers inherit both suffixes automatically — groupDek takes `m`
+  and stateDek's hedged branch is the same function with `hedged`
+  true; the user's "statements of significance" covers the "appears
+  to" hedges too.
 - With the corrected precision weights the rendered texts moved AWAY from
   the user's dictated examples where those examples had been written
   against junk-weight runs (onp gained a thin renters move, alp's

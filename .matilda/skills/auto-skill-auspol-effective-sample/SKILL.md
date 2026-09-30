@@ -1,6 +1,6 @@
 ---
 name: auspol-effective-sample
-description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Filing houses with a sampleEff leg: Newspoll, YouGov, Essential, DemosAU, and (from 2026-09-04) RedBridge/Accent — a fully OFFLINE leg reading the committed .build/redbridge-src caches, 8 waves stamped. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index — with a release-PDF fallback (added 2026-09-02) that parses a needing row's own url when it is a demosau.com wp-content PDF, since the house posts statement-bearing report PDFs it never lists / Essential's ONE living disclosure PDF shared by every covered wave and refreshed in place when re-uploaded — the only leg allowed to overwrite; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md; plus (2026-09-04) an accent-only ride-along inside redbridge-updater.sh — `extract-sampleeff.mjs accent` right after a changed:true extract, so the new wave's eff joins the same commit. Statement caches in .build/sampleeff-src/. Since commit 212282c (2026-09-04) extract-sampleeff.mjs also treats each statement's raw `Sample size` row as authoritative for the row's `sample`, re-parses the committed caches offline every run, and corrects stale press-rounded samples (first data pass 0a280d6 fixed 13 waves, including YouGov 2026-06-16 1500→1492). Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement, DemosAU 2026-01-06's release URL is a Capital Brief article page (no demosau.com PDF to fall back on). RECURRING REPAIR GAP (hit 2026-09-18, DemosAU 2026-09-14 wave): NO pipeline leg stamps releaseUrl — a CI wave-reconcile that adds methodUrl (commit 4bb73b7) arrives WITHOUT the companion releaseUrl, so the expanded poll regresses to a bare 'APC statement' row instead of the merged 'Pollster's release … (includes the wave's APC methodology statement)' row until releaseUrl = the same demosau.com PDF is hand-set on the row. TIMING-GAP TRIAGE (worked 2026-09-23, Newspoll 2026-09-17 wave, fix f7d6cfa): 'statement exists on pyxispolling.com/apc but the row is unstamped' is usually cadence, not breakage — Pyxis posted AFTER the week's Mon 07:15 CI sweep, so probe in order (sampleeff-src cache absent → statement date vs `git log -- .build/sampleeff-src/` runs → LIVE collection API not stale /apc HTML → slug regex match), then run `node .build/extract-sampleeff.mjs` DIRECTLY (wrapper aborts on sibling-session dirty tree), validate, build, commit owned paths. The rd layer's pending display for a filing house's just-released, not-yet-stamped wave is the 'eff. TBC' marker — rdEffTbc gate → rdEffTbcNote renderer, BOTH homes in rd-allpolls.jsx (rdPollHead `n` line + All-polls sampleCell); YouGov's TBC links yougov.com/about/methodology/australian-polling-council since 42491f8 (2026-09-28), other houses a plain span; .rd-tbc CSS in rd.css beside .rd-ap-sub."
+description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Filing houses with a sampleEff leg: Newspoll, YouGov, Essential, DemosAU, and (from 2026-09-04) RedBridge/Accent — a fully OFFLINE leg reading the committed .build/redbridge-src caches, 8 waves stamped. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index — with a release-PDF fallback (added 2026-09-02) that parses a needing row's own url when it is a demosau.com wp-content PDF, since the house posts statement-bearing report PDFs it never lists / Essential's ONE living disclosure PDF shared by every covered wave and refreshed in place when re-uploaded — the only leg allowed to overwrite; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md; plus (2026-09-04) an accent-only ride-along inside redbridge-updater.sh — `extract-sampleeff.mjs accent` right after a changed:true extract, so the new wave's eff joins the same commit. Statement caches in .build/sampleeff-src/. Since commit 212282c (2026-09-04) extract-sampleeff.mjs also treats each statement's raw `Sample size` row as authoritative for the row's `sample`, re-parses the committed caches offline every run, and corrects stale press-rounded samples (first data pass 0a280d6 fixed 13 waves, including YouGov 2026-06-16 1500→1492). Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement, DemosAU 2026-01-06's release URL is a Capital Brief article page (no demosau.com PDF to fall back on). RECURRING REPAIR GAP (hit 2026-09-18, DemosAU 2026-09-14 wave): NO pipeline leg stamps releaseUrl — a CI wave-reconcile that adds methodUrl (commit 4bb73b7) arrives WITHOUT the companion releaseUrl, so the expanded poll regresses to a bare 'APC statement' row instead of the merged 'Pollster's release … (includes the wave's APC methodology statement)' row until releaseUrl = the same demosau.com PDF is hand-set on the row. TIMING-GAP TRIAGE (worked 2026-09-23, Newspoll 2026-09-17 wave, fix f7d6cfa): 'statement exists on pyxispolling.com/apc but the row is unstamped' is usually cadence, not breakage — Pyxis posted AFTER the week's Mon 07:15 CI sweep, so probe in order (sampleeff-src cache absent → statement date vs `git log -- .build/sampleeff-src/` runs → LIVE collection API not stale /apc HTML → slug regex match), then run `node .build/extract-sampleeff.mjs` DIRECTLY (wrapper aborts on sibling-session dirty tree), validate, build, commit owned paths. The rd layer's pending display for a filing house's just-released, not-yet-stamped wave is the 'eff. TBC' marker — rdEffTbc gate → rdEffTbcNote renderer, BOTH homes in rd-allpolls.jsx (rdPollHead `n` line + All-polls sampleCell); YouGov's TBC links yougov.com/about/methodology/australian-polling-council since 42491f8 (2026-09-28), other houses a plain span; .rd-tbc CSS in rd.css beside .rd-ap-sub. Disputed-figure adjudication (worked 2026-09-30, Essential 29-Sep wave — Guardian's 1,022 vs our 1008/865 vs a phantom 1,088): the disclosure statement is the wave's ONLY authoritative doc (methodology page links exactly one PDF; the /reports/ page links none), so disprove the claimant with a fresh-download grep; press copy never feeds sample and sampleEff forces raw+eff from the same APC row."
 source: auto-skill
 extracted_at: '2026-09-04T01:05:29.530Z'
 ---
@@ -500,8 +500,45 @@ style `Update effective sample sizes <date>` and push. Worked outcome
 statement PDF as `methodUrl`; validate kept the row consistent on the
 first pass (eff ≤ 1.05×raw guard). Status line
 `SAMPLEEFF_STATUS {"stamped":1,"methods":1,…}` confirms both fields
-landed; a `methods:1`-only run means the statement parsed with no eff
+landed; a `methods:1`-only run means the statement parses with no eff
 figure (check the cached txt before believing a parse miss).
+
+## Disputed-sample-figure adjudication (worked 2026-09-30, Essential 29-Sep wave)
+
+User report shape: "the methodology PDF says sample X but the article
+says Y" — reconcile which figure is authoritative for a stamped wave.
+Worked case: polls.json said 1008/865 (extractor-stamped from the
+disclosure statement), the Guardian write-up said "poll of 1,022
+people", the user reported "1088" from the methodology PDF. Procedure:
+
+1. **The Essential disclosure statement is the wave's ONLY
+   authoritative document.** `essentialreport.com.au/methodology` links
+   exactly ONE live PDF (currently
+   `Essential-Report-Disclosure-Statement-Full-Questionnaire-2.pdf`);
+   there is no separate per-wave questionnaire PDF, and the wave's
+   `/reports/<date>` page carries no PDF hrefs at all (audit with
+   `grep -o 'href="[^"]*"' page.html` — its 16 `wp-content` hits are
+   css/ico). Any "the PDF says X" claim therefore refers to the
+   disclosure statement or to nothing.
+2. **Disprove the claimant, not just prove our figure.** Re-download
+   the LIVE PDF fresh (don't trust only the committed
+   `.build/sampleeff-src/essential-disclosure.txt` cache), `pdftotext
+   -layout`, and grep for the CLAIMED figure (`1,088`) as well as ours —
+   1,088 appears nowhere in it; the 30-Sep-26 row reads
+   `1,008 86% 865 ±3.3%`.
+3. **Press copy is never a data source.** The Guardian's "poll of 1,022
+   people" is hand-set `url` material only (assimilate-essential-vi.mjs
+   hand-set convention); it never feeds `sample`. Amusing tell: 1,022 IS
+   in the disclosure table — as the 28-Jan-26 wave's row — suggesting a
+   stale embargo-note figure, but don't chase it; the write-up's figure
+   has no pipeline role whatever its origin.
+4. **Verdict stands with the statement because sampleEff forces it** —
+   raw and effective n must come from the same APC table row, so
+   adopting a press figure for `sample` would orphan the 865.
+   `sample: 1008, sampleEff: 865` kept; no edit.
+5. Watch for user-side misreads before hunting phantoms: "1088" was
+   almost certainly "1,008" skimmed — check your own figure visually
+   matches before assuming a third source exists.
 
 ## Rules
 

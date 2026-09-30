@@ -11,6 +11,43 @@ The fact line at the top of every expanded poll detail (above the shared `PollLe
 exists in TWO renderers — changes to what the line carries belong in BOTH, rebuilt,
 or the two tables disagree.
 
+## Post-redesign head: the sentence you SEE is rdPollHead, not this band (4b6ffbe, 2026-09-28)
+
+**Current trap**: a user-quoted header sentence (e.g. "This poll, Fieldwork 24–28
+Aug, n = 1,006 (eff. 808), Published by AFR …") is NOT in the pd-meta band below —
+it is ONE shared function **`rdPollHead(p)` in `rd-allpolls.jsx ~:128`**, consumed
+by `rd-polls.jsx` (Latest detail `.rd-pld-h`, ~:335) and the archive detail
+(`.rd-apd-h`, ~:393) of the redesign (`body.rd`). One edit covers BOTH tables; the
+pd-meta machinery in this file is the legacy/structural layer (its two-home rule
+still applies when THAT code is touched, but the live header sentence is rdPollHead).
+
+Post-4b6ffbe sentence shape: `Conducted on ‹fieldwork› from a sample of ‹n›
+(eff. ‹eff›), published by ‹name› on ‹Day date, hour›`:
+
+- Article rule `rdApThe`: mastheads/institutions take "the" (the AFR, the Daily
+  Telegraph; names starting "The " kept) via `RD_AP_BARE_CLIENTS` = News24,
+  Capital Brief, News.com.au, News Australia, Amplify (online brands go bare);
+  self-published waves name the pollster with NO article.
+- gen-data maps polls.json `client:"—"` → `"Self-published"`; rdPollHead's
+  `/^self/i` check swaps that for `p.pollster`.
+- Post-539abb5 the nowrap glue is ONLY the figure cluster: `"a sample of "` is
+  PLAIN flowing text (a direct text node of the head's fragment) and the
+  `.rd-nocaps` span holds just `1,500 (eff. 808)` (or `1,500 (eff. TBC)` via
+  `rdEffTbcNote`); no-sample reads `an unpublished sample`; no-field fallback
+  lead is `From `. Pre-539abb5 the WHOLE run (`a sample of n + eff`) sat in
+  the nowrap span, so at widths where it did not fit after "…from " the full
+  chunk jumped to line 2 and stranded a wide void mid-sentence (user report,
+  laptop width, fixed 539abb5). Rule: glue only the atomic cluster that must
+  not split mid-figure; the connective words wrap freely.
+- **The copy-card re-derives itself from this sentence**: copy-poll.js
+  `retitlePollHead` regexes the mounted head (see auspol-copy-poll-image) — a
+  rewording that changes its anchors ("Conducted on … from ", ", published by …
+  on …") without updating that transform silently ships a malformed card line.
+  (A 539abb5-style restructure that only MOVES the span boundary — every text
+  node's VALUE unchanged — needs NO copy-poll change; the matcher walks nodes.)
+- The `rd-nocaps` rule's `text-transform:none` is vestigial — NO ancestor
+  uppercases `.rd-apd-h`/`.rd-pld-h`; the head renders sentence case as authored.
+
 ## Mounted DOM shape (verified 2026-09-04, for any panel-level feature)
 
 Both renderers emit the IDENTICAL mount: the expanded panel opens as

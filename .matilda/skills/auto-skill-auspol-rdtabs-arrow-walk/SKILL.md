@@ -1,6 +1,6 @@
 ---
 name: auspol-rdtabs-arrow-walk
-description: auspol-tracker — the page-wide left/right arrow-key tab walk (shipped 5d374ed, 2026-09-29; made CIRCULAR d57fdfe same day): one rdTabsKey factory in rd.jsx wired into the shared RdTabs group covers ~12 tab rows free, and the hand-rolled rows (past-cycles Compare/Measure, all-polls pinbar, issues narrow chips) attach it themselves. Invariants (options in DOM order, focus follows selection, wraps at the ends, arrows only when a tab has focus), and the probe lesson that All polls and Past cycles are hash-driven page views whose rows don't exist on the Snapshot view.
+description: auspol-tracker — the page-wide left/right arrow-key tab walk (shipped 5d374ed, 2026-09-29; made CIRCULAR d57fdfe same day): one rdTabsKey factory in rd.jsx wired into the shared RdTabs group covers ~12 tab rows free, and the hand-rolled rows (past-cycles Compare/Measure, all-polls pinbar, issues narrow chips) attach it themselves. Invariants (options in DOM order, focus follows selection, wraps at the ends, arrows only when a tab has focus), the probe lesson that All polls and Past cycles are hash-driven page views whose rows don't exist on the Snapshot view, and the separate phone-swipe registration (data-rd-swipe + __rdSwipe; hand-rolled rows must claim it too — 615ae67 Compare-with — or flicks fall through to the page turn; touch probes must wait out smooth scrolling and re-aim rects per facet switch).
 source: auto-skill
 extracted_at: '2026-09-29'
 ---
@@ -27,6 +27,13 @@ Up/Down row walk (a398185) to extend across all of the site's tab rows.
 - It only fires when a button of that row has focus (handler lives on the
   row container, no global key listener) — reading the page with arrows is
   unaffected elsewhere.
+- **Any focus in these handlers MUST pass `{ preventScroll: true }`**
+  (rdTabFocus and rdTabsKey's arrow step both do, 7c4bba4 2026-09-30): a
+  FIXED/pinned tab bar's buttons have layout boxes far up the page, and a
+  plain `focus()` re-scrolls the viewport there — observed as a 1801px
+  teleport on the All-polls pinbar. The pin owns the scroll position;
+  full mechanism and diagnosis harness in auspol-rdpinscroll-row-pin.
+  Never add a bare `.focus()` to a walk/click handler in these files.
 - **A click must focus the tab explicitly** (`rdTabFocus`, wired as onClick
   on every walk-enabled role=group, f0996a9): Safari and Firefox on macOS
   never focus a `<button>` on click (Chrome does), so the walk was dead for
@@ -132,7 +139,16 @@ Two more walk families ride the same ideas:
   WRAPPING round the ends (d57fdfe). The navbar's own
   `Tabs.onTabKeyDown` (which always wrapped, `(i ± 1 + n) % n`) covers
   the focused-tab case, so the focused-control bail is correct everywhere
-  else.
+  else. Since 2026-09-30 a third layer sits on the other side of the same
+  guards: pointer-over-a-card claims ←/→ WITHOUT touching focus (capture-
+  phase document keydown while a pointerenter-flipped ref is set), shipped
+  Latest → All-polls → both vote cards — see auspol-hover-claims-arrows.
+  Also 2026-09-30: the navbar tab's onClick blurs on POINTER clicks
+  (`if (e.detail) e.currentTarget.blur()` — detail 0 = keyboard-activated
+  clicks keep focus per the ARIA tabs pattern), because Chrome's
+  click-focus left focus on the nav tab after navigation, and the
+  leftover focus ate ←/→ as page turns and vetoed every hover claim —
+  full chain in auspol-hover-claims-arrows.
 
 Probe: `.matilda/probe-pollrows-keys.mjs` walks both tables' rows (incl.
 phone cards at 480px), the row-level facet walk (tab `aria-pressed` index
@@ -174,7 +190,81 @@ Probe: `.matilda/probe-swipe-wrap.mjs` (480×900, `page.touchscreen`
 touchStart/Move/End flicks) — hero card swipes cycle every matchup and
 wrap both directions without turning the page; the who-votes view row
 swipes wrap Home→Age and Age→Home; the page turn wraps snapshot→info and
-info→snapshot swiping on the verdict strip, which no row owns.
+info→snapshot swiping on the verdict strip, which no row owns; the
+compare-with block below pins the past-cycles row.
+
+## Hand-rolled rows take the phone swipe too (615ae67, 2026-09-30)
+
+The keyboard walk and the phone swipe are TWO registrations, and a
+row can have one without the other. This bit twice, both times user-
+reported as "arrows walk but swipe on the phone doesn't":
+
+1. **Hand-rolled row** (615ae67, Compare-with): the bug report "the
+   arrows walk the Compare-with row but swipe on the phone doesn't" was
+   exactly that: the row had `rdTabsKey` but no `data-rd-swipe`, so the
+2. **`RdTabs` row missing the `swipe` prop** (2cf6d8c, Undecided views,
+   same day's other report): `<RdTabs>` only registers
+   `data-rd-swipe`/`__rdSwipe` when the `swipe` prop is passed; without
+   it the row took arrow keys and a phone flick fell through to the
+   page turn. Fix was the prop plus the rdPinScroll pin wiring (see
+   auspol-rdpinscroll-row-pin). For ANY "keys yes, swipe no" report,
+   diff the row's props against the nearest walking row before
+   suspecting the touch layer.
+
+Case 1 detail: the row had `rdTabsKey` but no `data-rd-swipe`, so the
+touch effect never saw it and a flick on or under the row fell through
+to the page turn. Recipe (mirrors the RdTabs `swipe` prop line-for-line,
+in rd-cycles.jsx beside CMP_ROWS):
+
+```jsx
+const cmpSwipeLive = React.useRef(null);
+cmpSwipeLive.current = (dir) => {
+  const i = CMP_ROWS.findIndex(([id]) => id === compare);
+  if (i < 0) return false;
+  setCompare(CMP_ROWS[(i + dir + CMP_ROWS.length) % CMP_ROWS.length][0]);
+  return true;
+};
+const cmpSwipe = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => cmpSwipeLive.current(dir); }, []);
+// on the role=group div:  ref={cmpSwipe} data-rd-swipe=""
+```
+
+Wrinkles worth remembering:
+
+- **Sync the header-layer comment** (73de0c58, in the touch effect's
+  header block) — it lists which cycling rows are deliberately UNMARKED
+  ("the page turns there"); it claimed Past cycles' re-elected/ousted
+  row was unmarked and went stale the moment the row was marked; now
+  only the level/change Measure row is unmarked. Comments are stripped
+  from the built index.html, so this edit shows only in the source
+  diff — that is normal for the hashed JS layers.
+- **Marking a row makes it own its whole section**: reach is
+  `max(row.bottom + 120, owner section bottom)`, so a swipe anywhere in
+  the past-cycles view now steps the comparison instead of turning the
+  page — the same ownership the Latest-polls and who-votes rows already
+  had. Deliberate, matches user expectation, but say it in the report.
+- **Touch-probe robustness (cost a full misdiagnosis round):** the probe
+  first "proved" the row didn't claim — actually its touch rect was
+  STALE. (a) `scrollIntoView` smooth-scrolls on this page: capture rects
+  only after scrollY stops changing (the probe's `settle()` polls two
+  equal samples ~120ms apart); (b) re-`box()` the rect before EVERY
+  flick when the walk re-renders copy ABOVE the row — a facet switch
+  re-wraps the dek text at 480px and shifts the row by a line, and the
+  next flick aimed at the old rect misses it (touch lands in no row's
+  reach → page turn probes as `sel() === null`). The who-votes block in
+  probe-swipe-wrap.mjs had always been racy this way; it broke the day
+  facae31 lengthened the dek copy. In-page debugging when "should claim
+  but page turns": replay `rowAt`'s reach math over
+  `[data-rd-swipe]` rects AND the `claimsSideways` ancestor walk
+  (`getComputedStyle` touchAction → overflow-x auto/scroll with
+  `scrollWidth > clientWidth + 1`) at `document.elementFromPoint(x, y)`
+  — both replays came back clean here, which exonerated the app and
+  indicted the probe.
+- Probe home: `.matilda/probe-swipe-wrap.mjs` gained a cycles block
+  (navigate `window.location.hash = "cycles"` first — per the
+  hash-driven view gate below): next-swipes step All→Re-elected→Ousted
+  and wrap to All, back-swipes wrap off the first tab to the last, a
+  flick 60px UNDER the row steps it (reach-below), and the hash never
+  leaves "cycles".
 
 ## Probe: .matilda/probe-rdtabs-keys.mjs
 

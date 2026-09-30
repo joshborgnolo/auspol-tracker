@@ -77,6 +77,32 @@ cosmetic, heals on the next wave or the daily backstop. `news24-updater.sh` has
 no CI twin, so its renders happen only via the local launchd Mac (Chrome at the
 default path).
 
+## Healing a stamp-skew red train (observed 2026-09-30, heal commit ac7ef1b)
+
+A MANUAL bare `build.mjs` has the same trap as the confirm-skip blocks: commit
+04738f5 corrected Essential's wrongly-published 1-Oct wave back to 30 Sep via a
+bare build, so the data un-wound but card.json stayed drawn for 2026-10-01 —
+the tests date gate then hard-failed EVERY push (~10 red runs, all innocent
+bystanders, all failing at the `die(...)` card line in ~15s). Symptom line:
+`share card is drawn for <X>, data is <Y> … regenerate: see make-card.js`.
+
+Heal = refresh_site order by hand: `node .build/newtracker/build.mjs` →
+`node .build/newtracker/render-card.mjs` (expect "card stale or unstamped –
+drawing", "stamped assets/auspol-card.json") → `node .build/newtracker/build.mjs`
+(restamp). Verify `assets/auspol-card.json` and `assets/auspol-latest.json`
+match on publishedISO AND fig, then `npm test`, commit, push.
+
+Contaminated-tree variant (a sibling session's uncommitted source edits were in
+the tree and the restamp builds baked them into index.html): the CI gate only
+compares the two JSON sidecars — neither index.html nor the gate cares about
+the og:image ?v= line in the committed index.html. So commit ONLY
+`assets/auspol-card.json assets/auspol-card.png`, leave the contaminated
+index.html unstaged, and the og:image restamp lands on its own with the next
+writer's build. Never `git add -A` here (shared-repo-session-race); stage the
+named card paths and eyeball `git diff --staged --stat` before committing.
+Commit-message precedent: "Heal the tests run: re-draw the share card …" (also
+84ddd62's "Heal the tests run: re-draw the share card and favicon …").
+
 ## Related
 
 - **auspol-build-pipeline** — build.mjs/gen-data.mjs map (grabLatest, writeAtomic;

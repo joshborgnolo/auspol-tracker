@@ -1,8 +1,9 @@
 ---
 name: auspol-issues-panel
-description: auspol-tracker — the Snapshot's "The issues" panel (shipped 2026-09-25; Ipsos added 2026-09-26) end to end - what each pollster publishes about issues, how .build/issues.mjs reads it into data/issues.json, how gen-data §7h pools it (houseEffectsFor on ownership, pairLeanFor on salience), the panel's two views plus the 2026-09-28 importance-weighted scoreboard tally row (and the rd-is-row five-column auto-placement trap), and the traps found building it (RedBridge's two table layouts, Resolve's double-counted July 2026, Ipsos's rolling page 2 and publication lag, why only three parties pool).
+description: auspol-tracker — the Snapshot's "The issues" panel (shipped 2026-09-25; Ipsos added 2026-09-26) end to end - what each pollster publishes about issues, how .build/issues.mjs reads it into data/issues.json, how gen-data §7h pools it (houseEffectsFor on ownership, pairLeanFor on salience), the panel's two views plus the 2026-09-28 importance-weighted scoreboard tally row (and the rd-is-row five-column auto-placement trap), and the traps found building it (RedBridge's two table layouts, Resolve's double-counted July 2026, Ipsos's rolling page 2 and publication lag, why only three parties pool). 3cc1b40 (2026-09-30): the "Issue" kicker span over the phone chips row is GONE (aria-label covers it) — its 16px moved onto .rd-iw-chips; pinWhom pins the grouping menu first (rdPinScroll array form).
 source: auto-skill
 extracted_at: '2026-09-26'
+updated_at: '2026-09-30'
 ---
 
 # The issues panel
@@ -101,6 +102,24 @@ extracted_at: '2026-09-26'
 
 ## Pooling (gen-data §7h)
 
+- WAVE→ROW KEYING TRAP (found 2026-09-29 planning the All-polls Issues
+  facet): §7h's `pollOf(w)` matches an issue wave to a `polls[]` row by
+  EXACT `pollster|fieldwork-end-date` only, and silently falls back to the
+  wave's own `{date, dateStart, sample, sampleEff}` when it misses. It
+  misses ROUTINELY, not exceptionally: RedBridge's wave date is the report
+  publication date (2026-08-28) while its poll row keys on the fieldwork
+  end (~a week earlier), so RedBridge waves never join their poll rows at
+  all. Pollster names normalise fine (`RedBridge/Accent` both sides;
+  `houseName` maps to "RedBridge" for display). The fallback is harmless
+  for the pooled figures (midpoint/window/sample all live on the wave) but
+  any consumer that needs the actual row (the archive table's per-wave
+  `iss` join, where a wave must LAND on an individualPolls/directionOnlyPolls
+  row or become an issuesOnly one) has to resolve across the gap: exact
+  `date|pollster` first, else nearest same-pollster poll inside ~14 days,
+  else the `direction[]` key (SEC's issue rows carry their dir row's date),
+  else a declared issues-only house (Ipsos) – and an unresolvable wave must
+  fail the build, never vanish quietly. Direction-wave joins don't have
+  this trap: direction `.date` is always the fieldwork end.
 - Ownership pools ONLY Labor / Coalition / One Nation as shares of those
   naming one of the three: the answer sets differ (no Greens at Resolve,
   "all about equal" only at RedBridge), and this is the part every current
@@ -115,7 +134,15 @@ extracted_at: '2026-09-26'
   (a + b − (a − b)²)/n.
 - The three parties leave out a quarter to two fifths of voters on most
   issues and 56–58% on climate at RedBridge/YouGov (the Greens). `grnTop`
-  flags a Greens-first reading; the panel says so under the rows.
+  flags a Greens-first reading: `grnTop[k] = {house, grn, date}` from the
+  newest in-window (SPARSE_K) wave of a Greens-offering house (median
+  ranker) where the Greens top the table (gen-data ~:2870, `grn > alp &&
+  grn > lnp`, ranked over Gen/GenC rows). Two render sites in RdIssues:
+  the row verdict's small print "Greens first (N) where offered" — N
+  bracketed, inked `inkOf(pColor("grn"))`, the figure column's convention
+  (added 01410e0, 2026-09-30, at the user's request; the payload's `grn`
+  field had always been there, just never printed) — and the rd-note under
+  the rows "-house- also offers the Greens, who come first on -issue- (N%)".
 - Salience pools RedBridge and Ipsos with `pairLeanFor`: each poll's gap to
   the other house's polls within HE_WINDOW, recency-decayed (HE_HALF), each
   house leaning HALF of it (two houses can't say which is right), NOT
@@ -140,11 +167,32 @@ extracted_at: '2026-09-26'
 
 ## The panel (a11e1559 `IssuesPanel`, composed in 73de0c58 before Undecided)
 
+- `D.issues.list` is an SORTED ARRAY of `{id, label, imp, own, monthly,
+  dots,…}` (sorted by `imp.v` at the end of §7h, and later
+  scoreboard-descended by display) — NOT a map keyed by `id`. Any consumer
+  off the archive rail must find by `it.then((x) => x.id === …)` /
+  `find((it) => it.id === k)`, as RdApIssMini does (a `list[iss.top]`?
+  keyed lookup returns `undefined` and the component's empty `<div>`
+  fallback renders silently, giving an empty rail box with no pageerror —
+  shipped as a half-finished row and caught by the iss-facet probe's
+  railSvg:false, 2026-09-29). Monthly rows are `[ym, alp, lnp, onp,
+  ±alp, ±lnp, ±onp]` — arrays, not objects (RdApIssMini's per-party line
+  unpacks the i-th column, never a key).
+
 - "Who's trusted": rows sorted by salience (importance bar, three-party bar
   with dot-numbers, verdict) beside the chosen issue's monthly chart;
   `issTrendVerdict` = withinHouseSlope per party, Holm. Under the rows: the
   issue where the two salience houses' latest polls differ most (≥5
-  points), then the Greens note. Rows are focusable buttons (tabIndex 0);
+  points), then the Greens note (figure included — see `grnTop` above).
+  The trust axis prints gridline labels 20/30/40/50 ONLY: its "⅓ each"
+  even-split label and the per-row dotted line it named
+  (rd-is-third/rd-is-thirdlab) were removed 2026-09-30 at the user's call
+  ("don't think it's necessary"; the row figures + the ahead/behind
+  verdicts carry the reading) — removed TOGETHER on the principle that a
+  mark must never outlive the label that names it (an unlabelled vertical
+  line through every row reads as a bug), and the axis's min-height/height
+  tightened 30→20px with it (the 30px had existed for that second label
+  line). Rows are focusable buttons (tabIndex 0);
   ArrowDown/ArrowUp from a focused row steps the selection one row at a
   time, focus following (a held key keeps walking), clamped at the list's
   ends – `rowKey` in RdIssues (~:1771) locates row j through `rowsRef` on
@@ -171,6 +219,33 @@ extracted_at: '2026-09-26'
   first sentence ("‹issue› comes first for everyone."); the conditional
   "What comes second divides them." tail and its `secondDiffers` check were
   cut (8a7d389), don't restore.
+- Whom view's grouping switcher is the LAPTOP'S MENU on a phone too
+  (1e2838f, 2026-09-30, user's request "can you make it a menu on phone…
+  or does it not fit" — it fits, proven): the ≤1000px `whomList` branch
+  (rd-panels.jsx ~:2461) renders the SAME RdTabs `.rd-iw-ctl` uses
+  (`rd-tabs-sm rd-iw-tabs` + `swipe`), not the old `.rd-iw-chips` chip
+  cloud; the 14-item Issue row below STAYS chips (a menu can't scroll).
+  Six tabs fit 320px via a measured ladder in rd.css (~:1244, all under
+  `@media (max-width: 1000px)`): `flex: 1 1 0` slots, 14px font with
+  `0 6px` padding; 341–400px `0 4px`; ≤340px 13px + `0 2px` (~262px of
+  the 280px card at 320 — the first candidate 13px/4px was 281.8 > 280;
+  the card clips its own overflow so the PAGE never spills and
+  scrollWidth stays green while the row crowds the card edge — assert
+  tab-in-card rects numerically, never trust scrollW). No
+  `padding-bottom` tuning: it would double the selected underline's
+  distance, inconsistent with every other RdTabs. ISSUE_GROUP_SETS
+  (gen-data ~:2869) reordered Vote, Age, Gender, Education, Place, Home
+  (Education from last to fourth, per the user) — groupTabs (~:3021) maps
+  it, so desktop table + phone menu follow one source; order is
+  presentation-only, safe to reorder. Probe
+  `.matilda/probe/issues-group-menu.mjs` (gitignored dir: `git add -f`;
+  23 checks, 320–1280px) asserts the six-tab menu + order at every rung,
+  no `.rd-iw-chip` grouping switcher, text-overflow ≤0.5px per tab, tab
+  rects inside row AND card, Issue row unchanged, click re-reads the
+  groups, desktop `.rd-iw-ctl` + table intact at 1280. Probe trap: the
+  panel's default view is "trust" — click the `.rd-is-tabs` tab matching
+  /matters to whom/i BEFORE waiting on `.rd-iw`, or the waitForSelector
+  times out and reads like a site 404.
 - Layout keys off the panel's own width: two columns from 1080px of panel
   (= 1136px viewport; the chart's height follows via `useNarrow`). Verified at
   1440/1024/860/390, light and dark, with a pageerror probe

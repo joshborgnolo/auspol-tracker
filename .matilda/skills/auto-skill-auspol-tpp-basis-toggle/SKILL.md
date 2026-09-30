@@ -20,6 +20,20 @@ side and leads with the implied one:
   (classic: `latest.alp2pp`; ALP v ON: `D.altLatest.alp_on` /
   `MATCHUPS.alp_on.data`).
 
+## The visible 2PP chart moved to rd-hero.jsx (2026-09-28)
+
+The front-page two-party section a visitor sees today renders from
+`rd-hero.jsx`, NOT the 73de0c58 hero layer mapped below: the compare
+checkbox ("Compare published 2PP" on EVERY matchup since the same day),
+the "As published"/"Implied" overlay, the ON-flow sensitivity bracket
+(`edge: true` area whose stroked TOP edge reads as a phantom second
+dotted line — restyled faint/dotted via the renderer's new
+edgeWidth/edgeDash/edgeOpacity options), and the event markers
+(keptEvents union on every matchup pill) all live there. This skill's
+basis STATE and layer notes below still apply (the redesign shares the
+D.* payloads); for the chart surface itself read
+`auto-skill-auspol-rd-tpp-hero` (probe: `.matilda/rd-tpp-hero-probe.mjs`).
+
 ## Layer map (edit any copy/behaviour in all its homes)
 
 - `gen-data.mjs` — hoisted `impOk(p)` eligibility predicate (~:271, full

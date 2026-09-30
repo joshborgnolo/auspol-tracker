@@ -15,10 +15,11 @@ actually fill, so the reader never faces an archive of dashes.
 ## The moving parts (each edit usually touches several)
 
 - `FACET_SCOPE` (~:4701) — one def per facet `{ has(p), label }`:
-  twopp = basis-keyed 2PP presence (`(pubBasis ? p.alp!=null : p.alpImp!=null)
-  || p.tppAlt || p.tppAlt2 || p.tpp3`, label "With a 2PP"), primary = null
-  (unscoped), leadership, direction. Sits above the state declarations
-  because the URL restore's `defaultScopeFor` consults it.
+  twopp = basis-keyed 2PP presence, primary = null
+  (unscoped), leadership, direction, and since the Issues facet shipped
+  (891d06c, 2026-09-29) `issues: { has: (p)=>!!p.iss, label:"With issues
+  figures" }` (:4800). Sits above the state declarations because the URL
+  restore's `defaultScopeFor` consults it.
 - `CONTEST_SCOPE` (~:4711, added 2026-09-24) — published-only MATCHUPS
   self-arm their own scope when picked in the Contest popover:
   `lnponp → !!p.tppAlt2` ("With an L/NP v ON 2PP", 5 waves), `3cp → !!p.tpp3`
@@ -50,6 +51,15 @@ actually fill, so the reader never faces an archive of dashes.
   FilterPop (~:5395); on other facets it's pushed into the `pills` array
   (`if (scoping && facet !== "twopp")`) that renders in the `.ap-active`
   strip — don't add a third site.
+- **rd view hides auto pills by design** (found 2026-09-29 while probing
+  the Issues facet): rd-allpolls.jsx's `shownPills = pills.filter((f) =>
+  !f.auto)` (:~1096) drops every `auto`-flagged pill — on the redesign the
+  facet tab itself carries the scope, so the armed state is INVISIBLE on
+  the page. The classic view still renders them in `.ap-active >
+  .ap-pill.auto` (:5253, :5565-5576). Probing consequence: assert the
+  armed scope via the scoped tally ("42 of 182 polls" not "182 polls")
+  and assert that NO `.rd-ap-pill` with the label text leaked into the
+  rd strip — asserting pill presence in the rd view fails forever.
 - URL: only `s=0` is ever written, and only `if (!scope && FACET_SCOPE[facet])`
   — an EXPLICIT off. No `s=` means "seed from defaults", so `?v=3` alone
   opens scoped, and `?v=3&s=0` keeps the reader's unscoped choice across

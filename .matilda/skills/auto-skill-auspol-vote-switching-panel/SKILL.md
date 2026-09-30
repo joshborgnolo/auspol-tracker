@@ -1,8 +1,8 @@
 ---
 name: auspol-vote-switching-panel
-description: auspol-tracker — the "Where One Nation's new voters came from" panel (§5b) end-to-end. Data is data/vote-switching.json (recalled-2025-vote → current-party transition matrix), hand-maintained via .build/vote-switching.mjs. gen-data ALL-OR-NOTHING gates each wave: any missing group→ON split or ON-retention returns null and the wave is silently dropped. Newspoll's remembered-vote writeup uses TWO bases — ALP→ON quoted as a share of the LOST vote, Coalition→ON as a share of ALL 2025 Coalition voters. Convert bases before comparing to the chart's stored all-voter pp or the numbers "contradict" what is already plotted.
+description: auspol-tracker — the "Where One Nation's new voters came from" panel (§5b) end-to-end. Data is data/vote-switching.json (recalled-2025-vote → current-party transition matrix), hand-maintained via .build/vote-switching.mjs. gen-data ALL-OR-NOTHING gates each wave: any missing group→ON split or ON-retention returns null and the wave is silently dropped. Newspoll's remembered-vote writeup uses TWO bases — ALP→ON quoted as a share of the LOST vote, Coalition→ON as a share of ALL 2025 Coalition voters. Convert bases before comparing to the chart's stored all-voter pp or the numbers "contradict" what is already plotted. The dek's gain sentence ("…of One Nation's new voters voted for the Coalition in 2025.") is a GENERATED template — gainOf at rd-panels.jsx ~:1860, rdFraction share + dynamic party ternary; verb dictated "voted for" 2026-09-30 with the user's "keeping it dynamic" rule (edit the template only, preserve the dynamics) — full-sentence greps miss it, search fragments.
 source: auto-skill
-extracted_at: '2026-09-24T06:59:15.806Z'
+extracted_at: '2026-09-30T13:30:01.000Z'
 ---
 
 # "Where One Nation's new voters came from" (§5b) — auspol-tracker
@@ -21,14 +21,30 @@ extracted_at: '2026-09-24T06:59:15.806Z'
   " 2025 {A} voters now back One Nation"` (e.g. "Almost two in five 2025
   Coalition voters now back One Nation") — and the **dek** is
   "{A} voters have flocked to One Nation at about {r} times the rate of {B}
-  voters. {share} of One Nation's new voters backed the {Z} in 2025." where
-  {A}/{B} follow whichever of lnp/alp rates higher, {r} is the ratio rounded
-  to the nearest quarter, and the second sentence is the OLD head: {share} is
-  rdFraction of the top gain share and {Z} that gainer's party ("the
-  Coalition"/"Labor"/"the Greens"/"another party"). The pre-swap dek tail
-  "{share} 2025 {A} voters now say they'd vote for One Nation." is GONE —
+  voters. {share} of One Nation's new voters voted for the {Z} in 2025."
+  where {A}/{B} follow whichever of lnp/alp rates higher, {r} is the ratio
+  rounded to the nearest quarter, and the second sentence is the OLD head:
+  {share} is rdFraction of the top gain share and {Z} that gainer's party
+  ("the Coalition"/"Labor"/"the Greens"/"another party"). The pre-swap dek
+  tail "{share} 2025 {A} voters now say they'd vote for One Nation." is GONE —
   don't grep for it as a health check. Both figures recompute every build;
   hiC/loC derivation sits at rd-panels.jsx ~:1816-1832.
+  - Verb re-dictated **2026-09-30** ("backed" → "voted for", user quote:
+    "change this copy: Three in five of One Nation's new voters backed the
+    Coalition in 2025. to '…voted for the Coalition in 2025'") with the
+    follow-up rule **"keeping it dynamic"**: copy edits to this sentence go
+    in the TEMPLATE ONLY — `const gainOf = top ? rdCap(rdFraction(top.gain))
+    + " of One Nation's new voters voted for " + (top.id === "lnp" ? "the
+    Coalition" : top.id === "alp" ? "Labor" : top.id === "grn" ? "the
+    Greens" : "another party") + " in 2025." : "";` at rd-panels.jsx ~:1860
+    (rendered at index.html:67420 in that build) — preserving the dynamic
+    party-name ternary and the rdFraction share. The rendered sentence NEVER
+    appears literally in source (assembled from rdFraction + ternary), so a
+    full-sentence grep like "Three in five of One Nation" returns nothing —
+    search generic fragments ("new voters") to locate it, then grep the
+    built index.html for an all-ASCII tail fragment (`new voters voted for`)
+    to confirm the rebuild; the curly ’ in "Nation’s" is \uXXXX-escaped in
+    the built JS (see auto-skill-auspol-built-html-verification).
   - Dek → graphic spacing (user-found loose on phone, 2026-09-29):
     `.rd-mo-wrap { margin-top: 36px }` is the desktop value; **06bb319**
     adds a ≤640px override of **28px**. On phone the card is fully unboxed

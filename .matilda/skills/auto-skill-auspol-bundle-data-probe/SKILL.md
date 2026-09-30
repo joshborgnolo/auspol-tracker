@@ -1,6 +1,6 @@
 ---
 name: auspol-bundle-data-probe
-description: auspol-tracker — verifying healed/added rows actually landed in the BUILT data bundle (assets/9f09dca2-*.js) after a rebuild. The consts are minified onto few lines (line-based greps and line-slice JSON.parse both fail), arrays are embedded literals you extract by bracket-depth parsing, and row date keys are `released` / `ym`+`day` — probes filtered on `p.date` silently match nothing. Four failed probes on 2026-09-23 before these were pinned.
+description: auspol-tracker — verifying healed/added rows actually landed in the BUILT data bundle after a rebuild. PATH FIRST: the bundle is .build/newtracker/assets/9f09dca2-<uuid>.js — the repo-root assets/ is the shipped shell dir (site-shell, cycle-source, fonts) and NEVER contains it; probe it via `new Function` or regex-extract the const from built index.html where the layer is inlined. The consts are minified onto few lines (line-based greps and line-slice JSON.parse both fail), arrays are embedded literals you extract by bracket-depth parsing, and row date keys are `released` / `ym`+`day` — probes filtered on `p.date` silently match nothing. Four failed probes on 2026-09-23, two more on 2026-09-28, before these were pinned.
 source: auto-skill
 extracted_at: '2026-09-23T00:00:00.000Z'
 ---

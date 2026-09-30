@@ -68,10 +68,15 @@ is one and the same", extended to all satellites). Four wiring channels:
   settle→h, needle rotate 0→nd after a double-rAF, skipped under
   prefers-reduced-motion) and the parts take var() strokes, following the
   page's theme exactly as the main page's does.
-- **Story link** – the lockup is `<a class="wm-glyph" href="/#story">`; the
-  main page's Header (73de0c58 asset, after the `window.AP.openStatic` effect)
-  eats hash `#story` on mount into openStory() and clears the hash, so the
-  click does exactly what clicking the main masthead does.
+- **Story link** – the satellite lockup is `<a class="wm-glyph"
+  href="/#story">`; the main page's Header (73de0c58 asset, after the
+  `window.AP.openStatic` effect) eats hash `#story` on mount into openStory()
+  and clears the hash, so the click lands in the same overlay. NOTE
+  (2026-09-29): the MAIN masthead no longer shares this structure — its story
+  player is a DIAL-ONLY `button.wm-glyph` (border-radius 50%) beside a
+  text-only h1 inside a `.lockup` flex row; the satellites deliberately keep
+  the whole-lockup anchor. See auspol-masthead-glyph-player before touching
+  either side, and before trusting the parity probe's byte-identical check.
 - **Ink-width squaring** – the wordmark aligns auspol/tracker by MEASURED ink
   width: site-shell.js runs the same letter-spacing align on load +
   document.fonts.ready.
@@ -88,12 +93,18 @@ request; the d1a1d215 Tabs JSX no longer carries it, the `.tab-link` CSS is
 out of template.html). The Info glossary's implied-2PP and preference-flows
 entries link /preference-flows/.
 
-**Verify**: add `.matilda/probe/masthead-parity.mjs` to the probes below – it
-asserts a satellite's lockup is byte-identical to the main page's (type,
-ink-width squaring, one inline `svg.wm-dial` at 57px, per-part colours,
-graduation heights, settled needle angle), no Archives link on EITHER navbar,
-and /#story opening the `.dl-backdrop` overlay. Two probe traps: the main
-page's React puts stroke-dasharray in the STYLE attribute (read
+**Verify**: add `.matilda/probe/masthead-parity.mjs` to the probes below. Since
+the 2026-09-29 two-structure split (see auto-skill-auspol-masthead-glyph-player)
+it asserts parity on the PARTS, never the wrapper (the wrappers differ on
+purpose): one inline `svg.wm-dial` at 57px (looked up at document scope – the
+dial sits INSIDE `.wordmark` on satellites, beside it in `.lockup` on the main
+page), wordmark face + weights + ink-width squaring, per-part colours,
+graduation heights, needle angle within 1e-3 rad (each page is sampled
+mid-settle, so matrices are never string-equal), no Archives link on EITHER
+navbar, and /#story opening the `.dl-backdrop` overlay. The wordmark SIZE is
+deliberately split too – main 34px (rd.css:402, 32px on the narrow rung) vs
+shell 30px – and the probe pins exactly that pair. Two older probe traps still
+apply: the main page's React puts stroke-dasharray in the STYLE attribute (read
 `el.style.strokeDasharray` first, and inline style serialises comma-separated
 so normalise commas). The Newspoll archive's Infogram embed stalls the load
 event past 30s – navigate with waitUntil "domcontentloaded".

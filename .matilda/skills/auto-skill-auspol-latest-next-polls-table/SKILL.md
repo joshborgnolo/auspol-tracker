@@ -1,6 +1,6 @@
 ---
 name: auspol-latest-next-polls-table
-description: "auspol-tracker — RdPolls ('Latest and next polls' section) anatomy: facet tabs (twopp/primary/leadership) via rd.jsx RdSec data-facet, 6-column desktop grid in rd.css (~:557), per-facet grid-template-columns overrides are a media-query leak hazard (@media (min-width:901px) needed), the facet RdSwap crossfade ghost must stay OUT of flow (position:absolute float, fixed 2026-09-28) or the phone's content-sized figs track snaps ~360ms in when the ghost unmounts (figures visibly jump right/down); probe by toggling tabs headlessly and asserting getComputedStyle(row).gridTemplateColumns + per-cell bounding rects stay constant through the crossfade."
+description: "auspol-tracker — RdPolls ('Latest and next polls' section) anatomy: facet tabs (twopp/primary/leadership) via rd.jsx RdSec data-facet, 6-column desktop grid in rd.css (~:557), per-facet grid-template-columns overrides are a media-query leak hazard (@media (min-width:901px) needed), the facet RdSwap crossfade ghost must stay OUT of flow (position:absolute float, fixed 2026-09-28) or the phone's content-sized figs track snaps ~360ms in when the ghost unmounts, the DESKTOP figs cell must stretch to the row top (6142f35), and the expanded row's change markers reuse rdApChg + gen-data chg.d/r keys shared from rd-allpolls.jsx (ce17e27, 2026-09-30 — dec conventions, filtered-index trap, probe expand via $eval click on the figs cell since the name cell is a site link), and a CSS specificity trap: .rd-pld-prim > span > span (19px) swallows any new child span including .rd-apd-chg markers — fix with :not (48131ae), verify cross-table marker parity with computed-style sets since All-polls swaps classes and primary order; probe facet glitches with a per-frame rAF geometry recorder, NOT strided setTimeout samples. 2026-09-30 (9a87ded): facet figures "slow to populate" vs All-polls = RdSwap's .12s arrival delay on .rd-swap-now.in (a 120ms invisible dead zone on every tab switch) — dropped to `.2s ease-out both`; RdSwap serves ONLY this table's figs head+cells so the retime cannot touch RdCrossfade's (deliberate) identical delay."
 source: auto-skill
 extracted_at: '2026-09-28T02:47:51.147Z'
 ---
@@ -66,6 +66,67 @@ exactly over the right-aligned figures it replaces. Don't put the ghost
 back in flow — desktop's fixed px columns wouldn't bounce, but any
 content-sized track (all phone facets, any future auto column) will.
 
+## The desktop figure-align trap (fixed 6142f35, 2026-09-28)
+
+Reported as "on my laptop … numbers start higher momentarily and then
+glitch into place" in primary view — sounded EXACTLY like the phone ghost
+bounce above, but the per-frame rAF recorder proved there was no transient
+at all on desktop: geometry was final within the first sampled frame. The
+complaint was a PERSISTENT per-facet mis-registration: `.rd-pl-row`
+declares `align-items: center`, and the `.rd-pl-c-figs` cell is a flex
+column whose content differs per facet — primary is a single-line
+`.rd-pl-prim` mini-grid (15px/600) while twopp/leaders are two-line
+main+sub stacks. Centring puts the one-line primary digits ~8–9px LOWER
+than the other facets' digits, so switching into primary visibly drops
+every figure even with zero animation.
+
+Fix: `@media (min-width: 901px) { body.rd .rd-pl-row > .rd-pl-c-figs {
+align-self: stretch; justify-content: flex-start; } }` — exactly one slot
+(row top + 10px padding) in every facet. Phone untouched (≤900px block
+already stacks and was fixed in 105dfd1).
+
+Probe lesson (cost a wasted diagnostic lap): strided `setTimeout`
+sampling discovers STATIC geometry but cannot tell a one-frame transient
+from a persistent offset — use a per-frame rAF recorder during the click
+(`.matilda/probe-rdpl-desktop2.mjs`) and diff consecutive frames before
+concluding "no animation". Trap: synthetic `btn.click()` doesn't set
+`window.__rdInput`, so RdGlide/RdSwap input gates stay shut — probe with
+real `page.mouse.click` and `scrollIntoView({block:"center"})` + ~300ms
+settle first.
+
+## The figures-population timing (user-complaint fix 9a87ded, 2026-09-30)
+
+User report: the table's figures column ("Labor v One Nation",
+"ALP/L-NP/GRN/ON/OTH", "Preferred PM, net approval" — the THREE figHead
+variants was the tell it was the whole column, all facets) is "a little slow
+to populate" compared to All-polls' instantaneous. Diagnosis by measurement,
+not code-reading first:
+
+- **Initial page load was exonerated by a cold probe** — rows AND figs
+  populated at ~86ms from domcontentloaded, `figOp=1`, zero `.rd-swap-was`
+  ghosts. So the complaint was the FACET SWITCH, not the mount.
+- **The switch recorder** (`page.evaluate` arms a per-rAF sampler BEFORE the
+  synthetic click, samples `has/txt/opacity/wasCount`, prints changes-only):
+  the incoming figs mounted at ~12ms ALREADY at opacity 0 and STAYED
+  invisible until ~130ms (a 120ms dead zone, all 8 rows + the head at once),
+  full opacity at ~330ms. Cause: `.rd-swap-now.in { animation: rd-xf-in .2s
+  ease-out .12s both }` (rd.css ~:305) — the `.12s` delay is the RdCrossfade
+  "out, then in" hand-off (rd.css :284 comment: two views' headlines
+  half-seen read as a double exposure). All-polls' tab figures animate
+  `.2s ease-out both` — NO delay, no ghost — hence "instantaneous".
+- **Scope check before retiming**: `RdSwap k=` has exactly TWO call sites,
+  both in rd-polls.jsx (figHead :500, figCell per-row :527) — the component
+  serves only this table, so the timing edit cannot leak into RdCrossfade's
+  panels (whose identical `.12s` delay stays).
+- **Fix**: `.rd-swap-now.in { animation: rd-xf-in .2s ease-out both }` + a
+  why-comment (the ghost still fades out underneath for its 130ms; figures
+  are short, no double-exposure risk). Re-probe: first visibility inside 2
+  frames (opacity .26 at ~45ms), full at ~210ms.
+- **Probing trap**: `#rd-ap-top` does NOT exist on the Snapshot page — the
+  All-polls view only mounts under the `#allpolls` hash; a
+  `waitForSelector("#rd-ap-top")` on the snapshot view burns the whole 30s
+  timeout. (Cost one probe run.)
+
 ## Headless verification recipe
 
 Probe `.matilda/probe/pl-primary-width.mjs` (scratch, not committed) and
@@ -98,3 +159,70 @@ the fix-proofs. Pattern for a facet-rendering change:
   (first click is fine). Investigated 2026-09-28, root cause not landed.
 - Fonts: `tabular-nums` on `.rd-pl`; heavy `.rd-pl-main`/`rd-pl-sub` sizing map
   lives in `rd.css:588-598` with phone overrides in the 900px block.
+
+## The expanded row's change markers (shipped ce17e27, 2026-09-30)
+
+User asked for the All-polls expansion's DELTAS ("add detlas … like in the all
+polls table") on `detail(e)` in rd-polls.jsx. Implementation notes that hold:
+
+- **`rdApChg` is shared across same-layer files**: like `rdPollHead`, it is
+  defined top-level in rd-allpolls.jsx and called from rd-polls.jsx at
+  runtime — no import/export needed, the built layer concatenates both.
+- **chg payload** (gen-data.mjs `chgByKey`, per-poll `{d, r}`, ~:1703-1757):
+  keys `pAlp pLnp pGrn pOnp pOth`, `imp`, `impOn`, `alp2pp`, `altAlpOn`,
+  `albNet taylorNet hansonNet`, `ppmAlb ppmOpp ppmHan`, `und`, `flows`;
+  `d[k]` is the delta on the pollster's previous wave publishing that key,
+  `r[k]` that wave's ISO date. **Decimal places differ per measure** in
+  RdApDetail and must match there: primaries/nets/published-2PP dec 0,
+  implied dec 1.
+- **The filtered-index trap**: mapping delta keys by index over a FILTERED
+  array breaks when a middle element is null (e.g. `taylorNet` absent shifts
+  Hanson onto `"taylorNet"`). Carry the key inside the tuple through
+  `filter` then `map`: `[["Albanese", a.albNet, "albNet"], …]`.
+- **`.rd-apd-chg`** (rd.css:1863, 12px ink-3 nowrap) is plain `body.rd`
+  scoped — reusable inside rd-pld with no new CSS. Primary cells render
+  `rdApChg(…) || "\u00a0"` so every figure keeps its delta slot and the
+  columns' baselines stay level (All-polls uses `|| " "`).
+- The "Changes are on pollster's field poll." provenance note under the
+  dl takes its ref date from `chg.r.pOnp || pAlp || impOn || imp || alp2pp`
+  (same priority as RdApDetail) and looks the wave up in
+  `D.individualPolls` for its `field` label.
+- Preferred-PM deliberately has NO delta there because RdApDetail's
+  better-PM row carries none — "like the All-polls table" means matching
+  its omissions too.
+- **Probe lesson**: expanding a row headlessly, DON'T coordinate-click the
+  row — the name cell is an external site link (`a[target=_blank]`) when the
+  pollster has a projection `site`, so a click there navigates and the await
+  dies with `frame got detached` (burnt one probe run at 390px). Expand with
+  `page.$eval(".rd-pl-item .rd-pl-c-figs", el => el.click())` — the figs
+  cell is plain in every facet, and plain React onClick works synthetic
+  (the row toggle has no `__rdInput` gate, unlike RdGlide/RdSwap).
+- **The `.rd-pld-prim` number-rule swallows inserted spans (fixed 48131ae,
+  2026-09-30)**: user reported the new markers rendered much BIGGER in the
+  Latest expansion than in All-polls — because
+  `body.rd .rd-pld-prim > span > span { font-size: 19px; font-weight: 600 }`
+  (rd.css ~:757) matches EVERY span under each primary party cell, including
+  the third-child `.rd-apd-chg` span ce17e27 appended there, overriding its
+  12px class rule (element+descendant+structure selectors at body.rd scope
+  beat the bare `.rd-apd-chg` class). Fix is ONE selector:
+  `.rd-pld-prim > span > span:not(.rd-apd-chg)` — excluded classes, don't
+  add a competing override. Lesson: when reusing a shared marker class
+  inside a cell whose original author sized children by POSITION
+  (`> span > span`), any new child enters that rule too. Values were never
+  wrong — both tables render the same gen-data `chgByKey` object — so probe
+  computed style on the marker spans before touching data.
+- **Cross-table parity probe** (`.matilda/latest-delta-probe.mjs`, scratch):
+  expand the Latest row BEFORE clicking the All-polls page-level tab — that
+  tab switch unmounts the Snapshot view holding the table and kills cached
+  element handles. In All-polls, primary markers are `.rd-apd-sub` spans,
+  not `.rd-apd-chg` (that's the clause-marker class there), and primary
+  ORDER differs (All-polls sorts parties by value; Latest is fixed
+  order) — compare marker strings as SORTED SETS. Row identity: All-polls
+  row text is like "Essential↗The Guardian", so split on `↗` to match the
+  Latest row's pollster name.
+- `rdPollRow` (rd-polls.jsx top) maps a quiet house's last individualPoll
+  into pollsterTable shape for rows with a projection but no Latest row. It
+  forwards `chg` already, so the delta work needed no gen-data edit — but it
+  DROPS fields (`sampleEff`, `eff`, `dir`, `iss`, `releaseUrl`), so a future
+  detail feature that needs one of those for a quiet house extends
+  `rdPollRow`, nothing else.

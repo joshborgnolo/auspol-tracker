@@ -3,6 +3,7 @@ name: essential-vi-assimilator
 description: The Essential VI assimilator (.build/assimilate-essential-vi.mjs) — converts data/essential-report.csv waves into polls.json poll rows + approval/direction series; CSV vocab (Trend visual TOTAL: Approve/Disapprove, dataset-id-keyed approvals because question labels retitle on leadership changes), the Retro-fill self-repair pass, dup-guard tolerances (±2d date / ±10d figures), published/dateStart conventions, direction rows filing url (the report page — mood-only waves have no Guardian write-up) + published (T01:00 stamp) at insert with a url-null heal that back-fills every Essential direction row, the KNOWN_OTHER_APPROVALS warning gate, and the wrapper's two-run trigger model (CSV-change OR report-index drift) with --apply no-op hygiene (notes vs fixes; proof only when touched). Assimilator 62b0179 + wrapper gating 9cf8a9a (2026-09-02).
 source: auto-skill
 extracted_at: '2026-09-02T00:00:00.000Z'
+last_updated: '2026-09-30T00:00:00.000Z'
 ---
 
 # Essential VI assimilator (data/essential-report.csv → data/polls.json)
@@ -70,8 +71,9 @@ the releaseUrl retro-fill land hours apart, never in the same run.
 
 ## Conventions duplicated from curated rows
 
-- `published = csvDate + 1d + "T01:00"` (Guardian 01:00 Sydney embargo stamp);
-  `dateStart = date − 5d` (fieldwork window); `client: "The Guardian"`.
+- `published = csvDate + 1d + "T01:00"` (Guardian 01:00 Sydney embargo stamp) —
+  **omitted at insert when that stamp is still in the future** (the embargo gate
+  below); `dateStart = date − 5d` (fieldwork window); `client: "The Guardian"`.
 - `releaseUrl` resolves from `.build/essential-src/report-index.json` with ±1 day slack
   (WP UTC date vs Sydney wave label). Missing ⇒ logged note, retro-fill fills it later.
 - Guardian article `url` is NOT derivable — log "hand-set the Guardian write-up URL".

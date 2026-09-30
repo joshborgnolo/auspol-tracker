@@ -1,6 +1,6 @@
 ---
 name: auspol-direction-dek
-description: "auspol-tracker — the National-direction panel's head+dek generator (RdDirection in rd-panels.jsx ~:820-845; dek's NET framing shipped 464b57c, 2026-09-28, vivid-verb ladder added same day: 'Net mood has plummeted, down N points in a month and M points since May 2025'): now.chg/sinceFirst are NET changes (right minus wrong), netVerb grades plummeted/soured/soured slightly (up: soared/lifted/lifted slightly) by N>=10|6|<6 inside the changeSig gate only, netWord/upDown keep wording leadership-agnostic, rdRoughPts owns the election figure ('more than 30', never a hard-coded flat 30), the old-design DirectionPanel carries DIFFERENT legacy copy — the dek is a SINGLE home, not a two-homes pair."
+description: "auspol-tracker — the National-direction panel's head+dek generator (RdDirection in rd-panels.jsx ~:820-845; dek's NET framing shipped 464b57c, 2026-09-28, vivid-verb ladder added same day: 'Net mood has plummeted, down N points in a month and M points since May 2025') plus the net chip under the share bar ('▼ 5.4 on a month ago, within the margin' when changeSig is false — bcda719, 2026-09-30): now.chg/sinceFirst are NET changes (right minus wrong), netVerb grades plummeted/soured/soured slightly (up: soared/lifted/lifted slightly) by N>=10|6|<6 inside the changeSig gate only, netWord/upDown keep wording leadership-agnostic, rdRoughPts owns the election figure ('more than 30', never a hard-coded flat 30), the old-design DirectionPanel carries DIFFERENT legacy copy — the dek is a SINGLE home, not a two-homes pair. The 'within the margin' idiom is a site-wide promise (hero chip, Info guide) — keep every panel's insignificant-move chip on the same terse wording."
 source: auto-skill
 extracted_at: '2026-09-28T01:45:57.762Z'
 ---
@@ -81,6 +81,37 @@ each deliberate deviation in the summary. With the 464b57c refactor the only
 direction-dependent phrase left is the "Only N%" lead-in (which needs
 `wrongLeads`); future edits should not reintroduce `wrongLeads` into the
 movement wording.
+
+## The net chip under the bar (.rd-dir-net, ~:943-944 — qualifier shipped bcda719 2026-09-30)
+
+"Net −39.0 points, ▼ 5.4 on a month ago" is a SECOND place the significance
+gate shapes user-facing copy: when `now.changeSig === false` it now renders
+", within the margin" on the tail. Gate it on `=== false` exactly — a
+significant move gets no qualifier, and `changeSig` may be absent (gen-data
+only sets it when the net nowcast's changeCi95 exists), so the loose
+falsy test would misrename those panels.
+
+Origin: the user hit Net −39.0 with a ▼ 5.4 month dip beside a dek saying
+"held steady" and asked "should it say …, within the margin?" — the −5.4
+was honest but well inside the change's own 95% band (changeCi95 was 10.9;
+the direction series is three houses and sometimes one, the widest band on
+the site, which gen-data's own comment says is the honest shape). The chip
+is the exact spot the contradiction read, so the qualifier went THERE, not
+into the dek.
+
+"Within the margin" is the user's chosen terse wording — do NOT re-expand
+to "…of error". It matches the established idiom elsewhere on the site:
+- the 2pp hero's month chip (rd-panels.jsx `change` const, ~:103):
+  `sig === false` → ", within the <RdTerm id='margin-of-error'>margin</RdTerm>"
+  and `sig === true` → ", a significant rise/fall" (RdTerm lives in rd.jsx
+  ~:522; the direction chip stays PLAIN text — RdTerm isn't imported there
+  because the glossary opens from "two-party preferred" context).
+- the old design's trend-chart tooltip title (a11e1559 ~:1663):
+  "vs a month ago – within the margin".
+- the Info guide's "Beside a figure in a panel" entry, which already
+  promised: "When the move is smaller than its margin of error, the
+  headline says 'within the margin'" — and lists national direction among
+  those figures. Direction's chip was the gap making that copy false.
 
 ## Neighbour machinery that is deliberately NOT net-framed
 

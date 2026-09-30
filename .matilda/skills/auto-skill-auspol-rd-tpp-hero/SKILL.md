@@ -100,6 +100,36 @@ A 2026-09-28 probe "failure" was the probe expecting "4 4" for the compare
 series when it's "6 6" — verify the encoding in the renderer before
 asserting on rendered zeros.
 
+## Lead gauge (RdLeadGauge) — the first-frame width contract
+
+`RdLeadGauge` (~rd-hero.jsx:20) sizes to its parent via a measured-width
+state (`w`, min 760) fitted by a ResizeObserver in a layout effect; every
+element's x geometry is computed from `w` (`cx = w/2`, `unit` clamp,
+`X(v)`; phones land on w = parent ≈ 350 inside the page padding). The
+spans/caps/dots carry a `.32s var(--morph-ease)` `left`/`width` transition
+(rd.css ~:534), so ANY step change in `w` interpolates positions — which
+is why the width state must be measured before the FIRST paint (fix
+460a75c, 2026-09-30, the Snapshot-tab bounce/right-overflow report):
+
+- PRE-FIX: `useState(760)` mounted with desktop geometry; on a tab
+  remount one 760 frame painted before the fit's setW landed and the
+  transitions then slid children 760→350 era. Mid-interpolation the dot's
+  right edge reached 408px on a 390px phone (absolute children extend
+  `documentElement.scrollWidth` even with the parent already correct) —
+  the reader felt a bounce / saw right-edge overflow.
+- POST-FIX contract: `useState(0)` is the unmeasured sentinel; the div
+  renders `width: w || "auto"` + `visibility: w ? "visible" : "hidden"`
+  until the observer measures, so its first painted geometry is already
+  final. The mercury settle (`settled` after SETTLE_MS, collapsed at `cx`
+  then spreading) is independent of this and must keep working.
+- Regression probe: `.matilda/probe/snapshot-tab-overflow.mjs` (per-rAF
+  scrollWidth/innerWidth sampler around a Snapshot tab click; asserts
+  zero frames wider than the captured viewport at phone and laptop
+  rungs). Full method in `auto-skill-auspol-mobile-overflow-probe` —
+  transient-overflow section. Note `.rd-lg` itself has NO CSS transition
+  and no overflow clipping; the `.rd-lg-dot` shares the reduced-motion
+  override list with the chart's `.rd-tpp-dot`.
+
 ## Probe & verification
 
 `.matilda/rd-tpp-hero-probe.mjs` (14 checks, harness copied from

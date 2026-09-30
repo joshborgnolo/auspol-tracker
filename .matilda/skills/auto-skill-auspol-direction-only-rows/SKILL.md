@@ -1,6 +1,6 @@
 ---
 name: auspol-direction-only-rows
-description: "auspol-tracker — the All-polls Direction facet's direction-only rows (SEC Newgate's waves + Essential's three 2025 national-mood-only waves, shipped 2026-09-29): extract-secnewgate files sample+url+published in the direction row (Essential's assimilator heals url/published onto all its direction rows), gen-data emits directionOnlyPolls (sample carried over from the VI join or the house's own n, dir.eff footprint) + directionPolls dots, d1a1d215 merges dirOnly on facet==='direction' only (housesDir, housesV, URL_HOUSES append), EVERY facet's tally denominates against totalAll ('163 of 173'), the RdApDetail direction 'How it counts' rail (net mini chart + usual lean + today's net, release link and publish stamp in the head), ed2260de ROW_KEYS joins them so Snapshot dots can 'open this poll', ?f=d URL state, phone-card field/sample join quirks ('Leaders' tab label), no-VI waves drop the RdApDetail 2PP matchup grid wholesale (hasMatchup OR of every matchup cell's nulls), the rd-ap-dbar drops its zero-width unsure strip (the flex gaps each side of it doubled the divider), and the dir-facet.mjs acceptance probe."
+description: "auspol-tracker — the All-polls Direction facet's direction-only rows (SEC Newgate's waves + Essential's three 2025 national-mood-only waves, shipped 2026-09-29): extract-secnewgate files sample+url+published in the direction row (Essential's assimilator heals url/published onto all its direction rows), gen-data emits directionOnlyPolls (sample carried over from the VI join or the house's own n, dir.eff footprint) + directionPolls dots, d1a1d215 merges dirOnly on facet==='direction' only (housesDir, housesV, URL_HOUSES append), EVERY facet's tally denominates against totalAll ('163 of 173'), the RdApDetail direction 'How it counts' rail (net mini chart + usual lean + today's net, release link and publish stamp in the head), ed2260de ROW_KEYS joins them so Snapshot dots can 'open this poll', ?f=d URL state, phone-card field/sample join quirks ('Leaders' tab label), no-VI waves drop the RdApDetail 2PP matchup grid wholesale (hasMatchup OR of every matchup cell's nulls), the rd-ap-dbar drops its zero-width unsure strip AND scopes its border-left separators to frame that strip alone (user directive 2026-09-29: a no-unsure bar's two answers meet with nothing painted between — the lone i+i divider read as a phantom grey strip on SEC waves), and the dir-facet.mjs acceptance probe."
 source: auto-skill
 extracted_at: '2026-09-29T01:00:00.000Z'
 ---
@@ -102,7 +102,7 @@ placeholder dash `—` where not.
   (p.releaseUrl || p.url) need no direction special case — the fields
   ride the emitted row.
 
-## No matchup grid when there's no VI; the direction bar's separator stays 2px
+## No matchup grid when there's no VI; the direction bar's separators frame the unsure strip only
 
 - RdApDetail's 2PP matchup block (rd-allpolls.jsx, the `.rd-apd-grid`
   with its `.rd-apd-th` "v One Nation" / "v Coalition" heads and the
@@ -117,29 +117,39 @@ placeholder dash `—` where not.
   unaffected; the non-redesign ArchPollDetail in d1a1d215 never had the
   grid (meta band + PollLedger), so it needed no co-edit.
 - The row's direction-bar picture `.rd-ap-dbar` (rd-allpolls.jsx
-  ~:1133-1141; css rd.css :1785-1790 + phone :1945) is `display:flex`
-  over `flexGrow: d.right/unsure/wrong` items. Two separator lessons,
-  both pinned by the probe:
+  ~:1133-1141; css rd.css :1785-1792 + phone :1945) is `display:flex`
+  over `flexGrow: d.right/unsure/wrong` items. Three separator lessons,
+  all pinned by the probe:
   - A zero-width item still took the flex `gap: 2px` on BOTH sides, so
     SEC's `unsure: 0` strip left 2px+2px=4px of white dividing
     right-direction from wrong-track while bars carrying an unsure
     share showed single 2px separators. The middle `<i className="u">`
-    renders only when `d.unsure > 0` — one separator in every case, and
-    the first/last-child border-radius ends never move. The DOM tell
-    of the bug: a mounted `i.u` whose inline `flexGrow` is 0.
-  - Even then the gaps did not RENDER uniformly: segment widths are
-    fractional (percent splits across an absolute-width bar), so each
+    renders only when `d.unsure > 0` — the first/last-child
+    border-radius ends never move. The DOM tell of the bug: a mounted
+    `i.u` whose inline `flexGrow` is 0.
+  - Transparent flex gaps do not RENDER uniformly on a bar with
+    proportional widths: segment widths are fractional, so each
     transparent 2px gap landed at a different fractional device-pixel
     offset and anti-aliased into a visibly different thickness across
     rows — and between the two dividers inside one bar (user report
     2026-09-29; headless dump confirmed every gap measured 2.00 CSS px
-    in layout). The separator is therefore an OPAQUE `border-left: 2px
-    solid var(--line)` on every `i + i` (no `gap` on the bar):
+    in layout). The separator is therefore an OPAQUE
+    `border-left: 2px solid var(--line)` (no `gap` on the bar):
     border-boxes pixel-snap to the device grid, so every divider paints
     the same thickness. With content-box sizing and `flex-basis: 0`
     the border sits between segments exactly where the gap did.
     Never reintroduce a transparent-gap separator in a bar with
     proportional widths — on any facet.
+  - But a divider that OUTLIVES its strip reads as the strip itself.
+    The generic `i + i` border painted one lone grey line between
+    right and wrong on every SEC wave, and to the user that line WAS
+    an unsure component (third report, 2026-09-29: "if unsure = 0,
+    grey component should = 0"). The borders are now scoped to frame
+    the strip alone — `i.u, i.u + i` (the strip and the segment
+    following it) — so a no-unsure bar paints NO separator at all:
+    its green and red answers meet directly. Any future row bar with
+    an optional middle band needs the same "decorations die with the
+    band" scoping, not a blanket sibling rule.
 
 ## Tally denominators — the archive extent, not the facet's rows
 
@@ -209,9 +219,12 @@ off the mounted rows: no `i.u` survives with a non-positive inline
 flexGrow, every SEC row's `.rd-ap-dbar` is exactly two `<i>` children,
 the facet still mounts the middle strip where a reading carries an
 unsure share, every bar's computed `column-gap` is `normal`/`0px`, and
-every non-first segment carries the one computed `2px` `border-left`
-in the resolved `--line` colour (resolving the var through a scratch
-element). Two traps hit live: (1) the 2025-05-11 Essential
+the separators pin framed-only: a segment that IS or DIRECTLY FOLLOWS
+an `i.u` carries the computed `2px` `border-left` in the resolved
+`--line` colour (var resolved through a scratch `<span
+style="color:var(--line)">`), while every segment of a no-unsure bar
+computes `borderLeftWidth: 0px`. Two traps hit live: (1) the 2025-05-11
+Essential
 mood-only wave must be opened via /Essential[\s\S]*7–11 May/ —
 plain /Essential/ matches a VI
 row first and its detail has no direction rail; (2) the head credits

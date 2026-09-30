@@ -24,24 +24,63 @@ JSX, gen-data, or polls.json.
   `body.rd .rd-head-meta .meta-k` (~:349). JSX is in the 73de0c58 asset
   (~:417/429/435/455) as `<span className="meta-k">Latest poll</span>`; the
   phone compact line (:410) was already sentence case.
-- Poll header band "This poll · Fieldwork … · n = … · Published by …" →
-  `body.rd .rd-pld-h` (~:653, Latest tab, rd-polls.jsx:335) AND
-  `body.rd .rd-apd-h` (~:1638, All-polls detail). The string is built once by
-  `rdPollHead(p)` in rd-allpolls.jsx:116-125 and rendered through
-  `<span className="rd-apd-h">{rdPollHead(p)}</span>` (:393) — TWO renderer
-  CSS homes for one source string.
-- "How it counts" → same `.rd-apd-h` rule (rd-allpolls.jsx:453).
+- Poll header band "Conducted on … from a sample of … , published by …" →
+  `body.rd .rd-pld-h` (rd.css :739, Latest tab, rd-polls.jsx:335) AND
+  `body.rd .rd-apd-h` (rd.css :1824, All-polls detail, rd-allpolls.jsx:454).
+  The string is built once by `rdPollHead(p)` in rd-allpolls.jsx — TWO
+  renderer CSS homes for one source string. **Letter-spacing REMOVED from
+  both rules (and from `.rd-nocaps`, rd.css :1823) by 3e34bc1, 2026-09-29**
+  — see the de-spaced note below; the heads now set at default spacing.
+- "How it counts" → same `.rd-apd-h` rule (rd-allpolls.jsx:514); also
+  de-spaced by 3e34bc1 (shared class — splitting it out would need a JSX
+  modifier, which the user did not ask for).
 - "v One Nation / v Coalition" column heads → `body.rd .rd-apd-th` (~:1650);
   heads defined at rd-allpolls.jsx:333/:336.
+
+Once caps-laden, now de-capped (kept here so no one hunts for transforms
+that no longer exist):
+
+- Issues tally label, `body.rd .rd-is-tallab b` (rd.css) — REMOVED by
+  355a6e2 (2026-09-28): the 12px caps+tracking eyebrow "Weighted by
+  importance" became the plain 14px/600 sentence-case label
+  "Issue-importance-weighted trust score" (user-requested).
+- Issues scoreboard chip party names, `body.rd .rd-is-score i` (rd.css
+  ~:1146) — REMOVED by 6ca8ea8 (2026-09-29): the user's "make these party
+  names sentence case" was again a CSS-only ask — ISS_PARTY_CAP already
+  stored "Labor"/"Coalition"/"One Nation", so the fix was deleting
+  `letter-spacing: 0.04em; text-transform: uppercase` from the one rule
+  (no letter-spacing at all after: the de-capped label is a chip part, not
+  a meta label, so the 0.02em meta convention below didn't apply). Pinned
+  by `.matilda/probe-issues-tally.mjs` asserting chip `text-transform: none`
+  + the exact rendered texts.
+
+De-SPACED (tracking removed after de-capping; do not re-add):
+
+- Poll head sentence + its figures (3e34bc1, 2026-09-29): the rdPollHead
+  "Conducted on … …" sentence kept `letter-spacing: 0.02em` on `.rd-pld-h`,
+  `.rd-apd-h` AND the `.rd-nocaps` figure span as a leftover from the caps
+  pass; the user's read: "leftover from when it was small caps … runs a
+  little large" on a full sentence. Lesson: **0.02em is the convention for
+  short meta LABELS; a full de-capped SENTENCE sets at default (no
+  letter-spacing declaration at all)** — and a nowrap figure span inside
+  such a sentence must drop its own tracking too, or the figures set wider
+  than the words around them. Pinned by
+  `.matilda/probe/head-letter-spacing.mjs`: expands the Latest row
+  (`.rd-pl-row` click) and the first archive row (`.rd-ap-row` click —
+  role=row divs, NOT tbody tr) and asserts computed `letter-spacing:
+  normal` + the rendered text on both heads and How-it-counts.
 
 ## Conventions chosen
 
 - letter-spacing: caps rules used 0.04–0.06em; non-caps small labels use
   **0.02em** (matches `.meta-k` in template.html:761). Use 0.02em when
-  de-uppercasing.
-- `.rd-nocaps` (rd.css:1637) protects "n = 1,500 (eff. …)" from the parent
-  transform. It becomes a no-op once the parent transform is removed — kept
-  deliberately as documentation.
+  de-uppercasing a short LABEL — never on a full sentence or a component
+  that isn't a tracking-styled meta tag at all (poll heads, tally label,
+  chips above all take none).
+- `.rd-nocaps` (rd.css :1823) protects "n = 1,500 (eff. …)" from the parent
+  transform. Its `text-transform: none` is vestigial (NO ancestor
+  uppercases) and its letter-spacing was dropped in 3e34bc1 — the rule now
+  exists only for `white-space: nowrap`.
 - Deliberately untouched in the pass (components the user didn't name):
   `.rd-pl-head` Latest-table column heads (:561), archive `.rd-ap-th` (:1506),
   `.rd-ap-cap` (:1531), `.rd-ap-sheetk` (:1785), plus :1026/:1275/:1327.

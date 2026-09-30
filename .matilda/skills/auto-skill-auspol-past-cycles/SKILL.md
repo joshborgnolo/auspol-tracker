@@ -1,6 +1,6 @@
 ---
 name: auspol-past-cycles
-description: auspol-tracker — Past-cycles machinery end-to-end (CYC_META → CYCLE_DEFS → 9f09dca2 data asset + root cycle-source.<hash>.json). Adding a historical cycle is ONE CYC_META row + ONE elections row in polls.json; the renderer, accuracy panel, legend and CSV export are fully data-driven — only copy strings hard-coding the count (now "ten"/"since 1996") need parallel edits. Keyed gotchas: src keys cyclePolls by term-END election, appr keys cycleApproval by term-START, ELECTIONS["e"+year] must exist for the lead-anchor, and accuracy rows are labelled by the election being CALLED (c.src), not the term-start year. The CycleChart person-toggles (Hanson '25 `hanCtl`, One Nation) are the ONE non-CYC_META part: they gate on DATA AVAILABILITY, never the cycle rows — Hanson can stand alone with every chip off (a062495). Board rows name split terms with BOTH officeholders from c.raw.netEras joined "–" ("Rudd–Gillard", 90db0a4); D.cycles items are TRANSFORMED objects — eras/series live under .raw, never top-level. Also covers the historical ribbon (7240d7d): band = 3+ past terms HOLDING THE MEASURE via hasData (the cycBanded helper is deleted, 20ef05e — data-less era-bucket terms 1972-84 hold no fan seat, move no caption year, name no strip entry; a lifted one is a no-op on approval cards); drawnCycles swap; pctOf quartile stats; TrendChart areas (cyc-band lo/hi fills, class-beats-opacity-attribute theming; fill colour is the --cyc-fill variable = color-mix oklch 50/50 Labor→Coalition purple since ab4de49, one :root definition that follows theme via use-site var resolution); ('Mean of past terms' series with per-point n-of-N-tooltip notes; legend caption .cyc-band-note. Per-term event lines (CYC_EVENTS) follow ONE singled-out term via eventCycle = solo || single-forward-past || sitting-term-fallthrough (5995b8f). Card captions are measure-lead fan descriptions shared across FIVE charts (net/oppnet/ppmm/primary/tpp since a670008): approval cards lead with the literal "Approval minus disapproval" (0929fac — the rename is CAPTION-LEAD-scoped: glossary bodies, the Hanson note and the Latest-table metric link keep "approve minus disapprove" as formula words), the others lead with their own CYC_METRICS sub (ppmm "PM's lead on the preferred-PM question", tpp "Governing-party 2PP" — hyphenated); "<lead>, with a historical fan chart for all|selected previous terms since <firstYear>" where firstYear = min visible past-term year HOLDING THE MEASURE (hasData-gated since 20ef05e — approval/PPM captions open "since 1987" while the 1972-84 buckets are approval-empty; front-trims re-anchor the year, only interior DATA-BEARING gaps flip 'all'→'selected'), outcome-filter clause " that ended in a returned/ousted government" appended last (no comma, 08f2cca); the 'net approval' glossary tap-to-define lives in the CARD TITLE h2 via .hi-term (8b36759, keep the phrase 'net approval' intact in CYC_METRICS titles or the link silently dies); `hidden` is a Set — .size/.has(), never .length; card subs live ONLY in CYC_METRICS (index.html string hits are the compiled bundle, auspol-polling.html is a different legacy page). Outcome vocabulary is ousted/Ousted everywhere user-facing (turned out retired 2026-09-27, ids were already "ousted"); outcome copy lives in TWO compiled layers — d1a1d215 (popover quick-opts + explainer) AND rd-cycles.jsx, the redesign's own Past-cycles tab (compare-pill labels, chip outcome tags, tip row, head/dek insight strings) — a rename must grep BOTH.
+description: auspol-tracker — Past-cycles machinery end-to-end (CYC_META → CYCLE_DEFS → 9f09dca2 data asset + root cycle-source.<hash>.json). Adding a historical cycle is ONE CYC_META row + ONE elections row in polls.json; the renderer, accuracy panel, legend and CSV export are fully data-driven — only copy strings hard-coding the count (now "ten"/"since 1996") need parallel edits. Keyed gotchas: src keys cyclePolls by term-END election, appr keys cycleApproval by term-START, ELECTIONS["e"+year] must exist for the lead-anchor, and accuracy rows are labelled by the election being CALLED (c.src), not the term-start year. The CycleChart person-toggles (Hanson '25 `hanCtl`; the `oppr`-only "Combine L/NP and ON" checkbox `showOnp`, cyc-comb sum series, cd6cdd4 — it REPLACED the old "One Nation this term" overlay) are the ONE non-CYC_META part: they gate on DATA AVAILABILITY, never the cycle rows — Hanson can stand alone with every chip off (a062495). Board rows name split terms with BOTH officeholders from c.raw.netEras joined "–" ("Rudd–Gillard", 90db0a4); D.cycles items are TRANSFORMED objects — eras/series live under .raw, never top-level. Also covers the historical ribbon (7240d7d): band = 3+ past terms HOLDING THE MEASURE via hasData (the cycBanded helper is deleted, 20ef05e — data-less era-bucket terms 1972-84 hold no fan seat, move no caption year, name no strip entry; a lifted one is a no-op on approval cards); drawnCycles swap; pctOf quartile stats; TrendChart areas (cyc-band lo/hi fills, class-beats-opacity-attribute theming; fill colour is the --cyc-fill variable = color-mix oklch 50/50 Labor→Coalition purple since ab4de49, one :root definition that follows theme via use-site var resolution); ('Mean of past terms' series with per-point n-of-N-tooltip notes; legend caption .cyc-band-note. Per-term event lines (CYC_EVENTS) follow ONE singled-out term via eventCycle = solo || single-forward-past || sitting-term-fallthrough (5995b8f). Card captions are measure-lead fan descriptions shared across FIVE charts (net/oppnet/ppmm/primary/tpp since a670008): approval cards lead with the literal "Approval minus disapproval" (0929fac — the rename is CAPTION-LEAD-scoped: glossary bodies, the Hanson note and the Latest-table metric link keep "approve minus disapprove" as formula words), the others lead with their own CYC_METRICS sub (ppmm "PM's lead on the preferred-PM question", tpp "Governing-party 2PP" — hyphenated); "<lead>, with a historical fan chart for all|selected previous terms since <firstYear>" where firstYear = min visible past-term year HOLDING THE MEASURE (hasData-gated since 20ef05e — approval/PPM captions open "since 1987" while the 1972-84 buckets are approval-empty; front-trims re-anchor the year, only interior DATA-BEARING gaps flip 'all'→'selected'), outcome-filter clause " that ended in a returned/ousted government" appended last (no comma, 08f2cca); the 'net approval' glossary tap-to-define lives in the CARD TITLE h2 via .hi-term (8b36759, keep the phrase 'net approval' intact in CYC_METRICS titles or the link silently dies); `hidden` is a Set — .size/.has(), never .length; card subs live ONLY in CYC_METRICS (index.html string hits are the compiled bundle, auspol-polling.html is a different legacy page). Outcome vocabulary is ousted/Ousted everywhere user-facing (turned out retired 2026-09-27, ids were already "ousted"); outcome copy lives in TWO compiled layers — d1a1d215 (popover quick-opts + explainer) AND rd-cycles.jsx, the redesign's own Past-cycles tab (compare-pill labels, chip outcome tags, tip row, head/dek insight strings) — a rename must grep BOTH. The redesign phone summary grid keeps long Re-elected rank notes out of the shared Now column by spanning `.rd-cs-rank` across row 3 (8c6fc24); verify name wrapping with text-node Range rects at 390/430/480px, never element-content ranges.
 source: auto-skill
 extracted_at: '2026-09-04T06:57:40.352Z'
 ---
@@ -236,9 +236,11 @@ side (AccuracyPanel in d1a1d215 + two CSS lines in template.html); gen-data's
   `.acc-group-h.acc-group-more { margin-top: 18px }`.
 - **Probe gotcha**: AccuracyPanel renders ONLY in the Past-cycles view —
   on the default page a DOM probe finds 8 `.card`s and NO `.acc-card`.
-  Click the "Past cycles" tab (`[...document.querySelectorAll("button,a")]
-  .find(b => /past cycles/i.test(b.textContent)).click()`) before
-  waiting on `.acc-card .acc-row`.
+  Open the tab FIRST: prefer the hash (`page.goto(url + "/#cycles")` —
+  readHash in 73de0c58 keys tab state on it) over clicking a button found
+  by label text; the phone tab row shortens "Past cycles" to "Cycles" and
+  nested spans can break textContent regexes (this recipe bit twice on
+  2026-09-30 — see auspol-headless-geometry-verify).
 - Verified by DOM probe (not pixel diff): subhead text/classes, row order
   2025,2022,2019,2016,2013 | 2010,2007,2004,2001,1998,1996,1993, zero
   page errors.
@@ -318,6 +320,57 @@ exception — hand-wired in the d1a1d215 asset (hash churns; grep `hanCtl` or
   only under `showHan`.
 - Verify in built index.html: `hidden.has(hanCycle` → 0 hits, `cyc-han` still
   present (babel keeps the class string).
+
+## Renderer: "Combine L/NP and ON" primary checkbox (commit cd6cdd4, 2026-09-30)
+
+The opposition-primary chart's old "One Nation this term" overlay (a lone ON
+line over every past term, series id `cyc-onp`, class `.cyc-onp`) is GONE —
+the user had the checkbox REWIRED, not added-to ("the checkbox becomes
+that"). Ticking "Combine L/NP and ON" now sums the Coalition's and One
+Nation's first-preference votes and draws the total over the CURRENT term
+only: one dotted line in neutral ink (past-term right-bloc history was
+judged crowd, not context). Every home of the checkbox:
+
+- **`M.onp` is the master gate** — only the `oppr` CYC_METRICS entry carries
+  `onp: true` (the government-primary card `primary` has no party pair that
+  sums to anything meaningful and must STAY checkbox-free). `M.onp` gates the
+  cycDomain overlay block, the `M.onp && showOnp` series builder, BOTH
+  checkbox renders (legacy `pg-check` label + the redesign `RdCheck` in
+  rd-cycles.jsx) and the strip pill. The state is still named
+  `showOnp`/`setShowOnp` in d1a1d215 (~:2958) — semantics changed, wiring
+  didn't; rd-cycles.jsx folds `showOnp` into viewKey so morphs work.
+- **Series builder** (d1a1d215, grep `cyc-comb`): over `shown.find(x =>
+  x.current)` only; a monthly point exists ONLY where BOTH `c.raw.oppr[i]`
+  and `c.raw.onp[i]` are non-null (never invent a partial total — no
+  carrying a single party when the other is missing that month).
+  Change-since-election anchor is `cycBase(c,"oppr") + cycBase(c,"onp")`,
+  and the y-domain's overlay block computes the same sum so ticking never
+  rescales past what's drawn.
+- **Presentation**: id `cyc-comb`, label `"L/NP + One Nation"`, `color:
+  "var(--ink-2)"` (NEUTRAL ink — no party owns a sum of two; template.html
+  pairs `.cyc-comb.on { color: var(--ink-2) }` beside
+  `.cyc-han.on { color: var(--onp-text) }`, `.cyc-onp` selector deleted),
+  `dash: "1 3"`, endLabel `"L/NP+ON"`, and overlayYears' strip-pill years
+  (d1a1d215, chip-plural helper) now needs BOTH `p.p.lnp != null && p.p.onp
+  != null`.
+- **Redesign renderer** in rd-cycles.jsx has three matching homes: the
+  series special-case `s.id === "cyc-comb" || s.id === "cyc-han"`; the
+  overlayNotes filter + note text `"L/NP + ON " + fmt(last.y)` (note lives
+  IN the svg as `<text>`); and the `<RdCheck>` label. copy-chart.js's
+  cycle-legend maps end-label text `"L/NP+ON"` → legend line "L/NP and One
+  Nation combined" (kind `dashed`, year 9999).
+- **Checkbox copy/title**: label is sentence-case "Combine L/NP and ON"
+  (a `.pg-check cyc-comb` label); its `title` spells out "The Coalition's
+  and One Nation's first-preference votes summed, drawn as one dotted line
+  over the current term only…". If the user asks to revert to a standalone
+  ON overlay, the old `cyc-onp` shape is recoverable from git but was
+  deliberately replaced — reseat means REPLACE here, not resurrect-both.
+- **Probe**: expect level note "L/NP + ON 48.1" and change note "L/NP + ON
+  +9.9"-shaped strings computed in-page from
+  `window.AP.D.cycles.find(c=>c.current)`; government chart asserts ZERO
+  checkboxes matching `/Combine/`. Worked probe:
+  `.matilda/probe/cycles-combine-onp.mjs` (opens the tab via `/#cycles` —
+  see auspol-headless-geometry-verify).
 
 ## Renderer: measure-aware fan membership (commit 20ef05e, 2026-09-14)
 
@@ -950,6 +1003,64 @@ Curly-typography rule applies in reverse for probes: the asset keeps
 curly `’` (apostrophe in "PM's lead") in SOURCE, but the built bundle
 escapes it to `\u2019` — assert subs in the built DOM (probe) or with the
 escaped form, never grepping the raw apostrophe in index.html.
+
+## Redesign summary rows: long notes must not size the Now column (worked 2026-09-30, commit 8c6fc24)
+
+Symptom reported on a phone: in Past cycles → **Compare with Re-elected**,
+the measure names "Government's primary vote" and "Prime minister's net
+approval" wrapped to two lines even though the right-hand side looked
+empty. The renderer is `rd-cycles.jsx` (~:326–329 row names, ~:513–575
+summary-row JSX); the culprit is CSS, not JSX or a narrow-name rule.
+
+At `≤900px`, `rd.css` lays `.rd-cs-row` out as:
+
+```css
+grid-template-columns: minmax(0, 1fr) auto;
+grid-template-areas:
+  "name now"
+  "strip strip"
+  "avg rank";
+```
+
+`.rd-cs-rank` and `.rd-cs-now` therefore share the intrinsic-width second
+column. Re-elected rows expose long superlative notes such as "Lowest of
+15 – Previous low: Albanese, 33.7" (≈168px) and "2nd lowest of 15 – Only
+Hawke (1990) was lower" (≈174px), while the Now figure is only ≈59px.
+Those notes size the shared `auto` column and squeeze the name column to
+≈164–170px — narrower than the 188–205px natural width of those labels.
+All/Ousted mainly show shorter notes, so the same defect looked
+comparison-specific.
+
+The shipped fix leaves every other placement alone and removes the note
+from the column-sizing pool:
+
+```css
+body.rd .rd-cs-rank {
+  grid-row: 3;
+  grid-column: 1 / -1;
+  text-align: right;
+}
+```
+
+Do not solve this by narrowing/renaming the measure, wrapping the rank
+note in a fixed width, or touching the JSX lettering; the row-scale rule
+is that a long note must span the row when it would otherwise share an
+`auto` track with a compact figure and a natural-width label.
+
+Verification recipe (`.matilda/probe/cycles-label-wrap.mjs`, gitignored
+scratch — never commit it): serve the built page, use touch viewports at
+390×844, 430×932 and 480×900, click Re-elected with
+`document.querySelectorAll('[aria-label="Compare with"] button')[1].click()`,
+then measure every `.rd-cs-name b`. Use ranges over **text nodes**
+(`document.createTreeWalker(el, NodeFilter.SHOW_TEXT)`) and assert exactly
+one rect per name; selecting an element's contents around flex siblings
+measures empty gap/margin space and produced a false "rank and average
+boxes collide" failure during the 2026-09-30 pass. After the fix all six
+names rendered on one line and avg→rank clearance was 83–273px (criterion
+≥4px). Also rerun `node .matilda/probe-cycles-pin.mjs` for the pinned-row
+layout and the full `npm test`. The ship commit should contain only
+`.build/newtracker/assets/rd.css` and rebuilt `index.html`; `rd-cycles.jsx`
+and the probe do not change.
 
 ### Probe recipe (retired probes: captions-probe2/3/4, then `.matilda/probe.mjs` in the a670008 worktree)
 

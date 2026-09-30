@@ -1,9 +1,9 @@
 ---
 name: ci-main-writer-races
-description: auspol-tracker — how writers (CI updaters, the laptop's launchd copies, agent repairs, humans) stay safe pushing to one main. Since 2026-09-25 there is NO shared concurrency group: each workflow queues in its own (poll-agent.yml's writers-<house>), and .build/git-push-main.sh push_main() resolves every push race — generated files rebuilt not merged, one wrapper re-run on a data conflict, "FAIL push race" (classified transient) only when a race is lost twice. Adding a writer? Its own group, and push through push_main. Never re-add a shared group.
+description: auspol-tracker — how writers (CI updaters, the laptop's launchd copies, agent repairs, humans) stay safe pushing to one main. Since 2026-09-25 there is NO shared concurrency group: each workflow queues in its own (poll-agent.yml's writers-<house>), and .build/git-push-main.sh push_main() resolves every push race — generated files rebuilt not merged, one wrapper re-run on a data conflict, "FAIL push race" (classified transient) only when a race is lost twice. GOTCHA: git-push-main.sh is a SOURCED library, not a script — `bash`-ing it exits 0 and pushes NOTHING; agent/human sessions push with plain `git push origin HEAD:main` (rebase+rebuild+amend by hand on a lost race). A dirty shared checkout breaks push_main's rung-1 rebase (no autostash — log says "conflicted on data" but means "You have unstaged changes"): recover via a detached-worktree cherry-pick + rebuild + push, then MIXED (never --hard) reset the checkout, or rebase with `-c rebase.autoStash=true`. Adding a writer? Its own group, and push through push_main. Never re-add a shared group.
 source: auto-skill
 extracted_at: '2026-09-04T13:36:12.593Z'
-updated_at: '2026-09-25'
+updated_at: '2026-09-28'
 ---
 
 # Writers racing origin/main
@@ -56,6 +56,19 @@ rebuilt index.html), so the retry failed exactly when it was needed (DemosAU, 20
      side-by-side rows, the same row, a race lost twice, AUSPOL_PR_GATE, the runner-clone
      heal). A mutation check: drop the merge driver and scenario A needs a re-run.
 
+## Agent/human sessions push DIRECTLY — `bash`-ing the file is a silent no-op
+
+`.build/git-push-main.sh` is a SOURCED function library for the wrappers ("Source AFTER
+the wrapper defines REPO, LOG and log()") — it is NOT a runnable script. Executing
+`bash .build/git-push-main.sh` defines the functions, exits 0 immediately, and pushes
+NOTHING, with zero output — origin/main unmoved (observed 2026-09-28, an agent session
+ran it twice before noticing). An interactive session commits to local main and pushes
+plainly: `git push origin HEAD:main`. If origin has raced ahead, replay push_main's
+rungs by hand: fetch, `git pull --rebase` (generated files — index.html, feed, sitemap,
+robots, `assets/**`, `.build/newtracker/assets/**` — fold via rebuild, never textual
+merge), `node .build/newtracker/build.mjs`, re-stage the regenerated files, `--amend`,
+push once more.
+
 ## Adding a writer
 
 - Give it its OWN concurrency group (`cancel-in-progress: false`). Never a group shared
@@ -65,6 +78,52 @@ rebuilt index.html), so the retry failed exactly when it was needed (DemosAU, 20
   the list when the commit carries them (that is the rebuild signal).
 - Agent sessions (`AUSPOL_PR_GATE=1`) never push: push_main leaves the commit local and
   the calling workflow's publish step owns the push.
+
+## Interactive/Matilda sessions push directly — do NOT "run" the script
+
+`.build/git-push-main.sh` is a SOURCED function library for the wrappers, not a
+runnable script: executing `bash .build/git-push-main.sh` defines the functions,
+evaluates the `$0` case, and exits 0 having pushed NOTHING — silently, twice in a
+row on 2026-09-28 when an agent session took its name literally. A human/agent
+session that has committed to local main pushes with plain
+`git push origin HEAD:main`. If origin has raced ahead, replay push_main's rung 1
+by hand: fetch, `git pull --rebase` (generated files conflict only on real data
+now — index.html etc. are rebuilt, so on an index.html conflict take the rebuild
+route: rebase with ours, `node .build/newtracker/build.mjs`, re-stage, amend),
+then `git push` again.
+
+## Dirty shared checkout: rung 1 has NO autoStash — recover via worktree
+
+Methods (worked 2026-09-28, local commit `20fd11b` vs racing `0200407`):
+
+- push_main's rung-1 `git pull --rebase` carries no `--autostash`. With
+  sibling sessions' uncommitted files in the tree it aborts at
+  "cannot pull with rebase: You have unstaged changes" and the wrapper's
+  catch-all logs "FAIL push race: the rebase onto origin/main conflicted on
+  data" — MISLEADING: read the log for the unstaged-changes line before
+  hunting a data conflict. The commit is intact locally.
+- Diagnosing the racing commit: `git diff <myTip>..<remoteTip>` unions BOTH
+  divergent commits' changes, so it lies about what the remote touched —
+  `git show <remoteTip> --stat` (or diff `merge-base..remoteTip`) instead.
+- Recovery, untouched by the dirty tree:
+  `git worktree add .matilda/pushfix-<tag> --detach origin/main`,
+  `cd` in, `git cherry-pick <myCommit>` (generated files may auto-merge
+  textually — fine, but still run validate + build.mjs in the worktree; the
+  rebuild reproduced the auto-merge byte-identical here, leaving the tree
+  clean so there was nothing to amend), `git push origin HEAD:main` from
+  the worktree, `git worktree remove` it.
+- Realign the checkout afterwards (its commit is now the pushed one's
+  twin): `git reset origin/main` — MIXED, never `--hard`, which would wipe
+  sibling sessions' tracked uncommitted edits — then
+  `git checkout -- index.html <any other generated paths>` so the working
+  tree's generated copies refresh from HEAD. Old local commit dies in the
+  reflog; fine.
+- Small edits interactively: plain `git push` first (it usually wins); on
+  rejection `git -c rebase.autoStash=true pull --rebase origin main`
+  survives the dirty tree (stashes, replays, POPS the stash back — confirm
+  the "Applied autostash." line), rebuild, confirm
+  `git status --short index.html .build/newtracker/assets/` is empty
+  (zero drift), push. Clean twice that day (8a7d389, 32cdfe8).
 
 ## Verifying
 

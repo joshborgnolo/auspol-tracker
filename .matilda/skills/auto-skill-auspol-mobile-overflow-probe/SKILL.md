@@ -78,3 +78,48 @@ stays 390 after opening All polls; pre-fix it jumped to 551). Any new
 wide ledger/chart-table added to the All-polls facet should get its
 wrap's overflow behaviour decided at ship time — run the probe across
 360/375/390/414/430 as part of the ship checklist.
+
+## Transient overflow — the settle-state scan sees nothing (worked 2026-09-30, 460a75c)
+
+Report shape: "switching to view X makes the page bounce a bit; sometimes
+you see overflow on the right". The document grows past the viewport for
+only 2–3 frames DURING the view switch, so every post-state probe
+(`wide: []`, scrollWidth == viewport) passes while the bug is real.
+Probe it in flight instead:
+
+- Arm a per-rAF sampler BEFORE the click: `[t, scrollY, scrollX,
+  documentElement.scrollWidth, innerWidth]` for ~2.6s after it
+  (`.matilda/probe/snapshot-tab-overflow.mjs` — served repo root,
+  clicks `.tabs .tab` by text).
+- On the FIRST frame where scrollWidth > captured-original-innerWidth,
+  record the wide elements IN FLIGHT (same absolute-rect scan as Trap 2)
+  — they are unfindable one frame later.
+- Correlate the overflow window with a per-frame log of the suspect
+  component's geometry (`el.getBoundingClientRect().width`,
+  `el.parentElement` width, a KEY child's inline `left`) — that is what
+  pinned it: parent already 350 while children still held 760-era
+  positions.
+
+Cause class to suspect: a component mounts with a DESKTOP-default
+measured-width state (RdLeadGauge's `useState(760)`) whose layout-effect
+ResizeObserver fit corrects AFTER one painted frame on remount, and the
+children's CSS `left`/`width` transitions then interpolate
+default→real geometry — absolutely-positioned children don't size their
+parent but DO extend `documentElement.scrollWidth`, so mid-interpolation
+frames overshoot a phone viewport (dot right edge observed at 408 on a
+390px viewport). Fix pattern (460a75c): an unmeasured sentinel
+(`useState(0)`, render `width: w || "auto"` +
+`visibility: w ? visible : hidden`) so the FIRST painted geometry is
+already correct — never let a default-width frame paint when positions
+are CSS-transitioned. See `auspol-rd-tpp-hero` for the gauge specifics.
+
+## Probe-authoring trap: the double-slash URL
+
+Building the probe URL as `origin + "/" + "/#allpolls"` yields
+`http://host:port//#allpolls` — path "//", which the naive static server
+fails to read → 404 with no obvious signal, and
+`waitForSelector(".site-head")` then times out, masquerading as a
+cold-compile flake. Debug with a stripped-down mount check
+(readyState/body class/tab list after a fixed sleep) before believing a
+selector timeout; pass the hash bare (`"#allpolls"`) when concatenating.
+This cost a full "cold compile" misdiagnosis before the real repro ran.

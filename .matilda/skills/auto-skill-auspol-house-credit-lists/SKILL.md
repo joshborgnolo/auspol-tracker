@@ -47,7 +47,7 @@ a11e1559 ~:1159, now `houseList(D.favHouses)`). Consumers render via
   still plain creditHouses (no stopped tail requested there).
   See `auspol-undecided-basis-display` for the basis machinery.
 
-## The recency rule — creditHouses() (gen-data ~:1102)
+## The recency rule — creditHouses() (gen-data ~:1195)
 
 ```js
 const CURRENT_HOUSE_MS = 183 * 86400000;   // ~6 months
@@ -64,7 +64,7 @@ const creditHouses = (items, firmOf, xOf) => { … };
 - Ordering: reading-count desc, ties alphabetical (`localeCompare`). Freshwater
   had dropped out at 2026-09-23: `["Roy Morgan","Essential","Spectre Strategy"]`.
 
-## Stopped houses — creditHousesWithStopped() (157f35c, gen-data ~:1121)
+## Stopped houses — creditHousesWithStopped() (157f35c, gen-data ~:1217)
 
 ```js
 const STOPPED_HOUSES = new Map(
@@ -93,7 +93,7 @@ const creditHousesWithStopped = (items, firmOf, xOf, display = (f) => f) => {
   the default existed the build died with `TypeError: display is not a
   function`. (build.mjs swallows gen-data stderr — run
   `node .build/newtracker/gen-data.mjs` standalone to see errors.)
-- Call sites (gen-data ~:1156-1173, emits ~:3641):
+- Call sites (gen-data ~:1316-1343, emits ~:3641):
   - `directionHouses` — UNCHANGED plain creditHouses (active only) → the
     How-to-read "Only N houses" count.
   - `directionHousesAll` — creditHousesWithStopped over the same MONTH_SET
@@ -110,10 +110,20 @@ const creditHousesWithStopped = (items, firmOf, xOf, display = (f) => f) => {
 - Shipped 157f35c with these built values (2026-09-24):
   `directionHousesAll = ["Roy Morgan","Essential","Spectre Strategy","Freshwater (inactive)"]`,
   `favHouses = ["DemosAU","RedBridge/Accent","Spectre Strategy","Freshwater (inactive)"]`.
+  directionHousesAll = ["Roy Morgan","Essential","SEC Newgate","Spectre Strategy","RedBridge/Accent","Freshwater (inactive)"]`.
   Order between the two differs because active ordering is reading-count —
   don't "fix" it to be alphabetical. By 2026-09-28 RedBridge/Accent had
   joined the direction roster:
   `directionHousesAll = ["Roy Morgan","Essential","Spectre Strategy","RedBridge/Accent","Freshwater (inactive)"]`.
+  And by 2026-09-29 SEC Newgate had joined via its seven backfilled
+  direction-only waves (no poll rows — `directionHouses =
+  ["Roy Morgan","Essential","SEC Newgate","Spectre Strategy","RedBridge/Accent"]`
+  in the 9f09dca2 bundle): a direction-only house needs NO registration to
+  appear in the credit lists — it lands the moment its `direction[]` rows
+  exist. All the var-shaped credits live in the 9f09dca2 data asset
+  (`grep -o 'const directionHouses\w* = \[[^]]*\]'
+  .build/newtracker/assets/9f09dca2-*.js`), which is where a "did house X
+  land?" check belongs.
 
 ## Dating the stop — directionStoppedSince (2026-09-28, direction only)
 
