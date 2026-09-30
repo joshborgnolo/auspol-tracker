@@ -2702,7 +2702,7 @@ function RdIssues({ rangeId = "all" }) {
 }
 
 /* ======================================================================
-   Undecided
+   Decidedness
    ====================================================================== */
 /* round denominators only: "one in twenty" is something a reader carries
    away, "one in twenty-three" is not */
@@ -2881,8 +2881,12 @@ function RdUndecided({ rangeId }) {
         : "Among the parties, " + rdList(sigRows.map((r) => r.label)) + " have changed significantly.")
       + (allSig ? " The share of all voters calling their vote solid has also " + (F.now.all.v < F.base.all.v ? "fallen" : "risen") + " significantly, from " + F.base.all.v.toFixed(1) + "% to " + F.now.all.v.toFixed(1) + "%." : "");
     const biggest = sigRows.slice().sort((a, b) => Math.abs(b.now - b.base) - Math.abs(a.now - a.base))[0];
-    const sub = biggest ? (biggest.id === "oth" ? "Minor-party voters" : biggest.label + " voters") + " " + (biggest.now < biggest.base ? "have softened" : "have firmed") + " since mid-2025"
-      : "No party’s voters have softened significantly since mid-2025";
+    /* One Nation gets the tail whenever its swing is significant and the
+       lead clause hasn't already said it */
+    const onpRow = rows.find((r) => r.id === "onp");
+    const onpTail = onpRow && onpRow.sig && biggest && biggest.id !== "onp" ? ", while One Nation voters have " + (onpRow.now < onpRow.base ? "softened" : "hardened") : "";
+    const sub = biggest ? (biggest.id === "oth" ? "Minor-party voters" : biggest.label + " voters") + " " + (biggest.now < biggest.base ? "have softened" : "have firmed") + " since July 2025" + onpTail
+      : "No party’s voters have softened significantly since July 2025";
     const rolled = F.waves.map((w, i) => {
       const ws = F.waves.slice(Math.max(0, i - F.pool + 1), i + 1);
       const r = { x: w.x, dateLabel: w.dateLabel };
@@ -2937,9 +2941,9 @@ function RdUndecided({ rangeId }) {
   };
   const pickView = (id) => { pinUn(); setView(id); };
   return (
-    <RdSec id="undecided" cls="rd-un" title="Undecided" meta={rdList(U.houses) + ", since the 2025 election"}>
+    <RdSec id="undecided" cls="rd-un" title="Decidedness" meta={rdList(U.houses) + ", since the 2025 election"}>
       {story && <RdHed head={story.head} dek={story.dek} />}
-      <RdTabs swipe value={view} onChange={pickView} options={views} ariaLabel="Undecided among" className="rd-un-tabs" />
+      <RdTabs swipe value={view} onChange={pickView} options={views} ariaLabel="Decidedness among" className="rd-un-tabs" />
       {/* each view is its own measure from its own pollsters: a switch
           crossfades them (RdCrossfade) */}
       <RdCrossfade k={view}>
@@ -2978,7 +2982,7 @@ function RdUndecided({ rangeId }) {
             {panel([first, tpp].filter(Boolean), 0, 10, 5, "und", "Undecided", "% of all voters")}
             {soft && panel([soft], 0, 40, 10, "soft", "Not firm", "% of voters who named a party")}
           </div>
-          <RdFoot how={{ term: "undecided", from: "Undecided" }}>{changeFoot}</RdFoot>
+          <RdFoot how={{ term: "undecided", from: "Decidedness" }}>{changeFoot}</RdFoot>
         </>
       )}
       {view === "party" && partyView && (
@@ -3013,7 +3017,7 @@ function RdUndecided({ rangeId }) {
               </div>
             ))}
           </div>
-          <RdFoot how={{ term: "undecided", from: "Undecided" }}>Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined.</RdFoot>
+          <RdFoot how={{ term: "undecided", from: "Decidedness" }}>Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined.</RdFoot>
         </>
       )}
       {view === "age" && ageView && (
@@ -3046,7 +3050,7 @@ function RdUndecided({ rangeId }) {
                       legend: ageView.B.map((b, i) => ({ label: b.label, color: ageView.grey(i), kind: "line" }))
                         .concat([{ label: "All voters", color: "var(--ink)", kind: "dashed" }]) }} />
           </div>
-          <RdFoot how={{ term: "undecided", from: "Undecided" }}>Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined.</RdFoot>
+          <RdFoot how={{ term: "undecided", from: "Decidedness" }}>Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined.</RdFoot>
         </>
       )}
       </RdCrossfade>

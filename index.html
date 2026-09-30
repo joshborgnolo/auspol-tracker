@@ -69852,7 +69852,9 @@ function RdUndecided({
     const allSig = apart(F.now.all, F.base.all);
     const note = "RedBridge asks voters how firm their choice is, a different question from Resolve’s in All voters, so the two views don’t compare directly. " + (!sigRows.length ? "Among the parties, no change is significant." : sigRows.length === 1 ? "Among the parties, only the " + (sigRows[0].id === "lnp" ? "Coalition" : sigRows[0].label) + "’s " + (sigRows[0].now < sigRows[0].base ? "fall" : "rise") + " is significant." : "Among the parties, " + rdList(sigRows.map(r => r.label)) + " have changed significantly.") + (allSig ? " The share of all voters calling their vote solid has also " + (F.now.all.v < F.base.all.v ? "fallen" : "risen") + " significantly, from " + F.base.all.v.toFixed(1) + "% to " + F.now.all.v.toFixed(1) + "%." : "");
     const biggest = sigRows.slice().sort((a, b) => Math.abs(b.now - b.base) - Math.abs(a.now - a.base))[0];
-    const sub = biggest ? (biggest.id === "oth" ? "Minor-party voters" : biggest.label + " voters") + " " + (biggest.now < biggest.base ? "have softened" : "have firmed") + " since mid-2025" : "No party’s voters have softened significantly since mid-2025";
+    const onpRow = rows.find(r => r.id === "onp");
+    const onpTail = onpRow && onpRow.sig && biggest && biggest.id !== "onp" ? ", while One Nation voters have " + (onpRow.now < onpRow.base ? "softened" : "hardened") : "";
+    const sub = biggest ? (biggest.id === "oth" ? "Minor-party voters" : biggest.label + " voters") + " " + (biggest.now < biggest.base ? "have softened" : "have firmed") + " since July 2025" + onpTail : "No party’s voters have softened significantly since July 2025";
     const rolled = F.waves.map((w, i) => {
       const ws = F.waves.slice(Math.max(0, i - F.pool + 1), i + 1);
       const r = {
@@ -69966,7 +69968,7 @@ function RdUndecided({
   return React.createElement(RdSec, {
     id: "undecided",
     cls: "rd-un",
-    title: "Undecided",
+    title: "Decidedness",
     meta: rdList(U.houses) + ", since the 2025 election"
   }, story && React.createElement(RdHed, {
     head: story.head,
@@ -69976,7 +69978,7 @@ function RdUndecided({
     value: view,
     onChange: pickView,
     options: views,
-    ariaLabel: "Undecided among",
+    ariaLabel: "Decidedness among",
     className: "rd-un-tabs"
   }), React.createElement(RdCrossfade, {
     k: view
@@ -70047,7 +70049,7 @@ function RdUndecided({
   }, panel([first, tpp].filter(Boolean), 0, 10, 5, "und", "Undecided", "% of all voters"), soft && panel([soft], 0, 40, 10, "soft", "Not firm", "% of voters who named a party")), React.createElement(RdFoot, {
     how: {
       term: "undecided",
-      from: "Undecided"
+      from: "Decidedness"
     }
   }, changeFoot)), view === "party" && partyView && React.createElement(React.Fragment, null, React.createElement("div", {
     className: "card rd-card rd-un-sp"
@@ -70160,7 +70162,7 @@ function RdUndecided({
   })))), React.createElement(RdFoot, {
     how: {
       term: "undecided",
-      from: "Undecided"
+      from: "Decidedness"
     }
   }, "Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined.")), view === "age" && ageView && React.createElement(React.Fragment, null, React.createElement("div", {
     className: "card rd-card rd-un-sp"
@@ -70271,7 +70273,7 @@ function RdUndecided({
   })), React.createElement(RdFoot, {
     how: {
       term: "undecided",
-      from: "Undecided"
+      from: "Decidedness"
     }
   }, "Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined."))));
 }
