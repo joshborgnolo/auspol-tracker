@@ -69357,8 +69357,18 @@ function RdPolls({
     const r = e.poll,
       pj = e.next;
     const f = figOf(r);
-    const imp = [r.alpOnImp != null ? "Labor " + r.alpOnImp.toFixed(1) + " – " + (100 - r.alpOnImp).toFixed(1) + " One Nation" : null, r.alpImp != null ? "Labor " + r.alpImp.toFixed(1) + " – " + (100 - r.alpImp).toFixed(1) + " Coalition" : null].filter(Boolean).join(", ");
-    const pub = [r.tppAlt ? "Labor " + r.tppAlt.alp + " – " + r.tppAlt.onp + " One Nation" : null, r.alp2pp != null ? "Labor " + r.alp2pp + " – " + (r.lnp2pp != null ? r.lnp2pp : 100 - r.alp2pp) + " Coalition" : null].filter(Boolean).join(", ");
+    const cgd = r.chg && r.chg.d || {};
+    const plus = (k, dec) => {
+      const s = rdApChg(cgd[k], dec);
+      return s ? React.createElement(React.Fragment, null, " ", React.createElement("span", {
+        className: "rd-apd-chg"
+      }, s)) : null;
+    };
+    const clause = items => items.map(([txt, k, dec], i) => React.createElement(React.Fragment, {
+      key: k
+    }, i > 0 && ", ", txt, plus(k, dec)));
+    const imp = clause([r.alpOnImp != null ? ["Labor " + r.alpOnImp.toFixed(1) + " – " + (100 - r.alpOnImp).toFixed(1) + " One Nation", "impOn", 1] : null, r.alpImp != null ? ["Labor " + r.alpImp.toFixed(1) + " – " + (100 - r.alpImp).toFixed(1) + " Coalition", "imp", 1] : null].filter(Boolean));
+    const pub = clause([r.tppAlt ? ["Labor " + r.tppAlt.alp + " – " + r.tppAlt.onp + " One Nation", "altAlpOn", 0] : null, r.alp2pp != null ? ["Labor " + r.alp2pp + " – " + (r.lnp2pp != null ? r.lnp2pp : 100 - r.alp2pp) + " Coalition", "alp2pp", 0] : null].filter(Boolean));
     const ppm = ppmContests(r).map(s => {
       const o = Object.keys(s).find(k => k !== "alb" && k !== "unc");
       const Lm = (window.LEADER_META || {})[o];
@@ -69366,7 +69376,9 @@ function RdPolls({
     }).join("; ");
     const a = r.appr || {};
     const net = v => v == null ? null : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v);
-    const nets = [["Albanese", a.albNet], [a.oppName || "Taylor", a.taylorNet], ["Hanson", a.hansonNet]].filter(([, v]) => v != null).map(([n, v]) => n + " " + net(v)).join(", ");
+    const nets = clause([["Albanese", a.albNet, "albNet"], [a.oppName || "Taylor", a.taylorNet, "taylorNet"], ["Hanson", a.hansonNet, "hansonNet"]].filter(([, v]) => v != null).map(([n, v, k]) => [n + " " + net(v), k, 0]));
+    const refIso = r.chg && r.chg.r ? r.chg.r.pOnp || r.chg.r.pAlp || r.chg.r.impOn || r.chg.r.imp || r.chg.r.alp2pp : null;
+    const prev = refIso ? D.individualPolls.find(x => x.pollster === r.pollster && x.released === refIso) : null;
     const key = window.AP.pollRowKey && window.AP.pollRowKey({
       pollster: r.pollster,
       released: r.released
@@ -69395,9 +69407,19 @@ function RdPolls({
       style: {
         color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")")
       }
-    }, +r.p[id].toFixed(1))))), React.createElement("dl", {
+    }, +r.p[id].toFixed(1)), React.createElement("span", {
+      className: "rd-apd-chg"
+    }, rdApChg(cgd[{
+      alp: "pAlp",
+      lnp: "pLnp",
+      grn: "pGrn",
+      onp: "pOnp",
+      oth: "pOth"
+    }[id]], 0) || "\u00a0")))), React.createElement("dl", {
       className: "rd-pld-dl"
-    }, imp && React.createElement(React.Fragment, null, React.createElement("dt", null, "Two-party, implied"), React.createElement("dd", null, imp)), pub && React.createElement(React.Fragment, null, React.createElement("dt", null, "As published"), React.createElement("dd", null, pub)), ppm && React.createElement(React.Fragment, null, React.createElement("dt", null, "Preferred prime minister"), React.createElement("dd", null, ppm)), nets && React.createElement(React.Fragment, null, React.createElement("dt", null, "Net approval"), React.createElement("dd", null, nets))), React.createElement("div", {
+    }, imp.length > 0 && React.createElement(React.Fragment, null, React.createElement("dt", null, "Two-party, implied"), React.createElement("dd", null, imp)), pub.length > 0 && React.createElement(React.Fragment, null, React.createElement("dt", null, "As published"), React.createElement("dd", null, pub)), ppm && React.createElement(React.Fragment, null, React.createElement("dt", null, "Preferred prime minister"), React.createElement("dd", null, ppm)), nets.length > 0 && React.createElement(React.Fragment, null, React.createElement("dt", null, "Net approval"), React.createElement("dd", null, nets))), prev && React.createElement("div", {
+      className: "rd-apd-sub rd-apd-note"
+    }, "Changes are on ", r.pollster, "\u2019s ", prev.field, " poll."), React.createElement("div", {
       className: "rd-pld-links"
     }, key && window.AP.openPoll && React.createElement("button", {
       type: "button",

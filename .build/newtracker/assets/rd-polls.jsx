@@ -312,10 +312,21 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const detail = (e) => {
     const r = e.poll, pj = e.next;
     const f = figOf(r);
-    const imp = [r.alpOnImp != null ? "Labor " + r.alpOnImp.toFixed(1) + " – " + (100 - r.alpOnImp).toFixed(1) + " One Nation" : null,
-                 r.alpImp != null ? "Labor " + r.alpImp.toFixed(1) + " – " + (100 - r.alpImp).toFixed(1) + " Coalition" : null].filter(Boolean).join(", ");
-    const pub = [r.tppAlt ? "Labor " + r.tppAlt.alp + " – " + r.tppAlt.onp + " One Nation" : null,
-                 r.alp2pp != null ? "Labor " + r.alp2pp + " – " + (r.lnp2pp != null ? r.lnp2pp : 100 - r.alp2pp) + " Coalition" : null].filter(Boolean).join(", ");
+    /* the All-polls expansion's movement markers, beside the figures they
+       belong to: each measure's change on the same pollster's previous poll
+       that published it (gen-data's chg, keyed d[k] against ref date r[k]) */
+    const cgd = (r.chg && r.chg.d) || {};
+    const plus = (k, dec) => {
+      const s = rdApChg(cgd[k], dec);
+      return s ? <> <span className="rd-apd-chg">{s}</span></> : null;
+    };
+    const clause = (items) => items.map(([txt, k, dec], i) => (
+      <React.Fragment key={k}>{i > 0 && ", "}{txt}{plus(k, dec)}</React.Fragment>
+    ));
+    const imp = clause([r.alpOnImp != null ? ["Labor " + r.alpOnImp.toFixed(1) + " – " + (100 - r.alpOnImp).toFixed(1) + " One Nation", "impOn", 1] : null,
+                        r.alpImp != null ? ["Labor " + r.alpImp.toFixed(1) + " – " + (100 - r.alpImp).toFixed(1) + " Coalition", "imp", 1] : null].filter(Boolean));
+    const pub = clause([r.tppAlt ? ["Labor " + r.tppAlt.alp + " – " + r.tppAlt.onp + " One Nation", "altAlpOn", 0] : null,
+                        r.alp2pp != null ? ["Labor " + r.alp2pp + " – " + (r.lnp2pp != null ? r.lnp2pp : 100 - r.alp2pp) + " Coalition", "alp2pp", 0] : null].filter(Boolean));
     const ppm = ppmContests(r).map((s) => {
       const o = Object.keys(s).find((k) => k !== "alb" && k !== "unc");
       const Lm = (window.LEADER_META || {})[o];
@@ -323,8 +334,12 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     }).join("; ");
     const a = r.appr || {};
     const net = (v) => (v == null ? null : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v));
-    const nets = [["Albanese", a.albNet], [a.oppName || "Taylor", a.taylorNet], ["Hanson", a.hansonNet]]
-      .filter(([, v]) => v != null).map(([n, v]) => n + " " + net(v)).join(", ");
+    const nets = clause([["Albanese", a.albNet, "albNet"], [a.oppName || "Taylor", a.taylorNet, "taylorNet"], ["Hanson", a.hansonNet, "hansonNet"]]
+      .filter(([, v]) => v != null).map(([n, v, k]) => [n + " " + net(v), k, 0]));
+    /* where a change marker shows, name the poll it is measured against,
+       as the All-polls expansion's note does */
+    const refIso = r.chg && r.chg.r ? (r.chg.r.pOnp || r.chg.r.pAlp || r.chg.r.impOn || r.chg.r.imp || r.chg.r.alp2pp) : null;
+    const prev = refIso ? D.individualPolls.find((x) => x.pollster === r.pollster && x.released === refIso) : null;
     const key = window.AP.pollRowKey && window.AP.pollRowKey({ pollster: r.pollster, released: r.released });
     const recent = ((pj && pj.recent) || []).slice(-5).reverse();
     const nx = nextWords(e);
@@ -337,16 +352,18 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
             <div className="rd-pld-prim">
               {RD_PL_PARTIES.map(([id, lab]) => r.p[id] != null && (
                 <span key={id}><b style={{ color: id === "oth" ? "var(--ink-3)" : inkOf("var(--" + id + ")") }}>{lab}</b>
-                  <span style={{ color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")") }}>{+r.p[id].toFixed(1)}</span></span>
+                  <span style={{ color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")") }}>{+r.p[id].toFixed(1)}</span>
+                  <span className="rd-apd-chg">{rdApChg(cgd[{ alp: "pAlp", lnp: "pLnp", grn: "pGrn", onp: "pOnp", oth: "pOth" }[id]], 0) || "\u00a0"}</span></span>
               ))}
             </div>
           )}
           <dl className="rd-pld-dl">
-            {imp && <><dt>Two-party, implied</dt><dd>{imp}</dd></>}
-            {pub && <><dt>As published</dt><dd>{pub}</dd></>}
+            {imp.length > 0 && <><dt>Two-party, implied</dt><dd>{imp}</dd></>}
+            {pub.length > 0 && <><dt>As published</dt><dd>{pub}</dd></>}
             {ppm && <><dt>Preferred prime minister</dt><dd>{ppm}</dd></>}
-            {nets && <><dt>Net approval</dt><dd>{nets}</dd></>}
+            {nets.length > 0 && <><dt>Net approval</dt><dd>{nets}</dd></>}
           </dl>
+          {prev && <div className="rd-apd-sub rd-apd-note">Changes are on {r.pollster}’s {prev.field} poll.</div>}
           <div className="rd-pld-links">
             {key && window.AP.openPoll && <button type="button" className="rd-link" onClick={(ev) => { ev.stopPropagation(); window.AP.openPoll(key, facet, "latest and next polls"); }}>Open in All polls →</button>}
             {r.url && <a className="rd-link rd-link-ext" href={r.url} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}><span className="rd-link-t">Read the release</span> <span className="rd-apd-ext" aria-hidden="true">↗</span></a>}
