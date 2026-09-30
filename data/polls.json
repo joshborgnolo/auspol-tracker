@@ -1300,7 +1300,7 @@
       "wrong": 60,
       "unsure": 15,
       "url": "https://essentialreport.com.au/reports/30-september-2026",
-      "published": "2026-10-01T01:00"
+      "published": "2026-09-30T01:00"
     }
   ],
   "polls": [
@@ -5322,7 +5322,7 @@
     },
     {
       "date": "2026-09-29",
-      "published": "2026-10-01T01:00",
+      "published": "2026-09-30T01:00",
       "dateStart": "2026-09-24",
       "pollster": "Essential",
       "client": "The Guardian",

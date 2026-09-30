@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-09-30T00:00:03.214Z",
+  "generatedAt": "2026-09-30T09:46:10.114Z",
   "horizon": "2025-09-29",
   "retro": [
     {
       "date": "2026-09-29",
       "fixes": [
-        "published 2026-10-01T01:00"
+        "published 2026-09-30T01:00 (Guardian's datePublished; replaces synthetic 2026-10-01T01:00)"
       ]
     }
   ],

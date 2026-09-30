@@ -21,9 +21,12 @@
 // tpp as published undecided-inclusive (pollsterRules.Essential
 // .tppIncludesUndecided reads the shortfall as undecided-after-
 // preferences). The CSV carries no sample/url/fieldwork window, but the
-// curated Essential convention is recoverable: published = the Guardian
-// embargo stamp (csvDate + 1 day, 01:00 Sydney) and dateStart = date - 5
-// days (the curated fieldwork window), so both are set on inserted rows.
+// curated Essential convention is recoverable: published = the synthesised
+// Guardian embargo stamp (csvDate + 1 day, 01:00 Sydney — a PROVISIONAL
+// guess that the Guardian retro-correct below replaces with the article's
+// own datePublished once a Guardian url is on the row) and dateStart =
+// date - 5 days (the curated fieldwork window), so both are set on
+// inserted rows.
 // The wave's own release page is resolved from .build/essential-src/
 // report-index.json (written by the extractor) and lands in releaseUrl —
 // the WP record date can lag the wave date by a day (UTC post timestamps
@@ -192,6 +195,35 @@ const publishedFor = (csvWave) => iso(Date.parse(csvWave) + DAY) + "T01:00";
 const embargoed = (stamp) => stamp.slice(0, 10) <= iso(Date.now() + DAY);
 const fieldworkStart = (date) => iso(Date.parse(date) - 5 * DAY);
 
+/* publishedFor is a PROVISIONAL guess: Essential's label date used to sit a
+   day ahead of the Guardian embargo day, but the 2026-09 wave's label landed
+   ON the embargo day, and the guess displayed a publication time a full day
+   late. Once a Guardian write-up URL is on the row (hand-set; a NOTE logs in
+   the retro-fill until then), the article's own datePublished is the truth
+   and retro-correct rewrites the guess from it. */
+const GUARDIAN_RE = /^https?:\/\/(www\.)?theguardian\.com\//;
+const sydneyStamp = (utcIso) => {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en", {
+    timeZone: "Australia/Sydney", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).formatToParts(new Date(utcIso)).map((x) => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
+};
+const guardianPublished = async (url) => {
+  try {
+    const res = await fetch(url, {
+      headers: { "user-agent": "Mozilla/5.0 (auspol-tracker essential assimilator)" },
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const raw = (await res.text()).match(/"datePublished"\s*:\s*"([^"]+)"/i)?.[1];
+    return raw ? sydneyStamp(raw) : null;
+  } catch (e) {
+    console.log(`WARNING: could not read the Guardian publication time from ${url} (${e.message}); keeping the recorded stamp`);
+    return null;
+  }
+};
+
 // canonical curated poll-row key order, used to rebuild retro-filled rows
 const POLL_KEY_ORDER = ["date", "published", "dateStart", "pollster", "client", "sample",
   "alp", "lnp", "grn", "onp", "ind", "oth", "tpp_alp", "tpp_lnp",
@@ -204,6 +236,7 @@ const reorderPollRow = (p) => {
 
 // --- retro-fill: complete rows the insert pass originally wrote partial ---
 const retro = [];
+const truthByWave = new Map();
 for (let i = 0; i < D.polls.length; i++) {
   const p = D.polls[i];
   if (p.pollster !== "Essential" || p.assimilated !== true) continue;
@@ -214,9 +247,21 @@ for (let i = 0; i < D.polls.length; i++) {
     console.log(`WARNING: assimilated row ${p.date} has no matching CSV wave ${csvWave}; retro-fill skipped`);
     continue;
   }
+  if (p.url != null) truthByWave.set(csvWave, p);
   if (p.published == null && embargoed(publishedFor(csvWave))) {
     p.published = publishedFor(csvWave);
     fixes.push(`published ${p.published}`);
+  }
+  // a stamp still equal to the synthetic guess (or still missing) is replaced
+  // by the Guardian article's own datePublished; corrected and hand-set
+  // stamps differ from the guess, so each URL is fetched at most once
+  const syn = publishedFor(csvWave);
+  if (GUARDIAN_RE.test(p.url ?? "") && (p.published == null || p.published === syn)) {
+    const truth = await guardianPublished(p.url);
+    if (truth && truth !== p.published) {
+      fixes.push(`published ${truth} (Guardian's datePublished; replaces synthetic ${p.published ?? "–"})`);
+      p.published = truth;
+    }
   }
   if (p.dateStart == null) { p.dateStart = fieldworkStart(p.date); fixes.push(`dateStart ${p.dateStart}`); }
   if (p.tpp_alp == null || p.tpp_lnp == null) {
@@ -363,6 +408,14 @@ for (const r of D.direction.filter((r) => r.pollster === "Essential" && (r.url =
   if (r.published == null && embargoed(stamp)) { r.published = stamp; touchedRow = true; }
   if (touchedRow) healedDir.push(r.date);
 }
+/* direction rows for a wave share the poll wave's publish moment, and their
+   stamps were synthesised from the same label rule — carry the Guardian
+   truth across wherever the poll row established it this run or a past one */
+const correctedDir = [];
+for (const r of D.direction.filter((r) => r.pollster === "Essential")) {
+  const truth = truthByWave.get(iso(Date.parse(r.date) + DAY))?.published;
+  if (truth && truth !== r.published) { r.published = truth; correctedDir.push(r.date); }
+}
 
 console.log(`mode: ${APPLY ? "APPLY" : "dry-run"}`);
 console.log(`VI waves in CSV: ${vi.size} (2PP waves: ${tppDates.length} · approval waves: alb ${appWaves.alb.size} / opp ${appWaves.opp.size} · mood waves: ${mood.size})`);
@@ -374,13 +427,14 @@ added.forEach((x) => console.log(`  + ${x.row.date} (csv ${x.csvWave}): alp ${x.
 addedAppr.forEach((x) => console.log(`  + approval ${x.row.date} (csv ${x.csvWave}): alb ${x.row.alb} (${x.row.detail.alb.app}/${x.row.detail.alb.dis}) · ${x.row.oppName} ${x.row.opp} (${x.row.detail.opp.app}/${x.row.detail.opp.dis})`));
 addedDir.forEach((x) => console.log(`  + direction ${x.row.date} (csv ${x.csvWave}): right ${x.row.right} wrong ${x.row.wrong} unsure ${x.row.unsure}`));
 healedDir.forEach((d) => console.log(`  ~ direction ${d}: url + published`));
+correctedDir.forEach((d) => console.log(`  ~ direction ${d}: published corrected to the wave's Guardian stamp`));
 skippedFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} duplicates curated row ${x.matchesRow} (same figures)`));
 skippedApprFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} approval duplicates ${x.matchesRow} (same figures)`));
 skippedDirFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} direction duplicates ${x.matchesRow} (same figures)`));
 console.log(`skipped: ${skippedDateDup.length} date-dup, ${skippedFigureDup.length} figure-dup, ${skippedPreHorizon.length} at/before horizon ${horizon}`);
 console.log(`skipped approval: ${skippedApprDateDup.length} date-dup, ${skippedApprFigureDup.length} figure-dup · direction: ${skippedDirDateDup.length} date-dup, ${skippedDirFigureDup.length} figure-dup`);
 
-const touched = added.length + retro.length + addedAppr.length + addedDir.length + healedDir.length;
+const touched = added.length + retro.length + addedAppr.length + addedDir.length + healedDir.length + correctedDir.length;
 if (APPLY && touched) {
   const out = JSON.stringify(D, null, 2) + "\n";
   writeAtomic("data/polls.json", out);
