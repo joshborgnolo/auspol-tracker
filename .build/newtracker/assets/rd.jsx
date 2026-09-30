@@ -220,11 +220,18 @@ function rdPinScroll(row) {
     if (--rdPinLive > 0) return;
     rdPinLive = 0;
     if (rdPinAnchorSave !== null) { html.style.overflowAnchor = rdPinAnchorSave; rdPinAnchorSave = null; }
-    /* the freeze releases in this same frame and the shift it let through
-       is answered by ONE correction inside the same task - layout and
-       scroll land in one painted frame, on every browser */
+    /* the freeze releases in this same frame and ONE correction answers
+       it inside the same task - but only for the thaw's own shift, sized
+       from the row's motion across the release, never against the anchor:
+       anything the user scrolled away since the last tick (an inertial
+       flick still rolling on iOS) is theirs to keep (was: fix() vs the
+       anchor, which teleported the page back to the row - the one fix
+       step()s user-leaving guard called too) */
+    const was = row.isConnected ? row.getBoundingClientRect().top : 0;
     rdPinThaw();
-    if (row.isConnected) fix();
+    if (!row.isConnected) return;
+    const shift = row.getBoundingClientRect().top - was;
+    if (shift) { window.scrollBy(0, shift); lastY = window.scrollY; }
   };
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {

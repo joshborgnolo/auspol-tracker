@@ -62801,8 +62801,14 @@ function rdPinScroll(row) {
       html.style.overflowAnchor = rdPinAnchorSave;
       rdPinAnchorSave = null;
     }
+    const was = row.isConnected ? row.getBoundingClientRect().top : 0;
     rdPinThaw();
-    if (row.isConnected) fix();
+    if (!row.isConnected) return;
+    const shift = row.getBoundingClientRect().top - was;
+    if (shift) {
+      window.scrollBy(0, shift);
+      lastY = window.scrollY;
+    }
   };
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
