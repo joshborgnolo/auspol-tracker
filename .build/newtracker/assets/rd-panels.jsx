@@ -941,7 +941,7 @@ function RdDirection({ rangeId }) {
         <span className="rd-dir-neg" style={{ flexBasis: now.wrong + "%" }}></span>
       </div>
       <p className="rd-dir-net"><b>Net {signedP(now.net)} points</b>
-        {now.chg != null && <>, {rdArrow(now.chg)} {Math.abs(now.chg).toFixed(1)} on a month ago</>}</p>
+        {now.chg != null && <>, {rdArrow(now.chg)} {Math.abs(now.chg).toFixed(1)} on a month ago{now.changeSig === false ? ", within the margin" : ""}</>}</p>
       <div className="card rd-card rd-dir-chart">
         <div className="rd-chead"><span className="rd-chead-t">{narrow ? "Right direction and wrong track, %" : "Right direction and wrong track, % of voters, month by month"}</span></div>
         {narrow && <RdKey items={[{ kind: "line", color: "var(--mood-neg)", label: "Wrong track" }, { kind: "line", color: "var(--mood-pos)", label: "Right direction" }]} className="rd-tpp-legend" />}

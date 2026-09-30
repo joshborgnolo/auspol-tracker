@@ -65643,7 +65643,7 @@ function RdDirection({
     }
   })), React.createElement("p", {
     className: "rd-dir-net"
-  }, React.createElement("b", null, "Net ", signedP(now.net), " points"), now.chg != null && React.createElement(React.Fragment, null, ", ", rdArrow(now.chg), " ", Math.abs(now.chg).toFixed(1), " on a month ago")), React.createElement("div", {
+  }, React.createElement("b", null, "Net ", signedP(now.net), " points"), now.chg != null && React.createElement(React.Fragment, null, ", ", rdArrow(now.chg), " ", Math.abs(now.chg).toFixed(1), " on a month ago", now.changeSig === false ? ", within the margin" : "")), React.createElement("div", {
     className: "card rd-card rd-dir-chart"
   }, React.createElement("div", {
     className: "rd-chead"
