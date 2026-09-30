@@ -2105,10 +2105,11 @@ function App() {
 
      It only ever reads a finished gesture, and leaves alone anything that
      claims sideways drags for itself: a chart scrubs (touch-action: pan-y),
-     a slider drags (none), a wide table scrolls. One exact exception: an
-     element marked data-rd-swipe-exact (the hero's 2PP card, which flips
-     the contest) keeps a touch that lands on it no matter what it would
-     otherwise claim. So do the edges, where iOS
+     a slider drags (none), a wide table scrolls. One exact exception: a
+     touch landing ON THE CHART of an element marked data-rd-swipe-exact
+     (the hero's 2PP card, which flips the contest) keeps it no matter what
+     it would otherwise claim - the card round the chart flips nothing, its
+     touch falls back to a row or the page. So do the edges, where iOS
      and Android put their own back gesture, a zoomed-in page (the finger is
      panning it) and a second finger (a pinch). Passive throughout: the page
      never waits on this to scroll. */
@@ -2157,8 +2158,12 @@ function App() {
       const t = e.touches[0];
       if (t.clientX < EDGE || t.clientX > window.innerWidth - EDGE) return;
       /* an exact claimer (the hero's 2PP card) takes a touch that lands on
-         it, whatever sideways claims stand between it and the page */
-      const own = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-exact]") : null;
+         its chart, whatever sideways claims stand between it and the page;
+         the claim stops at the chart's frame - a swipe on the numbered
+         event list under it belongs to the page again (.rd-evlist's own
+         pan-y keeps it inert) */
+      const own0 = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-exact]") : null;
+      const own = own0 && e.target.closest(".chart") ? own0 : null;
       if (!own && claimsSideways(e.target)) return;
       g = { x: t.clientX, y: t.clientY, t: Date.now(), sy: window.scrollY, row: own || rowAt(t.clientY) };
     };

@@ -812,9 +812,13 @@ function TrendChart(props) {
   // guide. Without the first case the svg's own onMouseMove kept firing while
   // the pointer sat on an event label, so the month readout covered the very
   // annotation being pointed at.
+  // An evt the list just opened carries no coordinates yet - the reconciler
+  // re-hangs it a turn later. Drawing the readout that frame would land it
+  // without left/top at the svg's heels, right where the list sits: hold it
+  // back until the chart knows where the event goes.
   let tip = null;
   if (evt) {
-    tip = {
+    if (evt.x != null && evt.y != null) tip = {
       left: (evt.x / W) * 100, top: (evt.y / H) * 100,
       title: evt.e.label, date: fmtEventDate(evt.e.date), desc: evt.e.desc, rows: [],
     };

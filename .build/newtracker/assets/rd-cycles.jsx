@@ -272,9 +272,20 @@ function RdPastCycles(p) {
      above this row; scrolled past them under the sticky tabs, each step
      then drags the row and charts up or down mid-walk. rdPinScroll (in
      rd.jsx, shared with the other tab rows) holds the row's spot on
-     screen through the head/dek glide instead. */
+     screen through the head/dek glide instead. Deeper in the summary the
+     row itself is off the screen: anchor the reader's own strip, key or
+     foot instead or nothing holds the spot at all - Chrome's native
+     scroll anchoring papers over that gap there, but Safari has no
+     overflow-anchor and every compare swipe shoved the reader down the
+     page by the dek's height swing */
   const pinView = () => {
-    rdPinScroll(boardRef.current);
+    const sec = document.getElementById("cyc-summary");
+    const strip = sec && [...sec.querySelectorAll(".rd-cs-row")].find((el) => {
+      const r = el.getBoundingClientRect();
+      return r.bottom >= 0 && r.top <= window.innerHeight;
+    });
+    rdPinScroll([boardRef.current, strip,
+                 sec && sec.querySelector(".rd-cs-key"), sec && sec.querySelector(".rd-foot")]);
   };
   const chg = mode === "chg";
   const cur = cycles.find((c) => c.current);

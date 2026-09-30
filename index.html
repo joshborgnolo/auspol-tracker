@@ -48663,7 +48663,7 @@ function TrendChart(props) {
   const bracketAll = crossWords(mf && mf.brackets, brackets, b => (b.lines || []).join("/") + "|" + b.x + "|" + b.y0 + "|" + b.y1);
   let tip = null;
   if (evt) {
-    tip = {
+    if (evt.x != null && evt.y != null) tip = {
       left: evt.x / W * 100,
       top: evt.y / H * 100,
       title: evt.e.label,
@@ -70012,7 +70012,12 @@ function RdPastCycles(p) {
   const boardRef = React.useRef(null);
   window.useDismissOutside(boardRef, board, () => setBoard(false));
   const pinView = () => {
-    rdPinScroll(boardRef.current);
+    const sec = document.getElementById("cyc-summary");
+    const strip = sec && [...sec.querySelectorAll(".rd-cs-row")].find(el => {
+      const r = el.getBoundingClientRect();
+      return r.bottom >= 0 && r.top <= window.innerHeight;
+    });
+    rdPinScroll([boardRef.current, strip, sec && sec.querySelector(".rd-cs-key"), sec && sec.querySelector(".rd-foot")]);
   };
   const chg = mode === "chg";
   const cur = cycles.find(c => c.current);
@@ -76434,7 +76439,8 @@ function App() {
       if (window.visualViewport && window.visualViewport.scale > 1.01) return;
       const t = e.touches[0];
       if (t.clientX < EDGE || t.clientX > window.innerWidth - EDGE) return;
-      const own = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-exact]") : null;
+      const own0 = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-exact]") : null;
+      const own = own0 && e.target.closest(".chart") ? own0 : null;
       if (!own && claimsSideways(e.target)) return;
       g = {
         x: t.clientX,
