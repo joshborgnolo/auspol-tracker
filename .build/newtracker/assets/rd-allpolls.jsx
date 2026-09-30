@@ -2048,10 +2048,13 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   const sizeMax = split ? Math.max(0, ...rows.map((r) => { const e = r.s[r.s.length - 1]; return Math.abs(e.on + e.co); })) : 0;
   /* the Two-party tab follows the page's 2PP matchup, so it carries the same
      switch the table does; the head/dek rewrite with it, so the row (or its
-     strip) holds its place through the flip */
+     strip) holds its place through the flip. Touch-only pin, though: the one
+     desktop-Safari report for this button had its second click land one row
+     underneath, and rdPinScroll's own default is to let click-driven desktop
+     swaps reflow live rather than pin them */
   const flipPick = () => {
     const sec = document.getElementById("house-lean");
-    if (sec) rdPinScroll([sec.querySelector(".rd-hl-tabs"), sec.querySelector(".rd-ap-pctl")].filter(Boolean), true);
+    if (sec) rdPinScroll([sec.querySelector(".rd-hl-tabs"), sec.querySelector(".rd-ap-pctl")].filter(Boolean));
     onMeasure(onM ? "lnp" : "onp");
   };
   const flip = (

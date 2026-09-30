@@ -75070,7 +75070,7 @@ function RdHouseLean({
   })) : 0;
   const flipPick = () => {
     const sec = document.getElementById("house-lean");
-    if (sec) rdPinScroll([sec.querySelector(".rd-hl-tabs"), sec.querySelector(".rd-ap-pctl")].filter(Boolean), true);
+    if (sec) rdPinScroll([sec.querySelector(".rd-hl-tabs"), sec.querySelector(".rd-ap-pctl")].filter(Boolean));
     onMeasure(onM ? "lnp" : "onp");
   };
   const flip = React.createElement("button", {
