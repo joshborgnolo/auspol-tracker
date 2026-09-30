@@ -517,16 +517,6 @@ function cycDomain(cycles, M, chg) {
       .filter((v) => v != null)
       .map((v) => (chg ? v - cycBase(c, "onp") : v))));
   }
-  // Others, combined graces the domain in exactly the same way: its series
-  // is read straight from the cycle payload (grn+onp+oth summed there), so
-  // it is present on either primary chart on the current term and nowhere
-  // else. (Present also on the OPPOSITION chart's own domain pass.)
-  {
-    const c = cycles.find((x) => x.current);
-    if (c && c.raw.othr) vals.push(...c.raw.othr
-      .filter((v) => v != null)
-      .map((v) => (chg ? v - cycBase(c, "othr") : v)));
-  }
   const ref = chg ? 0 : M.refAbs;
   let lo = Math.min(...vals), hi = Math.max(...vals);
   if (ref != null) { lo = Math.min(lo, ref); hi = Math.max(hi, ref); }
@@ -1374,7 +1364,7 @@ function cycHolderAt(c, M, m) {
 }
 
 function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, chipClick, toggle,
-                     showAll, hideAll, showOutcome, showHan, setHan, showOnp, setOnp, showComb, setComb, showOth, setOth, shapes,
+                     showAll, hideAll, showOutcome, showHan, setHan, showOnp, setOnp, showComb, setComb, shapes,
                      outcomeShown, rdHalf, rdEvents }) {
   const { D } = window.AP;
   const narrow = useNarrow();
@@ -1839,33 +1829,6 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
     }
   }
 
-  /* "Others, combined" (this term, both primary charts): every non-major
-     vote pooled – Greens, One Nation and Others as one line. gen-data
-     emits the election-anchored sum as c.raw.othr, so this needs nothing
-     more than the One Nation overlay's own mechanics. A primary chart
-     offers its box only while the sitting term actually carries the
-     series. */
-  if (M.primaryIs && showOth) {
-    const c = shown.find((x) => x.current);
-    if (c && c.raw.othr) {
-      const oBase = cycBase(c, "othr");
-      const pts = c.raw.months
-        .map((m, i) => ({ x: m, y: c.raw.othr[i] }))
-        .filter((p) => p.y != null)
-        .map((p) => ({ x: p.x, y: chg ? +(p.y - oBase).toFixed(2) : p.y }));
-      if (pts.length) {
-        built.push({
-          id: "cyc-oth", label: "Others",
-          color: HAN_COLOR, width: 2.2, points: pts, weight: 2.5,
-          smooth: false, dash: "1 3",
-          opacity: 0.85,
-          endLabel: "OT",
-          endLabelOpacity: 0.8,
-        });
-      }
-    }
-  }
-
   // draw muted first, highlighted, current last (on top)
   built.sort((a, b) => a.weight - b.weight);
 
@@ -1918,8 +1881,6 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
     ? overlayYears((p) => p.p && p.p.onp != null) : null;
   const combYears = (M.onp && showComb && shown.some((c) => c.current))
     ? overlayYears((p) => p.p && p.p.onp != null && p.p.lnp != null) : null;
-  const othYears = (M.primaryIs && showOth && shown.some((c) => c.current))
-    ? overlayYears((p) => p.p && p.p.grn != null && p.p.onp != null && p.p.oth != null) : null;
 
   const cur = cycles.find((c) => c.current);
   let insight = null;
@@ -2025,7 +1986,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
   if (window.AP.rd) return (
     <RdCycleChart M={M} chg={chg} built={built} bandAreas={bandAreas} bandRows={bandRows} scatter={scatter}
       events={rdEvents || cycleEvents} badged={!!rdEvents} domain={domain} ticks={ticks} cur={cur} hidden={hidden} narrow={narrow} half={!!rdHalf}
-      hanCtl={hanCtl} showHan={showHan} setHan={setHan} showOnp={showOnp} setOnp={setOnp} showComb={showComb} setComb={setComb} showOth={showOth} setOth={setOth} tipCycle={tipCycle}
+      hanCtl={hanCtl} showHan={showHan} setHan={setHan} showOnp={showOnp} setOnp={setOnp} showComb={showComb} setComb={setComb} tipCycle={tipCycle}
       banded={banded} bandN={bandN} isOpp={isOpp} terms={shown.filter(hasData).map((c) => c.year)} outcomeShown={outcomeShown} />
   );
   return (
@@ -2082,19 +2043,6 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
               One Nation this term
             </label>
           )}
-          {M.primaryIs && (() => {
-            const cury = cycles.find((x) => x.current);
-            return cury && cury.raw.othr ? (
-              <label className={"pg-check cyc-oth" + (showOth ? " on" : "")}
-                     title={"The Greens', One Nation's and Others' first-preference votes " +
-                            "summed – everyone outside the majors – drawn as one dotted line " +
-                            "over the current term only."}>
-                <input type="checkbox" checked={!!showOth}
-                       onChange={(e) => setOth(e.target.checked)} />
-                Others, combined
-              </label>
-            ) : null;
-          })()}
         </div>
         {insight && (() => {
           /* Prose, not a table cell: a gap of exactly nine points reads as
@@ -2203,12 +2151,6 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
             <span className="cyc-drawn-item fixed" style={{ "--cyc": "var(--ink-2)" }}>
               <span className="cyc-drawn-rule" aria-hidden="true"></span>
               <span className="cyc-drawn-who">{"L/NP + One Nation in " + combYears}</span>
-            </span>
-          )}
-          {othYears && (
-            <span className="cyc-drawn-item fixed" style={{ "--cyc": HAN_COLOR }}>
-              <span className="cyc-drawn-rule" aria-hidden="true"></span>
-              <span className="cyc-drawn-who">{"All others combined in " + othYears}</span>
             </span>
           )}
         </div>
@@ -3085,7 +3027,6 @@ function PastCyclesView() {
   const [showHan, setShowHan] = useState(false);
   const [showOnp, setShowOnp] = useState(false);
   const [showComb, setShowComb] = useState(false);
-  const [showOth, setShowOth] = useState(false);
 
   /* Same contract as the archive writer: replaceState, foreign params
      (the archive's q/w/t/…) parsed out and left alone, vanished when the
@@ -3217,7 +3158,7 @@ function PastCyclesView() {
     <RdPastCycles cycles={cycles} mode={mode} setMode={setMode} hidden={hidden} lifted={lifted} hi={hi} setHi={setHi}
       toggle={toggle} lift={lift} unlift={unlift} chipClick={chipClick} showAll={showAll} hideAll={hideAll}
       showOutcome={showOutcome} outcomeShown={outcomeShown} shapes={shapes} showHan={showHan} setShowHan={setShowHan}
-      showOnp={showOnp} setShowOnp={setShowOnp} showComb={showComb} setShowComb={setShowComb} showOth={showOth} setShowOth={setShowOth}
+      showOnp={showOnp} setShowOnp={setShowOnp} showComb={showComb} setShowComb={setShowComb}
       exportSource={exportSource} srcFailed={srcFailed} retrySource={retrySource} />
   );
   return (
@@ -3295,7 +3236,7 @@ function PastCyclesView() {
                       showAll={showAll} hideAll={hideAll} showOutcome={showOutcome}
                       showHan={showHan} setHan={setShowHan}
                       showOnp={showOnp} setOnp={setShowOnp} showComb={showComb} setComb={setShowComb}
-                      showOth={showOth} setOth={setShowOth} shapes={shapes}
+                      shapes={shapes}
                       outcomeShown={outcomeShown} />
         ))}
       </div>

@@ -47,7 +47,7 @@ const rdSgn = (v, unit) => (unit ? "" : v > 0 ? "+" : v < 0 ? "−" : "") + Math
 
 /* ---- one chart, in the redesign's frame --------------------------------- */
 function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evIn, badged, domain, ticks, cur, hidden, narrow, half,
-                        hanCtl, showHan, setHan, showOnp, setOnp, showComb, setComb, showOth, setOth, tipCycle, banded, bandN, isOpp, terms, outcomeShown }) {
+                        hanCtl, showHan, setHan, showOnp, setOnp, showComb, setComb, tipCycle, banded, bandN, isOpp, terms, outcomeShown }) {
   const { D } = window.AP;
   /* the sitting term's change of contest, said as the headline says it */
   const events = evIn.map((e) => (/^Now v /.test(e.short || "")
@@ -72,7 +72,7 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
        the opposition the overlays land. Here each is a plain 2px line in
        its own colour, curved like every other line, and named at its end
        by a note (overlayNotes, below). */
-    if (s.id === "cyc-onp" || s.id === "cyc-oth" || s.id === "cyc-comb" || s.id === "cyc-han")
+    if (s.id === "cyc-onp" || s.id === "cyc-comb" || s.id === "cyc-han")
       return { ...s, smooth: undefined, dash: null, dashed: false, rdWidth: 2, endLabel: null,
                opacity: s.opacity != null && s.opacity < 0.5 ? s.opacity : 1 };
     if (s.endLabel && s.label) return { ...s, rdWidth: s.width >= 3 ? 2.2 : 1.4, endLabel: half ? null : s.label.replace(", ", " ") };
@@ -115,13 +115,13 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
      15px clear of the sitting term's two lines of words */
   const plotH = (narrow ? 260 : half ? 290 : 330) - 80;
   const pxOf = (v) => ((v - domain[0]) / (domain[1] - domain[0])) * plotH;
-  series.filter((s) => (s.id === "cyc-onp" || s.id === "cyc-comb" || s.id === "cyc-oth" || s.id === "cyc-han") && s.points.length && !(s.opacity < 0.5)).forEach((s) => {
+  series.filter((s) => (s.id === "cyc-onp" || s.id === "cyc-comb" || s.id === "cyc-han") && s.points.length && !(s.opacity < 0.5)).forEach((s) => {
     const last = s.points[s.points.length - 1];
     const taken = peer && curVal != null ? notes.slice(0, 2).map((n) => pxOf(last.y) - pxOf(curVal) + n.dy) : [];
     // candidate baselines, nearest the line's end first; y grows downward in dy
     const dy = [4, -8, 16, -20, 28, -32, 40].find((c) => taken.every((t) => Math.abs(c - t) >= 15)) ?? 4;
     notes.push({ k: s.id, x: last.x, y: last.y, dx: 10, dy,
-                 text: (s.id === "cyc-comb" ? "L/NP + ON " : s.id === "cyc-onp" ? "One Nation " : s.id === "cyc-oth" ? "Others " : "Hanson ") + fmt(last.y),
+                 text: (s.id === "cyc-comb" ? "L/NP + ON " : s.id === "cyc-onp" ? "One Nation " : "Hanson ") + fmt(last.y),
                  color: inkOf(s.color), weight: 600, size: 12.5 });
   });
   if (!chg && M.key === "tpp") {
@@ -161,7 +161,7 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
      term switched on or off fades - rather than the chart being rebuilt.
      (It was keyed by level-or-change, so that switch remounted it: the chart
      blanked and faded back in.) Hover and lifting stay instant. */
-  const viewKey = (chg ? "c" : "a") + "|" + [...hidden].sort().join(",") + "|" + (showOnp ? 1 : 0) + (showComb ? 1 : 0) + (showHan ? 1 : 0) + (showOth ? 1 : 0);
+  const viewKey = (chg ? "c" : "a") + "|" + [...hidden].sort().join(",") + "|" + (showOnp ? 1 : 0) + (showComb ? 1 : 0) + (showHan ? 1 : 0);
   const cardRef = React.useRef(null);
   const clk = window.AP.useKeyClock(viewKey, cardRef);
   const shownScene = React.useRef(null), fromScene = React.useRef(null);
@@ -207,7 +207,6 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
         <span className="rd-chead-t">{title}</span>
         {M.onp && <RdCheck checked={showComb} onChange={setComb}>Combine L/NP and ON</RdCheck>}
         {M.onp && <RdCheck checked={showOnp} onChange={setOnp}>One Nation this term</RdCheck>}
-        {M.primaryIs && cur && cur.raw.othr && <RdCheck checked={showOth} onChange={setOth}>Others, combined</RdCheck>}
         {hanCtl && <RdCheck checked={showHan} onChange={setHan}>Pauline Hanson this term</RdCheck>}
       </div>
       <TrendChart key={"rd-cyc-" + M.key}
@@ -265,7 +264,7 @@ function rdCycRank(peers, v, fmt) {
 /* ---- the tab --------------------------------------------------------------- */
 function RdPastCycles(p) {
   const { cycles, mode, setMode, hidden, lifted, hi, setHi, toggle, lift, unlift, chipClick, showAll, hideAll,
-          showOutcome, outcomeShown, shapes, showHan, setShowHan, showOnp, setShowOnp, showComb, setShowComb, showOth, setShowOth, exportSource, srcFailed, retrySource } = p;
+          showOutcome, outcomeShown, shapes, showHan, setShowHan, showOnp, setShowOnp, showComb, setShowComb, exportSource, srcFailed, retrySource } = p;
   const { D } = window.AP;
   const narrow = useNarrow("(max-width: 640px)");
   const [board, setBoard] = useState(false);
@@ -672,7 +671,7 @@ function RdPastCycles(p) {
     return <CycleChart key={key} metric={M} cycles={cycles} mode={mode} hidden={hidden} hi={hi} setHi={setHi} lifted={lifted} unlift={unlift}
                        chipClick={chipClick} toggle={toggle} showAll={showAll} hideAll={hideAll} showOutcome={showOutcome}
                        showHan={showHan} setHan={setShowHan} showOnp={showOnp} setOnp={setShowOnp}
-                       showComb={showComb} setComb={setShowComb} showOth={showOth} setOth={setShowOth} shapes={shapes}
+                       showComb={showComb} setComb={setShowComb} shapes={shapes}
                        outcomeShown={outcomeShown} rdHalf={half} rdEvents={evs} />;
   };
   /* The key names the sitting term's own lines and its election ring as well
