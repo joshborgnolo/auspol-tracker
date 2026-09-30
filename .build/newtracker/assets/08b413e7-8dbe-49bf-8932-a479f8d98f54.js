@@ -206,6 +206,13 @@ function TrendChart(props) {
        Without it the set changed on the switch's last frame and every name
        re-laid itself out at once. */
     eventsFrom = null, eventMix = 1,
+    /* `evt` CONTROLLED: a caller holding the open annotation (the phone's
+       numbered list under the chart) passes it in as { e, x, y } and learns
+       of every open/close through `onEvt`. x and y may be null - the chart
+       knows where the event sits and fills them in. A caller that has been
+       scrolled away from a set event it no longer wants passes null. Without
+       the pair the chart keeps the annotation itself, as it always has. */
+    evt: evtCtl, onEvt,
     /* `morphFrom`: mid-switch, what the view being left draws besides its
        lines and dots - { yTicks, yTickFmt, refLines, notes, brackets } - with
        `morphT` how far the switch has run. The two views' axis labels, rules
@@ -420,7 +427,12 @@ function TrendChart(props) {
   });
   const [hover, setHover] = useState(null);     // {index, clientX}
   const [dot, setDot] = useState(null);         // hovered scatter point
-  const [evt, setEvt] = useState(null);         // hovered key event {e, x, y}
+  const [evtMy, setEvtMy] = useState(null);     // hovered key event {e, x, y}
+  /* A controlled evt belongs to the caller and moves with the placement of
+     the set it draws; the chart's own opens and closes are reported up. */
+  const ctl = typeof onEvt === "function";
+  const evt = ctl ? evtCtl : evtMy;
+  const setEvt = (v) => { if (ctl) onEvt(v); else setEvtMy(v); };
   /* The readout's own width, measured off the page. The clamp below needs it,
      and every attempt to name it in advance has gone stale as rows were added
      to the panel – see the note there. */
@@ -1092,6 +1104,18 @@ function TrendChart(props) {
     byKey.forEach((q) => out.push({ ...q, op: 1 - t, leaving: true }));
     return out.sort((a, b) => a.ex - b.ex);
   })();
+  /* A controlled evt follows the placement of whatever set is on screen now
+     (a list that stayed open over a matchup or range switch is re-hung where
+     its event sits today, and put away when the new window drops the event);
+     an uncontrolled one keeps its own spot, as it always has. */
+  if (ctl && evt) {
+    const q = evPlaced.find((p) => p.e === evt.e && !p.leaving);
+    if (!q) { const cur = evt; setTimeout(() => { if (evtCtl === cur) setEvt(null); }, 0); }
+    else if (evt.x !== q.ex || evt.y !== q.y) {
+      const cur = evt;
+      setTimeout(() => { if (evtCtl === cur) setEvt({ e: cur.e, x: q.ex, y: q.y }); }, 0);
+    } else { evt.x = q.ex; evt.y = q.y; }
+  }
 
   return (
     <div className="chart" ref={ref} data-copy={copy ? JSON.stringify(copy) : undefined}>
@@ -1362,9 +1386,14 @@ function TrendChart(props) {
           const cls = "evt" + (evt && evt.e === e ? " on" : "");
           const fadeSt = p.op != null && p.op < 1 ? { opacity: p.op } : null;
           const k = evKey(e) + (p.leaving ? "|out" : "");
+          /* the anchor a list tap scrolls to, on the open set's rule: a
+             rendered target survives a badge slide where a computed % had
+             the playground's jump quirk. Ids hang off the badge KEY, so two
+             charts (hero, primary) never mint the same one. */
+          const aId = ctl && evt && evt.e === e && !p.leaving && e.badgeKey ? "evt-a-" + e.badgeKey : undefined;
           // no room for a label: the reference line still earns its place
           if (row == null) return (
-            <g key={k} className={cls} role="img" aria-label={aria} style={fadeSt} data-ev={k}>
+            <g key={k} className={cls} role="img" aria-label={aria} style={fadeSt} data-ev={k} id={aId}>
               {/* a 1px dashed rule is a poor hover target; an invisible wide
                   line over it makes the annotation reachable */}
               <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-hit" />
@@ -1393,7 +1422,7 @@ function TrendChart(props) {
           const ruleTop = rd ? yRow + PX(5) : yRow;
           const displaced = !rd || !!p.disp;
           return (
-            <g key={k} className={cls} role="img" aria-label={aria} style={fadeSt} data-ev={k}>
+            <g key={k} className={cls} role="img" aria-label={aria} style={fadeSt} data-ev={k} id={aId}>
               <line x1={ex} x2={ex} y1={ruleTop} y2={H - pad.b} className="evt-hit" />
               <line x1={ex} x2={ex} y1={ruleTop} y2={H - pad.b} className="evt-line" />
               {/* elbow: reads as a lead-in rule at the label's baseline */}
@@ -1411,7 +1440,8 @@ function TrendChart(props) {
           );
         })}
         {rd && evPlaced.map((p, i) => p.row == null ? null : (
-          <g key={"evl" + evKey(p.e) + (p.leaving ? "|out" : "")} data-ev={"l" + evKey(p.e) + (p.leaving ? "|out" : "")} className={"evt" + (evt && evt.e === p.e ? " on" : "")} aria-hidden="true"
+          <g key={"evl" + evKey(p.e) + (p.leaving ? "|out" : "")} data-ev={"l" + evKey(p.e) + (p.leaving ? "|out" : "")}
+             className={"evt" + (evt && evt.e === p.e ? " on" : "")} aria-hidden="true"
              style={p.op != null && p.op < 1 ? { opacity: p.op } : null}>
             <text x={p.x} y={p.y} className="evt-label" textAnchor="start"
                   style={{ fontSize: p.fsz, strokeWidth: PX(4) }}>

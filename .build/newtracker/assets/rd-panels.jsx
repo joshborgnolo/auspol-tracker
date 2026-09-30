@@ -121,7 +121,12 @@ function RdPrimary({ rangeId }) {
   const shownScatter = React.useMemo(() => scatter.map((d) => (hidden[d.party] ? { ...d, op: 0 } : d)), [scatter, hidden]);
   const marks = base ? parts.map((p) => ({ x: base.x, y: base[p.id], color: p.color, r: 4.5, hidden: !!hidden[p.id] })) : [];
   const evs = (D.events || []).filter((e) => e.major);
-  const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
+  const badges = narrow ? rdEventBadges("p1", evs, xDomain[0], xDomain[1]) : null;
+  /* the phone list under the chart opens an event's panel by tapping its
+     number; a tap on another number hands the panel over, and an event that
+     leaves the window is put away by the chart's own reconciliation */
+  const [evtOpen, setEvtOpen] = useState(null);
+  const pickEv = (e) => { setEvtOpen((cur) => (cur && cur.e === e ? cur : { e })); rdEventReveal("evt-a-" + e.badgeKey); };
   const eDate = (D.cycles.find((c) => c.current) || {}).eDate;
   const meta = narrow
     ? D.latest.pollsTracked + " national polls, latest fieldwork " + rdDate(D.latest.updatedISO)
@@ -186,6 +191,7 @@ function RdPrimary({ rangeId }) {
           series={chartSeries} spine={series(pts, "alp")} areas={areas}
           scatter={shownScatter} pollFacet="primary" marks={marks} ringAtX={base ? base.x : null}
           events={badges ? badges.events : evs}
+          evt={evtOpen} onEvt={setEvtOpen}
           tooltipTitle={(i) => (pts[i] ? monthLabelFull(pts[i].ym) : "")}
           extraRows={(i) => {
             const d = pts[i];
@@ -195,7 +201,8 @@ function RdPrimary({ rangeId }) {
           fmt={(v) => v.toFixed(1)}
           copy={{ title: "Primary vote", sub: story.head, legend: parts.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
         />
-        {badges && <RdEventList list={badges.list} />}
+        {badges && <RdEventList list={badges.list} onPick={pickEv}
+                                openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />}
         <RdKey className="rd-ckey" items={[
           { kind: "dot", color: "var(--ink-3)", label: "One poll" },
           { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
@@ -938,7 +945,7 @@ function RdDirection({ rangeId }) {
     base ? Math.abs(base.wrong - base.right).toFixed(1) + " before Bondi" : null,
   ].filter(Boolean) }];
   const evs = bondi ? [bondi] : [];
-  const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
+  const badges = narrow ? rdEventBadges("dir", evs, xDomain[0], xDomain[1]) : null;
   /* who supplies the readings, and how many, lives in Info's National
      direction entry; the foot keeps only the note about the figures above */
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";

@@ -3227,6 +3227,11 @@ body.rd .rd-evlist li { display: flex; align-items: baseline; gap: 12px; padding
 body.rd .rd-evlist-n { width: 14px; flex-shrink: 0; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-evlist-l { flex-grow: 1; }
 body.rd .rd-evlist-d { color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-evlist li:has(.rd-evlist-b) { padding: 0; }
+body.rd .rd-evlist-b { display: flex; align-items: baseline; gap: 12px; width: 100%; padding: 7px 4px; margin: 0 -4px; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; border-radius: 4px; }
+body.rd .rd-evlist-b:active { background: var(--surface-2); }
+body.rd .rd-evlist-b:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+@media (hover: hover) { body.rd .rd-evlist-b:hover { background: var(--surface-2); } }
 @media (min-width: 641px) {
   body.rd .rd-evlist.inline { display: flex; flex-wrap: wrap; column-gap: 28px; row-gap: 6px; margin-top: 16px; }
   body.rd .rd-evlist.inline li { gap: 8px; padding: 0; align-items: center; }
@@ -48141,6 +48146,8 @@ function TrendChart(props) {
     clipX,
     eventsFrom = null,
     eventMix = 1,
+    evt: evtCtl,
+    onEvt,
     morphFrom = null,
     morphT = 1,
     driven = false,
@@ -48309,7 +48316,12 @@ function TrendChart(props) {
   });
   const [hover, setHover] = useState(null);
   const [dot, setDot] = useState(null);
-  const [evt, setEvt] = useState(null);
+  const [evtMy, setEvtMy] = useState(null);
+  const ctl = typeof onEvt === "function";
+  const evt = ctl ? evtCtl : evtMy;
+  const setEvt = v => {
+    if (ctl) onEvt(v);else setEvtMy(v);
+  };
   const tipRef = useRef(null);
   const [tipW, setTipW] = useState(0);
   const [tipLay, setTipLay] = useState({
@@ -48931,6 +48943,27 @@ function TrendChart(props) {
     }));
     return out.sort((a, b) => a.ex - b.ex);
   })();
+  if (ctl && evt) {
+    const q = evPlaced.find(p => p.e === evt.e && !p.leaving);
+    if (!q) {
+      const cur = evt;
+      setTimeout(() => {
+        if (evtCtl === cur) setEvt(null);
+      }, 0);
+    } else if (evt.x !== q.ex || evt.y !== q.y) {
+      const cur = evt;
+      setTimeout(() => {
+        if (evtCtl === cur) setEvt({
+          e: cur.e,
+          x: q.ex,
+          y: q.y
+        });
+      }, 0);
+    } else {
+      evt.x = q.ex;
+      evt.y = q.y;
+    }
+  }
   return React.createElement("div", {
     className: "chart",
     ref: ref,
@@ -49242,13 +49275,15 @@ function TrendChart(props) {
       opacity: p.op
     } : null;
     const k = evKey(e) + (p.leaving ? "|out" : "");
+    const aId = ctl && evt && evt.e === e && !p.leaving && e.badgeKey ? "evt-a-" + e.badgeKey : undefined;
     if (row == null) return React.createElement("g", {
       key: k,
       className: cls,
       role: "img",
       "aria-label": aria,
       style: fadeSt,
-      "data-ev": k
+      "data-ev": k,
+      id: aId
     }, React.createElement("line", {
       x1: ex,
       x2: ex,
@@ -49301,7 +49336,8 @@ function TrendChart(props) {
       role: "img",
       "aria-label": aria,
       style: fadeSt,
-      "data-ev": k
+      "data-ev": k,
+      id: aId
     }, React.createElement("line", {
       x1: ex,
       x2: ex,
@@ -63264,8 +63300,12 @@ function rdYTicks(lo, hi, step) {
   for (let v = lo; v <= hi + 1e-9; v += step) out.push(+v.toFixed(6));
   return out;
 }
-function rdEventBadges(events, x0, x1) {
+function rdEventBadges(idKey, events, x0, x1) {
   const inWin = (events || []).filter(e => e.x >= x0 && e.x <= x1).sort((a, b) => a.x - b.x);
+  const memo = rdEventBadges.memo || (rdEventBadges.memo = {});
+  const memKey = idKey + "|" + x0.toFixed(4) + "|" + x1.toFixed(4) + "|" + inWin.map(e => e.date).join(",");
+  if (memo[memKey]) return memo[memKey];
+  if (Object.keys(memo).length > 120) rdEventBadges.memo = {};
   const list = [];
   const out = inWin.map(e => {
     const ym = e.date.slice(0, 7);
@@ -63274,34 +63314,68 @@ function rdEventBadges(events, x0, x1) {
       item = {
         n: list.length + 1,
         ym,
-        labels: []
+        labels: [],
+        evs: []
       };
       list.push(item);
     }
     item.labels.push(/→/.test(e.short || "") || !e.short ? e.label : e.short);
-    return {
+    const badged = {
       ...e,
       badge: item.n,
-      badgeLead: item.labels.length === 1
+      badgeLead: item.labels.length === 1,
+      badgeKey: idKey + "-" + e.date
     };
+    item.evs.push(badged);
+    return badged;
   });
-  return {
+  const result = {
     events: out,
     list
   };
+  rdEventBadges.memo[memKey] = result;
+  return result;
 }
 function RdEventList({
   list,
   inline,
   from,
-  mix
+  mix,
+  onPick,
+  openKey
 }) {
   if (!list || !list.length) return null;
-  const ol = (l0, st, hidden) => React.createElement("ol", {
+  const row = (l, i) => {
+    const d = window.AUSPOL.monthName(Number(l.ym.slice(5))) + " " + l.ym.slice(0, 4);
+    const on = !!(openKey && l.evs && l.evs.some(e => e.badgeKey === openKey));
+    return onPick && l.evs && l.evs.length ? React.createElement("li", {
+      key: l.n
+    }, React.createElement("button", {
+      type: "button",
+      className: "rd-evlist-b" + (on ? " on" : ""),
+      "aria-pressed": on,
+      onClick: () => onPick(l.evs[0])
+    }, React.createElement("span", {
+      className: "rd-evlist-n"
+    }, l.n), React.createElement("span", {
+      className: "rd-evlist-l"
+    }, l.labels.join(", ")), React.createElement("span", {
+      className: "rd-evlist-d"
+    }, d))) : React.createElement("li", {
+      key: l.n
+    }, React.createElement("span", {
+      className: "rd-evlist-n"
+    }, l.n), React.createElement("span", {
+      className: "rd-evlist-l"
+    }, l.labels.join(", ")), React.createElement("span", {
+      className: "rd-evlist-d"
+    }, d));
+  };
+  const ol = (l0, st, hidden, pick) => React.createElement("ol", {
     className: "rd-evlist" + (inline ? " inline" : ""),
     style: st,
     "aria-hidden": hidden || undefined
-  }, l0.map(l => React.createElement("li", {
+  }, l0.map((l, i) => pick ? row(l, i) : React.createElement("li", {
     key: l.n
   }, React.createElement("span", {
     className: "rd-evlist-n"
@@ -63311,14 +63385,15 @@ function RdEventList({
     className: "rd-evlist-d"
   }, window.AUSPOL.monthName(Number(l.ym.slice(5))) + " " + l.ym.slice(0, 4)))));
   const same = from && from.length === list.length && from.every((l, i) => l.n === list[i].n && l.ym === list[i].ym && l.labels.join() === list[i].labels.join());
-  if (!from || same || mix >= 1) return ol(list);
+  if (!from || same || mix >= 1) return ol(list, undefined, undefined, !!onPick);
   return React.createElement("div", {
     className: "rd-evstack"
   }, ol(from, {
-    opacity: 1 - mix
+    opacity: 1 - mix,
+    pointerEvents: "none"
   }, true), ol(list, {
     opacity: mix
-  }));
+  }, undefined, !!onPick));
 }
 function RdCheck({
   checked,
@@ -63409,6 +63484,17 @@ function RdQPop({
     "aria-label": label
   }, children));
 }
+function rdEventReveal(id) {
+  requestAnimationFrame(() => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 88;
+    if (top < window.scrollY) window.scrollTo({
+      top,
+      behavior: "smooth"
+    });
+  });
+}
 Object.assign(window, {
   RdSec,
   RdHed,
@@ -63435,6 +63521,7 @@ Object.assign(window, {
   rdYTicks,
   rdEventBadges,
   RdEventList,
+  rdEventReveal,
   RdCheck,
   RdSwitch,
   RdTerm,
@@ -63853,10 +63940,17 @@ function RdHero(p) {
   };
   const evsAll = evsOf(morph ? B : S);
   const evsWas = morph ? evsOf(A) : null;
-  const badges = narrow ? rdEventBadges(evsAll, xDomain[0], xDomain[1]) : null;
-  const badgesWas = narrow && evsWas ? rdEventBadges(evsWas, xDomain[0], xDomain[1]) : null;
+  const badges = narrow ? rdEventBadges("tp", evsAll, xDomain[0], xDomain[1]) : null;
+  const badgesWas = narrow && evsWas ? rdEventBadges("tp", evsWas, xDomain[0], xDomain[1]) : null;
   const events = badges ? badges.events : evsAll;
   const eventsWas = evsWas ? badgesWas ? badgesWas.events : evsWas : null;
+  const [evtOpen, setEvtOpen] = useState(null);
+  const pickEv = e => {
+    setEvtOpen(cur => cur && cur.e === e ? cur : {
+      e
+    });
+    rdEventReveal("evt-a-" + e.badgeKey);
+  };
   const aName = m.a.name,
     rival = M[matchup].vsLabor ? "Rival" : m.b.name;
   const notes = [{
@@ -64178,6 +64272,8 @@ function RdHero(p) {
     events: events,
     eventsFrom: eventsWas,
     eventMix: t,
+    evt: evtOpen,
+    onEvt: setEvtOpen,
     series: series,
     spine: spine,
     scatter: scatter,
@@ -64201,7 +64297,9 @@ function RdHero(p) {
   }), badges && React.createElement(RdEventList, {
     list: badges.list,
     from: badgesWas ? badgesWas.list : null,
-    mix: t
+    mix: t,
+    onPick: pickEv,
+    openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
   }), React.createElement(RdKey, {
     className: "rd-ckey",
     items: keyItems
@@ -64376,7 +64474,14 @@ function RdPrimary({
     hidden: !!hidden[p.id]
   })) : [];
   const evs = (D.events || []).filter(e => e.major);
-  const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
+  const badges = narrow ? rdEventBadges("p1", evs, xDomain[0], xDomain[1]) : null;
+  const [evtOpen, setEvtOpen] = useState(null);
+  const pickEv = e => {
+    setEvtOpen(cur => cur && cur.e === e ? cur : {
+      e
+    });
+    rdEventReveal("evt-a-" + e.badgeKey);
+  };
   const eDate = (D.cycles.find(c => c.current) || {}).eDate;
   const meta = narrow ? D.latest.pollsTracked + " national polls, latest fieldwork " + rdDate(D.latest.updatedISO) : D.latest.pollsTracked + " national polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true);
   const toggle = id => setHidden(h => {
@@ -64472,6 +64577,8 @@ function RdPrimary({
     marks: marks,
     ringAtX: base ? base.x : null,
     events: badges ? badges.events : evs,
+    evt: evtOpen,
+    onEvt: setEvtOpen,
     tooltipTitle: i => pts[i] ? monthLabelFull(pts[i].ym) : "",
     extraRows: i => {
       const d = pts[i];
@@ -64495,7 +64602,9 @@ function RdPrimary({
       }))
     }
   }), badges && React.createElement(RdEventList, {
-    list: badges.list
+    list: badges.list,
+    onPick: pickEv,
+    openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
   }), React.createElement(RdKey, {
     className: "rd-ckey",
     items: [{
@@ -65663,7 +65772,7 @@ function RdDirection({
     lines: [gapNow.toFixed(1) + " points apart", "in " + D.monthNameFull(Number(last.ym.slice(5))) + (base ? ";" : ""), base ? Math.abs(base.wrong - base.right).toFixed(1) + " before Bondi" : null].filter(Boolean)
   }];
   const evs = bondi ? [bondi] : [];
-  const badges = narrow ? rdEventBadges(evs, xDomain[0], xDomain[1]) : null;
+  const badges = narrow ? rdEventBadges("dir", evs, xDomain[0], xDomain[1]) : null;
   const monthNow = last ? D.monthNameFull(Number(last.ym.slice(5))) : "";
   const foot = last ? "The headline figures pool the latest polls, so they can differ a little from " + monthNow + "’s monthly average." : null;
   const asked = rdList(D.directionHouses || []);
@@ -69648,7 +69757,7 @@ function RdCycleChart({
   const badges = badged ? {
     events,
     list: null
-  } : narrow ? rdEventBadges(events.filter(e => e.date), -2, 38) : null;
+  } : narrow ? rdEventBadges("cy", events.filter(e => e.date), -2, 38) : null;
   const tickSet = ticks.slice();
   if (!tickSet.includes(domain[0])) tickSet.unshift(domain[0]);
   if (!tickSet.includes(domain[1])) tickSet.push(domain[1]);
@@ -70484,7 +70593,7 @@ function RdPastCycles(p) {
   })), React.createElement("p", {
     className: "rd-note"
   }, "Click a term to draw its own line over the band, and again to put it back. The \xD7 takes it off the board altogether: out of the band, the average and the download. With three terms or fewer on the board, the band gives way to the polls under each line.")));
-  const pairOf = keys => rdEventBadges((CYC_EVENTS[cur.year] || []).filter(e => !e.metrics || e.metrics.some(k => keys.includes(k))).map(e => ({
+  const pairOf = keys => rdEventBadges("cy" + cur.year, (CYC_EVENTS[cur.year] || []).filter(e => !e.metrics || e.metrics.some(k => keys.includes(k))).map(e => ({
     ...e,
     x: cycEventMonth(e.date, cur.eDate)
   })), -2, 38);

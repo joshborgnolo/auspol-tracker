@@ -525,42 +525,81 @@ function rdYTicks(lo, hi, step) {
 /* ---------------------------------------------------------------- events
    On a phone the event names do not fit over the plot, so each month with
    an event gets a number over its rule and the names are listed under the
-   chart. Events in one month share a number. */
-function rdEventBadges(events, x0, x1) {
+   chart. Events in one month share a number. The caller hangs an `idKey`
+   on each badge so two charts' taps and scroll anchors (evt-a-<key>) never
+   mint the same id; list items carrying `evs` let a tap hand the event
+   back to the chart. */
+function rdEventBadges(idKey, events, x0, x1) {
   const inWin = (events || []).filter((e) => e.x >= x0 && e.x <= x1).sort((a, b) => a.x - b.x);
+  /* An opened event lives in the caller across renders; this memo returns
+     the SAME objects while the window holds the same set, or the chart's
+     identity reconciliation (evt.e === a drawn event) lets the open go */
+  const memo = rdEventBadges.memo || (rdEventBadges.memo = {});
+  const memKey = idKey + "|" + x0.toFixed(4) + "|" + x1.toFixed(4) + "|" + inWin.map((e) => e.date).join(",");
+  if (memo[memKey]) return memo[memKey];
+  if (Object.keys(memo).length > 120) rdEventBadges.memo = {};
   const list = [];
   const out = inWin.map((e) => {
     const ym = e.date.slice(0, 7);
     let item = list.find((l) => l.ym === ym);
-    if (!item) { item = { n: list.length + 1, ym, labels: [] }; list.push(item); }
+    if (!item) { item = { n: list.length + 1, ym, labels: [], evs: [] }; list.push(item); }
     /* the short name reads better in a list, unless it is shorthand */
     item.labels.push(/→/.test(e.short || "") || !e.short ? e.label : e.short);
-    return { ...e, badge: item.n, badgeLead: item.labels.length === 1 };
+    /* the list hands the chart back the same object it drew: an opened
+       event reconciles by identity against it */
+    const badged = { ...e, badge: item.n, badgeLead: item.labels.length === 1, badgeKey: idKey + "-" + e.date };
+    item.evs.push(badged);
+    return badged;
   });
-  return { events: out, list };
+  const result = { events: out, list };
+  rdEventBadges.memo[memKey] = result;
+  return result;
 }
-function RdEventList({ list, inline, from, mix }) {
+function RdEventList({ list, inline, from, mix, onPick, openKey }) {
   if (!list || !list.length) return null;
   /* `inline` runs the list across the page, as the canvas set the one shared
      by a pair of half-width charts; a phone always stacks it */
-  const ol = (l0, st, hidden) => (
+  const row = (l, i) => {
+    const d = window.AUSPOL.monthName(Number(l.ym.slice(5))) + " " + l.ym.slice(0, 4);
+    /* a tap opens the event's panel in the chart above; the first event
+       against the number answers, a month of them sharing one */
+    const on = !!(openKey && l.evs && l.evs.some((e) => e.badgeKey === openKey));
+    return onPick && l.evs && l.evs.length ? (
+      <li key={l.n}>
+        <button type="button" className={"rd-evlist-b" + (on ? " on" : "")} aria-pressed={on}
+                onClick={() => onPick(l.evs[0])}>
+          <span className="rd-evlist-n">{l.n}</span>
+          <span className="rd-evlist-l">{l.labels.join(", ")}</span>
+          <span className="rd-evlist-d">{d}</span>
+        </button>
+      </li>
+    ) : (
+      <li key={l.n}>
+        <span className="rd-evlist-n">{l.n}</span>
+        <span className="rd-evlist-l">{l.labels.join(", ")}</span>
+        <span className="rd-evlist-d">{d}</span>
+      </li>
+    );
+  };
+  const ol = (l0, st, hidden, pick) => (
     <ol className={"rd-evlist" + (inline ? " inline" : "")} style={st} aria-hidden={hidden || undefined}>
-      {l0.map((l) => (
+      {l0.map((l, i) => (pick ? row(l, i) : (
         <li key={l.n}><span className="rd-evlist-n">{l.n}</span>
           <span className="rd-evlist-l">{l.labels.join(", ")}</span>
           <span className="rd-evlist-d">{window.AUSPOL.monthName(Number(l.ym.slice(5))) + " " + l.ym.slice(0, 4)}</span></li>
-      ))}
+      )))}
     </ol>
   );
   /* mid-switch (`from`, `mix`): the list being left fades out over the list
      arriving, both in one cell, so the names change with the chart's badges
      and the page below does not move on the switch's last frame */
   const same = from && from.length === list.length && from.every((l, i) => l.n === list[i].n && l.ym === list[i].ym && l.labels.join() === list[i].labels.join());
-  if (!from || same || mix >= 1) return ol(list);
+  if (!from || same || mix >= 1) return ol(list, undefined, undefined, !!onPick);
+  /* mid-switch the tappable list belongs to the view being arrived at */
   return (
     <div className="rd-evstack">
-      {ol(from, { opacity: 1 - mix }, true)}
-      {ol(list, { opacity: mix })}
+      {ol(from, { opacity: 1 - mix, pointerEvents: "none" }, true)}
+      {ol(list, { opacity: mix }, undefined, !!onPick)}
     </div>
   );
 }
@@ -626,9 +665,21 @@ function RdQPop({ label, children, align }) {
     </span>
   );
 }
+/* A tapped event answers from the chart above: scroll its rule to just
+   under the sticky head so the panel it opens has the plot to hang in.
+   The anchor renders only after the tap's state commits, so the reveal
+   waits for the next frame. */
+function rdEventReveal(id) {
+  requestAnimationFrame(() => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 88;
+    if (top < window.scrollY) window.scrollTo({ top, behavior: "smooth" });
+  });
+}
 
 Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdGlide, RdCrossfade,
                         rdTabsKey, rdTabFocus, rdDigitKey,
                         rdNumWord, rdCap, rdFraction, rdSigned, rdArrow,
                         rdDate, rdMonthYear, rdPointsPhrase, rdXTicks, rdYTicks,
-                        rdEventBadges, RdEventList, RdCheck, RdSwitch, RdTerm, RdQPop });
+                        rdEventBadges, RdEventList, rdEventReveal, RdCheck, RdSwitch, RdTerm, RdQPop });

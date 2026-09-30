@@ -148,7 +148,7 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
     .concat(nowM != null ? [{ x: nowM, label: "Now", strong: true }] : []).sort((a, b) => a.x - b.x);
   /* a pair of half-width charts shares one numbered list, made by the tab;
      a lone chart on a phone numbers its own */
-  const badges = badged ? { events, list: null } : narrow ? rdEventBadges(events.filter((e) => e.date), -2, 38) : null;
+  const badges = badged ? { events, list: null } : narrow ? rdEventBadges("cy", events.filter((e) => e.date), -2, 38) : null;
   const tickSet = ticks.slice();
   if (!tickSet.includes(domain[0])) tickSet.unshift(domain[0]);
   if (!tickSet.includes(domain[1])) tickSet.push(domain[1]);
@@ -647,7 +647,7 @@ function RdPastCycles(p) {
 
   /* the sitting term's events, numbered once for each pair of half-width
      charts so the list under the pair serves both */
-  const pairOf = (keys) => rdEventBadges((CYC_EVENTS[cur.year] || [])
+  const pairOf = (keys) => rdEventBadges("cy" + cur.year, (CYC_EVENTS[cur.year] || [])
     .filter((e) => !e.metrics || e.metrics.some((k) => keys.includes(k)))
     .map((e) => ({ ...e, x: cycEventMonth(e.date, cur.eDate) })), -2, 38);
   const PAIRS = { primary: pairOf(["primary", "oppr"]), leaders: pairOf(["ppmm", "oppnet"]) };

@@ -289,10 +289,15 @@ function RdHero(p) {
   };
   const evsAll = evsOf(morph ? B : S);
   const evsWas = morph ? evsOf(A) : null;
-  const badges = narrow ? rdEventBadges(evsAll, xDomain[0], xDomain[1]) : null;
-  const badgesWas = narrow && evsWas ? rdEventBadges(evsWas, xDomain[0], xDomain[1]) : null;
+  const badges = narrow ? rdEventBadges("tp", evsAll, xDomain[0], xDomain[1]) : null;
+  const badgesWas = narrow && evsWas ? rdEventBadges("tp", evsWas, xDomain[0], xDomain[1]) : null;
   const events = badges ? badges.events : evsAll;
   const eventsWas = evsWas ? (badgesWas ? badgesWas.events : evsWas) : null;
+  /* the phone list under the chart opens an event's panel by tapping its
+     number; a tap on another number hands the panel over, and an event that
+     leaves the window is put away by the chart's own reconciliation */
+  const [evtOpen, setEvtOpen] = useState(null);
+  const pickEv = (e) => { setEvtOpen((cur) => (cur && cur.e === e ? cur : { e })); rdEventReveal("evt-a-" + e.badgeKey); };
 
   const aName = m.a.name, rival = M[matchup].vsLabor ? "Rival" : m.b.name;
   const notes = [
@@ -477,6 +482,7 @@ function RdHero(p) {
           xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, elec ? elec.x : null)} baseline
           refLines={[{ y: 50, color: "var(--ink-faint)" }]}
           notes={notes} marks={marks} ringAtX={ringOn ? elec.x : null} events={events} eventsFrom={eventsWas} eventMix={t}
+          evt={evtOpen} onEvt={setEvtOpen}
           series={series} spine={spine}
           scatter={scatter} scatterOut={scatterOut} scatterMove={scatterMove}
           areas={areas} fade={morph ? t : 1}
@@ -487,7 +493,7 @@ function RdHero(p) {
                   sub: basisWords.replace(/^Implied flows$/, "Implied preference flows").replace(/^As published$/, "Pollsters’ published figures") + (unc ? ", weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
                   legend: copyKey.map((k) => ({ label: k.label, color: k.color, kind: k.kind })) }}
         />
-        {badges && <RdEventList list={badges.list} from={badgesWas ? badgesWas.list : null} mix={t} />}
+        {badges && <RdEventList list={badges.list} from={badgesWas ? badgesWas.list : null} mix={t} onPick={pickEv} openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />}
         <RdKey className="rd-ckey" items={keyItems} />
         {narrow && cmpAvail && <RdCheck checked={showSynth} onChange={setShowSynth}>{cmpBox}</RdCheck>}
       </div>
