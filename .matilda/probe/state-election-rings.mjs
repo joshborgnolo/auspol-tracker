@@ -166,7 +166,7 @@ for (const party of ["alp", "lnp", "onp", "grn", "oth"]) {
     const y = yOf(exp, p.tks);
     check(party + " " + PANELS[i] + ": ring at the AEC share " + exp, p.tks.length >= 2 && p.ringBox && Math.abs(p.ringBox.cy - y) < 3,
       p.ringBox ? "cy " + p.ringBox.cy.toFixed(1) + " vs " + y.toFixed(1) + " ticks" + JSON.stringify(p.tks.map((t) => t.v)) : "no ring, ticks" + JSON.stringify(p.tks.map((t) => t.v)));
-    check(party + " " + PANELS[i] + ": label reads 2025 election", p.label && p.label.includes("2025 election: " + exp.toFixed(1)),
+    check(party + " " + PANELS[i] + ": ring carries no text label", !p.label,
       JSON.stringify(p.label));
   });
   /* hover Victoria's ring: guide tip, two ring swatches, both rows at the election share */

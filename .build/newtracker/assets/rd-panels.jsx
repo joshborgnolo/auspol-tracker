@@ -1407,7 +1407,7 @@ function RdDemographics({ rangeId = "all" }) {
                     series={[{ ...allSeries, rdWidth: 1.25, endLabel: null, points: allPtsS }, lineOf(r, pColorNow, { rdWidth: 2.25, endLabel: null, ...(linePts ? { points: linePts.concat(r.rows.map((d) => ({ x: d.x, y: d.y }))) } : {}) })]}
                     areas={[bandOf(r, pColorNow)].filter((a) => a.points.length >= 2)}
                     spine={spine}
-                    marks={seY != null ? [{ x: se.x, y: seY, color: pColorNow, label: "2025 election: " + seY.toFixed(1) }] : []}
+                    marks={seY != null ? [{ x: se.x, y: seY, color: pColorNow }] : []}
                     ringAtX={seY != null ? se.x : null}
                     scatter={mine(cross ? cross.scatter : c.dots, g.label)} scatterOut={mine(cross ? cross.scatterOut : [], g.label)}
                     scatterMove={mine(cross ? cross.scatterMove : [], g.label)}
