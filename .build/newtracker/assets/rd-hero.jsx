@@ -392,6 +392,18 @@ function RdHero(p) {
     ? "After preferences, updated " + rdDate(D.latest.updatedISO, true)
     : "After preferences, " + D.latest.pollsTracked + " polls from " + D.latest.housesTracked + " pollsters, updated " + rdDate(D.latest.updatedISO, true);
 
+  /* the tab's on-this-page index, in the hero's eyebrow as Past cycles and
+     All polls carry theirs in theirs; the Snapshot's sections run ten deep,
+     so the links are the exact section titles scrolled to */
+  const snapNav = [
+    ["latest-polls", "Latest and next polls"],
+    ["leadership", "Leadership"],
+    ["who-votes", "Who votes for whom"],
+    ["issues", "The issues"],
+    ["undecided", "Undecided", true],
+  ];
+  const snapGo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
+
   /* a sideways swipe on the chart flips the 2PP contest, wrapping round the
      matchups like the computer's arrow keys wrap a row - the card bears the
      exact claim so the gesture reaches it past the chart's own scrub */
@@ -447,6 +459,7 @@ function RdHero(p) {
       <div className="rd-eyebrow">
         <h2 className="rd-title" id="rd-tpp-t">Two-party preferred</h2>
         <span className="rd-meta">{meta}</span>
+        {!narrow && <nav className="rd-eyebrow-tools rd-snap-nav" aria-label="On this page">{snapNav.map(([id, lab, tail]) => <button key={id} type="button" className={tail ? "rd-snap-t" : undefined} onClick={() => snapGo(id)}>{lab}</button>)}</nav>}
       </div>
       {/* The section's headline under its heading, as every other section
          has it, so the opening view reads down a left edge before the

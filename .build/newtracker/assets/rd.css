@@ -1615,11 +1615,22 @@ body.rd {
   --rd-rowbg: var(--bg);
 }
 body.rd.dark { --rd-whisker: #5C5751; --rd-avgline: #6E6964; }
-body.rd .rd-ap-nav button {
+body.rd .rd-ap-nav button,
+body.rd .rd-snap-nav button {
   all: unset; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--ink-2); white-space: nowrap;
 }
-body.rd .rd-ap-nav button:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
-body.rd .rd-ap-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+body.rd .rd-ap-nav button:hover,
+body.rd .rd-snap-nav button:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+body.rd .rd-ap-nav button:focus-visible,
+body.rd .rd-snap-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+/* the snapshot's index rides a row whose left side (title + poll-count
+   meta) is its own, so it carries the eyebrow's 16px rhythm rather than
+   the 20px of the tabs' own rows, and sheds its tail as the row narrows:
+   the deepest link first (the 1200px column only saturates at 1280), the
+   rest once the four that remain can no longer hold the line */
+body.rd .rd-snap-nav { gap: 16px; }
+@media (max-width: 1279px) { body.rd .rd-snap-nav .rd-snap-t { display: none; } }
+@media (max-width: 1189px) { body.rd .rd-snap-nav { display: none; } }
 body.rd .rd-ap-tabs { margin-top: 28px; }
 body.rd .rd-ap-pctl { display: flex; align-items: center; gap: 4px; min-height: 40px; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-ap-pctl .rd-pl-flip { font-size: 13px; }
