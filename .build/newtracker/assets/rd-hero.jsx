@@ -474,7 +474,7 @@ function RdHero(p) {
           yTickFmt={(v) => (v === yTarget[1] ? v + "%" : String(v))}
           morphFrom={yFrom ? { yTicks: yFromTicks, yTickFmt: (v) => (v === yTop(yFrom) ? v + "%" : String(v)),
                                refLines: [{ y: 50, color: "var(--ink-faint)" }], notes } : null} morphT={t}
-          xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline
+          xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, elec ? elec.x : null)} baseline
           refLines={[{ y: 50, color: "var(--ink-faint)" }]}
           notes={notes} marks={marks} ringAtX={ringOn ? elec.x : null} events={events} eventsFrom={eventsWas} eventMix={t}
           series={series} spine={spine}

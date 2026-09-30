@@ -64166,7 +64166,7 @@ function RdHero(p) {
       notes
     } : null,
     morphT: t,
-    xTicks: rdXTicks(xDomain[0], xDomain[1], narrow),
+    xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, elec ? elec.x : null),
     baseline: true,
     refLines: [{
       y: 50,
