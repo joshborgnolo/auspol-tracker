@@ -1164,12 +1164,15 @@ function RdGenBorn({ label }) {
   );
 }
 /* the composition-trend block's wording slots (shapes are the user's, dictated
-   2026-09-29; the SENTENCES are generated from D.demoTrend — gen-data §7gb —
-   and re-word themselves as significances move, so only these phrase pieces
-   are curated). Titles: "… is losing voters faster in …", "The composition of
-   …'s vote is unchanged". Deks: "… shifted away from … and towards …", "…
-   voter base has become more inner-metro", "… once-large lead … appears to be
-   shrinking". */
+   2026-09-29 and re-dictated 2026-09-30; the SENTENCES are generated from
+   D.demoTrend — gen-data §7gb — and re-word themselves as significances move,
+   so only these phrase pieces are curated). Titles: "… is losing voters
+   faster in …", "The composition of …'s vote is unchanged". Deks: "… shifted
+   away from X (−x points …), and towards Y (+y points)", "… voter base has
+   become more inner-metro" + "… has increased by +x points relative to the
+   overall change, rising even as …", "It has also shifted away from /
+   towards …" — a sole gender move as "Its relative position among men has
+   also shrunk". */
 const RD_TREND_NAME = { onp: "One Nation", alp: "Labor", lnp: "The Coalition", grn: "the Greens", oth: "Others & independents" };
 const RD_TREND_NAME_DEK = { onp: "One Nation", alp: "Labor", lnp: "the Coalition", grn: "the Greens", oth: "others & independents" };
 const RD_TREND_BARE = { onp: "One Nation", alp: "Labor", lnp: "Coalition", grn: "Greens" };
@@ -1187,12 +1190,12 @@ const RD_TREND_LOC = {
   Rural: { adj: "rural", ref: "rural areas" },
 };
 const RD_TREND_GROUP = {
-  "Other language": "voters in non-English-speaking households", "English only": "English-only speakers",
+  "Other language": "voters who speak a language other than English at home", "English only": "English-only speakers",
   "18–34": "18–34s", "35–54": "35–54s", "55+": "over-55s",
   "Gen Z": "Gen Z", Millennials: "Millennials", "Gen X": "Gen X", Boomers: "Boomers",
   Men: "men", Women: "women",
   University: "university graduates", "TAFE or trade": "TAFE-qualified voters", "Year 12 or less": "voters with Year 12 or less",
-  "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
+  "Own outright": "outright homeowners", Mortgage: "mortgage holders", Renting: "renters",
 };
 /* the state panels' titles, as the board wrote them */
 const RD_STATE_NAME = { Vic: "Victoria", Qld: "Queensland" };
@@ -1327,11 +1330,11 @@ function RdDemographics({ rangeId = "all" }) {
      towards" means beyond what the party's own national trend hands a group
      merely for its starting level. Sets rank by their strongest move's
      |t(log-ratio)|; the dek carries the top two. Figures quoted are the
-     fitted start/end levels, a move on seven or fewer monthly points
-     hedges "appears to be", and (user dictate 2026-09-29: "it must be
-     significantly significant to make it") a thin move never CARRIES a
-     claim — it trails a solid one as a hedged sentence, and a party
-     whose moves are all thin renders the unchanged pair. */
+     signed moves relative to the all-voters shift, a move on seven or
+     fewer monthly points hedges "appears to", and (user dictate 2026-09-29:
+     "it must be significantly significant to make it") a thin move never
+     CARRIES a claim — it trails a solid one, and a party whose moves are
+     all thin renders the unchanged pair. */
   const shift = (() => {
     const dt = D.demoTrend && D.demoTrend[party];
     if (!dt || !dt.windowYm) return null;
@@ -1365,13 +1368,18 @@ function RdDemographics({ rangeId = "all" }) {
       return st ? st.groups.map((g) => g.label) : [];
     };
     const bestOf = (ms) => ms.slice().sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR))[0];
+    /* the vote noun phrase: others & independents can't carry a possessive
+       ("the vote for others & independents", user dictate 2026-09-30) */
+    const voteOf = party === "oth" ? "the vote for others & independents" : poss(nameD) + " vote";
     const stateDek = (ms, hedged) => {
       /* a side with no significant move of its own names the other side's
          complement: "away from NSW, Victoria, and Queensland, and towards
          the rest of Australia" is rest-of-Australia's single move read the
-         other way */
-      const toward = ms.filter((m) => m.dir > 0).map((m) => m.group);
-      const away = ms.filter((m) => m.dir < 0).map((m) => m.group);
+         other way. A side with a move of its own QUOTES its own figure
+         (user dictate 2026-09-30); a complement-named side stays bare. */
+      const towardMs = ms.filter((m) => m.dir > 0), awayMs = ms.filter((m) => m.dir < 0);
+      const toward = towardMs.map((m) => m.group);
+      const away = awayMs.map((m) => m.group);
       const others = ms.length ? setGroupsOf(ms[0]) : [];
       if (!toward.length) toward.push(...others.filter((l) => !away.includes(l)));
       if (!away.length) away.push(...others.filter((l) => !toward.includes(l)));
@@ -1383,30 +1391,46 @@ function RdDemographics({ rangeId = "all" }) {
         // the title's pole: the three eastern states together name as one
         pole: a.length ? (eastern(a) ? "the eastern-mainland states" : serial(named(a))) : (eastern(t) ? "the eastern-mainland states" : serial(named(t))),
         toward: !a.length,
-        dek: "the composition of " + poss(nameD) + " vote " + (hedged ? "appears to have" : "has") + " shifted away from " + serial(named(a)) + ", and towards " + serial(named(t)) + " (" + relPts(bestOf(ms.filter((m) => m.dir < 0).length ? ms.filter((m) => m.dir < 0) : ms)) + " points relative to all " + nameD + " voters)",
+        dek: "the composition of " + voteOf + " " + (hedged ? "appears to have" : "has") + " shifted away from " + serial(named(a)) + " (" + relPts(bestOf(awayMs.length ? awayMs : ms)) + " points relative to all " + nameD + " voters), and towards " + serial(named(t)) + (towardMs.length ? " (" + relPts(bestOf(towardMs)) + " points)" : ""),
       };
     };
     const locDek = (m) => {
       const loc = RD_TREND_LOC[m.group] || { adj: m.group.toLowerCase(), ref: m.group };
       if (m.thin) return [poss(nameD) + " voter base appears to have become " + (m.dir > 0 ? "more " : "less ") + loc.adj];
       const flat = Math.abs(m.a1 - m.a0) < 1;
-      const national = flat ? ", even as the national vote has remained flat"
-        : ", while the national vote has " + (m.a1 < m.a0 ? "fallen" : "risen") + " from " + pct(m.a0) + "% to " + pct(m.a1) + "%";
+      const national = (flat ? "even as the national vote has remained flat"
+        : "while the national vote has " + (m.a1 < m.a0 ? "fallen" : "risen") + " from " + pct(m.a0) + "% to " + pct(m.a1) + "%");
       const support = party === "oth" ? "Support for others & independents" : (RD_TREND_BARE[party] || nameT) + " support";
+      /* the quoted figure is the RELATIVE move, not the fitted from–to
+         levels, and the direction word moves into the national clause
+         (user dictate 2026-09-30): "... has increased by +3.7 points
+         relative to the overall change, rising even as the national vote
+         has remained flat" */
+      const rel = (m.g1 - m.g0) - (m.a1 - m.a0);
       return [
         poss(nameD) + " voter base has become " + (m.dir > 0 ? "more " : "less ") + loc.adj,
-        support + " in " + loc.ref + " has " + (m.dir > 0 ? "risen" : "fallen") + " from " + pct(m.g0) + "% to about " + pct(m.g1) + "%" + national,
+        support + " in " + loc.ref + " has " + (rel >= 0 ? "increased" : "decreased") + " by " + sgnPts(rel) + " points relative to the overall change, " + (m.dir > 0 ? "rising " : "falling ") + national,
       ];
     };
-    const groupDek = (m) => {
-      const gap0 = m.g0 - m.a0, gap1 = m.g1 - m.a1;
-      const lead = gap1 >= 0;
-      const noun = lead ? "lead" : "deficit";
-      const motion = gap1 > gap0 ? (lead ? "growing" : "narrowing") : (lead ? "shrinking" : "growing");
-      const mag = motion === "shrinking" || motion === "narrowing" ? Math.abs(gap0) : Math.abs(gap1);
-      const strength = mag >= 8 ? "once-large " : mag >= 3 ? "considerable " : "";
-      const hedge = m.thin ? "appears to be " : "is ";
-      return poss(nameD) + " " + strength + noun + " among " + (RD_TREND_GROUP[m.group] || m.group) + " " + hedge + motion + " (" + relPts(m) + " points)";
+    /* non-state, non-location moves merge into ONE "It has also shifted …"
+       sentence, each group quoting its own figure (user dictate 2026-09-30);
+       a sole GENDER move names a relative position instead ("Its relative
+       position among men has also shrunk"). The sentence hedges only when
+       every move it carries is thin. */
+    const groupSentence = (gms) => {
+      const fig = (m) => (RD_TREND_GROUP[m.group] || m.group) + " (" + relPts(m) + " points)";
+      const hedged = gms.every((m) => m.thin);
+      if (gms.length === 1 && gms[0].set === "gender") {
+        const m = gms[0], gap0 = m.g0 - m.a0, gap1 = m.g1 - m.a1;
+        const motion = Math.abs(gap1) > Math.abs(gap0) ? "grown" : "shrunk";
+        return "Its relative position among " + (RD_TREND_GROUP[m.group] || m.group) + (hedged ? " appears to have also " : " has also ") + motion + " (" + relPts(m) + " points)";
+      }
+      const away = gms.filter((m) => m.dir < 0).map(fig);
+      const toward = gms.filter((m) => m.dir > 0).map(fig);
+      const halves = [];
+      if (away.length) halves.push("away from " + serial(away));
+      if (toward.length) halves.push("towards " + serial(toward));
+      return "It " + (hedged ? "also appears to have shifted " : "has also shifted ") + halves.join(", and ");
     };
     const bySet = new Map();
     for (const m of solid) {
@@ -1420,6 +1444,7 @@ function RdDemographics({ rangeId = "all" }) {
       .slice(0, 2);
     let head = null;
     const parts = [];
+    const groupMoves = [];
     for (const { ms } of setsRanked) {
       const m0 = ms[0];
       if (m0.set === "state") {
@@ -1431,14 +1456,13 @@ function RdDemographics({ rangeId = "all" }) {
         if (!head) head = nameT + " " + isAre + " " + (m.dir > 0 ? "gaining in " : "losing voters faster in ") + loc.ref;
         parts.push(...locDek(m));
       } else {
-        const m = bestOf(ms);
         if (!head) head = "The composition of " + poss(nameT) + " vote is shifting";
-        parts.push(groupDek(m));
+        groupMoves.push(bestOf(ms));
       }
     }
-    /* thin moves trail the solid claim as hedged sentences (groupDek, the
-       thin locDek and the hedged stateDek all render "appears to"); a set
-       already carried by a solid move stays out */
+    /* thin moves trail the solid claim (the thin locDek and the hedged
+       stateDek render "appears to"; a group sentence of only thin moves
+       hedges too); a set already carried by a solid move stays out */
     const carried = new Set(setsRanked.map(({ ms }) => ms[0].tab + "|" + ms[0].set));
     const thinSets = new Map();
     for (const m of thin) {
@@ -1455,8 +1479,15 @@ function RdDemographics({ rangeId = "all" }) {
         const m0 = ms[0];
         if (m0.set === "state") parts.push(stateDek(ms, true).dek);
         else if (m0.set === "location") parts.push(...locDek(bestOf(ms)));
-        else parts.push(groupDek(bestOf(ms)));
+        else groupMoves.push(bestOf(ms));
       });
+    /* a dek the group sentence OPENS drops the "also" and stays lower-case
+       ("Since …, it has shifted towards renters (+0.9 points)"); after a
+       state/location sentence it trails as dictated */
+    if (groupMoves.length) {
+      const s = groupSentence(groupMoves);
+      parts.push(parts.length ? s : s.replace(/^I(t|ts)/, (w) => w.toLowerCase()).replace(" also ", " "));
+    }
     /* sentences after the first start a sentence of their own, so a
        lower-case name ("others & independents") still opens capitalised */
     return { head, dek: since + parts.map((s, i) => (i === 0 ? s : rdCap(s))).join(". ") + "." };
