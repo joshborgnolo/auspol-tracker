@@ -66478,12 +66478,20 @@ function RdDemographics({
     sec.addEventListener("pointerenter", enter);
     sec.addEventListener("pointerleave", leave);
     const key = e => {
-      if (!wvHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      if (!wvHover.current) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
+      if (e.key >= "1" && e.key <= "9") {
+        const pp = DEMO_PARTIES[e.key.charCodeAt(0) - 48 - 1];
+        if (!pp) return;
+        e.preventDefault();
+        pickParty(pp.id);
+        return;
+      }
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
       const list = (T.tabs || []).map(x => x.id);
       const i = list.indexOf(tabId);
       if (i < 0 || list.length < 2) return;
@@ -67771,6 +67779,18 @@ function RdIssues({
   const isHover = React.useRef(false);
   const iwHover = React.useRef(false);
   const iwCard = React.useRef(null);
+  const trHover = React.useRef(false);
+  const trGrid = React.useRef(null);
+  const trStep = React.useRef(null);
+  trStep.current = dir => {
+    const list = I && I.list ? I.list : [];
+    if (list.length < 2) return false;
+    const cur = selNow && list.some(x => x.id === selNow) ? selNow : list[0].id;
+    const j = list.findIndex(x => x.id === cur) + dir;
+    if (j < 0 || j >= list.length) return false;
+    setSel(list[j].id);
+    return true;
+  };
   React.useEffect(() => {
     const sec = document.getElementById("issues");
     if (!sec) return undefined;
@@ -67788,13 +67808,22 @@ function RdIssues({
     };
     const pairs = [on(sec, isHover)];
     if (iwCard.current) pairs.push(on(iwCard.current, iwHover));else iwHover.current = false;
+    if (trGrid.current) pairs.push(on(trGrid.current, trHover));else trHover.current = false;
     const key = e => {
-      if (!isHover.current && !iwHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      if (!isHover.current && !iwHover.current && !trHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        if (!trHover.current || view !== "trust") return;
+        const trg = trGrid.current;
+        if (!trg || !trg.isConnected || !trg.getClientRects().length) return;
+        if (!trStep.current || !trStep.current(e.key === "ArrowDown" ? 1 : -1)) return;
+        e.preventDefault();
+        return;
+      }
       const G = I && I.groups;
       if (iwHover.current && view === "whom" && G && G.tabs) {
         const iw = iwCard.current;
@@ -68189,7 +68218,8 @@ function RdIssues({
     head: trustHead,
     dek: trustDek
   }), React.createElement("div", {
-    className: "rd-is-grid"
+    className: "rd-is-grid",
+    ref: trGrid
   }, React.createElement("div", {
     className: "rd-is-left",
     ref: rowsRef
