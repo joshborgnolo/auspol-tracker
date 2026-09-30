@@ -3951,7 +3951,7 @@ body.rd .rd-iw-k:first-child { margin-top: 0; }
   body.rd .rd-iw-tabs .rd-tab { padding: 0 2px; font-size: 13px; }
 }
 body.rd .rd-iw-chips {
-  margin: 8px calc(-1 * var(--rd-gutter)) 0 0; padding-right: var(--rd-gutter);
+  margin: 16px calc(-1 * var(--rd-gutter)) 0 0; padding-right: var(--rd-gutter);
   display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
 }
 body.rd .rd-iw-chips::-webkit-scrollbar { display: none; }
@@ -68196,7 +68196,7 @@ function RdIssues({
   };
   const pinWhom = () => {
     const sec = document.getElementById("issues");
-    rdPinScroll(sec && (sec.querySelector(".rd-iw-chips") || sec.querySelector(".rd-iw-ctl")));
+    rdPinScroll(sec && [sec.querySelector(".rd-iw-tabs"), sec.querySelector(".rd-iw-chips"), sec.querySelector(".rd-iw-ctl")]);
   };
   const pickGset = id => {
     pinWhom();
@@ -68377,9 +68377,7 @@ function RdIssues({
     })),
     ariaLabel: "Group voters by",
     className: "rd-tabs-sm rd-iw-tabs"
-  }), React.createElement("span", {
-    className: "rd-iw-k"
-  }, "Issue"), React.createElement("div", {
+  }), React.createElement("div", {
     className: "rd-iw-chips",
     role: "group",
     "aria-label": "Issue"

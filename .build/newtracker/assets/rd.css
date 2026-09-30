@@ -1269,7 +1269,9 @@ body.rd .rd-iw-k:first-child { margin-top: 0; }
   body.rd .rd-iw-tabs .rd-tab { padding: 0 2px; font-size: 13px; }
 }
 body.rd .rd-iw-chips {
-  margin: 8px calc(-1 * var(--rd-gutter)) 0 0; padding-right: var(--rd-gutter);
+  /* no "Issue" label above any more (2026-09-30): the 16px the label's
+     margin gave the grouping menu moves onto the chips row itself */
+  margin: 16px calc(-1 * var(--rd-gutter)) 0 0; padding-right: var(--rd-gutter);
   display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
 }
 body.rd .rd-iw-chips::-webkit-scrollbar { display: none; }

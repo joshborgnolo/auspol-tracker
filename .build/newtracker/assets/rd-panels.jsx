@@ -2368,11 +2368,16 @@ function RdIssues({ rangeId = "all" }) {
   };
 
   /* Switching the grouping or the issue rewrites the head and dek above the
-     toggle row; scrolled past them, the toggle row and rows under it would
-     ride the story block's height glide. rdPinScroll holds the spot. */
+     grouping row; scrolled past them, the control row and everything under
+     it would ride the story block's height glide. rdPinScroll holds the
+     spot. Pin the grouping's own control first: .rd-iw-tabs is the one menu
+     at every width since 1e2838f (pinning the .rd-iw-chips Issue row left
+     the menu the user tapped gliding away); read top to bottom, so deep in
+     the list with the menu scrolled off the Issue chips row itself takes
+     the pin; the desktop label+menu row is the last resort */
   const pinWhom = () => {
     const sec = document.getElementById("issues");
-    rdPinScroll(sec && (sec.querySelector(".rd-iw-chips") || sec.querySelector(".rd-iw-ctl")));
+    rdPinScroll(sec && [sec.querySelector(".rd-iw-tabs"), sec.querySelector(".rd-iw-chips"), sec.querySelector(".rd-iw-ctl")]);
   };
   const pickGset = (id) => { pinWhom(); setGset(id); };
   const pickWhom = (k) => { pinWhom(); setWhomK(k); };
@@ -2469,7 +2474,6 @@ function RdIssues({ rangeId = "all" }) {
                   <span className="rd-iw-k">Group voters by</span>
                   <RdTabs swipe value={gtab.id} onChange={pickGset} options={G.tabs.map((x) => ({ id: x.id, label: x.label }))}
                           ariaLabel="Group voters by" className="rd-tabs-sm rd-iw-tabs" />
-                  <span className="rd-iw-k">Issue</span>
                   <div className="rd-iw-chips" role="group" aria-label="Issue">
                     {gtab.issues.map((k) => <button key={k} type="button" className="rd-iw-chip" aria-pressed={whomIssue === k} onClick={() => pickWhom(k)}>{ISS_SHORT[k] || I.labels[k] || k}</button>)}
                   </div>
