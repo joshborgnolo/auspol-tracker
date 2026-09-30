@@ -21,7 +21,10 @@
                  QLD, then SA, WA and ACT/NT/TAS, which together are Rest of
                  Australia, merged at their shares of the 2025 formal vote
                  (AEC event 31496) – a known split, not an estimate. A wave
-                 missing any of the three doesn't join there.
+                 missing any of the three doesn't join there. Roy Morgan
+                 (from the 2026-09-27 wave's fortnight release PDF) prints
+                 NSW, Vic, Qld, SA and WA but no Tas/ACT/NT cut, so it joins
+                 only at the three big states, like YouGov's 18–34 age band.
      location    Inner metro, Outer metro, Provincial and Rural – YouGov and
                  RedBridge cut identically. DemosAU's Regional/Rural is
                  provincial and rural voters together, so it joins only at

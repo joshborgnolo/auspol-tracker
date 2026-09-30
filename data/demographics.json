@@ -5871,6 +5871,61 @@
     "grn": 14,
     "oth": 12
    }
+  },
+  {
+   "pollster": "Roy Morgan",
+   "date": "2026-09-27",
+   "dateStart": "2026-09-14",
+   "sample": 2569,
+   "article": "https://www.roymorgan.com/findings/10363-federal-voting-intention-september-29-2026",
+   "source": "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29053832/10363-Federal-Voting-Intention-September-29-2026.pdf",
+   "read": "published table",
+   "dims": {
+    "state": {
+     "NSW": {
+      "alp": 28.5,
+      "lnp": 22,
+      "onp": 26.5,
+      "grn": 12,
+      "oth": 11
+     },
+     "Vic": {
+      "alp": 25.5,
+      "lnp": 26.5,
+      "onp": 23,
+      "grn": 16.5,
+      "oth": 9
+     },
+     "Qld": {
+      "alp": 20.5,
+      "lnp": 21,
+      "onp": 32.5,
+      "grn": 16,
+      "oth": 10
+     },
+     "SA": {
+      "alp": 28,
+      "lnp": 26.5,
+      "onp": 18.5,
+      "grn": 15.5,
+      "oth": 10.5
+     },
+     "WA": {
+      "alp": 27.5,
+      "lnp": 20,
+      "onp": 26,
+      "grn": 15,
+      "oth": 12
+     }
+    }
+   },
+   "total": {
+    "alp": 26,
+    "lnp": 22.5,
+    "onp": 25.5,
+    "grn": 14.5,
+    "oth": 11
+   }
   }
  ],
  "skipped": [

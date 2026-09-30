@@ -26,6 +26,15 @@
      Resolve   – the SMH Political Monitor interactive's age, gender and
                  state series, every month of the term, rebuilt each run from
                  one fetch (values decoded as extract-resolve-rpm.mjs does).
+     Roy Morgan– "Primary Vote by State" and city/country tables appeared in
+                 one release PDF to date (10363, the Sep-29-2026 fortnight
+                 aggregate) – earlier 2026 releases gate state detail behind
+                 "contact Julian McCrann". Hand-entered in ROYMORGAN_STATE
+                 below until the format proves recurring and a reader is
+                 worth building; harmonize joins only NSW/Vic/Qld (no Tas or
+                 ACT/NT cut → no Rest of Australia). Not in HOUSES: most
+                 weekly waves carry no state table, so stale/dropped checks
+                 would misfire.
    Groups are kept exactly as each house draws them – the age bands differ
    (Resolve and DemosAU 18–34/35–54/55+, YouGov 18–34/35–49/50+, RedBridge by
    generation) – with labels only tidied. Party keys alp/lnp/onp/grn/oth;
@@ -79,6 +88,22 @@ const KNOWN_SKIP = {
 const KNOWN_DROP = {
   "YouGov|age|50–64|2026-03-24": "YouGov printed 50–64 and 65+ only in Feb–Mar 2026; from 24 Mar it cut by generation instead, and from Jun its oldest band is 50+",
   "YouGov|age|65+|2026-03-24": "YouGov printed 50–64 and 65+ only in Feb–Mar 2026; from 24 Mar it cut by generation instead, and from Jun its oldest band is 50+",
+};
+
+/* Roy Morgan state tables, hand-entered from release PDFs (see the house
+   note in the header). Keyed by the poll row's date; shares as printed. */
+const ROYMORGAN_STATE = {
+  "2026-09-27": {
+    source: "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29053832/10363-Federal-Voting-Intention-September-29-2026.pdf",
+    state: {
+      NSW: { alp: 28.5, lnp: 22, onp: 26.5, grn: 12, oth: 11 },
+      Vic: { alp: 25.5, lnp: 26.5, onp: 23, grn: 16.5, oth: 9 },
+      Qld: { alp: 20.5, lnp: 21, onp: 32.5, grn: 16, oth: 10 },
+      SA: { alp: 28, lnp: 26.5, onp: 18.5, grn: 15.5, oth: 10.5 },
+      WA: { alp: 27.5, lnp: 20, onp: 26, grn: 15, oth: 12 },
+    },
+    total: { alp: 26, lnp: 22.5, onp: 25.5, grn: 14.5, oth: 11 },
+  },
 };
 
 function redbridgeCache(date) {
@@ -150,6 +175,20 @@ try {
     } catch (e) {
       pend(k, String(e.message || e).slice(0, 160));
     }
+  }
+  // Roy Morgan: hand-entered state tables (ROYMORGAN_STATE) — not every
+  // release carries one, so waves with none are left alone, not pending
+  for (const [date, h] of Object.entries(ROYMORGAN_STATE)) {
+    const k = "Roy Morgan|" + date;
+    if (!refresh && have.has(k)) { waves.push(have.get(k)); continue; }
+    const p = polls.find((x) => x.pollster === "Roy Morgan" && x.date === date);
+    if (!p) { pend(k, "no Roy Morgan poll row for this wave's date yet"); continue; }
+    const dims = { state: h.state };
+    const bad = dimsProblem(dims) || totalProblem(h.total, p);
+    if (bad) { pend(k, `the hand-entered state table failed the gate – ${bad}`); continue; }
+    push({ pollster: "Roy Morgan", date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
+           article: p.url ?? null, source: h.source, read: "published table", dims, total: h.total });
+    console.log(`${k}: state(${Object.keys(h.state).join("/")})`);
   }
   // Resolve: one fetch carries every month; rebuilt whole each run, or kept
   // whole from the file when the fetch or any month fails the gate
