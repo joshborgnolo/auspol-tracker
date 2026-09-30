@@ -62815,6 +62815,7 @@ let rdPinAnchorSave = null;
 let rdPinRO = null;
 let rdPinHeld = null;
 let rdPinLive = 0;
+let rdPinDone = null;
 const RD_PIN_STICKY = ".tabs.sticky,.info-index,.rd-ap-headwrap,.poll-table thead th";
 const RD_TOUCH_SLIDE_DX = 60;
 let rdTouchHot = 0,
@@ -62907,6 +62908,12 @@ const rdPinThaw = () => {
 function rdPinScroll(row, fine) {
   if (!row) return;
   if (!fine && window.matchMedia && !window.matchMedia("(pointer: coarse)").matches) return;
+  if (rdPinRaf !== 0 && rdPinDone) {
+    const end = rdPinDone;
+    rdPinDone = null;
+    cancelAnimationFrame(rdPinRaf);
+    end();
+  }
   const bar = document.querySelector(".tabs.sticky");
   const reserve = () => {
     const r = bar && bar.getBoundingClientRect();
@@ -62967,6 +62974,7 @@ function rdPinScroll(row, fine) {
   window.__rdPinObserve = hook;
   const done = () => {
     rdPinRaf = 0;
+    rdPinDone = null;
     if (rdPinRO) {
       rdPinRO.disconnect();
       rdPinRO = null;
@@ -63006,6 +63014,7 @@ function rdPinScroll(row, fine) {
     fix();
     if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);else done();
   };
+  rdPinDone = done;
   rdPinRaf = requestAnimationFrame(step);
 }
 function RdGlide({

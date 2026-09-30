@@ -769,3 +769,81 @@ mechanisms, proven separately with headless timelines:
      residual ±200px across full cycles is anchor-semantics mixing
      (divider picks vs table picks across a cycle), not accumulation.
 
+## Laptop drift, round three (2026-10-01) — the SURVIVING row anchor CHASES its displacement
+
+Round 2's reseat kept the pin alive, but the user still reported
+"dude it still drifts. it struggles particularly on 2pp view. again,
+it's fine on phone" — a subtle crawl of a few lines per arrow-hop,
+worst on returns to the 2PP facet, full-screen laptop only. The
+decisive observation came from instrumenting rdPinScroll's picks with
+`window.__RDPIN_DBG=1` debug taps (temporary, REMOVED after the trace —
+never commit them) and walking one slow lap
+(`.matilda/dbg-ap-inside.mjs`): the failing line was
+
+    fix anchor=rd-ap-row drift=+1407.75
+
+on an issues→twopp hop. Round 2's premise — every row re-keys, so a
+row anchor always dies — was only half true. **React keys All-polls
+rows BY POLL: a poll present on BOTH facets of a hop keeps its DOM
+node** (only absent/added polls re-mount). A surviving row sits at a
+wildly different document position in each facet's row set (different
+row counts, different per-row content, hed presence toggling), so when
+the pin's array picked that on-screen row as anchor, the pin "held"
+the row by scrolling the page through the row's ENTIRE displacement —
+1407.75px on issues→twopp in one `fix()` on the trace laptop
+(1512×945 dpr2), and a few lines per hop in the common case. The 2PP
+facet was worst because twopp is the only facet WITH the hed
+(`.rd-ap-headwrap` present; ±181.34px layout swap vs every other
+facet), so every hop ONTO twopp moved surviving rows the most. Phones
+were immune because the phone path's anchors are persistent chrome
+(`.rd-ap-bar`/`.rd-ap-tabs`; `.rd-ap-pctl` strip aside) — it never
+pinned a poll row.
+
+Fix (rd-allpolls.jsx `pinAp`): **anchors are section CHROME only,
+never a data row** — `rdPinScroll([bar, tabs, table], fine)`. The
+`.rd-ap-table` element survives every facet hop and the table head's
+hed-presence deltas sum to exactly zero over a full facet lap, so the
+viewport now trades exactly the ±181.34px hed swap entering/leaving
+twopp (measured rest positions: 1750 twopp ↔ 1568.66 others from a
+1750 twopp start) and returns pixel-exact per lap. The on-screen-row
+candidates were deleted, not demoted — a surviving row anchor is
+worse than a dead one because it CHASES instead of dying.
+
+Also kept from this round's false leads, both correct hygiene that
+were NOT the crawl:
+- (**Dead theory: focus-scroll nudge**) rowNav's facet-hop refocus
+  already used `focus({ preventScroll: true })` — kept; a default
+  focus scroll CAN nudge the page to fit a re-keyed row, just wasn't
+  the crawler.
+- (**Latent bug, kept**) rdPinScroll had no close-out for the
+  `rdPinDone`/rAF pair: a second pin armed inside the first's window
+  left the first pin's `done()` orphaned to fire later and scroll the
+  page to a stale anchor. rd.jsx now tracks the live pin's close-out
+  in the module-level `rdPinDone`; a new fine-pointer pin calling
+  rdPinScroll while `rdPinRaf !== 0` cancels the rAF and runs the old
+  `done()` FIRST, before ANY measurement (`reserve()`, the candidate
+  scan, `want0`) — placing it after measurement had the stale close
+  clobber the new pin's freshly measured `want`.
+
+Verification battery (all headless, 1512×945 dpr2, row focused like
+the user's gesture): `dbg-ap-slow.mjs` 1300ms-cadence 3-lap walk —
+every lap END y=1750 exactly, H constant 6657, `frozen=0` at measure
+time; `dbg-ap-ab.mjs` MODE=0 and MODE=1 both 1750 across laps (the
+row-anchor regression is mode-independent by design now);
+`dbg-ap-rowfocus.mjs` twopp-return landings 1749–1750;
+`dbg-ap-settle.mjs` REST 1750 ×3 (mid-walk `frozen=3` heals at
+settle — freeze clips are expected DURING a pin window); plus the
+four standing probes `probe-allpolls-pin` / `probe-panels-pin` /
+`probe-cycles-pin` / `probe-rdtabs-keys` all `ok`. A quarter-pixel
+`fix()` bounce (drift ±0.25/frame at dpr2) is quantisation, benign.
+
+Lesson added to the array-form contract: **pins may anchor only
+layout-stable geometry survivors** — elements whose document position
+is (at worst) a bounded, hop-reversible function of the facet (chrome,
+the table shell). Any poll-content element is disqualified both ways:
+re-mounted nodes die round-2-style, and poll-keyed survivors chase
+round-3-style. When verifying a facet hop, assert the PIN's anchor
+class (`anchor=rd-ap-table`) and that per-facet rest positions are
+periodic over a full lap — a lap that doesn't sum to zero means some
+anchor is content-keyed.
+

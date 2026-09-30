@@ -1061,10 +1061,9 @@ function RdAllPolls(P) {
         const rows = bodyRef.current ? bodyRef.current.querySelectorAll(rowSel) : [];
         const nx = rows[Math.min(Math.max(at, 0), rows.length - 1)];
         /* preventScroll on a FACET-walk reseat: the pin owns the viewport
-           here, and the re-keyed row sits where the new facet put it - a
-           default focus scroll nudges a few lines to fit it, worst on 2PP
-           (the hed swap moves rows the most), walking the viewport one
-           crawl per hop on a laptop (probe .matilda/dbg-ap-rowfocus.mjs) */
+           here - a default focus scroll can nudge the page to fit the
+           re-keyed row under the datasheet scrub (round-2 crawl theory;
+           not the culprit, that was row anchors - see pinAp - but right) */
         if (nx) nx.focus({ preventScroll: true });
       });
       return;

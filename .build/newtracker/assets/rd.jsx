@@ -136,6 +136,7 @@ let rdPinAnchorSave = null;
 let rdPinRO = null;
 let rdPinHeld = null;
 let rdPinLive = 0;
+let rdPinDone = null;
 /* freezing must not clip a sticky thing's run: a clipped ancestor makes
    position:sticky descendants scroll off like ordinary content, so any
    branch holding one stays unfrozen (its changes ride the RO fix below) */
@@ -246,6 +247,22 @@ function rdPinScroll(row, fine) {
      walk, matchup flip and counts-basis switch hold the bar and rows on a
      laptop exactly as on a phone) */
   if (!fine && window.matchMedia && !window.matchMedia("(pointer: coarse)").matches) return;
+  /* a re-pin inside the window ENDS the outgoing pin first, synchronously:
+     its owed thaw and landing correction run NOW so this pin measures
+     clean geometry. Simply cancelling the old rAF left its freeze clips
+     on the page stacked under the new pin's own (rdPinHeld never thawed
+     until the final pin's done), and every measurement the new pin then
+     took - want0, the reseat tops, its own clip set - was polluted by the
+     previous facet's frozen heights; a chained arrow-key facet walk read
+     those fouled heights and wandered the page a few lines per hop (the
+     round-3 laptop crawl). This must sit above EVERY measurement this
+     function makes - reserve(), the candidate list scan, want0 */
+  if (rdPinRaf !== 0 && rdPinDone) {
+    const end = rdPinDone;
+    rdPinDone = null;
+    cancelAnimationFrame(rdPinRaf);
+    end();
+  }
   const bar = document.querySelector(".tabs.sticky");
   /* the bar's box sits at its unstuck place whenever it isn't stuck (top of
      the page), so its live bottom is 200px+ there - reserve only what the
@@ -265,8 +282,8 @@ function rdPinScroll(row, fine) {
   if (!row) return;
   const want0 = row.getBoundingClientRect();
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
-  /* a re-pin inside the window REPLACES the old one - its own step loop
-     never runs to done(), so it must not count as open */
+  /* the close-out above zeroed the outgoing pin's bookkeeping, so this
+     counts exactly one live pin again */
   if (rdPinRaf === 0) rdPinLive++;
   cancelAnimationFrame(rdPinRaf);
   /* Chrome's scroll anchoring fights the pin when the click focused a
@@ -334,6 +351,7 @@ function rdPinScroll(row, fine) {
   window.__rdPinObserve = hook;
   const done = () => {
     rdPinRaf = 0;
+    rdPinDone = null;
     if (rdPinRO) { rdPinRO.disconnect(); rdPinRO = null; }
     if (window.__rdPinObserve === hook) window.__rdPinObserve = null;
     if (--rdPinLive > 0) return;
@@ -375,6 +393,7 @@ function rdPinScroll(row, fine) {
     if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);
     else done();
   };
+  rdPinDone = done;
   rdPinRaf = requestAnimationFrame(step);
 }
 function RdGlide({ children, className, as, watch }) {
