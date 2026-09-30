@@ -1015,11 +1015,11 @@ const RD_DEMO_SHORT = {
    significances — every trait listed is a significant gap in the current
    pool, so refresh these by hand when the pool moves, as with RD_DEMO_SHORT */
 const RD_DEMO_HOME = {
-  onp: "One Nation voters are more likely to be 55+, TAFE- or trade-qualified, English-only-speaking, rural, and non-Victorian",
+  onp: "One Nation voters are more likely to be 55+, TAFE- or trade-qualified, and rural; less likely to live in Victoria or speak a language other than English at home",
   alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial",
   lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
   grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
-  oth: "Voters for others/independents are more likely to be Gen Z, renting, and NSW-based, and less likely to be provincial or mortgage holders",
+  oth: "Voters for others/independents are more likely to be Gen Z, renting, and NSW-based; less likely to live in provincial areas or have a mortgage",
 };
 /* the composition-trend block's wording slots (shapes are the user's, dictated
    2026-09-29; the SENTENCES are generated from D.demoTrend — gen-data §7gb —
