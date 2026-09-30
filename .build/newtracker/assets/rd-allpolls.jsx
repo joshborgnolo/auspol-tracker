@@ -1060,7 +1060,12 @@ function RdAllPolls(P) {
         if (act && act.closest && act.closest(rowSel)) return;
         const rows = bodyRef.current ? bodyRef.current.querySelectorAll(rowSel) : [];
         const nx = rows[Math.min(Math.max(at, 0), rows.length - 1)];
-        if (nx) nx.focus();
+        /* preventScroll on a FACET-walk reseat: the pin owns the viewport
+           here, and the re-keyed row sits where the new facet put it - a
+           default focus scroll nudges a few lines to fit it, worst on 2PP
+           (the hed swap moves rows the most), walking the viewport one
+           crawl per hop on a laptop (probe .matilda/dbg-ap-rowfocus.mjs) */
+        if (nx) nx.focus({ preventScroll: true });
       });
       return;
     }
@@ -1470,24 +1475,20 @@ function RdAllPolls(P) {
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
     if (!sec) return;
-    /* the last anchor is the first data row ON SCREEN, not the first in the
-       DOM: deeper into the table the bar, tabs and the table's first row
-       are all above the fold, where the pin must still hold the row the
-       reader has in view through the facet swap (its head/dek arrive and
-       leave by the facet; without an anchor on screen there was nothing to
-       compensate them and the viewport walked down the page each cycle).
-       Last of all, the table itself: a facet hop re-keys the whole row set,
-       so on a facet whose rows are all new every row anchor dies with the
-       swap and only the bars and the table keep the pin alive */
-    const onScreenRows = [...sec.querySelectorAll(".rd-ap-table .rd-ap-mrow, .rd-ap-table .rd-ap-row, .rd-ap-table .rd-ap-card")]
-      .filter((el) => {
-        const r = el.getBoundingClientRect();
-        return r.bottom > 0 && r.top < window.innerHeight;
-      });
+    /* anchors are section CHROME only - never a data row. The rows are
+       keyed by poll, so a poll that exists on both sides of a facet hop
+       keeps its DOM node but sits at a wildly different doc position in
+       each facet's row set: pin one and the pin scrolls the page by the
+       row's full displacement to hold it still (a 1408px chase on an
+       issues->2PP hop, a few lines per hop in the common case - the
+       round-3 laptop crawl). The table element survives every hop and
+       holding ITS top still compensates the hed swap while the reshuffled
+       rows ride with the document, one rigid body: a full facet lap nets
+       exactly zero scroll. Bars first when the scroll is shallow, the
+       table as the deep-scroll anchor - all three persist across hops. */
     rdPinScroll([
       sec.querySelector(".rd-ap-bar"),
       sec.querySelector(".rd-ap-tabs"),
-      ...onScreenRows.slice(0, 3),
       sec.querySelector(".rd-ap-table"),
     ], true);
   };
@@ -1888,7 +1889,7 @@ function RdDisagree() {
 }
 
 /* ---------------------------------------------------------------- how each pollster leans */
-function RdHouseLean({ measure, tppBasis }) {
+function RdHouseLean({ measure, onMeasure, tppBasis }) {
   const D = window.AUSPOL;
   const phone = useNarrow("(max-width: 760px)");
   /* the tablet's narrower bar column (rd.css) has room to label only the
@@ -2046,6 +2047,18 @@ function RdHouseLean({ measure, tppBasis }) {
   /* the size half of the finding, in words: added together, a pollster's two
      leans on the right nearly cancel */
   const sizeMax = split ? Math.max(0, ...rows.map((r) => { const e = r.s[r.s.length - 1]; return Math.abs(e.on + e.co); })) : 0;
+  /* the Two-party tab follows the page's 2PP matchup, so it carries the same
+     switch the table does; the head/dek rewrite with it, so the row (or its
+     strip) holds its place through the flip */
+  const flipPick = () => {
+    const sec = document.getElementById("house-lean");
+    if (sec) rdPinScroll([sec.querySelector(".rd-hl-tabs"), sec.querySelector(".rd-ap-pctl")].filter(Boolean), true);
+    onMeasure(onM ? "lnp" : "onp");
+  };
+  const flip = (
+    <button type="button" className="rd-pl-flip" title={"Switch the page to Labor v " + (onM ? "Coalition" : "One Nation")}
+            onClick={flipPick}>Labor v {onM ? "One Nation" : "Coalition"} <span aria-hidden="true">⇄</span></button>
+  );
   return (
     <section className="rd-sec rd-hl" id="house-lean" aria-labelledby="rd-hl-t">
       <div className="rd-eyebrow">
@@ -2055,7 +2068,12 @@ function RdHouseLean({ measure, tppBasis }) {
       {head && <RdHed head={head} dek={dek} />}
       <RdTabs value={view} onChange={(v) => { setView(v); setHover(null); }} ariaLabel="Measure" className="rd-hl-tabs"
               options={[{ id: "tpp", label: "Two-party" }, { id: "alp", label: "Labor" }, { id: "lnp", label: "Coalition" }, { id: "onp", label: "One Nation" },
-                        { id: "split", label: phone ? "Split" : "One Nation v Coalition", title: "One Nation’s primary vote against the Coalition’s" }]} />
+                        { id: "split", label: phone ? "Split" : "One Nation v Coalition", title: "One Nation’s primary vote against the Coalition’s" }]}>
+        {view === "tpp" && !narrowBar && <span className="rd-pl-ctl"><span className="rd-pl-ctl-l">Two-party:</span>{flip}</span>}
+      </RdTabs>
+      {/* under 1001px the five tab labels fill the row already, so the
+          switch drops to its own strip, as the table's does on a phone */}
+      {view === "tpp" && narrowBar && <div className="rd-ap-pctl">{flip}</div>}
       <h4 className="rd-ap-ct rd-hl-ct">{phone ? title.replace(", points", ", points; the line beneath each is its lean month by month since the election") : title}</h4>
       <div className="rd-hl-table" role="table" aria-label="Each pollster’s lean against the others, now and month by month since the election">
         <div className="rd-hl-hrow" role="row">

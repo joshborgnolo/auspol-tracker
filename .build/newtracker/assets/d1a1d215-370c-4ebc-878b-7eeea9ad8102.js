@@ -5451,7 +5451,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         synthByYm={synthByYm} aggByYm={aggByYm} synthOnByYm={synthOnByYm} altOnByYm={altOnByYm}
         ofTotal={totalAll} ofHouses={housesAll.length} />
       <RdDisagree />
-      <RdHouseLean measure={measure} tppBasis={tppBasis} />
+      <RdHouseLean measure={measure} onMeasure={onMeasure} tppBasis={tppBasis} />
       <RdFlows />
     </div>
   );

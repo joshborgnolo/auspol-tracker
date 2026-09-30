@@ -60570,6 +60570,7 @@ function AllPollsView({
     ofHouses: housesAll.length
   }), React.createElement(RdDisagree, null), React.createElement(RdHouseLean, {
     measure: measure,
+    onMeasure: onMeasure,
     tppBasis: tppBasis
   }), React.createElement(RdFlows, null));
   return React.createElement("div", {
@@ -62814,7 +62815,6 @@ let rdPinAnchorSave = null;
 let rdPinRO = null;
 let rdPinHeld = null;
 let rdPinLive = 0;
-let rdPinDone = null;
 const RD_PIN_STICKY = ".tabs.sticky,.info-index,.rd-ap-headwrap,.poll-table thead th";
 const RD_TOUCH_SLIDE_DX = 60;
 let rdTouchHot = 0,
@@ -62907,12 +62907,6 @@ const rdPinThaw = () => {
 function rdPinScroll(row, fine) {
   if (!row) return;
   if (!fine && window.matchMedia && !window.matchMedia("(pointer: coarse)").matches) return;
-  if (rdPinRaf !== 0 && rdPinDone) {
-    const end = rdPinDone;
-    rdPinDone = null;
-    cancelAnimationFrame(rdPinRaf);
-    end();
-  }
   const bar = document.querySelector(".tabs.sticky");
   const reserve = () => {
     const r = bar && bar.getBoundingClientRect();
@@ -62973,7 +62967,6 @@ function rdPinScroll(row, fine) {
   window.__rdPinObserve = hook;
   const done = () => {
     rdPinRaf = 0;
-    rdPinDone = null;
     if (rdPinRO) {
       rdPinRO.disconnect();
       rdPinRO = null;
@@ -63013,7 +63006,6 @@ function rdPinScroll(row, fine) {
     fix();
     if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);else done();
   };
-  rdPinDone = done;
   rdPinRaf = requestAnimationFrame(step);
 }
 function RdGlide({
@@ -74003,11 +73995,7 @@ function RdAllPolls(P) {
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
     if (!sec) return;
-    const onScreenRows = [...sec.querySelectorAll(".rd-ap-table .rd-ap-mrow, .rd-ap-table .rd-ap-row, .rd-ap-table .rd-ap-card")].filter(el => {
-      const r = el.getBoundingClientRect();
-      return r.bottom > 0 && r.top < window.innerHeight;
-    });
-    rdPinScroll([sec.querySelector(".rd-ap-bar"), sec.querySelector(".rd-ap-tabs"), ...onScreenRows.slice(0, 3), sec.querySelector(".rd-ap-table")], true);
+    rdPinScroll([sec.querySelector(".rd-ap-bar"), sec.querySelector(".rd-ap-tabs"), sec.querySelector(".rd-ap-table")], true);
   };
   const facetPick = id => {
     pinAp();
@@ -74816,6 +74804,7 @@ function RdDisagree() {
 }
 function RdHouseLean({
   measure,
+  onMeasure,
   tppBasis
 }) {
   const D = window.AUSPOL;
@@ -75070,6 +75059,19 @@ function RdHouseLean({
     const e = r.s[r.s.length - 1];
     return Math.abs(e.on + e.co);
   })) : 0;
+  const flipPick = () => {
+    const sec = document.getElementById("house-lean");
+    if (sec) rdPinScroll([sec.querySelector(".rd-hl-tabs"), sec.querySelector(".rd-ap-pctl")].filter(Boolean), true);
+    onMeasure(onM ? "lnp" : "onp");
+  };
+  const flip = React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip",
+    title: "Switch the page to Labor v " + (onM ? "Coalition" : "One Nation"),
+    onClick: flipPick
+  }, "Labor v ", onM ? "One Nation" : "Coalition", " ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4"));
   return React.createElement("section", {
     className: "rd-sec rd-hl",
     id: "house-lean",
@@ -75109,7 +75111,13 @@ function RdHouseLean({
       label: phone ? "Split" : "One Nation v Coalition",
       title: "One Nation’s primary vote against the Coalition’s"
     }]
-  }), React.createElement("h4", {
+  }, view === "tpp" && !narrowBar && React.createElement("span", {
+    className: "rd-pl-ctl"
+  }, React.createElement("span", {
+    className: "rd-pl-ctl-l"
+  }, "Two-party:"), flip)), view === "tpp" && narrowBar && React.createElement("div", {
+    className: "rd-ap-pctl"
+  }, flip), React.createElement("h4", {
     className: "rd-ap-ct rd-hl-ct"
   }, phone ? title.replace(", points", ", points; the line beneath each is its lean month by month since the election") : title), React.createElement("div", {
     className: "rd-hl-table",
