@@ -66585,14 +66585,51 @@ function RdDemographics({
     const both = words.all === "men and women" || words.all === "owners and renters";
     let dek = noDiff ? rdCap(rdFraction(all)) + (both ? " " + words.all + " alike" : " of every " + (words.one || "group")) + " back " + pName + "." : top && bot && top !== bot ? rdCap(rdFraction(top.v[party])) + " " + short(top) + " back " + pName + ", against " + rdFraction(bot.v[party]) + " " + short(bot) + "." : "";
     const st1 = tab.sets[1];
-    if (st1) {
-      const out = st1.groups.filter(g => g.v[party] != null).map(g => ({
-        g,
-        d: g.v[party] - all,
-        sig: Math.abs(g.v[party] - all) > (g.ci[party] || 0)
-      })).sort((a, b) => Math.abs(b.d) - Math.abs(a.d))[0];
-      if (out && out.sig) dek += " " + rdCap(short(out.g)) + " " + (/s$/.test(short(out.g)) && !/^Gen/.test(out.g.label) ? "are" : "is") + " the outlier, at " + rdFraction(out.g.v[party]) + ".";
+    const outFor = groups => groups.filter(g => g.v[party] != null).map(g => ({
+      g,
+      d: g.v[party] - all,
+      sig: Math.abs(g.v[party] - all) > (g.ci[party] || 0)
+    }));
+    const st1Out = st1 ? outFor(st1.groups).filter(o => o.sig).sort((a, b) => Math.abs(b.d) - Math.abs(a.d)) : [];
+    const st0Out = noDiff ? outFor(st0.groups).filter(o => o.sig) : [];
+    const snapRatio = v => {
+      const cands = [[1, 2], [1, 3], [2, 3], [1, 4], [3, 4], [1, 5], [2, 5], [3, 5], [4, 5], [1, 6], [1, 7], [1, 8], [1, 9], [1, 10], [3, 10], [7, 10], [9, 10], [1, 12], [1, 15], [1, 20]];
+      let best = null;
+      for (const [a, b] of cands) {
+        const err = Math.abs(v / 100 - a / b);
+        if (!best || err < best.err) best = {
+          a,
+          b,
+          err
+        };
+      }
+      return best.a + "/" + best.b;
+    };
+    const seen = new Set();
+    const outlierGroups = [];
+    const pick = o => {
+      const key = o.g.label;
+      if (seen.has(key)) return;
+      seen.add(key);
+      outlierGroups.push(o);
+    };
+    st1Out.forEach(pick);
+    st0Out.forEach(pick);
+    const byRatio = new Map();
+    for (const o of outlierGroups) {
+      const r = snapRatio(o.g.v[party]);
+      if (!byRatio.has(r)) byRatio.set(r, []);
+      byRatio.get(r).push(o);
     }
+    const outlierSentence = [...byRatio.values()].map(grp => {
+      const rep = grp.slice().sort((a, b) => Math.abs(b.d) - Math.abs(a.d))[0];
+      const labels = grp.map(o => short(o.g));
+      const listed = labels.length === 1 ? labels[0] : labels.length === 2 ? labels.join(" and ") : labels.slice(0, -1).join(", ") + " and " + labels[labels.length - 1];
+      const plural = labels.length > 1 || /s$/.test(labels[0]);
+      const verb = !plural || /^Gen/.test(grp[0].g.label) && labels.length === 1 ? "is" : "are";
+      return rdCap(listed) + " " + verb + " the " + (labels.length > 1 ? "outliers" : "outlier") + ", at " + rdFraction(rep.g.v[party]) + ".";
+    }).join(" ");
+    if (outlierSentence) dek += " " + outlierSentence;
     const home = RD_DEMO_HOME[party];
     if (home) dek = dek ? rdCap(finding) + ". " + dek : rdCap(finding) + ".";
     return {

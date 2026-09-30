@@ -1132,8 +1132,8 @@ const RD_DEMO_SHORT = {
 const RD_DEMO_HOME = {
   onp: "One Nation voters are more likely to be 55+, TAFE- or trade-qualified, and rural; less likely to live in Victoria or speak a language other than English at home",
   alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial; less likely to live in the eastern mainland states, especially Queensland",
-  lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
-  grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
+  lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, Victorian, and outright homeowners; less likely to live in an outer metro",
+  grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial; less likely to be TAFE- or trade-qualified",
   oth: "Voters for others & independents are more likely to be Gen Z and renting; less likely to live in provincial areas",
 };
 /* the usual (Pew) birth years behind the polls' generation labels: neither
@@ -1278,8 +1278,11 @@ function RdDemographics({ rangeId = "all" }) {
   const tab = T.tabs.find((x) => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
   /* the prose names them "others & independents" (user dictate): a lower-case
-     description whose possessive takes a bare apostrophe */
-  const pName = party === "oth" ? "others & independents" : P.name;
+     description whose possessive takes a bare apostrophe. The Coalition and
+     the Greens take their definite articles in prose (user dictate
+     2026-09-30): "The Coalition's vote is much the same…", "The Greens' vote
+     falls with age", "…back the Coalition" */
+  const pName = party === "oth" ? "others & independents" : party === "lnp" ? "the Coalition" : party === "grn" ? "the Greens" : P.name;
   const pPoss = pName + (/s$/.test(pName) ? "’" : "’s"), pColor = P.color;
   const all = T.all[party];
   const ki = T.order.indexOf(party), gpi = DEMO_GRP_PARTY.indexOf(party);
@@ -1311,12 +1314,51 @@ function RdDemographics({ rangeId = "all" }) {
         ? rdCap(rdFraction(top.v[party])) + " " + short(top) + " back " + pName + ", against " + rdFraction(bot.v[party]) + " " + short(bot) + "."
         : "";
     const st1 = tab.sets[1];
-    if (st1) {
-      const out = st1.groups.filter((g) => g.v[party] != null)
-        .map((g) => ({ g, d: g.v[party] - all, sig: Math.abs(g.v[party] - all) > (g.ci[party] || 0) }))
-        .sort((a, b) => Math.abs(b.d) - Math.abs(a.d))[0];
-      if (out && out.sig) dek += " " + rdCap(short(out.g)) + " " + (/s$/.test(short(out.g)) && !/^Gen/.test(out.g.label) ? "are" : "is") + " the outlier, at " + rdFraction(out.g.v[party]) + ".";
+    /* collect margin outliers from both the st0 (when noDiff: the headline's
+       "much the same" was also computed on st0) and st1 sets, merge by
+       snapped fraction ratio, and emit one sentence per ratio-group. */
+    const outFor = (groups) => groups.filter((g) => g.v[party] != null)
+      .map((g) => ({ g, d: g.v[party] - all, sig: Math.abs(g.v[party] - all) > (g.ci[party] || 0) }));
+    const st1Out = st1 ? outFor(st1.groups).filter((o) => o.sig).sort((a, b) => Math.abs(b.d) - Math.abs(a.d)) : [];
+    const st0Out = noDiff ? outFor(st0.groups).filter((o) => o.sig) : [];
+    const snapRatio = (v) => {
+      const cands = [[1,2],[1,3],[2,3],[1,4],[3,4],[1,5],[2,5],[3,5],[4,5],[1,6],[1,7],[1,8],[1,9],[1,10],[3,10],[7,10],[9,10],[1,12],[1,15],[1,20]];
+      let best = null;
+      for (const [a, b] of cands) {
+        const err = Math.abs(v / 100 - a / b);
+        if (!best || err < best.err) best = { a, b, err };
+      }
+      return best.a + "/" + best.b;
+    };
+    const seen = new Set();
+    const outlierGroups = [];
+    const pick = (o) => {
+      const key = o.g.label;
+      if (seen.has(key)) return;
+      seen.add(key);
+      outlierGroups.push(o);
+    };
+    /* st1 first (its outlier was already displayed; keeps the existing
+       single-sentence form as default when st0 adds nothing new) */
+    st1Out.forEach(pick);
+    st0Out.forEach(pick);
+    const byRatio = new Map();
+    for (const o of outlierGroups) {
+      const r = snapRatio(o.g.v[party]);
+      if (!byRatio.has(r)) byRatio.set(r, []);
+      byRatio.get(r).push(o);
     }
+    /* join labels by shared snapped ratio; one sentence per distinct ratio */
+    const outlierSentence = [...byRatio.values()].map((grp) => {
+      /* representative fraction: the largest-|d| member of the group */
+      const rep = grp.slice().sort((a, b) => Math.abs(b.d) - Math.abs(a.d))[0];
+      const labels = grp.map((o) => short(o.g));
+      const listed = labels.length === 1 ? labels[0] : labels.length === 2 ? labels.join(" and ") : labels.slice(0, -1).join(", ") + " and " + labels[labels.length - 1];
+      const plural = labels.length > 1 || /s$/.test(labels[0]);
+      const verb = !plural || /^Gen/.test(grp[0].g.label) && labels.length === 1 ? "is" : "are";
+      return rdCap(listed) + " " + verb + " the " + (labels.length > 1 ? "outliers" : "outlier") + ", at " + rdFraction(rep.g.v[party]) + ".";
+    }).join(" ");
+    if (outlierSentence) dek += " " + outlierSentence;
     /* the headline stays put as the grouping tab flips: the per-grouping
        finding leads the dek instead, the figures sentences after it */
     const home = RD_DEMO_HOME[party];

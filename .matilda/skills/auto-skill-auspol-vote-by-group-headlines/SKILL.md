@@ -1,6 +1,6 @@
 ---
 name: auspol-vote-by-group-headlines
-description: auspol-tracker — the "Who votes for whom" panel headline is now a CONSTANT per party (RD_DEMO_HOME in rd-panels.jsx, right after RD_DEMO_SHORT, shipped 0d91b2e on 2026-09-28; grn and alp lines amended same day to an "urban or provincial" non-rural trait): one hand-curated sentence per switcher party ("One Nation voters are more likely to be …"), refreshed BY HAND from the current pooled significances; the per-grouping finding sentence that used to BE the headline now leads the dek ahead of the two-form figures sentence (contrast when a split is significant, ONE shared fraction when not — shipped e87f1f9 after the ONP gender trap, where independent rdFraction snaps drew a 2.0pt pool as a 5-point "about three in ten … against one in four" gap). Switcher DEMO_PARTIES = FIVE chips since 69f467e (2026-09-29): oth joined as "Others" (short chip label; PARTIES.oth.name stays "Others / Ind." for table cells) with a curated oth RD_DEMO_HOME line, and the phone chip row wraps 3-over-2 at ≤480px because five chips+swatches overflow one nowrap row. oth's RUNNING-PROSE name is lowercase "others/independents" and its supporters "voters for others/independents" (user dictate 2026-09-29) — five name constants split across the a11e1559 asset and rd-panels plus a pName/pPoss plumbing in RdDemographics (s-ending name takes a bare ’ possessive; rdCap at sentence starts); PARTIES.oth.name "Others / Ind." still owns table cells, chip label "Others". Curate against window.AUSPOL.demographics with the panel's own simple |g.v − all| > g.ci margin test (NOT demoVerdict's Holm correction). ONP line was re-dictated 2026-09-30 (8ca5756) to the "more likely to be X, Y, and Z; less likely to …" shape: significant positive traits first, significant negative-side traits cast as "less likely to" verb phrases after a semicolon ("less likely to live in Victoria or speak a language other than English at home") — the pre-restyle inversion compounds "English-only-speaking" and "non-Victorian" are GONE, and oth's line was assimilated to the same shape ("…NSW-based; less likely to live in provincial areas or have a mortgage"); alp/lnp/grn untouched at that pass. A SECOND 2026-09-30 pass, under the user's restated rule "keep the copy here in this section dynamic, of course" (the margin test is a CONTINUING obligation — a listed trait that loses pool significance comes OUT at any curation pass, checked whenever the section's copy is touched or the pool is otherwise in doubt): alp gained "; less likely to live in the eastern mainland states, especially Queensland" (user dictate, anchored Qld −3.5±3.0 SIG + Rest-of-Australia +4.4±3.4 SIG on that day's pool; NSW +0.2±3.2 and Vic −0.5±2.6 flat, so the collapse rides Qld + the inversion), oth's "NSW-based" was DROPPED as pool-killed (+1.3±2.1 no longer SIG — shipped oth line reads "…Gen Z and renting; less likely to live in provincial areas") and "or have a mortgage" was DROPPED editorially despite still-SIG −2.3±1.7, as entailed by the kept "renting" +2.3 (user: "sorta entailed by more likely to be renting, so it doesn't add much information"). No trailing full stops on these constants, even when a dictated paste carries one. The composition TREND block IS the change-over-time head/dek slot between the dot-plot card and the monthly charts (RdSub at rd-panels.jsx ~:1447, relocated same date from under the panel headline — user correction 2026-09-29, see the trend-block section) is wholly GENERATED from gen-data §7gb's demoTrend payload (two-stage proportionality test, shipped 2026-09-29): curated RD_TREND_* phrase-pieces at ~:1006-1032, the shift IIFE compositor at ~:1119-1217, probe .matilda/demo-trend-probe.mjs. Since 2026-09-30 the shift dek's significance sentences carry a RELATIVE-POINTS parenthetical (user dictate: "after statements of significance … say '(−x points relative to all Labor voters)'. and then if there's a second … say '(−y points)'"): stateDek appends "(−x points relative to all Labor voters)" quoting the POLE (away) side's strongest move — never bestOf over the whole set, that quotes the complement ("the rest of Australia" +5.6 when named pole Qld moved −2.8) — and groupDek's lead/deficit sentence appends bare "(−y points)" = the change in gap; relPts(m) = (g1−g0)−(a1−a0) sits with sgnPts beside pct (~:1147-1150). Regression probes .matilda/demo-head-probe.mjs and .matilda/demo-oth-copy-probe.mjs, rel-points probe .matilda/verify-dek-relpoints.mjs (gitignored).
+description: auspol-tracker — the "Who votes for whom" panel headline is now a CONSTANT per party (RD_DEMO_HOME in rd-panels.jsx, right after RD_DEMO_SHORT, shipped 0d91b2e on 2026-09-28; grn and alp lines amended same day to an "urban or provincial" non-rural trait): one hand-curated sentence per switcher party ("One Nation voters are more likely to be …"), refreshed BY HAND from the current pooled significances; the per-grouping finding sentence that used to BE the headline now leads the dek ahead of the two-form figures sentence (contrast when a split is significant, ONE shared fraction when not — shipped e87f1f9 after the ONP gender trap, where independent rdFraction snaps drew a 2.0pt pool as a 5-point "about three in ten … against one in four" gap). Switcher DEMO_PARTIES = FIVE chips since 69f467e (2026-09-29): oth joined as "Others" (short chip label; PARTIES.oth.name stays "Others / Ind." for table cells) with a curated oth RD_DEMO_HOME line, and the phone chip row wraps 3-over-2 at ≤480px because five chips+swatches overflow one nowrap row. oth's RUNNING-PROSE name is lowercase "others/independents" and its supporters "voters for others/independents" (user dictate 2026-09-29) — five name constants split across the a11e1559 asset and rd-panels plus a pName/pPoss plumbing in RdDemographics (s-ending name takes a bare ’ possessive; rdCap at sentence starts); PARTIES.oth.name "Others / Ind." still owns table cells, chip label "Others". Curate against window.AUSPOL.demographics with the panel's own simple |g.v − all| > g.ci margin test (NOT demoVerdict's Holm correction). ONP line was re-dictated 2026-09-30 (8ca5756) to the "more likely to be X, Y, and Z; less likely to …" shape: significant positive traits first, significant negative-side traits cast as "less likely to" verb phrases after a semicolon ("less likely to live in Victoria or speak a language other than English at home") — the pre-restyle inversion compounds "English-only-speaking" and "non-Victorian" are GONE, and oth's line was assimilated to the same shape ("…NSW-based; less likely to live in provincial areas or have a mortgage"); alp/lnp/grn untouched at that pass. A SECOND 2026-09-30 pass, under the user's restated rule "keep the copy here in this section dynamic, of course" (the margin test is a CONTINUING obligation — a listed trait that loses pool significance comes OUT at any curation pass, checked whenever the section's copy is touched or the pool is otherwise in doubt): alp gained "; less likely to live in the eastern mainland states, especially Queensland" (user dictate, anchored Qld −3.5±3.0 SIG + Rest-of-Australia +4.4±3.4 SIG on that day's pool; NSW +0.2±3.2 and Vic −0.5±2.6 flat, so the collapse rides Qld + the inversion), oth's "NSW-based" was DROPPED as pool-killed (+1.3±2.1 no longer SIG — shipped oth line reads "…Gen Z and renting; less likely to live in provincial areas") and "or have a mortgage" was DROPPED editorially despite still-SIG −2.3±1.7, as entailed by the kept "renting" +2.3 (user: "sorta entailed by more likely to be renting, so it doesn't add much information"). A THIRD same-day pass (user dictate) gave lnp its own "; less likely" tail — ", Victorian" (+2.6±2.5 SIG) into the positives and "; less likely to live in an outer metro" (−3.4±2.3 SIG) — the line is now "Coalition voters are more likely to be 55+, university-educated, inner-metro, Victorian, and outright homeowners; less likely to live in an outer metro". A FOURTH same-day pass: grn gained its own tail "; less likely to be TAFE- or trade-qualified" (TAFE −3.2±1.9 SIG on the day's pool), and lnp prose took the definite article everywhere — a second pName special case in RdDemographics ("the Coalition" → pPoss "the Coalition's") — and likewise grn ("the Greens" → "the Greens'", the bare-apostrophe path), so findings render "The Coalition's vote is much the same across the states / men and women", "The Greens' vote falls with age", and deks "…back the Coalition / the Greens" (DEMO_VOTE_FOR and RD_TREND_NAME already carried both articles). No trailing full stops on these constants, even when a dictated paste carries one. The composition TREND block IS the change-over-time head/dek slot between the dot-plot card and the monthly charts (RdSub at rd-panels.jsx ~:1447, relocated same date from under the panel headline — user correction 2026-09-29, see the trend-block section) is wholly GENERATED from gen-data §7gb's demoTrend payload (two-stage proportionality test, shipped 2026-09-29): curated RD_TREND_* phrase-pieces at ~:1006-1032, the shift IIFE compositor at ~:1119-1217, probe .matilda/demo-trend-probe.mjs. Since 2026-09-30 the shift dek's significance sentences carry a RELATIVE-POINTS parenthetical (user dictate: "after statements of significance … say '(−x points relative to all Labor voters)'. and then if there's a second … say '(−y points)'"): stateDek appends "(−x points relative to all Labor voters)" quoting the POLE (away) side's strongest move — never bestOf over the whole set, that quotes the complement ("the rest of Australia" +5.6 when named pole Qld moved −2.8) — and groupDek's lead/deficit sentence appends bare "(−y points)" = the change in gap; relPts(m) = (g1−g0)−(a1−a0) sits with sgnPts beside pct (~:1147-1150). Regression probes .matilda/demo-head-probe.mjs and .matilda/demo-oth-copy-probe.mjs, rel-points probe .matilda/verify-dek-relpoints.mjs (gitignored).
 source: auto-skill
 extracted_at: '2026-09-28T07:14:51.777Z'
 ---
@@ -36,7 +36,7 @@ convention in "Curating the lines" below; the inversion compounds
   below).
 - The per-grouping `finding` (the OLD headline text) is now PREPENDED
   to the dek: `{finding}. {figures sentence}. {optional
-  st1 outlier sentence}.` An empty figures case degrades to
+  outlier sentence(s)}.` An empty figures case degrades to
   `{finding}.` alone.
 - The figures sentence has TWO forms (2026-09-28): the top/bottom
   fraction contrast ("…back One Nation, against one in six 18–34s.")
@@ -60,7 +60,14 @@ convention in "Curating the lines" below; the inversion compounds
 ## Curating the lines
 
 Significance = the simple margin test the panel's own st1-outlier
-sentence uses, NOT demoVerdict's Holm correction. Probe the pooled
+sentence uses, NOT demoVerdict's Holm correction. The outlier sentence (2026-09-30, noDiff st0 sweep)
+emits one sentence per snapped-ratio group: when noDiff it collects st0
+groups whose |g.v−all| > g.ci alongside st1's, deduplicates by label,
+groups by rdFraction's ratio key, and renders "{labels} are/is the
+outlier(s), at {fraction of the largest-|d| member}" — lnp/Place
+(Victoria +2.6 SIG) now renders "Inner-suburban voters and Victorians
+are the outliers, at one in four" once instead of implying a flat
+pool. Probe the pooled
 payload via vm (the 9f09dca2 bundle —
 .build/newtracker/assets/9f09dca2-….js, NOT the repo-root assets/
 which is the shipped shell dir and never contains it; two failed
@@ -150,10 +157,24 @@ grn 13.2 · oth 11.5:
   mainland states, especially Queensland". The Rest-of-Aus inversion
   claim was already noted as true-but-unused at 0d91b2e; it is now
   the line's second half.
-- lnp — all four traits still SIG: 55+ +4.1 · University +4.3 ·
-  inner-metro +4.7 · own outright +7.9. No change.
-- grn — all four traits still SIG: 18–34 +12.4 · women +1.7 (men
-  −1.6) · renting +4.7 · rural −3.5 (inversion). No change.
+- lnp — four inherited traits still SIG (55+ +4.1 · University +4.3 ·
+  inner-metro +4.7 · own outright +7.9); user's dictated addition
+  later that day anchored on Vic +2.6±2.5 SIG and outer metro
+  −3.4±2.3 SIG (NSW −0.9±2.2, Qld −1.4±2.7, Rest-of-Aus +0.1±3.0 all
+  flat) → line gains "Victorian," and its first "; less likely" tail:
+  "…inner-metro, Victorian, and outright homeowners; less likely to
+  live in an outer metro". Singular "an outer metro" is the dictated
+  wording (sister tails are plural). Note outer-metro-less-likely is
+  a separate cell measurement from inner-metro-more-likely, not an
+  entailment like renting/mortgage.
+- grn — all four inherited traits still SIG: 18–34 +12.4 · women +1.7
+  (men −1.6) · renting +4.7 · rural −3.5 (inversion). User-dictated
+  addition later that day anchored on TAFE or trade −3.2±1.9 SIG
+  (Year-12-or-less +1.2, University +1.2 both flat) → the line gains
+  its own "; less likely" tail: "…renters, and urban or provincial;
+  less likely to be TAFE- or trade-qualified" (dictated wording —
+  trait phrasing borrowed from RD_DEMO_SHORT's "TAFE- or
+  trade-qualified voters").
 - oth — Gen Z +5.3±3.9 and renting +2.3±2.3 still SIG, provincial
   −5.2 still SIG. POOL-KILLED: NSW-based (+1.3±2.1, was SIG at the
   69f467e curation) — dropped, line now "…Gen Z and renting; less
@@ -205,9 +226,22 @@ constants across the two assets, plus plumbing:
   (~:2590, issues-panel group noun).
 - rd-panels.jsx: `RD_DEMO_HOME.oth` (the curated line, now starting
   "Voters for others/independents …"), and the RdDemographics
-  generator plumbing ~:1064 — one `pName = party === "oth" ?
-  "others/independents" : P.name` feeds every finding/dek/aria
-  template so future prose renames are a one-place change.
+  generator plumbing ~:1282 — one `pName = party === "oth" ?
+  "others & independents" : party === "lnp" ? "the Coalition" :
+  party === "grn" ? "the Greens" : P.name`
+  feeds every finding/dek/aria template so future prose renames are a
+  one-place change. The lnp branch joined 2026-09-30 on the user's
+  dictate that Coalition findings carry the definite article ("The
+  Coalition's vote is much the same across the states/men and women",
+  "…climbs with age", "One in five … back the Coalition"), and the
+  grn branch ("the Greens", possessive "the Greens'") followed the
+  same day on "greens should also have a 'the'" — the s-ending name
+  exercises the bare-apostrophe pPoss path. rdCap capitalises
+  sentence starts. RD_TREND_NAME(_DEK) and DEMO_VOTE_FOR already
+  carried both articles — the trend block and the verdict-form
+  findings ("…to vote for the Coalition/the Greens") never needed
+  the fix, and neither curated RD_DEMO_HOME line changes ("Greens
+  voters are…" stays article-less in the headline).
 - rd-panels.jsx groupLong (~:1858): the old
   `.replace(/^voters for other parties and independents$/, …)` mapping
   was REMOVED — ISS_WHO now emits the target phrasing directly.
