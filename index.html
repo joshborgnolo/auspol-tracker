@@ -63611,8 +63611,7 @@ function RdLeadGauge({
     },
     role: "img",
     "aria-label": say,
-    title: say,
-    "data-rd-swipe-self": ""
+    title: say
   }, React.createElement("span", {
     className: "rd-lg-side",
     style: {
@@ -64135,14 +64134,7 @@ function RdHero(p) {
   }, React.createElement("div", {
     className: "rd-tpp-read",
     ref: swipeMark,
-    "data-rd-swipe-self": "",
-    onTouchStart: () => {
-      window.__rdScrollAnchor = true;
-      clearTimeout(window.__rdScrollAnchorT);
-      window.__rdScrollAnchorT = setTimeout(() => {
-        window.__rdScrollAnchor = false;
-      }, 700);
-    }
+    "data-rd-swipe-self": ""
   }, React.createElement("div", {
     className: "rd-tpp-side rd-a"
   }, React.createElement("span", {
@@ -76475,8 +76467,7 @@ function App() {
       const t = e.touches[0];
       if (t.clientX < EDGE || t.clientX > window.innerWidth - EDGE) return;
       const self = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-self]") : null;
-      if (self) {
-        if (!self.__rdSwipe) return;
+      if (self && self.__rdSwipe) {
         g = {
           x: t.clientX,
           y: t.clientY,
@@ -76486,20 +76477,7 @@ function App() {
         };
         return;
       }
-      if (window.__rdScrollAnchor) {
-        g = {
-          x: t.clientX,
-          y: t.clientY,
-          t: Date.now(),
-          sy: window.scrollY,
-          row: null,
-          free: true
-        };
-        return;
-      }
-      const own0 = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-exact]") : null;
-      if (own0 && !e.target.closest(".chart")) return;
-      const own = own0 || null;
+      const own = e.target && e.target.closest && e.target.closest(".chart") ? e.target.closest("[data-rd-swipe-exact]") : null;
       if (!own && claimsSideways(e.target)) return;
       g = {
         x: t.clientX,
@@ -76524,7 +76502,6 @@ function App() {
         dy = t.clientY - s.y;
       if (Math.abs(dx) < MIN_DX || Math.abs(dy) > Math.abs(dx) * 0.5) return;
       if (s.selfScroll) s.sy = window.scrollY;
-      if (s.free) return;
       if (Date.now() - s.t > MAX_MS || Math.abs(window.scrollY - s.sy) > 12) return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
