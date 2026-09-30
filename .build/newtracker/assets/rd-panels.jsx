@@ -157,6 +157,26 @@ function RdPrimary({ rangeId, setRangeId }) {
     </button>
   );
 
+  /* a phone swipe landing on the chart steps the same window the menu's
+     swipe and its arrow walk do: the card claims touches inside its .chart
+     by data-rd-swipe-exact (the hero card's claim shape) and `rangeLive`
+     steps and wraps the one shared range state - left for the next window,
+     All round to 3 mo, as the menu row does. rdPinScroll holds the card's
+     place through the reflow the shared range kicks off above it (the
+     two-party card's phone event list), as the menu's own pin does. The
+     live/stepper split is the hero card's: the mark is set once, the
+     stepper re-read every render so its range is never stale. */
+  const rangeLive = React.useRef(null);
+  const cardEl = React.useRef(null);
+  rangeLive.current = (dir) => {
+    const i = RD_RANGES.findIndex((o) => o.id === rangeId);
+    if (i < 0) return false;
+    if (cardEl.current) rdPinScroll(cardEl.current);
+    setRangeId(RD_RANGES[(i + dir + RD_RANGES.length) % RD_RANGES.length].id);
+    return true;
+  };
+  const chartMark = React.useCallback((el) => { cardEl.current = el; if (el) el.__rdSwipe = (dir) => rangeLive.current(dir); }, []);
+
   return (
     <RdSec id="primary-vote" title="Primary vote" meta={meta}>
       <RdHed head={story.head} dek={story.dek} />
@@ -180,13 +200,17 @@ function RdPrimary({ rangeId, setRangeId }) {
           {parts.map(stat)}
         </div>
       )}
-      <div className="card rd-card rd-pv-chart">
-        {/* the same window menu the two-party card carries over its chart:
-            the one range state drives both charts, a click arms the arrow
-            walk, a phone swipe on the row itself steps the windows, and
-            pin holds the row's spot on screen - the shared state reshapes
-            THIS card's twin above (the two-party phone event list), which
-            would drag the menu out from under the reader otherwise */}
+      <div className="card rd-card rd-pv-chart" ref={chartMark} data-rd-swipe-exact="">
+        {/* the card claims phone swipes landing on its chart (vs the page
+            turn a swipe anywhere else gets) and steps the window; the
+            event list and key sit outside .chart so they keep the page
+            turn. This menu carries the same window the two-party card
+            carries over its chart: the one range state drives both charts,
+            a click arms the arrow walk, a phone swipe on the row itself
+            steps the windows, and pin holds the row's spot on screen - the
+            shared state reshapes THIS card's twin above (the two-party
+            phone event list), which would drag the menu out from under
+            the reader otherwise */}
         <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm" swipeSelf pin />
         <TrendChart
           key="rd-pv"

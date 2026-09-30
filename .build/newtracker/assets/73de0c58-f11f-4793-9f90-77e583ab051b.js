@@ -2109,9 +2109,10 @@ function App() {
      claims sideways drags for itself: a chart scrubs (touch-action: pan-y),
      a slider drags (none), a wide table scrolls. One exact exception: a
      touch landing ON THE CHART of an element marked data-rd-swipe-exact
-     (the hero's 2PP card, which flips the contest) keeps it no matter what
-     it would otherwise claim - the card round the chart flips nothing, its
-     touch falls back to a row or the page. So do the edges, where iOS
+     (the hero's 2PP card, which flips the contest; the primary card,
+     which steps the window) keeps it no matter what it would otherwise
+     claim - the card round the chart flips nothing, its touch falls back
+     to a row or the page. So do the edges, where iOS
      and Android put their own back gesture, a zoomed-in page (the finger is
      panning it) and a second finger (a pinch). Passive throughout: the page
      never waits on this to scroll. */
@@ -2171,11 +2172,12 @@ function App() {
         g = { x: t.clientX, y: t.clientY, t: Date.now(), selfScroll: true, row: self };
         return;
       }
-      /* an exact claimer (the hero's 2PP card) takes a touch that lands
-         on its chart, whatever sideways claims stand between it and the
-         page. The rest of the card - the numbered event list under the
-         chart, the tabs and chrome - claims nothing: a swipe there falls
-         through to the page's own reach and turn, like anywhere else */
+      /* an exact claimer (the hero's 2PP card, the primary-vote card)
+         takes a touch that lands on its chart, whatever sideways claims
+         stand between it and the page. The rest of the card - the numbered
+         event list under the chart, the tabs and chrome - claims nothing:
+         a swipe there falls through to the page's own reach and turn,
+         like anywhere else */
       const own = e.target && e.target.closest && e.target.closest(".chart")
         ? e.target.closest("[data-rd-swipe-exact]") : null;
       if (!own && claimsSideways(e.target)) return;
