@@ -497,10 +497,19 @@ function cycDomain(cycles, M, chg) {
   if (M.han) vals.push(...cycles.flatMap((c) => (c.raw.han || [])
     .filter((v) => v != null)
     .map((v) => (chg ? v - cycBase(c, "han") : v))));
-  // One Nation's overlay follows the same rule on the opposition primary chart.
-  if (M.onp) vals.push(...cycles.flatMap((c) => (c.raw.onp || [])
-    .filter((v) => v != null)
-    .map((v) => (chg ? v - cycBase(c, "onp") : v))));
+  // The combined L/NP+One Nation overlay follows the same rule on the
+  // opposition primary chart: its months are the current term's where both
+  // parties were measured, and its change anchor is the two results summed.
+  if (M.onp) {
+    const c = cycles.find((x) => x.current);
+    if (c) {
+      const cBase = cycBase(c, "oppr") + cycBase(c, "onp");
+      vals.push(...c.raw.months
+        .map((m, i) => (c.raw.oppr[i] != null && (c.raw.onp || [])[i] != null ? c.raw.oppr[i] + c.raw.onp[i] : null))
+        .filter((v) => v != null)
+        .map((v) => (chg ? v - cBase : v)));
+    }
+  }
   const ref = chg ? 0 : M.refAbs;
   let lo = Math.min(...vals), hi = Math.max(...vals);
   if (ref != null) { lo = Math.min(lo, ref); hi = Math.max(hi, ref); }
@@ -1746,31 +1755,35 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
     });
   }
 
-  /* One Nation – a single dotted line tracking the party's first-
-     preference vote over the CURRENT term only. Past terms carried one
-     dotted line each, but they crowded the chart without adding context,
-     so only the current cycle is drawn. Points skip null months as
-     Hanson's do, and the line stays thin and light – an overlay on the
-     opposition chart, not a rival to its own lines. */
+  /* L/NP + One Nation – a single dotted line tracking the SUM of the two
+     parties' first-preference votes over the CURRENT term only, drawn when
+     "Combine L/NP and ON" is ticked. (It replaced the plain One Nation
+     overlay: the combined reading is the one the chart can say something
+     with.) A month joins the line only where BOTH parties were measured, so
+     a gap where one went unpolled never invents a partial total. Points
+     skip null months as Hanson's do, and the line stays thin and light –
+     an overlay on the opposition chart, not a rival to its own lines. Its
+     ink is the chart's neutral, since no one party owns a sum of two. */
   if (M.onp && showOnp) {
     const c = shown.find((x) => x.current);
     if (c) {
-      const oBase = cycBase(c, "onp");
+      const cBase = cycBase(c, "oppr") + cycBase(c, "onp");
       const pts = c.raw.months
-        .map((m, i) => ({ x: m, y: c.raw.onp[i] }))
+        .map((m, i) => ({ x: m, y: c.raw.oppr[i] != null && c.raw.onp[i] != null ? +(c.raw.oppr[i] + c.raw.onp[i]).toFixed(2) : null }))
         .filter((p) => p.y != null)
-        .map((p) => ({ x: p.x, y: chg ? +(p.y - oBase).toFixed(2) : p.y }));
+        .map((p) => ({ x: p.x, y: chg ? +(p.y - cBase).toFixed(2) : p.y }));
       if (pts.length) {
         built.push({
-          id: "cyc-onp", label: "One Nation",
-          color: HAN_COLOR, width: 2.2, points: pts, weight: 2.5,
+          id: "cyc-comb", label: "L/NP + One Nation",
+          color: "var(--ink-2)", width: 2.2, points: pts, weight: 2.5,
           smooth: false, dash: "1 3",
           opacity: 0.85,
           /* No year: this line is only ever the CURRENT term (c is found by
              .find(x => x.current) above), so a year suffix here never
              distinguished one reading from another - it only repeated what
-             "One Nation" already says on the checkbox that draws it. */
-          endLabel: "ON",
+             "Combine L/NP and ON" already says on the checkbox that draws
+             it. */
+          endLabel: "L/NP+ON",
           endLabelOpacity: 0.8,
         });
       }
@@ -1826,7 +1839,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
     p.appr && p.appr.hansonNet != null &&
     (!p.appr.metricBy || p.appr.metricBy.hanson !== "fav")) : null;
   const onpYears = (M.onp && showOnp && shown.some((c) => c.current))
-    ? overlayYears((p) => p.p && p.p.onp != null) : null;
+    ? overlayYears((p) => p.p && p.p.onp != null && p.p.lnp != null) : null;
 
   const cur = cycles.find((c) => c.current);
   let insight = null;
@@ -1970,13 +1983,13 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
             </label>
           )}
           {M.onp && (
-            <label className={"pg-check cyc-onp" + (showOnp ? " on" : "")}
-                   title={"One Nation first-preference support, drawn as one dotted line " +
-                          "over the current term only. The party's past terms are left off – " +
-                          "they crowd the chart without adding context."}>
+            <label className={"pg-check cyc-comb" + (showOnp ? " on" : "")}
+                   title={"The Coalition's and One Nation's first-preference votes summed, " +
+                          "drawn as one dotted line over the current term only. The parties' " +
+                          "past terms are left off – they crowd the chart without adding context."}>
               <input type="checkbox" checked={!!showOnp}
                      onChange={(e) => setOnp(e.target.checked)} />
-              One Nation this term
+              Combine L/NP and ON
             </label>
           )}
         </div>
@@ -2078,9 +2091,9 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
             </span>
           )}
           {onpYears && (
-            <span className="cyc-drawn-item fixed" style={{ "--cyc": HAN_COLOR }}>
+            <span className="cyc-drawn-item fixed" style={{ "--cyc": "var(--ink-2)" }}>
               <span className="cyc-drawn-rule" aria-hidden="true"></span>
-              <span className="cyc-drawn-who">{"One Nation in " + onpYears}</span>
+              <span className="cyc-drawn-who">{"L/NP + One Nation in " + onpYears}</span>
             </span>
           )}
         </div>

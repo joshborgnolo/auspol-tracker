@@ -2399,7 +2399,8 @@ body.dark .cyc-band.hi.thin { opacity: 0.13; }
 }
 .pg-check input:checked::after { background-color: var(--chart-bg); }
 .pg-check input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.cyc-han.on, .cyc-onp.on { color: var(--onp-text); }
+.cyc-han.on { color: var(--onp-text); }
+.cyc-comb.on { color: var(--ink-2); }
 .cyc-charts { display: flex; flex-direction: column; }
 .cycle-head { align-items: baseline; }
 .cycle-head > div { flex: 1 1 26ch; min-width: 0; }
@@ -46894,8 +46895,8 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
       const entries = labels.map(t => {
         const text = (t.textContent || "").trim();
         const fill = getComputedStyle(t).fill;
-        if (text === "ON") return {
-          label: "One Nation this term",
+        if (text === "L/NP+ON") return {
+          label: "L/NP and One Nation combined",
           kind: "dashed",
           fill,
           alpha: 1,
@@ -55723,7 +55724,13 @@ const cycBase = (c, key) => {
 function cycDomain(cycles, M, chg) {
   const vals = cycles.flatMap(c => c.raw[M.key].filter(v => v != null).map(v => chg ? v - cycBase(c, M.key) : v));
   if (M.han) vals.push(...cycles.flatMap(c => (c.raw.han || []).filter(v => v != null).map(v => chg ? v - cycBase(c, "han") : v)));
-  if (M.onp) vals.push(...cycles.flatMap(c => (c.raw.onp || []).filter(v => v != null).map(v => chg ? v - cycBase(c, "onp") : v)));
+  if (M.onp) {
+    const c = cycles.find(x => x.current);
+    if (c) {
+      const cBase = cycBase(c, "oppr") + cycBase(c, "onp");
+      vals.push(...c.raw.months.map((m, i) => c.raw.oppr[i] != null && (c.raw.onp || [])[i] != null ? c.raw.oppr[i] + c.raw.onp[i] : null).filter(v => v != null).map(v => chg ? v - cBase : v));
+    }
+  }
   const ref = chg ? 0 : M.refAbs;
   let lo = Math.min(...vals),
     hi = Math.max(...vals);
@@ -56771,26 +56778,26 @@ function CycleChart({
   if (M.onp && showOnp) {
     const c = shown.find(x => x.current);
     if (c) {
-      const oBase = cycBase(c, "onp");
+      const cBase = cycBase(c, "oppr") + cycBase(c, "onp");
       const pts = c.raw.months.map((m, i) => ({
         x: m,
-        y: c.raw.onp[i]
+        y: c.raw.oppr[i] != null && c.raw.onp[i] != null ? +(c.raw.oppr[i] + c.raw.onp[i]).toFixed(2) : null
       })).filter(p => p.y != null).map(p => ({
         x: p.x,
-        y: chg ? +(p.y - oBase).toFixed(2) : p.y
+        y: chg ? +(p.y - cBase).toFixed(2) : p.y
       }));
       if (pts.length) {
         built.push({
-          id: "cyc-onp",
-          label: "One Nation",
-          color: HAN_COLOR,
+          id: "cyc-comb",
+          label: "L/NP + One Nation",
+          color: "var(--ink-2)",
           width: 2.2,
           points: pts,
           weight: 2.5,
           smooth: false,
           dash: "1 3",
           opacity: 0.85,
-          endLabel: "ON",
+          endLabel: "L/NP+ON",
           endLabelOpacity: 0.8
         });
       }
@@ -56819,7 +56826,7 @@ function CycleChart({
     return y0 + (y1 === y0 ? "" : "–" + tail);
   };
   const hanYears = hanCtl && showHan ? overlayYears(p => p.appr && p.appr.hansonNet != null && (!p.appr.metricBy || p.appr.metricBy.hanson !== "fav")) : null;
-  const onpYears = M.onp && showOnp && shown.some(c => c.current) ? overlayYears(p => p.p && p.p.onp != null) : null;
+  const onpYears = M.onp && showOnp && shown.some(c => c.current) ? overlayYears(p => p.p && p.p.onp != null && p.p.lnp != null) : null;
   const cur = cycles.find(c => c.current);
   let insight = null;
   if (cur && !hidden.has(cur.year)) {
@@ -56940,13 +56947,13 @@ function CycleChart({
     checked: !!showHan,
     onChange: e => setHan(e.target.checked)
   }), "Pauline Hanson this term"), M.onp && React.createElement("label", {
-    className: "pg-check cyc-onp" + (showOnp ? " on" : ""),
-    title: "One Nation first-preference support, drawn as one dotted line " + "over the current term only. The party's past terms are left off – " + "they crowd the chart without adding context."
+    className: "pg-check cyc-comb" + (showOnp ? " on" : ""),
+    title: "The Coalition's and One Nation's first-preference votes summed, " + "drawn as one dotted line over the current term only. The parties' " + "past terms are left off – they crowd the chart without adding context."
   }, React.createElement("input", {
     type: "checkbox",
     checked: !!showOnp,
     onChange: e => setOnp(e.target.checked)
-  }), "One Nation this term")), insight && (() => {
+  }), "Combine L/NP and ON")), insight && (() => {
     const shown = M.fmt(insight.d).replace(/^[+−-]/, "").replace(/\.0+$/, "");
     const level = parseFloat(shown) === 0;
     const rankJsx = insight.rank && React.createElement(React.Fragment, null, " ", insight.rank.lead, insight.rank.refs.map((r, i, a) => React.createElement(React.Fragment, {
@@ -57003,14 +57010,14 @@ function CycleChart({
   }, "Pauline Hanson in " + hanYears)), onpYears && React.createElement("span", {
     className: "cyc-drawn-item fixed",
     style: {
-      "--cyc": HAN_COLOR
+      "--cyc": "var(--ink-2)"
     }
   }, React.createElement("span", {
     className: "cyc-drawn-rule",
     "aria-hidden": "true"
   }), React.createElement("span", {
     className: "cyc-drawn-who"
-  }, "One Nation in " + onpYears))), React.createElement(TrendChart, {
+  }, "L/NP + One Nation in " + onpYears))), React.createElement(TrendChart, {
     key: "cyc-" + M.key + "-" + mode,
     height: narrow ? 500 : 300,
     xDomain: CYC_XDOMAIN,
@@ -69813,7 +69820,7 @@ function RdCycleChart({
       rdCap: 4,
       endLabel: null
     };
-    if (s.id === "cyc-onp" || s.id === "cyc-han") return {
+    if (s.id === "cyc-comb" || s.id === "cyc-han") return {
       ...s,
       smooth: undefined,
       dash: null,
@@ -69888,7 +69895,7 @@ function RdCycleChart({
   }
   const plotH = (narrow ? 260 : half ? 290 : 330) - 80;
   const pxOf = v => (v - domain[0]) / (domain[1] - domain[0]) * plotH;
-  series.filter(s => (s.id === "cyc-onp" || s.id === "cyc-han") && s.points.length && !(s.opacity < 0.5)).forEach(s => {
+  series.filter(s => (s.id === "cyc-comb" || s.id === "cyc-han") && s.points.length && !(s.opacity < 0.5)).forEach(s => {
     const last = s.points[s.points.length - 1];
     const taken = peer && curVal != null ? notes.slice(0, 2).map(n => pxOf(last.y) - pxOf(curVal) + n.dy) : [];
     const dy = [4, -8, 16, -20, 28, -32, 40].find(c => taken.every(t => Math.abs(c - t) >= 15)) ?? 4;
@@ -69898,7 +69905,7 @@ function RdCycleChart({
       y: last.y,
       dx: 10,
       dy,
-      text: (s.id === "cyc-onp" ? "One Nation " : "Hanson ") + fmt(last.y),
+      text: (s.id === "cyc-comb" ? "L/NP + ON " : "Hanson ") + fmt(last.y),
       color: inkOf(s.color),
       weight: 600,
       size: 12.5
@@ -70070,7 +70077,7 @@ function RdCycleChart({
   }, title), M.onp && React.createElement(RdCheck, {
     checked: showOnp,
     onChange: setOnp
-  }, "One Nation this term"), hanCtl && React.createElement(RdCheck, {
+  }, "Combine L/NP and ON"), hanCtl && React.createElement(RdCheck, {
     checked: showHan,
     onChange: setHan
   }, "Pauline Hanson this term")), React.createElement(TrendChart, {

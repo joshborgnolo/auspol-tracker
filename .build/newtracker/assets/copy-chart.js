@@ -636,12 +636,13 @@
       const entries = labels.map((t) => {
         const text = (t.textContent || "").trim();
         const fill = getComputedStyle(t).fill;
-        /* Checked before the digits-only branch below: ON is letters, a term
-           code is always two bare digits, so the two can never collide - and
-           the wording matches the chart's own checkbox ("One Nation this
-           term"), the way the Hanson branch below matches hers. */
-        if (text === "ON")
-          return { label: "One Nation this term",
+        /* Checked before the digits-only branch below: L/NP+ON is letters,
+           a term code is always two bare digits, so the two can never
+           collide - and the wording says what the chart's own checkbox does
+           ("Combine L/NP and ON"), the way the Hanson branch below matches
+           hers. */
+        if (text === "L/NP+ON")
+          return { label: "L/NP and One Nation combined",
                    kind: "dashed", fill, alpha: 1, year: 9999 };
         const digits = text.replace(/[^0-9]/g, "");
         const c = !/[A-Za-z]/.test(text) && digits.length === 2 &&
