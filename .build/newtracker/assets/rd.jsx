@@ -134,20 +134,46 @@ let rdPinAnchorSave = null;
 let rdPinRO = null;
 let rdPinHeld = null;
 let rdPinLive = 0;
-const rdPinClip = (rowTop) => {
-  const held = [];
-  document.querySelectorAll(".rd-glide-in").forEach((i) => {
-    const o = i.parentElement;
-    if (!o || o.__rdFrozen) return;
-    const r = o.getBoundingClientRect();
-    if (r.bottom > rowTop + 1) return;
+/* freezing must not clip a sticky thing's run: a clipped ancestor makes
+   position:sticky descendants scroll off like ordinary content, so any
+   branch holding one stays unfrozen (its changes ride the RO fix below) */
+const RD_PIN_STICKY = ".tabs.sticky,.info-index,.rd-ap-headwrap,.poll-table thead th";
+const rdPinClip = (row, rowTop) => {
+  const held = rdPinHeld || (rdPinHeld = []);
+  const freeze = (o, r) => {
+    if (o.__rdFrozen) return;
     o.__rdFrozen = true;
     o.style.transition = "none";
     o.style.overflowY = "clip";
     o.style.height = r.height + "px";
     held.push(o);
+  };
+  document.querySelectorAll(".rd-glide-in").forEach((i) => {
+    const o = i.parentElement;
+    if (!o) return;
+    const r = o.getBoundingClientRect();
+    if (r.bottom > rowTop + 1) return;
+    freeze(o, r);
   });
-  rdPinHeld = rdPinHeld ? rdPinHeld.concat(held) : held;
+  /* glide blocks are not the only movers: the vote cards' event list
+     unmounts and its chart lane snaps on a shared-range step, and a
+     panel's dek snaps when a metric flips its line count - none glides.
+     So freeze EVERY earlier box along the row's ancestor chain (the
+     sibling sections and cards above it) too: nothing over the row may
+     resize while the pin holds, or iOS catches the row a frame from its
+     spot and paints the lurch no correction can call back */
+  for (let node = row; node && node !== document.body;) {
+    const parent = node.parentElement;
+    if (!parent || parent === document.body) break;
+    for (let sib = parent.firstElementChild; sib && sib !== node; sib = sib.nextElementSibling) {
+      if (sib.__rdFrozen) continue;
+      const r = sib.getBoundingClientRect();
+      if (!r.height || r.bottom > rowTop + 1) continue;
+      if (sib.matches(RD_PIN_STICKY) || sib.querySelector(RD_PIN_STICKY)) continue;
+      freeze(sib, r);
+    }
+    node = parent;
+  }
 };
 const rdPinThaw = () => {
   if (!rdPinHeld) return;
@@ -182,8 +208,6 @@ function rdPinScroll(row) {
      never runs to done(), so it must not count as open */
   if (rdPinRaf === 0) rdPinLive++;
   cancelAnimationFrame(rdPinRaf);
-  rdPinClip(want0.top);
-  if (rdPinRO) { rdPinRO.disconnect(); rdPinRO = null; }
   /* Chrome's scroll anchoring fights the pin when the click focused a
      control OUTSIDE the row (a party chip): the focused box becomes the
      anchor, the browser re-scrolls every frame to hold THAT still through
@@ -197,20 +221,35 @@ function rdPinScroll(row) {
     const drift = row.getBoundingClientRect().top - want;
     if (drift) { window.scrollBy(0, drift); lastY = window.scrollY; }
   };
+  /* freezing can itself nudge the row a few px (a freshly clipped box
+     stops its children's margins collapsing through it), so settle that
+     here in the same task: before any frame gets the chance to paint */
+  rdPinClip(row, want0.top);
+  fix();
   /* A glide hands us its block through __rdPinObserve and we correct its
      resizing frames from a ResizeObserver: RO runs after layout, BEFORE the
      frame paints, so the row never leaves its spot on screen at all -
      rAF-time corrections paint one frame late in Safari, which read as the
      charts bouncing and stuttering under your finger through a swipe walk */
-  const hook = (el) => {
-    if (!el || typeof ResizeObserver === "undefined") return;
-    if (rdPinRO) rdPinRO.disconnect();
+  if (rdPinRO) { rdPinRO.disconnect(); rdPinRO = null; }
+  if (typeof ResizeObserver !== "undefined") {
     rdPinRO = new ResizeObserver(() => {
       if (!row.isConnected) return;
       window.__rdPinROn = (window.__rdPinROn || 0) + 1;
       fix();
     });
-    rdPinRO.observe(el);
+    /* Not everything above the row is a glide block: the vote cards' event
+       list unmounts and the chart's event lane snaps on a shared-range step,
+       and a panel's head/dek snaps when a metric flips its line count - the
+       freeze can't hold them (their change is the row's own React commit,
+       one frame) and no glide registers them. But every such change resizes
+       the row's ancestors, so watch the chain above the row too and answer
+       in this same before-paint callback; a change BELOW the row fires the
+       observer with zero drift and fix() does nothing */
+    for (let el = row.parentElement; el && el !== document.body; el = el.parentElement) rdPinRO.observe(el);
+  }
+  const hook = (el) => {
+    if (el && rdPinRO) rdPinRO.observe(el);
   };
   window.__rdPinObserve = hook;
   const done = () => {

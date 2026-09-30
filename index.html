@@ -62719,20 +62719,36 @@ let rdPinAnchorSave = null;
 let rdPinRO = null;
 let rdPinHeld = null;
 let rdPinLive = 0;
-const rdPinClip = rowTop => {
-  const held = [];
-  document.querySelectorAll(".rd-glide-in").forEach(i => {
-    const o = i.parentElement;
-    if (!o || o.__rdFrozen) return;
-    const r = o.getBoundingClientRect();
-    if (r.bottom > rowTop + 1) return;
+const RD_PIN_STICKY = ".tabs.sticky,.info-index,.rd-ap-headwrap,.poll-table thead th";
+const rdPinClip = (row, rowTop) => {
+  const held = rdPinHeld || (rdPinHeld = []);
+  const freeze = (o, r) => {
+    if (o.__rdFrozen) return;
     o.__rdFrozen = true;
     o.style.transition = "none";
     o.style.overflowY = "clip";
     o.style.height = r.height + "px";
     held.push(o);
+  };
+  document.querySelectorAll(".rd-glide-in").forEach(i => {
+    const o = i.parentElement;
+    if (!o) return;
+    const r = o.getBoundingClientRect();
+    if (r.bottom > rowTop + 1) return;
+    freeze(o, r);
   });
-  rdPinHeld = rdPinHeld ? rdPinHeld.concat(held) : held;
+  for (let node = row; node && node !== document.body;) {
+    const parent = node.parentElement;
+    if (!parent || parent === document.body) break;
+    for (let sib = parent.firstElementChild; sib && sib !== node; sib = sib.nextElementSibling) {
+      if (sib.__rdFrozen) continue;
+      const r = sib.getBoundingClientRect();
+      if (!r.height || r.bottom > rowTop + 1) continue;
+      if (sib.matches(RD_PIN_STICKY) || sib.querySelector(RD_PIN_STICKY)) continue;
+      freeze(sib, r);
+    }
+    node = parent;
+  }
 };
 const rdPinThaw = () => {
   if (!rdPinHeld) return;
@@ -62762,11 +62778,6 @@ function rdPinScroll(row) {
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
   if (rdPinRaf === 0) rdPinLive++;
   cancelAnimationFrame(rdPinRaf);
-  rdPinClip(want0.top);
-  if (rdPinRO) {
-    rdPinRO.disconnect();
-    rdPinRO = null;
-  }
   const html = document.documentElement;
   if (rdPinAnchorSave === null) rdPinAnchorSave = html.style.overflowAnchor;
   html.style.overflowAnchor = "none";
@@ -62779,15 +62790,22 @@ function rdPinScroll(row) {
       lastY = window.scrollY;
     }
   };
-  const hook = el => {
-    if (!el || typeof ResizeObserver === "undefined") return;
-    if (rdPinRO) rdPinRO.disconnect();
+  rdPinClip(row, want0.top);
+  fix();
+  if (rdPinRO) {
+    rdPinRO.disconnect();
+    rdPinRO = null;
+  }
+  if (typeof ResizeObserver !== "undefined") {
     rdPinRO = new ResizeObserver(() => {
       if (!row.isConnected) return;
       window.__rdPinROn = (window.__rdPinROn || 0) + 1;
       fix();
     });
-    rdPinRO.observe(el);
+    for (let el = row.parentElement; el && el !== document.body; el = el.parentElement) rdPinRO.observe(el);
+  }
+  const hook = el => {
+    if (el && rdPinRO) rdPinRO.observe(el);
   };
   window.__rdPinObserve = hook;
   const done = () => {
