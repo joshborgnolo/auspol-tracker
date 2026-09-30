@@ -1170,14 +1170,14 @@ function RdGenBorn({ label }) {
    faster in …", "The composition of …'s vote is unchanged". Deks: "… shifted
    away from X (−x points …), and towards Y (+y points)", "… voter base has
    become more inner-metro" + "… has increased by +x points relative to the
-   overall change, rising even as …", "It has also shifted away from /
+   overall decrease, rising even as …", "It has also shifted away from /
    towards …" — a sole gender move as "Its relative position among men has
-   also shrunk". */
+   shrunk" (no "also"). */
 const RD_TREND_NAME = { onp: "One Nation", alp: "Labor", lnp: "The Coalition", grn: "the Greens", oth: "Others & independents" };
 const RD_TREND_NAME_DEK = { onp: "One Nation", alp: "Labor", lnp: "the Coalition", grn: "the Greens", oth: "others & independents" };
 const RD_TREND_BARE = { onp: "One Nation", alp: "Labor", lnp: "Coalition", grn: "Greens" };
 const RD_TREND_SKEW = {
-  onp: "Its older, regional skew is no stronger now than it was then.",
+  onp: "Its older, regional skew is no stronger or weaker now than it was then.",
   grn: "Its younger, urban skew remains.",
 };
 const RD_TREND_STATE = { NSW: "NSW", Vic: "Victoria", Qld: "Queensland", "Rest of Australia": "the rest of Australia" };
@@ -1404,26 +1404,27 @@ function RdDemographics({ rangeId = "all" }) {
       /* the quoted figure is the RELATIVE move, not the fitted from–to
          levels, and the direction word moves into the national clause
          (user dictate 2026-09-30): "... has increased by +3.7 points
-         relative to the overall change, rising even as the national vote
+         relative to the overall decrease, rising even as the national vote
          has remained flat" */
       const rel = (m.g1 - m.g0) - (m.a1 - m.a0);
       return [
         poss(nameD) + " voter base has become " + (m.dir > 0 ? "more " : "less ") + loc.adj,
-        support + " in " + loc.ref + " has " + (rel >= 0 ? "increased" : "decreased") + " by " + sgnPts(rel) + " points relative to the overall change, " + (m.dir > 0 ? "rising " : "falling ") + national,
+        support + " in " + loc.ref + " has " + (rel >= 0 ? "increased" : "decreased") + " by " + sgnPts(rel) + " points relative to the overall decrease, " + (m.dir > 0 ? "rising " : "falling ") + national,
       ];
     };
     /* non-state, non-location moves merge into ONE "It has also shifted …"
        sentence, each group quoting its own figure (user dictate 2026-09-30);
        a sole GENDER move names a relative position instead ("Its relative
-       position among men has also shrunk"). The sentence hedges only when
-       every move it carries is thin. */
+       position among men has shrunk" — no "also", since a gender move often
+       sits after an opposite-direction location move, per the same dictate).
+       The sentence hedges only when every move it carries is thin. */
     const groupSentence = (gms) => {
       const fig = (m) => (RD_TREND_GROUP[m.group] || m.group) + " (" + relPts(m) + " points)";
       const hedged = gms.every((m) => m.thin);
       if (gms.length === 1 && gms[0].set === "gender") {
         const m = gms[0], gap0 = m.g0 - m.a0, gap1 = m.g1 - m.a1;
         const motion = Math.abs(gap1) > Math.abs(gap0) ? "grown" : "shrunk";
-        return "Its relative position among " + (RD_TREND_GROUP[m.group] || m.group) + (hedged ? " appears to have also " : " has also ") + motion + " (" + relPts(m) + " points)";
+        return "Its relative position among " + (RD_TREND_GROUP[m.group] || m.group) + (hedged ? " appears to have " : " has ") + motion + " (" + relPts(m) + " points)";
       }
       const away = gms.filter((m) => m.dir < 0).map(fig);
       const toward = gms.filter((m) => m.dir > 0).map(fig);

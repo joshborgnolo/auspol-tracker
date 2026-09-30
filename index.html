@@ -66438,7 +66438,7 @@ const RD_TREND_BARE = {
   grn: "Greens"
 };
 const RD_TREND_SKEW = {
-  onp: "Its older, regional skew is no stronger now than it was then.",
+  onp: "Its older, regional skew is no stronger or weaker now than it was then.",
   grn: "Its younger, urban skew remains."
 };
 const RD_TREND_STATE = {
@@ -66657,7 +66657,7 @@ function RdDemographics({
       const national = flat ? "even as the national vote has remained flat" : "while the national vote has " + (m.a1 < m.a0 ? "fallen" : "risen") + " from " + pct(m.a0) + "% to " + pct(m.a1) + "%";
       const support = party === "oth" ? "Support for others & independents" : (RD_TREND_BARE[party] || nameT) + " support";
       const rel = m.g1 - m.g0 - (m.a1 - m.a0);
-      return [poss(nameD) + " voter base has become " + (m.dir > 0 ? "more " : "less ") + loc.adj, support + " in " + loc.ref + " has " + (rel >= 0 ? "increased" : "decreased") + " by " + sgnPts(rel) + " points relative to the overall change, " + (m.dir > 0 ? "rising " : "falling ") + national];
+      return [poss(nameD) + " voter base has become " + (m.dir > 0 ? "more " : "less ") + loc.adj, support + " in " + loc.ref + " has " + (rel >= 0 ? "increased" : "decreased") + " by " + sgnPts(rel) + " points relative to the overall decrease, " + (m.dir > 0 ? "rising " : "falling ") + national];
     };
     const groupSentence = gms => {
       const fig = m => (RD_TREND_GROUP[m.group] || m.group) + " (" + relPts(m) + " points)";
@@ -66667,7 +66667,7 @@ function RdDemographics({
           gap0 = m.g0 - m.a0,
           gap1 = m.g1 - m.a1;
         const motion = Math.abs(gap1) > Math.abs(gap0) ? "grown" : "shrunk";
-        return "Its relative position among " + (RD_TREND_GROUP[m.group] || m.group) + (hedged ? " appears to have also " : " has also ") + motion + " (" + relPts(m) + " points)";
+        return "Its relative position among " + (RD_TREND_GROUP[m.group] || m.group) + (hedged ? " appears to have " : " has ") + motion + " (" + relPts(m) + " points)";
       }
       const away = gms.filter(m => m.dir < 0).map(fig);
       const toward = gms.filter(m => m.dir > 0).map(fig);
