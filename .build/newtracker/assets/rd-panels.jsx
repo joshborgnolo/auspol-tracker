@@ -1141,6 +1141,10 @@ function RdDemographics({ rangeId = "all" }) {
       };
     }
     const pct = (v) => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
+    /* a move's points relative to the all-voters shift over the same window:
+       (g1−g0) − (a1−a0) — also a group claim's change in gap vs all voters */
+    const sgnPts = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + pct(Math.abs(v));
+    const relPts = (m) => sgnPts((m.g1 - m.g0) - (m.a1 - m.a0));
     const setGroupsOf = (m) => {
       const tb = T.tabs.find((t) => t.id === m.tab);
       const st = tb && tb.sets.find((s) => s.id === m.set);
@@ -1165,7 +1169,7 @@ function RdDemographics({ rangeId = "all" }) {
         // the title's pole: the three eastern states together name as one
         pole: a.length ? (eastern(a) ? "the eastern-mainland states" : serial(named(a))) : (eastern(t) ? "the eastern-mainland states" : serial(named(t))),
         toward: !a.length,
-        dek: "the composition of " + poss(nameD) + " vote " + (hedged ? "appears to have" : "has") + " shifted away from " + serial(named(a)) + ", and towards " + serial(named(t)),
+        dek: "the composition of " + poss(nameD) + " vote " + (hedged ? "appears to have" : "has") + " shifted away from " + serial(named(a)) + ", and towards " + serial(named(t)) + " (" + relPts(bestOf(ms.filter((m) => m.dir < 0).length ? ms.filter((m) => m.dir < 0) : ms)) + " points relative to all " + nameD + " voters)",
       };
     };
     const locDek = (m) => {
@@ -1188,7 +1192,7 @@ function RdDemographics({ rangeId = "all" }) {
       const mag = motion === "shrinking" || motion === "narrowing" ? Math.abs(gap0) : Math.abs(gap1);
       const strength = mag >= 8 ? "once-large " : mag >= 3 ? "considerable " : "";
       const hedge = m.thin ? "appears to be " : "is ";
-      return poss(nameD) + " " + strength + noun + " among " + (RD_TREND_GROUP[m.group] || m.group) + " " + hedge + motion;
+      return poss(nameD) + " " + strength + noun + " among " + (RD_TREND_GROUP[m.group] || m.group) + " " + hedge + motion + " (" + relPts(m) + " points)";
     };
     const bySet = new Map();
     for (const m of solid) {
