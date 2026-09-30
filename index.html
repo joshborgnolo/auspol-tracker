@@ -3856,7 +3856,6 @@ body.rd .rd-mo-rbar > em { position: absolute; top: 50%; transform: translateY(-
 body.rd .rd-mo-rbar > em.rd-mo-first { display: flex; flex-direction: column; gap: 2px; line-height: 1.15; }
 body.rd .rd-mo-big { font-size: 22px; font-weight: 600; }
 body.rd .rd-mo-nb { font-size: 12px; font-weight: 400; }
-body.rd .rd-mo-rbar > i.rd-mo-else { position: absolute; right: 8px; top: 6px; font-style: normal; font-size: 11px; }
 body.rd .rd-sm-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px; margin-top: 24px; }
 body.rd .rd-sm-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; font-weight: 600; }
 body.rd .rd-sm-top b { font-size: 18px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -67424,7 +67423,7 @@ function RdSwitching({
     nm: c.kept ? ["One Nation", "ON"] : [NAME[c.id]],
     sz: [fmt1(c.w) + "%" + (c.id === "lnp" || c.id === "alp" ? " of 2025 voters" : c.id === "oth" ? ", incl. independents" : ""), fmt1(c.w) + "%"],
     pts: c.kept ? ["≈ " + fmt1(keptPts)] : ["≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)],
-    sh: c.kept ? ["kept"] : [Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + (i === 0 ? " of One Nation’s gain" : i === 1 ? " of the gain" : ""), Math.round(c.gain) + "% ±" + fmt1(c.gainCi), Math.round(c.gain) + "%"]
+    sh: c.kept ? ["kept"] : [fmt1(c.rate) + "% ±" + fmt1(c.rateCi) + (i === 0 ? " of its 2025 voters now back One Nation" : i === 1 ? " now back One Nation" : ""), fmt1(c.rate) + "% ±" + fmt1(c.rateCi), Math.round(c.rate) + "%"]
   }));
   const lab = {};
   [["nm", 15, 600], ["sz", 12, 400], ["pts", 15, 600], ["sh", 12, 400]].forEach(([key, size, wt]) => {
@@ -67448,12 +67447,12 @@ function RdSwitching({
     height: H + 110,
     viewBox: `0 0 ${W} ${H + 110}`,
     role: "img",
-    "aria-label": "Each 2025 party’s voters as a column sized by its 2025 vote, filled by the share now backing One Nation. " + cols.map(c => NAME[c.id] + " " + fmt1(c.rate) + "%").join(", ") + (keptPct != null ? "; One Nation kept " + Math.round(keptPct) + "% of its own." : ".")
+    "aria-label": "Each 2025 party’s voters as a column sized by its 2025 vote, filled by that party’s share of One Nation’s gain. " + cols.map(c => NAME[c.id] + " " + fmt1(c.gain) + "%").join(", ") + (keptPct != null ? "; One Nation kept " + Math.round(keptPct) + "% of its own." : ".")
   }, geo.map((c, i) => {
     const last = i === geo.length - 1;
     const tx = last ? c.x + c.cw : c.x,
       anchor = last ? "end" : "start";
-    const fillH = c.rate / 100 * H;
+    const fillH = (c.kept ? c.rate : c.gain) / 100 * H;
     return React.createElement("g", {
       key: c.id
     }, React.createElement("text", {
@@ -67486,14 +67485,7 @@ function RdSwitching({
       style: {
         fill: c.kept ? "var(--onp-deep)" : "var(--onp)"
       }
-    }), i === 0 && React.createElement("text", {
-      className: "rd-mo-sz",
-      x: c.x + 12,
-      y: 48 + 22,
-      style: {
-        fill: c.ink
-      }
-    }, "Stayed or went elsewhere"), c.kept ? (() => {
+    }), c.kept ? (() => {
       const fit = c.cw >= textWidth(Math.round(c.rate) + "%", 15, 600) + 20;
       const kx = fit ? c.x + 10 : c.x + c.cw / 2,
         ka = fit ? "start" : "middle";
@@ -67518,18 +67510,18 @@ function RdSwitching({
       className: "rd-mo-rate",
       x: c.x + 14,
       y: 48 + H - fillH + 30
-    }, fmt1(c.rate), "%"), React.createElement("text", {
+    }, fmt1(c.gain), "%"), React.createElement("text", {
       className: "rd-mo-sz rd-mo-onfill",
       x: c.x + 14,
       y: 48 + H - fillH + 48
-    }, "now back One Nation")) : React.createElement("text", {
+    }, "of One Nation\u2019s gain")) : React.createElement("text", {
       className: "rd-mo-rates",
       x: c.x + 14,
       y: fillH >= 22 ? 48 + H - fillH + 20 : 48 + H - fillH - 8,
       style: fillH >= 22 ? undefined : {
         fill: "var(--onp-text)"
       }
-    }, fmt1(c.rate), "%"), React.createElement("text", {
+    }, fmt1(c.gain), "%"), React.createElement("text", {
       className: "rd-mo-pts",
       x: tx,
       y: 48 + H + 28,
@@ -67559,7 +67551,7 @@ function RdSwitching({
     }
   }, c.kept ? "One Nation" : c.id === "oth" ? "Others & independents" : NAME[c.id]), React.createElement("b", null, "\u2248 ", fmt1(c.kept ? keptPts : c.pts), " pts")), React.createElement("div", {
     className: "rd-mo-rsub"
-  }, React.createElement("span", null, fmt1(c.w), "% of 2025 voters"), React.createElement("span", null, c.kept ? Math.round(c.rate) + "% still back it" : Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + " of the gain")), React.createElement("div", {
+  }, React.createElement("span", null, fmt1(c.w), "% of 2025 voters"), React.createElement("span", null, c.kept ? Math.round(c.rate) + "% still back it" : fmt1(c.rate) + "% now back One Nation")), React.createElement("div", {
     className: "rd-mo-rbar",
     style: {
       height: Math.max(16, c.w * 2.6),
@@ -67567,28 +67559,23 @@ function RdSwitching({
     }
   }, React.createElement("span", {
     style: {
-      width: c.rate + "%",
+      width: (c.kept ? c.rate : c.gain) + "%",
       background: c.kept ? "var(--onp-deep)" : "var(--onp)"
     }
   }), !c.kept && i === 0 ? React.createElement("em", {
     className: "rd-mo-first",
     style: {
-      left: "calc(" + c.rate + "% + 8px)"
+      left: "calc(" + c.gain + "% + 8px)"
     }
   }, React.createElement("span", {
     className: "rd-mo-big"
-  }, fmt1(c.rate), "%"), React.createElement("span", {
+  }, fmt1(c.gain), "%"), React.createElement("span", {
     className: "rd-mo-nb"
-  }, "now back One Nation")) : !c.kept && React.createElement("em", {
+  }, "of One Nation\u2019s gain")) : !c.kept && React.createElement("em", {
     style: {
-      left: "calc(" + c.rate + "% + 8px)"
+      left: "calc(" + c.gain + "% + 8px)"
     }
-  }, fmt1(c.rate), "%"), !c.kept && i === 0 && React.createElement("i", {
-    className: "rd-mo-else",
-    style: {
-      color: c.ink
-    }
-  }, "Stayed or went elsewhere")))));
+  }, fmt1(c.gain), "%")))));
   return React.createElement(RdSec, {
     id: "switching",
     cls: "rd-sw",
@@ -67616,9 +67603,9 @@ function RdSwitching({
     color: "var(--onp-deep)"
   }), "Already One Nation in 2025"), !narrow && React.createElement("span", {
     className: "rd-key-item rd-mo-howread"
-  }, "Width: share of the 2025 vote, Height: share now backing One Nation, Area: voters gained")), narrow && React.createElement("p", {
+  }, "Width: share of the 2025 vote, Height: share of One Nation\u2019s gain")), narrow && React.createElement("p", {
     className: "rd-note"
-  }, "Bar height: that party\u2019s share of the 2025 vote. Filled width: share now backing One Nation. Filled area: voters One Nation gained.")), React.createElement(RdSub, {
+  }, "Bar height: that party\u2019s share of the 2025 vote. Bar fill: that party\u2019s share of One Nation\u2019s gain.")), React.createElement(RdSub, {
     head: subHead,
     dek: subDek
   }), React.createElement("div", {

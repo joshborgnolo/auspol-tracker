@@ -1876,8 +1876,8 @@ function RdSwitching({ rangeId }) {
     nm: c.kept ? ["One Nation", "ON"] : [NAME[c.id]],
     sz: [fmt1(c.w) + "%" + (c.id === "lnp" || c.id === "alp" ? " of 2025 voters" : c.id === "oth" ? ", incl. independents" : ""), fmt1(c.w) + "%"],
     pts: c.kept ? ["≈ " + fmt1(keptPts)] : ["≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)],
-    sh: c.kept ? ["kept"] : [Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + (i === 0 ? " of One Nation’s gain" : i === 1 ? " of the gain" : ""),
-                            Math.round(c.gain) + "% ±" + fmt1(c.gainCi), Math.round(c.gain) + "%"],
+    sh: c.kept ? ["kept"] : [fmt1(c.rate) + "% ±" + fmt1(c.rateCi) + (i === 0 ? " of its 2025 voters now back One Nation" : i === 1 ? " now back One Nation" : ""),
+                            fmt1(c.rate) + "% ±" + fmt1(c.rateCi), Math.round(c.rate) + "%"],
   }));
   const lab = {};
   [["nm", 15, 600], ["sz", 12, 400], ["pts", 15, 600], ["sh", 12, 400]].forEach(([key, size, wt]) => {
@@ -1899,19 +1899,21 @@ function RdSwitching({ rangeId }) {
   });
   const mosaic = !narrow ? (
     <svg className="rd-mo" width={W} height={H + 110} viewBox={`0 0 ${W} ${H + 110}`} role="img"
-         aria-label={"Each 2025 party’s voters as a column sized by its 2025 vote, filled by the share now backing One Nation. "
-           + cols.map((c) => NAME[c.id] + " " + fmt1(c.rate) + "%").join(", ") + (keptPct != null ? "; One Nation kept " + Math.round(keptPct) + "% of its own." : ".")}>
+         aria-label={"Each 2025 party’s voters as a column sized by its 2025 vote, filled by that party’s share of One Nation’s gain. "
+           + cols.map((c) => NAME[c.id] + " " + fmt1(c.gain) + "%").join(", ") + (keptPct != null ? "; One Nation kept " + Math.round(keptPct) + "% of its own." : ".")}>
       {geo.map((c, i) => {
         const last = i === geo.length - 1;
         const tx = last ? c.x + c.cw : c.x, anchor = last ? "end" : "start";
-        const fillH = (c.rate / 100) * H;
+        /* the fill is that party's share of One Nation's gain (kept column:
+           its own 2025 share still backing it) - the under-bar text carries
+           the rate, the per-party share of its 2025 voters now with ON */
+        const fillH = ((c.kept ? c.rate : c.gain) / 100) * H;
         return (
           <g key={c.id}>
             <text className="rd-mo-nm" x={tx} y={16} textAnchor={anchor} style={{ fill: c.ink }}>{lab.nm[i]}</text>
             <text className="rd-mo-sz" x={tx} y={35} textAnchor={anchor}>{lab.sz[i]}</text>
             <rect x={c.x} y={48} width={c.cw} height={H} style={{ fill: c.tint }} />
             <rect className="rd-mo-fill" x={c.x} y={48 + H - fillH} width={c.cw} height={fillH} style={{ fill: c.kept ? "var(--onp-deep)" : "var(--onp)" }} />
-            {i === 0 && <text className="rd-mo-sz" x={c.x + 12} y={48 + 22} style={{ fill: c.ink }}>Stayed or went elsewhere</text>}
             {c.kept ? (() => {
               /* a tablet's One Nation column is barely wider than "94%": set
                  in from its edge, the figure ran off the drawing - centred there */
@@ -1925,12 +1927,12 @@ function RdSwitching({ rangeId }) {
               );
             })() : i === 0 ? (
               <>
-                <text className="rd-mo-rate" x={c.x + 14} y={48 + H - fillH + 30}>{fmt1(c.rate)}%</text>
-                <text className="rd-mo-sz rd-mo-onfill" x={c.x + 14} y={48 + H - fillH + 48}>now back One Nation</text>
+                <text className="rd-mo-rate" x={c.x + 14} y={48 + H - fillH + 30}>{fmt1(c.gain)}%</text>
+                <text className="rd-mo-sz rd-mo-onfill" x={c.x + 14} y={48 + H - fillH + 48}>of One Nation’s gain</text>
               </>
             ) : (
               <text className="rd-mo-rates" x={c.x + 14} y={fillH >= 22 ? 48 + H - fillH + 20 : 48 + H - fillH - 8}
-                    style={fillH >= 22 ? undefined : { fill: "var(--onp-text)" }}>{fmt1(c.rate)}%</text>
+                    style={fillH >= 22 ? undefined : { fill: "var(--onp-text)" }}>{fmt1(c.gain)}%</text>
             )}
             <text className="rd-mo-pts" x={tx} y={48 + H + 28} textAnchor={anchor}>{lab.pts[i]}</text>
             <text className="rd-mo-sh" x={tx} y={48 + H + 47} textAnchor={anchor}>{lab.sh[i]}</text>
@@ -1946,14 +1948,13 @@ function RdSwitching({ rangeId }) {
       {all.map((c, i) => (
         <div key={c.id} className="rd-mo-row">
           <div className="rd-mo-rtop"><b style={{ color: c.ink }}>{c.kept ? "One Nation" : c.id === "oth" ? "Others & independents" : NAME[c.id]}</b><b>≈ {fmt1(c.kept ? keptPts : c.pts)} pts</b></div>
-          <div className="rd-mo-rsub"><span>{fmt1(c.w)}% of 2025 voters</span><span>{c.kept ? Math.round(c.rate) + "% still back it" : Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + " of the gain"}</span></div>
+          <div className="rd-mo-rsub"><span>{fmt1(c.w)}% of 2025 voters</span><span>{c.kept ? Math.round(c.rate) + "% still back it" : fmt1(c.rate) + "% now back One Nation"}</span></div>
           <div className="rd-mo-rbar" style={{ height: Math.max(16, c.w * 2.6), background: c.tint }}>
-            <span style={{ width: c.rate + "%", background: c.kept ? "var(--onp-deep)" : "var(--onp)" }}></span>
+            <span style={{ width: (c.kept ? c.rate : c.gain) + "%", background: c.kept ? "var(--onp-deep)" : "var(--onp)" }}></span>
             {!c.kept && i === 0 ? (
-              <em className="rd-mo-first" style={{ left: "calc(" + c.rate + "% + 8px)" }}>
-                <span className="rd-mo-big">{fmt1(c.rate)}%</span><span className="rd-mo-nb">now back One Nation</span></em>
-            ) : !c.kept && <em style={{ left: "calc(" + c.rate + "% + 8px)" }}>{fmt1(c.rate)}%</em>}
-            {!c.kept && i === 0 && <i className="rd-mo-else" style={{ color: c.ink }}>Stayed or went elsewhere</i>}
+              <em className="rd-mo-first" style={{ left: "calc(" + c.gain + "% + 8px)" }}>
+                <span className="rd-mo-big">{fmt1(c.gain)}%</span><span className="rd-mo-nb">of One Nation’s gain</span></em>
+            ) : !c.kept && <em style={{ left: "calc(" + c.gain + "% + 8px)" }}>{fmt1(c.gain)}%</em>}
           </div>
         </div>
       ))}
@@ -1970,9 +1971,9 @@ function RdSwitching({ rangeId }) {
         <div className="rd-key rd-mo-key">
           <span className="rd-key-item"><RdSwatch kind="square" color="var(--onp)" />Switched to One Nation</span>
           <span className="rd-key-item"><RdSwatch kind="square" color="var(--onp-deep)" />Already One Nation in 2025</span>
-          {!narrow && <span className="rd-key-item rd-mo-howread">Width: share of the 2025 vote, Height: share now backing One Nation, Area: voters gained</span>}
+          {!narrow && <span className="rd-key-item rd-mo-howread">Width: share of the 2025 vote, Height: share of One Nation’s gain</span>}
         </div>
-        {narrow && <p className="rd-note">Bar height: that party’s share of the 2025 vote. Filled width: share now backing One Nation. Filled area: voters One Nation gained.</p>}
+        {narrow && <p className="rd-note">Bar height: that party’s share of the 2025 vote. Bar fill: that party’s share of One Nation’s gain.</p>}
       </div>
       <RdSub head={subHead} dek={subDek} />
       <div className="rd-sm-grid">
