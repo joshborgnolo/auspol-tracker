@@ -1430,7 +1430,7 @@ body.rd .rd-un-age { margin-top: 20px; }
 body.rd .rd-sp { font-variant-numeric: tabular-nums; }
 body.rd .rd-sp-head, body.rd .rd-sp-row, body.rd .rd-sp-axis { display: grid; grid-template-columns: 200px minmax(0, 1fr) 110px 60px; column-gap: 20px; align-items: center; }
 body.rd .rd-sp-head { min-height: 36px; font-size: 13px; }
-body.rd .rd-sp-head b { font-size: 15px; font-weight: 600; color: var(--ink); grid-column: 1; grid-row: 1; }
+body.rd .rd-sp-head b { font-size: 15px; font-weight: 600; color: var(--ink); grid-column: 1 / span 2; grid-row: 1; white-space: nowrap; }
 body.rd .rd-sp-allcap { position: relative; grid-column: 2; grid-row: 1; height: 16px; align-self: end; }
 body.rd .rd-sp-allcap > span { position: absolute; bottom: 0; transform: translateX(-50%); font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-sp-src { grid-column: 3 / span 2; text-align: right; color: var(--ink-3); }
