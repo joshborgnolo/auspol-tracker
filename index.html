@@ -67467,7 +67467,11 @@ function RdIssues({
       style: v && v.color ? {
         color: v.color
       } : undefined
-    }, v ? v.text : "", x.grnTop && React.createElement("small", null, "Greens first where offered")));
+    }, v ? v.text : "", x.grnTop && React.createElement("small", null, "Greens first (", React.createElement("span", {
+      style: {
+        color: inkOf(pColor("grn"))
+      }
+    }, Math.round(x.grnTop.grn)), ") where offered")));
   };
   const wide = list.filter(x => x.imp && x.imp.gap && x.imp.by.length === 2).map(x => {
     const [hi, lo] = [...x.imp.by].sort((a, b) => b.v - a.v);

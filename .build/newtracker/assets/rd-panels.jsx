@@ -2004,7 +2004,7 @@ function RdIssues({ rangeId = "all" }) {
         </span>
         <span className="rd-is-nums">{x.own ? pOrd.map((q) => <b key={q} style={{ color: inkOf(pColor(q)) }}>{Math.round(x.own.v[q])}</b>) : null}</span>
         <span className={"rd-is-verdict" + (v && v.strong ? " strong" : "")} style={v && v.color ? { color: v.color } : undefined}>
-          {v ? v.text : ""}{x.grnTop && <small>Greens first where offered</small>}</span>
+          {v ? v.text : ""}{x.grnTop && <small>Greens first (<span style={{ color: inkOf(pColor("grn")) }}>{Math.round(x.grnTop.grn)}</span>) where offered</small>}</span>
       </div>
     );
   };
