@@ -2420,10 +2420,20 @@ function RdUndecided({ rangeId }) {
   const monthsLabel = (from, to) => from + " → " + to;
 
   const views = [{ id: "all", label: "All voters" }].concat(F ? [{ id: "party", label: "By party" }] : [], A ? [{ id: "age", label: "By age" }] : []);
+  /* The views are pages of their own, so the row walks them by arrow keys
+     and, on a phone, by a sideways swipe on or just under it (without
+     swipe the gesture turns the page instead). Scrolled past the head and
+     dek, a walk holds the row's spot through the view switch the same way
+     the cycles and panels rows do (rdPinScroll). */
+  const pinUn = () => {
+    const sec = document.getElementById("undecided");
+    rdPinScroll(sec && sec.querySelector(".rd-un-tabs"), sec && sec.querySelector(".rd-dek"));
+  };
+  const pickView = (id) => { pinUn(); setView(id); };
   return (
     <RdSec id="undecided" cls="rd-un" title="Undecided" meta={rdList(U.houses) + ", since the 2025 election"}>
       {story && <RdHed head={story.head} dek={story.dek} />}
-      <RdTabs value={view} onChange={setView} options={views} ariaLabel="Undecided among" className="rd-un-tabs" />
+      <RdTabs swipe value={view} onChange={pickView} options={views} ariaLabel="Undecided among" className="rd-un-tabs" />
       {/* each view is its own measure from its own pollsters: a switch
           crossfades them (RdCrossfade) */}
       <RdCrossfade k={view}>

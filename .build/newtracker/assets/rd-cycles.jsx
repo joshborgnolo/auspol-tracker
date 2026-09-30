@@ -268,6 +268,15 @@ function RdPastCycles(p) {
   const [tip, setTip] = useState(null);
   const boardRef = React.useRef(null);
   window.useDismissOutside(boardRef, board, () => setBoard(false));
+  /* Walking the compare sets or the measure rewrites the head and dek
+     above this row; scrolled past them under the sticky tabs, each step
+     then drags the row and charts up or down mid-walk. rdPinScroll (in
+     rd.jsx, shared with the other tab rows) holds the row's spot on
+     screen through the head/dek glide instead. */
+  const pinView = () => {
+    const sec = boardRef.current && boardRef.current.closest("section");
+    rdPinScroll(boardRef.current, sec && sec.querySelector(".rd-dek"));
+  };
   const chg = mode === "chg";
   const cur = cycles.find((c) => c.current);
   const m = cur ? cur.span : 0;
@@ -294,10 +303,12 @@ function RdPastCycles(p) {
      its Labor line while the table and headlines beside it still quoted it -
      so it is put straight back (toggle's update runs after showOutcome's). */
   const setCompare = (id) => {
+    pinView();
     if (id === "all") { showAll(); return; }
     showOutcome(id);
     if (cur) toggle(cur.year);
   };
+  const setModePin = (id) => { pinView(); setMode(id); };
 
   /* ---- the rows -------------------------------------------------------------- */
   const ROWS = [
@@ -584,9 +595,9 @@ function RdPastCycles(p) {
         </div>
         <span className="rd-cc-sep" aria-hidden="true"></span>
         <div className="rd-tabs rd-cc-tabs" role="group" aria-label="Measure"
-             onKeyDown={rdTabsKey(MODE_ROWS.map((id) => ({ id })), setMode)} onClick={rdTabFocus}>
-          <button type="button" className="rd-tab" aria-pressed={!chg} onClick={() => setMode("abs")}>Level</button>
-          <button type="button" className="rd-tab" aria-pressed={chg} onClick={() => setMode("chg")}>{narrow ? "Change" : "Change since election"}</button>
+             onKeyDown={rdTabsKey(MODE_ROWS.map((id) => ({ id })), setModePin)} onClick={rdTabFocus}>
+          <button type="button" className="rd-tab" aria-pressed={!chg} onClick={() => setModePin("abs")}>Level</button>
+          <button type="button" className="rd-tab" aria-pressed={chg} onClick={() => setModePin("chg")}>{narrow ? "Change" : "Change since election"}</button>
         </div>
         <span className="rd-grow"></span>
         <button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>

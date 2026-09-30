@@ -62674,6 +62674,7 @@ function rdHoldSection(el, dh, ms) {
   }, ms);
 }
 let rdPinRaf = 0;
+let rdPinAnchorSave = null;
 function rdPinScroll(row, dek) {
   if (!row || !dek) return;
   const bar = document.querySelector(".tabs.sticky");
@@ -62685,12 +62686,22 @@ function rdPinScroll(row, dek) {
   const want0 = row.getBoundingClientRect();
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
   cancelAnimationFrame(rdPinRaf);
+  const html = document.documentElement;
+  if (rdPinAnchorSave === null) rdPinAnchorSave = html.style.overflowAnchor;
+  html.style.overflowAnchor = "none";
+  const done = () => {
+    rdPinRaf = 0;
+    if (rdPinAnchorSave !== null) {
+      html.style.overflowAnchor = rdPinAnchorSave;
+      rdPinAnchorSave = null;
+    }
+  };
   let want = want0.top,
     lastY = window.scrollY;
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
     if (!row.isConnected) {
-      rdPinRaf = 0;
+      done();
       return;
     }
     const y = window.scrollY;
@@ -62701,7 +62712,7 @@ function rdPinScroll(row, dek) {
       window.scrollBy(0, drift);
       lastY = window.scrollY;
     }
-    if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);else rdPinRaf = 0;
+    if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);else done();
   };
   rdPinRaf = requestAnimationFrame(step);
 }
@@ -68180,6 +68191,14 @@ function RdUndecided({
     id: "age",
     label: "By age"
   }] : []);
+  const pinUn = () => {
+    const sec = document.getElementById("undecided");
+    rdPinScroll(sec && sec.querySelector(".rd-un-tabs"), sec && sec.querySelector(".rd-dek"));
+  };
+  const pickView = id => {
+    pinUn();
+    setView(id);
+  };
   return React.createElement(RdSec, {
     id: "undecided",
     cls: "rd-un",
@@ -68189,8 +68208,9 @@ function RdUndecided({
     head: story.head,
     dek: story.dek
   }), React.createElement(RdTabs, {
+    swipe: true,
     value: view,
-    onChange: setView,
+    onChange: pickView,
     options: views,
     ariaLabel: "Undecided among",
     className: "rd-un-tabs"
@@ -69870,6 +69890,10 @@ function RdPastCycles(p) {
   const [tip, setTip] = useState(null);
   const boardRef = React.useRef(null);
   window.useDismissOutside(boardRef, board, () => setBoard(false));
+  const pinView = () => {
+    const sec = boardRef.current && boardRef.current.closest("section");
+    rdPinScroll(boardRef.current, sec && sec.querySelector(".rd-dek"));
+  };
   const chg = mode === "chg";
   const cur = cycles.find(c => c.current);
   const m = cur ? cur.span : 0;
@@ -69898,12 +69922,17 @@ function RdPastCycles(p) {
     nOus = cycles.filter((c, i) => outcomeOf(i) === "ousted").length;
   const compare = hidden.size === 0 ? "all" : outcomeShown || null;
   const setCompare = id => {
+    pinView();
     if (id === "all") {
       showAll();
       return;
     }
     showOutcome(id);
     if (cur) toggle(cur.year);
+  };
+  const setModePin = id => {
+    pinView();
+    setMode(id);
   };
   const ROWS = [{
     key: "tpp",
@@ -70344,18 +70373,18 @@ function RdPastCycles(p) {
     "aria-label": "Measure",
     onKeyDown: rdTabsKey(MODE_ROWS.map(id => ({
       id
-    })), setMode),
+    })), setModePin),
     onClick: rdTabFocus
   }, React.createElement("button", {
     type: "button",
     className: "rd-tab",
     "aria-pressed": !chg,
-    onClick: () => setMode("abs")
+    onClick: () => setModePin("abs")
   }, "Level"), React.createElement("button", {
     type: "button",
     className: "rd-tab",
     "aria-pressed": chg,
-    onClick: () => setMode("chg")
+    onClick: () => setModePin("chg")
   }, narrow ? "Change" : "Change since election")), React.createElement("span", {
     className: "rd-grow"
   }), React.createElement("button", {

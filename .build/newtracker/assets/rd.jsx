@@ -120,6 +120,7 @@ function rdHoldSection(el, dh, ms) {
    state changes. No-op while any of the dek still shows: there the words
    change in view and nothing should move. */
 let rdPinRaf = 0;
+let rdPinAnchorSave = null;
 function rdPinScroll(row, dek) {
   if (!row || !dek) return;
   const bar = document.querySelector(".tabs.sticky");
@@ -132,17 +133,29 @@ function rdPinScroll(row, dek) {
   const want0 = row.getBoundingClientRect();
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
   cancelAnimationFrame(rdPinRaf);
+  /* Chrome's scroll anchoring fights the pin when the click focused a
+     control OUTSIDE the row (a party chip): the focused box becomes the
+     anchor, the browser re-scrolls every frame to hold THAT still through
+     the glide, and the two trade scrolls back and forth while the row
+     rides off. Silence anchoring for the pin's window, then hand back. */
+  const html = document.documentElement;
+  if (rdPinAnchorSave === null) rdPinAnchorSave = html.style.overflowAnchor;
+  html.style.overflowAnchor = "none";
+  const done = () => {
+    rdPinRaf = 0;
+    if (rdPinAnchorSave !== null) { html.style.overflowAnchor = rdPinAnchorSave; rdPinAnchorSave = null; }
+  };
   let want = want0.top, lastY = window.scrollY;
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
-    if (!row.isConnected) { rdPinRaf = 0; return; }
+    if (!row.isConnected) { done(); return; }
     const y = window.scrollY;
     want += y - lastY;
     lastY = y;
     const drift = row.getBoundingClientRect().top - want;
     if (drift) { window.scrollBy(0, drift); lastY = window.scrollY; }
     if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);
-    else rdPinRaf = 0;
+    else done();
   };
   rdPinRaf = requestAnimationFrame(step);
 }
