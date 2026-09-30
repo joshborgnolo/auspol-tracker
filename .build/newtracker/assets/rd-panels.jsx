@@ -1134,7 +1134,7 @@ const RD_DEMO_HOME = {
   alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial",
   lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
   grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
-  oth: "Voters for others/independents are more likely to be Gen Z, renting, and NSW-based; less likely to live in provincial areas or have a mortgage",
+  oth: "Voters for others & independents are more likely to be Gen Z, renting, and NSW-based; less likely to live in provincial areas or have a mortgage",
 };
 /* the usual (Pew) birth years behind the polls' generation labels: neither
    pollster publishes its own, so the "By generation" dot-plot labels bracket
@@ -1170,8 +1170,8 @@ function RdGenBorn({ label }) {
    …'s vote is unchanged". Deks: "… shifted away from … and towards …", "…
    voter base has become more inner-metro", "… once-large lead … appears to be
    shrinking". */
-const RD_TREND_NAME = { onp: "One Nation", alp: "Labor", lnp: "The Coalition", grn: "the Greens", oth: "Others/independents" };
-const RD_TREND_NAME_DEK = { onp: "One Nation", alp: "Labor", lnp: "the Coalition", grn: "the Greens", oth: "others/independents" };
+const RD_TREND_NAME = { onp: "One Nation", alp: "Labor", lnp: "The Coalition", grn: "the Greens", oth: "Others & independents" };
+const RD_TREND_NAME_DEK = { onp: "One Nation", alp: "Labor", lnp: "the Coalition", grn: "the Greens", oth: "others & independents" };
 const RD_TREND_BARE = { onp: "One Nation", alp: "Labor", lnp: "Coalition", grn: "Greens" };
 const RD_TREND_SKEW = {
   onp: "Its older, regional skew is no stronger now than it was then.",
@@ -1274,9 +1274,9 @@ function RdDemographics({ rangeId = "all" }) {
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find((x) => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
-  /* the prose names them "others/independents" (user dictate): a lower-case
+  /* the prose names them "others & independents" (user dictate): a lower-case
      description whose possessive takes a bare apostrophe */
-  const pName = party === "oth" ? "others/independents" : P.name;
+  const pName = party === "oth" ? "others & independents" : P.name;
   const pPoss = pName + (/s$/.test(pName) ? "’" : "’s"), pColor = P.color;
   const all = T.all[party];
   const ki = T.order.indexOf(party), gpi = DEMO_GRP_PARTY.indexOf(party);
@@ -1392,7 +1392,7 @@ function RdDemographics({ rangeId = "all" }) {
       const flat = Math.abs(m.a1 - m.a0) < 1;
       const national = flat ? ", even as the national vote has remained flat"
         : ", while the national vote has " + (m.a1 < m.a0 ? "fallen" : "risen") + " from " + pct(m.a0) + "% to " + pct(m.a1) + "%";
-      const support = party === "oth" ? "Support for others/independents" : (RD_TREND_BARE[party] || nameT) + " support";
+      const support = party === "oth" ? "Support for others & independents" : (RD_TREND_BARE[party] || nameT) + " support";
       return [
         poss(nameD) + " voter base has become " + (m.dir > 0 ? "more " : "less ") + loc.adj,
         support + " in " + loc.ref + " has " + (m.dir > 0 ? "risen" : "fallen") + " from " + pct(m.g0) + "% to about " + pct(m.g1) + "%" + national,
@@ -1458,7 +1458,7 @@ function RdDemographics({ rangeId = "all" }) {
         else parts.push(groupDek(bestOf(ms)));
       });
     /* sentences after the first start a sentence of their own, so a
-       lower-case name ("others/independents") still opens capitalised */
+       lower-case name ("others & independents") still opens capitalised */
     return { head, dek: since + parts.map((s, i) => (i === 0 ? s : rdCap(s))).join(". ") + "." };
   })();
 

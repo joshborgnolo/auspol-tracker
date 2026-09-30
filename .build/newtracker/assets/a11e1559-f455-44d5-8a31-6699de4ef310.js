@@ -1707,7 +1707,7 @@ function UndecidedPanel({ rangeId }) {
    95% margin, √(a² + b²) of the two ± figures. */
 const UND_VIEWS = [{ id: "all", label: "All voters" }, { id: "party", label: "By party" }, { id: "age", label: "By age" }];
 const FIRM_ORDER = ["onp", "alp", "lnp", "grn", "oth"];
-const firmWho = (k) => (k === "oth" ? "voters for others/independents" : window.AP.D.PARTIES[k].name + " voters");
+const firmWho = (k) => (k === "oth" ? "voters for others & independents" : window.AP.D.PARTIES[k].name + " voters");
 const firmApart = (a, b) => Math.abs(a.v - b.v) > Math.hypot(a.ci95, b.ci95);
 const firmSaid = (cls, t, sig) => <p className={cls}>{sig ? <mark>{t}</mark> : t}</p>;
 function FirmnessView({ F, rangeId }) {
@@ -2176,7 +2176,7 @@ const DEMO_SET_WORDS = {
   housing: { all: "owners and renters", others: "other voters", step: null, one: "group" },
   language: { all: "voters who speak only English at home and those who don’t", others: null, step: null },
 };
-const DEMO_VOTE_FOR = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "others/independents" };
+const DEMO_VOTE_FOR = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "others & independents" };
 // P(|Z| > z) for a standard normal (Abramowitz & Stegun 7.1.26, error under 1.5e-7)
 function zTail(z) {
   const x = Math.abs(z) / Math.SQRT2, t = 1 / (1 + 0.3275911 * x);
@@ -2589,7 +2589,7 @@ const ISS_PHRASE = { col: "the cost of living", housing: "housing", health: "hea
 const ISS_WHO = {
   Labor: "Labor voters", Coalition: "Coalition voters", Liberal: "Liberal voters",
   "Nationals, LNP and CLP": "Nationals, LNP and CLP voters", "One Nation": "One Nation voters",
-  Greens: "Greens voters", Others: "voters for others/independents", Undecided: "undecided voters",
+  Greens: "Greens voters", Others: "voters for others & independents", Undecided: "undecided voters",
   "Below Year 12": "voters who left school before Year 12", "Year 12": "voters who finished Year 12",
   "Renting and other": "renters and others",
 };

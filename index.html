@@ -52030,7 +52030,7 @@ const UND_VIEWS = [{
   label: "By age"
 }];
 const FIRM_ORDER = ["onp", "alp", "lnp", "grn", "oth"];
-const firmWho = k => k === "oth" ? "voters for others/independents" : window.AP.D.PARTIES[k].name + " voters";
+const firmWho = k => k === "oth" ? "voters for others & independents" : window.AP.D.PARTIES[k].name + " voters";
 const firmApart = (a, b) => Math.abs(a.v - b.v) > Math.hypot(a.ci95, b.ci95);
 const firmSaid = (cls, t, sig) => React.createElement("p", {
   className: cls
@@ -52648,7 +52648,7 @@ const DEMO_VOTE_FOR = {
   lnp: "the Coalition",
   grn: "the Greens",
   onp: "One Nation",
-  oth: "others/independents"
+  oth: "others & independents"
 };
 function zTail(z) {
   const x = Math.abs(z) / Math.SQRT2,
@@ -53123,7 +53123,7 @@ const ISS_WHO = {
   "Nationals, LNP and CLP": "Nationals, LNP and CLP voters",
   "One Nation": "One Nation voters",
   Greens: "Greens voters",
-  Others: "voters for others/independents",
+  Others: "voters for others & independents",
   Undecided: "undecided voters",
   "Below Year 12": "voters who left school before Year 12",
   "Year 12": "voters who finished Year 12",
@@ -66347,7 +66347,7 @@ const RD_DEMO_HOME = {
   alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial",
   lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
   grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
-  oth: "Voters for others/independents are more likely to be Gen Z, renting, and NSW-based; less likely to live in provincial areas or have a mortgage"
+  oth: "Voters for others & independents are more likely to be Gen Z, renting, and NSW-based; less likely to live in provincial areas or have a mortgage"
 };
 const RD_GEN_BORN = {
   "Gen Z": [1997, 2012],
@@ -66383,14 +66383,14 @@ const RD_TREND_NAME = {
   alp: "Labor",
   lnp: "The Coalition",
   grn: "the Greens",
-  oth: "Others/independents"
+  oth: "Others & independents"
 };
 const RD_TREND_NAME_DEK = {
   onp: "One Nation",
   alp: "Labor",
   lnp: "the Coalition",
   grn: "the Greens",
-  oth: "others/independents"
+  oth: "others & independents"
 };
 const RD_TREND_BARE = {
   onp: "One Nation",
@@ -66523,7 +66523,7 @@ function RdDemographics({
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find(x => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
-  const pName = party === "oth" ? "others/independents" : P.name;
+  const pName = party === "oth" ? "others & independents" : P.name;
   const pPoss = pName + (/s$/.test(pName) ? "’" : "’s"),
     pColor = P.color;
   const all = T.all[party];
@@ -66613,7 +66613,7 @@ function RdDemographics({
       if (m.thin) return [poss(nameD) + " voter base appears to have become " + (m.dir > 0 ? "more " : "less ") + loc.adj];
       const flat = Math.abs(m.a1 - m.a0) < 1;
       const national = flat ? ", even as the national vote has remained flat" : ", while the national vote has " + (m.a1 < m.a0 ? "fallen" : "risen") + " from " + pct(m.a0) + "% to " + pct(m.a1) + "%";
-      const support = party === "oth" ? "Support for others/independents" : (RD_TREND_BARE[party] || nameT) + " support";
+      const support = party === "oth" ? "Support for others & independents" : (RD_TREND_BARE[party] || nameT) + " support";
       return [poss(nameD) + " voter base has become " + (m.dir > 0 ? "more " : "less ") + loc.adj, support + " in " + loc.ref + " has " + (m.dir > 0 ? "risen" : "fallen") + " from " + pct(m.g0) + "% to about " + pct(m.g1) + "%" + national];
     };
     const groupDek = m => {
