@@ -123,9 +123,12 @@ function rdHoldSection(el, dh, ms) {
    compositor paints a script's scroll a frame late during a touch - so
    while a pin holds, nothing above the row resizes at all: each glide
    block hanging entirely over it freezes at its current height, its new
-   words already inside, and takes the box's new height in one glide when
-   the pin lets go (usually off the screen by then). The corrector below
-   stays as the backstop; the freeze is why it has nothing to answer. */
+   words already inside. When the pin lets go the freeze is cleared in one
+   frame and the pin answers the whole shift with a single scroll in that
+   same frame - the browser's own scroll-anchoring shape. No glide across
+   the boundary: an animated release moves content under the reader for
+   320ms with no fairness to correct it (a slow drift after the gesture,
+   worse than the staircase it replaced). */
 let rdPinRaf = 0;
 let rdPinAnchorSave = null;
 let rdPinRO = null;
@@ -148,23 +151,14 @@ const rdPinClip = (rowTop) => {
 };
 const rdPinThaw = () => {
   if (!rdPinHeld) return;
-  const AP = window.AP || {};
-  const ms = AP.MORPH_MS || 320, css = AP.MORPH_CSS || "ease";
-  rdPinHeld.forEach((o) => {
-    o.__rdFrozen = false;
-    if (!o.isConnected) return;
-    const i = o.querySelector(".rd-glide-in");
-    const h = i ? i.getBoundingClientRect().height : o.getBoundingClientRect().height;
-    if (Math.abs(h - o.getBoundingClientRect().height) < 1) {
-      o.style.transition = ""; o.style.height = ""; o.style.overflowY = "";
-      return;
-    }
-    rdHoldSection(o, h - o.getBoundingClientRect().height, ms + 80);
-    o.style.transition = "height " + ms + "ms " + css;
-    o.style.height = h + "px";
-    setTimeout(() => { if (o.isConnected) { o.style.transition = ""; o.style.height = ""; o.style.overflowY = ""; } }, ms + 60);
-  });
+  const held = rdPinHeld;
   rdPinHeld = null;
+  held.forEach((o) => {
+    o.__rdFrozen = false;
+    o.style.transition = "";
+    o.style.height = "";
+    o.style.overflowY = "";
+  });
 };
 function rdPinScroll(row) {
   if (!row) return;
@@ -226,7 +220,11 @@ function rdPinScroll(row) {
     if (--rdPinLive > 0) return;
     rdPinLive = 0;
     if (rdPinAnchorSave !== null) { html.style.overflowAnchor = rdPinAnchorSave; rdPinAnchorSave = null; }
+    /* the freeze releases in this same frame and the shift it let through
+       is answered by ONE correction inside the same task - layout and
+       scroll land in one painted frame, on every browser */
     rdPinThaw();
+    if (row.isConnected) fix();
   };
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
@@ -499,7 +497,7 @@ function rdDigitKey(items, onChange) {
     onChange(items[n - 1].id);
   };
 }
-function RdTabs({ value, onChange, options, ariaLabel, children, className, swipe, swipeSelf, onDigits }) {
+function RdTabs({ value, onChange, options, ariaLabel, children, className, swipe, swipeSelf, pin, onDigits }) {
   /* `swipe`: the views are pages of their own (All polls' figures, preferred
      PM's questions, who votes by age or by place…), so on a phone a sideways
      swipe on or just under the row steps through them, wrapping round the
@@ -512,26 +510,34 @@ function RdTabs({ value, onChange, options, ariaLabel, children, className, swip
      by touch target alone and nothing below the row reaches into it), and
      a swipe under it does whatever the surface there does - the two-party
      chart beneath its row keeps its contest flip.
-     `onDigits`: a row-wide number-key handler (rdDigitKey) hung on the outer
-     div, so it hears a focused view tab or a focused row child alike. */
+     `pin`: a change to this row re-cuts content ELSEWHERE on the page too
+     (the vote charts' one shared range state resizes the other card's
+     phone event list, above this row on the primary chart) - hold the row
+     at its spot on screen with rdPinScroll through the reflow, whichever
+     input changed it (click, arrow walk or menu swipe all funnel through
+     `fire`). The change handler itself belongs to the row's owner. */
   const live = React.useRef(null);
+  const root = React.useRef(null);
+  const fire = React.useMemo(() => (pin
+    ? (id) => { if (root.current) rdPinScroll(root.current); onChange(id); }
+    : onChange), [pin, onChange]);
   live.current = (dir) => {
     const i = options.findIndex((o) => o.id === value);
     if (i < 0 || options.length < 2) return false;
-    onChange(options[(i + dir + options.length) % options.length].id);
+    fire(options[(i + dir + options.length) % options.length].id);
     return true;
   };
-  const mark = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => live.current(dir); }, []);
+  const mark = React.useCallback((el) => { root.current = el; if (el) el.__rdSwipe = (dir) => live.current(dir); }, []);
   return (
     <div className={"rd-tabs" + (className ? " " + className : "")}
-         ref={swipe || swipeSelf ? mark : undefined} data-rd-swipe={swipe ? "" : undefined}
+         ref={swipe || swipeSelf || pin ? mark : undefined} data-rd-swipe={swipe ? "" : undefined}
          data-rd-swipe-self={swipeSelf ? "" : undefined}
          onKeyDown={onDigits || undefined}>
       <div role="group" aria-label={ariaLabel} style={{ display: "flex", gap: 4 }}
-           onKeyDown={rdTabsKey(options, onChange)} onClick={rdTabFocus}>
+           onKeyDown={rdTabsKey(options, fire)} onClick={rdTabFocus}>
         {options.map((o) => (
           <button key={o.id} type="button" className="rd-tab" aria-pressed={value === o.id}
-                  onClick={() => onChange(o.id)} title={o.title}>
+                  onClick={() => fire(o.id)} title={o.title}>
             {o.label}
           </button>
         ))}

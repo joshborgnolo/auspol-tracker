@@ -183,8 +183,11 @@ function RdPrimary({ rangeId, setRangeId }) {
       <div className="card rd-card rd-pv-chart">
         {/* the same window menu the two-party card carries over its chart:
             the one range state drives both charts, a click arms the arrow
-            walk and a phone swipe on the row itself steps the windows */}
-        <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm" swipeSelf />
+            walk, a phone swipe on the row itself steps the windows, and
+            pin holds the row's spot on screen - the shared state reshapes
+            THIS card's twin above (the two-party phone event list), which
+            would drag the menu out from under the reader otherwise */}
+        <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm" swipeSelf pin />
         <TrendChart
           key="rd-pv"
           heightPx={narrow ? 320 : 440}
@@ -608,14 +611,10 @@ function RdLeadership({ rangeId }) {
             legend: [], caption: keyDots + " " + keyLead + "." },
   };
   /* The engine widens the right margin to the longest end label showing, so
-     each view would get its own plot width and the switch would jolt it.
-     One margin for the widest label either view prints (the engine's own
-     measure of a label), and the plot keeps its width through the morph. */
-  const ppmPad = (() => {
-    const room = (t) => [...t].reduce((n, c) => n + (c >= "0" && c <= "9" ? 0.55 : c === " " ? 0.3 : 0.72), 0) * 13 * 0.95 + 12;
-    const labs = leadSeries.concat(threeSeries).map((x) => x.endLabel).filter(Boolean);
-    return { ...chartPad, r: Math.max(chartPad.r, ...labs.map(room)) };
-  })();
+     priced per drawn set each view would get its own plot width and the
+     switch would jolt it. Handing the union of both views' series to the
+     engine's own measured reserve keeps one exact margin through the morph. */
+  const ppmPadSeries = leadSeries.concat(threeSeries);
   const ppmChart = (key, v, m) => {
     const B = ppmModel(m ? ppmSlot(m.to) : v);
     let series = B.series, cross = null, dom = B.domain;
@@ -637,7 +636,7 @@ function RdLeadership({ rangeId }) {
     }
     const A0 = m ? ppmModel(ppmSlot(m.from)) : null;
     return lchart(key, B.title, {
-      padPx: ppmPad, yDomain: dom, yTicks: B.yTicks, yTickFmt: B.yTickFmt, refLines: B.refLines,
+      padSeries: ppmPadSeries, yDomain: dom, yTicks: B.yTicks, yTickFmt: B.yTickFmt, refLines: B.refLines,
       series, areas: bandsOf(series), notes: B.notes,
       morphFrom: A0 ? { yTicks: A0.yTicks, yTickFmt: A0.yTickFmt, refLines: A0.refLines, notes: A0.notes } : null, morphT: m ? m.t : 1,
       scatter: cross ? cross.scatter : B.dots, scatterOut: cross ? cross.scatterOut : [], scatterMove: cross ? cross.scatterMove : [],

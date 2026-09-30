@@ -464,7 +464,7 @@ function RdHero(p) {
       {story && narrow && <RdSub head={story.head} dek={story.dek} level={3} glide />}
 
       <div className="card rd-card rd-tpp-chart" ref={swipeMark} data-rd-swipe-exact="">
-        <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm" swipeSelf>
+        <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm" swipeSelf pin>
           {!narrow && cmpAvail && <RdCheck checked={showSynth} onChange={setShowSynth}>{cmpBox}</RdCheck>}
         </RdTabs>
         <div className="rd-chead"><span className="rd-chead-t">{chartTitle}</span></div>

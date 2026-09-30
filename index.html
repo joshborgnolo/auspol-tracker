@@ -62734,32 +62734,14 @@ const rdPinClip = rowTop => {
 };
 const rdPinThaw = () => {
   if (!rdPinHeld) return;
-  const AP = window.AP || {};
-  const ms = AP.MORPH_MS || 320,
-    css = AP.MORPH_CSS || "ease";
-  rdPinHeld.forEach(o => {
-    o.__rdFrozen = false;
-    if (!o.isConnected) return;
-    const i = o.querySelector(".rd-glide-in");
-    const h = i ? i.getBoundingClientRect().height : o.getBoundingClientRect().height;
-    if (Math.abs(h - o.getBoundingClientRect().height) < 1) {
-      o.style.transition = "";
-      o.style.height = "";
-      o.style.overflowY = "";
-      return;
-    }
-    rdHoldSection(o, h - o.getBoundingClientRect().height, ms + 80);
-    o.style.transition = "height " + ms + "ms " + css;
-    o.style.height = h + "px";
-    setTimeout(() => {
-      if (o.isConnected) {
-        o.style.transition = "";
-        o.style.height = "";
-        o.style.overflowY = "";
-      }
-    }, ms + 60);
-  });
+  const held = rdPinHeld;
   rdPinHeld = null;
+  held.forEach(o => {
+    o.__rdFrozen = false;
+    o.style.transition = "";
+    o.style.height = "";
+    o.style.overflowY = "";
+  });
 };
 function rdPinScroll(row) {
   if (!row) return;
@@ -62820,6 +62802,7 @@ function rdPinScroll(row) {
       rdPinAnchorSave = null;
     }
     rdPinThaw();
+    if (row.isConnected) fix();
   };
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
@@ -63283,21 +63266,28 @@ function RdTabs({
   className,
   swipe,
   swipeSelf,
+  pin,
   onDigits
 }) {
   const live = React.useRef(null);
+  const root = React.useRef(null);
+  const fire = React.useMemo(() => pin ? id => {
+    if (root.current) rdPinScroll(root.current);
+    onChange(id);
+  } : onChange, [pin, onChange]);
   live.current = dir => {
     const i = options.findIndex(o => o.id === value);
     if (i < 0 || options.length < 2) return false;
-    onChange(options[(i + dir + options.length) % options.length].id);
+    fire(options[(i + dir + options.length) % options.length].id);
     return true;
   };
   const mark = React.useCallback(el => {
+    root.current = el;
     if (el) el.__rdSwipe = dir => live.current(dir);
   }, []);
   return React.createElement("div", {
     className: "rd-tabs" + (className ? " " + className : ""),
-    ref: swipe || swipeSelf ? mark : undefined,
+    ref: swipe || swipeSelf || pin ? mark : undefined,
     "data-rd-swipe": swipe ? "" : undefined,
     "data-rd-swipe-self": swipeSelf ? "" : undefined,
     onKeyDown: onDigits || undefined
@@ -63308,14 +63298,14 @@ function RdTabs({
       display: "flex",
       gap: 4
     },
-    onKeyDown: rdTabsKey(options, onChange),
+    onKeyDown: rdTabsKey(options, fire),
     onClick: rdTabFocus
   }, options.map(o => React.createElement("button", {
     key: o.id,
     type: "button",
     className: "rd-tab",
     "aria-pressed": value === o.id,
-    onClick: () => onChange(o.id),
+    onClick: () => fire(o.id),
     title: o.title
   }, o.label))), children ? React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-tabs-grow"
@@ -64293,7 +64283,8 @@ function RdHero(p) {
     options: RD_RANGES,
     ariaLabel: "Time range",
     className: "rd-tabs-sm",
-    swipeSelf: true
+    swipeSelf: true,
+    pin: true
   }, !narrow && cmpAvail && React.createElement(RdCheck, {
     checked: showSynth,
     onChange: setShowSynth
@@ -64640,7 +64631,8 @@ function RdPrimary({
     options: RD_RANGES,
     ariaLabel: "Time range",
     className: "rd-tabs-sm",
-    swipeSelf: true
+    swipeSelf: true,
+    pin: true
   }), React.createElement(TrendChart, {
     key: "rd-pv",
     heightPx: narrow ? 320 : 440,
@@ -65272,14 +65264,7 @@ function RdLeadership({
       caption: keyDots + " " + keyLead + "."
     }
   };
-  const ppmPad = (() => {
-    const room = t => [...t].reduce((n, c) => n + (c >= "0" && c <= "9" ? 0.55 : c === " " ? 0.3 : 0.72), 0) * 13 * 0.95 + 12;
-    const labs = leadSeries.concat(threeSeries).map(x => x.endLabel).filter(Boolean);
-    return {
-      ...chartPad,
-      r: Math.max(chartPad.r, ...labs.map(room))
-    };
-  })();
+  const ppmPadSeries = leadSeries.concat(threeSeries);
   const ppmChart = (key, v, m) => {
     const B = ppmModel(m ? ppmSlot(m.to) : v);
     let series = B.series,
@@ -65318,7 +65303,7 @@ function RdLeadership({
     }
     const A0 = m ? ppmModel(ppmSlot(m.from)) : null;
     return lchart(key, B.title, {
-      padPx: ppmPad,
+      padSeries: ppmPadSeries,
       yDomain: dom,
       yTicks: B.yTicks,
       yTickFmt: B.yTickFmt,
