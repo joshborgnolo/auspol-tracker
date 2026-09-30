@@ -595,6 +595,57 @@ function RdPastCycles(p) {
     return true;
   };
   const cmpSwipe = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => cmpSwipeLive.current(dir); }, []);
+  /* The Compare-with swipe's reach is the whole summary section, so the
+     hover claim is: pointers anywhere over the section hand <-/-> to the
+     comparison, except over the Measure row itself, whose claim is deeper
+     and wins. Both step through the .current steppers (fresh closures
+     every render, so the effect registers once), and both keep the row's
+     own walk - focused tabs and the page-level key walk are untouched. */
+  const modeSwipeLive = React.useRef(null);
+  modeSwipeLive.current = (dir) => {
+    const i = MODE_ROWS.indexOf(mode);
+    if (i < 0) return false;
+    setModePin(MODE_ROWS[(i + dir + MODE_ROWS.length) % MODE_ROWS.length]);
+    return true;
+  };
+  const sumHover = React.useRef(false), measHover = React.useRef(false), measEl = React.useRef(null), measWalk = React.useRef(0);
+  React.useEffect(() => {
+    const sec = document.getElementById("cyc-summary"), meas = measEl.current;
+    if (!sec) return undefined;
+    const on = (el, ref) => {
+      const enter = () => { ref.current = true; }, leave = () => { ref.current = false; };
+      ref.current = el.matches(":hover");
+      el.addEventListener("pointerenter", enter);
+      el.addEventListener("pointerleave", leave);
+      return [el, enter, leave];
+    };
+    const pairs = meas ? [on(sec, sumHover), on(meas, measHover)] : [on(sec, sumHover)];
+    /* each mode step rewrites the head/dek ABOVE the rows, and near the top
+       of the page the row slides out from under a parked pointer (the pin
+       scroll can't hold it - the page can't scroll past the ceiling). A
+       pointerleave from that slide would ladder the walk onto the Compare
+       claim mid-gesture, so while the section is still hovered the walk's
+       own step keeps measure claimed for a beat instead. */
+    const key = (e) => {
+      if ((!sumHover.current && !measHover.current) || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const dir = e.key === "ArrowRight" ? 1 : -1, mo = measEl.current;
+      if ((measHover.current || (sumHover.current && Date.now() - measWalk.current < 800)) && mo && mo.isConnected && mo.getClientRects().length) {
+        if (modeSwipeLive.current(dir)) { measWalk.current = Date.now(); e.preventDefault(); }
+        return;
+      }
+      if (cmpSwipeLive.current(dir)) e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      pairs.forEach(([el, enter, leave]) => { el.removeEventListener("pointerenter", enter); el.removeEventListener("pointerleave", leave); });
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
   const controls = (
     <div className="rd-cc" ref={boardRef}>
       <div className="rd-cc-row">
@@ -607,7 +658,7 @@ function RdPastCycles(p) {
           ))}
         </div>
         <span className="rd-cc-sep" aria-hidden="true"></span>
-        <div className="rd-tabs rd-cc-tabs" role="group" aria-label="Measure"
+        <div className="rd-tabs rd-cc-tabs" role="group" aria-label="Measure" ref={measEl}
              onKeyDown={rdTabsKey(MODE_ROWS.map((id) => ({ id })), setModePin)} onClick={rdTabFocus}>
           <button type="button" className="rd-tab" aria-pressed={!chg} onClick={() => setModePin("abs")}>Level</button>
           <button type="button" className="rd-tab" aria-pressed={chg} onClick={() => setModePin("chg")}>{narrow ? "Change" : "Change since election"}</button>
