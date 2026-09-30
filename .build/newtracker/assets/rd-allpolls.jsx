@@ -1474,6 +1474,38 @@ function RdAllPolls(P) {
     ]);
   };
   const facetPick = (id) => { pinAp(); onFacet(id); };
+  /* Pointing at the card makes its facet row the arrow-key target without
+     moving DOM focus. Real keyboard focus still wins, and the capture phase
+     beats the page's own left/right page turn. */
+  const hoverKeys = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById("rd-ap-top");
+    if (!sec) return undefined;
+    const enter = () => { hoverKeys.current = true; };
+    const leave = () => { hoverKeys.current = false; };
+    hoverKeys.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const key = (e) => {
+      if (!hoverKeys.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      e.preventDefault();
+      const i = FACETS.findIndex((x) => x.id === facet);
+      if (i < 0) return;
+      const f = (i + (e.key === "ArrowRight" ? 1 : -1) + FACETS.length) % FACETS.length;
+      facetPick(FACETS[f].id);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [facet]);
   const flipPick = () => { pinAp(); onMeasure(onM ? "lnp" : "onp"); };
   const basisPick = () => { pinAp(); setTppBasis(pub ? "imp" : "resp"); };
   const pinBar = (
