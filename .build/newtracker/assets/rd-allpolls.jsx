@@ -1463,7 +1463,10 @@ function RdAllPolls(P) {
      the strip lands between it and the table; on a phone it rides up the
      strip's height instead). The desktop column head is the same height in
      every facet (rd.css's .rd-ap-hrow floor), so the rows hold there too.
-     Deeper scrolls fall back through the tab row to the first data row. */
+     Deeper scrolls fall back through the tab row to the first data row.
+     Unlike every other pinned section, this one asks for the pin on fine
+     pointers too (rdPinScroll's second arg) - the user wants the laptop's
+     facet walk to hold the table the way a phone's does, 2026-09-30 */
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
     if (!sec) return;
@@ -1471,7 +1474,7 @@ function RdAllPolls(P) {
       sec.querySelector(".rd-ap-bar"),
       sec.querySelector(".rd-ap-tabs"),
       sec.querySelector(".rd-ap-table .rd-ap-mrow, .rd-ap-table .rd-ap-row, .rd-ap-table .rd-ap-card"),
-    ]);
+    ], true);
   };
   const facetPick = (id) => { pinAp(); onFacet(id); };
   /* Pointing at the card makes its facet row the arrow-key target without

@@ -72,9 +72,10 @@ const readMenu = (page) => page.evaluate(() => {
              insideCard: r.right <= cr.right + 0.6 };
   });
   out.menuTop = Math.round(mr.top - card.getBoundingClientRect().top);
-  const ks = [...card.querySelectorAll(".rd-iw-k")];
-  const issueLab = ks.find((k) => /Issue/.test(k.textContent));
-  out.issueChips = !!(issueLab && issueLab.nextElementSibling && issueLab.nextElementSibling.classList.contains("rd-iw-chips"));
+  /* the Issue chips row sits DIRECTLY under the grouping menu with no
+     kicker of its own (3cc1b40 dropped the redundant "Issue" label) */
+  const chips = menu.nextElementSibling;
+  out.issueChips = !!(chips && chips.classList.contains("rd-iw-chips") && chips.getAttribute("aria-label") === "Issue");
   return out;
 });
 

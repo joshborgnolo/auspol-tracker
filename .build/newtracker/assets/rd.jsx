@@ -237,12 +237,15 @@ const rdPinThaw = () => {
     o.style.overflowY = "";
   });
 };
-function rdPinScroll(row) {
+function rdPinScroll(row, fine) {
   if (!row) return;
-  /* the fixed view is a TOUCH-device contract: it exists to stop mid-
-     gesture drift on iOS Safari. On a computer (fine pointer - mouse,
-     trackpad, keyboard) a click or keypress just reflows live, no pin */
-  if (window.matchMedia && !window.matchMedia("(pointer: coarse)").matches) return;
+  /* the fixed view is a TOUCH-device contract by default: it exists to stop
+     mid-gesture drift on iOS Safari. On a computer (fine pointer - mouse,
+     trackpad, keyboard) a click or keypress just reflows live, no pin -
+     unless the caller passes fine (the All-polls table does: its facet
+     walk, matchup flip and counts-basis switch hold the bar and rows on a
+     laptop exactly as on a phone) */
+  if (!fine && window.matchMedia && !window.matchMedia("(pointer: coarse)").matches) return;
   const bar = document.querySelector(".tabs.sticky");
   /* the bar's box sits at its unstuck place whenever it isn't stuck (top of
      the page), so its live bottom is 200px+ there - reserve only what the
