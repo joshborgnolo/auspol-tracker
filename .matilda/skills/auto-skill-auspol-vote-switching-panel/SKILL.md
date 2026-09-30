@@ -15,13 +15,51 @@ extracted_at: '2026-09-24T06:59:15.806Z'
 - **Panel JSX:** `a11e1559` asset ~:1540-1660 (h2 "Where One Nation's new
   voters came from"; verdict line "{a}% of One Nation's gain came from people
   who voted for X in 2025"; `openTerm("vote-switching", …)`). With the
-  redesign on, `RdSwitching` in rd-panels.jsx (~:1377) renders instead; its
-  dek uses the user's wording (2026-09-28: "{A} voters have flocked to One
-  Nation at about {r} times the rate of {B} voters. {share} 2025 {A} voters
-  now say they'd vote for One Nation.") with every figure computed live —
+  redesign on, `RdSwitching` in rd-panels.jsx (~:1770-2000) renders instead.
+  TITLE/DEK SWAPPED (user's, **2026-09-30**, everything computed live):
+  the **head** is the switch-RATE sentence — `rdCap(plainShare(hiC.rate)) +
+  " 2025 {A} voters now back One Nation"` (e.g. "Almost two in five 2025
+  Coalition voters now back One Nation") — and the **dek** is
+  "{A} voters have flocked to One Nation at about {r} times the rate of {B}
+  voters. {share} of One Nation's new voters backed the {Z} in 2025." where
   {A}/{B} follow whichever of lnp/alp rates higher, {r} is the ratio rounded
-  to the nearest quarter, {share} is plainShare of the higher rate. The
-  `head` above it stays fully data-driven.
+  to the nearest quarter, and the second sentence is the OLD head: {share} is
+  rdFraction of the top gain share and {Z} that gainer's party ("the
+  Coalition"/"Labor"/"the Greens"/"another party"). The pre-swap dek tail
+  "{share} 2025 {A} voters now say they'd vote for One Nation." is GONE —
+  don't grep for it as a health check. Both figures recompute every build;
+  hiC/loC derivation sits at rd-panels.jsx ~:1816-1832.
+  - Dek → graphic spacing (user-found loose on phone, 2026-09-29):
+    `.rd-mo-wrap { margin-top: 36px }` is the desktop value; **06bb319**
+    adds a ≤640px override of **28px**. On phone the card is fully unboxed
+    (`.rd-card` padding/background/border 0, rd.css :545), so that margin IS
+    the whole perceived gap — it measured 36px = 1.7× the phone dek's
+    line-height against who-votes' 28px = 1.33× on the same dek→content
+    step. The site's phone rhythm for a block directly under a dek is
+    **28px** (`.rd-wv-tabs`, `.rd-dir-chart` phone, `.rd-un-sp`);
+    `.rd-is-grid` at 36px is the other desktop-carryover outlier if spacing
+    triage ever reaches the issues panel. Probe:
+    `.matilda/probe-switching-gap.mjs` measures dek-bottom →
+    first-graphic-top at 390/1440 and compares ACROSS SECTIONS in
+    line-heights — the reusable pattern for any "is this gap too big?"
+    report: never judge one gap alone, rank it against the siblings.
+  - Mosaic encoding: fills = switch RATE, text under bars = gain share —
+    the ORIGINAL setup. A one-day reversal (**742df1e**, fills=gain /
+    text=rate) was REVERTED on the user's "undo this reversal" the same
+    afternoon (2026-09-30, landed uncommitted alongside the title/dek swap
+    via `git revert --no-commit 742df1e`): the "Area: voters gained" key
+    clause, the "Stayed or went elsewhere" caption and `.rd-mo-else` are
+    back, and `.matilda/probe/switching-reverse.mjs` was deleted by the
+    revert (a probe pinning a dead encoding would fail from then on).
+  - Mosaic `pts` label chains (user's, 2026-09-30): the FIRST column's
+    points row descends "… of One Nation's gain" → "… of ON's gain" →
+    bare, the SECOND descends "… of the gain" → bare, all later columns
+    are bare ("≈ 3.1 points"); the chains are SVG-column-label only —
+    the phone `.rd-mo-rows` variant still shows "≈ N pts". Pinned by
+    `.matilda/probe/switching-title-dek-swap.mjs` (13 checks, 1280 +
+    390px; floats its own http server — map "/" → "/index.html", and use
+    `new Function` on the 9f09dca2 asset for live expectations;
+    `S.series` is an ARRAY of `{id,…}` entries, not a keyed object).
 - **Glossary / Info:** `d1a1d215` ~:5212-5216 (all-polls table columns for
   `p.sw.{lnp,alp,grn,oth,onp}`), and the `vote-switching` term + "A check."
   paragraph (~:6280-6296) whose identity is kept-ON + each group's switch
