@@ -311,6 +311,12 @@ function RdPastCycles(p) {
      "who" name the era's opposition leader, as the opposition row's does. */
   Mby.onp = { key: "onp", unit: "%" };
   Mby.comb = { key: "comb", leader: "opp", unit: "%" };
+  /* Hanson's row is the sitting term's own reading, but its strip, average
+     and rank are the opposition leader's measure: no past term rated her
+     (raw.han null-pads every cycle before this one), so the peer key is
+     "oppnet" while the row key stays "han" so the now-figure still comes
+     from her series (curOf). leader:"opp" names past opposition leaders. */
+  Mby.han = { key: "oppnet", leader: "opp", unit: "" };
   /* a half-measured month never becomes a half-total: the combined now
      figure renders a dash when either party's is missing */
   const endOfKey = (c, key) => (key === "comb"
@@ -357,6 +363,7 @@ function RdPastCycles(p) {
     { key: "ppmm", name: "Preferred PM, lead", sub: pm + " over " + oppL, group: "leaders", color: cur.color },
     { key: "net", name: "Prime minister’s net approval", sub: pm, group: "leaders", color: cur.color },
     { key: "oppnet", name: "Opposition leader’s net approval", sub: oppL, group: "leaders", color: D.PARTIES[cur.opp].color },
+    { key: "han", name: "Hanson’s net approval", sub: "Pauline Hanson", group: "leaders", color: D.PARTIES.onp.color },
   ].map((r) => {
     const peers = peersOf(r.key);
     const v = curOf(r.key);
@@ -537,7 +544,7 @@ function RdPastCycles(p) {
   const goTo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
   /* One Nation and the combined row belong to the primary section: its
      opposition chart draws these very series when its boxes are ticked */
-  const SEC = { tpp: "cyc-tpp", primary: "cyc-primary", oppr: "cyc-primary", onp: "cyc-primary", comb: "cyc-primary", ppmm: "cyc-leaders", net: "cyc-leaders", oppnet: "cyc-leaders" };
+  const SEC = { tpp: "cyc-tpp", primary: "cyc-primary", oppr: "cyc-primary", onp: "cyc-primary", comb: "cyc-primary", ppmm: "cyc-leaders", net: "cyc-leaders", oppnet: "cyc-leaders", han: "cyc-leaders" };
   const summary = (
     <div className="rd-cs" role="table" aria-label={"Every measure " + m + " months in, against past terms at the same point"}>
       <div className="rd-cs-head" role="row">

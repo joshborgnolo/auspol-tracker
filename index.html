@@ -70640,6 +70640,11 @@ function RdPastCycles(p) {
     leader: "opp",
     unit: "%"
   };
+  Mby.han = {
+    key: "oppnet",
+    leader: "opp",
+    unit: ""
+  };
   const endOfKey = (c, key) => key === "comb" ? c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null : c.end[key];
   const curOf = key => {
     const v = endOfKey(cur, key);
@@ -70725,6 +70730,12 @@ function RdPastCycles(p) {
     sub: oppL,
     group: "leaders",
     color: D.PARTIES[cur.opp].color
+  }, {
+    key: "han",
+    name: "Hanson’s net approval",
+    sub: "Pauline Hanson",
+    group: "leaders",
+    color: D.PARTIES.onp.color
   }].map(r => {
     const peers = peersOf(r.key);
     const v = curOf(r.key);
@@ -70910,7 +70921,8 @@ function RdPastCycles(p) {
     comb: "cyc-primary",
     ppmm: "cyc-leaders",
     net: "cyc-leaders",
-    oppnet: "cyc-leaders"
+    oppnet: "cyc-leaders",
+    han: "cyc-leaders"
   };
   const summary = React.createElement("div", {
     className: "rd-cs",
