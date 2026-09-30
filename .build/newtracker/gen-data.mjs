@@ -2661,7 +2661,7 @@ const demographics = (() => {
       used = true;
       const ym = ymOf(p ? p.date : w.date), M = allByYm.get(ym);
       for (const k of DEMO_KEYS) {
-        (rows[set.id + "|" + group + "|" + k] ||= []).push({ mid, x: ALL[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster, lab });
+        (rows[set.id + "|" + group + "|" + k] ||= []).push({ mid, x: ALL[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster, lab, rel: p ? p.date : w.date });
         if (M) (rowsM[set.id + "|" + group + "|" + k] ||= []).push({ ym, mid, x: M[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster });
       }
     }
@@ -2690,11 +2690,13 @@ const demographics = (() => {
       }).filter(Boolean);
       /* the rug above the group's whisker: each wave the window holds, with
          its own reading on the display scale. Waves push all five parties in
-         one loop, so the px arrays below stay identically ordered. */
+         one loop, so the px arrays below stay identically ordered. The wave's
+         release date rides each pd entry so the panel can key the dot back to
+         its poll row (AP.pollRowKey) and open the poll on click. */
       const win = (rows[key("alp")] || [])
         .filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; })
         .sort((a, b) => a.mid - b.mid);
-      const pd = win.map((r) => ({ f: r.firm, l: r.lab, n: Math.round(r.n) }));
+      const pd = win.map((r) => ({ f: r.firm, l: r.lab, n: Math.round(r.n), r: r.rel }));
       const px = Object.fromEntries(DEMO_KEYS.map((k) => [k,
         (rows[key(k)] || []).filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; })
           .sort((a, b) => a.mid - b.mid).map((r) => r1(ALL_T * r.x / t))]));

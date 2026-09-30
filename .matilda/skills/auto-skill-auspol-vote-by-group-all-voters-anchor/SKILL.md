@@ -95,12 +95,19 @@ Gotchas:
   composes its title and dek from that list.
   Each group also carries pooled `v[party]`, `ci[party]`, `n`, `houses`,
   plus the whisker-rug pair `pd`/`px` (2026-10-01): `pd` lists the
-  in-window waves as `{f: firm, l: fieldwork label, n: group-sample n}`,
-  and `px[party]` the same waves' readings on the display scale in the
-  SAME array order for every party (one filter+sort per key over the same
-  rows), so a party-chip switch glides dot-for-dot. rd-panels renders
-  `.rd-wv-rug` above the CI strip (party colour at .55, tooltipped
-  "Firm, dates · x.x% · n≈…"); the RdKey "dot" item explains it. CAVEAT:
+  in-window waves as `{f: firm, l: fieldwork label, n: group-sample n,
+  r: released date}`, and `px[party]` the same waves' readings on the
+  display scale in the SAME array order for every party (one filter+sort
+  per key over the same rows), so a party-chip switch glides dot-for-dot.
+  rd-panels renders `.rd-wv-rug` above the CI strip (party colour at .55,
+  tooltipped "Firm, dates · x.x% · n≈…"); the RdKey "dot" item explains
+  it. The dots behave as the TrendChart's do (same-day change): a dot
+  keys back to its poll row via `AP.pollRowKey({pollster: f, released:
+  r})` and mouse-click or Enter runs `AP.openPoll(key, "primary", "who
+  votes for whom")` — pointer cursor + a ::before hit box on openable
+  dots (.on), a touch tap does NOT navigate. Once the dots were buttons
+  the track's aria-hidden moved onto its three decorative siblings
+  (.rd-wv-all/.rd-wv-ci/.rd-wv-dot) instead. CAVEAT:
   `pd.n` is whole-poll n × DEMO_SHARE, like the group's pooled `n` — an
   approximation of the published group n, not a crosstab read-back.
 - `oth` rides the full payload end-to-end (25/25 groups carry pooled

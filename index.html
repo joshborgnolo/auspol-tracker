@@ -3774,6 +3774,10 @@ body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; botto
 body.rd .rd-wv-all { display: none; }
 body.rd .rd-wv-rug { position: absolute; top: 1px; left: 0; right: 0; height: 6px; z-index: 1; }
 body.rd .rd-wv-rug b { position: absolute; top: 0; left: 0; width: 6px; height: 6px; border-radius: 50%; opacity: 0.55; transform: translateX(calc(var(--x) * 1cqw - 50%)); }
+body.rd .rd-wv-rug b.on { cursor: pointer; }
+body.rd .rd-wv-rug b.on::before { content: ""; position: absolute; inset: -5px -7px; }
+body.rd .rd-wv-rug b.on:hover, body.rd .rd-wv-rug b.on:focus-visible { opacity: 1; }
+body.rd .rd-wv-rug b.on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 body.rd .rd-wv-ci { position: absolute; top: 50%; left: 0; right: 0; height: 12px; transform: translateY(-50%); z-index: 2; }
 body.rd .rd-wv-ci > b { position: absolute; left: 0; top: 50%; width: 100%; height: 2px; background: currentColor; transform-origin: 0 50%;
   transform: translate(calc(var(--lo) * 1cqw), -50%) scaleX(calc((var(--hi) - var(--lo)) / 100)); }
@@ -17796,27 +17800,33 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 338
+            "n": 338,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 472
+            "n": 472,
+            "r": "2026-08-24"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 461
+            "n": 461,
+            "r": "2026-09-08"
           }, {
             "f": "Resolve",
             "l": "12 Sep",
-            "n": 630
+            "n": 630,
+            "r": "2026-09-12"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 389
+            "n": 389,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 420
+            "n": 420,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [31.1, 28.1, 27.1, 29.7, 37.1, 26.1],
@@ -17847,15 +17857,18 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 398
+            "n": 398,
+            "r": "2026-08-20"
           }, {
             "f": "Resolve",
             "l": "12 Sep",
-            "n": 743
+            "n": 743,
+            "r": "2026-09-12"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 459
+            "n": 459,
+            "r": "2026-09-14"
           }],
           "px": {
             "alp": [28.1, 30.9, 25.1],
@@ -17886,15 +17899,18 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 470
+            "n": 470,
+            "r": "2026-08-20"
           }, {
             "f": "Resolve",
             "l": "12 Sep",
-            "n": 878
+            "n": 878,
+            "r": "2026-09-12"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 542
+            "n": 542,
+            "r": "2026-09-14"
           }],
           "px": {
             "alp": [25.1, 21.7, 22.1],
@@ -17930,19 +17946,23 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 320
+            "n": 320,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 246
+            "n": 246,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 313
+            "n": 313,
+            "r": "2026-09-08"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 285
+            "n": 285,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [31.4, 29.1, 30.1, 23.1],
@@ -17973,19 +17993,23 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 472
+            "n": 472,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 362
+            "n": 362,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 461
+            "n": 461,
+            "r": "2026-09-08"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 420
+            "n": 420,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [25.1, 25.1, 29.1, 27.1],
@@ -18016,19 +18040,23 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 421
+            "n": 421,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 323
+            "n": 323,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 411
+            "n": 411,
+            "r": "2026-09-08"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 375
+            "n": 375,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [26.4, 27.1, 30.1, 24.1],
@@ -18059,19 +18087,23 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 472
+            "n": 472,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 362
+            "n": 362,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 461
+            "n": 461,
+            "r": "2026-09-08"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 420
+            "n": 420,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [27.1, 27.1, 24.1, 32.1],
@@ -18111,31 +18143,38 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 591
+            "n": 591,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 826
+            "n": 826,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 633
+            "n": 633,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 806
+            "n": 806,
+            "r": "2026-09-08"
           }, {
             "f": "Resolve",
             "l": "12 Sep",
-            "n": 1103
+            "n": 1103,
+            "r": "2026-09-12"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 681
+            "n": 681,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 735
+            "n": 735,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [27.1, 30.4, 28.1, 27.1, 28.3, 27.1, 24.1],
@@ -18166,31 +18205,38 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 615
+            "n": 615,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 859
+            "n": 859,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 659
+            "n": 659,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 839
+            "n": 839,
+            "r": "2026-09-08"
           }, {
             "f": "Resolve",
             "l": "12 Sep",
-            "n": 1148
+            "n": 1148,
+            "r": "2026-09-12"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 709
+            "n": 709,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 765
+            "n": 765,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [28.1, 23.4, 26.1, 27.1, 25.9, 26.1, 29.1],
@@ -18230,27 +18276,33 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 483
+            "n": 483,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 674
+            "n": 674,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 517
+            "n": 517,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 658
+            "n": 658,
+            "r": "2026-09-08"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 556
+            "n": 556,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 600
+            "n": 600,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [27.1, 25.1, 25.7, 27.1, 28.1, 23.1],
@@ -18281,27 +18333,33 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 374
+            "n": 374,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 522
+            "n": 522,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 401
+            "n": 401,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 510
+            "n": 510,
+            "r": "2026-09-08"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 431
+            "n": 431,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 465
+            "n": 465,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [25.1, 25.4, 24.1, 23.1, 23.1, 27.8],
@@ -18332,27 +18390,33 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 350
+            "n": 350,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 489
+            "n": 489,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 375
+            "n": 375,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 477
+            "n": 477,
+            "r": "2026-09-08"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 403
+            "n": 403,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 435
+            "n": 435,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [30.1, 30.1, 34.1, 30.8, 29.1, 31.4],
@@ -18392,23 +18456,28 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 522
+            "n": 522,
+            "r": "2026-08-24"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 510
+            "n": 510,
+            "r": "2026-09-08"
           }, {
             "f": "Resolve",
             "l": "12 Sep",
-            "n": 698
+            "n": 698,
+            "r": "2026-09-12"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 465
+            "n": 465,
+            "r": "2026-09-21"
           }, {
             "f": "Roy Morgan",
             "l": "14–27 Sep",
-            "n": 796
+            "n": 796,
+            "r": "2026-09-27"
           }],
           "px": {
             "alp": [26.8, 23.1, 25.9, 25.1, 29.5],
@@ -18439,23 +18508,28 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 438
+            "n": 438,
+            "r": "2026-08-24"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 428
+            "n": 428,
+            "r": "2026-09-08"
           }, {
             "f": "Resolve",
             "l": "12 Sep",
-            "n": 585
+            "n": 585,
+            "r": "2026-09-12"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 390
+            "n": 390,
+            "r": "2026-09-21"
           }, {
             "f": "Roy Morgan",
             "l": "14–27 Sep",
-            "n": 668
+            "n": 668,
+            "r": "2026-09-27"
           }],
           "px": {
             "alp": [22.1, 30.4, 26.3, 26.1, 26.3],
@@ -18486,23 +18560,28 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 337
+            "n": 337,
+            "r": "2026-08-24"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 329
+            "n": 329,
+            "r": "2026-09-08"
           }, {
             "f": "Resolve",
             "l": "12 Sep",
-            "n": 450
+            "n": 450,
+            "r": "2026-09-12"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 300
+            "n": 300,
+            "r": "2026-09-21"
           }, {
             "f": "Roy Morgan",
             "l": "14–27 Sep",
-            "n": 514
+            "n": 514,
+            "r": "2026-09-27"
           }],
           "px": {
             "alp": [25.1, 25.1, 26.2, 25.1, 21.5],
@@ -18533,19 +18612,23 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 388
+            "n": 388,
+            "r": "2026-08-24"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 378
+            "n": 378,
+            "r": "2026-09-08"
           }, {
             "f": "Resolve",
             "l": "12 Sep",
-            "n": 518
+            "n": 518,
+            "r": "2026-09-12"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 345
+            "n": 345,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [33.9, 32.8, 30.7, 32.1],
@@ -18581,27 +18664,33 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 362
+            "n": 362,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 505
+            "n": 505,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 388
+            "n": 388,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 493
+            "n": 493,
+            "r": "2026-09-08"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 417
+            "n": 417,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 450
+            "n": 450,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [32.1, 34.1, 28.1, 33.8, 31.1, 30.1],
@@ -18632,27 +18721,33 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 398
+            "n": 398,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 556
+            "n": 556,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 427
+            "n": 427,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 543
+            "n": 543,
+            "r": "2026-09-08"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 459
+            "n": 459,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 495
+            "n": 495,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [28.1, 27.4, 35.1, 29.4, 27.1, 27.1],
@@ -18683,19 +18778,23 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 270
+            "n": 270,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 207
+            "n": 207,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 263
+            "n": 263,
+            "r": "2026-09-08"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 240
+            "n": 240,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [28.8, 23.1, 29.8, 34.1],
@@ -18726,19 +18825,23 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 354
+            "n": 354,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 271
+            "n": 271,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 345
+            "n": 345,
+            "r": "2026-09-08"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 315
+            "n": 315,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [15.9, 20.1, 14.2, 16.1],
@@ -18778,27 +18881,33 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 386
+            "n": 386,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 539
+            "n": 539,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 414
+            "n": 414,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 526
+            "n": 526,
+            "r": "2026-09-08"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 445
+            "n": 445,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 480
+            "n": 480,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [24.1, 23.1, 28.1, 22.1, 23.1, 28.1],
@@ -18829,27 +18938,33 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 434
+            "n": 434,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 607
+            "n": 607,
+            "r": "2026-08-24"
           }, {
             "f": "RedBridge/Accent",
             "l": "24–28 Aug",
-            "n": 465
+            "n": 465,
+            "r": "2026-08-28"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 592
+            "n": 592,
+            "r": "2026-09-08"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 501
+            "n": 501,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 540
+            "n": 540,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [30.1, 30.1, 27.1, 31.4, 27.1, 28.1],
@@ -18880,23 +18995,28 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 386
+            "n": 386,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 539
+            "n": 539,
+            "r": "2026-08-24"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 526
+            "n": 526,
+            "r": "2026-09-08"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 445
+            "n": 445,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 480
+            "n": 480,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [28.1, 26.8, 28.1, 30.1, 25.1],
@@ -18932,23 +19052,28 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 917
+            "n": 917,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 1280
+            "n": 1280,
+            "r": "2026-08-24"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 1250
+            "n": 1250,
+            "r": "2026-09-08"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 1057
+            "n": 1057,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 1140
+            "n": 1140,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [25.1, 25.8, 27.1, 24.1, 26.1],
@@ -18979,23 +19104,28 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           "pd": [{
             "f": "DemosAU",
             "l": "18–20 Aug",
-            "n": 290
+            "n": 290,
+            "r": "2026-08-20"
           }, {
             "f": "YouGov",
             "l": "18–24 Aug",
-            "n": 404
+            "n": 404,
+            "r": "2026-08-24"
           }, {
             "f": "YouGov",
             "l": "1–8 Sep",
-            "n": 395
+            "n": 395,
+            "r": "2026-09-08"
           }, {
             "f": "DemosAU",
             "l": "10–14 Sep",
-            "n": 334
+            "n": 334,
+            "r": "2026-09-14"
           }, {
             "f": "YouGov",
             "l": "15–21 Sep",
-            "n": 360
+            "n": 360,
+            "r": "2026-09-21"
           }],
           "px": {
             "alp": [37.1, 31.8, 27.1, 37.1, 29.1],
@@ -67277,6 +67407,7 @@ function RdDemographics({
     };
   }, [tabId]);
   const chartCache = React.useRef({});
+  const wvPtr = React.useRef(null);
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find(x => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
@@ -67549,30 +67680,60 @@ function RdDemographics({
     }, g.label, React.createElement(RdGenBorn, {
       label: g.label
     })), React.createElement("span", {
-      className: "rd-wv-track",
-      "aria-hidden": "true"
+      className: "rd-wv-track"
     }, React.createElement("span", {
       className: "rd-wv-all",
       style: {
         "--x": xp(all)
-      }
-    }), g.pd && g.px && g.px[party] && React.createElement("span", {
-      className: "rd-wv-rug",
-      "aria-hidden": "true"
-    }, g.px[party].map((x, i) => React.createElement("b", {
-      key: i,
-      style: {
-        "--x": xp(x),
-        background: pColor
       },
-      title: (g.pd[i] ? g.pd[i].f + ", " + g.pd[i].l + " · " : "") + x.toFixed(1) + "%" + (g.pd[i] ? " · n≈" + g.pd[i].n : "")
-    }))), React.createElement("span", {
+      "aria-hidden": "true"
+    }), g.pd && g.px && g.px[party] && React.createElement("span", {
+      className: "rd-wv-rug"
+    }, g.px[party].map((x, i) => {
+      const d = g.pd[i] || null;
+      const rk = d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+        pollster: d.f,
+        released: d.r
+      }) : null;
+      const txt = (d ? d.f + ", " + d.l + " · " : "") + x.toFixed(1) + "%" + (d ? " · n≈" + d.n : "");
+      const go = rk ? () => {
+        if (window.AP && window.AP.openPoll) window.AP.openPoll(rk, "primary", "who votes for whom");
+      } : null;
+      return React.createElement("b", {
+        key: i,
+        className: rk ? "on" : undefined,
+        style: {
+          "--x": xp(x),
+          background: pColor
+        },
+        role: rk ? "button" : undefined,
+        tabIndex: rk ? 0 : undefined,
+        title: txt + (rk ? " – click to open this poll" : ""),
+        "aria-label": rk ? txt + ", press Enter to open this poll" : undefined,
+        onPointerDown: rk ? ev => {
+          wvPtr.current = ev.pointerType;
+        } : undefined,
+        onClick: rk ? ev => {
+          ev.stopPropagation();
+          const pt = ev.detail === 0 ? "key" : wvPtr.current;
+          wvPtr.current = null;
+          if (pt === "mouse" || pt === "key") go();
+        } : undefined,
+        onKeyDown: rk ? ev => {
+          if (ev.key === "Enter" || ev.key === " " || ev.key === "Spacebar") {
+            ev.preventDefault();
+            go();
+          }
+        } : undefined
+      });
+    })), React.createElement("span", {
       className: "rd-wv-ci",
       style: {
         "--lo": xp(v - ci),
         "--hi": xp(v + ci),
         color: pColor
-      }
+      },
+      "aria-hidden": "true"
     }, React.createElement("i", {
       className: "lo"
     }), React.createElement("i", {
@@ -67583,7 +67744,8 @@ function RdDemographics({
         "--x": xp(v),
         background: sig ? pColor : undefined,
         borderColor: pColor
-      }
+      },
+      "aria-hidden": "true"
     })), React.createElement("span", {
       role: "cell",
       className: "rd-wv-v"
