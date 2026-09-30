@@ -1163,14 +1163,21 @@ function RdGenBorn({ label }) {
     </button>
   );
 }
-/* a rug row's dots behave as a chart's do: point at one (or put it into
-   focus) and it rings and shows the poll it sits on; a mouse click or Enter
-   then opens it, a tap only shows it - a tap is the only way to read a dot
-   on a touch screen, so it can't also be the trip. Same contract as
-   RdApMini's past-release dots: the shared .tip chrome, the edge-clamped
-   position, a keyless dot still reading but never opening. One instance per
-   row so its tip is the only one open on that row, and the tip rides inside
-   its dot so a party switch glides the two together. */
+/* a rug row's dots behave as a chart's do, in the chart's exact look. The
+   tooltip IS the chart's dot readout: the shared .tip card under tip-dot's
+   own transform (-50%, calc(-100% - 14px)) hung from the dot's centre, with
+   the same content map - firm as the title, a swatch row of party colour +
+   name + reading, a Field row, the sample as "n ≈ …" (the rug's is a group
+   approximation, not the chart's whole-poll n), and the charts' own
+   "… in All polls" hint. The hovered dot dresses in the Interaction board's
+   ring: the disc (an <i> inside the fixed anchor, so the tip never grows
+   with it) doubles over a 2px halo of the page ground, inside a 1.5px ring
+   of its own party colour, and the row's other dots step back a fold. A
+   mouse click or Enter then opens the poll; a tap only tips it - a tap is
+   the only way to read a dot on a touch screen, so it can't also be the
+   trip. One instance per row so its tip is the only one open on that row,
+   and the tip rides inside its dot so a party switch glides the two
+   together. */
 function WvRug({ g, party, xp, pColor, pName }) {
   const [tip, setTip] = useState(null);
   const tipBox = React.useRef(null);
@@ -1186,10 +1193,10 @@ function WvRug({ g, party, xp, pColor, pName }) {
   const show = (i, src) => setTip({ i, src });
   const hide = (i, src) => setTip((tp) => (tp && tp.i === i && (!src || tp.src === src) ? null : tp));
   return (
-    <span className="rd-wv-rug">
+    <span className={"rd-wv-rug" + (tip ? " lit" : "")}>
       {g.px[party].map((x, i) => {
         const d = g.pd[i] || null;
-        if (!d) return <b key={i} style={{ "--x": xp(x), background: pColor }}></b>;
+        if (!d) return <b key={i} style={{ "--x": xp(x), "--pcolor": pColor }}><i aria-hidden="true"></i></b>;
         const rk = d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.f, released: d.r }) : null;
         const open = () => {
           if (!rk || !(window.AP && window.AP.openPoll)) return;
@@ -1199,7 +1206,7 @@ function WvRug({ g, party, xp, pColor, pName }) {
         const lab = d.f + ", " + d.l + " · " + x.toFixed(1) + "% · n≈" + d.n;
         const on = tip && tip.i === i;
         return (
-          <b key={i} className={[(rk ? "on" : ""), (on ? "hi" : "")].filter(Boolean).join(" ") || undefined} style={{ "--x": xp(x), background: pColor }}
+          <b key={i} className={[(rk ? "on" : ""), (on ? "hi" : "")].filter(Boolean).join(" ") || undefined} style={{ "--x": xp(x), "--pcolor": pColor }}
              role={rk ? "button" : "img"} tabIndex={rk ? 0 : undefined}
              aria-label={lab + (rk ? ", press Enter to open this poll" : "")}
              onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
@@ -1219,10 +1226,13 @@ function WvRug({ g, party, xp, pColor, pName }) {
                ev.preventDefault();
                open();
              }}>
-            {on && <span ref={tipBox} className="tip rd-wv-rtip" aria-hidden="true">
-              <span className="tip-title">{d.f + ", " + d.l}</span>
-              <span className="tip-sub">{pName + " " + x.toFixed(1) + "% of " + (RD_DEMO_SHORT[g.label] || g.label.toLowerCase()) + " · n≈" + d.n}</span>
-              {tip.src !== "touch" && <span className="tip-hint">{rk ? (tip.src === "focus" ? "Press Enter to open this poll" : "Click to open this poll") : "Released " + d.r}</span>}
+            <i aria-hidden="true"></i>
+            {on && <span ref={tipBox} className="tip tip-dot rd-wv-rtip" aria-hidden="true">
+              <span className="tip-title">{d.f}</span>
+              <span className="tip-row"><span className="tip-swatch" style={{ background: pColor }}></span><span className="tip-label">{pName}</span><span className="tip-val">{x.toFixed(1) + "%"}</span></span>
+              <span className="tip-row"><span className="tip-label">Field</span><span className="tip-val">{d.l}</span></span>
+              <span className="tip-sub">{"n ≈ " + (+d.n).toLocaleString()}</span>
+              {tip.src !== "touch" && <span className="tip-hint">{rk ? (tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls") : "Released " + d.r}</span>}
             </span>}
           </b>
         );

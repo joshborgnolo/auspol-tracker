@@ -101,21 +101,34 @@ Gotchas:
   per key over the same rows), so a party-chip switch glides dot-for-dot.
   `WvRug` (rd-panels.jsx, extracted beside RdGenBorn when the dots grew
   behaviour, 2026-10-01) renders `.rd-wv-rug` above the CI strip. Each
-  dot carries the chart dots' full furniture, mirroring RdApMini's
-  off-chart contract: hover/Tab-focus/touch-tap tips it in the shared
-  `.tip` family (`.rd-wv-rtip` child of the dot — glides with it on a
-  party switch — edge-clamped useLayoutEffect copied from RdApMini) with
-  a `.hi` accent ring (::after, inset -3px), and the native `title` is
-  GONE from the dots (the row's own pooled-figures `title` moved onto
-  the .rd-wv-lab/.rd-wv-v/.rd-wv-d cells so the OS tooltip never pops
-  over the custom one). Mouse click or Enter opens the poll row via
+  dot carries the chart dots' EXACT look, not a lookalike (user: "use
+  the exact pre-existing tooltip styling… and ring-on-hover styling"):
+  - The tooltip IS the chart's dot readout — the shared `.tip` card
+    under `tip-dot`'s own transform (-50%, calc(-100% - 14px)) hung from
+    the dot's centre (`.rd-wv-rtip` only re-seats the anchor at
+    left:50%/top:50% and lifts z) with the chart's own content map:
+    firm as `.tip-title`, a `.tip-row` of party swatch + name + reading,
+    a `Field` + dates row, the sample as an "n ≈ …" `.tip-sub` (group
+    approximation, where the chart's is whole-poll n), and the charts'
+    own "…in All polls" `.tip-hint` wording.
+  - The ring IS the Interaction board's picked-dot recipe: the disc (an
+    <i> inside the fixed <b> anchor, so the tip never scales with it)
+    doubles over a 2px halo of the page ground (var(--bg), the same halo
+    the whisker dot and CI ticks carry), inside a 1.5px ring of the
+    dot's OWN party colour at opacity .55 — never the accent — while the
+    row's other dots step back a fold (.rd-wv-rug.lit).
+  - The native `title` is gone from the dots (the row's pooled-figures
+    `title` moved onto the .rd-wv-lab/.rd-wv-v/.rd-wv-d cells so the OS
+    tooltip never pops over the custom one).
+  Mouse click or Enter opens the poll row via
   `AP.pollRowKey({pollster: f, released: r})` → `AP.openPoll(key,
   "primary", "who votes for whom")`; a touch tap only tips (tap again to
   close) and never navigates. Unkeyed dots (pollRowKey miss) still tip
   and read ("Released …" hint) but never open. Two probes pin the whole
   contract: `.matilda/probe/t2vxj1/rug-payload.mjs` (payload: 0 unkeyed
-  dots) and `rug-webkit.mjs` (ring, tip, hints, mouse/Enter navigation,
-  touch toggle, 25 assertions). Once the dots were buttons the track's
+  dots) and `rug-webkit.mjs` (tip-dot class + content map, disc growth,
+  halo, party ring, .lit dimming, hints, mouse/Enter navigation, touch
+  toggle — 30 assertions). Once the dots were buttons the track's
   aria-hidden moved onto its three decorative siblings
   (.rd-wv-all/.rd-wv-ci/.rd-wv-dot) instead. CAVEAT:
   `pd.n` is whole-poll n × DEMO_SHARE, like the group's pooled `n` — an
