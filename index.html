@@ -71036,6 +71036,61 @@ function RdPastCycles(p) {
   const cmpSwipe = React.useCallback(el => {
     if (el) el.__rdSwipe = dir => cmpSwipeLive.current(dir);
   }, []);
+  const modeSwipeLive = React.useRef(null);
+  modeSwipeLive.current = dir => {
+    const i = MODE_ROWS.indexOf(mode);
+    if (i < 0) return false;
+    setModePin(MODE_ROWS[(i + dir + MODE_ROWS.length) % MODE_ROWS.length]);
+    return true;
+  };
+  const sumHover = React.useRef(false),
+    measHover = React.useRef(false),
+    measEl = React.useRef(null),
+    measWalk = React.useRef(0);
+  React.useEffect(() => {
+    const sec = document.getElementById("cyc-summary"),
+      meas = measEl.current;
+    if (!sec) return undefined;
+    const on = (el, ref) => {
+      const enter = () => {
+          ref.current = true;
+        },
+        leave = () => {
+          ref.current = false;
+        };
+      ref.current = el.matches(":hover");
+      el.addEventListener("pointerenter", enter);
+      el.addEventListener("pointerleave", leave);
+      return [el, enter, leave];
+    };
+    const pairs = meas ? [on(sec, sumHover), on(meas, measHover)] : [on(sec, sumHover)];
+    const key = e => {
+      if (!sumHover.current && !measHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const dir = e.key === "ArrowRight" ? 1 : -1,
+        mo = measEl.current;
+      if ((measHover.current || sumHover.current && Date.now() - measWalk.current < 800) && mo && mo.isConnected && mo.getClientRects().length) {
+        if (modeSwipeLive.current(dir)) {
+          measWalk.current = Date.now();
+          e.preventDefault();
+        }
+        return;
+      }
+      if (cmpSwipeLive.current(dir)) e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      pairs.forEach(([el, enter, leave]) => {
+        el.removeEventListener("pointerenter", enter);
+        el.removeEventListener("pointerleave", leave);
+      });
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
   const controls = React.createElement("div", {
     className: "rd-cc",
     ref: boardRef
@@ -71068,6 +71123,7 @@ function RdPastCycles(p) {
     className: "rd-tabs rd-cc-tabs",
     role: "group",
     "aria-label": "Measure",
+    ref: measEl,
     onKeyDown: rdTabsKey(MODE_ROWS.map(id => ({
       id
     })), setModePin),
