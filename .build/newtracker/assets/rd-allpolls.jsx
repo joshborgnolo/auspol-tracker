@@ -1049,7 +1049,7 @@ function RdAllPolls(P) {
       const f = (FACETS.findIndex((x) => x.id === facet) + (e.key === "ArrowRight" ? 1 : -1) + FACETS.length) % FACETS.length;
       const rowSel = phone ? ".rd-ap-card" : ".rd-ap-row";
       const at = [...(bodyRef.current ? bodyRef.current.querySelectorAll(rowSel) : [])].indexOf(e.currentTarget);
-      onFacet(FACETS[f].id);
+      facetPick(FACETS[f].id);
       /* the leadership and direction facets self-arm a "has the numbers"
          scope, so the hop can filter the focused poll out of the table –
          React then drops its node, the focus falls to the page, and the
@@ -1454,6 +1454,16 @@ function RdAllPolls(P) {
   const NAV = phone || tight
     ? [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagreement"], ["house-lean", "Lean"], ["flow-drift", "Flows"]]
     : [["rd-ap-top", "The polls"], ["poll-disagreement", "How much they disagree"], ["house-lean", "How each pollster leans"], ["flow-drift", "Preference flows"]];
+  /* Walking the facets, the flip or the counts basis rewrites the head and
+     dek above the facet row (every facet but twopp drops them outright);
+     rdPinScroll (rd.jsx) holds the row's spot while the words land. */
+  const pinAp = () => {
+    const sec = document.getElementById("rd-ap-top");
+    rdPinScroll(sec && sec.querySelector(".rd-ap-tabs"));
+  };
+  const facetPick = (id) => { pinAp(); onFacet(id); };
+  const flipPick = () => { pinAp(); onMeasure(onM ? "lnp" : "onp"); };
+  const basisPick = () => { pinAp(); setTppBasis(pub ? "imp" : "resp"); };
   const pinBar = (
     <div className={"rd-ap-pinbar" + (pinned ? " on" : "")} aria-hidden={!pinned}>
       <nav className="rd-ap-pinnav" aria-label="On this page">
@@ -1466,8 +1476,8 @@ function RdAllPolls(P) {
         </button>
       ) : <>
         <span className="rd-ap-pintabs" role="group" aria-label="Figures"
-              onKeyDown={rdTabsKey(FACETS, onFacet)} onClick={rdTabFocus}>
-          {FACETS.map((f) => <button key={f.id} type="button" className="rd-ap-pint" aria-pressed={facet === f.id} tabIndex={pinned ? 0 : -1} onClick={() => onFacet(f.id)}>{f.label}</button>)}
+              onKeyDown={rdTabsKey(FACETS, facetPick)} onClick={rdTabFocus}>
+          {FACETS.map((f) => <button key={f.id} type="button" className="rd-ap-pint" aria-pressed={facet === f.id} tabIndex={pinned ? 0 : -1} onClick={() => facetPick(f.id)}>{f.label}</button>)}
         </span>
         <span className="rd-ap-pinsep" aria-hidden="true"></span>
         <button type="button" className="rd-ap-pins" aria-label="Search the polls" tabIndex={pinned ? 0 : -1} onClick={toSearch}>
@@ -1482,12 +1492,12 @@ function RdAllPolls(P) {
       <p>{pub ? "Each poll’s two-party figure as its pollster published it, against the average of the published figures that month."
         : "Each poll’s primary votes read through the same preference flows, the 2025 election’s, so the polls compare like for like. The pollster’s own figure sits beneath."}</p>
       <div className="rd-qrow"><span>Show the pollsters’ published figures</span>
-        <RdSwitch on={pub} onToggle={() => setTppBasis(pub ? "imp" : "resp")} label="Show the pollsters’ published figures" /></div>
+        <RdSwitch on={pub} onToggle={basisPick} label="Show the pollsters’ published figures" /></div>
     </RdQPop>
   );
   const flip = (
     <button type="button" className="rd-pl-flip" title={"Switch the page to Labor v " + (onM ? "Coalition" : "One Nation")}
-            onClick={() => onMeasure(onM ? "lnp" : "onp")}>Labor v {onM ? "One Nation" : "Coalition"} <span aria-hidden="true">⇄</span></button>
+            onClick={flipPick}>Labor v {onM ? "One Nation" : "Coalition"} <span aria-hidden="true">⇄</span></button>
   );
 
   return (
@@ -1505,7 +1515,7 @@ function RdAllPolls(P) {
       </div>
       {head && <RdHed head={head} dek={dek} level={2} />}
 
-      <RdTabs swipe value={facet} onChange={onFacet} options={FACETS} ariaLabel="Figures" className="rd-ap-tabs">
+      <RdTabs swipe value={facet} onChange={facetPick} options={FACETS} ariaLabel="Figures" className="rd-ap-tabs">
         {facet === "twopp" && !phone && (
           <span className="rd-pl-ctl">
             <span className="rd-pl-ctl-l">Two-party:</span>{flip}

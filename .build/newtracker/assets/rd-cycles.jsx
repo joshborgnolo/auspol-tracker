@@ -274,8 +274,7 @@ function RdPastCycles(p) {
      rd.jsx, shared with the other tab rows) holds the row's spot on
      screen through the head/dek glide instead. */
   const pinView = () => {
-    const sec = boardRef.current && boardRef.current.closest("section");
-    rdPinScroll(boardRef.current, sec && sec.querySelector(".rd-dek"));
+    rdPinScroll(boardRef.current);
   };
   const chg = mode === "chg";
   const cur = cycles.find((c) => c.current);

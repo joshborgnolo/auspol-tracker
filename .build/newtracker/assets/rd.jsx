@@ -111,25 +111,24 @@ function rdHoldSection(el, dh, ms) {
   hold.t = setTimeout(() => { sec.style.minHeight = ""; sec.__rdHold = null; }, ms);
 }
 /* A tab or chip row above a changing head and dek: the glide animates
-   their height over the morph window, and once the dek has slid up under
-   the sticky page tabs the user sees none of it - every step then drags
-   the row and the charts under it up or down out from under them. Pin
-   instead: hold the row at its spot on screen while the glide runs,
-   scrolling the difference back out (any scrolling of the user's own
-   folds into the anchor). Call from the row's change handler, before the
-   state changes. No-op while any of the dek still shows: there the words
-   change in view and nothing should move. */
+   their height over the morph window, and every step drags the row and
+   the charts under it up or down out from under the user. Pin instead:
+   hold the row at its spot on screen while the glide runs, scrolling the
+   difference back out (any scrolling of the user's own folds into the
+   anchor). When the dek is on screen its bottom edge stays glued to the
+   row and the changed words spill upward, but what the user keeps is the
+   control they touched and everything below it. Call from the row's
+   change handler, before the state changes. */
 let rdPinRaf = 0;
 let rdPinAnchorSave = null;
-function rdPinScroll(row, dek) {
-  if (!row || !dek) return;
+function rdPinScroll(row) {
+  if (!row) return;
   const bar = document.querySelector(".tabs.sticky");
   /* the bar's box sits at its unstuck place whenever it isn't stuck (top of
      the page), so its live bottom is 200px+ there - reserve only what the
-     bar takes up when it IS stuck (its height), else the gate never sees
-     the dek as gone */
+     bar takes up when it IS stuck (its height), else a row right under the
+     viewport top reads as hidden behind it */
   const reserve = () => { const r = bar && bar.getBoundingClientRect(); return r ? Math.min(r.bottom, r.height) : 0; };
-  if (dek.getBoundingClientRect().bottom > reserve()) return;
   const want0 = row.getBoundingClientRect();
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
   cancelAnimationFrame(rdPinRaf);
@@ -150,7 +149,13 @@ function rdPinScroll(row, dek) {
   const step = () => {
     if (!row.isConnected) { done(); return; }
     const y = window.scrollY;
-    want += y - lastY;
+    /* a wheel or trackpad tick mid-glide folds into the anchor and the pin
+       follows it, but a jump of a screen or more (Home/End, a nav pill, a
+       scrollIntoView) is the user leaving - hand back rather than drag the
+       page to where the row was */
+    const dy = y - lastY;
+    if (Math.abs(dy) > window.innerHeight) { done(); return; }
+    want += dy;
     lastY = y;
     const drift = row.getBoundingClientRect().top - want;
     if (drift) { window.scrollBy(0, drift); lastY = window.scrollY; }

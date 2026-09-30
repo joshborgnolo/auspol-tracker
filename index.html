@@ -62675,14 +62675,13 @@ function rdHoldSection(el, dh, ms) {
 }
 let rdPinRaf = 0;
 let rdPinAnchorSave = null;
-function rdPinScroll(row, dek) {
-  if (!row || !dek) return;
+function rdPinScroll(row) {
+  if (!row) return;
   const bar = document.querySelector(".tabs.sticky");
   const reserve = () => {
     const r = bar && bar.getBoundingClientRect();
     return r ? Math.min(r.bottom, r.height) : 0;
   };
-  if (dek.getBoundingClientRect().bottom > reserve()) return;
   const want0 = row.getBoundingClientRect();
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
   cancelAnimationFrame(rdPinRaf);
@@ -62705,7 +62704,12 @@ function rdPinScroll(row, dek) {
       return;
     }
     const y = window.scrollY;
-    want += y - lastY;
+    const dy = y - lastY;
+    if (Math.abs(dy) > window.innerHeight) {
+      done();
+      return;
+    }
+    want += dy;
     lastY = y;
     const drift = row.getBoundingClientRect().top - want;
     if (drift) {
@@ -65465,6 +65469,15 @@ function RdLeadership({
   }, React.createElement("path", {
     d: expanded === id ? "M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3" : "M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"
   })));
+  const pinLd = () => {
+    const sec = document.getElementById("leadership");
+    const p = sec && sec.querySelectorAll(".rd-ld-panel")[1];
+    rdPinScroll(p && p.querySelector("[aria-label='Leader rating']"));
+  };
+  const pickMetric = v => {
+    pinLd();
+    if (v === "both" || own === "both") setOwn(v);else chooseMetric(v);
+  };
   return React.createElement(RdSec, {
     id: "leadership",
     cls: "rd-lead",
@@ -65509,9 +65522,7 @@ function RdLeadership({
   }, keyDots + " " + (ppmView === "three" ? keyThree : ppmView === "two" ? keyLead + ", which lets one chart carry both head-to-head contests." : keyLead + "; three-way figures are shares of all respondents."))))), panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval", metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person." : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. RedBridge, DemosAU, Freshwater and Spectre Strategy." : "Approve minus disapprove of the job each leader is doing. Newspoll, YouGov, Resolve, Essential and others.", React.createElement(RdTabs, {
     swipe: true,
     value: metric,
-    onChange: v => {
-      if (v === "both" || own === "both") setOwn(v);else chooseMetric(v);
-    },
+    onChange: pickMetric,
     ariaLabel: "Leader rating",
     options: [{
       id: "net",
@@ -65942,7 +65953,7 @@ function RdDemographics({
   const [partyMorph, chooseParty] = window.AP.useMorph(party, v => setParty(v), (a, b) => a !== b);
   const pinWv = () => {
     const sec = document.getElementById("who-votes");
-    rdPinScroll(sec && sec.querySelector(".rd-wv-tabs"), sec && sec.querySelector(".rd-dek"));
+    rdPinScroll(sec && sec.querySelector(".rd-wv-tabs"));
   };
   const pickTab = id => {
     pinWv();
@@ -67555,7 +67566,7 @@ function RdIssues({
   };
   const pinWhom = () => {
     const sec = document.getElementById("issues");
-    rdPinScroll(sec && (sec.querySelector(".rd-iw-chips") || sec.querySelector(".rd-iw-ctl")), sec && sec.querySelector(".rd-dek"));
+    rdPinScroll(sec && (sec.querySelector(".rd-iw-chips") || sec.querySelector(".rd-iw-ctl")));
   };
   const pickGset = id => {
     pinWhom();
@@ -68193,7 +68204,7 @@ function RdUndecided({
   }] : []);
   const pinUn = () => {
     const sec = document.getElementById("undecided");
-    rdPinScroll(sec && sec.querySelector(".rd-un-tabs"), sec && sec.querySelector(".rd-dek"));
+    rdPinScroll(sec && sec.querySelector(".rd-un-tabs"));
   };
   const pickView = id => {
     pinUn();
@@ -69891,8 +69902,7 @@ function RdPastCycles(p) {
   const boardRef = React.useRef(null);
   window.useDismissOutside(boardRef, board, () => setBoard(false));
   const pinView = () => {
-    const sec = boardRef.current && boardRef.current.closest("section");
-    rdPinScroll(boardRef.current, sec && sec.querySelector(".rd-dek"));
+    rdPinScroll(boardRef.current);
   };
   const chg = mode === "chg";
   const cur = cycles.find(c => c.current);
@@ -72219,7 +72229,7 @@ function RdAllPolls(P) {
       const f = (FACETS.findIndex(x => x.id === facet) + (e.key === "ArrowRight" ? 1 : -1) + FACETS.length) % FACETS.length;
       const rowSel = phone ? ".rd-ap-card" : ".rd-ap-row";
       const at = [...(bodyRef.current ? bodyRef.current.querySelectorAll(rowSel) : [])].indexOf(e.currentTarget);
-      onFacet(FACETS[f].id);
+      facetPick(FACETS[f].id);
       requestAnimationFrame(() => {
         const act = document.activeElement;
         if (act && act.closest && act.closest(rowSel)) return;
@@ -73047,6 +73057,22 @@ function RdAllPolls(P) {
     className: "rd-ap-cap"
   }, "Share naming each issue as one that matters, %")));
   const NAV = phone || tight ? [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagreement"], ["house-lean", "Lean"], ["flow-drift", "Flows"]] : [["rd-ap-top", "The polls"], ["poll-disagreement", "How much they disagree"], ["house-lean", "How each pollster leans"], ["flow-drift", "Preference flows"]];
+  const pinAp = () => {
+    const sec = document.getElementById("rd-ap-top");
+    rdPinScroll(sec && sec.querySelector(".rd-ap-tabs"));
+  };
+  const facetPick = id => {
+    pinAp();
+    onFacet(id);
+  };
+  const flipPick = () => {
+    pinAp();
+    onMeasure(onM ? "lnp" : "onp");
+  };
+  const basisPick = () => {
+    pinAp();
+    setTppBasis(pub ? "imp" : "resp");
+  };
   const pinBar = React.createElement("div", {
     className: "rd-ap-pinbar" + (pinned ? " on" : ""),
     "aria-hidden": !pinned
@@ -73079,7 +73105,7 @@ function RdAllPolls(P) {
     className: "rd-ap-pintabs",
     role: "group",
     "aria-label": "Figures",
-    onKeyDown: rdTabsKey(FACETS, onFacet),
+    onKeyDown: rdTabsKey(FACETS, facetPick),
     onClick: rdTabFocus
   }, FACETS.map(f => React.createElement("button", {
     key: f.id,
@@ -73087,7 +73113,7 @@ function RdAllPolls(P) {
     className: "rd-ap-pint",
     "aria-pressed": facet === f.id,
     tabIndex: pinned ? 0 : -1,
-    onClick: () => onFacet(f.id)
+    onClick: () => facetPick(f.id)
   }, f.label))), React.createElement("span", {
     className: "rd-ap-pinsep",
     "aria-hidden": "true"
@@ -73122,14 +73148,14 @@ function RdAllPolls(P) {
     className: "rd-qrow"
   }, React.createElement("span", null, "Show the pollsters\u2019 published figures"), React.createElement(RdSwitch, {
     on: pub,
-    onToggle: () => setTppBasis(pub ? "imp" : "resp"),
+    onToggle: basisPick,
     label: "Show the pollsters\u2019 published figures"
   })));
   const flip = React.createElement("button", {
     type: "button",
     className: "rd-pl-flip",
     title: "Switch the page to Labor v " + (onM ? "Coalition" : "One Nation"),
-    onClick: () => onMeasure(onM ? "lnp" : "onp")
+    onClick: flipPick
   }, "Labor v ", onM ? "One Nation" : "Coalition", " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
@@ -73164,7 +73190,7 @@ function RdAllPolls(P) {
   }), React.createElement(RdTabs, {
     swipe: true,
     value: facet,
-    onChange: onFacet,
+    onChange: facetPick,
     options: FACETS,
     ariaLabel: "Figures",
     className: "rd-ap-tabs"

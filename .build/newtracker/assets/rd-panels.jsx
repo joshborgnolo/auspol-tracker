@@ -799,6 +799,16 @@ function RdLeadership({ rangeId }) {
     </button>
   );
 
+  /* Walking Approval / Favourability / Both rewrites the panel's head and
+     dek above the row; rdPinScroll (rd.jsx) holds the row's spot while the
+     words land. */
+  const pinLd = () => {
+    const sec = document.getElementById("leadership");
+    const p = sec && sec.querySelectorAll(".rd-ld-panel")[1];
+    rdPinScroll(p && p.querySelector("[aria-label='Leader rating']"));
+  };
+  const pickMetric = (v) => { pinLd(); if (v === "both" || own === "both") setOwn(v); else chooseMetric(v); };
+
   return (
     <RdSec id="leadership" cls="rd-lead" title="Leadership" meta="Preferred PM and net approval, Newspoll, YouGov, Resolve, Essential and others">
       {story && <RdHed head={story.head} dek={story.dek} />}
@@ -840,7 +850,7 @@ function RdLeadership({ rangeId }) {
           metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person."
             : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. RedBridge, DemosAU, Freshwater and Spectre Strategy."
             : "Approve minus disapprove of the job each leader is doing. Newspoll, YouGov, Resolve, Essential and others.",
-          <RdTabs swipe value={metric} onChange={(v) => { if (v === "both" || own === "both") setOwn(v); else chooseMetric(v); }} ariaLabel="Leader rating"
+          <RdTabs swipe value={metric} onChange={pickMetric} ariaLabel="Leader rating"
                   options={[{ id: "net", label: "Approval" }, { id: "fav", label: "Favourability" }, { id: "both", label: "Both" }]}>
             {!narrow && expandBtn("appr", "leader ratings")}
           </RdTabs>,
@@ -1068,7 +1078,7 @@ function RdDemographics({ rangeId = "all" }) {
      glide instead. */
   const pinWv = () => {
     const sec = document.getElementById("who-votes");
-    rdPinScroll(sec && sec.querySelector(".rd-wv-tabs"), sec && sec.querySelector(".rd-dek"));
+    rdPinScroll(sec && sec.querySelector(".rd-wv-tabs"));
   };
   const pickTab = (id) => { pinWv(); setTab(id); };
   const pickParty = (v) => { pinWv(); chooseParty(v); };
@@ -2083,8 +2093,7 @@ function RdIssues({ rangeId = "all" }) {
      ride the story block's height glide. rdPinScroll holds the spot. */
   const pinWhom = () => {
     const sec = document.getElementById("issues");
-    rdPinScroll(sec && (sec.querySelector(".rd-iw-chips") || sec.querySelector(".rd-iw-ctl")),
-                sec && sec.querySelector(".rd-dek"));
+    rdPinScroll(sec && (sec.querySelector(".rd-iw-chips") || sec.querySelector(".rd-iw-ctl")));
   };
   const pickGset = (id) => { pinWhom(); setGset(id); };
   const pickWhom = (k) => { pinWhom(); setWhomK(k); };
@@ -2427,7 +2436,7 @@ function RdUndecided({ rangeId }) {
      the cycles and panels rows do (rdPinScroll). */
   const pinUn = () => {
     const sec = document.getElementById("undecided");
-    rdPinScroll(sec && sec.querySelector(".rd-un-tabs"), sec && sec.querySelector(".rd-dek"));
+    rdPinScroll(sec && sec.querySelector(".rd-un-tabs"));
   };
   const pickView = (id) => { pinUn(); setView(id); };
   return (
