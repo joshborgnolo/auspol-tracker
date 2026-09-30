@@ -62801,14 +62801,8 @@ function rdPinScroll(row) {
       html.style.overflowAnchor = rdPinAnchorSave;
       rdPinAnchorSave = null;
     }
-    const was = row.isConnected ? row.getBoundingClientRect().top : 0;
     rdPinThaw();
-    if (!row.isConnected) return;
-    const shift = row.getBoundingClientRect().top - was;
-    if (shift) {
-      window.scrollBy(0, shift);
-      lastY = window.scrollY;
-    }
+    if (row.isConnected) fix();
   };
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
@@ -63383,35 +63377,28 @@ function rdEventBadges(idKey, events, x0, x1) {
   const memKey = idKey + "|" + x0.toFixed(4) + "|" + x1.toFixed(4) + "|" + inWin.map(e => e.date).join(",");
   if (memo[memKey]) return memo[memKey];
   if (Object.keys(memo).length > 120) rdEventBadges.memo = {};
-  const list = [];
-  const out = inWin.map(e => {
-    const ym = e.date.slice(0, 7);
-    let item = list.find(l => l.ym === ym);
-    if (!item) {
-      item = {
-        n: list.length + 1,
-        ym,
-        labels: [],
-        evs: []
-      };
-      list.push(item);
-    }
-    item.labels.push(/→/.test(e.short || "") || !e.short ? e.label : e.short);
-    const badged = {
-      ...e,
-      badge: item.n,
-      badgeLead: item.labels.length === 1,
-      badgeKey: idKey + "-" + e.date
-    };
-    item.evs.push(badged);
-    return badged;
-  });
+  const out = inWin.map((e, i) => ({
+    ...e,
+    badge: i + 1,
+    badgeLead: true,
+    badgeKey: idKey + "-" + e.date
+  }));
+  const list = out.map(e => ({
+    n: e.badge,
+    date: e.date,
+    labels: [/→/.test(e.short || "") || !e.short ? e.label : e.short],
+    evs: [e]
+  }));
   const result = {
     events: out,
     list
   };
   rdEventBadges.memo[memKey] = result;
   return result;
+}
+function rdChartEvents(events, x0, x1) {
+  const KEPT = ["2026-02-12", "2025-12-08"];
+  return (events || []).filter(e => (e.major || KEPT.includes(e.date)) && e.x >= x0 - 0.02 && e.x <= x1 + 0.02);
 }
 function RdEventList({
   list,
@@ -63422,8 +63409,9 @@ function RdEventList({
   openKey
 }) {
   if (!list || !list.length) return null;
+  const dateOf = l => rdDate(l.date, true);
   const row = (l, i) => {
-    const d = window.AUSPOL.monthName(Number(l.ym.slice(5))) + " " + l.ym.slice(0, 4);
+    const d = dateOf(l);
     const on = !!(openKey && l.evs && l.evs.some(e => e.badgeKey === openKey));
     return onPick && l.evs && l.evs.length ? React.createElement("li", {
       key: l.n
@@ -63460,8 +63448,8 @@ function RdEventList({
     className: "rd-evlist-l"
   }, l.labels.join(", ")), React.createElement("span", {
     className: "rd-evlist-d"
-  }, window.AUSPOL.monthName(Number(l.ym.slice(5))) + " " + l.ym.slice(0, 4)))));
-  const same = from && from.length === list.length && from.every((l, i) => l.n === list[i].n && l.ym === list[i].ym && l.labels.join() === list[i].labels.join());
+  }, dateOf(l)))));
+  const same = from && from.length === list.length && from.every((l, i) => l.n === list[i].n && l.date === list[i].date && l.labels.join() === list[i].labels.join());
   if (!from || same || mix >= 1) return ol(list, undefined, undefined, !!onPick);
   return React.createElement("div", {
     className: "rd-evstack"
@@ -63597,6 +63585,7 @@ Object.assign(window, {
   rdXTicks,
   rdYTicks,
   rdEventBadges,
+  rdChartEvents,
   RdEventList,
   rdEventReveal,
   RdCheck,
@@ -64007,13 +63996,12 @@ function RdHero(p) {
   const yTicks = rdYTicks(yTarget[0], yTarget[1], 5);
   const yTop = dm => Math.floor(dm[1] / 5 + 1e-9) * 5;
   const yFromTicks = yFrom ? rdYTicks(Math.ceil(yFrom[0] / 5 - 1e-9) * 5, yTop(yFrom), 5) : null;
-  const keptEvents = ["2026-02-12", "2025-12-08"];
   const evsOf = sc => {
     const rows = [sc.main, sc.other].filter(r => r && r.length);
     if (!rows.length) return [];
     const x0 = Math.min(...rows.map(r => r[0].x)),
       x1 = Math.max(...rows.map(r => r[r.length - 1].x));
-    return (D.events || []).filter(e => (e.major || keptEvents.includes(e.date)) && e.x >= x0 - 0.02 && e.x <= x1 + 0.02);
+    return rdChartEvents(D.events, x0, x1);
   };
   const evsAll = evsOf(morph ? B : S);
   const evsWas = morph ? evsOf(A) : null;
@@ -64555,7 +64543,7 @@ function RdPrimary({
     r: 4.5,
     hidden: !!hidden[p.id]
   })) : [];
-  const evs = (D.events || []).filter(e => e.major);
+  const evs = rdChartEvents(D.events, xDomain[0], xDomain[1]);
   const badges = narrow ? rdEventBadges("p1", evs, xDomain[0], xDomain[1]) : null;
   const [evtOpen, setEvtOpen] = useState(null);
   const pickEv = e => {

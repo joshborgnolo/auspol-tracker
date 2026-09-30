@@ -274,18 +274,17 @@ function RdHero(p) {
   const yTop = (dm) => Math.floor(dm[1] / 5 + 1e-9) * 5;
   const yFromTicks = yFrom ? rdYTicks(Math.ceil(yFrom[0] / 5 - 1e-9) * 5, yTop(yFrom), 5) : null;
 
-  /* events: the major ones, plus both recent changes of hand – Taylor
-     replacing Ley, Joyce joining One Nation – on EVERY contest's view, so
-     the markers are identical whichever matchup pill is up, over the months
-     that contest's lines run. Mid-switch the chart is handed both scenes'
-     events and slides one set into the other (TrendChart's eventsFrom), so
-     the markers change with the lines, not after them. */
-  const keptEvents = ["2026-02-12", "2025-12-08"];
+  /* events: rdChartEvents' shared set – the one the Primary vote chart
+     marks – on EVERY contest's view, so the markers are identical whichever
+     matchup pill is up, over the months that contest's lines run. Mid-switch
+     the chart is handed both scenes' events and slides one set into the
+     other (TrendChart's eventsFrom), so the markers change with the lines,
+     not after them. */
   const evsOf = (sc) => {
     const rows = [sc.main, sc.other].filter((r) => r && r.length);
     if (!rows.length) return [];
     const x0 = Math.min(...rows.map((r) => r[0].x)), x1 = Math.max(...rows.map((r) => r[r.length - 1].x));
-    return (D.events || []).filter((e) => (e.major || keptEvents.includes(e.date)) && e.x >= x0 - 0.02 && e.x <= x1 + 0.02);
+    return rdChartEvents(D.events, x0, x1);
   };
   const evsAll = evsOf(morph ? B : S);
   const evsWas = morph ? evsOf(A) : null;

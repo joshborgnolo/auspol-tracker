@@ -1415,7 +1415,7 @@ function TrendChart(props) {
               <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-hit" />
               <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-line" />
               {/* the redesign numbers a phone's events; the names are listed
-                  under the chart, and events in one month share a number */}
+                  under the chart with their dates, one row per number */}
               {rd && e.badge != null && e.badgeLead && (() => {
                 const bx = badgeAt.current && badgeAt.current[i] != null ? badgeAt.current[i] : ex;
                 return (

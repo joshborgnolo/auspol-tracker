@@ -619,12 +619,14 @@ function rdYTicks(lo, hi, step) {
 }
 
 /* ---------------------------------------------------------------- events
-   On a phone the event names do not fit over the plot, so each month with
-   an event gets a number over its rule and the names are listed under the
-   chart. Events in one month share a number. The caller hangs an `idKey`
-   on each badge so two charts' taps and scroll anchors (evt-a-<key>) never
-   mint the same id; list items carrying `evs` let a tap hand the event
-   back to the chart. */
+   On a phone the event names do not fit over the plot, so each event gets
+   a number over its rule and the name is listed under the chart with its
+   date. Two events in one month get two numbers (Joyce crossing on the
+   8th, Bondi on the 14th); the chart spreads badges too close to touch
+   and ties them back to their rules. The caller hangs an `idKey` on each
+   badge so two charts' taps and scroll anchors (evt-a-<key>) never mint
+   the same id; a list row's `evs` lets a tap hand the event back to the
+   chart. */
 function rdEventBadges(idKey, events, x0, x1) {
   const inWin = (events || []).filter((e) => e.x >= x0 && e.x <= x1).sort((a, b) => a.x - b.x);
   /* An opened event lives in the caller across renders; this memo returns
@@ -634,31 +636,33 @@ function rdEventBadges(idKey, events, x0, x1) {
   const memKey = idKey + "|" + x0.toFixed(4) + "|" + x1.toFixed(4) + "|" + inWin.map((e) => e.date).join(",");
   if (memo[memKey]) return memo[memKey];
   if (Object.keys(memo).length > 120) rdEventBadges.memo = {};
-  const list = [];
-  const out = inWin.map((e) => {
-    const ym = e.date.slice(0, 7);
-    let item = list.find((l) => l.ym === ym);
-    if (!item) { item = { n: list.length + 1, ym, labels: [], evs: [] }; list.push(item); }
-    /* the short name reads better in a list, unless it is shorthand */
-    item.labels.push(/→/.test(e.short || "") || !e.short ? e.label : e.short);
-    /* the list hands the chart back the same object it drew: an opened
-       event reconciles by identity against it */
-    const badged = { ...e, badge: item.n, badgeLead: item.labels.length === 1, badgeKey: idKey + "-" + e.date };
-    item.evs.push(badged);
-    return badged;
-  });
+  /* the list hands the chart back the same object it drew: an opened event
+     reconciles by identity against it */
+  const out = inWin.map((e, i) => ({ ...e, badge: i + 1, badgeLead: true, badgeKey: idKey + "-" + e.date }));
+  /* the short name reads better in a list, unless it is shorthand */
+  const list = out.map((e) => ({ n: e.badge, date: e.date, labels: [/→/.test(e.short || "") || !e.short ? e.label : e.short], evs: [e] }));
   const result = { events: out, list };
   rdEventBadges.memo[memKey] = result;
   return result;
+}
+/* The vote charts' shared event set: the major events, plus the two
+   changes of hand – Taylor replacing Ley, Joyce joining One Nation – so
+   the numbered markers are identical on the 2PP hero and the Primary vote
+   chart over the months each one's window shows. x0/x1 is the caller's
+   scene window, kept to the 0.02 hair of slop the axis months keep. */
+function rdChartEvents(events, x0, x1) {
+  const KEPT = ["2026-02-12", "2025-12-08"];
+  return (events || []).filter((e) => (e.major || KEPT.includes(e.date)) && e.x >= x0 - 0.02 && e.x <= x1 + 0.02);
 }
 function RdEventList({ list, inline, from, mix, onPick, openKey }) {
   if (!list || !list.length) return null;
   /* `inline` runs the list across the page, as the canvas set the one shared
      by a pair of half-width charts; a phone always stacks it */
+  /* the day the number answers for, year and all ("8 Dec 2025") */
+  const dateOf = (l) => rdDate(l.date, true);
   const row = (l, i) => {
-    const d = window.AUSPOL.monthName(Number(l.ym.slice(5))) + " " + l.ym.slice(0, 4);
-    /* a tap opens the event's panel in the chart above; the first event
-       against the number answers, a month of them sharing one */
+    const d = dateOf(l);
+    /* a tap opens the event's panel in the chart above */
     const on = !!(openKey && l.evs && l.evs.some((e) => e.badgeKey === openKey));
     return onPick && l.evs && l.evs.length ? (
       <li key={l.n}>
@@ -682,14 +686,14 @@ function RdEventList({ list, inline, from, mix, onPick, openKey }) {
       {l0.map((l, i) => (pick ? row(l, i) : (
         <li key={l.n}><span className="rd-evlist-n">{l.n}</span>
           <span className="rd-evlist-l">{l.labels.join(", ")}</span>
-          <span className="rd-evlist-d">{window.AUSPOL.monthName(Number(l.ym.slice(5))) + " " + l.ym.slice(0, 4)}</span></li>
+          <span className="rd-evlist-d">{dateOf(l)}</span></li>
       )))}
     </ol>
   );
   /* mid-switch (`from`, `mix`): the list being left fades out over the list
      arriving, both in one cell, so the names change with the chart's badges
      and the page below does not move on the switch's last frame */
-  const same = from && from.length === list.length && from.every((l, i) => l.n === list[i].n && l.ym === list[i].ym && l.labels.join() === list[i].labels.join());
+  const same = from && from.length === list.length && from.every((l, i) => l.n === list[i].n && l.date === list[i].date && l.labels.join() === list[i].labels.join());
   if (!from || same || mix >= 1) return ol(list, undefined, undefined, !!onPick);
   /* mid-switch the tappable list belongs to the view being arrived at */
   return (
@@ -778,4 +782,4 @@ Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdT
                         rdTabsKey, rdTabFocus, rdDigitKey,
                         rdNumWord, rdCap, rdFraction, rdSigned, rdArrow,
                         rdDate, rdMonthYear, rdPointsPhrase, rdXTicks, rdYTicks,
-                        rdEventBadges, RdEventList, rdEventReveal, RdCheck, RdSwitch, RdTerm, RdQPop });
+                        rdEventBadges, rdChartEvents, RdEventList, rdEventReveal, RdCheck, RdSwitch, RdTerm, RdQPop });
