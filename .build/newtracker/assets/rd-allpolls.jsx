@@ -1470,10 +1470,21 @@ function RdAllPolls(P) {
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
     if (!sec) return;
+    /* the last anchor is the first data row ON SCREEN, not the first in the
+       DOM: deeper into the table the bar, tabs and the table's first row
+       are all above the fold, where the pin must still hold the row the
+       reader has in view through the facet swap (its head/dek arrive and
+       leave by the facet; without an anchor on screen there was nothing to
+       compensate them and the viewport walked down the page each cycle) */
+    const onScreenRows = [...sec.querySelectorAll(".rd-ap-table .rd-ap-mrow, .rd-ap-table .rd-ap-row, .rd-ap-table .rd-ap-card")]
+      .filter((el) => {
+        const r = el.getBoundingClientRect();
+        return r.bottom > 0 && r.top < window.innerHeight;
+      });
     rdPinScroll([
       sec.querySelector(".rd-ap-bar"),
       sec.querySelector(".rd-ap-tabs"),
-      sec.querySelector(".rd-ap-table .rd-ap-mrow, .rd-ap-table .rd-ap-row, .rd-ap-table .rd-ap-card"),
+      ...onScreenRows.slice(0, 3),
     ], true);
   };
   const facetPick = (id) => { pinAp(); onFacet(id); };

@@ -666,3 +666,51 @@ the click helper still parks a target just below the sticky site tab
 bar's reserve before `mouse.click` (a control parked under
 `.tabs.sticky` gets its click intercepted by the site tab and the probe
 navigates to `#cycles`).
+
+## The laptop facet-walk drift fixes (2026-09-30, the day after the fine opt-in)
+
+User report straight after the `fine` opt-in shipped: "pressing right
+arrow scrolled down on all polls table; each time the view comes around
+to 2PP and primary, the viewport drifts down." Two independent
+mechanisms, proven separately with headless timelines:
+
+1. **`focus()` teleports the page: any focus on a pinned-bar control
+   MUST pass `{ preventScroll: true }`.** The All-polls pinbar
+   (`.rd-ap-pinbar`) is `position: fixed`, so its facet buttons' LAYOUT
+   boxes sit far up the page where the unpinned bar rendered. Chrome
+   focuses a `<button>` on click (Safari/Firefox-mac don't), and a plain
+   `el.focus()` re-scrolls the page to the button's layout box —
+   observed 4200 → 2399 = a 1801px teleport. `rdTabFocus` (the click
+   focus for Safari/Firefox) and `rdTabsKey`'s arrow step (both in
+   rd.jsx) now call `focus({ preventScroll: true })`: the pin owns the
+   scroll position, so a tab-walk control focus must never move the
+   viewport. Diagnosis harness: `.matilda/dbg-ap-click-jump2.mjs` wraps
+   `HTMLElement.prototype.focus` (call AFTER load — the page's own
+   wrappers stack) and records `opts` + `Error().stack`; the trace that
+   convicted it was `focus opts=null at rdTabFocus`. REBUILD GOTCHA
+   that cost a lap: the fix in rd.jsx source does NOT reach the running
+   page until `node .build/newtracker/build.mjs` re-runs — index.html
+   kept executing the stale `b.focus()` copy at the old line and the
+   probe kept failing post-edit. **After any rd.jsx edit, grep the BUILT
+   index.html for the fix (the source map isn't there — grep for the
+   literal `preventScroll: true`), don't assume the rebuild happened.**
+2. **The anchor preference list must include the reader's own ground,
+   or the pin no-ops AT READING DEPTH** (the 08329ba lesson, repeated
+   for a table this time). pinAp's list was `[bar, tabs, first DOM data
+   row]`; 620px into the table all three are above the fold, so at a
+   user's real facet-walk depth the pin bailed (RO count stayed 0, no
+   compensation) and each facet's head/dek swap (twopp keeps a 99.3px
+   hed, every other facet drops it — ±182px page-height deltas at
+   1440px) walked the viewport under a held scroll offset. pinAp now
+   appends `[...onScreenRows].slice(0, 3)` — the first up-to-three
+   `.rd-ap-mrow/.rd-ap-row/.rd-ap-card` whose rect spans the viewport —
+   so the row the reader is staring at takes the pin.
+   **Repro-depth gotcha that wasted two probes**: at 1440×900 the whole
+   All-polls TABLE occupies ~620–2930 document px (measured on a
+   39-row twopp facet), so `scrollTo(0, 4200)` lands PAST the table in
+   the poll-disagreement/house-lean sections with NO rows on screen —
+   there the pin has no anchor BY DESIGN and drift measurements prove
+   nothing. `.matilda/dbg-ap-arrow-drift3.mjs` prints each section's
+   rect first — confirm rows are actually on screen (`nrows` visible,
+   `tbl` spans the viewport) before reading drift into a result.
+

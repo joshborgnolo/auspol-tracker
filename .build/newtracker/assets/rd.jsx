@@ -570,10 +570,12 @@ function RdFoot({ children, how }) {
    sit in the buttons' DOM order. */
 /* Safari and Firefox on macOS never focus a <button> on click (only Chrome
    does), which would leave the walk dead for a pointer user - a click lands
-   the button's focus explicitly. */
+   the button's focus explicitly, without scrolling to do it: a pinned bar's
+   button has its layout box somewhere up the page and a plain focus() would
+   teleport the viewport there (the pin owns the scroll position). */
 function rdTabFocus(e) {
   const b = e.target && e.target.closest ? e.target.closest("button") : null;
-  if (b) b.focus();
+  if (b) b.focus({ preventScroll: true });
 }
 function rdTabsKey(options, onChange) {
   return (e) => {
@@ -585,7 +587,7 @@ function rdTabsKey(options, onChange) {
     const j = (btns.indexOf(btn) + (e.key === "ArrowRight" ? 1 : -1) + btns.length) % btns.length;
     if (!btns[j] || !options[j]) return;
     onChange(options[j].id);
-    btns[j].focus();
+    btns[j].focus({ preventScroll: true });
   };
 }
 /* number-key hotkeys over a row: with focus anywhere in the row, 1..9 picks
