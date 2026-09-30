@@ -16,7 +16,10 @@ const RD_RANGES = [{ id: "3", label: "3 mo" }, { id: "6", label: "6 mo" },
    the lead plus or minus its 95% margin (or the flows' range); a tie inside
    it is the verdict "too close to call", drawn. Plain boxes rather than svg
    geometry so the span and dot can travel on a CSS transition when the
-   contest or basis changes, on the same curve the figures roll on. */
+   contest or basis changes, on the same curve the figures roll on.
+   The root carries data-rd-swipe-self with NO __rdSwipe handler: the
+   gesture layer reads that as "this surface is spoken for but does
+   nothing" - a swipe here is absorbed, never a page turn. */
 function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
   const ref = React.useRef(null);
   const [w, setW] = React.useState(760);
@@ -48,7 +51,7 @@ function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
   const say = aName + (lead >= 0 ? " ahead by " : " behind by ") + Math.abs(lead).toFixed(1) + " points"
     + (margin != null ? ", give or take " + margin.toFixed(1) + (lo <= 0 && hi >= 0 ? ": a tie is inside that range." : ": a tie is outside that range.") : ".");
   return (
-    <div className="rd-lg" ref={ref} style={{ width: w }} role="img" aria-label={say} title={say}>
+    <div className="rd-lg" ref={ref} style={{ width: w }} role="img" aria-label={say} title={say} data-rd-swipe-self="">
       <span className="rd-lg-side" style={{ left: sideX, color: inkOf(aColor) }}>◀ {aName} ahead</span>
       <span className="rd-lg-side" style={{ right: sideX, color: inkOf(bColor) }}>{bName} ahead ▶</span>
       {[-10, -5, 5, 10].map((v) => <span key={v} className="rd-lg-grid" style={{ left: X(v) }}></span>)}
@@ -415,7 +418,20 @@ function RdHero(p) {
          screen, and the figure is what the page is opened for. */}
       {story && !narrow && <RdHed head={story.head} dek={story.dek} />}
       <div className="rd-tpp-top">
-        <div className="rd-tpp-read">
+        {/* the figures swipe like the chart under them: marked self so only
+            this strip of numbers and names claims the gesture - the
+            "ahead" scale directly below it, and the words below that, keep
+            their plain page turn. The strip also arms the page's scroll
+            anchor for the beat its own flip takes to settle (morph+spin):
+            that long a finger pressed near it sees the page walk its scroll
+            to hold the reader's line, and a plain touch crossing the spot
+            would otherwise read the page's own walk as the swipe's turn */}
+        <div className="rd-tpp-read" ref={swipeMark} data-rd-swipe-self=""
+          onTouchStart={() => {
+            window.__rdScrollAnchor = true;
+            clearTimeout(window.__rdScrollAnchorT);
+            window.__rdScrollAnchorT = setTimeout(() => { window.__rdScrollAnchor = false; }, 700);
+          }}>
           <div className="rd-tpp-side rd-a">
             <span className="rd-tpp-name" style={{ color: inkOf(m.a.color) }}><span className="rd-tpp-dot" style={{ background: m.a.color }}></span>{m.a.name}</span>
             <RollNum className="rd-tpp-num" value={latest.a.toFixed(1)} style={{ color: inkOf(m.a.color) }} spinIn />

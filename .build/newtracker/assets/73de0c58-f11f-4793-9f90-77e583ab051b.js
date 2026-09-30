@@ -2157,6 +2157,29 @@ function App() {
       if (window.visualViewport && window.visualViewport.scale > 1.01) return;
       const t = e.touches[0];
       if (t.clientX < EDGE || t.clientX > window.innerWidth - EDGE) return;
+      /* a piece of surface landing its own claim owns the touch outright:
+         exact by target, so nothing measured - no row's reach and no
+         card's chart - gets to second-guess where the finger meant. The
+         hero's 2PP figures flip the contest (they carry __rdSwipe); the
+         lead scale directly under them claims itself but flips nothing -
+         a swipe on it does nothing at all, not even the page's turn */
+      const self = e.target && e.target.closest ? e.target.closest("[data-rd-swipe-self]") : null;
+      if (self) {
+        /* no __rdSwipe = a spoken-for surface that does nothing: absorb */
+        if (!self.__rdSwipe) return;
+        g = { x: t.clientX, y: t.clientY, t: Date.now(), selfScroll: true, row: self };
+        return;
+      }
+      /* while the figures strip's own flip is settling (morph+spin), the
+         page's scroll anchor walks scrollY under a finger still held near
+         the strip - a plain touch crossing the spot then reads the page's
+         own walk as the swipe's turn. The strip arms the anchor for that
+         beat; let onEnd swallow the gesture (free) rather than gate on a
+         scrollY the page itself is moving */
+      if (window.__rdScrollAnchor) {
+        g = { x: t.clientX, y: t.clientY, t: Date.now(), sy: window.scrollY, row: null, free: true };
+        return;
+      }
       /* an exact claimer (the hero's 2PP card) takes a touch that lands on
          its chart, whatever sideways claims stand between it and the page;
          the card absorbs the rest of its own surface too - a swipe on the
@@ -2177,6 +2200,8 @@ function App() {
       const t = e.changedTouches[0];
       const dx = t.clientX - s.x, dy = t.clientY - s.y;
       if (Math.abs(dx) < MIN_DX || Math.abs(dy) > Math.abs(dx) * 0.5) return;
+      if (s.selfScroll) s.sy = window.scrollY;   // the self-claim pins its reference now (see onStart)
+      if (s.free) return;                        // anchor-armed: the page walked the scroll itself; never a swipe
       if (Date.now() - s.t > MAX_MS || Math.abs(window.scrollY - s.sy) > 12) return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;       // the finger was selecting text
