@@ -798,7 +798,10 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
   body.rd .rd-pl-foot1 b { font-weight: 600; color: var(--ink); }
   body.rd .rd-pl-foot1 .missed, body.rd .rd-pl-foot1 .missed b { color: var(--mood-neg); }
   body.rd .rd-pl-main { font-size: 15px; }
-  body.rd .rd-pl-c-figs .rd-pl-main { font-size: 17px; }
+  /* the figures stack right-aligns by anchoring; .rd-pl-main is a flex box, so
+     its text never sees the cell's text-align: when the sub line sets the
+     width the main line's text parked at the left (leadership ppm readouts) */
+  body.rd .rd-pl-c-figs .rd-pl-main { font-size: 17px; justify-content: flex-end; }
   body.rd .rd-pl-c-figs .rd-pl-main .rd-pl-tag { display: none; }
   body.rd .rd-pl-c-figs .rd-pl-sub .rd-pl-tag { margin-left: 0; margin-right: 8px; }
   body.rd .rd-pl-long { display: none; }

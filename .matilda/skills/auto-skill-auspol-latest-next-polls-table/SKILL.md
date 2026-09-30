@@ -94,6 +94,28 @@ concluding "no animation". Trap: synthetic `btn.click()` doesn't set
 real `page.mouse.click` and `scrollIntoView({block:"center"})` + ~300ms
 settle first.
 
+## The phone main-line alignment trap (fixed 2026-10-01)
+
+User report: on phone, leadership rows' "Albanese x–y Taylor" ppm strings
+left-aligned for SOME houses (Newspoll, DemosAU, RedBridge + Spectre's "No
+preferred-PM question" fallback), right-aligned for others. Mechanism: the
+phone figs cell is a flex column with `align-items: flex-end; text-align:
+right` (rd.css 900px block), and `.rd-pl-lead`/`.rd-pl-fig` inside it
+STRETCH to the widest of their two lines (main ppm vs sub net-approval).
+`text-align: right` reaches the plain-block `.rd-pl-sub`'s inline text but
+NEVER `.rd-pl-main`'s text: base rd.css gives `.rd-pl-c-figs .rd-pl-main`
+`display: inline-flex`, so its content is flex items packed at
+`justify-content: flex-start` = LEFT. Any row whose sub line is the wider
+of the two parked its main line left — hence only some houses. Fix is ONE
+property in the 900px block: `.rd-pl-c-figs .rd-pl-main { justify-content:
+flex-end; }` — do NOT try `text-align` on a flex main line (inert), and
+keep the rule media-gated: desktop's computed jc is `normal` and the
+change must not leak (probe trap: computed jc default is `normal`, NOT
+`flex-start` — a `=== "flex-start"` desktop gate false-fails). Pinned by
+probe `.matilda/pl-lead-align.mjs` (scratch): ranges every row's
+main/sub text rects vs the cell's right edge at 390px on Leadership AND
+2PP, plus the desktop gate.
+
 ## The figures-population timing (user-complaint fix 9a87ded, 2026-09-30)
 
 User report: the table's figures column ("Labor v One Nation",
