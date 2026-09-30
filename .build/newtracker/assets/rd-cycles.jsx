@@ -233,15 +233,25 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
   );
 }
 
+/* The combined L/NP + One Nation primary is a summary-table-only measure,
+   derived row by row rather than shipped as a series: the opposition
+   overlay's own rules - a month joins only where BOTH parties were
+   measured, and the change anchor is the two results summed (the
+   overlaySeries block in the tabbed-views layer). Terms whose polls never
+   split One Nation out (2010, 2013) have a null-padded raw.onp, so they
+   carry no combined reading and simply drop out of the strip. */
+const combSeries = (c) => c.raw.months.map((_, i) => (c.raw.oppr[i] != null && (c.raw.onp || [])[i] != null ? +(c.raw.oppr[i] + c.raw.onp[i]).toFixed(2) : null));
+const seriesOf = (c, key) => (key === "comb" ? combSeries(c) : (c.raw[key] || []));
+const cycBaseOf = (c, key) => (key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : cycBase(c, key));
 /* the past terms at one month for one measure: the same pooled set the band
    draws, with who each value belongs to */
 function rdCycPeers(M, cycles, hidden, chg, m) {
-  const hasData = (c) => (c.raw[M.key] || []).some((v) => v != null);
+  const hasData = (c) => seriesOf(c, M.key).some((v) => v != null);
   const vals = [];
   cycles.filter((c) => !c.current && !hidden.has(c.year) && hasData(c)).forEach((c) => {
-    const p = toMonthly(c.raw.months, c.raw[M.key], c.span)[m];
+    const p = toMonthly(c.raw.months, seriesOf(c, M.key), c.span)[m];
     if (!p || p.y == null) return;
-    vals.push({ v: chg ? +(p.y - cycBase(c, M.key)).toFixed(2) : p.y, who: cycHolderAt(c, M, m), yr: c.year, c });
+    vals.push({ v: chg ? +(p.y - cycBaseOf(c, M.key)).toFixed(2) : p.y, who: cycHolderAt(c, M, m), yr: c.year, c });
   });
   if (!vals.length) return null;
   vals.sort((a, b) => a.v - b.v);
@@ -295,7 +305,18 @@ function RdPastCycles(p) {
   const m = cur ? cur.span : 0;
   const Mby = {};
   CYC_METRICS.forEach((M) => { Mby[M.key] = M; });
-  const curOf = (key) => (chg ? cur.end[key] - cycBase(cur, key) : cur.end[key]);
+  /* the summary's two extra vote rows are not CYC_METRICS measures: One
+     Nation's own primary (shipped as each term's raw.onp) and the L/NP + ON
+     sum (derived - combSeries above). leader:"opp" makes the combined row's
+     "who" name the era's opposition leader, as the opposition row's does. */
+  Mby.onp = { key: "onp", unit: "%" };
+  Mby.comb = { key: "comb", leader: "opp", unit: "%" };
+  /* a half-measured month never becomes a half-total: the combined now
+     figure renders a dash when either party's is missing */
+  const endOfKey = (c, key) => (key === "comb"
+    ? (c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null)
+    : c.end[key]);
+  const curOf = (key) => { const v = endOfKey(cur, key); return v == null ? null : (chg ? v - cycBaseOf(cur, key) : v); };
   const peersOf = (key) => rdCycPeers(Mby[key], cycles, hidden, chg, m);
   const fmtOf = (key) => (v) => (Mby[key].unit === "%" && !chg ? v.toFixed(1) : rdSgn(v, false));
   const govName = D.PARTIES[cur.gov].name, oppName = D.PARTIES[cur.opp].name;
@@ -328,12 +349,17 @@ function RdPastCycles(p) {
     { key: "tpp", name: "Two-party preferred", sub: govName + ", against " + rivalWord.replace(/^the /, "the "), group: "votes", color: cur.color },
     { key: "primary", name: "Government’s primary vote", sub: govName, group: "votes", color: cur.color },
     { key: "oppr", name: "Opposition’s primary vote", sub: rdCap(oppIn), group: "votes", color: D.PARTIES[cur.opp].color },
+    { key: "onp", name: "One Nation’s primary vote", sub: "Pauline Hanson’s party", group: "votes", color: D.PARTIES.onp.color },
+    /* the non-government right's combined first preference: the opposition's
+       own plus One Nation's. ink-2 like the combined overlay line - no one
+       party owns a sum of two */
+    { key: "comb", name: "L/NP + ON combined primary vote", sub: "The Coalition and One Nation, together", group: "votes", color: "var(--ink-2)" },
     { key: "ppmm", name: "Preferred PM, lead", sub: pm + " over " + oppL, group: "leaders", color: cur.color },
     { key: "net", name: "Prime minister’s net approval", sub: pm, group: "leaders", color: cur.color },
     { key: "oppnet", name: "Opposition leader’s net approval", sub: oppL, group: "leaders", color: D.PARTIES[cur.opp].color },
   ].map((r) => {
     const peers = peersOf(r.key);
-    const v = cur.end[r.key] != null ? curOf(r.key) : null;
+    const v = curOf(r.key);
     return { ...r, peers, v, fmt: fmtOf(r.key), rank: peers && v != null ? rdCycRank(peers, v, fmtOf(r.key)) : null };
   });
   const scaleOf = (group) => {
@@ -509,7 +535,9 @@ function RdPastCycles(p) {
 
   /* ---- the summary table --------------------------------------------------------- */
   const goTo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
-  const SEC = { tpp: "cyc-tpp", primary: "cyc-primary", oppr: "cyc-primary", ppmm: "cyc-leaders", net: "cyc-leaders", oppnet: "cyc-leaders" };
+  /* One Nation and the combined row belong to the primary section: its
+     opposition chart draws these very series when its boxes are ticked */
+  const SEC = { tpp: "cyc-tpp", primary: "cyc-primary", oppr: "cyc-primary", onp: "cyc-primary", comb: "cyc-primary", ppmm: "cyc-leaders", net: "cyc-leaders", oppnet: "cyc-leaders" };
   const summary = (
     <div className="rd-cs" role="table" aria-label={"Every measure " + m + " months in, against past terms at the same point"}>
       <div className="rd-cs-head" role="row">

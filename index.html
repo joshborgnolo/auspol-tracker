@@ -70491,14 +70491,17 @@ function RdCycleChart({
     list: badges.list
   }));
 }
+const combSeries = c => c.raw.months.map((_, i) => c.raw.oppr[i] != null && (c.raw.onp || [])[i] != null ? +(c.raw.oppr[i] + c.raw.onp[i]).toFixed(2) : null);
+const seriesOf = (c, key) => key === "comb" ? combSeries(c) : c.raw[key] || [];
+const cycBaseOf = (c, key) => key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : cycBase(c, key);
 function rdCycPeers(M, cycles, hidden, chg, m) {
-  const hasData = c => (c.raw[M.key] || []).some(v => v != null);
+  const hasData = c => seriesOf(c, M.key).some(v => v != null);
   const vals = [];
   cycles.filter(c => !c.current && !hidden.has(c.year) && hasData(c)).forEach(c => {
-    const p = toMonthly(c.raw.months, c.raw[M.key], c.span)[m];
+    const p = toMonthly(c.raw.months, seriesOf(c, M.key), c.span)[m];
     if (!p || p.y == null) return;
     vals.push({
-      v: chg ? +(p.y - cycBase(c, M.key)).toFixed(2) : p.y,
+      v: chg ? +(p.y - cycBaseOf(c, M.key)).toFixed(2) : p.y,
       who: cycHolderAt(c, M, m),
       yr: c.year,
       c
@@ -70598,7 +70601,20 @@ function RdPastCycles(p) {
   CYC_METRICS.forEach(M => {
     Mby[M.key] = M;
   });
-  const curOf = key => chg ? cur.end[key] - cycBase(cur, key) : cur.end[key];
+  Mby.onp = {
+    key: "onp",
+    unit: "%"
+  };
+  Mby.comb = {
+    key: "comb",
+    leader: "opp",
+    unit: "%"
+  };
+  const endOfKey = (c, key) => key === "comb" ? c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null : c.end[key];
+  const curOf = key => {
+    const v = endOfKey(cur, key);
+    return v == null ? null : chg ? v - cycBaseOf(cur, key) : v;
+  };
   const peersOf = key => rdCycPeers(Mby[key], cycles, hidden, chg, m);
   const fmtOf = key => v => Mby[key].unit === "%" && !chg ? v.toFixed(1) : rdSgn(v, false);
   const govName = D.PARTIES[cur.gov].name,
@@ -70650,6 +70666,18 @@ function RdPastCycles(p) {
     group: "votes",
     color: D.PARTIES[cur.opp].color
   }, {
+    key: "onp",
+    name: "One Nation’s primary vote",
+    sub: "Pauline Hanson’s party",
+    group: "votes",
+    color: D.PARTIES.onp.color
+  }, {
+    key: "comb",
+    name: "L/NP + ON combined primary vote",
+    sub: "The Coalition and One Nation, together",
+    group: "votes",
+    color: "var(--ink-2)"
+  }, {
     key: "ppmm",
     name: "Preferred PM, lead",
     sub: pm + " over " + oppL,
@@ -70669,7 +70697,7 @@ function RdPastCycles(p) {
     color: D.PARTIES[cur.opp].color
   }].map(r => {
     const peers = peersOf(r.key);
-    const v = cur.end[r.key] != null ? curOf(r.key) : null;
+    const v = curOf(r.key);
     return {
       ...r,
       peers,
@@ -70848,6 +70876,8 @@ function RdPastCycles(p) {
     tpp: "cyc-tpp",
     primary: "cyc-primary",
     oppr: "cyc-primary",
+    onp: "cyc-primary",
+    comb: "cyc-primary",
     ppmm: "cyc-leaders",
     net: "cyc-leaders",
     oppnet: "cyc-leaders"
