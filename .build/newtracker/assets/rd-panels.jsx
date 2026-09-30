@@ -2066,16 +2066,15 @@ function RdIssues({ rangeId = "all" }) {
   const trHover = React.useRef(false);
   const trGrid = React.useRef(null);
   /* live hover stepper for the trust rows: assigned every render so the key
-     handler's closure never goes stale, and returns false at the list's ends
-     so the claim bails before preventDefault (the key keeps its day job —
-     scrolling the page — when the walk can't step) */
+     handler's closure never goes stale, and returns false only when there's
+     no walk to make (the key keeps its day job — scrolling the page — then);
+     the walk is circular, like every other claimed row */
   const trStep = React.useRef(null);
   trStep.current = (dir) => {
     const list = I && I.list ? I.list : [];
     if (list.length < 2) return false;
     const cur = selNow && list.some((x) => x.id === selNow) ? selNow : list[0].id;
-    const j = list.findIndex((x) => x.id === cur) + dir;
-    if (j < 0 || j >= list.length) return false;
+    const j = (list.findIndex((x) => x.id === cur) + dir + list.length) % list.length;
     setSel(list[j].id);
     return true;
   };
@@ -2243,14 +2242,14 @@ function RdIssues({ rangeId = "all" }) {
     : { text: "No clear lead" };
   /* keyboard walk over the issue rows: with a row focused, ArrowDown/ArrowUp
      step the selection a row at a time, focus following (a held key keeps
-     walking), clamped at the list's ends */
+     walking), circular at the list's ends (down on the last row lands on
+     the first, as the hover claim's walk does) */
   const rowKey = (e, x) => {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSel(x.id); return; }
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
     const i = list.findIndex((y) => y.id === x.id);
-    const j = i + (e.key === "ArrowDown" ? 1 : -1);
-    if (j < 0 || j >= list.length) return;
+    const j = (i + (e.key === "ArrowDown" ? 1 : -1) + list.length) % list.length;
     setSel(list[j].id);
     const rows = rowsRef.current ? rowsRef.current.querySelectorAll(".rd-is-row:not(.rd-is-tally)") : [];
     if (rows[j]) rows[j].focus();
