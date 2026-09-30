@@ -1224,6 +1224,37 @@ function RdDemographics({ rangeId = "all" }) {
   };
   const pickTab = (id) => { pinWv(); setTab(id); };
   const pickParty = (v) => { pinWv(); chooseParty(v); };
+  /* hovering the panel hands the arrow keys to the group row (as the
+     focused row's own walk does) until the pointer leaves */
+  const wvHover = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById("who-votes");
+    if (!sec) return undefined;
+    const enter = () => { wvHover.current = true; };
+    const leave = () => { wvHover.current = false; };
+    wvHover.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const key = (e) => {
+      if (!wvHover.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const list = (T.tabs || []).map((x) => x.id);
+      const i = list.indexOf(tabId);
+      if (i < 0 || list.length < 2) return;
+      e.preventDefault();
+      pickTab(list[(i + (e.key === "ArrowRight" ? 1 : -1) + list.length) % list.length]);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [tabId]);
   /* each party's charts, built once per grouping and range: a switch
      re-renders every frame, and rebuilding both parties' lines and poll
      dots (a pass over every poll) on each one starved the dot plot's own
@@ -2014,6 +2045,59 @@ function RdIssues({ rangeId = "all" }) {
   /* the issues rows' container, so an arrow key can hand focus to the row it
      just selected */
   const rowsRef = React.useRef(null);
+  /* hovering the section hands ←/→ to the view row; hovering the whom card
+     hands them to its group row instead (the deeper claim wins in the key
+     handler). All hooks sit above the early return below. */
+  const isHover = React.useRef(false);
+  const iwHover = React.useRef(false);
+  const iwCard = React.useRef(null);
+  React.useEffect(() => {
+    const sec = document.getElementById("issues");
+    if (!sec) return undefined;
+    const on = (el, ref) => {
+      const enter = () => { ref.current = true; };
+      const leave = () => { ref.current = false; };
+      ref.current = el.matches(":hover");
+      el.addEventListener("pointerenter", enter);
+      el.addEventListener("pointerleave", leave);
+      return [el, enter, leave];
+    };
+    const pairs = [on(sec, isHover)];
+    if (iwCard.current) pairs.push(on(iwCard.current, iwHover));
+    else iwHover.current = false;
+    const key = (e) => {
+      if ((!isHover.current && !iwHover.current) || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const G = I && I.groups;
+      if (iwHover.current && view === "whom" && G && G.tabs) {
+        const iw = iwCard.current;
+        if (!iw || !iw.isConnected || !iw.getClientRects().length) return;
+        const list = G.tabs.map((x) => x.id);
+        const i = list.indexOf(gsetId);
+        if (i < 0 || list.length < 2) return;
+        e.preventDefault();
+        pickGset(list[(i + (e.key === "ArrowRight" ? 1 : -1) + list.length) % list.length]);
+      } else if (isHover.current) {
+        const vs = ["trust", "whom"];
+        const i = vs.indexOf(view);
+        if (i < 0) return;
+        e.preventDefault();
+        setView(vs[(i + (e.key === "ArrowRight" ? 1 : -1) + vs.length) % vs.length]);
+      }
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      pairs.forEach(([el, enter, leave]) => {
+        el.removeEventListener("pointerenter", enter);
+        el.removeEventListener("pointerleave", leave);
+      });
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [view, gsetId, I]);
   const stripW = useRdWidth(stripRef, 150);
   if (!I || !I.list || !I.list.length) return null;
   const P = I.parties;
@@ -2320,7 +2404,7 @@ function RdIssues({ rangeId = "all" }) {
         <>
           <RdHed head={whomHead} dek={gVerdicts.length ? gVerdicts.map((v) => v.text).join(" ") : "No two groups differ significantly on any of these issues."} />
           {gtab ? (
-            <div className="card rd-card rd-iw">
+            <div className="card rd-card rd-iw" ref={iwCard}>
               {whomList ? (
                 /* a tablet or phone: pick the groups and the issue, and read
                    every group's share of that one issue down a single scale */
@@ -2430,6 +2514,42 @@ function RdUndecided({ rangeId }) {
   const narrow = useNarrow("(max-width: 640px)");
   const [view, setView] = useState("all");
   const U = D.undecided;
+  /* hovering the panel hands the arrow keys to the views row (the hooks sit
+     above the early return, so the id list is computed from the data here,
+     where `views` isn't in scope yet) */
+  const unHover = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById("undecided");
+    if (!sec || !U || !U.series || !U.series.length) return undefined;
+    const enter = () => { unHover.current = true; };
+    const leave = () => { unHover.current = false; };
+    unHover.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const ids = ["all"]
+      .concat(D.firmness ? ["party"] : [])
+      .concat(U.softAge ? ["age"] : []);
+    const key = (e) => {
+      if (!unHover.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const i = ids.indexOf(view);
+      if (i < 0 || ids.length < 2) return;
+      e.preventDefault();
+      const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
+      rdPinScroll(document.getElementById("undecided") && document.getElementById("undecided").querySelector(".rd-un-tabs"));
+      setView(nxt);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [U, D, view]);
   if (!U || !U.series.length) return null;
   const F = D.firmness, A = U.softAge;
   const byId = {};
