@@ -1131,10 +1131,10 @@ const RD_DEMO_SHORT = {
    pool, so refresh these by hand when the pool moves, as with RD_DEMO_SHORT */
 const RD_DEMO_HOME = {
   onp: "One Nation voters are more likely to be 55+, TAFE- or trade-qualified, and rural; less likely to live in Victoria or speak a language other than English at home",
-  alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial",
+  alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial; less likely to live in the eastern mainland states, especially Queensland",
   lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, and outright homeowners",
   grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
-  oth: "Voters for others & independents are more likely to be Gen Z, renting, and NSW-based; less likely to live in provincial areas or have a mortgage",
+  oth: "Voters for others & independents are more likely to be Gen Z and renting; less likely to live in provincial areas",
 };
 /* the usual (Pew) birth years behind the polls' generation labels: neither
    pollster publishes its own, so the "By generation" dot-plot labels bracket
@@ -1857,7 +1857,7 @@ function RdSwitching({ rangeId }) {
   const loC = hiC ? (hiC === lnp ? alp : lnp) : null;
   const nm = (c) => (c.id === "lnp" ? "Coalition" : "Labor");
   const head = hiC ? rdCap(plainShare(hiC.rate)) + " 2025 " + nm(hiC) + " voters now back One Nation" : null;
-  const gainOf = top ? rdCap(rdFraction(top.gain)) + " of One Nation’s new voters backed " + (top.id === "lnp" ? "the Coalition" : top.id === "alp" ? "Labor" : top.id === "grn" ? "the Greens" : "another party") + " in 2025." : "";
+  const gainOf = top ? rdCap(rdFraction(top.gain)) + " of One Nation’s new voters voted for " + (top.id === "lnp" ? "the Coalition" : top.id === "alp" ? "Labor" : top.id === "grn" ? "the Greens" : "another party") + " in 2025." : "";
   const dek = (!hiC || !loC) ? null
     : nm(hiC) + " voters have flocked to One Nation at about " + (Math.round(hiC.rate / loC.rate * 4) / 4) + " times the rate of " + nm(loC) + " voters. "
     + gainOf;
