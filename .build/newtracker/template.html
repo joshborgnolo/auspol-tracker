@@ -462,7 +462,7 @@ body.js.ss-view #root { display: none; }
    dial-only button, so the ellipse replaces it. border-radius shapes the
    hit target as well as the paint, so the corners' dead air no longer
    fires the player either. */
-button.wm-glyph { border-radius: 50%; }
+button.wm-glyph { border-radius: 50%; -webkit-tap-highlight-color: transparent; /* the mobile tap flash, clipped to the ellipse, is the grey oval again */ }
 /* …and the dial grows NO hover shape: clipped to the ellipse, the shared
    6% ink wash reads as a grey oval swimming behind the gauge, so the main
    page fills the button with nothing on hover and lets the scale alone
