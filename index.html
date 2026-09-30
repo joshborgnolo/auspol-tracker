@@ -62948,7 +62948,7 @@ function rdPinScroll(row, fine) {
   };
   const fix = () => {
     if (!reseat()) return;
-    const drift = row.getBoundingClientRect().top - want;
+    const drift = Math.round(row.getBoundingClientRect().top - want);
     if (drift) {
       window.scrollBy(0, drift);
       lastY = window.scrollY;
@@ -62990,7 +62990,7 @@ function rdPinScroll(row, fine) {
     const was = row.isConnected ? row.getBoundingClientRect().top : 0;
     rdPinThaw();
     if (!row.isConnected) return;
-    const shift = row.getBoundingClientRect().top - was;
+    const shift = Math.round(row.getBoundingClientRect().top - was);
     if (shift) {
       window.scrollBy(0, shift);
       lastY = window.scrollY;

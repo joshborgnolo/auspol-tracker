@@ -311,9 +311,20 @@ function rdPinScroll(row, fine) {
     want = next[1];
     return true;
   };
+  /* scroll corrections go out as WHOLE css pixels. WebKit's root scroller
+     quantises a programmatic scroll to integer css px (a fractional
+     scrollBy truncates away and never lands), while getBoundingClientRect
+     returns fractions: an un-rounded chase asks for the same sub-pixel
+     drift every frame, and where the engine's own rounding does apply -
+     the thaw correction below, one hop's boundary case - each landing
+     leaks ~1px into the settled scroll position (the Safari facet-walk
+     crawl, round 4: the page walked down 1px per lap forever). Rounding
+     parks the pin within half a css px of its anchor, sub-device-pixel at
+     any dpr, and the residual no longer compounds hop to hop. Blink's
+     half-pixel scroll fidelity is not worth keeping over that. */
   const fix = () => {
     if (!reseat()) return;
-    const drift = row.getBoundingClientRect().top - want;
+    const drift = Math.round(row.getBoundingClientRect().top - want);
     if (drift) { window.scrollBy(0, drift); lastY = window.scrollY; }
   };
   /* freezing can itself nudge the row a few px (a freshly clipped box
@@ -368,7 +379,10 @@ function rdPinScroll(row, fine) {
     const was = row.isConnected ? row.getBoundingClientRect().top : 0;
     rdPinThaw();
     if (!row.isConnected) return;
-    const shift = row.getBoundingClientRect().top - was;
+    /* whole-css-px here too - the fix() comment above has the WebKit
+       quantisation story (this hop's boundary case is where its rounder
+       was biting the walk a pixel a lap) */
+    const shift = Math.round(row.getBoundingClientRect().top - was);
     if (shift) { window.scrollBy(0, shift); lastY = window.scrollY; }
   };
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;

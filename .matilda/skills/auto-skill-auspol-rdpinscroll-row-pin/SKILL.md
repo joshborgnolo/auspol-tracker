@@ -847,3 +847,72 @@ class (`anchor=rd-ap-table`) and that per-facet rest positions are
 periodic over a full lap — a lap that doesn't sum to zero means some
 anchor is content-keyed.
 
+## Round 4 — WebKit quantises fractional scrolls; round every correction (2026-10-01)
+
+User report after round 3 shipped: "a lot better now, but there's
+still small drift on 2pp and primary views only — consistently down,
+same small amount" — walking down **forever**, at any pace, table-row
+focused, **Safari only** (Chrome clean). Chrome probes (creep walk 8
+laps, ping-pong twopp↔primary 16 pairs, 400ms chains, shallow parks)
+were all pixel-exact periodic before AND after, so Chrome could never
+see it. Drove Safari's engine with **Playwright WebKit** (cached
+builds live at `~/Library/Caches/ms-playwright/webkit-*`;
+playwright-core installed OUTSIDE the repo at
+`~/.matilda-tooling/pw` since the repo's package files are shared —
+`node dbg-ap-webkit.mjs`): the creep reproduced immediately, **exactly
+−1 css px of scrollY per full facet lap**, unbounded.
+
+Wrapped `scrollBy/scrollTo/scroll` + the scroll EVENT in-page
+(`dbg-ap-scroll.mjs`) nailed the mechanism — **WebKit's root scroller
+quantises programmatic scrolls to whole css px** (its `window.scrollY`
+is always an integer) while `getBoundingClientRect()` returns
+fractions:
+
+1. `scrollBy(0, -181.344)` truncates to −182. Then fix() chases the
+   residual `scrollBy(0, 0.656)` **every rAF for the whole 560ms
+   window** — the target `1568 + 0.656` truncates to 1568, nothing
+   moves, drift stays 0.656 forever (~40 wasted scroll calls/hop).
+2. At `done()` the thaw correction `scrollBy(0, shift)` runs the same
+   machine over the accumulated sub-pixel offset; where it rounds to a
+   full pixel it applies the integer — each landing parks up to 1px
+   off its anchor's fractional ideal, and hop-to-hop the truncations
+   drain one way: −1px/lap, monotonic, matching the user's "2pp and
+   primary only" reading (those are the two landings whose fixed-point
+   constellation sat on the draining side).
+
+**The twist: every element above the table measured CONSTANT across
+hops** (tabs/bar/tops byte-identical per facet — `dbg-ap-culprit2.mjs`
+tracking tab line-boxes with the text-node-range trick). Nothing
+grew; the DOCUMENT never changed. It was scroll-quantisation leak,
+not layout — the "engorgement"/CSSOM-injection family (round-3.5
+theory, text-transform+line-height surgery on UA btn styles — real
+behaviour in WebKit, mini-repro `dbg-ap-cssom.mjs`: bare `font:inherit`
+btn under `text-transform:uppercase` picks up line-height and shifts
++0.39–0.55px where Blink holds CSS px) was investigated and cleared:
+no updated uppercase rule with positive line-height matches the page,
+and the constant-above-table data contradicted it before any website
+CSSOM archaeology. If a WebKit-only +Npx/hop symptom ever IS content,
+that CSSOM twist is the first suspect — but check geometry first.
+
+**Fix** (rd.jsx): every pin scroll correction — `fix()`'s drift AND
+`done()`'s thaw shift — is `Math.round`'d to a whole css px before
+`scrollBy`. The residual parks ≤0.5 css px (sub-device-pixel), stays
+static (a rounded zero drift issues no call), and truncation can no
+longer leak per hop. Blink's half-pixel scroll fidelity is not worth
+keeping over that. Post-fix WebKit: 6 laps at 950ms AND 400ms cadence
+land every facet at its exact rest position every lap; Chrome's
+constellation unchanged (twopp tbl −1130.77 / primary −1131.11,
+pre- and post-fix identical); panels/cycles pin probes still `ok`.
+
+Probe kit for the next round of "only Safari drifts": webkit engine
+via playwright-core from `~/.matilda-tooling/pw` (**never** add it to
+the repo's package.json); `dbg-ap-webkit.mjs CAD` (facet walk,
+per-hop y+tbl+tabs), `dbg-ap-scroll.mjs` (wrapped scroll APIs +
+scroll EVENT with before/after — a scrollY that moves with NO JS
+scroll call is the engine; a fractional scrollBy that lands nothing
+is quantisation), `dbg-ap-culprit2.mjs` (fixed-selector height/top
+tracking — kills "something is growing" theories in one run). Real
+Safari needs `safaridriver` but enabling it is interactive sudo —
+webkit has matched every Safari scroll-anchoring behaviour so far
+(Safari also lacks overflow-anchor and paints rAF scrolls late).
+
