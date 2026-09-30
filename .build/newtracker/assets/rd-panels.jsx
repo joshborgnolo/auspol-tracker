@@ -1224,8 +1224,9 @@ function RdDemographics({ rangeId = "all" }) {
   };
   const pickTab = (id) => { pinWv(); setTab(id); };
   const pickParty = (v) => { pinWv(); chooseParty(v); };
-  /* hovering the panel hands the arrow keys to the group row (as the
-     focused row's own walk does) until the pointer leaves */
+  /* hovering the panel hands the arrow keys to the group row and the 1..5
+     keys to the party chips (as their focused walks do) until the pointer
+     leaves */
   const wvHover = React.useRef(false);
   React.useEffect(() => {
     const sec = document.getElementById("who-votes");
@@ -1236,12 +1237,22 @@ function RdDemographics({ rangeId = "all" }) {
     sec.addEventListener("pointerenter", enter);
     sec.addEventListener("pointerleave", leave);
     const key = (e) => {
-      if (!wvHover.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (!wvHover.current) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
+      if (e.key >= "1" && e.key <= "9") {
+        /* the chips' own rdDigitKey mapping, at the panel's reach: 1..5
+           picks a party, 6..9 finds no chip and keeps its day job */
+        const pp = DEMO_PARTIES[e.key.charCodeAt(0) - 48 - 1];
+        if (!pp) return;
+        e.preventDefault();
+        pickParty(pp.id);
+        return;
+      }
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
       const list = (T.tabs || []).map((x) => x.id);
       const i = list.indexOf(tabId);
       if (i < 0 || list.length < 2) return;
@@ -2047,10 +2058,27 @@ function RdIssues({ rangeId = "all" }) {
   const rowsRef = React.useRef(null);
   /* hovering the section hands ←/→ to the view row; hovering the whom card
      hands them to its group row instead (the deeper claim wins in the key
-     handler). All hooks sit above the early return below. */
+     handler); hovering the trust grid hands ↑/↓ to the issue rows' walk.
+     All hooks sit above the early return below. */
   const isHover = React.useRef(false);
   const iwHover = React.useRef(false);
   const iwCard = React.useRef(null);
+  const trHover = React.useRef(false);
+  const trGrid = React.useRef(null);
+  /* live hover stepper for the trust rows: assigned every render so the key
+     handler's closure never goes stale, and returns false at the list's ends
+     so the claim bails before preventDefault (the key keeps its day job —
+     scrolling the page — when the walk can't step) */
+  const trStep = React.useRef(null);
+  trStep.current = (dir) => {
+    const list = I && I.list ? I.list : [];
+    if (list.length < 2) return false;
+    const cur = selNow && list.some((x) => x.id === selNow) ? selNow : list[0].id;
+    const j = list.findIndex((x) => x.id === cur) + dir;
+    if (j < 0 || j >= list.length) return false;
+    setSel(list[j].id);
+    return true;
+  };
   React.useEffect(() => {
     const sec = document.getElementById("issues");
     if (!sec) return undefined;
@@ -2065,13 +2093,26 @@ function RdIssues({ rangeId = "all" }) {
     const pairs = [on(sec, isHover)];
     if (iwCard.current) pairs.push(on(iwCard.current, iwHover));
     else iwHover.current = false;
+    if (trGrid.current) pairs.push(on(trGrid.current, trHover));
+    else trHover.current = false;
     const key = (e) => {
-      if ((!isHover.current && !iwHover.current) || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if ((!isHover.current && !iwHover.current && !trHover.current) || (e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "ArrowDown" && e.key !== "ArrowUp")) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        /* the trust rows' focused walk goes vertical; their column and its
+           chart share one grid, so the claim is the grid — the walk's effect
+           (selection → chart morph) reads across both */
+        if (!trHover.current || view !== "trust") return;
+        const trg = trGrid.current;
+        if (!trg || !trg.isConnected || !trg.getClientRects().length) return;
+        if (!trStep.current || !trStep.current(e.key === "ArrowDown" ? 1 : -1)) return;
+        e.preventDefault();
+        return;
+      }
       const G = I && I.groups;
       if (iwHover.current && view === "whom" && G && G.tabs) {
         const iw = iwCard.current;
@@ -2337,7 +2378,7 @@ function RdIssues({ rangeId = "all" }) {
       {view === "trust" ? (
         <>
           <RdHed head={trustHead} dek={trustDek} />
-          <div className="rd-is-grid">
+          <div className="rd-is-grid" ref={trGrid}>
             <div className="rd-is-left" ref={rowsRef}>
               {/* Each head sits over its own column: the strip's words over the
                   strip, the key over the three figures it colours (a phone stacks
