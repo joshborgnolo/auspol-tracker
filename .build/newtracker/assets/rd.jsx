@@ -123,12 +123,14 @@ function rdHoldSection(el, dh, ms) {
    compositor paints a script's scroll a frame late during a touch - so
    while a pin holds, nothing above the row resizes at all: each glide
    block hanging entirely over it freezes at its current height, its new
-   words already inside. When the pin lets go the freeze is cleared in one
-   frame and the pin answers the whole shift with a single scroll in that
-   same frame - the browser's own scroll-anchoring shape. No glide across
-   the boundary: an animated release moves content under the reader for
-   320ms with no fairness to correct it (a slow drift after the gesture,
-   worse than the staircase it replaced). */
+   words already inside. (Boxes ON the screen are the exception: outside a
+   hot sideways touch they reflow live, since a frozen visible paragraph
+   reads sliced at the freeze line.) When the pin lets go the freeze is
+   cleared in one frame and the pin answers the whole shift with a single
+   scroll in that same frame - the browser's own scroll-anchoring shape.
+   No glide across the boundary: an animated release moves content under
+   the reader for 320ms with no fairness to correct it (a slow drift after
+   the gesture, worse than the staircase it replaced). */
 let rdPinRaf = 0;
 let rdPinAnchorSave = null;
 let rdPinRO = null;
@@ -138,21 +140,41 @@ let rdPinLive = 0;
    position:sticky descendants scroll off like ordinary content, so any
    branch holding one stays unfrozen (its changes ride the RO fix below) */
 const RD_PIN_STICKY = ".tabs.sticky,.info-index,.rd-ap-headwrap,.poll-table thead th";
-/* was a finger down when the pin was raised? Scroll corrections made while
-   a touch is live paint a frame late on iOS, so a pin raised MID-GESTURE
-   must freeze even the on-screen boxes above the row - nothing over the row
-   may move, or iOS shows the row a frame from its spot. A pin from a click,
-   key or wheel paints its corrections cleanly, and there letting on-screen
-   text reflow live is kinder: a frozen paragraph on screen reads sliced at
-   the freeze line (past-cycles' dek did exactly that under a click pin).
-   The heat lingers a beat after lift: a swipe's range step is committed on
-   touchend, still inside the gesture's compositor run */
-let rdTouchHot = 0;
-window.addEventListener("touchstart", () => { rdTouchHot = performance.now() + 500; }, { passive: true });
-window.addEventListener("touchmove", () => { rdTouchHot = performance.now() + 220; }, { passive: true });
-const rdTouchLift = () => { rdTouchHot = performance.now() + 160; };
-window.addEventListener("touchend", rdTouchLift, { passive: true });
-window.addEventListener("touchcancel", rdTouchLift, { passive: true });
+/* did a SIDEWAYS touch drive this pin? Scroll corrections made while a
+   horizontal swipe is live paint a frame late on iOS, so a pin raised by a
+   swiping finger must freeze even the on-screen boxes above the row. A pin
+   from a click, key or TAP paints its corrections cleanly - and there
+   letting on-screen text reflow live is kinder: a frozen paragraph on
+   screen reads sliced at the freeze line (past-cycles' dek did exactly
+   that, and arming heat on touchstart alone meant every iPhone TAP on a
+   cycles pill fell inside the window and sliced it again). So the heat
+   mirrors the app's own page-swipe effect (MIN_DX, the sideways-dominance
+   gate): only a gesture that has actually SLID far enough sideward to be a
+   swipe counts. The end sets one last beat - the swipe effect commits its
+   step inside this same touchend dispatch */
+const RD_TOUCH_SLIDE_DX = 60;   // mirrors MIN_DX in the app swipe effect
+let rdTouchHot = 0, rdTouchFrom = null;
+window.addEventListener("touchstart", (e) => {
+  const t = e.touches && e.touches[0];
+  rdTouchFrom = e.touches && e.touches.length === 1 && t ? { x: t.clientX, y: t.clientY } : null;
+}, { passive: true });
+window.addEventListener("touchmove", (e) => {
+  if (!rdTouchFrom || e.touches.length !== 1) { rdTouchFrom = null; return; }
+  const t = e.touches[0];
+  const dx = t.clientX - rdTouchFrom.x, dy = t.clientY - rdTouchFrom.y;
+  if (Math.abs(dx) >= RD_TOUCH_SLIDE_DX && Math.abs(dy) <= Math.abs(dx) * 0.5)
+    rdTouchHot = performance.now() + 220;
+}, { passive: true });
+window.addEventListener("touchend", (e) => {
+  const t = e.changedTouches && e.changedTouches[0];
+  if (rdTouchFrom && t) {
+    const dx = t.clientX - rdTouchFrom.x, dy = t.clientY - rdTouchFrom.y;
+    if (Math.abs(dx) >= RD_TOUCH_SLIDE_DX && Math.abs(dy) <= Math.abs(dx) * 0.5)
+      rdTouchHot = performance.now() + 220;
+  }
+  rdTouchFrom = null;
+}, { passive: true });
+window.addEventListener("touchcancel", () => { rdTouchFrom = null; }, { passive: true });
 const rdPinClip = (row, rowTop) => {
   const held = rdPinHeld || (rdPinHeld = []);
   const freeze = (o, r) => {
@@ -163,11 +185,25 @@ const rdPinClip = (row, rowTop) => {
     o.style.height = r.height + "px";
     held.push(o);
   };
+  /* either freeze path - glide blocks here, chain walk below - applies the
+     same screen rule: a box wholly off the screen always freezes, but a
+     box ON the screen freezes only while a touch is hot. Mid-gesture its
+     reflow would paint a frame late as drift, while a click- or tap-raised
+     pin lets it reflow live: a frozen paragraph on screen reads sliced at
+     the freeze line, which past-cycles' dek did inside its OWN glide
+     wrapper's frozen parent until the sweep took the gate too. "On screen"
+     counts only content readable past the stuck tabs bar - a box squeezed
+     wholly into the bar's strip cannot be read (and freezing it is what
+     holds the pin cheap), so the strip freezes like off-screen content */
+  const barR = (() => { const b = document.querySelector(".tabs.sticky"); return b && b.getBoundingClientRect(); })();
+  const visTop = barR ? Math.min(barR.bottom, barR.height) : 0;
+  const onScreen = (r) => r.bottom > visTop + 6;
+  const freezeOnScreen = performance.now() < rdTouchHot;
   document.querySelectorAll(".rd-glide-in").forEach((i) => {
     const o = i.parentElement;
     if (!o) return;
     const r = o.getBoundingClientRect();
-    if (r.bottom > rowTop + 1) return;
+    if (r.bottom > rowTop + 1 || (!freezeOnScreen && onScreen(r))) return;
     freeze(o, r);
   });
   /* glide blocks are not the only movers: the vote cards' event list
@@ -176,20 +212,14 @@ const rdPinClip = (row, rowTop) => {
      So freeze EVERY earlier box along the row's ancestor chain (the
      sibling sections and cards above it) too: nothing over the row may
      resize while the pin holds, or iOS catches the row a frame from its
-     spot and paints the lurch no correction can call back. Boxes wholly
-     off the screen always freeze. A box actually ON the screen freezes
-     only while a touch is hot: mid-gesture its reflow would paint a
-     frame late as drift, while a click-raised pin lets it reflow live,
-     since a frozen paragraph on screen reads sliced at the freeze line
-     (past-cycles' dek did exactly that) */
-  const freezeOnScreen = performance.now() < rdTouchHot;
+     spot and paints the lurch no correction can call back */
   for (let node = row; node && node !== document.body;) {
     const parent = node.parentElement;
     if (!parent || parent === document.body) break;
     for (let sib = parent.firstElementChild; sib && sib !== node; sib = sib.nextElementSibling) {
       if (sib.__rdFrozen) continue;
       const r = sib.getBoundingClientRect();
-      if (!r.height || r.bottom > rowTop + 1 || (!freezeOnScreen && r.bottom > 0)) continue;
+      if (!r.height || r.bottom > rowTop + 1 || (!freezeOnScreen && onScreen(r))) continue;
       if (sib.matches(RD_PIN_STICKY) || sib.querySelector(RD_PIN_STICKY)) continue;
       freeze(sib, r);
     }

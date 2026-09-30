@@ -62722,24 +62722,44 @@ let rdPinRO = null;
 let rdPinHeld = null;
 let rdPinLive = 0;
 const RD_PIN_STICKY = ".tabs.sticky,.info-index,.rd-ap-headwrap,.poll-table thead th";
-let rdTouchHot = 0;
-window.addEventListener("touchstart", () => {
-  rdTouchHot = performance.now() + 500;
+const RD_TOUCH_SLIDE_DX = 60;
+let rdTouchHot = 0,
+  rdTouchFrom = null;
+window.addEventListener("touchstart", e => {
+  const t = e.touches && e.touches[0];
+  rdTouchFrom = e.touches && e.touches.length === 1 && t ? {
+    x: t.clientX,
+    y: t.clientY
+  } : null;
 }, {
   passive: true
 });
-window.addEventListener("touchmove", () => {
-  rdTouchHot = performance.now() + 220;
+window.addEventListener("touchmove", e => {
+  if (!rdTouchFrom || e.touches.length !== 1) {
+    rdTouchFrom = null;
+    return;
+  }
+  const t = e.touches[0];
+  const dx = t.clientX - rdTouchFrom.x,
+    dy = t.clientY - rdTouchFrom.y;
+  if (Math.abs(dx) >= RD_TOUCH_SLIDE_DX && Math.abs(dy) <= Math.abs(dx) * 0.5) rdTouchHot = performance.now() + 220;
 }, {
   passive: true
 });
-const rdTouchLift = () => {
-  rdTouchHot = performance.now() + 160;
-};
-window.addEventListener("touchend", rdTouchLift, {
+window.addEventListener("touchend", e => {
+  const t = e.changedTouches && e.changedTouches[0];
+  if (rdTouchFrom && t) {
+    const dx = t.clientX - rdTouchFrom.x,
+      dy = t.clientY - rdTouchFrom.y;
+    if (Math.abs(dx) >= RD_TOUCH_SLIDE_DX && Math.abs(dy) <= Math.abs(dx) * 0.5) rdTouchHot = performance.now() + 220;
+  }
+  rdTouchFrom = null;
+}, {
   passive: true
 });
-window.addEventListener("touchcancel", rdTouchLift, {
+window.addEventListener("touchcancel", () => {
+  rdTouchFrom = null;
+}, {
   passive: true
 });
 const rdPinClip = (row, rowTop) => {
@@ -62752,21 +62772,27 @@ const rdPinClip = (row, rowTop) => {
     o.style.height = r.height + "px";
     held.push(o);
   };
+  const barR = (() => {
+    const b = document.querySelector(".tabs.sticky");
+    return b && b.getBoundingClientRect();
+  })();
+  const visTop = barR ? Math.min(barR.bottom, barR.height) : 0;
+  const onScreen = r => r.bottom > visTop + 6;
+  const freezeOnScreen = performance.now() < rdTouchHot;
   document.querySelectorAll(".rd-glide-in").forEach(i => {
     const o = i.parentElement;
     if (!o) return;
     const r = o.getBoundingClientRect();
-    if (r.bottom > rowTop + 1) return;
+    if (r.bottom > rowTop + 1 || !freezeOnScreen && onScreen(r)) return;
     freeze(o, r);
   });
-  const freezeOnScreen = performance.now() < rdTouchHot;
   for (let node = row; node && node !== document.body;) {
     const parent = node.parentElement;
     if (!parent || parent === document.body) break;
     for (let sib = parent.firstElementChild; sib && sib !== node; sib = sib.nextElementSibling) {
       if (sib.__rdFrozen) continue;
       const r = sib.getBoundingClientRect();
-      if (!r.height || r.bottom > rowTop + 1 || !freezeOnScreen && r.bottom > 0) continue;
+      if (!r.height || r.bottom > rowTop + 1 || !freezeOnScreen && onScreen(r)) continue;
       if (sib.matches(RD_PIN_STICKY) || sib.querySelector(RD_PIN_STICKY)) continue;
       freeze(sib, r);
     }
