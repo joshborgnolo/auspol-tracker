@@ -62814,6 +62814,7 @@ let rdPinAnchorSave = null;
 let rdPinRO = null;
 let rdPinHeld = null;
 let rdPinLive = 0;
+let rdPinDone = null;
 const RD_PIN_STICKY = ".tabs.sticky,.info-index,.rd-ap-headwrap,.poll-table thead th";
 const RD_TOUCH_SLIDE_DX = 60;
 let rdTouchHot = 0,
@@ -62906,6 +62907,12 @@ const rdPinThaw = () => {
 function rdPinScroll(row, fine) {
   if (!row) return;
   if (!fine && window.matchMedia && !window.matchMedia("(pointer: coarse)").matches) return;
+  if (rdPinRaf !== 0 && rdPinDone) {
+    const end = rdPinDone;
+    rdPinDone = null;
+    cancelAnimationFrame(rdPinRaf);
+    end();
+  }
   const bar = document.querySelector(".tabs.sticky");
   const reserve = () => {
     const r = bar && bar.getBoundingClientRect();
@@ -62966,6 +62973,7 @@ function rdPinScroll(row, fine) {
   window.__rdPinObserve = hook;
   const done = () => {
     rdPinRaf = 0;
+    rdPinDone = null;
     if (rdPinRO) {
       rdPinRO.disconnect();
       rdPinRO = null;
@@ -63005,6 +63013,7 @@ function rdPinScroll(row, fine) {
     fix();
     if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);else done();
   };
+  rdPinDone = done;
   rdPinRaf = requestAnimationFrame(step);
 }
 function RdGlide({
@@ -66621,14 +66630,29 @@ function RdDemographics({
       if (!byRatio.has(r)) byRatio.set(r, []);
       byRatio.get(r).push(o);
     }
-    const outlierSentence = [...byRatio.values()].map(grp => {
+    const ratioGroups = [...byRatio.values()].map(grp => {
       const rep = grp.slice().sort((a, b) => Math.abs(b.d) - Math.abs(a.d))[0];
       const labels = grp.map(o => short(o.g));
       const listed = labels.length === 1 ? labels[0] : labels.length === 2 ? labels.join(" and ") : labels.slice(0, -1).join(", ") + " and " + labels[labels.length - 1];
-      const plural = labels.length > 1 || /s$/.test(labels[0]);
-      const verb = !plural || /^Gen/.test(grp[0].g.label) && labels.length === 1 ? "is" : "are";
-      return rdCap(listed) + " " + verb + " the " + (labels.length > 1 ? "outliers" : "outlier") + ", at " + rdFraction(rep.g.v[party]) + ".";
-    }).join(" ");
+      return {
+        grp,
+        labels,
+        listed,
+        frac: rdFraction(rep.g.v[party])
+      };
+    });
+    let outlierSentence = "";
+    if (ratioGroups.length === 1) {
+      const g0 = ratioGroups[0];
+      const plural = g0.labels.length > 1 || /s$/.test(g0.labels[0]);
+      const verb = !plural || /^Gen/.test(g0.grp[0].g.label) && g0.labels.length === 1 ? "is" : "are";
+      outlierSentence = rdCap(g0.listed) + " " + verb + " the " + (g0.labels.length > 1 ? "outliers" : "outlier") + ", at " + g0.frac + ".";
+    } else if (ratioGroups.length > 1) {
+      const items = ratioGroups.map(g => g.listed + ", at " + g.frac);
+      const anyAnd = ratioGroups.some(g => g.labels.length > 1);
+      const joined = items.length === 2 && !anyAnd ? items[0] + ", and " + items[1] : items.slice(0, -1).join("; ") + (items.length > 2 ? "; and " : "; ") + items[items.length - 1];
+      outlierSentence = "The outliers are " + joined + ".";
+    }
     if (outlierSentence) dek += " " + outlierSentence;
     const home = RD_DEMO_HOME[party];
     if (home) dek = dek ? rdCap(finding) + ". " + dek : rdCap(finding) + ".";

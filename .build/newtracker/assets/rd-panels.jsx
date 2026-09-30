@@ -1349,15 +1349,30 @@ function RdDemographics({ rangeId = "all" }) {
       byRatio.get(r).push(o);
     }
     /* join labels by shared snapped ratio; one sentence per distinct ratio */
-    const outlierSentence = [...byRatio.values()].map((grp) => {
+    const ratioGroups = [...byRatio.values()].map((grp) => {
       /* representative fraction: the largest-|d| member of the group */
       const rep = grp.slice().sort((a, b) => Math.abs(b.d) - Math.abs(a.d))[0];
       const labels = grp.map((o) => short(o.g));
       const listed = labels.length === 1 ? labels[0] : labels.length === 2 ? labels.join(" and ") : labels.slice(0, -1).join(", ") + " and " + labels[labels.length - 1];
-      const plural = labels.length > 1 || /s$/.test(labels[0]);
-      const verb = !plural || /^Gen/.test(grp[0].g.label) && labels.length === 1 ? "is" : "are";
-      return rdCap(listed) + " " + verb + " the " + (labels.length > 1 ? "outliers" : "outlier") + ", at " + rdFraction(rep.g.v[party]) + ".";
-    }).join(" ");
+      return { grp, labels, listed, frac: rdFraction(rep.g.v[party]) };
+    });
+    let outlierSentence = "";
+    if (ratioGroups.length === 1) {
+      const g0 = ratioGroups[0];
+      const plural = g0.labels.length > 1 || /s$/.test(g0.labels[0]);
+      const verb = !plural || (/^Gen/.test(g0.grp[0].g.label) && g0.labels.length === 1) ? "is" : "are";
+      outlierSentence = rdCap(g0.listed) + " " + verb + " the " + (g0.labels.length > 1 ? "outliers" : "outlier") + ", at " + g0.frac + ".";
+    } else if (ratioGroups.length > 1) {
+      /* several ratio groups: one shared "The outliers are …" sentence, the
+         items semicolon-listed so the "at one in four" clauses don't drown in
+         commas — never "X is the outlier. Y is the outlier." back to back */
+      const items = ratioGroups.map((g) => g.listed + ", at " + g.frac);
+      const anyAnd = ratioGroups.some((g) => g.labels.length > 1);
+      const joined = items.length === 2 && !anyAnd
+        ? items[0] + ", and " + items[1]
+        : items.slice(0, -1).join("; ") + (items.length > 2 ? "; and " : "; ") + items[items.length - 1];
+      outlierSentence = "The outliers are " + joined + ".";
+    }
     if (outlierSentence) dek += " " + outlierSentence;
     /* the headline stays put as the grouping tab flips: the per-grouping
        finding leads the dek instead, the figures sentences after it */
