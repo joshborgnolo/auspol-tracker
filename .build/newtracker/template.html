@@ -1641,6 +1641,8 @@ body.dark .sens-band { opacity: 0.10; }
 .tip-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.01em; white-space: nowrap; }
 .tip-row { display: flex; align-items: center; gap: 7px; font-size: 13px; padding: 1px 0; white-space: nowrap; }
 .tip-swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+/* hovering an election result swaps the series square for the chart's ring */
+.tip-swatch.is-ring { border-radius: 50%; border: 1.5px solid; background: transparent; }
 .tip-label { color: var(--ink-3); }
 .tip-val { margin-left: auto; font-weight: 700; color: var(--ink); padding-left: 10px; }
 /* event readout: the date sits under the name in the serif, the description

@@ -175,7 +175,7 @@ function RdPrimary({ rangeId }) {
           yTickFmt={(v) => (v === 0 ? "" : v + "%")} baseline
           xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)}
           series={chartSeries} spine={series(pts, "alp")} areas={areas}
-          scatter={shownScatter} pollFacet="primary" marks={marks}
+          scatter={shownScatter} pollFacet="primary" marks={marks} ringAtX={base ? base.x : null}
           events={badges ? badges.events : evs}
           tooltipTitle={(i) => (pts[i] ? monthLabelFull(pts[i].ym) : "")}
           extraRows={(i) => {

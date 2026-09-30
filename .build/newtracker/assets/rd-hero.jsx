@@ -241,10 +241,11 @@ function RdHero(p) {
   const scatterMove = !split ? [] : split.travel.map(([a, b]) => ({
     x: a.x, y: a.y + (b.y - a.y) * t, color: mixC(a.color, b.color, t), label: b.label, meta: b.meta }));
 
-  /* the 2025 result, a count rather than a poll: the Coalition contest's first point */
+  /* the 2025 result, a count rather than a poll: the Coalition contest's first
+     point, rung in that contest line's colour as the primary chart's rings are */
   const elec = D.agg2pp.find((d) => d.election);
   const ringOn = elec && (shown === "alp_lnp" || otherOf(shown) === "alp_lnp");
-  const marks = ringOn ? [{ x: elec.x, y: elec.alp, label: narrow ? null : "2025 election: " + elec.alp.toFixed(1) }] : [];
+  const marks = ringOn ? [{ x: elec.x, y: elec.alp, color: M.alp_lnp.b.color, label: narrow ? null : "2025 election: " + elec.alp.toFixed(1) }] : [];
 
   /* the window fits everything drawn, both contests, their dots and interval */
   const domainOf = (id, b) => kept("d" + id + b + ringOn, () => {
@@ -475,7 +476,7 @@ function RdHero(p) {
                                refLines: [{ y: 50, color: "var(--ink-faint)" }], notes } : null} morphT={t}
           xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline
           refLines={[{ y: 50, color: "var(--ink-faint)" }]}
-          notes={notes} marks={marks} events={events} eventsFrom={eventsWas} eventMix={t}
+          notes={notes} marks={marks} ringAtX={ringOn ? elec.x : null} events={events} eventsFrom={eventsWas} eventMix={t}
           series={series} spine={spine}
           scatter={scatter} scatterOut={scatterOut} scatterMove={scatterMove}
           areas={areas} fade={morph ? t : 1}

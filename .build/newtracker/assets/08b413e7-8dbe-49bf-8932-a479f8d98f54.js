@@ -240,8 +240,12 @@ function TrendChart(props) {
                 (the plot's edges), or "data" (where the lines, bands and
                 dots begin or end);
        baseline – draw the x axis as a solid rule at the domain's floor,
-                with a tick under each labelled month. */
-    marks = [], notes = [], baseline = false,
+                with a tick under each labelled month.
+       ringAtX – a spine x whose guide-tooltip swatches are drawn as the
+                `marks` ring (border in each row's colour) rather than the
+                solid square – the tooltip marks an election result the way
+                the chart does. Null on every other chart. */
+    marks = [], notes = [], baseline = false, ringAtX = null,
     /* brackets – [{x, y0, y1, dx?, lines: [strong, plain]}] a span between two
        readings at one month, measured off the chart with its words to the left */
     brackets = [],
@@ -817,6 +821,7 @@ function TrendChart(props) {
     const spx = spinePts[i] ? spinePts[i].x : null;
     tip = {
       left: (hoverX / W) * 100, top: 6,
+      ringSwatch: ringAtX != null && spx != null && Math.abs(spx - ringAtX) < 1e-6,
       title: tooltipTitle ? tooltipTitle(i) : "",
       // rows sorted by value, so the readout order matches the lines'
       // top-to-bottom order at the hovered point
@@ -1757,7 +1762,8 @@ function TrendChart(props) {
           {(() => {
             const row = (r, i) => (
               <div className="tip-row" key={i}>
-                {r.color && <span className="tip-swatch" style={{ background: r.color }}></span>}
+                {r.color && <span className={"tip-swatch" + (tip.ringSwatch ? " is-ring" : "")}
+                                  style={tip.ringSwatch ? { borderColor: r.color } : { background: r.color }}></span>}
                 <span className="tip-label">{r.label}</span>
                 {r.note && <span className="tip-note">{r.note}</span>}
                 <span className="tip-val">{r.value}</span>

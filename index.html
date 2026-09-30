@@ -1061,6 +1061,7 @@ body.dark .sens-band { opacity: 0.10; }
 .tip-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.01em; white-space: nowrap; }
 .tip-row { display: flex; align-items: center; gap: 7px; font-size: 13px; padding: 1px 0; white-space: nowrap; }
 .tip-swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+.tip-swatch.is-ring { border-radius: 50%; border: 1.5px solid; background: transparent; }
 .tip-label { color: var(--ink-3); }
 .tip-val { margin-left: auto; font-weight: 700; color: var(--ink); padding-left: 10px; }
 .tip-hint { margin-top: 5px; font-size: 11px; font-weight: 600; color: var(--accent); white-space: nowrap; }
@@ -48124,6 +48125,7 @@ function TrendChart(props) {
     marks = [],
     notes = [],
     baseline = false,
+    ringAtX = null,
     brackets = [],
     vlines = []
   } = props;
@@ -48656,6 +48658,7 @@ function TrendChart(props) {
     tip = {
       left: hoverX / W * 100,
       top: 6,
+      ringSwatch: ringAtX != null && spx != null && Math.abs(spx - ringAtX) < 1e-6,
       title: tooltipTitle ? tooltipTitle(i) : "",
       rows: (() => {
         const claimed = new Set();
@@ -49665,8 +49668,10 @@ function TrendChart(props) {
       className: "tip-row",
       key: i
     }, r.color && React.createElement("span", {
-      className: "tip-swatch",
-      style: {
+      className: "tip-swatch" + (tip.ringSwatch ? " is-ring" : ""),
+      style: tip.ringSwatch ? {
+        borderColor: r.color
+      } : {
         background: r.color
       }
     }), React.createElement("span", {
@@ -63727,6 +63732,7 @@ function RdHero(p) {
   const marks = ringOn ? [{
     x: elec.x,
     y: elec.alp,
+    color: M.alp_lnp.b.color,
     label: narrow ? null : "2025 election: " + elec.alp.toFixed(1)
   }] : [];
   const domainOf = (id, b) => kept("d" + id + b + ringOn, () => {
@@ -64083,6 +64089,7 @@ function RdHero(p) {
     }],
     notes: notes,
     marks: marks,
+    ringAtX: ringOn ? elec.x : null,
     events: events,
     eventsFrom: eventsWas,
     eventMix: t,
@@ -64376,6 +64383,7 @@ function RdPrimary({
     scatter: shownScatter,
     pollFacet: "primary",
     marks: marks,
+    ringAtX: base ? base.x : null,
     events: badges ? badges.events : evs,
     tooltipTitle: i => pts[i] ? monthLabelFull(pts[i].ym) : "",
     extraRows: i => {
