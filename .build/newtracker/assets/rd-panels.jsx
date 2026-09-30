@@ -1163,6 +1163,73 @@ function RdGenBorn({ label }) {
     </button>
   );
 }
+/* a rug row's dots behave as a chart's do: point at one (or put it into
+   focus) and it rings and shows the poll it sits on; a mouse click or Enter
+   then opens it, a tap only shows it - a tap is the only way to read a dot
+   on a touch screen, so it can't also be the trip. Same contract as
+   RdApMini's past-release dots: the shared .tip chrome, the edge-clamped
+   position, a keyless dot still reading but never opening. One instance per
+   row so its tip is the only one open on that row, and the tip rides inside
+   its dot so a party switch glides the two together. */
+function WvRug({ g, party, xp, pColor, pName }) {
+  const [tip, setTip] = useState(null);
+  const tipBox = React.useRef(null);
+  const ptr = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = tipBox.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip]);
+  const show = (i, src) => setTip({ i, src });
+  const hide = (i, src) => setTip((tp) => (tp && tp.i === i && (!src || tp.src === src) ? null : tp));
+  return (
+    <span className="rd-wv-rug">
+      {g.px[party].map((x, i) => {
+        const d = g.pd[i] || null;
+        if (!d) return <b key={i} style={{ "--x": xp(x), background: pColor }}></b>;
+        const rk = d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.f, released: d.r }) : null;
+        const open = () => {
+          if (!rk || !(window.AP && window.AP.openPoll)) return;
+          setTip(null);
+          window.AP.openPoll(rk, "primary", "who votes for whom");
+        };
+        const lab = d.f + ", " + d.l + " · " + x.toFixed(1) + "% · n≈" + d.n;
+        const on = tip && tip.i === i;
+        return (
+          <b key={i} className={[(rk ? "on" : ""), (on ? "hi" : "")].filter(Boolean).join(" ") || undefined} style={{ "--x": xp(x), background: pColor }}
+             role={rk ? "button" : "img"} tabIndex={rk ? 0 : undefined}
+             aria-label={lab + (rk ? ", press Enter to open this poll" : "")}
+             onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+             onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(i, "mouse"); }}
+             onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(i, "mouse"); }}
+             onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show(i, "focus"); }}
+             onBlur={() => hide(i, "focus")}
+             onClick={(ev) => {
+               ev.stopPropagation();
+               const pt = ev.detail === 0 ? "key" : ptr.current;
+               ptr.current = null;
+               if (pt === "mouse" || pt === "key") { open(); return; }
+               if (tip && tip.i === i) setTip(null); else setTip({ i, src: "touch" });
+             }}
+             onKeyDown={(ev) => {
+               if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+               ev.preventDefault();
+               open();
+             }}>
+            {on && <span ref={tipBox} className="tip rd-wv-rtip" aria-hidden="true">
+              <span className="tip-title">{d.f + ", " + d.l}</span>
+              <span className="tip-sub">{pName + " " + x.toFixed(1) + "% of " + (RD_DEMO_SHORT[g.label] || g.label.toLowerCase()) + " · n≈" + d.n}</span>
+              {tip.src !== "touch" && <span className="tip-hint">{rk ? (tip.src === "focus" ? "Press Enter to open this poll" : "Click to open this poll") : "Released " + d.r}</span>}
+            </span>}
+          </b>
+        );
+      })}
+    </span>
+  );
+}
 /* the composition-trend block's wording slots (shapes are the user's, dictated
    2026-09-29 and re-dictated 2026-09-30; the SENTENCES are generated from
    D.demoTrend — gen-data §7gb — and re-word themselves as significances move,
@@ -1274,10 +1341,6 @@ function RdDemographics({ rangeId = "all" }) {
      dots (a pass over every poll) on each one starved the dot plot's own
      motion of frames on a phone */
   const chartCache = React.useRef({});
-  /* which pointer is on a rug dot, for the click gate (mouse + keyboard open
-     the poll; a touch tap doesn't navigate, the same contract the chart dots
-     keep) */
-  const wvPtr = React.useRef(null);
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find((x) => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
@@ -1569,10 +1632,13 @@ function RdDemographics({ rangeId = "all" }) {
       </div>
       {st.groups.map((g, gi) => {
         const v = g.v[party], ci = g.ci[party] || 0, d = v - all, sig = Math.abs(d) > ci;
+        /* the pooled-figures note sits on the text cells, not the row: the
+           rug dots now bring their own chart-style tip, and a row-wide
+           title would pop the OS tooltip over it */
+        const rowTitle = "Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + ", " + rdList((g.houses || []).map(demoHouse)) + ", ± is the 95% margin, small dots: each poll’s own reading";
         return (
-          <div key={"r" + gi} className="rd-wv-row" role="row"
-               title={"Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + ", " + rdList((g.houses || []).map(demoHouse)) + ", ± is the 95% margin, small dots: each poll’s own reading"}>
-            <span role="cell" className="rd-wv-lab">{g.label}<RdGenBorn label={g.label} /></span>
+          <div key={"r" + gi} className="rd-wv-row" role="row">
+            <span role="cell" className="rd-wv-lab" title={rowTitle}>{g.label}<RdGenBorn label={g.label} /></span>
             <span className="rd-wv-track">
               {/* positions go to CSS as --x/--lo/--hi (percent of the track)
                   and are drawn with transforms, so a switch glides them on
@@ -1580,38 +1646,17 @@ function RdDemographics({ rangeId = "all" }) {
               <span className="rd-wv-all" style={{ "--x": xp(all) }} aria-hidden="true"></span>
               {/* the rug: each wave in the window as a small dot at its own
                   reading; px is wave-ordered for every party, so a party
-                  switch glides the dots rather than reshuffling them. A dot
-                  that keys back to a poll row opens that poll on click,
-                  exactly as the chart's dots do. The dots can't live under
+                  switch glides the dots rather than reshuffling them. The
+                  dots are row-keyed buttons - WvRug gives them the chart
+                  dots' ring, tip and click-through. They can't live under
                   aria-hidden once they're buttons, so the purely visual
                   siblings carry it instead of the track */}
-              {g.pd && g.px && g.px[party] && <span className="rd-wv-rug">
-                {g.px[party].map((x, i) => {
-                  const d = g.pd[i] || null;
-                  const rk = d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.f, released: d.r }) : null;
-                  const txt = (d ? d.f + ", " + d.l + " · " : "") + x.toFixed(1) + "%" + (d ? " · n≈" + d.n : "");
-                  const go = rk ? () => { if (window.AP && window.AP.openPoll) window.AP.openPoll(rk, "primary", "who votes for whom"); } : null;
-                  return <b key={i} className={rk ? "on" : undefined} style={{ "--x": xp(x), background: pColor }}
-                    role={rk ? "button" : undefined} tabIndex={rk ? 0 : undefined}
-                    title={txt + (rk ? " – click to open this poll" : "")}
-                    aria-label={rk ? txt + ", press Enter to open this poll" : undefined}
-                    onPointerDown={rk ? (ev) => { wvPtr.current = ev.pointerType; } : undefined}
-                    onClick={rk ? (ev) => {
-                      ev.stopPropagation();
-                      const pt = ev.detail === 0 ? "key" : wvPtr.current;
-                      wvPtr.current = null;
-                      if (pt === "mouse" || pt === "key") go();
-                    } : undefined}
-                    onKeyDown={rk ? (ev) => {
-                      if (ev.key === "Enter" || ev.key === " " || ev.key === "Spacebar") { ev.preventDefault(); go(); }
-                    } : undefined}></b>;
-                })}
-              </span>}
+              {g.pd && g.px && g.px[party] && <WvRug g={g} party={party} xp={xp} pColor={pColor} pName={pName} />}
               <span className="rd-wv-ci" style={{ "--lo": xp(v - ci), "--hi": xp(v + ci), color: pColor }} aria-hidden="true"><i className="lo"></i><i className="hi"></i><b></b></span>
               <span className={"rd-wv-dot" + (sig ? "" : " open")} style={{ "--x": xp(v), background: sig ? pColor : undefined, borderColor: pColor }} aria-hidden="true"></span>
             </span>
-            <span role="cell" className="rd-wv-v"><b><RollNum value={v.toFixed(1)} />%</b> <span>±<RollNum value={ci.toFixed(1)} /></span></span>
-            <span role="cell" className={"rd-wv-d" + (sig ? " sig" : "")} style={sig ? { color: inkOf(pColor) } : undefined}><RollNum value={signedD(d)} /></span>
+            <span role="cell" className="rd-wv-v" title={rowTitle}><b><RollNum value={v.toFixed(1)} />%</b> <span>±<RollNum value={ci.toFixed(1)} /></span></span>
+            <span role="cell" className={"rd-wv-d" + (sig ? " sig" : "")} style={sig ? { color: inkOf(pColor) } : undefined} title={rowTitle}><RollNum value={signedD(d)} /></span>
           </div>
         );
       })}

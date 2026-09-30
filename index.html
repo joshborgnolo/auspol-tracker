@@ -3773,11 +3773,14 @@ body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; botto
   background: repeating-linear-gradient(to bottom, var(--ink) 0 4px, transparent 4px 7px); }
 body.rd .rd-wv-all { display: none; }
 body.rd .rd-wv-rug { position: absolute; top: 1px; left: 0; right: 0; height: 6px; z-index: 1; }
-body.rd .rd-wv-rug b { position: absolute; top: 0; left: 0; width: 6px; height: 6px; border-radius: 50%; opacity: 0.55; transform: translateX(calc(var(--x) * 1cqw - 50%)); }
+body.rd .rd-wv-rug b { position: absolute; top: 0; left: 0; width: 6px; height: 6px; border-radius: 50%; opacity: 0.55; transform: translateX(calc(var(--x) * 1cqw - 50%)); touch-action: manipulation; }
+body.rd .rd-wv-rug b::before { content: ""; position: absolute; inset: -5px -6px; }
 body.rd .rd-wv-rug b.on { cursor: pointer; }
-body.rd .rd-wv-rug b.on::before { content: ""; position: absolute; inset: -5px -7px; }
+body.rd .rd-wv-rug b.hi { opacity: 1; }
+body.rd .rd-wv-rug b.hi::after { content: ""; position: absolute; inset: -3px; border: 1.5px solid var(--accent); border-radius: 50%; }
 body.rd .rd-wv-rug b.on:hover, body.rd .rd-wv-rug b.on:focus-visible { opacity: 1; }
 body.rd .rd-wv-rug b.on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+body.rd .rd-wv-rtip { position: absolute; left: 50%; bottom: 100%; margin-bottom: 1px; transform: translateX(-50%); z-index: 20; white-space: nowrap; text-align: left; pointer-events: none; }
 body.rd .rd-wv-ci { position: absolute; top: 50%; left: 0; right: 0; height: 12px; transform: translateY(-50%); z-index: 2; }
 body.rd .rd-wv-ci > b { position: absolute; left: 0; top: 50%; width: 100%; height: 2px; background: currentColor; transform-origin: 0 50%;
   transform: translate(calc(var(--lo) * 1cqw), -50%) scaleX(calc((var(--hi) - var(--lo)) / 100)); }
@@ -67265,6 +67268,105 @@ function RdGenBorn({
     onClick: () => setTapped(v => !v)
   }, "(", asYears ? born[0] + "–" + born[1] : "aged " + Math.max(18, y - born[1]) + "–" + (y - born[0]), ")");
 }
+function WvRug({
+  g,
+  party,
+  xp,
+  pColor,
+  pName
+}) {
+  const [tip, setTip] = useState(null);
+  const tipBox = React.useRef(null);
+  const ptr = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = tipBox.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip]);
+  const show = (i, src) => setTip({
+    i,
+    src
+  });
+  const hide = (i, src) => setTip(tp => tp && tp.i === i && (!src || tp.src === src) ? null : tp);
+  return React.createElement("span", {
+    className: "rd-wv-rug"
+  }, g.px[party].map((x, i) => {
+    const d = g.pd[i] || null;
+    if (!d) return React.createElement("b", {
+      key: i,
+      style: {
+        "--x": xp(x),
+        background: pColor
+      }
+    });
+    const rk = d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+      pollster: d.f,
+      released: d.r
+    }) : null;
+    const open = () => {
+      if (!rk || !(window.AP && window.AP.openPoll)) return;
+      setTip(null);
+      window.AP.openPoll(rk, "primary", "who votes for whom");
+    };
+    const lab = d.f + ", " + d.l + " · " + x.toFixed(1) + "% · n≈" + d.n;
+    const on = tip && tip.i === i;
+    return React.createElement("b", {
+      key: i,
+      className: [rk ? "on" : "", on ? "hi" : ""].filter(Boolean).join(" ") || undefined,
+      style: {
+        "--x": xp(x),
+        background: pColor
+      },
+      role: rk ? "button" : "img",
+      tabIndex: rk ? 0 : undefined,
+      "aria-label": lab + (rk ? ", press Enter to open this poll" : ""),
+      onPointerDown: ev => {
+        ptr.current = ev.pointerType;
+      },
+      onPointerEnter: ev => {
+        if (ev.pointerType === "mouse") show(i, "mouse");
+      },
+      onPointerLeave: ev => {
+        if (ev.pointerType === "mouse") hide(i, "mouse");
+      },
+      onFocus: ev => {
+        if (ev.target.matches(":focus-visible")) show(i, "focus");
+      },
+      onBlur: () => hide(i, "focus"),
+      onClick: ev => {
+        ev.stopPropagation();
+        const pt = ev.detail === 0 ? "key" : ptr.current;
+        ptr.current = null;
+        if (pt === "mouse" || pt === "key") {
+          open();
+          return;
+        }
+        if (tip && tip.i === i) setTip(null);else setTip({
+          i,
+          src: "touch"
+        });
+      },
+      onKeyDown: ev => {
+        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+        ev.preventDefault();
+        open();
+      }
+    }, on && React.createElement("span", {
+      ref: tipBox,
+      className: "tip rd-wv-rtip",
+      "aria-hidden": "true"
+    }, React.createElement("span", {
+      className: "tip-title"
+    }, d.f + ", " + d.l), React.createElement("span", {
+      className: "tip-sub"
+    }, pName + " " + x.toFixed(1) + "% of " + (RD_DEMO_SHORT[g.label] || g.label.toLowerCase()) + " · n≈" + d.n), tip.src !== "touch" && React.createElement("span", {
+      className: "tip-hint"
+    }, rk ? tip.src === "focus" ? "Press Enter to open this poll" : "Click to open this poll" : "Released " + d.r)));
+  }));
+}
 const RD_TREND_NAME = {
   onp: "One Nation",
   alp: "Labor",
@@ -67407,7 +67509,6 @@ function RdDemographics({
     };
   }, [tabId]);
   const chartCache = React.useRef({});
-  const wvPtr = React.useRef(null);
   if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find(x => x.id === tabId) || T.tabs[0];
   const P = D.PARTIES[party];
@@ -67669,14 +67770,15 @@ function RdDemographics({
       ci = g.ci[party] || 0,
       d = v - all,
       sig = Math.abs(d) > ci;
+    const rowTitle = "Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + ", " + rdList((g.houses || []).map(demoHouse)) + ", ± is the 95% margin, small dots: each poll’s own reading";
     return React.createElement("div", {
       key: "r" + gi,
       className: "rd-wv-row",
-      role: "row",
-      title: "Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + ", " + rdList((g.houses || []).map(demoHouse)) + ", ± is the 95% margin, small dots: each poll’s own reading"
+      role: "row"
     }, React.createElement("span", {
       role: "cell",
-      className: "rd-wv-lab"
+      className: "rd-wv-lab",
+      title: rowTitle
     }, g.label, React.createElement(RdGenBorn, {
       label: g.label
     })), React.createElement("span", {
@@ -67687,46 +67789,13 @@ function RdDemographics({
         "--x": xp(all)
       },
       "aria-hidden": "true"
-    }), g.pd && g.px && g.px[party] && React.createElement("span", {
-      className: "rd-wv-rug"
-    }, g.px[party].map((x, i) => {
-      const d = g.pd[i] || null;
-      const rk = d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
-        pollster: d.f,
-        released: d.r
-      }) : null;
-      const txt = (d ? d.f + ", " + d.l + " · " : "") + x.toFixed(1) + "%" + (d ? " · n≈" + d.n : "");
-      const go = rk ? () => {
-        if (window.AP && window.AP.openPoll) window.AP.openPoll(rk, "primary", "who votes for whom");
-      } : null;
-      return React.createElement("b", {
-        key: i,
-        className: rk ? "on" : undefined,
-        style: {
-          "--x": xp(x),
-          background: pColor
-        },
-        role: rk ? "button" : undefined,
-        tabIndex: rk ? 0 : undefined,
-        title: txt + (rk ? " – click to open this poll" : ""),
-        "aria-label": rk ? txt + ", press Enter to open this poll" : undefined,
-        onPointerDown: rk ? ev => {
-          wvPtr.current = ev.pointerType;
-        } : undefined,
-        onClick: rk ? ev => {
-          ev.stopPropagation();
-          const pt = ev.detail === 0 ? "key" : wvPtr.current;
-          wvPtr.current = null;
-          if (pt === "mouse" || pt === "key") go();
-        } : undefined,
-        onKeyDown: rk ? ev => {
-          if (ev.key === "Enter" || ev.key === " " || ev.key === "Spacebar") {
-            ev.preventDefault();
-            go();
-          }
-        } : undefined
-      });
-    })), React.createElement("span", {
+    }), g.pd && g.px && g.px[party] && React.createElement(WvRug, {
+      g: g,
+      party: party,
+      xp: xp,
+      pColor: pColor,
+      pName: pName
+    }), React.createElement("span", {
       className: "rd-wv-ci",
       style: {
         "--lo": xp(v - ci),
@@ -67748,7 +67817,8 @@ function RdDemographics({
       "aria-hidden": "true"
     })), React.createElement("span", {
       role: "cell",
-      className: "rd-wv-v"
+      className: "rd-wv-v",
+      title: rowTitle
     }, React.createElement("b", null, React.createElement(RollNum, {
       value: v.toFixed(1)
     }), "%"), " ", React.createElement("span", null, "\xB1", React.createElement(RollNum, {
@@ -67758,7 +67828,8 @@ function RdDemographics({
       className: "rd-wv-d" + (sig ? " sig" : ""),
       style: sig ? {
         color: inkOf(pColor)
-      } : undefined
+      } : undefined,
+      title: rowTitle
     }, React.createElement(RollNum, {
       value: signedD(d)
     })));

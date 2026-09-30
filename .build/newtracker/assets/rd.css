@@ -1034,14 +1034,20 @@ body.rd .rd-wv-all { display: none; }
    track, the poll's own reading for the group, quieter than the whisker
    so it reads as the working, not the figure */
 body.rd .rd-wv-rug { position: absolute; top: 1px; left: 0; right: 0; height: 6px; z-index: 1; }
-body.rd .rd-wv-rug b { position: absolute; top: 0; left: 0; width: 6px; height: 6px; border-radius: 50%; opacity: 0.55; transform: translateX(calc(var(--x) * 1cqw - 50%)); }
-/* an openable dot (.on) is a button the same as a chart dot: pointer
-   cursor, a hit box wider than its 6px self (the ::before), full colour on
-   hover, the shared accent ring on keyboard focus */
+body.rd .rd-wv-rug b { position: absolute; top: 0; left: 0; width: 6px; height: 6px; border-radius: 50%; opacity: 0.55; transform: translateX(calc(var(--x) * 1cqw - 50%)); touch-action: manipulation; }
+/* every dot tips like a chart dot: a hit box wider than its 6px self (the
+   ::before), and while tipped (.hi, whatever the tip's source) the accent
+   ring and full colour; keyboard focus keeps the shared accent outline.
+   Only the row-keyed dot (.on) opens on click, so only it takes the cursor */
+body.rd .rd-wv-rug b::before { content: ""; position: absolute; inset: -5px -6px; }
 body.rd .rd-wv-rug b.on { cursor: pointer; }
-body.rd .rd-wv-rug b.on::before { content: ""; position: absolute; inset: -5px -7px; }
+body.rd .rd-wv-rug b.hi { opacity: 1; }
+body.rd .rd-wv-rug b.hi::after { content: ""; position: absolute; inset: -3px; border: 1.5px solid var(--accent); border-radius: 50%; }
 body.rd .rd-wv-rug b.on:hover, body.rd .rd-wv-rug b.on:focus-visible { opacity: 1; }
 body.rd .rd-wv-rug b.on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* the dot's tip rides inside it, so a party switch glides the two together;
+   hung above the dot like the All-polls mini tip (.rd-apd-tip) */
+body.rd .rd-wv-rtip { position: absolute; left: 50%; bottom: 100%; margin-bottom: 1px; transform: translateX(-50%); z-index: 20; white-space: nowrap; text-align: left; pointer-events: none; }
 /* the interval spans the track and draws its parts inside it: the bar
    shifted to --lo and stretched to --hi (a 2px-tall line can scale
    sideways without distorting), each end tick shifted on its own */

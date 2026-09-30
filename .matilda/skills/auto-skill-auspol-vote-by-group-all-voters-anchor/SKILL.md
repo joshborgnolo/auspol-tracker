@@ -99,14 +99,24 @@ Gotchas:
   r: released date}`, and `px[party]` the same waves' readings on the
   display scale in the SAME array order for every party (one filter+sort
   per key over the same rows), so a party-chip switch glides dot-for-dot.
-  rd-panels renders `.rd-wv-rug` above the CI strip (party colour at .55,
-  tooltipped "Firm, dates · x.x% · n≈…"); the RdKey "dot" item explains
-  it. The dots behave as the TrendChart's do (same-day change): a dot
-  keys back to its poll row via `AP.pollRowKey({pollster: f, released:
-  r})` and mouse-click or Enter runs `AP.openPoll(key, "primary", "who
-  votes for whom")` — pointer cursor + a ::before hit box on openable
-  dots (.on), a touch tap does NOT navigate. Once the dots were buttons
-  the track's aria-hidden moved onto its three decorative siblings
+  `WvRug` (rd-panels.jsx, extracted beside RdGenBorn when the dots grew
+  behaviour, 2026-10-01) renders `.rd-wv-rug` above the CI strip. Each
+  dot carries the chart dots' full furniture, mirroring RdApMini's
+  off-chart contract: hover/Tab-focus/touch-tap tips it in the shared
+  `.tip` family (`.rd-wv-rtip` child of the dot — glides with it on a
+  party switch — edge-clamped useLayoutEffect copied from RdApMini) with
+  a `.hi` accent ring (::after, inset -3px), and the native `title` is
+  GONE from the dots (the row's own pooled-figures `title` moved onto
+  the .rd-wv-lab/.rd-wv-v/.rd-wv-d cells so the OS tooltip never pops
+  over the custom one). Mouse click or Enter opens the poll row via
+  `AP.pollRowKey({pollster: f, released: r})` → `AP.openPoll(key,
+  "primary", "who votes for whom")`; a touch tap only tips (tap again to
+  close) and never navigates. Unkeyed dots (pollRowKey miss) still tip
+  and read ("Released …" hint) but never open. Two probes pin the whole
+  contract: `.matilda/probe/t2vxj1/rug-payload.mjs` (payload: 0 unkeyed
+  dots) and `rug-webkit.mjs` (ring, tip, hints, mouse/Enter navigation,
+  touch toggle, 25 assertions). Once the dots were buttons the track's
+  aria-hidden moved onto its three decorative siblings
   (.rd-wv-all/.rd-wv-ci/.rd-wv-dot) instead. CAVEAT:
   `pd.n` is whole-poll n × DEMO_SHARE, like the group's pooled `n` — an
   approximation of the published group n, not a crosstab read-back.
