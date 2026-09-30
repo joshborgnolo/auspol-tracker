@@ -2713,6 +2713,12 @@ function rdOneIn(v) {
   const n = RD_ONE_IN.reduce((b, k) => (Math.abs(Math.log(100 / k / v)) < Math.abs(Math.log(100 / b / v)) ? k : b), RD_ONE_IN[0]);
   return (Math.abs(100 / n - v) < 0.3 ? "one voter in " : "about one voter in ") + (RD_BIG_WORDS[n] || rdNumWord(n));
 }
+/* a share as "one in four" (no cardinality word), same ladder as rdOneIn;
+   only "about"-qualified when the round ratio misses like rdShareWords guards */
+function rdOneInShare(v) {
+  const n = RD_ONE_IN.reduce((b, k) => (Math.abs(Math.log(100 / k / v)) < Math.abs(Math.log(100 / b / v)) ? k : b), RD_ONE_IN[0]);
+  return (Math.abs(100 / n - v) < 1.2 ? "" : "about ") + "one in " + (RD_BIG_WORDS[n] || rdNumWord(n));
+}
 /* the mid-2025 ring and the now dot, per group, on one scale */
 function RdShiftPlot({ rows, all, lo, hi, title, source, allLabel }) {
   const X = (v) => ((Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * 100;
@@ -2800,7 +2806,21 @@ function RdUndecided({ rangeId }) {
   const story = (() => {
     const u = nowOf(first), sf = nowOf(soft);
     if (u == null) return null;
-    const head = rdCap(rdOneIn(u)) + " is undecided." + (sf != null ? " " + rdCap(rdShareWords(sf / 100)) + " of the rest could still switch." : "");
+    /* the firmest party tail appears only while one party's solid share is
+       significantly above the runner-up's (same apart-test the by-party
+       view gates its swings on) */
+    const firmestTail = !F || !F.now ? "" : (() => {
+      /* the pool's own id list - F.now also carries from/to strings */
+      const ord = ["onp", "alp", "lnp", "grn", "oth"].filter((k) => F.now[k]).sort((a, b) => F.now[b].v - F.now[a].v);
+      if (ord.length < 2) return "";
+      const top = F.now[ord[0]], nxt = F.now[ord[1]];
+      if (!(Math.abs(top.v - nxt.v) > Math.hypot(top.ci95, nxt.ci95))) return "";
+      const np = ord[0] === "oth" ? "the minor-party" : "the " + D.PARTIES[ord[0]].name;
+      return ", and " + np + " vote is firmest";
+    })();
+    const head = rdCap(rdOneIn(u)) + " is undecided"
+      + (sf != null ? ", " + rdOneInShare(sf) + " might change their mind" : "")
+      + firmestTail + ".";
     const moves = [["undecided", first], ["not firm", soft]].map(([nm, s]) => ({ nm, s, f: slopeOf(s) })).filter((m) => m.f);
     const movedSig = moves.filter((m) => m.f.p < 0.05 / moves.length);
     /* the dek is the movement verdict alone (user trim, 2026-09-28): the

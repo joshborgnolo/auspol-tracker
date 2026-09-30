@@ -69559,6 +69559,10 @@ function rdOneIn(v) {
   const n = RD_ONE_IN.reduce((b, k) => Math.abs(Math.log(100 / k / v)) < Math.abs(Math.log(100 / b / v)) ? k : b, RD_ONE_IN[0]);
   return (Math.abs(100 / n - v) < 0.3 ? "one voter in " : "about one voter in ") + (RD_BIG_WORDS[n] || rdNumWord(n));
 }
+function rdOneInShare(v) {
+  const n = RD_ONE_IN.reduce((b, k) => Math.abs(Math.log(100 / k / v)) < Math.abs(Math.log(100 / b / v)) ? k : b, RD_ONE_IN[0]);
+  return (Math.abs(100 / n - v) < 1.2 ? "" : "about ") + "one in " + (RD_BIG_WORDS[n] || rdNumWord(n));
+}
 function RdShiftPlot({
   rows,
   all,
@@ -69715,7 +69719,16 @@ function RdUndecided({
     const u = nowOf(first),
       sf = nowOf(soft);
     if (u == null) return null;
-    const head = rdCap(rdOneIn(u)) + " is undecided." + (sf != null ? " " + rdCap(rdShareWords(sf / 100)) + " of the rest could still switch." : "");
+    const firmestTail = !F || !F.now ? "" : (() => {
+      const ord = ["onp", "alp", "lnp", "grn", "oth"].filter(k => F.now[k]).sort((a, b) => F.now[b].v - F.now[a].v);
+      if (ord.length < 2) return "";
+      const top = F.now[ord[0]],
+        nxt = F.now[ord[1]];
+      if (!(Math.abs(top.v - nxt.v) > Math.hypot(top.ci95, nxt.ci95))) return "";
+      const np = ord[0] === "oth" ? "the minor-party" : "the " + D.PARTIES[ord[0]].name;
+      return ", and " + np + " vote is firmest";
+    })();
+    const head = rdCap(rdOneIn(u)) + " is undecided" + (sf != null ? ", " + rdOneInShare(sf) + " might change their mind" : "") + firmestTail + ".";
     const moves = [["undecided", first], ["not firm", soft]].map(([nm, s]) => ({
       nm,
       s,
