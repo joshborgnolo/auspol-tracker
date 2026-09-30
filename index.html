@@ -18525,6 +18525,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "Rest of Australia": [37.64, 29.01, 6.34, 12.55, 14.45]
     }
   };
+  const demoLocElection = {
+    "x": 2025.375,
+    "groups": {
+      "Nat": [34.56, 31.82, 6.4, 12.2, 15.01],
+      "Inner metro": [38.35, 27.98, 3.49, 16.5, 13.68],
+      "Outer metro": [39.28, 30.21, 6.18, 11.87, 12.45],
+      "Provincial": [35.2, 32.6, 8.01, 11.22, 12.97],
+      "Rural": [24.41, 37.68, 8.94, 8.41, 20.56]
+    }
+  };
   const issues = {
     "window": "six weeks",
     "parties": ["alp", "lnp", "onp"],
@@ -45173,6 +45183,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     demographics,
     demoTrend,
     demoStateElection,
+    demoLocElection,
     demoGroups,
     issues,
     accuracy,
@@ -66398,6 +66409,13 @@ function RdDemographics({
         }));
       })));
     }
+    const le = c.st.id === "location" && D.demoLocElection ? D.demoLocElection : null;
+    const leI = le && !pm ? T.order.indexOf(party) : -1;
+    const leOn = le != null && leI >= 0 && c.allPts.length && le.x >= xDom[0] - 0.25 - 1e-6 && le.x < c.allPts[0].x;
+    const leN = leOn ? le.groups.Nat[leI] : null;
+    const leY = g => leOn && le.groups[g.label] ? le.groups[g.label][leI] : null;
+    const xDomL = leOn && le.x < xDom[0] ? [le.x - 0.05, xDom[1]] : xDom;
+    const ciLoc = ciRows(rowsOf, "95% intervals");
     return React.createElement("div", {
       className: "card rd-card rd-wv-chart",
       key: c.st.id,
@@ -66420,26 +66438,55 @@ function RdDemographics({
         t: 12,
         b: 30
       },
-      xDomain: xDom,
+      xDomain: xDomL,
       yDomain: yDom,
       yTicks: rdYTicks(0, yMax, 10),
       yTickFmt: v => v === 0 ? "0" : v + "%",
       xTicks: rdXTicks(c.x0, c.x1, narrow || c.span < 0.8),
       baseline: true,
       driven: !!A,
-      series: [allSeries, ...rowsOf.map(r => lineOf(r, colorOf(r)))],
+      series: [leN != null ? {
+        ...allSeries,
+        points: [{
+          x: le.x,
+          y: leN
+        }].concat(allSeries.points)
+      } : allSeries, ...rowsOf.map(r => {
+        const y = leY(r.l.g);
+        return lineOf(r, colorOf(r), y != null ? {
+          points: [{
+            x: le.x,
+            y
+          }].concat(r.rows.map(d => ({
+            x: d.x,
+            y: d.y
+          })))
+        } : undefined);
+      })],
       areas: rowsOf.map(r => bandOf(r, colorOf(r))).filter(a => a.points.length >= 2),
-      spine: c.allPts.map(d => ({
+      spine: (leN != null ? [{
+        x: le.x,
+        y: leN
+      }] : []).concat(c.allPts.map(d => ({
         x: d.x,
         y: d.y
-      })),
+      }))),
+      marks: leOn ? rowsOf.filter(r => leY(r.l.g) != null).map(r => ({
+        x: le.x,
+        y: leY(r.l.g),
+        color: colorOf(r)
+      })) : [],
+      ringAtX: leOn ? le.x : null,
       scatter: cross ? cross.scatter : c.dots,
       scatterOut: cross ? cross.scatterOut : [],
       scatterMove: cross ? cross.scatterMove : [],
       fade: A ? t : 1,
       pollFacet: "primary",
-      tooltipTitle: i => c.allPts[i] ? monthLabelFull(c.allPts[i].ym) : "",
-      extraRows: ciRows(rowsOf, "95% intervals"),
+      tooltipTitle: i => leOn && i === 0 ? monthLabelFull("2025-05") : c.allPts[leOn ? i - 1 : i] ? monthLabelFull(c.allPts[leOn ? i - 1 : i].ym) : "",
+      extraRows: leOn ? i => i === 0 ? [{
+        label: "",
+        value: "The election result"
+      }] : ciLoc(i - 1) : ciLoc,
       fmt: v => v.toFixed(1),
       copy: {
         title: "Who votes for whom",
@@ -70157,6 +70204,16 @@ function RdPastCycles(p) {
   const pmNames = c => c.raw.netEras && c.raw.netEras.length > 1 ? c.raw.netEras.map(e => e.name).join("–") : c.lead;
   const CMP_ROWS = [["all", "All past terms", nPast], ["returned", "Re-elected", nRet], ["ousted", "Ousted", nOus]];
   const MODE_ROWS = ["abs", "chg"];
+  const cmpSwipeLive = React.useRef(null);
+  cmpSwipeLive.current = dir => {
+    const i = CMP_ROWS.findIndex(([id]) => id === compare);
+    if (i < 0) return false;
+    setCompare(CMP_ROWS[(i + dir + CMP_ROWS.length) % CMP_ROWS.length][0]);
+    return true;
+  };
+  const cmpSwipe = React.useCallback(el => {
+    if (el) el.__rdSwipe = dir => cmpSwipeLive.current(dir);
+  }, []);
   const controls = React.createElement("div", {
     className: "rd-cc",
     ref: boardRef
@@ -70168,6 +70225,8 @@ function RdPastCycles(p) {
     className: "rd-tabs rd-cc-tabs",
     role: "group",
     "aria-label": "Compare with",
+    ref: cmpSwipe,
+    "data-rd-swipe": "",
     onKeyDown: rdTabsKey(CMP_ROWS.map(([id]) => ({
       id
     })), setCompare),

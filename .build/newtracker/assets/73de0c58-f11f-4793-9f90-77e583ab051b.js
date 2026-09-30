@@ -2098,7 +2098,7 @@ function App() {
      a swipe on it or anywhere in what it switches - down to the end of
      its panel or section, so the table or chart under the row too - steps
      through ITS views instead, the nearest row winning. Rows that only re-cut one figure (the time range,
-     Past cycles' re-elected/ousted) aren't marked, so the page turns there.
+     Past cycles' level/change measure) aren't marked, so the page turns there.
      Both the page turn and every row step wrap round the ends, as the
      arrow-key walks on a computer do: a swipe off the last page or the last
      tab comes back round to the first.

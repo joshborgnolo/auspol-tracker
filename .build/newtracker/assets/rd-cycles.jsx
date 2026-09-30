@@ -559,11 +559,24 @@ function RdPastCycles(p) {
   const pmNames = (c) => (c.raw.netEras && c.raw.netEras.length > 1 ? c.raw.netEras.map((e) => e.name).join("–") : c.lead);
   const CMP_ROWS = [["all", "All past terms", nPast], ["returned", "Re-elected", nRet], ["ousted", "Ousted", nOus]];
   const MODE_ROWS = ["abs", "chg"];
+  /* the Compare-with choice is a view of its own, so it takes the phone
+     swipe hand-rolled the way RdTabs' `swipe` prop does it (data-rd-swipe +
+     __rdSwipe on the row; the app's touch effect finds and steps it,
+     wrapping as the arrow-key walk does) */
+  const cmpSwipeLive = React.useRef(null);
+  cmpSwipeLive.current = (dir) => {
+    const i = CMP_ROWS.findIndex(([id]) => id === compare);
+    if (i < 0) return false;
+    setCompare(CMP_ROWS[(i + dir + CMP_ROWS.length) % CMP_ROWS.length][0]);
+    return true;
+  };
+  const cmpSwipe = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => cmpSwipeLive.current(dir); }, []);
   const controls = (
     <div className="rd-cc" ref={boardRef}>
       <div className="rd-cc-row">
         <span className="rd-cc-l">Compare with</span>
         <div className="rd-tabs rd-cc-tabs" role="group" aria-label="Compare with"
+             ref={cmpSwipe} data-rd-swipe=""
              onKeyDown={rdTabsKey(CMP_ROWS.map(([id]) => ({ id })), setCompare)} onClick={rdTabFocus}>
           {CMP_ROWS.map(([id, lab, n]) => (
             <button key={id} type="button" className="rd-tab" aria-pressed={compare === id} onClick={() => setCompare(id)}>{narrow && id === "all" ? "All" : lab}<span className="rd-cc-n">{n}</span></button>
