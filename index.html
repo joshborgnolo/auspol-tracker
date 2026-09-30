@@ -3888,17 +3888,15 @@ body.rd .rd-is-bar span { display: block; height: 100%; background: var(--ink-3)
 body.rd .rd-is-imp b { font-size: 14px; font-weight: 600; color: var(--ink); }
 body.rd .rd-is-dots { position: relative; height: 52px; }
 body.rd .rd-is-gl { position: absolute; top: 8px; bottom: 8px; border-left: 1px solid var(--line-2); }
-body.rd .rd-is-third { position: absolute; top: 8px; bottom: 8px; border-left: 1.5px dotted var(--ink-faint); }
 body.rd .rd-is-dot { position: absolute; top: 50%; width: 11px; height: 11px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 1.5px var(--bg); }
 body.rd .rd-is-nums { display: flex; justify-content: space-between; font-size: 14px; }
 body.rd .rd-is-nums b { font-weight: 600; width: 28px; text-align: right; }
 body.rd .rd-is-verdict { font-size: 14px; color: var(--ink-3); line-height: 1.3; }
 body.rd .rd-is-verdict.strong { font-weight: 600; color: var(--ink); }
 body.rd .rd-is-verdict small { display: block; font-size: 12px; font-weight: 400; color: var(--ink-3); }
-body.rd .rd-is-axis { padding: 0 12px; min-height: 30px; }
-body.rd .rd-is-axis .rd-is-dots { height: 30px; }
+body.rd .rd-is-axis { padding: 0 12px; min-height: 20px; }
+body.rd .rd-is-axis .rd-is-dots { height: 20px; }
 body.rd .rd-is-axis .rd-is-dots > span { position: absolute; top: 4px; transform: translateX(-50%); font-size: 12px; color: var(--ink-3); }
-body.rd .rd-is-axis .rd-is-thirdlab { top: 18px !important; font-size: 11px !important; }
 body.rd .rd-is-left .rd-note { margin-top: 12px; }
 body.rd .rd-is-ctop { display: flex; align-items: center; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); min-height: 28px; }
 body.rd .rd-is-chead { margin: 4px 0 0; font-family: var(--serif); font-weight: 700; font-size: 22px; line-height: 1.15; color: var(--ink); text-wrap: balance; }
@@ -67449,12 +67447,7 @@ function RdIssues({
       style: {
         left: dx(g) + "%"
       }
-    })), React.createElement("span", {
-      className: "rd-is-third",
-      style: {
-        left: dx(100 / 3) + "%"
-      }
-    }), x.own && P.map(q => React.createElement("span", {
+    })), x.own && P.map(q => React.createElement("span", {
       key: q,
       className: "rd-is-dot",
       style: {
@@ -67665,12 +67658,7 @@ function RdIssues({
     style: {
       left: dx(g) + "%"
     }
-  }, g === 50 ? "50%" : g)), React.createElement("span", {
-    className: "rd-is-thirdlab",
-    style: {
-      left: dx(100 / 3) + "%"
-    }
-  }, "\u2153 each")), React.createElement("span", null), React.createElement("span", null)), wide && React.createElement("p", {
+  }, g === 50 ? "50%" : g))), React.createElement("span", null), React.createElement("span", null)), wide && React.createElement("p", {
     className: "rd-note"
   }, wide.hi.house, " and ", wide.lo.house, " word the importance question differently and disagree most on ", ISS_PHRASE[wide.x.id], ": ", Math.round(wide.hi.v), "% in ", wide.hi.house, "\u2019s latest poll, ", Math.round(wide.lo.v), "% in ", wide.lo.house, "\u2019s. The grey bars sit midway between the two pollsters\u2019 usual figures."), list.filter(x => x.grnTop).map(x => React.createElement("p", {
     key: "g" + x.id,

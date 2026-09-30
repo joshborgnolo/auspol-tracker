@@ -1999,7 +1999,6 @@ function RdIssues({ rangeId = "all" }) {
         <span className="rd-is-imp">{x.imp ? <><span className="rd-is-bar"><span style={{ width: x.imp.v + "%" }}></span></span><b>{Math.round(x.imp.v)}%</b><span className="rd-is-impw"> rank it top three</span></> : <span className="rd-is-na">not asked</span>}</span>
         <span className="rd-is-dots" aria-hidden="true">
           {[20, 30, 40, 50].map((g) => <span key={g} className="rd-is-gl" style={{ left: dx(g) + "%" }}></span>)}
-          <span className="rd-is-third" style={{ left: dx(100 / 3) + "%" }}></span>
           {x.own && P.map((q) => <span key={q} className="rd-is-dot" style={{ left: dx(x.own.v[q]) + "%", top: "calc(50% + " + off[q] + "px)", background: pColor(q) }}></span>)}
         </span>
         <span className="rd-is-nums">{x.own ? pOrd.map((q) => <b key={q} style={{ color: inkOf(pColor(q)) }}>{Math.round(x.own.v[q])}</b>) : null}</span>
@@ -2143,8 +2142,7 @@ function RdIssues({ rangeId = "all" }) {
               )}
               <div className="rd-is-axis" aria-hidden="true">
                 <span></span><span></span>
-                <span className="rd-is-dots" ref={stripRef}>{[20, 30, 40, 50].map((g) => <span key={g} style={{ left: dx(g) + "%" }}>{g === 50 ? "50%" : g}</span>)}
-                  <span className="rd-is-thirdlab" style={{ left: dx(100 / 3) + "%" }}>⅓ each</span></span>
+                <span className="rd-is-dots" ref={stripRef}>{[20, 30, 40, 50].map((g) => <span key={g} style={{ left: dx(g) + "%" }}>{g === 50 ? "50%" : g}</span>)}</span>
                 <span></span><span></span>
               </div>
               {wide && <p className="rd-note">{wide.hi.house} and {wide.lo.house} word the importance question differently and disagree most on {ISS_PHRASE[wide.x.id]}: {Math.round(wide.hi.v)}% in {wide.hi.house}’s latest poll, {Math.round(wide.lo.v)}% in {wide.lo.house}’s. The grey bars sit midway between the two pollsters’ usual figures.</p>}
