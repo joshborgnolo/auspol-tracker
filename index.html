@@ -18518,6 +18518,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   const demoStateElection = {
     "x": 2025.375,
     "groups": {
+      "Nat": [34.56, 31.82, 6.4, 12.2, 15.01],
       "NSW": [35.2, 31.53, 6.02, 11.06, 16.19],
       "Vic": [33.95, 32.2, 5.79, 13.59, 14.48],
       "Qld": [30.98, 34.91, 7.84, 11.76, 14.5],
@@ -66286,7 +66287,7 @@ function RdDemographics({
         color: pColorNow
       }));
       const se = D.demoStateElection;
-      const seI = se && !pm ? T.order.indexOf(pty) : -1;
+      const seI = se && !pm ? T.order.indexOf(party) : -1;
       return React.createElement("div", {
         className: "card rd-card rd-wv-chart",
         key: c.st.id,
@@ -66298,7 +66299,8 @@ function RdDemographics({
       }, rowsOf.map(r => {
         const g = r.l.g,
           name = RD_STATE_NAME[g.label] || g.label;
-        const seY = seI >= 0 && se.groups[g.label] && se.x >= xDom[0] - 1e-6 && se.x < c.allPts[0].x ? se.groups[g.label][seI] : null;
+        const seY = seI >= 0 && se.groups[g.label] && se.x >= xDom[0] - 0.25 - 1e-6 && se.x < c.allPts[0].x ? se.groups[g.label][seI] : null;
+        const seN = seY != null && se.groups.Nat ? se.groups.Nat[seI] : null;
         const spine = seY != null ? [{
           x: se.x,
           y: seY
@@ -66309,6 +66311,16 @@ function RdDemographics({
           x: d.x,
           y: d.y
         }));
+        const xDomP = seY != null && se.x < xDom[0] ? [se.x - 0.05, xDom[1]] : xDom;
+        const allPtsS = seN != null ? [{
+          x: se.x,
+          y: seN
+        }].concat(allSeries.points) : allSeries.points;
+        const linePts = seY != null ? [{
+          x: se.x,
+          y: seY
+        }] : null;
+        const ciUnshifted = ciRows([r], "95% interval");
         return React.createElement("div", {
           key: g.label,
           className: "rd-sm rd-wv-panel"
@@ -66323,7 +66335,7 @@ function RdDemographics({
             t: 8,
             b: 24
           },
-          xDomain: xDom,
+          xDomain: xDomP,
           yDomain: yDom,
           yTicks: rdYTicks(0, yMax, 20),
           yTickFmt: v => v === 0 ? "0" : v + "%",
@@ -66333,10 +66345,17 @@ function RdDemographics({
           series: [{
             ...allSeries,
             rdWidth: 1.25,
-            endLabel: null
+            endLabel: null,
+            points: allPtsS
           }, lineOf(r, pColorNow, {
             rdWidth: 2.25,
-            endLabel: null
+            endLabel: null,
+            ...(linePts ? {
+              points: linePts.concat(r.rows.map(d => ({
+                x: d.x,
+                y: d.y
+              })))
+            } : {})
           })],
           areas: [bandOf(r, pColorNow)].filter(a => a.points.length >= 2),
           spine: spine,
@@ -66353,7 +66372,7 @@ function RdDemographics({
           fade: A ? t : 1,
           pollFacet: "primary",
           tooltipTitle: i => seY != null && i === 0 ? monthLabelFull("2025-05") : c.allPts[seY != null ? i - 1 : i] ? monthLabelFull(c.allPts[seY != null ? i - 1 : i].ym) : "",
-          extraRows: ciRows([r], "95% interval"),
+          extraRows: seY != null ? i => i === 0 ? [] : ciUnshifted(i - 1) : ciUnshifted,
           fmt: v => v.toFixed(1),
           copy: {
             title: "Who votes for whom",

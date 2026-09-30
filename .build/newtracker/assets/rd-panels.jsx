@@ -1370,27 +1370,50 @@ function RdDemographics({ rangeId = "all" }) {
     );
     if (panelled(c)) {
       const mine = (arr, label) => (arr || []).filter((d) => d.label === label).map((d) => ({ ...d, color: pColorNow }));
+      /* each panel carries its state's 2025 election result as the site's
+         usual ring, before the first monthly point; the spine picks the
+         mark up so the May 2025 hover and its ring swatch exist (rd-ring,
+         as the primary chart's election dot) */
+      const se = D.demoStateElection;
+      const seI = se && !pm ? T.order.indexOf(party) : -1;
       return (
         <div className="card rd-card rd-wv-chart" key={c.st.id} style={{ flex: "1 1 0" }}>
           {head}
           <div className="rd-wv-panels">
             {rowsOf.map((r) => {
               const g = r.l.g, name = RD_STATE_NAME[g.label] || g.label;
+              /* the ring leads the series by a month or two, so the edge
+                 test lets it sit just left of the window the monthly run
+                 starts (and the domain below is widened to hold it) */
+              const seY = seI >= 0 && se.groups[g.label] && se.x >= xDom[0] - 0.25 - 1e-6 && se.x < c.allPts[0].x ? se.groups[g.label][seI] : null;
+              const seN = seY != null && se.groups.Nat ? se.groups.Nat[seI] : null;
+              const spine = seY != null ? [{ x: se.x, y: seY }].concat(c.allPts.map((d) => ({ x: d.x, y: d.y }))) : c.allPts.map((d) => ({ x: d.x, y: d.y }));
+              const xDomP = seY != null && se.x < xDom[0] ? [se.x - 0.05, xDom[1]] : xDom;
+              /* the guide tip reads a row off a series ONLY where the series
+                 has a point at that exact x, so both lines are led back to
+                 the election (as the hero's aggregate carries its election
+                 row): the state's to its own share here, the national
+                 line's to Nat in the data above */
+              const allPtsS = seN != null ? [{ x: se.x, y: seN }].concat(allSeries.points) : allSeries.points;
+              const linePts = seY != null ? [{ x: se.x, y: seY }] : null;
+              const ciUnshifted = ciRows([r], "95% interval");
               return (
                 <div key={g.label} className="rd-sm rd-wv-panel">
                   <div className="rd-sm-top"><span>{name}</span><b>{g.v[party] != null ? g.v[party].toFixed(1) + "%" : ""}</b></div>
                   <TrendChart key={"rd-wv-" + c.st.id + "-" + g.label} heightPx={narrow ? 120 : 140}
                     padPx={{ l: 30, r: 6, t: 8, b: 24 }}
-                    xDomain={xDom} yDomain={yDom} yTicks={rdYTicks(0, yMax, 20)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
+                    xDomain={xDomP} yDomain={yDom} yTicks={rdYTicks(0, yMax, 20)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
                     xTicks={rdXTicks(c.x0, c.x1, true)} baseline driven={!!A}
-                    series={[{ ...allSeries, rdWidth: 1.25, endLabel: null }, lineOf(r, pColorNow, { rdWidth: 2.25, endLabel: null })]}
+                    series={[{ ...allSeries, rdWidth: 1.25, endLabel: null, points: allPtsS }, lineOf(r, pColorNow, { rdWidth: 2.25, endLabel: null, ...(linePts ? { points: linePts.concat(r.rows.map((d) => ({ x: d.x, y: d.y }))) } : {}) })]}
                     areas={[bandOf(r, pColorNow)].filter((a) => a.points.length >= 2)}
-                    spine={c.allPts.map((d) => ({ x: d.x, y: d.y }))}
+                    spine={spine}
+                    marks={seY != null ? [{ x: se.x, y: seY, color: pColorNow, label: "2025 election: " + seY.toFixed(1) }] : []}
+                    ringAtX={seY != null ? se.x : null}
                     scatter={mine(cross ? cross.scatter : c.dots, g.label)} scatterOut={mine(cross ? cross.scatterOut : [], g.label)}
                     scatterMove={mine(cross ? cross.scatterMove : [], g.label)}
                     fade={A ? t : 1} pollFacet="primary"
-                    tooltipTitle={(i) => (c.allPts[i] ? monthLabelFull(c.allPts[i].ym) : "")}
-                    extraRows={ciRows([r], "95% interval")}
+                    tooltipTitle={(i) => (seY != null && i === 0 ? monthLabelFull("2025-05") : c.allPts[seY != null ? i - 1 : i] ? monthLabelFull(c.allPts[seY != null ? i - 1 : i].ym) : "")}
+                    extraRows={seY != null ? ((i) => (i === 0 ? [] : ciUnshifted(i - 1))) : ciUnshifted}
                     fmt={(v) => v.toFixed(1)}
                     copy={{ title: "Who votes for whom", sub: pPoss + " share of the vote in " + name + ", month by month",
                             legend: [{ label: name, color: pColor, kind: "line" }, { label: "95% interval", color: pColor, kind: "band" }, { label: "All voters", color: "var(--ink)", kind: "dashed" }] }}

@@ -19,7 +19,7 @@ import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const CHROME = process.env.CHROME
   || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 if (!fs.existsSync(CHROME)) { console.error("no Chrome at " + CHROME); process.exit(1); }

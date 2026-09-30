@@ -2568,7 +2568,31 @@ const primaryNowAt = (ref) => {
 const primaryNow = primaryNowAt(refNow);
 
 /* ---- 7g. the vote by group (age, gender, education, place, home) -------------
-   One figure per group and party, built as the headline is. Each poll says
+
+  Election marks for the By-state small multiples: each group's 2025 first
+  preference result, per panel party in DEMO_KEYS order. From the AEC's
+  per-state first-prefs-by-vote-type pages (event 31496,
+  HouseStateFirstPrefsByPartyByVoteType-31496-<state>.htm); Coalition rows
+  summed (Liberal + The Nationals; + Liberal National Party of Queensland in
+  Qld, + Country Liberal in the NT). Rest of Australia = national less
+  NSW+Vic+Qld (the panel's RoA group pools SA/WA/Tas/ACT/NT); x is the
+  election's mid-month mark, as aggPrimary's election row carries. Nat is
+  the national share, so the All-voters line can be led back to its own
+  election point in the guide tip (no ring - it draws no panel of its
+  own). */
+const DEMO_STATE_ELECTION = {
+
+  x: mx("2025-05"),
+  groups: {
+    "Nat": [34.56, 31.82, 6.4, 12.2, 15.01],
+    "NSW": [35.2, 31.53, 6.02, 11.06, 16.19],
+    "Vic": [33.95, 32.2, 5.79, 13.59, 14.48],
+    "Qld": [30.98, 34.91, 7.84, 11.76, 14.5],
+    "Rest of Australia": [37.64, 29.01, 6.34, 12.55, 14.45],
+  },
+};
+
+/* One figure per group and party, built as the headline is. Each poll says
    how far a group sits from that poll's own all-voters figure – One Nation
    ten points lower among 18–34s, say. Those gaps are pooled over the six-week
    window (recency- and sample-weighted, a house's repeat waves as sqrt(m);
@@ -4517,6 +4541,9 @@ window.AUSPOL = (function () {
   /* Composition trend (§7gb): per party, the groups that have moved toward
      or away from it out of proportion to the all-voters line. */
   const demoTrend = ${JSON.stringify(demoTrend)};
+  /* The By-state panels' 2025 election marks (§7g): each group's result per
+     party, in order, with the election's mid-month x. */
+  const demoStateElection = ${JSON.stringify(DEMO_STATE_ELECTION)};
   /* The issues (§7h): per issue, who voters think is best (three-way,
      pooled) and how many put it in their top three, plus the top three by
      group. */
@@ -4600,7 +4627,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoTrend, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoTrend, demoStateElection, demoGroups, issues, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
