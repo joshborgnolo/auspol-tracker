@@ -2868,7 +2868,7 @@ const demoTrend = (() => {
 const OWN3 = ["alp", "lnp", "onp"];
 const ISSUE_GROUP_SETS = [
   { id: "vote", label: "Vote" }, { id: "generation", label: "Age" }, { id: "gender", label: "Gender" },
-  { id: "location", label: "Place" }, { id: "housing", label: "Home" }, { id: "education", label: "Education" },
+  { id: "education", label: "Education" }, { id: "location", label: "Place" }, { id: "housing", label: "Home" },
 ];
 /* Each group's rough share of a poll's respondents: it sizes that group's
    sampling-error floor and nothing else. Vote groups from the poll's own

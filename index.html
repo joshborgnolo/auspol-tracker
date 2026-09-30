@@ -20,7 +20,7 @@
   <meta property="og:site_name" content="auspoltracker.com">
   <meta property="og:locale" content="en_AU">
   <meta property="og:url" content="https://auspoltracker.com/">
-  <meta property="og:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-01-809499d0">
+  <meta property="og:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-09-30-809499d0">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="auspol tracker: Labor 52.0, Coalition 48.0 two-party preferred on implied preference flows, ±1.4 points, updated 29 September 2026, with the trend since the 2025 election">
@@ -3939,6 +3939,17 @@ body.rd .rd-iw-cell b em { font-style: normal; margin-left: 3px; font-size: 12px
 }
 body.rd .rd-iw-k { display: block; margin-top: 16px; font-size: 12px; font-weight: 600; color: var(--ink-2); }
 body.rd .rd-iw-k:first-child { margin-top: 0; }
+@media (max-width: 1000px) {
+  body.rd .rd-iw-tabs { border-bottom: 1px solid var(--line); margin-top: 4px; }
+  body.rd .rd-iw-tabs > [role="group"] { flex: 1 1 auto; }
+  body.rd .rd-iw-tabs .rd-tab { flex: 1 1 0; justify-content: center; padding: 0 6px; }
+}
+@media (max-width: 400px) and (min-width: 341px) {
+  body.rd .rd-iw-tabs .rd-tab { padding: 0 4px; }
+}
+@media (max-width: 340px) {
+  body.rd .rd-iw-tabs .rd-tab { padding: 0 2px; font-size: 13px; }
+}
 body.rd .rd-iw-chips {
   margin: 8px calc(-1 * var(--rd-gutter)) 0 0; padding-right: var(--rd-gutter);
   display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
@@ -19420,6 +19431,117 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
           }
         }
       }, {
+        "id": "education",
+        "label": "Education",
+        "groups": ["Below Year 12", "Year 12", "TAFE or trade", "University"],
+        "issues": ["col", "housing", "health", "immigration", "crime", "economy"],
+        "cells": {
+          "Below Year 12": {
+            "col": {
+              "v": 69,
+              "ci": 8.1
+            },
+            "housing": {
+              "v": 29,
+              "ci": 7.9
+            },
+            "health": {
+              "v": 40,
+              "ci": 8.6
+            },
+            "immigration": {
+              "v": 38,
+              "ci": 8.5
+            },
+            "crime": {
+              "v": 39,
+              "ci": 8.5
+            },
+            "economy": {
+              "v": 10,
+              "ci": 5.2
+            }
+          },
+          "Year 12": {
+            "col": {
+              "v": 82,
+              "ci": 5.4
+            },
+            "housing": {
+              "v": 43,
+              "ci": 6.9
+            },
+            "health": {
+              "v": 34,
+              "ci": 6.6
+            },
+            "immigration": {
+              "v": 24,
+              "ci": 6
+            },
+            "crime": {
+              "v": 22,
+              "ci": 5.8
+            },
+            "economy": {
+              "v": 9,
+              "ci": 4
+            }
+          },
+          "TAFE or trade": {
+            "col": {
+              "v": 74,
+              "ci": 5.4
+            },
+            "housing": {
+              "v": 29,
+              "ci": 5.6
+            },
+            "health": {
+              "v": 39,
+              "ci": 6
+            },
+            "immigration": {
+              "v": 33,
+              "ci": 5.8
+            },
+            "crime": {
+              "v": 28,
+              "ci": 5.6
+            },
+            "economy": {
+              "v": 13,
+              "ci": 4.2
+            }
+          },
+          "University": {
+            "col": {
+              "v": 75,
+              "ci": 5.5
+            },
+            "housing": {
+              "v": 32,
+              "ci": 6
+            },
+            "health": {
+              "v": 37,
+              "ci": 6.2
+            },
+            "immigration": {
+              "v": 23,
+              "ci": 5.4
+            },
+            "crime": {
+              "v": 25,
+              "ci": 5.5
+            },
+            "economy": {
+              "v": 21,
+              "ci": 5.2
+            }
+          }
+        }
+      }, {
         "id": "location",
         "label": "Place",
         "groups": ["Inner metro", "Outer metro", "Provincial", "Rural"],
@@ -19612,117 +19734,6 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
             "economy": {
               "v": 8,
               "ci": 3.3
-            }
-          }
-        }
-      }, {
-        "id": "education",
-        "label": "Education",
-        "groups": ["Below Year 12", "Year 12", "TAFE or trade", "University"],
-        "issues": ["col", "housing", "health", "immigration", "crime", "economy"],
-        "cells": {
-          "Below Year 12": {
-            "col": {
-              "v": 69,
-              "ci": 8.1
-            },
-            "housing": {
-              "v": 29,
-              "ci": 7.9
-            },
-            "health": {
-              "v": 40,
-              "ci": 8.6
-            },
-            "immigration": {
-              "v": 38,
-              "ci": 8.5
-            },
-            "crime": {
-              "v": 39,
-              "ci": 8.5
-            },
-            "economy": {
-              "v": 10,
-              "ci": 5.2
-            }
-          },
-          "Year 12": {
-            "col": {
-              "v": 82,
-              "ci": 5.4
-            },
-            "housing": {
-              "v": 43,
-              "ci": 6.9
-            },
-            "health": {
-              "v": 34,
-              "ci": 6.6
-            },
-            "immigration": {
-              "v": 24,
-              "ci": 6
-            },
-            "crime": {
-              "v": 22,
-              "ci": 5.8
-            },
-            "economy": {
-              "v": 9,
-              "ci": 4
-            }
-          },
-          "TAFE or trade": {
-            "col": {
-              "v": 74,
-              "ci": 5.4
-            },
-            "housing": {
-              "v": 29,
-              "ci": 5.6
-            },
-            "health": {
-              "v": 39,
-              "ci": 6
-            },
-            "immigration": {
-              "v": 33,
-              "ci": 5.8
-            },
-            "crime": {
-              "v": 28,
-              "ci": 5.6
-            },
-            "economy": {
-              "v": 13,
-              "ci": 4.2
-            }
-          },
-          "University": {
-            "col": {
-              "v": 75,
-              "ci": 5.5
-            },
-            "housing": {
-              "v": 32,
-              "ci": 6
-            },
-            "health": {
-              "v": 37,
-              "ci": 6.2
-            },
-            "immigration": {
-              "v": 23,
-              "ci": 5.4
-            },
-            "crime": {
-              "v": 25,
-              "ci": 5.5
-            },
-            "economy": {
-              "v": 21,
-              "ci": 5.2
             }
           }
         }
@@ -68356,19 +68367,17 @@ function RdIssues({
     ref: iwCard
   }, whomList ? React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-iw-k"
-  }, "Group voters by"), React.createElement("div", {
-    className: "rd-iw-chips",
-    role: "group",
-    "aria-label": "Group voters by",
-    onKeyDown: rdTabsKey(G.tabs, pickGset),
-    onClick: rdTabFocus
-  }, G.tabs.map(x => React.createElement("button", {
-    key: x.id,
-    type: "button",
-    className: "rd-iw-chip",
-    "aria-pressed": gtab.id === x.id,
-    onClick: () => pickGset(x.id)
-  }, x.label))), React.createElement("span", {
+  }, "Group voters by"), React.createElement(RdTabs, {
+    swipe: true,
+    value: gtab.id,
+    onChange: pickGset,
+    options: G.tabs.map(x => ({
+      id: x.id,
+      label: x.label
+    })),
+    ariaLabel: "Group voters by",
+    className: "rd-tabs-sm rd-iw-tabs"
+  }), React.createElement("span", {
     className: "rd-iw-k"
   }, "Issue"), React.createElement("div", {
     className: "rd-iw-chips",

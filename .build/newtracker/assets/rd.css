@@ -1241,9 +1241,29 @@ body.rd .rd-iw-cell b em { font-style: normal; margin-left: 3px; font-size: 12px
   body.rd .rd-iw-table col.rd-iw-labcol { width: 170px; }
 }
 /* a tablet or phone: one issue at a time, as the canvas's phone board drew it -
-   chips for the groups and the issue, then every group down one scale */
+   the laptop's grouping menu above it, chips for the issue, then every
+   group down one scale */
 body.rd .rd-iw-k { display: block; margin-top: 16px; font-size: 12px; font-weight: 600; color: var(--ink-2); }
 body.rd .rd-iw-k:first-child { margin-top: 0; }
+/* the grouping menu in the one-issue list: there's no ctl row here, so the
+   row carries its own baseline, and the six group words share the card's
+   width evenly */
+@media (max-width: 1000px) {
+  body.rd .rd-iw-tabs { border-bottom: 1px solid var(--line); margin-top: 4px; }
+  body.rd .rd-iw-tabs > [role="group"] { flex: 1 1 auto; }
+  body.rd .rd-iw-tabs .rd-tab { flex: 1 1 0; justify-content: center; padding: 0 6px; }
+}
+/* narrow phones: six tabs in the laptop's size outgrow the narrow card, so
+   the menu steps its lettering down rather than crowd the page edge (every
+   rung measured against the card, smallest phone first: 13px/2px needs
+   ~262px of a 280px card at 320 · 14px/4px ~303px of a 320px card at 360 ·
+   the full 14px/6px ~327px of a 350px card at 390) */
+@media (max-width: 400px) and (min-width: 341px) {
+  body.rd .rd-iw-tabs .rd-tab { padding: 0 4px; }
+}
+@media (max-width: 340px) {
+  body.rd .rd-iw-tabs .rd-tab { padding: 0 2px; font-size: 13px; }
+}
 body.rd .rd-iw-chips {
   margin: 8px calc(-1 * var(--rd-gutter)) 0 0; padding-right: var(--rd-gutter);
   display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;

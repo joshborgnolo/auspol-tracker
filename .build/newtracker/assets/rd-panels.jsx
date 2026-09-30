@@ -2461,13 +2461,14 @@ function RdIssues({ rangeId = "all" }) {
             <div className="card rd-card rd-iw" ref={iwCard}>
               {whomList ? (
                 /* a tablet or phone: pick the groups and the issue, and read
-                   every group's share of that one issue down a single scale */
+                   every group's share of that one issue down a single scale.
+                   The grouping picks from the same menu a laptop shows (the
+                   chips gave way to it, 2026-09-30, user's) - as who votes
+                   for whom's row does on a phone, swipe included */
                 <>
                   <span className="rd-iw-k">Group voters by</span>
-                  <div className="rd-iw-chips" role="group" aria-label="Group voters by"
-                       onKeyDown={rdTabsKey(G.tabs, pickGset)} onClick={rdTabFocus}>
-                    {G.tabs.map((x) => <button key={x.id} type="button" className="rd-iw-chip" aria-pressed={gtab.id === x.id} onClick={() => pickGset(x.id)}>{x.label}</button>)}
-                  </div>
+                  <RdTabs swipe value={gtab.id} onChange={pickGset} options={G.tabs.map((x) => ({ id: x.id, label: x.label }))}
+                          ariaLabel="Group voters by" className="rd-tabs-sm rd-iw-tabs" />
                   <span className="rd-iw-k">Issue</span>
                   <div className="rd-iw-chips" role="group" aria-label="Issue">
                     {gtab.issues.map((k) => <button key={k} type="button" className="rd-iw-chip" aria-pressed={whomIssue === k} onClick={() => pickWhom(k)}>{ISS_SHORT[k] || I.labels[k] || k}</button>)}
