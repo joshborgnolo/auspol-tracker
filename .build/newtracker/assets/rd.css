@@ -1005,8 +1005,8 @@ body.rd .rd-wv-allcap > span { position: absolute; left: 0; transform: translate
 body.rd .rd-wv-vs { grid-column: 3 / span 2; text-align: right; font-size: 12px; }
 body.rd .rd-wv-row { min-height: 32px; }
 body.rd .rd-wv-lab { font-size: 15px; color: var(--ink); }
-/* a generation's birth years ride its label as a quiet bracket; lit while it
-   reads as ages (hover or tapped on) */
+/* a generation's ages ride its label as a quiet bracket; lit while it reads
+   as birth years (hover or tapped on) */
 body.rd .rd-wv-born { margin-left: 5px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; color: var(--ink-3); white-space: nowrap; cursor: pointer; }
 body.rd .rd-wv-born.on { color: var(--ink); }
 body.rd .rd-wv-track { position: relative; height: 32px; }

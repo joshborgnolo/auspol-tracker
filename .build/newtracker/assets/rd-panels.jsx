@@ -1058,29 +1058,29 @@ const RD_DEMO_HOME = {
   oth: "Voters for others/independents are more likely to be Gen Z, renting, and NSW-based; less likely to live in provincial areas or have a mortgage",
 };
 /* the usual (Pew) birth years behind the polls' generation labels: neither
-   pollster publishes its own, so the "By generation" dot-plot labels show
-   these in brackets. The Info glossary's "Generations" entry (d1a1d215
-   asset) lists the same ranges - the two copies move together */
+   pollster publishes its own, so the "By generation" dot-plot labels bracket
+   each row as ages derived from these. The Info glossary's "Generations"
+   entry (d1a1d215 asset) lists the same ranges - the two copies move together */
 const RD_GEN_BORN = { "Gen Z": [1997, 2012], Millennials: [1981, 1996], "Gen X": [1965, 1980], Boomers: [1946, 1964] };
-/* a label's birth years read as ages when asked: hover works on a mouse
-   pointer, a tap toggles. Floored at voting age, since the panel reports
-   voters (Gen Z's young end sits under 18 this decade; the floor lifts
-   itself once 2012 comes of age) */
+/* a label's bracket reads as today's ages; a hover on a mouse pointer or a
+   tap shows the birth years instead. Ages are floored at voting age, since
+   the panel reports voters (Gen Z's young end sits under 18 this decade;
+   the floor lifts itself once 2012 comes of age) */
 function RdGenBorn({ label }) {
   const born = RD_GEN_BORN[label];
   const [hover, setHover] = useState(false);
   const [tapped, setTapped] = useState(false);
   if (!born) return null;
   const y = new Date().getFullYear();
-  const asAges = hover || tapped;
+  const asYears = hover || tapped;
   return (
-    <button type="button" className={"rd-wv-born" + (asAges ? " on" : "")}
-            aria-pressed={asAges}
-            aria-label={label + ", born " + born[0] + " to " + born[1] + ", shows their current ages"}
+    <button type="button" className={"rd-wv-born" + (asYears ? " on" : "")}
+            aria-pressed={asYears}
+            aria-label={label + ", aged " + Math.max(18, y - born[1]) + " to " + (y - born[0]) + ", shows the birth years"}
             onPointerEnter={(e) => { if (e.pointerType === "mouse") setHover(true); }}
             onPointerLeave={(e) => { if (e.pointerType === "mouse") setHover(false); }}
             onClick={() => setTapped((v) => !v)}>
-      ({asAges ? "aged " + Math.max(18, y - born[1]) + "–" + (y - born[0]) : born[0] + "–" + born[1]})
+      ({asYears ? born[0] + "–" + born[1] : "aged " + Math.max(18, y - born[1]) + "–" + (y - born[0])})
     </button>
   );
 }

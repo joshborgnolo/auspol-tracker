@@ -62722,6 +62722,26 @@ let rdPinRO = null;
 let rdPinHeld = null;
 let rdPinLive = 0;
 const RD_PIN_STICKY = ".tabs.sticky,.info-index,.rd-ap-headwrap,.poll-table thead th";
+let rdTouchHot = 0;
+window.addEventListener("touchstart", () => {
+  rdTouchHot = performance.now() + 500;
+}, {
+  passive: true
+});
+window.addEventListener("touchmove", () => {
+  rdTouchHot = performance.now() + 220;
+}, {
+  passive: true
+});
+const rdTouchLift = () => {
+  rdTouchHot = performance.now() + 160;
+};
+window.addEventListener("touchend", rdTouchLift, {
+  passive: true
+});
+window.addEventListener("touchcancel", rdTouchLift, {
+  passive: true
+});
 const rdPinClip = (row, rowTop) => {
   const held = rdPinHeld || (rdPinHeld = []);
   const freeze = (o, r) => {
@@ -62739,13 +62759,14 @@ const rdPinClip = (row, rowTop) => {
     if (r.bottom > rowTop + 1) return;
     freeze(o, r);
   });
+  const freezeOnScreen = performance.now() < rdTouchHot;
   for (let node = row; node && node !== document.body;) {
     const parent = node.parentElement;
     if (!parent || parent === document.body) break;
     for (let sib = parent.firstElementChild; sib && sib !== node; sib = sib.nextElementSibling) {
       if (sib.__rdFrozen) continue;
       const r = sib.getBoundingClientRect();
-      if (!r.height || r.bottom > rowTop + 1) continue;
+      if (!r.height || r.bottom > rowTop + 1 || !freezeOnScreen && r.bottom > 0) continue;
       if (sib.matches(RD_PIN_STICKY) || sib.querySelector(RD_PIN_STICKY)) continue;
       freeze(sib, r);
     }
@@ -66108,12 +66129,12 @@ function RdGenBorn({
   const [tapped, setTapped] = useState(false);
   if (!born) return null;
   const y = new Date().getFullYear();
-  const asAges = hover || tapped;
+  const asYears = hover || tapped;
   return React.createElement("button", {
     type: "button",
-    className: "rd-wv-born" + (asAges ? " on" : ""),
-    "aria-pressed": asAges,
-    "aria-label": label + ", born " + born[0] + " to " + born[1] + ", shows their current ages",
+    className: "rd-wv-born" + (asYears ? " on" : ""),
+    "aria-pressed": asYears,
+    "aria-label": label + ", aged " + Math.max(18, y - born[1]) + " to " + (y - born[0]) + ", shows the birth years",
     onPointerEnter: e => {
       if (e.pointerType === "mouse") setHover(true);
     },
@@ -66121,7 +66142,7 @@ function RdGenBorn({
       if (e.pointerType === "mouse") setHover(false);
     },
     onClick: () => setTapped(v => !v)
-  }, "(", asAges ? "aged " + Math.max(18, y - born[1]) + "–" + (y - born[0]) : born[0] + "–" + born[1], ")");
+  }, "(", asYears ? born[0] + "–" + born[1] : "aged " + Math.max(18, y - born[1]) + "–" + (y - born[0]), ")");
 }
 const RD_TREND_NAME = {
   onp: "One Nation",
