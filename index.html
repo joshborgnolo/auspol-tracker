@@ -66411,11 +66411,22 @@ function RdDemographics({
     }
     const le = c.st.id === "location" && D.demoLocElection ? D.demoLocElection : null;
     const leI = le && !pm ? T.order.indexOf(party) : -1;
-    const leOn = le != null && leI >= 0 && c.allPts.length && le.x >= xDom[0] - 0.25 - 1e-6 && le.x < c.allPts[0].x;
+    const leOn = le != null && leI >= 0 && c.allPts.length && le.x < c.allPts[0].x && (xDom[0] <= le.x + 1e-6 || rangeId === "all");
     const leN = leOn ? le.groups.Nat[leI] : null;
     const leY = g => leOn && le.groups[g.label] ? le.groups[g.label][leI] : null;
     const xDomL = leOn && le.x < xDom[0] ? [le.x - 0.05, xDom[1]] : xDom;
     const ciLoc = ciRows(rowsOf, "95% intervals");
+    const leRows = leOn ? rowsOf.filter(r => leY(r.l.g) != null).map(r => ({
+      label: r.l.g.label,
+      value: leY(r.l.g).toFixed(1) + "%",
+      color: colorOf(r),
+      y: leY(r.l.g)
+    })).concat(leN != null ? [{
+      label: "All voters",
+      value: leN.toFixed(1) + "%",
+      color: "var(--ink)",
+      y: leN
+    }] : []).sort((a, b) => b.y - a.y) : [];
     return React.createElement("div", {
       className: "card rd-card rd-wv-chart",
       key: c.st.id,
@@ -66445,24 +66456,7 @@ function RdDemographics({
       xTicks: rdXTicks(c.x0, c.x1, narrow || c.span < 0.8),
       baseline: true,
       driven: !!A,
-      series: [leN != null ? {
-        ...allSeries,
-        points: [{
-          x: le.x,
-          y: leN
-        }].concat(allSeries.points)
-      } : allSeries, ...rowsOf.map(r => {
-        const y = leY(r.l.g);
-        return lineOf(r, colorOf(r), y != null ? {
-          points: [{
-            x: le.x,
-            y
-          }].concat(r.rows.map(d => ({
-            x: d.x,
-            y: d.y
-          })))
-        } : undefined);
-      })],
+      series: [allSeries, ...rowsOf.map(r => lineOf(r, colorOf(r)))],
       areas: rowsOf.map(r => bandOf(r, colorOf(r))).filter(a => a.points.length >= 2),
       spine: (leN != null ? [{
         x: le.x,
@@ -66483,10 +66477,10 @@ function RdDemographics({
       fade: A ? t : 1,
       pollFacet: "primary",
       tooltipTitle: i => leOn && i === 0 ? monthLabelFull("2025-05") : c.allPts[leOn ? i - 1 : i] ? monthLabelFull(c.allPts[leOn ? i - 1 : i].ym) : "",
-      extraRows: leOn ? i => i === 0 ? [{
+      extraRows: leOn ? i => i === 0 ? leRows.concat({
         label: "",
         value: "The election result"
-      }] : ciLoc(i - 1) : ciLoc,
+      }) : ciLoc(i - 1) : ciLoc,
       fmt: v => v.toFixed(1),
       copy: {
         title: "Who votes for whom",

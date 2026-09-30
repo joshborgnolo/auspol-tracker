@@ -2592,6 +2592,27 @@ const DEMO_STATE_ELECTION = {
   },
 };
 
+/* The same marks for the By-location lines: each classification's 2025
+   first-preference result, computed from the AEC's 150 division pages
+   (event 31496 HouseDivisionPage-*) summed over the divisions the divisional
+   classifications page (HouseDivisionClassifications-31496-NAT) puts in
+   each demographic class, party bucketing as the state marks'. Sums and
+   bucket shares: .matilda/aec-loc-election.mjs; its national column
+   reproduces the early-rounded Nat row [34.56, 31.82, 6.4, 12.2, 15.01]
+   within 0.07, so Nat stays that official row for consistency with every
+   other election display. Keys are the location set's group labels. */
+const DEMO_LOC_ELECTION = {
+
+  x: mx("2025-05"),
+  groups: {
+    "Nat": [34.56, 31.82, 6.4, 12.2, 15.01],
+    "Inner metro": [38.35, 27.98, 3.49, 16.5, 13.68],
+    "Outer metro": [39.28, 30.21, 6.18, 11.87, 12.45],
+    "Provincial": [35.2, 32.6, 8.01, 11.22, 12.97],
+    "Rural": [24.41, 37.68, 8.94, 8.41, 20.56],
+  },
+};
+
 /* One figure per group and party, built as the headline is. Each poll says
    how far a group sits from that poll's own all-voters figure – One Nation
    ten points lower among 18–34s, say. Those gaps are pooled over the six-week
@@ -4544,6 +4565,9 @@ window.AUSPOL = (function () {
   /* The By-state panels' 2025 election marks (§7g): each group's result per
      party, in order, with the election's mid-month x. */
   const demoStateElection = ${JSON.stringify(DEMO_STATE_ELECTION)};
+  /* The By-location chart's 2025 election marks (§7g), same shape: one ring
+     per classification line at May 2025. */
+  const demoLocElection = ${JSON.stringify(DEMO_LOC_ELECTION)};
   /* The issues (§7h): per issue, who voters think is best (three-way,
      pooled) and how many put it in their top three, plus the top three by
      group. */
@@ -4627,7 +4651,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoTrend, demoStateElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved

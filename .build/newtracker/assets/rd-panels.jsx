@@ -1429,20 +1429,43 @@ function RdDemographics({ rangeId = "all" }) {
         </div>
       );
     }
+    /* By location gets the state panels' rings too - one per classification
+       line at its own 2025 election result, named "The election result" in
+       the hover. The monthly run only starts Feb 2026 though, nearly a year
+       after the election, so where the state ring leads its line back by a
+       month or two this one stands alone at the election x: the domain
+       widens to hold it and the hover's swatch rows come from the election
+       figures themselves. The stretch is kept to the all-range (and any
+       window whose left edge already reaches back that far); a short range
+       keeps its own window, and nothing is marked mid-party-switch */
+    const le = c.st.id === "location" && D.demoLocElection ? D.demoLocElection : null;
+    const leI = le && !pm ? T.order.indexOf(party) : -1;
+    const leOn = le != null && leI >= 0 && c.allPts.length && le.x < c.allPts[0].x
+      && (xDom[0] <= le.x + 1e-6 || rangeId === "all");
+    const leN = leOn ? le.groups.Nat[leI] : null;
+    const leY = (g) => (leOn && le.groups[g.label] ? le.groups[g.label][leI] : null);
+    const xDomL = leOn && le.x < xDom[0] ? [le.x - 0.05, xDom[1]] : xDom;
+    const ciLoc = ciRows(rowsOf, "95% intervals");
+    const leRows = leOn ? rowsOf.filter((r) => leY(r.l.g) != null)
+      .map((r) => ({ label: r.l.g.label, value: leY(r.l.g).toFixed(1) + "%", color: colorOf(r), y: leY(r.l.g) }))
+      .concat(leN != null ? [{ label: "All voters", value: leN.toFixed(1) + "%", color: "var(--ink)", y: leN }] : [])
+      .sort((a, b) => b.y - a.y) : [];
     return (
     <div className="card rd-card rd-wv-chart" key={c.st.id} style={even ? { flex: "1 1 0" } : { flexGrow: narrow ? 1 : Math.max(0.35, c.span) }}>
       {head}
       <TrendChart key={"rd-wv-" + c.st.id + "-" + tab.id} heightPx={narrow ? 240 : 260}
         padPx={narrow ? { l: 34, r: 8, t: 12, b: 28 } : { l: 40, r: 12, t: 12, b: 30 }}
-        xDomain={xDom} yDomain={yDom} yTicks={rdYTicks(0, yMax, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
+        xDomain={xDomL} yDomain={yDom} yTicks={rdYTicks(0, yMax, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
         xTicks={rdXTicks(c.x0, c.x1, narrow || c.span < 0.8)} baseline driven={!!A}
         series={[allSeries, ...rowsOf.map((r) => lineOf(r, colorOf(r)))]}
         areas={rowsOf.map((r) => bandOf(r, colorOf(r))).filter((a) => a.points.length >= 2)}
-        spine={c.allPts.map((d) => ({ x: d.x, y: d.y }))}
+        spine={(leN != null ? [{ x: le.x, y: leN }] : []).concat(c.allPts.map((d) => ({ x: d.x, y: d.y })))}
+        marks={leOn ? rowsOf.filter((r) => leY(r.l.g) != null).map((r) => ({ x: le.x, y: leY(r.l.g), color: colorOf(r) })) : []}
+        ringAtX={leOn ? le.x : null}
         scatter={cross ? cross.scatter : c.dots} scatterOut={cross ? cross.scatterOut : []} scatterMove={cross ? cross.scatterMove : []}
         fade={A ? t : 1} pollFacet="primary"
-        tooltipTitle={(i) => (c.allPts[i] ? monthLabelFull(c.allPts[i].ym) : "")}
-        extraRows={ciRows(rowsOf, "95% intervals")}
+        tooltipTitle={(i) => (leOn && i === 0 ? monthLabelFull("2025-05") : c.allPts[leOn ? i - 1 : i] ? monthLabelFull(c.allPts[leOn ? i - 1 : i].ym) : "")}
+        extraRows={leOn ? ((i) => (i === 0 ? leRows.concat({ label: "", value: "The election result" }) : ciLoc(i - 1))) : ciLoc}
         fmt={(v) => v.toFixed(1)}
         /* keyed in full: a phone names no line at its end, and "All voters"
            loses its name wherever the groups crowd it */

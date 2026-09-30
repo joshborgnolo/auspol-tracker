@@ -141,6 +141,9 @@ window.AUSPOL = (function () {
   /* The By-state panels' 2025 election marks (§7g): each group's result per
      party, in order, with the election's mid-month x. */
   const demoStateElection = {"x":2025.375,"groups":{"Nat":[34.56,31.82,6.4,12.2,15.01],"NSW":[35.2,31.53,6.02,11.06,16.19],"Vic":[33.95,32.2,5.79,13.59,14.48],"Qld":[30.98,34.91,7.84,11.76,14.5],"Rest of Australia":[37.64,29.01,6.34,12.55,14.45]}};
+  /* The By-location chart's 2025 election marks (§7g), same shape: one ring
+     per classification line at May 2025. */
+  const demoLocElection = {"x":2025.375,"groups":{"Nat":[34.56,31.82,6.4,12.2,15.01],"Inner metro":[38.35,27.98,3.49,16.5,13.68],"Outer metro":[39.28,30.21,6.18,11.87,12.45],"Provincial":[35.2,32.6,8.01,11.22,12.97],"Rural":[24.41,37.68,8.94,8.41,20.56]}};
   /* The issues (§7h): per issue, who voters think is best (three-way,
      pooled) and how many put it in their top three, plus the top three by
      group. */
@@ -224,7 +227,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoTrend, demoStateElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved

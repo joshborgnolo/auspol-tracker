@@ -37,6 +37,16 @@ const ELECTION = {
 };
 /* the All-voters row at the election month reads the NATIONAL result */
 const ELECTION_NAT = { alp: 34.56, lnp: 31.82, onp: 6.4, grn: 12.2, oth: 15.01 };
+/* By location: each classification line's own share (Inner, Outer, Prov,
+   Rural order), ringed at the same May 2025 x */
+const LOC = ["Inner metro", "Outer metro", "Provincial", "Rural"];
+const ELECTION_LOC = {
+  alp: [38.35, 39.28, 35.2, 24.41],
+  lnp: [27.98, 30.21, 32.6, 37.68],
+  onp: [3.49, 6.18, 8.01, 8.94],
+  grn: [16.5, 11.87, 11.22, 8.41],
+  oth: [13.68, 12.45, 12.97, 20.56],
+};
 const PARTY_BUTTON = { alp: "Labor", lnp: "Coalition", onp: "One Nation", grn: "Greens", oth: "Others" };
 const PANELS = ["NSW", "Vic", "Qld", "Rest"];
 
@@ -132,10 +142,11 @@ const readTip = () => page.evaluate(() => {
     return {
       label: (r.querySelector(".tip-label") || {}).textContent || "",
       val: (r.querySelector(".tip-val") || {}).textContent || "",
+      hasSwatch: !!sw,
       ring: sw ? sw.classList.contains("is-ring") : false,
     };
   });
-  return { kind: "guide", text: tip.textContent, nSwatch: rows.filter((r) => r.ring !== undefined).length, nRing: rows.filter((r) => r.ring).length, rows };
+  return { kind: "guide", text: tip.textContent, nSwatch: rows.filter((r) => r.hasSwatch).length, nRing: rows.filter((r) => r.ring).length, rows };
 });
 
 /* y-pixel of value v: linear fit through the panel's tick labels */
@@ -145,6 +156,31 @@ const yOf = (v, tks) => {
   return tks[0].cy + (v - tks[0].v) * k;
 };
 
+/* the By-location chart is the only .rd-wv-chart without a panel grid */
+const scrollLoc = () => page.evaluate(() => {
+  const w = [...document.querySelectorAll("#who-votes .rd-wv-charts > .rd-wv-chart")].find((x) => !x.querySelector(".rd-wv-panels"));
+  if (w) w.scrollIntoView({ block: "center" });
+});
+const readLoc = () => page.evaluate(() => {
+  const card = [...document.querySelectorAll("#who-votes .rd-wv-charts > .rd-wv-chart")].find((x) => !x.querySelector(".rd-wv-panels"));
+  if (!card) return { found: false };
+  const svg = card.querySelector("svg");
+  const svgR = svg.getBoundingClientRect();
+  const lines = [...card.querySelectorAll("path.series-line")].map((x) => getComputedStyle(x).stroke);
+  const rings = [...card.querySelectorAll("circle.rd-ring")].map((c) => {
+    const r = c.getBoundingClientRect();
+    return { stroke: getComputedStyle(c).stroke, cx: r.x + r.width / 2, cy: r.y + r.height / 2 };
+  }).filter((r) => r.cx > 0 || r.cy > 0);
+  const lab = card.querySelector(".rd-mark text");
+  const tks = [...card.querySelectorAll("text.axis-label.y")].map((t) => {
+    const r = t.getBoundingClientRect();
+    return { v: parseFloat(t.textContent), cy: r.y + r.height / 2 };
+  }).filter((t) => !isNaN(t.v));
+  tks.sort((a, b) => a.v - b.v);
+  const head = (card.querySelector(".rd-chead") || {}).textContent || "";
+  return { found: true, head, svgR: { x: svgR.x, y: svgR.y, w: svgR.width, h: svgR.height }, lines, rings, label: lab ? lab.textContent : null, tks };
+});
+
 for (const party of ["alp", "lnp", "onp", "grn", "oth"]) {
   await openParty(party);
   /* scroll the panel grid into view so rect reads are viewport-relative */
@@ -152,8 +188,14 @@ for (const party of ["alp", "lnp", "onp", "grn", "oth"]) {
     const w = document.querySelector("#who-votes .rd-wv-panels");
     if (w) w.scrollIntoView({ block: "center" });
   });
-  await sleep(250);
-  const P = await readPanels();
+  /* rings unmount while a party switch morphs and re-mount on its last
+     frame; poll until all four are back rather than trusting a settle */
+  let P = null;
+  for (let tries = 0; tries < 12; tries++) {
+    await sleep(250);
+    P = await readPanels();
+    if (P.found && P.panels.length === 4 && P.panels.every((p) => p.ringBox)) break;
+  }
   check(party + ": four state panels", P.found && P.panels.length === 4, P.panels && P.panels.map((p) => p.name).join(","));
   if (!P.found || P.panels.length !== 4) continue;
   check(party + ": rings in every panel", P.panels.every((p) => p.ringBox), JSON.stringify(P.panels.map((p) => !!p.ringBox)));
@@ -172,10 +214,12 @@ for (const party of ["alp", "lnp", "onp", "grn", "oth"]) {
   /* hover Victoria's ring: guide tip, two ring swatches, both rows at the election share */
   const vic = P.panels[1];
   let t = { kind: "none" };
-  for (const off of [[0, 0], [0, -40], [0, 40], [2, -70]]) {
-    await hoverAt(vic.ringBox.cx + off[0], vic.ringBox.cy + off[1]);
-    t = await readTip();
-    if (t.kind === "guide") break;
+  if (vic.ringBox) {
+    for (const off of [[0, 0], [0, -40], [0, 40], [2, -70]]) {
+      await hoverAt(vic.ringBox.cx + off[0], vic.ringBox.cy + off[1]);
+      t = await readTip();
+      if (t.kind === "guide") break;
+    }
   }
   check(party + " Vic election hover: guide tip", t.kind === "guide", JSON.stringify(t).slice(0, 220));
   if (t.kind === "guide") {
@@ -198,6 +242,60 @@ for (const party of ["alp", "lnp", "onp", "grn", "oth"]) {
   }
   check(party + " Vic recent month: plain squares", t2.kind === "guide" && t2.nRing === 0,
     t2.kind + " " + JSON.stringify(t2.rows || []).slice(0, 160));
+
+  /* By location: one ring per classification line at its own AEC share, in
+     the line's colour, label-free; the May 2025 hover reads five rows with
+     ring swatches, the national figure on All voters, and the footer */
+  await scrollLoc();
+  let L = null;
+  for (let tries = 0; tries < 12; tries++) {
+    await sleep(250);
+    L = await readLoc();
+    if (!L.found || L.rings.length === LOC.length) break;
+  }
+  check(party + ": By-location chart found", L.found, L.found ? L.head.slice(0, 60) : "");
+  if (!L.found) continue;
+  const expL = ELECTION_LOC[party];
+  check(party + " location: a ring per classification line", L.rings.length === LOC.length,
+    L.rings.length + " rings");
+  check(party + " location: rings carry no text label", !L.label, JSON.stringify(L.label));
+  L.rings.forEach((rk, ri) => {
+    check(party + " location ring " + ri + " is a line colour", L.lines.slice(1).some((s) => s === rk.stroke),
+      rk.stroke + " in " + JSON.stringify(L.lines.slice(1)));
+    check(party + " location ring " + ri + " not the all-voters ink", rk.stroke !== L.lines[0], "both " + rk.stroke);
+  });
+  LOC.forEach((g, gi) => {
+    const y = yOf(expL[gi], L.tks);
+    check(party + " " + g + ": ring at the AEC share " + expL[gi],
+      L.tks.length >= 2 && L.rings.some((rk) => Math.abs(rk.cy - y) < 3),
+      "exp y " + y.toFixed(1) + " rings " + L.rings.map((rk) => rk.cy.toFixed(1)).join(",") + " ticks" + JSON.stringify(L.tks.map((t) => t.v)));
+  });
+  const rk0 = L.rings.length ? L.rings.slice().sort((a, b) => a.cx - b.cx)[0] : null;
+  let t3 = { kind: "none" };
+  if (rk0) {
+    for (const off of [[0, 0], [0, -30], [0, 30], [5, -60], [5, 60]]) {
+      await hoverAt(rk0.cx + off[0], rk0.cy + off[1]);
+      t3 = await readTip();
+      if (t3.kind === "guide") break;
+    }
+  }
+  check(party + " location election hover: guide tip", t3.kind === "guide", JSON.stringify(t3).slice(0, 220));
+  if (t3.kind === "guide") {
+    check(party + " location election hover: five ring swatches", t3.nSwatch === 5 && t3.nRing === 5,
+      t3.nRing + "/" + t3.nSwatch + " " + JSON.stringify((t3.rows || []).map((r) => r.label)));
+    const rNat2 = (t3.rows || []).find((r) => /^All voters$/.test(r.label));
+    check(party + " location election hover: all-voters row at the national result",
+      !!rNat2 && Math.abs(parseFloat(rNat2.val) - ELECTION_NAT[party]) < 0.06, JSON.stringify(rNat2));
+    check(party + " location election hover: tip titled May 2025", /May 2025/.test(t3.text), JSON.stringify(t3.text && t3.text.slice(0, 40)));
+    check(party + " location election hover: footer names the election", /The election result/.test(t3.text), JSON.stringify(t3.text && t3.text.slice(-80)));
+  }
+  let t4 = { kind: "none" };
+  for (const off of [[-40, 0], [-40, -40], [-40, 40], [-110, 0]]) {
+    await hoverAt(L.svgR.x + L.svgR.w - 20 + off[0], L.svgR.y + L.svgR.h / 2 + off[1]);
+    t4 = await readTip();
+    if (t4.kind === "guide") break;
+  }
+  check(party + " location recent month: plain squares", t4.kind === "guide" && t4.nRing === 0, t4.kind);
 }
 
 await browser.close();
