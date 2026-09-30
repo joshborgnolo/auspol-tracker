@@ -186,6 +186,7 @@ for (const party of ["alp", "lnp", "onp", "grn", "oth"]) {
     check(party + " Vic election hover: rows at the election shares",
       rNat && rSt && Math.abs(parseFloat(rNat.val) - ELECTION_NAT[party]) < 0.06 && Math.abs(parseFloat(rSt.val) - ELECTION[party][1]) < 0.06, JSON.stringify(t.rows));
     check(party + " Vic election hover: tip titled May 2025", /May 2025/.test(t.text), JSON.stringify(t.text && t.text.slice(0, 40)));
+    check(party + " Vic election hover: footer names the election", /The election result/.test(t.text), JSON.stringify(t.text && t.text.slice(-80)));
   }
   /* a recent month: the guide may not rise straight onto a scatter dot, so
      walk a few offsets until one appears */

@@ -66372,7 +66372,10 @@ function RdDemographics({
           fade: A ? t : 1,
           pollFacet: "primary",
           tooltipTitle: i => seY != null && i === 0 ? monthLabelFull("2025-05") : c.allPts[seY != null ? i - 1 : i] ? monthLabelFull(c.allPts[seY != null ? i - 1 : i].ym) : "",
-          extraRows: seY != null ? i => i === 0 ? [] : ciUnshifted(i - 1) : ciUnshifted,
+          extraRows: seY != null ? i => i === 0 ? [{
+            label: "",
+            value: "The election result"
+          }] : ciUnshifted(i - 1) : ciUnshifted,
           fmt: v => v.toFixed(1),
           copy: {
             title: "Who votes for whom",

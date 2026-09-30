@@ -1413,7 +1413,7 @@ function RdDemographics({ rangeId = "all" }) {
                     scatterMove={mine(cross ? cross.scatterMove : [], g.label)}
                     fade={A ? t : 1} pollFacet="primary"
                     tooltipTitle={(i) => (seY != null && i === 0 ? monthLabelFull("2025-05") : c.allPts[seY != null ? i - 1 : i] ? monthLabelFull(c.allPts[seY != null ? i - 1 : i].ym) : "")}
-                    extraRows={seY != null ? ((i) => (i === 0 ? [] : ciUnshifted(i - 1))) : ciUnshifted}
+                    extraRows={seY != null ? ((i) => (i === 0 ? [{ label: "", value: "The election result" }] : ciUnshifted(i - 1))) : ciUnshifted}
                     fmt={(v) => v.toFixed(1)}
                     copy={{ title: "Who votes for whom", sub: pPoss + " share of the vote in " + name + ", month by month",
                             legend: [{ label: name, color: pColor, kind: "line" }, { label: "95% interval", color: pColor, kind: "band" }, { label: "All voters", color: "var(--ink)", kind: "dashed" }] }}
