@@ -1082,7 +1082,7 @@ const CYC_EVENTS = {
     {
       date: "2026-01-22", short: "2nd Coalition split",
       label: "Coalition dissolves again",
-      desc: "Second dissolution of the Liberal–National Coalition.",
+      desc: "the Liberal–National Coalition dissolves again.",
       major: true,
     },
     {
