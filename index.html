@@ -4269,7 +4269,6 @@ body.rd .rd-snap-nav button:hover { color: var(--ink); text-decoration: underlin
 body.rd .rd-ap-nav button:focus-visible,
 body.rd .rd-snap-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 body.rd .rd-snap-nav { gap: 16px; }
-@media (max-width: 1279px) { body.rd .rd-snap-nav .rd-snap-t { display: none; } }
 @media (max-width: 1189px) { body.rd .rd-snap-nav { display: none; } }
 body.rd .rd-ap-tabs { margin-top: 28px; }
 body.rd .rd-ap-pctl { display: flex; align-items: center; gap: 4px; min-height: 40px; font-size: 13px; color: var(--ink-3); }
@@ -64334,7 +64333,7 @@ function RdHero(p) {
     }];
   };
   const meta = narrow ? "After preferences, updated " + rdDate(D.latest.updatedISO, true) : "After preferences, " + D.latest.pollsTracked + " polls from " + D.latest.housesTracked + " pollsters, updated " + rdDate(D.latest.updatedISO, true);
-  const snapNav = [["latest-polls", "Latest and next polls"], ["leadership", "Leadership"], ["who-votes", "Who votes for whom"], ["issues", "The issues"], ["undecided", "Undecided", true]];
+  const snapNav = [["latest-polls", "Latest and next polls"], ["leadership", "Leadership"], ["who-votes", "Who votes for whom"], ["issues", "The issues"]];
   const snapGo = id => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({
@@ -64404,10 +64403,9 @@ function RdHero(p) {
   }, meta), !narrow && React.createElement("nav", {
     className: "rd-eyebrow-tools rd-snap-nav",
     "aria-label": "On this page"
-  }, snapNav.map(([id, lab, tail]) => React.createElement("button", {
+  }, snapNav.map(([id, lab]) => React.createElement("button", {
     key: id,
     type: "button",
-    className: tail ? "rd-snap-t" : undefined,
     onClick: () => snapGo(id)
   }, lab)))), story && !narrow && React.createElement(RdHed, {
     head: story.head,
