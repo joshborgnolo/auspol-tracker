@@ -129,6 +129,14 @@ function rdPinScroll(row) {
      bar takes up when it IS stuck (its height), else a row right under the
      viewport top reads as hidden behind it */
   const reserve = () => { const r = bar && bar.getBoundingClientRect(); return r ? Math.min(r.bottom, r.height) : 0; };
+  /* an array is a preference list - the caller names every anchor that would
+     serve and the first one actually on screen takes the pin */
+  if (Array.isArray(row)) row = row.find((el) => {
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    return r.bottom >= reserve() && r.top <= window.innerHeight;
+  });
+  if (!row) return;
   const want0 = row.getBoundingClientRect();
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
   cancelAnimationFrame(rdPinRaf);

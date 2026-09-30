@@ -1455,11 +1455,23 @@ function RdAllPolls(P) {
     ? [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagreement"], ["house-lean", "Lean"], ["flow-drift", "Flows"]]
     : [["rd-ap-top", "The polls"], ["poll-disagreement", "How much they disagree"], ["house-lean", "How each pollster leans"], ["flow-drift", "Preference flows"]];
   /* Walking the facets, the flip or the counts basis rewrites the head and
-     dek above the facet row (every facet but twopp drops them outright);
-     rdPinScroll (rd.jsx) holds the row's spot while the words land. */
+     dek above the facet row (every facet but twopp drops them outright), and
+     on a phone the two-party counts strip springs open between the tab row
+     and the table. Anchor the search/filter bar first: everything above it
+     can then resize itself while the bar, the column head and every row
+     under the reader stay exactly where they were (the tab row can't hold -
+     the strip lands between it and the table; on a phone it rides up the
+     strip's height instead). The desktop column head is the same height in
+     every facet (rd.css's .rd-ap-hrow floor), so the rows hold there too.
+     Deeper scrolls fall back through the tab row to the first data row. */
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
-    rdPinScroll(sec && sec.querySelector(".rd-ap-tabs"));
+    if (!sec) return;
+    rdPinScroll([
+      sec.querySelector(".rd-ap-bar"),
+      sec.querySelector(".rd-ap-tabs"),
+      sec.querySelector(".rd-ap-table .rd-ap-mrow, .rd-ap-table .rd-ap-row, .rd-ap-table .rd-ap-card"),
+    ]);
   };
   const facetPick = (id) => { pinAp(); onFacet(id); };
   const flipPick = () => { pinAp(); onMeasure(onM ? "lnp" : "onp"); };

@@ -1673,7 +1673,8 @@ body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 208px) minmax(0, 208px) minmax(0, 300px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint); }
+body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint);
+  box-sizing: border-box; min-height: 57px; /* every facet meets the scale-header facets' row, so hopping facets never shifts the data rows under the reader */ }
 body.rd .rd-ap-hrow > * { min-width: 0; }
 body.rd .rd-ap-hc1 { padding-left: 12px; }
 body.rd .rd-ap-th {
