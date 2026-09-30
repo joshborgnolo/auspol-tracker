@@ -1475,7 +1475,10 @@ function RdAllPolls(P) {
        are all above the fold, where the pin must still hold the row the
        reader has in view through the facet swap (its head/dek arrive and
        leave by the facet; without an anchor on screen there was nothing to
-       compensate them and the viewport walked down the page each cycle) */
+       compensate them and the viewport walked down the page each cycle).
+       Last of all, the table itself: a facet hop re-keys the whole row set,
+       so on a facet whose rows are all new every row anchor dies with the
+       swap and only the bars and the table keep the pin alive */
     const onScreenRows = [...sec.querySelectorAll(".rd-ap-table .rd-ap-mrow, .rd-ap-table .rd-ap-row, .rd-ap-table .rd-ap-card")]
       .filter((el) => {
         const r = el.getBoundingClientRect();
@@ -1485,6 +1488,7 @@ function RdAllPolls(P) {
       sec.querySelector(".rd-ap-bar"),
       sec.querySelector(".rd-ap-tabs"),
       ...onScreenRows.slice(0, 3),
+      sec.querySelector(".rd-ap-table"),
     ], true);
   };
   const facetPick = (id) => { pinAp(); onFacet(id); };

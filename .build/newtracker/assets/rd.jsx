@@ -254,11 +254,14 @@ function rdPinScroll(row, fine) {
   const reserve = () => { const r = bar && bar.getBoundingClientRect(); return r ? Math.min(r.bottom, r.height) : 0; };
   /* an array is a preference list - the caller names every anchor that would
      serve and the first one actually on screen takes the pin */
-  if (Array.isArray(row)) row = row.find((el) => {
-    if (!el) return false;
-    const r = el.getBoundingClientRect();
-    return r.bottom >= reserve() && r.top <= window.innerHeight;
-  });
+  let list = null;
+  if (Array.isArray(row)) {
+    list = row.filter((el) => el);
+    row = list.find((el) => {
+      const r = el.getBoundingClientRect();
+      return r.bottom >= reserve() && r.top <= window.innerHeight;
+    });
+  }
   if (!row) return;
   const want0 = row.getBoundingClientRect();
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
@@ -275,7 +278,24 @@ function rdPinScroll(row, fine) {
   if (rdPinAnchorSave === null) rdPinAnchorSave = html.style.overflowAnchor;
   html.style.overflowAnchor = "none";
   let want = want0.top, lastY = window.scrollY;
+  /* every candidate a caller lists sits below the section head, so they
+     share the ONE translation through a swap: when the pinned element's
+     own React commit re-keys it out of the DOM mid-pin (an All-polls facet
+     hop replaces the table's whole row set), the pin re-seats onto any
+     candidate still in the tree instead of ending there. Ending handed
+     the mid-swap viewport to the browser's own anchoring, and a facet
+     whose rows are all new walked it a screen or more per cycle */
+  let tops = null;
+  const reseat = () => {
+    if (row.isConnected) return true;
+    const next = tops && tops.find((t) => t[0].isConnected);
+    if (!next) return false;
+    row = next[0];
+    want = next[1];
+    return true;
+  };
   const fix = () => {
+    if (!reseat()) return;
     const drift = row.getBoundingClientRect().top - want;
     if (drift) { window.scrollBy(0, drift); lastY = window.scrollY; }
   };
@@ -284,6 +304,9 @@ function rdPinScroll(row, fine) {
      here in the same task: before any frame gets the chance to paint */
   rdPinClip(row, want0.top);
   fix();
+  /* the candidates' pin-time tops land after the clip's own settle, so
+     each snapshot is its post-freeze spot */
+  if (list) tops = list.map((el) => [el, el.getBoundingClientRect().top]);
   /* A glide hands us its block through __rdPinObserve and we correct its
      resizing frames from a ResizeObserver: RO runs after layout, BEFORE the
      frame paints, so the row never leaves its spot on screen at all -
@@ -292,7 +315,6 @@ function rdPinScroll(row, fine) {
   if (rdPinRO) { rdPinRO.disconnect(); rdPinRO = null; }
   if (typeof ResizeObserver !== "undefined") {
     rdPinRO = new ResizeObserver(() => {
-      if (!row.isConnected) return;
       window.__rdPinROn = (window.__rdPinROn || 0) + 1;
       fix();
     });
@@ -324,6 +346,7 @@ function rdPinScroll(row, fine) {
        flick still rolling on iOS) is theirs to keep (was: fix() vs the
        anchor, which teleported the page back to the row - the one fix
        step()s user-leaving guard called too) */
+    reseat();
     const was = row.isConnected ? row.getBoundingClientRect().top : 0;
     rdPinThaw();
     if (!row.isConnected) return;
@@ -332,7 +355,7 @@ function rdPinScroll(row, fine) {
   };
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
-    if (!row.isConnected) { done(); return; }
+    if (!reseat()) { done(); return; }
     const y = window.scrollY;
     /* a wheel or trackpad tick mid-glide folds into the anchor and the pin
        follows it: the row moves OPPOSITE the scroll on screen, so the
@@ -345,6 +368,9 @@ function rdPinScroll(row, fine) {
     if (Math.abs(dy) > window.innerHeight) { done(); return; }
     want -= dy;
     lastY = y;
+    /* the fold moves every candidate's target with the user's scroll, so a
+       re-seat after one lands keeps following the same moved pin */
+    if (tops) for (let i = 0; i < tops.length; i++) tops[i][1] -= dy;
     fix();
     if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);
     else done();

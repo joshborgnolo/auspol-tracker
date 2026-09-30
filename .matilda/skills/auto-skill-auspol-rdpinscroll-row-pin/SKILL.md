@@ -714,3 +714,58 @@ mechanisms, proven separately with headless timelines:
    rect first — confirm rows are actually on screen (`nrows` visible,
    `tbl` spans the viewport) before reading drift into a result.
 
+## Laptop drift, round two (2026-09-30, pm) — the anchor UNMOUNTS
+
+   The on-screen-row fix above held for single hops but the user still
+   saw systematic drift "on computer, not phone" during a full
+   facet WALK. Root cause found by tagging rows with an expando
+   (`.matilda/dbg-ap-row-survival.mjs`): **a facet hop re-keys the
+   ENTIRE row set** — every `.rd-ap-row`/`.rd-ap-card` node is a fresh
+   DOM node afterwards, EVEN when the same poll is present in both
+   facets (rows carry no data-key attributes to reuse by). The ONLY
+   All-polls table nodes that survive a facet swap are the month
+   dividers (`.rd-ap-mrow`, React-reused) plus the `.rd-ap-bar`,
+   `.rd-ap-tabs` and `.rd-ap-table` structural elements. So the round-1
+   array pin's data-row anchor was dying mid-hop; rdPinScroll's rAF
+   step hit `!row.isConnected` and ended the session, Chrome's
+   overflow-anchor took over, and it walked the viewport roughly a
+   screen per cycle (pre-fix laptop walk: +410px then +1026px per
+   5-hop cycle, monotone downward — `.matilda/dbg-ap-laptop-drift.mjs`).
+   Diagnostic signature to remember: **the pin's RO counter frozen at
+   the same value across hops = the session died** (probe prints
+   `RO=<n>` per sample; n must advance every hop).
+
+   The fix, all in rdPinScroll (`fine` path, rd.jsx):
+   - An array pin now snapshots `[el, docTop]` for EVERY candidate once
+     after the clip (`tops`), and a `reseat()` step re-anchors onto the
+     first STILL-CONNECTED candidate in list order whenever the current
+     row disconnects — the pin survives its anchor's unmount instead of
+     ending the session.
+   - The RO callback and the done() thaw no longer bail on
+     `!isConnected`; they reseat first.
+   - The mid-pin user-scroll fold (`tops` each `-= dy`) moves EVERY
+     candidate's target, not just the live row's.
+   - pinAp's last candidate is the `.rd-ap-table` itself (`[bar, tabs,
+     ...onScreenRows(≤3), table]`) — it always survives, so the pin
+     degrades to hed-translation-exact rather than dying.
+
+   Contract after the fix (each bounded, nothing cumulative):
+   - Divider on screen → month-divider anchor: date region held to the
+     pixel through any hop (verified at depth 1050: exact −18px screen
+     position through a +1114px issues→twopp correction).
+   - Deep in the table (no divider) → reseat to table: hed-swap
+     translation exact (twopp↔others = ±181.3px at 1512×945 dpr2,
+     corrections ≤1px settle; `.matilda/dbg-ap-hop-xray.mjs`, run with
+     `DEPTH=<px>` — env vars must be passed INTO page.evaluate, process
+     doesn't exist browser-side), but facet content redistributes
+     around the held geometry (≤~40px per hop of bounded content churn,
+     e.g. issues' extra rows) — same geometry-pin contract the phone
+     always had. **Verify at geometry, not at content rows**: a row's
+     doc-top moving between facets is legitimate redistribution, not
+     pin error; compare `.rd-ap-bar`/`.rd-ap-tabs`/`.rd-ap-table`
+     doc-tops and their per-facet deltas.
+   - Post-fix laptop walk (15 arrows + 10 clicks, real pinbar clicks,
+     1512×945 dpr2): RO advances every hop, no monotone drift; the
+     residual ±200px across full cycles is anchor-semantics mixing
+     (divider picks vs table picks across a cycle), not accumulation.
+
