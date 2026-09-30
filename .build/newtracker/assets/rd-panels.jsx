@@ -2003,7 +2003,7 @@ function RdIssues({ rangeId = "all" }) {
         </span>
         <span className="rd-is-nums">{x.own ? pOrd.map((q) => <b key={q} style={{ color: inkOf(pColor(q)) }}>{Math.round(x.own.v[q])}</b>) : null}</span>
         <span className={"rd-is-verdict" + (v && v.strong ? " strong" : "")} style={v && v.color ? { color: v.color } : undefined}>
-          {v ? v.text : ""}{x.grnTop && <small>Greens first (<span style={{ color: inkOf(pColor("grn")) }}>{Math.round(x.grnTop.grn)}</span>) where offered</small>}</span>
+          {v ? v.text : ""}{x.grnTop && <small>Greens first (<span style={{ color: inkOf(pColor("grn")) }}>+{Math.round(x.grnTop.grn - x.grnTop.nextV)}</span>) when offered</small>}</span>
       </div>
     );
   };
@@ -2146,7 +2146,7 @@ function RdIssues({ rangeId = "all" }) {
                 <span></span><span></span>
               </div>
               {wide && <p className="rd-note">{wide.hi.house} and {wide.lo.house} word the importance question differently and disagree most on {ISS_PHRASE[wide.x.id]}: {Math.round(wide.hi.v)}% in {wide.hi.house}’s latest poll, {Math.round(wide.lo.v)}% in {wide.lo.house}’s. The grey bars sit midway between the two pollsters’ usual figures.</p>}
-              {list.filter((x) => x.grnTop).map((x) => <p key={"g" + x.id} className="rd-note">{x.grnTop.house} also offers the Greens, who come first on {ISS_PHRASE[x.id]} ({x.grnTop.grn}%).</p>)}
+              {list.filter((x) => x.grnTop).map((x) => <p key={"g" + x.id} className="rd-note">{x.grnTop.house} also offers the Greens, who come first on {ISS_PHRASE[x.id]} ({x.grnTop.grn}% of all voters, {pName(x.grnTop.next)} next on {Math.round(x.grnTop.nextV)}%).</p>)}
             </div>
             {ch && (
               <div className="card rd-card rd-is-chart">

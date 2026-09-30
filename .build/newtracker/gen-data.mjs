@@ -2913,8 +2913,13 @@ const issues = (() => {
       // [x, pollster, fieldwork end, …three-way shares]: the chart's dots, each one its poll's archive row
       (dots[k] ||= []).push([r2(dx(w.date)), firm, w.date, ...OWN3.map((q) => r1(s3[q]))]);
       if (sh.grn != null && inWin(mid) && sh.grn > Math.max(sh.alp, sh.lnp, sh.onp)
-          && (!grnTop[k] || grnTop[k].date < w.date))
-        grnTop[k] = { house: firm === "RedBridge/Accent" ? "RedBridge" : firm, grn: sh.grn, date: w.date };
+          && (!grnTop[k] || grnTop[k].date < w.date)) {
+        // the runner-up party on the same raw ballot: raw shares sit beside
+        // the row's three-way renormalised ones, so "first (26)" only reads
+        // right against the 18 the next party held on the same ballot
+        const nx = [...OWN3, "oth"].filter((q) => sh[q] != null).sort((a, b) => sh[b] - sh[a])[0];
+        grnTop[k] = { house: firm === "RedBridge/Accent" ? "RedBridge" : firm, grn: sh.grn, date: w.date, next: nx, nextV: sh[nx] };
+      }
     }
     if (used && inWin(mid)) wavesIn.push({ w, p, d: ddays(refNow, mid) });
   }

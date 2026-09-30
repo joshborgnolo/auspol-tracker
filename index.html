@@ -18923,7 +18923,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "grnTop": {
         "house": "RedBridge",
         "grn": 26,
-        "date": "2026-08-28"
+        "date": "2026-08-28",
+        "next": "alp",
+        "nextV": 18
       }
     }, {
       "id": "security",
@@ -62714,7 +62716,7 @@ function rdPinScroll(row) {
       done();
       return;
     }
-    want += dy;
+    want -= dy;
     lastY = y;
     const drift = row.getBoundingClientRect().top - want;
     if (drift) {
@@ -67471,7 +67473,7 @@ function RdIssues({
       style: {
         color: inkOf(pColor("grn"))
       }
-    }, Math.round(x.grnTop.grn)), ") where offered")));
+    }, "+", Math.round(x.grnTop.grn - x.grnTop.nextV)), ") when offered")));
   };
   const wide = list.filter(x => x.imp && x.imp.gap && x.imp.by.length === 2).map(x => {
     const [hi, lo] = [...x.imp.by].sort((a, b) => b.v - a.v);
@@ -67663,7 +67665,7 @@ function RdIssues({
   }, wide.hi.house, " and ", wide.lo.house, " word the importance question differently and disagree most on ", ISS_PHRASE[wide.x.id], ": ", Math.round(wide.hi.v), "% in ", wide.hi.house, "\u2019s latest poll, ", Math.round(wide.lo.v), "% in ", wide.lo.house, "\u2019s. The grey bars sit midway between the two pollsters\u2019 usual figures."), list.filter(x => x.grnTop).map(x => React.createElement("p", {
     key: "g" + x.id,
     className: "rd-note"
-  }, x.grnTop.house, " also offers the Greens, who come first on ", ISS_PHRASE[x.id], " (", x.grnTop.grn, "%)."))), ch && React.createElement("div", {
+  }, x.grnTop.house, " also offers the Greens, who come first on ", ISS_PHRASE[x.id], " (", x.grnTop.grn, "% of all voters, ", pName(x.grnTop.next), " next on ", Math.round(x.grnTop.nextV), "%)."))), ch && React.createElement("div", {
     className: "card rd-card rd-is-chart"
   }, React.createElement("div", {
     className: "rd-is-ctop"
