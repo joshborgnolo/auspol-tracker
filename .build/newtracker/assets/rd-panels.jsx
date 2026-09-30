@@ -1057,6 +1057,33 @@ const RD_DEMO_HOME = {
   grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
   oth: "Voters for others/independents are more likely to be Gen Z, renting, and NSW-based; less likely to live in provincial areas or have a mortgage",
 };
+/* the usual (Pew) birth years behind the polls' generation labels: neither
+   pollster publishes its own, so the "By generation" dot-plot labels show
+   these in brackets. The Info glossary's "Generations" entry (d1a1d215
+   asset) lists the same ranges - the two copies move together */
+const RD_GEN_BORN = { "Gen Z": [1997, 2012], Millennials: [1981, 1996], "Gen X": [1965, 1980], Boomers: [1946, 1964] };
+/* a label's birth years read as ages when asked: hover works on a mouse
+   pointer, a tap toggles. Floored at voting age, since the panel reports
+   voters (Gen Z's young end sits under 18 this decade; the floor lifts
+   itself once 2012 comes of age) */
+function RdGenBorn({ label }) {
+  const born = RD_GEN_BORN[label];
+  const [hover, setHover] = useState(false);
+  const [tapped, setTapped] = useState(false);
+  if (!born) return null;
+  const y = new Date().getFullYear();
+  const asAges = hover || tapped;
+  return (
+    <button type="button" className={"rd-wv-born" + (asAges ? " on" : "")}
+            aria-pressed={asAges}
+            aria-label={label + ", born " + born[0] + " to " + born[1] + ", shows their current ages"}
+            onPointerEnter={(e) => { if (e.pointerType === "mouse") setHover(true); }}
+            onPointerLeave={(e) => { if (e.pointerType === "mouse") setHover(false); }}
+            onClick={() => setTapped((v) => !v)}>
+      ({asAges ? "aged " + Math.max(18, y - born[1]) + "–" + (y - born[0]) : born[0] + "–" + born[1]})
+    </button>
+  );
+}
 /* the composition-trend block's wording slots (shapes are the user's, dictated
    2026-09-29; the SENTENCES are generated from D.demoTrend — gen-data §7gb —
    and re-word themselves as significances move, so only these phrase pieces
@@ -1331,7 +1358,7 @@ function RdDemographics({ rangeId = "all" }) {
         return (
           <div key={"r" + gi} className="rd-wv-row" role="row"
                title={"Pooled from " + g.n + " poll" + (g.n === 1 ? "" : "s") + ", " + rdList((g.houses || []).map(demoHouse)) + ", ± is the 95% margin"}>
-            <span role="cell" className="rd-wv-lab">{g.label}</span>
+            <span role="cell" className="rd-wv-lab">{g.label}<RdGenBorn label={g.label} /></span>
             <span className="rd-wv-track" aria-hidden="true">
               {/* positions go to CSS as --x/--lo/--hi (percent of the track)
                   and are drawn with transforms, so a switch glides them on

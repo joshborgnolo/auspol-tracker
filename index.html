@@ -3760,6 +3760,8 @@ body.rd .rd-wv-allcap > span { position: absolute; left: 0; transform: translate
 body.rd .rd-wv-vs { grid-column: 3 / span 2; text-align: right; font-size: 12px; }
 body.rd .rd-wv-row { min-height: 32px; }
 body.rd .rd-wv-lab { font-size: 15px; color: var(--ink); }
+body.rd .rd-wv-born { margin-left: 5px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; color: var(--ink-3); white-space: nowrap; cursor: pointer; }
+body.rd .rd-wv-born.on { color: var(--ink); }
 body.rd .rd-wv-track { position: relative; height: 32px; }
 body.rd .rd-wv-track, body.rd .rd-wv-allline > span, body.rd .rd-wv-allcap, body.rd .rd-wv-ticks { container-type: inline-size; }
 body.rd .rd-wv-track::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), var(--line-2) calc(25% - 1px), var(--line-2) 25%); opacity: 0.8; }
@@ -66092,6 +66094,35 @@ const RD_DEMO_HOME = {
   grn: "Greens voters are more likely to be 18–34, women, renters, and urban or provincial",
   oth: "Voters for others/independents are more likely to be Gen Z, renting, and NSW-based; less likely to live in provincial areas or have a mortgage"
 };
+const RD_GEN_BORN = {
+  "Gen Z": [1997, 2012],
+  Millennials: [1981, 1996],
+  "Gen X": [1965, 1980],
+  Boomers: [1946, 1964]
+};
+function RdGenBorn({
+  label
+}) {
+  const born = RD_GEN_BORN[label];
+  const [hover, setHover] = useState(false);
+  const [tapped, setTapped] = useState(false);
+  if (!born) return null;
+  const y = new Date().getFullYear();
+  const asAges = hover || tapped;
+  return React.createElement("button", {
+    type: "button",
+    className: "rd-wv-born" + (asAges ? " on" : ""),
+    "aria-pressed": asAges,
+    "aria-label": label + ", born " + born[0] + " to " + born[1] + ", shows their current ages",
+    onPointerEnter: e => {
+      if (e.pointerType === "mouse") setHover(true);
+    },
+    onPointerLeave: e => {
+      if (e.pointerType === "mouse") setHover(false);
+    },
+    onClick: () => setTapped(v => !v)
+  }, "(", asAges ? "aged " + Math.max(18, y - born[1]) + "–" + (y - born[0]) : born[0] + "–" + born[1], ")");
+}
 const RD_TREND_NAME = {
   onp: "One Nation",
   alp: "Labor",
@@ -66396,7 +66427,9 @@ function RdDemographics({
     }, React.createElement("span", {
       role: "cell",
       className: "rd-wv-lab"
-    }, g.label), React.createElement("span", {
+    }, g.label, React.createElement(RdGenBorn, {
+      label: g.label
+    })), React.createElement("span", {
       className: "rd-wv-track",
       "aria-hidden": "true"
     }, React.createElement("span", {
