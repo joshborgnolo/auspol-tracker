@@ -441,8 +441,11 @@ const CYC_METRICS = [
       marks where that changed. How the final polls did, below, still scores what the pollsters
       published.</>,
     ] },
+  /* primaryIs marks the two primary charts: it draws the sitting term's
+     Others sum (Greens + One Nation + Others as one line) on either and
+     offers its box, where onp keeps the L/NP overlays opposition-only. */
   { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
-    unit: "%", fmt: (v) => v.toFixed(1),
+    primaryIs: true, unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: null },
   /* The opposition chart reads the same terms from the losing side of them:
      the opposition party's own primary line. leader:"opp" makes the line and
@@ -451,7 +454,7 @@ const CYC_METRICS = [
      There is no opposition-2PP chart – 2PP sums to 100, so it would be an
      exact mirror of the government 2PP chart above. */
   { key: "oppr", title: "Opposition primary vote", sub: "First-preference support for the opposition party",
-    leader: "opp", onp: true, unit: "%", fmt: (v) => v.toFixed(1),
+    leader: "opp", primaryIs: true, onp: true, unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: null },
   /* One line per term: the PM's lead in the preferred-PM question, pmPpm
      minus oppPpm. The pairing names itself per segment (e.ppmEras, or
@@ -509,6 +512,20 @@ function cycDomain(cycles, M, chg) {
         .filter((v) => v != null)
         .map((v) => (chg ? v - cBase : v)));
     }
+    // One Nation's own overlay follows the same rule.
+    vals.push(...cycles.flatMap((c) => (c.raw.onp || [])
+      .filter((v) => v != null)
+      .map((v) => (chg ? v - cycBase(c, "onp") : v))));
+  }
+  // Others, combined graces the domain in exactly the same way: its series
+  // is read straight from the cycle payload (grn+onp+oth summed there), so
+  // it is present on either primary chart on the current term and nowhere
+  // else. (Present also on the OPPOSITION chart's own domain pass.)
+  {
+    const c = cycles.find((x) => x.current);
+    if (c && c.raw.othr) vals.push(...c.raw.othr
+      .filter((v) => v != null)
+      .map((v) => (chg ? v - cycBase(c, "othr") : v)));
   }
   const ref = chg ? 0 : M.refAbs;
   let lo = Math.min(...vals), hi = Math.max(...vals);
@@ -1357,7 +1374,7 @@ function cycHolderAt(c, M, m) {
 }
 
 function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, chipClick, toggle,
-                     showAll, hideAll, showOutcome, showHan, setHan, showOnp, setOnp, shapes,
+                     showAll, hideAll, showOutcome, showHan, setHan, showOnp, setOnp, showComb, setComb, showOth, setOth, shapes,
                      outcomeShown, rdHalf, rdEvents }) {
   const { D } = window.AP;
   const narrow = useNarrow();
@@ -1757,14 +1774,15 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
 
   /* L/NP + One Nation – a single dotted line tracking the SUM of the two
      parties' first-preference votes over the CURRENT term only, drawn when
-     "Combine L/NP and ON" is ticked. (It replaced the plain One Nation
-     overlay: the combined reading is the one the chart can say something
-     with.) A month joins the line only where BOTH parties were measured, so
-     a gap where one went unpolled never invents a partial total. Points
-     skip null months as Hanson's do, and the line stays thin and light –
-     an overlay on the opposition chart, not a rival to its own lines. Its
-     ink is the chart's neutral, since no one party owns a sum of two. */
-  if (M.onp && showOnp) {
+     "Combine L/NP and ON" is ticked. It sits beside the plain One Nation
+     overlay (one block down, on its own box): the combined reading is the
+     one the chart can say something with. A month joins the line only where
+     BOTH parties were measured, so a gap where one went unpolled never
+     invents a partial total. Points skip null months as Hanson's do, and
+     the line stays thin and light – an overlay on the opposition chart,
+     not a rival to its own lines. Its ink is the chart's neutral, since no
+     one party owns a sum of two. */
+  if (M.onp && showComb) {
     const c = shown.find((x) => x.current);
     if (c) {
       const cBase = cycBase(c, "oppr") + cycBase(c, "onp");
@@ -1784,6 +1802,64 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
              "Combine L/NP and ON" already says on the checkbox that draws
              it. */
           endLabel: "L/NP+ON",
+          endLabelOpacity: 0.8,
+        });
+      }
+    }
+  }
+
+  /* One Nation – a single dotted line tracking the party's first-
+     preference vote over the CURRENT term only. Past terms carried one
+     dotted line each, but they crowded the chart without adding context,
+     so only the current cycle is drawn. Points skip null months as
+     Hanson's do, and the line stays thin and light – an overlay on the
+     opposition chart, not a rival to its own lines. */
+  if (M.onp && showOnp) {
+    const c = shown.find((x) => x.current);
+    if (c) {
+      const oBase = cycBase(c, "onp");
+      const pts = c.raw.months
+        .map((m, i) => ({ x: m, y: c.raw.onp[i] }))
+        .filter((p) => p.y != null)
+        .map((p) => ({ x: p.x, y: chg ? +(p.y - oBase).toFixed(2) : p.y }));
+      if (pts.length) {
+        built.push({
+          id: "cyc-onp", label: "One Nation",
+          color: HAN_COLOR, width: 2.2, points: pts, weight: 2.5,
+          smooth: false, dash: "1 3",
+          opacity: 0.85,
+          /* No year: this line is only ever the CURRENT term (c is found by
+             .find(x => x.current) above), so a year suffix here never
+             distinguished one reading from another - it only repeated what
+             "One Nation" already says on the checkbox that draws it. */
+          endLabel: "ON",
+          endLabelOpacity: 0.8,
+        });
+      }
+    }
+  }
+
+  /* "Others, combined" (this term, both primary charts): every non-major
+     vote pooled – Greens, One Nation and Others as one line. gen-data
+     emits the election-anchored sum as c.raw.othr, so this needs nothing
+     more than the One Nation overlay's own mechanics. A primary chart
+     offers its box only while the sitting term actually carries the
+     series. */
+  if (M.primaryIs && showOth) {
+    const c = shown.find((x) => x.current);
+    if (c && c.raw.othr) {
+      const oBase = cycBase(c, "othr");
+      const pts = c.raw.months
+        .map((m, i) => ({ x: m, y: c.raw.othr[i] }))
+        .filter((p) => p.y != null)
+        .map((p) => ({ x: p.x, y: chg ? +(p.y - oBase).toFixed(2) : p.y }));
+      if (pts.length) {
+        built.push({
+          id: "cyc-oth", label: "Others",
+          color: HAN_COLOR, width: 2.2, points: pts, weight: 2.5,
+          smooth: false, dash: "1 3",
+          opacity: 0.85,
+          endLabel: "OT",
           endLabelOpacity: 0.8,
         });
       }
@@ -1839,7 +1915,11 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
     p.appr && p.appr.hansonNet != null &&
     (!p.appr.metricBy || p.appr.metricBy.hanson !== "fav")) : null;
   const onpYears = (M.onp && showOnp && shown.some((c) => c.current))
+    ? overlayYears((p) => p.p && p.p.onp != null) : null;
+  const combYears = (M.onp && showComb && shown.some((c) => c.current))
     ? overlayYears((p) => p.p && p.p.onp != null && p.p.lnp != null) : null;
+  const othYears = (M.primaryIs && showOth && shown.some((c) => c.current))
+    ? overlayYears((p) => p.p && p.p.grn != null && p.p.onp != null && p.p.oth != null) : null;
 
   const cur = cycles.find((c) => c.current);
   let insight = null;
@@ -1945,7 +2025,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
   if (window.AP.rd) return (
     <RdCycleChart M={M} chg={chg} built={built} bandAreas={bandAreas} bandRows={bandRows} scatter={scatter}
       events={rdEvents || cycleEvents} badged={!!rdEvents} domain={domain} ticks={ticks} cur={cur} hidden={hidden} narrow={narrow} half={!!rdHalf}
-      hanCtl={hanCtl} showHan={showHan} setHan={setHan} showOnp={showOnp} setOnp={setOnp} tipCycle={tipCycle}
+      hanCtl={hanCtl} showHan={showHan} setHan={setHan} showOnp={showOnp} setOnp={setOnp} showComb={showComb} setComb={setComb} showOth={showOth} setOth={setOth} tipCycle={tipCycle}
       banded={banded} bandN={bandN} isOpp={isOpp} terms={shown.filter(hasData).map((c) => c.year)} outcomeShown={outcomeShown} />
   );
   return (
@@ -1983,15 +2063,38 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
             </label>
           )}
           {M.onp && (
-            <label className={"pg-check cyc-comb" + (showOnp ? " on" : "")}
+            <label className={"pg-check cyc-comb" + (showComb ? " on" : "")}
                    title={"The Coalition's and One Nation's first-preference votes summed, " +
                           "drawn as one dotted line over the current term only. The parties' " +
                           "past terms are left off – they crowd the chart without adding context."}>
-              <input type="checkbox" checked={!!showOnp}
-                     onChange={(e) => setOnp(e.target.checked)} />
+              <input type="checkbox" checked={!!showComb}
+                     onChange={(e) => setComb(e.target.checked)} />
               Combine L/NP and ON
             </label>
           )}
+          {M.onp && (
+            <label className={"pg-check cyc-onp" + (showOnp ? " on" : "")}
+                   title={"One Nation first-preference support, drawn as one dotted line " +
+                          "over the current term only. The party's past terms are left off – " +
+                          "they crowd the chart without adding context."}>
+              <input type="checkbox" checked={!!showOnp}
+                     onChange={(e) => setOnp(e.target.checked)} />
+              One Nation this term
+            </label>
+          )}
+          {M.primaryIs && (() => {
+            const cury = cycles.find((x) => x.current);
+            return cury && cury.raw.othr ? (
+              <label className={"pg-check cyc-oth" + (showOth ? " on" : "")}
+                     title={"The Greens', One Nation's and Others' first-preference votes " +
+                            "summed – everyone outside the majors – drawn as one dotted line " +
+                            "over the current term only."}>
+                <input type="checkbox" checked={!!showOth}
+                       onChange={(e) => setOth(e.target.checked)} />
+                Others, combined
+              </label>
+            ) : null;
+          })()}
         </div>
         {insight && (() => {
           /* Prose, not a table cell: a gap of exactly nine points reads as
@@ -2091,9 +2194,21 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
             </span>
           )}
           {onpYears && (
+            <span className="cyc-drawn-item fixed" style={{ "--cyc": HAN_COLOR }}>
+              <span className="cyc-drawn-rule" aria-hidden="true"></span>
+              <span className="cyc-drawn-who">{"One Nation in " + onpYears}</span>
+            </span>
+          )}
+          {combYears && (
             <span className="cyc-drawn-item fixed" style={{ "--cyc": "var(--ink-2)" }}>
               <span className="cyc-drawn-rule" aria-hidden="true"></span>
-              <span className="cyc-drawn-who">{"L/NP + One Nation in " + onpYears}</span>
+              <span className="cyc-drawn-who">{"L/NP + One Nation in " + combYears}</span>
+            </span>
+          )}
+          {othYears && (
+            <span className="cyc-drawn-item fixed" style={{ "--cyc": HAN_COLOR }}>
+              <span className="cyc-drawn-rule" aria-hidden="true"></span>
+              <span className="cyc-drawn-who">{"All others combined in " + othYears}</span>
             </span>
           )}
         </div>
@@ -2969,6 +3084,8 @@ function PastCyclesView() {
   }, [hi]);
   const [showHan, setShowHan] = useState(false);
   const [showOnp, setShowOnp] = useState(false);
+  const [showComb, setShowComb] = useState(false);
+  const [showOth, setShowOth] = useState(false);
 
   /* Same contract as the archive writer: replaceState, foreign params
      (the archive's q/w/t/…) parsed out and left alone, vanished when the
@@ -3100,7 +3217,8 @@ function PastCyclesView() {
     <RdPastCycles cycles={cycles} mode={mode} setMode={setMode} hidden={hidden} lifted={lifted} hi={hi} setHi={setHi}
       toggle={toggle} lift={lift} unlift={unlift} chipClick={chipClick} showAll={showAll} hideAll={hideAll}
       showOutcome={showOutcome} outcomeShown={outcomeShown} shapes={shapes} showHan={showHan} setShowHan={setShowHan}
-      showOnp={showOnp} setShowOnp={setShowOnp} exportSource={exportSource} srcFailed={srcFailed} retrySource={retrySource} />
+      showOnp={showOnp} setShowOnp={setShowOnp} showComb={showComb} setShowComb={setShowComb} showOth={showOth} setShowOth={setShowOth}
+      exportSource={exportSource} srcFailed={srcFailed} retrySource={retrySource} />
   );
   return (
     <div className="view view-cycles">
@@ -3176,7 +3294,8 @@ function PastCyclesView() {
                       chipClick={chipClick} toggle={toggle}
                       showAll={showAll} hideAll={hideAll} showOutcome={showOutcome}
                       showHan={showHan} setHan={setShowHan}
-                      showOnp={showOnp} setOnp={setShowOnp} shapes={shapes}
+                      showOnp={showOnp} setOnp={setShowOnp} showComb={showComb} setComb={setShowComb}
+                      showOth={showOth} setOth={setShowOth} shapes={shapes}
                       outcomeShown={outcomeShown} />
         ))}
       </div>
@@ -3212,6 +3331,13 @@ function PastCyclesView() {
           <span>
             The One Nation line tracks the party’s first-preference vote over
             the current term only; past cycles are left undrawn.{" "}
+          </span>
+        )}
+        {showComb && (
+          <span>
+            The combined line sums the Coalition’s and One Nation’s first-preference
+            votes over the current term only, counting only months where both
+            parties were polled; past cycles are left undrawn.{" "}
           </span>
         )}
         {mode === "chg"

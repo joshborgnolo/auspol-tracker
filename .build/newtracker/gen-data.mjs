@@ -3689,7 +3689,7 @@ const debiasTerm = (pts, strat) => {
 const eraIndex = (spl) => (p) => splIsos(spl).filter((b) => b <= p.iso).length;
 
 const CYCLE_DEFS = CYC_META.map((c) => {
-  let primPts, tppPts, netPts, oppPts, hanPts, oppPrimPts, onpPts, ppmPts;
+  let primPts, tppPts, netPts, oppPts, hanPts, oppPrimPts, onpPts, ppmPts, othrPts = [];
   if (c.current) {
     primPts = aggPrimary.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d.alp }));
     /* The sitting term is drawn on the site's default basis, the implied 2PP,
@@ -3713,6 +3713,14 @@ const CYCLE_DEFS = CYC_META.map((c) => {
        mirror of the government line. */
     oppPrimPts = aggPrimary.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d[c.opp] }));
     onpPts = aggPrimary.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d.onp }));
+    /* Everyone outside the two big parties, summed for the "Others,
+       combined" overlay – Greens + One Nation + independents/minors, one
+       estimate per month. A month enters only when all three columns hold
+       a reading (cycleSeries zero-fills an unpolled column, which would
+       fake a low sum). */
+    othrPts = aggPrimary
+      .filter((d) => d.grn && d.onp && d.oth)
+      .map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: r1(d.grn + d.onp + d.oth) }));
     // approval-metric readings only – the historical cycle series are
     // approve−disapprove, so favourability rows would contaminate them
     const apprOnly = appr.filter((a) => metricOf(a.firm, "alb") !== "fav");   // PM approval only, not favourability
@@ -3761,6 +3769,12 @@ const CYCLE_DEFS = CYC_META.map((c) => {
      degrades to zero rows, so those terms emit a null-padding grid and simply
      draw nothing when the overlay is on. */
   const onp = cycleSeries(onpPts, eOpp.onp, cap);
+  /* Others = Greens + One Nation + independents/minors summed. Current term
+     only: past cycles never split their minor-party votes out in the source
+     series cyclePolls reads, so there is nothing to sum there. Its anchor is
+     the three election results summed, the same basis the overlay subtracts
+     from. Null when empty so the page simply hides the checkbox. */
+  const othr = c.current ? cycleSeries(othrPts, (ELECTIONS["e" + c.year].grn || 0) + (ELECTIONS["e" + c.year].onp || 0) + (ELECTIONS["e" + c.year].oth || 0), cap) : null;
   const net = cycleSeries(netPts, null, cap);
   const opp = cycleSeries(oppPts, null, cap);
   const ppmm = cycleSeries(ppmPts, null, cap);
@@ -3788,8 +3802,12 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     // the null-padded form align() can't produce alone: with no ONP readings
     // on record (2010/13), s.months is empty and align has nothing to index
     onp: onp.months.length ? align(onp) : months.map(() => null),
+    /* Others the same – a null series (past terms) means no checkbox at all,
+       so months.map(null) would invent readings the term never had */
+    othr: othr && othr.months.length ? align(othr) : null,
     obs: { primary: prim.obs, tpp: tpp.obs, net: alignObs(net), oppnet: alignObs(opp),
-           oppr: oppr.obs, onp: alignObs(onp), ppmm: alignObs(ppmm) },
+           oppr: oppr.obs, onp: alignObs(onp), ppmm: alignObs(ppmm),
+           othr: othr ? alignObs(othr) : null },
     han: sparseSeries(hanPts, months, cap),
     netEras: eraSeries(netPts, c.pmSpl, cap), oppEras: eraSeries(oppPts, c.oppSpl, cap),
     tppEras: c.current ? rivalEras(tppPts, c, cap) : null,
@@ -4631,12 +4649,13 @@ window.AUSPOL = (function () {
     eDate: c.eDate,
     color: PARTIES[c.gov].color, span: c.months[c.months.length - 1],
     base: { tpp: c.tpp[0], primary: c.primary[0], net: c.net[0], oppnet: c.oppnet[0], han: c.han[0],
-            oppr: c.oppr[0], onp: c.onp[0], ppmm: c.ppmm[0] },
+            oppr: c.oppr[0], onp: c.onp[0], ppmm: c.ppmm[0], othr: c.othr ? c.othr[0] : null },
     // han is sparse, so "end" is its last READING, not its last slot;
     // onp and ppmm follow it — both grid as all-null on some cycles
     end: { tpp: c.tpp[c.tpp.length - 1], primary: c.primary[c.primary.length - 1], net: c.net[c.net.length - 1], oppnet: c.oppnet[c.oppnet.length - 1], han: [...c.han].reverse().find((v) => v != null) ?? null,
            oppr: c.oppr[c.oppr.length - 1], onp: [...c.onp].reverse().find((v) => v != null) ?? null,
-           ppmm: [...c.ppmm].reverse().find((v) => v != null) ?? null },
+           ppmm: [...c.ppmm].reverse().find((v) => v != null) ?? null,
+           othr: c.othr ? ([...c.othr].reverse().find((v) => v != null) ?? null) : null },
     points: {
       tpp: c.months.map((m, i) => ({ x: m, y: c.tpp[i] })),
       primary: c.months.map((m, i) => ({ x: m, y: c.primary[i] })),
@@ -4646,9 +4665,10 @@ window.AUSPOL = (function () {
       oppr: c.months.map((m, i) => ({ x: m, y: c.oppr[i] })),
       onp: c.months.map((m, i) => ({ x: m, y: c.onp[i] })),
       ppmm: c.months.map((m, i) => ({ x: m, y: c.ppmm[i] })),
+      ...(c.othr ? { othr: c.months.map((m, i) => ({ x: m, y: c.othr[i] })) } : {}),
     },
     raw: { tpp: c.tpp, primary: c.primary, net: c.net, oppnet: c.oppnet, han: c.han, months: c.months, obs: c.obs,
-           oppr: c.oppr, onp: c.onp, ppmm: c.ppmm,
+           oppr: c.oppr, onp: c.onp, ppmm: c.ppmm, ...(c.othr ? { othr: c.othr } : {}),
            ...(c.netEras ? { netEras: c.netEras } : {}), ...(c.oppEras ? { oppEras: c.oppEras } : {}),
            ...(c.ppmEras ? { ppmEras: c.ppmEras } : {}), ...(c.ppmPair ? { ppmPair: c.ppmPair } : {}),
            ...(c.tppEras ? { tppEras: c.tppEras } : {}) },

@@ -644,6 +644,14 @@
         if (text === "L/NP+ON")
           return { label: "L/NP and One Nation combined",
                    kind: "dashed", fill, alpha: 1, year: 9999 };
+        /* One Nation's own overlay names at "ON" - the same letters-only
+           dodge as L/NP+ON keeps it clear of the digit terms below. */
+        if (text === "ON")
+          return { label: "One Nation this term",
+                   kind: "dashed", fill, alpha: 1, year: 9999 };
+        if (text === "OT")
+          return { label: "All others combined this term",
+                   kind: "dashed", fill, alpha: 1, year: 9999 };
         const digits = text.replace(/[^0-9]/g, "");
         const c = !/[A-Za-z]/.test(text) && digits.length === 2 &&
           cycList.find((r) => String(r.year).slice(2) === digits);

@@ -1501,7 +1501,10 @@ body.rd .rd-cyc-one { margin-top: 28px; }
 body.rd .rd-cyc-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 48px; margin-top: 28px; }
 body.rd .rd-cyc-subs .rd-sub { margin-top: 44px; }
 body.rd .rd-cyc-subs .rd-subdek { font-size: 15px; min-height: 45px; margin-bottom: 8px; }
-body.rd .rd-cyc-chart .rd-chead { gap: 12px; }
+/* the current term's overlay boxes next to the chart's name can outrun one
+   row (all three wider than a 580px half-column, let alone a phone) - let
+   them wrap under the name rather than push the page sideways */
+body.rd .rd-cyc-chart .rd-chead { flex-wrap: wrap; gap: 12px; }
 body.rd .rd-cyc-chart .rd-check { font-size: 13px; }
 /* the band in the redesign's warm grey */
 body.rd .cyc-band.lo { fill: var(--ink-3); opacity: 0.1; }
