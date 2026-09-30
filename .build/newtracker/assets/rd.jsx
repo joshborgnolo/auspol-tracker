@@ -138,6 +138,21 @@ let rdPinLive = 0;
    position:sticky descendants scroll off like ordinary content, so any
    branch holding one stays unfrozen (its changes ride the RO fix below) */
 const RD_PIN_STICKY = ".tabs.sticky,.info-index,.rd-ap-headwrap,.poll-table thead th";
+/* was a finger down when the pin was raised? Scroll corrections made while
+   a touch is live paint a frame late on iOS, so a pin raised MID-GESTURE
+   must freeze even the on-screen boxes above the row - nothing over the row
+   may move, or iOS shows the row a frame from its spot. A pin from a click,
+   key or wheel paints its corrections cleanly, and there letting on-screen
+   text reflow live is kinder: a frozen paragraph on screen reads sliced at
+   the freeze line (past-cycles' dek did exactly that under a click pin).
+   The heat lingers a beat after lift: a swipe's range step is committed on
+   touchend, still inside the gesture's compositor run */
+let rdTouchHot = 0;
+window.addEventListener("touchstart", () => { rdTouchHot = performance.now() + 500; }, { passive: true });
+window.addEventListener("touchmove", () => { rdTouchHot = performance.now() + 220; }, { passive: true });
+const rdTouchLift = () => { rdTouchHot = performance.now() + 160; };
+window.addEventListener("touchend", rdTouchLift, { passive: true });
+window.addEventListener("touchcancel", rdTouchLift, { passive: true });
 const rdPinClip = (row, rowTop) => {
   const held = rdPinHeld || (rdPinHeld = []);
   const freeze = (o, r) => {
@@ -161,14 +176,20 @@ const rdPinClip = (row, rowTop) => {
      So freeze EVERY earlier box along the row's ancestor chain (the
      sibling sections and cards above it) too: nothing over the row may
      resize while the pin holds, or iOS catches the row a frame from its
-     spot and paints the lurch no correction can call back */
+     spot and paints the lurch no correction can call back. Boxes wholly
+     off the screen always freeze. A box actually ON the screen freezes
+     only while a touch is hot: mid-gesture its reflow would paint a
+     frame late as drift, while a click-raised pin lets it reflow live,
+     since a frozen paragraph on screen reads sliced at the freeze line
+     (past-cycles' dek did exactly that) */
+  const freezeOnScreen = performance.now() < rdTouchHot;
   for (let node = row; node && node !== document.body;) {
     const parent = node.parentElement;
     if (!parent || parent === document.body) break;
     for (let sib = parent.firstElementChild; sib && sib !== node; sib = sib.nextElementSibling) {
       if (sib.__rdFrozen) continue;
       const r = sib.getBoundingClientRect();
-      if (!r.height || r.bottom > rowTop + 1) continue;
+      if (!r.height || r.bottom > rowTop + 1 || (!freezeOnScreen && r.bottom > 0)) continue;
       if (sib.matches(RD_PIN_STICKY) || sib.querySelector(RD_PIN_STICKY)) continue;
       freeze(sib, r);
     }
