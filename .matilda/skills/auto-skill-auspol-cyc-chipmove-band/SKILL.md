@@ -1,6 +1,6 @@
 ---
 name: auspol-cyc-chipmove-band
-description: auspol-tracker — the Past-cycles ".rd-cyc-chipmove" band floating 12px above the #cyc-tpp eyebrow divider, FLUSH LEFT (ship 7964e12, follow-ups 204654b, COLUMN STACK ba613b3; left move + 12px gap + ≤640px 60px headroom 2026-10-02 after user: "move it to the left… breathing room from the line below it"; JS HEADROOM REFIT same day after user: "more than 5 drawn → causes mayhem with the text already in the page… the rest of the page content is not pushed up"; chips ~80% + cancellable sitting-term × 2026-10-02 after user: "reduce the size of the cycles chips by 20% and add an x for Albanese 2025"): RdSec tools-slot anchoring (top: pad+1px of --cyc-chip-pad-fallback --rd-sec-pad, translateY(-100%−12px)), band is a COLUMN flex — chip on top, the drawn-pills row stacked beneath it, both flush left — plus the CANCELLABLE .rd-cc-cur sitting-term pill (its × is toggle(cur.year): term, line and figure off the board; the board's eye puts it back) and RdCycleChart's nonDefault note-gating; the BAND IS OUT OF FLOW, so rd-cycles.jsx's chipmove fit() measures the wrapped band and GROWS --cyc-chip-pad + padding-top INLINE on #cyc-tpp when the stack needs more than the CSS floor (a tall stack pushes the page down instead of climbing over the Summary foot). Probe .matilda/probe-cyc-chipmove.mjs.
+description: auspol-tracker — the Past-cycles ".rd-cyc-chipmove" band floating 12px above the #cyc-tpp eyebrow divider, FLUSH LEFT (ship 7964e12, follow-ups 204654b, COLUMN STACK ba613b3; left move + 12px gap + ≤640px 60px headroom 2026-10-02 after user: "move it to the left… breathing room from the line below it"; JS HEADROOM REFIT same day after user: "more than 5 drawn → causes mayhem with the text already in the page… the rest of the page content is not pushed up"; chips ~80% + cancellable sitting-term × 2026-10-02 after user: "reduce the size of the cycles chips by 20% and add an x for Albanese 2025"; ~80% cut REVERSED same-day — type now tracks 70% of the section's `.rd-title` (22px→15.4px desktop / 19px→13.3px ≤640) on restored shared chrome (36px chip/44px tap, 34px ring-to-ring pills) after user: "you know that draw term size decrease you made? reverse it - align it to the size : 70% of the heading / eyebrow text"): RdSec tools-slot anchoring (top: pad+1px of --cyc-chip-pad-fallback --rd-sec-pad, translateY(-100%−12px)), band is a COLUMN flex — chip on top, the drawn-pills row stacked beneath it, both flush left — plus the CANCELLABLE .rd-cc-cur sitting-term pill (its × is toggle(cur.year): term, line and figure off the board; the board's eye puts it back) and RdCycleChart's nonDefault note-gating; the BAND IS OUT OF FLOW, so rd-cycles.jsx's chipmove fit() measures the wrapped band and GROWS --cyc-chip-pad + padding-top INLINE on #cyc-tpp when the stack needs more than the CSS floor (a tall stack pushes the page down instead of climbing over the Summary foot). Probe .matilda/probe-cyc-chipmove.mjs.
 source: auto-skill
 extracted_at: '2026-10-01T13:50:56.926Z'
 ---
@@ -18,7 +18,11 @@ reverted their compiled features while leaving their sources). The ~80%
 band chrome + cancellable sitting-term × followed 2026-10-02 on a8e9b41's
 tail — same working tree, same "trust tokens, not numbers" caveat: search
 `.rd-cyc-chipmove .rd-chip` and the cur pill's
-`"Take the " + cur.year + " term off the board"` aria-label.
+`"Take the " + cur.year + " term off the board"` aria-label. The ~80% cut
+was REVERSED the same day: the ".rd-cyc-chipmove .rd-chip" override shrank
+to a font-only anchor (15.4px = 70% of the 22px `.rd-title`, 13.3px ≤640)
+and the pills went back to their controls-row-era 34px chrome — the chip's
+min-height/::after tap-cheat fall back to the SHARED base `.rd-chip` rule.
 
 ## Homes
 
@@ -29,7 +33,7 @@ tail — same working tree, same "trust tokens, not numbers" caveat: search
 | JS headroom refit | `rd-cycles.jsx` `chipmoveRef` + `useLayoutEffect(fit)` right after the story-floor effect inside `RdPastCycles` (~:341-376); ref hung on the `<span className="rd-cyc-chipmove" ref={chipmoveRef}>` in the tools JSX |
 | Tools JSX (band contents) | `rd-cycles.jsx` ~:953 — `tools={…}` on `<RdSec id="cyc-tpp" …>` |
 | Drawn-row styling | `rd.css` (.rd-cc-drawn no longer has `margin-top: 12px`; row gap 8px) |
-| Pill + band-chip ~80% scale | `rd.css`: `.rd-cc-pill` (its only home) 34→27px high, 14→11px type, × 26→21px, gap 8→6.5, radius 17→14, padding 12→10/4→3; `.rd-cyc-chipmove .rd-chip` override 36→29px, 14→11px type, `::after` tap-cheat 44→35px (the base `.rd-chip` is SHARED — never shrink it at source) |
+| Band type anchor (70% of `.rd-title`) | `rd.css`: `.rd-cyc-chipmove .rd-chip` carries ONLY `font-size: 15.4px` (22px title × 0.7); `.rd-cc-pill` 34px/15.4px/×-26px/gap-8/radius-17/pad 12·4 restored; both flip to `13.3px` (19px × 0.7) in the ≤640px block (the shared base `.rd-chip` 36px/44px-tap chrome returns untouched — never shrink it at source) — REVERSES the e3fd388 ~80% cut |
 | Sitting-term × / restore | Tools JSX cur pill button (`toggle(cur.year)`); board eye gate `{!c.current && …}` REMOVED (~:880); board main `aria-pressed={drawn || (c.current && !off)}`; head count `… - (hidden.has(cur.year) ? 0 : 1)`; `setCompare` `curHidden` snapshot (~:479) |
 | `nonDefault` gate const | `rd-cycles.jsx` ~:60, in `RdCycleChart` (~:49) |
 | Gated notes | gap note `{ k: "gap" …" average" }` ~:116; ▲/▼ pair `if (!chg && M.key === "tpp" && !nonDefault)` ~:131 |
@@ -183,13 +187,15 @@ would crash the `<RdCycleChart>` branch via `lifted.size`.
 ## Probe contracts (.matilda/probe-cyc-chipmove.mjs; 1440×960 / 820×900 / 390×844-touch)
 
 - Geometry: `wrap.b ≈ ruleY − 12` (±1.6px) checked against the WRAP — not the
-  chip — so the same assertion holds with pills in the band (min-height 27px
+  chip — so the same assertion holds with pills in the band (min-height 34px
   pills are taller than the chip).
-- **Band chrome is ~80% scale (2026-10-02):** chip computed font 11px and
-  border-box height ≤29.6 (the `.rd-cyc-chipmove .rd-chip` override —
-  base `.rd-chip` elsewhere stays 14px/36px); pill font 11px and
-  ring-to-ring height ≈27px (27px min-height is border-box, so the 1.5px
-  borders eat into it — the old 34px pill measured the same way).
+- **Band chrome: 70%-of-title type on shared chrome (2026-10-02, reverses
+  e3fd388's ~80% cut):** chip computed font 15.4px (13.3px ≤640, from the
+  22/19px `.rd-title`) and border-box height ~36 (font-only
+  `.rd-cyc-chipmove .rd-chip` override — the shared base `.rd-chip` chrome
+  carries min-height/tap-cheat); pill same font ladder and ring-to-ring
+  height ≈34px (34px min-height is border-box, so the 1.5px borders eat
+  into it).
 - **Stack assertions (left-flush since 2026-10-02):** with a term lifted,
   `chipB <= drawnT + 1` (chip's bottom at or above the drawn row's top —
   the chip is visibly ABOVE the pills it spawns) and
@@ -266,3 +272,20 @@ staged source diff was re-verified against the NEW HEAD before commit (the
 staged stat looks wrong), and empty `git diff` on index.html after a HEAD
 adoption is NOT a regression sign when the sibling committed the build that
 already contained your sources' output.
+
+**e3fd388 logistics (2026-10-02, the ~80%/cancellable-× rung):** the
+sibling's verify cycle HEAD-restored the shared tree and swept the
+uncommitted rd.css/rd-cycles.jsx edits TWICE (see
+auto-skill-shared-repo-session-race's "sibling build-verify" section for
+the full pattern) — the edits survived in `.matilda/scratch-chipmove-80/`,
+were re-derived onto the sibling's landed e9c9066 (its rd.css cyc-ctls
+hunks at :1695+ are AFTER this rung's :1598 insert point and content-
+disjoint; `git show e9c9066 --stat` proved rd-cycles.jsx untouched, so
+only the CSS scratch needed re-basing via `git show HEAD:… > scratch`),
+then copied in and rebuilt in one tight window. One genuine FAILURE hid
+in the sweep noise: the pill probe expected ~30px ring-to-ring
+(27px min-height **plus** 1.5px borders), but the sheet is
+`box-sizing: border-box`, so the borders eat INTO the 27px — the pill
+modeled 34×0.8≈27 correctly and the PROBE was wrong, not the CSS. When a
+size assert fails only on border arithmetic, check box-sizing before
+touching the stylesheet.

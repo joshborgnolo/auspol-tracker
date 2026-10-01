@@ -77,11 +77,13 @@ async function run(W, H, touch) {
      drawn pills (taller than the chip) joined the band */
   const gap = g.ruleY - g.wrap.b;
   if (Math.abs(gap - 12) > 1.6) fails.push(tag + ": band bottom sits " + gap.toFixed(1) + "px above the divider " + g.ruleY.toFixed(1) + ", not ~12px (wrap bottom " + g.wrap.b.toFixed(1) + ")");
-  /* the band's chips are the ~80% cut of the shared chrome the reader asked
-     for ("reduce the size of the cycles chips by 20%"): 11px type on a 29px
-     chip (the shared .rd-chip is 14px/36px) */
-  if (g.chipFs !== "11px") fails.push(tag + ": the band chip reads " + g.chipFs + ", not the shrunk 11px");
-  if (Math.abs(g.chip.b - g.chip.t - 29) > 1) fails.push(tag + ": the band chip is " + (g.chip.b - g.chip.t).toFixed(1) + "px tall, not ~29px");
+  /* the band's chip type tracks 70% of the section's rd-title (22px
+     desktop / 19px <=640px -> 15.4/13.3px) - the reader reversed the
+     ~80% cut ("reverse it - align it to 70% of the heading/eyebrow
+     text"); the chrome is back to the shared 36px tap-target recipe */
+  const wantFs = W <= 640 ? "13.3px" : "15.4px";
+  if (g.chipFs !== wantFs) fails.push(tag + ": the band chip reads " + g.chipFs + ", not the 70%-of-title " + wantFs);
+  if (Math.abs(g.chip.b - g.chip.t - 36) > 1) fails.push(tag + ": the band chip is " + (g.chip.b - g.chip.t).toFixed(1) + "px tall, not the shared ~36px");
   if (Math.abs(g.chip.l - g.ebLeft) > 1.5) fails.push(tag + ": chip left edge " + g.chip.l.toFixed(1) + " != eyebrow left edge " + g.ebLeft.toFixed(1));
   if (g.pos !== "absolute") fails.push(tag + ": .rd-cyc-chipmove is not absolutely positioned (" + g.pos + ")");
   if (!/^＋ Draw a( past)? term$/.test(g.label)) fails.push(tag + ": unexpected chip label '" + g.label + "'");
@@ -173,11 +175,12 @@ async function run(W, H, touch) {
     if (afterLift.footB != null && afterLift.wrapT < afterLift.footB - 0.6) fails.push(tag + ": band top " + afterLift.wrapT.toFixed(1) + " overlaps the Summary foot (bottom " + afterLift.footB.toFixed(1) + ")");
     const past = afterLift.pills.filter((p) => !p.cur);
     if (!past.some((p) => p.text.indexOf(picked) === 0 && p.btn)) fails.push(tag + ": no unliftable pill for the lifted " + picked + " term (pills: " + afterLift.pills.map((p) => p.text).join(" | ") + ")");
-    /* the pills are the same ~80% cut as the band chip: 11px type, 27px
-       ring-to-ring (27px min-height is box-sizing: border-box, so the
-       1.5px borders eat into it — OLD 34px included them the same way) */
-    if (afterLift.pillFs !== "11px") fails.push(tag + ": a drawn pill reads " + afterLift.pillFs + ", not the shrunk 11px");
-    if (afterLift.pillH == null || Math.abs(afterLift.pillH - 27) > 1) fails.push(tag + ": a drawn pill is " + (afterLift.pillH == null ? "n/a" : afterLift.pillH.toFixed(1)) + "px tall ring-to-ring, not ~27px");
+    /* the pills share the band chip's contract: 70%-of-title type
+       (15.4px desktop / 13.3px <=640px) on the restored 34px
+       ring-to-ring chrome (min-height is box-sizing: border-box, so the
+       1.5px borders eat into it) */
+    if (afterLift.pillFs !== wantFs) fails.push(tag + ": a drawn pill reads " + afterLift.pillFs + ", not the 70%-of-title " + wantFs);
+    if (afterLift.pillH == null || Math.abs(afterLift.pillH - 34) > 1) fails.push(tag + ": a drawn pill is " + (afterLift.pillH == null ? "n/a" : afterLift.pillH.toFixed(1)) + "px tall ring-to-ring, not ~34px");
     const cur = afterLift.pills.filter((p) => p.cur);
     if (cur.length !== 1) fails.push(tag + ": expected exactly one sitting-term pill while " + picked + " is drawn, found " + cur.length);
     else {

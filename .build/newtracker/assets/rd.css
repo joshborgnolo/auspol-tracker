@@ -1596,21 +1596,24 @@ body.rd .rd-cyc-chipmove {
   row-gap: 8px; max-width: 100%;
 }
 body.rd .rd-cyc-chipmove .rd-cc-drawn { justify-content: flex-start; }
-/* the band's own .rd-chip chrome at ~80% of the shared 36px tap-target
-   recipe — the base .rd-chip is shared site-wide so the cut is scoped
-   here (29px pill, 11px type, the ::after tap-cheat shrinks 44→35px) */
-body.rd .rd-cyc-chipmove .rd-chip { min-height: 29px; padding: 0 11px; border-radius: 14px; gap: 6.5px; font-size: 11px; }
-body.rd .rd-cyc-chipmove .rd-chip::after { height: 35px; }
+/* the band's chip type tracks 70% of the section eyebrow's title
+   (rd-title 22px desktop / 19px phone → 15.4/13.3px) - the e3fd388 ~80%
+   cut of the shared chrome is reversed, so the chrome itself is the
+   shared 36px/44px tap-target recipe and only the type is scoped here */
+body.rd .rd-cyc-chipmove .rd-chip { font-size: 15.4px; }
 body.rd .rd-cc-l { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-cc-tabs { border-bottom: 0; }
 body.rd .rd-cc-n { margin-left: 6px; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-cc-sep { width: 1px; height: 22px; background: var(--line); margin: 0 6px; }
-/* the drawn-term pills at ~80% of their controls-row-era chrome, matching
-   the band chip's own cut (the label and rule marks keep their size) */
+/* the drawn-term pills back at their controls-row-era chrome, matching
+   the band chip's own reversal (the label and rule marks keep their size) */
 body.rd .rd-cc-drawn { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-body.rd .rd-cc-pill { display: inline-flex; align-items: center; gap: 6.5px; min-height: 27px; padding: 0 3px 0 10px; border: 1.5px solid; border-radius: 14px; font-size: 11px; color: var(--ink); }
-body.rd .rd-cc-pill button { all: unset; cursor: pointer; width: 21px; height: 21px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-3); border-radius: 10.5px; }
+body.rd .rd-cc-pill { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 4px 0 12px; border: 1.5px solid; border-radius: 17px; font-size: 15.4px; color: var(--ink); }
+body.rd .rd-cc-pill button { all: unset; cursor: pointer; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-3); border-radius: 13px; }
 body.rd .rd-cc-pill button:hover { background: var(--surface-2); color: var(--ink); }
+@media (max-width: 640px) {
+  body.rd .rd-cyc-chipmove .rd-chip, body.rd .rd-cc-pill { font-size: 13.3px; }
+}
 body.rd .rd-cc-rule { display: inline-block; width: 14px; height: 3px; border-radius: 2px; }
 body.rd .rd-cc-board {
   position: absolute; z-index: 25; left: 0; right: 0; top: calc(100% + 8px);
@@ -1686,7 +1689,10 @@ body.rd .rd-cyc-subs .rd-subdek { font-size: 15px; min-height: 45px; margin-bott
 /* the current term's overlay boxes next to the chart's name can outrun one
    row (all three wider than a 580px half-column, let alone a phone) - let
    them wrap under the name rather than push the page sideways */
-body.rd .rd-cyc-chart .rd-chead { flex-wrap: wrap; gap: 12px; }
+/* margin-top 0: the .rd-cyc-one cards rely on the chead's top margin
+   collapsing into the row's 28px, but the .rd-cyc-two grid keeps it inside
+   the card and pushes those charts 16px lower than their siblings */
+body.rd .rd-cyc-chart .rd-chead { flex-wrap: wrap; gap: 12px; margin-top: 0; }
 body.rd .rd-cyc-chart .rd-check { font-size: 13px; font-weight: 400; }
 /* the pair of One Nation overlay boxes is one box in the row flow: on
    desktop its two checks sit beside the chart's name as if nothing wrapped
