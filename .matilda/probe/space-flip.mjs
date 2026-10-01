@@ -10,7 +10,7 @@ import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import puppeteer from "puppeteer-core";
 
-const ROOT = process.env.PROBE_ROOT || fileURLToPath(new URL("..", import.meta.url));
+const ROOT = process.env.PROBE_ROOT || fileURLToPath(new URL("../..", import.meta.url));
 const PORT = 9006;
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".sass": "text/css", ".mjs": "text/javascript",
                ".css": "text/css", ".json": "application/json", ".woff2": "font/woff2",

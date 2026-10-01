@@ -1808,13 +1808,17 @@ function RdAllPolls(P) {
   }, [facet]);
   const flipPick = () => { pinAp(); onMeasure(onM ? "lnp" : "onp"); };
   const basisPick = () => { pinAp(); setTppBasis(pub ? "imp" : "resp"); };
-  /* Spacebar while the table is on screen flips the two-party contest -
-     the tab row's "Labor v X ⇄" button by key. The claim is the viewport
-     (IntersectionObserver, not the pointer) and twopp-facet only; in every
-     other state, or while real focus is anywhere but the page, space keeps
-     its scroll day job. */
+  /* Spacebar flips the two-party contest and p the published/implied
+     basis while the table is on screen - the tab row's "Labor v X ⇄"
+     button and the "Show the pollsters’ published figures" switch, by
+     key. The claim is the viewport (IntersectionObserver, not the
+     pointer) and twopp-facet only; in every other state, or while real
+     focus is anywhere but the page, space keeps its scroll day job and
+     p is left alone. */
   const spaceFlip = React.useRef(null);
   spaceFlip.current = facet === "twopp" ? flipPick : null;
+  const pubFlip = React.useRef(null);
+  pubFlip.current = facet === "twopp" ? basisPick : null;
   React.useEffect(() => {
     const sec = document.getElementById("rd-ap-top");
     if (!sec) return undefined;
@@ -1822,16 +1826,18 @@ function RdAllPolls(P) {
     const io = new IntersectionObserver((es) => es.forEach((en) => { inView.current = en.isIntersecting; }));
     io.observe(sec);
     const key = (e) => {
-      if (!inView.current || e.key !== " ") return;
-      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      if (!inView.current) return;
+      const isPub = e.key === "p" || e.key === "P";
+      if (!isPub && e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || (!isPub && e.shiftKey)) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
-      const flip = spaceFlip.current;
-      if (!flip) return;
+      const act = isPub ? pubFlip.current : spaceFlip.current;
+      if (!act) return;
       e.preventDefault();
-      if (!e.repeat) flip();
+      if (!e.repeat) act();
     };
     document.addEventListener("keydown", key, true);
     return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };

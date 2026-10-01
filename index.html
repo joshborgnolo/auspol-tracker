@@ -71398,6 +71398,8 @@ function RdPolls({
   }, []);
   const spaceFlip = React.useRef(null);
   spaceFlip.current = facet === "twopp" && setTppMatchup ? () => setTppMatchup(onMatch ? "alp_lnp" : "alp_on") : null;
+  const pubFlip = React.useRef(null);
+  pubFlip.current = facet === "twopp" && setTppBasis ? () => setTppBasis(basis === "imp" ? "resp" : "imp") : null;
   React.useEffect(() => {
     const sec = document.getElementById("latest-polls");
     if (!sec) return undefined;
@@ -71409,16 +71411,18 @@ function RdPolls({
     }));
     io.observe(sec);
     const key = e => {
-      if (!inView.current || e.key !== " ") return;
-      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      if (!inView.current) return;
+      const isPub = e.key === "p" || e.key === "P";
+      if (!isPub && e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || !isPub && e.shiftKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
-      const flip = spaceFlip.current;
-      if (!flip) return;
+      const act = isPub ? pubFlip.current : spaceFlip.current;
+      if (!act) return;
       e.preventDefault();
-      if (!e.repeat) flip();
+      if (!e.repeat) act();
     };
     document.addEventListener("keydown", key, true);
     return () => {
@@ -75970,6 +75974,8 @@ function RdAllPolls(P) {
   };
   const spaceFlip = React.useRef(null);
   spaceFlip.current = facet === "twopp" ? flipPick : null;
+  const pubFlip = React.useRef(null);
+  pubFlip.current = facet === "twopp" ? basisPick : null;
   React.useEffect(() => {
     const sec = document.getElementById("rd-ap-top");
     if (!sec) return undefined;
@@ -75981,16 +75987,18 @@ function RdAllPolls(P) {
     }));
     io.observe(sec);
     const key = e => {
-      if (!inView.current || e.key !== " ") return;
-      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      if (!inView.current) return;
+      const isPub = e.key === "p" || e.key === "P";
+      if (!isPub && e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || !isPub && e.shiftKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
-      const flip = spaceFlip.current;
-      if (!flip) return;
+      const act = isPub ? pubFlip.current : spaceFlip.current;
+      if (!act) return;
       e.preventDefault();
-      if (!e.repeat) flip();
+      if (!e.repeat) act();
     };
     document.addEventListener("keydown", key, true);
     return () => {
