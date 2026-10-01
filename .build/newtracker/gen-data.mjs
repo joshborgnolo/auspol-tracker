@@ -3769,6 +3769,13 @@ const CYCLE_DEFS = CYC_META.map((c) => {
   const prim = cycleSeries(primPts, c.ePrim, cap);
   const tpp = cycleSeries(tppPts, c.eTpp, cap);
   const eOpp = ELECTIONS["e" + c.year];             // the election that STARTED the term
+  // and the one that ENDED it, for the past-cycles election rings: the 2PP
+  // card rings both counts against each drawn term's line. The sitting term
+  // has none - its result is uncounted.
+  const eClose = c.current ? null : ELECTIONS["e" + c.src];
+  const endRes = eClose && eClose["tpp_" + c.gov] != null
+    ? { x: +monthsSince(eClose.date, c.eDate).toFixed(3), tpp: eClose["tpp_" + c.gov] }
+    : null;
   const oppr = cycleSeries(oppPrimPts, eOpp[c.opp], cap);
   /* One Nation's overlay keeps the vote-series machinery but its history has
      a hole: houses didn't report it separately before 2016, and the elections
@@ -3797,6 +3804,7 @@ const CYCLE_DEFS = CYC_META.map((c) => {
   return {
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: !!c.current,
     eDate: c.eDate,
+    ...(endRes ? { endRes } : {}),
     months, primary: prim.vals, tpp: tpp.vals, net: align(net), oppnet: align(opp),
     oppr: oppr.vals,
     ppmm: align(ppmm),
@@ -4644,6 +4652,7 @@ window.AUSPOL = (function () {
   const cycles = CYCLE_DEFS.map((c) => ({
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
     eDate: c.eDate,
+    ...(c.endRes ? { endRes: c.endRes } : {}),
     color: PARTIES[c.gov].color, span: c.months[c.months.length - 1],
     base: { tpp: c.tpp[0], primary: c.primary[0], net: c.net[0], oppnet: c.oppnet[0], han: c.han[0],
             oppr: c.oppr[0], onp: c.onp[0], ppmm: c.ppmm[0] },

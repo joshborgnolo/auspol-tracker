@@ -14,6 +14,17 @@ shipping the 2007 Rudd term (commit `8c8e15c`, 2026-09-02).
 
 ## The legend is a popover, once per chart — READ THIS FIRST (2026-09-18)
 
+> **2026-10-01 caution: this section describes the PRE-redesign
+> (d1a1d215) past-cycles UI.** The rd-cycles redesign renders
+> `.rd-cc-board`/`button.rd-chip` instead — `.cyc-legend` matches ZERO
+> elements on the live page (verified headlessly). The
+> `.matilda/verify-cycle-lift/` and `.matilda/verify-cycle-outcome/`
+> probes wait on `.cyc-legend .ap-popbtn` and are DEAD since the
+> redesign — their lift/outcome contracts now live in
+> `.matilda/probe/{cycles-combine-onp,cyc-rings}.mjs`; port or retire
+> before trusting their output. The section below still documents the
+> d1a1d215 code, which ships in the bundle but never renders.
+
 Everything below that says "chip" means a row in the **board panel** now. The
 legend used to be twenty-one `.cyc-chip` pills standing open above the charts
 — four rows deep in a desktop column, eleven on a phone, ~210px of chrome
@@ -1142,3 +1153,49 @@ each row's true holder->years map by opening the row's own peer-dot tips
 mouseover path, so a dispatched bubbling mouseover opens the tip where
 puppeteer's `hover()` misses) and asserts the tag iff the set duplicates
 the name - no hardcoded duplicate list to rot.
+
+## Election-result rings on the redesign 2PP card (2026-10-01)
+
+Every term DRAWN on the 2PP card rings BOTH its elections - the opening
+at x=0 and the closing at the next election's counted result - each
+ring in its own line's colour, the hero's rule brought to this card.
+The old single ink ring for the sitting term alone is GONE on tpp; the
+two primary cards keep theirs (ink, sitting term only) awaiting their
+own pass - primary-vote sourcing was deferred by the user ("do that in
+another step", 2026-10-01).
+
+- **Data**: `gen-data.mjs` builds `endRes` (~:3772) -
+  `eClose = c.current ? null : ELECTIONS["e" + c.src]`, then
+  `{ x: monthsSince(termStart, eClose.date), tpp: eClose["tpp_" + c.gov] }`
+  - spread into CYCLE_DEFS (:3807) and the runtime `cycles` map (:4655).
+  The sitting term gets none; a drawn past line WITHOUT a closing ring
+  means the served index.html predates the gen-data rebuild (stale
+  data), not intent.
+- **Collection**: d1a1d215 CycleChart builds `ringTerms`
+  (`M.key === "tpp"` only, :1529-1554) inside the drawnCycles walk -
+  `{ yr, color: colorOf(c), opacity, base, close: c.endRes || null }` -
+  and passes `rings={ringTerms}` to RdCycleChart (:2004).
+- **Marks**: rd-cycles.jsx :132-146 - per term `{k:"base-"+yr, x:0}` and,
+  when `rt.close`, `{k:"close-"+yr, x:rt.close.x}`; opacity
+  `(chg ? 0 : 1) * rt.opacity` so Level->Change fades every ring where
+  it is (the "Result" zero rule) instead of popping it away. The
+  primary/oppr ink ring is the untouched old block directly below.
+- **Key copy**: rd-cycles.jsx :871 - tpp reads "Each term's election
+  results", primary keeps "{year} election result".
+
+Probe: `.matilda/probe/cyc-rings.mjs` (21 checks x {1280,390}; curated,
+`git add -f`). Four traps it pins, each learnt live:
+
+- the peer-mean dot `{k:"mean", color:"var(--ink-2)"}` (rd-cycles.jsx
+  :132) rides the same `.rd-mark > circle.rd-ring` DOM - filter
+  `stroke === "var(--ink-2)"` out before counting election rings;
+- the FIRST `#cyc-tpp path.series-line` is the MEAN dashed reference
+  line, not the sitting term - assert the ring's computed stroke against
+  ALL line strokes;
+- px(dataX) derives from least-squares over the rendered
+  `text.axis-label.x` tick labels ({Election:0, 1 yr:12, 2 yrs:24,
+  3 yrs:36}) - the "Now" tick's data x is unknown, exclude it;
+- a sibling commit carrying the rd-cycles/d1a1d215 UI WITHOUT the
+  gen-data rebuild leaves closing rings silently skipped
+  (`c.endRes || null`) - the probe's "the data landed" check fails that
+  loudly. See auto-skill-shared-repo-session-race.
