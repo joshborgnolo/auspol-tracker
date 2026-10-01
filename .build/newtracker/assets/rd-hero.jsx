@@ -417,6 +417,25 @@ function RdHero(p) {
   };
   const swipeMark = React.useCallback((el) => { if (el) el.__rdSwipe = (dir) => swipeLive.current(dir); }, []);
 
+  /* two quick presses on the headline figures flip the contest, one step
+     along the matchups like a sideways swipe - the numbers themselves
+     carry the claim (the names and the rule between them do not), and the
+     pair is read off pointerdown so a mouse double-click and a phone
+     double-tap are the same gesture. The second press's default is killed:
+     left to the browser it would select the digits. */
+  const numTap = React.useRef({ t: 0, x: 0, y: 0 });
+  const numPress = (e) => {
+    if (!(e.target.closest && e.target.closest(".rd-tpp-num"))) return;
+    const now = performance.now(), p = numTap.current;
+    const pair = now - p.t < 500 && Math.abs(e.clientX - p.x) < 30 && Math.abs(e.clientY - p.y) < 30;
+    p.t = now; p.x = e.clientX; p.y = e.clientY;
+    if (!pair || orderedMatchups.length < 2) return;
+    p.t = 0;
+    e.preventDefault();
+    const i = orderedMatchups.indexOf(matchup);
+    chooseMatchup(orderedMatchups[(i + 1 + orderedMatchups.length) % orderedMatchups.length]);
+  };
+
   /* Pointing at the chart card makes its range menu the arrow-key target
      without moving DOM focus: the card claims bare presses on the page
      itself, a focused control (the menu's own walk, the compare checkbox)
@@ -472,8 +491,9 @@ function RdHero(p) {
         {/* the figures swipe like the chart under them: marked self so only
             this strip of numbers and names claims the gesture - the
             "ahead" scale directly below it, and the words below that, keep
-            their plain page turn */}
-        <div className="rd-tpp-read" ref={swipeMark} data-rd-swipe-self="">
+            their plain page turn. A press on the numbers is double-counted
+            here (numPress): two quick ones flip the contest */}
+        <div className="rd-tpp-read" ref={swipeMark} data-rd-swipe-self="" onPointerDown={numPress}>
           <div className="rd-tpp-side rd-a">
             <span className="rd-tpp-name" style={{ color: inkOf(m.a.color) }}><span className="rd-tpp-dot" style={{ background: m.a.color }}></span>{m.a.name}</span>
             <RollNum className="rd-tpp-num" value={latest.a.toFixed(1)} style={{ color: inkOf(m.a.color) }} spinIn />
