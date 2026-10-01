@@ -125,6 +125,7 @@ async function run(W, H, touch) {
   const afterLift = await page.evaluate(() => {
     const q = (s) => document.querySelector(s);
     const drawn = q("#cyc-tpp .rd-cyc-chipmove .rd-cc-drawn");
+    const chip = q("#cyc-tpp .rd-cyc-chipmove .rd-chip");
     const eb = q("#cyc-tpp .rd-eyebrow");
     const wrap = q("#cyc-tpp .rd-cyc-chipmove");
     const ebs = getComputedStyle(eb);
@@ -140,11 +141,20 @@ async function run(W, H, touch) {
       pills,
       svg: Array.from(document.querySelectorAll("#cyc-tpp svg")).map((s) => s.textContent).join(" "),
       gap: (r(eb).top + parseFloat(ebs.borderTopWidth) / 2) - r(wrap).bottom,
+      chipR: r(chip).right,
+      chipB: r(chip).bottom,
+      drawnR: drawn ? r(drawn).right : null,
+      drawnT: drawn ? r(drawn).top : null,
+      ebRight: r(eb).right,
     };
   });
   if (!afterLift.drawn) fails.push(tag + ": lifting " + picked + " did not raise the drawn-over-the-band row up with the chip");
   else {
     if (!/Drawn over the band/.test(afterLift.text)) fails.push(tag + ": the raised row lost its 'Drawn over the band' label");
+    /* the band stacks down: chip on top, the drawn row directly beneath
+       it, both ends flush with the eyebrow's right edge */
+    if (afterLift.chipB > afterLift.drawnT + 1) fails.push(tag + ": the chip is not above the drawn row (chip bottom " + afterLift.chipB.toFixed(1) + " > drawn top " + afterLift.drawnT.toFixed(1) + ")");
+    if (Math.abs(afterLift.drawnR - afterLift.ebRight) > 1.5) fails.push(tag + ": drawn row right edge " + afterLift.drawnR.toFixed(1) + " != eyebrow right edge " + afterLift.ebRight.toFixed(1));
     const past = afterLift.pills.filter((p) => !p.cur);
     if (!past.some((p) => p.text.indexOf(picked) === 0 && p.btn)) fails.push(tag + ": no unliftable pill for the lifted " + picked + " term (pills: " + afterLift.pills.map((p) => p.text).join(" | ") + ")");
     const cur = afterLift.pills.filter((p) => p.cur);

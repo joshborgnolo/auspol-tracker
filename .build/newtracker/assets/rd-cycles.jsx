@@ -912,6 +912,7 @@ function RdPastCycles(p) {
       </section>
       <RdSec id="cyc-tpp" title="Two-party preferred" meta="Implied from each poll’s primary votes, on the flows counted at the election that opened its term"
              tools={<span className="rd-cyc-chipmove">
+               <button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
                {liftedList.length > 0 && (
                  <span className="rd-cc-drawn">
                    <span className="rd-cc-l">Drawn over the band</span>
@@ -931,7 +932,6 @@ function RdPastCycles(p) {
                    )}
                  </span>
                )}
-               <button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
              </span>}>
         {tppStory && <RdHed head={tppStory.head} dek={tppStory.dek} />}
         <div className="rd-cyc-one">{chart("tpp", false)}</div>

@@ -1567,14 +1567,16 @@ body.rd .rd-cc-row { display: flex; align-items: center; gap: 12px; border-botto
    controls row onto the Two-party section's own divider: the band floats
    just above the 2px eyebrow rule, its bottom 6px clear of the line, and
    lands the same at every width (the eyebrow tools slot exists only to
-   hang it inside the already-positioned .rd-sec); the chip ends flush
-   with the right edge and the pills queue in from the left */
+   hang it inside the already-positioned .rd-sec); everything is flush
+   with the right edge, and the band stacks down - chip on top, the
+   drawn-terms row directly beneath it */
 body.rd .rd-cyc-chipmove {
   position: absolute; top: calc(var(--rd-sec-pad) + 1px); right: 0; z-index: 1;
   transform: translateY(calc(-100% - 6px));
-  display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap;
-  gap: 14px; max-width: 100%;
+  display: flex; flex-direction: column; align-items: flex-end;
+  row-gap: 8px; max-width: 100%;
 }
+body.rd .rd-cyc-chipmove .rd-cc-drawn { justify-content: flex-end; }
 body.rd .rd-cc-l { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-cc-tabs { border-bottom: 0; }
 body.rd .rd-cc-n { margin-left: 6px; font-weight: 400; color: var(--ink-3); }
