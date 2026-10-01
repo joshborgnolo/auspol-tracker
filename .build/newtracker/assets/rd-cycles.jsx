@@ -274,8 +274,8 @@ function rdCycRank(peers, v, fmt) {
   if (hiR === 1) return { main: "Highest of " + n, sub: "Previous high: " + rdCycHolderTag(peers, top) + ", " + fmt(top.v), strong: true };
   if (loR === 1) return { main: "Lowest of " + n, sub: "Previous low: " + rdCycHolderTag(peers, low) + ", " + fmt(low.v), strong: true };
   if (above === below) return { main: "Middle of " + n };
-  if (hiR < loR) return { main: rdOrd(hiR) + " highest of " + n, sub: hiR === 2 ? "Only " + top.who + " (" + top.yr + ") was higher" : null };
-  return { main: rdOrd(loR) + " lowest of " + n, sub: loR === 2 ? "Only " + low.who + " (" + low.yr + ") was lower" : null };
+  if (hiR < loR) return { main: rdOrd(hiR) + " highest of " + n, sub: hiR === 2 ? "Only " + rdCycHolderTag(peers, top) + " was higher" : null };
+  return { main: rdOrd(loR) + " lowest of " + n, sub: loR === 2 ? "Only " + rdCycHolderTag(peers, low) + " was lower" : null };
 }
 
 /* ---- the tab --------------------------------------------------------------- */

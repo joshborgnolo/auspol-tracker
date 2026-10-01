@@ -72001,11 +72001,11 @@ function rdCycRank(peers, v, fmt) {
   };
   if (hiR < loR) return {
     main: rdOrd(hiR) + " highest of " + n,
-    sub: hiR === 2 ? "Only " + top.who + " (" + top.yr + ") was higher" : null
+    sub: hiR === 2 ? "Only " + rdCycHolderTag(peers, top) + " was higher" : null
   };
   return {
     main: rdOrd(loR) + " lowest of " + n,
-    sub: loR === 2 ? "Only " + low.who + " (" + low.yr + ") was lower" : null
+    sub: loR === 2 ? "Only " + rdCycHolderTag(peers, low) + " was lower" : null
   };
 }
 function RdPastCycles(p) {
