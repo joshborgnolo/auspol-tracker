@@ -54,7 +54,8 @@ const RD_CYC_LEAD = "0.5 4";
 
 /* ---- one chart, in the redesign's frame --------------------------------- */
 function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evIn, badged, domain, ticks, cur, hidden, liftedN, narrow, half,
-                        hanCtl, showHan, setHan, showOnp, setOnp, showComb, setComb, tipCycle, banded, bandN, isOpp, terms, outcomeShown, rings }) {
+                        hanCtl, showHan, setHan, showOnp, setOnp, showComb, setComb, tipCycle, banded, bandN, isOpp, terms, outcomeShown, rings,
+                        evtOut, onEvtOut }) {
   const { D } = window.AP;
   /* the sitting term's change of contest, said as the headline says it */
   const events = evIn.map((e) => (/^Now v /.test(e.short || "")
@@ -170,9 +171,14 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
   const xTicks = [{ x: 0, label: "Election", strong: true }, { x: 12, label: yr[0] }, { x: 24, label: yr[1] }, { x: 36, label: yr[2] }]
     .filter((t) => nowM == null || Math.abs(t.x - nowM) > 2.5)
     .concat(nowM != null ? [{ x: nowM, label: "Now", strong: true }] : []).sort((a, b) => a.x - b.x);
-  /* a pair of half-width charts shares one numbered list, made by the tab;
-     a lone chart on a phone numbers its own */
+  /* a pair of half-width charts shares one numbered list, made by the tab
+     and holding its open event (evtOut/onEvtOut); a lone chart on a phone
+     numbers its own list and keeps the open event itself, as the hero does */
   const badges = badged ? { events, list: null } : narrow ? rdEventBadges("cy", events.filter((e) => e.date), -2, 38) : null;
+  const [evtHeld, setEvtHeld] = useState(null);
+  const ctlOut = typeof onEvtOut === "function";
+  const evt = ctlOut ? evtOut : evtHeld, setEvt = ctlOut ? onEvtOut : setEvtHeld;
+  const pickEv = (e) => { setEvt((cur) => (cur && cur.e === e ? cur : { e })); rdEventReveal("evt-a-" + e.badgeKey); };
   const tickSet = ticks.slice();
   if (!tickSet.includes(domain[0])) tickSet.unshift(domain[0]);
   if (!tickSet.includes(domain[1])) tickSet.push(domain[1]);
@@ -242,7 +248,8 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
         scatterOut={drawn ? drawn.scatterOut : []} scatterMove={drawn ? drawn.scatterMove : []} fade={drawn ? clk.t : 1}
         areas={drawn ? drawn.areas : (bandAreas || undefined)}
         morphFrom={was ? { yTicks: was.ticks, yTickFmt: was.fmt, refLines: was.refLines, notes: notesWas, brackets: bracketsWas } : null} morphT={clk ? clk.t : 1}
-        events={badges ? badges.events : events} notes={notesNow} marks={marksNow} brackets={bracketsNow}
+        events={badges ? badges.events : events} evt={(badged || badges) ? evt : null} onEvt={(badged || badges) ? setEvt : null}
+        notes={notesNow} marks={marksNow} brackets={bracketsNow}
         tooltipTitle={(i) => cycMonthLabel(CYC_SPINE[i].x) + (tipCycle ? " – " + cycMonthOf(tipCycle.eDate, CYC_SPINE[i].x) : "")}
         extraRows={(i) => {
           const r = bandRows.find((b) => b.m === CYC_SPINE[i].x);
@@ -252,7 +259,7 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
         copy={{ title: copyTitle, sub: banded ? "Against the middle half and middle 80% of " + bandN + " past terms"
           + (outcomeShown === "returned" ? " whose government was re-elected" : outcomeShown === "ousted" ? " whose government was ousted" : "") : "", terms }}
       />
-      {badges && badges.list && <RdEventList list={badges.list} />}
+      {badges && badges.list && <RdEventList list={badges.list} onPick={pickEv} openKey={evt && evt.e ? evt.e.badgeKey : null} />}
     </div>
   );
 }
@@ -854,6 +861,30 @@ function RdPastCycles(p) {
     .filter((e) => !e.metrics || e.metrics.some((k) => keys.includes(k)))
     .map((e) => ({ ...e, x: cycEventMonth(e.date, cur.eDate) })), -2, 38);
   const PAIRS = { primary: pairOf(["primary", "oppr"]), leaders: pairOf(["ppmm", "oppnet"]) };
+  /* Each pair of half charts shares the one numbered list, so the open
+     event lives here: a pick opens it in the pair's first chart whose
+     measures carry the event (the rest of the routing is the chart's own
+     controlled-evt contract), and only one chart of a pair holds it at a
+     time. A metric-less event draws in both, so its pick goes to the
+     left-hand chart and its scroll anchor exists only there. */
+  const [evt, setEvt] = useState({ primary: null, oppr: null, ppmm: null, oppnet: null });
+  const onEvtOf = (key) => (v) => setEvt((s) => (s[key] === v ? s : { ...s, [key]: v }));
+  const pickPair = (pair, keys) => (e) => {
+    const k = keys.find((c) => !e.metrics || e.metrics.includes(c));
+    if (k) setEvt((s) => {
+      if (s[k] && s[k].e === e) return s;
+      const nx = { ...s };
+      keys.forEach((c) => { nx[c] = null; });
+      nx[k] = { e };
+      return nx;
+    });
+    if (k) rdEventReveal("evt-a-" + e.badgeKey);
+  };
+  const pickEvOf = { primary: pickPair("primary", ["primary", "oppr"]), leaders: pickPair("leaders", ["ppmm", "oppnet"]) };
+  const openKeyOf = (keys) => {
+    for (const k of keys) { if (evt[k] && evt[k].e) return evt[k].e.badgeKey; }
+    return null;
+  };
   const chart = (key, half, pair) => {
     const M = Mby[key];
     const evs = pair ? PAIRS[pair].events.filter((e) => !e.metrics || e.metrics.includes(key)) : null;
@@ -861,7 +892,8 @@ function RdPastCycles(p) {
                        chipClick={chipClick} toggle={toggle} showAll={showAll} hideAll={hideAll} showOutcome={showOutcome}
                        showHan={showHan} setHan={setShowHan} showOnp={showOnp} setOnp={setShowOnp}
                        showComb={showComb} setComb={setShowComb} shapes={shapes}
-                       outcomeShown={outcomeShown} rdHalf={half} rdEvents={evs} />;
+                       outcomeShown={outcomeShown} rdHalf={half} rdEvents={evs}
+                       evtOut={pair ? evt[key] : null} onEvtOut={pair ? onEvtOf(key) : null} />;
   };
   /* The key names the sitting term's own lines and its election ring as well
      as the band, as the canvas did: the lines were keyed only by the words at
@@ -948,7 +980,7 @@ function RdPastCycles(p) {
       <RdSec id="cyc-primary" title="Primary vote" meta="First preferences for the governing party and the main opposition party">
         {primStory && <RdHed head={primStory.head} dek={primStory.dek} />}
         <div className="rd-cyc-two">{chart("primary", true, "primary")}{chart("oppr", true, "primary")}</div>
-        <RdEventList list={PAIRS.primary.list} inline />
+        <RdEventList list={PAIRS.primary.list} inline onPick={pickEvOf.primary} openKey={openKeyOf(["primary", "oppr"])} />
         {bandKey("primary")}
         <RdFoot how={{ term: "what-am-i-looking-at", from: "Past cycles" }}>
           Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed. The dotted start of each line runs from the election’s counted result to the term’s first poll.
@@ -961,7 +993,7 @@ function RdPastCycles(p) {
           <div><RdSub head="Preferred prime minister" dek="The prime minister’s lead over the opposition leader on the question of who would make the better PM. Asked since 1984." />{chart("ppmm", true, "leaders")}</div>
           <div><RdSub head="Opposition leader’s net approval" dek="Approve minus disapprove, for whoever led the opposition at the time. Rated since 1972." />{chart("oppnet", true, "leaders")}</div>
         </div>
-        <RdEventList list={PAIRS.leaders.list} inline />
+        <RdEventList list={PAIRS.leaders.list} inline onPick={pickEvOf.leaders} openKey={openKeyOf(["ppmm", "oppnet"])} />
         {bandKey("leaders")}
         <RdFoot how={{ term: "approval", from: "Past cycles" }}>
           Where a term changed leader its line follows whoever held the office. The earliest terms’ ratings are the Morgan Gallup Poll’s; later terms pool every pollster that asked, each corrected for its lean. Favourability ratings are left out.

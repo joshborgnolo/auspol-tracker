@@ -1372,7 +1372,7 @@ function cycHolderAt(c, M, m) {
 
 function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, chipClick, toggle,
                      showAll, hideAll, showOutcome, showHan, setHan, showOnp, setOnp, showComb, setComb, shapes,
-                     outcomeShown, rdHalf, rdEvents }) {
+                     outcomeShown, rdHalf, rdEvents, evtOut, onEvtOut }) {
   const { D } = window.AP;
   const narrow = useNarrow();
   const M = metric;
@@ -2007,7 +2007,8 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
     <RdCycleChart M={M} chg={chg} built={built} bandAreas={bandAreas} bandRows={bandRows} scatter={scatter}
       events={rdEvents || cycleEvents} badged={!!rdEvents} domain={domain} ticks={ticks} cur={cur} hidden={hidden} liftedN={lifted.size} narrow={narrow} half={!!rdHalf}
       hanCtl={hanCtl} showHan={showHan} setHan={setHan} showOnp={showOnp} setOnp={setOnp} showComb={showComb} setComb={setComb} tipCycle={tipCycle}
-      banded={banded} bandN={bandN} isOpp={isOpp} terms={shown.filter(hasData).map((c) => c.year)} outcomeShown={outcomeShown} rings={ringTerms} />
+      banded={banded} bandN={bandN} isOpp={isOpp} terms={shown.filter(hasData).map((c) => c.year)} outcomeShown={outcomeShown} rings={ringTerms}
+      evtOut={evtOut} onEvtOut={onEvtOut} />
   );
   return (
     <section className="card cycle-card">

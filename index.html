@@ -57553,7 +57553,9 @@ function CycleChart({
   shapes,
   outcomeShown,
   rdHalf,
-  rdEvents
+  rdEvents,
+  evtOut,
+  onEvtOut
 }) {
   const {
     D
@@ -58013,7 +58015,9 @@ function CycleChart({
     isOpp: isOpp,
     terms: shown.filter(hasData).map(c => c.year),
     outcomeShown: outcomeShown,
-    rings: ringTerms
+    rings: ringTerms,
+    evtOut: evtOut,
+    onEvtOut: onEvtOut
   });
   return React.createElement("section", {
     className: "card cycle-card"
@@ -71785,7 +71789,9 @@ function RdCycleChart({
   isOpp,
   terms,
   outcomeShown,
-  rings
+  rings,
+  evtOut,
+  onEvtOut
 }) {
   const {
     D
@@ -71993,6 +71999,16 @@ function RdCycleChart({
     events,
     list: null
   } : narrow ? rdEventBadges("cy", events.filter(e => e.date), -2, 38) : null;
+  const [evtHeld, setEvtHeld] = useState(null);
+  const ctlOut = typeof onEvtOut === "function";
+  const evt = ctlOut ? evtOut : evtHeld,
+    setEvt = ctlOut ? onEvtOut : setEvtHeld;
+  const pickEv = e => {
+    setEvt(cur => cur && cur.e === e ? cur : {
+      e
+    });
+    rdEventReveal("evt-a-" + e.badgeKey);
+  };
   const tickSet = ticks.slice();
   if (!tickSet.includes(domain[0])) tickSet.unshift(domain[0]);
   if (!tickSet.includes(domain[1])) tickSet.push(domain[1]);
@@ -72136,6 +72152,8 @@ function RdCycleChart({
     } : null,
     morphT: clk ? clk.t : 1,
     events: badges ? badges.events : events,
+    evt: badged || badges ? evt : null,
+    onEvt: badged || badges ? setEvt : null,
     notes: notesNow,
     marks: marksNow,
     brackets: bracketsNow,
@@ -72158,7 +72176,9 @@ function RdCycleChart({
       terms
     }
   }), badges && badges.list && React.createElement(RdEventList, {
-    list: badges.list
+    list: badges.list,
+    onPick: pickEv,
+    openKey: evt && evt.e ? evt.e.badgeKey : null
   }));
 }
 const combSeries = c => c.raw.months.map((_, i) => c.raw.oppr[i] != null && (c.raw.onp || [])[i] != null ? +(c.raw.oppr[i] + c.raw.onp[i]).toFixed(2) : null);
@@ -72961,6 +72981,43 @@ function RdPastCycles(p) {
     primary: pairOf(["primary", "oppr"]),
     leaders: pairOf(["ppmm", "oppnet"])
   };
+  const [evt, setEvt] = useState({
+    primary: null,
+    oppr: null,
+    ppmm: null,
+    oppnet: null
+  });
+  const onEvtOf = key => v => setEvt(s => s[key] === v ? s : {
+    ...s,
+    [key]: v
+  });
+  const pickPair = (pair, keys) => e => {
+    const k = keys.find(c => !e.metrics || e.metrics.includes(c));
+    if (k) setEvt(s => {
+      if (s[k] && s[k].e === e) return s;
+      const nx = {
+        ...s
+      };
+      keys.forEach(c => {
+        nx[c] = null;
+      });
+      nx[k] = {
+        e
+      };
+      return nx;
+    });
+    if (k) rdEventReveal("evt-a-" + e.badgeKey);
+  };
+  const pickEvOf = {
+    primary: pickPair("primary", ["primary", "oppr"]),
+    leaders: pickPair("leaders", ["ppmm", "oppnet"])
+  };
+  const openKeyOf = keys => {
+    for (const k of keys) {
+      if (evt[k] && evt[k].e) return evt[k].e.badgeKey;
+    }
+    return null;
+  };
   const chart = (key, half, pair) => {
     const M = Mby[key];
     const evs = pair ? PAIRS[pair].events.filter(e => !e.metrics || e.metrics.includes(key)) : null;
@@ -72988,7 +73045,9 @@ function RdPastCycles(p) {
       shapes: shapes,
       outcomeShown: outcomeShown,
       rdHalf: half,
-      rdEvents: evs
+      rdEvents: evs,
+      evtOut: pair ? evt[key] : null,
+      onEvtOut: pair ? onEvtOf(key) : null
     });
   };
   const twoLines = (a, b) => React.createElement("svg", {
@@ -73165,7 +73224,9 @@ function RdPastCycles(p) {
     className: "rd-cyc-two"
   }, chart("primary", true, "primary"), chart("oppr", true, "primary")), React.createElement(RdEventList, {
     list: PAIRS.primary.list,
-    inline: true
+    inline: true,
+    onPick: pickEvOf.primary,
+    openKey: openKeyOf(["primary", "oppr"])
   }), bandKey("primary"), React.createElement(RdFoot, {
     how: {
       term: "what-am-i-looking-at",
@@ -73190,7 +73251,9 @@ function RdPastCycles(p) {
     dek: "Approve minus disapprove, for whoever led the opposition at the time. Rated since 1972."
   }), chart("oppnet", true, "leaders"))), React.createElement(RdEventList, {
     list: PAIRS.leaders.list,
-    inline: true
+    inline: true,
+    onPick: pickEvOf.leaders,
+    openKey: openKeyOf(["ppmm", "oppnet"])
   }), bandKey("leaders"), React.createElement(RdFoot, {
     how: {
       term: "approval",
