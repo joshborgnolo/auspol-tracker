@@ -1231,8 +1231,8 @@ function WvRug({ g, party, xp, pColor, pName }) {
               <span className="tip-title">{d.f}</span>
               <span className="tip-row"><span className="tip-swatch" style={{ background: pColor }}></span><span className="tip-label">{pName}</span><span className="tip-val">{x.toFixed(1) + "%"}</span></span>
               <span className="tip-row"><span className="tip-label">Field</span><span className="tip-val">{d.l}</span></span>
-              <span className="tip-sub">{"n ≈ " + (+d.n).toLocaleString()}</span>
-              {tip.src !== "touch" && <span className="tip-hint">{rk ? (tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls") : "Released " + d.r}</span>}
+              <div className="tip-sub">{"n ≈ " + (+d.n).toLocaleString()}</div>
+              {tip.src !== "touch" && <div className="tip-hint">{rk ? (tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls") : "Released " + d.r}</div>}
             </span>}
           </b>
         );
