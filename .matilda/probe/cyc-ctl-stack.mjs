@@ -59,6 +59,8 @@ const readLayout = () => window.__cycCtlLayout = (() => {
     comb: note(comb.getBoundingClientRect()), onp: note(onp.getBoundingClientRect()),
     ctls: note(ctls.getBoundingClientRect()), ctlsDisplay: getComputedStyle(ctls).display,
     ctlsDir: getComputedStyle(ctls).flexDirection, combText: comb.textContent.trim(), onpText: onp.textContent.trim(),
+    combWeight: getComputedStyle(comb.querySelector("i") || comb).fontWeight,
+    onpWeight: getComputedStyle(onp.querySelector("i") || onp).fontWeight,
     hanWrappers, docW: document.documentElement.scrollWidth, vw: window.innerWidth };
 })();
 
@@ -115,6 +117,9 @@ const faceCentrePx = async (page, S) => {
       check(t + ": DOM order keeps Combine first, One Nation second",
         /Combine/.test(L.combText) && /One Nation this term/.test(L.onpText),
         L.combText + " | " + L.onpText);
+      check(t + ": checkbox labels are not bold (chead inherits 600)",
+        L.combWeight === "400" && L.onpWeight === "400",
+        "comb=" + L.combWeight + " onp=" + L.onpWeight);
       if (vw <= 640) {
         check(t + ": wrapper becomes the tight corner column at phone width",
           L.ctlsDisplay === "flex" && L.ctlsDir === "column-reverse", L.ctlsDisplay + " " + L.ctlsDir);
@@ -123,11 +128,14 @@ const faceCentrePx = async (page, S) => {
           "comb.bottom=" + L.comb.bottom + " title.bottom=" + L.title.bottom);
         check(t + ": One Nation sits fully above Combine",
           L.onp.bottom <= L.combTop + 1, "onp.bottom=" + L.onp.bottom + " comb.top=" + L.combTop);
-        check(t + ": the pair is tight (gap no more than 4px)",
-          L.combTop - L.onp.bottom <= 4 && L.combTop - L.onp.bottom >= 0,
+        check(t + ": the pair is tight (gap no more than 2px)",
+          L.combTop - L.onp.bottom <= 2 && L.combTop - L.onp.bottom >= 0,
           "gap=" + (L.combTop - L.onp.bottom));
-        check(t + ": One Nation clears the chart name above it",
-          L.onp.bottom <= L.title.y + 1, "onp.bottom=" + L.onp.bottom + " title.top=" + L.title.y);
+        check(t + ": the phone rows are squeezed (no line-height slack)",
+          L.comb.h <= 17 && L.onp.h <= 17,
+          "comb.h=" + L.comb.h + " onp.h=" + L.onp.h);
+        check(t + ": One Nation's row clears the chart name to its left",
+          L.title.right <= L.comb.x + 1, "title.right=" + L.title.right + " comb.x=" + L.comb.x);
         check(t + ": the two boxes are right-aligned with each other",
           Math.abs(L.onp.right - L.comb.right) <= 2, "onp.right=" + L.onp.right + " comb.right=" + L.comb.right);
         check(t + ": the stack hugs the head row's right edge",

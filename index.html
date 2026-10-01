@@ -4251,11 +4251,13 @@ body.rd .rd-cyc-two { display: grid; grid-template-columns: minmax(0, 1fr) minma
 body.rd .rd-cyc-subs .rd-sub { margin-top: 44px; }
 body.rd .rd-cyc-subs .rd-subdek { font-size: 15px; min-height: 45px; margin-bottom: 8px; }
 body.rd .rd-cyc-chart .rd-chead { flex-wrap: wrap; gap: 12px; }
-body.rd .rd-cyc-chart .rd-check { font-size: 13px; }
+body.rd .rd-cyc-chart .rd-check { font-size: 13px; font-weight: 400; }
 body.rd .rd-cyc-ctls { display: contents; }
 @media (max-width: 640px) {
   body.rd .rd-cyc-chart .rd-chead { align-items: flex-end; }
-  body.rd .rd-cyc-ctls { display: flex; flex-direction: column-reverse; align-items: flex-end; row-gap: 2px; margin-left: auto; }
+  body.rd .rd-cyc-ctls { display: flex; flex-direction: column-reverse; align-items: flex-end; row-gap: 0; margin-left: auto; }
+  body.rd .rd-cyc-chart .rd-check { line-height: 1.15; min-height: 0; }
+  body.rd .rd-cyc-chart .rd-check input { width: 15px; height: 15px; margin-top: 1px; }
 }
 body.rd .cyc-band.lo { fill: var(--ink-3); opacity: 0.1; }
 body.rd .cyc-band.hi { fill: var(--ink-3); opacity: 0.17; }
