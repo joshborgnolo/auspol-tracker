@@ -1182,6 +1182,38 @@ function WvRug({ g, party, xp, pColor, pName }) {
   const [tip, setTip] = useState(null);
   const tipBox = React.useRef(null);
   const ptr = React.useRef(null);
+  /* the rug's corridor doubled, and the dots ride its lower half; a dot
+     whose disc would touch its left neighbour's steps up into the added
+     half (its --v), recomputed per party switch and resize from the real
+     track width - dots are sized in px but placed in cqw, so only the
+     rendered strip says how far apart two readings actually sit */
+  const rugBox = React.useRef(null);
+  const [ups, setUps] = useState(null);
+  React.useLayoutEffect(() => {
+    const el = rugBox.current;
+    if (!el) return;
+    const compute = () => {
+      const b = el.querySelector("b");
+      const w = el.clientWidth;
+      if (!b || !w) return;
+      const gap = (b.offsetWidth / w) * 100;
+      const last = [-Infinity, -Infinity];
+      const next = new Array(g.px[party].length).fill(0);
+      g.px[party].map((x, i) => ({ i, p: xp(x) })).sort((a, c) => a.p - c.p).forEach(({ i, p }) => {
+        let l;
+        if (p - last[0] >= gap) l = 0;
+        else if (p - last[1] >= gap) l = 1;
+        else l = last[0] <= last[1] ? 0 : 1;
+        last[l] = p;
+        next[i] = l;
+      });
+      setUps((prev) => (prev && prev.length === next.length && next.every((v, k) => v === prev[k]) ? prev : next));
+    };
+    compute();
+    const ro = new ResizeObserver(compute);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [g, party, xp]);
   React.useLayoutEffect(() => {
     const el = tipBox.current;
     if (!el) return;
@@ -1193,10 +1225,10 @@ function WvRug({ g, party, xp, pColor, pName }) {
   const show = (i, src) => setTip({ i, src });
   const hide = (i, src) => setTip((tp) => (tp && tp.i === i && (!src || tp.src === src) ? null : tp));
   return (
-    <span className={"rd-wv-rug" + (tip ? " lit" : "")}>
+    <span ref={rugBox} className={"rd-wv-rug" + (tip ? " lit" : "")}>
       {g.px[party].map((x, i) => {
         const d = g.pd[i] || null;
-        if (!d) return <b key={i} style={{ "--x": xp(x), "--pcolor": pColor }}><i aria-hidden="true"></i></b>;
+        if (!d) return <b key={i} style={{ "--x": xp(x), "--pcolor": pColor, "--v": ups ? ups[i] : 0 }}><i aria-hidden="true"></i></b>;
         const rk = d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.f, released: d.r }) : null;
         const open = () => {
           if (!rk || !(window.AP && window.AP.openPoll)) return;
@@ -1206,7 +1238,7 @@ function WvRug({ g, party, xp, pColor, pName }) {
         const lab = d.f + ", " + d.l + " · " + x.toFixed(1) + "% · n≈" + d.n;
         const on = tip && tip.i === i;
         return (
-          <b key={i} className={[(rk ? "on" : ""), (on ? "hi" : "")].filter(Boolean).join(" ") || undefined} style={{ "--x": xp(x), "--pcolor": pColor }}
+          <b key={i} className={[(rk ? "on" : ""), (on ? "hi" : "")].filter(Boolean).join(" ") || undefined} style={{ "--x": xp(x), "--pcolor": pColor, "--v": ups ? ups[i] : 0 }}
              role={rk ? "button" : "img"} tabIndex={rk ? 0 : undefined}
              aria-label={lab + (rk ? ", press Enter to open this poll" : "")}
              onPointerDown={(ev) => { ptr.current = ev.pointerType; }}

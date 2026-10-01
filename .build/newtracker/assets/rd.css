@@ -1035,7 +1035,12 @@ body.rd .rd-wv-allline i, body.rd .rd-wv-all { position: absolute; top: 0; botto
 body.rd .rd-wv-all { display: none; }
 /* the rug: each wave the window holds is a small dot along the top of the
    track, the poll's own reading for the group, quieter than the whisker
-   so it reads as the working, not the figure. It pips the all-voters
+   so it reads as the working, not the figure. The corridor is two
+   dot-widths tall - it grows UPWARD out of the track's free top edge (the
+   interval's line sits below), dots riding the bottom half where they have
+   always sat while a dot whose disc would overlap its neighbour's steps up
+   a half-corridor (its --v, the anchor's transform glide carrying the hop).
+   It pips the all-voters
    line (z 1, drawn over all the rows at once) at the whisker's tier,
    z 2, so the dash passes under a poll dot as it does the interval.
    b is the dot's fixed anchor + hit box (the glide's transform lives on it);
@@ -1046,9 +1051,9 @@ body.rd .rd-wv-all { display: none; }
    halo the panel's whisker dot and CI ticks already carry), inside a 1.5px
    ring of the dot's own colour at .55 - and the row's other dots step back
    a fold, as the chart's cloud does around its pick. */
-body.rd .rd-wv-rug { position: absolute; top: 1px; left: 0; right: 0; height: 6px; z-index: 2; }
+body.rd .rd-wv-rug { position: absolute; top: -5px; left: 0; right: 0; height: 12px; z-index: 2; }
 body.rd .rd-wv-rug:has(> b.hi) { z-index: 4; }
-body.rd .rd-wv-rug b { position: absolute; top: 0; left: 0; width: 6px; height: 6px; transform: translateX(calc(var(--x) * 1cqw - 50%)); touch-action: manipulation; }
+body.rd .rd-wv-rug b { position: absolute; bottom: 0; left: 0; width: 6px; height: 6px; transform: translateX(calc(var(--x) * 1cqw - 50%)) translateY(calc(var(--v, 0) * -6px)); touch-action: manipulation; }
 body.rd .rd-wv-rug b::before { content: ""; position: absolute; inset: -5px -6px; }
 /* the dot's alpha lives in its colour, not in opacity: only a solid element
    can carry the background ring that erases the all-voters dash where it
