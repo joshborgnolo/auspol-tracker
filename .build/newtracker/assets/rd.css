@@ -667,6 +667,13 @@ body.rd .rd-pl-ticks > span {
 body.rd .rd-pl-ticks > span.today { font-weight: 600; color: var(--ink); }
 body.rd .rd-pl-prim { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 4px; font-size: 15px; font-weight: 600; }
 body.rd .rd-pl-primh { font-size: 12px; letter-spacing: 0.02em; }
+/* half-point houses (Roy Morgan) print x.5 next to whole figures; the row's
+   cells are fixed-width, so the full-size ".5" suffix makes every other column
+   gap a suffix-width wider and the row's rhythm stutters — set the fraction as
+   a small suffix to shrink the width difference (it also clears a near-wrapping
+   4-char figure from the phone rung's ~27px cells) */
+body.rd .rd-pl-prim .rd-pl-frac { font-size: 11px; }
+@media (max-width: 900px) { body.rd .rd-pl-prim .rd-pl-frac { font-size: 10px; } }
 body.rd .rd-pl-item { border-bottom: 1px solid var(--line); }
 body.rd .rd-pl-row { padding: 0 8px; min-height: 64px; cursor: pointer; }
 body.rd .rd-pl-row:hover { background: var(--surface-2); }

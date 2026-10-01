@@ -3489,6 +3489,8 @@ body.rd .rd-pl-ticks > span {
 body.rd .rd-pl-ticks > span.today { font-weight: 600; color: var(--ink); }
 body.rd .rd-pl-prim { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 4px; font-size: 15px; font-weight: 600; }
 body.rd .rd-pl-primh { font-size: 12px; letter-spacing: 0.02em; }
+body.rd .rd-pl-prim .rd-pl-frac { font-size: 11px; }
+@media (max-width: 900px) { body.rd .rd-pl-prim .rd-pl-frac { font-size: 10px; } }
 body.rd .rd-pl-item { border-bottom: 1px solid var(--line); }
 body.rd .rd-pl-row { padding: 0 8px; min-height: 64px; cursor: pointer; }
 body.rd .rd-pl-row:hover { background: var(--surface-2); }
@@ -70637,6 +70639,13 @@ function RdPolls({
   const figCell = e => {
     const r = e.poll;
     if (facet === "primary") {
+      const primFig = v => {
+        if (v == null) return "—";
+        const [i, f] = (+v).toFixed(1).split(".");
+        return f === "0" ? i : React.createElement(React.Fragment, null, i, React.createElement("b", {
+          className: "rd-pl-frac"
+        }, ".", f));
+      };
       return React.createElement("div", {
         className: "rd-pl-prim"
       }, RD_PL_PARTIES.map(([id]) => React.createElement("span", {
@@ -70644,7 +70653,7 @@ function RdPolls({
         style: {
           color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")")
         }
-      }, r.p && r.p[id] != null ? String(+r.p[id].toFixed(1)) : "—")));
+      }, primFig(r.p ? r.p[id] : null))));
     }
     if (facet === "leadership") {
       const ppm = ppmContests(r)[0];

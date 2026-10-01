@@ -167,11 +167,16 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const figCell = (e) => {
     const r = e.poll;
     if (facet === "primary") {
+      const primFig = (v) => {
+        if (v == null) return "—";
+        const [i, f] = (+v).toFixed(1).split(".");
+        return f === "0" ? i : <>{i}<b className="rd-pl-frac">.{f}</b></>;
+      };
       return (
         <div className="rd-pl-prim">
           {RD_PL_PARTIES.map(([id]) => (
             <span key={id} style={{ color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")") }}>
-              {r.p && r.p[id] != null ? String(+r.p[id].toFixed(1)) : "—"}</span>
+              {primFig(r.p ? r.p[id] : null)}</span>
           ))}
         </div>
       );
