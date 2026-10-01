@@ -394,7 +394,9 @@ function RdHero(p) {
 
   /* the tab's on-this-page index, in the hero's eyebrow as Past cycles and
      All polls carry theirs in theirs; the Snapshot's sections run ten deep,
-     so the links are the exact section titles scrolled to */
+     so the links are the exact section titles scrolled to. The list reads as
+     one sentence, "and" before the last and no commas - words only, the look
+     is unchanged */
   const snapNav = [
     ["latest-polls", "Latest and next polls"],
     ["leadership", "Leadership"],
@@ -458,7 +460,7 @@ function RdHero(p) {
       <div className="rd-eyebrow">
         <h2 className="rd-title" id="rd-tpp-t">Two-party preferred</h2>
         <span className="rd-meta">{meta}</span>
-        {!narrow && <nav className="rd-eyebrow-tools rd-snap-nav" aria-label="On this page">{snapNav.map(([id, lab]) => <button key={id} type="button" onClick={() => snapGo(id)}>{lab}</button>)}</nav>}
+        {!narrow && <nav className="rd-eyebrow-tools rd-snap-nav" aria-label="On this page">{snapNav.map(([id, lab], i) => <button key={id} type="button" onClick={() => snapGo(id)}>{(i === snapNav.length - 1 ? "and " : "") + lab}</button>)}</nav>}
       </div>
       {/* The section's headline under its heading, as every other section
          has it, so the opening view reads down a left edge before the

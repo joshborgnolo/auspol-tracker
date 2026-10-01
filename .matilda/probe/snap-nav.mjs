@@ -49,7 +49,7 @@ const check = (w, h) => page.setViewport({ width: w, height: h }).then(() => pag
   if (!r.inDom) return r;
   const jump = await page.evaluate(() => new Promise((res) => {
     const btns = [...document.querySelectorAll(".rd-snap-nav button")];
-    const b = btns.find((x) => x.textContent === "The issues");
+    const b = btns.find((x) => x.textContent.endsWith("The issues"));
     if (!b) return res({ jump: "no button" });
     b.click();
     setTimeout(() => {

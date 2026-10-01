@@ -936,6 +936,33 @@ body.rd .rd-dp-ci { position: absolute; top: 50%; height: 2.5px; transform: tran
 body.rd .rd-dp-link { position: absolute; top: 50%; height: 2px; transform: translateY(-50%); opacity: 0.6; transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
 body.rd .rd-dp-dot { position: absolute; top: 50%; width: 11px; height: 11px; box-sizing: border-box; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 2px var(--bg); transition: left .32s var(--morph-ease); }
 body.rd .rd-dp-dot.open { background: var(--bg); border: 2px solid; }
+/* the rating rows' rug: the Who-votes whisker rug's own recipe carried to
+   the leader tracks (its corridor, lanes, tints, tip and ring unchanged -
+   see the .rd-wv-rug block's comments), each dot a poll in the row's pooled
+   window; the corridor grows UPWARD out of the track's free top edge as
+   there. The track becomes the cqw container for the same glide basis; a
+   Both row's favourability dots wear the open marker's face, an inset ring
+   of the leader's tint, so the two measures share one corridor told apart.
+   The rug sits above the zero dashed rule as the Who-votes rug pips the
+   all-voters line at the whisker's tier. */
+body.rd .rd-dp-track { container-type: inline-size; }
+body.rd .rd-dp-rug { position: absolute; top: -5px; left: 0; right: 0; height: 12px; z-index: 2; }
+body.rd .rd-dp-rug:has(> b.hi) { z-index: 4; }
+body.rd .rd-dp-rug b { position: absolute; bottom: 0; left: 0; width: 6px; height: 6px; transform: translateX(calc(var(--x) * 1cqw - 50%)) translateY(calc(var(--v, 0) * -6px)); touch-action: manipulation; transition: transform .32s var(--morph-ease); }
+body.rd .rd-dp-rug b::before { content: ""; position: absolute; inset: -5px -6px; }
+body.rd .rd-dp-rug b > i { position: absolute; inset: 0; border-radius: 50%; background: color-mix(in oklab, var(--pcolor) 55%, transparent); pointer-events: none; }
+body.rd .rd-dp-rug b.open > i { background: var(--bg); box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--pcolor) 55%, transparent); }
+body.rd .rd-dp-rug b.on { cursor: pointer; }
+body.rd .rd-dp-rug b.on:hover > i, body.rd .rd-dp-rug b.on:focus-visible > i { background: var(--pcolor); box-shadow: none; }
+body.rd .rd-dp-rug b.on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+body.rd .rd-dp-rug b.hi { z-index: 2; }
+body.rd .rd-dp-rug b.hi > i { inset: -3px; background: var(--pcolor); box-shadow: 0 0 0 2px var(--bg); }
+body.rd .rd-dp-rug b.hi > i::after { content: ""; position: absolute; inset: -5px; border: 1.5px solid color-mix(in oklab, var(--pcolor) 55%, transparent); border-radius: 50%; }
+body.rd .rd-dp-rug.lit b:not(.hi):not(.open) > i { background: color-mix(in oklab, var(--pcolor) 28%, transparent); }
+body.rd .rd-dp-rtip { position: absolute; left: 50%; top: 50%; z-index: 20; white-space: nowrap; text-align: left; pointer-events: none; font-weight: 400; }
+@media (prefers-reduced-motion: reduce) {
+  body.rd .rd-dp-rug b { transition: none; }
+}
 body.rd .rd-dp-now { text-align: right; font-size: 15px; font-weight: 600; color: var(--ink); }
 body.rd .rd-dp-chg { text-align: right; font-size: 14px; color: var(--ink-3); }
 body.rd .rd-dp-chg.sig { font-weight: 700; color: var(--ink); }
@@ -969,6 +996,7 @@ body.rd .rd-dp-key { margin-top: 10px; }
   body.rd .rd-dp-now { grid-area: now; min-width: 52px; }
   body.rd .rd-dp-chg { grid-area: chg; min-width: 52px; }
   body.rd .rd-dp-track { grid-area: track; height: 26px; border-left: 0; border-right: 0; }
+  body.rd .rd-dp-rug b { width: 5px; height: 5px; }
   body.rd .rd-dp-foot > span:not(.rd-dp-axis) { display: none; }
   body.rd .rd-dp-foot > .rd-dp-axis { grid-column: 1 / -1; }
   body.rd .rd-hb-seg { padding: 0 7px; font-size: 12px; }
@@ -1527,7 +1555,7 @@ body.rd .rd-vline { stroke: var(--ink-3); stroke-width: 1; vector-effect: non-sc
 /* ---------- past cycles ------------------------------------------------------ */
 body.rd .rd-cycles .rd-hed { font-size: 44px; }
 body.rd .rd-cyc-nav { gap: 20px; }
-body.rd .rd-cyc-nav button { all: unset; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap; }
+body.rd .rd-cyc-nav button { all: unset; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--ink); white-space: nowrap; }
 body.rd .rd-cyc-nav button:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* the comparison controls */
 body.rd .rd-cc { position: relative; margin-top: 32px; }
@@ -1702,7 +1730,7 @@ body.rd {
 body.rd.dark { --rd-whisker: #5C5751; --rd-avgline: #6E6964; }
 body.rd .rd-ap-nav button,
 body.rd .rd-snap-nav button {
-  all: unset; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--ink-2); white-space: nowrap;
+  all: unset; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--ink-2); white-space: nowrap;
 }
 body.rd .rd-ap-nav button:hover,
 body.rd .rd-snap-nav button:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
@@ -1798,6 +1826,7 @@ body.rd .rd-ap-pinl:hover, body.rd .rd-ap-pint:hover { color: var(--ink); }
 body.rd .rd-ap-pinl:focus-visible, body.rd .rd-ap-pint:focus-visible, body.rd .rd-ap-pins:focus-visible, body.rd .rd-ap-pinf:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
 body.rd .rd-ap-pintabs { display: flex; align-items: stretch; gap: 16px; }
 body.rd .rd-ap-pint { font-size: 13px; padding: 0 2px; }
+body.rd .rd-ap-pinl { font-size: 12px; }
 body.rd .rd-ap-pinsep { align-self: center; width: 1px; height: 18px; background: var(--line); }
 body.rd .rd-ap-pins { all: unset; cursor: pointer; align-self: center; width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-2); }
 body.rd .rd-ap-pins:hover { background: var(--surface-2); color: var(--ink); }
@@ -2074,7 +2103,6 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-headwrap { top: calc(var(--rd-pin) + 44px); }
   body.rd .rd-ap-pinbar { height: 44px; gap: 10px; }
   body.rd .rd-ap-pinnav { gap: 16px; }
-  body.rd .rd-ap-pinl { font-size: 13px; }
   body.rd .rd-ap-phead { padding: 8px 0 6px; border-bottom: 1px solid var(--ink-faint); }
   body.rd .rd-ap-phead .rd-ap-hpic { min-height: 38px; }
   body.rd .rd-ap-phead .rd-ap-in, body.rd .rd-ap-card .rd-ap-in { left: 8px; right: 8px; }

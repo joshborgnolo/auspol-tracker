@@ -800,6 +800,7 @@ function RdPastCycles(p) {
       {(sec === "tpp" || sec === "primary") && <span className="rd-key-item"><RdSwatch kind="ring" />{cur.year} election result</span>}
     </RdKey>
   );
+  /* the list reads as one sentence, "and" before the last and no commas */
   const navs = [["cyc-tpp", "Two-party preferred"], ["cyc-primary", "Primary vote"], ["cyc-leaders", "Leadership"], ["final-polls", "How the final polls did"]];
   /* the final polls' record answers to none of the controls above it, so it
      is made once and handed back unchanged: React skips an element it has
@@ -811,7 +812,7 @@ function RdPastCycles(p) {
         <div className="rd-eyebrow">
           <h2 className="rd-title" id="rd-cyc-t">Past cycles</h2>
           <span className="rd-meta">Every term since {cycles[0].year}, lined up on its own election day</span>
-          {!narrow && <nav className="rd-eyebrow-tools rd-cyc-nav" aria-label="On this page">{navs.map(([id, lab]) => <button key={id} type="button" onClick={() => goTo(id)}>{lab}</button>)}</nav>}
+          {!narrow && <nav className="rd-eyebrow-tools rd-cyc-nav" aria-label="On this page">{navs.map(([id, lab], i) => <button key={id} type="button" onClick={() => goTo(id)}>{(i === navs.length - 1 ? "and " : "") + lab}</button>)}</nav>}
         </div>
         <RdHed head={pageStory.head} dek={pageStory.dek} level={2} />
         {srcFailed && <p className="rd-note">The individual polls behind the past terms didn’t load; the monthly lines are unaffected. <button type="button" className="rd-link" onClick={retrySource}>Try again</button></p>}

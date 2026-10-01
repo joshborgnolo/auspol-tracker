@@ -956,9 +956,6 @@ function RdAllPolls(P) {
   const ofT = ofTotal != null && ofTotal !== total ? ofTotal : null;
   const ofTxt = ofT ? " of " + ofT : "";
   const phone = useNarrow("(max-width: 760px)");
-  /* the pinned bar's section links take their short names wherever the long
-     ones would crowd the figures' tabs */
-  const tight = useNarrow("(max-width: 1100px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const contest = onM ? "onp" : "lnp";
@@ -1455,9 +1452,9 @@ function RdAllPolls(P) {
       {facet === "issues" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap">Share naming each issue as one that matters, %</span></span>}
     </div>
   );
-  const NAV = phone || tight
-    ? [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagreement"], ["house-lean", "Lean"], ["flow-drift", "Flows"]]
-    : [["rd-ap-top", "The polls"], ["poll-disagreement", "How much they disagree"], ["house-lean", "How each pollster leans"], ["flow-drift", "Preference flows"]];
+  /* the pinned bar's section links are the short names at every width - the
+     full titles stay in the eyebrow's "On this page" list */
+  const NAV = [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagree"], ["house-lean", "Lean"], ["flow-drift", "Flows"]];
   /* The head and dek render on EVERY facet (not just twopp): it is a
      where-things-stand line, not a facet label, and keeping the slot's
      height constant means a laptop facet walk moves nothing above the bar
@@ -1578,7 +1575,7 @@ function RdAllPolls(P) {
           <nav className="rd-eyebrow-tools rd-ap-nav" aria-label="On this page">
             <button type="button" onClick={() => jump("poll-disagreement")}>How much the polls disagree</button>
             <button type="button" onClick={() => jump("house-lean")}>How each pollster leans</button>
-            <button type="button" onClick={() => jump("flow-drift")}>Preference flows</button>
+            <button type="button" onClick={() => jump("flow-drift")}>and Preference flows</button>
           </nav>
         )}
       </div>
@@ -1791,6 +1788,41 @@ function RdDisagree() {
   const [hover, setHover] = useState(null);
   const box = useRef(null);
   const Wall = useRdWidth(box, 1152);
+  /* hovering the panel hands the arrow keys to the measure row below - the
+     walk a focused tab has, claimed only while the pointer is over the card;
+     the RdTabs' `swipe` marker claims the phone's sideways swipe on or just
+     under the row for the same step */
+  const disHover = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById("poll-disagreement");
+    if (!sec) return undefined;
+    const enter = () => { disHover.current = true; };
+    const leave = () => { disHover.current = false; };
+    disHover.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const key = (e) => {
+      if (!disHover.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const ids = ["primary", "twopp"];
+      const i = ids.indexOf(view);
+      if (i < 0 || ids.length < 2) return;
+      e.preventDefault();
+      const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
+      setView(nxt);
+      setHover(null);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [view]);
   const panels = RD_DIS_PANELS[view];
   const ms = rdApMonths("2025-05");
   const lastOf = (id) => { const s = AP.discord(id).filter((d) => d.sigma != null); return s.length ? s[s.length - 1] : null; };
@@ -1830,7 +1862,7 @@ function RdDisagree() {
         <span className="rd-meta">The spread between polls, against what sampling error alone would produce</span>
       </div>
       <RdHed head={head} dek={dek} />
-      <RdTabs value={view} onChange={(v) => { setView(v); setHover(null); }} ariaLabel="Measure" className="rd-dis-tabs"
+      <RdTabs swipe value={view} onChange={(v) => { setView(v); setHover(null); }} ariaLabel="Measure" className="rd-dis-tabs"
               options={[{ id: "primary", label: "Primary vote" }, { id: "twopp", label: "Two-party" }]} />
       <h4 className="rd-ap-ct rd-dis-ct">How far polls typically sit from {phone ? "their trend" : "the trend through them"}, points</h4>
       {/* primary vote and two-party are different measures, so a switch
@@ -1907,6 +1939,41 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   const [hover, setHover] = useState(null);
   const boxRef = useRef(null);
   const SW = useRdWidth(boxRef, 500);
+  /* hovering the panel hands the arrow keys to the measure row - the walk a
+     focused tab has, claimed only while the pointer is over the card; the
+     RdTabs' `swipe` marker claims the phone's sideways swipe on or just
+     under the row for the same step */
+  const hlHover = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById("house-lean");
+    if (!sec) return undefined;
+    const enter = () => { hlHover.current = true; };
+    const leave = () => { hlHover.current = false; };
+    hlHover.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const key = (e) => {
+      if (!hlHover.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const ids = ["tpp", "alp", "lnp", "onp", "split"];
+      const i = ids.indexOf(view);
+      if (i < 0 || ids.length < 2) return;
+      e.preventDefault();
+      const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
+      setView(nxt);
+      setHover(null);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [view]);
   const HL0 = D.houseLean || {};
   /* One Nation against the Coalition: each pollster's lean on the gap
      between the two primaries. The estimator is linear and all but one poll
@@ -2075,7 +2142,7 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
         <span className="rd-meta">Each pollster’s usual gap to the others polling at the same time{phone ? "" : ", which the averages take out"}</span>
       </div>
       {head && <RdHed head={head} dek={dek} />}
-      <RdTabs value={view} onChange={(v) => { setView(v); setHover(null); }} ariaLabel="Measure" className="rd-hl-tabs"
+      <RdTabs swipe value={view} onChange={(v) => { setView(v); setHover(null); }} ariaLabel="Measure" className="rd-hl-tabs"
               options={[{ id: "tpp", label: "Two-party" }, { id: "alp", label: "Labor" }, { id: "lnp", label: "Coalition" }, { id: "onp", label: "One Nation" },
                         { id: "split", label: phone ? "Split" : "One Nation v Coalition", title: "One Nation’s primary vote against the Coalition’s" }]}>
         {view === "tpp" && !narrowBar && <span className="rd-pl-ctl"><span className="rd-pl-ctl-l">Two-party:</span>{flip}</span>}
