@@ -78121,6 +78121,7 @@ function MethodNote({
 }
 let chromeSettled = false;
 let viewPanelPokedAt = 0;
+let viewPanelFocusIsPointer = false;
 const TABS = [{
   id: "snapshot",
   label: "Snapshot"
@@ -78654,11 +78655,18 @@ function App() {
     onPointerDownCapture: () => {
       viewPanelPokedAt = Date.now();
     },
-    onPointerUpCapture: () => {
+    onPointerUpCapture: e => {
       viewPanelPokedAt = Date.now();
+      const el = e.currentTarget;
+      setTimeout(() => {
+        if (viewPanelFocusIsPointer && document.activeElement === el && window.getSelection().isCollapsed) el.blur();
+      }, 0);
     },
     onFocus: e => {
-      if (e.target === e.currentTarget && Date.now() - viewPanelPokedAt < 400) e.currentTarget.blur();
+      viewPanelFocusIsPointer = e.target === e.currentTarget && Date.now() - viewPanelPokedAt < 400;
+    },
+    onBlur: e => {
+      if (e.target === e.currentTarget) viewPanelFocusIsPointer = false;
     }
   }, React.createElement(ViewBoundary, null, tab === "snapshot" && React.createElement(SnapshotView, {
     rangeId: rangeId,
