@@ -1879,6 +1879,9 @@ function MethodNote({ onInfo }) {
 // set once the body first carries its theme classes – see the effect below
 let chromeSettled = false;
 
+// timestamp of the last pointer down/up inside the tab panel – see the panel itself
+let viewPanelPokedAt = 0;
+
 const TABS = [
   { id: "snapshot", label: "Snapshot" },
   /* short: the docked phone bar's label, which buys the room to keep Info
@@ -2439,10 +2442,24 @@ function App() {
             the page at all, so aria-controls had no target and a screen reader
             that moved to the "tab panel" landed nowhere. tabIndex=0 makes the
             panel itself focusable, which is what the pattern asks for when the
-            panel's first child isn't. */}
+            panel's first child isn't.
+            But tabIndex=0 also makes the panel the nearest focusable ancestor
+            of every inert pointer click inside it: click a heading or blank
+            space in a view and Chrome focuses the whole panel, and every
+            hover-claim key guard on the page then reads "real keyboard focus
+            elsewhere" and stands down. A poke stamps pointer down AND up (the
+            focus can land at either end of a drag); the panel taking focus
+            hard on a poke's heels is the pointer parking, not
+            the keyboard — blur it back to BODY. TAB-arrival carries no poke,
+            so the ARIA tabs pattern's panel-in-tab-order still stands. */}
         <div className="view-enter content" key={tab + (rd ? "-rd" : "")}
              role="tabpanel" id={"panel-" + tab} aria-labelledby={"tab-" + tab}
-             tabIndex={0}>
+             tabIndex={0}
+             onPointerDownCapture={() => { viewPanelPokedAt = Date.now(); }}
+             onPointerUpCapture={() => { viewPanelPokedAt = Date.now(); }}
+             onFocus={(e) => {
+               if (e.target === e.currentTarget && Date.now() - viewPanelPokedAt < 400) e.currentTarget.blur();
+             }}>
           <ViewBoundary>
             {tab === "snapshot" && (
               <SnapshotView rangeId={rangeId} setRangeId={setRangeId} showScatter={t.showScatter}

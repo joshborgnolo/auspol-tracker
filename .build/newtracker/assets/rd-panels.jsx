@@ -2720,29 +2720,35 @@ function rdOneInShare(v) {
   return (Math.abs(100 / n - v) < 1.2 ? "" : "about ") + "one in " + (RD_BIG_WORDS[n] || rdNumWord(n));
 }
 /* the mid-2025 ring and the now dot, per group, on one scale */
-function RdShiftPlot({ rows, all, lo, hi, title, source, allLabel }) {
+function RdShiftPlot({ rows, all, lo, hi, title, source, dp }) {
   const X = (v) => ((Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * 100;
+  const dpv = dp == null ? 1 : dp;
   const signedD = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
   return (
     <div className="rd-sp" role="table" aria-label={title}>
       <div className="rd-sp-head" role="row">
         <b role="columnheader">{title}</b>
-        <span className="rd-sp-allcap" aria-hidden="true">{all != null && <span style={{ left: X(all) + "%" }}>{allLabel}</span>}</span>
+        <span className="rd-sp-allcap" aria-hidden="true">{all != null && <span style={{ "--x": X(all) }}>All voters <RollNum value={all.toFixed(dpv)} />%</span>}</span>
         <span className="rd-sp-src" role="columnheader">{source}</span>
       </div>
-      {rows.map((r) => (
-        <div key={r.id} className="rd-sp-row" role="row">
-          <span role="cell" className="rd-sp-lab">{r.sw && <span className="rd-sp-sw" style={{ background: r.color }}></span>}{r.label}</span>
-          <span className="rd-sp-track" aria-hidden="true">
-            {all != null && <span className="rd-sp-all" style={{ left: X(all) + "%" }}></span>}
-            <span className="rd-sp-link" style={{ left: Math.min(X(r.base), X(r.now)) + "%", width: Math.abs(X(r.now) - X(r.base)) + "%", background: r.color }}></span>
-            <span className="rd-sp-ring" style={{ left: X(r.base) + "%" }}></span>
-            <span className="rd-sp-dot" style={{ left: X(r.now) + "%", background: r.color }}></span>
-          </span>
-          <span role="cell" className="rd-sp-v"><b>{r.now.toFixed(1)}%</b> <span>±{r.ci.toFixed(1)}</span></span>
-          <span role="cell" className={"rd-sp-d" + (r.sig ? " sig" : "")}>{signedD(r.now - r.base)}</span>
-        </div>
-      ))}
+      <div className="rd-sp-plot" role="none">
+        {/* one all-voters line from its label to the axis, through every row,
+            as Who votes for whom draws it; a phone keeps it to each row's track */}
+        {all != null && <div className="rd-sp-allline" aria-hidden="true"><span><i style={{ "--x": X(all) }}></i></span></div>}
+        {rows.map((r) => (
+          <div key={r.id} className="rd-sp-row" role="row">
+            <span role="cell" className="rd-sp-lab">{r.sw && <span className="rd-sp-sw" style={{ background: r.color }}></span>}{r.label}</span>
+            <span className="rd-sp-track" aria-hidden="true">
+              {all != null && <span className="rd-sp-all" style={{ "--x": X(all) }}></span>}
+              <span className="rd-sp-link" style={{ left: Math.min(X(r.base), X(r.now)) + "%", width: Math.abs(X(r.now) - X(r.base)) + "%", "--lc": r.color }}></span>
+              <span className="rd-sp-ring" style={{ left: X(r.base) + "%" }}></span>
+              <span className="rd-sp-dot" style={{ left: X(r.now) + "%", background: r.color }}></span>
+            </span>
+            <span role="cell" className="rd-sp-v"><b>{r.now.toFixed(1)}%</b> <span>±{r.ci.toFixed(1)}</span></span>
+            <span role="cell" className={"rd-sp-d" + (r.sig ? " sig" : "")}>{signedD(r.now - r.base)}</span>
+          </div>
+        ))}
+      </div>
       <div className="rd-sp-axis" aria-hidden="true">
         <span></span>
         <span className="rd-sp-ticks">{rdYTicks(lo, hi, 10).map((v) => <span key={v} style={{ left: X(v) + "%" }}>{v}%</span>)}</span>
@@ -3009,7 +3015,7 @@ function RdUndecided({ rangeId }) {
         <>
           <div className="card rd-card rd-un-sp">
             <RdShiftPlot rows={partyView.rows} all={F.now.all.v} lo={partyView.lo} hi={partyView.hi}
-                         title="Share who call their vote solid" source={"RedBridge, mid-2025 → now"} allLabel={"All voters " + F.now.all.v.toFixed(1) + "%"} />
+                         title="Share who call their vote solid" source={"RedBridge, mid-2025 → now"} />
             <RdKey className="rd-ckey" items={[{ kind: "dot-open", color: "var(--ink-3)", label: "Mid-2025 (" + F.base.from + " to " + F.base.to + ")" },
                                                 { kind: "dot-solid", color: "var(--ink-3)", label: "Now (" + F.now.from + " to " + F.now.to + ")" }]}>
               <span className="rd-key-item" style={{ color: "var(--ink-3)" }}>Change in bold: significant</span>
@@ -3044,7 +3050,7 @@ function RdUndecided({ rangeId }) {
         <>
           <div className="card rd-card rd-un-sp">
             <RdShiftPlot rows={ageView.rows} all={ageView.allNow} lo={ageView.lo} hi={ageView.hi}
-                         title="Share not firm, by age" source="Resolve, mid-2025 → now" allLabel={"All voters " + Math.round(ageView.allNow) + "%"} />
+                         title="Share not firm, by age" source="Resolve, mid-2025 → now" dp={0} />
             <RdKey className="rd-ckey" items={[{ kind: "dot-open", color: "var(--ink-3)", label: "Mid-2025 (" + A.base.from + " to " + A.base.to + ")" },
                                                 { kind: "dot-solid", color: "var(--ink-3)", label: "Now (" + A.now.from + " to " + A.now.to + ")" }]}>
               <span className="rd-key-item" style={{ color: "var(--ink-3)" }}>Change in bold: significant</span>
