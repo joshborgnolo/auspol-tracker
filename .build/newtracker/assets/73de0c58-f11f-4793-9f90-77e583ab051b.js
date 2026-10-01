@@ -1879,8 +1879,10 @@ function MethodNote({ onInfo }) {
 // set once the body first carries its theme classes – see the effect below
 let chromeSettled = false;
 
-// timestamp of the last pointer down/up inside the tab panel – see the panel itself
+// timestamp of the last pointer down/up inside the tab panel, and whether the
+// panel's current focus arrived through that pointer – see the panel itself
 let viewPanelPokedAt = 0;
+let viewPanelFocusIsPointer = false;
 
 const TABS = [
   { id: "snapshot", label: "Snapshot" },
@@ -2448,17 +2450,30 @@ function App() {
             space in a view and Chrome focuses the whole panel, and every
             hover-claim key guard on the page then reads "real keyboard focus
             elsewhere" and stands down. A poke stamps pointer down AND up (the
-            focus can land at either end of a drag); the panel taking focus
-            hard on a poke's heels is the pointer parking, not
-            the keyboard — blur it back to BODY. TAB-arrival carries no poke,
-            so the ARIA tabs pattern's panel-in-tab-order still stands. */}
+            focus can land at either end of a drag), and the gesture itself is
+            never touched: blurring the panel while the button is still down
+            would abort the mousedown caret path and kill text selection in
+            the whole view. At pointer-up a pointer-parked panel whose gesture
+            selected no text blurs back to BODY (keyboard-arrival carries no
+            poke, so the ARIA panel-in-tab-order keeps focus through clicks;
+            a drag's catch keeps its park while the selection lives — keystrokes
+            are vetoed under a live selection anyway). */}
         <div className="view-enter content" key={tab + (rd ? "-rd" : "")}
              role="tabpanel" id={"panel-" + tab} aria-labelledby={"tab-" + tab}
              tabIndex={0}
              onPointerDownCapture={() => { viewPanelPokedAt = Date.now(); }}
-             onPointerUpCapture={() => { viewPanelPokedAt = Date.now(); }}
+             onPointerUpCapture={(e) => {
+               viewPanelPokedAt = Date.now();
+               const el = e.currentTarget;
+               setTimeout(() => {
+                 if (viewPanelFocusIsPointer && document.activeElement === el && window.getSelection().isCollapsed) el.blur();
+               }, 0);
+             }}
              onFocus={(e) => {
-               if (e.target === e.currentTarget && Date.now() - viewPanelPokedAt < 400) e.currentTarget.blur();
+               viewPanelFocusIsPointer = e.target === e.currentTarget && Date.now() - viewPanelPokedAt < 400;
+             }}
+             onBlur={(e) => {
+               if (e.target === e.currentTarget) viewPanelFocusIsPointer = false;
              }}>
           <ViewBoundary>
             {tab === "snapshot" && (
