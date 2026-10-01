@@ -1,6 +1,6 @@
 ---
 name: auspol-chart-sizing
-description: "auspol-tracker — map of every TrendChart's height prop and how rendered height is derived (SVG viewBox 0 0 1000 H + CSS height:auto = rendered h = container px × H/1000); useNarrow() exists because media queries can't retune SVG aspect — ALL eight charts ship adaptive narrow-taller heights since 654b926"
+description: "auspol-tracker — map of every TrendChart's height prop and how rendered height is derived (SVG viewBox 0 0 1000 H + CSS height:auto = rendered h = container px × H/1000); useNarrow() exists because media queries can't retune SVG aspect — ALL eight charts ship adaptive narrow-taller heights since 654b926. Redesign rd-* callsites pass heightPx/padPx in SCREEN px instead: the renderer divides by k0 = measuredWidth/1000 so rendered svg height == heightPx exactly at any width, and rendered plot == heightPx − padPx.t − padPx.b"
 source: auto-skill
 extracted_at: '2026-09-02T07:09:16.608Z'
 ---
