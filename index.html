@@ -71766,6 +71766,7 @@ function rdCycPeers(M, cycles, hidden, chg, m) {
     p90: pctOf(nums, 0.9)
   };
 }
+const rdCycHolderTag = (peers, p) => peers.vals.some(q => q !== p && q.who === p.who) ? p.who + " (" + p.yr + ")" : p.who;
 function rdCycRank(peers, v, fmt) {
   const above = peers.vals.filter(p => p.v > v).length,
     below = peers.vals.filter(p => p.v < v).length;
@@ -71776,12 +71777,12 @@ function rdCycRank(peers, v, fmt) {
     low = peers.vals[0];
   if (hiR === 1) return {
     main: "Highest of " + n,
-    sub: "Previous high: " + top.who + ", " + fmt(top.v),
+    sub: "Previous high: " + rdCycHolderTag(peers, top) + ", " + fmt(top.v),
     strong: true
   };
   if (loR === 1) return {
     main: "Lowest of " + n,
-    sub: "Previous low: " + low.who + ", " + fmt(low.v),
+    sub: "Previous low: " + rdCycHolderTag(peers, low) + ", " + fmt(low.v),
     strong: true
   };
   if (above === below) return {

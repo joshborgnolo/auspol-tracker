@@ -259,13 +259,20 @@ function rdCycPeers(M, cycles, hidden, chg, m) {
   return { vals, n: nums.length, mean: nums.reduce((s, v) => s + v, 0) / nums.length,
            q1: pctOf(nums, 0.25), q3: pctOf(nums, 0.75), p10: pctOf(nums, 0.1), p90: pctOf(nums, 0.9) };
 }
+/* A holder's name recurs across terms (Hawke carried three, Howard
+   four): when this month's pooled set carries the name more than once,
+   qualify it with the term's year or two different terms pass for one
+   person - the counts rule the boundary-company sentence in the
+   tabbed-views layer already runs. */
+const rdCycHolderTag = (peers, p) =>
+  peers.vals.some((q) => q !== p && q.who === p.who) ? p.who + " (" + p.yr + ")" : p.who;
 function rdCycRank(peers, v, fmt) {
   const above = peers.vals.filter((p) => p.v > v).length, below = peers.vals.filter((p) => p.v < v).length;
   const n = peers.n + 1;
   const hiR = above + 1, loR = below + 1;
   const top = peers.vals[peers.vals.length - 1], low = peers.vals[0];
-  if (hiR === 1) return { main: "Highest of " + n, sub: "Previous high: " + top.who + ", " + fmt(top.v), strong: true };
-  if (loR === 1) return { main: "Lowest of " + n, sub: "Previous low: " + low.who + ", " + fmt(low.v), strong: true };
+  if (hiR === 1) return { main: "Highest of " + n, sub: "Previous high: " + rdCycHolderTag(peers, top) + ", " + fmt(top.v), strong: true };
+  if (loR === 1) return { main: "Lowest of " + n, sub: "Previous low: " + rdCycHolderTag(peers, low) + ", " + fmt(low.v), strong: true };
   if (above === below) return { main: "Middle of " + n };
   if (hiR < loR) return { main: rdOrd(hiR) + " highest of " + n, sub: hiR === 2 ? "Only " + top.who + " (" + top.yr + ") was higher" : null };
   return { main: rdOrd(loR) + " lowest of " + n, sub: loR === 2 ? "Only " + low.who + " (" + low.yr + ") was lower" : null };
