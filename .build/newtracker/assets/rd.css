@@ -1559,6 +1559,9 @@ body.rd .rd-cyc-nav button { all: unset; cursor: pointer; font-size: 12px; font-
 body.rd .rd-cyc-nav button:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* the comparison controls */
 body.rd .rd-cc { position: relative; margin-top: 32px; }
+/* the walk floor's measurement stack: every walkable finding state laid out
+   invisibly so the live slot can stand at the tallest (rd-cycles.jsx) */
+body.rd .rd-cyc-storyvar { height: 0; overflow: hidden; visibility: hidden; }
 body.rd .rd-cc-row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 body.rd .rd-cc-l { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-cc-tabs { border-bottom: 0; }
@@ -2022,6 +2025,10 @@ body.rd .rd-apd-leaders { display: flex; flex-wrap: wrap; gap: 6px 28px; }
 body.rd .rd-apd-links { margin: 10px 0 0 -4px; padding-right: 40px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; }
 body.rd .rd-apd-ext { display: inline-block; margin-left: 3px; font-size: 11px; color: var(--ink-faint); text-decoration: none; }
 body.rd .rd-apd-ct { margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--ink); }
+body.rd .rd-apd-met { all: unset; cursor: pointer; font: inherit; color: inherit; font-weight: inherit;
+  text-decoration: underline dotted var(--ink-faint); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+body.rd .rd-apd-met:hover { text-decoration-color: currentColor; }
+body.rd .rd-apd-met:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 body.rd .rd-apd-mini { margin-top: 10px; position: relative; }
 body.rd .rd-apd-mini svg { display: block; overflow: visible; }
 body.rd .rd-apd-gl { stroke: var(--line); stroke-width: 1; }

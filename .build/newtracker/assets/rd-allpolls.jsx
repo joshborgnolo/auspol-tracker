@@ -512,6 +512,16 @@ function rdApLdPairs(a) {
   }
   return out;
 }
+/* the release's SECOND reading where a firm prints both questions in one
+   wave (Resolve's likeability nets ride appr.alt per leader); gap =
+   Albanese's alt net minus the rival's, tagged met:"fav" so the chart's
+   favourability styling follows */
+function rdApLdAltPairs(a) {
+  const alt = a && a.alt;
+  if (!alt || !alt.alb || alt.alb.net == null) return [];
+  return RD_AP_LD_RIVALS.filter((R) => alt[R.met] && alt[R.met].net != null)
+    .map((R) => ({ riv: R.riv, R, name: R.name(a), met: "fav", ink: R.ink, net: alt[R.met].net, gap: alt.alb.net - alt[R.met].net }));
+}
 const rdApLdMetWord = (met) => (met === "fav" ? "net favourability" : "net approval");
 /* "net leader ratings" rather than a metric word when the window mixes both,
    so the caption never mislabels the chart */
@@ -547,7 +557,7 @@ function rdApLdWindow(p) {
 }
 /* who is ahead: a positive gap is Albanese's way */
 const rdApLdWay = (g, name) => (Math.abs(g) < 0.05 ? "level" : g > 0 ? "Albanese’s way" : name + "’s way");
-function RdApLdMini({ p }) {
+function RdApLdMini({ p, met }) {
   const D = window.AUSPOL;
   const box = React.useRef(null);
   const W = useRdWidth(box, 470);
@@ -563,9 +573,16 @@ function RdApLdMini({ p }) {
     const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
     if (off) el.style.marginLeft = off + "px";
   }, [tip]);
-  const { ms, t0, t1, waves } = rdApLdWindow(p);
-  const own = rdApLdPairs(p.appr);
-  if (!waves.length || !own.length) return <div ref={box}></div>;
+  const { ms, t0, t1, waves: full } = rdApLdWindow(p);
+  /* met is the caption toggle's view: "fav" redraws every wave on the
+     release's second-question favourability pairs (waves that never printed
+     the second question drop out of the window); anything else draws the
+     primary pairs, which are already the wave's only question */
+  const waves = met === "fav"
+    ? full.map((w) => ({ q: w.q, pairs: rdApLdAltPairs(w.q.appr) })).filter((w) => w.pairs.length)
+    : full;
+  const own = (met === "fav" ? rdApLdAltPairs(p.appr) : rdApLdPairs(p.appr));
+  if (!waves.length) return <div ref={box}></div>;
   /* the monthly average-gap line for exactly the (rival, question) combos the
      dots carry; a line needs a ratio of two months' readings, not one */
   const combos = new Set();
@@ -598,7 +615,7 @@ function RdApLdMini({ p }) {
   return (
     <div ref={box} className="rd-apd-mini">
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
-           aria-label={`${p.pollster}’s polls since ${rdMonthYear(ms[0])} on the ${rdApLdWord(waves)} gap, Albanese minus ${rdApLdJoin([...new Set(waves.flatMap((w) => w.pairs.map((pr) => pr.name)))])}, against the monthly average; this poll ${own.map((pr) => rdApLdWay(pr.gap, pr.name)).join(" and ")}.`}>
+           aria-label={`${p.pollster}’s polls since ${rdMonthYear(ms[0])} on the ${rdApLdWord(waves)} gap, Albanese minus ${rdApLdJoin([...new Set(waves.flatMap((w) => w.pairs.map((pr) => pr.name)))])}, against the monthly average; ${own.length ? "this poll " + own.map((pr) => rdApLdWay(pr.gap, pr.name)).join(" and ") : "this poll’s own readings are on the other question"}.`}>
         {ticks.map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === 0 ? "rd-apd-even" : "rd-apd-gl"}></path>)}
         {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{v}</text>)}
         {avg.map((al) => (
@@ -878,6 +895,16 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
   const ldOwn = isLd ? rdApLdPairs(p.appr) : [];
   const ldWin = isLd && ldOwn.length ? rdApLdWindow(p) : null;
   const ldWord = ldWin && ldWin.waves.length ? rdApLdWord(ldWin.waves) : null;
+  /* the caption's metric word is a toggle when the house prints BOTH
+     questions: approvals are its primary (metricOf is firm-steady, so every
+     window wave's pair is approval) and at least one window wave carries the
+     release's second favourability reading (appr.alt, Resolve's likeability
+     column). Clicking flips the word and the chart to that other question */
+  const ldAltWin = !!(ldWin && ldWin.waves.some((w) => rdApLdAltPairs(w.q.appr).length));
+  const ldBoth = !!(ldAltWin && ldWin.waves.every((w) => w.pairs.every((pr) => pr.met === "approval")));
+  const [ldMet, setLdMet] = React.useState(null);
+  React.useEffect(() => { setLdMet(null); }, [p.pollster, p.released]);
+  const ldAct = ldBoth ? (ldMet || "approval") : null;
   const ldHe = isLd ? (D.houseEffects && D.houseEffects.appr) || null : null;
   const ldLean = isLd && ldHe ? ldOwn.map((pr) => {
     const hA = (ldHe.alb || {})[p.pollster], hR = (ldHe[pr.R.he] || {})[p.pollster];
@@ -1014,8 +1041,13 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
         )}
         {isLd && ldOwn.length > 0 && ldWin && ldWin.waves.length > 0 && (
           <>
-            <span className="rd-apd-ct">{p.pollster}’s polls since {D.monthNameFull(Number(from.slice(5)))} against the monthly average – {ldWord}, Albanese minus {rdApLdJoin(ldOwn.map((pr) => pr.name))}</span>
-            <RdApLdMini p={p} />
+            <span className="rd-apd-ct">{p.pollster}’s polls since {D.monthNameFull(Number(from.slice(5)))} against the monthly average – {ldBoth
+              ? <button type="button" className="rd-apd-met"
+                        aria-label={"Showing " + rdApLdMetWord(ldAct) + ". Switch to " + rdApLdMetWord(ldAct === "fav" ? "approval" : "fav")}
+                        title={"Switch to " + rdApLdMetWord(ldAct === "fav" ? "approval" : "fav")}
+                        onClick={(e) => { e.stopPropagation(); setLdMet(ldAct === "fav" ? "approval" : "fav"); }}>{rdApLdMetWord(ldAct)}</button>
+              : ldWord}, Albanese minus {rdApLdJoin(ldOwn.map((pr) => pr.name))}</span>
+            <RdApLdMini p={p} met={ldAct} />
           </>
         )}
         {isDir && d && (

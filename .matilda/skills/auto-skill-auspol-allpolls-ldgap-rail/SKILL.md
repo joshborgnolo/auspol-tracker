@@ -45,6 +45,32 @@ Facts "Now" row carries the mixed-metric rider "– favourability and
 approval are different questions, so each gap here stays on its own".
 Copy uses NO article: "on net approval", not "on the net approval".
 
+## Metric toggle — the second question a release prints (2026-10-01)
+
+A wave's metricBy is NOT its whole story: gen-data buildAppr (~:1627)
+emits `appr.alt = {alb,taylor,hanson}: {metric:"fav",net}` when a firm
+printed BOTH questions in one release (today ONLY Resolve: its
+likeability column, inherited as `detail.fav` by the crosstabs reader
+— polls.json approval rows carry no splits.fav). Alt is favourability
+only and only at approval-primary firms (`altOf()` returns null where
+metricOf is already "fav").
+
+`rdApLdAltPairs(a)` (next to rdApLdPairs) turns alt into pair objects
+(met:"fav", gap = alt.alb.net − alt[rival].net). The `ldBoth` trigger
+in RdApDetail: the caption's metric word becomes a
+`<button class="rd-apd-met">` (chevron-free, tagline-flip style) when
+(a) every window wave's PRIMARY pair is approval AND (b) some window
+wave's appr.alt pairs a rival — i.e. the house publishes both
+questions. Clicking flips the word and RdApLdMini's `met` view;
+`met==="fav"` rebuilds the window from rdApLdAltPairs (waves lacking
+alt drop out; monthly-average line re-scopes to `_*_fav` via
+rdApLdMonthGap). An opened poll without its own alt keeps chart+line
+but drops its `.rd-apd-this`/`.rd-apd-ring` marks (svg aria ends
+"…own readings are on the other question"). State resets on
+`[p.pollster, p.released]`. Default view is approval. Single-question
+houses keep the static word; Newspoll (the example in the user's
+request) has NO favourability ingested, so it never toggles.
+
 ## House lean per pair
 
 Slot-level `D.houseEffects.appr = {alb,opp,han}: {firm:{v,n}}`
