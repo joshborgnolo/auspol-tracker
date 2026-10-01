@@ -57,7 +57,7 @@ async function run(W, H, touch) {
       ruleY: r(eb).t + parseFloat(ebs.borderTopWidth) / 2,
       chip: r(chip),
       wrap: r(wrap),
-      ebRight: r(eb).r,
+      ebLeft: r(eb).l,
       pos: ws.position,
       label: chip.textContent.replace(/\s+/g, " ").trim(),
       meta: meta ? r(meta) : null,
@@ -69,13 +69,14 @@ async function run(W, H, touch) {
   if (g.rowChip) fails.push(tag + ": a .rd-chip is still inside .rd-cc-row");
   if (!g.chipInTools) fails.push(tag + ": chip is not in the cyc-tpp eyebrow tools slot");
   if (g.drawnInControls) fails.push(tag + ": the drawn-over-the-band row is still inside .rd-cc (it belongs up with the chip)");
-  /* the band floats just above the divider: its bottom edge rests 6px
+  /* the band floats just above the divider: its bottom edge rests 12px
      clear of the 2px rule (the reader asked for it above the line, never
-     straddling it) - checked as the WRAP's bottom so the check holds when
-     the drawn pills (taller than the chip) joined the band */
+     straddling it) and flush with the eyebrow's LEFT edge at every
+     width - checked as the WRAP's bottom so the check holds when the
+     drawn pills (taller than the chip) joined the band */
   const gap = g.ruleY - g.wrap.b;
-  if (Math.abs(gap - 6) > 1.6) fails.push(tag + ": band bottom sits " + gap.toFixed(1) + "px above the divider " + g.ruleY.toFixed(1) + ", not ~6px (wrap bottom " + g.wrap.b.toFixed(1) + ")");
-  if (Math.abs(g.chip.r - g.ebRight) > 1.5) fails.push(tag + ": chip right edge " + g.chip.r.toFixed(1) + " != eyebrow right edge " + g.ebRight.toFixed(1));
+  if (Math.abs(gap - 12) > 1.6) fails.push(tag + ": band bottom sits " + gap.toFixed(1) + "px above the divider " + g.ruleY.toFixed(1) + ", not ~12px (wrap bottom " + g.wrap.b.toFixed(1) + ")");
+  if (Math.abs(g.chip.l - g.ebLeft) > 1.5) fails.push(tag + ": chip left edge " + g.chip.l.toFixed(1) + " != eyebrow left edge " + g.ebLeft.toFixed(1));
   if (g.pos !== "absolute") fails.push(tag + ": .rd-cyc-chipmove is not absolutely positioned (" + g.pos + ")");
   if (!/^＋ Draw a( past)? term$/.test(g.label)) fails.push(tag + ": unexpected chip label '" + g.label + "'");
   const overlap = (a, b) => {
@@ -141,20 +142,25 @@ async function run(W, H, touch) {
       pills,
       svg: Array.from(document.querySelectorAll("#cyc-tpp svg")).map((s) => s.textContent).join(" "),
       gap: (r(eb).top + parseFloat(ebs.borderTopWidth) / 2) - r(wrap).bottom,
-      chipR: r(chip).right,
+      chipL: r(chip).left,
       chipB: r(chip).bottom,
-      drawnR: drawn ? r(drawn).right : null,
+      drawnL: drawn ? r(drawn).left : null,
       drawnT: drawn ? r(drawn).top : null,
-      ebRight: r(eb).right,
+      ebLeft: r(eb).left,
+      wrapT: r(wrap).top,
+      footB: (() => { const f = q("#cyc-summary .rd-foot"); return f ? r(f).bottom : null; })(),
     };
   });
   if (!afterLift.drawn) fails.push(tag + ": lifting " + picked + " did not raise the drawn-over-the-band row up with the chip");
   else {
     if (!/Drawn over the band/.test(afterLift.text)) fails.push(tag + ": the raised row lost its 'Drawn over the band' label");
     /* the band stacks down: chip on top, the drawn row directly beneath
-       it, both ends flush with the eyebrow's right edge */
+       it, both ends flush with the eyebrow's left edge */
     if (afterLift.chipB > afterLift.drawnT + 1) fails.push(tag + ": the chip is not above the drawn row (chip bottom " + afterLift.chipB.toFixed(1) + " > drawn top " + afterLift.drawnT.toFixed(1) + ")");
-    if (Math.abs(afterLift.drawnR - afterLift.ebRight) > 1.5) fails.push(tag + ": drawn row right edge " + afterLift.drawnR.toFixed(1) + " != eyebrow right edge " + afterLift.ebRight.toFixed(1));
+    if (Math.abs(afterLift.drawnL - afterLift.ebLeft) > 1.5) fails.push(tag + ": drawn row left edge " + afterLift.drawnL.toFixed(1) + " != eyebrow left edge " + afterLift.ebLeft.toFixed(1));
+    /* the stack's top must stay clear of the Summary section's foot (the
+       640px block widens #cyc-tpp's headroom to make this hold) */
+    if (afterLift.footB != null && afterLift.wrapT < afterLift.footB - 0.6) fails.push(tag + ": band top " + afterLift.wrapT.toFixed(1) + " overlaps the Summary foot (bottom " + afterLift.footB.toFixed(1) + ")");
     const past = afterLift.pills.filter((p) => !p.cur);
     if (!past.some((p) => p.text.indexOf(picked) === 0 && p.btn)) fails.push(tag + ": no unliftable pill for the lifted " + picked + " term (pills: " + afterLift.pills.map((p) => p.text).join(" | ") + ")");
     const cur = afterLift.pills.filter((p) => p.cur);
@@ -163,7 +169,7 @@ async function run(W, H, touch) {
       if (!/^20\d\d /.test(cur[0].text)) fails.push(tag + ": sitting-term pill does not read like '2025 Albanese' ('" + cur[0].text + "')");
       if (cur[0].btn) fails.push(tag + ": the sitting-term pill carries an unlift button - the sitting term cannot be returned to the band");
     }
-    if (Math.abs(afterLift.gap - 6) > 1.6) fails.push(tag + ": with pills up, band bottom sits " + afterLift.gap.toFixed(1) + "px above the divider, not ~6px");
+    if (Math.abs(afterLift.gap - 12) > 1.6) fails.push(tag + ": with pills up, band bottom sits " + afterLift.gap.toFixed(1) + "px above the divider, not ~12px");
   }
   if (/Government ahead|Opposition ahead/.test(afterLift.svg)) fails.push(tag + ": the ahead pair survived a term being drawn over the band");
   if (/(above|below) average/.test(afterLift.svg)) fails.push(tag + ": the above/below-average reading survived a term being drawn over the band");
