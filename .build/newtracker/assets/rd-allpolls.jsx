@@ -490,6 +490,188 @@ function RdApDirMini({ p }) {
   );
 }
 
+/* A leadership wave's version of the mini charts: the gap between Albanese's
+   net rating and each rival's, this pollster's own waves against the monthly
+   average gap. A gap is only read on the question both names were asked the
+   same wave - approval with approval, favourability with favourability, never
+   one of each (they are different questions everywhere on the site; a gap
+   mixing them would be neither), and a favourability gap gets the open face
+   the Leadership dot-plot gives favourability. */
+const RD_AP_LD_RIVALS = [
+  { riv: "opp", net: "taylorNet", met: "taylor", he: "opp", ln: "taylor", ink: "var(--lnp)", name: (a) => a.oppName || "Taylor" },
+  { riv: "han", net: "hansonNet", met: "hanson", he: "han", ln: "hanson", ink: "var(--onp)", name: () => "Hanson" },
+];
+function rdApLdPairs(a) {
+  if (!a || a.albNet == null || !a.metricBy) return [];
+  const out = [];
+  for (const R of RD_AP_LD_RIVALS) {
+    if (a[R.net] == null) continue;
+    const met = a.metricBy[R.met];
+    if (met !== a.metricBy.alb) continue;
+    out.push({ riv: R.riv, R, name: R.name(a), met, ink: R.ink, net: a[R.net], gap: a.albNet - a[R.net] });
+  }
+  return out;
+}
+const rdApLdMetWord = (met) => (met === "fav" ? "net favourability" : "net approval");
+/* "net leader ratings" rather than a metric word when the window mixes both,
+   so the caption never mislabels the chart */
+function rdApLdWord(waves) {
+  const mets = new Set();
+  waves.forEach((w) => w.pairs.forEach((pr) => mets.add(pr.met)));
+  return mets.size === 1 ? rdApLdMetWord([...mets][0]) : "net leader ratings";
+}
+const rdApLdJoin = (list) => (list.length > 2 ? list.slice(0, -1).join(", ") + " and " + list[list.length - 1] : list.join(" and "));
+/* the monthly average gap on that same question, keyed to the office-holder
+   as each month asked them (Taylor's and Ley's series stay separate people) */
+function rdApLdMonthGap(D, ym, riv, met) {
+  const m = (D.leaderMonths || []).find((r) => r.ym === ym);
+  if (!m) return null;
+  const suf = met === "fav" ? "_fav" : "_net";
+  const A = m["alb" + suf];
+  const O = riv === "opp" ? (m["taylor" + suf] != null ? m["taylor" + suf] : m["ley" + suf]) : m["hanson" + suf];
+  return A != null && O != null ? A - O : null;
+}
+/* the pollster's seven-month window of waves with a gap to draw */
+function rdApLdWindow(p) {
+  const D = window.AUSPOL;
+  const iM = D.MONTHS.indexOf(p.ym);
+  const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
+  const t0 = rdApDays(ms[0] + "-01");
+  const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
+  const t1 = Date.UTC(ly, lm, 1) - 864e5;
+  const waves = D.individualPolls
+    .filter((q) => q.pollster === p.pollster && rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1)
+    .map((q) => ({ q, pairs: rdApLdPairs(q.appr) }))
+    .filter((w) => w.pairs.length);
+  return { ms, t0, t1, waves };
+}
+/* who is ahead: a positive gap is Albanese's way */
+const rdApLdWay = (g, name) => (Math.abs(g) < 0.05 ? "level" : g > 0 ? "Albanese’s way" : name + "’s way");
+function RdApLdMini({ p }) {
+  const D = window.AUSPOL;
+  const box = React.useRef(null);
+  const W = useRdWidth(box, 470);
+  const H = 176;
+  const [tip, setTip] = useState(null);
+  const tipBox = React.useRef(null);
+  const ptr = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = tipBox.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip]);
+  const { ms, t0, t1, waves } = rdApLdWindow(p);
+  const own = rdApLdPairs(p.appr);
+  if (!waves.length || !own.length) return <div ref={box}></div>;
+  /* the monthly average-gap line for exactly the (rival, question) combos the
+     dots carry; a line needs a ratio of two months' readings, not one */
+  const combos = new Set();
+  waves.forEach((w) => w.pairs.forEach((pr) => combos.add(pr.riv + "|" + pr.met)));
+  const avg = [...combos].map((cm) => {
+    const [riv, met] = cm.split("|");
+    const pts = ms.map((ym) => { const g = rdApLdMonthGap(D, ym, riv, met); return g == null ? null : { x: rdApDays(ym + "-15"), v: g }; }).filter(Boolean);
+    return { riv, met, ink: RD_AP_LD_RIVALS.find((r) => r.riv === riv).ink, pts };
+  }).filter((al) => al.pts.length > 1);
+  const vals = waves.flatMap((w) => w.pairs.map((pr) => pr.gap)).concat(avg.flatMap((al) => al.pts.map((z) => z.v)), [0]);
+  let lo = Math.floor(Math.min(...vals) / 4) * 4, hi = Math.ceil(Math.max(...vals) / 4) * 4;
+  if (hi - lo < 12) { const c = (lo + hi) / 2; lo = Math.floor((c - 6) / 4) * 4; hi = lo + 12; }
+  const x0 = 30, x1 = W - 16, top = 10, bot = H - 26;
+  const X = (tt) => x0 + ((tt - t0) / (t1 - t0)) * (x1 - x0);
+  const Y = (v) => bot - ((v - lo) / (hi - lo)) * (bot - top);
+  const ticks = [];
+  for (let v = lo; v <= hi + 1e-9; v += 4) ticks.push(v);
+  const cx = X(rdApDays(p.fmid || p.released));
+  const labLeft = cx > W * 0.45;
+  const dots = waves.filter((w) => w.q.released !== p.released).flatMap((w) => w.pairs.map((pr) => {
+    const q = w.q;
+    const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: q.pollster, released: q.released }) : null;
+    const dup = waves.some((z) => z.q !== q && z.q.released === q.released);
+    return { q, pr, key: (!raw || dup) ? null : raw, id: q.pollster + "|" + q.released + "|" + pr.riv, cx: X(rdApDays(q.fmid || q.released)) };
+  }));
+  const show = (id, src) => setTip({ id, src });
+  const hide = (id, src) => setTip((tp) => (tp && tp.id === id && (!src || tp.src === src) ? null : tp));
+  const dotTip = tip && dots.find((d) => d.id === tip.id);
+  const ownInkOf = (pr) => pr.ink;
+  return (
+    <div ref={box} className="rd-apd-mini">
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
+           aria-label={`${p.pollster}’s polls since ${rdMonthYear(ms[0])} on the ${rdApLdWord(waves)} gap, Albanese minus ${rdApLdJoin([...new Set(waves.flatMap((w) => w.pairs.map((pr) => pr.name)))])}, against the monthly average; this poll ${own.map((pr) => rdApLdWay(pr.gap, pr.name)).join(" and ")}.`}>
+        {ticks.map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === 0 ? "rd-apd-even" : "rd-apd-gl"}></path>)}
+        {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{v}</text>)}
+        {avg.map((al) => (
+          <path key={al.riv + "|" + al.met} d={monotoneXY(al.pts.map((z) => [X(z.x), Y(z.v)]))} className="rd-apd-avgline"
+                style={{ stroke: `color-mix(in oklab, ${al.ink} 78%, transparent)`, strokeDasharray: al.met === "fav" ? "5 4" : undefined }}></path>
+        ))}
+        {dots.map((d) => {
+          const { id, key: k, pr } = d;
+          const open = () => { if (k && window.AP.openPoll) { setTip(null); window.AP.openPoll(k, "leadership", "the poll you were reading"); } };
+          return (
+            <g key={id}>
+              {tip && tip.id === id && <circle cx={d.cx} cy={Y(pr.gap)} r="7.5" className="rd-apd-dothi"></circle>}
+              {pr.met === "fav"
+                ? <circle cx={d.cx} cy={Y(pr.gap)} r="4" style={{ fill: "var(--surface-2)", stroke: pr.ink, strokeWidth: 1.8 }}></circle>
+                : <circle cx={d.cx} cy={Y(pr.gap)} r="4" style={{ fill: `color-mix(in oklab, ${pr.ink} 55%, transparent)` }}></circle>}
+              <circle cx={d.cx} cy={Y(pr.gap)} r="9" className={"rd-apd-hit" + (k ? " link" : "")}
+                      tabIndex="0" role={k ? "button" : "img"}
+                      aria-label={"Albanese’s " + rdApLdMetWord(pr.met) + " minus " + pr.name + "’s, " + rdApLdWay(pr.gap, pr.name)
+                        + ", " + d.q.pollster + "’s poll of " + (d.q.field || d.q.released)
+                        + (k ? "; press Enter to open it" : "")}
+                      onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+                      onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(id, "mouse"); }}
+                      onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(id, "mouse"); }}
+                      onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show(id, "focus"); }}
+                      onBlur={() => hide(id, "focus")}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        const pt = ev.detail === 0 ? "key" : ptr.current;
+                        ptr.current = null;
+                        if (pt === "mouse" || pt === "key") { open(); return; }
+                        if (tip && tip.id === id) setTip(null); else setTip({ id, src: "touch" });
+                      }}
+                      onKeyDown={(ev) => {
+                        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+                        ev.preventDefault();
+                        open();
+                      }}></circle>
+            </g>
+          );
+        })}
+        {own.map((pr, i) => {
+          const cy = Y(pr.gap);
+          const above = own.length === 1 || i === 0;
+          return (
+            <g key={pr.riv}>
+              <circle cx={cx} cy={cy} r="8" className="rd-apd-ring" style={{ stroke: ownInkOf(pr) }}></circle>
+              <circle cx={cx} cy={cy} r="4.5" className="rd-apd-this" style={pr.met === "fav"
+                ? { fill: "var(--surface-2)", stroke: ownInkOf(pr), strokeWidth: 2 }
+                : { fill: ownInkOf(pr) }}></circle>
+              <text x={labLeft ? cx - 12 : cx + 12} y={above ? cy - 12 : cy + 24} className="rd-apd-thislab"
+                    textAnchor={labLeft ? "end" : "start"}>{own.length > 1 ? "v " + pr.name + " " : "This poll "}{rdApSigned(pr.gap)}</text>
+            </g>
+          );
+        })}
+        <path d={`M${x0} ${bot}H${x1}`} className="rd-apd-base"></path>
+        {ms.map((ym, i) => (i % 2 === (ms.length - 1) % 2 ? (
+          <text key={ym} x={X(rdApDays(ym + "-01"))} y={bot + 18} className="rd-apd-ax" textAnchor="middle">{D.monthName(Number(ym.slice(5)))}</text>
+        ) : null))}
+      </svg>
+      {dotTip && (
+        <div ref={tipBox} className="tip rd-apd-tip" style={{ left: dotTip.cx + "px" }} aria-hidden="true">
+          <div className="tip-title">Fieldwork {dotTip.q.field || dotTip.q.released}</div>
+          <div className="tip-sub">Albanese {rdApSigned(dotTip.q.appr.albNet)}, {dotTip.pr.name} {rdApSigned(dotTip.pr.net)} – {Math.abs(dotTip.pr.gap).toFixed(1)} points {rdApLdWay(dotTip.pr.gap, dotTip.pr.name)} ({rdApLdMetWord(dotTip.pr.met)})</div>
+          {dotTip.q.sample != null && <div className="tip-sub">n = {dotTip.q.sample.toLocaleString()}</div>}
+          {tip.src !== "touch" && (dotTip.key
+            ? <div className="tip-hint">{tip.src === "focus" ? "Press Enter to open this poll" : "Click to open this poll"}</div>
+            : null)}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* An issues wave's version of the mini charts: the pooled monthly lines for
    who voters rate best on the wave's top issue, over seven months, with this
    wave's own printed three-way shares rung at their date. Ownership shares
@@ -686,6 +868,26 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
   const issPair = issPlus && issPlus.pair != null ? issPlus.pair : null;
   const issLeadMeta = issPlus && issPlus.lead ? window.ISS_PARTY_META[issPlus.lead] || null : null;
   const issPrompted = !!(iss && iss.sal && iss.sal.length);
+  /* on the leadership facet the rail counts the NET GAP instead: Albanese's
+     net rating minus each rival's, only ever on the one question a wave put
+     to both names (approval with approval, favourability with favourability -
+     rdApLdPairs enforces it), so a favourability-only wave charts and reads
+     as favourability. The lean is the house-effects difference on the two
+     slots, the same figures the Leadership dot-plot corrects with. */
+  const isLd = facet === "leadership";
+  const ldOwn = isLd ? rdApLdPairs(p.appr) : [];
+  const ldWin = isLd && ldOwn.length ? rdApLdWindow(p) : null;
+  const ldWord = ldWin && ldWin.waves.length ? rdApLdWord(ldWin.waves) : null;
+  const ldHe = isLd ? (D.houseEffects && D.houseEffects.appr) || null : null;
+  const ldLean = isLd && ldHe ? ldOwn.map((pr) => {
+    const hA = (ldHe.alb || {})[p.pollster], hR = (ldHe[pr.R.he] || {})[p.pollster];
+    return hA && hR ? { name: pr.name, met: pr.met, v: hA.v - hR.v } : null;
+  }) : [];
+  const ldNow = isLd && D.leaderNow ? ldOwn.map((pr) => {
+    const suf = pr.met === "fav" ? "_fav" : "_net";
+    const A = D.leaderNow["alb" + suf], R = D.leaderNow[pr.R.ln + suf];
+    return A && R && A.v != null && R.v != null ? { name: pr.name, met: pr.met, gap: A.v - R.v, a: A.v, o: R.v } : null;
+  }) : [];
   /* the release, and beside it the poll's APC methodology statement where the
      pollster published one. Where the release is itself the statement
      (DemosAU's reports), both links open the same file and the statement
@@ -804,10 +1006,16 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
       </div>
       <div className="rd-apd-r">
         <span className="rd-apd-h">How it counts</span>
-        {!isDir && !isIss && fig.a != null && (
+        {!isDir && !isIss && !isLd && fig.a != null && (
           <>
             <span className="rd-apd-ct">{p.pollster}’s polls since {D.monthNameFull(Number(from.slice(5)))} against the average, Labor v {onM ? "One Nation" : "Coalition"}{pub ? " as published" : ""}</span>
             <RdApMini p={p} onM={onM} pub={pub} avgFor={avgFor} />
+          </>
+        )}
+        {isLd && ldOwn.length > 0 && ldWin && ldWin.waves.length > 0 && (
+          <>
+            <span className="rd-apd-ct">{p.pollster}’s polls since {D.monthNameFull(Number(from.slice(5)))} against the monthly average – {ldWord}, Albanese minus {rdApLdJoin(ldOwn.map((pr) => pr.name))}</span>
+            <RdApLdMini p={p} />
           </>
         )}
         {isDir && d && (
@@ -868,7 +1076,45 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
             <span className="rd-apd-k">National direction</span>
             <span>{p.pollster} didn’t ask the direction question in this poll, so there’s no reading to set against the direction figures.</span>
           </>}
-          {!isDir && !isIss && <>
+          {isLd && ldOwn.length > 0 && <>
+            <span className="rd-apd-k">The gap in this poll</span>
+            <span>{ldOwn.map((pr, i) => (
+              <React.Fragment key={pr.riv}>{i > 0 ? "; " : ""}against {pr.name}, <b>{Math.abs(pr.gap) < 0.05 ? "level" : Math.abs(pr.gap).toFixed(1) + " points " + rdApLdWay(pr.gap, pr.name)}</b> (Albanese {rdApSigned(p.appr.albNet)}, {pr.name} {rdApSigned(pr.net)}) on {rdApLdMetWord(pr.met)}</React.Fragment>
+            ))}</span>
+            {(() => {
+              const cmp = ldOwn.flatMap((pr) => {
+                const mg = rdApLdMonthGap(D, p.ym, pr.riv, pr.met);
+                if (mg == null) return [];
+                return [{ ...pr, mg }];
+              });
+              if (!cmp.length) return null;
+              const mName = D.monthNameFull(Number(p.ym.slice(5)));
+              return <>
+                <span className="rd-apd-k">Against {mName}</span>
+                <span>{cmp.map((pr, i) => {
+                  const delta = pr.gap - pr.mg;
+                  return <React.Fragment key={pr.riv}>{i > 0 ? "; against " + pr.name + ", " : ""}the average {mName} gap is <b>{rdApSigned(pr.mg)}</b>, so this poll reads {Math.abs(delta) < 0.05 ? "level with it" : <><b>{Math.abs(delta).toFixed(1)}</b> further {rdApLdWay(delta, pr.name)}</>} on {rdApLdMetWord(pr.met)}</React.Fragment>;
+                })}</span>
+              </>;
+            })()}
+            <span className="rd-apd-k">{p.pollster}’s usual lean</span>
+            <span>{ldLean.filter(Boolean).length
+              ? <>{ldLean.filter(Boolean).map((l, i) => (
+                  <React.Fragment key={l.name}>{i > 0 ? "; on the gap against " + l.name + ", " : ""}{Math.abs(l.v) < 0.05 ? "level with the other pollsters on the gap against " + l.name : <>about <b>{Math.abs(l.v).toFixed(1)}</b> points {l.v > 0 ? "Albanese’s" : l.name + "’s"} way</>}</React.Fragment>
+                ))}, taken out before its figures are averaged with the rest</>
+              : "Not measured yet: too few readings on the series"}</span>
+            {ldNow.filter(Boolean).length > 0 && <>
+              <span className="rd-apd-k">Now</span>
+              <span>{ldNow.filter(Boolean).map((n, i) => (
+                <React.Fragment key={n.name}>{i > 0 ? "; against " + n.name + ", " : ""}<b>{Math.abs(n.gap) < 0.05 ? "level" : Math.abs(n.gap).toFixed(1) + " points " + rdApLdWay(n.gap, n.name)}</b> (Albanese {rdApSigned(n.a)}, {n.name} {rdApSigned(n.o)}) on {rdApLdMetWord(n.met)}</React.Fragment>
+              ))}{ldOwn.some((pr) => pr.met === "fav") ? " – favourability and approval are different questions, so each gap here stays on its own" : ""}</span>
+            </>}
+          </>}
+          {isLd && !ldOwn.length && <>
+            <span className="rd-apd-k">Leader ratings</span>
+            <span>{p.pollster} didn’t ask Albanese and {p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader"} on the same question in this poll, so there’s no net-approval gap to set against the leadership figures.</span>
+          </>}
+          {!isDir && !isIss && !isLd && <>
           {lean != null && avg != null && <>
             <span className="rd-apd-k">Against {D.monthNameFull(Number(p.ym.slice(5)))}</span>
             <span>{Math.abs(lean) < 0.05

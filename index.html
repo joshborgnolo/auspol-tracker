@@ -73710,6 +73710,321 @@ function RdApDirMini({
     className: "tip-hint"
   }, tip.src === "focus" ? "Press Enter to open this reading" : "Click to open this reading") : null)));
 }
+const RD_AP_LD_RIVALS = [{
+  riv: "opp",
+  net: "taylorNet",
+  met: "taylor",
+  he: "opp",
+  ln: "taylor",
+  ink: "var(--lnp)",
+  name: a => a.oppName || "Taylor"
+}, {
+  riv: "han",
+  net: "hansonNet",
+  met: "hanson",
+  he: "han",
+  ln: "hanson",
+  ink: "var(--onp)",
+  name: () => "Hanson"
+}];
+function rdApLdPairs(a) {
+  if (!a || a.albNet == null || !a.metricBy) return [];
+  const out = [];
+  for (const R of RD_AP_LD_RIVALS) {
+    if (a[R.net] == null) continue;
+    const met = a.metricBy[R.met];
+    if (met !== a.metricBy.alb) continue;
+    out.push({
+      riv: R.riv,
+      R,
+      name: R.name(a),
+      met,
+      ink: R.ink,
+      net: a[R.net],
+      gap: a.albNet - a[R.net]
+    });
+  }
+  return out;
+}
+const rdApLdMetWord = met => met === "fav" ? "net favourability" : "net approval";
+function rdApLdWord(waves) {
+  const mets = new Set();
+  waves.forEach(w => w.pairs.forEach(pr => mets.add(pr.met)));
+  return mets.size === 1 ? rdApLdMetWord([...mets][0]) : "net leader ratings";
+}
+const rdApLdJoin = list => list.length > 2 ? list.slice(0, -1).join(", ") + " and " + list[list.length - 1] : list.join(" and ");
+function rdApLdMonthGap(D, ym, riv, met) {
+  const m = (D.leaderMonths || []).find(r => r.ym === ym);
+  if (!m) return null;
+  const suf = met === "fav" ? "_fav" : "_net";
+  const A = m["alb" + suf];
+  const O = riv === "opp" ? m["taylor" + suf] != null ? m["taylor" + suf] : m["ley" + suf] : m["hanson" + suf];
+  return A != null && O != null ? A - O : null;
+}
+function rdApLdWindow(p) {
+  const D = window.AUSPOL;
+  const iM = D.MONTHS.indexOf(p.ym);
+  const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
+  const t0 = rdApDays(ms[0] + "-01");
+  const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
+  const t1 = Date.UTC(ly, lm, 1) - 864e5;
+  const waves = D.individualPolls.filter(q => q.pollster === p.pollster && rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1).map(q => ({
+    q,
+    pairs: rdApLdPairs(q.appr)
+  })).filter(w => w.pairs.length);
+  return {
+    ms,
+    t0,
+    t1,
+    waves
+  };
+}
+const rdApLdWay = (g, name) => Math.abs(g) < 0.05 ? "level" : g > 0 ? "Albanese’s way" : name + "’s way";
+function RdApLdMini({
+  p
+}) {
+  const D = window.AUSPOL;
+  const box = React.useRef(null);
+  const W = useRdWidth(box, 470);
+  const H = 176;
+  const [tip, setTip] = useState(null);
+  const tipBox = React.useRef(null);
+  const ptr = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = tipBox.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip]);
+  const {
+    ms,
+    t0,
+    t1,
+    waves
+  } = rdApLdWindow(p);
+  const own = rdApLdPairs(p.appr);
+  if (!waves.length || !own.length) return React.createElement("div", {
+    ref: box
+  });
+  const combos = new Set();
+  waves.forEach(w => w.pairs.forEach(pr => combos.add(pr.riv + "|" + pr.met)));
+  const avg = [...combos].map(cm => {
+    const [riv, met] = cm.split("|");
+    const pts = ms.map(ym => {
+      const g = rdApLdMonthGap(D, ym, riv, met);
+      return g == null ? null : {
+        x: rdApDays(ym + "-15"),
+        v: g
+      };
+    }).filter(Boolean);
+    return {
+      riv,
+      met,
+      ink: RD_AP_LD_RIVALS.find(r => r.riv === riv).ink,
+      pts
+    };
+  }).filter(al => al.pts.length > 1);
+  const vals = waves.flatMap(w => w.pairs.map(pr => pr.gap)).concat(avg.flatMap(al => al.pts.map(z => z.v)), [0]);
+  let lo = Math.floor(Math.min(...vals) / 4) * 4,
+    hi = Math.ceil(Math.max(...vals) / 4) * 4;
+  if (hi - lo < 12) {
+    const c = (lo + hi) / 2;
+    lo = Math.floor((c - 6) / 4) * 4;
+    hi = lo + 12;
+  }
+  const x0 = 30,
+    x1 = W - 16,
+    top = 10,
+    bot = H - 26;
+  const X = tt => x0 + (tt - t0) / (t1 - t0) * (x1 - x0);
+  const Y = v => bot - (v - lo) / (hi - lo) * (bot - top);
+  const ticks = [];
+  for (let v = lo; v <= hi + 1e-9; v += 4) ticks.push(v);
+  const cx = X(rdApDays(p.fmid || p.released));
+  const labLeft = cx > W * 0.45;
+  const dots = waves.filter(w => w.q.released !== p.released).flatMap(w => w.pairs.map(pr => {
+    const q = w.q;
+    const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+      pollster: q.pollster,
+      released: q.released
+    }) : null;
+    const dup = waves.some(z => z.q !== q && z.q.released === q.released);
+    return {
+      q,
+      pr,
+      key: !raw || dup ? null : raw,
+      id: q.pollster + "|" + q.released + "|" + pr.riv,
+      cx: X(rdApDays(q.fmid || q.released))
+    };
+  }));
+  const show = (id, src) => setTip({
+    id,
+    src
+  });
+  const hide = (id, src) => setTip(tp => tp && tp.id === id && (!src || tp.src === src) ? null : tp);
+  const dotTip = tip && dots.find(d => d.id === tip.id);
+  const ownInkOf = pr => pr.ink;
+  return React.createElement("div", {
+    ref: box,
+    className: "rd-apd-mini"
+  }, React.createElement("svg", {
+    width: W,
+    height: H,
+    viewBox: `0 0 ${W} ${H}`,
+    role: "img",
+    "aria-label": `${p.pollster}’s polls since ${rdMonthYear(ms[0])} on the ${rdApLdWord(waves)} gap, Albanese minus ${rdApLdJoin([...new Set(waves.flatMap(w => w.pairs.map(pr => pr.name)))])}, against the monthly average; this poll ${own.map(pr => rdApLdWay(pr.gap, pr.name)).join(" and ")}.`
+  }, ticks.map(v => React.createElement("path", {
+    key: v,
+    d: `M${x0} ${Y(v)}H${x1}`,
+    className: v === 0 ? "rd-apd-even" : "rd-apd-gl"
+  })), ticks.map(v => React.createElement("text", {
+    key: "t" + v,
+    x: x0 - 6,
+    y: Y(v) + 4,
+    className: "rd-apd-ax",
+    textAnchor: "end"
+  }, v)), avg.map(al => React.createElement("path", {
+    key: al.riv + "|" + al.met,
+    d: monotoneXY(al.pts.map(z => [X(z.x), Y(z.v)])),
+    className: "rd-apd-avgline",
+    style: {
+      stroke: `color-mix(in oklab, ${al.ink} 78%, transparent)`,
+      strokeDasharray: al.met === "fav" ? "5 4" : undefined
+    }
+  })), dots.map(d => {
+    const {
+      id,
+      key: k,
+      pr
+    } = d;
+    const open = () => {
+      if (k && window.AP.openPoll) {
+        setTip(null);
+        window.AP.openPoll(k, "leadership", "the poll you were reading");
+      }
+    };
+    return React.createElement("g", {
+      key: id
+    }, tip && tip.id === id && React.createElement("circle", {
+      cx: d.cx,
+      cy: Y(pr.gap),
+      r: "7.5",
+      className: "rd-apd-dothi"
+    }), pr.met === "fav" ? React.createElement("circle", {
+      cx: d.cx,
+      cy: Y(pr.gap),
+      r: "4",
+      style: {
+        fill: "var(--surface-2)",
+        stroke: pr.ink,
+        strokeWidth: 1.8
+      }
+    }) : React.createElement("circle", {
+      cx: d.cx,
+      cy: Y(pr.gap),
+      r: "4",
+      style: {
+        fill: `color-mix(in oklab, ${pr.ink} 55%, transparent)`
+      }
+    }), React.createElement("circle", {
+      cx: d.cx,
+      cy: Y(pr.gap),
+      r: "9",
+      className: "rd-apd-hit" + (k ? " link" : ""),
+      tabIndex: "0",
+      role: k ? "button" : "img",
+      "aria-label": "Albanese’s " + rdApLdMetWord(pr.met) + " minus " + pr.name + "’s, " + rdApLdWay(pr.gap, pr.name) + ", " + d.q.pollster + "’s poll of " + (d.q.field || d.q.released) + (k ? "; press Enter to open it" : ""),
+      onPointerDown: ev => {
+        ptr.current = ev.pointerType;
+      },
+      onPointerEnter: ev => {
+        if (ev.pointerType === "mouse") show(id, "mouse");
+      },
+      onPointerLeave: ev => {
+        if (ev.pointerType === "mouse") hide(id, "mouse");
+      },
+      onFocus: ev => {
+        if (ev.target.matches(":focus-visible")) show(id, "focus");
+      },
+      onBlur: () => hide(id, "focus"),
+      onClick: ev => {
+        ev.stopPropagation();
+        const pt = ev.detail === 0 ? "key" : ptr.current;
+        ptr.current = null;
+        if (pt === "mouse" || pt === "key") {
+          open();
+          return;
+        }
+        if (tip && tip.id === id) setTip(null);else setTip({
+          id,
+          src: "touch"
+        });
+      },
+      onKeyDown: ev => {
+        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+        ev.preventDefault();
+        open();
+      }
+    }));
+  }), own.map((pr, i) => {
+    const cy = Y(pr.gap);
+    const above = own.length === 1 || i === 0;
+    return React.createElement("g", {
+      key: pr.riv
+    }, React.createElement("circle", {
+      cx: cx,
+      cy: cy,
+      r: "8",
+      className: "rd-apd-ring",
+      style: {
+        stroke: ownInkOf(pr)
+      }
+    }), React.createElement("circle", {
+      cx: cx,
+      cy: cy,
+      r: "4.5",
+      className: "rd-apd-this",
+      style: pr.met === "fav" ? {
+        fill: "var(--surface-2)",
+        stroke: ownInkOf(pr),
+        strokeWidth: 2
+      } : {
+        fill: ownInkOf(pr)
+      }
+    }), React.createElement("text", {
+      x: labLeft ? cx - 12 : cx + 12,
+      y: above ? cy - 12 : cy + 24,
+      className: "rd-apd-thislab",
+      textAnchor: labLeft ? "end" : "start"
+    }, own.length > 1 ? "v " + pr.name + " " : "This poll ", rdApSigned(pr.gap)));
+  }), React.createElement("path", {
+    d: `M${x0} ${bot}H${x1}`,
+    className: "rd-apd-base"
+  }), ms.map((ym, i) => i % 2 === (ms.length - 1) % 2 ? React.createElement("text", {
+    key: ym,
+    x: X(rdApDays(ym + "-01")),
+    y: bot + 18,
+    className: "rd-apd-ax",
+    textAnchor: "middle"
+  }, D.monthName(Number(ym.slice(5)))) : null)), dotTip && React.createElement("div", {
+    ref: tipBox,
+    className: "tip rd-apd-tip",
+    style: {
+      left: dotTip.cx + "px"
+    },
+    "aria-hidden": "true"
+  }, React.createElement("div", {
+    className: "tip-title"
+  }, "Fieldwork ", dotTip.q.field || dotTip.q.released), React.createElement("div", {
+    className: "tip-sub"
+  }, "Albanese ", rdApSigned(dotTip.q.appr.albNet), ", ", dotTip.pr.name, " ", rdApSigned(dotTip.pr.net), " \u2013 ", Math.abs(dotTip.pr.gap).toFixed(1), " points ", rdApLdWay(dotTip.pr.gap, dotTip.pr.name), " (", rdApLdMetWord(dotTip.pr.met), ")"), dotTip.q.sample != null && React.createElement("div", {
+    className: "tip-sub"
+  }, "n = ", dotTip.q.sample.toLocaleString()), tip.src !== "touch" && (dotTip.key ? React.createElement("div", {
+    className: "tip-hint"
+  }, tip.src === "focus" ? "Press Enter to open this poll" : "Click to open this poll") : null)));
+}
 function RdApIssMini({
   p
 }) {
@@ -73975,6 +74290,32 @@ function RdApDetail({
   const issPair = issPlus && issPlus.pair != null ? issPlus.pair : null;
   const issLeadMeta = issPlus && issPlus.lead ? window.ISS_PARTY_META[issPlus.lead] || null : null;
   const issPrompted = !!(iss && iss.sal && iss.sal.length);
+  const isLd = facet === "leadership";
+  const ldOwn = isLd ? rdApLdPairs(p.appr) : [];
+  const ldWin = isLd && ldOwn.length ? rdApLdWindow(p) : null;
+  const ldWord = ldWin && ldWin.waves.length ? rdApLdWord(ldWin.waves) : null;
+  const ldHe = isLd ? D.houseEffects && D.houseEffects.appr || null : null;
+  const ldLean = isLd && ldHe ? ldOwn.map(pr => {
+    const hA = (ldHe.alb || {})[p.pollster],
+      hR = (ldHe[pr.R.he] || {})[p.pollster];
+    return hA && hR ? {
+      name: pr.name,
+      met: pr.met,
+      v: hA.v - hR.v
+    } : null;
+  }) : [];
+  const ldNow = isLd && D.leaderNow ? ldOwn.map(pr => {
+    const suf = pr.met === "fav" ? "_fav" : "_net";
+    const A = D.leaderNow["alb" + suf],
+      R = D.leaderNow[pr.R.ln + suf];
+    return A && R && A.v != null && R.v != null ? {
+      name: pr.name,
+      met: pr.met,
+      gap: A.v - R.v,
+      a: A.v,
+      o: R.v
+    } : null;
+  }) : [];
   const relUrl = p.releaseUrl || p.url;
   return React.createElement("div", {
     className: "rd-apd"
@@ -74170,13 +74511,17 @@ function RdApDetail({
     className: "rd-apd-r"
   }, React.createElement("span", {
     className: "rd-apd-h"
-  }, "How it counts"), !isDir && !isIss && fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, "How it counts"), !isDir && !isIss && !isLd && fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-ct"
   }, p.pollster, "\u2019s polls since ", D.monthNameFull(Number(from.slice(5))), " against the average, Labor v ", onM ? "One Nation" : "Coalition", pub ? " as published" : ""), React.createElement(RdApMini, {
     p: p,
     onM: onM,
     pub: pub,
     avgFor: avgFor
+  })), isLd && ldOwn.length > 0 && ldWin && ldWin.waves.length > 0 && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-ct"
+  }, p.pollster, "\u2019s polls since ", D.monthNameFull(Number(from.slice(5))), " against the monthly average \u2013 ", ldWord, ", Albanese minus ", rdApLdJoin(ldOwn.map(pr => pr.name))), React.createElement(RdApLdMini, {
+    p: p
   })), isDir && d && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-ct"
   }, p.pollster, "\u2019s readings since ", D.monthNameFull(Number(from.slice(5))), " against the monthly average, net right direction minus wrong track"), React.createElement(RdApDirMini, {
@@ -74207,7 +74552,40 @@ function RdApDetail({
     className: "rd-apd-k"
   }, "In today\u2019s ", rdApSigned(dirNow.net), " net"), React.createElement("span", null, dEff && dEff.w ? React.createElement(React.Fragment, null, "One of the ", rdNumWord(dirNow.n), " readings it\u2019s built from; this one moves it ", React.createElement("b", null, move(dEff))) : dEff && dEff.t ? React.createElement(React.Fragment, null, "Not one of them: today\u2019s figure uses the last three weeks of readings. When it came out, it moved the figure ", React.createElement("b", null, move(dEff.t))) : React.createElement(React.Fragment, null, "Not one of them: today\u2019s figure uses the last three weeks of readings")))), isDir && !d && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
-  }, "National direction"), React.createElement("span", null, p.pollster, " didn\u2019t ask the direction question in this poll, so there\u2019s no reading to set against the direction figures.")), !isDir && !isIss && React.createElement(React.Fragment, null, lean != null && avg != null && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, "National direction"), React.createElement("span", null, p.pollster, " didn\u2019t ask the direction question in this poll, so there\u2019s no reading to set against the direction figures.")), isLd && ldOwn.length > 0 && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "The gap in this poll"), React.createElement("span", null, ldOwn.map((pr, i) => React.createElement(React.Fragment, {
+    key: pr.riv
+  }, i > 0 ? "; " : "", "against ", pr.name, ", ", React.createElement("b", null, Math.abs(pr.gap) < 0.05 ? "level" : Math.abs(pr.gap).toFixed(1) + " points " + rdApLdWay(pr.gap, pr.name)), " (Albanese ", rdApSigned(p.appr.albNet), ", ", pr.name, " ", rdApSigned(pr.net), ") on ", rdApLdMetWord(pr.met)))), (() => {
+    const cmp = ldOwn.flatMap(pr => {
+      const mg = rdApLdMonthGap(D, p.ym, pr.riv, pr.met);
+      if (mg == null) return [];
+      return [{
+        ...pr,
+        mg
+      }];
+    });
+    if (!cmp.length) return null;
+    const mName = D.monthNameFull(Number(p.ym.slice(5)));
+    return React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "rd-apd-k"
+    }, "Against ", mName), React.createElement("span", null, cmp.map((pr, i) => {
+      const delta = pr.gap - pr.mg;
+      return React.createElement(React.Fragment, {
+        key: pr.riv
+      }, i > 0 ? "; against " + pr.name + ", " : "", "the average ", mName, " gap is ", React.createElement("b", null, rdApSigned(pr.mg)), ", so this poll reads ", Math.abs(delta) < 0.05 ? "level with it" : React.createElement(React.Fragment, null, React.createElement("b", null, Math.abs(delta).toFixed(1)), " further ", rdApLdWay(delta, pr.name)), " on ", rdApLdMetWord(pr.met));
+    })));
+  })(), React.createElement("span", {
+    className: "rd-apd-k"
+  }, p.pollster, "\u2019s usual lean"), React.createElement("span", null, ldLean.filter(Boolean).length ? React.createElement(React.Fragment, null, ldLean.filter(Boolean).map((l, i) => React.createElement(React.Fragment, {
+    key: l.name
+  }, i > 0 ? "; on the gap against " + l.name + ", " : "", Math.abs(l.v) < 0.05 ? "level with the other pollsters on the gap against " + l.name : React.createElement(React.Fragment, null, "about ", React.createElement("b", null, Math.abs(l.v).toFixed(1)), " points ", l.v > 0 ? "Albanese’s" : l.name + "’s", " way"))), ", taken out before its figures are averaged with the rest") : "Not measured yet: too few readings on the series"), ldNow.filter(Boolean).length > 0 && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Now"), React.createElement("span", null, ldNow.filter(Boolean).map((n, i) => React.createElement(React.Fragment, {
+    key: n.name
+  }, i > 0 ? "; against " + n.name + ", " : "", React.createElement("b", null, Math.abs(n.gap) < 0.05 ? "level" : Math.abs(n.gap).toFixed(1) + " points " + rdApLdWay(n.gap, n.name)), " (Albanese ", rdApSigned(n.a), ", ", n.name, " ", rdApSigned(n.o), ") on ", rdApLdMetWord(n.met))), ldOwn.some(pr => pr.met === "fav") ? " – favourability and approval are different questions, so each gap here stays on its own" : ""))), isLd && !ldOwn.length && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Leader ratings"), React.createElement("span", null, p.pollster, " didn\u2019t ask Albanese and ", p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader", " on the same question in this poll, so there\u2019s no net-approval gap to set against the leadership figures.")), !isDir && !isIss && !isLd && React.createElement(React.Fragment, null, lean != null && avg != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
   }, "Against ", D.monthNameFull(Number(p.ym.slice(5)))), React.createElement("span", null, Math.abs(lean) < 0.05 ? React.createElement(React.Fragment, null, "Level with the month\u2019s average of ", avg.toFixed(1), moe != null ? ", inside its ±" + moe.toFixed(1) + " margin" : "") : React.createElement(React.Fragment, null, React.createElement("b", {
     style: {
