@@ -1458,8 +1458,10 @@ body.dark .sens-band { opacity: 0.10; }
 /* pan-y keeps vertical page scrolling with the browser while horizontal drags
    belong to the chart, so scrubbing the guide on a phone never fights the page.
    The chart is a tab stop (arrow keys step the guide), so it needs the ring —
-   inset, because overflow:visible would push an offset ring under the card edge. */
-.chart-svg { width: 100%; height: auto; display: block; overflow: visible; touch-action: pan-y; }
+   inset, because overflow:visible would push an offset ring under the card edge.
+   Unselectable, because a double press is a chart gesture (onDoubleEmpty) and
+   the browser's double-click word pick must not take its labels. */
+.chart-svg { width: 100%; height: auto; display: block; overflow: visible; touch-action: pan-y; -webkit-user-select: none; user-select: none; }
 .chart-svg:focus-visible { outline: 2.5px solid var(--accent); outline-offset: -3px; border-radius: 4px; }
 /* copy-as-image shortcut, in its own strip BELOW every chart, right-aligned:
    quiet until hovered, on --chart-bg so it reads as part of the chart's own

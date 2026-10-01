@@ -407,7 +407,10 @@ function RdHero(p) {
 
   /* a sideways swipe on the chart flips the 2PP contest, wrapping round the
      matchups like the computer's arrow keys wrap a row - the card bears the
-     exact claim so the gesture reaches it past the chart's own scrub */
+     exact claim so the gesture reaches it past the chart's own scrub. And
+     two quick presses on open chart - the engine only fires onDoubleEmpty
+     when the press picks no poll and no event, so a dot's tap and an
+     event's keep their own jobs - step it the same way */
   const swipeLive = React.useRef(null);
   swipeLive.current = (dir) => {
     const i = orderedMatchups.indexOf(matchup);
@@ -565,6 +568,7 @@ function RdHero(p) {
           scatter={scatter} scatterOut={scatterOut} scatterMove={scatterMove}
           areas={areas} fade={morph ? t : 1}
           pollFacet="twopp"
+          onDoubleEmpty={() => swipeLive.current(1)}
           tooltipTitle={tooltipTitle} extraRows={extraRows}
           fmt={(v) => v.toFixed(1)}
           copy={{ title: chartTitle.replace(/, %$/, ""),

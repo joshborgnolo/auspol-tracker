@@ -1,6 +1,6 @@
 ---
 name: auspol-rd-tpp-hero
-description: auspol-tracker — the redesign front-page two-party hero (rd-hero.jsx, section.rd-tpp) — the chart a visitor actually sees: it draws Labor's share vs BOTH rivals at once (main + "other" line with "v Coalition"/"v One Nation" END labels), the "Compare published 2PP" overlay ("As published"/"Implied" end label), and the ON-flow sensitivity bracket whose `edge:true` renders its TOP edge as a PHANTOM second dotted line (renderer strokes area top-edges dashed; fill invisible at .rd-sens opacity .1) — restyled 1px/"1.8 3"/0.35 on 2026-09-28 via new parametric area options edgeWidth/edgeDash/edgeOpacity. Event markers are the UNION of keptEvents since the same day (user wanted identical markers on every matchup pill). Renderer dash encodings trap: dashed SERIES encode stroke-dasharray "6 6", area EDGES default "4 4"/custom — probe assertions must match the right pattern. Pinned by .matilda/rd-tpp-hero-probe.mjs (14 checks)
+description: auspol-tracker — the redesign front-page two-party hero (rd-hero.jsx, section.rd-tpp) — the chart a visitor actually sees: it draws Labor's share vs BOTH rivals at once (main + "other" line with "v Coalition"/"v One Nation" END labels), the "Compare published 2PP" overlay ("As published"/"Implied" end label), and the ON-flow sensitivity bracket whose `edge:true` renders its TOP edge as a PHANTOM second dotted line (renderer strokes area top-edges dashed; fill invisible at .rd-sens opacity .1) — restyled 1px/"1.8 3"/0.35 on 2026-09-28 via new parametric area options edgeWidth/edgeDash/edgeOpacity. Event markers are the UNION of keptEvents since the same day (user wanted identical markers on every matchup pill). Renderer dash encodings trap: dashed SERIES encode stroke-dasharray "6 6", area EDGES default "4 4"/custom — probe assertions must match the right pattern. Pinned by .matilda/rd-tpp-hero-probe.mjs (14 checks). Double-press figure flip: numPress (pointerdown pairing 500ms/30px, gated on .rd-tpp-num only, second-press preventDefault kills digit selection) steps the matchup one slot via chooseMatchup — shipped ada1ca1 (compiled layer rode along in sibling 0f1e189); probe .matilda/probe/tpp-num-dbltap.mjs
 source: auto-skill
 extracted_at: '2026-09-28T06:34:26.389Z'
 ---
@@ -49,6 +49,85 @@ TWO dotted lines but only three end labels ("v One Nation", "v Coalition",
     renderer's only `edge: true` consumer is this sens area (every other
     area in the codebase passes `edge: false`); the component doc block at
     08b413e7 ~:160 documents its spec — keep it in sync.
+
+## Double-press figure flip (numPress, shipped ada1ca1 / 2026-10-02)
+
+Two quick presses on the headline `.rd-tpp-num` RollNum figures step the
+contest one slot along `orderedMatchups` (wrapping
+`(i + 1 + len) % len`, the same dir:+1 advance as `swipeLive.current`),
+through `chooseMatchup` — the 320ms morph/domain seeding handles an
+interrupt mid-morph. Contract (rd-hero.jsx ~:420 after `swipeMark`):
+
+- **Pairing reads `pointerdown`, never click/dblclick** — a mouse
+  double-click and a phone double-tap are then the same gesture, and
+  dblclick doesn't fire reliably on touch. Window: 500ms and 30px on
+  both axes (`numTap` ref `{t, x, y}`).
+- **Only the NUMBERS carry the claim**: the handler gates on
+  `e.target.closest(".rd-tpp-num")`; it's wired `onPointerDown` on the
+  `.rd-tpp-read` strip (which already carries `ref={swipeMark}
+  data-rd-swipe-self=""`), so the names and the rule stay inert.
+- **`e.preventDefault()` on the paired second press** kills the
+  browser's double-click digit text-selection.
+- Probe: `.matilda/probe/tpp-num-dbltap.mjs` (ROOT `../..`, PORT 9041;
+  touch rungs use `page.touchscreen.tap`, desktop `page.mouse.click`,
+  70ms between presses) — per rung 1440/820/390-touch: single press
+  inert, double flips (names read via `.rd-tpp-side.rd-a/.rd-b
+  .rd-tpp-name`), `window.getSelection().toString()` empty, second
+  double flips back, double on the NAMES inert.
+- Landing note: the compiled layer shipped first inside sibling commit
+  `0f1e189` (their build read the shared worktree); ada1ca1 is the
+  source-only follow-up — see auto-skill-shared-repo-session-race
+  "Sibling's commit SHIPS your compiled change" (2026-10-02).
+
+## Double-press open-water flip (onDoubleEmpty, 2026-10-02)
+
+The same two-press claim the figure flip has on `.rd-tpp-num`, applied to
+the chart itself: two quick presses on OPEN chart water (no poll and no
+event in either press's catchment) step the matchup one slot, wired in
+rd-hero.jsx as `onDoubleEmpty={() => swipeLive.current(1)}` between
+`pollFacet="twopp"` and `tooltipTitle` — the exact +1 advance the swipe
+runs through chooseMatchup, so drag, figure double-press and chart
+double-press are the same gesture to the state machine. Engine side is an
+OPT-IN TrendChart prop (08b413e7):
+
+- `dblEmpty(e, pickPx)` (~:706): pairs presses within 500ms/30px measured
+  on client coords. A press whose catchment holds a poll or event
+  (`nearestDot`/`nearestEvent`) does its own job AND resets the clock
+  (`dblTap.current.t = 0`) — it is never the first half of a pair.
+  Touch measures openness with TOUCH_PICK_PX=22, mouse MOUSE_PICK_PX=11.
+- Touch path runs `dblEmpty(e, TOUCH_PICK_PX)` inside `onPointerUp`
+  BEFORE `pickTouch(e, true)`; mouse path runs `dblEmpty(e,
+  MOUSE_PICK_PX)` inside `handleClick` ONLY when the dot isn't openable
+  (hovered dot + dotSrc "mouse" + rowKey) — a hovered double-click keeps
+  its archive-open, it never flips.
+- **The echo-press trap (the one that bites):** Chrome dispatches a
+  synthesized CLICK after every touch tap, immediately after pointerup.
+  Without the `touchTapAt` guard both handlers count the same tap —
+  every SINGLE tap on open water flips the contest (probe caught this).
+  `onPointerUp` stamps `touchTapAt.current = performance.now()` where it
+  processes a touch tap, and `handleClick` returns when
+  `now - touchTapAt.current < 400`. Only a touch tap stamps the clock
+  (the pointerup touch branch returns early for the mouse), so desktop
+  double-click pairing is untouched; the real second tap's echo is
+  swallowed too — harmless, its pointerup already paired.
+- `.chart-svg` is unselectable (`user-select: none` +
+  `-webkit-user-select`, template.html ~:1462 beside `touch-action:
+  pan-y`) so a desktop double-click can't word-grab the chart's text
+  labels.
+- Probe `.matilda/probe/tpp-chart-dbltap.mjs` (PORT 9042). Three traps to
+  know before editing it: the naive phone-rung selector
+  `section.rd-tpp .rd-tpp-chart svg` matches RdKey's 24×14 legend line
+  sample — select `.rd-tpp-chart .chart svg.chart-svg` AND wait
+  `width > 200` because the narrow-rung chart mounts late after the
+  useNarrow re-render; pickable dots are ONLY `circle.scatter-dot` /
+  `g.rd-dot-hot circle` (rings, end-caps, hover-markers, badge circles
+  live in the keep-out set); a desktop hovered-dot double-click opens
+  the archive, which switches to the all-polls tab and UNMOUNTS the
+  hero — read `.rd-tpp-name` before the click and assert `.poll-detail`
+  / `#allpolls` hash after. Per rung (1440/820/390-touch): lone press
+  inert, double flips, no text selected, second double flips back; touch
+  adds a dot tap opens its `.tip.tip-dot` readout without flipping;
+  desktop adds the openable-dot double-click opening the archive.
 
 ## Compare checkbox (RdCheck)
 

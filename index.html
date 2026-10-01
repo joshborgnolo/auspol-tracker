@@ -936,7 +936,7 @@ body.dark .sens-band { opacity: 0.10; }
 .delta.down { color: var(--ink-2); }
 .delta.flat { color: var(--ink-3); font-weight: 600; }
 .chart { position: relative; width: 100%; margin-top: 4px; }
-.chart-svg { width: 100%; height: auto; display: block; overflow: visible; touch-action: pan-y; }
+.chart-svg { width: 100%; height: auto; display: block; overflow: visible; touch-action: pan-y; -webkit-user-select: none; user-select: none; }
 .chart-svg:focus-visible { outline: 2.5px solid var(--accent); outline-offset: -3px; border-radius: 4px; }
 .chart:has(> .chart-copy-btn) { padding-bottom: 30px; }
 .chart-copy-btn {
@@ -49213,6 +49213,7 @@ function TrendChart(props) {
     morphT = 1,
     driven = false,
     pollFacet,
+    onDoubleEmpty,
     marks = [],
     notes = [],
     baseline = false,
@@ -49494,9 +49495,14 @@ function TrendChart(props) {
   };
   const rowKey = dot && window.AP.pollRowKey ? window.AP.pollRowKey(dot.meta) : null;
   const openable = !!(dot && dotSrc.current === "mouse" && rowKey && window.AP.openPoll);
-  const handleClick = () => {
-    if (!openable) return;
-    window.AP.openPoll(rowKey, pollFacet);
+  const touchTapAt = useRef(0);
+  const handleClick = e => {
+    if (performance.now() - touchTapAt.current < 400) return;
+    if (openable) {
+      window.AP.openPoll(rowKey, pollFacet);
+      return;
+    }
+    dblEmpty(e, MOUSE_PICK_PX);
   };
   const TOUCH_PICK_PX = 22;
   const MOUSE_PICK_PX = 11;
@@ -49576,6 +49582,29 @@ function TrendChart(props) {
   };
   const TAP_SLOP_PX = 10;
   const SCRUB_PX = 8;
+  const dblTap = useRef({
+    t: 0,
+    x: 0,
+    y: 0
+  });
+  const dblEmpty = (e, pickPx) => {
+    if (!onDoubleEmpty) return false;
+    const p = toVB(e);
+    if (nearestDot(p, pickPx) || nearestEvent(p, pickPx)) {
+      dblTap.current.t = 0;
+      return false;
+    }
+    const now = performance.now(),
+      q = dblTap.current;
+    const pair = now - q.t < 500 && Math.abs(e.clientX - q.x) < 30 && Math.abs(e.clientY - q.y) < 30;
+    q.t = now;
+    q.x = e.clientX;
+    q.y = e.clientY;
+    if (!pair) return false;
+    q.t = 0;
+    onDoubleEmpty();
+    return true;
+  };
   const gesture = useRef(null);
   const onPointerDown = e => {
     if (e.pointerType === "mouse") return;
@@ -49626,6 +49655,8 @@ function TrendChart(props) {
     gesture.current = null;
     if (!g || g.dead || g.scrub) return;
     if (Math.abs(e.clientX - g.x) > TAP_SLOP_PX || Math.abs(e.clientY - g.y) > TAP_SLOP_PX) return;
+    touchTapAt.current = performance.now();
+    if (dblEmpty(e, TOUCH_PICK_PX)) return;
     pickTouch(e, true);
   };
   const onPointerCancel = e => {
@@ -65688,6 +65719,7 @@ function RdHero(p) {
     areas: areas,
     fade: morph ? t : 1,
     pollFacet: "twopp",
+    onDoubleEmpty: () => swipeLive.current(1),
     tooltipTitle: tooltipTitle,
     extraRows: extraRows,
     fmt: v => v.toFixed(1),

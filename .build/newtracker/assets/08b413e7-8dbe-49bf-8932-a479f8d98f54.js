@@ -240,6 +240,12 @@ function TrendChart(props) {
     /* Which archive view a dot from THIS chart should land in. The chart has no
        idea what it is plotting; the panel does. */
     pollFacet,
+    /* `onDoubleEmpty`: two quick presses on OPEN chart - catching no poll and
+       no event - call it (the hero 2PP chart steps its matchup on it). A
+       press that picks something keeps its own job instead: a tapped dot
+       opens or closes its readout, a dot under the mouse stays the archive
+       link. */
+    onDoubleEmpty,
     /* The redesign's extras, drawn only where a panel passes them:
        marks  – [{x, y, label?, labelDx?, labelDy?, anchor?}] an open ring on
                 a point that is a count rather than a poll (an election
@@ -587,9 +593,16 @@ function TrendChart(props) {
      the tooltip away from the only input that needs it. */
   const rowKey = dot && window.AP.pollRowKey ? window.AP.pollRowKey(dot.meta) : null;
   const openable = !!(dot && dotSrc.current === "mouse" && rowKey && window.AP.openPoll);
-  const handleClick = () => {
-    if (!openable) return;
-    window.AP.openPoll(rowKey, pollFacet);
+  /* A touch tap is read entirely on pointerup below - and then the browser
+     dispatches the tap's synthesized click, which would register the same
+     tap a second time (reading every single tap as a double). Only a real
+     touch tap stamps this clock (the touch branch returns early for a
+     mouse), so the guard silences the echo and nothing else. */
+  const touchTapAt = useRef(0);
+  const handleClick = (e) => {
+    if (performance.now() - touchTapAt.current < 400) return;
+    if (openable) { window.AP.openPoll(rowKey, pollFacet); return; }
+    dblEmpty(e, MOUSE_PICK_PX);
   };
 
   /* ---- picking a poll -----------------------------------------------------
@@ -689,6 +702,27 @@ function TrendChart(props) {
      the page scrolling and opens nothing at all. */
   const TAP_SLOP_PX = 10;   // travel still counted as a tap rather than a drag
   const SCRUB_PX = 8;       // horizontal travel that commits the gesture to scrubbing
+
+  /* Two quick presses on open water - no poll and no event in either's
+     catchment - are a caller-claimed gesture (`onDoubleEmpty`), the one
+     pairing a chart offers beyond its own. A press that picks something is
+     never the first half of a pair: it does its own job (a dot's tap opens
+     or closes its readout) and resets the clock, and each input measures
+     openness with its own catchment, a fingertip's the wider one. */
+  const dblTap = useRef({ t: 0, x: 0, y: 0 });
+  const dblEmpty = (e, pickPx) => {
+    if (!onDoubleEmpty) return false;
+    const p = toVB(e);
+    if (nearestDot(p, pickPx) || nearestEvent(p, pickPx)) { dblTap.current.t = 0; return false; }
+    const now = performance.now(), q = dblTap.current;
+    const pair = now - q.t < 500 && Math.abs(e.clientX - q.x) < 30 && Math.abs(e.clientY - q.y) < 30;
+    q.t = now; q.x = e.clientX; q.y = e.clientY;
+    if (!pair) return false;
+    q.t = 0;
+    onDoubleEmpty();
+    return true;
+  };
+
   const gesture = useRef(null);
   const onPointerDown = (e) => {
     if (e.pointerType === "mouse") return;
@@ -728,6 +762,8 @@ function TrendChart(props) {
     if (!g || g.dead || g.scrub) return;          // a scroll, or a scrub already read
     if (Math.abs(e.clientX - g.x) > TAP_SLOP_PX
         || Math.abs(e.clientY - g.y) > TAP_SLOP_PX) return;
+    touchTapAt.current = performance.now();        // the click this tap spawns is its echo, not a second press
+    if (dblEmpty(e, TOUCH_PICK_PX)) return;        // a caller's double-tap
     pickTouch(e, true);                            // a tap, and only now
   };
   // the browser has taken the gesture for a scroll - nothing to read from it
