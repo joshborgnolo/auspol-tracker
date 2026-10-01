@@ -1,6 +1,6 @@
 ---
 name: auspol-cyc-chipmove-band
-description: auspol-tracker — the Past-cycles ".rd-cyc-chipmove" band floating 12px above the #cyc-tpp eyebrow divider, FLUSH LEFT (ship 7964e12, follow-ups 204654b, COLUMN STACK ba613b3; left move + 12px gap + ≤640px 60px headroom 2026-10-02 after user: "move it to the left… breathing room from the line below it"): RdSec tools-slot anchoring (top: pad+1px of --cyc-chip-pad-fallback --rd-sec-pad, translateY(-100%−12px)), band is a COLUMN flex — chip on top, the drawn-pills row stacked beneath it, both flush left — plus the read-only .rd-cc-cur sitting-term pill (lift() no-ops on the current year) and RdCycleChart's nonDefault note-gating (liftedN threaded from CycleChart in d1a1d215; hides the ▲/▼ ahead pair + "N.N above/below average", keeps the sitting figure). Probe .matilda/probe-cyc-chipmove.mjs.
+description: auspol-tracker — the Past-cycles ".rd-cyc-chipmove" band floating 12px above the #cyc-tpp eyebrow divider, FLUSH LEFT (ship 7964e12, follow-ups 204654b, COLUMN STACK ba613b3; left move + 12px gap + ≤640px 60px headroom 2026-10-02 after user: "move it to the left… breathing room from the line below it"; JS HEADROOM REFIT same day after user: "more than 5 drawn → causes mayhem with the text already in the page… the rest of the page content is not pushed up"): RdSec tools-slot anchoring (top: pad+1px of --cyc-chip-pad-fallback --rd-sec-pad, translateY(-100%−12px)), band is a COLUMN flex — chip on top, the drawn-pills row stacked beneath it, both flush left — plus the read-only .rd-cc-cur sitting-term pill and RdCycleChart's nonDefault note-gating; the BAND IS OUT OF FLOW, so rd-cycles.jsx's chipmove fit() measures the wrapped band and GROWS --cyc-chip-pad + padding-top INLINE on #cyc-tpp when the stack needs more than the CSS floor (a tall stack pushes the page down instead of climbing over the Summary foot). Probe .matilda/probe-cyc-chipmove.mjs.
 source: auto-skill
 extracted_at: '2026-10-01T13:50:56.926Z'
 ---
@@ -9,20 +9,22 @@ extracted_at: '2026-10-01T13:50:56.926Z'
 
 All line numbers are for commit `ba613b3` (204654b + the column stack; the
 sibling session's WIP in the working tree can shift `rd-cycles.jsx` and
-`d1a1d215-….js` line offsets — trust tokens, not raw numbers).
+`d1a1d215-….js` line offsets — trust tokens, not raw numbers). The headroom
+refit shipped on top of `14ddd71` (2026-10-02) — search `chipmoveRef`.
 
 ## Homes
 
 | Piece | Where |
 |---|---|
-| CSS anchor recipe | `rd.css` ~:1576-1593 (`body.rd .rd-cyc-chipmove`, comment block above it) |
-| ≤640px headroom bump + label hide | `rd.css` :98-109 (`body.rd #cyc-tpp` + `.rd-cc-drawn .rd-cc-l` in the 640 block) |
-| Tools JSX (band contents) | `rd-cycles.jsx` ~:898-918 — `tools={…}` on `<RdSec id="cyc-tpp" …>` |
+| CSS anchor recipe | `rd.css` ~:1590-1600 (`body.rd .rd-cyc-chipmove`, comment block above it) |
+| ≤640px headroom floor + label hide | `rd.css` :98-116 (`body.rd #cyc-tpp` + `.rd-cc-drawn .rd-cc-l` in the 640 block) — a FLOOR now, not the whole story |
+| JS headroom refit | `rd-cycles.jsx` `chipmoveRef` + `useLayoutEffect(fit)` right after the story-floor effect inside `RdPastCycles` (~:341-376); ref hung on the `<span className="rd-cyc-chipmove" ref={chipmoveRef}>` in the tools JSX |
+| Tools JSX (band contents) | `rd-cycles.jsx` ~:953 — `tools={…}` on `<RdSec id="cyc-tpp" …>` |
 | Drawn-row styling | `rd.css` (.rd-cc-drawn no longer has `margin-top: 12px`; .rd-cc-pill / .rd-cc-cur unchanged from the controls-row era) |
 | `nonDefault` gate const | `rd-cycles.jsx` ~:60, in `RdCycleChart` (~:49) |
 | Gated notes | gap note `{ k: "gap" …" average" }` ~:116; ▲/▼ pair `if (!chg && M.key === "tpp" && !nonDefault)` ~:131 |
 | Prop threading | `d1a1d215-…js`: `CycleChart` :1373 (destructures `lifted`) → `<RdCycleChart … liftedN={lifted.size} …>` at :2001-2005 |
-| `useDismissOutside` 4th arg `ignoreSel` | `rd.jsx` + call site `rd-cycles.jsx:340` (chip clicks don't count as "outside") |
+| `useDismissOutside` 4th arg `ignoreSel` | `rd.jsx` + call site in `rd-cycles.jsx` (chip clicks don't count as "outside") |
 | Probe | `.matilda/probe-cyc-chipmove.mjs` (tracked) |
 
 ## The anchor recipe (rd.css)
@@ -52,12 +54,12 @@ inside the band or its pills hug the middle of the column.
 
 **The ≤640px pair**: the anchor reads `--cyc-chip-pad` falling back to
 `--rd-sec-pad` (36px on phones), and the 640-block sets #cyc-tpp's
-`--cyc-chip-pad` AND `padding-top` to 60px so the floating stack still has
-headroom; the same block hides the drawn row's "Drawn over the band"
-label (`.rd-cc-l`) because label + two pills wrap to an ~120px-tall stack
-on a phone — taller than ANY headroom that keeps the default view sane —
-while one pill row stays ~78px and clears the Summary foot above (probe
-asserts `wrapT >= #cyc-summary .rd-foot bottom − 0.6`).
+`--cyc-chip-pad` AND `padding-top` to 60px as a FLOOR so the floating
+stack has headroom; the same block hides the drawn row's "Drawn over the
+band" label (`.rd-cc-l`) because label + two pills wrap to an ~120px-tall
+stack on a phone — taller than ANY headroom that keeps the default view
+sane — while one pill row stays ~78px and clears the Summary foot above
+(probe asserts `wrapT >= #cyc-summary .rd-foot bottom − 0.6`).
 
 - `top: pad+1px` is where the eyebrow's 2px border-top rule sits (its centre).
   `translateY(calc(-100% - 12px))` lifts the whole band so its **bottom edge
@@ -74,9 +76,37 @@ asserts `wrapT >= #cyc-summary .rd-foot bottom − 0.6`).
   works (`rd-cyc-nav` in #cyc-summary uses it for the on-this-page nav).
 - `max-width: 100%` caps the band at the section width; a second or later
   drawn term can still wrap the pills row and the translate keeps the
-  wrapped block's bottom 12px above the rule whatever its height (the
-  single-term state is the one the ≤640px label-hide + headroom pair
-  guarantees clear of the Summary foot).
+  wrapped block's bottom 12px above the rule whatever its height —
+  growing UP out of the section's fixed headroom is exactly the bug the
+  headroom refit below exists for.
+
+## The headroom refit (rd-cycles.jsx `chipmoveRef` + `fit()`)
+
+The band is absolutely positioned — OUT OF FLOW — so once enough terms are
+drawn that the pill row wraps (a phone hits it at ~4 pills, a desktop at
+~6-7), the stack is taller than ANY CSS floor that keeps the default view
+sane, and without help it simply climbs over the Summary section's foot
+content (reader report 2026-10-02: "more than 5 → causes mayhem with the
+text already in the page, e.g. 'how it's built' … the rest of the page
+content is not pushed up"). A layout effect right after the story-floor
+effect in `RdPastCycles` owns it: `fit()` clears its own inline work,
+reads the section's computed `padding-top` as the base floor (56px / 60px
+media default), measures `band.offsetHeight`, and — only when
+`ceil(bandH) + 19 − gap > base + 0.5` — sets `--cyc-chip-pad` and
+`padding-top` inline on `#cyc-tpp` to that figure (19 = 12px above the
+rule + 1px anchor + ~8px spare kept under the previous section's content,
+minus its 2px of section-top arithmetic; `gap` is the measured space
+between the previous section's content bottom and #cyc-tpp's border edge,
+i.e. the inter-section air the stack was previously allowed to borrow —
+36px at ≤640px, 56 above). When the pills unwrap the clause fails and the
+inline pair is GONE again, so the default view never carries a phantom
+gap. The refit re-runs on band ResizeObserver (pills wrapping and
+unwrapping) and on window resize (the 640px floor swap, and pill
+re-wrapping at new widths); the observer target is the band span itself,
+hung as `ref={chipmoveRef}` in the tools JSX. CSS and inline
+`--cyc-chip-pad`/`padding-top` are the same knob — the probe asserts the
+inline var is set once rows wrap and REMOVED once the board is cleared,
+and that `padding-top` returns to ≤60.5px.
 
 ## Band contents (tools JSX)
 
@@ -161,6 +191,17 @@ would crash the `<RdCycleChart>` branch via `lifted.size`.
   `.rd-cc-cur` pill (text `^20\d\d `, NO button); svg loses the three verdict
   strings but keeps `Labor`; unlift via the pill's × → row gone, verdicts
   back.
+- MANY-DRAWN round-trip (the headroom-refit rung, shipped 2026-10-02): click
+  six terms as their own line (one `page.evaluate` loop clicking
+  `.rd-cc-main` — React batches, the one-tick DOM nodes all stay live);
+  assert band top ≥ Summary `.rd-foot` bottom − 0.6, the 12px rule gap
+  holds, no horizontal page overflow, and — once the pills wrap to ≥2 rows —
+  the inline `--cyc-chip-pad` is SET on #cyc-tpp. Then click every drawn
+  pill's × ALL in one synchronous evaluate (React coalesces the unlifts),
+  then assert the drawn row is gone AND
+  `--cyc-chip-pad` was removed from the element's inline style AND
+  computed `padding-top` ≤ 60.5 (the refit let go; the ≤640px floor is
+  60px exactly and must not have been inflated by the fit).
 - Toggle/dismiss round-trip unchanged from 7964e12: chip-close, outside click/
   tap close, board `×` close. At ≤900px `.rd-cc-board` is a FIXED bottom sheet
   hugging up to 75vh — anchor the chip at viewport y≈110 (below the 72px

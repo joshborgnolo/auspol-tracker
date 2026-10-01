@@ -72296,6 +72296,34 @@ function RdPastCycles(p) {
     if (box) [...box.children].forEach(c => ro.observe(c));
     return () => ro.disconnect();
   });
+  const chipmoveRef = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const fit = () => {
+      const band = chipmoveRef.current;
+      const sec = band && band.closest(".rd-sec");
+      const prev = sec && sec.previousElementSibling;
+      if (!sec || !prev) return;
+      sec.style.removeProperty("--cyc-chip-pad");
+      sec.style.removeProperty("padding-top");
+      const base = parseFloat(getComputedStyle(sec).paddingTop) || 0;
+      const prevBtm = prev.getBoundingClientRect().bottom - (parseFloat(getComputedStyle(prev).paddingBottom) || 0);
+      const gap = sec.getBoundingClientRect().top - prevBtm;
+      const need = Math.ceil(band.offsetHeight) + 19 - gap;
+      if (need > base + 0.5) {
+        sec.style.setProperty("--cyc-chip-pad", need + "px");
+        sec.style.paddingTop = need + "px";
+      }
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    if (typeof ResizeObserver === "undefined" || !chipmoveRef.current) return () => window.removeEventListener("resize", fit);
+    const ro = new ResizeObserver(fit);
+    ro.observe(chipmoveRef.current);
+    return () => {
+      window.removeEventListener("resize", fit);
+      ro.disconnect();
+    };
+  }, []);
   const boardRef = React.useRef(null);
   window.useDismissOutside(boardRef, board, () => setBoard(false), ".rd-cyc-chipmove");
   const pinView = () => {
@@ -73167,7 +73195,8 @@ function RdPastCycles(p) {
     title: "Two-party preferred",
     meta: "Implied from each poll\u2019s primary votes, on the flows counted at the election that opened its term",
     tools: React.createElement("span", {
-      className: "rd-cyc-chipmove"
+      className: "rd-cyc-chipmove",
+      ref: chipmoveRef
     }, React.createElement("button", {
       type: "button",
       className: "rd-chip",

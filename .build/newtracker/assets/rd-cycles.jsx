@@ -346,6 +346,40 @@ function RdPastCycles(p) {
     if (box) [...box.children].forEach((c) => ro.observe(c));
     return () => ro.disconnect();
   });
+  /* The Draw-a-term band floats absolutely, out of flow - left alone a
+     tall stack of drawn pills grows up over the previous section's foot
+     instead of lengthening the page. Keep #cyc-tpp's headroom at least as
+     tall as the band, its 12px of air above the rule and an 8px spare
+     under whatever ends the section above: the fit clears its inline
+     work, reads the CSS floor (56/60px media-block default) back as the
+     base, and re-applies only when the measured band needs more. The
+     observer catches the pill rows wrapping and unwrapping; the resize
+     listener catches the 640px floor swap. */
+  const chipmoveRef = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const fit = () => {
+      const band = chipmoveRef.current;
+      const sec = band && band.closest(".rd-sec");
+      const prev = sec && sec.previousElementSibling;
+      if (!sec || !prev) return;
+      sec.style.removeProperty("--cyc-chip-pad");
+      sec.style.removeProperty("padding-top");
+      const base = parseFloat(getComputedStyle(sec).paddingTop) || 0;
+      const prevBtm = prev.getBoundingClientRect().bottom - (parseFloat(getComputedStyle(prev).paddingBottom) || 0);
+      const gap = sec.getBoundingClientRect().top - prevBtm;
+      const need = Math.ceil(band.offsetHeight) + 19 - gap; /* 12 above the rule + 1 anchor + 8 spared, less the gap ahead of the section */
+      if (need > base + 0.5) {
+        sec.style.setProperty("--cyc-chip-pad", need + "px");
+        sec.style.paddingTop = need + "px";
+      }
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    if (typeof ResizeObserver === "undefined" || !chipmoveRef.current) return () => window.removeEventListener("resize", fit);
+    const ro = new ResizeObserver(fit);
+    ro.observe(chipmoveRef.current);
+    return () => { window.removeEventListener("resize", fit); ro.disconnect(); };
+  }, []);
   const boardRef = React.useRef(null);
   /* the board's toggle is rendered on the Two-party section's divider, far
      outside boardRef, so its pointerdown is told apart from a real outside
@@ -948,7 +982,7 @@ function RdPastCycles(p) {
         </div>
       </section>
       <RdSec id="cyc-tpp" title="Two-party preferred" meta="Implied from each poll’s primary votes, on the flows counted at the election that opened its term"
-             tools={<span className="rd-cyc-chipmove">
+             tools={<span className="rd-cyc-chipmove" ref={chipmoveRef}>
                <button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
                {liftedList.length > 0 && (
                  <span className="rd-cc-drawn">

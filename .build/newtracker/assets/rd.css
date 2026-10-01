@@ -101,9 +101,13 @@ body.rd.dark {
      this width its drawn row drops the "Drawn over the band" explainer so
      a term's pills hold one line - that keeps the floating stack ~78px
      tall, more than the 36px headroom this width gives sections, so this
-     one section keeps 60px above its rule (--cyc-chip-pad moves the
+     one section FLOORS at 60px above its rule (--cyc-chip-pad moves the
      band's anchor in step; the previous section's content ends 36px
-     above the boundary, so the stack clears it) */
+     above the boundary, so the stack clears it). The floor is only where
+     rd-cycles.jsx's chipmove refit starts from: when more terms are
+     drawn than one pill row holds it grows the section's padding and
+     the anchor inline, so the stack pushes the page down instead of
+     overlapping the Summary foot above */
   body.rd #cyc-tpp { --cyc-chip-pad: 60px; padding-top: 60px; }
   body.rd .rd-cyc-chipmove .rd-cc-drawn .rd-cc-l { display: none; }
 }
@@ -1578,10 +1582,13 @@ body.rd .rd-cc-row { display: flex; align-items: center; gap: 12px; border-botto
    lands the same at every width (the eyebrow tools slot exists only to
    hang it inside the already-positioned .rd-sec); everything is flush
    with the left edge, and the band stacks down - chip on top, the
-   drawn-terms row directly beneath it. --cyc-chip-pad lets a media block
-   raise where the float anchors from (the 640px block pairs it with the
-   same figure on #cyc-tpp's padding-top so the taller pills stack clears
-   the previous section's foot) */
+   drawn-terms row directly beneath it. --cyc-chip-pad sets where the
+   float anchors from, and #cyc-tpp's padding-top always matches it: the
+   640px block floors the pair at 60px, and rd-cycles.jsx's chipmove
+   refit grows both inline whenever the wrapped pill rows need more
+   headroom than the floor gives (the band is out of flow, so without
+   the refit a tall stack would climb over the previous section's foot
+   instead of pushing the page down) */
 body.rd .rd-cyc-chipmove {
   position: absolute; top: calc(var(--cyc-chip-pad, var(--rd-sec-pad)) + 1px); left: 0; z-index: 1;
   transform: translateY(calc(-100% - 12px));

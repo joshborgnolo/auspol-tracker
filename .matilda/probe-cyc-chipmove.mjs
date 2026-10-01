@@ -158,8 +158,9 @@ async function run(W, H, touch) {
        it, both ends flush with the eyebrow's left edge */
     if (afterLift.chipB > afterLift.drawnT + 1) fails.push(tag + ": the chip is not above the drawn row (chip bottom " + afterLift.chipB.toFixed(1) + " > drawn top " + afterLift.drawnT.toFixed(1) + ")");
     if (Math.abs(afterLift.drawnL - afterLift.ebLeft) > 1.5) fails.push(tag + ": drawn row left edge " + afterLift.drawnL.toFixed(1) + " != eyebrow left edge " + afterLift.ebLeft.toFixed(1));
-    /* the stack's top must stay clear of the Summary section's foot (the
-       640px block widens #cyc-tpp's headroom to make this hold) */
+    /* the stack's top must stay clear of the Summary section's foot - the
+       640px floor gives the headroom at this width, and the chipmove
+       refit grows it inline whenever the wrapped pills need more */
     if (afterLift.footB != null && afterLift.wrapT < afterLift.footB - 0.6) fails.push(tag + ": band top " + afterLift.wrapT.toFixed(1) + " overlaps the Summary foot (bottom " + afterLift.footB.toFixed(1) + ")");
     const past = afterLift.pills.filter((p) => !p.cur);
     if (!past.some((p) => p.text.indexOf(picked) === 0 && p.btn)) fails.push(tag + ": no unliftable pill for the lifted " + picked + " term (pills: " + afterLift.pills.map((p) => p.text).join(" | ") + ")");
@@ -192,6 +193,69 @@ async function run(W, H, touch) {
   if (restored.drawn) fails.push(tag + ": the drawn-over-the-band row survived its only term being returned");
   if (!/Government ahead/.test(restored.svg)) fails.push(tag + ": the ahead pair did not return when the lifted term went back to the band");
   if (!/(above|below) average/.test(restored.svg)) fails.push(tag + ": the above/below-average reading did not return with the lifted term");
+
+  /* many terms drawn at once: the pills wrap to several rows, and the band
+     is out of flow - the chipmove refit must grow #cyc-tpp's headroom in
+     step so the tall stack pushes the page down instead of climbing over
+     the Summary section's foot above. Then, back to zero drawn terms, the
+     inline growth must go away (the 640px floor handles the phone's
+     single-row case, so nothing clever should pin below one wrapped row) */
+  if (!(await boardOpen())) { await page.click(chipSel); await sleep(300); }
+  const manyYears = await page.evaluate(() => {
+    const mains = Array.from(document.querySelectorAll(".rd-cc-term:not(.current) .rd-cc-main"));
+    const got = [];
+    for (const m of mains) {
+      if (got.length >= 6) break;
+      const y = m.querySelector("b").textContent.trim();
+      m.click();
+      got.push(y);
+    }
+    return got;
+  });
+  await sleep(400);
+  const afterMany = await page.evaluate(() => {
+    const q = (s) => document.querySelector(s);
+    const sec = q("#cyc-tpp");
+    const wrap = q("#cyc-tpp .rd-cyc-chipmove");
+    const foot = q("#cyc-summary .rd-foot");
+    const drawn = q("#cyc-tpp .rd-cc-drawn");
+    const eb = q("#cyc-tpp .rd-eyebrow");
+    const ebs = getComputedStyle(eb);
+    const r = (el) => el.getBoundingClientRect();
+    const rows = drawn ? (() => { const tops = new Set(); drawn.querySelectorAll(".rd-cc-pill").forEach((p) => tops.add(Math.round(p.getBoundingClientRect().top))); return tops.size; })() : 0;
+    return {
+      rows,
+      padTop: parseFloat(getComputedStyle(sec).paddingTop),
+      varPad: sec.style.getPropertyValue("--cyc-chip-pad"),
+      wrapT: r(wrap).top,
+      wrapB: r(wrap).bottom,
+      ruleY: r(eb).top + parseFloat(ebs.borderTopWidth) / 2,
+      footB: foot ? r(foot).bottom : null,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  });
+  if (manyYears.length < 3) fails.push(tag + ": could not lift enough terms for the many-drawn case (" + manyYears.length + ")");
+  if (afterMany.wrapT < (afterMany.footB == null ? -Infinity : afterMany.footB - 0.6)) fails.push(tag + ": with six terms drawn, band top " + afterMany.wrapT.toFixed(1) + " climbs over the Summary foot (bottom " + (afterMany.footB == null ? "n/a" : afterMany.footB.toFixed(1)) + ")");
+  if (afterMany.rows >= 2 && !afterMany.varPad) fails.push(tag + ": the drawn pills wrapped to " + afterMany.rows + " rows but --cyc-chip-pad was never raised inline");
+  if (Math.abs(afterMany.ruleY - afterMany.wrapB - 12) > 1.6) fails.push(tag + ": with six terms drawn, band bottom sits " + (afterMany.ruleY - afterMany.wrapB).toFixed(1) + "px above the divider, not ~12px");
+  if (afterMany.overflow > 0) fails.push(tag + ": six drawn terms caused horizontal page overflow (" + afterMany.overflow + "px)");
+  /* and the fit lets go again when the board is cleared */
+  await page.evaluate(() => {
+    const chips = Array.from(document.querySelectorAll("#cyc-tpp .rd-cyc-chipmove .rd-cc-pill:not(.rd-cc-cur) button"));
+    chips.forEach((b) => b.click());
+  });
+  await sleep(400);
+  const afterClear = await page.evaluate(() => {
+    const sec = document.querySelector("#cyc-tpp");
+    return {
+      drawn: !!document.querySelector("#cyc-tpp .rd-cc-drawn"),
+      varPad: sec.style.getPropertyValue("--cyc-chip-pad"),
+      padTop: parseFloat(getComputedStyle(sec).paddingTop),
+    };
+  });
+  if (afterClear.drawn) fails.push(tag + ": unlifting every pill did not drop the drawn row");
+  if (afterClear.varPad) fails.push(tag + ": --cyc-chip-pad still pinned at " + afterClear.varPad + " after every drawn term returned");
+  if (afterClear.padTop > 60.5) fails.push(tag + ": #cyc-tpp padding stayed grown at " + afterClear.padTop + "px after every drawn term returned");
 
   /* toggle round-trip: open; second chip click must close (the dismiss
      hook would otherwise swallow the toggle); outside click/tap must close
