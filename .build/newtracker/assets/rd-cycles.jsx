@@ -45,6 +45,13 @@ function rdUseOutgoing(k, value, ms = (window.AP && window.AP.MORPH_MS || 320) +
 const rdOrd = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th");
 const rdSgn = (v, unit) => (unit ? "" : v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
 
+/* The dotted stroke of a term's lead-in run from its election-day anchor to
+   its first poll - interpolation out of a counted result, not a month nobody
+   polled. Same stroke the by-state panels use to bridge an election mark to
+   the first polled month (RD_ELECTION_LEAD), so the two reference-line kinds
+   read the same way wherever they appear. */
+const RD_CYC_LEAD = "0.5 4";
+
 /* ---- one chart, in the redesign's frame --------------------------------- */
 function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evIn, badged, domain, ticks, cur, hidden, liftedN, narrow, half,
                         hanCtl, showHan, setHan, showOnp, setOnp, showComb, setComb, tipCycle, banded, bandN, isOpp, terms, outcomeShown, rings }) {
@@ -67,6 +74,11 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
   /* the series, in the redesign's weights and words */
   const series = built.map((s) => {
     if (s.id === "cyc-band-mean") return { ...s, label: "Past-term average", dash: "4 3", rdWidth: 1.5, endLabel: "Average", endLabelOpacity: 1 };
+    /* the election-to-first-poll lead-in: dotted, never solid, and ahead of
+       the current-term branch so this term's own lead dots too. The stroke
+       is what changes - the run still rides its line's colour, weight and
+       opacity, fades in and out with it, and keeps the line's tooltip. */
+    if (s.lead) return { ...s, dash: RD_CYC_LEAD };
     if (s.current) return { ...s, rdWidth: 3, rdCap: 4, endLabel: null };
     /* The "this term" overlays (One Nation's primary vote, the combined
        L/NP+One Nation sum, Hanson's rating) are the old design's thin
@@ -139,15 +151,13 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
      brought to this card. Change mode draws no ring (the "Result" rule
      says it) but keeps them all unseen at their change-basis positions,
      so on the switch each fades where it is rather than popping away.
-     The primary cards still ring the sitting term alone, in ink, awaiting
-     their own pass - leaving their old block untouched below. */
+     rt.close carries a value per vote CARD (tpp, primary, oppr). */
   if (rings) rings.forEach((rt) => {
     const op = (chg ? 0 : 1) * rt.opacity;
-    marks.push({ k: "base-" + rt.yr, x: 0, y: chg ? 0 : rt.base, r: 5, color: rt.color, opacity: op });
-    if (rt.close) marks.push({ k: "close-" + rt.yr, x: rt.close.x, y: chg ? rt.close.tpp - rt.base : rt.close.tpp, r: 5, color: rt.color, opacity: op });
+    if (rt.base != null) marks.push({ k: "base-" + rt.yr, x: 0, y: chg ? 0 : rt.base, r: 5, color: rt.color, opacity: op });
+    const cv = rt.close && rt.close[M.key];
+    if (cv != null) marks.push({ k: "close-" + rt.yr, x: rt.close.x, y: chg ? cv - rt.base : cv, r: 5, color: rt.color, opacity: op });
   });
-  if (cur && !hidden.has(cur.year) && (M.key === "primary" || M.key === "oppr") && cur.base[M.key] != null)
-    marks.push({ k: "base", x: 0, y: chg ? 0 : cur.base[M.key], r: 5, ...(chg ? { opacity: 0 } : {}) });
   const brackets = peer && curVal != null && Math.abs(d) >= 0.3 ? [{ x: nowM, y0: curVal, y1: peer.mean, dx: 5, lines: [] }] : [];
   const refY = chg ? 0 : M.refAbs;
   const refLines = refY != null ? [{ y: refY, color: "var(--ink-faint)" }] : [];
@@ -863,7 +873,7 @@ function RdPastCycles(p) {
       {sec === "tpp" && <span className="rd-key-item"><RdSwatch kind="line" color={cur.color} />The {cur.year} term, monthly</span>}
       {sec === "primary" && <span className="rd-key-item">{twoLines(D.PARTIES[cur.gov].color, D.PARTIES[cur.opp].color)}The {cur.year} term: {govName}, {oppIn}</span>}
       {sec === "leaders" && <span className="rd-key-item">{twoLines(D.PARTIES[cur.gov].color, D.PARTIES[cur.opp].color)}The {cur.year} term: {pm}, the opposition leader</span>}
-      {(sec === "tpp" || sec === "primary") && <span className="rd-key-item"><RdSwatch kind="ring" />{sec === "tpp" ? "Each term’s election results" : (cur.year + " election result")}</span>}
+      {(sec === "tpp" || sec === "primary") && <span className="rd-key-item"><RdSwatch kind="ring" />Each term’s election results</span>}
     </RdKey>
   );
   /* the list reads as one sentence, "and" before the last and no commas */
@@ -925,7 +935,7 @@ function RdPastCycles(p) {
         <div className="rd-cyc-one">{chart("tpp", false)}</div>
         {bandKey("tpp")}
         <RdFoot how={{ term: "last-election-flows", from: "Past cycles" }}>
-          Every line is the implied two-party figure: each poll’s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The {cur.year} term follows the rival {govName} is doing worst against, as the headline does.
+          Every line is the implied two-party figure: each poll’s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The {cur.year} term follows the rival {govName} is doing worst against, as the headline does. Each line’s dotted start runs from the election’s counted result to the term’s first poll.
         </RdFoot>
       </RdSec>
       <RdSec id="cyc-primary" title="Primary vote" meta="First preferences for the governing party and the main opposition party">
@@ -934,7 +944,7 @@ function RdPastCycles(p) {
         <RdEventList list={PAIRS.primary.list} inline />
         {bandKey("primary")}
         <RdFoot how={{ term: "what-am-i-looking-at", from: "Past cycles" }}>
-          Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed.
+          Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed. The dotted start of each line runs from the election’s counted result to the term’s first poll.
         </RdFoot>
       </RdSec>
       <RdSec id="cyc-leaders" title="Leadership" meta="Net approval since 1972 and preferred PM since 1984, for whoever held the office">

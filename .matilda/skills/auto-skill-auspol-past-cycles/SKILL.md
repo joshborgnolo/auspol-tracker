@@ -1154,48 +1154,95 @@ mouseover path, so a dispatched bubbling mouseover opens the tip where
 puppeteer's `hover()` misses) and asserts the tag iff the set duplicates
 the name - no hardcoded duplicate list to rot.
 
-## Election-result rings on the redesign 2PP card (2026-10-01)
+## Election-result rings + dotted lead-in on the redesign vote cards (2026-10-01)
 
-Every term DRAWN on the 2PP card rings BOTH its elections - the opening
-at x=0 and the closing at the next election's counted result - each
-ring in its own line's colour, the hero's rule brought to this card.
-The old single ink ring for the sitting term alone is GONE on tpp; the
-two primary cards keep theirs (ink, sitting term only) awaiting their
-own pass - primary-vote sourcing was deferred by the user ("do that in
-another step", 2026-10-01).
+Every term DRAWN on the THREE vote cards (tpp, government primary,
+opposition primary) rings BOTH its elections - the opening at x=0 and
+the closing at the next election's counted result - each ring in its
+own line's colour on that card (colorOf, so the oppr card's rings wear
+the opposition party's paint, matching its lines). The leadership cards
+keep none. The single ink ring for the sitting term alone is GONE
+everywhere. The lead-in run from the election-day anchor to the term's
+first polled month draws DOTTED where the underlying node is
+interpolated.
 
-- **Data**: `gen-data.mjs` builds `endRes` (~:3772) -
+- **Data**: `gen-data.mjs` `endRes` (~:3790) -
   `eClose = c.current ? null : ELECTIONS["e" + c.src]`, then
-  `{ x: monthsSince(termStart, eClose.date), tpp: eClose["tpp_" + c.gov] }`
-  - spread into CYCLE_DEFS (:3807) and the runtime `cycles` map (:4655).
-  The sitting term gets none; a drawn past line WITHOUT a closing ring
-  means the served index.html predates the gen-data rebuild (stale
-  data), not intent.
-- **Collection**: d1a1d215 CycleChart builds `ringTerms`
-  (`M.key === "tpp"` only, :1529-1554) inside the drawnCycles walk -
-  `{ yr, color: colorOf(c), opacity, base, close: c.endRes || null }` -
-  and passes `rings={ringTerms}` to RdCycleChart (:2004).
-- **Marks**: rd-cycles.jsx :132-146 - per term `{k:"base-"+yr, x:0}` and,
-  when `rt.close`, `{k:"close-"+yr, x:rt.close.x}`; opacity
-  `(chg ? 0 : 1) * rt.opacity` so Level->Change fades every ring where
-  it is (the "Result" zero rule) instead of popping it away. The
-  primary/oppr ink ring is the untouched old block directly below.
-- **Key copy**: rd-cycles.jsx :871 - tpp reads "Each term's election
-  results", primary keeps "{year} election result".
+  `{ x: monthsSince(eClose.date, c.eDate), tpp, primary, oppr }` -
+  primary is the card's GOVERNMENT-side count, oppr the opposition's,
+  each keyed off `c.gov`/`c.opp` so the per-CARD value rides the same
+  object. Spread into CYCLE_DEFS (:3824) and the runtime `cycles` map
+  (:4672). The sitting term gets none; a drawn past line WITHOUT a
+  closing ring means the served index.html predates the gen-data
+  rebuild (stale data), not intent.
+- **Canonical primaries, single-sourced**: CYC_META rows no longer
+  carry `ePrim`/`eTpp` literals (gen-data.mjs ~:3507) - the derive
+  loop right under the array reads `c.ePrim = ELECTIONS["e"+year][gov]`
+  and `c.eTpp = ["tpp_"+gov]` from the polls.json elections table,
+  whose 21 alp/lnp primaries are the AEC two-decimal shares. The strip
+  retired three outright disagreements the literals had carried: 1996's
+  Coalition primary 46.9 -> 47.25, 1998's 39.2 -> 39.52, and 1974's
+  44.9 (the summary-table figure that drops WA's National Alliance).
+  Every past term's opening anchor moved to the counted figure in the
+  same pass.
+- **Collection**: d1a1d215 CycleChart builds `ringTerms` gated
+  `M.key === "tpp" || "primary" || "oppr"` (:1528) inside the
+  drawnCycles walk - `{ yr, color: colorOf(c), opacity, base, close:
+  c.endRes || null }` (:1553) - and passes `rings={ringTerms}` to
+  RdCycleChart (:2010).
+- **Marks**: rd-cycles.jsx :139-147 - per term `{k:"base-"+yr, x:0,
+  y:base}` and, when `rt.close[M.key] != null`, `{k:"close-"+yr,
+  x:rt.close.x, y:rt.close[M.key]}`; opacity `(chg ? 0 : 1) *
+  rt.opacity` so Level->Change fades every ring where it is (the
+  "Result" zero rule) instead of popping it away. The change-basis y of
+  the close ring is `close - base`.
+- **Dotted lead-in**: d1a1d215 obsRuns emission sets
+  `lead: ringTerms != null && run.dashed && run.points[0].x === 0`
+  (:1590) - the ringTerms gate is deliberate: VOTE CARDS ONLY. A leader
+  line starts at its first reading, not a counted result, so its
+  leftmost dashed stretch is just another gap. rd-cycles.jsx
+  `RD_CYC_LEAD = "0.5 4"` (:53) in the series restyle ladder (:77),
+  AHEAD of the current-term branch so the sitting term's own lead dots
+  too; only the stroke changes - the run keeps its line's colour,
+  weight, opacity and tooltip, and fades with the line. The mean's
+  "4 3" branch sits before it (:79). Distinct from the interior
+  gap-dash "6 6" and user-specified to match the by-state panels'
+  RD_ELECTION_LEAD. The trailing stretch after a term's last poll is
+  NOT special-cased (user call: "nothing to be interpolated there,
+  it's just error").
+- **Which cycles dot**: only terms whose month-1 node is interpolated
+  (raw vals non-null, obs flag false) - as of 2026-10-01 that's 1972
+  (plus an interior interp at month 13), 1984, 2001, 2019; 1974 month 6
+  and 1980 month 14 are interior gaps, not lead-ins, so they draw "6 6"
+  not dotted. The 2025 term's own lead is SOLID in current data
+  (month-1 node observed) - a default-view dotted assert would be
+  vacuous.
+- **Key copy**: rd-cycles.jsx :883 - one `.rd-key-item` ("Each term's
+  election results", RdSwatch kind="ring") covers BOTH vote sections
+  (`sec === "tpp" || sec === "primary"`).
 
-Probe: `.matilda/probe/cyc-rings.mjs` (21 checks x {1280,390}; curated,
-`git add -f`). Four traps it pins, each learnt live:
+Probe: `.matilda/probe/cyc-rings.mjs` (~90 checks x {1280,390};
+curated, `git add -f`). Default view + a 2019 lift (its month-1 node
+is interpolated on all three vote cards, exercising the dotted lead)
++ a 1996 lift (its endRes carries the canonical 2dp primaries,
+exercising the per-card close rings) + Level->Change fade +
+unlift. Dash counts are never hardcoded - the probe replays obsRuns
+verbatim over the drawn cycles' obs flags (`tppEras`-aware) and diffs
+the DOM's "0.5 4"/"6 6" counts against it. Traps it pins, all learnt
+live:
 
 - the peer-mean dot `{k:"mean", color:"var(--ink-2)"}` (rd-cycles.jsx
-  :132) rides the same `.rd-mark > circle.rd-ring` DOM - filter
+  :139) rides the same `.rd-mark > circle.rd-ring` DOM - filter
   `stroke === "var(--ink-2)"` out before counting election rings;
 - the FIRST `#cyc-tpp path.series-line` is the MEAN dashed reference
-  line, not the sitting term - assert the ring's computed stroke against
-  ALL line strokes;
+  line (`cyc-band-mean`), not the sitting term - assert ring strokes
+  against ALL line strokes;
 - px(dataX) derives from least-squares over the rendered
   `text.axis-label.x` tick labels ({Election:0, 1 yr:12, 2 yrs:24,
   3 yrs:36}) - the "Now" tick's data x is unknown, exclude it;
+- page.evaluate cannot return functions - return the fit COEFFICIENTS
+  and rebuild px/py Node-side;
 - a sibling commit carrying the rd-cycles/d1a1d215 UI WITHOUT the
   gen-data rebuild leaves closing rings silently skipped
-  (`c.endRes || null`) - the probe's "the data landed" check fails that
-  loudly. See auto-skill-shared-repo-session-race.
+  (`c.endRes || null`) - the probe's "the data landed" check fails
+  that loudly. See auto-skill-shared-repo-session-race.

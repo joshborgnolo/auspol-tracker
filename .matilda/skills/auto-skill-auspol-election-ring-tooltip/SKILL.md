@@ -160,3 +160,32 @@ Gotchas pinned by the probes:
   `state-election-rings.mjs` (105 checks, committed fb824bf) pins the
   state rings; `election-ring.mjs` (hero/primary) is the regression
   sibling — run both after ANY TrendChart tooltip change.
+
+## Fourth ring consumer: Past-cycles vote-card per-term rings (2026-10-01)
+
+The redesign Past-cycles vote cards — 2PP, government primary and
+opposition primary — ring EVERY drawn term at both its elections:
+opening at x=0, closing at the next election's counted result, each in
+its line's own colour on that card (the opposition card's rings wear
+the opposition party's paint via `colorOf`'s isOpp branch). The hero
+rule generalised, reaching each mark with `color` set (never the ink
+CSS default). The TrendChart renderer contract is untouched. Data
+shape `endRes = { x, tpp, primary, oppr }` (gen-data ~:3790, the
+primary/oppr counts keyed off `c.gov`/`c.opp` so all three vote cards
+close the SAME term on their own measure) → `ringTerms` collection
+gated to the three vote keys (d1a1d215 :1528, :1553) → `rings=` prop →
+per-term marks reading `rt.close[M.key]` in rd-cycles.jsx :139-147.
+The same door carries the vote cards' DOTTED lead-in: obsRuns flags
+`lead: ringTerms != null && run.dashed && run.points[0].x === 0`
+(d1a1d215 :1590 — the ringTerms gate is what keeps leader cards
+dotless) and rd-cycles restyles it `RD_CYC_LEAD = "0.5 4"` (:53, :77),
+matching the by-state panels' RD_ELECTION_LEAD. Full map, the
+ePrim/eTpp elections-table single-sourcing and the data fixes it
+retired (1996/1998/1974), the fade-in-place change-mode rule, which
+cycles actually dot (1972/1984/2001/2019 as of 2026-10-01) and the
+probe traps (the peer-mean dot shares `.rd-mark`, first series-line is
+the mean line, tick-label px fit, stale-data silhouette) live in
+auto-skill-auspol-past-cycles "Election-result rings + dotted lead-in
+on the redesign vote cards". Probe: `.matilda/probe/cyc-rings.mjs`
+(~90 × {1280,390} — the 2019 lift exercises the dotted lead, the 1996
+lift the canonical 2dp close rings).

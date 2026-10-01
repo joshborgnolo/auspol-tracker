@@ -3446,14 +3446,14 @@ const CYC_META = [
      series is the IMPLIED last-election-flows figure (FLOW_ERAS in flows.mjs,
      tppEra-tagged rows), not anything Morgan itself published — the method
      note lives in cyclePollBases. ePrim/eTpp are the governing side's
-     official result, same as every row below. */
-  { year: 1972, gov: "alp", opp: "lnp", pm: "Whitlam", lead: "Whitlam", oppLead: "McMahon → Snedden", eDate: "1972-12-02", ePrim: 49.6, eTpp: 52.7, src: 1974, appr: 1972,
+     official result, filled in from the elections table below the array. */
+  { year: 1972, gov: "alp", opp: "lnp", pm: "Whitlam", lead: "Whitlam", oppLead: "McMahon → Snedden", eDate: "1972-12-02", src: 1974, appr: 1972,
     oppSpl: { iso: "1972-12-20", names: ["McMahon", "Snedden"] } },
   /* The dismissal: Fraser was caretaker PM from 11 Nov 1975 to the 13 Dec
      election, with Whitlam leading the opposition — and the Morgan Gallup
      column rated them in those roles for those five weeks. Both offices
      split on the day, so the last month's readings sit on the right lines. */
-  { year: 1974, gov: "alp", opp: "lnp", pm: "Whitlam → Fraser", lead: "Whitlam", oppLead: "Snedden → Fraser → Whitlam", eDate: "1974-05-18", ePrim: 49.3, eTpp: 51.7, src: 1975, appr: 1974,
+  { year: 1974, gov: "alp", opp: "lnp", pm: "Whitlam → Fraser", lead: "Whitlam", oppLead: "Snedden → Fraser → Whitlam", eDate: "1974-05-18", src: 1975, appr: 1974,
     pmSpl: { iso: "1975-11-11", names: ["Whitlam", "Fraser"] },
     oppSpl: { isos: ["1975-03-21", "1975-11-11"], names: ["Snedden", "Fraser", "Whitlam"] } },
   /* Whitlam led the opposition for the whole 1975 term; Hayden replaced him
@@ -3461,48 +3461,61 @@ const CYC_META = [
      the 1977 row, the way McMahon → Snedden (1972) and Shorten → Albanese
      (2019) do. It used to sit here dated 1977-02-10, a date nothing
      happened on. */
-  { year: 1975, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Whitlam", eDate: "1975-12-13", ePrim: 53.1, eTpp: 55.7, src: 1977, appr: 1975 },
-  { year: 1977, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Whitlam → Hayden", eDate: "1977-12-10", ePrim: 48.1, eTpp: 54.6, src: 1980, appr: 1977,
+  { year: 1975, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Whitlam", eDate: "1975-12-13", src: 1977, appr: 1975 },
+  { year: 1977, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Whitlam → Hayden", eDate: "1977-12-10", src: 1980, appr: 1977,
     oppSpl: { iso: "1977-12-22", names: ["Whitlam", "Hayden"] } },
   // Hawke took the leadership on 3 Feb 1983, the morning Fraser called the election
-  { year: 1980, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Hayden → Hawke", eDate: "1980-10-18", ePrim: 46.4, eTpp: 50.4, src: 1983, appr: 1980,
+  { year: 1980, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Hayden → Hawke", eDate: "1980-10-18", src: 1983, appr: 1980,
     oppSpl: { iso: "1983-02-03", names: ["Hayden", "Hawke"] } },
-  { year: 1983, gov: "alp", opp: "lnp", pm: "Hawke", lead: "Hawke", oppLead: "Fraser → Peacock", eDate: "1983-03-05", ePrim: 49.5, eTpp: 53.2, src: 1984, appr: 1983,
+  { year: 1983, gov: "alp", opp: "lnp", pm: "Hawke", lead: "Hawke", oppLead: "Fraser → Peacock", eDate: "1983-03-05", src: 1984, appr: 1983,
     oppSpl: { iso: "1983-03-11", names: ["Fraser", "Peacock"] } },
-  { year: 1984, gov: "alp", opp: "lnp", pm: "Hawke", lead: "Hawke", oppLead: "Peacock → Howard", eDate: "1984-12-01", ePrim: 47.6, eTpp: 51.8, src: 1987, appr: 1984,
+  { year: 1984, gov: "alp", opp: "lnp", pm: "Hawke", lead: "Hawke", oppLead: "Peacock → Howard", eDate: "1984-12-01", src: 1987, appr: 1984,
     oppSpl: { iso: "1985-09-05", names: ["Peacock", "Howard"] } },
-  { year: 1987, gov: "alp", opp: "lnp", pm: "Hawke", lead: "Hawke", oppLead: "Howard → Peacock", eDate: "1987-07-11", ePrim: 45.8, eTpp: 50.8, src: 1990, appr: 1987,
+  { year: 1987, gov: "alp", opp: "lnp", pm: "Hawke", lead: "Hawke", oppLead: "Howard → Peacock", eDate: "1987-07-11", src: 1990, appr: 1987,
     oppSpl: { iso: "1989-05-09", names: ["Howard", "Peacock"] } },
-  { year: 1990, gov: "alp", opp: "lnp", pm: "Hawke → Keating", lead: "Hawke", oppLead: "Hewson", eDate: "1990-03-24", ePrim: 39.4, eTpp: 49.9, src: 1993, appr: 1990,
+  { year: 1990, gov: "alp", opp: "lnp", pm: "Hawke → Keating", lead: "Hawke", oppLead: "Hewson", eDate: "1990-03-24", src: 1993, appr: 1990,
     pmSpl: { iso: "1991-12-19", names: ["Hawke", "Keating"] } },
-  { year: 1993, gov: "alp", opp: "lnp", pm: "Keating", lead: "Keating", oppLead: "Hewson → Downer → Howard", eDate: "1993-03-13", ePrim: 44.9, eTpp: 51.4, src: 1996, appr: 1993,
+  { year: 1993, gov: "alp", opp: "lnp", pm: "Keating", lead: "Keating", oppLead: "Hewson → Downer → Howard", eDate: "1993-03-13", src: 1996, appr: 1993,
     oppSpl: { isos: ["1994-05-23", "1995-01-30"], names: ["Hewson", "Downer", "Howard"] } },
-  { year: 1996, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Beazley", eDate: "1996-03-02", ePrim: 46.9, eTpp: 53.6, src: 1998, appr: 1996 },
-  { year: 1998, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Beazley", eDate: "1998-10-03", ePrim: 39.2, eTpp: 49.0, src: 2001, appr: 1998 },
-  { year: 2001, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Beazley → Crean → Latham", eDate: "2001-11-10", ePrim: 43.0, eTpp: 51.0, src: 2004, appr: 2001,
+  { year: 1996, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Beazley", eDate: "1996-03-02", src: 1998, appr: 1996 },
+  { year: 1998, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Beazley", eDate: "1998-10-03", src: 2001, appr: 1998 },
+  { year: 2001, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Beazley → Crean → Latham", eDate: "2001-11-10", src: 2004, appr: 2001,
     oppSpl: { isos: ["2001-11-22", "2003-12-02"], names: ["Beazley", "Crean", "Latham"] } },
-  { year: 2004, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Latham → Beazley → Rudd", eDate: "2004-10-09", ePrim: 46.7, eTpp: 52.7, src: 2007, appr: 2004,
+  { year: 2004, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Latham → Beazley → Rudd", eDate: "2004-10-09", src: 2007, appr: 2004,
     oppSpl: { isos: ["2005-01-28", "2006-12-04"], names: ["Latham", "Beazley", "Rudd"] } },
-  { year: 2007, gov: "alp", opp: "lnp", pm: "Rudd → Gillard", lead: "Rudd", oppLead: "Nelson → Turnbull → Abbott", eDate: "2007-11-24", ePrim: 43.4, eTpp: 52.7, src: 2010, appr: 2007,
+  { year: 2007, gov: "alp", opp: "lnp", pm: "Rudd → Gillard", lead: "Rudd", oppLead: "Nelson → Turnbull → Abbott", eDate: "2007-11-24", src: 2010, appr: 2007,
     pmSpl: { iso: "2010-06-24", names: ["Rudd", "Gillard"] },
     oppSpl: { isos: ["2008-09-16", "2009-12-01"], names: ["Nelson", "Turnbull", "Abbott"] } },
-  { year: 2010, gov: "alp", opp: "lnp", pm: "Gillard → Rudd", lead: "Gillard", oppLead: "Abbott", eDate: "2010-08-21", ePrim: 38.0, eTpp: 50.1, src: 2013, appr: 2010,
+  { year: 2010, gov: "alp", opp: "lnp", pm: "Gillard → Rudd", lead: "Gillard", oppLead: "Abbott", eDate: "2010-08-21", src: 2013, appr: 2010,
     pmSpl: { iso: "2013-06-27", names: ["Gillard", "Rudd"] } },
-  { year: 2013, gov: "lnp", opp: "alp", pm: "Abbott → Turnbull", lead: "Abbott", oppLead: "Shorten", eDate: "2013-09-07", ePrim: 45.6, eTpp: 53.5, src: 2016, appr: 2013,
+  { year: 2013, gov: "lnp", opp: "alp", pm: "Abbott → Turnbull", lead: "Abbott", oppLead: "Shorten", eDate: "2013-09-07", src: 2016, appr: 2013,
     pmSpl: { iso: "2015-09-15", names: ["Abbott", "Turnbull"] } },
-  { year: 2016, gov: "lnp", opp: "alp", pm: "Turnbull → Morrison", lead: "Turnbull", oppLead: "Shorten", eDate: "2016-07-02", ePrim: 42.0, eTpp: 50.4, src: 2019, appr: 2016,
+  { year: 2016, gov: "lnp", opp: "alp", pm: "Turnbull → Morrison", lead: "Turnbull", oppLead: "Shorten", eDate: "2016-07-02", src: 2019, appr: 2016,
     pmSpl: { iso: "2018-08-24", names: ["Turnbull", "Morrison"] },
     oppSpl: { iso: "2019-05-27", names: ["Shorten", "Albanese"] } },
   /* Shorten → Albanese carries the iso here (like every other mid-term
      opposition change) because the preferred-PM pairing eras need it to
      name themselves; for the approval panels his era holds no post-
      election readings, so the eras collapse to one and nothing redraws. */
-  { year: 2019, gov: "lnp", opp: "alp", pm: "Morrison", lead: "Morrison", oppLead: "Shorten → Albanese", eDate: "2019-05-18", ePrim: 41.44, eTpp: 51.53, src: 2022, appr: 2019,
+  { year: 2019, gov: "lnp", opp: "alp", pm: "Morrison", lead: "Morrison", oppLead: "Shorten → Albanese", eDate: "2019-05-18", src: 2022, appr: 2019,
     oppSpl: { iso: "2019-05-27", names: ["Shorten", "Albanese"] } },
-  { year: 2022, gov: "alp", opp: "lnp", pm: "Albanese", lead: "Albanese", oppLead: "Dutton", eDate: "2022-05-21", ePrim: 32.6, eTpp: 52.1, src: 2025, appr: 2022 },
-  { year: 2025, gov: "alp", opp: "lnp", pm: "Albanese", lead: "Albanese", oppLead: "Ley → Taylor", current: true, eDate: "2025-05-03", ePrim: 34.6, eTpp: 55.2,
+  { year: 2022, gov: "alp", opp: "lnp", pm: "Albanese", lead: "Albanese", oppLead: "Dutton", eDate: "2022-05-21", src: 2025, appr: 2022 },
+  { year: 2025, gov: "alp", opp: "lnp", pm: "Albanese", lead: "Albanese", oppLead: "Ley → Taylor", current: true, eDate: "2025-05-03",
     oppSpl: { iso: OPP_SPLICE_ISO, names: ["Ley", "Taylor"] } },
 ];
+/* The opening result a term's vote lines anchor to is read from the one
+   canonical home - the elections table in polls.json, whose alp/lnp primaries
+   are the AEC two-decimal first-preference shares: ePrim is the governing
+   side's primary and eTpp its two-party share at the election that STARTED
+   the term. These used to be per-row literals above; they carried rounding,
+   and three disagreed with the AEC figure outright (1996's Coalition primary
+   sat at 46.9 against 47.25, 1998's at 39.2 against 39.52, and 1974's held
+   the summary-table 44.9 that drops WA's National Alliance). */
+for (const c of CYC_META) {
+  const e = ELECTIONS["e" + c.year];
+  c.ePrim = e[c.gov];
+  c.eTpp = e["tpp_" + c.gov];
+}
 /* A term that changed leaders mid-stream is not one line. The pooled net /
    oppnet series stay (they fit the domain, the change-since base and the
    peer average), and beside them each person gets his own monthly run, built
@@ -3769,12 +3782,16 @@ const CYCLE_DEFS = CYC_META.map((c) => {
   const prim = cycleSeries(primPts, c.ePrim, cap);
   const tpp = cycleSeries(tppPts, c.eTpp, cap);
   const eOpp = ELECTIONS["e" + c.year];             // the election that STARTED the term
-  // and the one that ENDED it, for the past-cycles election rings: the 2PP
-  // card rings both counts against each drawn term's line. The sitting term
-  // has none - its result is uncounted.
+  // and the one that ENDED it, for the past-cycles election rings: the vote
+  // cards ring both counts against each drawn term's line - the 2PP card its
+  // two-party share, and the two primary cards each side's first preferences
+  // (primary/oppr name the CARD, so primary is the government's figure and
+  // oppr the opposition's, whoever held which office). The sitting term has
+  // none - its result is uncounted.
   const eClose = c.current ? null : ELECTIONS["e" + c.src];
   const endRes = eClose && eClose["tpp_" + c.gov] != null
-    ? { x: +monthsSince(eClose.date, c.eDate).toFixed(3), tpp: eClose["tpp_" + c.gov] }
+    ? { x: +monthsSince(eClose.date, c.eDate).toFixed(3), tpp: eClose["tpp_" + c.gov],
+        primary: eClose[c.gov], oppr: eClose[c.opp] }
     : null;
   const oppr = cycleSeries(oppPrimPts, eOpp[c.opp], cap);
   /* One Nation's overlay keeps the vote-series machinery but its history has

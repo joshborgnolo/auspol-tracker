@@ -1521,12 +1521,11 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
      control is offered whenever her readings exist, including when 2025
      itself is hidden. */
   const hanCtl = M.han && hanAvail && hanCycle;
-  /* The past-cycles 2PP card rings each drawn term's two counts against its
-     line: the election that opened it at month 0, the one that closed it at
-     the line's end. Collected in the line-building pass so a ring takes its
-     line's exact colour and weight - a dimmed term's rings go quiet with
-     it. 2PP alone for now; the primary cards defer to a data pass. */
-  const ringTerms = M.key === "tpp" ? [] : null;
+  /* The vote cards ring each drawn term's two counts against its line: the
+     election that opened it at month 0, the one that closed it at the line's
+     end. Collected in the line-building pass so a ring takes its line's
+     exact colour and weight - a dimmed term's rings go quiet with it. */
+  const ringTerms = M.key === "tpp" || M.key === "primary" || M.key === "oppr" ? [] : null;
   const built = drawnCycles.flatMap((c) => {
     const base = cycBase(c, M.key);
     /* An office that changed hands mid-term draws one run per person, in the
@@ -1582,6 +1581,13 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       return runs.map((run, i) => ({
         id: "c" + c.year + (si ? "-e" + si : "") + (i ? "-" + i : ""), label, color: colorOf(c), width,
         points: run.points, weight, current: c.current, opacity, dashed: run.dashed,
+        /* a dashed run anchored at month 0 bridges the election result to the
+           term's first poll - interpolation out of a counted figure, not a
+           gap nobody polled. rd-cycles draws it dotted, distinct from the
+           interior-gap dash. Vote cards only: a leader line starts at its
+           first reading, not the counted result, so its leftmost stretch is
+           just another gap. */
+        lead: ringTerms != null && run.dashed && run.points[0].x === 0,
         // the end label and the end-cap dot belong to the LINE, so only the
         // final era's last run carries them – otherwise a split line grows a
         // dot and a year at every run boundary
