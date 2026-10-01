@@ -1055,11 +1055,12 @@ body.rd .rd-wv-rug { position: absolute; top: -5px; left: 0; right: 0; height: 1
 body.rd .rd-wv-rug:has(> b.hi) { z-index: 4; }
 body.rd .rd-wv-rug b { position: absolute; bottom: 0; left: 0; width: 6px; height: 6px; transform: translateX(calc(var(--x) * 1cqw - 50%)) translateY(calc(var(--v, 0) * -6px)); touch-action: manipulation; }
 body.rd .rd-wv-rug b::before { content: ""; position: absolute; inset: -5px -6px; }
-/* the dot's alpha lives in its colour, not in opacity: only a solid element
-   can carry the background ring that erases the all-voters dash where it
-   passes under the dot, as the ci ticks' ring does (a translucent element's
-   ring would ghost with it) */
-body.rd .rd-wv-rug b > i { position: absolute; inset: 0; border-radius: 50%; background: color-mix(in oklab, var(--pcolor) 55%, transparent); box-shadow: 0 0 0 2px var(--bg); pointer-events: none; }
+/* a poll dot behaves exactly as the poll charts' dots do: the party tint
+   carries its alpha (the toolkit's fill-opacity recipe — no compositing
+   group per dot) and nothing else — no ring, so two dots that overlap
+   blend like the chart cloud's, and the all-voters dash and the track's
+   quarter-lines show through one as chart lines show through theirs */
+body.rd .rd-wv-rug b > i { position: absolute; inset: 0; border-radius: 50%; background: color-mix(in oklab, var(--pcolor) 55%, transparent); pointer-events: none; }
 body.rd .rd-wv-rug b.on { cursor: pointer; }
 body.rd .rd-wv-rug b.on:hover > i, body.rd .rd-wv-rug b.on:focus-visible > i { background: var(--pcolor); }
 body.rd .rd-wv-rug b.on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
