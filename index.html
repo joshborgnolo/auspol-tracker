@@ -2041,11 +2041,6 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
   .tabs.show-score .tab-pinhide { display: none; }
 }
 .tabs-list { display: flex; gap: inherit; align-items: flex-end; }
-.tab-label-short { display: none; }
-@media (max-width: 420px) {
-  .tabs.show-score .tab-label-long { display: none; }
-  .tabs.show-score .tab-label-short { display: inline; }
-}
 .tab-next { display: none; }
 @media (min-width: 1100px) {
   .tab-next {
@@ -56690,12 +56685,7 @@ function Tabs({
     }
   }, React.createElement("span", {
     className: "tab-label"
-  }, t.short ? React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "tab-label-long"
-  }, t.label), React.createElement("span", {
-    className: "tab-label-short",
-    "aria-hidden": "true"
-  }, t.short)) : t.label), t.note != null && React.createElement("span", {
+  }, t.label), t.note != null && React.createElement("span", {
     className: "tab-note"
   }, t.note))))), React.createElement(NextPollTicker, {
     showScore: pinned && heroGone
@@ -79325,8 +79315,7 @@ const TABS = [{
   label: "Now"
 }, {
   id: "cycles",
-  label: "Past cycles",
-  short: "Cycles"
+  label: "Past cycles"
 }, {
   id: "allpolls",
   label: "All polls"

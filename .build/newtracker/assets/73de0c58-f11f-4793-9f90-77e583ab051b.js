@@ -1886,9 +1886,7 @@ let viewPanelFocusIsPointer = false;
 
 const TABS = [
   { id: "snapshot", label: "Now" },
-  /* short: the docked phone bar's label, which buys the room to keep Info
-     and to name the parties beside the docked score */
-  { id: "cycles", label: "Past cycles", short: "Cycles" },
+  { id: "cycles", label: "Past cycles" },
   { id: "allpolls", label: "All polls" },
   /* pinHide: the docked 2PP score takes this end of the bar once the bar
      pins AND the hero 2PP has scrolled off (.show-score), and on a phone

@@ -3446,20 +3446,17 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
    better that the bar carry only the tabs that do something. The reader is
    undisturbed: the Info panel stays on screen, and a scroll back up restores
    the unpinned bar with its tab. */
-/* Sep 2026: from 640px down to 380. Below 420 the docked bar shortens "Past
-   cycles" to "Cycles" instead, which leaves room for Info AND for the party
-   names beside the score - "51.2 | 48.8" alone said nothing about whose. */
+/* Sep 2026: from 640px down to 380 - below that the docked bar hides Info
+   instead, which leaves room for the party names beside the score -
+   "51.2 | 48.8" alone said nothing about whose. (Oct 2026: "Snapshot"
+   became "Now", which freed enough of the docked bar that every tab keeps
+   its full label at every width.) */
 @media (max-width: 380px) {
   .tabs.show-score .tab-pinhide { display: none; }
 }
 /* The views' tablist is a flex row inside the set, spaced as the set spaces
    its items. */
 .tabs-list { display: flex; gap: inherit; align-items: flex-end; }
-.tab-label-short { display: none; }
-@media (max-width: 420px) {
-  .tabs.show-score .tab-label-long { display: none; }
-  .tabs.show-score .tab-label-short { display: inline; }
-}
 /* ---- the next-poll countdown in the tab bar ------------------------------
    Wide screens only. The countdown is absolutely seated in BOTH bar states
    so it can GLIDE between them: it docks to the right end (left:100% +

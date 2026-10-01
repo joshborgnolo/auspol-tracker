@@ -383,9 +383,7 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                          clicks, so Enter/Space activation keeps focus per
                          the ARIA tabs pattern. */
                       onClick={(e) => { onChange(t.id); if (e.detail) e.currentTarget.blur(); }}>
-                <span className="tab-label">{t.short
-                  ? <><span className="tab-label-long">{t.label}</span><span className="tab-label-short" aria-hidden="true">{t.short}</span></>
-                  : t.label}</span>
+                <span className="tab-label">{t.label}</span>
                 {t.note != null && <span className="tab-note">{t.note}</span>}
               </button>
             ))}
