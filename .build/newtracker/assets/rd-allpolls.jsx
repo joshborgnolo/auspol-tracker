@@ -1808,6 +1808,34 @@ function RdAllPolls(P) {
   }, [facet]);
   const flipPick = () => { pinAp(); onMeasure(onM ? "lnp" : "onp"); };
   const basisPick = () => { pinAp(); setTppBasis(pub ? "imp" : "resp"); };
+  /* Spacebar while the table is on screen flips the two-party contest -
+     the tab row's "Labor v X ⇄" button by key. The claim is the viewport
+     (IntersectionObserver, not the pointer) and twopp-facet only; in every
+     other state, or while real focus is anywhere but the page, space keeps
+     its scroll day job. */
+  const spaceFlip = React.useRef(null);
+  spaceFlip.current = facet === "twopp" ? flipPick : null;
+  React.useEffect(() => {
+    const sec = document.getElementById("rd-ap-top");
+    if (!sec) return undefined;
+    const inView = { current: false };
+    const io = new IntersectionObserver((es) => es.forEach((en) => { inView.current = en.isIntersecting; }));
+    io.observe(sec);
+    const key = (e) => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const flip = spaceFlip.current;
+      if (!flip) return;
+      e.preventDefault();
+      if (!e.repeat) flip();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
+  }, []);
   const pinBar = (
     <div className={"rd-ap-pinbar" + (pinned ? " on" : "")} aria-hidden={!pinned}>
       <nav className="rd-ap-pinnav" aria-label="On this page">
