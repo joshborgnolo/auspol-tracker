@@ -2461,7 +2461,7 @@ function RdIssues({ rangeId = "all" }) {
         </span>
         <span className="rd-is-nums">{x.own ? pOrd.map((q) => <b key={q} style={{ color: inkOf(pColor(q)) }}>{Math.round(x.own.v[q])}</b>) : null}</span>
         <span className={"rd-is-verdict" + (v && v.strong ? " strong" : "")} style={v && v.color ? { color: v.color } : undefined}>
-          {v ? v.text : ""}{x.grnTop && <small>Greens first (<span style={{ color: inkOf(pColor("grn")) }}>+{Math.round(x.grnTop.grn - x.grnTop.nextV)}</span>) when offered</small>}</span>
+          {v ? v.text : ""}{x.grnTop && <small className="grn" style={{ color: inkOf(pColor("grn")) }}>Greens first (+{Math.round(x.grnTop.grn - x.grnTop.nextV)}) when offered</small>}</span>
       </div>
     );
   };
