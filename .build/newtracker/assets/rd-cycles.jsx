@@ -47,7 +47,7 @@ const rdSgn = (v, unit) => (unit ? "" : v > 0 ? "+" : v < 0 ? "−" : "") + Math
 
 /* ---- one chart, in the redesign's frame --------------------------------- */
 function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evIn, badged, domain, ticks, cur, hidden, narrow, half,
-                        hanCtl, showHan, setHan, showOnp, setOnp, showComb, setComb, tipCycle, banded, bandN, isOpp, terms, outcomeShown }) {
+                        hanCtl, showHan, setHan, showOnp, setOnp, showComb, setComb, tipCycle, banded, bandN, isOpp, terms, outcomeShown, rings }) {
   const { D } = window.AP;
   /* the sitting term's change of contest, said as the headline says it */
   const events = evIn.map((e) => (/^Now v /.test(e.short || "")
@@ -130,11 +130,19 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
   }
   const marks = [];
   if (peer && curVal != null) marks.push({ k: "mean", x: nowM, y: peer.mean, r: 3.5, color: "var(--ink-2)" });
-  /* The election-result ring sits where the term's line starts. Change mode
-     draws no ring - the "Result" rule says it - but keeps one, unseen, at
-     zero, so on the switch the ring travels with the line's start as it
-     fades rather than parting from it. */
-  if (cur && !hidden.has(cur.year) && (M.key === "tpp" || M.key === "primary" || M.key === "oppr") && cur.base[M.key] != null)
+  /* The election-result rings sit where each drawn term's line starts and,
+     its result counted, ends - in the line's own colour, the hero's rule
+     brought to this card. Change mode draws no ring (the "Result" rule
+     says it) but keeps them all unseen at their change-basis positions,
+     so on the switch each fades where it is rather than popping away.
+     The primary cards still ring the sitting term alone, in ink, awaiting
+     their own pass - leaving their old block untouched below. */
+  if (rings) rings.forEach((rt) => {
+    const op = (chg ? 0 : 1) * rt.opacity;
+    marks.push({ k: "base-" + rt.yr, x: 0, y: chg ? 0 : rt.base, r: 5, color: rt.color, opacity: op });
+    if (rt.close) marks.push({ k: "close-" + rt.yr, x: rt.close.x, y: chg ? rt.close.tpp - rt.base : rt.close.tpp, r: 5, color: rt.color, opacity: op });
+  });
+  if (cur && !hidden.has(cur.year) && (M.key === "primary" || M.key === "oppr") && cur.base[M.key] != null)
     marks.push({ k: "base", x: 0, y: chg ? 0 : cur.base[M.key], r: 5, ...(chg ? { opacity: 0 } : {}) });
   const brackets = peer && curVal != null && Math.abs(d) >= 0.3 ? [{ x: nowM, y0: curVal, y1: peer.mean, dx: 5, lines: [] }] : [];
   const refY = chg ? 0 : M.refAbs;
@@ -286,24 +294,60 @@ function RdPastCycles(p) {
   const narrow = useNarrow("(max-width: 640px)");
   const [board, setBoard] = useState(false);
   const [tip, setTip] = useState(null);
+  /* the walk floor: the finding's slot stands at the tallest of every
+     (compare, measure) state the walk can reach, so a hop rewrites the
+     words inside a box that never moves - nothing above the pinned row
+     reflows and no scroll correction is ever issued (the All-polls
+     hed-on-every-facet bargain, 2026-10-01). The walkable states render
+     invisibly in .rd-cyc-storyvar and the slot re-floors if any of them
+     re-wraps (a resize, a font arriving); the live block joins the max so
+     the hand-entered "terms on the board" state counts too */
+  const storySlotRef = React.useRef(null), storyVarRef = React.useRef(null);
+  const [storyFloor, setStoryFloor] = useState(0);
+  React.useLayoutEffect(() => {
+    const measure = () => {
+      let h = 0;
+      const live = storySlotRef.current && storySlotRef.current.querySelector(".rd-glide-in");
+      if (live) h = live.scrollHeight;
+      const box = storyVarRef.current;
+      if (box) for (const c of box.children) h = Math.max(h, c.scrollHeight);
+      setStoryFloor((f) => (Math.abs(f - h) > 1 ? h : f));
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver(measure);
+    const live = storySlotRef.current && storySlotRef.current.querySelector(".rd-glide-in");
+    const box = storyVarRef.current;
+    if (live) ro.observe(live);
+    if (box) [...box.children].forEach((c) => ro.observe(c));
+    return () => ro.disconnect();
+  });
   const boardRef = React.useRef(null);
   window.useDismissOutside(boardRef, board, () => setBoard(false));
-  /* Walking the compare sets or the measure rewrites the head and dek
-     above this row; scrolled past them under the sticky tabs, each step
-     then drags the row and charts up or down mid-walk. rdPinScroll (in
-     rd.jsx, shared with the other tab rows) holds the row's spot on
-     screen through the head/dek glide instead. Deeper in the summary the
-     row itself is off the screen: anchor the reader's own strip, key or
-     foot instead or nothing holds the spot at all - Chrome's native
-     scroll anchoring papers over that gap there, but Safari has no
-     overflow-anchor and every compare swipe shoved the reader down the
-     page by the dek's height swing. Like the All-polls table, this walk
-     opts into the pin on fine pointers too (the second arg, 2026-10-01):
+  /* Walking the compare sets or the measure rewrites the finding above
+     this row, and its height swings state to state. The walk floor (the
+     storyFloor machinery below) holds the finding's slot at the tallest
+     walkable state, so the rewrite moves nothing above the row and the
+     pin has nothing to correct - the All-polls hed-on-every-facet
+     bargain, taken a step further because this finding cannot keep one
+     line count across states. (The floor came in after the ed293ff
+     fine-pointer opt-in tried to let rdPinScroll's corrections carry
+     the live glide on a laptop: every hop re-wrote the finding above
+     the row and the pin chased each glide frame with an integer
+     scrollTo, which Safari.app's quantised scroller commits ~2css off
+     and drops under 3css - the user-visible bounce and drift of the
+     laptop walk. Same lesson the All-polls table learned in scroll
+     space's thirteenth round: when the correction channel loses data,
+     delete the reflow that needs correcting.) Deeper in the summary
+     the row itself is off the screen: anchor the reader's own strip,
+     key or foot instead or nothing holds the spot at all - Chrome's
+     native scroll anchoring papers over that gap there, but Safari has
+     no overflow-anchor and every compare swipe shoved the reader down
+     the page by the finding's height swing. Like the All-polls table,
+     this walk opts into the pin on fine pointers too (the second arg):
      a laptop's compare/measure click or arrow-key step holds the board
-     and summary exactly as a phone swipe's does - glides only reflow
-     above the row here (no per-hop mounts like the All-polls hed), so
-     rd.jsx's integer-absolute corrections plus sub-3css adoption are
-     the whole Safari.app story for it */
+     and summary exactly as a phone swipe's does - with the floor, the
+     pin measures zero drift and issues zero corrections */
   const pinView = () => {
     const sec = document.getElementById("cyc-summary");
     const strip = sec && [...sec.querySelectorAll(".rd-cs-row")].find((el) => {
@@ -342,9 +386,12 @@ function RdPastCycles(p) {
   const endOfKey = (c, key) => (key === "comb"
     ? (c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null)
     : c.end[key]);
-  const curOf = (key) => { const v = endOfKey(cur, key); return v == null ? null : (chg ? v - cycBaseOf(cur, key) : v); };
-  const peersOf = (key) => rdCycPeers(Mby[key], cycles, hidden, chg, m);
-  const fmtOf = (key) => (v) => (Mby[key].unit === "%" && !chg ? v.toFixed(1) : rdSgn(v, false));
+  const curOfS = (key, c2) => { const v = endOfKey(cur, key); return v == null ? null : (c2 ? v - cycBaseOf(cur, key) : v); };
+  const peersOfS = (key, hid, c2) => rdCycPeers(Mby[key], cycles, hid, c2, m);
+  const fmtOfS = (key, c2) => (v) => (Mby[key].unit === "%" && !c2 ? v.toFixed(1) : rdSgn(v, false));
+  const curOf = (key) => curOfS(key, chg);
+  const peersOf = (key) => peersOfS(key, hidden, chg);
+  const fmtOf = (key) => fmtOfS(key, chg);
   const govName = D.PARTIES[cur.gov].name, oppName = D.PARTIES[cur.opp].name;
   const govIn = cur.gov === "lnp" ? "the Coalition" : govName, oppIn = cur.opp === "lnp" ? "the Coalition" : oppName;
   const pm = sitting(cur.pm), oppL = sitting(cur.oppLead);
@@ -354,6 +401,12 @@ function RdPastCycles(p) {
 
   /* the outcome sets, counted off the board's own rule */
   const outcomeOf = (i) => { const nx = cycles[i + 1]; return nx ? (nx.gov === cycles[i].gov ? "returned" : "ousted") : null; };
+  /* the hidden set a Compare-with pick lands on (the tabbed-views layer's
+     showOutcome + setCompare's put-the-sitting-term-back, worked out here
+     without touching its state): past terms not in the outcome set are
+     off the board, the sitting term stays on it */
+  const hiddenFor = (cmp) => cmp === "all" ? new Set()
+    : new Set(cycles.filter((c, i) => !c.current && outcomeOf(i) !== cmp).map((c) => c.year));
   const nPast = cycles.filter((c) => !c.current).length;
   const nRet = cycles.filter((c, i) => outcomeOf(i) === "returned").length, nOus = cycles.filter((c, i) => outcomeOf(i) === "ousted").length;
   const compare = hidden.size === 0 ? "all" : outcomeShown || null;
@@ -371,7 +424,7 @@ function RdPastCycles(p) {
   const setModePin = (id) => { pinView(); setMode(id); };
 
   /* ---- the rows -------------------------------------------------------------- */
-  const ROWS = [
+  const ROW_DEFS = [
     { key: "tpp", name: "Two-party preferred", sub: govName + ", against " + rivalWord.replace(/^the /, "the "), group: "votes", color: cur.color },
     { key: "primary", name: "Government’s primary vote", sub: govName, group: "votes", color: cur.color },
     { key: "oppr", name: "Opposition’s primary vote", sub: rdCap(oppIn), group: "votes", color: D.PARTIES[cur.opp].color },
@@ -384,11 +437,14 @@ function RdPastCycles(p) {
     { key: "net", name: "Prime minister’s net approval", sub: pm, group: "leaders", color: cur.color },
     { key: "oppnet", name: "Opposition leader’s net approval", sub: oppL, group: "leaders", color: D.PARTIES[cur.opp].color },
     { key: "han", name: "Hanson’s net approval", sub: "Pauline Hanson", group: "leaders", color: D.PARTIES.onp.color },
-  ].map((r) => {
-    const peers = peersOf(r.key);
-    const v = curOf(r.key);
-    return { ...r, peers, v, fmt: fmtOf(r.key), rank: peers && v != null ? rdCycRank(peers, v, fmtOf(r.key)) : null };
+  ];
+  const rowsForHidden = (hid, c2) => ROW_DEFS.map((r) => {
+    const peers = peersOfS(r.key, hid, c2);
+    const v = curOfS(r.key, c2);
+    const fmt = fmtOfS(r.key, c2);
+    return { ...r, peers, v, fmt, rank: peers && v != null ? rdCycRank(peers, v, fmt) : null };
   });
+  const ROWS = rowsForHidden(hidden, chg);
   const scaleOf = (group) => {
     const rs = ROWS.filter((r) => r.group === group && r.peers);
     const vals = rs.flatMap((r) => r.peers.vals.map((q) => q.v).concat(r.v != null ? [r.v] : []));
@@ -418,8 +474,8 @@ function RdPastCycles(p) {
   const dotsWas = rdUseOutgoing((chg ? "c" : "a") + "|" + [...hidden].sort().join(","), dotsNow);
 
   /* ---- the findings ---------------------------------------------------------------- */
-  const R = {};
-  ROWS.forEach((r) => { R[r.key] = r; });
+  const rowIdx = (rows) => { const o = {}; rows.forEach((r) => { o[r.key] = r; }); return o; };
+  const R = rowIdx(ROWS);
   /* With "Change since election" on, every rank is a rank of the change, so
      the lowest is the biggest fall (or the smallest rise). The words say so:
      they used to call it a record low, and the head could claim a party was
@@ -433,11 +489,22 @@ function RdPastCycles(p) {
   const tail = compare === "all" ? "" : compare === "returned" ? ", among terms whose government was re-elected"
     : compare === "ousted" ? ", among terms whose government was ousted" : ", among the terms on the board";
   const since = compare === "all" ? " since " + cycles[0].year : "";
-  const pageStory = (() => {
-    const g = R.primary, o = R.oppr, t = R.tpp;
+  /* The finding the compare/measure walk rewrites per hop, worked out for
+     any (compare, measure) state: the section's walk floor (below) renders
+     every walkable state of it and holds the slot at the tallest, so a hop
+     reflows nothing above the pinned compare row and the pin issues no
+     scroll correction at all - the same bargain the All-polls table struck
+     by rendering its hed on every facet (2026-10-01), because Safari.app's
+     quantised scroller cannot be trusted with a per-hop correction stream.
+     `t2`/`snc` are that state's `tail`/`since`. */
+  const storyFor = (RV, cmp, c2) => {
+    const t2 = cmp === "all" ? "" : cmp === "returned" ? ", among terms whose government was re-elected"
+      : cmp === "ousted" ? ", among terms whose government was ousted" : ", among the terms on the board";
+    const snc = cmp === "all" ? " since " + cycles[0].year : "";
+    const g = RV.primary, o = RV.oppr, t = RV.tpp;
     const gLow = g.rank && /^Lowest/.test(g.rank.main), oLow = o.rank && /^Lowest/.test(o.rank.main);
     const moved = (r) => (r.v < 0 ? "fallen further" : "risen less");
-    const found = chg
+    const found = c2
       ? (gLow && oLow ? (g.v < 0 && o.v < 0 ? "Both major parties have lost more of their vote than any before them at this point in a term"
           : "Both major parties have done worse since the election than any before them at this point in a term")
         : gLow ? govName + "’s primary vote has " + moved(g) + " than any government’s at this point in a term"
@@ -448,33 +515,37 @@ function RdPastCycles(p) {
       : gLow ? govName + "’s primary vote is the lowest of any government at this point in a term"
       : oLow ? rdCap(oppIn) + "’s primary vote is the lowest of any opposition at this point in a term"
       : t.peers && t.v != null ? govName + " sits " + (t.v >= t.peers.mean ? "above" : "below") + " the average government at this point in a term" : null;
-    const head = found ? found + tail : "Every term since " + cycles[0].year + ", lined up on its election day";
+    const head = found ? found + t2 : "Every term since " + cycles[0].year + ", lined up on its election day";
     let dek = monthsWord + " after the " + cur.year + " election, ";
     const bits = [];
     const extreme = (r) => (r.v < 0 ? "the biggest fall" : "the smallest rise");
-    if (chg) {
-      if (gLow) bits.push(govName + "’s primary vote is " + upDown(g.v) + " points, " + extreme(g) + " for any government at that point" + since);
+    if (c2) {
+      if (gLow) bits.push(govName + "’s primary vote is " + upDown(g.v) + " points, " + extreme(g) + " for any government at that point" + snc);
       if (oLow) bits.push((gLow ? "and " + oppIn + "’s is " : oppIn + "’s primary vote is ") + upDown(o.v) + " points, " + extreme(o) + " for any opposition");
     } else {
-      if (gLow) bits.push(govName + "’s primary vote is the lowest of any government at the same point" + since);
+      if (gLow) bits.push(govName + "’s primary vote is the lowest of any government at the same point" + snc);
       if (oLow) bits.push((gLow ? "and " + oppIn + "’s" : oppIn + "’s primary vote is") + " the lowest of any opposition");
     }
     /* a rank counts this term among its peers, so "of 21" is 21 governments,
        twenty of them past */
     const rankWords = (r) => (/^Middle/.test(r.rank.main) ? "in the " : "the ") + r.rank.main.toLowerCase().replace(/ of (\d+)$/, " of $1 governments");
-    dek += bits.length ? bits.join(", ") + tail + "."
+    dek += bits.length ? bits.join(", ") + t2 + "."
       : g.v == null || !g.rank ? govName + "’s primary vote has no reading to set against past governments yet."
-      : chg ? govName + "’s primary vote is " + upDown(g.v) + " points since the election; past governments were "
-          + (g.peers.mean < 0 ? "down " : "up ") + pts1(g.peers.mean) + " on average by now" + tail + "."
-      : govName + "’s primary vote is " + rankWords(g) + " at this point" + tail + ".";
-    if (t.peers && t.v != null && !chg) {
-      const past = tail ? "those governments" : "past governments";
+      : c2 ? govName + "’s primary vote is " + upDown(g.v) + " points since the election; past governments were "
+          + (g.peers.mean < 0 ? "down " : "up ") + pts1(g.peers.mean) + " on average by now" + t2 + "."
+      : govName + "’s primary vote is " + rankWords(g) + " at this point" + t2 + ".";
+    if (t.peers && t.v != null && !c2) {
+      const past = t2 ? "those governments" : "past governments";
       const where = t.v >= t.peers.q1 && t.v <= t.peers.q3 ? "sits in the middle half of " + past
         : t.v > t.peers.q3 ? "is above three in four of " + past : "is below three in four of " + past;
       dek += " After preferences, " + (bits.length ? "though, " : "") + govName + "’s " + t.v.toFixed(1) + "% " + where + ".";
     }
     return { head, dek };
-  })();
+  };
+  const pageStory = storyFor(R, compare, chg);
+  /* every (compare, measure) state the walk can land this section in */
+  const storyVariants = ["all", "returned", "ousted"].flatMap((cmp) => [false, true]
+    .map((c2) => ({ key: cmp + (c2 ? "/c" : "/a"), story: storyFor(rowIdx(rowsForHidden(hiddenFor(cmp), c2)), cmp, c2) })));
   /* the 2PP against the governments that were re-elected and ousted */
   const outcomePeers = (which) => {
     const keep = new Set(cycles.filter((c, i) => outcomeOf(i) === which).map((c) => c.year));
@@ -797,7 +868,7 @@ function RdPastCycles(p) {
       {sec === "tpp" && <span className="rd-key-item"><RdSwatch kind="line" color={cur.color} />The {cur.year} term, monthly</span>}
       {sec === "primary" && <span className="rd-key-item">{twoLines(D.PARTIES[cur.gov].color, D.PARTIES[cur.opp].color)}The {cur.year} term: {govName}, {oppIn}</span>}
       {sec === "leaders" && <span className="rd-key-item">{twoLines(D.PARTIES[cur.gov].color, D.PARTIES[cur.opp].color)}The {cur.year} term: {pm}, the opposition leader</span>}
-      {(sec === "tpp" || sec === "primary") && <span className="rd-key-item"><RdSwatch kind="ring" />{cur.year} election result</span>}
+      {(sec === "tpp" || sec === "primary") && <span className="rd-key-item"><RdSwatch kind="ring" />{sec === "tpp" ? "Each term’s election results" : (cur.year + " election result")}</span>}
     </RdKey>
   );
   /* the list reads as one sentence, "and" before the last and no commas */
@@ -814,7 +885,14 @@ function RdPastCycles(p) {
           <span className="rd-meta">Every term since {cycles[0].year}, lined up on its own election day</span>
           {!narrow && <nav className="rd-eyebrow-tools rd-cyc-nav" aria-label="On this page">{navs.map(([id, lab], i) => <button key={id} type="button" onClick={() => goTo(id)}>{(i === navs.length - 1 ? "and " : "") + lab}</button>)}</nav>}
         </div>
-        <RdHed head={pageStory.head} dek={pageStory.dek} level={2} />
+        <div ref={storySlotRef} style={storyFloor ? { minHeight: storyFloor + "px" } : null}>
+          <RdHed head={pageStory.head} dek={pageStory.dek} level={2} />
+        </div>
+        <div className="rd-cyc-storyvar" ref={storyVarRef} aria-hidden="true">
+          {storyVariants.map((v) => (
+            <div key={v.key}><h2 className="rd-hed">{v.story.head}</h2><p className="rd-dek">{v.story.dek}</p></div>
+          ))}
+        </div>
         {srcFailed && <p className="rd-note">The individual polls behind the past terms didn’t load; the monthly lines are unaffected. <button type="button" className="rd-link" onClick={retrySource}>Try again</button></p>}
         {controls}
         {summary}

@@ -14,11 +14,13 @@ story block up or down. On a fine-pointer computer the fixed view is OFF
 (pointer-gate below): clicks and keys just reflow live — unless the
 caller passes the `fine` opt-in, which All-polls (facet walk) and past
 cycles (pinView's compare/measure walk, opted in 2026-10-01) do — the
-laptop walk holds the table/board the way a phone's does. Cycles needs
-no layout-side Safari surgery like the All-polls hed fix: its walks
-reflow glides only above the board, no per-hop mounts, so the shipped
-integer-absolute corrections plus sub-3css adoption are the whole
-Safari.app surface (real-device check: `.matilda/safari-cycleswalk.js`).
+laptop walk holds the table/board the way a phone's does. Cycles got
+the SAME layout-side treatment as the All-polls hed fix on 2026-10-01
+(the "walk floor" — its pageStory finding glided ±60-74 css live above
+`.rd-cc` under the fine opt-in and the correction stream bounced
+Safari.app's laptop walk; the slot is now height-floored across all six
+walk states so a hop reflows zero above the pin — see the last
+section). Real-device check: `.matilda/safari-cycleswalk.js`.
 **On touch devices
 the contract is unconditional** since 1d76fd5:
 it holds scrolled past the dek (the original case) AND with the dek on
@@ -1180,4 +1182,56 @@ Safari.app, and delete the reflow that needed the ≥3 css correction**
 — between those two there is no remaining need to scroll-correct
 during a facet walk at all. When the correction channel itself loses
 data, stop tuning the channel and remove what flows through it.
+
+## Cycles gets the same layout-space fix — the walk floor (2026-10-01, pm)
+
+User report against the same-day fine opt-in: "the implementation of
+the fixed-view feature in past cycles is inferior to that in all polls…
+the latter drifts/bounces slightly when arrow walking." ed293ff had
+opted pinView in on fine pointers and called it done — "cycle walks
+reflow glides only, no per-hop mounts, so nothing like the All-polls
+hed layout fix was needed and the shipped integer-absolute + adoption
+machinery is cycles' whole Safari.app surface." That note is now
+FALSIFIED: cycles' per-hop glide is a LIVE `.rd-glide-in` head/dek
+morph of the pageStory finding (±60-74 css by compare set × measure)
+directly above the pinned `.rd-cc` row, so every arrow-key or click hop
+issued a big correction stream into the round-13-walled channel, and
+Safari.app's lattice mangled it into the user-visible bounce/drift —
+the rdPinClip freeze never engages on a laptop (gated on rdTouchHot).
+
+**Fix is the round-13 recipe adapted, not the correction channel
+tuned.** rd-cycles.jsx: the pageStory IIFE became
+`storyFor(rowsView, cmp, c2)` — pure in (compare set, measure) — plus
+`hiddenFor(cmp)` replicating showOutcome/setCompare's net hidden set
+(current term always re-added) and `rowsForHidden(hid, c2)` built off a
+`ROW_DEFS` table, so the finding text is computable for ALL SIX
+walkable states (3 compare sets × 2 measures). The six variants render
+invisibly in a sibling `.rd-cyc-storyvar` box (`height:0; overflow:
+hidden; visibility:hidden` in rd.css), and a dependency-less
+`useLayoutEffect` + `ResizeObserver` measures the live `.rd-glide-in`
+block and every variant and holds the slot's `minHeight` at
+`max(live, variants…)` (the `storyFloor` state). The live block keeps
+gliding content-inside-its-slot; the slot itself never resizes, so a
+walk hop reflows ZERO css above the pin and no correction is ever
+issued — the exact analogue of 0f8eca0's "render the hed on every
+facet" gate change. (User rejected the alternative of relocating the
+finding below the controls: "didn't i ask you basically reimplement the
+all polls implementation, adapted for past cycles?" — the finding stays
+put; the slot gets floored.)
+
+Verification follows the round-13 pattern: geometry is engine-neutral,
+scroll commits are not. `.matilda/probe-cycles-pin.mjs` (headless) now
+inverts its old vacuity guard — row docTop spread across all six
+finding states must be ≤ lim at 480px AND 1440px, a nonzero spread
+FAILS — asserts the floor exists (`minHeight > 0`, six variants,
+`floor + 1 >= max(live, …variants)`, note line prints the per-state
+heights), and on fine rungs asserts ZERO scroll corrections (both
+window.scrollTo and window.scrollBy wrapped by `__sbLog`) across the
+pinned click-walk, arrow-key walk, measure switch and dek-on-screen
+cases. The real-device check `.matilda/safari-cycleswalk.js` gained a
+`scrolls` counter (both scroll APIs wrapped, counter zeroed after the
+initial park): pass is climb 0, per-set docSpan 0 AND `scrolls: 0` over
+the 8-lap compare walk + 6 measure flips — with the floor, the pin owes
+Safari.app's lattice nothing, so any scroll landing during the walk is
+a live correction and a regression.
 

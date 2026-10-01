@@ -1521,6 +1521,12 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
      control is offered whenever her readings exist, including when 2025
      itself is hidden. */
   const hanCtl = M.han && hanAvail && hanCycle;
+  /* The past-cycles 2PP card rings each drawn term's two counts against its
+     line: the election that opened it at month 0, the one that closed it at
+     the line's end. Collected in the line-building pass so a ring takes its
+     line's exact colour and weight - a dimmed term's rings go quiet with
+     it. 2PP alone for now; the primary cards defer to a data pass. */
+  const ringTerms = M.key === "tpp" ? [] : null;
   const built = drawnCycles.flatMap((c) => {
     const base = cycBase(c, M.key);
     /* An office that changed hands mid-term draws one run per person, in the
@@ -1545,6 +1551,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
     if (c.current) { width = isHi ? 4 : 3.6; weight = 3; opacity = 1; labOp = 1; }
     else if (out) { width = 3; weight = 2; opacity = 1; labOp = 1; }
     else { width = 1.7; weight = dim ? 0 : 1; opacity = dim ? 0.13 : 0.42; labOp = dim ? 0.2 : 0.75; }
+    if (ringTerms) ringTerms.push({ yr: c.year, color: colorOf(c), opacity, base, close: c.endRes || null });
     return seriesIn.flatMap((s, si) => {
       const monthly = toMonthly(s.months, s.vals, c.span);
       // months with no reading are dropped, so the line begins where the polling
@@ -1994,7 +2001,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
     <RdCycleChart M={M} chg={chg} built={built} bandAreas={bandAreas} bandRows={bandRows} scatter={scatter}
       events={rdEvents || cycleEvents} badged={!!rdEvents} domain={domain} ticks={ticks} cur={cur} hidden={hidden} narrow={narrow} half={!!rdHalf}
       hanCtl={hanCtl} showHan={showHan} setHan={setHan} showOnp={showOnp} setOnp={setOnp} showComb={showComb} setComb={setComb} tipCycle={tipCycle}
-      banded={banded} bandN={bandN} isOpp={isOpp} terms={shown.filter(hasData).map((c) => c.year)} outcomeShown={outcomeShown} />
+      banded={banded} bandN={bandN} isOpp={isOpp} terms={shown.filter(hasData).map((c) => c.year)} outcomeShown={outcomeShown} rings={ringTerms} />
   );
   return (
     <section className="card cycle-card">
