@@ -1066,7 +1066,10 @@ body.rd .rd-wv-rug.lit b:not(.hi) > i { background: color-mix(in oklab, var(--pc
    transform (-50%, calc(-100% - 14px)); this rule only re-seats the anchor
    at the dot's centre, as the charts' left/top % does, and lifts the card
    over the rows */
-body.rd .rd-wv-rtip { position: absolute; left: 50%; top: 50%; z-index: 20; white-space: nowrap; text-align: left; pointer-events: none; }
+/* font-weight: 400 undoes the rug dot's own <b> — the tip would otherwise
+   inherit "bolder" and every weight-inheriting line (rows, sub) would render
+   heavier than every other chart's poll-dot tip */
+body.rd .rd-wv-rtip { position: absolute; left: 50%; top: 50%; z-index: 20; white-space: nowrap; text-align: left; pointer-events: none; font-weight: 400; }
 /* the interval spans the track and draws its parts inside it: the bar
    shifted to --lo and stretched to --hi (a 2px-tall line can scale
    sideways without distorting), each end tick shifted on its own */
