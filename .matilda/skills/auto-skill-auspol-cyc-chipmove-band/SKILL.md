@@ -1,6 +1,6 @@
 ---
 name: auspol-cyc-chipmove-band
-description: auspol-tracker — the Past-cycles ".rd-cyc-chipmove" band floating 12px above the #cyc-tpp eyebrow divider, FLUSH LEFT (ship 7964e12, follow-ups 204654b, COLUMN STACK ba613b3; left move + 12px gap + ≤640px 60px headroom 2026-10-02 after user: "move it to the left… breathing room from the line below it"; JS HEADROOM REFIT same day after user: "more than 5 drawn → causes mayhem with the text already in the page… the rest of the page content is not pushed up"): RdSec tools-slot anchoring (top: pad+1px of --cyc-chip-pad-fallback --rd-sec-pad, translateY(-100%−12px)), band is a COLUMN flex — chip on top, the drawn-pills row stacked beneath it, both flush left — plus the read-only .rd-cc-cur sitting-term pill and RdCycleChart's nonDefault note-gating; the BAND IS OUT OF FLOW, so rd-cycles.jsx's chipmove fit() measures the wrapped band and GROWS --cyc-chip-pad + padding-top INLINE on #cyc-tpp when the stack needs more than the CSS floor (a tall stack pushes the page down instead of climbing over the Summary foot). Probe .matilda/probe-cyc-chipmove.mjs.
+description: auspol-tracker — the Past-cycles ".rd-cyc-chipmove" band floating 12px above the #cyc-tpp eyebrow divider, FLUSH LEFT (ship 7964e12, follow-ups 204654b, COLUMN STACK ba613b3; left move + 12px gap + ≤640px 60px headroom 2026-10-02 after user: "move it to the left… breathing room from the line below it"; JS HEADROOM REFIT same day after user: "more than 5 drawn → causes mayhem with the text already in the page… the rest of the page content is not pushed up"; chips ~80% + cancellable sitting-term × 2026-10-02 after user: "reduce the size of the cycles chips by 20% and add an x for Albanese 2025"): RdSec tools-slot anchoring (top: pad+1px of --cyc-chip-pad-fallback --rd-sec-pad, translateY(-100%−12px)), band is a COLUMN flex — chip on top, the drawn-pills row stacked beneath it, both flush left — plus the CANCELLABLE .rd-cc-cur sitting-term pill (its × is toggle(cur.year): term, line and figure off the board; the board's eye puts it back) and RdCycleChart's nonDefault note-gating; the BAND IS OUT OF FLOW, so rd-cycles.jsx's chipmove fit() measures the wrapped band and GROWS --cyc-chip-pad + padding-top INLINE on #cyc-tpp when the stack needs more than the CSS floor (a tall stack pushes the page down instead of climbing over the Summary foot). Probe .matilda/probe-cyc-chipmove.mjs.
 source: auto-skill
 extracted_at: '2026-10-01T13:50:56.926Z'
 ---
@@ -10,7 +10,15 @@ extracted_at: '2026-10-01T13:50:56.926Z'
 All line numbers are for commit `ba613b3` (204654b + the column stack; the
 sibling session's WIP in the working tree can shift `rd-cycles.jsx` and
 `d1a1d215-….js` line offsets — trust tokens, not raw numbers). The headroom
-refit shipped on top of `14ddd71` (2026-10-02) — search `chipmoveRef`.
+refit shipped as **a8e9b41** (2026-10-02) — search `chipmoveRef`. Two
+sibling commits (51e04ba, 5132aad) landed between implementation and push;
+index.html was rebuilt against the NEW HEAD before staging so its diff
+stayed the refit's own compiled output (the pre-sibling build would have
+reverted their compiled features while leaving their sources). The ~80%
+band chrome + cancellable sitting-term × followed 2026-10-02 on a8e9b41's
+tail — same working tree, same "trust tokens, not numbers" caveat: search
+`.rd-cyc-chipmove .rd-chip` and the cur pill's
+`"Take the " + cur.year + " term off the board"` aria-label.
 
 ## Homes
 
@@ -20,7 +28,9 @@ refit shipped on top of `14ddd71` (2026-10-02) — search `chipmoveRef`.
 | ≤640px headroom floor + label hide | `rd.css` :98-116 (`body.rd #cyc-tpp` + `.rd-cc-drawn .rd-cc-l` in the 640 block) — a FLOOR now, not the whole story |
 | JS headroom refit | `rd-cycles.jsx` `chipmoveRef` + `useLayoutEffect(fit)` right after the story-floor effect inside `RdPastCycles` (~:341-376); ref hung on the `<span className="rd-cyc-chipmove" ref={chipmoveRef}>` in the tools JSX |
 | Tools JSX (band contents) | `rd-cycles.jsx` ~:953 — `tools={…}` on `<RdSec id="cyc-tpp" …>` |
-| Drawn-row styling | `rd.css` (.rd-cc-drawn no longer has `margin-top: 12px`; .rd-cc-pill / .rd-cc-cur unchanged from the controls-row era) |
+| Drawn-row styling | `rd.css` (.rd-cc-drawn no longer has `margin-top: 12px`; row gap 8px) |
+| Pill + band-chip ~80% scale | `rd.css`: `.rd-cc-pill` (its only home) 34→27px high, 14→11px type, × 26→21px, gap 8→6.5, radius 17→14, padding 12→10/4→3; `.rd-cyc-chipmove .rd-chip` override 36→29px, 14→11px type, `::after` tap-cheat 44→35px (the base `.rd-chip` is SHARED — never shrink it at source) |
+| Sitting-term × / restore | Tools JSX cur pill button (`toggle(cur.year)`); board eye gate `{!c.current && …}` REMOVED (~:880); board main `aria-pressed={drawn || (c.current && !off)}`; head count `… - (hidden.has(cur.year) ? 0 : 1)`; `setCompare` `curHidden` snapshot (~:479) |
 | `nonDefault` gate const | `rd-cycles.jsx` ~:60, in `RdCycleChart` (~:49) |
 | Gated notes | gap note `{ k: "gap" …" average" }` ~:116; ▲/▼ pair `if (!chg && M.key === "tpp" && !nonDefault)` ~:131 |
 | Prop threading | `d1a1d215-…js`: `CycleChart` :1373 (destructures `lifted`) → `<RdCycleChart … liftedN={lifted.size} …>` at :2001-2005 |
@@ -122,17 +132,27 @@ present.
   flex alignment otherwise misaligns it against the chip).
 - **`.rd-cc-cur` sitting-term pill**: renders when
   `liftedList.length > 0 && !hidden.has(cur.year)` — the sitting term draws
-  over the band too, so it says so ("2025 Albanese"), but it was never IN the
-  band to lift out of: `lift()` in d1a1d215 no-ops on the current year
-  (`if (year === currentYear) return; // nothing to lift it out of`), so the
-  pill must have **no × button** and no onClick. The probe asserts exactly
-  that (no `button` child).
-- The current term's only exit from the band is `hidden` (`toggle`); the
-  board's per-term eye button (`rd-cc-x`) renders for non-current terms only,
-  and `chipClick`/the main button are disabled on `.current`. `setCompare`
+  over the band too, so it says so ("2025 Albanese"). It was never IN the
+  band to lift out of (`lift()` in d1a1d215 no-ops on the current year), but
+  since 2026-10-02 it **carries a ×** (`toggle(cur.year)`) — user: "add an x
+  for Albanese 2025 - currently it's not cancellable". The × takes the term,
+  its line and its sitting-figure note off the board; everything downstream
+  already gates on `hidden` (nowM/curVal/notes/built/count/URL state), so no
+  other code had to move. The pill comes back via the board's own per-term
+  eye (see below).
+- The board's per-term eye button (`rd-cc-x`) now renders for EVERY term
+  including the current (2026-10-02 — it's the restore path the cur pill's ×
+  needs: `{off ? "+" : "×"}`, aria-label "…back on the board" when hidden).
+  `chipClick`/the main board button stay disabled on `.current` (lift still
+  no-ops there), but its `aria-pressed` is `drawn || (c.current && !off)` so
+  a hidden current no longer paints as pressed, and the board header count is
+  `cycles.length - hidden.size - (hidden.has(cur.year) ? 0 : 1)`. `setCompare`
   legally hides the current term transiently via `showOutcome` + re-`toggle`,
-  so `hidden.has(cur.year)` CAN be true — keep the gate alive even though no
-  UI path reaches it in the redesign today.
+  so `hidden.has(cur.year)` CAN be true — keep the gate alive. The re-toggle
+  is guarded by a `curHidden` snapshot taken BEFORE `showOutcome`: a reader
+  who hid the sitting term with the pill × keeps it hidden across a
+  compare-set swap ("a set swap does not undo someone's choice"), while the
+  "All sets" (`showAll`) branch still restores everything.
 
 ## `nonDefault` verdict-word gating (RdCycleChart)
 
@@ -163,8 +183,13 @@ would crash the `<RdCycleChart>` branch via `lifted.size`.
 ## Probe contracts (.matilda/probe-cyc-chipmove.mjs; 1440×960 / 820×900 / 390×844-touch)
 
 - Geometry: `wrap.b ≈ ruleY − 12` (±1.6px) checked against the WRAP — not the
-  chip — so the same assertion holds with pills in the band (min-height 34px
+  chip — so the same assertion holds with pills in the band (min-height 27px
   pills are taller than the chip).
+- **Band chrome is ~80% scale (2026-10-02):** chip computed font 11px and
+  border-box height ≤29.6 (the `.rd-cyc-chipmove .rd-chip` override —
+  base `.rd-chip` elsewhere stays 14px/36px); pill font 11px and
+  ring-to-ring height ≈27px (27px min-height is border-box, so the 1.5px
+  borders eat into it — the old 34px pill measured the same way).
 - **Stack assertions (left-flush since 2026-10-02):** with a term lifted,
   `chipB <= drawnT + 1` (chip's bottom at or above the drawn row's top —
   the chip is visibly ABOVE the pills it spawns) and
@@ -188,9 +213,9 @@ would crash the `<RdCycleChart>` branch via `lifted.size`.
 - Lift round-trip: click first `.rd-cc-term:not(.current) .rd-cc-main` inside
   the open board → drawn row appears in the chipmove band with the label, a
   pill starting with the picked year WITH a button, and exactly one
-  `.rd-cc-cur` pill (text `^20\d\d `, NO button); svg loses the three verdict
-  strings but keeps `Labor`; unlift via the pill's × → row gone, verdicts
-  back.
+  `.rd-cc-cur` pill (text `^20\d\d `, WITH a cancel cross since
+  2026-10-02); svg loses the three verdict strings but keeps `Labor`;
+  unlift via the pill's × → row gone, verdicts back.
 - MANY-DRAWN round-trip (the headroom-refit rung, shipped 2026-10-02): click
   six terms as their own line (one `page.evaluate` loop clicking
   `.rd-cc-main` — React batches, the one-tick DOM nodes all stay live);
@@ -202,6 +227,13 @@ would crash the `<RdCycleChart>` branch via `lifted.size`.
   `--cyc-chip-pad` was removed from the element's inline style AND
   computed `padding-top` ≤ 60.5 (the refit let go; the ≤640px floor is
   60px exactly and must not have been inflated by the fit).
+- CUR-CANCEL round-trip (the cancellable sitting term, 2026-10-02): with one
+  past term lifted (so the `.rd-cc-cur` pill is on the band), click
+  `.rd-cyc-chipmove .rd-cc-cur button` → the pill is gone, the svg loses
+  `Labor`, and `.rd-cc-term.current .rd-cc-x` reads `+` with a
+  /back on the board/ aria-label → click that eye → pill, `Labor` and the
+  board's `×` all return; then tidy-unlift the past term. Sits BEFORE the
+  toggle rung's `boardOpen` precheck so the board is left closed.
 - Toggle/dismiss round-trip unchanged from 7964e12: chip-close, outside click/
   tap close, board `×` close. At ≤900px `.rd-cc-board` is a FIXED bottom sheet
   hugging up to 75vh — anchor the chip at viewport y≈110 (below the 72px

@@ -4173,13 +4173,15 @@ body.rd .rd-cyc-chipmove {
   row-gap: 8px; max-width: 100%;
 }
 body.rd .rd-cyc-chipmove .rd-cc-drawn { justify-content: flex-start; }
+body.rd .rd-cyc-chipmove .rd-chip { min-height: 29px; padding: 0 11px; border-radius: 14px; gap: 6.5px; font-size: 11px; }
+body.rd .rd-cyc-chipmove .rd-chip::after { height: 35px; }
 body.rd .rd-cc-l { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-cc-tabs { border-bottom: 0; }
 body.rd .rd-cc-n { margin-left: 6px; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-cc-sep { width: 1px; height: 22px; background: var(--line); margin: 0 6px; }
-body.rd .rd-cc-drawn { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-body.rd .rd-cc-pill { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 4px 0 12px; border: 1.5px solid; border-radius: 17px; font-size: 14px; color: var(--ink); }
-body.rd .rd-cc-pill button { all: unset; cursor: pointer; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-3); border-radius: 13px; }
+body.rd .rd-cc-drawn { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+body.rd .rd-cc-pill { display: inline-flex; align-items: center; gap: 6.5px; min-height: 27px; padding: 0 3px 0 10px; border: 1.5px solid; border-radius: 14px; font-size: 11px; color: var(--ink); }
+body.rd .rd-cc-pill button { all: unset; cursor: pointer; width: 21px; height: 21px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-3); border-radius: 10.5px; }
 body.rd .rd-cc-pill button:hover { background: var(--surface-2); color: var(--ink); }
 body.rd .rd-cc-rule { display: inline-block; width: 14px; height: 3px; border-radius: 2px; }
 body.rd .rd-cc-board {
@@ -72390,8 +72392,9 @@ function RdPastCycles(p) {
       showAll();
       return;
     }
+    const curHidden = cur && hidden.has(cur.year);
     showOutcome(id);
-    if (cur) toggle(cur.year);
+    if (cur && !curHidden) toggle(cur.year);
   };
   const setModePin = id => {
     pinView();
@@ -72946,7 +72949,7 @@ function RdPastCycles(p) {
     "aria-label": "Past terms"
   }, React.createElement("div", {
     className: "rd-cc-bhead"
-  }, React.createElement("b", null, "Past terms"), React.createElement("span", null, cycles.length - hidden.size - 1, " on the board, ", liftedList.length, " drawn as their own line"), React.createElement("span", {
+  }, React.createElement("b", null, "Past terms"), React.createElement("span", null, cycles.length - hidden.size - (hidden.has(cur.year) ? 0 : 1), " on the board, ", liftedList.length, " drawn as their own line"), React.createElement("span", {
     className: "rd-grow"
   }), React.createElement("button", {
     type: "button",
@@ -72979,7 +72982,7 @@ function RdPastCycles(p) {
     }, React.createElement("button", {
       type: "button",
       className: "rd-cc-main",
-      "aria-pressed": drawn || c.current,
+      "aria-pressed": drawn || c.current && !off,
       disabled: c.current,
       onClick: () => chipClick(c.year),
       title: off ? "Put " + c.year + " back on the board" : drawn ? "Return " + c.year + " to the band" : "Draw " + c.year + " as its own line"
@@ -72993,7 +72996,7 @@ function RdPastCycles(p) {
       className: "rd-cc-now"
     }, "This term") : React.createElement("span", {
       className: "rd-cc-oc"
-    }, oc === "returned" ? "Re-elected" : "Ousted"), !c.current && React.createElement("button", {
+    }, oc === "returned" ? "Re-elected" : "Ousted"), React.createElement("button", {
       type: "button",
       className: "rd-cc-x",
       "aria-label": (off ? "Put " : "Take ") + c.year + (off ? " back on the board" : " off the board"),
@@ -73232,7 +73235,11 @@ function RdPastCycles(p) {
       style: {
         background: cur.color
       }
-    }), cur.year, " ", pmNames(cur))))
+    }), cur.year, " ", pmNames(cur), React.createElement("button", {
+      type: "button",
+      "aria-label": "Take the " + cur.year + " term off the board",
+      onClick: () => toggle(cur.year)
+    }, "\xD7"))))
   }, tppStory && React.createElement(RdHed, {
     head: tppStory.head,
     dek: tppStory.dek

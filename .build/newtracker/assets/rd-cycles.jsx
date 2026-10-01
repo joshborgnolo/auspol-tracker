@@ -471,12 +471,16 @@ function RdPastCycles(p) {
      sitting term stays on the charts whichever set is picked. The board's
      showOutcome takes "only" to mean only and hides it too - every chart lost
      its Labor line while the table and headlines beside it still quoted it -
-     so it is put straight back (toggle's update runs after showOutcome's). */
+     so it is put straight back (toggle's update runs after showOutcome's) -
+     UNLESS the reader hid it themselves since (the sitting-term pill's cross
+     is a first-class toggle now): a set swap does not undo someone's
+     choice, so only a term showOutcome hid is re-shown. */
   const setCompare = (id) => {
     pinView();
     if (id === "all") { showAll(); return; }
+    const curHidden = cur && hidden.has(cur.year);
     showOutcome(id);
-    if (cur) toggle(cur.year);
+    if (cur && !curHidden) toggle(cur.year);
   };
   const setModePin = (id) => { pinView(); setMode(id); };
 
@@ -859,7 +863,7 @@ function RdPastCycles(p) {
       {board && (
         <div className="rd-cc-board" role="dialog" aria-label="Past terms">
           <div className="rd-cc-bhead">
-            <b>Past terms</b><span>{cycles.length - hidden.size - 1} on the board, {liftedList.length} drawn as their own line</span>
+            <b>Past terms</b><span>{cycles.length - hidden.size - (hidden.has(cur.year) ? 0 : 1)} on the board, {liftedList.length} drawn as their own line</span>
             <span className="rd-grow"></span>
             <button type="button" className="rd-link" onClick={() => { cycles.forEach((c) => { if (!c.current && !lifted.has(c.year) && !hidden.has(c.year)) toggle(c.year); }); }}>Only the drawn terms</button>
             <button type="button" className="rd-link" onClick={() => liftedList.forEach((c) => unlift(c.year))}>Clear lines</button>
@@ -872,13 +876,13 @@ function RdPastCycles(p) {
               return (
                 <span key={c.year} className={"rd-cc-term" + (off ? " off" : "") + (drawn ? " drawn" : "") + (c.current ? " current" : "")}
                       onMouseEnter={() => setHi(c.year)} onMouseLeave={() => setHi(null)}>
-                  <button type="button" className="rd-cc-main" aria-pressed={drawn || c.current} disabled={c.current}
+                  <button type="button" className="rd-cc-main" aria-pressed={drawn || (c.current && !off)} disabled={c.current}
                           onClick={() => chipClick(c.year)} title={off ? "Put " + c.year + " back on the board" : drawn ? "Return " + c.year + " to the band" : "Draw " + c.year + " as its own line"}>
                     <span className="rd-cc-rule" style={{ background: c.color, opacity: drawn || c.current ? 1 : 0.4 }}></span>
                     <b>{c.year}</b><span>{pmNames(c)}</span>
                   </button>
                   {c.current ? <span className="rd-cc-now">This term</span> : <span className="rd-cc-oc">{oc === "returned" ? "Re-elected" : "Ousted"}</span>}
-                  {!c.current && <button type="button" className="rd-cc-x" aria-label={(off ? "Put " : "Take ") + c.year + (off ? " back on the board" : " off the board")} onClick={() => toggle(c.year)}>{off ? "+" : "×"}</button>}
+                  <button type="button" className="rd-cc-x" aria-label={(off ? "Put " : "Take ") + c.year + (off ? " back on the board" : " off the board")} onClick={() => toggle(c.year)}>{off ? "+" : "×"}</button>
                 </span>
               );
             })}
@@ -995,10 +999,13 @@ function RdPastCycles(p) {
                    ))}
                    {/* the sitting term draws over the band too (it was never IN the
                        band to lift out of) - it says so as an unliftable pill; only
-                       not at all on the board when the reader has hidden its term */}
+                       not at all on the board when the reader has hidden its term.
+                       Its cross takes the term off the board like any other's
+                       (it comes back from the board's own eye) */}
                    {!hidden.has(cur.year) && (
                      <span className="rd-cc-pill rd-cc-cur" style={{ borderColor: cur.color }}>
                        <span className="rd-cc-rule" style={{ background: cur.color }}></span>{cur.year} {pmNames(cur)}
+                       <button type="button" aria-label={"Take the " + cur.year + " term off the board"} onClick={() => toggle(cur.year)}>×</button>
                      </span>
                    )}
                  </span>

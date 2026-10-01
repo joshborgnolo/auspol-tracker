@@ -56,6 +56,7 @@ async function run(W, H, touch) {
       chipInTools: !!(tools && chip.closest(".rd-eyebrow-tools") === tools),
       ruleY: r(eb).t + parseFloat(ebs.borderTopWidth) / 2,
       chip: r(chip),
+      chipFs: getComputedStyle(chip).fontSize,
       wrap: r(wrap),
       ebLeft: r(eb).l,
       pos: ws.position,
@@ -76,6 +77,11 @@ async function run(W, H, touch) {
      drawn pills (taller than the chip) joined the band */
   const gap = g.ruleY - g.wrap.b;
   if (Math.abs(gap - 12) > 1.6) fails.push(tag + ": band bottom sits " + gap.toFixed(1) + "px above the divider " + g.ruleY.toFixed(1) + ", not ~12px (wrap bottom " + g.wrap.b.toFixed(1) + ")");
+  /* the band's chips are the ~80% cut of the shared chrome the reader asked
+     for ("reduce the size of the cycles chips by 20%"): 11px type on a 29px
+     chip (the shared .rd-chip is 14px/36px) */
+  if (g.chipFs !== "11px") fails.push(tag + ": the band chip reads " + g.chipFs + ", not the shrunk 11px");
+  if (Math.abs(g.chip.b - g.chip.t - 29) > 1) fails.push(tag + ": the band chip is " + (g.chip.b - g.chip.t).toFixed(1) + "px tall, not ~29px");
   if (Math.abs(g.chip.l - g.ebLeft) > 1.5) fails.push(tag + ": chip left edge " + g.chip.l.toFixed(1) + " != eyebrow left edge " + g.ebLeft.toFixed(1));
   if (g.pos !== "absolute") fails.push(tag + ": .rd-cyc-chipmove is not absolutely positioned (" + g.pos + ")");
   if (!/^＋ Draw a( past)? term$/.test(g.label)) fails.push(tag + ": unexpected chip label '" + g.label + "'");
@@ -136,10 +142,13 @@ async function run(W, H, touch) {
       cur: p.classList.contains("rd-cc-cur"),
       btn: !!p.querySelector("button"),
     })) : [];
+    const firstPill = drawn ? drawn.querySelector(".rd-cc-pill") : null;
     return {
       drawn: !!drawn,
       text: drawn ? drawn.textContent.replace(/\s+/g, " ").trim() : "",
       pills,
+      pillFs: firstPill ? getComputedStyle(firstPill).fontSize : null,
+      pillH: firstPill ? r(firstPill).bottom - r(firstPill).top : null,
       svg: Array.from(document.querySelectorAll("#cyc-tpp svg")).map((s) => s.textContent).join(" "),
       gap: (r(eb).top + parseFloat(ebs.borderTopWidth) / 2) - r(wrap).bottom,
       chipL: r(chip).left,
@@ -164,11 +173,16 @@ async function run(W, H, touch) {
     if (afterLift.footB != null && afterLift.wrapT < afterLift.footB - 0.6) fails.push(tag + ": band top " + afterLift.wrapT.toFixed(1) + " overlaps the Summary foot (bottom " + afterLift.footB.toFixed(1) + ")");
     const past = afterLift.pills.filter((p) => !p.cur);
     if (!past.some((p) => p.text.indexOf(picked) === 0 && p.btn)) fails.push(tag + ": no unliftable pill for the lifted " + picked + " term (pills: " + afterLift.pills.map((p) => p.text).join(" | ") + ")");
+    /* the pills are the same ~80% cut as the band chip: 11px type, 27px
+       ring-to-ring (27px min-height is box-sizing: border-box, so the
+       1.5px borders eat into it — OLD 34px included them the same way) */
+    if (afterLift.pillFs !== "11px") fails.push(tag + ": a drawn pill reads " + afterLift.pillFs + ", not the shrunk 11px");
+    if (afterLift.pillH == null || Math.abs(afterLift.pillH - 27) > 1) fails.push(tag + ": a drawn pill is " + (afterLift.pillH == null ? "n/a" : afterLift.pillH.toFixed(1)) + "px tall ring-to-ring, not ~27px");
     const cur = afterLift.pills.filter((p) => p.cur);
     if (cur.length !== 1) fails.push(tag + ": expected exactly one sitting-term pill while " + picked + " is drawn, found " + cur.length);
     else {
       if (!/^20\d\d /.test(cur[0].text)) fails.push(tag + ": sitting-term pill does not read like '2025 Albanese' ('" + cur[0].text + "')");
-      if (cur[0].btn) fails.push(tag + ": the sitting-term pill carries an unlift button - the sitting term cannot be returned to the band");
+      if (!cur[0].btn) fails.push(tag + ": the sitting-term pill carries no cancel cross - the reader asked for one ('add an x for Albanese 2025')");
     }
     if (Math.abs(afterLift.gap - 12) > 1.6) fails.push(tag + ": with pills up, band bottom sits " + afterLift.gap.toFixed(1) + "px above the divider, not ~12px");
   }
@@ -256,6 +270,55 @@ async function run(W, H, touch) {
   if (afterClear.drawn) fails.push(tag + ": unlifting every pill did not drop the drawn row");
   if (afterClear.varPad) fails.push(tag + ": --cyc-chip-pad still pinned at " + afterClear.varPad + " after every drawn term returned");
   if (afterClear.padTop > 60.5) fails.push(tag + ": #cyc-tpp padding stayed grown at " + afterClear.padTop + "px after every drawn term returned");
+
+  /* the sitting term's pill carries its own cross now (reader: "add an x
+     for Albanese 2025 - currently it's not cancellable"): clicking it takes
+     the term off the board exactly like any other term's eye - its line,
+     its figure and its pill all go (the drawn row needs one past term
+     lifted, or the pill never renders) - and the board's eye on the
+     current row puts it straight back. */
+  if (!(await boardOpen())) { await anchorChip(); await sleep(250); await page.click(chipSel); await sleep(300); }
+  await page.evaluate(() => { const m = document.querySelector(".rd-cc-term:not(.current) .rd-cc-main"); if (m) m.click(); });
+  await sleep(300);
+  const curXed = await page.evaluate(() => {
+    const b = document.querySelector("#cyc-tpp .rd-cyc-chipmove .rd-cc-cur button");
+    if (b) b.click();
+    return !!b;
+  });
+  if (!curXed) fails.push(tag + ": no cancel cross on the sitting-term pill to click");
+  await sleep(300);
+  const afterCurX = await page.evaluate(() => {
+    const eye = document.querySelector(".rd-cc-term.current .rd-cc-x");
+    return {
+      curPill: !!document.querySelector("#cyc-tpp .rd-cc-cur"),
+      svg: Array.from(document.querySelectorAll("#cyc-tpp svg")).map((s) => s.textContent).join(" "),
+      eye: eye ? eye.textContent.trim() : null,
+      eyeLbl: eye ? eye.getAttribute("aria-label") : null,
+    };
+  });
+  if (afterCurX.curPill) fails.push(tag + ": the sitting term's pill survived its own cross");
+  if (/Labor/.test(afterCurX.svg)) fails.push(tag + ": the sitting term's figure stayed on the tpp chart after its own cross (hidden must mean hidden)");
+  if (afterCurX.eye !== "+") fails.push(tag + ": the board's current row does not offer the term back after the cross (eye reads '" + afterCurX.eye + "', want '+')");
+  if (!/back on the board/.test(afterCurX.eyeLbl || "")) fails.push(tag + ": the current row's eye does not read as a restore ('" + afterCurX.eyeLbl + "')");
+  const putBack = await page.evaluate(() => {
+    const b = document.querySelector(".rd-cc-term.current .rd-cc-x");
+    if (b) b.click();
+    return !!b;
+  });
+  await sleep(300);
+  const afterPutBack = await page.evaluate(() => ({
+    curPill: !!document.querySelector("#cyc-tpp .rd-cyc-chipmove .rd-cc-cur"),
+    svg: Array.from(document.querySelectorAll("#cyc-tpp svg")).map((s) => s.textContent).join(" "),
+  }));
+  if (!putBack) fails.push(tag + ": no eye on the current row to put the term back");
+  if (!afterPutBack.curPill) fails.push(tag + ": putting the current term back did not return its pill");
+  if (!/Labor/.test(afterPutBack.svg)) fails.push(tag + ": the sitting term's figure did not come back with the term");
+  /* tidy: return the lifted term so the toggle round-trips start default */
+  await page.evaluate(() => {
+    const p = Array.from(document.querySelectorAll("#cyc-tpp .rd-cyc-chipmove .rd-cc-pill:not(.rd-cc-cur) button"))[0];
+    if (p) p.click();
+  });
+  await sleep(300);
 
   /* toggle round-trip: open; second chip click must close (the dismiss
      hook would otherwise swallow the toggle); outside click/tap must close
