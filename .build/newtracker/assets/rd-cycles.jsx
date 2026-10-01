@@ -311,13 +311,14 @@ function RdPastCycles(p) {
   const [board, setBoard] = useState(false);
   const [tip, setTip] = useState(null);
   /* the walk floor: the finding's slot stands at the tallest of every
-     (compare, measure) state the walk can reach, so a hop rewrites the
-     words inside a box that never moves - nothing above the pinned row
-     reflows and no scroll correction is ever issued (the All-polls
-     hed-on-every-facet bargain, 2026-10-01). The walkable states render
-     invisibly in .rd-cyc-storyvar and the slot re-floors if any of them
-     re-wraps (a resize, a font arriving); the live block joins the max so
-     the hand-entered "terms on the board" state counts too */
+     measure state the walk can reach (the finding no longer answers to
+     the Compare-with pick), so a hop rewrites the words inside a box that
+     never moves - nothing above the pinned row reflows and no scroll
+     correction is ever issued (the All-polls hed-on-every-facet bargain,
+     2026-10-01). The walkable states render invisibly in .rd-cyc-storyvar
+     and the slot re-floors if any of them re-wraps (a resize, a font
+     arriving); the live block joins the max so any live re-count counts
+     too */
   const storySlotRef = React.useRef(null), storyVarRef = React.useRef(null);
   const [storyFloor, setStoryFloor] = useState(0);
   React.useLayoutEffect(() => {
@@ -344,8 +345,9 @@ function RdPastCycles(p) {
      tap or the hook would dismiss and the click would re-open - a toggle
      that can only open, never close */
   window.useDismissOutside(boardRef, board, () => setBoard(false), ".rd-cyc-chipmove");
-  /* Walking the compare sets or the measure rewrites the finding above
-     this row, and its height swings state to state. The walk floor (the
+  /* Walking the measure rewrites the finding above this row (the
+     Compare-with walk leaves it standing), and its height swings state
+     to state. The walk floor (the
      storyFloor machinery below) holds the finding's slot at the tallest
      walkable state, so the rewrite moves nothing above the row and the
      pin has nothing to correct - the All-polls hed-on-every-facet
@@ -421,12 +423,6 @@ function RdPastCycles(p) {
 
   /* the outcome sets, counted off the board's own rule */
   const outcomeOf = (i) => { const nx = cycles[i + 1]; return nx ? (nx.gov === cycles[i].gov ? "returned" : "ousted") : null; };
-  /* the hidden set a Compare-with pick lands on (the tabbed-views layer's
-     showOutcome + setCompare's put-the-sitting-term-back, worked out here
-     without touching its state): past terms not in the outcome set are
-     off the board, the sitting term stays on it */
-  const hiddenFor = (cmp) => cmp === "all" ? new Set()
-    : new Set(cycles.filter((c, i) => !c.current && outcomeOf(i) !== cmp).map((c) => c.year));
   const nPast = cycles.filter((c) => !c.current).length;
   const nRet = cycles.filter((c, i) => outcomeOf(i) === "returned").length, nOus = cycles.filter((c, i) => outcomeOf(i) === "ousted").length;
   const compare = hidden.size === 0 ? "all" : outcomeShown || null;
@@ -502,27 +498,35 @@ function RdPastCycles(p) {
      at its lowest level on the strength of how far it had fallen. */
   const pts1 = (v) => Math.abs(v).toFixed(1);
   const upDown = (v) => (v < 0 ? "down " : "up ") + pts1(v);
-  /* The findings rank this term against the past terms in the comparison,
-     so a superlative says which ones: with Re-elected picked, "the lowest of
-     any prime minister" left out Whitlam, who was lower. `tail` closes the
-     sentence that makes the claim; "since 1972" belongs to the full set. */
+  /* The per-measure findings rank this term against the past terms in the
+     comparison, so a superlative says which ones: with Re-elected picked,
+     "the lowest of any prime minister" left out Whitlam, who was lower.
+     `tail` closes the sentence that makes the claim. */
   const tail = compare === "all" ? "" : compare === "returned" ? ", among terms whose government was re-elected"
     : compare === "ousted" ? ", among terms whose government was ousted" : ", among the terms on the board";
-  const since = compare === "all" ? " since " + cycles[0].year : "";
-  /* The finding the compare/measure walk rewrites per hop, worked out for
-     any (compare, measure) state: the section's walk floor (below) renders
-     every walkable state of it and holds the slot at the tallest, so a hop
-     reflows nothing above the pinned compare row and the pin issues no
-     scroll correction at all - the same bargain the All-polls table struck
-     by rendering its hed on every facet (2026-10-01), because Safari.app's
-     quantised scroller cannot be trusted with a per-hop correction stream.
-     `t2`/`snc` are that state's `tail`/`since`. */
-  const storyFor = (RV, cmp, c2) => {
-    const t2 = cmp === "all" ? "" : cmp === "returned" ? ", among terms whose government was re-elected"
-      : cmp === "ousted" ? ", among terms whose government was ousted" : ", among the terms on the board";
-    const snc = cmp === "all" ? " since " + cycles[0].year : "";
-    const g = RV.primary, o = RV.oppr, t = RV.tpp;
+  /* THE section finding holds the same copy at every Compare-with pick: it
+     ranks this term against every past term (the pick still rescopes the
+     table below and the charts beside it; the finding stands above them as
+     the page's read of the moment, so it doesn't move). The measure walk
+     still rewrites it, so it is worked out per measure state: the section's
+     walk floor (below) renders both invisibly and holds the slot at the
+     taller, so a hop reflows nothing above the pinned compare row and the
+     pin issues no scroll correction at all - the same bargain the All-polls
+     table struck by rendering its hed on every facet (2026-10-01), because
+     Safari.app's quantised scroller cannot be trusted with a per-hop
+     correction stream. */
+  const storyFor = (c2) => {
+    const FA = rowIdx(rowsForHidden(new Set(), c2));
+    const g = FA.primary, o = FA.oppr, t = FA.tpp;
+    const snc = " since " + cycles[0].year;
     const gLow = g.rank && /^Lowest/.test(g.rank.main), oLow = o.rank && /^Lowest/.test(o.rank.main);
+    /* the right-of-government vote pooled: an opposition-primary record low
+       is only half the picture while One Nation polls this high, so the
+       finding also weighs the opposition's own vote combined with One
+       Nation's against past terms on the same footing */
+    const cb = !c2 && FA.comb.rank && FA.comb.v != null ? FA.comb : null;
+    const combined = cb ? /^Highest/.test(cb.rank.main) ? "the highest"
+      : cb.v >= cb.peers.q3 ? "among the highest" : cb.v > cb.peers.q1 ? "in the middle half" : "among the lowest" : null;
     const moved = (r) => (r.v < 0 ? "fallen further" : "risen less");
     const found = c2
       ? (gLow && oLow ? (g.v < 0 && o.v < 0 ? "Both major parties have lost more of their vote than any before them at this point in a term"
@@ -535,7 +539,7 @@ function RdPastCycles(p) {
       : gLow ? govName + "’s primary vote is the lowest of any government at this point in a term"
       : oLow ? rdCap(oppIn) + "’s primary vote is the lowest of any opposition at this point in a term"
       : t.peers && t.v != null ? govName + " sits " + (t.v >= t.peers.mean ? "above" : "below") + " the average government at this point in a term" : null;
-    const head = found ? found + t2 : "Every term since " + cycles[0].year + ", lined up on its election day";
+    const head = found || "Every term since " + cycles[0].year + ", lined up on its election day";
     let dek = monthsWord + " after the " + cur.year + " election, ";
     const bits = [];
     const extreme = (r) => (r.v < 0 ? "the biggest fall" : "the smallest rise");
@@ -544,28 +548,29 @@ function RdPastCycles(p) {
       if (oLow) bits.push((gLow ? "and " + oppIn + "’s is " : oppIn + "’s primary vote is ") + upDown(o.v) + " points, " + extreme(o) + " for any opposition");
     } else {
       if (gLow) bits.push(govName + "’s primary vote is the lowest of any government at the same point" + snc);
-      if (oLow) bits.push((gLow ? "and " + oppIn + "’s" : oppIn + "’s primary vote is") + " the lowest of any opposition");
+      /* the opposition's record low is its own sentence when the combined
+         standing can ride its tail clause */
+      if (oLow && !combined) bits.push((gLow ? "and " + oppIn + "’s" : oppIn + "’s primary vote is") + " the lowest of any opposition");
     }
     /* a rank counts this term among its peers, so "of 21" is 21 governments,
        twenty of them past */
     const rankWords = (r) => (/^Middle/.test(r.rank.main) ? "in the " : "the ") + r.rank.main.toLowerCase().replace(/ of (\d+)$/, " of $1 governments");
-    dek += bits.length ? bits.join(", ") + t2 + "."
+    dek += bits.length ? bits.join(", ") + "."
       : g.v == null || !g.rank ? govName + "’s primary vote has no reading to set against past governments yet."
       : c2 ? govName + "’s primary vote is " + upDown(g.v) + " points since the election; past governments were "
-          + (g.peers.mean < 0 ? "down " : "up ") + pts1(g.peers.mean) + " on average by now" + t2 + "."
-      : govName + "’s primary vote is " + rankWords(g) + " at this point" + t2 + ".";
+          + (g.peers.mean < 0 ? "down " : "up ") + pts1(g.peers.mean) + " on average by now."
+      : govName + "’s primary vote is " + rankWords(g) + " at this point.";
     if (t.peers && t.v != null && !c2) {
-      const past = t2 ? "those governments" : "past governments";
-      const where = t.v >= t.peers.q1 && t.v <= t.peers.q3 ? "sits in the middle half of " + past
-        : t.v > t.peers.q3 ? "is above three in four of " + past : "is below three in four of " + past;
+      const where = t.v >= t.peers.q1 && t.v <= t.peers.q3 ? "sits in the middle half of past governments"
+        : t.v > t.peers.q3 ? "is above three in four of past governments" : "is below three in four of past governments";
       dek += " After preferences, " + (bits.length ? "though, " : "") + govName + "’s " + t.v.toFixed(1) + "% " + where + ".";
     }
+    if (!c2 && oLow && combined) dek += " And while " + oppIn + "’s primary vote is the lowest of any opposition, it’s " + combined + " when combined with One Nation’s.";
     return { head, dek };
   };
-  const pageStory = storyFor(R, compare, chg);
-  /* every (compare, measure) state the walk can land this section in */
-  const storyVariants = ["all", "returned", "ousted"].flatMap((cmp) => [false, true]
-    .map((c2) => ({ key: cmp + (c2 ? "/c" : "/a"), story: storyFor(rowIdx(rowsForHidden(hiddenFor(cmp), c2)), cmp, c2) })));
+  const pageStory = storyFor(chg);
+  /* both measure states the walk can land this section in */
+  const storyVariants = [false, true].map((c2) => ({ key: c2 ? "chg" : "abs", story: storyFor(c2) }));
   /* the 2PP against the governments that were re-elected and ousted */
   const outcomePeers = (which) => {
     const keep = new Set(cycles.filter((c, i) => outcomeOf(i) === which).map((c) => c.year));
