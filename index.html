@@ -4162,6 +4162,11 @@ body.rd .rd-cyc-nav button:hover { text-decoration: underline; text-underline-of
 body.rd .rd-cc { position: relative; margin-top: 32px; }
 body.rd .rd-cyc-storyvar { height: 0; overflow: hidden; visibility: hidden; }
 body.rd .rd-cc-row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+body.rd .rd-cyc-chipmove {
+  position: absolute; top: calc(var(--rd-sec-pad) + 1px); right: 0; z-index: 1;
+  transform: translateY(-50%);
+  background: var(--bg); padding: 0 6px;
+}
 body.rd .rd-cc-l { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-cc-tabs { border-bottom: 0; }
 body.rd .rd-cc-n { margin-left: 6px; font-weight: 400; color: var(--ink-3); }
@@ -46227,7 +46232,7 @@ window.useNarrow = function useNarrow(query) {
 window.inkOf = function inkOf(c) {
   return typeof c === "string" ? c.replace(/var\(--(alp|lnp|grn|onp|oth)\)/g, "var(--$1-text)") : c;
 };
-window.useDismissOutside = function useDismissOutside(ref, open, onDismiss) {
+window.useDismissOutside = function useDismissOutside(ref, open, onDismiss, ignoreSel) {
   const cb = React.useRef(onDismiss);
   cb.current = onDismiss;
   React.useEffect(() => {
@@ -46235,6 +46240,7 @@ window.useDismissOutside = function useDismissOutside(ref, open, onDismiss) {
     const outside = e => {
       const el = ref && ref.current;
       if (el && e.target instanceof Node && el.contains(e.target)) return;
+      if (ignoreSel && e.target instanceof Element && e.target.closest(ignoreSel)) return;
       cb.current();
     };
     document.addEventListener("pointerdown", outside, true);
@@ -72215,7 +72221,7 @@ function RdPastCycles(p) {
     return () => ro.disconnect();
   });
   const boardRef = React.useRef(null);
-  window.useDismissOutside(boardRef, board, () => setBoard(false));
+  window.useDismissOutside(boardRef, board, () => setBoard(false), ".rd-cyc-chipmove");
   const pinView = () => {
     const sec = document.getElementById("cyc-summary");
     const strip = sec && [...sec.querySelectorAll(".rd-cs-row")].find(el => {
@@ -72829,14 +72835,7 @@ function RdPastCycles(p) {
     className: "rd-tab",
     "aria-pressed": chg,
     onClick: () => setModePin("chg")
-  }, narrow ? "Change" : "Change since election")), React.createElement("span", {
-    className: "rd-grow"
-  }), React.createElement("button", {
-    type: "button",
-    className: "rd-chip",
-    "aria-expanded": board,
-    onClick: () => setBoard(b => !b)
-  }, "\uFF0B ", narrow ? "Draw a term" : "Draw a past term")), liftedList.length > 0 && React.createElement("div", {
+  }, narrow ? "Change" : "Change since election"))), liftedList.length > 0 && React.createElement("div", {
     className: "rd-cc-drawn"
   }, React.createElement("span", {
     className: "rd-cc-l"
@@ -73070,7 +73069,15 @@ function RdPastCycles(p) {
   }))), React.createElement(RdSec, {
     id: "cyc-tpp",
     title: "Two-party preferred",
-    meta: "Implied from each poll\u2019s primary votes, on the flows counted at the election that opened its term"
+    meta: "Implied from each poll\u2019s primary votes, on the flows counted at the election that opened its term",
+    tools: React.createElement("span", {
+      className: "rd-cyc-chipmove"
+    }, React.createElement("button", {
+      type: "button",
+      className: "rd-chip",
+      "aria-expanded": board,
+      onClick: () => setBoard(b => !b)
+    }, "\uFF0B ", narrow ? "Draw a term" : "Draw a past term"))
   }, tppStory && React.createElement(RdHed, {
     head: tppStory.head,
     dek: tppStory.dek

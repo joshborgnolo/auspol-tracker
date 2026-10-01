@@ -1563,6 +1563,16 @@ body.rd .rd-cc { position: relative; margin-top: 32px; }
    invisibly so the live slot can stand at the tallest (rd-cycles.jsx) */
 body.rd .rd-cyc-storyvar { height: 0; overflow: hidden; visibility: hidden; }
 body.rd .rd-cc-row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+/* the Draw-a-term chip, moved off the controls row onto the Two-party
+   section's own divider: it sits on the 2px eyebrow rule at the right
+   edge, the bg patch breaking the line behind it, and lands the same at
+   every width (the eyebrow tools slot exists only to hang it inside the
+   already-positioned .rd-sec) */
+body.rd .rd-cyc-chipmove {
+  position: absolute; top: calc(var(--rd-sec-pad) + 1px); right: 0; z-index: 1;
+  transform: translateY(-50%);
+  background: var(--bg); padding: 0 6px;
+}
 body.rd .rd-cc-l { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-cc-tabs { border-bottom: 0; }
 body.rd .rd-cc-n { margin-left: 6px; font-weight: 400; color: var(--ink-3); }

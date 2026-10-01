@@ -323,7 +323,11 @@ function RdPastCycles(p) {
     return () => ro.disconnect();
   });
   const boardRef = React.useRef(null);
-  window.useDismissOutside(boardRef, board, () => setBoard(false));
+  /* the board's toggle is rendered on the Two-party section's divider, far
+     outside boardRef, so its pointerdown is told apart from a real outside
+     tap or the hook would dismiss and the click would re-open - a toggle
+     that can only open, never close */
+  window.useDismissOutside(boardRef, board, () => setBoard(false), ".rd-cyc-chipmove");
   /* Walking the compare sets or the measure rewrites the finding above
      this row, and its height swings state to state. The walk floor (the
      storyFloor machinery below) holds the finding's slot at the tallest
@@ -789,8 +793,6 @@ function RdPastCycles(p) {
           <button type="button" className="rd-tab" aria-pressed={!chg} onClick={() => setModePin("abs")}>Level</button>
           <button type="button" className="rd-tab" aria-pressed={chg} onClick={() => setModePin("chg")}>{narrow ? "Change" : "Change since election"}</button>
         </div>
-        <span className="rd-grow"></span>
-        <button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
       </div>
       {liftedList.length > 0 && (
         <div className="rd-cc-drawn">
@@ -903,7 +905,8 @@ function RdPastCycles(p) {
           <RdHow term="what-am-i-looking-at" from="Past cycles" />
         </div>
       </section>
-      <RdSec id="cyc-tpp" title="Two-party preferred" meta="Implied from each poll’s primary votes, on the flows counted at the election that opened its term">
+      <RdSec id="cyc-tpp" title="Two-party preferred" meta="Implied from each poll’s primary votes, on the flows counted at the election that opened its term"
+             tools={<span className="rd-cyc-chipmove"><button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button></span>}>
         {tppStory && <RdHed head={tppStory.head} dek={tppStory.dek} />}
         <div className="rd-cyc-one">{chart("tpp", false)}</div>
         {bandKey("tpp")}

@@ -49,7 +49,7 @@ window.inkOf = function inkOf(c) {
    pointerdown rather than click, and in the CAPTURE phase, so the panel goes
    as the next gesture BEGINS - before that gesture turns into a scroll, and
    before any handler inside the page can stop it propagating. */
-window.useDismissOutside = function useDismissOutside(ref, open, onDismiss) {
+window.useDismissOutside = function useDismissOutside(ref, open, onDismiss, ignoreSel) {
   const cb = React.useRef(onDismiss);
   cb.current = onDismiss;
   React.useEffect(() => {
@@ -57,6 +57,7 @@ window.useDismissOutside = function useDismissOutside(ref, open, onDismiss) {
     const outside = (e) => {
       const el = ref && ref.current;
       if (el && e.target instanceof Node && el.contains(e.target)) return;
+      if (ignoreSel && e.target instanceof Element && e.target.closest(ignoreSel)) return;
       cb.current();
     };
     document.addEventListener("pointerdown", outside, true);
