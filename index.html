@@ -4165,9 +4165,10 @@ body.rd .rd-cc-row { display: flex; align-items: center; gap: 12px; border-botto
 body.rd .rd-cyc-chipmove {
   position: absolute; top: calc(var(--rd-sec-pad) + 1px); right: 0; z-index: 1;
   transform: translateY(calc(-100% - 6px));
-  display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap;
-  gap: 14px; max-width: 100%;
+  display: flex; flex-direction: column; align-items: flex-end;
+  row-gap: 8px; max-width: 100%;
 }
+body.rd .rd-cyc-chipmove .rd-cc-drawn { justify-content: flex-end; }
 body.rd .rd-cc-l { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-cc-tabs { border-bottom: 0; }
 body.rd .rd-cc-n { margin-left: 6px; font-weight: 400; color: var(--ink-3); }
@@ -4247,6 +4248,10 @@ body.rd .rd-cyc-subs .rd-sub { margin-top: 44px; }
 body.rd .rd-cyc-subs .rd-subdek { font-size: 15px; min-height: 45px; margin-bottom: 8px; }
 body.rd .rd-cyc-chart .rd-chead { flex-wrap: wrap; gap: 12px; }
 body.rd .rd-cyc-chart .rd-check { font-size: 13px; }
+body.rd .rd-cyc-ctls { display: contents; }
+@media (max-width: 640px) {
+  body.rd .rd-cyc-ctls { display: flex; flex-direction: column-reverse; align-items: flex-end; flex-basis: 100%; row-gap: 6px; }
+}
 body.rd .cyc-band.lo { fill: var(--ink-3); opacity: 0.1; }
 body.rd .cyc-band.hi { fill: var(--ink-3); opacity: 0.17; }
 body.rd .cyc-band.lo.thin { opacity: 0.045; }
@@ -72073,13 +72078,15 @@ function RdCycleChart({
     className: "rd-chead"
   }, React.createElement("span", {
     className: "rd-chead-t"
-  }, title), M.onp && React.createElement(RdCheck, {
+  }, title), M.onp && React.createElement("span", {
+    className: "rd-cyc-ctls"
+  }, React.createElement(RdCheck, {
     checked: showComb,
     onChange: setComb
-  }, "Combine L/NP and ON"), M.onp && React.createElement(RdCheck, {
+  }, "Combine L/NP and ON"), React.createElement(RdCheck, {
     checked: showOnp,
     onChange: setOnp
-  }, "One Nation this term"), hanCtl && React.createElement(RdCheck, {
+  }, "One Nation this term")), hanCtl && React.createElement(RdCheck, {
     checked: showHan,
     onChange: setHan
   }, "Pauline Hanson this term")), React.createElement(TrendChart, {
@@ -73095,7 +73102,12 @@ function RdPastCycles(p) {
     meta: "Implied from each poll\u2019s primary votes, on the flows counted at the election that opened its term",
     tools: React.createElement("span", {
       className: "rd-cyc-chipmove"
-    }, liftedList.length > 0 && React.createElement("span", {
+    }, React.createElement("button", {
+      type: "button",
+      className: "rd-chip",
+      "aria-expanded": board,
+      onClick: () => setBoard(b => !b)
+    }, "\uFF0B ", narrow ? "Draw a term" : "Draw a past term"), liftedList.length > 0 && React.createElement("span", {
       className: "rd-cc-drawn"
     }, React.createElement("span", {
       className: "rd-cc-l"
@@ -73124,12 +73136,7 @@ function RdPastCycles(p) {
       style: {
         background: cur.color
       }
-    }), cur.year, " ", pmNames(cur))), React.createElement("button", {
-      type: "button",
-      className: "rd-chip",
-      "aria-expanded": board,
-      onClick: () => setBoard(b => !b)
-    }, "\uFF0B ", narrow ? "Draw a term" : "Draw a past term"))
+    }), cur.year, " ", pmNames(cur))))
   }, tppStory && React.createElement(RdHed, {
     head: tppStory.head,
     dek: tppStory.dek

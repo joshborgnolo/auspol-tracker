@@ -227,8 +227,10 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
     <div className="card rd-card rd-cyc-chart" ref={cardRef}>
       <div className="rd-chead">
         <span className="rd-chead-t">{title}</span>
-        {M.onp && <RdCheck checked={showComb} onChange={setComb}>Combine L/NP and ON</RdCheck>}
-        {M.onp && <RdCheck checked={showOnp} onChange={setOnp}>One Nation this term</RdCheck>}
+        {M.onp && <span className="rd-cyc-ctls">
+          <RdCheck checked={showComb} onChange={setComb}>Combine L/NP and ON</RdCheck>
+          <RdCheck checked={showOnp} onChange={setOnp}>One Nation this term</RdCheck>
+        </span>}
         {hanCtl && <RdCheck checked={showHan} onChange={setHan}>Pauline Hanson this term</RdCheck>}
       </div>
       <TrendChart key={"rd-cyc-" + M.key}
