@@ -979,7 +979,7 @@ function RdAllPolls(P) {
   const inToday = (p) => { const t = rdApDays(p.released); return t > upd - winDays * 864e5 && t <= upd && figOf(p).a != null; };
   const win = rows.filter(inToday);
   let head = null, dek = null;
-  if (facet === "twopp" && today && win.length) {
+  if (today && win.length) {
     const vals = win.map((p) => figOf(p).a);
     const lo = Math.min(...vals), hi = Math.max(...vals);
     const f = (v) => (pub ? rdApNum(v) : v.toFixed(1));
@@ -1458,14 +1458,21 @@ function RdAllPolls(P) {
   const NAV = phone || tight
     ? [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagreement"], ["house-lean", "Lean"], ["flow-drift", "Flows"]]
     : [["rd-ap-top", "The polls"], ["poll-disagreement", "How much they disagree"], ["house-lean", "How each pollster leans"], ["flow-drift", "Preference flows"]];
-  /* Walking the facets, the flip or the counts basis rewrites the head and
-     dek above the facet row (every facet but twopp drops them outright), and
-     on a phone the two-party counts strip springs open between the tab row
-     and the table. Anchor the search/filter bar first: everything above it
-     can then resize itself while the bar, the column head and every row
-     under the reader stay exactly where they were (the tab row can't hold -
-     the strip lands between it and the table; on a phone it rides up the
-     strip's height instead). The desktop column head is the same height in
+  /* The head and dek render on EVERY facet (not just twopp): it is a
+     where-things-stand line, not a facet label, and keeping the slot's
+     height constant means a laptop facet walk moves nothing above the bar
+     but the two-party strip's ~1px in the tab row. That is load-bearing,
+     not cosmetic - Safari.app's scroller lattice drops any sub-3css scroll
+     correction and lands each big one ~±2css off, so a per-hop hed reflow
+     could not be chased (the 2026-09-30 laptop facet-walk crawl, rounds
+     9-12 in the rdpinscroll skill). The flip/basis toggles still rewrite
+     the hed's words, and on a phone the two-party counts strip still
+     springs open between the tab row and the table. Anchor the
+     search/filter bar first: whatever can still resize above it does so
+     while the bar, the column head and every row under the reader stay
+     exactly where they were (the tab row can't hold - the strip lands
+     between it and the table; on a phone it rides up the strip's height
+     instead). The desktop column head is the same height in
      every facet (rd.css's .rd-ap-hrow floor), so the rows hold there too.
      Deeper scrolls fall back through the tab row to the first data row.
      Unlike every other pinned section, this one asks for the pin on fine

@@ -294,7 +294,7 @@ function rdPinScroll(row, fine) {
   const html = document.documentElement;
   if (rdPinAnchorSave === null) rdPinAnchorSave = html.style.overflowAnchor;
   html.style.overflowAnchor = "none";
-  let want = want0.top, lastY = window.scrollY;
+  let want = want0.top, lastY = window.scrollY, lastIssued = 0, issueY = -1, eaten = 0;
   /* every candidate a caller lists sits below the section head, so they
      share the ONE translation through a swap: when the pinned element's
      own React commit re-keys it out of the DOM mid-pin (an All-polls facet
@@ -311,6 +311,23 @@ function rdPinScroll(row, fine) {
     want = next[1];
     return true;
   };
+  /* adopt a sub-pixel leftover into the anchor (and every reseat target).
+     Whole-css-px corrections park any engine within half a pixel of the
+     anchor, and the rounding residual is meant to die there - but the
+     quantisation lives in the Safari app's own scroller, which commits
+     positions its web process doesn't report back the same way (native
+     WKWebView settles exactly like Playwright's WebKit; Safari.app alone
+     re-reads each hop's leftover differently). A residual the next pin
+     then measures from compounds hop to hop: the Safari facet-walk crawl
+     (~1.8px per All-polls pri<->2pp lap, both hops low). Adopting the
+     leftover when the rounded correction no-ops makes the pin aim only
+     ever at a position the engine can actually hold, so nothing carries
+     across hops; engines that settle truthfully adopt <=0.5px, below a
+     device pixel at any dpr */
+  const retarget = (delta) => {
+    want += delta;
+    if (tops) for (let i = 0; i < tops.length; i++) tops[i][1] += delta;
+  };
   /* scroll corrections go out as WHOLE css pixels. WebKit's root scroller
      quantises a programmatic scroll to integer css px (a fractional
      scrollBy truncates away and never lands), while getBoundingClientRect
@@ -324,8 +341,49 @@ function rdPinScroll(row, fine) {
      half-pixel scroll fidelity is not worth keeping over that. */
   const fix = () => {
     if (!reseat()) return;
-    const drift = Math.round(row.getBoundingClientRect().top - want);
-    if (drift) { window.scrollBy(0, drift); lastY = window.scrollY; }
+    const d = row.getBoundingClientRect().top - want;
+    const drift = Math.round(d);
+    const y0 = window.scrollY;
+    const now = performance.now();
+    /* the fold treats the issued scroll landing off its pre-issue spot
+       as eaten, never owed; gate the adopt the same way - a residual the
+       issued correction's own commit is about to erase is not the
+       engine's to keep. Once two eatens pass with no commit the scroll
+       is dead for real (Safari.app drops uncoalesced tween hops) and
+       the leftover stands - adopt then, or after two frames clear */
+    const quiet = window.scrollY !== issueY || eaten > 1 || now - lastIssued > 34;
+    /* Safari.app scroller contract (safari-scroll-probe + rounds 8-10
+       pindumps): scroll corrections commit quantised to a device-pixel
+       lattice the app's own scroller keeps; sub-3css re-issues - relative
+       OR absolute, at any cadence - never commit at all, so only BIG
+       one-shot deltas land. The round-10 pindump then showed what-lands
+       is only half of it: relative integer hops re-snap to the lattice
+       per commit from wherever the last commit left the scroller, and
+       the per-commit re-snap walks the fractional frame ~2css a lap with
+       the page's integer scrollY compensating in step - the row stays
+       doc-perfect (settleGap 0), the frame crawls. Round 11 then sent
+       big corrections out as ABSOLUTE FRACTIONAL targets and the walk
+       got WORSE (+36/12 laps) - Safari.app truncates a fractional commit
+       with a systematic ~1.8css downward bias per hop. The scroll-probe
+       already held the counter-evidence: its step-F big absolute
+       INTEGER scrollTo committed exactly (pageTop 1000.00). So big
+       corrections (|d| >= 3, the real-reflow hop) go out as absolute
+       INTEGER targets - the same integer landing every lap, nothing
+       left to truncate - and every sub-3css leftover is adopted into
+       the anchor as it is gated, no piloting at all. Round 13 closed
+       the hunt upstream rather than in scroll space: the All-polls hed
+       now renders on every facet (rd-allpolls.jsx), so the walk that
+       started all this reflows nothing and issues no corrections at
+       all (2026-10-01 pindump: scrolls 0, climb 0 over 12 laps - the
+       lattice can neither botch nor be asked to hold anything). */
+    if (drift && Math.abs(d) >= 3) {
+      window.scrollTo(0, Math.round(y0 + d));
+      lastIssued = now; issueY = y0; eaten = 0; lastY = window.scrollY;
+    } else if (drift) {
+      retarget(d);
+    } else if (d && quiet) {
+      retarget(d);
+    }
   };
   /* freezing can itself nudge the row a few px (a freshly clipped box
      stops its children's margins collapsing through it), so settle that
@@ -379,11 +437,13 @@ function rdPinScroll(row, fine) {
     const was = row.isConnected ? row.getBoundingClientRect().top : 0;
     rdPinThaw();
     if (!row.isConnected) return;
-    /* whole-css-px here too - the fix() comment above has the WebKit
-       quantisation story (this hop's boundary case is where its rounder
-       was biting the walk a pixel a lap) */
-    const shift = Math.round(row.getBoundingClientRect().top - was);
-    if (shift) { window.scrollBy(0, shift); lastY = window.scrollY; }
+    /* the fix() rule: a big thaw shift goes out as one absolute INTEGER
+       target (fractional absolutes commit with a systematic truncation
+       bias on Safari.app, round 11), and a sub-3css one is lattice-dead
+       there so it is simply left (the pin is over - nothing follows to
+       carry it) */
+    const thawD = row.getBoundingClientRect().top - was;
+    if (Math.abs(thawD) >= 3) window.scrollTo(0, Math.round(window.scrollY + thawD));
   };
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
@@ -398,11 +458,27 @@ function rdPinScroll(row, fine) {
        back rather than drag the page to where the row was */
     const dy = y - lastY;
     if (Math.abs(dy) > window.innerHeight) { done(); return; }
-    want -= dy;
+    if (dy && issueY === lastY) {
+      /* a fold whose scroll starts from the pre-issue spot IS the last
+         correction landing late - folding it into the anchor AND keeping
+         the issued scrollBy (which quantises off the same delta) pays it
+         twice (round 7: pri 63.125->64, dy=2 exactly the issued +2,
+         want folded 60->58 while the scrollBy also moved the page; two
+         hops later the anchor's 58 sat against scroll 64->66 and the
+         pin corrected +6/+4 climbing back, the lap netting +2.5). Count
+         it eaten and leave the anchor alone - the scrollBy that follows
+         the fold puts the page where the anchor already sits; only a
+         fold off some OTHER base is the user's own scroll */
+      retarget(0);
+      eaten++;
+    } else {
+      want -= dy;
+      /* the fold moves every candidate's target with the user's scroll,
+         so a re-seat after one lands keeps following the same moved
+         pin */
+      if (tops) for (let i = 0; i < tops.length; i++) tops[i][1] -= dy;
+    }
     lastY = y;
-    /* the fold moves every candidate's target with the user's scroll, so a
-       re-seat after one lands keeps following the same moved pin */
-    if (tops) for (let i = 0; i < tops.length; i++) tops[i][1] -= dy;
     fix();
     if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);
     else done();

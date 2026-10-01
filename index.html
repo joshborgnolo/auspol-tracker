@@ -63780,7 +63780,10 @@ function rdPinScroll(row, fine) {
   if (rdPinAnchorSave === null) rdPinAnchorSave = html.style.overflowAnchor;
   html.style.overflowAnchor = "none";
   let want = want0.top,
-    lastY = window.scrollY;
+    lastY = window.scrollY,
+    lastIssued = 0,
+    issueY = -1,
+    eaten = 0;
   let tops = null;
   const reseat = () => {
     if (row.isConnected) return true;
@@ -63790,12 +63793,27 @@ function rdPinScroll(row, fine) {
     want = next[1];
     return true;
   };
+  const retarget = delta => {
+    want += delta;
+    if (tops) for (let i = 0; i < tops.length; i++) tops[i][1] += delta;
+  };
   const fix = () => {
     if (!reseat()) return;
-    const drift = Math.round(row.getBoundingClientRect().top - want);
-    if (drift) {
-      window.scrollBy(0, drift);
+    const d = row.getBoundingClientRect().top - want;
+    const drift = Math.round(d);
+    const y0 = window.scrollY;
+    const now = performance.now();
+    const quiet = window.scrollY !== issueY || eaten > 1 || now - lastIssued > 34;
+    if (drift && Math.abs(d) >= 3) {
+      window.scrollTo(0, Math.round(y0 + d));
+      lastIssued = now;
+      issueY = y0;
+      eaten = 0;
       lastY = window.scrollY;
+    } else if (drift) {
+      retarget(d);
+    } else if (d && quiet) {
+      retarget(d);
     }
   };
   rdPinClip(row, want0.top);
@@ -63834,11 +63852,8 @@ function rdPinScroll(row, fine) {
     const was = row.isConnected ? row.getBoundingClientRect().top : 0;
     rdPinThaw();
     if (!row.isConnected) return;
-    const shift = Math.round(row.getBoundingClientRect().top - was);
-    if (shift) {
-      window.scrollBy(0, shift);
-      lastY = window.scrollY;
-    }
+    const thawD = row.getBoundingClientRect().top - was;
+    if (Math.abs(thawD) >= 3) window.scrollTo(0, Math.round(window.scrollY + thawD));
   };
   const stop = performance.now() + (window.AP && window.AP.MORPH_MS || 320) + 240;
   const step = () => {
@@ -63852,9 +63867,14 @@ function rdPinScroll(row, fine) {
       done();
       return;
     }
-    want -= dy;
+    if (dy && issueY === lastY) {
+      retarget(0);
+      eaten++;
+    } else {
+      want -= dy;
+      if (tops) for (let i = 0; i < tops.length; i++) tops[i][1] -= dy;
+    }
     lastY = y;
-    if (tops) for (let i = 0; i < tops.length; i++) tops[i][1] -= dy;
     fix();
     if (performance.now() < stop) rdPinRaf = requestAnimationFrame(step);else done();
   };
@@ -74082,7 +74102,7 @@ function RdAllPolls(P) {
   const win = rows.filter(inToday);
   let head = null,
     dek = null;
-  if (facet === "twopp" && today && win.length) {
+  if (today && win.length) {
     const vals = win.map(p => figOf(p).a);
     const lo = Math.min(...vals),
       hi = Math.max(...vals);

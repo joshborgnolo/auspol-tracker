@@ -1,8 +1,8 @@
 ---
 name: auspol-rdpinscroll-row-pin
-description: auspol-tracker — rdPinScroll (rd.jsx), the pinned-view contract for tab/chip walk rows whose head+dek glide above them (2cf6d8c machinery; 1d76fd5 generalised it to ONE ARG — pins even with the dek on screen, dek bottom glued to the row — plus the >1-screen "jump-bail", and added Leadership metric tabs + All-polls facet/flip/basis wiring; 2d23b7f added the ARRAY form — first on-screen candidate takes the pin — and re-anchored All-polls on .rd-ap-bar because the phone twopp .rd-ap-pctl counts strip sits in flow BETWEEN the tab row and the rows; 4ad3144 fixed the mid-glide USER-SCROLL FOLD sign — the anchor target is viewport-space, so a user scroll folds in as want -= dy; with += every tick fought the user 2x and shoved the page to the top; 08329ba fixed the OFF-SCREEN anchor case — pinView pinned only the compare board, so deep in #cyc-summary the pin no-oped and every compare swipe shoved an iPhone reader ~66px down: CHROME'S NATIVE scroll anchoring hides a missing pin, SAFARI HAS NO overflow-anchor — probe with an injected `* { overflow-anchor: none !important; }` <style> to see what Safari sees; fix = caller-side array preference list [board, first visible .rd-cs-row, .rd-cs-key, .rd-foot]): per-panel pinX + pickY wrappers, the sticky-bar reserve gate, and the CHROME SCROLL ANCHORING counter-force root cause (focused control outside the row becomes the browser's anchor and re-scrolls every frame against the rAF pin — suppress overflow-anchor on <html> for the pin window; 5a44431 then replaced the rAF CORRECTIVE PATH with a PRE-PAINT one — rAF-applied scrollBy paints a frame LATE in Safari, so during the 320ms glide the pinned strip breathed ±8px/frame = user-visible bounce/stutter even at net-zero drift: RdGlide hands its wrapper to the live pin via window.__rdPinObserve(el) and a ResizeObserver on that block runs the shared fix() after layout, BEFORE paint, so correction and cause land in the same painted frame; the rAF loop survives only for user-scroll fold + jump-bail. In headless Chromium rAF corrections paint BETWEEN frames — the defect is locally invisible, diagnose via .matilda/dbg-cycles-traj.mjs per-rAF strip-top trajectory + wrapped scrollBy list and look for the post-swipe 8px→0 staircase; fixed signature = each correction paired with a sub-pixel residue at the SAME millisecond). Diagnosing "my rAF scroll fix is losing" or "the pin fights my scroll": instrument all scroll APIs via evaluateOnNewDocument (scrollY moving with no JS scroll call = the browser, not the app) and record per-rAF aligned frames + wrapped scrollBy deltas (.matilda/dbg-pin-fight.mjs) — corrections ≈ -2x each user pan = the fold sign is wrong. Freeze era (2026-09-30): every device-perfect case had zero reflow above its row (all-polls was never exercised, not better) — above-row glides now FREEZE for the pin window (rdPinClip + atomic same-frame thaw, never animated), and the pin CLOSE teleporter is dead — done() scrolling back to the stale anchor reverted the user's whole scroll (a probe's 8272px setup scrollTo undone; step()'s >1-screen jump-bail guard called the same teleporting done() so it guarded nothing) — pin close now scrolls ONLY the row's measured delta ACROSS rdPinThaw, regression = probe-cycles-pin leave-mid-pin; locate the guilty scroll with a goto-time scrollTo/scrollBy/scroll wrapper logging Error().stack. 3b0dc00 then GENERALISED the freeze past glide blocks (user's third iOS report: "swiping between months views on primary vote chart, and approval/favourability/both, causes drift" — net anchor ≈ 0 headless, mid-gesture CORRECTION STREAM is the real signal): the actual movers were never .rd-glide-in — the hero card's .rd-evlist unmounts (0–230px by range, shared range state resizes the HERO card when stepping range on the PV card), .chart's event lane snaps ±30px (svg height constant, the wrapper grows), and Leadership's UNGLIDED RdSub dek snaps 45↔68px (unglided ON PURPOSE for the desktop subgrid). rdPinClip(row, rowTop) now also freezes every EARLIER SIBLING along the row's ancestor chain (skip zero-height; skip branches containing .tabs.sticky/.info-index/.rd-ap-headwrap/.poll-table thead th — overflow:clip kills sticky) and the pin RO-watches the ancestor chain as backstop — RO alone CANNOT win the race: rAF runs before RO in the same rendering iteration, so step() eats the big drift and the RO only ever sees the ≤0.2px residue. Acceptance = probe-swipe390.mjs attributing every correction via Error().stack (thaw:/step:/RO:): ZERO step: corrections, the single thaw: release ~560ms after lift is by design. Later commits then reconciled the freeze↔slice tension for boxes ON screen (cycles dek "cut off mid-paragraph, blocked out" — user reported it gone after a000f12, then "rarely, but still happens"): rdPinClip freezes an on-screen box ONLY while rdTouchHot is live, and heat now arms ONLY on a sideways-sliding touch that meets the app swipe effect's own gates (|dx| ≥ RD_TOUCH_SLIDE_DX 60, dy ≤ dx·0.5 — taps never arm), and BOTH freeze paths take the gate (the .rd-glide-in parent sweep originally froze unconditionally — the cycles dek lives inside its own glide wrapper's parent, THE residual slicer); "on screen" = readable past the stuck tabs bar (r.bottom > barHeight+6), not r.bottom > 0. probe-cycles-pin's phone touch-TAP case (no dek-chain __rdFrozen + sbSmooth live-reflow contract) pins it. 2026-09-30 follow-up: rdPinScroll is now a TOUCH-DEVICE contract only — it no-ops on fine pointers via `(pointer: coarse)`, desktop clicks/keys reflow live, and the pin probes gate row-hold assertions per rung on the same media query. Same-day coda (user: "can you implement it on laptop just in the all polls table?"): the gate moved to a two-arg `rdPinScroll(row, fine)` — callers pass `fine` to opt a row IN on fine pointers, and pinAp (alone) does, so the All-polls filter bar + rows hold through facet walk/flip/basis on a laptop exactly as on a phone while every other section stays touch-only; probe-allpolls-pin therefore asserts row-hold on EVERY rung (its mid-pin user-scroll case sends a 180px mouse-wheel tick on desktop) while panels/cycles probes stay per-rung gated. Also: pinWhom's preference list leads with `.rd-iw-tabs` (the grouping menu) since 1e2838f put that menu at every width — pinning the `.rd-iw-chips` Issue row first left the menu the user tapped gliding away, and 3cc1b40 then dropped the phone "Issue" kicker, so the chips row is `.rd-iw-tabs`' nextElementSibling with no `.rd-iw-k` of its own at phone widths. Same day, pm: 8cec1f9 fixed the laptop FULL-WALK drift that survived all of this — an All-polls facet hop re-keys the ENTIRE row set (every .rd-ap-row/.rd-ap-card is a fresh DOM node afterwards, even for a poll present in both facets; only .rd-ap-mrow month dividers, .rd-ap-bar, .rd-ap-tabs and .rd-ap-table survive a swap), so the on-screen-row anchor unmounted MID-HOP, the pin session ended on !row.isConnected, and Chrome's overflow-anchor walked the viewport ~a screen per cycle (diagnostic signature: the pin's RO counter frozen at one value across hops = the session died). The fine path now snapshots [el, docTop] for EVERY candidate once after the clip and re-seat()s onto the first still-connected candidate whenever the live anchor disconnects (RO callback and thaw reseat instead of bailing; the user-scroll fold moves every candidate's target); pinAp's anchor list ends with .rd-ap-table itself as the always-alive fallback. Contract: month-divider anchors hold the date region to the pixel; deep-table is geometry-exact (twopp<->others hed swap = ±181.3px at 1512×945 dpr2, ≤1px settle) with ≤~40px bounded non-cumulative content redistribution around the held geometry — VERIFY AT STRUCTURAL GEOMETRY (bar/tabs/table doc-tops + per-facet deltas), never at content rows, whose doc-tops legitimately move between facets (probes: dbg-ap-laptop-drift full-cycle walk, dbg-ap-hop-xray DEPTH env — process.env does NOT exist inside page.evaluate, pass values as evaluate args — dbg-ap-row-survival expando tagging).
+description: auspol-tracker — rdPinScroll (rd.jsx), the pinned-view contract for tab/chip walk rows whose head+dek glide above them (2cf6d8c machinery; 1d76fd5 generalised it to ONE ARG — pins even with the dek on screen, dek bottom glued to the row — plus the >1-screen "jump-bail", and added Leadership metric tabs + All-polls facet/flip/basis wiring; 2d23b7f added the ARRAY form — first on-screen candidate takes the pin — and re-anchored All-polls on .rd-ap-bar because the phone twopp .rd-ap-pctl counts strip sits in flow BETWEEN the tab row and the rows; 4ad3144 fixed the mid-glide USER-SCROLL FOLD sign — the anchor target is viewport-space, so a user scroll folds in as want -= dy; with += every tick fought the user 2x and shoved the page to the top; 08329ba fixed the OFF-SCREEN anchor case — pinView pinned only the compare board, so deep in #cyc-summary the pin no-oped and every compare swipe shoved an iPhone reader ~66px down: CHROME'S NATIVE scroll anchoring hides a missing pin, SAFARI HAS NO overflow-anchor — probe with an injected `* { overflow-anchor: none !important; }` <style> to see what Safari sees; fix = caller-side array preference list [board, first visible .rd-cs-row, .rd-cs-key, .rd-foot]): per-panel pinX + pickY wrappers, the sticky-bar reserve gate, and the CHROME SCROLL ANCHORING counter-force root cause (focused control outside the row becomes the browser's anchor and re-scrolls every frame against the rAF pin — suppress overflow-anchor on <html> for the pin window; 5a44431 then replaced the rAF CORRECTIVE PATH with a PRE-PAINT one — rAF-applied scrollBy paints a frame LATE in Safari, so during the 320ms glide the pinned strip breathed ±8px/frame = user-visible bounce/stutter even at net-zero drift: RdGlide hands its wrapper to the live pin via window.__rdPinObserve(el) and a ResizeObserver on that block runs the shared fix() after layout, BEFORE paint, so correction and cause land in the same painted frame; the rAF loop survives only for user-scroll fold + jump-bail. In headless Chromium rAF corrections paint BETWEEN frames — the defect is locally invisible, diagnose via .matilda/dbg-cycles-traj.mjs per-rAF strip-top trajectory + wrapped scrollBy list and look for the post-swipe 8px→0 staircase; fixed signature = each correction paired with a sub-pixel residue at the SAME millisecond). Diagnosing "my rAF scroll fix is losing" or "the pin fights my scroll": instrument all scroll APIs via evaluateOnNewDocument (scrollY moving with no JS scroll call = the browser, not the app) and record per-rAF aligned frames + wrapped scrollBy deltas (.matilda/dbg-pin-fight.mjs) — corrections ≈ -2x each user pan = the fold sign is wrong. Freeze era (2026-09-30): every device-perfect case had zero reflow above its row (all-polls was never exercised, not better) — above-row glides now FREEZE for the pin window (rdPinClip + atomic same-frame thaw, never animated), and the pin CLOSE teleporter is dead — done() scrolling back to the stale anchor reverted the user's whole scroll (a probe's 8272px setup scrollTo undone; step()'s >1-screen jump-bail guard called the same teleporting done() so it guarded nothing) — pin close now scrolls ONLY the row's measured delta ACROSS rdPinThaw, regression = probe-cycles-pin leave-mid-pin; locate the guilty scroll with a goto-time scrollTo/scrollBy/scroll wrapper logging Error().stack. 3b0dc00 then GENERALISED the freeze past glide blocks (user's third iOS report: "swiping between months views on primary vote chart, and approval/favourability/both, causes drift" — net anchor ≈ 0 headless, mid-gesture CORRECTION STREAM is the real signal): the actual movers were never .rd-glide-in — the hero card's .rd-evlist unmounts (0–230px by range, shared range state resizes the HERO card when stepping range on the PV card), .chart's event lane snaps ±30px (svg height constant, the wrapper grows), and Leadership's UNGLIDED RdSub dek snaps 45↔68px (unglided ON PURPOSE for the desktop subgrid). rdPinClip(row, rowTop) now also freezes every EARLIER SIBLING along the row's ancestor chain (skip zero-height; skip branches containing .tabs.sticky/.info-index/.rd-ap-headwrap/.poll-table thead th — overflow:clip kills sticky) and the pin RO-watches the ancestor chain as backstop — RO alone CANNOT win the race: rAF runs before RO in the same rendering iteration, so step() eats the big drift and the RO only ever sees the ≤0.2px residue. Acceptance = probe-swipe390.mjs attributing every correction via Error().stack (thaw:/step:/RO:): ZERO step: corrections, the single thaw: release ~560ms after lift is by design. Later commits then reconciled the freeze↔slice tension for boxes ON screen (cycles dek "cut off mid-paragraph, blocked out" — user reported it gone after a000f12, then "rarely, but still happens"): rdPinClip freezes an on-screen box ONLY while rdTouchHot is live, and heat now arms ONLY on a sideways-sliding touch that meets the app swipe effect's own gates (|dx| ≥ RD_TOUCH_SLIDE_DX 60, dy ≤ dx·0.5 — taps never arm), and BOTH freeze paths take the gate (the .rd-glide-in parent sweep originally froze unconditionally — the cycles dek lives inside its own glide wrapper's parent, THE residual slicer); "on screen" = readable past the stuck tabs bar (r.bottom > barHeight+6), not r.bottom > 0. probe-cycles-pin's phone touch-TAP case (no dek-chain __rdFrozen + sbSmooth live-reflow contract) pins it. 2026-09-30 follow-up: rdPinScroll is now a TOUCH-DEVICE contract only — it no-ops on fine pointers via `(pointer: coarse)`, desktop clicks/keys reflow live, and the pin probes gate row-hold assertions per rung on the same media query. Same-day coda (user: "can you implement it on laptop just in the all polls table?"): the gate moved to a two-arg `rdPinScroll(row, fine)` — callers pass `fine` to opt a row IN on fine pointers, and pinAp (alone) does, so the All-polls filter bar + rows hold through facet walk/flip/basis on a laptop exactly as on a phone while every other section stays touch-only; probe-allpolls-pin therefore asserts row-hold on EVERY rung (its mid-pin user-scroll case sends a 180px mouse-wheel tick on desktop) while panels/cycles probes stay per-rung gated. Also: pinWhom's preference list leads with `.rd-iw-tabs` (the grouping menu) since 1e2838f put that menu at every width — pinning the `.rd-iw-chips` Issue row first left the menu the user tapped gliding away, and 3cc1b40 then dropped the phone "Issue" kicker, so the chips row is `.rd-iw-tabs`' nextElementSibling with no `.rd-iw-k` of its own at phone widths. Same day, pm: 8cec1f9 fixed the laptop FULL-WALK drift that survived all of this — an All-polls facet hop re-keys the ENTIRE row set (every .rd-ap-row/.rd-ap-card is a fresh DOM node afterwards, even for a poll present in both facets; only .rd-ap-mrow month dividers, .rd-ap-bar, .rd-ap-tabs and .rd-ap-table survive a swap), so the on-screen-row anchor unmounted MID-HOP, the pin session ended on !row.isConnected, and Chrome's overflow-anchor walked the viewport ~a screen per cycle (diagnostic signature: the pin's RO counter frozen at one value across hops = the session died). The fine path now snapshots [el, docTop] for EVERY candidate once after the clip and re-seat()s onto the first still-connected candidate whenever the live anchor disconnects (RO callback and thaw reseat instead of bailing; the user-scroll fold moves every candidate's target); pinAp's anchor list ends with .rd-ap-table itself as the always-alive fallback. Contract: month-divider anchors hold the date region to the pixel; deep-table is geometry-exact (twopp<->others hed swap = ±181.3px at 1512×945 dpr2, ≤1px settle) with ≤~40px bounded non-cumulative content redistribution around the held geometry — VERIFY AT STRUCTURAL GEOMETRY (bar/tabs/table doc-tops + per-facet deltas), never at content rows, whose doc-tops legitimately move between facets (probes: dbg-ap-laptop-drift full-cycle walk, dbg-ap-hop-xray DEPTH env — process.env does NOT exist inside page.evaluate, pass values as evaluate args — dbg-ap-row-survival expando tagging); round 6 (2026-10-01): real Safari.app diverges from BOTH Playwright WebKit and native WKWebView on scroll quantisation (only engine that compounding-leaks, ~+1.8px/All-polls lap) — three-rung verification ladder (playwright WebKit → .matilda/wkprobe.swift native WKWebView harness, no sudo needed → user-side instrumented localhost snippet), fix = retarget() adopts sub-pixel residuals into want+tops when the rounded correction no-ops — ROUND 7 (2026-10-01, user-side PINDUMP of the round-6 build) then FALSIFIED the residue theory: real Safari.app's error is >=1 WHOLE-px mislands plus fully-EATEN corrections (27 straight scrollBy with frozen scrollY AND frozen DOM rect, then done() sees nothing move), never the sub-0.5px residue adoption was built on, so adoption fired ~0 total and the crawl marched on (+24-26px over 12 pri<->2pp laps, Σ(issued-applied) slop); eaten corrections correlate with the ~181px .rd-ap-headwrap mount reflowing LIVE on 2pp-ward hops (headwrap sits on RD_PIN_STICKY so the freeze can't hold it) while pri-ward pins stayed healthy; fix-count arithmetic trap: fix() runs EVERY rAF of the 560ms pin window (~33) plus RO callbacks (~37/pin Chrome, 31-34 WKWebView), so fixes=2 in a remote digest means the pin CLOSED EARLY (reseat-fail or jump-bail), and round-6's "collapse to 2 fix calls" was really scroll-ISSUING fixes; the adopt-gate must verify COMMITMENT (scrollY moved off its pre-issue spot, 34ms two-frame release) not a time window — a fixed 100ms gate starves adoption through any RO/morph storm (every fix lands <100ms from the last correction); round-7 scaffolding in rd.jsx: fix/done taps + want/maxS/dEnd fields, a 120ms post-pin settle probe, retarget's commitment gate, and a ?rdscroll=to A/B flag routing rdPinScroll's TWO correction sites (fix + done-thaw only) through absolute scrollTo targets vs relative scrollBy — all TEMP-INSTRUMENT, strip before the fix commit; provenance: a 2026-10-01 resume found the tree TORN (four call/log sites, ZERO definitions of RD_SCROLL_TO/rdPinScrollBy in rd.jsx or the built index.html — the authoring edit never landed, first pin would ReferenceError) and re-derived both consts from this description before the user's pindump step, smoke via .matilda/dbg-pin-taps.mjs (Chrome headless on localhost:8734; argv `to` = run B; green counts start/fix/done/settle with to:0 and to:1). ROUND 8 (2026-10-01, instrumented build, user-Safari PINDUMP pending): the crawler is step()'s user-scroll FOLD catching the pin's OWN deferred scrollBy commit — fix() issues scrollBy(0,+2), Safari.app commits the scroll past the rAF boundary, the next step() tick reads dy=+2 off the pre-issue base as a user scroll and folds want -=2 while the scrollBy ALSO lands the +2 = the delta pays twice per hop (~+2.5px/pri↔2pp-lap climb, both legs positive, real Safari.app only — every headless engine commits same-task so the race can never fire for them). Fix = attribution bookkeeping in rdPinScroll: issueY (scrollY at the moment each correction is ISSUED; set in fix() AND done()'s thaw issue) + an eaten counter zeroed per issue; step() folds ONLY when the delta's base is NOT the pre-issue spot (dy && issueY === lastY → count eaten++, leave want/tops alone — the scrollBy that follows the fold puts the page where the anchor already sits); fix()'s adopt gate gains eaten>1 (two eatens with no commit = Safari.app dropped the uncoalesced tween hops for real, so the leftover then genuinely stands — the 34ms two-frame release stays as backstop). Rebuild-grep gotcha: rd.jsx concatenates INLINE at the bottom of built index.html, it is NOT a hashed assets/<hash>.js layer — after build.mjs grep index.html for the fix literal (issueY === lastY, eaten > 1); grepping the hashed assets returns nothing but false friends (d1a1d215's 1975-supply event text contains the word "eaten"). RESOLUTION (round 13, 2026-10-01): scroll space is exhausted — rounds 8→12 falsified every scroll-space tactic (cadence throttle; adopt-on-throttle — WORKS, keep it: retarget() absorbs sub-3css leftovers into want+tops; fractional-absolute scrollTo; integer-absolute scrollTo) because Safari.app's lattice lands each big commit ~±2css off AND drops every sub-3css correction of it at any cadence/protocol, so the residual error can never be chased — the fix left scroll space for LAYOUT space: .matilda/dbg-hed-geo.mjs (headless per-facet doc-top/height survey of the All-polls chrome at 1512×945 — geometry is engine-neutral for WHAT reflows, only scroll commits diverge) proved the whole ±182.3 css hop was the twopp-only .rd-hed/.rd-dek block (~181.3 css incl. margins) unmounting per hop, while headwrap/hrow/pinbar were constant all along (57/57/46) and the twopp-only .rd-pl-ctl tab-row strip costs just 1 css (absorbable by round-10 adoption); fix = ONE-LINE gate change in rd-allpolls.jsx (~:982, `if (facet === "twopp" && today && win.length)` → `if (today && win.length)`) so the hed+dek renders on EVERY facet — hop reflow collapses 182.3→1.0 css, no big correction is ever issued, and round-10's adoption holds the rest. Standing lesson: when the engine's correction channel itself loses data, stop chasing in scroll space and delete the reflow that needs correcting. (user-Safari PINDUMP 2026-10-01 CONFIRMED: scrolls 0/pin, an alternating ∓0.99 css adoption for the ctl strip's 1 css, climb 0/0 over 12 laps; rd.jsx TEMP-INSTRUMENT taps+flags stripped in the same commit — the clean build keeps no __pinLog, so its verification snippet is .matilda/safari-finalwalk.js: 12 pri↔2pp laps reading scrollY+bar.top per lap, pass = climb 0/0 and zero docSpan per facet.)
 source: auto-skill
-extracted_at: '2026-09-30'
+extracted_at: '2026-10-01'
 ---
 
 # rdPinScroll — pinned view while the head/dek glides above
@@ -914,5 +914,265 @@ is quantisation), `dbg-ap-culprit2.mjs` (fixed-selector height/top
 tracking — kills "something is growing" theories in one run). Real
 Safari needs `safaridriver` but enabling it is interactive sudo —
 webkit has matched every Safari scroll-anchoring behaviour so far
-(Safari also lacks overflow-anchor and paints rAF scrolls late).
+(Safari also lacks overflow-anchor and paints rAF scrolls late) —
+until round 6 (below), where real Safari.app diverges from BOTH
+Playwright WebKit and native WKWebView on scroll quantisation and
+only a user-side instrumented snippet sees the truth.
+
+**Round 5 coda (2026-10-01, commit 2447997) — check ROW HEIGHTS before
+the pin.** After round 4 shipped, the user still read the primary facet
+as landing "a tad lower" than twopp. Instrumenting the pin found nothing
+— the post-quantisation constellation was already static — because the
+residual was never pin drift: the primary facet's `.rd-ap-mrow` month
+rows rendered 61px tall where twopp's rendered 54.75, so EVERY primary
+facet landing sat ~6px off (20+ month rows of delta compounding up the
+table). Root cause: dead CSS — `.rd-ap-mpic { min-height: 22px }` lost
+to the later, equal-specificity `body.rd .rd-ap-pic { min-height: 28px }`
+(source-order tie-break); fix was the compound `.rd-ap-pic.rd-ap-mpic`
+with `min-height: 0`. Diagnostic lesson: when a facet makes EVERY
+landing sit off by a constant, measure that facet's own geometry
+(`.matilda/dbg-ap-mrow.mjs` dumps labelled `.rd-ap-mrow` heights per
+facet in both engines) before re-opening the pin machinery — row-height
+parity across facets is a precondition of the aligned constellation,
+not something the pin can fix. The month-row anatomy lives in the
+`auspol-allpolls-month-rows` skill.
+
+## Round 6 — real Safari.app diverges from WKWebView; adopt residuals into the anchor (2026-10-01, fix in flight)
+
+Round 4's "webkit matches Safari" streak ENDS at scroll quantisation.
+User report after round 5 shipped: facet-walk drift persists in Safari
+only, the user's own hypothesis being the 2pp facet (it's the only one
+with the head+dek above the pinned bar). Their numbers (paste-in console
+clicker, 12 pri↔2pp pairs on the LIVE site): bar top climbs ~+1.8px PER
+PAIR, both hops low (mount ≈ +0.7, unmount ≈ +1.0), `scrollY` readback
+always integer — a monotone down-walk NO local engine shows: Playwright
+WebKit, Chrome AND a native WKWebView harness all park the identical
+±0.3438 alternation (NET 0.000 over 30 pairs). The leak lives in the
+Safari APP's scroller, not WebKit.
+
+### The verification ladder for "Safari-only" scroll bugs (rungs in order)
+
+1. Playwright WebKit (round-4 kit) — catches WebKit-engine scroll
+   anchoring/quantisation.
+2. **Native WKWebView harness** — new rung; same WebKit2/compositing
+   stack as Safari.app but drivable unattended with NO sudo and no
+   browser settings. `.matilda/wkprobe.swift` (gitignored scratch) →
+   `swiftc -O wkprobe.swift -o wkprobe`: a ~110-line Swift app that
+   opens a REAL first window (1512×945 — quantisation only engages on a
+   composited window), loads a localhost-served build, injects the probe
+   JS via `evaluateJavaScript`, and returns results to stdout through a
+   `WKScriptMessageHandler` — console.log does NOT reach the terminal;
+   pass results via `webkit.messageHandlers.probe.postMessage`, and
+   don't sweat WKErrorDomain Code=5 ("result of an unsupported type" —
+   the async IIFE's Promise return; harmless). The window pops on the
+   user's screen for the probe's ~40s. Round-6 verdict: WKWebView ≈
+   Playwright WebKit on quantisation — BOTH too clean to see
+   Safari.app's behaviour. Worth the 5-minute build anyway: it RULES
+   OUT engine-level causes before you start reasoning about app-level
+   ones.
+3. **Real Safari.app** can only be probed through the user:
+   `safaridriver` needs interactive sudo (`safaridriver --enable`
+   prompts for the password; don't burn a session timeout on it),
+   AppleScript "do JavaScript" needs Safari's 'Allow JavaScript from
+   Apple Events' toggled by hand. So: serve the checkout on localhost
+   (`python3 -m http.server PORT --directory <repo>`, detached
+   background run — drop `--directory` quotes carefully, this repo's
+   path contains a space) with INSTRUMENTED sources rebuilt in, and
+   hand the user a paste-in console snippet. The round-6 pattern:
+   12× pri↔2pp clicker (park the bar at top≈130 first, 1100ms between
+   clicks so the 560ms pin fully closes), then a console.table of
+   landings + a digest over a page-side `window.__pinLog` — temporary
+   taps pushed from inside rdPinScroll's fix()/done()/step() carrying
+   pin id, raw drift vs rounded correction, scrollY before/after each
+   scroll, post-scroll residual (`d2`), hed presence, adopted amounts,
+   and step()-fold events. The digest turns "it still drifts" into
+   per-pin numbers from the actual failing engine. Strip the taps
+   (marked TEMP-INSTRUMENT in rd.jsx) before committing.
+
+### The fix (user-Safari confirmation pending at extraction)
+
+**Adopt residual leftovers into the anchor.** Round-4 rounding parks an
+engine ≤0.5px from `want`, but the pin never ADOPTED the leftover — it
+kept aiming at the fractional target, so whatever Safari.app re-reads
+differently each hop carried forward and compounded. rd.jsx now has
+`retarget(delta)` (moves `want` AND every cached reseat `tops` entry
+together) and fix() ends with `else if (d) retarget(d)` -- when the
+rounded correction no-ops, the sub-pixel residual becomes the anchor.
+The pin then only ever aims at positions the engine can actually hold;
+per-hop residual is zero by construction, so nothing can carry across
+hops regardless of the engine's quantisation scheme. Clean engines are
+untouched (their ≤0.5px adoptions are sub-device-pixel, WKWebView/
+Playwright/Chrome landings identical pre/post), and adoption COLLAPSES
+the RO chase: WKWebView pins converge in 2 fix() calls where round-4
+needed ~31 (each RO callback's leftover re-armed the next callback).
+Do NOT re-read the rect right after scrollBy and adopt from that read
+in the same task — if the engine defers committing the scroll, the rect
+is stale and adoption swallows a whole live correction; adopt only in
+the no-op branch, where no scroll was issued that tick and the readback
+is self-consistent.
+
+### Round 8 postmortem + the round-9 lattice-aware cadence fix (2026-10-01)
+
+Round 8's user-Safari PINDUMP falsified round 8's own double-pay theory
+(folds:0, doneShift:0): instead 26–30 fix fires per pin with y0===y1 on
+EVERY fire, misLands === scrolls, residuals pinned at lattice constants
+(1.25 / 1.103 / 2.279 css) and rows creeping ~2px per accepted lap. The
+.SCROLLPROBE engine-contract snippet (.matilda/safari-scroll-probe.js,
+two user runs at dpr 1.7 → 0.588235 css per device px) produced the
+engine law that explains all of it:
+
+- Safari.app commits scrolls quantised to the DEVICE-PIXEL lattice;
+  sub-quantum deltas are silently DROPPED (no scroll event, no motion —
+  B/C probes: scrollTo/scrollTop to y0+2 from a y0 sitting 0.412 css
+  above a lattice point).
+- Worse, an absolute sub-quantum RE-TARGET actively REVERTS a prior
+  uncommittable commit back to the last stable baseline (D probe:
+  scrollTo(y0+1.5) rolled an already-committed +1.18 back to baseline).
+- scrollBy / scrollTo / scrollingElement.scrollTop are ONE engine (the
+  round-7 ?rdscroll=to A/B failed identically — protocol is irrelevant);
+  scroll events fire ONLY on committed scrolls; sync read === +150ms
+  read (scrollY, scrollTop, visualViewport.pageTop all agree).
+
+So the round-8 pindump signature was the pin fighting the lattice, not
+folding itself: fix() issued ±1–2 css corrections AT FRAME CADENCE; each
+sub-quantum issue was dropped, and each frame's absolute re-target of a
+different sub-quantum amount cancelled/rolled back its predecessor
+(D-law), while the flown-to bookkeeping (y1 = y0 + issued) credited
+phantom motion the anchor never received.
+
+**Fix (rd.jsx fix(), TEMP-INSTRUMENT round 9 — strip before commit):**
+match the issue cadence to the commit window. Sub-3 css corrections may
+issue at most ONE per 150 ms (`gapOk = now - lastIssued >= 150`,
+tracked per-pin and reset on start()); when a correction is throttled
+(`g: 1` in the pinLog) its whole delta is ADOPTED into the anchor
+(`retarget(d)`) so nothing is owed and no second correction follows.
+|d| ≥ 3 css corrections are EXEMPT (they always land — several quanta
+wide). `?rdscroll=raw` keeps the round-8 eager path as the A/B control;
+pinLog fix events carry `r:` (issued, actual), `g:` (1 = gated), `ad:`
+(adopted). Round-9 pindump A/B: A = plain `?s=0#allpolls` (fixed
+default), B = `?s=0&rdscroll=raw#allpolls`; success profile for A is
+fixes ~2–8/pin with some g:1, misLands ~0, resid ≤ ~0.6 css, rows.y
+flat across laps; B must reproduce round 8 (26–30 fixes, misLands ≈
+scrolls, lattice residuals). Headless Chrome cannot tell the modes
+apart (it never drops, d is always 0 in the pin window) — dbg-pin-taps
+green on both argv values only proves no regression/syntax, never the
+fix itself. Lesson standing: on Safari.app NEVER issue a correction
+before the previous one has had its ~150 ms to commit or roll back.
+
+**Round 10 (2026-10-01): cadence pilot dead — adopt-on-throttle.**
+Round 9's user pindump falsified the cadence theory itself: run A
+(`climb +23.5/+24.7 css over 12 laps`, fixes 25–29/pin) showed every
+150 ms-spaced ±1–2 css correction STILL 4-for-4 dead (misLands ===
+scrolls on all four-scroll pins) — Safari.app's lattice eats re-issues
+at ANY sub-frame-idle spacing, not just at frame cadence — and the
+throttle's own structure compounded the damage: the adopt branch
+required `!drift`, so a throttled drift of ±2 (e.g. d=2.2794) fell
+through BOTH branches — no issue, no adoption, `ad: 0`, the leftover
+owed forever (`want` pinned one value, `d` constant 2.2794 for the
+pin's whole life, +2/lap creep). Fix: a throttled sub-3 css correction
+is ADOPTED into the anchor wholesale the frame it is gated (`else if
+(drift) retarget(d)` — in default mode the pilot never re-issues; the
+next ≥3 css real-reflow correction carries anyway, and big deltas are
+the only ones Safari.app reliably lands). `?rdscroll=raw` now replays
+the round-9 cadence pilot as control; the round-9 run-A dump is the
+control evidence on file (above numbers). Round-10 success profile:
+scrolls ~1–3/pin (the big hop correction only), early `ad≠0` events
+absorbing each leftover, resid/dEnd/settleGap ≈ 0, and `climb ≈ 0`
+across the 12 laps.
+
+**Round 11 (2026-10-01): what-lands is only half of it — relative hops
+walk the frame.** Round 10's pindump hit its internals profile exactly
+(scrolls 1/pin, resid/dEnd/settleGap ALL 0, adoption absorbing the
+lattice constants 1.25/1.10/2.28) yet `climb` was UNCHANGED at
++23.5/+24.7: the row's doc position was pinned perfectly
+(`rows.y + bar.top` constant ≈381/563 across all 12 laps) while the
+DECOMPOSITION into {integer scrollY, fractional viewport frame} walked
+~2 css/lap. Mechanism: `scrollBy(0, round(d))` relative integer hops
+re-snap to Safari.app's lattice per commit from wherever the last
+commit left the scroller, and the per-commit re-snap error accumulates
+(−2/lap on scrollY, +2/lap on the bar's frame, doc-stable). Fix:
+corrections with |d| ≥ 3 (the facet-hop reflow correction, and done()'s
+thaw shift) go out as `window.scrollTo(0, y0 + d)` — ABSOLUTE,
+fractional, the identical committable landing every lap, error bounded
+by one lattice step, nothing accumulating. Sub-3css leftovers just get
+adopted when gated (round 10) — the absolute probes B/C proved sub-3
+absolutes commit no better than relatives, so no pilot of any kind
+survives. `?rdscroll=raw` keeps the round-8+9 relative-scrollBy path.
+Raw-mode sites: fix()'s drift branch AND done()'s thaw shift. To read:
+`issued`/`r` is now fractional `d` in default mode (integer `drift`
+under raw).
+
+**Round 12 (2026-10-01): absolute INTEGER targets.** Round 11 FALSIFIED
+the fractional-absolute theory even harder — climb GREW to +35/+36
+(~3.6 css/lap): Safari.app truncates a fractional absolute commit with
+a systematic ~1.8 css downward bias per hop (pri-ward commits −184
+against −182.3 needed, 2pp-ward +180.6 against +182.3 — both biased
+down). The scroll-probe file held the counter-evidence all along:
+step F's big absolute INTEGER `scrollTo` committed exactly (pageTop
+1000.00 after a 29 css move), while +2 absolutes (any parity) never
+committed at all. So big corrections now go out as
+`window.scrollTo(0, Math.round(y0 + d))` — the identical integer
+landing every lap of a facet parity, nothing left to truncate; sub-3
+leftovers still adopted (round 10); done()'s thaw shift follows the
+same rule. Expect `climb` ≈ 0 with `issued` integer in default mode.
+
+### Round 13 (2026-10-01): the scroll-space wall → the hed-slot resolution
+
+Round 12's user pindump landed at the round-9 baseline (`climb
++23.53/+24.7`, same digest shape): even absolute INTEGER scrollTo
+targets — exact in isolation (probe step F's 1000.00) — carry ~±2 css
+per-commit error in the pin context, and the lattice forecloses every
+sub-3 css follow-up at any cadence or protocol (relative/absolute,
+fractional/integer, frame-paced/150 ms-spaced — FIVE scroll-space
+experiments, rounds 8→12, all falsified). Engine law as it stands:
+Safari.app's scroller lattice BOTH introduces the ~1–2 css per-commit
+error AND refuses every channel that could chase it. A ±182 css per-hop
+reflow can therefore never be pinned by scrolling.
+
+The fix left scroll space for LAYOUT space (user-chosen strategy
+"Reserve the hed slot"): make the geometry above the pin anchors
+constant across facets so no large correction is ever issued.
+
+**Diagnostic — .matilda/dbg-hed-geo.mjs.** Headless Chrome at 1512×945
+(layout geometry is engine-neutral for WHAT reflows — only scroll
+commits diverge, so Chrome can name the mover even though it can't
+reproduce the crawl). Per facet it clicks the tab and dumps doc-top +
+height for eyebrow/.rd-hed/.rd-dek/.rd-ap-tabs/.rd-ap-bar/
+.rd-ap-headwrap/.rd-ap-pinbar/.rd-ap-hrow/.rd-ap-table/.rd-ap-sent. The
+survey precisely named the mover: the ONLY facet-dependent geometry
+above the anchors was the hed+dek block (hed 99.34 + dek 54 + ~28 css
+margins = 181.3 css — exactly the per-hop correction figure in every
+pindump), present on twopp only (`if (facet === "twopp" && …)` gate on
+the head generator). The `.rd-ap-headwrap` the strategy text had
+suspected was constant all along (hrow 57 css every facet via rd.css's
+min-height floor; pinbar 46); the twopp-only `.rd-pl-ctl` strip inside
+the tab row costs 1 css of tab-row height (45 vs 44) — inside the
+round-10 adoption budget.
+
+**Fix: one-line gate, not a restructure.** rd-allpolls.jsx (~:982):
+`if (facet === "twopp" && today && win.length)` →
+`if (today && win.length)` — the hed+dek renders on EVERY facet. It is
+a where-things-stand line about today's aggregate, not a facet label,
+and the dek's closing sentence ("Below is every national
+poll…") was already facet-agnostic. The slot is now the same box on
+every facet, so a facet hop reflows only the ctl strip's 1 css — no
+≥3 css correction is ever issued, leftovers stay in the verified
+round-10 adoption path, and the anchor holds by construction.
+Post-rebuild dbg-hed-geo: bar/table doc-top deltas collapsed
+182.3 → 1.0 css across all five facets; dbg-pin-taps default+raw both
+green (d: 0, dEnd: 0 — no regression/syntax). The pinAp comment above
+pinAp() documents the flat slot as load-bearing — **do NOT re-gate the
+hed by facet**; if per-facet copy is ever wanted, gate the STRINGS,
+never the slot's presence.
+
+Untouched by design: the phone's twopp-only `.rd-ap-pctl` counts strip
+(phone corrections have always worked — the lattice failure is a
+laptop-Safari.app fine-pointer story), and the rare `!today ||
+!win.length` collapse (a transient one-off correction, not a walk).
+
+Standing lesson, pairing with round 10: **never chase sub-3 css on
+Safari.app, and delete the reflow that needed the ≥3 css correction**
+— between those two there is no remaining need to scroll-correct
+during a facet walk at all. When the correction channel itself loses
+data, stop tuning the channel and remove what flows through it.
 
