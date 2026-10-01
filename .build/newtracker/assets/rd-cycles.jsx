@@ -320,9 +320,16 @@ function RdPastCycles(p) {
   CYC_METRICS.forEach((M) => { Mby[M.key] = M; });
   /* the summary's two extra vote rows are not CYC_METRICS measures: One
      Nation's own primary (shipped as each term's raw.onp) and the L/NP + ON
-     sum (derived - combSeries above). leader:"opp" makes the combined row's
-     "who" name the era's opposition leader, as the opposition row's does. */
-  Mby.onp = { key: "onp", unit: "%" };
+     sum (derived - combSeries above). One Nation's row reads its now-figure
+     off ON's own series but is ranked against past OPPOSITION primaries,
+     not past ON primaries: this term it is the non-government protest vote
+     (polling above the Coalition), so its company is Beazley's 40 and the
+     other opposition shares, not ON's own <10% history - the Hanson's-row
+     pattern below, which ranks her against past opposition leaders. The
+     peer key is "oppr" while the row key stays "onp" so the now-figure and
+     its change anchor still come from ON's own series (curOf). leader:"opp"
+     names each era's opposition leader, as the opposition row's does. */
+  Mby.onp = { key: "oppr", leader: "opp", unit: "%" };
   Mby.comb = { key: "comb", leader: "opp", unit: "%" };
   /* Hanson's row is the sitting term's own reading, but its strip, average
      and rank are the opposition leader's measure: no past term rated her
