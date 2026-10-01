@@ -4164,14 +4164,15 @@ body.rd .rd-cyc-storyvar { height: 0; overflow: hidden; visibility: hidden; }
 body.rd .rd-cc-row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 body.rd .rd-cyc-chipmove {
   position: absolute; top: calc(var(--rd-sec-pad) + 1px); right: 0; z-index: 1;
-  transform: translateY(-50%);
-  background: var(--bg); padding: 0 6px;
+  transform: translateY(calc(-100% - 6px));
+  display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap;
+  gap: 14px; max-width: 100%;
 }
 body.rd .rd-cc-l { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-cc-tabs { border-bottom: 0; }
 body.rd .rd-cc-n { margin-left: 6px; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-cc-sep { width: 1px; height: 22px; background: var(--line); margin: 0 6px; }
-body.rd .rd-cc-drawn { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+body.rd .rd-cc-drawn { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 body.rd .rd-cc-pill { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 4px 0 12px; border: 1.5px solid; border-radius: 17px; font-size: 14px; color: var(--ink); }
 body.rd .rd-cc-pill button { all: unset; cursor: pointer; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-3); border-radius: 13px; }
 body.rd .rd-cc-pill button:hover { background: var(--surface-2); color: var(--ink); }
@@ -57943,6 +57944,7 @@ function CycleChart({
     ticks: ticks,
     cur: cur,
     hidden: hidden,
+    liftedN: lifted.size,
     narrow: narrow,
     half: !!rdHalf,
     hanCtl: hanCtl,
@@ -71713,6 +71715,7 @@ function RdCycleChart({
   ticks,
   cur,
   hidden,
+  liftedN,
   narrow,
   half,
   hanCtl,
@@ -71739,6 +71742,7 @@ function RdCycleChart({
   } : e);
   const nowM = cur && !hidden.has(cur.year) ? cur.span : null;
   const curVal = nowM != null ? chg ? cur.end[M.key] - cycBase(cur, M.key) : cur.end[M.key] : null;
+  const nonDefault = (liftedN || 0) > 0 || (cur ? hidden.has(cur.year) : false);
   const peer = nowM != null ? bandRows.find(r => r.m === nowM) : null;
   const subj = M.key === "net" || M.key === "ppmm" ? sitting(cur ? cur.pm : "") : M.key === "oppnet" ? sitting(cur ? cur.oppLead : "") : cur ? isOpp ? D.PARTIES[cur.opp].name : D.PARTIES[cur.gov].name : "";
   const subjColor = cur ? isOpp ? D.PARTIES[cur.opp].color : cur.color : "var(--ink)";
@@ -71821,7 +71825,7 @@ function RdCycleChart({
       weight: 600,
       size: 12.5
     });
-    notes.push({
+    if (!nonDefault) notes.push({
       k: "gap",
       x: nowM,
       y: curVal,
@@ -71849,7 +71853,7 @@ function RdCycleChart({
       size: 12.5
     });
   });
-  if (!chg && M.key === "tpp") {
+  if (!chg && M.key === "tpp" && !nonDefault) {
     notes.push({
       x: "left",
       y: 50,
@@ -72835,26 +72839,7 @@ function RdPastCycles(p) {
     className: "rd-tab",
     "aria-pressed": chg,
     onClick: () => setModePin("chg")
-  }, narrow ? "Change" : "Change since election"))), liftedList.length > 0 && React.createElement("div", {
-    className: "rd-cc-drawn"
-  }, React.createElement("span", {
-    className: "rd-cc-l"
-  }, "Drawn over the band"), liftedList.map(c => React.createElement("span", {
-    key: c.year,
-    className: "rd-cc-pill",
-    style: {
-      borderColor: c.color
-    }
-  }, React.createElement("span", {
-    className: "rd-cc-rule",
-    style: {
-      background: c.color
-    }
-  }), c.year, " ", pmNames(c), React.createElement("button", {
-    type: "button",
-    "aria-label": "Return " + c.year + " to the band",
-    onClick: () => unlift(c.year)
-  }, "\xD7")))), board && React.createElement("div", {
+  }, narrow ? "Change" : "Change since election"))), board && React.createElement("div", {
     className: "rd-cc-board",
     role: "dialog",
     "aria-label": "Past terms"
@@ -73072,7 +73057,36 @@ function RdPastCycles(p) {
     meta: "Implied from each poll\u2019s primary votes, on the flows counted at the election that opened its term",
     tools: React.createElement("span", {
       className: "rd-cyc-chipmove"
-    }, React.createElement("button", {
+    }, liftedList.length > 0 && React.createElement("span", {
+      className: "rd-cc-drawn"
+    }, React.createElement("span", {
+      className: "rd-cc-l"
+    }, "Drawn over the band"), liftedList.map(c => React.createElement("span", {
+      key: c.year,
+      className: "rd-cc-pill",
+      style: {
+        borderColor: c.color
+      }
+    }, React.createElement("span", {
+      className: "rd-cc-rule",
+      style: {
+        background: c.color
+      }
+    }), c.year, " ", pmNames(c), React.createElement("button", {
+      type: "button",
+      "aria-label": "Return " + c.year + " to the band",
+      onClick: () => unlift(c.year)
+    }, "\xD7"))), !hidden.has(cur.year) && React.createElement("span", {
+      className: "rd-cc-pill rd-cc-cur",
+      style: {
+        borderColor: cur.color
+      }
+    }, React.createElement("span", {
+      className: "rd-cc-rule",
+      style: {
+        background: cur.color
+      }
+    }), cur.year, " ", pmNames(cur))), React.createElement("button", {
       type: "button",
       className: "rd-chip",
       "aria-expanded": board,

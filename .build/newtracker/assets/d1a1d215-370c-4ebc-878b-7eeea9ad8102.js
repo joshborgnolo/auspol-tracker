@@ -1999,7 +1999,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
      against the band's average, and the tab's controls kept once, above. */
   if (window.AP.rd) return (
     <RdCycleChart M={M} chg={chg} built={built} bandAreas={bandAreas} bandRows={bandRows} scatter={scatter}
-      events={rdEvents || cycleEvents} badged={!!rdEvents} domain={domain} ticks={ticks} cur={cur} hidden={hidden} narrow={narrow} half={!!rdHalf}
+      events={rdEvents || cycleEvents} badged={!!rdEvents} domain={domain} ticks={ticks} cur={cur} hidden={hidden} liftedN={lifted.size} narrow={narrow} half={!!rdHalf}
       hanCtl={hanCtl} showHan={showHan} setHan={setHan} showOnp={showOnp} setOnp={setOnp} showComb={showComb} setComb={setComb} tipCycle={tipCycle}
       banded={banded} bandN={bandN} isOpp={isOpp} terms={shown.filter(hasData).map((c) => c.year)} outcomeShown={outcomeShown} rings={ringTerms} />
   );

@@ -1563,21 +1563,23 @@ body.rd .rd-cc { position: relative; margin-top: 32px; }
    invisibly so the live slot can stand at the tallest (rd-cycles.jsx) */
 body.rd .rd-cyc-storyvar { height: 0; overflow: hidden; visibility: hidden; }
 body.rd .rd-cc-row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
-/* the Draw-a-term chip, moved off the controls row onto the Two-party
-   section's own divider: it sits on the 2px eyebrow rule at the right
-   edge, the bg patch breaking the line behind it, and lands the same at
-   every width (the eyebrow tools slot exists only to hang it inside the
-   already-positioned .rd-sec) */
+/* the Draw-a-term chip and the drawn-over-the-band pills, moved off the
+   controls row onto the Two-party section's own divider: the band floats
+   just above the 2px eyebrow rule, its bottom 6px clear of the line, and
+   lands the same at every width (the eyebrow tools slot exists only to
+   hang it inside the already-positioned .rd-sec); the chip ends flush
+   with the right edge and the pills queue in from the left */
 body.rd .rd-cyc-chipmove {
   position: absolute; top: calc(var(--rd-sec-pad) + 1px); right: 0; z-index: 1;
-  transform: translateY(-50%);
-  background: var(--bg); padding: 0 6px;
+  transform: translateY(calc(-100% - 6px));
+  display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap;
+  gap: 14px; max-width: 100%;
 }
 body.rd .rd-cc-l { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-cc-tabs { border-bottom: 0; }
 body.rd .rd-cc-n { margin-left: 6px; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-cc-sep { width: 1px; height: 22px; background: var(--line); margin: 0 6px; }
-body.rd .rd-cc-drawn { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+body.rd .rd-cc-drawn { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 body.rd .rd-cc-pill { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 4px 0 12px; border: 1.5px solid; border-radius: 17px; font-size: 14px; color: var(--ink); }
 body.rd .rd-cc-pill button { all: unset; cursor: pointer; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-3); border-radius: 13px; }
 body.rd .rd-cc-pill button:hover { background: var(--surface-2); color: var(--ink); }

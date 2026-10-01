@@ -46,7 +46,7 @@ const rdOrd = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "
 const rdSgn = (v, unit) => (unit ? "" : v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
 
 /* ---- one chart, in the redesign's frame --------------------------------- */
-function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evIn, badged, domain, ticks, cur, hidden, narrow, half,
+function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evIn, badged, domain, ticks, cur, hidden, liftedN, narrow, half,
                         hanCtl, showHan, setHan, showOnp, setOnp, showComb, setComb, tipCycle, banded, bandN, isOpp, terms, outcomeShown, rings }) {
   const { D } = window.AP;
   /* the sitting term's change of contest, said as the headline says it */
@@ -54,6 +54,10 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
     ? { ...e, short: e.short.replace(/^Now /, "") + " from " + D.monthNameFull(Number(e.date.slice(5, 7))) } : e));
   const nowM = cur && !hidden.has(cur.year) ? cur.span : null;
   const curVal = nowM != null ? (chg ? cur.end[M.key] - cycBase(cur, M.key) : cur.end[M.key]) : null;
+  /* anything but the default picture (only the sitting term over the band)
+     drops the "ahead" pair and the above/below-average reading - the words
+     read as a verdict on the contest, which a mixed view is not */
+  const nonDefault = (liftedN || 0) > 0 || (cur ? hidden.has(cur.year) : false);
   const peer = nowM != null ? bandRows.find((r) => r.m === nowM) : null;
   const subj = M.key === "net" || M.key === "ppmm" ? sitting(cur ? cur.pm : "")
     : M.key === "oppnet" ? sitting(cur ? cur.oppLead : "")
@@ -109,7 +113,7 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
     /* straddling the point, unless it sits at an edge of the window */
     const dys = frac < 0.22 ? [-24, -8] : frac > 0.82 ? [16, 32] : [-6, 10];
     notes.push({ k: "cur", x: nowM, y: curVal, dx: 10, dy: dys[0], text: subj + " " + fmt(curVal), color: inkOf(subjColor), weight: 600, size: 12.5 });
-    notes.push({ k: "gap", x: nowM, y: curVal, dx: 10, dy: dys[1], text: Math.abs(d).toFixed(1) + (d >= 0 ? " above" : " below") + " average", size: 12.5 });
+    if (!nonDefault) notes.push({ k: "gap", x: nowM, y: curVal, dx: 10, dy: dys[1], text: Math.abs(d).toFixed(1) + (d >= 0 ? " above" : " below") + " average", size: 12.5 });
   }
   /* an overlay's name and figure at its end, on whichever side keeps it
      15px clear of the sitting term's two lines of words */
@@ -124,7 +128,7 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
                  text: (s.id === "cyc-comb" ? "L/NP + ON " : s.id === "cyc-onp" ? "One Nation " : "Hanson ") + fmt(last.y),
                  color: inkOf(s.color), weight: 600, size: 12.5 });
   });
-  if (!chg && M.key === "tpp") {
+  if (!chg && M.key === "tpp" && !nonDefault) {
     notes.push({ x: "left", y: 50, dy: -6, text: "▲ Government ahead", size: 11.5 });
     notes.push({ x: "left", y: 50, dy: 15, text: "▼ Opposition ahead", size: 11.5 });
   }
@@ -794,17 +798,6 @@ function RdPastCycles(p) {
           <button type="button" className="rd-tab" aria-pressed={chg} onClick={() => setModePin("chg")}>{narrow ? "Change" : "Change since election"}</button>
         </div>
       </div>
-      {liftedList.length > 0 && (
-        <div className="rd-cc-drawn">
-          <span className="rd-cc-l">Drawn over the band</span>
-          {liftedList.map((c) => (
-            <span key={c.year} className="rd-cc-pill" style={{ borderColor: c.color }}>
-              <span className="rd-cc-rule" style={{ background: c.color }}></span>{c.year} {pmNames(c)}
-              <button type="button" aria-label={"Return " + c.year + " to the band"} onClick={() => unlift(c.year)}>×</button>
-            </span>
-          ))}
-        </div>
-      )}
       {board && (
         <div className="rd-cc-board" role="dialog" aria-label="Past terms">
           <div className="rd-cc-bhead">
@@ -906,7 +899,28 @@ function RdPastCycles(p) {
         </div>
       </section>
       <RdSec id="cyc-tpp" title="Two-party preferred" meta="Implied from each poll’s primary votes, on the flows counted at the election that opened its term"
-             tools={<span className="rd-cyc-chipmove"><button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button></span>}>
+             tools={<span className="rd-cyc-chipmove">
+               {liftedList.length > 0 && (
+                 <span className="rd-cc-drawn">
+                   <span className="rd-cc-l">Drawn over the band</span>
+                   {liftedList.map((c) => (
+                     <span key={c.year} className="rd-cc-pill" style={{ borderColor: c.color }}>
+                       <span className="rd-cc-rule" style={{ background: c.color }}></span>{c.year} {pmNames(c)}
+                       <button type="button" aria-label={"Return " + c.year + " to the band"} onClick={() => unlift(c.year)}>×</button>
+                     </span>
+                   ))}
+                   {/* the sitting term draws over the band too (it was never IN the
+                       band to lift out of) - it says so as an unliftable pill; only
+                       not at all on the board when the reader has hidden its term */}
+                   {!hidden.has(cur.year) && (
+                     <span className="rd-cc-pill rd-cc-cur" style={{ borderColor: cur.color }}>
+                       <span className="rd-cc-rule" style={{ background: cur.color }}></span>{cur.year} {pmNames(cur)}
+                     </span>
+                   )}
+                 </span>
+               )}
+               <button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
+             </span>}>
         {tppStory && <RdHed head={tppStory.head} dek={tppStory.dek} />}
         <div className="rd-cyc-one">{chart("tpp", false)}</div>
         {bandKey("tpp")}

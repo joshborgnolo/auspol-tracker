@@ -40,6 +40,7 @@ async function run(W, H, touch) {
     const chip = q("#cyc-tpp .rd-cyc-chipmove .rd-chip");
     const wrap = q("#cyc-tpp .rd-cyc-chipmove");
     const rowChip = q(".rd-cc-row .rd-chip");
+    const drawnInControls = q(".rd-cc .rd-cc-drawn");
     const eb = q("#cyc-tpp .rd-eyebrow");
     const tools = q("#cyc-tpp .rd-eyebrow-tools");
     if (!chip || !wrap || !eb) return { missing: true, rowChip: !!rowChip };
@@ -48,29 +49,34 @@ async function run(W, H, touch) {
     const ws = getComputedStyle(wrap);
     const meta = q("#cyc-tpp .rd-meta");
     const title = q("#cyc-tpp .rd-title");
+    const svgText = () => Array.from(document.querySelectorAll("#cyc-tpp svg")).map((s) => s.textContent).join(" ");
     return {
       rowChip: !!rowChip,
+      drawnInControls: !!drawnInControls,
       chipInTools: !!(tools && chip.closest(".rd-eyebrow-tools") === tools),
       ruleY: r(eb).t + parseFloat(ebs.borderTopWidth) / 2,
       chip: r(chip),
       wrap: r(wrap),
       ebRight: r(eb).r,
       pos: ws.position,
-      bg: ws.backgroundColor,
       label: chip.textContent.replace(/\s+/g, " ").trim(),
       meta: meta ? r(meta) : null,
       title: title ? r(title) : null,
-      rowH: (q(".rd-cc-row") || {}).offsetHeight || 0,
+      svg: svgText(),
     };
   });
   if (g.missing) { fails.push(tag + ": chip/eyebrow not found under #cyc-tpp"); await page.close(); return; }
   if (g.rowChip) fails.push(tag + ": a .rd-chip is still inside .rd-cc-row");
   if (!g.chipInTools) fails.push(tag + ": chip is not in the cyc-tpp eyebrow tools slot");
-  const cy = (g.chip.t + g.chip.b) / 2;
-  if (Math.abs(cy - g.ruleY) > 1.6) fails.push(tag + ": chip centre " + cy.toFixed(1) + " sits off the divider " + g.ruleY.toFixed(1) + " by " + (cy - g.ruleY).toFixed(1) + "px");
-  if (Math.abs(g.wrap.r - g.ebRight) > 1.5) fails.push(tag + ": chip patch right edge " + g.wrap.r.toFixed(1) + " != eyebrow right edge " + g.ebRight.toFixed(1));
+  if (g.drawnInControls) fails.push(tag + ": the drawn-over-the-band row is still inside .rd-cc (it belongs up with the chip)");
+  /* the band floats just above the divider: its bottom edge rests 6px
+     clear of the 2px rule (the reader asked for it above the line, never
+     straddling it) - checked as the WRAP's bottom so the check holds when
+     the drawn pills (taller than the chip) joined the band */
+  const gap = g.ruleY - g.wrap.b;
+  if (Math.abs(gap - 6) > 1.6) fails.push(tag + ": band bottom sits " + gap.toFixed(1) + "px above the divider " + g.ruleY.toFixed(1) + ", not ~6px (wrap bottom " + g.wrap.b.toFixed(1) + ")");
+  if (Math.abs(g.chip.r - g.ebRight) > 1.5) fails.push(tag + ": chip right edge " + g.chip.r.toFixed(1) + " != eyebrow right edge " + g.ebRight.toFixed(1));
   if (g.pos !== "absolute") fails.push(tag + ": .rd-cyc-chipmove is not absolutely positioned (" + g.pos + ")");
-  if (g.bg === "rgba(0, 0, 0, 0)" || g.bg === "transparent") fails.push(tag + ": chip patch has no opaque bg to break the rule behind it");
   if (!/^＋ Draw a( past)? term$/.test(g.label)) fails.push(tag + ": unexpected chip label '" + g.label + "'");
   const overlap = (a, b) => {
     if (!a || !b) return 0;
@@ -80,32 +86,106 @@ async function run(W, H, touch) {
   };
   if (overlap(g.chip, g.meta) > 1) fails.push(tag + ": chip overlaps the eyebrow meta text by " + overlap(g.chip, g.meta).toFixed(0) + "px2");
   if (overlap(g.chip, g.title) > 1) fails.push(tag + ": chip overlaps the title by " + overlap(g.chip, g.title).toFixed(0) + "px2");
+  /* the default picture keeps the verdict words; they must vanish as soon
+     as a term is lifted (checked after the lift below) */
+  if (!/Government ahead/.test(g.svg) || !/Opposition ahead/.test(g.svg)) fails.push(tag + ": default tpp chart lost its Government/Opposition ahead pair");
+  if (!/(above|below) average/.test(g.svg)) fails.push(tag + ": default tpp chart lost the above/below-average reading");
+  if (!/Labor/.test(g.svg)) fails.push(tag + ": default tpp chart lost the sitting term's figure ('Labor …' not found in the svg)");
 
-  /* toggle round-trip: open; second chip click must close (the dismiss
-     hook would otherwise swallow the toggle); outside click/tap must close
-     too. At <=900px the board is a FIXED bottom sheet hugging up to 75vh of
-     the viewport (rd.css media block), so the chip/title must sit in the
-     exposed top band: anchor the chip centre at viewport y=110, below the
-     72px sticky tabs and above the shallowest sheet top (211px at 844 tall).
-     Clicking a point under the sheet is not a fair test - the sheet eats it,
-     as any overlaid content does. */
+  /* toggle round-trip setup + the lift case: at <=900px the board is a
+     FIXED bottom sheet hugging up to 75vh of the viewport (rd.css media
+     block), so the chip/title must sit in the exposed top band: anchor the
+     chip centre at viewport y=110, below the 72px sticky tabs and above the
+     shallowest sheet top (211px at 844 tall). Clicking a point under the
+     sheet is not a fair test - the sheet eats it, as any overlaid content
+     does. */
   const chipSel = "#cyc-tpp .rd-cyc-chipmove .rd-chip";
   const boardOpen = () => page.evaluate(() => !!document.querySelector(".rd-cc-board"));
-  await page.$eval(chipSel, (el) => {
+  const anchorChip = () => page.$eval(chipSel, (el) => {
     window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 110);
   });
+  await anchorChip();
   await sleep(250);
   /* the chip must be visible above any sheet before its first click */
   const chipY = await page.$eval(chipSel, (el) => el.getBoundingClientRect().top);
   if (chipY < 72 || chipY > 200) fails.push(tag + ": chip anchored at viewport y " + chipY.toFixed(0) + ", outside the 72-200px band needed for sheet clearance");
+
+  /* open the board and draw a past term as its own line: the picked term's
+     pill and the sitting term's read-only pill must appear up with the
+     chip, and the chart's verdict words must go */
   await page.click(chipSel);
   await sleep(300);
-  if (!(await boardOpen())) fails.push(tag + ": chip click did not open the board");
-  const expanded = await page.$eval(chipSel, (el) => el.getAttribute("aria-expanded"));
-  if (expanded !== "true") fails.push(tag + ": aria-expanded did not follow the open board (" + expanded + ")");
+  if (!(await boardOpen())) fails.push(tag + ": chip click did not open the board (lift case)");
+  const picked = await page.$eval(".rd-cc-term:not(.current) .rd-cc-main", (el) => {
+    const year = el.querySelector("b").textContent.trim();
+    el.click();
+    return year;
+  });
+  await sleep(300);
+  const afterLift = await page.evaluate(() => {
+    const q = (s) => document.querySelector(s);
+    const drawn = q("#cyc-tpp .rd-cyc-chipmove .rd-cc-drawn");
+    const eb = q("#cyc-tpp .rd-eyebrow");
+    const wrap = q("#cyc-tpp .rd-cyc-chipmove");
+    const ebs = getComputedStyle(eb);
+    const r = (el) => el.getBoundingClientRect();
+    const pills = drawn ? Array.from(drawn.querySelectorAll(".rd-cc-pill")).map((p) => ({
+      text: p.textContent.replace(/\s+/g, " ").trim(),
+      cur: p.classList.contains("rd-cc-cur"),
+      btn: !!p.querySelector("button"),
+    })) : [];
+    return {
+      drawn: !!drawn,
+      text: drawn ? drawn.textContent.replace(/\s+/g, " ").trim() : "",
+      pills,
+      svg: Array.from(document.querySelectorAll("#cyc-tpp svg")).map((s) => s.textContent).join(" "),
+      gap: (r(eb).top + parseFloat(ebs.borderTopWidth) / 2) - r(wrap).bottom,
+    };
+  });
+  if (!afterLift.drawn) fails.push(tag + ": lifting " + picked + " did not raise the drawn-over-the-band row up with the chip");
+  else {
+    if (!/Drawn over the band/.test(afterLift.text)) fails.push(tag + ": the raised row lost its 'Drawn over the band' label");
+    const past = afterLift.pills.filter((p) => !p.cur);
+    if (!past.some((p) => p.text.indexOf(picked) === 0 && p.btn)) fails.push(tag + ": no unliftable pill for the lifted " + picked + " term (pills: " + afterLift.pills.map((p) => p.text).join(" | ") + ")");
+    const cur = afterLift.pills.filter((p) => p.cur);
+    if (cur.length !== 1) fails.push(tag + ": expected exactly one sitting-term pill while " + picked + " is drawn, found " + cur.length);
+    else {
+      if (!/^20\d\d /.test(cur[0].text)) fails.push(tag + ": sitting-term pill does not read like '2025 Albanese' ('" + cur[0].text + "')");
+      if (cur[0].btn) fails.push(tag + ": the sitting-term pill carries an unlift button - the sitting term cannot be returned to the band");
+    }
+    if (Math.abs(afterLift.gap - 6) > 1.6) fails.push(tag + ": with pills up, band bottom sits " + afterLift.gap.toFixed(1) + "px above the divider, not ~6px");
+  }
+  if (/Government ahead|Opposition ahead/.test(afterLift.svg)) fails.push(tag + ": the ahead pair survived a term being drawn over the band");
+  if (/(above|below) average/.test(afterLift.svg)) fails.push(tag + ": the above/below-average reading survived a term being drawn over the band");
+  if (!/Labor/.test(afterLift.svg)) fails.push(tag + ": the sitting term's figure went missing after the lift (only the verdict words should go)");
+
+  /* return the term to the band via its pill: row, pill and chart words
+     all restore with it */
+  const unlifted = await page.evaluate(() => {
+    const p = Array.from(document.querySelectorAll("#cyc-tpp .rd-cyc-chipmove .rd-cc-pill:not(.rd-cc-cur) button"))[0];
+    if (!p) return false;
+    p.click();
+    return true;
+  });
+  if (!unlifted) fails.push(tag + ": no pill cross to unlift " + picked);
+  await sleep(300);
+  const restored = await page.evaluate(() => ({
+    drawn: !!document.querySelector(".rd-cc-drawn"),
+    svg: Array.from(document.querySelectorAll("#cyc-tpp svg")).map((s) => s.textContent).join(" "),
+  }));
+  if (restored.drawn) fails.push(tag + ": the drawn-over-the-band row survived its only term being returned");
+  if (!/Government ahead/.test(restored.svg)) fails.push(tag + ": the ahead pair did not return when the lifted term went back to the band");
+  if (!/(above|below) average/.test(restored.svg)) fails.push(tag + ": the above/below-average reading did not return with the lifted term");
+
+  /* toggle round-trip: open; second chip click must close (the dismiss
+     hook would otherwise swallow the toggle); outside click/tap must close
+     too. */
+  if (!(await boardOpen())) fails.push(tag + ": board was not still open after the lift round-trip");
+  await anchorChip();
+  await sleep(250);
   await page.click(chipSel);
   await sleep(300);
-  if (await boardOpen()) fails.push(tag + ": second chip click did not close the board (dismiss hook swallowed the toggle)");
+  if (await boardOpen()) fails.push(tag + ": chip click did not close the board (dismiss hook swallowed the toggle)");
   await page.click(chipSel);
   await sleep(300);
   if (!(await boardOpen())) fails.push(tag + ": board did not re-open for the outside-dismiss case");
