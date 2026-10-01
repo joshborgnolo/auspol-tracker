@@ -279,6 +279,13 @@ body.rd .rd-evlist { list-style: none; margin: 12px 0 0; padding: 0; font-size: 
 /* straight under its chart the list starts in the band the copy button
    keeps, so the numbers sit next to the badges they decode */
 body.rd .chart:has(> .chart-copy-btn) + .rd-evlist { margin-top: 0; }
+/* the foldable form of the list (the primary card on a phone): the same
+   gaps the bare list kept, the summary set like the list it decodes */
+body.rd .rd-evdrop { margin: 12px 0 0; }
+body.rd .chart:has(> .chart-copy-btn) + .rd-evdrop { margin-top: 0; }
+body.rd .rd-evdrop > summary { cursor: pointer; width: fit-content; padding: 4px 0; font-weight: 600; font-size: 13px; color: var(--ink-2); }
+@media (hover: hover) { body.rd .rd-evdrop > summary:hover { color: var(--ink); } }
+body.rd .rd-evdrop .rd-evlist { margin-top: 8px; }
 /* RdCrossfade: the view being left lies over the one arriving and fades */
 body.rd .rd-xf { position: relative; }
 /* out, then in, as a chart's words hand over: two views' headlines half-seen
@@ -336,7 +343,7 @@ body.rd .rd-ap-mrow.rd-ap-sw > :not(.rd-ap-mlab), body.rd .rd-ap-mrow.rd-ap-sw >
 /* two lists in one cell while a switch crossfades them (RdEventList) */
 body.rd .rd-evstack { display: grid; }
 body.rd .rd-evstack > .rd-evlist { grid-area: 1 / 1; }
-body.rd .rd-evlist + .rd-ckey { margin-top: 16px; }
+body.rd :is(.rd-evlist, .rd-evdrop) + .rd-ckey { margin-top: 16px; }
 body.rd .rd-evlist li { display: flex; align-items: baseline; gap: 12px; padding: 3px 0; }
 body.rd .rd-evlist-n { width: 14px; flex-shrink: 0; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-evlist-l { flex-grow: 1; }

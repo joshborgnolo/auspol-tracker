@@ -265,8 +265,16 @@ function RdPrimary({ rangeId, setRangeId }) {
           fmt={(v) => v.toFixed(1)}
           copy={{ title: "Primary vote", sub: story.head, legend: parts.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
         />
-        {badges && <RdEventList list={badges.list} onPick={pickEv}
-                                openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />}
+        {/* the 2PP card above already lists this window's events under its
+            own chart, so this copy folds away behind a disclosure the reader
+            opens when a mark puzzles them; two lists said the same thing */}
+        {badges && badges.list.length > 0 && (
+          <details className="rd-evdrop">
+            <summary>The marked events</summary>
+            <RdEventList list={badges.list} onPick={pickEv}
+                         openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />
+          </details>
+        )}
         <RdKey className="rd-ckey" items={[
           { kind: "dot", color: "var(--ink-3)", label: "One poll" },
           { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },

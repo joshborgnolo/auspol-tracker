@@ -3185,6 +3185,11 @@ body.rd .rd-badge text { font-family: var(--sans); font-weight: 600; fill: var(-
 body.rd .rd-badge-tie { fill: none; stroke: var(--ink-faint); stroke-width: 1; vector-effect: non-scaling-stroke; }
 body.rd .rd-evlist { list-style: none; margin: 12px 0 0; padding: 0; font-size: 13px; color: var(--ink-2); }
 body.rd .chart:has(> .chart-copy-btn) + .rd-evlist { margin-top: 0; }
+body.rd .rd-evdrop { margin: 12px 0 0; }
+body.rd .chart:has(> .chart-copy-btn) + .rd-evdrop { margin-top: 0; }
+body.rd .rd-evdrop > summary { cursor: pointer; width: fit-content; padding: 4px 0; font-weight: 600; font-size: 13px; color: var(--ink-2); }
+@media (hover: hover) { body.rd .rd-evdrop > summary:hover { color: var(--ink); } }
+body.rd .rd-evdrop .rd-evlist { margin-top: 8px; }
 body.rd .rd-xf { position: relative; }
 body.rd .rd-xf-was { position: absolute; inset: 0 0 auto 0; pointer-events: none; animation: rd-xf-out .13s ease-out both; }
 body.rd .rd-xf-now.in { animation: rd-xf-in .2s ease-out .12s both; }
@@ -3223,7 +3228,7 @@ body.rd .rd-ap-mrow.rd-ap-sw > :not(.rd-ap-mlab), body.rd .rd-ap-mrow.rd-ap-sw >
 }
 body.rd .rd-evstack { display: grid; }
 body.rd .rd-evstack > .rd-evlist { grid-area: 1 / 1; }
-body.rd .rd-evlist + .rd-ckey { margin-top: 16px; }
+body.rd :is(.rd-evlist, .rd-evdrop) + .rd-ckey { margin-top: 16px; }
 body.rd .rd-evlist li { display: flex; align-items: baseline; gap: 12px; padding: 3px 0; }
 body.rd .rd-evlist-n { width: 14px; flex-shrink: 0; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 body.rd .rd-evlist-l { flex-grow: 1; }
@@ -65855,11 +65860,13 @@ function RdPrimary({
         kind: p.id === "oth" ? "dashed" : "line"
       }))
     }
-  }), badges && React.createElement(RdEventList, {
+  }), badges && badges.list.length > 0 && React.createElement("details", {
+    className: "rd-evdrop"
+  }, React.createElement("summary", null, "The marked events"), React.createElement(RdEventList, {
     list: badges.list,
     onPick: pickEv,
     openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
-  }), React.createElement(RdKey, {
+  })), React.createElement(RdKey, {
     className: "rd-ckey",
     items: [{
       kind: "dot",
