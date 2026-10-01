@@ -1120,3 +1120,25 @@ legit). The archive FLOOR for Morgan/ACNielsen is reached — Morgan opens
 1996-03-23 and ACNielsen 1996-03-02: Newspoll is the only source for any
 drill further back, and its own 2PP table (since 1993) is the binding
 constraint.
+
+## Holder-name year tags (shipped c1c978b, 2026-10-01)
+
+Any GENERATED sentence in the Past cycles tab that names a past term's
+holder must qualify it with the term's year when that name appears more
+than once in the peer set it was ranked against (Hawke x3, Howard x4) -
+"Previous high: Howard, +9.7" read the same whichever Howard term topped
+the set. `rdCycHolderTag(peers, p)` in rd-cycles.jsx (next to rdCycRank)
+is the single rule: `p.who + " (" + p.yr + ")"` iff another peer in
+`peers.vals` shares the name - the same counts rule the boundary-company
+sentence in the tabbed-views layer (fmtPeer, ~:1949) has always run.
+Current call sites: the rdCycRank Previous-high/low subs, and the
+leadStory possessive net-approval heads ("...but Howard's" / "...after
+Howard's"). The rdCycRank "Only X (yr) was higher/lower" lines were
+ALWAYS tagged; primStory's dek head-line name already carries its year.
+New generated copy that names a peer holder goes through rdCycHolderTag,
+never bare `p.who`. Probe: `.matilda/probe-cyc-holder-year.mjs` learns
+each row's true holder->years map by opening the row's own peer-dot tips
+(`.rd-cs-dot` mouseover; React keeps onMouseEnter on the root-delegated
+mouseover path, so a dispatched bubbling mouseover opens the tip where
+puppeteer's `hover()` misses) and asserts the tag iff the set duplicates
+the name - no hardcoded duplicate list to rot.

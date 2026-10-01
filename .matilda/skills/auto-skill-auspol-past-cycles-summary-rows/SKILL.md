@@ -1,6 +1,6 @@
 ---
 name: auspol-past-cycles-summary-rows
-description: auspol-tracker — adding a row to the Past-cycles "Every measure N months in" summary table (worked 2026-09-30 THREE times: One Nation onp row, L/NP + ON comb sum row aa72b41, Hanson net-approval han row 17688a9). Pure rd-cycles.jsx edit (no gen-data unless the series doesn't exist): helpers combSeries/seriesOf/cycBaseOf (after RdCycleChart), the Mby alias block + endOfKey/curOf (RdPastCycles), a ROWS entry in position, and the SEC map (↓ jump target). KEY TRICK: row key ≠ metric key — Mby.han = { key:"oppnet", leader:"opp", unit:"" } makes the han row QUOTE the sitting term's own series (curOf reads c.end.han) but rank its strip/average/rank against the oppnet PEER set (rdCycPeers reads past cycles' raw.oppnet), answering "treat it as an opposition leader's measure for the purposes of rank". derived-series rows (comb) extend seriesOf/cycBaseOf/endOfKey, never invented per-call. Data already emitted by gen-data: raw.base.end for han/onp (end = last READING on sparse grids), no emitter change needed. Value fmt: unit "%" level = unsigned toFixed(1), change and leaders = rdSgn signed 1dp. Probes that MUST move with any row add: .matilda/probe/cycles-combine-onp.mjs EXPECTED_NAMES exact order (row order, Now figures, strip dot counts, rank text, level AND change mode, 1280+390px) and .matilda/probe/cycles-label-wrap.mjs (row-name one-line, avg/rank non-collision at 390/430/480).
+description: auspol-tracker — adding a row to the Past-cycles "Every measure N months in" summary table (worked 2026-09-30 THREE times: One Nation onp row, L/NP + ON comb sum row aa72b41, Hanson net-approval han row 17688a9). Pure rd-cycles.jsx edit (no gen-data unless the series doesn't exist): helpers combSeries/seriesOf/cycBaseOf (after RdCycleChart), the Mby alias block + endOfKey/curOf (RdPastCycles), a ROWS entry in position, and the SEC map (↓ jump target). KEY TRICK: row key ≠ metric key — Mby.han = { key:"oppnet", leader:"opp", unit:"" } makes the han row QUOTE the sitting term's own series (curOf reads c.end.han) but rank its strip/average/rank against the oppnet PEER set (rdCycPeers reads past cycles' raw.oppnet), answering "treat it as an opposition leader's measure for the purposes of rank"; Mby.onp = { key:"oppr", leader:"opp", unit:"%" } (e394c49) does the same for ON's primary against past OPPOSITION primaries, since ON's own history starts under 10%. derived-series rows (comb) extend seriesOf/cycBaseOf/endOfKey, never invented per-call. Data already emitted by gen-data: raw.base.end for han/onp (end = last READING on sparse grids), no emitter change needed. Value fmt: unit "%" level = unsigned toFixed(1), change and leaders = rdSgn signed 1dp. Probes that MUST move with any row add: .matilda/probe/cycles-combine-onp.mjs EXPECTED_NAMES exact order (row order, Now figures, strip dot counts, rank text, level AND change mode, 1280+390px) and .matilda/probe/cycles-label-wrap.mjs (row-name one-line, avg/rank non-collision at 390/430/480).
 source: auto-skill
 extracted_at: '2026-09-30T10:19:09.476Z'
 ---
@@ -30,7 +30,7 @@ d1a1d215; the CYC_META-side series assembly is gen-data's, `auspol-past-cycles`)
    ("3rd highest of 21", "Middle of 21", "Only X (YYYY) was higher").
 2. **Mby alias + figure plumbing (RdPastCycles, ~:308)**:
    ```js
-   Mby.onp  = { key: "onp",  unit: "%" };
+   Mby.onp  = { key: "oppr", leader: "opp", unit: "%" };    // peer key ≠ row key
    Mby.comb = { key: "comb", leader: "opp", unit: "%" };
    Mby.han  = { key: "oppnet", leader: "opp", unit: "" };   // peer key ≠ row key
    const endOfKey = (c, key) => (key === "comb"
@@ -45,6 +45,13 @@ d1a1d215; the CYC_META-side series assembly is gen-data's, `auspol-past-cycles`)
    `cycBase(c, key)` = `c.base[key]` else first non-null `c.raw[key]` reading else 0 —
    a sparse series (han) base-anchors on its FIRST READING, never month 0.
    `rdSgn(v, false)` = sign + `Math.abs(v).toFixed(1)` (probe helper `signed` mirrors it).
+   onp aliased to oppr in e394c49 (2026-10-01): ON's own history starts under 10%, so
+   ranking today's 20%+ against past ON primaries read as a record walkover. The row
+   still QUOTES ON's sitting-term series (row key onp — `curOf` reads `c.end.onp`,
+   `cycBaseOf` anchors ON's own base; no `endOfKey` branch needed) but
+   `peersOf`/`seriesOf`/`cycHolderAt` pool past OPPOSITION primaries, so the strip and
+   Previous-high/low now name Howard, Rudd, Gillard, Turnbull, Shorten and Albanese
+   (Previous low reads "Albanese, 34.9", not an ON-era low).
 3. **ROWS entry** — in position between the neighbouring measures:
    ```js
    { key: "han", name: "Hanson’s net approval", sub: "Pauline Hanson",
@@ -98,6 +105,10 @@ FOUR-extension whitelist (+ base/end/points/raw) pinned in `auspol-past-cycles`.
 - `.matilda/probe/cycles-label-wrap.mjs` (390/430/480px, text-node Range rects over
   the name's bold) — "Hanson’s net approval" fits one line; re-run on ANY row-name
   change, `.rd-cs-rank` must keep its 4px clearance from the average box.
+- `.matilda/probe-cyc-holder-year.mjs` (repo root, port 8952) — holder-name dot
+  tooltips from cyc264366 onward; it asserts the onp row's holder set, so it now
+  expects ON's 20 dots to resolve to the 15 OPPOSITION holders (same pool as the
+  Opposition's-primary row). Run it on any Mby alias change.
 - The curves' own end-note overlay probe section asserts the chart series names
   ("One Nation this term", "Combine L/NP and ON") — same file, separate block.
 
