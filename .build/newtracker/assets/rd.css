@@ -1684,16 +1684,19 @@ body.rd .rd-cyc-chart .rd-check { font-size: 13px; font-weight: 400; }
 /* the pair of One Nation overlay boxes is one box in the row flow: on
    desktop its two checks sit beside the chart's name as if nothing wrapped
    them; on a phone it hugs the head row's right edge as one corner stack -
-   One Nation's own overlay tight on top, Combine on the bottom row so the
-   bottom-aligned head row lands the chart's name on the SAME line. The
-   phone stack also squeezes the rows themselves: the site-wide 44px touch
+   One Nation's own overlay on top so it lands on the chart's name LINE and
+   Combine hangs just below (the head re-aligns to the top for that card
+   alone; every other head keeps its flex-end), with the rows stretched to
+   the widest label so the two checkbox glyphs line up on one x. The phone
+   stack also squeezes the rows themselves: the site-wide 44px touch
    target drops off these two labels, the native 18px box swaps for a 15px
    one and the label line-height tightens, so the pair reads as one control
    instead of two spaced lines */
 body.rd .rd-cyc-ctls { display: contents; }
 @media (max-width: 640px) {
   body.rd .rd-cyc-chart .rd-chead { align-items: flex-end; }
-  body.rd .rd-cyc-ctls { display: flex; flex-direction: column-reverse; align-items: flex-end; row-gap: 0; margin-left: auto; }
+  body.rd .rd-cyc-chart .rd-chead:has(> .rd-cyc-ctls) { align-items: flex-start; }
+  body.rd .rd-cyc-ctls { display: flex; flex-direction: column-reverse; align-items: stretch; row-gap: 0; margin-left: auto; }
   body.rd .rd-cyc-chart .rd-check { line-height: 1.15; min-height: 0; }
   body.rd .rd-cyc-chart .rd-check input { width: 15px; height: 15px; margin-top: 1px; }
 }

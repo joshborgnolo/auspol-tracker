@@ -1,9 +1,11 @@
 /* cyc-ctl-stack: the Past-cycles opposition-primary card's two One Nation
    overlay boxes ("Combine L/NP and ON", "One Nation this term") on a phone:
-   the pair hugs the head row's right edge as one tight corner stack - One
-   Nation's own overlay on top, Combine on the bottom row so the
-   bottom-aligned head row lands "Opposition's primary vote" on the SAME
-   line as Combine. The wrapper is display:contents everywhere else, so the
+   the pair hugs the head row's right edge as one tight corner stack whose
+   TOP row shares the chart's name line - One Nation's own overlay lands on
+   the "Opposition's primary vote" line (that card's head re-aligns to the
+   top; every other head keeps its flex-end) and "Combine L/NP and ON"
+   hangs just below. The stretched rows put the two checkbox glyphs on one
+   x line. The wrapper is display:contents everywhere else, so the
    desktop row beside the chart's name is untouched (checked at 1440 and
    760 - stacking must stay phone-only). Also: the phone stack must not
    push the page sideways, and the Hanson card's lone box keeps no wrapper.
@@ -57,6 +59,8 @@ const readLayout = () => window.__cycCtlLayout = (() => {
   return { present: !!ctls, chead: note(chead.getBoundingClientRect()), title: note(title.getBoundingClientRect()),
     titleBottom: top(title.getBoundingClientRect()), ctlsTop: top(ctls.getBoundingClientRect()), combTop: top(comb.getBoundingClientRect()),
     comb: note(comb.getBoundingClientRect()), onp: note(onp.getBoundingClientRect()),
+    combInX: +comb.querySelector("input").getBoundingClientRect().x.toFixed(1),
+    onpInX: +onp.querySelector("input").getBoundingClientRect().x.toFixed(1),
     ctls: note(ctls.getBoundingClientRect()), ctlsDisplay: getComputedStyle(ctls).display,
     ctlsDir: getComputedStyle(ctls).flexDirection, combText: comb.textContent.trim(), onpText: onp.textContent.trim(),
     combWeight: getComputedStyle(comb.querySelector("i") || comb).fontWeight,
@@ -123,9 +127,9 @@ const faceCentrePx = async (page, S) => {
       if (vw <= 640) {
         check(t + ": wrapper becomes the tight corner column at phone width",
           L.ctlsDisplay === "flex" && L.ctlsDir === "column-reverse", L.ctlsDisplay + " " + L.ctlsDir);
-        check(t + ": Combine sits on the chart-name line",
-          Math.abs(L.comb.bottom - L.title.bottom) <= 2,
-          "comb.bottom=" + L.comb.bottom + " title.bottom=" + L.title.bottom);
+        check(t + ": One Nation sits on the chart-name line",
+          Math.abs(L.onp.y - L.title.y) <= 1.5,
+          "onp.y=" + L.onp.y + " title.y=" + L.title.y);
         check(t + ": One Nation sits fully above Combine",
           L.onp.bottom <= L.combTop + 1, "onp.bottom=" + L.onp.bottom + " comb.top=" + L.combTop);
         check(t + ": the pair is tight (gap no more than 2px)",
@@ -134,9 +138,11 @@ const faceCentrePx = async (page, S) => {
         check(t + ": the phone rows are squeezed (no line-height slack)",
           L.comb.h <= 17 && L.onp.h <= 17,
           "comb.h=" + L.comb.h + " onp.h=" + L.onp.h);
-        check(t + ": One Nation's row clears the chart name to its left",
-          L.title.right <= L.comb.x + 1, "title.right=" + L.title.right + " comb.x=" + L.comb.x);
-        check(t + ": the two boxes are right-aligned with each other",
+        check(t + ": the pair's column clears the chart name to its left",
+          L.title.right <= L.ctls.x + 1, "title.right=" + L.title.right + " ctls.x=" + L.ctls.x);
+        check(t + ": the two checkbox glyphs line up on one x",
+          Math.abs(L.combInX - L.onpInX) <= 1, "comb=" + L.combInX + " onp=" + L.onpInX);
+        check(t + ": the two boxes share the one column's right edge",
           Math.abs(L.onp.right - L.comb.right) <= 2, "onp.right=" + L.onp.right + " comb.right=" + L.comb.right);
         check(t + ": the stack hugs the head row's right edge",
           Math.abs(L.comb.right - L.chead.right) <= 2 && Math.abs(L.onp.right - L.chead.right) <= 2,

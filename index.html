@@ -4255,7 +4255,8 @@ body.rd .rd-cyc-chart .rd-check { font-size: 13px; font-weight: 400; }
 body.rd .rd-cyc-ctls { display: contents; }
 @media (max-width: 640px) {
   body.rd .rd-cyc-chart .rd-chead { align-items: flex-end; }
-  body.rd .rd-cyc-ctls { display: flex; flex-direction: column-reverse; align-items: flex-end; row-gap: 0; margin-left: auto; }
+  body.rd .rd-cyc-chart .rd-chead:has(> .rd-cyc-ctls) { align-items: flex-start; }
+  body.rd .rd-cyc-ctls { display: flex; flex-direction: column-reverse; align-items: stretch; row-gap: 0; margin-left: auto; }
   body.rd .rd-cyc-chart .rd-check { line-height: 1.15; min-height: 0; }
   body.rd .rd-cyc-chart .rd-check input { width: 15px; height: 15px; margin-top: 1px; }
 }
