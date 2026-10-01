@@ -65435,6 +65435,25 @@ function RdHero(p) {
   const swipeMark = React.useCallback(el => {
     if (el) el.__rdSwipe = dir => swipeLive.current(dir);
   }, []);
+  const numTap = React.useRef({
+    t: 0,
+    x: 0,
+    y: 0
+  });
+  const numPress = e => {
+    if (!(e.target.closest && e.target.closest(".rd-tpp-num"))) return;
+    const now = performance.now(),
+      p = numTap.current;
+    const pair = now - p.t < 500 && Math.abs(e.clientX - p.x) < 30 && Math.abs(e.clientY - p.y) < 30;
+    p.t = now;
+    p.x = e.clientX;
+    p.y = e.clientY;
+    if (!pair || orderedMatchups.length < 2) return;
+    p.t = 0;
+    e.preventDefault();
+    const i = orderedMatchups.indexOf(matchup);
+    chooseMatchup(orderedMatchups[(i + 1 + orderedMatchups.length) % orderedMatchups.length]);
+  };
   const chartEl = React.useRef(null);
   const hoverKeys = React.useRef(false);
   const chartMark = React.useCallback(el => {
@@ -65499,7 +65518,8 @@ function RdHero(p) {
   }, React.createElement("div", {
     className: "rd-tpp-read",
     ref: swipeMark,
-    "data-rd-swipe-self": ""
+    "data-rd-swipe-self": "",
+    onPointerDown: numPress
   }, React.createElement("div", {
     className: "rd-tpp-side rd-a"
   }, React.createElement("span", {

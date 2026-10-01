@@ -266,9 +266,15 @@ function RdPrimary({ rangeId, setRangeId }) {
           copy={{ title: "Primary vote", sub: story.head, legend: parts.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
         />
         {/* the 2PP card above already lists this window's events under its
-            own chart, so this copy folds away behind a disclosure the reader
-            opens when a mark puzzles them; two lists said the same thing */}
-        {badges && badges.list.length > 0 && (
+            own chart, so two or more fold away behind a disclosure the
+            reader opens when a mark puzzles them; two lists said the same
+            thing. A lone marked event is no list at all - it just sits out
+            as the single row, with no "The marked events" wrapping it */}
+        {badges && badges.list.length === 1 && (
+          <RdEventList list={badges.list} onPick={pickEv}
+                       openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />
+        )}
+        {badges && badges.list.length > 1 && (
           <details className="rd-evdrop">
             <summary>The marked events</summary>
             <RdEventList list={badges.list} onPick={pickEv}
@@ -1904,6 +1910,22 @@ function RdDemographics({ rangeId = "all" }) {
      then share the row evenly with the location chart. */
   const panelled = (c) => c.st.id === "state";
   const even = charts.some(panelled);
+  /* On a laptop the Place tab's cards sit side by side, and the reader
+     expects By location's y axis to run the full height of the 2x2 state
+     grid beside it. That height is layout, not data, so it is measured and
+     the location chart's plot is sized to it. A phone stacks the cards and
+     keeps its fixed chart heights. */
+  const wvGridRef = React.useRef(null);
+  const [wvGridH, setWvGridH] = React.useState(0);
+  React.useLayoutEffect(() => {
+    const el = wvGridRef.current;
+    if (!el) return undefined;
+    const fit = () => setWvGridH(el.getBoundingClientRect().height);
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [even, narrow, tabId]);
   const chartOf = (c) => {
     const A = fromCharts && fromCharts.find((x) => x.st.id === c.st.id);
     const t = pm ? pm.t : 1;
@@ -1954,7 +1976,7 @@ function RdDemographics({ rangeId = "all" }) {
       return (
         <div className="card rd-card rd-wv-chart" key={c.st.id} style={{ flex: "1 1 0" }}>
           {head}
-          <div className="rd-wv-panels">
+          <div className="rd-wv-panels" ref={wvGridRef}>
             {rowsOf.map((r) => {
               const g = r.l.g, name = RD_STATE_NAME[g.label] || g.label;
               /* the ring leads the series by a month or two, so the edge
@@ -2039,7 +2061,10 @@ function RdDemographics({ rangeId = "all" }) {
     return (
     <div className="card rd-card rd-wv-chart" key={c.st.id} style={even ? { flex: "1 1 0" } : { flexGrow: narrow ? 1 : Math.max(0.35, c.span) }}>
       {head}
-      <TrendChart key={"rd-wv-" + c.st.id + "-" + tab.id} heightPx={narrow ? 240 : 260}
+      {/* heightPx = grid + t/b pads: the plot (svg minus the pads below)
+          then matches the 2x2 state grid's height exactly. 42 is padPx
+          t 12 + b 30; a change to those pads moves with it. */}
+      <TrendChart key={"rd-wv-" + c.st.id + "-" + tab.id} heightPx={narrow ? 240 : (even && wvGridH ? Math.round(wvGridH) + 42 : 260)}
         padPx={narrow ? { l: 34, r: 8, t: 12, b: 28 } : { l: 40, r: 12, t: 12, b: 30 }}
         xDomain={xDomL} yDomain={yDom} yTicks={rdYTicks(0, yMax, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
         xTicks={leOn ? rdElectionTicks(xDomL[0], c.x1, narrow || c.span < 0.8, le.x) : rdXTicks(c.x0, c.x1, narrow || c.span < 0.8)} baseline driven={!!A}
