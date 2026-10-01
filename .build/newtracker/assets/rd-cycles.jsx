@@ -297,7 +297,13 @@ function RdPastCycles(p) {
      foot instead or nothing holds the spot at all - Chrome's native
      scroll anchoring papers over that gap there, but Safari has no
      overflow-anchor and every compare swipe shoved the reader down the
-     page by the dek's height swing */
+     page by the dek's height swing. Like the All-polls table, this walk
+     opts into the pin on fine pointers too (the second arg, 2026-10-01):
+     a laptop's compare/measure click or arrow-key step holds the board
+     and summary exactly as a phone swipe's does - glides only reflow
+     above the row here (no per-hop mounts like the All-polls hed), so
+     rd.jsx's integer-absolute corrections plus sub-3css adoption are
+     the whole Safari.app story for it */
   const pinView = () => {
     const sec = document.getElementById("cyc-summary");
     const strip = sec && [...sec.querySelectorAll(".rd-cs-row")].find((el) => {
@@ -305,7 +311,7 @@ function RdPastCycles(p) {
       return r.bottom >= 0 && r.top <= window.innerHeight;
     });
     rdPinScroll([boardRef.current, strip,
-                 sec && sec.querySelector(".rd-cs-key"), sec && sec.querySelector(".rd-foot")]);
+                 sec && sec.querySelector(".rd-cs-key"), sec && sec.querySelector(".rd-foot")], true);
   };
   const chg = mode === "chg";
   const cur = cycles.find((c) => c.current);
@@ -516,7 +522,7 @@ function RdPastCycles(p) {
     if (chg) {
       const less = n.v < 0 ? "fallen further" : "risen less";
       const head = (/^Lowest/.test(rk.main) ? pm + "’s net approval has " + less + " than any prime minister’s at this point"
-        : /^2nd lowest/.test(rk.main) ? pm + "’s net approval has " + less + " than any prime minister’s at this point but " + low.who + "’s"
+        : /^2nd lowest/.test(rk.main) ? pm + "’s net approval has " + less + " than any prime minister’s at this point but " + rdCycHolderTag(n.peers, low) + "’s"
         : /^Highest/.test(rk.main) ? pm + "’s net approval has " + (n.v >= 0 ? "risen more" : "fallen less") + " than any prime minister’s at this point"
         : pm + "’s net approval has done " + (dN >= 0 ? "better" : "worse") + " than the average prime minister’s since the term’s first reading") + tail;
       /* the leaders' measures count from the term's first reading, not the election */
@@ -532,7 +538,7 @@ function RdPastCycles(p) {
       return { head, dek };
     }
     const head = (/^Lowest/.test(rk.main) ? pm + "’s net approval is the lowest of any prime minister at this point"
-      : /^2nd lowest/.test(rk.main) ? pm + "’s net approval is the second lowest of any prime minister at this point, after " + low.who + "’s"
+      : /^2nd lowest/.test(rk.main) ? pm + "’s net approval is the second lowest of any prime minister at this point, after " + rdCycHolderTag(n.peers, low) + "’s"
       : /^Highest/.test(rk.main) ? pm + "’s net approval is the highest of any prime minister at this point"
       : pm + "’s net approval is " + (n.v >= n.peers.mean ? "above" : "below") + " the average prime minister’s at this point") + tail;
     let dek = "At " + fmtOf("net")(n.v) + " he is " + Math.abs(dN).toFixed(1) + " points " + (dN >= 0 ? "above" : "below") + " the average prime minister " + m + " months in" + tail + ".";

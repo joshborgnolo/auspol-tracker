@@ -243,8 +243,9 @@ function rdPinScroll(row, fine) {
   /* the fixed view is a TOUCH-device contract by default: it exists to stop
      mid-gesture drift on iOS Safari. On a computer (fine pointer - mouse,
      trackpad, keyboard) a click or keypress just reflows live, no pin -
-     unless the caller passes fine (the All-polls table does: its facet
-     walk, matchup flip and counts-basis switch hold the bar and rows on a
+     unless the caller passes fine (the All-polls table and the past-cycles
+     compare/measure walk do: the facet walk, matchup flip, counts-basis
+     switch and compare/measure step hold the bar, rows and board on a
      laptop exactly as on a phone) */
   if (!fine && window.matchMedia && !window.matchMedia("(pointer: coarse)").matches) return;
   /* a re-pin inside the window ENDS the outgoing pin first, synchronously:
@@ -295,6 +296,7 @@ function rdPinScroll(row, fine) {
   if (rdPinAnchorSave === null) rdPinAnchorSave = html.style.overflowAnchor;
   html.style.overflowAnchor = "none";
   let want = want0.top, lastY = window.scrollY, lastIssued = 0, issueY = -1, eaten = 0;
+  let lastDVal = NaN, lastDAt = 0;
   /* every candidate a caller lists sits below the section head, so they
      share the ONE translation through a swap: when the pinned element's
      own React commit re-keys it out of the DOM mid-pin (an All-polls facet
@@ -376,12 +378,22 @@ function rdPinScroll(row, fine) {
        started all this reflows nothing and issues no corrections at
        all (2026-10-01 pindump: scrolls 0, climb 0 over 12 laps - the
        lattice can neither botch nor be asked to hold anything). */
+    let still = 0;
+    if (d !== lastDVal) { lastDVal = d; lastDAt = now; }
+    else still = now - lastDAt;
     if (drift && Math.abs(d) >= 3) {
       window.scrollTo(0, Math.round(y0 + d));
       lastIssued = now; issueY = y0; eaten = 0; lastY = window.scrollY;
-    } else if (drift) {
-      retarget(d);
-    } else if (d && quiet) {
+    } else if (d && quiet && still > 40) {
+      /* a sub-3css leftover mid-glide is NOT adopted: adopting each small
+         frame subtracts it from the anchor, so the anchor rides the
+         glide's decelerating tail with it (the past-cycles dek case rode
+         11.5px down over the tail's sub-3 frames). Left standing, the
+         leftovers accumulate into the next fix()'s d until they cross 3
+         and a whole-pixel correction goes out - the Safari.app lattice
+         that the 3px rule exists for loses nothing. Only a STANDING
+         leftover (motion stopped >40ms, nothing outstanding) is adopted:
+         that one is the engine's real floor */
       retarget(d);
     }
   };
