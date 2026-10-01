@@ -1,10 +1,17 @@
-/* cyc-ctl-stack: on a phone the Past-cycles opposition-primary card's two
-   One Nation overlay boxes ("Combine L/NP and ON", "One Nation this term")
-   leave the name row and stack under it, right-aligned, One Nation's own
-   overlay on top. The wrapper is display:contents everywhere else, so the
+/* cyc-ctl-stack: the Past-cycles opposition-primary card's two One Nation
+   overlay boxes ("Combine L/NP and ON", "One Nation this term") on a phone:
+   the pair hugs the head row's right edge as one tight corner stack - One
+   Nation's own overlay on top, Combine on the bottom row so the
+   bottom-aligned head row lands "Opposition's primary vote" on the SAME
+   line as Combine. The wrapper is display:contents everywhere else, so the
    desktop row beside the chart's name is untouched (checked at 1440 and
    760 - stacking must stay phone-only). Also: the phone stack must not
-   push the page sideways, and the Hanson card's lone box keeps no wrapper. */
+   push the page sideways, and the Hanson card's lone box keeps no wrapper.
+   Plus the theme contract: native controls answer to the resolved
+   color-scheme, and body/body.dark now pin it to the site's OWN theme
+   class - emulate a dark OS, the auto theme goes .dark and the unchecked
+   box paints dark; force the light theme and the box goes light even
+   though the device still says dark. */
 import http from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -55,6 +62,38 @@ const readLayout = () => window.__cycCtlLayout = (() => {
     hanWrappers, docW: document.documentElement.scrollWidth, vw: window.innerWidth };
 })();
 
+/* the native checkbox answers to the resolved color-scheme: body pins it
+   light, body.dark pins it dark, so the site's own theme toggle (not the
+   device) decides how the box paints. Chrome's computed background-color
+   for a native checkbox is transparent both ways (the control face is
+   painted natively), so the rendered outcome is sampled as PIXELS: shot
+   the box's centre and decode it back through the page's own canvas */
+const readScheme = () => {
+  const bodyCs = getComputedStyle(document.body).colorScheme;
+  const inp = document.querySelector("#cyc-primary .rd-cyc-ctls input");
+  inp.scrollIntoView({ block: "center" });
+  const r = inp.getBoundingClientRect();
+  return { darkClass: document.body.classList.contains("dark"), bodyCs,
+    cx: r.x + r.width / 2, cy: r.y + r.height / 2, w: r.width, h: r.height };
+};
+const faceCentrePx = async (page, S) => {
+  const clip = { x: Math.max(0, S.cx - 4), y: Math.max(0, S.cy - 4), width: 8, height: 8 };
+  const offX = S.cx - clip.x, offY = S.cy - clip.y;
+  const buf = await page.screenshot({ clip });
+  return page.evaluate(async (b64, offX, offY) => {
+    const img = new Image();
+    img.src = "data:image/png;base64," + b64;
+    await img.decode();
+    const c = document.createElement("canvas");
+    c.width = img.width; c.height = img.height;
+    const ctx = c.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(img, 0, 0);
+    const d = ctx.getImageData(Math.round(offX), Math.round(offY), 1, 1).data;
+    const lum = +((0.2126 * d[0] + 0.7152 * d[1] + 0.0722 * d[2]) / 255).toFixed(3);
+    return { rgb: [d[0], d[1], d[2]].join(","), lum };
+  }, buf.toString("base64"), offX, offY);
+};
+
 (async () => {
   await new Promise((r) => server.listen(PORT, r));
   const browser = await puppeteer.launch({ executablePath: CHROME, headless: "new", args: ["--no-sandbox"] });
@@ -77,17 +116,25 @@ const readLayout = () => window.__cycCtlLayout = (() => {
         /Combine/.test(L.combText) && /One Nation this term/.test(L.onpText),
         L.combText + " | " + L.onpText);
       if (vw <= 640) {
-        check(t + ": wrapper becomes the flex column at phone width",
+        check(t + ": wrapper becomes the tight corner column at phone width",
           L.ctlsDisplay === "flex" && L.ctlsDir === "column-reverse", L.ctlsDisplay + " " + L.ctlsDir);
-        check(t + ": One Nation sits fully above Combine (on top of the other)",
+        check(t + ": Combine sits on the chart-name line",
+          Math.abs(L.comb.bottom - L.title.bottom) <= 2,
+          "comb.bottom=" + L.comb.bottom + " title.bottom=" + L.title.bottom);
+        check(t + ": One Nation sits fully above Combine",
           L.onp.bottom <= L.combTop + 1, "onp.bottom=" + L.onp.bottom + " comb.top=" + L.combTop);
+        check(t + ": the pair is tight (gap no more than 4px)",
+          L.combTop - L.onp.bottom <= 4 && L.combTop - L.onp.bottom >= 0,
+          "gap=" + (L.combTop - L.onp.bottom));
+        check(t + ": One Nation clears the chart name above it",
+          L.onp.bottom <= L.title.y + 1, "onp.bottom=" + L.onp.bottom + " title.top=" + L.title.y);
         check(t + ": the two boxes are right-aligned with each other",
           Math.abs(L.onp.right - L.comb.right) <= 2, "onp.right=" + L.onp.right + " comb.right=" + L.comb.right);
-        check(t + ": the stack reaches the head row's right edge",
+        check(t + ": the stack hugs the head row's right edge",
           Math.abs(L.comb.right - L.chead.right) <= 2 && Math.abs(L.onp.right - L.chead.right) <= 2,
           "comb.right=" + L.comb.right + " onp.right=" + L.onp.right + " chead.right=" + L.chead.right);
-        check(t + ": the stack drops to its own row, under the chart's name",
-          L.ctlsTop >= L.titleBottom - 2, "ctls.top=" + L.ctlsTop + " title.bottom=" + L.titleBottom);
+        check(t + ": the wrapper hugs a corner, not a full-width band",
+          L.ctls.w < L.chead.w * 0.7, "ctls.w=" + L.ctls.w + " chead.w=" + L.chead.w);
         check(t + ": both boxes clear of the head row's left half",
           L.comb.x > L.chead.x + L.chead.w / 2 && L.onp.x > L.chead.x + L.chead.w / 2,
           "comb.x=" + L.comb.x + " onp.x=" + L.onp.x + " mid=" + (L.chead.x + L.chead.w / 2));
@@ -102,6 +149,43 @@ const readLayout = () => window.__cycCtlLayout = (() => {
           Math.abs(L.comb.cy - L.title.cy) <= 8, "comb.cy=" + L.comb.cy + " title.cy=" + L.title.cy);
         check(t + ": no horizontal page overflow", L.docW <= L.vw + 1, "docW=" + L.docW + " vw=" + L.vw);
       }
+      await page.close();
+    }
+
+    /* --- the theme contract: native controls follow body.dark, not the OS.
+       Emulate a dark device; the auto theme should put .dark on the body and
+       the unchecked box should paint dark. Then force the light theme the
+       way the user's toggle does (the class comes off) and the box must go
+       light while the device still says dark. */
+    {
+      const page = await browser.newPage();
+      const pageErrors = [];
+      page.on("pageerror", (e) => pageErrors.push(String(e)));
+      await page.setViewport({ width: 390, height: 844, hasTouch: true });
+      await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "dark" }]);
+      await page.goto(`http://127.0.0.1:${PORT}/#cycles`, { waitUntil: "domcontentloaded", timeout: 60000 });
+      await page.waitForSelector("#cyc-primary .rd-cyc-ctls input", { timeout: 45000 });
+      await new Promise((r) => setTimeout(r, 1200));
+      let S = await page.evaluate(readScheme);
+      let px = await faceCentrePx(page, S);
+      check("theme: a dark device in auto mode puts .dark on the body",
+        S.darkClass === true, JSON.stringify(S));
+      check("theme: body pins the dark scheme for native controls",
+        S.bodyCs === "dark", "color-scheme=" + S.bodyCs);
+      check("theme: the unchecked box paints dark on the dark theme",
+        px.lum < 0.5, "face rgb=" + px.rgb + " lum=" + px.lum);
+
+      await page.evaluate(() => document.body.classList.remove("dark"));
+      await new Promise((r) => setTimeout(r, 600));
+      S = await page.evaluate(readScheme);
+      px = await faceCentrePx(page, S);
+      check("theme: forcing the light theme takes .dark off the body",
+        S.darkClass === false, JSON.stringify(S));
+      check("theme: body pins the light scheme for native controls",
+        S.bodyCs === "light", "color-scheme=" + S.bodyCs);
+      check("theme: the unchecked box paints light on the light theme (dark device or not)",
+        px.lum > 0.6, "face rgb=" + px.rgb + " lum=" + px.lum);
+      check("theme: no page exceptions", pageErrors.length === 0, pageErrors[0] || "");
       await page.close();
     }
   } finally {

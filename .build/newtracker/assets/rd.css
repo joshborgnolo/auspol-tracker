@@ -1664,12 +1664,13 @@ body.rd .rd-cyc-chart .rd-chead { flex-wrap: wrap; gap: 12px; }
 body.rd .rd-cyc-chart .rd-check { font-size: 13px; }
 /* the pair of One Nation overlay boxes is one box in the row flow: on
    desktop its two checks sit beside the chart's name as if nothing wrapped
-   them; on a phone they can't share that row, so the box drops to a line
-   of its own and stacks them right-aligned, One Nation's own overlay on
-   top */
+   them; on a phone it hugs the head row's right edge as one corner stack -
+   One Nation's own overlay tight on top, Combine on the bottom row so the
+   bottom-aligned head row lands the chart's name on the SAME line */
 body.rd .rd-cyc-ctls { display: contents; }
 @media (max-width: 640px) {
-  body.rd .rd-cyc-ctls { display: flex; flex-direction: column-reverse; align-items: flex-end; flex-basis: 100%; row-gap: 6px; }
+  body.rd .rd-cyc-chart .rd-chead { align-items: flex-end; }
+  body.rd .rd-cyc-ctls { display: flex; flex-direction: column-reverse; align-items: flex-end; row-gap: 2px; margin-left: auto; }
 }
 /* the band in the redesign's warm grey */
 body.rd .cyc-band.lo { fill: var(--ink-3); opacity: 0.1; }

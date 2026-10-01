@@ -231,7 +231,13 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   line-height: 1.45;
+  /* native controls answer to the resolved color-scheme, not to our CSS
+     vars - and the meta tag offers the device both, so a light page on a
+     dark-mode phone still drew its checkboxes black. Pin body's subtree to
+     the site's own theme class (the toggle's .dark) instead */
+  color-scheme: light;
 }
+body.dark { color-scheme: dark; }
 
 /* ---------- pre-script / no-JS / reader-mode state ----------
    The article version of the page: every headline figure and the methodology
