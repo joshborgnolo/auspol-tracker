@@ -792,6 +792,34 @@ function RdLeadership({ rangeId }) {
   const dotRows = (mt) => leaders.map((Ld) => ({ Ld, n: N[Ld.id + "_" + mt] })).filter((r) => r.n);
   const dotDom = [-40, 20];
   const dxp = (v) => ((Math.max(dotDom[0], Math.min(dotDom[1], v)) - dotDom[0]) / (dotDom[1] - dotDom[0])) * 100;
+  /* The rows' tracks carry the Who-votes whiskers' rug: the window's polls
+     as small dots along the leader's track, the rug's mechanics in DpRug.
+     Membership mirrors leaderNow's own pools - approval of the majors on
+     gen-data's HEADLINE window (21d), favourability and Hanson's thinner
+     measures on SPARSE (42d), both anchored at the data's latest - and the
+     metric routing is the chart cloud's (a poll that published both
+     measures lends its second reading to the other track). A Both row
+     marks its favourability dots open. */
+  const poolItems = (Ld, mt, both) => {
+    const wantFav = mt === "fav";
+    const ref = Date.parse(D.latest.updatedISO);
+    const win = wantFav || Ld.id === "hanson" ? 42 : 21;
+    const lab = Ld.short + (both ? (wantFav ? " favourability" : " approval") : "");
+    return D.individualPolls.flatMap((q) => {
+      const a = q.appr;
+      if (!a) return [];
+      const mid = q.fmid ? Date.parse(q.fmid) : Date.parse(q.released);
+      const d = (ref - mid) / 86400000;
+      if (d < 0 || d > win) return [];
+      const out = [];
+      const isFav = ((a.metricBy || {})[Ld.id] === "fav");
+      const fav = both && wantFav;
+      if (a[Ld.id + "Net"] != null && isFav === wantFav) out.push({ q, y: a[Ld.id + "Net"], fav, label: lab });
+      const alt = a.alt && a.alt[Ld.id];
+      if (alt && alt.net != null && (alt.metric === "fav") === wantFav) out.push({ q, y: alt.net, fav, label: lab });
+      return out;
+    });
+  };
   const dotPlot = (mode) => {
     const rowsA = dotRows("net"), rowsF = dotRows("fav");
     const both = mode === "both";
@@ -804,22 +832,28 @@ function RdLeadership({ rangeId }) {
           <span role="columnheader">{both ? "Approval" : "Now"}</span>
           <span role="columnheader">{both ? "Favour." : "Change"}</span>
         </div>
-        {list.map(({ Ld, a, f }) => (
+        {list.map(({ Ld, a, f }) => {
+          /* the rug's dots are buttons now, so aria-hidden moves off the
+             track onto its purely visual siblings, as the Who-votes rows */
+          const items = both ? poolItems(Ld, "net", true).concat(poolItems(Ld, "fav", true)) : poolItems(Ld, mode, false);
+          return (
           <div key={Ld.id} className="rd-dp-row" role="row">
             <span role="cell" className="rd-dp-name"><span className="rd-dp-sw" style={{ background: Ld.color }}></span>{Ld.short}</span>
-            <span className="rd-dp-track" aria-hidden="true">
-              <span className="rd-dp-zero" style={{ left: dxp(0) + "%" }}></span>
-              {!both && a && <span className="rd-dp-ci" style={{ left: dxp(a.v - a.ci95) + "%", width: dxp(a.v + a.ci95) - dxp(a.v - a.ci95) + "%", background: Ld.color }}></span>}
-              {both && a && f && <span className="rd-dp-link" style={{ left: Math.min(dxp(a.v), dxp(f.v)) + "%", width: Math.abs(dxp(a.v) - dxp(f.v)) + "%", background: Ld.color }}></span>}
-              {a && <span className="rd-dp-dot" style={{ left: dxp(a.v) + "%", background: Ld.color }}></span>}
-              {both && f && <span className="rd-dp-dot open" style={{ left: dxp(f.v) + "%", borderColor: Ld.color }}></span>}
+            <span className="rd-dp-track">
+              <span className="rd-dp-zero" aria-hidden="true" style={{ left: dxp(0) + "%" }}></span>
+              {items.length > 0 && <DpRug items={items} color={Ld.color} dxp={dxp} fmt={signed} />}
+              {!both && a && <span className="rd-dp-ci" aria-hidden="true" style={{ left: dxp(a.v - a.ci95) + "%", width: dxp(a.v + a.ci95) - dxp(a.v - a.ci95) + "%", background: Ld.color }}></span>}
+              {both && a && f && <span className="rd-dp-link" aria-hidden="true" style={{ left: Math.min(dxp(a.v), dxp(f.v)) + "%", width: Math.abs(dxp(a.v) - dxp(f.v)) + "%", background: Ld.color }}></span>}
+              {a && <span className="rd-dp-dot" aria-hidden="true" style={{ left: dxp(a.v) + "%", background: Ld.color }}></span>}
+              {both && f && <span className="rd-dp-dot open" aria-hidden="true" style={{ left: dxp(f.v) + "%", borderColor: Ld.color }}></span>}
             </span>
             <span role="cell" className="rd-dp-now">{a ? <RollNum value={signed(a.v)} /> : "—"}</span>
             <span role="cell" className={"rd-dp-chg" + (!both && a && a.changeSig ? " sig" : "")}>
               {both ? (f ? <RollNum value={signed(f.v)} /> : "—")
                 : a && a.chg != null ? <>{Math.abs(a.chg) < 0.05 ? "→" : rdArrow(a.chg)} <RollNum value={Math.abs(a.chg) < 0.05 ? "0.0" : Math.abs(a.chg).toFixed(1)} /></> : ""}</span>
           </div>
-        ))}
+        );
+        })}
         <div className="rd-dp-foot" aria-hidden="true">
           <span></span>
           <span className="rd-dp-axis">{[-40, -20, 0, 20].map((v) => <span key={v} style={{ left: dxp(v) + "%" }}>{v === 0 ? "0" : v > 0 ? "+" + v : "−" + Math.abs(v)}</span>)}</span>
@@ -1275,6 +1309,110 @@ function WvRug({ g, party, xp, pColor, pName }) {
               <span className="tip-row"><span className="tip-label">Field</span><span className="tip-val">{d.l}</span></span>
               <div className="tip-sub">{"n ≈ " + (+d.n).toLocaleString()}</div>
               {tip.src !== "touch" && <div className="tip-hint">{rk ? (tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls") : "Released " + d.r}</div>}
+            </span>}
+          </b>
+        );
+      })}
+    </span>
+  );
+}
+/* The Who-votes rug carried across to the leader-rating rows: each poll the
+   row's figure pools rides the track as a small dot at its own reading, with
+   WvRug's every mechanic - the doubled corridor dodging into two lanes
+   measured off the rendered strip, the chart's dot tip, the Interaction
+   board's ring, click to open, a touch tap's readout dismissing on the next
+   tap outside (9ccaf8b). Items arrive ready-built from the parent's pool
+   walk: q the wave's individualPolls row, y its own reading, fav the
+   Both-row favourability face (the open marker's), label the tip's swatch
+   name. Fieldwork mid-day dates the membership - q.fmid, q.released where
+   the wave was a single day; gen-data's midMs can fall at noon UTC on an
+   odd-length span, a half-day reconstructible here only to the midnight, so
+   a poll sat exactly on the window's edge can count or not by half a day. */
+function DpRug({ items, color, dxp, fmt }) {
+  const [tip, setTip] = useState(null);
+  const tipBox = React.useRef(null);
+  const ptr = React.useRef(null);
+  const rugBox = React.useRef(null);
+  const [ups, setUps] = useState(null);
+  React.useLayoutEffect(() => {
+    const el = rugBox.current;
+    if (!el) return;
+    const compute = () => {
+      const b = el.querySelector("b");
+      const w = el.clientWidth;
+      if (!b || !w) return;
+      const gap = (b.offsetWidth / w) * 100;
+      const last = [-Infinity, -Infinity];
+      const next = new Array(items.length).fill(0);
+      items.map((d, i) => ({ i, p: dxp(d.y) })).sort((a, c) => a.p - c.p).forEach(({ i, p }) => {
+        let l;
+        if (p - last[0] >= gap) l = 0;
+        else if (p - last[1] >= gap) l = 1;
+        else l = last[0] <= last[1] ? 0 : 1;
+        last[l] = p;
+        next[i] = l;
+      });
+      setUps((prev) => (prev && prev.length === next.length && next.every((v, k) => v === prev[k]) ? prev : next));
+    };
+    compute();
+    const ro = new ResizeObserver(compute);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [items, dxp]);
+  React.useLayoutEffect(() => {
+    const el = tipBox.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip]);
+  const show = (i, src) => setTip({ i, src });
+  const hide = (i, src) => setTip((tp) => (tp && tp.i === i && (!src || tp.src === src) ? null : tp));
+  // a readout a finger raised stays up until the next tap lands outside its row
+  window.useDismissOutside(rugBox, !!(tip && tip.src === "touch"), () => setTip(null));
+  return (
+    <span ref={rugBox} className={"rd-dp-rug" + (tip ? " lit" : "")}>
+      {items.map((it, i) => {
+        const q = it.q;
+        const key = q.pollster + "|" + q.released + (it.fav ? "|f" : "");
+        const rk = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: q.pollster, released: q.released }) : null;
+        const open = () => {
+          if (!rk || !(window.AP && window.AP.openPoll)) return;
+          setTip(null);
+          window.AP.openPoll(rk, "leadership", "leadership");
+        };
+        const lab = q.pollster + ", " + q.field + " · " + fmt(it.y) + (q.sample != null ? " · n≈" + q.sample : "");
+        const on = tip && tip.i === i;
+        return (
+          <b key={key} className={[(it.fav ? "open" : ""), (rk ? "on" : ""), (on ? "hi" : "")].filter(Boolean).join(" ") || undefined}
+             style={{ "--x": dxp(it.y), "--pcolor": color, "--v": ups ? ups[i] : 0 }}
+             role={rk ? "button" : "img"} tabIndex={rk ? 0 : undefined}
+             aria-label={lab + (rk ? ", press Enter to open this poll" : "")}
+             onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+             onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(i, "mouse"); }}
+             onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(i, "mouse"); }}
+             onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show(i, "focus"); }}
+             onBlur={() => hide(i, "focus")}
+             onClick={(ev) => {
+               ev.stopPropagation();
+               const pt = ev.detail === 0 ? "key" : ptr.current;
+               ptr.current = null;
+               if (pt === "mouse" || pt === "key") { open(); return; }
+               if (tip && tip.i === i) setTip(null); else setTip({ i, src: "touch" });
+             }}
+             onKeyDown={(ev) => {
+               if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+               ev.preventDefault();
+               open();
+             }}>
+            <i aria-hidden="true"></i>
+            {on && <span ref={tipBox} className="tip tip-dot rd-dp-rtip" aria-hidden="true">
+              <span className="tip-title">{q.pollster}</span>
+              <span className="tip-row"><span className="tip-swatch" style={{ background: color }}></span><span className="tip-label">{it.label}</span><span className="tip-val">{fmt(it.y)}</span></span>
+              <span className="tip-row"><span className="tip-label">Field</span><span className="tip-val">{q.field}</span></span>
+              {q.sample != null && <div className="tip-sub">{"n ≈ " + (+q.sample).toLocaleString()}</div>}
+              {tip.src !== "touch" && <div className="tip-hint">{rk ? (tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls") : "Released " + q.released}</div>}
             </span>}
           </b>
         );
