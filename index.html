@@ -67361,6 +67361,7 @@ function WvRug({
     src
   });
   const hide = (i, src) => setTip(tp => tp && tp.i === i && (!src || tp.src === src) ? null : tp);
+  window.useDismissOutside(rugBox, !!(tip && tip.src === "touch"), () => setTip(null));
   return React.createElement("span", {
     ref: rugBox,
     className: "rd-wv-rug" + (tip ? " lit" : "")

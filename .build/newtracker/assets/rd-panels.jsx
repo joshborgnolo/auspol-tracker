@@ -1224,6 +1224,8 @@ function WvRug({ g, party, xp, pColor, pName }) {
   }, [tip]);
   const show = (i, src) => setTip({ i, src });
   const hide = (i, src) => setTip((tp) => (tp && tp.i === i && (!src || tp.src === src) ? null : tp));
+  // a readout a finger raised stays up until the next tap lands outside its row
+  window.useDismissOutside(rugBox, !!(tip && tip.src === "touch"), () => setTip(null));
   return (
     <span ref={rugBox} className={"rd-wv-rug" + (tip ? " lit" : "")}>
       {g.px[party].map((x, i) => {
