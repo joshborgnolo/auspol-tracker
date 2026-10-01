@@ -3027,6 +3027,7 @@ body.rd.dark {
 }
 @media (max-width: 640px) {
   body.rd { --rd-sec-pad: 36px; }
+  body.rd #cyc-tpp { --cyc-chip-pad: 60px; padding-top: 60px; }
 }
 body.rd .page {
   max-width: calc(var(--rd-maxw) + 2 * var(--rd-gutter));
@@ -4165,12 +4166,12 @@ body.rd .rd-cc { position: relative; margin-top: 32px; }
 body.rd .rd-cyc-storyvar { height: 0; overflow: hidden; visibility: hidden; }
 body.rd .rd-cc-row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 body.rd .rd-cyc-chipmove {
-  position: absolute; top: calc(var(--rd-sec-pad) + 1px); right: 0; z-index: 1;
-  transform: translateY(calc(-100% - 6px));
-  display: flex; flex-direction: column; align-items: flex-end;
+  position: absolute; top: calc(var(--cyc-chip-pad, var(--rd-sec-pad)) + 1px); left: 0; z-index: 1;
+  transform: translateY(calc(-100% - 12px));
+  display: flex; flex-direction: column; align-items: flex-start;
   row-gap: 8px; max-width: 100%;
 }
-body.rd .rd-cyc-chipmove .rd-cc-drawn { justify-content: flex-end; }
+body.rd .rd-cyc-chipmove .rd-cc-drawn { justify-content: flex-start; }
 body.rd .rd-cc-l { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-cc-tabs { border-bottom: 0; }
 body.rd .rd-cc-n { margin-left: 6px; font-weight: 400; color: var(--ink-3); }
@@ -72490,7 +72491,7 @@ function RdPastCycles(p) {
       const where = t.v >= t.peers.q1 && t.v <= t.peers.q3 ? "sits in the middle half of past governments" : t.v > t.peers.q3 ? "is above three in four of past governments" : "is below three in four of past governments";
       dek += " After preferences, " + (bits.length ? "though, " : "") + govName + "’s " + t.v.toFixed(1) + "% " + where + ".";
     }
-    if (!c2 && oLow && combined) dek += " And while " + oppIn + "’s primary vote is the lowest of any opposition, it’s " + combined + " when combined with One Nation’s.";
+    if (!c2 && oLow && combined) dek += " But while " + oppIn + "’s primary vote is the lowest of any opposition, it’s " + combined + " when combined with One Nation’s.";
     return {
       head,
       dek
