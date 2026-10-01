@@ -45,7 +45,7 @@ function TabScore({ onGoHero, matchup, tppBasis = "imp" }) {
   const M = MM[id], v = tppNow(id);
   return (
     <button className="tab-score" onClick={onGoHero}
-            title={"Latest " + M.label + " two-party preferred – go to Snapshot"}>
+            title={"Latest " + M.label + " two-party preferred – go to Now"}>
       <span className="ts-eyebrow">2PP</span>
       <span className="ts-party">
         <span className="ts-abbr">{M.a.abbr}</span>

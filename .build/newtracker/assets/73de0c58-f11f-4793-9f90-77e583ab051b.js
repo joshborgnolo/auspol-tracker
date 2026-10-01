@@ -1885,7 +1885,7 @@ let viewPanelPokedAt = 0;
 let viewPanelFocusIsPointer = false;
 
 const TABS = [
-  { id: "snapshot", label: "Snapshot" },
+  { id: "snapshot", label: "Now" },
   /* short: the docked phone bar's label, which buys the room to keep Info
      and to name the parties beside the docked score */
   { id: "cycles", label: "Past cycles", short: "Cycles" },

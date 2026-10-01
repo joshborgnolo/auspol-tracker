@@ -4252,7 +4252,7 @@ body.rd .rd-cyc-one { margin-top: 28px; }
 body.rd .rd-cyc-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 48px; margin-top: 28px; }
 body.rd .rd-cyc-subs .rd-sub { margin-top: 44px; }
 body.rd .rd-cyc-subs .rd-subdek { font-size: 15px; min-height: 45px; margin-bottom: 8px; }
-body.rd .rd-cyc-chart .rd-chead { flex-wrap: wrap; gap: 12px; }
+body.rd .rd-cyc-chart .rd-chead { flex-wrap: wrap; gap: 12px; margin-top: 0; }
 body.rd .rd-cyc-chart .rd-check { font-size: 13px; font-weight: 400; }
 body.rd .rd-cyc-ctls { display: contents; }
 @media (max-width: 640px) {
@@ -56451,7 +56451,7 @@ function TabScore({
   return React.createElement("button", {
     className: "tab-score",
     onClick: onGoHero,
-    title: "Latest " + M.label + " two-party preferred – go to Snapshot"
+    title: "Latest " + M.label + " two-party preferred – go to Now"
   }, React.createElement("span", {
     className: "ts-eyebrow"
   }, "2PP"), React.createElement("span", {
@@ -66069,7 +66069,11 @@ function RdPrimary({
         kind: p.id === "oth" ? "dashed" : "line"
       }))
     }
-  }), badges && badges.list.length > 0 && React.createElement("details", {
+  }), badges && badges.list.length === 1 && React.createElement(RdEventList, {
+    list: badges.list,
+    onPick: pickEv,
+    openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
+  }), badges && badges.list.length > 1 && React.createElement("details", {
     className: "rd-evdrop"
   }, React.createElement("summary", null, "The marked events"), React.createElement(RdEventList, {
     list: badges.list,
@@ -68408,6 +68412,17 @@ function RdDemographics({
   const fromYMax = fromCharts ? yMaxOf(fromCharts) : yMax;
   const panelled = c => c.st.id === "state";
   const even = charts.some(panelled);
+  const wvGridRef = React.useRef(null);
+  const [wvGridH, setWvGridH] = React.useState(0);
+  React.useLayoutEffect(() => {
+    const el = wvGridRef.current;
+    if (!el) return undefined;
+    const fit = () => setWvGridH(el.getBoundingClientRect().height);
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [even, narrow, tabId]);
   const chartOf = c => {
     const A = fromCharts && fromCharts.find(x => x.st.id === c.st.id);
     const t = pm ? pm.t : 1;
@@ -68507,7 +68522,8 @@ function RdDemographics({
           flex: "1 1 0"
         }
       }, head, React.createElement("div", {
-        className: "rd-wv-panels"
+        className: "rd-wv-panels",
+        ref: wvGridRef
       }, rowsOf.map(r => {
         const g = r.l.g,
           name = RD_STATE_NAME[g.label] || g.label;
@@ -68668,7 +68684,7 @@ function RdDemographics({
       }
     }, head, React.createElement(TrendChart, {
       key: "rd-wv-" + c.st.id + "-" + tab.id,
-      heightPx: narrow ? 240 : 260,
+      heightPx: narrow ? 240 : even && wvGridH ? Math.round(wvGridH) + 42 : 260,
       padPx: narrow ? {
         l: 34,
         r: 8,
@@ -79304,7 +79320,7 @@ let viewPanelPokedAt = 0;
 let viewPanelFocusIsPointer = false;
 const TABS = [{
   id: "snapshot",
-  label: "Snapshot"
+  label: "Now"
 }, {
   id: "cycles",
   label: "Past cycles",
