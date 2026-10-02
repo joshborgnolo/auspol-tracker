@@ -68721,82 +68721,83 @@ function RdDemographics({
         y: leN
       }, allSeries.points[0]]
     }] : []) : [];
-    return React.createElement("div", {
-      className: "card rd-card rd-wv-chart",
-      key: c.st.id,
-      style: even ? {
-        flex: "1 1 0"
-      } : {
-        flexGrow: narrow ? 1 : Math.max(0.35, c.span)
-      }
-    }, head, React.createElement(TrendChart, {
-      key: "rd-wv-" + c.st.id + "-" + tab.id,
-      heightPx: narrow ? 240 : even && wvGridH ? Math.round(wvGridH) + 14 : 260,
-      padPx: narrow ? {
-        l: 34,
-        r: 8,
-        t: 12,
-        b: 28
-      } : {
-        l: 40,
-        r: 12,
-        t: 12,
-        b: 30
-      },
-      xDomain: xDomL,
-      yDomain: yDom,
-      yTicks: rdYTicks(0, yMax, 10),
-      yTickFmt: v => v === 0 ? "0" : v + "%",
-      xTicks: leOn ? rdElectionTicks(xDomL[0], c.x1, narrow || c.span < 0.8, le.x) : rdXTicks(c.x0, c.x1, narrow || c.span < 0.8),
-      baseline: true,
-      driven: !!A,
-      series: [allSeries, ...rowsOf.map(r => lineOf(r, colorOf(r)))].concat(leLeads),
-      areas: rowsOf.map(r => bandOf(r, colorOf(r))).filter(a => a.points.length >= 2),
-      spine: leN != null ? [{
-        x: le.x,
-        y: leN
-      }].concat(c.allPts.map(d => ({
-        x: d.x,
-        y: d.y
-      }))) : c.allPts.map(d => ({
-        x: d.x,
-        y: d.y
-      })),
-      marks: leOn ? rowsOf.filter(r => leY(r.l.g) != null).map(r => ({
-        x: le.x,
-        y: leY(r.l.g),
-        color: colorOf(r)
-      })) : [],
-      ringAtX: leOn ? le.x : null,
-      scatter: cross ? cross.scatter : c.dots,
-      scatterOut: cross ? cross.scatterOut : [],
-      scatterMove: cross ? cross.scatterMove : [],
-      fade: A ? t : 1,
-      pollFacet: "primary",
-      tooltipTitle: i => leOn && i === 0 ? monthLabelFull("2025-05") : c.allPts[leOn ? i - 1 : i] ? monthLabelFull(c.allPts[leOn ? i - 1 : i].ym) : "",
-      extraRows: leOn ? i => i === 0 ? [{
-        label: "",
-        value: "The election result"
-      }] : ciLoc(i - 1) : ciLoc,
-      fmt: v => v.toFixed(1),
-      copy: {
-        title: "Who votes for whom",
-        sub: pPoss + " share of the vote, " + (c.st.label || "By " + tab.label).toLowerCase() + ", month by month",
-        legend: c.drawn.map(l => ({
-          label: l.g.label,
-          color: l.color,
-          kind: "line"
-        })).concat([{
-          label: "95% interval",
-          color: pColor,
-          kind: "band"
-        }, {
-          label: "All voters",
-          color: "var(--ink)",
-          kind: "dashed"
-        }])
-      }
-    }));
+    return (React.createElement("div", {
+        className: "card rd-card rd-wv-chart",
+        key: c.st.id,
+        style: even ? {
+          flex: "1 1 0"
+        } : {
+          flexGrow: narrow || charts.length < 2 ? 1 : Math.max(0.35, c.span)
+        }
+      }, head, React.createElement(TrendChart, {
+        key: "rd-wv-" + c.st.id + "-" + tab.id,
+        heightPx: narrow ? 240 : even && wvGridH ? Math.round(wvGridH) + 14 : 260,
+        padPx: narrow ? {
+          l: 34,
+          r: 8,
+          t: 12,
+          b: 28
+        } : {
+          l: 40,
+          r: 12,
+          t: 12,
+          b: 30
+        },
+        xDomain: xDomL,
+        yDomain: yDom,
+        yTicks: rdYTicks(0, yMax, 10),
+        yTickFmt: v => v === 0 ? "0" : v + "%",
+        xTicks: leOn ? rdElectionTicks(xDomL[0], c.x1, narrow || c.span < 0.8, le.x) : rdXTicks(c.x0, c.x1, narrow || c.span < 0.8),
+        baseline: true,
+        driven: !!A,
+        series: [allSeries, ...rowsOf.map(r => lineOf(r, colorOf(r)))].concat(leLeads),
+        areas: rowsOf.map(r => bandOf(r, colorOf(r))).filter(a => a.points.length >= 2),
+        spine: leN != null ? [{
+          x: le.x,
+          y: leN
+        }].concat(c.allPts.map(d => ({
+          x: d.x,
+          y: d.y
+        }))) : c.allPts.map(d => ({
+          x: d.x,
+          y: d.y
+        })),
+        marks: leOn ? rowsOf.filter(r => leY(r.l.g) != null).map(r => ({
+          x: le.x,
+          y: leY(r.l.g),
+          color: colorOf(r)
+        })) : [],
+        ringAtX: leOn ? le.x : null,
+        scatter: cross ? cross.scatter : c.dots,
+        scatterOut: cross ? cross.scatterOut : [],
+        scatterMove: cross ? cross.scatterMove : [],
+        fade: A ? t : 1,
+        pollFacet: "primary",
+        tooltipTitle: i => leOn && i === 0 ? monthLabelFull("2025-05") : c.allPts[leOn ? i - 1 : i] ? monthLabelFull(c.allPts[leOn ? i - 1 : i].ym) : "",
+        extraRows: leOn ? i => i === 0 ? [{
+          label: "",
+          value: "The election result"
+        }] : ciLoc(i - 1) : ciLoc,
+        fmt: v => v.toFixed(1),
+        copy: {
+          title: "Who votes for whom",
+          sub: pPoss + " share of the vote, " + (c.st.label || "By " + tab.label).toLowerCase() + ", month by month",
+          legend: c.drawn.map(l => ({
+            label: l.g.label,
+            color: l.color,
+            kind: "line"
+          })).concat([{
+            label: "95% interval",
+            color: pColor,
+            kind: "band"
+          }, {
+            label: "All voters",
+            color: "var(--ink)",
+            kind: "dashed"
+          }])
+        }
+      }))
+    );
   };
   return React.createElement(RdSec, {
     id: "who-votes",

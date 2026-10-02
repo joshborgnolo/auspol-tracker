@@ -2059,7 +2059,12 @@ function RdDemographics({ rangeId = "all" }) {
              endCap: false, points: [{ x: le.x, y: leN }, allSeries.points[0]] }]
         : []) : [];
     return (
-    <div className="card rd-card rd-wv-chart" key={c.st.id} style={even ? { flex: "1 1 0" } : { flexGrow: narrow ? 1 : Math.max(0.35, c.span) }}>
+    /* A lone card on the row must always fill it, but the data-driven
+       grow keeps a SHORT series under 1, and CSS hands a row whose grow
+       factors sum to less than 1 only that fraction of the free space -
+       so the By-education card stopped short of the row's edge. The
+       proportional rule applies only when two cards share the row. */
+    <div className="card rd-card rd-wv-chart" key={c.st.id} style={even ? { flex: "1 1 0" } : { flexGrow: narrow || charts.length < 2 ? 1 : Math.max(0.35, c.span) }}>
       {head}
       {/* heightPx = grid + 8 + (30 − 24): the svg starts at the card's
           content top while the grid sits 8px lower (.rd-wv-panels
