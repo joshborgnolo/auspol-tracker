@@ -2216,6 +2216,41 @@ function RdDemographics({ rangeId = "all" }) {
   );
 }
 
+/* the fold-out significance battery, shared by every panel whose charts
+   answer "did this move?": a details fold under the legend, the .rd-tsig
+   chrome (green rows where the test passes, quiet ink where it doesn't),
+   each table naming its own test in the note. rows: {name, cells, sig} */
+const rdTsSgn = (v, s) => (v < 0 ? "−" : s && v > 0 ? "+" : "") + Math.abs(v).toFixed(1);
+function RdTsig({ summary, heads, sets, note }) {
+  return (
+    <details className="rd-evdrop rd-tsig">
+      <summary>{summary}</summary>
+      <div className="rd-tsig-wrap">
+        <table className="rd-tsig-table">
+          <thead>
+            <tr>
+              <th scope="col"><span className="sr-only">{heads[0]}</span></th>
+              {heads.slice(1).map((h) => <th key={h} scope="col">{h}</th>)}
+            </tr>
+          </thead>
+          {sets.map((s) => (
+            <tbody key={s.key}>
+              {s.label ? <tr className="rd-tsig-set"><th colSpan={heads.length}>{s.label}{s.since ? <span className="rd-tsig-since">{s.since}</span> : null}</th></tr> : null}
+              {s.rows.map((r, i) => (
+                <tr key={r.key || i}>
+                  <th scope="row">{r.name}</th>
+                  {r.cells.map((c, j) => <td key={j} className={j === r.cells.length - 1 && r.sig ? "rd-tsig-yes" : ""}>{c}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          ))}
+        </table>
+      </div>
+      <p className="rd-note rd-tsig-note">{note}</p>
+    </details>
+  );
+}
+
 /* ======================================================================
    Where One Nation's voters came from
    ====================================================================== */
@@ -2468,6 +2503,15 @@ function RdSwitching({ rangeId }) {
         { kind: "dot", color: "var(--ink-3)", label: "One poll" },
         { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
       ]} />
+      <RdTsig summary="Trend-significance table"
+        heads={["Party’s 2025 voters", "Monthly line, first → last, %", "Slope, pts/yr", "t", "Significant"]}
+        sets={[{ key: "main", rows: cols.map((c) => {
+          const ms = c.sr.rate.monthly, fe = fits.find((x) => x.c === c), f = fe && fe.fit, sg = !!fe && sig.includes(fe);
+          return { key: c.id, name: LONG[c.id], sig: sg,
+            cells: [rdTsSgn(ms[0].v) + " → " + rdTsSgn(ms[ms.length - 1].v), f ? rdTsSgn(f.b, true) : "–", f ? rdTsSgn(f.t) : "–", sg ? "Yes" : "No"] };
+        }) }]}
+        note={"Rates are pooled across pollsters; a party’s trend test fits one shared slope to every pollster’s own monthly changes (a level per pollster, each poll weighted by its sample), Holm’s correction applied across the four parties, so Yes means the slope clears 95% — the test behind the “since " + sinceM + "” line above."}
+      />
       <RdFoot how={{ term: "vote-switching", from: "Where One Nation’s voters came from" }}>
         2025 vote is as respondents recall it. {narrow ? "Bar heights" : "Column widths"} use the AEC 2025 first-preference result.
       </RdFoot>
@@ -2491,7 +2535,13 @@ function rdIssTrend(D, it, dots) {
     if (f.fit.p >= 0.05 / (fits.length - i)) break;
     sig.push(f);
   }
-  return { ym, up: sig.filter((f) => f.fit.b > 0).map((f) => f.q), down: sig.filter((f) => f.fit.b < 0).map((f) => f.q), tested: fits.length };
+  /* the Trend-significance table beneath the chart reads the same fits:
+     every party's slope and t, and the Holm survivors as its Sig column */
+  const byParty = D.issues.parties.map((q) => {
+    const f = fits.find((x) => x.q === q);
+    return { q, fit: f ? { b: f.fit.b, t: f.fit.t } : null, sig: sig.some((s) => s.q === q) };
+  });
+  return { ym, up: sig.filter((f) => f.fit.b > 0).map((f) => f.q), down: sig.filter((f) => f.fit.b < 0).map((f) => f.q), tested: fits.length, byParty };
 }
 
 function RdIssues({ rangeId = "all" }) {
@@ -2899,6 +2949,18 @@ function RdIssues({ rangeId = "all" }) {
                   <>The grey bar is how many voters put the issue among their three most important. RedBridge and Ipsos both ask every month, in different words, and their figures sit a steady distance apart, so each poll is moved half that distance toward the other before the two are pooled.</>,
                   <>The dots split the voters who named Labor, the Coalition or One Nation as best on the issue. Pollsters also offer other answers, and each offers a different set, so only these three can be pooled.</>,
                 ]} />
+                {ch.trend && ch.trend.byParty && (
+                  <RdTsig summary="Trend-significance table"
+                    heads={["Party", "Monthly line, first → last, %", "Slope, pts/yr", "t", "Significant"]}
+                    sets={[{ key: "main", rows: ch.trend.byParty.map((r) => {
+                      const ms = ch.pts.filter((d) => d[r.q] != null);
+                      return { key: r.q, name: pName(r.q), sig: r.sig,
+                        cells: [rdTsSgn(ms[0][r.q]) + " → " + rdTsSgn(ms[ms.length - 1][r.q]),
+                          r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–", r.sig ? "Yes" : "No"] };
+                    }) }]}
+                    note={"Each party’s share is pooled across the pollsters who asked about " + (ISS_PHRASE[it.id] || it.label.toLowerCase()) + "; its trend test fits one shared slope to every pollster’s own monthly changes (a level per pollster, each poll weighted by its sample), Holm’s correction applied across the three parties, so Yes means the slope clears 95% — the test behind the head above."}
+                  />
+                )}
               </div>
             )}
           </div>
@@ -2958,6 +3020,22 @@ function RdIssues({ rangeId = "all" }) {
                 <span className="rd-key-item"><span className="rd-iw-keybar" aria-hidden="true"><i></i></span>Group’s share, with all voters marked</span>
                 <span className="rd-key-item"><b aria-hidden="true">▲▼</b>Differs from all voters by more than the group’s own 95% margin</span>
               </div>
+              {/* the battery behind every ▲▼ on the card: the same per-cell
+                  gate the marks use, one set per issue, values as published
+                  (these are wave figures, not trends) */}
+              <RdTsig summary="Significance table"
+                heads={["Group", "Share, %", "All voters, %", "Difference, pts", "z", "Significant"]}
+                sets={gtab.issues.map((k) => ({
+                  key: k, label: I.labels[k] || k,
+                  rows: gtab.groups.map((g) => gtab.cells[g] && gtab.cells[g][k]).map((c, i) => ({ c, g: gtab.groups[i] })).filter((r) => r.c && allOf(k))
+                    .map((r) => {
+                      const a = allOf(k), diff = r.c.v - a.v, z = diff / (r.c.ci / 1.96);
+                      return { key: r.g, name: groupShort(r.g), sig: Math.abs(diff) > r.c.ci,
+                        cells: [rdTsSgn(r.c.v), rdTsSgn(a.v), rdTsSgn(diff, true), rdTsSgn(z), Math.abs(diff) > r.c.ci ? "Yes" : "No"] };
+                    }),
+                }))}
+                note={"Figures are " + G.house + "’s published shares of each group putting the issue in their top three — the same wave the card pools. Yes marks the card’s ▲▼: the group sits further from all voters than its own 95% margin."}
+              />
             </div>
           ) : <p className="rd-note">No poll in the last {I.window} published these figures by group.</p>}
           <RdFoot how={{ term: "issues", from: "The issues" }}>
@@ -3224,6 +3302,19 @@ function RdUndecided({ rangeId }) {
   })();
   const monthsLabel = (from, to) => from + " → " + to;
 
+  /* the all-voters trend battery behind the dek: one within-house slope per
+     series (the dek only sentences undecided and firmness), Holm across
+     whatever has a fit; the fold-out lists every series, fit or not */
+  const unSig = (() => {
+    const ss = [first, tpp, soft].filter(Boolean).map((s) => ({ s, pts: s.monthly ? filterPts(s.monthly, xDomain[0]) : [], fit: slopeOf(s) }));
+    const ok = ss.filter((x) => x.fit), won = [];
+    for (const [i, f] of [...ok].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+      if (f.fit.p >= 0.05 / (ok.length - i)) break;
+      won.push(f.s.id);
+    }
+    return ss.map((x) => ({ ...x, sig: won.includes(x.s.id) }));
+  })();
+
   const views = [{ id: "all", label: "All voters" }].concat(F ? [{ id: "party", label: "By party" }] : [], A ? [{ id: "age", label: "By age" }] : []);
   /* The views are pages of their own, so the row walks them by arrow keys
      and, on a phone, by a sideways swipe on or just under it (without
@@ -3277,6 +3368,15 @@ function RdUndecided({ rangeId }) {
             {panel([first, tpp].filter(Boolean), 0, 10, 5, "und", "Undecided", "% of all voters")}
             {soft && panel([soft], 0, 40, 10, "soft", "Not firm", "% of voters who named a party")}
           </div>
+          <RdTsig summary="Trend-significance table"
+            heads={["Series", "Monthly line, first → last, %", "Slope, pts/yr", "t", "Significant"]}
+            sets={[{ key: "main", rows: unSig.map((x) => ({
+              key: x.s.id, name: x.s.id === "tpp" ? "After preferences" : x.s.id === "soft" ? "Not firm" : "Undecided", sig: x.sig,
+              cells: [x.pts.length >= 2 ? rdTsSgn(x.pts[0].v) + " → " + rdTsSgn(x.pts[x.pts.length - 1].v) : "–",
+                x.fit ? rdTsSgn(x.fit.b, true) : "–", x.fit ? rdTsSgn(x.fit.t) : "–", x.sig ? "Yes" : "No"],
+            })) }]}
+            note={"One trend test per series: a shared slope through each pollster’s own polls (a level per pollster, each poll weighted by its sample), Holm’s correction across the series. Yes means the slope clears 95% since the 2025 election; the dek above reads the same tests. Undecided counts all voters, “Might still change” those who named a party, so the two panels’ figures sit on different scales."}
+          />
           <RdFoot how={{ term: "undecided", from: "Decidedness" }}>{changeFoot}</RdFoot>
         </>
       )}
@@ -3290,6 +3390,20 @@ function RdUndecided({ rangeId }) {
               <span className="rd-key-item" style={{ color: "var(--ink-3)" }}>Change in bold: significant</span>
             </RdKey>
             <p className="rd-note">{partyView.note}</p>
+            {/* the battery behind the plot's bold deltas: each party's start-
+                to-now move, its z on the pooled margins, and the same apart-
+                test the bolding uses; the all-voters row is the anchor */}
+            <RdTsig summary="Significance table"
+              heads={["Party’s voters", "Solid, mid-2025 → now, %", "Change, pts", "All voters’ change, pts", "Change vs all voters, pts", "z", "Significant"]}
+              sets={[{ key: "main", rows: partyView.ids.concat(["all"]).map((k) => {
+                const b = F.base[k], n = F.now[k], chg = n.v - b.v, allChg = F.now.all.v - F.base.all.v;
+                const z = chg / (Math.hypot(n.ci95, b.ci95) / 1.96), sg = Math.abs(n.v - b.v) > Math.hypot(n.ci95, b.ci95);
+                return { key: k, name: k === "all" ? "All voters" : k === "oth" ? "Others" : D.PARTIES[k].name, sig: sg,
+                  cells: [rdTsSgn(b.v) + " → " + rdTsSgn(n.v), rdTsSgn(chg, true), rdTsSgn(allChg, true),
+                    k === "all" ? "–" : rdTsSgn(chg - allChg, true), rdTsSgn(z), sg ? "Yes" : "No"] };
+              }) }]}
+              note={"Shares are RedBridge’s solid-vote figures, pooled in the card’s “mid-2025” and “now” windows. z measures the change against the two windows’ pooled 95% margins; Yes is a bold change on the plot above — a move the margins can’t explain. “Change vs all voters” shows how far the party’s own move parts company with the electorate’s."}
+            />
           </div>
           <RdSub head={partyView.sub} dek="Share of each party’s voters calling their vote solid, pooled three RedBridge waves at a time; dots are single waves. The dashed line is all voters." />
           <div className="rd-sm-grid rd-un-sm">
@@ -3325,6 +3439,19 @@ function RdUndecided({ rangeId }) {
               <span className="rd-key-item" style={{ color: "var(--ink-3)" }}>Change in bold: significant</span>
             </RdKey>
             <p className="rd-note">{ageView.note}</p>
+            {/* same battery as the by-party card's: each band's start-to-now
+                move and its z on the pooled margins; there's no all-voters
+                Resolve not-firm reading over the span, so no anchor column */}
+            <RdTsig summary="Significance table"
+              heads={["Age group", "Not firm, mid-2025 → now, %", "Change, pts", "z", "Significant"]}
+              sets={[{ key: "main", rows: ageView.B.map((b) => {
+                const bb = A.base[b.id], nn = A.now[b.id], chg = nn.v - bb.v;
+                const z = chg / (Math.hypot(nn.ci95, bb.ci95) / 1.96), sg = Math.abs(nn.v - bb.v) > Math.hypot(nn.ci95, bb.ci95);
+                return { key: b.id, name: b.label, sig: sg,
+                  cells: [rdTsSgn(bb.v) + " → " + rdTsSgn(nn.v), rdTsSgn(chg, true), rdTsSgn(z), sg ? "Yes" : "No"] };
+              }) }]}
+              note={"Shares are Resolve’s not-firm figures, pooled in the card’s “mid-2025” and “now” windows, each group weighted by its share of adults (2021 Census). z measures the change against the two windows’ pooled 95% margins; Yes is a bold change on the plot above."}
+            />
           </div>
           <RdSub head={ageView.sub} dek="Share of each age group who named a party but aren’t firm, pooled three Resolve waves at a time; dots are single waves. The dashed line is all voters." />
           <div className="card rd-card rd-un-age">

@@ -56974,6 +56974,7 @@ function withinHouseSlope(pts) {
   const se = Math.sqrt(dm.reduce((a, p) => a + p.w * (p.dy - b * p.dt) ** 2, 0) / df / sxx);
   return {
     b,
+    t: se > 0 ? b / se : 0,
     p: se > 0 ? tTail(b / se, df) : 1
   };
 }
@@ -72142,6 +72143,45 @@ function RdDemographics({
     }
   }, charts.length > 1 ? even ? "Every panel shares one scale." : "Both panels share one scale, so each is only as wide as its data." : null));
 }
+const rdTsSgn = (v, s) => (v < 0 ? "−" : s && v > 0 ? "+" : "") + Math.abs(v).toFixed(1);
+function RdTsig({
+  summary,
+  heads,
+  sets,
+  note
+}) {
+  return React.createElement("details", {
+    className: "rd-evdrop rd-tsig"
+  }, React.createElement("summary", null, summary), React.createElement("div", {
+    className: "rd-tsig-wrap"
+  }, React.createElement("table", {
+    className: "rd-tsig-table"
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
+    scope: "col"
+  }, React.createElement("span", {
+    className: "sr-only"
+  }, heads[0])), heads.slice(1).map(h => React.createElement("th", {
+    key: h,
+    scope: "col"
+  }, h)))), sets.map(s => React.createElement("tbody", {
+    key: s.key
+  }, s.label ? React.createElement("tr", {
+    className: "rd-tsig-set"
+  }, React.createElement("th", {
+    colSpan: heads.length
+  }, s.label, s.since ? React.createElement("span", {
+    className: "rd-tsig-since"
+  }, s.since) : null)) : null, s.rows.map((r, i) => React.createElement("tr", {
+    key: r.key || i
+  }, React.createElement("th", {
+    scope: "row"
+  }, r.name), r.cells.map((c, j) => React.createElement("td", {
+    key: j,
+    className: j === r.cells.length - 1 && r.sig ? "rd-tsig-yes" : ""
+  }, c)))))))), React.createElement("p", {
+    className: "rd-note rd-tsig-note"
+  }, note));
+}
 function useRdWidth(ref, fallback) {
   const [w, setW] = React.useState(fallback || 800);
   React.useLayoutEffect(() => {
@@ -72590,6 +72630,25 @@ function RdSwitching({
       color: "var(--ink-3)",
       label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval"
     }]
+  }), React.createElement(RdTsig, {
+    summary: "Trend-significance table",
+    heads: ["Party’s 2025 voters", "Monthly line, first → last, %", "Slope, pts/yr", "t", "Significant"],
+    sets: [{
+      key: "main",
+      rows: cols.map(c => {
+        const ms = c.sr.rate.monthly,
+          fe = fits.find(x => x.c === c),
+          f = fe && fe.fit,
+          sg = !!fe && sig.includes(fe);
+        return {
+          key: c.id,
+          name: LONG[c.id],
+          sig: sg,
+          cells: [rdTsSgn(ms[0].v) + " → " + rdTsSgn(ms[ms.length - 1].v), f ? rdTsSgn(f.b, true) : "–", f ? rdTsSgn(f.t) : "–", sg ? "Yes" : "No"]
+        };
+      })
+    }],
+    note: "Rates are pooled across pollsters; a party’s trend test fits one shared slope to every pollster’s own monthly changes (a level per pollster, each poll weighted by its sample), Holm’s correction applied across the four parties, so Yes means the slope clears 95% — the test behind the “since " + sinceM + "” line above."
   }), React.createElement(RdFoot, {
     how: {
       term: "vote-switching",
@@ -72616,11 +72675,23 @@ function rdIssTrend(D, it, dots) {
     if (f.fit.p >= 0.05 / (fits.length - i)) break;
     sig.push(f);
   }
+  const byParty = D.issues.parties.map(q => {
+    const f = fits.find(x => x.q === q);
+    return {
+      q,
+      fit: f ? {
+        b: f.fit.b,
+        t: f.fit.t
+      } : null,
+      sig: sig.some(s => s.q === q)
+    };
+  });
   return {
     ym,
     up: sig.filter(f => f.fit.b > 0).map(f => f.q),
     down: sig.filter(f => f.fit.b < 0).map(f => f.q),
-    tested: fits.length
+    tested: fits.length,
+    byParty
   };
 }
 function RdIssues({
@@ -73208,6 +73279,22 @@ function RdIssues({
   }), React.createElement(HowTo, {
     label: "How to read these figures",
     paras: [React.createElement(React.Fragment, null, "The grey bar is how many voters put the issue among their three most important. RedBridge and Ipsos both ask every month, in different words, and their figures sit a steady distance apart, so each poll is moved half that distance toward the other before the two are pooled."), React.createElement(React.Fragment, null, "The dots split the voters who named Labor, the Coalition or One Nation as best on the issue. Pollsters also offer other answers, and each offers a different set, so only these three can be pooled.")]
+  }), ch.trend && ch.trend.byParty && React.createElement(RdTsig, {
+    summary: "Trend-significance table",
+    heads: ["Party", "Monthly line, first → last, %", "Slope, pts/yr", "t", "Significant"],
+    sets: [{
+      key: "main",
+      rows: ch.trend.byParty.map(r => {
+        const ms = ch.pts.filter(d => d[r.q] != null);
+        return {
+          key: r.q,
+          name: pName(r.q),
+          sig: r.sig,
+          cells: [rdTsSgn(ms[0][r.q]) + " → " + rdTsSgn(ms[ms.length - 1][r.q]), r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–", r.sig ? "Yes" : "No"]
+        };
+      })
+    }],
+    note: "Each party’s share is pooled across the pollsters who asked about " + (ISS_PHRASE[it.id] || it.label.toLowerCase()) + "; its trend test fits one shared slope to every pollster’s own monthly changes (a level per pollster, each poll weighted by its sample), Holm’s correction applied across the three parties, so Yes means the slope clears 95% — the test behind the head above."
   }))), React.createElement(RdFoot, {
     how: {
       term: "issues",
@@ -73300,7 +73387,29 @@ function RdIssues({
     className: "rd-key-item"
   }, React.createElement("b", {
     "aria-hidden": "true"
-  }, "\u25B2\u25BC"), "Differs from all voters by more than the group\u2019s own 95% margin"))) : React.createElement("p", {
+  }, "\u25B2\u25BC"), "Differs from all voters by more than the group\u2019s own 95% margin")), React.createElement(RdTsig, {
+    summary: "Significance table",
+    heads: ["Group", "Share, %", "All voters, %", "Difference, pts", "z", "Significant"],
+    sets: gtab.issues.map(k => ({
+      key: k,
+      label: I.labels[k] || k,
+      rows: gtab.groups.map(g => gtab.cells[g] && gtab.cells[g][k]).map((c, i) => ({
+        c,
+        g: gtab.groups[i]
+      })).filter(r => r.c && allOf(k)).map(r => {
+        const a = allOf(k),
+          diff = r.c.v - a.v,
+          z = diff / (r.c.ci / 1.96);
+        return {
+          key: r.g,
+          name: groupShort(r.g),
+          sig: Math.abs(diff) > r.c.ci,
+          cells: [rdTsSgn(r.c.v), rdTsSgn(a.v), rdTsSgn(diff, true), rdTsSgn(z), Math.abs(diff) > r.c.ci ? "Yes" : "No"]
+        };
+      })
+    })),
+    note: "Figures are " + G.house + "’s published shares of each group putting the issue in their top three — the same wave the card pools. Yes marks the card’s ▲▼: the group sits further from all voters than its own 95% margin."
+  })) : React.createElement("p", {
     className: "rd-note"
   }, "No poll in the last ", I.window, " published these figures by group."), React.createElement(RdFoot, {
     how: {
@@ -73732,6 +73841,23 @@ function RdUndecided({
     };
   })();
   const monthsLabel = (from, to) => from + " → " + to;
+  const unSig = (() => {
+    const ss = [first, tpp, soft].filter(Boolean).map(s => ({
+      s,
+      pts: s.monthly ? filterPts(s.monthly, xDomain[0]) : [],
+      fit: slopeOf(s)
+    }));
+    const ok = ss.filter(x => x.fit),
+      won = [];
+    for (const [i, f] of [...ok].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+      if (f.fit.p >= 0.05 / (ok.length - i)) break;
+      won.push(f.s.id);
+    }
+    return ss.map(x => ({
+      ...x,
+      sig: won.includes(x.s.id)
+    }));
+  })();
   const views = [{
     id: "all",
     label: "All voters"
@@ -73831,7 +73957,20 @@ function RdUndecided({
     dek: "Each dot is one poll, open rings for after preferences; lines are monthly averages. Undecided voters are counted out of all voters and firmness out of those who named a party, so the two panels have different scales."
   }), React.createElement("div", {
     className: "rd-un-panels"
-  }, panel([first, tpp].filter(Boolean), 0, 10, 5, "und", "Undecided", "% of all voters"), soft && panel([soft], 0, 40, 10, "soft", "Not firm", "% of voters who named a party")), React.createElement(RdFoot, {
+  }, panel([first, tpp].filter(Boolean), 0, 10, 5, "und", "Undecided", "% of all voters"), soft && panel([soft], 0, 40, 10, "soft", "Not firm", "% of voters who named a party")), React.createElement(RdTsig, {
+    summary: "Trend-significance table",
+    heads: ["Series", "Monthly line, first → last, %", "Slope, pts/yr", "t", "Significant"],
+    sets: [{
+      key: "main",
+      rows: unSig.map(x => ({
+        key: x.s.id,
+        name: x.s.id === "tpp" ? "After preferences" : x.s.id === "soft" ? "Not firm" : "Undecided",
+        sig: x.sig,
+        cells: [x.pts.length >= 2 ? rdTsSgn(x.pts[0].v) + " → " + rdTsSgn(x.pts[x.pts.length - 1].v) : "–", x.fit ? rdTsSgn(x.fit.b, true) : "–", x.fit ? rdTsSgn(x.fit.t) : "–", x.sig ? "Yes" : "No"]
+      }))
+    }],
+    note: "One trend test per series: a shared slope through each pollster’s own polls (a level per pollster, each poll weighted by its sample), Holm’s correction across the series. Yes means the slope clears 95% since the 2025 election; the dek above reads the same tests. Undecided counts all voters, “Might still change” those who named a party, so the two panels’ figures sit on different scales."
+  }), React.createElement(RdFoot, {
     how: {
       term: "undecided",
       from: "Decidedness"
@@ -73863,7 +74002,28 @@ function RdUndecided({
     }
   }, "Change in bold: significant")), React.createElement("p", {
     className: "rd-note"
-  }, partyView.note)), React.createElement(RdSub, {
+  }, partyView.note), React.createElement(RdTsig, {
+    summary: "Significance table",
+    heads: ["Party’s voters", "Solid, mid-2025 → now, %", "Change, pts", "All voters’ change, pts", "Change vs all voters, pts", "z", "Significant"],
+    sets: [{
+      key: "main",
+      rows: partyView.ids.concat(["all"]).map(k => {
+        const b = F.base[k],
+          n = F.now[k],
+          chg = n.v - b.v,
+          allChg = F.now.all.v - F.base.all.v;
+        const z = chg / (Math.hypot(n.ci95, b.ci95) / 1.96),
+          sg = Math.abs(n.v - b.v) > Math.hypot(n.ci95, b.ci95);
+        return {
+          key: k,
+          name: k === "all" ? "All voters" : k === "oth" ? "Others" : D.PARTIES[k].name,
+          sig: sg,
+          cells: [rdTsSgn(b.v) + " → " + rdTsSgn(n.v), rdTsSgn(chg, true), rdTsSgn(allChg, true), k === "all" ? "–" : rdTsSgn(chg - allChg, true), rdTsSgn(z), sg ? "Yes" : "No"]
+        };
+      })
+    }],
+    note: "Shares are RedBridge’s solid-vote figures, pooled in the card’s “mid-2025” and “now” windows. z measures the change against the two windows’ pooled 95% margins; Yes is a bold change on the plot above — a move the margins can’t explain. “Change vs all voters” shows how far the party’s own move parts company with the electorate’s."
+  })), React.createElement(RdSub, {
     head: partyView.sub,
     dek: "Share of each party\u2019s voters calling their vote solid, pooled three RedBridge waves at a time; dots are single waves. The dashed line is all voters."
   }), React.createElement("div", {
@@ -73976,7 +74136,27 @@ function RdUndecided({
     }
   }, "Change in bold: significant")), React.createElement("p", {
     className: "rd-note"
-  }, ageView.note)), React.createElement(RdSub, {
+  }, ageView.note), React.createElement(RdTsig, {
+    summary: "Significance table",
+    heads: ["Age group", "Not firm, mid-2025 → now, %", "Change, pts", "z", "Significant"],
+    sets: [{
+      key: "main",
+      rows: ageView.B.map(b => {
+        const bb = A.base[b.id],
+          nn = A.now[b.id],
+          chg = nn.v - bb.v;
+        const z = chg / (Math.hypot(nn.ci95, bb.ci95) / 1.96),
+          sg = Math.abs(nn.v - bb.v) > Math.hypot(nn.ci95, bb.ci95);
+        return {
+          key: b.id,
+          name: b.label,
+          sig: sg,
+          cells: [rdTsSgn(bb.v) + " → " + rdTsSgn(nn.v), rdTsSgn(chg, true), rdTsSgn(z), sg ? "Yes" : "No"]
+        };
+      })
+    }],
+    note: "Shares are Resolve’s not-firm figures, pooled in the card’s “mid-2025” and “now” windows, each group weighted by its share of adults (2021 Census). z measures the change against the two windows’ pooled 95% margins; Yes is a bold change on the plot above."
+  })), React.createElement(RdSub, {
     head: ageView.sub,
     dek: "Share of each age group who named a party but aren\u2019t firm, pooled three Resolve waves at a time; dots are single waves. The dashed line is all voters."
   }), React.createElement("div", {

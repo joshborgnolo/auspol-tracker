@@ -2268,7 +2268,7 @@ function withinHouseSlope(pts) {
   if (df < 3 || !(sxx > 0)) return null;
   const b = dm.reduce((a, p) => a + p.w * p.dt * p.dy, 0) / sxx;
   const se = Math.sqrt(dm.reduce((a, p) => a + p.w * (p.dy - b * p.dt) ** 2, 0) / df / sxx);
-  return { b, p: se > 0 ? tTail(b / se, df) : 1 };
+  return { b, t: se > 0 ? b / se : 0, p: se > 0 ? tTail(b / se, df) : 1 };
 }
 function demoTrendVerdict(D, st, party, inX) {
   const gpi = DEMO_GRP_PARTY.indexOf(party);
