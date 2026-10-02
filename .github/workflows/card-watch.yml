@@ -1,0 +1,64 @@
+# card-watch — hourly share-card drift backstop, runs .build/card-watch.sh.
+#
+# Every per-poll pipeline redraws the share card inside refresh_site the
+# moment a wave lands, and prediction-refresh's daily 13:00 slot is the
+# backstop for figure drift — but the headline figures also move by
+# recency decay on days no writer runs at all, and that used to wait up
+# to 24h for the daily slot. This job probes hourly: build.mjs is
+# idempotent for unchanged inputs, so a current card makes the run a
+# seconds-long no-op; a moved fig block triggers the same validate ->
+# refresh_site -> push_main path every wrapper uses, committing the
+# redrawn card and the restamped og:image.
+#
+# Failure path: a red run (build, validate or push_main failure) triggers
+# the central agent-repair.yml (card-watch is on its watched list, house
+# prompt .build/card-repair-prompt.md), whose publish job rebuilds the
+# generated files itself — the deterministic rebuild path, same as the
+# poll updaters.
+
+name: card-watch
+
+on:
+  schedule:
+    - cron: '7 * * * *' # hourly, off the top-of-hour congestion
+  workflow_dispatch:
+
+# Its own group: writers no longer queue behind one another (the shared
+# main-writers group's one-pending rule cancelled real runs); push_main in
+# card-watch.sh resolves a race with another writer itself.
+concurrency:
+  group: card-watch
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          fetch-depth: 0 # push_main rebases on a lost race
+
+      - name: Pin Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install puppeteer-core (best effort, for the gated share-card redraw)
+        # Version lives in package-lock.json; render-card.mjs resolves it from
+        # repo node_modules. --ignore-scripts: nothing here needs postinstall.
+        run: npm ci --ignore-scripts --no-audit --no-fund || true
+
+      - name: Run card-watch
+        env:
+          CHROME: /usr/bin/google-chrome
+        run: bash .build/card-watch.sh

@@ -51,6 +51,7 @@ on:
       - pollbludger-fallback
       - coverage-check
       - prediction-refresh
+      - card-watch
       - np-score
     types: [completed]
   workflow_dispatch:
@@ -120,6 +121,7 @@ jobs:
             pollbludger-fallback) HP=.build/pollbludger-repair-prompt.md ;;
             coverage-check)     HP=.build/coverage-doctor-repair-prompt.md ;;
             prediction-refresh) HP=.build/prediction-repair-prompt.md ;;
+            card-watch)         HP=.build/card-repair-prompt.md ;;
             *)                  HP="" ;;
           esac
           RUN_URL="https://github.com/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}"
