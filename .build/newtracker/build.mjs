@@ -875,30 +875,135 @@ const fieldLabel = (p) => {
 // noon UTC: a date-only fieldwork end has no time of day, and midnight would
 // land readers in the previous day west of Greenwich
 const rfc822 = (iso) => new Date(iso + "T12:00:00Z").toUTCString();
-const feedPolls = DATA.polls.filter((p) => !p.isElection).slice(-40).reverse();
+
+/* One item is a RELEASE WAVE: every measure the tracker holds for one house's
+   one release rides a single item – voting intention, alternate two-party
+   matchups, leader ratings and preferred PM, national direction, the issues
+   (salience and best party), the vote by group, the switch from the 2025
+   vote, undecided and soft shares, sample and fieldwork. Waves with no
+   voting-intention figure – SEC Newgate's direction-only releases, the Ipsos
+   Issues Monitor – get an item of their own rather than none. */
+const ISSUES = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "issues.json"), "utf8"));
+const DEMO = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "demographics.json"), "utf8"));
+const SWITCH = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-switching.json"), "utf8"));
+const waves = new Map(); // `${house}|${date}` -> every measure on record for the wave
+const waveOf = (house, date, dateStart) => {
+  const k = `${house}|${date}`;
+  let w = waves.get(k);
+  if (!w) waves.set(k, (w = { house, date, dateStart }));
+  if (!w.dateStart && dateStart) w.dateStart = dateStart;
+  return w;
+};
+for (const p of DATA.polls) if (!p.isElection) waveOf(p.pollster, p.date, p.dateStart).poll = p;
+for (const a of DATA.approval || []) waveOf(a.firm, a.date).approval = a;
+for (const m of DATA.ppm || []) waveOf(m.firm, m.date).ppm = m;
+for (const h of DATA.ppmHeadToHead || []) waveOf(h.firm, h.date).h2h = h;
+for (const t of DATA.altTpp || []) waveOf(t.firm, t.date).alt = t;
+for (const d of DATA.direction || []) waveOf(d.pollster, d.date, d.dateStart).dir = d;
+for (const s of ISSUES.salience || []) waveOf(s.pollster, s.date, s.dateStart).sal = s;
+for (const o of ISSUES.ownership || []) waveOf(o.pollster, o.date, o.dateStart).own = o;
+for (const g of DEMO.waves || []) waveOf(g.pollster, g.date).demo = g;
+for (const v of SWITCH.waves || []) waveOf(v.pollster, v.date).sw = v;
+const feedWaves = [...waves.values()]
+  .sort((a, b) => b.date.localeCompare(a.date) || a.house.localeCompare(b.house))
+  .slice(0, 40);
+
+const PARTY = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", ind: "IND", oth: "OTH" };
+const r1 = (v) => Math.round(v * 10) / 10;
 const shareLine = (p) => {
   const bits = [["ALP", p.alp], ["L/NP", p.lnp], ["GRN", p.grn], ["ON", p.onp],
                 ["Ind/Oth", (p.ind ?? 0) + (p.oth ?? 0) || null]]
     .filter(([, v]) => v != null).map(([k, v]) => `${k} ${v}`);
   return bits.join(", ");
 };
-const items = feedPolls.map((p) => {
-  const year = p.date.slice(0, 4);
-  const tpp = p.tpp_alp != null ? `ALP ${p.tpp_alp} – L/NP ${p.tpp_lnp}` : null;
-  const title = `${p.pollster}, ${fieldLabel(p)} ${year}` + (tpp ? ` – 2PP ${tpp}` : ` – ${shareLine(p)}`);
-  const desc = [
-    `Primary vote: ${shareLine(p)}.`,
-    tpp ? `Two-party preferred: ${tpp}.` : "No two-party figure published.",
-    p.undecided != null ? `Undecided ${p.undecided}%.` : null,
-    p.sample ? `Sample ${p.sample.toLocaleString("en-AU")}.` : null,
-    `Fieldwork ${fieldLabel(p)} ${year}.`,
-  ].filter(Boolean).join(" ");
+// `GRN 6 · IND 3` out of any {code: pct} bag; unknown codes print as-is
+const bits = (o) => Object.entries(o)
+  .filter(([, v]) => v != null)
+  .map(([k, v]) => `${PARTY[k] || k} ${r1(v)}`)
+  .join(" · ");
+
+const items = feedWaves.map((w) => {
+  const p = w.poll || null, year = w.date.slice(0, 4);
+  const tpp = p && p.tpp_alp != null ? `ALP ${p.tpp_alp} – L/NP ${p.tpp_lnp}` : null;
+  const head = tpp ? `2PP ${tpp}`
+    : p ? shareLine(p)
+    : w.dir ? `Right ${w.dir.right} · Wrong track ${w.dir.wrong}`
+    : w.sal || w.own ? "the issues"
+    : w.sw ? "vote switching"
+    : w.demo ? "the vote by group"
+    : "polling release";
+  const title = `${w.house}, ${fieldLabel(w)} ${year} – ${head}`;
+  const parts = [];
+  if (p) {
+    parts.push(`Primary vote: ${shareLine(p)}.`);
+    parts.push(tpp ? `Two-party preferred: ${tpp}.` : "No two-party figure published.");
+    if (p.tpp3) parts.push(`Three-way (ALP v L/NP v ON): ALP ${p.tpp3.alp} · L/NP ${p.tpp3.lnp} · ON ${p.tpp3.onp}.`);
+    if (p.undecided != null) parts.push(`Undecided ${p.undecided}%.`);
+    if (p.soft != null)
+      parts.push(`Soft vote ${p.soft}%` +
+        (p.softAge ? ` by age (${Object.entries(p.softAge).map(([a, v]) => `${a}: ${v}%`).join(", ")})` : "") + ".");
+  }
+  if (w.alt) {
+    const alts = [];
+    if (w.alt.alpVsOnp_alp != null) alts.push(`ALP ${r1(w.alt.alpVsOnp_alp)} – ON ${r1(100 - w.alt.alpVsOnp_alp)}`);
+    if (w.alt.lnpVsOnp_lnp != null) alts.push(`L/NP ${r1(w.alt.lnpVsOnp_lnp)} – ON ${r1(100 - w.alt.lnpVsOnp_lnp)}`);
+    if (alts.length) parts.push(`Other two-party contests: ${alts.join(" · ")}.`);
+  }
+  if (w.ppm) parts.push(`Preferred PM: Albanese ${w.ppm.alb} – ${w.ppm.oppName || "opposition leader"} ${w.ppm.opp}.`);
+  if (w.h2h) parts.push(`Preferred PM, Albanese v Hanson: ${w.h2h.alb} – ${w.h2h.han}.`);
+  if (w.approval) {
+    const det = w.approval.detail || {};
+    const seg = (name, net, d) =>
+      `${name} ${net >= 0 ? "+" : ""}${net} net${d ? ` (${d.app}% approve, ${d.dis}% disapprove)` : ""}`;
+    const ratings = [seg("Albanese", w.approval.alb, det.alb),
+                     seg(w.approval.oppName || "Opposition leader", w.approval.opp, det.opp)];
+    if (w.approval.han != null) ratings.push(seg("Hanson", w.approval.han, det.han));
+    parts.push(`Satisfaction: ${ratings.join("; ")}.`);
+  }
+  if (w.dir)
+    parts.push(`National direction: right direction ${w.dir.right}% · wrong track ${w.dir.wrong}%` +
+               (w.dir.unsure != null ? ` · unsure ${w.dir.unsure}%` : "") + ".");
+  if (w.sal) {
+    const seen = Object.entries(w.sal.issues).map(([k, v]) => {
+      const lab = ISSUES.issues[k] || k;
+      const t3 = v.top3 != null ? `${r1(v.top3)}% in the top three` : null;
+      const first = v.r1 != null ? `${r1(v.r1)}% rank it first` : null;
+      return `${lab}: ${[t3, first].filter(Boolean).join(", ") || "no figure"}`;
+    });
+    parts.push(`The issues, what voters say matters: ${seen.join("; ")}.`);
+  }
+  if (w.own) {
+    const OPT = { alp: "ALP", lnp: "L/NP", onp: "ON", grn: "GRN", oth: "other",
+                  equal: "all equal", none: "neither", unsure: "unsure" };
+    const seen = Object.entries(w.own.issues).map(([k, v]) => {
+      const lab = ISSUES.issues[k] || k;
+      const shares = Object.entries(v).filter(([, x]) => x != null)
+        .map(([kk, x]) => `${OPT[kk] || kk} ${r1(x)}%`);
+      return `${lab}: ${shares.join(" · ")}`;
+    });
+    parts.push(`And the party voters see as best on each: ${seen.join("; ")}.`);
+  }
+  if (w.demo) {
+    const dims = Object.entries(w.demo.dims).map(([dim, groups]) =>
+      `${dim} – ${Object.entries(groups).map(([g, parties]) => `${g}: ${bits(parties)}`).join("; ")}`);
+    parts.push(`The vote by group (${Object.keys(w.demo.dims).join(", ")}): ${dims.join(". ")}.`);
+  }
+  if (w.sw) {
+    const moves = Object.entries(w.sw.rows).map(([grp, row]) =>
+      `2025 ${PARTY[grp] || grp} voters now: ${bits(row)}`);
+    parts.push(`Where the 2025 vote has moved: ${moves.join(". ")}.`);
+  }
+  const n = p?.sample ?? w.sal?.sample ?? w.own?.sample ?? w.demo?.sample ?? w.sw?.sample;
+  if (n != null) parts.push(`Sample ${n.toLocaleString("en-AU")}.`);
+  parts.push(`Fieldwork ${fieldLabel(w)} ${year}.`);
+  const link = p?.url || w.dir?.url || w.sal?.source || w.own?.source
+             || w.demo?.article || w.demo?.source || w.sw?.article || w.sw?.source || SITE_URL;
   return `    <item>
       <title>${xesc(title)}</title>
-      <link>${xesc(p.url || SITE_URL)}</link>
-      <guid isPermaLink="false">auspol-tracker:${xesc(p.date + "|" + p.pollster)}</guid>
-      <pubDate>${rfc822(p.date)}</pubDate>
-      <description>${xesc(desc)}</description>
+      <link>${xesc(link)}</link>
+      <guid isPermaLink="false">auspol-tracker:${xesc(w.date + "|" + w.house)}</guid>
+      <pubDate>${rfc822(w.date)}</pubDate>
+      <description>${xesc(parts.join(" "))}</description>
     </item>`;
 }).join("\n");
 const feed = `<?xml version="1.0" encoding="UTF-8"?>
@@ -907,7 +1012,7 @@ const feed = `<?xml version="1.0" encoding="UTF-8"?>
     <title>auspol tracker – new polls</title>
     <link>${SITE_URL}</link>
     <atom:link href="${SITE_URL}feed.xml" rel="self" type="application/rss+xml"/>
-    <description>Every national voting-intention poll as it enters the tracker. Items link to the pollster's own release.</description>
+    <description>Every national polling release as it enters the tracker – voting intention, leader ratings, national direction, the issues and vote breakdowns included. Items link to the pollster's own release.</description>
     <language>en-AU</language>
     <lastBuildDate>${rfc822(grabLatest().updatedISO)}</lastBuildDate>
 ${items}
@@ -996,6 +1101,6 @@ console.log(`built ${path.basename(OUT)}`);
 console.log(`  ${(size / 1024 / 1024).toFixed(2)} MB raw · ${(gz / 1024).toFixed(0)} KB over the wire (gzipped)`);
 console.log(`  + assets/fonts · ${[...fontKeep].length} faces, ${(FONTS.reduce((n, f) => n + fs.statSync(path.join(HERE, "fonts", f.file)).size, 0) / 1024).toFixed(0)} KB, cached by hash`);
 console.log(`  + assets/${cycleSrcName} · ${(Buffer.byteLength(cycleSourceJson) / 1024).toFixed(0)} KB, fetched only by Past cycles`);
-console.log(`built feed.xml · ${feedPolls.length} polls, newest ${feedPolls[0].date} ${feedPolls[0].pollster}`);
+console.log(`built feed.xml · ${feedWaves.length} waves, newest ${feedWaves[0].date} ${feedWaves[0].house}`);
 console.log(`built sitemap.xml · lastmod ${dataStamp}`);
 console.log("built robots.txt");

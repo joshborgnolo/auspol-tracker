@@ -4,7 +4,7 @@
     <title>auspol tracker – new polls</title>
     <link>https://auspoltracker.com/</link>
     <atom:link href="https://auspoltracker.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <description>Every national voting-intention poll as it enters the tracker. Items link to the pollster's own release.</description>
+    <description>Every national polling release as it enters the tracker – voting intention, leader ratings, national direction, the issues and vote breakdowns included. Items link to the pollster's own release.</description>
     <language>en-AU</language>
     <lastBuildDate>Tue, 29 Sep 2026 12:00:00 GMT</lastBuildDate>
     <item>
@@ -12,224 +12,273 @@
       <link>https://www.theguardian.com/australia-news/2026/sep/29/guardian-essential-poll-coalitions-primary-vote-sinks-to-lowest-ever-as-majority-support-hardline-immigration-ideas</link>
       <guid isPermaLink="false">auspol-tracker:2026-09-29|Essential</guid>
       <pubDate>Tue, 29 Sep 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 29, L/NP 22, GRN 12, ON 25, Ind/Oth 12. Two-party preferred: ALP 48 – L/NP 46. Sample 1,008. Fieldwork 24–29 Sep 2026.</description>
+      <description>Primary vote: ALP 29, L/NP 22, GRN 12, ON 25, Ind/Oth 12. Two-party preferred: ALP 48 – L/NP 46. Satisfaction: Albanese -17 net (37% approve, 54% disapprove); Taylor -12 net (31% approve, 43% disapprove). National direction: right direction 25% · wrong track 60% · unsure 15%. Sample 1,008. Fieldwork 24–29 Sep 2026.</description>
     </item>
     <item>
       <title>Roy Morgan, 14–27 Sep 2026 – 2PP ALP 52.5 – L/NP 47.5</title>
       <link>https://www.roymorgan.com/findings/10363-federal-voting-intention-september-29-2026</link>
       <guid isPermaLink="false">auspol-tracker:2026-09-27|Roy Morgan</guid>
       <pubDate>Sun, 27 Sep 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 26, L/NP 22.5, GRN 14.5, ON 25.5, Ind/Oth 11. Two-party preferred: ALP 52.5 – L/NP 47.5. Undecided 7%. Sample 2,569. Fieldwork 14–27 Sep 2026.</description>
+      <description>Primary vote: ALP 26, L/NP 22.5, GRN 14.5, ON 25.5, Ind/Oth 11. Two-party preferred: ALP 52.5 – L/NP 47.5. Undecided 7%. Other two-party contests: ALP 53.5 – ON 46.5. National direction: right direction 21.5% · wrong track 63.5% · unsure 15%. The vote by group (state): state – NSW: ALP 28.5 · L/NP 22 · ON 26.5 · GRN 12 · OTH 11; Vic: ALP 25.5 · L/NP 26.5 · ON 23 · GRN 16.5 · OTH 9; Qld: ALP 20.5 · L/NP 21 · ON 32.5 · GRN 16 · OTH 10; SA: ALP 28 · L/NP 26.5 · ON 18.5 · GRN 15.5 · OTH 10.5; WA: ALP 27.5 · L/NP 20 · ON 26 · GRN 15 · OTH 12. Sample 2,569. Fieldwork 14–27 Sep 2026.</description>
     </item>
     <item>
       <title>YouGov, 15–21 Sep 2026 – 2PP ALP 52 – L/NP 48</title>
       <link>https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209</link>
       <guid isPermaLink="false">auspol-tracker:2026-09-21|YouGov</guid>
       <pubDate>Mon, 21 Sep 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 26, L/NP 21, GRN 14, ON 27, Ind/Oth 12. Two-party preferred: ALP 52 – L/NP 48. Sample 1,500. Fieldwork 15–21 Sep 2026.</description>
+      <description>Primary vote: ALP 26, L/NP 21, GRN 14, ON 27, Ind/Oth 12. Two-party preferred: ALP 52 – L/NP 48. Other two-party contests: ALP 55 – ON 45. Preferred PM: Albanese 41 – Taylor 37. Preferred PM, Albanese v Hanson: 50 – 38. Satisfaction: Albanese -29 net (33% approve, 62% disapprove); Taylor -12 net (36% approve, 48% disapprove). The vote by group (gender, age, generation, state, location, education, language, housing): gender – Men: ALP 23 · L/NP 21 · ON 29 · GRN 12 · OTH 15; Women: ALP 28 · L/NP 21 · ON 25 · GRN 15 · OTH 11. age – 18–34: ALP 25 · L/NP 11 · ON 18 · GRN 27 · OTH 19; 35–49: ALP 24 · L/NP 19 · ON 28 · GRN 16 · OTH 13; 50+: ALP 27 · L/NP 27 · ON 31 · GRN 5 · OTH 10. generation – Gen Z: ALP 22 · L/NP 12 · ON 11 · GRN 36 · OTH 19; Millennials: ALP 26 · L/NP 16 · ON 28 · GRN 15 · OTH 15; Gen X: ALP 23 · L/NP 22 · ON 34 · GRN 10 · OTH 11; Boomers: ALP 31 · L/NP 26 · ON 29 · GRN 4 · OTH 10; Silent: ALP 20 · L/NP 48 · ON 22 · GRN 4 · OTH 5. state – NSW: ALP 24 · L/NP 21 · ON 26 · GRN 13 · OTH 16; Vic: ALP 25 · L/NP 22 · ON 26 · GRN 18 · OTH 9; Qld: ALP 24 · L/NP 20 · ON 31 · GRN 12 · OTH 13; SA: ALP 25 · L/NP 16 · ON 29 · GRN 16 · OTH 14; WA: ALP 32 · L/NP 21 · ON 30 · GRN 7 · OTH 10; ACT/NT/Tas: ALP 38 · L/NP 24 · ON 12 · GRN 15 · OTH 11. location – Inner metro: ALP 29 · L/NP 24 · ON 17 · GRN 19 · OTH 11; Outer metro: ALP 26 · L/NP 17 · ON 29 · GRN 14 · OTH 14; Provincial: ALP 33 · L/NP 22 · ON 28 · GRN 11 · OTH 6; Rural: ALP 15 · L/NP 21 · ON 36 · GRN 9 · OTH 19. education – Year 12 or less: ALP 22 · L/NP 21 · ON 30 · GRN 16 · OTH 11; TAFE or college: ALP 27 · L/NP 17 · ON 31 · GRN 10 · OTH 16; University: ALP 30 · L/NP 26 · ON 17 · GRN 14 · OTH 12. language – Other language: ALP 28 · L/NP 16 · ON 18 · GRN 21 · OTH 17; English only: ALP 25 · L/NP 22 · ON 28 · GRN 13 · OTH 12. housing – Own outright: ALP 27 · L/NP 32 · ON 25 · GRN 5 · OTH 11; Mortgage: ALP 27 · L/NP 22 · ON 33 · GRN 8 · OTH 10; Renting: ALP 24 · L/NP 10 · ON 30 · GRN 21 · OTH 15. Where the 2025 vote has moved: 2025 ALP voters now: ALP 65 · L/NP 9 · ON 15 · GRN 6 · IND 3 · OTH 1 · community-strong 1. 2025 L/NP voters now: ALP 6 · L/NP 52 · ON 38 · GRN 1 · IND 1 · OTH 2 · community-strong 0. 2025 GRN voters now: ALP 8 · L/NP 2 · ON 2 · GRN 80 · IND 2 · OTH 3 · community-strong 3. 2025 ON voters now: ALP 3 · L/NP 2 · ON 92 · GRN 0 · IND 0 · OTH 3 · community-strong 0. 2025 IND voters now: ALP 9 · L/NP 5 · ON 19 · GRN 5 · IND 57 · OTH 1 · community-strong 4. 2025 OTH voters now: ALP 5 · L/NP 9 · ON 27 · GRN 6 · IND 4 · OTH 43 · community-strong 6. Sample 1,500. Fieldwork 15–21 Sep 2026.</description>
     </item>
     <item>
       <title>Roy Morgan, 14–20 Sep 2026 – 2PP ALP 53 – L/NP 47</title>
       <link>https://www.roymorgan.com/findings/10353-federal-voting-intention-september-21-2026</link>
       <guid isPermaLink="false">auspol-tracker:2026-09-20|Roy Morgan</guid>
       <pubDate>Sun, 20 Sep 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 25, L/NP 21.5, GRN 15.5, ON 25.5, Ind/Oth 12.5. Two-party preferred: ALP 53 – L/NP 47. Undecided 1%. Sample 1,561. Fieldwork 14–20 Sep 2026.</description>
+      <description>Primary vote: ALP 25, L/NP 21.5, GRN 15.5, ON 25.5, Ind/Oth 12.5. Two-party preferred: ALP 53 – L/NP 47. Undecided 1%. Other two-party contests: ALP 54 – ON 46. National direction: right direction 21% · wrong track 65% · unsure 14%. Sample 1,561. Fieldwork 14–20 Sep 2026.</description>
     </item>
     <item>
       <title>Newspoll, 14–17 Sep 2026 – ALP 27, L/NP 19, GRN 13, ON 30, Ind/Oth 11</title>
       <link>https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455</link>
       <guid isPermaLink="false">auspol-tracker:2026-09-17|Newspoll</guid>
       <pubDate>Thu, 17 Sep 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 27, L/NP 19, GRN 13, ON 30, Ind/Oth 11. No two-party figure published. Sample 1,244. Fieldwork 14–17 Sep 2026.</description>
+      <description>Primary vote: ALP 27, L/NP 19, GRN 13, ON 30, Ind/Oth 11. No two-party figure published. Preferred PM: Albanese 44 – Taylor 24. Satisfaction: Albanese -27 net (35% approve, 62% disapprove); Taylor -15 net; Hanson -7 net (44% approve, 51% disapprove). Sample 1,244. Fieldwork 14–17 Sep 2026.</description>
     </item>
     <item>
       <title>DemosAU, 10–14 Sep 2026 – ALP 28, L/NP 20, GRN 13, ON 26, Ind/Oth 13</title>
       <link>https://www.capitalbrief.com/newsletter/exclusive-poll-voters-back-social-media-reform-fbd908f1-a09e-4d1e-9713-9c8c02dd0d31/</link>
       <guid isPermaLink="false">auspol-tracker:2026-09-14|DemosAU</guid>
       <pubDate>Mon, 14 Sep 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28, L/NP 20, GRN 13, ON 26, Ind/Oth 13. No two-party figure published. Undecided 4%. Sample 1,583. Fieldwork 10–14 Sep 2026.</description>
+      <description>Primary vote: ALP 28, L/NP 20, GRN 13, ON 26, Ind/Oth 13. No two-party figure published. Undecided 4%. Preferred PM: Albanese 36 – Taylor 21. Satisfaction: Albanese -16 net (29% approve, 45% disapprove); Taylor -4 net (23% approve, 27% disapprove); Hanson -12 net (32% approve, 44% disapprove). The vote by group (gender, age, education, location, housing, language): gender – Men: ALP 28 · GRN 12 · OTH 13 · L/NP 21 · ON 26; Women: ALP 27 · GRN 14 · OTH 14 · L/NP 20 · ON 25. age – 18–34: ALP 38 · GRN 22 · OTH 9 · L/NP 15 · ON 16; 35–54: ALP 26 · GRN 13 · OTH 13 · L/NP 21 · ON 27; 55+: ALP 23 · GRN 7 · OTH 16 · L/NP 23 · ON 31. education – School: ALP 29 · GRN 13 · OTH 16 · L/NP 17 · ON 25; TAFE: ALP 24 · GRN 11 · OTH 11 · L/NP 20 · ON 34; University: ALP 30 · GRN 15 · OTH 13 · L/NP 25 · ON 17. location – Inner metro: ALP 32 · GRN 13 · OTH 9 · L/NP 28 · ON 18; Outer metro: ALP 28 · GRN 15 · OTH 13 · L/NP 17 · ON 27; Regional or rural: ALP 23 · GRN 8 · OTH 19 · L/NP 16 · ON 34. housing – Renting: ALP 31 · GRN 16 · OTH 14 · L/NP 13 · ON 26; Mortgage: ALP 28 · GRN 13 · OTH 10 · L/NP 23 · ON 26; Own outright: ALP 24 · GRN 10 · OTH 16 · L/NP 25 · ON 25. language – English only: ALP 25 · GRN 13 · OTH 14 · L/NP 21 · ON 27; Other language: ALP 38 · GRN 14 · OTH 12 · L/NP 18 · ON 18. Where the 2025 vote has moved: 2025 ALP voters now: ALP 68 · GRN 6 · OTH 4 · L/NP 8 · ON 14. 2025 L/NP voters now: ALP 8 · GRN 2 · OTH 3 · L/NP 52 · ON 35. 2025 GRN voters now: ALP 12 · GRN 79 · L/NP 4 · ON 5. 2025 ON voters now: ALP 1 · OTH 2 · L/NP 1 · ON 96. 2025 OTH voters now: ALP 4 · GRN 3 · OTH 71 · L/NP 6 · ON 16. 2025 dnr voters now: ALP 19 · GRN 10 · OTH 23 · L/NP 11 · ON 37. Sample 1,583. Fieldwork 10–14 Sep 2026.</description>
+    </item>
+    <item>
+      <title>SEC Newgate, 8–14 Sep 2026 – Right 32 · Wrong track 68</title>
+      <link>https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-september-2026-report/</link>
+      <guid isPermaLink="false">auspol-tracker:2026-09-14|SEC Newgate</guid>
+      <pubDate>Mon, 14 Sep 2026 12:00:00 GMT</pubDate>
+      <description>National direction: right direction 32% · wrong track 68% · unsure 0%. And the party voters see as best on each: Cost of living: ALP 23% · L/NP 16% · ON 22% · GRN 12% · other 27%. Sample 1,659. Fieldwork 8–14 Sep 2026.</description>
+    </item>
+    <item>
+      <title>Resolve, 13 Sep 2026 – the vote by group</title>
+      <link>https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html</link>
+      <guid isPermaLink="false">auspol-tracker:2026-09-13|Resolve</guid>
+      <pubDate>Sun, 13 Sep 2026 12:00:00 GMT</pubDate>
+      <description>The vote by group (age, gender, state): age – 18–34: L/NP 17.9 · ALP 30.9 · GRN 23.8 · ON 17.2 · OTH 10.2; 35–54: L/NP 23.5 · ALP 32.1 · GRN 11.3 · ON 24.4 · OTH 8.8; 55+: L/NP 28.9 · ALP 22.9 · GRN 2.9 · ON 35.5 · OTH 9.8. gender – Men: L/NP 23.6 · ALP 29.5 · GRN 10 · ON 27.7 · OTH 9.2; Women: L/NP 24.2 · ALP 27.1 · GRN 13.4 · ON 25.4 · OTH 9.9. state – NSW: L/NP 22.2 · ALP 27 · GRN 9.9 · ON 29.6 · OTH 11.2; Vic: L/NP 26.5 · ALP 27.4 · GRN 11.3 · ON 23.6 · OTH 11.1; Qld: L/NP 23.5 · ALP 27.3 · GRN 12.2 · ON 28.2 · OTH 8.8; Rest of Australia: L/NP 23.8 · ALP 31.9 · GRN 14.4 · ON 23.8 · OTH 6.1. Fieldwork 13 Sep 2026.</description>
     </item>
     <item>
       <title>Roy Morgan, 7–13 Sep 2026 – 2PP ALP 55 – L/NP 45</title>
       <link>https://www.roymorgan.com/findings/10343-federal-voting-intention-september-14-2026</link>
       <guid isPermaLink="false">auspol-tracker:2026-09-13|Roy Morgan</guid>
       <pubDate>Sun, 13 Sep 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 25, L/NP 21.5, GRN 16, ON 25, Ind/Oth 12.5. Two-party preferred: ALP 55 – L/NP 45. Undecided 6.5%. Sample 1,583. Fieldwork 7–13 Sep 2026.</description>
+      <description>Primary vote: ALP 25, L/NP 21.5, GRN 16, ON 25, Ind/Oth 12.5. Two-party preferred: ALP 55 – L/NP 45. Undecided 6.5%. Other two-party contests: ALP 54.5 – ON 45.5. National direction: right direction 23% · wrong track 64% · unsure 13%. Sample 1,583. Fieldwork 7–13 Sep 2026.</description>
     </item>
     <item>
       <title>Resolve, 12 Sep 2026 – ALP 28, L/NP 24, GRN 11, ON 27, Ind/Oth 9</title>
       <link>https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html</link>
       <guid isPermaLink="false">auspol-tracker:2026-09-12|Resolve</guid>
       <pubDate>Sat, 12 Sep 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28, L/NP 24, GRN 11, ON 27, Ind/Oth 9. No two-party figure published. Sample 2,250. Fieldwork 12 Sep 2026.</description>
+      <description>Primary vote: ALP 28, L/NP 24, GRN 11, ON 27, Ind/Oth 9. No two-party figure published. Soft vote 26% by age (18-34: 38%, 35-54: 27%, 55+: 17%). Preferred PM: Albanese 29 – Taylor 21. Satisfaction: Albanese -18 net (35% approve, 53% disapprove); Taylor +9 net (39% approve, 30% disapprove). And the party voters see as best on each: Economic management: L/NP 27.3% · ALP 22.8% · other 8.2% · unsure 20.8% · ON 20.9%; National security: L/NP 24.3% · ALP 24.4% · other 7% · unsure 20.4% · ON 24%; Health: L/NP 20.2% · ALP 28.5% · other 8.7% · unsure 22.4% · ON 20.2%; Education: L/NP 20.9% · ALP 26.2% · other 8.7% · unsure 23.1% · ON 21.1%; Transport: L/NP 22.8% · ALP 25.9% · other 8.1% · unsure 24.4% · ON 18.9%; Industrial relations: L/NP 21.4% · ALP 25.8% · other 8.2% · unsure 23.8% · ON 20.8%; Managing the finances: L/NP 26.2% · ALP 22.5% · other 7.1% · unsure 22.5% · ON 21.6%; Indigenous affairs: L/NP 14.8% · ALP 23.9% · other 12% · unsure 27.2% · ON 22.1%; Climate change: L/NP 16.7% · ALP 24.2% · other 14.2% · unsure 24.3% · ON 20.6%; Jobs and wages: L/NP 21.4% · ALP 27.6% · other 8.4% · unsure 20.3% · ON 22.3%; Welfare: L/NP 18.6% · ALP 29% · other 9.4% · unsure 20.3% · ON 22.7%; Energy: L/NP 18.9% · ALP 24.9% · other 10.5% · unsure 22% · ON 23.8%; Immigration: L/NP 16.6% · ALP 21.9% · other 8.2% · unsure 17.5% · ON 35.8%; Cost of living: L/NP 22.2% · ALP 21.1% · other 10% · unsure 23.2% · ON 23.6%; Foreign affairs: L/NP 21% · ALP 27.3% · other 7.7% · unsure 20.4% · ON 23.7%; Natural disasters: L/NP 16.5% · ALP 25.9% · other 8.7% · unsure 31.1% · ON 17.8%; Crime: L/NP 20.9% · ALP 22.2% · other 7.6% · unsure 21.5% · ON 27.8%; Housing: L/NP 18.1% · ALP 24.6% · other 9.2% · unsure 24% · ON 24.2%. Sample 2,250. Fieldwork 12 Sep 2026.</description>
     </item>
     <item>
       <title>YouGov, 1–8 Sep 2026 – 2PP ALP 52 – L/NP 48</title>
       <link>https://www.news24.com.au/politics/australian-politics/pauline-hansons-one-nation-surges-to-top-of-pulse-as-labor-plunges-to-record-low/news-story/334ce8596f4b51edb853c103514385a0</link>
       <guid isPermaLink="false">auspol-tracker:2026-09-08|YouGov</guid>
       <pubDate>Tue, 08 Sep 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 26, L/NP 18, GRN 12, ON 30, Ind/Oth 14. Two-party preferred: ALP 52 – L/NP 48. Sample 1,504. Fieldwork 1–8 Sep 2026.</description>
+      <description>Primary vote: ALP 26, L/NP 18, GRN 12, ON 30, Ind/Oth 14. Two-party preferred: ALP 52 – L/NP 48. Other two-party contests: ALP 53 – ON 47. Preferred PM: Albanese 43 – Taylor 39. Preferred PM, Albanese v Hanson: 51 – 40. Satisfaction: Albanese -23 net (36% approve, 59% disapprove); Taylor -12 net (36% approve, 48% disapprove). The vote by group (gender, age, generation, state, location, education, language, housing): gender – Men: ALP 26 · L/NP 20 · ON 32 · GRN 9 · OTH 13; Women: ALP 26 · L/NP 17 · ON 28 · GRN 14 · OTH 15. age – 18–34: ALP 26 · L/NP 11 · ON 16 · GRN 27 · OTH 20; 35–49: ALP 32 · L/NP 17 · ON 29 · GRN 10 · OTH 12; 50+: ALP 24 · L/NP 23 · ON 38 · GRN 5 · OTH 11. generation – Gen Z: ALP 29 · L/NP 12 · ON 9 · GRN 31 · OTH 19; Millennials: ALP 28 · L/NP 15 · ON 26 · GRN 14 · OTH 17; Gen X: ALP 29 · L/NP 18 · ON 35 · GRN 7 · OTH 11; Boomers: ALP 23 · L/NP 25 · ON 37 · GRN 4 · OTH 11; Silent: ALP 13 · L/NP 19 · ON 54 · GRN 3 · OTH 11. state – NSW: ALP 22 · L/NP 18 · ON 32 · GRN 12 · OTH 16; Vic: ALP 29 · L/NP 18 · ON 25 · GRN 13 · OTH 14; Qld: ALP 24 · L/NP 15 · ON 38 · GRN 11 · OTH 12; SA: ALP 34 · L/NP 18 · ON 25 · GRN 11 · OTH 12; WA: ALP 30 · L/NP 21 · ON 28 · GRN 9 · OTH 12; ACT/NT/Tas: ALP 32 · L/NP 29 · ON 15 · GRN 13 · OTH 11. location – Inner metro: ALP 33 · L/NP 21 · ON 20 · GRN 13 · OTH 14; Outer metro: ALP 28 · L/NP 15 · ON 29 · GRN 10 · OTH 17; Provincial: ALP 29 · L/NP 15 · ON 34 · GRN 16 · OTH 7; Rural: ALP 13 · L/NP 21 · ON 41 · GRN 11 · OTH 13. education – Year 12 or less: ALP 26 · L/NP 18 · ON 34 · GRN 12 · OTH 10; TAFE or college: ALP 22 · L/NP 17 · ON 34 · GRN 10 · OTH 17; University: ALP 30 · L/NP 20 · ON 20 · GRN 14 · OTH 17. language – Other language: ALP 26 · L/NP 21 · ON 24 · GRN 14 · OTH 15; English only: ALP 26 · L/NP 18 · ON 31 · GRN 11 · OTH 14. housing – Own outright: ALP 21 · L/NP 25 · ON 34 · GRN 6 · OTH 14; Mortgage: ALP 30 · L/NP 20 · ON 30 · GRN 8 · OTH 11; Renting: ALP 27 · L/NP 10 · ON 31 · GRN 15 · OTH 17. Where the 2025 vote has moved: 2025 ALP voters now: ALP 68 · L/NP 6 · ON 13 · GRN 6 · IND 4 · OTH 2 · community-strong 1. 2025 L/NP voters now: ALP 2 · L/NP 49 · ON 47 · GRN 0 · IND 1 · OTH 1 · community-strong 0. 2025 GRN voters now: ALP 12 · L/NP 2 · ON 3 · GRN 73 · IND 8 · OTH 2 · community-strong 0. 2025 ON voters now: ALP 2 · L/NP 1 · ON 94 · GRN 0 · IND 0 · OTH 3 · community-strong 0. 2025 IND voters now: ALP 11 · L/NP 2 · ON 13 · GRN 3 · IND 54 · OTH 1 · community-strong 16. 2025 OTH voters now: ALP 2 · L/NP 4 · ON 34 · GRN 2 · IND 3 · OTH 50 · community-strong 5. Sample 1,504. Fieldwork 1–8 Sep 2026.</description>
     </item>
     <item>
       <title>Roy Morgan, 31 Aug – 6 Sep 2026 – 2PP ALP 53 – L/NP 47</title>
       <link>https://www.roymorgan.com/findings/10333-federal-voting-intention-september-7-2026</link>
       <guid isPermaLink="false">auspol-tracker:2026-09-06|Roy Morgan</guid>
       <pubDate>Sun, 06 Sep 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 27, L/NP 21.5, GRN 14.5, ON 26.5, Ind/Oth 10.5. Two-party preferred: ALP 53 – L/NP 47. Undecided 6.5%. Sample 1,541. Fieldwork 31 Aug – 6 Sep 2026.</description>
+      <description>Primary vote: ALP 27, L/NP 21.5, GRN 14.5, ON 26.5, Ind/Oth 10.5. Two-party preferred: ALP 53 – L/NP 47. Undecided 6.5%. Other two-party contests: ALP 53.5 – ON 46.5. National direction: right direction 24% · wrong track 62% · unsure 14%. Sample 1,541. Fieldwork 31 Aug – 6 Sep 2026.</description>
     </item>
     <item>
       <title>Essential, 26–31 Aug 2026 – 2PP ALP 45 – L/NP 50</title>
       <link>https://www.theguardian.com/australia-news/2026/sep/02/guardian-essential-poll-one-nation-popularity-slips-albanese-records-lowest-approval-as-prime-minister-ntwnfb</link>
       <guid isPermaLink="false">auspol-tracker:2026-08-31|Essential</guid>
       <pubDate>Mon, 31 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 26, L/NP 26, GRN 13, ON 23, Ind/Oth 11. Two-party preferred: ALP 45 – L/NP 50. Sample 1,017. Fieldwork 26–31 Aug 2026.</description>
+      <description>Primary vote: ALP 26, L/NP 26, GRN 13, ON 23, Ind/Oth 11. Two-party preferred: ALP 45 – L/NP 50. Satisfaction: Albanese -21 net (35% approve, 56% disapprove); Taylor -9 net (32% approve, 41% disapprove). National direction: right direction 23% · wrong track 59% · unsure 19%. Sample 1,017. Fieldwork 26–31 Aug 2026.</description>
     </item>
     <item>
       <title>Roy Morgan, 24–30 Aug 2026 – 2PP ALP 56 – L/NP 44</title>
       <link>https://www.roymorgan.com/findings/10328-federal-voting-intention-august-31-2026</link>
       <guid isPermaLink="false">auspol-tracker:2026-08-30|Roy Morgan</guid>
       <pubDate>Sun, 30 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 29.5, L/NP 20.5, GRN 13.5, ON 23.5, Ind/Oth 13. Two-party preferred: ALP 56 – L/NP 44. Undecided 6.5%. Sample 1,585. Fieldwork 24–30 Aug 2026.</description>
-    </item>
-    <item>
-      <title>RedBridge/Accent, 24–28 Aug 2026 – 2PP ALP 48 – L/NP 52</title>
-      <link>https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn</link>
-      <guid isPermaLink="false">auspol-tracker:2026-08-28|RedBridge/Accent</guid>
-      <pubDate>Fri, 28 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 29, L/NP 22, GRN 12, ON 28, Ind/Oth 9. Two-party preferred: ALP 48 – L/NP 52. Sample 1,006. Fieldwork 24–28 Aug 2026.</description>
+      <description>Primary vote: ALP 29.5, L/NP 20.5, GRN 13.5, ON 23.5, Ind/Oth 13. Two-party preferred: ALP 56 – L/NP 44. Undecided 6.5%. Other two-party contests: ALP 55.5 – ON 44.5. National direction: right direction 28% · wrong track 59% · unsure 13%. Sample 1,585. Fieldwork 24–30 Aug 2026.</description>
     </item>
     <item>
       <title>Newspoll, 24–28 Aug 2026 – ALP 29, L/NP 19, GRN 13, ON 30, Ind/Oth 9</title>
       <link>https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b</link>
       <guid isPermaLink="false">auspol-tracker:2026-08-28|Newspoll</guid>
       <pubDate>Fri, 28 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 29, L/NP 19, GRN 13, ON 30, Ind/Oth 9. No two-party figure published. Sample 1,243. Fieldwork 24–28 Aug 2026.</description>
+      <description>Primary vote: ALP 29, L/NP 19, GRN 13, ON 30, Ind/Oth 9. No two-party figure published. Preferred PM: Albanese 46 – Taylor 23. Preferred PM, Albanese v Hanson: 56 – 44. Satisfaction: Albanese -21 net (38% approve, 59% disapprove); Taylor -17 net (33% approve, 50% disapprove); Hanson -1 net (47% approve, 48% disapprove). Sample 1,243. Fieldwork 24–28 Aug 2026.</description>
+    </item>
+    <item>
+      <title>RedBridge/Accent, 24–28 Aug 2026 – 2PP ALP 48 – L/NP 52</title>
+      <link>https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-28|RedBridge/Accent</guid>
+      <pubDate>Fri, 28 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 29, L/NP 22, GRN 12, ON 28, Ind/Oth 9. Two-party preferred: ALP 48 – L/NP 52. Other two-party contests: ALP 52 – ON 48. Preferred PM: Albanese 31 – Taylor 15. Satisfaction: Albanese -17 net (31% approve, 48% disapprove); Taylor -3 net (22% approve, 25% disapprove); Hanson -12 net (36% approve, 48% disapprove). The issues, what voters say matters: Cost of living: 75% in the top three, 44% rank it first; Health: 37% in the top three, 8% rank it first; Housing: 33% in the top three, 8% rank it first; Crime: 27% in the top three, 7% rank it first; Immigration: 29% in the top three, 10% rank it first; Climate change: 12% in the top three, 4% rank it first; The environment: 8% in the top three, 2% rank it first; Economic management: 14% in the top three, 4% rank it first; National security: 9% in the top three, 2% rank it first; Education: 8% in the top three, 1% rank it first; Tax: 12% in the top three, 3% rank it first; Government debt: 13% in the top three, 3% rank it first; Energy: 10% in the top three, 1% rank it first; Transport: 7% in the top three, 1% rank it first. And the party voters see as best on each: Cost of living: ALP 25% · L/NP 20% · ON 20% · GRN 8% · all equal 7% · neither 9% · unsure 11%; Health: ALP 31% · L/NP 20% · ON 14% · GRN 8% · all equal 9% · neither 6% · unsure 12%; Housing: ALP 23% · L/NP 19% · ON 19% · GRN 8% · all equal 7% · neither 11% · unsure 13%; National security: ALP 22% · L/NP 26% · ON 18% · GRN 4% · all equal 10% · neither 6% · unsure 14%; Climate change: ALP 18% · L/NP 10% · ON 15% · GRN 26% · all equal 7% · neither 13% · unsure 11%; Immigration: ALP 19% · L/NP 15% · ON 39% · GRN 5% · all equal 4% · neither 7% · unsure 11%; Crime: ALP 20% · L/NP 21% · ON 24% · GRN 4% · all equal 10% · neither 8% · unsure 13%; Economic management: ALP 24% · L/NP 29% · ON 14% · GRN 5% · all equal 7% · neither 8% · unsure 13%; Tax: ALP 23% · L/NP 24% · ON 15% · GRN 6% · all equal 7% · neither 9% · unsure 16%. The vote by group (softness, generation, gender, location, education, housing): softness – Solid: ALP 30 · L/NP 22 · ON 33 · GRN 10 · OTH 5; Soft: ALP 30 · L/NP 22 · ON 24 · GRN 14 · OTH 10; Very soft: ALP 22 · L/NP 25 · ON 24 · GRN 9 · OTH 20. generation – Gen Z: ALP 31 · L/NP 12 · ON 16 · GRN 32 · OTH 9; Millennials: ALP 27 · L/NP 19 · ON 32 · GRN 14 · OTH 8; Gen X: ALP 29 · L/NP 21 · ON 34 · GRN 7 · OTH 9; Boomers: ALP 29 · L/NP 32 · ON 28 · GRN 2 · OTH 9. gender – Women: ALP 28 · L/NP 20 · ON 29 · GRN 14 · OTH 9; Men: ALP 30 · L/NP 24 · ON 28 · GRN 9 · OTH 9. location – Inner metro: ALP 30 · L/NP 27 · ON 21 · GRN 13 · OTH 9; Outer metro: ALP 37 · L/NP 18 · ON 27 · GRN 14 · OTH 4; Provincial: ALP 25 · L/NP 29 · ON 24 · GRN 12 · OTH 10; Rural: ALP 22 · L/NP 17 · ON 41 · GRN 8 · OTH 12. education – Below Year 12: ALP 27 · L/NP 25 · ON 41 · GRN 3 · OTH 4; Year 12: ALP 28 · L/NP 22 · ON 17 · GRN 26 · OTH 7; TAFE or trade: ALP 26 · L/NP 19 · ON 37 · GRN 6 · OTH 12; University: ALP 36 · L/NP 26 · ON 18 · GRN 13 · OTH 7. housing – Own outright: ALP 30 · L/NP 29 · ON 29 · GRN 5 · OTH 7; Mortgage: ALP 29 · L/NP 18 · ON 33 · GRN 11 · OTH 9; Renting and other: ALP 29 · L/NP 19 · ON 21 · GRN 21 · OTH 10. Sample 1,006. Fieldwork 24–28 Aug 2026.</description>
     </item>
     <item>
       <title>YouGov, 18–24 Aug 2026 – 2PP ALP 53 – L/NP 47</title>
       <link>https://www.news24.com.au/politics/australian-politics/one-nation-trails-labor-by-three-points-following-a-difficult-parliamentary-fortnight-for-albanese/news-story/d04bde51f5545775296ce13f7e15515e</link>
       <guid isPermaLink="false">auspol-tracker:2026-08-24|YouGov</guid>
       <pubDate>Mon, 24 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 29, L/NP 21, GRN 12, ON 26, Ind/Oth 12. Two-party preferred: ALP 53 – L/NP 47. Sample 1,510. Fieldwork 18–24 Aug 2026.</description>
+      <description>Primary vote: ALP 29, L/NP 21, GRN 12, ON 26, Ind/Oth 12. Two-party preferred: ALP 53 – L/NP 47. Other two-party contests: ALP 56 – ON 44. Preferred PM: Albanese 44 – Taylor 37. Preferred PM, Albanese v Hanson: 52 – 37. Satisfaction: Albanese -24 net (35% approve, 59% disapprove); Taylor -16 net (33% approve, 49% disapprove). And the party voters see as best on each: Cost of living: ALP 24% · L/NP 20% · ON 22% · GRN 9% · unsure 25%; Immigration: ALP 22% · L/NP 14% · ON 37% · GRN 8% · unsure 19%; Housing: ALP 23% · L/NP 18% · ON 21% · GRN 11% · unsure 27%; Economic management: ALP 25% · L/NP 28% · ON 17% · GRN 7% · unsure 23%; Climate change: ALP 17% · L/NP 11% · ON 16% · GRN 28% · unsure 28%; Health: ALP 29% · L/NP 18% · ON 18% · GRN 10% · unsure 24%; Inequality: ALP 22% · L/NP 14% · ON 22% · GRN 14% · unsure 29%; Jobs and wages: ALP 31% · L/NP 18% · ON 20% · GRN 8% · unsure 23%; Pensions and older Australians: ALP 29% · L/NP 16% · ON 21% · GRN 9% · unsure 25%; National security: ALP 26% · L/NP 24% · ON 21% · GRN 4% · unsure 24%; Foreign affairs: ALP 29% · L/NP 24% · ON 18% · GRN 5% · unsure 23%; Education: ALP 31% · L/NP 19% · ON 17% · GRN 9% · unsure 24%. The vote by group (gender, age, generation, state, location, education, language, housing): gender – Men: ALP 32 · L/NP 23 · ON 24 · GRN 10 · OTH 10; Women: ALP 25 · L/NP 19 · ON 29 · GRN 13 · OTH 13. age – 18–34: ALP 30 · L/NP 12 · ON 15 · GRN 26 · OTH 17; 35–49: ALP 32 · L/NP 19 · ON 26 · GRN 13 · OTH 10; 50+: ALP 27 · L/NP 27 · ON 33 · GRN 4 · OTH 10. generation – Gen Z: ALP 33 · L/NP 12 · ON 12 · GRN 27 · OTH 15; Millennials: ALP 27 · L/NP 16 · ON 24 · GRN 19 · OTH 14; Gen X: ALP 28 · L/NP 21 · ON 32 · GRN 6 · OTH 12; Boomers: ALP 29 · L/NP 29 · ON 31 · GRN 2 · OTH 9; Silent: ALP 20 · L/NP 44 · ON 27 · GRN 3 · OTH 5. state – NSW: ALP 29 · L/NP 19 · ON 26 · GRN 12 · OTH 15; Vic: ALP 24 · L/NP 24 · ON 21 · GRN 15 · OTH 16; Qld: ALP 27 · L/NP 22 · ON 34 · GRN 10 · OTH 7; SA: ALP 34 · L/NP 14 · ON 40 · GRN 6 · OTH 6; WA: ALP 37 · L/NP 21 · ON 21 · GRN 13 · OTH 8; ACT/NT/Tas: ALP 36 · L/NP 21 · ON 21 · GRN 8 · OTH 14. location – Inner metro: ALP 36 · L/NP 24 · ON 15 · GRN 12 · OTH 13; Outer metro: ALP 29 · L/NP 22 · ON 27 · GRN 10 · OTH 11; Provincial: ALP 31 · L/NP 13 · ON 34 · GRN 15 · OTH 8; Rural: ALP 18 · L/NP 21 · ON 35 · GRN 12 · OTH 15. education – Year 12 or less: ALP 27 · L/NP 19 · ON 34 · GRN 9 · OTH 11; TAFE or college: ALP 27 · L/NP 21 · ON 29 · GRN 11 · OTH 11; University: ALP 32 · L/NP 24 · ON 14 · GRN 16 · OTH 14. language – Other language: ALP 34 · L/NP 22 · ON 22 · GRN 15 · OTH 8; English only: ALP 28 · L/NP 21 · ON 27 · GRN 11 · OTH 14. housing – Own outright: ALP 25 · L/NP 34 · ON 26 · GRN 4 · OTH 11; Mortgage: ALP 32 · L/NP 20 · ON 30 · GRN 9 · OTH 9; Renting: ALP 29 · L/NP 8 · ON 27 · GRN 21 · OTH 16. Where the 2025 vote has moved: 2025 ALP voters now: ALP 71 · L/NP 8 · ON 11 · GRN 4 · IND 3 · OTH 2 · community-strong 1. 2025 L/NP voters now: ALP 4 · L/NP 56 · ON 35 · GRN 2 · IND 0 · OTH 2 · community-strong 1. 2025 GRN voters now: ALP 11 · L/NP 2 · ON 2 · GRN 76 · IND 3 · OTH 4 · community-strong 2. 2025 ON voters now: ALP 2 · L/NP 4 · ON 90 · GRN 1 · IND 0 · OTH 2 · community-strong 0. 2025 IND voters now: ALP 9 · L/NP 4 · ON 21 · GRN 1 · IND 53 · OTH 1 · community-strong 11. 2025 OTH voters now: ALP 3 · L/NP 4 · ON 52 · GRN 1 · IND 0 · OTH 39 · community-strong 1. Sample 1,510. Fieldwork 18–24 Aug 2026.</description>
     </item>
     <item>
       <title>Roy Morgan, 17–23 Aug 2026 – 2PP ALP 52 – L/NP 48</title>
       <link>https://www.roymorgan.com/findings/10321-federal-voting-intention-august-24-2026</link>
       <guid isPermaLink="false">auspol-tracker:2026-08-23|Roy Morgan</guid>
       <pubDate>Sun, 23 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 27, L/NP 21, GRN 14, ON 27, Ind/Oth 11. Two-party preferred: ALP 52 – L/NP 48. Undecided 6.5%. Sample 1,508. Fieldwork 17–23 Aug 2026.</description>
+      <description>Primary vote: ALP 27, L/NP 21, GRN 14, ON 27, Ind/Oth 11. Two-party preferred: ALP 52 – L/NP 48. Undecided 6.5%. Other two-party contests: ALP 53 – ON 47. National direction: right direction 27% · wrong track 58.5% · unsure 14.5%. Sample 1,508. Fieldwork 17–23 Aug 2026.</description>
     </item>
     <item>
       <title>DemosAU, 18–20 Aug 2026 – ALP 26, L/NP 25, GRN 12, ON 24, Ind/Oth 13</title>
       <link>https://www.capitalbrief.com/newsletter/hanson-support-plunges-in-new-poll-7ec0e908-55c4-434a-bd91-97190dcf30ff/</link>
       <guid isPermaLink="false">auspol-tracker:2026-08-20|DemosAU</guid>
       <pubDate>Thu, 20 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 26, L/NP 25, GRN 12, ON 24, Ind/Oth 13. No two-party figure published. Undecided 5%. Sample 1,562. Fieldwork 18–20 Aug 2026.</description>
+      <description>Primary vote: ALP 26, L/NP 25, GRN 12, ON 24, Ind/Oth 13. No two-party figure published. Undecided 5%. Preferred PM: Albanese 35 – Taylor 23. Preferred PM, Albanese v Hanson: 43 – 32. Satisfaction: Albanese -19 net (28% approve, 47% disapprove); Taylor -4 net (23% approve, 27% disapprove); Hanson -17 net (30% approve, 47% disapprove). The vote by group (gender, age, education, location, housing, language): gender – Men: ALP 26 · GRN 9 · OTH 13 · ON 26 · L/NP 26; Women: ALP 27 · GRN 15 · OTH 12 · ON 22 · L/NP 24. age – 18–34: ALP 30 · GRN 26 · OTH 8 · ON 19 · L/NP 17; 35–54: ALP 27 · GRN 13 · OTH 14 · ON 24 · L/NP 22; 55+: ALP 24 · GRN 2 · OTH 15 · ON 27 · L/NP 32. education – School: ALP 26 · GRN 11 · OTH 13 · ON 25 · L/NP 25; TAFE: ALP 24 · GRN 11 · OTH 15 · ON 31 · L/NP 19; University: ALP 29 · GRN 14 · OTH 11 · ON 15 · L/NP 31. location – Inner metro: ALP 31 · GRN 13 · OTH 9 · ON 20 · L/NP 27; Outer metro: ALP 27 · GRN 12 · OTH 15 · ON 21 · L/NP 25; Regional or rural: ALP 20 · GRN 10 · OTH 15 · ON 34 · L/NP 21. housing – Renting: ALP 27 · GRN 18 · OTH 13 · ON 27 · L/NP 15; Mortgage: ALP 29 · GRN 12 · OTH 12 · ON 19 · L/NP 28; Own outright: ALP 23 · GRN 6 · OTH 14 · ON 27 · L/NP 30. language – English only: ALP 24 · GRN 11 · OTH 15 · ON 25 · L/NP 25; Other language: ALP 36 · GRN 15 · OTH 6 · ON 18 · L/NP 25. Where the 2025 vote has moved: 2025 ALP voters now: ALP 74 · GRN 3 · OTH 2 · ON 15 · L/NP 6. 2025 L/NP voters now: ALP 1 · OTH 1 · ON 31 · L/NP 67. 2025 GRN voters now: ALP 6 · GRN 83 · OTH 5 · ON 4 · L/NP 2. 2025 ON voters now: ALP 2 · OTH 1 · ON 96 · L/NP 1. 2025 OTH voters now: ALP 3 · GRN 5 · OTH 72 · ON 9 · L/NP 11. 2025 dnr voters now: ALP 17 · GRN 10 · OTH 18 · ON 40 · L/NP 15. Sample 1,562. Fieldwork 18–20 Aug 2026.</description>
+    </item>
+    <item>
+      <title>Resolve, 16 Aug 2026 – the vote by group</title>
+      <link>https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-16|Resolve</guid>
+      <pubDate>Sun, 16 Aug 2026 12:00:00 GMT</pubDate>
+      <description>The vote by group (age, gender, state): age – 18–34: L/NP 20.7 · ALP 31.2 · GRN 27.6 · ON 12.2 · OTH 8.3; 35–54: L/NP 21.6 · ALP 29 · GRN 9.8 · ON 29.3 · OTH 10.2; 55+: L/NP 26.3 · ALP 25.4 · GRN 3.8 · ON 32.4 · OTH 12.2. gender – Men: L/NP 23.5 · ALP 29.5 · GRN 11.3 · ON 25.1 · OTH 10.5; Women: L/NP 22.9 · ALP 26.9 · GRN 13.4 · ON 26.4 · OTH 10.5. state – NSW: L/NP 19.9 · ALP 30.3 · GRN 13.3 · ON 25.7 · OTH 10.8; Vic: L/NP 27.7 · ALP 24 · GRN 13 · ON 23.4 · OTH 11.9; Qld: L/NP 21.9 · ALP 30.7 · GRN 8.5 · ON 32.5 · OTH 6.5; Rest of Australia: L/NP 23.9 · ALP 27.7 · GRN 13.9 · ON 22.6 · OTH 11.9. Fieldwork 16 Aug 2026.</description>
     </item>
     <item>
       <title>Roy Morgan, 10–16 Aug 2026 – 2PP ALP 52 – L/NP 48</title>
       <link>https://www.roymorgan.com/findings/10311-federal-voting-intention-august-17-2026</link>
       <guid isPermaLink="false">auspol-tracker:2026-08-16|Roy Morgan</guid>
       <pubDate>Sun, 16 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28.5, L/NP 23.5, GRN 12.5, ON 25, Ind/Oth 10.5. Two-party preferred: ALP 52 – L/NP 48. Undecided 4%. Sample 1,576. Fieldwork 10–16 Aug 2026.</description>
+      <description>Primary vote: ALP 28.5, L/NP 23.5, GRN 12.5, ON 25, Ind/Oth 10.5. Two-party preferred: ALP 52 – L/NP 48. Undecided 4%. Other two-party contests: ALP 53 – ON 47. National direction: right direction 26% · wrong track 60.5% · unsure 13.5%. Sample 1,576. Fieldwork 10–16 Aug 2026.</description>
     </item>
     <item>
       <title>Resolve, 9–15 Aug 2026 – ALP 28, L/NP 23, GRN 12, ON 26, Ind/Oth 11</title>
       <link>https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html</link>
       <guid isPermaLink="false">auspol-tracker:2026-08-15|Resolve</guid>
       <pubDate>Sat, 15 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28, L/NP 23, GRN 12, ON 26, Ind/Oth 11. No two-party figure published. Sample 2,256. Fieldwork 9–15 Aug 2026.</description>
+      <description>Primary vote: ALP 28, L/NP 23, GRN 12, ON 26, Ind/Oth 11. No two-party figure published. Soft vote 27% by age (18-34: 30%, 35-54: 31%, 55+: 21%). Preferred PM: Albanese 32 – Taylor 19. Satisfaction: Albanese -16 net (37% approve, 53% disapprove); Taylor +7 net (40% approve, 33% disapprove); Hanson +5 net (46% approve, 41% disapprove). And the party voters see as best on each: Economic management: L/NP 25.1% · ALP 26% · other 9.4% · unsure 18.9% · ON 20.6%; National security: L/NP 24.7% · ALP 22.9% · other 9.1% · unsure 20.9% · ON 22.5%; Health: L/NP 21.9% · ALP 26.5% · other 11% · unsure 19.3% · ON 21.3%; Education: L/NP 21% · ALP 27.2% · other 10% · unsure 20.4% · ON 21.3%; Transport: L/NP 21.5% · ALP 26% · other 10.8% · unsure 22.8% · ON 18.9%; Industrial relations: L/NP 19.7% · ALP 27% · other 10.7% · unsure 23.1% · ON 19.6%; Managing the finances: L/NP 27.9% · ALP 23.8% · other 9.4% · unsure 18% · ON 20.9%; Indigenous affairs: L/NP 14.9% · ALP 25.4% · other 14.2% · unsure 24.9% · ON 20.6%; Climate change: L/NP 16.5% · ALP 23.3% · other 16.3% · unsure 23% · ON 20.9%; Jobs and wages: L/NP 21.1% · ALP 29.2% · other 9.9% · unsure 17.3% · ON 22.6%; Welfare: L/NP 18.4% · ALP 30.1% · other 8.5% · unsure 18.3% · ON 24.8%; Energy: L/NP 21.3% · ALP 24.6% · other 11.4% · unsure 21.8% · ON 21%; Immigration: L/NP 17.1% · ALP 22.7% · other 9.6% · unsure 15.4% · ON 35.2%; Cost of living: L/NP 21.6% · ALP 22.9% · other 9.7% · unsure 20.1% · ON 25.8%; Foreign affairs: L/NP 21% · ALP 28.3% · other 8.7% · unsure 19% · ON 23%; Natural disasters: L/NP 19.2% · ALP 26% · other 11% · unsure 27.5% · ON 16.4%; Crime: L/NP 22.9% · ALP 20.9% · other 10.4% · unsure 18.9% · ON 26.9%; Housing: L/NP 21.1% · ALP 23% · other 12.6% · unsure 18.6% · ON 24.7%. Sample 2,256. Fieldwork 9–15 Aug 2026.</description>
+    </item>
+    <item>
+      <title>Ipsos, 5–13 Aug 2026 – the issues</title>
+      <link>https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-09/IM_Nat_Aug_26_v1.pdf</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-13|Ipsos</guid>
+      <pubDate>Thu, 13 Aug 2026 12:00:00 GMT</pubDate>
+      <description>The issues, what voters say matters: Cost of living: 63% in the top three; Housing: 39% in the top three; Crime: 25% in the top three; Economic management: 23% in the top three; Immigration: 21% in the top three; Health: 20% in the top three; Petrol prices: 19% in the top three; Poverty: 15% in the top three; The environment: 11% in the top three; Tax: 10% in the top three; Population: 9% in the top three; Unemployment: 8% in the top three; Personal debt: 8% in the top three; Racism: 7% in the top three; Education: 6% in the top three; Drug and alcohol abuse: 6% in the top three; National security: 5% in the top three; Transport: 4% in the top three; Indigenous affairs: 3% in the top three. And the party voters see as best on each: Cost of living: L/NP 20% · ALP 27% · GRN 8% · ON 18% · other 2% · unsure 17% · neither 9%; Housing: L/NP 17% · ALP 24% · GRN 10% · ON 17% · other 2% · unsure 21% · neither 10%; Crime: L/NP 20% · ALP 23% · GRN 7% · ON 21% · other 2% · unsure 19% · neither 8%; Economic management: L/NP 23% · ALP 28% · GRN 7% · ON 15% · other 2% · unsure 18% · neither 7%; Immigration: L/NP 15% · ALP 25% · GRN 8% · ON 29% · other 2% · unsure 15% · neither 7%. Sample 1,000. Fieldwork 5–13 Aug 2026.</description>
     </item>
     <item>
       <title>YouGov, 4–10 Aug 2026 – 2PP ALP 52 – L/NP 48</title>
       <link>https://www.news24.com.au/politics/australian-politics/coalition-and-one-nation-face-vote-consolidation-battle-to-oust-albanese-as-formal-alliance-ruled-out/news-story/647c039e1efc5027e63a509879724195</link>
       <guid isPermaLink="false">auspol-tracker:2026-08-10|YouGov</guid>
       <pubDate>Mon, 10 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28, L/NP 22, GRN 12, ON 24, Ind/Oth 14. Two-party preferred: ALP 52 – L/NP 48. Sample 1,511. Fieldwork 4–10 Aug 2026.</description>
+      <description>Primary vote: ALP 28, L/NP 22, GRN 12, ON 24, Ind/Oth 14. Two-party preferred: ALP 52 – L/NP 48. Other two-party contests: ALP 56 – ON 44. Preferred PM: Albanese 42 – Taylor 38. Preferred PM, Albanese v Hanson: 51 – 38. Satisfaction: Albanese -21 net (36% approve, 57% disapprove); Taylor -11 net (35% approve, 46% disapprove). The vote by group (gender, age, generation, state, location, education, language, housing): gender – Men: ALP 29 · L/NP 22 · ON 25 · GRN 11 · OTH 12; Women: ALP 26 · L/NP 21 · ON 24 · GRN 13 · OTH 16. age – 18–34: ALP 31 · L/NP 16 · ON 11 · GRN 25 · OTH 17; 35–49: ALP 28 · L/NP 16 · ON 28 · GRN 13 · OTH 14; 50+: ALP 26 · L/NP 27 · ON 30 · GRN 5 · OTH 11. generation – Gen Z: ALP 32 · L/NP 14 · ON 7 · GRN 25 · OTH 22; Millennials: ALP 29 · L/NP 17 · ON 21 · GRN 18 · OTH 15; Gen X: ALP 29 · L/NP 19 · ON 31 · GRN 8 · OTH 13; Boomers: ALP 25 · L/NP 30 · ON 31 · GRN 3 · OTH 11; Silent: ALP 21 · L/NP 53 · ON 22 · GRN 0 · OTH 4. state – NSW: ALP 24 · L/NP 24 · ON 24 · GRN 13 · OTH 15; Vic: ALP 30 · L/NP 22 · ON 21 · GRN 12 · OTH 15; Qld: ALP 23 · L/NP 19 · ON 29 · GRN 12 · OTH 17; SA: ALP 44 · L/NP 20 · ON 26 · GRN 6 · OTH 4; WA: ALP 28 · L/NP 21 · ON 25 · GRN 15 · OTH 11; ACT/NT/Tas: ALP 33 · L/NP 18 · ON 24 · GRN 10 · OTH 15. location – Inner metro: ALP 34 · L/NP 24 · ON 18 · GRN 14 · OTH 9; Outer metro: ALP 29 · L/NP 20 · ON 24 · GRN 12 · OTH 15; Provincial: ALP 25 · L/NP 26 · ON 30 · GRN 9 · OTH 10; Rural: ALP 19 · L/NP 18 · ON 31 · GRN 12 · OTH 20. education – Year 12 or less: ALP 28 · L/NP 21 · ON 27 · GRN 10 · OTH 14; TAFE or college: ALP 24 · L/NP 19 · ON 29 · GRN 12 · OTH 16; University: ALP 31 · L/NP 25 · ON 16 · GRN 15 · OTH 13. language – Other language: ALP 32 · L/NP 22 · ON 13 · GRN 16 · OTH 18; English only: ALP 27 · L/NP 22 · ON 27 · GRN 11 · OTH 13. housing – Own outright: ALP 26 · L/NP 35 · ON 25 · GRN 3 · OTH 11; Mortgage: ALP 32 · L/NP 20 · ON 28 · GRN 11 · OTH 10; Renting: ALP 27 · L/NP 9 · ON 27 · GRN 16 · OTH 21. Where the 2025 vote has moved: 2025 ALP voters now: ALP 73 · L/NP 6 · ON 11 · GRN 5 · IND 2 · OTH 2 · community-strong 1. 2025 L/NP voters now: ALP 4 · L/NP 57 · ON 36 · GRN 0 · IND 1 · OTH 2 · community-strong 0. 2025 GRN voters now: ALP 9 · L/NP 0 · ON 6 · GRN 76 · IND 5 · OTH 1 · community-strong 3. 2025 ON voters now: ALP 1 · L/NP 6 · ON 90 · GRN 1 · IND 0 · OTH 1 · community-strong 1. 2025 IND voters now: ALP 7 · L/NP 3 · ON 15 · GRN 7 · IND 51 · OTH 5 · community-strong 12. 2025 OTH voters now: ALP 4 · L/NP 9 · ON 19 · GRN 1 · IND 0 · OTH 62 · community-strong 5. Sample 1,511. Fieldwork 4–10 Aug 2026.</description>
     </item>
     <item>
       <title>Roy Morgan, 3–9 Aug 2026 – 2PP ALP 53 – L/NP 47</title>
       <link>https://www.roymorgan.com/findings/10307-federal-voting-intention-august-10-2026</link>
       <guid isPermaLink="false">auspol-tracker:2026-08-09|Roy Morgan</guid>
       <pubDate>Sun, 09 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 25.5, L/NP 22, GRN 15.5, ON 26, Ind/Oth 11. Two-party preferred: ALP 53 – L/NP 47. Undecided 6%. Sample 1,647. Fieldwork 3–9 Aug 2026.</description>
+      <description>Primary vote: ALP 25.5, L/NP 22, GRN 15.5, ON 26, Ind/Oth 11. Two-party preferred: ALP 53 – L/NP 47. Undecided 6%. Other two-party contests: ALP 53 – ON 47. National direction: right direction 24% · wrong track 61.5% · unsure 14.5%. Sample 1,647. Fieldwork 3–9 Aug 2026.</description>
     </item>
     <item>
       <title>Newspoll, 3–7 Aug 2026 – ALP 29, L/NP 18, GRN 14, ON 29, Ind/Oth 10</title>
       <link>https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albaneses-labor-hits-a-julia-gillardlevel-low-primary-vote-after-winter-break/news-story/ca81774a347a1fd299e48ce0361d1a8a</link>
       <guid isPermaLink="false">auspol-tracker:2026-08-07|Newspoll</guid>
       <pubDate>Fri, 07 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 29, L/NP 18, GRN 14, ON 29, Ind/Oth 10. No two-party figure published. Sample 1,242. Fieldwork 3–7 Aug 2026.</description>
+      <description>Primary vote: ALP 29, L/NP 18, GRN 14, ON 29, Ind/Oth 10. No two-party figure published. Preferred PM: Albanese 46 – Taylor 23. Preferred PM, Albanese v Hanson: 56 – 44. Satisfaction: Albanese -22 net; Taylor -12 net (34% approve, 46% disapprove); Hanson -3 net. Sample 1,242. Fieldwork 3–7 Aug 2026.</description>
     </item>
     <item>
       <title>Roy Morgan, 27 Jul – 2 Aug 2026 – 2PP ALP 52 – L/NP 48</title>
       <link>https://www.roymorgan.com/findings/10297-federal-voting-intention-august-3-2026</link>
       <guid isPermaLink="false">auspol-tracker:2026-08-02|Roy Morgan</guid>
       <pubDate>Sun, 02 Aug 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 27.5, L/NP 23.5, GRN 15, ON 24, Ind/Oth 10. Two-party preferred: ALP 52 – L/NP 48. Undecided 8.5%. Sample 1,531. Fieldwork 27 Jul – 2 Aug 2026.</description>
+      <description>Primary vote: ALP 27.5, L/NP 23.5, GRN 15, ON 24, Ind/Oth 10. Two-party preferred: ALP 52 – L/NP 48. Undecided 8.5%. Other two-party contests: ALP 54 – ON 46. National direction: right direction 27% · wrong track 59.5% · unsure 13.5%. Sample 1,531. Fieldwork 27 Jul – 2 Aug 2026.</description>
     </item>
     <item>
       <title>RedBridge/Accent, 27–30 Jul 2026 – 2PP ALP 48 – L/NP 52</title>
       <link>https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6</link>
       <guid isPermaLink="false">auspol-tracker:2026-07-30|RedBridge/Accent</guid>
       <pubDate>Thu, 30 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 29, L/NP 22, GRN 10, ON 31, Ind/Oth 8. Two-party preferred: ALP 48 – L/NP 52. Sample 1,001. Fieldwork 27–30 Jul 2026.</description>
+      <description>Primary vote: ALP 29, L/NP 22, GRN 10, ON 31, Ind/Oth 8. Two-party preferred: ALP 48 – L/NP 52. Other two-party contests: ALP 53 – ON 47. Preferred PM: Albanese 32 – Taylor 15. Satisfaction: Albanese -19 net (30% approve, 49% disapprove); Taylor -6 net (20% approve, 26% disapprove); Hanson -10 net (36% approve, 46% disapprove). The issues, what voters say matters: Cost of living: 73% in the top three, 44% rank it first; Health: 36% in the top three, 8% rank it first; Housing: 35% in the top three, 9% rank it first; Crime: 29% in the top three, 6% rank it first; Immigration: 28% in the top three, 10% rank it first; Climate change: 13% in the top three, 3% rank it first; The environment: 8% in the top three, 2% rank it first; Economic management: 18% in the top three, 6% rank it first; National security: 11% in the top three, 2% rank it first; Education: 8% in the top three, 1% rank it first; Tax: 11% in the top three, 2% rank it first; Government debt: 11% in the top three, 2% rank it first; Energy: 9% in the top three, 2% rank it first; Transport: 7% in the top three, 1% rank it first. And the party voters see as best on each: Cost of living: ALP 22% · L/NP 21% · ON 20% · GRN 6% · all equal 7% · neither 12% · unsure 12%; Health: ALP 27% · L/NP 21% · ON 17% · GRN 8% · all equal 8% · neither 6% · unsure 13%; Housing: ALP 22% · L/NP 19% · ON 18% · GRN 7% · all equal 8% · neither 12% · unsure 14%; National security: ALP 22% · L/NP 23% · ON 22% · GRN 3% · all equal 9% · neither 6% · unsure 15%; Climate change: ALP 17% · L/NP 11% · ON 14% · GRN 27% · all equal 7% · neither 11% · unsure 13%; Immigration: ALP 17% · L/NP 17% · ON 40% · GRN 6% · all equal 4% · neither 5% · unsure 11%; Crime: ALP 18% · L/NP 23% · ON 24% · GRN 5% · all equal 9% · neither 8% · unsure 13%; Economic management: ALP 23% · L/NP 29% · ON 16% · GRN 5% · all equal 6% · neither 8% · unsure 13%; Tax: ALP 22% · L/NP 24% · ON 16% · GRN 5% · all equal 9% · neither 9% · unsure 15%. The vote by group (softness, generation, gender, location, education, housing): softness – Solid: ALP 30 · L/NP 20 · ON 37 · GRN 8 · OTH 5; Soft: ALP 28 · L/NP 23 · ON 27 · GRN 13 · OTH 9; Very soft: ALP 31 · L/NP 21 · ON 16 · GRN 11 · OTH 21. generation – Gen Z: ALP 26 · L/NP 16 · ON 21 · GRN 27 · OTH 10; Millennials: ALP 30 · L/NP 22 · ON 29 · GRN 12 · OTH 7; Gen X: ALP 28 · L/NP 19 · ON 35 · GRN 7 · OTH 11; Boomers: ALP 30 · L/NP 26 · ON 35 · GRN 3 · OTH 6. gender – Women: ALP 29 · L/NP 21 · ON 29 · GRN 13 · OTH 8; Men: ALP 29 · L/NP 22 · ON 33 · GRN 8 · OTH 8. location – Inner metro: ALP 35 · L/NP 23 · ON 21 · GRN 12 · OTH 9; Outer metro: ALP 27 · L/NP 23 · ON 34 · GRN 12 · OTH 4; Provincial: ALP 30 · L/NP 18 · ON 32 · GRN 10 · OTH 10; Rural: ALP 24 · L/NP 20 · ON 39 · GRN 6 · OTH 11. education – Below Year 12: ALP 21 · L/NP 26 · ON 44 · GRN 4 · OTH 5; Year 12: ALP 28 · L/NP 22 · ON 31 · GRN 12 · OTH 7; TAFE or trade: ALP 28 · L/NP 19 · ON 35 · GRN 9 · OTH 9; University: ALP 35 · L/NP 23 · ON 20 · GRN 13 · OTH 9. housing – Own outright: ALP 29 · L/NP 25 · ON 35 · GRN 5 · OTH 6; Mortgage: ALP 29 · L/NP 22 · ON 31 · GRN 11 · OTH 7; Renting and other: ALP 29 · L/NP 17 · ON 27 · GRN 16 · OTH 11. Sample 1,001. Fieldwork 27–30 Jul 2026.</description>
     </item>
     <item>
       <title>YouGov, 21–28 Jul 2026 – 2PP ALP 53 – L/NP 47</title>
       <link>https://www.news24.com.au/politics/australian-politics/labor-on-lowest-majoritywinning-vote-since-federation-as-voters-turn-on-major-parties-news24-pulse/news-story/30abb89ce081815670d1a05c4517f90e</link>
       <guid isPermaLink="false">auspol-tracker:2026-07-28|YouGov</guid>
       <pubDate>Tue, 28 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28, L/NP 22, GRN 13, ON 25, Ind/Oth 12. Two-party preferred: ALP 53 – L/NP 47. Sample 1,519. Fieldwork 21–28 Jul 2026.</description>
+      <description>Primary vote: ALP 28, L/NP 22, GRN 13, ON 25, Ind/Oth 12. Two-party preferred: ALP 53 – L/NP 47. Other two-party contests: ALP 56 – ON 44. Preferred PM: Albanese 43 – Taylor 37. Preferred PM, Albanese v Hanson: 52 – 37. Satisfaction: Albanese -17 net (38% approve, 55% disapprove); Taylor -16 net (33% approve, 49% disapprove). The vote by group (gender, age, generation, state, location, education, language, housing): gender – Men: ALP 29 · L/NP 24 · ON 28 · GRN 10 · OTH 9; Women: ALP 28 · L/NP 19 · ON 23 · GRN 15 · OTH 14. age – 18–34: ALP 31 · L/NP 13 · ON 15 · GRN 31 · OTH 10; 35–49: ALP 30 · L/NP 20 · ON 25 · GRN 10 · OTH 15; 50+: ALP 26 · L/NP 27 · ON 31 · GRN 5 · OTH 11. generation – Gen Z: ALP 31 · L/NP 12 · ON 11 · GRN 35 · OTH 11; Millennials: ALP 30 · L/NP 18 · ON 26 · GRN 14 · OTH 12; Gen X: ALP 27 · L/NP 26 · ON 26 · GRN 9 · OTH 13; Boomers: ALP 29 · L/NP 24 · ON 31 · GRN 3 · OTH 13; Silent: ALP 8 · L/NP 47 · ON 37 · GRN 1 · OTH 8. state – NSW: ALP 29 · L/NP 24 · ON 22 · GRN 11 · OTH 14; Vic: ALP 26 · L/NP 28 · ON 20 · GRN 16 · OTH 10; Qld: ALP 27 · L/NP 16 · ON 34 · GRN 12 · OTH 11; SA: ALP 39 · L/NP 11 · ON 28 · GRN 13 · OTH 9; WA: ALP 24 · L/NP 21 · ON 32 · GRN 12 · OTH 11; ACT/NT/Tas: ALP 37 · L/NP 14 · ON 15 · GRN 17 · OTH 18. location – Inner metro: ALP 33 · L/NP 23 · ON 16 · GRN 16 · OTH 12; Outer metro: ALP 32 · L/NP 20 · ON 27 · GRN 13 · OTH 8; Provincial: ALP 25 · L/NP 22 · ON 28 · GRN 14 · OTH 11; Rural: ALP 20 · L/NP 21 · ON 35 · GRN 7 · OTH 18. education – Year 12 or less: ALP 24 · L/NP 23 · ON 32 · GRN 11 · OTH 10; TAFE or college: ALP 30 · L/NP 19 · ON 28 · GRN 12 · OTH 11; University: ALP 33 · L/NP 22 · ON 14 · GRN 16 · OTH 14. language – Other language: ALP 35 · L/NP 20 · ON 12 · GRN 20 · OTH 13; English only: ALP 27 · L/NP 22 · ON 28 · GRN 12 · OTH 11. housing – Own outright: ALP 26 · L/NP 25 · ON 30 · GRN 5 · OTH 13; Mortgage: ALP 31 · L/NP 25 · ON 24 · GRN 11 · OTH 9; Renting: ALP 32 · L/NP 11 · ON 25 · GRN 16 · OTH 16. Where the 2025 vote has moved: 2025 ALP voters now: ALP 72 · L/NP 7 · ON 11 · GRN 6 · community-strong 1 · IND 2 · OTH 1. 2025 L/NP voters now: ALP 3 · L/NP 56 · ON 38 · GRN 0 · community-strong 1 · IND 1 · OTH 2. 2025 GRN voters now: ALP 10 · L/NP 3 · ON 3 · GRN 81 · community-strong 1 · IND 1 · OTH 1. 2025 ON voters now: ALP 2 · L/NP 1 · ON 89 · GRN 4 · community-strong 0 · IND 3 · OTH 1. 2025 IND voters now: ALP 6 · L/NP 8 · ON 14 · GRN 3 · community-strong 8 · IND 59 · OTH 2. 2025 OTH voters now: ALP 13 · L/NP 10 · ON 26 · GRN 2 · community-strong 0 · IND 3 · OTH 46. Sample 1,519. Fieldwork 21–28 Jul 2026.</description>
     </item>
     <item>
       <title>Essential, 22–27 Jul 2026 – 2PP ALP 48 – L/NP 47</title>
       <link>https://www.theguardian.com/australia-news/2026/jul/29/guardian-essential-poll-angus-taylors-approval-rating-crashes-and-one-nation-support-plateaus</link>
       <guid isPermaLink="false">auspol-tracker:2026-07-27|Essential</guid>
       <pubDate>Mon, 27 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 31, L/NP 22, GRN 12, ON 25, Ind/Oth 6. Two-party preferred: ALP 48 – L/NP 47. Sample 1,060. Fieldwork 22–27 Jul 2026.</description>
+      <description>Primary vote: ALP 31, L/NP 22, GRN 12, ON 25, Ind/Oth 6. Two-party preferred: ALP 48 – L/NP 47. Satisfaction: Albanese -14 net (38% approve, 52% disapprove); Taylor -11 net (33% approve, 44% disapprove). National direction: right direction 28% · wrong track 53% · unsure 19%. Sample 1,060. Fieldwork 22–27 Jul 2026.</description>
     </item>
     <item>
       <title>Roy Morgan, 20–26 Jul 2026 – 2PP ALP 54 – L/NP 46</title>
       <link>https://www.roymorgan.com/findings/10293-federal-voting-intention-july-27-2026</link>
       <guid isPermaLink="false">auspol-tracker:2026-07-26|Roy Morgan</guid>
       <pubDate>Sun, 26 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 27.5, L/NP 22, GRN 14, ON 25.5, Ind/Oth 11. Two-party preferred: ALP 54 – L/NP 46. Undecided 6%. Sample 1,643. Fieldwork 20–26 Jul 2026.</description>
+      <description>Primary vote: ALP 27.5, L/NP 22, GRN 14, ON 25.5, Ind/Oth 11. Two-party preferred: ALP 54 – L/NP 46. Undecided 6%. Other two-party contests: ALP 53.5 – ON 46.5. National direction: right direction 27% · wrong track 58% · unsure 15%. Sample 1,643. Fieldwork 20–26 Jul 2026.</description>
     </item>
     <item>
       <title>Spectre Strategy, 11–23 Jul 2026 – 2PP ALP 51 – L/NP 49</title>
       <link>https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026-lrxjw</link>
       <guid isPermaLink="false">auspol-tracker:2026-07-23|Spectre Strategy</guid>
       <pubDate>Thu, 23 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28, L/NP 23, GRN 12, ON 26, Ind/Oth 11. Two-party preferred: ALP 51 – L/NP 49. Sample 1,434. Fieldwork 11–23 Jul 2026.</description>
+      <description>Primary vote: ALP 28, L/NP 23, GRN 12, ON 26, Ind/Oth 11. Two-party preferred: ALP 51 – L/NP 49. Other two-party contests: ALP 54 – ON 46. Satisfaction: Albanese -14 net (33% approve, 47% disapprove); Taylor -7 net (26% approve, 33% disapprove); Hanson -1 net (41% approve, 42% disapprove). National direction: right direction 29% · wrong track 57% · unsure 14%. Sample 1,434. Fieldwork 11–23 Jul 2026.</description>
     </item>
     <item>
       <title>Roy Morgan, 13–19 Jul 2026 – 2PP ALP 56 – L/NP 44</title>
       <link>https://www.roymorgan.com/findings/10291-federal-voting-intention-july-20-2026</link>
       <guid isPermaLink="false">auspol-tracker:2026-07-19|Roy Morgan</guid>
       <pubDate>Sun, 19 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 27.5, L/NP 23, GRN 14, ON 22.5, Ind/Oth 13. Two-party preferred: ALP 56 – L/NP 44. Undecided 5%. Sample 1,679. Fieldwork 13–19 Jul 2026.</description>
+      <description>Primary vote: ALP 27.5, L/NP 23, GRN 14, ON 22.5, Ind/Oth 13. Two-party preferred: ALP 56 – L/NP 44. Undecided 5%. Other two-party contests: ALP 55 – ON 45. National direction: right direction 26% · wrong track 59.5% · unsure 14.5%. Sample 1,679. Fieldwork 13–19 Jul 2026.</description>
     </item>
     <item>
       <title>Newspoll, 13–16 Jul 2026 – ALP 30, L/NP 19, GRN 12, ON 30, Ind/Oth 9</title>
       <link>https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hanson-regains-ground-and-liberals-rise-as-labor-falls-to-equal-lowest-point-since-2022/news-story/da8374ff67e3769478b13867909a1074</link>
       <guid isPermaLink="false">auspol-tracker:2026-07-16|Newspoll</guid>
       <pubDate>Thu, 16 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 30, L/NP 19, GRN 12, ON 30, Ind/Oth 9. No two-party figure published. Sample 1,238. Fieldwork 13–16 Jul 2026.</description>
+      <description>Primary vote: ALP 30, L/NP 19, GRN 12, ON 30, Ind/Oth 9. No two-party figure published. Preferred PM: Albanese 46 – Taylor 22. Satisfaction: Albanese -18 net (39% approve, 57% disapprove); Taylor -21 net (30% approve, 51% disapprove); Hanson +0 net (47% approve, 47% disapprove). Sample 1,238. Fieldwork 13–16 Jul 2026.</description>
+    </item>
+    <item>
+      <title>Ipsos, 3–14 Jul 2026 – the issues</title>
+      <link>https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-08/IM_Nat_Jul_26_v2.pdf</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-14|Ipsos</guid>
+      <pubDate>Tue, 14 Jul 2026 12:00:00 GMT</pubDate>
+      <description>The issues, what voters say matters: Cost of living: 65% in the top three; Housing: 43% in the top three; Economic management: 24% in the top three; Crime: 24% in the top three; Health: 23% in the top three; Immigration: 20% in the top three; Poverty: 14% in the top three; Petrol prices: 14% in the top three; Tax: 11% in the top three; The environment: 10% in the top three; Population: 9% in the top three; Unemployment: 9% in the top three; Personal debt: 7% in the top three; Racism: 6% in the top three; Drug and alcohol abuse: 5% in the top three; National security: 5% in the top three; Education: 5% in the top three; Transport: 4% in the top three; Indigenous affairs: 2% in the top three. And the party voters see as best on each: Cost of living: L/NP 18% · ALP 28% · GRN 7% · ON 16% · other 3% · unsure 19% · neither 10%; Housing: L/NP 13% · ALP 27% · GRN 8% · ON 16% · other 3% · unsure 22% · neither 11%; Economic management: L/NP 19% · ALP 30% · GRN 6% · ON 15% · other 3% · unsure 19% · neither 7%; Crime: L/NP 16% · ALP 26% · GRN 7% · ON 19% · other 3% · unsure 21% · neither 9%; Health: L/NP 15% · ALP 33% · GRN 9% · ON 13% · other 2% · unsure 21% · neither 7%. Sample 1,001. Fieldwork 3–14 Jul 2026.</description>
     </item>
     <item>
       <title>YouGov, 7–14 Jul 2026 – 2PP ALP 53 – L/NP 47</title>
       <link>https://www.skynews.com.au/australia-news/politics/pauline-hansons-monoculture-call-sees-one-nation-support-slide-as-labor-regains-poll-lead-in-sky-news-pulse/news-story/ff02004ef7e9634e18b54b227fba984b</link>
       <guid isPermaLink="false">auspol-tracker:2026-07-14|YouGov</guid>
       <pubDate>Tue, 14 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28, L/NP 20, GRN 12, ON 26, Ind/Oth 14. Two-party preferred: ALP 53 – L/NP 47. Sample 1,468. Fieldwork 7–14 Jul 2026.</description>
+      <description>Primary vote: ALP 28, L/NP 20, GRN 12, ON 26, Ind/Oth 14. Two-party preferred: ALP 53 – L/NP 47. Other two-party contests: ALP 56 – ON 44. Preferred PM: Albanese 45 – Taylor 34. Preferred PM, Albanese v Hanson: 54 – 35. Satisfaction: Albanese -18 net (38% approve, 56% disapprove); Taylor -16 net (33% approve, 49% disapprove). The vote by group (gender, age, generation, state, location, education, language, housing): gender – Men: ALP 31 · L/NP 19 · ON 29 · GRN 8 · OTH 13; Women: ALP 26 · L/NP 20 · ON 24 · GRN 16 · OTH 14. age – 18–34: ALP 27 · L/NP 12 · ON 17 · GRN 28 · OTH 17; 35–49: ALP 31 · L/NP 19 · ON 25 · GRN 12 · OTH 14; 50+: ALP 27 · L/NP 25 · ON 32 · GRN 4 · OTH 12. generation – Gen Z: ALP 24 · L/NP 9 · ON 14 · GRN 35 · OTH 18; Millennials: ALP 29 · L/NP 17 · ON 25 · GRN 13 · OTH 15; Gen X: ALP 28 · L/NP 21 · ON 30 · GRN 6 · OTH 15; Boomers: ALP 30 · L/NP 27 · ON 30 · GRN 3 · OTH 10; Silent: ALP 17 · L/NP 29 · ON 46 · GRN 6 · OTH 2. state – NSW: ALP 26 · L/NP 20 · ON 27 · GRN 11 · OTH 16; Vic: ALP 30 · L/NP 22 · ON 25 · GRN 10 · OTH 13; Qld: ALP 27 · L/NP 23 · ON 27 · GRN 10 · OTH 14; SA: ALP 32 · L/NP 8 · ON 28 · GRN 20 · OTH 12; WA: ALP 30 · L/NP 16 · ON 29 · GRN 15 · OTH 10; ACT/NT/Tas: ALP 25 · L/NP 23 · ON 15 · GRN 16 · OTH 22. location – Inner metro: ALP 32 · L/NP 20 · ON 19 · GRN 16 · OTH 12; Outer metro: ALP 29 · L/NP 19 · ON 27 · GRN 11 · OTH 15; Provincial: ALP 26 · L/NP 21 · ON 30 · GRN 6 · OTH 17; Rural: ALP 22 · L/NP 21 · ON 32 · GRN 11 · OTH 14. education – Year 12 or less: ALP 26 · L/NP 20 · ON 30 · GRN 12 · OTH 12; TAFE or college: ALP 24 · L/NP 17 · ON 30 · GRN 12 · OTH 17; University: ALP 35 · L/NP 23 · ON 17 · GRN 13 · OTH 12. language – Other language: ALP 30 · L/NP 20 · ON 18 · GRN 16 · OTH 16; English only: ALP 28 · L/NP 20 · ON 28 · GRN 11 · OTH 14. housing – Own outright: ALP 27 · L/NP 30 · ON 28 · GRN 4 · OTH 10; Mortgage: ALP 29 · L/NP 22 · ON 30 · GRN 6 · OTH 13; Renting: ALP 30 · L/NP 10 · ON 24 · GRN 19 · OTH 17. Where the 2025 vote has moved: 2025 ALP voters now: ALP 68 · L/NP 6 · ON 15 · GRN 5 · IND 4 · OTH 2 · community-strong 1. 2025 L/NP voters now: ALP 6 · L/NP 54 · ON 38 · GRN 0 · IND 1 · OTH 1 · community-strong 0. 2025 GRN voters now: ALP 9 · L/NP 5 · ON 3 · GRN 75 · IND 4 · OTH 1 · community-strong 3. 2025 ON voters now: ALP 3 · L/NP 0 · ON 91 · GRN 0 · IND 1 · OTH 3 · community-strong 2. 2025 IND voters now: ALP 14 · L/NP 6 · ON 9 · GRN 2 · IND 57 · OTH 5 · community-strong 7. 2025 OTH voters now: ALP 5 · L/NP 1 · ON 29 · GRN 3 · IND 3 · OTH 58 · community-strong 1. Sample 1,468. Fieldwork 7–14 Jul 2026.</description>
+    </item>
+    <item>
+      <title>SEC Newgate, 2–13 Jul 2026 – Right 32 · Wrong track 68</title>
+      <link>https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-july-2026/</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-13|SEC Newgate</guid>
+      <pubDate>Mon, 13 Jul 2026 12:00:00 GMT</pubDate>
+      <description>National direction: right direction 32% · wrong track 68% · unsure 0%. And the party voters see as best on each: Cost of living: ALP 24% · L/NP 14% · ON 23% · GRN 10% · other 29%. Sample 1,975. Fieldwork 2–13 Jul 2026.</description>
+    </item>
+    <item>
+      <title>Resolve, 12 Jul 2026 – the vote by group</title>
+      <link>https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-12|Resolve</guid>
+      <pubDate>Sun, 12 Jul 2026 12:00:00 GMT</pubDate>
+      <description>The vote by group (age, gender, state): age – 18–34: L/NP 22.9 · ALP 29.4 · GRN 21.2 · ON 18.1 · OTH 8.5; 35–54: L/NP 19.3 · ALP 32.1 · GRN 10.8 · ON 27 · OTH 10.8; 55+: L/NP 26.7 · ALP 24.5 · GRN 4.9 · ON 31.6 · OTH 12.4. gender – Men: L/NP 24 · ALP 29.9 · GRN 8.4 · ON 27 · OTH 10.6; Women: L/NP 22.3 · ALP 26.9 · GRN 14.5 · ON 25.5 · OTH 10.9. state – NSW: L/NP 23.1 · ALP 26.9 · GRN 10 · ON 30.9 · OTH 9.1; Vic: L/NP 24.9 · ALP 26.6 · GRN 13.4 · ON 24.4 · OTH 10.8; Qld: L/NP 23.8 · ALP 25.6 · GRN 10.9 · ON 25.6 · OTH 14.1; Rest of Australia: L/NP 20.5 · ALP 35.2 · GRN 12.1 · ON 22 · OTH 10.2. Fieldwork 12 Jul 2026.</description>
     </item>
     <item>
       <title>Roy Morgan, 6–12 Jul 2026 – 2PP ALP 54 – L/NP 46</title>
       <link>https://www.roymorgan.com/findings/10283-federal-voting-intention-july-13-2026</link>
       <guid isPermaLink="false">auspol-tracker:2026-07-12|Roy Morgan</guid>
       <pubDate>Sun, 12 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 27.5, L/NP 20, GRN 12.5, ON 28, Ind/Oth 12. Two-party preferred: ALP 54 – L/NP 46. Undecided 6.5%. Sample 1,612. Fieldwork 6–12 Jul 2026.</description>
+      <description>Primary vote: ALP 27.5, L/NP 20, GRN 12.5, ON 28, Ind/Oth 12. Two-party preferred: ALP 54 – L/NP 46. Undecided 6.5%. Other two-party contests: ALP 52.5 – ON 47.5. National direction: right direction 23.5% · wrong track 62.5% · unsure 14%. Sample 1,612. Fieldwork 6–12 Jul 2026.</description>
     </item>
     <item>
       <title>DemosAU (MRP), 27 May – 11 Jul 2026 – ALP 26, L/NP 21, GRN 13, ON 30, Ind/Oth 10</title>
@@ -237,55 +286,6 @@
       <guid isPermaLink="false">auspol-tracker:2026-07-11|DemosAU (MRP)</guid>
       <pubDate>Sat, 11 Jul 2026 12:00:00 GMT</pubDate>
       <description>Primary vote: ALP 26, L/NP 21, GRN 13, ON 30, Ind/Oth 10. No two-party figure published. Sample 9,343. Fieldwork 27 May – 11 Jul 2026.</description>
-    </item>
-    <item>
-      <title>Resolve, 6–11 Jul 2026 – ALP 28, L/NP 23, GRN 12, ON 26, Ind/Oth 11</title>
-      <link>https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html</link>
-      <guid isPermaLink="false">auspol-tracker:2026-07-11|Resolve</guid>
-      <pubDate>Sat, 11 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28, L/NP 23, GRN 12, ON 26, Ind/Oth 11. No two-party figure published. Sample 2,252. Fieldwork 6–11 Jul 2026.</description>
-    </item>
-    <item>
-      <title>DemosAU, 3–8 Jul 2026 – ALP 26, L/NP 21, GRN 14, ON 29, Ind/Oth 10</title>
-      <link>https://www.capitalbrief.com/newsletter/pauline-hansons-agenda-takes-a-hit-in-new-poll-701d8498-f9f1-43f6-ab7c-dd8d236dfa78/</link>
-      <guid isPermaLink="false">auspol-tracker:2026-07-08|DemosAU</guid>
-      <pubDate>Wed, 08 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 26, L/NP 21, GRN 14, ON 29, Ind/Oth 10. No two-party figure published. Sample 2,694. Fieldwork 3–8 Jul 2026.</description>
-    </item>
-    <item>
-      <title>Roy Morgan, 28 Jun – 5 Jul 2026 – 2PP ALP 55 – L/NP 45</title>
-      <link>https://www.roymorgan.com/findings/10276-federal-voting-intention-july-6-2026</link>
-      <guid isPermaLink="false">auspol-tracker:2026-07-05|Roy Morgan</guid>
-      <pubDate>Sun, 05 Jul 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28, L/NP 21.5, GRN 14, ON 22.5, Ind/Oth 14. Two-party preferred: ALP 55 – L/NP 45. Undecided 5%. Sample 1,584. Fieldwork 28 Jun – 5 Jul 2026.</description>
-    </item>
-    <item>
-      <title>YouGov, 23–30 Jun 2026 – 2PP ALP 54 – L/NP 46</title>
-      <link>https://www.skynews.com.au/australia-news/politics/one-nation-records-historic-result-in-latest-poll-since-hansons-monoculture-call-despite-albanese-rejecting-it-as-nonsense/news-story/3ecdbeb123199de72a7c12b4fb9efbd2</link>
-      <guid isPermaLink="false">auspol-tracker:2026-06-30|YouGov</guid>
-      <pubDate>Tue, 30 Jun 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 29, L/NP 17, GRN 13, ON 30, Ind/Oth 11. Two-party preferred: ALP 54 – L/NP 46. Sample 1,502. Fieldwork 23–30 Jun 2026.</description>
-    </item>
-    <item>
-      <title>Essential, 24–29 Jun 2026 – 2PP ALP 46 – L/NP 48</title>
-      <link>https://www.theguardian.com/australia-news/2026/jun/30/guardian-essential-poll-voters-reject-key-one-nation-policies-as-support-drops</link>
-      <guid isPermaLink="false">auspol-tracker:2026-06-29|Essential</guid>
-      <pubDate>Mon, 29 Jun 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 30, L/NP 23, GRN 10, ON 26, Ind/Oth 10. Two-party preferred: ALP 46 – L/NP 48. Sample 1,017. Fieldwork 24–29 Jun 2026.</description>
-    </item>
-    <item>
-      <title>Roy Morgan, 22–28 Jun 2026 – 2PP ALP 53.5 – L/NP 46.5</title>
-      <link>https://www.roymorgan.com/findings/10266-federal-voting-intention-june-29-2026</link>
-      <guid isPermaLink="false">auspol-tracker:2026-06-28|Roy Morgan</guid>
-      <pubDate>Sun, 28 Jun 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28, L/NP 21.5, GRN 13, ON 26, Ind/Oth 11.5. Two-party preferred: ALP 53.5 – L/NP 46.5. Undecided 6.5%. Sample 1,639. Fieldwork 22–28 Jun 2026.</description>
-    </item>
-    <item>
-      <title>RedBridge/Accent, 22–26 Jun 2026 – 2PP ALP 54 – L/NP 46</title>
-      <link>https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9</link>
-      <guid isPermaLink="false">auspol-tracker:2026-06-26|RedBridge/Accent</guid>
-      <pubDate>Fri, 26 Jun 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 30, L/NP 18, GRN 14, ON 29, Ind/Oth 9. Two-party preferred: ALP 54 – L/NP 46. Sample 1,006. Fieldwork 22–26 Jun 2026.</description>
     </item>
   </channel>
 </rss>
