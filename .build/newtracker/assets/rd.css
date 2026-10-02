@@ -696,18 +696,26 @@ body.rd .rd-pl-ticks > span {
 body.rd .rd-pl-ticks > span.today { font-weight: 600; color: var(--ink); }
 body.rd .rd-pl-prim { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 4px; font-size: 15px; font-weight: 600; }
 body.rd .rd-pl-primh { font-size: 12px; letter-spacing: 0.02em; }
-/* half-point houses (Roy Morgan) print x.5 next to whole figures; the row's
-   cells are fixed-width, so the full-size decimal makes every other column
-   gap a suffix-width wider and the row's rhythm stutters — the half casts as
-   one ½ glyph (already a one-on-two superscript form) in a small suffix.
-   IBM Plex Sans advances U+00BD at ~0.86em, so the half leaves the base
-   11px/10px suffix rung for its own 9.5px/8.5px one, keeping its ink
-   (8.2px/7.3px) under the ".5" pair it replaced (8.25px/7.5px); it also
-   clears a near-wrapping 4-char figure from the phone rung's ~27px cells */
+/* half-point houses (Roy Morgan) print x.5 beside whole figures; an IN-FLOW
+   suffix of any size shifts the figure inside the fixed-width lattice —
+   desktop rows stutter their ink gaps and the phone's right-aligned figs
+   walk the whole column's integers 7.3px sideways (user catch 2026-10-02).
+   The half instead casts as one ½ glyph (a one-on-two superscript form)
+   absolutely positioned beside the integer's top, OUT of flow: the integer
+   alone sets the layout, so every poll's primaries run straight down the
+   column and the near-wrapping 4-char phone figure can never return.
+   U+00BD advances ~0.86em in IBM Plex Sans, so the half runs its own
+   9.5px/8.5px rung to keep its ink (8.2px/7.3px) under the ".5" pair it
+   replaced; any non-.5 decimal keeps a plain in-flow ".x" suffix below. */
 body.rd .rd-pl-prim .rd-pl-frac { font-size: 11px; }
 @media (max-width: 900px) { body.rd .rd-pl-prim .rd-pl-frac { font-size: 10px; } }
-body.rd .rd-pl-prim .rd-pl-half { font-size: 9.5px; }
-@media (max-width: 900px) { body.rd .rd-pl-prim .rd-pl-half { font-size: 8.5px; } }
+body.rd .rd-pl-prim .rd-pl-halfwrap { position: relative; display: inline-block; }
+body.rd .rd-pl-prim .rd-pl-half {
+  position: absolute; left: 100%; bottom: 0.85em;
+  padding-left: 1.5px; line-height: 1; white-space: nowrap;
+  font-size: 9.5px;
+}
+@media (max-width: 900px) { body.rd .rd-pl-prim .rd-pl-half { font-size: 8.5px; padding-left: 1px; } }
 body.rd .rd-pl-item { border-bottom: 1px solid var(--line); }
 body.rd .rd-pl-row { padding: 0 8px; min-height: 64px; cursor: pointer; }
 body.rd .rd-pl-row:hover { background: var(--surface-2); }

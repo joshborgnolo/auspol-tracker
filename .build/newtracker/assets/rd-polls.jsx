@@ -171,8 +171,8 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
         if (v == null) return "—";
         const [i, f] = (+v).toFixed(1).split(".");
         if (f === "0") return i;
-        const half = f === "5";
-        return <>{i}<b className={half ? "rd-pl-frac rd-pl-half" : "rd-pl-frac"}>{half ? "½" : "." + f}</b></>;
+        if (f === "5") return <span className="rd-pl-halfwrap">{i}<b className="rd-pl-frac rd-pl-half">½</b></span>;
+        return <>{i}<b className="rd-pl-frac">{"." + f}</b></>;
       };
       return (
         <div className="rd-pl-prim">
