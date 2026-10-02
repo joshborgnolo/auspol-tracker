@@ -1,13 +1,22 @@
 ---
 name: auspol-satellite-page-branding
-description: auspol-tracker — pages outside the main build (/preference-flows/, /prediction/, /atlas/, /feedback/, the /archives/* five; redirect stubs aside). CURRENT RECIPE (user request, 2026-09-24): every satellite carries the SITE SHELL from .build/site-shell.mjs – the EXACT main-page masthead (wordmark lockup shellCopy'd from template.html's brand CSS + a LIVE dial glyph swapped in by site-shell.js off /assets/auspol-now.json's dial spec, lockup linking /#story to open the DialStory overlay on the main page), the FOUR-VIEW tab bar (Snapshot/Past cycles/All polls/Info – the Archives link was REMOVED from both navbars), the colour-theme switch (shares localStorage auspol.tweaks with the main page), the live 2PP (auspol-now.json), the main colophon and tide band – written between <!--shell:…--> markers by node .build/site-shell.mjs and by every satellite generator (applyShell before write). build.mjs publishes assets/site-shell.css|js, auspol-now.json, masthead-dial.svg and tile-art(-dark).svg each build and warns on drift; npm test fails on it (test-site-shell.mjs). /prediction/ and /atlas/ carry the shell but must stay UNLINKED (user: 'they're not very good'). The 2026-09-03 no-masthead/no-glyph/.ss-back recipe below is SUPERSEDED. Still true: sitemap ARCHIVE_STAMP trap, the archives' own tab strip homes, favicon link, font hashes, curly apostrophes.
+description: auspol-tracker — pages outside the main build (/preference-flows/, /prediction/, /atlas/, /feedback/, the /archives/* five; redirect stubs aside). CURRENT RECIPE (user requests 2026-09-24 + 2026-10-02): every satellite carries the SITE SHELL from .build/site-shell.mjs – the CURRENT (rd-redesign) main-page masthead replicated: the split lockup (wordmark <a href=/> beside a dial-only <a class=wm-glyph href=/#story> contour ellipse, 34px wordmark / 57px dial, no hover wash – see auspol-masthead-glyph-player) shellCopy'd from template.html's brand CSS + a LIVE dial swapped in by site-shell.js off /assets/auspol-now.json's dial spec, the rd three-fact status block + phone compact line (filled off auspol-now.json's latest.fact/factUrl), the rd sans FOUR-VIEW tab bar (Snapshot/Past cycles/All polls/Info – the Archives link was REMOVED from both navbars), the colour-theme switch (shares localStorage auspol.tweaks with the main page), the live 2PP (auspol-now.json), the main colophon and tide band – written between <!--shell:…--> markers by node .build/site-shell.mjs and by every satellite generator (applyShell before write). build.mjs publishes assets/site-shell.css|js, auspol-now.json, masthead-dial.svg and tile-art(-dark).svg each build and warns on drift; npm test fails on it (test-site-shell.mjs). /prediction/ and /atlas/ carry the shell but must stay UNLINKED (user: 'they're not very good'). The 2026-09-03 no-masthead/no-glyph/.ss-back recipe below is SUPERSEDED. Still true: sitemap ARCHIVE_STAMP trap, the archives' own tab strip homes, favicon link, font hashes, curly apostrophes.
 source: auto-skill
 extracted_at: '2026-09-03T00:00:00.000Z'
 ---
 
 # auspol-tracker: standalone satellite pages + brand reproduction
 
-## CURRENT (2026-09-24): the site shell – every satellite joins the site
+## CURRENT (2026-09-24, reskinned 2026-10-02): the site shell – every satellite joins the site
+
+Skin update 2026-10-02: the user asked the satellites integrated with the
+then-new rd redesign ("particularly the mast head and whatever other elements
+you feel appropriate"), so the 09-24 shell's old-likeness chrome was replaced
+by the redesign's – the split wordmark/dial lockup at the rd sizes, the
+three-fact status block + phone compact line, the rd sans tab row (active
+600 over a 2px square underline, pinned scale 0.85), the rd docked score and
+ticker spacing. The machinery below (shellCopy channels, applyShell markers,
+theme, lives) is unchanged; only what the channels carry moved.
 
 The user found the satellites "very separate, which makes the site seem less
 well-executed", and asked for every suggestion made to fix it, except that
@@ -68,15 +77,26 @@ is one and the same", extended to all satellites). Four wiring channels:
   settle→h, needle rotate 0→nd after a double-rAF, skipped under
   prefers-reduced-motion) and the parts take var() strokes, following the
   page's theme exactly as the main page's does.
-- **Story link** – the satellite lockup is `<a class="wm-glyph"
-  href="/#story">`; the main page's Header (73de0c58 asset, after the
-  `window.AP.openStatic` effect) eats hash `#story` on mount into openStory()
-  and clears the hash, so the click lands in the same overlay. NOTE
-  (2026-09-29): the MAIN masthead no longer shares this structure — its story
-  player is a DIAL-ONLY `button.wm-glyph` (border-radius 50%) beside a
-  text-only h1 inside a `.lockup` flex row; the satellites deliberately keep
-  the whole-lockup anchor. See auspol-masthead-glyph-player before touching
-  either side, and before trusting the parity probe's byte-identical check.
+- **Story link** – since 2026-10-02 the satellite lockup is split exactly as
+  the main page's, differing only in element KIND (the satellite page's own
+  title keeps the `<h1>`): a text-only `<a class="wordmark stacked" href="/">`
+  beside `<a class="wm-glyph" href="/#story">` wrapping just the dial, inside
+  a `.sh-lockup` flex row. The main page's Header (73de0c58 asset) eats hash
+  `#story` on mount into openStory() and clears the hash, so the dial click
+  lands in the same overlay. Reader: auspol-masthead-glyph-player — the
+  2026-09-29 two-structure split it once documented is SUPERSEDED by this
+  reunification.
+- **Status block + phone compact** – shellHeader also emits the redesign's
+  `.sh-meta` three facts with notes (Latest poll "published N ago" · This
+  term "N polls / N pollsters" · Next election day, "N months at most" — the
+  months derive from nextElectionDue with the regex escaped `\\d…` inside
+  shellJs()'s TEMPLATE LITERAL, double backslashes or they vanish in the
+  built file) and the phone-only `.sh-head-compact` ("Latest poll <fact>,
+  <rel>, N polls"). All filled off auspol-now.json's `latest` — build.mjs's
+  shellNow supplies `fact`/`factUrl` (the newest pollsterTable row by
+  pubSort desc, releaseUrl||url, exactly the main page's rdLatest pick) so a
+  satellite ages correctly between builds. Desktop the fact links to the
+  release as `a.mh-latest` (target _blank rel noreferrer).
 - **Ink-width squaring** – the wordmark aligns auspol/tracker by MEASURED ink
   width: site-shell.js runs the same letter-spacing align on load +
   document.fonts.ready.
@@ -94,17 +114,18 @@ out of template.html). The Info glossary's implied-2PP and preference-flows
 entries link /preference-flows/.
 
 **Verify**: add `.matilda/probe/masthead-parity.mjs` to the probes below. Since
-the 2026-09-29 two-structure split (see auto-skill-auspol-masthead-glyph-player)
-it asserts parity on the PARTS, never the wrapper (the wrappers differ on
-purpose): one inline `svg.wm-dial` at 57px (looked up at document scope – the
-dial sits INSIDE `.wordmark` on satellites, beside it in `.lockup` on the main
-page), wordmark face + weights + ink-width squaring, per-part colours,
-graduation heights, needle angle within 1e-3 rad (each page is sampled
-mid-settle, so matrices are never string-equal), no Archives link on EITHER
-navbar, and /#story opening the `.dl-backdrop` overlay. The wordmark SIZE is
-deliberately split too – main 34px (rd.css:402, 32px on the narrow rung) vs
-shell 30px – and the probe pins exactly that pair. Two older probe traps still
-apply: the main page's React puts stroke-dasharray in the STYLE attribute (read
+the 2026-10-02 reunification onto the rd design it asserts parity on structure
+AND parts: `.lockup` ≈ `.sh-lockup` split lockups (wordmark 34px desktop / 32px
+phone and dial 57px / 54px IDENTICAL both sides, borderRadius 50%, hover
+background transparent both sides), wordmark face + weights + ink-width
+squaring + track ink, per-part dial colours, graduation heights, needle angle
+within 1e-3 rad (each page is sampled mid-settle, so matrices are never
+string-equal), the `.sh-meta` three notes and the phone `.sh-head-compact`
+naming the newest poll, tab-row type parity (read the main nav via
+`.tabs-set .tab .tab-label` – a bare `.tabs .tab` also matches inner facet
+tabs and fails falsely), no Archives link on EITHER navbar, and /#story
+opening the `.dl-backdrop` overlay. Two probe traps still apply: the main
+page's React puts stroke-dasharray in the STYLE attribute (read
 `el.style.strokeDasharray` first, and inline style serialises comma-separated
 so normalise commas). The Newspoll archive's Infogram embed stalls the load
 event past 30s – navigate with waitUntil "domcontentloaded".
