@@ -65,48 +65,61 @@
 }
 .sh-skip:focus { top: 12px; }
 
-/* masthead: the lockup left, the switch right (.site-head). The lockup is
-   the main page's own rules, lifted verbatim from its template (shell-copy
-   markers) – one definition for both. */
+/* masthead: the main page's current one (rd.css's masthead section) –
+   no rule under it (the tab row carries the page's first), the status
+   block of three facts with their notes under them at the right. The
+   lockup's shared rules are lifted from the template's shell-copy:brand
+   markers; the split, the sizes and the dial's ellipse are the current
+   design's, mirrored in the rules after it. */
 .sh-head {
   position: relative;
-  display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap;
-  padding-bottom: 16px; border-bottom: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 28px; flex-wrap: wrap;
+  margin-bottom: 16px;
 }
-/* the tagline and the meta beside it (.tagline, .head-right, .head-meta):
-   the same sentence and the same three figures the main page carries, off
-   auspol-now.json – so every page opens on the same masthead */
+/* the lockup row (.lockup): wordmark alone (its link is the satellite's
+   way home), the dial alone beside it */
+.sh-lockup { display: flex; align-items: center; gap: 12px; }
+a.wordmark { text-decoration: none; }
 .sh-tagline {
-  margin: 7px 0 -1.5px; font-family: "Crimson Text", var(--serif); font-weight: 400;
-  font-size: 15px; line-height: 1.5; color: var(--ink-3); text-wrap: balance;
+  margin: 10px 0 0; max-width: 440px;
+  font-family: "Crimson Text", var(--serif); font-weight: 400;
+  font-size: 16px; line-height: 1.45; color: var(--ink-2); text-wrap: pretty;
 }
-.sh-meta-compact { display: none; }
-.sh-right { display: flex; align-items: center; gap: 18px; }
-.sh-meta { display: flex; align-items: center; gap: 18px; font-family: var(--sans); line-height: 1.5; }
+.sh-head-compact { display: none; }
+.sh-head a.mh-latest { color: inherit; text-decoration: none; }
+.sh-head a.mh-latest:hover { text-decoration: underline; text-underline-offset: 3px; }
+.sh-right { display: flex; align-items: flex-start; gap: 28px; padding-top: 4px; }
+.sh-meta { display: flex; align-items: stretch; gap: 24px; font-family: var(--sans); line-height: 1.5; }
 .sh-meta[hidden] { display: none; }
-.sh-meta-item { display: flex; flex-direction: column; gap: 2px; }
-.sh-meta-k { font-size: 13px; color: var(--ink-3); font-weight: 600; white-space: nowrap; letter-spacing: 0.02em; }
-.sh-meta-v { font-size: 14px; color: var(--ink); font-weight: 600; white-space: nowrap; }
+.sh-meta-item { display: flex; flex-direction: column; gap: 3px; }
+.sh-meta-k { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-3); white-space: nowrap; }
+.sh-meta-v { font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; display: inline-flex; align-items: center; }
+.sh-meta-s { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 .sh-fresh-dot {
   display: inline-block; vertical-align: middle; position: relative; top: -1px;
   width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; background: var(--ink-3);
 }
 .sh-fresh-dot.fresh { background: var(--sh-mood-pos); }
 .sh-fresh-dot.stale { background: var(--sh-mood-neg); }
-.sh-fresh-rel { margin-left: 6px; color: var(--ink-3); font-weight: 500; }
-.sh-meta-divide { width: 1px; height: 30px; background: var(--line); }
+.sh-meta-divide { width: 1px; height: auto; align-self: stretch; background: var(--line); }
 @media (max-width: 900px) { .sh-meta { gap: 12px; } }
-@media (max-width: 560px) {
-  /* as the main page's phone masthead: the meta gives way to one compact
-     freshness line, and the switch pins to the lockup's corner */
+@media (max-width: 640px) {
+  /* the main page's phone masthead: the status block gives way to one
+     compact line that names the newest poll, the lockup a size down */
   .sh-meta { display: none; }
-  .sh-meta-compact:not([hidden]) {
-    display: flex; align-items: center; gap: 8px; margin: 9px 0 0;
+  .sh-head-compact:not([hidden]) {
+    display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin: 10px 0 0;
     font-family: var(--sans); font-size: 13px; line-height: 1.5; color: var(--ink-3); font-variant-numeric: tabular-nums;
   }
-  .sh-meta-compact .sh-fresh-dot { margin-right: 0; width: 6px; height: 6px; top: 0; }
+  .sh-head-compact b { font-weight: 600; color: var(--ink); }
+  .sh-head-compact .sh-fresh-dot { margin: 0; flex-shrink: 0; position: relative; top: -1px; width: 6px; height: 6px; }
+  .sh-tagline { margin-top: 12px; }
+}
+@media (max-width: 560px) {
+  /* the switch pins to the header corner as the main page's does, and the
+     lockup row holds the 92px clearance so it can't sit on the dial */
   .sh-head { flex-direction: column; align-items: flex-start; gap: 13px; }
-  .sh-head .wordmark { padding-right: 92px; }
+  .sh-head .sh-lockup { padding-right: 92px; }
   .sh-right { display: contents; }
   .sh-theme { position: absolute; top: 0; right: 0; }
 }
@@ -188,9 +201,24 @@
 .wm-glyph:hover { background: color-mix(in oklch, var(--ink) 6%, transparent); transform: scale(1.06); }
 .wm-glyph:active { transform: scale(0.97); }
 .wm-glyph:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
+/* the current masthead's sizes over shell-copy:brand's, and the dial's
+   ellipse – the contour the main page's button grew, the satellites' worn
+   on an anchor: no hover wash (a shape clipped to an ellipse reads as an
+   outline), the scale alone answers the pointer */
+.wordmark { font-size: 34px; }
+.wm-name { font-size: 34px; }
+.wordmark.stacked .wm-track { font-size: 34px; color: var(--ink-2); }
+a.wm-glyph { border-radius: 50%; -webkit-tap-highlight-color: transparent; }
+a.wm-glyph:hover { background: transparent; }
 /* the stand-in the page first paints, swapped for the live inline dial the
    moment auspol-now.json lands – same box the masthead's svg takes */
 .wm-dial-img { display: block; overflow: visible; }
+@media (max-width: 640px) {
+  .wordmark { font-size: 32px; }
+  .wm-name { font-size: 32px; }
+  .wordmark.stacked .wm-track { font-size: 32px; }
+  .wm-dial-img, .sh-lockup svg.wm-dial { width: 54px; height: 37.6px; }
+}
 @media (prefers-reduced-motion: reduce) { .wm-glyph, .wm-glyph:hover, .wm-glyph:active { transition: none; transform: none; } }
 .wordmark.stacked .wm-glyph { align-self: center; }
 .wm-dial { display: block; overflow: visible; }
@@ -263,21 +291,21 @@ body { height: auto; }
   container-type: inline-size;
 }
 .sh-tabs-set {
-  display: flex; gap: 30px; align-items: flex-end;
+  display: flex; gap: 28px; align-items: flex-end;
   transform-origin: left bottom;
   transition: transform .38s cubic-bezier(.22, 1, .36, 1);
 }
-.sh-tabs.pinned .sh-tabs-set { transform: scale(0.789); }   /* 19px → 15px, the main page's pin */
+.sh-tabs.pinned .sh-tabs-set { transform: scale(0.85); }   /* the main page's pin (rd.css) */
 .sh-tab {
-  position: relative; padding: 12px 1px; white-space: nowrap; text-decoration: none;
-  font-family: "Crimson Text", var(--serif); font-weight: 600; font-size: 19px; line-height: 23.5px;
-  letter-spacing: -0.01em; color: var(--ink-3); transition: color .15s ease;
+  position: relative; padding: 12px 2px 13px; white-space: nowrap; text-decoration: none;
+  font-family: var(--sans); font-weight: 400; font-size: 16px; line-height: 20px;
+  letter-spacing: 0; color: var(--ink-2); transition: color .15s ease;
 }
-.sh-tab:hover { color: var(--ink-2); }
-.sh-tab.active { color: var(--ink); }
+.sh-tab:hover { color: var(--ink); }
+.sh-tab.active { color: var(--ink); font-weight: 600; }
 .sh-tab::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2.5px;
-  background: var(--ink); border-radius: 2px 2px 0 0; transform: scaleX(0); transform-origin: left center;
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+  background: var(--ink); border-radius: 0; transform: scaleX(0); transform-origin: left center;
   transition: transform .2s ease;
 }
 .sh-tab.active::after, .sh-tab:hover::after { transform: scaleX(1); }
@@ -306,8 +334,8 @@ body { height: auto; }
 .sh-eyebrow { font: 700 10.5px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-right: 2px; }
 .sh-party { display: inline-flex; align-items: baseline; gap: 5px; }
 .sh-abbr { font: 700 10.5px var(--sans); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
-.sh-num { font-family: "Crimson Text", var(--serif); font-weight: 600; font-size: 16px; line-height: 1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
-.sh-sep { width: 1.5px; height: 13px; background: var(--line-2); align-self: center; position: relative; top: 1px; }
+.sh-num { font-family: var(--sans); font-weight: 600; font-size: 17px; line-height: 1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.sh-sep { width: 1.5px; height: 13px; background: var(--line); align-self: center; position: relative; top: 1px; }
 
 /* the next-poll countdown (.tab-next): wide screens only, absolutely seated
    so it glides – docked right until the score owns that end, then to the
@@ -316,19 +344,17 @@ body { height: auto; }
 .sh-next { display: none; }
 @media (min-width: 1100px) {
   .sh-next:not([hidden]) {
-    display: inline-flex; align-items: baseline; gap: 14px;
+    display: inline-flex; align-items: baseline; gap: 16px;
     position: absolute; bottom: 0; left: 100%; transform: translateX(-100%);
-    padding-bottom: 11px; font-family: var(--sans); font-size: 12px; line-height: 1.45; white-space: nowrap;
+    padding-bottom: 14px; font-family: var(--sans); font-size: 13px; line-height: 1.45; white-space: nowrap;
     color: var(--ink-3); transition: transform .38s cubic-bezier(.22, 1, .36, 1);
   }
   .sh-tabs.pinned .sh-next { transform: translateX(calc(-50% - 50cqw)); }
   .sh-tn-item.sh-tn-park { position: absolute; visibility: hidden; }
 }
-/* the main page's label is a button whose reset inherits the ticker's own
-   12px regular, so that is what it reads as */
-.sh-tn-lab { color: var(--ink-3); }
+.sh-tn-lab { color: var(--ink-2); font-weight: 600; }
 .sh-tn-item { display: inline-flex; align-items: baseline; gap: 6px; }
-.sh-tn-firm { font-weight: 700; color: var(--ink-2); }
+.sh-tn-firm { font-weight: 600; color: var(--ink); }
 .sh-tn-when { font-variant-numeric: tabular-nums; }
 .sh-tn-overdue { color: var(--sh-mood-neg); }
 .sh-tn-maybe { color: var(--ink-3); }
@@ -409,11 +435,13 @@ nav.tabs[aria-label="Poll archives"] {
   nav.tabs[aria-label="Poll archives"] {
     margin-left: calc(16px + env(safe-area-inset-left, 0px)); margin-right: calc(16px + env(safe-area-inset-right, 0px));
   }
-  .sh-tabs-set { gap: 14px; }
-  .sh-tab { padding-block: 9px; font-size: 16px; line-height: 19.5px; }
-  .sh-tabs.pinned .sh-tabs-set { transform: scale(0.903); }
+  /* the set spreads across the whole row as the main page's phone tabs
+     do; pinned it closes up at the left so the score can dock right of it */
+  .sh-tabs-set { gap: 0; width: 100%; justify-content: space-between; }
+  .sh-tabs.pinned .sh-tabs-set { width: auto; justify-content: flex-start; }
+  .sh-tab { padding: 11px 6px 12px; font-size: 15px; line-height: 19px; }
   .sh-eyebrow { display: none; }
-  .sh-score { gap: 7px; }
+  .sh-score { gap: 6px; }
   .sh-num { font-size: 15px; }
   .sh-colo { grid-template-columns: minmax(0, 1fr); }
   .sh-about { padding-right: 0; border-right: 0; padding-bottom: 16px; }

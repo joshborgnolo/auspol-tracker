@@ -106,37 +106,45 @@ export function shellHeader({ tab } = {}) {
     + `${t.id === tab ? ' aria-current="page"' : ""}>`
     + (t.short ? `<span class="sh-tab-long">${t.label}</span><span class="sh-tab-short" aria-hidden="true">${t.short}</span>` : t.label)
     + `</a>`).join("\n        ");
-  /* The lockup is the main page's masthead worn on an <a> instead of a
-     <button>: same classes, same hidden spans (extracted shell-copy:brand
-     rules style all of it), and it goes where the masthead's click goes –
-     the dial, replayed, on /#story. The <img> is the per-build static dial
-     the page paints before site-shell.js swaps in the live inline one. */
+  /* The current masthead's lockup, split exactly as the main page's: the
+     wordmark alone, and the dial beside it as a control of its own. Both
+     are links here where the main page mounts a button and a heading – the
+     wordmark goes home (the satellite's way back), the dial goes where the
+     masthead's click goes: /#story, which the main page opens its dial
+     story for. The wordmark can't be the page's <h1> – the page's own
+     title holds that. The <img> is the per-build static dial the page
+     paints before site-shell.js swaps in the live inline one. The meta is
+     the current design's three facts with their notes (Latest poll, This
+     term, Next election), and the phone compact names the newest poll
+     rather than just the day it landed – all filled off auspol-now.json. */
   return `<a class="sh-skip" href="#sh-content">Skip to content</a>
 <div class="sh-frame sh-top">
   <header class="sh-head">
     <div class="sh-brand">
-    <div class="wordmark stacked">
-      <a class="wm-glyph" href="/#story" title="Wind the dial back through the term" aria-describedby="wm-action">
+    <div class="sh-lockup">
+      <a class="wordmark stacked" href="/" title="The interactive tracker">
         <span class="wm-textcol">
           <span class="wm-name">auspol</span>
           <span class="sr-only"> </span>
           <span class="wm-track">tracker</span>
         </span>
+        <span class="wm-sr">– Australian federal polling</span>
+      </a>
+      <a class="wm-glyph" href="/#story" title="Wind the dial back through the term" aria-label="Wind the dial back through the term" aria-describedby="wm-action">
         <img class="wm-dial-img" src="/assets/masthead-dial.svg" alt="" width="57" height="39.7">
       </a>
-      <span class="wm-sr">– Australian federal polling</span>
       <span id="wm-action" hidden>Replays the term on the masthead dial</span>
     </div>
-    <p class="sh-tagline">Aggregated opinion polling for the next Australian <br class="sh-tagline-br">federal election, set against the last <span class="sh-past">twenty</span>.</p>
-    <p class="sh-meta-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span>Updated <span class="sh-pub"></span>, <span class="sh-npolls"></span> polls</span></p>
+    <p class="sh-tagline">Aggregated opinion polling for the next Australian federal election, set against the last <span class="sh-past">twenty</span>.</p>
+    <p class="sh-head-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span><b>Latest poll</b> <span class="sh-latest"></span>, <span class="sh-rel"></span>, <span class="sh-npolls"></span> polls</span></p>
     </div>
     <div class="sh-right">
     <div class="sh-meta" hidden>
-      <div class="sh-meta-item"><span class="sh-meta-k">Last poll</span><span class="sh-meta-v"><span class="sh-fresh-dot"></span><span class="sh-pub"></span><span class="sh-fresh-rel"></span></span></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">Latest poll</span><span class="sh-meta-v"><span class="sh-fresh-dot"></span><span class="sh-latest"></span></span><span class="sh-meta-s">published <span class="sh-rel"></span></span></div>
       <div class="sh-meta-divide"></div>
-      <div class="sh-meta-item"><span class="sh-meta-k">Next election</span><span class="sh-meta-v sh-due"></span></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">This term</span><span class="sh-meta-v sh-tracked"></span><span class="sh-meta-s sh-houses"></span></div>
       <div class="sh-meta-divide"></div>
-      <div class="sh-meta-item"><span class="sh-meta-k">Polls tracked</span><span class="sh-meta-v sh-tracked"></span></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">Next election</span><span class="sh-meta-v sh-due"></span><span class="sh-meta-s sh-duein"></span></div>
     </div>
     <div class="sh-theme" role="group" aria-label="Colour theme">
       <button type="button" class="sh-cell" data-theme="light" aria-pressed="false" aria-label="Light mode" title="Light mode">${SUN}</button><button type="button" class="sh-cell" data-theme="dark" aria-pressed="false" aria-label="Dark mode" title="Dark mode">${MOON}</button>
@@ -172,7 +180,7 @@ export function shellFooter({ page } = {}) {
   <footer class="sh-foot">
     <div class="sh-colo">
       <div class="sh-about" data-nosnippet>
-        <p class="sh-lede">auspol tracker is an unofficial aggregate of published federal opinion polling.</p>
+        <p class="sh-lede">auspol tracker is an unofficial aggregator of published federal opinion polling.</p>
         <p class="sh-disc">Best efforts are made to make the aggregate figures transparent, trustworthy, statistically sound, and informative, but they are, in the end, estimates only.</p>
       </div>
       <div class="sh-ways">
@@ -233,7 +241,7 @@ const BACK_PILL = /\n?<a class="ss-back" href="\/">[^<]*<\/a>\n?/g;
 // each rule, and the blank line closing the block (as the generators' templates dropped it)
 const BACK_PILL_CSS = /^[ \t]*\.ss-back[^{\n]*\{[^}]*\}[ \t]*\n(?:[ \t]*\n)?/gm;
 const BACK_PILL_NOTE = /^[ \t]*\/\* -+ back to the interactive tracker \(the static page's \.ss-back pill\) \*\/[ \t]*\n/gm;
-const SAT_NOTE = /([ \t]*)<p class="ss-note">(?:This is (?:a satellite (?:archive |analysis )?page|the feedback page)|This page belongs to) (?:of |to )?<a href="\/">auspol tracker<\/a>, an unofficial aggregate of published federal opinion polling\.(?: The live(?:, interactive)? tracker (?:carries|has) the current [^<.]*\.)?\s*([^<]*(?:<(?!\/p>)[^<]*)*)<\/p>\n?/g;
+const SAT_NOTE = /([ \t]*)<p class="ss-note">(?:This is (?:a satellite (?:archive |analysis )?page|the feedback page)|This page belongs to) (?:of |to )?<a href="\/">auspol tracker<\/a>, an unofficial aggregator of published federal opinion polling\.(?: The live(?:, interactive)? tracker (?:carries|has) the current [^<.]*\.)?\s*([^<]*(?:<(?!\/p>)[^<]*)*)<\/p>\n?/g;
 
 /* The four faces every satellite paints above the fold – the lockup's Source
    Sans 3, the tabs' and titles' Crimson Text at 400 and 600, and the body's
@@ -343,55 +351,83 @@ ${ss3 ? `@font-face {
 }
 .sh-skip:focus { top: 12px; }
 
-/* masthead: the lockup left, the switch right (.site-head). The lockup is
-   the main page's own rules, lifted verbatim from its template (shell-copy
-   markers) – one definition for both. */
+/* masthead: the main page's current one (rd.css's masthead section) –
+   no rule under it (the tab row carries the page's first), the status
+   block of three facts with their notes under them at the right. The
+   lockup's shared rules are lifted from the template's shell-copy:brand
+   markers; the split, the sizes and the dial's ellipse are the current
+   design's, mirrored in the rules after it. */
 .sh-head {
   position: relative;
-  display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap;
-  padding-bottom: 16px; border-bottom: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 28px; flex-wrap: wrap;
+  margin-bottom: 16px;
 }
-/* the tagline and the meta beside it (.tagline, .head-right, .head-meta):
-   the same sentence and the same three figures the main page carries, off
-   auspol-now.json – so every page opens on the same masthead */
+/* the lockup row (.lockup): wordmark alone (its link is the satellite's
+   way home), the dial alone beside it */
+.sh-lockup { display: flex; align-items: center; gap: 12px; }
+a.wordmark { text-decoration: none; }
 .sh-tagline {
-  margin: 7px 0 -1.5px; font-family: "Crimson Text", var(--serif); font-weight: 400;
-  font-size: 15px; line-height: 1.5; color: var(--ink-3); text-wrap: balance;
+  margin: 10px 0 0; max-width: 440px;
+  font-family: "Crimson Text", var(--serif); font-weight: 400;
+  font-size: 16px; line-height: 1.45; color: var(--ink-2); text-wrap: pretty;
 }
-.sh-meta-compact { display: none; }
-.sh-right { display: flex; align-items: center; gap: 18px; }
-.sh-meta { display: flex; align-items: center; gap: 18px; font-family: var(--sans); line-height: 1.5; }
+.sh-head-compact { display: none; }
+.sh-head a.mh-latest { color: inherit; text-decoration: none; }
+.sh-head a.mh-latest:hover { text-decoration: underline; text-underline-offset: 3px; }
+.sh-right { display: flex; align-items: flex-start; gap: 28px; padding-top: 4px; }
+.sh-meta { display: flex; align-items: stretch; gap: 24px; font-family: var(--sans); line-height: 1.5; }
 .sh-meta[hidden] { display: none; }
-.sh-meta-item { display: flex; flex-direction: column; gap: 2px; }
-.sh-meta-k { font-size: 13px; color: var(--ink-3); font-weight: 600; white-space: nowrap; letter-spacing: 0.02em; }
-.sh-meta-v { font-size: 14px; color: var(--ink); font-weight: 600; white-space: nowrap; }
+.sh-meta-item { display: flex; flex-direction: column; gap: 3px; }
+.sh-meta-k { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-3); white-space: nowrap; }
+.sh-meta-v { font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; display: inline-flex; align-items: center; }
+.sh-meta-s { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 .sh-fresh-dot {
   display: inline-block; vertical-align: middle; position: relative; top: -1px;
   width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; background: var(--ink-3);
 }
 .sh-fresh-dot.fresh { background: var(--sh-mood-pos); }
 .sh-fresh-dot.stale { background: var(--sh-mood-neg); }
-.sh-fresh-rel { margin-left: 6px; color: var(--ink-3); font-weight: 500; }
-.sh-meta-divide { width: 1px; height: 30px; background: var(--line); }
+.sh-meta-divide { width: 1px; height: auto; align-self: stretch; background: var(--line); }
 @media (max-width: 900px) { .sh-meta { gap: 12px; } }
-@media (max-width: 560px) {
-  /* as the main page's phone masthead: the meta gives way to one compact
-     freshness line, and the switch pins to the lockup's corner */
+@media (max-width: 640px) {
+  /* the main page's phone masthead: the status block gives way to one
+     compact line that names the newest poll, the lockup a size down */
   .sh-meta { display: none; }
-  .sh-meta-compact:not([hidden]) {
-    display: flex; align-items: center; gap: 8px; margin: 9px 0 0;
+  .sh-head-compact:not([hidden]) {
+    display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin: 10px 0 0;
     font-family: var(--sans); font-size: 13px; line-height: 1.5; color: var(--ink-3); font-variant-numeric: tabular-nums;
   }
-  .sh-meta-compact .sh-fresh-dot { margin-right: 0; width: 6px; height: 6px; top: 0; }
+  .sh-head-compact b { font-weight: 600; color: var(--ink); }
+  .sh-head-compact .sh-fresh-dot { margin: 0; flex-shrink: 0; position: relative; top: -1px; width: 6px; height: 6px; }
+  .sh-tagline { margin-top: 12px; }
+}
+@media (max-width: 560px) {
+  /* the switch pins to the header corner as the main page's does, and the
+     lockup row holds the 92px clearance so it can't sit on the dial */
   .sh-head { flex-direction: column; align-items: flex-start; gap: 13px; }
-  .sh-head .wordmark { padding-right: 92px; }
+  .sh-head .sh-lockup { padding-right: 92px; }
   .sh-right { display: contents; }
   .sh-theme { position: absolute; top: 0; right: 0; }
 }
 ${shellCopy("brand")}
+/* the current masthead's sizes over shell-copy:brand's, and the dial's
+   ellipse – the contour the main page's button grew, the satellites' worn
+   on an anchor: no hover wash (a shape clipped to an ellipse reads as an
+   outline), the scale alone answers the pointer */
+.wordmark { font-size: 34px; }
+.wm-name { font-size: 34px; }
+.wordmark.stacked .wm-track { font-size: 34px; color: var(--ink-2); }
+a.wm-glyph { border-radius: 50%; -webkit-tap-highlight-color: transparent; }
+a.wm-glyph:hover { background: transparent; }
 /* the stand-in the page first paints, swapped for the live inline dial the
    moment auspol-now.json lands – same box the masthead's svg takes */
 .wm-dial-img { display: block; overflow: visible; }
+@media (max-width: 640px) {
+  .wordmark { font-size: 32px; }
+  .wm-name { font-size: 32px; }
+  .wordmark.stacked .wm-track { font-size: 32px; }
+  .wm-dial-img, .sh-lockup svg.wm-dial { width: 54px; height: 37.6px; }
+}
 ${shellCopy("dial")}
 
 /* the colour switch (.theme-seg): a light switch, the pressed half is the theme */
@@ -455,21 +491,21 @@ body { height: auto; }
   container-type: inline-size;
 }
 .sh-tabs-set {
-  display: flex; gap: 30px; align-items: flex-end;
+  display: flex; gap: 28px; align-items: flex-end;
   transform-origin: left bottom;
   transition: transform .38s cubic-bezier(.22, 1, .36, 1);
 }
-.sh-tabs.pinned .sh-tabs-set { transform: scale(0.789); }   /* 19px → 15px, the main page's pin */
+.sh-tabs.pinned .sh-tabs-set { transform: scale(0.85); }   /* the main page's pin (rd.css) */
 .sh-tab {
-  position: relative; padding: 12px 1px; white-space: nowrap; text-decoration: none;
-  font-family: "Crimson Text", var(--serif); font-weight: 600; font-size: 19px; line-height: 23.5px;
-  letter-spacing: -0.01em; color: var(--ink-3); transition: color .15s ease;
+  position: relative; padding: 12px 2px 13px; white-space: nowrap; text-decoration: none;
+  font-family: var(--sans); font-weight: 400; font-size: 16px; line-height: 20px;
+  letter-spacing: 0; color: var(--ink-2); transition: color .15s ease;
 }
-.sh-tab:hover { color: var(--ink-2); }
-.sh-tab.active { color: var(--ink); }
+.sh-tab:hover { color: var(--ink); }
+.sh-tab.active { color: var(--ink); font-weight: 600; }
 .sh-tab::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2.5px;
-  background: var(--ink); border-radius: 2px 2px 0 0; transform: scaleX(0); transform-origin: left center;
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+  background: var(--ink); border-radius: 0; transform: scaleX(0); transform-origin: left center;
   transition: transform .2s ease;
 }
 .sh-tab.active::after, .sh-tab:hover::after { transform: scaleX(1); }
@@ -498,8 +534,8 @@ body { height: auto; }
 .sh-eyebrow { font: 700 10.5px var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-right: 2px; }
 .sh-party { display: inline-flex; align-items: baseline; gap: 5px; }
 .sh-abbr { font: 700 10.5px var(--sans); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
-.sh-num { font-family: "Crimson Text", var(--serif); font-weight: 600; font-size: 16px; line-height: 1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
-.sh-sep { width: 1.5px; height: 13px; background: var(--line-2); align-self: center; position: relative; top: 1px; }
+.sh-num { font-family: var(--sans); font-weight: 600; font-size: 17px; line-height: 1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.sh-sep { width: 1.5px; height: 13px; background: var(--line); align-self: center; position: relative; top: 1px; }
 
 /* the next-poll countdown (.tab-next): wide screens only, absolutely seated
    so it glides – docked right until the score owns that end, then to the
@@ -508,19 +544,17 @@ body { height: auto; }
 .sh-next { display: none; }
 @media (min-width: 1100px) {
   .sh-next:not([hidden]) {
-    display: inline-flex; align-items: baseline; gap: 14px;
+    display: inline-flex; align-items: baseline; gap: 16px;
     position: absolute; bottom: 0; left: 100%; transform: translateX(-100%);
-    padding-bottom: 11px; font-family: var(--sans); font-size: 12px; line-height: 1.45; white-space: nowrap;
+    padding-bottom: 14px; font-family: var(--sans); font-size: 13px; line-height: 1.45; white-space: nowrap;
     color: var(--ink-3); transition: transform .38s cubic-bezier(.22, 1, .36, 1);
   }
   .sh-tabs.pinned .sh-next { transform: translateX(calc(-50% - 50cqw)); }
   .sh-tn-item.sh-tn-park { position: absolute; visibility: hidden; }
 }
-/* the main page's label is a button whose reset inherits the ticker's own
-   12px regular, so that is what it reads as */
-.sh-tn-lab { color: var(--ink-3); }
+.sh-tn-lab { color: var(--ink-2); font-weight: 600; }
 .sh-tn-item { display: inline-flex; align-items: baseline; gap: 6px; }
-.sh-tn-firm { font-weight: 700; color: var(--ink-2); }
+.sh-tn-firm { font-weight: 600; color: var(--ink); }
 .sh-tn-when { font-variant-numeric: tabular-nums; }
 .sh-tn-overdue { color: var(--sh-mood-neg); }
 .sh-tn-maybe { color: var(--ink-3); }
@@ -601,11 +635,13 @@ nav.tabs[aria-label="Poll archives"] {
   nav.tabs[aria-label="Poll archives"] {
     margin-left: calc(16px + env(safe-area-inset-left, 0px)); margin-right: calc(16px + env(safe-area-inset-right, 0px));
   }
-  .sh-tabs-set { gap: 14px; }
-  .sh-tab { padding-block: 9px; font-size: 16px; line-height: 19.5px; }
-  .sh-tabs.pinned .sh-tabs-set { transform: scale(0.903); }
+  /* the set spreads across the whole row as the main page's phone tabs
+     do; pinned it closes up at the left so the score can dock right of it */
+  .sh-tabs-set { gap: 0; width: 100%; justify-content: space-between; }
+  .sh-tabs.pinned .sh-tabs-set { width: auto; justify-content: flex-start; }
+  .sh-tab { padding: 11px 6px 12px; font-size: 15px; line-height: 19px; }
   .sh-eyebrow { display: none; }
-  .sh-score { gap: 7px; }
+  .sh-score { gap: 6px; }
   .sh-num { font-size: 15px; }
   .sh-colo { grid-template-columns: minmax(0, 1fr); }
   .sh-about { padding-right: 0; border-right: 0; padding-bottom: 16px; }
@@ -771,9 +807,10 @@ ${npProjectSrc()}
     if (next && window.ResizeObserver) new ResizeObserver(function () { fitNext(); }).observe(next.parentElement);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitNext(); });
   };
-  /* the masthead's meta and tagline count, as the main page's Header fills
-     them; the freshness reading is its freshness() (73de0c58…js): whole
-     Sydney calendar days, fresh to a week, aging to three */
+  /* the masthead's status block, tagline count and compact line, as the
+     main page's Header fills them (rd-head-meta / rd-head-compact); the
+     freshness reading is its freshness() (73de0c58…js): whole Sydney
+     calendar days, fresh to a week, aging to three */
   var setText = function (sel, v) {
     var els = document.querySelectorAll(sel);
     for (var i = 0; i < els.length; i++) els[i].textContent = v;
@@ -783,17 +820,43 @@ ${npProjectSrc()}
     var L = n.latest;
     if (!L) return;
     var days = Math.max(0, Math.round((easternNow().day - Date.parse(L.publishedISO)) / 86400000));
-    var rel = days === 0 ? "Today" : days === 1 ? "Yesterday" : days < 14 ? days + " days ago"
+    var rel = days === 0 ? "today" : days === 1 ? "yesterday" : days < 14 ? days + " days ago"
       : days < 56 ? Math.round(days / 7) + " weeks ago" : Math.round(days / 30) + " months ago";
     var state = days <= 7 ? "fresh" : days <= 21 ? "aging" : "stale";
-    setText(".sh-pub", L.published);
-    setText(".sh-fresh-rel", ", " + rel);
+    /* the newest poll by its pollster and fieldwork, linked to the release
+       where the dataset has one – the main page's a.mh-latest, invisible
+       as a link until the pointer says otherwise */
+    var fact = L.fact || L.published;
+    var factEls = document.querySelectorAll(".sh-latest");
+    for (var fi = 0; fi < factEls.length; fi++) {
+      factEls[fi].textContent = "";
+      if (L.factUrl) {
+        var fa = document.createElement("a");
+        fa.className = "mh-latest"; fa.href = L.factUrl;
+        fa.target = "_blank"; fa.rel = "noopener noreferrer";
+        fa.textContent = fact;
+        factEls[fi].appendChild(fa);
+      } else factEls[fi].textContent = fact;
+    }
+    setText(".sh-rel", rel);
+    setText(".sh-tracked", L.pollsTracked + " polls");
+    setText(".sh-houses", L.housesTracked + " pollsters");
     setText(".sh-due", L.nextElectionDue);
-    setText(".sh-tracked", L.pollsTracked + ", " + L.housesTracked + " pollsters");
+    /* "N months at most" under the election date – the main page's rdDue,
+       same clock and rounding, hidden when it runs out. (The backslashes
+       are doubled: this JS is text built inside a template literal.) */
+    var duein = "", dm = /(\\d{1,2}) (\\w+) (\\d{4})/.exec(L.nextElectionDue || "");
+    if (dm) {
+      var dt = Date.parse(dm[1] + " " + dm[2] + " " + dm[3] + " UTC");
+      var months = isNaN(dt) ? 0 : Math.round((dt - easternNow().day) / (86400000 * 30.44));
+      if (months > 1) duein = months + " months at most";
+    }
+    var dueEls = document.querySelectorAll(".sh-duein");
+    for (var di = 0; di < dueEls.length; di++) { dueEls[di].textContent = duein; dueEls[di].hidden = !duein; }
     setText(".sh-npolls", L.pollsTracked);
     var dots = document.querySelectorAll(".sh-fresh-dot");
     for (var i = 0; i < dots.length; i++) dots[i].className = "sh-fresh-dot " + state;
-    var hid = document.querySelectorAll(".sh-meta, .sh-meta-compact");
+    var hid = document.querySelectorAll(".sh-meta, .sh-head-compact");
     for (var j = 0; j < hid.length; j++) hid[j].hidden = false;
   };
 

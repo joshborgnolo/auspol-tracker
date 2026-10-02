@@ -33,11 +33,12 @@ this strap-line is a THIRD duplicated copy family next to the methodology pair
 (auto-skill-auspol-disclaimer-copy) — and it is the only one whose footprint
 leaves `.build/newtracker` and reaches the satellites.
 
-Current wording everywhere: "an unofficial aggregate of published federal
-opinion polling" — main-site frame "auspol tracker is an …polling."; satellite
-frame "This is a satellite archive page of <a href="/">auspol tracker</a>, an
-…polling. The live, interactive tracker carries…"; feedback page swaps
-"satellite archive page" for "the feedback page".
+Current wording everywhere: "an unofficial aggregator of published federal
+opinion polling" (aggregate → aggregator, 2026-10-02, user's word swap via
+commit-pending sweep) — main-site frame "auspol tracker is an …polling.";
+satellite frame "This is a satellite archive page of <a href="/">auspol
+tracker</a>, an …polling. The live, interactive tracker carries…"; feedback
+page swaps "satellite archive page" for "the feedback page".
 
 ## The eleven homes (all edited together or not at all)
 

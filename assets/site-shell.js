@@ -726,9 +726,10 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     if (next && window.ResizeObserver) new ResizeObserver(function () { fitNext(); }).observe(next.parentElement);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitNext(); });
   };
-  /* the masthead's meta and tagline count, as the main page's Header fills
-     them; the freshness reading is its freshness() (73de0c58…js): whole
-     Sydney calendar days, fresh to a week, aging to three */
+  /* the masthead's status block, tagline count and compact line, as the
+     main page's Header fills them (rd-head-meta / rd-head-compact); the
+     freshness reading is its freshness() (73de0c58…js): whole Sydney
+     calendar days, fresh to a week, aging to three */
   var setText = function (sel, v) {
     var els = document.querySelectorAll(sel);
     for (var i = 0; i < els.length; i++) els[i].textContent = v;
@@ -738,17 +739,43 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     var L = n.latest;
     if (!L) return;
     var days = Math.max(0, Math.round((easternNow().day - Date.parse(L.publishedISO)) / 86400000));
-    var rel = days === 0 ? "Today" : days === 1 ? "Yesterday" : days < 14 ? days + " days ago"
+    var rel = days === 0 ? "today" : days === 1 ? "yesterday" : days < 14 ? days + " days ago"
       : days < 56 ? Math.round(days / 7) + " weeks ago" : Math.round(days / 30) + " months ago";
     var state = days <= 7 ? "fresh" : days <= 21 ? "aging" : "stale";
-    setText(".sh-pub", L.published);
-    setText(".sh-fresh-rel", ", " + rel);
+    /* the newest poll by its pollster and fieldwork, linked to the release
+       where the dataset has one – the main page's a.mh-latest, invisible
+       as a link until the pointer says otherwise */
+    var fact = L.fact || L.published;
+    var factEls = document.querySelectorAll(".sh-latest");
+    for (var fi = 0; fi < factEls.length; fi++) {
+      factEls[fi].textContent = "";
+      if (L.factUrl) {
+        var fa = document.createElement("a");
+        fa.className = "mh-latest"; fa.href = L.factUrl;
+        fa.target = "_blank"; fa.rel = "noopener noreferrer";
+        fa.textContent = fact;
+        factEls[fi].appendChild(fa);
+      } else factEls[fi].textContent = fact;
+    }
+    setText(".sh-rel", rel);
+    setText(".sh-tracked", L.pollsTracked + " polls");
+    setText(".sh-houses", L.housesTracked + " pollsters");
     setText(".sh-due", L.nextElectionDue);
-    setText(".sh-tracked", L.pollsTracked + ", " + L.housesTracked + " pollsters");
+    /* "N months at most" under the election date – the main page's rdDue,
+       same clock and rounding, hidden when it runs out. (The backslashes
+       are doubled: this JS is text built inside a template literal.) */
+    var duein = "", dm = /(\d{1,2}) (\w+) (\d{4})/.exec(L.nextElectionDue || "");
+    if (dm) {
+      var dt = Date.parse(dm[1] + " " + dm[2] + " " + dm[3] + " UTC");
+      var months = isNaN(dt) ? 0 : Math.round((dt - easternNow().day) / (86400000 * 30.44));
+      if (months > 1) duein = months + " months at most";
+    }
+    var dueEls = document.querySelectorAll(".sh-duein");
+    for (var di = 0; di < dueEls.length; di++) { dueEls[di].textContent = duein; dueEls[di].hidden = !duein; }
     setText(".sh-npolls", L.pollsTracked);
     var dots = document.querySelectorAll(".sh-fresh-dot");
     for (var i = 0; i < dots.length; i++) dots[i].className = "sh-fresh-dot " + state;
-    var hid = document.querySelectorAll(".sh-meta, .sh-meta-compact");
+    var hid = document.querySelectorAll(".sh-meta, .sh-head-compact");
     for (var j = 0; j < hid.length; j++) hid[j].hidden = false;
   };
 

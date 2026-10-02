@@ -19,7 +19,7 @@ for (const p of SHELL_PAGES) {
     assert.equal(html.split(`<!--shell:${r}-->`).length - 1, 1, `${p.file}: one shell ${r}`);
   assert.ok(!/class="ss-back"/.test(html), `${p.file}: the retired back pill is gone`);
   assert.ok(/<main id="sh-content"/.test(html), `${p.file}: the skip link has its target`);
-  assert.equal((html.match(/an unofficial aggregate of published federal opinion polling/g) || []).length, 1,
+  assert.equal((html.match(/an unofficial aggregator of published federal opinion polling/g) || []).length, 1,
     `${p.file}: the strap-line once, in the colophon`);
 }
 
@@ -58,8 +58,8 @@ p { margin: 0; }
 <main class="frame-wrap">
   <h1>A page</h1>
   <p class="ss-note">A note of its own.</p>
-  <p class="ss-note">This is a satellite archive page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
-  <p class="ss-note">This is a satellite page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. Figures are computed from AEC results.</p>
+  <p class="ss-note">This is a satellite archive page of <a href="/">auspol tracker</a>, an unofficial aggregator of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
+  <p class="ss-note">This is a satellite page of <a href="/">auspol tracker</a>, an unofficial aggregator of published federal opinion polling. Figures are computed from AEC results.</p>
 </main>
 <a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
 </body>

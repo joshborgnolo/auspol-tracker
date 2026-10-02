@@ -435,10 +435,12 @@ writeAtomic(path.join(ROOT, "assets", "masthead-dial.svg"), fav.masthead.svg + "
 writeAtomic(path.join(ROOT, "assets", "site-shell.css"), shellCss());
 writeAtomic(path.join(ROOT, "assets", "site-shell.js"), shellJs());
 /* …and what the satellites' masthead and tab bar show beside it, off the same
-   dataset the main page's do: the "Last poll / Next election / Polls tracked"
-   meta, the tagline's count of past terms, and the houses' release rhythm the
-   bar's next-poll countdown projects from at view time (np-project.js, run by
-   site-shell.js), so the countdown stays right as a page ages between builds. */
+   dataset the main page's do: the status block's three facts and the phone
+   compact (the newest poll by its pollster and fieldwork, linked to its
+   release – the main page's rdLatest), the tagline's count of past terms,
+   and the houses' release rhythm the bar's next-poll countdown projects
+   from at view time (np-project.js, run by site-shell.js), so the countdown
+   stays right as a page ages between builds. */
 const shellNow = (() => {
   const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
   const grab = (name) => {
@@ -447,8 +449,14 @@ const shellNow = (() => {
     return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
   };
   const L = grab("latest");
+  /* the newest row of pollsterTable, exactly as the main page's Header
+     picks it (pubSort desc) – releaseUrl over a media url citation is the
+     archive emitter's own precedence */
+  const newest = grab("pollsterTable").slice().sort((a, b) => (a.pubSort < b.pubSort ? 1 : -1))[0] || null;
   return { latest: { published: L.published, publishedISO: L.publishedISO, nextElectionDue: L.nextElectionDue,
-                     pollsTracked: L.pollsTracked, housesTracked: L.housesTracked },
+                     pollsTracked: L.pollsTracked, housesTracked: L.housesTracked,
+                     fact: newest ? newest.pollster + ", " + newest.field : null,
+                     factUrl: newest ? (newest.releaseUrl || newest.url || null) : null },
            past: pastCycleWord(), pollCadence: grab("pollCadence") };
 })();
 writeAtomic(path.join(ROOT, "assets", "auspol-now.json"), JSON.stringify({ ...fav.score, dial: fav.masthead.spec, ...shellNow }) + "\n");
@@ -660,7 +668,7 @@ function buildStaticSummary() {
       <h2>Sources</h2>
       <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
 
-      <p class="ss-note" data-nosnippet>auspol tracker is an unofficial aggregate of published federal opinion polling.
+      <p class="ss-note" data-nosnippet>auspol tracker is an unofficial aggregator of published federal opinion polling.
         Best efforts are made to make the aggregate figures transparent, trustworthy, statistically
         sound, and informative, but they are, in the end, estimates only. Federal polling archives
         I&#8217;ve located are stored <a href="https://auspoltracker.com/archives/newspoll/">here</a> for
