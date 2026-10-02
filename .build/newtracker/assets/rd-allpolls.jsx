@@ -1147,6 +1147,10 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
             <span>{p.pollster} didn’t ask Albanese and {p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader"} on the same question in this poll, so there’s no net-approval gap to set against the leadership figures.</span>
           </>}
           {!isDir && !isIss && !isLd && <>
+          {p.noAgg && <>
+            <span className="rd-apd-k">In the aggregates</span>
+            <span>Because SMS polls have a strong selection bias, they do not count towards any aggregates.</span>
+          </>}
           {lean != null && avg != null && <>
             <span className="rd-apd-k">Against {D.monthNameFull(Number(p.ym.slice(5)))}</span>
             <span>{Math.abs(lean) < 0.05

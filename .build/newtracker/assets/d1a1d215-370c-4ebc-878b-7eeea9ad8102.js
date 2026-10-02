@@ -6369,6 +6369,8 @@ function infoTerms(D) {
         <span className="info-p"><b>Repeat polls.</b> A pollster that publishes several times in
         the window counts for the square root of its number of polls, so three weekly Roy Morgan
         polls count as 1.7, not 3.</span>
+        <span className="info-p"><b>One exclusion.</b> Roy Morgan’s SMS polls stay in the archive
+        but count towards no aggregate here: SMS polls have a strong selection bias.</span>
         <span className="info-p">The headline two-party figure runs each poll’s primary votes
         through the fixed 2025 preference table – the
         {" "}{xref("implied-2pp", "weighted aggregate", "implied 2PP")} – so every poll that

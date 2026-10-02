@@ -59,6 +59,10 @@ const HE_WINDOW = 28, SHRINK_K = 1.5, SAMPLE_CAP = 3000, LN2 = Math.log(2);
 const HL_DEFF = 1.6;
 const HE_HALF = 90;
 const HL_WINDOW = 21, HL_HALF = 7, HL_TAPER = 14;
+/* Mirror of gen-data.mjs's NO_AGG_HOUSES: no-aggregate houses (SMS polls'
+   selection bias) are out of every estimator series, the consensus pools
+   included, so the replica must drop them too. */
+const NO_AGG_HOUSES = new Set(["Roy Morgan (SMS)"]);
 /* Production tapers the recency weight from HL_TAPER days down to zero at
    HL_WINDOW (half-cosine), so a poll sliding off the 21st day fades out of
    the window instead of stepping. Verbatim copy of gen-data.mjs's taperW /
@@ -163,7 +167,7 @@ const mkRowN = (arm) => (p) => {
 const POLLS = D.polls.filter((p) => !p.isElection)
   .map((p) => (HOUSE_RENAMES[p.pollster] ? { ...p, pollster: HOUSE_RENAMES[p.pollster] } : p));
 const tppRowsFor = (rowN, rows) => rows
-  .filter((p) => p.tpp_alp != null)
+  .filter((p) => p.tpp_alp != null && !NO_AGG_HOUSES.has(p.firm || p.pollster))
   .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: rowN(p), firm: p.firm || p.pollster, key: p.date + "|" + (p.firm || p.pollster) }));
 
 /* ---- parity gate: A0 must reproduce the committed headline ------------- */

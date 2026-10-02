@@ -100,6 +100,16 @@ const mergedPolls = (() => {
   return [...D.polls, ...live].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
 })();
 const POLLS = mergedPolls.filter((p) => !p.isElection);
+/* Houses whose waves stay in the archive but are kept out of EVERY aggregate.
+   Roy Morgan's SMS wave was an opt-in SMS blast to a non-probability sample -
+   a selection-biased mode a house-effect cannot repair, so the wave never
+   enters tppRows, the implied series, the primary series, the alt matchup
+   aggregates or the leadership monthly lines. It still renders as an archive
+   row (individualPolls stays unfiltered), flagged noAgg so the detail view can
+   say why its figures sit outside the aggregates. Checks here key the full
+   suffix string; the houses inventory (:3322) already folds "(SMS)" back into
+   "Roy Morgan" for counting. */
+const NO_AGG_HOUSES = new Set(["Roy Morgan (SMS)"]);
 const ppm = D.ppm;
 /* Leader satisfaction the fallback filed (D.fallbackApproval) joins the
    approval rows on the same terms as fallbackPolls above, but on its own:
@@ -128,6 +138,10 @@ const mergedAppr = (() => {
   return [...D.approval, ...rows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
 })();
 const appr = mergedAppr.map((r) => ({ ...r, splits: r.detail ?? null }));
+/* The aggregate pool: every leadership line, house effect and nowcast reads
+   this, never raw appr - no-aggregate houses (NO_AGG_HOUSES) are out, while
+   appr itself stays whole so APPR_BY can still key the row's detail copy. */
+const apprAgg = appr.filter((a) => !NO_AGG_HOUSES.has(a.firm));
 const cyclePolls = D.cyclePolls;
 const cycleAppr = D.cycleApproval;
 
@@ -296,7 +310,7 @@ const SPARSE_K = {
   weight: (d) => Math.exp(-LN2 * d / SPARSE_HALF)
     * (d <= SPARSE_TAPER ? 1 : 0.5 * (1 + Math.cos(Math.PI * (d - SPARSE_TAPER) / (SPARSE_WINDOW - SPARSE_TAPER)))),
 };
-const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
+const tppRows = POLLS.filter((p) => p.tpp_alp != null && !NO_AGG_HOUSES.has(p.pollster)).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
 /* Implied 2PP eligibility: a poll's primaries can only be read through the
    flow table when it files a full primary set with no documented anomaly
    (sumNote) – a set that doesn't total ~100 can't be read through a
@@ -338,7 +352,7 @@ const impliedOn = (p) =>
    its own ONP primary so §1c can re-price that one conversion cell per row
    (§1b's estimator never reads it). */
 const tppRowsSynth = POLLS
-  .filter(impOk)
+  .filter((p) => impOk(p) && !NO_AGG_HOUSES.has(p.pollster))
   .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedAlp2pp(p), n: rowN(p), firm: p.pollster, onp: p.onp, key: p.date + "|" + p.pollster }));
 /* Implied ALP–ON rows: the same waves re-read under the ALP-v-ON frozen
    table (FP_ON, above) instead of the AEC count's. Like the classic implied
@@ -351,7 +365,7 @@ const tppRowsSynth = POLLS
    just the n-weighted mean of its rows' ranges, which §1d lifts directly –
    no ratio, no simulation. */
 const tppRowsSynthOn = POLLS
-  .filter(impOk)
+  .filter((p) => impOk(p) && !NO_AGG_HOUSES.has(p.pollster))
   .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedOn(p),
                  bn: p.lnp * FP_ON_BAND.lnp + p.grn * FP_ON_BAND.grn
                      + ((p.ind || 0) + (p.oth || 0)) * FP_ON_BAND.oth,
@@ -700,7 +714,7 @@ const PRIMARY_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
 const primaryVal = (p, k) => (k === "oth" ? ((p.ind ?? null) === null && (p.oth ?? null) === null ? null : (p.ind ?? 0) + (p.oth ?? 0)) : p[k]);
 const primaryRows = {}, primaryHE = {};
 for (const k of PRIMARY_KEYS) {
-  primaryRows[k] = POLLS.filter((p) => primaryVal(p, k) != null)
+  primaryRows[k] = POLLS.filter((p) => primaryVal(p, k) != null && !NO_AGG_HOUSES.has(p.pollster))
     .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: primaryVal(p, k), n: rowN(p), firm: p.pollster }));
   primaryHE[k] = houseEffectsFor(primaryRows[k]);
 }
@@ -746,6 +760,7 @@ function altRowsFor(field) {
   const out = [];
   for (const [key, v] of ALT_BY.entries()) {
     if (v[field] == null) continue;
+    if (NO_AGG_HOUSES.has(key.split("|")[1])) continue;
     const p = POLL_BY_KEY.get(key);
     const date = key.split("|")[0];
     out.push({ ym: ymOf(date), mid: p ? midMs(p) : new Date(date).getTime(),
@@ -869,6 +884,7 @@ const effByKey = (() => {
   const onpMonth = alt2pp.alp_on.length ? alt2pp.alp_on[alt2pp.alp_on.length - 1] : null;
   const out = new Map();
   for (const p of POLLS) {
+    if (NO_AGG_HOUSES.has(p.pollster)) continue;
     const key = p.date + "|" + p.pollster;
     const eff = {};
     if (p.tpp_alp != null && cur2pp) {
@@ -948,7 +964,7 @@ const r1n = (v) => (v == null ? null : r1(v));
 const APPR_SLOTS = [["alb", "alb"], ["opp", "opp"], ["han", "han"]];
 const apprHE = {};
 for (const [prop, lk] of APPR_SLOTS) {
-  const rows = appr.filter((p) => p[prop] != null).map((p) => ({
+  const rows = apprAgg.filter((p) => p[prop] != null).map((p) => ({
     firm: p.firm, mid: midMs({ date: p.date }), n: rowN(POLL_BY_KEY.get(p.date + "|" + p.firm)),
     x: p[prop],
     strat: metricOf(p.firm, lk, p.date) + "|" + (lk === "opp" ? eraOf(p.date) : "-"),
@@ -1028,7 +1044,7 @@ const leaderMonths = MONTHS.map((ym) => {
   // …and Albanese v Hanson is a third question again, asked with the opposition
   // leader's name absent, so it lives in its own array and its own series
   const ppH = D.ppmHeadToHead.filter((r) => ymOf(r.date) === ym);
-  const rows = appr.filter((p) => ymOf(p.date) === ym);
+  const rows = apprAgg.filter((p) => ymOf(p.date) === ym);
   if (!pp.length && !rows.length && !ppH.length) return null;
   // approval and favourability are different questions – routed PER LEADER by
   // that leader's metric at the firm, never pooled into one mean
@@ -1157,7 +1173,7 @@ const leaderNow = (() => {
   const out = {};
   const put = (key, r) => { if (r) out[key] = { ...r, v: r1n(r.v), prev: r.prev != null ? r1n(r.prev) : null }; };
   const taylorEra = (p) => eraOf(p.date) === "taylor";
-  for (const [prop, lk, id, pool] of [["alb", "alb", "alb", appr], ["opp", "opp", "taylor", appr.filter(taylorEra)], ["han", "han", "hanson", appr]]) {
+  for (const [prop, lk, id, pool] of [["alb", "alb", "alb", apprAgg], ["opp", "opp", "taylor", apprAgg.filter(taylorEra)], ["han", "han", "hanson", apprAgg]]) {
     for (const metric of ["net", "fav"]) {
       const rows = [];
       for (const p of pool) {
@@ -2157,6 +2173,10 @@ const individualPolls = POLLS.map((p) => {
        and a "—" in the views; the estimator's derived weighting n is
        internal to rowN() and is never surfaced per-poll. */
     ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),
+    // a no-aggregate wave: the row renders with its figures whole, but every
+    // series, monthly point and house effect above was built WITHOUT it -
+    // the detail view's "How it counts" rail says why (see NO_AGG_HOUSES)
+    ...(NO_AGG_HOUSES.has(p.pollster) ? { noAgg: true } : {}),
     /* When the wave was PUBLISHED, where the cited release says so. The
        archive's row detail has always had a line labelled "Published" and has
        always filled it with `released`, which is the last day of FIELDWORK -
@@ -2366,6 +2386,9 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     // this poll's pull on the standing aggregates (leave-one-out, §3b) –
     // absent where the wave sits in none of the three series
     ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),
+    // same no-aggregate flag as the archive emitter (see NO_AGG_HOUSES), so a
+    // no-agg wave that ever lands in the Latest window carries the note too
+    ...(NO_AGG_HOUSES.has(p.pollster) ? { noAgg: true } : {}),
     alp2pp: p.tpp_alp ?? null, lnp2pp: p.tpp_lnp ?? null,
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
@@ -2572,6 +2595,7 @@ const FLOW_ON_BASE_MIN = 3;
 const driftOnResid = [];
 for (const [key, v] of ALT_BY.entries()) {
   if (v.ao == null) continue;
+  if (NO_AGG_HOUSES.has(key.split("|")[1])) continue;
   const p = POLL_BY_KEY.get(key);
   if (!p || !impOk(p)) continue;
   const x = v.ao;                          // published ALP share of the pairing (0-100)
@@ -3480,7 +3504,7 @@ const showWorking = (() => {
      which the guard below enforces. */
   let primary = null;
   if (primaryNow) {
-    const wPolls = POLLS.filter((p) => { if (p.alp == null) return false; const d = ddays(refNow, midMs(p)); return d >= 0 && d <= HL_WINDOW; });
+    const wPolls = POLLS.filter((p) => { if (p.alp == null) return false; if (NO_AGG_HOUSES.has(p.pollster)) return false; const d = ddays(refNow, midMs(p)); return d >= 0 && d <= HL_WINDOW; });
     wPolls.sort((a, b) => midMs(a) - midMs(b));
     const waves = new Map();
     for (const p of wPolls) waves.set(p.pollster, (waves.get(p.pollster) || 0) + 1);
@@ -3870,7 +3894,7 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     onpPts = aggPrimary.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d.onp }));
     // approval-metric readings only – the historical cycle series are
     // approve−disapprove, so favourability rows would contaminate them
-    const apprOnly = appr.filter((a) => metricOf(a.firm, "alb") !== "fav");   // PM approval only, not favourability
+    const apprOnly = apprAgg.filter((a) => metricOf(a.firm, "alb") !== "fav");   // PM approval only, not favourability
     const leaderPt = (a, v) => ({ m: monthsSince(a.date, c.eDate), v, iso: a.date, firm: a.firm, t: Date.parse(a.date), w0: 1 });
     netPts = debiasTerm(apprOnly.map((a) => leaderPt(a, a.alb)));
     oppPts = debiasTerm(apprOnly.map((a) => leaderPt(a, a.opp)), (p) => eraOf(p.iso));
@@ -3880,7 +3904,7 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     // Hanson's metric is filtered per row and per DATE – Resolve rated her on
     // likeability until the 6-11 Jul 2026 wave and on performance after it, so
     // an unbounded firm test would put favourability on an approval line.
-    hanPts = debiasTerm(appr.filter((a) => metricOf(a.firm, "han", a.date) !== "fav").map((a) => leaderPt(a, a.han)));
+    hanPts = debiasTerm(apprAgg.filter((a) => metricOf(a.firm, "han", a.date) !== "fav").map((a) => leaderPt(a, a.han)));
   } else {
     const ps = cyclePolls[c.src], as = cycleAppr[c.appr];
     const pollPt = (p, v) => ({ m: monthsSince(p.date, c.eDate), v, iso: p.date, firm: p.firm, t: Date.parse(p.date) });
