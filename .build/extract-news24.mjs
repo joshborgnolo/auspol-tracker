@@ -788,8 +788,9 @@ function parseWikiYouGov(text) {
 }
 
 // --------------------------------------------------------------- entry
-// N24_LIB=1: import the parsers (tests) without running the extraction.
-export { parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells };
+// N24_LIB=1: import the parsers and guards (tests, the layout healer's
+// acceptance step) without running the extraction.
+export { parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells, guard, WIKI_RAW };
 if (!process.env.N24_LIB) {
 const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [], releaseFilled: [] };
 

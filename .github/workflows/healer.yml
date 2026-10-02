@@ -1,0 +1,284 @@
+# Layout healer — wave-level first aid when an extractor's guard trips on an
+# upstream layout change (exit 2: page fetched fine, anchors gone — the class
+# that blinded both Wikipedia readers for twelve days in Sep 2026).
+#
+# agent-repair.yml fixes the CODE (hours, publishes to main). This workflow
+# stands in for the DATA inside the same slot:
+#
+#   gate   reads the failed run's log and reuses classify-failure.mjs — heal
+#          ONLY on the extractor's guard trip (kind exit-2). Transient
+#          upstream failures and push races are never healer work. It also
+#          stands down while an unreviewed repair/healer-<house>-* branch
+#          exists (one filing awaits a human; a second never piles up), and
+#          runs the generic 3-sessions-per-24h circuit breaker.
+#   file   re-fetches the source into .build/healer-src/evidence/, runs a
+#          headless Matilda session that reads it and writes candidate waves
+#          as JSON (no credentials, no commits), then accepts or rejects
+#          each wave DETERMINISTICALLY (.build/healer.mjs --accept: the
+#          house's own guard functions imported from the extractor, dedupe
+#          against polls.json, every figure verbatim in the evidence text).
+#          Accepted waves are committed on a repair/healer-<house>-<run>
+#          branch through the normal validate+build path, pushed by the
+#          workflow (never the agent), and a ci-alert issue asks for review.
+#
+# Nothing here commits to main; a human merges or rejects. If agent-repair
+# fixes the parser first, the branch is redundant — the issue says so and
+# the extractor's own dedupe prevents a double-filing on merge.
+#
+# Not watched by agent-repair in turn: a red healer run emails like the
+# tests do — no repairs of repairs.
+
+name: healer
+
+on:
+  workflow_run:
+    workflows:
+      - roymorgan-update
+      - news24-update
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      failed_run_id:
+        description: 'Run ID of the failed updater run to heal from'
+        required: true
+        type: string
+      house:
+        description: 'House key (drives the evidence adapter and prompt)'
+        required: true
+        type: choice
+        options:
+          - roymorgan
+          - news24
+
+run-name: "healer: ${{ github.event.workflow_run.name || inputs.house }}"
+
+permissions: {}
+
+jobs:
+  gate:
+    # Only failures on main can be a layout break worth first aid.
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read # the failed run's log; the breaker's session count
+      issues: write # breaker alert issues
+    outputs:
+      allowed: ${{ steps.pending.outputs.heal == 'true' && steps.breaker.outputs.allowed == 'true' }}
+      house: ${{ steps.ctx.outputs.house }}
+      failed_run_id: ${{ steps.ctx.outputs.failed_run_id }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - name: Resolve run context
+        id: ctx
+        env:
+          DISPATCH_RUN: ${{ inputs.failed_run_id || '' }}
+          DISPATCH_HOUSE: ${{ inputs.house || '' }}
+          EVENT_RUN: ${{ github.event.workflow_run.id || '' }}
+          EVENT_WF: ${{ github.event.workflow_run.name || '' }}
+        run: |
+          set -eu
+          if [ -n "$DISPATCH_RUN" ]; then
+            RUN_ID="$DISPATCH_RUN"; HOUSE="$DISPATCH_HOUSE"
+          else
+            RUN_ID="$EVENT_RUN"
+            case "$EVENT_WF" in
+              roymorgan-update) HOUSE=roymorgan ;;
+              news24-update)    HOUSE=news24 ;;
+              *)                HOUSE="" ;;
+            esac
+          fi
+          [ -n "$HOUSE" ] || { echo "workflow '$EVENT_WF' is not a healer house; standing down"; }
+          {
+            echo "failed_run_id=$RUN_ID"
+            echo "house=$HOUSE"
+          } >> "$GITHUB_OUTPUT"
+
+      # The poll-agent.yml "Show the updater log" step (if: always()) tailed
+      # the wrapper's log into the run log, FAIL lines included.
+      - name: Only a guard trip (exit 2) is healer work
+        id: verdict
+        if: steps.ctx.outputs.house != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.ctx.outputs.failed_run_id }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/healer-logs"
+          raw="$RUNNER_TEMP/healer-logs/run.log"
+          gh run view "$RUN_ID" --log-failed > "$raw" 2>&1 || true
+          [ -s "$raw" ] || gh run view "$RUN_ID" --log > "$raw" 2>&1 || true
+          verdict="$(node .build/healer.mjs --gate --logdir "$RUNNER_TEMP/healer-logs")"
+          echo "$verdict"
+          heal="$(printf '%s\n' "$verdict" | sed -n 's/^HEALER_GATE //p' | tail -1 | node -e 'let s="";process.stdin.on("data",(d)=>s+=d).on("end",()=>{try{process.stdout.write(JSON.parse(s).heal===true?"true":"false")}catch{process.stdout.write("false")}})')"
+          echo "gate verdict: heal=$heal"
+          echo "heal=$heal" >> "$GITHUB_OUTPUT"
+
+      - name: Stand down while a healer branch for the house is open
+        id: pending
+        if: steps.verdict.outputs.heal == 'true'
+        env:
+          HOUSE: ${{ steps.ctx.outputs.house }}
+        run: |
+          if git ls-remote --heads origin "repair/healer-${HOUSE}-*" | grep -q .; then
+            echo "an unreviewed repair/healer-${HOUSE}-* branch exists — the filing awaits a human, not another session"
+            echo "heal=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "heal=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Circuit breaker
+        id: breaker
+        if: steps.pending.outputs.heal == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HOUSE: ${{ steps.ctx.outputs.house }}
+        run: bash .build/repair-gate.sh "healer-${HOUSE}" healer.yml file
+
+      - name: Alert when the circuit breaker is tripped
+        if: steps.pending.outputs.heal == 'true' && steps.breaker.outputs.allowed == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HOUSE: ${{ steps.ctx.outputs.house }}
+          FAILED_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ steps.ctx.outputs.failed_run_id }}
+        run: |
+          bash .build/alert-issue.sh \
+            "Repair circuit breaker: healer-${HOUSE}" \
+            "Three healer sessions in 24h and ${HOUSE} is still guard-tripping — [failed run](${FAILED_RUN_URL}), [this run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). No further healer sessions this window; this layout break needs a human."
+
+  file:
+    needs: gate
+    if: needs.gate.outputs.allowed == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    # The filer pushes a repair/ BRANCH, never main, so it only has to keep
+    # from racing itself (same shape as newspoll-watch's file-missing).
+    concurrency:
+      group: healer-${{ needs.gate.outputs.house }}
+      cancel-in-progress: false
+    permissions:
+      contents: write  # push the repair branch (and only the branch)
+      issues: write    # the review request
+      actions: read
+    env:
+      HOUSE: ${{ needs.gate.outputs.house }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0 (the credential strip below removes what v5 persists)
+
+      - name: Pin Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install puppeteer-core (best effort, for the gated share-card redraw)
+        run: npm ci --ignore-scripts --no-audit --no-fund || true
+
+      # Agent code runs only after this: the session holds no credential.
+      - name: Strip the persisted git credentials
+        run: |
+          git config --unset-all http.https://github.com/.extraheader || true
+          git config --unset-all url."https://github.com/".insteadOf || true
+          git config --unset-all url."git@github.com:".insteadOf || true
+
+      - name: Fetch the page the parser choked on
+        id: evidence
+        run: node .build/healer.mjs --fetch-evidence --house "$HOUSE"
+
+      # Pin the agent CLI: a floating @latest install means a tag move
+      # changes the code that runs with MATILDA_API_KEY (same rationale as
+      # poll-agent.yml, agent-repair.yml and newspoll-watch.yml).
+      - name: Install Matilda CLI
+        if: steps.evidence.outcome == 'success'
+        run: npm i -g @maincode-ai/matilda-code@0.21.4
+
+      # Deliberately NO GITHUB_TOKEN here: the workflow owns every remote op.
+      - name: Read the evidence and propose the wave
+        if: steps.evidence.outcome == 'success'
+        id: agent
+        env:
+          MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          if [ -z "$MATILDA_API_KEY" ]; then
+            echo "::warning::MATILDA_API_KEY secret not set; skipping the heal session. Add it in repo Settings > Secrets."
+            exit 0
+          fi
+          matilda -p "$(cat ".build/healer-prompts/${HOUSE}.md")" --yolo --output-format text --max-wall-time 15m --max-tool-calls 60
+
+      # The deterministic acceptance gate: house guard functions imported
+      # from the extractor + (pollster,date) dedupe + verbatim figures.
+      # Zero accepted waves is a quiet, successful run.
+      - name: Accept only what passes the house's own guards
+        id: accept
+        if: steps.evidence.outcome == 'success'
+        env:
+          HEALER_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          out="$(node .build/healer.mjs --accept --house "$HOUSE")"
+          echo "$out"
+          status="$(printf '%s\n' "$out" | sed -n 's/^HEALER_STATUS //p' | tail -1)"
+          parsed="$(printf '%s' "$status" | node -e 'let s="";process.stdin.on("data",(d)=>s+=d).on("end",()=>{try{const o=JSON.parse(s);process.stdout.write([(o.changed===true).toString(),(o.accepted||[]).map(a=>a.date).join("+")].join("\n"))}catch{process.stdout.write("false\n")}})')"
+          changed="$(printf '%s' "$parsed" | sed -n 1p)"
+          dates="$(printf '%s' "$parsed" | sed -n 2p)"
+          {
+            echo "changed=$changed"
+            echo "dates=$dates"
+          } >> "$GITHUB_OUTPUT"
+
+      # The same validate+build path a writer runs, on the review branch, so
+      # the compare shows exactly what merge will deploy. Generated files
+      # and the gen-data dataset ride along via the shared SITE_FILES list.
+      - name: Validate, build and commit the accepted wave(s) on a review branch
+        id: commit
+        if: steps.accept.outputs.changed == 'true'
+        env:
+          CHROME: /usr/bin/google-chrome
+          DATES: ${{ steps.accept.outputs.dates }}
+        run: |
+          set -eu
+          BRANCH="repair/healer-${HOUSE}-${GITHUB_RUN_ID}"
+          git checkout -b "$BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          node .build/newtracker/validate.mjs
+          REPO="$GITHUB_WORKSPACE"; export REPO
+          LOG_DIR=".build/logs"; LOG="$LOG_DIR/healer.log"; export LOG
+          mkdir -p "$LOG_DIR"
+          log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
+          # refresh_site + SITE_FILES come from the shared writer library
+          . "$REPO/.build/git-push-main.sh"
+          refresh_site
+          git add data/polls.json .build/healer-src .build/roymorgan-src .build/news24-src "${SITE_FILES[@]}"
+          git commit -m "Healer-filed ${HOUSE} wave(s) ${DATES} — review before merge" \
+            -m "Proposed from the fetched source text by the healer agent after the ${HOUSE} extractor guard-tripped on an upstream layout change; accepted deterministically (.build/healer.mjs: house guard functions, polls.json dedupe, every figure verbatim in the evidence). The run proof is in .build/healer-src/. Never hand-merged blind — see the ci-alert issue."
+
+      # Same posture as newspoll-watch's filer: this repo forbids Actions
+      # from opening PRs, so the branch goes up and the issue carries the
+      # one-click compare link — the review this gate exists for.
+      - name: Push the branch and ask for a review
+        if: steps.commit.outputs.branch != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.commit.outputs.branch }}
+          DATES: ${{ steps.accept.outputs.dates }}
+          FAILED_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ needs.gate.outputs.failed_run_id }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x:%s' "$GH_TOKEN" | base64 -w0)" \
+            push origin "HEAD:${BRANCH}"
+          COMPARE="https://github.com/${GITHUB_REPOSITORY}/compare/main...${BRANCH}?expand=1"
+          BODY="$(printf '%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n' \
+            "The layout healer pushed \`${BRANCH}\` after the ${HOUSE} updater guard-tripped (exit 2) on an upstream layout change — [failed run](${FAILED_RUN_URL}), [healer run](${RUN_URL})." \
+            "**[Open the pull request](${COMPARE})** to review the filing (${DATES}). Nothing here has touched main or the live site; merging deploys it." \
+            "The deterministic gate already enforced: the extractor's own guard checks, dedupe against polls.json, and every figure appearing verbatim in the fetched source text. The run proof (.build/healer-src/, on the branch) records both accepted and rejected candidates." \
+            "Still check by eye: the figures match the cited source, the fieldwork dates are the wave's own, and the diff is one polls.json filing plus generated artifacts — no workflow, prompt or extractor changes." \
+            "If agent-repair has since fixed the parser and landed the wave, this branch is redundant (the extractor dedupes by pollster+date, so merging is still safe). Reject or merge, then delete the branch." \
+            "Closing this issue without merging means only 'not now' — the next guard trip won't re-file while the branch is still open.")"
+          bash .build/alert-issue.sh "Healer filing ready for review: ${HOUSE}" "$BODY"
+          echo "review link: $COMPARE" | tee -a "$GITHUB_STEP_SUMMARY"

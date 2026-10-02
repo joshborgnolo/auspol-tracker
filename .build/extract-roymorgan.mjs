@@ -81,7 +81,32 @@
 // Provenance: each appended release's parsed post JSON is saved to
 // .build/roymorgan-src/release-<slug>.json and committed alongside.
 //
+// Adjudication (2026-10-02): the judgement calls this script used to punt —
+//   * DOUBLE releases: ≥2 unfiled candidates ≤4 days apart or with
+//     overlapping field windows (a fortnight special sitting beside the
+//     weekly wave; a wave republished under a second slug). Plain runs file
+//     every candidate as before; --adjudicate emits a case and HOLDS the
+//     cluster, and the wrapper re-runs with --decisions <verdict-file>
+//     (file_both | file_only <slug> | never_file <slug>). never_file and
+//     the file_only sibling persist to .build/roymorgan-src/adjudicated.json
+//     so the slug is dropped from candidates on later runs (dup_of).
+//   * REISSUES: a candidate whose wave date already has a polls row but
+//     whose parsed figures moved >0.5pt (a corrected or expanded
+//     re-release). Case → heal_absent (fills fields the row leaves ABSENT,
+//     from the parser's values; a field the row carries is never touched —
+//     the never-overwrite covenant holds) or escalate (no data change; the
+//     correction is repair-agent or human work, noted in the run status).
+//   The LLM's verdicts are routing only; every row filed still passes
+//   guardRelease in this run, and validate.mjs runs in the wrapper after.
+//   Without --adjudicate the script behaves exactly as before.
+//
+// Fetch fixture seam for tests: --feed-dir <dir> reads the feed page(s) and
+// per-post payloads from files instead of the network:
+//   <dir>/feed-page-<n>.json   the findings-search array for page n
+//   <dir>/post-<slug>.json     the post's __NEXT_DATA__ object
+//
 // Usage: node .build/extract-roymorgan.mjs [--check] [search-api-base]
+//        [--adjudicate] [--decisions <file>] [--feed-dir <dir>]
 //
 // Automation contract (safe to schedule in launchd):
 //   - idempotent: re-running with unchanged upstream data writes nothing
@@ -99,7 +124,8 @@ import { fetchText, TRACKER_UA, FETCH_TRIES, FETCH_TIMEOUT_MS, MONTHS, clean, wr
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
-const FEED_URL = argv.find((a) => !a.startsWith("--")) || "https://wp.roymorgan.com/wp-json/rmr/v1/findings-search";
+const FEED_DEFAULT = "https://wp.roymorgan.com/wp-json/rmr/v1/findings-search";
+const FEED_URL = argv.find((a) => !a.startsWith("--")) || FEED_DEFAULT;
 // The front-end's own query: date-ordered, filtered server-side to the
 // "Federal Poll" topic, 10 posts/page (x-wp-totalpages reports the count).
 const FEED_QS = "sort_by=date&topic[]=federal-poll";
@@ -353,6 +379,11 @@ function guardRelease(r, slug, releaseDate) {
 }
 
 // -------------------------------------------------------------------- main
+// RM_LIB=1: import the parser/guard/feed helpers (the layout healer's
+// evidence fetch and acceptance step) without running the extraction.
+// Same pattern as extract-news24.mjs's N24_LIB.
+export { guardRelease, parseRelease, fetchFeedPage, nextData, dmyToIso, FEED_DEFAULT };
+if (!process.env.RM_LIB) {
 const status = { changed: false, check: CHECK, added: [], skipped_existing: [], warnings: [], feed: FEED_URL };
 try {
   const orig = readFileSync(OUT, "utf8");
@@ -502,3 +533,4 @@ try {
   console.log("RM_STATUS " + JSON.stringify(status));
   process.exit(1);
 }
+} // RM_LIB

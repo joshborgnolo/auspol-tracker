@@ -19,6 +19,12 @@ node_modules/
 # seen.json (the first-seen grace ledger) beside it IS committed.
 .build/pollbludger-src/current.xml
 
+# layout healer: fetched evidence text and the agent's output scratch are
+# per-run bulk; the .*-proof.json files beside them ARE committed on the
+# review branch.
+.build/healer-src/evidence/
+.build/healer-out/
+
 # wrangler's local build/state dir, left beside the dispatch-clock Worker by
 # `npx wrangler deploy` (see .build/dispatch-clock/README.md)
 .wrangler/

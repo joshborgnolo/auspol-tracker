@@ -80,4 +80,9 @@ for (const f of callers)
   if (text[f].includes("# tune-schedules:begin"))
     assert.ok(tuneList.includes(nameOf(text[f])), `${f} has a tuned block but schedule-tune.yml doesn't run when it lands a wave`);
 
+const healerList = listUnder(text["healer.yml"], "workflows");
+assert.ok(healerList.length >= 2, "healer.yml's watch list parsed");
+for (const w of healerList) assert.ok(names.has(w), `healer watches '${w}', which is no workflow's name`);
+assert.ok(!healerList.includes("healer"), "healer must not watch itself");
+
 console.log(`test-workflows: ok (${files.length} workflows, ${callers.length} poll-agent callers)`);
