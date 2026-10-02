@@ -14,9 +14,12 @@
 // carries the sidebar, so one plain curl a week keeps the record whole;
 // the history before install day is the one-off Wayback backfill's job
 // (.build/bonham-wayback-backfill.mjs), which writes the same file with
-// the same row shape. The One Nation series is recorded but never drawn:
-// his shadow estimate is respondent-allocated-flavoured and is not
-// comparable with the tracker's frozen-flow implied pairing.
+// the same row shape. The One Nation series rides AS PUBLISHED wherever
+// the page draws it: it was "recorded but never drawn" until the
+// 2026-10-02 hero overlay took it onto the Labor v One Nation contest,
+// marked as his figures beside the implied-flows line it cannot be
+// rebuilt to — the shadow estimate is respondent-allocated-flavoured and
+// is not comparable with the tracker's frozen-flow implied pairing.
 //
 // WHAT A ROW IS
 // [date, alpShare] where the date is HIS "Last update D Mon" stamp, not

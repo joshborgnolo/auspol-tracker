@@ -2250,9 +2250,29 @@ const extAgg = {
     const rep = bonhamReplica(POLLS, LATEST_ISO);
     const daily = rep.daily.filter((d) => d.sm != null);
     if (!daily.length) return null;
+    /* drawn on the same month-anchor lattice as every other line the hero
+       overlays – a daily polyline of his 7-day-smoothed index renders as
+       jitter beside the month-anchored house lines. The daily series itself
+       stays the validation substrate (.build/check-bonham-replica.mjs runs
+       bonham-replica.mjs directly); sampling changes nothing he published */
+    const smByIso = new Map(daily.map((d) => [d.iso, d.sm]));
+    const replica = MONTHS.map((ym) => {
+      const y = smByIso.get(ym + "-15");
+      return y == null ? null : { x: mx(ym), y };
+    }).filter(Boolean);
+    /* the live head: the latest smoothed day rides past the last month
+       anchor, so the right edge breathes with the data like the main line */
+    const tail = daily[daily.length - 1];
+    const tx = xOfIso(tail.iso);
+    if (!replica.length || tx > replica[replica.length - 1].x + 0.002) replica.push({ x: tx, y: tail.sm });
+    if (!replica.length) return null;
     return {
-      replica: daily.map((d) => ({ x: xOfIso(d.iso), y: d.sm })),
+      replica,
       published: (KBONHAM?.series || []).map(([iso, alp]) => ({ x: xOfIso(iso), y: alp })),
+      /* his One Nation shadow-2PP stamps ride AS PUBLISHED (respondent-
+         allocated flavour – nothing to rebuild); the hero draws them only
+         on the Labor v One Nation contest */
+      shadow: (KBONHAM?.shadow || []).map(([iso, alp]) => ({ x: xOfIso(iso), y: alp })),
       site: "kevinbonham.blogspot.com",
     };
   })(),
@@ -4689,7 +4709,8 @@ window.AUSPOL = (function () {
   const accuracy = ${JSON.stringify(accuracy)};
   /* The external aggregates the hero can overlay (§6b): BludgerTrack's
      machine trend, and Kevin Bonham's line as a RECONSTRUCTION of his
-     published method with his as-published sidebar stamps beside it. */
+     published method with his as-published sidebar stamps beside it –
+     the One Nation shadow estimate rides AS PUBLISHED. */
   const extAgg = ${JSON.stringify(extAgg)};
   const individualPolls = ${JSON.stringify(individualPolls)};
   const pollsterTable = ${JSON.stringify(pollsterTable)};
