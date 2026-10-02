@@ -691,19 +691,50 @@ html = html.replace("<!--STATIC_SUMMARY-->", "\n    " + buildStaticSummary() + "
    It was updatedISO - the end of the most recent poll's FIELDWORK - and a
    correction to a poll's publisher moves one and not the other, so the check
    could call a card current while it showed a date the site no longer did. */
+/* The contest the card quotes. The card draws Labor against the rival the
+   site leads with - gen-data's rivalLead, the deadbanded walk over the
+   implied series that also picks the hero's contest and the favicon's
+   needle. When that rival is One Nation the figures are latest.onImp's
+   (the pairing's only quoted level; its interval is the flow table's RANGE,
+   not a sampling interval), and the pollsters' published head-to-heads the
+   only fallback. make-card.js's Q builds this same view from the same
+   dataset - the two must never disagree about what the card says, or the
+   stamp below calls a current card stale. */
+function cardContest() {
+  const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const grab = (name) => {
+    const i = src.indexOf("const " + name + " = ");
+    if (i < 0) throw new Error(name + " not found in dataset");
+    return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
+  };
+  const L = grab("latest"), S = grab("synthLatest"), alt = grab("altLatest");
+  const hv = headlineView(L, S);
+  const onImp = L.onImp && L.onImp.a != null ? L.onImp : null;
+  const onPub = alt && alt.alp_on && alt.alp_on.a != null ? alt.alp_on : null;
+  if (L.rivalLead !== "alp_on" || (!onImp && !onPub))
+    return { ...hv, vs: "lnp", oppLab: "Coalition" };
+  const s = onImp || onPub;
+  return { ...hv, vs: "onp", oppLab: "One Nation",
+           alp2pp: s.a, lnp2pp: s.b,
+           alp2ppCi95: onImp ? s.band : s.ci95,
+           alp2ppPrev: s.aPrev, changeSig: !!s.changeSig,
+           method: { ...hv.method, nPolls: s.n },
+           basis: onImp ? "imp" : "pub" };
+}
 /* The card's figure block, in exactly the shape make-card.js stamps into
    assets/auspol-card.json – mirror any change in both files. Written out as
    a machine-readable sidecar so render-card's staleness gate (and any future
    consumer) reads it here instead of string-splitting the dataset asset the
    way grabLatest does. */
 function cardFigs(L) {
-  return { alp: L.alp2pp.toFixed(1), lnp: L.lnp2pp.toFixed(1),
+  return { vs: L.vs, alp: L.alp2pp.toFixed(1), lnp: L.lnp2pp.toFixed(1),
            ci: L.alp2ppCi95.toFixed(1),
            n: L.method.nPolls, win: L.method.windowDays,
-           mom: (L.alp2pp - L.alp2ppPrev).toFixed(1), sig: !!L.changeSig,
+           mom: (L.alp2pp - (L.alp2ppPrev != null ? L.alp2ppPrev : L.alp2pp)).toFixed(1),
+           sig: !!L.changeSig,
            basis: L.basis };
 }
-const cardNow = grabLatest();
+const cardNow = cardContest();
 writeAtomic(path.join(ROOT, "assets", "auspol-latest.json"),
   JSON.stringify({ publishedISO: cardNow.publishedISO, fig: cardFigs(cardNow) }) + "\n");
 let cardStamp = null, cardFigsDrawn = null;
@@ -746,8 +777,8 @@ const cardFigKey = cardFigsDrawn
 const cardUrl = `${SITE_URL}assets/auspol-card.png?v=${(cardStamp || dataStamp) + cardFigKey}`;
 /* The card is now a chart with figures on it, so its alt says them. Someone
    who cannot see the preview should get the same reading from it. */
-const cl = grabLatest();
-const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, Coalition ${cl.lnp2pp.toFixed(1)} `
+const cl = cardContest();
+const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, ${cl.oppLab} ${cl.lnp2pp.toFixed(1)} `
   + `two-party preferred${basisClause(cl)}, ±${cl.alp2ppCi95.toFixed(1)} points, updated ${cl.updated}, `
   + `with the trend since the 2025 election`;
 /* SERP + social description. It opens with the site's name because Google
@@ -755,11 +786,13 @@ const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, Coalition ${cl.l
    tracker" it skipped the old tagline-first description and quoted the
    footer disclaimer, the one page line that began with the name. The date
    leads the race sentence so a stale cached snippet stays self-dating even
-   after Google truncates it (~160 characters). Reuses the same numbers as
-   the card alt and the summary below. */
+   after Google truncates it (~160 characters). Keeps the site's headline
+   race sentence - Labor v the Coalition - even when the share card is
+   quoting the leading contest (the cardAlt above follows the card). */
+const hl = grabLatest();
 const metaDesc = `auspol tracker averages every published Australian federal opinion poll. `
-  + `As of ${cl.updated}, ${raceLine(cl).replace(/^The /, "the ")} two-party preferred${basisClause(cl)} (±${cl.alp2ppCi95}), `
-  + `from ${cl.pollsTracked} polls by ${cl.housesTracked} pollsters. `
+  + `As of ${hl.updated}, ${raceLine(hl).replace(/^The /, "the ")} two-party preferred${basisClause(hl)} (±${hl.alp2ppCi95}), `
+  + `from ${hl.pollsTracked} polls by ${hl.housesTracked} pollsters. `
   + `Primary votes, every poll, and the last ${pastCycleWord()} elections for comparison.`;
 
 /* Structured data. With no Wikipedia entry, Google's knowledge of the site

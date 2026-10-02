@@ -61,6 +61,46 @@
         changeSig: D.synthLatest.changeSig,
         method: { ...D.latest.method, nPolls: D.synthLatest.n } }
     : D.latest;
+  /* WHICH CONTEST THE CARD QUOTES
+     Labor against the rival the site leads with - gen-data's rivalLead, the
+     deadbanded walk over the implied series that the hero, the favicon and
+     the masthead all defer to. The card drew ALP v L/NP whatever the page
+     led with, so while One Nation held the spot it previewed a contest the
+     page had left. When the ON pairing is quoted its figures come from
+     latest.onImp - the pairing's only quoted level, the primaries read
+     through one first-principles flow set - with the pollsters' published
+     head-to-heads (altLatest.alp_on) the only fallback. The implied
+     pairing's interval is that flow table's own RANGE, not a 95% sampling
+     interval, so the caveat line names it "flow range", as the hero does.
+     Mirror: build.mjs's cardContest builds this same view. */
+  const onImp = D.latest.onImp && D.latest.onImp.a != null ? D.latest.onImp : null;
+  const onPub = D.altLatest && D.altLatest.alp_on && D.altLatest.alp_on.a != null
+    ? D.altLatest.alp_on : null;
+  const VS_ON = D.latest.rivalLead === "alp_on" && !!(onImp || onPub);
+  /* One normalised view of the quoted contest, so nothing below branches on
+     the matchup again. LNP: the implied merge above (published fallback),
+     trend the classic aggregate, anchored at the 2025 count. ON: onImp's
+     figures, its flow range as the band, trend the implied ALP-ON monthly
+     series (alt2pp.alp_on under the published fallback) - no anchor, no
+     ALP-ON count of the 2025 election exists. */
+  const Q = VS_ON ? {
+    opp: "onp", oppLab: "One Nation",
+    a: onImp ? onImp.a : onPub.a, b: onImp ? onImp.b : onPub.b,
+    ci: onImp ? onImp.band : onPub.ci95, ciLab: onImp ? "flow range" : "95% interval",
+    prev: onImp ? onImp.aPrev : onPub.aPrev,
+    sig: !!(onImp ? onImp.changeSig : onPub.changeSig),
+    n: onImp ? onImp.n : onPub.n, imp: !!onImp,
+    series: (onImp ? D.synthOn : D.alt2pp.alp_on).map((d) => ({ x: d.x, a: d.a, b: d.b })),
+    anchor: null,
+  } : {
+    opp: "lnp", oppLab: "Coalition",
+    a: L.alp2pp, b: L.lnp2pp,
+    ci: L.alp2ppCi95, ciLab: "95% interval",
+    prev: L.alp2ppPrev, sig: !!L.changeSig,
+    n: L.method.nPolls, imp: IS_IMP,
+    series: D.agg2pp.map((d) => ({ x: d.x, a: d.alp, b: d.lnp })),
+    anchor: "2025 election, Labor " + D.agg2pp[0].alp.toFixed(1),
+  };
   const W = 1200, H = 630, S = 2;              // draw at 2x, export at 1x
   const cv = document.createElement("canvas");
   cv.width = W * S; cv.height = H * S;
@@ -79,6 +119,7 @@
   T.panel = R("oklch(0.988 0.005 80)");
   T.alpFill = R("oklch(0.55 0.150 27 / 0.13)");
   T.lnpFill = R("oklch(0.50 0.095 250 / 0.13)");
+  T.onpFill = R("oklch(0.66 0.130 58 / 0.13)");
 
   c.fillStyle = T.bg; c.fillRect(0, 0, W, H);
   const PAD = 70;
@@ -166,12 +207,9 @@
     const r = 12 * k, rad = (d) => ((d - 90) * Math.PI) / 180;
     const P = (d, rr) => ({ x: cx + Math.sin((d * Math.PI) / 180) * rr,
                             y: cy - Math.cos((d * Math.PI) / 180) * rr });
-    // whichever opponent polls the highest 2PP against Labor
-    const g2 = D.agg2pp[D.agg2pp.length - 1];
-    const gon = D.alt2pp && D.alt2pp.alp_on && D.alt2pp.alp_on[D.alt2pp.alp_on.length - 1];
-    const cands = [{ id: "lnp", lab: g2.alp, opp: g2.lnp }];
-    if (gon) cands.push({ id: "onp", lab: gon.a, opp: gon.b });
-    const top = cands.slice().sort((x, y) => y.opp - x.opp)[0];
+    // the rival the site leads with - the same contest Q quotes (rivalLead's
+    // deadbanded ruling), so the needle, the figures and the page never mix
+    const top = { id: Q.opp, lab: Q.a, opp: Q.b };
     const oppCol = T[top.id], margin = top.lab - top.opp;
 
     const arc = (a, b, col) => { c.beginPath(); c.arc(cx, cy, r, rad(a), rad(b));
@@ -204,8 +242,8 @@
      The band was 143px tall carrying one 14px line; the figures below need
      the whole middle of the card, and this is the only place the standfirst
      fits without taking it from them. */
-  const marg = L.alp2pp - L.lnp2pp, chg = L.alp2pp - L.alp2ppPrev;
-  const basisTag = IS_IMP ? ", implied preference flows" : "";
+  const marg = Q.a - Q.b, chg = Q.prev != null ? Q.a - Q.prev : 0;
+  const basisTag = Q.imp ? ", implied preference flows" : "";
   c.textAlign = "right";
   /* The PUBLICATION date of the most recent poll, which is what the site's own
      "Updated" stamp shows - not `updated`, the end of its fieldwork. The two
@@ -217,14 +255,14 @@
      and the 2.2px tracking with it, being what carried the caps. */
   caps("Updated " + L.published, W - PAD, 74, 13.5, 0, T.ink3, 600);
   c.font = '600 40px "Crimson Text", Georgia, serif'; c.fillStyle = T.ink;
-  c.fillText((marg >= 0 ? "Labor" : "Coalition") + " leads by " + Math.abs(marg).toFixed(1), W - PAD, 116);
+  c.fillText((marg >= 0 ? "Labor" : Q.oppLab) + " leads by " + Math.abs(marg).toFixed(1), W - PAD, 116);
   // one line, not two: the caveats belong beside the sentence they qualify.
   // The page will not call a move real unless it clears its own interval.
   c.font = '400 15px "IBM Plex Sans", sans-serif'; c.fillStyle = T.ink3;
-  c.fillText("95% interval ±" + L.alp2ppCi95.toFixed(1) + " pts, "
-             + L.method.nPolls + " polls in " + L.method.windowDays + " days, "
+  c.fillText(Q.ciLab + " ±" + Q.ci.toFixed(1) + " pts, "
+             + Q.n + " polls in " + L.method.windowDays + " days, "
              + (chg > 0 ? "+" : "−") + Math.abs(chg).toFixed(1) + " vs 1 month ago"
-             + (L.changeSig ? "" : ", within the margin")
+             + (Q.sig ? "" : ", within the margin")
              + basisTag, W - PAD, 142);
   c.textAlign = "left";
   c.strokeStyle = T.line; c.lineWidth = 1;
@@ -249,10 +287,10 @@
     return c.measureText(t).width; };
   const measFig = (v) => { c.font = figFont; return c.measureText(v.toFixed(1)).width; };
 
-  const wLabTxt = measLabel("Labor"), wCoaTxt = measLabel("Coalition");
-  const wAlp = measFig(L.alp2pp), wLnp = measFig(L.lnp2pp);
-  const rowW = DOT * 2 + 10 + wLabTxt + GAP + wAlp + GAP + 1 + GAP + wLnp
-             + GAP + wCoaTxt + 10 + DOT * 2;
+  const wLabTxt = measLabel("Labor"), wOppTxt = measLabel(Q.oppLab);
+  const wAlp = measFig(Q.a), wOpp = measFig(Q.b);
+  const rowW = DOT * 2 + 10 + wLabTxt + GAP + wAlp + GAP + 1 + GAP + wOpp
+             + GAP + wOppTxt + 10 + DOT * 2;
   let x = (W - rowW) / 2;
 
   /* Centred on the label's cap height, not floating above it - derived from
@@ -266,13 +304,13 @@
 
   dot(x + DOT, T.alp); x += DOT * 2 + 10;
   caps("Labor", x, FIG_Y, LAB_PX, 0, T.ink2, 700); x += wLabTxt + GAP;
-  figure(L.alp2pp, T.alp); x += GAP;
+  figure(Q.a, T.alp); x += GAP;
   c.strokeStyle = T.line; c.lineWidth = 1;
   c.beginPath(); c.moveTo(x + 0.5, FIG_Y - 104); c.lineTo(x + 0.5, FIG_Y); c.stroke();
   x += 1 + GAP;
-  figure(L.lnp2pp, T.lnp); x += GAP;
-  caps("Coalition", x, FIG_Y, LAB_PX, 0, T.ink2, 700); x += wCoaTxt + 10;
-  dot(x + DOT, T.lnp);
+  figure(Q.b, T[Q.opp]); x += GAP;
+  caps(Q.oppLab, x, FIG_Y, LAB_PX, 0, T.ink2, 700); x += wOppTxt + 10;
+  dot(x + DOT, T[Q.opp]);
 
   /* ---- the term's trend -------------------------------------------------- */
   /* The plot sits on its own, lighter panel running the full width and bled
@@ -285,7 +323,8 @@
      70px of air. */
   c.fillStyle = T.panel; c.fillRect(0, 372, W, H - 372);
   const CX0 = 0, CX1 = W - PAD, CY0 = 392, CY1 = 578;
-  const xs = D.agg2pp.map((d) => d.x), x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const TS = Q.series;          // the quoted contest's term trend, [{x, a, b}]
+  const xs = TS.map((d) => d.x), x0 = Math.min(...xs), x1 = Math.max(...xs);
   const y0 = 43, y1 = 57;
   const sx = (x) => CX0 + ((x - x0) / (x1 - x0)) * (CX1 - CX0);
   const sy = (y) => CY1 - ((y - y0) / (y1 - y0)) * (CY1 - CY0);
@@ -293,8 +332,8 @@
     const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
     c.bezierCurveTo(p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6,
                     p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6, p2[0], p2[1]); } };
-  const aPts = D.agg2pp.map((d) => [sx(d.x), sy(d.alp)]);
-  const lPts = D.agg2pp.map((d) => [sx(d.x), sy(d.lnp)]);
+  const aPts = TS.map((d) => [sx(d.x), sy(d.a)]);
+  const lPts = TS.map((d) => [sx(d.x), sy(d.b)]);
 
   /* Shade the LEAD - the leader's line down to 50% - not the gap between the
      two lines. The lines are exact complements, so the gap is twice the margin
@@ -310,7 +349,7 @@
      were behind. Today Labor leads throughout, so this changes nothing yet. */
   c.save();
   c.beginPath(); c.rect(0, CY0 - 40, W, sy(50) - (CY0 - 40)); c.clip();
-  [[aPts, T.alpFill], [lPts, T.lnpFill]].forEach(([pts, fill]) => {
+  [[aPts, T.alpFill], [lPts, T[Q.opp + "Fill"]]].forEach(([pts, fill]) => {
     c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); curve(pts);
     c.lineTo(CX1, sy(50)); c.lineTo(CX0, sy(50)); c.closePath();
     c.fillStyle = fill; c.fill();
@@ -326,7 +365,7 @@
   c.beginPath(); c.moveTo(CX0, sy(50)); c.lineTo(CX1, sy(50)); c.stroke();
   c.setLineDash([]); c.globalAlpha = 1;
 
-  [[lPts, T.lnp], [aPts, T.alp]].forEach(([pts, col]) => {
+  [[lPts, T[Q.opp]], [aPts, T.alp]].forEach(([pts, col]) => {
     c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); curve(pts);
     c.strokeStyle = col; c.lineWidth = 5; c.lineCap = "round"; c.lineJoin = "round"; c.stroke();
     const e = pts[pts.length - 1];
@@ -338,7 +377,13 @@
      caps legible and what makes lowercase look pulled apart. The right-hand
      label takes the chart axis's own form - month, curly apostrophe, two
      digits - the same string buildXTicks writes on the site. */
-  caps("2025 election, Labor " + D.agg2pp[0].alp.toFixed(1), PAD, 604, 13.5, 0, T.ink3, 600);
+  /* Left end: the 2025 count, the classic pairing's own anchor. The ALP-ON
+     pairing HAS no such count, so its trend opens on its first month
+     instead - the right-hand label's own form, so the two ends match. */
+  const MNS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const t0 = new Date(Q.series[0].x);
+  const leftLab = Q.anchor || MNS[t0.getUTCMonth()] + " ’" + String(t0.getUTCFullYear()).slice(2);
+  caps(leftLab, PAD, 604, 13.5, 0, T.ink3, 600);
   c.textAlign = "right"; caps("Aug \u201926", W - PAD, 604, 13.5, 0, T.ink3, 600); c.textAlign = "left";
 
   /* ---- footer ------------------------------------------------------------ */
@@ -370,11 +415,12 @@
      launching Chrome. Same shape build.mjs writes into
      assets/auspol-latest.json – mirror any change in both files. */
   window.__auspolCard = { png, publishedISO: L.publishedISO, fig: {
-    alp: L.alp2pp.toFixed(1), lnp: L.lnp2pp.toFixed(1),
-    ci: L.alp2ppCi95.toFixed(1),
-    n: L.method.nPolls, win: L.method.windowDays,
-    mom: (L.alp2pp - L.alp2ppPrev).toFixed(1), sig: !!L.changeSig,
-    basis: IS_IMP ? "imp" : "pub" } };
+    vs: VS_ON ? "onp" : "lnp",
+    alp: Q.a.toFixed(1), lnp: Q.b.toFixed(1),
+    ci: Q.ci.toFixed(1),
+    n: Q.n, win: L.method.windowDays,
+    mom: (Q.a - (Q.prev != null ? Q.prev : Q.a)).toFixed(1), sig: Q.sig,
+    basis: Q.imp ? "imp" : "pub" } };
   console.log("card drawn for data dated " + L.publishedISO
               + " – put this in assets/auspol-card.json");
   const a = document.createElement("a");
