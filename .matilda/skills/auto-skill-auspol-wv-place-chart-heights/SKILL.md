@@ -120,3 +120,23 @@ vs 1036.0 at 820, same after morph at 1440; ALL PASS. validate.mjs exit
 via `node .build/newtracker/build.mjs` first — and shield any sibling's
 dirty rd.css (it inlines into index.html; see
 auto-skill-shared-repo-session-race for the stash/checkout/restore dance).
+
+## Card widths — a LONE card must always fill the row with flexGrow 1
+
+The companion problem (same `.rd-wv-charts` row, asked the same day): the
+By-education chart stopped ~270px short of the row's right edge on
+desktop while By gender filled it. cardsFor gives each chart
+`span = x1 − x0` (x-domain span in YEARS; Education's four-house wave
+history spans ~0.68yr vs Gender's ~1.27yr) and cardOf sized the card
+`flexGrow: Math.max(0.35, c.span)`. CSS hands a row whose grow factors
+sum to LESS than 1 only that fraction of the free space — Education
+(factor 0.68) got a third of the free space withheld (measured at 1440:
+card right edge 1026 vs row edge 1296) while Gender (1.27) filled the row
+by accident. The proportional sizing only exists for two-chart tabs (Age,
+Home) so the pair share the row in x-span proportion beside the RdFoot
+"Both panels share one scale" note. Fix (rd-panels.jsx ~:2061):
+`flexGrow: narrow || charts.length < 2 ? 1 : Math.max(0.35, c.span)` —
+never restore an ungated Max(0.35, span). Verified by
+`.matilda/wv-widths.mjs` measuring rendered card rects per tab (run with
+`URL="file://…built index.html"` after rebuild: Education card right edge
+== row right edge 1296 at 1440px).
