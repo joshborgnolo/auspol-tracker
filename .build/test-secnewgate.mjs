@@ -6,7 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
-import { titleMonthOf, pickReports, methodologyOf, directionPageOf, directionChartOf, stateTableOf, concernTableOf, g4BestPartyOf }
+import { titleMonthOf, pickReports, methodologyOf, directionPageOf, directionChartOf, stateTableOf, concernTableOf, g4BestPartyOf, gridPageOf, heatGridOf }
   from "./extract-secnewgate.mjs";
 
 const SRC = ".build/secnewgate-src";
@@ -265,6 +265,65 @@ for (const { slug, sidecar } of reports) {
   assert.deepEqual(Object.keys(banked.bestParty).sort(), Object.keys(g4ByMonth).sort(),
     "all seven wave months – and nothing from the April 2026 special");
   assert.equal("2026-04" in banked.bestParty, false, "the special prints no G4 column");
+}
+
+// ---- gridPageOf / heatGridOf against the cache: the B6 Political Heat
+// Score grid ("Tracking the importance of 36 national priorities", page 4
+// in every wave), parsed by bbox GEOMETRY off <slug>.grid.bbox.html – the
+// -layout text reflows the six tile columns into one another. Labels bank
+// verbatim, so the university→University case flip (May 2026) shows as
+// one changed key between waves.
+const heatByMonth = {};   // ym -> { label: heat }
+for (const { slug, sidecar } of reports) {
+  const text = fs.readFileSync(path.join(SRC, slug + ".txt"), "utf8");
+  const grid = fs.readFileSync(path.join(SRC, slug + ".grid.bbox.html"), "utf8");
+  const info = gridPageOf(text);
+  assert.equal(info.page, 4, `${slug}: the summary grid's page`);
+  assert.equal(info.n, 36, `${slug}: 36 national priorities`);
+  const g = heatGridOf(grid, info.n);
+  assert.deepEqual(g.problems, [], `${slug}: heat grid clean`);
+  assert.equal(Object.keys(g.items).length, 36, `${slug}: every tile read`);
+  for (const [label, v] of Object.entries(g.items)) {
+    assert.ok(label.length >= 10, `${slug} '${label.slice(0, 40)}': a real label, not a fragment`);
+    assert.ok(v.heat >= 0 && v.heat <= 60, `${slug} '${label.slice(0, 40)}': heat ${v.heat} inside 0–60`);
+    assert.ok(v.ei >= 3 && v.ei <= 90, `${slug} '${label.slice(0, 40)}': EI ${v.ei} inside 3–90`);
+  }
+  const ym = sidecar.date.slice(0, 7);
+  heatByMonth[ym] = {};
+  for (const [label, v] of Object.entries(g.items)) heatByMonth[ym][label] = v.heat;
+}
+// the wave-27 grid's printed values, spot-pinned
+const COST = "Reducing cost increases for household bills and other essential expenses";
+assert.equal(heatByMonth["2026-09"][COST], 38, "Sep 2026: household-bill cost heat 38 (Jul 2025: 41)");
+assert.equal(heatByMonth["2025-07"][COST], 41, "Jul 2025: the series peak");
+assert.equal(heatByMonth["2026-09"]["Reducing crime and antisocial behaviour"], 23, "Sep 2026: crime second");
+assert.equal(heatByMonth["2026-09"]["Strengthening our borders against illegal immigration"], 8, "Sep 2026: borders");
+assert.equal(heatByMonth["2026-09"]["Increasing migration to fill workplace shortages"], 1, "Sep 2026: migration for shortages");
+assert.equal(heatByMonth["2025-09"]["Reducing cost increases for household bills and other essential expenses"],
+  heatByMonth["2025-09"][COST], "one cost tile only, never a double-count");
+// the verbatim label flip: lower-case university through Feb 2026, capital U from May 2026
+assert.ok(Object.keys(heatByMonth["2026-02"]).some((l) => l.includes("affordable university and TAFE")),
+  "Feb 2026: lower-case university");
+assert.ok(Object.keys(heatByMonth["2026-05"]).some((l) => l.includes("affordable University and TAFE")),
+  "May 2026: capital University");
+assert.ok(!Object.keys(heatByMonth["2026-05"]).some((l) => l.includes("affordable university and TAFE")),
+  "May 2026: the old case is gone");
+// every wave carries the same 36 priorities, the flip aside
+{
+  const keyset = (ym) => new Set(Object.keys(heatByMonth[ym]).map((l) => l.replace(/[uU]niversity and TAFE/, "UNIVERSITY and TAFE")));
+  const base = keyset("2025-07");
+  for (const ym of Object.keys(heatByMonth))
+    assert.deepEqual(keyset(ym), base, `${ym}: the same 36 priorities as 2025-07, case-flip aside`);
+}
+
+// data/sec-issues.json's heatScore block carries exactly what the cached
+// grid pages print, keyed in month order across all seven waves
+{
+  const banked = JSON.parse(fs.readFileSync("data/sec-issues.json", "utf8"));
+  assert.deepEqual(banked.heatScore, heatByMonth,
+    "the banked heatScore block matches the cached grid pages (rerun extract-secnewgate.mjs)");
+  assert.deepEqual(Object.keys(banked.heatScore).sort(), Object.keys(heatByMonth).sort(),
+    "all seven wave months, heat scores only (the EI half stays out)");
 }
 
 // a special asks no direction question at all

@@ -43,19 +43,25 @@
 
    Cache: .build/secnewgate-src/<slug>.txt (pdftotext -layout, the whole
    report), <slug>.bbox.html (pdftotext -bbox, the direction page only),
-   <slug>.json ({ pdf, wave, date, dateStart, sample, url, published }).
-   Written once when
+   <slug>.grid.bbox.html (pdftotext -bbox, the national-priorities summary
+   grid page), <slug>.json ({ pdf, wave, date, dateStart, sample, url,
+   published }). Written once when
    first fetched and never touched again, so a run that finds nothing new
-   changes nothing. A page or PDF that won't load is a warning, not a
-   failure: the cache stays; a report that IS cached but won't read is
+   changes nothing (a cache file added later, as the grid page was for the
+   heat-score bank, is back-filled from the still-listed PDF alone, the
+   existing cache bytes untouched). A page or PDF that won't load is a
+   warning, not a failure: the cache stays; a report that IS cached but
+   won't read is
    pending and fails the run that landed it, once anything else is pushed.
 
    Two parse-only bank files are rebuilt from the cache each run:
    data/sec-direction-states.json banks the per-state direction table
    off the bbox (SECNEWGATE_STATES redirects), and data/sec-issues.json
-   banks two blocks off the whole-report -layout text: B1's "% MENTIONING
-   EACH" unprompted-concerns table (a reference series; the B5/B6
-   priority tiles are not banked) and G4's best-party-on-the-cost-of-
+   banks three blocks: B1's "% MENTIONING
+   EACH" unprompted-concerns table (a reference series) off the
+   whole-report -layout text, the B6 political-heat-score grid off
+   <slug>.grid.bbox.html (a reference series; the B5 extremely-important
+   ratings are not banked), and G4's best-party-on-the-cost-of-
    living table, whose May 2026-on rows .build/issues.mjs pools into
    data/issues.json. Direction and concerns reprint their trailing
    waves, so a conflict between reports for one month is a revision and
@@ -321,10 +327,12 @@ export function stateTableOf(bboxHtml) {
    Special Edition DID ask B1, unlike direction, so 2026-04 enters from the
    May and July 2026 reprints – the special itself is never cached). The
    table is read from the whole-report -layout TEXT – the bbox cache holds
-   only the direction page – where each MON column header trailed by its
+   only the direction and priorities-grid pages – where each MON column
+   header trailed by its
    ’YY on a line below gives the column's right edge, and each row prints
    its label then one bare-integer cell right-aligned on every column.
-   The B5/B6 objective-priority ratings on later pages are NOT banked. */
+   The B5 extremely-important ratings are NOT banked (B6's heat scores
+   bank separately, from the grid page's bbox – see heatGridOf). */
 export function concernTableOf(text) {
   const lines = String(text).split("\n");
   const problems = [];
@@ -439,6 +447,97 @@ export function g4BestPartyOf(text) {
   return { ym, shares: { ...shares, rest }, problems };
 }
 
+/* The national-priorities summary grid's page number in a report's layout
+   text (form-feed split), for `pdftotext -f N -l N -bbox`, plus the grid's
+   own item count. The grid – "Tracking the importance of NN national
+   priorities", every priority a numbered tile printed Label (EI:heat),
+   rated "Extremely Important" : "Political Heat Score" – sits on one page
+   (page 4 in every cached wave), so a {page: 0} means the report carries
+   none, which a tracking wave's caller treats as a defect. */
+export function gridPageOf(text) {
+  const pages = String(text).split("\f");
+  const i = pages.findIndex((pg) => /Tracking the importance of (\d+) national priorities/i.test(pg));
+  if (i < 0) return { page: 0, n: 0 };
+  const n = +pages[i].match(/Tracking the importance of (\d+) national priorities/i)[1];
+  return { page: i + 1, n };
+}
+
+/* The summary grid's heat scores from a `pdftotext -bbox` of its page.
+   The 36 numbered tiles sit in rows of six: the tile numbers anchor six
+   x bands (a number's xMin is its band's left edge), a tile's box runs
+   from its row's number y to the next row's, and every word of a tile –
+   its wrapped label, then the "(EI:heat)" pair – lies inside its box.
+   Every heat score in the bank below comes from this grid; it is read by
+   GEOMETRY because pdftotext -layout reflows the six tile columns into
+   one another (a label's words and its pair can land a band-width away
+   from their tile), which char-column slicing cannot undo. A tile's
+   words re-join by visual line, the pair comes last, and the EI half of
+   the pair is parsed with the heat but stays out of the bank (a ratings
+   scale that mixes with nothing). */
+export function heatGridOf(bboxHtml, wantN = 36) {
+  const words = [...bboxHtml.matchAll(/<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)<\/word>/g)]
+    .map((m) => ({ x: +m[1], xm: +m[3], y: +m[2], t: m[5] }));
+  const problems = [];
+  const empty = { items: {}, problems };
+  const head = words.find((w) => w.t === "Tracking"
+    && words.some((o) => o.t === "importance" && Math.abs(o.y - w.y) < 3));
+  if (!head) { problems.push("no 'Tracking the importance …' headline word on the grid page"); return empty; }
+  const legend = words.find((w) => w.t === "Legend");
+  if (!legend) { problems.push("no 'Legend (X:X)' line on the grid page"); return empty; }
+  // the tile numbers 1..N, clustered into rows by y
+  const nums = words.filter((w) => /^\d{1,2}$/.test(w.t) && w.y > head.y + 2 && w.y < legend.y - 2)
+    .sort((a, b) => a.y - b.y || a.x - b.x);
+  const rows = [];
+  for (const n of nums) {
+    const r = rows.length && Math.abs(rows[rows.length - 1][0].y - n.y) <= 3 ? rows[rows.length - 1]
+      : (rows.push([]), rows[rows.length - 1]);
+    r.push(n);
+  }
+  let expect = 1;
+  for (const row of rows)
+    for (const n of row) {
+      if (+n.t === expect) expect++;
+      else { problems.push(`the tile-number sequence broke at '${n.t}' (expected ${expect})`); break; }
+    }
+  if (expect !== wantN + 1) problems.push(`${expect - 1} tile numbers on the grid page, expected ${wantN}`);
+  // each tile's box: its row's band of rows (number y to the next row's,
+  // the last to the legend line) and its number's column band
+  const items = {};
+  let n0 = 1;
+  for (let ri = 0; ri < rows.length; ri++) {
+    const rowTop = rows[ri][0].y;
+    const rowBot = ri + 1 < rows.length ? rows[ri + 1][0].y : legend.y;
+    const xs = rows[ri].map((n) => n.x);
+    for (let j = 0; j < xs.length; j++) {
+      const lo = xs[j], hi = j + 1 < xs.length ? xs[j + 1] : Infinity;
+      const ws = words.filter((w) => w !== rows[ri][j]
+        && (w.x + w.xm) / 2 >= lo && (w.x + w.xm) / 2 < hi
+        && w.y > rowTop + 1 && w.y < rowBot);
+      ws.sort((a, b) => a.y - b.y || a.x - b.x);
+      const lineGroups = [];
+      for (const w of ws) {
+        const g = lineGroups.length && Math.abs(lineGroups[lineGroups.length - 1][0].y - w.y) <= 2 ? lineGroups[lineGroups.length - 1]
+          : (lineGroups.push([]), lineGroups[lineGroups.length - 1]);
+        g.push(w);
+      }
+      const text = lineGroups.map((g) => g.map((w) => w.t).join(" ")).join(" ").replace(/\s+/g, " ").trim();
+      const tile = n0 + j;
+      const m = text.match(/^(.*?)\s*\((\d{1,2}):(\d{1,2})\)$/);
+      if (!m) { problems.push(`tile ${tile}: no trailing (EI:heat) pair (text: '${text.slice(0, 60)}')`); continue; }
+      const label = m[1].trim(), ei = +m[2], heat = +m[3];
+      if (/\(\d{1,2}:\d{1,2}\)/.test(label)) problems.push(`tile ${tile}: a second (EI:heat) pair inside its label`);
+      if (label.length < 10) problems.push(`tile ${tile}: a label of ${label.length} chars`);
+      if (items[label]) problems.push(`label '${label.slice(0, 40)}' appears twice`);
+      if (ei < 3 || ei > 90) problems.push(`tile ${tile}: EI ${ei} outside 3–90`);
+      if (heat < 0 || heat > 60) problems.push(`tile ${tile}: heat ${heat} outside 0–60`);
+      items[label] = { ei, heat };
+    }
+    n0 += rows[ri].length;
+  }
+  if (Object.keys(items).length !== wantN) problems.push(`read ${Object.keys(items).length} item(s), expected ${wantN}`);
+  return { items, problems };
+}
+
 const slugOf = (url) => decodeURIComponent(url.split("/").pop())
   .replace(/\.pdf$/i, "").replace(/[^A-Za-z0-9._-]+/g, "_");
 
@@ -470,6 +569,7 @@ async function main() {
       const slug = slugOf(url);
       const txtPath = path.join(SRC, slug + ".txt");
       const bboxPath = path.join(SRC, slug + ".bbox.html");
+      const gridPath = path.join(SRC, slug + ".grid.bbox.html");
       let text, bbox;
       if (!FORCE && fs.existsSync(txtPath) && fs.existsSync(bboxPath)) {
         text = fs.readFileSync(txtPath, "utf8");
@@ -479,6 +579,7 @@ async function main() {
         try { buf = await get(url); }
         catch (e) { status.warnings.push(`${slug}: ${e.message}`); continue; }
         if (buf.subarray(0, 5).toString("latin1") !== "%PDF-") { status.warnings.push(`${slug}: not a PDF`); continue; }
+        let grid;
         try {
           text = pdfToText(buf, slug, ["-layout"]);
           const meta0 = methodologyOf(text);
@@ -486,14 +587,32 @@ async function main() {
           const page = directionPageOf(text);
           if (!page) { status.pending.push(`${g.ym}: the report has no national direction chart page`); done = true; break; }
           bbox = pdfToText(buf, slug, ["-f", String(page), "-l", String(page), "-bbox"]);
+          const grid0 = gridPageOf(text);
+          if (grid0.page) grid = pdfToText(buf, slug, ["-f", String(grid0.page), "-l", String(grid0.page), "-bbox"]);
         } catch (e) { status.warnings.push(`${slug}: ${e.message}`); continue; }
         fs.writeFileSync(txtPath + ".tmp", text); fs.renameSync(txtPath + ".tmp", txtPath);
         fs.writeFileSync(bboxPath + ".tmp", bbox); fs.renameSync(bboxPath + ".tmp", bboxPath);
+        if (grid != null) { fs.writeFileSync(gridPath + ".tmp", grid); fs.renameSync(gridPath + ".tmp", gridPath); }
         console.log(`cached report ${slug}`);
       }
       const meta = methodologyOf(text);
       if (!meta) break;        // cached pre-refactor special: set aside
       if (!meta.date) { status.pending.push(`${g.ym}: ${meta.problems.join("; ")}`); done = true; break; }
+      // the grid page's bbox joined the cache with the heat-score bank:
+      // back-fill it for waves cached before then, from the still-listed
+      // PDF alone; a failure here only leaves the wave's heat unbanked
+      if (!fs.existsSync(gridPath)) {
+        try {
+          const grid0 = gridPageOf(text);
+          if (grid0.page) {
+            const buf = await get(url);
+            if (buf.subarray(0, 5).toString("latin1") !== "%PDF-") throw new Error("not a PDF");
+            const grid = pdfToText(buf, slug, ["-f", String(grid0.page), "-l", String(grid0.page), "-bbox"]);
+            fs.writeFileSync(gridPath + ".tmp", grid); fs.renameSync(gridPath + ".tmp", gridPath);
+            console.log(`back-filled grid page ${slug}`);
+          }
+        } catch (e) { status.warnings.push(`${slug}: grid page: ${e.message}`); }
+      }
       const chart = directionChartOf(bbox);
       const last = chart.columns[chart.columns.length - 1];
       if (chart.problems.length || !last) {
@@ -536,7 +655,17 @@ async function main() {
         status.pending.push(`${g.ym}: the G4 table's month is ${g4.ym}, not the wave's ${meta.date.slice(0, 7)}`);
         g4 = null;
       }
-      waves.set(meta.wave, { slug, meta, cols: chart.columns, page: cand.page, published: cand.published, table, concerns, g4 });
+      // the B6 heat-score grid banks the same way, off its page's bbox;
+      // a wave with no grid cache yet (the PDF went unlisted before the
+      // back-fill reached it) just banks no heat
+      let heat = null;
+      if (fs.existsSync(gridPath)) {
+        const grid = heatGridOf(fs.readFileSync(gridPath, "utf8"), gridPageOf(text).n || 36);
+        if (grid.problems.length) {
+          status.pending.push(`${g.ym}: the heat grid didn't read (${grid.problems[0]})`);
+        } else heat = grid.items;
+      }
+      waves.set(meta.wave, { slug, meta, cols: chart.columns, page: cand.page, published: cand.published, table, concerns, g4, heat });
       done = true;
     }
     if (!done && ![...waves.values()].some((w) => w.meta.date.startsWith(g.ym))) {
@@ -681,11 +810,34 @@ async function main() {
     }
     const bestParty = {};
     for (const [, x] of [...byWaveG4.entries()].sort((a, b) => a[0] - b[0])) bestParty[x.ym] = x.shares;
+    // the B6 heat-score grids bank the same way as G4: each wave's grid
+    // printed once, sighted once. Clobber-on-write is fine (no reprints
+    // to conflict), and the verbatim labels mean a wave's label flip
+    // (university/University) lives only in its own month
+    const byWaveHeat = new Map([...waves.entries()].filter(([, x]) => x.heat)
+      .map(([w, x]) => [w, { heat: x.heat, ym: x.meta.date.slice(0, 7) }]));
+    for (const f of fs.readdirSync(SRC).filter((f) => f.endsWith(".json")).sort()) {
+      let side;
+      try { side = JSON.parse(fs.readFileSync(path.join(SRC, f), "utf8")); } catch { continue; }
+      if (!side || side.wave == null || side.date == null || waves.has(side.wave) || byWaveHeat.has(side.wave)) continue;
+      const slug = f.replace(/\.json$/, "");
+      const gridPath = path.join(SRC, slug + ".grid.bbox.html");
+      if (!fs.existsSync(gridPath)) continue;
+      const grid = heatGridOf(fs.readFileSync(gridPath, "utf8"), 36);
+      if (grid.problems.length) { status.pending.push(`${slug}: the cached heat grid didn't read (${grid.problems[0]})`); continue; }
+      byWaveHeat.set(side.wave, { heat: grid.items, ym: side.date.slice(0, 7) });
+    }
+    const heatScore = {};
+    for (const [, x] of [...byWaveHeat.entries()].sort((a, b) => a[0] - b[0])) {
+      heatScore[x.ym] = {};
+      for (const [label, v] of Object.entries(x.heat)) heatScore[x.ym][label] = v.heat;
+    }
     const out = {
-      _about: "Unprompted issue concerns from SEC Newgate's Mood of the Nation tracking study – the B1 table ('What are the main issues facing Australians that are most important to you right now?'), an OPEN-ENDED question taking any number of mentions in the voter's own words, printed per wave as '% MENTIONING EACH' for the wave's top issues (so shares don't sum to 100, and levels sit well above the forced top-three salience the Issues panel pools – which is why nothing there reads this; banked by .build/extract-secnewgate.mjs as waves land, as a reference series). Each wave's report carries its own column and reprints its two predecessors (plus a MAR '22 anchor); sightings of a month across reports must agree. Unlike the direction question, the April 2026 Special Edition asked B1, so 2026-04 enters from the May and July 2026 reprints. The B5/B6 objective-priority ratings later in each report are not banked. bestParty banks the G4 question, asked every wave: 'Which of the following do you think would be the best party to manage the cost of living?' – per fieldwork month the shares its table prints (alp, lnp the Coalition under the wave's own label, onp/grn options from May 2026, oth the 'Neither / someone else' row where printed) plus rest, the balance of 100: 'Can't say' alone once oth is printed, 'Neither/someone else' and 'Can't say' combined otherwise, and both inside oth before. The Issues panel's ownership pool reads the May 2026-on rows via .build/issues.mjs. month = fieldwork-end month, keying the wave's direction[] row in data/polls.json.",
+      _about: "Unprompted issue concerns from SEC Newgate's Mood of the Nation tracking study – the B1 table ('What are the main issues facing Australians that are most important to you right now?'), an OPEN-ENDED question taking any number of mentions in the voter's own words, printed per wave as '% MENTIONING EACH' for the wave's top issues (so shares don't sum to 100, and levels sit well above the forced top-three salience the Issues panel pools – which is why nothing there reads this; banked by .build/extract-secnewgate.mjs as waves land, as a reference series). Each wave's report carries its own column and reprints its two predecessors (plus a MAR '22 anchor); sightings of a month across reports must agree. Unlike the direction question, the April 2026 Special Edition asked B1, so 2026-04 enters from the May and July 2026 reprints. The B5 extremely-important ratings later in each report are not banked; B6's political heat scores bank as heatScore. bestParty banks the G4 question, asked every wave: 'Which of the following do you think would be the best party to manage the cost of living?' – per fieldwork month the shares its table prints (alp, lnp the Coalition under the wave's own label, onp/grn options from May 2026, oth the 'Neither / someone else' row where printed) plus rest, the balance of 100: 'Can't say' alone once oth is printed, 'Neither/someone else' and 'Can't say' combined otherwise, and both inside oth before. The Issues panel's ownership pool reads the May 2026-on rows via .build/issues.mjs. heatScore banks B6, the 'Political Heat Score' off every report's one-page summary grid ('Tracking the importance of 36 national priorities', each priority a printed Label (EI:heat) tile): per fieldwork month, the % of voters choosing each of the 36 prompted priorities among the top-three issues facing Australia – B6 asks for THREE of 36, so the shares read NOTHING like the open-ended B1 mentions or the narrower forced-choice salience the Issues panel pools (RedBridge's 14, Ipsos's 19), and stay a reference series nothing mixes with. Labels are banked VERBATIM per wave, case flips and all ('…affordable university and TAFE education' through February 2026, '…University…' from May 2026); the EI half of each tile's pair is read with the heat but not banked (a % extremely-important ratings scale that mixes with nothing). month = fieldwork-end month, keying the wave's direction[] row in data/polls.json.",
       issues: Object.keys(series),
       series,
       bestParty,
+      heatScore,
     };
     const outJson = JSON.stringify(out, null, 1) + "\n";
     if (!fs.existsSync(ISSUES_OUT) || fs.readFileSync(ISSUES_OUT, "utf8") !== outJson) {

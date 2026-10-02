@@ -212,6 +212,8 @@ ownership (`col`). Each report carries FOUR issue measures:
   choice set (dilutes every share vs their 14/19), printed for the
   current wave only, and many-to-one onto the issues-panel keys; see
   the auspol-issues-panel skill for the full not-pooled reasoning.
+  BANKED parse-only since 2026-10-02 (see the heat-score bank section
+  below) — from the page-4 summary grid, not the tile pages.
 - **G4 best party on cost of living** ("Now turning to the cost of
   living. Which of the following do you think would be the best party
   to manage the cost of living?"): asked EVERY wave, one issue only,
@@ -223,10 +225,11 @@ ownership (`col`). Each report carries FOUR issue measures:
 
 B5/B6 live on tile pages (6 tiles/page, label + 4 tracking values + one heat
 number) — pdftotext -layout interleaves them loosely, so bbox geometry
-would be needed if they're ever read. B5/B6 were deliberately NOT
-banked: B5's extremely-important scale mixes with nothing, and B6's
-heat scores print only the current wave (no tracking grid, so no
-reprint-verifiability) off a 36-item choice set.
+would be needed if they're ever read. B5 is deliberately NOT
+banked: its extremely-important scale mixes with nothing. B6's heat
+scores were banked from October 2026 (2026-10-02) — off the page-4
+summary grid, whose machine-printed `Label (EI:heat)` tiles make the
+series tractable; see the heat-score bank section below.
 
 ## Unprompted-concerns bank (data/sec-issues.json, shipped 2026-09-29)
 
@@ -299,3 +302,34 @@ test-issues.mjs pins the three pooled rows (dates, shares, options, gate).
 Verified figures: w21 alp38/lnp21/rest41, w22 35/22/43, w23 33/22/oth30/15,
 w24 29/22/oth31/18, w25 alp23/onp20/lnp17/grn9/rest31,
 w26 24/23/14/10/29, w27 23/22/16/12/27.
+
+## Heat-score bank (data/sec-issues.json `heatScore`, shipped 2026-10-02)
+
+B6's Political Heat Score banks into the same file as B1 and G4 — a third
+block `heatScore: { ym: { label: heat } }`. The source is NOT the tile
+pages (pp.10+) but each report's page-4 summary grid, "Tracking the
+importance of 36 national priorities": 36 numbered tiles in 6-column
+rows, each printed `Label (EI:heat)`. `gridPageOf(text)` finds the grid
+page (4 in every cached wave) and the grid's own N; `heatGridOf(bbox)`
+parses `<slug>.grid.bbox.html` — a THIRD cache file, fetched with the
+report when new and back-filled from the still-listed PDF for waves
+cached before the bank existed (the existing txt/bbox bytes never
+move). GEOMETRY is forced: `-layout` reflows the six tile columns into
+one another (probe: 27–33 problems per report), so tile numbers anchor
+the column x-bands, row bands run number-y to next-number-y (last row
+to the "Legend" line), and a tile's words (wrapped label then its pair)
+are whatever's centre-x inside its box, rejoined by visual line. The
+EI half of each pair parses with the heat but is NOT banked (a
+% extremely-important ratings scale mixing with nothing). One sighting
+per wave — the grid prints the current wave only, no reprints to
+cross-check — and labels bank VERBATIM per wave, including the
+university/University case flip at May 2026 (the same 36 priorities
+otherwise). Read `heatScore[ym][label]` for the % choosing the item in
+their top 3 of 36; the shares sit BELOW B1's multi-mention percentages
+and between RedBridge's 14-item and a free-for-all's dilution — nothing
+pools them (see the issues-panel skill). Verified Sep 2026 pins: cost
+38 (Jul 2025 peak 41), crime 23, healthcare 16, rental 15, interest
+rates 14, own-home 12, borders 8, migration-for-shortages 1, tariffs 0.
+test-secnewgate.mjs pins gridPageOf (page 4, n 36), all-clean grids,
+six spot values, the label flip in both directions, cross-wave label-set
+equality (flip aside), and the merged bank == the file.

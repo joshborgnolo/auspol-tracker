@@ -81,7 +81,9 @@ updated_at: '2026-09-30'
   open-ended unprompted concerns (% mentioning, 10 issues, tracked
   MAR '22 + 3 waves; banked parse-only 2026-09-29), B5 the 36-priority
   "extremely important" rating scale (tops ~70 vs a top-3 share's ~40,
-  unmixable), B6 the "Political Heat Score" pick-3 of 36, and G4
+  unmixable), B6 the "Political Heat Score" pick-3 of 36 (banked
+  parse-only 2026-10-02 into data/sec-issues.json `heatScore`, off
+  the page-4 summary grid; still NOT pooled), and G4
   "best party to manage the cost of living". Salience stays out:
   B1 is % mentioning (different scale from RedBridge's top-3 /
   Ipsos's pick-3), B5 is ratings, and even B6's 36-item choice set
