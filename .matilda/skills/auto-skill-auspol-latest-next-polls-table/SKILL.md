@@ -1,6 +1,6 @@
 ---
 name: auspol-latest-next-polls-table
-description: "auspol-tracker — RdPolls ('Latest and next polls' section) anatomy: facet tabs (twopp/primary/leadership) via rd.jsx RdSec data-facet, 6-column desktop grid in rd.css (~:557), per-facet grid-template-columns overrides are a media-query leak hazard (@media (min-width:901px) needed), the facet RdSwap crossfade ghost must stay OUT of flow (position:absolute float, fixed 2026-09-28) or the phone's content-sized figs track snaps ~360ms in when the ghost unmounts, the DESKTOP figs cell must stretch to the row top (6142f35), and the expanded row's change markers reuse rdApChg + gen-data chg.d/r keys shared from rd-allpolls.jsx (ce17e27, 2026-09-30 — dec conventions, filtered-index trap, probe expand via $eval click on the figs cell since the name cell is a site link), and a CSS specificity trap: .rd-pld-prim > span > span (19px) swallows any new child span including .rd-apd-chg markers — fix with :not (48131ae), verify cross-table marker parity with computed-style sets since All-polls swaps classes and primary order; probe facet glitches with a per-frame rAF geometry recorder, NOT strided setTimeout samples. 2026-09-30 (9a87ded): facet figures "slow to populate" vs All-polls = RdSwap's .12s arrival delay on .rd-swap-now.in (a 120ms invisible dead zone on every tab switch) — dropped to `.2s ease-out both`; RdSwap serves ONLY this table's figs head+cells so the retime cannot touch RdCrossfade's (deliberate) identical delay, and mixed-precision primary figures (Roy Morgan's .5 halves) render the half as a single ½ glyph in a small 11px/10px suffix (.rd-pl-frac, .5→½ cast 2026-10-02) — invisible padding inside the stretched grid cells CANNOT equalise ink gaps; only shrinking the suffix ink itself changes the row's rhythm."
+description: "auspol-tracker — RdPolls ('Latest and next polls' section) anatomy: facet tabs (twopp/primary/leadership) via rd.jsx RdSec data-facet, 6-column desktop grid in rd.css (~:557), per-facet grid-template-columns overrides are a media-query leak hazard (@media (min-width:901px) needed), the facet RdSwap crossfade ghost must stay OUT of flow (position:absolute float, fixed 2026-09-28) or the phone's content-sized figs track snaps ~360ms in when the ghost unmounts, the DESKTOP figs cell must stretch to the row top (6142f35), and the expanded row's change markers reuse rdApChg + gen-data chg.d/r keys shared from rd-allpolls.jsx (ce17e27, 2026-09-30 — dec conventions, filtered-index trap, probe expand via $eval click on the figs cell since the name cell is a site link), and a CSS specificity trap: .rd-pld-prim > span > span (19px) swallows any new child span including .rd-apd-chg markers — fix with :not (48131ae), verify cross-table marker parity with computed-style sets since All-polls swaps classes and primary order; probe facet glitches with a per-frame rAF geometry recorder, NOT strided setTimeout samples. 2026-09-30 (9a87ded): facet figures "slow to populate" vs All-polls = RdSwap's .12s arrival delay on .rd-swap-now.in (a 120ms invisible dead zone on every tab switch) — dropped to `.2s ease-out both`; RdSwap serves ONLY this table's figs head+cells so the retime cannot touch RdCrossfade's (deliberate) identical delay, and mixed-precision primary figures (Roy Morgan's .5 halves) render the half as a single ½ glyph (itself a one-on-two superscript form) in a small suffix whose halves take their own 9.5px/8.5px rung (.rd-pl-frac/.rd-pl-half, cast + resized same-day 2026-10-02: U+00BD advances ~0.86em in IBM Plex Sans, so at the base 11px suffix rung its ink out-ran the '.5' pair it replaced) — invisible padding inside the stretched grid cells CANNOT equalise ink gaps; only shrinking the suffix ink itself changes the row's rhythm."
 source: auto-skill
 extracted_at: '2026-09-28T02:47:51.147Z'
 ---
@@ -177,17 +177,22 @@ the working tree (rd-polls.jsx + rd.css + rebuilt index.html).
   data: rounding to whole, or printing fake ".0"s — both misstate the poll)
   changes the rhythm.
 - **Shipped fix**: de-emphasised real suffix — the half casts as one ½
-  glyph (U+00BD, close-set) in `<b class="rd-pl-frac">` at 11px (10px
-  inside the 900px block); primFig keeps a plain `.x` suffix for any
-  non-.5 decimal and drops `.0` entirely. ½ ink is 9.5px desktop / 8.6px
-  phone (IBM Plex Sans's ½ advance ≈0.86em — only ~1px narrower than the
-  old ".5" pair, so the rhythm contract is unchanged). DOM text now reads
+  glyph (U+00BD, close-set — already a one-on-two superscript form, so
+  sup/sub markup on "1/2" buys nothing and prints wider) in
+  `<b class="rd-pl-frac rd-pl-half">`; halves leave the base 11px/10px
+  suffix rung for their own 9.5px/8.5px (`.rd-pl-half`), and primFig
+  keeps a plain `.x` suffix for any non-.5 decimal and drops `.0`
+  entirely. The size discipline is load-bearing (user catch, same day as
+  the cast): IBM Plex Sans advances ½ at ≈0.86em, so at 11px its ink
+  (9.5px) TOPPED the ".5" pair (~8.25px desktop / 7.5px phone) it
+  replaced and the row's rhythm regressed; at 9.5px/8.5px the ink is
+  8.2px/7.3px — under the old pair at both widths. DOM text now reads
   "32½" — still the true figure, no aria games. Measured after
-  (.matilda/probe-pl-frac.mjs, scratch, 2026-10-02): desktop RM row gaps
-  22.8/13.3×3 against integer rows' uniform 22.8; phone ½-figure total
-  ink 25.4px ≤ the 26.8px cell, and every figure fits its cell at both
-  widths. BEFORE the fraction cast (".5" suffix): desktop gaps
-  22.8/12.8×3, phone decimals fit with the 10px override.
+  (.matilda/probe-pl-frac.mjs, scratch, 2026-10-02): desktop suffix ink
+  8.2px, RM row gaps 22.8/14.6×3 against integer rows' uniform 22.8 (a
+  BETTER rhythm than both the ½-at-11px pass, 13.3, and the original
+  ".5" suffix, 12.8); phone suffix ink 7.3px, gaps 6.7×3/14, and every
+  figure fits its 26.8px cell.
 - **Probe lessons** (`.matilda/probe-pl-prim-decimals.mjs`, scratch):
   (a) a stretched grid item's `getBoundingClientRect` returns the CELL, not
   the text — one whole probe pass measured "uniform gaps" that were just the
