@@ -1267,6 +1267,9 @@ body.rd .rd-tsig-table tbody > tr:first-child.rd-tsig-set th { padding-top: 8px;
    party greens tint, and the softening is a background wash not a paler ink */
 body.rd .rd-tsig-table tr:has(> td.rd-tsig-yes) > :is(th, td) { background: color-mix(in oklab, var(--chg-up) 9%, var(--surface)); }
 body.rd .rd-tsig-table td.rd-tsig-yes { font-weight: 600; color: var(--chg-up); }
+/* not-significant rows drop to the quiet tier instead of a red: a No is
+   the test failing to establish a shift, not evidence there is none */
+body.rd .rd-tsig-table tbody tr:not(.rd-tsig-set):not(:has(> td.rd-tsig-yes)) > :is(th, td) { color: var(--ink-3); }
 /* text-size-adjust: iOS inflates text in blocks wider than the viewport;
    the 600px min-width table is exactly that, and the short one-line set
    subheads were the rows it boosted */

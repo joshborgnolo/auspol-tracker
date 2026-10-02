@@ -212,6 +212,8 @@ if (sigParty) {
       cellGreen: first ? getComputedStyle(first).color === refCs.color : false,
       rowWash: rowTh ? getComputedStyle(rowTh).backgroundColor === refCs.backgroundColor : false,
       refBg: refCs.backgroundColor,
+      headInk: rowTh ? getComputedStyle(rowTh).color : null,
+      ink3: (() => { ref.style.color = "var(--ink-3)"; ref.style.background = "none"; return getComputedStyle(ref).color; })(),
     };
     ref.remove();
     return out;
@@ -220,6 +222,38 @@ if (sigParty) {
   check("Yes cells all read Yes and match the payload count", sig.count === wantYes && sig.count > 0 && sig.texts, sig);
   check("yes cell text is the direction-of-travel green", sig.cellGreen, sig);
   check("significant rows wash green", sig.rowWash && sig.refBg !== "rgba(0, 0, 0, 0)", sig);
+  check("significant rows keep full ink", !!sig.headInk && sig.headInk !== sig.ink3, sig);
+}
+
+/* the No rows drop to the quiet tier: switch to a party that HAS failing
+   rows and compare a No row's head against the --ink-3 token */
+const plainParty = Object.keys(demoTrend).find((k) => (demoTrend[k].rows || []).some((r) => !r.sig));
+check("payload has a party with not-significant rows", !!plainParty, plainParty);
+if (plainParty) {
+  if (plainParty !== sigParty) {
+    await page.evaluate((label) => {
+      const sec = document.querySelector("#who-votes");
+      const b = [...sec.querySelectorAll("button")].find((x) => (x.textContent || "").trim().toLowerCase().includes(label));
+      b.click();
+    }, PARTY_CHIP[plainParty]);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  }
+  const wantNo = demoTrend[plainParty].rows.find((r) => !r.sig);
+  const quiet = await page.evaluate((w) => {
+    const det = document.querySelector("#who-votes details.rd-tsig");
+    const ref = document.createElement("span");
+    ref.style.cssText = "color: var(--ink-3); position: absolute; visibility: hidden";
+    det.appendChild(ref);
+    const rows = [...det.querySelectorAll("tr:not(.rd-tsig-set)")];
+    const tr = rows.find((t) => t.querySelector("th")
+      && t.querySelector("th").textContent.trim().startsWith(w.group)
+      && t.children[6].textContent.trim() === "No");
+    const got = tr ? getComputedStyle(tr.querySelector("th")).color : null;
+    const wantInk = getComputedStyle(ref).color;
+    ref.remove();
+    return { got, want: wantInk, group: w.group };
+  }, wantNo);
+  check("not-significant rows sit at quiet ink", quiet.got !== null && quiet.got === quiet.want, quiet);
 }
 
 if (pageErrors.length) console.log("pageerrors:", pageErrors);
