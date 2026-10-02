@@ -2229,9 +2229,14 @@ const individualPolls = POLLS.map((p) => {
    his published method (.build/newtracker/bonham-replica.mjs, every constant
    taken from his methods page and its update log) run over this tracker's
    poll set, pinned against the as-published stamps the sidebar scraper and
-   the Wayback backfill keep in data/bonham-2pp.json (49 stamps as of
-   2026-10-02; the replica sits a mean 0.56 pts from them, so it is drawn as
-   his method's line, never as his numbers). Both sources are levelled as
+   the Wayback backfill keep in data/bonham-2pp.json (62 stamps as of
+   2026-10-02; the replica sits a mean 0.54 pts from them, so it is drawn as
+   his method's line, never as his numbers). The `published` array below is
+   that validation set AND the source of the hero key's "Bonham's estimate
+   (N.N%)" figure — the label quotes his current published estimate while
+   the line beside it stays the reconstruction (2026-10-02 user catch: the
+   key read the replica's tail, 0.3pt off his figure). Both sources are
+   levelled as
    ALP's share of the classic two-party preferred, exactly the line the
    hero itself draws; the view adds the credit, the reconstruction caveat
    and the links. */

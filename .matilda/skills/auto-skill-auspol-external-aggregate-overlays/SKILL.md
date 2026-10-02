@@ -41,7 +41,13 @@ history. The pivot ("don't we know bonham's formula? … back-derive his
    max 1.5, signed +0.52 (the unseen per-house accuracy weights lean
    Newspoll-heavy → replica runs ~½pt ALP-high), dead-on at the latest
    stamp. Everywhere it's drawn it's named "rebuilt"/"reconstruction";
-   the RdFoot provenance sentence carries the caveat.
+   the RdFoot provenance sentence carries the caveat. The definitive
+   stats/verdict + recovery worklog live in
+   `.matilda/bonham-accuracy-2026-10-02.md`; its appendix lists every
+   probe (accuracy probe `.matilda/bonham-accuracy-time.mjs`, the
+   stampDate boundary check, and `.matilda/mine-bonham-crosspoll.mjs` —
+   the blogspot month-archive crawler that pinned the pre-launch
+   negative: all 56 May–Sep 2025 posts, one informal figure).
 
 Apply the same pattern to any aggregator with a published method and
 recoverable spot values. Expect ~½pt tracking, not parity — the recipe
@@ -179,7 +185,9 @@ Contract mirrors the showSynth compare block (`cmpOn = … && !morph …`):
   track's website … label should read eg 'Bonham's estimate (current
   estimate figure for Labor)'") every key entry reads "<Publisher>’s
   estimate (N.N%)" — the figure interpolated off that series' last
-  point (lblExtBt/lblExtKb/lblExtSh constants beside the series block;
+  point, except Bonham's, which since the label-figure fix below
+  reads `ext.bonham.published`'s last AS-PUBLISHED stamp
+  (lblExtBt/lblExtKb/lblExtSh constants beside the series block;
   the desktop BludgerTrack entry keeps its trailing ", as published"
   qualifier AFTER the figure) — and the desktop keyItems + narrow RdKey
   entries are LINKED, BludgerTrack → the pollbludger.net feed URL,
@@ -194,6 +202,31 @@ Contract mirrors the showSynth compare block (`cmpOn = … && !morph …`):
   auto-skill-auspol-endlabel-colour
   before ever touching label colours). points run through
   `filterPts(pts, xDomain[0])`.
+- **LABEL-FIGURE PROVENANCE (user-reported WRONG 2026-10-02, FIX
+  SHIPPED)** — the three key figures did NOT all come from their
+  publisher: BludgerTrack's reads the as-published mirror's last point
+  and the shadow reads his stamps, but **Bonham's read the REPLICA's
+  tail** (pre-fix `extFig(extKb)` — extKb = D.extAgg.bonham.replica).
+  The user found the legend saying "Bonham's estimate (52.0%)" while
+  his live sidebar read 52.3 (the 52.3 stamp 2026-09-30 sat in
+  `bonham.published`, at the time validation-only). Diagnosis recipe:
+  tail of `data/bonham-2pp.json` `series` = HIS number; `lblExtKb`'s
+  source series (rd-hero.jsx ~:226) = OURS.
+  **The replica tail is LATEST_ISO-driven = max poll.FIELDWORK `date`
+  (2026-09-29), not wall-clock today** — probing
+  `bonhamReplica(polls, "2026-10-02")` gave 52.2 where the shipped
+  site showed 52.0; reproduce a label figure only with gen-data's
+  LATEST_ISO. Fixed same-day: lblExtKb cites
+  `ext.bonham.published`'s last stamp (`extKbPub || extKb` fallback,
+  rd-hero.jsx ~:226) — one change covers keyItems/copyKey/narrow
+  RdKey/phone — plus a RdFoot clause that the key quotes HIS current
+  figure while the line is rebuilt, a gen-data §6b comment, and probe
+  `.matilda/probe/hero-ext-compare.mjs` moving `kbFig` off `rep[last]`
+  onto `pub[last]` (:185/:183). The stamps file now freshens on
+  schedule (pollbludger-updater.sh's THIRD duty — see Refresh) so the
+  quoted figure rots only inside his own cadence.
+  Do NOT snap the drawn line to his stamps (fabricated agreement) and
+  do NOT chart the 62 published anchors as marks.
 - **y-window**: fold the ACTIVE contest's comparator values in OUTSIDE
   the memoised `domainOf` (Coalition: extKb+extBt; ON: extSh) on the
   same 5-pt lattice (floor(min+0.3)/5, ceil(max−0.3)/5) — in practice
@@ -243,10 +276,23 @@ Contract mirrors the showSynth compare block (`cmpOn = … && !morph …`):
 `data/bludgertrack-2pp.json` grows via extract-bludgertrack.mjs, run
 4×/day by `pollbludger-updater.sh` (best-effort second duty, wired
 2026-10-02 efbc280 — see the audit note above); `data/bonham-2pp.json`
-via extract-bonham-sidebar.mjs (backfill only for gaps; still
-unscheduled, a natural follow-up — Bonham's replica recomputes inside
-gen-data every build and his stamps are validation-only, so it needs
-no cadence). Any replica drift: run
+via extract-bonham-sidebar.mjs, SCHEDULED 2026-10-02 with the
+label-figure fix as pollbludger-updater.sh's THIRD duty (KB_CHANGED,
+copies the BT_CHANGED block: best-effort — a wobble logs WARN, never
+fails the poll agent — KB_CHANGED joins the early-exit gate,
+`FILES+=(data/bonham-2pp.json)` when changed; the comparator-refresh
+message join gained its missing "; " in the same edit, a cosmetic
+fix whose "no poll rowsBludgerTrack comparator refresh" concatenation
+nobody had hit yet). Bonham's extractor fetches his blog's monthly
+archive itself (the widget is sitewide); no launchd changes (the
+laptop jobs run the same wrapper script). The "validation-only,
+needs no cadence" reasoning died that afternoon (the KEY's quoted
+figure is user-facing and IS his published number — see the
+label-figure bullet) and the stamps proved staleness-prone: Jun–Aug
+2026 went two MONTHS unscraped before the Wayback re-sweep. The
+extractor was built wrapper-ready from day one (`--apply`; last
+stdout line always `KB_STATUS {json}` with a `changed` flag; exits
+0/1/2 — "for the wrapper" is its own comment). Any replica drift: run
 check-bonham-replica.mjs; a step
 change in mean dev after a date means one of his rule tweaks (see
 B_RULE_DATES / his update log) isn't mirrored yet.

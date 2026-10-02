@@ -69191,6 +69191,7 @@ function RdHero(p) {
   const extBt = ext && ext.bt && ext.bt.points && ext.bt.points.length > 1 ? ext.bt.points : null;
   const extKb = ext && ext.bonham && ext.bonham.replica && ext.bonham.replica.length > 1 ? ext.bonham.replica : null;
   const extSh = ext && ext.bonham && ext.bonham.shadow && ext.bonham.shadow.length > 1 ? ext.bonham.shadow : null;
+  const extKbPub = ext && ext.bonham && ext.bonham.published && ext.bonham.published.length ? ext.bonham.published : null;
   const isCoal = shown === "alp_lnp",
     isOn = shown === "alp_on";
   const extAvail = isCoal && !!(extBt || extKb) || isOn && !!extSh;
@@ -69201,7 +69202,7 @@ function RdHero(p) {
   const extKbHref = "https://" + (ext && ext.bonham && ext.bonham.site ? ext.bonham.site : "");
   const lblExtBt = "BludgerTrack’s estimate" + extFig(extBt) + ", as published";
   const lblExtBtNar = "BludgerTrack’s estimate" + extFig(extBt);
-  const lblExtKb = "Bonham’s estimate" + extFig(extKb);
+  const lblExtKb = "Bonham’s estimate" + extFig(extKbPub || extKb);
   const lblExtSh = "Bonham’s estimate" + extFig(extSh);
   const series = [];
   if (otherRows && otherRows.length > 1) series.push({
@@ -69891,7 +69892,7 @@ function RdHero(p) {
     how: {
       href: "/preference-flows/"
     }
-  }, "Figures pool the last ", D.latest.method.windowDays, " days of polls, weighted towards the most recent and adjusted for each pollster\u2019s lean. Changes are on a month ago. The chart follows the matchup chosen above.", extOn && isCoal && React.createElement(React.Fragment, null, " BludgerTrack\u2019s line is its published series; the Bonham line is rebuilt here from his published method over the same polls, and tracks the figures he publishes to within about half a point."), extOn && isOn && React.createElement(React.Fragment, null, " Bonham\u2019s shadow-2PP rides as he publishes it: primaries off his own estimates of 2025 preferences, pooled as the latest ten polls with at most two a house \u2014 a different conversion from the implied-flows line it sits beside, so it need not hug it.")));
+  }, "Figures pool the last ", D.latest.method.windowDays, " days of polls, weighted towards the most recent and adjusted for each pollster\u2019s lean. Changes are on a month ago. The chart follows the matchup chosen above.", extOn && isCoal && React.createElement(React.Fragment, null, " BludgerTrack\u2019s line is its published series; the Bonham line is rebuilt here from his published method over the same polls (the key quotes his current published figure), and tracks the figures he publishes to within about half a point."), extOn && isOn && React.createElement(React.Fragment, null, " Bonham\u2019s shadow-2PP rides as he publishes it: primaries off his own estimates of 2025 preferences, pooled as the latest ten polls with at most two a house \u2014 a different conversion from the implied-flows line it sits beside, so it need not hug it.")));
 }
 Object.assign(window, {
   RdHero,

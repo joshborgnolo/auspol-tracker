@@ -207,18 +207,25 @@ function RdHero(p) {
   const extBt = ext && ext.bt && ext.bt.points && ext.bt.points.length > 1 ? ext.bt.points : null;
   const extKb = ext && ext.bonham && ext.bonham.replica && ext.bonham.replica.length > 1 ? ext.bonham.replica : null;
   const extSh = ext && ext.bonham && ext.bonham.shadow && ext.bonham.shadow.length > 1 ? ext.bonham.shadow : null;
+  /* his OWN current figure rides the key (the drawn line beside it stays the
+     reconstruction): the as-published sidebar stamps, replica tail only as
+     the file-absent fallback - 2026-10-02 user catch: the key read 52.0 off
+     the replica where he publishes 52.3 */
+  const extKbPub = ext && ext.bonham && ext.bonham.published && ext.bonham.published.length ? ext.bonham.published : null;
   const isCoal = shown === "alp_lnp", isOn = shown === "alp_on";
   const extAvail = (isCoal && !!(extBt || extKb)) || (isOn && !!extSh);
   const extOn = showExt && extAvail && !morph;
   const extBox = "Compare outside estimates";
-  /* the key entries name the publisher, carry his CURRENT figure, and link
-     out to where he publishes (RdKey grows an href branch for them) */
+  /* the key entries name the publisher, carry his CURRENT figure as HE
+     publishes it (Bonham's is the sidebar stamp, never the reconstruction's
+     tail), and link out to where he publishes (RdKey grows an href branch
+     for them) */
   const extFig = (pts) => pts && pts.length ? " (" + pts[pts.length - 1].y.toFixed(1) + "%)" : "";
   const extBtHref = "https://" + (ext && ext.bt && ext.bt.feed ? ext.bt.feed : "");
   const extKbHref = "https://" + (ext && ext.bonham && ext.bonham.site ? ext.bonham.site : "");
   const lblExtBt = "BludgerTrack’s estimate" + extFig(extBt) + ", as published";
   const lblExtBtNar = "BludgerTrack’s estimate" + extFig(extBt);
-  const lblExtKb = "Bonham’s estimate" + extFig(extKb);
+  const lblExtKb = "Bonham’s estimate" + extFig(extKbPub || extKb);
   const lblExtSh = "Bonham’s estimate" + extFig(extSh);
 
   const series = [];
@@ -657,7 +664,7 @@ function RdHero(p) {
       </div>
       <RdFoot how={{ href: "/preference-flows/" }}>
         Figures pool the last {D.latest.method.windowDays} days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above.
-        {extOn && isCoal && <> BludgerTrack’s line is its published series; the Bonham line is rebuilt here from his published method over the same polls, and tracks the figures he publishes to within about half a point.</>}
+        {extOn && isCoal && <> BludgerTrack’s line is its published series; the Bonham line is rebuilt here from his published method over the same polls (the key quotes his current published figure), and tracks the figures he publishes to within about half a point.</>}
         {extOn && isOn && <> Bonham’s shadow-2PP rides as he publishes it: primaries off his own estimates of 2025 preferences, pooled as the latest ten polls with at most two a house — a different conversion from the implied-flows line it sits beside, so it need not hug it.</>}
       </RdFoot>
     </section>

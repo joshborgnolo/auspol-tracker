@@ -15,6 +15,14 @@
 # daily fetches; mirrored from the same cached feed bytes the fallback just
 # validated, best-effort (its failure only logs WARN and never blocks a run).
 #
+# THIRD DUTY (2026-10-02): freshen Kevin Bonham's published sidebar stamps
+# (extract-bonham-sidebar.mjs -> data/bonham-2pp.json). The stamps only move
+# when HE updates, so the extractor ran unscheduled until the hero key
+# started quoting his published current figure - an unfreshened stamp now
+# shows up as a wrong label on the front page. Its own fetch of his blog's
+# monthly archive (the widget is sitewide); same best-effort contract as the
+# BT mirror - a wobble logs WARN and can never fail the poll agent.
+#
 # Two commit shapes: (a) a filed/pruned row → the full site refresh, add-list
 # as the other poll wrappers; (b) only the first-seen ledger moved (a wave
 # is newly pending) → the ledger alone, no build. CI runners are fresh each
@@ -66,9 +74,22 @@ else
   log "WARN bludgertrack comparator extract (exit $BT_CODE): $BT_LINE"
 fi
 
+# THIRD DUTY: Kevin Bonham's published sidebar stamps (its own fetch; see the
+# header). Same best-effort contract — a comparator wobble only logs WARN.
+KB_CHANGED=false
+KB_OUT="$(node .build/extract-bonham-sidebar.mjs --apply 2>&1)"
+KB_CODE=$?
+KB_LINE="$(echo "$KB_OUT" | tail -1)"
+if [ $KB_CODE -eq 0 ] && echo "$KB_LINE" | grep -q '^KB_STATUS'; then
+  log "$KB_LINE"
+  echo "$KB_LINE" | grep -q '"changed":true' && KB_CHANGED=true
+else
+  log "WARN bonham sidebar extract (exit $KB_CODE): $KB_LINE"
+fi
+
 FILES=(data/polls.json .build/pollbludger-src/seen.json "${SITE_FILES[@]}")
 
-if ! echo "$LAST_LINE" | grep -q '"changed":true' && [ "$BT_CHANGED" = false ]; then
+if ! echo "$LAST_LINE" | grep -q '"changed":true' && [ "$BT_CHANGED" = false ] && [ "$KB_CHANGED" = false ]; then
   # nothing filed or pruned, comparator tame — but the grace ledger may have gained a wave
   if git diff --quiet -- .build/pollbludger-src/seen.json && [ -z "$(git ls-files --others --exclude-standard .build/pollbludger-src/seen.json)" ]; then
     exit 0
@@ -89,7 +110,11 @@ else
 fi
 if [ "$BT_CHANGED" = true ]; then
   FILES+=(data/bludgertrack-2pp.json)
-  FILED="$FILED$(echo "$LAST_LINE" | grep -q '"changed":true' && echo "; " || echo "")BludgerTrack comparator refresh"
+  FILED="$FILED; BludgerTrack comparator refresh"
+fi
+if [ "$KB_CHANGED" = true ]; then
+  FILES+=(data/bonham-2pp.json)
+  FILED="$FILED; Bonham sidebar refresh"
 fi
 log "change: $FILED; running validate/build/commit/push"
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
