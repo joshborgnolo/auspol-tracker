@@ -223,18 +223,20 @@ function RdHero(p) {
                   endLabel: narrow ? null : cmpName });
   /* the comparators sit UNDER the house line (pushed before it), thin and
      coloured by publisher - purple Bonham, aquamarine BludgerTrack - so
-     they never read as family with the party lines. On the One Nation
+     they never read as family with the party lines; SOLID (user 2026-10-02:
+     the 1.5px stand-out colours differentiate, the dash only made them
+     look dotted). On the One Nation
      contest the only outside line is Bonham's shadow-2PP stamps, drawn
      as-published; BludgerTrack carries no One Nation pairing */
   if (extOn) {
     if (isCoal && extKb)
-      series.push({ id: "kbonham", label: "Bonham (rebuilt)", color: EXT_KB, rdWidth: 1.5, dash: "7 4", endCap: false,
-                    points: filterPts(extKb, xDomain[0]), endLabel: narrow ? null : "Bonham (rebuilt)" });
+      series.push({ id: "kbonham", label: "Bonham", color: EXT_KB, rdWidth: 1.5, endCap: false,
+                    points: filterPts(extKb, xDomain[0]), endLabel: narrow ? null : "Bonham" });
     if (isOn && extSh)
-      series.push({ id: "kbsh", label: "Bonham (published)", color: EXT_KB, rdWidth: 1.5, dash: "7 4", endCap: false,
-                    points: filterPts(extSh, xDomain[0]), endLabel: narrow ? null : "Bonham (published)" });
+      series.push({ id: "kbsh", label: "Bonham", color: EXT_KB, rdWidth: 1.5, endCap: false,
+                    points: filterPts(extSh, xDomain[0]), endLabel: narrow ? null : "Bonham" });
     if (isCoal && extBt)
-      series.push({ id: "btrack", label: "BludgerTrack", color: EXT_BT, rdWidth: 1.5, dash: "1.6 3.4", endCap: false,
+      series.push({ id: "btrack", label: "BludgerTrack", color: EXT_BT, rdWidth: 1.5, endCap: false,
                     points: filterPts(extBt, xDomain[0]), endLabel: narrow ? null : "BludgerTrack" });
   }
   if (adjusted || morph)
@@ -413,9 +415,9 @@ function RdHero(p) {
       label: (narrow ? "Monthly" : "Monthly average") + (bandPts.length >= 2 ? (flowsBand ? (narrow ? ", flow range" : " and flow range") : (narrow ? ", 95% interval" : " and its 95% interval")) : "") } : null,
     (!narrow && labelOther) ? { kind: "line", color: otherCol, label: labelOther + ", monthly average" } : null,
     cmpOn ? { kind: "dash", color: mainCol, label: cmpName + ", monthly average" } : null,
-    extOn && isCoal && extBt ? { kind: "dash", color: EXT_BT, label: "BludgerTrack, as published" } : null,
-    extOn && isCoal && extKb ? { kind: "dash", color: EXT_KB, label: narrow ? "Bonham (rebuilt)" : "Bonham’s method, rebuilt" } : null,
-    extOn && isOn && extSh ? { kind: "dash", color: EXT_KB, label: narrow ? "Bonham (published)" : "Bonham’s shadow-2PP, as published" } : null,
+    extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: "BludgerTrack, as published" } : null,
+    extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: "Bonham" } : null,
+    extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: "Bonham" } : null,
     sensOn ? { kind: "band", color: "var(--lnp)", label: "Range if One Nation preferences flowed as in 2022" } : null,
     ringOn ? { kind: "ring", label: narrow ? "2025 election" : "2025 election result" } : null,
   ];
@@ -429,9 +431,9 @@ function RdHero(p) {
       label: labelMain + ", monthly average" + (bandPts.length >= 2 ? (flowsBand ? " and flow range" : " and its 95% interval") : "") } : null,
     labelOther ? { kind: "line", color: otherCol, label: labelOther + ", monthly average" } : null,
     cmpOn ? { kind: "dashed", color: mainCol, label: cmpName + ", monthly average" } : null,
-    extOn && isCoal && extBt ? { kind: "dashed", color: EXT_BT, label: "BludgerTrack, as published" } : null,
-    extOn && isCoal && extKb ? { kind: "dashed", color: EXT_KB, label: "Bonham’s method, rebuilt" } : null,
-    extOn && isOn && extSh ? { kind: "dashed", color: EXT_KB, label: "Bonham’s shadow-2PP, as published" } : null,
+    extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: "BludgerTrack, as published" } : null,
+    extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: "Bonham" } : null,
+    extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: "Bonham" } : null,
     sensOn ? { kind: "shade", color: "var(--lnp)", label: "Range if One Nation preferences flowed as in 2022" } : null,
     ringOn && narrow ? { kind: "ring", color: "var(--ink)", label: "2025 election result" } : null,
   ].filter(Boolean);
@@ -608,9 +610,9 @@ function RdHero(p) {
             { kind: "line", color: mainCol, label: labelMain },
             labelOther ? { kind: "line", color: otherCol, label: labelOther } : null,
             cmpOn ? { kind: "dash", color: mainCol, label: cmpName } : null,
-            extOn && isCoal && extBt ? { kind: "dash", color: EXT_BT, label: "BludgerTrack" } : null,
-            extOn && isCoal && extKb ? { kind: "dash", color: EXT_KB, label: "Bonham (rebuilt)" } : null,
-            extOn && isOn && extSh ? { kind: "dash", color: EXT_KB, label: "Bonham (published)" } : null,
+            extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: "BludgerTrack" } : null,
+            extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: "Bonham" } : null,
+            extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: "Bonham" } : null,
           ]} />
         )}
         <TrendChart

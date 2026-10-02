@@ -2239,10 +2239,35 @@ const readDataJson = (name) => {
 const BTRACK = readDataJson("bludgertrack-2pp.json");
 const KBONHAM = readDataJson("bonham-2pp.json");
 const xOfIso = (iso) => mx(ymOf(iso)) + (dayOf(iso) - 15) / 365;   // the individualPolls day convention
+/* BludgerTrack arrives as ~daily published trend points; drawn raw beside
+   the month-anchored house lines it renders as jitter (user 2026-10-02:
+   "way too bumpy"). Same display lattice as Bonham's replica: linear
+   interpolation to each mid-month anchor, plus one live tail vertex. */
+const btMidMonth = (ym) => {
+  const t = Date.parse(ym + "-15T00:00:00Z");
+  let prev = null, next = null;
+  for (const [iso, alp] of BTRACK.series) {
+    const at = Date.parse(iso + "T00:00:00Z");
+    if (at <= t) prev = [at, alp]; else if (!next) { next = [at, alp]; break; }
+  }
+  if (!prev || !next) return null;                 // never extrapolate
+  if (next[0] === t) return next[1];
+  const w = (t - prev[0]) / (next[0] - prev[0]);
+  return prev[1] + w * (next[1] - prev[1]);
+};
 const extAgg = {
   bt: BTRACK && BTRACK.series?.length
     ? {
-        points: BTRACK.series.map(([iso, alp]) => ({ x: xOfIso(iso), y: alp })),
+        points: (() => {
+          const pts = MONTHS.map((ym) => {
+            const y = btMidMonth(ym);
+            return y == null ? null : { x: mx(ym), y };
+          }).filter(Boolean);
+          const [iso, alp] = BTRACK.series[BTRACK.series.length - 1];
+          const tx = xOfIso(iso);
+          if (!pts.length || tx > pts[pts.length - 1].x + 0.002) pts.push({ x: tx, y: alp });
+          return pts;
+        })(),
         feed: "www.pollbludger.net/fed2028/bludgertrack",
       }
     : null,

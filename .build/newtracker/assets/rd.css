@@ -548,6 +548,13 @@ body.rd .rd-tpp-chart { margin-top: 16px; }
 body.rd .rd-tpp-top + .rd-tpp-chart { margin-top: 56px; }
 body.rd .rd-tabs-sm .rd-tab { font-size: 14px; padding: 0 10px; }
 body.rd .rd-tpp-legend { margin: 0 0 4px; }
+/* the synth + outside-estimates check boxes: the tabs row's 4px flex gap
+   crowds the pair on desktop, and the 44px touch-target height spreads the
+   stacked pair too far on the phone */
+body.rd .rd-tpp-chart .rd-tabs .rd-check + .rd-check { margin-left: 8px; }
+@media (max-width: 640px) {
+  body.rd .rd-tpp-chart > .rd-check { min-height: 30px; }
+}
 
 /* the lead gauge */
 body.rd .rd-lg { position: relative; height: 82px; margin-top: 18px; font-size: 12px; font-variant-numeric: tabular-nums; }
