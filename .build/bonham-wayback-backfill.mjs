@@ -58,7 +58,7 @@ const FROM = argOf("--from", "2025-10-01");
 const TO = argOf("--to", TODAY);
 const EVERY = Math.max(1, +argOf("--every-days", 1) || 1);
 
-const status = { changed: false, captures: 0, parsed: 0, skipped: 0, failures: 0, added: 0, replaced: 0, note: null, error: null };
+const status = { changed: false, captures: 0, parsed: 0, recognised: 0, skipped: 0, failures: 0, added: 0, replaced: 0, note: null, error: null };
 const done = (code) => { console.log("KB_BACKFILL " + JSON.stringify(status)); process.exit(code); };
 
 async function fetchText(url) {
@@ -106,6 +106,7 @@ for (const [ts] of captures) {
   }
   const parsed = parseSidebar(stripTags(html));
   if (!parsed || !figureOk(parsed)) { status.skipped++; await sleep(300); continue; }
+  status.recognised++; // parseable widget, even if its stamp then fails the date<=capture guard
   const date = stampDate(parsed.stamp, +ts.slice(0, 4), +ts.slice(4, 6));
   if (date && date <= capIso) {
     const prev = rows.get(date);
@@ -117,7 +118,7 @@ for (const [ts] of captures) {
   } else status.skipped++;
   await sleep(300);
 }
-if (!rows.size && !status.failures) { status.error = "no capture carried a parseable widget — parser no longer recognises the page"; done(2); }
+if (!status.recognised && !status.failures) { status.error = "no capture carried a parseable widget — parser no longer recognises the page"; done(2); }
 
 // ---- merge ------------------------------------------------------------------
 const doc = existsSync(OUT)

@@ -36,12 +36,16 @@ export function parseSidebar(text) {
 }
 
 /* resolve his year-less "Last update D Mon" stamp against the calendar
-   context of the page it was read on (a stamp month ahead of the page
-   month is last year's December tail) */
+   context of the page it was read on. The ONLY legitimate previous-year
+   case is a December stamp read on a January page (the December tail);
+   any other stamp month ahead of the page month means the capture itself
+   is mislabeled (Wayback holds front-page captures keyed 2025-09-26 whose
+   bytes carry a 5-Oct widget), and the caller's date<=pageDate guard
+   then skips it */
 export function stampDate(stamp, pageYear, pageMonth) {
   if (!stamp || !stamp.mon) return null;
   let y = pageYear;
-  if (stamp.mon > pageMonth) y -= 1;
+  if (stamp.mon === 12 && pageMonth === 1) y -= 1;
   const iso = `${y}-${String(stamp.mon).padStart(2, "0")}-${String(stamp.day).padStart(2, "0")}`;
   return Number.isNaN(Date.parse(iso)) ? null : iso;
 }

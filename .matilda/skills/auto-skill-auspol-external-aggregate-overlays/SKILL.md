@@ -1,6 +1,6 @@
 ---
 name: auspol-external-aggregate-overlays
-description: auspol-tracker — the hero 2PP chart's "Compare outside estimates" overlay (shipped 5bf0e64 2026-10-02; restyled same-day for "bumpy Bonham" + thin coloured SOLID lines + Bonham's ON shadow; both comparator lines then month-anchored and labels plain publisher names, same day) END-TO-END — BludgerTrack rides as-published SAMPLED TO MID-MONTH ANCHORS (.build/extract-bludgertrack.mjs → data/bludgertrack-2pp.json, 140 pts since 2025-05-19, gen-data btMidMonth interpolates; AUDITED 2026-10-02, .matilda/bt-line-accuracy-2026-10.md: mirror was bit-exact but of ALP2in = his scatter-DOT series; FIXED SAME-DAY in efbc280 — extractor now mirrors ALP2out, his published trend line/headline, refreshed 4×/day by pollbludger-updater.sh's second duty), Bonham is a REPLICA not a mirror (.build/newtracker/bonham-replica.mjs re-runs his published method over our polls, validated by .build/check-bonham-replica.mjs against 49 as-published anchors in data/bonham-2pp.json), gen-data §6b emits D.extAgg {bt, bonham:{replica MONTH-ANCHORED + live tail, published, shadow, site}}, rd-hero.jsx draws thin SOLID publisher-coloured lines (EXT_KB #7e52a8 purple / EXT_BT #10998d aquamarine, rdWidth 1.5, no dash) — kbonham+btrack on the Coalition contest, Bonham's shadow-2PP alone (as-published; ALSO primary-derived — "my conversion", his own 2025-preference estimates 72% Coalition / 9% Greens to ON, pooled latest-ten ≤2/house) on the One Nation contest. End labels were pulled the same day (legend below names them); keys wear plain publisher names (both Bonham lines just "Bonham" — the rebuilt/published distinction lives only in RdFoot copy). Also covers the reusable PATTERN: back-derive an aggregator's unpublished history by re-implementing his published method and validating against recovered published stamps.
+description: auspol-tracker — the hero 2PP chart's "Compare outside estimates" overlay (shipped 5bf0e64 2026-10-02; restyled same-day for "bumpy Bonham" + thin coloured SOLID lines + Bonham's ON shadow; both comparator lines then month-anchored and labels plain publisher names, same day) END-TO-END — BludgerTrack rides as-published SAMPLED TO MID-MONTH ANCHORS (.build/extract-bludgertrack.mjs → data/bludgertrack-2pp.json, 140 pts since 2025-05-19, gen-data btMidMonth interpolates; AUDITED 2026-10-02, .matilda/bt-line-accuracy-2026-10.md: mirror was bit-exact but of ALP2in = his scatter-DOT series; FIXED SAME-DAY in efbc280 — extractor now mirrors ALP2out, his published trend line/headline, refreshed 4×/day by pollbludger-updater.sh's second duty), Bonham is a REPLICA not a mirror (.build/newtracker/bonham-replica.mjs re-runs his published method over our polls, validated by .build/check-bonham-replica.mjs against 62 as-published anchors in data/bonham-2pp.json — launched 2025-09-26: the launch-day fig is a quoted constant, every earlier non-public value is VACUOUS BY CONSTRUCTION), gen-data §6b emits D.extAgg {bt, bonham:{replica MONTH-ANCHORED + live tail, published, shadow, site}}, rd-hero.jsx draws thin SOLID publisher-coloured lines (EXT_KB #7e52a8 purple / EXT_BT #10998d aquamarine, rdWidth 1.5, no dash) — kbonham+btrack on the Coalition contest, Bonham's shadow-2PP alone (as-published; ALSO primary-derived — "my conversion", his own 2025-preference estimates 72% Coalition / 9% Greens to ON, pooled latest-ten ≤2/house) on the One Nation contest. End labels were pulled the same day (legend below names them); keys wear plain publisher names (both Bonham lines just "Bonham" — the rebuilt/published distinction lives only in RdFoot copy). Also covers the reusable PATTERN: back-derive an aggregator's unpublished history by re-implementing his published method and validating against recovered published stamps.
 source: auto-skill
 extracted_at: '2026-10-02T04:17:50.527Z'
 ---
@@ -27,13 +27,18 @@ history. The pivot ("don't we know bonham's formula? … back-derive his
    dated rule gates B_RULE_DATES, house effects ≥0.5pt iterated once,
    freeze-fill interpolation, 7-day smooth). All constants + known
    unknowns documented in the module header — keep it the source of truth.
-2. **His real published figures are recoverable** — 49 stamp rows in
-   `data/bonham-2pp.json` (2025-10-05..2026-09-30, latest 52.3):
-   live scrapes + Wayback replays (below). These are the VALIDATION data,
+2. **His real published figures are recoverable** — 62 stamp rows in
+   `data/bonham-2pp.json` (2025-09-26..2026-09-30, latest 52.3):
+   live scrapes + Wayback replays (below) + the 2025-09-26 LAUNCH-DAY
+   figure 56.3 quoted in his methods post itself (aggregate launched
+   2025-09-26 — nothing he published exists earlier; his own activity
+   rule kept the machine dormant through May–June 2025 and he only
+   ever quoted ONE informal "Cross-poll estimate 56.3" in the window,
+   the 2025-09-17 roundup). These are the VALIDATION data,
    deliberately not charted.
 3. **Validate, report, label honestly** — `.build/check-bonham-replica.mjs`
-   (exit 0 always, a report not a gate): mean |dev| 0.56 pts, median 0.5,
-   max 1.5, signed +0.54 (the unseen per-house accuracy weights lean
+   (exit 0 always, a report not a gate): mean |dev| 0.54 pts, median 0.5,
+   max 1.5, signed +0.52 (the unseen per-house accuracy weights lean
    Newspoll-heavy → replica runs ~½pt ALP-high), dead-on at the latest
    stamp. Everywhere it's drawn it's named "rebuilt"/"reconstruction";
    the RdFoot provenance sentence carries the caveat.
@@ -82,8 +87,20 @@ never includes every ingredient.
   updates collapses to nothing); same stamp + newer capture WINS (he
   corrects in place). `--every-days` default 1 — captures are already
   daily-collapsed, thinning only costs rows (a 2026-08 capture was
-  almost lost this way). Failed parses are skips, not fatal; zero
-  parseable captures = parser rot (exit 2). Dry-run default, `--apply`
+  almost lost this way). Full-density `--apply` re-sweeps pay: the
+  2026-10-02 re-run of the whole span recovered 12 stamps the first
+  pass missed (captures added later / earlier thinnings).
+  **Wayback MISLABELS captures**: CDX row 20250926101724 for the front
+  page actually carries a 5-Oct widget (bytes verified) — the stamp
+  earns a year only in stampDate, and the ONLY legitimate previous-year
+  case is a DECEMBER stamp on a JANUARY page (shared-parser stampDate
+  comment; the old "any ahead-month ⇒ previous year" rule minted a
+  phantom 2024-10-05 that passed date<=capture). A mislabeled stamp
+  lands AHEAD of its page month, so the guard skips it. Failed parses
+  are skips, not fatal; "parser rot" (exit 2) keys on the `recognised`
+  counter (a capture that parses but guards out still proves the
+  parser healthy — keeps the Sep-2025 window, whose only capture is
+  exactly that mislabel, exit 0). Dry-run default, `--apply`
   writes. **Wayback is sparse mid-2026** (2 captures Jun–Sep): the
   Jun–Aug gap is archive ABSENCE, documented in the data file, not
   fixable by more scraping.
@@ -199,8 +216,8 @@ Contract mirrors the showSynth compare block (`cmpOn = … && !morph …`):
   shadow pairs — his Sep 2026 "flat field" post critiques them; an
   earlier version of this note's foot called HIS shadow
   respondent-allocated, which was wrong (fixed 2026-10-02).
-- **NOT charted**: bonham.published (49 anchors) — TrendChart `marks`
-  are labelled rings for counts (election results); 49 of them is
+- **NOT charted**: bonham.published (62 anchors) — TrendChart `marks`
+  are labelled rings for counts (election results); 62 of them is
   clutter. They stay validation data. The shadow is charted precisely
   BECAUSE it's the only as-published series of the three — don't
   "validate" it point-for-point against the implied-flows main line:
