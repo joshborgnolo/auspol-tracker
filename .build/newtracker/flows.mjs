@@ -87,23 +87,23 @@ export const impliedAlp2pp = (p) => {
       obvious at the time" case): no prior Democrat flow exists, so the
       1975 set carries dem=0.50 as an explicit debut assumption.
 
-   Right-edge backtest (each set's constants applied to the CLOSING
-   election's actual primaries vs its official 2PP): 1974 −0.04, 1975
-   +0.20, 1977 −0.20, 1980 −0.35, 1983 −0.14, 1984 −0.24, 1987 −0.24.
-   Every cycle lands inside Bonham's measured pre-1983 LEF error budget
-   (±0.6) and the broader post-1983 one (±0.3–1.1); the piece's own
-   normalised-error numbers are the figure the cyclePollBases notes quote.
-   The implied figure is tagged per row with `tppEra` (the opening election
-   year, i.e. the key below), and validate.mjs inverts era rows against
-   THESE constants instead of the 2025 set. */
+   The bt field is the right-edge backtest (same convention as FLOW_LEF):
+   the set's constants applied to the CLOSING election's actual primaries
+   vs that election's official 2PP, in ALP points. Every cycle lands inside
+   Bonham's measured pre-1983 LEF error budget (±0.6) and the broader
+   post-1983 one (±0.3–1.1); the piece's own normalised-error numbers are
+   the figure the cyclePollBases notes quote. The implied figure is tagged
+   per row with `tppEra` (the opening election year, i.e. the key below),
+   and validate.mjs inverts era rows against THESE constants instead of the
+   2025 set. */
 export const FLOW_ERAS = Object.freeze({
-  1972: { dlp: 0.2765, oth: 0.45 },
-  1974: { dlp: 0.3032, oth: 0.45 },
-  1975: { dlp: 0.1551, dem: 0.5, oth: 0.45 },
-  1977: { dlp: 0.27, dem: 0.5033, oth: 0.45 },
-  1980: { dlp: 0.27, dem: 0.5571, oth: 0.45 },
-  1983: { dlp: 0.27, dem: 0.584, oth: 0.45 },
-  1984: { dlp: 0.27, dem: 0.6287, oth: 0.45 },
+  1972: { dlp: 0.2765, oth: 0.45, bt: -0.04 },
+  1974: { dlp: 0.3032, oth: 0.45, bt: 0.2 },
+  1975: { dlp: 0.1551, dem: 0.5, oth: 0.45, bt: -0.2 },
+  1977: { dlp: 0.27, dem: 0.5033, oth: 0.45, bt: -0.35 },
+  1980: { dlp: 0.27, dem: 0.5571, oth: 0.45, bt: -0.14 },
+  1983: { dlp: 0.27, dem: 0.584, oth: 0.45, bt: -0.24 },
+  1984: { dlp: 0.27, dem: 0.6287, oth: 0.45, bt: -0.24 },
 });
 
 /* Implied ALP 2PP from an ERA row's primaries. Era rows itemise the

@@ -14,7 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp, FLOW, FLOW_TABLE, FLOW_LEF, impliedLefAlp2pp } from "./flows.mjs";
+import { impliedAlp2pp, FLOW, FLOW_TABLE, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp } from "./flows.mjs";
 import { bonhamReplica } from "./bonham-replica.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -4679,6 +4679,7 @@ window.AUSPOL = (function () {
      shares per bucket, the one lumped flow where no split was published, and
      each table's miss on the next election's primaries (bt, ALP points). */
   const lefTables = ${JSON.stringify([
+    ...Object.entries(FLOW_ERAS).map(([y, t]) => ({ year: +y, era: true, dlp: t.dlp ?? null, dem: t.dem ?? null, oth: t.oth, bt: t.bt ?? null })),
     ...Object.entries(FLOW_LEF).map(([y, t]) => ({ year: +y, grn: t.grn ?? null, onp: t.onp ?? null, oth: t.oth ?? null, minor: t.minor ?? null, bt: t.bt })),
     { year: 2025, grn: FLOW.grn, onp: FLOW.onp, oth: FLOW.oth, minor: null, bt: null },
   ])};

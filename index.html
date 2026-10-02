@@ -20,10 +20,10 @@
   <meta property="og:site_name" content="auspoltracker.com">
   <meta property="og:locale" content="en_AU">
   <meta property="og:url" content="https://auspoltracker.com/">
-  <meta property="og:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-09-30-809499d0">
+  <meta property="og:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-09-30-7db4b16a">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="auspol tracker: Labor 52.0, Coalition 48.0 two-party preferred on implied preference flows, ±1.4 points, updated 29 September 2026, with the trend since the 2025 election">
+  <meta property="og:image:alt" content="auspol tracker: Labor 51.7, One Nation 48.3 two-party preferred on implied preference flows, ±1.3 points, updated 29 September 2026, with the trend since the 2025 election">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="google-site-verification" content="sUMvJK3smMtuRAQNZiu9yW3FPS5rD4XI_eod7Dc6k5g">
   <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
@@ -6315,6 +6315,55 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "who": "alp_on"
   }];
   const lefTables = [{
+    "year": 1972,
+    "era": true,
+    "dlp": 0.2765,
+    "dem": null,
+    "oth": 0.45,
+    "bt": -0.04
+  }, {
+    "year": 1974,
+    "era": true,
+    "dlp": 0.3032,
+    "dem": null,
+    "oth": 0.45,
+    "bt": 0.2
+  }, {
+    "year": 1975,
+    "era": true,
+    "dlp": 0.1551,
+    "dem": 0.5,
+    "oth": 0.45,
+    "bt": -0.2
+  }, {
+    "year": 1977,
+    "era": true,
+    "dlp": 0.27,
+    "dem": 0.5033,
+    "oth": 0.45,
+    "bt": -0.35
+  }, {
+    "year": 1980,
+    "era": true,
+    "dlp": 0.27,
+    "dem": 0.5571,
+    "oth": 0.45,
+    "bt": -0.14
+  }, {
+    "year": 1983,
+    "era": true,
+    "dlp": 0.27,
+    "dem": 0.584,
+    "oth": 0.45,
+    "bt": -0.24
+  }, {
+    "year": 1984,
+    "era": true,
+    "dlp": 0.27,
+    "dem": 0.6287,
+    "oth": 0.45,
+    "bt": -0.24
+  }, {
     "year": 1987,
     "grn": null,
     "onp": null,
@@ -66522,11 +66571,13 @@ function infoTerms(D) {
     className: "info-work"
   }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Election"), React.createElement("th", null, "Greens"), React.createElement("th", null, "One Nation"), React.createElement("th", null, "Others"), React.createElement("th", null, "Miss next time"))), React.createElement("tbody", null, lefT.map((t, i) => React.createElement("tr", {
     key: t.year
-  }, React.createElement("td", null, t.year), t.minor != null ? React.createElement("td", {
+  }, React.createElement("td", null, t.year), t.era ? React.createElement("td", {
+    colSpan: "3"
+  }, pc(t.dlp), " DLP", t.dem != null ? ", " + pc(t.dem) + " Democrats" : "", ", ", pc(t.oth), " others (calibrated)") : t.minor != null ? React.createElement("td", {
     colSpan: "3"
   }, pc(t.minor), " (all minor parties)") : React.createElement(React.Fragment, null, React.createElement("td", null, pc(t.grn)), React.createElement("td", null, pc(t.onp)), React.createElement("td", null, pc(t.oth))), React.createElement("td", null, t.bt == null || !lefT[i + 1] ? "–" : (t.bt > 0 ? "+" : "−") + Math.abs(t.bt).toFixed(2) + " at " + lefT[i + 1].year))))), React.createElement("p", {
     className: "info-work-note"
-  }, "Per cent of each group\u2019s preferences reaching Labor against the Coalition. The miss is the table applied to the next election\u2019s actual primary votes, minus that election\u2019s official 2PP, in points for Labor. A party a table never counted (One Nation in 1996) is read at that table\u2019s \u201Cothers\u201D flow; a poll that doesn\u2019t list a party separately reads it at the election\u2019s own mix; and a poll whose shares don\u2019t total 100 is rescaled to 100 first. The 1972\u201384 terms use flows calibrated to each election\u2019s official result.")) : null;
+  }, "Per cent of each group\u2019s preferences reaching Labor against the Coalition. The miss is the table applied to the next election\u2019s actual primary votes, minus that election\u2019s official 2PP, in points for Labor. A party a table never counted (One Nation in 1996) is read at that table\u2019s \u201Cothers\u201D flow; a poll that doesn\u2019t list a party separately reads it at the election\u2019s own mix; and a poll whose shares don\u2019t total 100 is rescaled to 100 first. The 1972\u201384 rows pre-date any published two-party figure, so each table is calibrated to its own election\u2019s official result; the 1975 table\u2019s Democrat flow is a debut assumption \u2013 no earlier Democrat vote exists to count.")) : null;
   const groups = [{
     id: "g-headline",
     title: "The headline and how it is built",
@@ -66661,7 +66712,7 @@ function infoTerms(D) {
       term: "Last-election flows",
       body: React.createElement(React.Fragment, null, "The flow table a term\u2019s implied 2PP is read through: the preferences counted at the election that opened the term. It\u2019s the only table anyone inside the term could have used, and it\u2019s how Past cycles draws every term\u2019s two-party line, so each one sits on the same footing as today\u2019s ", xref("implied-2pp", "last-election flows", "implied 2PP"), ".", React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Where the tables come from."), " From 2004, the AEC\u2019s count of every ballot between Labor and the Coalition, in every seat. For 1996\u20132001, the AEC\u2019s official statistics, counted in the nine seats in ten where the final two were Labor and the Coalition. No flows by party were published before 1996, so each earlier table is the single minor-party flow the official result implies."), lefMean != null ? React.createElement("span", {
+      }, React.createElement("b", null, "Where the tables come from."), " From 2004, the AEC\u2019s count of every ballot between Labor and the Coalition, in every seat. For 1996\u20132001, the AEC\u2019s official statistics, counted in the nine seats in ten where the final two were Labor and the Coalition. No flows by party were published before 1996, so the 1987\u201393 tables are each the single minor-party flow the official result implies. The Morgan Gallup polls of 1972\u201384 published no two-party figure at all, so those terms get their own implied lines too \u2013 each read through a table calibrated to the election that opened its term: one flow each for the DLP, the Democrats (a debut assumption where an election met them for the first time) and all other votes."), lefMean != null ? React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "How well it works."), " Applied to the next election\u2019s actual primary votes, each table misses the official 2PP by ", lefMean.toFixed(1), " points on average. The biggest misses were ", lefBigText, ".") : null, React.createElement("span", {
         className: "info-p"
@@ -66754,9 +66805,9 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "Differences between groups."), " Two groups differ significantly when the gap between them is larger than its own margin. That margin combines both groups\u2019 margins. Because the groups are different people, their errors partly offset, so margins of 1.3 and 1.2 points combine to 1.8, not 2.5. With three or four groups there are three to six gaps to choose from, and testing that many at one in twenty would find a difference that isn\u2019t there far more often than that. So the bar rises with the number of gaps. With six, the clearest gap must be one chance would produce less than one time in 120, the next one time in 100, then 80, and so on, stopping at the first that falls short. The sentence then reports what passes: no difference, a steady rise or fall across ordered groups such as age (only when every step passes), one group apart from all the others, or failing those, the largest gap that passes."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Changes over time."), " The sentence under each chart asks whether any group has moved towards or away from the party, relative to all voters, over the period on screen. The monthly lines can\u2019t answer that by themselves. Resolve asked alone until February 2026, then YouGov, RedBridge, and DemosAU joined, and pollsters read some groups differently, so a line can move just because a new pollster arrived. The test compares each pollster only with itself. It fits a straight line through every poll\u2019s gap for the group, giving each pollster its own level and all of them one shared slope, with larger polls counting for more. How far the polls scatter around that line is measured from the polls themselves rather than assumed. The slope counts as a change when chance would produce one that steep less than one time in twenty, and the same rising bar applies across three or four groups. Men and women, and the two language groups, are a single test of the gap between them."), React.createElement("span", {
+      }, React.createElement("b", null, "Changes over time."), " The sentence under each chart asks whether any group has moved towards or away from the party, relative to all voters, over the period on screen. The point-gap by itself can\u2019t answer that. When a party grows everywhere, a group keeping its usual share of the party\u2019s vote watches its gap widen by arithmetic alone: a group at two-thirds of the national figure sits 3 points under when the party is on 8%, and 9 under when it is on 27%. So each group is tested twice. One fit asks whether its gap to all voters, in points, is drifting; the other asks the same of its ratio to all voters, which holds steady for a group merely keeping pace with a party on the rise. A change counts as significant only when both slopes clear the one-in-twenty bar \u2013 a genuine move out of proportion, not a rising party lifting every group. Each fit is a straight line through the monthly readings, a month with a tighter margin counting for more, and how far the readings scatter around it is measured from the readings themselves. Five monthly readings are the fewest a group can be tested on; on seven or fewer the sentence hedges (\u201Cappears to\u201D)."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Limits."), " One in twenty is a convention, and a result near the line can flip with a single new poll. The margins can\u2019t see pollsters defining or weighting a group differently, though the test over time sidesteps that by comparing each pollster with itself. It looks for steady change, so a rise and a fall within the period cancel out. And each sentence allows only for its own tests: across every tab, party, and period, about one chart sentence in twenty could report a change that isn\u2019t there."), React.createElement("span", {
+      }, React.createElement("b", null, "Limits."), " One in twenty is a convention, and a result near the line can flip with a single new poll. The margins can\u2019t see pollsters defining or weighting a group differently; a pollster that joins the series part-way reading a group its own way can move a monthly line by that alone, and the test over time can\u2019t tell. It looks for steady change, so a rise and a fall within the period cancel out. And each sentence allows only for its own tests: across every tab, party, and period, about one chart sentence in twenty could report a change that isn\u2019t there."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "A check."), " Every table is checked before it\u2019s used: each group must add up to 100, give or take rounding, and an all-voters column must match the poll\u2019s published vote."), React.createElement("span", {
         className: "info-p"
@@ -66766,7 +66817,7 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "Several groups:"), " Holm\u2019s method. With m gaps, sort their p from smallest. The kth smallest passes if p < 0.05 \xF7 (m \u2212 k + 1) and every smaller one passed."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Change over time:"), " for poll i from pollster h, y\u1D62 = \u03B1\u2095 + \u03B2t\u1D62 + \u03B5\u1D62, fitted by least squares weighted by each poll\u2019s sample n\u1D62. Here y\u1D62 is the group\u2019s gap to the poll\u2019s all-voters figure, in percent, and t\u1D62 is the fieldwork date, in years. With t\u0304\u2095 and \u0233\u2095 the pollster\u2019s own weighted means, \u03B2 = \u03A3n\u1D62(t\u1D62 \u2212 t\u0304\u2095)(y\u1D62 \u2212 \u0233\u2095) \xF7 \u03A3n\u1D62(t\u1D62 \u2212 t\u0304\u2095)\xB2. Its standard error is \u221A(s\xB2 \xF7 \u03A3n\u1D62(t\u1D62 \u2212 t\u0304\u2095)\xB2), where s\xB2 is the weighted sum of squared residuals \xF7 (N \u2212 H \u2212 1), for N polls from the H pollsters with at least two. \u03B2 gets a t-test on N \u2212 H \u2212 1 degrees of freedom; with fewer than three, the sentence says there aren\u2019t enough polls. For two groups, y\u1D62 is the gap between them."), demoWork)))
+      }, React.createElement("b", null, "Changes over time:"), " for month m, y is the group\u2019s share less all voters\u2019 share, and r = ln(group \xF7 all voters); months where either share is a trace drop out of r. y and r each get a weighted-least-squares slope on the month index, the weight the precision of the month\u2019s own 95% margin \u2013 w = (1.96 \xF7 margin)\xB2, the margin floored at 0.5 \u2013 t-tested on months \u2212 2 degrees of freedom against the months\u2019 own scatter. A move counts only when both slopes clear |t| = 1.96: the point-gap drifting AND the ratio drifting. Fewer than five monthly readings: untested. Seven or fewer: thin, and the sentence above hedges."), demoWork)))
     }, {
       id: "generations",
       term: "Generations",

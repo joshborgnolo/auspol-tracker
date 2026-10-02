@@ -6184,7 +6184,8 @@ function infoTerms(D) {
   /* Last-election flows: the tables Past cycles reads each term through
      (D.lefTables), the month the sitting term's rival changed (D.rivalWalk),
      and each table's miss on the next election's primaries. Pre-1996 tables
-     are one lumped minor-party flow, since nothing finer was published. */
+     are one lumped minor-party flow, since nothing finer was published; the
+     pre-1987 Morgan-era terms carry era-calibrated DLP/Democrat splits. */
   const lefT = (D.lefTables || []).slice().sort((a, b) => a.year - b.year);
   const lefMiss = lefT.map((t, i) => (t.bt == null || !lefT[i + 1] ? null : { at: lefT[i + 1].year, bt: t.bt }))
     .filter(Boolean);
@@ -6331,7 +6332,9 @@ function infoTerms(D) {
           {lefT.map((t, i) => (
             <tr key={t.year}>
               <td>{t.year}</td>
-              {t.minor != null
+              {t.era
+                ? <td colSpan="3">{pc(t.dlp)} DLP{t.dem != null ? ", " + pc(t.dem) + " Democrats" : ""}, {pc(t.oth)} others (calibrated)</td>
+                : t.minor != null
                 ? <td colSpan="3">{pc(t.minor)} (all minor parties)</td>
                 : <><td>{pc(t.grn)}</td><td>{pc(t.onp)}</td><td>{pc(t.oth)}</td></>}
               <td>{t.bt == null || !lefT[i + 1] ? "–" : (t.bt > 0 ? "+" : "−") + Math.abs(t.bt).toFixed(2) + " at " + lefT[i + 1].year}</td>
@@ -6344,7 +6347,9 @@ function infoTerms(D) {
         that election’s official 2PP, in points for Labor. A party a table never counted (One Nation
         in 1996) is read at that table’s “others” flow; a poll that doesn’t list a party separately
         reads it at the election’s own mix; and a poll whose shares don’t total 100 is rescaled to
-        100 first. The 1972–84 terms use flows calibrated to each election’s official result.</p>
+        100 first. The 1972–84 rows pre-date any published two-party figure, so each table is
+        calibrated to its own election’s official result; the 1975 table’s Democrat flow is a debut
+        assumption – no earlier Democrat vote exists to count.</p>
     </div>
   ) : null;
 
@@ -6570,8 +6575,12 @@ function infoTerms(D) {
         <span className="info-p"><b>Where the tables come from.</b> From 2004, the AEC’s count of
         every ballot between Labor and the Coalition, in every seat. For 1996–2001, the AEC’s
         official statistics, counted in the nine seats in ten where the final two were Labor and the
-        Coalition. No flows by party were published before 1996, so each earlier table is the
-        single minor-party flow the official result implies.</span>
+        Coalition. No flows by party were published before 1996, so the 1987–93 tables are each
+        the single minor-party flow the official result implies. The Morgan Gallup polls of
+        1972–84 published no two-party figure at all, so those terms get their own implied lines
+        too – each read through a table calibrated to the election that opened its term: one flow
+        each for the DLP, the Democrats (a debut assumption where an election met them for the
+        first time) and all other votes.</span>
         {lefMean != null ? (
           <span className="info-p"><b>How well it works.</b> Applied to the next election’s actual
           primary votes, each table misses the official 2PP by {lefMean.toFixed(1)} points on
@@ -6738,20 +6747,23 @@ function infoTerms(D) {
         largest gap that passes.</span>
         <span className="info-p"><b>Changes over time.</b> The sentence under each chart asks whether
         any group has moved towards or away from the party, relative to all voters, over the period
-        on screen. The monthly lines can’t answer that by themselves. Resolve asked alone until
-        February 2026, then YouGov, RedBridge, and DemosAU joined, and pollsters read some groups
-        differently, so a line can move just because a new pollster arrived. The test compares each
-        pollster only with itself. It fits a straight line through every poll’s gap for the group,
-        giving each pollster its own level and all of them one shared slope, with larger polls
-        counting for more. How far the polls scatter around that line is measured from the polls
-        themselves rather than assumed. The slope counts as a change when chance would produce one
-        that steep less than one time in twenty, and the same rising bar applies across three or
-        four groups. Men and women, and the two language groups, are a single test of the gap
-        between them.</span>
+        on screen. The point-gap by itself can’t answer that. When a party grows everywhere, a
+        group keeping its usual share of the party’s vote watches its gap widen by arithmetic
+        alone: a group at two-thirds of the national figure sits 3 points under when the party is
+        on 8%, and 9 under when it is on 27%. So each group is tested twice. One fit asks whether
+        its gap to all voters, in points, is drifting; the other asks the same of its ratio to all
+        voters, which holds steady for a group merely keeping pace with a party on the rise. A
+        change counts as significant only when both slopes clear the one-in-twenty bar – a genuine
+        move out of proportion, not a rising party lifting every group. Each fit is a straight
+        line through the monthly readings, a month with a tighter margin counting for more, and
+        how far the readings scatter around it is measured from the readings themselves. Five
+        monthly readings are the fewest a group can be tested on; on seven or fewer the sentence
+        hedges (“appears to”).</span>
         <span className="info-p"><b>Limits.</b> One in twenty is a convention, and a result near the
         line can flip with a single new poll. The margins can’t see pollsters defining or weighting
-        a group differently, though the test over time sidesteps that by comparing each pollster
-        with itself. It looks for steady change, so a rise and a fall within the period cancel out.
+        a group differently; a pollster that joins the series part-way reading a group its own way
+        can move a monthly line by that alone, and the test over time can’t tell. It looks for
+        steady change, so a rise and a fall within the period cancel out.
         And each sentence allows only for its own tests: across every tab, party, and period, about
         one chart sentence in twenty could report a change that isn’t there.</span>
         <span className="info-p"><b>A check.</b> Every table is checked before it’s used: each
@@ -6769,15 +6781,14 @@ function infoTerms(D) {
           <span className="info-p"><b>Several groups:</b> Holm’s method. With m gaps, sort their p
           from smallest. The kth smallest passes if p &lt; 0.05 ÷ (m − k + 1) and every smaller one
           passed.</span>
-          <span className="info-p"><b>Change over time:</b> for poll i from pollster h,
-          yᵢ = αₕ + βtᵢ + εᵢ, fitted by least squares weighted by each poll’s sample nᵢ. Here yᵢ is
-          the group’s gap to the poll’s all-voters figure, in percent, and tᵢ is the fieldwork date,
-          in years. With t̄ₕ and ȳₕ the pollster’s own weighted means,
-          β = Σnᵢ(tᵢ − t̄ₕ)(yᵢ − ȳₕ) ÷ Σnᵢ(tᵢ − t̄ₕ)². Its standard error is
-          √(s² ÷ Σnᵢ(tᵢ − t̄ₕ)²), where s² is the weighted sum of squared residuals ÷ (N − H − 1),
-          for N polls from the H pollsters with at least two. β gets a t-test on N − H − 1 degrees
-          of freedom; with fewer than three, the sentence says there aren’t enough polls. For two
-          groups, yᵢ is the gap between them.</span>
+          <span className="info-p"><b>Changes over time:</b> for month m, y is the group’s share
+          less all voters’ share, and r = ln(group ÷ all voters); months where either share is a
+          trace drop out of r. y and r each get a weighted-least-squares slope on the month index,
+          the weight the precision of the month’s own 95% margin – w = (1.96 ÷ margin)², the margin
+          floored at 0.5 – t-tested on months − 2 degrees of freedom against the months’ own
+          scatter. A move counts only when both slopes clear |t| = 1.96: the point-gap drifting AND
+          the ratio drifting. Fewer than five monthly readings: untested. Seven or fewer: thin, and
+          the sentence above hedges.</span>
           {demoWork}
         </>)}</>) },
       { id: "generations", term: "Generations", body: (
