@@ -1,6 +1,6 @@
 ---
 name: auspol-external-aggregate-triage
-description: auspol-tracker — "our aggregates are way off Bonham / Poll Bludger / BludgerTrack" triage. Verify raw rows against coverage BEFORE doubting the estimator, fetch comparators with as-of dates (BT history = plain curl of bludgertrack/xml/current.xml, no Chrome; Bonham's sidebar isn't on his homepage), then decompose with a parity-gated estimator replica one toggle at a time. Structural knowledge: BT+Bonham build 2PP from primaries→flows and SINCE THE 2026-09-18 BASIS TOGGLE (6cdfa7e) OUR DEFAULT DISPLAYED 2PP IS TOO (synthLatest = primaries × frozen AEC-2025 flows) — the hero line is already like-for-like with them; latest.alp2pp keeps the published-pair basis (its wedge vs implied ≈ flowDrift, −0.7pt Sep 2026); displayed "current" primaries are calendar month-to-date vs BT smoothing (+2 ONP gap in the Secret Harbour shock, vanished to ≤0.4 under a 21d primary nowcast on identical data); Newspoll/Resolve/DemosAU print no 2PP so the published-pair window is 4 houses.
+description: auspol-tracker — "our aggregates are way off Bonham / Poll Bludger / BludgerTrack" triage. Verify raw rows against coverage BEFORE doubting the estimator, fetch comparators with as-of dates — SINCE 5bf0e64 (2026-10-02) committed mirrors + a validated Bonham-method replica do this for you (data/bludgertrack-2pp.json, data/bonham-2pp.json + extractors, .build/newtracker/bonham-replica.mjs, .build/check-bonham-replica.mjs; both lines chartable on the hero "Compare outside estimates" toggle — see auspol-external-aggregate-overlays; NB the BludgerTrack mirror now takes the feed's ALP2out trend-line series — FIXED efbc280 2026-10-02, was ALP2in the scatter-DOT series until then; feed anatomy below), then decompose with a parity-gated estimator replica one toggle at a time. Structural knowledge: BT+Bonham build 2PP from primaries→flows and SINCE THE 2026-09-18 BASIS TOGGLE (6cdfa7e) OUR DEFAULT DISPLAYED 2PP IS TOO (synthLatest = primaries × frozen AEC-2025 flows) — the hero line is already like-for-like with them; latest.alp2pp keeps the published-pair basis (its wedge vs implied ≈ flowDrift, −0.7pt Sep 2026); displayed "current" primaries are calendar month-to-date vs BT smoothing (+2 ONP gap in the Secret Harbour shock, vanished to ≤0.4 under a 21d primary nowcast on identical data); Newspoll/Resolve/DemosAU print no 2PP so the published-pair window is 4 houses.
 source: auto-skill
 extracted_at: '2026-09-09T03:25:09.823Z'
 ---
@@ -31,13 +31,34 @@ fully explained a 2–3pt divergence with zero bugs found. Companion skills:
      update stamp on the page — record the fetch time.
      **The whole series also fetches as ONE PLAIN-CURL FILE** (found
      2026-10-02): `…/bludgertrack/xml/current.xml` — the shell page merely
-     renders it. `federal/charts` = dated aggregate trend points (163 on
-     2026-10-02, spanning 05/19/2025→; date attr is US MM/DD/YYYY), fields
-     `ALP/LNC/GRN/PHON` primary trends + `ALP2in/LNC2in` (2PP trend with
-     outliers included) + `ALP2out/LNC2out` (outliers excluded);
+     renders it. `federal/charts` points (163 on 2026-10-02, spanning
+     05/19/2025→; date attr US MM/DD/YYYY) carry TWINS per measure:
+     `ALPin/LNCin/…` are per-release READINGS (raw poll-down values — look
+     at `ALPin`: plain poll primaries, and `ALP2in` can whip 65.5→51.3
+     in two days) and `ALP2out/LNC2out` is his smoothed outlier-excluded
+     TREND. **His published figure is the OUT series, not IN** (audited
+     2026-10-02, `.matilda/bt-line-accuracy-2026-10.md`): his own
+     `js/voting.js` draws 2out as the 3px line with 2in as scatter DOTS,
+     and the page's headline 2PP (`<federal><summary><alp2><current>`,
+     52.2 that day) equals ALP2out (52.179), not ALP2in (52.376). Any
+     comparison against "BludgerTrack's estimate" must use 2out; 2in ran
+     mean 0.97pt / max 3.1pt away from it over the term (mostly ALP-low,
+     Feb–May 2026 the worst era). Our own mirror got this wrong until
+     efbc280 (2026-10-02): extract-bludgertrack.mjs mirrored 2in; it now
+     reads 2out and refreshes 4×/day inside pollbludger-updater.sh —
+     see auspol-external-aggregate-overlays for the wiring.
+     **Back-revision is asymmetric** (tested via 5 Wayback captures of
+     current.xml 2025-09→2026-05): 2in points are ~immutable once issued
+     (3 micro-revisions, max 1.47pt, always fresh points), while 2out
+     back-casts EVERY issue across the whole history (all overlapping
+     points moved in every capture, up to 1.8pt) — a 2out mirror must
+     re-fetch on a schedule, not once.
      `federal/table` = the same poll records our fallback agent reads. For a
      bulk as-of-now comparison this beats the Chrome route; use the piggyback
-     only if the XML's provenance is in doubt.
+     only if the XML's provenance is in doubt. Wayback replays of this file
+     (`web.archive.org/web/{ts}id_/…`) arrive gzip-compressed — `curl |
+     file` won't decompress; gunzip before parsing (found the hard way:
+     captures looked "empty").
    - **Bonham**: as of Sep 2026 his SIDEBAR carries two live figures —
      `Federal 2PP Polling Aggregate 52.3-47.7 TO ALP · Last update 8 Sep
      (YouGov)` and `One Nation Shadow-2PP Estimate 51.8-48.2 TO ALP vs ON`
@@ -99,18 +120,27 @@ fully explained a 2–3pt divergence with zero bugs found. Companion skills:
   (new pollster 0.8); NO sample-size weighting (n<900 halved); house effects
   only ≥0.5pt; excludes commissioned, SMS-majority, undecided≥10%, and polls
   with data >1 month old.
-- **ALP-v-ON divergences are flow-table basis, not noise** (Sep 2026 user
-  triage): Bonham's One Nation Shadow-2PP leans on the five pollsters'
-  published shadow-2PPs (Morgan, RedBridge/Accent, YouGov, Spectre,
-  Fox&Hedgehog) — ALL respondent-allocated per his own Sep-2026 post, where
-  he notes ~half of Coalition voters conventionally copy Coalition
-  how-to-vote cards, so stated splits mis-model real ballots for this exact
-  pairing. Our `onImp` figure instead runs primaries through the frozen
-  counted-ballot FP_ON set (see auspol-flow-drift-panel). Live comparison:
+- **ALP-v-ON divergences are flow-table + pooling, not noise** (Sep 2026
+  user triage; basis corrected 2026-10-02): BOTH estimator lines in this
+  pairing are primary-derived. Bonham's One Nation Shadow-2PP = "my
+  conversion" — his own estimate of 2025 ALP-v-ON preferences (72% of
+  Coalition, 9% of Greens voters flow to ON) applied to each poll's
+  primaries, pooled as the average of the ten most recent polls with at
+  most two per pollster, no house effects or accuracy/age weighting
+  (methods-page update log 28 Jan / 15 Feb / 22 Feb / 11 Mar 2026; his
+  Jul 2026 post says the same conversion feeds his Coalition aggregate).
+  The RESPONDENT-ALLOCATED story belongs to the five pollsters'
+  *published* shadow-2PPs (Morgan, RedBridge/Accent, YouGov, Spectre,
+  Fox&Hedgehog — his Sep 2026 "flat field" post critiques them: ~half
+  of Coalition voters conventionally copy Coalition how-to-vote cards,
+  so stated splits mis-model real ballots for this exact pairing); they
+  are NOT his inputs. An earlier version of this note claimed his
+  sidebar figure leans on those published pairs — wrong, deleted.
+  Our `onImp` figure runs primaries through the frozen counted-ballot
+  FP_ON set (see auspol-flow-drift-panel). Live comparison (Sep 2026):
   51.8–48.2 (his) vs 50.7–49.3 (ours) — a 1.1pt gap, inside our printed
-  ±1.1 band, and pointing exactly the way his own how-to-vote-card critique
-  predicts (respondent-allocated reads redder). Cite HIS critique when
-  defending ours rather than re-deriving the argument.
+  ±1.1 band. Cite HIS critique when a reader cites a pollster's
+  respondent-allocated ON pair rather than re-deriving the argument.
 - Morgan's weekly cadence and any small-house presence are style differences
   that move ≤0.6pt in arms — don't burn triage time there before checking the
   three structural items above.
