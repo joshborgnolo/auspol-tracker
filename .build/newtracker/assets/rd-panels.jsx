@@ -1911,10 +1911,10 @@ function RdDemographics({ rangeId = "all" }) {
   const panelled = (c) => c.st.id === "state";
   const even = charts.some(panelled);
   /* On a laptop the Place tab's cards sit side by side, and the reader
-     expects By location's y axis to run the full height of the 2x2 state
-     grid beside it. That height is layout, not data, so it is measured and
-     the location chart's plot is sized to it. A phone stacks the cards and
-     keeps its fixed chart heights. */
+     expects By location's x axis to land on the same line as the bottom
+     row's in the 2x2 state grid beside it. That height is layout, not
+     data, so the grid is measured and the location chart sized to it.
+     A phone stacks the cards and keeps its fixed chart heights. */
   const wvGridRef = React.useRef(null);
   const [wvGridH, setWvGridH] = React.useState(0);
   React.useLayoutEffect(() => {
@@ -2061,10 +2061,13 @@ function RdDemographics({ rangeId = "all" }) {
     return (
     <div className="card rd-card rd-wv-chart" key={c.st.id} style={even ? { flex: "1 1 0" } : { flexGrow: narrow ? 1 : Math.max(0.35, c.span) }}>
       {head}
-      {/* heightPx = grid + t/b pads: the plot (svg minus the pads below)
-          then matches the 2x2 state grid's height exactly. 42 is padPx
-          t 12 + b 30; a change to those pads moves with it. */}
-      <TrendChart key={"rd-wv-" + c.st.id + "-" + tab.id} heightPx={narrow ? 240 : (even && wvGridH ? Math.round(wvGridH) + 42 : 260)}
+      {/* heightPx = grid + 8 + (30 − 24): the svg starts at the card's
+          content top while the grid sits 8px lower (.rd-wv-panels
+          margin-top), this plot's x axis sits 30px above the svg bottom,
+          and the bottom-row panels' x axes sit 24px above the grid's
+          bottom edge - so round(grid) + 14 lands every x axis on the one
+          line. A change to any of the three constants moves the 14. */}
+      <TrendChart key={"rd-wv-" + c.st.id + "-" + tab.id} heightPx={narrow ? 240 : (even && wvGridH ? Math.round(wvGridH) + 14 : 260)}
         padPx={narrow ? { l: 34, r: 8, t: 12, b: 28 } : { l: 40, r: 12, t: 12, b: 30 }}
         xDomain={xDomL} yDomain={yDom} yTicks={rdYTicks(0, yMax, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
         xTicks={leOn ? rdElectionTicks(xDomL[0], c.x1, narrow || c.span < 0.8, le.x) : rdXTicks(c.x0, c.x1, narrow || c.span < 0.8)} baseline driven={!!A}
