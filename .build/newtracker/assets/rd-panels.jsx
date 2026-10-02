@@ -2864,6 +2864,30 @@ function RdIssues({ rangeId = "all" }) {
     );
   };
 
+  /* has each group's share MOVED since the election - a different question
+     from the card's ▲▼, which test today's gap to all voters? One straight
+     line per row through the house's own monthly waves (all-voters first as
+     the anchor: its line is the same house's, so the set averages to the
+     printed table), each wave weighted by its effective sample, t-tested;
+     Holm's correction within each issue, as the trust and decidedness
+     tables do, so Yes means the share drifted across the term */
+  const whomTsig = !gtab || !gtab.tr ? null : gtab.issues.map((k) => {
+    const rows = [["all", "All voters", (gtab.tr.all || {})[k]]]
+      .concat(gtab.groups.map((g) => [g, groupShort(g), gtab.tr.g[g] ? gtab.tr.g[g][k] : null]))
+      .filter((x) => x[2] && x[2].length)
+      .map(([id, name, s]) => ({ id, name, first: s[0][1], last: s[s.length - 1][1],
+        fit: withinHouseSlope(s.map((p) => ({ h: id, t: p[0], w: p[2], y: p[1] }))) }));
+    const tested = rows.filter((r) => r.fit);
+    const sigIds = [];
+    for (const [i, r] of [...tested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+      if (r.fit.p >= 0.05 / (tested.length - i)) break;
+      sigIds.push(r.id);
+    }
+    return { key: k, label: I.labels[k] || k, rows: rows.map((r) => ({ key: r.id, name: r.name, sig: sigIds.includes(r.id),
+      cells: [rdTsSgn(r.first) + " → " + rdTsSgn(r.last),
+        r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–",
+        r.fit ? (sigIds.includes(r.id) ? "Yes" : "No") : "–"] })) };
+  });
   /* Switching the grouping or the issue rewrites the head and dek above the
      grouping row; scrolled past them, the control row and everything under
      it would ride the story block's height glide. rdPinScroll holds the
@@ -3020,22 +3044,14 @@ function RdIssues({ rangeId = "all" }) {
                 <span className="rd-key-item"><span className="rd-iw-keybar" aria-hidden="true"><i></i></span>Group’s share, with all voters marked</span>
                 <span className="rd-key-item"><b aria-hidden="true">▲▼</b>Differs from all voters by more than the group’s own 95% margin</span>
               </div>
-              {/* the battery behind every ▲▼ on the card: the same per-cell
-                  gate the marks use, one set per issue, values as published
-                  (these are wave figures, not trends) */}
-              <RdTsig summary="Significance table"
-                heads={["Group", "Share, %", "All voters, %", "Difference, pts", "z", "Significant"]}
-                sets={gtab.issues.map((k) => ({
-                  key: k, label: I.labels[k] || k,
-                  rows: gtab.groups.map((g) => gtab.cells[g] && gtab.cells[g][k]).map((c, i) => ({ c, g: gtab.groups[i] })).filter((r) => r.c && allOf(k))
-                    .map((r) => {
-                      const a = allOf(k), diff = r.c.v - a.v, z = diff / (r.c.ci / 1.96);
-                      return { key: r.g, name: groupShort(r.g), sig: Math.abs(diff) > r.c.ci,
-                        cells: [rdTsSgn(r.c.v), rdTsSgn(a.v), rdTsSgn(diff, true), rdTsSgn(z), Math.abs(diff) > r.c.ci ? "Yes" : "No"] };
-                    }),
-                }))}
-                note={"Figures are " + G.house + "’s published shares of each group putting the issue in their top three — the same wave the card pools. Yes marks the card’s ▲▼: the group sits further from all voters than its own 95% margin."}
-              />
+              {/* the trend battery: has each group's share MOVED since the
+                  election? Computed as whomTsig among the whom helpers above,
+                  so the per-issue gate borders sit beside the series it draws */}
+              {whomTsig && <RdTsig summary="Trend-significance table"
+                heads={["Group", "Share, first → last", "Slope, pts/yr", "t", "Significant"]}
+                sets={whomTsig}
+                note={"Each row fits one straight line to " + G.house + "’s own monthly waves since the May 2025 election, each wave weighted by its share of the sample, t-tested, Holm’s correction applied across each issue’s rows — Yes means the group’s share has drifted over the term, not that it sits off the electorate’s today. First and last are the endpoint waves’ published figures, unsmoothed. The card’s ▲▼ marks ask a different question: today’s gap to all voters against the group’s own 95% margin."}
+              />}
             </div>
           ) : <p className="rd-note">No poll in the last {I.window} published these figures by group.</p>}
           <RdFoot how={{ term: "issues", from: "The issues" }}>

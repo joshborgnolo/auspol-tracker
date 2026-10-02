@@ -3046,6 +3046,8 @@ const issues = (() => {
     }
     if (inWin(mid)) { gHouse = w.pollster; if (!gNewest || w.date > gNewest) gNewest = w.date; }
   }
+  // the trend table's window: waves touched down since election day itself
+  const elect0 = new Date(ELECTION.date).getTime();
   const groupTabs = ISSUE_GROUP_SETS.map((s) => {
     const keys = Object.keys(gRows).filter((key) => key.startsWith(s.id + "|"));
     // the groups and issues the window holds, in the order the house prints them
@@ -3063,7 +3065,16 @@ const issues = (() => {
       const e = gRows[s.id + "|" + g + "|" + k] && weightedWithSe(nowcastPts(gRows[s.id + "|" + g + "|" + k], null, refNow, SPARSE_K));
       return [k, e ? { v: r1(e.v), ci: r1(1.96 * e.se) } : null];
     }))]));
-    return { id: s.id, label: s.label, groups: groupsSeen, issues: issuesSeen, cells };
+    /* the trend table's raw series: this house's waves since the election as
+       [decimal-year x, share, effective n], per group per issue; all-voters
+       takes the group house's own line, as the table's row does (never the
+       pooled one above) */
+    const trOf = (rs) => (rs || []).filter((r) => r.mid >= elect0).map((r) => [r2(dx(r.date)), r1(r.x), Math.round(r.n)]);
+    const tr = {
+      all: Object.fromEntries(issuesSeen.map((k) => [k, trOf((salRows[k] || []).filter((r) => r.firm === gHouse))])),
+      g: Object.fromEntries(groupsSeen.map((g) => [g, Object.fromEntries(issuesSeen.map((k) => [k, trOf(gRows[s.id + "|" + g + "|" + k])]))])),
+    };
+    return { id: s.id, label: s.label, groups: groupsSeen, issues: issuesSeen, cells, tr };
   }).filter(Boolean);
   wavesIn.sort((a, b) => a.d - b.d);
   /* the group table's all-voters row: the group house's own reading, never

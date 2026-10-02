@@ -2647,6 +2647,32 @@ function RdFlows() {
     + (worst < ci / 2 ? "well inside" : worst <= ci ? "inside" : "outside") + " the margin of ±" + ci.toFixed(1)
     + ". A shift in where voters send their preferences would show here first.";
   const houses = [...new Set(Object.keys(FD.houses || {}).concat(Object.keys(FO.houses || {})))].sort();
+  /* has each pollster's gap DRIFTED, not just sat off zero at the now-mark?
+     One straight line per pollster through its own monthly marks over the
+     charts' own months since the election, t-tested, Holm's correction
+     within each contest. The pooled now-test stays the head's business */
+  const flMonths = rdApMonths("2025-06");
+  const flSetRows = (fd) => {
+    const hs = fd.houses || {};
+    const rows = Object.keys(hs).sort().map((h) => {
+      const s = (hs[h] || []).filter((d) => flMonths.includes(d.ym));
+      return { h, s, fit: withinHouseSlope(s.map((d) => ({ h, t: D.mx(d.ym), w: 1, y: d.v }))) };
+    }).filter((r) => r.s.length);
+    const tested = rows.filter((r) => r.fit);
+    const sigH = [];
+    for (const [i, r] of [...tested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+      if (r.fit.p >= 0.05 / (tested.length - i)) break;
+      sigH.push(r.h);
+    }
+    return rows.map((r) => ({ key: r.h, name: r.h, sig: sigH.includes(r.h),
+      cells: [rdTsSgn(r.s[0].v) + " → " + rdTsSgn(r.s[r.s.length - 1].v),
+        r.fit ? rdTsSgn(r.fit.b, true) : "–", r.fit ? rdTsSgn(r.fit.t) : "–",
+        r.fit ? (sigH.includes(r.h) ? "Yes" : "No") : "–"] }));
+  };
+  const flSets = [
+    { key: "co", label: "Against the Coalition", rows: flSetRows(FD) },
+    { key: "on", label: "Against One Nation", rows: flSetRows(FO) },
+  ];
   const cw = phone ? Wall : Math.floor((Wall - 48) / 2);
   return (
     <section className="rd-sec rd-fl" id="flow-drift" aria-labelledby="rd-fl-t">
@@ -2677,15 +2703,13 @@ function RdFlows() {
         <span className="rd-key-item"><span className="rd-fl-keydot" aria-hidden="true"></span>One pollster’s gap that month</span>
         <span className="rd-key-item"><span className="rd-fl-keynow" aria-hidden="true"><i></i></span>Now: the latest weeks pooled, with its 95% interval</span>
       </RdKey>
+      {/* the drift battery: has each pollster's gap MOVED over the term,
+          not just sat off zero at the now-mark? Computed as flSets above;
+          sets are the two contests, Holm's correction within each */}
       <RdTsig summary="Trend-significance table"
-        heads={["Contest", "Published minus implied, now", "95% interval", "z", "Significant"]}
-        sets={[{ key: "now", rows: [
-          { key: "co", name: "Against the Coalition", sig: outC,
-            cells: [rdTsSgn(nC.v, true), "±" + nC.ci95.toFixed(1), rdTsSgn(nC.v / (nC.ci95 / 1.96)), outC ? "Yes" : "No"] },
-          { key: "on", name: "Against One Nation", sig: outO,
-            cells: [rdTsSgn(nO.v, true), "±" + nO.ci95.toFixed(1), rdTsSgn(nO.v / (nO.ci95 / 1.96)), outO ? "Yes" : "No"] },
-        ] }]}
-        note={"Yes is exactly the headline’s test above: the pooled “now” gap against its 95% interval, with z the gap divided by the standard error the interval implies, so this table cannot disagree with it. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the footer says, not the election."}
+        heads={["Pollster", "Gap, first → last", "Slope, pts/yr", "t", "Significant"]}
+        sets={flSets}
+        note={"One straight line per pollster through its own monthly gaps over the charts’ own months since the election, t-tested, Holm’s correction applied within each contest — Yes means the gap is drifting, not just sitting off zero today. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the footer says, not the election; pollsters with too few months for a fit show dashes."}
       />
       <RdFoot how={{ term: "preference-flows", from: "Preference flows" }}>
         Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later, so its usual way of allocating preferences counts as zero. No count of Labor v One Nation preferences exists, so that chart shows drift since each pollster’s first head-to-heads. This check corrects no other figure on the page.
