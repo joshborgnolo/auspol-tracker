@@ -2244,13 +2244,36 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   const phone = useNarrow("(max-width: 760px)");
   /* the tablet's narrower bar column (rd.css) has room to label only the
      scale's ends and the others, as the phone does */
-  const narrowBar = useNarrow("(max-width: 1000px)");
+  const narrowBar = useNarrow("(max-width: 1020px)");
+  /* the Greens and Others measures join the tab row only where the whole
+     row - five standing tabs, the joiners, and the two-party switch chip
+     (12.4px under 1021px) - still fits; Greens is the priority joiner, so
+     it clears at a narrower width than Others. The cut-offs were priced
+     from the rendered tabs by .matilda/probe-hl-tabfit.mjs on the +2px
+     padding rows: the six-tab row (with Greens) holds at 833.4px of
+     container and the seven-tab row at 902.1, so with the 76px body
+     padding Greens clears the moment the row stands at 912 and Others at
+     985. Under them the two tabs stay off and the row carries its five
+     exactly as before (the phone's flex-fill row included, which four
+     measures already fill). A view open while its tab is present drops
+     back to Two-party if a resize removes the tab. */
+  const roomGrn = !useNarrow("(max-width: 911px)");
+  const roomOth = !useNarrow("(max-width: 984px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const [view, setView] = useState("tpp");
   const [hover, setHover] = useState(null);
   const boxRef = useRef(null);
   const SW = useRdWidth(boxRef, 500);
+  /* the measure row, shared by the RdTabs render and the arrow-key walk so
+     the two can never disagree (the width-gated joiners sit between the
+     parties and the split pairing) */
+  const hlViews = [
+    { id: "tpp", label: "Two-party" }, { id: "alp", label: "Labor" }, { id: "lnp", label: "Coalition" }, { id: "onp", label: "One Nation" },
+    ...(roomGrn ? [{ id: "grn", label: "Greens" }] : []),
+    ...(roomOth ? [{ id: "oth", label: "Others" }] : []),
+    { id: "split", label: phone ? "Split" : "One Nation v Coalition", title: "One Nation’s primary vote against the Coalition’s" },
+  ];
   /* hovering the panel hands the arrow keys to the measure row - the walk a
      focused tab has, claimed only while the pointer is over the card; the
      RdTabs' `swipe` marker claims the phone's sideways swipe on or just
@@ -2271,7 +2294,7 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
-      const ids = ["tpp", "alp", "lnp", "onp", "split"];
+      const ids = hlViews.map((t) => t.id);
       const i = ids.indexOf(view);
       if (i < 0 || ids.length < 2) return;
       e.preventDefault();
@@ -2285,7 +2308,11 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
       sec.removeEventListener("pointerleave", leave);
       document.removeEventListener("keydown", key, true);
     };
-  }, [view]);
+  }, [view, roomGrn, roomOth]);
+  /* a resize that removes the open tab drops the view back to Two-party */
+  React.useEffect(() => {
+    if ((view === "grn" && !roomGrn) || (view === "oth" && !roomOth)) setView("tpp");
+  }, [roomGrn, roomOth, view]);
   const HL0 = D.houseLean || {};
   /* One Nation against the Coalition: each pollster's lean on the gap
      between the two primaries. The estimator is linear and all but one poll
@@ -2303,6 +2330,9 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   const heKey = { onimp: "synthOn", imp: "synth", onpub: "alp_on", tpp: "tpp" }[key];
   const valOf = { onimp: (p) => p.alpOnImp, imp: (p) => p.alpImp, onpub: (p) => (p.tppAlt ? p.tppAlt.alp : null), tpp: (p) => p.alpN,
                   alp: (p) => p.p && p.p.alp, lnp: (p) => p.p && p.p.lnp, onp: (p) => p.p && p.p.onp,
+                  /* the bundle's p.p.oth is already the IND+OTH grouping the
+                     Others lean is measured on (gen-data primaryOf) */
+                  grn: (p) => p.p && p.p.grn, oth: (p) => p.p && p.p.oth,
                   split: (p) => (p.p && p.p.onp != null && p.p.lnp != null ? p.p.onp - p.p.lnp : null) }[key];
   const nOf = (h) => {
     const he = heKey && HE[heKey] && HE[heKey][h];
@@ -2353,7 +2383,7 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   /* the two-ended measures: a lean is towards one side or the other */
   const split = view === "split";
   const two = view === "tpp" || split;
-  const partyName = { alp: "Labor", lnp: "the Coalition", onp: "One Nation" }[view];
+  const partyName = { alp: "Labor", lnp: "the Coalition", onp: "One Nation", grn: "the Greens", oth: "the others" }[view];
   const [posP, negP] = split ? ["onp", "lnp"] : ["alp", onM ? "onp" : "lnp"];
   const posName = split ? "One Nation" : "Labor", negName = split || !onM ? "the Coalition" : "One Nation";
   const pos = two ? `var(--${posP})` : "var(--" + view + ")";
@@ -2428,7 +2458,7 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   );
   const title = split ? "Each pollster’s lean on One Nation’s primary vote against the Coalition’s, points"
     : two ? `Each pollster’s lean on Labor v ${onM ? "One Nation" : "Coalition"}${pub ? " as published" : ""}, points`
-    : `Each pollster’s lean on ${partyName}’s primary vote, points`;
+    : `Each pollster’s lean on ${partyName}${partyName.endsWith("s") ? "’" : "’s"} primary vote, points`;
   /* the size half of the finding, in words: added together, a pollster's two
      leans on the right nearly cancel */
   const sizeMax = split ? Math.max(0, ...rows.map((r) => { const e = r.s[r.s.length - 1]; return Math.abs(e.on + e.co); })) : 0;
@@ -2455,8 +2485,7 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
       </div>
       {head && <RdHed head={head} dek={dek} />}
       <RdTabs swipe value={view} onChange={(v) => { setView(v); setHover(null); }} ariaLabel="Measure" className="rd-hl-tabs"
-              options={[{ id: "tpp", label: "Two-party" }, { id: "alp", label: "Labor" }, { id: "lnp", label: "Coalition" }, { id: "onp", label: "One Nation" },
-                        { id: "split", label: phone ? "Split" : "One Nation v Coalition", title: "One Nation’s primary vote against the Coalition’s" }]}>
+              options={hlViews}>
         {view === "tpp" && !narrowBar && <span className="rd-pl-ctl"><span className="rd-pl-ctl-l">Two-party:</span>{flip}</span>}
       </RdTabs>
       {/* under 1001px the five tab labels fill the row already, so the

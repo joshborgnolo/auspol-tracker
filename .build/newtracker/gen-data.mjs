@@ -781,8 +781,9 @@ const alt2pp = { alp_on: altAON.monthly, lnp_on: altLON.monthly };
    lean sampled at every month's midpoint from the month its first evidence
    poll lands, so the House-lean chart under Poll disagreement draws how a
    house's lean has walked, not just where it stands. Keyed by measure –
-   the 2PP plus the ALP / L/NP / ON primaries (matching the Poll-
-   disagreement trio; lives after primaryHE exists). A firm under 3 evidence
+   the 2PP plus the five primaries (ALP / L/NP / ON since the panel began;
+   the GRN and OTH read-offs joined 2026-10-02 for the panel's wide-screen
+   tabs; lives after primaryHE exists). A firm under 3 evidence
    polls on a measure is absent from that measure's map, never drawn flat. */
 /* "imp" is synthEffect, and it is here because the site's DEFAULT two-party
    figure is the implied one, which subtracts synthEffect and not houseEffect.
@@ -802,7 +803,8 @@ const houseLean = Object.fromEntries([
      already existed: synthOnEffect from §1d, and altSeries("ao")'s he, which
      that function has always returned and nothing read. */
   ["onimp", synthOnEffect], ["onpub", altAON.he],
-  ["alp", primaryHE.alp], ["lnp", primaryHE.lnp], ["onp", primaryHE.onp]]
+  ["alp", primaryHE.alp], ["lnp", primaryHE.lnp], ["onp", primaryHE.onp],
+  ["grn", primaryHE.grn], ["oth", primaryHE.oth]]
   .map(([k, he]) => [k, Object.fromEntries(Object.entries(he.evidenceN).filter(([, n]) => n >= 3).map(([firm]) => [
     firm,
     MONTHS.filter((ym) => ymMidMs(ym) >= he.evidenceFrom[firm])
