@@ -39,7 +39,71 @@ min-height/::after tap-cheat fall back to the SHARED base `.rd-chip` rule.
 | Gated notes | gap note `{ k: "gap" …" average" }` ~:116; ▲/▼ pair `if (!chg && M.key === "tpp" && !nonDefault)` ~:131 |
 | Prop threading | `d1a1d215-…js`: `CycleChart` :1373 (destructures `lifted`) → `<RdCycleChart … liftedN={lifted.size} …>` at :2001-2005 |
 | `useDismissOutside` 4th arg `ignoreSel` | `rd.jsx` + call site in `rd-cycles.jsx` (chip clicks don't count as "outside") |
+| Board desktop viewport-follow | `rd-cycles.jsx` `boardRef` block (~:389-414 post-fix): `board` state is `{open, sheet}` + a dependency-less layout effect flips `sheet: true` when open ≥901px with its home off-viewport; the `.rd-cc-board.body` CSS variant parks it fixed under the sticky tabs — rd.css ~:1623-1635 |
+| Real-press + placement probes | `.matilda/probe/cyc-chip-realclick.mjs` + `.matilda/probe/cyc-chip-sweeps.mjs` (untracked until curated, like `probe/cyc-rings.mjs`) |
 | Probe | `.matilda/probe-cyc-chipmove.mjs` (tracked) |
+
+## The board follow-viewport contract (fixed 2026-10-02)
+
+The report: "the + Draw a term button doesn't work on my laptop but it
+works on my phone". The click ALWAYS landed — a real-press probe
+(`cyc-chip-realclick`) showed the full pointer chain reaching the chip
+and the state flipping at every width. The board was the asymmetry: at
+≤900px `.rd-cc-board` is a `position: fixed` bottom sheet (always on
+screen), but on the desktop it still opened *absolutely under the
+`.rd-cc` controls row in the Summary section* — the chip had been
+relocated to the Two-party divider in 7964e12, decoupling toggle from
+target by hundreds of px (measured `y: -478` with the chip centred at
+1440×960). Click, sheet opens off-viewport, click again, closes:
+"doesn't work". The phone only "worked" because its media query
+accidentally papered over the decoupling.
+
+Shipped contract:
+
+- Board state is `{ open, sheet }`, initial `{ open: false, sheet:
+  null }`. Every reader gates on `board.open` — never truthiness of the
+  state itself.
+- One dependency-less `useLayoutEffect` in the `boardRef` block: when
+  open, `sheet == null`, `matchMedia("(min-width: 901px)")`, and the
+  board's home rect is entirely off-viewport
+  (`bottom < 0 || top > innerHeight`), set `sheet: true`.
+- `boardPane` maps `sheet` to `" body"` / `" sheet"` / `""`; the
+  `.rd-cc-board.body` rule (rd.css, with the base board rule) is
+  `position: fixed`, top `calc(72px + 8px)` (under the 72px sticky
+  tabs), width `min(960px, 100% - 32px)` centred,
+  `max-height: calc(100vh - 96px)` with its own overflow scroll.
+- Opens whose home IS in view stay `absolute` under the controls row —
+  same look as always (`1440px-home` probe rung, viewport 1400 tall so
+  chip and home fit together).
+- Close always resets to the null tri-state, so the next open
+  re-evaluates; the chip toggle sets fresh objects either way.
+- `useDismissOutside(boardRef, board.open, …, ".rd-cyc-chipmove")` —
+  the `.rd-cyc-chipmove` ignore was laid down for exactly this
+  toggle-far-from-board layout; pass `board.open` in, not the object.
+- The phone never crosses the `min-width: 901px` gate: its
+  `position: fixed` bottom sheet is untouched (the 390px touch rung pins
+  `y:211/h:633`).
+
+Probes (all in `.matilda/probe/`):
+
+- `cyc-chip-realclick.mjs` — REAL `page.mouse`/`page.touchscreen`
+  presses (never `evaluate` clicks): hit-test at the chip centre,
+  document-capture event log, then the OPEN board's placement contract:
+  at least one of five fractional probes inside its rect must be
+  on-viewport AND board-owned (the bug's signature was all five
+  clipped: rect `y:-478 absolute`; fixed is `.body` top 80). Red→green
+  at 1440 (3 FAILs pre-fix: "shows itself", "followed the viewport",
+  "parked under the tabs"), phone rung unchanged, plus the
+  `1440px-home` rung (non-follow branch).
+- `cyc-chip-sweeps.mjs` — sweeps `elementFromPoint` over the chip at
+  every scroll offset it is on screen; the ONE legitimate blind window
+  is the pinned `.tabs` bar's live-measured rect covering the chip
+  (reader can't click what they can't see — skip, don't fail). Blind
+  offsets below the bar assert zero.
+- `probe-cyc-chipmove.mjs` toggle round-trip picks its outside-dismiss
+  target by class: a parked `.body` sheet COVERS the eyebrow title, so
+  it taps the page margin beside the sheet (24, 300); the bottom-sheet
+  and home-anchored cases still use the title.
 
 ## The anchor recipe (rd.css)
 
@@ -240,11 +304,15 @@ would crash the `<RdCycleChart>` branch via `lifted.size`.
   /back on the board/ aria-label → click that eye → pill, `Labor` and the
   board's `×` all return; then tidy-unlift the past term. Sits BEFORE the
   toggle rung's `boardOpen` precheck so the board is left closed.
-- Toggle/dismiss round-trip unchanged from 7964e12: chip-close, outside click/
-  tap close, board `×` close. At ≤900px `.rd-cc-board` is a FIXED bottom sheet
+- Toggle/dismiss round-trip: chip-close, outside click/ tap close, board
+  `×` close. At ≤900px `.rd-cc-board` is a FIXED bottom sheet
   hugging up to 75vh — anchor the chip at viewport y≈110 (below the 72px
   sticky tabs, above the shallowest sheet top ~211px at 844 tall) before
-  clicking, or the sheet eats the click.
+  clicking, or the sheet eats the click. At ≥901px an out-of-home-view
+  open parks as the fixed `.body` sheet at the top (the 2026-10-02
+  follow-viewport fix) and covers the eyebrow title — the outside-
+  dismiss click there is the page margin beside the sheet, chosen by
+  class (`sheetParked`), not coordinates you'd have to re-derive.
 
 ## Session logistics that shipped it (worth repeating)
 

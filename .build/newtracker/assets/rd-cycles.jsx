@@ -321,7 +321,7 @@ function RdPastCycles(p) {
           showOutcome, outcomeShown, shapes, showHan, setShowHan, showOnp, setShowOnp, showComb, setShowComb, exportSource, srcFailed, retrySource } = p;
   const { D } = window.AP;
   const narrow = useNarrow("(max-width: 640px)");
-  const [board, setBoard] = useState(false);
+  const [board, setBoard] = useState({ open: false, sheet: null });
   const [tip, setTip] = useState(null);
   /* the walk floor: the finding's slot stands at the tallest of every
      measure state the walk can reach (the finding no longer answers to
@@ -387,11 +387,31 @@ function RdPastCycles(p) {
     return () => { window.removeEventListener("resize", fit); ro.disconnect(); };
   }, []);
   const boardRef = React.useRef(null);
+  const boardPane = board.sheet ? " body" : board.sheet === false ? " sheet" : "";
+  /* the board opens under its Summary-section controls row; the chip that
+     toggles it floats on the Two-party section's divider, so "working"
+     means the board is where the reader can see it. On a wide enough
+     window (where the sheet isn't already a fixed bottom sheet) an open
+     whose home isn't in view parks the sheet against the top of the
+     viewport instead - it follows the reader, the way the phone's fixed
+     sheet always did (the chip was moved off the controls row in 7964e12
+     and the board stayed anchored to .rd-cc, so a laptop reader in the
+     Two-party section clicked the chip and the sheet appeared hundreds of
+     pixels up the page, out of view) */
+  React.useLayoutEffect(() => {
+    if (board.open && board.sheet == null && window.matchMedia("(min-width: 901px)").matches && boardRef.current) {
+      const s = boardRef.current.querySelector(".rd-cc-board");
+      if (s) {
+        const r = s.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > window.innerHeight) setBoard((b) => (b.open && b.sheet == null ? { open: true, sheet: true } : b));
+      }
+    }
+  });
   /* the board's toggle is rendered on the Two-party section's divider, far
      outside boardRef, so its pointerdown is told apart from a real outside
      tap or the hook would dismiss and the click would re-open - a toggle
      that can only open, never close */
-  window.useDismissOutside(boardRef, board, () => setBoard(false), ".rd-cyc-chipmove");
+  window.useDismissOutside(boardRef, board.open, () => setBoard(false), ".rd-cyc-chipmove");
   /* Walking the measure rewrites the finding above this row (the
      Compare-with walk leaves it standing), and its height swings state
      to state. The walk floor (the
@@ -866,14 +886,14 @@ function RdPastCycles(p) {
           <button type="button" className="rd-tab" aria-pressed={chg} onClick={() => setModePin("chg")}>{narrow ? "Change" : "Change since election"}</button>
         </div>
       </div>
-      {board && (
-        <div className="rd-cc-board" role="dialog" aria-label="Past terms">
+      {board.open && (
+        <div className={"rd-cc-board" + boardPane} role="dialog" aria-label="Past terms">
           <div className="rd-cc-bhead">
             <b>Past terms</b><span>{cycles.length - hidden.size - (hidden.has(cur.year) ? 0 : 1)} on the board, {liftedList.length} drawn as their own line</span>
             <span className="rd-grow"></span>
             <button type="button" className="rd-link" onClick={() => { cycles.forEach((c) => { if (!c.current && !lifted.has(c.year) && !hidden.has(c.year)) toggle(c.year); }); }}>Only the drawn terms</button>
             <button type="button" className="rd-link" onClick={() => liftedList.forEach((c) => unlift(c.year))}>Clear lines</button>
-            <button type="button" className="rd-iconbtn" aria-label="Close" onClick={() => setBoard(false)}>×</button>
+            <button type="button" className="rd-iconbtn" aria-label="Close" onClick={() => setBoard({ open: false, sheet: null })}>×</button>
           </div>
           <div className="rd-cc-grid">
             {cycles.map((c, i) => {
@@ -993,7 +1013,7 @@ function RdPastCycles(p) {
       </section>
       <RdSec id="cyc-tpp" title="Two-party preferred" meta="Implied from each poll’s primary votes, on the flows counted at the election that opened its term"
              tools={<span className="rd-cyc-chipmove" ref={chipmoveRef}>
-               <button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
+               <button type="button" className="rd-chip" aria-expanded={board.open} onClick={() => setBoard((b) => (b.open ? { open: false, sheet: null } : { open: true, sheet: null }))}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
                {liftedList.length > 0 && (
                  <span className="rd-cc-drawn">
                    <span className="rd-cc-l">Drawn over the band</span>

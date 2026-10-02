@@ -336,7 +336,14 @@ async function run(W, H, touch) {
   await sleep(300);
   if (!(await boardOpen())) fails.push(tag + ": board did not re-open for the outside-dismiss case");
   const titleSel = "#cyc-tpp .rd-eyebrow .rd-title";
-  if (touch) {
+  /* >=901px the out-of-home-view board parks itself against the viewport
+     top (the .body sheet) and covers the title; the page margin beside
+     the sheet is the clean "outside". The phone's bottom sheet and the
+     home-anchored 820/phone cases still leave the title outside. */
+  const sheetParked = await page.evaluate(() => (document.querySelector(".rd-cc-board") || { className: "" }).className.includes("body"));
+  if (sheetParked) {
+    await page.mouse.click(24, 300);
+  } else if (touch) {
     const t = await(page.$(titleSel)).then((el) => el.boundingBox());
     await page.touchscreen.tap(t.x + t.width / 2, t.y + t.height / 2);
   } else {

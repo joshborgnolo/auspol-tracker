@@ -4186,6 +4186,11 @@ body.rd .rd-cc-board {
   background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px 12px;
   box-shadow: 0 12px 36px -12px rgba(40, 30, 20, 0.3);
 }
+body.rd .rd-cc-board.body {
+  position: fixed; top: calc(72px + 8px); bottom: auto; left: 50%; right: auto;
+  width: min(960px, calc(100% - 32px)); transform: translateX(-50%);
+  max-height: calc(100vh - 72px - 24px); overflow: auto;
+}
 body.rd .rd-cc-bhead { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-cc-bhead b { font-size: 15px; font-weight: 600; color: var(--ink); }
 body.rd .rd-cc-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 20px; margin-top: 8px; }
@@ -72364,7 +72369,10 @@ function RdPastCycles(p) {
     D
   } = window.AP;
   const narrow = useNarrow("(max-width: 640px)");
-  const [board, setBoard] = useState(false);
+  const [board, setBoard] = useState({
+    open: false,
+    sheet: null
+  });
   const [tip, setTip] = useState(null);
   const storySlotRef = React.useRef(null),
     storyVarRef = React.useRef(null);
@@ -72416,7 +72424,20 @@ function RdPastCycles(p) {
     };
   }, []);
   const boardRef = React.useRef(null);
-  window.useDismissOutside(boardRef, board, () => setBoard(false), ".rd-cyc-chipmove");
+  const boardPane = board.sheet ? " body" : board.sheet === false ? " sheet" : "";
+  React.useLayoutEffect(() => {
+    if (board.open && board.sheet == null && window.matchMedia("(min-width: 901px)").matches && boardRef.current) {
+      const s = boardRef.current.querySelector(".rd-cc-board");
+      if (s) {
+        const r = s.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > window.innerHeight) setBoard(b => b.open && b.sheet == null ? {
+          open: true,
+          sheet: true
+        } : b);
+      }
+    }
+  });
+  window.useDismissOutside(boardRef, board.open, () => setBoard(false), ".rd-cyc-chipmove");
   const pinView = () => {
     const sec = document.getElementById("cyc-summary");
     const strip = sec && [...sec.querySelectorAll(".rd-cs-row")].find(el => {
@@ -73031,8 +73052,8 @@ function RdPastCycles(p) {
     className: "rd-tab",
     "aria-pressed": chg,
     onClick: () => setModePin("chg")
-  }, narrow ? "Change" : "Change since election"))), board && React.createElement("div", {
-    className: "rd-cc-board",
+  }, narrow ? "Change" : "Change since election"))), board.open && React.createElement("div", {
+    className: "rd-cc-board" + boardPane,
     role: "dialog",
     "aria-label": "Past terms"
   }, React.createElement("div", {
@@ -73055,7 +73076,10 @@ function RdPastCycles(p) {
     type: "button",
     className: "rd-iconbtn",
     "aria-label": "Close",
-    onClick: () => setBoard(false)
+    onClick: () => setBoard({
+      open: false,
+      sheet: null
+    })
   }, "\xD7")), React.createElement("div", {
     className: "rd-cc-grid"
   }, cycles.map((c, i) => {
@@ -73292,8 +73316,14 @@ function RdPastCycles(p) {
     }, React.createElement("button", {
       type: "button",
       className: "rd-chip",
-      "aria-expanded": board,
-      onClick: () => setBoard(b => !b)
+      "aria-expanded": board.open,
+      onClick: () => setBoard(b => b.open ? {
+        open: false,
+        sheet: null
+      } : {
+        open: true,
+        sheet: null
+      })
     }, "\uFF0B ", narrow ? "Draw a term" : "Draw a past term"), liftedList.length > 0 && React.createElement("span", {
       className: "rd-cc-drawn"
     }, React.createElement("span", {
