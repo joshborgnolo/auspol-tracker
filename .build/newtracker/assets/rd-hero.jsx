@@ -225,19 +225,22 @@ function RdHero(p) {
      coloured by publisher - purple Bonham, aquamarine BludgerTrack - so
      they never read as family with the party lines; SOLID (user 2026-10-02:
      the 1.5px stand-out colours differentiate, the dash only made them
-     look dotted). On the One Nation
-     contest the only outside line is Bonham's shadow-2PP stamps, drawn
-     as-published; BludgerTrack carries no One Nation pairing */
+     look dotted). NO end labels (user 2026-10-02): the key below the
+     chart already names them, and publisher names have no -text token so
+     the engine ink-diluted them away from the line colour anyway. On the
+     One Nation contest the only outside line is Bonham's shadow-2PP
+     stamps, drawn as-published; BludgerTrack carries no One Nation
+     pairing */
   if (extOn) {
     if (isCoal && extKb)
       series.push({ id: "kbonham", label: "Bonham", color: EXT_KB, rdWidth: 1.5, endCap: false,
-                    points: filterPts(extKb, xDomain[0]), endLabel: narrow ? null : "Bonham" });
+                    points: filterPts(extKb, xDomain[0]), endLabel: null });
     if (isOn && extSh)
       series.push({ id: "kbsh", label: "Bonham", color: EXT_KB, rdWidth: 1.5, endCap: false,
-                    points: filterPts(extSh, xDomain[0]), endLabel: narrow ? null : "Bonham" });
+                    points: filterPts(extSh, xDomain[0]), endLabel: null });
     if (isCoal && extBt)
       series.push({ id: "btrack", label: "BludgerTrack", color: EXT_BT, rdWidth: 1.5, endCap: false,
-                    points: filterPts(extBt, xDomain[0]), endLabel: narrow ? null : "BludgerTrack" });
+                    points: filterPts(extBt, xDomain[0]), endLabel: null });
   }
   if (adjusted || morph)
     series.push({ id: "main", label: labelMain, color: mainCol, rdWidth: 3, endCap: false,

@@ -69053,7 +69053,7 @@ function RdHero(p) {
       rdWidth: 1.5,
       endCap: false,
       points: filterPts(extKb, xDomain[0]),
-      endLabel: narrow ? null : "Bonham"
+      endLabel: null
     });
     if (isOn && extSh) series.push({
       id: "kbsh",
@@ -69062,7 +69062,7 @@ function RdHero(p) {
       rdWidth: 1.5,
       endCap: false,
       points: filterPts(extSh, xDomain[0]),
-      endLabel: narrow ? null : "Bonham"
+      endLabel: null
     });
     if (isCoal && extBt) series.push({
       id: "btrack",
@@ -69071,7 +69071,7 @@ function RdHero(p) {
       rdWidth: 1.5,
       endCap: false,
       points: filterPts(extBt, xDomain[0]),
-      endLabel: narrow ? null : "BludgerTrack"
+      endLabel: null
     });
   }
   if (adjusted || morph) series.push({
