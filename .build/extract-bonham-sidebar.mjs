@@ -16,10 +16,22 @@
 // (.build/bonham-wayback-backfill.mjs), which writes the same file with
 // the same row shape. The One Nation series rides AS PUBLISHED wherever
 // the page draws it: it was "recorded but never drawn" until the
-// 2026-10-02 hero overlay took it onto the Labor v One Nation contest,
-// marked as his figures beside the implied-flows line it cannot be
-// rebuilt to — the shadow estimate is respondent-allocated-flavoured and
-// is not comparable with the tracker's frozen-flow implied pairing.
+// 2026-10-02 hero overlay took it onto the Labor v One Nation contest.
+// Its basis, from his methods-page update log: introduced 28 Jan 26 as
+// a regression trend estimate that "uses my estimate of 2025
+// preferences" (his estimate: 72% of Coalition and 9% of Greens voters
+// flow to One Nation vs Labor), pooled simply — since 11 Mar 26, the
+// average of the ten most recent polls with at most two per pollster,
+// none of his aggregate's weighting or house-effect levelling. Like the
+// Coalition line it is PRIMARY-DERIVED — "my conversion … is the figure
+// I use in my Labor vs Coalition 2PP aggregate and my Labor vs One
+// Nation 2PP estimate" (his 1 Jul 26 post). (The five pollsters'
+// published shadow pairs ARE respondent-allocated — his Sep 2026 "flat
+// field" post critiques them; they are not his inputs.) The shadow
+// differs from our frozen-flow implied pairing in the flow table (his
+// own estimates vs the counted 2025 one) and in pooling, not in basis
+// family — and it stays un-rebuildable from our side because his exact
+// per-wave converted figures are never published.
 //
 // WHAT A ROW IS
 // [date, alpShare] where the date is HIS "Last update D Mon" stamp, not

@@ -2269,9 +2269,11 @@ const extAgg = {
     return {
       replica,
       published: (KBONHAM?.series || []).map(([iso, alp]) => ({ x: xOfIso(iso), y: alp })),
-      /* his One Nation shadow-2PP stamps ride AS PUBLISHED (respondent-
-         allocated flavour – nothing to rebuild); the hero draws them only
-         on the Labor v One Nation contest */
+      /* his One Nation shadow-2PP stamps ride AS PUBLISHED: primary-
+         derived off his own 2025-preference estimates and pooled as the
+         latest ten polls (≤2 a house), so nothing here to rebuild and
+         no comparability claim with our frozen-flow implied line; the
+         hero draws them only on the Labor v One Nation contest */
       shadow: (KBONHAM?.shadow || []).map(([iso, alp]) => ({ x: xOfIso(iso), y: alp })),
       site: "kevinbonham.blogspot.com",
     };

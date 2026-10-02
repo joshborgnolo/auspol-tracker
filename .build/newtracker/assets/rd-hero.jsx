@@ -644,7 +644,7 @@ function RdHero(p) {
       <RdFoot how={{ href: "/preference-flows/" }}>
         Figures pool the last {D.latest.method.windowDays} days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above.
         {extOn && isCoal && <> BludgerTrack’s line is its published series; the Bonham line is rebuilt here from his published method over the same polls, and tracks the figures he publishes to within about half a point.</>}
-        {extOn && isOn && <> Bonham’s shadow-2PP rides as he publishes it, a respondent-allocated estimate — a different basis from the implied-flows line it sits beside, so it need not hug it.</>}
+        {extOn && isOn && <> Bonham’s shadow-2PP rides as he publishes it: primaries off his own estimates of 2025 preferences, pooled as the latest ten polls with at most two a house — a different conversion from the implied-flows line it sits beside, so it need not hug it.</>}
       </RdFoot>
     </section>
   );
