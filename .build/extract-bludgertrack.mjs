@@ -13,9 +13,20 @@
 // separate from extract-pollbludger.mjs, which reads a DIFFERENT part of the
 // same feed (federal/table, the per-poll records, filed as provisional rows);
 // the two share the feed and its cache and nothing else. What is taken here
-// is the classic-pairing 2PP trend only (ALP2in). BludgerTrack's ALP–ON
+// is the classic-pairing 2PP trend only (ALP2out). BludgerTrack's ALP–ON
 // figures are respondent-allocated shadow pairs and are NOT comparable to
 // our frozen-flow implied pairing, so they are never mirrored.
+//
+// ALP2out, not ALP2in (fixed 2026-10-02, audit .matilda/bt-line-accuracy-
+// 2026-10.md): the feed's own page draws the outliers-EXCLUDED series as its
+// 3px trend line and prints it as the summary-table headline 2PP (js/voting.js
+// series 2/3 = line; ALP2in/LNC2in ride as scatter dots — the per-release
+// readings). The first cut mirrored ALP2in, i.e. the dots, which diverged from
+// his line by mean 0.97 / up to 3.1pts (and read 52.4 to his published 52.2).
+// Note ALP2out BACK-CASTS: old values shift up to ~2pts as new polls land
+// (ALP2in was ~immutable; Wayback 2025-09 → 2026-05: every 2out point moved),
+// so this mirror MUST refresh on a schedule — pollbludger-updater.sh runs it
+// four times a day against the same cached feed.
 //
 // ROBUSTNESS, mirroring the other feed readers:
 //   * fetch: browser UA, 45 s timeout, three attempts with backoff; on
@@ -115,9 +126,9 @@ function parseFeed(xml) {
     const date = mdy(attrs.date);
     const vals = {};
     for (const v of m[2].matchAll(/<(\w+)>([^<]*)<\/\1>/g)) vals[v[1]] = v[2].trim() === "" ? null : Number(v[2]);
-    const a = vals.ALP2in, l = vals.LNC2in;
+    const a = vals.ALP2out, l = vals.LNC2out;
     if (!date) throw new Error(`unparseable point date "${attrs.date}" — feed structure changed`);
-    if (a == null || l == null) throw new Error(`chart point ${attrs.Id} lacks ALP2in/LNC2in — feed structure changed`);
+    if (a == null || l == null) throw new Error(`chart point ${attrs.Id} lacks ALP2out/LNC2out — feed structure changed`);
     if (a < 30 || a > 80 || Math.abs(a + l - 100) > SUM_TOL)
       throw new Error(`chart point ${attrs.Id} 2PP ${a}/${l} fails range/sum — parse is off`);
     raw.push([date, r1(a)]);
@@ -143,7 +154,7 @@ if (status.source === "live") { try { writeFileSync(CACHE, xml); } catch { /* ca
 
 const doc = {
   updated: NOW.toISOString().slice(0, 16) + "Z",
-  source: "BludgerTrack (William Bowe), pollbludger.net/fed2028/bludgertrack — classic ALP v Coalition 2PP trend, outliers included (ALP2in)",
+  source: "BludgerTrack (William Bowe), pollbludger.net/fed2028/bludgertrack — classic ALP v Coalition 2PP trend, outliers excluded (ALP2out, the line his page draws and prints)",
   feedDate: status.feedDate,
   series,
 };

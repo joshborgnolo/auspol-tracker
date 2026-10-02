@@ -2219,9 +2219,12 @@ const individualPolls = POLLS.map((p) => {
 /* ---- 6b. external aggregates — the comparator lines the hero can draw ----
    Two other public 2PP aggregates cover this term, and a reader who lands on
    the front page reasonably asks "what do they say?" – so the hero can
-   overlay both. BludgerTrack's line arrives machine-ready (the dated trend
-   points behind its own trend chart, mirrored to data/bludgertrack-2pp.json
-   by .build/extract-bludgertrack.mjs); Kevin Bonham's publishes only the
+   overlay both. BludgerTrack's line arrives machine-ready (the dated
+   outliers-excluded trend values its own page draws as the trend line and
+   prints as its headline 2PP — ALP2out, fixed from ALP2in 2026-10-02,
+   .matilda/bt-line-accuracy-2026-10.md — mirrored to
+   data/bludgertrack-2pp.json by .build/extract-bludgertrack.mjs); Kevin
+   Bonham's publishes only the
    CURRENT two figures in his blog sidebar, so his line is a reconstruction —
    his published method (.build/newtracker/bonham-replica.mjs, every constant
    taken from his methods page and its update log) run over this tracker's
@@ -2239,10 +2242,15 @@ const readDataJson = (name) => {
 const BTRACK = readDataJson("bludgertrack-2pp.json");
 const KBONHAM = readDataJson("bonham-2pp.json");
 const xOfIso = (iso) => mx(ymOf(iso)) + (dayOf(iso) - 15) / 365;   // the individualPolls day convention
-/* BludgerTrack arrives as ~daily published trend points; drawn raw beside
-   the month-anchored house lines it renders as jitter (user 2026-10-02:
-   "way too bumpy"). Same display lattice as Bonham's replica: linear
-   interpolation to each mid-month anchor, plus one live tail vertex. */
+/* BludgerTrack arrives as the same ~weekly-keyed trend lattice his own page
+   draws (ALP2out since 2026-10-02 — before that the extractor mirrored
+   ALP2in, his per-release dot series, which rendered as jitter, user
+   2026-10-02: "way too bumpy"). The month-anchor lattice it is sampled to
+   below tracks the genuine smooth trend within 0.03/0.17pts (mean/max over
+   the term); sampling kept for lattice-consistency with every other line
+   here — linear interpolation to each mid-month anchor, plus one live tail
+   vertex. 2out back-casts (old values drift as polls land), so the mirror
+   refreshes on schedule via pollbludger-updater.sh. */
 const btMidMonth = (ym) => {
   const t = Date.parse(ym + "-15T00:00:00Z");
   let prev = null, next = null;

@@ -9,6 +9,12 @@
 # line to .build/logs/pollbludger.log; any failure exits non-zero before any
 # commit.
 #
+# SECOND DUTY (2026-10-02): this wrapper also refreshes the BludgerTrack
+# comparator mirror (extract-bludgertrack.mjs -> data/bludgertrack-2pp.json).
+# That series (ALP2out) back-casts every feed issue, so it rides these four
+# daily fetches; mirrored from the same cached feed bytes the fallback just
+# validated, best-effort (its failure only logs WARN and never blocks a run).
+#
 # Two commit shapes: (a) a filed/pruned row → the full site refresh, add-list
 # as the other poll wrappers; (b) only the first-seen ledger moved (a wave
 # is newly pending) → the ledger alone, no build. CI runners are fresh each
@@ -43,10 +49,27 @@ case "$LAST_LINE" in
   *) log "FAIL extract (no PB_STATUS line): $LAST_LINE"; exit 1 ;;
 esac
 
+# Comparator mirror: BludgerTrack's published 2PP trend (ALP2out) is
+# re-issue wise back-cast, so it rides this wrapper's four daily fetches —
+# the extract above just refreshed .build/pollbludger-src/current.xml, so
+# mirror the same bytes rather than fetch twice. Best-effort on purpose:
+# a comparator wobble must never take down a poll agent; a missed tick
+# only bows the hero's overlay line until the next run.
+BT_CHANGED=false
+BT_OUT="$(node .build/extract-bludgertrack.mjs --apply --xml .build/pollbludger-src/current.xml 2>&1)"
+BT_CODE=$?
+BT_LINE="$(echo "$BT_OUT" | tail -1)"
+if [ $BT_CODE -eq 0 ] && echo "$BT_LINE" | grep -q '^BT_STATUS'; then
+  log "$BT_LINE"
+  echo "$BT_LINE" | grep -q '"changed":true' && BT_CHANGED=true
+else
+  log "WARN bludgertrack comparator extract (exit $BT_CODE): $BT_LINE"
+fi
+
 FILES=(data/polls.json .build/pollbludger-src/seen.json "${SITE_FILES[@]}")
 
-if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
-  # nothing filed or pruned — but the grace ledger may have gained a wave
+if ! echo "$LAST_LINE" | grep -q '"changed":true' && [ "$BT_CHANGED" = false ]; then
+  # nothing filed or pruned, comparator tame — but the grace ledger may have gained a wave
   if git diff --quiet -- .build/pollbludger-src/seen.json && [ -z "$(git ls-files --others --exclude-standard .build/pollbludger-src/seen.json)" ]; then
     exit 0
   fi
@@ -59,8 +82,16 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
   exit 0
 fi
 
-FILED="$(echo "$LAST_LINE" | sed 's/^PB_STATUS //' | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);const f=j.filed.map(x=>"filed "+x.pollster+" "+x.date),p=j.pruned.map(x=>"pruned "+x.pollster+" "+x.date),fa=(j.filedApproval||[]).map(x=>"filed ratings "+x.firm+" "+x.date),pa=(j.prunedApproval||[]).map(x=>"pruned ratings "+x.firm+" "+x.date);console.log([...f,...p,...fa,...pa].join("; "))})')"
-log "fallback change: $FILED; running validate/build/commit/push"
+if echo "$LAST_LINE" | grep -q '"changed":true'; then
+  FILED="$(echo "$LAST_LINE" | sed 's/^PB_STATUS //' | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);const f=j.filed.map(x=>"filed "+x.pollster+" "+x.date),p=j.pruned.map(x=>"pruned "+x.pollster+" "+x.date),fa=(j.filedApproval||[]).map(x=>"filed ratings "+x.firm+" "+x.date),pa=(j.prunedApproval||[]).map(x=>"pruned ratings "+x.firm+" "+x.date);console.log([...f,...p,...fa,...pa].join("; "))})')"
+else
+  FILED="no poll rows"
+fi
+if [ "$BT_CHANGED" = true ]; then
+  FILES+=(data/bludgertrack-2pp.json)
+  FILED="$FILED$(echo "$LAST_LINE" | grep -q '"changed":true' && echo "; " || echo "")BludgerTrack comparator refresh"
+fi
+log "change: $FILED; running validate/build/commit/push"
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
