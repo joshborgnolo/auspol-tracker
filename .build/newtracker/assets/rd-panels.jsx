@@ -1179,7 +1179,7 @@ const RD_DEMO_SHORT = {
    pool, so refresh these by hand when the pool moves, as with RD_DEMO_SHORT */
 const RD_DEMO_HOME = {
   onp: "One Nation voters are more likely to be 55+, TAFE- or trade-qualified, and rural; less likely to live in Victoria or speak a language other than English at home",
-  alp: "Labor voters are more likely to be under 55, university-educated, and urban or provincial; less likely to live in the eastern mainland states, especially Queensland",
+  alp: "Labor voters are more likely to be under 55, university-educated, and inner-metro; less likely to be rural or live in the eastern mainland states, especially Queensland",
   lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, Victorian, and outright homeowners; less likely to live in an outer metro",
   grn: "Greens voters are more likely to be 18–34, women, and renters; less likely to be rural or TAFE- or trade-qualified",
   oth: "Voters for others & independents are more likely to be Gen Z and renting; less likely to live in provincial areas",
