@@ -1,6 +1,6 @@
 ---
 name: auspol-latest-next-polls-table
-description: "auspol-tracker — RdPolls ('Latest and next polls' section) anatomy: facet tabs (twopp/primary/leadership) via rd.jsx RdSec data-facet, 6-column desktop grid in rd.css (~:557), per-facet grid-template-columns overrides are a media-query leak hazard (@media (min-width:901px) needed), the facet RdSwap crossfade ghost must stay OUT of flow (position:absolute float, fixed 2026-09-28) or the phone's content-sized figs track snaps ~360ms in when the ghost unmounts, the DESKTOP figs cell must stretch to the row top (6142f35), and the expanded row's change markers reuse rdApChg + gen-data chg.d/r keys shared from rd-allpolls.jsx (ce17e27, 2026-09-30 — dec conventions, filtered-index trap, probe expand via $eval click on the figs cell since the name cell is a site link), and a CSS specificity trap: .rd-pld-prim > span > span (19px) swallows any new child span including .rd-apd-chg markers — fix with :not (48131ae), verify cross-table marker parity with computed-style sets since All-polls swaps classes and primary order; probe facet glitches with a per-frame rAF geometry recorder, NOT strided setTimeout samples. 2026-09-30 (9a87ded): facet figures "slow to populate" vs All-polls = RdSwap's .12s arrival delay on .rd-swap-now.in (a 120ms invisible dead zone on every tab switch) — dropped to `.2s ease-out both`; RdSwap serves ONLY this table's figs head+cells so the retime cannot touch RdCrossfade's (deliberate) identical delay."
+description: "auspol-tracker — RdPolls ('Latest and next polls' section) anatomy: facet tabs (twopp/primary/leadership) via rd.jsx RdSec data-facet, 6-column desktop grid in rd.css (~:557), per-facet grid-template-columns overrides are a media-query leak hazard (@media (min-width:901px) needed), the facet RdSwap crossfade ghost must stay OUT of flow (position:absolute float, fixed 2026-09-28) or the phone's content-sized figs track snaps ~360ms in when the ghost unmounts, the DESKTOP figs cell must stretch to the row top (6142f35), and the expanded row's change markers reuse rdApChg + gen-data chg.d/r keys shared from rd-allpolls.jsx (ce17e27, 2026-09-30 — dec conventions, filtered-index trap, probe expand via $eval click on the figs cell since the name cell is a site link), and a CSS specificity trap: .rd-pld-prim > span > span (19px) swallows any new child span including .rd-apd-chg markers — fix with :not (48131ae), verify cross-table marker parity with computed-style sets since All-polls swaps classes and primary order; probe facet glitches with a per-frame rAF geometry recorder, NOT strided setTimeout samples. 2026-09-30 (9a87ded): facet figures "slow to populate" vs All-polls = RdSwap's .12s arrival delay on .rd-swap-now.in (a 120ms invisible dead zone on every tab switch) — dropped to `.2s ease-out both`; RdSwap serves ONLY this table's figs head+cells so the retime cannot touch RdCrossfade's (deliberate) identical delay, and mixed-precision primary figures (Roy Morgan's .5 halves) render the half as a single ½ glyph in a small 11px/10px suffix (.rd-pl-frac, .5→½ cast 2026-10-02) — invisible padding inside the stretched grid cells CANNOT equalise ink gaps; only shrinking the suffix ink itself changes the row's rhythm."
 source: auto-skill
 extracted_at: '2026-09-28T02:47:51.147Z'
 ---
@@ -149,6 +149,59 @@ not code-reading first:
   `waitForSelector("#rd-ap-top")` on the snapshot view burns the whole 30s
   timeout. (Cost one probe run.)
 
+## Mixed-precision primary figures (Roy Morgan halves) — worked 2026-10-01
+
+User report: "roymorgan uses decimal places and this fucks up the latest and
+next polls table primary view: 26 / 22.5 / 14.5 / 25.5 / 11 … the spacing is
+a little off". Fix lives in `figCell`'s primary branch (`primFig()` splits
+`toFixed(1)` into int + fraction) + the `.rd-pl-frac` rule beside
+`.rd-pl-prim` in rd.css. Commit state at write time: CHANGE UNCOMMITTED in
+the working tree (rd-polls.jsx + rd.css + rebuilt index.html).
+
+- **Root geometry**: `.rd-pl-prim` is `repeat(5, minmax(0,1fr))` over a
+  FIXED track (desktop figs 200px via the facet override → ~36.8px cells;
+  phone `min-width:150px`/14px → 26.8px cells), text hugging left. The ink
+  gap after a figure = cellW + col-gap − inkWidth, so the alternation
+  amplitude between an integer and an x.5 figure is exactly the ".5" suffix
+  width (~13px at 15px). Roy Morgan is the only house publishing `.5` halves
+  in `p`, so only its row stuttered (24/12px alternating gaps); on the phone
+  a full-size 4-char figure (~30.9px) overflowed its 26.8px cell into the
+  column gap.
+- **The burned-lap trap**: padding integers with an invisible ".0" slot
+  (JSX class + `::after { content:".0"; visibility:hidden }`) does NOTHING —
+  the items are already stretched fixed cells, so hidden glyphs inside an
+  item move nothing. More generally: any per-cell anchor (left, right,
+  centre) leaves the ink-gap variance intact, because the gap after figure i
+  always depends on someone's ink width. Equal advance widths ≠ equal ink
+  gaps. Only shrinking the ink-width DIFFERENCE itself (or altering the
+  data: rounding to whole, or printing fake ".0"s — both misstate the poll)
+  changes the rhythm.
+- **Shipped fix**: de-emphasised real suffix — the half casts as one ½
+  glyph (U+00BD, close-set) in `<b class="rd-pl-frac">` at 11px (10px
+  inside the 900px block); primFig keeps a plain `.x` suffix for any
+  non-.5 decimal and drops `.0` entirely. ½ ink is 9.5px desktop / 8.6px
+  phone (IBM Plex Sans's ½ advance ≈0.86em — only ~1px narrower than the
+  old ".5" pair, so the rhythm contract is unchanged). DOM text now reads
+  "32½" — still the true figure, no aria games. Measured after
+  (.matilda/probe-pl-frac.mjs, scratch, 2026-10-02): desktop RM row gaps
+  22.8/13.3×3 against integer rows' uniform 22.8; phone ½-figure total
+  ink 25.4px ≤ the 26.8px cell, and every figure fits its cell at both
+  widths. BEFORE the fraction cast (".5" suffix): desktop gaps
+  22.8/12.8×3, phone decimals fit with the 10px override.
+- **Probe lessons** (`.matilda/probe-pl-prim-decimals.mjs`, scratch):
+  (a) a stretched grid item's `getBoundingClientRect` returns the CELL, not
+  the text — one whole probe pass measured "uniform gaps" that were just the
+  equal columns; measure ink with
+  `Range.selectNodeContents(el).getBoundingClientRect()`.
+  (b) The phone figs cell inherits `text-align: right`, so phone ink
+  right-aligns inside each cell — shifted ink on ≤900px is NOT a broken
+  grid (the deep dump `.matilda/probe-pl-prim-phone.mjs` confirmed uniform
+  26.8px tracks while ink wobbled).
+  (c) Clicking the facet tab at phone widths: scroll the TAB BUTTON into
+  view and clamp the mouse coords; the tabs are `.rd-tab` buttons (no ARIA
+  tab roles on this table) and bare synthetic `.click()` never switched the
+  facet (first pass silently measured zero rows).
+
 ## Headless verification recipe
 
 Probe `.matilda/probe/pl-primary-width.mjs` (scratch, not committed) and
@@ -158,10 +211,14 @@ the fix-proofs. Pattern for a facet-rendering change:
 1. Serve the repo over a local http server (one-shot `createServer` + puppeteer-core,
    the standard `.matilda/probe/` skeleton), `waitForSelector(".rd-pl-row")`.
 2. Click a facet tab by visible text within `#latest-polls`
-   (`[role='tab']` nodes; "Two-party" / "Primary" / "Leaders").
+   (`.rd-tab` buttons — "2PP" / "Primary" / "Leadership", "Leaders" when
+   narrow; no ARIA tab roles, so `[role='tab']` selectors match nothing).
 3. Assert `getComputedStyle(row).gridTemplateColumns`,
    `getComputedStyle(row).gridTemplateAreas`, and per-cell
-   `getBoundingClientRect()` (hidden cells report width 0).
+   `getBoundingClientRect()` (hidden cells report width 0). For TEXT-level
+   spacing inside a grid item (figures, labels), element rects are the
+   stretched cell, not the ink — use a Range; see the decimals section
+   above.
 4. Run at ≥2 viewports: 1280 desktop AND a phone rung (480×860 or 390).
    The 2026-09-28 bug was invisible at 1280 and fully broken at 480 — a
    desktop-only probe would have passed.

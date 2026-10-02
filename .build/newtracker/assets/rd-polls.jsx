@@ -170,7 +170,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       const primFig = (v) => {
         if (v == null) return "—";
         const [i, f] = (+v).toFixed(1).split(".");
-        return f === "0" ? i : <>{i}<b className="rd-pl-frac">.{f}</b></>;
+        return f === "0" ? i : <>{i}<b className="rd-pl-frac">{f === "5" ? "½" : "." + f}</b></>;
       };
       return (
         <div className="rd-pl-prim">
