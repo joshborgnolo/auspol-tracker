@@ -7102,7 +7102,8 @@ function infoTerms(D) {
     <>
       <p className="info-about-p">auspol tracker is an unofficial aggregator of Australian federal
       political polls. It collects published polls, adjusts them for the pollster’s lean, weights
-      them by recency, and uses them to derive aggregate estimates. To be clear, the site does not
+      them by recency, and other things, and uses them to derive aggregate estimates. To be clear,
+      the site does not
       conduct polls of its own but just accrues and presents those published by others. It aims to
       cut through the noise and provide a clear view of Australian political sentiment, of how
       Australians intend to vote and their views on leaders, issues, and our country’s
