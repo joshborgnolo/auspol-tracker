@@ -4186,11 +4186,6 @@ body.rd .rd-cc-board {
   background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px 12px;
   box-shadow: 0 12px 36px -12px rgba(40, 30, 20, 0.3);
 }
-body.rd .rd-cc-board.body {
-  position: fixed; top: calc(72px + 8px); bottom: auto; left: 50%; right: auto;
-  width: min(960px, calc(100% - 32px)); transform: translateX(-50%);
-  max-height: calc(100vh - 72px - 24px); overflow: auto;
-}
 body.rd .rd-cc-bhead { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-cc-bhead b { font-size: 15px; font-weight: 600; color: var(--ink); }
 body.rd .rd-cc-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 20px; margin-top: 8px; }
@@ -67589,7 +67584,7 @@ const RD_DEMO_HOME = {
   onp: "One Nation voters are more likely to be 55+, TAFE- or trade-qualified, and rural; less likely to live in Victoria or speak a language other than English at home",
   alp: "Labor voters are more likely to be under 55, university-educated, and inner-metro; less likely to be rural or live in the eastern mainland states, especially Queensland",
   lnp: "Coalition voters are more likely to be 55+, university-educated, inner-metro, Victorian, and outright homeowners; less likely to live in an outer metro",
-  grn: "Greens voters are more likely to be 18–34, women, and renters; less likely to be rural or TAFE- or trade-qualified",
+  grn: "Greens voters are more likely to be Gen Z, women, and renting; less likely to be rural or TAFE- or trade-qualified",
   oth: "Voters for others & independents are more likely to be Gen Z and renting; less likely to live in provincial areas"
 };
 const RD_GEN_BORN = {

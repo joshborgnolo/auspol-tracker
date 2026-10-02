@@ -57,6 +57,18 @@ you nowhere — go via `window.AUSPOL.demographics` or the browser probe.
 
 ## The 2026-09-30 One Nation reading (will drift; the logic won't)
 
+COUNTER-EXAMPLE, learned 2026-10-02 (grn headline recut): the band-beats-
+generation rule above holds when the generation STRADDLES published cuts
+(Gen X). For a generation that sits wholly INSIDE one published band —
+Gen Z, voter-clamped 18–29 ⊂ every pollster's 18–34 — the inference is a
+subset split, not a straddle, and when the party's skew is concentrated
+there the generation claim is the STRONGER headline: grn Gen Z +20.7±4.3
+SIG (33.9 v anchor 13.2) vs the measured 18–34 band's +12.4±2.6, with
+Millennials flat (+1.6) — the band's whole lift is Gen-Z-driven, so
+"Gen Z" replaced "18–34" in RD_DEMO_HOME.grn. (oth's line had already
+curated "Gen Z".) Check the Millennials/Gen-X overflow cells before
+trusting a generation's edge is real and not harmonisation smear.
+
 Raw per-house latest waves, onp primary by age:
 
 | wave | 18–34 | mid | oldest band |
