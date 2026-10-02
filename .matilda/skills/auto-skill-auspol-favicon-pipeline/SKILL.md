@@ -54,10 +54,16 @@ home-screen icon). `<head>` links PNG first (Google takes it), SVG data-URI seco
   and push_main (whose rebase-amend path re-stages from it). A new generated file goes
   into `SITE_FILES` once. demosau/essential early "confirm-skip" blocks use
   `git add ... assets/` so they pick the trio up wholesale; that's fine (cosmetic cases).
-- **build.mjs stale-stamp warning** (~:379-397): after the `FAV_PNG` absent-warn, if the
-  PNG exists it reads the stamp and warns `favicon PNG: drawn from an older glyph` on
-  mismatch — soft warning only, never a hard fail (deliberate: a wrapper mid-refresh_site
-  is already consistent, and a human seeing the reminder can act without a red build).
+- **build.mjs self-heals the raster** (~:483-516): when the stamp doesn't match the SVG
+  just written (or the PNG is absent), the build spawns `render-favicon.mjs` itself
+  (execFileSync, stdio ignored, best-effort) and logs `favicon PNG: re-rasterised for the
+  current glyph` on success. Chrome-less machines throw, the build keeps the old raster,
+  and the old warnings (`absent` / `drawn from an older glyph`) print only after the
+  attempt — never a hard fail (deliberate: a wrapper mid-refresh_site is already
+  consistent, and a human seeing the reminder can act without a red build). The spawn is
+  cheap because render-favicon gates itself: the attempt only happens when a draw is owed.
+  This covers local/manual builds that bypass refresh_site — the 2026-10-02 case, where
+  the SMS-poll exclusion commit (f54ddb7) moved the needle and left the PNG two days stale.
 
 ## GOTCHA — hash the exact file bytes, not the in-memory glyph
 
