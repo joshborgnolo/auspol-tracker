@@ -6,6 +6,9 @@
    lead-in run - the interpolated bridge from the election-day anchor to the
    term's first poll - draws DOTTED ("0.5 4"), distinct from the interior
    gap-dash ("6 6") and the band mean ("4 3"); leadership cards never dot.
+   A past term's line ALSO runs a dotted lead-OUT: the two-point bridge from
+   its final poll to its closing-election ring - the same "0.5 4" stroke,
+   series id "c{year}-tail".
    Asserts at 1280 and 390:
    - default view: one ring per vote card at px(0), in the current term's
      line colour for that card (tpp/primary: c.color; oppr: the opposition
@@ -16,14 +19,17 @@
      fixed 39.52 (39.5).
    - keys: both vote sections say "Each term’s election results".
    - dashes: per vote card the dotted/gap path counts equal an in-page replay
-     of obsRuns over the drawn cycles' obs flags; every dotted path is a
-     cycle's first run (data-series "c{year}") starting at px(0).
+     of obsRuns over the drawn cycles' obs flags, plus one "-tail" dotted
+     run per drawn PAST term with a closing result; lead-in dotted paths
+     start at px(0), tails end at px(endRes.x).
    - lifting 1996: three rings per vote card, the 1996 pair in its card
      colour, base at px(0)/py(raw[key][0]) and close at
-     px(endRes.x)/py(endRes[key]); dash counts follow the replay.
+     px(endRes.x)/py(endRes[key]); dash counts follow the replay, and a
+     "c1996-tail" dotted run joins the 1996 line's final poll to its ring.
    - Level→Change fades every vote-card ring in place (opacity 0) while the
-     dotted runs stay dotted; flip back, unlift 1996, and each vote card is
-     back to its single current-colour ring.
+     dotted runs stay dotted (tail included, at its change-basis position);
+     flip back, unlift 1996, and each vote card is back to its single
+     current-colour ring, tail-free.
    - no page-level overflow, no page errors. */
 import http from "node:http";
 import { readFile } from "node:fs/promises";
@@ -101,14 +107,17 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
         };
         /* same segment-merge the tabbed-views layer's obsRuns does, replayed
            on the raw rows so the expected dash split (dotted lead vs "6 6"
-           interior gap) is derived, not retyped */
+           interior gap) is derived, not retyped. `tail` replays the d1a1d215
+           lead-out push: vote cards only, a drawn past term whose closing
+           result exists and sits past its final poll earns one dotted
+           two-point run ending at px(endRes.x) */
         const replay = (c, key) => {
-          let dotted = 0, gap = 0;
+          let dotted = 0, gap = 0, tails = [];
           const list = (key === "tpp" && c.raw.tppEras) ? c.raw.tppEras
             : [{ months: c.raw.months, vals: c.raw[key], obs: (c.raw.obs || {})[key] }];
-          for (const s of list) {
+          list.forEach((s, si) => {
             const pts = s.months.map((m, i) => ({ x: m, y: s.vals[i] })).filter((p) => p.y != null);
-            if (pts.length < 2) continue;
+            if (pts.length < 2) return;
             const observed = (m) => { const i = s.months.indexOf(m); return i < 0 ? true : !!(s.obs && s.obs[i]); };
             const runs = [];
             for (let i = 0; i < pts.length - 1; i++) {
@@ -121,28 +130,37 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
               if (!r.dashed) return;
               if (r.points[0].x === 0) dotted++; else gap++;
             });
-          }
-          return { dotted, gap };
+            if (si === list.length - 1 && c.endRes && c.endRes[key] != null) {
+              const lastPt = pts[pts.length - 1];
+              if (c.endRes.x > lastPt.x + 1e-6)
+                tails.push({ id: "c" + c.year + (si ? "-e" + si : "") + "-tail", x0: lastPt.x, x1: c.endRes.x, end: c.endRes[key] });
+            }
+          });
+          return { dotted, gap, tails };
         };
         const drawn = years.map((y) => D.cycles.find((c2) => c2.year === y));
         const expect = (key) => drawn.reduce((a, c) => {
           const r = replay(c, key);
-          return { dotted: a.dotted + r.dotted, gap: a.gap + r.gap };
-        }, { dotted: 0, gap: 0 });
+          return { dotted: a.dotted + r.dotted + r.tails.length, gap: a.gap + r.gap, tails: a.tails.concat(r.tails) };
+        }, { dotted: 0, gap: 0, tails: [] });
         const chartOf = (id, headRe) => [...document.querySelectorAll(id + " .rd-cyc-chart")]
           .find((el) => headRe.test((el.querySelector(".rd-chead-t") || {}).textContent || ""));
         const card = (el, key) => {
           const paths = [...el.querySelectorAll("path.series-line")].map((p) => {
-            const m = (p.getAttribute("d") || "").match(/^M\s*([-\d.]+)/);
+            const nums = ((p.getAttribute("d") || "").match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
             return { id: p.getAttribute("data-series"), dash: p.getAttribute("stroke-dasharray"),
-                     d0: m ? +m[1] : null, stroke: getComputedStyle(p).stroke };
+                     d0: nums.length ? nums[0] : null, dEnd: nums.length ? nums[nums.length - 2] : null,
+                     dEndY: nums.length ? nums[nums.length - 1] : null, stroke: getComputedStyle(p).stroke };
           });
+          const dotted = paths.filter((p) => p.dash === "0.5 4");
           return {
             key,
             rings: [...el.querySelectorAll(".rd-mark")].map(ringOf).filter((r) => r.stroke !== "var(--ink-2)"),
             lineStrokes: paths.filter((p) => p.id !== "cyc-band-mean").map((p) => p.stroke),
             meanDash: (paths.find((p) => p.id === "cyc-band-mean") || {}).dash || null,
-            dotted: paths.filter((p) => p.dash === "0.5 4"),
+            dotted,
+            tails: dotted.filter((p) => (p.id || "").endsWith("-tail")),
+            leads: dotted.filter((p) => !(p.id || "").endsWith("-tail")),
             gaps: paths.filter((p) => p.dash === "6 6"),
             expected: expect(key),
             fx: fitX(el), fy: fitY(el),
@@ -155,6 +173,9 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
           c96color: c96.color, c96oppColor: D.PARTIES[c96.opp].color,
           c96endRes: c96.endRes || null,
           c96raw0: { primary: c96.raw.primary[0], oppr: c96.raw.oppr[0], tpp: c96.raw.tpp[0] },
+          c19endRes: (D.cycles.find((c2) => c2.year === 2019) || {}).endRes || null,
+          c19raw0: ((c22) => c22 ? { primary: c22.raw.primary[0], oppr: c22.raw.oppr[0], tpp: c22.raw.tpp[0] } : null)(D.cycles.find((c2) => c2.year === 2019)),
+          c22endRes: (D.cycles.find((c2) => c2.year === 2022) || {}).endRes || null,
           c93endRes: (D.cycles.find((c2) => c2.year === 1993) || {}).endRes || null,
           c16endRes: (D.cycles.find((c2) => c2.year === 2016) || {}).endRes || null,
           c98raw0: c98 ? c98.raw.primary[0] : null,
@@ -211,9 +232,11 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
         check(`[${vw}] default ${k}: dashes follow the obs replay`,
           cardL.dotted.length === cardL.expected.dotted && cardL.gaps.length === cardL.expected.gap,
           `dom dotted ${cardL.dotted.length}/gap ${cardL.gaps.length} vs replay ${cardL.expected.dotted}/${cardL.expected.gap}`);
-        check(`[${vw}] default ${k}: every dotted path is a cycle's first run from px(0)`,
-          cardL.dotted.every((p) => p.id === "c" + L.curYear && p.d0 != null && Math.abs(p.d0 - px(cardL, 0)) <= 2),
-          JSON.stringify(cardL.dotted));
+        check(`[${vw}] default ${k}: every lead path is a cycle's first run from px(0)`,
+          cardL.leads.every((p) => p.id === "c" + L.curYear && p.d0 != null && Math.abs(p.d0 - px(cardL, 0)) <= 2),
+          JSON.stringify(cardL.leads));
+        check(`[${vw}] default ${k}: the sitting term draws no tail`,
+          cardL.tails.length === 0, JSON.stringify(cardL.tails.map((p) => p.id)));
         check(`[${vw}] default ${k}: the band mean keeps its own dash`,
           cardL.meanDash === "4 3", String(cardL.meanDash));
       }
@@ -254,9 +277,12 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
           cardL.dotted.length === cardL.expected.dotted && cardL.gaps.length === cardL.expected.gap,
           `dom dotted ${cardL.dotted.length}/gap ${cardL.gaps.length} vs replay ${cardL.expected.dotted}/${cardL.expected.gap}`);
         check(`[${vw}] lead-in lifted ${k}: 2019's lead run is dotted, from px(0)`,
-          cardL.dotted.some((p) => p.id === "c2019" && p.d0 != null && Math.abs(p.d0 - px(cardL, 0)) <= 2)
-            && cardL.dotted.every((p) => p.d0 != null && Math.abs(p.d0 - px(cardL, 0)) <= 2),
-          JSON.stringify(cardL.dotted));
+          cardL.leads.some((p) => p.id === "c2019" && p.d0 != null && Math.abs(p.d0 - px(cardL, 0)) <= 2)
+            && cardL.leads.every((p) => p.d0 != null && Math.abs(p.d0 - px(cardL, 0)) <= 2),
+          JSON.stringify(cardL.leads));
+        check(`[${vw}] lead-in lifted ${k}: 2019's tail runs to the 2022 closing count`,
+          cardL.tails.filter((p) => p.id === "c2019-tail").length === (L.c19endRes && L.c19endRes[k] != null ? 1 : 0),
+          JSON.stringify(cardL.tails));
       }
       check(`[${vw}] lead-in lifted: leaders charts still dotless`, L.leadersDotted === 0,
         `saw ${L.leadersDotted}`);
@@ -307,9 +333,19 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
         check(`[${vw}] lifted ${k}: dashes follow the obs replay`,
           cardL.dotted.length === cardL.expected.dotted && cardL.gaps.length === cardL.expected.gap,
           `dom dotted ${cardL.dotted.length}/gap ${cardL.gaps.length} vs replay ${cardL.expected.dotted}/${cardL.expected.gap}`);
-        check(`[${vw}] lifted ${k}: every dotted path is a first run from px(0)`,
-          cardL.dotted.every((p) => ["c" + L.curYear, "c1996"].includes(p.id) && p.d0 != null && Math.abs(p.d0 - px(cardL, 0)) <= 2),
-          JSON.stringify(cardL.dotted));
+        check(`[${vw}] lifted ${k}: every lead path is a first run from px(0)`,
+          cardL.leads.every((p) => ["c" + L.curYear, "c1996"].includes(p.id) && p.d0 != null && Math.abs(p.d0 - px(cardL, 0)) <= 2),
+          JSON.stringify(cardL.leads));
+        const tails96 = cardL.tails.filter((p) => p.id === "c1996-tail");
+        const want96 = L.c96endRes && L.c96endRes[k === "tpp" ? "tpp" : k] != null ? 1 : 0;
+        const tailV = L.c96endRes ? L.c96endRes[k === "tpp" ? "tpp" : k] : null;
+        check(`[${vw}] lifted ${k}: 1996's tail is the only tail`,
+          tails96.length === want96 && cardL.tails.length === want96,
+          JSON.stringify(cardL.tails.map((p) => p.id)));
+        check(`[${vw}] lifted ${k}: the tail ends at the closing ring`,
+          want96 === 0 || (Math.abs(tails96[0].dEnd - px(cardL, L.c96endRes.x)) <= 2
+            && Math.abs(tails96[0].dEndY - py(cardL, tailV)) <= 2),
+          tails96.length ? `dEnd ${tails96[0].dEnd} vs px(${L.c96endRes.x}) ${px(cardL, L.c96endRes.x).toFixed(2)} · dEndY ${tails96[0].dEndY} vs py(${tailV}) ${py(cardL, tailV).toFixed(2)}` : "(no tail)");
       }
 
       /* ---- change mode fades every ring in place; dots stay dots ---------- */
@@ -326,6 +362,9 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
         check(`[${vw}] change mode keeps the ${k} lead-in dotted`,
           L[k].dotted.length === L[k].expected.dotted,
           `dotted ${L[k].dotted.length} vs ${L[k].expected.dotted}`);
+        check(`[${vw}] change mode keeps 1996's ${k} tail dotted`,
+          L[k].tails.length === (L.c96endRes && L.c96endRes[k === "tpp" ? "tpp" : k] != null ? 1 : 0),
+          JSON.stringify(L[k].tails.map((p) => p.id)));
       }
 
       /* ---- level, then 1996 back into the band ---------------------------- */

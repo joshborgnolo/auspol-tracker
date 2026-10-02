@@ -46,10 +46,12 @@ const rdOrd = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "
 const rdSgn = (v, unit) => (unit ? "" : v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
 
 /* The dotted stroke of a term's lead-in run from its election-day anchor to
-   its first poll - interpolation out of a counted result, not a month nobody
-   polled. Same stroke the by-state panels use to bridge an election mark to
-   the first polled month (RD_ELECTION_LEAD), so the two reference-line kinds
-   read the same way wherever they appear. */
+   its first poll, and of the lead-out run from a past term's last poll to
+   the ring of the election that closed it - interpolation out of (or up to)
+   a counted result, not a month nobody polled. Same stroke the by-state
+   panels use to bridge an election mark to the first polled month
+   (RD_ELECTION_LEAD), so the two reference-line kinds read the same way
+   wherever they appear. */
 const RD_CYC_LEAD = "0.5 4";
 
 /* ---- one chart, in the redesign's frame --------------------------------- */
@@ -80,6 +82,10 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
        is what changes - the run still rides its line's colour, weight and
        opacity, fades in and out with it, and keeps the line's tooltip. */
     if (s.lead) return { ...s, dash: RD_CYC_LEAD };
+    /* the lead's mirror at the other end of a past term: the dotted run
+       from the term's final poll to the closing election's ring. Same
+       stroke, same rule - the colour, weight and opacity stay the line's. */
+    if (s.tail) return { ...s, dash: RD_CYC_LEAD };
     if (s.current) return { ...s, rdWidth: 3, rdCap: 4, endLabel: null };
     /* The "this term" overlays (One Nation's primary vote, the combined
        L/NP+One Nation sum, Hanson's rating) are the old design's thin
@@ -1015,7 +1021,7 @@ function RdPastCycles(p) {
         <div className="rd-cyc-one">{chart("tpp", false)}</div>
         {bandKey("tpp")}
         <RdFoot how={{ term: "last-election-flows", from: "Past cycles" }}>
-          Every line is the implied two-party figure: each poll’s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The {cur.year} term follows the rival {govName} is doing worst against, as the headline does. Each line’s dotted start runs from the election’s counted result to the term’s first poll.
+          Every line is the implied two-party figure: each poll’s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The {cur.year} term follows the rival {govName} is doing worst against, as the headline does. Each line’s dotted start runs from the election’s counted result to the term’s first poll, and a past line’s dotted end runs from its final poll to the closing election’s count.
         </RdFoot>
       </RdSec>
       <RdSec id="cyc-primary" title="Primary vote" meta="First preferences for the governing party and the main opposition party">
@@ -1024,7 +1030,7 @@ function RdPastCycles(p) {
         <RdEventList list={PAIRS.primary.list} inline onPick={pickEvOf.primary} openKey={openKeyOf(["primary", "oppr"])} />
         {bandKey("primary")}
         <RdFoot how={{ term: "what-am-i-looking-at", from: "Past cycles" }}>
-          Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed. The dotted start of each line runs from the election’s counted result to the term’s first poll.
+          Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed. The dotted start of each line runs from the election’s counted result to the term’s first poll; the dotted end of a past line runs from its final poll to the closing election’s count.
         </RdFoot>
       </RdSec>
       <RdSec id="cyc-leaders" title="Leadership" meta="Net approval since 1972 and preferred PM since 1984, for whoever held the office">

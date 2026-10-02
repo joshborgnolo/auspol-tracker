@@ -57700,7 +57700,7 @@ function CycleChart({
       });
       const runs = obsRuns(pts, observed);
       const termEnd = si === seriesIn.length - 1;
-      return runs.map((run, i) => ({
+      const rows = runs.map((run, i) => ({
         id: "c" + c.year + (si ? "-e" + si : "") + (i ? "-" + i : ""),
         label,
         color: colorOf(c),
@@ -57718,6 +57718,29 @@ function CycleChart({
           endCap: false
         })
       }));
+      if (termEnd && ringTerms != null && c.endRes && c.endRes[M.key] != null) {
+        const lastPt = pts[pts.length - 1];
+        if (lastPt && c.endRes.x > lastPt.x + 1e-6) rows.push({
+          id: "c" + c.year + (si ? "-e" + si : "") + "-tail",
+          label,
+          color: colorOf(c),
+          width,
+          weight,
+          current: c.current,
+          opacity,
+          dashed: true,
+          tail: true,
+          endCap: false,
+          points: [{
+            x: lastPt.x,
+            y: lastPt.y
+          }, {
+            x: c.endRes.x,
+            y: chg ? +(c.endRes[M.key] - base).toFixed(2) : c.endRes[M.key]
+          }]
+        });
+      }
+      return rows;
     });
   });
   const bandN = pastShown.length;
@@ -71883,6 +71906,10 @@ function RdCycleChart({
       ...s,
       dash: RD_CYC_LEAD
     };
+    if (s.tail) return {
+      ...s,
+      dash: RD_CYC_LEAD
+    };
     if (s.current) return {
       ...s,
       rdWidth: 3,
@@ -73310,7 +73337,7 @@ function RdPastCycles(p) {
       term: "last-election-flows",
       from: "Past cycles"
     }
-  }, "Every line is the implied two-party figure: each poll\u2019s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The ", cur.year, " term follows the rival ", govName, " is doing worst against, as the headline does. Each line\u2019s dotted start runs from the election\u2019s counted result to the term\u2019s first poll.")), React.createElement(RdSec, {
+  }, "Every line is the implied two-party figure: each poll\u2019s primary votes read through the preferences counted at the election that opened its term, the only table anyone could have used at the time. The ", cur.year, " term follows the rival ", govName, " is doing worst against, as the headline does. Each line\u2019s dotted start runs from the election\u2019s counted result to the term\u2019s first poll, and a past line\u2019s dotted end runs from its final poll to the closing election\u2019s count.")), React.createElement(RdSec, {
     id: "cyc-primary",
     title: "Primary vote",
     meta: "First preferences for the governing party and the main opposition party"
@@ -73329,7 +73356,7 @@ function RdPastCycles(p) {
       term: "what-am-i-looking-at",
       from: "Past cycles"
     }
-  }, "Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed. The dotted start of each line runs from the election\u2019s counted result to the term\u2019s first poll.")), React.createElement(RdSec, {
+  }, "Past terms are the governing party and the main opposition party of the day. A month with no poll is filled in from the months either side, and a drawn term shows that stretch dashed. The dotted start of each line runs from the election\u2019s counted result to the term\u2019s first poll; the dotted end of a past line runs from its final poll to the closing election\u2019s count.")), React.createElement(RdSec, {
     id: "cyc-leaders",
     title: "Leadership",
     meta: "Net approval since 1972 and preferred PM since 1984, for whoever held the office"

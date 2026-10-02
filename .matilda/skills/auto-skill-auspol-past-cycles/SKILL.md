@@ -1207,9 +1207,29 @@ interpolated.
   weight, opacity and tooltip, and fades with the line. The mean's
   "4 3" branch sits before it (:79). Distinct from the interior
   gap-dash "6 6" and user-specified to match the by-state panels'
-  RD_ELECTION_LEAD. The trailing stretch after a term's last poll is
-  NOT special-cased (user call: "nothing to be interpolated there,
-  it's just error").
+  RD_ELECTION_LEAD.
+- **Dotted tail (lead-out)**: after the lead restyle came the tail
+  (user request 2026-10-02, mirroring the by-location panel's
+  election→first-poll bridge). The d1a1d215 line-builder pushes ONE
+  two-point series per drawn PAST term (`id "c{year}(-e{si})-tail"`,
+  `tail: true`, `dashed: true`, `endCap: false`, same colour/weight/
+  opacity as its line) from the era's last poll point to
+  `{ x: c.endRes.x, y: endRes[M.key] }` (change basis:
+  `endRes - base`), gated by `termEnd && ringTerms != null &&
+  c.endRes && c.endRes[M.key] != null && c.endRes.x > lastPt.x + 1e-6`
+  (~:1590-1610). The gate means leaders and the sitting term get none
+  (c.endRes is null while the count is open). rd-cycles restyles
+  `if (s.tail) return { ...s, dash: RD_CYC_LEAD }` between the `s.lead`
+  and `s.current` branches — same 0.5 4 dots as the lead-in, so the
+  line runs bridge→line→bridge. `endCap: false` is load-bearing:
+  TrendChart's `s.endCap === false` gate is the only thing stopping
+  an end-cap dot drawing on top of the closing ring. blendScene fades
+  new ids in place, so tails appear/disappear with lifts without
+  morphing; endRes.x ≈ span ≤ maxM sits inside CYC_XDOMAIN, no domain
+  change needed. The footer copy on both vote sections names the
+  bridge ("dotted start … to the term's first poll, and a past line's
+  dotted end runs from its final poll to the closing election's
+  count").
 - **Which cycles dot**: only terms whose month-1 node is interpolated
   (raw vals non-null, obs flag false) - as of 2026-10-01 that's 1972
   (plus an interior interp at month 13), 1984, 2001, 2019; 1974 month 6
@@ -1221,15 +1241,18 @@ interpolated.
   election results", RdSwatch kind="ring") covers BOTH vote sections
   (`sec === "tpp" || sec === "primary"`).
 
-Probe: `.matilda/probe/cyc-rings.mjs` (~90 checks x {1280,390};
+Probe: `.matilda/probe/cyc-rings.mjs` (~120 checks x {1280,390};
 curated, `git add -f`). Default view + a 2019 lift (its month-1 node
-is interpolated on all three vote cards, exercising the dotted lead)
-+ a 1996 lift (its endRes carries the canonical 2dp primaries,
-exercising the per-card close rings) + Level->Change fade +
-unlift. Dash counts are never hardcoded - the probe replays obsRuns
-verbatim over the drawn cycles' obs flags (`tppEras`-aware) and diffs
-the DOM's "0.5 4"/"6 6" counts against it. Traps it pins, all learnt
-live:
+is interpolated on all three vote cards, exercising the dotted lead -
+and its tail sidesteps the "every lead from px(0)" assert, which is
+scoped to non-`-tail` ids) + a 1996 lift (its endRes carries the
+canonical 2dp primaries, exercising the per-card close rings AND
+pinning `c1996-tail`'s dEnd/dEndY to px/py(endRes)) + Level->Change
+fade + unlift. Dash counts are never hardcoded - the probe replays
+obsRuns verbatim over the drawn cycles' obs flags (`tppEras`-aware)
+PLUS the tail rule (last era, endRes present, endRes.x > lastPt.x),
+and diffs the DOM's "0.5 4"/"6 6" counts against it. Traps it pins,
+all learnt live:
 
 - the peer-mean dot `{k:"mean", color:"var(--ink-2)"}` (rd-cycles.jsx
   :139) rides the same `.rd-mark > circle.rd-ring` DOM - filter

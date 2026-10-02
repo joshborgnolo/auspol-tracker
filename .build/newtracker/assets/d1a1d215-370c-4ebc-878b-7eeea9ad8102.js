@@ -1576,7 +1576,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       if (flags) pts.forEach((p) => { if (!observed(p.x)) p.note = "no poll, Interpolated"; });
       const runs = obsRuns(pts, observed);
       const termEnd = si === seriesIn.length - 1;
-      return runs.map((run, i) => ({
+      const rows = runs.map((run, i) => ({
         id: "c" + c.year + (si ? "-e" + si : "") + (i ? "-" + i : ""), label, color: colorOf(c), width,
         points: run.points, weight, current: c.current, opacity, dashed: run.dashed,
         /* a dashed run anchored at month 0 bridges the election result to the
@@ -1593,6 +1593,29 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
           ? { endLabel: "’" + String(c.year).slice(2), endLabelOpacity: labOp }
           : { endCap: false }),
       }));
+      /* The lead-in run, turned to face the other way: a past term's line
+         ends where its polling does, but the closing election owns a counted
+         result the line never drew (the ring marks it but joins nothing) -
+         so bridge from the final poll to the ring with a dotted run of its
+         own, the by-state and by-location panels' lead-in walked back the
+         other direction. Two points and no more: the months between stay
+         unclaimed, which is what the dots say. Vote cards only - the leader
+         measures have no closing count to join - and never the sitting
+         term, whose result is not yet counted (c.endRes is null). The
+         endpoint rides the drawn basis, so in change mode the run lands
+         where the ring's unseen change-basis position already sits. */
+      if (termEnd && ringTerms != null && c.endRes && c.endRes[M.key] != null) {
+        const lastPt = pts[pts.length - 1];
+        if (lastPt && c.endRes.x > lastPt.x + 1e-6)
+          rows.push({
+            id: "c" + c.year + (si ? "-e" + si : "") + "-tail", label,
+            color: colorOf(c), width, weight, current: c.current, opacity,
+            dashed: true, tail: true, endCap: false,
+            points: [{ x: lastPt.x, y: lastPt.y },
+                     { x: c.endRes.x, y: chg ? +(c.endRes[M.key] - base).toFixed(2) : c.endRes[M.key] }],
+          });
+      }
+      return rows;
     });
   });
   /* ---- the past terms, pooled once -------------------------------------------
