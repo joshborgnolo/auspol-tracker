@@ -6,8 +6,14 @@
    blinded the parser for twelve days) and a scratch dataset, and asserts:
    the parse finds the waves; a covered wave is not a gap; an uncovered one
    is class 2; one the Poll Bludger fallback has filed is class 3, not 2; a
-   witness that parses nothing is class 1. Run: node .build/test-coverage.mjs */
-import { mkdtempSync, writeFileSync, mkdirSync, cpSync } from "node:fs";
+   witness that parses nothing is class 1; an UNKNOWN pollster on the
+   witness table is reported as first contact (name, dates, row refs) with
+   the exit code untouched; the first-contact seen-file suppresses at the
+   gate but never at emission; the seen-file writer keeps its
+   one-entry-per-line merge discipline; and the gate's pick verb caps a run
+   at three shell-safe names with recorded ones suppressed. Run:
+   node .build/test-coverage.mjs */
+import { mkdtempSync, writeFileSync, mkdirSync, cpSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -48,7 +54,7 @@ writeFileSync(WIKI, wiki + "x".repeat(60_000)); // past the checker's size floor
 // ---- scratch repo: the two scripts read data/polls.json relative to cwd -------------
 mkdirSync(path.join(dir, "data"));
 mkdirSync(path.join(dir, ".build"));
-for (const f of ["check-coverage.mjs", "coverage-doctor.mjs", "melbourne-time.mjs"]) cpSync(path.join(ROOT, ".build", f), path.join(dir, ".build", f));
+for (const f of ["check-coverage.mjs", "coverage-doctor.mjs", "melbourne-time.mjs", "first-contact.mjs"]) cpSync(path.join(ROOT, ".build", f), path.join(dir, ".build", f));
 const poll = (pollster, date) => ({ date, dateStart: date, pollster, client: "—", sample: 1500, alp: 27, lnp: 21, grn: 13, onp: 28, ind: 11, oth: null, tpp_alp: null, tpp_lnp: null });
 const write = (D) => writeFileSync(path.join(dir, "data", "polls.json"), JSON.stringify(D, null, 2));
 const base = () => ({
@@ -105,5 +111,72 @@ writeFileSync(path.join(dir, "empty.txt"), "==Voting intention==\n{|\n! Date\n|}
 r = doctor(path.join(dir, "empty.txt"));
 assert.equal(r.code, 1, r.out);
 assert.match(r.st.reason, /parsed only 0 waves/);
+
+// ---- first contact: an unknown pollster on the witness table ----------------
+const check = (wikiFile = WIKI) => {
+  const p = spawnSync(process.execPath, [".build/check-coverage.mjs", "--quiet"], {
+    cwd: dir, encoding: "utf8",
+    env: { ...process.env, COVERAGE_WIKI_FILE: wikiFile },
+  });
+  const fc = p.stdout.split("\n").find((l) => l.startsWith("FIRST_CONTACT "));
+  const st = p.stdout.split("\n").find((l) => l.startsWith("COVERAGE_STATUS "));
+  assert.ok(fc && st, "machine lines missing: " + p.stdout + p.stderr);
+  return { code: p.status, fc: JSON.parse(fc.slice("FIRST_CONTACT ".length)), st: JSON.parse(st.slice("COVERAGE_STATUS ".length)) };
+};
+const fcCli = (args) => {
+  const p = spawnSync(process.execPath, [".build/first-contact.mjs", ...args], { cwd: dir, encoding: "utf8" });
+  assert.equal(p.status, 0, p.stderr);
+  return p.stdout.trim();
+};
+
+// 6. the base witness (mapped houses only) reports no first contact
+write(base());
+writeFileSync(WIKI, wiki + "x".repeat(60_000));
+let c = check();
+assert.equal(c.code, 0, "baseline exit code");
+assert.deepEqual(c.fc, [], "no unknown houses on the base witness");
+
+// 7. an unknown pollster row → first-contact detection with its ref URL, exit code untouched
+writeFileSync(WIKI, wiki.replace("|}\n", row("18–21 Sept", "JWS Research", "[https://jws.example.com/poll-report-sept JWS survey]") + "|}\n") + "x".repeat(60_000));
+c = check();
+assert.equal(c.code, 0, "an unknown pollster is not a gap");
+assert.equal(c.st.witness_waves, 23, "unknown rows do not inflate the witness count");
+assert.ok(!JSON.stringify(c.st.missing).includes("JWS"), "unknown rows never join missing");
+assert.equal(c.fc.length, 1, "one first-contact name: " + JSON.stringify(c.fc));
+assert.equal(c.fc[0].name, "JWS Research");
+assert.deepEqual(c.fc[0].dates, ["2026-09-21"]);
+assert.deepEqual(c.fc[0].refs, ["https://jws.example.com/poll-report-sept"]);
+assert.deepEqual(c.st.first_contact, c.fc, "status carries the same list");
+
+// 8. the seen-file suppresses AT THE GATE, never at emission
+fcCli(["ignore", "JWS Research", "fixture: deliberately untracked"]);
+c = check();
+assert.equal(c.fc.length, 1, "emission is unfiltered — the import agent's own run still sees its house");
+assert.deepEqual(JSON.parse(fcCli(["filter", JSON.stringify(c.fc)])), [], "gate-side filter suppresses the recorded name");
+assert.deepEqual(JSON.parse(fcCli(["filter", JSON.stringify([...c.fc, { name: "New Face", dates: [], refs: [] }])])), ["New Face"], "unrecorded names survive the filter");
+
+// 9. the seen file is valid JSON, one entry per line, sorted — and a verdict
+// flip touches only its own line (review branches merge against moved main)
+fcCli(["pending", "Acme Polling"]);
+const seenPath = path.join(dir, ".build", "first-contact-seen.json");
+const before = readFileSync(seenPath, "utf8");
+const seen = JSON.parse(before);
+assert.equal(Object.keys(seen).length, 2);
+assert.deepEqual(Object.keys(seen), [...Object.keys(seen)].sort(), "keys sorted");
+const entryLines = before.split("\n").filter((l) => l.startsWith('"'));
+assert.equal(entryLines.length, 2, "one entry per line");
+fcCli(["imported", "Acme Polling"]);
+const after = readFileSync(seenPath, "utf8");
+const acme = JSON.parse(after)["acme polling"];
+assert.equal(acme.verdict, "imported");
+assert.ok(after.includes(before.split("\n").find((l) => l.startsWith('"jws research"'))), "another house's line is untouched by the flip");
+
+// 10. pick: seen-file suppression + shell-safe charset + the 3-per-run cap,
+// all in the one place the gate consumes
+const contacts = ["JWS Research", "Acme Polling", "OMalley & Sons", "Poll$(whoami)", "One More", "Two More", "Three More"]
+  .map((name) => ({ name, dates: [], refs: [] }));
+const picked = JSON.parse(fcCli(["pick", JSON.stringify(contacts)]));
+assert.deepEqual(picked.names, ["OMalley & Sons", "One More", "Two More"], "recorded names suppressed, cap at 3: " + JSON.stringify(picked));
+assert.deepEqual(picked.unsafe, ["Poll$(whoami)"], "shell metacharacters held back");
 
 console.log("test-coverage: ok");

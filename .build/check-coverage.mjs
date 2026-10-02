@@ -29,6 +29,23 @@
 // gives its cadence, so a house that has gone conspicuously quiet relative to
 // its own median gap is flagged even if Wikipedia is also behind.
 //
+// A THIRD, detection-only output: a pollster on the witness table that the
+// tracker does not follow. The HOUSE map used to be where those rows died,
+// which meant a brand-new pollster was invisible to every layer of the
+// pipeline. parseWitness now reads the FIRM CELL of such a row — the next
+// cell after the fieldwork date — for a wikilink or a plain-text firm name,
+// and the checker emits the surviving candidates as status.first_contact
+// plus a FIRST_CONTACT {json} line, ALWAYS unfiltered. Noise is cut at
+// source: a chunk with no vote figures is an event annotation, not a poll
+// row; a candidate naming any known house (linked aliases like
+// [[Resolve (poll)|Resolve]], or unlinked firm cells like "Freshwater
+// Strategy" on a client-linked row) is a labelling variant, not a new house.
+// First-contact.yml's gate then applies seen-file suppression (fire-once per
+// name) itself; emission here never reads the seen file, so the import
+// agent's own diagnostic run of this script still shows its house. Unknown
+// names never change the exit code: an untracked house is a first contact,
+// not a gap.
+//
 // Usage: node .build/check-coverage.mjs [--json] [--quiet] [--wiki <file>]
 //   exit 0 = everything current
 //   exit 1 = could not fetch or parse the witness (check is inconclusive)
@@ -120,11 +137,64 @@ function endDate(cell, year) {
   return null;
 }
 
+// The source URLs a row's <ref> tags give a wave — the first-contact import
+// agent's starting links. Capped at 3; a wave rarely carries more.
+function refsOf(chunk) {
+  const out = [];
+  for (const m of chunk.matchAll(/<ref\b[^>/]*>([\s\S]*?)<\/ref>/g)) {
+    for (const u of m[1].matchAll(/https?:\/\/[^\s\]|}<>]+/g)) {
+      const url = u[0].replace(/[.,;)]+$/, "");
+      if (!out.includes(url)) out.push(url);
+      if (out.length >= 3) return out;
+    }
+  }
+  return out;
+}
+
+// The text of a table cell line, with any rowspan/colspan attribute prefix
+// stripped. <ref> tags go FIRST: their {{Cite …}} templates are full of
+// `|param=` pipes, and a naive attribute cut at the last pipe slices into
+// the citation and leaves `language=en-AU}}</ref>` as the "content". Then
+// the attribute block and the content split at a `|`; the piped DISPLAY
+// half of a wikilink ([[target|display]]) is a trap for a naive
+// lastIndexOf, so the cut is the last `|` before the first `[[` when the
+// cell is linked, else the last `|` outright.
+function cellContent(line) {
+  let s = line.replace(/^[!|]\s*/, "")
+    .replace(/<ref\b[\s\S]*?(?:<\/ref>|$)/g, "")
+    .replace(/<ref\b[^>]*\/>/g, "");
+  const linkAt = s.indexOf("[[");
+  const cut = linkAt >= 0 ? s.lastIndexOf("|", linkAt) : s.lastIndexOf("|");
+  if (cut >= 0) s = s.slice(cut + 1);
+  return s.trim();
+}
+
+// A firm name as the HOUSE map keys it: lowercase, whitespace collapsed,
+// "&" read as "and" (the table writes "Fox & Hedgehog", the map keys
+// "fox and hedgehog"), {{nbsp}}-style templates stripped.
+const houseKey = (s) => s.toLowerCase()
+  .replace(/\{\{[^{}]*\}\}/g, " ")
+  .replace(/&/g, " and ")
+  .replace(/\s+/g, " ").trim();
+
+// The first-contact candidate name from a row's FIRM CELL — the cell after
+// the fieldwork date. Linked cells yield the piped display text (or the
+// target); a firm the table never linked (Freshwater's row links the News
+// Corp client instead) yields the cell's plain text. Anything else — empty,
+// markup wreckage over 60 chars — is no candidate at all.
+function firmCandidate(cell) {
+  let s = cell.replace(/<ref\b[\s\S]*?(?:<\/ref>|$)/g, "").replace(/<ref\b[^>]*\/>/g, "").replace(/\{\{[^{}]*\}\}/g, "").trim();
+  const l = s.match(/\[\[([^\]|]+?)(?:\|([^\]]+))?\]\]/);
+  if (!l) s = s.replace(/\[(?:https?:\/\/[^\s\]]+)\s*([^\]]*)\]/g, "$1").replace(/'''?/g, "").trim();
+  const name = (l ? (l[2] ?? l[1]) : s).trim();
+  return name.length >= 2 && name.length <= 60 ? name : null;
+}
+
 // Rows are chunks between |- separators. Only the voting-intention tables are
 // in scope: a leadership or preferred-PM table repeats the same houses and
 // dates and would double-count every wave.
 function parseWitness(text) {
-  const waves = [];
+  const waves = [], unknowns = [];
   let year = null, inVi = false;
   for (const chunk of text.split(/^\|-[^\n]*$/m)) {
     for (const h of chunk.matchAll(/^={2,4}\s*([^=]+?)\s*={2,4}\s*$/gm)) {
@@ -135,33 +205,53 @@ function parseWitness(text) {
     else if (/\|\}/.test(chunk)) inVi = false;
     if (!inVi) continue;
 
-    // Pollster: the first wikilink that maps to a house we track. Taking the
-    // link rather than the cell keeps refs, colspans and inline styling out.
-    let house = null, wikiName = null;
-    for (const l of chunk.matchAll(/\[\[([^\]|]+)(?:\|[^\]]*)?\]\]/g)) {
-      const key = l[1].trim().toLowerCase();
-      if (HOUSE[key]) { house = HOUSE[key]; wikiName = l[1].trim(); break; }
-    }
-    if (!house) continue;
-    const isMrp = /\bMRP\b/.test(chunk);
-
-    /* The fieldwork cell is the row's first cell that parses as a date.
-       It was a `!` header cell until Sep 2026, when the table's editors
-       made it a plain `|` cell with rowspan="2" (each poll now takes two
-       rows, the second carrying the flows-basis 2PP) — and for twelve days
-       this parsed zero waves and the watchdog reported "inconclusive",
-       which is green by design. So either cell kind is read, and the
-       count floor below is what turns the next such change into a class
-       that someone sees. */
-    let date = null;
-    for (const l of chunk.split("\n")) {
-      const c = l.match(/^[!|](?![-}])(.*)$/);
+    // Pollster: the first wikilink that maps to a house we track, matched on
+    // the link target OR its piped display text ([[Resolve (poll)|Resolve]],
+    // [[The Sydney Morning Herald#resolve|Resolve Political Monitor]] — the
+    // same house wearing client-side aliases). Failing that, the firm cell's
+    // PLAIN text is tried — DemosAU's, RedBridge/Accent's and Freshwater's
+    // cells are unlinked on the live table. Links are read only OUTSIDE
+    // <ref> tags and the downstream client cell: the citation's own
+    // publisher/work links ([[Nine Entertainment]], [[News Corp Australia]])
+    // and the client column are not the pollster.
+    const refStripped = chunk.replace(/<ref\b[\s\S]*?(?:<\/ref>|$)/g, "").replace(/<ref\b[^>]*\/>/g, "");
+    const lines = refStripped.split("\n");
+    let date = null, dateLine = -1;
+    for (let i = 0; i < lines.length; i++) {
+      const c = lines[i].match(/^[!|](?![-}])(.*)$/);
       if (!c) continue;
       const pipe = c[1].lastIndexOf("|");
       const d = endDate((pipe >= 0 ? c[1].slice(pipe + 1) : c[1]).trim(), year);
-      if (d) { date = d; break; }
+      if (d) { date = d; dateLine = i; break; }
     }
     if (!date || date <= CYCLE_START) continue;
+    let firmCell = null;
+    for (let j = dateLine + 1; j < lines.length; j++) {
+      if (/^[!|](?![-}])/.test(lines[j])) { firmCell = cellContent(lines[j]); break; }
+    }
+    let house = null, wikiName = null;
+    for (const l of (firmCell ?? refStripped).matchAll(/\[\[([^\]|]+?)(?:\|([^\]]+))?\]\]/g)) {
+      const hk = houseKey(l[1]), hd = l[2] ? houseKey(l[2]) : null;
+      if (HOUSE[hk] || (hd && HOUSE[hd])) {
+        house = HOUSE[hk] ?? HOUSE[hd];
+        wikiName = (l[2] ?? l[1]).trim();
+        break;
+      }
+    }
+    const firm = firmCell ? firmCandidate(firmCell) : null;
+    if (!house && firm && HOUSE[houseKey(firm)]) { house = HOUSE[houseKey(firm)]; wikiName = firm; }
+    const isMrp = /\bMRP\b/.test(chunk);
+
+    if (!house) {
+      /* First-contact candidate: only a row with vote figures is a poll
+         row — the table's colspan event annotations ("X resigns as
+         leader") carry a parseable date cell and party/person wikilinks
+         but never a % figure, and were the false candidates here until
+         this gate. The name is the firm cell's own — link display, link
+         target, or plain text for a firm the table never linked. */
+      if (/%/.test(chunk) && firm) unknowns.push({ name: firm, date, refs: refsOf(chunk) });
+      continue;
+    }
     waves.push({ date, house, wikiName, mrp: isMrp });
   }
   // The same wave can appear in more than one in-scope table.
@@ -171,7 +261,21 @@ function parseWitness(text) {
     if (seen.has(k)) continue;
     seen.add(k); out.push(w);
   }
-  return out;
+  // Unknown names likewise dedupe to one entry per name, dates newest first.
+  const byName = new Map(), unk = [];
+  for (const u of unknowns) {
+    const key = u.name.toLowerCase().replace(/\s+/g, " ");
+    const cur = byName.get(key) ?? { name: u.name, dates: [], refs: [] };
+    if (!cur.dates.includes(u.date)) cur.dates.push(u.date);
+    for (const r of u.refs) if (!cur.refs.includes(r) && cur.refs.length < 3) cur.refs.push(r);
+    byName.set(key, cur);
+  }
+  for (const u of byName.values()) {
+    u.dates.sort().reverse();
+    unk.push(u);
+  }
+  unk.sort((a, b) => (a.dates[0] < b.dates[0] ? 1 : -1));
+  return { waves: out, unknowns: unk };
 }
 
 // A house's own history is the only honest source for what "overdue" means:
@@ -185,7 +289,7 @@ function cadence(dates) {
   return gaps[Math.floor(gaps.length / 2)];
 }
 
-const status = { checked: todayLocal(), witness: "wikipedia", missing: [], overdue: [], houses: {}, witness_waves: 0, fallback_rows: 0, error: null };
+const status = { checked: todayLocal(), witness: "wikipedia", missing: [], overdue: [], houses: {}, witness_waves: 0, fallback_rows: 0, first_contact: [], error: null };
 
 try {
   const D = JSON.parse(readFileSync(OUT, "utf8"));
@@ -227,8 +331,27 @@ try {
 
   // ---- witness check (Wikipedia) -----------------------------------------
   const text = await fetchWiki();
-  const waves = parseWitness(text);
+  const { waves, unknowns } = parseWitness(text);
   status.witness_waves = waves.length;
+  /* An unlinked pollster cell is plain text, so its row can never resolve
+     through HOUSE — the candidate instead comes from the cell and the
+     known-name suppression here absorbs that house's aliases: every HOUSE
+     value variant, every HOUSE key ("freshwater strategy") the table
+     writes unlinked, and every canonical house name. Substring either way
+     ("Resolve" inside "The Sydney Morning Herald#resolve"-style leftovers
+     is impossible in a firm cell, but "uComms for Capital Brief" should
+     still surface — it does, no known name is a substring of it). */
+  const known = new Set();
+  const addKnown = (n) => { const k = houseKey(n); if (k) known.add(k); };
+  for (const h of byHouse.keys()) addKnown(h);
+  for (const variants of Object.values(HOUSE)) variants.forEach(addKnown);
+  Object.keys(HOUSE).forEach(addKnown);
+  const isKnownName = (name) => {
+    const k = houseKey(name);
+    for (const b of known) if (k.includes(b) || (k.length >= 4 && b.includes(k))) return true;
+    return false;
+  };
+  status.first_contact = unknowns.filter((u) => !isKnownName(u.name));
   if (waves.length < 20) throw new Error(`witness parsed only ${waves.length} waves — table layout may have changed`);
 
   for (const w of waves) {
@@ -280,6 +403,10 @@ if (!JSON_ONLY && !QUIET) {
       for (const h of status.overdue) console.log(`  ${h.house}: last ${h.last}, ${h.days_since}d ago (usually every ~${h.cadence_days}d) — ${h.verdict}`);
     }
   }
+  if (status.first_contact.length) {
+    console.log(`coverage: ${status.first_contact.length} pollster name${status.first_contact.length === 1 ? "" : "s"} on the witness table the tracker does not follow (first contact — not a gap):`);
+    for (const u of status.first_contact) console.log(`  ${u.name} — newest wave ${u.dates[0]}${u.refs.length ? `  (${u.refs[0]})` : ""}`);
+  }
 }
 // Leave the verdict on disk so build.mjs can report it without a network call
 // of its own — a build should never depend on Wikipedia being reachable.
@@ -288,6 +415,11 @@ try {
   writeFileSync(".build/logs/coverage-latest.json", JSON.stringify(status, null, 2) + "\n");
 } catch { /* the status line below is the real output */ }
 
+// The first-contact line rides every run — even a quiet one — so the
+// first-contact.yml gate has a stable parse target. Detection only: this
+// list is NEVER filtered by .build/first-contact-seen.json (the gate owns
+// suppression), and never feeds the exit code below.
+console.log("FIRST_CONTACT " + JSON.stringify(status.first_contact));
 console.log("COVERAGE_STATUS " + JSON.stringify(status));
 // Only a wave the witness can see and we cannot is worth an alarm. A house that
 // has genuinely gone quiet is reported above but must not fail the check, or

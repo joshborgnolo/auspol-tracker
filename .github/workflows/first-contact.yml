@@ -1,0 +1,263 @@
+# First-contact importer — fires an LLM session ONCE for each pollster name
+# that appears on the Wikipedia witness table and matches no tracked house.
+#
+# Detection lives in check-coverage.mjs: it parses the witness table and
+# emits a FIRST_CONTACT line with every untracked name (plus wave dates and
+# the row's source URLs), ALWAYS unfiltered — emission is detection, never a
+# decision. The two suppression layers:
+#
+#   1. this workflow's gate job: first-contact.mjs `pick` drops names the
+#      committed seen-file (.build/first-contact-seen.json) already records,
+#      keeps only shell-safe names, and caps a run at three;
+#   2. the seen-file itself is the fire-once memory: the gate records every
+#      fired name `pending` and pushes that to main BEFORE the session
+#      spends a cent, so tomorrow's run cannot refire.
+#
+# The contact job then runs one credential-free matilda session per name on
+# its own contact/<name>-<runid> branch (the agent reads
+# .build/first-contact-prompt.md): study the house's site, import every
+# current-cycle wave into polls.json, and leave a runnable-but-unwired
+# extract-<house>.mjs prototype plus a scout report for the human who pins
+# the house as a deterministic extractor afterwards. The branch goes up and
+# a ci-alert carries the one-click compare link (Actions may not open PRs
+# here); nothing reaches main or the site until a human merges it.
+#
+# A session that files nothing is NOT silent: the contact job flips the
+# name's seen-file verdict to `attempted` on main and files a ci-alert.
+# Retrying an attempted (or rejecting a pending) house is a deliberate human
+# edit of the seen-file — the machinery never refires on its own.
+
+name: first-contact
+
+on:
+  schedule:
+    - cron: '20 20 * * *' # ~06:20 Sydney, daily — ahead of the morning writers
+  workflow_dispatch:
+
+permissions:
+  contents: read # jobs declare what they need
+
+jobs:
+  # Detection + bookkeeping. Re-runs the witness check itself (seconds,
+  # read-only) rather than trusting a signal passed up from another job.
+  gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write # push the pending entries to main via push_main
+      issues: write # unsafe-name and breaker alerts
+      actions: read # the breaker counts earlier contact sessions
+    outputs:
+      fire: ${{ steps.pick.outputs.fire }}
+      names: ${{ steps.pick.outputs.names }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - name: Pin Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # Same rationale as the other agents: three spent sessions in 24h and
+      # this is a human-sized problem, not an API-credit bonfire. The
+      # contact job is a matrix fan-out and repair-gate counts its children.
+      - name: Circuit breaker
+        id: breaker
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .build/repair-gate.sh first-contact first-contact.yml contact
+
+      - name: Alert when the circuit breaker is tripped
+        if: steps.breaker.outputs.allowed == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash .build/alert-issue.sh \
+            "Repair circuit breaker: first-contact" \
+            "Three first-contact sessions in 24h and new pollster names keep coming — [run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). No further sessions this window; check the recent contact/* branches and .build/first-contact-seen.json."
+
+      - name: Detect new pollster names and record the fired ones
+        if: steps.breaker.outputs.allowed == 'true'
+        id: pick
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          node .build/check-coverage.mjs --quiet > "$RUNNER_TEMP/cov.log" 2>&1 || true
+          fc=$(grep '^FIRST_CONTACT ' "$RUNNER_TEMP/cov.log" | tail -n 1 | cut -d' ' -f2- || true)
+          [ -n "$fc" ] || fc='[]'
+          echo "witness FIRST_CONTACT: $fc"
+          picked=$(node .build/first-contact.mjs pick "$fc")
+          echo "gate pick: $picked"
+          names=$(printf '%s' "$picked" | node -e 'let s="";process.stdin.on("data",(d)=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(JSON.parse(s).names)))')
+          unsafe=$(printf '%s' "$picked" | node -e 'let s="";process.stdin.on("data",(d)=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(JSON.parse(s).unsafe)))')
+          fire=false
+          [ "$names" != "[]" ] && fire=true
+          echo "fire=$fire" >> "$GITHUB_OUTPUT"
+          echo "names=$names" >> "$GITHUB_OUTPUT"
+          echo "PICKED_NAMES=$names" >> "$GITHUB_ENV"
+          echo "UNSAFE_NAMES=$unsafe" >> "$GITHUB_ENV"
+
+      - name: Alert on names too hostile to interpolate safely
+        if: steps.breaker.outputs.allowed == 'true' && env.UNSAFE_NAMES != '[]'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash .build/alert-issue.sh \
+            "First-contact name needs manual adjudication" \
+            "check-coverage reported pollster name(s) whose characters are unsafe to hand to a shell or job matrix ([run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})):"$'\n\n'"${UNSAFE_NAMES}"$'\n\n'"Adjudicate by hand, then record a verdict in .build/first-contact-seen.json (\`node .build/first-contact.mjs ignore \"<name>\" <reason>\` once it is, so this alert stops)."
+
+      - name: Record the fired names as pending and push the seen-file
+        if: steps.pick.outputs.fire == 'true'
+        run: |
+          set -e
+          # NUL-separated read: names carry spaces and apostrophes, never NUL
+          mapfile -d '' NAMES < <(printf '%s' "$PICKED_NAMES" | node -e 'let s="";process.stdin.on("data",(d)=>s+=d).on("end",()=>{for(const n of JSON.parse(s))process.stdout.write(n+"\0")})')
+          for n in ${NAMES[@]+"${NAMES[@]}"}; do
+            node .build/first-contact.mjs pending "$n"
+          done
+          if git diff --quiet -- .build/first-contact-seen.json; then
+            echo "seen-file unchanged"; exit 0
+          fi
+          git add .build/first-contact-seen.json
+          git commit -m "first-contact: $(printf '%s' "$PICKED_NAMES" | node -e 'let s="";process.stdin.on("data",(d)=>s+=d).on("end",()=>process.stdout.write(JSON.parse(s).join(", ")))') pending import"
+          # Only the seen-file rides this push; a race rebuilds nothing.
+          LOG=/dev/null; log() { echo "$*"; }
+          source ./.build/git-push-main.sh
+          push_main "first-contact: pending import" .build/first-contact-seen.json
+
+  # One credential-free session per name, sequential (max-parallel: 1 AND a
+  # shared concurrency group: two ways of saying the same thing, because a
+  # missed one costs a parallel writer on polls.json).
+  contact:
+    needs: gate
+    if: needs.gate.outputs.fire == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        name: ${{ fromJSON(needs.gate.outputs.names) }}
+    concurrency:
+      group: first-contact
+      cancel-in-progress: false
+    permissions:
+      contents: write # push the review branch; flip attempted on main when empty
+      issues: write # the review request / attempted alert
+    env:
+      FC_NAME: ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0 (the branch step below strips the persisted credential; v6+ moves it)
+      - name: Pin Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install puppeteer-core (best effort, for the gated share-card redraw)
+        run: npm ci --ignore-scripts --no-audit --no-fund || true
+
+      - name: Re-read this house's witness entry (dates, source URLs)
+        id: entry
+        run: |
+          node .build/check-coverage.mjs --quiet > "$RUNNER_TEMP/cov.log" 2>&1 || true
+          fc=$(grep '^FIRST_CONTACT ' "$RUNNER_TEMP/cov.log" | tail -n 1 | cut -d' ' -f2- || true)
+          entry=$(FC_NAME="$FC_NAME" node -e 'let s="";process.stdin.on("data",(d)=>s+=d).on("end",()=>{const a=JSON.parse(s||"[]");const m=a.find((c)=>c.name===process.env.FC_NAME);process.stdout.write(JSON.stringify(m??{name:process.env.FC_NAME,dates:[],refs:[]}))})' <<< "$fc")
+          echo "witness entry: $entry"
+          echo "FIRST_CONTACT_ENTRY=$entry" >> "$GITHUB_ENV"
+
+      - name: Prepare a credential-free review branch
+        id: branch
+        run: |
+          slug=$(node .build/first-contact.mjs slug "$FC_NAME")
+          BRANCH="contact/${slug}-${GITHUB_RUN_ID}"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          git checkout -b "$BRANCH"
+          git config --unset-all http.https://github.com/.extraheader || true
+          git config --unset-all url."https://github.com/".insteadOf || true
+          git config --unset-all url."git@github.com:".insteadOf || true
+
+      # Pin the agent CLI: a floating @latest install means a tag move
+      # (compromised or accidental) changes the code that runs with
+      # MATILDA_API_KEY (same rationale as poll-agent.yml).
+      - name: Install Matilda CLI
+        run: npm i -g @maincode-ai/matilda-code@0.21.4
+
+      # Deliberately NO GITHUB_TOKEN here: the workflow owns every remote op.
+      - name: Run the first-contact import agent
+        env:
+          MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
+          CHROME: /usr/bin/google-chrome
+          GIT_TERMINAL_PROMPT: "0"
+          AUSPOL_PR_GATE: "1" # push_main in the wrappers leaves commits local
+          FIRST_CONTACT_HOUSE: ${{ matrix.name }}
+        run: |
+          if [ -z "$MATILDA_API_KEY" ]; then
+            echo "::warning::MATILDA_API_KEY secret not set; skipping the first-contact session. Add it in repo Settings > Secrets."
+            exit 0
+          fi
+          matilda -p "$(cat .build/first-contact-prompt.md)" --yolo --output-format text --max-wall-time 33m --max-tool-calls 120
+
+      # This repo does not let GitHub Actions open pull requests, so the
+      # branch goes up and a ci-alert issue carries the one-click link to
+      # open the PR as a human — the review this gate exists for.
+      - name: Push the review branch and ask for a review
+        if: steps.branch.outputs.branch != ''
+        id: review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if ! git log --oneline origin/main..HEAD | grep -q .; then
+            echo "filed=nothing" >> "$GITHUB_OUTPUT"
+            echo "the agent left no commits on this branch; the attempted bookkeeping follows"
+            exit 0
+          fi
+          echo "filed=commits" >> "$GITHUB_OUTPUT"
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x:%s' "$GH_TOKEN" | base64 -w0)" \
+            push origin "HEAD:${BRANCH}"
+          COMPARE="https://github.com/${GITHUB_REPOSITORY}/compare/main...${BRANCH}?expand=1"
+          BODY="$(printf '%s\n\n%s\n\n%s\n\n%s\n\n%s\n' \
+            "The first-contact agent pushed \`${BRANCH}\` for the untracked pollster **${FC_NAME}** the witness table surfaced — [run](${RUN_URL})." \
+            "**[Open the pull request](${COMPARE})** to review it. Nothing here has touched main or the live site; merging deploys the import and flips the seen-file verdict to \`imported\`." \
+            "Expected shape of an honest filing: polls.json rows for every current-cycle ${FC_NAME} wave, each corroborated against the cited source; the house's pollsterRules entry and check-coverage HOUSE mapping; the built artifacts from the normal validate+build path; an UNWIRED draft .build/extract-<house>.mjs prototype and a scout report (.build/first-contact-reports/) for whoever pins the deterministic extractor. No workflow or permissions changes. Reject anything else." \
+            "Once you decide the house deserves tracking, pin it like DemosAU/Spectre: extractor + updater + launchd plist + workflow + repair prompt, replacing the draft. Agent as scaffolding, not permanent infrastructure." \
+            "Delete the branch once it is merged or rejected.")"
+          bash .build/alert-issue.sh "First-contact import ready for review: ${FC_NAME}" "$BODY"
+          echo "review link: $COMPARE" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # Nothing filed is a verdict, not silence: flip the name to `attempted`
+      # on main (best-effort — `pending` suppresses refires just as well, so
+      # a lost race here only costs the record's accuracy) and say so.
+      - name: Record attempted when the session filed nothing
+        if: steps.review.outputs.filed == 'nothing'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          git fetch -q origin main
+          git checkout -q -B main origin/main
+          node .build/first-contact.mjs attempted "$FC_NAME" "$RUN_URL"
+          git add .build/first-contact-seen.json
+          git commit -m "first-contact: ${FC_NAME} attempted — the agent session filed nothing"
+          # the branch step stripped the persisted credential for the agent;
+          # the workflow owns this push, so it restores them first
+          git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(printf 'x:%s' "$GH_TOKEN" | base64 -w0)"
+          LOG=/dev/null; log() { echo "$*"; }
+          source ./.build/git-push-main.sh
+          push_main "first-contact: ${FC_NAME} attempted" .build/first-contact-seen.json \
+            || echo "::warning::the attempted flip lost its push race; ${FC_NAME} stays pending, which suppresses refires just the same"
+          bash .build/alert-issue.sh \
+            "First-contact import filed nothing: ${FC_NAME}" \
+            "The first-contact session for **${FC_NAME}** left no commits — [run](${RUN_URL}). Its seen-file verdict is \`attempted\` and it will not refire. To retry, adjudicate by hand: reset or remove the entry in .build/first-contact-seen.json, or \`node .build/first-contact.mjs ignore \"${FC_NAME}\" <reason>\` to close it out."

@@ -381,8 +381,9 @@ jobs:
 
           # 1. Off-limits in code: CI, dependency manifests, the domain, the
           #    clock and laptop installers, and the repair machinery itself —
-          #    an agent must not edit its own breaker, gate or prompts.
-          if echo "$CHANGED" | grep -E '^(\.github/|CNAME$|package\.json$|package-lock\.json$|\.nvmrc$|\.build/dispatch-clock/|\.build/launchd/|\.build/install-launchd\.sh$|\.build/repair-gate\.sh$|\.build/alert-issue\.sh$|\.build/resolve-alerts\.sh$|\.build/classify-failure\.mjs$|\.build/transient-streak\.sh$|\.build/[a-z0-9-]*repair-prompt\.md$|\.build/newspoll-file-missing-prompt\.md$)' | grep -q .; then
+          #    an agent must not edit its own breaker, gate or prompts (nor
+          #    the first-contact machinery: its state file and its prompt).
+          if echo "$CHANGED" | grep -E '^(\.github/|CNAME$|package\.json$|package-lock\.json$|\.nvmrc$|\.build/dispatch-clock/|\.build/launchd/|\.build/install-launchd\.sh$|\.build/repair-gate\.sh$|\.build/alert-issue\.sh$|\.build/resolve-alerts\.sh$|\.build/classify-failure\.mjs$|\.build/transient-streak\.sh$|\.build/[a-z0-9-]*repair-prompt\.md$|\.build/newspoll-file-missing-prompt\.md$|\.build/first-contact-(prompt\.md|mjs|seen\.json)$)' | grep -q .; then
             block "repair commits touch forbidden paths"
           fi
           if echo "$CHANGED" | grep -q '^\.build/logs/'; then

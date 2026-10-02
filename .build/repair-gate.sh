@@ -46,9 +46,11 @@ ids="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/workflows/${workflo
 
 count=0
 for id in $ids; do
+  # A matrix fan-out renames the job "job (value)" — count those children too,
+  # or a matrix agent job's sessions score zero and the breaker never trips.
   ran="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${id}/jobs" \
-    --jq "[.jobs[] | select(.name == \"${job}\" and (.conclusion == \"success\" or .conclusion == \"failure\"))] | length" 2>/dev/null)" || ran=0
-  [ "${ran:-0}" -gt 0 ] && count=$((count + 1))
+    --jq "[.jobs[] | select((.name == \"${job}\" or (.name | startswith(\"${job} (\"))) and (.conclusion == \"success\" or .conclusion == \"failure\"))] | length" 2>/dev/null)" || ran=0
+  [ "${ran:-0}" -gt 0 ] && count=$((count + ran))
 done
 
 echo "agent sessions for ${label} in the last 24h: ${count} (breaker trips at ${max})"

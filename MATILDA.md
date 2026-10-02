@@ -94,6 +94,31 @@ a GENERATED build artifact — never hand-edit it.
   for twelve days. Both now read either layout, pinned by
   `test-coverage.mjs` and `test-news24-wiki.mjs`; a future change is fixed
   in the parser AND pinned with a new fixture form.
+  check-coverage also reads the table's PLAIN-TEXT firm cells (DemosAU's
+  and RedBridge/Accent's rows are unlinked) to gap-check those houses,
+  and emits every name it cannot map as FIRST_CONTACT {json} +
+  status.first_contact — ALWAYS unfiltered; detection, never a decision.
+- FIRST CONTACT, when a pollster canon has never seen appears on the
+  witness table: the daily `first-contact.yml` gate is the decision
+  layer. `node .build/first-contact.mjs pick` drops names the committed
+  `.build/first-contact-seen.json` already records and any shell-hostile
+  name (those get a deduped ci-alert instead), caps a run at three,
+  records the fired ones `pending`, and pushes that file via push_main —
+  the fire-once memory (repair-gate's 3-sessions-a-day breaker guards
+  the spend). One credential-free `contact/<name>-<runid>` branch per
+  name, sequential: the agent (`.build/first-contact-prompt.md`, modelled
+  on the Newspoll filer's) studies the house, imports every corroborable
+  current-cycle wave (adding its pollsterRules entry and check-coverage
+  HOUSE alias so validate and the watchdog accept it), and leaves an
+  UNWIRED `extract-<house>.mjs` prototype plus a scout report in
+  `.build/first-contact-reports/`; the workflow pushes the branch and
+  files the review-request ci-alert, and merging flips the verdict to
+  `imported`. Nothing filed → `attempted` + ci-alert; retrying or
+  closing out is a human edit of the seen file (`ignore` verb to close),
+  never a refire. Pinning the deterministic pipeline afterwards (the
+  extractor + updater + plist + workflow + repair-prompt kit, modelled
+  on Spectre's a584829) is human work — agent as scaffolding, not
+  permanent infrastructure.
 - `news24-update.yml` (2026-09-22) runs the YouGov updater in the cloud —
   Chrome leg off under GITHUB_ACTIONS; the launchd job with Chrome upgrades
   News24-only rows in place later.
