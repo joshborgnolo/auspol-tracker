@@ -2380,6 +2380,28 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   let SM = 1;
   rows.forEach((r) => r.s.forEach((d) => { SM = Math.max(SM, Math.ceil(Math.abs(d.v) - 0.05)); }));
   const ms = rdApMonths("2025-06");
+  /* the Trend-significance fold: has any pollster's lean DRIFTED across the
+     months since the election? One straight line per pollster through its
+     own monthly readings, as the sparklines draw them (a within-house fit
+     with a single house is that line), t-tested, Holm's correction across
+     the pollsters on show. Recomputed with the view, as the rows are. */
+  const hlFits = rows.map((r) => {
+    const pts = r.s.filter((d) => ms.includes(d.ym));
+    return { r, pts, fit: withinHouseSlope(pts.map((d) => ({ h: r.h, t: D.mx(d.ym), w: 1, y: d.v }))) };
+  });
+  const hlTested = hlFits.filter((f) => f.fit);
+  const hlSig = [];
+  for (const [i, f] of [...hlTested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+    if (f.fit.p >= 0.05 / (hlTested.length - i)) break;
+    hlSig.push(f);
+  }
+  const hlTsig = {
+    key,
+    rows: hlFits.map((f) => ({ key: f.r.h, name: f.r.h, sig: hlSig.includes(f),
+      cells: [f.pts.length ? rdTsSgn(f.pts[0].v) + " → " + rdTsSgn(f.pts[f.pts.length - 1].v) : "–",
+        f.fit ? rdTsSgn(f.fit.b, true) : "–", f.fit ? rdTsSgn(f.fit.t) : "–",
+        f.fit ? (hlSig.includes(f) ? "Yes" : "No") : "–"] })),
+  };
   /* the two-ended measures: a lean is towards one side or the other */
   const split = view === "split";
   const two = view === "tpp" || split;
@@ -2516,6 +2538,11 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
           </div>
         ))}
       </div>
+      <RdTsig summary="Trend-significance table"
+        heads={["Pollster", "Lean, first → last", "Slope, pts/yr", "t", "Significant"]}
+        sets={[hlTsig]}
+        note={"Each row’s slope is a straight line through that pollster’s own monthly leans since the election, as the sparklines above draw them, t-tested against zero; Holm’s correction is applied across the " + (hlTested.length === 1 ? "pollster" : hlTested.length + " pollsters") + " on show, so Yes means a lean is drifting, not just sitting off-centre."}
+      />
       <RdFoot how={{ term: "house-lean", from: "How each pollster leans" }}>
         A pollster’s lean is its average gap to the other pollsters polling within four weeks of it{view === "tpp" && !pub ? ", all read through the same preference flows" : ""}, with recent polls counting most. One with few polls is pulled towards zero until its record builds.{view === "tpp" && !pub ? " Because every poll uses the same flows, a lean comes from a pollster’s primary votes, not from how it allocates preferences." : ""}
         {split ? ` Here it is the pollster’s lean on One Nation’s vote less its lean on the Coalition’s${sizeMax < maxAbs / 2 ? `; added together, the two mostly cancel, and no pollster reads the parties’ combined vote more than ${sizeMax.toFixed(1)} points off the others` : ""}.` : null}
@@ -2650,6 +2677,16 @@ function RdFlows() {
         <span className="rd-key-item"><span className="rd-fl-keydot" aria-hidden="true"></span>One pollster’s gap that month</span>
         <span className="rd-key-item"><span className="rd-fl-keynow" aria-hidden="true"><i></i></span>Now: the latest weeks pooled, with its 95% interval</span>
       </RdKey>
+      <RdTsig summary="Trend-significance table"
+        heads={["Contest", "Published minus implied, now", "95% interval", "z", "Significant"]}
+        sets={[{ key: "now", rows: [
+          { key: "co", name: "Against the Coalition", sig: outC,
+            cells: [rdTsSgn(nC.v, true), "±" + nC.ci95.toFixed(1), rdTsSgn(nC.v / (nC.ci95 / 1.96)), outC ? "Yes" : "No"] },
+          { key: "on", name: "Against One Nation", sig: outO,
+            cells: [rdTsSgn(nO.v, true), "±" + nO.ci95.toFixed(1), rdTsSgn(nO.v / (nO.ci95 / 1.96)), outO ? "Yes" : "No"] },
+        ] }]}
+        note={"Yes is exactly the headline’s test above: the pooled “now” gap against its 95% interval, with z the gap divided by the standard error the interval implies, so this table cannot disagree with it. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the footer says, not the election."}
+      />
       <RdFoot how={{ term: "preference-flows", from: "Preference flows" }}>
         Each pollster is measured against its own habits: its polls in the six months after the election, or its first polls if it started later, so its usual way of allocating preferences counts as zero. No count of Labor v One Nation preferences exists, so that chart shows drift since each pollster’s first head-to-heads. This check corrects no other figure on the page.
       </RdFoot>

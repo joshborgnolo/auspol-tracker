@@ -3480,4 +3480,4 @@ function RdUndecided({ rangeId }) {
   );
 }
 
-Object.assign(window, { RdPrimary, rdShareWords, rdPartyIn, rdPartyStart, rdElectionTicks, RdLeadership, RdHeadBar, RdDirection, rdList, rdRoughPts, RdDemographics, RdSwitching, useRdWidth, RdIssues, RdUndecided, RdShiftPlot, rdOneIn });
+Object.assign(window, { RdPrimary, rdShareWords, rdPartyIn, rdPartyStart, rdElectionTicks, RdLeadership, RdHeadBar, RdDirection, rdList, rdRoughPts, RdDemographics, RdSwitching, useRdWidth, RdIssues, RdUndecided, RdShiftPlot, rdOneIn, RdTsig, rdTsSgn });

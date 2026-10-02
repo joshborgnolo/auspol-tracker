@@ -74258,7 +74258,9 @@ Object.assign(window, {
   RdIssues,
   RdUndecided,
   RdShiftPlot,
-  rdOneIn
+  rdOneIn,
+  RdTsig,
+  rdTsSgn
 });</script>
   <script>const RD_PL_FACETS = [{
   id: "twopp",
@@ -80647,6 +80649,34 @@ function RdHouseLean({
     SM = Math.max(SM, Math.ceil(Math.abs(d.v) - 0.05));
   }));
   const ms = rdApMonths("2025-06");
+  const hlFits = rows.map(r => {
+    const pts = r.s.filter(d => ms.includes(d.ym));
+    return {
+      r,
+      pts,
+      fit: withinHouseSlope(pts.map(d => ({
+        h: r.h,
+        t: D.mx(d.ym),
+        w: 1,
+        y: d.v
+      })))
+    };
+  });
+  const hlTested = hlFits.filter(f => f.fit);
+  const hlSig = [];
+  for (const [i, f] of [...hlTested].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+    if (f.fit.p >= 0.05 / (hlTested.length - i)) break;
+    hlSig.push(f);
+  }
+  const hlTsig = {
+    key,
+    rows: hlFits.map(f => ({
+      key: f.r.h,
+      name: f.r.h,
+      sig: hlSig.includes(f),
+      cells: [f.pts.length ? rdTsSgn(f.pts[0].v) + " → " + rdTsSgn(f.pts[f.pts.length - 1].v) : "–", f.fit ? rdTsSgn(f.fit.b, true) : "–", f.fit ? rdTsSgn(f.fit.t) : "–", f.fit ? hlSig.includes(f) ? "Yes" : "No" : "–"]
+    }))
+  };
   const split = view === "split";
   const two = view === "tpp" || split;
   const partyName = {
@@ -80913,7 +80943,12 @@ function RdHouseLean({
   }, rdApSigned(r.v)), !phone && React.createElement("span", null), React.createElement("span", {
     role: "cell",
     className: "rd-hl-sc"
-  }, spark(r))))), React.createElement(RdFoot, {
+  }, spark(r))))), React.createElement(RdTsig, {
+    summary: "Trend-significance table",
+    heads: ["Pollster", "Lean, first → last", "Slope, pts/yr", "t", "Significant"],
+    sets: [hlTsig],
+    note: "Each row’s slope is a straight line through that pollster’s own monthly leans since the election, as the sparklines above draw them, t-tested against zero; Holm’s correction is applied across the " + (hlTested.length === 1 ? "pollster" : hlTested.length + " pollsters") + " on show, so Yes means a lean is drifting, not just sitting off-centre."
+  }), React.createElement(RdFoot, {
     how: {
       term: "house-lean",
       from: "How each pollster leans"
@@ -81200,7 +81235,25 @@ function RdFlows() {
   }, React.createElement("span", {
     className: "rd-fl-keynow",
     "aria-hidden": "true"
-  }, React.createElement("i", null)), "Now: the latest weeks pooled, with its 95% interval")), React.createElement(RdFoot, {
+  }, React.createElement("i", null)), "Now: the latest weeks pooled, with its 95% interval")), React.createElement(RdTsig, {
+    summary: "Trend-significance table",
+    heads: ["Contest", "Published minus implied, now", "95% interval", "z", "Significant"],
+    sets: [{
+      key: "now",
+      rows: [{
+        key: "co",
+        name: "Against the Coalition",
+        sig: outC,
+        cells: [rdTsSgn(nC.v, true), "±" + nC.ci95.toFixed(1), rdTsSgn(nC.v / (nC.ci95 / 1.96)), outC ? "Yes" : "No"]
+      }, {
+        key: "on",
+        name: "Against One Nation",
+        sig: outO,
+        cells: [rdTsSgn(nO.v, true), "±" + nO.ci95.toFixed(1), rdTsSgn(nO.v / (nO.ci95 / 1.96)), outO ? "Yes" : "No"]
+      }]
+    }],
+    note: "Yes is exactly the headline’s test above: the pooled “now” gap against its 95% interval, with z the gap divided by the standard error the interval implies, so this table cannot disagree with it. The One Nation contest’s zero is each pollster’s first published head-to-heads, as the footer says, not the election."
+  }), React.createElement(RdFoot, {
     how: {
       term: "preference-flows",
       from: "Preference flows"
