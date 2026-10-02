@@ -1,9 +1,9 @@
 ---
 name: ci-main-writer-races
-description: auspol-tracker — how writers (CI updaters, the laptop's launchd copies, agent repairs, humans) stay safe pushing to one main. Since 2026-09-25 there is NO shared concurrency group: each workflow queues in its own (poll-agent.yml's writers-<house>), and .build/git-push-main.sh push_main() resolves every push race — generated files rebuilt not merged, one wrapper re-run on a data conflict, "FAIL push race" (classified transient) only when a race is lost twice. GOTCHA: git-push-main.sh is a SOURCED library, not a script — `bash`-ing it exits 0 and pushes NOTHING; agent/human sessions push with plain `git push origin HEAD:main` (rebase+rebuild+amend by hand on a lost race). A dirty shared checkout breaks push_main's rung-1 rebase (no autostash — log says "conflicted on data" but means "You have unstaged changes"): recover via a detached-worktree cherry-pick + rebuild + push, then MIXED (never --hard) reset the checkout, or rebase with `-c rebase.autoStash=true`. Adding a writer? Its own group, and push through push_main. Never re-add a shared group.
+description: auspol-tracker — how writers (CI updaters, the laptop's launchd copies, agent repairs, humans) stay safe pushing to one main. Since 2026-09-25 there is NO shared concurrency group: each workflow queues in its own (poll-agent.yml's writers-<house>), and .build/git-push-main.sh push_main() resolves every push race — generated files rebuilt not merged, one wrapper re-run on a data conflict, "FAIL push race" (classified transient) only when a race is lost twice. HAZARD (2026-10-02): the rung-1 regen merge attributes cover `.build/newtracker/assets/**` SOURCE layers, so a racing commit touching the same rd-*/source file makes the blind driver silently KEEP ORIGIN'S version and rung 2 rebuilds index.html from the dropped source — the pushed commit's message describes a change its tree lacks (40a5f95); ALWAYS `git show origin/main:<source> | grep <marker>` after a rebase-path push and re-land on a zero. GOTCHA: git-push-main.sh is a SOURCED library, not a script — `bash`-ing it exits 0 and pushes NOTHING; agent/human sessions push with plain `git push origin HEAD:main` (rebase+rebuild+amend by hand on a lost race). A dirty shared checkout breaks push_main's rung-1 rebase (no autostash — log says "conflicted on data" but means "You have unstaged changes"): recover via a detached-worktree cherry-pick + rebuild + push, then MIXED (never --hard) reset the checkout, or rebase with `-c rebase.autoStash=true`. Adding a writer? Its own group, and push through push_main. Never re-add a shared group.
 source: auto-skill
 extracted_at: '2026-09-04T13:36:12.593Z'
-updated_at: '2026-09-28'
+updated_at: '2026-10-02'
 ---
 
 # Writers racing origin/main
@@ -55,6 +55,33 @@ rebuilt index.html), so the retry failed exactly when it was needed (DemosAU, 20
    - `.build/test-push-main.mjs` races two clones through every rung (different files,
      side-by-side rows, the same row, a race lost twice, AUSPOL_PR_GATE, the runner-clone
      heal). A mutation check: drop the merge driver and scenario A needs a re-run.
+
+## HAZARD: the regen list covers SOURCE assets — a race can silently drop your source edit
+
+`push_main_regen_attrs` lists `.build/newtracker/assets/**` — which holds the rd-*.jsx /
+rd.css / plain-JS SOURCE layers, not just built outputs. So when a racing commit touches
+the same source file (2026-10-02: my `flexGrow` gate in rd-panels.jsx vs the sibling's
+`77bc61c` in the same file), rung 1's blind `merge.auspol-regen.driver=true` KEEPS
+ORIGIN'S VERSION — the local source hunk is dropped WITHOUT a conflict and WITHOUT any
+log line — and rung 2 then rebuilds index.html from the dropped source. The push succeeds
+and the commit's MESSAGE describes a change its TREE does not carry (40a5f95 shipped
+message-without-fix; 0fd47c5 re-landed the source on the new base). Only `.matilda/**`
+content in the same commit was safe (not in the regen list).
+
+**After ANY push_main run (or hand replay of its rungs) that took the rebase path**,
+verify the source survived before reporting done:
+
+```bash
+git fetch -q origin
+git show origin/main:<source-file> | grep -c '<your marker>'   # must be > 0
+git show origin/main:index.html     | grep -c '<your marker>'  # compiled line, if rebuilt
+```
+
+A zero from the first command means the regen driver ate the hunk: re-apply the edit on
+the new origin/main tip, rebuild, re-verify, commit and push again. (An interactive
+session pushing plainly and rebasing by hand never registers the regen driver, so its
+rebase would CONFLICT on the same-file source touch — the silent form is specific to
+push_main callers and sessions that replicate its `-c core.attributesFile` dance.)
 
 ## Agent/human sessions push DIRECTLY — `bash`-ing the file is a silent no-op
 
