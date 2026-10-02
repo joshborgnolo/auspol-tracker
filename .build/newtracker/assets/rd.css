@@ -183,6 +183,8 @@ body.rd .rd-key {
 }
 body.rd .rd-key-item { display: inline-flex; align-items: center; gap: 8px; }
 body.rd .rd-key-item svg { flex-shrink: 0; display: block; }
+body.rd a.rd-key-item { color: var(--ink-2); text-decoration: none; }
+body.rd a.rd-key-item:hover { color: var(--ink); text-decoration: underline; }
 body.rd .rd-note { margin: 12px 0 0; max-width: 900px; font-size: 13px; line-height: 1.5; color: var(--ink-3); }
 body.rd .rd-foot {
   margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line);

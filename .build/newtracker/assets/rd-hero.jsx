@@ -211,6 +211,15 @@ function RdHero(p) {
   const extAvail = (isCoal && !!(extBt || extKb)) || (isOn && !!extSh);
   const extOn = showExt && extAvail && !morph;
   const extBox = "Compare outside estimates";
+  /* the key entries name the publisher, carry his CURRENT figure, and link
+     out to where he publishes (RdKey grows an href branch for them) */
+  const extFig = (pts) => pts && pts.length ? " (" + pts[pts.length - 1].y.toFixed(1) + "%)" : "";
+  const extBtHref = "https://" + (ext && ext.bt && ext.bt.feed ? ext.bt.feed : "");
+  const extKbHref = "https://" + (ext && ext.bonham && ext.bonham.site ? ext.bonham.site : "");
+  const lblExtBt = "BludgerTrack’s estimate" + extFig(extBt) + ", as published";
+  const lblExtBtNar = "BludgerTrack’s estimate" + extFig(extBt);
+  const lblExtKb = "Bonham’s estimate" + extFig(extKb);
+  const lblExtSh = "Bonham’s estimate" + extFig(extSh);
 
   const series = [];
   if (otherRows && otherRows.length > 1)
@@ -233,13 +242,13 @@ function RdHero(p) {
      pairing */
   if (extOn) {
     if (isCoal && extKb)
-      series.push({ id: "kbonham", label: "Bonham", color: EXT_KB, rdWidth: 1.5, endCap: false,
+      series.push({ id: "kbonham", label: "Bonham’s estimate", color: EXT_KB, rdWidth: 1.5, endCap: false,
                     points: filterPts(extKb, xDomain[0]), endLabel: null });
     if (isOn && extSh)
-      series.push({ id: "kbsh", label: "Bonham", color: EXT_KB, rdWidth: 1.5, endCap: false,
+      series.push({ id: "kbsh", label: "Bonham’s estimate", color: EXT_KB, rdWidth: 1.5, endCap: false,
                     points: filterPts(extSh, xDomain[0]), endLabel: null });
     if (isCoal && extBt)
-      series.push({ id: "btrack", label: "BludgerTrack", color: EXT_BT, rdWidth: 1.5, endCap: false,
+      series.push({ id: "btrack", label: "BludgerTrack’s estimate", color: EXT_BT, rdWidth: 1.5, endCap: false,
                     points: filterPts(extBt, xDomain[0]), endLabel: null });
   }
   if (adjusted || morph)
@@ -418,9 +427,9 @@ function RdHero(p) {
       label: (narrow ? "Monthly" : "Monthly average") + (bandPts.length >= 2 ? (flowsBand ? (narrow ? ", flow range" : " and flow range") : (narrow ? ", 95% interval" : " and its 95% interval")) : "") } : null,
     (!narrow && labelOther) ? { kind: "line", color: otherCol, label: labelOther + ", monthly average" } : null,
     cmpOn ? { kind: "dash", color: mainCol, label: cmpName + ", monthly average" } : null,
-    extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: "BludgerTrack, as published" } : null,
-    extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: "Bonham" } : null,
-    extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: "Bonham" } : null,
+    extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBt, href: extBtHref } : null,
+    extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: lblExtKb, href: extKbHref } : null,
+    extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: lblExtSh, href: extKbHref } : null,
     sensOn ? { kind: "band", color: "var(--lnp)", label: "Range if One Nation preferences flowed as in 2022" } : null,
     ringOn ? { kind: "ring", label: narrow ? "2025 election" : "2025 election result" } : null,
   ];
@@ -434,9 +443,9 @@ function RdHero(p) {
       label: labelMain + ", monthly average" + (bandPts.length >= 2 ? (flowsBand ? " and flow range" : " and its 95% interval") : "") } : null,
     labelOther ? { kind: "line", color: otherCol, label: labelOther + ", monthly average" } : null,
     cmpOn ? { kind: "dashed", color: mainCol, label: cmpName + ", monthly average" } : null,
-    extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: "BludgerTrack, as published" } : null,
-    extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: "Bonham" } : null,
-    extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: "Bonham" } : null,
+    extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBt } : null,
+    extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: lblExtKb } : null,
+    extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: lblExtSh } : null,
     sensOn ? { kind: "shade", color: "var(--lnp)", label: "Range if One Nation preferences flowed as in 2022" } : null,
     ringOn && narrow ? { kind: "ring", color: "var(--ink)", label: "2025 election result" } : null,
   ].filter(Boolean);
@@ -613,9 +622,9 @@ function RdHero(p) {
             { kind: "line", color: mainCol, label: labelMain },
             labelOther ? { kind: "line", color: otherCol, label: labelOther } : null,
             cmpOn ? { kind: "dash", color: mainCol, label: cmpName } : null,
-            extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: "BludgerTrack" } : null,
-            extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: "Bonham" } : null,
-            extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: "Bonham" } : null,
+            extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBtNar, href: extBtHref } : null,
+            extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: lblExtKb, href: extKbHref } : null,
+            extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: lblExtSh, href: extKbHref } : null,
           ]} />
         )}
         <TrendChart

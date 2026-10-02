@@ -3087,6 +3087,8 @@ body.rd .rd-key {
 }
 body.rd .rd-key-item { display: inline-flex; align-items: center; gap: 8px; }
 body.rd .rd-key-item svg { flex-shrink: 0; display: block; }
+body.rd a.rd-key-item { color: var(--ink-2); text-decoration: none; }
+body.rd a.rd-key-item:hover { color: var(--ink); text-decoration: underline; }
 body.rd .rd-note { margin: 12px 0 0; max-width: 900px; font-size: 13px; line-height: 1.5; color: var(--ink-3); }
 body.rd .rd-foot {
   margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line);
@@ -68339,15 +68341,25 @@ function RdKey({
   children,
   className
 }) {
-  return React.createElement("div", {
-    className: "rd-key" + (className ? " " + className : "")
-  }, items.filter(Boolean).map((it, i) => React.createElement("span", {
+  const item = (it, i) => it.href ? React.createElement("a", {
+    key: i,
+    className: "rd-key-item",
+    href: it.href,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, React.createElement(RdSwatch, {
+    kind: it.kind,
+    color: it.color
+  }), it.label) : React.createElement("span", {
     key: i,
     className: "rd-key-item"
   }, React.createElement(RdSwatch, {
     kind: it.kind,
     color: it.color
-  }), it.label)), children);
+  }), it.label);
+  return React.createElement("div", {
+    className: "rd-key" + (className ? " " + className : "")
+  }, items.filter(Boolean).map((it, i) => item(it, i)), children);
 }
 function RdHow({
   term,
@@ -69018,6 +69030,13 @@ function RdHero(p) {
   const extAvail = isCoal && !!(extBt || extKb) || isOn && !!extSh;
   const extOn = showExt && extAvail && !morph;
   const extBox = "Compare outside estimates";
+  const extFig = pts => pts && pts.length ? " (" + pts[pts.length - 1].y.toFixed(1) + "%)" : "";
+  const extBtHref = "https://" + (ext && ext.bt && ext.bt.feed ? ext.bt.feed : "");
+  const extKbHref = "https://" + (ext && ext.bonham && ext.bonham.site ? ext.bonham.site : "");
+  const lblExtBt = "BludgerTrack’s estimate" + extFig(extBt) + ", as published";
+  const lblExtBtNar = "BludgerTrack’s estimate" + extFig(extBt);
+  const lblExtKb = "Bonham’s estimate" + extFig(extKb);
+  const lblExtSh = "Bonham’s estimate" + extFig(extSh);
   const series = [];
   if (otherRows && otherRows.length > 1) series.push({
     id: "other",
@@ -69048,7 +69067,7 @@ function RdHero(p) {
   if (extOn) {
     if (isCoal && extKb) series.push({
       id: "kbonham",
-      label: "Bonham",
+      label: "Bonham’s estimate",
       color: EXT_KB,
       rdWidth: 1.5,
       endCap: false,
@@ -69057,7 +69076,7 @@ function RdHero(p) {
     });
     if (isOn && extSh) series.push({
       id: "kbsh",
-      label: "Bonham",
+      label: "Bonham’s estimate",
       color: EXT_KB,
       rdWidth: 1.5,
       endCap: false,
@@ -69066,7 +69085,7 @@ function RdHero(p) {
     });
     if (isCoal && extBt) series.push({
       id: "btrack",
-      label: "BludgerTrack",
+      label: "BludgerTrack’s estimate",
       color: EXT_BT,
       rdWidth: 1.5,
       endCap: false,
@@ -69307,15 +69326,18 @@ function RdHero(p) {
   } : null, extOn && isCoal && extBt ? {
     kind: "line",
     color: EXT_BT,
-    label: "BludgerTrack, as published"
+    label: lblExtBt,
+    href: extBtHref
   } : null, extOn && isCoal && extKb ? {
     kind: "line",
     color: EXT_KB,
-    label: "Bonham"
+    label: lblExtKb,
+    href: extKbHref
   } : null, extOn && isOn && extSh ? {
     kind: "line",
     color: EXT_KB,
-    label: "Bonham"
+    label: lblExtSh,
+    href: extKbHref
   } : null, sensOn ? {
     kind: "band",
     color: "var(--lnp)",
@@ -69339,15 +69361,15 @@ function RdHero(p) {
   } : null, extOn && isCoal && extBt ? {
     kind: "line",
     color: EXT_BT,
-    label: "BludgerTrack, as published"
+    label: lblExtBt
   } : null, extOn && isCoal && extKb ? {
     kind: "line",
     color: EXT_KB,
-    label: "Bonham"
+    label: lblExtKb
   } : null, extOn && isOn && extSh ? {
     kind: "line",
     color: EXT_KB,
-    label: "Bonham"
+    label: lblExtSh
   } : null, sensOn ? {
     kind: "shade",
     color: "var(--lnp)",
@@ -69608,15 +69630,18 @@ function RdHero(p) {
     } : null, extOn && isCoal && extBt ? {
       kind: "line",
       color: EXT_BT,
-      label: "BludgerTrack"
+      label: lblExtBtNar,
+      href: extBtHref
     } : null, extOn && isCoal && extKb ? {
       kind: "line",
       color: EXT_KB,
-      label: "Bonham"
+      label: lblExtKb,
+      href: extKbHref
     } : null, extOn && isOn && extSh ? {
       kind: "line",
       color: EXT_KB,
-      label: "Bonham"
+      label: lblExtSh,
+      href: extKbHref
     } : null]
   }), React.createElement(TrendChart, {
     key: "rd-hero",

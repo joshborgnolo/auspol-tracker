@@ -671,11 +671,12 @@ function RdSwatch({ kind = "line", color = "var(--ink-3)" }) {
 }
 
 function RdKey({ items, children, className }) {
+  const item = (it, i) => it.href
+    ? <a key={i} className="rd-key-item" href={it.href} target="_blank" rel="noopener noreferrer"><RdSwatch kind={it.kind} color={it.color} />{it.label}</a>
+    : <span key={i} className="rd-key-item"><RdSwatch kind={it.kind} color={it.color} />{it.label}</span>;
   return (
     <div className={"rd-key" + (className ? " " + className : "")}>
-      {items.filter(Boolean).map((it, i) => (
-        <span key={i} className="rd-key-item"><RdSwatch kind={it.kind} color={it.color} />{it.label}</span>
-      ))}
+      {items.filter(Boolean).map((it, i) => item(it, i))}
       {children}
     </div>
   );
