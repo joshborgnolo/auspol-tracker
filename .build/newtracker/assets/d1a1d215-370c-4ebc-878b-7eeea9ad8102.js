@@ -7097,21 +7097,21 @@ function infoTerms(D) {
       {" "}<a className="fb-link" href="/feedback/">report it</a>.</>) },
   ];
 
-  /* What the site is and how to follow it. Only facts the site already
-     states elsewhere (footer, feed, archives) – nothing about who runs it or
-     how the data may be reused until the owner says. */
+  /* What the site is and how to follow it. */
   const about = (
     <>
       <p className="info-about-p">auspol tracker is an unofficial aggregate of Australian federal
-      voting-intention polls. It runs no polls of its own: it collects what the pollsters publish,
-      adjusts for each pollster’s known lean, and shows its working. Every figure is an
-      estimate.</p>
-      <p className="info-about-p"><b>Updates.</b> New polls are added as they are released, most
-      by automated checks that run through the week, and every figure is rebuilt when one
-      lands.</p>
+      political polls. It collects published polls, adjusts them for the pollster’s lean, weights
+      them by recency, and uses them to derive aggregate estimates. To be clear, the site does not
+      conduct polls of its own but just aggregates those published by others. It aims to cut through
+      the noise and provide a clear view of Australian political sentiment, of how Australians
+      intend to vote, and on their views on leaders, issues, and our country’s direction.</p>
+      <p className="info-about-p"><b>Updates.</b> New polls are added as they are released, mostly
+      by automated checks but also manually by me (some guy). Every figure is rebuilt when a new
+      poll lands.</p>
       <p className="info-about-p"><b>Following along.</b> The <a className="fb-link" href="feed.xml">RSS feed</a> lists
       each new poll as it is added, with a link to the pollster’s own release.</p>
-      <p className="info-about-p"><b>Errors.</b> Spot a wrong number or a missing poll?
+      <p className="info-about-p"><b>Errors.</b> Spot a wrong number or have any other feedback?
       {" "}<a className="fb-link" href="/feedback/">Let me know</a>.</p>
       <p className="info-about-p"><b>Archives.</b> Older federal polling archives are kept
       {" "}<a className="fb-link" href="/archives/newspoll/">here</a> for safekeeping.</p>
