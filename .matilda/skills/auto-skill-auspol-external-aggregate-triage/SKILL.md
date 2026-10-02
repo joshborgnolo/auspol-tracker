@@ -1,6 +1,6 @@
 ---
 name: auspol-external-aggregate-triage
-description: auspol-tracker — "our aggregates are way off Bonham / Poll Bludger / BludgerTrack" triage. Verify raw rows against coverage BEFORE doubting the estimator, fetch comparators with as-of dates (BT = JS-rendered page via Chrome piggyback; Bonham's sidebar isn't on his homepage), then decompose with a parity-gated estimator replica one toggle at a time. Structural knowledge: BT+Bonham build 2PP from primaries→flows while our headline uses PUBLISHED pairs (standing wedge ≈ flowDrift, −0.7pt Sep 2026); our current primaries are calendar month-to-date vs BT smoothing (+2 ONP gap in the Secret Harbour shock, vanished to ≤0.4 under a 21d primary nowcast on identical data); Newspoll/Resolve/DemosAU print no 2PP so the published-pair window is 4 houses.
+description: auspol-tracker — "our aggregates are way off Bonham / Poll Bludger / BludgerTrack" triage. Verify raw rows against coverage BEFORE doubting the estimator, fetch comparators with as-of dates (BT history = plain curl of bludgertrack/xml/current.xml, no Chrome; Bonham's sidebar isn't on his homepage), then decompose with a parity-gated estimator replica one toggle at a time. Structural knowledge: BT+Bonham build 2PP from primaries→flows and SINCE THE 2026-09-18 BASIS TOGGLE (6cdfa7e) OUR DEFAULT DISPLAYED 2PP IS TOO (synthLatest = primaries × frozen AEC-2025 flows) — the hero line is already like-for-like with them; latest.alp2pp keeps the published-pair basis (its wedge vs implied ≈ flowDrift, −0.7pt Sep 2026); displayed "current" primaries are calendar month-to-date vs BT smoothing (+2 ONP gap in the Secret Harbour shock, vanished to ≤0.4 under a 21d primary nowcast on identical data); Newspoll/Resolve/DemosAU print no 2PP so the published-pair window is 4 houses.
 source: auto-skill
 extracted_at: '2026-09-09T03:25:09.823Z'
 ---
@@ -29,6 +29,15 @@ fully explained a 2–3pt divergence with zero bugs found. Companion skills:
      Figures live in `google-visualization-table` cells; the authoritative 2PP
      sits in a hidden `<table><thead><th>Party</th><th>2pp</th>` block. No
      update stamp on the page — record the fetch time.
+     **The whole series also fetches as ONE PLAIN-CURL FILE** (found
+     2026-10-02): `…/bludgertrack/xml/current.xml` — the shell page merely
+     renders it. `federal/charts` = dated aggregate trend points (163 on
+     2026-10-02, spanning 05/19/2025→; date attr is US MM/DD/YYYY), fields
+     `ALP/LNC/GRN/PHON` primary trends + `ALP2in/LNC2in` (2PP trend with
+     outliers included) + `ALP2out/LNC2out` (outliers excluded);
+     `federal/table` = the same poll records our fallback agent reads. For a
+     bulk as-of-now comparison this beats the Chrome route; use the piggyback
+     only if the XML's provenance is in doubt.
    - **Bonham**: as of Sep 2026 his SIDEBAR carries two live figures —
      `Federal 2PP Polling Aggregate 52.3-47.7 TO ALP · Last update 8 Sep
      (YouGov)` and `One Nation Shadow-2PP Estimate 51.8-48.2 TO ALP vs ON`
@@ -59,15 +68,20 @@ fully explained a 2–3pt divergence with zero bugs found. Companion skills:
 
 ## Structural facts that explain most of any gap (Sep 2026 state)
 
-- **Measure convention, biggest wedge**: BT and Bonham both aggregate
-  PRIMARIES and derive 2PP through (their own) preference-flow estimates —
-  Bonham's methods page states published 2PPs "do not affect the aggregate".
-  Our headline uses PUBLISHED pairs. When published pairs industry-wide run
-  from flow-implied (our own `flowDrift` says −0.7pt now), a standing wedge
-  of that size is EXPECTED. The like-for-like comparator to BT/Bonham is our
-  **implied-2PP diagnostic**: gen-data console's `synthLatest:` line
-  (n=9 — the larger panel), which read 51.8 when the published-pair headline
-  read 51.1 and BludgerTrack 52.1.
+- **Measure convention** (rewritten 2026-10-02): BT and Bonham both
+  aggregate PRIMARIES and derive 2PP through (their own) preference-flow
+  estimates — Bonham's methods page states published 2PPs "do not affect
+  the aggregate". Until 2026-09-17 our displayed headline likewise differed
+  (published-pair nowcast), but the 6cdfa7e basis toggle made
+  **synthLatest — primaries × the frozen AEC-2025 flow table — the site's
+  DEFAULT 2PP basis** (gen-data emitter comment at :4506), so the hero
+  line is now construction-like-for-like with BT/Bonham and only the
+  recipe differs (their evolving flow models vs our frozen 2025 table,
+  plus window/half-life/inclusion choices). The published-pair basis
+  survives as `latest.alp2pp`; published-vs-implied still carries the
+  standing wedge (our `flowDrift` said −0.7pt, Sep 2026). As-of read on
+  2026-09-09: `synthLatest:` (n=9) 51.8 vs published headline 51.1 vs
+  BludgerTrack 52.1.
 - **Published-pair panel thinning**: Newspoll, Resolve and DemosAU (Sep 2026)
   publish no 2PP — the window panel is Morgan/YouGov/Essential/RedBridge only
   (gen-data's `houseEffects (2PP)` + window dumps show it). Treat internal
