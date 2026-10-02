@@ -1814,6 +1814,25 @@ function RdDemographics({ rangeId = "all" }) {
     return { head, dek: since + parts.map((s, i) => (i === 0 ? s : rdCap(s))).join(". ") + "." };
   })();
 
+  /* the full significance battery behind the dek: every tested group, pass
+     or fail, in the tabs' own order — the Trend-significance table dropdown
+     under the trend legend. A signed figure the site's way: true minus, the
+     plus only where the sign is the claim (s = always sign) */
+  const sgn1 = (v, s) => (v < 0 ? "−" : s && v > 0 ? "+" : "") + Math.abs(v).toFixed(1);
+  const sigSets = (() => {
+    const dt = D.demoTrend && D.demoTrend[party];
+    const seen = new Map();
+    for (const r of (dt && dt.rows) || []) {
+      const k = r.tab + "|" + r.set;
+      if (!seen.has(k)) seen.set(k, { key: k, label: r.setLabel, from: r.from, to: r.to, rows: [] });
+      const s = seen.get(k);
+      s.rows.push(r);
+      if (r.from < s.from) s.from = r.from;
+      if (r.to > s.to) s.to = r.to;
+    }
+    return [...seen.values()];
+  })();
+
   /* ---- the dot plot, every set on one scale -------------------------------- */
   const vals = tab.sets.flatMap((st) => st.groups.flatMap((g) => [g.v[party] + (g.ci[party] || 0), g.v[party] - (g.ci[party] || 0)].concat((g.px && g.px[party]) || []))).concat([all]);
   const hi = Math.max(10, Math.ceil(Math.max(...vals) / 10) * 10);
@@ -2153,6 +2172,43 @@ function RdDemographics({ rangeId = "all" }) {
         { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
         { kind: "dash", color: "var(--ink)", label: "All voters" },
       ]} />
+      {sigSets.length > 0 && (
+        <details className="rd-evdrop rd-tsig">
+          <summary>Trend-significance table</summary>
+          <div className="rd-tsig-wrap">
+            <table className="rd-tsig-table">
+              <thead>
+                <tr>
+                  <th scope="col"><span className="sr-only">Group</span></th>
+                  <th scope="col">Support, start → end, %</th>
+                  <th scope="col">All voters, start → end, %</th>
+                  <th scope="col">Change vs all voters, pts</th>
+                  <th scope="col">t, gap</th>
+                  <th scope="col">t, ratio</th>
+                  <th scope="col">Significant</th>
+                </tr>
+              </thead>
+              {sigSets.map((s) => (
+                <tbody key={s.key}>
+                  <tr className="rd-tsig-set"><th colSpan={7}>{s.label}<span className="rd-tsig-since">since {rdMonthYear(s.from)}</span></th></tr>
+                  {s.rows.map((r) => (
+                    <tr key={r.group}>
+                      <th scope="row">{r.group}{r.thin ? " †" : ""}</th>
+                      <td>{sgn1(r.g0)} → {sgn1(r.g1)}</td>
+                      <td>{sgn1(r.a0)} → {sgn1(r.a1)}</td>
+                      <td>{sgn1(r.rel, true)}</td>
+                      <td>{r.tAbs == null ? "–" : sgn1(r.tAbs)}</td>
+                      <td>{r.tLR == null ? "–" : sgn1(r.tLR)}</td>
+                      <td className={r.sig ? "rd-tsig-yes" : ""}>{r.sig ? "Yes" : "No"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              ))}
+            </table>
+          </div>
+          <p className="rd-note rd-tsig-note">Support figures are fitted monthly trends over each set’s window, not single polls. A group’s change vs all voters is its fitted change less {party === "oth" ? "minor parties’ and independents’" : pName + "’s"} national fitted change, in points; a move counts as significant only when both trend tests — on the group’s gap to all voters and on its ratio — clear a t statistic of 1.96. † Seven or fewer monthly readings: the trend summary above hedges these (“appears to”).</p>
+        </details>
+      )}
       <RdFoot how={{ term: "vote-by-group", from: "Who votes for whom" }}>
         {charts.length > 1 ? (even ? "Every panel shares one scale." : "Both panels share one scale, so each is only as wide as its data.") : null}
       </RdFoot>

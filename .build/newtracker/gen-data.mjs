@@ -2783,6 +2783,10 @@ const demoTrend = (() => {
   for (let pid = 0; pid < KEYS.length; pid++) {
     const party = KEYS[pid];
     const moves = [];
+    // rows: every group with enough monthly points, PASS OR FAIL, so the
+    // Who-votes trend-significance table can show the whole test battery;
+    // `moves` above it stays the dek's significant-only list, unchanged
+    const rows = [];
     let windowYm = null;
     for (const tab of demographics.tabs) {
       for (const st of tab.sets) {
@@ -2802,32 +2806,39 @@ const demoTrend = (() => {
           const firstYm = (g.monthly || [])[0]?.[0];
           if (firstYm && (!windowYm || firstYm < windowYm)) windowYm = firstYm;
           const f1 = wls(xs, gs.map((v, i) => v - as[i]), ws);
-          if (!f1 || Math.abs(f1.t) < 1.96) continue;
           const lx = [], ly = [], lw = [];
           for (let i = 0; i < xs.length; i++) {
             if (gs[i] <= 0.05 || as[i] <= 0.05) continue;
             lx.push(xs[i]); ly.push(Math.log(gs[i] / as[i])); lw.push(ws[i]);
           }
-          if (lx.length < 5) continue;
-          const f2 = wls(lx, ly, lw);
-          if (!f2 || Math.abs(f2.t) < 1.96) continue;
+          const f2 = lx.length >= 5 ? wls(lx, ly, lw) : null;
           const lo = Math.min(...xs), hi = Math.max(...xs);
           const gl = wls(xs, gs, ws), al = wls(xs, as, ws);
-          const llo = Math.min(...lx), lhi = Math.max(...lx);
+          const g0 = rr(gl.at(lo)), g1 = rr(gl.at(hi)), a0 = rr(al.at(lo)), a1 = rr(al.at(hi));
+          const sig = !!(f1 && f2 && Math.abs(f1.t) >= 1.96 && Math.abs(f2.t) >= 1.96);
+          rows.push({
+            tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label,
+            from: demographics.allMonthly[lo][0], to: demographics.allMonthly[hi][0],
+            dir: (f2 ? f2.t : f1 ? f1.t : 0) >= 0 ? 1 : -1,
+            tAbs: f1 ? rr(f1.t) : null, tLR: f2 ? rr(f2.t) : null,
+            // seven or fewer monthly points: a handful of waves, one or two houses
+            thin: xs.length <= 7, months: xs.length,
+            g0, g1, a0, a1, rel: rr((g1 - g0) - (a1 - a0)), sig,
+          });
+          if (!sig) continue;
           moves.push({
             tab: tab.id, set: st.id, setLabel: st.label || tab.label, group: g.label,
             dir: f2.t > 0 ? 1 : -1,
             tAbs: rr(f1.t), tLR: rr(f2.t),
-            // seven or fewer monthly points: a handful of waves, one or two houses
             thin: xs.length <= 7, months: xs.length,
-            g0: rr(gl.at(lo)), g1: rr(gl.at(hi)), a0: rr(al.at(lo)), a1: rr(al.at(hi)),
-            r0: rr(Math.exp(f2.at(llo))), r1: rr(Math.exp(f2.at(lhi))),
+            g0, g1, a0, a1,
+            r0: rr(Math.exp(f2.at(Math.min(...lx)))), r1: rr(Math.exp(f2.at(Math.max(...lx)))),
           });
         }
       }
     }
     moves.sort((a, b) => Math.abs(b.tLR) - Math.abs(a.tLR));
-    out[party] = { windowYm, moves };
+    out[party] = { windowYm, moves, rows };
   }
   return out;
 })();
