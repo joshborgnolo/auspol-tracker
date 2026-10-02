@@ -60,6 +60,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { createHash } from "node:crypto";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(HERE, "..");
@@ -99,6 +100,17 @@ const TABS = [
 
 const SUN = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"></path></svg>';
 const MOON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.2 8.2 0 0 1 9.8 3.5a8.2 8.2 0 1 0 10.7 10.7Z"></path></svg>';
+
+/* The css/js links carry ?v=<content hash>: a page and its pair of shell
+   assets must always travel as one generation. The files ship at the stable
+   /assets/site-shell.* paths (the server serves the latest bytes and ignores
+   the query), but the query the PAGE asks for changes with the content, so a
+   browser holding a cached stale copy under yesterday's URL refetches instead
+   of mixing it with today's markup and styles (2026-10-02: a reader hit
+   exactly that – new pages against day-old css/js – and saw the empty status
+   block and a wayward dial where the css would have hidden them). A lazy
+   function, called at apply time, so module-evaluation order never matters. */
+const SHELL_V = () => createHash("sha256").update(shellCss() + "\n//\n" + shellJs()).digest("hex").slice(0, 10);
 
 // ---- the markup written into each page ---------------------------------------------
 export function shellHeader({ tab } = {}) {
@@ -190,7 +202,7 @@ export function shellFooter({ page } = {}) {
   </footer>
 </div>
 <div class="sh-band" aria-hidden="true"></div>
-<script src="/assets/site-shell.js" defer></script>`;
+<script src="/assets/site-shell.js?v=${SHELL_V()}" defer></script>`;
 }
 
 /* Before first paint: the reader's theme and accent from the main page's
@@ -260,7 +272,7 @@ export function applyShell(html, opts = {}) {
     .replace(SAT_NOTE, (all, ind, rest) => (rest.trim() ? `${ind}<p class="ss-note">${rest.trim()}</p>\n` : ""));
   const scoped = scopeDarkRules(h.replace(new RegExp("\\n?" + REGION("head").source), ""));
   h = scoped.html;
-  const head = region("head", fontPreloads() + `<link rel="stylesheet" href="/assets/site-shell.css">\n${EARLY}`
+  const head = region("head", fontPreloads() + `<link rel="stylesheet" href="/assets/site-shell.css?v=${SHELL_V()}">\n${EARLY}`
     + (scoped.rules.length ? `\n<style>\n/* this page's dark-mode rules, for a reader who chose dark on a light device */\n${darkCopies(scoped.rules)}\n</style>` : ""));
   h = h.replace(/\n?<\/head>/, "\n" + head + "\n</head>");
   const header = region("header", shellHeader(opts)), footer = region("footer", shellFooter(opts));
