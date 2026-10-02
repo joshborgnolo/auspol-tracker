@@ -3912,8 +3912,9 @@ body.rd .rd-tsig-table tbody:last-of-type > tr:last-child th, body.rd .rd-tsig-t
 body.rd .rd-tsig-table tr.rd-tsig-set th { padding-top: 14px; font-size: 13px; font-weight: 600; color: var(--ink-2); border-bottom: 1.5px solid var(--line-2); }
 body.rd .rd-tsig-table tr.rd-tsig-set th .rd-tsig-since { margin-left: 8px; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-tsig-table tbody > tr:first-child.rd-tsig-set th { padding-top: 8px; }
-body.rd .rd-tsig-table td.rd-tsig-yes { font-weight: 600; color: var(--ink); }
-@media (max-width: 640px) { body.rd .rd-tsig-table { min-width: 600px; } }
+body.rd .rd-tsig-table tr:has(> td.rd-tsig-yes) > :is(th, td) { background: color-mix(in oklab, var(--chg-up) 9%, var(--surface)); }
+body.rd .rd-tsig-table td.rd-tsig-yes { font-weight: 600; color: var(--chg-up); }
+@media (max-width: 640px) { body.rd .rd-tsig-table { min-width: 600px; text-size-adjust: 100%; -webkit-text-size-adjust: 100%; } body.rd .rd-tsig-table tr.rd-tsig-set th { font-size: 12px; } }
 @media (max-width: 900px) { body.rd .rd-sm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px; } }
 @media (max-width: 640px) { body.rd .rd-mo-wrap { margin-top: 28px; } body.rd .rd-sm-grid { column-gap: 16px; } body.rd .rd-sm-top { font-size: 13px; } body.rd .rd-sm-top b { font-size: 16px; } }
 body.rd .rd-is-tabs { margin-top: 20px; }

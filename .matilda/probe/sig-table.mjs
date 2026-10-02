@@ -163,6 +163,65 @@ check("phone: all rows still mount", phoneSig.rows === alpRows.length, phoneSig.
 check("phone: page does not scroll sideways", phoneSig.bodyW <= phoneSig.viewW, phoneSig);
 check("phone: columns scroll inside their wrap", phoneSig.tblBeyondWrap === true, phoneSig);
 
+/* set-subhead type rung: 13px desktop, 12px phone with text autoscaling
+   pinned off (iOS inflated the one-line subheads in the 600px-wide table) */
+const typeRung = await page.evaluate(() => {
+  const th = document.querySelector("#who-votes details.rd-tsig tbody tr.rd-tsig-set th");
+  const cs = getComputedStyle(th);
+  return { fs: parseFloat(cs.fontSize), tsa: cs.webkitTextSizeAdjust || cs.getPropertyValue("-webkit-text-size-adjust") };
+});
+check("desktop: set subhead 13px", typeRung.fs === 13, typeRung);
+const phoneType = await phone.evaluate(() => {
+  const th = document.querySelector("#who-votes details.rd-tsig tbody tr.rd-tsig-set th");
+  const cs = getComputedStyle(th);
+  return { fs: parseFloat(cs.fontSize), tsa: cs.webkitTextSizeAdjust || cs.getPropertyValue("-webkit-text-size-adjust") };
+});
+check("phone: set subhead 12px", phoneType.fs === 12, phoneType);
+check("phone: text autosizing pinned off", phoneType.tsa === "100%", phoneType);
+
+/* significant rows glow green: switch to a party that HAS sig rows (from the
+   payload), count its Yes cells against the data, and assert the hue */
+const PARTY_CHIP = { alp: "labor", lnp: "coalition", grn: "greens", onp: "one nation", ind: "independent", oth: "others" };
+const sigParty = Object.keys(demoTrend).find((k) => (demoTrend[k].rows || []).some((r) => r.sig));
+check("payload has a party with significant rows", !!sigParty, sigParty);
+if (sigParty) {
+  /* the phone page took focus above; a backgrounded tab never services rAF,
+     so the click-and-settle must run on a page brought back to the front */
+  await page.bringToFront();
+  await page.evaluate((label) => {
+    const sec = document.querySelector("#who-votes");
+    const b = [...sec.querySelectorAll("button")].find((x) => (x.textContent || "").trim().toLowerCase().includes(label));
+    b.click();
+  }, PARTY_CHIP[sigParty]);
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  const sig = await page.evaluate(() => {
+    const det = document.querySelector("#who-votes details.rd-tsig");
+    const yes = [...det.querySelectorAll("td.rd-tsig-yes")];
+    const first = yes[0];
+    const rowTh = first && first.parentElement.querySelector("th");
+    /* token-identity reference: a scratch span painted exactly as the rule
+       must paint the Yes cell/row, compared as computed values so the
+       browser's colour serialisation never enters the assertion */
+    const ref = document.createElement("span");
+    ref.style.cssText = "color: var(--chg-up); background: color-mix(in oklab, var(--chg-up) 9%, var(--surface)); position: absolute; visibility: hidden";
+    det.appendChild(ref);
+    const refCs = getComputedStyle(ref);
+    const out = {
+      count: yes.length,
+      texts: yes.every((y) => y.textContent.trim() === "Yes"),
+      cellGreen: first ? getComputedStyle(first).color === refCs.color : false,
+      rowWash: rowTh ? getComputedStyle(rowTh).backgroundColor === refCs.backgroundColor : false,
+      refBg: refCs.backgroundColor,
+    };
+    ref.remove();
+    return out;
+  });
+  const wantYes = demoTrend[sigParty].rows.filter((r) => r.sig).length;
+  check("Yes cells all read Yes and match the payload count", sig.count === wantYes && sig.count > 0 && sig.texts, sig);
+  check("yes cell text is the direction-of-travel green", sig.cellGreen, sig);
+  check("significant rows wash green", sig.rowWash && sig.refBg !== "rgba(0, 0, 0, 0)", sig);
+}
+
 if (pageErrors.length) console.log("pageerrors:", pageErrors);
 check("no page errors", pageErrors.length === 0, pageErrors);
 console.log(fails.length ? `\n${fails.length} FAILURES` : "\nALL GREEN");
