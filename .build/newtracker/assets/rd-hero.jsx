@@ -192,6 +192,20 @@ function RdHero(p) {
   const cmpBox = onImp ? "Compare published 2PP" : "Compare implied 2PP";
   const sensOn = cmpOn && matchup === "alp_lnp" && D.flowSens && D.flowSens.length > 1;
 
+  /* the outside-aggregate overlay, offered on the Coalition contest only -
+     the one contest both comparators publish: BludgerTrack's machine series
+     as THEY publish it, and this site's reconstruction of Kevin Bonham's
+     published method over the same polls (bonham-replica.mjs - his own
+     sidebar figures are that reconstruction's validation data, kept in
+     data/bonham-2pp.json and deliberately off the chart) */
+  const [showExt, setShowExt] = useState(false);
+  const ext = D.extAgg || null;
+  const extBt = ext && ext.bt && ext.bt.points && ext.bt.points.length > 1 ? ext.bt.points : null;
+  const extKb = ext && ext.bonham && ext.bonham.replica && ext.bonham.replica.length > 1 ? ext.bonham.replica : null;
+  const extAvail = shown === "alp_lnp" && !!(extBt || extKb);
+  const extOn = showExt && extAvail && !morph;
+  const extBox = "Compare outside estimates";
+
   const series = [];
   if (otherRows && otherRows.length > 1)
     series.push({ id: "other", label: labelOther || "", color: otherCol, rdWidth: 2, endCap: false,
@@ -201,6 +215,17 @@ function RdHero(p) {
     series.push({ id: "cmp", label: cmpName, color: mainCol, rdWidth: 2, dashed: true, endCap: false,
                   points: filterPts(cmpData.map((d) => ({ x: d.x, y: d.alp != null ? d.alp : d.a })), xDomain[0]),
                   endLabel: narrow ? null : cmpName });
+  /* the comparators sit UNDER the house line (pushed before it) in muted
+     ink, each with its own dash rhythm so the three dashes never read as
+     one family */
+  if (extOn) {
+    if (extKb)
+      series.push({ id: "kbonham", label: "Bonham (rebuilt)", color: "var(--ink-3)", rdWidth: 2, dash: "7 4", endCap: false,
+                    points: filterPts(extKb, xDomain[0]), endLabel: narrow ? null : "Bonham (rebuilt)" });
+    if (extBt)
+      series.push({ id: "btrack", label: "BludgerTrack", color: "var(--ink-2)", rdWidth: 2, dash: "1.6 3.4", endCap: false,
+                    points: filterPts(extBt, xDomain[0]), endLabel: narrow ? null : "BludgerTrack" });
+  }
   if (adjusted || morph)
     series.push({ id: "main", label: labelMain, color: mainCol, rdWidth: 3, endCap: false,
                   points: mainRows.map((d) => ({ x: d.x, y: d.a })),
@@ -266,7 +291,18 @@ function RdHero(p) {
        empty band of window */
     return [Math.floor((Math.min(...v) + 0.3) / 5) * 5, Math.ceil((Math.max(...v) - 0.3) / 5) * 5];
   });
-  const yTarget = domainOf(matchup, b0);
+  const yBase = domainOf(matchup, b0);
+  /* outside estimates on: stretch the window to their values too (they hug
+     the house line, so in practice this almost never moves it), keeping the
+     5-point lattice domainOf rounds to */
+  const yTarget = !extOn ? yBase : (() => {
+    const v = [];
+    if (extKb) for (const d of extKb) if (d.x >= xDomain[0]) v.push(d.y);
+    if (extBt) for (const d of extBt) if (d.x >= xDomain[0]) v.push(d.y);
+    if (!v.length) return yBase;
+    return [Math.min(yBase[0], Math.floor((Math.min(...v) + 0.3) / 5) * 5),
+            Math.max(yBase[1], Math.ceil((Math.max(...v) - 0.3) / 5) * 5)];
+  })();
   /* a switch that took over from another starts from the window on screen */
   const yFrom = morph ? (morph.fromDomain || domainOf(morph.from, fromB)) : null;
   const yDomain = morph ? blendDomain(yFrom, yTarget, t) : yTarget;
@@ -362,6 +398,8 @@ function RdHero(p) {
       label: (narrow ? "Monthly" : "Monthly average") + (bandPts.length >= 2 ? (flowsBand ? (narrow ? ", flow range" : " and flow range") : (narrow ? ", 95% interval" : " and its 95% interval")) : "") } : null,
     (!narrow && labelOther) ? { kind: "line", color: otherCol, label: labelOther + ", monthly average" } : null,
     cmpOn ? { kind: "dash", color: mainCol, label: cmpName + ", monthly average" } : null,
+    extOn && extBt ? { kind: "dash", color: "var(--ink-2)", label: "BludgerTrack, as published" } : null,
+    extOn && extKb ? { kind: "dash", color: "var(--ink-3)", label: narrow ? "Bonham (rebuilt)" : "Bonham’s method, rebuilt" } : null,
     sensOn ? { kind: "band", color: "var(--lnp)", label: "Range if One Nation preferences flowed as in 2022" } : null,
     ringOn ? { kind: "ring", label: narrow ? "2025 election" : "2025 election result" } : null,
   ];
@@ -375,6 +413,8 @@ function RdHero(p) {
       label: labelMain + ", monthly average" + (bandPts.length >= 2 ? (flowsBand ? " and flow range" : " and its 95% interval") : "") } : null,
     labelOther ? { kind: "line", color: otherCol, label: labelOther + ", monthly average" } : null,
     cmpOn ? { kind: "dashed", color: mainCol, label: cmpName + ", monthly average" } : null,
+    extOn && extBt ? { kind: "dashed", color: "var(--ink-2)", label: "BludgerTrack, as published" } : null,
+    extOn && extKb ? { kind: "dashed", color: "var(--ink-3)", label: "Bonham’s method, rebuilt" } : null,
     sensOn ? { kind: "shade", color: "var(--lnp)", label: "Range if One Nation preferences flowed as in 2022" } : null,
     ringOn && narrow ? { kind: "ring", color: "var(--ink)", label: "2025 election result" } : null,
   ].filter(Boolean);
@@ -543,6 +583,7 @@ function RdHero(p) {
       <div className="card rd-card rd-tpp-chart" ref={chartMark} data-rd-swipe-exact="">
         <RdTabs value={rangeId} onChange={setRangeId} options={RD_RANGES} ariaLabel="Time range" className="rd-tabs-sm" swipeSelf pin>
           {!narrow && cmpAvail && <RdCheck checked={showSynth} onChange={setShowSynth}>{cmpBox}</RdCheck>}
+          {!narrow && extAvail && <RdCheck checked={showExt} onChange={setShowExt}>{extBox}</RdCheck>}
         </RdTabs>
         <div className="rd-chead"><span className="rd-chead-t">{chartTitle}</span></div>
         {narrow && (
@@ -550,6 +591,8 @@ function RdHero(p) {
             { kind: "line", color: mainCol, label: labelMain },
             labelOther ? { kind: "line", color: otherCol, label: labelOther } : null,
             cmpOn ? { kind: "dash", color: mainCol, label: cmpName } : null,
+            extOn && extBt ? { kind: "dash", color: "var(--ink-2)", label: "BludgerTrack" } : null,
+            extOn && extKb ? { kind: "dash", color: "var(--ink-3)", label: "Bonham (rebuilt)" } : null,
           ]} />
         )}
         <TrendChart
@@ -578,9 +621,11 @@ function RdHero(p) {
         {badges && <RdEventList list={badges.list} from={badgesWas ? badgesWas.list : null} mix={t} onPick={pickEv} openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />}
         <RdKey className="rd-ckey" items={keyItems} />
         {narrow && cmpAvail && <RdCheck checked={showSynth} onChange={setShowSynth}>{cmpBox}</RdCheck>}
+        {narrow && extAvail && <RdCheck checked={showExt} onChange={setShowExt}>{extBox}</RdCheck>}
       </div>
       <RdFoot how={{ href: "/preference-flows/" }}>
         Figures pool the last {D.latest.method.windowDays} days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above.
+        {extOn && <> BludgerTrack’s line is its published series; the Bonham line is rebuilt here from his published method over the same polls, and tracks the figures he publishes to within about half a point.</>}
       </RdFoot>
     </section>
   );

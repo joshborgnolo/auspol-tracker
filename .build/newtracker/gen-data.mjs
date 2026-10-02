@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { writeAtomic } from "../atomic-write.mjs";
 import { impliedAlp2pp, FLOW, FLOW_TABLE, FLOW_LEF, impliedLefAlp2pp } from "./flows.mjs";
+import { bonhamReplica } from "./bonham-replica.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -2214,6 +2215,48 @@ const individualPolls = POLLS.map((p) => {
     ...(VS_BY_POLL.has(p.date + "|" + p.pollster) ? { sw: VS_BY_POLL.get(p.date + "|" + p.pollster) } : {}),
   };
 }).sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
+
+/* ---- 6b. external aggregates — the comparator lines the hero can draw ----
+   Two other public 2PP aggregates cover this term, and a reader who lands on
+   the front page reasonably asks "what do they say?" – so the hero can
+   overlay both. BludgerTrack's line arrives machine-ready (the dated trend
+   points behind its own trend chart, mirrored to data/bludgertrack-2pp.json
+   by .build/extract-bludgertrack.mjs); Kevin Bonham's publishes only the
+   CURRENT two figures in his blog sidebar, so his line is a reconstruction —
+   his published method (.build/newtracker/bonham-replica.mjs, every constant
+   taken from his methods page and its update log) run over this tracker's
+   poll set, pinned against the as-published stamps the sidebar scraper and
+   the Wayback backfill keep in data/bonham-2pp.json (49 stamps as of
+   2026-10-02; the replica sits a mean 0.56 pts from them, so it is drawn as
+   his method's line, never as his numbers). Both sources are levelled as
+   ALP's share of the classic two-party preferred, exactly the line the
+   hero itself draws; the view adds the credit, the reconstruction caveat
+   and the links. */
+const readDataJson = (name) => {
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", name), "utf8")); }
+  catch { return null; }
+};
+const BTRACK = readDataJson("bludgertrack-2pp.json");
+const KBONHAM = readDataJson("bonham-2pp.json");
+const xOfIso = (iso) => mx(ymOf(iso)) + (dayOf(iso) - 15) / 365;   // the individualPolls day convention
+const extAgg = {
+  bt: BTRACK && BTRACK.series?.length
+    ? {
+        points: BTRACK.series.map(([iso, alp]) => ({ x: xOfIso(iso), y: alp })),
+        feed: "www.pollbludger.net/fed2028/bludgertrack",
+      }
+    : null,
+  bonham: (() => {
+    const rep = bonhamReplica(POLLS, LATEST_ISO);
+    const daily = rep.daily.filter((d) => d.sm != null);
+    if (!daily.length) return null;
+    return {
+      replica: daily.map((d) => ({ x: xOfIso(d.iso), y: d.sm })),
+      published: (KBONHAM?.series || []).map(([iso, alp]) => ({ x: xOfIso(iso), y: alp })),
+      site: "kevinbonham.blogspot.com",
+    };
+  })(),
+};
 
 /* ---- 7. latest polls – the most recent reading from each ACTIVE house ----
    This was a flat three-week window, which is a rule about weekly houses. It
@@ -4644,6 +4687,10 @@ window.AUSPOL = (function () {
   // the common groups, in the order a poll row's grp.v follows (the export's columns)
   const demoGroups = ${JSON.stringify(DEMO_GROUPS)};
   const accuracy = ${JSON.stringify(accuracy)};
+  /* The external aggregates the hero can overlay (§6b): BludgerTrack's
+     machine trend, and Kevin Bonham's line as a RECONSTRUCTION of his
+     published method with his as-published sidebar stamps beside it. */
+  const extAgg = ${JSON.stringify(extAgg)};
   const individualPolls = ${JSON.stringify(individualPolls)};
   const pollsterTable = ${JSON.stringify(pollsterTable)};
   const latest = ${JSON.stringify(latest)};
@@ -4722,6 +4769,7 @@ window.AUSPOL = (function () {
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    extAgg,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
