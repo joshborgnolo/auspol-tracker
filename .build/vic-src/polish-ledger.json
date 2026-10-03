@@ -10,7 +10,10 @@
     "2026-10-03T15:22:03.371Z",
     "2026-10-03T20:53:17.415Z",
     "2026-10-03T20:53:17.469Z",
-    "2026-10-03T21:04:56.808Z"
+    "2026-10-03T21:04:56.808Z",
+    "2026-10-03T21:09:02.171Z",
+    "2026-10-03T21:09:02.206Z",
+    "2026-10-03T21:23:04.994Z"
   ],
   "gaps": {
     "data:scope-firms-miscounted": {
@@ -78,7 +81,7 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 0,
+      "missed": 1,
       "status": "open"
     },
     "feature:charts-missing-end-labels": {
@@ -90,7 +93,7 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 0,
+      "missed": 1,
       "status": "open"
     },
     "feature:dot-titles-lack-span": {
@@ -102,7 +105,7 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 0,
+      "missed": 1,
       "status": "open"
     },
     "feature:dot-titles-lack-sample": {
@@ -114,7 +117,7 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 0,
+      "missed": 1,
       "status": "open"
     },
     "feature:leaders-charts-no-series-legend": {
@@ -126,7 +129,7 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 0,
+      "missed": 1,
       "status": "open"
     },
     "feature:hero-missing-2022-delta": {
@@ -138,7 +141,7 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 0,
+      "missed": 1,
       "status": "open"
     },
     "feature:polls-section-missing-dek": {
@@ -150,7 +153,7 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 0,
+      "missed": 1,
       "status": "open"
     },
     "visual:leaders-charts-no-election-marker": {
@@ -161,6 +164,18 @@
       "opened": "2026-10-03T20:53:17.443Z",
       "seen": [
         "2026-10-03T20:53:17.443Z"
+      ],
+      "missed": 1,
+      "status": "open"
+    },
+    "feature:hero-duo-no-countdown": {
+      "id": "hero-duo-no-countdown",
+      "area": "feature",
+      "claim": "D7 demands the hero duo pair the current 2PP figure with a countdown-to-election figure in the hero type treatment, its clause naming the fixed date; the page's duo is Labor/Coalition 46.2/53.8 only, and '55 days out' appears solely as plain text in the ss-sub line",
+      "evidence": "vic/index.html:253-257 vp-duo holds the two 2PP numbers; countdown exists only as 'Assembled 4 October 2026 — 55 days out' at :252",
+      "opened": "2026-10-03T21:09:02.190Z",
+      "seen": [
+        "2026-10-03T21:09:02.190Z"
       ],
       "missed": 0,
       "status": "open"

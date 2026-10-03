@@ -35,6 +35,11 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, "..");
 const ELECTION_DATE = "2026-11-28";       // Victorian state election (fixed date)
 const ELEC_TPP_2022 = 55.0;               // ALP 2PP at the 2022 election (VEC)
+// 2022 election certified statewide primaries (VEC final count incl. the
+// Narracan supplementary, the count whose 2PP is the 55.0 above):
+// ALP 36.66, Liberal+National 34.48, Greens 11.50, One Nation 0.28,
+// the remaining minors and independents 17.08 between them
+const ELEC_PRIM_2022 = { alp: 36.66, lnp: 34.48, onp: 0.28, grn: 11.50, oth: 17.08 };
 const DATA_FILE = "data/vic-polls.json";
 const PAGE = "vic/index.html";
 const BUILD = ".build/newtracker/build.mjs";
@@ -234,12 +239,32 @@ const fwLabel = (p) => {
   return `${dA} ${MON3(p.fwStart)} ${y1}–${dB} ${MON3(p.fwEnd)} ${y2}`;
 };
 const enDashRange = (s) => s.replace(/(\d)\s*-\s*(\d)/g, "$1–$2");
+// wave-dot hover telemetry: firm, fieldwork span ("fieldwork to" for a
+// one-day wave), the plotted value, and the published sample as (n …)
+const fwTitle = (p) => (p.fwStart < p.fwEnd ? fwLabel(p) : `fieldwork to ${dateShort(p.fwEnd)}`);
+const nTitle = (nVal) => (nVal ? ` (n ${nVal.toLocaleString("en-AU")})` : "");
+const pollDotTitle = (p, what) => `${firmLabel[p.firm] || p.firm}, ${fwTitle(p)} — ${what}${nTitle(p.sample)}`;
+const ldrSpan = (l) => (l.fwStart && l.fwStart < l.date ? fwLabel({ fwStart: l.fwStart, fwEnd: l.date }) : `fieldwork to ${dateShort(l.date)}`);
+// per-series end-of-line value labels: each series's latest point carries
+// its figure, dodged so neighbouring labels never collide
+const endMarks = (fr, series, gap = 13) => {
+  const lo = fr.MT + 9, hi = fr.H - fr.MB - 4;
+  const arr = series.map((s) => ({ ...s, py: fr.Y(s.v) })).sort((a, b) => a.py - b.py);
+  const ys = arr.map((s) => Math.min(hi, Math.max(lo, s.py)));
+  for (let i = 1; i < ys.length; i++) if (ys[i] - ys[i - 1] < gap) ys[i] = ys[i - 1] + gap;
+  const over = ys[ys.length - 1] - hi;
+  if (over > 0) for (let i = 0; i < ys.length; i++) ys[i] -= over;
+  return arr.map((s, i) =>
+    (s.dotFill ? `<circle cx="${s.x}" cy="${s.py}" r="${s.r ?? 2.5}" fill="${s.dotFill}">` +
+      (s.dotTitle ? `<title>${esc(s.dotTitle)}</title>` : "") + `</circle>` : "") +
+    `<text x="${s.x - 7}" y="${+(ys[i] + 3.5).toFixed(1)}" text-anchor="end" font-size="11" font-weight="600" fill="${s.textFill}">${s.label ?? s.v.toFixed(1)}</text>`).join("");
+};
 
 // ---------- charts (static SVG — the refresh-prediction pattern) ---------
 leadership.sort((a, b) => a.date.localeCompare(b.date));
 const byT = (a, b) => a.t.localeCompare(b.t);
 
-function frame({ W = 640, H = 260, ML = 34, MR = 14, MT = 12, MB = 26, yLo, yHi, tick, ref, xTickDates }) {
+function frame({ W = 640, H = 260, ML = 34, MR = 14, MT = 12, MB = 26, yLo, yHi, tick, ref, xTickDates, electionY }) {
   const cw = W - ML - MR, ch = H - MT - MB;
   const x0 = dayMs(evalDates[0]), x1 = dayMs(ELECTION_DATE);
   const X = (d) => +(ML + ((dayMs(d) - x0) / (x1 - x0)) * cw).toFixed(1);
@@ -255,7 +280,7 @@ function frame({ W = 640, H = 260, ML = 34, MR = 14, MT = 12, MB = 26, yLo, yHi,
     `<line x1="${X(d)}" y1="${H - MB}" x2="${X(d)}" y2="${H - MB + 4}" stroke="var(--line)" stroke-width="1"/>` +
     (label ? `<text x="${X(d)}" y="${H - 10}" text-anchor="middle" font-size="9.5" fill="var(--ink-faint)">${label}</text>` : "")).join("");
   const election = `<line x1="${X(ELECTION_DATE)}" y1="${MT}" x2="${X(ELECTION_DATE)}" y2="${H - MB}" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 3"/>` +
-    `<text x="${X(ELECTION_DATE) - 4}" y="${MT + 8}" text-anchor="end" font-size="9" fill="var(--ink-3)">Election, 28 Nov</text>`;
+    `<text x="${X(ELECTION_DATE) - 4}" y="${electionY ?? MT + 8}" text-anchor="end" font-size="9" fill="var(--ink-3)">Election, 28 Nov</text>`;
   return { W, H, ML, MR, MT, MB, X, Y, grid, xt, election };
 }
 // May/November ticks between the data start and the election
@@ -299,10 +324,14 @@ const tppSvg = (() => {
     .map((d) => `<path d="${d}" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>`).join("");
   const dots = tppRows.map((p) =>
     `<circle cx="${fr.X(p.fwEnd)}" cy="${fr.Y(p.tpp2.alp)}" r="2.6" fill="var(${FIRM_CSS[p.firm] || "--oth"})">` +
-    `<title>${esc(`${firmLabel[p.firm] || p.firm}, ${dateShort(p.fwEnd)} — Labor two-party ${fmt(p.tpp2.alp)}`)}</title></circle>`).join("");
+    `<title>${esc(pollDotTitle(p, `Labor two-party ${fmt(p.tpp2.alp)}`))}</title></circle>`).join("");
   const last = [...trend.tpp].reverse().find(Boolean);
-  const end = last ? `<circle cx="${fr.X(last.t)}" cy="${fr.Y(last.v)}" r="3" fill="var(--ink)"><title>Blend ${last.v.toFixed(1)} at ${dateShort(last.t)}</title></circle>` +
-    `<text x="${fr.X(last.t) - 7}" y="${fr.Y(last.v) - 7}" text-anchor="end" font-size="11" font-weight="600" fill="var(--ink)">${last.v.toFixed(1)}</text>` : "";
+  const end = last ? endMarks(fr, [
+    { x: fr.X(last.t), v: last.v, r: 3, dotFill: "var(--ink)", textFill: "var(--ink)",
+      dotTitle: `Blend ${last.v.toFixed(1)} at ${dateShort(last.t)}` },
+    { x: fr.X(last.t), v: +(100 - last.v).toFixed(2), dotFill: "var(--lnp)", textFill: "var(--lnp-text)",
+      dotTitle: `Coalition ${(100 - last.v).toFixed(1)} — the Labor blend's complement` },
+  ]) : "";
   const base2022 = `<circle cx="${fr.X("2023-02-18")}" cy="${fr.Y(ELEC_TPP_2022)}" r="0.1" fill="none"/>` +
     `<text x="${fr.ML + 4}" y="${fr.Y(ELEC_TPP_2022) - 5}" font-size="9" fill="var(--ink-faint)">2022 election: Labor ${ELEC_TPP_2022.toFixed(1)}</text>` +
     `<line x1="${fr.ML}" y1="${fr.Y(ELEC_TPP_2022)}" x2="${fr.ML + 22}" y2="${fr.Y(ELEC_TPP_2022)}" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="2 2"/>`;
@@ -331,9 +360,26 @@ const primSvg = (() => {
     const marks = [["alp", p.primary.alp], ["lnp", p.primary.lnp], ["onp", p.primary.onp], ["grn", p.primary.grn], ["oth", othOf(p)]];
     for (const [k, v] of marks) if (v != null)
       body += `<circle cx="${fr.X(p.fwEnd)}" cy="${fr.Y(v)}" r="2.1" fill="${PRIM_SERIES.find(([kk]) => kk === k)[1]}" opacity="0.75">` +
-        `<title>${esc(`${firmLabel[p.firm] || p.firm}, ${dateShort(p.fwEnd)} — ${PARTY_NAME[k]} ${fmt(v)}`)}</title></circle>`;
+        `<title>${esc(pollDotTitle(p, `${PARTY_NAME[k]} ${fmt(v)}`))}</title></circle>`;
   }
-  return `<svg viewBox="0 0 ${fr.W} ${fr.H}" role="presentation" aria-hidden="true">${fr.grid}${fr.xt}${fr.election}${body}</svg>`;
+  // the certified 2022 result marks the left edge of each party's scale
+  const marks2022 = Object.entries(ELEC_PRIM_2022)
+    .map(([k, v]) => ({ k, name: PARTY_NAME[k], v, y: Math.min(fr.H - fr.MB - 4, Math.max(fr.MT + 9, fr.Y(v))) }))
+    .sort((a, b) => a.y - b.y);
+  for (let i = 1; i < marks2022.length; i++) if (marks2022[i].y - marks2022[i - 1].y < 11) marks2022[i].y = marks2022[i - 1].y + 11;
+  const elect = marks2022.map((p) => {
+    const text = (p.k === "alp" ? `2022 election: ` : "") + `${p.name} ${fmt(p.v)}`;
+    return `<line x1="${fr.ML}" y1="${fr.Y(p.v)}" x2="${fr.ML + 22}" y2="${fr.Y(p.v)}" stroke="var(--${p.k})" stroke-width="1" stroke-dasharray="2 2"/>` +
+      `<text x="${fr.ML + 26}" y="${p.y + 3}" font-size="9" fill="var(--ink-faint)">${text}</text>`;
+  }).join("");
+  const ends = PRIM_SERIES.map(([k, colour]) => {
+    const lp = [...trend[k]].reverse().find(Boolean);
+    return lp && {
+      x: fr.X(lp.t), v: lp.v, dotFill: colour, textFill: `var(--${k}-text)`,
+      dotTitle: `${PARTY_NAME[k]} blend ${lp.v.toFixed(1)} at ${dateShort(lp.t)}`,
+    };
+  }).filter(Boolean);
+  return `<svg viewBox="0 0 ${fr.W} ${fr.H}" role="presentation" aria-hidden="true">${fr.grid}${fr.xt}${fr.election}${elect}${body}${endMarks(fr, ends)}</svg>`;
 })();
 
 // ---- leadership: era boundaries from the pair chain ----
@@ -367,42 +413,50 @@ const boundarySvg = (fr) => boundaries.map((b) => {
 const ppmSeries = { pm: [], opp: [], extra: [] };
 for (const r of ppmRows) {
   const [pm, opp, extra] = rolesOf(r.pair);
-  if (r.values[pm] != null) ppmSeries.pm.push({ t: r.date, v: r.values[pm], leader: pm, firm: r.firm });
-  if (opp && r.values[opp] != null) ppmSeries.opp.push({ t: r.date, v: r.values[opp], leader: opp, firm: r.firm });
-  if (extra && r.values[extra] != null) ppmSeries.extra.push({ t: r.date, v: r.values[extra], leader: extra, firm: r.firm });
+  const tele = { firm: r.firm, fwStart: r.fwStart, sample: r.sample };
+  if (r.values[pm] != null) ppmSeries.pm.push({ t: r.date, v: r.values[pm], leader: pm, ...tele });
+  if (opp && r.values[opp] != null) ppmSeries.opp.push({ t: r.date, v: r.values[opp], leader: opp, ...tele });
+  if (extra && r.values[extra] != null) ppmSeries.extra.push({ t: r.date, v: r.values[extra], leader: extra, ...tele });
 }
 const ppmMax = Math.max(...ppmSeries.pm.map((p) => p.v), ...ppmSeries.opp.map((p) => p.v), ...ppmSeries.extra.map((p) => p.v));
 const ppmSvg = (() => {
-  const fr = frame({ H: 240, yLo: 0, yHi: Math.ceil((ppmMax + 8) / 10) * 10, tick: 10, xTickDates: xTicks });
+  const fr = frame({ H: 240, yLo: 0, yHi: Math.ceil((ppmMax + 8) / 10) * 10, tick: 10, xTickDates: xTicks, electionY: 32 });
   let body = "";
+  const ends = [];
   for (const [key, colour] of [["pm", "var(--alp)"], ["opp", "var(--lnp)"], ["extra", "var(--onp)"]]) {
     body += segPaths(fr, leaderSegs(ppmSeries[key]))
       .map((d) => `<path d="${d}" fill="none" stroke="${colour}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>`).join("");
     body += ppmSeries[key].map((p) =>
       `<circle cx="${fr.X(p.t)}" cy="${fr.Y(p.v)}" r="2.2" fill="${colour}">` +
-      `<title>${esc(`${firmLabel[p.firm] || p.firm}, ${dateShort(p.t)} — ${NAMES[p.leader] || p.leader} ${fmt(p.v)} (preferred premier)`)}</title></circle>`).join("");
+      `<title>${esc(`${firmLabel[p.firm] || p.firm}, ${ldrSpan({ fwStart: p.fwStart, date: p.t })} — ${NAMES[p.leader] || p.leader} ${fmt(p.v)} (preferred premier${p.sample ? `, n ${p.sample.toLocaleString("en-AU")}` : ""})`)}</title></circle>`).join("");
+    const lp = ppmSeries[key][ppmSeries[key].length - 1];
+    if (lp) ends.push({ x: fr.X(lp.t), v: lp.v, textFill: `var(--${key === "pm" ? "alp" : key === "opp" ? "lnp" : "onp"}-text)`, label: fmt(lp.v) });
   }
-  return `<svg viewBox="0 0 ${fr.W} ${fr.H}" role="presentation" aria-hidden="true">${fr.grid}${fr.xt}${boundarySvg(fr)}${body}</svg>`;
+  return `<svg viewBox="0 0 ${fr.W} ${fr.H}" role="presentation" aria-hidden="true">${fr.grid}${fr.xt}${fr.election}${boundarySvg(fr)}${body}${endMarks(fr, ends)}</svg>`;
 })();
 
 // ---- chart 4: net satisfaction ----
 const premierKeys = new Set(pairOrder.map((o) => rolesOf(o.pair)[0]));
 const oppKeys = new Set(pairOrder.map((o) => rolesOf(o.pair)[1]));
-const netsPm = apprRows.filter((r) => premierKeys.has(r.leader)).map((r) => ({ t: r.date, v: r.net, leader: r.leader, firm: r.firm }));
-const netsOpp = apprRows.filter((r) => !premierKeys.has(r.leader)).map((r) => ({ t: r.date, v: r.net, leader: r.leader, firm: r.firm }));
+const netPt = (r) => ({ t: r.date, v: r.net, leader: r.leader, firm: r.firm, fwStart: r.fwStart, sample: r.sample });
+const netsPm = apprRows.filter((r) => premierKeys.has(r.leader)).map(netPt);
+const netsOpp = apprRows.filter((r) => !premierKeys.has(r.leader)).map(netPt);
 const netAbs = Math.max(10, ...netsPm.map((p) => Math.abs(p.v)), ...netsOpp.map((p) => Math.abs(p.v)));
 const netM = Math.ceil((netAbs + 4) / 10) * 10;
 const netSvg = (() => {
-  const fr = frame({ H: 240, yLo: -netM, yHi: netM, tick: 10, ref: 0, xTickDates: xTicks });
+  const fr = frame({ H: 240, yLo: -netM, yHi: netM, tick: 10, ref: 0, xTickDates: xTicks, electionY: 32 });
   let body = "";
-  for (const [pts, colour] of [[netsPm, "var(--alp)"], [netsOpp, "var(--lnp)"]]) {
+  const ends = [];
+  for (const [pts, colour, textTok] of [[netsPm, "var(--alp)", "var(--alp-text)"], [netsOpp, "var(--lnp)", "var(--lnp-text)"]]) {
     body += segPaths(fr, leaderSegs(pts))
       .map((d) => `<path d="${d}" fill="none" stroke="${colour}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>`).join("");
     body += pts.map((p) =>
       `<circle cx="${fr.X(p.t)}" cy="${fr.Y(p.v)}" r="2.2" fill="${colour}">` +
-      `<title>${esc(`${firmLabel[p.firm] || p.firm}, ${dateShort(p.t)} — ${NAMES[p.leader] || p.leader} net satisfaction ${snet(p.v)}`)}</title></circle>`).join("");
+      `<title>${esc(`${firmLabel[p.firm] || p.firm}, ${ldrSpan({ fwStart: p.fwStart, date: p.t })} — ${NAMES[p.leader] || p.leader} net satisfaction ${snet(p.v)}${nTitle(p.sample)}`)}</title></circle>`).join("");
+    const lp = pts[pts.length - 1];
+    if (lp) ends.push({ x: fr.X(lp.t), v: lp.v, textFill: textTok, label: snet(lp.v).replace(/^\+/, "") });
   }
-  return `<svg viewBox="0 0 ${fr.W} ${fr.H}" role="presentation" aria-hidden="true">${fr.grid}${fr.xt}${boundarySvg(fr)}${body}</svg>`;
+  return `<svg viewBox="0 0 ${fr.W} ${fr.H}" role="presentation" aria-hidden="true">${fr.grid}${fr.xt}${fr.election}${boundarySvg(fr)}${body}${endMarks(fr, ends)}</svg>`;
 })();
 
 // ---------- composition (every user-visible number/word lands here) ------
@@ -421,6 +475,8 @@ const firmsN = Object.keys(firmLabel).length;
 const d1 = (v) => (v == null ? "—" : v.toFixed(1));
 
 const headNote = `${head.n2pp} published two-party ${head.n2pp === 1 ? "figure" : "figures"} from ${joinL(headTppFirms.map((f) => firmLabel[f]))} with fieldwork ending between ${dateShort(headTppFrom || asOf)} and ${dateShort(headTppLastEnd || asOf)}, blended by sample size and recency — each wave weighing n·2^(−d/28), its weight halving every 28 days, at most six waves per house. The published figures alone run from ${fmt(headMin)} to ${fmt(headMax)} for Labor.`;
+const delta22 = head.alp2pp != null ? +(head.alp2pp - ELEC_TPP_2022).toFixed(1) : null;
+const headDelta = delta22 == null ? "" : `The blend sits ${fmt(Math.abs(delta22))} points ${delta22 < 0 ? "short of" : delta22 > 0 ? "past" : "level with"} the 2022 election result, Labor ${ELEC_TPP_2022.toFixed(1)} to the Coalition's ${(100 - ELEC_TPP_2022).toFixed(1)}.`;
 const primNote = `First-preference blend of all ${head.nPolls} ${head.nPolls === 1 ? "poll" : "polls"} in the same window${headNoTppFirms.length ? ` — ${joinL(headNoTppFirms.map((f) => firmLabel[f]))} publishes no two-party figure, so ${headNoTppFirms.length === 1 ? "that house counts" : "those houses count"} here but not above` : ""}${onpRows.length < head.nPolls ? `; One Nation and Others draw on the ${onpRows.length} that split them out` : ""}. House effects are not adjusted.`;
 
 const latest = sorted[sorted.length - 1];
@@ -445,12 +501,16 @@ const netLatestPm = netsPm[netsPm.length - 1], netLatestOpp = netsOpp[netsOpp.le
 const netStrip = `<b>Net satisfaction, latest:</b> ${netLatestPm ? `${NAMES[netLatestPm.leader] || netLatestPm.leader} ${snet(netLatestPm.v)}` : ""}${netLatestPm && netLatestOpp ? " · " : ""}${netLatestOpp ? `${NAMES[netLatestOpp.leader] || netLatestOpp.leader} ${snet(netLatestOpp.v)}` : ""}${apprRows.length ? ` — ${firmLabel[apprRows[apprRows.length - 1].firm] || apprRows[apprRows.length - 1].firm}, fieldwork to ${dateShort(apprRows[apprRows.length - 1].date)}` : ""}.`;
 
 const firmLegend = [...new Set(tppRows.map((p) => p.firm))]
-  .map((f) => `<span class="vp-lg"><i style="background:var(${FIRM_CSS[f] || "--oth"})"></i>${firmLabel[f]}</span>`).join("\n      ");
+  .map((f) => `<span class="vp-lg"><i style="background:var(${FIRM_CSS[f] || "--oth"})"></i>${firmLabel[f]}</span>`).join("\n      ") +
+  `\n      <span class="vp-lg"><i style="background:var(--ink);width:14px;height:2px;border-radius:1px"></i>Trailing blend</span>`;
 const PARTY_LEGEND = [["Labor", "--alp"], ["Coalition", "--lnp"], ["One Nation", "--onp"], ["Greens", "--grn"], ["Others", "--oth"]];
 const partyLegend = PARTY_LEGEND.map(([k, v]) => `<span class="vp-lg"><i style="background:var(${v})"></i>${k}</span>`).join("\n      ");
-const leadLegend = `<span class="vp-lg"><i style="background:var(--alp)"></i>Premier</span>
-      <span class="vp-lg"><i style="background:var(--lnp)"></i>Opposition leader</span>${ppmSeries.extra.length
-  ? `\n      <span class="vp-lg"><i style="background:var(--onp)"></i>${NAMES[rolesOf(pairOrder[pairOrder.length - 1].pair)[2] || "pickering"] || "One Nation"}</span>` : ""}`;
+const curRoles = rolesOf(pairOrder[pairOrder.length - 1].pair);
+const leadLegend = `<span class="vp-lg"><i style="background:var(--alp)"></i>Premier (${NAMES[curRoles[0]] || curRoles[0]})</span>
+      <span class="vp-lg"><i style="background:var(--lnp)"></i>Opposition (${NAMES[curRoles[1]] || curRoles[1]})</span>${ppmSeries.extra.length
+  ? `\n      <span class="vp-lg"><i style="background:var(--onp)"></i>${NAMES[curRoles[2]] || "One Nation"}</span>` : ""}`;
+const netLegend = `<span class="vp-lg"><i style="background:var(--alp)"></i>Premier (${NAMES[curRoles[0]] || curRoles[0]})</span>
+      <span class="vp-lg"><i style="background:var(--lnp)"></i>Opposition (${NAMES[curRoles[1]] || curRoles[1]})</span>`;
 
 const pollRows = [...sorted].reverse().map((p) => {
   const lbl = fwLabel(p);
@@ -661,7 +721,7 @@ p.vp-tnote { font-size: 12.5px; line-height: 1.55; color: var(--ink-3); margin: 
     <div><div class="n" style="color:var(--alp-text)">${d1(head.alp2pp)}</div><div class="k">Labor — two-party preferred</div></div>
     <div><div class="n" style="color:var(--lnp-text)">${d1(head.lnp2pp)}</div><div class="k">Coalition — two-party preferred</div></div>
   </div>
-  <p class="vp-scope">${headNote}</p>
+  <p class="vp-scope">${headNote} ${headDelta}</p>
 
   <div class="vp-chips" aria-label="First-preference blend">
     <span class="vp-chip"><i style="background:var(--alp)"></i>Labor <b>${d1(head.prim.alp)}</b></span>
@@ -707,12 +767,12 @@ p.vp-tnote { font-size: 12.5px; line-height: 1.55; color: var(--ink-3); margin: 
     ${netSvg}
   </figure>
   <div class="vp-legend">
-      <span class="vp-lg"><i style="background:var(--alp)"></i>Premier</span>
-      <span class="vp-lg"><i style="background:var(--lnp)"></i>Opposition leader</span>
+      ${netLegend}
   </div>
   <p class="vp-scope">Net satisfaction is satisfied minus dissatisfied, as published; some houses publish the net only. The zero line is where approval turns to disapproval.</p>
 
   <h2>Every published poll</h2>
+  <p>${latest.firmRaw}'s ${fwLabel(latest)} wave is the newest of ${polls.length} published since ${MY(sorted[0].fwEnd)} by ${firmsN} houses — the complete census, every figure as the house published it, newest first.</p>
   <div class="vp-twrap">
     <table class="vp-table">
       <caption>All ${polls.length} published waves of voting intention since ${MY(sorted[0].fwEnd)}, newest first. * Fieldwork dates are approximate (the month is on record, the days are not). The two-party column is the house’s own published figure — “—” where none was published. Others combines independents and minor parties.</caption>
