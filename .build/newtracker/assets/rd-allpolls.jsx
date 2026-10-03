@@ -1491,7 +1491,7 @@ function RdAllPolls(P) {
           <span className="rd-ap-cap">Best on it</span>
           <span className="rd-ap-in">{[0, 10, 20, 30].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 30 ? "%" : ""}</span>)}</span>
         </span>
-        {th("Best on it", "iss.bestv", { right: true, title: "The party most voters rate best on that issue" })}
+        {th("Best party", "iss.bestv", { right: true, title: "The party most voters rate best on that issue" })}
       </>}
       <span></span>
     </div>
@@ -2291,20 +2291,14 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   /* the tablet's narrower bar column (rd.css) has room to label only the
      scale's ends and the others, as the phone does */
   const narrowBar = useNarrow("(max-width: 1020px)");
-  /* the Greens and Others measures join the tab row only where the whole
-     row - five standing tabs, the joiners, and the two-party switch chip
-     (12.4px under 1021px) - still fits; Greens is the priority joiner, so
-     it clears at a narrower width than Others. The cut-offs were priced
-     from the rendered tabs by .matilda/probe-hl-tabfit.mjs on the +2px
-     padding rows: the six-tab row (with Greens) holds at 833.4px of
-     container and the seven-tab row at 902.1, so with the 76px body
-     padding Greens clears the moment the row stands at 912 and Others at
-     985. Under them the two tabs stay off and the row carries its five
-     exactly as before (the phone's flex-fill row included, which four
-     measures already fill). A view open while its tab is present drops
-     back to Two-party if a resize removes the tab. */
-  const roomGrn = !useNarrow("(max-width: 911px)");
-  const roomOth = !useNarrow("(max-width: 984px)");
+  /* Every measure keeps its tab down to the phone: where the seven no
+     longer fit across the row, the tab group scrolls sideways under a
+     right-edge fade (the .rd-ap-pinnav idiom, rd.css) rather than the
+     Greens and Others tabs dropping off. The app's touch effect reads
+     the overflow and leaves the strip's sideways drags to it, so a
+     swipe ON the strip scrolls it while the under-row swipe still
+     steps views - and whichever tab a change lands on glides into view
+     (the effect after the arrow walk). */
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const [view, setView] = useState("tpp");
@@ -2312,12 +2306,11 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   const boxRef = useRef(null);
   const SW = useRdWidth(boxRef, 500);
   /* the measure row, shared by the RdTabs render and the arrow-key walk so
-     the two can never disagree (the width-gated joiners sit between the
-     parties and the split pairing) */
+     the two can never disagree (Greens and Others sit between the parties
+     and the split pairing) */
   const hlViews = [
     { id: "tpp", label: "Two-party" }, { id: "alp", label: "Labor" }, { id: "lnp", label: "Coalition" }, { id: "onp", label: "One Nation" },
-    ...(roomGrn ? [{ id: "grn", label: "Greens" }] : []),
-    ...(roomOth ? [{ id: "oth", label: "Others" }] : []),
+    { id: "grn", label: "Greens" }, { id: "oth", label: "Others" },
     { id: "split", label: phone ? "Split" : "One Nation v Coalition", title: "One Nation’s primary vote against the Coalition’s" },
   ];
   /* hovering the panel hands the arrow keys to the measure row - the walk a
@@ -2354,11 +2347,21 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
       sec.removeEventListener("pointerleave", leave);
       document.removeEventListener("keydown", key, true);
     };
-  }, [view, roomGrn, roomOth]);
-  /* a resize that removes the open tab drops the view back to Two-party */
+  }, [view]);
+  /* A view change can land on a tab parked past the strip's edge at the
+     widths where the row scrolls (the under-row swipe and the arrow
+     walks alike). Glide the strip to show it - the strip's own scroller
+     only, never scrollIntoView, which would drag the page up to the row
+     when a swipe under it fires with the row itself off screen. */
   React.useEffect(() => {
-    if ((view === "grn" && !roomGrn) || (view === "oth" && !roomOth)) setView("tpp");
-  }, [roomGrn, roomOth, view]);
+    const sec = document.getElementById("house-lean");
+    const btn = sec && sec.querySelector('.rd-hl-tabs [aria-pressed="true"]');
+    const sc = btn && btn.closest('[role="group"]');
+    if (!sc) return;
+    const r = btn.getBoundingClientRect(), s = sc.getBoundingClientRect();
+    if (r.left < s.left) sc.scrollTo({ left: sc.scrollLeft + r.left - s.left - 28, behavior: "smooth" });
+    else if (r.right > s.right) sc.scrollTo({ left: sc.scrollLeft + r.right - s.right + 28, behavior: "smooth" });
+  }, [view]);
   const HL0 = D.houseLean || {};
   /* One Nation against the Coalition: each pollster's lean on the gap
      between the two primaries. The estimator is linear and all but one poll

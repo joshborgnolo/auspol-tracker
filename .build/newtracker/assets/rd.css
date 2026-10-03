@@ -2412,6 +2412,26 @@ body.rd .rd-fl-keynow { position: relative; display: inline-block; width: 14px; 
 body.rd .rd-fl-keynow::before { content: ""; position: absolute; left: 6px; top: 2px; bottom: 2px; width: 2px; border-radius: 1px; background: var(--ink); opacity: 0.35; }
 body.rd .rd-fl-keynow i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ink); }
 
+/* Narrower than 985px the house-lean measure row's seven tabs no longer
+   fit across it, so its tab group scrolls sideways under a right-edge
+   fade - the .rd-ap-pinnav pattern - rather than dropping the Greens and
+   Others tabs off the row. The app's touch effect reads the overflow and
+   leaves the strip's own drags to it; a swipe under the strip still
+   steps the views, and the [view] effect in rd-allpolls glides the
+   chosen tab into sight. */
+@media (max-width: 984px) {
+  body.rd .rd-hl-tabs > div[role="group"] {
+    flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+    /* scroll runway the last tab's width of the fade: at max scroll it
+       sits fully opaque, 24px clear of the strip's physical edge */
+    padding-right: 24px;
+  }
+  body.rd .rd-hl-tabs > div[role="group"]::-webkit-scrollbar { display: none; }
+  body.rd .rd-hl-tabs .rd-tab { flex: 0 0 auto; }
+}
+
 @media (max-width: 1000px) {
   body.rd .rd-hl-hrow, body.rd .rd-hl-row { grid-template-columns: 170px 240px 56px 24px minmax(0, 1fr); }
   /* a long name fills this narrower column, so its count goes under it, as on the phone */
@@ -2428,10 +2448,11 @@ body.rd .rd-fl-keynow i { position: absolute; left: 50%; top: 50%; width: 9px; h
   body.rd .rd-hl-sep { display: none; }
 }
 @media (max-width: 760px) {
-  body.rd .rd-dis-tabs .rd-tab, body.rd .rd-hl-tabs .rd-tab { flex: 1; justify-content: center; }
-  body.rd .rd-dis-tabs > div[role="group"], body.rd .rd-hl-tabs > div[role="group"] { flex: 1; }
-  /* four measures across a phone, set as its board set them, so they fit 360px */
-  body.rd .rd-hl-tabs .rd-tab { padding: 0 4px; font-size: 14px; }
+  body.rd .rd-dis-tabs .rd-tab { flex: 1; justify-content: center; }
+  body.rd .rd-dis-tabs > div[role="group"] { flex: 1; }
+  /* the measure row's tabs keep their natural width so the row can
+     overflow and scroll (see the <=984px block); only the size comes down */
+  body.rd .rd-hl-tabs .rd-tab { font-size: 14px; }
   body.rd .rd-dis-name { font-size: 13px; }
   body.rd .rd-dis-big b { font-size: 22px; }
   body.rd .rd-dis-sub, body.rd .rd-dis-verdict { font-size: 12px; }

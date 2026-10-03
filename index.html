@@ -4852,6 +4852,16 @@ body.rd .rd-fl-keydot { display: inline-block; width: 6px; height: 6px; margin: 
 body.rd .rd-fl-keynow { position: relative; display: inline-block; width: 14px; height: 18px; }
 body.rd .rd-fl-keynow::before { content: ""; position: absolute; left: 6px; top: 2px; bottom: 2px; width: 2px; border-radius: 1px; background: var(--ink); opacity: 0.35; }
 body.rd .rd-fl-keynow i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ink); }
+@media (max-width: 984px) {
+  body.rd .rd-hl-tabs > div[role="group"] {
+    flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+    padding-right: 24px;
+  }
+  body.rd .rd-hl-tabs > div[role="group"]::-webkit-scrollbar { display: none; }
+  body.rd .rd-hl-tabs .rd-tab { flex: 0 0 auto; }
+}
 @media (max-width: 1000px) {
   body.rd .rd-hl-hrow, body.rd .rd-hl-row { grid-template-columns: 170px 240px 56px 24px minmax(0, 1fr); }
   body.rd .rd-hl-who { flex-direction: column; align-items: flex-start; gap: 0; }
@@ -4863,9 +4873,9 @@ body.rd .rd-fl-keynow i { position: absolute; left: 50%; top: 50%; width: 9px; h
   body.rd .rd-hl-sep { display: none; }
 }
 @media (max-width: 760px) {
-  body.rd .rd-dis-tabs .rd-tab, body.rd .rd-hl-tabs .rd-tab { flex: 1; justify-content: center; }
-  body.rd .rd-dis-tabs > div[role="group"], body.rd .rd-hl-tabs > div[role="group"] { flex: 1; }
-  body.rd .rd-hl-tabs .rd-tab { padding: 0 4px; font-size: 14px; }
+  body.rd .rd-dis-tabs .rd-tab { flex: 1; justify-content: center; }
+  body.rd .rd-dis-tabs > div[role="group"] { flex: 1; }
+  body.rd .rd-hl-tabs .rd-tab { font-size: 14px; }
   body.rd .rd-dis-name { font-size: 13px; }
   body.rd .rd-dis-big b { font-size: 22px; }
   body.rd .rd-dis-sub, body.rd .rd-dis-verdict { font-size: 12px; }
@@ -80009,7 +80019,7 @@ function RdAllPolls(P) {
     style: {
       left: pdx(v) + "%"
     }
-  }, v, v === 30 ? "%" : "")))), th("Best on it", "iss.bestv", {
+  }, v, v === 30 ? "%" : "")))), th("Best party", "iss.bestv", {
     right: true,
     title: "The party most voters rate best on that issue"
   })), React.createElement("span", null));
@@ -81530,8 +81540,6 @@ function RdHouseLean({
   const D = window.AUSPOL;
   const phone = useNarrow("(max-width: 760px)");
   const narrowBar = useNarrow("(max-width: 1020px)");
-  const roomGrn = !useNarrow("(max-width: 911px)");
-  const roomOth = !useNarrow("(max-width: 984px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const [view, setView] = useState("tpp");
@@ -81550,13 +81558,13 @@ function RdHouseLean({
   }, {
     id: "onp",
     label: "One Nation"
-  }, ...(roomGrn ? [{
+  }, {
     id: "grn",
     label: "Greens"
-  }] : []), ...(roomOth ? [{
+  }, {
     id: "oth",
     label: "Others"
-  }] : []), {
+  }, {
     id: "split",
     label: phone ? "Split" : "One Nation v Coalition",
     title: "One Nation’s primary vote against the Coalition’s"
@@ -81595,10 +81603,22 @@ function RdHouseLean({
       sec.removeEventListener("pointerleave", leave);
       document.removeEventListener("keydown", key, true);
     };
-  }, [view, roomGrn, roomOth]);
+  }, [view]);
   React.useEffect(() => {
-    if (view === "grn" && !roomGrn || view === "oth" && !roomOth) setView("tpp");
-  }, [roomGrn, roomOth, view]);
+    const sec = document.getElementById("house-lean");
+    const btn = sec && sec.querySelector('.rd-hl-tabs [aria-pressed="true"]');
+    const sc = btn && btn.closest('[role="group"]');
+    if (!sc) return;
+    const r = btn.getBoundingClientRect(),
+      s = sc.getBoundingClientRect();
+    if (r.left < s.left) sc.scrollTo({
+      left: sc.scrollLeft + r.left - s.left - 28,
+      behavior: "smooth"
+    });else if (r.right > s.right) sc.scrollTo({
+      left: sc.scrollLeft + r.right - s.right + 28,
+      behavior: "smooth"
+    });
+  }, [view]);
   const HL0 = D.houseLean || {};
   const HL = {
     ...HL0,
