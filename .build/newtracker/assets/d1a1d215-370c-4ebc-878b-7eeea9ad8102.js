@@ -315,7 +315,7 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
   // The docked score is a shortcut home: switch to Snapshot (where the 2PP
   // hero lives) and ride to the top. If already on Snapshot, just glide up.
   const goHero = () => {
-    if (active !== "snapshot") onChange("snapshot");
+    if (active !== "now") onChange("now");
     else window.scrollTo({ top: 0, behavior: "smooth" });
   };
   // A zero-height sentinel sits at the tab bar's natural flow position. When it
@@ -344,7 +344,7 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
      readout itself is the fallback. */
   React.useEffect(() => {
     if (!("IntersectionObserver" in window)) { setHeroGone(true); return; }
-    if (active !== "snapshot") { setHeroGone(true); return; }
+    if (active !== "now") { setHeroGone(true); return; }
     const el = document.querySelector(".hero-gauge, .rd-lg")
             || document.querySelector(".hero-readout");
     if (!el) { setHeroGone(true); return; }

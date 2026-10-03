@@ -882,7 +882,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     if (score && n.a != null && n.b != null) {
       var snapLab = "Now";
       if (n.copy && n.copy.tabs) for (var sl = 0; sl < n.copy.tabs.length; sl++) {
-        if (n.copy.tabs[sl].id === "snapshot") { snapLab = n.copy.tabs[sl].label; break; }
+        if (n.copy.tabs[sl].id === "now") { snapLab = n.copy.tabs[sl].label; break; }
       }
       score.querySelector(".sh-num-a").textContent = n.a.toFixed(1);
       score.querySelector(".sh-num-a").style.color = "var(--alp)";

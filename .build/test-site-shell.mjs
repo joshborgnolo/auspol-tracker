@@ -87,7 +87,7 @@ assert.ok(font && fs.existsSync(path.join(ROOT, font)), `the wordmark's face is 
 // ---- the chrome contract: one parse, lifted three ways --------------------------------
 assert.equal(mainChrome(), mainChrome(), "mainChrome is memoised");
 const chrome = mainChrome();
-assert.equal(chrome.tabs[0].id, "snapshot", "the parse carries the main page's tabs");
+assert.equal(chrome.tabs[0].id, "now", "the parse carries the main page's tabs");
 for (const [what, v] of [["wordmark name", chrome.wm.name], ["wordmark track", chrome.wm.track],
                          ["wordmark sr suffix", chrome.wm.sr], ["tagline tail", chrome.tagline.b],
                          ["status label 1", chrome.meta.k1], ["status label 2", chrome.meta.k2],

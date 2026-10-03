@@ -1883,7 +1883,7 @@ let viewPanelPokedAt = 0;
 let viewPanelFocusIsPointer = false;
 
 const TABS = [
-  { id: "snapshot", label: "Now" },
+  { id: "now", label: "Now" },
   { id: "cycles", label: "Past cycles" },
   { id: "allpolls", label: "All polls" },
   /* pinHide: the docked 2PP score takes this end of the bar once the bar
@@ -2081,7 +2081,10 @@ function App() {
   // active tab, persisted in the URL hash so a refresh / share keeps the view
   const readHash = () => {
     const h = (window.location.hash || "").replace(/^#/, "");
-    return TAB_IDS.includes(h) ? h : "snapshot";
+    /* the tab was Snapshot before it was Now: links shared under the old
+       #snapshot hash keep landing on it */
+    if (h === "snapshot") return "now";
+    return TAB_IDS.includes(h) ? h : "now";
   };
   const [tab, setTab] = useState(readHash);
   const [focusPoll, setFocusPoll] = useState(null);   // the poll a chart dot sent us to
@@ -2310,10 +2313,10 @@ function App() {
        wait for the snapshot view to mount, so the scroll is parked for the
        layout effect below the way a restore scroll is. */
     window.AP.gotoNextPolls = () => {
-      if (readHash() === "snapshot") { npScrollNow(); return; }
+      if (readHash() === "now") { npScrollNow(); return; }
       npJumpRef.current = true;
-      setTab("snapshot");
-      window.location.hash = "snapshot";
+      setTab("now");
+      window.location.hash = "now";
     };
     /* Info's "How the final polls did" mention, as a real link: to Past
        cycles, then down to the panel once the view (and its lazily fetched
@@ -2340,14 +2343,14 @@ function App() {
      kind of "works on my machine" this file has been bitten by before. */
   const restoreY = useRef(null);
   const backFromPoll = () => {
-    const b = (focusPoll && focusPoll.back) || { tab: "snapshot", y: 0 };
+    const b = (focusPoll && focusPoll.back) || { tab: "now", y: 0 };
     setFocusPoll(null);
     restoreY.current = b.y;
     setTab(b.tab);
     if (readHash() !== b.tab) window.location.hash = b.tab;
   };
   const backFromTerm = () => {
-    const b = (focusTerm && focusTerm.back) || { tab: "snapshot", y: 0 };
+    const b = (focusTerm && focusTerm.back) || { tab: "now", y: 0 };
     setFocusTerm(null);
     restoreY.current = b.y;
     setTab(b.tab);
@@ -2474,7 +2477,7 @@ function App() {
                if (e.target === e.currentTarget) viewPanelFocusIsPointer = false;
              }}>
           <ViewBoundary>
-            {tab === "snapshot" && (
+            {tab === "now" && (
               <SnapshotView rangeId={rangeId} setRangeId={setRangeId} showScatter={t.showScatter}
                             tppMatchup={tppMatchup} setTppMatchup={setTppMatchup}
                             tppBasis={tppBasis} setTppBasis={setTppBasis} />

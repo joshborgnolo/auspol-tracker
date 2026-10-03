@@ -60674,7 +60674,7 @@ function Tabs({
     if (el) el.focus();
   };
   const goHero = () => {
-    if (active !== "snapshot") onChange("snapshot");else window.scrollTo({
+    if (active !== "now") onChange("now");else window.scrollTo({
       top: 0,
       behavior: "smooth"
     });
@@ -60694,7 +60694,7 @@ function Tabs({
       setHeroGone(true);
       return;
     }
-    if (active !== "snapshot") {
+    if (active !== "now") {
       setHeroGone(true);
       return;
     }
@@ -84112,7 +84112,7 @@ let chromeSettled = false;
 let viewPanelPokedAt = 0;
 let viewPanelFocusIsPointer = false;
 const TABS = [{
-  id: "snapshot",
+  id: "now",
   label: "Now"
 }, {
   id: "cycles",
@@ -84274,7 +84274,8 @@ function App() {
   }, [tppBasis]);
   const readHash = () => {
     const h = (window.location.hash || "").replace(/^#/, "");
-    return TAB_IDS.includes(h) ? h : "snapshot";
+    if (h === "snapshot") return "now";
+    return TAB_IDS.includes(h) ? h : "now";
   };
   const [tab, setTab] = useState(readHash);
   const [focusPoll, setFocusPoll] = useState(null);
@@ -84479,13 +84480,13 @@ function App() {
     };
     window.AP.openTermPage = openTermPage;
     window.AP.gotoNextPolls = () => {
-      if (readHash() === "snapshot") {
+      if (readHash() === "now") {
         npScrollNow();
         return;
       }
       npJumpRef.current = true;
-      setTab("snapshot");
-      window.location.hash = "snapshot";
+      setTab("now");
+      window.location.hash = "now";
     };
     window.AP.gotoFinalPolls = () => {
       setTab("cycles");
@@ -84514,7 +84515,7 @@ function App() {
   const restoreY = useRef(null);
   const backFromPoll = () => {
     const b = focusPoll && focusPoll.back || {
-      tab: "snapshot",
+      tab: "now",
       y: 0
     };
     setFocusPoll(null);
@@ -84524,7 +84525,7 @@ function App() {
   };
   const backFromTerm = () => {
     const b = focusTerm && focusTerm.back || {
-      tab: "snapshot",
+      tab: "now",
       y: 0
     };
     setFocusTerm(null);
@@ -84636,7 +84637,7 @@ function App() {
     onBlur: e => {
       if (e.target === e.currentTarget) viewPanelFocusIsPointer = false;
     }
-  }, React.createElement(ViewBoundary, null, tab === "snapshot" && React.createElement(SnapshotView, {
+  }, React.createElement(ViewBoundary, null, tab === "now" && React.createElement(SnapshotView, {
     rangeId: rangeId,
     setRangeId: setRangeId,
     showScatter: t.showScatter,

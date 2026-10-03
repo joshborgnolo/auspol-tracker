@@ -106,7 +106,7 @@ const mainTabs = (() => {
     const dir = path.join(ROOT, ".build", "newtracker", "assets");
     const file = fs.readdirSync(dir).filter((f) => /\.jsx?$/.test(f)).sort().find((f) => {
       const s = fs.readFileSync(path.join(dir, f), "utf8");
-      return /const TABS = \[/.test(s) && /id: "snapshot", label: "/.test(s);
+      return /const TABS = \[/.test(s) && /id: "now", label: "/.test(s);
     });
     if (!file) throw new Error("site-shell: no asset in .build/newtracker/assets defines the main page's TABS");
     const body = fs.readFileSync(path.join(dir, file), "utf8").match(/const TABS = \[([\s\S]*?)\n\s*\];/);
@@ -115,14 +115,14 @@ const mainTabs = (() => {
       .map((m) => ({ id: m[1], label: m[2], href: "/#" + m[1],
                      ...(/pinHide:\s*true/.test(m[3]) ? { pinHide: true } : {}),
                      ...SHELL_TAB_EXTRAS[m[1]] }));
-    if (!tabs.length || tabs[0].id !== "snapshot") {
-      throw new Error("site-shell: TABS parse in " + file + " produced no snapshot tab");
+    if (!tabs.length || tabs[0].id !== "now") {
+      throw new Error("site-shell: TABS parse in " + file + " produced no now tab");
     }
     return (cache = tabs);
   };
 })();
 const TABS = mainTabs();
-const SNAPSHOT_LABEL = TABS.find((t) => t.id === "snapshot").label;
+const NOW_LABEL = TABS.find((t) => t.id === "now").label;
 
 /* The masthead's TEXT, lifted from the main page's own asset rather than
    copied: the satellite header must never say words the main page moved on
@@ -293,7 +293,7 @@ export function shellHeader({ tab } = {}) {
         ${tabs}
       </div>
       <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A slot that passes unrecorded counts up as overdue until the release is added"><span class="sh-tn-lab">Next</span></div>
-      <a class="sh-score" href="/#snapshot" hidden title="The latest two-party preferred – go to ${SNAPSHOT_LABEL}"><span class="sh-eyebrow">${C.score.eyebrow}</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
+      <a class="sh-score" href="/#now" hidden title="The latest two-party preferred – go to ${NOW_LABEL}"><span class="sh-eyebrow">${C.score.eyebrow}</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
     </div>
   </div>
 </nav>`;
@@ -1101,9 +1101,9 @@ ${npProjectSrc()}
        rename there lands here with the next build, no page commit */
     if (n.copy) fillCopy(n.copy);
     if (score && n.a != null && n.b != null) {
-      var snapLab = "${SNAPSHOT_LABEL}";
+      var snapLab = "${NOW_LABEL}";
       if (n.copy && n.copy.tabs) for (var sl = 0; sl < n.copy.tabs.length; sl++) {
-        if (n.copy.tabs[sl].id === "snapshot") { snapLab = n.copy.tabs[sl].label; break; }
+        if (n.copy.tabs[sl].id === "now") { snapLab = n.copy.tabs[sl].label; break; }
       }
       score.querySelector(".sh-num-a").textContent = n.a.toFixed(1);
       score.querySelector(".sh-num-a").style.color = "var(--alp)";
