@@ -145,14 +145,22 @@ function rdPollHead(p) {
   return <>{field ? "Conducted on " + field + " from " : "From "}{n}{", " + by + (out ? " on " + out : "")}</>;
 }
 
-/* The primary columns in the order every table on the site keeps. */
-const RD_AP_PRIM = [
-  { id: "alp", lab: "ALP", ink: "var(--alp-text)", dot: "var(--alp)" },
-  { id: "lnp", lab: "L/NP", ink: "var(--lnp-text)", dot: "var(--lnp)" },
-  { id: "grn", lab: "GRN", ink: "var(--grn-text)", dot: "var(--grn)" },
-  { id: "onp", lab: "ON", ink: "var(--onp-text)", dot: "var(--onp)" },
-  { id: "oth", lab: "OTH", ink: "var(--ink-2)", dot: "var(--oth)" },
-];
+/* Primary column metadata only - the display order is NOT baked here. The
+   primary facet ranks its columns by the site aggregate, reading gen-data's
+   latest.primaryOrder walk like every other party listing (the old tables'
+   pOrder, the Latest table's plParties); the FALLBACK ladder only covers a
+   bundle that predates primaryOrder. */
+const RD_AP_PRIM_META = {
+  alp: { lab: "ALP", ink: "var(--alp-text)", dot: "var(--alp)" },
+  lnp: { lab: "L/NP", ink: "var(--lnp-text)", dot: "var(--lnp)" },
+  grn: { lab: "GRN", ink: "var(--grn-text)", dot: "var(--grn)" },
+  onp: { lab: "ON", ink: "var(--onp-text)", dot: "var(--onp)" },
+  oth: { lab: "OTH", ink: "var(--ink-2)", dot: "var(--oth)" },
+};
+const RD_AP_PRIM_FALLBACK = ["alp", "lnp", "grn", "onp", "oth"];
+/* [{ id, lab, ink, dot }] from an id list; an unknown key drops out silently
+   rather than misorder the ladder */
+const rdApPrimList = (ids) => ids.filter((id) => id in RD_AP_PRIM_META).map((id) => ({ id, ...RD_AP_PRIM_META[id] }));
 /* The Includes filter in the redesign's words. The rare contests the old
    Contest control carried (Coalition v One Nation, three-cornered) are here
    now, as what a poll published. */
@@ -771,7 +779,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
   const refIso = p.chg && p.chg.r ? (p.chg.r.pOnp || p.chg.r.pAlp || p.chg.r.impOn || p.chg.r.imp) : null;
   const prev = refIso ? D.individualPolls.find((x) => x.pollster === p.pollster && x.released === refIso) : null;
   const CK = { alp: "pAlp", lnp: "pLnp", grn: "pGrn", onp: "pOnp", oth: "pOth" };
-  const prim = RD_AP_PRIM.filter((k) => q[k.id] != null).sort((a, b) => q[b.id] - q[a.id]);
+  const prim = rdApPrimList(RD_AP_PRIM_FALLBACK).filter((k) => q[k.id] != null).sort((a, b) => q[b.id] - q[a.id]);
   const pair = (a, b, bInk) => (
     <b className="rd-apd-pair"><span style={{ color: "var(--alp-text)" }}>{a}</span><span className="rd-ap-dash"> – </span><span style={{ color: bInk }}>{b}</span></b>
   );
@@ -816,7 +824,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
     .filter(([, nk]) => a[nk] != null);
   const allFav = leaders.length > 0 && leaders.every(([id]) => mb[id] === "fav");
   const d = p.dir;
-  const seats = p.seats && p.seats.p ? RD_AP_PRIM.filter((k) => p.seats.p[k.id]) : [];
+  const seats = p.seats && p.seats.p ? rdApPrimList(RD_AP_PRIM_FALLBACK).filter((k) => p.seats.p[k.id]) : [];
   /* the "Rated best on" block: the three-way ownership figures for the top
      issue when the wave printed them (they're shares of those naming one of
      the three parties), else SEC Newgate's printed best-party table */
@@ -1442,6 +1450,10 @@ function RdAllPolls(P) {
   for (let v = Math.ceil(LD.lo / 20) * 20; v <= LD.hi; v += 20) ldTicks.push(v);
   const PMAX = 45;
   const pdx = (v) => (Math.max(0, Math.min(PMAX, v)) / PMAX) * 100;
+  /* primary columns rank by the site aggregate like every other party
+     listing - user call 2026-10-03: a fixed Labor, Coalition, Greens, One
+     Nation, Other ladder is "unprincipled" */
+  const prims = rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK);
 
   const colHead = (
     <div className={"rd-ap-hrow " + cls} role="row">
@@ -1456,7 +1468,7 @@ function RdAllPolls(P) {
         <span></span>
       </>}
       {facet === "primary" && <>
-        <span className="rd-ap-pnums rd-ap-hpn">{RD_AP_PRIM.map((k) => (k.id === "oth"
+        <span className="rd-ap-pnums rd-ap-hpn">{prims.map((k) => (k.id === "oth"
           ? <span key={k.id} className="rd-ap-th" style={{ color: k.ink }}>{k.lab}</span>
           : <React.Fragment key={k.id}>{th(k.lab, "p." + k.id, { color: k.ink })}</React.Fragment>))}</span>
         <span className="rd-ap-hpic" aria-hidden="true">
@@ -1555,19 +1567,19 @@ function RdAllPolls(P) {
       body = <div className="rd-ap-cpic">{pic}<span className="rd-ap-cval" style={{ color: rdApLeanInk(p.lean, onM) }}>{p.lean == null ? "—" : rdApSigned(p.lean)}</span></div>;
     } else if (facet === "primary") {
       const pr = p.p || {};
-      figs = <span role="cell" className="rd-ap-pnums">{RD_AP_PRIM.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b>)}</span>;
+      figs = <span role="cell" className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b>)}</span>;
       pic = (
-        <span className="rd-ap-pic" role="img" aria-label={"Primary vote: " + RD_AP_PRIM.filter((k) => pr[k.id] != null).map((k) => k.lab + " " + rdApNum(pr[k.id])).join(", ")}>
+        <span className="rd-ap-pic" role="img" aria-label={"Primary vote: " + prims.filter((k) => pr[k.id] != null).map((k) => k.lab + " " + rdApNum(pr[k.id])).join(", ")}>
           <span className="rd-ap-in">
             {[0, 10, 20, 30, 40].map((v) => <i key={v} className="rd-ap-gl" style={{ left: pdx(v) + "%" }}></i>)}
-            {RD_AP_PRIM.filter((k) => pr[k.id] != null).sort((x, y) => pr[y.id] - pr[x.id]).map((k) => (
+            {rdApPrimList(RD_AP_PRIM_FALLBACK).filter((k) => pr[k.id] != null).sort((x, y) => pr[y.id] - pr[x.id]).map((k) => (
               <i key={k.id} className="rd-ap-dot" style={{ left: pdx(pr[k.id]) + "%", background: k.dot }}></i>
             ))}
           </span>
         </span>
       );
       body = <>
-        <div className="rd-ap-cprim">{RD_AP_PRIM.map((k) => <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b></span>)}</div>
+        <div className="rd-ap-cprim">{prims.map((k) => <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b></span>)}</div>
         <div className="rd-ap-cpic">{pic}</div>
       </>;
     } else if (facet === "leadership") {
@@ -1662,7 +1674,7 @@ function RdAllPolls(P) {
       const own = iss && iss.top ? (iss.own && iss.own[iss.top]) || iss.bp || null : null;
       const ownLab = iss && iss.top ? ((D.issues && D.issues.labels && D.issues.labels[iss.top]) || iss.top) : null;
       const ownDots = own
-        ? RD_AP_PRIM.filter((k) => k.id !== "oth" && own[k.id] != null).sort((a, b) => own[b.id] - own[a.id])
+        ? rdApPrimList(RD_AP_PRIM_FALLBACK).filter((k) => k.id !== "oth" && own[k.id] != null).sort((a, b) => own[b.id] - own[a.id])
         : [];
       const ariaBest = ownDots.length
         ? "Rated best on " + (ownLab || "the issue") + ": " + ownDots.map((k) => (window.ISS_PARTY_META[k.id] || [k.id])[0] + " " + rdApNum(own[k.id])).join(", ") + ", shares of all respondents"
@@ -1766,10 +1778,10 @@ function RdAllPolls(P) {
       return (
         <div className={"rd-ap-mrow " + cls} role="row" key={"m" + g.ym}>
           <span className="rd-ap-mlab" role="rowheader"><b>{lab}</b><span>{A && !phone ? "average, drawn as rings" : count}</span></span>
-          {A && !phone && <span className="rd-ap-pnums rd-ap-mpn">{RD_AP_PRIM.map((k) => <span key={k.id}>{A[k.id] != null ? A[k.id].toFixed(1) : "—"}</span>)}</span>}
+          {A && !phone && <span className="rd-ap-pnums rd-ap-mpn">{prims.map((k) => <span key={k.id}>{A[k.id] != null ? A[k.id].toFixed(1) : "—"}</span>)}</span>}
           {A && !phone && (
             <span className="rd-ap-pic rd-ap-mpic" aria-hidden="true"><span className="rd-ap-in">
-              {RD_AP_PRIM.filter((k) => A[k.id] != null).map((k) => <i key={k.id} className="rd-ap-ring" style={{ left: pdx(A[k.id]) + "%", borderColor: k.dot }}></i>)}
+              {prims.filter((k) => A[k.id] != null).map((k) => <i key={k.id} className="rd-ap-ring" style={{ left: pdx(A[k.id]) + "%", borderColor: k.dot }}></i>)}
             </span></span>
           )}
         </div>

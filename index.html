@@ -77954,32 +77954,38 @@ function rdPollHead(p) {
   const field = p.field || p.dateLabel;
   return React.createElement(React.Fragment, null, field ? "Conducted on " + field + " from " : "From ", n, ", " + by + (out ? " on " + out : ""));
 }
-const RD_AP_PRIM = [{
-  id: "alp",
-  lab: "ALP",
-  ink: "var(--alp-text)",
-  dot: "var(--alp)"
-}, {
-  id: "lnp",
-  lab: "L/NP",
-  ink: "var(--lnp-text)",
-  dot: "var(--lnp)"
-}, {
-  id: "grn",
-  lab: "GRN",
-  ink: "var(--grn-text)",
-  dot: "var(--grn)"
-}, {
-  id: "onp",
-  lab: "ON",
-  ink: "var(--onp-text)",
-  dot: "var(--onp)"
-}, {
-  id: "oth",
-  lab: "OTH",
-  ink: "var(--ink-2)",
-  dot: "var(--oth)"
-}];
+const RD_AP_PRIM_META = {
+  alp: {
+    lab: "ALP",
+    ink: "var(--alp-text)",
+    dot: "var(--alp)"
+  },
+  lnp: {
+    lab: "L/NP",
+    ink: "var(--lnp-text)",
+    dot: "var(--lnp)"
+  },
+  grn: {
+    lab: "GRN",
+    ink: "var(--grn-text)",
+    dot: "var(--grn)"
+  },
+  onp: {
+    lab: "ON",
+    ink: "var(--onp-text)",
+    dot: "var(--onp)"
+  },
+  oth: {
+    lab: "OTH",
+    ink: "var(--ink-2)",
+    dot: "var(--oth)"
+  }
+};
+const RD_AP_PRIM_FALLBACK = ["alp", "lnp", "grn", "onp", "oth"];
+const rdApPrimList = ids => ids.filter(id => id in RD_AP_PRIM_META).map(id => ({
+  id,
+  ...RD_AP_PRIM_META[id]
+}));
 const RD_AP_TAGS = {
   "2pp": {
     label: "A two-party figure",
@@ -79065,7 +79071,7 @@ function RdApDetail({
     onp: "pOnp",
     oth: "pOth"
   };
-  const prim = RD_AP_PRIM.filter(k => q[k.id] != null).sort((a, b) => q[b.id] - q[a.id]);
+  const prim = rdApPrimList(RD_AP_PRIM_FALLBACK).filter(k => q[k.id] != null).sort((a, b) => q[b.id] - q[a.id]);
   const pair = (a, b, bInk) => React.createElement("b", {
     className: "rd-apd-pair"
   }, React.createElement("span", {
@@ -79138,7 +79144,7 @@ function RdApDetail({
   const leaders = [["alb", "albNet", "Albanese"], ["taylor", "taylorNet", a.oppName || "Taylor"], ["hanson", "hansonNet", "Hanson"]].filter(([, nk]) => a[nk] != null);
   const allFav = leaders.length > 0 && leaders.every(([id]) => mb[id] === "fav");
   const d = p.dir;
-  const seats = p.seats && p.seats.p ? RD_AP_PRIM.filter(k => p.seats.p[k.id]) : [];
+  const seats = p.seats && p.seats.p ? rdApPrimList(RD_AP_PRIM_FALLBACK).filter(k => p.seats.p[k.id]) : [];
   const issBestBlock = (() => {
     const iss = p.iss;
     if (!iss) return null;
@@ -79931,6 +79937,7 @@ function RdAllPolls(P) {
   for (let v = Math.ceil(LD.lo / 20) * 20; v <= LD.hi; v += 20) ldTicks.push(v);
   const PMAX = 45;
   const pdx = v => Math.max(0, Math.min(PMAX, v)) / PMAX * 100;
+  const prims = rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK);
   const colHead = React.createElement("div", {
     className: "rd-ap-hrow " + cls,
     role: "row"
@@ -79954,7 +79961,7 @@ function RdAllPolls(P) {
     title: "Sort by poll lean, towards Labor first"
   }), React.createElement("span", null)), facet === "primary" && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-ap-pnums rd-ap-hpn"
-  }, RD_AP_PRIM.map(k => k.id === "oth" ? React.createElement("span", {
+  }, prims.map(k => k.id === "oth" ? React.createElement("span", {
     key: k.id,
     className: "rd-ap-th",
     style: {
@@ -80182,7 +80189,7 @@ function RdAllPolls(P) {
       figs = React.createElement("span", {
         role: "cell",
         className: "rd-ap-pnums"
-      }, RD_AP_PRIM.map(k => React.createElement("b", {
+      }, prims.map(k => React.createElement("b", {
         key: k.id,
         style: {
           color: k.ink
@@ -80191,7 +80198,7 @@ function RdAllPolls(P) {
       pic = React.createElement("span", {
         className: "rd-ap-pic",
         role: "img",
-        "aria-label": "Primary vote: " + RD_AP_PRIM.filter(k => pr[k.id] != null).map(k => k.lab + " " + rdApNum(pr[k.id])).join(", ")
+        "aria-label": "Primary vote: " + prims.filter(k => pr[k.id] != null).map(k => k.lab + " " + rdApNum(pr[k.id])).join(", ")
       }, React.createElement("span", {
         className: "rd-ap-in"
       }, [0, 10, 20, 30, 40].map(v => React.createElement("i", {
@@ -80200,7 +80207,7 @@ function RdAllPolls(P) {
         style: {
           left: pdx(v) + "%"
         }
-      })), RD_AP_PRIM.filter(k => pr[k.id] != null).sort((x, y) => pr[y.id] - pr[x.id]).map(k => React.createElement("i", {
+      })), rdApPrimList(RD_AP_PRIM_FALLBACK).filter(k => pr[k.id] != null).sort((x, y) => pr[y.id] - pr[x.id]).map(k => React.createElement("i", {
         key: k.id,
         className: "rd-ap-dot",
         style: {
@@ -80210,7 +80217,7 @@ function RdAllPolls(P) {
       }))));
       body = React.createElement(React.Fragment, null, React.createElement("div", {
         className: "rd-ap-cprim"
-      }, RD_AP_PRIM.map(k => React.createElement("span", {
+      }, prims.map(k => React.createElement("span", {
         key: k.id
       }, React.createElement("em", null, k.lab), React.createElement("b", {
         style: {
@@ -80424,7 +80431,7 @@ function RdAllPolls(P) {
       figs = React.createElement(React.Fragment, null, issCell(it, !(iss && iss.sal) && iss && iss.conc ? ", unprompted" : null), issCell(top3[1] || null), issCell(top3[2] || null));
       const own = iss && iss.top ? iss.own && iss.own[iss.top] || iss.bp || null : null;
       const ownLab = iss && iss.top ? D.issues && D.issues.labels && D.issues.labels[iss.top] || iss.top : null;
-      const ownDots = own ? RD_AP_PRIM.filter(k => k.id !== "oth" && own[k.id] != null).sort((a, b) => own[b.id] - own[a.id]) : [];
+      const ownDots = own ? rdApPrimList(RD_AP_PRIM_FALLBACK).filter(k => k.id !== "oth" && own[k.id] != null).sort((a, b) => own[b.id] - own[a.id]) : [];
       const ariaBest = ownDots.length ? "Rated best on " + (ownLab || "the issue") + ": " + ownDots.map(k => (window.ISS_PARTY_META[k.id] || [k.id])[0] + " " + rdApNum(own[k.id])).join(", ") + ", shares of all respondents" : "No best-party reading this wave";
       pic = React.createElement("span", {
         className: "rd-ap-pic",
@@ -80580,14 +80587,14 @@ function RdAllPolls(P) {
         role: "rowheader"
       }, React.createElement("b", null, lab), React.createElement("span", null, A && !phone ? "average, drawn as rings" : count)), A && !phone && React.createElement("span", {
         className: "rd-ap-pnums rd-ap-mpn"
-      }, RD_AP_PRIM.map(k => React.createElement("span", {
+      }, prims.map(k => React.createElement("span", {
         key: k.id
       }, A[k.id] != null ? A[k.id].toFixed(1) : "—"))), A && !phone && React.createElement("span", {
         className: "rd-ap-pic rd-ap-mpic",
         "aria-hidden": "true"
       }, React.createElement("span", {
         className: "rd-ap-in"
-      }, RD_AP_PRIM.filter(k => A[k.id] != null).map(k => React.createElement("i", {
+      }, prims.filter(k => A[k.id] != null).map(k => React.createElement("i", {
         key: k.id,
         className: "rd-ap-ring",
         style: {
