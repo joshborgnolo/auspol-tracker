@@ -416,11 +416,36 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     );
   };
 
+  /* the All-polls facet-walk contract, here too: switching view (tabs,
+     arrow walk, row nav, swipe) or flipping the matchup/basis holds the
+     TABLE at its spot on screen while anything above it reflows - on
+     narrow widths the twopp-only .rd-pl-ctlrow mount/unmount between the
+     tab row and the table is the live height change (the pin's RO-on-
+     ancestors answers it before the frame paints), and leaving twopp
+     takes the controls out of the desktop tab row. Anchor the table
+     itself first: pinning the tab row would hold the tabs and let the
+     table ride the ctlrow's height (All-polls' .rd-ap-pctl lesson). The
+     rows keep their pollster keys across a hop, so no reseat reshuffle.
+     Ask for the pin on fine pointers too, like the All-polls facet walk
+     and cycles' compare walk (the user's standing call: the laptop walk
+     holds the way a phone's does). */
+  const pinPl = () => {
+    const sec = document.getElementById("latest-polls");
+    if (!sec) return;
+    rdPinScroll([
+      sec.querySelector(".rd-pl"),
+      sec.querySelector(".rd-pl-tabs"),
+    ], true);
+  };
+  const pickFacet = (id) => { pinPl(); setFacet(id); };
+  const flipPick = () => { pinPl(); if (setTppMatchup) setTppMatchup(onMatch ? "alp_lnp" : "alp_on"); };
+  const basisPick = () => { pinPl(); setTppBasis(basis === "imp" ? "resp" : "imp"); };
+
   const basisWord = onMatch ? (basis === "resp" ? "as published" : "implied flows") : (basis === "resp" ? "as published" : "implied flows");
   const controls = facet === "twopp" && (
     <span className="rd-pl-ctl">
       {!narrow && <span className="rd-pl-ctl-l">Two-party:</span>}
-      <button type="button" className="rd-pl-flip" onClick={() => setTppMatchup && setTppMatchup(onMatch ? "alp_lnp" : "alp_on")}
+      <button type="button" className="rd-pl-flip" onClick={flipPick}
               title={"Show Labor v " + (onMatch ? "the Coalition" : "One Nation") + " instead"}>
         Labor v {rivalName} <span aria-hidden="true">⇄</span></button>
       <span className="rd-pl-ctl-l">, {narrow ? (basis === "resp" ? "published" : "implied") : basisWord}</span>
@@ -430,7 +455,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
           ? "Each pollster’s own published figures, from where its respondents say their preferences would go."
           : "Each poll’s primary votes, run through one fixed set of preference flows, so every pollster is read the same way."}</p>
         <div className="rd-qrow"><span>Show the pollsters’ published figures</span>
-          <RdSwitch on={basis === "resp"} onToggle={() => setTppBasis(basis === "imp" ? "resp" : "imp")} label="Show the pollsters’ published figures" /></div>
+          <RdSwitch on={basis === "resp"} onToggle={basisPick} label="Show the pollsters’ published figures" /></div>
         <p className="rd-qnote">The switch changes the whole page, the headline figures included.</p>
       </RdQPop>
     </span>
@@ -456,11 +481,10 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       e.preventDefault();
-      setFacet((f) => {
-        const n = RD_PL_FACETS.length;
-        const i = RD_PL_FACETS.findIndex((x) => x.id === f);
-        return i < 0 ? f : RD_PL_FACETS[(i + (e.key === "ArrowRight" ? 1 : -1) + n) % n].id;
-      });
+      const n = RD_PL_FACETS.length;
+      const i = RD_PL_FACETS.findIndex((x) => x.id === facet);
+      if (i < 0) return;
+      pickFacet(RD_PL_FACETS[(i + (e.key === "ArrowRight" ? 1 : -1) + n) % n].id);
     };
     document.addEventListener("keydown", key, true);
     return () => {
@@ -468,7 +492,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       sec.removeEventListener("pointerleave", leave);
       document.removeEventListener("keydown", key, true);
     };
-  }, []);
+  }, [facet]);
 
   /* Spacebar flips the two-party contest and p the published/implied
      basis while the table is on screen - the tab row's "Labor v X ⇄"
@@ -478,13 +502,9 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
      focus is anywhere but the page, space keeps its scroll day job and
      p is left alone. */
   const spaceFlip = React.useRef(null);
-  spaceFlip.current = facet === "twopp" && setTppMatchup
-    ? () => setTppMatchup(onMatch ? "alp_lnp" : "alp_on")
-    : null;
+  spaceFlip.current = facet === "twopp" && setTppMatchup ? flipPick : null;
   const pubFlip = React.useRef(null);
-  pubFlip.current = facet === "twopp" && setTppBasis
-    ? () => setTppBasis(basis === "imp" ? "resp" : "imp")
-    : null;
+  pubFlip.current = facet === "twopp" && setTppBasis ? basisPick : null;
   React.useEffect(() => {
     const sec = document.getElementById("latest-polls");
     if (!sec) return undefined;
@@ -522,7 +542,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
       e.preventDefault();
       const f = (RD_PL_FACETS.findIndex((x) => x.id === facet) + (e.key === "ArrowRight" ? 1 : -1) + RD_PL_FACETS.length) % RD_PL_FACETS.length;
-      setFacet(RD_PL_FACETS[f].id);
+      pickFacet(RD_PL_FACETS[f].id);
       return;
     }
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
@@ -542,7 +562,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
         {phone ? "The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll."
           : "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm." + (narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection.")}
       </p>
-      <RdTabs swipe value={facet} onChange={setFacet} options={narrow ? RD_PL_FACETS.map((f) => (f.id === "leadership" ? { ...f, label: "Leaders" } : f)) : RD_PL_FACETS}
+      <RdTabs swipe value={facet} onChange={pickFacet} options={narrow ? RD_PL_FACETS.map((f) => (f.id === "leadership" ? { ...f, label: "Leaders" } : f)) : RD_PL_FACETS}
               ariaLabel="Poll table view" className="rd-pl-tabs">
         {!narrow && controls}
       </RdTabs>
