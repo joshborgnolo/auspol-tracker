@@ -551,8 +551,13 @@ function gpEngine(M, N, cb, opt) {
   }
   const fiNow = () => M.fOf(S.x);
   function glideTo(x, t) {
-    S.glide = { x: S.x, v: S.glide && S.mode === "glide" ? S.glide.v : 0, to: gpClamp(x, x0, x1) };
     S.coast = null;
+    if (reduce) {          // no travel: the reading simply changes
+      S.x = gpClamp(x, x0, x1); S.glide = null; S.reelDirect = false;
+      setMode("pause", t); announce();
+      return;
+    }
+    S.glide = { x: S.x, v: S.glide && S.mode === "glide" ? S.glide.v : 0, to: gpClamp(x, x0, x1) };
     setMode("glide", t);
   }
   function nearestX(x) { return X[Math.round(M.fOf(x))]; }
@@ -1169,6 +1174,8 @@ function gpEngine(M, N, cb, opt) {
 
   const onResize = () => { measure(); wake(); };
   window.addEventListener("resize", onResize);
+  // the stage scrolls only on a very short screen; every cached rect moves with it
+  N.root.addEventListener("scroll", onResize, { passive: true });
   const mo = new MutationObserver(() => { readTheme(); buildStatic(); wake(); });
   mo.observe(document.body, { attributes: true, attributeFilter: ["class"] });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (!dead) { measure(); wake(); } });
@@ -1192,6 +1199,7 @@ function gpEngine(M, N, cb, opt) {
   measure();
   if (fly) glyph.style.opacity = "0";
   if (!fly) N.root.classList.add("gp-in");
+  setMode(S.mode, T0);    // the replay is already under way while the dial flies in
   if (reduce || !fly) {
     S.ended = true;
     N.root.classList.add("gp-end");
@@ -1248,6 +1256,7 @@ function gpEngine(M, N, cb, opt) {
       N.when.removeEventListener("wheel", onWheel);
       N.time.removeEventListener("wheel", onWheel);
       window.removeEventListener("resize", onResize);
+      N.root.removeEventListener("scroll", onResize);
       mo.disconnect();
       if (glyph) glyph.style.opacity = "";
     },
