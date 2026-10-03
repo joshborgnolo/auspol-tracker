@@ -139,6 +139,107 @@ ck("gen-page-path", "feature", genPage === PAGE_F, `generator PAGE = ${genPage} 
 const htmlHasEmbedded = /const POLL_DATA|const DATA|window\.__VIC|"polls":\[/.test(html);
 info("data-embed-shape", "feature", `embedded dataset in page: ${htmlHasEmbedded ? "yes" : "no (page fetches or inlines another way)"}`);
 
+// ---- charts: the standard §2 demand list (D1–D5, D13) --------------------------------
+const FIG_RE = /<figure class="vp-chart"[^>]*aria-label="([^"]*)"[^>]*>([\s\S]*?)<\/figure>/g;
+const figures = [...html.matchAll(FIG_RE)].map((m) => ({ label: m[1], body: m[2] }));
+const low = (s) => s.toLowerCase();
+const fig2pp = figures.find((f) => /two-party/.test(low(f.label)));
+const figFp = figures.find((f) => /first[ -]?pref/.test(low(f.label)));
+const figLeaders = figures.filter((f) => /leader|premier|satisfaction|approval/.test(low(f.label)));
+
+const figName = (i, f) => `f${i}-${(f.label.match(/(two-party|first preferences|leader|premier|approval|satisfaction|net)/i) || ["chart"])[0].toLowerCase().replace(/\s+/g, "-")}`;
+
+ck("chart-figure-count", "feature", figures.length >= 4, `${figures.length} .vp-chart figures on the page (expect ≥4: 2PP, first preferences, two leaders)`);
+
+// D1 — every wave dot's <title> carries firm + fieldwork span + value,
+// and the published sample where one exists ("Firm, 20–27 May 2023 —
+// measure 61.5 (n 1,004)"). Multi-day waves are a data-specific share, so
+// the span demand is a FAIL only when the data says spans exist.
+const multi = polls.filter((p) => p.fwStart && p.fwEnd && p.fwStart < p.fwEnd).length;
+const multiShare = multi / (polls.length || 1);
+figures.forEach((f, i) => {
+  const id = figName(i, f);
+  const titles = [...f.body.matchAll(/<title>([\s\S]*?)<\/title>/g)].map((m) => m[1].trim());
+  ck(`chart-titles-present-${id}`, "feature", titles.length > 0, `${titles.length} <title> hovers in figure ${i} (${f.label.slice(0, 60)})`);
+  if (!titles.length) return;
+  const withVal = titles.filter((t) => /\d+(\.\d+)?\s*(\([^()]*\))?\s*$/.test(t));
+  ck(`chart-titles-value-${id}`, "feature", withVal.length / titles.length >= 0.9, `${withVal.length}/${titles.length} titles end with the plotted value`);
+  const withSpan = titles.filter((t) => /–| to /.test(t));
+  const spanShare = withSpan.length / titles.length;
+  if (multiShare >= 0.4) ck(`chart-titles-span-${id}`, "feature", spanShare >= 0.75, `${withSpan.length}/${titles.length} titles carry a fieldwork span (data has ${multi}/${polls.length} multi-day waves)`);
+  const sampleRowsF = polls.filter((p) => typeof p.sample === "number").length / (polls.length || 1);
+  const withN = titles.filter((t) => /\(?\bn\s?[= ]\s?[\d,]{3,}\)?/.test(t));
+  if (sampleRowsF >= 0.5) ck(`chart-titles-sample-${id}`, "feature", withN.length / titles.length >= 0.4, `${withN.length}/${titles.length} titles name the sample (${sampleRowsF >= 0.5 ? Math.round(sampleRowsF * 100) : 0}% of waves publish one)`);
+});
+
+// D2 — end-of-line value labels on every series, every figure
+figures.forEach((f, i) => {
+  const id = figName(i, f);
+  const vb = (f.body.match(/viewBox="0 0 ([\d.]+) [\d.]+"/) || [])[1];
+  if (!vb) { ck(`chart-endlabels-${id}`, "feature", false, `figure ${i} has no parseable viewBox — cannot verify end labels`); return; }
+  const w = +vb;
+  const right = [...f.body.matchAll(/<text[^>]*x="([\d.]+)"[^>]*>([\d.]+)%?\u2212?[^<]*<\/text>/g)]
+    .filter((m) => +m[1] > w * 0.8 && /^\d+(\.\d+)?%?$/.test(m[2].trim()));
+  const need = f === figFp ? 4 : 1;
+  ck(`chart-endlabels-${id}`, "feature", right.length >= need, `${right.length} value label(s) at the right plot edge in figure ${i}; ${need}+ required (every series's current value visible, main-page end-label convention)`);
+});
+
+// D3 — official-result reference markers where a result exists
+ck("tpp-2022-election-marker", "feature", !!fig2pp && /2022/.test(fig2pp.body) && /55(\.0)?/.test(fig2pp.body), `2PP figure ${fig2pp ? (fig2pp.body.includes("2022") ? "marks" : "is MISSING") : "missing — no figure"} the 2022 election baseline (Labor 55.0)`);
+ck("fp-2022-election-markers", "feature", !!figFp && /2022/.test(figFp.body), `first-preferences figure ${figFp ? (/2022/.test(figFp.body) ? "carries" : "MISSING") : "missing"} 2022 election reference marks (official statewide primaries)`);
+
+// D4 — leadership-era boundary annotations on the leaders figures
+{
+  const names = ["Andrews", "Allan", "Carroll", "Pesutto", "Battin", "Wilson", "Pickering"];
+  const leadText = figLeaders.map((f) => f.body).join(" ");
+  const found = names.filter((n) => leadText.includes(n));
+  ck("leader-era-markers", "feature", figLeaders.length > 0 && found.length >= 2, figLeaders.length ? `leaders figures name ${found.length} era figures (${found.join(", ") || "none"}) — premier/opposition era changes must be marked` : "no leaders figures found");
+}
+
+// D5 — axis vocabulary on every figure: year-ish x ticks, y ticks, U+2212
+const negHyphen = figures.map((f, i) => i).filter((i) => /<text[^>]*>-\d/.test(figures[i].body));
+ck("chart-ticks-u2212", "visual", negHyphen.length === 0, negHyphen.length ? `figures ${negHyphen.join(",")} render hyphen-minus negatives — U+2212 required` : "no hyphen-minus negatives inside chart figures");
+figures.forEach((f, i) => {
+  const id = figName(i, f);
+  const ys = [...f.body.matchAll(/<text[^>]*>([−-]?\d+(\.\d+)?%?)\s*<\/text>/g)].length;
+  const xs = [...f.body.matchAll(/<text[^>]*>([\s\S]*?)<\/text>/g)].filter((m) => /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b|\b(19|20)\d\d\b|Election/.test(m[1])).length;
+  ck(`chart-axes-${id}`, "visual", ys >= 3 && xs >= 3, `figure ${i}: ${ys} numeric y ticks, ${xs} date/event x labels`);
+});
+
+// D13 — ARIA on page-owned parts
+ck("figure-aria-labels", "feature", figures.every((f) => f.label.trim().length > 10), `${figures.length} figures all carry a meaningful aria-label (role=img)`);
+ck("table-caption", "feature", /<table[^>]*>[\s\S]*?<caption/.test(html), "poll table carries a <caption>");
+
+// D7 — hero clauses: basis count + the 2022 baseline delta nearby
+ck("hero-basis-clause", "feature", /two-party figures/i.test(text) || /published 2PPs?/i.test(text) || /published two-party/i.test(text), "the headline 2PP clause names its basis ('from N published two-party figures …')");
+ck("hero-2022-delta", "feature", /2022/.test(text) && /(\d+(\.\d+)?\s*(points?|pts?)\s*(behind|ahead|above|below|off|short|of the 2022)|compared with 2022|vs 2022|against the 2022)/i.test(text), "hero/summary copy states the current blend's distance from the 2022 election result");
+
+// D8 — a gist dek under every content h2
+for (const want of EXPECTED_H2) {
+  const at = html.indexOf(`<h2`);
+  void at;
+  const m = html.match(new RegExp(`<h2[^>]*>[^<]*${want.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[^<]*</h2>([\\s\\S]{0,3000})`));
+  let okDek = false, got = "";
+  if (m) {
+    const seg = m[1].slice(0, m[1].search(/<(figure|table|h2)/i) >= 0 ? m[1].search(/<(figure|table|h2)/i) : m[1].length);
+    const p = seg.match(/<p[^>]*>([\s\S]*?)<\/p>/);
+    if (p) { const t = p[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(); got = t.slice(0, 80); okDek = t.length >= 40; }
+  }
+  ck(`section-dek-${want.toLowerCase().replace(/[^a-z]+/g, "-")}`, "feature", okDek, okDek ? `dek under "${want}": "${got}…"` : `no gist dek (≥40 chars) under "${want}" before its first figure/table`);
+}
+
+// D11 — "Every published poll" means every census row renders
+{
+  const h = html.indexOf("Every published poll");
+  const seg = h >= 0 ? html.slice(h, Math.min(h + 60000, html.indexOf("<h2", h + 10) > 0 ? html.indexOf("<h2", h + 10) : html.length)) : "";
+  const rows = (seg.match(/<tr[ >]/g) || []).length;
+  ck("poll-table-census", "feature", h >= 0 && rows >= polls.length, `poll table renders ${rows} <tr> (header included) against a census of ${polls.length} published waves — one row per published poll, newest first`);
+}
+
+// D12 — phone rung is a reviewer-judged item (needs a renderer); leave the
+// static facts on record so the judgement has evidence without a browser.
+info("phone-rung-evidence", "visual", `<meta name="viewport"> present; table wrapper: ${/class="vp-twrap"/.test(html) ? "overflow-x host" : "none"}; page-owned CSS @media rules: ${(html.match(/@media[^{]*max-width/g) || []).length} — reviewer judges 390px/320px integrity by inspection (D12)`);
+
 // ---- emit ---------------------------------------------------------------------------
 const pack = {
   generated: new Date().toISOString(),
