@@ -1,6 +1,6 @@
 ---
 name: auspol-allpolls-issues-facet
-description: auspol-tracker — the All-polls Issues facet (?f=i, shipped as 891d06c 2026-09-29) end-to-end: gen-data issuesOnlyPolls emitter (Ipsos as ISS_ONLY standalone rows, SEC waves riding direction rows), FACET_SCOPE.issues, RdApIssMini rail chart (D.issues.list is an ARRAY — find by id, not key; the TWO-BASIS ownership trap — iss.own is as-printed all-respondent, the pooled monthly series is three-party-renormalised §5i, renderers must renormalise before co-plotting), the FINAL phone-card anatomy (3a73407→f4e52b3→1c8ef8b→unranked-col-placeholder 2026-10-03: dots full-width on their own body line again, head-row issfig verdict chip, ONE superscript-ordinal ranking sentence — "Cost of living 1st, housing 2nd, crime 3rd", figures dropped, ISS_SENT_SHORT labels in SENTENCE CASE via sentLab/sentLab1, SEC ", unprompted", and for no-ranking waves the dictated "Issues unranked, but performance on cost of living assessed" line gated on iss.own.col), the ISS_PARTY → ISS_PARTY_META classic-script collision lesson, the detail rail's "Asked" fact-row three-way PAYLOAD branch (sal→prompted, conc→SEC line, own-only→"asked only who'd be best on each issue" — the Resolve-quoting-SEC fix, 9aa99cf; lesson: branch copy on payload fields, never on "the one house we know"), the probe openRowContaining toggle-collapse contract, and the iss-facet/dir-facet probes.
+description: auspol-tracker — the All-polls Issues facet (?f=i, shipped as 891d06c 2026-09-29) end-to-end: gen-data issuesOnlyPolls emitter (Ipsos as ISS_ONLY standalone rows, SEC waves riding direction rows), FACET_SCOPE.issues, RdApIssMini rail chart (D.issues.list is an ARRAY — find by id, not key; the TWO-BASIS ownership trap — iss.own is as-printed all-respondent, the pooled monthly series is three-party-renormalised §5i, renderers must renormalise before co-plotting), the FINAL phone-card anatomy (3a73407→f4e52b3→1c8ef8b→unranked-col-placeholder 2026-10-03: dots full-width on their own body line again, head-row issfig verdict chip, ONE superscript-ordinal ranking sentence — "Cost of living 1st, housing 2nd, crime 3rd", figures dropped, ISS_SENT_SHORT labels in SENTENCE CASE via sentLab/sentLab1, SEC "; unprompted", and for no-ranking waves the dictated "Issues unranked, but performance on cost of living assessed" line gated on iss.own.col), the ISS_PARTY → ISS_PARTY_META classic-script collision lesson, the detail rail's "Asked" fact-row three-way PAYLOAD branch (sal→prompted, conc→SEC line, own-only→"asked only who'd be best on each issue" — the Resolve-quoting-SEC fix, 9aa99cf; lesson: branch copy on payload fields, never on "the one house we know"), the probe openRowContaining toggle-collapse contract, and the iss-facet/dir-facet probes.
 source: auto-skill
 extracted_at: '2026-09-29'
 ---
@@ -405,7 +405,9 @@ third best issue on one line") re-restructured the card; f4e52b3
 [not affordability - that's not needed], crime 3rd (", unprompted" on
 SEC)"' +'"also don't capitalise issue names"') established the sentence;
 1c8ef8b ("the first letter of the first issue should be capitalised -
-sentence case") settled the casing. FINAL contract:
+sentence case") settled the casing; a later same-day call ("for sec
+newgate, make it '; unprompted' instead of ', unprompted'")
+re-punctuated SEC's tail. FINAL contract:
 
 - The ownership dot strip is BACK on its own full-width BODY line:
   `{ownDots.length > 0 && <div className="rd-ap-cpic">{pic}</div>}` is
@@ -430,7 +432,7 @@ sentence case") settled the casing. FINAL contract:
   and `sentLab1(l) = s.charAt(0).toUpperCase() + s.slice(1)` for the
   first label only — f4e52b3 had lowercased sentence-initial too;
   1c8ef8b lifted ONLY the leading letter, everything else stands;
-  `", unprompted"` suffix on SEC waves
+  `"; unprompted"` suffix on SEC waves
   (`unprompted = !!(iss && !iss.sal && iss.conc)`).
 - Unranked-but-col placeholder (same day; source jsx rode into the
   sibling primary-order commit 4820dda, probe pins + compiled line
@@ -464,7 +466,7 @@ sentence case") settled the casing. FINAL contract:
   (sentence+strip) / 93.9 (strip-only); the 140.3 outlier is
   "economic management" wrapping the sentence to two lines on its card.
   390px renders (post-1c8ef8b, sentence case): SEC "Cost of living 1st,
-  housing 2nd, crime 3rd, unprompted" (chip "ALP 23"); RedBridge "Cost
+  housing 2nd, crime 3rd; unprompted" (chip "ALP 23"); RedBridge "Cost
   of living 1st, health 2nd, housing 3rd"; Ipsos "Cost of living 1st,
   housing 2nd, economic management 3rd".
 - Probe pinning (iss-facet.mjs, 43 checks since the placeholder and
@@ -472,7 +474,7 @@ sentence case") settled the casing. FINAL contract:
   `/ 1st/`; ordinal grammar `/, [^,(]+ 2nd/` and `/, [^,(]+ 3rd/`;
   `legacy` flags any relic figure grammar (`/\(\d+\)/` or
   ` top issue | then |Best on it`); `capsOk` (1c8ef8b) asserts EXACTLY
-  ONE capital — at position 0 after stripping the ", unprompted" tail
+  ONE capital — at position 0 after stripping the "; unprompted" tail
   (`/^[A-Z]/.test(bare) && !/[A-Z]/.test(bare.slice(1))`) — so BOTH
   drift directions fail: all-lowercase (f4e52b3's contract) and Title
   Case. LESSON: the probe's grammar anchors ARE the copy contract —

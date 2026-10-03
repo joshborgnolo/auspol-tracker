@@ -1482,7 +1482,7 @@ function RdAllPolls(P) {
           ? <span key={k.id} className="rd-ap-th" style={{ color: k.ink }}>{k.lab}</span>
           : <React.Fragment key={k.id}>{th(k.lab, "p." + k.id, { color: k.ink })}</React.Fragment>))}</span>
         <span className="rd-ap-hpic" aria-hidden="true">
-          <span className="rd-ap-cap">Primary vote, %</span>
+          <span className="rd-ap-cap">Primary vote</span>
           <span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span>
         </span>
         <span></span>
@@ -1672,7 +1672,7 @@ function RdAllPolls(P) {
         </span>
       );
       figs = <>
-        {issCell(it, !(iss && iss.sal) && iss && iss.conc ? ", unprompted" : null)}
+        {issCell(it, !(iss && iss.sal) && iss && iss.conc ? "; unprompted" : null)}
         {issCell(top3[1] || null)}
         {issCell(top3[2] || null)}
       </>;
@@ -1715,7 +1715,9 @@ function RdAllPolls(P) {
          capitalise issue names - eg 'housing', not 'Housing'"; last of all:
          "the first letter of the first issue should be capitalised -
          sentence case", so sentence case it is - sentLab1 lifts only the
-         leading letter), a plain ranking with NO figures - the ordinal
+         leading letter; SEC's tail was later re-punctuated to
+         "; unprompted" ("for sec newgate, make it '; unprompted' instead
+         of ', unprompted'")), a plain ranking with NO figures - the ordinal
          itself now says what the wordy tail did, and the salience shares
          stay quoted in the desktop cells and the detail rail. Labels run
          through ISS_SENT_SHORT (the one SEC label the user named
@@ -1744,7 +1746,7 @@ function RdAllPolls(P) {
             {sentLab1(it[0])} {ord(1)}
             {top3.length > 1 && <>, {sentLab(top3[1][0])} {ord(2)}</>}
             {top3.length > 2 && <>, {sentLab(top3[2][0])} {ord(3)}</>}
-            {unprompted ? ", unprompted" : ""}
+            {unprompted ? "; unprompted" : ""}
           </div>
         )}
         {!it && iss && iss.own && iss.own.col && (
@@ -1828,7 +1830,7 @@ function RdAllPolls(P) {
   const phoneHead = (
     <div className={"rd-ap-phead " + cls}>
       {facet === "twopp" && <span className="rd-ap-hpic"><RdApScale onM={onM} phone /></span>}
-      {facet === "primary" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Primary vote, %</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
+      {facet === "primary" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Primary vote</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
       {facet === "leadership" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Net rating: approve minus disapprove</span><span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span></span>}
       {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span>, unsure, <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
       {facet === "issues" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Best on the top issue, %</span><span className="rd-ap-in">{[0, 10, 20, 30].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 30 ? "%" : ""}</span>)}</span></span>}

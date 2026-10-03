@@ -79989,7 +79989,7 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Primary vote, %"), React.createElement("span", {
+  }, "Primary vote"), React.createElement("span", {
     className: "rd-ap-in"
   }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
     key: v,
@@ -80441,7 +80441,7 @@ function RdAllPolls(P) {
       }, t[0], suffix || "")) : React.createElement("span", {
         className: "rd-ap-none"
       }, "\u2014"));
-      figs = React.createElement(React.Fragment, null, issCell(it, !(iss && iss.sal) && iss && iss.conc ? ", unprompted" : null), issCell(top3[1] || null), issCell(top3[2] || null));
+      figs = React.createElement(React.Fragment, null, issCell(it, !(iss && iss.sal) && iss && iss.conc ? "; unprompted" : null), issCell(top3[1] || null), issCell(top3[2] || null));
       const own = iss && iss.top ? iss.own && iss.own[iss.top] || iss.bp || null : null;
       const ownLab = iss && iss.top ? D.issues && D.issues.labels && D.issues.labels[iss.top] || iss.top : null;
       const ownDots = own ? prims.filter(k => k.id !== "oth" && own[k.id] != null) : [];
@@ -80496,7 +80496,7 @@ function RdAllPolls(P) {
       const ord = n => n === 1 ? React.createElement("span", null, "1", React.createElement("sup", null, "st")) : n === 2 ? React.createElement("span", null, "2", React.createElement("sup", null, "nd")) : React.createElement("span", null, "3", React.createElement("sup", null, "rd"));
       body = React.createElement(React.Fragment, null, it && React.createElement("div", {
         className: "rd-ap-csub rd-ap-csub-sent"
-      }, sentLab1(it[0]), " ", ord(1), top3.length > 1 && React.createElement(React.Fragment, null, ", ", sentLab(top3[1][0]), " ", ord(2)), top3.length > 2 && React.createElement(React.Fragment, null, ", ", sentLab(top3[2][0]), " ", ord(3)), unprompted ? ", unprompted" : ""), !it && iss && iss.own && iss.own.col && React.createElement("div", {
+      }, sentLab1(it[0]), " ", ord(1), top3.length > 1 && React.createElement(React.Fragment, null, ", ", sentLab(top3[1][0]), " ", ord(2)), top3.length > 2 && React.createElement(React.Fragment, null, ", ", sentLab(top3[2][0]), " ", ord(3)), unprompted ? "; unprompted" : ""), !it && iss && iss.own && iss.own.col && React.createElement("div", {
         className: "rd-ap-csub rd-ap-csub-sent"
       }, "Issues unranked, but performance on cost of living assessed"), ownDots.length > 0 && React.createElement("div", {
         className: "rd-ap-cpic"
@@ -80644,7 +80644,7 @@ function RdAllPolls(P) {
     className: "rd-ap-hpic"
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Primary vote, %"), React.createElement("span", {
+  }, "Primary vote"), React.createElement("span", {
     className: "rd-ap-in"
   }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
     key: v,

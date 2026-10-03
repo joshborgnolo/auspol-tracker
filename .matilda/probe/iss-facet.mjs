@@ -430,7 +430,8 @@ await showAll(page3);
 // and NO figures ("Cost of living 1st, housing 2nd, crime 3rd" - SENTENCE
 // CASE: only the leading letter of the first label is capital, every other
 // label lowercased; "Housing affordability"
-// shortened to "housing", ", unprompted" appended on SEC waves); it rides
+// shortened to "housing", "; unprompted" appended on SEC waves per the
+// later same-day call 'make it "; unprompted" instead of ", unprompted"'); it rides
 // .rd-ap-csub-sent so it flows as ONE inline run (the row's shared csub
 // rule is display:flex, which once itemised the JSX fragments into a
 // 4-line column at 390px). The best-party verdict leaves the body and
