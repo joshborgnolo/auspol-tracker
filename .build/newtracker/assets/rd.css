@@ -2067,9 +2067,11 @@ body.rd .rd-ap-dot {
 @media (prefers-reduced-motion: reduce) {
   body.rd .rd-ap-dot, body.rd .rd-ap-wh, body.rd .rd-ap-clip { transition: none; }
 }
+/* hollow centre: overlapping rings cross like a Venn instead of the
+   later-painted party erasing the earlier (nothing else sits under them) */
 body.rd .rd-ap-ring {
   top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; box-sizing: border-box;
-  border-radius: 50%; border: 1.75px solid; background: var(--bg);
+  border-radius: 50%; border: 1.75px solid;
 }
 body.rd .rd-ap-pnums { display: grid; grid-template-columns: repeat(5, 46px); align-items: baseline; }
 body.rd .rd-ap-pnums > b { font-size: 15px; font-weight: 600; }
