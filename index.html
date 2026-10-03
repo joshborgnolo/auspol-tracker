@@ -78666,7 +78666,14 @@ function RdCycleChart({
     openKey: evt && evt.e ? evt.e.badgeKey : null
   }));
 }
-const combSeries = c => c.raw.months.map((_, i) => c.opp === "lnp" && c.raw.oppr[i] != null && (c.raw.onp || [])[i] != null ? +(c.raw.oppr[i] + c.raw.onp[i]).toFixed(2) : null);
+const rdOnpUnsplit = c => !(c.raw.onp || []).some(v => v != null);
+const combSeries = c => {
+  const nil = rdOnpUnsplit(c);
+  return c.raw.months.map((_, i) => {
+    const on = nil ? 0 : (c.raw.onp || [])[i];
+    return c.opp === "lnp" && c.raw.oppr[i] != null && on != null ? +(c.raw.oppr[i] + on).toFixed(2) : null;
+  });
+};
 const seriesOf = (c, key) => key === "comb" ? combSeries(c) : c.raw[key] || [];
 const cycBaseOf = (c, key) => key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : cycBase(c, key);
 function rdCycPeers(M, cycles, hidden, chg, m) {
@@ -78735,7 +78742,7 @@ const rdCycWhen = (c, m) => {
 };
 function rdCycPolled(c, key, i) {
   const o = c.raw.obs || {};
-  if (key === "comb") return !!(o.oppr || [])[i] && c.raw.onp != null && c.raw.onp[i] != null && (!!(o.onp || [])[i] || c.raw.onp[i] === 0);
+  if (key === "comb") return !!(o.oppr || [])[i] && (rdOnpUnsplit(c) || c.raw.onp[i] != null && (!!(o.onp || [])[i] || c.raw.onp[i] === 0));
   if (!o[key]) return seriesOf(c, key)[i] != null;
   return !!o[key][i];
 }
@@ -79366,8 +79373,8 @@ function RdPastCycles(p) {
       } : a;
     }, null) : null;
     const peerNote = onpOwn ? "One Nation has never been the opposition, so it is ranked against past oppositions’ primary votes." : r.key === "han" ? "No past term rated Hanson, so she is ranked against past opposition leaders’ net approval, and her ratings join their records." : r.key === "comb" ? (() => {
-      const gone = cycles.filter(c => !c.current && c.opp === "lnp" && !seriesOf(c, "comb").some(v => v != null)).map(c => c.year);
-      return "Only terms with the Coalition in opposition count, and before One Nation existed the Coalition’s vote stands alone." + (gone.length ? " " + gone.join(" and ") + (gone.length > 1 ? " are" : " is") + " left out: " + (gone.length > 1 ? "their" : "its") + " polls didn’t report One Nation separately." : "");
+      const nil = cycles.filter(c => !c.current && c.opp === "lnp" && rdOnpUnsplit(c)).map(c => c.year);
+      return "Only terms with the Coalition in opposition count. Before One Nation existed the Coalition’s vote stands alone" + (nil.length ? ", as it does in " + nil.join(" and ") + ", when polls didn’t report One Nation separately (it was polling about 1%)" : "") + ".";
     })() : null;
     const notes = [onpOwn ? "One Nation’s records are its own" + (firstOnp ? ", from its first poll in " + rdCycWhen(firstOnp.c, firstOnp.m) : "") + "." : null, g === "leaders" ? "In the records a leader counts once per term, at their lowest or highest month. Only months with a poll count." : "In the records a term counts once, at its lowest or highest month, so one long slump can’t fill the list. Only months with a poll count, not the election results.", hasEl && list.some(e => e.el != null) ? React.createElement(React.Fragment, null, React.createElement("i", {
       className: "rd-csl-ring key",

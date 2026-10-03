@@ -280,9 +280,18 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
    was Labor's vote plus One Nation's, no measure of the right's. Before One
    Nation stood its 0 is a fact, so 1972-93's Coalition oppositions stand on
    their own vote. Terms whose polls never split One Nation out (2004-13)
-   have a null-padded raw.onp, so 2007 and 2010 carry no combined reading
-   and drop out of the strip. */
-const combSeries = (c) => c.raw.months.map((_, i) => (c.opp === "lnp" && c.raw.oppr[i] != null && (c.raw.onp || [])[i] != null ? +(c.raw.oppr[i] + c.raw.onp[i]).toFixed(2) : null));
+   have a null-padded raw.onp; it was polling about 1% then, so 2007 and
+   2010 count it as nothing too and keep their place (user call 2026-10-04)
+   rather than dropping out of the strip. A term that did split it out still
+   joins only the months both parties were measured. */
+const rdOnpUnsplit = (c) => !(c.raw.onp || []).some((v) => v != null);
+const combSeries = (c) => {
+  const nil = rdOnpUnsplit(c);
+  return c.raw.months.map((_, i) => {
+    const on = nil ? 0 : (c.raw.onp || [])[i];
+    return c.opp === "lnp" && c.raw.oppr[i] != null && on != null ? +(c.raw.oppr[i] + on).toFixed(2) : null;
+  });
+};
 const seriesOf = (c, key) => (key === "comb" ? combSeries(c) : (c.raw[key] || []));
 const cycBaseOf = (c, key) => (key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : cycBase(c, key));
 /* the past terms at one month for one measure: the same pooled set the band
@@ -338,7 +347,7 @@ const rdCycWhen = (c, m) => {
    not a gap. Hanson's ratings carry no flags: every one is a reading. */
 function rdCycPolled(c, key, i) {
   const o = c.raw.obs || {};
-  if (key === "comb") return !!(o.oppr || [])[i] && c.raw.onp != null && c.raw.onp[i] != null && (!!(o.onp || [])[i] || c.raw.onp[i] === 0);
+  if (key === "comb") return !!(o.oppr || [])[i] && (rdOnpUnsplit(c) || (c.raw.onp[i] != null && (!!(o.onp || [])[i] || c.raw.onp[i] === 0)));
   if (!o[key]) return seriesOf(c, key)[i] != null;
   return !!o[key][i];
 }
@@ -928,9 +937,9 @@ function RdPastCycles(p) {
     const peerNote = onpOwn ? "One Nation has never been the opposition, so it is ranked against past oppositions’ primary votes."
       : r.key === "han" ? "No past term rated Hanson, so she is ranked against past opposition leaders’ net approval, and her ratings join their records."
       : r.key === "comb" ? (() => {
-        const gone = cycles.filter((c) => !c.current && c.opp === "lnp" && !seriesOf(c, "comb").some((v) => v != null)).map((c) => c.year);
-        return "Only terms with the Coalition in opposition count, and before One Nation existed the Coalition’s vote stands alone."
-          + (gone.length ? " " + gone.join(" and ") + (gone.length > 1 ? " are" : " is") + " left out: " + (gone.length > 1 ? "their" : "its") + " polls didn’t report One Nation separately." : "");
+        const nil = cycles.filter((c) => !c.current && c.opp === "lnp" && rdOnpUnsplit(c)).map((c) => c.year);
+        return "Only terms with the Coalition in opposition count. Before One Nation existed the Coalition’s vote stands alone"
+          + (nil.length ? ", as it does in " + nil.join(" and ") + ", when polls didn’t report One Nation separately (it was polling about 1%)" : "") + ".";
       })()
       : null;
     const notes = [
