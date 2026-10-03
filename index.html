@@ -4457,7 +4457,7 @@ body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 176px) minmax(0, 136px) minmax(0, 136px) minmax(0, 336px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(120px, 176px) minmax(104px, 136px) minmax(104px, 136px) minmax(168px, 336px) 72px 40px; }
 body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint);
   box-sizing: border-box; min-height: 57px;  }
 body.rd .rd-ap-hrow > * { min-width: 0; }
@@ -4666,7 +4666,8 @@ body.rd .rd-apd-issrow > b { font-weight: 600; text-align: right; font-variant-n
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 148px) minmax(0, 116px) minmax(0, 116px) minmax(0, 300px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(108px, 148px) minmax(96px, 116px) 0 minmax(160px, 300px) 72px 32px; }
+  body.rd .rd-ap-hrow.rd-ap-ciss > :nth-child(7), body.rd .rd-ap-row.rd-ap-ciss > :nth-child(7) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-long { display: none; }
 }
 body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
@@ -4675,7 +4676,8 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
-  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 120px) minmax(0, 96px) minmax(0, 96px) minmax(0, 1fr) 72px 28px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px 120px 0 0 minmax(150px, 1fr) 72px 28px; }
+  body.rd .rd-ap-hrow.rd-ap-ciss > :nth-child(6), body.rd .rd-ap-row.rd-ap-ciss > :nth-child(6) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-n, body.rd .rd-ap-hrow > .rd-ap-th:nth-child(3) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
@@ -53157,6 +53159,7 @@ function TrendChart(props) {
     },
     heightPx,
     padPx,
+    widthSeed = null,
     series: seriesProp = [],
     scatter: scatterProp = [],
     yTicks = [],
@@ -53299,12 +53302,12 @@ function TrendChart(props) {
   const ref = useRef(null);
   const badgeAt = useRef({});
   const labOff = useRef(new Map());
-  const [cw, setCw] = useState(VB.W);
+  const [cw, setCw] = useState(widthSeed || VB.W);
   React.useLayoutEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
     const update = () => setCw(el.getBoundingClientRect().width || VB.W);
-    update();
+    if (widthSeed == null) update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
@@ -68920,6 +68923,11 @@ function rdGaugeSeed() {
   const g = Math.min(64, Math.max(20, 0.05 * vw));
   return Math.min(760, Math.max(280, Math.min(1152, vw - 2 * g)));
 }
+function rdHeroChartSeed() {
+  const vw = typeof window !== "undefined" && window.innerWidth || 1280;
+  const g = Math.min(64, Math.max(20, 0.05 * vw));
+  return Math.min(1152, vw - 2 * g);
+}
 function RdLeadGauge({
   lead,
   margin,
@@ -69795,6 +69803,7 @@ function RdHero(p) {
   }), React.createElement(TrendChart, {
     key: "rd-hero",
     heightPx: narrow ? 300 : 372,
+    widthSeed: rdHeroChartSeed(),
     padPx: narrow ? {
       l: 30,
       r: 6,
