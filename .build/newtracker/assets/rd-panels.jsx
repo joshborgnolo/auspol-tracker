@@ -2362,18 +2362,17 @@ function RdSwitching({ rangeId }) {
     sz: [fmt1(c.w) + "%" + (c.id === "lnp" || c.id === "alp" ? " of 2025 voters" : c.id === "oth" ? ", incl. independents" : ""), fmt1(c.w) + "%"],
     /* the first two columns' points rows name what they count (full wording
        on big screens, the ON short form on small, "of the gain" second);
-       every later column is bare */
+       every later column is bare. The phone rows say the same wordings */
     pts: c.kept ? ["≈ " + fmt1(keptPts)] : i === 0
       ? ["≈ " + fmt1(c.pts) + " points of One Nation’s gain", "≈ " + fmt1(c.pts) + " points of ON’s gain", "≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)]
       : i === 1
         ? ["≈ " + fmt1(c.pts) + " points of the gain", "≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)]
         : ["≈ " + fmt1(c.pts) + " points", "≈ " + fmt1(c.pts)],
-    /* the share row carries its counting tail on the FIRST column only, and
-       there as "of the gain" — the column's own "of One Nation's gain" sits
-       on the pts row above, so repeating it (or the second column's tail)
-       doubled the same tail down a column (user, 2026-09-30) */
-    sh: c.kept ? ["kept"] : [Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + (i === 0 ? " of the gain" : ""),
-                            Math.round(c.gain) + "% ±" + fmt1(c.gainCi), Math.round(c.gain) + "%"],
+    /* the share row is bare: its old "of the gain" tail duplicated what the
+       pts row above already names (first-column-only from 2026-09-30, gone
+       for good 2026-10-03, both layouts - user calls) */
+    sh: c.kept ? ["kept"] : [Math.round(c.gain) + "% ±" + fmt1(c.gainCi),
+                            Math.round(c.gain) + "%"],
   }));
   const lab = {};
   [["nm", 15, 600], ["sz", 12, 400], ["pts", 15, 600], ["sh", 12, 400]].forEach(([key, size, wt]) => {
@@ -2438,11 +2437,15 @@ function RdSwitching({ rangeId }) {
   ) : (
     <div className="rd-mo-rows">
       {/* the parties named as the canvas named them, and the first bar
-          spelling out what its two parts are, as the laptop's mosaic does */}
+          spelling out what its two parts are, as the laptop's mosaic does.
+          The first two rows' pts figures name what they count in the
+          laptop's short wordings - the full "One Nation's gain" doesn't
+          clear even a 390px row beside the party name (user, 2026-10-03);
+          the ± row needed no tail once the pts row named the gain */}
       {all.map((c, i) => (
         <div key={c.id} className="rd-mo-row">
-          <div className="rd-mo-rtop"><b style={{ color: c.ink }}>{c.kept ? "One Nation" : c.id === "oth" ? "Others & independents" : NAME[c.id]}</b><b>≈ {fmt1(c.kept ? keptPts : c.pts)} pts</b></div>
-          <div className="rd-mo-rsub"><span>{fmt1(c.w)}% of 2025 voters</span><span>{c.kept ? Math.round(c.rate) + "% still back it" : Math.round(c.gain) + "% ±" + fmt1(c.gainCi) + " of the gain"}</span></div>
+          <div className="rd-mo-rtop"><b style={{ color: c.ink }}>{c.kept ? "One Nation" : c.id === "oth" ? "Others & independents" : NAME[c.id]}</b><b>{c.kept ? "≈ " + fmt1(keptPts) + " pts" : i === 0 ? "≈ " + fmt1(c.pts) + " points of ON’s gain" : i === 1 ? "≈ " + fmt1(c.pts) + " points of the gain" : "≈ " + fmt1(c.pts) + " pts"}</b></div>
+          <div className="rd-mo-rsub"><span>{fmt1(c.w)}% of 2025 voters</span><span>{c.kept ? Math.round(c.rate) + "% still back it" : Math.round(c.gain) + "% ±" + fmt1(c.gainCi)}</span></div>
           <div className="rd-mo-rbar" style={{ height: Math.max(16, c.w * 2.6), background: c.tint }}>
             <span style={{ width: c.rate + "%", background: c.kept ? "var(--onp-deep)" : "var(--onp)" }}></span>
             {!c.kept && i === 0 ? (
