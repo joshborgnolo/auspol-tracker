@@ -840,7 +840,14 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
     const iss = p.iss;
     if (!iss) return null;
     const topId = iss.top;
+    /* the key reads "Rated best on cost of living" - sentence case:
+       the label bank starts labels capital ("Cost of living"), the
+       "Rated best on …" key sits mid-sentence (user call 2026-10-03:
+       "issues should take sentence case, no capital C"). Only the
+       leading letter drops - "Pensions and older Australians" keeps
+       its interior capital */
     const lab = (D.issues && D.issues.labels && D.issues.labels[topId]) || null;
+    const tit = lab ? lab.charAt(0).toLowerCase() + lab.slice(1) : "the top issue";
     const rowOf = (q, sh) => {
       const meta = window.ISS_PARTY_META[q] || [q, q, null];
       return { k: q, v: sh[q], lab: q === "rest" || q === "oth" ? "the rest" : meta[0], ink: meta[2] };
@@ -854,11 +861,11 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
         ? Object.fromEntries(["alp", "lnp", "onp"].map((q) => [q, own[q] * 100 / nm3]))
         : own;
       const rows = ["alp", "lnp", "onp"].filter((q) => o3[q] != null).map((q) => rowOf(q, o3));
-      if (rows.length > 1) return { title: lab || "the top issue", rows, cap: "Shares of those naming one of these three, %" };
+      if (rows.length > 1) return { title: tit, rows, cap: "Shares of those naming one of these three, %" };
     }
     if (iss.bp) {
       const rows = ["alp", "lnp", "grn", "onp", "rest"].filter((q) => iss.bp[q] != null).map((q) => rowOf(q, iss.bp));
-      if (rows.length > 1) return { title: lab || "the top issue", rows, cap: "SEC Newgate’s printed best-party figures, %" };
+      if (rows.length > 1) return { title: tit, rows, cap: "SEC Newgate’s printed best-party figures, %" };
     }
     return null;
   })();
@@ -1085,12 +1092,18 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
             <RdApDirMini p={p} />
           </>
         )}
-        {isIss && D.issues && iss && iss.own && iss.own[iss.top] && (
-          <>
-            <span className="rd-apd-ct">Who voters rate best on {(D.issues.labels && D.issues.labels[iss.top]) || iss.top} since {D.monthNameFull(Number(from.slice(5)))}, the monthly pooled line and this wave’s own figures on the same basis — shares of those naming one of the three parties</span>
-            <RdApIssMini p={p} />
-          </>
-        )}
+        {isIss && D.issues && iss && iss.own && iss.own[iss.top] && (() => {
+          const cLab = (D.issues.labels && D.issues.labels[iss.top]) || iss.top;
+          // sentence case mid-sentence, user call 2026-10-03 (the "Rated best on"
+          // key case): the labels bank ships leading-capped, drop only the first letter
+          const cTit = cLab.charAt(0).toLowerCase() + cLab.slice(1);
+          return (
+            <>
+              <span className="rd-apd-ct">Who voters rate best on {cTit} since {D.monthNameFull(Number(from.slice(5)))}, the monthly pooled line and this wave’s own figures on the same basis — shares of those naming one of the three parties</span>
+              <RdApIssMini p={p} />
+            </>
+          );
+        })()}
         <div className="rd-apd-facts">
           {isIss && iss && <>
             <span className="rd-apd-k">Asked</span>
@@ -1666,13 +1679,13 @@ function RdAllPolls(P) {
       const it = iss ? window.issTopOf(iss) : null;
       const ib = iss ? window.issBestOf(iss) : null;
       const im = ib ? (window.ISS_PARTY_META[ib.who] || [ib.who, ib.who, null]) : null;
-      const issCell = (t, suffix) => (
+      const issCell = (t) => (
         <span role="cell" className="rd-ap-dnum">
-          {t ? <><b>{rdApNum(t[1])}</b><span className="rd-ap-sub">{t[0]}{suffix || ""}</span></> : <span className="rd-ap-none">—</span>}
+          {t ? <><b>{rdApNum(t[1])}</b><span className="rd-ap-sub">{t[0]}</span></> : <span className="rd-ap-none">—</span>}
         </span>
       );
       figs = <>
-        {issCell(it, !(iss && iss.sal) && iss && iss.conc ? "; unprompted" : null)}
+        {issCell(it)}
         {issCell(top3[1] || null)}
         {issCell(top3[2] || null)}
       </>;
@@ -1687,7 +1700,7 @@ function RdAllPolls(P) {
         ? prims.filter((k) => k.id !== "oth" && own[k.id] != null)
         : [];
       const ariaBest = ownDots.length
-        ? "Rated best on " + (ownLab || "the issue") + ": " + ownDots.map((k) => (window.ISS_PARTY_META[k.id] || [k.id])[0] + " " + rdApNum(own[k.id])).join(", ") + ", shares of all respondents"
+        ? "Rated best on " + (ownLab ? ownLab.charAt(0).toLowerCase() + ownLab.slice(1) : "the issue") + ": " + ownDots.map((k) => (window.ISS_PARTY_META[k.id] || [k.id])[0] + " " + rdApNum(own[k.id])).join(", ") + ", shares of all respondents"
         : "No best-party reading this wave";
       pic = (
         <span className="rd-ap-pic" role="img" aria-label={ariaBest}>
@@ -1717,7 +1730,13 @@ function RdAllPolls(P) {
          sentence case", so sentence case it is - sentLab1 lifts only the
          leading letter; SEC's tail was later re-punctuated to
          "; unprompted" ("for sec newgate, make it '; unprompted' instead
-         of ', unprompted'")), a plain ranking with NO figures - the ordinal
+         of ', unprompted'"), and finally dropped from the ROWS outright
+         (same-day call: 'remove "; unprompted" from SEC Newgate rows -
+         this is not so important that it must be mentioned in the rows
+         as well as in the expanded poll detail' - the detail's unprompted
+         mentions all stay: the "Named without prompting" block, the
+         mention-shares note and the SEC explainer popup)), a plain
+         ranking with NO figures - the ordinal
          itself now says what the wordy tail did, and the salience shares
          stay quoted in the desktop cells and the detail rail. Labels run
          through ISS_SENT_SHORT (the one SEC label the user named
@@ -1745,7 +1764,6 @@ function RdAllPolls(P) {
          320px and up now gets the sentence on one line); pure
          best-party waves (SEC) and iss-less ordinary rows keep no
          sentence at all */
-      const unprompted = !!(iss && !iss.sal && iss.conc);
       if (ib && im) {
         right1 = <b className="rd-ap-issfig"><span style={im[2] ? { color: im[2] } : null}>{im[1]}</span> {rdApNum(ib.v)}</b>;
       }
@@ -1777,7 +1795,6 @@ function RdAllPolls(P) {
             {sentPart(it[0], true)} {ord(1)}
             {top3.length > 1 && <>, {sentPart(top3[1][0])} {ord(2)}</>}
             {top3.length > 2 && <>, {sentPart(top3[2][0])} {ord(3)}</>}
-            {unprompted ? "; unprompted" : ""}
           </div>
         )}
         {!it && iss && iss.own && iss.own.col && (

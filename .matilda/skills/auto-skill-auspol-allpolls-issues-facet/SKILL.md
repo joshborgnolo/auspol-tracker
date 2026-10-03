@@ -1,6 +1,6 @@
 ---
 name: auspol-allpolls-issues-facet
-description: auspol-tracker — the All-polls Issues facet (?f=i, shipped as 891d06c 2026-09-29) end-to-end: gen-data issuesOnlyPolls emitter (Ipsos as ISS_ONLY standalone rows, SEC waves riding direction rows), FACET_SCOPE.issues, RdApIssMini rail chart (D.issues.list is an ARRAY — find by id, not key; the TWO-BASIS ownership trap — iss.own is as-printed all-respondent, the pooled monthly series is three-party-renormalised §5i, renderers must renormalise before co-plotting), the FINAL phone-card anatomy (3a73407→f4e52b3→1c8ef8b→unranked-col-placeholder 2026-10-03: dots full-width on their own body line again, head-row issfig verdict chip, ONE superscript-ordinal ranking sentence — "Cost of living 1st, housing 2nd, crime 3rd", figures dropped, ISS_SENT_SHORT labels in SENTENCE CASE via sentLab/sentLab1, SEC "; unprompted", and for no-ranking waves the dictated "Issues unranked, but performance on cost of living assessed" line gated on iss.own.col), the ISS_PARTY → ISS_PARTY_META classic-script collision lesson, the detail rail's "Asked" fact-row three-way PAYLOAD branch (sal→prompted, conc→SEC line, own-only→"asked only who'd be best on each issue" — the Resolve-quoting-SEC fix, 9aa99cf; lesson: branch copy on payload fields, never on "the one house we know"), the probe openRowContaining toggle-collapse contract, and the iss-facet/dir-facet probes.
+description: auspol-tracker — the All-polls Issues facet (?f=i, shipped as 891d06c 2026-09-29) end-to-end: gen-data issuesOnlyPolls emitter (Ipsos as ISS_ONLY standalone rows, SEC waves riding direction rows), FACET_SCOPE.issues, RdApIssMini rail chart (D.issues.list is an ARRAY — find by id, not key; the TWO-BASIS ownership trap — iss.own is as-printed all-respondent, the pooled monthly series is three-party-renormalised §5i, renderers must renormalise before co-plotting), the FINAL phone-card anatomy (3a73407→f4e52b3→1c8ef8b→unranked-col-placeholder 2026-10-03: dots full-width on their own body line again, head-row issfig verdict chip, ONE superscript-ordinal ranking sentence — "Cost of living 1st, housing 2nd, crime 3rd", figures dropped, ISS_SENT_SHORT labels in SENTENCE CASE via sentLab/sentLab1, SEC's row "; unprompted" tail dropped the same day (the detail keeps its unprompted mentions), and for no-ranking waves the dictated "Issues unranked, but performance on cost of living assessed" line gated on iss.own.col), the ISS_PARTY → ISS_PARTY_META classic-script collision lesson, the detail rail's "Asked" fact-row three-way PAYLOAD branch (sal→prompted, conc→SEC line, own-only→"asked only who'd be best on each issue" — the Resolve-quoting-SEC fix, 9aa99cf; lesson: branch copy on payload fields, never on "the one house we know"), the probe openRowContaining toggle-collapse contract, and the iss-facet/dir-facet probes.
 source: auto-skill
 extracted_at: '2026-09-29'
 ---
@@ -253,6 +253,18 @@ bases at once and every renderer that co-plots them must align them:
   first or you sum to exactly 200) back through the axis-anchor pixel
   scale and assert Σ ≈ 100 ± 2.5. Catches any renderer regression that
   goes back to plotting as-printed shares.
+- The issBestBlock key reads "Rated best on cost of living" — SENTENCE
+  CASE (user call 2026-10-03: "issues should take sentence case, no
+  capital C"). The labels bank (data/issues.json issues: map) starts
+  labels capital ("Cost of living", "National security"), and the key
+  sits mid-sentence, so the renderer drops ONLY the leading letter
+  (`tit = lab.charAt(0).toLowerCase() + lab.slice(1)`; interior names
+  keep their caps). Every mid-sentence render site applies it: the two
+  issBestBlock return branches, the row's ariaBest string, and the rail
+  caption "Who voters rate best on cost of living since …" (cTit).
+  Pinned by iss-facet.mjs — opened SEC row: a grid matches
+  /^Rated best on [a-z]/ (none [A-Z]) and railCtrl matches
+  /rate best on [a-z]/.
 
 Rule of thumb repeated everywhere it bites: **before co-plotting any
 per-wave figure against a pooled auspol series, check the series' basis
@@ -387,8 +399,8 @@ THE LESSON that shipped the bug (user report 2026-10-03: "in all poles,
 in issues, in how it counts, resolve says: SEC Newgate asks…"): the row
 had TWO branches and its fallback sentence NAMED SEC Newgate — fine
 while SEC was the only salience-less house (the phone cards' ",
-unprompted" suffix has always been `conc`-gated, so only the desktop
-rail was wrong). Resolve/DemosAU/YouGov own-only waves fell straight
+unprompted" suffix — then still shipped, `conc`-gated — played no
+part, so only the desktop rail was wrong). Resolve/DemosAU/YouGov own-only waves fell straight
 into the fallback and every expanded Resolve row "quoted" SEC's method.
 RULE: key copy branches off payload fields (sal/conc/own); never write
 fallback text that names the one house you know carries the branch
@@ -437,7 +449,11 @@ SEC)"' +'"also don't capitalise issue names"') established the sentence;
 1c8ef8b ("the first letter of the first issue should be capitalised -
 sentence case") settled the casing; a later same-day call ("for sec
 newgate, make it '; unprompted' instead of ', unprompted'")
-re-punctuated SEC's tail. FINAL contract:
+re-punctuated SEC's tail, and a final same-day call ('remove
+"; unprompted" from SEC Newgate rows - this is not so important that
+it must be mentioned in the rows as well as in the expanded poll
+detail') dropped the tail from the rows outright (the detail's
+unprompted mentions all stay). FINAL contract:
 
 - The ownership dot strip is BACK on its own full-width BODY line:
   `{ownDots.length > 0 && <div className="rd-ap-cpic">{pic}</div>}` is
@@ -463,7 +479,15 @@ re-punctuated SEC's tail. FINAL contract:
   first label only — f4e52b3 had lowercased sentence-initial too;
   1c8ef8b lifted ONLY the leading letter, everything else stands;
   `"; unprompted"` suffix on SEC waves
-  (`unprompted = !!(iss && !iss.sal && iss.conc)`).
+  (`unprompted = !!(iss && !iss.sal && iss.conc)`) — DROPPED from the
+  rows on a last same-day call ('remove "; unprompted" from SEC Newgate
+  rows - this is not so important that it must be mentioned in the rows
+  as well as in the expanded poll detail'): the desktop dnum-cell
+  suffix, the phone sentence tail and the `unprompted` var all went;
+  every DETAIL mention stays (the "Named without prompting" block, the
+  mention-shares note, the SEC explainer popup). Probe absence pins:
+  rowAnatomy `unpRows` (no row textContent matches /unprompted/i),
+  card `unpLeft` (no sentence), both added with the drop.
 - The "economic management" label is a TWO-SPAN container rung
   (2026-10-03, user: 'Shorten it to "economic mgmt" when it would
   otherwise spill over to two lines'): `sentPart(l, pos1)`
@@ -540,20 +564,23 @@ re-punctuated SEC's tail. FINAL contract:
   the two-span rung the Ipsos card is one line on every shell from
   340px up (SHORT 291.7px ≤ every lane ≥300px) and the wrap survives
   only at 320px (the 280px lane, 11.7px short of even the short form).
-  390px renders (post-1c8ef8b, sentence case): SEC "Cost of living 1st,
-  housing 2nd, crime 3rd; unprompted" (chip "ALP 23"); RedBridge "Cost
+  390px renders (post-1c8ef8b, sentence case; the "; unprompted" SEC
+  row tail dropped same-day): SEC "Cost of living 1st, housing 2nd,
+  crime 3rd" (chip "ALP 23"); RedBridge "Cost
   of living 1st, health 2nd, housing 3rd"; Ipsos "Cost of living 1st,
   housing 2nd, economic management 3rd" — the LONG spelling, the rung
   a 350px 390px-shell lane shows.
-- Probe pinning (iss-facet.mjs, 44 checks since the placeholder and
+- Probe pinning (iss-facet.mjs, 47 checks since the placeholder and
   9aa99cf's Asked-branch pin): `topFilled` keys on
   `/ 1st/`; ordinal grammar `/, [^,(]+ 2nd/` and `/, [^,(]+ 3rd/`;
   `legacy` flags any relic figure grammar (`/\(\d+\)/` or
   ` top issue | then |Best on it`); `capsOk` (1c8ef8b) asserts EXACTLY
-  ONE capital — at position 0 after stripping the "; unprompted" tail
-  (`/^[A-Z]/.test(bare) && !/[A-Z]/.test(bare.slice(1))`) — so BOTH
+  ONE capital — at position 0, read straight off the sentence
+  (`/^[A-Z]/.test(txt) && !/[A-Z]/.test(txt.slice(1))`) — so BOTH
   drift directions fail: all-lowercase (f4e52b3's contract) and Title
-  Case. The mgmt rung adds the innerText lesson: cardAnatomy.txt reads
+  Case. Same-day the "; unprompted" tail was dropped the strip was
+  retired with it (`bare` went; `unp` + unpRows absence pins above).
+  The mgmt rung adds the innerText lesson: cardAnatomy.txt reads
   `sent.innerText`, never textContent — the -l/-s pair would
   concatenate BOTH spellings ("…economic management economic mgmt…")
   into every grammar anchor and capsOk; mgmtOk then pins the pair

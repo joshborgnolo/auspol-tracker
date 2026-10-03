@@ -209,6 +209,7 @@ const rowAnatomy = await page1.evaluate(() => {
       i,
       nNums: nums.length,
       filled: nums.map((n) => !!n.querySelector("b")),
+      unp: /unprompted/i.test(r.textContent),
       d2i: !!r.querySelector(".rd-ap-d2i"),
       pic: !!pic,
       dots: pic ? pic.querySelectorAll(".rd-ap-dot").length : 0,
@@ -226,6 +227,7 @@ const rowAnatomy = await page1.evaluate(() => {
     notThree: an.filter((a) => a.nNums !== 3).map((a) => a.i),
     runnerNoTop: an.filter((a) => (a.filled[1] || a.filled[2]) && !a.filled[0]).map((a) => a.i),
     d2iLeft: an.filter((a) => a.d2i).map((a) => a.i),
+    unpRows: an.filter((a) => a.unp).map((a) => a.i),
     noPic: an.filter((a) => !a.pic).map((a) => a.i),
     noNet: an.filter((a) => !a.net).map((a) => a.i),
     badDots: an.filter((a) => a.dots > 0 && (a.dots < 2 || a.dots > 4 || a.gls !== 5)).map((a) => a.i),
@@ -239,6 +241,8 @@ check("every row is three issue cells + the ownership strip + the rail verdict",
   `three-cells off: ${rowAnatomy.notThree.join(",") || "none"} · strip missing: ${rowAnatomy.noPic.join(",") || "none"} · rail missing: ${rowAnatomy.noNet.join(",") || "none"}`);
 check("the stacked 2nd/3rd cell is gone (the facet's tall-row offender)",
   rowAnatomy.d2iLeft.length === 0, `left on: ${rowAnatomy.d2iLeft.join(",") || "none"}`);
+check("no desktop row mentions 'unprompted' (rows dropped the tail 2026-10-03; only the detail keeps it)",
+  rowAnatomy.unpRows.length === 0, `left on: ${rowAnatomy.unpRows.join(",") || "none"}`);
 check("the ownership strip draws 2–4 party dots over 5 gridlines, verdict beside them",
   rowAnatomy.withDots > 0 && rowAnatomy.badDots.length === 0 && rowAnatomy.dotsNoNet.length === 0 && rowAnatomy.netNoDots.length === 0,
   `${rowAnatomy.withDots}/${rowAnatomy.rows} dotted; bad ${rowAnatomy.badDots.join(",") || "none"}; dots-without-verdict ${rowAnatomy.dotsNoNet.join(",") || "none"}; verdict-without-dots ${rowAnatomy.netNoDots.join(",") || "none"}`);
@@ -310,6 +314,18 @@ check("a SEC row shows the unprompted concerns block, flagged as not pooled",
 check("SEC issues rail says unprompted, and never touches the salience pair-lean",
   !!secD && /unprompted/.test(secD.rail) && !/question forms/.test(secD.rail),
   secD ? secD.rail.slice(0, 160) : "no detail");
+// the detail key reads "Rated best on cost of living" - SENTENCE CASE
+// (user call 2026-10-03: 'issues should take sentence case, no capital
+// C'); the labels bank starts labels capital, so the block drops the
+// leading letter. The rail caption ("Who voters rate best on cost of
+// living since …") embeds the same label mid-sentence and rides the
+// same rule.
+check("SEC's 'Rated best on' block names its issue in sentence case",
+  !!secD && secD.grids.some((g) => /^Rated best on [a-z]/.test(g)) && !secD.grids.some((g) => /^Rated best on [A-Z]/.test(g)),
+  secD ? (secD.grids.find((g) => /^Rated best on/.test(g)) || "no best block").slice(0, 90) : "no detail");
+check("the rail caption lowers its issue mid-sentence ('rate best on cost of living…')",
+  !!secD && /rate best on [a-z]/.test(secD.railCtrl) && !/rate best on [A-Z]/.test(secD.railCtrl),
+  secD ? (secD.railCtrl || "no caption").slice(0, 110) : "no detail");
 
 // 7b: opened Resolve row — an OWNERSHIP-ONLY wave (no salience ranking, no
 // concerns bank) must not wear SEC Newgate's Asked line: its Asked fact
@@ -434,8 +450,11 @@ await showAll(page3);
 // and NO figures ("Cost of living 1st, housing 2nd, crime 3rd" - SENTENCE
 // CASE: only the leading letter of the first label is capital, every other
 // label lowercased; "Housing affordability"
-// shortened to "housing", "; unprompted" appended on SEC waves per the
-// later same-day call 'make it "; unprompted" instead of ", unprompted"'); it rides
+// shortened to "housing"; SEC's "; unprompted" row tail was appended then
+// dropped outright the same day ('remove "; unprompted" from SEC Newgate
+// rows - this is not so important that it must be mentioned in the rows
+// as well as in the expanded poll detail' - the rows are bare, the
+// DETAIL's unprompted mentions all stay); it rides
 // .rd-ap-csub-sent so it flows as ONE inline run (the row's shared csub
 // rule is display:flex, which once itemised the JSX fragments into a
 // 4-line column at 390px). The best-party verdict leaves the body and
@@ -490,8 +509,10 @@ const cardAnatomy = await page3.evaluate(() => {
     // user call 2026-10-03: sentence case - exactly ONE capital, the
     // leading letter of the first label ("Cost of living 1st, housing
     // 2nd, ..."); every other label stays lowercase
-    const bare = txt.replace(/ unprompted$/, "");
-    const capsOk = !sent || (/^[A-Z]/.test(bare) && !/[A-Z]/.test(bare.slice(1)));
+    const capsOk = !sent || (/^[A-Z]/.test(txt) && !/[A-Z]/.test(txt.slice(1)));
+    // same-day follow-up: "; unprompted" belongs to the detail, never the
+    // row line - no card's sentence may carry it
+    const unp = /unprompted/i.test(txt);
     const legacy = subs.some((d) => /\(\d+\)/.test(d.textContent)) || subs.some((d) => / top issue | then |Best on it/.test(d.textContent));
     // a card shows exactly one csub when it has the sentence (one rung
     // when it is the placeholder ladder), none when best-party-only
@@ -516,6 +537,7 @@ const cardAnatomy = await page3.evaluate(() => {
     unranked: an.filter((a) => a.unranked).length,
     unrankedFirms: [...new Set(an.filter((a) => a.unranked).map((a) => a.firm))].sort(),
     withNxt: an.filter((a) => a.nxt).length,
+    unpLeft: an.filter((a) => a.unp).map((a) => a.firm + ": " + a.txt),
     badNxt: an.filter((a) => !a.runnerOk || !a.csubSentOk || !a.caps).length,
     // the two-span "economic mgmt" swap: cards carrying the label pair and
     // cards whose displayed-rung/identity contract holds
@@ -536,6 +558,8 @@ console.log("  diag bad-chips:", JSON.stringify(cardAnatomy.an.filter((a) => a.d
 check("phone: the best issues read as ONE flowing sentence of superscript-ordinal rankings in sentence case (no figures)",
   cardAnatomy.withTop > 0 && cardAnatomy.withNxt > 0 && cardAnatomy.badNxt === 0 && cardAnatomy.legacySubs === 0,
   `${cardAnatomy.withTop}/${cardAnatomy.cardsN} with the sentence (${cardAnatomy.withNxt} with runners, ${cardAnatomy.topMissing} best-party-only); bad ${cardAnatomy.badNxt}; legacy subs ${cardAnatomy.legacySubs}`);
+check("phone: no card sentence carries '; unprompted' (rows dropped it; the detail keeps it)",
+  cardAnatomy.unpLeft.length === 0, cardAnatomy.unpLeft.join(" | ") || "none left");
 // exact placeholder count keyed off the page's own data bundle: every
 // iss-bearing wave with no salience/concerns ranking but col ownership
 // figures shows the dictated line, and no other card does

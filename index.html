@@ -79186,6 +79186,7 @@ function RdApDetail({
     if (!iss) return null;
     const topId = iss.top;
     const lab = D.issues && D.issues.labels && D.issues.labels[topId] || null;
+    const tit = lab ? lab.charAt(0).toLowerCase() + lab.slice(1) : "the top issue";
     const rowOf = (q, sh) => {
       const meta = window.ISS_PARTY_META[q] || [q, q, null];
       return {
@@ -79201,7 +79202,7 @@ function RdApDetail({
       const o3 = nm3 > 0 ? Object.fromEntries(["alp", "lnp", "onp"].map(q => [q, own[q] * 100 / nm3])) : own;
       const rows = ["alp", "lnp", "onp"].filter(q => o3[q] != null).map(q => rowOf(q, o3));
       if (rows.length > 1) return {
-        title: lab || "the top issue",
+        title: tit,
         rows,
         cap: "Shares of those naming one of these three, %"
       };
@@ -79209,7 +79210,7 @@ function RdApDetail({
     if (iss.bp) {
       const rows = ["alp", "lnp", "grn", "onp", "rest"].filter(q => iss.bp[q] != null).map(q => rowOf(q, iss.bp));
       if (rows.length > 1) return {
-        title: lab || "the top issue",
+        title: tit,
         rows,
         cap: "SEC Newgate’s printed best-party figures, %"
       };
@@ -79508,11 +79509,15 @@ function RdApDetail({
     className: "rd-apd-ct"
   }, p.pollster, "\u2019s readings since ", D.monthNameFull(Number(from.slice(5))), " against the monthly average, net right direction minus wrong track"), React.createElement(RdApDirMini, {
     p: p
-  })), isIss && D.issues && iss && iss.own && iss.own[iss.top] && React.createElement(React.Fragment, null, React.createElement("span", {
-    className: "rd-apd-ct"
-  }, "Who voters rate best on ", D.issues.labels && D.issues.labels[iss.top] || iss.top, " since ", D.monthNameFull(Number(from.slice(5))), ", the monthly pooled line and this wave\u2019s own figures on the same basis \u2014 shares of those naming one of the three parties"), React.createElement(RdApIssMini, {
-    p: p
-  })), React.createElement("div", {
+  })), isIss && D.issues && iss && iss.own && iss.own[iss.top] && (() => {
+    const cLab = D.issues.labels && D.issues.labels[iss.top] || iss.top;
+    const cTit = cLab.charAt(0).toLowerCase() + cLab.slice(1);
+    return React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "rd-apd-ct"
+    }, "Who voters rate best on ", cTit, " since ", D.monthNameFull(Number(from.slice(5))), ", the monthly pooled line and this wave\u2019s own figures on the same basis \u2014 shares of those naming one of the three parties"), React.createElement(RdApIssMini, {
+      p: p
+    }));
+  })(), React.createElement("div", {
     className: "rd-apd-facts"
   }, isIss && iss && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
@@ -80457,19 +80462,19 @@ function RdAllPolls(P) {
       const it = iss ? window.issTopOf(iss) : null;
       const ib = iss ? window.issBestOf(iss) : null;
       const im = ib ? window.ISS_PARTY_META[ib.who] || [ib.who, ib.who, null] : null;
-      const issCell = (t, suffix) => React.createElement("span", {
+      const issCell = t => React.createElement("span", {
         role: "cell",
         className: "rd-ap-dnum"
       }, t ? React.createElement(React.Fragment, null, React.createElement("b", null, rdApNum(t[1])), React.createElement("span", {
         className: "rd-ap-sub"
-      }, t[0], suffix || "")) : React.createElement("span", {
+      }, t[0])) : React.createElement("span", {
         className: "rd-ap-none"
       }, "\u2014"));
-      figs = React.createElement(React.Fragment, null, issCell(it, !(iss && iss.sal) && iss && iss.conc ? "; unprompted" : null), issCell(top3[1] || null), issCell(top3[2] || null));
+      figs = React.createElement(React.Fragment, null, issCell(it), issCell(top3[1] || null), issCell(top3[2] || null));
       const own = iss && iss.top ? iss.own && iss.own[iss.top] || iss.bp || null : null;
       const ownLab = iss && iss.top ? D.issues && D.issues.labels && D.issues.labels[iss.top] || iss.top : null;
       const ownDots = own ? prims.filter(k => k.id !== "oth" && own[k.id] != null) : [];
-      const ariaBest = ownDots.length ? "Rated best on " + (ownLab || "the issue") + ": " + ownDots.map(k => (window.ISS_PARTY_META[k.id] || [k.id])[0] + " " + rdApNum(own[k.id])).join(", ") + ", shares of all respondents" : "No best-party reading this wave";
+      const ariaBest = ownDots.length ? "Rated best on " + (ownLab ? ownLab.charAt(0).toLowerCase() + ownLab.slice(1) : "the issue") + ": " + ownDots.map(k => (window.ISS_PARTY_META[k.id] || [k.id])[0] + " " + rdApNum(own[k.id])).join(", ") + ", shares of all respondents" : "No best-party reading this wave";
       pic = React.createElement("span", {
         className: "rd-ap-pic",
         role: "img",
@@ -80502,7 +80507,6 @@ function RdAllPolls(P) {
       }, rdApNum(ib.v), " on it")) : React.createElement("span", {
         className: "rd-ap-none"
       }, "\u2014"));
-      const unprompted = !!(iss && !iss.sal && iss.conc);
       if (ib && im) {
         right1 = React.createElement("b", {
           className: "rd-ap-issfig"
@@ -80529,7 +80533,7 @@ function RdAllPolls(P) {
       const ord = n => n === 1 ? React.createElement("span", null, "1", React.createElement("sup", null, "st")) : n === 2 ? React.createElement("span", null, "2", React.createElement("sup", null, "nd")) : React.createElement("span", null, "3", React.createElement("sup", null, "rd"));
       body = React.createElement(React.Fragment, null, it && React.createElement("div", {
         className: "rd-ap-csub rd-ap-csub-sent"
-      }, sentPart(it[0], true), " ", ord(1), top3.length > 1 && React.createElement(React.Fragment, null, ", ", sentPart(top3[1][0]), " ", ord(2)), top3.length > 2 && React.createElement(React.Fragment, null, ", ", sentPart(top3[2][0]), " ", ord(3)), unprompted ? "; unprompted" : ""), !it && iss && iss.own && iss.own.col && React.createElement("div", {
+      }, sentPart(it[0], true), " ", ord(1), top3.length > 1 && React.createElement(React.Fragment, null, ", ", sentPart(top3[1][0]), " ", ord(2)), top3.length > 2 && React.createElement(React.Fragment, null, ", ", sentPart(top3[2][0]), " ", ord(3))), !it && iss && iss.own && iss.own.col && React.createElement("div", {
         className: "rd-ap-issph"
       }, React.createElement("div", {
         className: "rd-ap-csub rd-ap-csub-sent rd-ap-issph-full"
