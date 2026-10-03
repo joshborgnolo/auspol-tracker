@@ -47,7 +47,6 @@ const BUILDER_WALL_DEF = "25m";
 const REVIEWER_WALL_DEF = "10m";
 const BUILDER_TOOLS = 80;
 const REVIEWER_TOOLS = 25; // the reviewer verifies claims with local reads before filing
-const MIN_ROUND_REMAIN_MS = 40 * 60e3; // stop starting rounds when this little run-wall is left
 const REVIEWER_RETRIES = 1;
 
 const argv = process.argv.slice(2);
@@ -82,6 +81,10 @@ const SKIP_NPM_TEST = FLAG("skip-npm-test");
 
 const isoNow = () => new Date().toISOString();
 const wallMs = (w) => { const m = String(w).match(/^(\d+)([smh])$/); if (!m) return 600e3; const n = +m[1]; return n * ({ s: 1e3, m: 60e3, h: 3600e3 })[m[2]]; };
+// Stop starting a round when the run wall can no longer hold one, sized off
+// the CONFIGURED walls: builder + (reviewer with its retry) + gate slack.
+// A fixed 40m floor made short-budget smoke runs cap before round 1.
+const MIN_ROUND_REMAIN_MS = wallMs(BUILDER_WALL) + wallMs(REVIEWER_WALL) * (1 + REVIEWER_RETRIES) + 5 * 60e3;
 
 // ---- git helpers --------------------------------------------------------------
 function git(args, { allowFail = false, env = {} } = {}) {
