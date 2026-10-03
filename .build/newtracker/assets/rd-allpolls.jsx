@@ -1564,7 +1564,7 @@ function RdAllPolls(P) {
         <span className="rd-ap-th" title="The 3rd-most-named issue voters said matters most, with the share naming it">3rd</span>
         <span className="rd-ap-hpic" aria-hidden="true">
           <span className="rd-ap-cap">Best on the top issue</span>
-          <span className="rd-ap-in">{[0, 10, 20, 30].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 30 ? "%" : ""}</span>)}</span>
+          <span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span>
         </span>
         {th("Party in first", "iss.bestv", { right: true, wrap: true, title: "The party most voters rate best on that issue" })}
       </>}

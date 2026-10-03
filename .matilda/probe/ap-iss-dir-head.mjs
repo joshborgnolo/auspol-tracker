@@ -1,7 +1,9 @@
 // Pins the 2026-10-03 All-polls head contracts:
-//  - issues facet: desktop scale ladder is 0/10/20/30(%) (the widened
-//    "40%" ticker overflowed its lane at desktop widths and was dropped;
-//    phone keeps 0/10/20/30/40%), and BOTH homes read "Best on the top issue".
+//  - issues facet: desktop scale ladder is 0/10/20/30/40(%) again (the
+//    "40%" ticker was dropped 2026-10-03 for overflow at desktop widths,
+//    then reinstated the same night after the caption's shorten swept to
+//    all five drives; phone identical), and BOTH homes read "Best on the
+//    top issue".
 //  - direction facet: "Right direction or wrong track, %" sits in the TICK
 //    lane (bottom of the 38px hpic) on desktop AND phone, not the cap lane.
 // Mirrors iss-head-overlap.mjs's harness (file:// build, puppeteer-core).
@@ -92,10 +94,10 @@ const headInfo = () => {
   await pickFacet(page, /^Issues$/);
   const i = await page.evaluate(headInfo);
   check("desktop issues: caption is the full form", i.capText === "Best on the top issue", i.capText);
-  check("desktop issues: ladder is 0/10/20/30 with the unit on 30 (no 40% ticker)",
-    i.tks.length === 4 && i.tks[3].text === "30%" && !i.tks.some((t) => t.text === "40%"),
+  check("desktop issues: ladder is 0/10/20/30/40 with the unit on 40 (the ticker is back)",
+    i.tks.length === 5 && i.tks[4].text === "40%" && i.tks.some((t) => t.text === "30"),
     JSON.stringify(i.tks.map((t) => t.text)));
-  check("desktop issues: last tick bottom == hpic bottom (lane intact)", i.tks.length === 4 && Math.abs(i.tks[3].bottom - i.hpic.bottom) < 0.51, JSON.stringify(i.tks[3]));
+  check("desktop issues: last tick bottom == hpic bottom (lane intact)", i.tks.length === 5 && Math.abs(i.tks[4].bottom - i.hpic.bottom) < 0.51, JSON.stringify(i.tks[4]));
 
   check("desktop: no page errors", errs.length === 0, errs[0] || "");
   await page.close();

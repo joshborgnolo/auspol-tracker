@@ -43,7 +43,8 @@ grammar exactly:
   as-printed non-null parties, sorted desc. Head captions MATCH after
   the fifth drive — both homes read "Best on the top issue" (the phone
   gained "the" in the same drive that dropped the desktop head's 40
-  tick; see the captions section below).
+  tick — restored hours later, so both heads draw the full 0–40 ladder
+  again; see the captions section below).
 - The Best-on-it verdict MOVED to the right-aligned `.rd-ap-netcell` rail
   position (`.rd-ap-issbest`: party abbrev in its css-var colour + the
   "N on it" sub) — the same slot Direction's Net figure occupies.
@@ -143,8 +144,16 @@ DESKTOP head ladder reverted to 0/10/20/30 (4 ticks, "%" back on the
 30) while the phone head keeps all five — the row strip gridlines and
 the 0–45 pdx scale are untouched everywhere (still 0/10/20/30/40, and
 >30 dots still overshoot the final desktop head gridline by design).
+SIXTH pass, hours later (user notices "no ticker label for 40%" on
+their laptop; told the blank was their own fifth-drive removal and
+that the caption had since shortened to the 148.6px "Best on the top
+issue", they reversed — "it fits now. add it"): the DESKTOP head runs
+0/10/20/30/40 again (5 ticks, "%" on the 40), so BOTH heads are once
+more identical — the row strip gridlines and 0–45 pdx scale never
+moved through any of it, and the head-overshoot clause moves up to
+>40 dots.
 
-## Head captions/labels — THREE strings, final contract 2026-10-03 (now FIVE drives)
+## Head captions/labels — THREE strings, final contract 2026-10-03 (now SIX drives)
 
 The phone complaint came first ("it just says best on its own on a line
 on my phone. Surely you can add more words there" — 9d2f9a2), then the
@@ -183,7 +192,8 @@ FINAL strings, all shipped:
   fit one line.
 - PHONE phead (:1852) = `"Best on the top issue"` since the fifth
   drive — the fourth dropped the ", %" basis mark (the 0–40 tick
-  ladder, phone-only since the fifth, already carries the sign) and
+  ladder, phone-only during the brief fifth-drive interval and back on
+  both rungs since the sixth, already carries the sign) and
   the fifth added "the" back so both homes match. Measured ~160px at
   the phone caps font — trivially clear of the ~272px track at 320,
   and the sweep probe capsOk of iss-facet.mjs pins it. The width law
@@ -203,8 +213,8 @@ FINAL strings, all shipped:
 - Probe pinning: iss-facet.mjs pins the two CAPTION strings —
   `headCap:"Best on the top issue"` (desktop, :247) and `phoneHead.cap:
   "Best on the top issue"` (:547; identical strings since the fifth
-  drive), PLUS the per-rung tick ladders (desktop 4 ticks end "30%",
-  phone 5 end "40%"; ap-iss-dir-head.mjs re-pins both beside the
+  drive), PLUS the per-rung tick ladders (5 ticks ending "40%" on BOTH
+  rungs since the sixth; ap-iss-dir-head.mjs re-pins both beside the
   direction-lane checks); it never pins the rail th text. The RAIL
   th is located by `/Party in first/i` regex in the three head-geometry
   probes iss-head-sweep.mjs (:34), iss-head-overlap.mjs (:50) and
@@ -696,7 +706,7 @@ exports.
   "question forms" in rail, Resolve detail = issues rail with Asked |
   usual lean | In today's panel, phone 390px cards (2nd/3rd csub iff top
   filled, ownership iff `.rd-ap-cpic` with 2–4 dots, phead caption +
-  4 ticks), the two-basis pin in §"TWO-BASIS OWNERSHIP" above (wave's
+  5 ticks), the two-basis pin in §"TWO-BASIS OWNERSHIP" above (wave's
   own detail dots Σ ≈ 100 after axis-pixel inversion — the detail
   renormalises; the ROW strip deliberately doesn't), and the x-basis pin
   8c in §"X-BASIS" above (dots cx ≈ X(fmid), ≠ X(released)).

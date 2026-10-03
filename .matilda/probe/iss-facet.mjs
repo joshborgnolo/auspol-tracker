@@ -251,7 +251,7 @@ check("a row naming a 2nd or 3rd issue always fills its top-issue cell",
 check("the column head names the scale the strip draws on",
   rowAnatomy.head.includes("2nd") && rowAnatomy.head.includes("3rd")
     && rowAnatomy.headCap === "Best on the top issue"
-    && rowAnatomy.headTk === 4,
+    && rowAnatomy.headTk === 5,
   rowAnatomy.headCap + ` · ticks ${rowAnatomy.headTk}`);
 
 // 5: Ipsos never leaves the facet (no VI, no leadership rows to stand on)
