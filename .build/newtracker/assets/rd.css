@@ -2290,7 +2290,11 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-c2 > .rd-ap-sub:last-child:not(:first-child) { flex-shrink: 0; }
   body.rd .rd-ap-cpic { position: relative; height: 28px; margin-top: 4px; }
   body.rd .rd-ap-cpic > .rd-ap-pic { position: absolute; inset: 0; min-height: 0; }
-  body.rd .rd-ap-cval { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  /* the "Lean " label is 400 like the House-lean sub's label (user call
+     2026-10-03, "add the word Lean to the lean above it"); only the
+     figure keeps 600 */
+  body.rd .rd-ap-cval { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 400; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  body.rd .rd-ap-cval > span { font-weight: 600; }
   /* twopp only, and only when the row carries the second right-edge
      line - the house's house lean under the figure (user call 2026-10-03).
      The strip's height comes from an INLINE style in rd-allpolls.jsx so
@@ -2300,7 +2304,10 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
      right-aligned. Rows whose house has no measured lean keep the shared
      28px centred strip above. */
   body.rd .rd-ap-cpic.hassub .rd-ap-cval { top: 4px; transform: none; }
-  body.rd .rd-ap-cvalsub { position: absolute; right: 0; bottom: 0; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  /* "House lean" label at normal weight (user call 2026-10-03, "the
+     word house lean ... should not be bolded"); the figure keeps 600. */
+  body.rd .rd-ap-cvalsub { position: absolute; right: 0; bottom: 0; font-size: 11px; font-weight: 400; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  body.rd .rd-ap-cvalsub > span { font-weight: 600; }
   body.rd .rd-ap-card .rd-ap-cprim { display: flex; justify-content: space-between; margin-top: 4px; }
   body.rd .rd-ap-card .rd-ap-cprim > span { display: inline-flex; align-items: baseline; gap: 4px; }
   body.rd .rd-ap-card .rd-ap-cprim em { font-style: normal; font-size: 11px; color: var(--ink-3); }

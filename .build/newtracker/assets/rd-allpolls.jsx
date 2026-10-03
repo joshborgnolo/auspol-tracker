@@ -1642,14 +1642,17 @@ function RdAllPolls(P) {
       /* phone card: the house's standing lean rides under the figure (user
          calls 2026-10-03: "add below '+1.7', 'Usual lean -0.3'", then
          renamed House lean - black label, party-tinted number - the
-         same D.houseLean latest point the detail expands on) */
+         same D.houseLean latest point the detail expands on); the figure
+         itself then got its own "Lean " label (user call same day: "also
+         add the word Lean to the lean above it - eg ... 'Lean +1.7'"),
+         same label-plain/figure-tinted pattern as the sub-line */
       const hls = ((D.houseLean || {})[pub ? (onM ? "onpub" : "tpp") : (onM ? "onimp" : "imp")] || {})[p.pollster];
       const hl = hls && hls.length ? hls[hls.length - 1].v : null;
       /* the strip's height pins the twopp card to the SAME row height as
          the primary facet's card (user call 2026-10-03, "just make the
          row height identical to that in the primary facet") via the
          fixed primStripH constant (see its derivation comment). */
-      body = <div className={"rd-ap-cpic" + (hl != null ? " hassub" : "")} style={hl != null && primStripH ? { height: primStripH + "px" } : null}>{pic}<span className="rd-ap-cval" style={{ color: rdApLeanInk(p.lean, onM) }}>{p.lean == null ? "—" : rdApSigned(p.lean)}</span>
+      body = <div className={"rd-ap-cpic" + (hl != null ? " hassub" : "")} style={hl != null && primStripH ? { height: primStripH + "px" } : null}>{pic}<span className="rd-ap-cval">{p.lean == null ? "—" : <>Lean <span style={{ color: rdApLeanInk(p.lean, onM) }}>{rdApSigned(p.lean)}</span></>}</span>
         {hl != null && <span className="rd-ap-cvalsub">House lean <span style={{ color: rdApLeanInk(hl, onM) }}>{rdApSigned(hl)}</span></span>}
       </div>;
     } else if (facet === "primary") {

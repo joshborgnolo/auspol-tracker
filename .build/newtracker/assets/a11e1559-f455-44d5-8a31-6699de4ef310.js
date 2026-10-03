@@ -2913,7 +2913,7 @@ function IssuesPanel({ rangeId = "all" }) {
                   The coloured bar splits the voters who named Labor, the Coalition or One Nation as best on the
                   issue. Pollsters also offer other answers – the Greens, someone else, all about equal, don’t
                   know – and each offers a different set, so only these three can be pooled. Resolve, RedBridge,
-                  Ipsos, YouGov and DemosAU count wherever they ask the issue, each less its usual lean, as in
+                  Ipsos, YouGov and DemosAU count wherever they ask the issue, each less its house lean, as in
                   the headline figures.
                 </p>
                 <p className="table-hint">

@@ -6886,7 +6886,7 @@ function infoTerms(D) {
         between Labor, the Coalition and One Nation. So each poll is read as those three parties’
         shares of the voters who named one of them: 25, 20 and 20 of all voters become 38, 31 and 31.
         Those shares are pooled over the last six weeks of polls, weighted as the headline’s polls
-        are, so newer and larger polls count for more. Each pollster’s usual lean is taken off
+        are, so newer and larger polls count for more. Each pollster’s house lean is taken off
         first, measured as the headline’s are. A lean measured from few polls is shrunk toward
         zero, and Ipsos and Resolve have offered all three parties only since mid-2026
         {ISS && ISS.leanMax ? <>: the largest lean taken off today is {Math.abs(ISS.leanMax.v).toFixed(1)}

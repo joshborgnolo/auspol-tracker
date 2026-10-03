@@ -4725,9 +4725,11 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-c2 > .rd-ap-sub:last-child:not(:first-child) { flex-shrink: 0; }
   body.rd .rd-ap-cpic { position: relative; height: 28px; margin-top: 4px; }
   body.rd .rd-ap-cpic > .rd-ap-pic { position: absolute; inset: 0; min-height: 0; }
-  body.rd .rd-ap-cval { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  body.rd .rd-ap-cval { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 400; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  body.rd .rd-ap-cval > span { font-weight: 600; }
   body.rd .rd-ap-cpic.hassub .rd-ap-cval { top: 4px; transform: none; }
-  body.rd .rd-ap-cvalsub { position: absolute; right: 0; bottom: 0; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  body.rd .rd-ap-cvalsub { position: absolute; right: 0; bottom: 0; font-size: 11px; font-weight: 400; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  body.rd .rd-ap-cvalsub > span { font-weight: 600; }
   body.rd .rd-ap-card .rd-ap-cprim { display: flex; justify-content: space-between; margin-top: 4px; }
   body.rd .rd-ap-card .rd-ap-cprim > span { display: inline-flex; align-items: baseline; gap: 4px; }
   body.rd .rd-ap-card .rd-ap-cprim em { font-style: normal; font-size: 11px; color: var(--ink-3); }
@@ -75924,6 +75926,23 @@ function RdPolls({
       className: "rd-pld-foot"
     }, pj.calMonth ? React.createElement(React.Fragment, null, "One release a month, on no set day: between the ", pj.calDays ? pj.calDays[0] + "th and the " + pj.calDays[1] + "th" : "start and the end", " so far. ", React.createElement("b", null, "Next: ", nx.date, ".")) : irregular(pj) ? React.createElement(React.Fragment, null, "Median ", Math.round(pj.cadence), " days between releases across the last ", pj.gapsUsed, " gaps, give or take ", Math.round(pj.spread), ". ", React.createElement("b", null, "Next: ", nx.date.replace(/^About/, "about"), ".")) : React.createElement(React.Fragment, null, "Median ", pj.cadence, " days between ", pj.basis === "published" ? "publications" : "fieldwork ends", " across the last ", pj.gapsUsed, " gaps.", " ", React.createElement("b", null, "Next: ", nx.date, hourWords(pj) ? ", " + hourWords(pj).replace(/^about /, "about ") + " " + easternAbbr(pj.release) : ""), ", at the earliest", then ? "; then " + wdm(then.release) : "", "."))));
   };
+  const pinPl = () => {
+    const sec = document.getElementById("latest-polls");
+    if (!sec) return;
+    rdPinScroll([sec.querySelector(".rd-pl"), sec.querySelector(".rd-pl-tabs")], true);
+  };
+  const pickFacet = id => {
+    pinPl();
+    setFacet(id);
+  };
+  const flipPick = () => {
+    pinPl();
+    if (setTppMatchup) setTppMatchup(onMatch ? "alp_lnp" : "alp_on");
+  };
+  const basisPick = () => {
+    pinPl();
+    setTppBasis(basis === "imp" ? "resp" : "imp");
+  };
   const basisWord = onMatch ? basis === "resp" ? "as published" : "implied flows" : basis === "resp" ? "as published" : "implied flows";
   const controls = facet === "twopp" && React.createElement("span", {
     className: "rd-pl-ctl"
@@ -75932,7 +75951,7 @@ function RdPolls({
   }, "Two-party:"), React.createElement("button", {
     type: "button",
     className: "rd-pl-flip",
-    onClick: () => setTppMatchup && setTppMatchup(onMatch ? "alp_lnp" : "alp_on"),
+    onClick: flipPick,
     title: "Show Labor v " + (onMatch ? "the Coalition" : "One Nation") + " instead"
   }, "Labor v ", rivalName, " ", React.createElement("span", {
     "aria-hidden": "true"
@@ -75945,7 +75964,7 @@ function RdPolls({
     className: "rd-qrow"
   }, React.createElement("span", null, "Show the pollsters\u2019 published figures"), React.createElement(RdSwitch, {
     on: basis === "resp",
-    onToggle: () => setTppBasis(basis === "imp" ? "resp" : "imp"),
+    onToggle: basisPick,
     label: "Show the pollsters\u2019 published figures"
   })), React.createElement("p", {
     className: "rd-qnote"
@@ -75971,11 +75990,10 @@ function RdPolls({
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       e.preventDefault();
-      setFacet(f => {
-        const n = RD_PL_FACETS.length;
-        const i = RD_PL_FACETS.findIndex(x => x.id === f);
-        return i < 0 ? f : RD_PL_FACETS[(i + (e.key === "ArrowRight" ? 1 : -1) + n) % n].id;
-      });
+      const n = RD_PL_FACETS.length;
+      const i = RD_PL_FACETS.findIndex(x => x.id === facet);
+      if (i < 0) return;
+      pickFacet(RD_PL_FACETS[(i + (e.key === "ArrowRight" ? 1 : -1) + n) % n].id);
     };
     document.addEventListener("keydown", key, true);
     return () => {
@@ -75983,11 +76001,11 @@ function RdPolls({
       sec.removeEventListener("pointerleave", leave);
       document.removeEventListener("keydown", key, true);
     };
-  }, []);
+  }, [facet]);
   const spaceFlip = React.useRef(null);
-  spaceFlip.current = facet === "twopp" && setTppMatchup ? () => setTppMatchup(onMatch ? "alp_lnp" : "alp_on") : null;
+  spaceFlip.current = facet === "twopp" && setTppMatchup ? flipPick : null;
   const pubFlip = React.useRef(null);
-  pubFlip.current = facet === "twopp" && setTppBasis ? () => setTppBasis(basis === "imp" ? "resp" : "imp") : null;
+  pubFlip.current = facet === "twopp" && setTppBasis ? basisPick : null;
   React.useEffect(() => {
     const sec = document.getElementById("latest-polls");
     if (!sec) return undefined;
@@ -76031,7 +76049,7 @@ function RdPolls({
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
       e.preventDefault();
       const f = (RD_PL_FACETS.findIndex(x => x.id === facet) + (e.key === "ArrowRight" ? 1 : -1) + RD_PL_FACETS.length) % RD_PL_FACETS.length;
-      setFacet(RD_PL_FACETS[f].id);
+      pickFacet(RD_PL_FACETS[f].id);
       return;
     }
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
@@ -76054,7 +76072,7 @@ function RdPolls({
   }, phone ? "The newest poll from each pollster, and the earliest its next could land. Tap a pollster for the full poll." : "The newest poll from each pollster, and the earliest its next could land, projected from its recent rhythm." + (narrow ? " Tap a pollster for the full poll." : " Open a row for the full poll and the releases behind the projection.")), React.createElement(RdTabs, {
     swipe: true,
     value: facet,
-    onChange: setFacet,
+    onChange: pickFacet,
     options: narrow ? RD_PL_FACETS.map(f => f.id === "leadership" ? {
       ...f,
       label: "Leaders"
@@ -80269,11 +80287,12 @@ function RdAllPolls(P) {
           height: primStripH + "px"
         } : null
       }, pic, React.createElement("span", {
-        className: "rd-ap-cval",
+        className: "rd-ap-cval"
+      }, p.lean == null ? "—" : React.createElement(React.Fragment, null, "Lean ", React.createElement("span", {
         style: {
           color: rdApLeanInk(p.lean, onM)
         }
-      }, p.lean == null ? "—" : rdApSigned(p.lean)), hl != null && React.createElement("span", {
+      }, rdApSigned(p.lean)))), hl != null && React.createElement("span", {
         className: "rd-ap-cvalsub"
       }, "House lean ", React.createElement("span", {
         style: {
