@@ -145,6 +145,9 @@ jobs:
           CHROME: /usr/bin/google-chrome
           WRAPPER: ${{ inputs.wrapper }}
           SIMULATE: ${{ inputs.simulate_failure }}
+          # wave adjudication's LLM pass (extractor --adjudicate →
+          # .build/adjudicate.mjs); absent on forks/PRs → deterministic path
+          MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
         run: |
           if [ "$SIMULATE" = "true" ]; then
             echo "simulate_failure requested; failing to exercise the repair job"

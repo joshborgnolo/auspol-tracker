@@ -24,9 +24,20 @@
 # BT mirror - a wobble logs WARN and can never fail the poll agent.
 #
 # Two commit shapes: (a) a filed/pruned row → the full site refresh, add-list
-# as the other poll wrappers; (b) only the first-seen ledger moved (a wave
-# is newly pending) → the ledger alone, no build. CI runners are fresh each
-# run, so the ledger MUST be committed or the grace period never elapses.
+# as the other poll wrappers; (b) only the ledgers moved (a wave is newly
+# pending, or the adjudicator wrote marks/verdicts) → the ledgers alone, no
+# build. CI runners are fresh each run, so the ledgers MUST be committed or
+# the grace period never elapses.
+#
+# FOURTH DUTY (2026-10-03): wave adjudication. The first extract pass runs
+# with --adjudicate (a no-op unless MATILDA_API_KEY is in the environment —
+# poll-agent.yml carries it, the laptop copies don't); when a judgement call
+# (pending file-now-or-defer, mismatch same_wave-or-distinct) is emitted in
+# status.ambiguous, .build/adjudicate.mjs asks the pinned CLI for a routing
+# verdict and this wrapper re-runs the extractor once: with --decisions
+# when the verdict was accepted, plain when it was rejected (deterministic
+# rules — the plain clock). Verdict + ledger are committed as
+# .build/pollbludger-src/{verdict,adjudicated}.json.
 set -uo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -43,7 +54,7 @@ else
   exit 1
 fi
 
-EXTRACT_OUT="$(node .build/extract-pollbludger.mjs --apply 2>&1)"
+EXTRACT_OUT="$(node .build/extract-pollbludger.mjs --apply --adjudicate 2>&1)"
 CODE=$?
 LAST_LINE="$(echo "$EXTRACT_OUT" | tail -1)"
 if [ $CODE -ne 0 ]; then
@@ -56,6 +67,49 @@ case "$LAST_LINE" in
   PB_STATUS*) log "$LAST_LINE" ;;
   *) log "FAIL extract (no PB_STATUS line): $LAST_LINE"; exit 1 ;;
 esac
+
+# Wave adjudication (see the header's FOURTH DUTY). --adjudicate on a
+# key-less run emits no cases, so the grep below skips this entire block.
+if echo "$LAST_LINE" | grep -q '"ambiguous":\[{'; then
+  ADJ_STATUS_FILE="${TMPDIR:-/tmp}/pb-adjudicate-status.$$.json"
+  echo "$LAST_LINE" | sed 's/^PB_STATUS //' > "$ADJ_STATUS_FILE"
+  ADJ_OUT="$(node .build/adjudicate.mjs --house pollbludger --status-file "$ADJ_STATUS_FILE" --out .build/pollbludger-src/verdict.json 2>&1)"
+  rm -f "$ADJ_STATUS_FILE"
+  ADJ_LINE="$(echo "$ADJ_OUT" | tail -1)"
+  case "$ADJ_LINE" in
+    ADJ_STATUS*) log "$ADJ_LINE" ;;
+    *) log "WARN adjudicate (no ADJ_STATUS line): $ADJ_LINE" ;;
+  esac
+  RERUN=""
+  if echo "$ADJ_LINE" | grep -q '"applied":true'; then
+    RERUN="verdict"
+  elif echo "$ADJ_LINE" | grep -q '"ran":true'; then
+    # the model answered but its verdict was rejected → deterministic path
+    RERUN="plain"
+  fi
+  # ran:false (no CLI, no key at this layer) → waves stay held for this slot;
+  # the asked marks already persisted, so the plain clock owns them after GRACE
+  if [ -n "$RERUN" ]; then
+    if [ "$RERUN" = verdict ]; then
+      # the re-run keeps --apply AND --adjudicate: ledger persistence lives
+      # inside APPLY, and a held wave the verdict defers must not leak out
+      # through a plain-pass's grace check ahead of schedule
+      EXTRACT_OUT="$(node .build/extract-pollbludger.mjs --apply --adjudicate --decisions .build/pollbludger-src/verdict.json 2>&1)"
+    else
+      EXTRACT_OUT="$(node .build/extract-pollbludger.mjs --apply 2>&1)"
+    fi
+    CODE=$?
+    LAST_LINE="$(echo "$EXTRACT_OUT" | tail -1)"
+    if [ $CODE -ne 0 ]; then
+      log "FAIL extract re-run (exit $CODE): $LAST_LINE"
+      exit $CODE
+    fi
+    case "$LAST_LINE" in
+      PB_STATUS*) log "re-run $RERUN: $LAST_LINE" ;;
+      *) log "FAIL extract re-run (no PB_STATUS line): $LAST_LINE"; exit 1 ;;
+    esac
+  fi
+fi
 
 # Comparator mirror: BludgerTrack's published 2PP trend (ALP2out) is
 # re-issue wise back-cast, so it rides this wrapper's four daily fetches —
@@ -87,18 +141,29 @@ else
   log "WARN bonham sidebar extract (exit $KB_CODE): $KB_LINE"
 fi
 
-FILES=(data/polls.json .build/pollbludger-src/seen.json "${SITE_FILES[@]}")
+# The ledgers this wrapper owns: the grace ledger, the adjudication ledger
+# and the adjudicator's verdict file. Any of them can move without a poll
+# row moving (a wave newly pending; asked marks; a defer/never_file verdict).
+LEDGER_FILES=()
+for f in .build/pollbludger-src/seen.json .build/pollbludger-src/adjudicated.json .build/pollbludger-src/verdict.json; do
+  [ -f "$f" ] || continue
+  if ! git diff --quiet -- "$f" || [ -n "$(git ls-files --others --exclude-standard -- "$f")" ]; then
+    LEDGER_FILES+=("$f")
+  fi
+done
+
+FILES=(data/polls.json "${LEDGER_FILES[@]}" "${SITE_FILES[@]}")
 
 if ! echo "$LAST_LINE" | grep -q '"changed":true' && [ "$BT_CHANGED" = false ] && [ "$KB_CHANGED" = false ]; then
-  # nothing filed or pruned, comparator tame — but the grace ledger may have gained a wave
-  if git diff --quiet -- .build/pollbludger-src/seen.json && [ -z "$(git ls-files --others --exclude-standard .build/pollbludger-src/seen.json)" ]; then
+  # nothing filed or pruned, comparator tame — but a ledger may have gained a wave or a mark
+  if [ ${#LEDGER_FILES[@]} -eq 0 ]; then
     exit 0
   fi
-  log "pending fallback wave(s) noted in the first-seen ledger; committing the ledger alone"
-  git add .build/pollbludger-src/seen.json || { log "FAIL git add ledger"; exit 1; }
+  log "fallback ledger(s) noted a pending wave / adjudication mark; committing them alone"
+  git add "${LEDGER_FILES[@]}" || { log "FAIL git add ledger"; exit 1; }
   MSG="Note pending Poll Bludger fallback wave(s) $(date '+%Y-%m-%d')"
   git commit -m "$MSG" >> "$LOG" 2>&1 || { log "FAIL git commit"; exit 1; }
-  push_main "$MSG" .build/pollbludger-src/seen.json || exit 1
+  push_main "$MSG" "${LEDGER_FILES[@]}" || exit 1
   log "OK committed + pushed: $MSG"
   exit 0
 fi

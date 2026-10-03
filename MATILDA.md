@@ -82,6 +82,28 @@ a GENERATED build artifact — never hand-edit it.
   non-favourability houses; never preferred-PM. The coverage doctor
   knows about these rows: a witness-listed wave the fallback has on the
   page is class 3 (green, warning + deduped ci-alert issue), not class 2.
+- WAVE ADJUDICATION (LLM, CI-only): the two judgement calls the Roy Morgan
+  and Poll Bludger extractors used to punt (RM's same-week double releases
+  and figure-diverging reissues; PB's in-grace pending waves and
+  near-canonical mismatches) are CASES the extractor emits under
+  `--adjudicate` instead of answering alone. Case/decision shapes and the
+  vote constants (RM_DOUBLE_DAYS=4, RM_REISSUE_PT=0.5, PB_MISMATCH_PT=1.0)
+  live in `.build/adjudicate-cases.mjs`, the ONE module extractor, judge
+  and tests share. The wrapper then runs `.build/adjudicate.mjs` — one
+  pinned matilda CLI call, ≤5 cases, evidence-only JSON (figures are
+  POISON_KEYS, never routing answers), invalid emission = deterministic
+  no-op, always exit 0 — and re-runs the extractor with `--decisions`.
+  Terminal verdicts and anti-spam `asked` marks persist in each house's
+  committed `<house>-src/adjudicated.json` ledger (the wrapper pushes a
+  ledger-only commit when nothing else changed). A PB row filed by a
+  distinct_wave verdict records `against: <canonical-date>` so the prune
+  keeps it beside exactly that row but still prunes it when the house's
+  real row lands. RM reissue `heal_absent` may fill ONLY
+  tpp_flows/undecided/published/sample on an existing row — a figure
+  correction is escalate (= nothing; repair-agent or human work).
+  poll-agent.yml passes `MATILDA_API_KEY`; without it (forks, PRs, the
+  laptop launchd copies) every case is skipped and the extractors behave
+  exactly as before. Pinned by `test-adjudicate.mjs`.
 - `.build/extract-essential-report.mjs` runs a PREFLIGHT before its
   ~10-minute crawl: the REST listings' (id, modified) pairs are hashed into
   `.build/essential-src/site-fingerprint.json` (committed by the wrapper);

@@ -119,13 +119,23 @@
 //     — the upstream format changed or the parse went wrong; nothing written
 //   - --check computes everything, prints RM_STATUS, never writes
 //   - writes are atomic (.tmp + rename)
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { fetchText, TRACKER_UA, FETCH_TRIES, FETCH_TIMEOUT_MS, MONTHS, clean, writeAtomic } from "./extract-common.mjs";
+import { RM_DOUBLE_DAYS, RM_REISSUE_PT } from "./adjudicate-cases.mjs";
 
 const argv = process.argv.slice(2);
+const argOf = (k) => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : null);
 const CHECK = argv.includes("--check");
 const FEED_DEFAULT = "https://wp.roymorgan.com/wp-json/rmr/v1/findings-search";
-const FEED_URL = argv.find((a) => !a.startsWith("--")) || FEED_DEFAULT;
+// The positional search-api-base argument must not swallow a --flag value
+const FLAG_VALUE = new Set(["--feed-dir", "--decisions"]);
+const FEED_URL = argv.find((a, i) => !a.startsWith("--") && !(i > 0 && FLAG_VALUE.has(argv[i - 1]))) || FEED_DEFAULT;
+// Adjudication flags (design in the header): --adjudicate needs the LLM pass
+// to exist behind it — poll-agent.yml carries MATILDA_API_KEY, the laptop
+// launchd copies deliberately don't. A key-less run is a plain run.
+const FEED_DIR = argOf("--feed-dir");
+const ADJUDICATE = argv.includes("--adjudicate") && !!process.env.MATILDA_API_KEY;
+const DECISIONS_FILE = argOf("--decisions");
 // The front-end's own query: date-ordered, filtered server-side to the
 // "Federal Poll" topic, 10 posts/page (x-wp-totalpages reports the count).
 const FEED_QS = "sort_by=date&topic[]=federal-poll";
@@ -138,6 +148,15 @@ const MAX_FEED_PAGES = 20;
 const STRAGGLER_MARGIN_DAYS = 14;
 const OUT = "data/polls.json";
 const SRC_DIR = ".build/roymorgan-src";
+// The adjudicator's ledger: terminal verdicts (never_file / dup_of /
+// heal_absent / escalate) plus the anti-spam "asked" mark, per slug or case
+// id. Committed by the wrapper, so each ambiguity is resolved ONCE.
+const ADJ_PATH = `${SRC_DIR}/adjudicated.json`;
+// reissue heal_absent fill scope: flat fields a row plausibly predates —
+// applied only where the row leaves them absent; a field it carries is
+// never touched (the never-overwrite covenant holds).
+const HEAL_FIELDS = ["tpp_flows", "undecided", "published", "sample"];
+const todayIso = () => new Date().toISOString().slice(0, 10);
 
 // ---------------------------------------------------------------- fetching
 // fetchText/consts come from ./extract-common.mjs; this house identifies as
@@ -384,13 +403,42 @@ function guardRelease(r, slug, releaseDate) {
 // Same pattern as extract-news24.mjs's N24_LIB.
 export { guardRelease, parseRelease, fetchFeedPage, nextData, dmyToIso, FEED_DEFAULT };
 if (!process.env.RM_LIB) {
-const status = { changed: false, check: CHECK, added: [], skipped_existing: [], warnings: [], feed: FEED_URL };
+const status = { changed: false, check: CHECK, added: [], skipped_existing: [], warnings: [], feed: FEED_URL,
+  notes: [], ambiguous: [], held: [], reissue_healed: [], escalated: [] };
 try {
   const orig = readFileSync(OUT, "utf8");
   const D = JSON.parse(orig);
   const rmDates = new Set(D.polls.filter((p) => p.pollster === "Roy Morgan").map((p) => p.date));
   const altBy = new Set((D.altTpp || []).map((a) => a.date + "|" + a.firm));
   const dirBy = new Set((D.direction || []).map((x) => x.date + "|" + x.pollster));
+
+  // ---- adjudication: verdict file + the machine ledger ---------------------
+  // Verdicts are routing only (validated upstream by adjudicate.mjs and the
+  // shared case contract in adjudicate-cases.mjs); an unreadable verdict file
+  // means "run deterministic", never a failure. The ledger carries terminal
+  // verdicts and the anti-spam "asked" mark across runs.
+  const decisions = {};
+  if (DECISIONS_FILE) {
+    try {
+      for (const d of JSON.parse(readFileSync(DECISIONS_FILE, "utf8")).decisions || []) decisions[d.case] = d;
+      status.notes.push(`adjudication: applying ${Object.keys(decisions).length} verdict(s) from ${DECISIONS_FILE}`);
+    } catch (e) {
+      status.notes.push(`decisions file unreadable (${e.message}); running deterministic`);
+    }
+  }
+  const adjudicated = existsSync(ADJ_PATH) ? JSON.parse(readFileSync(ADJ_PATH, "utf8")) : {};
+  const adjNow = { ...adjudicated };
+  const figSnap = (r) => ({ alp: r.alp, lnp: r.lnp, grn: r.grn, onp: r.onp, ind: r.ind, undecided: r.undecided ?? null,
+    tpp_alp: r.tpp_alp, tpp_lnp: r.tpp_lnp ?? null, tpp_flows: r.tpp_flows ?? null, tpp_onp: r.tpp_onp ?? null });
+  const snapRow = (p) => ({ date: p.date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
+    alp: p.alp, lnp: p.lnp, grn: p.grn, onp: p.onp, ind: p.ind, tpp_alp: p.tpp_alp ?? null, tpp_flows: p.tpp_flows ?? null });
+  const nearbyRmRows = (date) =>
+    D.polls.filter((p) => p.pollster === "Roy Morgan")
+      .map((p) => ({ d: Math.abs(Date.parse(p.date) - Date.parse(date)) / DAY, p }))
+      .filter((x) => x.d <= 21)
+      .sort((a, b) => a.d - b.d)
+      .slice(0, 3)
+      .map((x) => x.p).map(snapRow);
 
   const feedPosts = [];
   let pagesFetched = 0;
@@ -400,7 +448,15 @@ try {
       ? new Date(Date.parse(newestWave + "T00:00:00Z") - STRAGGLER_MARGIN_DAYS * DAY).toISOString().slice(0, 10)
       : null;
     for (let page = 1; page <= MAX_FEED_PAGES; page++) {
-      const { arr, totalPages } = await fetchFeedPage(FEED_URL, page);
+      let arr, totalPages = null;
+      if (FEED_DIR) {
+        const f = `${FEED_DIR}/feed-page-${page}.json`;
+        if (!existsSync(f)) break; // fixtures stop where the files stop
+        arr = JSON.parse(readFileSync(f, "utf8"));
+        if (!Array.isArray(arr)) throw new Error(`feed fixture ${f} is not an array`);
+      } else {
+        ({ arr, totalPages } = await fetchFeedPage(FEED_URL, page));
+      }
       pagesFetched = page;
       feedPosts.push(...arr);
       if (!arr.length) break;
@@ -418,6 +474,19 @@ try {
   const candidates = feedPosts.filter((p) =>
     (!Array.isArray(p.topics) || p.topics.some((t) => t.name === "Federal Poll")) &&
     /federal-voting-intention/.test(p.slug || ""));
+  // Adjudicated slugs drop out of candidacy forever: never_file is the
+  // machine equivalent of "not a wave we track"; dup_of is a re-skin of a
+  // wave another slug already filed.
+  const kept = candidates.filter((c) => {
+    const led = adjNow[c.slug];
+    if (led && (led.action === "never_file" || led.action === "dup_of")) {
+      status.notes.push(`adjudicated ${led.action}${led.of ? ` of ${led.of}` : ""}: ${c.slug}`);
+      return false;
+    }
+    return true;
+  });
+  candidates.length = 0;
+  candidates.push(...kept);
   status.candidates = candidates.map((c) => c.slug);
   if (!candidates.length) {
     const msg = `findings-search returned no federal-voting-intention candidates across ${pagesFetched} page(s) — topic slug or endpoint changed (silence here is never a quiet fortnight)`;
@@ -432,11 +501,18 @@ try {
   const sources = [];
   const altAdds = [];
   const dirAdds = [];
+  const parsed = []; // one record per candidate: {c, post, r, existed}
   for (const c of candidates) {
     let post;
     try {
-      post = nextData((await fetchText(`https://www.roymorgan.com/findings/${c.slug}`, { ua: TRACKER_UA })).text, c.slug)
-        ?.props?.pageProps?.findingData?.postBy;
+      if (FEED_DIR) {
+        const f = `${FEED_DIR}/post-${c.slug}.json`;
+        if (!existsSync(f)) throw new Error(`no fixture ${f}`);
+        post = JSON.parse(readFileSync(f, "utf8"))?.props?.pageProps?.findingData?.postBy;
+      } else {
+        post = nextData((await fetchText(`https://www.roymorgan.com/findings/${c.slug}`, { ua: TRACKER_UA })).text, c.slug)
+          ?.props?.pageProps?.findingData?.postBy;
+      }
     } catch (err) {
       // Deleted posts still appear as feed slugs but 404 individually — a
       // warning, never a reason to abandon the run's other candidates.
@@ -473,8 +549,105 @@ try {
         if (existed) status.dir_healed = [...(status.dir_healed || []), r.date];
       }
     }
-    if (existed) { status.skipped_existing.push(r.date); continue; }
-    if (guardFails.length) continue;
+    if (existed) status.skipped_existing.push(r.date);
+    parsed.push({ c, post, r, existed });
+  }
+  // Filing happens after the guard-fail exit below (a guarded run writes
+  // nothing), so the routing steps first see the full parsed picture —
+  // that's what the double clustering needs.
+  for (const w of status.warnings) console.warn("RM_WARN " + w);
+  if (guardFails.length) {
+    console.error("RM_GUARD " + guardFails.join(" | "));
+    status.guard = guardFails;
+    console.log("RM_STATUS " + JSON.stringify(status));
+    process.exit(2);
+  }
+
+  // ---- adjudication routing (case shapes: adjudicate-cases.mjs) ------------
+  // REISSUES first: an existing row whose freshly parsed figures moved more
+  // than RM_REISSUE_PT. heal_absent backfills ABSENT allowlisted fields from
+  // the parse — a field the row carries is never touched; escalate changes
+  // nothing (a genuine correction is repair-agent or human work).
+  for (const rec of parsed) {
+    if (!rec.existed) continue;
+    const row = D.polls.find((p) => p.pollster === "Roy Morgan" && p.date === rec.r.date);
+    if (!row || rec.r.date == null) continue;
+    const moved = ["alp", "lnp", "grn", "onp", "ind", "tpp_alp"]
+      .filter((f) => rec.r[f] != null && row[f] != null && Math.abs(rec.r[f] - row[f]) > RM_REISSUE_PT);
+    if (!moved.length) continue;
+    const CASE_ID = `reissue:${rec.r.date}`;
+    const verdict = decisions[CASE_ID];
+    if (verdict?.action === "heal_absent") {
+      const fills = HEAL_FIELDS.filter((f) => row[f] == null && rec.r[f] != null);
+      for (const f of fills) row[f] = rec.r[f];
+      if (fills.length) status.reissue_healed.push({ date: rec.r.date, fields: fills, slug: rec.c.slug });
+      status.notes.push(`adjudicated heal_absent: ${rec.r.date} (${fills.length ? fills.join(", ") : "nothing absent"})`);
+      adjNow[CASE_ID] = { action: "heal_absent", decided: todayIso(), reason: verdict.reason || "" };
+    } else if (verdict?.action === "escalate") {
+      status.escalated.push(rec.r.date);
+      status.notes.push(`adjudicated escalate: ${rec.r.date} (${(verdict.reason || "").slice(0, 120)}) — no data change; a correction is repair-agent or human work`);
+      adjNow[CASE_ID] = { action: "escalate", decided: todayIso(), reason: verdict.reason || "" };
+    } else if (ADJUDICATE && !adjNow[CASE_ID]) {
+      adjNow[CASE_ID] = { action: "asked", decided: todayIso() };
+      status.ambiguous.push({
+        case: CASE_ID, slug: rec.c.slug, date: rec.r.date, moved,
+        parsed: figSnap(rec.r), row: snapRow(row),
+      });
+      status.notes.push(`reissue case: ${rec.r.date} — parsed ${moved.join(", ")} moved >${RM_REISSUE_PT}pt vs the row`);
+    }
+  }
+
+  // DOUBLES: two or more unfiled candidates within RM_DOUBLE_DAYS of each
+  // other or with overlapping field windows (a fortnight special beside the
+  // weekly wave; one wave republished under a second slug). --adjudicate
+  // HOLDS the cluster and emits ONE case; the verdict routes it; a run with
+  // no verdict — including every ask-once-after state — files everything, as
+  // a plain run always has.
+  const dayDiff = (a, b) => Math.abs((Date.parse(a.r.date) - Date.parse(b.r.date)) / DAY);
+  const windowOverlap = (a, b) => a.r.dateStart && b.r.dateStart && a.r.dateStart <= b.r.date && b.r.dateStart <= a.r.date;
+  const fresh = parsed.filter((rec) => !rec.existed && rec.r.date && rec.r.dateStart);
+  const clusters = [];
+  for (const rec of [...fresh].sort((a, b) => (a.r.dateStart < b.r.dateStart ? -1 : 1))) {
+    const cl = clusters.find((cs) => cs.some((m) => dayDiff(m, rec) <= RM_DOUBLE_DAYS || windowOverlap(m, rec)));
+    if (cl) cl.push(rec); else clusters.push([rec]);
+  }
+  const dropSlugs = new Set(); // candidates that must NOT file this run
+  for (const cluster of clusters.filter((cs) => cs.length > 1)) {
+    cluster.sort((a, b) => (a.r.date < b.r.date ? -1 : 1));
+    const CASE_ID = `double:${cluster[0].r.date}:${cluster[cluster.length - 1].r.date}`;
+    const verdict = decisions[CASE_ID];
+    if (verdict?.action === "file_both") {
+      status.notes.push(`adjudicated file_both: ${CASE_ID} (${cluster.map((x) => x.c.slug).join(" + ")})`);
+    } else if (verdict?.action === "file_only" && cluster.some((x) => x.c.slug === verdict.slug)) {
+      status.notes.push(`adjudicated file_only ${verdict.slug}: ${CASE_ID}`);
+      for (const rec of cluster) {
+        if (rec.c.slug === verdict.slug) continue;
+        adjNow[rec.c.slug] = { action: "dup_of", of: verdict.slug, decided: todayIso(), reason: verdict.reason || "" };
+        dropSlugs.add(rec.c.slug);
+      }
+    } else if (verdict?.action === "never_file" && cluster.some((x) => x.c.slug === verdict.slug)) {
+      status.notes.push(`adjudicated never_file ${verdict.slug}: ${CASE_ID}`);
+      adjNow[verdict.slug] = { action: "never_file", decided: todayIso(), reason: verdict.reason || "" };
+      dropSlugs.add(verdict.slug); // the rest of the cluster is a wave again — files below
+    } else if (ADJUDICATE && !adjNow[CASE_ID] && !verdict) {
+      adjNow[CASE_ID] = { action: "asked", decided: todayIso() };
+      status.ambiguous.push({
+        case: CASE_ID,
+        waves: cluster.map((rec) => ({ slug: rec.c.slug, date: rec.r.date, dateStart: rec.r.dateStart,
+          published: rec.r.published, sample: rec.r.sample, figures: figSnap(rec.r) })),
+        nearbyRows: nearbyRmRows(cluster[0].r.date),
+      });
+      status.held.push(...cluster.map((rec) => rec.c.slug));
+      for (const rec of cluster) dropSlugs.add(rec.c.slug);
+      status.notes.push(`double case: ${CASE_ID} — ${cluster.length} candidates held for adjudication`);
+    }
+    // every other state files everything: an answered verdict routes via the
+    // branches above, and once the ask is spent the plain rule (file it) owns.
+  }
+
+  const filed = fresh.filter((rec) => !dropSlugs.has(rec.c.slug));
+  for (const rec of filed) {
+    const { c, r, post } = rec;
     newRows.push({
       date: r.date,
       published: r.published,
@@ -492,39 +665,35 @@ try {
     sources.push({ slug: c.slug, json: JSON.stringify(post, null, 2) + "\n" });
     status.added.push({ date: r.date, slug: c.slug, alp: r.alp, lnp: r.lnp, onp: r.onp, tpp: `${r.tpp_alp}/${r.tpp_lnp}`, flows: r.tpp_flows, onp2pp: r.tpp_onp != null ? `${r.tpp_onp}/${r.tpp_onp_onp}` : null });
   }
-  for (const w of status.warnings) console.warn("RM_WARN " + w);
-  if (guardFails.length) {
-    console.error("RM_GUARD " + guardFails.join(" | "));
-    status.guard = guardFails;
-    console.log("RM_STATUS " + JSON.stringify(status));
-    process.exit(2);
-  }
 
-  if (newRows.length || altAdds.length || dirAdds.length) {
-    if (newRows.length) {
-      D.polls = [...D.polls, ...newRows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  if (newRows.length) {
+    D.polls = [...D.polls, ...newRows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  }
+  if (altAdds.length) {
+    D.altTpp = [...(D.altTpp || []), ...altAdds].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+    console.log(`altTpp: +${altAdds.length} Roy Morgan ALP-v-One-Nation pair(s): ${altAdds.map((a) => a.date).join(", ")}`);
+  }
+  if (dirAdds.length) {
+    D.direction = [...(D.direction || []), ...dirAdds].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+    console.log(`direction: +${dirAdds.length} Roy Morgan national-direction row(s): ${dirAdds.map((a) => a.date).join(", ")}`);
+  }
+  const trailingNl = orig.endsWith("\n") ? "\n" : "";
+  const next = JSON.stringify(D, null, 2) + trailingNl;
+  status.changed = next !== orig;
+  if (status.changed && !CHECK) {
+    writeAtomic(OUT, next);
+    if (sources.length) {
+      mkdirSync(SRC_DIR, { recursive: true });
+      for (const s of sources) writeFileSync(`${SRC_DIR}/release-${s.slug}.json`, s.json);
     }
-    if (altAdds.length) {
-      D.altTpp = [...(D.altTpp || []), ...altAdds].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-      console.log(`altTpp: +${altAdds.length} Roy Morgan ALP-v-One-Nation pair(s): ${altAdds.map((a) => a.date).join(", ")}`);
-    }
-    if (dirAdds.length) {
-      D.direction = [...(D.direction || []), ...dirAdds].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-      console.log(`direction: +${dirAdds.length} Roy Morgan national-direction row(s): ${dirAdds.map((a) => a.date).join(", ")}`);
-    }
-    const trailingNl = orig.endsWith("\n") ? "\n" : "";
-    const next = JSON.stringify(D, null, 2) + trailingNl;
-    status.changed = next !== orig;
-    if (status.changed && !CHECK) {
-      writeAtomic(OUT, next);
-      if (sources.length) {
-        mkdirSync(SRC_DIR, { recursive: true });
-        for (const s of sources) writeFileSync(`${SRC_DIR}/release-${s.slug}.json`, s.json);
-      }
-      if (newRows.length) console.log(`wrote ${OUT}: +${newRows.length} Roy Morgan wave(s): ${status.added.map((a) => a.date).join(", ")}`);
-    }
-  } else {
-    status.changed = false;
+    if (newRows.length) console.log(`wrote ${OUT}: +${newRows.length} Roy Morgan wave(s): ${status.added.map((a) => a.date).join(", ")}`);
+  }
+  // adjudication ledger: terminal verdicts + the anti-spam "asked" mark.
+  // Written on any run that moves it (a verdict-only run moves the ledger
+  // with polls.json clean — the wrapper commits it like the release sources).
+  if (!CHECK && (JSON.stringify(adjNow) !== JSON.stringify(adjudicated) || (Object.keys(adjNow).length && !existsSync(ADJ_PATH)))) {
+    mkdirSync(SRC_DIR, { recursive: true });
+    writeAtomic(ADJ_PATH, JSON.stringify(adjNow, null, 2) + "\n");
   }
   console.log("RM_STATUS " + JSON.stringify(status));
 } catch (err) {

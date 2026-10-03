@@ -70,6 +70,22 @@
 //     .build/pollbludger-src/seen.json), so the house's own extractor — its
 //     dense release window, its follow-ups, its next-day sweep — gets every
 //     chance to land the real row first.
+//   * adjudication (2026-10-02): the judgement calls the clock can't make —
+//     "file this one now vs leave it to the grace clock vs never file it",
+//     and "the canonical row within the date slack IS this wave vs a
+//     different wave the dedupe just swallowed" — are emitted as CASES when
+//     run with --adjudicate (emission also SUPPRESSES re-asking: each
+//     pending wave is asked about once, recorded in
+//     .build/pollbludger-src/adjudicated.json). The house wrapper hands the
+//     cases to .build/adjudicate.mjs (the LLM pass, routing verdicts only)
+//     and re-runs this script with --decisions <verdict-file> (with --apply
+//     — ledger persistence lives inside APPLY); verdicts are applied here
+//     and every row written still passes buildRow's arithmetic. The LLM pass
+//     is a cloud-CI-only feature: --adjudicate needs MATILDA_API_KEY in the
+//     environment (poll-agent.yml carries it; the laptop launchd copies
+//     deliberately don't), so a key-less run behaves exactly as the plain
+//     clock. Without the flag the behaviour below is exactly the plain-clock
+//     rules.
 //   * arithmetic: primaries must be in range and sum to 100 − undecided
 //     within SUM_TOL; a 2PP pair is kept only when it sums to 100 (or to
 //     100 − UNDra for the one house that carries an undecided 2PP); anything
@@ -82,6 +98,9 @@
 //   node .build/extract-pollbludger.mjs --check    alias of the dry run
 //   --xml <file>       read the feed from a file (tests); --now <ISO> pins the clock
 //   --grace-hours <n>  override GRACE_HOURS (0 files immediately)
+//   --adjudicate       emit wave-adjudication cases in status.ambiguous
+//                      (no-op unless MATILDA_API_KEY is set — cloud CI only)
+//   --decisions <file> apply adjudication verdicts (JSON from adjudicate.mjs)
 //   POLLS_JSON=<path>  override the dataset path; PB_SRC_DIR=<dir> the ledger/cache dir (tests)
 // Exit: 0 ran (see PB_STATUS changed/filed/pruned), 1 fetch failed with no
 // usable cache, 2 feed failed a shape guard. Last stdout line is always
@@ -89,13 +108,15 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from "node:fs";
 import { writeJsonAtomic } from "./atomic-write.mjs";
+import { PB_MISMATCH_PT } from "./adjudicate-cases.mjs";
 
 const FEED = "https://www.pollbludger.net/fed2028/bludgertrack/xml/current.xml";
 const PAGE = "https://www.pollbludger.net/fed2028/bludgertrack/polldata.htm";
 const SRC_DIR = process.env.PB_SRC_DIR || ".build/pollbludger-src"; // tests point this elsewhere
 const CACHE = `${SRC_DIR}/current.xml`;
 const SEEN = `${SRC_DIR}/seen.json`;
-const IGNORE = `${SRC_DIR}/ignore.json`;
+const IGNORE = `${SRC_DIR}/ignore.json`;        // the human's "not this one"
+const ADJ_FILE = `${SRC_DIR}/adjudicated.json`; // the adjudicator's, per feed Id
 const OUT = process.env.POLLS_JSON || "data/polls.json";
 
 const CYCLE_START = "2025-05-03";
@@ -141,12 +162,17 @@ const argOf = (k) => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : null);
 const XML_FILE = argOf("--xml");
 const NOW = argOf("--now") ? new Date(argOf("--now")) : new Date();
 const GRACE = argOf("--grace-hours") != null ? Number(argOf("--grace-hours")) : GRACE_HOURS;
+// The LLM pass is a cloud-CI-only feature (poll-agent.yml carries
+// MATILDA_API_KEY; the laptop launchd copies deliberately don't): key-less
+// --adjudicate emits nothing, so those runs behave exactly as today's clock.
+const ADJUDICATE = argv.includes("--adjudicate") && !!process.env.MATILDA_API_KEY;
+const DECISIONS_FILE = argOf("--decisions");
 
 const DAY = 86400000;
 const days = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / DAY);
 const r1 = (x) => Math.round(x * 10) / 10;
 const status = { changed: false, source: null, stale: false, feedDate: null, points: 0, leaderPoints: 0,
-  filed: [], pruned: [], pending: [], skipped: [], filedApproval: [], prunedApproval: [], notes: [], error: null };
+  filed: [], pruned: [], pending: [], skipped: [], filedApproval: [], prunedApproval: [], notes: [], ambiguous: [], error: null };
 const done = (code) => { console.log("PB_STATUS " + JSON.stringify(status)); process.exit(code); };
 
 // ---- fetch -------------------------------------------------------------------
@@ -292,13 +318,64 @@ const ignore = existsSync(IGNORE) ? JSON.parse(readFileSync(IGNORE, "utf8")) : {
 const seen = existsSync(SEEN) ? JSON.parse(readFileSync(SEEN, "utf8")) : {};
 const slackFor = (house) => HOUSE_SLACK[house] ?? DATE_SLACK;
 const nearCanon = (names, end, slack) => canon.some((r) => names.includes(r.pollster) && Math.abs(days(r.date, end)) <= slack);
+const nearestCanon = (names, end, slack) => {
+  let best = null;
+  for (const r of canon) {
+    if (!names.includes(r.pollster)) continue;
+    const d = Math.abs(days(r.date, end));
+    if (d <= slack && (!best || d < best.d)) best = { row: r, d };
+  }
+  return best;
+};
 const latestClient = (house) => { const rows = canon.filter((r) => r.pollster === house); return rows.length ? rows[rows.length - 1].client ?? "—" : "—"; };
 
+// ---- adjudication: verdict file + the machine ledger -----------------------
+// Verdicts are routing only (validated upstream by adjudicate.mjs and the
+// shared case contract); an unreadable file means "run deterministic", never
+// a failure. The ledger (committed by the wrapper) records terminal verdicts
+// and the anti-spam "asked" mark — each pending wave is put to the model
+// ONCE; after that the plain clock owns it.
+const decisions = {};
+if (DECISIONS_FILE) {
+  try {
+    for (const d of JSON.parse(readFileSync(DECISIONS_FILE, "utf8")).decisions || []) decisions[d.case] = d;
+    status.notes.push(`adjudication: applying ${Object.keys(decisions).length} verdict(s) from ${DECISIONS_FILE}`);
+  } catch (e) {
+    status.notes.push(`decisions file unreadable (${e.message}); running deterministic`);
+  }
+}
+const adjudicated = existsSync(ADJ_FILE) ? JSON.parse(readFileSync(ADJ_FILE, "utf8")) : {};
+const adjNow = { ...adjudicated };
+const canonSnap = (r) => ({ date: r.date, dateStart: r.dateStart ?? null, sample: r.sample ?? null, alp: r.alp, lnp: r.lnp, grn: r.grn, onp: r.onp });
+const nearbyCanon = (names, end) =>
+  canon.filter((r) => names.includes(r.pollster))
+    .map((r) => ({ d: Math.abs(days(r.date, end)), snap: canonSnap(r) }))
+    .filter((x) => x.d <= 21)
+    .sort((a, b) => a.d - b.d)
+    .slice(0, 3)
+    .map((x) => x.snap);
+const figSnapshot = (p) => ({ start: p.start, end: p.end, sample: p.sample, alp: p.alp, lnp: p.lnp, grn: p.grn, onp: p.onp, und: p.und, alpRa: p.alpRa, lnpRa: p.lnpRa, alp2: p.alp2, lnp2: p.lnp2 });
+const nowIso = () => NOW.toISOString().slice(0, 10);
+// a feed wave beside a canonical row within the date slack whose primaries
+// move by more than PB_MISMATCH_PT is possibly a DIFFERENT wave (a second
+// wave of the same house in the window) — the mismatch case exists to ask
+const figDiverges = (p, r) =>
+  [["alp", "alp"], ["lnp", "lnp"], ["grn", "grn"], ["onp", "onp"]]
+    .some(([f, c]) => p[f] != null && r[c] != null && Math.abs(p[f] - r[c]) > PB_MISMATCH_PT);
+
 // ---- prune: fallback rows a canonical row now covers ------------------------------
+// A row filed by a distinct_wave verdict keeps its place beside the canonical
+// row it was adjudicated against (stored as `against` on the ledger entry);
+// a NEW canonical row landing anywhere else in the window still prunes it —
+// that is the house's real row for this wave arriving.
+const nearCanonRows = (names, end, slack) => canon.filter((r) => names.includes(r.pollster) && Math.abs(days(r.date, end)) <= slack);
 const kept = [];
 for (const f of fallback) {
   const names = Object.values(HOUSE).find((n) => n.includes(f.pollster)) || [f.pollster];
-  if (nearCanon(names, f.date, slackFor(f.pollster))) status.pruned.push({ pollster: f.pollster, date: f.date, reason: "canonical row landed" });
+  const near = nearCanonRows(names, f.date, slackFor(f.pollster));
+  const led = f.provisional?.feedId ? adjNow[f.provisional.feedId] : null;
+  const keepBesideAdjudicated = led?.action === "distinct_wave" && led.against && near.every((r) => r.date === led.against);
+  if (near.length && !keepBesideAdjudicated) status.pruned.push({ pollster: f.pollster, date: f.date, reason: "canonical row landed" });
   else kept.push(f);
 }
 
@@ -310,14 +387,78 @@ for (const p of points) {
   const h = houseFor(p, tracked);
   if (h.skip) { status.skipped.push({ id: p.id, pollster: p.pollster, end: p.end, why: h.skip }); continue; }
   if (ignore[p.id]) { status.skipped.push({ id: p.id, pollster: p.pollster, end: p.end, why: `ignored: ${ignore[p.id]}` }); continue; }
-  if (nearCanon(h.names, p.end, slackFor(h.house))) continue;
+  const led = adjNow[p.id];
+  // the LLM's "not this one", equivalent to the human's ignore.json entry
+  if (led && (led.action === "never_file" || led.action === "same_wave")) {
+    status.skipped.push({ id: p.id, pollster: p.pollster, end: p.end, why: `adjudicated ${led.action} (${(led.reason || "").slice(0, 80)})` });
+    continue;
+  }
+  const MISMATCH_CASE = `mismatch:${p.id}`;
+  const mmVerdict = decisions[MISMATCH_CASE];
+  const near = nearestCanon(h.names, p.end, slackFor(h.house));
+  if (near) {
+    // a canonical row within the slack covers this wave — unless the
+    // figures say otherwise and the adjudicator calls it a distinct wave
+    if (mmVerdict?.action === "distinct_wave") {
+      status.notes.push(`adjudicated distinct_wave: ${h.house} ${p.end} vs canonical ${near.row.date} — filing as a genuine miss`);
+    } else {
+      if (mmVerdict?.action === "same_wave") {
+        // terminal: the feed wave IS the canonical row's own wave — the
+        // dedupe had it right. Persist so later runs skip without asking.
+        adjNow[p.id] = { action: "same_wave", decided: nowIso(), reason: mmVerdict.reason || "" };
+        status.skipped.push({ id: p.id, pollster: p.pollster, end: p.end, why: `adjudicated same_wave (${(mmVerdict.reason || "").slice(0, 80)})` });
+      } else if (ADJUDICATE && !led && figDiverges(p, near.row)) {
+        adjNow[p.id] = { action: "asked", decided: nowIso() };
+        status.ambiguous.push({
+          case: MISMATCH_CASE, house: h.house, feedId: p.id,
+          hoursInWindow: null,
+          feed: figSnapshot(p), canonical: canonSnap(near.row), daysApart: near.d,
+          nearbyCanon: nearbyCanon(h.names, p.end),
+        });
+        status.pending.push({ id: p.id, pollster: h.house, end: p.end, adjudicating: true });
+      }
+      continue;
+    }
+  }
   const already = kept.find((f) => f.provisional?.feedId === p.id || (f.pollster === h.house && Math.abs(days(f.date, p.end)) <= slackFor(h.house)));
   if (already) continue; // filed on an earlier run, still unshadowed
   // first-seen ledger → grace
   const first = seen[p.id]?.firstSeen || NOW.toISOString();
   seenNow[p.id] = { firstSeen: first, pollster: p.pollster, end: p.end };
   const hours = (NOW - Date.parse(first)) / 3600000;
-  if (hours < GRACE) { status.pending.push({ id: p.id, pollster: h.house, end: p.end, hoursSeen: r1(hours), filesAt: new Date(Date.parse(first) + GRACE * 3600000).toISOString().slice(0, 16) + "Z" }); continue; }
+  const PEND_CASE = `pending:${p.id}`;
+  const pVerdict = decisions[PEND_CASE];
+  if (pVerdict?.action === "never_file") {
+    adjNow[p.id] = { action: "never_file", decided: nowIso(), reason: pVerdict.reason || "" };
+    status.skipped.push({ id: p.id, pollster: p.pollster, end: p.end, why: `adjudicated never_file (${(pVerdict.reason || "").slice(0, 80)})` });
+    continue;
+  }
+  if (pVerdict?.action === "defer") {
+    adjNow[p.id] = { action: "defer", decided: nowIso(), reason: pVerdict.reason || "" };
+    status.pending.push({ id: p.id, pollster: h.house, end: p.end, hoursSeen: r1(hours), adjudicated: "defer — stays on the grace clock" });
+    continue;
+  }
+  const fileNow = pVerdict?.action === "file_now" || mmVerdict?.action === "distinct_wave";
+  if (hours < GRACE && !fileNow) {
+    status.pending.push({ id: p.id, pollster: h.house, end: p.end, hoursSeen: r1(hours), filesAt: new Date(Date.parse(first) + GRACE * 3600000).toISOString().slice(0, 16) + "Z" });
+    // put the judgement call to the LLM ONCE per wave; the "asked" mark
+    // keeps later runs (verdict or not) on the plain clock
+    if (ADJUDICATE && !led) {
+      adjNow[p.id] = { action: "asked", decided: nowIso() };
+      status.ambiguous.push({
+        case: PEND_CASE, house: h.house, feedId: p.id,
+        hoursSeen: r1(hours),
+        feed: figSnapshot(p),
+        nearbyCanon: nearbyCanon(h.names, p.end),
+      });
+    }
+    continue;
+  }
+  if (fileNow) {
+    adjNow[p.id] = { action: pVerdict?.action === "file_now" ? "file_now" : "distinct_wave", decided: nowIso(), reason: (pVerdict?.reason || mmVerdict?.reason || ""),
+      ...(mmVerdict?.action === "distinct_wave" && near ? { against: near.row.date } : {}) };
+    status.notes.push(`adjudicated early filing: ${h.house} ${p.end} (${adjNow[p.id].action})`);
+  }
   const notes = [];
   const row = buildRow(p, h.house, latestClient(h.house), notes);
   if (!row) { status.skipped.push({ id: p.id, pollster: h.house, end: p.end, why: notes.join("; ") }); continue; }
@@ -374,6 +515,10 @@ if (APPLY) {
   // the ledger forgets waves the tracker now covers, so it cannot grow
   // forever; and it is not created empty (the wrapper commits it when it moves)
   if (Object.keys(seenNow).length || existsSync(SEEN)) writeJsonAtomic(SEEN, seenNow);
+  // adjudication ledger: terminal verdicts + the anti-spam "asked" mark.
+  // Committed by the wrapper when it moves, like seen.json.
+  if (JSON.stringify(adjNow) !== JSON.stringify(adjudicated) || (Object.keys(adjNow).length && !existsSync(ADJ_FILE)))
+    writeJsonAtomic(ADJ_FILE, adjNow);
   if (status.changed) {
     const next = { ...D };
     if (kept.length) next.fallbackPolls = kept; else delete next.fallbackPolls;
