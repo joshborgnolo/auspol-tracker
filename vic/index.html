@@ -140,6 +140,11 @@ body {
   font-size: 52px; line-height: 1; letter-spacing: -0.015em;
 }
 .vp-duo .k { margin-top: 7px; font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.vp-duo .kc { margin-top: 3px; font-size: 11.5px; color: var(--ink-3); }
+@media (max-width: 540px) {
+  .vp-duo { flex-wrap: wrap; gap: 18px 22px; }
+  .vp-duo .n { font-size: 38px; }
+}
 .vp-scope { font-size: 12.5px; line-height: 1.55; color: var(--ink-3); margin: 6px 0 14px; }
 .vp-chips { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 6px 0 4px; }
 .vp-chip { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-2); }
@@ -250,9 +255,10 @@ p.vp-tnote { font-size: 12.5px; line-height: 1.55; color: var(--ink-3); margin: 
   <h1>The Victorian election, in the polls</h1>
   <p class="ss-sub">Every published Victorian state poll toward the 28 November 2026 election, blended: 64 waves from 9 houses since Feb 23. Assembled 4 October 2026 — 55 days out.</p>
 
-  <div class="vp-duo" role="img" aria-label="Two-party preferred blend: Labor 46.2 per cent, Coalition 53.8 per cent.">
+  <div class="vp-duo" role="img" aria-label="Two-party preferred blend: Labor 46.2 per cent, Coalition 53.8 per cent; 55 days to the 28 November 2026 election.">
     <div><div class="n" style="color:var(--alp-text)">46.2</div><div class="k">Labor — two-party preferred</div></div>
     <div><div class="n" style="color:var(--lnp-text)">53.8</div><div class="k">Coalition — two-party preferred</div></div>
+    <div><div class="n">55</div><div class="k">days to election day</div><div class="kc">Saturday, 28 November 2026</div></div>
   </div>
   <p class="vp-scope">5 published two-party figures from Roy Morgan, DemosAU/Premier National, RedBridge/Accent, and Freshwater with fieldwork ending between 7 Aug 2026 and 28 Sep 2026, blended by sample size and recency — each wave weighing n·2^(−d/28), its weight halving every 28 days, at most six waves per house. The published figures alone run from 44 to 49 for Labor. The blend sits 8.8 points short of the 2022 election result, Labor 55.0 to the Coalition's 45.0.</p>
 

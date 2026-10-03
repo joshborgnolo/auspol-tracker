@@ -13,7 +13,9 @@
     "2026-10-03T21:04:56.808Z",
     "2026-10-03T21:09:02.171Z",
     "2026-10-03T21:09:02.206Z",
-    "2026-10-03T21:23:04.994Z"
+    "2026-10-03T21:23:04.994Z",
+    "2026-10-03T21:24:44.042Z",
+    "2026-10-03T21:29:59.877Z"
   ],
   "gaps": {
     "data:scope-firms-miscounted": {
@@ -81,8 +83,10 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 1,
-      "status": "open"
+      "missed": 2,
+      "status": "closed",
+      "closed": "2026-10-03T21:24:44.005Z",
+      "how": "quiet"
     },
     "feature:charts-missing-end-labels": {
       "id": "charts-missing-end-labels",
@@ -93,8 +97,10 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 1,
-      "status": "open"
+      "missed": 2,
+      "status": "closed",
+      "closed": "2026-10-03T21:24:44.005Z",
+      "how": "quiet"
     },
     "feature:dot-titles-lack-span": {
       "id": "dot-titles-lack-span",
@@ -105,8 +111,10 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 1,
-      "status": "open"
+      "missed": 2,
+      "status": "closed",
+      "closed": "2026-10-03T21:24:44.005Z",
+      "how": "quiet"
     },
     "feature:dot-titles-lack-sample": {
       "id": "dot-titles-lack-sample",
@@ -117,8 +125,10 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 1,
-      "status": "open"
+      "missed": 2,
+      "status": "closed",
+      "closed": "2026-10-03T21:24:44.005Z",
+      "how": "quiet"
     },
     "feature:leaders-charts-no-series-legend": {
       "id": "leaders-charts-no-series-legend",
@@ -129,8 +139,10 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 1,
-      "status": "open"
+      "missed": 2,
+      "status": "closed",
+      "closed": "2026-10-03T21:24:44.005Z",
+      "how": "quiet"
     },
     "feature:hero-missing-2022-delta": {
       "id": "hero-missing-2022-delta",
@@ -141,8 +153,10 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 1,
-      "status": "open"
+      "missed": 2,
+      "status": "closed",
+      "closed": "2026-10-03T21:24:44.005Z",
+      "how": "quiet"
     },
     "feature:polls-section-missing-dek": {
       "id": "polls-section-missing-dek",
@@ -153,8 +167,10 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 1,
-      "status": "open"
+      "missed": 2,
+      "status": "closed",
+      "closed": "2026-10-03T21:24:44.005Z",
+      "how": "quiet"
     },
     "visual:leaders-charts-no-election-marker": {
       "id": "leaders-charts-no-election-marker",
@@ -165,8 +181,10 @@
       "seen": [
         "2026-10-03T20:53:17.443Z"
       ],
-      "missed": 1,
-      "status": "open"
+      "missed": 2,
+      "status": "closed",
+      "closed": "2026-10-03T21:24:44.005Z",
+      "how": "quiet"
     },
     "feature:hero-duo-no-countdown": {
       "id": "hero-duo-no-countdown",
@@ -177,7 +195,7 @@
       "seen": [
         "2026-10-03T21:09:02.190Z"
       ],
-      "missed": 0,
+      "missed": 1,
       "status": "open"
     }
   },
@@ -320,6 +338,140 @@
       ],
       "verdict": "pass",
       "finished": "2026-10-03T15:23:50.316Z"
+    },
+    {
+      "started": "2026-10-03T21:09:02.171Z",
+      "rounds": [
+        {
+          "round": 1,
+          "started": "2026-10-03T21:09:02.190Z",
+          "builder": {
+            "exit": 0,
+            "summary": "closed all 8: 2022 marks+end labels+span/sample titles on all charts, era-named legends, hero 2022 delta, table dek"
+          },
+          "builderScopeViolations": [
+            ".build/newtracker/build.mjs",
+            ".matilda/skills/auto-skill-auspol-vic-satellite-plan/SKILL.md"
+          ],
+          "gate": {
+            "ok": true,
+            "steps": [
+              {
+                "name": "refresh-vic",
+                "ok": true,
+                "code": 0,
+                "tail": "VIC_STATUS {\"ran\":true,\"asOf\":\"2026-10-04\",\"daysToGo\":55,\"polls\":64,\"withTpp\":42,\"threeParty\":4,\"leadership\":87,\"tppBlend\":46.17,\"lnpBlend\":53.83,\"headN2pp\":5,\"headWindow\":60,\"headPolls\":7,\"prim\":{\"alp\":24.5,\"lnp\":28.75,\"onp\":22.96,\"grn\":13.71,\"oth\":10.2},\"changed\":false,\"wrote\":[],\"dry\":false}"
+              },
+              {
+                "name": "validate",
+                "ok": true,
+                "code": 0,
+                "tail": "  primary-sum   cyclePolls.2025 #295 2025-03-30 · Essential – Σ shares = 95.0 (basis: Primaries exclude undecided with no rebase to 100 (sums 92–97).) |   primary-sum   cyclePolls.2025 #306 2025-04-14 · Essential – Σ shares = 96.0 (basis: Primaries exclude undecided with no rebase to 100 (sums 92–97).) |   primary-sum   cyclePolls.2025 #325 2025-05-01 · Ipsos – Σ shares = 95.0 (basis: Primaries ex"
+              },
+              {
+                "name": "site-shell-check",
+                "ok": true,
+                "code": 0,
+                "tail": "site shell current on all 11 pages"
+              },
+              {
+                "name": "probe-pack",
+                "ok": true,
+                "code": 0,
+                "tail": "VP_AUDIT {\"checks\":79,\"failed\":[],\"daysSinceNewest\":6}"
+              },
+              {
+                "name": "npm-test",
+                "ok": true,
+                "code": 0,
+                "tail": "B6 invalid/retry: ok | B7 key/breaker: ok | test-vic-polish: all ok"
+              }
+            ]
+          },
+          "reviewer": {
+            "exit": 0,
+            "verdict": "gaps",
+            "gaps": 1,
+            "attempts": 1
+          },
+          "openAfter": [
+            "fp-chart-missing-2022-marks",
+            "charts-missing-end-labels",
+            "dot-titles-lack-span",
+            "dot-titles-lack-sample",
+            "leaders-charts-no-series-legend",
+            "hero-missing-2022-delta",
+            "polls-section-missing-dek",
+            "leaders-charts-no-election-marker",
+            "hero-duo-no-countdown"
+          ],
+          "finished": "2026-10-03T21:24:41.927Z",
+          "commit": {
+            "rev": "b156ad0e",
+            "pushed": true
+          }
+        },
+        {
+          "round": 2,
+          "started": "2026-10-03T21:24:44.005Z",
+          "builder": {
+            "exit": 0,
+            "summary": "hero duo gains countdown figure (55 days, names Sat 28 Nov 2026) + aria label + phone rung; other 8 gaps verified already-closed; probe 79/79"
+          },
+          "builderScopeViolations": [
+            ".build/newtracker/build.mjs",
+            ".matilda/skills/auto-skill-auspol-vic-satellite-plan/SKILL.md",
+            ".matilda/skills/auto-skill-auspol-vic-polish-loop/SKILL.md"
+          ],
+          "gate": {
+            "ok": true,
+            "steps": [
+              {
+                "name": "refresh-vic",
+                "ok": true,
+                "code": 0,
+                "tail": "VIC_STATUS {\"ran\":true,\"asOf\":\"2026-10-04\",\"daysToGo\":55,\"polls\":64,\"withTpp\":42,\"threeParty\":4,\"leadership\":87,\"tppBlend\":46.17,\"lnpBlend\":53.83,\"headN2pp\":5,\"headWindow\":60,\"headPolls\":7,\"prim\":{\"alp\":24.5,\"lnp\":28.75,\"onp\":22.96,\"grn\":13.71,\"oth\":10.2},\"changed\":false,\"wrote\":[],\"dry\":false}"
+              },
+              {
+                "name": "validate",
+                "ok": true,
+                "code": 0,
+                "tail": "  primary-sum   cyclePolls.2025 #295 2025-03-30 · Essential – Σ shares = 95.0 (basis: Primaries exclude undecided with no rebase to 100 (sums 92–97).) |   primary-sum   cyclePolls.2025 #306 2025-04-14 · Essential – Σ shares = 96.0 (basis: Primaries exclude undecided with no rebase to 100 (sums 92–97).) |   primary-sum   cyclePolls.2025 #325 2025-05-01 · Ipsos – Σ shares = 95.0 (basis: Primaries ex"
+              },
+              {
+                "name": "site-shell-check",
+                "ok": true,
+                "code": 0,
+                "tail": "site shell current on all 11 pages"
+              },
+              {
+                "name": "probe-pack",
+                "ok": true,
+                "code": 0,
+                "tail": "VP_AUDIT {\"checks\":79,\"failed\":[],\"daysSinceNewest\":6}"
+              },
+              {
+                "name": "npm-test",
+                "ok": true,
+                "code": 0,
+                "tail": "B6 invalid/retry: ok | B7 key/breaker: ok | test-vic-polish: all ok"
+              }
+            ]
+          },
+          "reviewer": {
+            "exit": 0,
+            "verdict": "pass",
+            "gaps": 0,
+            "attempts": 1
+          },
+          "openAfter": [
+            "hero-duo-no-countdown"
+          ],
+          "finished": "2026-10-03T21:31:52.114Z"
+        }
+      ],
+      "verdict": "pass",
+      "finished": "2026-10-03T21:31:52.114Z"
     }
   ]
 }

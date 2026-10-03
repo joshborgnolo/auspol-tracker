@@ -671,6 +671,11 @@ body {
   font-size: 52px; line-height: 1; letter-spacing: -0.015em;
 }
 .vp-duo .k { margin-top: 7px; font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.vp-duo .kc { margin-top: 3px; font-size: 11.5px; color: var(--ink-3); }
+@media (max-width: 540px) {
+  .vp-duo { flex-wrap: wrap; gap: 18px 22px; }
+  .vp-duo .n { font-size: 38px; }
+}
 .vp-scope { font-size: 12.5px; line-height: 1.55; color: var(--ink-3); margin: 6px 0 14px; }
 .vp-chips { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 6px 0 4px; }
 .vp-chip { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-2); }
@@ -717,9 +722,10 @@ p.vp-tnote { font-size: 12.5px; line-height: 1.55; color: var(--ink-3); margin: 
   <h1>The Victorian election, in the polls</h1>
   <p class="ss-sub">Every published Victorian state poll toward the ${dateLabel(ELECTION_DATE)} election, blended: ${polls.length} waves from ${firmsN} houses since ${MY(sorted[0].fwEnd)}. Assembled ${dateLabel(asOf)} — ${daysToGo} days out.</p>
 
-  <div class="vp-duo" role="img" aria-label="Two-party preferred blend: Labor ${d1(head.alp2pp)} per cent, Coalition ${d1(head.lnp2pp)} per cent.">
+  <div class="vp-duo" role="img" aria-label="Two-party preferred blend: Labor ${d1(head.alp2pp)} per cent, Coalition ${d1(head.lnp2pp)} per cent; ${daysToGo} days to the ${dateLabel(ELECTION_DATE)} election.">
     <div><div class="n" style="color:var(--alp-text)">${d1(head.alp2pp)}</div><div class="k">Labor — two-party preferred</div></div>
     <div><div class="n" style="color:var(--lnp-text)">${d1(head.lnp2pp)}</div><div class="k">Coalition — two-party preferred</div></div>
+    <div><div class="n">${daysToGo}</div><div class="k">days to election day</div><div class="kc">Saturday, ${dateLabel(ELECTION_DATE)}</div></div>
   </div>
   <p class="vp-scope">${headNote} ${headDelta}</p>
 
