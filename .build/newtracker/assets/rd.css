@@ -1981,7 +1981,7 @@ body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 208px) minmax(0, 208px) minmax(0, 300px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 176px) minmax(0, 136px) minmax(0, 136px) minmax(0, 336px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint);
   box-sizing: border-box; min-height: 57px; /* every facet meets the scale-header facets' row, so hopping facets never shifts the data rows under the reader */ }
 body.rd .rd-ap-hrow > * { min-width: 0; }
@@ -2112,6 +2112,7 @@ body.rd .rd-ap-hnets { align-self: end; }
 body.rd .rd-ap-netcell { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; padding-right: 4px; }
 body.rd .rd-ap-dnum { display: flex; flex-direction: column; gap: 1px; font-size: 15px; color: var(--ink-2); }
 body.rd .rd-ap-dnum b { font-weight: 600; }
+body.rd .rd-ap-issbest > b { font-size: 15px; font-weight: 600; }
 body.rd .rd-ap-dbar { position: absolute; left: 14px; right: 14px; top: 50%; height: 16px; margin-top: -8px; display: flex; }
 body.rd .rd-ap-dbar i { display: block; flex-basis: 0; min-width: 0; }
 /* the separators frame the unsure strip and only that strip – a reading
@@ -2120,9 +2121,8 @@ body.rd .rd-ap-dbar i.u, body.rd .rd-ap-dbar i.u + i { border-left: 2px solid va
 body.rd .rd-ap-dbar i:first-child { border-radius: 2px 0 0 2px; }
 body.rd .rd-ap-dbar i:last-child { border-radius: 0 2px 2px 0; }
 body.rd .rd-ap-dbar i.u { background: var(--line); }
-/* an issues row's 2nd/3rd-issue cell: the top-issue figure cell stacked
-   once per runner-up issue inside the poll's picture track */
-body.rd .rd-ap-d2i { display: flex; flex-direction: column; justify-content: center; gap: 6px; min-width: 0; }
+/* the issues facet's figure cells must truncate a long issue label rather
+   than push their column */
 body.rd .rd-ap-ciss .rd-ap-dnum > .rd-ap-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 body.rd .rd-ap-empty { padding: 28px 12px; font-size: 14px; color: var(--ink-2); }
 body.rd .rd-ap-tip {
@@ -2221,7 +2221,7 @@ body.rd .rd-apd-issrow > b { font-weight: 600; text-align: right; font-variant-n
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 176px) minmax(0, 176px) minmax(0, 260px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 148px) minmax(0, 116px) minmax(0, 116px) minmax(0, 300px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-long { display: none; }
 }
 body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
@@ -2232,7 +2232,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
-  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 148px) minmax(0, 148px) minmax(0, 1fr) 0 28px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 120px) minmax(0, 96px) minmax(0, 96px) minmax(0, 1fr) 72px 28px; }
   body.rd .rd-ap-n, body.rd .rd-ap-hrow > .rd-ap-th:nth-child(3) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }

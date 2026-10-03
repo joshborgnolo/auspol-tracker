@@ -1485,9 +1485,13 @@ function RdAllPolls(P) {
       </>}
       {facet === "issues" && <>
         {th("Top issue", "iss.topv", { title: "The issue most voters said matters most" })}
-        {th("Best on it", "iss.bestv", { title: "The party most voters rate best on that issue" })}
-        <span className="rd-ap-th" title="The 2nd- and 3rd-most-named issues voters said matter most, with the share naming each">2nd and 3rd top issues</span>
-        <span></span>
+        <span className="rd-ap-th" title="The 2nd-most-named issue voters said matters most, with the share naming it">2nd</span>
+        <span className="rd-ap-th" title="The 3rd-most-named issue voters said matters most, with the share naming it">3rd</span>
+        <span className="rd-ap-hpic" aria-hidden="true">
+          <span className="rd-ap-cap">Best on the top issue, % of all respondents</span>
+          <span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span>
+        </span>
+        {th("Best on it", "iss.bestv", { right: true, title: "The party most voters rate best on that issue" })}
       </>}
       <span></span>
     </div>
@@ -1636,32 +1640,58 @@ function RdAllPolls(P) {
          from the d1a1 asset's archive layer) so the cells here, the classic
          table and the CSV export always tell one story */
       const top3 = iss ? (iss.sal || iss.conc || []).slice(0, 3) : [];
-      const nxt = top3.slice(1, 3);
       const it = iss ? window.issTopOf(iss) : null;
       const ib = iss ? window.issBestOf(iss) : null;
       const im = ib ? (window.ISS_PARTY_META[ib.who] || [ib.who, ib.who, null]) : null;
-      figs = <>
+      const issCell = (t, suffix) => (
         <span role="cell" className="rd-ap-dnum">
-          {it ? <><b>{rdApNum(it[1])}</b><span className="rd-ap-sub">{it[0]}{!(iss && iss.sal) && iss && iss.conc ? ", unprompted" : ""}</span></> : <span className="rd-ap-none">—</span>}
+          {t ? <><b>{rdApNum(t[1])}</b><span className="rd-ap-sub">{t[0]}{suffix || ""}</span></> : <span className="rd-ap-none">—</span>}
         </span>
-        <span role="cell" className="rd-ap-dnum">
+      );
+      figs = <>
+        {issCell(it, !(iss && iss.sal) && iss && iss.conc ? ", unprompted" : null)}
+        {issCell(top3[1] || null)}
+        {issCell(top3[2] || null)}
+      </>;
+      /* the party-ownership strip: the wave's own printed shares naming a
+         major party best on its top issue (SEC Newgate: its printed
+         best-party table), as-printed of all respondents - the basis the
+         Best-on-it rail cell quotes too, never the pooled three-party
+         renormalisation of today's issues panel */
+      const own = iss && iss.top ? (iss.own && iss.own[iss.top]) || iss.bp || null : null;
+      const ownLab = iss && iss.top ? ((D.issues && D.issues.labels && D.issues.labels[iss.top]) || iss.top) : null;
+      const ownDots = own
+        ? RD_AP_PRIM.filter((k) => k.id !== "oth" && own[k.id] != null).sort((a, b) => own[b.id] - own[a.id])
+        : [];
+      const ariaBest = ownDots.length
+        ? "Rated best on " + (ownLab || "the issue") + ": " + ownDots.map((k) => (window.ISS_PARTY_META[k.id] || [k.id])[0] + " " + rdApNum(own[k.id])).join(", ") + ", shares of all respondents"
+        : "No best-party reading this wave";
+      pic = (
+        <span className="rd-ap-pic" role="img" aria-label={ariaBest}>
+          <span className="rd-ap-in">
+            {[0, 10, 20, 30, 40].map((v) => <i key={v} className="rd-ap-gl" style={{ left: pdx(v) + "%" }}></i>)}
+            {ownDots.map((k) => (
+              <i key={k.id} className="rd-ap-dot" style={{ left: pdx(own[k.id]) + "%", background: k.dot }}></i>
+            ))}
+          </span>
+        </span>
+      );
+      val = (
+        <span role="cell" className="rd-ap-netcell rd-ap-issbest">
           {ib ? <><b style={im[2] ? { color: im[2] } : null}>{im[1]}</b><span className="rd-ap-sub">{rdApNum(ib.v)} on it</span></> : <span className="rd-ap-none">—</span>}
         </span>
-      </>;
-      pic = nxt.length ? (
-        <span role="cell" className="rd-ap-d2i">
-          {nxt.map((nx) => (
-            <span key={nx[0]} className="rd-ap-dnum">
-              <b>{rdApNum(nx[1])}</b>
-              <span className="rd-ap-sub">{nx[0]}</span>
-            </span>
-          ))}
-        </span>
-      ) : <span className="rd-ap-pic"></span>;
+      );
       right1 = it ? <b className="rd-ap-pairfig">{rdApNum(it[1])}</b> : <span className="rd-ap-none">—</span>;
       body = <>
         {it && <div className="rd-ap-csub">{it[0]} <b>{rdApNum(it[1])}</b></div>}
-        {nxt.length > 0 && <div className="rd-ap-csub">{nxt.map((x, i) => `${i === 0 ? "2nd" : "3rd"} ${x[0]} `).join("")}<b>{nxt.map((x) => rdApNum(x[1])).join(", ")}</b></div>}
+        {top3.length > 1 && (
+          <div className="rd-ap-csub">
+            {top3.slice(1, 3).map((x, i) => (
+              <React.Fragment key={x[0]}>{i > 0 && " · "}{i === 0 ? "2nd" : "3rd"} {x[0]} <b>{rdApNum(x[1])}</b></React.Fragment>
+            ))}
+          </div>
+        )}
+        {ownDots.length > 0 && <div className="rd-ap-cpic">{pic}</div>}
         {ib && <div className="rd-ap-csub">Best on it: <b style={im[2] ? { color: im[2] } : null}>{im[0]}</b>, {rdApNum(ib.v)}</div>}
       </>;
     }
@@ -1743,7 +1773,7 @@ function RdAllPolls(P) {
       {facet === "primary" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Primary vote, %</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
       {facet === "leadership" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Net rating: approve minus disapprove</span><span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span></span>}
       {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span>, unsure, <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
-      {facet === "issues" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap">Share naming each issue as one that matters, %</span></span>}
+      {facet === "issues" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Best on the top issue, % of all respondents</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
     </div>
   );
   /* the pinned bar's section links are the short names at every width - the

@@ -10,8 +10,57 @@ extracted_at: '2026-09-29'
 The fifth facet tab (letter `i`, sits right after Direction in FACETS — that
 order is also the arrow-key walk). User's brief: Ipsos gets rows of its own
 (issues are all it polls); SEC Newgate's concerns ride in; VI houses show
-issues (and direction) only. Probes: `.matilda/probe/iss-facet.mjs` (35
+issues (and direction) only. Probes: `.matilda/probe/iss-facet.mjs` (39
 checks), regression guard `.matilda/probe/dir-facet.mjs` (31).
+
+## The 2026-10-03 row redesign — three dnum cells + ownership dots + rail verdict
+
+User brief: "improve the design of the issues view of the all polls table …
+the row heights should be identical to those in the other views." The
+offender was the stacked `.rd-ap-d2i` cell (2nd and 3rd issues as
+figure-over-label pairs, ~80px of content); since `.rd-ap-row` carries only
+`min-height: 58px` (the shared floor across every facet — load-bearing for
+the rdPinScroll facet-walk landings, see auspol-allpolls-month-rows), its
+rows stood ~80px tall. Shipped (plan-mode, user picked all three
+recommended options): the DESKTOP row now mirrors the Direction facet's
+grammar exactly:
+
+- THREE single-line issue cells (Top / 2nd / 3rd), each a `.rd-ap-dnum`
+  (figure `<b>` over a `.rd-ap-sub` issue label). `.rd-ap-d2i` is DELETED
+  from rd.css — do not reintroduce a vertically stacked cell; the
+  58px-parity probe check will catch it (iss-facet "5b": median
+  `.rd-ap-row` height, ≤0.75px spread across issues/twopp/primary/
+  leadership/direction). The three cells render inside ONE Fragment slot
+  so the row still carries exactly 10 grid children (the ciss template's
+  column count, and the fade `:nth-child(n+5)` selector's contract).
+- A NEW picture track: the wave's party-OWNERSHIP on its top issue as
+  `.rd-ap-dot`s on the shared 0–45 `pdx` scale with 5 `.rd-ap-gl`
+  gridlines, drawn straight off `RD_AP_PRIM` (rd-allpolls.jsx :149).
+  Dots = `iss.own[iss.top]` (or SEC's `iss.bp` fallback), filtered to
+  as-printed non-null parties, sorted desc. Column head caption:
+  "Best on the top issue, % of all respondents" + 0/10/20/30/40% ticks —
+  phone phead got the SAME hpic (it replaces the old text-cap-only head).
+- The Best-on-it verdict MOVED to the right-aligned `.rd-ap-netcell` rail
+  position (`.rd-ap-issbest`: party abbrev in its css-var colour + the
+  "N on it" sub) — the same slot Direction's Net figure occupies.
+- Empty-reading nulls: a best-party-only wave (Resolve's
+  party_attributes-only rows) = three dash cells + gridline-only track +
+  dash rail; salience-only (Ipsos) = three filled cells + gridline-only
+  track + dash rail.
+- Basis contract (the TWO-BASIS section below now cuts BOTH ways): the
+  ROW dots deliberately plot `iss.own` AS-PRINTED (all-respondent shares
+  — the caption says so, and it lines up with the printed wave and the
+  "N on it" chip). The OPENED detail's issBestBlock and the rail
+  RdApIssMini keep the three-party renormalisation because they co-plot
+  against the pooled `monthly` line. Row renderer = raw; detail/rail
+  renderer = renormalised. Neither mixes.
+- Phone cards gain the desktop track as `.rd-ap-cpic > .rd-ap-pic` (the
+  same hpic grammar, pinned by the probe's phone checks) — see the Phone
+  cards section.
+- Grid contract moved: `.rd-ap-ciss` ∈ {10, 9, 7}-col templates at the
+  3 breakpoints (rd.css :1975 / :2217 / :2228); the hpic span is the
+  9th/8th column, the netcell the last. The `.rd-ap-issbest > b`
+  normalisation (15px/600) sits beside `.rd-ap-netcell` (~:2104).
 
 ## TWO-BASIS OWNERSHIP — iss.own is AS-PRINTED, the pooled series is three-party
 
@@ -159,14 +208,21 @@ renormalised at :508-512 and the caption/ARIA at :528, :808-811)
 
 - Phone `.rd-ap-card.rd-ap-ciss` > `.rd-ap-c1` (firm link +
   `<b class="rd-ap-pairfig">63</b>` — the top-issue figure) + `.rd-ap-csub`
-  divs: "Cost of living <b>63</b>", the 2nd/3rd-issue csub ("2nd Hospitals,
-  3rd The economy" labels with the two shares in one trailing `<b>`), then
-  "Best on it: <b>Labor</b>, 27". NO picture strip — desktop's
-  "2nd and 3rd top issues" cell (`.rd-ap-d2i`, stacked `.rd-ap-dnum`
-  figure-over-label entries from the wave's salience row after the top one)
-  becomes that csub; the earlier `.rd-ap-ibar` share-bars were retired
-  2026-09-29 (user: "replace the share-naming column with 2nd and 3rd top
-  issues").
+  divs: "Cost of living <b>63</b>", the 2nd/3rd-issue csub ("2nd Hospitals
+  <b>32</b> · 3rd The economy <b>17</b>" — one `.rd-ap-csub`, each figure
+  in its own `<b>` beside its issue's name), then "Best on it:
+  <b>Labor</b>, 27". Cards whose wave asked the ownership question ALSO
+  mount the desktop track's phone rung — `.rd-ap-cpic > .rd-ap-pic`
+  (rd.css ~:2273, `height:28px`, the phead's scale head carries the same
+  caption + 0–40 ticks; the `> .rd-ap-pic { position:absolute; inset:0;
+  min-height:0 }` pin keeps the card's pic from inheriting the phead's
+  height floor; each row's pic is a fresh element, so no tk duplication
+  issue). Salience-only waves (Ipsos) get NO cpic, best-party-only waves
+  get NO csub — both legit. Desktop's stacked `.rd-ap-d2i` cell is dead
+  (the 2026-10-03 redesign, §top) — 2nd/3rd ride that one csub on phone
+  and their own `.rd-ap-dnum` cells on desktop. The `.rd-ap-ibar`
+  share-bars remain retired since 2026-09-29 (user: "replace the
+  share-naming column with 2nd and 3rd top issues").
 - **No `.rd-ap-dnum` on phone** — that's the DESKTOP figure cell. A probe
   selector `.rd-ap-cfigs .rd-ap-dnum b`/`.rd-ap-dnum b` matches nothing on
   cards (hit twice: first as an unserialisable-return bug, then as a
@@ -177,9 +233,9 @@ renormalised at :508-512 and the caption/ARIA at :528, :808-811)
 - A best-party-only wave (e.g. Resolve's party_attributes-only rows, top
   issue `—`) legitimately has fill-flag false and no 2nd/3rd cell/csub on
   BOTH rungs. Desktop fill flag = the first top-level `.rd-ap-dnum` b
-  (`:scope > .rd-ap-dnum` — the d2i's own entries also carry that class,
-  so scope the desktop row query or the two figure cells and the runner
-  entries sum together); phone = pairfig digit test.
+  (`:scope > .rd-ap-dnum` — after the 2026-10-03 redesign every figure
+  cell is a TOP-LEVEL row child, so scope the row query regardless);
+  phone = pairfig digit test.
 
 ## Classic-script global-name uniqueness (ISS_PARTY → ISS_PARTY_META)
 
@@ -199,19 +255,26 @@ exports.
 
 ## Verify probes
 
-- `.matilda/probe/iss-facet.mjs` — 35 checks: tab order + `?f=i` deep link,
-  42/42 rows (9 Ipsos + 7 SEC + 26 VI-house), 42-of-182 tally on Issues and
-  the 163/97/75 sibling-facet tallies, Ipsos never bleeding onto
-  2PP/Primary/Leaders/Direction, the 2nd/3rd-issues cell iff the top-issue
-  cell is filled (desktop `.rd-ap-d2i` figure-over-label entries, phone
-  ^2nd csub — both rungs), Ipsos detail = 11 apd-issrows + "The issues voters
-  name" + issues rail (`Asked/…/most capable of managing/usual lean/In
-  today's panel`, svg:true) with NO matchup grid/primary chips, SEC detail
-  = "Named without prompting" + not-pooled note + no "question forms" in
-  rail, Resolve detail = issues rail with Asked | usual lean | In today's
-  panel, phone 390px cards, the two-basis pin in §"TWO-BASIS OWNERSHIP"
-  above (wave's own dots Σ ≈ 100 after axis-pixel inversion), and the
-  x-basis pin 8c in §"X-BASIS" above (dots cx ≈ X(fmid), ≠ X(released)).
+- `.matilda/probe/iss-facet.mjs` — 39 checks: tab order + `?f=i` deep link,
+  42/42 rows (9 Ipsos + 7 SEC + 26 VI-house), 42-of-184 tally on Issues and
+  the sibling-facet tallies, Ipsos never bleeding onto
+  2PP/Primary/Leaders/Direction, the redesigned row anatomy (§top: exactly
+  three top-level `.rd-ap-dnum` cells, a `:scope > .rd-ap-pic` strip with
+  2–4 `.rd-ap-dot`s over 5 gridlines iff the wave has an ownership reading,
+  the `.rd-ap-netcell` verdict rail, `.rd-ap-d2i` ABSENT, runners imply a
+  filled top-issue cell, head names the 0–40% scale), ROW-HEIGHT PARITY
+  across all five facets (median `.rd-ap-row` height, ≤0.75px spread —
+  the redesign's acceptance check), Ipsos detail = 11 apd-issrows + "The
+  issues voters name" + issues rail (`Asked/…/most capable of managing/
+  usual lean/In today's panel`, svg:true) with NO matchup grid/primary
+  chips, SEC detail = "Named without prompting" + not-pooled note + no
+  "question forms" in rail, Resolve detail = issues rail with Asked |
+  usual lean | In today's panel, phone 390px cards (2nd/3rd csub iff top
+  filled, ownership iff `.rd-ap-cpic` with 2–4 dots, phead caption +
+  5 ticks), the two-basis pin in §"TWO-BASIS OWNERSHIP" above (wave's
+  own detail dots Σ ≈ 100 after axis-pixel inversion — the detail
+  renormalises; the ROW strip deliberately doesn't), and the x-basis pin
+  8c in §"X-BASIS" above (dots cx ≈ X(fmid), ≠ X(released)).
 - `.matilda/probe/dir-facet.mjs` — 31 checks; its tally derivation reads
   the third array off the live bundle.
 - Both probes read `window.AUSPOL` for expected counts — never bake counts
