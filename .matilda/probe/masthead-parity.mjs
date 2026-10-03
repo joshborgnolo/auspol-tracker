@@ -248,6 +248,16 @@ ok(satTabs.length === 4 && !/archives/i.test(satTabs.join("|")), "satellite tab 
 const mainTabs = await page.evaluate(() => [...document.querySelectorAll(".tabs-set .tab")].map((t) => t.innerText.trim()));
 ok(JSON.stringify(satTabs) === JSON.stringify(mainTabs),
    `tab labels match the main page's (main ${mainTabs.join(" | ")}, sat ${satTabs.join(" | ")})`);
+/* …and the tabs must NAVIGATE: the fillCopy rebuild derives each href from
+   the tab id (2026-10-03 hotfix – t.href wrote the string "undefined", and a
+   click on a satellite went to <satellite>/undefined). The scrape runs after
+   the page's own fetch, so this is the REBUILT set, not the bake */
+const chrome = mainChrome();
+const satTabHrefs = await sat.evaluate(() => [...document.querySelectorAll(".sh-tabs-set .sh-tab")].map((t) => t.getAttribute("href")));
+const expectHrefs = chrome.tabs.map((t) => "/#" + t.id);
+ok(!satTabHrefs.some((h) => h === null || /undefined|^#|^$/.test(h)), "no satellite tab href is undefined/empty");
+ok(JSON.stringify(satTabHrefs) === JSON.stringify(expectHrefs),
+   `satellite tabs navigate to the main page's views (${satTabHrefs.join(" ")})`);
 const tabType = await sat.evaluate(() => ({
   fam: getComputedStyle(document.querySelector(".sh-tabs .sh-tab")).fontFamily.slice(0, 40),
   size: getComputedStyle(document.querySelector(".sh-tabs .sh-tab")).fontSize }));
@@ -266,8 +276,8 @@ ok(!satArch, "satellite navbar carries no Archives link");
    lifts them out of the main page's compiled masthead, shellHeader bakes
    them into the satellites. So both pages must render the same strings,
    and those strings must BE the lift. The classes differ (.rd- vs .sh-);
-   the scrape takes a selector map per page. */
-const chrome = mainChrome();
+   the scrape takes a selector map per page. (`chrome` was lifted up at the
+   tab-nav check.) */
 const scrapeChrome = (S) => {
   const txt = (s, a) => { const el = document.querySelector(s); if (!el) return null;
     return a ? el.getAttribute(a) : el.textContent.replace(/\s+/g, " ").trim(); };

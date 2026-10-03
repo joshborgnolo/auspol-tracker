@@ -748,7 +748,10 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
   var TAB_EXTRAS = {"cycles":{"short":"Cycles"}};
   var fillCopy = function (cp) {
     /* the tab list, rebuilt in the main page's order with its labels (the
-       short label is the shell's own extra, baked in above) */
+       short label is the shell's own extra, baked in above). The contract
+       carries WORDS only – href derives from the id exactly as mainTabs
+       derives it ("/#<id>"); writing t.href wrote the string "undefined",
+       and a click went to <satellite>/undefined (2026-10-03 hotfix) */
     var set = document.querySelector(".sh-tabs-set");
     if (set && cp.tabs && cp.tabs.length) {
       var act = null, as = set.querySelectorAll("a.sh-tab");
@@ -756,9 +759,10 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
       while (set.firstChild) set.removeChild(set.firstChild);
       for (var ti = 0; ti < cp.tabs.length; ti++) {
         var t = cp.tabs[ti], a = document.createElement("a");
+        var h = "/#" + t.id;
         a.className = "sh-tab" + (t.pinHide ? " sh-tab-pinhide" : "");
-        a.setAttribute("href", t.href);
-        if (act === t.href) { a.className += " active"; a.setAttribute("aria-current", "page"); }
+        a.setAttribute("href", h);
+        if (act === h) { a.className += " active"; a.setAttribute("aria-current", "page"); }
         var xs = TAB_EXTRAS[t.id] || {};
         if (xs.short) {
           var l2 = document.createElement("span"); l2.className = "sh-tab-long"; l2.textContent = t.label;

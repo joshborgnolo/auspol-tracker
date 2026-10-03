@@ -112,6 +112,11 @@ for (const [what, v] of [["wordmark name", chrome.wm.name], ["tagline tail", chr
   assert.ok(head.includes(v), `shellHeader bakes the lifted ${what}`);
 // the runtime overlay shipped in the emitted js
 assert.ok(shellJs().includes("var fillCopy = function (cp)"), "site-shell.js carries the copy overlay");
+// …and its tab rebuild can never re-ship 2026-10-03's live bug: the contract carries
+// words only, so href comes from the id ("/#<id>"), never t.href ("undefined" – a
+// click went to <satellite>/undefined)
+assert.ok(!shellJs().includes('setAttribute("href", t.href)'), "the runtime tab reconcile never writes t.href");
+assert.ok(shellJs().includes('"/#" +'), "the runtime tab href derives from the tab id");
 // auspol-now.json (emitted by the build that precedes this test) carries the SAME parse
 const now = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", "auspol-now.json"), "utf8"));
 assert.deepEqual(now.copy, chrome, "auspol-now.json's copy block is the chrome contract verbatim");
