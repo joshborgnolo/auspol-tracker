@@ -2007,6 +2007,7 @@ class RootBoundary extends React.Component {
   componentDidCatch(err) {
     console.error("app render failed:", err);
     document.body.classList.remove("js");
+    document.documentElement.classList.remove("boot");
     const ss = document.querySelector(".static-summary");
     if (ss) {
       ss.removeAttribute("aria-hidden");

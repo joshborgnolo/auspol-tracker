@@ -364,6 +364,17 @@ body.js .static-summary {
 body.js #root {
   margin-top: calc(-1 * var(--ss-h, 0px));
 }
+/* Before the first commit the article was a visible flash on every load: the
+   parser paints it long before the ~3MB of inline script below it has run.
+   html.boot (set by the head script) holds it transparent until body.js takes
+   over - the same in-flow opacity hide, so the page keeps its height and the
+   tide band stays off-screen rather than splashing up top. The head script
+   drops html.boot if the app never mounts, and RootBoundary drops it with
+   body.js, so a failed app still falls back to the readable article. */
+html.boot body:not(.js) .static-summary {
+  opacity: 0;
+  pointer-events: none;
+}
 /* The meta line's freshness dot toggles ss-view: the article steps back up
    to full opacity in its own in-flow box while the app's box collapses out
    of the way - the same two levers body.js pulls at mount, in reverse. The
@@ -4992,6 +5003,19 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   <style>/* The redesign – rules in .build/newtracker/assets/rd.css, spliced in by build.mjs. */
 /*RDCSS*/
 </style>
+  <!-- Marks the page as booting so the static article stays invisible until
+       the app mounts (see html.boot). Script-only, so no-JS readers never get
+       the class. If any script throws before the mount, or the app has not
+       mounted 8s after load, the class goes and the article shows. -->
+  <script>(function () {
+    var h = document.documentElement;
+    h.classList.add("boot");
+    function bail() {
+      if (!(document.body && document.body.classList.contains("js"))) h.classList.remove("boot");
+    }
+    window.addEventListener("error", bail);
+    window.addEventListener("load", function () { setTimeout(bail, 8000); });
+  })();</script>
 </head>
 <body>
   <!-- build.mjs replaces this marker with the article version of the page:

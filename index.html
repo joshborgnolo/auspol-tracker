@@ -293,6 +293,10 @@ body.js .static-summary {
 body.js #root {
   margin-top: calc(-1 * var(--ss-h, 0px));
 }
+html.boot body:not(.js) .static-summary {
+  opacity: 0;
+  pointer-events: none;
+}
 body.js.ss-view .static-summary { opacity: 1; pointer-events: auto; }
 body.js.ss-view #root { display: none; }
 .view-error {
@@ -5121,6 +5125,19 @@ body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 60
   }
 }
 </style>
+  <!-- Marks the page as booting so the static article stays invisible until
+       the app mounts (see html.boot). Script-only, so no-JS readers never get
+       the class. If any script throws before the mount, or the app has not
+       mounted 8s after load, the class goes and the article shows. -->
+  <script>(function () {
+    var h = document.documentElement;
+    h.classList.add("boot");
+    function bail() {
+      if (!(document.body && document.body.classList.contains("js"))) h.classList.remove("boot");
+    }
+    window.addEventListener("error", bail);
+    window.addEventListener("load", function () { setTimeout(bail, 8000); });
+  })();</script>
 </head>
 <body>
   <!-- build.mjs replaces this marker with the article version of the page:
@@ -86547,6 +86564,7 @@ class RootBoundary extends React.Component {
   componentDidCatch(err) {
     console.error("app render failed:", err);
     document.body.classList.remove("js");
+    document.documentElement.classList.remove("boot");
     const ss = document.querySelector(".static-summary");
     if (ss) {
       ss.removeAttribute("aria-hidden");
