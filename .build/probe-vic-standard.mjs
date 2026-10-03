@@ -210,6 +210,54 @@ figures.forEach((f, i) => {
 ck("figure-aria-labels", "feature", figures.every((f) => f.label.trim().length > 10), `${figures.length} figures all carry a meaningful aria-label (role=img)`);
 ck("table-caption", "feature", /<table[^>]*>[\s\S]*?<caption/.test(html), "poll table carries a <caption>");
 
+// ---- interaction tier (D14 hover cards, D15 dot↔table wiring, D16 leaders) ----
+// The page is generated + inline; check its DOM signature in the shipped
+// html and fall back to the generator source for the script-side wiring.
+{
+  const src = html + "\n" + gen;
+  // D14: custom hover-card machinery = tooltip styling + a host element the
+  // script populates + pointer event wiring attached to dots.
+  const tipCss = /\.vp-(tip|tooltip|htip|card)\b/.test(src);
+  const tipHost = /class="vp-(tip|tooltip|htip|card)/.test(html) || /createElement\(["'](?:div|aside)["']\)[\s\S]{0,600}?vp-(tip|tooltip|htip)/.test(src);
+  const ptrWiring = /addEventListener\(["'](pointerenter|pointerover|pointermove|mouseover)/.test(src);
+  ck("hover-tip-machinery", "feature", tipCss && tipHost && ptrWiring,
+    `custom hover-card signature — tooltip styling: ${tipCss ? "yes" : "NO"}, host element: ${tipHost ? "yes" : "NO"}, pointer wiring: ${ptrWiring ? "yes" : "NO"} (native <title> alone is not the main page's hover surface)`);
+
+  // D15: dots carry wave keys; table rows carry anchor ids; a script
+  // joins them (dataset/getAttribute + getElementById/querySelector).
+  const WAVE_ATTR_RE = /<circle[^>]*data-(wave|key|fw|date|wave-key)="[^"]*"/g;
+  let waveDots = 0, circles = 0;
+  figures.forEach((f) => {
+    circles += (f.body.match(/<circle\b/g) || []).length;
+    waveDots += (f.body.match(WAVE_ATTR_RE) || []).length;
+  });
+  ck("dot-wave-keys", "feature", circles > 0 && waveDots / circles > 0.6,
+    `${waveDots}/${circles} chart dots carry a wave-key data attribute (hover/click targets must be wave-keyed)`);
+  const tblSeg = (() => { const h = html.indexOf("Every published poll"); return h >= 0 ? html.slice(h, Math.min(h + 120000, html.length)) : ""; })();
+  const rowIds = (tblSeg.match(/<tr[^>]*id="[^"]+"/g) || []).length;
+  ck("table-row-ids", "feature", rowIds >= polls.length,
+    `${rowIds}/${polls.length} poll-table rows carry an anchor id for dot wiring`);
+  const joiner = /\.dataset\.|getAttribute\(["']data-|getElementById\(|querySelector\(["']#/.test(src) && /(highlight|scrollIntoView|classList\.(add|toggle))/.test(src);
+  ck("dot-table-joiner", "feature", joiner, `page JS joins dots to rows (dataset read + highlight/scroll behaviour) ${joiner ? "present" : "ABSENT"}`);
+
+  // D16: leaders figures' dots also carry the wave-key attrs (first-class)
+  const leadersCircles = figLeaders.reduce((n, f) => n + ((f.body.match(/<circle\b/g) || []).length), 0);
+  const leadersKeyed = figLeaders.reduce((n, f) => n + ((f.body.match(WAVE_ATTR_RE) || []).length), 0);
+  ck("leaders-dots-keyed", "feature", leadersCircles > 0 && leadersKeyed / leadersCircles > 0.6,
+    `${leadersKeyed}/${leadersCircles} leader-chart dots carry wave keys (leaders join the interactive tier)`);
+}
+
+// D17 — next-expected-polls predictor strip under the hero
+{
+  const m = html.match(/<h[23][^>]*>[^<]*(next|expected)[^<]*<\/h[23]>([\s\S]{0,12000})/i)
+    || html.match(/class="[^"]*vp-(next|cadence|predict)[^"]*"([\s\S]{0,12000})/i);
+  const seg = m ? m.slice(m.length - 2).map((s) => s || "").join("") : "";
+  const houses = Object.keys(firms).filter((f) => seg && seg.includes(f));
+  const dateish = (seg.match(/\b(202[0-9])-(0[1-9]|1[0-2])-\d\d\b|Polling due|\bin ~?\d+ d|overdue|days?\b/g) || []).length;
+  ck("next-polls-strip", "feature", !!m && houses.length >= 2 && dateish >= 2,
+    m ? `next-polls strip found naming ${houses.length} houses (${houses.join(", ")}) with ${dateish} date/countdown tokens` : "NO next-expected-polls strip/section found under the hero (main page has its next-polls predictor; this page has none)");
+}
+
 // D7 — hero clauses: basis count + the 2022 baseline delta nearby
 ck("hero-basis-clause", "feature", /two-party figures/i.test(text) || /published 2PPs?/i.test(text) || /published two-party/i.test(text), "the headline 2PP clause names its basis ('from N published two-party figures …')");
 ck("hero-2022-delta", "feature", /2022/.test(text) && /(\d+(\.\d+)?\s*(points?|pts?)\s*(behind|ahead|above|below|off|short|of the 2022)|compared with 2022|vs 2022|against the 2022)/i.test(text), "hero/summary copy states the current blend's distance from the 2022 election result");
