@@ -4,7 +4,10 @@
     "2026-10-03T14:41:47.767Z",
     "2026-10-03T15:05:20.901Z",
     "2026-10-03T15:05:20.949Z",
-    "2026-10-03T15:07:11.459Z"
+    "2026-10-03T15:07:11.459Z",
+    "2026-10-03T15:15:15.481Z",
+    "2026-10-03T15:15:15.518Z",
+    "2026-10-03T15:22:03.371Z"
   ],
   "gaps": {
     "data:scope-firms-miscounted": {
@@ -16,7 +19,7 @@
       "seen": [
         "2026-10-03T15:05:20.933Z"
       ],
-      "missed": 0,
+      "missed": 1,
       "status": "open"
     },
     "feature:charts-no-hover-values": {
@@ -28,7 +31,7 @@
       "seen": [
         "2026-10-03T15:05:20.933Z"
       ],
-      "missed": 0,
+      "missed": 1,
       "status": "open"
     },
     "visual:table-date-label-style": {
@@ -40,7 +43,7 @@
       "seen": [
         "2026-10-03T15:05:20.933Z"
       ],
-      "missed": 0,
+      "missed": 1,
       "status": "open"
     },
     "visual:net-chart-axis-hyphen": {
@@ -52,7 +55,7 @@
       "seen": [
         "2026-10-03T15:05:20.933Z"
       ],
-      "missed": 0,
+      "missed": 1,
       "status": "open"
     }
   },
@@ -128,6 +131,73 @@
       ],
       "verdict": "gaps",
       "finished": "2026-10-03T15:10:25.765Z"
+    },
+    {
+      "started": "2026-10-03T15:15:15.481Z",
+      "rounds": [
+        {
+          "round": 1,
+          "started": "2026-10-03T15:15:15.503Z",
+          "builder": {
+            "exit": 0,
+            "summary": "scope line counts 2PP-carrying firms only; fieldwork labels derived from ISO spans; every chart dot carries a <title>; net ticks U+2212"
+          },
+          "builderScopeViolations": [
+            ".build/newtracker/build.mjs",
+            ".matilda/skills/auto-skill-auspol-vic-satellite-plan/SKILL.md"
+          ],
+          "gate": {
+            "ok": true,
+            "steps": [
+              {
+                "name": "refresh-vic",
+                "ok": true,
+                "code": 0,
+                "tail": "VIC_STATUS {\"ran\":true,\"asOf\":\"2026-10-04\",\"daysToGo\":55,\"polls\":64,\"withTpp\":42,\"threeParty\":4,\"leadership\":87,\"tppBlend\":46.17,\"lnpBlend\":53.83,\"headN2pp\":5,\"headWindow\":60,\"headPolls\":7,\"prim\":{\"alp\":24.5,\"lnp\":28.75,\"onp\":22.96,\"grn\":13.71,\"oth\":10.2},\"changed\":false,\"wrote\":[],\"dry\":false}"
+              },
+              {
+                "name": "validate",
+                "ok": true,
+                "code": 0,
+                "tail": "  primary-sum   cyclePolls.2025 #295 2025-03-30 · Essential – Σ shares = 95.0 (basis: Primaries exclude undecided with no rebase to 100 (sums 92–97).) |   primary-sum   cyclePolls.2025 #306 2025-04-14 · Essential – Σ shares = 96.0 (basis: Primaries exclude undecided with no rebase to 100 (sums 92–97).) |   primary-sum   cyclePolls.2025 #325 2025-05-01 · Ipsos – Σ shares = 95.0 (basis: Primaries ex"
+              },
+              {
+                "name": "site-shell-check",
+                "ok": true,
+                "code": 0,
+                "tail": "site shell current on all 11 pages"
+              },
+              {
+                "name": "probe-pack",
+                "ok": true,
+                "code": 0,
+                "tail": "VP_AUDIT {\"checks\":40,\"failed\":[],\"daysSinceNewest\":6}"
+              },
+              {
+                "name": "npm-test",
+                "ok": true,
+                "code": 0,
+                "tail": "B6 invalid/retry: ok | B7 key/breaker: ok | test-vic-polish: all ok"
+              }
+            ]
+          },
+          "reviewer": {
+            "exit": 0,
+            "verdict": "pass",
+            "gaps": 0,
+            "attempts": 1
+          },
+          "openAfter": [
+            "scope-firms-miscounted",
+            "charts-no-hover-values",
+            "table-date-label-style",
+            "net-chart-axis-hyphen"
+          ],
+          "finished": "2026-10-03T15:23:50.316Z"
+        }
+      ],
+      "verdict": "pass",
+      "finished": "2026-10-03T15:23:50.316Z"
     }
   ]
 }
