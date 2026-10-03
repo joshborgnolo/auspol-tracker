@@ -31,8 +31,9 @@
      start at px(0), tails end at px(endRes.x).
    - end-of-line: no drawn term's solid line ends to the RIGHT of its closing
      ring; lifting 2007 (the election rounds into the final month bucket,
-     mid-window) ends each vote line exactly at px(endRes.x) - the line
-     meets the ring - and fires no "c2007-tail".
+     mid-window) ends each vote line exactly at px(endRes.x) - the terminal
+     vertex clamps onto the ring's x - and a VERTICAL "c2007-tail" dotted
+     connector joins that vertex up or down to the count itself.
    - lifting 1996: three rings per vote card, the 1996 pair in its card
      colour, base at px(0)/py(raw[key][0]) and close at
      px(endRes.x)/py(endRes[key]); dash counts follow the replay, and a
@@ -120,8 +121,10 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
            on the raw rows so the expected dash split (dotted lead vs "6 6"
            interior gap) is derived, not retyped. `tail` replays the d1a1d215
            lead-out push: vote cards only, a drawn past term whose closing
-           result exists and sits past its final poll earns one dotted
-           two-point run ending at px(endRes.x) */
+           result is drawn earns one dotted two-point run ending at
+           px(endRes.x) - trailing off right when the ring sits past the
+           final poll, straight up or down onto it when the clamp pulled
+           the terminal vertex onto the ring's own x */
         const replay = (c, key) => {
           let dotted = 0, gap = 0, tails = [];
           const list = (key === "tpp" && c.raw.tppEras) ? c.raw.tppEras
@@ -143,8 +146,17 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
             });
             if (si === list.length - 1 && c.endRes && c.endRes[key] != null) {
               const lastPt = pts[pts.length - 1];
-              if (c.endRes.x > lastPt.x + 1e-6)
-                tails.push({ id: "c" + c.year + (si ? "-e" + si : "") + "-tail", x0: lastPt.x, x1: c.endRes.x, end: c.endRes[key] });
+              /* the d1a1d215 clamp: a ring rounding INTO the final bucket
+                 pulls the terminal vertex onto its own x, and the lead-out
+                 then fires from that shared x - the connector collapses to
+                 a vertical run from the vertex's figure to the count */
+              let clamped = false;
+              if (Math.round(c.endRes.x) === lastPt.x && c.endRes.x < lastPt.x - 1e-6) {
+                lastPt.x = c.endRes.x;
+                clamped = true;
+              }
+              if (c.endRes.x > lastPt.x + 1e-6 || (clamped && Math.abs(c.endRes[key] - lastPt.y) > 0.005))
+                tails.push({ id: "c" + c.year + (si ? "-e" + si : "") + "-tail", x0: lastPt.x, y0: lastPt.y, x1: c.endRes.x, end: c.endRes[key] });
             }
           });
           return { dotted, gap, tails };
@@ -160,7 +172,8 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
           const paths = [...el.querySelectorAll("path.series-line")].map((p) => {
             const nums = ((p.getAttribute("d") || "").match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
             return { id: p.getAttribute("data-series"), dash: p.getAttribute("stroke-dasharray"),
-                     d0: nums.length ? nums[0] : null, dEnd: nums.length ? nums[nums.length - 2] : null,
+                     d0: nums.length ? nums[0] : null, d0Y: nums.length ? nums[1] : null,
+                     dEnd: nums.length ? nums[nums.length - 2] : null,
                      dEndY: nums.length ? nums[nums.length - 1] : null, stroke: getComputedStyle(p).stroke };
           });
           const dotted = paths.filter((p) => p.dash === "0.5 4");
@@ -376,8 +389,9 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
       }
 
       /* ---- lift 2007: the election rounds INTO the final month bucket, so
-         the terminal vertex clamps onto the ring - line ends ON the count,
-         no lead-out tail - then unlift, leaving 1996 up for change mode --- */
+         the terminal vertex clamps onto the ring's x and the lead-out
+         collapses to a vertical dotted connector from the vertex's own
+         figure onto the count - then unlift, leaving 1996 for change mode --- */
       await ensureBoard();
       await page.evaluate(() => {
         const term = [...document.querySelectorAll(".rd-cc-term")]
@@ -391,13 +405,21 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
         JSON.stringify(L.c07endRes && { x: L.c07endRes.x }));
       for (const k of VOTE) {
         const cardL = L[k];
+        const exp07 = cardL.expected.tails.find((t) => t.id === "c2007-tail");
         check(`[${vw}] 2007-end ${k}: the solid line ends ON the closing ring`,
           !!L.c07endRes && cardL.end07 != null
             && Math.abs(cardL.end07 - px(cardL, L.c07endRes.x)) <= 2,
           `end ${cardL.end07} vs px(${L.c07endRes && L.c07endRes.x}) ${L.c07endRes ? px(cardL, L.c07endRes.x).toFixed(2) : "?"}`);
-        check(`[${vw}] 2007-end ${k}: no lead-out tail fires`,
-          cardL.tails.every((p) => p.id !== "c2007-tail"),
-          JSON.stringify(cardL.tails.map((p) => p.id)));
+        const tails07 = cardL.tails.filter((p) => p.id === "c2007-tail");
+        check(`[${vw}] 2007-end ${k}: a vertical dotted connector rises from the final vertex onto the ring`,
+          tails07.length === 1 && !!exp07 && !!L.c07endRes
+            && Math.abs(tails07[0].d0 - tails07[0].dEnd) <= 2
+            && Math.abs(tails07[0].dEnd - px(cardL, L.c07endRes.x)) <= 2
+            && Math.abs(tails07[0].d0Y - py(cardL, exp07.y0)) <= 2
+            && Math.abs(tails07[0].dEndY - py(cardL, exp07.end)) <= 2,
+          tails07.length
+            ? `tail ${JSON.stringify({ x: tails07[0].d0, y: tails07[0].d0Y, x1: tails07[0].dEnd, y1: tails07[0].dEndY })} vs replay ${JSON.stringify(exp07)}`
+            : "(no c2007-tail)");
         check(`[${vw}] 2007-end ${k}: dashes follow the obs replay`,
           cardL.dotted.length === cardL.expected.dotted && cardL.gaps.length === cardL.expected.gap,
           `dom dotted ${cardL.dotted.length}/gap ${cardL.gaps.length} vs replay ${cardL.expected.dotted}/${cardL.expected.gap}`);

@@ -61700,9 +61700,13 @@ function CycleChart({
       });
       const runs = obsRuns(pts, observed);
       const termEnd = si === seriesIn.length - 1;
+      let clampedToRing = false;
       if (termEnd && ringTerms != null && c.endRes) {
         const lastPt = pts[pts.length - 1];
-        if (lastPt && Math.round(c.endRes.x) === lastPt.x && c.endRes.x < lastPt.x - 1e-6) lastPt.x = c.endRes.x;
+        if (lastPt && Math.round(c.endRes.x) === lastPt.x && c.endRes.x < lastPt.x - 1e-6) {
+          lastPt.x = c.endRes.x;
+          clampedToRing = true;
+        }
       }
       const rows = runs.map((run, i) => ({
         id: "c" + c.year + (si ? "-e" + si : "") + (i ? "-" + i : ""),
@@ -61724,7 +61728,8 @@ function CycleChart({
       }));
       if (termEnd && ringTerms != null && c.endRes && c.endRes[M.key] != null) {
         const lastPt = pts[pts.length - 1];
-        if (lastPt && c.endRes.x > lastPt.x + 1e-6) rows.push({
+        const ringY = chg ? +(c.endRes[M.key] - base).toFixed(2) : c.endRes[M.key];
+        if (lastPt && (c.endRes.x > lastPt.x + 1e-6 || clampedToRing && Math.abs(ringY - lastPt.y) > 0.005)) rows.push({
           id: "c" + c.year + (si ? "-e" + si : "") + "-tail",
           label,
           color: colorOf(c),
@@ -61740,7 +61745,7 @@ function CycleChart({
             y: lastPt.y
           }, {
             x: c.endRes.x,
-            y: chg ? +(c.endRes[M.key] - base).toFixed(2) : c.endRes[M.key]
+            y: ringY
           }]
         });
       }

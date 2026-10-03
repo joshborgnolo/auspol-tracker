@@ -182,10 +182,15 @@ keeps leader cards dotless), and a separate two-point `tail` series
 per drawn past term bridges its final poll to `endRes` (same block,
 gated on `c.endRes[M.key] != null`; the sitting term and leaders get
 none). Ring-rounds-into-final-bucket terms (2007, 1974) have their
-terminal vertex CLAMPED onto `endRes.x` instead (same block: poll
-votes snap to integer months but the ring keeps the exact date, so
-that vertex had drawn ~3 days PAST the 21 Aug 2010 ring with no tail
-to bridge it) — a vote line never ends right of its closing count.
+terminal vertex CLAMPED onto `endRes.x` (same block: poll votes snap
+to integer months but the ring keeps the exact date, so that vertex
+had drawn ~3 days PAST the 21 Aug 2010 ring) — a vote line never ends
+right of its closing count. The tail still fires from the clamped
+spot (revised same-day, 2026-10-03, user call "the dotted line
+connects the line with the election results"): both points share the
+ring's x, so the connector draws straight up or down from the
+vertex's own figure to the count — skipped only when figure and
+count coincide (|Δ| ≤ 0.005, nothing to draw).
 rd-cycles restyles both `RD_CYC_LEAD = "0.5 4"` (:53, lead
 branch :77, tail branch next — tail is `endCap: false` so no end-dot
 paints over the closing ring), matching the by-state panels'

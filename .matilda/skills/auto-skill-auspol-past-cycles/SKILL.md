@@ -1216,14 +1216,22 @@ interpolated.
   opacity as its line) from the era's last poll point to
   `{ x: c.endRes.x, y: endRes[M.key] }` (change basis:
   `endRes - base`), gated by `termEnd && ringTerms != null &&
-  c.endRes && c.endRes[M.key] != null && c.endRes.x > lastPt.x + 1e-6`
+  c.endRes && c.endRes[M.key] != null && (c.endRes.x > lastPt.x +
+  1e-6 || (clampedToRing && Math.abs(ringY - lastPt.y) > 0.005))`
   (~:1590-1610). The gate means leaders and the sitting term get none
-  (c.endRes is null while the count is open), and neither does a term
-  whose ring rounds INTO its final month bucket but sits earlier than
-  the boundary (2007: election-day polls fold into month 33, three
-  days past the 21 Aug 2010 ring; 1974 same class) - the block CLAMPS
-  that terminal vertex onto `endRes.x` first, so the vote line ends
-  exactly ON the ring and no lead-out exists to fire. rd-cycles restyles
+  (c.endRes is null while the count is open). A term whose ring rounds
+  INTO its final month bucket but sits earlier than the boundary
+  (2007: election-day polls fold into month 33, three days past the
+  21 Aug 2010 ring; 1974 same class) gets the clamp variant (same-day
+  follow-up, 2026-10-03, user call "the dotted line connects the line
+  with the election results" - the morning's clamp had silenced the
+  tail outright): the line-builder CLAMPS that terminal vertex onto
+  `endRes.x` so the vote line never ends right of its closing count,
+  then still fires the tail from that shared x - both points at
+  `endRes.x`, the connector drawing straight up or down from the
+  vertex's own figure to the count (`Math.abs(ringY - lastPt.y) >
+  0.005`; when the last reading and the count coincide exactly there
+  is nothing to draw and no run fires). rd-cycles restyles
   `if (s.tail) return { ...s, dash: RD_CYC_LEAD }` between the `s.lead`
   and `s.current` branches — same 0.5 4 dots as the lead-in, so the
   line runs bridge→line→bridge. `endCap: false` is load-bearing:

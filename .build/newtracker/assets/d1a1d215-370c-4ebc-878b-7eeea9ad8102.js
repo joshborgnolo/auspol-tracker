@@ -1584,18 +1584,22 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       const termEnd = si === seriesIn.length - 1;
       /* The closing ring keeps the election's exact date, but poll votes
          snap to a month boundary - the 2007 term's election-day polls fold
-         into month 33 (= 24 Aug 2010) and drew 3 days PAST the 21 Aug ring,
-         with no lead-out run to bridge what already overshot it. When the
-         ring rounds into the line's final bucket and sits earlier than its
-         boundary, pull that vertex back onto the ring: the term's last
-         reading IS its election-month blend, and a vote line never draws
-         beyond the count it leads to. Mutation reaches `runs` (shared
-         points) and silences the lead-out below, whose condition reads
-         endRes.x > lastPt.x. */
+         into month 33 (= 24 Aug 2010) and drew 3 days PAST the 21 Aug ring.
+         When the ring rounds into the line's final bucket and sits earlier
+         than its boundary, pull that vertex back onto the ring's x: a vote
+         line never draws beyond the count it leads to. The vertex keeps
+         its own figure and lands beside the ring, so the lead-out below
+         still fires: a two-point dotted run straight down (or up) from the
+         vertex onto the ring - the same connector a term with a trailing
+         ring gets, collapsed onto the vertical. Mutation reaches `runs`
+         (shared points). */
+      let clampedToRing = false;
       if (termEnd && ringTerms != null && c.endRes) {
         const lastPt = pts[pts.length - 1];
-        if (lastPt && Math.round(c.endRes.x) === lastPt.x && c.endRes.x < lastPt.x - 1e-6)
+        if (lastPt && Math.round(c.endRes.x) === lastPt.x && c.endRes.x < lastPt.x - 1e-6) {
           lastPt.x = c.endRes.x;
+          clampedToRing = true;
+        }
       }
       const rows = runs.map((run, i) => ({
         id: "c" + c.year + (si ? "-e" + si : "") + (i ? "-" + i : ""), label, color: colorOf(c), width,
@@ -1624,16 +1628,22 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
          measures have no closing count to join - and never the sitting
          term, whose result is not yet counted (c.endRes is null). The
          endpoint rides the drawn basis, so in change mode the run lands
-         where the ring's unseen change-basis position already sits. */
+         where the ring's unseen change-basis position already sits. When
+         the clamp above pulled the terminal vertex onto the ring's own x,
+         the connector fires from exactly there: both points share the
+         ring's x, so the run draws straight up or down from the vertex's
+         figure to the count instead of trailing off to the right. */
       if (termEnd && ringTerms != null && c.endRes && c.endRes[M.key] != null) {
         const lastPt = pts[pts.length - 1];
-        if (lastPt && c.endRes.x > lastPt.x + 1e-6)
+        const ringY = chg ? +(c.endRes[M.key] - base).toFixed(2) : c.endRes[M.key];
+        if (lastPt && (c.endRes.x > lastPt.x + 1e-6
+            || (clampedToRing && Math.abs(ringY - lastPt.y) > 0.005)))
           rows.push({
             id: "c" + c.year + (si ? "-e" + si : "") + "-tail", label,
             color: colorOf(c), width, weight, current: c.current, opacity,
             dashed: true, tail: true, endCap: false,
             points: [{ x: lastPt.x, y: lastPt.y },
-                     { x: c.endRes.x, y: chg ? +(c.endRes[M.key] - base).toFixed(2) : c.endRes[M.key] }],
+                     { x: c.endRes.x, y: ringY }],
           });
       }
       return rows;
