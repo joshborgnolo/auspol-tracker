@@ -7,7 +7,7 @@
         point since 1972" (full-set "since", not a rescoped one)
      S2 "After preferences, though, <gov>'s NN.N% sits in the middle half
         of past governments" (the TPP now-figure, quartile ladder)
-     S3 "And while <opp>'s primary vote is also the lowest of any
+     S3 "But while <opp>'s primary vote is also the lowest of any
         opposition, it's <standing> when combined with One Nation's" (the combined
         L/NP + ON row's standing, mapped the-highest / second-or-third-
         highest-named / among-the-highest / in-the-middle-half /
@@ -124,7 +124,7 @@ async function run(W, H, touch) {
     : null; /* not today: the record-low rung is the one under contract */
   if (gLow) {
     const expectMid = s1 + " After preferences, though, " + gov + "’s " + tppNow + " " + tppWhere(tppRank) + "."
-      + (oLow ? " And while " + oppSub + "’s primary vote is also the lowest of any opposition, it’s " + standingOf(combRank) + " when combined with One Nation’s." : "");
+      + (oLow ? " But while " + oppSub + "’s primary vote is also the lowest of any opposition, it’s " + standingOf(combRank) + " when combined with One Nation’s." : "");
     const got = s0.dek.replace(/^.*?election, /, "");
     if (got !== expectMid) fails.push(tag + ": default dek body\n  GOT      " + got + "\n  EXPECTED " + expectMid);
   }

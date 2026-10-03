@@ -79155,7 +79155,7 @@ function RdPastCycles(p) {
       const where = t.v >= t.peers.q1 && t.v <= t.peers.q3 ? "sits in the middle half of past governments" : t.v > t.peers.q3 ? "is above three in four of past governments" : "is below three in four of past governments";
       dek += " After preferences, " + (bits.length ? "though, " : "") + govName + "’s " + t.v.toFixed(1) + "% " + where + ".";
     }
-    if (!c2 && oLow && combined) dek += " And while " + oppIn + "’s primary vote is also the lowest of any opposition, it’s " + combined + " when combined with One Nation’s.";
+    if (!c2 && oLow && combined) dek += " But while " + oppIn + "’s primary vote is also the lowest of any opposition, it’s " + combined + " when combined with One Nation’s.";
     return {
       head,
       dek
