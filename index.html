@@ -75252,7 +75252,14 @@ Object.assign(window, {
   id: "leadership",
   label: "Leadership"
 }];
-const RD_PL_PARTIES = [["alp", "ALP"], ["lnp", "L/NP"], ["grn", "GRN"], ["onp", "ON"], ["oth", "OTH"]];
+const RD_PL_LABEL = {
+  alp: "ALP",
+  lnp: "L/NP",
+  grn: "GRN",
+  onp: "ON",
+  oth: "OTH"
+};
+const RD_PL_FALLBACK = ["alp", "lnp", "grn", "onp", "oth"];
 const RD_STALE_DAYS = 42;
 function rdPollRow(p) {
   const pub = p.published || p.released;
@@ -75290,6 +75297,7 @@ function RdPolls({
   const {
     D
   } = window.AP;
+  const plParties = (D.latest && D.latest.primaryOrder || RD_PL_FALLBACK).filter(k => k in RD_PL_LABEL).map(k => [k, RD_PL_LABEL[k]]);
   const narrow = useNarrow("(max-width: 900px)");
   const phone = useNarrow("(max-width: 640px)");
   const [facet, setFacet] = useState("twopp");
@@ -75505,7 +75513,7 @@ function RdPolls({
       };
       return React.createElement("div", {
         className: "rd-pl-prim"
-      }, RD_PL_PARTIES.map(([id]) => React.createElement("span", {
+      }, plParties.map(([id]) => React.createElement("span", {
         key: id,
         style: {
           color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")")
@@ -75573,7 +75581,7 @@ function RdPolls({
   };
   const figHead = facet === "primary" ? React.createElement("div", {
     className: "rd-pl-prim rd-pl-primh"
-  }, RD_PL_PARTIES.map(([id, lab]) => React.createElement("span", {
+  }, plParties.map(([id, lab]) => React.createElement("span", {
     key: id,
     style: {
       color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")")
@@ -75806,7 +75814,7 @@ function RdPolls({
       ...r
     })), r.p && React.createElement("div", {
       className: "rd-pld-prim"
-    }, RD_PL_PARTIES.map(([id, lab]) => r.p[id] != null && React.createElement("span", {
+    }, plParties.map(([id, lab]) => r.p[id] != null && React.createElement("span", {
       key: id
     }, React.createElement("b", {
       style: {

@@ -3395,9 +3395,10 @@ const rivalByYm = Object.fromEntries(rivalWalk.map((r) => [r.ym, r.who]));
    than PRIMARY_DEADBAND, and then holds the slot until the reverse happens.
    Walked forward monthly from the election anchor rather than stored, so the
    order is a pure function of the data and every build reproduces it.
-   Since 2026-10-03 the All-polls house-lean tab row rides the SAME emission
-   (rd-allpolls.jsx hlViews: Two-party, split, then the five party tabs in
-   this order) – change the walk here and both surfaces move together. */
+   Since 2026-10-03 the All-polls house-lean tab row AND the Latest-and-
+   next primary facet ride the SAME emission (rd-allpolls.jsx hlViews and
+   rd-polls.jsx plParties) alongside the Latest/All-polls table columns –
+   change the walk here and every surface moves together. */
 const PRIMARY_DEADBAND = 1.0;
 const primaryOrder = (() => {
   const order = [...PRIMARY_KEYS];

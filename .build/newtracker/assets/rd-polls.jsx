@@ -7,7 +7,13 @@
    here is a second estimate of anything. */
 
 const RD_PL_FACETS = [{ id: "twopp", label: "2PP" }, { id: "primary", label: "Primary" }, { id: "leadership", label: "Leadership" }];
-const RD_PL_PARTIES = [["alp", "ALP"], ["lnp", "L/NP"], ["grn", "GRN"], ["onp", "ON"], ["oth", "OTH"]];
+/* primary columns rank by the site aggregate like every other party
+   listing (the All-polls/Latest tables read the same latest.primaryOrder
+   walk) - user call 2026-10-03: a fixed Labor, Coalition, Greens, One
+   Nation, Other ladder is "unprincipled". This map is only the id->label
+   lookup and the drift fallback; the live order comes from the data. */
+const RD_PL_LABEL = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", oth: "OTH" };
+const RD_PL_FALLBACK = ["alp", "lnp", "grn", "onp", "oth"];
 const RD_STALE_DAYS = 42;
 
 /* the table's shape of a poll, for a pollster with a projection but no row
@@ -24,6 +30,10 @@ function rdPollRow(p) {
 
 function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const { D } = window.AP;
+  /* [id, label] pairs in the aggregate's current order; an unknown key
+     drops out silently rather than misorder the ladder */
+  const plParties = ((D.latest && D.latest.primaryOrder) || RD_PL_FALLBACK)
+    .filter((k) => k in RD_PL_LABEL).map((k) => [k, RD_PL_LABEL[k]]);
   /* a tablet has no room for the release strip beside five columns, so it
      takes the phone's cards too */
   const narrow = useNarrow("(max-width: 900px)");
@@ -176,7 +186,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       };
       return (
         <div className="rd-pl-prim">
-          {RD_PL_PARTIES.map(([id]) => (
+          {plParties.map(([id]) => (
             <span key={id} style={{ color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")") }}>
               {primFig(r.p ? r.p[id] : null)}</span>
           ))}
@@ -223,7 +233,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     );
   };
   const figHead = facet === "primary"
-    ? <div className="rd-pl-prim rd-pl-primh">{RD_PL_PARTIES.map(([id, lab]) => (
+    ? <div className="rd-pl-prim rd-pl-primh">{plParties.map(([id, lab]) => (
         <span key={id} style={{ color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")") }}>{lab}</span>))}</div>
     : facet === "leadership" ? "Preferred PM, net approval" : "Labor v " + rivalName;
 
@@ -357,7 +367,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
           <div className="rd-pld-h">{rdPollHead({ ...(D.individualPolls.find((q) => q.pollster === r.pollster && q.released === r.released) || {}), ...r })}</div>
           {r.p && (
             <div className="rd-pld-prim">
-              {RD_PL_PARTIES.map(([id, lab]) => r.p[id] != null && (
+              {plParties.map(([id, lab]) => r.p[id] != null && (
                 <span key={id}><b style={{ color: id === "oth" ? "var(--ink-3)" : inkOf("var(--" + id + ")") }}>{lab}</b>
                   <span style={{ color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")") }}>{+r.p[id].toFixed(1)}</span>
                   <span className="rd-apd-chg">{rdApChg(cgd[{ alp: "pAlp", lnp: "pLnp", grn: "pGrn", onp: "pOnp", oth: "pOth" }[id]], 0) || "\u00a0"}</span></span>
