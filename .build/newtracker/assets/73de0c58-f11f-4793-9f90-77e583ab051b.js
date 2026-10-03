@@ -2053,6 +2053,10 @@ function App() {
   })();
   const rd = qDesign !== "old";
   window.AP.rd = rd;
+  /* The class first goes on in the boot script before render() is called
+     (children's layout effects would otherwise measure the pre-rd,
+     unstyled layout one commit too early - see the boot block); this
+     effect just keeps the flag the OWNER of the class after mount. */
   React.useLayoutEffect(() => { document.body.classList.toggle("rd", rd); }, [rd]);
 
   /* Which two-party contest the hero is showing. Owned here, not inside Hero,
@@ -2564,6 +2568,29 @@ if (staticSummary) {
      catch (where the app goes away). */
   staticSummary.setAttribute("aria-hidden", "true");
   staticSummary.inert = true;
+}
+/* body.rd gates every rd.css rule, so unlike body.js (see above) it must
+   go on BEFORE render, not from App's first-commit layout effect: React
+   walks child layout effects before the parent's, so everything that
+   measures its own layout in one (the house-lean sparklines, the width
+   hooks) measured the pre-rd UNSTYLED layout - an inline span where the
+   CSS wanted an anchored block - and painted the first frames off those
+   numbers. On the all-polls tab that was nine sparkline svgs ~900px wide
+   in a ~1000px document, the right edge of the page flashing past the
+   screen for a frame or two on every load until the rd class landed and
+   the re-fit corrected them. There is no risk in setting it early: rd
+   derives synchronously (only the ?design= query), and not one rd-scoped
+   rule styles the static article or anything else the pre-render frames
+   show - the css only speaks for the app's own elements. App's layout
+   effect below keeps owning the class after mount (it re-toggles the
+   same value, and a ?design= start gets whatever the URL says). */
+try {
+  document.body.classList.toggle(
+    "rd",
+    new URLSearchParams(window.location.search).get("design") !== "old"
+  );
+} catch (_) {
+  document.body.classList.add("rd");
 }
 ReactDOM.createRoot(document.getElementById("root")).render(
   <RootBoundary><App /></RootBoundary>

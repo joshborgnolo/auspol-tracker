@@ -2053,7 +2053,7 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
     transition: transform .38s cubic-bezier(.22, 1, .36, 1);
   }
   .tabs.show-score .tab-next { transform: translateX(calc(-50% - 50cqw + var(--tn-shift, 0px))); }
-  .tn-item.tn-park { position: absolute; visibility: hidden; }
+  .tn-item.tn-park { position: absolute; visibility: hidden; right: 0; }
   .tab-next.tn-none { visibility: hidden; }
 }
 .tn-lab { font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
@@ -79799,6 +79799,7 @@ function RdAllPolls(P) {
   const ofT = ofTotal != null && ofTotal !== total ? ofTotal : null;
   const ofTxt = ofT ? " of " + ofT : "";
   const phone = useNarrow("(max-width: 760px)");
+  const ctlNarrow = useNarrow("(max-width: 900px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const contest = onM ? "onp" : "lnp";
@@ -81030,13 +81031,13 @@ function RdAllPolls(P) {
     options: FACETS,
     ariaLabel: "Figures",
     className: "rd-ap-tabs"
-  }, facet === "twopp" && !phone && React.createElement("span", {
+  }, facet === "twopp" && !ctlNarrow && React.createElement("span", {
     className: "rd-pl-ctl"
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
   }, "Two-party:"), flip, React.createElement("span", {
     className: "rd-pl-ctl-l"
-  }, ", ", pub ? "as published" : "implied flows"), qpop)), facet === "twopp" && phone && React.createElement("div", {
+  }, ", ", pub ? "as published" : "implied flows"), qpop)), facet === "twopp" && ctlNarrow && React.createElement("div", {
     className: "rd-ap-pctl"
   }, flip, React.createElement("span", {
     className: "rd-pl-ctl-l"
@@ -84699,6 +84700,11 @@ if (staticSummary) {
   new ResizeObserver(setStaticSummaryHeight).observe(staticSummary);
   staticSummary.setAttribute("aria-hidden", "true");
   staticSummary.inert = true;
+}
+try {
+  document.body.classList.toggle("rd", new URLSearchParams(window.location.search).get("design") !== "old");
+} catch (_) {
+  document.body.classList.add("rd");
 }
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(RootBoundary, null, React.createElement(App, null)));</script>
 

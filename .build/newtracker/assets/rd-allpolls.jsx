@@ -1326,6 +1326,14 @@ function RdAllPolls(P) {
   const ofT = ofTotal != null && ofTotal !== total ? ofTotal : null;
   const ofTxt = ofT ? " of " + ofT : "";
   const phone = useNarrow("(max-width: 760px)");
+  /* The tab row only holds the two-party control while the tabs and the
+     control fit between the margins: below ~810px the 6-tab group plus the
+     nowrap "Two-party" control overflowed the document 40px on every frame
+     (worst at 761-808px, right past the phone rung). Under 900px the
+     control moves to its own row, matching the Latest table's 900px ctlrow
+     handoff - .rd-ap-pctl's rules are ungated, so it dresses itself the
+     same at 761 as at 430. */
+  const ctlNarrow = useNarrow("(max-width: 900px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const contest = onM ? "onp" : "lnp";
@@ -2143,14 +2151,14 @@ function RdAllPolls(P) {
       {head && <RdHed head={head} dek={dek} level={2} />}
 
       <RdTabs swipe value={facet} onChange={facetPick} options={FACETS} ariaLabel="Figures" className="rd-ap-tabs">
-        {facet === "twopp" && !phone && (
+        {facet === "twopp" && !ctlNarrow && (
           <span className="rd-pl-ctl">
             <span className="rd-pl-ctl-l">Two-party:</span>{flip}
             <span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span>{qpop}
           </span>
         )}
       </RdTabs>
-      {facet === "twopp" && phone && (
+      {facet === "twopp" && ctlNarrow && (
         <div className="rd-ap-pctl">{flip}<span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span><span className="rd-grow"></span>{qpop}</div>
       )}
 

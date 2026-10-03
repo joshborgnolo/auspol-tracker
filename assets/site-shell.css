@@ -358,7 +358,10 @@ body { height: auto; }
     color: var(--ink-3); transition: transform .38s cubic-bezier(.22, 1, .36, 1);
   }
   .sh-tabs.pinned .sh-next { transform: translateX(calc(-50% - 50cqw)); }
-  .sh-tn-item.sh-tn-park { position: absolute; visibility: hidden; }
+  /* parked to the strip's right edge, not the static position - see the
+     main page's .tn-item.tn-park note (a static pile at the label-only
+     start width overshoots the bar and flashes document overflow) */
+  .sh-tn-item.sh-tn-park { position: absolute; visibility: hidden; right: 0; }
 }
 .sh-tn-lab { color: var(--ink-2); font-weight: 600; }
 .sh-tn-item { display: inline-flex; align-items: baseline; gap: 6px; }

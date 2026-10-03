@@ -3489,8 +3489,13 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
   /* an item past the measured budget parks rather than wraps: out of flow
      and hidden, but still rendered (and measurable), so the fit pass can
      bring it straight back the moment the bar has room for it again. The
-     number of items on the bar is whatever fits, decided live. */
-  .tn-item.tn-park { position: absolute; visibility: hidden; }
+     number of items on the bar is whatever fits, decided live. Parked at
+     the strip's right edge rather than the static position: before the
+     fit pass the strip is label-wide, and a static-position pile there
+     lands past the bar's right edge - the hidden items still count
+     toward the document's overflow area, and that frame flashed a
+     scrollbar's worth of right-edge overflow on load. */
+  .tn-item.tn-park { position: absolute; visibility: hidden; right: 0; }
   .tab-next.tn-none { visibility: hidden; }
 }
 .tn-lab { font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
