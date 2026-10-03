@@ -1329,6 +1329,19 @@ function RdAllPolls(P) {
   const avgFor = (o, pb) => (pb ? (o ? altOnByYm : aggByYm) : (o ? synthOnByYm : synthByYm));
   const avgBy = avgFor(onM, pub);
   const figOf = (p) => rdApFig(p, onM, pub);
+  /* twopp usual-lean strip height (= 56px): the twopp phone card must sit
+     at the SAME row height as the primary facet's card (user call
+     2026-10-03, "just make the row height identical"). Measured on the
+     build at 390px: a primary card is 122px tall (11 padT +21.75 c1 +2 gap
+     +16.19 c2 +2 gap +21.75 cprim +2->4 collapse margin +28 strip +8 padB
+     with the line-box growth inside the cprim/cpic rows); the twopp card
+     is identical minus its own bottom block, and at the shared 28px strip
+     it stands 93.94 tall. To land at 122 the hassub strip must rise 28 to
+     56 - the shared 28 + the primary facet's ~19px figure row + ~4px gap,
+     the remaining ~=5px coming from the primary block's line/margin
+     collapses. Applied as an inline height so the CSS 28px strip stays
+     the lean-less default. */
+  const primStripH = 56;
 
   /* a published-only matchup from an old link has no place in the redesign's
      table: the rare contests live in Includes now */
@@ -1626,7 +1639,21 @@ function RdAllPolls(P) {
       val = <span role="cell" className="rd-ap-val" style={{ color: rdApLeanInk(p.lean, onM) }}>{p.lean == null ? "—" : rdApSigned(p.lean)}</span>;
       right1 = main;
       right2 = sub ? <span className="rd-ap-sub">{sub}</span> : null;
-      body = <div className="rd-ap-cpic">{pic}<span className="rd-ap-cval" style={{ color: rdApLeanInk(p.lean, onM) }}>{p.lean == null ? "—" : rdApSigned(p.lean)}</span></div>;
+      /* phone card: the house's usual lean rides under the figure (user
+         call 2026-10-03: "add below '+1.7', 'Usual lean -0.3'" - the
+         same D.houseLean latest point the detail expands on) */
+      const hls = ((D.houseLean || {})[pub ? (onM ? "onpub" : "tpp") : (onM ? "onimp" : "imp")] || {})[p.pollster];
+      const hl = hls && hls.length ? hls[hls.length - 1].v : null;
+      /* the strip's height is NOT a constant: the twopp card must sit at
+         the SAME row height as the primary facet's card (user call
+         2026-10-03, "just make the row height identical to that in the
+         primary facet"). The primary card's bottom block is
+         cprim+cpic (figure row + 28px strip); margin-collapses fold a few
+         px into that, so the lean strip's height is DERIVED live from a
+         real primary card's own block rather than stated as a number. */
+      body = <div className={"rd-ap-cpic" + (hl != null ? " hassub" : "")} style={hl != null && primStripH ? { height: primStripH + "px" } : null}>{pic}<span className="rd-ap-cval" style={{ color: rdApLeanInk(p.lean, onM) }}>{p.lean == null ? "—" : rdApSigned(p.lean)}</span>
+        {hl != null && <span className="rd-ap-cvalsub" style={{ color: rdApLeanInk(hl, onM) }}>Usual lean {rdApSigned(hl)}</span>}
+      </div>;
     } else if (facet === "primary") {
       const pr = p.p || {};
       figs = <span role="cell" className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b>)}</span>;

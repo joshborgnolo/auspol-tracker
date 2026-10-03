@@ -4716,6 +4716,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-mlab span { font-size: 12px; }
   body.rd .rd-ap-mavg { margin-left: auto; font-size: 12px; }
   body.rd .rd-ap-card { padding: 11px 0 8px; border-bottom: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
+  body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss) { min-height: 122px; }
   body.rd .rd-ap-card:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   body.rd .rd-ap-card.open { border-bottom-color: transparent; }
   body.rd .rd-ap-card.arrived { box-shadow: inset 3px 0 0 var(--accent); padding-left: 8px; }
@@ -4725,6 +4726,8 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cpic { position: relative; height: 28px; margin-top: 4px; }
   body.rd .rd-ap-cpic > .rd-ap-pic { position: absolute; inset: 0; min-height: 0; }
   body.rd .rd-ap-cval { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  body.rd .rd-ap-cpic.hassub .rd-ap-cval { top: 4px; transform: none; }
+  body.rd .rd-ap-cvalsub { position: absolute; right: 0; bottom: 0; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
   body.rd .rd-ap-card .rd-ap-cprim { display: flex; justify-content: space-between; margin-top: 4px; }
   body.rd .rd-ap-card .rd-ap-cprim > span { display: inline-flex; align-items: baseline; gap: 4px; }
   body.rd .rd-ap-card .rd-ap-cprim em { font-style: normal; font-size: 11px; color: var(--ink-3); }
@@ -79784,6 +79787,7 @@ function RdAllPolls(P) {
   const avgFor = (o, pb) => pb ? o ? altOnByYm : aggByYm : o ? synthOnByYm : synthByYm;
   const avgBy = avgFor(onM, pub);
   const figOf = p => rdApFig(p, onM, pub);
+  const primStripH = 56;
   React.useEffect(() => {
     if (measure !== "lnp" && measure !== "onp") onMeasure("onp");
   }, [measure]);
@@ -80257,14 +80261,24 @@ function RdAllPolls(P) {
       right2 = sub ? React.createElement("span", {
         className: "rd-ap-sub"
       }, sub) : null;
+      const hls = ((D.houseLean || {})[pub ? onM ? "onpub" : "tpp" : onM ? "onimp" : "imp"] || {})[p.pollster];
+      const hl = hls && hls.length ? hls[hls.length - 1].v : null;
       body = React.createElement("div", {
-        className: "rd-ap-cpic"
+        className: "rd-ap-cpic" + (hl != null ? " hassub" : ""),
+        style: hl != null && primStripH ? {
+          height: primStripH + "px"
+        } : null
       }, pic, React.createElement("span", {
         className: "rd-ap-cval",
         style: {
           color: rdApLeanInk(p.lean, onM)
         }
-      }, p.lean == null ? "—" : rdApSigned(p.lean)));
+      }, p.lean == null ? "—" : rdApSigned(p.lean)), hl != null && React.createElement("span", {
+        className: "rd-ap-cvalsub",
+        style: {
+          color: rdApLeanInk(hl, onM)
+        }
+      }, "Usual lean ", rdApSigned(hl)));
     } else if (facet === "primary") {
       const pr = p.p || {};
       figs = React.createElement("span", {

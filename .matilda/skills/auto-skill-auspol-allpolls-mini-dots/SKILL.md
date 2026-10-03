@@ -14,6 +14,13 @@ mini record chart ("HOW IT COUNTS") must behave exactly like the release
 dots in the Latest and Next-polls release strips — hover tooltip, click
 to open.
 
+The rail now has FOUR per-facet minis sharing this dot contract:
+RdApMini (2PP), RdApDirMini (direction), RdApIssMini (issues) and,
+since 2026-10-01, RdApLdMini (leadership net leader-rating gap) —
+see **auspol-allpolls-ldgap-rail** for the leadership rail's pair
+gate, facts rows and the phone/'Leaders'-label probe traps; the dot
+interaction contract below is the shared one.
+
 ## Where and how
 
 `RdApMini` in `.build/newtracker/assets/rd-allpolls.jsx` ~:196-316
@@ -54,6 +61,39 @@ Per-render plain objects; `window.AP.pollRowKey` (ed2260de ~:271) is the
 gate; a duplicate same-day wave by the same pollster yields a null key —
 the dot still reads ("Released 23 Sep" hint) but simply does not open.
 For the FOCUS-detail poll itself, exclude `q.released === p.released`.
+
+## Sibling: twopp phone-card "usual lean" sub-line (2026-10-03)
+
+User brief: under the twopp phone card's lean figure ("+1.7") add that
+house's measured lean against the pollsters ("Usual lean −0.3"), then
+"make the row height identical to that in the primary facet" (NOT a
+live measurement — a fixed constant). Shipped in `rowFor`'s twopp
+branch (rd-allpolls.jsx ~:1604) + rd.css ~:2285-2298:
+
+- `D.houseLean` latest point (same source the detail's "0.3 to One
+  Nation" expands on) renders as a `.rd-ap-cvalsub` (11px, right:0
+  bottom:0) inside `.rd-ap-cpic` when the house HAS one, plus a
+  `hassub` class.
+- `hassub` strips grow to `primStripH = 56` px via INLINE STYLE — the
+  constant derives from the measured primary card (122px = 11 padT +
+  21.75 c1 + 2 gap + 16.19 c2 + 2 gap + 21.75 cprim + 28 cpic +
+  ~4 collapse + 8 padB; a twopp card at the shared 28px strip is
+  93.94, so strip = 122−93.94 ≈ 56 → sub-card renders 121.94).
+- `hassub` re-anchors the figure: `.rd-ap-cpic.hassub .rd-ap-cval` is
+  `top:4px; transform:none` (default `.rd-ap-cval` is the shared
+  `top:50%; translateY(-50%)`); lean-less houses keep the shared
+  28px centred strip, no height attribute, no sub.
+- Other facets' `.rd-ap-cpic` NEVER grow and never carry a sub;
+  desktop rows are untouched (no `.rd-ap-cvalsub` anywhere).
+
+Pinned by `.matilda/probe/ap-usual-lean-sub.mjs` (heredoc-free,
+committed): sub wording/alignment, Essential "-0.3" (normalise the
+U+2212 minus), sub figure == detail's own usual-lean figure, primary
+122/122/122 uniformity, twopp sub-card == primary card height, other
+facets 28px/no-sub, desktop clean. Probe trap that cost a debug loop:
+`pickFacet(page, re)` round-trips `re.source` through `page.evaluate`
+— pass `re.flags` too or the `/…/i` case-insensitive facet-regex
+silently becomes case-sensitive against the "Primary|Leaders|…" tabs.
 
 ## Interaction contract (mirror of rd-polls.jsx tlTip, NOT TrendChart)
 

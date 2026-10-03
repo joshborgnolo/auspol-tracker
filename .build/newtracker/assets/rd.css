@@ -2266,6 +2266,16 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-mlab span { font-size: 12px; }
   body.rd .rd-ap-mavg { margin-left: auto; font-size: 12px; }
   body.rd .rd-ap-card { padding: 11px 0 8px; border-bottom: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
+  /* user call 2026-10-03: the four non-2PP phone cards share ONE height.
+     The primary card is the natural ceiling at 121.69px (c1 21.75 +
+     c2 16.19 + gap 2 + figures row 21.75+4mt + gap 2 + cpic 28+4mt +
+     padding 11+8 + border 1), so 122px stretches leadership (116.23),
+     direction (114.78) and issues (114.78, or 118.11 on ranked-sentence
+     cards whose sup ordinals grow the sentence line) to match, leaving
+     primary and the exempt 2PP card (93.94) untouched. Width-independent
+     at the 320/340/360/390/402 rungs - the sent/issph width ladders keep
+     every card one sentence-line deep. Pinned by ap-phcard-heights.mjs */
+  body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss) { min-height: 122px; }
   body.rd .rd-ap-card:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   body.rd .rd-ap-card.open { border-bottom-color: transparent; }
   body.rd .rd-ap-card.arrived { box-shadow: inset 3px 0 0 var(--accent); padding-left: 8px; }
@@ -2275,6 +2285,16 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cpic { position: relative; height: 28px; margin-top: 4px; }
   body.rd .rd-ap-cpic > .rd-ap-pic { position: absolute; inset: 0; min-height: 0; }
   body.rd .rd-ap-cval { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  /* twopp only, and only when the row carries the second right-edge
+     line - the house's usual lean under the figure (user call 2026-10-03).
+     The strip's height comes from an INLINE style in rd-allpolls.jsx so
+     the twopp card lands at exactly the primary facet's 122px row height
+     (user call same day); the CSS only owns the inside layout: 13px
+     figure just under the c2 line, 11px sub at the strip's foot, both
+     right-aligned. Rows whose house has no measured lean keep the shared
+     28px centred strip above. */
+  body.rd .rd-ap-cpic.hassub .rd-ap-cval { top: 4px; transform: none; }
+  body.rd .rd-ap-cvalsub { position: absolute; right: 0; bottom: 0; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
   body.rd .rd-ap-card .rd-ap-cprim { display: flex; justify-content: space-between; margin-top: 4px; }
   body.rd .rd-ap-card .rd-ap-cprim > span { display: inline-flex; align-items: baseline; gap: 4px; }
   body.rd .rd-ap-card .rd-ap-cprim em { font-style: normal; font-size: 11px; color: var(--ink-3); }
