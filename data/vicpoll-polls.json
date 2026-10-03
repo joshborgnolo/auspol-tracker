@@ -1,0 +1,3325 @@
+{
+  "generated": "2026-10-03",
+  "sources": {
+    "votingIntention": "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2026_Victorian_state_election (2026-10-03 snapshot)",
+    "crossCheck": "electiontracker.au voting-intention CSV (2026-10-03 snapshot)",
+    "note": "Rows are audited assemblages: provenance says which sources fed each row. Published 2PP only; no editor-derived 2PP. ind can be null when the source merged IND+OTH into one Others cell (2026 tables) or colspans."
+  },
+  "polls": [
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 825,
+      "dateLabel": "15–18 Feb 2023",
+      "fwStart": "2023-02-15",
+      "fwEnd": "2023-02-18",
+      "approxDate": false,
+      "primary": {
+        "alp": 41,
+        "lnp": 30,
+        "grn": 13,
+        "onp": null,
+        "ind": 13,
+        "oth": 4
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/support-for-daniel-andrews-rises-as-he-marks-3000-days-in-office-20230219-p5clok.html"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1609,
+      "dateLabel": "19–22 Apr 2023",
+      "fwStart": "2023-04-19",
+      "fwEnd": "2023-04-22",
+      "approxDate": false,
+      "primary": {
+        "alp": 42,
+        "lnp": 30,
+        "grn": 10,
+        "onp": null,
+        "ind": 12,
+        "oth": 5
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/labor-holds-lead-over-state-coalition-but-deeming-drama-fails-to-make-dent-20230421-p5d2cc.html"
+    },
+    {
+      "firmRaw": "Roy Morgan",
+      "firm": "roymorgan",
+      "client": null,
+      "sample": 2095,
+      "dateLabel": "17–22 May 2023",
+      "fwStart": "2023-05-17",
+      "fwEnd": "2023-05-22",
+      "approxDate": false,
+      "primary": {
+        "alp": 42,
+        "lnp": 28.5,
+        "grn": 12.5,
+        "onp": null,
+        "ind": 9,
+        "oth": 8
+      },
+      "tpp2": {
+        "alp": 61.5
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.roymorgan.com/findings/9218-roy-morgan-survey-on-voting-intention-in-victoria-may-23-2023"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1003,
+      "dateLabel": "May–Jun 2023",
+      "fwStart": "2023-05-01",
+      "fwEnd": "2023-06-30",
+      "approxDate": true,
+      "primary": {
+        "alp": 41,
+        "lnp": 26,
+        "grn": 15,
+        "onp": null,
+        "ind": 12,
+        "oth": 6
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/can-t-get-much-lower-pesutto-s-coalition-sinks-to-new-low-in-polls-20230614-p5dgeq.html"
+    },
+    {
+      "firmRaw": "Roy Morgan",
+      "firm": "roymorgan",
+      "client": null,
+      "sample": 1046,
+      "dateLabel": "19–20 Jul 2023",
+      "fwStart": "2023-07-19",
+      "fwEnd": "2023-07-20",
+      "approxDate": false,
+      "primary": {
+        "alp": 33,
+        "lnp": 35.5,
+        "grn": 12.5,
+        "onp": null,
+        "ind": 10.5,
+        "oth": 8.5
+      },
+      "tpp2": {
+        "alp": 53
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.roymorgan.com/findings/support-for-victorian-government-and-premier-daniel-andrews-plunges-after-cancellation-of-commonwealth-games"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1100,
+      "dateLabel": "Jul–Aug 2023",
+      "fwStart": "2023-07-01",
+      "fwEnd": "2023-08-31",
+      "approxDate": true,
+      "primary": {
+        "alp": 39,
+        "lnp": 28,
+        "grn": 13,
+        "onp": null,
+        "ind": 13,
+        "oth": 7
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/labor-s-lead-stays-strong-but-andrews-personal-popularity-falls-20230816-p5dx0e.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": null,
+      "sample": 3001,
+      "dateLabel": "31 Aug – 14 Sep 2023",
+      "fwStart": "2023-08-31",
+      "fwEnd": "2023-09-14",
+      "approxDate": false,
+      "primary": {
+        "alp": 37,
+        "lnp": 34,
+        "grn": 13,
+        "onp": null,
+        "ind": null,
+        "oth": 16
+      },
+      "tpp2": {
+        "alp": 56.5
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://redbridgegroup.com.au/wp-content/uploads/2023/09/Vic-votes-survey-Sept-2023.pdf"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1100,
+      "dateLabel": "Sep–Oct 2023",
+      "fwStart": "2023-09-01",
+      "fwEnd": "2023-10-31",
+      "approxDate": true,
+      "primary": {
+        "alp": 39,
+        "lnp": 32,
+        "grn": 12,
+        "onp": null,
+        "ind": 10,
+        "oth": 7
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/jacinta-allan-maintains-commanding-lead-over-coalition-but-gap-narrows-20231010-p5eb5f.html"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1100,
+      "dateLabel": "3 Dec 2023",
+      "fwStart": "2023-12-03",
+      "fwEnd": "2023-12-03",
+      "approxDate": false,
+      "primary": {
+        "alp": 37,
+        "lnp": 31,
+        "grn": 11,
+        "onp": null,
+        "ind": 14,
+        "oth": 6
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/support-for-allan-dips-but-labor-holds-strong-lead-over-coalition-20231208-p5eq38.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Herald Sun",
+      "sample": 2000,
+      "dateLabel": "2–12 Dec 2023",
+      "fwStart": "2023-12-02",
+      "fwEnd": "2023-12-12",
+      "approxDate": false,
+      "primary": {
+        "alp": 37,
+        "lnp": 36,
+        "grn": 13,
+        "onp": null,
+        "ind": null,
+        "oth": 14
+      },
+      "tpp2": {
+        "alp": 55.9
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/liberal-brand-a-very-damaged-product-in-victoria-redbridge-director-tony-barry-says/news-story/d6eac63bd65cf3568dceebb500796ca1"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Herald Sun",
+      "sample": 1559,
+      "dateLabel": "14–20 Mar 2024",
+      "fwStart": "2024-03-14",
+      "fwEnd": "2024-03-20",
+      "approxDate": false,
+      "primary": {
+        "alp": 36,
+        "lnp": 38,
+        "grn": 10,
+        "onp": null,
+        "ind": null,
+        "oth": 16
+      },
+      "tpp2": {
+        "alp": 54
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/coalition-records-best-primary-vote-result-since-june-2021-poll/news-story/a8656e6e9eafd8960765483a9ffb51e8"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1100,
+      "dateLabel": "24 Mar 2024",
+      "fwStart": "2024-03-24",
+      "fwEnd": "2024-03-24",
+      "approxDate": false,
+      "primary": {
+        "alp": 33,
+        "lnp": 35,
+        "grn": 13,
+        "onp": null,
+        "ind": 12,
+        "oth": 7
+      },
+      "tpp2": {
+        "alp": 54.6
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/slip-in-labor-support-pushes-pesutto-s-team-ahead-for-first-time-in-years-20240327-p5ffl9.html"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "Herald Sun",
+      "sample": 1000,
+      "dateLabel": "19 May 2024",
+      "fwStart": "2024-05-19",
+      "fwEnd": "2024-05-19",
+      "approxDate": false,
+      "primary": {
+        "alp": 28,
+        "lnp": 37,
+        "grn": 13,
+        "onp": null,
+        "ind": 16,
+        "oth": 6
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/labor-s-popularity-plunges-as-voters-demand-government-tackle-debt-20240520-p5jf41.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Herald Sun",
+      "sample": 1000,
+      "dateLabel": "7 Jun 2024",
+      "fwStart": "2024-06-07",
+      "fwEnd": "2024-06-07",
+      "approxDate": false,
+      "primary": {
+        "alp": 35,
+        "lnp": 38,
+        "grn": 14,
+        "onp": null,
+        "ind": null,
+        "oth": 13
+      },
+      "tpp2": {
+        "alp": 55
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/jacinta-allans-labor-government-would-win-election-polling-shows/news-story/4c411835b5aa4ceba971d50f89df58ef"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "14 Jul 2024",
+      "fwStart": "2024-07-14",
+      "fwEnd": "2024-07-14",
+      "approxDate": false,
+      "primary": {
+        "alp": 27,
+        "lnp": 37,
+        "grn": 15,
+        "onp": null,
+        "ind": 15,
+        "oth": 6
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/national/victoria/labor-primary-vote-slumps-under-premier-jacinta-allan-20240717-p5jubs.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Herald Sun",
+      "sample": 1514,
+      "dateLabel": "5 Aug 2024",
+      "fwStart": "2024-08-05",
+      "fwEnd": "2024-08-05",
+      "approxDate": false,
+      "primary": {
+        "alp": 31,
+        "lnp": 40,
+        "grn": 12,
+        "onp": null,
+        "ind": null,
+        "oth": 17
+      },
+      "tpp2": {
+        "alp": 50
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/victorian-voters-vent-anger-at-allan-govt-in-shock-poll-result/news-story/c397c3fb09084fac8b1e36bc3c3e48a7"
+    },
+    {
+      "firmRaw": "Wolf & Smith",
+      "firm": "wolf-smith",
+      "client": null,
+      "sample": 2024,
+      "dateLabel": "6–29 Aug 2024",
+      "fwStart": "2024-08-06",
+      "fwEnd": "2024-08-29",
+      "approxDate": false,
+      "primary": {
+        "alp": 28,
+        "lnp": 40,
+        "grn": 14,
+        "onp": null,
+        "ind": 15,
+        "oth": 3
+      },
+      "tpp2": {
+        "alp": 48
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.wolfandsmith.com/_files/ugd/78f0d6_e57dc0b5dbeb40beb34102811ab6374f.pdf"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1054,
+      "dateLabel": "7 Sep 2024",
+      "fwStart": "2024-09-07",
+      "fwEnd": "2024-09-07",
+      "approxDate": false,
+      "primary": {
+        "alp": 27,
+        "lnp": 37,
+        "grn": 14,
+        "onp": null,
+        "ind": 15,
+        "oth": 7
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/john-pesutto-within-striking-distance-as-state-s-preferred-premier-20240910-p5k9d5.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Herald Sun",
+      "sample": 1500,
+      "dateLabel": "18 Sep 2024",
+      "fwStart": "2024-09-18",
+      "fwEnd": "2024-09-18",
+      "approxDate": false,
+      "primary": {
+        "alp": 30,
+        "lnp": 40,
+        "grn": 12,
+        "onp": null,
+        "ind": null,
+        "oth": 17
+      },
+      "tpp2": {
+        "alp": 50
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/allan-government-facing-voter-backlash-over-housing-affordability-as-suburban-rail-loop-concerns-mount/news-story/0fafb666e9f1374db1b698464fc16ecd"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Herald Sun",
+      "sample": 1516,
+      "dateLabel": "26 Sep – 3 Oct 2024",
+      "fwStart": "2024-09-26",
+      "fwEnd": "2024-10-03",
+      "approxDate": false,
+      "primary": {
+        "alp": 30,
+        "lnp": 40,
+        "grn": 12,
+        "onp": null,
+        "ind": null,
+        "oth": 18
+      },
+      "tpp2": {
+        "alp": 49
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/coalition-in-electionwinning-position-after-edging-ahead-of-labor/news-story/f2db9d30cb1d5881258fd12b7568ff43"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "10 Nov 2024",
+      "fwStart": "2024-11-10",
+      "fwEnd": "2024-11-10",
+      "approxDate": false,
+      "primary": {
+        "alp": 28,
+        "lnp": 38,
+        "grn": 13,
+        "onp": null,
+        "ind": 14,
+        "oth": 7
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/national/victoria/john-pesutto-chalks-up-a-first-time-victory-over-jacinta-allan-in-latest-resolve-poll-20241111-p5kphq.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Herald Sun",
+      "sample": 920,
+      "dateLabel": "6–20 Nov 2024",
+      "fwStart": "2024-11-06",
+      "fwEnd": "2024-11-20",
+      "approxDate": false,
+      "primary": {
+        "alp": 30,
+        "lnp": 43,
+        "grn": 14,
+        "onp": null,
+        "ind": null,
+        "oth": 13
+      },
+      "tpp2": {
+        "alp": 49
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/cashstrapped-victorians-shift-support-to-coalition-according-to-new-poll/news-story/1462038ab13029839c8b7c69bd546f1f"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1124,
+      "dateLabel": "Dec 2024 – Jan 2025",
+      "fwStart": "2024-12-01",
+      "fwEnd": "2025-01-31",
+      "approxDate": true,
+      "primary": {
+        "alp": 22,
+        "lnp": 42,
+        "grn": 13,
+        "onp": null,
+        "ind": 17,
+        "oth": 6
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://archive.today/20250123215348/https://www.theage.com.au/politics/victoria/they-ve-turned-off-allan-victorian-labor-vote-plunges-to-historic-low-poll-shows-20250123-p5l6q1.html"
+    },
+    {
+      "firmRaw": "DemosAU/Premier National",
+      "firm": "demosau",
+      "client": null,
+      "sample": 1006,
+      "dateLabel": "17–21 Mar 2025",
+      "fwStart": "2025-03-17",
+      "fwEnd": "2025-03-21",
+      "approxDate": false,
+      "primary": {
+        "alp": 25,
+        "lnp": 39,
+        "grn": 15,
+        "onp": null,
+        "ind": null,
+        "oth": 21
+      },
+      "tpp2": {
+        "alp": 48
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://demosau.com/news/victorian-poll/"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "30 Mar 2025",
+      "fwStart": "2025-03-30",
+      "fwEnd": "2025-03-30",
+      "approxDate": false,
+      "primary": {
+        "alp": 24,
+        "lnp": 41,
+        "grn": 14,
+        "onp": null,
+        "ind": 14,
+        "oth": 7
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/jacinta-allan-s-sinking-popularity-inflicts-brand-damage-on-albanese-s-election-hopes-20250331-p5lnyy.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Herald Sun",
+      "sample": 2013,
+      "dateLabel": "24 Mar – 2 Apr 2025",
+      "fwStart": "2025-03-24",
+      "fwEnd": "2025-04-02",
+      "approxDate": false,
+      "primary": {
+        "alp": 29,
+        "lnp": 41,
+        "grn": 13,
+        "onp": null,
+        "ind": null,
+        "oth": 17
+      },
+      "tpp2": {
+        "alp": 49
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/victorian-premier-jacinta-allan-will-face-pressure-to-quit-if-labor-is-hit-hard-at-federal-election/news-story/ceec79f877c24b80e654fdcc2c073429"
+    },
+    {
+      "firmRaw": "Newspoll",
+      "firm": "newspoll",
+      "client": "The Australian",
+      "sample": 1000,
+      "dateLabel": "23–30 Jun 2025",
+      "fwStart": "2025-06-23",
+      "fwEnd": "2025-06-30",
+      "approxDate": false,
+      "primary": {
+        "alp": 35,
+        "lnp": 35,
+        "grn": 12,
+        "onp": null,
+        "ind": null,
+        "oth": 18
+      },
+      "tpp2": {
+        "alp": 53
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-deeply-unhappy-with-jacinta-allan-as-labor-clings-to-lead/news-story/ce029a5783cb5be601f8393e91969759"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Herald Sun",
+      "sample": 1183,
+      "dateLabel": "19–30 Jun 2025",
+      "fwStart": "2025-06-19",
+      "fwEnd": "2025-06-30",
+      "approxDate": false,
+      "primary": {
+        "alp": 33,
+        "lnp": 38,
+        "grn": 14,
+        "onp": null,
+        "ind": null,
+        "oth": 15
+      },
+      "tpp2": {
+        "alp": 51.5
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/labor-on-track-to-win-historic-fourth-election-in-victoria-coalition-support-falls-to-low-point/news-story/84aa44a2d3ff9eb4f43bc7176ba4ba35"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "17 Aug 2025",
+      "fwStart": "2025-08-17",
+      "fwEnd": "2025-08-17",
+      "approxDate": false,
+      "primary": {
+        "alp": 32,
+        "lnp": 33,
+        "grn": 12,
+        "onp": null,
+        "ind": 9,
+        "oth": 13
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/allan-rises-from-historic-low-eyes-unprecedented-fourth-labor-term-20250818-p5mnuz.html"
+    },
+    {
+      "firmRaw": "DemosAU/Premier National",
+      "firm": "demosau",
+      "client": null,
+      "sample": 1327,
+      "dateLabel": "2–9 Sep 2025",
+      "fwStart": "2025-09-02",
+      "fwEnd": "2025-09-09",
+      "approxDate": false,
+      "primary": {
+        "alp": 26,
+        "lnp": 38,
+        "grn": 15,
+        "onp": null,
+        "ind": null,
+        "oth": 21
+      },
+      "tpp2": {
+        "alp": 49
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://demosau.com/wp-content/uploads/2025/09/DemosAUPremierNational-Release-Victorian-Poll-September-25-1-1.pdf"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Herald Sun",
+      "sample": 2005,
+      "dateLabel": "3–11 Sep 2025",
+      "fwStart": "2025-09-03",
+      "fwEnd": "2025-09-11",
+      "approxDate": false,
+      "primary": {
+        "alp": 32,
+        "lnp": 37,
+        "grn": 13,
+        "onp": null,
+        "ind": null,
+        "oth": 18
+      },
+      "tpp2": {
+        "alp": 52
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/allan-labor-government-extends-lead-on-coalition-in-race-to-polls-as-voters-shift-toward-minor-parties-and-independents/news-story/ca732c4be8447edba6cc8a629714bb6e"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "12 Oct 2025",
+      "fwStart": "2025-10-12",
+      "fwEnd": "2025-10-12",
+      "approxDate": false,
+      "primary": {
+        "alp": 30,
+        "lnp": 33,
+        "grn": 12,
+        "onp": null,
+        "ind": 10,
+        "oth": 15
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/new-poll-delivers-bleak-outlook-for-terminal-battin-leadership-20251013-p5n24f.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Australian Financial Review",
+      "sample": 1501,
+      "dateLabel": "8–14 Oct 2025",
+      "fwStart": "2025-10-08",
+      "fwEnd": "2025-10-14",
+      "approxDate": false,
+      "primary": {
+        "alp": 32,
+        "lnp": 37,
+        "grn": 13,
+        "onp": null,
+        "ind": null,
+        "oth": 18
+      },
+      "tpp2": {
+        "alp": 52
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.afr.com/politics/poll-shows-turnaround-in-support-for-labor-in-victoria-20251016-p5n2xx"
+    },
+    {
+      "firmRaw": "DemosAU/Premier National",
+      "firm": "demosau",
+      "client": null,
+      "sample": 1016,
+      "dateLabel": "21–27 Oct 2025",
+      "fwStart": "2025-10-21",
+      "fwEnd": "2025-10-27",
+      "approxDate": false,
+      "primary": {
+        "alp": 26,
+        "lnp": 37,
+        "grn": 15,
+        "onp": null,
+        "ind": null,
+        "oth": 22
+      },
+      "tpp2": {
+        "alp": 49
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://demosau.com/wp-content/uploads/2025/11/DemosAU-Victoria-Poll-Oct-25.pdf"
+    },
+    {
+      "firmRaw": "Freshwater",
+      "firm": "freshwater",
+      "client": "Herald Sun",
+      "sample": 1217,
+      "dateLabel": "14–17 Nov 2025",
+      "fwStart": "2025-11-14",
+      "fwEnd": "2025-11-17",
+      "approxDate": false,
+      "primary": {
+        "alp": 30,
+        "lnp": 37,
+        "grn": 15,
+        "onp": null,
+        "ind": null,
+        "oth": 18
+      },
+      "tpp2": {
+        "alp": 49
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-Herald-Sun-Freshwater-Strategy-Vic-Polling-171125.xlsx"
+    },
+    {
+      "firmRaw": "Newspoll",
+      "firm": "newspoll",
+      "client": "The Australian",
+      "sample": 1030,
+      "dateLabel": "18–20 Nov 2025",
+      "fwStart": "2025-11-18",
+      "fwEnd": "2025-11-20",
+      "approxDate": false,
+      "primary": {
+        "alp": 28,
+        "lnp": 36,
+        "grn": 14,
+        "onp": null,
+        "ind": null,
+        "oth": 22
+      },
+      "tpp2": {
+        "alp": 49
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-take-lead-as-frightened-women-flee-victorian-labor/news-story/61ee349dbcd6dd84811b9d7fa082824d"
+    },
+    {
+      "firmRaw": "Freshwater",
+      "firm": "freshwater",
+      "client": "Herald Sun",
+      "sample": 1220,
+      "dateLabel": "21–24 Nov 2025",
+      "fwStart": "2025-11-21",
+      "fwEnd": "2025-11-24",
+      "approxDate": false,
+      "primary": {
+        "alp": 30,
+        "lnp": 37,
+        "grn": 15,
+        "onp": null,
+        "ind": null,
+        "oth": 18
+      },
+      "tpp2": {
+        "alp": 50
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-Herald-Sun-Freshwater-Strategy-Vic-Polling-241125.xlsx"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "7 Dec 2025",
+      "fwStart": "2025-12-07",
+      "fwEnd": "2025-12-07",
+      "approxDate": false,
+      "primary": {
+        "alp": 28,
+        "lnp": 39,
+        "grn": 12,
+        "onp": null,
+        "ind": 9,
+        "oth": 11
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/victoria-enters-election-year-on-political-knife-s-edge-as-opposition-support-surges-20251208-p5nlso.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Australian Financial Review",
+      "sample": 1021,
+      "dateLabel": "24 Nov – 8 Dec 2025",
+      "fwStart": "2025-11-24",
+      "fwEnd": "2025-12-08",
+      "approxDate": false,
+      "primary": {
+        "alp": 31,
+        "lnp": 40,
+        "grn": 12,
+        "onp": null,
+        "ind": 6,
+        "oth": 11
+      },
+      "tpp2": {
+        "alp": 50
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.afr.com/politics/voters-see-vic-politics-as-the-deeply-unpopular-versus-the-untested-20251210-p5nmiw"
+    },
+    {
+      "firmRaw": "DemosAU/Premier National",
+      "firm": "demosau",
+      "client": null,
+      "sample": 1274,
+      "dateLabel": "1–10 Feb",
+      "fwStart": "2026-02-01",
+      "fwEnd": "2026-02-10",
+      "approxDate": false,
+      "primary": {
+        "alp": 23,
+        "lnp": 29,
+        "grn": 15,
+        "onp": 21,
+        "ind": null,
+        "oth": 12
+      },
+      "tpp2": {
+        "alp": 47
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://demosau.com/wp-content/uploads/2026/02/DemosAU-Vic-Poll-Feb-2026-1.pdf"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1100,
+      "dateLabel": "12–16 Jan& 8–14 Feb",
+      "fwStart": "2026-01-12",
+      "fwEnd": "2026-02-14",
+      "approxDate": false,
+      "primary": {
+        "alp": 28,
+        "lnp": 30,
+        "grn": 12,
+        "onp": 11,
+        "ind": 7,
+        "oth": 11
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/none-of-the-above-poll-reveals-victorian-flight-from-major-parties-20260216-p5o2q9.html"
+    },
+    {
+      "firmRaw": "Roy Morgan",
+      "firm": "roymorgan",
+      "client": null,
+      "sample": 2462,
+      "dateLabel": "13–16 Feb",
+      "fwStart": "2026-02-13",
+      "fwEnd": "2026-02-16",
+      "approxDate": false,
+      "primary": {
+        "alp": 25.5,
+        "lnp": 21.5,
+        "grn": 13.5,
+        "onp": 26.5,
+        "ind": 9,
+        "oth": 4
+      },
+      "tpp2": {
+        "alp": 52
+      },
+      "alt": {
+        "alpVOnp": 52.5,
+        "lnpVOnp": 56
+      },
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.roymorgan.com/findings/10133-victorian-state-voting-intention-february-2026"
+    },
+    {
+      "firmRaw": "Freshwater",
+      "firm": "freshwater",
+      "client": "Herald Sun",
+      "sample": 1030,
+      "dateLabel": "19–23 Feb",
+      "fwStart": "2026-02-19",
+      "fwEnd": "2026-02-23",
+      "approxDate": false,
+      "primary": {
+        "alp": 28,
+        "lnp": 27,
+        "grn": 13,
+        "onp": 23,
+        "ind": null,
+        "oth": 9
+      },
+      "tpp2": {
+        "alp": 50
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-Herald-Sun-Freshwater-Strategy-Vic-Polling-230226.xlsx"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": null,
+      "sample": 2165,
+      "dateLabel": "18–27 Feb",
+      "fwStart": "2026-02-18",
+      "fwEnd": "2026-02-27",
+      "approxDate": false,
+      "primary": {
+        "alp": 25,
+        "lnp": 28,
+        "grn": 13,
+        "onp": 24,
+        "ind": null,
+        "oth": 10
+      },
+      "tpp2": {
+        "alp": 48
+      },
+      "alt": {
+        "alpVOnp": 53
+      },
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://web.archive.org/web/20260308055403/https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_eb49b08b5fa14e63b41cd68cf9bf10ca.pdf"
+    },
+    {
+      "firmRaw": "Freshwater",
+      "firm": "freshwater",
+      "client": "Herald Sun",
+      "sample": 1062,
+      "dateLabel": "19–23 Mar",
+      "fwStart": "2026-03-19",
+      "fwEnd": "2026-03-23",
+      "approxDate": false,
+      "primary": {
+        "alp": 27,
+        "lnp": 30,
+        "grn": 14,
+        "onp": 20,
+        "ind": null,
+        "oth": 9
+      },
+      "tpp2": {
+        "alp": 48
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://freshwaterstrategy.com/wp-content/uploads/Data-Tables-Herald-Sun-Freshwater-Strategy-Vic-Polling-230326.xlsx"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1047,
+      "dateLabel": "Mar – Apr",
+      "fwStart": "2026-03-17",
+      "fwEnd": "2026-04-18",
+      "approxDate": false,
+      "primary": {
+        "alp": 27,
+        "lnp": 29,
+        "grn": 10,
+        "onp": 21,
+        "ind": null,
+        "oth": 13
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/one-nation-entrenched-as-third-force-as-victorians-adopt-drain-the-swamp-mentality-20260421-p5zps9.html"
+    },
+    {
+      "firmRaw": "Roy Morgan",
+      "firm": "roymorgan",
+      "client": null,
+      "sample": 1707,
+      "dateLabel": "22–24 April",
+      "fwStart": "2026-04-22",
+      "fwEnd": "2026-04-24",
+      "approxDate": false,
+      "primary": {
+        "alp": 25.5,
+        "lnp": 24,
+        "grn": 13.5,
+        "onp": 24.5,
+        "ind": 8.5,
+        "oth": 4
+      },
+      "tpp2": {
+        "alp": 51
+      },
+      "alt": {
+        "alpVOnp": 53.5,
+        "lnpVOnp": 59
+      },
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.roymorgan.com/findings/10203-victorian-state-voting-intention-april-2026"
+    },
+    {
+      "firmRaw": "Freshwater",
+      "firm": "freshwater",
+      "client": "Herald Sun",
+      "sample": 1034,
+      "dateLabel": "5–8 Jun",
+      "fwStart": "2026-06-05",
+      "fwEnd": "2026-06-08",
+      "approxDate": false,
+      "primary": {
+        "alp": 23,
+        "lnp": 27,
+        "grn": 14,
+        "onp": 25,
+        "ind": null,
+        "oth": 9
+      },
+      "tpp2": {
+        "alp": 47
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.pollbludger.net/2026/06/08/freshwater-strategy-labor-23-coalition-27-one-nation-25-in-victoria/"
+    },
+    {
+      "firmRaw": "DemosAU/Premier National",
+      "firm": "demosau",
+      "client": null,
+      "sample": 1056,
+      "dateLabel": "7–11 Jun",
+      "fwStart": "2026-06-07",
+      "fwEnd": "2026-06-11",
+      "approxDate": false,
+      "primary": {
+        "alp": 21,
+        "lnp": 30,
+        "grn": 15,
+        "onp": 23,
+        "ind": null,
+        "oth": 11
+      },
+      "tpp2": {
+        "alp": 45
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://demosau.com/wp-content/uploads/2026/06/DemosAU-Vic-Poll-June-2026.pdf"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "May – Jun",
+      "fwStart": "2026-05-12",
+      "fwEnd": "2026-06-12",
+      "approxDate": false,
+      "primary": {
+        "alp": 26,
+        "lnp": 26,
+        "grn": 12,
+        "onp": 24,
+        "ind": null,
+        "oth": 12
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/end-of-days-labor-s-own-supporters-say-time-s-up-for-allan-government-20260614-p606m1.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Australian Financial Review",
+      "sample": 5516,
+      "dateLabel": "17–28 June",
+      "fwStart": "2026-06-17",
+      "fwEnd": "2026-06-28",
+      "approxDate": false,
+      "primary": {
+        "alp": 26,
+        "lnp": 26,
+        "grn": 13,
+        "onp": 27,
+        "ind": null,
+        "oth": 8
+      },
+      "tpp2": {
+        "alp": 46
+      },
+      "alt": {
+        "alpVOnp": 52
+      },
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.afr.com/politics/one-nation-overtakes-labor-liberals-in-victoria-allan-s-rating-dives-20260701-p60bnh"
+    },
+    {
+      "firmRaw": "YouGov (MRP)",
+      "firm": "yougov-mrp",
+      "client": null,
+      "sample": 4003,
+      "dateLabel": "16 Jun - 10 July",
+      "fwStart": "2026-06-16",
+      "fwEnd": "2026-07-10",
+      "approxDate": false,
+      "primary": {
+        "alp": 23,
+        "lnp": 26,
+        "grn": 13,
+        "onp": 24,
+        "ind": null,
+        "oth": 14
+      },
+      "tpp2": {
+        "alp": 46.2
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/new-premier-battles-to-keep-seat-as-liberal-treaty-pledge-falls-flat-20260806-p60m2s.html"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "12 July",
+      "fwStart": "2026-07-12",
+      "fwEnd": "2026-07-12",
+      "approxDate": false,
+      "primary": {
+        "alp": 27,
+        "lnp": 27,
+        "grn": 12,
+        "onp": 22,
+        "ind": null,
+        "oth": 12
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/even-with-one-nation-support-dropping-state-labor-still-has-reason-to-worry-ahead-of-november-20260713-p60etg.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Australian Financial Review",
+      "sample": 6500,
+      "dateLabel": "14 July",
+      "fwStart": "2026-07-14",
+      "fwEnd": "2026-07-14",
+      "approxDate": false,
+      "primary": {
+        "alp": 26,
+        "lnp": 26,
+        "grn": 12,
+        "onp": 27,
+        "ind": null,
+        "oth": 8
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.pollbludger.net/2026/07/14/resolve-strategic-labor-27-coalition-27-one-nation-22-in-victoria/"
+    },
+    {
+      "firmRaw": "Newspoll",
+      "firm": "newspoll",
+      "client": "The Australian",
+      "sample": 1035,
+      "dateLabel": "23–26 July",
+      "fwStart": "2026-07-23",
+      "fwEnd": "2026-07-26",
+      "approxDate": false,
+      "primary": {
+        "alp": 28,
+        "lnp": 31,
+        "grn": 13,
+        "onp": 19,
+        "ind": null,
+        "oth": 9
+      },
+      "tpp2": {
+        "alp": 48
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.theaustralian.com.au/nation/newspoll-shows-victorian-coalition-with-lead-as-jacinta-allan-faces-leadership-challenge/news-story/4ac504abe32030837be16ec669cb9b94"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Australian Financial Review",
+      "sample": 1014,
+      "dateLabel": "28 Jul–1 Aug",
+      "fwStart": "2026-07-28",
+      "fwEnd": "2026-08-01",
+      "approxDate": false,
+      "primary": {
+        "alp": 23,
+        "lnp": 30,
+        "grn": 14,
+        "onp": 22,
+        "ind": null,
+        "oth": 11
+      },
+      "tpp2": {
+        "alp": 43
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-august-2026-victorian-state-poll"
+    },
+    {
+      "firmRaw": "Freshwater",
+      "firm": "freshwater",
+      "client": "Herald Sun",
+      "sample": 1020,
+      "dateLabel": "31 Jul–3 Aug",
+      "fwStart": "2026-07-31",
+      "fwEnd": "2026-08-03",
+      "approxDate": false,
+      "primary": {
+        "alp": 25,
+        "lnp": 30,
+        "grn": 14,
+        "onp": 22,
+        "ind": null,
+        "oth": 9
+      },
+      "tpp2": {
+        "alp": 48
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://freshwaterstrategy.com/2026/08/04/herald-sun-freshwater-strategy-august-polling-data/"
+    },
+    {
+      "firmRaw": "Roy Morgan",
+      "firm": "roymorgan",
+      "client": null,
+      "sample": 2084,
+      "dateLabel": "5 Aug–7 Aug",
+      "fwStart": "2026-08-05",
+      "fwEnd": "2026-08-07",
+      "approxDate": false,
+      "primary": {
+        "alp": 26,
+        "lnp": 26,
+        "grn": 12.5,
+        "onp": 23.5,
+        "ind": 8,
+        "oth": 4
+      },
+      "tpp2": {
+        "alp": 49
+      },
+      "alt": {
+        "alpVOnp": 56,
+        "lnpVOnp": 63.5
+      },
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.roymorgan.com/findings/10303-victorian-state-voting-intention-august-2026"
+    },
+    {
+      "firmRaw": "DemosAU/Premier National",
+      "firm": "demosau",
+      "client": null,
+      "sample": 1007,
+      "dateLabel": "6–11 Aug",
+      "fwStart": "2026-08-06",
+      "fwEnd": "2026-08-11",
+      "approxDate": false,
+      "primary": {
+        "alp": 23,
+        "lnp": 32,
+        "grn": 13,
+        "onp": 22,
+        "ind": null,
+        "oth": 10
+      },
+      "tpp2": {
+        "alp": 45
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://demosau.com/news/coalition-holds-election-winning-lead-in-latest-victoria-poll/"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "16 Aug",
+      "fwStart": "2026-08-16",
+      "fwEnd": "2026-08-16",
+      "approxDate": false,
+      "primary": {
+        "alp": 25,
+        "lnp": 27,
+        "grn": 12,
+        "onp": 23,
+        "ind": null,
+        "oth": 13
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/revealed-how-leadership-coup-has-changed-labor-s-electoral-fortunes-20260817-p60p2l.html"
+    },
+    {
+      "firmRaw": "Resolve",
+      "firm": "resolve",
+      "client": "The Age",
+      "sample": 1000,
+      "dateLabel": "13 Sep",
+      "fwStart": "2026-09-13",
+      "fwEnd": "2026-09-13",
+      "approxDate": false,
+      "primary": {
+        "alp": 25,
+        "lnp": 28,
+        "grn": 12,
+        "onp": 23,
+        "ind": null,
+        "oth": 13
+      },
+      "tpp2": null,
+      "alt": {},
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/debt-concern-looms-large-for-voters-as-carroll-struggles-to-break-through-20260914-p60x45.html"
+    },
+    {
+      "firmRaw": "RedBridge/Accent",
+      "firm": "redbridge-accent",
+      "client": "Australian Financial Review",
+      "sample": 2371,
+      "dateLabel": "1–14 Sep",
+      "fwStart": "2026-09-01",
+      "fwEnd": "2026-09-14",
+      "approxDate": false,
+      "primary": {
+        "alp": 24,
+        "lnp": 29,
+        "grn": 15,
+        "onp": 25,
+        "ind": null,
+        "oth": 7
+      },
+      "tpp2": {
+        "alp": 44
+      },
+      "alt": {
+        "alpVOnp": 53
+      },
+      "provenance": [
+        "wikipedia",
+        "electiontracker"
+      ],
+      "sourceUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-victorian-state-poll"
+    },
+    {
+      "firmRaw": "DemosAU/Premier National",
+      "firm": "demosau",
+      "client": null,
+      "sample": 1020,
+      "dateLabel": "10–20 Sep",
+      "fwStart": "2026-09-10",
+      "fwEnd": "2026-09-20",
+      "approxDate": false,
+      "primary": {
+        "alp": 25,
+        "lnp": 30,
+        "grn": 14,
+        "onp": 20,
+        "ind": null,
+        "oth": 11
+      },
+      "tpp2": {
+        "alp": 48
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/ben-carrolls-promised-new-direction-failing-to-win-over-victorian-voters/news-story/b67ec2414f9c5867909abd57f6baac15"
+    },
+    {
+      "firmRaw": "Freshwater",
+      "firm": "freshwater",
+      "client": "Herald Sun",
+      "sample": 1030,
+      "dateLabel": "24–28 Sep",
+      "fwStart": "2026-09-24",
+      "fwEnd": "2026-09-28",
+      "approxDate": false,
+      "primary": {
+        "alp": 24,
+        "lnp": 29,
+        "grn": 14,
+        "onp": 22,
+        "ind": null,
+        "oth": 11
+      },
+      "tpp2": {
+        "alp": 47
+      },
+      "alt": {},
+      "provenance": [
+        "wikipedia"
+      ],
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/state-election/jess-wilson-extends-lead-as-labors-primary-vote-crashes-to-24-per-cent-in-victoria/news-story/7511ab7a982b91a898db91af9d5a0377"
+    }
+  ],
+  "threeParty": [
+    {
+      "dateLabel": "5-7 Aug 2026",
+      "fwEnd": "2026-08-07",
+      "firm": "roymorgan",
+      "sample": 2084,
+      "alp": 43.5,
+      "lnp": 30,
+      "onp": 26.5,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "dateLabel": "17–28 Jun 2026",
+      "fwEnd": "2026-06-28",
+      "firm": "redbridge-accent",
+      "sample": 5516,
+      "alp": 39.9,
+      "lnp": 30.1,
+      "onp": 29.9,
+      "sourceUrl": "https://www.afr.com/politics/one-nation-overtakes-labor-liberals-in-victoria-allan-s-rating-dives-20260701-p60bnh",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "dateLabel": "22–24 Apr 2026",
+      "fwEnd": "2026-04-24",
+      "firm": "roymorgan",
+      "sample": 1707,
+      "alp": 44.5,
+      "lnp": 28,
+      "onp": 27.5,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "dateLabel": "13–16 Feb 2026",
+      "fwEnd": "2026-02-16",
+      "firm": "roymorgan",
+      "sample": 2462,
+      "alp": 44.5,
+      "lnp": 26,
+      "onp": 29.5,
+      "provenance": [
+        "wikipedia"
+      ]
+    }
+  ],
+  "leadership": [
+    {
+      "series": "preferredPremier",
+      "dateLabel": "24–28 Sep 2026",
+      "date": "2026-09-28",
+      "fwStart": "2026-09-24",
+      "firm": "freshwater",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1030,
+      "values": {
+        "carroll": 30,
+        "wilson": 37,
+        "pickering": 13
+      },
+      "dk": 20,
+      "net": 7,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/state-election/jess-wilson-extends-lead-as-labors-primary-vote-crashes-to-24-per-cent-in-victoria/news-story/7511ab7a982b91a898db91af9d5a0377",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "13 Sep 2026",
+      "date": "2026-09-13",
+      "fwStart": "2026-09-13",
+      "firm": "resolve",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1000,
+      "values": {
+        "carroll": 20,
+        "wilson": 28,
+        "pickering": 8
+      },
+      "dk": 43,
+      "net": 8,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/debt-concern-looms-large-for-voters-as-carroll-struggles-to-break-through-20260914-p60x45.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "16 Aug 2026",
+      "date": "2026-08-16",
+      "fwStart": "2026-08-16",
+      "firm": "resolve",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1000,
+      "values": {
+        "carroll": 20,
+        "wilson": 26,
+        "pickering": 10
+      },
+      "dk": 43,
+      "net": 6,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/revealed-how-leadership-coup-has-changed-labor-s-electoral-fortunes-20260817-p60p2l.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "5–7 Aug 2026",
+      "date": "2026-08-07",
+      "fwStart": "2026-08-05",
+      "firm": "roymorgan",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 2084,
+      "values": {
+        "carroll": 46.5,
+        "wilson": 35.5,
+        "pickering": 16
+      },
+      "dk": 2,
+      "net": 11,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "4 Aug 2026",
+      "date": "2026-08-04",
+      "fwStart": "2026-08-04",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1014,
+      "values": {
+        "carroll": 19,
+        "wilson": 32,
+        "pickering": null
+      },
+      "dk": 49,
+      "net": 13,
+      "sourceUrl": "https://www.afr.com/politics/coalition-surges-ahead-of-labor-following-vic-leadership-challenge-20260803-p60kvr",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "23–26 Jul 2026",
+      "date": "2026-07-26",
+      "fwStart": "2026-07-23",
+      "firm": "newspoll",
+      "pair": "allan-vs-wilson",
+      "sample": 1035,
+      "values": {
+        "allan": 32,
+        "wilson": 51
+      },
+      "dk": 17,
+      "net": 19,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/newspoll-shows-victorian-coalition-with-lead-as-jacinta-allan-faces-leadership-challenge/news-story/4ac504abe32030837be16ec669cb9b94",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "12 July 2026",
+      "date": "2026-07-12",
+      "fwStart": "2026-07-12",
+      "firm": "resolve",
+      "pair": "allan-vs-wilson",
+      "sample": 1000,
+      "values": {
+        "allan": 24,
+        "wilson": 43
+      },
+      "dk": 33,
+      "net": 19,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "May–Jun 2026",
+      "date": "2026-06-30",
+      "fwStart": "2026-05-01",
+      "firm": "resolve",
+      "pair": "allan-vs-wilson",
+      "sample": 1000,
+      "values": {
+        "allan": 20,
+        "wilson": 39
+      },
+      "dk": 41,
+      "net": 19,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/end-of-days-labor-s-own-supporters-say-time-s-up-for-allan-government-20260614-p606m1.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "5–8 Jun 2026",
+      "date": "2026-06-08",
+      "fwStart": "2026-06-05",
+      "firm": "freshwater",
+      "pair": "allan-vs-wilson",
+      "sample": 1034,
+      "values": {
+        "allan": 25,
+        "wilson": 49
+      },
+      "dk": 26,
+      "net": 24,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/polling-shows-voters-believe-its-time-for-jacinta-allan-to-go-with-deputy-premier-ben-carroll-the-man-favoured-to-replace-her/news-story/d96f55c76fad1a52cbcf86b825271249",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "22–24 Apr 2026",
+      "date": "2026-04-24",
+      "fwStart": "2026-04-22",
+      "firm": "roymorgan",
+      "pair": "allan-vs-wilson",
+      "sample": 1707,
+      "values": {
+        "allan": 42,
+        "wilson": 53
+      },
+      "dk": 5,
+      "net": 11,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "Mar–Apr 2026",
+      "date": "2026-04-30",
+      "fwStart": "2026-03-01",
+      "firm": "resolve",
+      "pair": "allan-vs-wilson",
+      "sample": 1047,
+      "values": {
+        "allan": 20,
+        "wilson": 39
+      },
+      "dk": 41,
+      "net": 19,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/one-nation-entrenched-as-third-force-as-victorians-adopt-drain-the-swamp-mentality-20260421-p5zps9.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "19–23 Mar 2026",
+      "date": "2026-03-23",
+      "fwStart": "2026-03-19",
+      "firm": "freshwater",
+      "pair": "allan-vs-wilson",
+      "sample": 1062,
+      "values": {
+        "allan": 31,
+        "wilson": 47
+      },
+      "dk": 22,
+      "net": 16,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/jacinta-allan-faces-leadership-crisis-as-new-poll-reveals-catastrophic-slump/news-story/f649d3f7132e57f78d130e4ec834fe15",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "19–23 Feb 2026",
+      "date": "2026-02-23",
+      "fwStart": "2026-02-19",
+      "firm": "freshwater",
+      "pair": "allan-vs-wilson",
+      "sample": 1030,
+      "values": {
+        "allan": 30,
+        "wilson": 46
+      },
+      "dk": 24,
+      "net": 16,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/jess-wilson-ahead-as-preferred-premier-amid-rejection-of-jacinta-allans-leadership-new-poll-shows/news-story/3d56d368cce42fcad760055e40a11924",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "13–16 Feb 2026",
+      "date": "2026-02-16",
+      "fwStart": "2026-02-13",
+      "firm": "roymorgan",
+      "pair": "allan-vs-wilson",
+      "sample": 2462,
+      "values": {
+        "allan": 42.5,
+        "wilson": 51
+      },
+      "dk": 6.5,
+      "net": 8.5,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "Jan–Feb 2026",
+      "date": "2026-02-28",
+      "fwStart": "2026-01-01",
+      "firm": "resolve",
+      "pair": "allan-vs-wilson",
+      "sample": 1100,
+      "values": {
+        "allan": 20,
+        "wilson": 39
+      },
+      "dk": 41,
+      "net": 19,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/none-of-the-above-poll-reveals-victorian-flight-from-major-parties-20260216-p5o2q9.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "1–10 Feb 2026",
+      "date": "2026-02-10",
+      "fwStart": "2026-02-01",
+      "firm": "demosau",
+      "pair": "allan-vs-wilson",
+      "sample": 1274,
+      "values": {
+        "allan": 31,
+        "wilson": 40
+      },
+      "dk": 29,
+      "net": 9,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "7 Dec 2025",
+      "date": "2025-12-07",
+      "fwStart": "2025-12-07",
+      "firm": "resolve",
+      "pair": "allan-vs-wilson",
+      "sample": 1000,
+      "values": {
+        "allan": 24,
+        "wilson": 41
+      },
+      "dk": 35,
+      "net": 17,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/victoria-enters-election-year-on-political-knife-s-edge-as-opposition-support-surges-20251208-p5nlso.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "21–24 Nov 2025",
+      "date": "2025-11-24",
+      "fwStart": "2025-11-21",
+      "firm": "freshwater",
+      "pair": "allan-vs-wilson",
+      "sample": 1220,
+      "values": {
+        "allan": 31,
+        "wilson": 47
+      },
+      "dk": 22,
+      "net": 16,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/poll-finds-jess-wilson-is-well-ahead-of-jacinta-allan-as-preferred-premier/news-story/59f5bf53556338940ee4f72f116a5fc5",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "18–20 Nov 2025",
+      "date": "2025-11-20",
+      "fwStart": "2025-11-18",
+      "firm": "newspoll",
+      "pair": "allan-vs-wilson",
+      "sample": 1030,
+      "values": {
+        "allan": 33,
+        "wilson": 47
+      },
+      "dk": 20,
+      "net": 14,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-take-lead-as-frightened-women-flee-victorian-labor/news-story/61ee349dbcd6dd84811b9d7fa082824d",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "14–17 Nov 2025",
+      "date": "2025-11-17",
+      "fwStart": "2025-11-14",
+      "firm": "freshwater",
+      "pair": "allan-vs-battin",
+      "sample": 1217,
+      "values": {
+        "allan": 34,
+        "battin": 45
+      },
+      "dk": 21,
+      "net": 11,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/shock-poll-shows-liberal-leader-brad-battin-in-electionwinning-position-as-he-faces-leadership-challenge-from-jess-wilson/news-story/d79fe45ea91e8a8cce2a360bfdfaf75b",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "21–27 Oct 2025",
+      "date": "2025-10-27",
+      "fwStart": "2025-10-21",
+      "firm": "demosau",
+      "pair": "allan-vs-battin",
+      "sample": 1016,
+      "values": {
+        "allan": 32,
+        "battin": 40
+      },
+      "dk": 28,
+      "net": 8,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "12 Oct 2025",
+      "date": "2025-10-12",
+      "fwStart": "2025-10-12",
+      "firm": "resolve",
+      "pair": "allan-vs-battin",
+      "sample": 1000,
+      "values": {
+        "allan": 27,
+        "battin": 33
+      },
+      "dk": 40,
+      "net": 6,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/new-poll-delivers-bleak-outlook-for-terminal-battin-leadership-20251013-p5n24f.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "2–9 Sep 2025",
+      "date": "2025-09-09",
+      "fwStart": "2025-09-02",
+      "firm": "demosau",
+      "pair": "allan-vs-battin",
+      "sample": 1327,
+      "values": {
+        "allan": 32,
+        "battin": 37
+      },
+      "dk": 31,
+      "net": 5,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "23–30 Jun 2025",
+      "date": "2025-06-30",
+      "fwStart": "2025-06-23",
+      "firm": "newspoll",
+      "pair": "allan-vs-battin",
+      "sample": 1000,
+      "values": {
+        "allan": 36,
+        "battin": 41
+      },
+      "dk": 23,
+      "net": 5,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-deeply-unhappy-with-jacinta-allan-as-labor-clings-to-lead/news-story/ce029a5783cb5be601f8393e91969759",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "30 Mar 2025",
+      "date": "2025-03-30",
+      "fwStart": "2025-03-30",
+      "firm": "resolve",
+      "pair": "allan-vs-battin",
+      "sample": 1000,
+      "values": {
+        "allan": 23,
+        "battin": 36
+      },
+      "dk": 41,
+      "net": 13,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/jacinta-allan-s-sinking-popularity-inflicts-brand-damage-on-albanese-s-election-hopes-20250331-p5lnyy.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "17–21 Mar 2025",
+      "date": "2025-03-21",
+      "fwStart": "2025-03-17",
+      "firm": "demosau",
+      "pair": "allan-vs-battin",
+      "sample": 1006,
+      "values": {
+        "allan": 30,
+        "battin": 43
+      },
+      "dk": 27,
+      "net": 13,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "Dec 2024 – Jan 2025",
+      "date": "2025-01-31",
+      "fwStart": "2024-12-01",
+      "firm": "resolve",
+      "pair": "allan-vs-battin",
+      "sample": 1124,
+      "values": {
+        "allan": 27,
+        "battin": 36
+      },
+      "dk": 37,
+      "net": 9,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/they-ve-turned-off-allan-victorian-labor-vote-plunges-to-historic-low-poll-shows-20250123-p5l6q1.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "10 Nov 2024",
+      "date": "2024-11-10",
+      "fwStart": "2024-11-10",
+      "firm": "resolve",
+      "pair": "allan-vs-pesutto",
+      "sample": 1000,
+      "values": {
+        "allan": 29,
+        "pesutto": 30
+      },
+      "dk": 41,
+      "net": 1,
+      "sourceUrl": "https://www.theage.com.au/national/victoria/john-pesutto-chalks-up-a-first-time-victory-over-jacinta-allan-in-latest-resolve-poll-20241111-p5kphq.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "7 Sep 2024",
+      "date": "2024-09-07",
+      "fwStart": "2024-09-07",
+      "firm": "resolve",
+      "pair": "allan-vs-pesutto",
+      "sample": 1054,
+      "values": {
+        "allan": 30,
+        "pesutto": 29
+      },
+      "dk": 41,
+      "net": 1,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/john-pesutto-within-striking-distance-as-state-s-preferred-premier-20240910-p5k9d5.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "14 Jul 2024",
+      "date": "2024-07-14",
+      "fwStart": "2024-07-14",
+      "firm": "resolve",
+      "pair": "allan-vs-pesutto",
+      "sample": 1000,
+      "values": {
+        "allan": 31,
+        "pesutto": 28
+      },
+      "dk": 41,
+      "net": 3,
+      "sourceUrl": "https://www.theage.com.au/national/victoria/labor-primary-vote-slumps-under-premier-jacinta-allan-20240717-p5jubs.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "19 May 2024",
+      "date": "2024-05-19",
+      "fwStart": "2024-05-19",
+      "firm": "resolve",
+      "pair": "allan-vs-pesutto",
+      "sample": 1000,
+      "values": {
+        "allan": 31,
+        "pesutto": 26
+      },
+      "dk": 43,
+      "net": 5,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/labor-s-popularity-plunges-as-voters-demand-government-tackle-debt-20240520-p5jf41.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "24 Mar 2024",
+      "date": "2024-03-24",
+      "fwStart": "2024-03-24",
+      "firm": "resolve",
+      "pair": "allan-vs-pesutto",
+      "sample": 1100,
+      "values": {
+        "allan": 34,
+        "pesutto": 25
+      },
+      "dk": 41,
+      "net": 9,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/slip-in-labor-support-pushes-pesutto-s-team-ahead-for-first-time-in-years-20240327-p5ffl9.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "3 Dec 2023",
+      "date": "2023-12-03",
+      "fwStart": "2023-12-03",
+      "firm": "resolve",
+      "pair": "allan-vs-pesutto",
+      "sample": 1100,
+      "values": {
+        "allan": 34,
+        "pesutto": 22
+      },
+      "dk": 44,
+      "net": 12,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/support-for-allan-dips-but-labor-holds-strong-lead-over-coalition-20231208-p5eq38.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "Sep–Oct 2023",
+      "date": "2023-10-31",
+      "fwStart": "2023-09-01",
+      "firm": "resolve",
+      "pair": "allan-vs-pesutto",
+      "sample": 1100,
+      "values": {
+        "allan": 38,
+        "pesutto": 19
+      },
+      "dk": 43,
+      "net": 19,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/jacinta-allan-maintains-commanding-lead-over-coalition-but-gap-narrows-20231010-p5eb5f.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "Jul–Aug 2023",
+      "date": "2023-08-31",
+      "fwStart": "2023-07-01",
+      "firm": "resolve",
+      "pair": "andrews-vs-pesutto",
+      "sample": 1100,
+      "values": {
+        "andrews": 41,
+        "pesutto": 32
+      },
+      "dk": 27,
+      "net": 9,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/labor-s-lead-stays-strong-but-andrews-personal-popularity-falls-20230816-p5dx0e.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "19–20 Jul 2023",
+      "date": "2023-07-20",
+      "fwStart": "2023-07-19",
+      "firm": "roymorgan",
+      "pair": "andrews-vs-pesutto",
+      "sample": 1046,
+      "values": {
+        "andrews": 52.5,
+        "pesutto": 47.5
+      },
+      "dk": null,
+      "net": 5,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "17–22 May 2023",
+      "date": "2023-05-22",
+      "fwStart": "2023-05-17",
+      "firm": "roymorgan",
+      "pair": "andrews-vs-pesutto",
+      "sample": 2095,
+      "values": {
+        "andrews": 64,
+        "pesutto": 36
+      },
+      "dk": null,
+      "net": 28,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "19–22 Apr 2023",
+      "date": "2023-04-22",
+      "fwStart": "2023-04-19",
+      "firm": "resolve",
+      "pair": "andrews-vs-pesutto",
+      "sample": 1609,
+      "values": {
+        "andrews": 49,
+        "pesutto": 28
+      },
+      "dk": 23,
+      "net": 21,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/labor-holds-lead-over-state-coalition-but-deeming-drama-fails-to-make-dent-20230421-p5d2cc.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "preferredPremier",
+      "dateLabel": "15–18 Feb 2023",
+      "date": "2023-02-18",
+      "fwStart": "2023-02-15",
+      "firm": "resolve",
+      "pair": "andrews-vs-pesutto",
+      "sample": 825,
+      "values": {
+        "andrews": 50,
+        "pesutto": 26
+      },
+      "dk": 24,
+      "net": 24,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/support-for-daniel-andrews-rises-as-he-marks-3000-days-in-office-20230219-p5clok.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "24 – 28 Sep 2026",
+      "date": "2026-09-28",
+      "fwStart": "2026-09-24",
+      "firm": "freshwater",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1030,
+      "leader": "carroll",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": -7,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/state-election/jess-wilson-extends-lead-as-labors-primary-vote-crashes-to-24-per-cent-in-victoria/news-story/7511ab7a982b91a898db91af9d5a0377",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "24 – 28 Sep 2026",
+      "date": "2026-09-28",
+      "fwStart": "2026-09-24",
+      "firm": "freshwater",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1030,
+      "leader": "wilson",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": 19,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/state-election/jess-wilson-extends-lead-as-labors-primary-vote-crashes-to-24-per-cent-in-victoria/news-story/7511ab7a982b91a898db91af9d5a0377",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "10 – 20 Sep 2026",
+      "date": "2026-09-20",
+      "fwStart": "2026-09-10",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1020,
+      "leader": "carroll",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": -14,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "10 – 20 Sep 2026",
+      "date": "2026-09-20",
+      "fwStart": "2026-09-10",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1020,
+      "leader": "wilson",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": 8,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "16 Aug 2026",
+      "date": "2026-08-16",
+      "fwStart": "2026-08-16",
+      "firm": "resolve",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1000,
+      "leader": "carroll",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": -4,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/revealed-how-leadership-coup-has-changed-labor-s-electoral-fortunes-20260817-p60p2l.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "16 Aug 2026",
+      "date": "2026-08-16",
+      "fwStart": "2026-08-16",
+      "firm": "resolve",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1000,
+      "leader": "wilson",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": 18,
+      "sourceUrl": "https://www.theage.com.au/politics/victoria/revealed-how-leadership-coup-has-changed-labor-s-electoral-fortunes-20260817-p60p2l.html",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "6 – 11 Aug 2026",
+      "date": "2026-08-11",
+      "fwStart": "2026-08-06",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1007,
+      "leader": "carroll",
+      "pos": 21,
+      "neg": 37,
+      "dk": 42,
+      "net": -16,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "6 – 11 Aug 2026",
+      "date": "2026-08-11",
+      "fwStart": "2026-08-06",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1007,
+      "leader": "wilson",
+      "pos": 35,
+      "neg": 24,
+      "dk": 41,
+      "net": 11,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "6 – 11 Aug 2026",
+      "date": "2026-08-11",
+      "fwStart": "2026-08-06",
+      "firm": "demosau",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1007,
+      "leader": "pickering",
+      "pos": 19,
+      "neg": 38,
+      "dk": 43,
+      "net": -19,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "31 Jul – 3 Aug 2026",
+      "date": "2026-08-03",
+      "fwStart": "2026-07-31",
+      "firm": "roymorgan",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 2084,
+      "leader": "carroll",
+      "pos": 51,
+      "neg": 43,
+      "dk": 6,
+      "net": 8,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "31 Jul – 3 Aug 2026",
+      "date": "2026-08-03",
+      "fwStart": "2026-07-31",
+      "firm": "roymorgan",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 2084,
+      "leader": "wilson",
+      "pos": 58.5,
+      "neg": 38.5,
+      "dk": 3,
+      "net": 20,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "31 Jul – 3 Aug 2026",
+      "date": "2026-08-03",
+      "fwStart": "2026-07-31",
+      "firm": "roymorgan",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 2084,
+      "leader": "pickering",
+      "pos": 35,
+      "neg": 58.5,
+      "dk": 6.5,
+      "net": -23.5,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "31 Jul – 3 Aug 2026",
+      "date": "2026-08-03",
+      "fwStart": "2026-07-31",
+      "firm": "freshwater",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1020,
+      "leader": "carroll",
+      "pos": 22,
+      "neg": 29,
+      "dk": 49,
+      "net": -7,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/freshwater-strategy-poll-shows-that-on-a-twoparty-preferred-basis-the-coalition-remains-in-front-of-labor-52-to-48/news-story/28da81559b3cf762608351667fac5cb3",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "31 Jul – 3 Aug 2026",
+      "date": "2026-08-03",
+      "fwStart": "2026-07-31",
+      "firm": "freshwater",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1020,
+      "leader": "wilson",
+      "pos": 39,
+      "neg": 21,
+      "dk": 40,
+      "net": 18,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/freshwater-strategy-poll-shows-that-on-a-twoparty-preferred-basis-the-coalition-remains-in-front-of-labor-52-to-48/news-story/28da81559b3cf762608351667fac5cb3",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "28 Jul – 1 Aug 2026",
+      "date": "2026-08-01",
+      "fwStart": "2026-07-28",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1014,
+      "leader": "carroll",
+      "pos": 14,
+      "neg": 29,
+      "dk": 57,
+      "net": -15,
+      "sourceUrl": "https://www.afr.com/politics/coalition-surges-ahead-of-labor-following-vic-leadership-challenge-20260803-p60kvr",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "28 Jul – 1 Aug 2026",
+      "date": "2026-08-01",
+      "fwStart": "2026-07-28",
+      "firm": "redbridge-accent",
+      "pair": "carroll-vs-wilson-vs-pickering",
+      "sample": 1014,
+      "leader": "wilson",
+      "pos": 33,
+      "neg": 20,
+      "dk": 47,
+      "net": 13,
+      "sourceUrl": "https://www.afr.com/politics/coalition-surges-ahead-of-labor-following-vic-leadership-challenge-20260803-p60kvr",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "23–26 Jul 2026",
+      "date": "2026-07-26",
+      "fwStart": "2026-07-23",
+      "firm": "newspoll",
+      "pair": "allan-vs-wilson",
+      "sample": 1035,
+      "leader": "allan",
+      "pos": 25,
+      "neg": 71,
+      "dk": 4,
+      "net": -46,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/newspoll-shows-victorian-coalition-with-lead-as-jacinta-allan-faces-leadership-challenge/news-story/4ac504abe32030837be16ec669cb9b94",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "23–26 Jul 2026",
+      "date": "2026-07-26",
+      "fwStart": "2026-07-23",
+      "firm": "newspoll",
+      "pair": "allan-vs-wilson",
+      "sample": 1035,
+      "leader": "wilson",
+      "pos": 47,
+      "neg": 39,
+      "dk": 14,
+      "net": 8,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/newspoll-shows-victorian-coalition-with-lead-as-jacinta-allan-faces-leadership-challenge/news-story/4ac504abe32030837be16ec669cb9b94",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "17 – 28 Jun 2026",
+      "date": "2026-06-28",
+      "fwStart": "2026-06-17",
+      "firm": "redbridge-accent",
+      "pair": "allan-vs-wilson",
+      "sample": 5516,
+      "leader": "allan",
+      "pos": 17,
+      "neg": 59,
+      "dk": 24,
+      "net": -42,
+      "sourceUrl": "https://www.afr.com/politics/one-nation-overtakes-labor-liberals-in-victoria-allan-s-rating-dives-20260701-p60bnh",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "17 – 28 Jun 2026",
+      "date": "2026-06-28",
+      "fwStart": "2026-06-17",
+      "firm": "redbridge-accent",
+      "pair": "allan-vs-wilson",
+      "sample": 5516,
+      "leader": "wilson",
+      "pos": 31,
+      "neg": 18,
+      "dk": 51,
+      "net": 13,
+      "sourceUrl": "https://www.afr.com/politics/one-nation-overtakes-labor-liberals-in-victoria-allan-s-rating-dives-20260701-p60bnh",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "7–11 Jun 2026",
+      "date": "2026-06-11",
+      "fwStart": "2026-06-07",
+      "firm": "demosau",
+      "pair": "allan-vs-wilson",
+      "sample": 1056,
+      "leader": "allan",
+      "pos": 18,
+      "neg": 57,
+      "dk": 25,
+      "net": -39,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "7–11 Jun 2026",
+      "date": "2026-06-11",
+      "fwStart": "2026-06-07",
+      "firm": "demosau",
+      "pair": "allan-vs-wilson",
+      "sample": 1056,
+      "leader": "wilson",
+      "pos": 32,
+      "neg": 22,
+      "dk": 46,
+      "net": 10,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "5–8 Jun 2026",
+      "date": "2026-06-08",
+      "fwStart": "2026-06-05",
+      "firm": "freshwater",
+      "pair": "allan-vs-wilson",
+      "sample": 1034,
+      "leader": "allan",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": -37,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/polling-shows-voters-believe-its-time-for-jacinta-allan-to-go-with-deputy-premier-ben-carroll-the-man-favoured-to-replace-her/news-story/d96f55c76fad1a52cbcf86b825271249",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "5–8 Jun 2026",
+      "date": "2026-06-08",
+      "fwStart": "2026-06-05",
+      "firm": "freshwater",
+      "pair": "allan-vs-wilson",
+      "sample": 1034,
+      "leader": "wilson",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": 15,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/polling-shows-voters-believe-its-time-for-jacinta-allan-to-go-with-deputy-premier-ben-carroll-the-man-favoured-to-replace-her/news-story/d96f55c76fad1a52cbcf86b825271249",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "22–24 Apr 2026",
+      "date": "2026-04-24",
+      "fwStart": "2026-04-22",
+      "firm": "roymorgan",
+      "pair": "allan-vs-wilson",
+      "sample": 1707,
+      "leader": "allan",
+      "pos": 32.5,
+      "neg": 66.5,
+      "dk": 1,
+      "net": -34,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "22–24 Apr 2026",
+      "date": "2026-04-24",
+      "fwStart": "2026-04-22",
+      "firm": "roymorgan",
+      "pair": "allan-vs-wilson",
+      "sample": 1707,
+      "leader": "wilson",
+      "pos": 48.5,
+      "neg": 48.5,
+      "dk": 3,
+      "net": 0,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "19–23 Mar 2026",
+      "date": "2026-03-23",
+      "fwStart": "2026-03-19",
+      "firm": "freshwater",
+      "pair": "allan-vs-wilson",
+      "sample": 1062,
+      "leader": "allan",
+      "pos": 22,
+      "neg": 55,
+      "dk": 23,
+      "net": -33,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/polling-shows-voters-believe-its-time-for-jacinta-allan-to-go-with-deputy-premier-ben-carroll-the-man-favoured-to-replace-her/news-story/d96f55c76fad1a52cbcf86b825271249",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "19–23 Mar 2026",
+      "date": "2026-03-23",
+      "fwStart": "2026-03-19",
+      "firm": "freshwater",
+      "pair": "allan-vs-wilson",
+      "sample": 1062,
+      "leader": "wilson",
+      "pos": 32,
+      "neg": 14,
+      "dk": 54,
+      "net": 18,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/polling-shows-voters-believe-its-time-for-jacinta-allan-to-go-with-deputy-premier-ben-carroll-the-man-favoured-to-replace-her/news-story/d96f55c76fad1a52cbcf86b825271249",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "19–23 Feb 2026",
+      "date": "2026-02-23",
+      "fwStart": "2026-02-19",
+      "firm": "freshwater",
+      "pair": "allan-vs-wilson",
+      "sample": 1030,
+      "leader": "allan",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": -33,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/jess-wilson-ahead-as-preferred-premier-amid-rejection-of-jacinta-allans-leadership-new-poll-shows/news-story/3d56d368cce42fcad760055e40a11924",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "19–23 Feb 2026",
+      "date": "2026-02-23",
+      "fwStart": "2026-02-19",
+      "firm": "freshwater",
+      "pair": "allan-vs-wilson",
+      "sample": 1030,
+      "leader": "wilson",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": 15,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/jess-wilson-ahead-as-preferred-premier-amid-rejection-of-jacinta-allans-leadership-new-poll-shows/news-story/3d56d368cce42fcad760055e40a11924",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "13–16 Feb 2026",
+      "date": "2026-02-16",
+      "fwStart": "2026-02-13",
+      "firm": "roymorgan",
+      "pair": "allan-vs-wilson",
+      "sample": 2462,
+      "leader": "allan",
+      "pos": 30.5,
+      "neg": 67.5,
+      "dk": 2,
+      "net": -37,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "13–16 Feb 2026",
+      "date": "2026-02-16",
+      "fwStart": "2026-02-13",
+      "firm": "roymorgan",
+      "pair": "allan-vs-wilson",
+      "sample": 2462,
+      "leader": "wilson",
+      "pos": 53,
+      "neg": 42.5,
+      "dk": 4.5,
+      "net": 10.5,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "1–10 Feb 2026",
+      "date": "2026-02-10",
+      "fwStart": "2026-02-01",
+      "firm": "demosau",
+      "pair": "allan-vs-wilson",
+      "sample": 1274,
+      "leader": "allan",
+      "pos": 16,
+      "neg": 53,
+      "dk": 31,
+      "net": -37,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "1–10 Feb 2026",
+      "date": "2026-02-10",
+      "fwStart": "2026-02-01",
+      "firm": "demosau",
+      "pair": "allan-vs-wilson",
+      "sample": 1274,
+      "leader": "wilson",
+      "pos": 27,
+      "neg": 24,
+      "dk": 49,
+      "net": 3,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "18–20 Nov 2025",
+      "date": "2025-11-20",
+      "fwStart": "2025-11-18",
+      "firm": "newspoll",
+      "pair": "allan-vs-wilson",
+      "sample": 1000,
+      "leader": "allan",
+      "pos": 26,
+      "neg": 68,
+      "dk": 6,
+      "net": -42,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-take-lead-as-frightened-women-flee-victorian-labor/news-story/61ee349dbcd6dd84811b9d7fa082824d",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "18–20 Nov 2025",
+      "date": "2025-11-20",
+      "fwStart": "2025-11-18",
+      "firm": "newspoll",
+      "pair": "allan-vs-wilson",
+      "sample": 1000,
+      "leader": "wilson",
+      "pos": 32,
+      "neg": 31,
+      "dk": 37,
+      "net": 1,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-take-lead-as-frightened-women-flee-victorian-labor/news-story/61ee349dbcd6dd84811b9d7fa082824d",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "14–17 Nov 2025",
+      "date": "2025-11-17",
+      "fwStart": "2025-11-14",
+      "firm": "freshwater",
+      "pair": "allan-vs-battin",
+      "sample": 1217,
+      "leader": "allan",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": -28,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/shock-poll-shows-liberal-leader-brad-battin-in-electionwinning-position-as-he-faces-leadership-challenge-from-jess-wilson/news-story/d79fe45ea91e8a8cce2a360bfdfaf75b",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "14–17 Nov 2025",
+      "date": "2025-11-17",
+      "fwStart": "2025-11-14",
+      "firm": "freshwater",
+      "pair": "allan-vs-battin",
+      "sample": 1217,
+      "leader": "battin",
+      "pos": null,
+      "neg": null,
+      "dk": null,
+      "net": 15,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/shock-poll-shows-liberal-leader-brad-battin-in-electionwinning-position-as-he-faces-leadership-challenge-from-jess-wilson/news-story/d79fe45ea91e8a8cce2a360bfdfaf75b",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "23–30 Jun 2025",
+      "date": "2025-06-30",
+      "fwStart": "2025-06-23",
+      "firm": "newspoll",
+      "pair": "allan-vs-battin",
+      "sample": 1000,
+      "leader": "allan",
+      "pos": 30,
+      "neg": 61,
+      "dk": 9,
+      "net": -31,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-deeply-unhappy-with-jacinta-allan-as-labor-clings-to-lead/news-story/ce029a5783cb5be601f8393e91969759",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "23–30 Jun 2025",
+      "date": "2025-06-30",
+      "fwStart": "2025-06-23",
+      "firm": "newspoll",
+      "pair": "allan-vs-battin",
+      "sample": 1000,
+      "leader": "battin",
+      "pos": 35,
+      "neg": 40,
+      "dk": 25,
+      "net": -5,
+      "sourceUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-voters-deeply-unhappy-with-jacinta-allan-as-labor-clings-to-lead/news-story/ce029a5783cb5be601f8393e91969759",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "24 Mar – 2 Apr 2025",
+      "date": "2025-04-02",
+      "fwStart": "2025-03-24",
+      "firm": "redbridge-accent",
+      "pair": "allan-vs-battin",
+      "sample": 2013,
+      "leader": "allan",
+      "pos": 16,
+      "neg": 51,
+      "dk": 33,
+      "net": -35,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/victorian-premier-jacinta-allan-will-face-pressure-to-quit-if-labor-is-hit-hard-at-federal-election/news-story/ceec79f877c24b80e654fdcc2c073429",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "24 Mar – 2 Apr 2025",
+      "date": "2025-04-02",
+      "fwStart": "2025-03-24",
+      "firm": "redbridge-accent",
+      "pair": "allan-vs-battin",
+      "sample": 2013,
+      "leader": "battin",
+      "pos": 27,
+      "neg": 16,
+      "dk": 57,
+      "net": 11,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/victorian-premier-jacinta-allan-will-face-pressure-to-quit-if-labor-is-hit-hard-at-federal-election/news-story/ceec79f877c24b80e654fdcc2c073429",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "12–13 Mar 2025",
+      "date": "2025-03-13",
+      "fwStart": "2025-03-12",
+      "firm": "jws-research",
+      "pair": "allan-vs-battin",
+      "sample": null,
+      "leader": "allan",
+      "pos": 21,
+      "neg": 54,
+      "dk": 25,
+      "net": -33,
+      "sourceUrl": "https://www.heraldsun.com.au/news/victoria/liberal-party-poised-to-reclaim-teal-seats-in-victoria/news-story/83c31e250c24acd3c0536204002c28b3",
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "2–12 Dec 2023",
+      "date": "2023-12-12",
+      "fwStart": "2023-12-02",
+      "firm": "redbridge-accent",
+      "pair": "allan-vs-pesutto",
+      "sample": 2000,
+      "leader": "allan",
+      "pos": 24,
+      "neg": 30,
+      "dk": 46,
+      "net": -6,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "2–12 Dec 2023",
+      "date": "2023-12-12",
+      "fwStart": "2023-12-02",
+      "firm": "redbridge-accent",
+      "pair": "allan-vs-pesutto",
+      "sample": 2000,
+      "leader": "pesutto",
+      "pos": 16,
+      "neg": 29,
+      "dk": 55,
+      "net": -13,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "19–20 Jul 2023",
+      "date": "2023-07-20",
+      "fwStart": "2023-07-19",
+      "firm": "roymorgan",
+      "pair": "andrews-vs-pesutto",
+      "sample": 1046,
+      "leader": "andrews",
+      "pos": 45,
+      "neg": 55,
+      "dk": null,
+      "net": -10,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "17–22 May 2023",
+      "date": "2023-05-22",
+      "fwStart": "2023-05-17",
+      "firm": "roymorgan",
+      "pair": "andrews-vs-pesutto",
+      "sample": 2095,
+      "leader": "andrews",
+      "pos": 52.5,
+      "neg": 47.5,
+      "dk": null,
+      "net": 5,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    },
+    {
+      "series": "approval",
+      "dateLabel": "17–22 May 2023",
+      "date": "2023-05-22",
+      "fwStart": "2023-05-17",
+      "firm": "roymorgan",
+      "pair": "andrews-vs-pesutto",
+      "sample": 2095,
+      "leader": "pesutto",
+      "pos": 46.5,
+      "neg": 53.5,
+      "dk": null,
+      "net": -7,
+      "sourceUrl": null,
+      "provenance": [
+        "wikipedia"
+      ]
+    }
+  ]
+}
