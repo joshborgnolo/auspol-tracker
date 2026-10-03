@@ -189,6 +189,13 @@ function TrendChart(props) {
     /* the redesign sizes a chart in screen px - a fixed height and fixed
        margins however wide the column - and the viewBox follows the width */
     heightPx, padPx,
+    /* a caller that can price its column from the viewport (the hero is the
+       full content column) hands the seed in: the mount effect then skips
+       its synchronous getBoundingClientRect - reading layout inside the
+       first commit forces a full-document Layout, which the boot window is
+       made of. The ResizeObserver still corrects a scrollbar's-width miss
+       one frame later, the trade the lead gauge's seed already takes. */
+    widthSeed = null,
     series: seriesProp = [], scatter: scatterProp = [], yTicks = [], xTicks = [], refLines = [],
     /* `padSeries`: extra series to reserve right margin for even though they
        are not being drawn. The PPM switch's two views print different end
@@ -394,16 +401,18 @@ function TrendChart(props) {
   const labOff = useRef(new Map());          // each end name's dodge, eased mid-switch
   // axis text in real on-screen px – normalise by measured width so every
   // chart's labels match regardless of column width / responsive stacking
-  const [cw, setCw] = useState(VB.W);
+  const [cw, setCw] = useState(widthSeed || VB.W);
   /* measured before the chart is first painted (a LAYOUT effect): measured
      after it, a chart that mounts - a second chart under "Both", a tab
      opening - painted once at the viewBox's width, a third of its height on
-     a phone, and grew into place a frame later */
+     a phone, and grew into place a frame later. A widthSeed caller skips
+     that read instead: the seed already prices the first paint, and the
+     observer mops up a miss a frame later rather than mid-commit. */
   React.useLayoutEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
     const update = () => setCw(el.getBoundingClientRect().width || VB.W);
-    update();
+    if (widthSeed == null) update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();

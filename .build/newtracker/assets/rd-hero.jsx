@@ -28,6 +28,14 @@ function rdGaugeSeed() {
   const g = Math.min(64, Math.max(20, 0.05 * vw));
   return Math.min(760, Math.max(280, Math.min(1152, vw - 2 * g)));
 }
+/* the hero chart's own seed: same content column, no caps - the hero
+   TrendChart fills it edge to edge, so this lets the engine skip its
+   commit-time width read too (the one remaining forced layout there). */
+function rdHeroChartSeed() {
+  const vw = (typeof window !== "undefined" && window.innerWidth) || 1280;
+  const g = Math.min(64, Math.max(20, 0.05 * vw));
+  return Math.min(1152, vw - 2 * g);
+}
 function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
   const ref = React.useRef(null);
   /* seeded, never unmeasured: the frames one and two of this strip are the
@@ -650,6 +658,7 @@ function RdHero(p) {
         <TrendChart
           key="rd-hero"
           heightPx={narrow ? 300 : 372}
+          widthSeed={rdHeroChartSeed()}
           padPx={narrow ? { l: 30, r: 6, t: 34, b: 28 } : { l: 40, r: 16, t: 52, b: 30 }}
           xDomain={xDomain} yDomain={yDomain} yTicks={yTicks}
           yTickFmt={(v) => (v === yTarget[1] ? v + "%" : String(v))}
