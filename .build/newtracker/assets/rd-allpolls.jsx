@@ -164,7 +164,7 @@ const RD_AP_TAGS = {
   ppm: { label: "Better prime minister" },
   aprv: { label: "Leader approval" },
   fav: { label: "Leader favourability" },
-  seats: { label: "A seat projection", note: "MRP polls only" },
+  seats: { label: "A seat projection", note: "Modelled seat counts" },
   dir: { label: "Right direction or wrong track" },
   iss: { label: "Issues", note: "What voters say matters, and the party rated best on each" },
 };
@@ -1033,9 +1033,10 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
         {seats.length > 0 && (
           <div className="rd-apd-grid rd-apd-grid1">
             <span className="rd-apd-k">Seats, modelled</span>
-            <span className="rd-apd-cell"><span>{seats.map((k, i) => <React.Fragment key={k.id}>{i > 0 ? ", " : ""}{k.lab} <b style={{ color: k.ink }}>{p.seats.p[k.id].est}</b></React.Fragment>)}</span></span>
+            <span className="rd-apd-cell"><span>{seats.map((k, i) => { const s = p.seats.p[k.id]; return <React.Fragment key={k.id}>{i > 0 ? ", " : ""}{k.lab} <b style={{ color: k.ink }}>{s.est != null ? s.est : s.lo + "–" + s.hi}</b>{s.note ? " (" + s.note + ")" : ""}</React.Fragment>; })}</span></span>
           </div>
         )}
+        {seats.length > 0 && p.seats.rangeOnly && p.seats.method && <span className="rd-apd-sub rd-apd-note">Modelled range – {p.seats.method}.</span>}
         <div className="rd-apd-links">
           {relUrl && <a className="rd-link rd-link-ext" href={relUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}><span className="rd-link-t">Read the release</span> <span aria-hidden="true" className="rd-apd-ext">↗</span></a>}
           {p.methodUrl && <a className="rd-link rd-link-ext" href={p.methodUrl} target="_blank" rel="noopener noreferrer" title={"This poll’s Australian Polling Council methodology statement" + (p.methodUrl === relUrl ? ", part of the release" : "")} onClick={(e) => e.stopPropagation()}><span className="rd-link-t">APC methodology</span> <span aria-hidden="true" className="rd-apd-ext">↗</span></a>}

@@ -78009,7 +78009,7 @@ const RD_AP_TAGS = {
   },
   seats: {
     label: "A seat projection",
-    note: "MRP polls only"
+    note: "Modelled seat counts"
   },
   dir: {
     label: "Right direction or wrong track"
@@ -79391,13 +79391,18 @@ function RdApDetail({
     className: "rd-apd-k"
   }, "Seats, modelled"), React.createElement("span", {
     className: "rd-apd-cell"
-  }, React.createElement("span", null, seats.map((k, i) => React.createElement(React.Fragment, {
-    key: k.id
-  }, i > 0 ? ", " : "", k.lab, " ", React.createElement("b", {
-    style: {
-      color: k.ink
-    }
-  }, p.seats.p[k.id].est)))))), React.createElement("div", {
+  }, React.createElement("span", null, seats.map((k, i) => {
+    const s = p.seats.p[k.id];
+    return React.createElement(React.Fragment, {
+      key: k.id
+    }, i > 0 ? ", " : "", k.lab, " ", React.createElement("b", {
+      style: {
+        color: k.ink
+      }
+    }, s.est != null ? s.est : s.lo + "–" + s.hi), s.note ? " (" + s.note + ")" : "");
+  })))), seats.length > 0 && p.seats.rangeOnly && p.seats.method && React.createElement("span", {
+    className: "rd-apd-sub rd-apd-note"
+  }, "Modelled range \u2013 ", p.seats.method, "."), React.createElement("div", {
     className: "rd-apd-links"
   }, relUrl && React.createElement("a", {
     className: "rd-link rd-link-ext",
