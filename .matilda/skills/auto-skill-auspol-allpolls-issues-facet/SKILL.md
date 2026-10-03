@@ -1,6 +1,6 @@
 ---
 name: auspol-allpolls-issues-facet
-description: auspol-tracker — the All-polls Issues facet (?f=i, shipped as 891d06c 2026-09-29) end-to-end: gen-data issuesOnlyPolls emitter (Ipsos as ISS_ONLY standalone rows, SEC waves riding direction rows), FACET_SCOPE.issues, RdApIssMini rail chart (D.issues.list is an ARRAY — find by id, not key; the TWO-BASIS ownership trap — iss.own is as-printed all-respondent, the pooled monthly series is three-party-renormalised §5i, renderers must renormalise before co-plotting), the FINAL phone-card anatomy (3a73407→f4e52b3→1c8ef8b→unranked-col-placeholder 2026-10-03: dots full-width on their own body line again, head-row issfig verdict chip, ONE superscript-ordinal ranking sentence — "Cost of living 1st, housing 2nd, crime 3rd", figures dropped, ISS_SENT_SHORT labels in SENTENCE CASE via sentLab/sentLab1, SEC ", unprompted", and for no-ranking waves the dictated "Issues unranked, but performance on cost of living assessed" line gated on iss.own.col), the ISS_PARTY → ISS_PARTY_META classic-script collision lesson, and the iss-facet/dir-facet probes.
+description: auspol-tracker — the All-polls Issues facet (?f=i, shipped as 891d06c 2026-09-29) end-to-end: gen-data issuesOnlyPolls emitter (Ipsos as ISS_ONLY standalone rows, SEC waves riding direction rows), FACET_SCOPE.issues, RdApIssMini rail chart (D.issues.list is an ARRAY — find by id, not key; the TWO-BASIS ownership trap — iss.own is as-printed all-respondent, the pooled monthly series is three-party-renormalised §5i, renderers must renormalise before co-plotting), the FINAL phone-card anatomy (3a73407→f4e52b3→1c8ef8b→unranked-col-placeholder 2026-10-03: dots full-width on their own body line again, head-row issfig verdict chip, ONE superscript-ordinal ranking sentence — "Cost of living 1st, housing 2nd, crime 3rd", figures dropped, ISS_SENT_SHORT labels in SENTENCE CASE via sentLab/sentLab1, SEC ", unprompted", and for no-ranking waves the dictated "Issues unranked, but performance on cost of living assessed" line gated on iss.own.col), the ISS_PARTY → ISS_PARTY_META classic-script collision lesson, the detail rail's "Asked" fact-row three-way PAYLOAD branch (sal→prompted, conc→SEC line, own-only→"asked only who'd be best on each issue" — the Resolve-quoting-SEC fix, 9aa99cf; lesson: branch copy on payload fields, never on "the one house we know"), the probe openRowContaining toggle-collapse contract, and the iss-facet/dir-facet probes.
 source: auto-skill
 extracted_at: '2026-09-29'
 ---
@@ -334,6 +334,67 @@ renormalised at :508-512 and the caption/ARIA at :528, :808-811)
   rails never show it). A VI house on the Issues facet gets the same
   issues keys (Asked / its usual lean / In today's panel).
 
+## The detail "Asked" fact row — three-way PAYLOAD branch (shipped 9aa99cf, 2026-10-03)
+
+The rail's "Asked" line (RdApDetail issues branch, rd-allpolls.jsx
+~:1096-1101) branches on the wave's PAYLOAD, not on house name:
+
+- `iss.sal` (prompted) → "Voters picked the three issues that matter
+  most…" (+ the `iss.q`/Ipsos wording quote + the "…pooled against its
+  pair first" tail).
+- `iss.conc` (SEC concerns bank) → the SEC unprompted line: "SEC
+  Newgate asks what concerns Australians, unprompted – anyone can name
+  anything, so the shares are any-mentions, not forced picks…".
+- otherwise (OWNERSHIP-ONLY: `own`, no `sal`, no `conc` — Resolve's 63
+  best-party waves in data's term view, DemosAU's "trust more to handle"
+  wave, YouGov's News24 Pulse wave) → "{pollster} asked only who'd be
+  best on each issue – its wording: "{iss.q}" – not which issues matter
+  most, so this wave feeds the pooled best-party line and there's no
+  top-three list for it to join" (the q-quote clause drops to a plain
+  comma when iss.q is absent).
+
+THE LESSON that shipped the bug (user report 2026-10-03: "in all poles,
+in issues, in how it counts, resolve says: SEC Newgate asks…"): the row
+had TWO branches and its fallback sentence NAMED SEC Newgate — fine
+while SEC was the only salience-less house (the phone cards' ",
+unprompted" suffix has always been `conc`-gated, so only the desktop
+rail was wrong). Resolve/DemosAU/YouGov own-only waves fell straight
+into the fallback and every expanded Resolve row "quoted" SEC's method.
+RULE: key copy branches off payload fields (sal/conc/own); never write
+fallback text that names the one house you know carries the branch
+condition — a third payload class arrives later and silently
+misattributes ITS method as the named house's. Companion: the probe at
+that time pinned ONLY the SEC and Ipsos forms of this row — the
+ownership-only row class was probed nowhere, which is why it shipped
+silently. iss-facet.mjs check 7b is the pin now: an opened Resolve row
+asserts /asked only who.d be best/ in the rail AND the absence of
+/SEC Newgate asks/. Same rule of thumb as TWO-BASIS/X-BASIS: when a new
+payload class joins a facet, check every branch that used to be an
+"if A else theSECcase" for the else becoming "if A, elsif conc, else
+the generic one".
+
+## Probe row-state contract — openRowContaining TOGGLES
+
+(iss-facet.mjs, worked live in the 9aa99cf session: the first run after
+adding check 7b read 40 passed / 3 failed.) `openRowContaining(page,
+re)` dispatches a CLICK on the first `.rd-ap-row`/`.rd-ap-card` whose
+textContent matches — the row it opens STAYS OPEN. The next check that
+opens rows dynamically (check 8: `viHouse` = first non-Ipsos/non-SEC
+house — "Resolve↗" in the current archive, i.e. the very row 7b opened)
+clicks that same open row and COLLAPSES it, so its detail snapshot is
+null and later checks built on "the currently open detail" (8b's
+three-party dot-sum read of `.rd-ap-open .rd-apd`) fail along with it.
+Symptom pattern: you add one row-opening check and 2–3 LATER checks
+fail with "no detail"/"no dots" — that's leftover row state, not the
+page. CONTRACT: a probe check that opens a row must leave the table
+fully closed before a later check that opens rows of its own — restore
+by re-calling `openRowContaining` with the SAME regex (the first match
+is the open row; the re-click collapses it). Clicking `.rd-ap-open`
+directly does NOT work — the detail wrapper stops click propagation
+(the links/glyphs inside dispatch their own handlers), so a collapse
+attempt there silently no-ops. Verify FULL probe green after adding any
+row-opening check, not just the new check itself.
+
 ## Phone card FINAL anatomy (3a73407 then f4e52b3 then 1c8ef8b, 2026-10-03) — supersedes the section below
 
 THREE same-day user drives after the anatomy below shipped. 3a73407
@@ -383,10 +444,14 @@ sentence case") settled the casing. FINAL contract:
   rows keep no sentence. Probe pins it by verbatim text
   (`txt === "Issues unranked, but performance on cost of living
   assessed"`), counted against the page's own data bundle
-  (`exp.unrankedCol`); capsOk passes as written (sentence case). The
-  dictated literal wraps to two lines on the phone (38px csub; card
-  133.6px at both 360 and 390px — visible as the 133.6 entries in the
-  iss-card-height dumps alongside the 118.1 sentence+strip family).
+  (`exp.unrankedCol`); capsOk passes as written (sentence case). Wrap
+  behaviour is shell-width-dependent (measured same day against the
+  user's iPhone 17): TWO lines in the 360/390px shells (38px csub,
+  card 133.6px — the 133.6 entries in iss-card-height dumps), ONE
+  line at 402px (user report + probe 402: zero two-line sentences of
+  42, card 114.8px). The placeholder line also boxes at 19px vs the
+  ranked sentence's 22px — same class; the ranking's sup ordinals
+  inflate its line box.
 - `ISS_SENT_SHORT = { "Housing affordability": "housing" }` —
   module-level at rd-allpolls.jsx :186 (right after rdApX). The two
   label vocabularies differ (canonical data/issues.json stores
@@ -467,9 +532,12 @@ exports.
 
 ## Verify probes
 
-- `.matilda/probe/iss-facet.mjs` — 41 checks since f4e52b3 (the two new
-  phone-card sentence checks: superscript-ordinal grammar per §FINAL
-  anatomy above + `capsOk` no-uppercase): tab order + `?f=i` deep link,
+- `.matilda/probe/iss-facet.mjs` — 43 checks since 9aa99cf (the phone
+  sentence checks per §FINAL anatomy, the dictated "Issues unranked…"
+  placeholder pins via `exp.unrankedCol`/verbatim text, and check 7b's
+  Resolve ownership-only Asked-row pin per the §"Asked" section above;
+  remember the openRowContaining toggle contract when adding
+  row-opening checks): tab order + `?f=i` deep link,
   42/42 rows (9 Ipsos + 7 SEC + 26 VI-house), 42-of-184 tally on Issues and
   the sibling-facet tallies, Ipsos never bleeding onto
   2PP/Primary/Leaders/Direction, the redesigned row anatomy (§top: exactly
