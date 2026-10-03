@@ -660,10 +660,11 @@ body.rd .rd-pl-flip:focus-visible { outline: 2px solid var(--accent); outline-of
 body.rd .rd-pl { margin-top: 8px; font-variant-numeric: tabular-nums; }
 body.rd .rd-pl-head, body.rd .rd-pl-row {
   display: grid; column-gap: 16px; align-items: center;
+  /* one figures-track width for every facet: a per-facet width moves the
+     Releases/next timeline strip (minmax(0,1fr)) on every facet switch,
+     silently re-scaling its date->pixel map - the strip is the only flexible
+     track and it must sit still while only the figures change */
   grid-template-columns: 170px 124px 236px minmax(0, 1fr) 176px 28px;
-}
-@media (min-width: 901px) {
-  body.rd .rd-polls[data-facet="primary"] .rd-pl-head, body.rd .rd-polls[data-facet="primary"] .rd-pl-row { grid-template-columns: 170px 124px 200px minmax(0, 1fr) 176px 28px; }
 }
 body.rd .rd-pl-head {
   padding: 0 8px; min-height: 56px; align-items: end; padding-bottom: 8px;

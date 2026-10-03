@@ -1,6 +1,6 @@
 ---
 name: auspol-latest-next-polls-table
-description: "auspol-tracker — RdPolls ('Latest and next polls' section) anatomy: facet tabs (twopp/primary/leadership) via rd.jsx RdSec data-facet, 6-column desktop grid in rd.css (~:557), per-facet grid-template-columns overrides are a media-query leak hazard (@media (min-width:901px) needed), the facet RdSwap crossfade ghost must stay OUT of flow (position:absolute float, fixed 2026-09-28) or the phone's content-sized figs track snaps ~360ms in when the ghost unmounts, the DESKTOP figs cell must stretch to the row top (6142f35), and the expanded row's change markers reuse rdApChg + gen-data chg.d/r keys shared from rd-allpolls.jsx (ce17e27, 2026-09-30 — dec conventions, filtered-index trap, probe expand via $eval click on the figs cell since the name cell is a site link), and a CSS specificity trap: .rd-pld-prim > span > span (19px) swallows any new child span including .rd-apd-chg markers — fix with :not (48131ae), verify cross-table marker parity with computed-style sets since All-polls swaps classes and primary order; probe facet glitches with a per-frame rAF geometry recorder, NOT strided setTimeout samples. 2026-09-30 (9a87ded): facet figures "slow to populate" vs All-polls = RdSwap's .12s arrival delay on .rd-swap-now.in (a 120ms invisible dead zone on every tab switch) — dropped to `.2s ease-out both`; RdSwap serves ONLY this table's figs head+cells so the retime cannot touch RdCrossfade's (deliberate) identical delay, and mixed-precision primary figures (Roy Morgan's .5 halves) render the half as one ½ glyph (a one-on-two superscript form) absolutely positioned RAISED beside the integer inside .rd-pl-halfwrap, out of flow (.rd-pl-half, 9.5px/8.5px, final 2026-10-02 after two in-flow runs were measured and reverted same-day — any in-flow suffix shifts the fixed-lattice figure: desktop row gaps stutter and the phone's right-aligned figs walked every suffixed column's integers 7.3px sideways) — invisible padding inside the stretched grid cells CANNOT equalise ink gaps, and shrinking suffix ink only narrows a shift it can never zero; out-of-flow placement removes the shift entirely."
+description: "auspol-tracker — RdPolls ('Latest and next polls' section) anatomy: facet tabs (twopp/primary/leadership) via rd.jsx RdSec data-facet, 6-column desktop grid in rd.css (~:557), per-facet grid-template-columns overrides are a media-query leak hazard (@media (min-width:901px) needed), the facet RdSwap crossfade ghost must stay OUT of flow (position:absolute float, fixed 2026-09-28) or the phone's content-sized figs track snaps ~360ms in when the ghost unmounts, the DESKTOP figs cell must stretch to the row top (6142f35), and the expanded row's change markers reuse rdApChg + gen-data chg.d/r keys shared from rd-allpolls.jsx (ce17e27, 2026-09-30 — dec conventions, filtered-index trap, probe expand via $eval click on the figs cell since the name cell is a site link), and a CSS specificity trap: .rd-pld-prim > span > span (19px) swallows any new child span including .rd-apd-chg markers — fix with :not (48131ae), verify cross-table marker parity with computed-style sets since All-polls swaps classes and primary order; probe facet glitches with a per-frame rAF geometry recorder, NOT strided setTimeout samples. 2026-09-30 (9a87ded): facet figures "slow to populate" vs All-polls = RdSwap's .12s arrival delay on .rd-swap-now.in (a 120ms invisible dead zone on every tab switch) — dropped to `.2s ease-out both`; RdSwap serves ONLY this table's figs head+cells so the retime cannot touch RdCrossfade's (deliberate) identical delay, and mixed-precision primary figures (Roy Morgan's .5 halves) render the half as one ½ glyph (a one-on-two superscript form) absolutely positioned RAISED beside the integer inside .rd-pl-halfwrap, out of flow (.rd-pl-half, 9.5px/8.5px, final 2026-10-02 after two in-flow runs were measured and reverted same-day — any in-flow suffix shifts the fixed-lattice figure: desktop row gaps stutter and the phone's right-aligned figs walked every suffixed column's integers 7.3px sideways) — invisible padding inside the stretched grid cells CANNOT equalise ink gaps, and shrinking suffix ink only narrows a shift it can never zero; out-of-flow placement removes the shift entirely." 2026-10-03 (8d472e8): the All-polls rdPinScroll pinned-view contract ported in — pinPl anchors [.rd-pl, .rd-pl-tabs] TABLE FIRST (twopp-only .rd-pl-ctlrow mounts/unmounts in flow between tab row and table on ≤900px) with the fine-pointer opt-in, and every facet-changing input routed through pickFacet/flipPick/basisPick wrappers (RdTabs click+swipe, rdTabsKey arrows, hover keys now closing over live `facet` w/ deps [facet], row-nav, space/p hotkeys, flip + qpop basis switch); full recipe + probe traps in the auspol-rdpinscroll-row-pin skill, probe .matilda/probe-latest-pin.mjs ALL PASS at 480+1440.
 source: auto-skill
 extracted_at: '2026-09-28T02:47:51.147Z'
 ---
@@ -16,11 +16,17 @@ Source: `.build/newtracker/assets/rd-polls.jsx` (489 lines, plain prop of
   (`pollster|latest|next` + caret), `open` row state, `tl` tooltip state for
   the releases strip.
 - Desktop row (`.rd-pl-row`) is a 6-track CSS grid
-  (`name 170 | latest 124 | figs 236/200 | tl minmax(0,1fr) | next 176 | exp 28`),
-  declared at `rd.css:557-560`; the `tl` (releases strip) track is the only
-  flexible one. A `@media (max-width:1100px)` narrow-desktop variant and a
-  `@media (max-width:900px)` phone stacking variant follow (~:674-710): the
-  phone layout switches to `grid-template-areas: "name figs" "tl tl" "foot foot"`,
+  (`name 170 | latest 124 | figs 236 | tl minmax(0,1fr) | next 176 | exp 28`),
+  declared at `rd.css:661-667`; the `tl` (releases strip) track is the only
+  flexible one. 2026-10-03: the figs track was made UNIFORM across facets
+  (the primary facet's 200px override was deleted) — a per-facet figs width
+  shifts and re-scales the strip's date→pixel map on every facet switch, and
+  the strip must sit still while only the figures change (active design
+  principle, user-approved; it also closes the facet-override leak class
+  below by removing the override entirely). A `@media (max-width:1100px)`
+  narrow-desktop variant and a `@media (max-width:900px)` phone stacking
+  variant follow (~:674-710): the phone layout switches to
+  `grid-template-areas: "name figs" "tl tl" "foot foot"`,
   hides latest/next/exp cells, and shows `.rd-pl-foot1` instead.
 - `figHead`/`figCell` (~:172-217) swap per facet: twopp = Labor-v-rival pair
   (basis=tfff/implied), primary = 5-party `.rd-pl-prim` mini-grid (RD_PL_PARTIES),
@@ -326,3 +332,23 @@ polls table") on `detail(e)` in rd-polls.jsx. Implementation notes that hold:
   DROPS fields (`sampleEff`, `eff`, `dir`, `iss`, `releaseUrl`), so a future
   detail feature that needs one of those for a quiet house extends
   `rdPollRow`, nothing else.
+
+## The pinned-view facet walk (rdPinScroll, shipped 8d472e8 2026-10-03)
+
+User call: port the All-polls "table holds its spot while the text above
+changes" contract here. `rd-polls.jsx` declares `pinPl()` (anchors
+`[.rd-pl, .rd-pl-tabs]`, table first, `fine=true`) plus wrappers
+`pickFacet` / `flipPick` / `basisPick`, and EVERY facet-changing input
+routes through them — `RdTabs swipe value={facet} onChange={pickFacet}`,
+the rdTabsKey arrow walk, the hover ArrowLeft/Right keydown (effect
+closes over the live `facet`, deps `[facet]` — a functional `setFacet`
+form with `[]` deps was the predecessor), `rowNav`, `spaceFlip.current`/
+`pubFlip.current` hotkeys, the `.rd-pl-flip` button and the qpop
+published/implied RdSwitch. Row keys are the pollster (stable across
+facets), so a facet hop never disconnects the rows under the pin — the
+All-polls reseat hazard does not exist in this table. The anchor-order
+justification and the full probe trap list (hover-inside-a-row,
+`focus({ preventScroll: true })`) live in the
+**auspol-rdpinscroll-row-pin** skill; regression probe is
+`.matilda/probe-latest-pin.mjs` (scratch, ALL PASS at 480 touch + 1440,
+`__rdPinROn` fires ~11-13 per session, ctlrow 44px phone / 0 desktop).
