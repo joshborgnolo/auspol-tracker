@@ -190,6 +190,19 @@ try {
       const k3 = await read();
       const focused = await page.evaluate(() => document.activeElement && document.activeElement.dataset && document.activeElement.dataset.key);
       check(`${W} keyboard: Enter closes, Enter opens, ArrowDown carries it`, k1 === null && k2 && k2.name === target && k3 && k3.name === names[3] && !!focused, `${k1 && k1.name} / ${k2 && k2.name} / ${k3 && k3.name}, focus ${focused}`);
+      /* a focused row's left/right walk the Compare-with view (just as
+         hovering the section does) instead of doing nothing */
+      const cmpAt = () => page.evaluate(() => [...document.querySelectorAll('[aria-label="Compare with"] button')].findIndex((b) => b.getAttribute("aria-pressed") === "true"));
+      const c0 = await cmpAt();
+      await page.keyboard.press("ArrowRight"); await sleep(1000);
+      const c1 = await cmpAt();
+      await page.keyboard.press("ArrowLeft"); await sleep(1000);
+      const c2 = await cmpAt();
+      const stillOnRow = await page.evaluate(() => !!(document.activeElement && document.activeElement.dataset && document.activeElement.dataset.key));
+      const hash = await page.evaluate(() => location.hash);
+      check(`${W} keyboard: <-/-> on a focused row walk the compare view, focus keeps the row`, c0 === 0 && c1 === 1 && c2 === 0 && stillOnRow && hash === "#cycles", `${c0}->${c1}->${c2}, on-row ${stillOnRow}, hash ${hash}`);
+      const afterArrows = await read();
+      check(`${W} keyboard: compare walk leaves the open list intact`, afterArrows && afterArrows.name === names[3], JSON.stringify(afterArrows && afterArrows.name));
     }
     check(`${W} no page errors`, errs.length === 0, errs.slice(0, 3).join(" | "));
     await page.close();

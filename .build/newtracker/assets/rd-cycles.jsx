@@ -844,10 +844,19 @@ function RdPastCycles(p) {
     setOpenRow((o) => (o === key ? null : key));
   };
   /* Enter or space opens and closes; up and down step row to row, and an
-     open row's list travels with the focus */
+     open row's list travels with the focus. Left and right on a focused row
+     walk the table's compare view, exactly as hovering the section does:
+     the focus guards in the page-level and hover claims stand aside for a
+     focused row, so without this branch the keys died on the row. */
   const rowNav = (e, r) => {
     if (e.target !== e.currentTarget) return;
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleRow(r.key, e.currentTarget); return; }
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.defaultPrevented) return;
+      if (cmpSwipeLive.current(e.key === "ArrowRight" ? 1 : -1)) e.preventDefault();
+      return;
+    }
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
     const rows = [...e.currentTarget.closest(".rd-cs").querySelectorAll(".rd-cs-row")];
