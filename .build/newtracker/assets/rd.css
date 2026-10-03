@@ -1660,6 +1660,13 @@ body.rd .rd-cc-pill button { all: unset; cursor: pointer; width: 26px; height: 2
 body.rd .rd-cc-pill button:hover { background: var(--surface-2); color: var(--ink); }
 @media (max-width: 640px) {
   body.rd .rd-cyc-chipmove .rd-chip, body.rd .rd-cc-pill { font-size: 13.3px; }
+  /* phone: the summary controls row's contents measure 544.7px against a
+     320-387px row, so it cannot sit on one line (hide-label + pad trims
+     still wants 408px). The label steps out - its drawn-terms sibling
+     already hides at :112 - and the 1px separator goes with it, or it
+     dangles at the end of line one. The two tab groups then wrap to two
+     tidy rows: term chips, then Level/Change */
+  body.rd .rd-cc-row > .rd-cc-l, body.rd .rd-cc-row > .rd-cc-sep { display: none; }
 }
 body.rd .rd-cc-rule { display: inline-block; width: 14px; height: 3px; border-radius: 2px; }
 body.rd .rd-cc-board {
