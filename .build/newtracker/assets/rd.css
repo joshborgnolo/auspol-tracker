@@ -652,6 +652,13 @@ body.rd .rd-pl-dek { margin-top: 12px; font-size: 17px; }
 @media (max-width: 640px) { body.rd .rd-pl-dek { font-size: 15px; } }
 body.rd .rd-pl-tabs { margin-top: 24px; }
 body.rd .rd-pl-ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-3); white-space: nowrap; }
+/* in a tab row the controls stand on the tabs' own foot: the flip's 44px
+   tap height without the tab's -1px margin ran the row 1px taller on 2PP
+   alone, so every hop into 2PP set the table down 1px and every hop out
+   lifted it back - under rdPinScroll's 3px correction floor, so the pin
+   kept the nudge (Latest polls, All polls and House lean all carry these
+   controls in their tab row) */
+body.rd .rd-tabs > .rd-pl-ctl { margin-bottom: -1px; }
 body.rd .rd-pl-ctl-l { color: var(--ink-3); }
 body.rd .rd-pl-flip { all: unset; cursor: pointer; font-weight: 600; color: var(--ink); min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }
 body.rd .rd-pl-flip span { color: var(--ink-3); font-weight: 400; }
@@ -825,6 +832,13 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
   body.rd .rd-pl-tlcap { display: none; }
   body.rd .rd-pl-row {
     grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name figs" "tl tl" "foot foot";
+    /* the name-and-figures line keeps one height in every facet. 2PP's
+       figures stack - the 17px figure line at the page's 1.45, the 2px stack
+       gap, the 12px sub line at 1.35 - stands 2.9px taller than the name
+       stack that sets the line in Primary, so on every switch into 2PP each
+       row below the first slid 2.9px further down than the one above it.
+       The floor is that stack: change one, change the other */
+    grid-template-rows: minmax(calc(17px * 1.45 + 2px + 12px * 1.35), auto) auto auto;
     padding: 12px 0; column-gap: 12px; row-gap: 6px;
   }
   body.rd .rd-pl-row:hover { background: none; }

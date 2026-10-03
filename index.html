@@ -3482,6 +3482,7 @@ body.rd .rd-pl-dek { margin-top: 12px; font-size: 17px; }
 @media (max-width: 640px) { body.rd .rd-pl-dek { font-size: 15px; } }
 body.rd .rd-pl-tabs { margin-top: 24px; }
 body.rd .rd-pl-ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-tabs > .rd-pl-ctl { margin-bottom: -1px; }
 body.rd .rd-pl-ctl-l { color: var(--ink-3); }
 body.rd .rd-pl-flip { all: unset; cursor: pointer; font-weight: 600; color: var(--ink); min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }
 body.rd .rd-pl-flip span { color: var(--ink-3); font-weight: 400; }
@@ -3620,6 +3621,7 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
   body.rd .rd-pl-tlcap { display: none; }
   body.rd .rd-pl-row {
     grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name figs" "tl tl" "foot foot";
+    grid-template-rows: minmax(calc(17px * 1.45 + 2px + 12px * 1.35), auto) auto auto;
     padding: 12px 0; column-gap: 12px; row-gap: 6px;
   }
   body.rd .rd-pl-row:hover { background: none; }
