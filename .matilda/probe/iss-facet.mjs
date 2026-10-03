@@ -232,7 +232,7 @@ check("a row naming a 2nd or 3rd issue always fills its top-issue cell",
   rowAnatomy.runnerNoTop.length === 0, `rows off: ${rowAnatomy.runnerNoTop.join(",") || "none"}`);
 check("the column head names the scale the strip draws on",
   rowAnatomy.head.includes("2nd") && rowAnatomy.head.includes("3rd")
-    && rowAnatomy.headCap === "Best on it"
+    && rowAnatomy.headCap === "Best on top issue"
     && rowAnatomy.headTk === 4,
   rowAnatomy.headCap + ` · ticks ${rowAnatomy.headTk}`);
 
@@ -404,12 +404,19 @@ await showAll(page3);
 const cardAnatomy = await page3.evaluate(() => {
   const cards = [...document.querySelectorAll(".rd-ap-card")];
   const an = cards.map((c) => {
-    const runnerSub = [...c.querySelectorAll(".rd-ap-csub")].find((d) => /^2nd /.test(d.textContent)) || null;
+    const subs = [...c.querySelectorAll(".rd-ap-csub")];
+    const runnerSub = subs.find((d) => /^2nd /.test(d.textContent)) || null;
     const txt = runnerSub ? runnerSub.textContent.trim().replace(/\s+/g, " ") : "";
     const digitFigs = runnerSub ? [...runnerSub.querySelectorAll("b")].filter((b) => /\d/.test(b.textContent || "")).length : 0;
     const runnerOk = !runnerSub || (/^2nd [^·]+?\d/.test(txt) && (!/3rd/.test(txt) || / · 3rd [^·]+?\d/.test(txt)) && digitFigs >= 1);
-    const topFilled = /\d/.test((c.querySelector(".rd-ap-pairfig") || {}).textContent || "");
-    return { nxt: !!runnerSub, runnerOk, topFilled, dots: c.querySelectorAll(".rd-ap-cpic .rd-ap-pic .rd-ap-dot").length };
+    // the top-issue figure now lives ONLY in the first csub - the head
+    // row's pairfig died with the dot strip's move into it (a csub whose
+    // text is "Best on it: …" is the verdict line, not the top issue)
+    const topSub = subs.find((d) => !/^2nd /.test(d.textContent) && !/^Best on it/.test(d.textContent)) || null;
+    const topFilled = !!topSub && /\d/.test(topSub.textContent);
+    const noPair = !c.querySelector(".rd-ap-c1 .rd-ap-pairfig");
+    const headStrip = !!c.querySelector(".rd-ap-c1 > .rd-ap-cpic");
+    return { nxt: !!runnerSub, runnerOk, topFilled, noPair, headStrip, dots: c.querySelectorAll(".rd-ap-c1 > .rd-ap-cpic .rd-ap-pic .rd-ap-dot").length };
   });
   return {
     cardsN: cards.length,
@@ -418,32 +425,36 @@ const cardAnatomy = await page3.evaluate(() => {
     badNxt: an.filter((a) => !a.runnerOk).length,
     withDots: an.filter((a) => a.dots > 0).length,
     badDots: an.filter((a) => a.dots > 0 && (a.dots < 2 || a.dots > 4)).length,
+    strayPairs: an.filter((a) => a.dots > 0 && !a.noPair).length,
+    stripAdrift: an.filter((a) => a.dots > 0 && !a.headStrip).length,
+    loneStrips: an.filter((a) => a.dots === 0 && a.headStrip).length,
     ipsos: cards.filter((c) => /Ipsos/.test(c.textContent)).length,
   };
 });
 check("phone: the 2nd/3rd csub keeps its figures beside the issue names, under a filled top issue",
   cardAnatomy.withNxt > 0 && cardAnatomy.nxtNoTop === 0 && cardAnatomy.badNxt === 0,
   `${cardAnatomy.withNxt}/${cardAnatomy.cardsN} with the csub; topless ${cardAnatomy.nxtNoTop}; bad ${cardAnatomy.badNxt}`);
-check("phone: the ownership dot strip rides the cards whose wave asked the question",
-  cardAnatomy.withDots > 0 && cardAnatomy.badDots === 0,
-  `${cardAnatomy.withDots}/${cardAnatomy.cardsN} cards dotted, ${cardAnatomy.badDots} malformed`);
+check("phone: the ownership dot strip rides the HEAD ROW of the cards whose wave asked the question",
+  cardAnatomy.withDots > 0 && cardAnatomy.badDots === 0 && cardAnatomy.stripAdrift === 0 && cardAnatomy.loneStrips === 0,
+  `${cardAnatomy.withDots}/${cardAnatomy.cardsN} cards dotted, ${cardAnatomy.badDots} malformed, ${cardAnatomy.stripAdrift} strips outside .rd-ap-c1, ${cardAnatomy.loneStrips} strips without dots`);
+check("phone: the top-issue share is not reprinted beside the firm (the csub already names it)",
+  cardAnatomy.strayPairs === 0, `${cardAnatomy.strayPairs} head-row pairfigs left`);
 check("phone: the Ipsos cards are there", cardAnatomy.ipsos === exp.issOnly, `${cardAnatomy.ipsos}/${exp.issOnly}`);
 
 const ipPhone = await openRowContaining(page3, /^Ipsos/);
 check("phone: an opened Ipsos card stacks to one column with the salience grid",
   !!ipPhone && ipPhone.issRows >= 5 && /Asked/.test(ipPhone.rail) && !/Labor’s/.test(ipPhone.rail),
   ipPhone ? `${ipPhone.issRows} iss rows` : "no detail");
-// The phone pinned head runs the same scale grammar as desktop: the
-// caption names the dot strip's measure; the 0-30 tick ladder sits under it
-// (the pdx scale still runs to 45, so a share over 30 draws past the last
-// line - the sanctioned overflow).
+// The phone pinned head is caption-only on Issues now (direction's
+// grammar): the per-card strips sit in the head rows at compact width, so
+// a pinned full-width tick ladder would align with no card's scale.
 const phoneHead = await page3.evaluate(() => {
   const ph = document.querySelector(".rd-ap-phead");
   if (!ph) return { cap: "", ticks: 0 };
   return { cap: (ph.querySelector(".rd-ap-cap") || {}).textContent || "", ticks: ph.querySelectorAll(".rd-ap-tk").length };
 });
-check("phone: the pinned head carries the issues scale caption and 0-30 ticks",
-  phoneHead.cap === "Best on the top issue, %" && phoneHead.ticks === 4,
+check("phone: the pinned head carries the issues caption, ticks gone with the per-card strips' move",
+  phoneHead.cap === "Best on the top issue, %" && phoneHead.ticks === 0,
   JSON.stringify(phoneHead));
 check("no page errors on the phone rung", errs3.length === 0, errs3[0] || "");
 await page3.close();
