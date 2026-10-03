@@ -4280,7 +4280,8 @@ body.rd .rd-cc-now { font-size: 11px; font-weight: 600; color: var(--bg); backgr
 body.rd .rd-cc-x { all: unset; cursor: pointer; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; color: var(--ink-3); font-size: 15px; }
 body.rd .rd-cc-x:hover { background: var(--line-2); color: var(--ink); }
 body.rd .rd-cs { margin-top: 24px; font-variant-numeric: tabular-nums; }
-body.rd .rd-cs-head, body.rd .rd-cs-row, body.rd .rd-cs-group {
+body.rd .rd-cs-head, body.rd .rd-cs-row, body.rd .rd-cs-group,
+body.rd .rd-csl-head, body.rd .rd-csl-row, body.rd .rd-csl-bg {
   display: grid; grid-template-columns: 220px 90px minmax(0, 1fr) 130px 190px 36px; column-gap: 16px; align-items: center;
 }
 body.rd .rd-cs-head { min-height: 36px; border-bottom: 1.5px solid var(--ink-2); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
@@ -4317,8 +4318,95 @@ body.rd .rd-cs-avg, body.rd .rd-cs-rank { display: flex; flex-direction: column;
 body.rd .rd-cs-avg b, body.rd .rd-cs-rank b { font-size: 15px; font-weight: 600; color: var(--ink); }
 body.rd .rd-cs-rank b { font-weight: 400; }
 body.rd .rd-cs-rank.strong b { font-weight: 600; }
-body.rd .rd-cs-go { all: unset; cursor: pointer; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--ink-3); }
-body.rd .rd-cs-go:hover { background: var(--surface-2); color: var(--ink); }
+body.rd .rd-cs-row { cursor: pointer; }
+body.rd .rd-cs-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+body.rd .rd-cs-item.open > .rd-cs-row, body.rd .rd-csl {
+  background: var(--surface-2); box-shadow: -12px 0 0 var(--surface-2), 12px 0 0 var(--surface-2);
+}
+@media (hover: hover) {
+  body.rd .rd-cs-row:hover { background: var(--surface-2); box-shadow: -12px 0 0 var(--surface-2), 12px 0 0 var(--surface-2); }
+}
+body.rd .rd-cs-item.open > .rd-cs-row { border-bottom-color: transparent; }
+body.rd .rd-cs-c-exp { display: flex; justify-content: center; }
+body.rd .rd-cs-exp {
+  all: unset; box-sizing: border-box; cursor: pointer; width: 28px; height: 28px; border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center; color: var(--ink-3);
+  transition: transform .15s ease;
+}
+body.rd .rd-cs-exp.open { transform: rotate(90deg); color: var(--ink); }
+body.rd .rd-cs-exp svg { display: block; fill: currentColor; }
+body.rd .rd-cs-row:hover .rd-cs-exp { color: var(--ink); }
+body.rd .rd-cs-exp:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+body.rd .rd-cs-hint { color: var(--ink-3); }
+body.rd .rd-csl { padding: 4px 0 18px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink-2); cursor: default; }
+body.rd .rd-csl-pn { margin: 6px 0 2px; font-size: 12px; line-height: 1.45; color: var(--ink-3); max-width: 760px; }
+body.rd .rd-csl-head { position: relative; min-height: 30px; align-items: end; padding-bottom: 4px; font-size: 12px; color: var(--ink-3); }
+body.rd .rd-csl-go { position: absolute; right: 0; bottom: 4px; min-height: 0; padding: 0; font-size: 13px; line-height: 17px; }
+body.rd .rd-csl-h { grid-column: 1 / 3; white-space: nowrap; }
+body.rd .rd-csl-h b { font-weight: 600; color: var(--ink); }
+body.rd .rd-csl-nxh { grid-column: 4 / 6; white-space: nowrap; }
+body.rd .rd-csl-scale { position: relative; height: 16px; grid-column: 3; }
+body.rd .rd-csl-scale > span { position: absolute; bottom: 0; transform: translateX(-50%); white-space: nowrap; }
+body.rd .rd-csl-scale > span.last { transform: translateX(-100%); }
+body.rd .rd-csl-list { position: relative; }
+body.rd .rd-csl-bg { position: absolute; inset: 0; align-items: stretch; pointer-events: none; }
+body.rd .rd-csl-bgt { grid-column: 3; position: relative; }
+body.rd .rd-csl-bgt > i { position: absolute; top: 0; bottom: 0; }
+body.rd .rd-csl-gl { border-left: 1px solid var(--line-2); }
+body.rd .rd-csl-b80 { background: var(--ink-3); opacity: 0.07; }
+body.rd .rd-csl-b50 { background: var(--ink-3); opacity: 0.11; }
+body.rd .rd-csl-mean { width: 0; border-left: 1.5px solid var(--ink-2); opacity: 0.7; transform: translateX(-0.75px); }
+body.rd .rd-csl-row {
+  position: absolute; left: 0; right: 0; top: 0; height: 26px;
+  transition: transform .32s var(--morph-ease);
+}
+body.rd .rd-csl-row.on { background: color-mix(in oklch, var(--ink) 5%, transparent); }
+body.rd .rd-csl-row.cur { background: color-mix(in oklch, var(--ink) 4%, transparent); }
+body.rd .rd-csl-name { display: flex; align-items: baseline; gap: 6px; min-width: 0; white-space: nowrap; }
+body.rd .rd-csl-k { display: inline-block; min-width: 18px; text-align: right; font-size: 11px; color: var(--ink-faint); }
+body.rd .rd-csl-pty { display: inline-block; flex: none; width: 3px; height: 12px; border-radius: 1.5px; align-self: center; }
+body.rd .rd-csl-name b { font-size: 14px; font-weight: 500; color: var(--ink); overflow: hidden; text-overflow: ellipsis; }
+body.rd .rd-csl-row.cur .rd-csl-name b, body.rd .rd-csr-row.cur .rd-csl-name b { font-weight: 700; }
+body.rd .rd-csl-yr { font-size: 12px; color: var(--ink-3); }
+body.rd .rd-csl-v { text-align: right; font-size: 14px; color: var(--ink); }
+body.rd .rd-csl-row.cur .rd-csl-v { font-weight: 700; }
+body.rd .rd-csl-ip { color: var(--ink-3); margin-right: 2px; }
+body.rd .rd-csl-trk { position: relative; align-self: stretch; }
+body.rd .rd-csl-dot { position: absolute; top: 50%; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); transform: translate(-50%, -50%); transition: left .32s var(--morph-ease); z-index: 1; }
+body.rd .rd-csl-row.on .rd-csl-dot { background: var(--ink); width: 9px; height: 9px; }
+body.rd .rd-csl-dot.cur { width: 11px; height: 11px; box-shadow: 0 0 0 2px var(--surface-2); z-index: 2; }
+body.rd .rd-csl-ring { position: absolute; top: 50%; width: 7px; height: 7px; box-sizing: border-box; border: 1.5px solid var(--ink-3); border-radius: 50%; background: var(--surface-2); transform: translate(-50%, -50%); transition: left .32s var(--morph-ease); }
+body.rd .rd-csl-ring.key { position: static; display: inline-block; transform: none; margin-right: 6px; vertical-align: -0.5px; }
+body.rd .rd-csl-run { position: absolute; top: 50%; height: 0; border-top: 1px solid var(--ink-faint); opacity: 0.7; transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
+body.rd .rd-csl-row.on .rd-csl-ring { border-color: var(--ink); }
+body.rd .rd-csl-row.on .rd-csl-run { border-top-color: var(--ink-2); opacity: 1; }
+body.rd .rd-csl-el { font-size: 13px; color: var(--ink-2); }
+body.rd .rd-csl-oc { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-csl-under { font-size: 12px; color: var(--ink-faint); }
+body.rd .rd-csr-oc .rd-csl-under { font-size: 12px; }
+body.rd .rd-csl-row.cur .rd-csl-oc { color: var(--ink-2); }
+body.rd .rd-csl-list.unroll .rd-csl-row { animation: rd-csl-unroll .42s var(--morph-ease) both; animation-delay: calc(var(--k) * 8ms); }
+@keyframes rd-csl-unroll { from { transform: translateY(-26px); opacity: 0; } }
+body.rd .rd-csr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; margin-top: 22px; }
+body.rd .rd-csr.one { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+body.rd .rd-csr-h { font-size: 12px; font-weight: 600; color: var(--ink); padding-bottom: 6px; border-bottom: 1px solid var(--line); margin-bottom: 2px; }
+body.rd .rd-csr-row { display: grid; grid-template-columns: 18px minmax(0, 1fr) 52px 152px 128px; column-gap: 10px; align-items: baseline; min-height: 26px; padding: 3px 0; }
+body.rd .rd-csr-row .rd-csl-k { min-width: 0; }
+body.rd .rd-csr-row.cur { background: color-mix(in oklch, var(--ink) 4%, transparent); box-shadow: -6px 0 0 color-mix(in oklch, var(--ink) 4%, transparent), 6px 0 0 color-mix(in oklch, var(--ink) 4%, transparent); }
+body.rd .rd-csr-v { text-align: right; font-size: 14px; color: var(--ink); }
+body.rd .rd-csr-row.cur .rd-csr-v { font-weight: 700; }
+body.rd .rd-csr-when { color: var(--ink-2); white-space: nowrap; }
+body.rd .rd-csr-mo { color: var(--ink-3); }
+body.rd .rd-csr-oc { color: var(--ink-3); line-height: 1.25; }
+body.rd .rd-csr-oc .rd-csl-under { display: block; }
+body.rd .rd-csr-gap { height: 10px; margin: 0 0 2px 28px; border-bottom: 1px dashed var(--line); }
+body.rd .rd-csl-foot { margin-top: 16px; }
+body.rd .rd-csl-notes { display: flex; flex-direction: column; gap: 2px; flex: 1; font-size: 12px; line-height: 1.45; color: var(--ink-3); max-width: 760px; }
+@media (prefers-reduced-motion: reduce) {
+  body.rd .rd-csl-row, body.rd .rd-csl-dot, body.rd .rd-csl-ring, body.rd .rd-csl-run { transition: none; }
+  body.rd .rd-csl-list.unroll .rd-csl-row { animation: none; }
+}
+}
 body.rd .rd-cs-key { margin-top: 14px; }
 body.rd .rd-cs-keyband { display: inline-block; position: relative; width: 26px; height: 14px; background: var(--ink-3); opacity: 0.35; }
 body.rd .rd-cs-keyband i { position: absolute; left: 6px; right: 6px; top: 0; bottom: 0; background: var(--ink-3); }
@@ -4380,7 +4468,10 @@ body.rd .rd-acc-fv { font-size: 24px; font-weight: 500; color: var(--ink); font-
 body.rd .rd-acc-fv small { font-size: 13px; color: var(--ink-3); }
 body.rd .rd-acc-firm > span:last-child { font-size: 12px; color: var(--ink-3); }
 @media (max-width: 1100px) {
-  body.rd .rd-cs-head, body.rd .rd-cs-row, body.rd .rd-cs-group { grid-template-columns: 180px 76px minmax(0, 1fr) 120px 150px 32px; column-gap: 12px; }
+  body.rd .rd-cs-head, body.rd .rd-cs-row, body.rd .rd-cs-group,
+  body.rd .rd-csl-head, body.rd .rd-csl-row, body.rd .rd-csl-bg { grid-template-columns: 180px 76px minmax(0, 1fr) 120px 150px 32px; column-gap: 12px; }
+  body.rd .rd-csr-row { grid-template-columns: 18px minmax(0, 1fr) 50px 72px 128px; }
+  body.rd .rd-csr-mo { display: none; }
   body.rd .rd-acc-firms { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 16px; }
 }
 @media (max-width: 900px) {
@@ -4394,7 +4485,16 @@ body.rd .rd-acc-firm > span:last-child { font-size: 12px; color: var(--ink-3); }
   body.rd .rd-cs-name { grid-area: name; } body.rd .rd-cs-row .rd-cs-now { grid-area: now; }
   body.rd .rd-cs-strip { grid-area: strip; } body.rd .rd-cs-avg { grid-area: avg; }
   body.rd .rd-cs-rank { grid-row: 3; grid-column: 1 / -1; text-align: right; }
-  body.rd .rd-cs-go { display: none; }
+  body.rd .rd-cs-c-exp { display: none; }
+  body.rd .rd-csl-head, body.rd .rd-csl-row, body.rd .rd-csl-bg { grid-template-columns: minmax(0, 160px) 52px minmax(0, 1fr) 56px 156px; column-gap: 12px; }
+  body.rd .rd-csl { padding-top: 0; }
+  body.rd .rd-csl-h { white-space: normal; }
+  body.rd .rd-csl-go { position: static; grid-column: 1 / -1; grid-row: 1; justify-self: end; min-height: 40px; }
+  body.rd .rd-csl-hs { display: block; }
+  body.rd .rd-csl-sep { display: none; }
+  body.rd .rd-csr, body.rd .rd-csr.one { grid-template-columns: minmax(0, 1fr); row-gap: 20px; }
+  body.rd .rd-csr-row { grid-template-columns: 18px minmax(0, 1fr) 48px 160px 132px; column-gap: 8px; }
+  body.rd .rd-csr-mo { display: inline; }
   body.rd .rd-cyc-two { grid-template-columns: minmax(0, 1fr); row-gap: 28px; }
   body.rd .rd-acc-head, body.rd .rd-acc-row { grid-template-columns: 64px minmax(0, 1fr) 44px; column-gap: 8px; }
   body.rd .rd-acc-head > span:last-child, body.rd .rd-acc-n { display: none; }
@@ -4403,6 +4503,26 @@ body.rd .rd-acc-firm > span:last-child { font-size: 12px; color: var(--ink-3); }
   body.rd .rd-acc-firms { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 body.rd .rd-cs-head .rd-cs-now { font-size: 12px; font-weight: 600; }
+@media (max-width: 640px) {
+  body.rd .rd-csl-head, body.rd .rd-csl-row, body.rd .rd-csl-bg { grid-template-columns: minmax(0, 120px) 38px minmax(0, 1fr) 70px; column-gap: 6px; }
+  body.rd .rd-csl-row { height: 30px; }
+  body.rd .rd-csl-oc { line-height: 1.15; }
+  body.rd .rd-csl-under, body.rd .rd-csr-oc .rd-csl-under { display: block; font-size: 10px; white-space: nowrap; }
+  body.rd .rd-csl-el, body.rd .rd-csl-nxh { display: none; }
+  body.rd .rd-csl-scale > span.odd { display: none; }
+  body.rd .rd-csl-name { gap: 5px; }
+  body.rd .rd-csl-k { min-width: 14px; font-size: 10px; }
+  body.rd .rd-csl-name b { font-size: 13px; }
+  body.rd .rd-csl-yr { font-size: 11px; }
+  body.rd .rd-csl-row.cur .rd-csl-yr { display: none; }
+  body.rd .rd-csl-v { font-size: 13px; }
+  body.rd .rd-csl-oc { font-size: 12px; }
+  body.rd .rd-csr { grid-template-columns: minmax(0, 1fr); row-gap: 20px; }
+  body.rd .rd-csr.one { grid-template-columns: minmax(0, 1fr); }
+  body.rd .rd-csr-row { grid-template-columns: 14px minmax(0, 1fr) 40px 62px 70px; column-gap: 6px; font-size: 12px; align-items: center; }
+  body.rd .rd-csr-oc { line-height: 1.15; }
+  body.rd .rd-csr-mo { display: none; }
+  body.rd .rd-csr-v { font-size: 13px; }
 body.rd .rd-cyc-chart .rd-chead { min-height: 44px; }
 body.rd .rd-cyc-csv { display: inline-flex; gap: 6px; }
 body.rd {
@@ -78546,7 +78666,7 @@ function RdCycleChart({
     openKey: evt && evt.e ? evt.e.badgeKey : null
   }));
 }
-const combSeries = c => c.raw.months.map((_, i) => c.raw.oppr[i] != null && (c.raw.onp || [])[i] != null ? +(c.raw.oppr[i] + c.raw.onp[i]).toFixed(2) : null);
+const combSeries = c => c.raw.months.map((_, i) => c.opp === "lnp" && c.raw.oppr[i] != null && (c.raw.onp || [])[i] != null ? +(c.raw.oppr[i] + c.raw.onp[i]).toFixed(2) : null);
 const seriesOf = (c, key) => key === "comb" ? combSeries(c) : c.raw[key] || [];
 const cycBaseOf = (c, key) => key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : cycBase(c, key);
 function rdCycPeers(M, cycles, hidden, chg, m) {
@@ -78606,6 +78726,86 @@ function rdCycRank(peers, v, fmt) {
     sub: loR === 2 ? "Only " + rdCycHolderTag(peers, low) + " was lower" : null
   };
 }
+const RD_CSL_ROW = 26,
+  RD_CSL_ROW_PHONE = 30;
+const rdCycWhen = (c, m) => {
+  const [y, mo] = c.eDate.split("-").map(Number);
+  const t = mo - 1 + Math.max(0, m);
+  return window.AP.D.monthName(t % 12 + 1) + " " + (y + Math.floor(t / 12));
+};
+function rdCycPolled(c, key, i) {
+  const o = c.raw.obs || {};
+  if (key === "comb") return !!(o.oppr || [])[i] && c.raw.onp != null && c.raw.onp[i] != null && (!!(o.onp || [])[i] || c.raw.onp[i] === 0);
+  if (!o[key]) return seriesOf(c, key)[i] != null;
+  return !!o[key][i];
+}
+function rdCycRecords(cycles, hidden, chg, spec) {
+  const {
+    M,
+    key,
+    curKey,
+    whoOf,
+    people,
+    positive
+  } = spec;
+  const all = [];
+  cycles.forEach(c => {
+    if (!c.current && hidden.has(c.year)) return;
+    const k = c.current ? curKey : key;
+    const vals = seriesOf(c, k);
+    if (!vals.some(v => v != null)) return;
+    const base = cycBaseOf(c, k);
+    const by = new Map();
+    c.raw.months.forEach((mo, i) => {
+      if (mo <= 0 || vals[i] == null || !rdCycPolled(c, k, i)) return;
+      if (positive && !(vals[i] > 0)) return;
+      const who = whoOf && whoOf(c) || cycHolderAt(c, M, mo);
+      const v = chg ? +(vals[i] - base).toFixed(2) : vals[i];
+      const g = people ? who : "";
+      let e = by.get(g);
+      if (!e) by.set(g, e = {
+        lo: null,
+        hi: null
+      });
+      const at = {
+        v,
+        m: mo,
+        who,
+        yr: c.year,
+        c,
+        cur: !!c.current
+      };
+      if (!e.lo || v < e.lo.v) e.lo = at;
+      if (!e.hi || v > e.hi.v) e.hi = at;
+    });
+    by.forEach(e => all.push(e));
+  });
+  if (!all.length) return null;
+  return {
+    lows: all.map(e => e.lo).sort((a, b) => a.v - b.v || a.yr - b.yr),
+    highs: all.map(e => e.hi).sort((a, b) => b.v - a.v || a.yr - b.yr)
+  };
+}
+const rdCycEndLeader = (c, opp) => {
+  const own = sitting(String(opp ? c.oppLead : c.pm));
+  const other = String(opp ? c.pm : c.oppLead).split(/\s*\u2192\s*/);
+  return other.slice(0, -1).includes(own) ? sitting(String(opp ? c.pm : c.oppLead)) : own;
+};
+function RdCsUnroll({
+  className,
+  style,
+  children
+}) {
+  const [fresh, setFresh] = useState(true);
+  React.useEffect(() => {
+    const t = setTimeout(() => setFresh(false), 900);
+    return () => clearTimeout(t);
+  }, []);
+  return React.createElement("div", {
+    className: className + (fresh ? " unroll" : ""),
+    style: style
+  }, children);
+}
 function RdPastCycles(p) {
   const {
     cycles,
@@ -78643,6 +78843,8 @@ function RdPastCycles(p) {
     sheet: null
   });
   const [tip, setTip] = useState(null);
+  const [openRow, setOpenRow] = useState(null);
+  const [lit, setLit] = useState(null);
   const storySlotRef = React.useRef(null),
     storyVarRef = React.useRef(null);
   const [storyFloor, setStoryFloor] = useState(0);
@@ -78737,7 +78939,7 @@ function RdPastCycles(p) {
     leader: "opp",
     unit: ""
   };
-  const endOfKey = (c, key) => key === "comb" ? c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null : c.end[key];
+  const endOfKey = (c, key) => key === "comb" ? c.opp === "lnp" && c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null : c.end[key];
   const curOfS = (key, c2) => {
     const v = endOfKey(cur, key);
     return v == null ? null : c2 ? v - cycBaseOf(cur, key) : v;
@@ -79035,6 +79237,275 @@ function RdPastCycles(p) {
     oppnet: "cyc-leaders",
     han: "cyc-leaders"
   };
+  const toggleRow = (key, el) => {
+    if (el) rdPinScroll(el, true);
+    setLit(null);
+    setOpenRow(o => o === key ? null : key);
+  };
+  const rowNav = (e, r) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleRow(r.key, e.currentTarget);
+      return;
+    }
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const rows = [...e.currentTarget.closest(".rd-cs").querySelectorAll(".rd-cs-row")];
+    const nx = rows[rows.indexOf(e.currentTarget) + (e.key === "ArrowDown" ? 1 : -1)];
+    if (!nx) return;
+    if (openRow === r.key) toggleRow(nx.dataset.key, nx);
+    nx.focus();
+  };
+  const CSL_EL = {
+    tpp: true,
+    primary: true,
+    oppr: true
+  };
+  const ladderOf = r => {
+    const M = Mby[r.key],
+      P = r.peers,
+      g = r.group,
+      sc = SC[g];
+    if (!P && r.v == null) return null;
+    const opp = M.leader === "opp";
+    const partyOf = c => D.PARTIES[opp ? c.opp : c.gov].color;
+    const ocOf = c => {
+      const oc = outcomeOf(cycles.indexOf(c));
+      return !oc ? null : opp ? oc === "ousted" ? "Won" : "Lost" : oc === "returned" ? "Re-elected" : "Ousted";
+    };
+    const ocCell = (c, who) => {
+      const w = ocOf(c);
+      if (!w) return null;
+      const by = rdCycEndLeader(c, opp);
+      return by && by !== who ? React.createElement(React.Fragment, null, w, React.createElement("span", {
+        className: "rd-csl-under"
+      }, " under ", by)) : w;
+    };
+    const hasEl = !!CSL_EL[M.key];
+    const elOf = c => hasEl && c.endRes && c.endRes[M.key] != null ? chg ? c.endRes[M.key] - cycBaseOf(c, M.key) : c.endRes[M.key] : null;
+    const polledAt = c => {
+      const i = c.raw.months.indexOf(m);
+      return i >= 0 && rdCycPolled(c, M.key, i);
+    };
+    const curWho = r.key === "onp" ? "One Nation" : r.key === "han" ? "Hanson" : r.key === "comb" ? "L/NP + ON" : cycHolderAt(cur, M, m);
+    const curFirst = !!(r.rank && /highest/i.test(r.rank.main));
+    const rowH = narrow ? RD_CSL_ROW_PHONE : RD_CSL_ROW;
+    const list = (P ? P.vals.map(q => ({
+      ...q,
+      el: elOf(q.c),
+      polled: polledAt(q.c)
+    })) : []).concat(r.v != null ? [{
+      v: r.v,
+      who: curWho,
+      yr: cur.year,
+      c: cur,
+      cur: true
+    }] : []).sort((a, b) => b.v - a.v || (a.cur ? curFirst ? -1 : 1 : b.cur ? curFirst ? 1 : -1 : a.yr - b.yr));
+    const tipYr = tip && tip.key === r.key && P && P.vals[tip.i] ? P.vals[tip.i].yr : null;
+    const setWords = (compare === "all" ? "All " : "") + list.length + " terms";
+    const onpOwn = r.key === "onp";
+    const spec = onpOwn ? {
+      M,
+      key: "onp",
+      curKey: "onp",
+      whoOf: () => "One Nation",
+      people: false,
+      positive: true
+    } : {
+      M,
+      key: M.key,
+      curKey: r.key,
+      people: g === "leaders",
+      whoOf: r.key === "han" || r.key === "comb" ? c => c.current ? curWho : null : null
+    };
+    const recs = rdCycRecords(cycles, hidden, chg, spec);
+    const recTitle = lo => (chg ? (lo ? "Furthest below " : "Furthest above ") + (g === "leaders" ? "the term’s first reading" : onpOwn ? "its election result" : "the election result") : (onpOwn ? "One Nation’s own highs" : lo ? "Lowest" : "Highest") + " at any point in a term") + tail;
+    const recRow = (e, i) => React.createElement("div", {
+      key: e.yr + "|" + e.who,
+      className: "rd-csr-row" + (e.cur ? " cur" : "")
+    }, React.createElement("span", {
+      className: "rd-csl-k"
+    }, i + 1), React.createElement("span", {
+      className: "rd-csl-name"
+    }, React.createElement("i", {
+      className: "rd-csl-pty",
+      style: {
+        background: e.cur ? r.color : onpOwn ? D.PARTIES.onp.color : partyOf(e.c)
+      }
+    }), React.createElement("b", null, e.who), React.createElement("span", {
+      className: "rd-csl-yr"
+    }, e.yr)), React.createElement("span", {
+      className: "rd-csr-v",
+      style: e.cur ? {
+        color: inkOf(r.color)
+      } : null
+    }, r.fmt(e.v)), React.createElement("span", {
+      className: "rd-csr-when"
+    }, e.cur && e.m === m ? "Now" : rdCycWhen(e.c, e.m), React.createElement("span", {
+      className: "rd-csr-mo"
+    }, ", ", e.m, " ", e.m === 1 ? "month" : "months", " in")), React.createElement("span", {
+      className: "rd-csr-oc"
+    }, e.cur ? "This term" : onpOwn ? "" : ocCell(e.c, e.who)));
+    const recList = (rows, lo) => {
+      const pins = rows.map((e, i) => e.cur && i >= 5 ? i : -1).filter(i => i >= 0);
+      return React.createElement("div", {
+        className: "rd-csr-list"
+      }, React.createElement("div", {
+        className: "rd-csr-h"
+      }, recTitle(lo)), rows.slice(0, 5).map(recRow), pins.length > 0 && React.createElement("div", {
+        className: "rd-csr-gap",
+        "aria-hidden": "true"
+      }), pins.map(i => recRow(rows[i], i)));
+    };
+    const firstOnp = onpOwn && recs ? recs.highs.reduce((a, e) => {
+      const i = e.c.raw.months.findIndex((mo, j) => mo > 0 && e.c.raw.onp[j] > 0 && rdCycPolled(e.c, "onp", j));
+      return i >= 0 && (!a || e.c.year < a.c.year) ? {
+        c: e.c,
+        m: e.c.raw.months[i]
+      } : a;
+    }, null) : null;
+    const peerNote = onpOwn ? "One Nation has never been the opposition, so it is ranked against past oppositions’ primary votes." : r.key === "han" ? "No past term rated Hanson, so she is ranked against past opposition leaders’ net approval, and her ratings join their records." : r.key === "comb" ? (() => {
+      const gone = cycles.filter(c => !c.current && c.opp === "lnp" && !seriesOf(c, "comb").some(v => v != null)).map(c => c.year);
+      return "Only terms with the Coalition in opposition count, and before One Nation existed the Coalition’s vote stands alone." + (gone.length ? " " + gone.join(" and ") + (gone.length > 1 ? " are" : " is") + " left out: " + (gone.length > 1 ? "their" : "its") + " polls didn’t report One Nation separately." : "");
+    })() : null;
+    const notes = [onpOwn ? "One Nation’s records are its own" + (firstOnp ? ", from its first poll in " + rdCycWhen(firstOnp.c, firstOnp.m) : "") + "." : null, g === "leaders" ? "In the records a leader counts once per term, at their lowest or highest month. Only months with a poll count." : "In the records a term counts once, at its lowest or highest month, so one long slump can’t fill the list. Only months with a poll count, not the election results.", hasEl && list.some(e => e.el != null) ? React.createElement(React.Fragment, null, React.createElement("i", {
+      className: "rd-csl-ring key",
+      "aria-hidden": "true"
+    }), "Where each past term finished: its result at the next election.") : null, list.some(e => e.polled === false) ? "≈ No poll that month: read from the months either side." : null].filter(Boolean);
+    return React.createElement("div", {
+      className: "rd-csl",
+      id: "rd-csl-" + r.key,
+      role: "region",
+      "aria-label": r.name + ": every term ranked, and the records"
+    }, peerNote && React.createElement("p", {
+      className: "rd-csl-pn"
+    }, peerNote), React.createElement("div", {
+      className: "rd-csl-head"
+    }, React.createElement("span", {
+      className: "rd-csl-h"
+    }, React.createElement("b", null, setWords, ", ", m, " months in"), React.createElement("span", {
+      className: "rd-csl-hs"
+    }, React.createElement("span", {
+      className: "rd-csl-sep"
+    }, " \xB7 "), "highest first")), React.createElement("span", {
+      className: "rd-csl-scale",
+      "aria-hidden": "true"
+    }, scaleNow[g].ticks.map((q, i, a) => React.createElement("span", {
+      key: q.v,
+      className: (i % 2 ? "odd" : "") + (i === a.length - 1 ? " last" : ""),
+      style: {
+        left: q.left + "%"
+      }
+    }, q.lab))), React.createElement("span", {
+      className: "rd-csl-nxh"
+    }, hasEl && React.createElement("i", {
+      className: "rd-csl-ring key",
+      "aria-hidden": "true"
+    }), "Next election"), React.createElement("button", {
+      type: "button",
+      className: "rd-link rd-csl-go",
+      onClick: () => goTo(SEC[r.key])
+    }, "See every term on the chart \u2193")), React.createElement(RdCsUnroll, {
+      className: "rd-csl-list",
+      style: {
+        height: list.length * rowH + "px"
+      }
+    }, React.createElement("div", {
+      className: "rd-csl-bg",
+      "aria-hidden": "true"
+    }, React.createElement("span", {
+      className: "rd-csl-bgt"
+    }, scaleNow[g].ticks.map(q => React.createElement("i", {
+      key: q.v,
+      className: "rd-csl-gl",
+      style: {
+        left: q.left + "%"
+      }
+    })), P && P.n >= 3 && React.createElement("i", {
+      className: "rd-csl-b80",
+      style: {
+        left: X(sc, P.p10) + "%",
+        width: X(sc, P.p90) - X(sc, P.p10) + "%"
+      }
+    }), P && P.n >= 3 && React.createElement("i", {
+      className: "rd-csl-b50",
+      style: {
+        left: X(sc, P.q1) + "%",
+        width: X(sc, P.q3) - X(sc, P.q1) + "%"
+      }
+    }), P && React.createElement("i", {
+      className: "rd-csl-mean",
+      style: {
+        left: X(sc, P.mean) + "%"
+      }
+    }))), list.map((e, k) => React.createElement("div", {
+      key: e.yr,
+      className: "rd-csl-row" + (e.cur ? " cur" : "") + (!e.cur && (lit && lit.key === r.key && lit.yr === e.yr || tipYr === e.yr) ? " on" : ""),
+      style: {
+        transform: "translateY(" + k * rowH + "px)",
+        "--k": k
+      },
+      onMouseEnter: e.cur ? undefined : () => setLit({
+        key: r.key,
+        yr: e.yr
+      }),
+      onMouseLeave: e.cur ? undefined : () => setLit(null)
+    }, React.createElement("span", {
+      className: "rd-csl-name"
+    }, React.createElement("span", {
+      className: "rd-csl-k"
+    }, k + 1), React.createElement("i", {
+      className: "rd-csl-pty",
+      style: {
+        background: e.cur ? r.color : partyOf(e.c)
+      }
+    }), React.createElement("b", null, e.who), React.createElement("span", {
+      className: "rd-csl-yr"
+    }, e.yr)), React.createElement("span", {
+      className: "rd-csl-v",
+      style: e.cur ? {
+        color: inkOf(r.color)
+      } : null
+    }, e.polled === false && React.createElement("span", {
+      className: "rd-csl-ip"
+    }, "\u2248"), r.fmt(e.v)), React.createElement("span", {
+      className: "rd-csl-trk"
+    }, e.el != null && (() => {
+      const a = X(sc, e.v),
+        b = Math.min(100, Math.max(0, X(sc, e.el)));
+      return React.createElement(React.Fragment, null, React.createElement("i", {
+        className: "rd-csl-run",
+        style: {
+          left: Math.min(a, b) + "%",
+          width: Math.abs(b - a) + "%"
+        }
+      }), React.createElement("i", {
+        className: "rd-csl-ring",
+        style: {
+          left: b + "%"
+        }
+      }));
+    })(), React.createElement("i", {
+      className: "rd-csl-dot" + (e.cur ? " cur" : ""),
+      style: {
+        left: X(sc, e.v) + "%",
+        background: e.cur ? r.color : undefined
+      }
+    })), React.createElement("span", {
+      className: "rd-csl-el"
+    }, e.el != null ? r.fmt(e.el) : ""), React.createElement("span", {
+      className: "rd-csl-oc"
+    }, e.cur ? "This term" : ocCell(e.c, e.who))))), recs && React.createElement("div", {
+      className: "rd-csr" + (onpOwn ? " one" : "")
+    }, !onpOwn && recList(recs.lows, true), recList(recs.highs, false)), React.createElement("div", {
+      className: "rd-csl-foot"
+    }, React.createElement("span", {
+      className: "rd-csl-notes"
+    }, notes.map((t, i) => React.createElement("span", {
+      key: i
+    }, t)))));
+  };
   const summary = React.createElement("div", {
     className: "rd-cs",
     role: "table",
@@ -79077,10 +79548,19 @@ function RdPastCycles(p) {
     const sc = SC[g],
       P = r.peers;
     const dd = P && r.v != null ? r.v - P.mean : null;
+    const isOpen = openRow === r.key;
     return React.createElement("div", {
       key: r.key,
+      className: "rd-cs-item" + (isOpen ? " open" : "")
+    }, React.createElement("div", {
       className: "rd-cs-row",
-      role: "row"
+      role: "row",
+      "data-key": r.key,
+      tabIndex: 0,
+      "aria-expanded": isOpen,
+      "aria-controls": isOpen ? "rd-csl-" + r.key : undefined,
+      onClick: ev => toggleRow(r.key, ev.currentTarget),
+      onKeyDown: ev => rowNav(ev, r)
     }, React.createElement("span", {
       role: "cell",
       className: "rd-cs-name"
@@ -79126,7 +79606,7 @@ function RdPastCycles(p) {
       }
     })), P && P.vals.map((q, qi) => React.createElement("i", {
       key: q.yr,
-      className: "rd-cs-dot" + (tip && tip.key === r.key && tip.i === qi ? " on" : "") + (dotsWas && !dotsWas.value[r.key].some(d => d.yr === q.yr) ? " in" : ""),
+      className: "rd-cs-dot" + (tip && tip.key === r.key && tip.i === qi || lit && lit.key === r.key && lit.yr === q.yr ? " on" : "") + (dotsWas && !dotsWas.value[r.key].some(d => d.yr === q.yr) ? " in" : ""),
       style: {
         left: X(sc, q.v) + "%"
       },
@@ -79176,12 +79656,25 @@ function RdPastCycles(p) {
     }, dd != null ? React.createElement(React.Fragment, null, React.createElement("b", null, rdArrow(dd), " ", Math.abs(dd).toFixed(1), " ", dd >= 0 ? "above" : "below"), React.createElement("span", null, "average ", r.fmt(P.mean))) : "—"), React.createElement("span", {
       role: "cell",
       className: "rd-cs-rank" + (r.rank && r.rank.strong ? " strong" : "")
-    }, r.rank ? React.createElement(React.Fragment, null, React.createElement("b", null, r.rank.main), r.rank.sub && React.createElement("span", null, r.rank.sub)) : "—"), React.createElement("button", {
+    }, r.rank ? React.createElement(React.Fragment, null, React.createElement("b", null, r.rank.main), r.rank.sub && React.createElement("span", null, r.rank.sub)) : "—"), React.createElement("span", {
+      className: "rd-cs-c-exp"
+    }, React.createElement("button", {
       type: "button",
-      className: "rd-cs-go",
-      "aria-label": "Go to the " + r.name.toLowerCase() + " chart",
-      onClick: () => goTo(SEC[r.key])
-    }, "\u2193"));
+      className: "rd-cs-exp" + (isOpen ? " open" : ""),
+      "aria-expanded": isOpen,
+      "aria-label": (isOpen ? "Close" : "Open") + " every term’s " + r.name.replace(/^[A-Z]/, x => x.toLowerCase()) + ", ranked",
+      onClick: ev => {
+        ev.stopPropagation();
+        toggleRow(r.key, ev.currentTarget.closest(".rd-cs-row"));
+      }
+    }, React.createElement("svg", {
+      viewBox: "0 0 10 10",
+      width: "9",
+      height: "9",
+      "aria-hidden": "true"
+    }, React.createElement("path", {
+      d: "M3 1.5L7.5 5 3 8.5z"
+    }))))), isOpen && ladderOf(r));
   }))), React.createElement(RdKey, {
     className: "rd-ckey rd-cs-key",
     items: [{
@@ -79204,7 +79697,9 @@ function RdPastCycles(p) {
   }, React.createElement(RdSwatch, {
     kind: "dot-solid",
     color: cur.color
-  }), "The ", cur.year, " term")));
+  }), "The ", cur.year, " term"), React.createElement("span", {
+    className: "rd-key-item rd-cs-hint"
+  }, narrow ? "Tap a measure to rank every term" : "Open a measure to rank every term and see its records")));
   const liftedList = cycles.filter(c => lifted.has(c.year) && !hidden.has(c.year));
   const pmNames = c => c.raw.netEras && c.raw.netEras.length > 1 ? c.raw.netEras.map(e => e.name).join("–") : c.lead;
   const CMP_ROWS = [["all", "All past terms", nPast], ["returned", "Re-elected", nRet], ["ousted", "Ousted", nOus]];

@@ -1728,7 +1728,8 @@ body.rd .rd-cc-x { all: unset; cursor: pointer; width: 32px; height: 32px; displ
 body.rd .rd-cc-x:hover { background: var(--line-2); color: var(--ink); }
 /* the summary table */
 body.rd .rd-cs { margin-top: 24px; font-variant-numeric: tabular-nums; }
-body.rd .rd-cs-head, body.rd .rd-cs-row, body.rd .rd-cs-group {
+body.rd .rd-cs-head, body.rd .rd-cs-row, body.rd .rd-cs-group,
+body.rd .rd-csl-head, body.rd .rd-csl-row, body.rd .rd-csl-bg {
   display: grid; grid-template-columns: 220px 90px minmax(0, 1fr) 130px 190px 36px; column-gap: 16px; align-items: center;
 }
 body.rd .rd-cs-head { min-height: 36px; border-bottom: 1.5px solid var(--ink-2); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
@@ -1767,8 +1768,113 @@ body.rd .rd-cs-avg, body.rd .rd-cs-rank { display: flex; flex-direction: column;
 body.rd .rd-cs-avg b, body.rd .rd-cs-rank b { font-size: 15px; font-weight: 600; color: var(--ink); }
 body.rd .rd-cs-rank b { font-weight: 400; }
 body.rd .rd-cs-rank.strong b { font-weight: 600; }
-body.rd .rd-cs-go { all: unset; cursor: pointer; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--ink-3); }
-body.rd .rd-cs-go:hover { background: var(--surface-2); color: var(--ink); }
+/* a row opens on a click anywhere along it (the latest-polls rows' contract):
+   the ▸ turns, the row and its list share one tinted ground that runs 12px
+   past the table's edges so the list's columns stay on the table's own */
+body.rd .rd-cs-row { cursor: pointer; }
+body.rd .rd-cs-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+body.rd .rd-cs-item.open > .rd-cs-row, body.rd .rd-csl {
+  background: var(--surface-2); box-shadow: -12px 0 0 var(--surface-2), 12px 0 0 var(--surface-2);
+}
+/* a tap leaves :hover stuck on a phone, so only a pointer that hovers tints the row */
+@media (hover: hover) {
+  body.rd .rd-cs-row:hover { background: var(--surface-2); box-shadow: -12px 0 0 var(--surface-2), 12px 0 0 var(--surface-2); }
+}
+body.rd .rd-cs-item.open > .rd-cs-row { border-bottom-color: transparent; }
+body.rd .rd-cs-c-exp { display: flex; justify-content: center; }
+body.rd .rd-cs-exp {
+  all: unset; box-sizing: border-box; cursor: pointer; width: 28px; height: 28px; border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center; color: var(--ink-3);
+  transition: transform .15s ease;
+}
+body.rd .rd-cs-exp.open { transform: rotate(90deg); color: var(--ink); }
+body.rd .rd-cs-exp svg { display: block; fill: currentColor; }
+body.rd .rd-cs-row:hover .rd-cs-exp { color: var(--ink); }
+body.rd .rd-cs-exp:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+body.rd .rd-cs-hint { color: var(--ink-3); }
+
+/* the opened row: every term at this month, highest first, on the strip's
+   own scale - the list's track IS the strip's column, so each name's dot
+   stands straight under its dot on the strip, and the strip's band and
+   average run down behind the whole list */
+body.rd .rd-csl { padding: 4px 0 18px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink-2); cursor: default; }
+body.rd .rd-csl-pn { margin: 6px 0 2px; font-size: 12px; line-height: 1.45; color: var(--ink-3); max-width: 760px; }
+body.rd .rd-csl-head { position: relative; min-height: 30px; align-items: end; padding-bottom: 4px; font-size: 12px; color: var(--ink-3); }
+/* the way to the chart, in line with the list's heading at its right end;
+   where the table stacks it takes a line of its own above the heading */
+body.rd .rd-csl-go { position: absolute; right: 0; bottom: 4px; min-height: 0; padding: 0; font-size: 13px; line-height: 17px; }
+body.rd .rd-csl-h { grid-column: 1 / 3; white-space: nowrap; }
+body.rd .rd-csl-h b { font-weight: 600; color: var(--ink); }
+body.rd .rd-csl-nxh { grid-column: 4 / 6; white-space: nowrap; }
+body.rd .rd-csl-scale { position: relative; height: 16px; grid-column: 3; }
+body.rd .rd-csl-scale > span { position: absolute; bottom: 0; transform: translateX(-50%); white-space: nowrap; }
+/* the last label tucks inside the track so it can't run into the next column's head */
+body.rd .rd-csl-scale > span.last { transform: translateX(-100%); }
+body.rd .rd-csl-list { position: relative; }
+body.rd .rd-csl-bg { position: absolute; inset: 0; align-items: stretch; pointer-events: none; }
+body.rd .rd-csl-bgt { grid-column: 3; position: relative; }
+body.rd .rd-csl-bgt > i { position: absolute; top: 0; bottom: 0; }
+body.rd .rd-csl-gl { border-left: 1px solid var(--line-2); }
+body.rd .rd-csl-b80 { background: var(--ink-3); opacity: 0.07; }
+body.rd .rd-csl-b50 { background: var(--ink-3); opacity: 0.11; }
+body.rd .rd-csl-mean { width: 0; border-left: 1.5px solid var(--ink-2); opacity: 0.7; transform: translateX(-0.75px); }
+body.rd .rd-csl-row {
+  position: absolute; left: 0; right: 0; top: 0; height: 26px;
+  transition: transform .32s var(--morph-ease);
+}
+body.rd .rd-csl-row.on { background: color-mix(in oklch, var(--ink) 5%, transparent); }
+body.rd .rd-csl-row.cur { background: color-mix(in oklch, var(--ink) 4%, transparent); }
+body.rd .rd-csl-name { display: flex; align-items: baseline; gap: 6px; min-width: 0; white-space: nowrap; }
+body.rd .rd-csl-k { display: inline-block; min-width: 18px; text-align: right; font-size: 11px; color: var(--ink-faint); }
+body.rd .rd-csl-pty { display: inline-block; flex: none; width: 3px; height: 12px; border-radius: 1.5px; align-self: center; }
+body.rd .rd-csl-name b { font-size: 14px; font-weight: 500; color: var(--ink); overflow: hidden; text-overflow: ellipsis; }
+body.rd .rd-csl-row.cur .rd-csl-name b, body.rd .rd-csr-row.cur .rd-csl-name b { font-weight: 700; }
+body.rd .rd-csl-yr { font-size: 12px; color: var(--ink-3); }
+body.rd .rd-csl-v { text-align: right; font-size: 14px; color: var(--ink); }
+body.rd .rd-csl-row.cur .rd-csl-v { font-weight: 700; }
+body.rd .rd-csl-ip { color: var(--ink-3); margin-right: 2px; }
+body.rd .rd-csl-trk { position: relative; align-self: stretch; }
+body.rd .rd-csl-dot { position: absolute; top: 50%; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); transform: translate(-50%, -50%); transition: left .32s var(--morph-ease); z-index: 1; }
+body.rd .rd-csl-row.on .rd-csl-dot { background: var(--ink); width: 9px; height: 9px; }
+body.rd .rd-csl-dot.cur { width: 11px; height: 11px; box-shadow: 0 0 0 2px var(--surface-2); z-index: 2; }
+/* where a past term finished: its result at the next election, a ring on a
+   hairline run from where it stood this month - the charts' election ring */
+body.rd .rd-csl-ring { position: absolute; top: 50%; width: 7px; height: 7px; box-sizing: border-box; border: 1.5px solid var(--ink-3); border-radius: 50%; background: var(--surface-2); transform: translate(-50%, -50%); transition: left .32s var(--morph-ease); }
+body.rd .rd-csl-ring.key { position: static; display: inline-block; transform: none; margin-right: 6px; vertical-align: -0.5px; }
+body.rd .rd-csl-run { position: absolute; top: 50%; height: 0; border-top: 1px solid var(--ink-faint); opacity: 0.7; transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
+body.rd .rd-csl-row.on .rd-csl-ring { border-color: var(--ink); }
+body.rd .rd-csl-row.on .rd-csl-run { border-top-color: var(--ink-2); opacity: 1; }
+body.rd .rd-csl-el { font-size: 13px; color: var(--ink-2); }
+body.rd .rd-csl-oc { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-csl-under { font-size: 12px; color: var(--ink-faint); }
+body.rd .rd-csr-oc .rd-csl-under { font-size: 12px; }
+body.rd .rd-csl-row.cur .rd-csl-oc { color: var(--ink-2); }
+/* the opening: each term starts on the row above and runs down to its rank */
+body.rd .rd-csl-list.unroll .rd-csl-row { animation: rd-csl-unroll .42s var(--morph-ease) both; animation-delay: calc(var(--k) * 8ms); }
+@keyframes rd-csl-unroll { from { transform: translateY(-26px); opacity: 0; } }
+/* the records, beside each other: the lowest, then the highest */
+body.rd .rd-csr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; margin-top: 22px; }
+body.rd .rd-csr.one { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+body.rd .rd-csr-h { font-size: 12px; font-weight: 600; color: var(--ink); padding-bottom: 6px; border-bottom: 1px solid var(--line); margin-bottom: 2px; }
+body.rd .rd-csr-row { display: grid; grid-template-columns: 18px minmax(0, 1fr) 52px 152px 128px; column-gap: 10px; align-items: baseline; min-height: 26px; padding: 3px 0; }
+body.rd .rd-csr-row .rd-csl-k { min-width: 0; }
+body.rd .rd-csr-row.cur { background: color-mix(in oklch, var(--ink) 4%, transparent); box-shadow: -6px 0 0 color-mix(in oklch, var(--ink) 4%, transparent), 6px 0 0 color-mix(in oklch, var(--ink) 4%, transparent); }
+body.rd .rd-csr-v { text-align: right; font-size: 14px; color: var(--ink); }
+body.rd .rd-csr-row.cur .rd-csr-v { font-weight: 700; }
+body.rd .rd-csr-when { color: var(--ink-2); white-space: nowrap; }
+body.rd .rd-csr-mo { color: var(--ink-3); }
+body.rd .rd-csr-oc { color: var(--ink-3); line-height: 1.25; }
+/* a record's party went to the election under someone else: say so on a
+   line of its own, as the phone list does */
+body.rd .rd-csr-oc .rd-csl-under { display: block; }
+body.rd .rd-csr-gap { height: 10px; margin: 0 0 2px 28px; border-bottom: 1px dashed var(--line); }
+body.rd .rd-csl-foot { margin-top: 16px; }
+body.rd .rd-csl-notes { display: flex; flex-direction: column; gap: 2px; flex: 1; font-size: 12px; line-height: 1.45; color: var(--ink-3); max-width: 760px; }
+@media (prefers-reduced-motion: reduce) {
+  body.rd .rd-csl-row, body.rd .rd-csl-dot, body.rd .rd-csl-ring, body.rd .rd-csl-run { transition: none; }
+  body.rd .rd-csl-list.unroll .rd-csl-row { animation: none; }
+}
+}
 body.rd .rd-cs-key { margin-top: 14px; }
 body.rd .rd-cs-keyband { display: inline-block; position: relative; width: 26px; height: 14px; background: var(--ink-3); opacity: 0.35; }
 body.rd .rd-cs-keyband i { position: absolute; left: 6px; right: 6px; top: 0; bottom: 0; background: var(--ink-3); }
@@ -1849,7 +1955,10 @@ body.rd .rd-acc-fv { font-size: 24px; font-weight: 500; color: var(--ink); font-
 body.rd .rd-acc-fv small { font-size: 13px; color: var(--ink-3); }
 body.rd .rd-acc-firm > span:last-child { font-size: 12px; color: var(--ink-3); }
 @media (max-width: 1100px) {
-  body.rd .rd-cs-head, body.rd .rd-cs-row, body.rd .rd-cs-group { grid-template-columns: 180px 76px minmax(0, 1fr) 120px 150px 32px; column-gap: 12px; }
+  body.rd .rd-cs-head, body.rd .rd-cs-row, body.rd .rd-cs-group,
+  body.rd .rd-csl-head, body.rd .rd-csl-row, body.rd .rd-csl-bg { grid-template-columns: 180px 76px minmax(0, 1fr) 120px 150px 32px; column-gap: 12px; }
+  body.rd .rd-csr-row { grid-template-columns: 18px minmax(0, 1fr) 50px 72px 128px; }
+  body.rd .rd-csr-mo { display: none; }
   body.rd .rd-acc-firms { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 16px; }
 }
 @media (max-width: 900px) {
@@ -1865,7 +1974,21 @@ body.rd .rd-acc-firm > span:last-child { font-size: 12px; color: var(--ink-3); }
   /* The rank note can be longer than the Now figure; span it so it never
      sizes the shared second column and squeezes the measure name. */
   body.rd .rd-cs-rank { grid-row: 3; grid-column: 1 / -1; text-align: right; }
-  body.rd .rd-cs-go { display: none; }
+  body.rd .rd-cs-c-exp { display: none; }
+  /* the opened row keeps its own columns once the table stacks: name,
+     figure, track, result, outcome - the track is the list's own, no
+     longer the strip's column */
+  body.rd .rd-csl-head, body.rd .rd-csl-row, body.rd .rd-csl-bg { grid-template-columns: minmax(0, 160px) 52px minmax(0, 1fr) 56px 156px; column-gap: 12px; }
+  body.rd .rd-csl { padding-top: 0; }
+  body.rd .rd-csl-h { white-space: normal; }
+  body.rd .rd-csl-go { position: static; grid-column: 1 / -1; grid-row: 1; justify-self: end; min-height: 40px; }
+  body.rd .rd-csl-hs { display: block; }
+  body.rd .rd-csl-sep { display: none; }
+  /* the records stack once the table does: two side by side would leave
+     a name column too narrow for "Albanese 2025" */
+  body.rd .rd-csr, body.rd .rd-csr.one { grid-template-columns: minmax(0, 1fr); row-gap: 20px; }
+  body.rd .rd-csr-row { grid-template-columns: 18px minmax(0, 1fr) 48px 160px 132px; column-gap: 8px; }
+  body.rd .rd-csr-mo { display: inline; }
   body.rd .rd-cyc-two { grid-template-columns: minmax(0, 1fr); row-gap: 28px; }
   body.rd .rd-acc-head, body.rd .rd-acc-row { grid-template-columns: 64px minmax(0, 1fr) 44px; column-gap: 8px; }
   body.rd .rd-acc-head > span:last-child, body.rd .rd-acc-n { display: none; }
@@ -1875,6 +1998,32 @@ body.rd .rd-acc-firm > span:last-child { font-size: 12px; color: var(--ink-3); }
 }
 
 body.rd .rd-cs-head .rd-cs-now { font-size: 12px; font-weight: 600; }
+/* a phone: the election results step aside for the track (the list still
+   says how each next election went), the records stack, and the dates
+   lose their "months in" */
+@media (max-width: 640px) {
+  body.rd .rd-csl-head, body.rd .rd-csl-row, body.rd .rd-csl-bg { grid-template-columns: minmax(0, 120px) 38px minmax(0, 1fr) 70px; column-gap: 6px; }
+  /* 30px rows (RD_CSL_ROW_PHONE): room for a second line under the outcome
+     naming the leader the party went to the election under */
+  body.rd .rd-csl-row { height: 30px; }
+  body.rd .rd-csl-oc { line-height: 1.15; }
+  body.rd .rd-csl-under, body.rd .rd-csr-oc .rd-csl-under { display: block; font-size: 10px; white-space: nowrap; }
+  body.rd .rd-csl-el, body.rd .rd-csl-nxh { display: none; }
+  body.rd .rd-csl-scale > span.odd { display: none; }
+  body.rd .rd-csl-name { gap: 5px; }
+  body.rd .rd-csl-k { min-width: 14px; font-size: 10px; }
+  body.rd .rd-csl-name b { font-size: 13px; }
+  body.rd .rd-csl-yr { font-size: 11px; }
+  /* the sitting term's row already says "This term": its year makes room for "One Nation" */
+  body.rd .rd-csl-row.cur .rd-csl-yr { display: none; }
+  body.rd .rd-csl-v { font-size: 13px; }
+  body.rd .rd-csl-oc { font-size: 12px; }
+  body.rd .rd-csr { grid-template-columns: minmax(0, 1fr); row-gap: 20px; }
+  body.rd .rd-csr.one { grid-template-columns: minmax(0, 1fr); }
+  body.rd .rd-csr-row { grid-template-columns: 14px minmax(0, 1fr) 40px 62px 70px; column-gap: 6px; font-size: 12px; align-items: center; }
+  body.rd .rd-csr-oc { line-height: 1.15; }
+  body.rd .rd-csr-mo { display: none; }
+  body.rd .rd-csr-v { font-size: 13px; }
 body.rd .rd-cyc-chart .rd-chead { min-height: 44px; }
 body.rd .rd-cyc-csv { display: inline-flex; gap: 6px; }
 

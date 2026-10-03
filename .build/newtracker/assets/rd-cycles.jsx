@@ -274,10 +274,15 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
    derived row by row rather than shipped as a series: the opposition
    overlay's own rules - a month joins only where BOTH parties were
    measured, and the change anchor is the two results summed (the
-   overlaySeries block in the tabbed-views layer). Terms whose polls never
-   split One Nation out (2010, 2013) have a null-padded raw.onp, so they
-   carry no combined reading and simply drop out of the strip. */
-const combSeries = (c) => c.raw.months.map((_, i) => (c.raw.oppr[i] != null && (c.raw.onp || [])[i] != null ? +(c.raw.oppr[i] + c.raw.onp[i]).toFixed(2) : null));
+   overlaySeries block in the tabbed-views layer). Only terms with the
+   Coalition in opposition carry it (user call 2026-10-04: "It should only
+   take coalition opposition years") - in a Labor-opposition term the sum
+   was Labor's vote plus One Nation's, no measure of the right's. Before One
+   Nation stood its 0 is a fact, so 1972-93's Coalition oppositions stand on
+   their own vote. Terms whose polls never split One Nation out (2004-13)
+   have a null-padded raw.onp, so 2007 and 2010 carry no combined reading
+   and drop out of the strip. */
+const combSeries = (c) => c.raw.months.map((_, i) => (c.opp === "lnp" && c.raw.oppr[i] != null && (c.raw.onp || [])[i] != null ? +(c.raw.oppr[i] + c.raw.onp[i]).toFixed(2) : null));
 const seriesOf = (c, key) => (key === "comb" ? combSeries(c) : (c.raw[key] || []));
 const cycBaseOf = (c, key) => (key === "comb" ? cycBase(c, "oppr") + cycBase(c, "onp") : cycBase(c, key));
 /* the past terms at one month for one measure: the same pooled set the band
@@ -315,6 +320,87 @@ function rdCycRank(peers, v, fmt) {
   return { main: rdOrd(loR) + " lowest of " + n, sub: loR === 2 ? "Only " + rdCycHolderTag(peers, low) + " was lower" : null };
 }
 
+/* ---- a summary row opened: every term at this month, then the records ---- */
+/* one ranked term's height: the rows stand at k * RD_CSL_ROW, so a re-rank
+   (Level to Change, another set of terms) glides them to their new places */
+const RD_CSL_ROW = 26, RD_CSL_ROW_PHONE = 30;
+/* the calendar month a term's month m fell in, short ("Sep 2026"): the
+   month the bucket sits in, named from the election month as cycMonthOf
+   names it */
+const rdCycWhen = (c, m) => {
+  const [y, mo] = c.eDate.split("-").map(Number);
+  const t = (mo - 1) + Math.max(0, m);
+  return window.AP.D.monthName((t % 12) + 1) + " " + (y + Math.floor(t / 12));
+};
+/* Whether a poll was taken in a term's month i, rather than the month being
+   read from the months either side (raw.obs). The combined row needs both
+   parties polled - except that before One Nation existed its 0 is a fact,
+   not a gap. Hanson's ratings carry no flags: every one is a reading. */
+function rdCycPolled(c, key, i) {
+  const o = c.raw.obs || {};
+  if (key === "comb") return !!(o.oppr || [])[i] && c.raw.onp != null && c.raw.onp[i] != null && (!!(o.onp || [])[i] || c.raw.onp[i] === 0);
+  if (!o[key]) return seriesOf(c, key)[i] != null;
+  return !!o[key][i];
+}
+/* The records: the lowest and highest a measure went at ANY point in a
+   term, not just at this month. One long slump is one record, not five.
+   The vote measures follow parties, so each term counts once; the leaders'
+   measures rate people, so each leader counts once per term (Hawke and
+   Keating both keep their 1990-term lows). Only months with a poll count:
+   not the election result each term starts from, and not a month read
+   between two polls, which can never be an extreme anyway.
+   spec: M names each entry's holder (cycHolderAt), key is the series past
+   terms are read from, curKey the sitting term's own (Hanson's row ranks
+   her against opposition leaders but reads her ratings), whoOf overrides
+   the holder, and people says a leader, not a term, counts once. */
+function rdCycRecords(cycles, hidden, chg, spec) {
+  const { M, key, curKey, whoOf, people, positive } = spec;
+  const all = [];
+  cycles.forEach((c) => {
+    if (!c.current && hidden.has(c.year)) return;
+    const k = c.current ? curKey : key;
+    const vals = seriesOf(c, k);
+    if (!vals.some((v) => v != null)) return;
+    const base = cycBaseOf(c, k);
+    const by = new Map();
+    c.raw.months.forEach((mo, i) => {
+      if (mo <= 0 || vals[i] == null || !rdCycPolled(c, k, i)) return;
+      /* a party's own series before it stood (One Nation's 0s) has nothing to record */
+      if (positive && !(vals[i] > 0)) return;
+      const who = (whoOf && whoOf(c)) || cycHolderAt(c, M, mo);
+      const v = chg ? +(vals[i] - base).toFixed(2) : vals[i];
+      const g = people ? who : "";
+      let e = by.get(g);
+      if (!e) by.set(g, (e = { lo: null, hi: null }));
+      const at = { v, m: mo, who, yr: c.year, c, cur: !!c.current };
+      if (!e.lo || v < e.lo.v) e.lo = at;
+      if (!e.hi || v > e.hi.v) e.hi = at;
+    });
+    by.forEach((e) => all.push(e));
+  });
+  if (!all.length) return null;
+  return { lows: all.map((e) => e.lo).sort((a, b) => a.v - b.v || a.yr - b.yr),
+           highs: all.map((e) => e.hi).sort((a, b) => b.v - a.v || a.yr - b.yr) };
+}
+/* Who led one side of a term into the election that closed it: the last
+   holder of that side's office - except where the offices swapped hands
+   mid-term. In 1975 Fraser became caretaker prime minister, so the Labor
+   government of the 1974 term went to the polls under Whitlam, by then
+   opposition leader, and the Coalition under Fraser. */
+const rdCycEndLeader = (c, opp) => {
+  const own = sitting(String(opp ? c.oppLead : c.pm));
+  const other = String(opp ? c.pm : c.oppLead).split(/\s*\u2192\s*/);
+  return other.slice(0, -1).includes(own) ? sitting(String(opp ? c.pm : c.oppLead)) : own;
+};
+/* the ranked list stands its terms in their opening places, then lets go
+   once: the rows run down from the row above into their ranks. Terms the
+   set adds later just appear, and a re-rank glides (rd.css) */
+function RdCsUnroll({ className, style, children }) {
+  const [fresh, setFresh] = useState(true);
+  React.useEffect(() => { const t = setTimeout(() => setFresh(false), 900); return () => clearTimeout(t); }, []);
+  return <div className={className + (fresh ? " unroll" : "")} style={style}>{children}</div>;
+}
+
 /* ---- the tab --------------------------------------------------------------- */
 function RdPastCycles(p) {
   const { cycles, mode, setMode, hidden, lifted, hi, setHi, toggle, lift, unlift, chipClick, showAll, hideAll,
@@ -323,6 +409,10 @@ function RdPastCycles(p) {
   const narrow = useNarrow("(max-width: 640px)");
   const [board, setBoard] = useState({ open: false, sheet: null });
   const [tip, setTip] = useState(null);
+  /* the summary row opened to its ranked terms and records (one at a time),
+     and the term a pointer is on in that list, lit on the strip above */
+  const [openRow, setOpenRow] = useState(null);
+  const [lit, setLit] = useState(null);
   /* the walk floor: the finding's slot stands at the tallest of every
      measure state the walk can reach (the finding no longer answers to
      the Compare-with pick), so a hop rewrites the words inside a box that
@@ -473,7 +563,7 @@ function RdPastCycles(p) {
   /* a half-measured month never becomes a half-total: the combined now
      figure renders a dash when either party's is missing */
   const endOfKey = (c, key) => (key === "comb"
-    ? (c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null)
+    ? (c.opp === "lnp" && c.end.oppr != null && c.end.onp != null ? +(c.end.oppr + c.end.onp).toFixed(1) : null)
     : c.end[key]);
   const curOfS = (key, c2) => { const v = endOfKey(cur, key); return v == null ? null : (c2 ? v - cycBaseOf(cur, key) : v); };
   const peersOfS = (key, hid, c2) => rdCycPeers(Mby[key], cycles, hid, c2, m);
@@ -732,6 +822,175 @@ function RdPastCycles(p) {
   /* One Nation and the combined row belong to the primary section: its
      opposition chart draws these very series when its boxes are ticked */
   const SEC = { tpp: "cyc-tpp", primary: "cyc-primary", oppr: "cyc-primary", onp: "cyc-primary", comb: "cyc-primary", ppmm: "cyc-leaders", net: "cyc-leaders", oppnet: "cyc-leaders", han: "cyc-leaders" };
+
+  /* ---- a row opened ---------------------------------------------------------------- */
+  /* A row opens to every term on its strip, by name and ranked at this
+     month, with how each one's next election went; then the records, the
+     lowest and highest the measure went at any point in a term. One row is
+     open at a time, and opening another holds the clicked row where it
+     stands while the one above it closes, as the latest-polls rows do. */
+  const toggleRow = (key, el) => {
+    if (el) rdPinScroll(el, true);
+    setLit(null);
+    setOpenRow((o) => (o === key ? null : key));
+  };
+  /* Enter or space opens and closes; up and down step row to row, and an
+     open row's list travels with the focus */
+  const rowNav = (e, r) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleRow(r.key, e.currentTarget); return; }
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const rows = [...e.currentTarget.closest(".rd-cs").querySelectorAll(".rd-cs-row")];
+    const nx = rows[rows.indexOf(e.currentTarget) + (e.key === "ArrowDown" ? 1 : -1)];
+    if (!nx) return;
+    if (openRow === r.key) toggleRow(nx.dataset.key, nx);
+    nx.focus();
+  };
+  /* the measures an election counts: where each past term finished is its
+     result, the ring that closes its line on the charts below */
+  const CSL_EL = { tpp: true, primary: true, oppr: true };
+  const ladderOf = (r) => {
+    const M = Mby[r.key], P = r.peers, g = r.group, sc = SC[g];
+    if (!P && r.v == null) return null;
+    const opp = M.leader === "opp";
+    const partyOf = (c) => D.PARTIES[opp ? c.opp : c.gov].color;
+    /* the next election from the measure's side: a government re-elected or
+       ousted, an opposition that won or lost */
+    const ocOf = (c) => {
+      const oc = outcomeOf(cycles.indexOf(c));
+      return !oc ? null : opp ? (oc === "ousted" ? "Won" : "Lost") : (oc === "returned" ? "Re-elected" : "Ousted");
+    };
+    /* the party won or lost; when someone else led it by then, say who -
+       "Downer, Won" would credit Downer with Howard's 1996 win */
+    const ocCell = (c, who) => {
+      const w = ocOf(c);
+      if (!w) return null;
+      const by = rdCycEndLeader(c, opp);
+      return by && by !== who ? <>{w}<span className="rd-csl-under"> under {by}</span></> : w;
+    };
+    const hasEl = !!CSL_EL[M.key];
+    const elOf = (c) => (hasEl && c.endRes && c.endRes[M.key] != null ? (chg ? c.endRes[M.key] - cycBaseOf(c, M.key) : c.endRes[M.key]) : null);
+    const polledAt = (c) => { const i = c.raw.months.indexOf(m); return i >= 0 && rdCycPolled(c, M.key, i); };
+    const curWho = r.key === "onp" ? "One Nation" : r.key === "han" ? "Hanson" : r.key === "comb" ? "L/NP + ON" : cycHolderAt(cur, M, m);
+    /* a tie with a past term goes the way the rank cell counts: "8th
+       highest" puts this term above an equal past one, "3rd lowest" below */
+    const curFirst = !!(r.rank && /highest/i.test(r.rank.main));
+    const rowH = narrow ? RD_CSL_ROW_PHONE : RD_CSL_ROW;
+    const list = (P ? P.vals.map((q) => ({ ...q, el: elOf(q.c), polled: polledAt(q.c) })) : [])
+      .concat(r.v != null ? [{ v: r.v, who: curWho, yr: cur.year, c: cur, cur: true }] : [])
+      .sort((a, b) => b.v - a.v || (a.cur ? (curFirst ? -1 : 1) : b.cur ? (curFirst ? 1 : -1) : a.yr - b.yr));
+    const tipYr = tip && tip.key === r.key && P && P.vals[tip.i] ? P.vals[tip.i].yr : null;
+    /* the count, not the set's name: the Compare-with pills just above
+       already name it, and "Terms whose government was re-elected" ran
+       into the scale */
+    const setWords = (compare === "all" ? "All " : "") + list.length + " terms";
+    /* the records: One Nation's row ranks it against past oppositions (it
+       has never been one), but its records are its own - and only highs,
+       since its lows are the years it barely registered. Hanson's row
+       ranks her against opposition leaders, so her ratings join theirs. */
+    const onpOwn = r.key === "onp";
+    const spec = onpOwn ? { M, key: "onp", curKey: "onp", whoOf: () => "One Nation", people: false, positive: true }
+      : { M, key: M.key, curKey: r.key, people: g === "leaders",
+          whoOf: r.key === "han" || r.key === "comb" ? (c) => (c.current ? curWho : null) : null };
+    const recs = rdCycRecords(cycles, hidden, chg, spec);
+    const recTitle = (lo) => (chg
+      ? (lo ? "Furthest below " : "Furthest above ") + (g === "leaders" ? "the term’s first reading" : onpOwn ? "its election result" : "the election result")
+      : (onpOwn ? "One Nation’s own highs" : lo ? "Lowest" : "Highest") + " at any point in a term") + tail;
+    const recRow = (e, i) => (
+      <div key={e.yr + "|" + e.who} className={"rd-csr-row" + (e.cur ? " cur" : "")}>
+        <span className="rd-csl-k">{i + 1}</span>
+        <span className="rd-csl-name"><i className="rd-csl-pty" style={{ background: e.cur ? r.color : onpOwn ? D.PARTIES.onp.color : partyOf(e.c) }}></i><b>{e.who}</b><span className="rd-csl-yr">{e.yr}</span></span>
+        <span className="rd-csr-v" style={e.cur ? { color: inkOf(r.color) } : null}>{r.fmt(e.v)}</span>
+        <span className="rd-csr-when">{e.cur && e.m === m ? "Now" : rdCycWhen(e.c, e.m)}<span className="rd-csr-mo">, {e.m} {e.m === 1 ? "month" : "months"} in</span></span>
+        <span className="rd-csr-oc">{e.cur ? "This term" : onpOwn ? "" : ocCell(e.c, e.who)}</span>
+      </div>
+    );
+    /* the sitting term always shows: past the first five, after a gap, at
+       its own place - each of its leaders' entries, on a leader's row
+       (Ley's low this term as well as Taylor's) */
+    const recList = (rows, lo) => {
+      const pins = rows.map((e, i) => (e.cur && i >= 5 ? i : -1)).filter((i) => i >= 0);
+      return (
+        <div className="rd-csr-list">
+          <div className="rd-csr-h">{recTitle(lo)}</div>
+          {rows.slice(0, 5).map(recRow)}
+          {pins.length > 0 && <div className="rd-csr-gap" aria-hidden="true"></div>}
+          {pins.map((i) => recRow(rows[i], i))}
+        </div>
+      );
+    };
+    const firstOnp = onpOwn && recs ? recs.highs.reduce((a, e) => {
+      const i = e.c.raw.months.findIndex((mo, j) => mo > 0 && e.c.raw.onp[j] > 0 && rdCycPolled(e.c, "onp", j));
+      return i >= 0 && (!a || e.c.year < a.c.year) ? { c: e.c, m: e.c.raw.months[i] } : a;
+    }, null) : null;
+    /* whom a borrowed row is ranked against, said above the list it explains */
+    const peerNote = onpOwn ? "One Nation has never been the opposition, so it is ranked against past oppositions’ primary votes."
+      : r.key === "han" ? "No past term rated Hanson, so she is ranked against past opposition leaders’ net approval, and her ratings join their records."
+      : r.key === "comb" ? (() => {
+        const gone = cycles.filter((c) => !c.current && c.opp === "lnp" && !seriesOf(c, "comb").some((v) => v != null)).map((c) => c.year);
+        return "Only terms with the Coalition in opposition count, and before One Nation existed the Coalition’s vote stands alone."
+          + (gone.length ? " " + gone.join(" and ") + (gone.length > 1 ? " are" : " is") + " left out: " + (gone.length > 1 ? "their" : "its") + " polls didn’t report One Nation separately." : "");
+      })()
+      : null;
+    const notes = [
+      onpOwn ? "One Nation’s records are its own" + (firstOnp ? ", from its first poll in " + rdCycWhen(firstOnp.c, firstOnp.m) : "") + "." : null,
+      g === "leaders" ? "In the records a leader counts once per term, at their lowest or highest month. Only months with a poll count."
+        : "In the records a term counts once, at its lowest or highest month, so one long slump can’t fill the list. Only months with a poll count, not the election results.",
+      hasEl && list.some((e) => e.el != null) ? <><i className="rd-csl-ring key" aria-hidden="true"></i>Where each past term finished: its result at the next election.</> : null,
+      list.some((e) => e.polled === false) ? "≈ No poll that month: read from the months either side." : null,
+    ].filter(Boolean);
+    return (
+      <div className="rd-csl" id={"rd-csl-" + r.key} role="region" aria-label={r.name + ": every term ranked, and the records"}>
+        {peerNote && <p className="rd-csl-pn">{peerNote}</p>}
+        <div className="rd-csl-head">
+          <span className="rd-csl-h"><b>{setWords}, {m} months in</b><span className="rd-csl-hs"><span className="rd-csl-sep"> · </span>highest first</span></span>
+          <span className="rd-csl-scale" aria-hidden="true">{scaleNow[g].ticks.map((q, i, a) => (
+            <span key={q.v} className={(i % 2 ? "odd" : "") + (i === a.length - 1 ? " last" : "")} style={{ left: q.left + "%" }}>{q.lab}</span>
+          ))}</span>
+          <span className="rd-csl-nxh">{hasEl && <i className="rd-csl-ring key" aria-hidden="true"></i>}Next election</span>
+          <button type="button" className="rd-link rd-csl-go" onClick={() => goTo(SEC[r.key])}>See every term on the chart ↓</button>
+        </div>
+        <RdCsUnroll className="rd-csl-list" style={{ height: list.length * rowH + "px" }}>
+          <div className="rd-csl-bg" aria-hidden="true">
+            <span className="rd-csl-bgt">
+              {scaleNow[g].ticks.map((q) => <i key={q.v} className="rd-csl-gl" style={{ left: q.left + "%" }}></i>)}
+              {P && P.n >= 3 && <i className="rd-csl-b80" style={{ left: X(sc, P.p10) + "%", width: X(sc, P.p90) - X(sc, P.p10) + "%" }}></i>}
+              {P && P.n >= 3 && <i className="rd-csl-b50" style={{ left: X(sc, P.q1) + "%", width: X(sc, P.q3) - X(sc, P.q1) + "%" }}></i>}
+              {P && <i className="rd-csl-mean" style={{ left: X(sc, P.mean) + "%" }}></i>}
+            </span>
+          </div>
+          {list.map((e, k) => (
+            <div key={e.yr} className={"rd-csl-row" + (e.cur ? " cur" : "") + (!e.cur && ((lit && lit.key === r.key && lit.yr === e.yr) || tipYr === e.yr) ? " on" : "")}
+                 style={{ transform: "translateY(" + k * rowH + "px)", "--k": k }}
+                 onMouseEnter={e.cur ? undefined : () => setLit({ key: r.key, yr: e.yr })} onMouseLeave={e.cur ? undefined : () => setLit(null)}>
+              <span className="rd-csl-name"><span className="rd-csl-k">{k + 1}</span><i className="rd-csl-pty" style={{ background: e.cur ? r.color : partyOf(e.c) }}></i><b>{e.who}</b><span className="rd-csl-yr">{e.yr}</span></span>
+              <span className="rd-csl-v" style={e.cur ? { color: inkOf(r.color) } : null}>{e.polled === false && <span className="rd-csl-ip">≈</span>}{r.fmt(e.v)}</span>
+              <span className="rd-csl-trk">
+                {e.el != null && (() => {
+                  const a = X(sc, e.v), b = Math.min(100, Math.max(0, X(sc, e.el)));
+                  return <><i className="rd-csl-run" style={{ left: Math.min(a, b) + "%", width: Math.abs(b - a) + "%" }}></i><i className="rd-csl-ring" style={{ left: b + "%" }}></i></>;
+                })()}
+                <i className={"rd-csl-dot" + (e.cur ? " cur" : "")} style={{ left: X(sc, e.v) + "%", background: e.cur ? r.color : undefined }}></i>
+              </span>
+              <span className="rd-csl-el">{e.el != null ? r.fmt(e.el) : ""}</span>
+              <span className="rd-csl-oc">{e.cur ? "This term" : ocCell(e.c, e.who)}</span>
+            </div>
+          ))}
+        </RdCsUnroll>
+        {recs && (
+          <div className={"rd-csr" + (onpOwn ? " one" : "")}>
+            {!onpOwn && recList(recs.lows, true)}
+            {recList(recs.highs, false)}
+          </div>
+        )}
+        <div className="rd-csl-foot">
+          <span className="rd-csl-notes">{notes.map((t, i) => <span key={i}>{t}</span>)}</span>
+        </div>
+      </div>
+    );
+  };
+
   const summary = (
     <div className="rd-cs" role="table" aria-label={"Every measure " + m + " months in, against past terms at the same point"}>
       <div className="rd-cs-head" role="row">
@@ -752,8 +1011,11 @@ function RdPastCycles(p) {
           {ROWS.filter((r) => r.group === g).map((r) => {
             const sc = SC[g], P = r.peers;
             const dd = P && r.v != null ? r.v - P.mean : null;
+            const isOpen = openRow === r.key;
             return (
-              <div key={r.key} className="rd-cs-row" role="row">
+              <div key={r.key} className={"rd-cs-item" + (isOpen ? " open" : "")}>
+              <div className="rd-cs-row" role="row" data-key={r.key} tabIndex={0} aria-expanded={isOpen} aria-controls={isOpen ? "rd-csl-" + r.key : undefined}
+                   onClick={(ev) => toggleRow(r.key, ev.currentTarget)} onKeyDown={(ev) => rowNav(ev, r)}>
                 <span role="cell" className="rd-cs-name"><b>{r.name}</b><span>{r.sub}</span></span>
                 <span role="cell" className="rd-cs-now" style={{ color: inkOf(r.color) }}>{r.v != null ? r.fmt(r.v) : "—"}{r.v != null && Mby[r.key].unit === "%" && !chg ? <small>%</small> : null}</span>
                 <span className="rd-cs-strip" aria-hidden="true">
@@ -765,7 +1027,7 @@ function RdPastCycles(p) {
                     <i key={"o" + dotsWas.id + "-" + q.yr} className="rd-cs-dot out" aria-hidden="true" style={{ left: q.left + "%" }}></i>
                   ))}
                   {P && P.vals.map((q, qi) => (
-                    <i key={q.yr} className={"rd-cs-dot" + (tip && tip.key === r.key && tip.i === qi ? " on" : "")
+                    <i key={q.yr} className={"rd-cs-dot" + ((tip && tip.key === r.key && tip.i === qi) || (lit && lit.key === r.key && lit.yr === q.yr) ? " on" : "")
                          + (dotsWas && !dotsWas.value[r.key].some((d) => d.yr === q.yr) ? " in" : "")} style={{ left: X(sc, q.v) + "%" }}
                        onMouseEnter={() => setTip({ key: r.key, i: qi })} onMouseLeave={() => setTip(null)}></i>
                   ))}
@@ -786,7 +1048,13 @@ function RdPastCycles(p) {
                 </span>
                 <span role="cell" className="rd-cs-avg">{dd != null ? <><b>{rdArrow(dd)} {Math.abs(dd).toFixed(1)} {dd >= 0 ? "above" : "below"}</b><span>average {r.fmt(P.mean)}</span></> : "—"}</span>
                 <span role="cell" className={"rd-cs-rank" + (r.rank && r.rank.strong ? " strong" : "")}>{r.rank ? <><b>{r.rank.main}</b>{r.rank.sub && <span>{r.rank.sub}</span>}</> : "—"}</span>
-                <button type="button" className="rd-cs-go" aria-label={"Go to the " + r.name.toLowerCase() + " chart"} onClick={() => goTo(SEC[r.key])}>↓</button>
+                <span className="rd-cs-c-exp">
+                  <button type="button" className={"rd-cs-exp" + (isOpen ? " open" : "")} aria-expanded={isOpen}
+                          aria-label={(isOpen ? "Close" : "Open") + " every term’s " + r.name.replace(/^[A-Z]/, (x) => x.toLowerCase()) + ", ranked"}
+                          onClick={(ev) => { ev.stopPropagation(); toggleRow(r.key, ev.currentTarget.closest(".rd-cs-row")); }}><svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 1.5L7.5 5 3 8.5z"></path></svg></button>
+                </span>
+              </div>
+              {isOpen && ladderOf(r)}
               </div>
             );
           })}
@@ -796,6 +1064,7 @@ function RdPastCycles(p) {
         <span className="rd-key-item"><span className="rd-cs-keyband" aria-hidden="true"><i></i></span>Middle half, and middle 80%, of past terms</span>
         <span className="rd-key-item"><span className="rd-cs-keymean" aria-hidden="true"></span>Their average</span>
         <span className="rd-key-item"><RdSwatch kind="dot-solid" color={cur.color} />The {cur.year} term</span>
+        <span className="rd-key-item rd-cs-hint">{narrow ? "Tap a measure to rank every term" : "Open a measure to rank every term and see its records"}</span>
       </RdKey>
     </div>
   );
