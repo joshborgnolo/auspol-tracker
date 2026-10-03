@@ -443,7 +443,7 @@ const phoneHead = await page3.evaluate(() => {
   return { cap: (ph.querySelector(".rd-ap-cap") || {}).textContent || "", ticks: ph.querySelectorAll(".rd-ap-tk").length };
 });
 check("phone: the pinned head carries the issues scale caption and 0-30 ticks",
-  phoneHead.cap === "Best" && phoneHead.ticks === 4,
+  phoneHead.cap === "Best on the top issue, %" && phoneHead.ticks === 4,
   JSON.stringify(phoneHead));
 check("no page errors on the phone rung", errs3.length === 0, errs3[0] || "");
 await page3.close();
