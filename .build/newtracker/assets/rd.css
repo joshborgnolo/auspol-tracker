@@ -2301,6 +2301,21 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-shown { font-size: 12px; }
 }
 
+/* the five facet tabs - Direction the long one - outgrow the phone shell at
+   their menu size: 15px over 12px pads = a 375.6px group against the
+   350/320/280px shells at 390/360/320, the page h-scrolling 6/36/76px. Step
+   the lettering down like the issues menu does rather than crowd the page
+   edge (every rung measured against the shell, smallest phone first:
+   14px/2px needs ~254px of the 264px tab budget in the 280px shell at 320 ·
+   15px/6px ~301 of the 305px budget at 361-400 · the full 15px/12px only
+   fits 416px and up) */
+@media (max-width: 400px) {
+  body.rd .rd-ap-tabs .rd-tab { padding: 0 6px; }
+}
+@media (max-width: 360px) {
+  body.rd .rd-ap-tabs .rd-tab { padding: 0 2px; font-size: 14px; }
+}
+
 /* the phone's filters sheet */
 body.rd .rd-ap-sheetwrap { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-end; background: color-mix(in oklab, var(--ink) 38%, transparent); }
 body.rd .rd-ap-sheet {
