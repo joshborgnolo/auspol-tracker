@@ -364,17 +364,19 @@ body.js .static-summary {
 body.js #root {
   margin-top: calc(-1 * var(--ss-h, 0px));
 }
-/* Before the first commit the article was a visible flash on every load: the
-   parser paints it long before the ~3MB of inline script below it has run.
-   html.boot (set by the head script) holds it transparent until body.js takes
-   over - the same in-flow opacity hide, so the page keeps its height and the
-   tide band stays off-screen rather than splashing up top. The head script
-   drops html.boot if the app never mounts, and RootBoundary drops it with
-   body.js, so a failed app still falls back to the readable article. */
-html.boot body:not(.js) .static-summary {
-  opacity: 0;
-  pointer-events: none;
-}
+/* Nothing paints before the app's first commit. The article used to stand
+   in for those frames, so every load showed a different page for a beat and
+   then the site. html.boot (set by the script at the top of <body>) hides the
+   whole body instead - no text, no image - so a browser that holds the
+   previous page until the next one has drawn something keeps the old frame up
+   until the app replaces it in one step, and a cold load shows bare paper
+   (that script gives the canvas the body's ground) until the app lands. The
+   body itself rather than its children: Safari's "has this page drawn yet"
+   test reads body's own visibility. It is visibility, not display, so the
+   article keeps its box and --ss-h measures it as before. App's first commit
+   lifts it (window.apBootDone), and so do RootBoundary and the script's own
+   fallbacks - a failed app still leaves the article readable. */
+html.boot body { visibility: hidden; }
 /* The meta line's freshness dot toggles ss-view: the article steps back up
    to full opacity in its own in-flow box while the app's box collapses out
    of the way - the same two levers body.js pulls at mount, in reverse. The
@@ -5003,21 +5005,42 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   <style>/* The redesign – rules in .build/newtracker/assets/rd.css, spliced in by build.mjs. */
 /*RDCSS*/
 </style>
-  <!-- Marks the page as booting so the static article stays invisible until
-       the app mounts (see html.boot). Script-only, so no-JS readers never get
-       the class. If any script throws before the mount, or the app has not
-       mounted 8s after load, the class goes and the article shows. -->
+</head>
+<body>
+  <!-- Dresses the body before its first style is computed, with the classes
+       App would put on it at mount (TWEAK_DEFAULTS is App's own default set,
+       spliced in by build.mjs), so the first frame is already in the reader's
+       theme and nothing crossfades in from the default palette. Then hides
+       the page until App's first commit (html.boot, by the body.js rules),
+       with the body's paper on the canvas meanwhile. Script-only: with no JS
+       the article is the page. A script that throws before the mount, or no
+       app 8s after load, shows the page anyway and the article stands in. -->
   <script>(function () {
-    var h = document.documentElement;
+    var h = document.documentElement, b = document.body;
+    var t = /*TWEAK_DEFAULTS*/{};
+    try {
+      var s = JSON.parse(localStorage.getItem("auspol.tweaks") || "null");
+      if (s && typeof s === "object") for (var k in t) if (k in s) t[k] = s[k];
+    } catch (e) {}
+    var sysDark = !!(window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+    b.classList.toggle("editorial", t.layout === "editorial");
+    b.classList.toggle("cool", t.accent === "cool");
+    b.classList.toggle("dark", t.theme === "dark" || (t.theme === "auto" && sysDark));
     h.classList.add("boot");
+    h.style.background = getComputedStyle(b).backgroundColor;
+    window.apBootDone = function () {
+      h.classList.remove("boot");
+      h.style.removeProperty("background");
+    };
     function bail() {
-      if (!(document.body && document.body.classList.contains("js"))) h.classList.remove("boot");
+      if (b.classList.contains("js")) return;
+      window.apBootDone();
+      var ss = document.querySelector(".static-summary");
+      if (ss) { ss.removeAttribute("aria-hidden"); ss.inert = false; }
     }
     window.addEventListener("error", bail);
     window.addEventListener("load", function () { setTimeout(bail, 8000); });
   })();</script>
-</head>
-<body>
   <!-- build.mjs replaces this marker with the article version of the page:
        every headline figure and the methodology, as real text, for a crawler,
        a link-preview scraper, reader mode, assistive tech, or a reader whose

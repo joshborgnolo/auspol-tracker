@@ -192,6 +192,15 @@ html = html.replace("/*FONTFACES*/", () => faceCss);
 if (!html.includes("/*RDCSS*/")) throw new Error("RDCSS marker not found in template");
 html = html.replace("/*RDCSS*/", () => fs.readFileSync(A("rd.css"), "utf8"));
 
+/* The body-start script dresses the page in App's theme classes before its
+   first style, so it needs App's defaults - read from App's own EDITMODE
+   block (the tweaks host rewrites that literal), never copied by hand. */
+const editMode = fs.readFileSync(A("73de0c58-f11f-4793-9f90-77e583ab051b.js"), "utf8")
+  .match(/\/\*EDITMODE-BEGIN\*\/([\s\S]*?)\/\*EDITMODE-END\*\//);
+if (!editMode) throw new Error("EDITMODE defaults not found in the app module");
+if (!html.includes("/*TWEAK_DEFAULTS*/{}")) throw new Error("TWEAK_DEFAULTS marker not found in template");
+html = html.replace("/*TWEAK_DEFAULTS*/{}", () => JSON.stringify(JSON.parse(editMode[1])));
+
 // -- head: give the page a tab icon + a share card --
 
 /* Tab icon: the masthead glyph itself, drawn from the same aggregates and the

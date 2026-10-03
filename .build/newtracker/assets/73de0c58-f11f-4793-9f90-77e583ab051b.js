@@ -2007,7 +2007,7 @@ class RootBoundary extends React.Component {
   componentDidCatch(err) {
     console.error("app render failed:", err);
     document.body.classList.remove("js");
-    document.documentElement.classList.remove("boot");
+    if (window.apBootDone) window.apBootDone();
     const ss = document.querySelector(".static-summary");
     if (ss) {
       ss.removeAttribute("aria-hidden");
@@ -2042,9 +2042,13 @@ function App() {
      band alone at the top of a blank screen. A refresh painted exactly
      that frame - the line art splashed across the screen - until the app
      landed. In a layout effect the class change and the first tree paint
-     together, so no frame exists in between. The no-commit frames are then
-     just the no-JS page, which the static article was built to be. */
-  React.useLayoutEffect(() => { document.body.classList.add("js"); }, []);
+     together, so no frame exists in between. The same commit lifts html.boot
+     (the body-start script in template.html hides the page until now), so
+     the first frame the reader sees is the app itself, never the article. */
+  React.useLayoutEffect(() => {
+    document.body.classList.add("js");
+    if (window.apBootDone) window.apBootDone();
+  }, []);
   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
     "layout": "editorial",
     "theme": "auto",
@@ -2421,6 +2425,17 @@ function App() {
   const applyChrome = () => {
     for (const c in want) document.body.classList.toggle(c, want[c]);
   };
+  /* The first application belongs to the first commit, before anything
+     paints: from the passive effect below it landed a frame late, so a dark
+     reader's first frame of the app was the light palette. The body-start
+     script in template.html has normally put these same classes on already
+     (that is what keeps body's colour transition from fading the page in),
+     so this is the backstop that makes App's word final. */
+  React.useLayoutEffect(() => {
+    if (chromeSettled) return;
+    chromeSettled = true;
+    applyChrome();
+  }, []);
   React.useEffect(() => {
     // nothing to change – a re-render that re-runs this effect must not animate
     if (!Object.keys(want).some((c) => document.body.classList.contains(c) !== want[c])) return;
@@ -2695,6 +2710,14 @@ try {
 } catch (_) {
   document.body.classList.add("rd");
 }
-ReactDOM.createRoot(document.getElementById("root")).render(
+/* The first render is synchronous, so the app commits inside this script -
+   before the document finishes parsing, let alone loading. A browser holding
+   the previous page on screen lets go once the new one has drawn something
+   or has finished loading, whichever comes first. html.boot means nothing
+   draws before the app, but a render left to the scheduler committed after
+   load: Chrome showed the bare page in between on two of three cross-site
+   loads, and on none with this render synchronous. */
+const appRoot = ReactDOM.createRoot(document.getElementById("root"));
+ReactDOM.flushSync(() => appRoot.render(
   <RootBoundary><App /></RootBoundary>
-);
+));
