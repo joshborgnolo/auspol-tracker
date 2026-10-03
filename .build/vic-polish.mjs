@@ -227,13 +227,18 @@ const commits = [];
 
 // Commit everything the loop legitimately owns right now: builder-scope
 // files (only when gateOk — a red gate means the round is unaccepted) plus
-// the committed ledger. Ledger dirtiness is judged BEFORE writeLedger — the
-// write itself would make a first run always look "already existed".
+// the committed ledger. The ledger is written FIRST and dirtiness read off
+// git afterwards — a session entry lands on every run, and judging dirt
+// pre-write misses exactly the runs (invalid verdict, cap) whose only
+// artifact IS the ledger update. An untracked ledger only shows in
+// porcelain as its collapsed directory ("?? .build/vic-src/"), so ask git
+// whether the path is tracked instead of trusting a has() lookup.
 function commitDirtyFiles(msg, { gateOk = true } = {}) {
+  writeLedger(repo, ledger);
   const dirtyNow = porcelain();
   const commitFiles = [...dirtyNow.keys()].filter((p) => builderAllowed(p) && p !== LEDGER_PATH);
-  const ledgerDirty = dirtyNow.has(LEDGER_PATH) || !existsSync(path.join(repo, LEDGER_PATH));
-  writeLedger(repo, ledger);
+  const ledgerTracked = git(["ls-files", "--error-unmatch", LEDGER_PATH], { allowFail: true }).status === 0;
+  const ledgerDirty = dirtyNow.has(LEDGER_PATH) || !ledgerTracked;
   const files = [];
   if (gateOk) files.push(...commitFiles);
   if (ledgerDirty) files.push(LEDGER_PATH);
