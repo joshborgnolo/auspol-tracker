@@ -34,8 +34,10 @@ grammar exactly:
   so the row still carries exactly 10 grid children (the ciss template's
   column count, and the fade `:nth-child(n+5)` selector's contract).
 - A NEW picture track: the wave's party-OWNERSHIP on its top issue as
-  `.rd-ap-dot`s on the shared 0–45 `pdx` scale with 4 `.rd-ap-gl`
-  gridlines (0/10/20/30 — b900f23 dropped the 40), drawn straight off
+  `.rd-ap-dot`s on the shared 0–45 `pdx` scale with 5 `.rd-ap-gl`
+  gridlines (0/10/20/30/40 — b900f23 dropped the 40, then the user's
+  2026-10-03 call brought it back: "add a '40%' ticker… there's much
+  room for it"), drawn straight off
   `RD_AP_PRIM` (rd-allpolls.jsx :149). Dots =
   `iss.own[iss.top]` (or SEC's `iss.bp` fallback), filtered to
   as-printed non-null parties, sorted desc. Head captions DIFFER by
@@ -127,7 +129,12 @@ The caption half of the same complaint had already shipped in sibling
 commit b900f23 (user call: "you can just say 'Best'. and you don't need a
 40% line"): both heads read "Best" at that point, ladder 0/10/20/30
 (4 ticks), pdx 0–45 scale kept so >30 dots overshoot the final gridline
-by design. Check `git log` before "fixing" text a summary says is wrong —
+by design. SUPERSEDED on 2026-10-03 — the user reversed the ladder call
+("add a '40%' ticker to the issues facet of the all polls table on small
+screens - there's much room for it"): both heads now run 0/10/20/30/40
+(5 ticks, "%" on the last) and the strip's gridlines are 0/10/20/30/40
+again; the b900f23 overshoot clause applied only to the 0–30 era. Check
+`git log` before "fixing" text a summary says is wrong —
 snapshot-era copies of the 307px caption string were already dead code.
 
 ## Head captions/labels — THREE strings, final contract 2026-10-03
@@ -446,14 +453,31 @@ re-punctuated SEC's tail. FINAL contract:
   rows keep no sentence. Probe pins it by verbatim text
   (`txt === "Issues unranked, but performance on cost of living
   assessed"`), counted against the page's own data bundle
-  (`exp.unrankedCol`); capsOk passes as written (sentence case). Wrap
-  behaviour is shell-width-dependent (measured same day against the
-  user's iPhone 17): TWO lines in the 360/390px shells (38px csub,
-  card 133.6px — the 133.6 entries in iss-card-height dumps), ONE
-  line at 402px (user report + probe 402: zero two-line sentences of
-  42, card 114.8px). The placeholder line also boxes at 19px vs the
-  ranked sentence's 22px — same class; the ranking's sup ordinals
-  inflate its line box.
+  (`exp.unrankedCol`); capsOk passes as written (sentence case).
+  WIDTH LADDER (same day, three consecutive user calls — "if it
+  overflows to two lines, reword… wording depends on screen width";
+  "if that rewording doesn't do it, change 'assessed' to 'asked'";
+  "wraps to one line only on phones, all phones"): the placeholder
+  is now THREE rung divs in a `.rd-ap-issph` wrapper
+  (`container-type: inline-size`, rd.css next to `-sent`) and CSS
+  container queries show the longest that fits the card's text lane:
+  full 351.5px ("…performance on cost of living assessed") → mid
+  337.9px ("…cost-of-living performance assessed") → ask 318.6px
+  ("…performance asked"), tiers at 351.5/337.9 max-width against
+  measured lanes 280@320 / 300@340 / 320@360 / 350@390 / 361.8@402.
+  Scratch probe .matilda/probe-issph-ladder.mjs (13 checks): ask at
+  320/340/360, mid at 390, full at 402, ONE line at ≥360 —
+  the 320/340 lanes wrap all three rungs (nothing ≤300px fits at
+  the 13px csub font), told to the user as the hard exception to
+  "all phones". Container display rules come AFTER the `-sent {
+  display:block }` rule so equal specificity resolves by source
+  order. PROBE CONTRACT CHANGE: the card now carries three
+  `.rd-ap-csub` nodes per placeholder — iss-facet.mjs reads the
+  DISPLAYED rung (`getComputedStyle.display !== "none"`) for
+  sent/subs/csubSentOk and accepts any of the three literals
+  (RUNGS array). Legacy note (superseded by the ladder): the flat
+  full literal rendered TWO lines in the 360/390px shells and one
+  at 402px.
 - `ISS_SENT_SHORT = { "Housing affordability": "housing" }` —
   module-level at rd-allpolls.jsx :186 (right after rdApX). The two
   label vocabularies differ (canonical data/issues.json stores
@@ -544,9 +568,9 @@ exports.
   the sibling-facet tallies, Ipsos never bleeding onto
   2PP/Primary/Leaders/Direction, the redesigned row anatomy (§top: exactly
   three top-level `.rd-ap-dnum` cells, a `:scope > .rd-ap-pic` strip with
-  2–4 `.rd-ap-dot`s over 4 gridlines iff the wave has an ownership reading,
+  2–4 `.rd-ap-dot`s over 5 gridlines iff the wave has an ownership reading,
   the `.rd-ap-netcell` verdict rail, `.rd-ap-d2i` ABSENT, runners imply a
-  filled top-issue cell, head names the 0–30 ladder on the 0–45 scale), ROW-HEIGHT PARITY
+  filled top-issue cell, head names the 0–40 ladder on the 0–45 scale), ROW-HEIGHT PARITY
   across all five facets (median `.rd-ap-row` height, ≤0.75px spread —
   the redesign's acceptance check), Ipsos detail = 11 apd-issrows + "The
   issues voters name" + issues rail (`Asked/…/most capable of managing/

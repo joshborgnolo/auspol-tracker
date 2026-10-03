@@ -21,7 +21,9 @@
 //     reads as a superscript-ordinal ranking ("Cost of living 1st, housing
 //     2nd, crime 3rd") on ONE csub line; a wave with no ranking but
 //     cost-of-living ownership figures fills the line with the dictated
-//     "Issues unranked, but performance on cost of living assessed"
+//     "Issues unranked, but performance on cost of living assessed" -
+//     since 2026-10-03 a THREE-RUNG width ladder (full/mid/ask literals,
+//     CSS container queries, one displayed) read via the shown rung
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -224,7 +226,7 @@ const rowAnatomy = await page1.evaluate(() => {
     d2iLeft: an.filter((a) => a.d2i).map((a) => a.i),
     noPic: an.filter((a) => !a.pic).map((a) => a.i),
     noNet: an.filter((a) => !a.net).map((a) => a.i),
-    badDots: an.filter((a) => a.dots > 0 && (a.dots < 2 || a.dots > 4 || a.gls !== 4)).map((a) => a.i),
+    badDots: an.filter((a) => a.dots > 0 && (a.dots < 2 || a.dots > 4 || a.gls !== 5)).map((a) => a.i),
     dotsNoNet: an.filter((a) => a.dots > 0 && !a.netFilled).map((a) => a.i),
     netNoDots: an.filter((a) => a.netFilled && a.dots === 0).map((a) => a.i),
     withDots: an.filter((a) => a.dots > 0).length,
@@ -235,15 +237,15 @@ check("every row is three issue cells + the ownership strip + the rail verdict",
   `three-cells off: ${rowAnatomy.notThree.join(",") || "none"} · strip missing: ${rowAnatomy.noPic.join(",") || "none"} · rail missing: ${rowAnatomy.noNet.join(",") || "none"}`);
 check("the stacked 2nd/3rd cell is gone (the facet's tall-row offender)",
   rowAnatomy.d2iLeft.length === 0, `left on: ${rowAnatomy.d2iLeft.join(",") || "none"}`);
-check("the ownership strip draws 2–4 party dots over 4 gridlines, verdict beside them",
+check("the ownership strip draws 2–4 party dots over 5 gridlines, verdict beside them",
   rowAnatomy.withDots > 0 && rowAnatomy.badDots.length === 0 && rowAnatomy.dotsNoNet.length === 0 && rowAnatomy.netNoDots.length === 0,
   `${rowAnatomy.withDots}/${rowAnatomy.rows} dotted; bad ${rowAnatomy.badDots.join(",") || "none"}; dots-without-verdict ${rowAnatomy.dotsNoNet.join(",") || "none"}; verdict-without-dots ${rowAnatomy.netNoDots.join(",") || "none"}`);
 check("a row naming a 2nd or 3rd issue always fills its top-issue cell",
   rowAnatomy.runnerNoTop.length === 0, `rows off: ${rowAnatomy.runnerNoTop.join(",") || "none"}`);
 check("the column head names the scale the strip draws on",
   rowAnatomy.head.includes("2nd") && rowAnatomy.head.includes("3rd")
-    && rowAnatomy.headCap === "Best on top issue"
-    && rowAnatomy.headTk === 4,
+    && rowAnatomy.headCap === "Best on the top issue"
+    && rowAnatomy.headTk === 5,
   rowAnatomy.headCap + ` · ticks ${rowAnatomy.headTk}`);
 
 // 5: Ipsos never leaves the facet (no VI, no leadership rows to stand on)
@@ -439,25 +441,42 @@ await showAll(page3);
 // reading carry the full-width party-dot strip on its own body line,
 // under the restored pinned tick ladder.
 const cardAnatomy = await page3.evaluate(() => {
+  // the unranked placeholder is a three-rung WIDTH LADDER since 2026-10-03:
+  // the wrapper .rd-ap-issph carries full/mid/ask copies of the sentence
+  // and CSS container queries show exactly ONE (the longest that fits the
+  // card's text lane on one line: full 351.5px, mid 337.9px, ask 318.6px,
+  // measured at the 13px csub font). Everywhere below must read the
+  // DISPLAYED rung, not node counts.
+  const shown = (n) => getComputedStyle(n).display !== "none";
+  const RUNGS = [
+    "Issues unranked, but performance on cost of living assessed",
+    "Issues unranked, but cost-of-living performance assessed",
+    "Issues unranked, but cost-of-living performance asked",
+  ];
   const cards = [...document.querySelectorAll(".rd-ap-card")];
   const an = cards.map((c) => {
-    const subs = [...c.querySelectorAll(".rd-ap-csub")];
-    const sent = c.querySelector(".rd-ap-csub-sent");
+    const rungs = [...c.querySelectorAll(".rd-ap-issph .rd-ap-csub-sent")];
+    const rungsShown = rungs.filter(shown).length;
+    // a ladder is intact iff it carries all three rungs with exactly one
+    // displayed; absent on waves without the placeholder
+    const ladderOk = rungs.length === 0 || (rungs.length === 3 && rungsShown === 1);
+    const sent = [...c.querySelectorAll(".rd-ap-csub-sent")].find(shown) || null;
+    const subs = [...c.querySelectorAll(".rd-ap-csub")].filter(shown);
     const txt = sent ? sent.textContent.trim().replace(/\s+/g, " ") : "";
     const topFilled = !!sent && / 1st/.test(txt);
     // the dictated placeholder on waves that ask cost-of-living ownership
-    // but rank no issues (Resolve, YouGov, DemosAU) - verbatim, sentence
-    // case, the same .rd-ap-csub-sent line the ranking would ride
-    const unranked = txt === "Issues unranked, but performance on cost of living assessed";
+    // but rank no issues (Resolve, YouGov, DemosAU) - the displayed rung
+    // is the longest of the three literals that fits this card's lane
+    const unranked = RUNGS.includes(txt);
     // user call 2026-10-03: sentence case - exactly ONE capital, the
     // leading letter of the first label ("Cost of living 1st, housing
     // 2nd, ..."); every other label stays lowercase
     const bare = txt.replace(/ unprompted$/, "");
     const capsOk = !sent || (/^[A-Z]/.test(bare) && !/[A-Z]/.test(bare.slice(1)));
     const legacy = subs.some((d) => /\(\d+\)/.test(d.textContent)) || subs.some((d) => / top issue | then |Best on it/.test(d.textContent));
-    // a card carries exactly one csub when it has the sentence, none when
-    // it is a best-party-only wave
-    const csubSentOk = subs.length === (sent ? 1 : 0);
+    // a card shows exactly one csub when it has the sentence (one rung
+    // when it is the placeholder ladder), none when best-party-only
+    const csubSentOk = subs.length === (sent ? 1 : 0) && ladderOk;
     // runners ride the same single line: ", housing 2nd, crime 3rd"
     const runnerOk = !sent || (!/ 2nd/.test(txt) || /, [^,(]+ 2nd/.test(txt)) && (!/ 3rd/.test(txt) || /, [^,(]+ 3rd/.test(txt));
     const noPair = !c.querySelector(".rd-ap-pairfig");
@@ -523,7 +542,7 @@ const phoneHead = await page3.evaluate(() => {
   return { cap: (ph.querySelector(".rd-ap-cap") || {}).textContent || "", ticks: ph.querySelectorAll(".rd-ap-tk").length };
 });
 check("phone: the pinned head carries the issues caption and the restored tick ladder",
-  phoneHead.cap === "Best on the top issue, %" && phoneHead.ticks === 4,
+  phoneHead.cap === "Best on top issue" && phoneHead.ticks === 5,
   JSON.stringify(phoneHead));
 check("no page errors on the phone rung", errs3.length === 0, errs3[0] || "");
 await page3.close();

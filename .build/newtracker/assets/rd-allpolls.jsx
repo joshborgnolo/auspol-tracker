@@ -1511,10 +1511,10 @@ function RdAllPolls(P) {
         <span className="rd-ap-th" title="The 2nd-most-named issue voters said matters most, with the share naming it">2nd</span>
         <span className="rd-ap-th" title="The 3rd-most-named issue voters said matters most, with the share naming it">3rd</span>
         <span className="rd-ap-hpic" aria-hidden="true">
-          <span className="rd-ap-cap">Best on top issue</span>
-          <span className="rd-ap-in">{[0, 10, 20, 30].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 30 ? "%" : ""}</span>)}</span>
+          <span className="rd-ap-cap">Best on the top issue</span>
+          <span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span>
         </span>
-        {th("Best party", "iss.bestv", { right: true, title: "The party most voters rate best on that issue" })}
+        {th("Party in first", "iss.bestv", { right: true, title: "The party most voters rate best on that issue" })}
       </>}
       <span></span>
     </div>
@@ -1692,7 +1692,7 @@ function RdAllPolls(P) {
       pic = (
         <span className="rd-ap-pic" role="img" aria-label={ariaBest}>
           <span className="rd-ap-in">
-            {[0, 10, 20, 30].map((v) => <i key={v} className="rd-ap-gl" style={{ left: pdx(v) + "%" }}></i>)}
+            {[0, 10, 20, 30, 40].map((v) => <i key={v} className="rd-ap-gl" style={{ left: pdx(v) + "%" }}></i>)}
             {ownDots.map((k) => (
               <i key={k.id} className="rd-ap-dot" style={{ left: pdx(own[k.id]) + "%", background: k.dot }}></i>
             ))}
@@ -1731,8 +1731,17 @@ function RdAllPolls(P) {
          are not ranked but cost of living performance is asked, eg with
          resolve and yougov, in the line where the issues ranking would
          go, say "Issues unranked, but performance on cost of living
-         assessed"'); pure best-party waves (SEC) and iss-less ordinary
-         rows keep no sentence at all */
+         assessed"'), rendered as a THREE-RUNG width ladder (.rd-ap-issph,
+         same-day follow-ups: 'if it overflows to two lines, make the
+         reword the wording… so wording depends on screen width', then
+         'change "assessed" to "asked"', the aim stated as one line on
+         all phones - the container shows the longest of full 351.5px /
+         mid "…cost-of-living performance assessed" 337.9px / ask
+         "…performance asked" 318.6px that fits the card's text lane, via
+         two @container tiers at those widths; every phone ≥360px gets it
+         on one line, the 320/340px shells wrap even the ask rung); pure
+         best-party waves (SEC) and iss-less ordinary rows keep no
+         sentence at all */
       const unprompted = !!(iss && !iss.sal && iss.conc);
       if (ib && im) {
         right1 = <b className="rd-ap-issfig"><span style={im[2] ? { color: im[2] } : null}>{im[1]}</span> {rdApNum(ib.v)}</b>;
@@ -1750,7 +1759,11 @@ function RdAllPolls(P) {
           </div>
         )}
         {!it && iss && iss.own && iss.own.col && (
-          <div className="rd-ap-csub rd-ap-csub-sent">Issues unranked, but performance on cost of living assessed</div>
+          <div className="rd-ap-issph">
+            <div className="rd-ap-csub rd-ap-csub-sent rd-ap-issph-full">Issues unranked, but performance on cost of living assessed</div>
+            <div className="rd-ap-csub rd-ap-csub-sent rd-ap-issph-mid">Issues unranked, but cost-of-living performance assessed</div>
+            <div className="rd-ap-csub rd-ap-csub-sent rd-ap-issph-ask">Issues unranked, but cost-of-living performance asked</div>
+          </div>
         )}
         {ownDots.length > 0 && <div className="rd-ap-cpic">{pic}</div>}
       </>;
@@ -1833,7 +1846,7 @@ function RdAllPolls(P) {
       {facet === "primary" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Primary vote</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
       {facet === "leadership" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Net rating: approve minus disapprove</span><span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span></span>}
       {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span>, unsure, <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
-      {facet === "issues" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Best on the top issue, %</span><span className="rd-ap-in">{[0, 10, 20, 30].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 30 ? "%" : ""}</span>)}</span></span>}
+      {facet === "issues" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Best on top issue</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
     </div>
   );
   /* the pinned bar's section links are the short names at every width - the

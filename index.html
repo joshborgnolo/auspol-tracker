@@ -4731,6 +4731,16 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-card .rd-ap-cprim b { font-size: 15px; font-weight: 600; }
   body.rd .rd-ap-cnets, body.rd .rd-ap-csub { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
   body.rd .rd-ap-csub-sent { display: block; }
+  body.rd .rd-ap-issph { container-type: inline-size; }
+  body.rd .rd-ap-issph-mid, body.rd .rd-ap-issph-ask { display: none; }
+  @container (max-width: 351.5px) {
+    body.rd .rd-ap-issph-full { display: none; }
+    body.rd .rd-ap-issph-mid { display: block; }
+  }
+  @container (max-width: 337.9px) {
+    body.rd .rd-ap-issph-mid { display: none; }
+    body.rd .rd-ap-issph-ask { display: block; }
+  }
   body.rd .rd-ap-cnets .rd-ap-nets { grid-template-columns: repeat(3, auto); column-gap: 12px; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }
@@ -80054,15 +80064,15 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Best on top issue"), React.createElement("span", {
+  }, "Best on the top issue"), React.createElement("span", {
     className: "rd-ap-in"
-  }, [0, 10, 20, 30].map(v => React.createElement("span", {
+  }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
     key: v,
     className: "rd-ap-tk",
     style: {
       left: pdx(v) + "%"
     }
-  }, v, v === 30 ? "%" : "")))), th("Best party", "iss.bestv", {
+  }, v, v === 40 ? "%" : "")))), th("Party in first", "iss.bestv", {
     right: true,
     title: "The party most voters rate best on that issue"
   })), React.createElement("span", null));
@@ -80460,7 +80470,7 @@ function RdAllPolls(P) {
         "aria-label": ariaBest
       }, React.createElement("span", {
         className: "rd-ap-in"
-      }, [0, 10, 20, 30].map(v => React.createElement("i", {
+      }, [0, 10, 20, 30, 40].map(v => React.createElement("i", {
         key: v,
         className: "rd-ap-gl",
         style: {
@@ -80505,8 +80515,14 @@ function RdAllPolls(P) {
       body = React.createElement(React.Fragment, null, it && React.createElement("div", {
         className: "rd-ap-csub rd-ap-csub-sent"
       }, sentLab1(it[0]), " ", ord(1), top3.length > 1 && React.createElement(React.Fragment, null, ", ", sentLab(top3[1][0]), " ", ord(2)), top3.length > 2 && React.createElement(React.Fragment, null, ", ", sentLab(top3[2][0]), " ", ord(3)), unprompted ? "; unprompted" : ""), !it && iss && iss.own && iss.own.col && React.createElement("div", {
-        className: "rd-ap-csub rd-ap-csub-sent"
-      }, "Issues unranked, but performance on cost of living assessed"), ownDots.length > 0 && React.createElement("div", {
+        className: "rd-ap-issph"
+      }, React.createElement("div", {
+        className: "rd-ap-csub rd-ap-csub-sent rd-ap-issph-full"
+      }, "Issues unranked, but performance on cost of living assessed"), React.createElement("div", {
+        className: "rd-ap-csub rd-ap-csub-sent rd-ap-issph-mid"
+      }, "Issues unranked, but cost-of-living performance assessed"), React.createElement("div", {
+        className: "rd-ap-csub rd-ap-csub-sent rd-ap-issph-ask"
+      }, "Issues unranked, but cost-of-living performance asked")), ownDots.length > 0 && React.createElement("div", {
         className: "rd-ap-cpic"
       }, pic));
     }
@@ -80688,15 +80704,15 @@ function RdAllPolls(P) {
     className: "rd-ap-hpic"
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Best on the top issue, %"), React.createElement("span", {
+  }, "Best on top issue"), React.createElement("span", {
     className: "rd-ap-in"
-  }, [0, 10, 20, 30].map(v => React.createElement("span", {
+  }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
     key: v,
     className: "rd-ap-tk",
     style: {
       left: pdx(v) + "%"
     }
-  }, v, v === 30 ? "%" : "")))));
+  }, v, v === 40 ? "%" : "")))));
   const NAV = [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagree"], ["house-lean", "Lean"], ["flow-drift", "Flows"]];
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
