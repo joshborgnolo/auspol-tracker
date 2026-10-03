@@ -350,13 +350,21 @@ ${ss3 ? `@font-face {
 @media (prefers-color-scheme: dark) { :root.sh-cool:not(.sh-light) { --bg: oklch(0.210 0.012 248); --sh-surface: oklch(0.248 0.013 248); --line: oklch(0.352 0.013 248); --line-2: oklch(0.310 0.012 248); } }
 :root.sh-cool.sh-dark { --bg: oklch(0.210 0.012 248); --sh-surface: oklch(0.248 0.013 248); --line: oklch(0.352 0.013 248); --line-2: oklch(0.310 0.012 248); }
 
-/* the main page's .page box: the header and footer line up with its own */
+/* the main page's .page box: the header, tab bar and footer line up with its
+   margins. Gutter and column are its --rd-gutter/--rd-maxw verbatim (assets/
+   rd.css body.rd: clamp(20px, 5vw, 64px) over 1152px) – a frame change on the
+   main page moves here too. */
+:root { --sh-gutter: clamp(20px, 5vw, 64px); --sh-maxw: 1152px; }
 .sh-frame {
-  box-sizing: border-box; width: 100%; max-width: 1200px; margin: 0 auto; flex: none;
-  padding-left: calc(28px + env(safe-area-inset-left, 0px));
-  padding-right: calc(28px + env(safe-area-inset-right, 0px));
+  box-sizing: border-box; width: 100%; max-width: calc(var(--sh-maxw) + 2 * var(--sh-gutter)); margin: 0 auto; flex: none;
+  padding-left: calc(var(--sh-gutter) + env(safe-area-inset-left, 0px));
+  padding-right: calc(var(--sh-gutter) + env(safe-area-inset-right, 0px));
 }
 .sh-top { padding-top: calc(28px + env(safe-area-inset-top, 0px)); }
+@media (max-width: 560px) {
+  /* the main page's phone step: .page's vertical padding goes 28 → 20 there */
+  .sh-top { padding-top: calc(20px + env(safe-area-inset-top, 0px)); }
+}
 .sh-skip {
   position: absolute; left: 12px; top: -60px; z-index: 400; padding: 8px 12px; border-radius: 8px;
   background: var(--bg); color: var(--ink); border: 1px solid var(--line); font: 600 13px var(--sans);
@@ -580,9 +588,12 @@ a.sh-tn-link:hover, a.sh-tn-link:focus-visible { text-decoration: underline; tex
 /* the page's own column sits where the main page's Info column does: on the
    frame's left edge at the Info measure (.info's 66ch, 692px), rather than
    centred on a column of its own – and the archives' switcher with it. The
-   tab bar's margin is now the gap above it, as on the main page. */
+   tab bar's margin is now the gap above it, as on the main page. margin-left
+   lands the article text on the frame's content edge (frame-left + gutter,
+   less this column's own 28px padding). */
 .frame-wrap {
-  max-width: calc(692px + 56px); margin-left: max(0px, calc((100% - 1200px) / 2)); margin-right: auto;
+  max-width: calc(692px + 56px); margin-right: auto;
+  margin-left: max(0px, calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) - 28px));
 }
 .frame-wrap { padding-top: 0; }
 /* The Morgan and Trove archives run to ~30,000 table elements; laid out
@@ -604,11 +615,12 @@ a.sh-tn-link:hover, a.sh-tn-link:focus-visible { text-decoration: underline; tex
 .frame-wrap .toc a:hover, .frame-wrap .toc a:focus-visible { text-decoration-color: currentColor; }
 /* the archives' switcher on the same edge; its underline is drawn across its
    own box, so the frame's inset is margin here, not padding – the rule
-   starts where the text does */
+   starts where the text does. The edge is the frame's content edge: its own
+   gutter below the 1152px column's width, (100% − maxw)/2 once it floats. */
 nav.tabs[aria-label="Poll archives"] {
   box-sizing: border-box; width: auto; max-width: 692px; padding-left: 0; padding-right: 0;
-  margin: 0 calc(28px + env(safe-area-inset-right, 0px)) 22px
-          calc(max(0px, (100% - 1200px) / 2) + 28px + env(safe-area-inset-left, 0px));
+  margin: 0 calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) + env(safe-area-inset-right, 0px)) 22px
+          calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) + env(safe-area-inset-left, 0px));
 }
 
 /* the colophon (.method .colophon): identity left, ways in right */
@@ -640,13 +652,8 @@ nav.tabs[aria-label="Poll archives"] {
 }
 
 @media (max-width: 640px) {
-  .sh-frame { padding-left: calc(16px + env(safe-area-inset-left, 0px)); padding-right: calc(16px + env(safe-area-inset-right, 0px)); }
-  .sh-top { padding-top: calc(18px + env(safe-area-inset-top, 0px)); }
   .sh-head { gap: 16px; padding-bottom: 12px; }
   .sh-tabs { margin-bottom: 18px; }
-  nav.tabs[aria-label="Poll archives"] {
-    margin-left: calc(16px + env(safe-area-inset-left, 0px)); margin-right: calc(16px + env(safe-area-inset-right, 0px));
-  }
   /* the set spreads across the whole row as the main page's phone tabs
      do; pinned it closes up at the left so the score can dock right of it */
   .sh-tabs-set { gap: 0; width: 100%; justify-content: space-between; }
