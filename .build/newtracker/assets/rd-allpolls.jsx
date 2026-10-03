@@ -784,7 +784,10 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
   const refIso = p.chg && p.chg.r ? (p.chg.r.pOnp || p.chg.r.pAlp || p.chg.r.impOn || p.chg.r.imp) : null;
   const prev = refIso ? D.individualPolls.find((x) => x.pollster === p.pollster && x.released === refIso) : null;
   const CK = { alp: "pAlp", lnp: "pLnp", grn: "pGrn", onp: "pOnp", oth: "pOth" };
-  const prim = rdApPrimList(RD_AP_PRIM_FALLBACK).filter((k) => q[k.id] != null).sort((a, b) => q[b.id] - q[a.id]);
+  /* the expansion ranks by the SAME site-aggregate walk the row above it
+     rides (prims in RdAllPolls) - not the wave's own largest-first order;
+     two orders for one wave was the unprincipled bit (user call 2026-10-03) */
+  const prim = rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK).filter((k) => q[k.id] != null);
   const pair = (a, b, bInk) => (
     <b className="rd-apd-pair"><span style={{ color: "var(--alp-text)" }}>{a}</span><span className="rd-ap-dash"> – </span><span style={{ color: bInk }}>{b}</span></b>
   );
@@ -829,7 +832,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
     .filter(([, nk]) => a[nk] != null);
   const allFav = leaders.length > 0 && leaders.every(([id]) => mb[id] === "fav");
   const d = p.dir;
-  const seats = p.seats && p.seats.p ? rdApPrimList(RD_AP_PRIM_FALLBACK).filter((k) => p.seats.p[k.id]) : [];
+  const seats = p.seats && p.seats.p ? rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK).filter((k) => p.seats.p[k.id]) : [];
   /* the "Rated best on" block: the three-way ownership figures for the top
      issue when the wave printed them (they're shares of those naming one of
      the three parties), else SEC Newgate's printed best-party table */
@@ -1093,7 +1096,9 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
             <span className="rd-apd-k">Asked</span>
             <span>{issPrompted
               ? <>Voters picked the three issues that matter most{iss.q ? <> – {p.pollster}’s wording: “{iss.q}”</> : p.pollster === "Ipsos" ? " – Ipsos asks its standing list of 19 issues, best party on the month’s five leaders" : ""}. SEC Newgate’s mentions count can’t sit in the same series, so each house’s wording is pooled against its pair first.</>
-              : <>SEC Newgate asks what concerns Australians, unprompted – anyone can name anything, so the shares are any-mentions, not forced picks. That reading can’t mix with the top-three series the issues panel pools, so it isn’t counted toward it.</>}</span>
+              : iss.conc
+                ? <>SEC Newgate asks what concerns Australians, unprompted – anyone can name anything, so the shares are any-mentions, not forced picks. That reading can’t mix with the top-three series the issues panel pools, so it isn’t counted toward it.</>
+                : <>{p.pollster} asked only who’d be best on each issue{iss.q ? <> – its wording: “{iss.q}” –</> : ","} not which issues matter most, so this wave feeds the pooled best-party line and there’s no top-three list for it to join.</>}</span>
             {issPair != null && <>
               <span className="rd-apd-k">Between the question forms</span>
               <span>RedBridge’s and Ipsos’s wordings for what matters sit a measured <b>{Math.abs(issPair).toFixed(1)}</b> points apart on {((D.issues.labels && D.issues.labels[iss.top]) || iss.top)}; this wave’s reading was moved half that gap toward the other house’s before it entered any average.</span>
@@ -1577,7 +1582,7 @@ function RdAllPolls(P) {
         <span className="rd-ap-pic" role="img" aria-label={"Primary vote: " + prims.filter((k) => pr[k.id] != null).map((k) => k.lab + " " + rdApNum(pr[k.id])).join(", ")}>
           <span className="rd-ap-in">
             {[0, 10, 20, 30, 40].map((v) => <i key={v} className="rd-ap-gl" style={{ left: pdx(v) + "%" }}></i>)}
-            {rdApPrimList(RD_AP_PRIM_FALLBACK).filter((k) => pr[k.id] != null).sort((x, y) => pr[y.id] - pr[x.id]).map((k) => (
+            {prims.filter((k) => pr[k.id] != null).map((k) => (
               <i key={k.id} className="rd-ap-dot" style={{ left: pdx(pr[k.id]) + "%", background: k.dot }}></i>
             ))}
           </span>
@@ -1679,7 +1684,7 @@ function RdAllPolls(P) {
       const own = iss && iss.top ? (iss.own && iss.own[iss.top]) || iss.bp || null : null;
       const ownLab = iss && iss.top ? ((D.issues && D.issues.labels && D.issues.labels[iss.top]) || iss.top) : null;
       const ownDots = own
-        ? rdApPrimList(RD_AP_PRIM_FALLBACK).filter((k) => k.id !== "oth" && own[k.id] != null).sort((a, b) => own[b.id] - own[a.id])
+        ? prims.filter((k) => k.id !== "oth" && own[k.id] != null)
         : [];
       const ariaBest = ownDots.length
         ? "Rated best on " + (ownLab || "the issue") + ": " + ownDots.map((k) => (window.ISS_PARTY_META[k.id] || [k.id])[0] + " " + rdApNum(own[k.id])).join(", ") + ", shares of all respondents"
@@ -1717,7 +1722,15 @@ function RdAllPolls(P) {
          redundant) before lowercasing. The sentence carries
          .rd-ap-csub-sent: the row's shared csub rule is display:flex
          (built for figure chips), which would itemise every JSX fragment
-         on its own line */
+         on its own line. A wave that measures no ranking but asked
+         cost-of-living ownership instead (Resolve, YouGov, DemosAU - iss
+         with own.col but no sal/conc, so no `it`) fills the same line
+         with the user's dictated placeholder (same-day call: 'When issues
+         are not ranked but cost of living performance is asked, eg with
+         resolve and yougov, in the line where the issues ranking would
+         go, say "Issues unranked, but performance on cost of living
+         assessed"'); pure best-party waves (SEC) and iss-less ordinary
+         rows keep no sentence at all */
       const unprompted = !!(iss && !iss.sal && iss.conc);
       if (ib && im) {
         right1 = <b className="rd-ap-issfig"><span style={im[2] ? { color: im[2] } : null}>{im[1]}</span> {rdApNum(ib.v)}</b>;
@@ -1733,6 +1746,9 @@ function RdAllPolls(P) {
             {top3.length > 2 && <>, {sentLab(top3[2][0])} {ord(3)}</>}
             {unprompted ? ", unprompted" : ""}
           </div>
+        )}
+        {!it && iss && iss.own && iss.own.col && (
+          <div className="rd-ap-csub rd-ap-csub-sent">Issues unranked, but performance on cost of living assessed</div>
         )}
         {ownDots.length > 0 && <div className="rd-ap-cpic">{pic}</div>}
       </>;

@@ -3398,8 +3398,12 @@ const rivalByYm = Object.fromEntries(rivalWalk.map((r) => [r.ym, r.who]));
    Since 2026-10-03 the All-polls house-lean tab row, the Latest-and-
    next primary facet AND the redesign All-polls tab's primary facet ride
    the SAME emission (rd-allpolls.jsx hlViews and prims, rd-polls.jsx
-   plParties) alongside the Latest/All-polls table columns – change the
-   walk here and every surface moves together. */
+   plParties) alongside the Latest/All-polls table columns – as do, from
+   the same day, the redesign tab's expanded-poll primary ladder, its
+   modelled-seats sentence, its row primary dots and its issues
+   ownership dots (RdApDetail prim/seats + the row strip's rd-ap-dots,
+   all rd-allpolls.jsx). Change the walk here and every surface moves
+   together. */
 const PRIMARY_DEADBAND = 1.0;
 const primaryOrder = (() => {
   const order = [...PRIMARY_KEYS];

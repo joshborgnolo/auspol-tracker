@@ -79074,7 +79074,7 @@ function RdApDetail({
     onp: "pOnp",
     oth: "pOth"
   };
-  const prim = rdApPrimList(RD_AP_PRIM_FALLBACK).filter(k => q[k.id] != null).sort((a, b) => q[b.id] - q[a.id]);
+  const prim = rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK).filter(k => q[k.id] != null);
   const pair = (a, b, bInk) => React.createElement("b", {
     className: "rd-apd-pair"
   }, React.createElement("span", {
@@ -79147,7 +79147,7 @@ function RdApDetail({
   const leaders = [["alb", "albNet", "Albanese"], ["taylor", "taylorNet", a.oppName || "Taylor"], ["hanson", "hansonNet", "Hanson"]].filter(([, nk]) => a[nk] != null);
   const allFav = leaders.length > 0 && leaders.every(([id]) => mb[id] === "fav");
   const d = p.dir;
-  const seats = p.seats && p.seats.p ? rdApPrimList(RD_AP_PRIM_FALLBACK).filter(k => p.seats.p[k.id]) : [];
+  const seats = p.seats && p.seats.p ? rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK).filter(k => p.seats.p[k.id]) : [];
   const issBestBlock = (() => {
     const iss = p.iss;
     if (!iss) return null;
@@ -80210,7 +80210,7 @@ function RdAllPolls(P) {
         style: {
           left: pdx(v) + "%"
         }
-      })), rdApPrimList(RD_AP_PRIM_FALLBACK).filter(k => pr[k.id] != null).sort((x, y) => pr[y.id] - pr[x.id]).map(k => React.createElement("i", {
+      })), prims.filter(k => pr[k.id] != null).map(k => React.createElement("i", {
         key: k.id,
         className: "rd-ap-dot",
         style: {
@@ -80434,7 +80434,7 @@ function RdAllPolls(P) {
       figs = React.createElement(React.Fragment, null, issCell(it, !(iss && iss.sal) && iss && iss.conc ? ", unprompted" : null), issCell(top3[1] || null), issCell(top3[2] || null));
       const own = iss && iss.top ? iss.own && iss.own[iss.top] || iss.bp || null : null;
       const ownLab = iss && iss.top ? D.issues && D.issues.labels && D.issues.labels[iss.top] || iss.top : null;
-      const ownDots = own ? rdApPrimList(RD_AP_PRIM_FALLBACK).filter(k => k.id !== "oth" && own[k.id] != null).sort((a, b) => own[b.id] - own[a.id]) : [];
+      const ownDots = own ? prims.filter(k => k.id !== "oth" && own[k.id] != null) : [];
       const ariaBest = ownDots.length ? "Rated best on " + (ownLab || "the issue") + ": " + ownDots.map(k => (window.ISS_PARTY_META[k.id] || [k.id])[0] + " " + rdApNum(own[k.id])).join(", ") + ", shares of all respondents" : "No best-party reading this wave";
       pic = React.createElement("span", {
         className: "rd-ap-pic",
