@@ -17,8 +17,9 @@
 //     chart — the rail never says "Labor's" on this facet
 //  7. An opened SEC row shows "Named without prompting" + the not-pooled
 //     note (its concerns bank is any-mentions, not a forced pick)
-//  8. VW=390 VH=844: the phone rung mounts cards carrying the 2nd/3rd
-//     issues as a csub under the top issue
+//  8. VW=390 VH=844: the phone rung mounts cards whose best-issue sentence
+//     reads as a superscript-ordinal ranking ("Cost of living 1st, housing
+//     2nd, crime 3rd") on ONE csub line
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -397,28 +398,33 @@ await page3.waitForSelector(".rd-ap-card", { timeout: 15000 });
 await showAll(page3);
 
 // Same contract as the desktop rows: a card carries the one-line best-issue
-// sentence ("Cost of living top issue (68), then health (45) and crime
-// (23)") iff its top-issue cell is filled (best-party-only waves rightly
-// have neither), each share parenthesised beside its issue's name; the
-// sentence rides .rd-ap-csub-sent so it flows as ONE inline run (the row's
-// shared csub rule is display:flex, which once itemised the JSX fragments
-// into a 4-line column at 390px). The best-party verdict leaves the body
-// and rides the head row as a compact chip ("ALP 29"); cards with an
-// ownership reading carry the full-width party-dot strip on its own body
-// line, under the restored pinned tick ladder.
+// sentence iff its top-issue cell is filled (best-party-only waves rightly
+// have neither). The sentence is a plain ranking with superscript ordinals
+// and NO figures ("cost of living 1st, housing 2nd, crime 3rd", ALL
+// labels lowercased - sentence-initial included - "Housing affordability"
+// shortened to "housing", ", unprompted" appended on SEC waves); it rides
+// .rd-ap-csub-sent so it flows as ONE inline run (the row's shared csub
+// rule is display:flex, which once itemised the JSX fragments into a
+// 4-line column at 390px). The best-party verdict leaves the body and
+// rides the head row as a compact chip ("ALP 29"); cards with an ownership
+// reading carry the full-width party-dot strip on its own body line,
+// under the restored pinned tick ladder.
 const cardAnatomy = await page3.evaluate(() => {
   const cards = [...document.querySelectorAll(".rd-ap-card")];
   const an = cards.map((c) => {
     const subs = [...c.querySelectorAll(".rd-ap-csub")];
     const sent = c.querySelector(".rd-ap-csub-sent");
     const txt = sent ? sent.textContent.trim().replace(/\s+/g, " ") : "";
-    const topFilled = !!sent && / top issue \(\d/.test(txt);
-    const legacy = subs.some((d) => /^2nd |^Best on it/.test(d.textContent));
+    const topFilled = !!sent && / 1st/.test(txt);
+    // user call 2026-10-03: no capitalised issue names anywhere in the
+    // sentence - "cost of living", not "Cost of living"
+    const capsOk = !sent || !/[A-Z]/.test(txt.replace(/ unprompted$/, ""));
+    const legacy = subs.some((d) => /\(\d+\)/.test(d.textContent)) || subs.some((d) => / top issue | then |Best on it/.test(d.textContent));
     // a card carries exactly one csub when it has the sentence, none when
     // it is a best-party-only wave
     const csubSentOk = subs.length === (sent ? 1 : 0);
-    // runners ride the same single line: ", then health (45) and crime (23)"
-    const runnerOk = !sent || (!/ then /.test(txt) || /, then [^()]+ \(\d/.test(txt)) && (!/ and /.test(txt.replace(/^.* then /, "")) || /\) and [^()]+ \(\d/.test(txt));
+    // runners ride the same single line: ", housing 2nd, crime 3rd"
+    const runnerOk = !sent || (!/ 2nd/.test(txt) || /, [^,(]+ 2nd/.test(txt)) && (!/ 3rd/.test(txt) || /, [^,(]+ 3rd/.test(txt));
     const noPair = !c.querySelector(".rd-ap-pairfig");
     const chip = c.querySelector(".rd-ap-c1 .rd-ap-issfig");
     const chipTxt = chip ? chip.textContent.trim().replace(/\s+/g, " ") : "";
@@ -427,7 +433,7 @@ const cardAnatomy = await page3.evaluate(() => {
     const chipOk = !!chip && /[A-Za-z]+ \d+/.test(chipTxt);
     const bodyStrip = c.querySelector(":scope > .rd-ap-cpic");
     const dots = bodyStrip ? bodyStrip.querySelectorAll(".rd-ap-dot").length : 0;
-    return { nxt: sent ? / then /.test(txt) : false, runnerOk, topFilled, legacy, csubSentOk, noPair, chip: chipOk, chipTxt, bodyStrip: !!bodyStrip, dots, subN: subs.length, txt, firm: (c.querySelector(".rd-ap-firm") || {}).textContent || "?" };
+    return { nxt: sent ? / 2nd/.test(txt) : false, runnerOk, topFilled, caps: capsOk, legacy, csubSentOk, noPair, chip: chipOk, chipTxt, bodyStrip: !!bodyStrip, dots, subN: subs.length, txt, firm: (c.querySelector(".rd-ap-firm") || {}).textContent || "?" };
   });
   const dotted = an.filter((a) => a.dots > 0);
   return { an,
@@ -435,7 +441,7 @@ const cardAnatomy = await page3.evaluate(() => {
     withTop: an.filter((a) => a.topFilled).length,
     topMissing: an.filter((a) => !a.topFilled).length,
     withNxt: an.filter((a) => a.nxt).length,
-    badNxt: an.filter((a) => !a.runnerOk || !a.csubSentOk).length,
+    badNxt: an.filter((a) => !a.runnerOk || !a.csubSentOk || !a.caps).length,
     legacySubs: an.filter((a) => a.legacy).length,
     withDots: dotted.length,
     badDots: dotted.filter((a) => a.dots < 2 || a.dots > 4).length,
@@ -446,9 +452,9 @@ const cardAnatomy = await page3.evaluate(() => {
     ipsos: cards.filter((c) => /Ipsos/.test(c.textContent)).length,
   };
 });
-console.log("  diag bad-runners:", JSON.stringify(cardAnatomy.an.filter((a) => !a.runnerOk || !a.csubSentOk).map((a) => ({ f: a.firm, t: a.txt, n: a.subN }))));
+console.log("  diag bad-runners:", JSON.stringify(cardAnatomy.an.filter((a) => !a.runnerOk || !a.csubSentOk || !a.caps).map((a) => ({ f: a.firm, t: a.txt, n: a.subN }))));
 console.log("  diag bad-chips:", JSON.stringify(cardAnatomy.an.filter((a) => a.dots > 0 && !a.chip).map((a) => ({ f: a.firm, c: a.chipTxt }))));
-check("phone: the best issues read as ONE flowing sentence with each share parenthesised beside its name",
+check("phone: the best issues read as ONE flowing sentence of superscript-ordinal rankings (no figures)",
   cardAnatomy.withTop > 0 && cardAnatomy.withNxt > 0 && cardAnatomy.badNxt === 0 && cardAnatomy.legacySubs === 0,
   `${cardAnatomy.withTop}/${cardAnatomy.cardsN} with the sentence (${cardAnatomy.withNxt} with runners, ${cardAnatomy.topMissing} best-party-only); bad ${cardAnatomy.badNxt}; legacy subs ${cardAnatomy.legacySubs}`);
 check("phone: the ownership dot strip spans the full width of the card body again",

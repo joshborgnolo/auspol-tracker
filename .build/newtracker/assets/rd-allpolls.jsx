@@ -182,6 +182,11 @@ const rdApTagLab = (id) => (RD_AP_TAGS[id] ? RD_AP_TAGS[id].label : id);
 const RD_AP_M = 6;
 const rdApX = (v) => ((Math.max(-RD_AP_M, Math.min(RD_AP_M, v)) + RD_AP_M) / (2 * RD_AP_M)) * 100;
 
+/* the issues phone sentence shortens the one stored label the user called
+   redundant (2026-10-03: "housing affordability - that's not needed");
+   everything else falls through to plain lowercasing */
+const ISS_SENT_SHORT = { "Housing affordability": "housing" };
+
 /* ---------------------------------------------------------------- the lean picture
    One poll against the average of its month: the centre line is that
    average, the dot the poll's lean, the whisker its 95% margin from sampling
@@ -1696,26 +1701,33 @@ function RdAllPolls(P) {
       );
       /* the phone card gives the ownership strip the whole width of the row
          back (user call 2026-10-03: "make the dots span the whole width of
-         the row once again, like in primary and like in leaders") - the
-         three best-issue sublines collapse into ONE sentence ("Cost of
-         living top issue (60), then health (27) and housing (8)"), and the
-         best-party line moves up beside the firm name as a compact chip, so
-         the strip's own full-width line costs no extra height. The top-issue
-         share is NOT reprinted as a pairfig beside the firm either - the
-         sentence's first parenthesised figure already names it. The sentence
-         carries .rd-ap-csub-sent: the row's shared csub rule is display:flex
-         (built for figure chips), which would itemise every JSX fragment on
-         its own line */
+         the row once again, like in primary and like in leaders"), and the
+         three best-issue sublines collapse into ONE sentence, first as
+         "…top issue (68), then … (32) and … (20)" and then, on the same-day
+         follow-up call ("Cost of living 1st, housing 2nd, crime 3rd" with
+         superscript ordinals, "housing affordability" shortened to
+         "housing", ", unprompted" kept for SEC; a moment later: "don't
+         capitalise issue names - eg 'housing', not 'Housing'", so ALL
+         three labels lowercase, sentence-initial included), a plain
+         ranking with NO figures - the ordinal itself now says what the
+         wordy tail did, and the salience shares stay quoted in the desktop
+         cells and the detail rail. Labels run through ISS_SENT_SHORT (the
+         one SEC label the user named redundant) before lowercasing. The
+         sentence carries .rd-ap-csub-sent: the row's shared csub rule is
+         display:flex (built for figure chips), which would itemise every
+         JSX fragment on its own line */
       const unprompted = !!(iss && !iss.sal && iss.conc);
       if (ib && im) {
         right1 = <b className="rd-ap-issfig"><span style={im[2] ? { color: im[2] } : null}>{im[1]}</span> {rdApNum(ib.v)}</b>;
       }
+      const sentLab = (l) => (ISS_SENT_SHORT[l] || l.toLowerCase());
+      const ord = (n) => n === 1 ? <span>1<sup>st</sup></span> : n === 2 ? <span>2<sup>nd</sup></span> : <span>3<sup>rd</sup></span>;
       body = <>
         {it && (
           <div className="rd-ap-csub rd-ap-csub-sent">
-            {it[0]} top issue <b>({rdApNum(it[1])})</b>
-            {top3.length > 1 && <>, then {top3[1][0]} <b>({rdApNum(top3[1][1])})</b></>}
-            {top3.length > 2 && <> and {top3[2][0]} <b>({rdApNum(top3[2][1])})</b></>}
+            {sentLab(it[0])} {ord(1)}
+            {top3.length > 1 && <>, {sentLab(top3[1][0])} {ord(2)}</>}
+            {top3.length > 2 && <>, {sentLab(top3[2][0])} {ord(3)}</>}
             {unprompted ? ", unprompted" : ""}
           </div>
         )}
