@@ -1512,9 +1512,9 @@ function RdAllPolls(P) {
         <span className="rd-ap-th" title="The 3rd-most-named issue voters said matters most, with the share naming it">3rd</span>
         <span className="rd-ap-hpic" aria-hidden="true">
           <span className="rd-ap-cap">Best on the top issue</span>
-          <span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span>
+          <span className="rd-ap-in">{[0, 10, 20, 30].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 30 ? "%" : ""}</span>)}</span>
         </span>
-        {th("Party in first", "iss.bestv", { right: true, title: "The party most voters rate best on that issue" })}
+        {th("Party in first", "iss.bestv", { right: true, wrap: true, title: "The party most voters rate best on that issue" })}
       </>}
       <span></span>
     </div>
@@ -1849,7 +1849,7 @@ function RdAllPolls(P) {
       {facet === "primary" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Primary vote</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
       {facet === "leadership" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Net rating: approve minus disapprove</span><span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span></span>}
       {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span>, unsure, <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
-      {facet === "issues" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Best on top issue</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
+      {facet === "issues" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Best on the top issue</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
     </div>
   );
   /* the pinned bar's section links are the short names at every width - the

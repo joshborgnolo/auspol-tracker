@@ -80066,14 +80066,15 @@ function RdAllPolls(P) {
     className: "rd-ap-cap"
   }, "Best on the top issue"), React.createElement("span", {
     className: "rd-ap-in"
-  }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
+  }, [0, 10, 20, 30].map(v => React.createElement("span", {
     key: v,
     className: "rd-ap-tk",
     style: {
       left: pdx(v) + "%"
     }
-  }, v, v === 40 ? "%" : "")))), th("Party in first", "iss.bestv", {
+  }, v, v === 30 ? "%" : "")))), th("Party in first", "iss.bestv", {
     right: true,
+    wrap: true,
     title: "The party most voters rate best on that issue"
   })), React.createElement("span", null));
   const pollsterCell = p => React.createElement("span", {
@@ -80704,7 +80705,7 @@ function RdAllPolls(P) {
     className: "rd-ap-hpic"
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Best on top issue"), React.createElement("span", {
+  }, "Best on the top issue"), React.createElement("span", {
     className: "rd-ap-in"
   }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
     key: v,

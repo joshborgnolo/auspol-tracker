@@ -40,9 +40,10 @@ grammar exactly:
   room for it"), drawn straight off
   `RD_AP_PRIM` (rd-allpolls.jsx :149). Dots =
   `iss.own[iss.top]` (or SEC's `iss.bp` fallback), filtered to
-  as-printed non-null parties, sorted desc. Head captions DIFFER by
-  rung — desktop hrow "Best" vs phone phead "Best on the top issue, %"
-  (see the captions section below).
+  as-printed non-null parties, sorted desc. Head captions MATCH after
+  the fifth drive — both homes read "Best on the top issue" (the phone
+  gained "the" in the same drive that dropped the desktop head's 40
+  tick; see the captions section below).
 - The Best-on-it verdict MOVED to the right-aligned `.rd-ap-netcell` rail
   position (`.rd-ap-issbest`: party abbrev in its css-var colour + the
   "N on it" sub) — the same slot Direction's Net figure occupies.
@@ -136,8 +137,14 @@ screens - there's much room for it"): both heads now run 0/10/20/30/40
 again; the b900f23 overshoot clause applied only to the 0–30 era. Check
 `git log` before "fixing" text a summary says is wrong —
 snapshot-era copies of the 307px caption string were already dead code.
+FIFTH drive, same evening ("remove the '40%' ticker in the issues facet
+… It doesn't fit. Keep it on small screens where it does fit"): the
+DESKTOP head ladder reverted to 0/10/20/30 (4 ticks, "%" back on the
+30) while the phone head keeps all five — the row strip gridlines and
+the 0–45 pdx scale are untouched everywhere (still 0/10/20/30/40, and
+>30 dots still overshoot the final desktop head gridline by design).
 
-## Head captions/labels — THREE strings, final contract 2026-10-03
+## Head captions/labels — THREE strings, final contract 2026-10-03 (now FIVE drives)
 
 The phone complaint came first ("it just says best on its own on a line
 on my phone. Surely you can add more words there" — 9d2f9a2), then the
@@ -145,33 +152,46 @@ user walked the same wish across desktop in two more calls: "instead of
 just best on desktop, call it best on it. There is room for on it."
 (15dbaed) and "the last two columns are both labeled best on it. I
 think call the last column 'Best party'" (label rode 6825d55, probes
-pinned f67f598). FINAL strings, all shipped:
+pinned f67f598). Fourth drive, same day: "Best on top issue" → "Best on
+the top issue" (desktop), "Best party" → "Party in first" (desktop),
+and the phone cap's ", %" gloss dropped — the fuller wording SWAPPED
+SIDES (desktop now carries the fuller reading, phone the terse one).
+Fifth drive, same evening ("make it 'Best on the top issue'", phone):
+the phone cap gains "the", so BOTH homes now read the full form.
+FINAL strings, all shipped:
 
-- DESKTOP hrow caption (rd-allpolls.jsx :1491) = `"Best on top issue"`
-  — walked 15dbaed's `"Best on it"` to the fuller reading so the dots
-  column's scale grammar matches the rail's `"Best party"` beside it.
-  The 66a078a budget math that starved the hpic to ~196px no longer
-  binds: the caption measures ~110px against the column's ~104px
-  narrowest template floor under its th; the sweep confirmed no
-  caption/tick contact at 560–1480. The phone head takes the fullest
-  wording still.
-- DESKTOP rail th (:1494) = `th("Best party", "iss.bestv", …)` — the
-  right-aligned verdict column got its own distinct name so the last
-  two column heads don't both read "Best on it". Sort key and title
-  ("The party most voters rate best on that issue") unchanged. Fits:
-  scrollWidth 83 ≤ the 82.8px th box at every rung 800–1480 (the
-  82.8px-into-72px overflow is pre-existing padding geometry, same as
-  "Best on it" had).
-- PHONE phead (:1776) stays `"Best on the top issue, %"`, deliberately
-  the same terse basis-marked grammar as the phone primary facet's
-  `"Primary vote, %"`. Measured 168px at the 12px/600 caps caption font
-  (`.rd-ap-cap` ≈ 8px/char) → 104px clear of the track's right edge
-  even at 320px. The obvious fuller choice — the pre-b900f23
-  "Best on the top issue, % of all respondents" — measures ~307px and
-  OVERFLOWS the 320–360 rungs (`0.9·320 − 16 ≈ 272px` of track); that
-  is why it lost. `.rd-ap-cap` is `position:absolute; white-space:
-  nowrap`: an over-long caption NEVER wraps, NEVER ellipsises — it
-  silently paints past the track right edge. A caption change needs a
+- DESKTOP hrow caption (rd-allpolls.jsx :1514) = `"Best on the top
+  issue"` — walks the pre-drive `"Best on top issue"` up to the phone's
+  old fuller reading. Measured 148.6px at the head's caps font; the
+  hpic track's narrowest desktop template width is 196px, so it clears
+  every rung — the sweep confirms no cap/tick or cap/th contact at
+  560–1480.
+- DESKTOP rail th (:1517) = `th("Party in first", "iss.bestv",
+  { right: true, wrap: true, … })` — sort key and title ("The party
+  most voters rate best on that issue") unchanged. THE FIT LESSON:
+  column 9 of the ciss template is a FIXED 72px track and .rd-ap-th has
+  NO horizontal padding (`all: unset`), so the th box hugs its glyphs —
+  "Party in first" measures 106px on one line and overflowed 34px INTO
+  the tick ladder (sweep tk4∩best at 15/24 rungs; "Best party"'s 83px
+  box had overflowed 11px but cleared the ticks, which is why it got
+  away with it). Fix is the helper's `opt.wrap` — shipped since on the
+  twopp facet's "Labor v Coalition" th: `white-space: normal` +
+  `justify-self: end` clamps the box to the 72px track and the label
+  wraps to two lines (~33px tall < the 38px hpic min-height, so the
+  head row never grows). Any future rail-label rename must measure
+  against the 72px track — a single word longer than "Party" will not
+  fit one line.
+- PHONE phead (:1852) = `"Best on the top issue"` since the fifth
+  drive — the fourth dropped the ", %" basis mark (the 0–40 tick
+  ladder, phone-only since the fifth, already carries the sign) and
+  the fifth added "the" back so both homes match. Measured ~160px at
+  the phone caps font — trivially clear of the ~272px track at 320,
+  and the sweep probe capsOk of iss-facet.mjs pins it. The width law
+  stands:
+  `.rd-ap-cap` is `position:absolute; white-space: nowrap`, so an
+  over-long caption NEVER wraps, NEVER ellipsises — it silently paints
+  past the track right edge (the pre-b900f23 "…, % of all respondents"
+  at ~307px overflowed the 320–360 rungs). A caption change needs a
   right-edge probe (cap rect ≤ hpic rect − 8) at 320/360/390/560/760,
   not just the collision sweep (cap and ticks sit on different bands,
   so the sweep's intersection check cannot see horizontal overflow).
@@ -181,13 +201,16 @@ pinned f67f598). FINAL strings, all shipped:
   rail are the best-ON-the-top-issue shares, as printed, of all
   respondents (§TWO-BASIS below).
 - Probe pinning: iss-facet.mjs pins the two CAPTION strings —
-  `headCap:"Best on it"` (desktop, :235) and `phoneHead.cap:
-  "Best on the top issue, %"` (:446); it never pinned the rail th text.
-  The RAIL th is located by `/Best party/i` regex in the three
-  head-geometry probes iss-head-sweep.mjs (:33), iss-head-overlap.mjs
-  (:50) and iss-head-safari.mjs (:27) — a rail-label rename touches all
-  three at once. A deliberate copy change fails the probes until the
-  pinned expectation moves with it. THE PROBE ADD GOTCHA: iss-facet.mjs
+  `headCap:"Best on the top issue"` (desktop, :247) and `phoneHead.cap:
+  "Best on the top issue"` (:547; identical strings since the fifth
+  drive), PLUS the per-rung tick ladders (desktop 4 ticks end "30%",
+  phone 5 end "40%"; ap-iss-dir-head.mjs re-pins both beside the
+  direction-lane checks); it never pins the rail th text. The RAIL
+  th is located by `/Party in first/i` regex in the three head-geometry
+  probes iss-head-sweep.mjs (:34), iss-head-overlap.mjs (:50) and
+  iss-head-safari.mjs (:27) — a rail-label rename touches all three at
+  once. A deliberate copy change fails the probes until the pinned
+  expectation moves with it. THE PROBE ADD GOTCHA: iss-facet.mjs
   is tracked BUT
   lives under the gitignored `.matilda/probe/` — a batched
   `git add file1 index.html probe` fails the WHOLE add with exit 1

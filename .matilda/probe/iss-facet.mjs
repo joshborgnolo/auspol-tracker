@@ -247,7 +247,7 @@ check("a row naming a 2nd or 3rd issue always fills its top-issue cell",
 check("the column head names the scale the strip draws on",
   rowAnatomy.head.includes("2nd") && rowAnatomy.head.includes("3rd")
     && rowAnatomy.headCap === "Best on the top issue"
-    && rowAnatomy.headTk === 5,
+    && rowAnatomy.headTk === 4,
   rowAnatomy.headCap + ` · ticks ${rowAnatomy.headTk}`);
 
 // 5: Ipsos never leaves the facet (no VI, no leadership rows to stand on)
@@ -544,7 +544,7 @@ const phoneHead = await page3.evaluate(() => {
   return { cap: (ph.querySelector(".rd-ap-cap") || {}).textContent || "", ticks: ph.querySelectorAll(".rd-ap-tk").length };
 });
 check("phone: the pinned head carries the issues caption and the restored tick ladder",
-  phoneHead.cap === "Best on top issue" && phoneHead.ticks === 5,
+  phoneHead.cap === "Best on the top issue" && phoneHead.ticks === 5,
   JSON.stringify(phoneHead));
 check("no page errors on the phone rung", errs3.length === 0, errs3[0] || "");
 await page3.close();
