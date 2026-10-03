@@ -1134,10 +1134,16 @@ body.rd .rd-wv-rug b { position: absolute; bottom: 0; left: 0; width: 6px; heigh
 body.rd .rd-wv-rug b::before { content: ""; position: absolute; inset: -5px -6px; }
 /* a poll dot behaves exactly as the poll charts' dots do: the party tint
    carries its alpha (the toolkit's fill-opacity recipe — no compositing
-   group per dot) and nothing else — no ring, so two dots that overlap
-   blend like the chart cloud's, and the all-voters dash and the track's
-   quarter-lines show through one as chart lines show through theirs */
+   group per dot) and nothing else at rest — no ring, so two dots that
+   overlap blend like the chart cloud's and the track's quarter-lines show
+   through one as chart lines show through theirs */
 body.rd .rd-wv-rug b > i { position: absolute; inset: 0; border-radius: 50%; background: color-mix(in oklab, var(--pcolor) 55%, transparent); pointer-events: none; }
+/* — except the dots the all-voters dash crosses: the dash must not run
+   through a dot's face (user call), so b.ring alone borrows the whisker
+   ticks' 2px page-ground halo and the dash stops at it as at a tick.
+   Ringing every dot would punch bg holes through neighbours on dense rows
+   (the blindness beb28b3 dropped the ring for); the conditional keeps it */
+body.rd .rd-wv-rug b.ring > i { box-shadow: 0 0 0 2px var(--bg); }
 body.rd .rd-wv-rug b.on { cursor: pointer; }
 body.rd .rd-wv-rug b.on:hover > i, body.rd .rd-wv-rug b.on:focus-visible > i { background: var(--pcolor); }
 body.rd .rd-wv-rug b.on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }

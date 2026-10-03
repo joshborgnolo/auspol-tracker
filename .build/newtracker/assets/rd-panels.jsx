@@ -1226,7 +1226,7 @@ function RdGenBorn({ label }) {
    trip. One instance per row so its tip is the only one open on that row,
    and the tip rides inside its dot so a party switch glides the two
    together. */
-function WvRug({ g, party, xp, pColor, pName }) {
+function WvRug({ g, party, xp, pColor, pName, allXp }) {
   const [tip, setTip] = useState(null);
   const tipBox = React.useRef(null);
   const ptr = React.useRef(null);
@@ -1234,9 +1234,14 @@ function WvRug({ g, party, xp, pColor, pName }) {
      whose disc would touch its left neighbour's steps up into the added
      half (its --v), recomputed per party switch and resize from the real
      track width - dots are sized in px but placed in cqw, so only the
-     rendered strip says how far apart two readings actually sit */
+     rendered strip says how far apart two readings actually sit. The same
+     pass flags any dot the all-voters dash crosses (b.ring): it alone picks
+     up the figure marks' 2px page-ground halo so the dash stops at it as
+     it does the whisker ticks, while dots clear of the dash stay ringless
+     and keep their cloud blend */
   const rugBox = React.useRef(null);
   const [ups, setUps] = useState(null);
+  const [rings, setRings] = useState(null);
   React.useLayoutEffect(() => {
     const el = rugBox.current;
     if (!el) return;
@@ -1256,12 +1261,15 @@ function WvRug({ g, party, xp, pColor, pName }) {
         next[i] = l;
       });
       setUps((prev) => (prev && prev.length === next.length && next.every((v, k) => v === prev[k]) ? prev : next));
+      const ringPx = b.offsetWidth / 2 + 2.75;
+      const nextRing = g.px[party].map((x) => Math.abs(xp(x) - allXp) * (w / 100) <= ringPx);
+      setRings((prev) => (prev && prev.length === nextRing.length && nextRing.every((v, k) => v === prev[k]) ? prev : nextRing));
     };
     compute();
     const ro = new ResizeObserver(compute);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [g, party, xp]);
+  }, [g, party, xp, allXp]);
   React.useLayoutEffect(() => {
     const el = tipBox.current;
     if (!el) return;
@@ -1278,7 +1286,7 @@ function WvRug({ g, party, xp, pColor, pName }) {
     <span ref={rugBox} className={"rd-wv-rug" + (tip ? " lit" : "")}>
       {g.px[party].map((x, i) => {
         const d = g.pd[i] || null;
-        if (!d) return <b key={i} style={{ "--x": xp(x), "--pcolor": pColor, "--v": ups ? ups[i] : 0 }}><i aria-hidden="true"></i></b>;
+        if (!d) return <b key={i} className={rings && rings[i] ? "ring" : ""} style={{ "--x": xp(x), "--pcolor": pColor, "--v": ups ? ups[i] : 0 }}><i aria-hidden="true"></i></b>;
         const rk = d && d.r && window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.f, released: d.r }) : null;
         const open = () => {
           if (!rk || !(window.AP && window.AP.openPoll)) return;
@@ -1288,7 +1296,7 @@ function WvRug({ g, party, xp, pColor, pName }) {
         const lab = d.f + ", " + d.l + " · " + x.toFixed(1) + "% · n≈" + d.n;
         const on = tip && tip.i === i;
         return (
-          <b key={i} className={[(rk ? "on" : ""), (on ? "hi" : "")].filter(Boolean).join(" ") || undefined} style={{ "--x": xp(x), "--pcolor": pColor, "--v": ups ? ups[i] : 0 }}
+          <b key={i} className={[(rk ? "on" : ""), (on ? "hi" : ""), (rings && rings[i] ? "ring" : "")].filter(Boolean).join(" ") || undefined} style={{ "--x": xp(x), "--pcolor": pColor, "--v": ups ? ups[i] : 0 }}
              role={rk ? "button" : "img"} tabIndex={rk ? 0 : undefined}
              aria-label={lab + (rk ? ", press Enter to open this poll" : "")}
              onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
@@ -1866,7 +1874,7 @@ function RdDemographics({ rangeId = "all" }) {
                   dots' ring, tip and click-through. They can't live under
                   aria-hidden once they're buttons, so the purely visual
                   siblings carry it instead of the track */}
-              {g.pd && g.px && g.px[party] && <WvRug g={g} party={party} xp={xp} pColor={pColor} pName={pName} />}
+              {g.pd && g.px && g.px[party] && <WvRug g={g} party={party} xp={xp} pColor={pColor} pName={pName} allXp={xp(all)} />}
               <span className="rd-wv-ci" style={{ "--lo": xp(v - ci), "--hi": xp(v + ci), color: pColor }} aria-hidden="true"><i className="lo"></i><i className="hi"></i><b></b></span>
               <span className={"rd-wv-dot" + (sig ? "" : " open")} style={{ "--x": xp(v), background: sig ? pColor : undefined, borderColor: pColor }} aria-hidden="true"></span>
             </span>

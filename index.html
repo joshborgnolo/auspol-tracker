@@ -3815,6 +3815,7 @@ body.rd .rd-wv-rug:has(> b.hi) { z-index: 4; }
 body.rd .rd-wv-rug b { position: absolute; bottom: 0; left: 0; width: 6px; height: 6px; transform: translateX(calc(var(--x) * 1cqw - 50%)) translateY(calc(var(--v, 0) * -6px)); touch-action: manipulation; }
 body.rd .rd-wv-rug b::before { content: ""; position: absolute; inset: -5px -6px; }
 body.rd .rd-wv-rug b > i { position: absolute; inset: 0; border-radius: 50%; background: color-mix(in oklab, var(--pcolor) 55%, transparent); pointer-events: none; }
+body.rd .rd-wv-rug b.ring > i { box-shadow: 0 0 0 2px var(--bg); }
 body.rd .rd-wv-rug b.on { cursor: pointer; }
 body.rd .rd-wv-rug b.on:hover > i, body.rd .rd-wv-rug b.on:focus-visible > i { background: var(--pcolor); }
 body.rd .rd-wv-rug b.on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -71726,13 +71727,15 @@ function WvRug({
   party,
   xp,
   pColor,
-  pName
+  pName,
+  allXp
 }) {
   const [tip, setTip] = useState(null);
   const tipBox = React.useRef(null);
   const ptr = React.useRef(null);
   const rugBox = React.useRef(null);
   const [ups, setUps] = useState(null);
+  const [rings, setRings] = useState(null);
   React.useLayoutEffect(() => {
     const el = rugBox.current;
     if (!el) return;
@@ -71756,12 +71759,15 @@ function WvRug({
         next[i] = l;
       });
       setUps(prev => prev && prev.length === next.length && next.every((v, k) => v === prev[k]) ? prev : next);
+      const ringPx = b.offsetWidth / 2 + 2.75;
+      const nextRing = g.px[party].map(x => Math.abs(xp(x) - allXp) * (w / 100) <= ringPx);
+      setRings(prev => prev && prev.length === nextRing.length && nextRing.every((v, k) => v === prev[k]) ? prev : nextRing);
     };
     compute();
     const ro = new ResizeObserver(compute);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [g, party, xp]);
+  }, [g, party, xp, allXp]);
   React.useLayoutEffect(() => {
     const el = tipBox.current;
     if (!el) return;
@@ -71783,6 +71789,7 @@ function WvRug({
     const d = g.pd[i] || null;
     if (!d) return React.createElement("b", {
       key: i,
+      className: rings && rings[i] ? "ring" : "",
       style: {
         "--x": xp(x),
         "--pcolor": pColor,
@@ -71804,7 +71811,7 @@ function WvRug({
     const on = tip && tip.i === i;
     return React.createElement("b", {
       key: i,
-      className: [rk ? "on" : "", on ? "hi" : ""].filter(Boolean).join(" ") || undefined,
+      className: [rk ? "on" : "", on ? "hi" : "", rings && rings[i] ? "ring" : ""].filter(Boolean).join(" ") || undefined,
       style: {
         "--x": xp(x),
         "--pcolor": pColor,
@@ -72468,7 +72475,8 @@ function RdDemographics({
       party: party,
       xp: xp,
       pColor: pColor,
-      pName: pName
+      pName: pName,
+      allXp: xp(all)
     }), React.createElement("span", {
       className: "rd-wv-ci",
       style: {
