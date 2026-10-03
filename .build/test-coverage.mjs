@@ -59,8 +59,10 @@ const poll = (pollster, date) => ({ date, dateStart: date, pollster, client: "â€
 const write = (D) => writeFileSync(path.join(dir, "data", "polls.json"), JSON.stringify(D, null, 2));
 const base = () => ({
   // the 20 daily August YouGov filler waves make that house "overdue" by
-  // its own cadence; declared stopped so the fixture's clean case is clean
-  pollsterRules: { YouGov: { stopped: true } },
+  // its own cadence, and the pinned September Roy Morgan waves drift late
+  // against the wall clock as time passes; declared stopped so the
+  // fixture's clean case is clean
+  pollsterRules: { YouGov: { stopped: true }, "Roy Morgan": { stopped: true } },
   polls: [
     ...Array.from({ length: 6 }, (_, i) => poll("Roy Morgan", `2026-08-${String(9 + i * 7).padStart(2, "0")}`)),
     poll("Roy Morgan", "2026-09-20"), poll("Newspoll", "2026-08-27"), poll("Newspoll", "2026-09-17"), poll("Resolve", "2026-09-12"),
