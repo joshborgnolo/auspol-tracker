@@ -396,65 +396,85 @@ await pickFacet(page3, /^Issues$/);
 await page3.waitForSelector(".rd-ap-card", { timeout: 15000 });
 await showAll(page3);
 
-// Same contract as the desktop rows: a card carries a "2nd … · 3rd …"
-// csub iff its top-issue cell is filled (best-party-only waves rightly
-// have neither), figures sitting beside each issue's name; cards with an
-// ownership reading carry the desktop picture column's phone rung — the
-// party-dot strip under the pinned scale.
+// Same contract as the desktop rows: a card carries the one-line best-issue
+// sentence ("Cost of living top issue (68), then health (45) and crime
+// (23)") iff its top-issue cell is filled (best-party-only waves rightly
+// have neither), each share parenthesised beside its issue's name; the
+// sentence rides .rd-ap-csub-sent so it flows as ONE inline run (the row's
+// shared csub rule is display:flex, which once itemised the JSX fragments
+// into a 4-line column at 390px). The best-party verdict leaves the body
+// and rides the head row as a compact chip ("ALP 29"); cards with an
+// ownership reading carry the full-width party-dot strip on its own body
+// line, under the restored pinned tick ladder.
 const cardAnatomy = await page3.evaluate(() => {
   const cards = [...document.querySelectorAll(".rd-ap-card")];
   const an = cards.map((c) => {
     const subs = [...c.querySelectorAll(".rd-ap-csub")];
-    const runnerSub = subs.find((d) => /^2nd /.test(d.textContent)) || null;
-    const txt = runnerSub ? runnerSub.textContent.trim().replace(/\s+/g, " ") : "";
-    const digitFigs = runnerSub ? [...runnerSub.querySelectorAll("b")].filter((b) => /\d/.test(b.textContent || "")).length : 0;
-    const runnerOk = !runnerSub || (/^2nd [^·]+?\d/.test(txt) && (!/3rd/.test(txt) || / · 3rd [^·]+?\d/.test(txt)) && digitFigs >= 1);
-    // the top-issue figure now lives ONLY in the first csub - the head
-    // row's pairfig died with the dot strip's move into it (a csub whose
-    // text is "Best on it: …" is the verdict line, not the top issue)
-    const topSub = subs.find((d) => !/^2nd /.test(d.textContent) && !/^Best on it/.test(d.textContent)) || null;
-    const topFilled = !!topSub && /\d/.test(topSub.textContent);
-    const noPair = !c.querySelector(".rd-ap-c1 .rd-ap-pairfig");
-    const headStrip = !!c.querySelector(".rd-ap-c1 > .rd-ap-cpic");
-    return { nxt: !!runnerSub, runnerOk, topFilled, noPair, headStrip, dots: c.querySelectorAll(".rd-ap-c1 > .rd-ap-cpic .rd-ap-pic .rd-ap-dot").length };
+    const sent = c.querySelector(".rd-ap-csub-sent");
+    const txt = sent ? sent.textContent.trim().replace(/\s+/g, " ") : "";
+    const topFilled = !!sent && / top issue \(\d/.test(txt);
+    const legacy = subs.some((d) => /^2nd |^Best on it/.test(d.textContent));
+    // a card carries exactly one csub when it has the sentence, none when
+    // it is a best-party-only wave
+    const csubSentOk = subs.length === (sent ? 1 : 0);
+    // runners ride the same single line: ", then health (45) and crime (23)"
+    const runnerOk = !sent || (!/ then /.test(txt) || /, then [^()]+ \(\d/.test(txt)) && (!/ and /.test(txt.replace(/^.* then /, "")) || /\) and [^()]+ \(\d/.test(txt));
+    const noPair = !c.querySelector(".rd-ap-pairfig");
+    const chip = c.querySelector(".rd-ap-c1 .rd-ap-issfig");
+    const chipTxt = chip ? chip.textContent.trim().replace(/\s+/g, " ") : "";
+    // "ALP 29", or "rest 43" when the rest-of-field bucket leads (desktop
+    // rail prints the same verdict)
+    const chipOk = !!chip && /[A-Za-z]+ \d+/.test(chipTxt);
+    const bodyStrip = c.querySelector(":scope > .rd-ap-cpic");
+    const dots = bodyStrip ? bodyStrip.querySelectorAll(".rd-ap-dot").length : 0;
+    return { nxt: sent ? / then /.test(txt) : false, runnerOk, topFilled, legacy, csubSentOk, noPair, chip: chipOk, chipTxt, bodyStrip: !!bodyStrip, dots, subN: subs.length, txt, firm: (c.querySelector(".rd-ap-firm") || {}).textContent || "?" };
   });
-  return {
-    cardsN: cards.length,
+  const dotted = an.filter((a) => a.dots > 0);
+  return { an,
+    cardsN: an.length,
+    withTop: an.filter((a) => a.topFilled).length,
+    topMissing: an.filter((a) => !a.topFilled).length,
     withNxt: an.filter((a) => a.nxt).length,
-    nxtNoTop: an.filter((a) => a.nxt && !a.topFilled).length,
-    badNxt: an.filter((a) => !a.runnerOk).length,
-    withDots: an.filter((a) => a.dots > 0).length,
-    badDots: an.filter((a) => a.dots > 0 && (a.dots < 2 || a.dots > 4)).length,
-    strayPairs: an.filter((a) => a.dots > 0 && !a.noPair).length,
-    stripAdrift: an.filter((a) => a.dots > 0 && !a.headStrip).length,
-    loneStrips: an.filter((a) => a.dots === 0 && a.headStrip).length,
+    badNxt: an.filter((a) => !a.runnerOk || !a.csubSentOk).length,
+    legacySubs: an.filter((a) => a.legacy).length,
+    withDots: dotted.length,
+    badDots: dotted.filter((a) => a.dots < 2 || a.dots > 4).length,
+    strayPairs: an.filter((a) => !a.noPair).length,
+    chipsMissing: dotted.filter((a) => !a.chip).length,
+    stripAdrift: an.filter((a) => a.dots > 0 && !a.bodyStrip).length,
+    loneStrips: an.filter((a) => a.dots === 0 && a.bodyStrip).length,
     ipsos: cards.filter((c) => /Ipsos/.test(c.textContent)).length,
   };
 });
-check("phone: the 2nd/3rd csub keeps its figures beside the issue names, under a filled top issue",
-  cardAnatomy.withNxt > 0 && cardAnatomy.nxtNoTop === 0 && cardAnatomy.badNxt === 0,
-  `${cardAnatomy.withNxt}/${cardAnatomy.cardsN} with the csub; topless ${cardAnatomy.nxtNoTop}; bad ${cardAnatomy.badNxt}`);
-check("phone: the ownership dot strip rides the HEAD ROW of the cards whose wave asked the question",
+console.log("  diag bad-runners:", JSON.stringify(cardAnatomy.an.filter((a) => !a.runnerOk || !a.csubSentOk).map((a) => ({ f: a.firm, t: a.txt, n: a.subN }))));
+console.log("  diag bad-chips:", JSON.stringify(cardAnatomy.an.filter((a) => a.dots > 0 && !a.chip).map((a) => ({ f: a.firm, c: a.chipTxt }))));
+check("phone: the best issues read as ONE flowing sentence with each share parenthesised beside its name",
+  cardAnatomy.withTop > 0 && cardAnatomy.withNxt > 0 && cardAnatomy.badNxt === 0 && cardAnatomy.legacySubs === 0,
+  `${cardAnatomy.withTop}/${cardAnatomy.cardsN} with the sentence (${cardAnatomy.withNxt} with runners, ${cardAnatomy.topMissing} best-party-only); bad ${cardAnatomy.badNxt}; legacy subs ${cardAnatomy.legacySubs}`);
+check("phone: the ownership dot strip spans the full width of the card body again",
   cardAnatomy.withDots > 0 && cardAnatomy.badDots === 0 && cardAnatomy.stripAdrift === 0 && cardAnatomy.loneStrips === 0,
-  `${cardAnatomy.withDots}/${cardAnatomy.cardsN} cards dotted, ${cardAnatomy.badDots} malformed, ${cardAnatomy.stripAdrift} strips outside .rd-ap-c1, ${cardAnatomy.loneStrips} strips without dots`);
-check("phone: the top-issue share is not reprinted beside the firm (the csub already names it)",
+  `${cardAnatomy.withDots}/${cardAnatomy.cardsN} cards dotted, ${cardAnatomy.badDots} malformed, ${cardAnatomy.stripAdrift} strips outside the body, ${cardAnatomy.loneStrips} strips without dots`);
+check("phone: the top-issue share is not reprinted beside the firm (the sentence already names it)",
   cardAnatomy.strayPairs === 0, `${cardAnatomy.strayPairs} head-row pairfigs left`);
+check("phone: every ownership card names its best party as a head-row chip (the old body line)",
+  cardAnatomy.chipsMissing === 0 && cardAnatomy.withDots > 0,
+  `${cardAnatomy.chipsMissing} dotted cards without the chip`);
 check("phone: the Ipsos cards are there", cardAnatomy.ipsos === exp.issOnly, `${cardAnatomy.ipsos}/${exp.issOnly}`);
 
 const ipPhone = await openRowContaining(page3, /^Ipsos/);
 check("phone: an opened Ipsos card stacks to one column with the salience grid",
   !!ipPhone && ipPhone.issRows >= 5 && /Asked/.test(ipPhone.rail) && !/Labor’s/.test(ipPhone.rail),
   ipPhone ? `${ipPhone.issRows} iss rows` : "no detail");
-// The phone pinned head is caption-only on Issues now (direction's
-// grammar): the per-card strips sit in the head rows at compact width, so
-// a pinned full-width tick ladder would align with no card's scale.
+// The phone pinned head carries the full-width tick ladder again: every
+// card's strip now spans the whole row width on the same 0-45 scale, so
+// the ladder aligns with all of them.
 const phoneHead = await page3.evaluate(() => {
   const ph = document.querySelector(".rd-ap-phead");
   if (!ph) return { cap: "", ticks: 0 };
   return { cap: (ph.querySelector(".rd-ap-cap") || {}).textContent || "", ticks: ph.querySelectorAll(".rd-ap-tk").length };
 });
-check("phone: the pinned head carries the issues caption, ticks gone with the per-card strips' move",
-  phoneHead.cap === "Best on the top issue, %" && phoneHead.ticks === 0,
+check("phone: the pinned head carries the issues caption and the restored tick ladder",
+  phoneHead.cap === "Best on the top issue, %" && phoneHead.ticks === 4,
   JSON.stringify(phoneHead));
 check("no page errors on the phone rung", errs3.length === 0, errs3[0] || "");
 await page3.close();

@@ -1682,22 +1682,32 @@ function RdAllPolls(P) {
           {ib ? <><b style={im[2] ? { color: im[2] } : null}>{im[1]}</b><span className="rd-ap-sub">{rdApNum(ib.v)} on it</span></> : <span className="rd-ap-none">—</span>}
         </span>
       );
-      /* the ownership strip rides the card's head row at its right side
-         instead of taking its own line - the top-issue share is NOT
-         reprinted as a pairfig up here, since the first csub already
-         names it (user call 2026-10-03: the 68 was "already displayed
-         explicitly... on the left side of the row") */
-      right1 = ownDots.length > 0 ? <span className="rd-ap-cpic">{pic}</span> : null;
+      /* the phone card gives the ownership strip the whole width of the row
+         back (user call 2026-10-03: "make the dots span the whole width of
+         the row once again, like in primary and like in leaders") - the
+         three best-issue sublines collapse into ONE sentence ("Cost of
+         living top issue (60), then health (27) and housing (8)"), and the
+         best-party line moves up beside the firm name as a compact chip, so
+         the strip's own full-width line costs no extra height. The top-issue
+         share is NOT reprinted as a pairfig beside the firm either - the
+         sentence's first parenthesised figure already names it. The sentence
+         carries .rd-ap-csub-sent: the row's shared csub rule is display:flex
+         (built for figure chips), which would itemise every JSX fragment on
+         its own line */
+      const unprompted = !!(iss && !iss.sal && iss.conc);
+      if (ib && im) {
+        right1 = <b className="rd-ap-issfig"><span style={im[2] ? { color: im[2] } : null}>{im[1]}</span> {rdApNum(ib.v)}</b>;
+      }
       body = <>
-        {it && <div className="rd-ap-csub">{it[0]} <b>{rdApNum(it[1])}</b></div>}
-        {top3.length > 1 && (
-          <div className="rd-ap-csub">
-            {top3.slice(1, 3).map((x, i) => (
-              <React.Fragment key={x[0]}>{i > 0 && " · "}{i === 0 ? "2nd" : "3rd"} {x[0]} <b>{rdApNum(x[1])}</b></React.Fragment>
-            ))}
+        {it && (
+          <div className="rd-ap-csub rd-ap-csub-sent">
+            {it[0]} top issue <b>({rdApNum(it[1])})</b>
+            {top3.length > 1 && <>, then {top3[1][0]} <b>({rdApNum(top3[1][1])})</b></>}
+            {top3.length > 2 && <> and {top3[2][0]} <b>({rdApNum(top3[2][1])})</b></>}
+            {unprompted ? ", unprompted" : ""}
           </div>
         )}
-        {ib && <div className="rd-ap-csub">Best on it: <b style={im[2] ? { color: im[2] } : null}>{im[0]}</b>, {rdApNum(ib.v)}</div>}
+        {ownDots.length > 0 && <div className="rd-ap-cpic">{pic}</div>}
       </>;
     }
     const detail = isOpen && (
@@ -1778,10 +1788,7 @@ function RdAllPolls(P) {
       {facet === "primary" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Primary vote, %</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
       {facet === "leadership" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Net rating: approve minus disapprove</span><span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span></span>}
       {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span>, unsure, <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
-      {/* caption-only like direction's: the per-card dot strips now sit in
-          each card's head row at its own compact width, so a full-width
-          tick ladder here would no longer align with any card's scale */}
-      {facet === "issues" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap">Best on the top issue, %</span></span>}
+      {facet === "issues" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Best on the top issue, %</span><span className="rd-ap-in">{[0, 10, 20, 30].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 30 ? "%" : ""}</span>)}</span></span>}
     </div>
   );
   /* the pinned bar's section links are the short names at every width - the

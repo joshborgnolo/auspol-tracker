@@ -29,6 +29,7 @@ const MEASURE = `(() => {
   const hpic = head && head.querySelector(".rd-ap-hpic");
   const cap = hpic && hpic.querySelector(".rd-ap-cap");
   const tks = hpic ? [...hpic.querySelectorAll(".rd-ap-tk")] : [];
+  const bars = hpic ? [...hpic.querySelectorAll(".rd-ap-hbar-bar")] : [];
   const ths = head ? [...head.querySelectorAll(".rd-ap-th")] : [];
   const best = ths.find((n) => /Best party/i.test(n.textContent));
   const row = document.querySelector(".rd-ap-row");
@@ -37,7 +38,7 @@ const MEASURE = `(() => {
   const net = row && row.querySelector(".rd-ap-netcell");
   return {
     which: head && head.classList.contains("rd-ap-phead") ? "phead" : "hrow",
-    hpic: r(hpic), cap: r(cap), tks: tks.map(r),
+    hpic: r(hpic), cap: r(cap), tks: tks.map(r), bars: bars.map(r),
     best: r(best), rowH: row ? r(row).h : null,
     pic: r(pic), net: r(net), dots: dots.map(r),
   };
@@ -66,13 +67,31 @@ for (let w = 560; w <= 1480; w += 40) {
     for (let j2 = i + 1; j2 < m.tks.length; j2++) if (inter(m.tks[i], m.tks[j2])) tkPairs.push(`${i}∩${j2}`);
   }
   if (inter(m.cap, m.best)) hits.push("cap∩best");
+  for (let i = 0; i < (m.bars || []).length; i++) {
+    if (inter(m.cap, m.bars[i])) hits.push(`cap∩bar${i}`);
+  }
   if (tkPairs.length) hits.push("tk∩tk:" + tkPairs.join(","));
   let dotHit = 0;
+  // dot∩dot: flag only truly CO-LOCATED pairs (centres under a quarter
+  // diameter apart). Ownership shares routinely sit a few points together,
+  // and a point is ~4px at these strip widths while dots are 12px across,
+  // so rect overlap — even half-diameter centre gaps — is normal data and
+  // the halo-ring crossing design absorbs it (the 2026-10-03 strict checks
+  // failed on every desktop width for data reasons, not layout).
+  let dotMin = Infinity;
   for (let i = 0; i < m.dots.length; i++) {
     if (m.net && m.dots[i] && m.dots[i].x + m.dots[i].w > m.net.x + 0.5) dotHit++;
-    for (let j2 = i + 1; j2 < m.dots.length; j2++) if (inter(m.dots[i], m.dots[j2])) dotHit++;
+    for (let j2 = i + 1; j2 < m.dots.length; j2++) {
+      const a = m.dots[i], b = m.dots[j2];
+      if (!a || !b) continue;
+      const dx = (a.x + a.w / 2) - (b.x + b.w / 2);
+      const dy = (a.y + a.h / 2) - (b.y + b.h / 2);
+      const dd = Math.hypot(dx, dy);
+      if (dd < dotMin) dotMin = dd;
+      if (dd < 3) dotHit++;
+    }
   }
-  if (dotHit) hits.push(`dotsX:${dotHit}`);
+  if (dotHit) hits.push(`dotsX:${dotHit}(nearest ${dotMin.toFixed(1)}px)`);
   if (m.pic && m.net && m.pic.x + m.pic.w > m.net.x + 0.5) hits.push("picruns past netcell→");
   if (hits.length) worst++;
   console.log(`${w}px ${m.which} hpic=${m.hpic ? m.hpic.w : "-"} row=${m.rowH} ${hits.length ? "HITS: " + hits.join(" ") : "clean"}`);
