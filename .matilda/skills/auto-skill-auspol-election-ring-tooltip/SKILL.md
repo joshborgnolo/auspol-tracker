@@ -181,7 +181,12 @@ run.points[0].x === 0` (d1a1d215 :1590 — the ringTerms gate is what
 keeps leader cards dotless), and a separate two-point `tail` series
 per drawn past term bridges its final poll to `endRes` (same block,
 gated on `c.endRes[M.key] != null`; the sitting term and leaders get
-none). rd-cycles restyles both `RD_CYC_LEAD = "0.5 4"` (:53, lead
+none). Ring-rounds-into-final-bucket terms (2007, 1974) have their
+terminal vertex CLAMPED onto `endRes.x` instead (same block: poll
+votes snap to integer months but the ring keeps the exact date, so
+that vertex had drawn ~3 days PAST the 21 Aug 2010 ring with no tail
+to bridge it) — a vote line never ends right of its closing count.
+rd-cycles restyles both `RD_CYC_LEAD = "0.5 4"` (:53, lead
 branch :77, tail branch next — tail is `endCap: false` so no end-dot
 paints over the closing ring), matching the by-state panels'
 RD_ELECTION_LEAD and the by-location panel's election→first-poll

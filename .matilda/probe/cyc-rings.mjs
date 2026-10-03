@@ -8,7 +8,14 @@
    gap-dash ("6 6") and the band mean ("4 3"); leadership cards never dot.
    A past term's line ALSO runs a dotted lead-OUT: the two-point bridge from
    its final poll to its closing-election ring - the same "0.5 4" stroke,
-   series id "c{year}-tail".
+   series id "c{year}-tail" - BUT only when the ring sits past the line's
+   final month. Poll votes snap to a month boundary while the ring keeps the
+   election's exact date, so a term whose closing date rounds INTO its last
+   observed month had its line ending to the ring's RIGHT (2007's election-
+   day polls fold into month 33, three days past the 21 Aug 2010 ring, and
+   no tail could bridge what had already overshot). Such a term now has its
+   terminal vertex clamped onto the ring's exact x: the line ends ON the
+   count, no tail exists to fire.
    Asserts at 1280 and 390:
    - default view: one ring per vote card at px(0), in the current term's
      line colour for that card (tpp/primary: c.color; oppr: the opposition
@@ -22,6 +29,10 @@
      of obsRuns over the drawn cycles' obs flags, plus one "-tail" dotted
      run per drawn PAST term with a closing result; lead-in dotted paths
      start at px(0), tails end at px(endRes.x).
+   - end-of-line: no drawn term's solid line ends to the RIGHT of its closing
+     ring; lifting 2007 (the election rounds into the final month bucket,
+     mid-window) ends each vote line exactly at px(endRes.x) - the line
+     meets the ring - and fires no "c2007-tail".
    - lifting 1996: three rings per vote card, the 1996 pair in its card
      colour, base at px(0)/py(raw[key][0]) and close at
      px(endRes.x)/py(endRes[key]); dash counts follow the replay, and a
@@ -153,6 +164,16 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
                      dEndY: nums.length ? nums[nums.length - 1] : null, stroke: getComputedStyle(p).stroke };
           });
           const dotted = paths.filter((p) => p.dash === "0.5 4");
+          /* terminal x of each drawn term's solid line - dotted lead-OUT
+             bridges and the overlays exempt - for the "never ends right of
+             its closing ring" contract */
+          const termEnds = {};
+          paths.filter((p) => p.id && !p.id.endsWith("-tail") && !p.id.startsWith("cyc-")).forEach((p) => {
+            const m = /^c(\d+)/.exec(p.id);
+            if (!m || p.dEnd == null) return;
+            const yr = +m[1];
+            if (termEnds[yr] == null || p.dEnd > termEnds[yr]) termEnds[yr] = p.dEnd;
+          });
           return {
             key,
             rings: [...el.querySelectorAll(".rd-mark")].map(ringOf).filter((r) => r.stroke !== "var(--ink-2)"),
@@ -163,6 +184,11 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
             leads: dotted.filter((p) => !(p.id || "").endsWith("-tail")),
             gaps: paths.filter((p) => p.dash === "6 6"),
             expected: expect(key),
+            lineEnds: Object.entries(termEnds).map(([yr, x]) => ({
+              yr: +yr, x,
+              ringX: (((D.cycles.find((c2) => c2.year === +yr) || {}).endRes || {}).x ?? null),
+            })),
+            end07: termEnds["2007"] ?? null,
             fx: fitX(el), fy: fitY(el),
           };
         };
@@ -176,6 +202,7 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
           c19endRes: (D.cycles.find((c2) => c2.year === 2019) || {}).endRes || null,
           c19raw0: ((c22) => c22 ? { primary: c22.raw.primary[0], oppr: c22.raw.oppr[0], tpp: c22.raw.tpp[0] } : null)(D.cycles.find((c2) => c2.year === 2019)),
           c22endRes: (D.cycles.find((c2) => c2.year === 2022) || {}).endRes || null,
+          c07endRes: (D.cycles.find((c2) => c2.year === 2007) || {}).endRes || null,
           c93endRes: (D.cycles.find((c2) => c2.year === 1993) || {}).endRes || null,
           c16endRes: (D.cycles.find((c2) => c2.year === 2016) || {}).endRes || null,
           c98raw0: c98 ? c98.raw.primary[0] : null,
@@ -347,6 +374,43 @@ const py = (cardL, v) => cardL.fy.a + cardL.fy.b * v;
             && Math.abs(tails96[0].dEndY - py(cardL, tailV)) <= 2),
           tails96.length ? `dEnd ${tails96[0].dEnd} vs px(${L.c96endRes.x}) ${px(cardL, L.c96endRes.x).toFixed(2)} · dEndY ${tails96[0].dEndY} vs py(${tailV}) ${py(cardL, tailV).toFixed(2)}` : "(no tail)");
       }
+
+      /* ---- lift 2007: the election rounds INTO the final month bucket, so
+         the terminal vertex clamps onto the ring - line ends ON the count,
+         no lead-out tail - then unlift, leaving 1996 up for change mode --- */
+      await ensureBoard();
+      await page.evaluate(() => {
+        const term = [...document.querySelectorAll(".rd-cc-term")]
+          .find((t) => { const b = t.querySelector(".rd-cc-main b"); return b && b.textContent.trim() === "2007"; });
+        term.querySelector(".rd-cc-main").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      });
+      await new Promise((r) => setTimeout(r, 700));
+      L = await live([2025, 1996, 2007]);
+      check(`[${vw}] 2007's closing ring carries the exact 2010-08-21 month (32.887)`,
+        !!L.c07endRes && Math.abs(L.c07endRes.x - 32.887) < 0.005,
+        JSON.stringify(L.c07endRes && { x: L.c07endRes.x }));
+      for (const k of VOTE) {
+        const cardL = L[k];
+        check(`[${vw}] 2007-end ${k}: the solid line ends ON the closing ring`,
+          !!L.c07endRes && cardL.end07 != null
+            && Math.abs(cardL.end07 - px(cardL, L.c07endRes.x)) <= 2,
+          `end ${cardL.end07} vs px(${L.c07endRes && L.c07endRes.x}) ${L.c07endRes ? px(cardL, L.c07endRes.x).toFixed(2) : "?"}`);
+        check(`[${vw}] 2007-end ${k}: no lead-out tail fires`,
+          cardL.tails.every((p) => p.id !== "c2007-tail"),
+          JSON.stringify(cardL.tails.map((p) => p.id)));
+        check(`[${vw}] 2007-end ${k}: dashes follow the obs replay`,
+          cardL.dotted.length === cardL.expected.dotted && cardL.gaps.length === cardL.expected.gap,
+          `dom dotted ${cardL.dotted.length}/gap ${cardL.gaps.length} vs replay ${cardL.expected.dotted}/${cardL.expected.gap}`);
+        check(`[${vw}] 2007-end ${k}: no drawn term's solid line ends right of its ring`,
+          cardL.lineEnds.filter((e) => e.ringX != null)
+            .every((e) => e.x <= px(cardL, e.ringX) + 2),
+          JSON.stringify(cardL.lineEnds));
+      }
+      await page.evaluate(() => {
+        const pill = [...document.querySelectorAll(".rd-cc-pill")].find((t) => t.textContent.includes("2007"));
+        pill.querySelector("button").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      });
+      await new Promise((r) => setTimeout(r, 500));
 
       /* ---- change mode fades every ring in place; dots stay dots ---------- */
       await page.evaluate(() => {

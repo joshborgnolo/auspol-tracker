@@ -1582,6 +1582,21 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       if (flags) pts.forEach((p) => { if (!observed(p.x)) p.note = "no poll, Interpolated"; });
       const runs = obsRuns(pts, observed);
       const termEnd = si === seriesIn.length - 1;
+      /* The closing ring keeps the election's exact date, but poll votes
+         snap to a month boundary - the 2007 term's election-day polls fold
+         into month 33 (= 24 Aug 2010) and drew 3 days PAST the 21 Aug ring,
+         with no lead-out run to bridge what already overshot it. When the
+         ring rounds into the line's final bucket and sits earlier than its
+         boundary, pull that vertex back onto the ring: the term's last
+         reading IS its election-month blend, and a vote line never draws
+         beyond the count it leads to. Mutation reaches `runs` (shared
+         points) and silences the lead-out below, whose condition reads
+         endRes.x > lastPt.x. */
+      if (termEnd && ringTerms != null && c.endRes) {
+        const lastPt = pts[pts.length - 1];
+        if (lastPt && Math.round(c.endRes.x) === lastPt.x && c.endRes.x < lastPt.x - 1e-6)
+          lastPt.x = c.endRes.x;
+      }
       const rows = runs.map((run, i) => ({
         id: "c" + c.year + (si ? "-e" + si : "") + (i ? "-" + i : ""), label, color: colorOf(c), width,
         points: run.points, weight, current: c.current, opacity, dashed: run.dashed,

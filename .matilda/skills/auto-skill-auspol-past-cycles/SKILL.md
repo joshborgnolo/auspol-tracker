@@ -1218,7 +1218,12 @@ interpolated.
   `endRes - base`), gated by `termEnd && ringTerms != null &&
   c.endRes && c.endRes[M.key] != null && c.endRes.x > lastPt.x + 1e-6`
   (~:1590-1610). The gate means leaders and the sitting term get none
-  (c.endRes is null while the count is open). rd-cycles restyles
+  (c.endRes is null while the count is open), and neither does a term
+  whose ring rounds INTO its final month bucket but sits earlier than
+  the boundary (2007: election-day polls fold into month 33, three
+  days past the 21 Aug 2010 ring; 1974 same class) - the block CLAMPS
+  that terminal vertex onto `endRes.x` first, so the vote line ends
+  exactly ON the ring and no lead-out exists to fire. rd-cycles restyles
   `if (s.tail) return { ...s, dash: RD_CYC_LEAD }` between the `s.lead`
   and `s.current` branches — same 0.5 4 dots as the lead-in, so the
   line runs bridge→line→bridge. `endCap: false` is load-bearing:
@@ -1247,7 +1252,9 @@ is interpolated on all three vote cards, exercising the dotted lead -
 and its tail sidesteps the "every lead from px(0)" assert, which is
 scoped to non-`-tail` ids) + a 1996 lift (its endRes carries the
 canonical 2dp primaries, exercising the per-card close rings AND
-pinning `c1996-tail`'s dEnd/dEndY to px/py(endRes)) + Level->Change
+pinning `c1996-tail`'s dEnd/dEndY to px/py(endRes)) + a 2007 lift
+(line ends exactly at px(endRes.x), no `c2007-tail`, and no drawn
+term's solid line ends right of its ring) + Level->Change
 fade + unlift. Dash counts are never hardcoded - the probe replays
 obsRuns verbatim over the drawn cycles' obs flags (`tppEras`-aware)
 PLUS the tail rule (last era, endRes present, endRes.x > lastPt.x),

@@ -61691,6 +61691,10 @@ function CycleChart({
       });
       const runs = obsRuns(pts, observed);
       const termEnd = si === seriesIn.length - 1;
+      if (termEnd && ringTerms != null && c.endRes) {
+        const lastPt = pts[pts.length - 1];
+        if (lastPt && Math.round(c.endRes.x) === lastPt.x && c.endRes.x < lastPt.x - 1e-6) lastPt.x = c.endRes.x;
+      }
       const rows = runs.map((run, i) => ({
         id: "c" + c.year + (si ? "-e" + si : "") + (i ? "-" + i : ""),
         label,
