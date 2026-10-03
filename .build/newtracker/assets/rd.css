@@ -2075,6 +2075,21 @@ body.rd .rd-ap-ring {
 }
 body.rd .rd-ap-pnums { display: grid; grid-template-columns: repeat(5, 46px); align-items: baseline; }
 body.rd .rd-ap-pnums > b { font-size: 15px; font-weight: 600; }
+/* the all-polls primary figures take the SAME half-glyph cast as the Latest
+   table (rd-pl-half, :703, whose comment carries the ink-width rationale):
+   the ½ is one glyph absolutely positioned beside the integer's top, OUT of
+   flow, so the integer alone sets the 46px/40px column lattice and every
+   house's primaries run straight down it. These selectors carry the extra
+   .rd-ap-card span on purpose: the phone card's `b { 15px }` rule (≤760px
+   block) would otherwise out-rank the suffix sizes below. */
+body.rd .rd-ap-pnums .rd-ap-halfwrap, body.rd .rd-ap-card .rd-ap-cprim .rd-ap-halfwrap { position: relative; display: inline-block; }
+body.rd .rd-ap-pnums .rd-ap-frac:not(.rd-ap-half),
+body.rd .rd-ap-card .rd-ap-cprim .rd-ap-frac:not(.rd-ap-half) { font-size: 11px; }
+body.rd .rd-ap-pnums .rd-ap-half, body.rd .rd-ap-card .rd-ap-cprim .rd-ap-half {
+  position: absolute; left: 100%; bottom: 0.85em;
+  padding-left: 1.5px; line-height: 1; white-space: nowrap;
+  font-size: 9.5px;
+}
 body.rd .rd-ap-hpn { align-self: end; }
 body.rd .rd-ap-nets { display: grid; grid-template-columns: repeat(3, 44px); justify-content: end; text-align: right; }
 body.rd .rd-ap-nets > b { font-size: 15px; font-weight: 600; }

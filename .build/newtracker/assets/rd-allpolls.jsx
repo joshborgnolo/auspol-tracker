@@ -45,6 +45,18 @@ function rdPollMargin(p, contest, pub) {
 
 /* a published figure as the pollster printed it: 55, 54.5 */
 const rdApNum = (v) => (v == null ? "—" : String(+(+v).toFixed(1)));
+/* the same figure cast the Latest table's way (its primFig): a half prints
+   as one ½ glyph absolutely positioned out of flow beside the integer, so
+   every house's integers run straight down the column lattice; any other
+   decimal keeps an in-flow ".x" suffix. Ink sizing is with the rd-pl-half
+   rule's comment in rd.css. */
+const rdApPrimFig = (v) => {
+  if (v == null) return "—";
+  const [i, f] = (+v).toFixed(1).split(".");
+  if (f === "0") return i;
+  if (f === "5") return <span className="rd-ap-halfwrap">{i}<b className="rd-ap-frac rd-ap-half">½</b></span>;
+  return <>{i}<b className="rd-ap-frac">{"." + f}</b></>;
+};
 /* a change on the same pollster's previous poll */
 function rdApChg(d, dec) {
   if (d == null) return null;
@@ -1538,7 +1550,7 @@ function RdAllPolls(P) {
       body = <div className="rd-ap-cpic">{pic}<span className="rd-ap-cval" style={{ color: rdApLeanInk(p.lean, onM) }}>{p.lean == null ? "—" : rdApSigned(p.lean)}</span></div>;
     } else if (facet === "primary") {
       const pr = p.p || {};
-      figs = <span role="cell" className="rd-ap-pnums">{RD_AP_PRIM.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr[k.id] != null ? rdApNum(pr[k.id]) : "—"}</b>)}</span>;
+      figs = <span role="cell" className="rd-ap-pnums">{RD_AP_PRIM.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b>)}</span>;
       pic = (
         <span className="rd-ap-pic" role="img" aria-label={"Primary vote: " + RD_AP_PRIM.filter((k) => pr[k.id] != null).map((k) => k.lab + " " + rdApNum(pr[k.id])).join(", ")}>
           <span className="rd-ap-in">
@@ -1550,7 +1562,7 @@ function RdAllPolls(P) {
         </span>
       );
       body = <>
-        <div className="rd-ap-cprim">{RD_AP_PRIM.map((k) => <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{pr[k.id] != null ? rdApNum(pr[k.id]) : "—"}</b></span>)}</div>
+        <div className="rd-ap-cprim">{RD_AP_PRIM.map((k) => <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—"}</b></span>)}</div>
         <div className="rd-ap-cpic">{pic}</div>
       </>;
     } else if (facet === "leadership") {

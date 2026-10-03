@@ -4561,6 +4561,14 @@ body.rd .rd-ap-ring {
 }
 body.rd .rd-ap-pnums { display: grid; grid-template-columns: repeat(5, 46px); align-items: baseline; }
 body.rd .rd-ap-pnums > b { font-size: 15px; font-weight: 600; }
+body.rd .rd-ap-pnums .rd-ap-halfwrap, body.rd .rd-ap-card .rd-ap-cprim .rd-ap-halfwrap { position: relative; display: inline-block; }
+body.rd .rd-ap-pnums .rd-ap-frac:not(.rd-ap-half),
+body.rd .rd-ap-card .rd-ap-cprim .rd-ap-frac:not(.rd-ap-half) { font-size: 11px; }
+body.rd .rd-ap-pnums .rd-ap-half, body.rd .rd-ap-card .rd-ap-cprim .rd-ap-half {
+  position: absolute; left: 100%; bottom: 0.85em;
+  padding-left: 1.5px; line-height: 1; white-space: nowrap;
+  font-size: 9.5px;
+}
 body.rd .rd-ap-hpn { align-self: end; }
 body.rd .rd-ap-nets { display: grid; grid-template-columns: repeat(3, 44px); justify-content: end; text-align: right; }
 body.rd .rd-ap-nets > b { font-size: 15px; font-weight: 600; }
@@ -77815,6 +77823,19 @@ function rdPollMargin(p, contest, pub) {
   return 196 * Math.sqrt(Math.max(0, e2 - e1 * e1) / n);
 }
 const rdApNum = v => v == null ? "—" : String(+(+v).toFixed(1));
+const rdApPrimFig = v => {
+  if (v == null) return "—";
+  const [i, f] = (+v).toFixed(1).split(".");
+  if (f === "0") return i;
+  if (f === "5") return React.createElement("span", {
+    className: "rd-ap-halfwrap"
+  }, i, React.createElement("b", {
+    className: "rd-ap-frac rd-ap-half"
+  }, "\xBD"));
+  return React.createElement(React.Fragment, null, i, React.createElement("b", {
+    className: "rd-ap-frac"
+  }, "." + f));
+};
 function rdApChg(d, dec) {
   if (d == null) return null;
   if (Math.abs(d) < (dec ? 0.05 : 0.5)) return "no change";
@@ -80111,7 +80132,7 @@ function RdAllPolls(P) {
         style: {
           color: k.ink
         }
-      }, pr[k.id] != null ? rdApNum(pr[k.id]) : "—")));
+      }, pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—")));
       pic = React.createElement("span", {
         className: "rd-ap-pic",
         role: "img",
@@ -80140,7 +80161,7 @@ function RdAllPolls(P) {
         style: {
           color: k.ink
         }
-      }, pr[k.id] != null ? rdApNum(pr[k.id]) : "—")))), React.createElement("div", {
+      }, pr[k.id] != null ? rdApPrimFig(pr[k.id]) : "—")))), React.createElement("div", {
         className: "rd-ap-cpic"
       }, pic));
     } else if (facet === "leadership") {
