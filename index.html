@@ -4854,7 +4854,8 @@ body.rd .rd-fl-keynow::before { content: ""; position: absolute; left: 6px; top:
 body.rd .rd-fl-keynow i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ink); }
 @media (max-width: 984px) {
   body.rd .rd-hl-tabs > div[role="group"] {
-    flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none;
+    flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden;
+    overflow-y: clip; scrollbar-width: none;
     -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
     mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
     padding-right: 24px;
@@ -81566,7 +81567,7 @@ function RdHouseLean({
     label: "Others"
   }, {
     id: "split",
-    label: phone ? "Split" : "One Nation v Coalition",
+    label: "One Nation–Coalition split",
     title: "One Nation’s primary vote against the Coalition’s"
   }];
   const hlHover = React.useRef(false);

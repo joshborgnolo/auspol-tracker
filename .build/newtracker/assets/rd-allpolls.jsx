@@ -2311,7 +2311,9 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   const hlViews = [
     { id: "tpp", label: "Two-party" }, { id: "alp", label: "Labor" }, { id: "lnp", label: "Coalition" }, { id: "onp", label: "One Nation" },
     { id: "grn", label: "Greens" }, { id: "oth", label: "Others" },
-    { id: "split", label: phone ? "Split" : "One Nation v Coalition", title: "One Nation’s primary vote against the Coalition’s" },
+    /* one label at every width now the row scrolls (user call 2026-10-03:
+       "One Nation–Coalition split", retiring the phone's bare "Split") */
+    { id: "split", label: "One Nation–Coalition split", title: "One Nation’s primary vote against the Coalition’s" },
   ];
   /* hovering the panel hands the arrow keys to the measure row - the walk a
      focused tab has, claimed only while the pointer is over the card; the

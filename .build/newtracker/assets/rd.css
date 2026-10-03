@@ -2418,10 +2418,16 @@ body.rd .rd-fl-keynow i { position: absolute; left: 50%; top: 50%; width: 9px; h
    Others tabs off the row. The app's touch effect reads the overflow and
    leaves the strip's own drags to it; a swipe under the strip still
    steps the views, and the [view] effect in rd-allpolls glides the
-   chosen tab into sight. */
+   chosen tab into sight. overflow-y needs the explicit lock: a bare
+   overflow-x:auto computes overflow-y to auto, and the resulting
+   fraction-of-px slack made the strip wobble up and down under a thumb
+   (user report 2026-10-03). hidden kills the user scroll; the clip
+   override after it takes over in any engine that lets clip stand
+   beside overflow-x:auto (they all compute it to hidden today). */
 @media (max-width: 984px) {
   body.rd .rd-hl-tabs > div[role="group"] {
-    flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none;
+    flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden;
+    overflow-y: clip; scrollbar-width: none;
     -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
     mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
     /* scroll runway the last tab's width of the fade: at max scroll it

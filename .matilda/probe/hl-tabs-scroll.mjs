@@ -6,6 +6,9 @@
    idiom); a view change landing past the strip's edge glides it into
    view via the strip's own scroller only (never the page), and a 24px
    padding runway keeps the last tab clear of the fade at max scroll.
+   Sideways ONLY: overflow-y:clip locks the strip's other axis (a bare
+   overflow-x:auto computes overflow-y to auto and the strip wobbled
+   up and down under a thumb - user report same day).
    Run from the repo root: node .matilda/probe/hl-tabs-scroll.mjs
    Rebuild first (node .build/newtracker/build.mjs) — this probes the
    COMMITTED index.html artifact. */
@@ -64,7 +67,9 @@ async function measure(page) {
       gL: group.getBoundingClientRect().left, gR: group.getBoundingClientRect().right,
       rowR: row.getBoundingClientRect().right,
       scrollW: group.scrollWidth, clientW: group.clientWidth,
-      ox: cs.overflowX, mask: cs.maskImage || cs.webkitMaskImage || "", padR: cs.paddingRight,
+      scrollH: group.scrollHeight, clientH: group.clientHeight,
+      ox: cs.overflowX, oy: cs.overflowY,
+      mask: cs.maskImage || cs.webkitMaskImage || "", padR: cs.paddingRight,
       font: tabs.length ? getComputedStyle(tabs[0]).fontSize : "",
       flex: tabs.length ? getComputedStyle(tabs[0]).flexGrow : "",
       winScrollY: window.scrollY,
@@ -73,8 +78,10 @@ async function measure(page) {
   });
 }
 
-const EXPECT_NARROW = ["Two-party", "Labor", "Coalition", "One Nation", "Greens", "Others", "Split"];
-const EXPECT_WIDE = EXPECT_NARROW.map((l, i) => (i === 6 ? "One Nation v Coalition" : l));
+/* one label at every width since 2026-10-03 (user: "One Nation–Coalition
+   split") - the phone's bare "Split" and the desktop's "One Nation v
+   Coalition" both retired once the row could scroll */
+const EXPECT = ["Two-party", "Labor", "Coalition", "One Nation", "Greens", "Others", "One Nation–Coalition split"];
 
 /* expectScroll: true = the strip must overflow and the reveal test runs;
    false = desktop gate, seven tabs fit with no scroll; null = either is
@@ -89,6 +96,14 @@ async function rung(vw, vh, expectScroll, expectLabels) {
   const overflowing = m.scrollW > m.clientW + 1;
   if (vw <= 984) {
     ok(`${tag}: group overflow-x auto`, m.ox === "auto", m.ox);
+    /* not user-scrollable vertically: overflow-y must compute hidden or
+       clip - a bare overflow-x:auto computes y to auto, and an auto
+       strip is drag/rubber-band scrollable, which is the wobble the
+       user reported. (clip computes to hidden beside overflow-x:auto
+       under CSS Overflow 3 today; either locked value passes.) */
+    ok(`${tag}: y-axis not user-scrollable`, m.oy === "hidden" || m.oy === "clip", m.oy);
+    ok(`${tag}: vertical slack under a pixel`, m.scrollH - m.clientH <= 1,
+       `scrollH ${m.scrollH} clientH ${m.clientH}`);
     ok(`${tag}: right-edge fade mask`, m.mask.includes("linear-gradient"), m.mask || "(none)");
     ok(`${tag}: fade runway`, parseFloat(m.padR) === 24, m.padR);
     ok(`${tag}: tab size/flex`, m.font === (vw <= 760 ? "14px" : "15px") && m.flex === "0",
@@ -104,6 +119,19 @@ async function rung(vw, vh, expectScroll, expectLabels) {
   ok(`${tag}: strip stays on-page`, m.rowR <= m.winW + 1, `row right ${m.rowR} vs page ${m.winW}`);
 
   if (overflowing) {
+    /* the glide is only owed when the LAST tab actually sits off the
+       strip at rest - near the 985px fit boundary the overflow can be
+       a sliver (at 800px it is 11px) with every tab already visible,
+       and then the correct behaviour is no motion at all */
+    const lastOffStrip = await page.evaluate(() => {
+      const g = document.querySelector('.rd-hl-tabs [role="group"]');
+      g.scrollLeft = 0;
+      const t = [...document.querySelectorAll(".rd-hl-tabs .rd-tab")].at(-1);
+      return t.getBoundingClientRect().right > g.getBoundingClientRect().right + 0.5;
+    });
+    if (!lastOffStrip) {
+      console.log(`  ..  ${tag}: last tab already on-strip at rest — glide not owed here`);
+    } else {
     /* a view change landing on an off-strip tab must glide it into view
        WITHOUT moving the page (never scrollIntoView). Baseline: flip to
        Coalition (always on-strip from the left edge), park the strip's
@@ -138,14 +166,15 @@ async function rung(vw, vh, expectScroll, expectLabels) {
     await new Promise((r) => setTimeout(r, 900));
     const o = await measure(page);
     ok(`${tag}: strip glides back`, Math.abs(o.views[0].left - o.gL) < 2, `first tab left ${o.views[0].left.toFixed(1)} vs strip ${o.gL.toFixed(1)}`);
+    }
   }
   await page.close();
 }
 
-await rung(390, 844, true, EXPECT_NARROW);          // phone
-await rung(360, 800, true, EXPECT_NARROW);          // small phone
-await rung(800, 1024, null, EXPECT_WIDE);           // the 761-984 band
-await rung(1100, 900, false, EXPECT_WIDE);          // desktop gate
+await rung(390, 844, true, EXPECT);                 // phone
+await rung(360, 800, true, EXPECT);                 // small phone
+await rung(800, 1024, null, EXPECT);                // the 761-984 band
+await rung(1100, 900, false, EXPECT);               // desktop gate
 
 await browser.close();
 server.close();
