@@ -79781,18 +79781,19 @@ function RdPastCycles(p) {
       if (!sumHover.current && !measHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       const dir = e.key === "ArrowRight" ? 1 : -1,
         mo = measEl.current;
-      if ((measHover.current || sumHover.current && Date.now() - measWalk.current < 800) && mo && mo.isConnected && mo.getClientRects().length) {
+      const rowFocus = !!(a && a.closest && a.closest(".rd-cs-row"));
+      if ((!a || a.tagName === "BODY" || a.tagName === "HTML" || rowFocus) && (measHover.current || sumHover.current && Date.now() - measWalk.current < 800) && mo && mo.isConnected && mo.getClientRects().length) {
         if (modeSwipeLive.current(dir)) {
           measWalk.current = Date.now();
           e.preventDefault();
         }
         return;
       }
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       if (cmpSwipeLive.current(dir)) e.preventDefault();
     };
     document.addEventListener("keydown", key, true);

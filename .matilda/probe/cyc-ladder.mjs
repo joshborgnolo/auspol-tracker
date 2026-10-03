@@ -203,6 +203,34 @@ try {
       check(`${W} keyboard: <-/-> on a focused row walk the compare view, focus keeps the row`, c0 === 0 && c1 === 1 && c2 === 0 && stillOnRow && hash === "#cycles", `${c0}->${c1}->${c2}, on-row ${stillOnRow}, hash ${hash}`);
       const afterArrows = await read();
       check(`${W} keyboard: compare walk leaves the open list intact`, afterArrows && afterArrows.name === names[3], JSON.stringify(afterArrows && afterArrows.name));
+
+      /* hovering the Measure row claims <-/-> even from a focused row:
+         arrows flip Level<->Change (the compare view is untouched, the
+         row keeps focus and its list; user call 2026-10-04); moving the
+         pointer off the measure row hands the compare walk back */
+      await page.evaluate(() => document.querySelector('#cyc-summary [aria-label="Measure"]').scrollIntoView({ behavior: "instant", block: "center" }));
+      await sleep(300);
+      const measBox = await page.evaluate(() => { const r = document.querySelector('#cyc-summary [aria-label="Measure"]').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, bottom: r.bottom }; });
+      const measureAt = () => page.evaluate(() => { const b = [...document.querySelectorAll('#cyc-summary [aria-label="Measure"] button')].find((x) => x.getAttribute("aria-pressed") === "true"); return b ? b.textContent.trim() : ""; });
+      const focusedRow = () => page.evaluate(() => document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.key || null : null);
+      const cHeld = await cmpAt();
+      const key3 = await page.evaluate((name) => { const el = [...document.querySelectorAll("#cyc-summary .rd-cs-row")].find((el) => el.querySelector(".rd-cs-name b").textContent.trim() === name); return el ? el.dataset.key : null; }, names[3]);
+      await page.mouse.move(measBox.x, measBox.y); await sleep(300);
+      await page.keyboard.press("ArrowRight"); await sleep(450);
+      const m1 = await measureAt(), c1m = await cmpAt(), f1 = await focusedRow(), op1 = await read();
+      await page.keyboard.press("ArrowLeft"); await sleep(900);
+      const m2 = await measureAt(), c2m = await cmpAt();
+      check(`${W} keyboard: hovering the measure row, arrows flip Level/Change only`, /^Change/.test(m1) && /^Level/.test(m2) && c1m === cHeld && c2m === cHeld, `measure "${m1}"/"${m2}", compare ${cHeld}->${c1m}->${c2m}`);
+      check(`${W} keyboard: the row keeps focus and its list through the measure walk`, f1 === key3 && op1 && op1.name === names[3], `focus ${f1} vs ${key3}, open ${op1 && op1.name}`);
+      /* off the measure row, still over the section: the focused row's compare walk owns the keys again */
+      await sleep(1000); /* let the 800ms measure-walk window lapse */
+      await page.mouse.move(measBox.x, Math.max(measBox.y + 60, measBox.bottom + 20)); await sleep(300);
+      await page.keyboard.press("ArrowRight"); await sleep(900);
+      const c3m = await cmpAt();
+      await page.keyboard.press("ArrowLeft"); await sleep(900);
+      const c4m = await cmpAt();
+      const m3 = await measureAt();
+      check(`${W} keyboard: pointer off the measure row, arrows walk the compare view again`, c3m === (cHeld + 1) % 3 && c4m === cHeld && /^Level/.test(m3), `compare ${cHeld}->${c3m}->${c4m}, measure "${m3}"`);
     }
     check(`${W} no page errors`, errs.length === 0, errs.slice(0, 3).join(" | "));
     await page.close();

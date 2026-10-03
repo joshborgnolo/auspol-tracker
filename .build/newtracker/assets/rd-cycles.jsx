@@ -850,7 +850,9 @@ function RdPastCycles(p) {
      open row's list travels with the focus. Left and right on a focused row
      walk the table's compare view, exactly as hovering the section does:
      the focus guards in the page-level and hover claims stand aside for a
-     focused row, so without this branch the keys died on the row. */
+     focused row, so without this branch the keys died on the row. (While
+     the pointer sits on the Measure row its deeper hover claim takes the
+     arrows back - see the claim effect below.) */
   const rowNav = (e, r) => {
     if (e.target !== e.currentTarget) return;
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleRow(r.key, e.currentTarget); return; }
@@ -1110,9 +1112,10 @@ function RdPastCycles(p) {
   /* The Compare-with swipe's reach is the whole summary section, so the
      hover claim is: pointers anywhere over the section hand <-/-> to the
      comparison, except over the Measure row itself, whose claim is deeper
-     and wins. Both step through the .current steppers (fresh closures
-     every render, so the effect registers once), and both keep the row's
-     own walk - focused tabs and the page-level key walk are untouched. */
+     and wins - even over a focused summary row (user call 2026-10-04).
+     Both step through the .current steppers (fresh closures every render,
+     so the effect registers once); other focused elements keep their keys
+     and the page-level key walk is untouched. */
   const modeSwipeLive = React.useRef(null);
   modeSwipeLive.current = (dir) => {
     const i = MODE_ROWS.indexOf(mode);
@@ -1142,14 +1145,22 @@ function RdPastCycles(p) {
       if ((!sumHover.current && !measHover.current) || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       const dir = e.key === "ArrowRight" ? 1 : -1, mo = measEl.current;
-      if ((measHover.current || (sumHover.current && Date.now() - measWalk.current < 800)) && mo && mo.isConnected && mo.getClientRects().length) {
+      /* a focused summary row counts as unclaimed for the measure row
+         only: while the pointer is on the measure row, <-/-> flip
+         Level/Change instead of walking the compare view (the row keeps
+         focus and gets the keys back the moment the pointer leaves);
+         every other focused element still keeps its keys */
+      const rowFocus = !!(a && a.closest && a.closest(".rd-cs-row"));
+      if ((!a || a.tagName === "BODY" || a.tagName === "HTML" || rowFocus)
+          && (measHover.current || (sumHover.current && Date.now() - measWalk.current < 800))
+          && mo && mo.isConnected && mo.getClientRects().length) {
         if (modeSwipeLive.current(dir)) { measWalk.current = Date.now(); e.preventDefault(); }
         return;
       }
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       if (cmpSwipeLive.current(dir)) e.preventDefault();
     };
     document.addEventListener("keydown", key, true);

@@ -20,7 +20,11 @@ digits), never anything else.
 
 This is NOT focus-follows-mouse: pointerenter/leave on a card flips a
 ref; a CAPTURE-phase document keydown steps the row's existing walk
-while the pointer is over it. Real keyboard focus always wins.
+while the pointer is over it. Real keyboard focus wins — with ONE
+deliberate exception shipped 2026-10-04: rung 6's measure row claims
+<-/-> even from a focused Past-cycles summary row when the pointer is
+ON the measure row (user dictate; details in the Past cycles site
+below). DOM focus never moves in any of this.
 
 ## The canonical block
 
@@ -228,6 +232,32 @@ allpolls view so that final phase still works.
     the Measure row div gained `ref={measEl}`. ONE capture keydown
     checks measure first (canonical liveness guard
     `isConnected && getClientRects().length`), then compare.
+  - **THE FOCUS EXCEPTION (2026-10-04, user dictate "hovering ...
+    doesn't change the focus of the arrow walking - shouldn't
+    it?").** The ladder work made every `.rd-cs-row` focusable
+    (rowNav: Enter/Space toggle, up/down step rows carrying the open
+    ladder, left/right walk the compare view — the blanket
+    "focus must be BODY/HTML" bail is why rowNav exists at all: the
+    claims stood aside for the focused row, so the row needed its own
+    branch). Then the dictate: a pointer ON the Measure row must
+    claim <-/-> away from that focused row. So the handler's focus
+    bail is now TWO-TIERED: `rowFocus =
+    a && a.closest && a.closest(".rd-cs-row")` counts as unclaimed
+    FOR THE MEASURE BRANCH ONLY (its condition hoists the
+    !a/BODY/HTML/rowFocus test ahead of the measHover/window test);
+    the compare fallback keeps the blanket "any focus disarms" bail,
+    and every other focused element (compare pill, measure tab,
+    navbar) still vetoes the whole handler. DOM focus itself never
+    moves; the row gets the keys back on pointerleave. Order in the
+    handler: the selection guard and `dir` read now precede the
+    branch because the measure condition needs them. Pinned by
+    `.matilda/probe/cyc-ladder.mjs` keyboard phases (hover measure:
+    Level/Change flips, compare view and row focus and open ladder
+    untouched; pointer off: compare walk resumes). Probe-writing
+    note: keep the measure-flip's next key inside the 800ms window
+    (the slide-out lesson below applies), and scrollIntoView the
+    measure row with `behavior: "instant"` before parking the pointer
+    on it — earlier phases may have scrolled it off-screen.
   - **THE NEW LESSON — slide-out at the scroll ceiling.** Each measure
     step rewrites the head/dek ABOVE the row, and near `scrollY≈0`
     pinView can't hold the row (the page can't scroll past the top),
