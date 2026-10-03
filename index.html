@@ -4731,10 +4731,14 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-card .rd-ap-cprim b { font-size: 15px; font-weight: 600; }
   body.rd .rd-ap-cnets, body.rd .rd-ap-csub { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
   body.rd .rd-ap-csub-sent { display: block; container-type: inline-size; }
-  body.rd .rd-ap-mgmt-s { display: none; }
+  body.rd .rd-ap-mgmt-s, body.rd .rd-ap-mgmt-x { display: none; }
   @container (max-width: 334.5px) {
     body.rd .rd-ap-mgmt-l { display: none; }
     body.rd .rd-ap-mgmt-s { display: inline; }
+  }
+  @container (max-width: 291.7px) {
+    body.rd .rd-ap-mgmt-s { display: none; }
+    body.rd .rd-ap-mgmt-x { display: inline; }
   }
   body.rd .rd-ap-issph { container-type: inline-size; }
   body.rd .rd-ap-issph-mid, body.rd .rd-ap-issph-ask { display: none; }
@@ -79685,6 +79689,41 @@ function RdApSheet({
     onClick: onClose
   }, "Show ", count, " poll", count === 1 ? "" : "s")));
 }
+function RdApRankSent({
+  children
+}) {
+  const el = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const node = el.current;
+    if (!node) return undefined;
+    const rk = node.querySelector(".rd-ap-rk");
+    if (!rk) return undefined;
+    const fit = () => {
+      rk.style.display = "";
+      node.style.whiteSpace = "nowrap";
+      const fits = node.scrollWidth <= node.clientWidth + 0.5;
+      node.style.whiteSpace = "";
+      rk.style.display = fits ? "" : "none";
+    };
+    let raf = 0;
+    const refit = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(fit);
+    };
+    const ro = new ResizeObserver(refit);
+    ro.observe(node);
+    fit();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+    return () => {
+      ro.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+  return React.createElement("div", {
+    className: "rd-ap-csub rd-ap-csub-sent",
+    ref: el
+  }, children);
+}
 function RdAllPolls(P) {
   const {
     rows,
@@ -80528,12 +80567,14 @@ function RdAllPolls(P) {
           className: "rd-ap-mgmt-l"
         }, pos1 ? "Economic management" : "economic management"), React.createElement("span", {
           className: "rd-ap-mgmt-s"
-        }, pos1 ? "Economic mgmt" : "economic mgmt"));
+        }, pos1 ? "Economic mgmt" : "economic mgmt"), React.createElement("span", {
+          className: "rd-ap-mgmt-x"
+        }, pos1 ? "Econ mgmt" : "econ mgmt"));
       };
       const ord = n => n === 1 ? React.createElement("span", null, "1", React.createElement("sup", null, "st")) : n === 2 ? React.createElement("span", null, "2", React.createElement("sup", null, "nd")) : React.createElement("span", null, "3", React.createElement("sup", null, "rd"));
-      body = React.createElement(React.Fragment, null, it && React.createElement("div", {
-        className: "rd-ap-csub rd-ap-csub-sent"
-      }, sentPart(it[0], true), " ", ord(1), top3.length > 1 && React.createElement(React.Fragment, null, ", ", sentPart(top3[1][0]), " ", ord(2)), top3.length > 2 && React.createElement(React.Fragment, null, ", ", sentPart(top3[2][0]), " ", ord(3))), !it && iss && iss.own && iss.own.col && React.createElement("div", {
+      body = React.createElement(React.Fragment, null, it && React.createElement(RdApRankSent, null, sentPart(it[0], true), " ", React.createElement("span", {
+        className: "rd-ap-rk"
+      }, "ranked "), ord(1), top3.length > 1 && React.createElement(React.Fragment, null, ", ", sentPart(top3[1][0]), " ", ord(2)), top3.length > 2 && React.createElement(React.Fragment, null, ", ", sentPart(top3[2][0]), " ", ord(3))), !it && iss && iss.own && iss.own.col && React.createElement("div", {
         className: "rd-ap-issph"
       }, React.createElement("div", {
         className: "rd-ap-csub rd-ap-csub-sent rd-ap-issph-full"

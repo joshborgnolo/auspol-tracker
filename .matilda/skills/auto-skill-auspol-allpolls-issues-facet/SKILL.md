@@ -488,26 +488,52 @@ unprompted mentions all stay). FINAL contract:
   mention-shares note, the SEC explainer popup). Probe absence pins:
   rowAnatomy `unpRows` (no row textContent matches /unprompted/i),
   card `unpLeft` (no sentence), both added with the drop.
-- The "economic management" label is a TWO-SPAN container rung
-  (2026-10-03, user: 'Shorten it to "economic mgmt" when it would
-  otherwise spill over to two lines'): `sentPart(l, pos1)`
+- The "economic management" label is a THREE-RUNG container ladder
+  (2026-10-03, two user calls: 'Shorten it to "economic mgmt" when
+  it would otherwise spill over to two lines', THEN — after the
+  audit found 320px shells 11.7px short of even the short form —
+  'implement a further shortening… "econ mgmt"'): `sentPart(l, pos1)`
   (rd-allpolls.jsx, right after sentLab/sentLab1) renders plain
   text for every label EXCEPT the economy one, where it emits
   `<span class="rd-ap-mgmt-l">…management…` + `<span
-  class="rd-ap-mgmt-s">…mgmt…`; the sentence div itself is the
-  query container (`.rd-ap-csub-sent { display:block;
-  container-type: inline-size; }` — the two declarations landed
-  together in the rd.css phone block), and ONE
-  `@container (max-width: 334.5px)` tier swaps -l→-s. Measured at
-  13px csub (offscreen white-space:nowrap shrink-wrap, the issap
-  ladder's own idiom): LONG sentence 334.5px vs SHORT 291.7px
-  against the golden lanes 280@320 / 300@340 / 320@360 / 350@390 /
-  361.8@402 — so SHORT covers 340/360, LONG covers 390/402, and
-  the 320 shell's 280px lane is 11.7px short of even the short
-  form (the sentence wraps there: recorded residue, user told).
-  ISS_SENT_SHORT is NOT expanded (the call was conditional, not a
-  global shorten); desktop cells, the detail and D.issues.labels
-  keep the full label — the swap lives in this one phone sentence.
+  class="rd-ap-mgmt-s">…mgmt…` + `<span class="rd-ap-mgmt-x">…
+  Econ mgmt…`; the sentence div itself is the query container
+  (`.rd-ap-csub-sent { display:block; container-type: inline-size; }`
+  — the two declarations landed together in the rd.css phone
+  block), and TWO tiers swap rungs: `@container
+  (max-width: 334.5px)` -l→-s, `@container (max-width: 291.7px)`
+  -s→-x. Measured at 13px csub (offscreen white-space:nowrap
+  shrink-wrap, the issap ladder's own idiom — STRIP
+  `containerType` on the clone: inline-size containment zeroes
+  the intrinsic measure): LONG sentence 334.5px, SHORT 291.7px,
+  XTRA 263.3px against the golden lanes 280@320 / 300@340 /
+  320@360 / 350@390 / 361.8@402 — XTRA covers 320, SHORT covers
+  340/360, LONG covers 390/402, ONE LINE ON EVERY SHIPPED SHELL
+  (the old 320px residue — 11.7px short — is CLOSED by the third
+  rung). ISS_SENT_SHORT is NOT expanded (the calls were
+  conditional, not a global shorten); desktop cells, the detail
+  and D.issues.labels keep the full label — the ladder lives in
+  this one phone sentence.
+- The "ranked" flourish (same day, user: "make eg 'Cost of living
+  1st…' read 'Cost of living ranked 1st…' — add 'ranked' if it keeps
+  it on one line"): NOT a CSS rung — sentence content varies per
+  wave, so each card fit-tests LIVE. `RdApRankSent` (module-level
+  in rd-allpolls.jsx, right before RdAllPolls) renders the
+  sentence line: useLayoutEffect shows the `<span
+  class="rd-ap-rk">ranked </span>` before the `1st` ordinal, forces
+  `whiteSpace: nowrap`, and parks the span (display:none) when
+  scrollWidth > clientWidth + 0.5; ResizeObserver + rAF coalesce +
+  document.fonts.ready re-fit. The ranking sentence JSX moved from
+  a plain div into `<RdApRankSent>` around the unchanged children.
+  Measured cost of the word: +40.3px — so per-wave admittance:
+  SEC 271.2px and RedBridge 275px ranked → EVERY shell; the Ipsos
+  petrol sentence 311.5px → 360px up (parks at 320/340); the
+  economy sentence 374.9px ranked on its LONG rung → NEVER carries
+  it (all rungs park: SHORT 332 > 320px 360-shell lane, XTRA
+  303.6 > 280/300). Scratch probes: .matilda/probe-issmgmt-rung.mjs
+  (five shells × ladder identity / one-line / flourish admittance —
+  25 checks) + the measurement rig .matilda/probe-issmgmt-measure.mjs
+  (both uncommitted by design).
 - Unranked-but-col placeholder (same day; source jsx rode into the
   sibling primary-order commit 4820dda, probe pins + compiled line
   landed with the Asked-line fix in 9aa99cf): Resolve, YouGov and
@@ -558,20 +584,22 @@ unprompted mentions all stay). FINAL contract:
   emissions keep the stored label, so map in the renderer, never edit
   the stored data. Add a future label the user calls redundant to this
   map, not to the data.
-- Heights (360px, post-mgmt-swap): sentence csub one text line 22.2px;
+- Heights (360px, post-mgmt-ladder): sentence csub one text line 22.2px;
   cards 118.1 (sentence+strip) / 93.9 (strip-only); the 140.3 outlier
   WAS "economic management" wrapping the sentence to two lines — with
-  the two-span rung the Ipsos card is one line on every shell from
-  340px up (SHORT 291.7px ≤ every lane ≥300px) and the wrap survives
-  only at 320px (the 280px lane, 11.7px short of even the short form).
+  the THREE-rung ladder every card is one line on EVERY shipped shell
+  (XTRA "Econ mgmt" 263.3px ≤ the 320px shell's 280px lane; the old
+  11.7px short residue is closed).
   390px renders (post-1c8ef8b, sentence case; the "; unprompted" SEC
-  row tail dropped same-day): SEC "Cost of living 1st, housing 2nd,
-  crime 3rd" (chip "ALP 23"); RedBridge "Cost
-  of living 1st, health 2nd, housing 3rd"; Ipsos "Cost of living 1st,
-  housing 2nd, economic management 3rd" — the LONG spelling, the rung
-  a 350px 390px-shell lane shows.
-- Probe pinning (iss-facet.mjs, 47 checks since the placeholder and
-  9aa99cf's Asked-branch pin): `topFilled` keys on
+  row tail dropped same-day; "ranked" flourish riding every sentence
+  it fits — at this rung all but Ipsos's economy one): SEC "Cost of
+  living ranked 1st, housing 2nd, crime 3rd" (chip "ALP 23");
+  RedBridge "Cost of living ranked 1st, health 2nd, housing 3rd";
+  Ipsos "Cost of living 1st, housing 2nd, economic management
+  3rd" — the LONG spelling, the rung a 350px 390px-shell lane shows
+  (and 334.5+40.3 > 350 is why the flourish parks exactly here).
+- Probe pinning (iss-facet.mjs, 49 checks since the mgmt ladder and
+  flourish landed): `topFilled` keys on
   `/ 1st/`; ordinal grammar `/, [^,(]+ 2nd/` and `/, [^,(]+ 3rd/`;
   `legacy` flags any relic figure grammar (`/\(\d+\)/` or
   ` top issue | then |Best on it`); `capsOk` (1c8ef8b) asserts EXACTLY
@@ -581,11 +609,15 @@ unprompted mentions all stay). FINAL contract:
   Case. Same-day the "; unprompted" tail was dropped the strip was
   retired with it (`bare` went; `unp` + unpRows absence pins above).
   The mgmt rung adds the innerText lesson: cardAnatomy.txt reads
-  `sent.innerText`, never textContent — the -l/-s pair would
-  concatenate BOTH spellings ("…economic management economic mgmt…")
-  into every grammar anchor and capsOk; mgmtOk then pins the pair
-  present, exactly one displayed, and /economic management/ (the LONG
-  spelling) at page3's 390px rung. LESSON: the probe's grammar anchors
+  `sent.innerText`, never textContent — the -l/-s/-x set would
+  concatenate ALL THREE spellings into every grammar anchor and
+  capsOk; mgmtOk then pins the three spans present, exactly one
+  displayed, and /economic management/ (the LONG spelling) at page3's
+  390px rung. `rankedOk` pins the flourish contract from the same
+  pass: sentence cards carry `.rd-ap-rk`, shown ("ranked 1st" in
+  innerText) at 390px UNLESS the card carries the mgmt ladder —
+  the economy sentence never fits the word on any shell.
+  LESSON: the probe's grammar anchors
   ARE the copy contract —
   after a deliberate sentence-copy change, update the anchor AND its
   check label in the same commit; this session's mid-work false-FAIL

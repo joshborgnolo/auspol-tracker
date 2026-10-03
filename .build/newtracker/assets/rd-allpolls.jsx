@@ -1268,6 +1268,45 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
   );
 }
 
+/* the phone cards' ranked sentence, wrapper for the "ranked" flourish:
+   "ranked" joins the first label ("Cost of living ranked 1st") only while
+   it still fits ONE line (user call 2026-10-03: "if it wouldn't make it
+   spill over, make it … ranked 1st"). Sentence content varies wave to
+   wave so no CSS width ladder (which prices only FIXED strings the way
+   the mgmt/issph rungs do) can call it per card - the LIVE element is
+   measured instead: show the word, force the sentence to one physical
+   line, and compare scrollWidth against the lane's clientWidth, parking
+   the span display:none when it would overflow. Runs pre-paint on mount,
+   on lane resize, and again once webfonts settle. The economy sentence
+   NEVER keeps it (its LONG form 334.5px already nearly fills the 350px
+   390-shell lane) - the flourish only rides the sentences with slack
+   (SEC 271.2px, RedBridge 275px, the first three phone lanes 280/300/
+   320px; Ipsos's petrol sentence 311.5px fits from the 360px shell up) */
+function RdApRankSent({ children }) {
+  const el = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const node = el.current;
+    if (!node) return undefined;
+    const rk = node.querySelector(".rd-ap-rk");
+    if (!rk) return undefined;
+    const fit = () => {
+      rk.style.display = "";
+      node.style.whiteSpace = "nowrap";
+      const fits = node.scrollWidth <= node.clientWidth + 0.5;
+      node.style.whiteSpace = "";
+      rk.style.display = fits ? "" : "none";
+    };
+    let raf = 0;
+    const refit = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(fit); };
+    const ro = new ResizeObserver(refit);
+    ro.observe(node);
+    fit();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+    return () => { ro.disconnect(); cancelAnimationFrame(raf); };
+  }, []);
+  return <div className="rd-ap-csub rd-ap-csub-sent" ref={el}>{children}</div>;
+}
+
 /* ---------------------------------------------------------------- the table */
 function RdAllPolls(P) {
   const { rows, sorted, total, houses, houseRank, houseN, tagN, shownTags, rangeN, RANGE_LAB,
@@ -1772,30 +1811,32 @@ function RdAllPolls(P) {
       /* "economic management" is the sentence's one spiller: the Ipsos
          "Cost of living 1st, housing 2nd, economic management 3rd" card is
          the only ranked card that ever wrapped to two lines (the 140.3px
-         outlier in the 360px height pass). User call 2026-10-03: shorten
-         to "economic mgmt" WHEN IT WOULD OTHERWISE SPILL OVER - so the
-         label ships as TWO spans and the .rd-ap-csub-sent container
-         itself (container-type: inline-size, rd.css) swaps them at the
-         measured break: LONG "economic management" puts the Ipsos
-         sentence at 334.5px vs SHORT "economic mgmt" 291.7px (13px
-         csub), lanes 280@320vp / 300@340 / 320@360 / 350@390 /
-         361.8@402 - so the container shows SHORT below 334.5px and LONG
-         at/above. Every other label renders plain text exactly as
-         before; desktop cells and the stored data are untouched (this
-         map lives only in this one phone sentence) */
+         outlier in the 360px height pass). User calls 2026-10-03: shorten
+         to "economic mgmt" - and further to "econ mgmt" - WHEN IT WOULD
+         OTHERWISE SPILL OVER, so the label ships as THREE spans and the
+         .rd-ap-csub-sent container itself (container-type: inline-size,
+         rd.css) thins them at the measured breaks: sentence widths LONG
+         "economic management" 334.5px / SHORT "economic mgmt" 291.7px /
+         XTRA "econ mgmt" 263.3px (13px csub), against lanes 280@320vp /
+         300@340 / 320@360 / 350@390 / 361.8@402 - so the container shows
+         LONG at/above 334.5px, SHORT down to 291.7px and XTRA below, the
+         263.3px rung clearing even the 320-shell 280px lane by 16.7px
+         (EVERY phone rung back to one line). Every other label renders
+         plain text exactly as before; desktop cells and the stored data
+         are untouched (this map lives only in this one phone sentence) */
       const sentPart = (l, pos1) => {
         const s = sentLab(l);
         if (s !== "economic management") return pos1 ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-        return <><span className="rd-ap-mgmt-l">{pos1 ? "Economic management" : "economic management"}</span><span className="rd-ap-mgmt-s">{pos1 ? "Economic mgmt" : "economic mgmt"}</span></>;
+        return <><span className="rd-ap-mgmt-l">{pos1 ? "Economic management" : "economic management"}</span><span className="rd-ap-mgmt-s">{pos1 ? "Economic mgmt" : "economic mgmt"}</span><span className="rd-ap-mgmt-x">{pos1 ? "Econ mgmt" : "econ mgmt"}</span></>;
       };
       const ord = (n) => n === 1 ? <span>1<sup>st</sup></span> : n === 2 ? <span>2<sup>nd</sup></span> : <span>3<sup>rd</sup></span>;
       body = <>
         {it && (
-          <div className="rd-ap-csub rd-ap-csub-sent">
-            {sentPart(it[0], true)} {ord(1)}
+          <RdApRankSent>
+            {sentPart(it[0], true)} <span className="rd-ap-rk">ranked </span>{ord(1)}
             {top3.length > 1 && <>, {sentPart(top3[1][0])} {ord(2)}</>}
             {top3.length > 2 && <>, {sentPart(top3[2][0])} {ord(3)}</>}
-          </div>
+          </RdApRankSent>
         )}
         {!it && iss && iss.own && iss.own.col && (
           <div className="rd-ap-issph">
