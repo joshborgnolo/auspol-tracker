@@ -1,15 +1,133 @@
 {
   "v": 1,
   "sessions": [
-    "2026-10-03T14:41:47.767Z"
+    "2026-10-03T14:41:47.767Z",
+    "2026-10-03T15:05:20.901Z",
+    "2026-10-03T15:05:20.949Z",
+    "2026-10-03T15:07:11.459Z"
   ],
-  "gaps": {},
+  "gaps": {
+    "data:scope-firms-miscounted": {
+      "id": "scope-firms-miscounted",
+      "area": "data",
+      "claim": "2PP scope line names Resolve as a source of the '5 published two-party figures' but Resolve's two in-window waves publish no 2PP (em-dash rows); the next line then says 'the same 7 polls', leaving the two scope lines inconsistent (5 vs 7)",
+      "evidence": "vic/index.html rendered scope vs table rows Resolve 13 Sep/16 Aug 2026 showing '—'; headNote firm list built from all headRows, not the 2PP-carrying subset (refresh-vic.mjs:387)",
+      "opened": "2026-10-03T15:05:20.933Z",
+      "seen": [
+        "2026-10-03T15:05:20.933Z"
+      ],
+      "missed": 0,
+      "status": "open"
+    },
+    "feature:charts-no-hover-values": {
+      "id": "charts-no-hover-values",
+      "area": "feature",
+      "claim": "No chart offers a hover/tap affordance naming a point's value — 0 <title> elements on dots and no page-owned script; the standard requires one at least for head figures, and only the 2PP endpoint carries a static value label while FP and leaders charts have no on-chart values",
+      "evidence": "vic/index.html: 4 figures have no <title> children; only 2 scripts on page, both shell-owned (theme inline + /assets/site-shell.js)",
+      "opened": "2026-10-03T15:05:20.933Z",
+      "seen": [
+        "2026-10-03T15:05:20.933Z"
+      ],
+      "missed": 0,
+      "status": "open"
+    },
+    "visual:table-date-label-style": {
+      "id": "table-date-label-style",
+      "area": "visual",
+      "claim": "Fieldwork column mixes date styles against the condensed en-dash main-page convention: '16 Jun - 10 July 2026' (hyphen-minus), '12–16 Jan& 8–14 Feb 2026' (glued '&'), '22–24 April 2026'/'12 July 2026' (months spelt out), '5 Aug–7 Aug 2026' (month repeated)",
+      "evidence": "vic/index.html poll table rows; sources are free-text dateLabel in data/vic-polls.json rendered verbatim at refresh-vic.mjs:421",
+      "opened": "2026-10-03T15:05:20.933Z",
+      "seen": [
+        "2026-10-03T15:05:20.933Z"
+      ],
+      "missed": 0,
+      "status": "open"
+    },
+    "visual:net-chart-axis-hyphen": {
+      "id": "net-chart-axis-hyphen",
+      "area": "visual",
+      "claim": "Net-satisfaction chart y-axis tick labels render ASCII hyphen-minus ('-50'…'-10'); the standard requires U+2212 minus for figures and body copy already uses it (−7)",
+      "evidence": "vic/index.html fourth figure (net satisfaction) <text> elements: '-50','-40','-30','-20','-10' hyphen-minus",
+      "opened": "2026-10-03T15:05:20.933Z",
+      "seen": [
+        "2026-10-03T15:05:20.933Z"
+      ],
+      "missed": 0,
+      "status": "open"
+    }
+  },
   "runs": [
     {
       "started": "2026-10-03T14:41:47.767Z",
       "rounds": [],
       "verdict": "cap",
       "finished": "2026-10-03T14:41:47.784Z"
+    },
+    {
+      "started": "2026-10-03T15:05:20.901Z",
+      "rounds": [
+        {
+          "round": 1,
+          "started": "2026-10-03T15:05:20.933Z",
+          "builder": {
+            "exit": 0,
+            "summary": "no open reviewer gaps; refresh-vic regen clean (date rollover: VIC_STAMP 2026-10-04, 55d countdown); audit pack 40/40 green"
+          },
+          "builderScopeViolations": [
+            ".build/newtracker/build.mjs"
+          ],
+          "gate": {
+            "ok": true,
+            "steps": [
+              {
+                "name": "refresh-vic",
+                "ok": true,
+                "code": 0,
+                "tail": "VIC_STATUS {\"ran\":true,\"asOf\":\"2026-10-04\",\"daysToGo\":55,\"polls\":64,\"withTpp\":42,\"threeParty\":4,\"leadership\":87,\"tppBlend\":46.17,\"lnpBlend\":53.83,\"headN2pp\":5,\"headWindow\":60,\"headPolls\":7,\"prim\":{\"alp\":24.5,\"lnp\":28.75,\"onp\":22.96,\"grn\":13.71,\"oth\":10.2},\"changed\":false,\"wrote\":[],\"dry\":false}"
+              },
+              {
+                "name": "validate",
+                "ok": true,
+                "code": 0,
+                "tail": "  primary-sum   cyclePolls.2025 #295 2025-03-30 · Essential – Σ shares = 95.0 (basis: Primaries exclude undecided with no rebase to 100 (sums 92–97).) |   primary-sum   cyclePolls.2025 #306 2025-04-14 · Essential – Σ shares = 96.0 (basis: Primaries exclude undecided with no rebase to 100 (sums 92–97).) |   primary-sum   cyclePolls.2025 #325 2025-05-01 · Ipsos – Σ shares = 95.0 (basis: Primaries ex"
+              },
+              {
+                "name": "site-shell-check",
+                "ok": true,
+                "code": 0,
+                "tail": "site shell current on all 11 pages"
+              },
+              {
+                "name": "probe-pack",
+                "ok": true,
+                "code": 0,
+                "tail": "VP_AUDIT {\"checks\":40,\"failed\":[],\"daysSinceNewest\":6}"
+              },
+              {
+                "name": "npm-test",
+                "ok": true,
+                "code": 0,
+                "tail": "B6 invalid/retry: ok | B7 key/breaker: ok | test-vic-polish: all ok"
+              }
+            ]
+          },
+          "reviewer": {
+            "exit": 0,
+            "verdict": "gaps",
+            "gaps": 4,
+            "attempts": 1
+          },
+          "openAfter": [
+            "scope-firms-miscounted",
+            "charts-no-hover-values",
+            "table-date-label-style",
+            "net-chart-axis-hyphen"
+          ],
+          "finished": "2026-10-03T15:10:25.765Z"
+        }
+      ],
+      "verdict": "gaps",
+      "finished": "2026-10-03T15:10:25.765Z"
     }
   ]
 }
