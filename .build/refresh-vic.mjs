@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-/* /vicpoll/ page generator.
+/* /vic/ page generator.
  *
- * Reads data/vicpoll-polls.json (the audited Victorian poll file assembled
+ * Reads data/vic-polls.json (the audited Victorian poll file assembled
  * by .build/vic-watch.mjs), validates every row fail-hard, computes the
- * headline estimates and trend curves, and renders vicpoll/index.html — a
+ * headline estimates and trend curves, and renders vic/index.html — a
  * GENERATED file, never hand-edited (the refresh-prediction.mjs pattern:
  * numbers composed here, the page a dumb renderer; static SVG, no page JS).
  * Landing path per wave: this script, then
- *   bash .build/git-push-main.sh "<msg>" data/vicpoll-polls.json vicpoll/index.html
- * (vicpoll/index.html rides its own file list, never shared SITE_FILES).
+ *   bash .build/git-push-main.sh "<msg>" data/vic-polls.json vic/index.html
+ * (vic/index.html rides its own file list, never shared SITE_FILES).
  *
  * Estimate design (locked 2026-10-03): two-party preferred is a weighted
  * blend of PUBLISHED 2PP figures only — Victoria has no usable One Nation
@@ -23,8 +23,8 @@
  * Off-ramp: after the 28 November 2026 election, freeze rows, run once with
  * --as-of=2026-11-29, and the page joins the archives family.
  *
- * Usage: node .build/refresh-vicpoll.mjs [--as-of=YYYY-MM-DD] [--dry]
- * Prints a final VICPOLL_STATUS {...} line.
+ * Usage: node .build/refresh-vic.mjs [--as-of=YYYY-MM-DD] [--dry]
+ * Prints a final VIC_STATUS {...} line.
  */
 import { readFileSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
 import path from "node:path";
@@ -35,8 +35,8 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, "..");
 const ELECTION_DATE = "2026-11-28";       // Victorian state election (fixed date)
 const ELEC_TPP_2022 = 55.0;               // ALP 2PP at the 2022 election (VEC)
-const DATA_FILE = "data/vicpoll-polls.json";
-const PAGE = "vicpoll/index.html";
+const DATA_FILE = "data/vic-polls.json";
+const PAGE = "vic/index.html";
 const BUILD = ".build/newtracker/build.mjs";
 
 // estimator constants (locked 2026-10-03; change here, never per-run)
@@ -72,7 +72,7 @@ const inPct = (v) => isNum(v) && v >= 0 && v <= 100;
 const errors = [];
 let data;
 try { data = JSON.parse(readFileSync(path.join(REPO, DATA_FILE), "utf8")); }
-catch (e) { console.error(`VICPOLL_STATUS ${JSON.stringify({ ran: false, error: `cannot read ${DATA_FILE}: ${e.message}` })}`); process.exit(1); }
+catch (e) { console.error(`VIC_STATUS ${JSON.stringify({ ran: false, error: `cannot read ${DATA_FILE}: ${e.message}` })}`); process.exit(1); }
 
 const polls = Array.isArray(data.polls) ? data.polls : [];
 const threeParty = Array.isArray(data.threeParty) ? data.threeParty : [];
@@ -129,7 +129,7 @@ for (const [i, l] of leadership.entries()) {
 }
 if (errors.length) {
   for (const e of errors) console.error(`  invalid: ${e}`);
-  console.error(`VICPOLL_STATUS ${JSON.stringify({ ran: false, error: `${errors.length} invalid rows`, dry })}`);
+  console.error(`VIC_STATUS ${JSON.stringify({ ran: false, error: `${errors.length} invalid rows`, dry })}`);
   process.exit(1);
 }
 
@@ -440,10 +440,10 @@ const html = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vicpoll: the Victorian election in the polls – auspol tracker</title>
-<!-- GENERATED FILE — do not hand-edit. Rebuilt by .build/refresh-vicpoll.mjs
-     from data/vicpoll-polls.json (validated fail-hard there); landing path per
-     wave: this script, then .build/git-push-main.sh data/vicpoll-polls.json
-     vicpoll/index.html. This read: ${dateLabel(asOf)}, ${daysToGo} days to the
+<!-- GENERATED FILE — do not hand-edit. Rebuilt by .build/refresh-vic.mjs
+     from data/vic-polls.json (validated fail-hard there); landing path per
+     wave: this script, then .build/git-push-main.sh data/vic-polls.json
+     vic/index.html. This read: ${dateLabel(asOf)}, ${daysToGo} days to the
      28 November 2026 election. -->
 <meta name="description" content="${metaDesc}">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
@@ -453,7 +453,7 @@ const html = `<!DOCTYPE html>
 <meta property="og:title" content="Vicpoll: the Victorian election in the polls – auspol tracker">
 <meta property="og:description" content="${metaDesc}">
 <meta name="twitter:card" content="summary">
-<link rel="canonical" href="https://auspoltracker.com/vicpoll/">
+<link rel="canonical" href="https://auspoltracker.com/vic/">
 <link rel="icon" href="/assets/favicon.svg">
 <style>
 /* ------- fonts: the two cuts the static article runs (as prediction/) ------- */
@@ -756,22 +756,22 @@ const put = (file, content) => {
 // the site's shared header and footer (.build/site-shell.mjs), as every satellite carries them
 put(path.join(REPO, PAGE), applyShell(html, shellOptsFor(PAGE)));
 
-// The sitemap's vicpoll/ route reads VICPOLL_STAMP from build.mjs — bump it
+// The sitemap's vic/ route reads VIC_STAMP from build.mjs — bump it
 // only when the page actually moved, so a no-change run doesn't falsely
 // datestamp the sitemap (the main build regenerates it from the constant).
 if (changed) {
   const buildPath = path.join(REPO, BUILD);
   const src = readFileSync(buildPath, "utf8");
-  const m = src.match(/const VICPOLL_STAMP = "\d{4}-\d{2}-\d{2}";/);
-  const next = `const VICPOLL_STAMP = "${asOf}";`;
-  if (!m) console.error("WARN no VICPOLL_STAMP in build.mjs — sitemap lastmod stale");
+  const m = src.match(/const VIC_STAMP = "\d{4}-\d{2}-\d{2}";/);
+  const next = `const VIC_STAMP = "${asOf}";`;
+  if (!m) console.error("WARN no VIC_STAMP in build.mjs — sitemap lastmod stale");
   else if (m[0] !== next) {
     wrote.push(BUILD);
     if (!dry) writeAtomic(buildPath, src.replace(m[0], next));
   }
 }
 
-console.log(`VICPOLL_STATUS ${JSON.stringify({
+console.log(`VIC_STATUS ${JSON.stringify({
   ran: true, asOf, daysToGo,
   polls: polls.length, withTpp: tppRows.length, threeParty: threeParty.length, leadership: leadership.length,
   tppBlend: head.alp2pp, lnpBlend: head.lnp2pp, headN2pp: head.n2pp, headWindow, headPolls: head.nPolls,

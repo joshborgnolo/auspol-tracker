@@ -1097,9 +1097,9 @@ const ARCHIVE_STAMP = "2026-09-24";
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
 const PREDICTION_STAMP = "2026-10-03";
-/* vicpoll/ likewise: .build/refresh-vicpoll.mjs regenerates the page on each
+/* vic/ likewise: .build/refresh-vic.mjs regenerates the page on each
    new wave and bumps this stamp itself, through election day 2026-11-28. */
-const VICPOLL_STAMP = "2026-10-03";
+const VIC_STAMP = "2026-10-03";
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -1147,8 +1147,8 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
     <lastmod>${PREDICTION_STAMP}</lastmod>
   </url>
   <url>
-    <loc>${SITE_URL}vicpoll/</loc>
-    <lastmod>${VICPOLL_STAMP}</lastmod>
+    <loc>${SITE_URL}vic/</loc>
+    <lastmod>${VIC_STAMP}</lastmod>
   </url>
 </urlset>
 `;

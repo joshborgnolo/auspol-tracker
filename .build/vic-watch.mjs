@@ -8,18 +8,18 @@
  *     election" wikitext (Legislative Assembly tables 2023–2026, the
  *     three-party-preferred table, and every leadership pair table) and the
  *     electiontracker.au polls.csv, merge on firm+end-date, and print the
- *     merged candidate JSON to stdout. Used for the initial data/vicpoll-
+ *     merged candidate JSON to stdout. Used for the initial data/vic-
  *     polls.json assembly and any re-import; output is INSPECTED by a human
  *     before it lands — this script never writes the data file itself.
  *
  *   --cross-check [--json]
- *     Weekly witness pass (vic-watch.yml): diff data/vicpoll-polls.json
+ *     Weekly witness pass (vic-watch.yml): diff data/vic-polls.json
  *     against the same two sources. Exit 2 with machine-readable findings
  *     when a wave or leadership row exists upstream that we lack.
  *
  *   --discovery [--json]
  *     Daily release discovery: Roy Morgan findings feed (RM_LIB helpers),
- *     plus per-house release-page fingerprints in .build/vicpoll-src/
+ *     plus per-house release-page fingerprints in .build/vic-src/
  *     seen.json (committed) for DemosAU, Freshwater, RedBridge/Accent, and
  *     a Bing News RSS scan for Newspoll and Resolve coverage.
  *
@@ -43,13 +43,13 @@ import { dirname } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url)).replace(/\/$/, "");
-const DATA_FILE = ROOT + "/data/vicpoll-polls.json";
-const SEEN_DIR = ROOT + "/.build/vicpoll-src";
+const DATA_FILE = ROOT + "/data/vic-polls.json";
+const SEEN_DIR = ROOT + "/.build/vic-src";
 const SEEN_FILE = SEEN_DIR + "/seen.json";
 const WIKI_PAGE = "Opinion_polling_for_the_2026_Victorian_state_election";
 const WIKI_API = `https://en.wikipedia.org/w/api.php?action=parse&page=${WIKI_PAGE}&prop=wikitext&format=json`;
 const ET_CSV = "https://electiontracker.au/data/vic2026/polls.csv";
-const UA = { "User-Agent": "auspoltracker-vicpoll/1.0 (contact via github)" };
+const UA = { "User-Agent": "auspoltracker-vic/1.0 (contact via github)" };
 
 const argv = process.argv.slice(2);
 const FLAG = (n) => argv.includes("--" + n);
