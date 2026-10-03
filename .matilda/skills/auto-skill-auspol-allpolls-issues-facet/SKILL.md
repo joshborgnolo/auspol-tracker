@@ -608,6 +608,20 @@ unprompted mentions all stay). FINAL contract:
   Ipsos "Cost of living 1st, housing 2nd, economic management
   3rd" — the LONG spelling, the rung a 350px 390px-shell lane shows
   (and 334.5+40.3 > 350 is why the flourish parks exactly here).
+- Phone card HEIGHT floor (2026-10-03, cross-facet user call —
+  full story in auspol-allpolls-month-rows): the issues card's
+  sentence grammar carries a hidden height wrinkle — the RANKED
+  sentence (`.rd-ap-csub-sent`, `<sup>` ordinals) renders its line
+  ~3.3px taller than the unranked placeholder (`.rd-ap-issph`), so
+  cards measured 118.11 vs 114.78px even at one sentence line deep
+  (the delta is the sup ordinals growing the line box, not wrapping).
+  The `min-height: 122px` card floor in the rd.css ≤760px block (on
+  `.rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir,
+  .rd-ap-ciss)`) swallows it — every non-2PP phone card in EVERY
+  facet is now exactly 122px — but per-card issue-facet heights are a
+  content-sensitive variable, NOT a pinned constant: don't assert a
+  natural card height anywhere, the floor probe
+  (.matilda/probe/ap-phcard-heights.mjs) is the only height pin.
 - Probe pinning (iss-facet.mjs, 49 checks since the mgmt ladder and
   flourish landed): `topFilled` keys on
   `/ 1st/`; ordinal grammar `/, [^,(]+ 2nd/` and `/, [^,(]+ 3rd/`;
