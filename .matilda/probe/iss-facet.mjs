@@ -232,7 +232,7 @@ check("a row naming a 2nd or 3rd issue always fills its top-issue cell",
   rowAnatomy.runnerNoTop.length === 0, `rows off: ${rowAnatomy.runnerNoTop.join(",") || "none"}`);
 check("the column head names the scale the strip draws on",
   rowAnatomy.head.includes("2nd") && rowAnatomy.head.includes("3rd")
-    && rowAnatomy.headCap === "Best"
+    && rowAnatomy.headCap === "Best on it"
     && rowAnatomy.headTk === 4,
   rowAnatomy.headCap + ` · ticks ${rowAnatomy.headTk}`);
 
