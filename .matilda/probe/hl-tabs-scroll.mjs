@@ -80,8 +80,9 @@ async function measure(page) {
 
 /* one label at every width since 2026-10-03 (user: "One Nation–Coalition
    split") - the phone's bare "Split" and the desktop's "One Nation v
-   Coalition" both retired once the row could scroll */
-const EXPECT = ["Two-party", "Labor", "Coalition", "One Nation", "Greens", "Others", "One Nation–Coalition split"];
+   Coalition" both retired once the row could scroll. The split sits
+   SECOND, straight after Two-party (user call same day). */
+const EXPECT = ["Two-party", "One Nation–Coalition split", "Labor", "Coalition", "One Nation", "Greens", "Others"];
 
 /* expectScroll: true = the strip must overflow and the reveal test runs;
    false = desktop gate, seven tabs fit with no scroll; null = either is
@@ -133,13 +134,13 @@ async function rung(vw, vh, expectScroll, expectLabels) {
       console.log(`  ..  ${tag}: last tab already on-strip at rest — glide not owed here`);
     } else {
     /* a view change landing on an off-strip tab must glide it into view
-       WITHOUT moving the page (never scrollIntoView). Baseline: flip to
-       Coalition (always on-strip from the left edge), park the strip's
-       scroll at 0, then press the LAST tab, scrolled off right. */
+       WITHOUT moving the page (never scrollIntoView). Baseline: press the
+       FIRST tab (always on-strip at rest), park the strip's scroll at 0,
+       then press the LAST tab, scrolled off right. */
     const before = m.winScrollY;
     await page.evaluate(() => {
       const tabs = [...document.querySelectorAll(".rd-hl-tabs .rd-tab")];
-      tabs[2].click();
+      tabs[0].click();
     });
     await new Promise((r) => setTimeout(r, 200));
     await page.evaluate(() => {

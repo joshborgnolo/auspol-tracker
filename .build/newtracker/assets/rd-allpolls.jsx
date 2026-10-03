@@ -1488,7 +1488,7 @@ function RdAllPolls(P) {
         <span className="rd-ap-th" title="The 2nd-most-named issue voters said matters most, with the share naming it">2nd</span>
         <span className="rd-ap-th" title="The 3rd-most-named issue voters said matters most, with the share naming it">3rd</span>
         <span className="rd-ap-hpic" aria-hidden="true">
-          <span className="rd-ap-cap">Best on it</span>
+          <span className="rd-ap-cap">Best on top issue</span>
           <span className="rd-ap-in">{[0, 10, 20, 30].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 30 ? "%" : ""}</span>)}</span>
         </span>
         {th("Best party", "iss.bestv", { right: true, title: "The party most voters rate best on that issue" })}
@@ -2306,14 +2306,15 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
   const boxRef = useRef(null);
   const SW = useRdWidth(boxRef, 500);
   /* the measure row, shared by the RdTabs render and the arrow-key walk so
-     the two can never disagree (Greens and Others sit between the parties
-     and the split pairing) */
+     the two can never disagree. The split pairing sits second, straight
+     after Two-party (user call 2026-10-03); one label at every width now
+     the row scrolls (user call same day: "One Nation–Coalition split",
+     retiring the phone's bare "Split") */
   const hlViews = [
-    { id: "tpp", label: "Two-party" }, { id: "alp", label: "Labor" }, { id: "lnp", label: "Coalition" }, { id: "onp", label: "One Nation" },
-    { id: "grn", label: "Greens" }, { id: "oth", label: "Others" },
-    /* one label at every width now the row scrolls (user call 2026-10-03:
-       "One Nation–Coalition split", retiring the phone's bare "Split") */
+    { id: "tpp", label: "Two-party" },
     { id: "split", label: "One Nation–Coalition split", title: "One Nation’s primary vote against the Coalition’s" },
+    { id: "alp", label: "Labor" }, { id: "lnp", label: "Coalition" }, { id: "onp", label: "One Nation" },
+    { id: "grn", label: "Greens" }, { id: "oth", label: "Others" },
   ];
   /* hovering the panel hands the arrow keys to the measure row - the walk a
      focused tab has, claimed only while the pointer is over the card; the
