@@ -79130,7 +79130,12 @@ function RdPastCycles(p) {
     const gLow = g.rank && /^Lowest/.test(g.rank.main),
       oLow = o.rank && /^Lowest/.test(o.rank.main);
     const cb = !c2 && FA.comb.rank && FA.comb.v != null ? FA.comb : null;
-    const combined = cb ? /^Highest/.test(cb.rank.main) ? "the highest" : cb.v >= cb.peers.q3 ? "among the highest" : cb.v > cb.peers.q1 ? "in the middle half" : "among the lowest" : null;
+    const cbHi = cb ? /^(\d+)(?:st|nd|rd|th) highest/.exec(cb.rank.main) : null;
+    const cbOrdW = cbHi ? {
+      2: "second",
+      3: "third"
+    }[+cbHi[1]] : null;
+    const combined = cb ? /^Highest/.test(cb.rank.main) ? "the highest" : cbOrdW ? cbOrdW + " highest" : cb.v >= cb.peers.q3 ? "among the highest" : cb.v > cb.peers.q1 ? "in the middle half" : "among the lowest" : null;
     const moved = r => r.v < 0 ? "fallen further" : "risen less";
     const found = c2 ? gLow && oLow ? g.v < 0 && o.v < 0 ? "Both major parties have lost more of their vote than any before them at this point in a term" : "Both major parties have done worse since the election than any before them at this point in a term" : gLow ? govName + "’s primary vote has " + moved(g) + " than any government’s at this point in a term" : oLow ? rdCap(oppIn) + "’s primary vote has " + moved(o) + " than any opposition’s at this point in a term" : t.peers && t.v != null ? govName + "’s two-party vote has done " + (t.v >= t.peers.mean ? "better" : "worse") + " than the average government’s since its election" : null : gLow && oLow ? "Both major parties are at record lows for this point in a term" : gLow ? govName + "’s primary vote is the lowest of any government at this point in a term" : oLow ? rdCap(oppIn) + "’s primary vote is the lowest of any opposition at this point in a term" : t.peers && t.v != null ? govName + " sits " + (t.v >= t.peers.mean ? "above" : "below") + " the average government at this point in a term" : null;
     const head = found || "Every term since " + cycles[0].year + ", lined up on its election day";

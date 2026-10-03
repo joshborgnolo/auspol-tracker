@@ -1,6 +1,6 @@
 ---
 name: auspol-cyc-summary-finding
-description: auspol-tracker — the Past-cycles summary finding (the head+dek above the "Every measure N months in" table, storyFor in rd-cycles.jsx, ~:523 → pageStory → RdHed at the top of #cyc-summary). FROZEN ACROSS COMPARE PICKS (user dictate 2026-10-02, "make this the copy in past cycles … but keep it dynamic … this is the copy regardless of whether All past terms / Re-elected / Ousted is selected"): storyFor(c2) ranks the sitting term against EVERY past term (rowsForHidden(new Set(), c2)) and emits no compare-scoped tails; the summary table and charts below still rescope to the pick. Dek shape (level measure): S1 "<N> months after the {year} election, <gov>'s primary vote is the lowest of any government at the same point since {firstYear}." (full-set "since" ALWAYS), S2 "After preferences, though, <gov>'s NN.N% <quartile ladder: sits in the middle half / is above three in four / is below three in four> of past governments.", S3 (only while the opposition primary is a record low AND the combined row carries a reading) "And while <opp>'s primary vote is also the lowest of any opposition, it's <STANDING LADDER: the highest (rank /^Highest/) / among the highest (v>=q3) / in the middle half / among the lowest> when combined with One Nation's." (wording per user dictates 2026-10-02 — 0a6efe2's same-day "But while" stint reversed to "And while … it's also" (3974f43), then a further same-day dictate slid "also" ahead of the ladder ("is the lowest … it's also" → "is also the lowest … it's"); the probe's derived expectation carries the literal wording too, so ANY S3 wording swap edits rd-cycles.jsx AND probe-cyc-story-freeze.mjs's expectMid builder in one pass) — S3 rides the summary table's own L/NP+ON `comb` row (FA.comb rank/peers quartiles), never rederived. storyVariants (the invisible walk-floor stack .rd-cyc-storyvar) is now TWO measure states (abs/chg) — it was SIX (3 compare × 2 measure); probe-cyc-cycles-pin's floor-state-count assertion moved 6→2 in the same pass (internal-count probes ride DESIGN changes). hiddenFor DELETED (its only consumer was the old storyVariants). The per-SECTION stories (tppStory/primStory/leadStory, RdHed per RdSec ~:936-953) still take `tail` and DO rescope with the compare pick — the dictate covered only the top finding. Regression set: .matilda/probe-cyc-story-freeze.mjs (the contract probe: derives expected copy from the table's rank cells so it tracks data; asserts identical head/dek under all three pills, chg-measure invariance, 2-state floor, 1440px + 390px-touch), probe-cycles-pin.mjs, probe-cyc-chipmove.mjs, validate, npm test.
+description: auspol-tracker — the Past-cycles summary finding (the head+dek above the "Every measure N months in" table, storyFor in rd-cycles.jsx, ~:523 → pageStory → RdHed at the top of #cyc-summary). FROZEN ACROSS COMPARE PICKS (user dictate 2026-10-02, "make this the copy in past cycles … but keep it dynamic … this is the copy regardless of whether All past terms / Re-elected / Ousted is selected"): storyFor(c2) ranks the sitting term against EVERY past term (rowsForHidden(new Set(), c2)) and emits no compare-scoped tails; the summary table and charts below still rescope to the pick. Dek shape (level measure): S1 "<N> months after the {year} election, <gov>'s primary vote is the lowest of any government at the same point since {firstYear}." (full-set "since" ALWAYS), S2 "After preferences, though, <gov>'s NN.N% <quartile ladder: sits in the middle half / is above three in four / is below three in four> of past governments.", S3 (only while the opposition primary is a record low AND the combined row carries a reading) "And while <opp>'s primary vote is also the lowest of any opposition, it's <STANDING LADDER: the highest (rank /^Highest/) / second-highest & third-highest NAMED off the ordinal in rank.main (2026-10-04 dictate) / among the highest (v>=q3) / in the middle half / among the lowest> when combined with One Nation's." (wording per user dictates 2026-10-02 — 0a6efe2's same-day "But while" stint reversed to "And while … it's also" (3974f43), then a further same-day dictate slid "also" ahead of the ladder ("is the lowest … it's also" → "is also the lowest … it's"); the probe's derived expectation carries the literal wording too, so ANY S3 wording swap edits rd-cycles.jsx AND probe-cyc-story-freeze.mjs's expectMid builder in one pass) — S3 rides the summary table's own L/NP+ON `comb` row (FA.comb rank/peers quartiles), never rederived. storyVariants (the invisible walk-floor stack .rd-cyc-storyvar) is now TWO measure states (abs/chg) — it was SIX (3 compare × 2 measure); probe-cyc-cycles-pin's floor-state-count assertion moved 6→2 in the same pass (internal-count probes ride DESIGN changes). hiddenFor DELETED (its only consumer was the old storyVariants). The per-SECTION stories (tppStory/primStory/leadStory, RdHed per RdSec ~:936-953) still take `tail` and DO rescope with the compare pick — the dictate covered only the top finding. Regression set: .matilda/probe-cyc-story-freeze.mjs (the contract probe: derives expected copy from the table's rank cells so it tracks data; asserts identical head/dek under all three pills, chg-measure invariance, 2-state floor, 1440px + 390px-touch), probe-cycles-pin.mjs, probe-cyc-chipmove.mjs, validate, npm test.
 source: auto-skill
 extracted_at: '2026-10-02T09:00:00.000Z'
 ---
@@ -68,10 +68,18 @@ const storyFor = (c2) => {
 
   ```js
   const cb = !c2 && FA.comb.rank && FA.comb.v != null ? FA.comb : null;
+  const cbHi = cb ? /^(\d+)(?:st|nd|rd|th) highest/.exec(cb.rank.main) : null;
+  const cbOrdW = cbHi ? { 2: "second", 3: "third" }[+cbHi[1]] : null;
   const combined = cb ? /^Highest/.test(cb.rank.main) ? "the highest"
+      : cbOrdW ? cbOrdW + " highest"
       : cb.v >= cb.peers.q3 ? "among the highest"
       : cb.v > cb.peers.q1 ? "in the middle half" : "among the lowest" : null;
   ```
+  Ranks 2nd and 3rd NAME themselves ("second highest", "third highest";
+  user dictate 2026-10-04 — "among the highest" was too vague once the row
+  hit 2nd) before the quartile bands take over. **The named-ordinal rung
+  lives in `standingOf` in probe-cyc-story-freeze.mjs too** — one ladder,
+  two homes, edit both in one pass.
   If `oLow && !combined` (no ON-split history), the opposition clause folds
   back into S1 as ", and the Coalition's the lowest of any opposition" — the
   pre-dictate shape. At ship the comb row read 48.1%, "4th highest of 17" →
@@ -103,6 +111,15 @@ FREEZE, not 2026-10-02's numbers. Asserts, at 1440px and 390px-touch:
 - change-measure finding: different dek, still pill-invariant, no "One Nation".
 
 DON'T paste exact current copy into probes — the figures move.
+
+Built-verification of a wording swap (worked 7e1b99a): rd-cycles.jsx compiles
+INLINE VERBATIM into index.html — no hashed asset file appears, and its curly
+typography (’, “”) survives UNESCAPED, so grep index.html for an ASCII slice of
+the new clause (e.g. "is also the lowest of any opposition") to confirm the one
+compiled line landed. (Other asset layers are babelised with \uXXXX escapes —
+the built-html-verification gotcha does not apply to this inline block.) The
+swap commit therefore carries exactly rd-cycles.jsx + index.html + this note —
+no asset hash churn.
 
 ### DOM click gotchas (learned writing the probe)
 

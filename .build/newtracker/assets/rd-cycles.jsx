@@ -695,7 +695,10 @@ function RdPastCycles(p) {
        finding also weighs the opposition's own vote combined with One
        Nation's against past terms on the same footing */
     const cb = !c2 && FA.comb.rank && FA.comb.v != null ? FA.comb : null;
+    const cbHi = cb ? /^(\d+)(?:st|nd|rd|th) highest/.exec(cb.rank.main) : null;
+    const cbOrdW = cbHi ? { 2: "second", 3: "third" }[+cbHi[1]] : null;
     const combined = cb ? /^Highest/.test(cb.rank.main) ? "the highest"
+      : cbOrdW ? cbOrdW + " highest"
       : cb.v >= cb.peers.q3 ? "among the highest" : cb.v > cb.peers.q1 ? "in the middle half" : "among the lowest" : null;
     const moved = (r) => (r.v < 0 ? "fallen further" : "risen less");
     const found = c2
