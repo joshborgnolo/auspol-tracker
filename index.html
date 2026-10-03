@@ -80479,10 +80479,14 @@ function RdAllPolls(P) {
         }, im[1]), " ", rdApNum(ib.v));
       }
       const sentLab = l => ISS_SENT_SHORT[l] || l.toLowerCase();
+      const sentLab1 = l => {
+        const s = sentLab(l);
+        return s.charAt(0).toUpperCase() + s.slice(1);
+      };
       const ord = n => n === 1 ? React.createElement("span", null, "1", React.createElement("sup", null, "st")) : n === 2 ? React.createElement("span", null, "2", React.createElement("sup", null, "nd")) : React.createElement("span", null, "3", React.createElement("sup", null, "rd"));
       body = React.createElement(React.Fragment, null, it && React.createElement("div", {
         className: "rd-ap-csub rd-ap-csub-sent"
-      }, sentLab(it[0]), " ", ord(1), top3.length > 1 && React.createElement(React.Fragment, null, ", ", sentLab(top3[1][0]), " ", ord(2)), top3.length > 2 && React.createElement(React.Fragment, null, ", ", sentLab(top3[2][0]), " ", ord(3)), unprompted ? ", unprompted" : ""), ownDots.length > 0 && React.createElement("div", {
+      }, sentLab1(it[0]), " ", ord(1), top3.length > 1 && React.createElement(React.Fragment, null, ", ", sentLab(top3[1][0]), " ", ord(2)), top3.length > 2 && React.createElement(React.Fragment, null, ", ", sentLab(top3[2][0]), " ", ord(3)), unprompted ? ", unprompted" : ""), ownDots.length > 0 && React.createElement("div", {
         className: "rd-ap-cpic"
       }, pic));
     }

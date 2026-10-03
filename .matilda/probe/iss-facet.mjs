@@ -400,8 +400,9 @@ await showAll(page3);
 // Same contract as the desktop rows: a card carries the one-line best-issue
 // sentence iff its top-issue cell is filled (best-party-only waves rightly
 // have neither). The sentence is a plain ranking with superscript ordinals
-// and NO figures ("cost of living 1st, housing 2nd, crime 3rd", ALL
-// labels lowercased - sentence-initial included - "Housing affordability"
+// and NO figures ("Cost of living 1st, housing 2nd, crime 3rd" - SENTENCE
+// CASE: only the leading letter of the first label is capital, every other
+// label lowercased; "Housing affordability"
 // shortened to "housing", ", unprompted" appended on SEC waves); it rides
 // .rd-ap-csub-sent so it flows as ONE inline run (the row's shared csub
 // rule is display:flex, which once itemised the JSX fragments into a
@@ -416,9 +417,11 @@ const cardAnatomy = await page3.evaluate(() => {
     const sent = c.querySelector(".rd-ap-csub-sent");
     const txt = sent ? sent.textContent.trim().replace(/\s+/g, " ") : "";
     const topFilled = !!sent && / 1st/.test(txt);
-    // user call 2026-10-03: no capitalised issue names anywhere in the
-    // sentence - "cost of living", not "Cost of living"
-    const capsOk = !sent || !/[A-Z]/.test(txt.replace(/ unprompted$/, ""));
+    // user call 2026-10-03: sentence case - exactly ONE capital, the
+    // leading letter of the first label ("Cost of living 1st, housing
+    // 2nd, ..."); every other label stays lowercase
+    const bare = txt.replace(/ unprompted$/, "");
+    const capsOk = !sent || (/^[A-Z]/.test(bare) && !/[A-Z]/.test(bare.slice(1)));
     const legacy = subs.some((d) => /\(\d+\)/.test(d.textContent)) || subs.some((d) => / top issue | then |Best on it/.test(d.textContent));
     // a card carries exactly one csub when it has the sentence, none when
     // it is a best-party-only wave
@@ -454,7 +457,7 @@ const cardAnatomy = await page3.evaluate(() => {
 });
 console.log("  diag bad-runners:", JSON.stringify(cardAnatomy.an.filter((a) => !a.runnerOk || !a.csubSentOk || !a.caps).map((a) => ({ f: a.firm, t: a.txt, n: a.subN }))));
 console.log("  diag bad-chips:", JSON.stringify(cardAnatomy.an.filter((a) => a.dots > 0 && !a.chip).map((a) => ({ f: a.firm, c: a.chipTxt }))));
-check("phone: the best issues read as ONE flowing sentence of superscript-ordinal rankings (no figures)",
+check("phone: the best issues read as ONE flowing sentence of superscript-ordinal rankings in sentence case (no figures)",
   cardAnatomy.withTop > 0 && cardAnatomy.withNxt > 0 && cardAnatomy.badNxt === 0 && cardAnatomy.legacySubs === 0,
   `${cardAnatomy.withTop}/${cardAnatomy.cardsN} with the sentence (${cardAnatomy.withNxt} with runners, ${cardAnatomy.topMissing} best-party-only); bad ${cardAnatomy.badNxt}; legacy subs ${cardAnatomy.legacySubs}`);
 check("phone: the ownership dot strip spans the full width of the card body again",

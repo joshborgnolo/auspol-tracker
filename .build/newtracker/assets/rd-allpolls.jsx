@@ -1707,25 +1707,28 @@ function RdAllPolls(P) {
          follow-up call ("Cost of living 1st, housing 2nd, crime 3rd" with
          superscript ordinals, "housing affordability" shortened to
          "housing", ", unprompted" kept for SEC; a moment later: "don't
-         capitalise issue names - eg 'housing', not 'Housing'", so ALL
-         three labels lowercase, sentence-initial included), a plain
-         ranking with NO figures - the ordinal itself now says what the
-         wordy tail did, and the salience shares stay quoted in the desktop
-         cells and the detail rail. Labels run through ISS_SENT_SHORT (the
-         one SEC label the user named redundant) before lowercasing. The
-         sentence carries .rd-ap-csub-sent: the row's shared csub rule is
-         display:flex (built for figure chips), which would itemise every
-         JSX fragment on its own line */
+         capitalise issue names - eg 'housing', not 'Housing'"; last of all:
+         "the first letter of the first issue should be capitalised -
+         sentence case", so sentence case it is - sentLab1 lifts only the
+         leading letter), a plain ranking with NO figures - the ordinal
+         itself now says what the wordy tail did, and the salience shares
+         stay quoted in the desktop cells and the detail rail. Labels run
+         through ISS_SENT_SHORT (the one SEC label the user named
+         redundant) before lowercasing. The sentence carries
+         .rd-ap-csub-sent: the row's shared csub rule is display:flex
+         (built for figure chips), which would itemise every JSX fragment
+         on its own line */
       const unprompted = !!(iss && !iss.sal && iss.conc);
       if (ib && im) {
         right1 = <b className="rd-ap-issfig"><span style={im[2] ? { color: im[2] } : null}>{im[1]}</span> {rdApNum(ib.v)}</b>;
       }
       const sentLab = (l) => (ISS_SENT_SHORT[l] || l.toLowerCase());
+      const sentLab1 = (l) => { const s = sentLab(l); return s.charAt(0).toUpperCase() + s.slice(1); };
       const ord = (n) => n === 1 ? <span>1<sup>st</sup></span> : n === 2 ? <span>2<sup>nd</sup></span> : <span>3<sup>rd</sup></span>;
       body = <>
         {it && (
           <div className="rd-ap-csub rd-ap-csub-sent">
-            {sentLab(it[0])} {ord(1)}
+            {sentLab1(it[0])} {ord(1)}
             {top3.length > 1 && <>, {sentLab(top3[1][0])} {ord(2)}</>}
             {top3.length > 2 && <>, {sentLab(top3[2][0])} {ord(3)}</>}
             {unprompted ? ", unprompted" : ""}
