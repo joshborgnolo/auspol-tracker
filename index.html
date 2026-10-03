@@ -68144,6 +68144,7 @@ function RdGlide({
     if (!o || !i) return;
     if (watch !== undefined && seen.current.w === watch && last.current != null) return;
     seen.current.w = watch;
+    if (watch !== undefined && last.current == null && typeof ResizeObserver !== "undefined") return;
     const h = i.getBoundingClientRect().height;
     const prev = last.current;
     last.current = h;
@@ -68923,6 +68924,11 @@ Object.assign(window, {
   id: "all",
   label: "All"
 }];
+function rdGaugeSeed() {
+  const vw = typeof window !== "undefined" && window.innerWidth || 1280;
+  const g = Math.min(64, Math.max(20, 0.05 * vw));
+  return Math.min(760, Math.max(280, Math.min(1152, vw - 2 * g)));
+}
 function RdLeadGauge({
   lead,
   margin,
@@ -68932,12 +68938,11 @@ function RdLeadGauge({
   bColor
 }) {
   const ref = React.useRef(null);
-  const [w, setW] = React.useState(0);
+  const [w, setW] = React.useState(rdGaugeSeed);
   React.useLayoutEffect(() => {
     const el = ref.current;
     if (!el || !el.parentElement) return undefined;
     const fit = () => setW(Math.min(760, el.parentElement.getBoundingClientRect().width || 760));
-    fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el.parentElement);
     return () => ro.disconnect();
@@ -68965,8 +68970,7 @@ function RdLeadGauge({
     className: "rd-lg",
     ref: ref,
     style: {
-      width: w || "auto",
-      visibility: w ? "visible" : "hidden"
+      width: w
     },
     role: "img",
     "aria-label": say,
@@ -83967,7 +83971,7 @@ function SnapshotView({
     setMatchup: setTppMatchup,
     basis: tppBasis,
     setBasis: setTppBasis
-  }), React.createElement(PrimaryVoteMemo, {
+  }), tail && React.createElement(PrimaryVoteMemo, {
     rangeId: heroRange,
     setRangeId: setRangeId
   }), React.createElement(PollsterTable, {

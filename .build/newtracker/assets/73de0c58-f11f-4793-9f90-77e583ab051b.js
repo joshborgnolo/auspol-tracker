@@ -1922,17 +1922,18 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
      design it replaced keeps its page-wide range, set at the top of its
      hero. */
   const rangeId = window.AP.rd ? "all" : heroRange;
-  /* The analytical tail mounts one pass LATE, not in the first commit.
-     body.js - the flag that retires the static article - lands on that
-     first commit, and rendering all six analysis sections inside it kept
-     that one commit above 200ms of main-thread work: that is the
-     refresh-time window in which the static page sits on screen. Commit
-     the top of the page alone, have the tail follow in the very next
-     pass, and the window halves; everything deferred lies below the
-     fold, so the second commit has landed long before the reader
-     scrolls to it. snapshotTailArmed pins the deferral to FIRST mount
-     only - tab switches and design flips remount this view, and those
-     paths must draw whole, not pop. */
+  /* Everything below the hero mounts one pass LATE, not in the first
+     commit. body.js - the flag that retires the static article - lands
+     on that first commit, and rendering the primary-vote panel plus all
+     six analysis sections inside it kept that one commit above 200ms of
+     main-thread work: that is the refresh-time window in which the
+     static page sits on screen. Commit just the hero, latest-polls table
+     and next-polls ticker first, have the rest follow in the very next
+     pass, and the window more than halves; everything deferred lies
+     below the fold, so the second commit has landed long before the
+     reader scrolls to it. snapshotTailArmed pins the deferral to FIRST
+     mount only - tab switches and design flips remount this view, and
+     those paths must draw whole, not pop. */
   const [tail, setTail] = useState(snapshotTailArmed);
   React.useEffect(() => {
     if (!snapshotTailArmed) { snapshotTailArmed = true; setTail(true); }
@@ -1942,7 +1943,10 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
       <Hero rangeId={heroRange} setRangeId={setRangeId} showScatter={showScatter}
             matchup={tppMatchup} setMatchup={setTppMatchup}
             basis={tppBasis} setBasis={setTppBasis} />
-      <PrimaryVoteMemo rangeId={heroRange} setRangeId={setRangeId} />
+      {/* the primary-vote chart joins the pass-late set: at half the first
+          commit's DOM it was worth as much to the static-article window as
+          the whole six-section tail did */}
+      {tail && <PrimaryVoteMemo rangeId={heroRange} setRangeId={setRangeId} />}
       <PollsterTable tppBasis={tppBasis} setTppBasis={setTppBasis}
                      tppMatchup={tppMatchup} setTppMatchup={setTppMatchup} />
       {/* when the next ones land, straight after the latest ones - it sat

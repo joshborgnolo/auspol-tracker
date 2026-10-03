@@ -509,6 +509,11 @@ function RdGlide({ children, className, as, watch }) {
        re-render (a morph's frames) reads no layout */
     if (watch !== undefined && seen.current.w === watch && last.current != null) return;
     seen.current.w = watch;
+    /* first mount: nothing to glide FROM (prev==null returned below anyway),
+       and a forced layout read inside the first commit is what the boot
+       window pays for - the passive ResizeObserver below establishes the
+       baseline a frame later instead */
+    if (watch !== undefined && last.current == null && typeof ResizeObserver !== "undefined") return;
     const h = i.getBoundingClientRect().height;
     const prev = last.current;
     last.current = h;

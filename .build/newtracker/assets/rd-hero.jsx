@@ -17,17 +17,30 @@ const RD_RANGES = [{ id: "3", label: "3 mo" }, { id: "6", label: "6 mo" },
    it is the verdict "too close to call", drawn. Plain boxes rather than svg
    geometry so the span and dot can travel on a CSS transition when the
    contest or basis changes, on the same curve the figures roll on. */
+function rdGaugeSeed() {
+  /* content width is min(1152, vw - 2*gutter) with gutter clamp(20,5vw,64),
+     and the gauge caps at 760 - so this seed is exact on phones and on
+     every desktop band, and at most a scrollbar's width out in the narrow
+     tablet band. window.innerWidth is a viewport read: it does not force
+     the layout a getBoundingClientRect here would, and THAT layout inside
+     the first commit is what the boot window is made of. */
+  const vw = (typeof window !== "undefined" && window.innerWidth) || 1280;
+  const g = Math.min(64, Math.max(20, 0.05 * vw));
+  return Math.min(760, Math.max(280, Math.min(1152, vw - 2 * g)));
+}
 function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
   const ref = React.useRef(null);
-  /* 0 = unmeasured: the 760 fallback must never paint, because the left-ed
-     transition then drags the dots across from 760px geometry to the real
-     width and, on a phone, one or two frames of that overshoot the viewport. */
-  const [w, setW] = React.useState(0);
+  /* seeded, never unmeasured: the frames one and two of this strip are the
+     boot window, and a wrong-width paint is both rarer and smaller with a
+     viewport seed than with a 0/760 fallback the observer must then fix */
+  const [w, setW] = React.useState(rdGaugeSeed);
   React.useLayoutEffect(() => {
     const el = ref.current;
     if (!el || !el.parentElement) return undefined;
     const fit = () => setW(Math.min(760, el.parentElement.getBoundingClientRect().width || 760));
-    fit();
+    /* no synchronous fit() here - reading the parent's rect inside the
+       first commit forces a full-document layout. Any seed correction the
+       observer's initial callback carries lands one frame later instead. */
     const ro = new ResizeObserver(fit);
     ro.observe(el.parentElement);
     return () => ro.disconnect();
@@ -51,7 +64,7 @@ function RdLeadGauge({ lead, margin, aName, bName, aColor, bColor }) {
   const say = aName + (lead >= 0 ? " ahead by " : " behind by ") + Math.abs(lead).toFixed(1) + " points"
     + (margin != null ? ", give or take " + margin.toFixed(1) + (lo <= 0 && hi >= 0 ? ": a tie is inside that range." : ": a tie is outside that range.") : ".");
   return (
-    <div className="rd-lg" ref={ref} style={{ width: w || "auto", visibility: w ? "visible" : "hidden" }} role="img" aria-label={say} title={say}>
+    <div className="rd-lg" ref={ref} style={{ width: w }} role="img" aria-label={say} title={say}>
       <span className="rd-lg-side" style={{ left: sideX, color: inkOf(aColor) }}>◀ {aName} ahead</span>
       <span className="rd-lg-side" style={{ right: sideX, color: inkOf(bColor) }}>{bName} ahead ▶</span>
       {[-10, -5, 5, 10].map((v) => <span key={v} className="rd-lg-grid" style={{ left: X(v) }}></span>)}
