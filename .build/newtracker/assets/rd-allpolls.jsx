@@ -229,7 +229,7 @@ function RdApScale({ onM, phone }) {
 /* ---------------------------------------------------------------- a poll opened
    The poll in full on the left, with its changes on the same pollster's last
    poll; on the right, how it counts: its pollster's recent record against the
-   average, its place against its month, the pollster's usual lean, and what
+   average, its place against its month, the pollster's house lean, and what
    it does to today's figure. */
 function RdApMini({ p, onM, pub, avgFor }) {
   const D = window.AUSPOL;
@@ -1117,7 +1117,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
               <span>RedBridge’s and Ipsos’s wordings for what matters sit a measured <b>{Math.abs(issPair).toFixed(1)}</b> points apart on {((D.issues.labels && D.issues.labels[iss.top]) || iss.top)}; this wave’s reading was moved half that gap toward the other house’s before it entered any average.</span>
             </>}
             {issLeadMeta && <>
-              <span className="rd-apd-k">{p.pollster}’s usual lean</span>
+              <span className="rd-apd-k">{p.pollster}’s house lean</span>
               <span>{issPlus.lean == null ? "None to speak of: its figures sit level with the other pollsters’"
                 : <>About <b>{Math.abs(issPlus.lean).toFixed(1)}</b> {issPlus.lean > 0 ? "richer" : "poorer"} for {issLeadMeta[0]} on {((D.issues.labels && D.issues.labels[iss.top]) || iss.top)}, taken out before the figures are pooled</>}</span>
             </>}
@@ -1135,7 +1135,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
                 ? <>Level with the month’s average net of {rdApSigned(dirAvgRow.net)}{dirMoe != null ? ", inside its ±" + dirMoe.toFixed(1) + " margin" : ""}</>
                 : <><b style={{ color: dirLean > 0 ? "var(--mood-pos)" : "var(--mood-neg)" }}>{Math.abs(dirLean).toFixed(1)}</b> more {dirLean > 0 ? "right-direction" : "wrong-track"} than the month’s average net of {rdApSigned(dirAvgRow.net)}{dirMoe != null ? ", " + insideD + " its ±" + dirMoe.toFixed(1) + " margin" : ""}</>}</span>
             </>}
-            <span className="rd-apd-k">{p.pollster}’s usual lean</span>
+            <span className="rd-apd-k">{p.pollster}’s house lean</span>
             <span>{dirHl == null ? "Not measured yet: too few readings on the series"
               : Math.abs(dirHl.v) < 0.05 ? "None to speak of: its readings sit level with the other pollsters’"
               : <><b>{Math.abs(dirHl.v).toFixed(1)}</b> more {dirHl.v > 0 ? "right-direction" : "wrong-track"}, taken out before the readings are averaged</>}</span>
@@ -1173,7 +1173,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
                 })}</span>
               </>;
             })()}
-            <span className="rd-apd-k">{p.pollster}’s usual lean</span>
+            <span className="rd-apd-k">{p.pollster}’s house lean</span>
             <span>{ldLean.filter(Boolean).length
               ? <>{ldLean.filter(Boolean).map((l, i) => (
                   <React.Fragment key={l.name}>{i > 0 ? "; on the gap against " + l.name + ", " : ""}{Math.abs(l.v) < 0.05 ? "level with the other pollsters on the gap against " + l.name : <>about <b>{Math.abs(l.v).toFixed(1)}</b> points {l.v > 0 ? "Albanese’s" : l.name + "’s"} way</>}</React.Fragment>
@@ -1205,7 +1205,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
             <span className="rd-apd-k">Two-party</span>
             <span>{fig.none[0].toUpperCase() + fig.none.slice(1)}, so this poll has no {pub ? "published" : "implied"} figure to set against the average.</span>
           </>}
-          <span className="rd-apd-k">{p.pollster}’s usual lean</span>
+          <span className="rd-apd-k">{p.pollster}’s house lean</span>
           <span>{hl == null ? "Not measured yet: too few polls on this contest"
             : Math.abs(hl) < 0.05 ? "None to speak of: it sits level with the other pollsters"
             : <><b>{Math.abs(hl).toFixed(1)}</b> to {hl > 0 ? "Labor" : onM ? "One Nation" : "the Coalition"}, taken out before the polls are averaged</>}</span>
@@ -1639,20 +1639,18 @@ function RdAllPolls(P) {
       val = <span role="cell" className="rd-ap-val" style={{ color: rdApLeanInk(p.lean, onM) }}>{p.lean == null ? "—" : rdApSigned(p.lean)}</span>;
       right1 = main;
       right2 = sub ? <span className="rd-ap-sub">{sub}</span> : null;
-      /* phone card: the house's usual lean rides under the figure (user
-         call 2026-10-03: "add below '+1.7', 'Usual lean -0.3'" - the
+      /* phone card: the house's standing lean rides under the figure (user
+         calls 2026-10-03: "add below '+1.7', 'Usual lean -0.3'", then
+         renamed House lean - black label, party-tinted number - the
          same D.houseLean latest point the detail expands on) */
       const hls = ((D.houseLean || {})[pub ? (onM ? "onpub" : "tpp") : (onM ? "onimp" : "imp")] || {})[p.pollster];
       const hl = hls && hls.length ? hls[hls.length - 1].v : null;
-      /* the strip's height is NOT a constant: the twopp card must sit at
-         the SAME row height as the primary facet's card (user call
-         2026-10-03, "just make the row height identical to that in the
-         primary facet"). The primary card's bottom block is
-         cprim+cpic (figure row + 28px strip); margin-collapses fold a few
-         px into that, so the lean strip's height is DERIVED live from a
-         real primary card's own block rather than stated as a number. */
+      /* the strip's height pins the twopp card to the SAME row height as
+         the primary facet's card (user call 2026-10-03, "just make the
+         row height identical to that in the primary facet") via the
+         fixed primStripH constant (see its derivation comment). */
       body = <div className={"rd-ap-cpic" + (hl != null ? " hassub" : "")} style={hl != null && primStripH ? { height: primStripH + "px" } : null}>{pic}<span className="rd-ap-cval" style={{ color: rdApLeanInk(p.lean, onM) }}>{p.lean == null ? "—" : rdApSigned(p.lean)}</span>
-        {hl != null && <span className="rd-ap-cvalsub" style={{ color: rdApLeanInk(hl, onM) }}>Usual lean {rdApSigned(hl)}</span>}
+        {hl != null && <span className="rd-ap-cvalsub">House lean <span style={{ color: rdApLeanInk(hl, onM) }}>{rdApSigned(hl)}</span></span>}
       </div>;
     } else if (facet === "primary") {
       const pr = p.p || {};
