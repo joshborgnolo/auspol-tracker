@@ -1971,7 +1971,7 @@ body.rd .rd-ap-pinf {
 }
 
 /* the grids, one per view */
-body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(0, 400px) 64px minmax(0, 1fr) 40px; }
+body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(0, 400px) 64px 60px minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
@@ -2045,6 +2045,10 @@ body.rd .rd-ap-pairfig, body.rd .rd-ap-issfig { font-size: 15px; font-weight: 60
 body.rd .rd-ap-dash { color: var(--ink-faint); font-weight: 400; }
 body.rd .rd-ap-none { font-size: 15px; color: var(--ink-3); }
 body.rd .rd-ap-val { text-align: right; font-size: 14px; font-weight: 600; color: var(--ink); }
+/* the twopp facet's last column: the pollster's standing lean. The figure
+   never wraps (user call 2026-10-03: "the figure certainly will [fit]" -
+   the wrap concession belongs to the header alone, .rd-ap-th.wrap) */
+body.rd .rd-ap-hl { text-align: right; font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-ap-chev {
   all: unset; cursor: pointer; justify-self: center; width: 28px; height: 28px; border-radius: 6px;
   display: inline-flex; align-items: center; justify-content: center; font-size: 11px; color: var(--ink-3);
@@ -2212,7 +2216,7 @@ body.rd .rd-apd-issrow > b { font-weight: 600; text-align: right; font-variant-n
 
 /* a laptop's narrower column: shorter words over the scale */
 @media (max-width: 1240px) {
-  body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px 52px minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
@@ -2225,7 +2229,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
 
 /* the middle widths drop the sample column: the opened poll carries it */
 @media (max-width: 1000px) {
-  body.rd .rd-ap-c2pp { grid-template-columns: 150px 104px 0 12px 118px minmax(0, 1fr) 52px 0 28px; }
+  body.rd .rd-ap-c2pp { grid-template-columns: 150px 104px 0 12px 118px minmax(0, 1fr) 52px 48px 0 28px; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }

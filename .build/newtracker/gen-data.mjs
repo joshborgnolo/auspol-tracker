@@ -311,13 +311,49 @@ const SPARSE_K = {
     * (d <= SPARSE_TAPER ? 1 : 0.5 * (1 + Math.cos(Math.PI * (d - SPARSE_TAPER) / (SPARSE_WINDOW - SPARSE_TAPER)))),
 };
 const tppRows = POLLS.filter((p) => p.tpp_alp != null && !NO_AGG_HOUSES.has(p.pollster)).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
-/* Implied 2PP eligibility: a poll's primaries can only be read through the
-   flow table when it files a full primary set with no documented anomaly
-   (sumNote) – a set that doesn't total ~100 can't be read through a
-   100-point flow table. One predicate, hoisted, because every consumer of
-   the implied series (the rows below, the per-poll alpImp dots on the
-   chart, the flow-drift join) must agree on which waves have one. */
+/* Implied 2PP eligibility for the AGGREGATE: a poll's primaries can only be
+   read into the standing implied series through the flow table when it
+   files a full primary set with no documented anomaly (sumNote) – a set
+   that doesn't total ~100 can't be read through a 100-point flow table.
+   One aggregate predicate, hoisted, because every consumer of the implied
+   series (the rows below, the flow-drift join) must agree on which waves
+   have one. The per-poll DISPLAY rule is wider – see impShow below. */
 const impOk = (p) => p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote;
+/* Per-poll DISPLAY eligibility, wider than impOk (user calls 2026-10-03):
+   a wave whose primaries miss 100 ONLY through a documented anomaly
+   (sumNote – Essential's undecided-exclusive ind wave; YouGov's
+   undecided-inclusive OTH wave) still shows an implied 2PP in the tables:
+   the anomaly is a publish-out artefact, not missing data. An UNDOCUMENTED
+   sum failure still suppresses the figure – any other row whose primaries
+   miss 100 is a bad row, and rdApFig keeps its "primaries don't add to
+   100" tripwire for exactly that case. impShow gates ONLY the per-poll
+   alpImp/alpOnImp fields; the aggregate stays impOk-strict, so anomalous
+   waves never join the standing implied series. */
+const PRIM_SUM_KEYS = ["alp", "lnp", "grn", "onp", "ind", "oth"];
+const primSum = (p) => PRIM_SUM_KEYS.reduce((a, k) => a + (p[k] || 0), 0);
+const impShow = (p) =>
+  p.alp != null && p.lnp != null && p.grn != null && p.onp != null
+  && (!!p.sumNote || Math.abs(primSum(p) - 100) <= 2);
+/* The rebase behind impShow: a documented-anomaly set (the only kind that
+   fails the ±2 check and still displays) is scaled onto the 100-pt base
+   first, so its implied figure sits on the whole-electorate scale –
+   consistent with share2pp rescaling undecided-inclusive published pairs
+   (Essential 48/47 → 50.5). */
+const impShowRow = (p) => {
+  const s = primSum(p);
+  if (Math.abs(s - 100) <= 2) return p;
+  const r = { ...p };
+  PRIM_SUM_KEYS.forEach((k) => { if (p[k] != null) r[k] = p[k] * 100 / s; });
+  return r;
+};
+/* One shared per-poll emitter: the archive individualPolls row and the
+   Latest pollsterTable row must agree on which waves carry alpImp/alpOnImp,
+   so both spread this helper. */
+const impFields = (p) => {
+  if (!impShow(p)) return {};
+  const q = impShowRow(p);
+  return { alpImp: r1(impliedAlp2pp(q)), alpOnImp: r1(impliedOn(q)) };
+};
 /* The frozen flow table for the ALP-v-ON PAIRING, in ALP-shares, with the
    set's own ± range in FP_ON_BAND. No House count of an ALP-v-ON final
    pairing has ever run, so unlike flows.mjs's table this one cannot be
@@ -326,10 +362,10 @@ const impOk = (p) => p.alp != null && p.lnp != null && p.grn != null && p.onp !=
    counts, senate-flows first-principles analysis 2026-09, Coalition cell
    recalibrated 2026-09-11). Full flow-share warmup:
        implied ALP v ON = alp + lnp·f_lnp + grn·f_grn + (ind+oth)·f_oth
-   Hoisted here beside impOk – which is ALSO its eligibility rule (impliedOn
-   reads the same primary set, so the implied ALP–ON chart cloud and §1d's
-   implied ALP–ON series take exactly tppRowsSynth's waves) – because §1d
-   and the individualPolls emitter (:1169) run before §7d needs it. */
+   Hoisted here beside impOk/impShow – the §1d SERIES takes impOk's waves,
+   the per-poll chart cloud impShow's (impliedOn reads the same primary
+   set) – because §1d and the individualPolls emitter (:1169) run before
+   §7d needs it. */
 const FP_ON = { lnp: 0.315, grn: 0.89, oth: 0.53 };
 const FP_ON_BAND = { lnp: 0.025, grn: 0.03, oth: 0.03 };
 const impliedOn = (p) =>
@@ -2193,10 +2229,11 @@ const individualPolls = POLLS.map((p) => {
     ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),
     alp: p.tpp_alp ?? null, lnp: p.tpp_lnp ?? null, alpN: alpNOf(p),
     // this wave's implied 2PP (its own primaries at the 2025 flow table) –
-    // absent under the same eligibility rule tppRowsSynth uses, so the
-    // chart's implied-basis poll cloud is exactly the estimator's own rows;
+    // emitted under impShow's display rule: documented sum anomalies show
+    // rebased to 100, an UNDOCUMENTED sum failure withholds the figure so
+    // the table's "primaries don't add to 100" tripwire stays lit;
     // alpOnImp is the same re-read under the ALP-v-ON frozen table (§0 FP_ON)
-    ...(impOk(p) ? { alpImp: r1(impliedAlp2pp(p)), alpOnImp: r1(impliedOn(p)) } : {}),
+    ...impFields(p),
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
     // link back to the published release/report this row came from (the
@@ -2380,9 +2417,10 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
-    // this poll's own primaries implied at the fixed 2025 flows (same rule
-    // as the archive emitter above) – the implied line's default basis
-    ...(impOk(p) ? { alpImp: r1(impliedAlp2pp(p)), alpOnImp: r1(impliedOn(p)) } : {}),
+    // this poll's own primaries implied at the fixed 2025 flows (same
+    // impShow display rule as the archive emitter above) – the implied
+    // line's default basis
+    ...impFields(p),
     // this poll's pull on the standing aggregates (leave-one-out, §3b) –
     // absent where the wave sits in none of the three series
     ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),

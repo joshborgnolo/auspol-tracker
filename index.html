@@ -4452,7 +4452,7 @@ body.rd .rd-ap-pinf {
   display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 15px;
   background: var(--surface); font-size: 13px; color: var(--ink); white-space: nowrap;
 }
-body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(0, 400px) 64px minmax(0, 1fr) 40px; }
+body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(0, 400px) 64px 60px minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
@@ -4522,6 +4522,7 @@ body.rd .rd-ap-pairfig, body.rd .rd-ap-issfig { font-size: 15px; font-weight: 60
 body.rd .rd-ap-dash { color: var(--ink-faint); font-weight: 400; }
 body.rd .rd-ap-none { font-size: 15px; color: var(--ink-3); }
 body.rd .rd-ap-val { text-align: right; font-size: 14px; font-weight: 600; color: var(--ink); }
+body.rd .rd-ap-hl { text-align: right; font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-ap-chev {
   all: unset; cursor: pointer; justify-self: center; width: 28px; height: 28px; border-radius: 6px;
   display: inline-flex; align-items: center; justify-content: center; font-size: 11px; color: var(--ink-3);
@@ -4662,7 +4663,7 @@ body.rd .rd-apd-issbar { position: relative; height: 8px; border-radius: 4px; ba
 body.rd .rd-apd-issbar i { display: block; height: 100%; border-radius: 4px; background: var(--ink-3); }
 body.rd .rd-apd-issrow > b { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
 @media (max-width: 1240px) {
-  body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px 52px minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
@@ -4672,7 +4673,7 @@ body.rd .rd-apd-issrow > b { font-weight: 600; text-align: right; font-variant-n
 }
 body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
 @media (max-width: 1000px) {
-  body.rd .rd-ap-c2pp { grid-template-columns: 150px 104px 0 12px 118px minmax(0, 1fr) 52px 0 28px; }
+  body.rd .rd-ap-c2pp { grid-template-columns: 150px 104px 0 12px 118px minmax(0, 1fr) 52px 48px 0 28px; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
@@ -27670,6 +27671,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "alp": 56,
     "lnp": 44,
     "alpN": 56,
+    "alpImp": 55.8,
+    "alpOnImp": 60.6,
     "p": {
       "alp": 34,
       "lnp": 27,
@@ -43357,6 +43360,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "alp": 48,
     "lnp": 47,
     "alpN": 50.5,
+    "alpImp": 53.4,
+    "alpOnImp": 53.9,
     "p": {
       "alp": 31,
       "lnp": 22,
@@ -80061,7 +80066,11 @@ function RdAllPolls(P) {
   })), th("Lean", "lean", {
     right: true,
     title: "Sort by poll lean, towards Labor first"
-  }), React.createElement("span", null)), facet === "primary" && React.createElement(React.Fragment, null, React.createElement("span", {
+  }), React.createElement("span", {
+    role: "columnheader",
+    className: "rd-ap-th r wrap",
+    title: "The pollster\u2019s standing lean against the pooled average \u2014 the House-lean panel below traces it month by month"
+  }, "House lean"), React.createElement("span", null)), facet === "primary" && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-ap-pnums rd-ap-hpn"
   }, prims.map(k => k.id === "oth" ? React.createElement("span", {
     key: k.id,
@@ -80227,7 +80236,13 @@ function RdAllPolls(P) {
       val = React.createElement("span", null),
       right1 = null,
       right2 = null,
-      body = null;
+      body = null,
+      hlCell = null;
+    let hl = null;
+    if (facet === "twopp") {
+      const hls = ((D.houseLean || {})[pub ? onM ? "onpub" : "tpp" : onM ? "onimp" : "imp"] || {})[p.pollster];
+      hl = hls && hls.length ? hls[hls.length - 1].v : null;
+    }
     if (facet === "twopp") {
       const f = figOf(p);
       const m = f.a != null ? rdPollMargin(p, contest, pub) : null;
@@ -80279,8 +80294,13 @@ function RdAllPolls(P) {
       right2 = sub ? React.createElement("span", {
         className: "rd-ap-sub"
       }, sub) : null;
-      const hls = ((D.houseLean || {})[pub ? onM ? "onpub" : "tpp" : onM ? "onimp" : "imp"] || {})[p.pollster];
-      const hl = hls && hls.length ? hls[hls.length - 1].v : null;
+      hlCell = React.createElement("span", {
+        role: "cell",
+        className: "rd-ap-hl",
+        style: {
+          color: rdApLeanInk(hl, onM)
+        }
+      }, hl == null ? "—" : rdApSigned(hl));
       body = React.createElement("div", {
         className: "rd-ap-cpic" + (hl != null ? " hassub" : ""),
         style: hl != null && primStripH ? {
@@ -80677,7 +80697,7 @@ function RdAllPolls(P) {
       onClick: toggle,
       tabIndex: 0,
       onKeyDown: e => rowNav(e, p)
-    }, pollsterCell(p), fieldCell(p), sampleCell(p), React.createElement("span", null), figs, pic, val, facet === "twopp" && React.createElement("span", null), React.createElement("button", {
+    }, pollsterCell(p), fieldCell(p), sampleCell(p), React.createElement("span", null), figs, pic, val, facet === "twopp" && React.createElement(React.Fragment, null, hlCell, React.createElement("span", null)), React.createElement("button", {
       type: "button",
       className: "rd-ap-chev" + (isOpen ? " open" : ""),
       "aria-expanded": isOpen,

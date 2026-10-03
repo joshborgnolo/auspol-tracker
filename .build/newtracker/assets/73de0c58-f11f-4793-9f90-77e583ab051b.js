@@ -1026,9 +1026,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   /* The BASIS re-point, one place. On the implied basis the classic
      contest's chart data becomes synth2pp's monthly points (labor/coalition
      shares, its own ci95) and its poll cloud becomes each wave's OWN implied
-     figure (alpImp, emitted from the same eligibility rule the implied
-     estimator uses) – so "two charts with different sets of points" is a
-     data swap here, not a second chart component. Everything measure-shaped
+     figure (alpImp, emitted under impShow's display rule – a documented
+     primary-sum anomaly shows rebased to 100, an undocumented sum failure
+     emits no dot at all, and the implied estimator's rows stay impOk's
+     clean waves) – so "two charts with different sets of points" is a data
+     swap here, not a second chart component. Everything measure-shaped
      below takes iDataOf/iScatOf rather than the matchup's own entries.
      impData is computed whenever the basis is imp at all – NOT only while
      the classic contest is the one on screen – so a morph AWAY from it

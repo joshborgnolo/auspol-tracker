@@ -3486,9 +3486,12 @@ function ArchApprCell({ s, net, metric }) {
 // The wave's own published 2PP lives in its expanded breakdown (and drives
 // the Lead column); this cell is the implied basis only, L/NP completed as
 // 100 minus ALP the way the poll-detail implied line completes it.
-// alpImp is absent under the same eligibility rule the implied estimator
-// uses (a full comparable primary set) – no figure, a dash with the reason,
-// never a silently different basis.
+// alpImp is absent where a poll never filed a full primary set – and where
+// the filed set misses 100 with no documented explanation (gen-data's
+// impShow rule; a bad row keeps the table's sum tripwire lit). A documented
+// anomaly still shows, rebased to the electorate, while the implied
+// estimator keeps its clean waves. No figure at all gets a dash with the
+// reason.
 // The cell follows the table's MATCHUP as well as its basis: on ALP v ON it
 // prints the same primaries through the site's ALP–ON flow set (alpOnImp),
 // the pairing's own implied reading, so a table opened on the rival Labor

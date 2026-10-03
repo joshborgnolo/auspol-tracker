@@ -76,6 +76,11 @@ function rdApFig(p, onM, pub) {
              none: onM ? "no head-to-head published" : "no two-party figure published" };
   }
   const q = p.p || {};
+  /* no implied figure when a primary column was never filed, or when the
+     filed set misses 100 with NO documented explanation – gen-data's
+     impShow withholds alpImp there, so any non-Essential row whose
+     primaries miss 100 keeps this tripwire lit (documented anomalies show
+     rebased instead) */
   return { a: imp, b: imp != null ? 100 - imp : null,
            txtA: imp != null ? imp.toFixed(1) : "—", txtB: imp != null ? (100 - imp).toFixed(1) : "—",
            sub: pubPair ? "published " + pubPair : null,
@@ -1540,6 +1545,12 @@ function RdAllPolls(P) {
         {th("Labor v " + (onM ? "One Nation" : "Coalition"), "alp", { title: "Sort by Labor’s share", wrap: true })}
         <span role="columnheader" aria-label="Poll lean against the average of its month" className="rd-ap-hpic"><RdApScale onM={onM} /></span>
         {th("Lean", "lean", { right: true, title: "Sort by poll lean, towards Labor first" })}
+        {/* the desktop table's last column (user call 2026-10-03: "the
+            column heading can be wrapped if it can't fit" - .rd-ap-th.wrap
+            lets it break onto a second line; not sortable: its figure is the
+            house's standing lean, constant down a house's rows, and the
+            classic table's hfx sort key measures a different quantity) */}
+        <span role="columnheader" className="rd-ap-th r wrap" title="The pollster’s standing lean against the pooled average — the House-lean panel below traces it month by month">House lean</span>
         <span></span>
       </>}
       {facet === "primary" && <>
@@ -1619,7 +1630,16 @@ function RdAllPolls(P) {
     const isOpen = open === id;
     const arrived = !!focus && focus.key === id;
     const toggle = () => setOpen(isOpen ? null : id);
-    let figs, pic, val = <span></span>, right1 = null, right2 = null, body = null;
+    let figs, pic, val = <span></span>, right1 = null, right2 = null, body = null, hlCell = null;
+    /* the house's standing lean, the latest D.houseLean point on the table's
+       basis and matchup - ONE derivation for the desktop twopp table's last
+       column (user call 2026-10-03: "add a 'house lean' column to the end of
+       the all poles table"), the phone card's sub-line and the detail rail */
+    let hl = null;
+    if (facet === "twopp") {
+      const hls = ((D.houseLean || {})[pub ? (onM ? "onpub" : "tpp") : (onM ? "onimp" : "imp")] || {})[p.pollster];
+      hl = hls && hls.length ? hls[hls.length - 1].v : null;
+    }
     if (facet === "twopp") {
       const f = figOf(p);
       const m = f.a != null ? rdPollMargin(p, contest, pub) : null;
@@ -1639,6 +1659,10 @@ function RdAllPolls(P) {
       val = <span role="cell" className="rd-ap-val" style={{ color: rdApLeanInk(p.lean, onM) }}>{p.lean == null ? "—" : rdApSigned(p.lean)}</span>;
       right1 = main;
       right2 = sub ? <span className="rd-ap-sub">{sub}</span> : null;
+      /* the desktop table's last column: the standing lean at a glance, the
+         same figure the phone card's sub-line carries (hl is derived above
+         the branch) */
+      hlCell = <span role="cell" className="rd-ap-hl" style={{ color: rdApLeanInk(hl, onM) }}>{hl == null ? "—" : rdApSigned(hl)}</span>;
       /* phone card: the house's standing lean rides under the figure (user
          calls 2026-10-03: "add below '+1.7', 'Usual lean -0.3'", then
          renamed House lean - black label, party-tinted number - the
@@ -1646,8 +1670,6 @@ function RdAllPolls(P) {
          itself then got its own "Lean " label (user call same day: "also
          add the word Lean to the lean above it - eg ... 'Lean +1.7'"),
          same label-plain/figure-tinted pattern as the sub-line */
-      const hls = ((D.houseLean || {})[pub ? (onM ? "onpub" : "tpp") : (onM ? "onimp" : "imp")] || {})[p.pollster];
-      const hl = hls && hls.length ? hls[hls.length - 1].v : null;
       /* the strip's height pins the twopp card to the SAME row height as
          the primary facet's card (user call 2026-10-03, "just make the
          row height identical to that in the primary facet") via the
@@ -1902,7 +1924,7 @@ function RdAllPolls(P) {
       <React.Fragment key={id}>
         <div className={"rd-ap-row " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle} tabIndex={0} onKeyDown={(e) => rowNav(e, p)}>
           {pollsterCell(p)}{fieldCell(p)}{sampleCell(p)}<span></span>
-          {figs}{pic}{val}{facet === "twopp" && <span></span>}
+          {figs}{pic}{val}{facet === "twopp" && <>{hlCell}<span></span></>}
           <button type="button" className={"rd-ap-chev" + (isOpen ? " open" : "")} aria-expanded={isOpen}
                   aria-label={(isOpen ? "Hide" : "Show") + " the full poll: " + p.pollster + ", " + p.field}
                   onClick={(e) => { e.stopPropagation(); toggle(); }}><svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 1.5L7.5 5 3 8.5z"></path></svg></button>
