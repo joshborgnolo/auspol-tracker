@@ -2282,8 +2282,24 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cnets, body.rd .rd-ap-csub { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
   /* the issues top-issue sentence must flow as ONE inline run and wrap
      per-word - under the flex rule above every JSX fragment would become
-     a gap-joined flex item and the sentence would break item-by-item */
-  body.rd .rd-ap-csub-sent { display: block; }
+     a gap-joined flex item and the sentence would break item-by-item.
+     It is ALSO a query container so the economic-management label can
+     swap to "economic mgmt" against the lane width (next block) */
+  body.rd .rd-ap-csub-sent { display: block; container-type: inline-size; }
+  /* "economic management" is the ranked sentence's one spiller - the
+     Ipsos "Cost of living 1st, housing 2nd, economic management 3rd"
+     card was the only ranked card to wrap two lines. User call
+     2026-10-03: shorten to "economic mgmt" when it would otherwise
+     spill. Measured 13px csub: sentence LONG 334.5px / SHORT 291.7px
+     against lanes 280@320vp / 300@340 / 320@360 / 350@390 / 361.8@402,
+     so below 334.5 the short form renders; the 334.5-361.8 band keeps
+     the full label (the 320px shell at 280px lane is the known
+     11.7px-too-small residue - EVERY other phone rung is one line) */
+  body.rd .rd-ap-mgmt-s { display: none; }
+  @container (max-width: 334.5px) {
+    body.rd .rd-ap-mgmt-l { display: none; }
+    body.rd .rd-ap-mgmt-s { display: inline; }
+  }
   /* the unranked-but-col placeholder is a three-rung WIDTH LADDER, not one
      string: .rd-ap-issph is the query container and shows the longest of
      the dictated wordings that fits the card's text lane on ONE line

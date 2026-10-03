@@ -464,6 +464,26 @@ re-punctuated SEC's tail. FINAL contract:
   1c8ef8b lifted ONLY the leading letter, everything else stands;
   `"; unprompted"` suffix on SEC waves
   (`unprompted = !!(iss && !iss.sal && iss.conc)`).
+- The "economic management" label is a TWO-SPAN container rung
+  (2026-10-03, user: 'Shorten it to "economic mgmt" when it would
+  otherwise spill over to two lines'): `sentPart(l, pos1)`
+  (rd-allpolls.jsx, right after sentLab/sentLab1) renders plain
+  text for every label EXCEPT the economy one, where it emits
+  `<span class="rd-ap-mgmt-l">…management…` + `<span
+  class="rd-ap-mgmt-s">…mgmt…`; the sentence div itself is the
+  query container (`.rd-ap-csub-sent { display:block;
+  container-type: inline-size; }` — the two declarations landed
+  together in the rd.css phone block), and ONE
+  `@container (max-width: 334.5px)` tier swaps -l→-s. Measured at
+  13px csub (offscreen white-space:nowrap shrink-wrap, the issap
+  ladder's own idiom): LONG sentence 334.5px vs SHORT 291.7px
+  against the golden lanes 280@320 / 300@340 / 320@360 / 350@390 /
+  361.8@402 — so SHORT covers 340/360, LONG covers 390/402, and
+  the 320 shell's 280px lane is 11.7px short of even the short
+  form (the sentence wraps there: recorded residue, user told).
+  ISS_SENT_SHORT is NOT expanded (the call was conditional, not a
+  global shorten); desktop cells, the detail and D.issues.labels
+  keep the full label — the swap lives in this one phone sentence.
 - Unranked-but-col placeholder (same day; source jsx rode into the
   sibling primary-order commit 4820dda, probe pins + compiled line
   landed with the Asked-line fix in 9aa99cf): Resolve, YouGov and
@@ -514,14 +534,18 @@ re-punctuated SEC's tail. FINAL contract:
   emissions keep the stored label, so map in the renderer, never edit
   the stored data. Add a future label the user calls redundant to this
   map, not to the data.
-- Heights (360px): sentence csub one text line 22.2px; cards 118.1
-  (sentence+strip) / 93.9 (strip-only); the 140.3 outlier is
-  "economic management" wrapping the sentence to two lines on its card.
+- Heights (360px, post-mgmt-swap): sentence csub one text line 22.2px;
+  cards 118.1 (sentence+strip) / 93.9 (strip-only); the 140.3 outlier
+  WAS "economic management" wrapping the sentence to two lines — with
+  the two-span rung the Ipsos card is one line on every shell from
+  340px up (SHORT 291.7px ≤ every lane ≥300px) and the wrap survives
+  only at 320px (the 280px lane, 11.7px short of even the short form).
   390px renders (post-1c8ef8b, sentence case): SEC "Cost of living 1st,
   housing 2nd, crime 3rd; unprompted" (chip "ALP 23"); RedBridge "Cost
   of living 1st, health 2nd, housing 3rd"; Ipsos "Cost of living 1st,
-  housing 2nd, economic management 3rd".
-- Probe pinning (iss-facet.mjs, 43 checks since the placeholder and
+  housing 2nd, economic management 3rd" — the LONG spelling, the rung
+  a 350px 390px-shell lane shows.
+- Probe pinning (iss-facet.mjs, 44 checks since the placeholder and
   9aa99cf's Asked-branch pin): `topFilled` keys on
   `/ 1st/`; ordinal grammar `/, [^,(]+ 2nd/` and `/, [^,(]+ 3rd/`;
   `legacy` flags any relic figure grammar (`/\(\d+\)/` or
@@ -529,7 +553,13 @@ re-punctuated SEC's tail. FINAL contract:
   ONE capital — at position 0 after stripping the "; unprompted" tail
   (`/^[A-Z]/.test(bare) && !/[A-Z]/.test(bare.slice(1))`) — so BOTH
   drift directions fail: all-lowercase (f4e52b3's contract) and Title
-  Case. LESSON: the probe's grammar anchors ARE the copy contract —
+  Case. The mgmt rung adds the innerText lesson: cardAnatomy.txt reads
+  `sent.innerText`, never textContent — the -l/-s pair would
+  concatenate BOTH spellings ("…economic management economic mgmt…")
+  into every grammar anchor and capsOk; mgmtOk then pins the pair
+  present, exactly one displayed, and /economic management/ (the LONG
+  spelling) at page3's 390px rung. LESSON: the probe's grammar anchors
+  ARE the copy contract —
   after a deliberate sentence-copy change, update the anchor AND its
   check label in the same commit; this session's mid-work false-FAIL
   (40/41) was a stale `/ then /` anchor against the figure-free

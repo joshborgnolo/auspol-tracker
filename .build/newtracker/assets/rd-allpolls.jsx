@@ -1751,13 +1751,32 @@ function RdAllPolls(P) {
       }
       const sentLab = (l) => (ISS_SENT_SHORT[l] || l.toLowerCase());
       const sentLab1 = (l) => { const s = sentLab(l); return s.charAt(0).toUpperCase() + s.slice(1); };
+      /* "economic management" is the sentence's one spiller: the Ipsos
+         "Cost of living 1st, housing 2nd, economic management 3rd" card is
+         the only ranked card that ever wrapped to two lines (the 140.3px
+         outlier in the 360px height pass). User call 2026-10-03: shorten
+         to "economic mgmt" WHEN IT WOULD OTHERWISE SPILL OVER - so the
+         label ships as TWO spans and the .rd-ap-csub-sent container
+         itself (container-type: inline-size, rd.css) swaps them at the
+         measured break: LONG "economic management" puts the Ipsos
+         sentence at 334.5px vs SHORT "economic mgmt" 291.7px (13px
+         csub), lanes 280@320vp / 300@340 / 320@360 / 350@390 /
+         361.8@402 - so the container shows SHORT below 334.5px and LONG
+         at/above. Every other label renders plain text exactly as
+         before; desktop cells and the stored data are untouched (this
+         map lives only in this one phone sentence) */
+      const sentPart = (l, pos1) => {
+        const s = sentLab(l);
+        if (s !== "economic management") return pos1 ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+        return <><span className="rd-ap-mgmt-l">{pos1 ? "Economic management" : "economic management"}</span><span className="rd-ap-mgmt-s">{pos1 ? "Economic mgmt" : "economic mgmt"}</span></>;
+      };
       const ord = (n) => n === 1 ? <span>1<sup>st</sup></span> : n === 2 ? <span>2<sup>nd</sup></span> : <span>3<sup>rd</sup></span>;
       body = <>
         {it && (
           <div className="rd-ap-csub rd-ap-csub-sent">
-            {sentLab1(it[0])} {ord(1)}
-            {top3.length > 1 && <>, {sentLab(top3[1][0])} {ord(2)}</>}
-            {top3.length > 2 && <>, {sentLab(top3[2][0])} {ord(3)}</>}
+            {sentPart(it[0], true)} {ord(1)}
+            {top3.length > 1 && <>, {sentPart(top3[1][0])} {ord(2)}</>}
+            {top3.length > 2 && <>, {sentPart(top3[2][0])} {ord(3)}</>}
             {unprompted ? "; unprompted" : ""}
           </div>
         )}

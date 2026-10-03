@@ -464,7 +464,24 @@ const cardAnatomy = await page3.evaluate(() => {
     const ladderOk = rungs.length === 0 || (rungs.length === 3 && rungsShown === 1);
     const sent = [...c.querySelectorAll(".rd-ap-csub-sent")].find(shown) || null;
     const subs = [...c.querySelectorAll(".rd-ap-csub")].filter(shown);
-    const txt = sent ? sent.textContent.trim().replace(/\s+/g, " ") : "";
+    // innerText, never textContent: the economic-management label ships as
+    // TWO spans (.rd-ap-mgmt-l long / .rd-ap-mgmt-s short), the -sent
+    // container showing exactly one by lane width (swap below 334.5px -
+    // LONG "economic management" 334.5px vs SHORT "economic mgmt" 291.7px,
+    // measured at 13px csub; user call 2026-10-03 "shorten to mgmt when it
+    // would otherwise spill"). textContent would concat both spellings and
+    // corrupt every grammar anchor below; innerText reads only the
+    // displayed rung, same as the issap ladder's shown() reads above
+    const txt = sent ? sent.innerText.trim().replace(/\s+/g, " ") : "";
+    // the mgmt swap itself: any card carrying the two-span label shows
+    // EXACTLY ONE of them, and page3's 390px/350px-lane rung displays the
+    // LONG form (below 334.5px the SHORT "economic mgmt" renders - the
+    // one-line reach extends to the 340/360 shells; the 320px shell at a
+    // 280px lane is the recorded residue)
+    const mgmt = sent ? sent.querySelectorAll(".rd-ap-mgmt-l, .rd-ap-mgmt-s") : [];
+    const mgmtOk = mgmt.length === 0 ||
+      ([...mgmt].length === 2 && [...sent.querySelectorAll(".rd-ap-mgmt-l")].length === 1 &&
+       [...mgmt].filter(shown).length === 1 && shown(mgmt[0]) && /economic management/.test(txt));
     const topFilled = !!sent && / 1st/.test(txt);
     // the dictated placeholder on waves that ask cost-of-living ownership
     // but rank no issues (Resolve, YouGov, DemosAU) - the displayed rung
@@ -489,7 +506,7 @@ const cardAnatomy = await page3.evaluate(() => {
     const chipOk = !!chip && /[A-Za-z]+ \d+/.test(chipTxt);
     const bodyStrip = c.querySelector(":scope > .rd-ap-cpic");
     const dots = bodyStrip ? bodyStrip.querySelectorAll(".rd-ap-dot").length : 0;
-    return { nxt: sent ? / 2nd/.test(txt) : false, runnerOk, topFilled, caps: capsOk, legacy, csubSentOk, noPair, chip: chipOk, chipTxt, bodyStrip: !!bodyStrip, dots, subN: subs.length, txt, unranked, firm: (c.querySelector(".rd-ap-firm") || {}).textContent || "?" };
+    return { nxt: sent ? / 2nd/.test(txt) : false, runnerOk, topFilled, caps: capsOk, legacy, csubSentOk, mgmtOk, mgmtN: mgmt.length, noPair, chip: chipOk, chipTxt, bodyStrip: !!bodyStrip, dots, subN: subs.length, txt, unranked, firm: (c.querySelector(".rd-ap-firm") || {}).textContent || "?" };
   });
   const dotted = an.filter((a) => a.dots > 0);
   return { an,
@@ -500,6 +517,10 @@ const cardAnatomy = await page3.evaluate(() => {
     unrankedFirms: [...new Set(an.filter((a) => a.unranked).map((a) => a.firm))].sort(),
     withNxt: an.filter((a) => a.nxt).length,
     badNxt: an.filter((a) => !a.runnerOk || !a.csubSentOk || !a.caps).length,
+    // the two-span "economic mgmt" swap: cards carrying the label pair and
+    // cards whose displayed-rung/identity contract holds
+    mgmtCards: an.filter((a) => a.mgmtN > 0).length,
+    mgmtGood: an.filter((a) => a.mgmtOk).length,
     legacySubs: an.filter((a) => a.legacy).length,
     withDots: dotted.length,
     badDots: dotted.filter((a) => a.dots < 2 || a.dots > 4).length,
@@ -529,6 +550,16 @@ check("phone: the top-issue share is not reprinted beside the firm (the sentence
 check("phone: every ownership card names its best party as a head-row chip (the old body line)",
   cardAnatomy.chipsMissing === 0 && cardAnatomy.withDots > 0,
   `${cardAnatomy.chipsMissing} dotted cards without the chip`);
+// the economic-management label is two spans (.rd-ap-mgmt-l long +
+// .rd-ap-mgmt-s short); the sentence container shows exactly ONE by lane
+// width (LONG at this 390px rung, SHORT under the measured 334.5px break)
+// and cardAnatomy.txt reads the displayed rung via innerText - a leak in
+// either direction (both spans shown, none shown, or textContent-style
+// concatenation in a future regression) trips this pin
+check("phone: the economy label is exactly one displayed rung, LONG at 390px (the 'economic mgmt' narrow-shell swap)",
+  cardAnatomy.mgmtCards > 0 && cardAnatomy.mgmtGood === cardAnatomy.cardsN &&
+  cardAnatomy.an.filter((a) => a.mgmtN > 0 && !/economic management/.test(a.txt)).length === 0,
+  `${cardAnatomy.mgmtCards} mgmt pairs; good ${cardAnatomy.mgmtGood}/${cardAnatomy.cardsN}`);
 check("phone: the Ipsos cards are there", cardAnatomy.ipsos === exp.issOnly, `${cardAnatomy.ipsos}/${exp.issOnly}`);
 
 const ipPhone = await openRowContaining(page3, /^Ipsos/);
