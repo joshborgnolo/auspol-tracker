@@ -477,134 +477,236 @@ button.wm-glyph { border-radius: 50%; -webkit-tap-highlight-color: transparent; 
    the keyboard user's pointer, not a hover shape. */
 button.wm-glyph:hover { background: transparent; }
 
-/* ---------- the dial, wound back ---------- */
-/* Paper, not a lightbox: this is a printed instrument being demonstrated, so
-   the backdrop is the page's own stock rather than a black scrim. */
-.dl-backdrop {
+/* ---------- the dial, wound back (wm-story.jsx) -----------------------------
+   A stage, not a card. The replay takes the whole viewport, on the page's own
+   paper rather than a scrim - the masthead's instrument being demonstrated,
+   not a lightbox. Everything that moves is written by gpEngine; everything
+   laid out here sits still. */
+.gp {
   position: fixed; inset: 0; z-index: 200;
-  display: flex; align-items: center; justify-content: center; padding: 24px;
-  background: color-mix(in oklch, var(--surface) 88%, transparent);
-  backdrop-filter: blur(7px) saturate(1.05);
-  animation: dl-in .3s ease both;
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto;
+  row-gap: clamp(4px, 1.3vh, 14px);
+  padding: max(10px, env(safe-area-inset-top)) max(22px, env(safe-area-inset-right))
+           max(14px, env(safe-area-inset-bottom)) max(22px, env(safe-area-inset-left));
+  color: var(--ink); font-family: var(--sans);
+  overscroll-behavior: contain; -webkit-tap-highlight-color: transparent;
+  isolation: isolate;
+  /* the arc's tint, read by the engine for the masthead-to-stage blend */
+  --gp-tint: 0.2;
 }
-@keyframes dl-in { from { opacity: 0 } to { opacity: 1 } }
-.dl-shell {
-  position: relative; width: min(560px, 100%); max-height: 100%;
-  display: flex; flex-direction: column; gap: 18px;
-  padding: 30px 30px 24px; border-radius: 16px;
-  background: var(--surface); border: 1px solid var(--line);
-  box-shadow: 0 30px 80px -30px color-mix(in oklch, var(--ink) 40%, transparent);
-  transform-origin: center center;
+body.dark .gp { --gp-tint: 0.3; }
+.gp-paper {
+  position: absolute; inset: 0; z-index: -1;
+  background: color-mix(in oklch, var(--bg) 94%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.05); backdrop-filter: blur(14px) saturate(1.05);
+  animation: gp-in .34s ease both;
 }
-.dl-close {
-  position: absolute; top: 10px; right: 12px; width: 30px; height: 30px;
-  border: 0; background: none; color: var(--ink-3); cursor: pointer;
-  font: 400 26px/1 var(--sans); border-radius: 8px;
-}
-.dl-close:hover { color: var(--ink); background: var(--surface-2); }
+.gp[data-phase="leaving"] .gp-paper { animation: gp-out .4s ease .32s both; }
+@keyframes gp-in { from { opacity: 0; } }
+@keyframes gp-out { to { opacity: 0; } }
 
-.dl-figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.dl-svg { width: min(420px, 94%); height: auto; overflow: visible; display: block; }
-/* ---- the mercury column -------------------------------------------------
-   The channel is a groove: darker than the face, capped round at both ends,
-   and empty until the liquid runs into it. The tint under it keeps each side
-   named without pretending to be a quantity. */
-.dl-channel { fill: none; stroke: var(--dl-channel); stroke-width: 2.2;
-              stroke-linecap: round; transition: none; }
-.dl-side, .dl-side-raw { fill: none; stroke-width: 1.9; stroke-linecap: round;
-                         transition: none; }
-.dl-side, .dl-side-g { opacity: 0.17; }
-/* The liquid itself. Slightly proud of the channel it sits in, because a
-   meniscus stands above its walls, and carrying one bright line along the
-   upper wall - the specular is the whole difference between mercury and
-   paint. */
-.dl-merc { fill: none; stroke-width: 2.05; stroke-linecap: round; transition: none; }
-.dl-merc-lit { fill: none; stroke: #fff; stroke-width: 0.42; opacity: 0.5;
-               stroke-linecap: round; transition: none; }
-.dl-merc-cap-lit { fill: #fff; opacity: 0.62; }
-.dl-mercury {
-  filter: drop-shadow(0 0.35px 0.7px color-mix(in oklch, var(--ink) 34%, transparent));
+/* the furniture arrives once the dial has most of the way flown, in a
+   stagger down the stage, and leaves first on the way out */
+.gp-top, .gp-when, .gp-side, .gp-beat, .gp-time, .gp-ctl {
+  transition: opacity .55s ease, transform .7s cubic-bezier(.2, .8, .2, 1);
 }
-body.dark .dl-merc-lit { opacity: 0.62; }
-body.dark .dl-side, body.dark .dl-side-g { opacity: 0.26; }
-/* the blades are rects now, so the width is geometry rather than stroke; what
-   is left here is the material - a hairline of its own colour darkened, and a
-   shadow throwing them off the rim they are seated in */
-.dl-bar {
-  stroke: color-mix(in oklch, var(--ink) 30%, transparent); stroke-width: 0.22;
-  filter: drop-shadow(0.3px 0.5px 0.45px color-mix(in oklch, var(--ink) 26%, transparent));
+.gp:not(.gp-in) :is(.gp-top, .gp-when, .gp-side, .gp-beat, .gp-time, .gp-ctl) { opacity: 0; transform: translateY(12px); }
+.gp.gp-in .gp-when { transition-delay: .03s; }
+.gp.gp-in .gp-side { transition-delay: .1s; }
+.gp.gp-in .gp-beat { transition-delay: .14s; }
+.gp.gp-in .gp-time { transition-delay: .18s; }
+.gp.gp-in .gp-ctl  { transition-delay: .26s; }
+.gp[data-phase="leaving"] :is(.gp-top, .gp-when, .gp-side, .gp-beat, .gp-time, .gp-ctl) {
+  opacity: 0; transform: translateY(6px); transition-duration: .2s; transition-delay: 0s;
 }
-.dl-read-party {
-  font-family: var(--sans); font-size: 2.15px; font-weight: 800;
-  letter-spacing: 0.10em; opacity: 0.95;
+
+.gp-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: min(1180px, 100%); margin: 0 auto; min-height: 40px;
 }
-.dl-read-val {
-  font-family: var(--sans); font-size: 3.3px; font-weight: 700; fill: var(--ink-2);
+.gp-eyebrow {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; min-width: 0;
+  font-size: 11.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3);
+}
+.gp-count { letter-spacing: .06em; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.gp-rwmark { display: none; align-items: center; gap: 6px; color: var(--ink-2); }
+.gp.gp-rw .gp-rwmark { display: inline-flex; animation: gp-blink .9s ease-in-out infinite alternate; }
+.gp.gp-rw .gp-count { display: none; }
+@keyframes gp-blink { from { opacity: .4; } }
+.gp-x {
+  flex: none; width: 40px; height: 40px; margin-right: -8px; border: 0; border-radius: 50%;
+  background: transparent; color: var(--ink-2); cursor: pointer; display: grid; place-items: center;
+}
+.gp-x:hover { color: var(--ink); background: color-mix(in oklch, var(--ink) 7%, transparent); }
+.gp-x svg { transition: transform .4s cubic-bezier(.3, 1.6, .5, 1); }
+.gp-x:hover svg { transform: rotate(90deg); }
+
+.gp-stage {
+  min-height: 0; width: min(1180px, 100%); margin: 0 auto;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: clamp(2px, 1vh, 10px);
+}
+/* the month: a reel, rolled by the playhead - and grabbable, like a reel */
+.gp-when { text-align: center; cursor: ns-resize; touch-action: none; user-select: none; -webkit-user-select: none; }
+.gp-wline { font-family: var(--serif); font-size: clamp(30px, min(5vw, 7.2vh), 64px); line-height: 1; letter-spacing: -.01em; }
+.gp-reelbox {
+  display: inline-block; height: 1.15em; overflow: hidden; vertical-align: top;
+  -webkit-mask-image: linear-gradient(transparent, #000 9%, #000 91%, transparent);
+  mask-image: linear-gradient(transparent, #000 9%, #000 91%, transparent);
+}
+.gp-reel { display: flex; flex-direction: column; align-items: center; will-change: transform; }
+.gp-reel > span { display: block; height: 1.15em; line-height: 1.15em; white-space: nowrap; padding: 0 .12em; }
+.gp-reel em { font-style: normal; color: var(--ink-3); }
+.gp-wsub { margin-top: 2px; height: 1.4em; font-size: 12.5px; color: var(--ink-3); letter-spacing: .01em; }
+
+/* Labor's figure on the Labor side of the dial, the challenger's on theirs:
+   the needle leans toward the bigger number */
+.gp-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end;
+  width: 100%; column-gap: clamp(4px, 1.5vw, 24px);
+}
+.gp-dial { padding: clamp(26px, 4.4vh, 44px) clamp(44px, 5vw, 70px) 0; }
+.gp-dbox { position: relative; width: clamp(240px, min(40vw, calc((100vh - 450px) * 1.64)), 560px); }
+.gp-dbox { width: clamp(240px, min(40vw, calc((100dvh - 450px) * 1.64)), 560px); }
+.gp-flier { position: absolute; inset: 0; will-change: transform; }
+.gp-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.gp-side { display: flex; flex-direction: column; gap: 4px; padding-bottom: 2px; min-width: 0; }
+.gp-side-a { align-items: flex-end; text-align: right; color: var(--alp-text); }
+.gp-side-b { align-items: flex-start; color: var(--lnp-text); }
+.gp.gp-in .gp-side-b { transition: opacity .55s ease .1s, transform .7s cubic-bezier(.2, .8, .2, 1) .1s, color .5s ease; }
+.gp-side-b[data-opp="onp"] { color: var(--onp-text); }
+.gp-name { display: inline-flex; align-items: center; gap: 7px; font-size: clamp(13px, 1.3vw, 16px); font-weight: 600; }
+.gp-name i { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--alp); }
+.gp-oppname { display: block; height: 1.3em; overflow: hidden; }
+.gp-opp-reel { display: flex; flex-direction: column; transition: transform .42s cubic-bezier(.3, 1.25, .5, 1); }
+.gp-opp-reel > span { height: 1.3em; line-height: 1.3em; display: inline-flex; align-items: center; gap: 7px; }
+.gp-opp-reel [data-id="lnp"] i { background: var(--lnp); }
+.gp-opp-reel [data-id="onp"] i { background: var(--onp); }
+.gp-side-b[data-opp="onp"] .gp-opp-reel { transform: translateY(-1.3em); }
+.gp-num {
+  display: inline-flex; font-family: var(--sans); font-weight: 500;
+  font-size: clamp(38px, min(5.6vw, 8.4vh), 84px); line-height: 1; letter-spacing: -.035em;
   font-variant-numeric: tabular-nums;
 }
-/* a filled pointer now, so the old stroke sizing has nothing to size */
-.dl-needle { stroke: none; }
-.dl-needle-lit { fill: #fff; opacity: 0.32; }
-body.dark .dl-needle-lit { opacity: 0.4; }
-/* a bearing, not a blob – the solid grey disc sat heavier than the needle */
-.dl-pivot { fill: var(--surface); stroke: var(--ink-3); stroke-width: 0.7; }
-/* everywhere the needle has been so far – the term's swing, accumulated */
-/* the event line above the dial – fixed height so it never shifts layout */
-.dl-event {
-  height: 20px; display: flex; align-items: center; justify-content: center;
-  font-family: var(--sans); font-size: 12px; font-weight: 600;
-  letter-spacing: 0.04em; color: var(--ink-2);
-}
-.dl-event span { display: inline-flex; align-items: center; gap: 7px; }
-.dl-event-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); }
+.gp-od { display: block; height: 1em; overflow: hidden; }
+.gp-od > span { display: flex; flex-direction: column; will-change: transform; }
+.gp-od i { display: block; height: 1em; line-height: 1em; font-style: normal; text-align: center; }
+.gp-pt { display: block; line-height: 1em; }
 
-.dl-cap { text-align: center; }
-.dl-month {
-  font-family: var(--serif, var(--sans)); font-size: 26px; font-weight: 400; color: var(--ink);
-  letter-spacing: -0.01em; display: flex; align-items: baseline; justify-content: center; gap: 9px;
+/* the instrument */
+.gp-arc path { fill: none; }
+.gp-arc-a { stroke: var(--alp); }
+.gp-arc-f { opacity: 0; }
+.gp-tick { stroke: var(--ink-faint); stroke-width: 2.2; stroke-linecap: round; }
+.gp-tick.mj { stroke: var(--ink-3); stroke-width: 2.8; }
+.gp-tick.lv { stroke: var(--ink); stroke-width: 3.6; }
+.gp-merc { fill: none; stroke-linecap: round; }
+.gp-ghost { stroke: var(--ink-3); stroke-width: 3.2; stroke-dasharray: 1 9; stroke-linecap: round; opacity: 0; }
+.gp-bar { stroke-linecap: butt; }
+.gp-needle { stroke-linecap: round; }
+.gp-pivot { fill: var(--ink-3); }
+.gp-shock { fill: none; opacity: 0; }
+.gp-wake { opacity: 0; }
+.gp-bl {
+  position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center;
+  line-height: 1.05; white-space: nowrap; pointer-events: none; opacity: 0; will-change: transform;
 }
-.dl-tag {
-  font-family: var(--sans); font-size: 11px; font-weight: 700;
-  color: var(--ink-3); border: 1px solid var(--line);
-  border-radius: 999px; padding: 2px 7px;
-}
-.dl-contest {
-  margin-top: 5px; font-family: var(--sans); font-size: 15px; font-weight: 700;
-  font-variant-numeric: tabular-nums; display: flex; gap: 9px; justify-content: center;
-}
-.dl-v { color: var(--ink-3); font-weight: 500; font-style: italic; }
-.dl-note { margin-top: 5px; font-size: 12px; color: var(--ink-3); }
+.gp-bl b { font-size: 10.5px; font-weight: 700; letter-spacing: .12em; }
+.gp-bl span { font-size: clamp(14px, 1.6vw, 20px); font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
 
-/* The timeline is a line graph now (see DialTrack), so it needs real height -
-   at 26px a 2PP range of a few points had nowhere to go. */
-/* ---- the dial's housing -------------------------------------------------
-   Tokens, not literal colours, so the instrument reads the same in both
-   themes: light gives it a pale enamel face in a warm steel bezel, dark a
-   sunk graphite face in a rim catching what light there is. Every value is
-   mixed from the palette already in use rather than introduced, so nothing
-   here is a new colour - it is the surface tokens leaned on a little.
+/* the caption for each moment: words rise in, party names underline themselves */
+.gp-beat { position: relative; display: grid; place-items: center; width: 100%; min-height: 3.5em; text-align: center; }
+.gp-beat-in { grid-area: 1 / 1; max-width: 46em; padding: 0 8px; --d0: 0s; }
+.gp-beat-in.late { --d0: .2s; }
+.gp-beat-t { font-family: var(--serif); font-style: italic; font-size: clamp(18px, min(2.1vw, 3.2vh), 26px); line-height: 1.22; color: var(--ink); }
+.gp-w { display: inline-block; animation: gp-word .62s cubic-bezier(.2, .9, .25, 1.18) both; animation-delay: calc(var(--d0) + var(--i) * 34ms); }
+.gp-pw {
+  font-weight: 600;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat;
+  animation-name: gp-word, gp-under; animation-duration: .62s, .5s; animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(.2, .9, .25, 1.18), cubic-bezier(.6, 0, .2, 1);
+  animation-delay: calc(var(--d0) + var(--i) * 34ms), calc(var(--d0) + var(--i) * 34ms + .28s);
+}
+@keyframes gp-word { from { opacity: 0; transform: translateY(.6em) rotate(3deg); filter: blur(4px); } }
+@keyframes gp-under { to { background-size: 100% 2px; } }
+.gp-beat-s {
+  margin-top: 5px; font-size: 11.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3);
+  animation: gp-word .5s ease both; animation-delay: calc(var(--d0) + var(--i) * 34ms + .1s);
+}
+.gp-beat-in.out { animation: gp-leave .26s ease-in both; }
+@keyframes gp-leave { to { opacity: 0; transform: translateY(-.5em); filter: blur(3px); } }
 
-   The lighting is fixed at top-left throughout: the bezel gradient runs from
-   there, the face falls away from there, and the glass sheen comes from the
-   same corner. One light source is the whole difference between an object and
-   a pile of gradients. */
-/* Both sets, and on BODY not :root - which is the whole reason the pair
-   exists. A custom property substitutes where it is DEFINED, so one declared
-   on :root against var(--surface-2) resolves the LIGHT surface even inside
-   body.dark, and the instrument comes out lit for the wrong room. The theme
-   classes live on body, so these do too - the same note --chart-bg carries. */
+/* the term as a line, every poll on it, scrubbable and throwable */
+.gp-time {
+  position: relative; width: min(1180px, 100%); margin: 0 auto; height: clamp(92px, 16vh, 150px);
+  cursor: ew-resize; touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.gp-time:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 4px; border-radius: 6px; }
+.gp-tl { position: absolute; inset: 0; width: 100%; height: 100%; }
+.gp-ev { position: absolute; top: -6px; left: 0; pointer-events: none; --pin: 9px; }
+.gp-ev span {
+  display: inline-block; padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+  font-size: 11.5px; font-weight: 600; color: var(--ink-2);
+  background: var(--surface); border: 1px solid var(--line);
+  box-shadow: 0 2px 8px -4px color-mix(in oklch, var(--ink) 30%, transparent);
+  transform-origin: var(--pin) 100%; transform: translateY(-8px) scale(.6); opacity: 0;
+  transition: transform .4s cubic-bezier(.3, 1.6, .5, 1), opacity .2s ease;
+}
+.gp-ev.on span { transform: translateY(-8px); opacity: 1; }
+
+.gp-ctl { width: min(1180px, 100%); margin: 0 auto; display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; }
+.gp-play {
+  flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center; background: var(--ink); color: var(--bg);
+  box-shadow: 0 1px 1.5px var(--btn-shade), 0 6px 14px -6px color-mix(in oklch, var(--ink) 55%, transparent);
+  transition: transform .16s ease;
+}
+.gp-play:hover { transform: scale(1.06); }
+.gp-play:active { transform: scale(.94); }
+.gp-play path { transition: opacity .22s ease, transform .32s cubic-bezier(.3, 1.5, .5, 1); transform-origin: 10px 10px; }
+.gp-play .gp-ic-pause { opacity: 0; transform: scale(.4) rotate(-90deg); }
+.gp-play.on .gp-ic-play { opacity: 0; transform: scale(.4) rotate(90deg); }
+.gp-play.on .gp-ic-pause { opacity: 1; transform: none; }
+.gp-btn {
+  display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px 0 12px;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  font: 600 13px/1 var(--sans); color: var(--ink-2); cursor: pointer;
+}
+.gp-btn:hover { color: var(--ink); border-color: var(--ink-3); }
+.gp-replay svg { transition: transform .55s cubic-bezier(.3, 1.4, .5, 1); }
+.gp-replay:hover svg { transform: rotate(-200deg); }
+.gp-key {
+  list-style: none; margin: 0 0 0 auto; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px;
+  font-size: 12px; color: var(--ink-3);
+}
+.gp-key li { display: inline-flex; align-items: center; gap: 6px; }
+.gp-key svg { fill: none; overflow: visible; }
+.gp-hint { font-size: 11.5px; color: var(--ink-faint); letter-spacing: .04em; }
+@media (hover: none), (pointer: coarse) { .gp-hint { display: none; } }
+.gp-fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+
+@media (max-width: 700px) {
+  .gp { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+  .gp-row { grid-template-columns: 1fr 1fr; grid-template-areas: "dial dial" "a b"; row-gap: 6px; column-gap: 0; }
+  .gp-dial { grid-area: dial; justify-self: center; padding: 30px 40px 0; }
+  .gp-dbox { width: max(210px, min(calc(100vw - 112px), calc((100vh - 470px) * 1.64))); }
+  .gp-dbox { width: max(210px, min(calc(100vw - 112px), calc((100dvh - 470px) * 1.64))); }
+  .gp-side-a { grid-area: a; padding-right: 14px; border-right: 1.5px solid var(--line); }
+  .gp-side-b { grid-area: b; padding-left: 14px; }
+  .gp-num { font-size: clamp(36px, 12vw, 52px); }
+  .gp-key { margin-left: 0; width: 100%; gap: 2px 12px; font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gp-paper, .gp-w, .gp-pw, .gp-beat-s, .gp-beat-in.out, .gp.gp-rw .gp-rwmark { animation: none; }
+  .gp-top, .gp-when, .gp-side, .gp-beat, .gp-time, .gp-ctl, .gp-opp-reel, .gp-ev span, .gp-side-b { transition: none; }
+}
+
+/* Theme-dependent material tokens - the hero gauge, the controls, the theme
+   rocker. On BODY, not :root: a custom property substitutes where it is
+   DEFINED, so one declared on :root against var(--surface) resolves the LIGHT
+   surface even inside body.dark. The theme classes live on body, so these do
+   too - the same note --chart-bg carries. */
 body {
-  --dl-rim-hi:   color-mix(in oklch, white 55%, var(--glass-border));
-  --dl-rim:      var(--glass-bg);
-  --dl-rim-lo:   color-mix(in oklch, var(--ink) 12%, var(--glass-bg));
-  --dl-face-hi:  color-mix(in oklch, white 40%, var(--surface));
-  --dl-face-lo:  color-mix(in oklch, var(--ink) 7%, var(--surface-2));
-  --dl-edge:     color-mix(in oklch, white 78%, transparent);
-  --dl-grad:     color-mix(in oklch, var(--ink) 26%, transparent);
-  --dl-slot:     color-mix(in oklch, var(--ink) 24%, transparent);
-  --dl-channel:  color-mix(in oklch, var(--ink) 13%, var(--surface-2));
-  --dl-scale-band: color-mix(in oklch, var(--ink) 6%, transparent);
-  --dl-lip:        color-mix(in oklch, white 80%, transparent);
   --hg-well: color-mix(in oklch, var(--ink) 5%, var(--surface));
   --hg-cut:  color-mix(in oklch, var(--ink) 20%, transparent);
   --hg-lip:  color-mix(in oklch, white 85%, transparent);
@@ -629,16 +731,6 @@ body {
   --sw-pivot: color-mix(in oklch, var(--ink) 18%, transparent);
 }
 body.dark {
-  --dl-rim-hi:   color-mix(in oklch, white 26%, var(--glass-border));
-  --dl-rim-lo:   color-mix(in oklch, black 34%, var(--glass-bg));
-  --dl-face-hi:  color-mix(in oklch, white 9%, var(--surface-2));
-  --dl-face-lo:  color-mix(in oklch, black 26%, var(--surface));
-  --dl-edge:     color-mix(in oklch, white 40%, transparent);
-  --dl-grad:     color-mix(in oklch, white 30%, transparent);
-  --dl-slot:     color-mix(in oklch, white 16%, transparent);
-  --dl-channel:  color-mix(in oklch, black 40%, var(--surface));
-  --dl-scale-band: color-mix(in oklch, black 30%, transparent);
-  --dl-lip:        color-mix(in oklch, white 22%, transparent);
   --hg-well: color-mix(in oklch, black 30%, var(--surface));
   --hg-cut:  color-mix(in oklch, black 55%, transparent);
   --hg-lip:  color-mix(in oklch, white 13%, transparent);
@@ -652,113 +744,6 @@ body.dark {
   --sw-cap:   color-mix(in oklch, white 7%, var(--surface));
   --sw-well:  color-mix(in oklch, black 44%, var(--surface));
   --sw-pivot: color-mix(in oklch, black 58%, transparent);
-}
-/* ---- the dial's housing -------------------------------------------------
-   Glass rather than metal, and the site's own glass: the frosted recipe the
-   floating readouts and the pinned nav already share, so the dial is not the
-   one place a material appears once. Light runs from the top left through the
-   rim, the face and the grain alike - one source is the difference between an
-   object and a pile of gradients. */
-.dl-bezel { fill: url(#dl-rim); stroke: var(--glass-border); stroke-width: 0.4; }
-.dl-face  { fill: url(#dl-face); }
-.dl-edge  { stroke: url(#dl-edge); stroke-width: 0.5; }
-.dl-boss  { fill: url(#dl-rim); stroke: var(--glass-border); stroke-width: 0.22;
-            filter: drop-shadow(0.25px 0.4px 0.35px color-mix(in oklch, var(--ink) 30%, transparent)); }
-.dl-slot  { fill: var(--dl-slot); }
-/* The plate the marks are cut into: a shallow recess spanning exactly the
-   needle's travel, so the scale has an extent of its own and the ticks stop
-   floating on bare enamel. */
-.dl-scale-band { fill: none; stroke: var(--dl-scale-band); stroke-width: 4.2;
-                 stroke-linecap: round; }
-/* the lit lip of each groove, shifted by the instrument's one light direction */
-.dl-grad-lip .dl-grad, .dl-grad-lip .dl-grad.major, .dl-grad-lip .dl-grad.level {
-  stroke: var(--dl-lip);
-}
-/* the scale: two points a tick, six a long one, and level the longest mark on
-   the face - the reading the whole contest turns on */
-.dl-grad { stroke: var(--dl-grad); stroke-width: 0.28; stroke-linecap: butt; }
-.dl-grad.major { stroke-width: 0.45; stroke: color-mix(in oklch, var(--ink) 52%, transparent); }
-.dl-grad.level { stroke-width: 0.62; stroke: var(--ink); opacity: 0.72; }
-body.dark .dl-grad.major { stroke: color-mix(in oklch, white 52%, transparent); }
-body.dark .dl-grad.level { stroke: var(--ink); opacity: 0.9; }
-/* the needle is a moving part, so it throws a shadow onto the face - the one
-   place a reading gets any relief, and only because a needle sitting flat on
-   its own dial is the thing that looks wrong */
-.dl-needle-g {
-  filter: drop-shadow(0.35px 0.55px 0.4px color-mix(in oklch, var(--ink) 30%, transparent));
-}
-.dl-pivot-seat { fill: color-mix(in oklch, var(--ink) 16%, transparent); }
-.dl-pivot { fill: url(#dl-screw); stroke: color-mix(in oklch, var(--ink) 34%, transparent); stroke-width: 0.3; }
-/* blades keep their length and gain inner light rather than a machined face */
-.dl-bar {
-  stroke: color-mix(in oklch, white 26%, transparent); stroke-width: 0.3;
-  filter: drop-shadow(0 0.5px 1.1px color-mix(in oklch, var(--ink) 22%, transparent));
-}
-/* Bounce is light, so it wants a dark face to land on. At full strength on
-   pale enamel it stops reading as light and starts reading as a smudge, so
-   the paper theme takes about half what the dark one does. */
-.dl-bounce, .dl-bloom, .dl-grain { pointer-events: none; }
-.dl-bounce { opacity: 0.45; }
-.dl-bloom { opacity: 0.55; }
-body.dark .dl-bounce { opacity: 1; }
-body.dark .dl-bloom { opacity: 1; }
-
-@media (prefers-reduced-motion: reduce) {
-  /* the shadows are static; nothing here needs suppressing */
-}
-/* grabbable at all times now, including mid-replay */
-.dl-track { position: relative; height: 62px; cursor: ew-resize; touch-action: none; }
-.dl-track:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 3px; border-radius: 6px; }
-.dl-spark { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.dl-spark-50 {
-  stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 2 4; opacity: 0.8;
-}
-.dl-spark-ghost {
-  fill: none; stroke: var(--line); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round;
-}
-.dl-spark-run {
-  fill: none; stroke-width: 2.6; stroke-linejoin: round; stroke-linecap: round;
-}
-.dl-tick {
-  position: absolute; top: 0; bottom: 0; width: 1px; background: var(--ink-faint);
-  opacity: 0.5; transform: translateX(-0.5px);
-}
-.dl-tick.on { opacity: 0.9; background: var(--ink-3); }
-/* the playhead reads on the line, not beside it: a hairline for the month and
-   a dot at the value, carrying that month's challenger colour */
-.dl-head-rule {
-  position: absolute; top: 0; bottom: 0; width: 1px; background: var(--ink);
-  opacity: 0.28; transform: translateX(-0.5px);
-}
-.dl-head {
-  position: absolute; width: 9px; height: 9px; border-radius: 50%;
-  background: var(--ink); border: 2px solid var(--surface);
-  transform: translate(-50%, -50%);
-  box-shadow: 0 1px 4px color-mix(in oklch, var(--ink) 30%, transparent);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .dl-track:not(.playing) .dl-head,
-  .dl-track:not(.playing) .dl-head-rule { transition: left .12s ease, top .12s ease; }
-}
-
-.dl-foot { display: flex; align-items: flex-end; gap: 16px; }
-.dl-legend { flex: 1; font-size: 12px; line-height: 1.5; color: var(--ink-3); }
-.dl-replay {
-  flex: none; border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
-  padding: 6px 14px; font-family: var(--sans); font-size: 13px; font-weight: 600;
-  color: var(--ink-2); cursor: pointer;
-}
-.dl-replay:hover:not(:disabled) { color: var(--ink); border-color: var(--ink-3); }
-.dl-replay:disabled { opacity: 0.5; cursor: default; }
-
-@media (max-width: 560px) {
-  .dl-shell { padding: 26px 18px 18px; }
-  .dl-svg { width: 96%; }
-  .dl-month { font-size: 22px; }
-  .dl-foot { flex-direction: column; align-items: stretch; gap: 12px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .dl-backdrop { animation: none; }
 }
 /* shell-copy:dial */
 @media (prefers-reduced-motion: reduce) { .wm-glyph, .wm-glyph:hover, .wm-glyph:active { transition: none; transform: none; } }
@@ -1019,17 +1004,17 @@ a.pollster-link::after, a.pollster-method::after, a.np-link::after, a.tn-link::a
    a way a tint cannot. The .segmented track recesses so its active cell has
    something to stand proud of - that cell already carried a drop shadow, which
    is the idiom the rest of this follows. */
-.ha-chip, .legend-chip, .ap-popbtn, .dl-replay, .acc-spread {
+.ha-chip, .legend-chip, .ap-popbtn, .gp-btn, .acc-spread {
   box-shadow: inset 0 1px 0 var(--btn-lit),
               0 1px 1.5px var(--btn-shade),      /* contact */
               0 3px 6px -3px var(--btn-shade);   /* ambient - what makes it sit ON the page */
 }
-.ha-chip, .legend-chip, .ap-popbtn, .dl-replay, .acc-spread,
+.ha-chip, .legend-chip, .ap-popbtn, .gp-btn, .acc-spread,
 .seg-btn, .pg-check input {
   transition-property: color, border-color, background-color, opacity, transform, box-shadow;
 }
 .ha-chip:active, .legend-chip:active,
-.ap-popbtn:active, .dl-replay:active:not(:disabled), .acc-spread:active,
+.ap-popbtn:active, .gp-btn:active:not(:disabled), .acc-spread:active,
 .ap-popbtn.on, .ap-popbtn.open,
 /* a latching toggle that is ON is a button held in, which is a thing a tint
    alone cannot say */
@@ -1059,7 +1044,7 @@ a.pollster-link::after, a.pollster-method::after, a.np-link::after, a.tn-link::a
    cascade to all of them and the bevel silently never rendered. One extra
    element selector outranks a single class whatever the source order. */
 button.ha-chip, button.legend-chip,
-button.ap-popbtn, button.dl-replay, button.acc-spread {
+button.ap-popbtn, button.gp-btn, button.acc-spread {
   border-bottom-color: var(--btn-edge);
 }
 
@@ -4762,16 +4747,16 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
      controls block above; together they are the object meeting the paper. */
   .legend-chip:active, .ap-popbtn:active,
   .seg-btn:active, .ha-chip:active, .acc-spread:active,
-  .dl-replay:active:not(:disabled) { transform: translateY(1px) scale(0.985); }
+  .gp-btn:active:not(:disabled) { transform: translateY(1px) scale(0.985); }
   .exp-btn:active { transform: scale(0.965); }
   /* Fast in, slower out. A press that returns at the speed it went is a
      crossfade between two states; the asymmetry is what reads as a thing
      with weight being let go of. */
-  .legend-chip, .ap-popbtn, .seg-btn, .ha-chip, .dl-replay, .acc-spread {
+  .legend-chip, .ap-popbtn, .seg-btn, .ha-chip, .gp-btn, .acc-spread {
     transition-duration: .19s;
   }
   .legend-chip:active, .ap-popbtn:active, .acc-spread:active,
-  .seg-btn:active, .ha-chip:active, .dl-replay:active:not(:disabled) {
+  .seg-btn:active, .ha-chip:active, .gp-btn:active:not(:disabled) {
     transition-duration: .055s;
   }
   .exp-btn.open:active { transform: rotate(90deg) scale(0.965); }
