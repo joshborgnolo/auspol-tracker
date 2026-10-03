@@ -13,10 +13,11 @@
 //    12px sub at 1.35 = 42.83) stood 2.9px over the name stack (39.94) that
 //    sets Primary's line, so each row below the first slid 2.9px further.
 //    rd.css floors the row's first track at that stack.
-// Out of contract: Leadership on phones <=440px (its net-approval line
-// widens the figures column, so long client/cadence lines wrap a second
-// line under the pollster) and Primary at <=360px (its 150px mini-grid
-// does the same) - content wraps, not this reflow.
+// Leadership and narrow-phone Primary joined the contract the same day:
+// their wider figures squeezed the name column so client/cadence lines
+// wrapped in those facets only (now one line, ellipsized), and the 901-1100px
+// band wrapped Leadership's labelled net line (the label now hides under
+// the column head on desktop).
 // Mirrors ap-phcard-heights.mjs's harness (file:// build, puppeteer-core).
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
@@ -86,10 +87,8 @@ async function rung(vw, vh, touch) {
   const worst = Math.max(...tpp.rows.map((h, i) => Math.abs(h - pri.rows[i])));
   check(`${vw}px Latest rows: 2PP and Primary heights match row for row`, tpp.rows.length > 5 && worst < EPS,
         `${tpp.rows.length} rows, worst ${worst.toFixed(3)}px (2PP ${fmt(tpp.rows.slice(0, 3))}, Primary ${fmt(pri.rows.slice(0, 3))})`);
-  if (vw > 440) {
-    const worstL = Math.max(...tpp.rows.map((h, i) => Math.abs(h - lead.rows[i])));
-    if (vw >= 1280 || vw <= 900) check(`${vw}px Latest rows: Leadership matches too`, worstL < EPS, `worst ${worstL.toFixed(3)}px`);
-  }
+  const worstL = Math.max(...tpp.rows.map((h, i) => Math.abs(h - lead.rows[i])));
+  check(`${vw}px Latest rows: Leadership matches too`, worstL < EPS, `worst ${worstL.toFixed(3)}px`);
   if (vw > 1000) {
     await page.goto(`${PAGE}#allpolls`, { waitUntil: "domcontentloaded" });
     await page.waitForSelector(".rd-ap-tabs button", { timeout: 30000 });
@@ -105,7 +104,7 @@ async function rung(vw, vh, touch) {
   await page.close();
 }
 
-for (const [vw, vh, touch] of [[1440, 900, false], [1000, 900, false], [820, 1180, true], [430, 932, true], [390, 844, true], [375, 812, true]]) {
+for (const [vw, vh, touch] of [[1440, 900, false], [1000, 900, false], [820, 1180, true], [430, 932, true], [390, 844, true], [375, 812, true], [360, 780, true], [320, 640, true]]) {
   await rung(vw, vh, touch);
 }
 await browser.close();

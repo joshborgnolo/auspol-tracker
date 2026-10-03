@@ -735,6 +735,13 @@ body.rd .rd-pl-dash { color: var(--ink-faint); padding: 0 2px; }
 body.rd .rd-pl-tag { margin-left: 8px; font-size: 12px; font-weight: 600; }
 body.rd .rd-pl-none { font-size: 13px; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-pl-lead .rd-pl-main { font-size: 14px; }
+/* a desktop row sits under the "Preferred PM, net approval" head, so its
+   net line needs no label of its own - and the 210px figures track of the
+   901-1100px band can't hold the labelled three-leader line on one line:
+   it wrapped, and the row stood 10.7px taller in Leadership than in 2PP or
+   Primary, sliding every row below it on each facet switch. Phone rows
+   (no head) and the strip's hover card keep the label */
+@media (min-width: 901px) { body.rd .rd-pl-row > .rd-pl-c-figs .rd-pl-netl { display: none; } }
 body.rd .rd-pl-short, body.rd .rd-pl-foot1 { display: none; }
 body.rd .rd-pl-c-next.missed .rd-pl-main, body.rd .rd-pl-c-next.missed .rd-pl-sub { color: var(--mood-neg); }
 body.rd .rd-pl-exp {
@@ -843,6 +850,13 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
   }
   body.rd .rd-pl-row:hover { background: none; }
   body.rd .rd-pl-row > .rd-pl-c-name { grid-area: name; padding: 0; }
+  /* the client-and-rhythm line stays one line: the figures column is as
+     wide as each facet's figures (Leadership's net-approval line reaches
+     228px, Primary's grid 150px), so a squeezed name column wrapped it in
+     some facets and not others, and those rows stood 13.3px taller there -
+     every row below slid on the switch. It ellipsizes instead; the row's
+     expansion carries the release rhythm in full */
+  body.rd .rd-pl-row > .rd-pl-c-name .rd-pl-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   body.rd .rd-pl-row > .rd-pl-c-figs { grid-area: figs; padding: 0; align-items: flex-end; text-align: right; }
   body.rd .rd-pl-row > .rd-pl-c-tl { grid-area: tl; min-height: 36px; }
   body.rd .rd-pl-row > .rd-pl-c-latest, body.rd .rd-pl-row > .rd-pl-c-next, body.rd .rd-pl-row > .rd-pl-c-exp { display: none; }

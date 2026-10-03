@@ -205,7 +205,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       return (
         <div className="rd-pl-lead">
           <span className="rd-pl-main">{ppmTxt || <span className="rd-pl-none">No preferred-PM question</span>}</span>
-          <span className="rd-pl-sub">Net: Albanese {net(a.albNet)}, {opp} {net(a.taylorNet)}{a.hansonNet != null ? ", Hanson " + net(a.hansonNet) : ""}</span>
+          <span className="rd-pl-sub"><span className="rd-pl-netl">Net: </span>Albanese {net(a.albNet)}, {opp} {net(a.taylorNet)}{a.hansonNet != null ? ", Hanson " + net(a.hansonNet) : ""}</span>
         </div>
       );
     }
