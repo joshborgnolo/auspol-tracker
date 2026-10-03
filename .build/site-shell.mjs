@@ -86,17 +86,44 @@ export const SHELL_PAGES = [
 ];
 export const shellOptsFor = (file) => SHELL_PAGES.find((p) => p.file === file) || {};
 
-/* The main page's tabs (73de0c58…js TABS, reached by their hash) – the
-   views, and nothing else: the archives and the other satellites keep out
-   of it here, exactly as they do on the main page. */
-const TABS = [
-  { id: "snapshot", label: "Snapshot", href: "/#snapshot" },
-  // short/pinHide as the main page's TABS: the pinned phone bar's "Cycles",
-  // and the tab that yields to the docked score below 380px
-  { id: "cycles", label: "Past cycles", short: "Cycles", href: "/#cycles" },
-  { id: "allpolls", label: "All polls", href: "/#allpolls" },
-  { id: "info", label: "Info", href: "/#info", pinHide: true },
-];
+/* The main page's tabs, LIFTED from its own list rather than copied: the
+   const TABS in the newtracker's 73de0c58 tab-views asset is the one source
+   of truth, and the shell derives { id, label, href } from it at apply
+   time, so a label edit on the main page (the 2026-10-03 Snapshot → Now
+   rename that froze the old hand copy below) reaches every satellite with
+   the next apply. href is simply /#<id>. The views only – the archives and
+   the other satellites keep out of it here, exactly as they do on the main
+   page. short/pinHide stay shell-local rendering extras merged over by id
+   (the pinned phone bar's short label, and the tab that yields to the
+   docked score below 380px), as the main page's TABS. Throws like
+   shellCopy() when the mark vanishes, never a silent fallback: a main-page
+   TABS change the parser can't read must stop the apply, not ship a lie. */
+const mainTabs = (() => {
+  let cache = null;
+  return () => {
+    if (cache) return cache;
+    const dir = path.join(ROOT, ".build", "newtracker", "assets");
+    const file = fs.readdirSync(dir).filter((f) => /\.jsx?$/.test(f)).sort().find((f) => {
+      const s = fs.readFileSync(path.join(dir, f), "utf8");
+      return /const TABS = \[/.test(s) && /id: "snapshot", label: "/.test(s);
+    });
+    if (!file) throw new Error("site-shell: no asset in .build/newtracker/assets defines the main page's TABS");
+    const body = fs.readFileSync(path.join(dir, file), "utf8").match(/const TABS = \[([\s\S]*?)\n\s*\];/);
+    if (!body) throw new Error("site-shell: TABS array in " + file + " did not parse");
+    const tabs = [...body[1].matchAll(/\{ id: "([^"]+)", label: "([^"]+)"([\s\S]*?)\}/g)]
+      .map((m) => ({ id: m[1], label: m[2], href: "/#" + m[1],
+                     ...(/pinHide:\s*true/.test(m[3]) ? { pinHide: true } : {}),
+                     // the pinned phone bar's short label, the one extra the
+                     // shell adds beyond the main page's list
+                     ...(m[1] === "cycles" ? { short: "Cycles" } : {}) }));
+    if (!tabs.length || tabs[0].id !== "snapshot") {
+      throw new Error("site-shell: TABS parse in " + file + " produced no snapshot tab");
+    }
+    return (cache = tabs);
+  };
+})();
+const TABS = mainTabs();
+const SNAPSHOT_LABEL = TABS.find((t) => t.id === "snapshot").label;
 
 const SUN = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"></path></svg>';
 const MOON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.2 8.2 0 0 1 9.8 3.5a8.2 8.2 0 1 0 10.7 10.7Z"></path></svg>';
@@ -172,7 +199,7 @@ export function shellHeader({ tab } = {}) {
         ${tabs}
       </div>
       <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A slot that passes unrecorded counts up as overdue until the release is added"><span class="sh-tn-lab">Next</span></div>
-      <a class="sh-score" href="/#snapshot" hidden title="The latest two-party preferred – go to Snapshot"><span class="sh-eyebrow">2PP</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
+      <a class="sh-score" href="/#snapshot" hidden title="The latest two-party preferred – go to ${SNAPSHOT_LABEL}"><span class="sh-eyebrow">2PP</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
     </div>
   </div>
 </nav>`;
@@ -890,7 +917,7 @@ ${npProjectSrc()}
       score.querySelector(".sh-num-b").textContent = n.b.toFixed(1);
       score.querySelector(".sh-num-b").style.color = n.rival === "onp" ? "var(--onp)" : "var(--lnp)";
       score.querySelector(".sh-abbr-b").textContent = n.rival === "onp" ? "ON" : "L/NP";
-      score.title = "The latest two-party preferred, Labor v " + (n.rival === "onp" ? "One Nation" : "the Coalition") + " – go to Snapshot";
+      score.title = "The latest two-party preferred, Labor v " + (n.rival === "onp" ? "One Nation" : "the Coalition") + " – go to ${SNAPSHOT_LABEL}";
       score.hidden = false;
     }
     fillHead(n);

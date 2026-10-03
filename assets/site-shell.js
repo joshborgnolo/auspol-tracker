@@ -790,7 +790,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
       score.querySelector(".sh-num-b").textContent = n.b.toFixed(1);
       score.querySelector(".sh-num-b").style.color = n.rival === "onp" ? "var(--onp)" : "var(--lnp)";
       score.querySelector(".sh-abbr-b").textContent = n.rival === "onp" ? "ON" : "L/NP";
-      score.title = "The latest two-party preferred, Labor v " + (n.rival === "onp" ? "One Nation" : "the Coalition") + " – go to Snapshot";
+      score.title = "The latest two-party preferred, Labor v " + (n.rival === "onp" ? "One Nation" : "the Coalition") + " – go to Now";
       score.hidden = false;
     }
     fillHead(n);

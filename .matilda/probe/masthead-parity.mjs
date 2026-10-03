@@ -235,8 +235,14 @@ ok(/^Latest poll .+?, (today|yesterday|\d+ (days|weeks|months) ago), \d+ polls$/
    `compact names the newest poll as the main page's does (${satPhone.compactText})`);
 await sat.setViewport({ width: 1280, height: 900 });
 
-const satTabs = await sat.evaluate(() => [...document.querySelectorAll(".sh-tabs-set .sh-tab")].map((t) => t.textContent.trim()));
+const satTabs = await sat.evaluate(() => [...document.querySelectorAll(".sh-tabs-set .sh-tab")].map((t) => t.innerText.trim()));
 ok(satTabs.length === 4 && !/archives/i.test(satTabs.join("|")), "satellite tab bar: " + satTabs.join(" | "));
+/* the tab bar is LIFTED from the main page's TABS (site-shell.mjs mainTabs):
+   a rename on the main page (Snapshot → Now, 2026-10-03) must land here
+   verbatim with one apply, and this check is what fails if it didn't */
+const mainTabs = await page.evaluate(() => [...document.querySelectorAll(".tabs-set .tab")].map((t) => t.innerText.trim()));
+ok(JSON.stringify(satTabs) === JSON.stringify(mainTabs),
+   `tab labels match the main page's (main ${mainTabs.join(" | ")}, sat ${satTabs.join(" | ")})`);
 const tabType = await sat.evaluate(() => ({
   fam: getComputedStyle(document.querySelector(".sh-tabs .sh-tab")).fontFamily.slice(0, 40),
   size: getComputedStyle(document.querySelector(".sh-tabs .sh-tab")).fontSize }));
