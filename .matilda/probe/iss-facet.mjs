@@ -21,9 +21,11 @@
 //     reads as a superscript-ordinal ranking ("Cost of living 1st, housing
 //     2nd, crime 3rd") on ONE csub line; a wave with no ranking but
 //     cost-of-living ownership figures fills the line with the dictated
-//     "Issues unranked, but performance on cost of living assessed" -
-//     since 2026-10-03 a THREE-RUNG width ladder (full/mid/ask literals,
-//     CSS container queries, one displayed) read via the shown rung
+//     "Issues unranked, but trust on cost of living assessed" - since
+//     2026-10-03 a THREE-RUNG width ladder (full/mid/ask literals, CSS
+//     container queries, one displayed) read via the shown rung; the
+//     later same-day trust swap is what lets every shell >=320px hold
+//     the sentence on ONE line
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -426,9 +428,9 @@ await showAll(page3);
 // Same contract as the desktop rows: a card carries the one-line best-issue
 // sentence iff its top-issue cell is filled; a wave with NO ranking but
 // cost-of-living ownership figures (Resolve, YouGov, DemosAU) fills the same
-// line with the dictated placeholder "Issues unranked, but performance on
-// cost of living assessed"; SEC's best-party-only waves rightly have
-// neither. The sentence is a plain ranking with superscript ordinals
+// line with the dictated placeholder "Issues unranked, but trust on cost of
+// living assessed" (wording became "trust" on the same-day swap call);
+// SEC's best-party-only waves rightly have neither. The sentence is a plain ranking with superscript ordinals
 // and NO figures ("Cost of living 1st, housing 2nd, crime 3rd" - SENTENCE
 // CASE: only the leading letter of the first label is capital, every other
 // label lowercased; "Housing affordability"
@@ -444,14 +446,14 @@ const cardAnatomy = await page3.evaluate(() => {
   // the unranked placeholder is a three-rung WIDTH LADDER since 2026-10-03:
   // the wrapper .rd-ap-issph carries full/mid/ask copies of the sentence
   // and CSS container queries show exactly ONE (the longest that fits the
-  // card's text lane on one line: full 351.5px, mid 337.9px, ask 318.6px,
-  // measured at the 13px csub font). Everywhere below must read the
-  // DISPLAYED rung, not node counts.
+  // card's text lane on one line: full 304.1px, mid 290.5px, ask 271.1px,
+  // measured at the 13px csub font after the same-day performance->trust
+  // swap). Everywhere below must read the DISPLAYED rung, not node counts.
   const shown = (n) => getComputedStyle(n).display !== "none";
   const RUNGS = [
-    "Issues unranked, but performance on cost of living assessed",
-    "Issues unranked, but cost-of-living performance assessed",
-    "Issues unranked, but cost-of-living performance asked",
+    "Issues unranked, but trust on cost of living assessed",
+    "Issues unranked, but cost-of-living trust assessed",
+    "Issues unranked, but cost-of-living trust asked",
   ];
   const cards = [...document.querySelectorAll(".rd-ap-card")];
   const an = cards.map((c) => {

@@ -450,34 +450,39 @@ re-punctuated SEC's tail. FINAL contract:
   performance on cost of living assessed"') fills it with that
   dictated literal when `!it && iss && iss.own && iss.own.col` (col
   ownership was asked); SEC's pure best-party waves and iss-less
-  rows keep no sentence. Probe pins it by verbatim text
-  (`txt === "Issues unranked, but performance on cost of living
-  assessed"`), counted against the page's own data bundle
+  rows keep no sentence. Probe pins it by verbatim text against the
+  RUNGS literals, counted against the page's own data bundle
   (`exp.unrankedCol`); capsOk passes as written (sentence case).
   WIDTH LADDER (same day, three consecutive user calls — "if it
   overflows to two lines, reword… wording depends on screen width";
   "if that rewording doesn't do it, change 'assessed' to 'asked'";
-  "wraps to one line only on phones, all phones"): the placeholder
-  is now THREE rung divs in a `.rd-ap-issph` wrapper
-  (`container-type: inline-size`, rd.css next to `-sent`) and CSS
-  container queries show the longest that fits the card's text lane:
-  full 351.5px ("…performance on cost of living assessed") → mid
-  337.9px ("…cost-of-living performance assessed") → ask 318.6px
-  ("…performance asked"), tiers at 351.5/337.9 max-width against
-  measured lanes 280@320 / 300@340 / 320@360 / 350@390 / 361.8@402.
-  Scratch probe .matilda/probe-issph-ladder.mjs (13 checks): ask at
-  320/340/360, mid at 390, full at 402, ONE line at ≥360 —
-  the 320/340 lanes wrap all three rungs (nothing ≤300px fits at
-  the 13px csub font), told to the user as the hard exception to
-  "all phones". Container display rules come AFTER the `-sent {
-  display:block }` rule so equal specificity resolves by source
-  order. PROBE CONTRACT CHANGE: the card now carries three
-  `.rd-ap-csub` nodes per placeholder — iss-facet.mjs reads the
-  DISPLAYED rung (`getComputedStyle.display !== "none"`) for
+  "wraps to one line only on phones, all phones") THEN A FOURTH —
+  "actually, replace performance with trust, in all cases. that's
+  a better, more accurate word" (user's rationale verbatim — the
+  houses' ownership questions ask who voters trust): the
+  placeholder is THREE rung divs in a
+  `.rd-ap-issph` wrapper (`container-type: inline-size`, rd.css
+  next to `-sent`), container queries show the longest that fits
+  the card's text lane: full 304.1px ("Issues unranked, but trust
+  on cost of living assessed") → mid 290.5px ("…cost-of-living
+  trust assessed") → ask 271.1px ("…trust asked"), tiers at
+  max-width 304.1/290.5 against measured lanes 280@320 / 300@340 /
+  320@360 / 350@390 / 361.8@402. Scratch probe
+  .matilda/probe-issph-ladder.mjs: ask@320, mid@340, full from 360
+  up, and ONE LINE ON EVERY SHELL — "trust" is six letters
+  narrower than "performance" and that alone cleared the old
+  320/340px wraps, closing the earlier hard exception (the
+  performance rungs at 351.5/337.9/318.6px wrapped below 360px,
+  nothing ≤300px lane fit; aim now fully met). Container display
+  rules come AFTER the `-sent { display:block }` rule so equal
+  specificity resolves by source order. PROBE CONTRACT CHANGE
+  (still live): the card carries three `.rd-ap-csub` nodes per
+  placeholder — iss-facet.mjs reads the DISPLAYED rung
+  (`getComputedStyle.display !== "none"`) for
   sent/subs/csubSentOk and accepts any of the three literals
-  (RUNGS array). Legacy note (superseded by the ladder): the flat
-  full literal rendered TWO lines in the 360/390px shells and one
-  at 402px.
+  (RUNGS array, now the trust wordings). Legacy note (superseded
+  by the ladder): the flat full literal rendered TWO lines in the
+  360/390px shells and one at 402px.
 - `ISS_SENT_SHORT = { "Housing affordability": "housing" }` —
   module-level at rd-allpolls.jsx :186 (right after rdApX). The two
   label vocabularies differ (canonical data/issues.json stores

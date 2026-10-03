@@ -1503,7 +1503,7 @@ function RdAllPolls(P) {
         {th("Right", "dir.right", { color: "var(--mood-pos)" })}
         {th("Wrong", "dir.wrong", { color: "var(--mood-neg)" })}
         <span className="rd-ap-th">Unsure</span>
-        <span className="rd-ap-hpic"><span className="rd-ap-cap">Right direction or wrong track, %</span></span>
+        <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap">Right direction or wrong track, %</span></span>
         {th("Net", "dir.net", { right: true })}
       </>}
       {facet === "issues" && <>
@@ -1735,11 +1735,14 @@ function RdAllPolls(P) {
          same-day follow-ups: 'if it overflows to two lines, make the
          reword the wording… so wording depends on screen width', then
          'change "assessed" to "asked"', the aim stated as one line on
-         all phones - the container shows the longest of full 351.5px /
-         mid "…cost-of-living performance assessed" 337.9px / ask
-         "…performance asked" 318.6px that fits the card's text lane, via
-         two @container tiers at those widths; every phone ≥360px gets it
-         on one line, the 320/340px shells wrap even the ask rung); pure
+         all phones, then 'actually, replace performance with trust, in
+         all cases. that's a better, more accurate word' - the container
+         shows the longest of full "…trust on cost of living assessed"
+         304.1px / mid "…cost-of-living trust assessed" 290.5px / ask
+         "…trust asked" 271.1px that fits the card's text lane, via two
+         @container tiers at those widths; the trust wording cleared the
+         320/340px wraps the performance rungs suffered, so EVERY shell
+         320px and up now gets the sentence on one line); pure
          best-party waves (SEC) and iss-less ordinary rows keep no
          sentence at all */
       const unprompted = !!(iss && !iss.sal && iss.conc);
@@ -1760,9 +1763,9 @@ function RdAllPolls(P) {
         )}
         {!it && iss && iss.own && iss.own.col && (
           <div className="rd-ap-issph">
-            <div className="rd-ap-csub rd-ap-csub-sent rd-ap-issph-full">Issues unranked, but performance on cost of living assessed</div>
-            <div className="rd-ap-csub rd-ap-csub-sent rd-ap-issph-mid">Issues unranked, but cost-of-living performance assessed</div>
-            <div className="rd-ap-csub rd-ap-csub-sent rd-ap-issph-ask">Issues unranked, but cost-of-living performance asked</div>
+            <div className="rd-ap-csub rd-ap-csub-sent rd-ap-issph-full">Issues unranked, but trust on cost of living assessed</div>
+            <div className="rd-ap-csub rd-ap-csub-sent rd-ap-issph-mid">Issues unranked, but cost-of-living trust assessed</div>
+            <div className="rd-ap-csub rd-ap-csub-sent rd-ap-issph-ask">Issues unranked, but cost-of-living trust asked</div>
           </div>
         )}
         {ownDots.length > 0 && <div className="rd-ap-cpic">{pic}</div>}
