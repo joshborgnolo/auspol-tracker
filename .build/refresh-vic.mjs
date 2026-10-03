@@ -5,7 +5,9 @@
  * by .build/vic-watch.mjs), validates every row fail-hard, computes the
  * headline estimates and trend curves, and renders vic/index.html — a
  * GENERATED file, never hand-edited (the refresh-prediction.mjs pattern:
- * numbers composed here, the page a dumb renderer; static SVG, no page JS).
+ * numbers composed here; static SVG plus a small inline wiring script
+ * driving the hover cards and the dot↔table joins — JS enhances only,
+ * every dot, row and <title> exists in the static page).
  * Landing path per wave: this script, then
  *   bash .build/git-push-main.sh "<msg>" data/vic-polls.json vic/index.html
  * (vic/index.html rides its own file list, never shared SITE_FILES).
@@ -323,7 +325,7 @@ const tppSvg = (() => {
   const lines = segPaths(fr, segsOf(trend.tpp))
     .map((d) => `<path d="${d}" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>`).join("");
   const dots = tppRows.map((p) =>
-    `<circle cx="${fr.X(p.fwEnd)}" cy="${fr.Y(p.tpp2.alp)}" r="2.6" fill="var(${FIRM_CSS[p.firm] || "--oth"})">` +
+    `<circle data-wave="${p.firm}|${p.fwEnd}" cx="${fr.X(p.fwEnd)}" cy="${fr.Y(p.tpp2.alp)}" r="2.6" fill="var(${FIRM_CSS[p.firm] || "--oth"})">` +
     `<title>${esc(pollDotTitle(p, `Labor two-party ${fmt(p.tpp2.alp)}`))}</title></circle>`).join("");
   const last = [...trend.tpp].reverse().find(Boolean);
   const end = last ? endMarks(fr, [
@@ -359,7 +361,7 @@ const primSvg = (() => {
   for (const p of sorted) {
     const marks = [["alp", p.primary.alp], ["lnp", p.primary.lnp], ["onp", p.primary.onp], ["grn", p.primary.grn], ["oth", othOf(p)]];
     for (const [k, v] of marks) if (v != null)
-      body += `<circle cx="${fr.X(p.fwEnd)}" cy="${fr.Y(v)}" r="2.1" fill="${PRIM_SERIES.find(([kk]) => kk === k)[1]}" opacity="0.75">` +
+      body += `<circle data-wave="${p.firm}|${p.fwEnd}" data-v="${k}" cx="${fr.X(p.fwEnd)}" cy="${fr.Y(v)}" r="2.1" fill="${PRIM_SERIES.find(([kk]) => kk === k)[1]}" opacity="0.75">` +
         `<title>${esc(pollDotTitle(p, `${PARTY_NAME[k]} ${fmt(v)}`))}</title></circle>`;
   }
   // the certified 2022 result marks the left edge of each party's scale
@@ -399,14 +401,19 @@ for (let i = 0; i < pairOrder.length - 1; i++) {
   const a = pairOrder[i], b = pairOrder[i + 1];
   const mid = addDays(a.max, Math.round(daysBetween(a.max, b.min) / 2));
   const ra = rolesOf(a.pair), rb = rolesOf(b.pair);
-  if (ra[0] !== rb[0]) boundaries.push({ date: mid, who: NAMES[rb[0]] || rb[0], role: "pm" });
-  if (ra[1] !== rb[1]) boundaries.push({ date: mid, who: NAMES[rb[1]] || rb[1], role: "opp" });
+  if (ra[0] !== rb[0]) boundaries.push({ date: mid, who: NAMES[rb[0]] || rb[0], from: NAMES[ra[0]] || ra[0], role: "pm", fromD: a.max, toD: b.min });
+  if (ra[1] !== rb[1]) boundaries.push({ date: mid, who: NAMES[rb[1]] || rb[1], from: NAMES[ra[1]] || ra[1], role: "opp", fromD: a.max, toD: b.min });
 }
+// the boundary date is a computed midpoint between measured eras — the
+// description names both leaders and the honest handover window instead
+const eraDesc = (b) => `${b.who} replaced ${b.from} as ${b.role === "pm" ? "premier" : "opposition leader"} — the handover window, ${dateShort(b.fromD)}–${dateShort(b.toD)}`;
 const boundarySvg = (fr) => boundaries.map((b) => {
   const x = fr.X(b.date);
   const y = b.role === "pm" ? fr.MT + 8 : fr.H - fr.MB - 6;
-  return `<line x1="${x}" y1="${fr.MT}" x2="${x}" y2="${fr.H - fr.MB}" stroke="var(--line-2)" stroke-width="1"/>` +
-    `<text x="${x + 4}" y="${y}" font-size="9" fill="var(--ink-faint)">${b.who}</text>`;
+  return `<g class="vp-era" data-wave="era|${b.date}|${b.role}"><title>${esc(eraDesc(b))}</title>` +
+    `<line x1="${x}" y1="${fr.MT}" x2="${x}" y2="${fr.H - fr.MB}" stroke="transparent" stroke-width="14"/>` +
+    `<line x1="${x}" y1="${fr.MT}" x2="${x}" y2="${fr.H - fr.MB}" stroke="var(--line-2)" stroke-width="1"/>` +
+    `<text x="${x + 4}" y="${y}" font-size="9" fill="var(--ink-faint)">${b.who}</text></g>`;
 }).join("");
 
 // ---- chart 3: preferred premier ----
@@ -427,7 +434,7 @@ const ppmSvg = (() => {
     body += segPaths(fr, leaderSegs(ppmSeries[key]))
       .map((d) => `<path d="${d}" fill="none" stroke="${colour}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>`).join("");
     body += ppmSeries[key].map((p) =>
-      `<circle cx="${fr.X(p.t)}" cy="${fr.Y(p.v)}" r="2.2" fill="${colour}">` +
+      `<circle data-wave="ppm|${p.firm}|${p.t}|${p.leader}" cx="${fr.X(p.t)}" cy="${fr.Y(p.v)}" r="2.2" fill="${colour}">` +
       `<title>${esc(`${firmLabel[p.firm] || p.firm}, ${ldrSpan({ fwStart: p.fwStart, date: p.t })} — ${NAMES[p.leader] || p.leader} ${fmt(p.v)} (preferred premier${p.sample ? `, n ${p.sample.toLocaleString("en-AU")}` : ""})`)}</title></circle>`).join("");
     const lp = ppmSeries[key][ppmSeries[key].length - 1];
     if (lp) ends.push({ x: fr.X(lp.t), v: lp.v, textFill: `var(--${key === "pm" ? "alp" : key === "opp" ? "lnp" : "onp"}-text)`, label: fmt(lp.v) });
@@ -451,7 +458,7 @@ const netSvg = (() => {
     body += segPaths(fr, leaderSegs(pts))
       .map((d) => `<path d="${d}" fill="none" stroke="${colour}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>`).join("");
     body += pts.map((p) =>
-      `<circle cx="${fr.X(p.t)}" cy="${fr.Y(p.v)}" r="2.2" fill="${colour}">` +
+      `<circle data-wave="net|${p.firm}|${p.t}|${p.leader}" cx="${fr.X(p.t)}" cy="${fr.Y(p.v)}" r="2.2" fill="${colour}">` +
       `<title>${esc(`${firmLabel[p.firm] || p.firm}, ${ldrSpan({ fwStart: p.fwStart, date: p.t })} — ${NAMES[p.leader] || p.leader} net satisfaction ${snet(p.v)}${nTitle(p.sample)}`)}</title></circle>`).join("");
     const lp = pts[pts.length - 1];
     if (lp) ends.push({ x: fr.X(lp.t), v: lp.v, textFill: textTok, label: snet(lp.v).replace(/^\+/, "") });
@@ -500,6 +507,88 @@ const ppmStrip = (() => {
 const netLatestPm = netsPm[netsPm.length - 1], netLatestOpp = netsOpp[netsOpp.length - 1];
 const netStrip = `<b>Net satisfaction, latest:</b> ${netLatestPm ? `${NAMES[netLatestPm.leader] || netLatestPm.leader} ${snet(netLatestPm.v)}` : ""}${netLatestPm && netLatestOpp ? " · " : ""}${netLatestOpp ? `${NAMES[netLatestOpp.leader] || netLatestOpp.leader} ${snet(netLatestOpp.v)}` : ""}${apprRows.length ? ` — ${firmLabel[apprRows[apprRows.length - 1].firm] || apprRows[apprRows.length - 1].firm}, fieldwork to ${dateShort(apprRows[apprRows.length - 1].date)}` : ""}.`;
 
+// ---- next-expected-polls strip: median release cadence per windowed house,
+// projected from the published waves in the census (derived, never hand-fed)
+const median = (xs) => {
+  if (!xs.length) return null;
+  const a = [...xs].sort((x, y) => x - y);
+  const m = a.length >> 1;
+  return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+};
+const endsByFirm = new Map();
+for (const p of sorted) {
+  if (!endsByFirm.has(p.firm)) endsByFirm.set(p.firm, []);
+  endsByFirm.get(p.firm).push(p.fwEnd);
+}
+const nextCards = head.firms.map((f) => {
+  const ends = endsByFirm.get(f) || [];
+  const gaps = [];
+  for (let i = 1; i < ends.length; i++) {
+    const g = daysBetween(ends[i - 1], ends[i]);
+    if (g > 0) gaps.push(g);
+  }
+  const med = gaps.length ? Math.round(median(gaps)) : null;
+  const last = ends[ends.length - 1];
+  return med == null
+    ? { f, nWaves: ends.length, med }
+    : { f, nWaves: ends.length, med, next: addDays(last, med), diff: daysBetween(asOf, addDays(last, med)) };
+}).sort((a, b) => (a.next || "9999").localeCompare(b.next || "9999"));
+const nextBadge = (c) => c.med == null ? "cadence not measurable yet"
+  : c.next > ELECTION_DATE ? `then: after election day`
+  : c.diff > 0 ? `expected in ~${c.diff} days`
+  : c.diff === 0 ? "expected about now"
+  : `${-c.diff} ${c.diff === -1 ? "day" : "days"} overdue`;
+const nextCardsHtml = nextCards.map((c) => `      <div class="vp-nx" data-firm="${c.f}">
+        <b>${esc(firmLabel[c.f] || c.f)}</b>
+        ${c.med == null
+          ? `<span>${c.nWaves === 1 ? "first published wave so far —" : "cadence not measurable yet"}</span>`
+          : `<span>median gap ~${c.med} days across ${c.nWaves} ${c.nWaves === 1 ? "wave" : "waves"}</span>\n        <span>next around ${dateShort(c.next)}</span>`}
+        <em>${nextBadge(c)}</em>
+      </div>`).join("\n");
+const nextStrip = `  <section class="vp-next" aria-label="Next expected polls">
+    <h2 class="vp-next-h">Next expected polls</h2>
+    <p class="vp-next-sub">Each house in the current window, its median gap between published waves, and when its next release falls due — one slot a house. Election day is fixed at Saturday, ${dateLabel(ELECTION_DATE)}, ${daysToGo} days out.</p>
+    <div class="vp-next-grid">
+${nextCardsHtml}
+    </div>
+  </section>`;
+
+// ---- wave records for the hover card + dot↔table wiring: every plotted
+// dot's data-wave key maps to its full record, text pre-formatted here
+const waveRecs = {};
+for (const p of polls) {
+  const oth = othOf(p);
+  waveRecs[`${p.firm}|${p.fwEnd}`] = {
+    f: p.firmRaw, s: fwTitle(p), n: p.sample || 0, row: 1,
+    prim: {
+      alp: +p.primary.alp.toFixed(1), lnp: +p.primary.lnp.toFixed(1), grn: +p.primary.grn.toFixed(1),
+      ...(p.primary.onp != null ? { onp: +p.primary.onp.toFixed(1) } : {}),
+      ...(oth != null ? { oth: +oth.toFixed(1) } : {}),
+    },
+    ...(p.tpp2?.alp != null ? { two: `Labor two-party ${fmt(p.tpp2.alp)} · Coalition ${fmt(+(100 - p.tpp2.alp).toFixed(1))}` } : {}),
+  };
+}
+for (const l of leadership) {
+  if (l.series === "preferredPremier") {
+    for (const [k, v] of Object.entries(l.values || {})) {
+      if (v == null || !NAMES[k]) continue;
+      waveRecs[`ppm|${l.firm}|${l.date}|${k}`] = {
+        f: firmLabel[l.firm] || l.firm, s: ldrSpan(l), n: l.sample || 0,
+        val: `${NAMES[k]} ${fmt(v)}`, kind: "preferred premier",
+      };
+    }
+  } else {
+    waveRecs[`net|${l.firm}|${l.date}|${l.leader}`] = {
+      f: firmLabel[l.firm] || l.firm, s: ldrSpan(l), n: l.sample || 0,
+      val: `${NAMES[l.leader] || l.leader} ${snet(l.net)}`, kind: "net satisfaction",
+    };
+  }
+}
+for (const b of boundaries) waveRecs[`era|${b.date}|${b.role}`] = { txt: eraDesc(b) };
+// < cannot occur in these records; guard anyway so a hostile record can
+// never break out of the inline script
+const REC_JSON = JSON.stringify(waveRecs).replace(/</g, "\\u003c");
+
 const firmLegend = [...new Set(tppRows.map((p) => p.firm))]
   .map((f) => `<span class="vp-lg"><i style="background:var(${FIRM_CSS[f] || "--oth"})"></i>${firmLabel[f]}</span>`).join("\n      ") +
   `\n      <span class="vp-lg"><i style="background:var(--ink);width:14px;height:2px;border-radius:1px"></i>Trailing blend</span>`;
@@ -518,7 +607,7 @@ const pollRows = [...sorted].reverse().map((p) => {
     ? `<a class="vp-x" href="${p.sourceUrl}">${p.firmRaw}</a>`
     : p.firmRaw;
   const client = p.client ? ` <span class="vp-client">${p.client}</span>` : "";
-  return `<tr><td class="l">${name}${client}</td><td>${lbl}${p.approxDate ? "*" : ""}</td><td>${p.sample ? p.sample.toLocaleString("en-AU") : "—"}</td>` +
+  return `<tr id="wave-${p.firm}-${p.fwEnd}"><td class="l">${name}${client}</td><td>${lbl}${p.approxDate ? "*" : ""}</td><td>${p.sample ? p.sample.toLocaleString("en-AU") : "—"}</td>` +
     `<td>${fmt(p.primary.alp)}</td><td>${fmt(p.primary.lnp)}</td><td>${fmt(p.primary.grn)}</td><td>${fmt(p.primary.onp)}</td><td>${fmt(othOf(p))}</td>` +
     `<td class="vp-tpp">${p.tpp2?.alp != null ? fmt(p.tpp2.alp) : "—"}</td></tr>`;
 }).join("\n        ");
@@ -687,6 +776,30 @@ body {
 }
 .vp-latest b { color: var(--ink); font-weight: 600; }
 
+/* ------- next-expected-polls strip (the main page's predictor, in vic vocabulary) ------- */
+.vp-next { margin: 24px 0 4px; }
+.vp-next .vp-next-h { margin: 0 0 6px; padding-top: 12px; }
+.vp-next-sub { font-size: 13px; line-height: 1.55; color: var(--ink-3); margin: 0 0 10px; }
+.vp-next-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.vp-nx { border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px 8px; }
+.vp-nx b { display: block; font-size: 13px; font-weight: 600; color: var(--ink); }
+.vp-nx span { display: block; margin-top: 2px; font-size: 12px; line-height: 1.45; color: var(--ink-3); }
+.vp-nx em { display: block; margin-top: 5px; font-style: normal; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+@media (max-width: 540px) { .vp-next-grid { grid-template-columns: 1fr; } }
+
+/* ------- hover card + dot↔table wiring ------- */
+.vp-chart circle[data-wave] { cursor: pointer; }
+.vp-tip {
+  position: fixed; z-index: 40; max-width: 252px; padding: 9px 11px;
+  font-size: 12.5px; line-height: 1.5; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(22, 18, 12, 0.2); pointer-events: none;
+}
+.vp-tip[hidden] { display: none; }
+.vp-tip-hint { display: block; margin-top: 5px; font-size: 11px; color: var(--ink-faint); }
+.vp-table tbody tr.vp-glow td { background: var(--line-2); }
+.vp-table tbody tr.vp-glow td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+
 /* ------- charts ------- */
 .vp-chart { margin: 16px 0 6px; }
 .vp-chart svg { display: block; width: 100%; height: auto; }
@@ -738,6 +851,8 @@ p.vp-tnote { font-size: 12.5px; line-height: 1.55; color: var(--ink-3); margin: 
   </div>
   <p class="vp-scope">${primNote}</p>
   <p class="vp-latest">${latestStrip}</p>
+
+${nextStrip}
 
   <h2>Two-party preferred</h2>
   <p>Every figure here is a pollster’s own published two-party preferred — Labor versus Coalition — never one this page constructs from first preferences. Why that rule exists is explained below.</p>
@@ -832,6 +947,94 @@ p.vp-tnote { font-size: 12.5px; line-height: 1.55; color: var(--ink-3); margin: 
 
   <p class="ss-note">Figures on this page are aggregates of published polling — estimates, not predictions. Vicpoll is independent and unofficial, with no affiliation to any pollster, party or candidate. Assembled ${dateLabel(asOf)}.</p>
 </main>
+<div class="vp-tip" role="status" hidden></div>
+<script>
+/* hover cards (main-page tooltip surface) + dot↔table wiring, wave-keyed.
+   Enhances only: with no JS the page keeps every dot, row and <title>. */
+(function () {
+  var REC = ${REC_JSON};
+  var tip = document.querySelector(".vp-tip");
+  if (!tip) return;
+  var PARTY = { alp: "Labor", lnp: "Coalition", onp: "One Nation", grn: "Greens", oth: "Others" };
+  var pinKey = null, glowEl = null, glowTimer = null;
+  function escH(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function cardFor(el) {
+    var key = el.getAttribute("data-wave");
+    var r = key && REC[key];
+    if (!r) return null;
+    if (r.txt) return escH(r.txt);
+    var bits = [];
+    if (r.val) bits.push(r.val + " " + r.kind);
+    else {
+      var pv = el.getAttribute("data-v");
+      if (pv && r.prim && r.prim[pv] != null) bits.push(PARTY[pv] + " " + r.prim[pv]);
+      else if (r.two) bits.push(r.two);
+    }
+    if (r.n) bits.push("n " + Number(r.n).toLocaleString("en-AU"));
+    var out = "<b>" + escH(r.f) + "</b>" + (r.s ? ", " + escH(r.s) : "") + " — " + bits.map(escH).join(" · ");
+    if (r.row) out += '<span class="vp-tip-hint">Click the dot to find this wave in the table.</span>';
+    return out;
+  }
+  function show(el, x, y) {
+    var html = cardFor(el);
+    if (!html) return;
+    tip.innerHTML = html;
+    tip.hidden = false;
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var left = x + 14;
+    if (left + w > window.innerWidth - 8) left = x - w - 14;
+    if (left < 8) left = 8;
+    var top = y - h - 12;
+    if (top < 8) top = y + 16;
+    if (top + h > window.innerHeight - 8) top = window.innerHeight - h - 8;
+    tip.style.left = left + "px";
+    tip.style.top = top + "px";
+  }
+  function hide() { tip.hidden = true; }
+  function clearGlow() {
+    if (glowTimer) { clearTimeout(glowTimer); glowTimer = null; }
+    if (glowEl) { glowEl.classList.remove("vp-glow"); glowEl = null; }
+  }
+  function plotted(e) {
+    return e.target && e.target.closest ? e.target.closest("circle[data-wave], g[data-wave]") : null;
+  }
+  document.addEventListener("pointerover", function (e) {
+    if (pinKey) return;
+    var el = plotted(e);
+    if (el) show(el, e.clientX, e.clientY); else hide();
+  });
+  document.addEventListener("pointerdown", function (e) {
+    var el = plotted(e);
+    if (el) {
+      pinKey = el.getAttribute("data-wave");
+      show(el, e.clientX, e.clientY);
+    } else if (pinKey) {
+      pinKey = null;
+      hide();
+    }
+  });
+  document.addEventListener("click", function (e) {
+    var el = plotted(e);
+    if (!el) return;
+    var key = el.getAttribute("data-wave");
+    var r = key && REC[key];
+    if (!r || !r.row) return;
+    var row = document.getElementById("wave-" + key.split("|").join("-"));
+    if (!row) return;
+    clearGlow();
+    row.classList.add("vp-glow");
+    glowEl = row;
+    row.scrollIntoView({ behavior: "smooth", block: "center" });
+    glowTimer = setTimeout(clearGlow, 7000);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    pinKey = null;
+    hide();
+    clearGlow();
+  });
+})();
+</script>
 </body>
 </html>
 `;

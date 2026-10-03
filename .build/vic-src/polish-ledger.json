@@ -15,7 +15,10 @@
     "2026-10-03T21:09:02.206Z",
     "2026-10-03T21:23:04.994Z",
     "2026-10-03T21:24:44.042Z",
-    "2026-10-03T21:29:59.877Z"
+    "2026-10-03T21:29:59.877Z",
+    "2026-10-03T21:40:40.634Z",
+    "2026-10-03T21:40:40.671Z",
+    "2026-10-03T21:53:12.009Z"
   ],
   "gaps": {
     "data:scope-firms-miscounted": {
@@ -195,8 +198,10 @@
       "seen": [
         "2026-10-03T21:09:02.190Z"
       ],
-      "missed": 1,
-      "status": "open"
+      "missed": 2,
+      "status": "closed",
+      "closed": "2026-10-03T21:40:40.654Z",
+      "how": "quiet"
     }
   },
   "runs": [
@@ -472,6 +477,67 @@
       ],
       "verdict": "pass",
       "finished": "2026-10-03T21:31:52.114Z"
+    },
+    {
+      "started": "2026-10-03T21:40:40.634Z",
+      "rounds": [
+        {
+          "round": 1,
+          "started": "2026-10-03T21:40:40.654Z",
+          "builder": {
+            "exit": 0,
+            "summary": "hero-duo-no-countdown verified closed (b98c6d0); shipped D14–D17: hover cards, dot↔table wave keys, era hovers, next-polls strip — probe 85/85"
+          },
+          "builderScopeViolations": [
+            ".matilda/skills/auto-skill-auspol-vic-satellite-plan/SKILL.md"
+          ],
+          "gate": {
+            "ok": true,
+            "steps": [
+              {
+                "name": "refresh-vic",
+                "ok": true,
+                "code": 0,
+                "tail": "VIC_STATUS {\"ran\":true,\"asOf\":\"2026-10-04\",\"daysToGo\":55,\"polls\":64,\"withTpp\":42,\"threeParty\":4,\"leadership\":87,\"tppBlend\":46.17,\"lnpBlend\":53.83,\"headN2pp\":5,\"headWindow\":60,\"headPolls\":7,\"prim\":{\"alp\":24.5,\"lnp\":28.75,\"onp\":22.96,\"grn\":13.71,\"oth\":10.2},\"changed\":false,\"wrote\":[],\"dry\":false}"
+              },
+              {
+                "name": "validate",
+                "ok": true,
+                "code": 0,
+                "tail": "  primary-sum   cyclePolls.2025 #295 2025-03-30 · Essential – Σ shares = 95.0 (basis: Primaries exclude undecided with no rebase to 100 (sums 92–97).) |   primary-sum   cyclePolls.2025 #306 2025-04-14 · Essential – Σ shares = 96.0 (basis: Primaries exclude undecided with no rebase to 100 (sums 92–97).) |   primary-sum   cyclePolls.2025 #325 2025-05-01 · Ipsos – Σ shares = 95.0 (basis: Primaries ex"
+              },
+              {
+                "name": "site-shell-check",
+                "ok": true,
+                "code": 0,
+                "tail": "site shell current on all 11 pages"
+              },
+              {
+                "name": "probe-pack",
+                "ok": true,
+                "code": 0,
+                "tail": "VP_AUDIT {\"checks\":85,\"failed\":[],\"daysSinceNewest\":6}"
+              },
+              {
+                "name": "npm-test",
+                "ok": true,
+                "code": 0,
+                "tail": "B6 invalid/retry: ok | B7 key/breaker: ok | test-vic-polish: all ok"
+              }
+            ]
+          },
+          "reviewer": {
+            "exit": 0,
+            "verdict": "pass",
+            "gaps": 0,
+            "attempts": 1
+          },
+          "openAfter": [],
+          "finished": "2026-10-03T21:54:42.121Z"
+        }
+      ],
+      "verdict": "pass",
+      "finished": "2026-10-03T21:54:42.121Z"
     }
   ]
 }
