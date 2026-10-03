@@ -4466,7 +4466,7 @@ body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 208px) minmax(0, 208px) minmax(0, 300px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 176px) minmax(0, 136px) minmax(0, 136px) minmax(0, 336px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint);
   box-sizing: border-box; min-height: 57px;  }
 body.rd .rd-ap-hrow > * { min-width: 0; }
@@ -4579,13 +4579,13 @@ body.rd .rd-ap-hnets { align-self: end; }
 body.rd .rd-ap-netcell { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; padding-right: 4px; }
 body.rd .rd-ap-dnum { display: flex; flex-direction: column; gap: 1px; font-size: 15px; color: var(--ink-2); }
 body.rd .rd-ap-dnum b { font-weight: 600; }
+body.rd .rd-ap-issbest > b { font-size: 15px; font-weight: 600; }
 body.rd .rd-ap-dbar { position: absolute; left: 14px; right: 14px; top: 50%; height: 16px; margin-top: -8px; display: flex; }
 body.rd .rd-ap-dbar i { display: block; flex-basis: 0; min-width: 0; }
 body.rd .rd-ap-dbar i.u, body.rd .rd-ap-dbar i.u + i { border-left: 2px solid var(--line); }
 body.rd .rd-ap-dbar i:first-child { border-radius: 2px 0 0 2px; }
 body.rd .rd-ap-dbar i:last-child { border-radius: 0 2px 2px 0; }
 body.rd .rd-ap-dbar i.u { background: var(--line); }
-body.rd .rd-ap-d2i { display: flex; flex-direction: column; justify-content: center; gap: 6px; min-width: 0; }
 body.rd .rd-ap-ciss .rd-ap-dnum > .rd-ap-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 body.rd .rd-ap-empty { padding: 28px 12px; font-size: 14px; color: var(--ink-2); }
 body.rd .rd-ap-tip {
@@ -4675,7 +4675,7 @@ body.rd .rd-apd-issrow > b { font-weight: 600; text-align: right; font-variant-n
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 176px) minmax(0, 176px) minmax(0, 260px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 148px) minmax(0, 116px) minmax(0, 116px) minmax(0, 300px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-long { display: none; }
 }
 body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
@@ -4684,7 +4684,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
-  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 148px) minmax(0, 148px) minmax(0, 1fr) 0 28px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 120px) minmax(0, 96px) minmax(0, 96px) minmax(0, 1fr) 72px 28px; }
   body.rd .rd-ap-n, body.rd .rd-ap-hrow > .rd-ap-th:nth-child(3) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
@@ -60565,12 +60565,13 @@ function NextPollTicker({
       el.style.setProperty("--tn-shift", shift.toFixed(1) + "px");
       setFit(k);
     };
-    compute();
+    const raf = requestAnimationFrame(compute);
     const settle = setTimeout(compute, 420);
     const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(compute) : null;
     if (ro && el.parentElement) ro.observe(el.parentElement);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(compute);
     return () => {
+      cancelAnimationFrame(raf);
       clearTimeout(settle);
       if (ro) ro.disconnect();
     };
@@ -79986,12 +79987,29 @@ function RdAllPolls(P) {
     right: true
   })), facet === "issues" && React.createElement(React.Fragment, null, th("Top issue", "iss.topv", {
     title: "The issue most voters said matters most"
-  }), th("Best on it", "iss.bestv", {
-    title: "The party most voters rate best on that issue"
   }), React.createElement("span", {
     className: "rd-ap-th",
-    title: "The 2nd- and 3rd-most-named issues voters said matter most, with the share naming each"
-  }, "2nd and 3rd top issues"), React.createElement("span", null)), React.createElement("span", null));
+    title: "The 2nd-most-named issue voters said matters most, with the share naming it"
+  }, "2nd"), React.createElement("span", {
+    className: "rd-ap-th",
+    title: "The 3rd-most-named issue voters said matters most, with the share naming it"
+  }, "3rd"), React.createElement("span", {
+    className: "rd-ap-hpic",
+    "aria-hidden": "true"
+  }, React.createElement("span", {
+    className: "rd-ap-cap"
+  }, "Best on the top issue, % of all respondents"), React.createElement("span", {
+    className: "rd-ap-in"
+  }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
+    key: v,
+    className: "rd-ap-tk",
+    style: {
+      left: pdx(v) + "%"
+    }
+  }, v, v === 40 ? "%" : "")))), th("Best on it", "iss.bestv", {
+    right: true,
+    title: "The party most voters rate best on that issue"
+  })), React.createElement("span", null));
   const pollsterCell = p => React.createElement("span", {
     role: "rowheader",
     className: "rd-ap-who"
@@ -80364,20 +80382,45 @@ function RdAllPolls(P) {
     } else if (facet === "issues") {
       const iss = p.iss || null;
       const top3 = iss ? (iss.sal || iss.conc || []).slice(0, 3) : [];
-      const nxt = top3.slice(1, 3);
       const it = iss ? window.issTopOf(iss) : null;
       const ib = iss ? window.issBestOf(iss) : null;
       const im = ib ? window.ISS_PARTY_META[ib.who] || [ib.who, ib.who, null] : null;
-      figs = React.createElement(React.Fragment, null, React.createElement("span", {
+      const issCell = (t, suffix) => React.createElement("span", {
         role: "cell",
         className: "rd-ap-dnum"
-      }, it ? React.createElement(React.Fragment, null, React.createElement("b", null, rdApNum(it[1])), React.createElement("span", {
+      }, t ? React.createElement(React.Fragment, null, React.createElement("b", null, rdApNum(t[1])), React.createElement("span", {
         className: "rd-ap-sub"
-      }, it[0], !(iss && iss.sal) && iss && iss.conc ? ", unprompted" : "")) : React.createElement("span", {
+      }, t[0], suffix || "")) : React.createElement("span", {
         className: "rd-ap-none"
-      }, "\u2014")), React.createElement("span", {
+      }, "\u2014"));
+      figs = React.createElement(React.Fragment, null, issCell(it, !(iss && iss.sal) && iss && iss.conc ? ", unprompted" : null), issCell(top3[1] || null), issCell(top3[2] || null));
+      const own = iss && iss.top ? iss.own && iss.own[iss.top] || iss.bp || null : null;
+      const ownLab = iss && iss.top ? D.issues && D.issues.labels && D.issues.labels[iss.top] || iss.top : null;
+      const ownDots = own ? RD_AP_PRIM.filter(k => k.id !== "oth" && own[k.id] != null).sort((a, b) => own[b.id] - own[a.id]) : [];
+      const ariaBest = ownDots.length ? "Rated best on " + (ownLab || "the issue") + ": " + ownDots.map(k => (window.ISS_PARTY_META[k.id] || [k.id])[0] + " " + rdApNum(own[k.id])).join(", ") + ", shares of all respondents" : "No best-party reading this wave";
+      pic = React.createElement("span", {
+        className: "rd-ap-pic",
+        role: "img",
+        "aria-label": ariaBest
+      }, React.createElement("span", {
+        className: "rd-ap-in"
+      }, [0, 10, 20, 30, 40].map(v => React.createElement("i", {
+        key: v,
+        className: "rd-ap-gl",
+        style: {
+          left: pdx(v) + "%"
+        }
+      })), ownDots.map(k => React.createElement("i", {
+        key: k.id,
+        className: "rd-ap-dot",
+        style: {
+          left: pdx(own[k.id]) + "%",
+          background: k.dot
+        }
+      }))));
+      val = React.createElement("span", {
         role: "cell",
-        className: "rd-ap-dnum"
+        className: "rd-ap-netcell rd-ap-issbest"
       }, ib ? React.createElement(React.Fragment, null, React.createElement("b", {
         style: im[2] ? {
           color: im[2]
@@ -80386,18 +80429,7 @@ function RdAllPolls(P) {
         className: "rd-ap-sub"
       }, rdApNum(ib.v), " on it")) : React.createElement("span", {
         className: "rd-ap-none"
-      }, "\u2014")));
-      pic = nxt.length ? React.createElement("span", {
-        role: "cell",
-        className: "rd-ap-d2i"
-      }, nxt.map(nx => React.createElement("span", {
-        key: nx[0],
-        className: "rd-ap-dnum"
-      }, React.createElement("b", null, rdApNum(nx[1])), React.createElement("span", {
-        className: "rd-ap-sub"
-      }, nx[0])))) : React.createElement("span", {
-        className: "rd-ap-pic"
-      });
+      }, "\u2014"));
       right1 = it ? React.createElement("b", {
         className: "rd-ap-pairfig"
       }, rdApNum(it[1])) : React.createElement("span", {
@@ -80405,9 +80437,13 @@ function RdAllPolls(P) {
       }, "\u2014");
       body = React.createElement(React.Fragment, null, it && React.createElement("div", {
         className: "rd-ap-csub"
-      }, it[0], " ", React.createElement("b", null, rdApNum(it[1]))), nxt.length > 0 && React.createElement("div", {
+      }, it[0], " ", React.createElement("b", null, rdApNum(it[1]))), top3.length > 1 && React.createElement("div", {
         className: "rd-ap-csub"
-      }, nxt.map((x, i) => `${i === 0 ? "2nd" : "3rd"} ${x[0]} `).join(""), React.createElement("b", null, nxt.map(x => rdApNum(x[1])).join(", "))), ib && React.createElement("div", {
+      }, top3.slice(1, 3).map((x, i) => React.createElement(React.Fragment, {
+        key: x[0]
+      }, i > 0 && " · ", i === 0 ? "2nd" : "3rd", " ", x[0], " ", React.createElement("b", null, rdApNum(x[1]))))), ownDots.length > 0 && React.createElement("div", {
+        className: "rd-ap-cpic"
+      }, pic), ib && React.createElement("div", {
         className: "rd-ap-csub"
       }, "Best on it: ", React.createElement("b", {
         style: im[2] ? {
@@ -80590,10 +80626,18 @@ function RdAllPolls(P) {
       color: "var(--mood-neg)"
     }
   }, "wrong track"), ", %")), facet === "issues" && React.createElement("span", {
-    className: "rd-ap-hpic rd-ap-hdir"
+    className: "rd-ap-hpic"
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Share naming each issue as one that matters, %")));
+  }, "Best on the top issue, % of all respondents"), React.createElement("span", {
+    className: "rd-ap-in"
+  }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
+    key: v,
+    className: "rd-ap-tk",
+    style: {
+      left: pdx(v) + "%"
+    }
+  }, v, v === 40 ? "%" : "")))));
   const NAV = [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagree"], ["house-lean", "Lean"], ["flow-drift", "Flows"]];
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
@@ -83908,6 +83952,13 @@ function SnapshotView({
   setTppBasis
 }) {
   const rangeId = window.AP.rd ? "all" : heroRange;
+  const [tail, setTail] = useState(snapshotTailArmed);
+  React.useEffect(() => {
+    if (!snapshotTailArmed) {
+      snapshotTailArmed = true;
+      setTail(true);
+    }
+  }, []);
   return React.createElement(React.Fragment, null, React.createElement(Hero, {
     rangeId: heroRange,
     setRangeId: setRangeId,
@@ -83924,7 +83975,7 @@ function SnapshotView({
     setTppBasis: setTppBasis,
     tppMatchup: tppMatchup,
     setTppMatchup: setTppMatchup
-  }), React.createElement(NextPollsMemo, null), React.createElement(LeadershipMemo, {
+  }), React.createElement(NextPollsMemo, null), tail && React.createElement(React.Fragment, null, React.createElement(LeadershipMemo, {
     rangeId: rangeId
   }), React.createElement(DirectionMemo, {
     rangeId: rangeId
@@ -83936,8 +83987,9 @@ function SnapshotView({
     rangeId: rangeId
   }), React.createElement(UndecidedMemo, {
     rangeId: rangeId
-  }));
+  })));
 }
+let snapshotTailArmed = false;
 class ViewBoundary extends React.Component {
   constructor(props) {
     super(props);

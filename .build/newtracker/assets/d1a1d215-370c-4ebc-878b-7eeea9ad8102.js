@@ -225,12 +225,18 @@ function NextPollTicker({ showScore }) {
       el.style.setProperty("--tn-shift", shift.toFixed(1) + "px");
       setFit(k);
     };
-    compute();
+    /* The first pass goes in a frame, not the commit: geometry reads
+       mid-commit force a full synchronous layout of the whole document,
+       inside the app's first-commit long task - it measured ~50ms of the
+       refresh-time static-summary window, all to park items the tn-none
+       start state already hides. The bar simply stands empty for the one
+       frame instead; an over-filled one still never reaches the screen. */
+    const raf = requestAnimationFrame(compute);
     const settle = setTimeout(compute, 420);
     const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(compute) : null;
     if (ro && el.parentElement) ro.observe(el.parentElement);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(compute);
-    return () => { clearTimeout(settle); if (ro) ro.disconnect(); };
+    return () => { cancelAnimationFrame(raf); clearTimeout(settle); if (ro) ro.disconnect(); };
   }, [itemsKey, showScore]);
 
   if (!items.length) return null;

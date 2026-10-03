@@ -1922,6 +1922,21 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
      design it replaced keeps its page-wide range, set at the top of its
      hero. */
   const rangeId = window.AP.rd ? "all" : heroRange;
+  /* The analytical tail mounts one pass LATE, not in the first commit.
+     body.js - the flag that retires the static article - lands on that
+     first commit, and rendering all six analysis sections inside it kept
+     that one commit above 200ms of main-thread work: that is the
+     refresh-time window in which the static page sits on screen. Commit
+     the top of the page alone, have the tail follow in the very next
+     pass, and the window halves; everything deferred lies below the
+     fold, so the second commit has landed long before the reader
+     scrolls to it. snapshotTailArmed pins the deferral to FIRST mount
+     only - tab switches and design flips remount this view, and those
+     paths must draw whole, not pop. */
+  const [tail, setTail] = useState(snapshotTailArmed);
+  React.useEffect(() => {
+    if (!snapshotTailArmed) { snapshotTailArmed = true; setTail(true); }
+  }, []);
   return (
     <>
       <Hero rangeId={heroRange} setRangeId={setRangeId} showScatter={showScatter}
@@ -1934,22 +1949,27 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
           between National direction and the vote-by-group analysis, a
           schedule in the middle of the reading */}
       <NextPollsMemo />
-      <LeadershipMemo rangeId={rangeId} />
-      <DirectionMemo rangeId={rangeId} />
-      {/* who votes for whom: age, gender, education, place, and home */}
-      <DemographicsMemo rangeId={rangeId} />
-      {/* who One Nation's surge is made of */}
-      <OnSourcesMemo rangeId={rangeId} />
-      {/* what voters say matters, and which party they trust with it -
-          the reasons behind the vote, before the page turns to those who
-          haven't settled on one */}
-      <IssuesMemo rangeId={rangeId} />
-      {/* closes the page: the electorate's mood rather than its party
-          choice - how many can't say who they would vote for */}
-      <UndecidedMemo rangeId={rangeId} />
+      {tail && <>
+        <LeadershipMemo rangeId={rangeId} />
+        <DirectionMemo rangeId={rangeId} />
+        {/* who votes for whom: age, gender, education, place, and home */}
+        <DemographicsMemo rangeId={rangeId} />
+        {/* who One Nation's surge is made of */}
+        <OnSourcesMemo rangeId={rangeId} />
+        {/* what voters say matters, and which party they trust with it -
+            the reasons behind the vote, before the page turns to those who
+            haven't settled on one */}
+        <IssuesMemo rangeId={rangeId} />
+        {/* closes the page: the electorate's mood rather than its party
+            choice - how many can't say who they would vote for */}
+        <UndecidedMemo rangeId={rangeId} />
+      </>}
     </>
   );
 }
+
+/* One page load arms the snapshot tail exactly once - see SnapshotView. */
+let snapshotTailArmed = false;
 
 /* Error boundaries. Before these, ANY render throw anywhere in the tree
    unmounted the whole createRoot root, leaving the reader a blank page
