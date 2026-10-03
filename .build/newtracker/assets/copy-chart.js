@@ -1225,6 +1225,37 @@
     });
   };
 
+  /* Plain "C" copies the chart (or expanded poll breakdown) the pointer is
+     over. pointerover keeps the claim, so it never outlives the pointer
+     leaving the card, and each press CLICKS the card's own copy button:
+     one pipeline, one flash, one error path, and the keydown's transient
+     activation reaches the clipboard write exactly as a mouse click's
+     would. copy-poll.js buttons carry a different class, so one handler
+     serves both card kinds, and the guard is the text-field one the page's
+     letter keys share, not the arrow keys' body-focus one - a poll card is
+     reached BY CLICKING its row, which leaves the row focused, and a
+     body-only veto would disarm the key on exactly the card it is for.
+     Touch-first devices - no pointer to claim with - don't install it. */
+  if (!(window.matchMedia && window.matchMedia("(hover: none)").matches)) {
+    let hoverCopy = null;
+    document.addEventListener("pointerover", (e) => {
+      hoverCopy = e.target && e.target.closest ? e.target.closest(".chart, .poll-detail") : null;
+    });
+    document.addEventListener("keydown", (e) => {
+      if (!hoverCopy || (e.key !== "c" && e.key !== "C") || e.defaultPrevented || e.repeat) return;
+      if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.tagName === "SELECT" || a.isContentEditable)) return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!hoverCopy.isConnected || !hoverCopy.getClientRects().length) { hoverCopy = null; return; }
+      const btn = hoverCopy.querySelector(":scope > .chart-copy-btn, :scope > .poll-copy-btn");
+      if (!btn) return;
+      e.preventDefault();
+      btn.click();
+    });
+  }
+
   /* plain scripts run before the mount script renders any chart, and React
      later mutates hosts (tab switches, range toggles) - watch and re-attach */
   let queued = false;

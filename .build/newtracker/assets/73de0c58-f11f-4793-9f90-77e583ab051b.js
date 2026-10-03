@@ -2016,6 +2016,21 @@ class RootBoundary extends React.Component {
   render() { return this.state.err ? null : this.props.children; }
 }
 
+/* The sheet "?" opens: the page's own table of what it listens for, kept
+   short enough that every row earns its place. The keys are sentence-case
+   in here; rd.css does the chiclet chrome. ⌥ is Alt on non-Apple
+   keyboards, said once beside the one shortcut that needs it. */
+const KBD_ROWS = [
+  { keys: ["←", "→"], what: "Turn between Now, All polls, Past cycles and Info" },
+  { keys: ["⌥", "D"], what: "Dark mode, on or off — ⌥ is Alt on a PC" },
+  { keys: ["C"], what: "Copy the chart or poll breakdown under the pointer as an image" },
+  { keys: ["←", "→"], what: "Walk a card's tabs or chips while the pointer is over it" },
+  { keys: ["1–9"], what: "Pick a numbered party or term on a chips row" },
+  { keys: ["Space"], what: "In the all-polls two-party table, flip the matchup" },
+  { keys: ["P"], what: "In that table, published figures only" },
+  { keys: ["?"], what: "This sheet" },
+];
+
 function App() {
   /* body.js is the "app has mounted" flag (see the boot block below), so it
      is added by the first COMMIT, from this layout effect, and not by the
@@ -2250,7 +2265,7 @@ function App() {
       if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
       const a = document.activeElement;
       if (a && a !== document.body && a !== document.documentElement) return;
-      if (document.querySelector(".rd-qpanel, .term-pop")) return;
+      if (document.querySelector(".rd-qpanel, .term-pop, .rd-keysheet")) return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       const { tab: cur, goTab: go } = swipeRef.current;
@@ -2432,6 +2447,69 @@ function App() {
 
   const cycleTheme = () => setTweak("theme", isDark ? "light" : "dark");
 
+  /* Option+D flips the theme from anywhere on the page. e.code, not e.key:
+     on a Mac the combo types ∂ into e.key, which would take layout-by-layout
+     character tables to catch, while the physical key is D on every layout.
+     A held key autorepeats straight through the view-transition crossfade,
+     so repeats are ignored rather than strobed, and a text field keeps its
+     Option characters for its own typing. The toggle is read through a ref
+     refreshed every render (the swipeRef pattern above): the listener binds
+     once, but the closure it calls must see this render's theme, or the
+     second keypress flips from the first render's value and nothing moves. */
+  const themeKeyRef = useRef(cycleTheme);
+  themeKeyRef.current = cycleTheme;
+  React.useEffect(() => {
+    const onKey = (e) => {
+      if (e.defaultPrevented || e.repeat || e.metaKey || e.ctrlKey || e.shiftKey || !e.altKey) return;
+      if (e.code !== "KeyD" && e.key !== "d" && e.key !== "D" && e.key !== "∂") return;
+      const a = document.activeElement;
+      if (a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.tagName === "SELECT" || a.isContentEditable)) return;
+      e.preventDefault();
+      themeKeyRef.current();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  /* "?" opens the keys sheet from anywhere: the discoverable answer to the
+     page listening to keys at all. The toggle is state, not intent, so "?"
+     closes as well as opens, and the handler re-registers with keySheet so
+     Escape and "?" both read the current state rather than the mount
+     render's. Escape closes only the sheet - a term popover or method
+     popover open beneath it keeps its own Escape contract, and the page-
+     turn arrows are vetoed on ".rd-keysheet" like the other popups.
+     Opening hands the dialog focus: every key claim on the page guards on
+     body focus, so the sheet being focused stands them all down at once;
+     closing returns focus to whatever held it. In a text field "?" is
+     typing, and the sheet leaves it alone. */
+  const [keySheet, setKeySheet] = useState(false);
+  const keySheetEl = useRef(null);
+  React.useEffect(() => {
+    const onKey = (e) => {
+      if (e.defaultPrevented || e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
+      const a = document.activeElement;
+      if (a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.tagName === "SELECT" || a.isContentEditable)) return;
+      if (e.key === "?") {
+        e.preventDefault();
+        e.stopPropagation();
+        setKeySheet((v) => !v);
+      } else if (keySheet && e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        setKeySheet(false);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [keySheet]);
+  React.useEffect(() => {
+    if (!keySheet) return undefined;
+    const back = document.activeElement;
+    const el = keySheetEl.current;
+    if (el) el.focus();
+    return () => { if (back && back.focus && back.isConnected) back.focus(); };
+  }, [keySheet]);
+
   return (
     <div className="page">
       {/* Twelve tab stops (masthead, theme, the next-poll links, the docked
@@ -2499,6 +2577,28 @@ function App() {
         </div>
         <MethodNote onInfo={tab === "info" ? null : () => goTab("info")} key={"foot-" + rd} />
       </main>
+
+      {keySheet && (
+        <div className="rd-keysheet-scrim" onClick={() => setKeySheet(false)}>
+          <div className="rd-keysheet" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts"
+               tabIndex={-1} ref={keySheetEl} onClick={(e) => e.stopPropagation()}>
+            <div className="rd-keysheet-head">
+              <h2 className="rd-keysheet-t">Keyboard shortcuts</h2>
+              <button type="button" className="rd-keysheet-x" aria-label="Close"
+                      onClick={() => setKeySheet(false)}>×</button>
+            </div>
+            <dl className="rd-keysheet-rows">
+              {KBD_ROWS.map((r) => (
+                <div className="rd-keysheet-row" key={r.what}>
+                  <dt>{r.keys.map((k) => <kbd className="rd-keysheet-key" key={k}>{k}</kbd>)}</dt>
+                  <dd>{r.what}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="rd-keysheet-foot">Hover gives a card its keys; a live text selection and a blinking caret keep every key quiet.</p>
+          </div>
+        </div>
+      )}
 
       <TweaksPanel>
         <TweakSection label="Appearance" />

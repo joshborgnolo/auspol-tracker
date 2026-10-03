@@ -2171,6 +2171,31 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   .term-pop-scrim { align-items: flex-end; padding: 0; }
   .term-pop { width: 100%; border-radius: 14px 14px 0 0; max-height: 80vh; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
 }
+.rd-keysheet-scrim { position: fixed; inset: 0; z-index: 900; background: oklch(0.2 0.01 60 / 0.18);
+  display: flex; align-items: center; justify-content: center; padding: 16px; }
+.rd-keysheet { width: min(480px, 100%); max-height: min(78vh, 640px); overflow: auto;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: 0 10px 40px oklch(0.2 0.02 60 / 0.22); padding: 18px 20px 16px; outline: none; }
+.rd-keysheet-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.rd-keysheet-t { font: 600 20px/1.25 var(--serif); color: var(--ink); margin: 0; flex: 1; }
+.rd-keysheet-x { border: 0; background: none; font: 400 26px/1 var(--sans); color: var(--ink-3);
+  cursor: pointer; padding: 0 4px; position: relative; }
+.rd-keysheet-x::after { content: ""; position: absolute; inset: -10px; }
+.rd-keysheet-x:hover { color: var(--ink); }
+.rd-keysheet-rows { margin: 0 0 12px; }
+.rd-keysheet-row { display: flex; align-items: baseline; gap: 14px; padding: 7px 0;
+  border-top: 1px solid var(--line); }
+.rd-keysheet-row > dt { flex: none; width: 88px; display: flex; gap: 4px; }
+.rd-keysheet-key { font: 600 12px/1 var(--sans); color: var(--ink); background: var(--surface-2);
+  border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px;
+  padding: 5px 6px 4px; white-space: nowrap; }
+.rd-keysheet-row > dd { margin: 0; font: 400 14px/1.45 var(--sans); color: var(--ink-2); }
+.rd-keysheet-foot { margin: 0; font: 400 12px/1.5 var(--sans); color: var(--ink-3);
+  border-top: 1px solid var(--line); padding-top: 10px; }
+@media (max-width: 640px) {
+  .rd-keysheet-scrim { align-items: flex-end; padding: 0; }
+  .rd-keysheet { width: 100%; border-radius: 14px 14px 0 0; max-height: 80vh; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+}
 .view-how { margin: 0 0 16px; }
 .hint-how { margin: 8px 2px 0; }
 .hint-how > .table-hint { margin-top: 8px; }
@@ -52553,6 +52578,28 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
       host.appendChild(btn);
     });
   };
+  if (!(window.matchMedia && window.matchMedia("(hover: none)").matches)) {
+    let hoverCopy = null;
+    document.addEventListener("pointerover", e => {
+      hoverCopy = e.target && e.target.closest ? e.target.closest(".chart, .poll-detail") : null;
+    });
+    document.addEventListener("keydown", e => {
+      if (!hoverCopy || e.key !== "c" && e.key !== "C" || e.defaultPrevented || e.repeat) return;
+      if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.tagName === "SELECT" || a.isContentEditable)) return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!hoverCopy.isConnected || !hoverCopy.getClientRects().length) {
+        hoverCopy = null;
+        return;
+      }
+      const btn = hoverCopy.querySelector(":scope > .chart-copy-btn, :scope > .poll-copy-btn");
+      if (!btn) return;
+      e.preventDefault();
+      btn.click();
+    });
+  }
   let queued = false;
   const queueAttach = () => {
     if (queued) return;
@@ -84237,6 +84284,31 @@ class RootBoundary extends React.Component {
     return this.state.err ? null : this.props.children;
   }
 }
+const KBD_ROWS = [{
+  keys: ["←", "→"],
+  what: "Turn between Now, All polls, Past cycles and Info"
+}, {
+  keys: ["⌥", "D"],
+  what: "Dark mode, on or off — ⌥ is Alt on a PC"
+}, {
+  keys: ["C"],
+  what: "Copy the chart or poll breakdown under the pointer as an image"
+}, {
+  keys: ["←", "→"],
+  what: "Walk a card's tabs or chips while the pointer is over it"
+}, {
+  keys: ["1–9"],
+  what: "Pick a numbered party or term on a chips row"
+}, {
+  keys: ["Space"],
+  what: "In the all-polls two-party table, flip the matchup"
+}, {
+  keys: ["P"],
+  what: "In that table, published figures only"
+}, {
+  keys: ["?"],
+  what: "This sheet"
+}];
 function App() {
   React.useLayoutEffect(() => {
     document.body.classList.add("js");
@@ -84415,7 +84487,7 @@ function App() {
       if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
       const a = document.activeElement;
       if (a && a !== document.body && a !== document.documentElement) return;
-      if (document.querySelector(".rd-qpanel, .term-pop")) return;
+      if (document.querySelector(".rd-qpanel, .term-pop, .rd-keysheet")) return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
       const {
@@ -84579,6 +84651,49 @@ function App() {
     }
   }, [t.layout, t.accent, isDark]);
   const cycleTheme = () => setTweak("theme", isDark ? "light" : "dark");
+  const themeKeyRef = useRef(cycleTheme);
+  themeKeyRef.current = cycleTheme;
+  React.useEffect(() => {
+    const onKey = e => {
+      if (e.defaultPrevented || e.repeat || e.metaKey || e.ctrlKey || e.shiftKey || !e.altKey) return;
+      if (e.code !== "KeyD" && e.key !== "d" && e.key !== "D" && e.key !== "∂") return;
+      const a = document.activeElement;
+      if (a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.tagName === "SELECT" || a.isContentEditable)) return;
+      e.preventDefault();
+      themeKeyRef.current();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+  const [keySheet, setKeySheet] = useState(false);
+  const keySheetEl = useRef(null);
+  React.useEffect(() => {
+    const onKey = e => {
+      if (e.defaultPrevented || e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
+      const a = document.activeElement;
+      if (a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.tagName === "SELECT" || a.isContentEditable)) return;
+      if (e.key === "?") {
+        e.preventDefault();
+        e.stopPropagation();
+        setKeySheet(v => !v);
+      } else if (keySheet && e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        setKeySheet(false);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [keySheet]);
+  React.useEffect(() => {
+    if (!keySheet) return undefined;
+    const back = document.activeElement;
+    const el = keySheetEl.current;
+    if (el) el.focus();
+    return () => {
+      if (back && back.focus && back.isConnected) back.focus();
+    };
+  }, [keySheet]);
   return React.createElement("div", {
     className: "page"
   }, React.createElement("a", {
@@ -84660,7 +84775,37 @@ function App() {
   }))), React.createElement(MethodNote, {
     onInfo: tab === "info" ? null : () => goTab("info"),
     key: "foot-" + rd
-  })), React.createElement(TweaksPanel, null, React.createElement(TweakSection, {
+  })), keySheet && React.createElement("div", {
+    className: "rd-keysheet-scrim",
+    onClick: () => setKeySheet(false)
+  }, React.createElement("div", {
+    className: "rd-keysheet",
+    role: "dialog",
+    "aria-modal": "true",
+    "aria-label": "Keyboard shortcuts",
+    tabIndex: -1,
+    ref: keySheetEl,
+    onClick: e => e.stopPropagation()
+  }, React.createElement("div", {
+    className: "rd-keysheet-head"
+  }, React.createElement("h2", {
+    className: "rd-keysheet-t"
+  }, "Keyboard shortcuts"), React.createElement("button", {
+    type: "button",
+    className: "rd-keysheet-x",
+    "aria-label": "Close",
+    onClick: () => setKeySheet(false)
+  }, "\xD7")), React.createElement("dl", {
+    className: "rd-keysheet-rows"
+  }, KBD_ROWS.map(r => React.createElement("div", {
+    className: "rd-keysheet-row",
+    key: r.what
+  }, React.createElement("dt", null, r.keys.map(k => React.createElement("kbd", {
+    className: "rd-keysheet-key",
+    key: k
+  }, k))), React.createElement("dd", null, r.what)))), React.createElement("p", {
+    className: "rd-keysheet-foot"
+  }, "Hover gives a card its keys; a live text selection and a blinking caret keep every key quiet."))), React.createElement(TweaksPanel, null, React.createElement(TweakSection, {
     label: "Appearance"
   }), React.createElement(TweakRadio, {
     label: "Theme",

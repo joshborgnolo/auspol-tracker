@@ -3659,6 +3659,33 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   .term-pop-scrim { align-items: flex-end; padding: 0; }
   .term-pop { width: 100%; border-radius: 14px 14px 0 0; max-height: 80vh; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
 }
+/* The app's "?" sheet borrows the term-pop chrome wholesale (scrim, card,
+   close button) so the two read as one family. */
+.rd-keysheet-scrim { position: fixed; inset: 0; z-index: 900; background: oklch(0.2 0.01 60 / 0.18);
+  display: flex; align-items: center; justify-content: center; padding: 16px; }
+.rd-keysheet { width: min(480px, 100%); max-height: min(78vh, 640px); overflow: auto;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: 0 10px 40px oklch(0.2 0.02 60 / 0.22); padding: 18px 20px 16px; outline: none; }
+.rd-keysheet-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.rd-keysheet-t { font: 600 20px/1.25 var(--serif); color: var(--ink); margin: 0; flex: 1; }
+.rd-keysheet-x { border: 0; background: none; font: 400 26px/1 var(--sans); color: var(--ink-3);
+  cursor: pointer; padding: 0 4px; position: relative; }
+.rd-keysheet-x::after { content: ""; position: absolute; inset: -10px; }
+.rd-keysheet-x:hover { color: var(--ink); }
+.rd-keysheet-rows { margin: 0 0 12px; }
+.rd-keysheet-row { display: flex; align-items: baseline; gap: 14px; padding: 7px 0;
+  border-top: 1px solid var(--line); }
+.rd-keysheet-row > dt { flex: none; width: 88px; display: flex; gap: 4px; }
+.rd-keysheet-key { font: 600 12px/1 var(--sans); color: var(--ink); background: var(--surface-2);
+  border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px;
+  padding: 5px 6px 4px; white-space: nowrap; }
+.rd-keysheet-row > dd { margin: 0; font: 400 14px/1.45 var(--sans); color: var(--ink-2); }
+.rd-keysheet-foot { margin: 0; font: 400 12px/1.5 var(--sans); color: var(--ink-3);
+  border-top: 1px solid var(--line); padding-top: 10px; }
+@media (max-width: 640px) {
+  .rd-keysheet-scrim { align-items: flex-end; padding: 0; }
+  .rd-keysheet { width: 100%; border-radius: 14px 14px 0 0; max-height: 80vh; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+}
 .view-how { margin: 0 0 16px; }
 .hint-how { margin: 8px 2px 0; }
 .hint-how > .table-hint { margin-top: 8px; }
