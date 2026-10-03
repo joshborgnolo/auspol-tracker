@@ -1,6 +1,6 @@
 ---
 name: auspol-disclaimer-copy
-description: auspol-tracker — the footer estimates-only disclaimer is a SECOND two-homes copy pair (MethodNote .disclaimer JSX in the 73de0c58 asset + <p class="ss-note"> in build.mjs buildStaticSummary) — edit both together; per-home apostrophe style (literal curly vs &#8217; entity); line-wrapped source breaks naive one-space greps. Learned 2026-09-03 (commit 8ef7495). UPDATE 2026-09-24: a THIRD home – shellFooter's sh-disc in .build/site-shell.mjs, the satellites' shared colophon (copied into each satellite's <!--shell:footer--> region by node .build/site-shell.mjs; never hand-edit the pages).
+description: auspol-tracker — the footer estimates-only disclaimer is a SECOND two-homes copy pair (MethodNote .disclaimer JSX in the 73de0c58 asset + <p class="ss-note"> in build.mjs buildStaticSummary) — edit both together; per-home apostrophe style (literal curly vs &#8217; entity); line-wrapped source breaks naive one-space greps. Learned 2026-09-03 (commit 8ef7495). UPDATE 2026-09-24: a THIRD home – shellFooter's sh-disc in .build/site-shell.mjs, the satellites' shared colophon (copied into each satellite's <!--shell:footer--> region by node .build/site-shell.mjs; never hand-edit the pages). UPDATE 2026-10-03: that third home went DERIVATIVE – shellFooter's words are lifted out of MethodNote by site-shell.mjs's mainChrome parse (the masthead's lift covering the colophon), so the pair is a TWO-home pair again; the satellites follow through the shell, and site-shell.js re-applies the sentence at load from auspol-now.json's copy block.
 source: auto-skill
 extracted_at: '2026-09-03T01:30:00.000Z'
 ---
@@ -13,12 +13,20 @@ an unofficial aggregate …", shipped `8ef7495`). The user skill
 separate pair it doesn't cover. Rule 4 of MATILDA.md applies: copy edits
 move in both homes or not at all.
 
-## UPDATE 2026-09-24 – a third home
+## UPDATE 2026-09-24 – a third home ⟹ derivative as of 2026-10-03
 
 The satellites now close on the main page's colophon, disclaimer included, from
 `shellFooter` in `.build/site-shell.mjs` (class `sh-disc`, literal curly apostrophes,
-Oxford comma as the main page). Edit it with the other two, run
-`node .build/site-shell.mjs`, and commit the rewritten satellite pages with them.
+Oxford comma as the main page).
+
+**UPDATE 2026-10-03: back to a TWO-home pair.** ShellFooter no longer holds the
+words: they are lifted out of MethodNote (home 1) by site-shell.mjs's
+`mainChrome()` — the masthead's lift covering the colophon — and reach the
+satellites in the shell's usual two ways (the baked `<!--shell:footer-->`
+regions on apply, and the `copy` block of auspol-now.json re-applied by
+site-shell.js at load). Editing this pair means editing the two pipeline
+homes below; the satellites and their drift-pinned pages derive with no
+separate step (`npm test`'s test-site-shell pins the lift).
 
 ## The two homes
 

@@ -737,13 +737,14 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     var els = document.querySelectorAll(sel);
     for (var i = 0; i < els.length; i++) els[i].textContent = v;
   };
-  /* The masthead's TEXT follows every build too, not just its figures: the
-     copy block build.mjs lifts out of the main page's own asset (mainChrome)
-     is re-applied here, so a rename of anything the main masthead says
-     reaches every satellite with the next build, no page commits. The baked
-     copy below the fold stays as the no-JS read. Words, artwork and the tab
-     list only – structure stays the shell's own. Runs BEFORE fillHead, whose
-     value pass writes into the fresh spans. */
+  /* The header's TEXT AND the colophon's words follow every build too, not
+     just the figures: the copy block build.mjs lifts out of the main page's
+     own asset (mainChrome) is re-applied here, so a rename of anything the
+     main masthead or footer says reaches every satellite with the next
+     build, no page commits. The baked copy below the fold stays as the no-JS
+     read. Words, artwork and the tab list only – structure stays the shell's
+     own. Runs BEFORE fillHead, whose value pass writes into the fresh
+     spans. */
   var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
   var TAB_EXTRAS = {"cycles":{"short":"Cycles"}};
   var fillCopy = function (cp) {
@@ -823,6 +824,23 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     }
     var eb = document.querySelector(".sh-score .sh-eyebrow");
     if (eb && cp.score) eb.textContent = cp.score.eyebrow;
+    /* the colophon: sentences only, into the shell's own markup. The
+       feedback page was baked without its own invite – its .sh-fb carries
+       no .sh-fb-link, and the baked link's absence is the variant's
+       witness. Archives pages were baked with no .sh-arch row at all. */
+    var F = cp.footer;
+    if (F) {
+      var lede = document.querySelector(".sh-lede"), disc = document.querySelector(".sh-disc");
+      if (lede) lede.textContent = F.lede;
+      if (disc) disc.textContent = F.disc;
+      var fbp = document.querySelector(".sh-fb");
+      if (fbp) {
+        fbp.innerHTML = esc(F.infoLead) + '<a href="/#info">' + esc(F.infoWord) + "</a>."
+          + (fbp.querySelector(".sh-fb-link") ? " " + esc(F.spot) + ' <a class="sh-fb-link" href="/feedback/">' + esc(F.linkWord) + "</a>." : "");
+      }
+      var arch = document.querySelector(".sh-arch");
+      if (arch) arch.innerHTML = esc(F.archLead) + '<a href="' + F.archHref + '">' + esc(F.archWord) + "</a>" + esc(F.archTail);
+    }
   };
   var fillHead = function (n) {
     var W = (n.copy && n.copy.meta) || {};

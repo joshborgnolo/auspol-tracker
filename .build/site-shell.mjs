@@ -14,7 +14,10 @@
    term – by landing on /#story, which the main page opens its dial story
    for. The navbar carries only the views: the archives and the other
    satellites are linked from the colophon and their own strips, not the tab
-   bar (the user, 2026-09-24).
+   bar (the user, 2026-09-24). And the colophon's words lift the same way,
+   out of the main page's MethodNote by the same parse – a strap-line or
+   disclaimer edit lands here like a masthead rename (the colophon's "read
+   as plain text" row is main-page only and stays home).
 
    Before this the satellites opened on a bare article with no masthead or
    way round the site, and left by a floating "Back to the interactive
@@ -124,20 +127,22 @@ const mainTabs = (() => {
 const TABS = mainTabs();
 const NOW_LABEL = TABS.find((t) => t.id === "now").label;
 
-/* The masthead's TEXT, lifted from the main page's own asset rather than
-   copied: the satellite header must never say words the main page moved on
-   from (the 2026-10-03 Snapshot → Now rename sat in a hand copy here for a
-   day). parseChrome picks the words out of the compiled newtracker asset —
-   wordmark, tagline, status-block labels, phone compact, theme switch (svg
-   artwork included), score eyebrow, dial and skip-link titles — and
-   mainChrome() feeds them to THREE consumers of one contract: shellHeader
-   bakes them into each page at apply time, build.mjs ships them in
-   auspol-now.json's copy block, and site-shell.js re-applies that block on
-   load so the satellites follow every build with no page commits. Throws on
-   any miss, shellCopy's posture: a main-page refactor the parser can't read
-   must stop the apply, not ship yesterday's words. build.mjs is the one
-   soft consumer (warn + keep the previous JSON block), so a cosmetic main
-   edit can never hold the poll-data pipeline hostage. */
+/* The header's TEXT and the colophon's words, lifted from the main page's
+   own asset rather than copied: the satellites must never say words the
+   main page moved on from (the 2026-10-03 Snapshot → Now rename sat in a
+   hand copy here for a day; the colophon then lurked as literals in
+   shellFooter until the same lift covered it). parseChrome picks the words
+   out of the compiled newtracker asset — wordmark, tagline, status-block
+   labels, phone compact, theme switch (svg artwork included), score
+   eyebrow, dial and skip-link titles, and MethodNote's colophon sentences —
+   and mainChrome() feeds them to THREE consumers of one contract:
+   shellHeader/shellFooter bake them into each page at apply time, build.mjs
+   ships them in auspol-now.json's copy block, and site-shell.js re-applies
+   that block on load so the satellites follow every build with no page
+   commits. Throws on any miss, shellCopy's posture: a main-page refactor
+   the parser can't read must stop the apply, not ship yesterday's words.
+   build.mjs is the one soft consumer (warn + keep the previous JSON block),
+   so a cosmetic main edit can never hold the poll-data pipeline hostage. */
 const unesc = (s) => s.replace(/\\u([0-9a-fA-F]{4})/g, (m, h) => String.fromCharCode(parseInt(h, 16)));
 const jsxSvg = (s) => s.replace(/strokeWidth=/g, "stroke-width=")
   .replace(/strokeLinecap=/g, "stroke-linecap=").replace(/strokeLinejoin=/g, "stroke-linejoin=")
@@ -171,6 +176,29 @@ export function parseChrome(headSrc, scoreSrc, tabs) {
   if (!lightM || !darkM) miss("theme switch", "the header asset");
   const scM = scoreSrc && scoreSrc.match(/ts-eyebrow">([^<]+)</);
   if (!scM) miss("score eyebrow", "the score asset");
+  /* The colophon's words, lifted from MethodNote like the masthead's: the
+     satellite footer is its shape, never its copy – a strap-line or
+     disclaimer edit on the main page flows to every satellite with the apply
+     (and, over the copy block, with the build alone). JSX text only; the
+     {" "} spacing literals and line-wraps collapse to one space run. */
+  const phrase = (s) => unesc(s.replace(/\{" "\}/g, " ").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+  const coloBlock = (name, what) => {
+    const m = headSrc.match(new RegExp('className="' + name + '">\\s*([\\s\\S]*?)\\s*</p>'));
+    if (!m) miss(what, "the header asset");
+    return phrase(m[1]);
+  };
+  const lede = coloBlock("colo-lede", "colophon lede");
+  const disc = coloBlock("disclaimer", "colophon disclaimer");
+  const fbM = headSrc.match(/className="fb-lede">([\s\S]*?)<\/p>/);
+  if (!fbM) miss("colophon feedback line", "the header asset");
+  const infoM = fbM[1].match(/\{onInfo && \(\s*<>\s*([\s\S]*?)\{" "\}\s*<button[^>]*>([^<]+)<\/button>\.\{" "\}\s*<\/>\s*\)\}/);
+  if (!infoM) miss("colophon Info signpost", "the colophon feedback line");
+  const spotM = fbM[1].match(/\)\}\s*([\s\S]*?)\{" "\}\s*<a className="fb-link"[^>]*>([^<]+)<\/a>\./);
+  if (!spotM) miss("colophon feedback clause", "the colophon feedback line");
+  /* the FIRST colo-arch block (the archives line); the second is the main
+     page's own "read as plain text" switch, which has no satellite row */
+  const archM = headSrc.match(/className="colo-arch">\s*([\s\S]*?)\{" "\}\s*<a className="colo-link" href="([^"]+)">([\s\S]*?)<\/a>\{" "\}\s*([\s\S]*?)\s*<\/p>/);
+  if (!archM) miss("colophon archives line", "the header asset");
   return {
     tabs: tabs.map(({ id, label, pinHide }) => ({ id, label, ...(pinHide ? { pinHide: true } : {}) })),
     skip: one(/className="skip-link"[\s\S]*?>\s*([^{}<>]+?)\s*<\/a>/, "skip link"),
@@ -186,6 +214,12 @@ export function parseChrome(headSrc, scoreSrc, tabs) {
     score: { eyebrow: unesc(scM[1]) },
     dial: { title: one(/className="wm-glyph"[\s\S]*?title="([^"]+)"/, "dial title"),
             action: one(/<span id="wm-action" hidden>([^<]+)</, "dial action") },
+    footer: { lede, disc,
+              infoLead: phrase(infoM[1]) + " ", infoWord: phrase(infoM[2]),
+              spot: phrase(spotM[1]), linkWord: phrase(spotM[2]),
+              archLead: phrase(archM[1]) + " ",
+              archWord: phrase(archM[3].replace(/<span[\s\S]*?<\/span>/g, "")),
+              archHref: archM[2], archTail: " " + phrase(archM[4]) },
   };
 }
 /* Memoised like mainTabs(): scans the compiled newtracker assets once per
@@ -299,22 +333,28 @@ export function shellHeader({ tab } = {}) {
 </nav>`;
 }
 
-/* The main page's colophon (73de0c58…js MethodNote), word for word: the
-   strap-line and the disclaimer are copy families with several homes each
-   (auto-skill-auspol-strapline-copy, auto-skill-auspol-disclaimer-copy), and
-   this is one of them. */
+/* The main page's colophon (73de0c58…js MethodNote): its words are CHROME's,
+   lifted from the main page's own asset at apply time exactly as the
+   masthead's are (mainChrome's footer block) – this markup only decides
+   shape. The strap-line and the disclaimer copy families each keep TWO homes
+   now (MethodNote and build.mjs's ss-note; auto-skill-auspol-strapline-copy,
+   auto-skill-auspol-disclaimer-copy), the satellites deriving like the rest
+   of the shell. The main page's colophon carries one row no satellite has:
+   "Read this page as plain text" (window.AP.openStatic is main-page only) –
+   it stays home. */
 export function shellFooter({ page } = {}) {
+  const F = CHROME().footer;
   const fb = page === "feedback"
-    ? `How the figures are built is in <a href="/#info">Info</a>.`
-    : `How the figures are built is in <a href="/#info">Info</a>. Spot an error, a missing poll, or have any other feedback? Please <a class="sh-fb-link" href="/feedback/">let me know</a>.`;
+    ? `${F.infoLead}<a href="/#info">${F.infoWord}</a>.`
+    : `${F.infoLead}<a href="/#info">${F.infoWord}</a>. ${F.spot} <a class="sh-fb-link" href="/feedback/">${F.linkWord}</a>.`;
   const arch = page === "archives" ? ""
-    : `\n        <p class="sh-arch">Federal polling archives I’ve located are stored <a href="/archives/newspoll/">here</a> for safekeeping and convenience.</p>`;
+    : `\n        <p class="sh-arch">${F.archLead}<a href="${F.archHref}">${F.archWord}</a>${F.archTail}</p>`;
   return `<div class="sh-frame">
   <footer class="sh-foot">
     <div class="sh-colo">
       <div class="sh-about" data-nosnippet>
-        <p class="sh-lede">auspol tracker is an unofficial aggregator of published federal opinion polling.</p>
-        <p class="sh-disc">Best efforts are made to make the aggregate figures transparent, trustworthy, statistically sound, and informative, but they are, in the end, estimates only.</p>
+        <p class="sh-lede">${F.lede}</p>
+        <p class="sh-disc">${F.disc}</p>
       </div>
       <div class="sh-ways">
         <p class="sh-fb">${fb}</p>${arch}
@@ -958,13 +998,14 @@ ${npProjectSrc()}
     var els = document.querySelectorAll(sel);
     for (var i = 0; i < els.length; i++) els[i].textContent = v;
   };
-  /* The masthead's TEXT follows every build too, not just its figures: the
-     copy block build.mjs lifts out of the main page's own asset (mainChrome)
-     is re-applied here, so a rename of anything the main masthead says
-     reaches every satellite with the next build, no page commits. The baked
-     copy below the fold stays as the no-JS read. Words, artwork and the tab
-     list only – structure stays the shell's own. Runs BEFORE fillHead, whose
-     value pass writes into the fresh spans. */
+  /* The header's TEXT AND the colophon's words follow every build too, not
+     just the figures: the copy block build.mjs lifts out of the main page's
+     own asset (mainChrome) is re-applied here, so a rename of anything the
+     main masthead or footer says reaches every satellite with the next
+     build, no page commits. The baked copy below the fold stays as the no-JS
+     read. Words, artwork and the tab list only – structure stays the shell's
+     own. Runs BEFORE fillHead, whose value pass writes into the fresh
+     spans. */
   var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
   var TAB_EXTRAS = ${JSON.stringify(SHELL_TAB_EXTRAS)};
   var fillCopy = function (cp) {
@@ -1044,6 +1085,23 @@ ${npProjectSrc()}
     }
     var eb = document.querySelector(".sh-score .sh-eyebrow");
     if (eb && cp.score) eb.textContent = cp.score.eyebrow;
+    /* the colophon: sentences only, into the shell's own markup. The
+       feedback page was baked without its own invite – its .sh-fb carries
+       no .sh-fb-link, and the baked link's absence is the variant's
+       witness. Archives pages were baked with no .sh-arch row at all. */
+    var F = cp.footer;
+    if (F) {
+      var lede = document.querySelector(".sh-lede"), disc = document.querySelector(".sh-disc");
+      if (lede) lede.textContent = F.lede;
+      if (disc) disc.textContent = F.disc;
+      var fbp = document.querySelector(".sh-fb");
+      if (fbp) {
+        fbp.innerHTML = esc(F.infoLead) + '<a href="/#info">' + esc(F.infoWord) + "</a>."
+          + (fbp.querySelector(".sh-fb-link") ? " " + esc(F.spot) + ' <a class="sh-fb-link" href="/feedback/">' + esc(F.linkWord) + "</a>." : "");
+      }
+      var arch = document.querySelector(".sh-arch");
+      if (arch) arch.innerHTML = esc(F.archLead) + '<a href="' + F.archHref + '">' + esc(F.archWord) + "</a>" + esc(F.archTail);
+    }
   };
   var fillHead = function (n) {
     var W = (n.copy && n.copy.meta) || {};

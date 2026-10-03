@@ -1,28 +1,38 @@
 ---
 name: auspol-strapline-copy
-description: auspol-tracker — the site-descriptor strap-line ("auspol tracker is an unofficial aggregate of published federal opinion polling") has ELEVEN homes across THREE systems that must all move together — build pipeline ×2 (build.mjs static summary + 73de0c58 asset colophon), satellite GENERATORS ×3 (.build/refresh-{morgan,trove,galaxy}-archive.mjs), and satellite/hand pages ×6 (the five archives/* pages + feedback/index.html) — plus 2 compiled copies in built index.html. For generated satellites edit the generator AND the committed page in one commit (regenerating hits the network). Phrase is pure ASCII so plain grep verifies all copies, unlike curly-typography greps. Satellite copy (incl. <meta> descriptions) uses CURLY apostrophes — the user audits them. Learned 2026-09-04 (commit 3ee127f). UPDATE 2026-09-24: the satellites no longer carry their own strap-line notes – every satellite's copy now comes from ONE home, shellFooter in .build/site-shell.mjs (the shared colophon, written into each page's <!--shell:footer--> region); the satellite-page and generator-template homes below are retired.
+description: auspol-tracker — the site-descriptor strap-line ("auspol tracker is an unofficial aggregate of published federal opinion polling") has ELEVEN homes across THREE systems that must all move together — build pipeline ×2 (build.mjs static summary + 73de0c58 asset colophon), satellite GENERATORS ×3 (.build/refresh-{morgan,trove,galaxy}-archive.mjs), and satellite/hand pages ×6 (the five archives/* pages + feedback/index.html) — plus 2 compiled copies in built index.html. For generated satellites edit the generator AND the committed page in one commit (regenerating hits the network). Phrase is pure ASCII so plain grep verifies all copies, unlike curly-typography greps. Satellite copy (incl. <meta> descriptions) uses CURLY apostrophes — the user audits them. Learned 2026-09-04 (commit 3ee127f). UPDATE 2026-09-24: the satellites no longer carry their own strap-line notes – every satellite's copy now comes from ONE home, shellFooter in .build/site-shell.mjs (the shared colophon, written into each page's <!--shell:footer--> region); the satellite-page and generator-template homes below are retired. UPDATE 2026-10-03: shellFooter is no longer a home either – its words are LIFTED out of MethodNote by site-shell.mjs's mainChrome parse (the masthead's lift covering the colophon). The strap-line's SOURCE homes are down to TWO: MethodNote's colo-lede + build.mjs's ss-note.
 source: auto-skill
 extracted_at: '2026-09-04T03:06:31.900Z'
 ---
 
 # auspol-strapline-copy: the site-descriptor sentence's homes
 
-## UPDATE 2026-09-24 – three source homes now, not eleven
+## UPDATE 2026-09-24 – three source homes now, not eleven ⟹ folded into 2026-10-03's TWO
 
 The site shell (`.build/site-shell.mjs`, see auto-skill-auspol-satellite-page-branding)
 replaced every satellite's closing `ss-note` with the main page's colophon, word for
-word. The strap-line's SOURCE homes are now:
+word. The strap-line's SOURCE homes shrank to:
 
 1. `.build/newtracker/build.mjs` – the static summary's `ss-note` (unchanged).
 2. `.build/newtracker/assets/73de0c58-*.js` – MethodNote's `colo-lede` (unchanged).
 3. `.build/site-shell.mjs` – `shellFooter`'s `sh-lede`, for every satellite.
 
-Each satellite page carries a COPY of (3) inside its `<!--shell:footer-->` region:
-never hand-edit it – change `shellFooter`, run `node .build/site-shell.mjs`, and
-commit the pages (`npm test` fails on a page out of step: .build/test-site-shell.mjs).
-The generator templates (refresh-morgan/galaxy/trove/prediction) no longer contain
-the sentence at all; `applyShell` adds the colophon to their output. The historical
-"eleven homes" list below is kept for the record.
+**UPDATE 2026-10-03: home (3) went derivative.** `shellFooter` no longer carries a
+literal: site-shell.mjs's `mainChrome()` lifts the colophon sentences out of
+MethodNote at apply time — the masthead's own lift covering the footer — so a
+strap-line edit on homes (1)/(2) reaches every satellite through the normal
+shell apply (`node .build/site-shell.mjs` + commit the pages) and, between
+applies, through the `copy` block of auspol-now.json that site-shell.js
+re-applies at load. The satellites now derive; an edit here needs no separate
+step for them, only the shell's usual two consumers.
+
+Each satellite page carries a COPY of the lifted sentence inside its
+`<!--shell:footer-->` region: never hand-edit it – the apply rewrites it
+(`npm test` fails on a page out of step: .build/test-site-shell.mjs, which now
+pins the footer lift itself). The generator templates
+(refresh-morgan/galaxy/trove/prediction) contain no copy of the sentence at
+all; `applyShell` adds the colophon to their output. The historical "eleven
+homes" list below is kept for the record.
 
 
 Learned 2026-09-04 ("…unofficial aggregate of published national polling" →

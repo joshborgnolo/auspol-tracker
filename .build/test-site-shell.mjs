@@ -110,6 +110,22 @@ for (const [what, v] of [["wordmark name", chrome.wm.name], ["tagline tail", chr
                          ["light artwork", chrome.theme.light.svg], ["score eyebrow", chrome.score.eyebrow],
                          ["dial title", chrome.dial.title]])
   assert.ok(head.includes(v), `shellHeader bakes the lifted ${what}`);
+// the colophon, lifted with the header: every sentence parses, bakes and overlays
+for (const [what, v] of [["colophon lede", chrome.footer.lede], ["colophon disclaimer", chrome.footer.disc],
+                         ["colophon info lead", chrome.footer.infoLead], ["colophon info word", chrome.footer.infoWord],
+                         ["colophon feedback clause", chrome.footer.spot], ["colophon feedback link word", chrome.footer.linkWord],
+                         ["colophon archives lead", chrome.footer.archLead], ["colophon archives word", chrome.footer.archWord],
+                         ["colophon archives tail", chrome.footer.archTail], ["colophon archives href", chrome.footer.archHref]])
+  assert.ok(typeof v === "string" && v.length > 0, `chrome lift: ${what} came through`);
+const foot = shellFooter({});
+for (const [what, v] of [["lede", chrome.footer.lede], ["disclaimer", chrome.footer.disc],
+                         ["feedback clause", chrome.footer.spot], ["feedback link word", chrome.footer.linkWord],
+                         ["archives lead", chrome.footer.archLead], ["archives tail", chrome.footer.archTail]])
+  assert.ok(foot.includes(v), `shellFooter bakes the lifted ${what}`);
+assert.ok(foot.includes(chrome.footer.infoLead + '<a href="/#info">' + chrome.footer.infoWord), "the Info signpost lands first in sh-fb");
+assert.ok(foot.includes(`href="${chrome.footer.archHref}"`), "shellFooter bakes the lifted archives href");
+assert.ok(shellJs().includes('querySelector(".sh-lede")') && shellJs().includes('querySelector(".sh-arch")'),
+  "site-shell.js re-applies the colophon from the copy block");
 // the runtime overlay shipped in the emitted js
 assert.ok(shellJs().includes("var fillCopy = function (cp)"), "site-shell.js carries the copy overlay");
 // …and its tab rebuild can never re-ship 2026-10-03's live bug: the contract carries
@@ -136,5 +152,7 @@ assert.throws(() => parseChrome(headSrc.replace('className="wm-name"', 'classNam
 assert.throws(() => parseChrome(headSrc, "", chrome.tabs), /score eyebrow/, "a missing score asset throws");
 const noTag = headSrc.replace(/className="tagline">([\s\S]*?)<\/p>/, "x");
 assert.throws(() => parseChrome(noTag, scoreSrc, chrome.tabs), /tagline/, "a refactored tagline throws");
+const noLede = headSrc.replace('className="colo-lede"', 'className="colo-gone"');
+assert.throws(() => parseChrome(noLede, scoreSrc, chrome.tabs), /colophon lede/, "a moved colophon anchor throws");
 
 console.log(`PASS: site shell – ${SHELL_PAGES.length} satellites current, idempotent, theme scoping, the unlisted pages unlisted, the chrome contract lifted`);
