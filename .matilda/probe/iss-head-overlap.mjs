@@ -47,7 +47,7 @@ const measure = (page, sel) => page.evaluate((s) => {
   const cap = hpic && hpic.querySelector(".rd-ap-cap");
   const tks = hpic ? [...hpic.querySelectorAll(".rd-ap-tk")] : [];
   const ths = head ? [...head.querySelectorAll(".rd-ap-th")] : [];
-  const best = ths.find((n) => /Best party/i.test(n.textContent));
+  const best = ths.find((n) => /Party in first/i.test(n.textContent));
   const lastTh = ths[ths.length - 1] || null;
   const style = hpic ? getComputedStyle(hpic) : {};
   const csCap = cap ? getComputedStyle(cap) : {};

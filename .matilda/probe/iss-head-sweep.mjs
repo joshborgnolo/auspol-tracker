@@ -31,7 +31,7 @@ const MEASURE = `(() => {
   const tks = hpic ? [...hpic.querySelectorAll(".rd-ap-tk")] : [];
   const bars = hpic ? [...hpic.querySelectorAll(".rd-ap-hbar-bar")] : [];
   const ths = head ? [...head.querySelectorAll(".rd-ap-th")] : [];
-  const best = ths.find((n) => /Best party/i.test(n.textContent));
+  const best = ths.find((n) => /Party in first/i.test(n.textContent));
   const row = document.querySelector(".rd-ap-row");
   const dots = row ? [...row.querySelectorAll(".rd-ap-pic .rd-ap-dot")] : [];
   const pic = row && row.querySelector(".rd-ap-pic");
