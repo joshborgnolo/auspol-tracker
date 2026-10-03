@@ -2310,11 +2310,21 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
      after Two-party (user call 2026-10-03); one label at every width now
      the row scrolls (user call same day: "One Nation–Coalition split",
      retiring the phone's bare "Split") */
+  const HL_LABELS = { alp: "Labor", lnp: "Coalition", onp: "One Nation", grn: "Greens", oth: "Others" };
+  /* the party tabs ride latest.primaryOrder - the gen-data walk joined to
+     the poll tables, so this row and the tables agree on largest first
+     (user call 2026-10-03: "the rest should be ordered by primary vote,
+     largest first"); an unknown key silently falls back to the previous
+     static order, so a drift can't hide a tab */
+  const hlParties = ((D) => {
+    const ord = (D && D.latest && D.latest.primaryOrder) || [];
+    if (!ord.length || ord.some((k) => !(k in HL_LABELS))) return ["alp", "lnp", "onp", "grn", "oth"];
+    return ord;
+  })(D);
   const hlViews = [
     { id: "tpp", label: "Two-party" },
     { id: "split", label: "One Nation–Coalition split", title: "One Nation’s primary vote against the Coalition’s" },
-    { id: "alp", label: "Labor" }, { id: "lnp", label: "Coalition" }, { id: "onp", label: "One Nation" },
-    { id: "grn", label: "Greens" }, { id: "oth", label: "Others" },
+    ...hlParties.map((k) => ({ id: k, label: HL_LABELS[k] })),
   ];
   /* hovering the panel hands the arrow keys to the measure row - the walk a
      focused tab has, claimed only while the pointer is over the card; the

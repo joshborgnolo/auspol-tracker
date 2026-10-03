@@ -80012,7 +80012,7 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Best on it"), React.createElement("span", {
+  }, "Best on top issue"), React.createElement("span", {
     className: "rd-ap-in"
   }, [0, 10, 20, 30].map(v => React.createElement("span", {
     key: v,
@@ -81547,6 +81547,18 @@ function RdHouseLean({
   const [hover, setHover] = useState(null);
   const boxRef = useRef(null);
   const SW = useRdWidth(boxRef, 500);
+  const HL_LABELS = {
+    alp: "Labor",
+    lnp: "Coalition",
+    onp: "One Nation",
+    grn: "Greens",
+    oth: "Others"
+  };
+  const hlParties = (D => {
+    const ord = D && D.latest && D.latest.primaryOrder || [];
+    if (!ord.length || ord.some(k => !(k in HL_LABELS))) return ["alp", "lnp", "onp", "grn", "oth"];
+    return ord;
+  })(D);
   const hlViews = [{
     id: "tpp",
     label: "Two-party"
@@ -81554,22 +81566,10 @@ function RdHouseLean({
     id: "split",
     label: "One Nation–Coalition split",
     title: "One Nation’s primary vote against the Coalition’s"
-  }, {
-    id: "alp",
-    label: "Labor"
-  }, {
-    id: "lnp",
-    label: "Coalition"
-  }, {
-    id: "onp",
-    label: "One Nation"
-  }, {
-    id: "grn",
-    label: "Greens"
-  }, {
-    id: "oth",
-    label: "Others"
-  }];
+  }, ...hlParties.map(k => ({
+    id: k,
+    label: HL_LABELS[k]
+  }))];
   const hlHover = React.useRef(false);
   React.useEffect(() => {
     const sec = document.getElementById("house-lean");

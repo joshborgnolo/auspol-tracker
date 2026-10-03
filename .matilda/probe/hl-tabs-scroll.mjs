@@ -8,10 +8,14 @@
    padding runway keeps the last tab clear of the fade at max scroll.
    Sideways ONLY: overflow-y:clip locks the strip's other axis (a bare
    overflow-x:auto computes overflow-y to auto and the strip wobbled
-   up and down under a thumb - user report same day).
+   up and down under a thumb - user report same day). Same day: the
+   tab row follows gen-data's latest.primaryOrder (Two-party, split,
+   then the five parties by primary vote - the expected order below is
+   re-derived from the same 9f09dca2 payload the page reads, so the
+   probe pins the WIRING, not the day's data).
    Run from the repo root: node .matilda/probe/hl-tabs-scroll.mjs
    Rebuild first (node .build/newtracker/build.mjs) — this probes the
-   COMMITTED index.html artifact. */
+   BUILT index.html artifact in the working tree. */
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -81,8 +85,21 @@ async function measure(page) {
 /* one label at every width since 2026-10-03 (user: "One Nation–Coalition
    split") - the phone's bare "Split" and the desktop's "One Nation v
    Coalition" both retired once the row could scroll. The split sits
-   SECOND, straight after Two-party (user call same day). */
-const EXPECT = ["Two-party", "One Nation–Coalition split", "Labor", "Coalition", "One Nation", "Greens", "Others"];
+   SECOND, straight after Two-party; the five party tabs then follow
+   latest.primaryOrder (user call same day: "the rest should be ordered
+   by primary vote, largest first"), so EXPECT is built from the same
+   9f09dca2 payload the page consumes - a primary-vote crossing via
+   gen-data's walk moves the tabs AND this expectation together. */
+const dataFile = (await import("node:fs")).readdirSync(join(ROOT, ".build/newtracker/assets"))
+  .find((f) => f.startsWith("9f09dca2") && f.endsWith(".js"));
+const world = {};
+new Function("window", await readFile(join(ROOT, ".build/newtracker/assets", dataFile), "utf8"))(world);
+const D = world.AUSPOL || die2("no AUSPOL payload in the data asset");
+const LABELS = { alp: "Labor", lnp: "Coalition", onp: "One Nation", grn: "Greens", oth: "Others" };
+function die2(m) { console.error("probe setup: " + m); process.exit(1); }
+const ord = (D.latest && D.latest.primaryOrder) || [];
+if (!ord.length || ord.some((k) => !(k in LABELS))) die2("latest.primaryOrder unreadable: " + JSON.stringify(ord));
+const EXPECT = ["Two-party", "One Nation–Coalition split", ...ord.map((k) => LABELS[k])];
 
 /* expectScroll: true = the strip must overflow and the reveal test runs;
    false = desktop gate, seven tabs fit with no scroll; null = either is
