@@ -3432,6 +3432,50 @@ function issBestOf(iss) {
   return null;
 }
 
+/* demographics facet – the splits its rows can draw. Each compares two of a
+   poll's own groups, the first the one a positive gap favours, and the pairs
+   are tried in order: the pooled panel's own groups first, then the nearest
+   pair the house printed (YouGov's early age bands stop at 65+, DemosAU folds
+   provincial and rural voters together), so every row names the pair it
+   used. Figures are each poll's as printed; only RedBridge's two school rows
+   come merged, as the pooling merges them (gen-data's grp.v). */
+const DEM_SPLITS = [
+  { id: "age", label: "Age", lo: "Older", hi: "Younger", scope: "With an age breakdown",
+    pairs: [["18–34", "55+", "18–34 v 55+"], ["Gen Z", "Boomers", "Gen Z v Boomers"], ["18–34", "65+", "18–34 v 65+"], ["18–34", "50+", "18–34 v 50+"]] },
+  { id: "gender", label: "Gender", lo: "Men", hi: "Women", scope: "With a gender breakdown",
+    pairs: [["Women", "Men", "Women v men"]] },
+  { id: "education", label: "Education", lo: "Year 12 or less", hi: "University", scope: "With an education breakdown",
+    pairs: [["University", "School", "Uni v school"], ["University", "Year 12 or less", "Uni v Year 12"]] },
+  { id: "place", label: "Place", lo: "Rural", hi: "Inner metro", scope: "With a city and country breakdown",
+    pairs: [["Inner metro", "Rural", "Inner metro v rural"], ["Inner metro", "Regional or rural", "Inner metro v regional"]] },
+  { id: "home", label: "Home", lo: "Owners", hi: "Renters", scope: "With a housing breakdown",
+    pairs: [["Renting", "Own outright", "Renters v owners"], ["Renting and other", "Own outright", "Renters v owners"]] },
+];
+const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];   // grp's party order
+// a poll's groups by label: its printed table, with the pooled groups
+// filling what the table spells another way
+function demGroupsOf(p) {
+  const g = p && p.grp;
+  if (!g) return null;
+  const m = {};
+  for (const rows of Object.values(g.d || {})) for (const [lab, v] of rows) m[lab] = Object.fromEntries(DEM_KEYS.map((k, i) => [k, v[i]]));
+  const G = window.AUSPOL.demoGroups || [];
+  (g.v || []).forEach((v, i) => { if (v && !m[G[i]]) m[G[i]] = Object.fromEntries(DEM_KEYS.map((k, j) => [k, v[j]])); });
+  return m;
+}
+/* the split a row draws: { a, b, lab, A, B, gap }, gap = A − B per party in
+   points, or null where the poll printed neither pair */
+function demPairOf(p, split) {
+  const sp = DEM_SPLITS.find((s) => s.id === split);
+  const m = sp ? demGroupsOf(p) : null;
+  if (!m) return null;
+  for (const [a, b, lab] of sp.pairs) if (m[a] && m[b]) {
+    const gap = Object.fromEntries(DEM_KEYS.map((k) => [k, m[a][k] != null && m[b][k] != null ? +(m[a][k] - m[b][k]).toFixed(1) : null]));
+    return { a, b, lab, A: m[a], B: m[b], gap };
+  }
+  return null;
+}
+
 // the top-issue cell: the issue most voters name first, and the share naming
 // it. SEC's unprompted concern reading is flagged, since its answer set
 // ("any mention") isn't the pooled question's.
@@ -4954,6 +4998,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     leadership: { has: (p) => window.ppmContests(p).length > 0 || (p.appr && (p.appr.albNet != null || p.appr.taylorNet != null || p.appr.hansonNet != null)), label: "With leadership numbers" },
     direction: { has: (p) => !!p.dir, label: "With a direction reading" },
     issues: { has: (p) => !!p.iss, label: "With issues figures" },
+    /* keyed on the split in view – a poll that printed ages but no
+       education cut leaves the table when it splits by education. demSplit
+       is declared further down; the tests only run once it is */
+    demographics: { has: (p) => !!demPairOf(p, demSplit),
+                    get label() { const s = DEM_SPLITS.find((x) => x.id === demSplit); return s ? s.scope : "With a breakdown by group"; } },
   };
   /* The two published-only matchups are measured by almost no wave – five
      waves print an L/NP v ON figure, four a three-cornered one – so
@@ -5017,7 +5066,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      and tag values out as comma-joined names. All spellings are still read
      here, the short key winning if a hand-edited URL carries both; only
      the short keys and mask values are ever written. */
-  const FACET_BY_URL = { p: "primary", l: "leadership", d: "direction", i: "issues", primary: "primary", leadership: "leadership", direction: "direction", issues: "issues" };
+  const FACET_BY_URL = { p: "primary", l: "leadership", d: "direction", i: "issues", primary: "primary", leadership: "leadership", direction: "direction", issues: "issues",
+                         ...(window.AP.rd ? { g: "demographics", demographics: "demographics" } : {}) };
+  // the demographics facet's split → URL letter's inverse; age, the default, rides no letter
+  const DEM_BY_URL = { a: "age", g: "gender", e: "education", p: "place", h: "home" };
   const MEAS_BY_URL = { o: "onp", lo: "lnponp", "3": "3cp", c: "lnp", onp: "onp", lnponp: "lnponp", "3cp": "3cp", lnp: "lnp" };
   /* The lead column opens on the rival Labor is doing WORST against – the
      hero's own ruling (latest.rivalLead, deadbanded in gen-data so it
@@ -5056,6 +5108,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       measure: meas,
       range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
       facet: view,
+      split: DEM_BY_URL[get("g")] || "age",
       /* "explicit" means the reader (or a shared link) said something about
          the scope. Absent that, the facet seeds it and keeps seeding it as
          the basis moves. */
@@ -5080,6 +5133,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const [tagSel, setTagSel] = useState(new Set(urlInit.has)); // data-content tags; empty = all
   const [sort, setSort] = useState({ key: "date", dir: -1 });
   const [facet, setFacet] = useState(urlInit.facet);
+  const [demSplit, setDemSplit] = useState(urlInit.split);   // the demographics facet's split
   const [open, setOpen] = useState(null);     // expanded ROW
   const [pop, setPop] = useState(null);       // open filter popover
   /* Each view hides the columns it can't fill; it should hide the ROWS it
@@ -5102,6 +5156,15 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     setScope(false); setQ(""); setSel(new Set()); setLead("all"); setMeasure(DEFAULT_MEASURE);
     setRange("all"); setTagSel(new Set());
     if (focus.facet) setFacet(focus.facet);
+    /* a Who votes for whom dot names its tab's split; where the poll can't
+       draw that pair (a Resolve dot from By state: it prints no city and
+       country cut), it opens on the first split it can, so its row still
+       carries figures - the opened table shows every cut either way */
+    if (focus.split) {
+      const fp = D.individualPolls.find((q) => q.pollster + "|" + q.released === focus.key);
+      const can = (s) => !!(fp && demPairOf(fp, s));
+      setDemSplit(can(focus.split) ? focus.split : DEM_SPLITS.map((s) => s.id).find(can) || focus.split);
+    }
     setOpen(focus.key);
   }, [focus]);
   // …and once the row is actually on the page, put it under the reader's eye.
@@ -5358,7 +5421,12 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       case "dir.net": return p.dir ? p.dir.net : -Infinity;
       case "iss.topv": { const t = issTopOf(p.iss); return t ? t[1] : -Infinity; }
       case "iss.bestv": { const b = issBestOf(p.iss); return b ? b.v : -Infinity; }
-      default: return 0;
+      // dem.<party>: that party's gap across the split in view
+      default: {
+        if (!key.startsWith("dem.")) return 0;
+        const pr = demPairOf(p, demSplit);
+        return pr && pr.gap[key.slice(4)] != null ? pr.gap[key.slice(4)] : -Infinity;
+      }
     }
   };
   const sorted = [...filtered].sort((a, b) => {
@@ -5420,11 +5488,12 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      can never clobber each other. The guard against a no-op write matters:
      without it the URL was normalised every render, and this effect also
      runs for the reader who typed a stale or partial query by hand. */
-  const FACET_BY_ID = { primary: "p", leadership: "l", direction: "d", issues: "i" };  // facet → URL letter (inverse of the restore map)
+  const FACET_BY_ID = { primary: "p", leadership: "l", direction: "d", issues: "i", demographics: "g" };  // facet → URL letter (inverse of the restore map)
+  const DEM_BY_ID = { gender: "g", education: "e", place: "p", home: "h" };   // split → URL letter; age is the omitted default
   const MEAS_BY_ID = { lnp: "c", onp: "o", lnponp: "lo", "3cp": "3" };    // matchup → URL letter; the page's default matchup is omitted
   const LEAD_BY_ID = { alp: "a", lnp: "l", onp: "o" };                    // holder → URL letter; "all" is the omitted default
   React.useEffect(() => {
-    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "who", "when", "has", "vs", "lead", "view", "scope"];
+    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "g", "who", "when", "has", "vs", "lead", "view", "scope"];
     const p = new URLSearchParams(window.location.search);
     OWNED.forEach((k) => p.delete(k));
     if (ql) p.set("q", q.trim());
@@ -5434,6 +5503,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     if (measure !== DEFAULT_MEASURE) p.set("v", MEAS_BY_ID[measure]);
     if (lead !== "all") p.set("l", LEAD_BY_ID[lead]);
     if (facet !== "twopp") p.set("f", FACET_BY_ID[facet]);
+    // the split only means something on its own facet, so only there is it written
+    if (facet === "demographics" && DEM_BY_ID[demSplit]) p.set("g", DEM_BY_ID[demSplit]);
     if (!scope && FACET_SCOPE[facet]) p.set("s", "0");
     const qs = p.toString();
     const L = window.location;
@@ -5518,7 +5589,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         pills={pills} clearAll={clearAll} sort={sort} onSort={onSort} open={open} setOpen={setOpen}
         focus={focus} onBack={onBack} backLabel={backLabel} exportCsv={exportCsv} bodyRef={bodyRef}
         synthByYm={synthByYm} aggByYm={aggByYm} synthOnByYm={synthOnByYm} altOnByYm={altOnByYm}
-        ofTotal={totalAll} ofHouses={housesAll.length} />
+        ofTotal={totalAll} ofHouses={housesAll.length} demSplit={demSplit} setDemSplit={setDemSplit} />
       <RdDisagree />
       <RdHouseLean measure={measure} onMeasure={onMeasure} tppBasis={tppBasis} />
       <RdFlows />
@@ -7292,4 +7363,6 @@ Object.assign(window, { Tabs, PastCyclesView, AllPollsView, InfoView, TermPop,
   // shared cell renderers reused by the latest-polls table
   ArchSortTh, ArchImplied, ArchPublished, ArchTpp, ArchLead, ArchApprCell, ArchDirCell, archLeadInfo,
   // issues facet readouts, shared with the redesign's table
-  issTopOf, issBestOf, ISS_PARTY_META, ArchIssTop, ArchIssBest });
+  issTopOf, issBestOf, ISS_PARTY_META, ArchIssTop, ArchIssBest,
+  // the demographics facet's splits, shared with the redesign's table
+  DEM_SPLITS, demGroupsOf, demPairOf });

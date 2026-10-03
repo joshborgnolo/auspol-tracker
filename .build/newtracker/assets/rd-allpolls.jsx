@@ -782,7 +782,7 @@ function RdApIssMini({ p }) {
   );
 }
 
-function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, backLabel }) {
+function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, backLabel, demSplit }) {
   const D = window.AUSPOL;
   const q = p.p || {};
   const c = (p.chg && p.chg.d) || {};
@@ -960,9 +960,95 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
      (DemosAU's reports), both links open the same file and the statement
      link's title says so. */
   const relUrl = p.releaseUrl || p.url;
+  /* on the demographics facet the poll's whole table leads, full width, as
+     the house printed it: every cut, the parties in the row's aggregate
+     order, the two groups the row compares marked, a figure shaded where the
+     group sits five or more points above the poll's all-voters figure and
+     faded five or more below. Laid out in three columns balanced by row
+     count on a laptop - beside the poll in full it ran a 28-group YouGov
+     wave ~1,400px down against a short How-it-counts column - and one on a
+     phone, where the later columns drop their repeated heads */
+  const isDem = facet === "demographics";
+  const demTable = (() => {
+    if (!isDem || !p.grp || !p.grp.d) return null;
+    const K = ["alp", "lnp", "grn", "onp", "oth"];
+    const cols = rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK);
+    const tot = p.grp.t || null;
+    const pr = window.demPairOf(p, demSplit);
+    const DN = { gender: "Gender", age: "Age", generation: "Generation", education: "Education", state: "State", location: "Location", housing: "Housing", language: "Language at home" };
+    const cell = (v, k) => {
+      const t = tot ? tot[K.indexOf(k)] : null;
+      const d = v != null && t != null ? v - t : 0;
+      return <span role="cell" className={"rd-apd-dv" + (d >= 5 ? " hi" : d <= -5 ? " lo" : "")}>{v == null ? "—" : Math.round(v)}</span>;
+    };
+    const dims = Object.entries(p.grp.d);
+    const per = Math.ceil(dims.reduce((a, [, r]) => a + r.length + 1, 0) / 3);
+    const split = [[], [], []];
+    let ci = 0, n = 0;
+    for (const dm of dims) {
+      if (n > 0 && n + dm[1].length + 1 > per + 1 && ci < 2) { ci++; n = 0; }
+      split[ci].push(dm);
+      n += dm[1].length + 1;
+    }
+    const head = <div className="rd-apd-demr rd-apd-demh" role="row"><span></span>{cols.map((k) => <span key={k.id} role="columnheader" style={{ color: k.ink }}>{k.lab}</span>)}</div>;
+    const all = tot && <div className="rd-apd-demr rd-apd-demall" role="row"><span role="rowheader">All voters</span>{cols.map((k) => <span key={k.id} role="cell">{Math.round(tot[K.indexOf(k.id)])}</span>)}</div>;
+    return (
+      <div className="rd-apd-demwrap">
+        <span className="rd-apd-h">The vote by group, {p.grp.r === "measured from the charts" ? "measured off " + p.pollster + "’s charts" : "as " + p.pollster + " printed it"}</span>
+        <div className="rd-apd-demcols">
+          {split.filter((c) => c.length).map((c, i) => (
+            <div key={i} className="rd-apd-dem" role="table" aria-label={"The vote by group" + (i ? ", continued" : "")}>
+              {head}{all}
+              {c.map(([dim, rows]) => (
+                <React.Fragment key={dim}>
+                  <div className="rd-apd-demsub" role="row"><span role="rowheader">{DN[dim] || dim}</span></div>
+                  {rows.map(([lab, v]) => (
+                    <div key={lab} className={"rd-apd-demr" + (pr && (lab === pr.a || lab === pr.b) ? " on" : "")} role="row">
+                      <span role="rowheader">{lab}</span>
+                      {cols.map((k) => <React.Fragment key={k.id}>{cell(v[K.indexOf(k.id)], k.id)}</React.Fragment>)}
+                    </div>
+                  ))}
+                </React.Fragment>
+              ))}
+            </div>
+          ))}
+        </div>
+        <span className="rd-apd-sub rd-apd-note">Primary vote within each group, %. Shaded: five points or more above the poll’s all-voters figure; faded: five or more below.{pr ? " Marked: " + pr.a + " and " + pr.b + ", the two groups the row compares." : ""}</span>
+      </div>
+    );
+  })();
+  /* …and How it counts tells that table's story: what the house printed,
+     which of its groups feed the pooled Who votes for whom figures (the rest
+     are cut in ways no other house matches - their parts merged into a
+     pooled group, like YouGov's SA, WA and ACT/NT/Tas into the rest of
+     Australia, aren't counted as staying out), and whether it sits in the
+     panel's six-week window today */
+  const demFacts = (() => {
+    if (!isDem || !p.grp) return null;
+    const G = D.demoGroups || [];
+    const raw = Object.values(p.grp.d || {}).flatMap((rows) => rows.map((r) => r[0]));
+    const pooled = (p.grp.v || []).map((v, i) => (v ? G[i] : null)).filter(Boolean);
+    const MERGED = ["Below Year 12", "Year 12", "School", "TAFE", "TAFE or college", "SA", "WA", "ACT/NT/Tas"];
+    const alone = raw.filter((l) => !pooled.includes(l) && !MERGED.includes(l));
+    const T = D.demographics || {};
+    const base = (n) => (n === "RedBridge" ? "RedBridge/Accent" : n);
+    const inWin = (T.polls || []).some((q) => base(q.pollster) === p.pollster && q.dateLabel === p.field);
+    const nCuts = Object.keys(p.grp.d || {}).length;
+    return <>
+      <span className="rd-apd-k">Printed</span>
+      <span>{raw.length} groups across {rdNumWord(nCuts)} breakdown{nCuts === 1 ? "" : "s"}, {p.grp.r === "measured from the charts" ? "read off its charts to the nearest point" : "from its own table"}.</span>
+      <span className="rd-apd-k">In Who votes for whom</span>
+      <span>{pooled.length} of its groups join the pooled figures{alone.length ? <>; {rdApLdJoin(alone)} {alone.length === 1 ? "stays" : "stay"} here alone, since no other pollster draws {alone.length === 1 ? "that group" : "those groups"} the same way</> : ""}.</span>
+      {T.window && <>
+        <span className="rd-apd-k">In today’s figures</span>
+        <span>{inWin ? <>One of the polls the panel’s current figures draw on (the last {T.window}).</> : <>Outside the {T.window} the panel’s current figures draw on.</>}</span>
+      </>}
+    </>;
+  })();
 
   return (
     <div className="rd-apd">
+      {demTable}
       <div className="rd-apd-l poll-detail" data-pollster={p.pollster}>
         <span className="rd-apd-h">{rdPollHead(p)}</span>
         {prim.length > 0 && (
@@ -1074,7 +1160,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
       </div>
       <div className="rd-apd-r">
         <span className="rd-apd-h">How it counts</span>
-        {!isDir && !isIss && !isLd && fig.a != null && (
+        {!isDir && !isIss && !isLd && !isDem && fig.a != null && (
           <>
             <span className="rd-apd-ct">{p.pollster}’s polls since {D.monthNameFull(Number(from.slice(5)))} against the average, Labor v {onM ? "One Nation" : "Coalition"}{pub ? " as published" : ""}</span>
             <RdApMini p={p} onM={onM} pub={pub} avgFor={avgFor} />
@@ -1110,6 +1196,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
           );
         })()}
         <div className="rd-apd-facts">
+          {demFacts}
           {isIss && iss && <>
             <span className="rd-apd-k">Asked</span>
             <span>{issPrompted
@@ -1195,7 +1282,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
             <span className="rd-apd-k">Leader ratings</span>
             <span>{p.pollster} didn’t ask Albanese and {p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader"} on the same question in this poll, so there’s no net-approval gap to set against the leadership figures.</span>
           </>}
-          {!isDir && !isIss && !isLd && <>
+          {!isDir && !isIss && !isLd && !isDem && <>
           {p.noAgg && <>
             <span className="rd-apd-k">In the aggregates</span>
             <span>Because SMS polls have a strong selection bias, they do not count towards any aggregates.</span>
@@ -1318,7 +1405,7 @@ function RdAllPolls(P) {
           facet, onFacet, measure, onMeasure, tppBasis, setTppBasis,
           q, setQ, sel, setSel, toggleHouse, range, setRange, tagSel, setTagSel, toggleTag, pop, setPop,
           pills, clearAll, sort, onSort, open, setOpen, focus, onBack, backLabel, exportCsv, bodyRef,
-          synthByYm, aggByYm, synthOnByYm, altOnByYm, ofTotal, ofHouses } = P;
+          synthByYm, aggByYm, synthOnByYm, altOnByYm, ofTotal, ofHouses, demSplit, setDemSplit } = P;
   const D = window.AUSPOL;
   /* the direction-only waves sit outside every other facet's rows; ofTotal
      is the archive's full extent so an unfiltered count can acknowledge them
@@ -1326,14 +1413,23 @@ function RdAllPolls(P) {
   const ofT = ofTotal != null && ofTotal !== total ? ofTotal : null;
   const ofTxt = ofT ? " of " + ofT : "";
   const phone = useNarrow("(max-width: 760px)");
-  /* The tab row only holds the two-party control while the tabs and the
-     control fit between the margins: below ~810px the 6-tab group plus the
-     nowrap "Two-party" control overflowed the document 40px on every frame
-     (worst at 761-808px, right past the phone rung). Under 900px the
-     control moves to its own row, matching the Latest table's 900px ctlrow
-     handoff - .rd-ap-pctl's rules are ungated, so it dresses itself the
-     same at 761 as at 430. */
-  const ctlNarrow = useNarrow("(max-width: 900px)");
+  /* The tab row only holds the two-party control (and the demographics
+     facet's split picker) while the tabs and the control fit between the
+     margins: below ~810px the five-tab group plus the nowrap "Two-party"
+     control overflowed the document 40px on every frame (worst at
+     761-808px, right past the phone rung), so under 900px the control moved
+     to its own row, the Latest table's 900px ctlrow handoff. The sixth tab,
+     Demographics, moved the handoff up: the tabs measure 523px, the
+     two-party control 365 and the split picker 341, and the section is 90%
+     of the viewport, so the pair needs ~991px - under 1000px both controls
+     take their own row (at 901 they had run the page 38px and 17px wide).
+     .rd-ap-pctl's rules are ungated, so it dresses itself the same at 990
+     as at 430. */
+  const ctlNarrow = useNarrow("(max-width: 1000px)");
+  /* the demographics scale's nine ticks need the strip's full 410px: under
+     ~1150px the column shrinks (273px at 1001) and "40 pts 30" collide, so
+     the head keeps the phone's five */
+  const demMid = useNarrow("(max-width: 1150px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const contest = onM ? "onp" : "lnp";
@@ -1427,7 +1523,7 @@ function RdAllPolls(P) {
   const visRows = byDate ? groups.flatMap((g) => g.list) : flat;
   const FACETS = [{ id: "twopp", label: "2PP" }, { id: "primary", label: "Primary" },
                   { id: "leadership", label: phone ? "Leaders" : "Leadership" }, { id: "direction", label: "Direction" },
-                  { id: "issues", label: "Issues" }];
+                  { id: "issues", label: "Issues" }, { id: "demographics", label: phone ? "Groups" : "Demographics" }];
   const rowNav = (e, p) => {
     if (e.target !== e.currentTarget) return;
     const id = rowKey(p);
@@ -1513,7 +1609,7 @@ function RdAllPolls(P) {
      table inside the press, tripling what it cost. */
   const facetWas = useRef(facet), facetSwaps = useRef(0);
   if (facetWas.current !== facet) { facetWas.current = facet; facetSwaps.current += 1; }
-  const cls = { twopp: "rd-ap-c2pp", primary: "rd-ap-cprim", leadership: "rd-ap-clead", direction: "rd-ap-cdir", issues: "rd-ap-ciss" }[facet]
+  const cls = { twopp: "rd-ap-c2pp", primary: "rd-ap-cprim", leadership: "rd-ap-clead", direction: "rd-ap-cdir", issues: "rd-ap-ciss", demographics: "rd-ap-cdem" }[facet]
     + (facetSwaps.current ? " rd-ap-sw" : "");
   const th = (label, k, o) => {
     const on = sort.key === k;
@@ -1542,6 +1638,32 @@ function RdAllPolls(P) {
      listing - user call 2026-10-03: a fixed Labor, Coalition, Greens, One
      Nation, Other ladder is "unprincipled" */
   const prims = rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK);
+  /* the demographics facet: each party's vote in one of a poll's groups
+     minus its vote in another (user call 2026-10-04, design A of three
+     mocked: the Primary facet's five figures and strip, with gaps for
+     primaries). One scale for every split, 40 points either way of Even, so
+     moving from age to gender pulls the dots in - which is the finding - and
+     a dot never moves under the reader as the filters change */
+  const SPLITS = window.DEM_SPLITS || [];
+  const spl = SPLITS.find((x) => x.id === demSplit) || SPLITS[0];
+  const DEM_M = 40;
+  const gx = (v) => ((Math.max(-DEM_M, Math.min(DEM_M, v)) + DEM_M) / (2 * DEM_M)) * 100;
+  // whole points: the groups are a few hundred people each, a decimal claims too much
+  const gapTxt = (v) => (v == null ? "—" : Math.abs(v) < 0.5 ? "0" : (v > 0 ? "+" : "−") + Math.abs(Math.round(v)));
+  const DEM_PNAME = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "others" };
+  const demScale = (short) => {
+    const ticks = short ? [[-40, "40"], [-20, "20"], [0, "Even"], [20, "20"], [40, "40 pts"]]
+      : [[-40, "40 pts"], [-30, "30"], [-20, "20"], [-10, "10"], [0, "Even"], [10, "10"], [20, "20"], [30, "30"], [40, "40 pts"]];
+    return (
+      <span className="rd-ap-scale" aria-hidden="true">
+        <span className="rd-ap-in">
+          <b className="rd-ap-scl">◀ {spl.lo}</b>
+          <b className="rd-ap-scr">{spl.hi} ▶</b>
+          {ticks.map(([v, lab]) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "") + (short && v === -DEM_M ? " start" : "") + (short && v === DEM_M ? " end" : "")} style={{ left: gx(v) + "%" }}>{lab}</span>)}
+        </span>
+      </span>
+    );
+  };
 
   const colHead = (
     <div className={"rd-ap-hrow " + cls} role="row">
@@ -1599,6 +1721,11 @@ function RdAllPolls(P) {
           <span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span>
         </span>
         {th("Party in first", "iss.bestv", { right: true, wrap: true, title: "The party most voters rate best on that issue" })}
+      </>}
+      {facet === "demographics" && <>
+        <span className="rd-ap-pnums rd-ap-hpn">{prims.map((k) => <React.Fragment key={k.id}>{th(k.lab, "dem." + k.id, { color: k.ink, title: "Sort by " + DEM_PNAME[k.id] + "’s gap between the two groups" })}</React.Fragment>)}</span>
+        <span role="columnheader" aria-label={"Each party’s gap between the two groups, from stronger with " + spl.lo.toLowerCase() + " to stronger with " + spl.hi.toLowerCase() + " voters"} className="rd-ap-hpic">{demScale(demMid)}</span>
+        <span></span>
       </>}
       <span></span>
     </div>
@@ -1905,11 +2032,39 @@ function RdAllPolls(P) {
         )}
         {ownDots.length > 0 && <div className="rd-ap-cpic">{pic}</div>}
       </>;
+    } else if (facet === "demographics") {
+      /* the split in view, read off the poll's own table (demPairOf, the
+         d1a1 asset - the scope and the sort quote the same pair). The pair
+         differs by pollster, so every row names its own under the figures,
+         and on a phone at the card's top right */
+      const pr = window.demPairOf(p, demSplit);
+      figs = (
+        <span role="cell" className="rd-ap-fig rd-ap-dgap">
+          <span className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr ? gapTxt(pr.gap[k.id]) : "—"}</b>)}</span>
+          <span className="rd-ap-sub">{pr ? pr.lab + ", in points" : "no " + spl.label.toLowerCase() + " breakdown"}</span>
+        </span>
+      );
+      pic = (
+        <span className="rd-ap-pic" role="img" aria-label={pr ? pr.lab + ": " + prims.filter((k) => pr.gap[k.id] != null).map((k) => k.lab + " " + gapTxt(pr.gap[k.id])).join(", ") + " points" : "No breakdown to split"}>
+          <span className="rd-ap-in">
+            {[-30, -20, -10, 10, 20, 30].map((v) => <i key={v} className="rd-ap-gl" style={{ left: gx(v) + "%" }}></i>)}
+            <i className="rd-ap-avg" style={{ left: gx(0) + "%" }}></i>
+            {pr && prims.filter((k) => pr.gap[k.id] != null).map((k) => (
+              <i key={k.id} className="rd-ap-dot" style={{ left: gx(pr.gap[k.id]) + "%", background: k.dot }}></i>
+            ))}
+          </span>
+        </span>
+      );
+      right1 = pr ? <span className="rd-ap-dpair">{pr.lab}</span> : null;
+      body = <>
+        <div className="rd-ap-cprim">{prims.map((k) => <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{pr ? gapTxt(pr.gap[k.id]) : "—"}</b></span>)}</div>
+        <div className="rd-ap-cpic">{pic}</div>
+      </>;
     }
     const detail = isOpen && (
       <div className="rd-ap-open" role="row">
         <RdApDetail p={p} onM={onM} pub={pub} today={today} winN={win.length} avgBy={avgBy} avgFor={avgFor}
-                    facet={facet} onBack={arrived ? onBack : null} backLabel={backLabel} />
+                    facet={facet} onBack={arrived ? onBack : null} backLabel={backLabel} demSplit={demSplit} />
       </div>
     );
     if (phone) {
@@ -1985,6 +2140,7 @@ function RdAllPolls(P) {
       {facet === "leadership" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Net rating: approve minus disapprove</span><span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span></span>}
       {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span>, unsure, <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
       {facet === "issues" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Best on the top issue</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
+      {facet === "demographics" && <span className="rd-ap-hpic">{demScale(true)}</span>}
     </div>
   );
   /* the pinned bar's section links are the short names at every width - the
@@ -2064,6 +2220,20 @@ function RdAllPolls(P) {
     };
   }, [facet]);
   const flipPick = () => { pinAp(); onMeasure(onM ? "lnp" : "onp"); };
+  /* the demographics facet's split: the Who votes for whom panel's own
+     group names, picked like a facet - the table holds its spot through the
+     reflow, and the arrow keys walk the words the way they walk the tabs */
+  const splitPick = (id) => { pinAp(); setDemSplit(id); };
+  const splitPicker = (
+    <span className="rd-ap-dpick">
+      <span className="rd-pl-ctl-l">Split by:</span>
+      {/* one of five, so a radio group - which also keeps it out of the
+          facet tabs' own [role=group] */}
+      <span role="radiogroup" aria-label="Split the vote by" onKeyDown={rdTabsKey(SPLITS, splitPick)} onClick={rdTabFocus}>
+        {SPLITS.map((x) => <button key={x.id} type="button" role="radio" aria-checked={x.id === demSplit} onClick={() => splitPick(x.id)}>{x.label}</button>)}
+      </span>
+    </span>
+  );
   const basisPick = () => { pinAp(); setTppBasis(pub ? "imp" : "resp"); };
   /* Spacebar flips the two-party contest and p the published/implied
      basis while the table is on screen - the tab row's "Labor v X ⇄"
@@ -2157,10 +2327,12 @@ function RdAllPolls(P) {
             <span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span>{qpop}
           </span>
         )}
+        {facet === "demographics" && !ctlNarrow && splitPicker}
       </RdTabs>
       {facet === "twopp" && ctlNarrow && (
         <div className="rd-ap-pctl">{flip}<span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span><span className="rd-grow"></span>{qpop}</div>
       )}
+      {facet === "demographics" && ctlNarrow && <div className="rd-ap-pctl">{splitPicker}</div>}
 
       <div className="rd-ap-bar">
         <label className="rd-ap-search">
@@ -2234,12 +2406,18 @@ function RdAllPolls(P) {
           <span className="rd-key-item"><span className="rd-ap-keyring" aria-hidden="true"></span>The month’s average</span>
         </RdKey>
       )}
+      {facet === "demographics" && (
+        <RdKey className="rd-ckey rd-ap-key" items={[{ kind: "dot-solid", color: "var(--ink-3)", label: "A party’s gap between the two groups, in its colour" }]}>
+          <span className="rd-key-item"><span className="rd-ap-keyavg" aria-hidden="true"></span>Even: the same vote in both groups</span>
+        </RdKey>
+      )}
       <HowTo label="How to read this table" paras={[
         <>Dates are fieldwork; the day the poll came out sits beneath. A dash means the pollster didn’t publish that figure. Open any row for the poll in full, with what it does to today’s figure.</>,
         facet === "twopp" && <>{pub
           ? "Each figure is the pollster’s own, as published. The dot is its gap to the average of the published figures that month, and the whisker the 95% interval its sample alone would give it."
           : "Each figure reads the poll’s primary votes through the 2025 election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to that month’s average, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows."}
           {" "}About one poll in 20 should sit outside its interval by chance.</>,
+        facet === "demographics" && <>Each figure is a party’s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18–34 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party’s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation’s have widened that way as its vote has grown. Open any row for the poll’s whole table.</>,
         <><b>Sample</b> is the number of people polled; <b>eff.</b> is the pollster’s own effective sample after weighting, where it publishes one. Where it doesn’t, the interval assumes weighting costs what it does on average.</>,
       ]} />
       <div className="rd-foot">

@@ -1226,7 +1226,7 @@ function RdGenBorn({ label }) {
    trip. One instance per row so its tip is the only one open on that row,
    and the tip rides inside its dot so a party switch glides the two
    together. */
-function WvRug({ g, party, xp, pColor, pName, allXp }) {
+function WvRug({ g, party, xp, pColor, pName, allXp, split }) {
   const [tip, setTip] = useState(null);
   const tipBox = React.useRef(null);
   const ptr = React.useRef(null);
@@ -1291,7 +1291,10 @@ function WvRug({ g, party, xp, pColor, pName, allXp }) {
         const open = () => {
           if (!rk || !(window.AP && window.AP.openPoll)) return;
           setTip(null);
-          window.AP.openPoll(rk, "primary", "who votes for whom");
+          /* the poll's own vote by group, on the split of the tab the dot
+             sits under (user call 2026-10-04: dots open the poll in the
+             All-polls demographics facet) */
+          window.AP.openPoll(rk, "demographics", "who votes for whom", split);
         };
         const lab = d.f + ", " + d.l + " · " + x.toFixed(1) + "% · n≈" + d.n;
         const on = tip && tip.i === i;
@@ -1874,7 +1877,7 @@ function RdDemographics({ rangeId = "all" }) {
                   dots' ring, tip and click-through. They can't live under
                   aria-hidden once they're buttons, so the purely visual
                   siblings carry it instead of the track */}
-              {g.pd && g.px && g.px[party] && <WvRug g={g} party={party} xp={xp} pColor={pColor} pName={pName} allXp={xp(all)} />}
+              {g.pd && g.px && g.px[party] && <WvRug g={g} party={party} xp={xp} pColor={pColor} pName={pName} allXp={xp(all)} split={tab.id} />}
               <span className="rd-wv-ci" style={{ "--lo": xp(v - ci), "--hi": xp(v + ci), color: pColor }} aria-hidden="true"><i className="lo"></i><i className="hi"></i><b></b></span>
               <span className={"rd-wv-dot" + (sig ? "" : " open")} style={{ "--x": xp(v), background: sig ? pColor : undefined, borderColor: pColor }} aria-hidden="true"></span>
             </span>
@@ -2046,7 +2049,7 @@ function RdDemographics({ rangeId = "all" }) {
                     ringAtX={seY != null ? se.x : null}
                     scatter={mine(cross ? cross.scatter : c.dots, g.label)} scatterOut={mine(cross ? cross.scatterOut : [], g.label)}
                     scatterMove={mine(cross ? cross.scatterMove : [], g.label)}
-                    fade={A ? t : 1} pollFacet="primary"
+                    fade={A ? t : 1} pollFacet="demographics" pollSplit={tab.id}
                     tooltipTitle={(i) => (seY != null && i === 0 ? monthLabelFull("2025-05") : c.allPts[seY != null ? i - 1 : i] ? monthLabelFull(c.allPts[seY != null ? i - 1 : i].ym) : "")}
                     extraRows={seY != null ? ((i) => (i === 0 ? [{ label: "", value: "The election result" }] : ciUnshifted(i - 1))) : ciUnshifted}
                     fmt={(v) => v.toFixed(1)}
@@ -2109,7 +2112,7 @@ function RdDemographics({ rangeId = "all" }) {
         marks={leOn ? rowsOf.filter((r) => leY(r.l.g) != null).map((r) => ({ x: le.x, y: leY(r.l.g), color: colorOf(r) })) : []}
         ringAtX={leOn ? le.x : null}
         scatter={cross ? cross.scatter : c.dots} scatterOut={cross ? cross.scatterOut : []} scatterMove={cross ? cross.scatterMove : []}
-        fade={A ? t : 1} pollFacet="primary"
+        fade={A ? t : 1} pollFacet="demographics" pollSplit={tab.id}
         tooltipTitle={(i) => (leOn && i === 0 ? monthLabelFull("2025-05") : c.allPts[leOn ? i - 1 : i] ? monthLabelFull(c.allPts[leOn ? i - 1 : i].ym) : "")}
         extraRows={leOn ? ((i) => (i === 0 ? [{ label: "", value: "The election result" }] : ciLoc(i - 1))) : ciLoc}
         fmt={(v) => v.toFixed(1)}

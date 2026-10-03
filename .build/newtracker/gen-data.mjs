@@ -2165,8 +2165,14 @@ const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm
    oth] as published (RedBridge's two school rows merged, as the pooling
    merges them); `r` is how the figures were read; `t` is the wave's own
    all-voters figure in the same order, taken to 100, so the panel can plot
-   each poll's gap from it as §7g pools it. */
+   each poll's gap from it as §7g pools it. `d` is the wave's table exactly
+   as the house printed it – every cut but RedBridge's vote firmness, each
+   group [label, [alp, lnp, grn, onp, oth]] in the house's own order – for
+   the All-polls demographics facet: its rows compare two of these groups
+   (YouGov's 65+ and DemosAU's regional-or-rural voters join no common
+   group, so `v` alone can't serve them) and an opened poll shows the lot. */
 const DEMO_GROUPS = DEMO_SETS.flatMap((st) => st.groups);
+const DEMO_RAW_DIMS = ["gender", "age", "generation", "education", "state", "location", "housing", "language"];
 const DEMO_BY_POLL = new Map();
 for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) {
   const p = demoPollOf(w);
@@ -2179,8 +2185,10 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
   });
   while (v.length && v[v.length - 1] == null) v.pop();
   const tot = demoTotalOf(w, p);
+  const d = Object.fromEntries(DEMO_RAW_DIMS.filter((k) => w.dims && w.dims[k]).map((k) => [k,
+    Object.entries(w.dims[k]).map(([g, s]) => [g, ["alp", "lnp", "grn", "onp", "oth"].map((q) => (s[q] != null ? r1(+s[q]) : null))])]));
   if (v.some(Boolean)) DEMO_BY_POLL.set(p.date + "|" + p.pollster,
-    { r: w.read, v, ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => r1(tot[k])) } : {}) });
+    { r: w.read, v, d, ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => r1(tot[k])) } : {}) });
 }
 
 /* ---- 6. individual polls (full archive) -------------------------------- */

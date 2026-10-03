@@ -2302,9 +2302,11 @@ function App() {
        use. It used to be assumed - every trip started at a chart, so the way
        back could say so - and "Back to the chart" is simply wrong for a reader
        who arrived from the list of releases behind a projection. */
-    window.AP.openPoll = (key, facet, from) => {
+    /* `split` rides along for the demographics facet: a Who votes for whom
+       dot names its group tab, so the poll opens on that split */
+    window.AP.openPoll = (key, facet, from, split) => {
       if (!key) return;
-      setFocusPoll({ key, facet: facet || null,
+      setFocusPoll({ key, facet: facet || null, split: split || null,
                      back: { tab: readHash(), y: window.scrollY, from: from || "the chart" } });
       setTab("allpolls");
       if (readHash() !== "allpolls") window.location.hash = "allpolls";

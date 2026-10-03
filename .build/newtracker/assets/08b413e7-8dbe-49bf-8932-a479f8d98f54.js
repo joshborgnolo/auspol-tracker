@@ -247,6 +247,9 @@ function TrendChart(props) {
     /* Which archive view a dot from THIS chart should land in. The chart has no
        idea what it is plotting; the panel does. */
     pollFacet,
+    /* …and, for the demographics facet, which split: the Who votes for whom
+       charts pass their group tab, so a dot opens on its own pair */
+    pollSplit,
     /* `onDoubleEmpty`: two quick presses on OPEN chart - catching no poll and
        no event - call it (the hero 2PP chart steps its matchup on it). A
        press that picks something keeps its own job instead: a tapped dot
@@ -610,7 +613,7 @@ function TrendChart(props) {
   const touchTapAt = useRef(0);
   const handleClick = (e) => {
     if (performance.now() - touchTapAt.current < 400) return;
-    if (openable) { window.AP.openPoll(rowKey, pollFacet); return; }
+    if (openable) { window.AP.openPoll(rowKey, pollFacet, undefined, pollSplit); return; }
     dblEmpty(e, MOUSE_PICK_PX);
   };
 

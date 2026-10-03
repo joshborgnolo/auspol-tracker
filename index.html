@@ -3260,11 +3260,13 @@ body.rd .rd-swap-now.in { animation: rd-xf-in .2s ease-out both; }
 @keyframes rd-ap-in-clead { from { opacity: 0; } }
 @keyframes rd-ap-in-cdir { from { opacity: 0; } }
 @keyframes rd-ap-in-ciss { from { opacity: 0; } }
+@keyframes rd-ap-in-cdem { from { opacity: 0; } }
 body.rd .rd-ap-sw.rd-ap-c2pp { --rd-ap-in: rd-ap-in-c2pp; }
 body.rd .rd-ap-sw.rd-ap-cprim { --rd-ap-in: rd-ap-in-cprim; }
 body.rd .rd-ap-sw.rd-ap-clead { --rd-ap-in: rd-ap-in-clead; }
 body.rd .rd-ap-sw.rd-ap-cdir { --rd-ap-in: rd-ap-in-cdir; }
 body.rd .rd-ap-sw.rd-ap-ciss { --rd-ap-in: rd-ap-in-ciss; }
+body.rd .rd-ap-sw.rd-ap-cdem { --rd-ap-in: rd-ap-in-cdem; }
 body.rd :is(.rd-ap-row, .rd-ap-hrow).rd-ap-sw > :nth-child(n+5):not(.rd-ap-chev),
 body.rd .rd-ap-card.rd-ap-sw > :is(.rd-ap-c1, .rd-ap-c2) > :last-child,
 body.rd .rd-ap-card.rd-ap-sw > :nth-child(n+3),
@@ -4638,6 +4640,7 @@ body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(120px, 176px) minmax(104px, 136px) minmax(104px, 136px) minmax(168px, 336px) 72px 40px; }
+body.rd .rd-ap-cdem { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint);
   box-sizing: border-box; min-height: 57px;  }
 body.rd .rd-ap-hrow > * { min-width: 0; }
@@ -4760,6 +4763,20 @@ body.rd .rd-ap-dbar i:first-child { border-radius: 2px 0 0 2px; }
 body.rd .rd-ap-dbar i:last-child { border-radius: 0 2px 2px 0; }
 body.rd .rd-ap-dbar i.u { background: var(--line); }
 body.rd .rd-ap-ciss .rd-ap-dnum > .rd-ap-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.rd .rd-ap-dgap { gap: 2px; }
+body.rd .rd-ap-dgap .rd-ap-pnums > b { font-variant-numeric: tabular-nums; }
+body.rd .rd-ap-dpick { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-3); white-space: nowrap; }
+body.rd .rd-tabs > .rd-ap-dpick { margin-bottom: -1px; }
+body.rd .rd-ap-dpick > [role="radiogroup"] { display: inline-flex; align-items: center; gap: 2px; }
+body.rd .rd-ap-dpick button {
+  all: unset; cursor: pointer; box-sizing: border-box; min-height: 44px; padding: 0 7px;
+  display: inline-flex; align-items: center; color: var(--ink-3);
+}
+body.rd .rd-ap-dpick button:hover { color: var(--ink); }
+body.rd .rd-ap-dpick button[aria-checked="true"] { color: var(--ink); font-weight: 600; }
+body.rd .rd-ap-dpick button:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; border-radius: 4px; }
+body.rd .rd-ap-pctl .rd-ap-dpick { font-size: 13px; }
+body.rd .rd-ap-pctl .rd-ap-dpick button { padding: 0 6px; }
 body.rd .rd-ap-empty { padding: 28px 12px; font-size: 14px; color: var(--ink-2); }
 body.rd .rd-ap-tip {
   position: absolute; bottom: calc(50% + 14px); top: auto; transform: translateX(-50%); z-index: 20;
@@ -4843,12 +4860,27 @@ body.rd .rd-apd-isslab { font-size: 13px; line-height: 1.35; color: var(--ink-2)
 body.rd .rd-apd-issbar { position: relative; height: 8px; border-radius: 4px; background: var(--line-2); overflow: hidden; }
 body.rd .rd-apd-issbar i { display: block; height: 100%; border-radius: 4px; background: var(--ink-3); }
 body.rd .rd-apd-issrow > b { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+body.rd .rd-apd-demwrap { grid-column: 1 / -1; padding-bottom: 22px; border-bottom: 1px solid var(--line-2); }
+body.rd .rd-apd-demcols { margin-top: 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 36px; align-items: start; }
+body.rd .rd-apd-dem { display: flex; flex-direction: column; min-width: 0; font-size: 13px; font-variant-numeric: tabular-nums; }
+body.rd .rd-apd-demr { display: grid; grid-template-columns: minmax(0, 1fr) repeat(5, 44px); align-items: baseline; padding: 3px 6px; border-radius: 4px; }
+body.rd .rd-apd-demr > span:first-child { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.rd .rd-apd-demr > span:not(:first-child) { text-align: right; padding-right: 6px; }
+body.rd .rd-apd-demh { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; padding-bottom: 6px; border-bottom: 1px solid var(--line-2); }
+body.rd .rd-apd-demall, body.rd .rd-apd-demall > span:first-child { font-weight: 600; color: var(--ink); }
+body.rd .rd-apd-demsub { margin-top: 8px; padding: 4px 6px 2px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+body.rd .rd-apd-demr.on { background: var(--surface); box-shadow: inset 2px 0 0 var(--ink-3); }
+body.rd .rd-apd-dv { color: var(--ink-2); }
+body.rd .rd-apd-dv.hi { color: var(--ink); font-weight: 600; background: color-mix(in oklab, var(--ink) 7%, transparent); border-radius: 3px; }
+body.rd .rd-apd-dv.lo { color: var(--ink-faint); }
+body.rd .rd-apd-demwrap .rd-apd-note { margin-top: 8px; }
 @media (max-width: 1240px) {
   body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px 52px minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(108px, 148px) minmax(96px, 116px) 0 minmax(160px, 300px) 72px 32px; }
+  body.rd .rd-ap-cdem { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-hrow.rd-ap-ciss > :nth-child(7), body.rd .rd-ap-row.rd-ap-ciss > :nth-child(7) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-long { display: none; }
 }
@@ -4859,6 +4891,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
   body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px 120px 0 0 minmax(150px, 1fr) 72px 28px; }
+  body.rd .rd-ap-cdem { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-hrow.rd-ap-ciss > :nth-child(6), body.rd .rd-ap-row.rd-ap-ciss > :nth-child(6) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-n, body.rd .rd-ap-hrow > .rd-ap-th:nth-child(3) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
@@ -4869,6 +4902,8 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-search { width: 260px; }
   body.rd .rd-ap-open { padding: 20px 16px; }
   body.rd .rd-apd { grid-template-columns: minmax(0, 1fr); }
+  body.rd .rd-apd-demcols { grid-template-columns: minmax(0, 1fr); }
+  body.rd .rd-apd-dem + .rd-apd-dem > :is(.rd-apd-demh, .rd-apd-demall) { display: none; }
 }
 @media (max-width: 760px) {
   body.rd { --rd-pin: 45px; }
@@ -4892,13 +4927,13 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-phead .rd-ap-in, body.rd .rd-ap-card .rd-ap-in { left: 8px; right: 8px; }
   body.rd .rd-ap-phead.rd-ap-c2pp .rd-ap-in, body.rd .rd-ap-card.rd-ap-c2pp .rd-ap-in { right: 46px; }
   body.rd .rd-ap-phead .rd-ap-cap { left: 8px; }
-  body.rd .rd-ap-c2pp, body.rd .rd-ap-cprim, body.rd .rd-ap-clead, body.rd .rd-ap-cdir, body.rd .rd-ap-ciss { grid-template-columns: none; }
+  body.rd .rd-ap-c2pp, body.rd .rd-ap-cprim, body.rd .rd-ap-clead, body.rd .rd-ap-cdir, body.rd .rd-ap-ciss, body.rd .rd-ap-cdem { grid-template-columns: none; }
   body.rd .rd-ap-mrow { display: flex; align-items: baseline; gap: 8px; padding: 22px 0 6px; }
   body.rd .rd-ap-mlab { padding-left: 0; gap: 8px; }
   body.rd .rd-ap-mlab span { font-size: 12px; }
   body.rd .rd-ap-mavg { margin-left: auto; font-size: 12px; }
   body.rd .rd-ap-card { padding: 11px 0 8px; border-bottom: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
-  body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss) { min-height: 122px; }
+  body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss, .rd-ap-cdem) { min-height: 122px; }
   body.rd .rd-ap-card:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   body.rd .rd-ap-card.open { border-bottom-color: transparent; }
   body.rd .rd-ap-card.arrived { box-shadow: inset 3px 0 0 var(--accent); padding-left: 8px; }
@@ -4916,6 +4951,8 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-card .rd-ap-cprim > span { display: inline-flex; align-items: baseline; gap: 4px; }
   body.rd .rd-ap-card .rd-ap-cprim em { font-style: normal; font-size: 11px; color: var(--ink-3); }
   body.rd .rd-ap-card .rd-ap-cprim b { font-size: 15px; font-weight: 600; }
+  body.rd .rd-ap-dpair { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+  body.rd .rd-apd-demr { grid-template-columns: minmax(0, 1fr) repeat(5, 40px); padding: 3px 2px; }
   body.rd .rd-ap-cnets, body.rd .rd-ap-csub { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
   body.rd .rd-ap-csub-sent { display: block; container-type: inline-size; }
   body.rd .rd-ap-mgmt-s, body.rd .rd-ap-mgmt-x { display: none; }
@@ -4952,11 +4989,18 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-more { gap: 14px; }
   body.rd .rd-ap-shown { font-size: 12px; }
 }
-@media (max-width: 400px) {
+@media (max-width: 519px) {
   body.rd .rd-ap-tabs .rd-tab { padding: 0 6px; }
 }
-@media (max-width: 360px) {
-  body.rd .rd-ap-tabs .rd-tab { padding: 0 2px; font-size: 14px; }
+@media (max-width: 439px) {
+  body.rd .rd-ap-tabs .rd-tab { padding: 0 2px; }
+}
+@media (max-width: 389px) {
+  body.rd .rd-ap-tabs > div[role="group"] { gap: 2px !important; }
+  body.rd .rd-ap-tabs .rd-tab { padding: 0 1px; font-size: 14px; }
+}
+@media (max-width: 349px) {
+  body.rd .rd-ap-tabs .rd-tab { font-size: 12.5px; }
 }
 body.rd .rd-ap-sheetwrap { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-end; background: color-mix(in oklab, var(--ink) 38%, transparent); }
 body.rd .rd-ap-sheet {
@@ -5123,6 +5167,9 @@ body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 60
     content: ""; position: sticky; right: 0; flex: 0 0 28px; margin-left: -28px; align-self: stretch;
     background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none;
   }
+}
+@media (max-width: 360px) {
+  body.rd .rd-ap-pctl .rd-ap-dpick > .rd-pl-ctl-l { display: none; }
 }
 </style>
   <!-- Marks the page as booting so the static article stays invisible until
@@ -26596,6 +26643,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[36.6, 17.9, 28.1, 5.5, 11.9], [37.2, 26.1, 12.1, 8.5, 16.1], [31.5, 37.5, 4.2, 8.6, 18.2], null, null, null, null, [33.6, 30.8, 10.7, 9, 15.9], [36.2, 27, 13.6, 7, 16.3], null, null, null, [35.9, 31.3, 11.3, 7.9, 13.5], [37.7, 27.8, 12.7, 7.7, 14.3], [31.3, 30.6, 11.1, 10.3, 16.7], [33.1, 25.4, 13.6, 6.5, 21.5]],
+      "d": {
+        "gender": [["Men", [33.6, 30.8, 10.7, 9, 15.9]], ["Women", [36.2, 27, 13.6, 7, 16.3]]],
+        "age": [["18–34", [36.6, 17.9, 28.1, 5.5, 11.9]], ["35–54", [37.2, 26.1, 12.1, 8.5, 16.1]], ["55+", [31.5, 37.5, 4.2, 8.6, 18.2]]],
+        "state": [["NSW", [35.9, 31.3, 11.3, 7.9, 13.5]], ["Vic", [37.7, 27.8, 12.7, 7.7, 14.3]], ["Qld", [31.3, 30.6, 11.1, 10.3, 16.7]], ["Rest of Australia", [33.1, 25.4, 13.6, 6.5, 21.5]]]
+      },
       "t": [35, 29, 12, 8, 16]
     }
   }, {
@@ -27096,6 +27148,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[38.6, 24.4, 21.7, 5.9, 9.5], [39.8, 23.8, 11.3, 10.1, 15], [33.6, 36.1, 4.1, 11.3, 14.8], null, null, null, null, [36, 32.2, 9.6, 9.9, 12.3], [38.2, 25.3, 13.4, 8.7, 14.4], null, null, null, [37.2, 28.8, 12.7, 11.7, 9.6], [36.1, 30.5, 11.7, 6.5, 15.3], [39.1, 28.8, 10.3, 8.6, 13.3], [36.5, 26.3, 10.7, 9.8, 16.7]],
+      "d": {
+        "gender": [["Men", [36, 32.2, 9.6, 9.9, 12.3]], ["Women", [38.2, 25.3, 13.4, 8.7, 14.4]]],
+        "age": [["18–34", [38.6, 24.4, 21.7, 5.9, 9.5]], ["35–54", [39.8, 23.8, 11.3, 10.1, 15]], ["55+", [33.6, 36.1, 4.1, 11.3, 14.8]]],
+        "state": [["NSW", [37.2, 28.8, 12.7, 11.7, 9.6]], ["Vic", [36.1, 30.5, 11.7, 6.5, 15.3]], ["Qld", [39.1, 28.8, 10.3, 8.6, 13.3]], ["Rest of Australia", [36.5, 26.3, 10.7, 9.8, 16.7]]]
+      },
       "t": [36.6, 28.7, 11.9, 8.9, 13.9]
     }
   }, {
@@ -27629,6 +27686,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[40.5, 18.3, 21.8, 10.6, 8.9], [34, 24, 10.2, 12.8, 19], [31.7, 36.5, 4, 12.4, 15.4], null, null, null, null, [38.7, 27.3, 8.9, 11.5, 13.6], [31.3, 26.9, 13.3, 12.6, 16], null, null, null, [33.7, 28.3, 8.5, 15.6, 13.8], [31.6, 30, 14.6, 8.7, 15], [37, 27.4, 9.7, 12, 13.9], [38.8, 21.6, 12, 10.9, 16.8]],
+      "d": {
+        "gender": [["Men", [38.7, 27.3, 8.9, 11.5, 13.6]], ["Women", [31.3, 26.9, 13.3, 12.6, 16]]],
+        "age": [["18–34", [40.5, 18.3, 21.8, 10.6, 8.9]], ["35–54", [34, 24, 10.2, 12.8, 19]], ["55+", [31.7, 36.5, 4, 12.4, 15.4]]],
+        "state": [["NSW", [33.7, 28.3, 8.5, 15.6, 13.8]], ["Vic", [31.6, 30, 14.6, 8.7, 15]], ["Qld", [37, 27.4, 9.7, 12, 13.9]], ["Rest of Australia", [38.8, 21.6, 12, 10.9, 16.8]]]
+      },
       "t": [35, 27, 11, 12, 15]
     }
   }, {
@@ -28319,6 +28381,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[38.6, 20.4, 19.8, 8.7, 12.5], [35.1, 25.9, 11.9, 12.7, 14.5], [28.6, 35.8, 3.4, 14.2, 18.1], null, null, null, null, [35.2, 30.3, 9.1, 10.1, 15.3], [31.9, 26.2, 12.4, 14.1, 15.4], null, null, null, [35, 29.5, 9.4, 13.9, 12.2], [33.4, 28.5, 11.8, 10.4, 15.8], [34.7, 22.9, 13.1, 12.7, 16.6], [30.5, 30.7, 9.5, 11.2, 18.1]],
+      "d": {
+        "gender": [["Men", [35.2, 30.3, 9.1, 10.1, 15.3]], ["Women", [31.9, 26.2, 12.4, 14.1, 15.4]]],
+        "age": [["18–34", [38.6, 20.4, 19.8, 8.7, 12.5]], ["35–54", [35.1, 25.9, 11.9, 12.7, 14.5]], ["55+", [28.6, 35.8, 3.4, 14.2, 18.1]]],
+        "state": [["NSW", [35, 29.5, 9.4, 13.9, 12.2]], ["Vic", [33.4, 28.5, 11.8, 10.4, 15.8]], ["Qld", [34.7, 22.9, 13.1, 12.7, 16.6]], ["Rest of Australia", [30.5, 30.7, 9.5, 11.2, 18.1]]]
+      },
       "t": [33.7, 27.7, 10.9, 11.9, 15.8]
     }
   }, {
@@ -29070,6 +29137,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[38.6, 20.8, 18.3, 7, 15.3], [34.8, 25.1, 10.9, 14.8, 14.4], [27.7, 39.1, 7.2, 14.3, 11.7], null, null, null, null, [34.2, 31.5, 11.1, 11.1, 12], [32.2, 27.1, 12, 13.6, 15.1], null, null, null, [34.3, 31, 11.5, 12.8, 10.5], [32.9, 28.7, 12.5, 12, 14], [34.7, 26.3, 14.2, 11.3, 13.6], [30.6, 30.1, 8.4, 13.2, 17.7]],
+      "d": {
+        "gender": [["Men", [34.2, 31.5, 11.1, 11.1, 12]], ["Women", [32.2, 27.1, 12, 13.6, 15.1]]],
+        "age": [["18–34", [38.6, 20.8, 18.3, 7, 15.3]], ["35–54", [34.8, 25.1, 10.9, 14.8, 14.4]], ["55+", [27.7, 39.1, 7.2, 14.3, 11.7]]],
+        "state": [["NSW", [34.3, 31, 11.5, 12.8, 10.5]], ["Vic", [32.9, 28.7, 12.5, 12, 14]], ["Qld", [34.7, 26.3, 14.2, 11.3, 13.6]], ["Rest of Australia", [30.6, 30.1, 8.4, 13.2, 17.7]]]
+      },
       "t": [33.3, 29.3, 12.1, 12.1, 13.1]
     }
   }, {
@@ -30202,6 +30274,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[37, 21.4, 22.6, 8.2, 10.8], [40.7, 21.7, 10.1, 12.6, 14.9], [29.4, 32.4, 4, 19.1, 15.1], null, null, null, null, [39.4, 27.9, 6.7, 12.3, 13.7], [31.5, 23.6, 15.6, 15.4, 13.9], null, null, null, [34.6, 25.5, 10.7, 16.8, 12.4], [31, 31.2, 11, 11.4, 15.3], [36.3, 26, 11.7, 10.9, 15.2], [41.1, 18.9, 12, 15.2, 12.9]],
+      "d": {
+        "gender": [["Men", [39.4, 27.9, 6.7, 12.3, 13.7]], ["Women", [31.5, 23.6, 15.6, 15.4, 13.9]]],
+        "age": [["18–34", [37, 21.4, 22.6, 8.2, 10.8]], ["35–54", [40.7, 21.7, 10.1, 12.6, 14.9]], ["55+", [29.4, 32.4, 4, 19.1, 15.1]]],
+        "state": [["NSW", [34.6, 25.5, 10.7, 16.8, 12.4]], ["Vic", [31, 31.2, 11, 11.4, 15.3]], ["Qld", [36.3, 26, 11.7, 10.9, 15.2]], ["Rest of Australia", [41.1, 18.9, 12, 15.2, 12.9]]]
+      },
       "t": [35, 26, 11, 14, 14]
     }
   }, {
@@ -30738,6 +30815,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[32.3, 22, 21.4, 10.8, 13.6], [35.2, 22, 11.4, 15.4, 16.1], [29.2, 37.8, 4.6, 19.8, 8.6], null, null, null, null, [36, 27.8, 11.3, 14.3, 10.6], [28.2, 28.4, 11.8, 17.3, 14.3], null, null, null, [30.6, 28.5, 8.8, 19.6, 12.5], [30.5, 30.4, 11.9, 14.7, 12.5], [33.5, 26.5, 14, 14.4, 11.6], [34.5, 26.3, 12.7, 13.3, 13.2]],
+      "d": {
+        "gender": [["Men", [36, 27.8, 11.3, 14.3, 10.6]], ["Women", [28.2, 28.4, 11.8, 17.3, 14.3]]],
+        "age": [["18–34", [32.3, 22, 21.4, 10.8, 13.6]], ["35–54", [35.2, 22, 11.4, 15.4, 16.1]], ["55+", [29.2, 37.8, 4.6, 19.8, 8.6]]],
+        "state": [["NSW", [30.6, 28.5, 8.8, 19.6, 12.5]], ["Vic", [30.5, 30.4, 11.9, 14.7, 12.5]], ["Qld", [33.5, 26.5, 14, 14.4, 11.6]], ["Rest of Australia", [34.5, 26.3, 12.7, 13.3, 13.2]]]
+      },
       "t": [32, 28, 12, 16, 12]
     }
   }, {
@@ -31465,6 +31547,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[36.3, 22.1, 23.4, 8.5, 9.7], [29.9, 24.7, 7.1, 20.9, 17.4], [25.2, 35.7, 4.1, 22.1, 13], null, null, null, null, [32.1, 28.9, 9.3, 17.7, 12], [27.7, 27.4, 11.6, 18.1, 15.2], null, null, null, [30.7, 26.3, 11.9, 19.7, 11.5], [26.1, 32.6, 12.8, 16.6, 11.9], [27.8, 29.6, 9.7, 19, 13.9], [34.8, 24.4, 6.4, 15.9, 18.5]],
+      "d": {
+        "gender": [["Men", [32.1, 28.9, 9.3, 17.7, 12]], ["Women", [27.7, 27.4, 11.6, 18.1, 15.2]]],
+        "age": [["18–34", [36.3, 22.1, 23.4, 8.5, 9.7]], ["35–54", [29.9, 24.7, 7.1, 20.9, 17.4]], ["55+", [25.2, 35.7, 4.1, 22.1, 13]]],
+        "state": [["NSW", [30.7, 26.3, 11.9, 19.7, 11.5]], ["Vic", [26.1, 32.6, 12.8, 16.6, 11.9]], ["Qld", [27.8, 29.6, 9.7, 19, 13.9]], ["Rest of Australia", [34.8, 24.4, 6.4, 15.9, 18.5]]]
+      },
       "t": [30, 28, 10, 18, 14]
     }
   }, {
@@ -32715,6 +32802,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [[36, 11, 28, 14, 10], null, null, null, null, null, null, [31, 20, 9, 29, 11], [29, 18, 15, 27, 11], null, null, null, null, null, null, null, [35, 21, 17, 16, 11], [29, 18, 13, 30, 10], [35, 16, 8, 30, 12], [21, 19, 7, 40, 13]],
+      "d": {
+        "gender": [["Men", [31, 20, 9, 29, 11]], ["Women", [29, 18, 15, 27, 11]]],
+        "age": [["18–34", [36, 11, 28, 14, 10]], ["35–49", [32, 17, 13, 25, 12]], ["50–64", [27, 21, 5, 36, 11]], ["65+", [24, 27, 1, 37, 11]]],
+        "location": [["Inner metro", [35, 21, 17, 16, 11]], ["Outer metro", [29, 18, 13, 30, 10]], ["Provincial", [35, 16, 8, 30, 12]], ["Rural", [21, 19, 7, 40, 13]]]
+      },
       "t": [30, 19, 12, 28, 11]
     },
     "sw": {
@@ -33144,6 +33236,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[36.7, 17.6, 19.1, 13.6, 13], [32.4, 22.9, 10.3, 23.9, 10.4], [27.4, 26, 4.6, 29.8, 12.2], null, null, null, null, [33.9, 22.4, 8.6, 22.6, 12.4], [29.8, 22.6, 12.7, 23.5, 11.4], null, null, null, [31.7, 20.7, 11.1, 24.4, 12.1], [29.2, 21.2, 12, 25.1, 12.6], [30.1, 24.8, 11.7, 22.7, 10.7], [36.5, 24.5, 7.9, 19.4, 11.6]],
+      "d": {
+        "gender": [["Men", [33.9, 22.4, 8.6, 22.6, 12.4]], ["Women", [29.8, 22.6, 12.7, 23.5, 11.4]]],
+        "age": [["18–34", [36.7, 17.6, 19.1, 13.6, 13]], ["35–54", [32.4, 22.9, 10.3, 23.9, 10.4]], ["55+", [27.4, 26, 4.6, 29.8, 12.2]]],
+        "state": [["NSW", [31.7, 20.7, 11.1, 24.4, 12.1]], ["Vic", [29.2, 21.2, 12, 25.1, 12.6]], ["Qld", [30.1, 24.8, 11.7, 22.7, 10.7]], ["Rest of Australia", [36.5, 24.5, 7.9, 19.4, 11.6]]]
+      },
       "t": [31.7, 22.8, 10.9, 22.8, 11.9]
     }
   }, {
@@ -33949,6 +34046,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [[35, 14, 29, 11, 11], null, null, null, null, null, null, [32, 23, 9, 26, 10], [26, 22, 16, 22, 14], null, null, null, null, null, null, null, [34, 23, 14, 17, 11], [31, 19, 11, 25, 13], [22, 27, 14, 28, 8], [23, 23, 13, 28, 13]],
+      "d": {
+        "gender": [["Men", [32, 23, 9, 26, 10]], ["Women", [26, 22, 16, 22, 14]]],
+        "age": [["18–34", [35, 14, 29, 11, 11]], ["35–49", [30, 21, 14, 23, 13]], ["50–64", [27, 23, 6, 30, 14]], ["65+", [24, 33, 2, 32, 10]]],
+        "location": [["Inner metro", [34, 23, 14, 17, 11]], ["Outer metro", [31, 19, 11, 25, 13]], ["Provincial", [22, 27, 14, 28, 8]], ["Rural", [23, 23, 13, 28, 13]]]
+      },
       "t": [29, 22, 13, 24, 12]
     },
     "sw": {
@@ -34254,6 +34356,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [null, null, null, [30, 16, 32, 12, 10], [30, 19, 14, 29, 8], [34, 14, 7, 35, 10], [32, 25, 2, 33, 8], [33, 21, 11, 29, 6], [30, 19, 12, 28, 11], [25.8, 21.3, 13.5, 32.4, 7], [29, 18, 9, 33, 11], [42, 19, 14, 17, 8], null, null, null, null, [41, 20, 14, 16, 9], [32, 16, 14, 28, 10], [32, 22, 5, 34, 7], [22, 20, 11, 39, 8], [31, 24, 6, 32, 7], [35, 20, 10, 28, 7]],
+      "d": {
+        "gender": [["Women", [30, 19, 12, 28, 11]], ["Men", [33, 21, 11, 29, 6]]],
+        "generation": [["Gen Z", [30, 16, 32, 12, 10]], ["Millennials", [30, 19, 14, 29, 8]], ["Gen X", [34, 14, 7, 35, 10]], ["Boomers", [32, 25, 2, 33, 8]]],
+        "education": [["Below Year 12", [27, 17, 5, 44, 7]], ["Year 12", [25, 24, 19, 25, 7]], ["TAFE or trade", [29, 18, 9, 33, 11]], ["University", [42, 19, 14, 17, 8]]],
+        "location": [["Inner metro", [41, 20, 14, 16, 9]], ["Outer metro", [32, 16, 14, 28, 10]], ["Provincial", [32, 22, 5, 34, 7]], ["Rural", [22, 20, 11, 39, 8]]],
+        "housing": [["Own outright", [31, 24, 6, 32, 7]], ["Mortgage", [35, 20, 10, 28, 7]], ["Renting and other", [29, 11, 21, 24, 15]]]
+      },
       "t": [32, 19, 12, 28, 9]
     }
   }, {
@@ -34730,6 +34839,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [[31, 13, 30, 15, 11], null, null, null, null, null, null, [29, 20, 13, 28, 9], [31, 19, 13, 23, 14], null, null, null, null, null, null, null, [39, 17, 15, 18, 10], [29, 22, 13, 26, 10], [30, 19, 12, 27, 13], [20, 21, 10, 33, 17]],
+      "d": {
+        "gender": [["Men", [29, 20, 13, 28, 9]], ["Women", [31, 19, 13, 23, 14]]],
+        "age": [["18–34", [31, 13, 30, 15, 11]], ["35–49", [31, 17, 12, 25, 15]], ["50–64", [27, 21, 5, 35, 12]], ["65+", [32, 30, 2, 27, 10]]],
+        "location": [["Inner metro", [39, 17, 15, 18, 10]], ["Outer metro", [29, 22, 13, 26, 10]], ["Provincial", [30, 19, 12, 27, 13]], ["Rural", [20, 21, 10, 33, 17]]]
+      },
       "t": [30, 19, 13, 26, 12]
     },
     "sw": {
@@ -34962,6 +35076,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[35.3, 12.7, 21.8, 16.7, 13.6], [27.3, 19.1, 13.4, 24.9, 15.3], [26.9, 30.1, 4.4, 28.1, 10.4], null, null, null, null, [30.1, 24, 9.9, 25.4, 10.6], [28.7, 19.2, 14.6, 22.4, 15.2], null, null, null, [27.6, 20.3, 10.5, 29.1, 12.4], [31.2, 22.1, 14.8, 21.3, 10.7], [29.2, 24, 11.8, 23.6, 11.5], [30, 20.3, 12.5, 19.3, 17.9]],
+      "d": {
+        "gender": [["Men", [30.1, 24, 9.9, 25.4, 10.6]], ["Women", [28.7, 19.2, 14.6, 22.4, 15.2]]],
+        "age": [["18–34", [35.3, 12.7, 21.8, 16.7, 13.6]], ["35–54", [27.3, 19.1, 13.4, 24.9, 15.3]], ["55+", [26.9, 30.1, 4.4, 28.1, 10.4]]],
+        "state": [["NSW", [27.6, 20.3, 10.5, 29.1, 12.4]], ["Vic", [31.2, 22.1, 14.8, 21.3, 10.7]], ["Qld", [29.2, 24, 11.8, 23.6, 11.5]], ["Rest of Australia", [30, 20.3, 12.5, 19.3, 17.9]]]
+      },
       "t": [29, 22, 12, 24, 13]
     }
   }, {
@@ -35500,6 +35619,12 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [null, null, null, [32, 10, 32, 10, 16], [28, 14, 17, 30, 11], [27, 20, 7, 32, 13], [32, 27, 3, 30, 7], [30, 19, 9, 31, 12], [29, 19, 17, 24, 11], null, null, null, null, null, null, null, [34, 20, 18, 17, 11], [31, 19, 13, 28, 9], [29, 19, 9, 32, 11], [21, 18, 10, 36, 15], [28, 32, 3, 29, 8], [28, 18, 12, 33, 8], [26, 11, 19, 27, 17]],
+      "d": {
+        "gender": [["Men", [30, 19, 9, 31, 12]], ["Women", [29, 19, 17, 24, 11]]],
+        "generation": [["Gen Z", [32, 10, 32, 10, 16]], ["Millennials", [28, 14, 17, 30, 11]], ["Gen X", [27, 20, 7, 32, 13]], ["Boomers", [32, 27, 3, 30, 7]], ["Silent", [16, 38, 5, 33, 8]]],
+        "location": [["Inner metro", [34, 20, 18, 17, 11]], ["Outer metro", [31, 19, 13, 28, 9]], ["Provincial", [29, 19, 9, 32, 11]], ["Rural", [21, 18, 10, 36, 15]]],
+        "housing": [["Own outright", [28, 32, 3, 29, 8]], ["Mortgage", [28, 18, 12, 33, 8]], ["Renting", [26, 11, 19, 27, 17]]]
+      },
       "t": [29, 19, 13, 27, 12]
     },
     "sw": {
@@ -36438,6 +36563,12 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [null, null, null, [28, 10, 34, 13, 14], [33, 14, 14, 26, 13], [26, 21, 8, 30, 14], [30, 30, 4, 27, 10], [32, 21, 10, 25, 12], [27, 19, 16, 25, 13], null, null, null, null, null, null, null, [36, 20, 15, 19, 11], [28, 22, 13, 26, 11], [25, 19, 15, 33, 8], [28, 19, 8, 26, 19], [30, 29, 5, 23, 13], [26, 21, 11, 31, 11], [35, 15, 17, 21, 12]],
+      "d": {
+        "gender": [["Men", [32, 21, 10, 25, 12]], ["Women", [27, 19, 16, 25, 13]]],
+        "generation": [["Gen Z", [28, 10, 34, 13, 14]], ["Millennials", [33, 14, 14, 26, 13]], ["Gen X", [26, 21, 8, 30, 14]], ["Boomers", [30, 30, 4, 27, 10]], ["Silent", [46, 36, 0, 17, 0]]],
+        "location": [["Inner metro", [36, 20, 15, 19, 11]], ["Outer metro", [28, 22, 13, 26, 11]], ["Provincial", [25, 19, 15, 33, 8]], ["Rural", [28, 19, 8, 26, 19]]],
+        "housing": [["Own outright", [30, 29, 5, 23, 13]], ["Mortgage", [26, 21, 11, 31, 11]], ["Renting", [35, 15, 17, 21, 12]]]
+      },
       "t": [29.7, 19.8, 12.9, 24.8, 12.9]
     },
     "sw": {
@@ -36826,6 +36957,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "measured from the charts",
       "v": [[24, 18, 28, 20, 10], [26, 20, 13, 26, 15], [28, 27, 5, 29, 11], null, null, null, null, [28, 23, 11, 24, 14], [25, 22, 15, 28, 10], [26, 22, 10, 31, 11], [24, 23, 13, 28, 12], [29, 24, 17, 18, 12], null, null, null, null, [33, 25, 16, 14, 12], [25, 25, 11, 26, 13], null, null, [26, 29, 9, 25, 11], [26, 23, 12, 25, 14], [27, 16, 17, 29, 11]],
+      "d": {
+        "gender": [["Men", [28, 23, 11, 24, 14]], ["Women", [25, 22, 15, 28, 10]]],
+        "age": [["18–34", [24, 18, 28, 20, 10]], ["35–54", [26, 20, 13, 26, 15]], ["55+", [28, 27, 5, 29, 11]]],
+        "education": [["School", [26, 22, 10, 31, 11]], ["TAFE", [24, 23, 13, 28, 12]], ["University", [29, 24, 17, 18, 12]]],
+        "location": [["Inner metro", [33, 25, 16, 14, 12]], ["Outer metro", [25, 25, 11, 26, 13]], ["Regional or rural", [21, 17, 12, 40, 10]]],
+        "housing": [["Renting", [27, 16, 17, 29, 11]], ["Mortgage", [26, 23, 12, 25, 14]], ["Own outright", [26, 29, 9, 25, 11]]]
+      },
       "t": [26, 23, 13, 26, 12]
     },
     "sw": {
@@ -37169,6 +37307,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[32.9, 20.6, 25.5, 13.4, 7.7], [39.4, 19.7, 11.2, 19, 10.7], [24.3, 28.2, 3.7, 32, 11.9], null, null, null, null, [33.4, 25, 9.9, 22.6, 9.1], [30.2, 21.5, 14.7, 22.2, 11.5], null, null, null, [33.8, 23.5, 9.9, 22.1, 10.7], [27.8, 24.8, 13.9, 22.2, 11.3], [28.7, 23, 12.9, 23.1, 12.4], [36.1, 21.1, 13.5, 22.4, 6.8]],
+      "d": {
+        "gender": [["Men", [33.4, 25, 9.9, 22.6, 9.1]], ["Women", [30.2, 21.5, 14.7, 22.2, 11.5]]],
+        "age": [["18–34", [32.9, 20.6, 25.5, 13.4, 7.7]], ["35–54", [39.4, 19.7, 11.2, 19, 10.7]], ["55+", [24.3, 28.2, 3.7, 32, 11.9]]],
+        "state": [["NSW", [33.8, 23.5, 9.9, 22.1, 10.7]], ["Vic", [27.8, 24.8, 13.9, 22.2, 11.3]], ["Qld", [28.7, 23, 12.9, 23.1, 12.4]], ["Rest of Australia", [36.1, 21.1, 13.5, 22.4, 6.8]]]
+      },
       "t": [32, 23, 12, 22, 11]
     }
   }, {
@@ -37412,6 +37555,12 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [null, null, null, [27, 11, 32, 11, 19], [30, 15, 16, 27, 12], [25, 20, 10, 34, 11], [28, 30, 3, 32, 7], [28, 20, 10, 29, 13], [27, 21, 15, 26, 11], null, null, null, null, null, null, null, [31, 18, 17, 21, 13], [27, 21, 13, 29, 10], [31, 19, 14, 26, 10], [20, 24, 8, 35, 13], [28, 29, 5, 30, 8], [27, 21, 10, 30, 12], [27, 15, 21, 25, 12]],
+      "d": {
+        "gender": [["Men", [28, 20, 10, 29, 13]], ["Women", [27, 21, 15, 26, 11]]],
+        "generation": [["Gen Z", [27, 11, 32, 11, 19]], ["Millennials", [30, 15, 16, 27, 12]], ["Gen X", [25, 20, 10, 34, 11]], ["Boomers", [28, 30, 3, 32, 7]], ["Silent", [15, 42, 9, 29, 5]]],
+        "location": [["Inner metro", [31, 18, 17, 21, 13]], ["Outer metro", [27, 21, 13, 29, 10]], ["Provincial", [31, 19, 14, 26, 10]], ["Rural", [20, 24, 8, 35, 13]]],
+        "housing": [["Own outright", [28, 29, 5, 30, 8]], ["Mortgage", [27, 21, 10, 30, 12]], ["Renting", [27, 15, 21, 25, 12]]]
+      },
       "t": [27, 20, 14, 27, 12]
     },
     "sw": {
@@ -37898,6 +38047,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [null, null, null, [26, 11, 37, 15, 11], [30, 20, 18, 23, 9], [31, 21, 7, 36, 5], [34, 28, 2, 30, 6], [35, 22, 9, 26, 8], [27, 22, 17, 28, 6], [30, 21.7, 15, 27.7, 5.6], [27, 21, 11, 35, 6], [38, 23, 12, 16, 11], null, null, null, null, [36, 21, 15, 21, 7], [32, 22, 14, 25, 7], [28, 21, 15, 32, 4], [26, 24, 8, 33, 9], [32, 28, 4, 30, 6], [32, 20, 15, 26, 7]],
+      "d": {
+        "gender": [["Women", [27, 22, 17, 28, 6]], ["Men", [35, 22, 9, 26, 8]]],
+        "generation": [["Gen Z", [26, 11, 37, 15, 11]], ["Millennials", [30, 20, 18, 23, 9]], ["Gen X", [31, 21, 7, 36, 5]], ["Boomers", [34, 28, 2, 30, 6]]],
+        "education": [["Below Year 12", [30, 29, 4, 32, 5]], ["Year 12", [30, 17, 22, 25, 6]], ["TAFE or trade", [27, 21, 11, 35, 6]], ["University", [38, 23, 12, 16, 11]]],
+        "location": [["Inner metro", [36, 21, 15, 21, 7]], ["Outer metro", [32, 22, 14, 25, 7]], ["Provincial", [28, 21, 15, 32, 4]], ["Rural", [26, 24, 8, 33, 9]]],
+        "housing": [["Own outright", [32, 28, 4, 30, 6]], ["Mortgage", [32, 20, 15, 26, 7]], ["Renting and other", [29, 16, 22, 24, 9]]]
+      },
       "t": [31, 22, 13, 27, 7]
     }
   }, {
@@ -38248,6 +38404,12 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [null, null, null, [31, 6, 39, 8, 16], [27, 22, 15, 24, 11], [32, 19, 11, 29, 9], [30, 27, 4, 29, 10], [30, 21, 13, 26, 10], [29, 21, 16, 22, 12], null, null, null, null, null, null, null, [29, 18, 24, 17, 12], [32, 21, 11, 25, 11], [35, 23, 11, 23, 8], [24, 23, 9, 31, 13], [29, 30, 5, 25, 11], [33, 19, 13, 25, 10], [29, 14, 20, 25, 12]],
+      "d": {
+        "gender": [["Men", [30, 21, 13, 26, 10]], ["Women", [29, 21, 16, 22, 12]]],
+        "generation": [["Gen Z", [31, 6, 39, 8, 16]], ["Millennials", [27, 22, 15, 24, 11]], ["Gen X", [32, 19, 11, 29, 9]], ["Boomers", [30, 27, 4, 29, 10]], ["Silent", [20, 54, 3, 20, 2]]],
+        "location": [["Inner metro", [29, 18, 24, 17, 12]], ["Outer metro", [32, 21, 11, 25, 11]], ["Provincial", [35, 23, 11, 23, 8]], ["Rural", [24, 23, 9, 31, 13]]],
+        "housing": [["Own outright", [29, 30, 5, 25, 11]], ["Mortgage", [33, 19, 13, 25, 10]], ["Renting", [29, 14, 20, 25, 12]]]
+      },
       "t": [30, 21, 14, 24, 11]
     },
     "sw": {
@@ -38945,6 +39107,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[31.5, 18, 21, 16, 13.6], [34, 19.6, 11.6, 24.7, 10.1], [23.7, 30.3, 4.7, 29.4, 11.9], null, null, null, null, [32, 27.3, 8.4, 22.3, 10], [26.9, 19.2, 14.7, 25.7, 13.5], null, null, null, [27.5, 25.5, 13.2, 24.6, 9.1], [28.6, 22.9, 13, 22.5, 13], [29.7, 24.5, 7.9, 25.7, 12.2], [32.8, 18.8, 11.1, 23.5, 13.8]],
+      "d": {
+        "gender": [["Men", [32, 27.3, 8.4, 22.3, 10]], ["Women", [26.9, 19.2, 14.7, 25.7, 13.5]]],
+        "age": [["18–34", [31.5, 18, 21, 16, 13.6]], ["35–54", [34, 19.6, 11.6, 24.7, 10.1]], ["55+", [23.7, 30.3, 4.7, 29.4, 11.9]]],
+        "state": [["NSW", [27.5, 25.5, 13.2, 24.6, 9.1]], ["Vic", [28.6, 22.9, 13, 22.5, 13]], ["Qld", [29.7, 24.5, 7.9, 25.7, 12.2]], ["Rest of Australia", [32.8, 18.8, 11.1, 23.5, 13.8]]]
+      },
       "t": [29, 23, 12, 24, 12]
     }
   }, {
@@ -39308,6 +39475,12 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [null, null, null, [32, 10, 29, 12, 17], [28, 24, 17, 19, 12], [28, 19, 11, 32, 9], [25, 30, 4, 30, 11], [29, 24, 12, 25, 10], [26, 21, 15, 24, 14], null, null, null, null, null, null, null, [32, 21, 16, 22, 9], [28, 23, 12, 27, 10], [28, 23, 12, 25, 12], [21, 24, 12, 25, 18], [27, 30, 5, 29, 9], [28, 27, 11, 23, 11], [27, 9, 23, 26, 16]],
+      "d": {
+        "gender": [["Men", [29, 24, 12, 25, 10]], ["Women", [26, 21, 15, 24, 14]]],
+        "generation": [["Gen Z", [32, 10, 29, 12, 17]], ["Millennials", [28, 24, 17, 19, 12]], ["Gen X", [28, 19, 11, 32, 9]], ["Boomers", [25, 30, 4, 30, 11]], ["Silent", [23, 35, 1, 37, 4]]],
+        "location": [["Inner metro", [32, 21, 16, 22, 9]], ["Outer metro", [28, 23, 12, 27, 10]], ["Provincial", [28, 23, 12, 25, 12]], ["Rural", [21, 24, 12, 25, 18]]],
+        "housing": [["Own outright", [27, 30, 5, 29, 9]], ["Mortgage", [28, 27, 11, 23, 11]], ["Renting", [27, 9, 23, 26, 16]]]
+      },
       "t": [28, 23, 13, 25, 11]
     },
     "sw": {
@@ -39429,6 +39602,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "measured from the charts",
       "v": [[30, 13, 33, 16, 8], [23, 22, 10, 30, 15], [26, 29, 4, 34, 7], null, null, null, null, [28, 22, 11, 28, 11], [24, 24, 14, 30, 8], [25, 22, 13, 29, 11], [23, 19, 12, 35, 11], [31, 27, 13, 21, 8], null, null, null, null, [31, 24, 18, 18, 9], [27, 22, 13, 29, 9], null, null, [21, 29, 7, 33, 10], [28, 24, 14, 27, 7], [29, 15, 17, 26, 13], [23, 23, 12, 31, 11], [39, 24, 14, 18, 5]],
+      "d": {
+        "gender": [["Men", [28, 22, 11, 28, 11]], ["Women", [24, 24, 14, 30, 8]]],
+        "age": [["18–34", [30, 13, 33, 16, 8]], ["35–54", [23, 22, 10, 30, 15]], ["55+", [26, 29, 4, 34, 7]]],
+        "education": [["School", [25, 22, 13, 29, 11]], ["TAFE", [23, 19, 12, 35, 11]], ["University", [31, 27, 13, 21, 8]]],
+        "location": [["Inner metro", [31, 24, 18, 18, 9]], ["Outer metro", [27, 22, 13, 29, 9]], ["Regional or rural", [17, 23, 9, 38, 13]]],
+        "housing": [["Renting", [29, 15, 17, 26, 13]], ["Mortgage", [28, 24, 14, 27, 7]], ["Own outright", [21, 29, 7, 33, 10]]],
+        "language": [["English only", [23, 23, 12, 31, 11]], ["Other language", [39, 24, 14, 18, 5]]]
+      },
       "t": [26, 23, 13, 28, 10]
     },
     "sw": {
@@ -40143,6 +40324,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [null, null, null, [35, 18, 27, 10, 10], [28, 16, 18, 30, 8], [24, 17, 10, 43, 6], [27, 25, 2, 35, 11], [28, 19, 10, 35, 8], [28, 20, 14, 28, 10], [27.2, 18.6, 12.3, 34.5, 7.4], [27, 18, 8, 39, 8], [30, 23, 17, 17, 13], null, null, null, null, [28, 23, 14, 23, 12], [31, 18, 13, 30, 8], [23, 16, 15, 36, 10], [28, 19, 7, 40, 6], [27, 24, 4, 35, 10], [28, 17, 14, 32, 9]],
+      "d": {
+        "gender": [["Women", [28, 20, 14, 28, 10]], ["Men", [28, 19, 10, 35, 8]]],
+        "generation": [["Gen Z", [35, 18, 27, 10, 10]], ["Millennials", [28, 16, 18, 30, 8]], ["Gen X", [24, 17, 10, 43, 6]], ["Boomers", [27, 25, 2, 35, 11]]],
+        "education": [["Below Year 12", [15, 21, 8, 51, 5]], ["Year 12", [35, 17, 15, 24, 9]], ["TAFE or trade", [27, 18, 8, 39, 8]], ["University", [30, 23, 17, 17, 13]]],
+        "location": [["Inner metro", [28, 23, 14, 23, 12]], ["Outer metro", [31, 18, 13, 30, 8]], ["Provincial", [23, 16, 15, 36, 10]], ["Rural", [28, 19, 7, 40, 6]]],
+        "housing": [["Own outright", [27, 24, 4, 35, 10]], ["Mortgage", [28, 17, 14, 32, 9]], ["Renting and other", [29, 17, 20, 25, 9]]]
+      },
       "t": [28, 20, 12, 31, 9]
     }
   }, {
@@ -40399,6 +40587,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [[28, 10, 29, 15, 18], null, null, [29, 7, 29, 10, 24], [28, 18, 17, 25, 10], [24, 18, 5, 42, 11], [25, 28, 6, 34, 7], [30, 20, 10, 27, 12], [23, 20, 15, 32, 11], [23, 18, 12, 36, 11], [25, 18, 15, 32, 11], [33, 24, 13, 18, 12], [26, 19, 13, 28, 14], [23, 24, 11, 32, 10], [24, 19, 14, 31, 12], [32.9, 17.2, 13.8, 26.9, 9.4], [31, 21, 16, 24, 9], [28, 21, 9, 30, 13], [33, 10, 17, 30, 10], [15, 23, 13, 36, 14], [24, 31, 7, 31, 7], [26, 19, 10, 33, 13], [27, 13, 18, 32, 10], [26, 20, 14, 30, 11], [33, 18, 9, 27, 13]],
+      "d": {
+        "gender": [["Men", [30, 20, 10, 27, 12]], ["Women", [23, 20, 15, 32, 11]]],
+        "age": [["18–34", [28, 10, 29, 15, 18]], ["35–49", [30, 20, 11, 28, 11]], ["50+", [24, 25, 5, 38, 8]]],
+        "generation": [["Gen Z", [29, 7, 29, 10, 24]], ["Millennials", [28, 18, 17, 25, 10]], ["Gen X", [24, 18, 5, 42, 11]], ["Boomers", [25, 28, 6, 34, 7]], ["Silent", [32, 49, 0, 18, 0]]],
+        "education": [["Year 12 or less", [23, 18, 12, 36, 11]], ["TAFE or college", [25, 18, 15, 32, 11]], ["University", [33, 24, 13, 18, 12]]],
+        "state": [["NSW", [26, 19, 13, 28, 14]], ["Vic", [23, 24, 11, 32, 10]], ["Qld", [24, 19, 14, 31, 12]], ["SA", [30, 12, 21, 31, 6]], ["WA", [32, 21, 13, 23, 11]], ["ACT/NT/Tas", [39, 17, 5, 29, 11]]],
+        "location": [["Inner metro", [31, 21, 16, 24, 9]], ["Outer metro", [28, 21, 9, 30, 13]], ["Provincial", [33, 10, 17, 30, 10]], ["Rural", [15, 23, 13, 36, 14]]],
+        "housing": [["Own outright", [24, 31, 7, 31, 7]], ["Mortgage", [26, 19, 10, 33, 13]], ["Renting", [27, 13, 18, 32, 10]]],
+        "language": [["Other language", [33, 18, 9, 27, 13]], ["English only", [26, 20, 14, 30, 11]]]
+      },
       "t": [26, 20, 13, 29, 12]
     },
     "sw": {
@@ -40861,6 +41059,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[30.9, 16.1, 24.6, 22, 6.5], [31.7, 15, 11.3, 26.9, 15.1], [21.7, 28.5, 3.6, 35.1, 11], null, null, null, null, [31.4, 25.1, 8.3, 25, 10.1], [24.1, 15.9, 15.7, 32.1, 12.2], null, null, null, [27.7, 20.6, 11.9, 30.4, 9.4], [24.4, 22.5, 11.2, 29.1, 12.8], [26.1, 20.2, 12.1, 31, 10.6], [32.8, 17.9, 13.5, 23.5, 12.2]],
+      "d": {
+        "gender": [["Men", [31.4, 25.1, 8.3, 25, 10.1]], ["Women", [24.1, 15.9, 15.7, 32.1, 12.2]]],
+        "age": [["18–34", [30.9, 16.1, 24.6, 22, 6.5]], ["35–54", [31.7, 15, 11.3, 26.9, 15.1]], ["55+", [21.7, 28.5, 3.6, 35.1, 11]]],
+        "state": [["NSW", [27.7, 20.6, 11.9, 30.4, 9.4]], ["Vic", [24.4, 22.5, 11.2, 29.1, 12.8]], ["Qld", [26.1, 20.2, 12.1, 31, 10.6]], ["Rest of Australia", [32.8, 17.9, 13.5, 23.5, 12.2]]]
+      },
       "t": [27.7, 19.8, 11.9, 28.7, 11.9]
     }
   }, {
@@ -41233,6 +41436,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "measured from the charts",
       "v": [[29, 12, 29, 22, 8], [28, 18, 11, 31, 12], [24, 22, 5, 35, 14], null, null, null, null, [32, 18, 11, 29, 10], [21, 19, 14, 32, 14], [25, 18, 13, 33, 11], [24, 15, 11, 33, 17], [31, 23, 14, 24, 8], null, null, null, null, [34, 19, 17, 19, 11], [25, 19, 13, 32, 11], null, null, [25, 25, 8, 29, 13], [26, 17, 13, 33, 11], [29, 12, 18, 29, 12], [25, 18, 11, 33, 13], [35, 16, 21, 21, 7]],
+      "d": {
+        "gender": [["Men", [32, 18, 11, 29, 10]], ["Women", [21, 19, 14, 32, 14]]],
+        "age": [["18–34", [29, 12, 29, 22, 8]], ["35–54", [28, 18, 11, 31, 12]], ["55+", [24, 22, 5, 35, 14]]],
+        "education": [["School", [25, 18, 13, 33, 11]], ["TAFE", [24, 15, 11, 33, 17]], ["University", [31, 23, 14, 24, 8]]],
+        "location": [["Inner metro", [34, 19, 17, 19, 11]], ["Outer metro", [25, 19, 13, 32, 11]], ["Regional or rural", [20, 15, 8, 42, 15]]],
+        "housing": [["Renting", [29, 12, 18, 29, 12]], ["Mortgage", [26, 17, 13, 33, 11]], ["Own outright", [25, 25, 8, 29, 13]]],
+        "language": [["English only", [25, 18, 11, 33, 13]], ["Other language", [35, 16, 21, 21, 7]]]
+      },
       "t": [27, 18, 13, 30, 12]
     },
     "sw": {
@@ -41715,6 +41926,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [null, null, null, [28, 8, 37, 18, 9], [35, 16, 15, 27, 7], [24, 22, 7, 38, 9], [32, 22, 5, 31, 10], [34, 16, 9, 33, 8], [27, 20, 18, 25, 10], [23.3, 19.5, 16.3, 33.1, 7.8], [31, 16, 11, 33, 9], [38, 18, 15, 19, 10], null, null, null, null, [38, 17, 13, 22, 10], [31, 17, 17, 30, 5], [34, 19, 8, 35, 4], [19, 18, 15, 33, 15], [30, 25, 7, 30, 8], [32, 17, 12, 32, 7]],
+      "d": {
+        "gender": [["Women", [27, 20, 18, 25, 10]], ["Men", [34, 16, 9, 33, 8]]],
+        "generation": [["Gen Z", [28, 8, 37, 18, 9]], ["Millennials", [35, 16, 15, 27, 7]], ["Gen X", [24, 22, 7, 38, 9]], ["Boomers", [32, 22, 5, 31, 10]]],
+        "education": [["Below Year 12", [16, 25, 9, 41, 9]], ["Year 12", [28, 16, 21, 28, 7]], ["TAFE or trade", [31, 16, 11, 33, 9]], ["University", [38, 18, 15, 19, 10]]],
+        "location": [["Inner metro", [38, 17, 13, 22, 10]], ["Outer metro", [31, 17, 17, 30, 5]], ["Provincial", [34, 19, 8, 35, 4]], ["Rural", [19, 18, 15, 33, 15]]],
+        "housing": [["Own outright", [30, 25, 7, 30, 8]], ["Mortgage", [32, 17, 12, 32, 7]], ["Renting and other", [29, 9, 26, 24, 12]]]
+      },
       "t": [30, 18, 14, 29, 9]
     }
   }, {
@@ -42109,6 +42327,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [[35, 13, 26, 18, 9], null, null, [35, 12, 31, 10, 12], [31, 13, 18, 29, 9], [27, 20, 6, 35, 11], [26, 20, 4, 39, 10], [31, 19, 8, 32, 10], [28, 15, 17, 29, 11], [26, 17, 12, 35, 10], [28, 13, 11, 36, 12], [35, 21, 16, 18, 10], [30, 15, 13, 32, 9], [27, 19, 13, 27, 15], [30, 16, 12, 33, 9], [30.7, 19.2, 12.6, 27.8, 10.2], [32, 19, 17, 21, 11], [33, 16, 11, 31, 9], [33, 16, 13, 31, 7], [18, 18, 10, 40, 14], [27, 21, 6, 37, 9], [33, 19, 9, 31, 7], [29, 10, 18, 27, 16], [29, 17, 13, 31, 10], [34, 16, 12, 24, 14]],
+      "d": {
+        "gender": [["Men", [31, 19, 8, 32, 10]], ["Women", [28, 15, 17, 29, 11]]],
+        "age": [["18–34", [35, 13, 26, 18, 9]], ["35–49", [29, 17, 14, 29, 11]], ["50+", [27, 20, 5, 38, 11]]],
+        "generation": [["Gen Z", [35, 12, 31, 10, 12]], ["Millennials", [31, 13, 18, 29, 9]], ["Gen X", [27, 20, 6, 35, 11]], ["Boomers", [26, 20, 4, 39, 10]], ["Silent", [33, 25, 7, 29, 6]]],
+        "education": [["Year 12 or less", [26, 17, 12, 35, 10]], ["TAFE or college", [28, 13, 11, 36, 12]], ["University", [35, 21, 16, 18, 10]]],
+        "state": [["NSW", [30, 15, 13, 32, 9]], ["Vic", [27, 19, 13, 27, 15]], ["Qld", [30, 16, 12, 33, 9]], ["SA", [32, 12, 12, 36, 8]], ["WA", [33, 21, 9, 29, 9]], ["ACT/NT/Tas", [24, 26, 21, 13, 16]]],
+        "location": [["Inner metro", [32, 19, 17, 21, 11]], ["Outer metro", [33, 16, 11, 31, 9]], ["Provincial", [33, 16, 13, 31, 7]], ["Rural", [18, 18, 10, 40, 14]]],
+        "housing": [["Own outright", [27, 21, 6, 37, 9]], ["Mortgage", [33, 19, 9, 31, 7]], ["Renting", [29, 10, 18, 27, 16]]],
+        "language": [["Other language", [34, 16, 12, 24, 14]], ["English only", [29, 17, 13, 31, 10]]]
+      },
       "t": [29, 17, 13, 30, 11]
     },
     "sw": {
@@ -42368,6 +42596,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "measured from the charts",
       "v": [[28, 13, 29, 21, 9], [26, 18, 14, 32, 10], [25, 28, 5, 31, 11], null, null, null, null, [27, 21, 11, 30, 11], [24, 22, 16, 28, 10], [25, 24, 10, 30, 11], [22, 19, 14, 35, 10], [31, 19, 19, 21, 10], null, null, null, null, [31, 24, 16, 21, 8], [27, 21, 15, 28, 9], null, null, [24, 31, 7, 28, 10], [26, 19, 16, 29, 10], [28, 14, 17, 30, 11], [24, 22, 12, 31, 11], [37, 19, 19, 19, 6]],
+      "d": {
+        "gender": [["Men", [27, 21, 11, 30, 11]], ["Women", [24, 22, 16, 28, 10]]],
+        "age": [["18–34", [28, 13, 29, 21, 9]], ["35–54", [26, 18, 14, 32, 10]], ["55+", [25, 28, 5, 31, 11]]],
+        "education": [["School", [25, 24, 10, 30, 11]], ["TAFE", [22, 19, 14, 35, 10]], ["University", [31, 19, 19, 21, 10]]],
+        "location": [["Inner metro", [31, 24, 16, 21, 8]], ["Outer metro", [27, 21, 15, 28, 9]], ["Regional or rural", [18, 19, 10, 39, 14]]],
+        "housing": [["Renting", [28, 14, 17, 30, 11]], ["Mortgage", [26, 19, 16, 29, 10]], ["Own outright", [24, 31, 7, 28, 10]]],
+        "language": [["English only", [24, 22, 12, 31, 11]], ["Other language", [37, 19, 19, 19, 6]]]
+      },
       "t": [26, 21, 14, 29, 10]
     },
     "sw": {
@@ -42625,6 +42861,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[29.4, 22.9, 21.2, 18.1, 8.5], [32.1, 19.3, 10.8, 27, 10.8], [24.5, 26.7, 4.9, 31.6, 12.4], null, null, null, null, [29.9, 24, 8.4, 27, 10.6], [26.9, 22.3, 14.5, 25.5, 10.9], null, null, null, [26.9, 23.1, 10, 30.9, 9.1], [26.6, 24.9, 13.4, 24.4, 10.8], [25.6, 23.8, 10.9, 25.6, 14.1], [35.2, 20.5, 12.1, 22, 10.2]],
+      "d": {
+        "gender": [["Men", [29.9, 24, 8.4, 27, 10.6]], ["Women", [26.9, 22.3, 14.5, 25.5, 10.9]]],
+        "age": [["18–34", [29.4, 22.9, 21.2, 18.1, 8.5]], ["35–54", [32.1, 19.3, 10.8, 27, 10.8]], ["55+", [24.5, 26.7, 4.9, 31.6, 12.4]]],
+        "state": [["NSW", [26.9, 23.1, 10, 30.9, 9.1]], ["Vic", [26.6, 24.9, 13.4, 24.4, 10.8]], ["Qld", [25.6, 23.8, 10.9, 25.6, 14.1]], ["Rest of Australia", [35.2, 20.5, 12.1, 22, 10.2]]]
+      },
       "t": [28, 23, 12, 26, 11]
     }
   }, {
@@ -43002,6 +43243,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [[27, 12, 28, 17, 17], null, null, [24, 9, 35, 14, 18], [29, 17, 13, 25, 15], [28, 21, 6, 30, 15], [30, 27, 3, 30, 10], [31, 19, 8, 29, 13], [26, 20, 16, 24, 14], [26, 20, 12, 30, 12], [24, 17, 12, 30, 17], [35, 23, 13, 17, 12], [26, 20, 11, 27, 16], [30, 22, 10, 25, 13], [27, 23, 10, 27, 14], [29.6, 14.9, 16.8, 25.6, 13.3], [32, 20, 16, 19, 12], [29, 19, 11, 27, 15], [26, 21, 6, 30, 17], [22, 21, 11, 32, 14], [27, 30, 4, 28, 10], [29, 22, 6, 30, 13], [30, 10, 19, 24, 17], [28, 20, 11, 28, 14], [30, 20, 16, 18, 16]],
+      "d": {
+        "gender": [["Men", [31, 19, 8, 29, 13]], ["Women", [26, 20, 16, 24, 14]]],
+        "age": [["18–34", [27, 12, 28, 17, 17]], ["35–49", [31, 19, 12, 25, 14]], ["50+", [27, 25, 4, 32, 12]]],
+        "generation": [["Gen Z", [24, 9, 35, 14, 18]], ["Millennials", [29, 17, 13, 25, 15]], ["Gen X", [28, 21, 6, 30, 15]], ["Boomers", [30, 27, 3, 30, 10]], ["Silent", [17, 29, 6, 46, 2]]],
+        "education": [["Year 12 or less", [26, 20, 12, 30, 12]], ["TAFE or college", [24, 17, 12, 30, 17]], ["University", [35, 23, 13, 17, 12]]],
+        "state": [["NSW", [26, 20, 11, 27, 16]], ["Vic", [30, 22, 10, 25, 13]], ["Qld", [27, 23, 10, 27, 14]], ["SA", [32, 8, 20, 28, 12]], ["WA", [30, 16, 15, 29, 10]], ["ACT/NT/Tas", [25, 23, 16, 15, 22]]],
+        "location": [["Inner metro", [32, 20, 16, 19, 12]], ["Outer metro", [29, 19, 11, 27, 15]], ["Provincial", [26, 21, 6, 30, 17]], ["Rural", [22, 21, 11, 32, 14]]],
+        "housing": [["Own outright", [27, 30, 4, 28, 10]], ["Mortgage", [29, 22, 6, 30, 13]], ["Renting", [30, 10, 19, 24, 17]]],
+        "language": [["Other language", [30, 20, 16, 18, 16]], ["English only", [28, 20, 11, 28, 14]]]
+      },
       "t": [28, 20, 12, 26, 14]
     },
     "sw": {
@@ -43765,6 +44016,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [[31, 13, 31, 15, 10], null, null, [31, 12, 35, 11, 11], [30, 18, 14, 26, 12], [27, 26, 9, 26, 13], [29, 24, 3, 31, 13], [29, 24, 10, 28, 9], [28, 19, 15, 23, 14], [24, 23, 11, 32, 10], [30, 19, 12, 28, 11], [33, 22, 16, 14, 14], [29, 24, 11, 22, 14], [26, 28, 16, 20, 10], [27, 16, 12, 34, 11], [31.7, 16.2, 13.4, 27, 11.9], [33, 23, 16, 16, 12], [32, 20, 13, 27, 8], [25, 22, 14, 28, 11], [20, 21, 7, 35, 18], [26, 25, 5, 30, 13], [31, 25, 11, 24, 9], [32, 11, 16, 25, 16], [27, 22, 12, 28, 11], [35, 20, 20, 12, 13]],
+      "d": {
+        "gender": [["Men", [29, 24, 10, 28, 9]], ["Women", [28, 19, 15, 23, 14]]],
+        "age": [["18–34", [31, 13, 31, 15, 10]], ["35–49", [30, 20, 10, 25, 15]], ["50+", [26, 27, 5, 31, 11]]],
+        "generation": [["Gen Z", [31, 12, 35, 11, 11]], ["Millennials", [30, 18, 14, 26, 12]], ["Gen X", [27, 26, 9, 26, 13]], ["Boomers", [29, 24, 3, 31, 13]], ["Silent", [8, 47, 1, 37, 8]]],
+        "education": [["Year 12 or less", [24, 23, 11, 32, 10]], ["TAFE or college", [30, 19, 12, 28, 11]], ["University", [33, 22, 16, 14, 14]]],
+        "state": [["NSW", [29, 24, 11, 22, 14]], ["Vic", [26, 28, 16, 20, 10]], ["Qld", [27, 16, 12, 34, 11]], ["SA", [39, 11, 13, 28, 9]], ["WA", [24, 21, 12, 32, 11]], ["ACT/NT/Tas", [37, 14, 17, 15, 18]]],
+        "location": [["Inner metro", [33, 23, 16, 16, 12]], ["Outer metro", [32, 20, 13, 27, 8]], ["Provincial", [25, 22, 14, 28, 11]], ["Rural", [20, 21, 7, 35, 18]]],
+        "housing": [["Own outright", [26, 25, 5, 30, 13]], ["Mortgage", [31, 25, 11, 24, 9]], ["Renting", [32, 11, 16, 25, 16]]],
+        "language": [["Other language", [35, 20, 20, 12, 13]], ["English only", [27, 22, 12, 28, 11]]]
+      },
       "t": [28, 22, 13, 25, 12]
     },
     "sw": {
@@ -44010,6 +44271,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [null, null, null, [26, 16, 27, 21, 10], [30, 22, 12, 29, 7], [28, 19, 7, 35, 11], [30, 26, 3, 35, 6], [29, 22, 8, 33, 8], [29, 21, 13, 29, 8], [25.3, 23.6, 8.9, 36.1, 6.2], [28, 19, 9, 35, 9], [35, 23, 13, 20, 9], null, null, null, null, [35, 23, 12, 21, 9], [27, 23, 12, 34, 4], [30, 18, 10, 32, 10], [24, 20, 6, 39, 11], [29, 25, 5, 35, 6], [29, 22, 11, 31, 7]],
+      "d": {
+        "gender": [["Women", [29, 21, 13, 29, 8]], ["Men", [29, 22, 8, 33, 8]]],
+        "generation": [["Gen Z", [26, 16, 27, 21, 10]], ["Millennials", [30, 22, 12, 29, 7]], ["Gen X", [28, 19, 7, 35, 11]], ["Boomers", [30, 26, 3, 35, 6]]],
+        "education": [["Below Year 12", [21, 26, 4, 44, 5]], ["Year 12", [28, 22, 12, 31, 7]], ["TAFE or trade", [28, 19, 9, 35, 9]], ["University", [35, 23, 13, 20, 9]]],
+        "location": [["Inner metro", [35, 23, 12, 21, 9]], ["Outer metro", [27, 23, 12, 34, 4]], ["Provincial", [30, 18, 10, 32, 10]], ["Rural", [24, 20, 6, 39, 11]]],
+        "housing": [["Own outright", [29, 25, 5, 35, 6]], ["Mortgage", [29, 22, 11, 31, 7]], ["Renting and other", [29, 17, 16, 27, 11]]]
+      },
       "t": [29, 22, 10, 31, 8]
     }
   }, {
@@ -44514,6 +44782,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [[31, 16, 25, 11, 17], null, null, [32, 14, 25, 7, 22], [29, 17, 18, 21, 15], [29, 19, 8, 31, 13], [25, 30, 3, 31, 11], [29, 22, 11, 25, 12], [26, 21, 13, 24, 16], [28, 21, 10, 27, 14], [24, 19, 12, 29, 16], [31, 25, 15, 16, 13], [24, 24, 13, 24, 15], [30, 22, 12, 21, 15], [23, 19, 12, 29, 17], [34.3, 20, 11, 25.1, 9.6], [34, 24, 14, 18, 9], [29, 20, 12, 24, 15], [25, 26, 9, 30, 10], [19, 18, 12, 31, 20], [26, 35, 3, 25, 11], [32, 20, 11, 28, 10], [27, 9, 16, 27, 21], [27, 22, 11, 27, 13], [32, 22, 16, 13, 18]],
+      "d": {
+        "gender": [["Men", [29, 22, 11, 25, 12]], ["Women", [26, 21, 13, 24, 16]]],
+        "age": [["18–34", [31, 16, 25, 11, 17]], ["35–49", [28, 16, 13, 28, 14]], ["50+", [26, 27, 5, 30, 11]]],
+        "generation": [["Gen Z", [32, 14, 25, 7, 22]], ["Millennials", [29, 17, 18, 21, 15]], ["Gen X", [29, 19, 8, 31, 13]], ["Boomers", [25, 30, 3, 31, 11]], ["Silent", [21, 53, 0, 22, 4]]],
+        "education": [["Year 12 or less", [28, 21, 10, 27, 14]], ["TAFE or college", [24, 19, 12, 29, 16]], ["University", [31, 25, 15, 16, 13]]],
+        "state": [["NSW", [24, 24, 13, 24, 15]], ["Vic", [30, 22, 12, 21, 15]], ["Qld", [23, 19, 12, 29, 17]], ["SA", [44, 20, 6, 26, 4]], ["WA", [28, 21, 15, 25, 11]], ["ACT/NT/Tas", [33, 18, 10, 24, 15]]],
+        "location": [["Inner metro", [34, 24, 14, 18, 9]], ["Outer metro", [29, 20, 12, 24, 15]], ["Provincial", [25, 26, 9, 30, 10]], ["Rural", [19, 18, 12, 31, 20]]],
+        "housing": [["Own outright", [26, 35, 3, 25, 11]], ["Mortgage", [32, 20, 11, 28, 10]], ["Renting", [27, 9, 16, 27, 21]]],
+        "language": [["Other language", [32, 22, 16, 13, 18]], ["English only", [27, 22, 11, 27, 13]]]
+      },
       "t": [28, 22, 12, 24, 14]
     },
     "sw": {
@@ -44788,6 +45066,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[31.2, 20.7, 27.6, 12.2, 8.3], [29, 21.6, 9.8, 29.3, 10.2], [25.4, 26.3, 3.8, 32.4, 12.2], null, null, null, null, [29.5, 23.5, 11.3, 25.1, 10.5], [26.9, 22.9, 13.4, 26.4, 10.5], null, null, null, [30.3, 19.9, 13.3, 25.7, 10.8], [24, 27.7, 13, 23.4, 11.9], [30.7, 21.9, 8.5, 32.5, 6.5], [27.7, 23.9, 13.9, 22.6, 11.9]],
+      "d": {
+        "gender": [["Men", [29.5, 23.5, 11.3, 25.1, 10.5]], ["Women", [26.9, 22.9, 13.4, 26.4, 10.5]]],
+        "age": [["18–34", [31.2, 20.7, 27.6, 12.2, 8.3]], ["35–54", [29, 21.6, 9.8, 29.3, 10.2]], ["55+", [25.4, 26.3, 3.8, 32.4, 12.2]]],
+        "state": [["NSW", [30.3, 19.9, 13.3, 25.7, 10.8]], ["Vic", [24, 27.7, 13, 23.4, 11.9]], ["Qld", [30.7, 21.9, 8.5, 32.5, 6.5]], ["Rest of Australia", [27.7, 23.9, 13.9, 22.6, 11.9]]]
+      },
       "t": [28, 23, 12, 26, 11]
     }
   }, {
@@ -45069,6 +45352,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "measured from the charts",
       "v": [[30, 17, 26, 19, 8], [27, 22, 13, 24, 14], [24, 32, 2, 27, 15], null, null, null, null, [26, 26, 9, 26, 13], [27, 24, 15, 22, 12], [26, 25, 11, 25, 13], [24, 19, 11, 31, 15], [29, 31, 14, 15, 11], null, null, null, null, [31, 27, 13, 20, 9], [27, 25, 12, 21, 15], null, null, [23, 30, 6, 27, 14], [29, 28, 12, 19, 12], [27, 15, 18, 27, 13], [24, 25, 11, 25, 15], [36, 25, 15, 18, 6]],
+      "d": {
+        "gender": [["Men", [26, 26, 9, 26, 13]], ["Women", [27, 24, 15, 22, 12]]],
+        "age": [["18–34", [30, 17, 26, 19, 8]], ["35–54", [27, 22, 13, 24, 14]], ["55+", [24, 32, 2, 27, 15]]],
+        "education": [["School", [26, 25, 11, 25, 13]], ["TAFE", [24, 19, 11, 31, 15]], ["University", [29, 31, 14, 15, 11]]],
+        "location": [["Inner metro", [31, 27, 13, 20, 9]], ["Outer metro", [27, 25, 12, 21, 15]], ["Regional or rural", [20, 21, 10, 34, 15]]],
+        "housing": [["Renting", [27, 15, 18, 27, 13]], ["Mortgage", [29, 28, 12, 19, 12]], ["Own outright", [23, 30, 6, 27, 14]]],
+        "language": [["English only", [24, 25, 11, 25, 15]], ["Other language", [36, 25, 15, 18, 6]]]
+      },
       "t": [26, 25, 12, 24, 13]
     },
     "sw": {
@@ -45436,6 +45727,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [[30, 12, 26, 15, 17], null, null, [33, 12, 27, 12, 15], [27, 16, 19, 24, 14], [28, 21, 6, 32, 12], [29, 29, 2, 31, 9], [32, 23, 10, 24, 10], [25, 19, 13, 29, 13], [27, 19, 9, 34, 11], [27, 21, 11, 29, 11], [32, 24, 16, 14, 14], [29, 19, 12, 26, 15], [24, 24, 15, 21, 16], [27, 22, 10, 34, 7], [35.8, 18.7, 9.6, 27.2, 8.7], [36, 24, 12, 15, 13], [29, 22, 10, 27, 11], [31, 13, 15, 34, 8], [18, 21, 12, 35, 15], [25, 34, 4, 26, 11], [32, 20, 9, 30, 9], [29, 8, 21, 27, 16], [28, 21, 11, 27, 14], [34, 22, 15, 22, 8]],
+      "d": {
+        "gender": [["Men", [32, 23, 10, 24, 10]], ["Women", [25, 19, 13, 29, 13]]],
+        "age": [["18–34", [30, 12, 26, 15, 17]], ["35–49", [32, 19, 13, 26, 10]], ["50+", [27, 27, 4, 33, 10]]],
+        "generation": [["Gen Z", [33, 12, 27, 12, 15]], ["Millennials", [27, 16, 19, 24, 14]], ["Gen X", [28, 21, 6, 32, 12]], ["Boomers", [29, 29, 2, 31, 9]], ["Silent", [20, 44, 3, 27, 5]]],
+        "education": [["Year 12 or less", [27, 19, 9, 34, 11]], ["TAFE or college", [27, 21, 11, 29, 11]], ["University", [32, 24, 16, 14, 14]]],
+        "state": [["NSW", [29, 19, 12, 26, 15]], ["Vic", [24, 24, 15, 21, 16]], ["Qld", [27, 22, 10, 34, 7]], ["SA", [34, 14, 6, 40, 6]], ["WA", [37, 21, 13, 21, 8]], ["ACT/NT/Tas", [36, 21, 8, 21, 14]]],
+        "location": [["Inner metro", [36, 24, 12, 15, 13]], ["Outer metro", [29, 22, 10, 27, 11]], ["Provincial", [31, 13, 15, 34, 8]], ["Rural", [18, 21, 12, 35, 15]]],
+        "housing": [["Own outright", [25, 34, 4, 26, 11]], ["Mortgage", [32, 20, 9, 30, 9]], ["Renting", [29, 8, 21, 27, 16]]],
+        "language": [["Other language", [34, 22, 15, 22, 8]], ["English only", [28, 21, 11, 27, 14]]]
+      },
       "t": [29, 21, 12, 26, 12]
     },
     "sw": {
@@ -45797,6 +46098,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [null, null, null, [31, 12, 32, 16, 9], [27, 19, 14, 32, 8], [29, 21, 7, 34, 9], [29, 32, 2, 28, 9], [30, 24, 9, 28, 9], [28, 20, 14, 29, 9], [27.6, 23.2, 17, 26.4, 5.8], [26, 19, 6, 37, 12], [36, 26, 13, 18, 7], null, null, null, null, [30, 27, 13, 21, 9], [37, 18, 14, 27, 4], [25, 29, 12, 24, 10], [22, 17, 8, 41, 12], [30, 29, 5, 29, 7], [29, 18, 11, 33, 9]],
+      "d": {
+        "gender": [["Women", [28, 20, 14, 29, 9]], ["Men", [30, 24, 9, 28, 9]]],
+        "generation": [["Gen Z", [31, 12, 32, 16, 9]], ["Millennials", [27, 19, 14, 32, 8]], ["Gen X", [29, 21, 7, 34, 9]], ["Boomers", [29, 32, 2, 28, 9]]],
+        "education": [["Below Year 12", [27, 25, 3, 41, 4]], ["Year 12", [28, 22, 26, 17, 7]], ["TAFE or trade", [26, 19, 6, 37, 12]], ["University", [36, 26, 13, 18, 7]]],
+        "location": [["Inner metro", [30, 27, 13, 21, 9]], ["Outer metro", [37, 18, 14, 27, 4]], ["Provincial", [25, 29, 12, 24, 10]], ["Rural", [22, 17, 8, 41, 12]]],
+        "housing": [["Own outright", [30, 29, 5, 29, 7]], ["Mortgage", [29, 18, 11, 33, 9]], ["Renting and other", [29, 19, 21, 21, 10]]]
+      },
       "t": [29, 22, 12, 28, 9]
     }
   }, {
@@ -46320,6 +46628,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [[26, 11, 27, 16, 20], null, null, [29, 12, 31, 9, 19], [28, 15, 14, 26, 17], [29, 18, 7, 35, 11], [23, 25, 4, 37, 11], [26, 20, 9, 32, 13], [26, 17, 14, 28, 15], [26, 18, 12, 34, 10], [22, 17, 10, 34, 17], [30, 20, 14, 20, 17], [22, 18, 12, 32, 16], [29, 18, 13, 25, 14], [24, 15, 11, 38, 12], [31.7, 21.8, 10.5, 24.2, 11.8], [33, 21, 13, 20, 14], [28, 15, 10, 29, 17], [29, 15, 16, 34, 7], [13, 21, 11, 41, 13], [21, 25, 6, 34, 14], [30, 20, 8, 30, 11], [27, 10, 15, 31, 17], [26, 18, 11, 31, 14], [26, 21, 14, 24, 15]],
+      "d": {
+        "gender": [["Men", [26, 20, 9, 32, 13]], ["Women", [26, 17, 14, 28, 15]]],
+        "age": [["18–34", [26, 11, 27, 16, 20]], ["35–49", [32, 17, 10, 29, 12]], ["50+", [24, 23, 5, 38, 11]]],
+        "generation": [["Gen Z", [29, 12, 31, 9, 19]], ["Millennials", [28, 15, 14, 26, 17]], ["Gen X", [29, 18, 7, 35, 11]], ["Boomers", [23, 25, 4, 37, 11]], ["Silent", [13, 19, 3, 54, 11]]],
+        "education": [["Year 12 or less", [26, 18, 12, 34, 10]], ["TAFE or college", [22, 17, 10, 34, 17]], ["University", [30, 20, 14, 20, 17]]],
+        "state": [["NSW", [22, 18, 12, 32, 16]], ["Vic", [29, 18, 13, 25, 14]], ["Qld", [24, 15, 11, 38, 12]], ["SA", [34, 18, 11, 25, 12]], ["WA", [30, 21, 9, 28, 12]], ["ACT/NT/Tas", [32, 29, 13, 15, 11]]],
+        "location": [["Inner metro", [33, 21, 13, 20, 14]], ["Outer metro", [28, 15, 10, 29, 17]], ["Provincial", [29, 15, 16, 34, 7]], ["Rural", [13, 21, 11, 41, 13]]],
+        "housing": [["Own outright", [21, 25, 6, 34, 14]], ["Mortgage", [30, 20, 8, 30, 11]], ["Renting", [27, 10, 15, 31, 17]]],
+        "language": [["Other language", [26, 21, 14, 24, 15]], ["English only", [26, 18, 11, 31, 14]]]
+      },
       "t": [26, 18, 12, 30, 14]
     },
     "sw": {
@@ -46566,6 +46884,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published series",
       "v": [[30.9, 17.9, 23.8, 17.2, 10.2], [32.1, 23.5, 11.3, 24.4, 8.8], [22.9, 28.9, 2.9, 35.5, 9.8], null, null, null, null, [29.5, 23.6, 10, 27.7, 9.2], [27.1, 24.2, 13.4, 25.4, 9.9], null, null, null, [27, 22.2, 9.9, 29.6, 11.2], [27.4, 26.5, 11.3, 23.6, 11.1], [27.3, 23.5, 12.2, 28.2, 8.8], [31.9, 23.8, 14.4, 23.8, 6.1]],
+      "d": {
+        "gender": [["Men", [29.5, 23.6, 10, 27.7, 9.2]], ["Women", [27.1, 24.2, 13.4, 25.4, 9.9]]],
+        "age": [["18–34", [30.9, 17.9, 23.8, 17.2, 10.2]], ["35–54", [32.1, 23.5, 11.3, 24.4, 8.8]], ["55+", [22.9, 28.9, 2.9, 35.5, 9.8]]],
+        "state": [["NSW", [27, 22.2, 9.9, 29.6, 11.2]], ["Vic", [27.4, 26.5, 11.3, 23.6, 11.1]], ["Qld", [27.3, 23.5, 12.2, 28.2, 8.8]], ["Rest of Australia", [31.9, 23.8, 14.4, 23.8, 6.1]]]
+      },
       "t": [28.3, 24.2, 11.1, 27.3, 9.1]
     }
   }, {
@@ -46789,6 +47112,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "measured from the charts",
       "v": [[38, 15, 22, 16, 9], [26, 21, 13, 27, 13], [23, 23, 7, 31, 16], null, null, null, null, [28, 21, 12, 26, 13], [27, 20, 14, 25, 14], [29, 17, 13, 25, 16], [24, 20, 11, 34, 11], [30, 25, 15, 17, 13], null, null, null, null, [32, 28, 13, 18, 9], [28, 17, 15, 27, 13], null, null, [24, 25, 10, 25, 16], [28, 23, 13, 26, 10], [31, 13, 16, 26, 14], [25, 21, 13, 27, 14], [38, 18, 14, 18, 12]],
+      "d": {
+        "gender": [["Men", [28, 21, 12, 26, 13]], ["Women", [27, 20, 14, 25, 14]]],
+        "age": [["18–34", [38, 15, 22, 16, 9]], ["35–54", [26, 21, 13, 27, 13]], ["55+", [23, 23, 7, 31, 16]]],
+        "education": [["School", [29, 17, 13, 25, 16]], ["TAFE", [24, 20, 11, 34, 11]], ["University", [30, 25, 15, 17, 13]]],
+        "location": [["Inner metro", [32, 28, 13, 18, 9]], ["Outer metro", [28, 17, 15, 27, 13]], ["Regional or rural", [23, 16, 8, 34, 19]]],
+        "housing": [["Renting", [31, 13, 16, 26, 14]], ["Mortgage", [28, 23, 13, 26, 10]], ["Own outright", [24, 25, 10, 25, 16]]],
+        "language": [["English only", [25, 21, 13, 27, 14]], ["Other language", [38, 18, 14, 18, 12]]]
+      },
       "t": [28, 20, 13, 26, 13]
     },
     "sw": {
@@ -47123,6 +47454,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [[25, 11, 27, 18, 19], null, null, [22, 12, 36, 11, 19], [26, 16, 15, 28, 15], [23, 22, 10, 34, 11], [31, 26, 4, 29, 10], [23, 21, 12, 29, 15], [28, 21, 15, 25, 11], [22, 21, 16, 30, 11], [27, 17, 10, 31, 16], [30, 26, 14, 17, 12], [24, 21, 13, 26, 16], [25, 22, 18, 26, 9], [24, 20, 12, 31, 13], [31, 20, 11.7, 25.7, 11.5], [29, 24, 19, 17, 11], [26, 17, 14, 29, 14], [33, 22, 11, 28, 6], [15, 21, 9, 36, 19], [27, 32, 5, 25, 11], [27, 22, 8, 33, 10], [24, 10, 21, 30, 15], [25, 22, 13, 28, 12], [28, 16, 21, 18, 17]],
+      "d": {
+        "gender": [["Men", [23, 21, 12, 29, 15]], ["Women", [28, 21, 15, 25, 11]]],
+        "age": [["18–34", [25, 11, 27, 18, 19]], ["35–49", [24, 19, 16, 28, 13]], ["50+", [27, 27, 5, 31, 10]]],
+        "generation": [["Gen Z", [22, 12, 36, 11, 19]], ["Millennials", [26, 16, 15, 28, 15]], ["Gen X", [23, 22, 10, 34, 11]], ["Boomers", [31, 26, 4, 29, 10]], ["Silent", [20, 48, 4, 22, 5]]],
+        "education": [["Year 12 or less", [22, 21, 16, 30, 11]], ["TAFE or college", [27, 17, 10, 31, 16]], ["University", [30, 26, 14, 17, 12]]],
+        "state": [["NSW", [24, 21, 13, 26, 16]], ["Vic", [25, 22, 18, 26, 9]], ["Qld", [24, 20, 12, 31, 13]], ["SA", [25, 16, 16, 29, 14]], ["WA", [32, 21, 7, 30, 10]], ["ACT/NT/Tas", [38, 24, 15, 12, 11]]],
+        "location": [["Inner metro", [29, 24, 19, 17, 11]], ["Outer metro", [26, 17, 14, 29, 14]], ["Provincial", [33, 22, 11, 28, 6]], ["Rural", [15, 21, 9, 36, 19]]],
+        "housing": [["Own outright", [27, 32, 5, 25, 11]], ["Mortgage", [27, 22, 8, 33, 10]], ["Renting", [24, 10, 21, 30, 15]]],
+        "language": [["Other language", [28, 16, 21, 18, 17]], ["English only", [25, 22, 13, 28, 12]]]
+      },
       "t": [26, 21, 14, 27, 12]
     },
     "sw": {
@@ -47244,6 +47585,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "grp": {
       "r": "published table",
       "v": [null, null, null, null, null, null, null, null, null, null, null, null, [28.5, 22, 12, 26.5, 11], [25.5, 26.5, 16.5, 23, 9], [20.5, 21, 16, 32.5, 10]],
+      "d": {
+        "state": [["NSW", [28.5, 22, 12, 26.5, 11]], ["Vic", [25.5, 26.5, 16.5, 23, 9]], ["Qld", [20.5, 21, 16, 32.5, 10]], ["SA", [28, 26.5, 15.5, 18.5, 10.5]], ["WA", [27.5, 20, 15, 26, 12]]]
+      },
       "t": [26.1, 22.6, 14.6, 25.6, 11.1]
     }
   }, {
@@ -53456,6 +53800,7 @@ function TrendChart(props) {
     morphT = 1,
     driven = false,
     pollFacet,
+    pollSplit,
     onDoubleEmpty,
     marks = [],
     notes = [],
@@ -53742,7 +54087,7 @@ function TrendChart(props) {
   const handleClick = e => {
     if (performance.now() - touchTapAt.current < 400) return;
     if (openable) {
-      window.AP.openPoll(rowKey, pollFacet);
+      window.AP.openPoll(rowKey, pollFacet, undefined, pollSplit);
       return;
     }
     dblEmpty(e, MOUSE_PICK_PX);
@@ -63590,6 +63935,71 @@ function issBestOf(iss) {
   };
   return null;
 }
+const DEM_SPLITS = [{
+  id: "age",
+  label: "Age",
+  lo: "Older",
+  hi: "Younger",
+  scope: "With an age breakdown",
+  pairs: [["18–34", "55+", "18–34 v 55+"], ["Gen Z", "Boomers", "Gen Z v Boomers"], ["18–34", "65+", "18–34 v 65+"], ["18–34", "50+", "18–34 v 50+"]]
+}, {
+  id: "gender",
+  label: "Gender",
+  lo: "Men",
+  hi: "Women",
+  scope: "With a gender breakdown",
+  pairs: [["Women", "Men", "Women v men"]]
+}, {
+  id: "education",
+  label: "Education",
+  lo: "Year 12 or less",
+  hi: "University",
+  scope: "With an education breakdown",
+  pairs: [["University", "School", "Uni v school"], ["University", "Year 12 or less", "Uni v Year 12"]]
+}, {
+  id: "place",
+  label: "Place",
+  lo: "Rural",
+  hi: "Inner metro",
+  scope: "With a city and country breakdown",
+  pairs: [["Inner metro", "Rural", "Inner metro v rural"], ["Inner metro", "Regional or rural", "Inner metro v regional"]]
+}, {
+  id: "home",
+  label: "Home",
+  lo: "Owners",
+  hi: "Renters",
+  scope: "With a housing breakdown",
+  pairs: [["Renting", "Own outright", "Renters v owners"], ["Renting and other", "Own outright", "Renters v owners"]]
+}];
+const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
+function demGroupsOf(p) {
+  const g = p && p.grp;
+  if (!g) return null;
+  const m = {};
+  for (const rows of Object.values(g.d || {})) for (const [lab, v] of rows) m[lab] = Object.fromEntries(DEM_KEYS.map((k, i) => [k, v[i]]));
+  const G = window.AUSPOL.demoGroups || [];
+  (g.v || []).forEach((v, i) => {
+    if (v && !m[G[i]]) m[G[i]] = Object.fromEntries(DEM_KEYS.map((k, j) => [k, v[j]]));
+  });
+  return m;
+}
+function demPairOf(p, split) {
+  const sp = DEM_SPLITS.find(s => s.id === split);
+  const m = sp ? demGroupsOf(p) : null;
+  if (!m) return null;
+  for (const [a, b, lab] of sp.pairs) if (m[a] && m[b]) {
+    const gap = Object.fromEntries(DEM_KEYS.map(k => [k, m[a][k] != null && m[b][k] != null ? +(m[a][k] - m[b][k]).toFixed(1) : null]));
+    return {
+      a,
+      b,
+      lab,
+      A: m[a],
+      B: m[b],
+      gap
+    };
+  }
+  return null;
+}
 function ArchIssTop({
   iss
 }) {
@@ -65329,6 +65739,13 @@ function AllPollsView({
     issues: {
       has: p => !!p.iss,
       label: "With issues figures"
+    },
+    demographics: {
+      has: p => !!demPairOf(p, demSplit),
+      get label() {
+        const s = DEM_SPLITS.find(x => x.id === demSplit);
+        return s ? s.scope : "With a breakdown by group";
+      }
     }
   };
   const CONTEST_SCOPE = {
@@ -65404,7 +65821,18 @@ function AllPollsView({
     primary: "primary",
     leadership: "leadership",
     direction: "direction",
-    issues: "issues"
+    issues: "issues",
+    ...(window.AP.rd ? {
+      g: "demographics",
+      demographics: "demographics"
+    } : {})
+  };
+  const DEM_BY_URL = {
+    a: "age",
+    g: "gender",
+    e: "education",
+    p: "place",
+    h: "home"
   };
   const MEAS_BY_URL = {
     o: "onp",
@@ -65454,6 +65882,7 @@ function AllPollsView({
       measure: meas,
       range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
       facet: view,
+      split: DEM_BY_URL[get("g")] || "age",
       scope: sExplicit ? get("s") !== "0" && get("s", "scope") !== "off" : defaultScopeFor(view, meas),
       scopeExplicit: sExplicit
     };
@@ -65474,6 +65903,7 @@ function AllPollsView({
     dir: -1
   });
   const [facet, setFacet] = useState(urlInit.facet);
+  const [demSplit, setDemSplit] = useState(urlInit.split);
   const [open, setOpen] = useState(null);
   const [pop, setPop] = useState(null);
   const [scope, setScope] = useState(urlInit.scope);
@@ -65490,6 +65920,11 @@ function AllPollsView({
     setRange("all");
     setTagSel(new Set());
     if (focus.facet) setFacet(focus.facet);
+    if (focus.split) {
+      const fp = D.individualPolls.find(q => q.pollster + "|" + q.released === focus.key);
+      const can = s => !!(fp && demPairOf(fp, s));
+      setDemSplit(can(focus.split) ? focus.split : DEM_SPLITS.map(s => s.id).find(can) || focus.split);
+    }
     setOpen(focus.key);
   }, [focus]);
   const bodyRef = useRef(null);
@@ -65730,7 +66165,11 @@ function AllPollsView({
           return b ? b.v : -Infinity;
         }
       default:
-        return 0;
+        {
+          if (!key.startsWith("dem.")) return 0;
+          const pr = demPairOf(p, demSplit);
+          return pr && pr.gap[key.slice(4)] != null ? pr.gap[key.slice(4)] : -Infinity;
+        }
     }
   };
   const sorted = [...filtered].sort((a, b) => {
@@ -65812,7 +66251,14 @@ function AllPollsView({
     primary: "p",
     leadership: "l",
     direction: "d",
-    issues: "i"
+    issues: "i",
+    demographics: "g"
+  };
+  const DEM_BY_ID = {
+    gender: "g",
+    education: "e",
+    place: "p",
+    home: "h"
   };
   const MEAS_BY_ID = {
     lnp: "c",
@@ -65826,7 +66272,7 @@ function AllPollsView({
     onp: "o"
   };
   React.useEffect(() => {
-    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "who", "when", "has", "vs", "lead", "view", "scope"];
+    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "g", "who", "when", "has", "vs", "lead", "view", "scope"];
     const p = new URLSearchParams(window.location.search);
     OWNED.forEach(k => p.delete(k));
     if (ql) p.set("q", q.trim());
@@ -65836,6 +66282,7 @@ function AllPollsView({
     if (measure !== DEFAULT_MEASURE) p.set("v", MEAS_BY_ID[measure]);
     if (lead !== "all") p.set("l", LEAD_BY_ID[lead]);
     if (facet !== "twopp") p.set("f", FACET_BY_ID[facet]);
+    if (facet === "demographics" && DEM_BY_ID[demSplit]) p.set("g", DEM_BY_ID[demSplit]);
     if (!scope && FACET_SCOPE[facet]) p.set("s", "0");
     const qs = p.toString();
     const L = window.location;
@@ -65915,7 +66362,9 @@ function AllPollsView({
     synthOnByYm: synthOnByYm,
     altOnByYm: altOnByYm,
     ofTotal: totalAll,
-    ofHouses: housesAll.length
+    ofHouses: housesAll.length,
+    demSplit: demSplit,
+    setDemSplit: setDemSplit
   }), React.createElement(RdDisagree, null), React.createElement(RdHouseLean, {
     measure: measure,
     onMeasure: onMeasure,
@@ -67462,7 +67911,10 @@ Object.assign(window, {
   issBestOf,
   ISS_PARTY_META,
   ArchIssTop,
-  ArchIssBest
+  ArchIssBest,
+  DEM_SPLITS,
+  demGroupsOf,
+  demPairOf
 });</script>
   <script>const GP = {
   R: 120,
@@ -73742,7 +74194,8 @@ function WvRug({
   xp,
   pColor,
   pName,
-  allXp
+  allXp,
+  split
 }) {
   const [tip, setTip] = useState(null);
   const tipBox = React.useRef(null);
@@ -73819,7 +74272,7 @@ function WvRug({
     const open = () => {
       if (!rk || !(window.AP && window.AP.openPoll)) return;
       setTip(null);
-      window.AP.openPoll(rk, "primary", "who votes for whom");
+      window.AP.openPoll(rk, "demographics", "who votes for whom", split);
     };
     const lab = d.f + ", " + d.l + " · " + x.toFixed(1) + "% · n≈" + d.n;
     const on = tip && tip.i === i;
@@ -74490,7 +74943,8 @@ function RdDemographics({
       xp: xp,
       pColor: pColor,
       pName: pName,
-      allXp: xp(all)
+      allXp: xp(all),
+      split: tab.id
     }), React.createElement("span", {
       className: "rd-wv-ci",
       style: {
@@ -74806,7 +75260,8 @@ function RdDemographics({
           scatterOut: mine(cross ? cross.scatterOut : [], g.label),
           scatterMove: mine(cross ? cross.scatterMove : [], g.label),
           fade: A ? t : 1,
-          pollFacet: "primary",
+          pollFacet: "demographics",
+          pollSplit: tab.id,
           tooltipTitle: i => seY != null && i === 0 ? monthLabelFull("2025-05") : c.allPts[seY != null ? i - 1 : i] ? monthLabelFull(c.allPts[seY != null ? i - 1 : i].ym) : "",
           extraRows: seY != null ? i => i === 0 ? [{
             label: "",
@@ -74919,7 +75374,8 @@ function RdDemographics({
         scatterOut: cross ? cross.scatterOut : [],
         scatterMove: cross ? cross.scatterMove : [],
         fade: A ? t : 1,
-        pollFacet: "primary",
+        pollFacet: "demographics",
+        pollSplit: tab.id,
         tooltipTitle: i => leOn && i === 0 ? monthLabelFull("2025-05") : c.allPts[leOn ? i - 1 : i] ? monthLabelFull(c.allPts[leOn ? i - 1 : i].ym) : "",
         extraRows: leOn ? i => i === 0 ? [{
           label: "",
@@ -81469,7 +81925,8 @@ function RdApDetail({
   avgFor,
   facet,
   onBack,
-  backLabel
+  backLabel,
+  demSplit
 }) {
   const D = window.AUSPOL;
   const q = p.p || {};
@@ -81661,9 +82118,115 @@ function RdApDetail({
     } : null;
   }) : [];
   const relUrl = p.releaseUrl || p.url;
+  const isDem = facet === "demographics";
+  const demTable = (() => {
+    if (!isDem || !p.grp || !p.grp.d) return null;
+    const K = ["alp", "lnp", "grn", "onp", "oth"];
+    const cols = rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK);
+    const tot = p.grp.t || null;
+    const pr = window.demPairOf(p, demSplit);
+    const DN = {
+      gender: "Gender",
+      age: "Age",
+      generation: "Generation",
+      education: "Education",
+      state: "State",
+      location: "Location",
+      housing: "Housing",
+      language: "Language at home"
+    };
+    const cell = (v, k) => {
+      const t = tot ? tot[K.indexOf(k)] : null;
+      const d = v != null && t != null ? v - t : 0;
+      return React.createElement("span", {
+        role: "cell",
+        className: "rd-apd-dv" + (d >= 5 ? " hi" : d <= -5 ? " lo" : "")
+      }, v == null ? "—" : Math.round(v));
+    };
+    const dims = Object.entries(p.grp.d);
+    const per = Math.ceil(dims.reduce((a, [, r]) => a + r.length + 1, 0) / 3);
+    const split = [[], [], []];
+    let ci = 0,
+      n = 0;
+    for (const dm of dims) {
+      if (n > 0 && n + dm[1].length + 1 > per + 1 && ci < 2) {
+        ci++;
+        n = 0;
+      }
+      split[ci].push(dm);
+      n += dm[1].length + 1;
+    }
+    const head = React.createElement("div", {
+      className: "rd-apd-demr rd-apd-demh",
+      role: "row"
+    }, React.createElement("span", null), cols.map(k => React.createElement("span", {
+      key: k.id,
+      role: "columnheader",
+      style: {
+        color: k.ink
+      }
+    }, k.lab)));
+    const all = tot && React.createElement("div", {
+      className: "rd-apd-demr rd-apd-demall",
+      role: "row"
+    }, React.createElement("span", {
+      role: "rowheader"
+    }, "All voters"), cols.map(k => React.createElement("span", {
+      key: k.id,
+      role: "cell"
+    }, Math.round(tot[K.indexOf(k.id)]))));
+    return React.createElement("div", {
+      className: "rd-apd-demwrap"
+    }, React.createElement("span", {
+      className: "rd-apd-h"
+    }, "The vote by group, ", p.grp.r === "measured from the charts" ? "measured off " + p.pollster + "’s charts" : "as " + p.pollster + " printed it"), React.createElement("div", {
+      className: "rd-apd-demcols"
+    }, split.filter(c => c.length).map((c, i) => React.createElement("div", {
+      key: i,
+      className: "rd-apd-dem",
+      role: "table",
+      "aria-label": "The vote by group" + (i ? ", continued" : "")
+    }, head, all, c.map(([dim, rows]) => React.createElement(React.Fragment, {
+      key: dim
+    }, React.createElement("div", {
+      className: "rd-apd-demsub",
+      role: "row"
+    }, React.createElement("span", {
+      role: "rowheader"
+    }, DN[dim] || dim)), rows.map(([lab, v]) => React.createElement("div", {
+      key: lab,
+      className: "rd-apd-demr" + (pr && (lab === pr.a || lab === pr.b) ? " on" : ""),
+      role: "row"
+    }, React.createElement("span", {
+      role: "rowheader"
+    }, lab), cols.map(k => React.createElement(React.Fragment, {
+      key: k.id
+    }, cell(v[K.indexOf(k.id)], k.id)))))))))), React.createElement("span", {
+      className: "rd-apd-sub rd-apd-note"
+    }, "Primary vote within each group, %. Shaded: five points or more above the poll\u2019s all-voters figure; faded: five or more below.", pr ? " Marked: " + pr.a + " and " + pr.b + ", the two groups the row compares." : ""));
+  })();
+  const demFacts = (() => {
+    if (!isDem || !p.grp) return null;
+    const G = D.demoGroups || [];
+    const raw = Object.values(p.grp.d || {}).flatMap(rows => rows.map(r => r[0]));
+    const pooled = (p.grp.v || []).map((v, i) => v ? G[i] : null).filter(Boolean);
+    const MERGED = ["Below Year 12", "Year 12", "School", "TAFE", "TAFE or college", "SA", "WA", "ACT/NT/Tas"];
+    const alone = raw.filter(l => !pooled.includes(l) && !MERGED.includes(l));
+    const T = D.demographics || {};
+    const base = n => n === "RedBridge" ? "RedBridge/Accent" : n;
+    const inWin = (T.polls || []).some(q => base(q.pollster) === p.pollster && q.dateLabel === p.field);
+    const nCuts = Object.keys(p.grp.d || {}).length;
+    return React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "rd-apd-k"
+    }, "Printed"), React.createElement("span", null, raw.length, " groups across ", rdNumWord(nCuts), " breakdown", nCuts === 1 ? "" : "s", ", ", p.grp.r === "measured from the charts" ? "read off its charts to the nearest point" : "from its own table", "."), React.createElement("span", {
+      className: "rd-apd-k"
+    }, "In Who votes for whom"), React.createElement("span", null, pooled.length, " of its groups join the pooled figures", alone.length ? React.createElement(React.Fragment, null, "; ", rdApLdJoin(alone), " ", alone.length === 1 ? "stays" : "stay", " here alone, since no other pollster draws ", alone.length === 1 ? "that group" : "those groups", " the same way") : "", "."), T.window && React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "rd-apd-k"
+    }, "In today\u2019s figures"), React.createElement("span", null, inWin ? React.createElement(React.Fragment, null, "One of the polls the panel\u2019s current figures draw on (the last ", T.window, ").") : React.createElement(React.Fragment, null, "Outside the ", T.window, " the panel\u2019s current figures draw on."))));
+  })();
   return React.createElement("div", {
     className: "rd-apd"
-  }, React.createElement("div", {
+  }, demTable, React.createElement("div", {
     className: "rd-apd-l poll-detail",
     "data-pollster": p.pollster
   }, React.createElement("span", {
@@ -81860,7 +82423,7 @@ function RdApDetail({
     className: "rd-apd-r"
   }, React.createElement("span", {
     className: "rd-apd-h"
-  }, "How it counts"), !isDir && !isIss && !isLd && fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, "How it counts"), !isDir && !isIss && !isLd && !isDem && fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-ct"
   }, p.pollster, "\u2019s polls since ", D.monthNameFull(Number(from.slice(5))), " against the average, Labor v ", onM ? "One Nation" : "Coalition", pub ? " as published" : ""), React.createElement(RdApMini, {
     p: p,
@@ -81895,7 +82458,7 @@ function RdApDetail({
     }));
   })(), React.createElement("div", {
     className: "rd-apd-facts"
-  }, isIss && iss && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, demFacts, isIss && iss && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
   }, "Asked"), React.createElement("span", null, issPrompted ? React.createElement(React.Fragment, null, "Voters picked the three issues that matter most", iss.q ? React.createElement(React.Fragment, null, " \u2013 ", p.pollster, "\u2019s wording: \u201C", iss.q, "\u201D") : p.pollster === "Ipsos" ? " – Ipsos asks its standing list of 19 issues, best party on the month’s five leaders" : "", ". SEC Newgate\u2019s mentions count can\u2019t sit in the same series, so each house\u2019s wording is pooled against its pair first.") : iss.conc ? React.createElement(React.Fragment, null, "SEC Newgate asks what concerns Australians, unprompted \u2013 anyone can name anything, so the shares are any-mentions, not forced picks. That reading can\u2019t mix with the top-three series the issues panel pools, so it isn\u2019t counted toward it.") : React.createElement(React.Fragment, null, p.pollster, " asked only who\u2019d be best on each issue", iss.q ? React.createElement(React.Fragment, null, " \u2013 its wording: \u201C", iss.q, "\u201D \u2013") : ",", " not which issues matter most, so this wave feeds the pooled best-party line and there\u2019s no top-three list for it to join.")), issPair != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
@@ -81948,7 +82511,7 @@ function RdApDetail({
     key: n.name
   }, i > 0 ? "; against " + n.name + ", " : "", React.createElement("b", null, Math.abs(n.gap) < 0.05 ? "level" : Math.abs(n.gap).toFixed(1) + " points " + rdApLdWay(n.gap, n.name)), " (Albanese ", rdApSigned(n.a), ", ", n.name, " ", rdApSigned(n.o), ") on ", rdApLdMetWord(n.met))), ldOwn.some(pr => pr.met === "fav") ? " – favourability and approval are different questions, so each gap here stays on its own" : ""))), isLd && !ldOwn.length && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
-  }, "Leader ratings"), React.createElement("span", null, p.pollster, " didn\u2019t ask Albanese and ", p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader", " on the same question in this poll, so there\u2019s no net-approval gap to set against the leadership figures.")), !isDir && !isIss && !isLd && React.createElement(React.Fragment, null, p.noAgg && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, "Leader ratings"), React.createElement("span", null, p.pollster, " didn\u2019t ask Albanese and ", p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader", " on the same question in this poll, so there\u2019s no net-approval gap to set against the leadership figures.")), !isDir && !isIss && !isLd && !isDem && React.createElement(React.Fragment, null, p.noAgg && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
   }, "In the aggregates"), React.createElement("span", null, "Because SMS polls have a strong selection bias, they do not count towards any aggregates.")), lean != null && avg != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
@@ -82142,13 +82705,16 @@ function RdAllPolls(P) {
     synthOnByYm,
     altOnByYm,
     ofTotal,
-    ofHouses
+    ofHouses,
+    demSplit,
+    setDemSplit
   } = P;
   const D = window.AUSPOL;
   const ofT = ofTotal != null && ofTotal !== total ? ofTotal : null;
   const ofTxt = ofT ? " of " + ofT : "";
   const phone = useNarrow("(max-width: 760px)");
-  const ctlNarrow = useNarrow("(max-width: 900px)");
+  const ctlNarrow = useNarrow("(max-width: 1000px)");
+  const demMid = useNarrow("(max-width: 1150px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const contest = onM ? "onp" : "lnp";
@@ -82240,6 +82806,9 @@ function RdAllPolls(P) {
   }, {
     id: "issues",
     label: "Issues"
+  }, {
+    id: "demographics",
+    label: phone ? "Groups" : "Demographics"
   }];
   const rowNav = (e, p) => {
     if (e.target !== e.currentTarget) return;
@@ -82349,7 +82918,8 @@ function RdAllPolls(P) {
     primary: "rd-ap-cprim",
     leadership: "rd-ap-clead",
     direction: "rd-ap-cdir",
-    issues: "rd-ap-ciss"
+    issues: "rd-ap-ciss",
+    demographics: "rd-ap-cdem"
   }[facet] + (facetSwaps.current ? " rd-ap-sw" : "");
   const th = (label, k, o) => {
     const on = sort.key === k;
@@ -82392,6 +82962,37 @@ function RdAllPolls(P) {
   const PMAX = 45;
   const pdx = v => Math.max(0, Math.min(PMAX, v)) / PMAX * 100;
   const prims = rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK);
+  const SPLITS = window.DEM_SPLITS || [];
+  const spl = SPLITS.find(x => x.id === demSplit) || SPLITS[0];
+  const DEM_M = 40;
+  const gx = v => (Math.max(-DEM_M, Math.min(DEM_M, v)) + DEM_M) / (2 * DEM_M) * 100;
+  const gapTxt = v => v == null ? "—" : Math.abs(v) < 0.5 ? "0" : (v > 0 ? "+" : "−") + Math.abs(Math.round(v));
+  const DEM_PNAME = {
+    alp: "Labor",
+    lnp: "the Coalition",
+    grn: "the Greens",
+    onp: "One Nation",
+    oth: "others"
+  };
+  const demScale = short => {
+    const ticks = short ? [[-40, "40"], [-20, "20"], [0, "Even"], [20, "20"], [40, "40 pts"]] : [[-40, "40 pts"], [-30, "30"], [-20, "20"], [-10, "10"], [0, "Even"], [10, "10"], [20, "20"], [30, "30"], [40, "40 pts"]];
+    return React.createElement("span", {
+      className: "rd-ap-scale",
+      "aria-hidden": "true"
+    }, React.createElement("span", {
+      className: "rd-ap-in"
+    }, React.createElement("b", {
+      className: "rd-ap-scl"
+    }, "\u25C0 ", spl.lo), React.createElement("b", {
+      className: "rd-ap-scr"
+    }, spl.hi, " \u25B6"), ticks.map(([v, lab]) => React.createElement("span", {
+      key: v,
+      className: "rd-ap-tk" + (v === 0 ? " mid" : "") + (short && v === -DEM_M ? " start" : "") + (short && v === DEM_M ? " end" : ""),
+      style: {
+        left: gx(v) + "%"
+      }
+    }, lab))));
+  };
   const colHead = React.createElement("div", {
     className: "rd-ap-hrow " + cls,
     role: "row"
@@ -82503,7 +83104,18 @@ function RdAllPolls(P) {
     right: true,
     wrap: true,
     title: "The party most voters rate best on that issue"
-  })), React.createElement("span", null));
+  })), facet === "demographics" && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-ap-pnums rd-ap-hpn"
+  }, prims.map(k => React.createElement(React.Fragment, {
+    key: k.id
+  }, th(k.lab, "dem." + k.id, {
+    color: k.ink,
+    title: "Sort by " + DEM_PNAME[k.id] + "’s gap between the two groups"
+  })))), React.createElement("span", {
+    role: "columnheader",
+    "aria-label": "Each party’s gap between the two groups, from stronger with " + spl.lo.toLowerCase() + " to stronger with " + spl.hi.toLowerCase() + " voters",
+    className: "rd-ap-hpic"
+  }, demScale(demMid)), React.createElement("span", null)), React.createElement("span", null));
   const pollsterCell = p => React.createElement("span", {
     role: "rowheader",
     className: "rd-ap-who"
@@ -82986,6 +83598,60 @@ function RdAllPolls(P) {
       }, "Issues unranked, but cost-of-living trust asked")), ownDots.length > 0 && React.createElement("div", {
         className: "rd-ap-cpic"
       }, pic));
+    } else if (facet === "demographics") {
+      const pr = window.demPairOf(p, demSplit);
+      figs = React.createElement("span", {
+        role: "cell",
+        className: "rd-ap-fig rd-ap-dgap"
+      }, React.createElement("span", {
+        className: "rd-ap-pnums"
+      }, prims.map(k => React.createElement("b", {
+        key: k.id,
+        style: {
+          color: k.ink
+        }
+      }, pr ? gapTxt(pr.gap[k.id]) : "—"))), React.createElement("span", {
+        className: "rd-ap-sub"
+      }, pr ? pr.lab + ", in points" : "no " + spl.label.toLowerCase() + " breakdown"));
+      pic = React.createElement("span", {
+        className: "rd-ap-pic",
+        role: "img",
+        "aria-label": pr ? pr.lab + ": " + prims.filter(k => pr.gap[k.id] != null).map(k => k.lab + " " + gapTxt(pr.gap[k.id])).join(", ") + " points" : "No breakdown to split"
+      }, React.createElement("span", {
+        className: "rd-ap-in"
+      }, [-30, -20, -10, 10, 20, 30].map(v => React.createElement("i", {
+        key: v,
+        className: "rd-ap-gl",
+        style: {
+          left: gx(v) + "%"
+        }
+      })), React.createElement("i", {
+        className: "rd-ap-avg",
+        style: {
+          left: gx(0) + "%"
+        }
+      }), pr && prims.filter(k => pr.gap[k.id] != null).map(k => React.createElement("i", {
+        key: k.id,
+        className: "rd-ap-dot",
+        style: {
+          left: gx(pr.gap[k.id]) + "%",
+          background: k.dot
+        }
+      }))));
+      right1 = pr ? React.createElement("span", {
+        className: "rd-ap-dpair"
+      }, pr.lab) : null;
+      body = React.createElement(React.Fragment, null, React.createElement("div", {
+        className: "rd-ap-cprim"
+      }, prims.map(k => React.createElement("span", {
+        key: k.id
+      }, React.createElement("em", null, k.lab), React.createElement("b", {
+        style: {
+          color: k.ink
+        }
+      }, pr ? gapTxt(pr.gap[k.id]) : "—")))), React.createElement("div", {
+        className: "rd-ap-cpic"
+      }, pic));
     }
     const detail = isOpen && React.createElement("div", {
       className: "rd-ap-open",
@@ -83000,7 +83666,8 @@ function RdAllPolls(P) {
       avgFor: avgFor,
       facet: facet,
       onBack: arrived ? onBack : null,
-      backLabel: backLabel
+      backLabel: backLabel,
+      demSplit: demSplit
     }));
     if (phone) {
       const sub = [p.client, fieldTxt(p), p.sample != null ? p.sample.toLocaleString() : null].filter(Boolean).join(", ");
@@ -83173,7 +83840,9 @@ function RdAllPolls(P) {
     style: {
       left: pdx(v) + "%"
     }
-  }, v, v === 40 ? "%" : "")))));
+  }, v, v === 40 ? "%" : "")))), facet === "demographics" && React.createElement("span", {
+    className: "rd-ap-hpic"
+  }, demScale(true)));
   const NAV = [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagree"], ["house-lean", "Lean"], ["flow-drift", "Flows"]];
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
@@ -83221,6 +83890,26 @@ function RdAllPolls(P) {
     pinAp();
     onMeasure(onM ? "lnp" : "onp");
   };
+  const splitPick = id => {
+    pinAp();
+    setDemSplit(id);
+  };
+  const splitPicker = React.createElement("span", {
+    className: "rd-ap-dpick"
+  }, React.createElement("span", {
+    className: "rd-pl-ctl-l"
+  }, "Split by:"), React.createElement("span", {
+    role: "radiogroup",
+    "aria-label": "Split the vote by",
+    onKeyDown: rdTabsKey(SPLITS, splitPick),
+    onClick: rdTabFocus
+  }, SPLITS.map(x => React.createElement("button", {
+    key: x.id,
+    type: "button",
+    role: "radio",
+    "aria-checked": x.id === demSplit,
+    onClick: () => splitPick(x.id)
+  }, x.label))));
   const basisPick = () => {
     pinAp();
     setTppBasis(pub ? "imp" : "resp");
@@ -83386,13 +84075,15 @@ function RdAllPolls(P) {
     className: "rd-pl-ctl-l"
   }, "Two-party:"), flip, React.createElement("span", {
     className: "rd-pl-ctl-l"
-  }, ", ", pub ? "as published" : "implied flows"), qpop)), facet === "twopp" && ctlNarrow && React.createElement("div", {
+  }, ", ", pub ? "as published" : "implied flows"), qpop), facet === "demographics" && !ctlNarrow && splitPicker), facet === "twopp" && ctlNarrow && React.createElement("div", {
     className: "rd-ap-pctl"
   }, flip, React.createElement("span", {
     className: "rd-pl-ctl-l"
   }, ", ", pub ? "as published" : "implied flows"), React.createElement("span", {
     className: "rd-grow"
-  }), qpop), React.createElement("div", {
+  }), qpop), facet === "demographics" && ctlNarrow && React.createElement("div", {
+    className: "rd-ap-pctl"
+  }, splitPicker), React.createElement("div", {
     className: "rd-ap-bar"
   }, React.createElement("label", {
     className: "rd-ap-search"
@@ -83596,9 +84287,21 @@ function RdAllPolls(P) {
   }, React.createElement("span", {
     className: "rd-ap-keyring",
     "aria-hidden": "true"
-  }), "The month\u2019s average")), React.createElement(HowTo, {
+  }), "The month\u2019s average")), facet === "demographics" && React.createElement(RdKey, {
+    className: "rd-ckey rd-ap-key",
+    items: [{
+      kind: "dot-solid",
+      color: "var(--ink-3)",
+      label: "A party’s gap between the two groups, in its colour"
+    }]
+  }, React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-ap-keyavg",
+    "aria-hidden": "true"
+  }), "Even: the same vote in both groups")), React.createElement(HowTo, {
     label: "How to read this table",
-    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to the average of the published figures that month, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the 2025 election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to that month’s average, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "About one poll in 20 should sit outside its interval by chance."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled; ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
+    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to the average of the published figures that month, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the 2025 election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to that month’s average, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "About one poll in 20 should sit outside its interval by chance."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled; ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
   }), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {
@@ -86816,11 +87519,12 @@ function App() {
     });
   };
   React.useEffect(() => {
-    window.AP.openPoll = (key, facet, from) => {
+    window.AP.openPoll = (key, facet, from, split) => {
       if (!key) return;
       setFocusPoll({
         key,
         facet: facet || null,
+        split: split || null,
         back: {
           tab: readHash(),
           y: window.scrollY,
