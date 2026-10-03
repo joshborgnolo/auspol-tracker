@@ -19,7 +19,9 @@
 //     note (its concerns bank is any-mentions, not a forced pick)
 //  8. VW=390 VH=844: the phone rung mounts cards whose best-issue sentence
 //     reads as a superscript-ordinal ranking ("Cost of living 1st, housing
-//     2nd, crime 3rd") on ONE csub line
+//     2nd, crime 3rd") on ONE csub line; a wave with no ranking but
+//     cost-of-living ownership figures fills the line with the dictated
+//     "Issues unranked, but performance on cost of living assessed"
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -52,11 +54,18 @@ const expectOf = async (page) => page.evaluate(() => {
   const D = window.AUSPOL;
   const withIss = (a) => (a || []).filter((p) => p.iss).length;
   const individual = D.individualPolls || [], dirOnly = D.directionOnlyPolls || [], issOnly = D.issuesOnlyPolls || [];
+  /* unranked-but-col waves (Resolve, YouGov, DemosAU): an iss payload with
+     no salience/concerns list but cost-of-living ownership figures - the
+     phone card fills their sentence line with the dictated placeholder */
+  const unranked = (a) => (a || []).filter((p) => p.iss
+    && !(p.iss.sal && p.iss.sal.length) && !(p.iss.conc && p.iss.conc.length)
+    && p.iss.own && p.iss.own.col != null).length;
   return {
     nAll: individual.length + dirOnly.length + issOnly.length,
     nIssAll: withIss(individual) + withIss(dirOnly) + issOnly.length,
     issOnly: issOnly.length,
     secIss: (dirOnly.filter((p) => /^SEC Newgate/.test(p.pollster) && p.iss)).length,
+    unrankedCol: unranked(individual) + unranked(dirOnly) + unranked(issOnly),
   };
 });
 
@@ -298,6 +307,21 @@ check("SEC issues rail says unprompted, and never touches the salience pair-lean
   !!secD && /unprompted/.test(secD.rail) && !/question forms/.test(secD.rail),
   secD ? secD.rail.slice(0, 160) : "no detail");
 
+// 7b: opened Resolve row — an OWNERSHIP-ONLY wave (no salience ranking, no
+// concerns bank) must not wear SEC Newgate's Asked line: its Asked fact
+// says the house asked only who's best on each issue and keeps the wave
+// out of the top-three series. The same branch covers DemosAU's and
+// YouGov's own-only waves.
+const reD = await openRowContaining(page1, /^Resolve/);
+check("a Resolve row's Asked line is the who's-best form, never SEC's concerns text",
+  !!reD && /asked only who.d be best on each issue/.test(reD.rail) && !/SEC Newgate asks/.test(reD.rail),
+  reD ? reD.rail.slice(0, 200) : "no detail");
+// restore the table: openRowContaining CLICKS its row, so re-clicking the
+// same Resolve row collapses it again before check 8's own open (the open
+// row keeps its .rd-ap-row class; .rd-ap-open sits on the detail wrapper,
+// and a click there is stopPropagation'd, never collapsing)
+await openRowContaining(page1, /^Resolve/);
+
 // 8: an opened VI+issues row — issues rail, no 2PP rail chart
 const hs = await page1.evaluate(() => [...new Set([...document.querySelectorAll(".rd-ap-row")]
   .map((r) => (r.querySelector("[role='rowheader'] b") || {}).textContent || "Ipsos"))]);
@@ -398,8 +422,11 @@ await page3.waitForSelector(".rd-ap-card", { timeout: 15000 });
 await showAll(page3);
 
 // Same contract as the desktop rows: a card carries the one-line best-issue
-// sentence iff its top-issue cell is filled (best-party-only waves rightly
-// have neither). The sentence is a plain ranking with superscript ordinals
+// sentence iff its top-issue cell is filled; a wave with NO ranking but
+// cost-of-living ownership figures (Resolve, YouGov, DemosAU) fills the same
+// line with the dictated placeholder "Issues unranked, but performance on
+// cost of living assessed"; SEC's best-party-only waves rightly have
+// neither. The sentence is a plain ranking with superscript ordinals
 // and NO figures ("Cost of living 1st, housing 2nd, crime 3rd" - SENTENCE
 // CASE: only the leading letter of the first label is capital, every other
 // label lowercased; "Housing affordability"
@@ -417,6 +444,10 @@ const cardAnatomy = await page3.evaluate(() => {
     const sent = c.querySelector(".rd-ap-csub-sent");
     const txt = sent ? sent.textContent.trim().replace(/\s+/g, " ") : "";
     const topFilled = !!sent && / 1st/.test(txt);
+    // the dictated placeholder on waves that ask cost-of-living ownership
+    // but rank no issues (Resolve, YouGov, DemosAU) - verbatim, sentence
+    // case, the same .rd-ap-csub-sent line the ranking would ride
+    const unranked = txt === "Issues unranked, but performance on cost of living assessed";
     // user call 2026-10-03: sentence case - exactly ONE capital, the
     // leading letter of the first label ("Cost of living 1st, housing
     // 2nd, ..."); every other label stays lowercase
@@ -436,13 +467,15 @@ const cardAnatomy = await page3.evaluate(() => {
     const chipOk = !!chip && /[A-Za-z]+ \d+/.test(chipTxt);
     const bodyStrip = c.querySelector(":scope > .rd-ap-cpic");
     const dots = bodyStrip ? bodyStrip.querySelectorAll(".rd-ap-dot").length : 0;
-    return { nxt: sent ? / 2nd/.test(txt) : false, runnerOk, topFilled, caps: capsOk, legacy, csubSentOk, noPair, chip: chipOk, chipTxt, bodyStrip: !!bodyStrip, dots, subN: subs.length, txt, firm: (c.querySelector(".rd-ap-firm") || {}).textContent || "?" };
+    return { nxt: sent ? / 2nd/.test(txt) : false, runnerOk, topFilled, caps: capsOk, legacy, csubSentOk, noPair, chip: chipOk, chipTxt, bodyStrip: !!bodyStrip, dots, subN: subs.length, txt, unranked, firm: (c.querySelector(".rd-ap-firm") || {}).textContent || "?" };
   });
   const dotted = an.filter((a) => a.dots > 0);
   return { an,
     cardsN: an.length,
     withTop: an.filter((a) => a.topFilled).length,
     topMissing: an.filter((a) => !a.topFilled).length,
+    unranked: an.filter((a) => a.unranked).length,
+    unrankedFirms: [...new Set(an.filter((a) => a.unranked).map((a) => a.firm))].sort(),
     withNxt: an.filter((a) => a.nxt).length,
     badNxt: an.filter((a) => !a.runnerOk || !a.csubSentOk || !a.caps).length,
     legacySubs: an.filter((a) => a.legacy).length,
@@ -460,6 +493,12 @@ console.log("  diag bad-chips:", JSON.stringify(cardAnatomy.an.filter((a) => a.d
 check("phone: the best issues read as ONE flowing sentence of superscript-ordinal rankings in sentence case (no figures)",
   cardAnatomy.withTop > 0 && cardAnatomy.withNxt > 0 && cardAnatomy.badNxt === 0 && cardAnatomy.legacySubs === 0,
   `${cardAnatomy.withTop}/${cardAnatomy.cardsN} with the sentence (${cardAnatomy.withNxt} with runners, ${cardAnatomy.topMissing} best-party-only); bad ${cardAnatomy.badNxt}; legacy subs ${cardAnatomy.legacySubs}`);
+// exact placeholder count keyed off the page's own data bundle: every
+// iss-bearing wave with no salience/concerns ranking but col ownership
+// figures shows the dictated line, and no other card does
+check("phone: unranked waves (Resolve, YouGov, DemosAU) carry the dictated 'Issues unranked…' placeholder on the sentence line",
+  cardAnatomy.unranked === exp.unrankedCol && cardAnatomy.unranked > 0,
+  `${cardAnatomy.unranked}/${exp.unrankedCol} placeholder lines — on ${cardAnatomy.unrankedFirms.join(", ") || "nobody"}`);
 check("phone: the ownership dot strip spans the full width of the card body again",
   cardAnatomy.withDots > 0 && cardAnatomy.badDots === 0 && cardAnatomy.stripAdrift === 0 && cardAnatomy.loneStrips === 0,
   `${cardAnatomy.withDots}/${cardAnatomy.cardsN} cards dotted, ${cardAnatomy.badDots} malformed, ${cardAnatomy.stripAdrift} strips outside the body, ${cardAnatomy.loneStrips} strips without dots`);
