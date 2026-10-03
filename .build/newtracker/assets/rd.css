@@ -1140,10 +1140,15 @@ body.rd .rd-wv-rug b::before { content: ""; position: absolute; inset: -5px -6px
 body.rd .rd-wv-rug b > i { position: absolute; inset: 0; border-radius: 50%; background: color-mix(in oklab, var(--pcolor) 55%, transparent); pointer-events: none; }
 /* — except the dots the all-voters dash crosses: the dash must not run
    through a dot's face (user call), so b.ring alone borrows the whisker
-   ticks' 2px page-ground halo and the dash stops at it as at a tick.
-   Ringing every dot would punch bg holes through neighbours on dense rows
-   (the blindness beb28b3 dropped the ring for); the conditional keeps it */
-body.rd .rd-wv-rug b.ring > i { box-shadow: 0 0 0 2px var(--bg); }
+   marks' full recipe — the 2px page-ground halo AND a face composited over
+   the page ground. The face keeps its 55% tint colour (so it still reads
+   exactly like its ringless neighbours) but paints that tint OVER an
+   opaque bg layer: z-order alone can't hide the dash because the plain
+   face is translucent and the dash shows through the disc itself, the same
+   reason the whisker circle and ticks are solid. Ringing every dot would
+   punch bg holes through neighbours on dense rows (the blindness beb28b3
+   dropped the ring for); the conditional keeps it */
+body.rd .rd-wv-rug b.ring > i { --ring-face: color-mix(in oklab, var(--pcolor) 55%, transparent); background: linear-gradient(var(--ring-face), var(--ring-face)), var(--bg); box-shadow: 0 0 0 2px var(--bg); }
 body.rd .rd-wv-rug b.on { cursor: pointer; }
 body.rd .rd-wv-rug b.on:hover > i, body.rd .rd-wv-rug b.on:focus-visible > i { background: var(--pcolor); }
 body.rd .rd-wv-rug b.on:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -1151,6 +1156,9 @@ body.rd .rd-wv-rug b.hi { z-index: 2; }
 body.rd .rd-wv-rug b.hi > i { inset: -3px; background: var(--pcolor); box-shadow: 0 0 0 2px var(--bg); }
 body.rd .rd-wv-rug b.hi > i::after { content: ""; position: absolute; inset: -5px; border: 1.5px solid color-mix(in oklab, var(--pcolor) 55%, transparent); border-radius: 50%; }
 body.rd .rd-wv-rug.lit b:not(.hi) > i { background: color-mix(in oklab, var(--pcolor) 28%, transparent); }
+/* a ringed dot stays ringed when the row dims: keep its bg underlay, swap
+   only its tint to the lit strength */
+body.rd .rd-wv-rug.lit b.ring:not(.hi) > i { --ring-face: color-mix(in oklab, var(--pcolor) 28%, transparent); background: linear-gradient(var(--ring-face), var(--ring-face)), var(--bg); }
 /* and its tooltip IS the chart's: the shared .tip card hung by tip-dot's own
    transform (-50%, calc(-100% - 14px)); this rule only re-seats the anchor
    at the dot's centre, as the charts' left/top % does, and lifts the card
