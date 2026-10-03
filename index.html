@@ -3787,11 +3787,11 @@ body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1
 body.rd .rd-wv-allcap { position: relative; grid-column: 2; grid-row: 1; height: 18px; }
 body.rd .rd-wv-allcap > span { position: absolute; left: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)); font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-wv-vs { grid-column: 3 / span 2; text-align: right; font-size: 12px; }
-body.rd .rd-wv-row { min-height: 32px; }
+body.rd .rd-wv-row { min-height: 40px; }
 body.rd .rd-wv-lab { font-size: 15px; color: var(--ink); }
 body.rd .rd-wv-born { margin-left: 5px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; color: var(--ink-3); white-space: nowrap; cursor: pointer; }
 body.rd .rd-wv-born.on { color: var(--ink); }
-body.rd .rd-wv-track { position: relative; height: 32px; }
+body.rd .rd-wv-track { position: relative; height: 36px; }
 body.rd .rd-wv-track, body.rd .rd-wv-allline > span, body.rd .rd-wv-allcap, body.rd .rd-wv-ticks { container-type: inline-size; }
 body.rd .rd-wv-track::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), var(--line-2) calc(25% - 1px), var(--line-2) 25%); opacity: 0.8; }
 body.rd .rd-wv-plot { position: relative; }
@@ -3854,11 +3854,11 @@ body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
   body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1; }
   body.rd .rd-wv-vs { grid-column: 3; grid-row: 1; }
   body.rd .rd-wv-allcap { grid-column: 1 / -1; grid-row: 2; }
-  body.rd .rd-wv-row { grid-template-areas: "lab v d" "track track track"; row-gap: 0; padding-top: 8px; min-height: 0; }
+  body.rd .rd-wv-row { grid-template-areas: "lab v d" "track track track"; row-gap: 6px; padding-top: 8px; min-height: 0; }
   body.rd .rd-wv-lab { grid-area: lab; font-size: 15px; }
   body.rd .rd-wv-v { grid-area: v; font-size: 15px; }
   body.rd .rd-wv-d { grid-area: d; font-size: 13px; min-width: 38px; }
-  body.rd .rd-wv-track { grid-area: track; height: 28px; }
+  body.rd .rd-wv-track { grid-area: track; height: 32px; }
   body.rd .rd-wv-rug b { width: 5px; height: 5px; }
   body.rd .rd-wv-axis > span:not(.rd-wv-ticks) { display: none; }
   body.rd .rd-wv-axis .rd-wv-ticks { grid-column: 1 / -1; }

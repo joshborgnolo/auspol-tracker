@@ -1077,13 +1077,16 @@ body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1
 body.rd .rd-wv-allcap { position: relative; grid-column: 2; grid-row: 1; height: 18px; }
 body.rd .rd-wv-allcap > span { position: absolute; left: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)); font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-wv-vs { grid-column: 3 / span 2; text-align: right; font-size: 12px; }
-body.rd .rd-wv-row { min-height: 32px; }
+/* the row runs a touch taller than its track: the rug corridor grows out
+   of the track's top edge, and the penthouse absorbs as much of it as it
+   can before it can reach the row above */
+body.rd .rd-wv-row { min-height: 40px; }
 body.rd .rd-wv-lab { font-size: 15px; color: var(--ink); }
 /* a generation's ages ride its label as a quiet bracket; lit while it reads
    as birth years (hover or tapped on) */
 body.rd .rd-wv-born { margin-left: 5px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; color: var(--ink-3); white-space: nowrap; cursor: pointer; }
 body.rd .rd-wv-born.on { color: var(--ink); }
-body.rd .rd-wv-track { position: relative; height: 32px; }
+body.rd .rd-wv-track { position: relative; height: 36px; }
 /* the dot plot's marks are placed by transform in units of these boxes'
    own width (cqw), not by left: a transform transition runs on the
    compositor, so a party switch glides them even on a phone whose main
@@ -1212,11 +1215,14 @@ body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
   body.rd .rd-wv-sethead > span:first-child { grid-column: 1 / span 2; grid-row: 1; }
   body.rd .rd-wv-vs { grid-column: 3; grid-row: 1; }
   body.rd .rd-wv-allcap { grid-column: 1 / -1; grid-row: 2; }
-  body.rd .rd-wv-row { grid-template-areas: "lab v d" "track track track"; row-gap: 0; padding-top: 8px; min-height: 0; }
+  /* a phone adds its corridor clearance as row-gap: the figures' line sits
+     directly above the track here, so the strip's 6px reach up into it now
+     lands in the gap instead of on the digits' ink */
+  body.rd .rd-wv-row { grid-template-areas: "lab v d" "track track track"; row-gap: 6px; padding-top: 8px; min-height: 0; }
   body.rd .rd-wv-lab { grid-area: lab; font-size: 15px; }
   body.rd .rd-wv-v { grid-area: v; font-size: 15px; }
   body.rd .rd-wv-d { grid-area: d; font-size: 13px; min-width: 38px; }
-  body.rd .rd-wv-track { grid-area: track; height: 28px; }
+  body.rd .rd-wv-track { grid-area: track; height: 32px; }
   body.rd .rd-wv-rug b { width: 5px; height: 5px; }
   body.rd .rd-wv-axis > span:not(.rd-wv-ticks) { display: none; }
   body.rd .rd-wv-axis .rd-wv-ticks { grid-column: 1 / -1; }
