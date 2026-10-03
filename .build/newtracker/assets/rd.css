@@ -1,23 +1,11 @@
 /* ==========================================================================
-   The redesign (Sep 2026) – every rule below is scoped to body.rd.
-   The tagline's "last" switches between this design and the one it replaced,
-   so nothing here may reach the old design; the one exception is the switch
-   itself (.tagline-flip), which both designs wear.
+   The redesign (Sep 2026) – every rule below is scoped to body.rd,
+   so nothing here may reach the old design (viewable at ?design=old while
+   its code ships; the tagline's "last" stopped switching between the two
+   2026-10-03).
    Colours are the site's own variables, so dark mode follows by itself; the
    few the redesign adds are declared first, with their dark twins.
    ========================================================================== */
-
-/* the switch – in BOTH designs: a word in the sentence, not a control on it */
-.tagline-flip {
-  all: unset;
-  cursor: pointer;
-  font: inherit; color: inherit;
-  text-decoration: underline dotted transparent;
-  text-underline-offset: 3px;
-  transition: text-decoration-color .2s ease;
-}
-.tagline-flip:hover { text-decoration-color: currentColor; }
-.tagline-flip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 
 /* ---------- tokens -------------------------------------------------------- */
 body.rd {

@@ -2938,16 +2938,6 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 }
 </style>
   <style>
-.tagline-flip {
-  all: unset;
-  cursor: pointer;
-  font: inherit; color: inherit;
-  text-decoration: underline dotted transparent;
-  text-underline-offset: 3px;
-  transition: text-decoration-color .2s ease;
-}
-.tagline-flip:hover { text-decoration-color: currentColor; }
-.tagline-flip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 body.rd {
   --rd-rule: var(--ink);
   --band-opacity: 0.14;
@@ -80002,15 +79992,15 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Best on the top issue, % of all respondents"), React.createElement("span", {
+  }, "Best"), React.createElement("span", {
     className: "rd-ap-in"
-  }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
+  }, [0, 10, 20, 30].map(v => React.createElement("span", {
     key: v,
     className: "rd-ap-tk",
     style: {
       left: pdx(v) + "%"
     }
-  }, v, v === 40 ? "%" : "")))), th("Best on it", "iss.bestv", {
+  }, v, v === 30 ? "%" : "")))), th("Best on it", "iss.bestv", {
     right: true,
     title: "The party most voters rate best on that issue"
   })), React.createElement("span", null));
@@ -80408,7 +80398,7 @@ function RdAllPolls(P) {
         "aria-label": ariaBest
       }, React.createElement("span", {
         className: "rd-ap-in"
-      }, [0, 10, 20, 30, 40].map(v => React.createElement("i", {
+      }, [0, 10, 20, 30].map(v => React.createElement("i", {
         key: v,
         className: "rd-ap-gl",
         style: {
@@ -80633,15 +80623,15 @@ function RdAllPolls(P) {
     className: "rd-ap-hpic"
   }, React.createElement("span", {
     className: "rd-ap-cap"
-  }, "Best on the top issue, % of all respondents"), React.createElement("span", {
+  }, "Best"), React.createElement("span", {
     className: "rd-ap-in"
-  }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
+  }, [0, 10, 20, 30].map(v => React.createElement("span", {
     key: v,
     className: "rd-ap-tk",
     style: {
       left: pdx(v) + "%"
     }
-  }, v, v === 40 ? "%" : "")))));
+  }, v, v === 30 ? "%" : "")))));
   const NAV = [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagree"], ["house-lean", "Lean"], ["flow-drift", "Flows"]];
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
@@ -82490,8 +82480,7 @@ window.GlyphDial = GlyphDial;
 function Header({
   isDark,
   onToggleTheme,
-  rd,
-  onFlipDesign
+  rd
 }) {
   const {
     D
@@ -82667,12 +82656,7 @@ function Header({
     className: "tagline"
   }, "Aggregated opinion polling for the next Australian ", React.createElement("br", {
     className: "tagline-br"
-  }), "federal election, set against the", " ", React.createElement("button", {
-    type: "button",
-    className: "tagline-flip",
-    onClick: onFlipDesign,
-    title: rd ? "Show the site’s previous design" : "Show the site’s new design"
-  }, "last"), " ", pastWord, "."), React.createElement("div", {
+  }), "federal election, set against the last ", pastWord, "."), React.createElement("div", {
     className: "head-meta-compact",
     "aria-hidden": "true"
   }, React.createElement("span", {
@@ -84056,7 +84040,6 @@ function App() {
   }, []);
   const TWEAK_DEFAULTS = {
     "layout": "editorial",
-    "design": "new",
     "theme": "auto",
     "accent": "warm",
     "showScatter": true
@@ -84071,37 +84054,11 @@ function App() {
       return null;
     }
   })();
-  const rd = (qDesign || t.design) !== "old";
+  const rd = qDesign !== "old";
   window.AP.rd = rd;
   React.useLayoutEffect(() => {
     document.body.classList.toggle("rd", rd);
   }, [rd]);
-  const flipDesign = () => {
-    const next = rd ? "old" : "new";
-    const apply = () => {
-      ReactDOM.flushSync(() => setTweak("design", next));
-      document.body.classList.toggle("rd", next === "new");
-      window.scrollTo({
-        top: 0,
-        behavior: "auto"
-      });
-    };
-    if (qDesign) {
-      const u = new URL(window.location.href);
-      u.searchParams.delete("design");
-      history.replaceState(null, "", u.pathname + u.search + u.hash);
-    }
-    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (still || typeof document.startViewTransition !== "function") {
-      apply();
-      return;
-    }
-    const vt = document.startViewTransition(apply);
-    if (vt) {
-      if (vt.ready && vt.ready.catch) vt.ready.catch(() => {});
-      if (vt.finished && vt.finished.catch) vt.finished.catch(() => {});
-    }
-  };
   const [tppMatchup, setTppMatchup] = useState(window.AUSPOL.latest && window.AUSPOL.latest.rivalLead || "alp_lnp");
   const [tppBasis, setTppBasis] = useState("imp");
   React.useEffect(() => {
@@ -84439,7 +84396,6 @@ function App() {
     isDark: isDark,
     onToggleTheme: cycleTheme,
     rd: rd,
-    onFlipDesign: flipDesign,
     key: "head-" + rd
   }), React.createElement(Tabs, {
     tabs: TABS,

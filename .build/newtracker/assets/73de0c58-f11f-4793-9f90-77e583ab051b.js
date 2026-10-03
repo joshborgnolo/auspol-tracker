@@ -165,7 +165,7 @@ function GlyphDial({ className, svgRef, width, height }) {
 }
 window.GlyphDial = GlyphDial;   // the tab bar's placeholder instance (views.jsx)
 
-function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
+function Header({ isDark, onToggleTheme, rd }) {
   const { D } = window.AP;
   const fresh = freshness(D.latest.publishedISO);
 
@@ -401,14 +401,10 @@ function Header({ isDark, onToggleTheme, rd, onFlipDesign }) {
           </button>
           <span id="wm-action" hidden>Replays the term on the masthead dial</span>
         </div>
-        {/* "last" is the way between the two designs: the new one by
-            default, the one it replaced a press away, and a second press
-            back again. A button that reads as the word it is, so the
-            sentence stays a sentence to a screen reader too. */}
-        <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the{" "}
-          <button type="button" className="tagline-flip" onClick={onFlipDesign}
-                  title={rd ? "Show the site’s previous design" : "Show the site’s new design"}>last</button>
-          {" "}{pastWord}.</p>
+        {/* plain text: the design flip this sentence used to carry moved
+            off the page 2026-10-03; the old design is viewable at
+            ?design=old while its code ships (see the design flag below). */}
+        <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the last {pastWord}.</p>
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot fresh-toggle " + fresh.state}
                 onClick={() => setStaticView(true)}></span>{" "}
@@ -2033,7 +2029,6 @@ function App() {
   React.useLayoutEffect(() => { document.body.classList.add("js"); }, []);
   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
     "layout": "editorial",
-    "design": "new",
     "theme": "auto",
     "accent": "warm",
     "showScatter": true
@@ -2041,43 +2036,22 @@ function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [rangeId, setRangeId] = useState("all");
 
-  /* Which design the page wears. The redesign is the default; the one it
-     replaced stays one press away, on the tagline's "last". A ?design=
-     query overrides the stored choice for this visit only (for checking one
-     against the other), and every component reads the flag off window.AP
-     while rendering, so the whole tree re-reads it when App re-renders -
-     the views below are keyed on it and remount. */
+  /* Which design the page wears. Only the redesign: the one it replaced
+     was unwired from the page 2026-10-03 (the tagline's "last" no longer
+     flips between them, and no choice is persisted any more, so a stored
+     "old" from before the unwiring cannot stick anyone to it). Its code
+     stays in the branches below that read this flag, and a ?design=old
+     query visits it for one load - for checking one against the other.
+     Every component reads the flag off window.AP while rendering, so the
+     whole tree re-reads it when App re-renders - the views below are
+     keyed on it and remount. */
   const qDesign = (() => {
     try { const q = new URLSearchParams(window.location.search).get("design"); return q === "old" || q === "new" ? q : null; }
     catch (_) { return null; }
   })();
-  const rd = (qDesign || t.design) !== "old";
+  const rd = qDesign !== "old";
   window.AP.rd = rd;
   React.useLayoutEffect(() => { document.body.classList.toggle("rd", rd); }, [rd]);
-  /* A flip crossfades the page like the theme does - one picture before, one
-     after - with the DOM change forced to land inside the transition's
-     callback, or the browser would capture two identical pictures. */
-  const flipDesign = () => {
-    const next = rd ? "old" : "new";
-    const apply = () => {
-      ReactDOM.flushSync(() => setTweak("design", next));
-      document.body.classList.toggle("rd", next === "new");
-      window.scrollTo({ top: 0, behavior: "auto" });
-    };
-    if (qDesign) {
-      // an explicit ?design= would pin the old choice; the press drops it
-      const u = new URL(window.location.href);
-      u.searchParams.delete("design");
-      history.replaceState(null, "", u.pathname + u.search + u.hash);
-    }
-    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (still || typeof document.startViewTransition !== "function") { apply(); return; }
-    const vt = document.startViewTransition(apply);
-    if (vt) {
-      if (vt.ready && vt.ready.catch) vt.ready.catch(() => {});
-      if (vt.finished && vt.finished.catch) vt.finished.catch(() => {});
-    }
-  };
 
   /* Which two-party contest the hero is showing. Owned here, not inside Hero,
      for two reasons that are the same one: the docked 2PP score in the tab
@@ -2459,7 +2433,7 @@ function App() {
         const m = document.getElementById("main-content");
         if (m) { m.focus({ preventScroll: true }); m.scrollIntoView({ block: "start" }); }
       }}>Skip to content</a>
-      <Header isDark={isDark} onToggleTheme={cycleTheme} rd={rd} onFlipDesign={flipDesign} key={"head-" + rd} />
+      <Header isDark={isDark} onToggleTheme={cycleTheme} rd={rd} key={"head-" + rd} />
       <Tabs tabs={TABS} active={tab} onChange={goTab} tppMatchup={tppMatchup} tppBasis={tppBasis} key={"tabs-" + rd} />
       <main className="content" id="main-content" tabIndex={-1}>
         {/* The panel the tab strip points at. There was no role="tabpanel" on

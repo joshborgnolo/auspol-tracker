@@ -1,8 +1,10 @@
 /* auspol tracker – the redesign's own pieces (Sep 2026).
 
-   The redesign is the default design; the one it replaced stays a press away
-   on the tagline's "last" (App owns the switch and sets window.AP.rd while it
-   renders). The existing panels keep their data and their machinery - the
+   The redesign is the only design the page wires up; the one it replaced is
+   no longer a press away (the tagline's "last" stopped flipping between them
+   2026-10-03) but its code stays in the branches below, viewable at
+   ?design=old (App owns the flag and sets window.AP.rd while it renders).
+   The existing panels keep their data and their machinery - the
    morphs, the rolling figures, the tooltips, the copy buttons - and branch at
    their return into the redesign's layout, built from the parts below. Every
    style these parts use lives in rd.css, scoped to body.rd. */
