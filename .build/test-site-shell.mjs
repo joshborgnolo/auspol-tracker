@@ -9,7 +9,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { ROOT, SHELL_PAGES, applyShell, shellDrift, shellCss, shellHeader, shellFooter } from "./site-shell.mjs";
+import { ROOT, SHELL_PAGES, applyShell, shellDrift, shellCss, shellJs, shellHeader, shellFooter, parseChrome, mainChrome } from "./site-shell.mjs";
 
 // ---- every listed page is current, and carries each part once --------------------------
 assert.deepEqual(shellDrift(), [], "a satellite is out of step with its shell – run node .build/site-shell.mjs and commit the pages");
@@ -84,4 +84,52 @@ assert.ok(/<!--\/shell:head-->\n<\/head>/.test(once), "the head part closes the 
 const font = (shellCss().match(/url\("(\/assets\/fonts\/[^"]+)"\)/) || [])[1];
 assert.ok(font && fs.existsSync(path.join(ROOT, font)), `the wordmark's face is on disk (${font})`);
 
-console.log(`PASS: site shell – ${SHELL_PAGES.length} satellites current, idempotent, theme scoping, the unlisted pages unlisted`);
+// ---- the chrome contract: one parse, lifted three ways --------------------------------
+assert.equal(mainChrome(), mainChrome(), "mainChrome is memoised");
+const chrome = mainChrome();
+assert.equal(chrome.tabs[0].id, "snapshot", "the parse carries the main page's tabs");
+for (const [what, v] of [["wordmark name", chrome.wm.name], ["wordmark track", chrome.wm.track],
+                         ["wordmark sr suffix", chrome.wm.sr], ["tagline tail", chrome.tagline.b],
+                         ["status label 1", chrome.meta.k1], ["status label 2", chrome.meta.k2],
+                         ["status label 3", chrome.meta.k3], ["published prefix", chrome.meta.published],
+                         ["polls word", chrome.meta.polls], ["pollsters word", chrome.meta.pollsters],
+                         ["compact head", chrome.compact.b], ["score eyebrow", chrome.score.eyebrow],
+                         ["dial title", chrome.dial.title], ["dial action", chrome.dial.action],
+                         ["skip link", chrome.skip]])
+  assert.ok(typeof v === "string" && v.length > 0, `chrome lift: ${what} came through`);
+assert.ok(chrome.tagline.a.endsWith(" "), "the tagline head keeps its trailing space for the date word");
+assert.ok(chrome.meta.monthsAtMost.endsWith("at most"), "the months-at-most phrase lifted whole");
+for (const t of ["light", "dark"]) {
+  assert.ok(chrome.theme[t].svg.startsWith("<svg"), `the ${t}-theme artwork lifted`);
+  assert.ok(chrome.theme[t].svg.includes("stroke-width"), `the ${t}-theme artwork is svg, not jsx (strokeWidth)`);
+}
+// the baked header carries the lifted words (the interpolation itself is pinned, not just the parse)
+const head = shellHeader({});
+for (const [what, v] of [["wordmark name", chrome.wm.name], ["tagline tail", chrome.tagline.b],
+                         ["status label", chrome.meta.k1], ["skip link", chrome.skip],
+                         ["light artwork", chrome.theme.light.svg], ["score eyebrow", chrome.score.eyebrow],
+                         ["dial title", chrome.dial.title]])
+  assert.ok(head.includes(v), `shellHeader bakes the lifted ${what}`);
+// the runtime overlay shipped in the emitted js
+assert.ok(shellJs().includes("var fillCopy = function (cp)"), "site-shell.js carries the copy overlay");
+// auspol-now.json (emitted by the build that precedes this test) carries the SAME parse
+const now = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", "auspol-now.json"), "utf8"));
+assert.deepEqual(now.copy, chrome, "auspol-now.json's copy block is the chrome contract verbatim");
+
+// ---- parseChrome says no aloud when the main page moves an anchor ----------------------
+const assetDir = path.join(ROOT, ".build", "newtracker", "assets");
+let headSrc = null, scoreSrc = null;
+for (const f of fs.readdirSync(assetDir).filter((f) => /\.jsx?$/.test(f)).sort()) {
+  const s = fs.readFileSync(path.join(assetDir, f), "utf8");
+  if (!headSrc && /className="wm-name"/.test(s) && /className="tagline"/.test(s)) headSrc = s;
+  if (!scoreSrc && /ts-eyebrow/.test(s)) scoreSrc = s;
+}
+assert.ok(headSrc && scoreSrc, "the masthead and score assets resolve (mainChrome's own anchor check)");
+assert.deepEqual(parseChrome(headSrc, scoreSrc, chrome.tabs).wm, chrome.wm, "a direct parse of the same assets agrees");
+assert.throws(() => parseChrome(headSrc.replace('className="wm-name"', 'className="wm-gone"'), scoreSrc, chrome.tabs),
+  /wordmark name/, "a moved wordmark anchor throws");
+assert.throws(() => parseChrome(headSrc, "", chrome.tabs), /score eyebrow/, "a missing score asset throws");
+const noTag = headSrc.replace(/className="tagline">([\s\S]*?)<\/p>/, "x");
+assert.throws(() => parseChrome(noTag, scoreSrc, chrome.tabs), /tagline/, "a refactored tagline throws");
+
+console.log(`PASS: site shell – ${SHELL_PAGES.length} satellites current, idempotent, theme scoping, the unlisted pages unlisted, the chrome contract lifted`);

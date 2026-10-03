@@ -35,6 +35,8 @@
      square off identically off whatever face actually rendered. The trailing
      letter-spacing unit comes back off BOTH measurements first: it widens
      the box by one unit more than it widens the ink. */
+  /* re-squared too (fillCopy swaps in the main page's current words) */
+  var alignWm = function () {};
   var wn = document.querySelector(".wm-name"), wt = document.querySelector(".wm-track");
   if (wn && wt) {
     var ink = function (el) {
@@ -49,6 +51,7 @@
       var base = parseFloat(getComputedStyle(narrow).letterSpacing);
       narrow.style.letterSpacing = (((isNaN(base) ? 0 : base) + (ink(wide) - ink(narrow)) / gaps)).toFixed(3) + "px";
     };
+    alignWm = align;
     align();
     if (document.fonts) document.fonts.ready.then(align);
   }
@@ -734,7 +737,92 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     var els = document.querySelectorAll(sel);
     for (var i = 0; i < els.length; i++) els[i].textContent = v;
   };
+  /* The masthead's TEXT follows every build too, not just its figures: the
+     copy block build.mjs lifts out of the main page's own asset (mainChrome)
+     is re-applied here, so a rename of anything the main masthead says
+     reaches every satellite with the next build, no page commits. The baked
+     copy below the fold stays as the no-JS read. Words, artwork and the tab
+     list only – structure stays the shell's own. Runs BEFORE fillHead, whose
+     value pass writes into the fresh spans. */
+  var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
+  var TAB_EXTRAS = {"cycles":{"short":"Cycles"}};
+  var fillCopy = function (cp) {
+    /* the tab list, rebuilt in the main page's order with its labels (the
+       short label is the shell's own extra, baked in above) */
+    var set = document.querySelector(".sh-tabs-set");
+    if (set && cp.tabs && cp.tabs.length) {
+      var act = null, as = set.querySelectorAll("a.sh-tab");
+      for (var ai = 0; ai < as.length; ai++) if (as[ai].getAttribute("aria-current")) act = as[ai].getAttribute("href");
+      while (set.firstChild) set.removeChild(set.firstChild);
+      for (var ti = 0; ti < cp.tabs.length; ti++) {
+        var t = cp.tabs[ti], a = document.createElement("a");
+        a.className = "sh-tab" + (t.pinHide ? " sh-tab-pinhide" : "");
+        a.setAttribute("href", t.href);
+        if (act === t.href) { a.className += " active"; a.setAttribute("aria-current", "page"); }
+        var xs = TAB_EXTRAS[t.id] || {};
+        if (xs.short) {
+          var l2 = document.createElement("span"); l2.className = "sh-tab-long"; l2.textContent = t.label;
+          var s2 = document.createElement("span"); s2.className = "sh-tab-short"; s2.setAttribute("aria-hidden", "true"); s2.textContent = xs.short;
+          a.appendChild(l2); a.appendChild(s2);
+        } else a.textContent = t.label;
+        set.appendChild(a);
+      }
+    }
+    /* the wordmark: name, track and the screen-reader suffix, then squared
+       off again off the new words */
+    if (cp.wm) {
+      var wnm = document.querySelector(".wm-name"), wtr = document.querySelector(".wm-track"), wsr = document.querySelector(".wm-sr");
+      if (wnm) wnm.textContent = cp.wm.name;
+      if (wtr) wtr.textContent = cp.wm.track;
+      if (wsr) wsr.textContent = cp.wm.sr;
+      alignWm();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(alignWm);
+    }
+    var tag = document.querySelector(".sh-tagline");
+    if (tag && cp.tagline) {
+      var past0 = tag.querySelector(".sh-past"), pastNow = past0 ? past0.textContent : "twenty";
+      tag.innerHTML = esc(cp.tagline.a) + '<span class="sh-past">' + esc(pastNow) + "</span>" + esc(cp.tagline.b);
+    }
+    var skip = document.querySelector(".sh-skip");
+    if (skip && cp.skip) skip.textContent = cp.skip;
+    var M = cp.meta || {};
+    if (M.k1) {
+      var mks = document.querySelectorAll(".sh-meta .sh-meta-k");
+      if (mks[0]) mks[0].textContent = M.k1;
+      if (mks[1]) mks[1].textContent = M.k2;
+      if (mks[2]) mks[2].textContent = M.k3;
+      var s0 = document.querySelector(".sh-meta .sh-meta-item:first-child .sh-meta-s");
+      if (s0 && M.published) s0.innerHTML = esc(M.published) + ' <span class="sh-rel"></span>';
+    }
+    var comp = document.querySelector(".sh-head-compact");
+    if (comp && cp.compact) {
+      var cont = comp.children[comp.children.length - 1];
+      if (cont && cont.tagName === "SPAN") cont.innerHTML = "<b>" + esc(cp.compact.b) + '</b> <span class="sh-latest"></span>'
+        + esc(cp.compact.sep) + '<span class="sh-rel"></span>' + esc(cp.compact.sep)
+        + '<span class="sh-npolls"></span> ' + esc(M.polls || "polls");
+    }
+    if (cp.theme) {
+      var btns = document.querySelectorAll(".sh-theme .sh-cell");
+      for (var bi = 0; bi < btns.length; bi++) {
+        var th = cp.theme[btns[bi].getAttribute("data-theme")];
+        if (!th) continue;
+        btns[bi].setAttribute("aria-label", th.label);
+        btns[bi].setAttribute("title", th.label);
+        btns[bi].innerHTML = th.svg;
+      }
+    }
+    if (cp.dial) {
+      var wmGlyph = document.querySelector(".sh-lockup a.wm-glyph");
+      if (wmGlyph) { wmGlyph.setAttribute("title", cp.dial.title); wmGlyph.setAttribute("aria-label", cp.dial.title); }
+      var wact = document.getElementById("wm-action");
+      if (wact) wact.textContent = cp.dial.action;
+    }
+    var eb = document.querySelector(".sh-score .sh-eyebrow");
+    if (eb && cp.score) eb.textContent = cp.score.eyebrow;
+  };
   var fillHead = function (n) {
+    var W = (n.copy && n.copy.meta) || {};
+    var wPolls = W.polls || "polls", wPollsters = W.pollsters || "pollsters", wMonths = W.monthsAtMost || "months at most";
     if (n.past) setText(".sh-past", n.past);
     var L = n.latest;
     if (!L) return;
@@ -758,8 +846,8 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
       } else factEls[fi].textContent = fact;
     }
     setText(".sh-rel", rel);
-    setText(".sh-tracked", L.pollsTracked + " polls");
-    setText(".sh-houses", L.housesTracked + " pollsters");
+    setText(".sh-tracked", L.pollsTracked + " " + wPolls);
+    setText(".sh-houses", L.housesTracked + " " + wPollsters);
     setText(".sh-due", L.nextElectionDue);
     /* "N months at most" under the election date – the main page's rdDue,
        same clock and rounding, hidden when it runs out. (The backslashes
@@ -768,7 +856,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
     if (dm) {
       var dt = Date.parse(dm[1] + " " + dm[2] + " " + dm[3] + " UTC");
       var months = isNaN(dt) ? 0 : Math.round((dt - easternNow().day) / (86400000 * 30.44));
-      if (months > 1) duein = months + " months at most";
+      if (months > 1) duein = months + " " + wMonths;
     }
     var dueEls = document.querySelectorAll(".sh-duein");
     for (var di = 0; di < dueEls.length; di++) { dueEls[di].textContent = duein; dueEls[di].hidden = !duein; }
@@ -784,13 +872,20 @@ window.AP.npMonthEndSlot = npMonthEndSlot;
   var score = document.querySelector(".sh-score");
   fetch("/assets/auspol-now.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (n) {
     if (!n) return;
+    /* the main page's own words, lifted into the JSON by build.mjs – a
+       rename there lands here with the next build, no page commit */
+    if (n.copy) fillCopy(n.copy);
     if (score && n.a != null && n.b != null) {
+      var snapLab = "Now";
+      if (n.copy && n.copy.tabs) for (var sl = 0; sl < n.copy.tabs.length; sl++) {
+        if (n.copy.tabs[sl].id === "snapshot") { snapLab = n.copy.tabs[sl].label; break; }
+      }
       score.querySelector(".sh-num-a").textContent = n.a.toFixed(1);
       score.querySelector(".sh-num-a").style.color = "var(--alp)";
       score.querySelector(".sh-num-b").textContent = n.b.toFixed(1);
       score.querySelector(".sh-num-b").style.color = n.rival === "onp" ? "var(--onp)" : "var(--lnp)";
       score.querySelector(".sh-abbr-b").textContent = n.rival === "onp" ? "ON" : "L/NP";
-      score.title = "The latest two-party preferred, Labor v " + (n.rival === "onp" ? "One Nation" : "the Coalition") + " – go to Now";
+      score.title = "The latest two-party preferred, Labor v " + (n.rival === "onp" ? "One Nation" : "the Coalition") + " – go to " + snapLab;
       score.hidden = false;
     }
     fillHead(n);

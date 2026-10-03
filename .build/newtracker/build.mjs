@@ -21,7 +21,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
 import { validate } from "./validate.mjs";
-import { shellCss, shellJs, shellDrift } from "../site-shell.mjs";
+import { shellCss, shellJs, shellDrift, mainChrome } from "../site-shell.mjs";
 
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -459,7 +459,19 @@ const shellNow = (() => {
                      factUrl: newest ? (newest.releaseUrl || newest.url || null) : null },
            past: pastCycleWord(), pollCadence: grab("pollCadence") };
 })();
-writeAtomic(path.join(ROOT, "assets", "auspol-now.json"), JSON.stringify({ ...fav.score, dial: fav.masthead.spec, ...shellNow }) + "\n");
+/* The masthead's words and artwork as the main page renders them, lifted by
+   site-shell.mjs's mainChrome() into the `copy` block: site-shell.js swaps
+   it over the baked header at view time, so a rename on the main page lands
+   on every satellite with this build, no page commit. A parse miss is a
+   warning like the tile-art miss below (never a poll-data block) – the JSON
+   keeps the previous build's copy block, which stays closer than nothing. */
+let shellChrome = null;
+try { shellChrome = mainChrome(); }
+catch (e) {
+  console.warn(`  site shell: chrome parse missed (${e.message}) – auspol-now.json keeps the previous copy block`);
+  try { shellChrome = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", "auspol-now.json"), "utf8")).copy || null; } catch {}
+}
+writeAtomic(path.join(ROOT, "assets", "auspol-now.json"), JSON.stringify({ ...fav.score, dial: fav.masthead.spec, ...shellNow, ...(shellChrome ? { copy: shellChrome } : {}) }) + "\n");
 for (const [token, file] of [["--tile-art", "tile-art.svg"], ["--tile-art-dark", "tile-art-dark.svg"]]) {
   const m = html.match(new RegExp(token + ':\\s*url\\("data:image\\/svg\\+xml,([^"]+)"\\)'));
   if (m) writeAtomic(path.join(ROOT, "assets", file), decodeURIComponent(m[1]) + "\n");

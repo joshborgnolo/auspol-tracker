@@ -7,11 +7,16 @@
    on the structure AND the parts – one live inline dial with the same
    colours, angles and heights, squared-off ink, the rd status block's
    three facts with notes, the compact phone line naming the newest poll,
-   the four-view tab bar, and /#story opening the dial story. */
+   the four-view tab bar, /#story opening the dial story – and since the
+   2026-10-03 chrome contract, every rendered masthead WORD identical on
+   both pages (site-shell.mjs mainChrome lifts them from the main page's
+   compiled masthead), plus the satellite's no-JS header still wearing
+   the same words baked in at apply time. */
 import puppeteer from "puppeteer-core";
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
+import { mainChrome } from "../../.build/site-shell.mjs";
 const ROOT = decodeURIComponent(new URL("../../", import.meta.url).pathname);
 const types = { ".html": "text/html", ".js": "text/javascript", ".json": "application/json",
                 ".css": "text/css", ".svg": "image/svg+xml", ".woff2": "font/woff2" };
@@ -257,6 +262,63 @@ const satArch = await sat.evaluate(() => !!document.querySelector('.sh-tabs a[hr
 ok(!mainArch, "main navbar carries no Archives link");
 ok(!satArch, "satellite navbar carries no Archives link");
 
+/* every masthead WORD is now one contract: site-shell.mjs mainChrome()
+   lifts them out of the main page's compiled masthead, shellHeader bakes
+   them into the satellites. So both pages must render the same strings,
+   and those strings must BE the lift. The classes differ (.rd- vs .sh-);
+   the scrape takes a selector map per page. */
+const chrome = mainChrome();
+const scrapeChrome = (S) => {
+  const txt = (s, a) => { const el = document.querySelector(s); if (!el) return null;
+    return a ? el.getAttribute(a) : el.textContent.replace(/\s+/g, " ").trim(); };
+  const sigOf = (b) => { const g = b && b.querySelector("svg"); if (!g) return null;
+    const shapes = [...g.querySelectorAll("path,line,circle,polyline,polygon,rect")].map((c) =>
+      c.getAttribute("d") || [c.getAttribute("x1"), c.getAttribute("y1"), c.getAttribute("x2"), c.getAttribute("y2"),
+                              c.getAttribute("cx"), c.getAttribute("cy"), c.getAttribute("r"), c.getAttribute("points")]
+        .filter((v) => v !== null).join(","));
+    return (g.getAttribute("viewBox") || "") + "|" + shapes.join(";"); };
+  return {
+    skip: txt(S.skip),
+    wmName: txt(".wm-name"), wmTrack: txt(".wm-track"), wmSr: txt(".wm-sr"),
+    tagline: txt(S.tagline),
+    metaK: [...document.querySelectorAll(S.metaK)].map((el) => el.textContent.replace(/\s+/g, " ").trim()),
+    theme: [...document.querySelectorAll(S.themeBtn)].map((b) => ({ l: b.getAttribute("aria-label"), s: sigOf(b) })),
+    score: txt(S.score),
+    dialTitle: txt(S.dial, "title"), dialAction: txt("#wm-action"),
+    compactB: txt(S.compactB),
+  };
+};
+const MAIN_CH = { skip: "a.skip-link", tagline: ".tagline", metaK: ".rd-head-meta .meta-k",
+                  themeBtn: '.theme-seg [aria-label$=" mode"]', score: ".ts-eyebrow",
+                  dial: "button.wm-glyph", compactB: ".rd-head-compact b" };
+const SAT_CH = { skip: "a.sh-skip", tagline: ".sh-tagline", metaK: ".sh-meta .sh-meta-k",
+                 themeBtn: '.sh-theme [aria-label$=" mode"]', score: ".sh-score .sh-eyebrow",
+                 dial: "a.wm-glyph", compactB: ".sh-head-compact b" };
+const mainW = await page.evaluate(scrapeChrome, MAIN_CH);
+const satW = await sat.evaluate(scrapeChrome, SAT_CH);
+console.log("main-w   ", JSON.stringify(mainW));
+console.log("sat-w    ", JSON.stringify(satW));
+for (const k of ["skip", "wmName", "wmTrack", "wmSr", "score", "dialTitle", "dialAction", "compactB"])
+  ok(mainW[k] !== null && mainW[k] === satW[k], `rendered ${k} identical on both pages (${satW[k]})`);
+ok(JSON.stringify(mainW.metaK) === JSON.stringify(satW.metaK), `status labels identical (${satW.metaK.join(" · ")})`);
+ok(JSON.stringify(mainW.theme) === JSON.stringify(satW.theme) && mainW.theme.length === 2,
+   `theme labels AND artwork identical (${satW.theme.map((t) => t.l).join(", ")})`);
+/* …and the satellite's words are the contract's, not a copy that drifted */
+ok(satW.skip === chrome.skip, `skip link carries the lift ("${chrome.skip}")`);
+ok(satW.wmName === chrome.wm.name && satW.wmTrack === chrome.wm.track && satW.wmSr === chrome.wm.sr,
+   "the wordmark's words are the lift");
+ok(JSON.stringify(satW.metaK) === JSON.stringify([chrome.meta.k1, chrome.meta.k2, chrome.meta.k3]),
+   "the status-block labels are the lift");
+ok(satW.theme[0].l === chrome.theme.light.label && satW.theme[1].l === chrome.theme.dark.label,
+   "the theme labels are the lift");
+ok(satW.score === chrome.score.eyebrow, `the score eyebrow is the lift ("${chrome.score.eyebrow}")`);
+ok(satW.dialTitle === chrome.dial.title && satW.dialAction === chrome.dial.action, "the dial titles are the lift");
+ok(satW.compactB === chrome.compact.b, `the compact head is the lift ("${chrome.compact.b}")`);
+ok(mainW.tagline.startsWith(chrome.tagline.a.trim()) && mainW.tagline.endsWith(chrome.tagline.b),
+   `the main tagline frames its past word with the lift (${mainW.tagline})`);
+ok(satW.tagline.startsWith(chrome.tagline.a.trim()) && satW.tagline.endsWith(chrome.tagline.b),
+   `the satellite tagline frames it likewise (${satW.tagline})`);
+
 const sp = await browser.newPage();
 await sp.setViewport({ width: 1280, height: 900 });
 sp.on("pageerror", (e) => console.log("pageerror(story):", e.message));
@@ -266,6 +328,30 @@ const story = await sp.evaluate(() => ({
   hash: window.location.hash }));
 ok(story.backdrop, "/#story opens the dial story");
 ok(story.hash === "", "the #story hash is eaten once opened");
+
+/* the BAKED fallback: with page scripts off, auspol-now.json's copy block
+   can't reach the DOM, so everything the satellite wears must come from
+   what shellHeader baked at apply time – assert the whole contract is
+   there, down to the tagline's "twenty" placeholder (only the bake says
+   it; the runtime overlay would have replaced it by now) */
+const nojs = await browser.newPage();
+await nojs.setJavaScriptEnabled(false);
+await nojs.setViewport({ width: 1280, height: 900 });
+await nojs.goto(base + "/feedback/", { waitUntil: "domcontentloaded" });
+const baked = await nojs.evaluate(scrapeChrome, SAT_CH);
+console.log("baked    ", JSON.stringify(baked));
+ok(baked.wmName === chrome.wm.name && baked.wmTrack === chrome.wm.track && baked.wmSr === chrome.wm.sr,
+   "no-JS: the wordmark's words are baked in");
+ok(baked.skip === chrome.skip, "no-JS: the skip link is baked in");
+ok(baked.tagline.startsWith(chrome.tagline.a.trim()) && baked.tagline.includes("twenty") &&
+   baked.tagline.endsWith(chrome.tagline.b), `no-JS: the tagline is baked in, placeholder intact (${baked.tagline})`);
+ok(JSON.stringify(baked.metaK) === JSON.stringify([chrome.meta.k1, chrome.meta.k2, chrome.meta.k3]),
+   "no-JS: the status-block labels are baked in");
+ok(JSON.stringify(baked.theme) === JSON.stringify(satW.theme), "no-JS: the theme switch is baked in, artwork inline");
+ok(baked.score === chrome.score.eyebrow && baked.dialTitle === chrome.dial.title && baked.dialAction === chrome.dial.action,
+   "no-JS: the score eyebrow and dial titles are baked in");
+ok(baked.compactB === chrome.compact.b, "no-JS: the compact head is baked in");
+await nojs.close();
 
 await browser.close(); server.close();
 console.log(fails ? `FAILED (${fails})` : "ALL CHECKS PASSED");

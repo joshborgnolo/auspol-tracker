@@ -93,11 +93,12 @@ export const shellOptsFor = (file) => SHELL_PAGES.find((p) => p.file === file) |
    rename that froze the old hand copy below) reaches every satellite with
    the next apply. href is simply /#<id>. The views only – the archives and
    the other satellites keep out of it here, exactly as they do on the main
-   page. short/pinHide stay shell-local rendering extras merged over by id
-   (the pinned phone bar's short label, and the tab that yields to the
-   docked score below 380px), as the main page's TABS. Throws like
+   page. pinHide comes down with the list; the pinned phone bar's SHORT
+   label is the shell's one extra (SHELL_TAB_EXTRAS, baked into shellJs so
+   the runtime tab reconcile draws the bar identically). Throws like
    shellCopy() when the mark vanishes, never a silent fallback: a main-page
    TABS change the parser can't read must stop the apply, not ship a lie. */
+const SHELL_TAB_EXTRAS = { cycles: { short: "Cycles" } };
 const mainTabs = (() => {
   let cache = null;
   return () => {
@@ -113,9 +114,7 @@ const mainTabs = (() => {
     const tabs = [...body[1].matchAll(/\{ id: "([^"]+)", label: "([^"]+)"([\s\S]*?)\}/g)]
       .map((m) => ({ id: m[1], label: m[2], href: "/#" + m[1],
                      ...(/pinHide:\s*true/.test(m[3]) ? { pinHide: true } : {}),
-                     // the pinned phone bar's short label, the one extra the
-                     // shell adds beyond the main page's list
-                     ...(m[1] === "cycles" ? { short: "Cycles" } : {}) }));
+                     ...SHELL_TAB_EXTRAS[m[1]] }));
     if (!tabs.length || tabs[0].id !== "snapshot") {
       throw new Error("site-shell: TABS parse in " + file + " produced no snapshot tab");
     }
@@ -125,8 +124,98 @@ const mainTabs = (() => {
 const TABS = mainTabs();
 const SNAPSHOT_LABEL = TABS.find((t) => t.id === "snapshot").label;
 
-const SUN = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"></path></svg>';
-const MOON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.2 8.2 0 0 1 9.8 3.5a8.2 8.2 0 1 0 10.7 10.7Z"></path></svg>';
+/* The masthead's TEXT, lifted from the main page's own asset rather than
+   copied: the satellite header must never say words the main page moved on
+   from (the 2026-10-03 Snapshot → Now rename sat in a hand copy here for a
+   day). parseChrome picks the words out of the compiled newtracker asset —
+   wordmark, tagline, status-block labels, phone compact, theme switch (svg
+   artwork included), score eyebrow, dial and skip-link titles — and
+   mainChrome() feeds them to THREE consumers of one contract: shellHeader
+   bakes them into each page at apply time, build.mjs ships them in
+   auspol-now.json's copy block, and site-shell.js re-applies that block on
+   load so the satellites follow every build with no page commits. Throws on
+   any miss, shellCopy's posture: a main-page refactor the parser can't read
+   must stop the apply, not ship yesterday's words. build.mjs is the one
+   soft consumer (warn + keep the previous JSON block), so a cosmetic main
+   edit can never hold the poll-data pipeline hostage. */
+const unesc = (s) => s.replace(/\\u([0-9a-fA-F]{4})/g, (m, h) => String.fromCharCode(parseInt(h, 16)));
+const jsxSvg = (s) => s.replace(/strokeWidth=/g, "stroke-width=")
+  .replace(/strokeLinecap=/g, "stroke-linecap=").replace(/strokeLinejoin=/g, "stroke-linejoin=")
+  .replace(/\s+/g, " ").replace(/>\s+</g, "><").trim();
+export function parseChrome(headSrc, scoreSrc, tabs) {
+  const miss = (what, where) => { throw new Error(`site-shell: main masthead copy "${what}" not found in ${where}`); };
+  const one = (re, what, where = "the header asset") => {
+    const m = re.exec(headSrc);
+    if (!m) miss(what, where);
+    return unesc(m[1]);
+  };
+  const word = one(/className="wm-name"[^>]*>([^<]+)</, "wordmark name");
+  const track = one(/className="wm-track"[^>]*>([^<]+)</, "wordmark track");
+  const sr = one(/className="wm-sr">([^<]+)</, "wordmark screen-reader suffix");
+  const tagM = headSrc.match(/className="tagline">([\s\S]*?)\{pastWord\}([\s\S]*?)<\/p>/);
+  if (!tagM) miss("tagline", "the header asset");
+  const tagA = unesc(tagM[1].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").replace(/\s*$/, "") + " ";
+  const tagB = unesc(tagM[2].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+  const compI = headSrc.indexOf('rd-head-compact');
+  if (compI < 0) miss("phone compact", "the header asset");
+  const comp = headSrc.slice(compI, compI + 1600);
+  const cB = (r, what) => { const m = r.exec(comp); if (!m) miss(what, "the phone compact"); return unesc(m[1]); };
+  const metaI = headSrc.indexOf('head-meta rd-head-meta');
+  if (metaI < 0) miss("status block", "the header asset");
+  const meta = headSrc.slice(metaI, metaI + 3200);
+  const ks = [...meta.matchAll(/className="meta-k">([^<]+)</g)].map((m) => unesc(m[1]));
+  if (ks.length < 3) miss("status-block labels", "the status block");
+  const cM = (r, what) => { const m = r.exec(meta); if (!m) miss(what, "the status block"); return unesc(m[1]); };
+  const lightM = headSrc.match(/aria-label="(Light mode)" title="Light mode">\s*(<svg[\s\S]*?<\/svg>)/);
+  const darkM = headSrc.match(/aria-label="(Dark mode)" title="Dark mode">\s*(<svg[\s\S]*?<\/svg>)/);
+  if (!lightM || !darkM) miss("theme switch", "the header asset");
+  const scM = scoreSrc && scoreSrc.match(/ts-eyebrow">([^<]+)</);
+  if (!scM) miss("score eyebrow", "the score asset");
+  return {
+    tabs: tabs.map(({ id, label, pinHide }) => ({ id, label, ...(pinHide ? { pinHide: true } : {}) })),
+    skip: one(/className="skip-link"[\s\S]*?>\s*([^{}<>]+?)\s*<\/a>/, "skip link"),
+    wm: { name: word, track, sr },
+    tagline: { a: tagA, b: tagB },
+    meta: { k1: ks[0], k2: ks[1], k3: ks[2],
+            published: cM(/className="meta-s">(\w+) \{fresh/, "published prefix"),
+            polls: cM(/pollsTracked\} (\w+)</, "polls word"),
+            pollsters: cM(/housesTracked\} (\w+)</, "pollsters word"),
+            monthsAtMost: (() => { const m = headSrc.match(/" (\w+ at most)"/); if (!m) miss("months-at-most", "the header asset"); return m[1]; })() },
+    compact: { b: cB(/<b>([^<]+)<\/b>/, "compact head"), sep: cB(/\}([^{}]*)\{fresh/, "compact separator") },
+    theme: { light: { label: lightM[1], svg: jsxSvg(lightM[2]) }, dark: { label: darkM[1], svg: jsxSvg(darkM[2]) } },
+    score: { eyebrow: unesc(scM[1]) },
+    dial: { title: one(/className="wm-glyph"[\s\S]*?title="([^"]+)"/, "dial title"),
+            action: one(/<span id="wm-action" hidden>([^<]+)</, "dial action") },
+  };
+}
+/* Memoised like mainTabs(): scans the compiled newtracker assets once per
+   process and parses the root masthead's words and artwork out of them.
+   build.mjs re-emits this as the auspol-now.json `copy` block, so one parse
+   contract feeds the baked header, the shellCopy string swaps and the
+   runtime overlay alike. */
+export const mainChrome = (() => {
+  let cache = null;
+  return () => {
+    if (cache) return cache;
+    const dir = path.join(ROOT, ".build", "newtracker", "assets");
+    let head = null, score = null;
+    for (const f of fs.readdirSync(dir).filter((f) => /\.jsx?$/.test(f)).sort()) {
+      const s = fs.readFileSync(path.join(dir, f), "utf8");
+      if (!head && /className="wm-name"/.test(s) && /className="tagline"/.test(s)) head = { f, s };
+      if (!score && /ts-eyebrow/.test(s)) score = { f, s };
+    }
+    if (!head) throw new Error("site-shell: no asset in .build/newtracker/assets carries the main page's masthead");
+    if (!score) throw new Error("site-shell: no asset in .build/newtracker/assets carries the main page's score chip");
+    return (cache = parseChrome(head.s, score.s, TABS));
+  };
+})();
+/* Lazy, like SHELL_V below: build.mjs imports this module and must NOT
+   inherit the parse's throw posture – a masthead refactor the parser can't
+   read warns + keeps the previous auspol-now.json copy block there (never
+   blocks the poll-data pipeline), while every shell consumer computes on
+   call and stops the apply, shellCopy's posture. */
+let CHROME_CACHE = null;
+const CHROME = () => (CHROME_CACHE ||= mainChrome());
 
 /* The css/js links carry ?v=<content hash>: a page and its pair of shell
    assets must always travel as one generation. The files ship at the stable
@@ -145,6 +234,7 @@ export function shellHeader({ tab } = {}) {
     + `${t.id === tab ? ' aria-current="page"' : ""}>`
     + (t.short ? `<span class="sh-tab-long">${t.label}</span><span class="sh-tab-short" aria-hidden="true">${t.short}</span>` : t.label)
     + `</a>`).join("\n        ");
+  const C = CHROME();
   /* The current masthead's lockup, split exactly as the main page's: the
      wordmark alone, and the dial beside it as a control of its own. Both
      are links here where the main page mounts a button and a heading – the
@@ -153,40 +243,44 @@ export function shellHeader({ tab } = {}) {
      story for. The wordmark can't be the page's <h1> – the page's own
      title holds that. The <img> is the per-build static dial the page
      paints before site-shell.js swaps in the live inline one. The meta is
-     the current design's three facts with their notes (Latest poll, This
-     term, Next election), and the phone compact names the newest poll
-     rather than just the day it landed – all filled off auspol-now.json. */
-  return `<a class="sh-skip" href="#sh-content">Skip to content</a>
+     the current design's three facts with their notes, and the phone
+     compact names the newest poll rather than just the day it landed – all
+     filled off auspol-now.json. Every WORD here is CHROME's (mainChrome()),
+     the main page's own text lifted at apply time, so this markup only ever
+     decides shape; the .sh-past count is the one placeholder, filled live.
+     ("The interactive tracker" wordmark link title stays the shell's own –
+     the main page's wordmark is a heading, not a link, and has none.) */
+  return `<a class="sh-skip" href="#sh-content">${C.skip}</a>
 <div class="sh-frame sh-top">
   <header class="sh-head">
     <div class="sh-brand">
     <div class="sh-lockup">
       <a class="wordmark stacked" href="/" title="The interactive tracker">
         <span class="wm-textcol">
-          <span class="wm-name">auspol</span>
+          <span class="wm-name">${C.wm.name}</span>
           <span class="sr-only"> </span>
-          <span class="wm-track">tracker</span>
+          <span class="wm-track">${C.wm.track}</span>
         </span>
-        <span class="wm-sr">– Australian federal polling</span>
+        <span class="wm-sr">${C.wm.sr}</span>
       </a>
-      <a class="wm-glyph" href="/#story" title="Wind the dial back through the term" aria-label="Wind the dial back through the term" aria-describedby="wm-action">
+      <a class="wm-glyph" href="/#story" title="${C.dial.title}" aria-label="${C.dial.title}" aria-describedby="wm-action">
         <img class="wm-dial-img" src="/assets/masthead-dial.svg" alt="" width="57" height="39.7">
       </a>
-      <span id="wm-action" hidden>Replays the term on the masthead dial</span>
+      <span id="wm-action" hidden>${C.dial.action}</span>
     </div>
-    <p class="sh-tagline">Aggregated opinion polling for the next Australian federal election, set against the last <span class="sh-past">twenty</span>.</p>
-    <p class="sh-head-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span><b>Latest poll</b> <span class="sh-latest"></span>, <span class="sh-rel"></span>, <span class="sh-npolls"></span> polls</span></p>
+    <p class="sh-tagline">${C.tagline.a}<span class="sh-past">twenty</span>${C.tagline.b}</p>
+    <p class="sh-head-compact" aria-hidden="true" hidden><span class="sh-fresh-dot"></span><span><b>${C.compact.b}</b> <span class="sh-latest"></span>${C.compact.sep}<span class="sh-rel"></span>${C.compact.sep}<span class="sh-npolls"></span> ${C.meta.polls}</span></p>
     </div>
     <div class="sh-right">
     <div class="sh-meta" hidden>
-      <div class="sh-meta-item"><span class="sh-meta-k">Latest poll</span><span class="sh-meta-v"><span class="sh-fresh-dot"></span><span class="sh-latest"></span></span><span class="sh-meta-s">published <span class="sh-rel"></span></span></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">${C.meta.k1}</span><span class="sh-meta-v"><span class="sh-fresh-dot"></span><span class="sh-latest"></span></span><span class="sh-meta-s">${C.meta.published} <span class="sh-rel"></span></span></div>
       <div class="sh-meta-divide"></div>
-      <div class="sh-meta-item"><span class="sh-meta-k">This term</span><span class="sh-meta-v sh-tracked"></span><span class="sh-meta-s sh-houses"></span></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">${C.meta.k2}</span><span class="sh-meta-v sh-tracked"></span><span class="sh-meta-s sh-houses"></span></div>
       <div class="sh-meta-divide"></div>
-      <div class="sh-meta-item"><span class="sh-meta-k">Next election</span><span class="sh-meta-v sh-due"></span><span class="sh-meta-s sh-duein"></span></div>
+      <div class="sh-meta-item"><span class="sh-meta-k">${C.meta.k3}</span><span class="sh-meta-v sh-due"></span><span class="sh-meta-s sh-duein"></span></div>
     </div>
     <div class="sh-theme" role="group" aria-label="Colour theme">
-      <button type="button" class="sh-cell" data-theme="light" aria-pressed="false" aria-label="Light mode" title="Light mode">${SUN}</button><button type="button" class="sh-cell" data-theme="dark" aria-pressed="false" aria-label="Dark mode" title="Dark mode">${MOON}</button>
+      <button type="button" class="sh-cell" data-theme="light" aria-pressed="false" aria-label="${C.theme.light.label}" title="${C.theme.light.label}">${C.theme.light.svg}</button><button type="button" class="sh-cell" data-theme="dark" aria-pressed="false" aria-label="${C.theme.dark.label}" title="${C.theme.dark.label}">${C.theme.dark.svg}</button>
     </div>
     </div>
   </header>
@@ -199,7 +293,7 @@ export function shellHeader({ tab } = {}) {
         ${tabs}
       </div>
       <div class="sh-next" hidden title="Projected from each house's recent publication intervals – the earliest each wave could land, not the likeliest. A slot that passes unrecorded counts up as overdue until the release is added"><span class="sh-tn-lab">Next</span></div>
-      <a class="sh-score" href="/#snapshot" hidden title="The latest two-party preferred – go to ${SNAPSHOT_LABEL}"><span class="sh-eyebrow">2PP</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
+      <a class="sh-score" href="/#snapshot" hidden title="The latest two-party preferred – go to ${SNAPSHOT_LABEL}"><span class="sh-eyebrow">${C.score.eyebrow}</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
     </div>
   </div>
 </nav>`;
@@ -743,6 +837,8 @@ export function shellJs() {
      square off identically off whatever face actually rendered. The trailing
      letter-spacing unit comes back off BOTH measurements first: it widens
      the box by one unit more than it widens the ink. */
+  /* re-squared too (fillCopy swaps in the main page's current words) */
+  var alignWm = function () {};
   var wn = document.querySelector(".wm-name"), wt = document.querySelector(".wm-track");
   if (wn && wt) {
     var ink = function (el) {
@@ -757,6 +853,7 @@ export function shellJs() {
       var base = parseFloat(getComputedStyle(narrow).letterSpacing);
       narrow.style.letterSpacing = (((isNaN(base) ? 0 : base) + (ink(wide) - ink(narrow)) / gaps)).toFixed(3) + "px";
     };
+    alignWm = align;
     align();
     if (document.fonts) document.fonts.ready.then(align);
   }
@@ -861,7 +958,92 @@ ${npProjectSrc()}
     var els = document.querySelectorAll(sel);
     for (var i = 0; i < els.length; i++) els[i].textContent = v;
   };
+  /* The masthead's TEXT follows every build too, not just its figures: the
+     copy block build.mjs lifts out of the main page's own asset (mainChrome)
+     is re-applied here, so a rename of anything the main masthead says
+     reaches every satellite with the next build, no page commits. The baked
+     copy below the fold stays as the no-JS read. Words, artwork and the tab
+     list only – structure stays the shell's own. Runs BEFORE fillHead, whose
+     value pass writes into the fresh spans. */
+  var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); };
+  var TAB_EXTRAS = ${JSON.stringify(SHELL_TAB_EXTRAS)};
+  var fillCopy = function (cp) {
+    /* the tab list, rebuilt in the main page's order with its labels (the
+       short label is the shell's own extra, baked in above) */
+    var set = document.querySelector(".sh-tabs-set");
+    if (set && cp.tabs && cp.tabs.length) {
+      var act = null, as = set.querySelectorAll("a.sh-tab");
+      for (var ai = 0; ai < as.length; ai++) if (as[ai].getAttribute("aria-current")) act = as[ai].getAttribute("href");
+      while (set.firstChild) set.removeChild(set.firstChild);
+      for (var ti = 0; ti < cp.tabs.length; ti++) {
+        var t = cp.tabs[ti], a = document.createElement("a");
+        a.className = "sh-tab" + (t.pinHide ? " sh-tab-pinhide" : "");
+        a.setAttribute("href", t.href);
+        if (act === t.href) { a.className += " active"; a.setAttribute("aria-current", "page"); }
+        var xs = TAB_EXTRAS[t.id] || {};
+        if (xs.short) {
+          var l2 = document.createElement("span"); l2.className = "sh-tab-long"; l2.textContent = t.label;
+          var s2 = document.createElement("span"); s2.className = "sh-tab-short"; s2.setAttribute("aria-hidden", "true"); s2.textContent = xs.short;
+          a.appendChild(l2); a.appendChild(s2);
+        } else a.textContent = t.label;
+        set.appendChild(a);
+      }
+    }
+    /* the wordmark: name, track and the screen-reader suffix, then squared
+       off again off the new words */
+    if (cp.wm) {
+      var wnm = document.querySelector(".wm-name"), wtr = document.querySelector(".wm-track"), wsr = document.querySelector(".wm-sr");
+      if (wnm) wnm.textContent = cp.wm.name;
+      if (wtr) wtr.textContent = cp.wm.track;
+      if (wsr) wsr.textContent = cp.wm.sr;
+      alignWm();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(alignWm);
+    }
+    var tag = document.querySelector(".sh-tagline");
+    if (tag && cp.tagline) {
+      var past0 = tag.querySelector(".sh-past"), pastNow = past0 ? past0.textContent : "twenty";
+      tag.innerHTML = esc(cp.tagline.a) + '<span class="sh-past">' + esc(pastNow) + "</span>" + esc(cp.tagline.b);
+    }
+    var skip = document.querySelector(".sh-skip");
+    if (skip && cp.skip) skip.textContent = cp.skip;
+    var M = cp.meta || {};
+    if (M.k1) {
+      var mks = document.querySelectorAll(".sh-meta .sh-meta-k");
+      if (mks[0]) mks[0].textContent = M.k1;
+      if (mks[1]) mks[1].textContent = M.k2;
+      if (mks[2]) mks[2].textContent = M.k3;
+      var s0 = document.querySelector(".sh-meta .sh-meta-item:first-child .sh-meta-s");
+      if (s0 && M.published) s0.innerHTML = esc(M.published) + ' <span class="sh-rel"></span>';
+    }
+    var comp = document.querySelector(".sh-head-compact");
+    if (comp && cp.compact) {
+      var cont = comp.children[comp.children.length - 1];
+      if (cont && cont.tagName === "SPAN") cont.innerHTML = "<b>" + esc(cp.compact.b) + '</b> <span class="sh-latest"></span>'
+        + esc(cp.compact.sep) + '<span class="sh-rel"></span>' + esc(cp.compact.sep)
+        + '<span class="sh-npolls"></span> ' + esc(M.polls || "polls");
+    }
+    if (cp.theme) {
+      var btns = document.querySelectorAll(".sh-theme .sh-cell");
+      for (var bi = 0; bi < btns.length; bi++) {
+        var th = cp.theme[btns[bi].getAttribute("data-theme")];
+        if (!th) continue;
+        btns[bi].setAttribute("aria-label", th.label);
+        btns[bi].setAttribute("title", th.label);
+        btns[bi].innerHTML = th.svg;
+      }
+    }
+    if (cp.dial) {
+      var wmGlyph = document.querySelector(".sh-lockup a.wm-glyph");
+      if (wmGlyph) { wmGlyph.setAttribute("title", cp.dial.title); wmGlyph.setAttribute("aria-label", cp.dial.title); }
+      var wact = document.getElementById("wm-action");
+      if (wact) wact.textContent = cp.dial.action;
+    }
+    var eb = document.querySelector(".sh-score .sh-eyebrow");
+    if (eb && cp.score) eb.textContent = cp.score.eyebrow;
+  };
   var fillHead = function (n) {
+    var W = (n.copy && n.copy.meta) || {};
+    var wPolls = W.polls || "polls", wPollsters = W.pollsters || "pollsters", wMonths = W.monthsAtMost || "months at most";
     if (n.past) setText(".sh-past", n.past);
     var L = n.latest;
     if (!L) return;
@@ -885,8 +1067,8 @@ ${npProjectSrc()}
       } else factEls[fi].textContent = fact;
     }
     setText(".sh-rel", rel);
-    setText(".sh-tracked", L.pollsTracked + " polls");
-    setText(".sh-houses", L.housesTracked + " pollsters");
+    setText(".sh-tracked", L.pollsTracked + " " + wPolls);
+    setText(".sh-houses", L.housesTracked + " " + wPollsters);
     setText(".sh-due", L.nextElectionDue);
     /* "N months at most" under the election date – the main page's rdDue,
        same clock and rounding, hidden when it runs out. (The backslashes
@@ -895,7 +1077,7 @@ ${npProjectSrc()}
     if (dm) {
       var dt = Date.parse(dm[1] + " " + dm[2] + " " + dm[3] + " UTC");
       var months = isNaN(dt) ? 0 : Math.round((dt - easternNow().day) / (86400000 * 30.44));
-      if (months > 1) duein = months + " months at most";
+      if (months > 1) duein = months + " " + wMonths;
     }
     var dueEls = document.querySelectorAll(".sh-duein");
     for (var di = 0; di < dueEls.length; di++) { dueEls[di].textContent = duein; dueEls[di].hidden = !duein; }
@@ -911,13 +1093,20 @@ ${npProjectSrc()}
   var score = document.querySelector(".sh-score");
   fetch("/assets/auspol-now.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (n) {
     if (!n) return;
+    /* the main page's own words, lifted into the JSON by build.mjs – a
+       rename there lands here with the next build, no page commit */
+    if (n.copy) fillCopy(n.copy);
     if (score && n.a != null && n.b != null) {
+      var snapLab = "${SNAPSHOT_LABEL}";
+      if (n.copy && n.copy.tabs) for (var sl = 0; sl < n.copy.tabs.length; sl++) {
+        if (n.copy.tabs[sl].id === "snapshot") { snapLab = n.copy.tabs[sl].label; break; }
+      }
       score.querySelector(".sh-num-a").textContent = n.a.toFixed(1);
       score.querySelector(".sh-num-a").style.color = "var(--alp)";
       score.querySelector(".sh-num-b").textContent = n.b.toFixed(1);
       score.querySelector(".sh-num-b").style.color = n.rival === "onp" ? "var(--onp)" : "var(--lnp)";
       score.querySelector(".sh-abbr-b").textContent = n.rival === "onp" ? "ON" : "L/NP";
-      score.title = "The latest two-party preferred, Labor v " + (n.rival === "onp" ? "One Nation" : "the Coalition") + " – go to ${SNAPSHOT_LABEL}";
+      score.title = "The latest two-party preferred, Labor v " + (n.rival === "onp" ? "One Nation" : "the Coalition") + " – go to " + snapLab;
       score.hidden = false;
     }
     fillHead(n);
