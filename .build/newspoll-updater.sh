@@ -7,12 +7,18 @@
 # failure exits non-zero before any commit, leaving the working tree for
 # manual review.
 #
-# The extractor's NEWSIE_CHROME=1 Chrome-session fallback (drives the user's
-# logged-in Chrome via AppleScript to read paywalled theaustralian.com.au
-# stories) is intentionally NOT enabled here: it needs Chrome running/logged
-# in, the "Allow JavaScript from Apple Events" toggle, and a one-time macOS
-# Automation consent prompt — interactive rescue only, run the extractor by
-# hand with NEWSIE_CHROME=1 when archive.md is down.
+# NEWSIE_CHROME=1 IS enabled on the laptop (2026-10-04): the extractor reads
+# The Australian's own story through the user's logged-in Chrome when the
+# plain fetch and archive.md are walled (archive.md was unusable for the
+# 2026-09-17 wave). It was held back on the belief that a scheduled job
+# could not answer macOS's Automation consent; the News24 job disproved that
+# on 2026-08-30 (see news24-updater.sh) and the RedBridge AFR-chart step
+# relies on the same consent. Without Chrome (CI, Chrome logged out) the
+# extractor degrades to the free outlets, exactly as before.
+#
+# Figures are read by Matilda with every citation verified
+# (newspoll-read.mjs; the regex parser is the fallback when Matilda is
+# unavailable), so the Chrome read now yields a full release on its own.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -43,6 +49,7 @@ else
   exit 1
 fi
 
+if [ "$(uname)" = Darwin ] && [ -z "${CI:-}" ]; then export NEWSIE_CHROME=1; fi
 EXTRACT_OUT="$(node .build/extract-newspoll.mjs 2>&1)"
 CODE=$?
 LAST_LINE="$(echo "$EXTRACT_OUT" | tail -1)"

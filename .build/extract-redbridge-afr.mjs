@@ -66,6 +66,7 @@ import { join } from "node:path";
 
 process.env.RB_LIB = "1";
 const { guardNewWave } = await import("./extract-redbridge.mjs");
+const { askMatildaJson } = await import("./matilda-json.mjs");
 
 const argv = process.argv.slice(2);
 const argOf = (k) => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : null);
@@ -208,25 +209,10 @@ function proseStates(paras, field, value, oppName) {
 }
 
 // ------------------------------------------------------------- Matilda
-// one retry: Nov and Dec 2025's charts each once ended the model's turn on
-// hidden reasoning with no answer (MAX_TOKENS)
 function askMatilda(charts) {
-  try { return askMatildaOnce(charts); }
-  catch (e) { status.notes.push(`matilda retry after: ${e.message.slice(0, 160)}`); return askMatildaOnce(charts); }
-}
-function askMatildaOnce(charts) {
   const bundle = charts.map((c, image) => ({ image, lines: c.lines.map((l, line) => ({ line, ...l })) }));
   const prompt = readFileSync(PROMPT, "utf8") + "\n\n## Evidence bundle (JSON)\n\n```json\n" + JSON.stringify(bundle) + "\n```\n";
-  // tools are never needed (the bundle is complete) but a stray read must not
-  // abort the run: Dec 2025's first try died on a 0 budget after one grep
-  const res = spawnSync("matilda", ["-p", prompt, "--output-format", "text", "--max-wall-time", MATILDA_WALL, "--max-tool-calls", "3"],
-    { encoding: "utf8", timeout: 240_000, env: { ...process.env, GIT_TERMINAL_PROMPT: "0" } });
-  if (res.error) throw new Error(`matilda spawn failed: ${res.error.message}`);
-  if (res.status !== 0) throw new Error(`matilda exit ${res.status}: ${(res.stderr || res.stdout || "").trim().slice(0, 300)}`);
-  const raw = res.stdout.trim().replace(/^```(?:json)?\s*/, "").replace(/```\s*$/, "");
-  const i0 = raw.indexOf("{"), i1 = raw.lastIndexOf("}");
-  if (i0 < 0 || i1 <= i0) throw new Error("matilda answered with no JSON object");
-  return JSON.parse(raw.slice(i0, i1 + 1));
+  return askMatildaJson(prompt, { wall: MATILDA_WALL, onRetry: (e) => status.notes.push(`matilda retry after: ${e.message.slice(0, 160)}`) });
 }
 
 // ------------------------------------------------------------------ main

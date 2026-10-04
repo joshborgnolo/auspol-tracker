@@ -77,12 +77,25 @@ import { execFileSync } from "node:child_process";
 import { fetchText, MONTHS, clean, writeAtomic } from "./extract-common.mjs";
 import { IG_SLUG, IG_EMBED, igWindow, infogramLive, infogramStatic, attachTarget,
   IG_DAY_WINDOW, IG_STA_WINDOW } from "./infogram.mjs";
+import { paragraphsOf, readArticle, prevNewspoll, NP_READ_FIELDS } from "./newspoll-read.mjs";
+import { matildaCli } from "./matilda-json.mjs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
 const URL_OF = (i => i >= 0 ? argv[i + 1] : null)(argv.indexOf("--url"));
 const OUT = "data/polls.json";
 const SRC_DIR = ".build/newspoll-src";
+// Who reads the figures out of each article (2026-10-04): Matilda cites the
+// sentence for every figure and newspoll-read.mjs verifies each citation;
+// the regex parser below is the fallback when no Matilda CLI is available
+// (or NP_READER=regex). Date window and sample stay with the regex parser,
+// which has read them reliably. Readings cache under SRC_DIR/readings.
+const READER = process.env.NP_READER === "regex" ? "regex" : "matilda";
+// a read takes 1–2 min; CI's update job has 25, so at most this many per run
+// (stories are taken in source-rank order, so the publisher's own is read
+// first; the rest fall back to the regex parser)
+const MAX_READS = 6;
+let reads = 0;
 const BING = "https://www.bing.com/news/search?q=newspoll&format=rss&mkt=en-AU";
 const TOPIC = "https://www.theaustralian.com.au/topics/newspoll?eafs_enabled=false";
 const DAY = 86400000;
@@ -119,6 +132,8 @@ const LEADERS = {
   ],
 };
 const olFor = (date) => LEADERS.ols.find((o) => date >= o.from && (!o.to || date <= o.to)) ?? null;
+// the leader names the article reader is told to expect
+const eraOf = (date) => ({ pm: LEADERS.pm.name, opp: (olFor(date) ?? LEADERS.ols[LEADERS.ols.length - 1]).oppName, third: "Hanson" });
 
 // ---------------------------------------------------------------- fetching
 async function fetchArticle(url) {
@@ -140,8 +155,8 @@ async function fetchArticle(url) {
   // NEWSIE_CHROME=1 only: rendered read of the page in the user's logged-in
   // Chrome (chrome-article.mjs drives it via AppleScript; needs Chrome's
   // "Allow JavaScript from Apple Events" plus one-time Automation consent).
-  // Interactive rescue path — launchd never sets NEWSIE_CHROME, so scheduled
-  // runs keep the plain + archive.md behaviour exactly.
+  // The laptop's newspoll-updater.sh sets NEWSIE_CHROME (since 2026-10-04);
+  // CI never does, so cloud runs keep the plain + archive.md behaviour.
   const chromeFallback = () => {
     if (!process.env.NEWSIE_CHROME) return null;
     if (!/(^|\.)theaustralian\.com\.au$/.test(new URL(url).hostname)) return null;
@@ -645,7 +660,17 @@ if (URL_OF || FILE_OF) { // dev oracle: parse one article, print the record, exi
   const html = FILE_OF ? readFileSync(FILE_OF, "utf8") : (await fetchArticle(URL_OF)).text;
   const bits = articleBits(html);
   const { r, missing } = parseArticle(bits.entryText, PUBDATE ?? bits.pubIso);
-  console.log(JSON.stringify({ headline: bits.headline, pubIso: PUBDATE ?? bits.pubIso, figures: r, missing }, null, 2));
+  const out = { headline: bits.headline, pubIso: PUBDATE ?? bits.pubIso, figures: r, missing };
+  // --read: the Matilda reading too, verified against the committed wave
+  // before this one (backtests: --file <saved html> --pubdate <yyyy-mm-dd>)
+  if (argv.includes("--read")) {
+    const D = JSON.parse(readFileSync(OUT, "utf8"));
+    const at = r.date ?? out.pubIso;
+    const read = readArticle({ url: URL_OF ?? FILE_OF, paras: paragraphsOf(html, [bits.headline]), era: eraOf(at),
+      prev: prevNewspoll(D, r.dateStart ?? at), cacheDir: process.env.NP_READ_CACHE || null });
+    out.read = { scope: read.scope, figures: read.ok, verdict: read.verdict, notes: read.reading?.notes };
+  }
+  console.log(JSON.stringify(out, null, 2));
   process.exit(0);
 }
 
@@ -658,7 +683,9 @@ try {
   // (Bing relevance-surfaces months-old wire pieces) out of the guard path.
   const latestNp = [...npDates].sort().pop();
 
-  const items = await discover();
+  // rank order: the merge ranks sources itself, so this only decides which
+  // stories get the capped Matilda reads (the publisher's own first)
+  const items = (await discover()).sort((a, b) => (sourceFor(a.link)?.rank ?? 99) - (sourceFor(b.link)?.rank ?? 99));
   const seen = new Set();
   const recs = [];
   // The Australian's links still matter when the fetch is walled: kept for
@@ -680,11 +707,40 @@ try {
     const bits = articleBits(art.text);
     const pubIso = bits.pubIso ?? it.pubIso;
     if (EXCLUDE.test(bits.headline ?? "")) continue;
-    const { r, missing } = parseArticle(bits.entryText, pubIso);
+    const parsed = parseArticle(bits.entryText, pubIso);
+    let { r, missing } = parsed;
+    let reader = "regex", verdict = null;
+    // Matilda reads only stories about a wave not yet on the site: one dated
+    // to a committed wave, or undated but published within its 10-day
+    // release window, would join a cluster the merge skips anyway.
+    const committedWave = r.date ? npDates.has(r.date)
+      : pubIso && [...npDates].some((d) => pubIso >= d && (new Date(pubIso) - new Date(d)) / DAY <= 10);
+    if (READER === "matilda" && !committedWave && reads >= MAX_READS)
+      console.error(`NP_NOTE reader: ${MAX_READS} Matilda reads this run — regex figures kept for ${src.client}`);
+    else if (READER === "matilda" && !committedWave && matildaCli()) {
+      reads++;
+      try {
+        const at = r.date ?? pubIso ?? today();
+        const read = readArticle({ url, paras: paragraphsOf(art.text, [bits.headline]), era: eraOf(at),
+          prev: prevNewspoll(D, r.dateStart ?? at), cacheDir: `${SRC_DIR}/readings`,
+          onNote: (n) => console.error(`NP_NOTE ${n}`) });
+        if (read.scope !== "newspoll") { console.error(`NP_NOTE reader: not a Newspoll story (${read.scope}) — ${(bits.headline ?? url).slice(0, 80)}`); continue; }
+        for (const f of NP_READ_FIELDS)
+          if (r[f] != null && read.ok[f] != null && Math.abs(r[f] - read.ok[f]) > 0.5)
+            console.error(`NP_NOTE reader: ${f} regex ${r[f]} vs verified ${read.ok[f]} — ${src.client}`);
+        for (const [f, v] of Object.entries(read.verdict)) if (/^REJECTED/.test(v)) console.error(`NP_NOTE reader: ${src.client} ${f} ${v}`);
+        r = { date: r.date, dateStart: r.dateStart, sample: r.sample, oppSurname: r.oppSurname, ...read.ok };
+        missing = NP_READ_FIELDS.filter((f) => read.ok[f] == null);
+        reader = "matilda";
+        verdict = read.verdict;
+      } catch (e) {
+        console.error(`NP_NOTE reader: Matilda read failed (${e.message.slice(0, 160)}) — regex figures kept for ${src.client}`);
+      }
+    }
     status.candidates.push((bits.headline ?? it.title).slice(0, 90));
     // Infogram embed ids ride in rendered/article DOMs (rung B input).
     const igIds = [...art.text.matchAll(/infogram-embed[^>]*?data-id="([0-9a-f-]{36})"/gi)].map((m) => m[1].toLowerCase());
-    recs.push({ src, url: art.canon ?? url, client: art.provider ?? src.client, title: bits.headline ?? it.title, pubIso, r, missing, igIds });
+    recs.push({ src, url: art.canon ?? url, client: art.provider ?? src.client, title: bits.headline ?? it.title, pubIso, r, missing, igIds, reader, verdict });
   }
 
   const clusters = new Map();
@@ -868,7 +924,8 @@ try {
     }
     sources.push({
       date, json: JSON.stringify({
-        cluster: cl.map(({ src, url, title, pubIso: p, r, missing }) => ({ client: src.client, url, title, pubIso: p, figures: r, missing })),
+        cluster: cl.map(({ src, url, title, pubIso: p, r, missing, reader, verdict }) => ({ client: src.client, url, title, pubIso: p,
+          ...(reader ? { reader } : {}), figures: r, missing, ...(verdict ? { verdict } : {}) })),
         merged: m,
       }, null, 2) + "\n",
     });
