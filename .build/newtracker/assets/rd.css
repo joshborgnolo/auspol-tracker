@@ -2634,6 +2634,13 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
    limit, so the 390 and 320 phones keep 8 and 10px spare) */
 @media (max-width: 519px) {
   body.rd .rd-ap-tabs .rd-tab { padding: 0 6px; }
+  /* where the six nearly fill the row, they span it edge to edge, the
+     spare width shared out as equal gaps rather than left after the last
+     tab (user report 2026-10-04: "excessive space after 'groups' on the
+     right-side of the screen"); wider, they keep the laptop's packed row */
+  body.rd .rd-ap-tabs .rd-tab { flex: none; }
+  body.rd .rd-ap-tabs > div[role="group"] { justify-content: space-between; }
+  body.rd .rd-ap-tabs > .rd-tabs-grow { display: none; }
 }
 @media (max-width: 439px) {
   body.rd .rd-ap-tabs .rd-tab { padding: 0 2px; }
