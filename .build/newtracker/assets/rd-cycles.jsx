@@ -42,6 +42,10 @@ function rdUseOutgoing(k, value, ms = (window.AP && window.AP.MORPH_MS || 320) +
   React.useEffect(() => () => clearTimeout(timer.current), []);
   return out.current;
 }
+/* A tab label that holds its bold width: the pressed tab goes 600, so a
+   plain label would widen it and nudge its neighbours on every switch. The
+   hidden bold twin sizes the box; the visible text centres inside it. */
+const RdTabW = ({ t }) => <span className="rd-tab-w" data-t={t}>{t}</span>;
 const rdOrd = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th");
 const rdSgn = (v, unit) => (unit ? "" : v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
 
@@ -1189,14 +1193,14 @@ function RdPastCycles(p) {
              ref={cmpSwipe} data-rd-swipe=""
              onKeyDown={rdTabsKey(CMP_ROWS.map(([id]) => ({ id })), setCompare)} onClick={rdTabFocus}>
           {CMP_ROWS.map(([id, lab, n]) => (
-            <button key={id} type="button" className="rd-tab" aria-pressed={compare === id} onClick={() => setCompare(id)}>{narrow && id === "all" ? "All" : lab}<span className="rd-cc-n">{n}</span></button>
+            <button key={id} type="button" className="rd-tab" aria-pressed={compare === id} onClick={() => setCompare(id)}><RdTabW t={narrow && id === "all" ? "All" : lab} /><span className="rd-cc-n">{n}</span></button>
           ))}
         </div>
         <span className="rd-cc-sep" aria-hidden="true"></span>
         <div className="rd-tabs rd-cc-tabs" role="group" aria-label="Measure" ref={measEl}
              onKeyDown={rdTabsKey(MODE_ROWS.map((id) => ({ id })), setModePin)} onClick={rdTabFocus}>
-          <button type="button" className="rd-tab" aria-pressed={!chg} onClick={() => setModePin("abs")}>Level</button>
-          <button type="button" className="rd-tab" aria-pressed={chg} onClick={() => setModePin("chg")}>{narrow ? "Change" : "Change since election"}</button>
+          <button type="button" className="rd-tab" aria-pressed={!chg} onClick={() => setModePin("abs")}><RdTabW t="Level" /></button>
+          <button type="button" className="rd-tab" aria-pressed={chg} onClick={() => setModePin("chg")}><RdTabW t={narrow ? "Change" : "Change since election"} /></button>
         </div>
       </div>
       {board.open && (
