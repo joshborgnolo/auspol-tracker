@@ -20,14 +20,24 @@
 		     (canonical rows show published ~20:00 Sun); sweep after release
 		     time, again late evening, then next-morning and further catch-ups -->
 		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>19</integer></dict>
-		<!-- release night (Sep 2026 filed 21:00): with the Chrome read and the
-		     Matilda reader the first slots after publication file the wave —
-		     +5, +10 and +20 minutes after the ~20:00 release -->
+		<!-- release night: Newspoll files ~20:00, sometimes 21:00 (Sep 2026).
+		     +5 and +10 minutes after each, then every 10 minutes to 21:30
+		     (2026-10-05: a quiet run is ~12s and opens no Chrome tab — the
+		     topic page reads through the cookie-keeping fetch and stories of
+		     committed waves are skipped — so the comb costs nothing) -->
 		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>5</integer></dict>
 		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>10</integer></dict>
 		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>20</integer></dict>
-		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>15</integer></dict>
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>30</integer></dict>
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>40</integer></dict>
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>50</integer></dict>
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer></dict>
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>5</integer></dict>
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>10</integer></dict>
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>20</integer></dict>
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>30</integer></dict>
 		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>45</integer></dict>
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>22</integer><key>Minute</key><integer>0</integer></dict>
 		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>22</integer><key>Minute</key><integer>30</integer></dict>
 		<dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>6</integer></dict>
 		<dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>6</integer></dict>

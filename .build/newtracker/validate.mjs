@@ -616,5 +616,13 @@ if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   console.log(`polls ${D.polls.length} · errors ${errors.length} · documented exceptions ${exempted.length} · leadership-only rows ${orphans.length}`);
   if (errors.length) { console.error("\nERRORS:"); errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }
   if (exempted.length) { console.log("\nDocumented exceptions (expected, not problems):"); exempted.forEach((e) => console.log(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }
+  // the errors again, last: the wrappers append this output to their logs and
+  // CI keeps only each log's tail, where ~270 exception lines had pushed the
+  // ERRORS block out of view (Essential's 2026-09-29 15:01Z failure left no
+  // trace of which rule failed)
+  if (errors.length && exempted.length) {
+    console.error(`\nERRORS (repeated after the exceptions): ${errors.length}`);
+    errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`));
+  }
   process.exit(errors.length ? 1 : 0);
 }

@@ -67,6 +67,7 @@ import { join } from "node:path";
 process.env.RB_LIB = "1";
 const { guardNewWave } = await import("./extract-redbridge.mjs");
 const { askMatildaJson } = await import("./matilda-json.mjs");
+const { fetchWithCookies } = await import("./extract-common.mjs");
 
 const argv = process.argv.slice(2);
 const argOf = (k) => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : null);
@@ -135,7 +136,13 @@ function articleParts(html) {
     .map((m) => decode(m[1].replace(/<[^>]+>/g, "")).trim())
     .filter((t) => t.length > 40 && t.length < 1500 && !/^(Log in|Gift|Subscribers can|Sign up)/.test(t));
   const pub = (html.match(/"datePublished":"([^"]+)"/) || [])[1] || null;
-  const images = [...new Set([...html.matchAll(/static\.ffx\.io\/images\/w_960\/([0-9a-f]{20,})/g)].map((m) => m[1]))];
+  // the rendered page's <img> sources, and — in the public page, whose body is
+  // paywall-trimmed — the article's image list in its hydration JSON
+  // ("fileName":"<id>", escaped inside a JSON string)
+  const images = [...new Set([
+    ...[...html.matchAll(/static\.ffx\.io\/images\/w_960\/([0-9a-f]{20,})/g)].map((m) => m[1]),
+    ...[...html.matchAll(/fileName\\*"\s*:\s*\\*"([0-9a-f]{40,64})/g)].map((m) => m[1]),
+  ])];
   return { paras, pub, images };
 }
 
@@ -237,18 +244,23 @@ for (const url of urls) {
   const rec = { url, id };
   status.read.push(rec);
   if (!CHECK && !argv.includes("--force") && seen[id]) { rec.result = `seen (${seen[id].result})`; continue; }
+  // The PUBLIC page first (2026-10-05): its body is paywall-trimmed, but its
+  // data lists every image in the article, the chart included, and gives the
+  // publication instant — so finding and reading the chart needs no Chrome,
+  // and a story without one (an opinion piece, a state poll) never opens a
+  // tab. The logged-in Chrome is read only once a chart is found, for the
+  // prose that backs a few leader figures (prose is optional: the headline
+  // figures need a reconciling printed change regardless).
   let html;
   try {
-    html = argOf("--html") ? readFileSync(argOf("--html"), "utf8")
-      : execFileSync("node", [".build/chrome-article.mjs", url], { encoding: "utf8", timeout: 180_000, maxBuffer: 64 << 20, stdio: ["ignore", "pipe", "pipe"] });
+    html = argOf("--html") ? readFileSync(argOf("--html"), "utf8") : (await fetchWithCookies(url)).text;
   } catch (e) {
     rec.result = "no-article";
-    status.notes.push(`${id}: Chrome read failed (${String(e.stderr || e.message).trim().slice(0, 200)})`);
+    status.notes.push(`${id}: page fetch failed (${String(e.message).slice(0, 160)})`);
     continue;
   }
   const art = articleParts(html);
   if (!art.pub) { rec.result = "no-publish-date"; continue; }
-  if (art.paras.length < 6) { rec.result = "paywalled"; status.notes.push(`${id}: only ${art.paras.length} paragraphs — Chrome not logged in to AFR?`); continue; }
 
   const charts = [];
   for (const h of art.images) {
@@ -263,6 +275,13 @@ for (const url of urls) {
     finally { try { execFileSync("rm", ["-f", file]); } catch { /* best effort */ } }
   }
   if (!charts.length) { rec.result = "no-chart"; continue; }
+  if (!argOf("--html")) {
+    try {
+      const full = articleParts(execFileSync("node", [".build/chrome-article.mjs", url],
+        { encoding: "utf8", timeout: 180_000, maxBuffer: 64 << 20, stdio: ["ignore", "pipe", "pipe"] }));
+      if (full.paras.length > art.paras.length) art.paras = full.paras;
+    } catch (e) { status.notes.push(`${id}: Chrome read failed — prose corroboration from the public lede only (${String(e.stderr || e.message).trim().slice(0, 120)})`); }
+  }
 
   const pubDay = sydney(art.pub).slice(0, 10);
   const fw = charts.map((c) => parseFooter(c.text, pubDay)).find(Boolean);

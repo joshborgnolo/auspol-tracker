@@ -104,17 +104,21 @@ const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
    stay: they spread the load, and the audit below still refuses a schedule
    in which three runs of any ONE group share a minute. */
 const TARGETS = [
-  { workflow: "roymorgan-update.yml", houses: ["Roy Morgan"], mode: "dense", sweep: "06:00", phase: 0 },
-  { workflow: "resolve-update.yml", houses: ["Resolve"], mode: "dense", sweep: "07:00", phase: 0 },
-  // each run is a ~10-minute full crawl of essentialreport.com.au and the
-  // writers queue is serialised, so the comb is coarse and stops at the
-  // habitual hour; the hourly follow-ups cover the occasional late file.
-  // Its daily sweep sits AFTER the morning cluster: a 10-minute holder of
-  // the writers queue in the middle of it got np-score cancelled (np-score
-  // has since left main-writers for its own group; the spacing still helps
-  // the updaters themselves).
+  // `slip`: a lighter comb (every N min) over the same hours on the day after
+  // the habit day. Roy Morgan's 2026-09-29 release came on a Tuesday (15:25)
+  // and waited 3.7 h for the next-day 19:00 check; ~1 release in 16 slips a
+  // day for these two, and a slip-day comb is a handful of 30-second runs.
+  { workflow: "roymorgan-update.yml", houses: ["Roy Morgan"], mode: "dense", sweep: "06:00", phase: 0, slip: 20 },
+  { workflow: "resolve-update.yml", houses: ["Resolve"], mode: "dense", sweep: "07:00", phase: 0, slip: 20 },
+  // Until 2026-10-05 each run was a ~10-minute full crawl of
+  // essentialreport.com.au, so the comb was coarse (every 30 min). The crawl
+  // is incremental now (seconds for a quiet or release-night run; a full
+  // crawl weekly), so it combs like the rest. It still stops at the habitual
+  // hour; the hourly follow-ups cover the occasional late file. Its daily
+  // sweep sits AFTER the morning cluster (a long holder of the writers queue
+  // in the middle of it once got np-score cancelled).
   { workflow: "essential-update.yml", houses: ["Essential"], mode: "dense", sweep: "07:45",
-    step: 30, chaseOutliers: false, phase: 0 },
+    chaseOutliers: false, phase: 0 },
   // shares its Sunday evening with Resolve: phased 5 min off Resolve's comb
   { workflow: "redbridge-update.yml", houses: ["RedBridge/Accent"], mode: "dense", sweep: "07:20",
     // evening PDF drops — the standing second daily check
@@ -282,6 +286,9 @@ function layout(target, m) {
     addP(d, start, "release window (sparse: the extractor lags the release)");
     for (const off of SPARSE_OFFSETS) { lastSlot = ceilTo(end + off, DENSE_STEP); addP(d, lastSlot, "release window (sparse: the extractor lags the release)"); }
   }
+  // the slip day: the same hours, a lighter comb (see `slip` on TARGETS)
+  if (target.slip && target.mode === "dense")
+    for (let t = start; t <= end; t += target.slip) addP(next, t, `slip day (a release a day late), every ${target.slip} min`);
   // follow-ups on the hour from the last comb slot, then the evening backstop
   const firstHour = ceilTo(lastSlot + 1, 60);
   for (let i = 0; i < FOLLOW_HOURS; i++) addP(d, firstHour + i * 60, "follow-up");

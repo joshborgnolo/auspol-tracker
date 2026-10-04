@@ -35,6 +35,9 @@ on:
     - cron: '0 8 * * 1'                # Mon 19:00 — follow-up
     - cron: '0 9 * * 1'                # Mon 20:00 — follow-up
     - cron: '30 11 * * 1'              # Mon 22:30 — late backstop
+    - cron: '40 4 * * 2'               # Tue 15:40 — slip day (a release a day late), every 20 min
+    - cron: '0,20,40 5 * * 2'          # Tue 16:00–16:40 — slip day (a release a day late), every 20 min
+    - cron: '0,20,40 6 * * 2'          # Tue 17:00–17:40 — slip day (a release a day late), every 20 min
     - cron: '0 8 * * 2'                # Tue 19:00 — next-day
     # tune-schedules:end
   workflow_dispatch:

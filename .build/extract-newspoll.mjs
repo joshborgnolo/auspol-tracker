@@ -74,7 +74,7 @@
 //   - writes are atomic (.tmp + rename)
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { fetchText, MONTHS, clean, writeAtomic } from "./extract-common.mjs";
+import { fetchText, fetchWithCookies, MONTHS, clean, writeAtomic } from "./extract-common.mjs";
 import { IG_SLUG, IG_EMBED, igWindow, infogramLive, infogramStatic, attachTarget,
   IG_DAY_WINDOW, IG_STA_WINDOW } from "./infogram.mjs";
 import { paragraphsOf, readArticle, prevNewspoll, NP_READ_FIELDS } from "./newspoll-read.mjs";
@@ -526,10 +526,14 @@ function bingUrl(link) {
 // "No Cookies" challenge, so the rendered read goes through Chrome when
 // NEWSIE_CHROME is set — the same rescue rung article fetches use.
 async function topicHtml() {
+  // The "No Cookies" wall is a cookie-check redirect, which a cookie-keeping
+  // fetch passes (2026-10-05): the topic page — headlines and links, no
+  // paywalled text — needs no browser, so a quiet run opens no Chrome tab and
+  // CI sees the "Newspoll:" release the minute it is listed.
   try {
-    const p = await fetchText(TOPIC);
+    const p = await fetchWithCookies(TOPIC);
     if (!/<title>\s*no cookies\b/i.test(p.text) && p.text.includes("/news-story/")) return p.text;
-  } catch { /* News Corp wall; RSS usually suffices */ }
+  } catch { /* wall changed; the Chrome session below, else RSS suffices */ }
   if (!process.env.NEWSIE_CHROME) return null;
   try {
     return execFileSync("node", [".build/chrome-article.mjs", TOPIC],
@@ -682,6 +686,7 @@ try {
   // cannot describe a newer release; skipping it keeps stale evergreen items
   // (Bing relevance-surfaces months-old wire pieces) out of the guard path.
   const latestNp = [...npDates].sort().pop();
+  const committedUrls = new Set(D.polls.filter((p) => p.pollster === "Newspoll" && p.url).map((p) => p.url));
 
   // rank order: the merge ranks sources itself, so this only decides which
   // stories get the capped Matilda reads (the publisher's own first)
@@ -695,6 +700,17 @@ try {
     const url = it.link;
     if (seen.has(url)) continue;
     if (latestNp && it.pubIso && it.pubIso < latestNp) continue;
+    // A story published within a committed wave's 10-day release window is
+    // about that wave (releases are three weeks apart): its cluster would be
+    // skipped anyway, so don't fetch it — on the laptop that fetch is a
+    // Chrome tab opened on every quiet run until the next wave.
+    // Topic-page tiles carry no date, so the story a committed row already
+    // cites is skipped by URL too, and a skipped URL is remembered so its
+    // duplicate (the same story from Bing, or the topic page) is skipped.
+    if (committedUrls.has(url) || (it.pubIso && [...npDates].some((d) => it.pubIso >= d && (new Date(it.pubIso) - new Date(d)) / DAY <= 10))) {
+      seen.add(url);
+      continue;
+    }
     seen.add(url);
     const src = sourceFor(url);
     if (!src) continue;

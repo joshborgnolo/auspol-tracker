@@ -85,6 +85,18 @@
 // --force always crawls. A skipped run still refreshes the report index
 // and reports latest_report_date, which the skip-confirm agent needs, and
 // says `crawl: "skipped"` in its status.
+//
+// INCREMENTAL CRAWL (2026-10-05): the fingerprint also keeps every page's
+// `modified`, so a run with a reason to crawl re-reads only the pages whose
+// stamp moved plus the reports inside RECENT_REPORT_DAYS (whose Flourish
+// charts can fill after the post) — the merge below is a union with the
+// existing CSV, so rows from pages not re-read stay as they were. Until
+// then nearly every run was a full ~10-minute crawl (one question page's
+// `modified` moving was enough), holding the serialised writers queue and
+// getting RedBridge's runs cancelled behind it. A full crawl still runs on
+// --force, with no per-page record, or when the last one is FULL_EVERY_DAYS
+// old — the net for a chart updated in Flourish on a page whose `modified`
+// never moved. Status: crawl "full" | "incremental" | "skipped".
 import { mkdirSync, readFileSync, writeFileSync, renameSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import vm from "node:vm";
@@ -95,6 +107,7 @@ const FORCE = argv.includes("--force");
 const OUT = "data/essential-report.csv";
 const FINGERPRINT = ".build/essential-src/site-fingerprint.json";
 const RECENT_REPORT_DAYS = 3; // always crawl this long after a new report post
+const FULL_EVERY_DAYS = 7;    // a full crawl at least this often (see INCREMENTAL CRAWL)
 const FETCH_TIMEOUT_MS = 30_000;
 const FETCH_TRIES = 24;     // generous: sucuri throttles bursts, we wait it out
 // ...but a 403/429 that outlasts this is a wall, not a burst throttle. On
@@ -438,6 +451,8 @@ try {
   })).digest("hex");
   const saved = existsSync(FINGERPRINT) ? JSON.parse(readFileSync(FINGERPRINT, "utf8")) : null;
   const latestAgeDays = latestReport ? (Date.now() - Date.parse(latestReport.date)) / 86400000 : Infinity;
+  const pagesNow = Object.fromEntries([...reports.map((r) => [`r${r.id}`, r.modified]), ...questions.map((q) => [`q${q.id}`, q.modified])]);
+  const fullAgeDays = saved?.fullAt ? (Date.now() - Date.parse(saved.fullAt)) / 86400000 : Infinity;
   const reason = FORCE ? "--force"
     : !existsSync(OUT) ? "no CSV yet"
     : !saved ? "no saved fingerprint"
@@ -462,7 +477,14 @@ try {
     })}`);
     process.exit(0);
   }
-  console.log(`preflight: crawling — ${reason}`);
+  // Which pages: all of them, or only those that moved (see INCREMENTAL CRAWL).
+  const fullWhy = FORCE ? "--force" : !existsSync(OUT) ? "no CSV yet" : !saved?.pages ? "no per-page record yet"
+    : fullAgeDays > FULL_EVERY_DAYS ? `last full crawl ${Number.isFinite(fullAgeDays) ? fullAgeDays.toFixed(1) + "d" : "never"} ago` : null;
+  const recent = (r) => (Date.now() - Date.parse(r.date)) / 86400000 <= RECENT_REPORT_DAYS;
+  const crawlReports = fullWhy ? reports : reports.filter((r) => saved.pages[`r${r.id}`] !== r.modified || recent(r));
+  const crawlQuestions = fullWhy ? questions : questions.filter((q) => saved.pages[`q${q.id}`] !== q.modified);
+  const mode = fullWhy ? "full" : "incremental";
+  console.log(`preflight: crawling — ${reason}; ${mode}${fullWhy ? ` (${fullWhy})` : ""}: ${crawlReports.length}/${reports.length} reports, ${crawlQuestions.length}/${questions.length} question pages`);
 
   // Crawl report pages (card structure) and question pages (bare embeds).
   // Individual page failures are tolerated (logged + counted in the status);
@@ -470,7 +492,7 @@ try {
   const reportCards = [];
   const zeroCard = [];
   const failedPages = [];
-  const reportResults = await pool(reports, CONCURRENCY, async (r) => {
+  const reportResults = await pool(crawlReports, CONCURRENCY, async (r) => {
     try {
       const { text } = await getText(r.link);
       return { report: r, parsed: parseReportPage(text, r) };
@@ -488,7 +510,7 @@ try {
   console.log("cards per report:", [...cardHistogram.entries()].sort((a, b) => a[0] - b[0]).map(([n, c]) => `${n}x${c}`).join(" "));
   if (zeroCard.length) console.warn(`reports with no parsed cards (${zeroCard.length}): ${zeroCard.join(" ; ")}`);
   const qCards = [];
-  await pool(questions, CONCURRENCY, async (q) => {
+  await pool(crawlQuestions, CONCURRENCY, async (q) => {
     try {
       const { text } = await getText(q.link);
       qCards.push(...parseQuestionPage(text, q));
@@ -562,8 +584,10 @@ try {
   // the site as fully read.
   if (!CHECK && !failedPages.length && !failedFlourishes.length) {
     mkdirSync(".build/essential-src", { recursive: true });
-    const fpJson = JSON.stringify({ fingerprint, at: new Date().toISOString(), reports: reports.length, questions: questions.length, newest_report: latestReport?.date ?? null }, null, 2) + "\n";
-    if (!saved || saved.fingerprint !== fingerprint) {
+    const at = new Date().toISOString();
+    const fpJson = JSON.stringify({ fingerprint, at, reports: reports.length, questions: questions.length, newest_report: latestReport?.date ?? null,
+      fullAt: mode === "full" ? at : saved?.fullAt ?? null, pages: pagesNow }, null, 2) + "\n";
+    if (!saved || saved.fingerprint !== fingerprint || mode === "full") {
       writeFileSync(FINGERPRINT + ".tmp", fpJson);
       renameSync(FINGERPRINT + ".tmp", FINGERPRINT);
       console.log(`updated ${FINGERPRINT}`);
@@ -573,8 +597,9 @@ try {
   console.log(`ESSENTIAL_STATUS ${JSON.stringify({
     changed: changed && !CHECK,
     check: CHECK,
-    crawl: "full",
-    crawl_reason: reason,
+    crawl: mode,
+    crawl_reason: reason + (fullWhy ? ` (full: ${fullWhy})` : ""),
+    pages_crawled: crawlReports.length + crawlQuestions.length,
     reports: reports.length,
     question_pages: questions.length,
     failed_pages: failedPages.length,
