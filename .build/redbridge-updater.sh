@@ -52,7 +52,25 @@ case "$LAST_LINE" in
   *) log "FAIL extract (no RB_STATUS line): $LAST_LINE"; exit 1 ;;
 esac
 
-if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
+FROM_AFR=""
+if ! echo "$LAST_LINE" | grep -q '"changed":true' && echo "$LAST_LINE" | grep -q '"afrTopicNotes"' \
+   && [ "$(uname)" = Darwin ] && [ -z "${CI:-}" ]; then
+  # AFR has published a wave Accent hasn't posted yet. On the laptop only
+  # (the article is read through the user's logged-in Chrome), file it from
+  # the article's chart: OCR + Matilda say where each figure is, and every
+  # figure must reconcile with its printed change since the previous wave
+  # (see extract-redbridge-afr.mjs). Anything short of that files nothing
+  # and the Accent PDF fills the wave as before.
+  AFR_OUT="$(node .build/extract-redbridge-afr.mjs --status "${LAST_LINE#RB_STATUS }" 2>&1)"
+  AFR_CODE=$?
+  AFR_LAST="$(echo "$AFR_OUT" | tail -1)"
+  log "afr-chart (exit $AFR_CODE): $AFR_LAST"
+  if [ $AFR_CODE -eq 0 ] && echo "$AFR_LAST" | grep -q '"changed":true'; then
+    FROM_AFR=1
+  fi
+fi
+
+if [ -z "$FROM_AFR" ] && ! echo "$LAST_LINE" | grep -q '"changed":true'; then
   # No new wave: give the skip-confirm a go. It verifies — from the AFR topic
   # list this run's extractor parsed a moment ago, not a cached state file —
   # that nothing has been filed since before the slot day and that it's past
@@ -102,6 +120,8 @@ log "new RedBridge/Accent wave(s) detected; running validate/build/commit/push"
 # "effective sample size of N" APC line; stamp it (plus the wave's methodUrl)
 # now so it reaches the site in this commit instead of waiting for the weekly
 # sampleeff sweep. Failures abort before any commit like every other step.
+# (An AFR-chart filing has no report yet: these wait for the Accent pass.)
+if [ -z "$FROM_AFR" ]; then
 SE_OUT="$(node .build/extract-sampleeff.mjs accent 2>&1)"
 SE_CODE=$?
 SE_LAST="$(echo "$SE_OUT" | tail -1)"
@@ -117,6 +137,7 @@ esac
 # The report's first-preference table by group joins data/demographics.json,
 # and its issue tables data/issues.json, in this same commit (non-fatal; see refresh_crosstabs in git-push-main.sh).
 refresh_crosstabs demographics issues
+fi
 
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
@@ -132,6 +153,7 @@ fi
 FILES=(data/polls.json data/demographics.json data/issues.json .build/redbridge-src/ "${SITE_FILES[@]}")
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
 MSG="Update RedBridge/Accent poll data $(date '+%Y-%m-%d')"
+[ -n "$FROM_AFR" ] && MSG="RedBridge/Accent: file the new wave from the AFR article's chart $(date '+%Y-%m-%d') (Accent report to follow)"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1

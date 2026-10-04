@@ -852,6 +852,7 @@ if (process.env.RB_LIB !== "1") try {
   const filledSplit = [];
   const filledSplitOn = [];
   const filledFirm = [];
+  const filledFirstSight = [];
 
   for (const c of candidates) {
     const cachePath = `${SRC_DIR}/${c.slug}.json`;
@@ -903,6 +904,18 @@ if (process.env.RB_LIB !== "1") try {
 
     if (matchPoll) {
       const diffs = [];
+      // a row with no releaseUrl is meeting its Accent page for the first
+      // time: a hand entry or an AFR-chart filing (extract-redbridge-afr.mjs).
+      // Those get what the AFR chart cannot give them — the 2025-flows 2PP,
+      // favourability detail and any leader row they were filed without.
+      // Waves seen before are only verified, so old gaps stay as reviewed.
+      const firstSight = !matchPoll.releaseUrl;
+      const fillPoll = (k, v) => {
+        const es = Object.entries(matchPoll), at = Object.keys(matchPoll).indexOf("url");
+        es.splice(at < 0 ? es.length : at, 0, [k, v]);
+        for (const key of Object.keys(matchPoll)) delete matchPoll[key];
+        Object.assign(matchPoll, Object.fromEntries(es));
+      };
       const cmp = (k, got, exp) => { if (got != null && exp !== got) diffs.push(`${k}: pdf=${got} vs file=${exp}`); };
       cmp("date", w.date, matchPoll.date);
       cmp("dateStart", w.dateStart, matchPoll.dateStart);
@@ -910,7 +923,10 @@ if (process.env.RB_LIB !== "1") try {
       for (const k of ["alp", "lnp", "grn", "onp", "ind"]) cmp(k, w[k], matchPoll[k]);
       cmp("tpp_alp", w.tppResp, matchPoll.tpp_alp);
       cmp("tpp_lnp", w.tppResp != null ? 100 - w.tppResp : null, matchPoll.tpp_lnp);
-      cmp("tpp_flows", w.tppHist, matchPoll.tpp_flows);
+      if (matchPoll.tpp_flows == null && w.tppHist != null && firstSight) {
+        if (CHECK) diffs.push(`tpp_flows: file lacks the PDF's 2025-flows 2PP (${w.tppHist})`);
+        else { fillPoll("tpp_flows", w.tppHist); filledFirstSight.push(`${matchPoll.date} tpp_flows`); }
+      } else cmp("tpp_flows", w.tppHist, matchPoll.tpp_flows);
       if (matchPoll.tpp_split && w.tppSplit)
         for (const k of ["grn", "onp", "oth"]) cmp(`tpp_split.${k}`, w.tppSplit[k], matchPoll.tpp_split[k]);
       if (matchPoll.tpp_split_on && w.tppSplitOn)
@@ -925,7 +941,23 @@ if (process.env.RB_LIB !== "1") try {
         ["altTpp", "firm", (r) => cmp("alpVsOnp_alp", w.tppVsOn, r.alpVsOnp_alp)],
       ]) {
         const row = D[sec].find((r) => r[keyField] === POLLSTER && w.date && Math.abs(daysBetween(r.date, w.date)) <= 14);
-        if (!row) { status.notes.push(`${c.slug}: no ${sec} row near ${w.date} for an existing wave — left for manual entry`); continue; }
+        if (!row) {
+          const fresh = firstSight && {
+            ppm: w.ppm && w.oppName && ["alb", "opp", "han"].every((k) => w.ppm[k] != null)
+              ? { date: matchPoll.date, firm: POLLSTER, alb: w.ppm.alb, opp: w.ppm.opp, oppName: w.oppName, han: w.ppm.han, extra: null } : null,
+            approval: w.nets && w.oppName && ["alb", "opp", "han"].every((k) => w.nets[k] != null)
+              ? { date: matchPoll.date, firm: POLLSTER, alb: w.nets.alb, opp: w.nets.opp, oppName: w.oppName, han: w.nets.han, detail: w.detail } : null,
+            altTpp: w.tppVsOn != null ? { date: matchPoll.date, firm: POLLSTER, alpVsOnp_alp: w.tppVsOn, lnpVsOnp_lnp: null } : null,
+          }[sec];
+          if (fresh && CHECK) diffs.push(`${sec}: file lacks the wave's row`);
+          else if (fresh) { D[sec] = [...D[sec], fresh].sort(byDate); filledFirstSight.push(`${matchPoll.date} ${sec}`); }
+          else status.notes.push(`${c.slug}: no ${sec} row near ${w.date} for an existing wave — left for manual entry`);
+          continue;
+        }
+        if (sec === "approval" && row.detail == null && w.detail && firstSight) {
+          if (CHECK) diffs.push("approval: file lacks the PDF's favourability detail");
+          else { row.detail = w.detail; filledFirstSight.push(`${matchPoll.date} approval.detail`); }
+        }
         const d2 = [];
         check(row, d2);
         diffs.push(...d2.map((s) => `${sec}: ${s}`));
@@ -1043,7 +1075,8 @@ if (process.env.RB_LIB !== "1") try {
   if (filledSplit.length) status.splitFilled = filledSplit;
   if (filledSplitOn.length) status.splitOnFilled = filledSplitOn;
   if (filledFirm.length) status.firmnessFilled = filledFirm;
-  if (hasNew || filledRelease.length || filledSplit.length || filledSplitOn.length || filledFirm.length) {
+  if (filledFirstSight.length) status.firstSightFilled = filledFirstSight;
+  if (hasNew || filledFirstSight.length || filledRelease.length || filledSplit.length || filledSplitOn.length || filledFirm.length) {
     const trailingNl = orig.endsWith("\n") ? "\n" : "";
     // hand-entered rows keep tpp3 on one line; stringify must not expand them
     const next =
