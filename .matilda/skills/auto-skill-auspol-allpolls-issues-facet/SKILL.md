@@ -1,6 +1,6 @@
 ---
 name: auspol-allpolls-issues-facet
-description: auspol-tracker — the All-polls Issues facet (?f=i, shipped as 891d06c 2026-09-29) end-to-end: gen-data issuesOnlyPolls emitter (Ipsos as ISS_ONLY standalone rows, SEC waves riding direction rows), FACET_SCOPE.issues, RdApIssMini rail chart (D.issues.list is an ARRAY — find by id, not key; the TWO-BASIS ownership trap — iss.own is as-printed all-respondent, the pooled monthly series is three-party-renormalised §5i, renderers must renormalise before co-plotting), the FINAL phone-card anatomy (3a73407→f4e52b3→1c8ef8b→unranked-col-placeholder 2026-10-03: dots full-width on their own body line again, head-row issfig verdict chip, ONE superscript-ordinal ranking sentence — "Cost of living 1st, housing 2nd, crime 3rd", figures dropped, ISS_SENT_SHORT labels in SENTENCE CASE via sentLab/sentLab1, SEC's row "; unprompted" tail dropped the same day (the detail keeps its unprompted mentions), and for no-ranking waves the dictated "Issues unranked, but performance on cost of living assessed" line gated on iss.own.col), the ISS_PARTY → ISS_PARTY_META classic-script collision lesson, the detail rail's "Asked" fact-row three-way PAYLOAD branch (sal→prompted, conc→SEC line, own-only→"asked only who'd be best on each issue" — the Resolve-quoting-SEC fix, 9aa99cf; lesson: branch copy on payload fields, never on "the one house we know"), the probe openRowContaining toggle-collapse contract, and the iss-facet/dir-facet probes.
+description: auspol-tracker — the All-polls Issues facet (?f=i, shipped 891d06c 2026-09-29; rows redesigned as design B "who leads on what" 2026-10-04 — six issue columns of party-and-lead verdicts over printed-share bars, the opened poll led by an issue-by-issue table; everything below the B section on row, card, head and opened-poll anatomy is HISTORY) end-to-end: gen-data issuesOnlyPolls emitter (Ipsos as ISS_ONLY standalone rows, SEC waves riding direction rows), FACET_SCOPE.issues, RdApIssMini rail chart (D.issues.list is an ARRAY — find by id; the TWO-BASIS ownership trap — iss.own is as-printed all-respondent, the pooled monthly series is three-party-renormalised §5i), the ISS_PARTY → ISS_PARTY_META classic-script collision lesson, the rail's "Asked" three-way payload branch (sal / conc / own-only), and the iss-facet/dir-facet probes.
 source: auto-skill
 extracted_at: '2026-09-29'
 ---
@@ -13,7 +13,74 @@ order is also the arrow-key walk). User's brief: Ipsos gets rows of its own
 issues (and direction) only. Probes: `.matilda/probe/iss-facet.mjs` (39
 checks), regression guard `.matilda/probe/dir-facet.mjs` (31).
 
-## The 2026-10-03 row redesign — three dnum cells + ownership dots + rail verdict
+## Design B, "who leads on what" (2026-10-04) — supersedes the row, card, head and opened-poll anatomy below
+
+User asked to improve the facet's design on small and large screens and to
+mock up favourites; three were mocked (artifact Up42oYu6Evig5LnCyDWEax) and
+the user picked B. Why B: every one of the 42 issues rows says who voters
+rate best on some issue (ownership), but only 18 rank what matters (Ipsos +
+RedBridge, plus SEC's 7 unprompted lists), so a row led by the ranking
+showed dashes on 17 rows.
+
+- **Data layer (d1a1d215):** `ISS_MAP` = col, housing, health, immigration,
+  crime, economy (the six most-asked); `ISS_MAP_LAB`; `ISS_ALIAS` (each
+  house's salience labels → ids); `issOwnOf(p, id)` (SEC's `iss.bp` stands in
+  for col); `issLeadOf(own)` → `{who, v, lead, level}` among ALP/L/NP/ON/GRN,
+  `level` when the lead is under 0.5 (Resolve's decimals put parties 0.08
+  apart). All on window.
+- **Desktop row:** `.rd-ap-imap` (role=cell) of six `.rd-ap-icell`: `<b>` the
+  verdict ("ALP +7" in party ink, "Level", "—" if not asked) over
+  `.rd-ap-ibar`, the four parties' printed shares end to end with the rest
+  as grey track. The verdict is two spans (party, lead), so phones stack it.
+  Each cell's aria-label speaks the shares with `rdApNum`.
+- **Heads:** six `.rd-ap-th.wrap` names in `.rd-ap-imap.rd-ap-hpn`, titled "The
+  party rated best on X by the most voters…". Wording is plurality, never
+  "most voters rate". `issHyph` gives Immigration and Economy soft hyphens
+  (`hyphens: manual`), so they break only when a column must (761–1100 and
+  phones).
+- **Phone card:** `.rd-ap-imapc`, a grid of six. The verdict `b` is a flex
+  column at `min-height: 30px`, so a one-line "Level" keeps its bar level
+  with its neighbours. The pinned head is `.rd-ap-imaph` (six names). Cards
+  hold 122px.
+- **Opened poll:** the `issTable` IIFE in RdApDetail leads `.rd-apd`. It uses
+  `.rd-apd-demwrap` and `.rd-apd-dem` tables of `.rd-apd-demr.rd-apd-isr`
+  rows:
+  - Columns: Ranked (only if the poll ranked: `sal`, else `conc`), only the
+    parties the poll printed (Resolve has no GRN, and no ON before March;
+    SEC has no Unsure), and Unsure (unsure + none + equal).
+  - The leading party's cell is shaded (`.lead`, `--lead` from the party
+    dot); no cell is shaded when level.
+  - Shares use **`rdApNum`, which keeps the printed decimal**. Rounding
+    Resolve's decimals made 7 of 199 row verdicts disagree with the table
+    by a point ("ON +1" over 24 v 22). With decimals shown, all agree.
+  - The `--isr-cols` track list is composed inline from CSS widths
+    (`--isr-rk/-p/-u`, desktop 72/44/56, phone 58/36/52). The base rule is
+    `.rd-apd-demr.rd-apd-isr` (two classes) **so the later `.rd-apd-demr`
+    templates can't override it**. That happened twice: the desktop table
+    rendered on the demographics 6-column template and wrapped.
+  - Two-line rows, where the name takes its own line above the figures:
+    `.isn6` at ≤419px (Ranked 1.4fr, parties 1fr, Unsure 1.15fr) and
+    `.isn5` at ≤379px.
+  - A list over 9 rows splits in two side by side only when there are 4
+    figures or fewer (Resolve).
+  - The note names the ranking and quotes `iq.q` as "The question's wording:
+    “…”". The salience bars, "Named without prompting" and "Rated best on"
+    blocks are gated `!isIss` (they still show on other facets).
+- **Probes:**
+  - `.matilda/probe/iss-facet.mjs` was rewritten for B: 49 checks, served
+    over HTTP. It re-derives each verdict from the cell's spoken shares and
+    checks the facet's verdicts against the bundle as a multiset. It covers
+    the opened tables (Ipsos, SEC, Resolve agreement, sentence case on
+    Direction), phones at 390, and the 320 fit and two-line ladder. The rail
+    now reads "house lean", not "usual lean".
+  - `ap-iss-dir-head.mjs` keeps only the direction head.
+  - `iss-head-sweep`, `-overlap`, `-safari` and `iss-card-height` were
+    deleted because they pinned the retired caption, tick ladder and cards.
+- **Same pass (066b998):** RdTabW is now global. Every bold-on-select
+  control holds its bold width (`.matilda/probe/tab-steady.mjs`, 15
+  controls at 1440/390/320).
+
+## The 2026-10-03 row redesign — three dnum cells + ownership dots + rail verdict (HISTORY — superseded by design B above)
 
 User brief: "improve the design of the issues view of the all polls table …
 the row heights should be identical to those in the other views." The

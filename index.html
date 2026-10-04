@@ -4640,7 +4640,7 @@ body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(120px, 176px) minmax(104px, 136px) minmax(104px, 136px) minmax(168px, 336px) 72px 40px; }
+body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 1fr) 0 40px; }
 body.rd .rd-ap-cdem { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint);
   box-sizing: border-box; min-height: 57px;  }
@@ -4756,14 +4756,19 @@ body.rd .rd-ap-hnets { align-self: end; }
 body.rd .rd-ap-netcell { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; padding-right: 4px; }
 body.rd .rd-ap-dnum { display: flex; flex-direction: column; gap: 1px; font-size: 15px; color: var(--ink-2); }
 body.rd .rd-ap-dnum b { font-weight: 600; }
-body.rd .rd-ap-issbest > b { font-size: 15px; font-weight: 600; }
 body.rd .rd-ap-dbar { position: absolute; left: 14px; right: 14px; top: 50%; height: 16px; margin-top: -8px; display: flex; }
 body.rd .rd-ap-dbar i { display: block; flex-basis: 0; min-width: 0; }
 body.rd .rd-ap-dbar i.u, body.rd .rd-ap-dbar i.u + i { border-left: 2px solid var(--line); }
 body.rd .rd-ap-dbar i:first-child { border-radius: 2px 0 0 2px; }
 body.rd .rd-ap-dbar i:last-child { border-radius: 0 2px 2px 0; }
 body.rd .rd-ap-dbar i.u { background: var(--line); }
-body.rd .rd-ap-ciss .rd-ap-dnum > .rd-ap-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.rd .rd-ap-imap { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); column-gap: 14px; align-items: center; min-width: 0; padding-right: 8px; }
+body.rd .rd-ap-imap.rd-ap-hpn { align-items: end; }
+body.rd .rd-ap-imap.rd-ap-hpn > .rd-ap-th { hyphens: manual; }
+body.rd .rd-ap-icell { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+body.rd .rd-ap-icell > b { font-size: 14px; font-weight: 600; color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+body.rd .rd-ap-ibar { display: flex; height: 6px; width: 100%; border-radius: 3px; overflow: hidden; background: var(--line-2); }
+body.rd .rd-ap-ibar > i { display: block; height: 100%; flex: none; }
 body.rd .rd-ap-dgap { gap: 2px; }
 body.rd .rd-ap-dgap .rd-ap-pnums > b { font-variant-numeric: tabular-nums; }
 body.rd .rd-ap-dpick { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-3); white-space: nowrap; }
@@ -4793,6 +4798,7 @@ body.rd .rd-ap-keywh { position: relative; display: inline-block; width: 34px; h
 body.rd .rd-ap-keywh::before { content: ""; position: absolute; left: 2px; right: 2px; top: 5px; height: 2px; border-radius: 1px; background: var(--rd-whisker); }
 body.rd .rd-ap-keywh i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ink-3); }
 body.rd .rd-ap-keyavg { display: inline-block; width: 1.5px; height: 16px; margin: 0 3px; background: var(--rd-avgline); }
+body.rd .rd-ap-keybar { width: 40px; flex: none; vertical-align: middle; }
 body.rd .rd-ap-keyring { display: inline-block; width: 9px; height: 9px; box-sizing: border-box; border-radius: 50%; border: 1.75px solid var(--ink-3); }
 body.rd .rd-ap ~ .rd-sec .view-how, body.rd .rd-ap .view-how { margin-top: 10px; }
 body.rd .rd-ap-open { padding: 22px 24px 20px 52px; background: var(--surface-2); border-bottom: 1px solid var(--line-2); cursor: default; }
@@ -4875,14 +4881,20 @@ body.rd .rd-apd-dv { color: var(--ink-2); }
 body.rd .rd-apd-dv.hi { color: var(--ink); font-weight: 600; background: color-mix(in oklab, var(--ink) 7%, transparent); border-radius: 3px; }
 body.rd .rd-apd-dv.lo { color: var(--ink-faint); }
 body.rd .rd-apd-demwrap .rd-apd-note { margin-top: 8px; }
+body.rd .rd-apd-demcols.one { grid-template-columns: minmax(0, 560px); }
+body.rd .rd-apd-demcols.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+body.rd .rd-apd-dem { --isr-rk: 72px; --isr-p: 44px; --isr-u: 56px; }
+body.rd .rd-apd-demr.rd-apd-isr { grid-template-columns: var(--isr-cols); }
+body.rd .rd-apd-isr.rk > span:nth-child(2) { color: var(--ink-3); }
+body.rd .rd-apd-isr > span:first-child { white-space: normal; overflow: visible; }
+body.rd .rd-apd-dv.lead { background: color-mix(in oklab, var(--lead) 20%, transparent); color: var(--ink); font-weight: 600; border-radius: 3px; }
 @media (max-width: 1240px) {
   body.rd .rd-ap-c2pp { grid-template-columns: 170px 110px 70px 16px 140px minmax(0, 400px) 56px 52px minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(108px, 148px) minmax(96px, 116px) 0 minmax(160px, 300px) 72px 32px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 1fr) 0 32px; }
   body.rd .rd-ap-cdem { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-hrow.rd-ap-ciss > :nth-child(7), body.rd .rd-ap-row.rd-ap-ciss > :nth-child(7) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-long { display: none; }
 }
 body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
@@ -4891,9 +4903,13 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
-  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px 120px 0 0 minmax(150px, 1fr) 72px 28px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 1fr) 0 28px; }
+  body.rd .rd-ap-imap { column-gap: 8px; padding-right: 4px; }
+  body.rd .rd-ap-icell > b { font-size: 13px; }
+  body.rd .rd-ap-imap.rd-ap-hpn > .rd-ap-th { font-size: 11px; letter-spacing: 0.03em; }
+  body.rd .rd-apd-demcols.two { grid-template-columns: minmax(0, 1fr); }
+  body.rd .rd-apd-demcols.two > .rd-apd-dem + .rd-apd-dem > .rd-apd-demh { display: none; }
   body.rd .rd-ap-cdem { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
-  body.rd .rd-ap-hrow.rd-ap-ciss > :nth-child(6), body.rd .rd-ap-row.rd-ap-ciss > :nth-child(6) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-n, body.rd .rd-ap-hrow > .rd-ap-th:nth-child(3) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
@@ -4954,27 +4970,15 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-card .rd-ap-cprim b { font-size: 15px; font-weight: 600; }
   body.rd .rd-ap-dpair { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
   body.rd .rd-apd-demr { grid-template-columns: minmax(0, 1fr) repeat(5, 40px); padding: 3px 2px; }
+  body.rd .rd-apd-dem { --isr-rk: 58px; --isr-p: 36px; --isr-u: 52px; }
+  body.rd .rd-ap-imapc, body.rd .rd-ap-imaph { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); column-gap: 4px; }
+  body.rd .rd-ap-imapc { margin-top: 8px; }
+  body.rd .rd-ap-imapc > span { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  body.rd .rd-ap-imapc b { display: flex; flex-direction: column; font-size: 13px; line-height: 15px; min-height: 30px; font-weight: 600; color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  body.rd .rd-ap-imapc .rd-ap-ibar { width: 88%; height: 5px; }
+  body.rd .rd-ap-imaph { align-items: end; hyphens: manual; }
+  body.rd .rd-ap-imaph > span { font-size: 11px; font-weight: 600; line-height: 13px; letter-spacing: 0.02em; color: var(--ink-3); }
   body.rd .rd-ap-cnets, body.rd .rd-ap-csub { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
-  body.rd .rd-ap-csub-sent { display: block; container-type: inline-size; }
-  body.rd .rd-ap-mgmt-s, body.rd .rd-ap-mgmt-x { display: none; }
-  @container (max-width: 334.5px) {
-    body.rd .rd-ap-mgmt-l { display: none; }
-    body.rd .rd-ap-mgmt-s { display: inline; }
-  }
-  @container (max-width: 291.7px) {
-    body.rd .rd-ap-mgmt-s { display: none; }
-    body.rd .rd-ap-mgmt-x { display: inline; }
-  }
-  body.rd .rd-ap-issph { container-type: inline-size; }
-  body.rd .rd-ap-issph-mid, body.rd .rd-ap-issph-ask { display: none; }
-  @container (max-width: 304.1px) {
-    body.rd .rd-ap-issph-full { display: none; }
-    body.rd .rd-ap-issph-mid { display: block; }
-  }
-  @container (max-width: 290.5px) {
-    body.rd .rd-ap-issph-mid { display: none; }
-    body.rd .rd-ap-issph-ask { display: block; }
-  }
   body.rd .rd-ap-cnets .rd-ap-nets { grid-template-columns: repeat(3, auto); column-gap: 12px; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }
@@ -4989,6 +4993,24 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-apd-facts { grid-template-columns: 104px minmax(0, 1fr); column-gap: 10px; font-size: 13px; }
   body.rd .rd-ap-more { gap: 14px; }
   body.rd .rd-ap-shown { font-size: 12px; }
+}
+@media (max-width: 419px) {
+  body.rd .rd-apd-dem.isn6 > .rd-apd-demr.rd-apd-isr { grid-template-columns: minmax(0, 1.4fr) repeat(4, minmax(0, 1fr)) minmax(0, 1.15fr); padding: 5px 2px; }
+  body.rd .rd-apd-dem.isn6 > .rd-apd-isr > span:first-child { grid-column: 1 / -1; color: var(--ink); }
+  body.rd .rd-apd-dem.isn6 > .rd-apd-isr.rd-apd-demh > span:first-child { display: none; }
+  body.rd .rd-apd-dem.isn6 > .rd-apd-isr > span:not(:first-child) { padding-right: 2px; }
+  body.rd .rd-apd-dem.isn6 > .rd-apd-isr.rk > span:nth-child(2) { white-space: nowrap; }
+  body.rd .rd-apd-dem.isn6 > .rd-apd-isr.rd-apd-demh { letter-spacing: 0.01em; }
+  body.rd .rd-apd-dem.isn6 > .rd-apd-isr:not(.rd-apd-demh) + .rd-apd-isr { border-top: 1px solid var(--line-2); }
+}
+@media (max-width: 379px) {
+  body.rd .rd-apd-dem.isn5 > .rd-apd-demr.rd-apd-isr { grid-template-columns: repeat(var(--isr-n), minmax(0, 1fr)); padding: 5px 2px; }
+  body.rd .rd-apd-dem.isn5 > .rd-apd-isr > span:first-child { grid-column: 1 / -1; color: var(--ink); }
+  body.rd .rd-apd-dem.isn5 > .rd-apd-isr.rd-apd-demh > span:first-child { display: none; }
+  body.rd .rd-apd-dem.isn5 > .rd-apd-isr > span:not(:first-child) { padding-right: 2px; }
+  body.rd .rd-apd-dem.isn5 > .rd-apd-isr.rk > span:nth-child(2) { white-space: nowrap; }
+  body.rd .rd-apd-dem.isn5 > .rd-apd-isr.rd-apd-demh { letter-spacing: 0.01em; }
+  body.rd .rd-apd-dem.isn5 > .rd-apd-isr:not(.rd-apd-demh) + .rd-apd-isr { border-top: 1px solid var(--line-2); }
 }
 @media (max-width: 519px) {
   body.rd .rd-ap-tabs .rd-tab { padding: 0 6px; }
@@ -64054,6 +64076,55 @@ function demPairOf(p, split) {
   }
   return null;
 }
+const ISS_MAP = ["col", "housing", "health", "immigration", "crime", "economy"];
+const ISS_MAP_LAB = {
+  col: "Cost of living",
+  housing: "Housing",
+  health: "Health",
+  immigration: "Immigration",
+  crime: "Crime",
+  economy: "Economy"
+};
+const ISS_ALIAS = {
+  "Cost of living": "col",
+  "Housing": "housing",
+  "Housing affordability": "housing",
+  "Health": "health",
+  "Healthcare": "health",
+  "Hospitals": "health",
+  "Immigration": "immigration",
+  "Immigration & population": "immigration",
+  "Crime": "crime",
+  "Economic management": "economy",
+  "The economy": "economy",
+  "Climate change": "climate",
+  "National security": "security"
+};
+function issOwnOf(p, id) {
+  const iss = p && p.iss;
+  if (!iss) return null;
+  if (iss.own && iss.own[id]) return iss.own[id];
+  if (id === "col" && iss.bp) return {
+    alp: iss.bp.alp,
+    lnp: iss.bp.lnp,
+    onp: iss.bp.onp,
+    grn: iss.bp.grn,
+    oth: iss.bp.rest
+  };
+  return null;
+}
+function issLeadOf(own) {
+  if (!own) return null;
+  const ps = ["alp", "lnp", "onp", "grn"].filter(k => own[k] != null).map(k => [k, +own[k]]).sort((a, b) => b[1] - a[1]);
+  if (!ps.length) return null;
+  const lead = ps.length > 1 ? ps[0][1] - ps[1][1] : null;
+  return {
+    who: ps[0][0],
+    v: ps[0][1],
+    lead,
+    level: lead != null && lead < 0.5
+  };
+}
 function ArchIssTop({
   iss
 }) {
@@ -68053,7 +68124,12 @@ Object.assign(window, {
   ArchIssBest,
   DEM_SPLITS,
   demGroupsOf,
-  demPairOf
+  demPairOf,
+  ISS_MAP,
+  ISS_MAP_LAB,
+  ISS_ALIAS,
+  issOwnOf,
+  issLeadOf
 });</script>
   <script>const GP = {
   R: 120,
@@ -81064,9 +81140,6 @@ const RD_AP_TAGS = {
 const rdApTagLab = id => RD_AP_TAGS[id] ? RD_AP_TAGS[id].label : id;
 const RD_AP_M = 6;
 const rdApX = v => (Math.max(-RD_AP_M, Math.min(RD_AP_M, v)) + RD_AP_M) / (2 * RD_AP_M) * 100;
-const ISS_SENT_SHORT = {
-  "Housing affordability": "housing"
-};
 function RdApStrip({
   lean,
   moe,
@@ -82396,9 +82469,105 @@ function RdApDetail({
       className: "rd-apd-k"
     }, "In today\u2019s figures"), React.createElement("span", null, inWin ? React.createElement(React.Fragment, null, "One of the polls the panel\u2019s current figures draw on (the last ", T.window, ").") : React.createElement(React.Fragment, null, "Outside the ", T.window, " the panel\u2019s current figures draw on."))));
   })();
+  const issTable = (() => {
+    if (!isIss || !p.iss) return null;
+    const iq = p.iss;
+    const labels = D.issues && D.issues.labels || {};
+    const ranked = (iq.sal && iq.sal.length ? iq.sal : iq.conc || []).map(([lab, v], i) => ({
+      id: window.ISS_ALIAS[lab] || null,
+      lab,
+      v,
+      rank: i + 1
+    }));
+    const seen = new Set(ranked.map(r => r.id).filter(Boolean));
+    const ownIds = Object.keys(iq.own || {}).concat(iq.bp && !(iq.own && iq.own.col) ? ["col"] : []);
+    const pooled = (D.issues && D.issues.list || []).map(x => x.id);
+    const order = pooled.filter(id => ownIds.includes(id)).concat(ownIds.filter(id => !pooled.includes(id)));
+    const rows = ranked.concat(order.filter(id => !seen.has(id)).map(id => ({
+      id,
+      lab: labels[id] || id,
+      v: null,
+      rank: null
+    })));
+    const ownOf = r => r.id ? window.issOwnOf(p, r.id) : null;
+    const unsure = o => {
+      const u = ["unsure", "none", "equal"].filter(k => o && o[k] != null);
+      return u.length ? u.reduce((a, k) => a + +o[k], 0) : null;
+    };
+    const cols = rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK).filter(k => k.id !== "oth" && rows.some(r => {
+      const o = ownOf(r);
+      return o && o[k.id] != null;
+    }));
+    const hasUnsure = rows.some(r => unsure(ownOf(r)) != null);
+    const hasRank = ranked.length > 0;
+    const nNum = (hasRank ? 1 : 0) + cols.length + (hasUnsure ? 1 : 0);
+    const tracks = ["minmax(0, 1fr)"].concat(hasRank ? ["var(--isr-rk)"] : [], cols.map(() => "var(--isr-p)"), hasUnsure ? ["var(--isr-u)"] : []);
+    const parts = rows.length > 9 && nNum <= 4 ? [rows.slice(0, Math.ceil(rows.length / 2)), rows.slice(Math.ceil(rows.length / 2))] : [rows];
+    const ordTxt = n => n + (n % 10 === 1 && n % 100 !== 11 ? "st" : n % 10 === 2 && n % 100 !== 12 ? "nd" : n % 10 === 3 && n % 100 !== 13 ? "rd" : "th");
+    const rc = "rd-apd-demr rd-apd-isr" + (hasRank ? " rk" : "");
+    const head = React.createElement("div", {
+      className: rc + " rd-apd-demh",
+      role: "row"
+    }, React.createElement("span", null), hasRank && React.createElement("span", {
+      role: "columnheader"
+    }, "Ranked"), cols.map(k => React.createElement("span", {
+      key: k.id,
+      role: "columnheader",
+      style: {
+        color: k.ink
+      }
+    }, k.lab)), hasUnsure && React.createElement("span", {
+      role: "columnheader"
+    }, "Unsure"));
+    return React.createElement("div", {
+      className: "rd-apd-demwrap"
+    }, React.createElement("span", {
+      className: "rd-apd-h"
+    }, "Issue by issue"), React.createElement("div", {
+      className: "rd-apd-demcols " + (parts.length === 2 ? "two" : "one")
+    }, parts.map((part, i) => React.createElement("div", {
+      key: i,
+      className: "rd-apd-dem isn" + nNum,
+      role: "table",
+      "aria-label": "Issue by issue" + (i ? ", continued" : ""),
+      style: {
+        "--isr-cols": tracks.join(" "),
+        "--isr-n": nNum
+      }
+    }, head, part.map(r => {
+      const o = ownOf(r);
+      const L = o ? window.issLeadOf(o) : null;
+      const u = unsure(o);
+      return React.createElement("div", {
+        key: r.lab,
+        className: rc,
+        role: "row"
+      }, React.createElement("span", {
+        role: "rowheader"
+      }, r.lab), hasRank && React.createElement("span", {
+        role: "cell",
+        className: "rd-apd-dv"
+      }, r.rank ? ordTxt(r.rank) + " · " + rdApNum(r.v) : "—"), cols.map(k => {
+        const lead = L && !L.level && L.who === k.id;
+        return React.createElement("span", {
+          key: k.id,
+          role: "cell",
+          className: "rd-apd-dv" + (lead ? " lead" : ""),
+          style: lead ? {
+            "--lead": k.dot
+          } : null
+        }, o && o[k.id] != null ? rdApNum(o[k.id]) : "—");
+      }), hasUnsure && React.createElement("span", {
+        role: "cell",
+        className: "rd-apd-dv"
+      }, rdApNum(u)));
+    })))), React.createElement("span", {
+      className: "rd-apd-sub rd-apd-note"
+    }, iq.sal && iq.sal.length ? "Ranked: the issue’s place among those voters said matter most, and the share naming it. " : iq.conc ? "Ranked: the issue’s place among concerns named without prompting, and the share mentioning it. " : "This poll didn’t ask which issues matter most. ", "The party columns are each party\u2019s share of all respondents, as printed.", iq.q ? React.createElement(React.Fragment, null, " The question\u2019s wording: \u201C", iq.q, "\u201D", /[.?…]$/.test(iq.q) ? "" : ".") : "", " The party in front is shaded."));
+  })();
   return React.createElement("div", {
     className: "rd-apd"
-  }, demTable, React.createElement("div", {
+  }, demTable, issTable, React.createElement("div", {
     className: "rd-apd-l poll-detail",
     "data-pollster": p.pollster
   }, React.createElement("span", {
@@ -82472,7 +82641,7 @@ function RdApDetail({
     style: {
       color: "var(--mood-neg)"
     }
-  }, rdApNum(d.wrong)), ", unsure ", rdApNum(d.unsure)))), p.iss && (p.iss.sal || []).length > 0 && React.createElement("div", {
+  }, rdApNum(d.wrong)), ", unsure ", rdApNum(d.unsure)))), !isIss && p.iss && (p.iss.sal || []).length > 0 && React.createElement("div", {
     className: "rd-apd-grid rd-apd-grid1 rd-apd-iss"
   }, React.createElement("span", {
     className: "rd-apd-k"
@@ -82492,9 +82661,9 @@ function RdApDetail({
     }
   })), React.createElement("b", null, rdApNum(v)), r1 != null && React.createElement("span", {
     className: "rd-apd-sub"
-  }, rdApNum(r1), " rank it first of all"))))), p.iss && (p.iss.sal || []).length > 0 && React.createElement("span", {
+  }, rdApNum(r1), " rank it first of all"))))), !isIss && p.iss && (p.iss.sal || []).length > 0 && React.createElement("span", {
     className: "rd-apd-sub rd-apd-note"
-  }, "Share naming each issue in the three that matter most, %.", prev ? " Changes are on " + p.pollster + "’s " + prev.field + " poll." : ""), p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && React.createElement("div", {
+  }, "Share naming each issue in the three that matter most, %.", prev ? " Changes are on " + p.pollster + "’s " + prev.field + " poll." : ""), !isIss && p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && React.createElement("div", {
     className: "rd-apd-grid rd-apd-grid1 rd-apd-iss"
   }, React.createElement("span", {
     className: "rd-apd-k"
@@ -82512,9 +82681,9 @@ function RdApDetail({
     style: {
       width: Math.min(100, v) + "%"
     }
-  })), React.createElement("b", null, rdApNum(v)))))), p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && React.createElement("span", {
+  })), React.createElement("b", null, rdApNum(v)))))), !isIss && p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && React.createElement("span", {
     className: "rd-apd-sub rd-apd-note"
-  }, "Shares of any mentions, not a forced pick \u2013 these can\u2019t sit beside the top-three numbers."), p.iss && issBestBlock && React.createElement("div", {
+  }, "Shares of any mentions, not a forced pick \u2013 these can\u2019t sit beside the top-three numbers."), !isIss && p.iss && issBestBlock && React.createElement("div", {
     className: "rd-apd-grid rd-apd-grid1 rd-apd-iss"
   }, React.createElement("span", {
     className: "rd-apd-k"
@@ -82536,7 +82705,7 @@ function RdApDetail({
       width: Math.min(100, r.v) + "%",
       background: r.ink || undefined
     }
-  })), React.createElement("b", null, rdApNum(r.v)))))), p.iss && issBestBlock && React.createElement("span", {
+  })), React.createElement("b", null, rdApNum(r.v)))))), !isIss && p.iss && issBestBlock && React.createElement("span", {
     className: "rd-apd-sub rd-apd-note"
   }, issBestBlock.cap), seats.length > 0 && React.createElement("div", {
     className: "rd-apd-grid rd-apd-grid1"
@@ -82797,41 +82966,6 @@ function RdApSheet({
     className: "rd-ap-sheetgo",
     onClick: onClose
   }, "Show ", count, " poll", count === 1 ? "" : "s")));
-}
-function RdApRankSent({
-  children
-}) {
-  const el = React.useRef(null);
-  React.useLayoutEffect(() => {
-    const node = el.current;
-    if (!node) return undefined;
-    const rk = node.querySelector(".rd-ap-rk");
-    if (!rk) return undefined;
-    const fit = () => {
-      rk.style.display = "";
-      node.style.whiteSpace = "nowrap";
-      const fits = node.scrollWidth <= node.clientWidth + 0.5;
-      node.style.whiteSpace = "";
-      rk.style.display = fits ? "" : "none";
-    };
-    let raf = 0;
-    const refit = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(fit);
-    };
-    const ro = new ResizeObserver(refit);
-    ro.observe(node);
-    fit();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
-    return () => {
-      ro.disconnect();
-      cancelAnimationFrame(raf);
-    };
-  }, []);
-  return React.createElement("div", {
-    className: "rd-ap-csub rd-ap-csub-sent",
-    ref: el
-  }, children);
 }
 function RdAllPolls(P) {
   const {
@@ -83148,6 +83282,10 @@ function RdAllPolls(P) {
     onp: "One Nation",
     oth: "others"
   };
+  const IMAP = window.ISS_MAP || [];
+  const IMAP_LAB = window.ISS_MAP_LAB || {};
+  const IP4 = prims.filter(k => k.id !== "oth");
+  const issHyph = id => id === "immigration" ? React.createElement(React.Fragment, null, "Immig\xADration") : id === "economy" ? React.createElement(React.Fragment, null, "Econ\xADomy") : IMAP_LAB[id];
   const demScale = short => {
     const ticks = short ? [[-40, "40"], [-20, "20"], [0, "Even"], [20, "20"], [40, "40 pts"]] : [[-40, "40 pts"], [-30, "30"], [-20, "20"], [-10, "10"], [0, "Even"], [10, "10"], [20, "20"], [30, "30"], [40, "40 pts"]];
     return React.createElement("span", {
@@ -83253,32 +83391,14 @@ function RdAllPolls(P) {
     className: "rd-ap-cap"
   }, "Right direction or wrong track, %")), th("Net", "dir.net", {
     right: true
-  })), facet === "issues" && React.createElement(React.Fragment, null, th("Top issue", "iss.topv", {
-    title: "The issue most voters said matters most"
-  }), React.createElement("span", {
-    className: "rd-ap-th",
-    title: "The 2nd-most-named issue voters said matters most, with the share naming it"
-  }, "2nd"), React.createElement("span", {
-    className: "rd-ap-th",
-    title: "The 3rd-most-named issue voters said matters most, with the share naming it"
-  }, "3rd"), React.createElement("span", {
-    className: "rd-ap-hpic",
-    "aria-hidden": "true"
-  }, React.createElement("span", {
-    className: "rd-ap-cap"
-  }, "Best on the top issue"), React.createElement("span", {
-    className: "rd-ap-in"
-  }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
-    key: v,
-    className: "rd-ap-tk",
-    style: {
-      left: pdx(v) + "%"
-    }
-  }, v, v === 40 ? "%" : "")))), th("Party in first", "iss.bestv", {
-    right: true,
-    wrap: true,
-    title: "The party most voters rate best on that issue"
-  })), facet === "demographics" && React.createElement(React.Fragment, null, React.createElement("span", {
+  })), facet === "issues" && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-ap-imap rd-ap-hpn"
+  }, IMAP.map(id => React.createElement("span", {
+    key: id,
+    role: "columnheader",
+    className: "rd-ap-th wrap",
+    title: "The party rated best on " + (IMAP_LAB[id] || id).toLowerCase() + " by the most voters, and its lead over the next, in points"
+  }, issHyph(id)))), React.createElement("span", null)), facet === "demographics" && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-ap-pnums rd-ap-hpn"
   }, prims.map(k => React.createElement(React.Fragment, {
     key: k.id
@@ -83683,95 +83803,57 @@ function RdAllPolls(P) {
         }
       }, rdApNum(d.wrong)), ", unsure ", rdApNum(d.unsure))) : null;
     } else if (facet === "issues") {
-      const iss = p.iss || null;
-      const top3 = iss ? (iss.sal || iss.conc || []).slice(0, 3) : [];
-      const it = iss ? window.issTopOf(iss) : null;
-      const ib = iss ? window.issBestOf(iss) : null;
-      const im = ib ? window.ISS_PARTY_META[ib.who] || [ib.who, ib.who, null] : null;
-      const issCell = t => React.createElement("span", {
-        role: "cell",
-        className: "rd-ap-dnum"
-      }, t ? React.createElement(React.Fragment, null, React.createElement("b", null, rdApNum(t[1])), React.createElement("span", {
-        className: "rd-ap-sub"
-      }, t[0])) : React.createElement("span", {
-        className: "rd-ap-none"
-      }, "\u2014"));
-      figs = React.createElement(React.Fragment, null, issCell(it), issCell(top3[1] || null), issCell(top3[2] || null));
-      const own = iss && iss.top ? iss.own && iss.own[iss.top] || iss.bp || null : null;
-      const ownLab = iss && iss.top ? D.issues && D.issues.labels && D.issues.labels[iss.top] || iss.top : null;
-      const ownDots = own ? prims.filter(k => k.id !== "oth" && own[k.id] != null) : [];
-      const ariaBest = ownDots.length ? "Rated best on " + (ownLab ? ownLab.charAt(0).toLowerCase() + ownLab.slice(1) : "the issue") + ": " + ownDots.map(k => (window.ISS_PARTY_META[k.id] || [k.id])[0] + " " + rdApNum(own[k.id])).join(", ") + ", shares of all respondents" : "No best-party reading this wave";
-      pic = React.createElement("span", {
-        className: "rd-ap-pic",
-        role: "img",
-        "aria-label": ariaBest
-      }, React.createElement("span", {
-        className: "rd-ap-in"
-      }, [0, 10, 20, 30, 40].map(v => React.createElement("i", {
-        key: v,
-        className: "rd-ap-gl",
-        style: {
-          left: pdx(v) + "%"
-        }
-      })), ownDots.map(k => React.createElement("i", {
+      const cells = IMAP.map(id => {
+        const own = window.issOwnOf(p, id);
+        return {
+          id,
+          own,
+          L: window.issLeadOf(own)
+        };
+      });
+      const verdict = ({
+        L
+      }) => !L ? "—" : L.level ? "Level" : React.createElement(React.Fragment, null, React.createElement("span", null, (window.ISS_PARTY_META[L.who] || [L.who, L.who])[1]), " ", React.createElement("span", null, "+", Math.round(L.lead)));
+      const ink = ({
+        L
+      }) => L && !L.level ? (window.ISS_PARTY_META[L.who] || [])[2] : null;
+      const words = ({
+        id,
+        own,
+        L
+      }) => own ? IMAP_LAB[id] + ": " + (!L ? "no party figures" : L.level ? "level" : (window.ISS_PARTY_META[L.who] || [L.who])[0] + " ahead by " + Math.round(L.lead)) + " (" + IP4.filter(k => own[k.id] != null).map(k => k.lab + " " + rdApNum(own[k.id])).join(", ") + ")" : IMAP_LAB[id] + ": not asked";
+      const bar = own => own && React.createElement("i", {
+        className: "rd-ap-ibar",
+        "aria-hidden": "true"
+      }, IP4.filter(k => own[k.id] != null).map(k => React.createElement("i", {
         key: k.id,
-        className: "rd-ap-dot",
         style: {
-          left: pdx(own[k.id]) + "%",
+          width: +own[k.id] + "%",
           background: k.dot
         }
-      }))));
-      val = React.createElement("span", {
+      })));
+      figs = React.createElement("span", {
         role: "cell",
-        className: "rd-ap-netcell rd-ap-issbest"
-      }, ib ? React.createElement(React.Fragment, null, React.createElement("b", {
-        style: im[2] ? {
-          color: im[2]
+        className: "rd-ap-imap"
+      }, cells.map(c => React.createElement("span", {
+        key: c.id,
+        className: "rd-ap-icell",
+        "aria-label": words(c)
+      }, React.createElement("b", {
+        style: ink(c) ? {
+          color: ink(c)
         } : null
-      }, im[1]), React.createElement("span", {
-        className: "rd-ap-sub"
-      }, rdApNum(ib.v), " on it")) : React.createElement("span", {
-        className: "rd-ap-none"
-      }, "\u2014"));
-      if (ib && im) {
-        right1 = React.createElement("b", {
-          className: "rd-ap-issfig"
-        }, React.createElement("span", {
-          style: im[2] ? {
-            color: im[2]
-          } : null
-        }, im[1]), " ", rdApNum(ib.v));
-      }
-      const sentLab = l => ISS_SENT_SHORT[l] || l.toLowerCase();
-      const sentLab1 = l => {
-        const s = sentLab(l);
-        return s.charAt(0).toUpperCase() + s.slice(1);
-      };
-      const sentPart = (l, pos1) => {
-        const s = sentLab(l);
-        if (s !== "economic management") return pos1 ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-        return React.createElement(React.Fragment, null, React.createElement("span", {
-          className: "rd-ap-mgmt-l"
-        }, pos1 ? "Economic management" : "economic management"), React.createElement("span", {
-          className: "rd-ap-mgmt-s"
-        }, pos1 ? "Economic mgmt" : "economic mgmt"), React.createElement("span", {
-          className: "rd-ap-mgmt-x"
-        }, pos1 ? "Econ mgmt" : "econ mgmt"));
-      };
-      const ord = n => n === 1 ? React.createElement("span", null, "1", React.createElement("sup", null, "st")) : n === 2 ? React.createElement("span", null, "2", React.createElement("sup", null, "nd")) : React.createElement("span", null, "3", React.createElement("sup", null, "rd"));
-      body = React.createElement(React.Fragment, null, it && React.createElement(RdApRankSent, null, sentPart(it[0], true), " ", React.createElement("span", {
-        className: "rd-ap-rk"
-      }, "ranked "), ord(1), top3.length > 1 && React.createElement(React.Fragment, null, ", ", sentPart(top3[1][0]), " ", ord(2)), top3.length > 2 && React.createElement(React.Fragment, null, ", ", sentPart(top3[2][0]), " ", ord(3))), !it && iss && iss.own && iss.own.col && React.createElement("div", {
-        className: "rd-ap-issph"
-      }, React.createElement("div", {
-        className: "rd-ap-csub rd-ap-csub-sent rd-ap-issph-full"
-      }, "Issues unranked, but trust on cost of living assessed"), React.createElement("div", {
-        className: "rd-ap-csub rd-ap-csub-sent rd-ap-issph-mid"
-      }, "Issues unranked, but cost-of-living trust assessed"), React.createElement("div", {
-        className: "rd-ap-csub rd-ap-csub-sent rd-ap-issph-ask"
-      }, "Issues unranked, but cost-of-living trust asked")), ownDots.length > 0 && React.createElement("div", {
-        className: "rd-ap-cpic"
-      }, pic));
+      }, verdict(c)), bar(c.own))));
+      body = React.createElement("div", {
+        className: "rd-ap-imapc"
+      }, cells.map(c => React.createElement("span", {
+        key: c.id,
+        "aria-label": words(c)
+      }, React.createElement("b", {
+        style: ink(c) ? {
+          color: ink(c)
+        } : null
+      }, verdict(c)), bar(c.own))));
     } else if (facet === "demographics") {
       const pr = window.demPairOf(p, demSplit);
       figs = React.createElement("span", {
@@ -84003,18 +84085,10 @@ function RdAllPolls(P) {
       color: "var(--mood-neg)"
     }
   }, "wrong track"), ", %")), facet === "issues" && React.createElement("span", {
-    className: "rd-ap-hpic"
-  }, React.createElement("span", {
-    className: "rd-ap-cap"
-  }, "Best on the top issue"), React.createElement("span", {
-    className: "rd-ap-in"
-  }, [0, 10, 20, 30, 40].map(v => React.createElement("span", {
-    key: v,
-    className: "rd-ap-tk",
-    style: {
-      left: pdx(v) + "%"
-    }
-  }, v, v === 40 ? "%" : "")))), facet === "demographics" && React.createElement("span", {
+    className: "rd-ap-hpic rd-ap-imaph"
+  }, IMAP.map(id => React.createElement("span", {
+    key: id
+  }, issHyph(id)))), facet === "demographics" && React.createElement("span", {
     className: "rd-ap-hpic"
   }, demScale(true)));
   const NAV = [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagree"], ["house-lean", "Lean"], ["flow-drift", "Flows"]];
@@ -84465,7 +84539,32 @@ function RdAllPolls(P) {
   }, React.createElement("span", {
     className: "rd-ap-keyring",
     "aria-hidden": "true"
-  }), "The month\u2019s average")), facet === "demographics" && React.createElement(RdKey, {
+  }), "The month\u2019s average")), facet === "issues" && React.createElement(RdKey, {
+    className: "rd-ckey rd-ap-key",
+    items: []
+  }, React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("b", null, "ALP +7"), "\xA0the party rated best on the issue, and its lead over the next, in points"), React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("i", {
+    className: "rd-ap-ibar rd-ap-keybar",
+    "aria-hidden": "true"
+  }, React.createElement("i", {
+    style: {
+      width: "34%",
+      background: "var(--alp)"
+    }
+  }), React.createElement("i", {
+    style: {
+      width: "26%",
+      background: "var(--onp)"
+    }
+  }), React.createElement("i", {
+    style: {
+      width: "22%",
+      background: "var(--lnp)"
+    }
+  })), "each party\u2019s share rating it best; grey, the rest")), facet === "demographics" && React.createElement(RdKey, {
     className: "rd-ckey rd-ap-key",
     items: [{
       kind: "dot-solid",
@@ -84479,7 +84578,7 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }), "Even: the same vote in both groups")), React.createElement(HowTo, {
     label: "How to read this table",
-    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to the average of the published figures that month, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the 2025 election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to that month’s average, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "About one poll in 20 should sit outside its interval by chance."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled; ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
+    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to the average of the published figures that month, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the 2025 election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to that month’s average, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "About one poll in 20 should sit outside its interval by chance."), facet === "issues" && React.createElement(React.Fragment, null, "Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; \"Level\" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn\u2019t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled; ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
   }), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {

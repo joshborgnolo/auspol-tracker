@@ -1,12 +1,9 @@
-// Pins the 2026-10-03 All-polls head contracts:
-//  - issues facet: desktop scale ladder is 0/10/20/30/40(%) again (the
-//    "40%" ticker was dropped 2026-10-03 for overflow at desktop widths,
-//    then reinstated the same night after the caption's shorten swept to
-//    all five drives; phone identical), and BOTH homes read "Best on the
-//    top issue".
-//  - direction facet: "Right direction or wrong track, %" sits in the TICK
-//    lane (bottom of the 38px hpic) on desktop AND phone, not the cap lane.
-// Mirrors iss-head-overlap.mjs's harness (file:// build, puppeteer-core).
+// Pins the 2026-10-03 All-polls direction head contract: "Right direction or
+// wrong track, %" sits in the TICK lane (bottom of the 38px hpic) on desktop
+// AND phone, not the cap lane. (The issues facet's head was the other half
+// of this probe until design B, 2026-10-04, replaced its caption and tick
+// ladder with six issue names - iss-facet.mjs pins that head now.)
+// file:// build, puppeteer-core.
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -91,13 +88,6 @@ const headInfo = () => {
   check("desktop direction: caption text", d.capText === "Right direction or wrong track, %", d.capText);
   check("desktop direction: no tick marks", d.tks.length === 0, `${d.tks.length} ticks`);
 
-  await pickFacet(page, /^Issues$/);
-  const i = await page.evaluate(headInfo);
-  check("desktop issues: caption is the full form", i.capText === "Best on the top issue", i.capText);
-  check("desktop issues: ladder is 0/10/20/30/40 with the unit on 40 (the ticker is back)",
-    i.tks.length === 5 && i.tks[4].text === "40%" && i.tks.some((t) => t.text === "30"),
-    JSON.stringify(i.tks.map((t) => t.text)));
-  check("desktop issues: last tick bottom == hpic bottom (lane intact)", i.tks.length === 5 && Math.abs(i.tks[4].bottom - i.hpic.bottom) < 0.51, JSON.stringify(i.tks[4]));
 
   check("desktop: no page errors", errs.length === 0, errs[0] || "");
   await page.close();
@@ -112,12 +102,6 @@ const headInfo = () => {
   check("phone direction: 38px band kept (the lane below exists)", d.which === "phead" && d.hpic && Math.abs(d.hpic.h - 38) < 0.51, JSON.stringify({ which: d.which, hpic: d.hpic, minH: d.minH }));
   check("phone direction: caption sits in the tick lane", d.isDir && !!d.cap && Math.abs(d.cap.bottom - d.hpic.bottom) < 0.51, JSON.stringify({ cap: d.cap, bottom: d.hpic && d.hpic.bottom }));
 
-  await pickFacet(page, /^Issues$/);
-  const i = await page.evaluate(headInfo);
-  check("phone issues: caption gains the article", i.capText === "Best on the top issue", i.capText);
-  check("phone issues: ladder keeps 0/10/20/30/40 with the unit on 40",
-    i.tks.length === 5 && i.tks[4].text === "40%",
-    JSON.stringify(i.tks.map((t) => t.text)));
 
   check("phone: no page errors", errs.length === 0, errs[0] || "");
   await page.close();

@@ -3477,6 +3477,40 @@ function demPairOf(p, split) {
   return null;
 }
 
+/* issues facet - who leads on what (user call 2026-10-04, design B of three
+   mocked). Every issues wave says which party voters rate best on at least
+   one issue (Resolve 18 issues a month, RedBridge up to 10, Ipsos the
+   month's five), while only Ipsos and RedBridge rank which issues matter -
+   so the row leads with the ownership every wave has. ISS_MAP is the six
+   issues the most waves ask it on (cost of living 42, housing 35,
+   immigration 32, economy 31, health 30, crime 29 at launch), in the pooled
+   panel's salience order. A wave's shares are its own as printed, of all
+   respondents; SEC Newgate's best-party table stands in for its cost of
+   living. */
+const ISS_MAP = ["col", "housing", "health", "immigration", "crime", "economy"];
+const ISS_MAP_LAB = { col: "Cost of living", housing: "Housing", health: "Health", immigration: "Immigration", crime: "Crime", economy: "Economy" };
+// salience labels as each house prints them -> issue ids
+const ISS_ALIAS = { "Cost of living": "col", "Housing": "housing", "Housing affordability": "housing", "Health": "health", "Healthcare": "health",
+  "Hospitals": "health", "Immigration": "immigration", "Immigration & population": "immigration", "Crime": "crime", "Economic management": "economy",
+  "The economy": "economy", "Climate change": "climate", "National security": "security" };
+function issOwnOf(p, id) {
+  const iss = p && p.iss;
+  if (!iss) return null;
+  if (iss.own && iss.own[id]) return iss.own[id];
+  if (id === "col" && iss.bp) return { alp: iss.bp.alp, lnp: iss.bp.lnp, onp: iss.bp.onp, grn: iss.bp.grn, oth: iss.bp.rest };
+  return null;
+}
+/* the party rated best and its lead on the runner-up among the four
+   parties; a lead under half a point is level - Resolve's decimals can put
+   two parties 0.08 apart */
+function issLeadOf(own) {
+  if (!own) return null;
+  const ps = ["alp", "lnp", "onp", "grn"].filter((k) => own[k] != null).map((k) => [k, +own[k]]).sort((a, b) => b[1] - a[1]);
+  if (!ps.length) return null;
+  const lead = ps.length > 1 ? ps[0][1] - ps[1][1] : null;
+  return { who: ps[0][0], v: ps[0][1], lead, level: lead != null && lead < 0.5 };
+}
+
 // the top-issue cell: the issue most voters name first, and the share naming
 // it. SEC's unprompted concern reading is flagged, since its answer set
 // ("any mention") isn't the pooled question's.
@@ -7466,4 +7500,6 @@ Object.assign(window, { Tabs, PastCyclesView, AllPollsView, InfoView, TermPop,
   // issues facet readouts, shared with the redesign's table
   issTopOf, issBestOf, ISS_PARTY_META, ArchIssTop, ArchIssBest,
   // the demographics facet's splits, shared with the redesign's table
-  DEM_SPLITS, demGroupsOf, demPairOf });
+  DEM_SPLITS, demGroupsOf, demPairOf,
+  // the issues facet's map, shared with the redesign's table
+  ISS_MAP, ISS_MAP_LAB, ISS_ALIAS, issOwnOf, issLeadOf });

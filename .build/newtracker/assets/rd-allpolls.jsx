@@ -187,11 +187,6 @@ const rdApTagLab = (id) => (RD_AP_TAGS[id] ? RD_AP_TAGS[id].label : id);
 const RD_AP_M = 6;
 const rdApX = (v) => ((Math.max(-RD_AP_M, Math.min(RD_AP_M, v)) + RD_AP_M) / (2 * RD_AP_M)) * 100;
 
-/* the issues phone sentence shortens the one stored label the user called
-   redundant (2026-10-03: "housing affordability - that's not needed");
-   everything else falls through to plain lowercasing */
-const ISS_SENT_SHORT = { "Housing affordability": "housing" };
-
 /* ---------------------------------------------------------------- the lean picture
    One poll against the average of its month: the centre line is that
    average, the dot the poll's lean, the whisker its 95% margin from sampling
@@ -1046,9 +1041,73 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
     </>;
   })();
 
+  /* on the issues facet the poll's every issue leads the opened poll, full
+     width: where voters ranked it among the issues that matter most (where
+     the poll asked), and the four parties' printed best-party shares with
+     the party in front shaded - one table in place of the salience bars and
+     the top-issue block the other facets keep further down. Shares keep the
+     decimal the house printed (Resolve's data prints them), so the row's
+     rounded lead is always the difference a reader can take here */
+  const issTable = (() => {
+    if (!isIss || !p.iss) return null;
+    const iq = p.iss;
+    const labels = (D.issues && D.issues.labels) || {};
+    const ranked = (iq.sal && iq.sal.length ? iq.sal : iq.conc || []).map(([lab, v], i) => ({ id: window.ISS_ALIAS[lab] || null, lab, v, rank: i + 1 }));
+    const seen = new Set(ranked.map((r) => r.id).filter(Boolean));
+    const ownIds = Object.keys(iq.own || {}).concat(iq.bp && !(iq.own && iq.own.col) ? ["col"] : []);
+    const pooled = ((D.issues && D.issues.list) || []).map((x) => x.id);
+    const order = pooled.filter((id) => ownIds.includes(id)).concat(ownIds.filter((id) => !pooled.includes(id)));
+    const rows = ranked.concat(order.filter((id) => !seen.has(id)).map((id) => ({ id, lab: labels[id] || id, v: null, rank: null })));
+    const ownOf = (r) => (r.id ? window.issOwnOf(p, r.id) : null);
+    const unsure = (o) => { const u = ["unsure", "none", "equal"].filter((k) => o && o[k] != null); return u.length ? u.reduce((a, k) => a + +o[k], 0) : null; };
+    /* only the columns this poll fills: Resolve offers no Greens (and no One
+       Nation before March), SEC Newgate prints no unsure figure */
+    const cols = rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK).filter((k) => k.id !== "oth" && rows.some((r) => { const o = ownOf(r); return o && o[k.id] != null; }));
+    const hasUnsure = rows.some((r) => unsure(ownOf(r)) != null);
+    const hasRank = ranked.length > 0;
+    const nNum = (hasRank ? 1 : 0) + cols.length + (hasUnsure ? 1 : 0);
+    // the column widths live in rd.css (--isr-*); which columns there are, here
+    const tracks = ["minmax(0, 1fr)"].concat(hasRank ? ["var(--isr-rk)"] : [], cols.map(() => "var(--isr-p)"), hasUnsure ? ["var(--isr-u)"] : []);
+    // a long list splits in two side by side - only when the figures are few enough to leave each half room for the names
+    const parts = rows.length > 9 && nNum <= 4 ? [rows.slice(0, Math.ceil(rows.length / 2)), rows.slice(Math.ceil(rows.length / 2))] : [rows];
+    const ordTxt = (n) => n + (n % 10 === 1 && n % 100 !== 11 ? "st" : n % 10 === 2 && n % 100 !== 12 ? "nd" : n % 10 === 3 && n % 100 !== 13 ? "rd" : "th");
+    const rc = "rd-apd-demr rd-apd-isr" + (hasRank ? " rk" : "");
+    const head = <div className={rc + " rd-apd-demh"} role="row"><span></span>{hasRank && <span role="columnheader">Ranked</span>}{cols.map((k) => <span key={k.id} role="columnheader" style={{ color: k.ink }}>{k.lab}</span>)}{hasUnsure && <span role="columnheader">Unsure</span>}</div>;
+    return (
+      <div className="rd-apd-demwrap">
+        <span className="rd-apd-h">Issue by issue</span>
+        <div className={"rd-apd-demcols " + (parts.length === 2 ? "two" : "one")}>
+          {parts.map((part, i) => (
+            <div key={i} className={"rd-apd-dem isn" + nNum} role="table" aria-label={"Issue by issue" + (i ? ", continued" : "")}
+              style={{ "--isr-cols": tracks.join(" "), "--isr-n": nNum }}>
+              {head}
+              {part.map((r) => {
+                const o = ownOf(r);
+                const L = o ? window.issLeadOf(o) : null;
+                const u = unsure(o);
+                return (
+                  <div key={r.lab} className={rc} role="row">
+                    <span role="rowheader">{r.lab}</span>
+                    {hasRank && <span role="cell" className="rd-apd-dv">{r.rank ? ordTxt(r.rank) + " · " + rdApNum(r.v) : "—"}</span>}
+                    {cols.map((k) => { const lead = L && !L.level && L.who === k.id; return <span key={k.id} role="cell" className={"rd-apd-dv" + (lead ? " lead" : "")} style={lead ? { "--lead": k.dot } : null}>{o && o[k.id] != null ? rdApNum(o[k.id]) : "—"}</span>; })}
+                    {hasUnsure && <span role="cell" className="rd-apd-dv">{rdApNum(u)}</span>}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        <span className="rd-apd-sub rd-apd-note">{iq.sal && iq.sal.length ? "Ranked: the issue’s place among those voters said matter most, and the share naming it. "
+          : iq.conc ? "Ranked: the issue’s place among concerns named without prompting, and the share mentioning it. " : "This poll didn’t ask which issues matter most. "}
+          The party columns are each party’s share of all respondents, as printed.{iq.q ? <> The question’s wording: “{iq.q}”{/[.?…]$/.test(iq.q) ? "" : "."}</> : ""} The party in front is shaded.</span>
+      </div>
+    );
+  })();
+
   return (
     <div className="rd-apd">
       {demTable}
+      {issTable}
       <div className="rd-apd-l poll-detail" data-pollster={p.pollster}>
         <span className="rd-apd-h">{rdPollHead(p)}</span>
         {prim.length > 0 && (
@@ -1098,7 +1157,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
             <span className="rd-apd-cell"><span>In the right direction <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>, on the wrong track <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>, unsure {rdApNum(d.unsure)}</span></span>
           </div>
         )}
-        {p.iss && (p.iss.sal || []).length > 0 && (
+        {!isIss && p.iss && (p.iss.sal || []).length > 0 && (
           <div className="rd-apd-grid rd-apd-grid1 rd-apd-iss">
             <span className="rd-apd-k">The issues voters name</span>
             <span className="rd-apd-cell rd-apd-isslist">
@@ -1113,8 +1172,8 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
             </span>
           </div>
         )}
-        {p.iss && (p.iss.sal || []).length > 0 && <span className="rd-apd-sub rd-apd-note">Share naming each issue in the three that matter most, %.{prev ? " Changes are on " + p.pollster + "’s " + prev.field + " poll." : ""}</span>}
-        {p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && (
+        {!isIss && p.iss && (p.iss.sal || []).length > 0 && <span className="rd-apd-sub rd-apd-note">Share naming each issue in the three that matter most, %.{prev ? " Changes are on " + p.pollster + "’s " + prev.field + " poll." : ""}</span>}
+        {!isIss && p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && (
           <div className="rd-apd-grid rd-apd-grid1 rd-apd-iss">
             <span className="rd-apd-k">Named without prompting</span>
             <span className="rd-apd-cell rd-apd-isslist">
@@ -1128,8 +1187,8 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
             </span>
           </div>
         )}
-        {p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && <span className="rd-apd-sub rd-apd-note">Shares of any mentions, not a forced pick – these can’t sit beside the top-three numbers.</span>}
-        {p.iss && issBestBlock && (
+        {!isIss && p.iss && !(p.iss.sal || []).length && (p.iss.conc || []).length > 0 && <span className="rd-apd-sub rd-apd-note">Shares of any mentions, not a forced pick – these can’t sit beside the top-three numbers.</span>}
+        {!isIss && p.iss && issBestBlock && (
           <div className="rd-apd-grid rd-apd-grid1 rd-apd-iss">
             <span className="rd-apd-k">Rated best on {issBestBlock.title}</span>
             <span className="rd-apd-cell rd-apd-isslist">
@@ -1143,7 +1202,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
             </span>
           </div>
         )}
-        {p.iss && issBestBlock && <span className="rd-apd-sub rd-apd-note">{issBestBlock.cap}</span>}
+        {!isIss && p.iss && issBestBlock && <span className="rd-apd-sub rd-apd-note">{issBestBlock.cap}</span>}
         {seats.length > 0 && (
           <div className="rd-apd-grid rd-apd-grid1">
             <span className="rd-apd-k">Seats, modelled</span>
@@ -1358,45 +1417,6 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
       </div>
     </div>
   );
-}
-
-/* the phone cards' ranked sentence, wrapper for the "ranked" flourish:
-   "ranked" joins the first label ("Cost of living ranked 1st") only while
-   it still fits ONE line (user call 2026-10-03: "if it wouldn't make it
-   spill over, make it … ranked 1st"). Sentence content varies wave to
-   wave so no CSS width ladder (which prices only FIXED strings the way
-   the mgmt/issph rungs do) can call it per card - the LIVE element is
-   measured instead: show the word, force the sentence to one physical
-   line, and compare scrollWidth against the lane's clientWidth, parking
-   the span display:none when it would overflow. Runs pre-paint on mount,
-   on lane resize, and again once webfonts settle. The economy sentence
-   NEVER keeps it (its LONG form 334.5px already nearly fills the 350px
-   390-shell lane) - the flourish only rides the sentences with slack
-   (SEC 271.2px, RedBridge 275px, the first three phone lanes 280/300/
-   320px; Ipsos's petrol sentence 311.5px fits from the 360px shell up) */
-function RdApRankSent({ children }) {
-  const el = React.useRef(null);
-  React.useLayoutEffect(() => {
-    const node = el.current;
-    if (!node) return undefined;
-    const rk = node.querySelector(".rd-ap-rk");
-    if (!rk) return undefined;
-    const fit = () => {
-      rk.style.display = "";
-      node.style.whiteSpace = "nowrap";
-      const fits = node.scrollWidth <= node.clientWidth + 0.5;
-      node.style.whiteSpace = "";
-      rk.style.display = fits ? "" : "none";
-    };
-    let raf = 0;
-    const refit = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(fit); };
-    const ro = new ResizeObserver(refit);
-    ro.observe(node);
-    fit();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
-    return () => { ro.disconnect(); cancelAnimationFrame(raf); };
-  }, []);
-  return <div className="rd-ap-csub rd-ap-csub-sent" ref={el}>{children}</div>;
 }
 
 /* ---------------------------------------------------------------- the table */
@@ -1651,6 +1671,12 @@ function RdAllPolls(P) {
   // whole points: the groups are a few hundred people each, a decimal claims too much
   const gapTxt = (v) => (v == null ? "—" : Math.abs(v) < 0.5 ? "0" : (v > 0 ? "+" : "−") + Math.abs(Math.round(v)));
   const DEM_PNAME = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "others" };
+  // the issues facet's six issues (ISS_MAP, the d1a1 asset) and the four parties it draws
+  const IMAP = window.ISS_MAP || [];
+  const IMAP_LAB = window.ISS_MAP_LAB || {};
+  const IP4 = prims.filter((k) => k.id !== "oth");
+  // the two one-word names that outgrow a narrow column break at a soft hyphen, only when they must
+  const issHyph = (id) => (id === "immigration" ? <>Immig&shy;ration</> : id === "economy" ? <>Econ&shy;omy</> : IMAP_LAB[id]);
   const demScale = (short) => {
     const ticks = short ? [[-40, "40"], [-20, "20"], [0, "Even"], [20, "20"], [40, "40 pts"]]
       : [[-40, "40 pts"], [-30, "30"], [-20, "20"], [-10, "10"], [0, "Even"], [10, "10"], [20, "20"], [30, "30"], [40, "40 pts"]];
@@ -1713,14 +1739,8 @@ function RdAllPolls(P) {
         {th("Net", "dir.net", { right: true })}
       </>}
       {facet === "issues" && <>
-        {th("Top issue", "iss.topv", { title: "The issue most voters said matters most" })}
-        <span className="rd-ap-th" title="The 2nd-most-named issue voters said matters most, with the share naming it">2nd</span>
-        <span className="rd-ap-th" title="The 3rd-most-named issue voters said matters most, with the share naming it">3rd</span>
-        <span className="rd-ap-hpic" aria-hidden="true">
-          <span className="rd-ap-cap">Best on the top issue</span>
-          <span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span>
-        </span>
-        {th("Party in first", "iss.bestv", { right: true, wrap: true, title: "The party most voters rate best on that issue" })}
+        <span className="rd-ap-imap rd-ap-hpn">{IMAP.map((id) => <span key={id} role="columnheader" className="rd-ap-th wrap" title={"The party rated best on " + (IMAP_LAB[id] || id).toLowerCase() + " by the most voters, and its lead over the next, in points"}>{issHyph(id)}</span>)}</span>
+        <span></span>
       </>}
       {facet === "demographics" && <>
         <span className="rd-ap-pnums rd-ap-hpn">{prims.map((k) => <React.Fragment key={k.id}>{th(k.lab, "dem." + k.id, { color: k.ink, title: "Sort by " + DEM_PNAME[k.id] + "’s gap between the two groups" })}</React.Fragment>)}</span>
@@ -1895,143 +1915,41 @@ function RdAllPolls(P) {
       body = d ? <><div className="rd-ap-cpic">{pic}</div>
         <div className="rd-ap-csub">Right <b style={{ color: "var(--mood-pos)" }}>{rdApNum(d.right)}</b>, wrong <b style={{ color: "var(--mood-neg)" }}>{rdApNum(d.wrong)}</b>, unsure {rdApNum(d.unsure)}</div></> : null;
     } else if (facet === "issues") {
-      const iss = p.iss || null;
-      /* quote the window-shared readouts (issTopOf/issBestOf/ISS_PARTY_META come
-         from the d1a1 asset's archive layer) so the cells here, the classic
-         table and the CSV export always tell one story */
-      const top3 = iss ? (iss.sal || iss.conc || []).slice(0, 3) : [];
-      const it = iss ? window.issTopOf(iss) : null;
-      const ib = iss ? window.issBestOf(iss) : null;
-      const im = ib ? (window.ISS_PARTY_META[ib.who] || [ib.who, ib.who, null]) : null;
-      const issCell = (t) => (
-        <span role="cell" className="rd-ap-dnum">
-          {t ? <><b>{rdApNum(t[1])}</b><span className="rd-ap-sub">{t[0]}</span></> : <span className="rd-ap-none">—</span>}
+      /* who leads on what (user call 2026-10-04, design B of three mocked):
+         the six most-asked issues across the row, each the party rated best
+         on it and its lead over the next party in points, over a bar of the
+         four parties' shares as printed (the grey is the rest - others,
+         unsure, none). A wave that didn't ask about an issue shows a dash;
+         its own every issue, and where voters ranked them, open beneath it */
+      const cells = IMAP.map((id) => { const own = window.issOwnOf(p, id); return { id, own, L: window.issLeadOf(own) }; });
+      /* party and lead as two spans: one line on a laptop, stacked on a
+         phone, where a sixth of a 320px card (43px) can't hold "L/NP +12" */
+      const verdict = ({ L }) => (!L ? "—" : L.level ? "Level"
+        : <><span>{(window.ISS_PARTY_META[L.who] || [L.who, L.who])[1]}</span> <span>+{Math.round(L.lead)}</span></>);
+      const ink = ({ L }) => (L && !L.level ? (window.ISS_PARTY_META[L.who] || [])[2] : null);
+      const words = ({ id, own, L }) => (own
+        ? IMAP_LAB[id] + ": " + (!L ? "no party figures" : L.level ? "level" : (window.ISS_PARTY_META[L.who] || [L.who])[0] + " ahead by " + Math.round(L.lead))
+          + " (" + IP4.filter((k) => own[k.id] != null).map((k) => k.lab + " " + rdApNum(own[k.id])).join(", ") + ")"
+        : IMAP_LAB[id] + ": not asked");
+      const bar = (own) => own && (
+        <i className="rd-ap-ibar" aria-hidden="true">{IP4.filter((k) => own[k.id] != null).map((k) => <i key={k.id} style={{ width: +own[k.id] + "%", background: k.dot }}></i>)}</i>
+      );
+      figs = (
+        <span role="cell" className="rd-ap-imap">
+          {cells.map((c) => (
+            <span key={c.id} className="rd-ap-icell" aria-label={words(c)}>
+              <b style={ink(c) ? { color: ink(c) } : null}>{verdict(c)}</b>{bar(c.own)}
+            </span>
+          ))}
         </span>
       );
-      figs = <>
-        {issCell(it)}
-        {issCell(top3[1] || null)}
-        {issCell(top3[2] || null)}
-      </>;
-      /* the party-ownership strip: the wave's own printed shares naming a
-         major party best on its top issue (SEC Newgate: its printed
-         best-party table), as-printed of all respondents - the basis the
-         Best-on-it rail cell quotes too, never the pooled three-party
-         renormalisation of today's issues panel */
-      const own = iss && iss.top ? (iss.own && iss.own[iss.top]) || iss.bp || null : null;
-      const ownLab = iss && iss.top ? ((D.issues && D.issues.labels && D.issues.labels[iss.top]) || iss.top) : null;
-      const ownDots = own
-        ? prims.filter((k) => k.id !== "oth" && own[k.id] != null)
-        : [];
-      const ariaBest = ownDots.length
-        ? "Rated best on " + (ownLab ? ownLab.charAt(0).toLowerCase() + ownLab.slice(1) : "the issue") + ": " + ownDots.map((k) => (window.ISS_PARTY_META[k.id] || [k.id])[0] + " " + rdApNum(own[k.id])).join(", ") + ", shares of all respondents"
-        : "No best-party reading this wave";
-      pic = (
-        <span className="rd-ap-pic" role="img" aria-label={ariaBest}>
-          <span className="rd-ap-in">
-            {[0, 10, 20, 30, 40].map((v) => <i key={v} className="rd-ap-gl" style={{ left: pdx(v) + "%" }}></i>)}
-            {ownDots.map((k) => (
-              <i key={k.id} className="rd-ap-dot" style={{ left: pdx(own[k.id]) + "%", background: k.dot }}></i>
-            ))}
-          </span>
-        </span>
+      /* the phone: the same six verdicts and bars in one line, under the
+         pinned head's issue names */
+      body = (
+        <div className="rd-ap-imapc">
+          {cells.map((c) => <span key={c.id} aria-label={words(c)}><b style={ink(c) ? { color: ink(c) } : null}>{verdict(c)}</b>{bar(c.own)}</span>)}
+        </div>
       );
-      val = (
-        <span role="cell" className="rd-ap-netcell rd-ap-issbest">
-          {ib ? <><b style={im[2] ? { color: im[2] } : null}>{im[1]}</b><span className="rd-ap-sub">{rdApNum(ib.v)} on it</span></> : <span className="rd-ap-none">—</span>}
-        </span>
-      );
-      /* the phone card gives the ownership strip the whole width of the row
-         back (user call 2026-10-03: "make the dots span the whole width of
-         the row once again, like in primary and like in leaders"), and the
-         three best-issue sublines collapse into ONE sentence, first as
-         "…top issue (68), then … (32) and … (20)" and then, on the same-day
-         follow-up call ("Cost of living 1st, housing 2nd, crime 3rd" with
-         superscript ordinals, "housing affordability" shortened to
-         "housing", ", unprompted" kept for SEC; a moment later: "don't
-         capitalise issue names - eg 'housing', not 'Housing'"; last of all:
-         "the first letter of the first issue should be capitalised -
-         sentence case", so sentence case it is - sentLab1 lifts only the
-         leading letter; SEC's tail was later re-punctuated to
-         "; unprompted" ("for sec newgate, make it '; unprompted' instead
-         of ', unprompted'"), and finally dropped from the ROWS outright
-         (same-day call: 'remove "; unprompted" from SEC Newgate rows -
-         this is not so important that it must be mentioned in the rows
-         as well as in the expanded poll detail' - the detail's unprompted
-         mentions all stay: the "Named without prompting" block, the
-         mention-shares note and the SEC explainer popup)), a plain
-         ranking with NO figures - the ordinal
-         itself now says what the wordy tail did, and the salience shares
-         stay quoted in the desktop cells and the detail rail. Labels run
-         through ISS_SENT_SHORT (the one SEC label the user named
-         redundant) before lowercasing. The sentence carries
-         .rd-ap-csub-sent: the row's shared csub rule is display:flex
-         (built for figure chips), which would itemise every JSX fragment
-         on its own line. A wave that measures no ranking but asked
-         cost-of-living ownership instead (Resolve, YouGov, DemosAU - iss
-         with own.col but no sal/conc, so no `it`) fills the same line
-         with the user's dictated placeholder (same-day call: 'When issues
-         are not ranked but cost of living performance is asked, eg with
-         resolve and yougov, in the line where the issues ranking would
-         go, say "Issues unranked, but performance on cost of living
-         assessed"'), rendered as a THREE-RUNG width ladder (.rd-ap-issph,
-         same-day follow-ups: 'if it overflows to two lines, make the
-         reword the wording… so wording depends on screen width', then
-         'change "assessed" to "asked"', the aim stated as one line on
-         all phones, then 'actually, replace performance with trust, in
-         all cases. that's a better, more accurate word' - the container
-         shows the longest of full "…trust on cost of living assessed"
-         304.1px / mid "…cost-of-living trust assessed" 290.5px / ask
-         "…trust asked" 271.1px that fits the card's text lane, via two
-         @container tiers at those widths; the trust wording cleared the
-         320/340px wraps the performance rungs suffered, so EVERY shell
-         320px and up now gets the sentence on one line); pure
-         best-party waves (SEC) and iss-less ordinary rows keep no
-         sentence at all */
-      if (ib && im) {
-        right1 = <b className="rd-ap-issfig"><span style={im[2] ? { color: im[2] } : null}>{im[1]}</span> {rdApNum(ib.v)}</b>;
-      }
-      const sentLab = (l) => (ISS_SENT_SHORT[l] || l.toLowerCase());
-      const sentLab1 = (l) => { const s = sentLab(l); return s.charAt(0).toUpperCase() + s.slice(1); };
-      /* "economic management" is the sentence's one spiller: the Ipsos
-         "Cost of living 1st, housing 2nd, economic management 3rd" card is
-         the only ranked card that ever wrapped to two lines (the 140.3px
-         outlier in the 360px height pass). User calls 2026-10-03: shorten
-         to "economic mgmt" - and further to "econ mgmt" - WHEN IT WOULD
-         OTHERWISE SPILL OVER, so the label ships as THREE spans and the
-         .rd-ap-csub-sent container itself (container-type: inline-size,
-         rd.css) thins them at the measured breaks: sentence widths LONG
-         "economic management" 334.5px / SHORT "economic mgmt" 291.7px /
-         XTRA "econ mgmt" 263.3px (13px csub), against lanes 280@320vp /
-         300@340 / 320@360 / 350@390 / 361.8@402 - so the container shows
-         LONG at/above 334.5px, SHORT down to 291.7px and XTRA below, the
-         263.3px rung clearing even the 320-shell 280px lane by 16.7px
-         (EVERY phone rung back to one line). Every other label renders
-         plain text exactly as before; desktop cells and the stored data
-         are untouched (this map lives only in this one phone sentence) */
-      const sentPart = (l, pos1) => {
-        const s = sentLab(l);
-        if (s !== "economic management") return pos1 ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-        return <><span className="rd-ap-mgmt-l">{pos1 ? "Economic management" : "economic management"}</span><span className="rd-ap-mgmt-s">{pos1 ? "Economic mgmt" : "economic mgmt"}</span><span className="rd-ap-mgmt-x">{pos1 ? "Econ mgmt" : "econ mgmt"}</span></>;
-      };
-      const ord = (n) => n === 1 ? <span>1<sup>st</sup></span> : n === 2 ? <span>2<sup>nd</sup></span> : <span>3<sup>rd</sup></span>;
-      body = <>
-        {it && (
-          <RdApRankSent>
-            {sentPart(it[0], true)} <span className="rd-ap-rk">ranked </span>{ord(1)}
-            {top3.length > 1 && <>, {sentPart(top3[1][0])} {ord(2)}</>}
-            {top3.length > 2 && <>, {sentPart(top3[2][0])} {ord(3)}</>}
-          </RdApRankSent>
-        )}
-        {!it && iss && iss.own && iss.own.col && (
-          <div className="rd-ap-issph">
-            <div className="rd-ap-csub rd-ap-csub-sent rd-ap-issph-full">Issues unranked, but trust on cost of living assessed</div>
-            <div className="rd-ap-csub rd-ap-csub-sent rd-ap-issph-mid">Issues unranked, but cost-of-living trust assessed</div>
-            <div className="rd-ap-csub rd-ap-csub-sent rd-ap-issph-ask">Issues unranked, but cost-of-living trust asked</div>
-          </div>
-        )}
-        {ownDots.length > 0 && <div className="rd-ap-cpic">{pic}</div>}
-      </>;
     } else if (facet === "demographics") {
       /* the split in view, read off the poll's own table (demPairOf, the
          d1a1 asset - the scope and the sort quote the same pair). The pair
@@ -2139,7 +2057,7 @@ function RdAllPolls(P) {
       {facet === "primary" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Primary vote</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
       {facet === "leadership" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Net rating: approve minus disapprove</span><span className="rd-ap-in">{ldTicks.map((v) => <span key={v} className={"rd-ap-tk" + (v === 0 ? " mid" : "")} style={{ left: ldx(v) + "%" }}>{v === 0 ? "Even" : rdSigned(v, 0)}</span>)}</span></span>}
       {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span>, unsure, <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
-      {facet === "issues" && <span className="rd-ap-hpic"><span className="rd-ap-cap">Best on the top issue</span><span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span></span>}
+      {facet === "issues" && <span className="rd-ap-hpic rd-ap-imaph">{IMAP.map((id) => <span key={id}>{issHyph(id)}</span>)}</span>}
       {facet === "demographics" && <span className="rd-ap-hpic">{demScale(true)}</span>}
     </div>
   );
@@ -2406,6 +2324,12 @@ function RdAllPolls(P) {
           <span className="rd-key-item"><span className="rd-ap-keyring" aria-hidden="true"></span>The month’s average</span>
         </RdKey>
       )}
+      {facet === "issues" && (
+        <RdKey className="rd-ckey rd-ap-key" items={[]}>
+          <span className="rd-key-item"><b>ALP +7</b>&nbsp;the party rated best on the issue, and its lead over the next, in points</span>
+          <span className="rd-key-item"><i className="rd-ap-ibar rd-ap-keybar" aria-hidden="true"><i style={{ width: "34%", background: "var(--alp)" }}></i><i style={{ width: "26%", background: "var(--onp)" }}></i><i style={{ width: "22%", background: "var(--lnp)" }}></i></i>each party’s share rating it best; grey, the rest</span>
+        </RdKey>
+      )}
       {facet === "demographics" && (
         <RdKey className="rd-ckey rd-ap-key" items={[{ kind: "dot-solid", color: "var(--ink-3)", label: "A party’s gap between the two groups, in its colour" }]}>
           <span className="rd-key-item"><span className="rd-ap-keyavg" aria-hidden="true"></span>Even: the same vote in both groups</span>
@@ -2417,6 +2341,7 @@ function RdAllPolls(P) {
           ? "Each figure is the pollster’s own, as published. The dot is its gap to the average of the published figures that month, and the whisker the 95% interval its sample alone would give it."
           : "Each figure reads the poll’s primary votes through the 2025 election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to that month’s average, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows."}
           {" "}About one poll in 20 should sit outside its interval by chance.</>,
+        facet === "issues" && <>Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; "Level" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn’t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them.</>,
         facet === "demographics" && <>Each figure is a party’s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18–34 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party’s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation’s have widened that way as its vote has grown. Open any row for the poll’s whole table.</>,
         <><b>Sample</b> is the number of people polled; <b>eff.</b> is the pollster’s own effective sample after weighting, where it publishes one. Where it doesn’t, the interval assumes weighting costs what it does on average.</>,
       ]} />

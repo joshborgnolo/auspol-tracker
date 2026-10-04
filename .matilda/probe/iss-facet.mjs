@@ -1,34 +1,34 @@
-// Headless acceptance probe for the All-polls Issues facet (Ipsos built
-// into the table, SEC Newgate's direction-only rows riding in, and the
-// "how it counts" rail tailored to issues). Mirror of dir-facet.mjs.
+// Headless acceptance probe for the All-polls Issues facet: design B, "who
+// leads on what" (user call 2026-10-04), with Ipsos built into the table and
+// SEC Newgate's direction-only rows riding in. Mirror of dir-facet.mjs.
 //
 //  1. The facet strip carries Issues after Direction (the arrow-key walk
 //     uses the same FACETS order), and ?f=i deep-links onto it
 //  2. The facet lists every iss-bearing wave: individual-with-iss + SEC
-//     Newgate's direction-only rows + the nine issuesOnlyPolls — and the
+//     Newgate's direction-only rows + the nine issuesOnlyPolls - and the
 //     tally denominates against the archive's full extent (of N_all)
-//  3. Ipsos rows never leave the Issues facet (no VI, no leadership)
-//  4. Every row carries two figure cells (top issue / best on it) and an
-//     .rd-ap-d2i cell stacking the 2nd/3rd-issue figure cells from the
-//     wave's salience row
-//  5. The "With issues figures" scope pill self-arms on the facet
-//  6. An opened Ipsos row shows the salience bars grid and the issues rail
-//     (Asked / question forms / usual lean / in today's panel) with NO 2PP
-//     chart — the rail never says "Labor's" on this facet
-//  7. An opened SEC row shows "Named without prompting" + the not-pooled
-//     note (its concerns bank is any-mentions, not a forced pick)
-//  8. VW=390 VH=844: the phone rung mounts cards whose best-issue sentence
-//     reads as a superscript-ordinal ranking ("Cost of living 1st, housing
-//     2nd, crime 3rd") on ONE csub line; a wave with no ranking but
-//     cost-of-living ownership figures fills the line with the dictated
-//     "Issues unranked, but trust on cost of living assessed" - since
-//     2026-10-03 a THREE-RUNG width ladder (full/mid/ask literals, CSS
-//     container queries, one displayed) read via the shown rung; the
-//     later same-day trust swap is what lets every shell >=320px hold
-//     the sentence on ONE line
+//  3. Ipsos rows never leave the Issues facet (no VI, no leadership); poll
+//     rows stand at one height on all six facets
+//  4. Every row is six issue cells (cost of living, housing, health,
+//     immigration, crime, economy): the party rated best and its lead, Level
+//     or a dash, over a bar of the printed shares - each verdict re-derived
+//     from the shares the cell itself speaks, and the facet's verdicts
+//     exactly the data bundle's
+//  5. An opened poll leads with its issue-by-issue table (Ranked where the
+//     poll ranked, only the parties it printed, Unsure where printed; the
+//     party in front shaded), the salience bars folded into it; Resolve's
+//     row verdicts are its table's gaps; the issues rail stays as it was
+//  6. Phones (390, 320): six verdicts in one line under the pinned head's
+//     six names, cards at 122px; at 320 a six-figure table gives each
+//     issue's name its own line and no opened table spills
+//
+// Serves the built site over HTTP (file:// blocks the webfonts, and the fit
+// checks measure text). Run: node .matilda/probe/iss-facet.mjs
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import http from "node:http";
+import { readFile } from "node:fs/promises";
+import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 let puppeteer;
@@ -40,8 +40,15 @@ for (const base of [process.cwd(), homedir()]) {
 }
 if (!puppeteer) { console.error("puppeteer-core not resolvable from ~ or cwd"); process.exit(2); }
 
-const ROOT = fileURLToPath(new URL("../..", import.meta.url));
-const PAGE = `file://${ROOT}/index.html`;
+const ROOT = process.env.ROOT || fileURLToPath(new URL("../..", import.meta.url));
+const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".woff2": "font/woff2", ".png": "image/png", ".svg": "image/svg+xml" };
+const server = http.createServer(async (req, res) => {
+  try { let p = decodeURIComponent(new URL(req.url, "http://x").pathname); if (p === "/") p = "/index.html";
+    res.writeHead(200, { "content-type": MIME[extname(p)] || "application/octet-stream" }); res.end(await readFile(join(ROOT, p)));
+  } catch { res.writeHead(404); res.end(); }
+});
+await new Promise((r) => server.listen(Number(process.env.PORT || 9234), r));
+const PAGE = `http://127.0.0.1:${process.env.PORT || 9234}/index.html`;
 const browser = await puppeteer.launch({
   executablePath: process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   headless: "new",
@@ -133,8 +140,44 @@ async function openRowContaining(page, re) {
       railCtrl: (detail.querySelector(".rd-apd-r .rd-apd-ct") || {}).textContent || "",
       railSvg: !!detail.querySelector(".rd-apd-r svg"),
       keys: [...detail.querySelectorAll(".rd-apd-r .rd-apd-k")].map((k) => k.textContent.trim()),
+      tbl: tableOf(detail),
+      rowCells: [...(document.querySelector(".rd-ap-row.open .rd-ap-imap, .rd-ap-card.open .rd-ap-imapc") || { children: [] }).children]
+        .map((c) => ((c.querySelector("b") || {}).textContent || "").replace(/\s+/g, " ").trim()),
     };
+    // the issues facet's opened poll leads with its issue-by-issue table
+    function tableOf(detail) {
+      const t = detail.querySelector(".rd-apd-demwrap");
+      if (!t || !t.querySelector(".rd-apd-isr")) return null;
+      const tables = [...t.querySelectorAll(".rd-apd-dem")];
+      return {
+        first: detail.firstElementChild === t,
+        h: (t.querySelector(".rd-apd-h") || {}).textContent || "",
+        heads: [...tables[0].querySelector(".rd-apd-demh").children].map((c) => c.textContent.trim()),
+        rows: tables.flatMap((tb) => [...tb.querySelectorAll(".rd-apd-isr:not(.rd-apd-demh)")]
+          .map((r) => [...r.children].map((c) => ({ t: c.textContent.trim(), lead: c.classList.contains("lead") })))),
+        note: (t.querySelector(".rd-apd-note") || {}).textContent.replace(/\s+/g, " ").trim(),
+        parts: tables.length,
+        labels: (window.AUSPOL.issues && window.AUSPOL.issues.labels) || {},
+      };
+    }
   });
+}
+
+// a table's shading: in each issue's row the party in front is shaded, and
+// none is when the two leading shares sit under half a point apart (shares
+// print to a decimal, so a gap within 0.05 of the line may go either way)
+function shadingOff(tbl) {
+  const iP = tbl.heads.map((h, i) => (/^(ALP|ON|L\/NP|GRN)$/.test(h) ? i : -1)).filter((i) => i >= 0);
+  const off = [];
+  for (const r of tbl.rows) {
+    const vals = iP.map((i) => [i, r[i] && /^\d/.test(r[i].t) ? +r[i].t : null]).filter((x) => x[1] != null).sort((a, b) => b[1] - a[1]);
+    const leads = r.filter((c) => c.lead).length;
+    if (vals.length < 2) { if (leads) off.push(r[0].t + ": shaded alone"); continue; }
+    const gap = vals[0][1] - vals[1][1];
+    const ok = gap < 0.45 ? leads === 0 : gap <= 0.55 ? leads <= 1 : leads === 1 && r[vals[0][0]].lead;
+    if (!ok) off.push(`${r[0].t}: gap ${gap.toFixed(1)}, ${leads} shaded`);
+  }
+  return off;
 }
 
 // ----------------------------------------------------------------- desktop
@@ -192,67 +235,92 @@ const pillLeak = await page1.evaluate(() =>
 check("the scope stays implicit (no leaked auto pill — parity with Direction facet)",
   pillLeak === null, pillLeak ? `leaked: ${pillLeak}` : "clean");
 
-// 4: the row is the direction facet's grammar — three one-line issue
-// readings, the party-ownership dot strip, the rail verdict. Top/2nd/3rd
-// are figure-over-label rd-ap-dnum cells; the picture column draws the
-// wave's as-printed best-party shares as dots on the shared 0–45 scale;
-// the rail cell names the winner. A best-party-only wave (Resolve's)
-// rightly shows three dash cells under the strip. The retired stacked
-// rd-ap-d2i (the tall-row offender) is pinned absent.
+// 4: who leads on what (design B, user call 2026-10-04): every row carries
+// six issue cells (cost of living, housing, health, immigration, crime,
+// economy), each the party rated best and its lead over the next party
+// ("ALP +7"), "Level" under half a point, or a dash where the wave didn't
+// ask - over a bar of the four parties' printed shares. Each cell's spoken
+// label carries the shares it was read from, so the verdict is re-derived
+// here from what the cell itself says; and the facet's verdicts as a whole
+// must be exactly the ones the data bundle gives. The old anatomy (three
+// issue cells, the dot strip, the rail verdict, the stacked 2nd/3rd cell) is
+// pinned gone.
 const rowAnatomy = await page1.evaluate(() => {
+  const LAB = window.ISS_MAP_LAB, MAP = window.ISS_MAP;
+  const SHORT = { ALP: "alp", "L/NP": "lnp", ON: "onp", GRN: "grn" };
+  const norm = (t) => t.replace(/\u00ad/g, "").replace(/\s+/g, " ").trim();
   const rows = [...document.querySelectorAll(".rd-ap-row")];
-  const an = rows.map((r, i) => {
-    const nums = [...r.querySelectorAll(":scope > .rd-ap-dnum")];
-    const pic = r.querySelector(":scope > .rd-ap-pic");
-    const net = r.querySelector(":scope > .rd-ap-netcell");
-    return {
-      i,
-      nNums: nums.length,
-      filled: nums.map((n) => !!n.querySelector("b")),
-      unp: /unprompted/i.test(r.textContent),
-      d2i: !!r.querySelector(".rd-ap-d2i"),
-      pic: !!pic,
-      dots: pic ? pic.querySelectorAll(".rd-ap-dot").length : 0,
-      gls: pic ? pic.querySelectorAll(".rd-ap-gl").length : 0,
-      net: !!net,
-      netFilled: !!(net && net.querySelector("b")),
-    };
+  const bad = [], seen = [];
+  rows.forEach((r, i) => {
+    const maps = r.querySelectorAll(":scope > .rd-ap-imap");
+    const cells = maps.length === 1 ? [...maps[0].querySelectorAll(":scope > .rd-ap-icell")] : [];
+    if (cells.length !== 6) { bad.push(i + ": " + cells.length + " cells"); return; }
+    cells.forEach((c, j) => {
+      const v = norm((c.querySelector("b") || {}).textContent || "");
+      const aria = c.getAttribute("aria-label") || "";
+      seen.push(v);
+      if (!aria.startsWith(LAB[MAP[j]] + ": ")) { bad.push(i + "/" + j + " label " + aria.slice(0, 40)); return; }
+      const asked = !/: not asked$/.test(aria);
+      const hasBar = !!c.querySelector(".rd-ap-ibar");
+      if (!asked) { if (v !== "—" || hasBar) bad.push(i + "/" + j + " unasked shows " + v); return; }
+      const m = aria.match(/\(([^)]*)\)$/);
+      const sh = (m ? m[1].split(", ") : []).map((t) => t.match(/^(ALP|L\/NP|ON|GRN) (\d+(?:\.\d)?)$/)).filter(Boolean).map((x) => [x[1], +x[2]]);
+      sh.sort((a, b) => b[1] - a[1]);
+      // the cell's own printed shares, read back off its spoken label
+      const lead = sh.length > 1 ? sh[0][1] - sh[1][1] : null;
+      // shares print to one decimal, so a lead within 0.05 of the half-point
+      // line may read either way; elsewhere the verdict is fixed
+      const mm = v.match(/^(\S+) \+(\d+)$/);
+      const ok = lead == null ? v === "—"
+        : lead < 0.45 ? v === "Level"
+        : lead <= 0.55 ? v === "Level" || v === sh[0][0] + " +1"
+        : !!mm && mm[1] === sh[0][0] && Math.abs(+mm[2] - lead) <= 0.6;
+      if (!ok) bad.push(i + "/" + j + " " + v + " v " + JSON.stringify(sh));
+      if (!hasBar) bad.push(i + "/" + j + " no bar");
+      else {
+        const segs = c.querySelectorAll(".rd-ap-ibar > i").length;
+        if (segs !== sh.length) bad.push(i + "/" + j + " bar " + segs + " segs v " + sh.length + " shares");
+      }
+      if (v !== "—" && v !== "Level" && !SHORT[v.split(" ")[0]]) bad.push(i + "/" + j + " party " + v);
+    });
   });
-  const head = [...(document.querySelectorAll(".rd-ap-hrow > *") || [])].map((h) => (h.textContent || "").trim());
+  // what the bundle says the facet's 6 x N verdicts are, as a multiset
+  const D = window.AUSPOL, META = window.ISS_PARTY_META;
+  const want = [];
+  for (const k of ["individualPolls", "issuesOnlyPolls", "directionOnlyPolls"]) for (const p of D[k] || []) {
+    if (!p.iss) continue;
+    for (const id of MAP) {
+      const L = window.issLeadOf(window.issOwnOf(p, id));
+      want.push(!L ? "—" : L.level ? "Level" : (META[L.who] || [L.who, L.who])[1] + " +" + Math.round(L.lead));
+    }
+  }
+  const tally = (a) => a.reduce((o, v) => ((o[v] = (o[v] || 0) + 1), o), {});
+  const tw = tally(want), ts = tally(seen);
+  const diff = [...new Set([...Object.keys(tw), ...Object.keys(ts)])].filter((k) => tw[k] !== ts[k]).map((k) => `${k}: data ${tw[k] || 0}, rows ${ts[k] || 0}`);
+  const hd = [...document.querySelectorAll(".rd-ap-hrow .rd-ap-imap > [role=columnheader]")];
   return {
-    rows: rows.length,
-    head: head.filter(Boolean),
-    headCap: (document.querySelector(".rd-ap-hrow .rd-ap-hpic .rd-ap-cap") || {}).textContent || "",
-    headTk: document.querySelectorAll(".rd-ap-hrow .rd-ap-hpic .rd-ap-tk").length,
-    notThree: an.filter((a) => a.nNums !== 3).map((a) => a.i),
-    runnerNoTop: an.filter((a) => (a.filled[1] || a.filled[2]) && !a.filled[0]).map((a) => a.i),
-    d2iLeft: an.filter((a) => a.d2i).map((a) => a.i),
-    unpRows: an.filter((a) => a.unp).map((a) => a.i),
-    noPic: an.filter((a) => !a.pic).map((a) => a.i),
-    noNet: an.filter((a) => !a.net).map((a) => a.i),
-    badDots: an.filter((a) => a.dots > 0 && (a.dots < 2 || a.dots > 4 || a.gls !== 5)).map((a) => a.i),
-    dotsNoNet: an.filter((a) => a.dots > 0 && !a.netFilled).map((a) => a.i),
-    netNoDots: an.filter((a) => a.netFilled && a.dots === 0).map((a) => a.i),
-    withDots: an.filter((a) => a.dots > 0).length,
+    rows: rows.length, bad, diff, cellsN: seen.length,
+    filled: seen.filter((v) => v !== "—").length,
+    level: seen.filter((v) => v === "Level").length,
+    head: hd.map((h) => norm(h.textContent)),
+    headWant: MAP.map((id) => LAB[id]),
+    headTitles: hd.every((h) => /^The party rated best on .+ by the most voters, and its lead over the next, in points$/.test(h.title || "")),
+    old: rows.filter((r) => r.querySelector(".rd-ap-dnum, .rd-ap-d2i, .rd-ap-pic .rd-ap-dot, .rd-ap-netcell")).length,
+    unp: rows.filter((r) => /unprompted/i.test(r.textContent)).length,
   };
 });
-check("every row is three issue cells + the ownership strip + the rail verdict",
-  rowAnatomy.notThree.length === 0 && rowAnatomy.noPic.length === 0 && rowAnatomy.noNet.length === 0,
-  `three-cells off: ${rowAnatomy.notThree.join(",") || "none"} · strip missing: ${rowAnatomy.noPic.join(",") || "none"} · rail missing: ${rowAnatomy.noNet.join(",") || "none"}`);
-check("the stacked 2nd/3rd cell is gone (the facet's tall-row offender)",
-  rowAnatomy.d2iLeft.length === 0, `left on: ${rowAnatomy.d2iLeft.join(",") || "none"}`);
-check("no desktop row mentions 'unprompted' (rows dropped the tail 2026-10-03; only the detail keeps it)",
-  rowAnatomy.unpRows.length === 0, `left on: ${rowAnatomy.unpRows.join(",") || "none"}`);
-check("the ownership strip draws 2–4 party dots over 5 gridlines, verdict beside them",
-  rowAnatomy.withDots > 0 && rowAnatomy.badDots.length === 0 && rowAnatomy.dotsNoNet.length === 0 && rowAnatomy.netNoDots.length === 0,
-  `${rowAnatomy.withDots}/${rowAnatomy.rows} dotted; bad ${rowAnatomy.badDots.join(",") || "none"}; dots-without-verdict ${rowAnatomy.dotsNoNet.join(",") || "none"}; verdict-without-dots ${rowAnatomy.netNoDots.join(",") || "none"}`);
-check("a row naming a 2nd or 3rd issue always fills its top-issue cell",
-  rowAnatomy.runnerNoTop.length === 0, `rows off: ${rowAnatomy.runnerNoTop.join(",") || "none"}`);
-check("the column head names the scale the strip draws on",
-  rowAnatomy.head.includes("2nd") && rowAnatomy.head.includes("3rd")
-    && rowAnatomy.headCap === "Best on the top issue"
-    && rowAnatomy.headTk === 5,
-  rowAnatomy.headCap + ` · ticks ${rowAnatomy.headTk}`);
+check("every row is six issue cells, each verdict re-derived from the shares it prints",
+  rowAnatomy.rows > 0 && rowAnatomy.bad.length === 0,
+  `${rowAnatomy.cellsN} cells (${rowAnatomy.filled} read, ${rowAnatomy.level} level); off: ${rowAnatomy.bad.slice(0, 4).join(" | ") || "none"}`);
+check("the facet's verdicts are exactly the data bundle's (as a multiset over every wave)",
+  rowAnatomy.diff.length === 0, rowAnatomy.diff.slice(0, 4).join(" | ") || "identical");
+check("the head names the six issues, each titled with what its cells read",
+  JSON.stringify(rowAnatomy.head) === JSON.stringify(rowAnatomy.headWant) && rowAnatomy.headTitles,
+  rowAnatomy.head.join(" | "));
+check("the old anatomy is gone (no issue-figure cells, dot strip, rail verdict or stacked 2nd/3rd)",
+  rowAnatomy.old === 0, `${rowAnatomy.old} rows keep it`);
+check("no desktop row mentions 'unprompted' (the opened table's note keeps it)",
+  rowAnatomy.unp === 0, `${rowAnatomy.unp} rows`);
 
 // 5: Ipsos never leaves the facet (no VI, no leadership rows to stand on)
 console.log("== Ipsos stays put ==");
@@ -271,7 +339,7 @@ for (const [lab, re] of [["2PP", /^2PP$/], ["Primary", /^Primary$/], ["Leaders",
 // and this facet's landings drifted under the reader)
 console.log("== row-height parity across facets ==");
 const rowHeightMedians = {};
-for (const [lab, re] of [["issues", /^Issues$/], ["twopp", /^2PP$/], ["primary", /^Primary$/], ["leadership", /^Leaders(?:hip)?$/], ["direction", /^Direction$/]]) {
+for (const [lab, re] of [["issues", /^Issues$/], ["twopp", /^2PP$/], ["primary", /^Primary$/], ["leadership", /^Leaders(?:hip)?$/], ["direction", /^Direction$/], ["demographics", /^Demographics$/]]) {
   await pickFacet(page1, re);
   await showAll(page1);
   rowHeightMedians[lab] = await page1.evaluate(() => {
@@ -282,34 +350,49 @@ for (const [lab, re] of [["issues", /^Issues$/], ["twopp", /^2PP$/], ["primary",
 const hVals = Object.values(rowHeightMedians).filter((v) => v != null);
 const hSpread = hVals.length ? Math.max(...hVals) - Math.min(...hVals) : null;
 check("poll rows stand at the same height on every facet",
-  hVals.length === 5 && hSpread <= 0.75,
+  hVals.length === 6 && hSpread <= 0.75,
   Object.entries(rowHeightMedians).map(([l, v]) => `${l} ${v == null ? "?" : v.toFixed(2)}`).join(" · "));
 
 // back to Issues for the detail passes
 await pickFacet(page1, /^Issues$/);
 await showAll(page1);
 
-// 6: opened Ipsos row — salience grid + issues rail, no 2PP anywhere
-console.log("== opened rows: the issues rail ==");
+// 6: opened Ipsos row — the issue-by-issue table leads (Ranked, the parties
+// it printed, Unsure), standing in for the salience bars, then the issues
+// rail with no 2PP anywhere
+console.log("== opened rows: the issue table and the issues rail ==");
 const ipD = await openRowContaining(page1, /^Ipsos/);
-check("an Ipsos row opens with its salience bars grid",
-  !!ipD && ipD.issRows >= 5 && ipD.grids.some((g) => /The issues voters name/.test(g)),
-  ipD ? `${ipD.issRows} iss rows, ${ipD.grids.length} grids` : "no detail");
+const ipT = ipD && ipD.tbl;
+check("an Ipsos row opens on its issue-by-issue table: Ranked, the parties, Unsure",
+  !!ipT && ipT.first && ipT.h === "Issue by issue" && ipT.heads[1] === "Ranked" && ipT.heads[ipT.heads.length - 1] === "Unsure"
+    && ipT.rows.length >= 5 && /^1st · \d/.test(ipT.rows[0][1].t),
+  ipT ? `${ipT.heads.join(" | ")} · ${ipT.rows.length} issues · first ${ipT.rows[0].map((c) => c.t).join(" ")}` : "no table");
+check("its salience bars and top-issue block are folded into the table (not repeated below)",
+  !!ipD && ipD.issRows === 0 && !ipD.grids.some((g) => /The issues voters name|Rated best on/.test(g)),
+  ipD ? `${ipD.issRows} bar rows; grids ${ipD.grids.map((g) => g.slice(0, 24)).join(" / ")}` : "no detail");
+check("the table shades the party in front on each issue, and none when level",
+  !!ipT && shadingOff(ipT).length === 0, ipT ? shadingOff(ipT).slice(0, 3).join(" | ") || "clean" : "no table");
+check("the table's note names the ranking and the question's own words",
+  !!ipT && /^Ranked: the issue’s place among those voters said matter most/.test(ipT.note) && /The question’s wording: “most capable of managing”/.test(ipT.note),
+  ipT ? ipT.note.slice(0, 160) : "no table");
 check("Ipsos rail carries the issues facts, no 2PP",
   !!ipD && ipD.railSvg && /Asked/.test(ipD.rail) && /most capable of managing/.test(ipD.rail)
-    && /usual lean/.test(ipD.rail) && /In today.{0,4}s panel/.test(ipD.rail) && !/Labor’s/.test(ipD.rail),
+    && /house lean/.test(ipD.rail) && /In today.{0,4}s panel/.test(ipD.rail) && !/Labor’s/.test(ipD.rail),
   ipD ? `${ipD.rail.slice(0, 240)} | svg:${ipD.railSvg}` : "no detail");
 check("Ipsos detail shows no matchup grid and no primary chips",
   !!ipD && !ipD.grids.join(" ").includes("Implied, on 2025 flows") && !ipD.grids.join(" ").includes("Primary vote, %"),
   ipD ? "grids: " + ipD.grids.length : "no detail");
 
-// 7: opened SEC row — unprompted concerns, kept out of the pooled series
+// 7: opened SEC row — its unprompted concerns rank the table, which prints
+// no Unsure column (SEC prints no unsure figure); the rail keeps it out of
+// the pooled series
 const secD = await openRowContaining(page1, /^SEC Newgate/);
-check("a SEC row shows the unprompted concerns block, flagged as not pooled",
-  !!secD && secD.grids.some((g) => /Named without prompting/.test(g))
-    && secD.notes.some((n) => /any mentions|can’t sit beside/.test(n)),
-  secD ? secD.notes.join(" · ").slice(0, 120) : "no detail");
-// SEC's any-mentions can pool into ownership (hence its usual-lean fact)
+const secT = secD && secD.tbl;
+check("a SEC row ranks its table by unprompted concerns, with no empty Unsure column",
+  !!secT && secT.heads[1] === "Ranked" && !secT.heads.includes("Unsure") && /concerns named without prompting/.test(secT.note)
+    && !secD.grids.some((g) => /Named without prompting/.test(g)),
+  secT ? `${secT.heads.join(" | ")} · ${secT.note.slice(0, 90)}` : "no table");
+// SEC's any-mentions can pool into ownership (hence its house-lean fact)
 // but never into the salience pair-lean ("Between the question forms").
 check("SEC issues rail says unprompted, and never touches the salience pair-lean",
   !!secD && /unprompted/.test(secD.rail) && !/question forms/.test(secD.rail),
@@ -320,9 +403,6 @@ check("SEC issues rail says unprompted, and never touches the salience pair-lean
 // leading letter. The rail caption ("Who voters rate best on cost of
 // living since …") embeds the same label mid-sentence and rides the
 // same rule.
-check("SEC's 'Rated best on' block names its issue in sentence case",
-  !!secD && secD.grids.some((g) => /^Rated best on [a-z]/.test(g)) && !secD.grids.some((g) => /^Rated best on [A-Z]/.test(g)),
-  secD ? (secD.grids.find((g) => /^Rated best on/.test(g)) || "no best block").slice(0, 90) : "no detail");
 check("the rail caption lowers its issue mid-sentence ('rate best on cost of living…')",
   !!secD && /rate best on [a-z]/.test(secD.railCtrl) && !/rate best on [A-Z]/.test(secD.railCtrl),
   secD ? (secD.railCtrl || "no caption").slice(0, 110) : "no detail");
@@ -336,6 +416,31 @@ const reD = await openRowContaining(page1, /^Resolve/);
 check("a Resolve row's Asked line is the who's-best form, never SEC's concerns text",
   !!reD && /asked only who.d be best on each issue/.test(reD.rail) && !/SEC Newgate asks/.test(reD.rail),
   reD ? reD.rail.slice(0, 200) : "no detail");
+// Resolve offers no Greens, so its table has no GRN column; its shares keep
+// the decimal Resolve's data prints, so each of the row's six verdicts is the
+// gap a reader can take off the table (the row once read "ON +1" over a
+// rounded 24 v 22)
+const reT = reD && reD.tbl;
+const reAgree = (() => {
+  if (!reT) return ["no table"];
+  const off = [];
+  const iP = reT.heads.map((h, i) => (/^(ALP|ON|L\/NP|GRN)$/.test(h) ? [h, i] : null)).filter(Boolean);
+  ["col", "housing", "health", "immigration", "crime", "economy"].forEach((id, j) => {
+    const r = reT.rows.find((x) => x[0].t === reT.labels[id]);
+    const v = reD.rowCells[j] || "";
+    if (!r) { if (v !== "—") off.push(id + ": row says " + v + ", table has no row"); return; }
+    const sh = iP.map(([h, i]) => [h, /^\d/.test(r[i].t) ? +r[i].t : null]).filter((x) => x[1] != null).sort((a, b) => b[1] - a[1]);
+    const gap = sh.length > 1 ? sh[0][1] - sh[1][1] : null;
+    const mm = v.match(/^(\S+) \+(\d+)$/);
+    const ok = gap == null ? v === "—" : gap < 0.45 ? v === "Level" : gap <= 0.55 ? v === "Level" || v === sh[0][0] + " +1"
+      : !!mm && mm[1] === sh[0][0] && Math.abs(+mm[2] - gap) <= 0.6;
+    if (!ok) off.push(`${id}: row ${v}, table ${sh.map((x) => x.join(" ")).join(", ")}`);
+  });
+  return off;
+})();
+check("Resolve's table has no Greens column, and the row's six verdicts are its table's gaps",
+  !!reT && !reT.heads.includes("GRN") && reAgree.length === 0,
+  reT ? `${reT.heads.join(" | ")} · ${reAgree.join(" | ") || "row and table agree"}` : "no table");
 // restore the table: openRowContaining CLICKS its row, so re-clicking the
 // same Resolve row collapses it again before check 8's own open (the open
 // row keeps its .rd-ap-row class; .rd-ap-open sits on the detail wrapper,
@@ -351,7 +456,7 @@ check(`a ${viHouse} wave's issues rail swaps the 2PP chart for the pooled issues
   !!viD && !/Labor’s/.test(viD.rail) && /Asked/.test(viD.rail),
   viD ? viD.railCtrl || viD.rail.slice(0, 140) : "no detail");
 check(`${viHouse} pools its top issue against the other house (pair / lean / panel facts)`,
-  !!viD && /question forms|usual lean|In today.{0,4}s panel/.test(viD.rail),
+  !!viD && /question forms|house lean|In today.{0,4}s panel/.test(viD.rail),
   viD ? viD.keys.join(" | ") : "no detail");
 
 // 8b: the mini-chart wave dots are drawn on the SAME basis as the pooled
@@ -410,6 +515,16 @@ check("the wave dot sits at its fieldwork midpoint, not its release stamp",
   !!xOf && !xOf.err && Math.abs(xOf.cx - xOf.expMid) < 2 && Math.abs(xOf.cx - xOf.expRel) > 2,
   xOf ? (xOf.err || `${xOf.field}: cx ${xOf.cx.toFixed(1)} | mid ${xOf.expMid.toFixed(1)} | released ${xOf.expRel.toFixed(1)}`) : "no svg");
 
+// 8d: off the Issues facet an opened poll keeps its top-issue block, and
+// SEC's "Rated best on" key names its issue in sentence case (user call
+// 2026-10-03: "issues should take sentence case, no capital C")
+await pickFacet(page1, /^Direction$/);
+await showAll(page1);
+const secDir = await openRowContaining(page1, /^SEC Newgate/);
+check("off the Issues facet, SEC's 'Rated best on' block names its issue in sentence case",
+  !!secDir && secDir.grids.some((g) => /^Rated best on [a-z]/.test(g)) && !secDir.grids.some((g) => /^Rated best on [A-Z]/.test(g)) && !secDir.tbl,
+  secDir ? (secDir.grids.find((g) => /^Rated best on/.test(g)) || "no best block").slice(0, 90) : "no detail");
+
 check("no page errors on the desktop pass", errs1.length === 0, errs1[0] || "");
 await page1.close();
 
@@ -441,194 +556,81 @@ await pickFacet(page3, /^Issues$/);
 await page3.waitForSelector(".rd-ap-card", { timeout: 15000 });
 await showAll(page3);
 
-// Same contract as the desktop rows: a card carries the one-line best-issue
-// sentence iff its top-issue cell is filled; a wave with NO ranking but
-// cost-of-living ownership figures (Resolve, YouGov, DemosAU) fills the same
-// line with the dictated placeholder "Issues unranked, but trust on cost of
-// living assessed" (wording became "trust" on the same-day swap call);
-// SEC's best-party-only waves rightly have neither. The sentence is a plain ranking with superscript ordinals
-// and NO figures ("Cost of living 1st, housing 2nd, crime 3rd" - SENTENCE
-// CASE: only the leading letter of the first label is capital, every other
-// label lowercased; "Housing affordability"
-// shortened to "housing"; SEC's "; unprompted" row tail was appended then
-// dropped outright the same day ('remove "; unprompted" from SEC Newgate
-// rows - this is not so important that it must be mentioned in the rows
-// as well as in the expanded poll detail' - the rows are bare, the
-// DETAIL's unprompted mentions all stay); it rides
-// .rd-ap-csub-sent so it flows as ONE inline run (the row's shared csub
-// rule is display:flex, which once itemised the JSX fragments into a
-// 4-line column at 390px). The best-party verdict leaves the body and
-// rides the head row as a compact chip ("ALP 29"); cards with an ownership
-// reading carry the full-width party-dot strip on its own body line,
-// under the restored pinned tick ladder.
+// A card carries the same six verdicts in one line of six under the pinned
+// head's six issue names; a verdict stacks its party over its lead (a sixth
+// of a 320px card can't hold "L/NP +12" on one line) and stands two lines
+// tall even when it is "Level", so the six bars share one line. Cards hold
+// the facets' 122px.
 const cardAnatomy = await page3.evaluate(() => {
-  // the unranked placeholder is a three-rung WIDTH LADDER since 2026-10-03:
-  // the wrapper .rd-ap-issph carries full/mid/ask copies of the sentence
-  // and CSS container queries show exactly ONE (the longest that fits the
-  // card's text lane on one line: full 304.1px, mid 290.5px, ask 271.1px,
-  // measured at the 13px csub font after the same-day performance->trust
-  // swap). Everywhere below must read the DISPLAYED rung, not node counts.
-  const shown = (n) => getComputedStyle(n).display !== "none";
-  const RUNGS = [
-    "Issues unranked, but trust on cost of living assessed",
-    "Issues unranked, but cost-of-living trust assessed",
-    "Issues unranked, but cost-of-living trust asked",
-  ];
+  const norm = (t) => t.replace(/\u00ad/g, "").replace(/\s+/g, " ").trim();
   const cards = [...document.querySelectorAll(".rd-ap-card")];
-  const an = cards.map((c) => {
-    const rungs = [...c.querySelectorAll(".rd-ap-issph .rd-ap-csub-sent")];
-    const rungsShown = rungs.filter(shown).length;
-    // a ladder is intact iff it carries all three rungs with exactly one
-    // displayed; absent on waves without the placeholder
-    const ladderOk = rungs.length === 0 || (rungs.length === 3 && rungsShown === 1);
-    const sent = [...c.querySelectorAll(".rd-ap-csub-sent")].find(shown) || null;
-    const subs = [...c.querySelectorAll(".rd-ap-csub")].filter(shown);
-    // innerText, never textContent: the economic-management label ships as
-    // THREE spans (.rd-ap-mgmt-l long 334.5px / -s short "economic mgmt"
-    // 291.7px / -x xtra "econ mgmt" 263.3px sentence widths, 13px csub),
-    // the -sent container showing exactly one by lane width (LONG at/above
-    // 334.5px, SHORT down to 291.7px, XTRA below - the user calls
-    // 2026-10-03 "shorten to mgmt… and further to econ mgmt when it would
-    // otherwise spill"). textContent would concat all spellings and
-    // corrupt every grammar anchor below; innerText reads only the
-    // displayed rung, same as the issap ladder's shown() reads above
-    const txt = sent ? sent.innerText.trim().replace(/\s+/g, " ") : "";
-    // the mgmt ladder itself: any card carrying the three-span label shows
-    // EXACTLY ONE of them, and page3's 390px/350px-lane rung displays the
-    // LONG form (SHORT under 334.5px, XTRA under 291.7px - the 263.3px
-    // rung clears even the 320-shell 280px lane)
-    const mgmt = sent ? [...sent.querySelectorAll(".rd-ap-mgmt-l, .rd-ap-mgmt-s, .rd-ap-mgmt-x")] : [];
-    const mgmtOk = mgmt.length === 0 ||
-      (mgmt.length === 3 && sent.querySelectorAll(".rd-ap-mgmt-l").length === 1 &&
-       mgmt.filter(shown).length === 1 && shown(mgmt[0]) && /economic management/.test(txt));
-    // the "ranked" flourish (user call 2026-10-03: add "ranked" to the
-    // first label when it keeps the sentence on one line) is a per-card
-    // LIVE FIT: RdApRankSent measures the line with the word in and parks
-    // the span display:none when it would overflow, so sentence identity
-    // decides per width - at this 390px/350px-lane rung every NON-economy
-    // sentence carries it (SEC 271.2px, RedBridge 275px, Ipsos petrol
-    // 311.5px) and the economy sentence NEVER does (its LONG rung already
-    // fills 334.5px of the 350px lane; LONG+ranked is 374.9px)
-    const rk = sent ? [...sent.querySelectorAll(".rd-ap-rk")] : [];
-    const econSent = mgmt.length > 0;
-    const sentence = / 1st/.test(sent ? sent.innerText : "");
-    const rankedOk = (mgmt.length === 0 && rk.length === 0 && !sentence) ||
-      (sentence && rk.length === 1 &&
-       (econSent ? (!shown(rk[0]) && !/ ranked /i.test(txt)) : (shown(rk[0]) && / ranked 1st/.test(txt))));
-    const topFilled = !!sent && / 1st/.test(txt);
-    // the dictated placeholder on waves that ask cost-of-living ownership
-    // but rank no issues (Resolve, YouGov, DemosAU) - the displayed rung
-    // is the longest of the three literals that fits this card's lane
-    const unranked = RUNGS.includes(txt);
-    // user call 2026-10-03: sentence case - exactly ONE capital, the
-    // leading letter of the first label ("Cost of living 1st, housing
-    // 2nd, ..."); every other label stays lowercase
-    const capsOk = !sent || (/^[A-Z]/.test(txt) && !/[A-Z]/.test(txt.slice(1)));
-    // same-day follow-up: "; unprompted" belongs to the detail, never the
-    // row line - no card's sentence may carry it
-    const unp = /unprompted/i.test(txt);
-    const legacy = subs.some((d) => /\(\d+\)/.test(d.textContent)) || subs.some((d) => / top issue | then |Best on it/.test(d.textContent));
-    // a card shows exactly one csub when it has the sentence (one rung
-    // when it is the placeholder ladder), none when best-party-only
-    const csubSentOk = subs.length === (sent ? 1 : 0) && ladderOk;
-    // runners ride the same single line: ", housing 2nd, crime 3rd"
-    const runnerOk = !sent || (!/ 2nd/.test(txt) || /, [^,(]+ 2nd/.test(txt)) && (!/ 3rd/.test(txt) || /, [^,(]+ 3rd/.test(txt));
-    const noPair = !c.querySelector(".rd-ap-pairfig");
-    const chip = c.querySelector(".rd-ap-c1 .rd-ap-issfig");
-    const chipTxt = chip ? chip.textContent.trim().replace(/\s+/g, " ") : "";
-    // "ALP 29", or "rest 43" when the rest-of-field bucket leads (desktop
-    // rail prints the same verdict)
-    const chipOk = !!chip && /[A-Za-z]+ \d+/.test(chipTxt);
-    const bodyStrip = c.querySelector(":scope > .rd-ap-cpic");
-    const dots = bodyStrip ? bodyStrip.querySelectorAll(".rd-ap-dot").length : 0;
-    return { nxt: sent ? / 2nd/.test(txt) : false, runnerOk, topFilled, caps: capsOk, legacy, csubSentOk, mgmtOk, mgmtN: mgmt.length, rankedOk, rkN: rk.length, noPair, chip: chipOk, chipTxt, bodyStrip: !!bodyStrip, dots, subN: subs.length, txt, unranked, firm: (c.querySelector(".rd-ap-firm") || {}).textContent || "?" };
+  const off = [];
+  cards.forEach((c, i) => {
+    const m = c.querySelector(".rd-ap-imapc");
+    const cells = m ? [...m.children] : [];
+    if (cells.length !== 6) { off.push(i + ": " + cells.length + " cells"); return; }
+    const bars = cells.map((x) => x.querySelector(".rd-ap-ibar")).filter(Boolean).map((b) => b.getBoundingClientRect().top);
+    if (bars.length && Math.max(...bars) - Math.min(...bars) > 0.5) off.push(i + ": bars off one line by " + (Math.max(...bars) - Math.min(...bars)).toFixed(1));
+    cells.forEach((x, j) => {
+      const v = norm((x.querySelector("b") || {}).textContent || "");
+      if (!/^(—|Level|(ALP|L\/NP|ON|GRN) \+\d+)$/.test(v)) off.push(i + "/" + j + " " + v);
+    });
   });
-  const dotted = an.filter((a) => a.dots > 0);
-  return { an,
-    cardsN: an.length,
-    withTop: an.filter((a) => a.topFilled).length,
-    topMissing: an.filter((a) => !a.topFilled).length,
-    unranked: an.filter((a) => a.unranked).length,
-    unrankedFirms: [...new Set(an.filter((a) => a.unranked).map((a) => a.firm))].sort(),
-    withNxt: an.filter((a) => a.nxt).length,
-    unpLeft: an.filter((a) => a.unp).map((a) => a.firm + ": " + a.txt),
-    badNxt: an.filter((a) => !a.runnerOk || !a.csubSentOk || !a.caps).length,
-    // the "economic management" label ladder: cards carrying the span set
-    // and cards whose displayed-rung/identity contract holds
-    mgmtCards: an.filter((a) => a.mgmtN > 0).length,
-    mgmtGood: an.filter((a) => a.mgmtOk).length,
-    rankedCards: an.filter((a) => a.rkN > 0).length,
-    rankedBad: an.filter((a) => !a.rankedOk),
-    legacySubs: an.filter((a) => a.legacy).length,
-    withDots: dotted.length,
-    badDots: dotted.filter((a) => a.dots < 2 || a.dots > 4).length,
-    strayPairs: an.filter((a) => !a.noPair).length,
-    chipsMissing: dotted.filter((a) => !a.chip).length,
-    stripAdrift: an.filter((a) => a.dots > 0 && !a.bodyStrip).length,
-    loneStrips: an.filter((a) => a.dots === 0 && a.bodyStrip).length,
-    ipsos: cards.filter((c) => /Ipsos/.test(c.textContent)).length,
-  };
+  const hs = cards.map((c) => c.getBoundingClientRect().height);
+  const head = [...document.querySelectorAll(".rd-ap-phead .rd-ap-imaph > span")].map((h) => norm(h.textContent));
+  return { n: cards.length, off, hMin: Math.min(...hs), hMax: Math.max(...hs), head, want: window.ISS_MAP.map((id) => window.ISS_MAP_LAB[id]),
+    ipsos: cards.filter((c) => /Ipsos/.test(c.textContent)).length };
 });
-console.log("  diag bad-runners:", JSON.stringify(cardAnatomy.an.filter((a) => !a.runnerOk || !a.csubSentOk || !a.caps).map((a) => ({ f: a.firm, t: a.txt, n: a.subN }))));
-console.log("  diag bad-chips:", JSON.stringify(cardAnatomy.an.filter((a) => a.dots > 0 && !a.chip).map((a) => ({ f: a.firm, c: a.chipTxt }))));
-check("phone: the best issues read as ONE flowing sentence of superscript-ordinal rankings in sentence case (no figures)",
-  cardAnatomy.withTop > 0 && cardAnatomy.withNxt > 0 && cardAnatomy.badNxt === 0 && cardAnatomy.legacySubs === 0,
-  `${cardAnatomy.withTop}/${cardAnatomy.cardsN} with the sentence (${cardAnatomy.withNxt} with runners, ${cardAnatomy.topMissing} best-party-only); bad ${cardAnatomy.badNxt}; legacy subs ${cardAnatomy.legacySubs}`);
-check("phone: no card sentence carries '; unprompted' (rows dropped it; the detail keeps it)",
-  cardAnatomy.unpLeft.length === 0, cardAnatomy.unpLeft.join(" | ") || "none left");
-// exact placeholder count keyed off the page's own data bundle: every
-// iss-bearing wave with no salience/concerns ranking but col ownership
-// figures shows the dictated line, and no other card does
-check("phone: unranked waves (Resolve, YouGov, DemosAU) carry the dictated 'Issues unranked…' placeholder on the sentence line",
-  cardAnatomy.unranked === exp.unrankedCol && cardAnatomy.unranked > 0,
-  `${cardAnatomy.unranked}/${exp.unrankedCol} placeholder lines — on ${cardAnatomy.unrankedFirms.join(", ") || "nobody"}`);
-check("phone: the ownership dot strip spans the full width of the card body again",
-  cardAnatomy.withDots > 0 && cardAnatomy.badDots === 0 && cardAnatomy.stripAdrift === 0 && cardAnatomy.loneStrips === 0,
-  `${cardAnatomy.withDots}/${cardAnatomy.cardsN} cards dotted, ${cardAnatomy.badDots} malformed, ${cardAnatomy.stripAdrift} strips outside the body, ${cardAnatomy.loneStrips} strips without dots`);
-check("phone: the top-issue share is not reprinted beside the firm (the sentence already names it)",
-  cardAnatomy.strayPairs === 0, `${cardAnatomy.strayPairs} head-row pairfigs left`);
-check("phone: every ownership card names its best party as a head-row chip (the old body line)",
-  cardAnatomy.chipsMissing === 0 && cardAnatomy.withDots > 0,
-  `${cardAnatomy.chipsMissing} dotted cards without the chip`);
-// the economic-management label is a three-span ladder (.rd-ap-mgmt-l long,
-// -s short, -x extra "Econ mgmt"); the sentence container shows exactly ONE
-// by lane width (LONG at this 390px rung, SHORT under the measured 334.5px
-// break, XTRA under 291.7px) and cardAnatomy.txt reads the displayed rung
-// via innerText - a leak in either direction (two spans shown, none shown,
-// or textContent-style concatenation in a future regression) trips this pin
-check("phone: the economy label is exactly one displayed rung, LONG at 390px (the mgmt swap ladder)",
-  cardAnatomy.mgmtCards > 0 && cardAnatomy.mgmtGood === cardAnatomy.cardsN &&
-  cardAnatomy.an.filter((a) => a.mgmtN > 0 && !/economic management/.test(a.txt)).length === 0,
-  `${cardAnatomy.mgmtCards} mgmt ladders; good ${cardAnatomy.mgmtGood}/${cardAnatomy.cardsN}`);
-// the "ranked" flourish: RdApRankSent's per-card fit test parks .rd-ap-rk
-// inline when a wave's sentence would wrap. At 390px the lane fits every
-// sentence with the word EXCEPT the economy label's (374.9px ranked vs a
-// 350px lane), so non-economy sentences read "… ranked 1st" and the
-// economy one never does
-check("phone: 'ranked' rides the sentences it fits (econ sentence never at any shell)",
-  cardAnatomy.rankedBad.length === 0 && cardAnatomy.rankedCards > 0,
-  `${cardAnatomy.rankedCards} cards carry the flourish; ${cardAnatomy.rankedBad.length} off-contract`);
-if (cardAnatomy.rankedBad.length) console.log("  diag ranked:", JSON.stringify(cardAnatomy.rankedBad.map((a) => ({ f: a.firm, t: a.txt }))));
+check("phone: every card reads the six verdicts in one line, bars level",
+  cardAnatomy.n > 0 && cardAnatomy.off.length === 0, `${cardAnatomy.n} cards; ${cardAnatomy.off.slice(0, 4).join(" | ") || "clean"}`);
+check("phone: the pinned head names the six issues over the cards' columns",
+  JSON.stringify(cardAnatomy.head) === JSON.stringify(cardAnatomy.want), cardAnatomy.head.join(" | "));
+check("phone: cards stand at the facets' 122px", Math.abs(cardAnatomy.hMin - 122) < 0.6 && Math.abs(cardAnatomy.hMax - 122) < 0.6,
+  `${cardAnatomy.hMin.toFixed(1)}–${cardAnatomy.hMax.toFixed(1)}px`);
 check("phone: the Ipsos cards are there", cardAnatomy.ipsos === exp.issOnly, `${cardAnatomy.ipsos}/${exp.issOnly}`);
 
 const ipPhone = await openRowContaining(page3, /^Ipsos/);
-check("phone: an opened Ipsos card stacks to one column with the salience grid",
-  !!ipPhone && ipPhone.issRows >= 5 && /Asked/.test(ipPhone.rail) && !/Labor’s/.test(ipPhone.rail),
-  ipPhone ? `${ipPhone.issRows} iss rows` : "no detail");
-// The phone pinned head carries the full-width tick ladder again: every
-// card's strip now spans the whole row width on the same 0-45 scale, so
-// the ladder aligns with all of them.
-const phoneHead = await page3.evaluate(() => {
-  const ph = document.querySelector(".rd-ap-phead");
-  if (!ph) return { cap: "", ticks: 0 };
-  return { cap: (ph.querySelector(".rd-ap-cap") || {}).textContent || "", ticks: ph.querySelectorAll(".rd-ap-tk").length };
-});
-check("phone: the pinned head carries the issues caption and the restored tick ladder",
-  phoneHead.cap === "Best on the top issue" && phoneHead.ticks === 5,
-  JSON.stringify(phoneHead));
+check("phone: an opened Ipsos card leads with its issue table, the rail beneath",
+  !!ipPhone && !!ipPhone.tbl && ipPhone.tbl.rows.length >= 5 && /Asked/.test(ipPhone.rail) && !/Labor’s/.test(ipPhone.rail),
+  ipPhone && ipPhone.tbl ? `${ipPhone.tbl.rows.length} issues` : "no table");
+
+// 9: the narrowest phone - a table of six figures (Ranked, four parties,
+// Unsure: RedBridge, Ipsos) gives each issue's name a line of its own, and no
+// cell of any opened table spills its column
+console.log("== phone rung (320px) ==");
+const page4 = await browser.newPage();
+await page4.setViewport({ width: 320, height: 900, isMobile: true, hasTouch: true });
+const errs4 = [];
+page4.on("pageerror", (e) => errs4.push(String(e)));
+await page4.goto(`${PAGE}?f=i#allpolls`, { waitUntil: "load" });
+await page4.waitForSelector(".rd-ap-card", { timeout: 30000 });
+await new Promise((r) => setTimeout(r, 900));
+const fit320 = [];
+for (const who of ["RedBridge", "Ipsos", "Resolve", "SEC Newgate", "YouGov", "DemosAU"]) {
+  const d = await openRowContaining(page4, new RegExp("^" + who));
+  if (!d) { fit320.push({ who, err: "no row" }); continue; }
+  fit320.push(Object.assign({ who }, await page4.evaluate(() => {
+    const t = document.querySelector(".rd-ap-open .rd-apd-dem[class*=isn]");
+    if (!t) return { err: "no table" };
+    const rows = [...t.querySelectorAll(".rd-apd-isr")];
+    const spill = rows.flatMap((r) => [...r.children].filter((c) => c.scrollWidth > c.clientWidth + 1).map((c) => c.textContent.slice(0, 14)));
+    const first = rows.find((r) => !r.classList.contains("rd-apd-demh")).children[0];
+    return { n: +t.className.match(/isn(\d)/)[1], twoLine: getComputedStyle(first).gridColumnEnd === "-1", spill, docW: document.documentElement.scrollWidth };
+  })));
+  await openRowContaining(page4, new RegExp("^" + who)); // fold it again
+}
+check("320px: no opened issue table spills a cell or the page",
+  fit320.every((f) => !f.err && f.spill.length === 0 && f.docW <= 320),
+  fit320.map((f) => f.err ? `${f.who} ${f.err}` : `${f.who} n${f.n}${f.twoLine ? " two-line" : ""}${f.spill.length ? " SPILL " + f.spill.join("/") : ""}${f.docW > 320 ? " doc " + f.docW : ""}`).join(" · "));
+check("320px: six-figure tables put each issue's name on a line of its own; four or fewer keep one line",
+  fit320.every((f) => f.err || (f.n >= 5 ? f.twoLine : !f.twoLine)),
+  fit320.filter((f) => !f.err).map((f) => `${f.who} n${f.n} ${f.twoLine ? "two" : "one"}`).join(" · "));
+check("no page errors on the 320px rung", errs4.length === 0, errs4[0] || "");
+await page4.close();
 check("no page errors on the phone rung", errs3.length === 0, errs3[0] || "");
 await page3.close();
 
 await browser.close();
+server.close();
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

@@ -2167,7 +2167,8 @@ body.rd .rd-ap-c2pp { grid-template-columns: 200px 120px 76px 28px 150px minmax(
 body.rd .rd-ap-cprim { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax(0, 380px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
-body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(120px, 176px) minmax(104px, 136px) minmax(104px, 136px) minmax(168px, 336px) 72px 40px; }
+/* issues: the six issue cells take the row (who leads on what, 2026-10-04) */
+body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 1fr) 0 40px; }
 /* demographics: the Primary facet's tracks, gaps for primaries */
 body.rd .rd-ap-cdem { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint);
@@ -2305,7 +2306,6 @@ body.rd .rd-ap-hnets { align-self: end; }
 body.rd .rd-ap-netcell { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; padding-right: 4px; }
 body.rd .rd-ap-dnum { display: flex; flex-direction: column; gap: 1px; font-size: 15px; color: var(--ink-2); }
 body.rd .rd-ap-dnum b { font-weight: 600; }
-body.rd .rd-ap-issbest > b { font-size: 15px; font-weight: 600; }
 body.rd .rd-ap-dbar { position: absolute; left: 14px; right: 14px; top: 50%; height: 16px; margin-top: -8px; display: flex; }
 body.rd .rd-ap-dbar i { display: block; flex-basis: 0; min-width: 0; }
 /* the separators frame the unsure strip and only that strip – a reading
@@ -2316,7 +2316,15 @@ body.rd .rd-ap-dbar i:last-child { border-radius: 0 2px 2px 0; }
 body.rd .rd-ap-dbar i.u { background: var(--line); }
 /* the issues facet's figure cells must truncate a long issue label rather
    than push their column */
-body.rd .rd-ap-ciss .rd-ap-dnum > .rd-ap-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* the issues map: six cells of a verdict over its share bar */
+body.rd .rd-ap-imap { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); column-gap: 14px; align-items: center; min-width: 0; padding-right: 8px; }
+body.rd .rd-ap-imap.rd-ap-hpn { align-items: end; }
+body.rd .rd-ap-imap.rd-ap-hpn > .rd-ap-th { hyphens: manual; }
+body.rd .rd-ap-icell { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+body.rd .rd-ap-icell > b { font-size: 14px; font-weight: 600; color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* the four parties' printed shares end to end, the rest left on the track */
+body.rd .rd-ap-ibar { display: flex; height: 6px; width: 100%; border-radius: 3px; overflow: hidden; background: var(--line-2); }
+body.rd .rd-ap-ibar > i { display: block; height: 100%; flex: none; }
 /* the demographics facet: five gaps over the pair they were taken across */
 body.rd .rd-ap-dgap { gap: 2px; }
 body.rd .rd-ap-dgap .rd-ap-pnums > b { font-variant-numeric: tabular-nums; }
@@ -2355,6 +2363,7 @@ body.rd .rd-ap-keywh { position: relative; display: inline-block; width: 34px; h
 body.rd .rd-ap-keywh::before { content: ""; position: absolute; left: 2px; right: 2px; top: 5px; height: 2px; border-radius: 1px; background: var(--rd-whisker); }
 body.rd .rd-ap-keywh i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ink-3); }
 body.rd .rd-ap-keyavg { display: inline-block; width: 1.5px; height: 16px; margin: 0 3px; background: var(--rd-avgline); }
+body.rd .rd-ap-keybar { width: 40px; flex: none; vertical-align: middle; }
 body.rd .rd-ap-keyring { display: inline-block; width: 9px; height: 9px; box-sizing: border-box; border-radius: 50%; border: 1.75px solid var(--ink-3); }
 body.rd .rd-ap ~ .rd-sec .view-how, body.rd .rd-ap .view-how { margin-top: 10px; }
 
@@ -2443,6 +2452,15 @@ body.rd .rd-apd-dv { color: var(--ink-2); }
 body.rd .rd-apd-dv.hi { color: var(--ink); font-weight: 600; background: color-mix(in oklab, var(--ink) 7%, transparent); border-radius: 3px; }
 body.rd .rd-apd-dv.lo { color: var(--ink-faint); }
 body.rd .rd-apd-demwrap .rd-apd-note { margin-top: 8px; }
+/* the issues facet's opened poll: its issue table on the rules above, its
+   own columns (Ranked, four parties, Unsure) set after .rd-apd-demr's */
+body.rd .rd-apd-demcols.one { grid-template-columns: minmax(0, 560px); }
+body.rd .rd-apd-demcols.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+body.rd .rd-apd-dem { --isr-rk: 72px; --isr-p: 44px; --isr-u: 56px; }
+body.rd .rd-apd-demr.rd-apd-isr { grid-template-columns: var(--isr-cols); }
+body.rd .rd-apd-isr.rk > span:nth-child(2) { color: var(--ink-3); }
+body.rd .rd-apd-isr > span:first-child { white-space: normal; overflow: visible; }
+body.rd .rd-apd-dv.lead { background: color-mix(in oklab, var(--lead) 20%, transparent); color: var(--ink); font-weight: 600; border-radius: 3px; }
 
 /* a laptop's narrower column: shorter words over the scale */
 @media (max-width: 1240px) {
@@ -2450,10 +2468,8 @@ body.rd .rd-apd-demwrap .rd-apd-note { margin-top: 8px; }
   body.rd .rd-ap-cprim { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-clead { grid-template-columns: 170px 110px 70px 16px 176px minmax(0, 380px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
-  body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(108px, 148px) minmax(96px, 116px) 0 minmax(160px, 300px) 72px 32px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 1fr) 0 32px; }
   body.rd .rd-ap-cdem { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
-  /* the issues facet drops its 3rd-issue column here; the opened poll carries it */
-  body.rd .rd-ap-hrow.rd-ap-ciss > :nth-child(7), body.rd .rd-ap-row.rd-ap-ciss > :nth-child(7) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-long { display: none; }
 }
 body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
@@ -2464,10 +2480,13 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
-  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px 120px 0 0 minmax(150px, 1fr) 72px 28px; }
+  body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 1fr) 0 28px; }
+  body.rd .rd-ap-imap { column-gap: 8px; padding-right: 4px; }
+  body.rd .rd-ap-icell > b { font-size: 13px; }
+  body.rd .rd-ap-imap.rd-ap-hpn > .rd-ap-th { font-size: 11px; letter-spacing: 0.03em; }
+  body.rd .rd-apd-demcols.two { grid-template-columns: minmax(0, 1fr); }
+  body.rd .rd-apd-demcols.two > .rd-apd-dem + .rd-apd-dem > .rd-apd-demh { display: none; }
   body.rd .rd-ap-cdem { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
-  /* …and its 2nd-issue column too at these widths */
-  body.rd .rd-ap-hrow.rd-ap-ciss > :nth-child(6), body.rd .rd-ap-row.rd-ap-ciss > :nth-child(6) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-n, body.rd .rd-ap-hrow > .rd-ap-th:nth-child(3) { visibility: hidden; overflow: hidden; }
   body.rd .rd-ap-c2pp .rd-ap-mlab { grid-column: 1 / span 5; }
   body.rd .rd-ap-c2pp .rd-ap-mavg { grid-column: 6; justify-self: center; }
@@ -2552,50 +2571,18 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-card .rd-ap-cprim b { font-size: 15px; font-weight: 600; }
   body.rd .rd-ap-dpair { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
   body.rd .rd-apd-demr { grid-template-columns: minmax(0, 1fr) repeat(5, 40px); padding: 3px 2px; }
+  body.rd .rd-apd-dem { --isr-rk: 58px; --isr-p: 36px; --isr-u: 52px; }
+  /* the issues card: six verdicts over their bars in one line, the issue
+     names pinned above them in the phone head (Immigration hyphenates so
+     six columns fit a 320px phone's 280px lane) */
+  body.rd .rd-ap-imapc, body.rd .rd-ap-imaph { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); column-gap: 4px; }
+  body.rd .rd-ap-imapc { margin-top: 8px; }
+  body.rd .rd-ap-imapc > span { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  body.rd .rd-ap-imapc b { display: flex; flex-direction: column; font-size: 13px; line-height: 15px; min-height: 30px; font-weight: 600; color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  body.rd .rd-ap-imapc .rd-ap-ibar { width: 88%; height: 5px; }
+  body.rd .rd-ap-imaph { align-items: end; hyphens: manual; }
+  body.rd .rd-ap-imaph > span { font-size: 11px; font-weight: 600; line-height: 13px; letter-spacing: 0.02em; color: var(--ink-3); }
   body.rd .rd-ap-cnets, body.rd .rd-ap-csub { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); }
-  /* the issues top-issue sentence must flow as ONE inline run and wrap
-     per-word - under the flex rule above every JSX fragment would become
-     a gap-joined flex item and the sentence would break item-by-item.
-     It is ALSO a query container so the economic-management label can
-     swap to "economic mgmt" against the lane width (next block) */
-  body.rd .rd-ap-csub-sent { display: block; container-type: inline-size; }
-  /* "economic management" is the ranked sentence's one spiller - the
-     Ipsos "Cost of living 1st, housing 2nd, economic management 3rd"
-     card was the only ranked card to wrap two lines. User calls
-     2026-10-03: shorten to "economic mgmt" when it would otherwise
-     spill, and further to "econ mgmt" when THAT would. Measured 13px
-     csub: sentence LONG 334.5px / SHORT 291.7px / XTRA 263.3px
-     against lanes 280@320vp / 300@340 / 320@360 / 350@390 /
-     361.8@402, so below 334.5 the short form renders and below
-     291.7 the "econ mgmt" rung - 263.3px clears the 320-shell 280px
-     lane by 16.7px, putting EVERY phone rung back on one line */
-  body.rd .rd-ap-mgmt-s, body.rd .rd-ap-mgmt-x { display: none; }
-  @container (max-width: 334.5px) {
-    body.rd .rd-ap-mgmt-l { display: none; }
-    body.rd .rd-ap-mgmt-s { display: inline; }
-  }
-  @container (max-width: 291.7px) {
-    body.rd .rd-ap-mgmt-s { display: none; }
-    body.rd .rd-ap-mgmt-x { display: inline; }
-  }
-  /* the unranked-but-col placeholder is a three-rung WIDTH LADDER, not one
-     string: .rd-ap-issph is the query container and shows the longest of
-     the dictated wordings that fits the card's text lane on ONE line
-     (measured 2026-10-03, 13px/400, after the performance->trust swap:
-     full 304.1px / mid 290.5px / ask 271.1px against lanes 280@320vp /
-     300@340 / 320@360 / 350@390 / 361.8@402 - every shell 320px and up
-     now holds its rung on one line; the trust wording is what cleared
-     the old 320/340px wraps) */
-  body.rd .rd-ap-issph { container-type: inline-size; }
-  body.rd .rd-ap-issph-mid, body.rd .rd-ap-issph-ask { display: none; }
-  @container (max-width: 304.1px) {
-    body.rd .rd-ap-issph-full { display: none; }
-    body.rd .rd-ap-issph-mid { display: block; }
-  }
-  @container (max-width: 290.5px) {
-    body.rd .rd-ap-issph-mid { display: none; }
-    body.rd .rd-ap-issph-ask { display: block; }
-  }
   body.rd .rd-ap-cnets .rd-ap-nets { grid-template-columns: repeat(3, auto); column-gap: 12px; }
   body.rd .rd-ap-cnets .rd-ap-nets > b { font-size: 14px; }
   body.rd .rd-ap-csub b { font-weight: 600; }
@@ -2612,6 +2599,29 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-more { gap: 14px; }
   body.rd .rd-ap-shown { font-size: 12px; }
 }
+/* a narrow phone can't seat an issue's name beside five or six figures: the
+   name takes a line of its own and the figures share the line beneath it,
+   still under their column heads. Six figures are always Ranked, the four
+   parties and Unsure, so the two worded heads get a little more room */
+@media (max-width: 419px) {
+  body.rd .rd-apd-dem.isn6 > .rd-apd-demr.rd-apd-isr { grid-template-columns: minmax(0, 1.4fr) repeat(4, minmax(0, 1fr)) minmax(0, 1.15fr); padding: 5px 2px; }
+  body.rd .rd-apd-dem.isn6 > .rd-apd-isr > span:first-child { grid-column: 1 / -1; color: var(--ink); }
+  body.rd .rd-apd-dem.isn6 > .rd-apd-isr.rd-apd-demh > span:first-child { display: none; }
+  body.rd .rd-apd-dem.isn6 > .rd-apd-isr > span:not(:first-child) { padding-right: 2px; }
+  body.rd .rd-apd-dem.isn6 > .rd-apd-isr.rk > span:nth-child(2) { white-space: nowrap; }
+  body.rd .rd-apd-dem.isn6 > .rd-apd-isr.rd-apd-demh { letter-spacing: 0.01em; }
+  body.rd .rd-apd-dem.isn6 > .rd-apd-isr:not(.rd-apd-demh) + .rd-apd-isr { border-top: 1px solid var(--line-2); }
+}
+@media (max-width: 379px) {
+  body.rd .rd-apd-dem.isn5 > .rd-apd-demr.rd-apd-isr { grid-template-columns: repeat(var(--isr-n), minmax(0, 1fr)); padding: 5px 2px; }
+  body.rd .rd-apd-dem.isn5 > .rd-apd-isr > span:first-child { grid-column: 1 / -1; color: var(--ink); }
+  body.rd .rd-apd-dem.isn5 > .rd-apd-isr.rd-apd-demh > span:first-child { display: none; }
+  body.rd .rd-apd-dem.isn5 > .rd-apd-isr > span:not(:first-child) { padding-right: 2px; }
+  body.rd .rd-apd-dem.isn5 > .rd-apd-isr.rk > span:nth-child(2) { white-space: nowrap; }
+  body.rd .rd-apd-dem.isn5 > .rd-apd-isr.rd-apd-demh { letter-spacing: 0.01em; }
+  body.rd .rd-apd-dem.isn5 > .rd-apd-isr:not(.rd-apd-demh) + .rd-apd-isr { border-top: 1px solid var(--line-2); }
+}
+
 
 /* the six facet tabs - Direction the long one, Groups the demographics
    tab's phone name - outgrow the phone shell at their menu size. Step the
