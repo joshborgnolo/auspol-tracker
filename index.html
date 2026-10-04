@@ -1439,7 +1439,8 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   font-size: 13px; position: sticky; top: 39px; z-index: 3; background: var(--bg);
   padding: 12px 0 10px; box-shadow: 0 1px 0 var(--line-2); }
 @media (max-width: 640px) {
-  .info-index { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; white-space: nowrap; }
+  .info-index { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
+    overflow-y: clip; scrollbar-width: none; white-space: nowrap; }
   .info-index::-webkit-scrollbar { display: none; }
 }
 .info-index button { background: none; border: 0; padding: 0; cursor: pointer;
@@ -5184,7 +5185,7 @@ body.rd .info-h#info-about { padding-top: 0; border-top: 0; }
 body.rd .info-h-faq { margin-top: 44px; }
 body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 600; letter-spacing: -0.005em; }
 @media (max-width: 640px) {
-  body.rd .info-index { top: 43px; }
+  body.rd .info-index { top: 43px; padding: 14px 0; }
   body.rd .info-h { font-size: 19px; }
   body.rd .info-index::after {
     content: ""; position: sticky; right: 0; flex: 0 0 28px; margin-left: -28px; align-self: stretch;

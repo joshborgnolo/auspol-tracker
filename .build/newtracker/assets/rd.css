@@ -2842,7 +2842,13 @@ body.rd .info-h#info-about { padding-top: 0; border-top: 0; }
 body.rd .info-h-faq { margin-top: 44px; }
 body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 600; letter-spacing: -0.005em; }
 @media (max-width: 640px) {
-  body.rd .info-index { top: 43px; }
+  /* pad so the buttons' 44px ::after hit areas ((44-19)/2 = 12.5px of
+     vertical reach each side) fit the row's box: overflow-x:auto computes
+     overflow-y to auto and any protrusion becomes scroll height, which
+     lets a thumb wobble the pinned row. Locking overflow-y stops the pan
+     but leaves 2px of scrollable slack; containing the targets kills the
+     slack itself (the base template rule carries the overflow-y lock) */
+  body.rd .info-index { top: 43px; padding: 14px 0; }
   body.rd .info-h { font-size: 19px; }
   /* a phone's index scrolls sideways; a fade at its right edge says so, as
      All polls' pinned links do. A sticky end cap rather than a mask: the

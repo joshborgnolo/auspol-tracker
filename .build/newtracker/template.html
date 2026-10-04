@@ -2253,7 +2253,13 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   font-size: 13px; position: sticky; top: 39px; z-index: 3; background: var(--bg);
   padding: 12px 0 10px; box-shadow: 0 1px 0 var(--line-2); }
 @media (max-width: 640px) {
-  .info-index { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; white-space: nowrap; }
+  /* overflow-x:auto computes overflow-y to auto too, and the buttons' 44px
+     ::after hit areas then give the row vertical scroll height - a thumb
+     drags the pinned index up and down. hidden kills the scroll; clip
+     stands beside overflow-x:auto. Using the targets' 44px reach as row
+     padding lives in rd.css's body.rd phone block (it wins specificity) */
+  .info-index { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
+    overflow-y: clip; scrollbar-width: none; white-space: nowrap; }
   .info-index::-webkit-scrollbar { display: none; }
 }
 .info-index button { background: none; border: 0; padding: 0; cursor: pointer;
