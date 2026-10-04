@@ -1030,7 +1030,7 @@ function RdLeadership({ rangeId }) {
           </>)}
       </div>
       <RdFoot how={{ term: "leadership", from: "Leadership" }}>
-        Figures pool the last six weeks of polls. Changes are on the previous period; ▼ in bold marks a significant change.
+        Albanese’s and Taylor’s approval pool the last three weeks of polls; the other figures, the last six. Changes are on a month ago; ▼ in bold marks a significant change.
       </RdFoot>
     </RdSec>
   );
