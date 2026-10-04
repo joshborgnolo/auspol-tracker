@@ -21,6 +21,15 @@
 		     05:00); sweep on Wednesday after release, again at midday and
 		     evening, then Thursday and Saturday morning catch-ups. Off-week
 		     runs are cheap no-ops (extractor prints changed:false) -->
+		<!-- +5, +10, +20 and +40 min after the 05:00 release (2026-10-05, the
+		     same steps as the Newspoll and RedBridge release nights): only this
+		     laptop reads the News24 article (Chrome); CI's release-window
+		     sweeps can file only what Wikipedia has, so these are the slots
+		     that land the full wave (leaders, PPM, ON 2PP) -->
+		<dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>5</integer><key>Minute</key><integer>5</integer></dict>
+		<dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>5</integer><key>Minute</key><integer>10</integer></dict>
+		<dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>5</integer><key>Minute</key><integer>20</integer></dict>
+		<dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>5</integer><key>Minute</key><integer>40</integer></dict>
 		<dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>6</integer></dict>
 		<dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>12</integer></dict>
 		<dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>19</integer></dict>
