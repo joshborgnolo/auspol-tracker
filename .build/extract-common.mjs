@@ -45,6 +45,45 @@ export async function fetchText(url,
   throw lastErr;
 }
 
+// fetchText's sibling for sites that gate pages behind a cookie-check
+// redirect: news24.com.au's Akamai front answers a cookieless request with
+// a 302 to /remote/check_cookie.html that sets a cookie and redirects back,
+// and fetch() drops Set-Cookie between hops, so the check never passes
+// (plain fetch ended on a 404 "Nocookies" page). A browser keeps the cookie;
+// this does the same with a per-call jar and manual redirects. No login, no
+// paywall: the articles are free to read in any browser.
+export async function fetchWithCookies(url,
+  { tries = FETCH_TRIES, timeoutMs = FETCH_TIMEOUT_MS, ua = BROWSER_UA, maxHops = 8 } = {}) {
+  let lastErr;
+  for (let i = 1; i <= tries; i++) {
+    try {
+      const jar = new Map();
+      let cur = url;
+      for (let hop = 0; ; hop++) {
+        if (hop > maxHops) throw new Error(`more than ${maxHops} redirects from ${url}`);
+        const cookie = [...jar].map(([k, v]) => `${k}=${v}`).join("; ");
+        const res = await fetch(cur, {
+          headers: { "user-agent": ua, accept: "text/html,application/xhtml+xml,*/*;q=0.8", "accept-language": "en-AU,en;q=0.9",
+            ...(cookie ? { cookie } : {}) },
+          redirect: "manual", signal: AbortSignal.timeout(timeoutMs),
+        });
+        for (const sc of res.headers.getSetCookie?.() ?? []) {
+          const kv = sc.split(";")[0], eq = kv.indexOf("=");
+          if (eq > 0) jar.set(kv.slice(0, eq).trim(), kv.slice(eq + 1).trim());
+        }
+        const loc = res.headers.get("location");
+        if (res.status >= 300 && res.status < 400 && loc) { cur = new URL(loc, cur).href; continue; }
+        if (!res.ok) { const e = new Error(`HTTP ${res.status}`); e.status = res.status; throw e; }
+        return { url: cur, text: await res.text() };
+      }
+    } catch (err) {
+      lastErr = err;
+      if (i < tries) await new Promise((r) => setTimeout(r, 1500 * i));
+    }
+  }
+  throw lastErr;
+}
+
 // Month names → 0-indexed month number (full and abbreviation forms, plus
 // the "sept" Australians actually write).
 export const MONTHS = { january: 0, jan: 0, february: 1, feb: 1, march: 2, mar: 2, april: 3, apr: 3,

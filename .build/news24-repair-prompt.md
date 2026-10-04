@@ -17,11 +17,19 @@ gate (forbidden-path blocklist, syntax checks, validate.mjs) and pushes
   federal polling table (`parseWikiYouGov` — pinned by
   `.build/test-news24-wiki.mjs` for BOTH table layouts; since Sep 2026 the
   fieldwork cell is a rowspan data cell and IND+OTH share one "Others" cell
-  split by an {{efn}} footnote). Under GitHub Actions the wrapper
-  (`.build/news24-updater.sh`) leaves NEWSIE_CHROME unset — there is no user
-  Chrome on a runner — so News24-only waves land as VI rows with
-  `published` empty, upgraded later by the laptop's launchd run. Prints a
-  final `N24_STATUS {...}` line; exit 0 ok, 1 fetch/parse, 2 guard.
+  split by an {{efn}} footnote). Second discovery source (2026-10-05): News24's
+  own Pulse topic page (`PULSE_TOPIC`, newest 6 uncited stories a run),
+  which lists a release before Wikipedia does. news24.com.au is READABLE WITHOUT CHROME: its Akamai
+  "wall" is a cookie check (302 to /remote/check_cookie.html, which sets a
+  cookie and bounces back), and `fetchWithCookies` in extract-common.mjs
+  passes it — so a runner reads the article and its six Infogram embed ids
+  itself; the user's Chrome (NEWSIE_CHROME, laptop only) is the fallback. A
+  plain fetch()/curl without a cookie jar still ends on the 404
+  "Nocookies" page — that is not evidence the site is down. A wave whose
+  article states no sample files with `samplePending: true`;
+  extract-sampleeff.mjs fills n from YouGov's APC methodology statement (the
+  authority for YouGov samples) — never fill it from Wikipedia or prose.
+  Prints a final `N24_STATUS {...}` line; exit 0 ok, 1 fetch/parse, 2 guard.
 - Cached provenance under `.build/news24-src/` (committed). Row shapes
   mirror existing canon YouGov rows in `data/polls.json`.
 - `N24_LIB=1` imports the parsers without running the extraction;

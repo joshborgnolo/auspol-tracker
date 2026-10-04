@@ -42,9 +42,10 @@
 // charts+prose lack, and every cross-source disagreement >0.5pp is logged to
 // problems, never silently swapped. The horserace time-series chart is
 // corroboration-only (proven Σ=94/102 columns, Σ-guarded). The article DOM
-// itself needs Chrome (Akamai cookie wall serves anonymous fetches a 404);
-// fetchNews24Article tries anonymous first so Chrome drops out the day the
-// wall drops. status.news24 gains `sources` (which leg served each DOM) and
+// sits behind Akamai's cookie check — a 302 to check_cookie.html that sets a
+// cookie and bounces back — which fetchWithCookies passes like a browser
+// does, so CI reads News24 too (2026-10-05); the logged-in Chrome is the
+// fallback. status.news24 gains `sources` (which leg served each DOM) and
 // `infogram` (per-wave ids/kinds/problems); provenance files carry the
 // parsed Infogram record so rows re-derive without re-fetching.
 //
@@ -54,13 +55,16 @@
 // han:null,extra:null}; approval {date,firm,alb,opp,oppName,han:null,
 // detail{alb:{app,dis},opp:{app,dis}}}.
 //
-// Fallback source: NEWSIE_CHROME=1 reads news24.com.au through the user's
-// logged-in Chrome (.build/chrome-article.mjs) for waves YouGov never
-// self-releases. The Wikipedia poll table supplies the News24 candidate URLs
-// plus independents/others, which News24 prose omits. News24 supplies prose
-// leadership metrics, published time and Coalition/One Nation preference
-// pairs; either failure degrades to the older Wikipedia-only path, not exit 1.
-// Chrome is manual-only because macOS Automation consent is a GUI prompt.
+// Fallback source: news24.com.au for waves YouGov never self-releases, read
+// by a cookie-keeping fetch (or NEWSIE_CHROME=1's logged-in Chrome). Waves
+// are discovered two ways: the Wikipedia poll table (candidate URLs plus a
+// rounded sample) and News24's own Pulse topic page (PULSE_TOPIC), which
+// lists a release before Wikipedia does. A Pulse-found wave takes its
+// figures from the article's Infogram embeds and, when the article states no
+// sample, files with samplePending until extract-sampleeff.mjs fills n from
+// YouGov's APC methodology statement — the authority for YouGov samples.
+// News24 supplies published time; any failure degrades to the
+// Wikipedia-only path, not exit 1.
 // Fallback rows can now also populate `altTpp` and `ppmHeadToHead` when the
 // News24 article names them. At most 4 fallback waves per run; more trips the
 // safety guard.
@@ -91,7 +95,7 @@
 //     N24_IG_DIR reads Infogram embeds from ig-<id>.html fixture captures
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { fetchText, MONTHS, clean, writeAtomic } from "./extract-common.mjs";
+import { fetchText, fetchWithCookies, MONTHS, clean, writeAtomic } from "./extract-common.mjs";
 import { IG_EMBED } from "./infogram.mjs";
 import { n24IdsOf, n24InfogramFetch, n24Figures, n24Corroborate } from "./news24-infogram.mjs";
 import { melbourneMinute } from "./melbourne-time.mjs";
@@ -120,6 +124,13 @@ const WIKI_FILE = process.env.N24_WIKI_FILE ?? null;
 const WIKI_DEBUG = !!process.env.N24_WIKI_DEBUG;
 const MAX_WIKI_ADDS = 4; // fortnightly series: >4 new fallback waves in one run = upstream layout shift
 const NEWS24_FILE = process.env.N24_NEWS24_FILE ?? null;
+// News24's own Pulse topic page lists each release the morning it lands —
+// usually before Wikipedia does — so it is a second discovery source beside
+// the Wikipedia table (2026-10-05). The newest PULSE_MAX stories not already
+// cited by a YouGov row are read each run (~1s each; no ledger, so a run
+// leaves nothing behind to dirty the runner clone).
+const PULSE_TOPIC = "https://www.news24.com.au/topics/news24-pulse";
+const PULSE_MAX = 6;
 
 // Candidate-title pre-screen (cheap; the methodology sentence is the gate).
 const TITLE_HIT = /yougov public data poll|primary vote|albanese|coalition|one nation|\blabor\b/i;
@@ -158,21 +169,64 @@ function fetchNews24Chrome(url) {
 // ----------------------------------------------------- News24 Infogram rung
 // (spec: .build/newspoll-infogram-rung.md) Each News24 Pulse article embeds
 // six static Infogram projects (`_/` ids, fresh per wave); the embeds fetch
-// anonymously. The ARTICLE DOM is not anonymous today: Akamai's cookie wall
-// serves a 404 "Nocookies" page to plain fetch. The chain below tries
-// anonymous first so the day the wall drops, Chrome drops out too.
+// anonymously. The ARTICLE DOM sits behind Akamai's cookie check, which a
+// cookie-keeping fetch passes (fetchWithCookies); the logged-in Chrome is
+// the fallback should the check ever demand more than a cookie.
 const IG_DIR = process.env.N24_IG_DIR ?? null; // test hook: dir of ig-<id>.html captures
+const igCache = new Map();
 async function fetchIgEmbed(id) {
   if (IG_DIR) return readFileSync(`${IG_DIR}/ig-${id.replace("_/", "")}.html`, "utf8");
-  return (await fetchText(IG_EMBED(id))).text;
+  if (!igCache.has(id)) igCache.set(id, (await fetchText(IG_EMBED(id))).text);
+  return igCache.get(id);
+}
+
+// Waves News24 has released that neither Wikipedia nor polls.json has yet:
+// each fresh Pulse story is read (cookie fetch), and one whose Infogram
+// embeds carry the voting-intention crosstab and a fieldwork window becomes
+// a wave record shaped like a Wikipedia one (figures from the embeds — the
+// same ones the Wikipedia path's enrichment overlays — sample from prose if
+// stated, else null until Wikipedia lists it). Spin-off stories can embed
+// the same wave's charts, so one wave per window: the earliest published.
+const storyId = (u) => (String(u ?? "").match(/news-story\/([0-9a-f]{32})/) || [])[1] ?? null;
+async function pulseWaves(D, wikiWaves, notes) {
+  if (process.env.N24_PULSE === "0" || WIKI_FILE || NEWS24_FILE || IG_DIR) return []; // test runs stay offline
+  const yg = D.polls.filter((p) => p.pollster === "YouGov");
+  const known = new Set([...yg.map((p) => p.url), ...wikiWaves.map((w) => w.url)].map(storyId).filter(Boolean));
+  const knownDates = new Set([...yg.map((p) => p.date), ...wikiWaves.map((w) => w.date)]);
+  let html;
+  try { html = (await fetchWithCookies(PULSE_TOPIC)).text; }
+  catch (e) { notes.push(`Pulse topic page unavailable (${e.message})`); return []; }
+  const urls = [...new Set([...html.matchAll(/href="((?:https:\/\/www\.news24\.com\.au)?\/[a-z0-9\/-]+\/news-story\/[0-9a-f]{32})"/g)]
+    .map((m) => new URL(m[1], "https://www.news24.com.au").href))];
+  const fresh = urls.filter((u) => !known.has(storyId(u))).slice(0, PULSE_MAX);
+  const byDate = new Map();
+  for (const url of fresh) {
+    const id = storyId(url);
+    const art = await fetchNews24Article(url);
+    if (!art.html) { notes.push(`Pulse story ${id.slice(0, 8)}: unreadable`); continue; }
+    const parsed = parseNews24Article(art.html, url);
+    if (!parsed) continue; // not the poll series
+    const ids = n24IdsOf(art.html);
+    const fig = ids.length ? n24Figures(await n24InfogramFetch(fetchIgEmbed, ids)) : null;
+    if (!fig?.window || !fig.vi) continue; // a spin-off without the voting-intention embeds
+    if (knownDates.has(fig.window.end)) continue;
+    const cand = { date: fig.window.end, dateStart: fig.window.start, sample: parsed.sample ?? null,
+      vi: { ...fig.vi, ...(fig.tpp ?? {}) }, url, client: "News24", source: "news24", published: parsed.published };
+    const prev = byDate.get(cand.date);
+    if (!prev || (cand.published ?? "9") < (prev.published ?? "9")) byDate.set(cand.date, cand);
+  }
+  return [...byDate.values()];
 }
 
 async function fetchNews24Article(url) {
   if (NEWS24_FILE) return { html: readFileSync(NEWS24_FILE, "utf8"), via: "file" };
+  // The Akamai "wall" is a cookie check (302 to check_cookie.html, which
+  // sets a cookie and bounces back): a fetch that keeps the cookie reads the
+  // article with no browser, so CI and agents get it too (2026-10-05).
   try {
-    const { text } = await fetchText(url);
+    const { text } = await fetchWithCookies(url);
     if (/News24 Pulse/i.test(text) || n24IdsOf(text).length) return { html: text, via: "anon" };
-  } catch { /* Akamai cookie wall; Chrome is the fallback */ }
+  } catch { /* wall changed or site down; Chrome is the fallback */ }
   const html = fetchNews24Chrome(url);
   return html ? { html, via: "chrome" } : { html: null, via: null };
 }
@@ -583,11 +637,11 @@ async function parseArticle(url, id) {
 // ---------------------------------------------------------------- guard
 // requirePublished/requireTpp hold for yougov.com releases; fallback waves
 // may legitimately lack a publish timestamp (Wikipedia-only) or a 2PP.
-function guard(rec, { requirePublished = true, requireTpp = true, spanMin = 1 } = {}) {
+function guard(rec, { requirePublished = true, requireTpp = true, spanMin = 1, requireSample = true } = {}) {
   const errs = [];
   const check = (n, ok) => { if (!ok) errs.push(n); };
   const { vi, sat } = rec;
-  const core = { date: rec.date, dateStart: rec.dateStart, sample: rec.sample };
+  const core = { date: rec.date, dateStart: rec.dateStart, ...(requireSample ? { sample: rec.sample } : {}) };
   if (requirePublished) core.published = rec.published;
   for (const [k, v] of Object.entries(core))
     if (v == null) errs.push(`missing ${k}`);
@@ -921,8 +975,19 @@ try {
     infogram: {}, // date -> {ids, kinds, problems}
   };
   try {
-    const wikiText = WIKI_FILE ? readFileSync(WIKI_FILE, "utf8") : (await fetchText(WIKI_RAW)).text;
-    const { waves, unparsed } = parseWikiYouGov(wikiText);
+    let waves = [], unparsed = [];
+    try {
+      const wikiText = WIKI_FILE ? readFileSync(WIKI_FILE, "utf8") : (await fetchText(WIKI_RAW)).text;
+      ({ waves, unparsed } = parseWikiYouGov(wikiText));
+    } catch (e) {
+      console.error(`N24_NOTE Wikipedia unavailable (${e.message}) — News24 Pulse discovery only`);
+      status.fallback.wikiError = String(e?.message || e);
+    }
+    const pulseNotes = [];
+    const pulse = await pulseWaves(D, waves, pulseNotes);
+    for (const n of pulseNotes) console.error(`N24_NOTE ${n}`);
+    status.fallback.pulse = pulse.map((w) => w.date);
+    waves = [...waves, ...pulse];
     if (WIKI_DEBUG) console.error("N24_WIKI " + JSON.stringify(waves));
     status.fallback.checked = waves.length;
     status.fallback.unparsed = unparsed.slice(0, 10);
@@ -972,7 +1037,13 @@ try {
       }
       if (canUpgrade && !n24) continue;
 
-      const errs = guard(h, { requirePublished: !!n24, requireTpp: false, spanMin: 0 });
+      // a wave found on the Pulse page may have no stated sample (the Sep 2026
+      // article style dropped the methodology line): it files with
+      // samplePending, validate's adjudicated case for these waves — YouGov's
+      // APC methodology statement is the authority for n, and
+      // extract-sampleeff.mjs fills it and clears the flag when the
+      // statement posts (gen-data prices the gap at n=1200 meanwhile)
+      const errs = guard(h, { requirePublished: !!n24, requireTpp: false, spanMin: 0, requireSample: h.source !== "news24" || !n24 });
       if (errs.length) { status.fallback.unparsed.push(`${h.date}: ${errs.join(" | ")}`); continue; }
       const era = olFor(h.date);
       const pollRow = {
@@ -981,6 +1052,7 @@ try {
         alp: h.vi.alp, lnp: h.vi.lnp, grn: h.vi.grn, onp: h.vi.onp,
         ind: h.vi.ind, oth: h.vi.oth,
         tpp_alp: h.vi.tpp_alp, tpp_lnp: h.vi.tpp_lnp,
+        ...(h.sample == null ? { samplePending: true } : {}),
         ...(h.published ? { published: h.published } : {}),
         ...(h.url ? { url: h.url } : {}),
       };
@@ -1016,7 +1088,8 @@ try {
       sources.push({
         date: h.date, file: `${n24 ? "news24" : "wiki"}-${h.date}.json`,
         json: JSON.stringify({
-          source: n24 ? "news24+wikipedia" : "wikipedia", title: WIKI_TITLE, url: h.url,
+          source: h.source === "news24" ? "news24 (Pulse topic page)" : n24 ? "news24+wikipedia" : "wikipedia",
+          ...(h.source === "news24" ? {} : { title: WIKI_TITLE }), url: h.url,
           published: h.published ?? null,
           fieldwork: { date: h.date, dateStart: h.dateStart, sample: h.sample }, vi: h.vi,
           satisfaction: n24?.sat ?? null,
@@ -1033,7 +1106,7 @@ try {
         tpp: h.vi.tpp_alp == null ? null : `${h.vi.tpp_alp}/${h.vi.tpp_lnp}`,
         ppm: n24?.ppmA == null ? null : `${n24.ppmA}/${n24.ppmO}`,
         pmNet: n24?.sat?.pmNet ?? null, oppNet: n24?.sat?.oppNet ?? null,
-        via: n24 ? "news24+wikipedia" : "wikipedia",
+        via: h.source === "news24" ? "news24" : n24 ? "news24+wikipedia" : "wikipedia",
       });
     }
     if (status.fallback.added.length > MAX_WIKI_ADDS)
