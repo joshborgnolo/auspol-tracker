@@ -5340,6 +5340,24 @@
       "assimilated": true,
       "sampleEff": 865,
       "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/09/Essential-Report-Disclosure-Statement-Full-Questionnaire-2.pdf"
+    },
+    {
+      "date": "2026-10-02",
+      "published": "2026-10-04T18:00",
+      "dateStart": "2026-09-28",
+      "pollster": "RedBridge/Accent",
+      "client": "AFR",
+      "sample": 1000,
+      "alp": 28,
+      "lnp": 21,
+      "grn": 11,
+      "onp": 29,
+      "ind": 11,
+      "oth": null,
+      "tpp_alp": 46,
+      "tpp_lnp": 54,
+      "tpp_flows": 50,
+      "url": "https://www.afr.com/politics/federal/voters-turn-on-albanese-and-chalmers-as-economic-concerns-bite-20261004-p612n5"
     }
   ],
   "ppm": [
@@ -6116,6 +6134,15 @@
       "opp": 37,
       "oppName": "Taylor",
       "han": null,
+      "extra": null
+    },
+    {
+      "date": "2026-10-02",
+      "firm": "RedBridge/Accent",
+      "alb": 31,
+      "opp": 15,
+      "oppName": "Taylor",
+      "han": 26,
       "extra": null
     }
   ],
@@ -7819,6 +7846,15 @@
           "dis": 43
         }
       }
+    },
+    {
+      "date": "2026-10-02",
+      "firm": "RedBridge/Accent",
+      "alb": -27,
+      "opp": -6,
+      "oppName": "Taylor",
+      "han": -10,
+      "detail": null
     }
   ],
   "ppmHeadToHead": [
@@ -8260,6 +8296,12 @@
       "date": "2026-09-27",
       "firm": "Roy Morgan",
       "alpVsOnp_alp": 53.5,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-10-02",
+      "firm": "RedBridge/Accent",
+      "alpVsOnp_alp": 52,
       "lnpVsOnp_lnp": null
     }
   ],
