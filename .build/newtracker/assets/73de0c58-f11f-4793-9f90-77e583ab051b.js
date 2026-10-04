@@ -2436,6 +2436,20 @@ function App() {
     chromeSettled = true;
     applyChrome();
   }, []);
+
+  /* The tab panel's rise-in (.view-enter) is for a SWITCH. On the panel the
+     page loads with it read as a bounce: the browser holds the previous page
+     until the app paints (html.boot), so the old frame showed every heading in
+     place and the new one showed them 7px low, sliding back up. The panel the
+     page opens on gets no entrance; the first switch away retires the
+     exemption, so coming back to that tab rises in like any other. Keyed by
+     panel rather than a flag, so a re-render never adds the class to a
+     standing panel (which would start the animation on it). */
+  const panelKey = tab + (rd ? "-rd" : "");
+  const loadPanel = useRef(panelKey);
+  useEffect(() => {
+    if (panelKey !== loadPanel.current) loadPanel.current = null;
+  }, [panelKey]);
   React.useEffect(() => {
     // nothing to change – a re-render that re-runs this effect must not animate
     if (!Object.keys(want).some((c) => document.body.classList.contains(c) !== want[c])) return;
@@ -2559,7 +2573,7 @@ function App() {
             poke, so the ARIA panel-in-tab-order keeps focus through clicks;
             a drag's catch keeps its park while the selection lives — keystrokes
             are vetoed under a live selection anyway). */}
-        <div className="view-enter content" key={tab + (rd ? "-rd" : "")}
+        <div className={panelKey === loadPanel.current ? "content" : "view-enter content"} key={panelKey}
              role="tabpanel" id={"panel-" + tab} aria-labelledby={"tab-" + tab}
              tabIndex={0}
              onPointerDownCapture={() => { viewPanelPokedAt = Date.now(); }}

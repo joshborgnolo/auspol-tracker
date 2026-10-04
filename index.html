@@ -87929,6 +87929,11 @@ function App() {
     chromeSettled = true;
     applyChrome();
   }, []);
+  const panelKey = tab + (rd ? "-rd" : "");
+  const loadPanel = useRef(panelKey);
+  useEffect(() => {
+    if (panelKey !== loadPanel.current) loadPanel.current = null;
+  }, [panelKey]);
   React.useEffect(() => {
     if (!Object.keys(want).some(c => document.body.classList.contains(c) !== want[c])) return;
     const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -88021,8 +88026,8 @@ function App() {
     id: "main-content",
     tabIndex: -1
   }, React.createElement("div", {
-    className: "view-enter content",
-    key: tab + (rd ? "-rd" : ""),
+    className: panelKey === loadPanel.current ? "content" : "view-enter content",
+    key: panelKey,
     role: "tabpanel",
     id: "panel-" + tab,
     "aria-labelledby": "tab-" + tab,
