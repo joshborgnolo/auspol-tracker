@@ -162,13 +162,15 @@ const cad = JSON.parse(JSON.stringify(D.pollCadence));
 // pinned date is that house's real previous wave, so its cadence and
 // spreads still describe the row: Roy Morgan's 14 Sep wave returns to Mon
 // 7 Sep, Resolve's 13 Sep to Sun 16 Aug, Newspoll's 20 Sep wave to Sun
-// 30 Aug, and DemosAU's September wave to Mon 24 Aug (putting its
-// calendar-month bracket back on the 9–27 Sep the scenarios count
-// around). cadSlip/cadHold derive from this, so their own steps ride on
-// top.
+// 30 Aug, RedBridge/Accent's 4 Oct wave (filed on the rolled Sunday, per
+// the real world below) to Sun 30 Aug, and DemosAU's September wave to
+// Mon 24 Aug (putting its calendar-month bracket back on the 9–27 Sep the
+// scenarios count around). cadSlip/cadHold derive from this, so their own
+// steps ride on top.
 for (const [firm, last] of [["Roy Morgan", "2026-09-07"],
                             ["Resolve", "2026-08-16"],
                             ["Newspoll", "2026-08-30"],
+                            ["RedBridge/Accent", "2026-08-30"],
                             ["DemosAU", "2026-08-24"]])
   cad.find((c) => c.pollster === firm).last = last;
 // RedBridge's 27 Sep Sunday was confirmed absent after that world was
