@@ -758,6 +758,15 @@ function rdDigitKey(items, onChange) {
     onChange(items[n - 1].id);
   };
 }
+/* A label that holds its bold width: a pressed tab (or chip, or picked word)
+   goes 600, so a plain label would widen it and nudge its neighbours on every
+   switch. The hidden bold twin sizes the box; the visible text centres inside
+   it. First written for Past cycles' view toggles (063b388), shared site-wide
+   since the user saw the same nudge in the latest-polls facets and the
+   demographics split picker (2026-10-04) - every bold-on-select control on the
+   page wears it: RdTabs, the main tab row, the Who-votes and issues chips,
+   the All-polls pinned facets, time pills and split picker. */
+const RdTabW = ({ t }) => <span className="rd-tab-w" data-t={t}>{t}</span>;
 function RdTabs({ value, onChange, options, ariaLabel, children, className, swipe, swipeSelf, pin, onDigits }) {
   /* `swipe`: the views are pages of their own (All polls' figures, preferred
      PM's questions, who votes by age or by place…), so on a phone a sideways
@@ -799,7 +808,7 @@ function RdTabs({ value, onChange, options, ariaLabel, children, className, swip
         {options.map((o) => (
           <button key={o.id} type="button" className="rd-tab" aria-pressed={value === o.id}
                   onClick={() => fire(o.id)} title={o.title}>
-            {o.label}
+            {typeof o.label === "string" ? <RdTabW t={o.label} /> : o.label}
           </button>
         ))}
       </div>
@@ -1039,7 +1048,7 @@ function rdEventReveal(id) {
   });
 }
 
-Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdGlide, RdCrossfade,
+Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdTabW, RdGlide, RdCrossfade,
                         rdTabsKey, rdTabFocus, rdDigitKey,
                         rdNumWord, rdCap, rdFraction, rdSigned, rdArrow,
                         rdDate, rdMonthYear, rdPointsPhrase, rdXTicks, rdYTicks,

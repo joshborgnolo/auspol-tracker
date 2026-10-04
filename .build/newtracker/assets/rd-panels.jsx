@@ -2138,7 +2138,7 @@ function RdDemographics({ rangeId = "all" }) {
             {DEMO_PARTIES.map((pp) => (
               <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} onClick={() => pickParty(pp.id)}
                       style={party === pp.id ? { background: "var(--tint-" + pp.id + ")", borderColor: D.PARTIES[pp.id].color } : undefined}>
-                <span className="rd-sw" style={{ background: D.PARTIES[pp.id].color }}></span>{pp.label}</button>
+                <span className="rd-sw" style={{ background: D.PARTIES[pp.id].color }}></span><RdTabW t={pp.label} /></button>
             ))}
           </span>
         )}
@@ -2152,7 +2152,7 @@ function RdDemographics({ rangeId = "all" }) {
             <button key={pp.id} type="button" className="rd-chip" aria-pressed={party === pp.id} aria-label={pp.label}
                     onClick={() => pickParty(pp.id)}
                     style={party === pp.id ? { background: "var(--tint-" + pp.id + ")", borderColor: D.PARTIES[pp.id].color } : undefined}>
-              <span className="rd-sw" style={{ background: D.PARTIES[pp.id].color }}></span>{pp.short}</button>
+              <span className="rd-sw" style={{ background: D.PARTIES[pp.id].color }}></span><RdTabW t={pp.short} /></button>
           ))}
         </div>
       )}
@@ -3022,7 +3022,7 @@ function RdIssues({ rangeId = "all" }) {
                   <RdTabs swipe value={gtab.id} onChange={pickGset} options={G.tabs.map((x) => ({ id: x.id, label: x.label }))}
                           ariaLabel="Group voters by" className="rd-tabs-sm rd-iw-tabs" />
                   <div className="rd-iw-chips" role="group" aria-label="Issue">
-                    {gtab.issues.map((k) => <button key={k} type="button" className="rd-iw-chip" aria-pressed={whomIssue === k} onClick={() => pickWhom(k)}>{ISS_SHORT[k] || I.labels[k] || k}</button>)}
+                    {gtab.issues.map((k) => <button key={k} type="button" className="rd-iw-chip" aria-pressed={whomIssue === k} onClick={() => pickWhom(k)}><RdTabW t={ISS_SHORT[k] || I.labels[k] || k} /></button>)}
                   </div>
                   <p className="rd-iw-ltitle"><b>{I.labels[whomIssue] || whomIssue} in their top three, %</b><br />{gSource}</p>
                   <div className="rd-iw-list" role="table" aria-label={"Share of each group putting " + (ISS_PHRASE[whomIssue] || whomIssue) + " in its top three"}>

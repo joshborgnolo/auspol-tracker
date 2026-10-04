@@ -42,10 +42,6 @@ function rdUseOutgoing(k, value, ms = (window.AP && window.AP.MORPH_MS || 320) +
   React.useEffect(() => () => clearTimeout(timer.current), []);
   return out.current;
 }
-/* A tab label that holds its bold width: the pressed tab goes 600, so a
-   plain label would widen it and nudge its neighbours on every switch. The
-   hidden bold twin sizes the box; the visible text centres inside it. */
-const RdTabW = ({ t }) => <span className="rd-tab-w" data-t={t}>{t}</span>;
 const rdOrd = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th");
 const rdSgn = (v, unit) => (unit ? "" : v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
 

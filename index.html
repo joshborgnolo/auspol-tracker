@@ -3171,6 +3171,8 @@ body.rd .rd-tab[aria-pressed="true"] { border-bottom-color: var(--ink); font-wei
 body.rd .rd-tab:hover { color: var(--ink); }
 body.rd .rd-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
 body.rd .rd-tabs-grow { flex-grow: 1; }
+body.rd .rd-tab-w { display: inline-flex; flex-direction: column; align-items: center; }
+body.rd .rd-tab-w::after { content: attr(data-t); font-weight: 600; height: 0; overflow: hidden; visibility: hidden; }
 body.rd .rd-chip {
   all: unset; box-sizing: border-box; cursor: pointer; position: relative;
   min-height: 36px; padding: 0 14px; border-radius: 18px;
@@ -3908,6 +3910,7 @@ body.rd .rd-wv-panels { display: grid; grid-template-columns: repeat(2, minmax(0
 body.rd .rd-wv-panel .rd-sm-top { font-size: 13px; }
 body.rd .rd-wv-panel .rd-sm-top b { font-size: 15px; }
 @media (max-width: 640px) { body.rd .rd-wv-panels { column-gap: 16px; } }
+@media (max-width: 359px) { body.rd .rd-wv-tabs .rd-tab { padding: 0 4px !important; } }
 @media (max-width: 640px) {
   body.rd .rd-wv-tabs .rd-tab { padding: 0 8px; font-size: 14px; }
   body.rd .rd-wv-sethead, body.rd .rd-wv-row, body.rd .rd-wv-axis { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 8px; }
@@ -3984,6 +3987,7 @@ body.rd .rd-tsig-table tbody tr:not(.rd-tsig-set):not(:has(> td.rd-tsig-yes)) > 
 @media (max-width: 900px) { body.rd .rd-sm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px; } }
 @media (max-width: 640px) { body.rd .rd-mo-wrap { margin-top: 28px; } body.rd .rd-sm-grid { column-gap: 16px; } body.rd .rd-sm-top { font-size: 13px; } body.rd .rd-sm-top b { font-size: 16px; } }
 body.rd .rd-is-tabs { margin-top: 20px; }
+@media (max-width: 359px) { body.rd .rd-is-tabs .rd-tab { padding: 0 6px; font-size: 14px; } }
 body.rd .rd-is .rd-hed { margin-top: 28px; }
 body.rd .rd-is-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; column-gap: 48px; margin-top: 36px; align-items: start; }
 body.rd .rd-is-head, body.rd .rd-is-row, body.rd .rd-is-axis {
@@ -4249,8 +4253,6 @@ body.rd .rd-cyc-chipmove .rd-cc-drawn { justify-content: flex-start; }
 body.rd .rd-cyc-chipmove .rd-chip { font-size: 15.4px; }
 body.rd .rd-cc-l { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 body.rd .rd-cc-tabs { border-bottom: 0; }
-body.rd .rd-tab-w { display: inline-flex; flex-direction: column; align-items: center; }
-body.rd .rd-tab-w::after { content: attr(data-t); font-weight: 600; height: 0; overflow: hidden; visibility: hidden; }
 body.rd .rd-cc-n { margin-left: 6px; font-weight: 400; color: var(--ink-3); }
 body.rd .rd-cc-sep { width: 1px; height: 22px; background: var(--line); margin: 0 6px; }
 body.rd .rd-cc-drawn { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -61354,7 +61356,9 @@ function Tabs({
     }
   }, React.createElement("span", {
     className: "tab-label"
-  }, t.label), t.note != null && React.createElement("span", {
+  }, window.RdTabW && typeof t.label === "string" ? React.createElement(window.RdTabW, {
+    t: t.label
+  }) : t.label), t.note != null && React.createElement("span", {
     className: "tab-note"
   }, t.note))))), React.createElement(NextPollTicker, {
     showScore: pinned && heroGone
@@ -63192,7 +63196,9 @@ function AccuracyPanel() {
       "aria-pressed": spread,
       onClick: () => setSpread(!spread),
       title: "Dots at the same miss are drawn on top of one another. This steps them into their own lanes, keeping each one exactly where it sits on the scale."
-    }, "Separate overlapping dots")), React.createElement("div", {
+    }, React.createElement(window.RdTabW, {
+      t: "Separate overlapping dots"
+    }))), React.createElement("div", {
       className: "rd-acc-head",
       "aria-hidden": "true"
     }, React.createElement("span", null, "Election"), React.createElement("span", {
@@ -71162,6 +71168,12 @@ function rdDigitKey(items, onChange) {
     onChange(items[n - 1].id);
   };
 }
+const RdTabW = ({
+  t
+}) => React.createElement("span", {
+  className: "rd-tab-w",
+  "data-t": t
+}, t);
 function RdTabs({
   value,
   onChange,
@@ -71212,7 +71224,9 @@ function RdTabs({
     "aria-pressed": value === o.id,
     onClick: () => fire(o.id),
     title: o.title
-  }, o.label))), children ? React.createElement(React.Fragment, null, React.createElement("span", {
+  }, typeof o.label === "string" ? React.createElement(RdTabW, {
+    t: o.label
+  }) : o.label))), children ? React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-tabs-grow"
   }), children) : null);
 }
@@ -71474,6 +71488,7 @@ Object.assign(window, {
   RdHow,
   RdFoot,
   RdTabs,
+  RdTabW,
   RdGlide,
   RdCrossfade,
   rdTabsKey,
@@ -75574,7 +75589,9 @@ function RdDemographics({
     style: {
       background: D.PARTIES[pp.id].color
     }
-  }), pp.label)))), narrow && React.createElement("div", {
+  }), React.createElement(RdTabW, {
+    t: pp.label
+  }))))), narrow && React.createElement("div", {
     className: "rd-chips rd-chips-row",
     role: "group",
     "aria-label": "Party",
@@ -75596,7 +75613,9 @@ function RdDemographics({
     style: {
       background: D.PARTIES[pp.id].color
     }
-  }), pp.short))), React.createElement("div", {
+  }), React.createElement(RdTabW, {
+    t: pp.short
+  })))), React.createElement("div", {
     className: "card rd-card rd-wv-dots"
   }, React.createElement("div", {
     className: "rd-wv-plot"
@@ -76910,7 +76929,9 @@ function RdIssues({
     className: "rd-iw-chip",
     "aria-pressed": whomIssue === k,
     onClick: () => pickWhom(k)
-  }, ISS_SHORT[k] || I.labels[k] || k))), React.createElement("p", {
+  }, React.createElement(RdTabW, {
+    t: ISS_SHORT[k] || I.labels[k] || k
+  })))), React.createElement("p", {
     className: "rd-iw-ltitle"
   }, React.createElement("b", null, I.labels[whomIssue] || whomIssue, " in their top three, %"), React.createElement("br", null), gSource), React.createElement("div", {
     className: "rd-iw-list",
@@ -78844,12 +78865,6 @@ function rdUseOutgoing(k, value, ms = (window.AP && window.AP.MORPH_MS || 320) +
   React.useEffect(() => () => clearTimeout(timer.current), []);
   return out.current;
 }
-const RdTabW = ({
-  t
-}) => React.createElement("span", {
-  className: "rd-tab-w",
-  "data-t": t
-}, t);
 const rdOrd = n => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th");
 const rdSgn = (v, unit) => (unit ? "" : v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
 const RD_CYC_LEAD = "0.5 4";
@@ -82764,7 +82779,9 @@ function RdApSheet({
     "aria-checked": range === id,
     className: "rd-ap-spill" + (range === id ? " on" : ""),
     onClick: () => setRange(id)
-  }, lab))), React.createElement("span", {
+  }, React.createElement(RdTabW, {
+    t: lab
+  })))), React.createElement("span", {
     className: "rd-ap-sheetk"
   }, "Includes"), React.createElement("div", {
     role: "group",
@@ -84066,7 +84083,9 @@ function RdAllPolls(P) {
     role: "radio",
     "aria-checked": x.id === demSplit,
     onClick: () => splitPick(x.id)
-  }, x.label))));
+  }, React.createElement(RdTabW, {
+    t: x.label
+  })))));
   const basisPick = () => {
     pinAp();
     setTppBasis(pub ? "imp" : "resp");
@@ -84146,7 +84165,9 @@ function RdAllPolls(P) {
     "aria-pressed": facet === f.id,
     tabIndex: pinned ? 0 : -1,
     onClick: () => facetPick(f.id)
-  }, f.label))), React.createElement("span", {
+  }, React.createElement(RdTabW, {
+    t: f.label
+  })))), React.createElement("span", {
     className: "rd-ap-pinsep",
     "aria-hidden": "true"
   }), React.createElement("button", {

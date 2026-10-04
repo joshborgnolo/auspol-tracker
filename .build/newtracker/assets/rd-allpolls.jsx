@@ -1346,7 +1346,7 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
           <div className="rd-ap-sheetpills" role="radiogroup" aria-label="Time span">
             {[["all", "Any time"], ["12", "Last 12 months"], ["6", "Last 6 months"], ["3", "Last 3 months"]].map(([id, lab]) => (
               <button key={id} type="button" role="radio" aria-checked={range === id} className={"rd-ap-spill" + (range === id ? " on" : "")}
-                      onClick={() => setRange(id)}>{lab}</button>
+                      onClick={() => setRange(id)}><RdTabW t={lab} /></button>
             ))}
           </div>
           <span className="rd-ap-sheetk">Includes</span>
@@ -2230,7 +2230,7 @@ function RdAllPolls(P) {
       {/* one of five, so a radio group - which also keeps it out of the
           facet tabs' own [role=group] */}
       <span role="radiogroup" aria-label="Split the vote by" onKeyDown={rdTabsKey(SPLITS, splitPick)} onClick={rdTabFocus}>
-        {SPLITS.map((x) => <button key={x.id} type="button" role="radio" aria-checked={x.id === demSplit} onClick={() => splitPick(x.id)}>{x.label}</button>)}
+        {SPLITS.map((x) => <button key={x.id} type="button" role="radio" aria-checked={x.id === demSplit} onClick={() => splitPick(x.id)}><RdTabW t={x.label} /></button>)}
       </span>
     </span>
   );
@@ -2282,7 +2282,7 @@ function RdAllPolls(P) {
       ) : <>
         <span className="rd-ap-pintabs" role="group" aria-label="Figures"
               onKeyDown={rdTabsKey(FACETS, facetPick)} onClick={rdTabFocus}>
-          {FACETS.map((f) => <button key={f.id} type="button" className="rd-ap-pint" aria-pressed={facet === f.id} tabIndex={pinned ? 0 : -1} onClick={() => facetPick(f.id)}>{f.label}</button>)}
+          {FACETS.map((f) => <button key={f.id} type="button" className="rd-ap-pint" aria-pressed={facet === f.id} tabIndex={pinned ? 0 : -1} onClick={() => facetPick(f.id)}><RdTabW t={f.label} /></button>)}
         </span>
         <span className="rd-ap-pinsep" aria-hidden="true"></span>
         <button type="button" className="rd-ap-pins" aria-label="Search the polls" tabIndex={pinned ? 0 : -1} onClick={toSearch}>

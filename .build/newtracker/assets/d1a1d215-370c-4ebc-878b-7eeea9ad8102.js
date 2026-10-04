@@ -389,7 +389,8 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                          clicks, so Enter/Space activation keeps focus per
                          the ARIA tabs pattern. */
                       onClick={(e) => { onChange(t.id); if (e.detail) e.currentTarget.blur(); }}>
-                <span className="tab-label">{t.label}</span>
+                {/* the active tab label goes 600 in the redesign - its bold twin holds the width */}
+                <span className="tab-label">{window.RdTabW && typeof t.label === "string" ? <window.RdTabW t={t.label} /> : t.label}</span>
                 {t.note != null && <span className="tab-note">{t.note}</span>}
               </button>
             ))}
@@ -2692,7 +2693,7 @@ function AccuracyPanel() {
         <div className="card rd-card rd-acc-card">
           <div className="rd-chead"><span className="rd-chead-t">Labor’s final two-party figure in the polls, minus the result, points</span>
             {stacked > 0 && <button type="button" className="rd-chip" aria-pressed={spread} onClick={() => setSpread(!spread)}
-              title="Dots at the same miss are drawn on top of one another. This steps them into their own lanes, keeping each one exactly where it sits on the scale.">Separate overlapping dots</button>}
+              title="Dots at the same miss are drawn on top of one another. This steps them into their own lanes, keeping each one exactly where it sits on the scale."><window.RdTabW t="Separate overlapping dots" /></button>}
           </div>
           <div className="rd-acc-head" aria-hidden="true">
             <span>Election</span>
