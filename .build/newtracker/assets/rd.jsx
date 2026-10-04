@@ -139,6 +139,9 @@ let rdPinRO = null;
 let rdPinHeld = null;
 let rdPinLive = 0;
 let rdPinDone = null;
+/* the live pin's row ({ row }, kept current through re-seats), for RdGlide:
+   a block whose resize moves this row must not glide */
+let rdPinAt = null;
 /* freezing must not clip a sticky thing's run: a clipped ancestor makes
    position:sticky descendants scroll off like ordinary content, so any
    branch holding one stays unfrozen (its changes ride the RO fix below) */
@@ -289,6 +292,8 @@ function rdPinScroll(row, fine) {
      counts exactly one live pin again */
   if (rdPinRaf === 0) rdPinLive++;
   cancelAnimationFrame(rdPinRaf);
+  const at = { row };
+  rdPinAt = at;
   /* Chrome's scroll anchoring fights the pin when the click focused a
      control OUTSIDE the row (a party chip): the focused box becomes the
      anchor, the browser re-scrolls every frame to hold THAT still through
@@ -312,6 +317,7 @@ function rdPinScroll(row, fine) {
     const next = tops && tops.find((t) => t[0].isConnected);
     if (!next) return false;
     row = next[0];
+    at.row = row;
     want = next[1];
     return true;
   };
@@ -435,6 +441,7 @@ function rdPinScroll(row, fine) {
   const done = () => {
     rdPinRaf = 0;
     rdPinDone = null;
+    if (rdPinAt === at) rdPinAt = null;
     if (rdPinRO) { rdPinRO.disconnect(); rdPinRO = null; }
     if (window.__rdPinObserve === hook) window.__rdPinObserve = null;
     if (--rdPinLive > 0) return;
@@ -527,6 +534,33 @@ function RdGlide({ children, className, as, watch }) {
     const AP = window.AP || {};
     if ((AP.reduceMotion && AP.reduceMotion()) || performance.now() - (window.__rdInput || 0) > 600) return;
     const cur = o.style.height ? o.getBoundingClientRect().height : prev;
+    /* Under a live pin, a block whose resize moves the pinned row takes its
+       new height at once. The pin answers a resize above its row from its
+       ResizeObserver, in the frame the resize paints, but only in whole
+       drifts of 3px or more (the Safari scroll-lattice rule in its fix()),
+       and a glide grows ~1px a frame. So the row and everything under it
+       rode each frame's growth and snapped back: the Who-votes dot plot
+       shook ±3px through every group-tab and party-chip switch with its dek
+       on screen, and landed 1-2px off (user report 2026-10-05). One jump is
+       one whole correction in that same frame, so the row holds still and
+       the changed words spill upward. The row is read with the block at
+       its new height and at its old one, so a block beside the row, or
+       below it, still glides */
+    const pinRow = rdPinAt && rdPinAt.row;
+    if (pinRow && pinRow.isConnected && !o.contains(pinRow)) {
+      const was = [o.style.transition, o.style.height];
+      o.style.transition = "none";
+      o.style.height = "";
+      const y1 = pinRow.getBoundingClientRect().top;
+      o.style.height = cur + "px";
+      if (Math.abs(pinRow.getBoundingClientRect().top - y1) >= 0.5) {
+        clearTimeout(timer.current);
+        o.style.transition = ""; o.style.height = ""; o.style.overflowY = "";
+        if (window.__rdPinObserve) window.__rdPinObserve(o);
+        return;
+      }
+      o.style.transition = was[0]; o.style.height = was[1];
+    }
     rdHoldSection(o, h - cur, (AP.MORPH_MS || 320) + 80);
     clearTimeout(timer.current);
     o.style.transition = "none";

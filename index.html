@@ -70918,6 +70918,7 @@ let rdPinRO = null;
 let rdPinHeld = null;
 let rdPinLive = 0;
 let rdPinDone = null;
+let rdPinAt = null;
 const RD_PIN_STICKY = ".tabs.sticky,.info-index,.rd-ap-headwrap,.poll-table thead th";
 const RD_TOUCH_SLIDE_DX = 60;
 let rdTouchHot = 0,
@@ -71034,6 +71035,10 @@ function rdPinScroll(row, fine) {
   if (want0.bottom < reserve() || want0.top > window.innerHeight) return;
   if (rdPinRaf === 0) rdPinLive++;
   cancelAnimationFrame(rdPinRaf);
+  const at = {
+    row
+  };
+  rdPinAt = at;
   const html = document.documentElement;
   if (rdPinAnchorSave === null) rdPinAnchorSave = html.style.overflowAnchor;
   html.style.overflowAnchor = "none";
@@ -71050,6 +71055,7 @@ function rdPinScroll(row, fine) {
     const next = tops && tops.find(t => t[0].isConnected);
     if (!next) return false;
     row = next[0];
+    at.row = row;
     want = next[1];
     return true;
   };
@@ -71100,6 +71106,7 @@ function rdPinScroll(row, fine) {
   const done = () => {
     rdPinRaf = 0;
     rdPinDone = null;
+    if (rdPinAt === at) rdPinAt = null;
     if (rdPinRO) {
       rdPinRO.disconnect();
       rdPinRO = null;
@@ -71171,6 +71178,24 @@ function RdGlide({
     const AP = window.AP || {};
     if (AP.reduceMotion && AP.reduceMotion() || performance.now() - (window.__rdInput || 0) > 600) return;
     const cur = o.style.height ? o.getBoundingClientRect().height : prev;
+    const pinRow = rdPinAt && rdPinAt.row;
+    if (pinRow && pinRow.isConnected && !o.contains(pinRow)) {
+      const was = [o.style.transition, o.style.height];
+      o.style.transition = "none";
+      o.style.height = "";
+      const y1 = pinRow.getBoundingClientRect().top;
+      o.style.height = cur + "px";
+      if (Math.abs(pinRow.getBoundingClientRect().top - y1) >= 0.5) {
+        clearTimeout(timer.current);
+        o.style.transition = "";
+        o.style.height = "";
+        o.style.overflowY = "";
+        if (window.__rdPinObserve) window.__rdPinObserve(o);
+        return;
+      }
+      o.style.transition = was[0];
+      o.style.height = was[1];
+    }
     rdHoldSection(o, h - cur, (AP.MORPH_MS || 320) + 80);
     clearTimeout(timer.current);
     o.style.transition = "none";
