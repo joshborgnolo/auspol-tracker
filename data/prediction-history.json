@@ -757,6 +757,32 @@
           18
         ]
       }
+    },
+    {
+      "asOf": "2026-10-04",
+      "age": 17.1,
+      "ousted": {
+        "median": 0.2863,
+        "lo": 0.1197,
+        "hi": 0.5386,
+        "shareOuster": 0.14
+      },
+      "inSample": 0.302,
+      "features": {
+        "pmNet": -19.4545,
+        "ppm": 12.8889,
+        "primSw": -6.9743,
+        "tppSw": -3.3042,
+        "govAge": 2,
+        "ageFrac": 0.4685
+      },
+      "ridge": {
+        "liveP": 0.277,
+        "window": [
+          12,
+          18
+        ]
+      }
     }
   ]
 }
