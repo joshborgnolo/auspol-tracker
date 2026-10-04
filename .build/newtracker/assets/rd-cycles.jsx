@@ -569,6 +569,14 @@ function RdPastCycles(p) {
      "oppnet" while the row key stays "han" so the now-figure still comes
      from her series (curOf). leader:"opp" names past opposition leaders. */
   Mby.han = { key: "oppnet", leader: "opp", unit: "" };
+  /* the Albanese-over-Hanson preferred-PM lead, asked as its own question
+     only this term (raw.ppmh null-pads every cycle before it): the row
+     reads the sitting term's own H2H margin, but its strip, average and
+     rank are the preferred-PM row's own peers - past PMs' leads over
+     their opposition leaders (user call 2026-10-04). The row key stays
+     "ppmh" so the now-figure and its change anchor come from the H2H
+     series; leader:"pm" keeps the PM named on each past term. */
+  Mby.ppmh = { key: "ppmm", leader: "pm", unit: "" };
   /* a half-measured month never becomes a half-total: the combined now
      figure renders a dash when either party's is missing */
   const endOfKey = (c, key) => (key === "comb"
@@ -620,6 +628,9 @@ function RdPastCycles(p) {
        party owns a sum of two */
     { key: "comb", name: "L/NP + ON combined primary vote", sub: "The Coalition and One Nation, together", group: "votes", color: "var(--ink-2)" },
     { key: "ppmm", name: "Preferred PM, lead", sub: pm + " over " + oppL, group: "leaders", color: cur.color },
+    /* the same row stated against Hanson, asked as its own pair this term:
+       sits straight under the main preferred-PM row (user call 2026-10-04) */
+    { key: "ppmh", name: "Preferred PM, lead", sub: pm + " over Hanson", group: "leaders", color: cur.color },
     { key: "net", name: "Prime minister’s net approval", sub: pm, group: "leaders", color: cur.color },
     { key: "oppnet", name: "Opposition leader’s net approval", sub: oppL, group: "leaders", color: D.PARTIES[cur.opp].color },
     { key: "han", name: "Hanson’s net approval", sub: "Pauline Hanson", group: "leaders", color: D.PARTIES.onp.color },
@@ -833,7 +844,7 @@ function RdPastCycles(p) {
   const goTo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
   /* One Nation and the combined row belong to the primary section: its
      opposition chart draws these very series when its boxes are ticked */
-  const SEC = { tpp: "cyc-tpp", primary: "cyc-primary", oppr: "cyc-primary", onp: "cyc-primary", comb: "cyc-primary", ppmm: "cyc-leaders", net: "cyc-leaders", oppnet: "cyc-leaders", han: "cyc-leaders" };
+  const SEC = { tpp: "cyc-tpp", primary: "cyc-primary", oppr: "cyc-primary", onp: "cyc-primary", comb: "cyc-primary", ppmm: "cyc-leaders", ppmh: "cyc-leaders", net: "cyc-leaders", oppnet: "cyc-leaders", han: "cyc-leaders" };
 
   /* ---- a row opened ---------------------------------------------------------------- */
   /* A row opens to every term on its strip, by name and ranked at this
@@ -950,6 +961,7 @@ function RdPastCycles(p) {
     /* whom a borrowed row is ranked against, said above the list it explains */
     const peerNote = onpOwn ? "One Nation has never been the opposition, so it is ranked against past oppositions’ primary votes."
       : r.key === "han" ? "No past term rated Hanson, so she is ranked against past opposition leaders’ net approval, and her ratings join their records."
+      : r.key === "ppmh" ? "Asked as its own pair only this term, so the lead over Hanson is ranked against past prime ministers’ leads over the opposition leader, and joins their records."
       : r.key === "comb" ? (() => {
         const nil = cycles.filter((c) => !c.current && c.opp === "lnp" && rdOnpUnsplit(c)).map((c) => c.year);
         return "Only terms with the Coalition in opposition count. Before One Nation existed the Coalition’s vote stands alone"

@@ -1248,6 +1248,13 @@ const leaderNow = (() => {
 const ppmMarginNow = currentReading(ppm.filter((p) => p.alb != null && p.opp != null && eraOf(p.date) === "taylor")
   .map((p) => ({ firm: p.firm, mid: midMs({ date: p.date }), x: p.alb - p.opp, n: ppmN(p),
                  pq: Math.max(0, 100 * (p.alb + p.opp) - (p.alb - p.opp) ** 2) })), null, SPARSE_K);
+/* Albanese-over-Hanson preferred-PM margin now, for the sitting term's
+   latest point in Past cycles: the H2H pair's own pool (its waves all sit
+   in the Taylor era, so no era filter is needed), the same six-week
+   window and sample weighting as ppmMarginNow. */
+const ppmHMarginNow = currentReading(D.ppmHeadToHead.filter((r) => r.alb != null && r.han != null)
+  .map((r) => ({ firm: r.firm, mid: midMs({ date: r.date }), x: r.alb - r.han, n: ppmN(r),
+                 pq: Math.max(0, 100 * (r.alb + r.han) - (r.alb - r.han) ** 2) })), null, SPARSE_K);
 
 /* A card's house credit-list names only houses still ASKING the question:
    anyone with a reading in the six months before the series' own newest.
@@ -3923,7 +3930,7 @@ const debiasTerm = (pts, strat) => {
 const eraIndex = (spl) => (p) => splIsos(spl).filter((b) => b <= p.iso).length;
 
 const CYCLE_DEFS = CYC_META.map((c) => {
-  let primPts, tppPts, netPts, oppPts, hanPts, oppPrimPts, onpPts, ppmPts = [];
+  let primPts, tppPts, netPts, oppPts, hanPts, oppPrimPts, onpPts, ppmPts, ppmhPts = [];
   if (c.current) {
     primPts = aggPrimary.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d.alp }));
     /* The sitting term is drawn on the site's default basis, the implied 2PP,
@@ -3956,6 +3963,11 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     // current-term ppm readings are the live ppm table's per-wave margin –
     // sample-weighted, never house-adjusted, as the live panel is
     ppmPts = ppm.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p.alb - p.opp, iso: p.date, firm: p.firm, t: Date.parse(p.date), n: ppmN(p) }));
+    // Albanese v Hanson on the same per-wave margin basis: a third question
+    // asked as its own contest this term only (ppH above), so it takes the
+    // live panel's treatment too – never house-adjusted, sparse months
+    ppmhPts = D.ppmHeadToHead.filter((r) => r.alb != null && r.han != null)
+      .map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.alb - r.han, iso: r.date, firm: r.firm, t: Date.parse(r.date), n: ppmN(r) }));
     // Hanson's metric is filtered per row and per DATE – Resolve rated her on
     // likeability until the 6-11 Jul 2026 wave and on performance after it, so
     // an unbounded firm test would put favourability on an approval line.
@@ -3983,6 +3995,8 @@ const CYCLE_DEFS = CYC_META.map((c) => {
       .map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.pmPpm - r.oppPpm, iso: r.date, firm: r.firm, t: Date.parse(r.date) }));
     // no past cycle rated Hanson: cycleApproval carries pmNet and oppNet only
     hanPts = [];
+    // and none asked the Albanese–Hanson pair, a 2026 question
+    ppmhPts = [];
   }
   const cap = c.current ? Math.max(1, Math.round(monthsSince(LATEST_ISO, c.eDate))) : 36;
   const prim = cycleSeries(primPts, c.ePrim, cap);
@@ -4037,6 +4051,8 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     obs: { primary: prim.obs, tpp: tpp.obs, net: alignObs(net), oppnet: alignObs(opp),
            oppr: oppr.obs, onp: alignObs(onp), ppmm: alignObs(ppmm) },
     han: sparseSeries(hanPts, months, cap),
+    // like Hanson's: this-term-only readings, sparse over the month grid
+    ppmh: sparseSeries(ppmhPts, months, cap),
     netEras: eraSeries(netPts, c.pmSpl, cap), oppEras: eraSeries(oppPts, c.oppSpl, cap),
     tppEras: c.current ? rivalEras(tppPts, c, cap) : null,
     ppmEras: ppmErasFor(c, ppmPts, cap),
@@ -4064,6 +4080,7 @@ const CYCLE_DEFS = CYC_META.map((c) => {
       onp: primaryNow ? primaryNow.onp : null,
       net: leaderNow.alb_net ? leaderNow.alb_net.v : null, oppnet: leaderNow.taylor_net ? leaderNow.taylor_net.v : null,
       han: leaderNow.hanson_net ? leaderNow.hanson_net.v : null, ppmm: ppmMarginNow ? ppmMarginNow.v : null,
+      ppmh: ppmHMarginNow ? ppmHMarginNow.v : null,
     };
     /* Era runs are bucketed poll by poll, so a reading from the last days of
        a month can land one month past the term's latest (months since the
@@ -4884,12 +4901,13 @@ window.AUSPOL = (function () {
     ...(c.endRes ? { endRes: c.endRes } : {}),
     color: PARTIES[c.gov].color, span: c.months[c.months.length - 1],
     base: { tpp: c.tpp[0], primary: c.primary[0], net: c.net[0], oppnet: c.oppnet[0], han: c.han[0],
-            oppr: c.oppr[0], onp: c.onp[0], ppmm: c.ppmm[0] },
+            oppr: c.oppr[0], onp: c.onp[0], ppmm: c.ppmm[0], ppmh: c.ppmh[0] },
     // han is sparse, so "end" is its last READING, not its last slot;
-    // onp and ppmm follow it — both grid as all-null on some cycles
+    // onp, ppmm and ppmh follow it — all grid as all-null on some cycles
     end: { tpp: c.tpp[c.tpp.length - 1], primary: c.primary[c.primary.length - 1], net: c.net[c.net.length - 1], oppnet: c.oppnet[c.oppnet.length - 1], han: [...c.han].reverse().find((v) => v != null) ?? null,
            oppr: c.oppr[c.oppr.length - 1], onp: [...c.onp].reverse().find((v) => v != null) ?? null,
-           ppmm: [...c.ppmm].reverse().find((v) => v != null) ?? null },
+           ppmm: [...c.ppmm].reverse().find((v) => v != null) ?? null,
+           ppmh: [...c.ppmh].reverse().find((v) => v != null) ?? null },
     points: {
       tpp: c.months.map((m, i) => ({ x: m, y: c.tpp[i] })),
       primary: c.months.map((m, i) => ({ x: m, y: c.primary[i] })),
@@ -4899,9 +4917,10 @@ window.AUSPOL = (function () {
       oppr: c.months.map((m, i) => ({ x: m, y: c.oppr[i] })),
       onp: c.months.map((m, i) => ({ x: m, y: c.onp[i] })),
       ppmm: c.months.map((m, i) => ({ x: m, y: c.ppmm[i] })),
+      ppmh: c.months.map((m, i) => ({ x: m, y: c.ppmh[i] })),
     },
     raw: { tpp: c.tpp, primary: c.primary, net: c.net, oppnet: c.oppnet, han: c.han, months: c.months, obs: c.obs,
-           oppr: c.oppr, onp: c.onp, ppmm: c.ppmm,
+           oppr: c.oppr, onp: c.onp, ppmm: c.ppmm, ppmh: c.ppmh,
            ...(c.netEras ? { netEras: c.netEras } : {}), ...(c.oppEras ? { oppEras: c.oppEras } : {}),
            ...(c.ppmEras ? { ppmEras: c.ppmEras } : {}), ...(c.ppmPair ? { ppmPair: c.ppmPair } : {}),
            ...(c.tppEras ? { tppEras: c.tppEras } : {}) },
