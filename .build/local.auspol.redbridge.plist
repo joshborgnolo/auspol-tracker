@@ -38,13 +38,18 @@
                 <dict><key>Day</key><integer>3</integer><key>Hour</key><integer>6</integer></dict>
                 <dict><key>Day</key><integer>4</integer><key>Hour</key><integer>6</integer></dict>
                 <!-- Sunday evening, after AFR's 18:00 release (20:00 some
-                     months): these slots exist for extract-redbridge-afr.mjs,
-                     which files the wave from the AFR article's chart through
-                     the logged-in Chrome only this laptop has. Already-read
-                     articles are skipped (afr-seen.json), so a quiet Sunday
-                     costs a sitemap fetch and nothing else. -->
+                     months) at +5, +10 and +20 minutes: these slots exist for
+                     extract-redbridge-afr.mjs, which files the wave from the
+                     AFR article's chart through the logged-in Chrome only
+                     this laptop has. Already-read articles are skipped
+                     (afr-seen.json), so a quiet Sunday costs a sitemap fetch
+                     and nothing else. -->
+                <dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>18</integer><key>Minute</key><integer>5</integer></dict>
+                <dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>18</integer><key>Minute</key><integer>10</integer></dict>
                 <dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>18</integer><key>Minute</key><integer>20</integer></dict>
                 <dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>19</integer><key>Minute</key><integer>0</integer></dict>
+                <dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>5</integer></dict>
+                <dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>10</integer></dict>
                 <dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>20</integer></dict>
                 <dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>30</integer></dict>
                 <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>7</integer><key>Minute</key><integer>30</integer></dict>

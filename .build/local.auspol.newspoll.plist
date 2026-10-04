@@ -21,7 +21,10 @@
 		     time, again late evening, then next-morning and further catch-ups -->
 		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>19</integer></dict>
 		<!-- release night (Sep 2026 filed 21:00): with the Chrome read and the
-		     Matilda reader the first slot after publication can file the wave -->
+		     Matilda reader the first slots after publication file the wave —
+		     +5, +10 and +20 minutes after the ~20:00 release -->
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>5</integer></dict>
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>10</integer></dict>
 		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>20</integer></dict>
 		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>15</integer></dict>
 		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>21</integer><key>Minute</key><integer>45</integer></dict>
