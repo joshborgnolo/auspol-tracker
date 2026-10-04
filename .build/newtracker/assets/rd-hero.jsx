@@ -675,8 +675,13 @@ function RdHero(p) {
           onDoubleEmpty={() => swipeLive.current(1)}
           tooltipTitle={tooltipTitle} extraRows={extraRows}
           fmt={(v) => v.toFixed(1)}
+          /* the finding first, then how it is counted: "weighted aggregate
+             of 8 polls to 2 Oct" alone read as if the whole chart rested on
+             eight polls, when that is the latest window */
           copy={{ title: chartTitle.replace(/, %$/, ""),
-                  sub: basisWords.replace(/^Implied flows$/, "Implied preference flows").replace(/^As published$/, "Pollsters’ published figures") + (unc ? ", weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
+                  sub: (story && M[matchup].vsLabor ? story.head + ". " : "")
+                    + basisWords.replace(/^Implied flows$/, "Implied preference flows").replace(/^As published$/, "Pollsters’ published figures")
+                    + ", monthly averages" + (unc ? "; the latest reading pools the " + unc.n + " poll" + (unc.n === 1 ? "" : "s") + " in the " + D.latest.method.windowDays + " days to " + rdDate(D.latest.updatedISO, true) : "") + ".",
                   legend: copyKey.map((k) => ({ label: k.label, color: k.color, kind: k.kind })) }}
         />
         {badges && <RdEventList list={badges.list} from={badgesWas ? badgesWas.list : null} mix={t} onPick={pickEv} openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />}

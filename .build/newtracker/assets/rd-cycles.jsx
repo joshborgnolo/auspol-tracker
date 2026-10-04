@@ -14,6 +14,20 @@ const RD_CYC_TITLE = {
   ppmm: "PM’s lead, points",
   oppnet: "Net approval, points",
 };
+/* what a copied chart is called, read away from the board's row names */
+const RD_CYC_COPY = {
+  tpp: "Government’s two-party-preferred vote",
+  primary: "Government’s primary vote",
+  oppr: "Opposition’s primary vote",
+  net: "Prime minister’s net approval",
+  ppmm: "Prime minister’s lead as preferred PM",
+  oppnet: "Opposition leader’s net approval",
+};
+const RD_CYC_UNIT = {
+  net: "Points, approve minus disapprove.",
+  oppnet: "Points, approve minus disapprove.",
+  ppmm: "Points, the prime minister’s share minus the rival’s.",
+};
 const RD_CYC_TITLE_CHG = {
   tpp: "The government’s two-party share, change since its election, points",
   primary: "Government’s primary vote, change since the election",
@@ -233,8 +247,14 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
                                  notes: notesNow, marks: marksNow, brackets: bracketsNow } : now;
   /* a copy is read away from the section heads, so it says whose measure
      it is where the chart's own head leaves that to the section */
-  const copyTitle = M.key === "ppmm" ? "The PM’s lead as preferred prime minister, " + (chg ? "change since the first reading" : "points")
-    : M.key === "oppnet" && !chg ? "Opposition leader’s net approval, points" : title;
+  /* The copy's title names the measure and that it runs through each term
+     (the image adds the years the board covers); the units and what the
+     shading is go to the sub. "…, %, by months since its election" and
+     "…: approve minus disapprove, points" read as axis labels. */
+  const copyTitle = (RD_CYC_COPY[M.key] || title) + (chg ? ": change since " + (M.key === "tpp" || M.key === "primary" || M.key === "oppr" ? "the election" : "the first reading") : " through each term");
+  const copySub = "This term set against " + (banded ? "the middle half and middle 80% of " + bandN + " past terms"
+      + (outcomeShown === "returned" ? " whose government was re-elected" : outcomeShown === "ousted" ? " whose government was ousted" : "") : "past terms")
+    + " at the same point, month by month from each election. " + (M.unit === "%" && !chg ? "Per cent of the vote." : RD_CYC_UNIT[M.key] || "Points.");
   return (
     <div className="card rd-card rd-cyc-chart" ref={cardRef}>
       <div className="rd-chead">
@@ -262,8 +282,7 @@ function RdCycleChart({ M, chg, built, bandAreas, bandRows, scatter, events: evI
           return r && banded ? [{ label: "Middle half", value: fmt(r.q1) + "–" + fmt(r.q3) }, { label: "Middle 80%", value: fmt(r.p10) + "–" + fmt(r.p90) }] : [];
         }}
         fmt={(v) => fmt(v)} pollFacet={M.key === "tpp" ? "twopp" : M.key === "primary" || M.key === "oppr" ? "primary" : "leadership"}
-        copy={{ title: copyTitle, sub: banded ? "Against the middle half and middle 80% of " + bandN + " past terms"
-          + (outcomeShown === "returned" ? " whose government was re-elected" : outcomeShown === "ousted" ? " whose government was ousted" : "") : "", terms }}
+        copy={{ title: copyTitle, sub: copySub, terms }}
       />
       {badges && badges.list && <RdEventList list={badges.list} onPick={pickEv} openKey={evt && evt.e ? evt.e.badgeKey : null} />}
     </div>

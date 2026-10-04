@@ -249,7 +249,12 @@
        that has to grow. */
     const host = svg.closest(".chart");
     const anchor = host && host.parentElement;
-    if (!host || !anchor || host.getBoundingClientRect().width >= COPY_W - 1) return () => {};
+    /* Every chart is laid out for its copy, a wide one included: skipping
+       the hero at 1120px+ also skipped the copy's own layout, which spaces
+       its event names wider than the screen does, and the image came out
+       with "Joyce \u2192 ONP 2nd Coalition split Hormuz crisis" set end to
+       end as one phrase. */
+    if (!host || !anchor) return () => {};
     const hostStyle = host.getAttribute("style"), anchorStyle = anchor.getAttribute("style");
     /* Measure before mutating: the stand-in and the sibling freeze below are
        placed from these rects. */
@@ -324,17 +329,25 @@
     host.style.top = "0";
     host.style.left = "-99999px";
     host.style.width = COPY_W + "px";
-    /* Wait for the observer to fire and React to commit the wider placement,
-       watching for the labels themselves rather than counting frames - a busy
-       main thread makes any fixed frame count a guess. */
-    for (let i = 0; i < 30; i++) {
+    /* Wait for React to commit the copy's layout: TrendChart stamps the svg
+       with the width it laid out at while the flag is up (data-copy-cw).
+       Waiting on the stamp rather than on event labels, which a wide chart
+       already had on screen - the old test passed at once and the copy took
+       the screen's layout. A fixed frame count would be a guess on a busy
+       main thread; 600ms covers a chart that never stamps. */
+    for (let i = 0; i < 38; i++) {
       await new Promise((r) => setTimeout(r, 16));
-      if (svg.querySelector(".evt-label")) break;
+      const live = host.querySelector("svg.chart-svg") || svg;
+      if (Math.abs((+live.getAttribute("data-copy-cw") || 0) - COPY_W) <= 1) break;
     }
     return () => {
       /* stand out first so the frame that brings the host back never shows
          the pair stacked - removal and restore are one paint */
       if (stand.parentNode) stand.parentNode.removeChild(stand);
+      /* the live chart goes back to its own layout without its names gliding
+         home from where the copy put them (see data-copy-settle in the css) */
+      host.setAttribute("data-copy-settle", "");
+      setTimeout(() => host.removeAttribute("data-copy-settle"), 400);
       host.removeAttribute("data-copying");
       if (hostStyle == null) host.removeAttribute("style"); else host.setAttribute("style", hostStyle);
       for (const f of frozenSibs) {
@@ -749,8 +762,11 @@
        says so rather than being handed one built from those names. */
     const stated = !!(own && Array.isArray(own.legend));
     let legend = stated
-      ? own.legend.map((l) => ({ label: l.label, kind: ["dashed", "shade", "dot", "ring"].includes(l.kind) ? l.kind : "line",
-                                 fill: paint(l.color), alpha: 1 }))
+      /* a "band" (a party-coloured 95% interval) is a shade at the faint
+         weight the chart draws it, not a line: drawn as one, "95% interval"
+         read as a second series in the series' own colour */
+      ? own.legend.map((l) => ({ label: l.label, kind: l.kind === "band" ? "shade" : ["dashed", "shade", "dot", "ring"].includes(l.kind) ? l.kind : "line",
+                                 fill: paint(l.color), alpha: l.kind === "band" ? 0.4 : 1 }))
       : readLegend(target);
     if (!stated && !legend.length && board0) legend = boardLegend();
     if (!stated && !legend.length) legend = cycleLegend();
@@ -840,14 +856,15 @@
         });
         if (line.length) legLines.push(line);
 
-        /* a sub that runs past one line (the analysis panels carry a
+        /* a sub that runs past two lines (the analysis panels carry a
            paragraph) keeps its FIRST SENTENCE, wrapped to at most three
            lines, rather than a mid-clause cut */
         m.font = "400 16px " + sans;
         const subLines = (() => {
           if (!sub) return [];
           const all = wrapText(m, sub, IW);
-          if (all.length <= 1) return all;
+          /* two lines hold a finding and how it was measured, whole */
+          if (all.length <= 2) return all;
           const first = (sub.match(/^.*?[.!?](?=\s|$)/) || [sub])[0];
           return wrapText(m, first, IW).slice(0, 3);
         })();

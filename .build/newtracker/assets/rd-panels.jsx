@@ -263,7 +263,13 @@ function RdPrimary({ rangeId, setRangeId }) {
             return [{ label: "95% intervals", value: visible.map((p) => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ") }];
           }}
           fmt={(v) => v.toFixed(1)}
-          copy={{ title: "Primary vote", sub: story.head, legend: parts.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
+          /* read away from the page, the copy names its measure and its
+             base as well as the finding: "Primary vote" over "Labor and One
+             Nation are level" said neither whose votes nor how many polls */
+          copy={{ title: "First-preference vote for each party", sub: story.head + ". Monthly averages of " + D.latest.pollsTracked + " " + (D.pollsWord || "national")
+                    + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + ".",
+                  caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
+                  legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
         />
         {/* the 2PP card above already lists this window's events under its
             own chart, so two or more fold away behind a disclosure the
@@ -670,7 +676,8 @@ function RdLeadership({ rangeId }) {
     title: "Share in the three-way question, month by month", series: threeSeries, dots: threeDots,
     domain: [0, threeTop], yTicks: rdYTicks(0, threeTop, 10), yTickFmt: (y) => (y === 0 ? "0" : y % 20 === 0 ? y + "%" : ""),
     refLines: [], notes: threeNotes, spine: (threeSeries[0] || { points: [] }).points,
-    copy: { title: "Preferred prime minister", sub: "Each leader’s share when asked to choose from all three, month by month",
+    copy: { title: "Preferred prime minister: " + pm.short + ", " + opp.short + " or " + han.short,
+            sub: "Each leader’s share when voters are asked to choose from all three, month by month",
             legend: [], caption: keyDots + " " + keyThree },
   } : {
     title: pm.short + "’s lead" + (ppmView === "both" ? " head to head" : "") + ", month by month", series: leadSeries, dots: leadDots,
@@ -678,7 +685,8 @@ function RdLeadership({ rangeId }) {
     yTickFmt: (y) => (y === 0 ? "Tied" : y > 0 ? "+" + y : "−" + Math.abs(y)),
     refLines: [{ y: 0, color: "var(--ink-3)" }], notes: leadNotes,
     spine: (leadSeries.find((s) => s.id === "taylor") || leadSeries[0] || { points: [] }).points,
-    copy: { title: "Preferred prime minister", sub: pm.short + "’s lead over each rival, asked head to head, month by month",
+    copy: { title: pm.short + "’s lead as preferred prime minister",
+            sub: "Points ahead of each rival when voters are asked to choose between the two, month by month",
             legend: [], caption: keyDots + " " + keyLead + "." },
   };
   /* The engine widens the right margin to the longest end label showing, so
@@ -770,6 +778,9 @@ function RdLeadership({ rangeId }) {
     const notes = ley && ley.rows.length ? [{ x: ley.rows[ley.rows.length - 1].x, y: ley.rows[ley.rows.length - 1].v, dy: 18, text: "Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 }] : [];
     const spine = (drawn[0] && drawn[0].runs[0] ? drawn[0].runs[0].rows.filter((r) => !r.mid) : []);
     const title = (mt === "fav" ? "Favourability" : "Net approval") + ", month by month";
+    /* the copy names the leaders: "Leaders’ net approval" left a reader of
+       the image to work out whose lines these were from the end labels */
+    const leaderNames = rdList(drawn.map((d) => d.Ld.short));
     const was = m ? fitFor(m.from).domain : null;
     /* keyed by its SLOT, not its metric: keyed by metric, an approval <->
        favourability switch remounted the chart - which fades in from blank -
@@ -783,9 +794,9 @@ function RdLeadership({ rangeId }) {
       fade: m ? m.t : 1, pollFacet: "leadership", spine,
       /* read away from the panel: its name, its measure, and the key */
       copy: mt === "fav"
-        ? { title: "Leaders’ net favourability", sub: "Favourable minus unfavourable views of each leader as a person, month by month",
+        ? { title: "Net favourability of " + leaderNames, sub: "Favourable minus unfavourable views of each leader as a person, month by month",
             legend: [], caption: keyDots + " Polls by RedBridge, DemosAU, Freshwater and Spectre Strategy." }
-        : { title: "Leaders’ net approval", sub: "Approve minus disapprove of the job each leader is doing, month by month",
+        : { title: "Net approval of " + leaderNames, sub: "Approve minus disapprove of the job each leader is doing, month by month",
             legend: [], caption: keyDots + " Polls by Newspoll, YouGov, Resolve, Essential and others." },
       extraRows: (i) => { const r = spine[i]; if (!r) return []; const cs = leaders.map((Ld) => { const row = pts.find((p) => p.ym === r.ym); const k = (Ld.id === "taylor" && row && row.taylor_net == null && row.ley_net != null ? "ley" : Ld.id) + "_" + mt + "Ci"; return row && row[k] != null ? "±" + row[k].toFixed(1) : null; }).filter(Boolean); return cs.length ? [{ label: "95% intervals", value: cs.join(", ") }] : []; },
     });
@@ -1140,7 +1151,8 @@ function RdDirection({ rangeId }) {
           tooltipTitle={(i) => (pts[i] ? monthLabelFull(pts[i].ym) : "")}
           extraRows={(i) => { const d = pts[i]; return d && d.rightCi != null ? [{ label: "95% intervals", value: "±" + d.rightCi.toFixed(1) + ", ±" + d.wrongCi.toFixed(1) }] : []; }}
           fmt={(v) => v.toFixed(1)}
-          copy={{ title: "National direction", sub: head, legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
+          copy={{ title: "Is Australia heading in the right direction?", sub: head + ". Monthly averages, adjusted for each pollster’s lean, of every poll asking whether the country is heading in the right direction or on the wrong track.",
+                  caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." + (asked ? " Polls by " + asked + "." : ""), legend: [{ label: "Right direction", color: "var(--mood-pos)", kind: "line" }, { label: "Wrong track", color: "var(--mood-neg)", kind: "line" }] }}
         />
         {badges && <RdEventList list={badges.list} />}
         <RdKey className="rd-ckey" items={[
@@ -2053,7 +2065,7 @@ function RdDemographics({ rangeId = "all" }) {
                     tooltipTitle={(i) => (seY != null && i === 0 ? monthLabelFull("2025-05") : c.allPts[seY != null ? i - 1 : i] ? monthLabelFull(c.allPts[seY != null ? i - 1 : i].ym) : "")}
                     extraRows={seY != null ? ((i) => (i === 0 ? [{ label: "", value: "The election result" }] : ciUnshifted(i - 1))) : ciUnshifted}
                     fmt={(v) => v.toFixed(1)}
-                    copy={{ title: "Who votes for whom", sub: pPoss + " share of the vote in " + name + ", month by month",
+                    copy={{ title: rdCap(pPoss) + " vote: " + name, sub: "Share of this group who would vote for " + pName + ", month by month, against all voters",
                             legend: [{ label: name, color: pColor, kind: "line" }, { label: "95% interval", color: pColor, kind: "band" }, { label: "All voters", color: "var(--ink)", kind: "dashed" }] }}
                   />
                 </div>
@@ -2118,7 +2130,7 @@ function RdDemographics({ rangeId = "all" }) {
         fmt={(v) => v.toFixed(1)}
         /* keyed in full: a phone names no line at its end, and "All voters"
            loses its name wherever the groups crowd it */
-        copy={{ title: "Who votes for whom", sub: pPoss + " share of the vote, " + (c.st.label || "By " + tab.label).toLowerCase() + ", month by month",
+        copy={{ title: rdCap(pPoss) + " vote " + (c.st.label || "By " + tab.label).toLowerCase(), sub: "Share of each group who would vote for " + pName + ", month by month, against all voters",
                 legend: c.drawn.map((l) => ({ label: l.g.label, color: l.color, kind: "line" }))
                   .concat([{ label: "95% interval", color: pColor, kind: "band" }, { label: "All voters", color: "var(--ink)", kind: "dashed" }]) }}
       />
@@ -2292,6 +2304,8 @@ function RdSwitching({ rangeId }) {
   S.series.forEach((sr) => { byId[sr.id] = sr; });
   const NAME = { lnp: "Coalition", alp: "Labor", oth: "Others", grn: "Greens" };
   const LONG = { lnp: "Coalition voters", alp: "Labor voters", oth: "Others & independents", grn: "Greens voters" };
+  const VOTED = { lnp: "for the Coalition", alp: "Labor", oth: "for another party or an independent", grn: "Green" };
+  const VOTERS25 = { lnp: "2025 Coalition voters", alp: "2025 Labor voters", oth: "2025 minor-party and independent voters", grn: "2025 Greens voters" };
   /* One Nation's own 2025 voters: the share still backing it, pooled over
      the same polls as the rates */
   const recent = (S.waves || []).slice(-(S.now && S.now.n ? S.now.n : 5));
@@ -2506,7 +2520,8 @@ function RdSwitching({ rangeId }) {
                 tooltipTitle={(i) => (pts[i] ? window.AP.monthLabelFull(pts[i].ym) : "")}
                 extraRows={(i) => (pts[i] && pts[i].ci != null ? [{ label: "95% interval", value: "±" + pts[i].ci.toFixed(1) }] : [])}
                 fmt={(v) => v.toFixed(1)}
-                copy={{ title: LONG[c.id] + " now backing One Nation", sub: "Share of the party’s 2025 voters, month by month",
+                copy={{ title: VOTERS25[c.id] + " now backing One Nation",
+                        sub: "Share of those who voted " + VOTED[c.id] + " at the 2025 election who now say they would vote One Nation, month by month",
                         legend: [{ label: "Monthly average", color: c.color, kind: "line" }, { label: "95% interval", color: c.color, kind: "band" }] }}
               />
             </div>
@@ -2981,7 +2996,9 @@ function RdIssues({ rangeId = "all" }) {
                   areas={chDraw.areas} spine={series(ch.pts, P[0])} scatter={chDraw.scatter} scatterOut={chDraw.scatterOut}
                   scatterMove={chDraw.scatterMove} fade={chDraw.fade} driven={!!issMorph} pollFacet="primary"
                   tooltipTitle={(i) => (ch.pts[i] ? monthLabelFull(ch.pts[i].ym) : "")} fmt={(v) => Math.round(v) + ""}
-                  copy={{ title: it.label + ": who voters think is best", sub: "Of those naming Labor, the Coalition or One Nation" }} />
+                  copy={{ title: "Which party voters think is best on " + it.label.charAt(0).toLowerCase() + it.label.slice(1),
+                          sub: "Share naming each party as best on the issue, of those naming Labor, the Coalition or One Nation, month by month",
+                          caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." }} />
                 <RdKey className="rd-ckey" items={[{ kind: "dot", color: "var(--ink-3)", label: "One poll" }, { kind: "lineband", color: "var(--ink-3)", label: "Monthly average and 95% interval" }]} />
                 <HowTo label="How to read these figures" paras={[
                   <>The grey bar is how many voters put the issue among their three most important. RedBridge and Ipsos both ask every month, in different words, and their figures sit a steady distance apart, so each poll is moved half that distance toward the other before the two are pooled.</>,
@@ -3250,7 +3267,9 @@ function RdUndecided({ rangeId }) {
           fmt={(v) => v.toFixed(1)}
           /* the readouts over the chart say which line is which; the copy
              leaves them behind, so its key says it, with the figures */
-          copy={{ title: title, sub: meta, caption: drawn.some((d) => d.s.id === "tpp")
+          copy={{ title: key === "und" ? "Undecided voters" : "Voters who might still change their mind",
+                  sub: key === "und" ? "Share of all voters who can’t say who they’d vote for, month by month"
+                    : "Share of voters naming a party who say they could still change their mind, month by month", caption: drawn.some((d) => d.s.id === "tpp")
                     ? "Each dot is one poll, open rings for after preferences; lines are monthly averages."
                     : "Each dot is one poll; lines are monthly averages.",
                   legend: drawn.map((d) => ({ label: (d.s.id === "soft" ? "Might still change" : d.s.label) + " " + nowOf(d.s).toFixed(1) + "%",
@@ -3449,7 +3468,7 @@ function RdUndecided({ rangeId }) {
                   scatter={partyView.waves.map((w) => ({ x: w.x, y: w.solid[k], color: D.PARTIES[k].color, label: D.PARTIES[k].name, meta: w }))} pollFacet="twopp"
                   tooltipTitle={(i) => (partyView.lines[i] ? partyView.lines[i].dateLabel : "")} fmt={(v) => v.toFixed(0)}
                   /* the dashed line is keyed only in the sub-head over the grid */
-                  copy={{ title: (k === "oth" ? "Others" : D.PARTIES[k].name) + " voters calling their vote solid", sub: "Three RedBridge waves at a time",
+                  copy={{ title: (k === "oth" ? "Others" : D.PARTIES[k].name) + " voters calling their vote solid", sub: "Share of the party’s voters who say their vote is solid, pooled three RedBridge waves at a time, against all voters",
                           caption: "Dots are single waves.",
                           legend: [{ label: (k === "oth" ? "Others" : D.PARTIES[k].name) + " voters " + F.now[k].v.toFixed(1) + "%", color: D.PARTIES[k].color, kind: "line" },
                                    { label: "All voters " + F.now.all.v.toFixed(1) + "%", color: "var(--ink)", kind: "dashed" }] }} />

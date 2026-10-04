@@ -405,6 +405,7 @@ function TrendChart(props) {
   // axis text in real on-screen px – normalise by measured width so every
   // chart's labels match regardless of column width / responsive stacking
   const [cw, setCw] = useState(widthSeed || VB.W);
+  const [, setCopyTick] = useState(0);       // see the copy flag's observer below
   /* measured before the chart is first painted (a LAYOUT effect): measured
      after it, a chart that mounts - a second chart under "Both", a tab
      opening - painted once at the viewBox's width, a third of its height on
@@ -418,10 +419,20 @@ function TrendChart(props) {
     if (widthSeed == null) update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
-    return () => ro.disconnect();
+    /* copy-chart.js flags the host data-copying for an image's layout. A
+       chart already 1120px wide gets no resize from that, and rendered
+       without the flag it kept the screen's tight event spacing in the copy,
+       so the flag itself re-renders the chart, on and off. */
+    const mo = new MutationObserver(() => setCopyTick((t) => t + 1));
+    mo.observe(el, { attributes: true, attributeFilter: ["data-copying"] });
+    return () => { ro.disconnect(); mo.disconnect(); };
   }, []);
   const k0 = cw / VB.W;
-  const height = heightPx ? heightPx / k0 : heightIn;
+  /* A copy is at least 0.3 of its width tall: a small multiple's 140px,
+     laid out 1120 wide for the image, came out a strip - the vote-switching
+     lines flattened into a band a seventh of the plot's height. */
+  const copyMinH = ref.current && ref.current.hasAttribute("data-copying") ? cw * 0.3 : 0;
+  const height = heightPx ? Math.max(heightPx, copyMinH) / k0 : heightIn;
   const padProp = padPx ? { l: padPx.l / k0, r: padPx.r / k0, t: padPx.t / k0, b: padPx.b / k0 } : padIn;
   /* Direct end-of-line labels need room past the last point, and it has to
      be found in SCREEN px: the viewBox is a fixed width, so a phone's label
@@ -1091,7 +1102,11 @@ function TrendChart(props) {
     const fsz = refUnits;          // 10.5px on screen: the type floor for words
     /* the redesign hangs its event names in two rows ABOVE the plot, each
        name a flag on its own rule, so no label sits over the data */
-    const ROWS = rd ? 2 : 3;
+    /* ...and a copy a third: the image grows upward to take in whatever
+       sits over the plot, and with two rows the hero's winter of events
+       still ran "Joyce → ONP", "2nd Coalition split" and "Hormuz crisis"
+       along one row, joined by elbows */
+    const ROWS = rd ? (copying ? 3 : 2) : 3;
     const ROW_H = refUnits * (rd ? 1.35 : 1.4);
     const LEAD = rd ? PX(5) : refUnits * 0.55;   // shortest elbow, line to text
     /* clear air between labels in a row - wider in a copy, which names what
@@ -1184,6 +1199,7 @@ function TrendChart(props) {
   return (
     <div className="chart" ref={ref} data-copy={copy ? JSON.stringify(copy) : undefined}>
       <svg viewBox={`0 0 ${W} ${H}`} className={"chart-svg" + (switching ? " switching" : "")}
+           data-copy-cw={copying ? Math.round(cw) : undefined}
            onPointerMove={onPointerMove} onPointerDown={onPointerDown}
            onPointerUp={onPointerUp} onPointerCancel={onPointerCancel}
            onMouseLeave={handleLeave} onClick={handleClick}

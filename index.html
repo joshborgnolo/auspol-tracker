@@ -2915,6 +2915,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   .exp-btn.open:active { transform: rotate(90deg) scale(0.965); }
 }
 .copy-stand, .copy-stand * { animation: none; transition: none; }
+.chart[data-copying] *, .chart[data-copy-settle] * { animation: none !important; transition: none !important; }
 @media (prefers-reduced-motion: reduce) {
   .guide, .hover-marker, .tip { transition: none; animation: none; }
   .acc-dot, .acc-mean { transition: none; }
@@ -52626,7 +52627,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
   const widenForCopy = async svg => {
     const host = svg.closest(".chart");
     const anchor = host && host.parentElement;
-    if (!host || !anchor || host.getBoundingClientRect().width >= COPY_W - 1) return () => {};
+    if (!host || !anchor) return () => {};
     const hostStyle = host.getAttribute("style"),
       anchorStyle = anchor.getAttribute("style");
     const hostRect = host.getBoundingClientRect();
@@ -52678,12 +52679,15 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
     host.style.top = "0";
     host.style.left = "-99999px";
     host.style.width = COPY_W + "px";
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 38; i++) {
       await new Promise(r => setTimeout(r, 16));
-      if (svg.querySelector(".evt-label")) break;
+      const live = host.querySelector("svg.chart-svg") || svg;
+      if (Math.abs((+live.getAttribute("data-copy-cw") || 0) - COPY_W) <= 1) break;
     }
     return () => {
       if (stand.parentNode) stand.parentNode.removeChild(stand);
+      host.setAttribute("data-copy-settle", "");
+      setTimeout(() => host.removeAttribute("data-copy-settle"), 400);
       host.removeAttribute("data-copying");
       if (hostStyle == null) host.removeAttribute("style");else host.setAttribute("style", hostStyle);
       for (const f of frozenSibs) {
@@ -53013,9 +53017,9 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
     const stated = !!(own && Array.isArray(own.legend));
     let legend = stated ? own.legend.map(l => ({
       label: l.label,
-      kind: ["dashed", "shade", "dot", "ring"].includes(l.kind) ? l.kind : "line",
+      kind: l.kind === "band" ? "shade" : ["dashed", "shade", "dot", "ring"].includes(l.kind) ? l.kind : "line",
       fill: paint(l.color),
-      alpha: 1
+      alpha: l.kind === "band" ? 0.4 : 1
     })) : readLegend(target);
     if (!stated && !legend.length && board0) legend = boardLegend();
     if (!stated && !legend.length) legend = cycleLegend();
@@ -53097,7 +53101,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
         const subLines = (() => {
           if (!sub) return [];
           const all = wrapText(m, sub, IW);
-          if (all.length <= 1) return all;
+          if (all.length <= 2) return all;
           const first = (sub.match(/^.*?[.!?](?=\s|$)/) || [sub])[0];
           return wrapText(m, first, IW).slice(0, 3);
         })();
@@ -54316,6 +54320,7 @@ function TrendChart(props) {
   const badgeAt = useRef({});
   const labOff = useRef(new Map());
   const [cw, setCw] = useState(widthSeed || VB.W);
+  const [, setCopyTick] = useState(0);
   React.useLayoutEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
@@ -54323,10 +54328,19 @@ function TrendChart(props) {
     if (widthSeed == null) update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
-    return () => ro.disconnect();
+    const mo = new MutationObserver(() => setCopyTick(t => t + 1));
+    mo.observe(el, {
+      attributes: true,
+      attributeFilter: ["data-copying"]
+    });
+    return () => {
+      ro.disconnect();
+      mo.disconnect();
+    };
   }, []);
   const k0 = cw / VB.W;
-  const height = heightPx ? heightPx / k0 : heightIn;
+  const copyMinH = ref.current && ref.current.hasAttribute("data-copying") ? cw * 0.3 : 0;
+  const height = heightPx ? Math.max(heightPx, copyMinH) / k0 : heightIn;
   const padProp = padPx ? {
     l: padPx.l / k0,
     r: padPx.r / k0,
@@ -54911,7 +54925,7 @@ function TrendChart(props) {
       badgeLead: false
     } : e).filter(e => e.x >= win[0] && e.x <= win[1]).sort((a, b) => a.x - b.x);
     const fsz = refUnits;
-    const ROWS = rd ? 2 : 3;
+    const ROWS = rd ? copying ? 3 : 2 : 3;
     const ROW_H = refUnits * (rd ? 1.35 : 1.4);
     const LEAD = rd ? PX(5) : refUnits * 0.55;
     const SEP = refUnits * (copying ? 2 : 0.85);
@@ -55054,6 +55068,7 @@ function TrendChart(props) {
   }, React.createElement("svg", {
     viewBox: `0 0 ${W} ${H}`,
     className: "chart-svg" + (switching ? " switching" : ""),
+    "data-copy-cw": copying ? Math.round(cw) : undefined,
     onPointerMove: onPointerMove,
     onPointerDown: onPointerDown,
     onPointerUp: onPointerUp,
@@ -72872,7 +72887,7 @@ function RdHero(p) {
     fmt: v => v.toFixed(1),
     copy: {
       title: chartTitle.replace(/, %$/, ""),
-      sub: basisWords.replace(/^Implied flows$/, "Implied preference flows").replace(/^As published$/, "Pollsters’ published figures") + (unc ? ", weighted aggregate of " + unc.n + " polls to " + rdDate(D.latest.updatedISO) : ""),
+      sub: (story && M[matchup].vsLabor ? story.head + ". " : "") + basisWords.replace(/^Implied flows$/, "Implied preference flows").replace(/^As published$/, "Pollsters’ published figures") + ", monthly averages" + (unc ? "; the latest reading pools the " + unc.n + " poll" + (unc.n === 1 ? "" : "s") + " in the " + D.latest.method.windowDays + " days to " + rdDate(D.latest.updatedISO, true) : "") + ".",
       legend: copyKey.map(k => ({
         label: k.label,
         color: k.color,
@@ -73235,9 +73250,10 @@ function RdPrimary({
     },
     fmt: v => v.toFixed(1),
     copy: {
-      title: "Primary vote",
-      sub: story.head,
-      legend: parts.map(p => ({
+      title: "First-preference vote for each party",
+      sub: story.head + ". Monthly averages of " + D.latest.pollsTracked + " " + (D.pollsWord || "national") + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + ".",
+      caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
+      legend: visible.map(p => ({
         label: p.name,
         color: p.color,
         kind: p.id === "oth" ? "dashed" : "line"
@@ -73801,8 +73817,8 @@ function RdLeadership({
       points: []
     }).points,
     copy: {
-      title: "Preferred prime minister",
-      sub: "Each leader’s share when asked to choose from all three, month by month",
+      title: "Preferred prime minister: " + pm.short + ", " + opp.short + " or " + han.short,
+      sub: "Each leader’s share when voters are asked to choose from all three, month by month",
       legend: [],
       caption: keyDots + " " + keyThree
     }
@@ -73822,8 +73838,8 @@ function RdLeadership({
       points: []
     }).points,
     copy: {
-      title: "Preferred prime minister",
-      sub: pm.short + "’s lead over each rival, asked head to head, month by month",
+      title: pm.short + "’s lead as preferred prime minister",
+      sub: "Points ahead of each rival when voters are asked to choose between the two, month by month",
       legend: [],
       caption: keyDots + " " + keyLead + "."
     }
@@ -74005,6 +74021,7 @@ function RdLeadership({
     }] : [];
     const spine = drawn[0] && drawn[0].runs[0] ? drawn[0].runs[0].rows.filter(r => !r.mid) : [];
     const title = (mt === "fav" ? "Favourability" : "Net approval") + ", month by month";
+    const leaderNames = rdList(drawn.map(d => d.Ld.short));
     const was = m ? fitFor(m.from).domain : null;
     return lchart("rd-appr-" + (key === "b" ? "b" : "main"), title, {
       yDomain: dom,
@@ -74033,12 +74050,12 @@ function RdLeadership({
       pollFacet: "leadership",
       spine,
       copy: mt === "fav" ? {
-        title: "Leaders’ net favourability",
+        title: "Net favourability of " + leaderNames,
         sub: "Favourable minus unfavourable views of each leader as a person, month by month",
         legend: [],
         caption: keyDots + " Polls by RedBridge, DemosAU, Freshwater and Spectre Strategy."
       } : {
-        title: "Leaders’ net approval",
+        title: "Net approval of " + leaderNames,
         sub: "Approve minus disapprove of the job each leader is doing, month by month",
         legend: [],
         caption: keyDots + " Polls by Newspoll, YouGov, Resolve, Essential and others."
@@ -74641,8 +74658,9 @@ function RdDirection({
     },
     fmt: v => v.toFixed(1),
     copy: {
-      title: "National direction",
-      sub: head,
+      title: "Is Australia heading in the right direction?",
+      sub: head + ". Monthly averages, adjusted for each pollster’s lean, of every poll asking whether the country is heading in the right direction or on the wrong track.",
+      caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals." + (asked ? " Polls by " + asked + "." : ""),
       legend: [{
         label: "Right direction",
         color: "var(--mood-pos)",
@@ -75824,8 +75842,8 @@ function RdDemographics({
           }] : ciUnshifted(i - 1) : ciUnshifted,
           fmt: v => v.toFixed(1),
           copy: {
-            title: "Who votes for whom",
-            sub: pPoss + " share of the vote in " + name + ", month by month",
+            title: rdCap(pPoss) + " vote: " + name,
+            sub: "Share of this group who would vote for " + pName + ", month by month, against all voters",
             legend: [{
               label: name,
               color: pColor,
@@ -75938,8 +75956,8 @@ function RdDemographics({
         }] : ciLoc(i - 1) : ciLoc,
         fmt: v => v.toFixed(1),
         copy: {
-          title: "Who votes for whom",
-          sub: pPoss + " share of the vote, " + (c.st.label || "By " + tab.label).toLowerCase() + ", month by month",
+          title: rdCap(pPoss) + " vote " + (c.st.label || "By " + tab.label).toLowerCase(),
+          sub: "Share of each group who would vote for " + pName + ", month by month, against all voters",
           legend: c.drawn.map(l => ({
             label: l.g.label,
             color: l.color,
@@ -76202,6 +76220,18 @@ function RdSwitching({
     alp: "Labor voters",
     oth: "Others & independents",
     grn: "Greens voters"
+  };
+  const VOTED = {
+    lnp: "for the Coalition",
+    alp: "Labor",
+    oth: "for another party or an independent",
+    grn: "Green"
+  };
+  const VOTERS25 = {
+    lnp: "2025 Coalition voters",
+    alp: "2025 Labor voters",
+    oth: "2025 minor-party and independent voters",
+    grn: "2025 Greens voters"
   };
   const recent = (S.waves || []).slice(-(S.now && S.now.n ? S.now.n : 5));
   const keptPct = recent.length ? recent.reduce((s, w) => s + w.keptPct * (w.sample || 1), 0) / recent.reduce((s, w) => s + (w.sample || 1), 0) : null;
@@ -76584,8 +76614,8 @@ function RdSwitching({
       }] : [],
       fmt: v => v.toFixed(1),
       copy: {
-        title: LONG[c.id] + " now backing One Nation",
-        sub: "Share of the party’s 2025 voters, month by month",
+        title: VOTERS25[c.id] + " now backing One Nation",
+        sub: "Share of those who voted " + VOTED[c.id] + " at the 2025 election who now say they would vote One Nation, month by month",
         legend: [{
           label: "Monthly average",
           color: c.color,
@@ -77270,8 +77300,9 @@ function RdIssues({
     tooltipTitle: i => ch.pts[i] ? monthLabelFull(ch.pts[i].ym) : "",
     fmt: v => Math.round(v) + "",
     copy: {
-      title: it.label + ": who voters think is best",
-      sub: "Of those naming Labor, the Coalition or One Nation"
+      title: "Which party voters think is best on " + it.label.charAt(0).toLowerCase() + it.label.slice(1),
+      sub: "Share naming each party as best on the issue, of those naming Labor, the Coalition or One Nation, month by month",
+      caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals."
     }
   }), React.createElement(RdKey, {
     className: "rd-ckey",
@@ -77695,8 +77726,8 @@ function RdUndecided({
       },
       fmt: v => v.toFixed(1),
       copy: {
-        title: title,
-        sub: meta,
+        title: key === "und" ? "Undecided voters" : "Voters who might still change their mind",
+        sub: key === "und" ? "Share of all voters who can’t say who they’d vote for, month by month" : "Share of voters naming a party who say they could still change their mind, month by month",
         caption: drawn.some(d => d.s.id === "tpp") ? "Each dot is one poll, open rings for after preferences; lines are monthly averages." : "Each dot is one poll; lines are monthly averages.",
         legend: drawn.map(d => ({
           label: (d.s.id === "soft" ? "Might still change" : d.s.label) + " " + nowOf(d.s).toFixed(1) + "%",
@@ -78084,7 +78115,7 @@ function RdUndecided({
     fmt: v => v.toFixed(0),
     copy: {
       title: (k === "oth" ? "Others" : D.PARTIES[k].name) + " voters calling their vote solid",
-      sub: "Three RedBridge waves at a time",
+      sub: "Share of the party’s voters who say their vote is solid, pooled three RedBridge waves at a time, against all voters",
       caption: "Dots are single waves.",
       legend: [{
         label: (k === "oth" ? "Others" : D.PARTIES[k].name) + " voters " + F.now[k].v.toFixed(1) + "%",
@@ -79229,6 +79260,19 @@ Object.assign(window, {
   ppmm: "PM’s lead, points",
   oppnet: "Net approval, points"
 };
+const RD_CYC_COPY = {
+  tpp: "Government’s two-party-preferred vote",
+  primary: "Government’s primary vote",
+  oppr: "Opposition’s primary vote",
+  net: "Prime minister’s net approval",
+  ppmm: "Prime minister’s lead as preferred PM",
+  oppnet: "Opposition leader’s net approval"
+};
+const RD_CYC_UNIT = {
+  net: "Points, approve minus disapprove.",
+  oppnet: "Points, approve minus disapprove.",
+  ppmm: "Points, the prime minister’s share minus the rival’s."
+};
 const RD_CYC_TITLE_CHG = {
   tpp: "The government’s two-party share, change since its election, points",
   primary: "Government’s primary vote, change since the election",
@@ -79612,7 +79656,8 @@ function RdCycleChart({
     marks: marksNow,
     brackets: bracketsNow
   } : now;
-  const copyTitle = M.key === "ppmm" ? "The PM’s lead as preferred prime minister, " + (chg ? "change since the first reading" : "points") : M.key === "oppnet" && !chg ? "Opposition leader’s net approval, points" : title;
+  const copyTitle = (RD_CYC_COPY[M.key] || title) + (chg ? ": change since " + (M.key === "tpp" || M.key === "primary" || M.key === "oppr" ? "the election" : "the first reading") : " through each term");
+  const copySub = "This term set against " + (banded ? "the middle half and middle 80% of " + bandN + " past terms" + (outcomeShown === "returned" ? " whose government was re-elected" : outcomeShown === "ousted" ? " whose government was ousted" : "") : "past terms") + " at the same point, month by month from each election. " + (M.unit === "%" && !chg ? "Per cent of the vote." : RD_CYC_UNIT[M.key] || "Points.");
   return React.createElement("div", {
     className: "card rd-card rd-cyc-chart",
     ref: cardRef
@@ -79691,7 +79736,7 @@ function RdCycleChart({
     pollFacet: M.key === "tpp" ? "twopp" : M.key === "primary" || M.key === "oppr" ? "primary" : "leadership",
     copy: {
       title: copyTitle,
-      sub: banded ? "Against the middle half and middle 80% of " + bandN + " past terms" + (outcomeShown === "returned" ? " whose government was re-elected" : outcomeShown === "ousted" ? " whose government was ousted" : "") : "",
+      sub: copySub,
       terms
     }
   }), badges && badges.list && React.createElement(RdEventList, {

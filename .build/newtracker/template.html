@@ -4803,6 +4803,15 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
    svg. Unconditional, scoped to the clone class; real charts keep their
    entrance motion. Must sit after the rules it overrides. */
 .copy-stand, .copy-stand * { animation: none; transition: none; }
+/* A chart being laid out wide for a copy (data-copying), and for a moment
+   after it is put back (data-copy-settle): its end labels sit by transform
+   and glide on a .2s transition, so the copy caught each name partway from
+   where the narrow chart had it - "over Hanson" under the axis, "Right
+   direction" cut at the card's edge (the text box was measured mid-glide),
+   a phone's "ON"/"ALP" and "Average" hundreds of px below the plot. Placed
+   at once, the image reads the names where they land; settling, the live
+   chart snaps back rather than visibly sliding home. */
+.chart[data-copying] *, .chart[data-copy-settle] * { animation: none !important; transition: none !important; }
 @media (prefers-reduced-motion: reduce) {
   .guide, .hover-marker, .tip { transition: none; animation: none; }
   .acc-dot, .acc-mean { transition: none; }
