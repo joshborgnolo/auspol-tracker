@@ -2427,7 +2427,7 @@ function RdAllPolls(P) {
               : "Every poll’s primary votes are read through the same preference flows, the 2025 election’s, so the polls compare like for like; the pollster’s own figure sits beneath where it published one. Those flows carry doubt of their own, but the same doubt for every poll, so each interval is sampling error alone. A dash marks a figure the pollster didn’t publish."))
           : "A dash marks a figure the pollster didn’t publish. Open any row for the poll in full."}</span>
         <span className="rd-grow"></span>
-        <span className="rd-foot-links"><a className="rd-how" href="/feedback/">Report an error</a><RdHow term="poll-lean" from="All polls" /></span>
+        <span className="rd-foot-links"><a className="rd-how" href="/feedback/">Report an error</a><RdHow term="all-polls" from="All polls" /></span>
       </div>
       {sheet && phone && (
         <RdApSheet onClose={() => setSheet(false)} houses={houses} houseRank={houseRank} houseN={houseN} sel={sel}

@@ -1325,7 +1325,7 @@ function RdPastCycles(p) {
           <span className="rd-foot-text">Each term is lined up on its own election day, so month {m} is the same distance into every one of them. Past terms are averaged month by month the way this term is; where a term changed leader, its line follows whoever held the office.</span>
           <span className="rd-grow"></span>
           <button type="button" className="rd-how rd-cyc-csv" onClick={exportSource}><DownloadIcon /> Source polls, CSV</button>
-          <RdHow term="what-am-i-looking-at" from="Past cycles" />
+          <RdHow term="past-cycles" from="Past cycles" />
         </div>
       </section>
       <RdSec id="cyc-tpp" title="Two-party preferred" meta="Implied from each poll’s primary votes, on the flows counted at the election that opened its term"

@@ -6051,12 +6051,14 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
 
 
 // ====================================================================
-// INFO – the glossary
+// INFO – the explainers
 // ====================================================================
-/* Every term the rest of the site uses, defined once, alphabetically. It
-   replaces the method footer that used to sit under all three tabs: three
-   sections of flowing prose that a reader had to scroll past the whole page
-   to reach and then read end-to-end to find one definition.
+/* About, the questions every reader asks first, the method every section
+   shares, then one explainer per section of the site in the page's order
+   (see THE PAGE'S SHAPE inside infoTerms). It replaces the method footer that
+   used to sit under all three tabs: three sections of flowing prose that a
+   reader had to scroll past the whole page to reach and then read end-to-end
+   to find one definition.
 
    The figures inside are LIVE. A definition that quotes a number has to quote
    the current one or it becomes a second, drifting copy of the page - the same
@@ -6231,10 +6233,7 @@ function infoTerms(D) {
         {" "}against {swP.plainTotal} unweighted
         {swP.rescaled
           ? ` – past the half-point tolerance, so all five are scaled by ${swP.plainTotal} ÷ ${swP.adjTotal}, which is how the Labor figure above lands at ${swP.v.toFixed(1)}.`
-          : " – within the half-point tolerance, so nothing is rescaled."}
-        {" "}A wave counts from its fieldwork midpoint and fades out over its last week: full
-        weight to day 14, then a half-cosine taper to zero on day 21, when it leaves the
-        window.</p>
+          : " – within the half-point tolerance, so nothing is rescaled."}</p>
     </div>
   ) : null;
   const tppWork = swT && swT.rows.length ? (
@@ -6458,434 +6457,520 @@ function infoTerms(D) {
     </div>
   ) : null;
 
-  /* Glossary, grouped by what the reader is trying to understand rather than
-     alphabetised: a family of terms (the three disagreement verdicts, the
-     three preference tables) reads best side by side. Within a group the
-     order is the order a reader needs them in. */
-  const groups = [
-    { id: "g-headline", title: "The headline and how it is built", entries: [
-      { id: "weighted-aggregate", term: "Weighted aggregate", body: (
-        <>How the headline is built. It averages the recent polls, giving more weight to newer
-        and larger ones, after removing each pollster’s known lean – its
-        {" "}{xref("house-effect", "weighted aggregate", "house effect")}.
-        <span className="info-p"><b>Recency.</b> A poll’s weight halves every seven days. It
-        counts in full for two weeks, then fades smoothly to nothing by day 21, when it leaves
-        the window.</span>
-        <span className="info-p"><b>Size.</b> Larger samples count for more. Where a pollster
-        publishes an {xref("effective-sample", "weighted aggregate", "effective sample")} in its
-        Australian Polling Council methodology statement, that figure is used. Otherwise the raw
-        sample is discounted by 1.6, roughly what weighting costs the pollsters that do publish,
-        and capped at 3,000 people.</span>
-        <span className="info-p"><b>Repeat polls.</b> A pollster that publishes several times in
-        the window counts for the square root of its number of polls, so three weekly Roy Morgan
-        polls count as 1.7, not 3.</span>
-        <span className="info-p"><b>One exclusion.</b> Roy Morgan’s SMS polls stay in the archive
-        but count towards no aggregate here: SMS polls have a strong selection bias.</span>
-        <span className="info-p">The headline two-party figure runs each poll’s primary votes
-        through the fixed 2025 preference table – the
-        {" "}{xref("implied-2pp", "weighted aggregate", "implied 2PP")} – so every poll that
-        publishes primaries counts.{SL ? <> Today that is {SL.alp.toFixed(1)}–{SL.lnp.toFixed(1)} to
-        Labor.</> : null} The pollsters’ own published figures go through the same machinery for
-        the version the chart switches to: {L.alp2pp.toFixed(1)}–{L.lnp2pp.toFixed(1)}.</span>
-        <span className="info-p">The monthly trend lines use the same method without the recency
-        weighting: the vote, the leader ratings, national direction, and every past term on Past
-        cycles. The current figure beside each panel is built as the headline is: a leader’s
-        rating, preferred prime minister, national direction, where One Nation’s new voters came
-        from, and who votes for whom. Measures polled about once a week or less
-        use a six-week window instead: favourability, Hanson’s approval, preferred prime minister,
-        the One Nation split, and the vote by group. There a poll’s weight halves every 14 days,
-        counts in full for four weeks, and fades out by day 42.</span>
-        <span className="info-p">Preferred prime minister gets no house adjustment, and the
-        undecided share is each pollster’s own reading: their differences between pollsters come
-        from the questions asked, not from a lean to correct. See
-        {" "}{xref("monthly-average", "weighted aggregate", "monthly averages")}.</span>
-        {working(<>
-          <span className="info-p">The headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window,
-          where xᵢ is a poll’s figure minus its house effect and wᵢ = nᵢ × 2^(−d/7) × t(d) ÷ √m.</span>
-          <span className="info-p"><b>nᵢ</b> is the poll’s sample: its published effective sample
-          × 1.6 (the design factor) where the pollster publishes one – Newspoll, YouGov, Essential,
-          DemosAU, RedBridge/Accent, and Fox & Hedgehog do – otherwise its raw sample capped at
-          3,000, or 1,200 if no sample is given. <b>d</b> is the poll’s age in days, counted from
-          its fieldwork midpoint. <b>t(d)</b> is 1 up to day 14, then a half-cosine taper to 0 at
-          day 21. <b>m</b> is the number of polls that pollster has in the window. The window’s
-          effective sample is (Σwᵢ)² ÷ Σwᵢ². If the window is empty, the last monthly point
-          stands in.</span>
-          <span className="info-p"><b>Worked example: the Labor primary.</b> Each party’s primary
-          is estimated the same way. The five are rescaled only if their total sits more than half
-          a point from the plain-average total, so a real shortfall from undecided voters is
-          kept.</span>
-          {primWork}
-          <span className="info-p"><b>Worked example: the published 2PP.</b> A pair published
-          with undecided voters still inside it is rebased to 100 first. A pollster that
-          publishes no pair adds no row.</span>
-          {tppWork}
-        </>)}</>) },
-      { id: "house-effect", term: "House effect", body: (
-        <>A pollster’s consistent lean relative to the others. Each of its polls is compared with
-        other pollsters’ polls taken around the same time, and those gaps are pooled with a
-        90-day half-life, so the lean tracks the pollster’s current methods. While the evidence
-        is thin, it is shrunk toward zero, as if the pollster’s polls were joined by {shrinkWord} more
-        that sat exactly on the others: a pollster with one recent poll keeps {shrinkKeep(1)}% of its
-        measured lean, one with four keeps {shrinkKeep(4)}%, and one with ten keeps {shrinkKeep(10)}%. That
-        setting is the one that best predicts each new poll from the polls before it. The lean is
-        measured separately for each figure: a pollster that leans to Labor on the two-party
-        figure need not lean the same way on a primary vote. The aggregate subtracts it before
-        averaging.
-        {working(<span className="info-p">A pollster’s lean is Σvⱼgⱼ ÷ (Σvⱼ + {shrinkK}) over its
-          polls, where gⱼ is a poll’s gap to the sample-weighted average of other pollsters’ polls
-          within 28 days of it (at least three of them), and vⱼ = 2^(−a/90), with a the poll’s age
-          in days when the lean is read.</span>)}</>) },
-      { id: "house-lean", term: "House lean", body: (
-        <>A pollster’s {xref("house-effect", "house lean", "house effect")} traced month by month,
-        so a change of method or ownership shows where it happened instead of being smeared across
-        its history. The aggregate always subtracts the house effect as it stood at the time of
-        each figure.{window.AP && window.AP.rd ? <> The One Nation v Coalition view is a
-        pollster’s lean on One Nation’s primary vote less its lean on the Coalition’s: how it
-        splits the right’s vote.</> : null}</>) },
-      { id: "poll-lean", term: "Poll lean", body: (
-        <>How far one poll sits from the aggregate for the month it was taken. It describes that
-        poll, not the pollster: sampling luck alone can put a single poll off the pace. A pollster
-        whose polls lean the same way again and again is showing its
-        {" "}{xref("house-effect", "poll lean", "house effect")}. Poll lean is sortable in the All
-        polls table and shown in each poll’s breakdown.</>) },
-      { id: "aggregate-effect", term: "Aggregate effect", body: (
-        <>How much one poll moves the headline. The poll’s breakdown recalculates the
-        {" "}{xref("weighted-aggregate", "aggregate effect", "weighted aggregate")} without it and
-        shows the difference: “+0.1 for ALP” means today’s two-party figure is a tenth of a point
-        higher because this poll is in the window. A poll older than 21 days moves nothing now,
-        and says so, with what it was worth on the day it was published where that can still be
-        worked out. One line appears for each figure the poll feeds: the published two-party
-        figure, the {xref("implied-2pp", "aggregate effect", "implied 2PP")} (which a poll with
-        no published pair still feeds through its primaries), and Labor v One Nation where the
-        poll asked it. House effects are left as measured, since they belong to the pollster, not
-        the poll; only the average is recalculated.</>) },
-      { id: "monthly-average", term: "Monthly average", body: (
-        <>What a contest gets when too few pollsters ask it to measure their
-        {" "}{xref("house-effect", "monthly average", "house effects")}: a plain average of the
-        month’s polls, with no adjustments. The hero says which kind it is showing, so an
-        unadjusted average is never mistaken for the more precise one.</>) },
-    ] },
-    { id: "g-uncertainty", title: "Uncertainty", entries: [
-      { id: "interval", term: "95% interval", body: (
-        <>How far the headline could plausibly be off. Today that’s ±{hl.ci.toFixed(1)} points
-        on each party’s share, and ±{(2 * hl.ci).toFixed(1)} on the lead. The lead is a gap
-        between two shares, so anything that moves one share moves the gap twice as far.
-        <span className="info-p">The interval takes the larger of two measures: how much the polls
-        in the window disagree, and how much chance alone would scatter them if they all agreed.
-        So it widens when the pollsters split, and never claims more precision than their
-        samples allow.</span>
-        <span className="info-p">Unfortunately, it can’t see an error every poll shares. When the
-        whole industry leans one way{accShared ? <>, as all {accShared.n} houses did
-        in {accShared.year}</> : null}, the interval has no way to know. A move smaller than the
-        interval is reported as within it, not as a change.</span>
-        {working(<>
-          <span className="info-p">1.96 × the larger of two standard errors, both taken on the
-          weights wᵢ of the {xref("weighted-aggregate", "95% interval", "weighted aggregate")}.</span>
-          <span className="info-p"><b>Spread:</b> √(Σwᵢ(xᵢ − x̄)² ÷ Σwᵢ ÷ (nEff − 1)). This is the
-          polls’ scatter around their weighted mean x̄, where nEff is the
-          {" "}{xref("effective-sample", "95% interval", "effective sample")}.</span>
-          <span className="info-p"><b>Sampling floor:</b> √(Σwᵢ² × 1.6 × p̂(1−p̂) ÷ nᵢ) ÷ Σwᵢ. Here
-          p̂ is the aggregate’s own share, and 1.6 is the design effect of a weighted panel.</span>
-        </>)}</>) },
-      { id: "margin-of-error", term: "Margin of error", body: (
-        <>How far a single poll can miss purely because it surveyed a sample rather than everyone.
-        A thousand respondents carry about ±3 points at 95% confidence. The error shrinks only
-        with the square root of the sample, so four times the interviews halves it. It covers
-        chance and nothing else: skewed samples, turnout assumptions, and a pollster’s methods sit
-        outside it. Pooling several polls narrows the chance part, which is why the headline’s
-        {" "}{xref("interval", "margin of error", "95% interval")} (±{hl.ci.toFixed(1)} today) is
-        tighter than one poll’s ±3. The part every pollster shares doesn’t shrink at all.</>) },
-      { id: "effective-sample", term: "Effective sample", body: (
-        <>How many polls the window is really worth once weighting is counted: today, {hl.nEff} of
-        the {hl.n} in it. Older polls, smaller samples, and repeat polls from one pollster all pull
-        it below the raw count. The {xref("interval", "effective sample", "95% interval")} is
-        computed from it.
-        <span className="info-p">A single poll has its own version, shown as {eff} beside its
-        sample: the effective sample its pollster publishes in its
-        {" "}{xref("apc-statement", "effective sample", "APC statement")}, which says what that one
-        sample is worth after weighting.</span></>) },
-      { id: "poll-disagreement", term: "Poll disagreement", body: (
-        <>The panel that asks whether the pollsters disagree more than chance explains. No two
-        polls match even when opinion hasn’t moved, because each surveys a different sample. The
-        panel compares the spread the pollsters actually show with the spread their sample sizes
-        alone would produce – the chance floor – and gives one of four verdicts:
-        <span className="info-p"><b>Herded</b> (under 0.80×): closer together than independent
-        samples can be, which suggests pollsters are adjusting towards each other.</span>
-        <span className="info-p"><b>Chance-consistent</b> (0.80–1.20×): as close as sampling
-        allows. This is what healthy polling looks like, not a sign the pollsters have compared
-        notes.</span>
-        <span className="info-p"><b>Mild divergence</b> (1.20–1.60×): a little further apart than
-        chance explains, so something real sits on top of it, such as different weighting,
-        different voters reached, or opinion moving at different speeds.</span>
-        <span className="info-p"><b>Real disagreement</b> (1.60× or more): the gap can’t be
-        chance. The pollsters aren’t measuring one number with different luck.</span></>) },
-    ] },
-    { id: "g-2pp", title: "Two-party preferred and preferences", entries: [
-      { id: "two-party-preferred", term: "Two-party preferred", body: (
+  /* Which design is showing: a few panels name things differently in each
+     (the disagreement verdicts, the change arrows' colours, the split view),
+     and an entry has to use the words on the reader's screen. */
+  const RD = !!(window.AP && window.AP.rd);
+  /* The two-party figure the hero leads with: the rival Labor is doing worse
+     against (latest.rivalLead), Labor v One Nation on the first-principles
+     flow set, Labor v Coalition on the 2025 table. */
+  const headFig = L.rivalLead === "alp_on" && L.onImp
+    ? { a: L.onImp.a, b: L.onImp.b, rival: "One Nation" }
+    : SL ? { a: SL.alp, b: SL.lnp, rival: "the Coalition" } : null;
+  // "Roy Morgan, DemosAU, and Essential": a list with the Oxford comma
+  const andList = (a) => (a.length > 2 ? a.slice(0, -1).join(", ") + ", and " + a[a.length - 1] : a.join(" and "));
+  const numWord = (n) => ({ 2: "two", 3: "three", 4: "four", 5: "five", 6: "six" }[n] || String(n));
+  /* Decidedness: whose undecided, after-preferences and not-firm lines are
+     drawn (the panel's own credit lists), and how many waves its by-party
+     and by-age figures pool. */
+  const UND = {};
+  ((D.undecided && D.undecided.series) || []).forEach((s) => { UND[s.id] = s; });
+  const undWho = (id) => (UND[id] && UND[id].houses && UND[id].houses.length ? andList(UND[id].houses) : null);
+  // the verb for that list: "Roy Morgan and DemosAU set", "Essential leaves"
+  const undVerb = (id, one, many) => (UND[id] && UND[id].houses && UND[id].houses.length > 1 ? many : one);
+  const firmPool = numWord((D.firmness && D.firmness.pool) || 3);
+  const agePool = numWord((D.undecided && D.undecided.softAge && D.undecided.softAge.pool) || 3);
+  /* The poll-disagreement verdicts, in the words each design prints. */
+  const verdict = RD
+    ? { herd: "Tighter than chance", ok: "Within chance", mild: "A little beyond chance", wide: "Well beyond chance" }
+    : { herd: "Herded", ok: "Chance-consistent", mild: "Mild divergence", wide: "Real disagreement" };
+
+  /* THE PAGE'S SHAPE (user call 2026-10-04: "maybe one explainer for each
+     section of the page"). Four parts, in the order a reader's questions
+     arrive:
+       1. About - what the site is.
+       2. Questions - the half-dozen everyone asks first, answered short,
+          each pointing down to the detail.
+       3. How the figures are built - the method every section shares,
+          written ONCE (the weighting, house effects, the interval, what
+          "significant" means), so no section has to repeat it.
+       4. Section by section - one explainer per section of the site, in the
+          page's own order: the Now page's nine, then Past cycles, then All
+          polls. A section's LEAD entry has no run-in name (the section's
+          own heading is its name) and carries the id that section's "How
+          it's built" link opens, so the pop-over shows the whole method for
+          what the reader was just looking at; the section's terms follow.
+     What shows is what a figure means, how it's built, how to read it and
+     its limits. Formulas, worked tables, exact question wordings,
+     pollster-by-pollster lists, data checks and source lists sit in each
+     entry's "Show the working" fold. An id merged into another lives on in
+     INFO_ALIAS, so no link breaks. */
+  const faqs = [
+    { id: "what-am-i-looking-at", q: "What am I looking at?", a: (
+      <>In the main chart, each dot is one published poll, placed at the midpoint of its
+      fieldwork. The line is a monthly average of the polls, weighted by sample size and adjusted
+      for each pollster’s {xref("house-effect", "what am i looking at", "lean")}, with its
+      {" "}{xref("interval", "what am i looking at", "95% interval")} shaded around it. Where two
+      bands overlap, the polls can’t separate the parties that month. The line’s points sit
+      mid-month, so late in a month the newest dots run past its end, though they’re already
+      counted in it. The figure at the top comes from the last three weeks of polls (see
+      {" "}{xref("weighted-aggregate", "what am i looking at", "Weighted aggregate")}), so it moves
+      with every poll. Other charts follow the same pattern. A dash (—) in a table means the
+      pollster didn’t ask that question.</>) },
+    { id: "where-does-data-come-from", q: "Where do the numbers come from?", a: (
+      <>From the pollsters: every national voting-intention poll published since the May 2025
+      election, from these {Object.keys(houseCounts).length} houses, most polls first:
+      {" "}{sources}. A pollster’s MRP or SMS polls count under its own name. All polls files each
+      one with its fieldwork dates, sample size, a link to the release and, where one exists, its
+      {" "}{xref("apc-statement", "where does data come from", "APC statement")}. Past cycles holds
+      every term back to 1972.</>) },
+    { id: "headline-how", q: "How is the headline worked out?", a: (
+      <>It averages the last three weeks of polls, counting newer and larger polls for more,
+      after taking out each pollster’s usual lean (see
+      {" "}{xref("weighted-aggregate", "how is the headline worked out", "Weighted aggregate")}).
+      Rather than average the pollsters’ own two-party figures, each worked out a different way,
+      the two-party figure reads every poll’s primary votes through one fixed
+      {" "}{xref("preference-flows", "how is the headline worked out", "preference table")} (see
+      {" "}{xref("implied-2pp", "how is the headline worked out", "Implied 2PP")}). The headline
+      follows the rival Labor is doing worse against
+      {headFig ? <>: today {headFig.rival}, at {headFig.a.toFixed(1)}–{headFig.b.toFixed(1)}</> : null}.</>) },
+    { id: "how-wrong-are-the-polls", q: "How accurate are the polls?", a: acc ? (
+      <>The {xref("interval", "how accurate are the polls", "95% interval")} says how far chance
+      alone could put a figure off: ±{hl.ci.toFixed(1)} points on each party’s share for Labor
+      against the Coalition today. Past elections show the rest. The
+      {" "}<button type="button" className="hi-term"
+        onClick={() => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()}>How the final polls did</button>
+      {" "}panel in Past cycles scores each pollster’s last two-party figure in the
+      {" "}{acc.windowDays} days before polling day against the result. Across {accSpan}, the
+      final polls missed by {acc.meanAbs} points on average, and by
+      {" "}{Math.abs(acc.worstCycle.err)} at worst, in {acc.worstCycle.year}.
+      {accShared ? <> In {accShared.year} all {accShared.n} houses missed on the same side, by
+      {" "}{accShared.absErr}.</> : null} Unfortunately, no aggregate can see an error every
+      pollster shares, which is why the interval never claims to cover it.</>) : (
+      <>The {xref("interval", "how accurate are the polls", "95% interval")} says how far chance
+      alone could put a figure off. The
+      {" "}<button type="button" className="hi-term"
+        onClick={() => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()}>How the final polls did</button>
+      {" "}panel in Past cycles scores each pollster’s last two-party figure of the campaign
+      against the result, election by election, house by house.</>) },
+    { id: "is-this-a-forecast", q: "Is it a forecast? What would it mean in seats?", a: (
+      <>No to both. Everything here describes where opinion stands now, from polls already
+      published, and final polls have missed past results{acc ? <> by {acc.meanAbs} points on
+      average</> : null}. Turning a national figure into seats would assume the swing is the same
+      everywhere. With One Nation near {onp}% of the primary vote, that fails in exactly the seats
+      that would decide the election: a large minor party wins where its vote is concentrated, and
+      a national figure can’t see where that is. Where a pollster modelled seats one by one, its
+      poll carries the {xref("mrp", "is it a forecast", "MRP")} tag in All polls.</>) },
+    { id: "why-2pp-headline", q: "Why lead with two-party preferred?", a: (
+      <>Because seats are decided between the final two candidates. Preferences are distributed
+      until one candidate has a majority, so “who’s ahead” is a
+      {" "}{xref("two-party-preferred", "why lead with two-party preferred", "two-party")} question
+      that first preferences alone can’t answer. With One Nation near {onp}% of the primary vote,
+      the two views of the race are far apart, so the
+      {" "}{xref("primary-vote", "why lead with two-party preferred", "primary vote")} has its own
+      section.</>) },
+    { id: "newest-poll-not-headline", q: "Why doesn’t the newest poll match the headline?", a: (
+      <>Usually neither is wrong. A poll is one pollster’s reading of one week, and chance alone
+      can put it off by its {xref("margin-of-error", "newest poll", "margin of error")}, so two
+      honest polls of an unchanged electorate will differ too. The headline pools every recent
+      poll after removing each pollster’s
+      {" "}{xref("house-effect", "newest poll", "house effect")}, its habit of leaning one way. One
+      poll moves it by its weight, not its news value: its
+      {" "}{xref("aggregate-effect", "newest poll", "aggregate effect")} shows how much.
+      {" "}{xref("poll-disagreement", "newest poll", "Poll disagreement")} tests whether the polls
+      differ by more than chance allows.</>) },
+  ];
+
+  /* The method every section shares, written once. */
+  const method = [
+    { id: "weighted-aggregate", term: "Weighted aggregate", body: (
+      <>How the headline and every other current figure are built. It averages the recent polls,
+      giving more weight to newer and larger ones, after removing each pollster’s
+      {" "}{xref("house-effect", "weighted aggregate", "house effect")}.
+      <span className="info-p"><b>Recency.</b> A poll’s weight halves every seven days, and it
+      fades out over its third week, leaving the window on day 21. So the figure can move on a day
+      with no new poll, as newer polls take over from older ones.</span>
+      <span className="info-p"><b>Size.</b> Larger samples count for more. Where a pollster
+      publishes an {xref("effective-sample", "weighted aggregate", "effective sample")}, that figure
+      is used. Otherwise the raw sample is discounted by 1.6, roughly what weighting costs the
+      pollsters that do publish, and capped at 3,000.</span>
+      <span className="info-p"><b>Repeat polls.</b> A pollster with several polls in the window
+      counts for the square root of their number, so three weekly Roy Morgan polls count as 1.7,
+      not 3.</span>
+      <span className="info-p"><b>One exclusion.</b> Roy Morgan’s SMS polls stay in the archive
+      but count towards no aggregate: SMS polls have a strong selection bias.</span>
+      <span className="info-p"><b>Sparse measures.</b> Measures polled about once a week or less
+      use a six-week window: favourability, Hanson’s approval, preferred prime minister, the One
+      Nation split, the vote by group, the issues, and decidedness. There a poll’s weight halves
+      every 14 days.</span>
+      <span className="info-p"><b>Monthly lines.</b> Each chart’s line uses the same method
+      without the recency weighting: one point per calendar month, from that month’s polls. Past
+      cycles draws every earlier term the same way. A few measures depart from all this, and their
+      sections say how.</span>
+      {working(<>
+        <span className="info-p">The headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window,
+        where xᵢ is a poll’s figure minus its house effect and wᵢ = nᵢ × 2^(−d/7) × t(d) ÷ √m.</span>
+        <span className="info-p"><b>nᵢ</b> is the poll’s sample: its published effective sample
+        × 1.6 (the design factor) where the pollster publishes one – Newspoll, YouGov, Essential,
+        DemosAU, RedBridge/Accent, and Fox & Hedgehog do – otherwise its raw sample capped at
+        3,000, or 1,200 if no sample is given. <b>d</b> is the poll’s age in days, counted from
+        its fieldwork midpoint. <b>t(d)</b> is 1 up to day 14, then a half-cosine taper to 0 at
+        day 21. <b>m</b> is the number of polls that pollster has in the window. The window’s
+        effective sample is (Σwᵢ)² ÷ Σwᵢ². If the window is empty, the last monthly point
+        stands in. The six-week window doubles every timescale: half-life 14 days, taper from
+        day 28 to day 42.</span>
+        <span className="info-p"><b>Worked example: the Labor primary.</b> Each party’s primary
+        is estimated the same way. The five are rescaled only if their total sits more than half
+        a point from the plain-average total, so a real shortfall from undecided voters is
+        kept.</span>
+        {primWork}
+        <span className="info-p"><b>Worked example: the published 2PP.</b> A pair published
+        with undecided voters still inside it is rebased to 100 first. A pollster that
+        publishes no pair adds no row.</span>
+        {tppWork}
+      </>)}</>) },
+    { id: "house-effect", term: "House effect", body: (
+      <>A pollster’s consistent lean relative to the others. Each of its polls is compared with
+      other pollsters’ polls taken around the same time, and the gaps are pooled with a 90-day
+      half-life, so the lean tracks the pollster’s current methods. A lean measured from few polls
+      is shrunk toward zero, as if joined by {shrinkWord} more polls sitting exactly on the
+      others: a pollster with one recent poll keeps {shrinkKeep(1)}% of its measured lean, one with
+      four keeps {shrinkKeep(4)}%, and one with ten keeps {shrinkKeep(10)}%. That setting best
+      predicts each new poll from the polls before it. Each figure gets its own lean, since a
+      pollster that leans to Labor on the two-party figure need not on a primary vote. The
+      aggregate subtracts the lean as it stood at the time of each figure.
+      {" "}{xref("house-lean", "house effect", "House lean")} in All polls shows each pollster’s.
+      {working(<span className="info-p">A pollster’s lean is Σvⱼgⱼ ÷ (Σvⱼ + {shrinkK}) over its
+        polls, where gⱼ is a poll’s gap to the sample-weighted average of other pollsters’ polls
+        within 28 days of it (at least three of them), and vⱼ = 2^(−a/90), with a the poll’s age
+        in days when the lean is read.</span>)}</>) },
+    { id: "monthly-average", term: "Monthly average", body: (
+      <>What a contest gets when too few pollsters ask it to measure their
+      {" "}{xref("house-effect", "monthly average", "house effects")}: a plain average of each
+      month’s polls, with no adjustments. The two-party section says which kind it is showing,
+      so an unadjusted average is never mistaken for the adjusted one.</>) },
+    { id: "interval", term: "95% interval", body: (
+      <>How far a figure could plausibly be off by chance. For the two-party figure against the
+      Coalition today, that’s ±{hl.ci.toFixed(1)} points on each party’s share, and
+      ±{(2 * hl.ci).toFixed(1)} on the lead: anything that moves one share moves the gap between
+      them twice as far. The interval takes the larger of two measures: how much the polls in the
+      window disagree, and how much chance alone would scatter them if they all agreed. So it
+      widens when the pollsters split, and never claims more precision than their samples allow.
+      <span className="info-p">Unfortunately, it can’t see an error every poll shares. When the
+      whole industry leans one way{accShared ? <>, as all {accShared.n} houses did
+      in {accShared.year}</> : null}, the interval has no way to know.</span>
+      {working(<>
+        <span className="info-p">1.96 × the larger of two standard errors, both taken on the
+        weights wᵢ of the {xref("weighted-aggregate", "95% interval", "weighted aggregate")}.</span>
+        <span className="info-p"><b>Spread:</b> √(Σwᵢ(xᵢ − x̄)² ÷ Σwᵢ ÷ (nEff − 1)). This is the
+        polls’ scatter around their weighted mean x̄, where nEff is the
+        {" "}{xref("effective-sample", "95% interval", "effective sample")}.</span>
+        <span className="info-p"><b>Sampling floor:</b> √(Σwᵢ² × 1.6 × p̂(1−p̂) ÷ nᵢ) ÷ Σwᵢ. Here
+        p̂ is the aggregate’s own share, and 1.6 is the design effect of a weighted panel.</span>
+      </>)}</>) },
+    { id: "margin-of-error", term: "Margin of error", body: (
+      <>How far a single poll can miss purely because it surveyed a sample rather than everyone.
+      A thousand respondents carry about ±3 points at 95% confidence, and it takes four times the
+      interviews to halve that. It covers chance and nothing else: skewed samples, turnout
+      assumptions and a pollster’s methods sit outside it. Pooling polls narrows the chance part,
+      which is why the two-party {xref("interval", "margin of error", "95% interval")}
+      {" "}(±{hl.ci.toFixed(1)} today) is tighter than one poll’s ±3. The part every pollster shares
+      doesn’t shrink at all.</>) },
+    { id: "effective-sample", term: "Effective sample", body: (
+      <>What a sample is worth once weighting is counted. A pollster’s
+      {" "}{xref("apc-statement", "effective sample", "APC statement")} gives one for each poll,
+      shown as {eff} beside its sample. The window has one too: today the two-party window’s
+      {" "}{hl.n} polls are worth {hl.nEff}, since older polls, smaller samples and repeat polls
+      from one pollster count for less. The
+      {" "}{xref("interval", "effective sample", "95% interval")} is computed from it.</>) },
+    { id: "significance", term: "Significant", body: (
+      <>A difference or change that chance is an unlikely explanation for: if nothing had really
+      differed or moved, a gap as large would turn up less than one time in twenty. Two figures
+      differ significantly when the gap between them is larger than their margins combined.
+      Figures from different people have errors that partly offset, so margins of 1.3 and 1.2
+      points combine to 1.8, not 2.5.
+      <span className="info-p"><b>Several at once.</b> Test enough gaps at one in twenty and one
+      will pass by chance, so the bar rises with the number tested. With six gaps, the clearest
+      must pass at one in 120, the next at one in 100, then 80, and so on, stopping at the first
+      that falls short.</span>
+      <span className="info-p"><b>Over time.</b> A change is a straight line through the readings,
+      tested against how far they scatter around it. Each section says which readings it
+      fits.</span>
+      <span className="info-p"><b>Limits.</b> One in twenty is a convention, and a result near the
+      line can flip with one new poll. Across every tab, party and period, about one sentence in
+      twenty could report a difference or change that isn’t there.</span>
+      {working(<>
+        <span className="info-p"><b>Gap between two figures:</b> z = 1.96 × (a − b) ÷ √(±a² + ±b²),
+        where a and b are the figures and ±a and ±b their 95% margins. p is the chance of a z at
+        least that far from zero under the normal curve. p &lt; 0.05 is the same as the gap
+        exceeding √(±a² + ±b²).</span>
+        <span className="info-p"><b>Several gaps:</b> Holm’s method. With m gaps, sort their p
+        from smallest. The kth smallest passes if p &lt; 0.05 ÷ (m − k + 1) and every smaller one
+        passed.</span>
+      </>)}</>) },
+    /* The ▲ ▼ figures measure against different things depending on where
+       they sit, and most panels say which only in words beside them. */
+    { id: "changes", q: "What are the ▲ and ▼ figures measured against?", a: (
+      <>It depends on where they sit.
+      <ul className="info-list">
+        <li><strong>Beside a current figure:</strong> the change on a month ago, from the same
+        estimate built from the polls of 30 days earlier. It counts as a change only when it is
+        larger than its own margin, which combines both readings’ intervals; otherwise the figure
+        says “within the margin”.</li>
+        <li><strong>On the primary vote figures:</strong> the change since the 2025 election,
+        where every line on that chart begins.</li>
+        <li><strong>In a poll’s breakdown and the poll tables:</strong> the change on that
+        pollster’s own previous poll.</li>
+        <li><strong>In the issues table by group:</strong> a group that differs from all voters by
+        more than its own 95% margin.</li>
+      </ul>
+      Most say what they are measured against beside them, or when you point at them.
+      {!RD ? <> A green ▲ is a rise and a red ▼ a fall: a direction, not a verdict on anyone. The
+      undecided share reverses the colours, since more undecided voters is the less settled
+      reading, and where One Nation’s voters came from stays grey either way.</> : null}</>) },
+  ];
+
+  /* One explainer per section of the site, in the page's order. `lead` is
+     the entry the section's own "How it's built" link opens. */
+  const sections = [
+    { id: "s-2pp", title: "Two-party preferred", nav: "Two-party",
+      lead: { id: "two-party-preferred", body: (
         <>Each party’s share after every other candidate’s preferences have been distributed
-        between the final two. It’s the figure that decides seats. The hero shows Labor against
-        the Coalition and the other head-to-heads pollsters publish. Both Labor contests lead with
-        the {xref("implied-2pp", "two-party preferred", "implied figure")}, with the pollsters’
-        own published figures a switch away. A contest no fixed table covers, such as the
-        Coalition against One Nation, is shown as published.</>) },
-      { id: "primary-vote", term: "Primary vote", body: (
-        <>The share of voters who put a party first, before any preferences are distributed.
-        Polls that publish no two-party figure still feed this series, the implied 2PP, and the
-        leader ratings.</>) },
-      { id: "implied-2pp", term: "Implied 2PP", body: (
-        <>The site’s main two-party figure, and the one on the hero, the share card, and the
-        summary. It takes each poll’s primary votes and distributes the minor parties’ shares
-        using one fixed {xref("preference-flows", "implied 2PP", "preference table")}: the flows
-        counted at the 2025 election. Every pollster allocates preferences its own way, so using
-        one table for all of them means the figure moves when voters do, not when the mix of
-        pollsters changes. It also lets every poll that publishes primaries count.
-        <span className="info-p">A switch under the two-party heading shows the pollsters’ own
-        published figures instead. Neither is the true 2PP.
-        {D.synthLatest && D.synth2pp && D.synth2pp.length > 1 ? (
-          <> Today the implied figure reads {D.synthLatest.alp.toFixed(1)} against the published
-          {" "}{L.alp2pp.toFixed(1)}: a gap, not a verdict. With One Nation on {onp}% of the primary
-          vote, five points of doubt about where its preferences go moves the two-party figure
-          {" "}{(prim.onp * 0.05).toFixed(1)} points either way.</>
-        ) : null}</span>
-        {L.onImp ? (
-          <span className="info-p">Labor v One Nation uses a different table, the
-          {" "}{xref("fp-flows", "implied 2PP", "first-principles flow set")}, because no election
-          has ever counted that pairing: {L.onImp.a.toFixed(1)} to Labor,
-          {" "}{L.onImp.b.toFixed(1)} to One Nation, ±{L.onImp.band.toFixed(1)}.</span>
-        ) : null}
-        <span className="info-p">Past cycles reads every earlier term the same way, each through
-        the flows of the election that opened it – see
-        {" "}{xref("last-election-flows", "implied 2PP", "Last-election flows")}.</span>
-        <span className="info-p">Both tables, where their numbers come from, and how polls become
-        the headline figure are set out line by line in
-        {" "}<a href="/preference-flows/">The two-party figure, two ways</a>.</span></>) },
-      { id: "preference-flows", term: "Preference flows", body: (
-        <>How minor-party votes split between the final two candidates once preferences are
-        distributed. The {xref("implied-2pp", "preference flows", "implied 2PP")} uses the flows
-        counted at the 2025 election
-        {" "}(<a href="https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm"
-        target="_blank" rel="noopener noreferrer">Greens 88.2%, One Nation 25.5% and all others
-        54.5% to Labor</a>).
-        <span className="info-chart"><FlowChart /></span>
-        Party-by-party flows exist only from 1996, when full preference data was first published;
-        One Nation’s line breaks where it barely stood candidates. Labor v One Nation uses a
-        different table, the {xref("fp-flows", "preference flows", "first-principles flow set")},
-        because no election has counted that pairing. The full working, table by table, is in
-        {" "}<a href="/preference-flows/">The two-party figure, two ways</a>.</>) },
-      { id: "last-election-flows", term: "Last-election flows", body: (
-        <>The flow table a term’s implied 2PP is read through: the preferences counted at the
-        election that opened the term. It’s the only table anyone inside the term could have used,
-        and it’s how Past cycles draws every term’s two-party line, so each one sits on the same
-        footing as today’s {xref("implied-2pp", "last-election flows", "implied 2PP")}.
-        <span className="info-p"><b>Where the tables come from.</b> From 2004, the AEC’s count of
-        every ballot between Labor and the Coalition, in every seat. For 1996–2001, the AEC’s
-        official statistics, counted in the nine seats in ten where the final two were Labor and the
-        Coalition. No flows by party were published before 1996, so the 1987–93 tables are each
-        the single minor-party flow the official result implies. The Morgan Gallup polls of
-        1972–84 published no two-party figure at all, so those terms get their own implied lines
-        too – each read through a table calibrated to the election that opened its term: one flow
-        each for the DLP, the Democrats (a debut assumption where an election met them for the
-        first time) and all other votes.</span>
-        {lefMean != null ? (
-          <span className="info-p"><b>How well it works.</b> Applied to the next election’s actual
-          primary votes, each table misses the official 2PP by {lefMean.toFixed(1)} points on
-          average. The biggest misses were {lefBigText}.</span>
-        ) : null}
-        <span className="info-p"><b>The sitting term</b> follows the rival Labor is doing worst
-        against, as the headline does{onSince ? <>: the Coalition until {onSince}, One Nation
-        since</> : null}. The chart marks the change.</span>
-        {working(lefWork)}</>) },
-      { id: "fp-flows", term: "First-principles flow set", body: (
-        <>The preference table behind the Labor v One Nation figure. The site built it, because
-        no election has ever counted a Labor v One Nation contest to take flows from. Three
-        settings do all the work: Coalition voters give 31.5% to Labor (±2.5), Greens 89% (±3)
-        and everyone else 53% (±3). The rest go to One Nation.
-        {L.onImp && prim ? (
-          <span className="info-p">On today’s primaries: Labor’s {prim.alp.toFixed(1)}, plus
-          31.5% of the Coalition’s {prim.lnp.toFixed(1)}, 89% of the Greens’
-          {" "}{prim.grn.toFixed(1)} and 53% of the others’ {prim.oth.toFixed(1)}, gives
-          {" "}{L.onImp.a.toFixed(1)} to Labor and {L.onImp.b.toFixed(1)} to One Nation. The
-          ±{L.onImp.band.toFixed(1)} adds up the three settings’ ranges. It measures doubt about
-          the table, not sampling chance.</span>
-        ) : null}
-        <span className="info-p"><b>Where the numbers come from.</b> They’re built from the
-        counted ballots that do exist: the AEC’s 2025 Senate ballot data, re-checked against the
-        2026 lower-house contests where One Nation made the final two and preferences were
-        counted – the SA state election and the Secret Harbour by-election. The table stays
-        fixed between such counts and is never fitted to current polls. The pollsters’ own
-        Labor v One Nation figures rely on respondents saying where their preferences would go,
-        with no count to check them against. They stay on the chart as a cross-check.</span></>) },
-      { id: "undecided", term: "Undecided", body: (
-        <>Voters who won’t name a party: the “can’t say” share. It’s shown beside the soft vote,
-        people who name a party but say their choice isn’t firm. They’re different questions, so
-        they’re kept as separate lines.
-        <span className="info-p">Pollsters also treat undecided voters differently, and each
-        poll’s breakdown says which way:</span>
-        <span className="info-p"><b>Set aside</b> (Roy Morgan, DemosAU): removed before party
-        shares are calculated, so the primaries sum to 100.</span>
-        <span className="info-p"><b>Inside the pair</b> (Essential): left inside the published
-        two-party figure, which then sums to less than 100.</span>
-        <span className="info-p"><b>Not firm</b> (Resolve): not undecided at all, but decided
-        voters who say they might still change their mind.</span></>) },
-    ] },
-    { id: "g-pollsters", title: "Pollsters and their polls", entries: [
-      { id: "house", term: "House", body: (
-        <>A polling company: Newspoll, YouGov, Resolve, and the rest. The industry calls them
-        houses. A single poll release is often called a wave.</>) },
-      { id: "apc-statement", term: "APC statement", body: (
-        <>The methodology statement a pollster publishes under the Australian Polling Council’s
-        Code of Conduct. The council sets the disclosure standard; the statement itself is the
-        pollster’s own publication – nothing is lodged with the council. Members publish one for
-        each poll, covering fieldwork dates and method, the raw sample, the effective sample
-        (what that sample is worth after weighting), the weighting used, and the question order.
-        <span className="info-p">A poll’s breakdown links its statement where there is one, and
-        reads both sample figures off it. The effective sample, scaled back up by the 1.6 design
-        factor, sets the poll’s weight in the
-        {" "}{xref("weighted-aggregate", "APC statement", "weighted aggregate")}. Newspoll, YouGov,
-        Essential, DemosAU, RedBridge/Accent, and Fox & Hedgehog publish one. Where a pollster
-        publishes none, the breakdown shows the raw sample alone and the {eff} column shows a
-        dash: the site doesn’t invent a figure the pollster never published.</span></>) },
-      { id: "mrp", term: "MRP", body: (
-        <>Multilevel regression and post-stratification: a model that estimates each seat
-        separately instead of applying one national swing everywhere. Seat figures appear on this
-        site only where a pollster built such a model and published the results. The MRP tag in
-        the archive marks those polls.</>) },
-      { id: "next-polls", term: "Next polls", body: (
-        <>When each pollster is likely to publish next, forecast from its own track record. The
-        dates are merely estimates.
-        <span className="info-p"><b>The date.</b> It is the house’s last release plus the median
-        of its last eight gaps between releases, nudged by up to three days onto the weekday it
-        usually publishes. Gaps are measured between publication dates where the record has them,
-        since publication is what’s being forecast.</span>
-        <span className="info-p"><b>The ±.</b> It is half the spread of those gaps, leaving out
-        the longest and shortest, and it widens for releases further out. For a house that always
-        publishes on the same weekday, it moves in whole weeks. If the forecast lands at the early
-        edge of the house’s record, only a later day is named as the alternative: “(or Wed
-        7 Oct)”.</span>
-        <span className="info-p"><b>Times.</b> A publishing hour appears once a house has been
-        timed often enough. It is given in the publisher’s own time zone (AEDT in summer, AEST
-        otherwise), and “today” means today in Sydney.</span>
-        <span className="info-p"><b>Late polls.</b> When a date passes with no poll, the row stays
-        and keeps counting. It turns red once the whole window has passed, and leaves only when
-        the poll itself is added. The countdown in the tab bar works the same way. A house too
-        irregular for a date gets a window instead. Roy Morgan’s stated schedule is taken at its
-        word, even though it doesn’t always keep it. Houses that stop publishing are removed by
-        hand.</span>
-        <span className="info-p">Open a row to see the house’s five most recent releases and its
-        release page, so you can check the forecast against its record.</span></>) },
-    ] },
-    { id: "g-who", title: "Who votes for whom", entries: [
-      { id: "vote-switching", term: "Vote switching", body: (
-        <>How people who voted for each party in 2025 say they would vote now. DemosAU and
-        YouGov both publish it, as a table with a row for each 2025 vote, and it’s what the panel
-        “Where One Nation’s new voters came from” is built from.
-        <span className="info-p"><b>How the split is worked out.</b> For each 2025 group, the share
-        now backing One Nation is multiplied by that group’s share of the 2025 vote. That gives the
-        points of the national vote One Nation has drawn from the group, and each group’s part of
-        the total is the share the panel shows.{onsYg ? <> In YouGov’s latest poll, {onsYg.toOn.lnp}%
-        of Coalition voters backing One Nation is worth {onsYg.pts.lnp.toFixed(1)} points, and
-        {" "}{onsYg.toOn.alp}% of Labor voters is worth {onsYg.pts.alp.toFixed(1)}.</> : null} The
-        panel’s other view shows the shares themselves: how much of each party’s 2025 vote One
-        Nation has taken.</span>
-        <span className="info-p"><b>A check.</b> Add the 2025 One Nation voters it kept, and every
-        poll’s table rebuilds its published One Nation vote to within about a point.</span>
-        <span className="info-p"><b>Limits.</b> People misremember how they voted, and memory tends
-        to drift toward how they feel now, which can blur the very switching being measured. Each
-        2025 group is only a few hundred respondents in any one poll, so a single poll’s split can
-        move several points. The figures pool each group’s share over the last six weeks of polls,
-        as the headline pools polls, and work the split out from the pooled shares; the lines do
-        the same month by month. Voters who can’t recall a 2025 vote,
-        or didn’t vote, are left out. Other parties and independents are counted together, because
-        DemosAU doesn’t separate them.</span>
-        <span className="info-p"><b>Sources.</b> YouGov’s figures are its own published tables,
-        from Sky News Pulse until July 2026 and News24 Pulse since. DemosAU prints its table only
-        as a chart, so its figures are measured from the chart in each report, and match every
-        label the chart prints. Newspoll publishes only Labor’s row: its September poll found 15% of
-        Labor’s 2025 voters now back One Nation (
-        <a className="fb-link" href="https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455"
-           target="_blank" rel="noopener noreferrer">The Australian</a>), close to DemosAU’s 14%
-        and YouGov’s 15%. Each poll’s figures are in the All polls export.</span>
-        {working(onsWork)}</>) },
-      { id: "vote-by-group", term: "Breakdowns by group", body: (
-        <>How each group – men and women, age groups, education levels, states, where people live,
-        whether they own or rent, and the language they speak at home – says it will vote, from the
-        tables pollsters publish with their polls. The panel “Who votes for whom” pools them into
-        one figure per group.
+        between the final two. It’s the figure that decides seats. The section shows Labor against
+        the Coalition and against One Nation, and leads with the one Labor is doing worse
+        against{onSince ? <>: the Coalition until {onSince}, One Nation since</> : null}. Both are
+        {" "}{xref("implied-2pp", "two-party preferred", "implied")} from each poll’s primary votes,
+        with the pollsters’ own published figures a switch away. A contest no fixed table covers,
+        such as the Coalition against One Nation, is shown as published.
+        <span className="info-p"><b>Published figures</b> are averaged as Labor’s share of the
+        two. Essential leaves {xref("decidedness", "two-party preferred", "undecided")} voters
+        inside its pair, which falls short of 100 by that share; averaged as published, it would mix
+        a share of everyone with a share of the decided and give Essential a false lean. Rescaling
+        splits the undecided in proportion, only because a pair on its own gives no basis for
+        splitting them any other way. The shortfall is kept as Essential’s own line in Decidedness.
+        The primaries keep their shortfall instead: a primary share can be read on its own, but a
+        two-party pair is pooled across pollsters, so it has to be comparable.</span></>) },
+      entries: [
+        { id: "implied-2pp", term: "Implied 2PP", body: (
+          <>The site’s main two-party figure, on the hero, the share card and the summary. It takes
+          each poll’s primary votes and distributes the minor parties’ shares using one fixed
+          {" "}{xref("preference-flows", "implied 2PP", "preference table")}: against the Coalition,
+          the flows counted at the 2025 election. Every pollster allocates preferences its own way,
+          so one table for all of them means the figure moves when voters do, not when the mix of
+          pollsters changes. It also counts every poll that publishes primaries, including those
+          with no two-party figure of their own.
+          <span className="info-p">Neither it nor the published figure is the true 2PP.
+          {D.synthLatest && D.synth2pp && D.synth2pp.length > 1 ? (
+            <> Against the Coalition today, the implied figure reads {D.synthLatest.alp.toFixed(1)}
+            {" "}and the published {L.alp2pp.toFixed(1)}. With One Nation on {onp}% of the primary
+            vote, five points of doubt about where its preferences go moves the two-party figure
+            {" "}{(prim.onp * 0.05).toFixed(1)} points either way.</>
+          ) : null}</span>
+          {L.onImp ? (
+            <span className="info-p">Labor v One Nation uses a different table, the
+            {" "}{xref("fp-flows", "implied 2PP", "first-principles flow set")}, because no election
+            has ever counted that pairing: {L.onImp.a.toFixed(1)} to Labor,
+            {" "}{L.onImp.b.toFixed(1)} to One Nation, ±{L.onImp.band.toFixed(1)}.</span>
+          ) : null}
+          <span className="info-p">Past cycles reads each earlier term through the flows of the
+          election that opened it (see
+          {" "}{xref("last-election-flows", "implied 2PP", "Last-election flows")}). Both tables, and
+          how polls become the headline, are set out line by line in
+          {" "}<a href="/preference-flows/">The two-party figure, two ways</a>.</span></>) },
+        { id: "preference-flows", term: "Preference flows", body: (
+          <>How minor-party votes split between the final two candidates once preferences are
+          distributed. The {xref("implied-2pp", "preference flows", "implied 2PP")} against the
+          Coalition uses the flows counted at the 2025 election
+          {" "}(<a href="https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm"
+          target="_blank" rel="noopener noreferrer">Greens 88.2%, One Nation 25.5% and all others
+          54.5% to Labor</a>).
+          <span className="info-chart"><FlowChart /></span>
+          Party-by-party flows exist only from 1996, when full preference data was first
+          published; One Nation’s line breaks where it barely stood candidates. Labor v One Nation
+          uses the {xref("fp-flows", "preference flows", "first-principles flow set")}, because no
+          election has counted that pairing.
+          <span className="info-p"><b>Are they still flowing that way?</b> The Preference flows
+          panel in All polls checks. The pollsters’ own two-party figures come largely from where their
+          respondents say their preferences would go, so if those drift from where the pollster’s
+          primary votes and the 2025 flows put them, voters may be sending preferences differently.
+          Each pollster is measured against its own habits: its polls in the six months after the
+          election, or its first polls if it started later. With no counted Labor v One Nation
+          flows, that chart shows drift since each pollster’s first head-to-heads. The check
+          corrects no other figure.</span></>) },
+        { id: "fp-flows", term: "First-principles flow set", body: (
+          <>The preference table behind the Labor v One Nation figure, which the site built because
+          no election has ever counted that contest. Three settings do all the work: Coalition
+          voters give 31.5% to Labor (±2.5), Greens 89% (±3) and everyone else 53% (±3). The rest go
+          to One Nation.
+          {L.onImp && prim ? (
+            <span className="info-p">On today’s primaries: Labor’s {prim.alp.toFixed(1)}, plus
+            31.5% of the Coalition’s {prim.lnp.toFixed(1)}, 89% of the Greens’
+            {" "}{prim.grn.toFixed(1)} and 53% of the others’ {prim.oth.toFixed(1)}, gives
+            {" "}{L.onImp.a.toFixed(1)} to Labor and {L.onImp.b.toFixed(1)} to One Nation. The
+            ±{L.onImp.band.toFixed(1)} adds up the three settings’ ranges, and doubles to
+            ±{(2 * L.onImp.band).toFixed(1)} on the lead, the flow range the hero shows. It measures
+            doubt about the table, not sampling chance.</span>
+          ) : null}
+          <span className="info-p"><b>Where the numbers come from.</b> The counted ballots that do
+          exist: the AEC’s 2025 Senate ballot data, re-checked against the 2026 lower-house contests
+          where One Nation made the final two, the SA state election and the Secret Harbour
+          by-election. The table stays fixed between such counts and is never fitted to current
+          polls. The pollsters’ own Labor v One Nation figures rest on what respondents say about
+          their preferences, with no count to check them against, so they stay on the chart as a
+          cross-check.</span></>) },
+      ] },
+    { id: "s-primary", title: "Primary vote", nav: "Primary vote",
+      lead: { id: "primary-vote", body: (
+        <>The share of voters who put a party first, before any preferences are distributed. Each
+        party’s figure is built like the headline, from the last three weeks of polls with each
+        pollster’s lean taken out (see {xref("weighted-aggregate", "primary vote", "Weighted aggregate")}).
+        Every line starts at the 2025 election result, and the figures beside the chart give the
+        change since then.
+        <span className="info-p"><b>Why they may not add up to 100.</b> Some pollsters keep
+        voters who won’t name a party inside their published shares, so the parties fall short of
+        100 by exactly that {xref("decidedness", "primary vote", "undecided")} share. The aggregate
+        keeps the shortfall, because it says something real about the electorate: the five parties
+        are rescaled only if their total sits more than half a point from the plain average’s.
+        Each poll’s breakdown says which approach its pollster used.</span></>) },
+      entries: [] },
+    { id: "s-latest", title: "Latest and next polls", nav: "Latest polls",
+      lead: { id: "latest-polls", body: (
+        <>The newest poll from each pollster, and when its next is likely to land. An earlier poll
+        leaves the table once a newer one comes out: All polls keeps every poll this term, and Past
+        cycles the ones before. If a published poll is missing from All polls too, that’s an error:
+        please <a className="fb-link" href="/feedback/">report it</a>.</>) },
+      entries: [
+        { id: "house", term: "House", body: (
+          <>A polling company: Newspoll, YouGov, Resolve and the rest. The industry calls them
+          houses. A single poll release is often called a wave.</>) },
+        { id: "next-polls", term: "Next polls", body: (
+          <>When each pollster is likely to publish next, forecast from its own track record. The
+          dates are merely estimates.
+          <span className="info-p"><b>The date</b> is the house’s last release plus the median of
+          its last eight gaps between releases, nudged by up to three days onto the weekday it
+          usually publishes. <b>The ±</b> is half the spread of those gaps, leaving out the longest
+          and shortest, and widens for releases further out; for a house that always publishes on
+          the same weekday, it moves in whole weeks. A house too irregular for a date gets a window
+          instead.</span>
+          <span className="info-p"><b>Late polls.</b> When a date passes with no poll, the row stays
+          and keeps counting, turns red once the whole window has passed, and leaves only when the
+          poll is added. The countdown in the tab bar works the same way. Roy Morgan’s stated
+          schedule is taken at its word, even though it doesn’t always keep it.</span>
+          <span className="info-p">Open a row to check the forecast against the house’s five most
+          recent releases.</span>
+          {working(<span className="info-p">Gaps are measured between publication dates where the
+            record has them, since publication is what’s being forecast. If the forecast lands at
+            the early edge of the house’s record, only a later day is named as the alternative:
+            “(or Wed 7 Oct)”. A publishing hour appears once a house has been timed often enough,
+            in the publisher’s own time zone (AEDT in summer, AEST otherwise), and “today” means
+            today in Sydney. Houses that stop publishing are removed by hand.</span>)}</>) },
+      ] },
+    { id: "s-leaders", title: "Leadership", nav: "Leadership",
+      lead: { id: "leadership", body: (
+        <>Three questions, each kept apart: who would make the better
+        {" "}{xref("preferred-pm", "leadership", "prime minister")}, how each leader is doing the
+        job ({xref("approval", "leadership", "approval")}), and what voters think of each as a
+        person ({xref("favourability", "leadership", "favourability")}).
+        <span className="info-p"><b>Approval and favourability</b> are monthly averages adjusted
+        for each pollster’s lean, as the vote is, except that every poll counts equally, whatever
+        its sample: a handful of houses answering the same question is not one pooled sample. A
+        pollster that publishes both measures lends its second reading to the other line.</span>
+        <span className="info-p"><b>Preferred prime minister</b> is averaged by sample size with no
+        house adjustment. Pollsters leave very different shares uncommitted, so one pollster’s
+        figures run high or low for both leaders at once. That is a difference of format, not a
+        lean, so levels can’t be compared across pollsters, though gaps and trends can. Two-way and
+        three-way questions are never averaged together.</span>
+        <span className="info-p"><b>One office, two people.</b> Ley’s readings and Taylor’s are
+        never averaged together, so the February 2026 handover doesn’t read as a move in one
+        person’s numbers.</span>
+        <span className="info-p"><b>The current figures</b> are built like the headline:
+        Albanese’s and Taylor’s approval from the last three weeks of polls, and favourability,
+        Hanson’s approval and preferred prime minister from the last six, since fewer pollsters ask
+        them.</span></>) },
+      entries: [
+        { id: "preferred-pm", term: "Preferred prime minister", body: (
+          <>Who voters say would make the better prime minister. Pollsters ask it head to head,
+          Albanese against the opposition leader or against Hanson, and some ask it three-way. Each
+          format is its own line.</>) },
+        { id: "approval", term: "Approval", body: (
+          <>A rating of how a leader is doing the job: the share who approve minus the share who
+          disapprove, called net approval. Essential asks, “Do you approve or disapprove of the job
+          Anthony Albanese is doing as Prime Minister?” YouGov and Newspoll ask, “Are you satisfied
+          or dissatisfied with the way Anthony Albanese is doing his job as Prime Minister?” Resolve
+          asks, “How would you rate Angus Taylor’s performance as opposition leader in recent
+          weeks?”</>) },
+        { id: "favourability", term: "Favourability", body: (
+          <>A rating of the leader as a person: favourable minus unfavourable. RedBridge/Accent
+          asks, “Do you have a favourable or unfavourable view of the following?” DemosAU asks,
+          “What is your opinion of the following people?”, offering positive, neutral and
+          negative. Freshwater and Spectre Strategy ask their own versions. A leader can be
+          approved of for the job and disliked as a person, so
+          {" "}{xref("approval", "favourability", "approval")} and favourability are never averaged
+          together.</>) },
+      ] },
+    { id: "s-direction", title: "National direction", nav: "Direction",
+      lead: { id: "direction", body: (
+        <>Whether voters think the country is heading in the right direction or is on the wrong
+        track. Only {(D.directionHouses || []).length} pollsters ask it, with slightly different
+        wording, and not every poll includes it. {dirSources}
+        <span className="info-p">Right direction and wrong track are averaged separately and
+        adjusted for each pollster’s {xref("house-effect", "direction", "lean")}; the undecided
+        share is whatever is left. SEC Newgate makes everyone choose, so its readings have no
+        undecided share and sit higher on both lines, which the lean adjustment takes out. The
+        figures at the top come from the last three weeks of polls. With so few pollsters asking,
+        some months rest on a single poll, and their
+        {" "}{xref("interval", "direction", "95% intervals")} are wider for it.</span></>) },
+      entries: [] },
+    { id: "s-who", title: "Who votes for whom", nav: "Who votes",
+      lead: { id: "vote-by-group", body: (
+        <>How each group says it will vote, from the tables pollsters publish with their polls:
+        men and women, age groups, generations, education levels, states, where people live,
+        whether they own or rent, and the language they speak at home.
         <span className="info-p"><b>How it’s built.</b> Each poll says how far a group sits from
         that poll’s own overall figure: One Nation ten points lower among 18–34s, say. Those gaps
-        are pooled over the last six weeks of polls, weighted as the headline’s polls are, so newer
-        and larger polls count for more. They are then added to the site’s current figure for all
-        voters. Measuring each poll against its own total removes its pollster’s lean, and puts
-        every group on the same level as the headline. The charts under the figures follow each
-        group month by month, built the same way: each month’s pooled gaps are added to that
-        month’s figure for all voters, as every monthly line on the site is built. They show each
-        group as a percentage above or below all voters.</span>
-        <span className="info-p"><b>Which pollsters count where.</b> Groups pool only where the
-        pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov, and
-        RedBridge. 18–34: Resolve, DemosAU, and YouGov. 35–54 and 55+: Resolve and DemosAU, since
-        YouGov’s bands are 35–49 and 50+. {xref("generations", "breakdowns by group", "Generations")}: YouGov and RedBridge. Education, on three
-        levels: DemosAU, YouGov, and RedBridge, with RedBridge’s two school rows combined in
-        proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA,
-        WA, and ACT/NT/Tas columns are combined into the rest of Australia at their shares of the
-        2025 vote. Where people live: YouGov and RedBridge, which draw the same four areas, and
-        DemosAU for the two metropolitan ones, since its third combines provincial and rural
-        voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its
-        renters include others who don’t own. Language at home: YouGov and DemosAU.</span>
-        <span className="info-p"><b>Reading a gap.</b> Each figure carries its 95% margin, usually
-        2 to 5 points. It is the {xref("interval", "breakdowns by group", "95% interval")} taken
-        over the group’s pooled gaps, with each poll’s sample for the group estimated as the poll’s
-        sample times the group’s share of adults: 18–34s are about 28%.</span>
-        <span className="info-p"><b>What “significantly” means.</b> The sentences under the figures
-        and the charts call a difference or a change significant only when chance is an unlikely
-        explanation for it. If the groups really voted alike, or hadn’t really moved, a gap as large
-        as the one measured would turn up less than one time in twenty.</span>
-        <span className="info-p"><b>Differences between groups.</b> Two groups differ significantly
-        when the gap between them is larger than its own margin. That margin combines both groups’
-        margins. Because the groups are different people, their errors partly offset, so margins of
-        1.3 and 1.2 points combine to 1.8, not 2.5. With three or four groups there are three to six
-        gaps to choose from, and testing that many at one in twenty would find a difference that
-        isn’t there far more often than that. So the bar rises with the number of gaps. With six,
-        the clearest gap must be one chance would produce less than one time in 120, the next one
-        time in 100, then 80, and so on, stopping at the first that falls short. The sentence then
-        reports what passes: no difference, a steady rise or fall across ordered groups such as age
-        (only when every step passes), one group apart from all the others, or failing those, the
-        largest gap that passes.</span>
-        <span className="info-p"><b>Changes over time.</b> The sentence under each chart asks whether
-        any group has moved towards or away from the party, relative to all voters, over the period
-        on screen. The point-gap by itself can’t answer that. When a party grows everywhere, a
-        group keeping its usual share of the party’s vote watches its gap widen by arithmetic
-        alone: a group at two-thirds of the national figure sits 3 points under when the party is
-        on 8%, and 9 under when it is on 27%. So each group is tested twice. One fit asks whether
-        its gap to all voters, in points, is drifting; the other asks the same of its ratio to all
-        voters, which holds steady for a group merely keeping pace with a party on the rise. A
-        change counts as significant only when both slopes clear the one-in-twenty bar – a genuine
-        move out of proportion, not a rising party lifting every group. Each fit is a straight
-        line through the monthly readings, a month with a tighter margin counting for more, and
-        how far the readings scatter around it is measured from the readings themselves. Five
-        monthly readings are the fewest a group can be tested on; on seven or fewer the sentence
-        hedges (“appears to”).</span>
-        <span className="info-p"><b>Limits.</b> One in twenty is a convention, and a result near the
-        line can flip with a single new poll. The margins can’t see pollsters defining or weighting
-        a group differently; a pollster that joins the series part-way reading a group its own way
-        can move a monthly line by that alone, and the test over time can’t tell. It looks for
-        steady change, so a rise and a fall within the period cancel out.
-        And each sentence allows only for its own tests: across every tab, party, and period, about
-        one chart sentence in twenty could report a change that isn’t there.</span>
-        <span className="info-p"><b>A check.</b> Every table is checked before it’s used: each
-        group must add up to 100, give or take rounding, and an all-voters column must match the
-        poll’s published vote.</span>
-        <span className="info-p"><b>Sources.</b> Resolve’s monthly age, gender, and state series (its
-        Political Monitor interactive), YouGov’s published crosstabs, RedBridge’s report tables,
-        and DemosAU’s report charts, measured from the chart in each report because small bars
-        carry no label. Each poll’s figures for these groups are in the All polls export.</span>
+        are pooled over the last six weeks of polls and added to the site’s current figure for all
+        voters. Measuring each poll against its own total removes its pollster’s lean. The charts
+        follow each group month by month, built the same way, as a percentage above or below all
+        voters. Groups pool only where pollsters cut the population the same way; the working
+        lists which count where.</span>
+        <span className="info-p"><b>Reading a gap.</b> Each figure carries its
+        {" "}{xref("interval", "who votes for whom", "95% margin")}, usually 2 to 5 points, with each
+        poll’s sample for a group estimated from the group’s share of adults (18–34s are about
+        28%). The sentences call a difference {xref("significance", "who votes for whom", "significant")}
+        {" "}only when it passes that test, with the bar raised when three or more groups are
+        compared. They report what passes: no difference, a steady rise or fall across ordered
+        groups such as age (only when every step passes), one group apart from the others, or
+        failing those, the largest gap that passes.</span>
+        <span className="info-p"><b>Changes over time.</b> The sentence under each chart asks
+        whether a group has moved towards or away from the party, relative to all voters. The
+        point-gap alone can’t say. When a party grows everywhere, a group keeping its usual share
+        of the party’s vote sees its gap widen by arithmetic alone: a group at two-thirds of the
+        national figure sits 3 points under when the party is on 8%, and 9 under at 27%. So each
+        group is tested on its gap in points and on its ratio to all voters, which holds steady for
+        a group merely keeping pace, and a change counts only when both pass. Each test is a line
+        through the monthly readings, tighter months counting for more. A group needs five monthly
+        readings to be tested, and on seven or fewer the sentence hedges (“appears to”).</span>
+        <span className="info-p"><b>Limits.</b> The margins can’t see pollsters defining or
+        weighting a group differently, and a pollster that joins the series part-way, reading a
+        group its own way, can move a monthly line by that alone. The test looks for steady change,
+        so a rise and a fall within the period cancel out.</span>
         {working(<>
-          <span className="info-p"><b>Gap between two groups:</b> z = 1.96 × (a − b) ÷ √(±a² + ±b²),
-          where a and b are the groups’ figures and ±a and ±b their 95% margins. p is the chance of
-          a z at least that far from zero under the normal curve. p &lt; 0.05 is the same as the gap
-          exceeding √(±a² + ±b²).</span>
-          <span className="info-p"><b>Several groups:</b> Holm’s method. With m gaps, sort their p
-          from smallest. The kth smallest passes if p &lt; 0.05 ÷ (m − k + 1) and every smaller one
-          passed.</span>
+          <span className="info-p"><b>Which pollsters count where.</b> Men and women: Resolve,
+          DemosAU, YouGov, and RedBridge. 18–34: Resolve, DemosAU, and YouGov. 35–54 and 55+:
+          Resolve and DemosAU, since YouGov’s bands are 35–49 and 50+.
+          {" "}{xref("generations", "who votes for whom", "Generations")}: YouGov and RedBridge.
+          Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge’s two school
+          rows combined in proportion to its own group sizes. States: Resolve and, since June 2026,
+          YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the rest of Australia at
+          their shares of the 2025 vote. Where people live: YouGov and RedBridge, which draw the
+          same four areas, and DemosAU for the two metropolitan ones, since its third combines
+          provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for
+          owners only, since its renters include others who don’t own. Language at home: YouGov and
+          DemosAU.</span>
+          <span className="info-p"><b>Pooling.</b> The gaps are weighted as the headline’s polls
+          are, so newer and larger polls count for more. A group’s 95% margin is the interval taken
+          over its pooled gaps, each poll’s sample for the group being the poll’s sample times the
+          group’s share of adults.</span>
           <span className="info-p"><b>Changes over time:</b> for month m, y is the group’s share
           less all voters’ share, and r = ln(group ÷ all voters); months where either share is a
           trace drop out of r. y and r each get a weighted-least-squares slope on the month index,
@@ -6894,337 +6979,319 @@ function infoTerms(D) {
           scatter. A move counts only when both slopes clear |t| = 1.96: the point-gap drifting AND
           the ratio drifting. Fewer than five monthly readings: untested. Seven or fewer: thin, and
           the sentence above hedges.</span>
+          <span className="info-p"><b>A check.</b> Every table is checked before it’s used: each
+          group must add up to 100, give or take rounding, and an all-voters column must match the
+          poll’s published vote.</span>
+          <span className="info-p"><b>Sources.</b> Resolve’s monthly age, gender, and state series
+          (its Political Monitor interactive), YouGov’s published crosstabs, RedBridge’s report
+          tables, and DemosAU’s report charts, measured from the chart in each report because small
+          bars carry no label. Each poll’s figures for these groups are in the All polls
+          export.</span>
           {demoWork}
         </>)}</>) },
-      { id: "generations", term: "Generations", body: (
-        <>The birth years behind the generations in {xref("vote-by-group", "generations", "breakdowns by group")}.
-        YouGov and RedBridge, the two pollsters that group voters this way, label their generations
-        but publish no birth years for them, so these are the usual definitions, set by the Pew
-        Research Center, rather than either pollster’s own:
-        <span className="info-p"><b>Gen Z</b>, born 1997 to 2012 – among voters, 1997 to 2008.<br />
-        <b>Millennials</b>, born 1981 to 1996.<br />
-        <b>Gen X</b>, born 1965 to 1980.<br />
-        <b>Boomers</b>, born 1946 to 1964.</span>
-        <span className="info-p"><b>What is uncertain.</b> Some Australian researchers draw each line
-        a year earlier or later – Gen Z from 1996, say – and neither pollster says which it follows,
-        so a voter born in a boundary year may sit in either group. The oldest voters are counted
-        differently: YouGov reports a Silent generation, born before 1946, which the site leaves
-        out, while RedBridge reports none, and its four generations add up to its whole sample, so
-        its Boomers take in everyone born before 1965. They are a small share of either sample.</span></>) },
-      { id: "issues", term: "Issues", body: (
-        <>Two questions pollsters ask about the issues: which ones matter most, and which party would
-        handle each one best. The panel “The issues” turns them into one figure per issue.
-        <span className="info-p"><b>What matters.</b> Two pollsters ask every month. RedBridge asks,
-        “If a federal election were held today, which of the following issues would be most
-        important to you when deciding who will receive your vote? Please rank your top 3.” It lists
-        14 issues. Ipsos asks, “What would you say are the three most important issues facing
-        Australia today?” It lists 19. The panel shows the share of voters putting each issue among
-        their three.</span>
-        <span className="info-p"><b>Two questions, two answers.</b> The different wording gives
-        steadily different answers.{gapUp && gapDown && gapUp.v > 0 && gapDown.v < 0 ? <> RedBridge’s
-        figure for {issPhrase(gapUp.id)} runs {Math.round(gapUp.v)} points above Ipsos’s, and its
-        figure for {issPhrase(gapDown.id)} {Math.round(-gapDown.v)} points below.</> : null} Two
-        pollsters can’t say which of them is right, so each poll is moved half their average gap
-        toward the other pollster, and the two are pooled over the last six weeks. The grey bars sit
-        midway between the two pollsters’ usual figures, and they don’t jump when one pollster’s poll
-        leaves the window.
-        Ipsos publishes about three weeks after its fieldwork, so its latest poll is in the window
-        for only part of each month.</span>
-        <span className="info-p"><b>Three more pollsters, as a check.</b> DemosAU asks every month,
-        “In your opinion, what is the biggest issue facing Australia today?” It takes one answer in
-        the voter’s own words and sorts the answers into categories generated by AI, which change
-        from month to month. Spectre asks about every three months for up to three of 14 issues,
-        several of them bundled, such as “health and aged care”. Every two months SEC Newgate asks
-        the same kind of open question – “What are the main issues facing Australians that are most
-        important to you right now?” – and counts every issue each voter mentions. None of the three
-        can be pooled with the others, but the first two side with Ipsos on health. In 2026 Spectre
-        had it at 18 to 20%, and 1 to 3% named it the biggest issue at DemosAU, where 7 to 10% put
-        it first at RedBridge.</span>
+      entries: [
+        { id: "generations", term: "Generations", body: (
+          <>The birth years behind the generations in
+          {" "}{xref("vote-by-group", "generations", "Who votes for whom")}. YouGov and RedBridge
+          label their generations but publish no birth years, so these are the usual definitions,
+          set by the Pew Research Center:
+          <span className="info-p"><b>Gen Z</b>, born 1997 to 2012 – among voters, 1997 to 2008.<br />
+          <b>Millennials</b>, born 1981 to 1996.<br />
+          <b>Gen X</b>, born 1965 to 1980.<br />
+          <b>Boomers</b>, born 1946 to 1964.</span>
+          <span className="info-p"><b>What is uncertain.</b> Some Australian researchers draw each
+          line a year earlier or later, and neither pollster says which it follows, so a voter born
+          in a boundary year may sit in either group. YouGov reports a Silent generation, born
+          before 1946, which the site leaves out. RedBridge reports none, so its Boomers take in
+          everyone born before 1965. Either way, they are a small share of the sample.</span></>) },
+      ] },
+    { id: "s-switching", title: "Where One Nation’s voters came from", nav: "Vote switching",
+      lead: { id: "vote-switching", body: (
+        <>How people who voted for each party in 2025 say they would vote now, from the tables
+        DemosAU and YouGov publish with a row for each 2025 vote.
+        <span className="info-p"><b>How the split is worked out.</b> For each 2025 group, the share
+        now backing One Nation is multiplied by that group’s share of the 2025 vote. That gives the
+        points of the national vote One Nation has drawn from the group, and each group’s part of
+        the total is the share the panel shows.{onsYg ? <> In YouGov’s latest poll, {onsYg.toOn.lnp}%
+        of Coalition voters backing One Nation is worth {onsYg.pts.lnp.toFixed(1)} points, and
+        {" "}{onsYg.toOn.alp}% of Labor voters is worth {onsYg.pts.alp.toFixed(1)}.</> : null} The
+        panel’s other view shows how much of each party’s 2025 vote One Nation has taken. As a
+        check, adding the One Nation voters it kept rebuilds every poll’s published One Nation vote
+        to within about a point.</span>
+        <span className="info-p"><b>Limits.</b> People misremember how they voted, and memory
+        drifts toward how they feel now, which can blur the very switching being measured. Each
+        2025 group is only a few hundred respondents in a poll, so the figures pool each group’s
+        share over the last six weeks before working out the split; the lines do the same month by
+        month. Voters who can’t recall a 2025 vote, or didn’t vote, are left out. Other parties and
+        independents are counted together, because DemosAU doesn’t separate them.</span>
+        <span className="info-p"><b>A third source.</b> Newspoll publishes only Labor’s row: its
+        September poll found 15% of Labor’s 2025 voters now back One Nation (
+        <a className="fb-link" href="https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455"
+           target="_blank" rel="noopener noreferrer">The Australian</a>), close to DemosAU’s 14%
+        and YouGov’s 15%.</span>
+        {working(<>
+          <span className="info-p"><b>Sources.</b> YouGov’s figures are its own published tables,
+          from Sky News Pulse until July 2026 and News24 Pulse since. DemosAU prints its table only
+          as a chart, so its figures are measured from the chart in each report, and match every
+          label the chart prints. Each poll’s figures are in the All polls export.</span>
+          {onsWork}
+        </>)}</>) },
+      entries: [] },
+    { id: "s-issues", title: "The issues", nav: "Issues",
+      lead: { id: "issues", body: (
+        <>Two questions pollsters ask about the issues: which ones matter most, and which party
+        would handle each best. The panel turns each into one figure per issue.
+        <span className="info-p"><b>What matters.</b> RedBridge and Ipsos ask every month for each
+        voter’s three most important issues, from lists of 14 and 19, and the panel shows the share
+        putting each issue among their three. Their wordings give steadily different
+        answers.{gapUp && gapDown && gapUp.v > 0 && gapDown.v < 0 ? <> RedBridge’s figure for
+        {" "}{issPhrase(gapUp.id)} runs {Math.round(gapUp.v)} points above Ipsos’s, and its figure
+        for {issPhrase(gapDown.id)} {Math.round(-gapDown.v)} points below.</> : null} Nothing shows
+        which is right, so each poll is moved half the pollsters’ average gap toward the other
+        before the two are pooled over six weeks. The grey bars sit midway between the two, and
+        don’t jump when one pollster’s poll leaves the window. Ipsos publishes about three weeks
+        after its fieldwork, so its latest poll is in the window for only part of each month.
+        DemosAU, Spectre and SEC Newgate ask versions that can’t be pooled, but DemosAU and Spectre
+        side with Ipsos on health: in 2026 Spectre had it at 18 to 20%, and 1 to 3% named it the
+        biggest issue at DemosAU, against 7 to 10% ranking it first at RedBridge.</span>
         <span className="info-p"><b>Who’s best.</b> Six pollsters ask which party would handle an
-        issue best, each in its own words. Resolve asks every month, “Which party do you think would
-        perform best in each of these areas?” RedBridge asks every month, “Which of the following do
-        you believe is best able to deal with…” Ipsos asks every month, “Please select the political
-        party that you believe is most capable of managing each of the following issues,” for its
-        month’s five top issues. YouGov asked in August 2026, “Which party is best at handling…”,
-        DemosAU in February 2026, “Which political party do you trust more to handle the following
-        issues?”, and every two months SEC Newgate asks, “Which of the following do you think would be
-        the best party to manage the cost of living?” Each offers different answers. Resolve offers the
-        Liberals, Labor, One Nation (since July 2026), someone else, and undecided. RedBridge offers
-        Labor, the Liberals, the Nationals, the Greens, One Nation, all about equal, none of these,
-        and not sure. Ipsos offers Labor, the Coalition, the Greens, One Nation (since June 2026),
-        other, don’t know, and none. YouGov and DemosAU offer Labor, the Coalition, One Nation, the
-        Greens, and don’t know. SEC Newgate lists all four from May 2026, when One Nation and the
-        Greens joined and “neither” and “can’t say” disappeared from the printed table; its pooled
-        waves are those from that month on.</span>
-        <span className="info-p"><b>How it’s built.</b> The part every question shares is the choice
-        between Labor, the Coalition and One Nation. So each poll is read as those three parties’
-        shares of the voters who named one of them: 25, 20 and 20 of all voters become 38, 31 and 31.
-        Those shares are pooled over the last six weeks of polls, weighted as the headline’s polls
-        are, so newer and larger polls count for more. Each pollster’s house lean is taken off
-        first, measured as the headline’s are. A lean measured from few polls is shrunk toward
-        zero, and Ipsos and Resolve have offered all three parties only since mid-2026
-        {ISS && ISS.leanMax ? <>: the largest lean taken off today is {Math.abs(ISS.leanMax.v).toFixed(1)}
-        {" "}points</> : null}. The panel shows eight issues most of the pollsters ask: the cost of living,
-        housing, health, economic management, immigration, climate change, crime, and national
-        security. Pollsters word them a little differently – RedBridge’s “the rate of immigration”
-        is Resolve’s “immigration and refugees”, Ipsos’s “defence, foreign affairs and terrorism”
-        counts as national security, and DemosAU’s “Medicare” as health – and each counts as the
-        same issue.</span>
-        <span className="info-p"><b>What’s left out.</b> The Greens, whom Resolve doesn’t offer, and
-        every answer that names no party. Together they are about a quarter to two fifths of voters
-        on most issues, and more than half on climate change with RedBridge and YouGov, where many
-        choose the Greens. RedBridge puts the Greens first on climate change, and the panel says so
-        beside its rows.</span>
-        <span className="info-p"><b>Ahead, or no clear lead.</b> A party is ahead on an issue when its
-        lead over the next party is larger than that lead’s own 95% margin. The lead and its margin
-        are worked out together, because both shares come from the same voters: when one rises, the
-        other tends to fall.</span>
+        issue best, each in its own words and with its own list of answers. What every version
+        shares is the choice between Labor, the Coalition and One Nation, so each poll is read as
+        those three parties’ shares of the voters who named one of them: 25, 20 and 20 of all
+        voters become 38, 31 and 31. The shares are pooled over six weeks, after taking off each
+        pollster’s lean, shrunk toward zero where it rests on few polls: Ipsos and Resolve have
+        offered all three parties only since mid-2026
+        {ISS && ISS.leanMax ? <>, and the largest lean taken off today is
+        {" "}{Math.abs(ISS.leanMax.v).toFixed(1)} points</> : null}. The panel shows the eight issues
+        most pollsters ask: the cost of living, housing, health, economic management, immigration,
+        climate change, crime, and national security, each matched across pollsters’ wordings.</span>
+        <span className="info-p"><b>What’s left out.</b> The Greens, whom Resolve doesn’t offer,
+        and every answer that names no party: about a quarter to two fifths of voters on most
+        issues, and more than half on climate change with RedBridge and YouGov, where many choose
+        the Greens. RedBridge puts the Greens first on climate change, and the panel says so beside
+        its rows.</span>
+        <span className="info-p"><b>Ahead, or no clear lead.</b> A party is ahead on an issue when
+        its lead over the next party is larger than that lead’s own 95% margin. The lead and its
+        margin are worked out together, because both shares come from the same voters: when one
+        rises, the other tends to fall.</span>
         <span className="info-p"><b>Changes over time.</b> The sentence under the chart asks whether
-        any party has gained or lost ground on the issue over the period shown. Ipsos and Resolve
-        joined the three-party question only in June and July 2026, so a line can move just because
-        one of them arrived. The test compares each pollster only with itself, as on the
-        vote-by-group charts, and the bar rises for testing three parties at once. A pollster with
-        a single poll, such as DemosAU, can’t show a change, so it’s left out of the test.</span>
-        <span className="info-p"><b>By group.</b> RedBridge publishes a table for each of its main
-        issues giving each group’s share putting it in their top three: by vote, generation, gender,
-        where people live, home ownership, and education. A group’s margin comes from its share of the
-        poll, so One Nation voters, about a quarter of RedBridge’s sample, carry margins of about 6
-        points. The table’s all-voters row is RedBridge’s own, so it can differ from the grey bars,
-        which pool RedBridge with Ipsos. The sentences under the table use the same test as the{" "}
-        {xref("vote-by-group", "issues", "breakdowns by group")}.</span>
+        any party has gained or lost ground on the issue. Ipsos and Resolve joined the three-party
+        question only in June and July 2026, so a line can move just because one of them arrived.
+        The test therefore compares each pollster only with itself, with the bar raised for testing
+        three parties at once (see {xref("significance", "issues", "Significant")}). A pollster
+        with a single poll, such as DemosAU, is left out of it.</span>
+        <span className="info-p"><b>By group.</b> RedBridge’s tables give each group’s share
+        putting an issue in its top three, by vote, generation, gender, where people live, home
+        ownership, and education. A group’s margin comes from its share of the poll, so One Nation
+        voters, about a quarter of RedBridge’s sample, carry margins of about 6 points. ▲ and ▼ mark
+        a group that differs from all voters by more than its margin. A group’s change over the
+        term is a line through RedBridge’s monthly polls, with the bar raised for the number of
+        groups tested. The all-voters row is RedBridge’s own, so it can differ from the grey bars,
+        which pool RedBridge with Ipsos.</span>
         <span className="info-p"><b>Limits.</b> Unfortunately, the two pollsters that ask what
         matters every month ask different questions, and nothing shows which is closer to how
-        people will vote. The grey bars simply sit midway between them. And the three-party shares can’t
-        show a party gaining ground among voters who had named no one.</span>
-        <span className="info-p"><b>A check.</b> Every table is checked before it’s used. A
-        salience row’s three ranks must add up to its top-three share, and every best-party row must
-        add up to 100, give or take rounding. RedBridge prints each month twice, in its own report and
-        again in the next, and the two must agree. Ipsos’s 19 shares must add up to about 300, three
-        per voter, and Ipsos prints each month again in every later report that year: every printing
-        must agree.</span>
-        <span className="info-p"><b>Sources.</b> RedBridge’s monthly reports with Accent Research
-        (accent-research.com), Resolve’s Political Monitor interactive (The Sydney Morning Herald),
-        Ipsos’s Issues Monitor reports and methodology statements (ipsos.com), YouGov’s News24
-        Pulse charts, and DemosAU’s report for February 2026. For the check, DemosAU’s and
-        Spectre’s reports.</span>
+        people will vote. The grey bars simply sit midway between them. And the three-party shares
+        can’t show a party gaining ground among voters who had named no one.</span>
         {working(<>
+          <span className="info-p"><b>What matters, as asked.</b> RedBridge: “If a federal
+          election were held today, which of the following issues would be most important to you
+          when deciding who will receive your vote? Please rank your top 3.” Ipsos: “What would you
+          say are the three most important issues facing Australia today?” As a check: DemosAU asks
+          every month, “In your opinion, what is the biggest issue facing Australia today?”, taking
+          one answer in the voter’s own words and sorting the answers into categories generated by
+          AI, which change from month to month. Spectre asks about every three months for up to
+          three of 14 issues, several of them bundled, such as “health and aged care”. Every two
+          months SEC Newgate asks, “What are the main issues facing Australians that are most
+          important to you right now?”, and counts every issue each voter mentions.</span>
+          <span className="info-p"><b>Who’s best, as asked.</b> Resolve asks every month, “Which
+          party do you think would perform best in each of these areas?”, offering the Liberals,
+          Labor, One Nation (since July 2026), someone else, and undecided. RedBridge asks every
+          month, “Which of the following do you believe is best able to deal with…”, offering
+          Labor, the Liberals, the Nationals, the Greens, One Nation, all about equal, none of
+          these, and not sure. Ipsos asks every month, “Please select the political party that you
+          believe is most capable of managing each of the following issues,” for its month’s five
+          top issues, offering Labor, the Coalition, the Greens, One Nation (since June 2026),
+          other, don’t know, and none. YouGov asked in August 2026, “Which party is best at
+          handling…”, and DemosAU in February 2026, “Which political party do you trust more to
+          handle the following issues?”, both offering Labor, the Coalition, One Nation, the Greens,
+          and don’t know. Every two months SEC Newgate asks, “Which of the following do you think
+          would be the best party to manage the cost of living?” It lists all four parties from May
+          2026, when One Nation and the Greens joined and “neither” and “can’t say” disappeared from
+          the printed table; its pooled waves are those from that month on.</span>
+          <span className="info-p"><b>Matching issues.</b> RedBridge’s “the rate of immigration” is
+          Resolve’s “immigration and refugees”, Ipsos’s “defence, foreign affairs and terrorism”
+          counts as national security, and DemosAU’s “Medicare” as health.</span>
+          <span className="info-p"><b>Pooling.</b> Shares are weighted as the headline’s polls are,
+          so newer and larger polls count for more, and each pollster’s lean is measured as the
+          headline’s are.</span>
           <span className="info-p"><b>Top three, two pollsters:</b> with g = RedBridge’s figure minus
           Ipsos’s on average, each RedBridge poll’s share x counts as x − g ÷ 2 and each Ipsos poll’s
-          as x + g ÷ 2, and the results pool like the shares below. g is measured poll by poll, against
-          the other pollster’s polls within four weeks, and averaged with a weight that halves every
-          90 days.</span>
+          as x + g ÷ 2, and the results pool like the shares below. g is measured poll by poll,
+          against the other pollster’s polls within four weeks, and averaged with a weight that
+          halves every 90 days.</span>
           <span className="info-p"><b>Three-party share:</b> for each party p, s = 100 × p ÷
           (Labor + Coalition + One Nation), from the poll’s published shares.</span>
-          <span className="info-p"><b>Lead:</b> the leader’s share minus the next party’s, pooled like
-          the shares. As a difference of two shares of one sample, its sampling variance is
+          <span className="info-p"><b>Lead:</b> the leader’s share minus the next party’s, pooled
+          like the shares. As a difference of two shares of one sample, its sampling variance is
           (a + b − (a − b)²) ÷ n, where a and b are the two shares as fractions.</span>
+          <span className="info-p"><b>A check.</b> Every table is checked before it’s used. A
+          salience row’s three ranks must add up to its top-three share, and every best-party row
+          must add up to 100, give or take rounding. RedBridge prints each month twice, in its own
+          report and again in the next, and the two must agree. Ipsos’s 19 shares must add up to
+          about 300, three per voter, and Ipsos prints each month again in every later report that
+          year: every printing must agree.</span>
+          <span className="info-p"><b>Sources.</b> RedBridge’s monthly reports with Accent Research
+          (accent-research.com), Resolve’s Political Monitor interactive (The Sydney Morning
+          Herald), Ipsos’s Issues Monitor reports and methodology statements (ipsos.com), YouGov’s
+          News24 Pulse charts, and DemosAU’s report for February 2026. For the check, DemosAU’s and
+          Spectre’s reports.</span>
           {issWork}
         </>)}</>) },
-    ] },
-    { id: "g-leaders", title: "Leaders", entries: [
-      { id: "approval", term: "Approval", body: (
-        <>A rating of how a leader is doing the job: approve minus disapprove. Essential asks,
-        “Do you approve or disapprove of the job Anthony Albanese is doing as Prime Minister?”
-        YouGov and Newspoll ask, “Are you satisfied or dissatisfied with the way Anthony Albanese
-        is doing his job as Prime Minister?” Resolve asks, “How would you rate Angus Taylor’s
-        performance as opposition leader in recent weeks?”
-        {" "}{xref("favourability", "approval", "Favourability")} is a different question, about
-        the person rather than the job.</>) },
-      { id: "favourability", term: "Favourability", body: (
-        <>A rating of the leader as a person: positive minus negative. RedBridge/Accent asks,
-        “Do you have a favourable or unfavourable view of the following?” DemosAU asks, “What is
-        your opinion of the following people?”, offering positive, neutral, and negative.
-        Freshwater asks its own version. A leader can be approved of for the job and disliked as
-        a person, or the reverse, so {xref("approval", "favourability", "approval")} and
-        favourability are shown in separate panels, never averaged together.</>) },
-      { id: "net-approval", term: "Net approval", body: (
-        <>Approve minus disapprove for a party leader, or favourable minus unfavourable where a
-        pollster asks about favourability. Pollsters ask irregularly and word the questions
-        differently. The lines are monthly aggregates, adjusted for house effects the same way as
-        the vote figures, with each pollster counting equally. The figure beside each leader is
-        the current reading, built as the headline is – see
-        {" "}{xref("weighted-aggregate", "net approval", "Weighted aggregate")}.</>) },
-      { id: "preferred-pm", term: "Preferred prime minister", body: (
-        <>Who voters say would make the better prime minister, head to head or three-way where a
-        pollster offers it. Pollsters leave different shares uncommitted, so their levels can’t be
-        compared directly; the gaps and trends can. The lines are monthly averages weighted by
-        sample size, with no adjustment for house effects. The figure beside each leader pools the
-        last six weeks of polls, newer ones counting for more.</>) },
-    ] },
-    { id: "g-mood", title: "The national mood", entries: [
-      { id: "direction", term: "National direction", body: (
-        <>Whether voters think the country is heading in the right direction or is on the wrong
-        track. Only {(D.directionHouses || []).length} pollsters ask it, with slightly different
-        wording, and not every poll includes it. {dirSources}
-        <span className="info-p">Right direction and wrong track are each averaged separately and
-        adjusted for each pollster’s {xref("house-lean", "direction", "lean")}, as the vote is. The
-        undecided share is whatever is left. SEC Newgate makes everyone choose, so its readings have
-        no undecided share and sit higher on both lines; the lean adjustment takes this out.</span>
-        <span className="info-p">The figures at the top are built like the headline, from the last
-        three weeks of polls with newer ones counting for more (see
-        {" "}{xref("weighted-aggregate", "direction", "Weighted aggregate")}). The chart has one
-        point per month. Because so few pollsters ask, some months rest on a single poll, and their
-        {" "}{xref("interval", "direction", "95% intervals")} are wider for it.</span></>) },
-    ] },
-  ];
-
-  /* Questions whose answers ARE the explanation, in the plainest words the
-     reader would type – rendered ahead of the glossary, and targetable by
-     openTerm exactly the way a term is (the id must not collide with one). The
-     order is the reader's own curiosity: what the picture is and where it
-     comes from, then the numbers, then their oddities, then how far to trust
-     them, then the plumbing. */
-  const faqs = [
-    { id: "what-am-i-looking-at", q: "What exactly am I looking at in the main chart?", a: (
-      <>Each dot is one published poll, placed at the midpoint of its fieldwork. The line is one
-      point per calendar month, pooling that month’s polls, adjusted for house effects, and
-      weighted by sample size, with the {xref("interval", "what am i looking at", "95% interval")}
-      {" "}shaded around it. Where the two parties’ bands overlap, the polls can’t separate them
-      that month. A dash (—) in any table means the pollster didn’t ask that question. The
-      headline figure at the top is calculated separately, over the last 21 days – see
-      {" "}{xref("weighted-aggregate", "what am i looking at", "Weighted aggregate")} – so it can
-      move before the monthly line catches up.</>) },
-    { id: "where-does-data-come-from", q: "Where do the numbers come from?", a: (
-      <>From the pollsters. The site runs no polls of its own. It includes every national
-      voting-intention poll published since the May 2025 federal election, from these
-      {" "}{Object.keys(houseCounts).length} houses, most polls first: {sources}. A pollster’s MRP
-      or SMS polls count under its own name. Each poll is filed in the archive with its fieldwork
-      dates, sample size, a link to the pollster’s release and, where one exists, its
-      {" "}{xref("apc-statement", "where does data come from", "APC statement")}.</>) },
-    { id: "dots-past-the-line", q: "Why do the newest poll dots sit past the end of the line?", a: (
-      <>Because the line has only one point per month, drawn at the middle of the month. Each dot
-      sits at its own fieldwork midpoint, so after mid-month the newest dots land to the right of
-      the line’s last point, even though they’re already counted in it. When the first poll of a
-      new month closes, the line gains a point at that month’s midpoint; until then, up to half a
-      month of dots can run ahead of it. Only the drawing lags, not the estimate: the headline
-      comes from the 21-day
-      {" "}{xref("weighted-aggregate", "dots past the line", "weighted aggregate")}, which moves
-      with every poll.</>) },
-    { id: "newest-poll-not-headline", q: "The newest poll doesn’t match the headline. Which one is wrong?", a: (
-      <>Usually neither. A poll is one pollster’s reading of one week, and chance alone can put it
-      off by its {xref("margin-of-error", "newest poll not headline", "margin of error")}. The
-      headline pools every recent poll, weights each by recency and sample size, and first
-      removes each pollster’s {xref("house-effect", "newest poll not headline", "house effect")}.
-      One poll moves it by its weight, not its news value. Each poll’s breakdown shows exactly
-      how much it moved today’s figure – its
-      {" "}{xref("aggregate-effect", "newest poll not headline", "aggregate effect")}.</>) },
-    { id: "headline-moved-no-poll", q: "Why did the headline move when no new poll came out?", a: (
-      <>Because polls age. A poll’s weight halves every seven days, so between releases the newest
-      polls steadily take over from older ones, and a poll leaves the average altogether after 21
-      days. The figure is recalculated every time the site rebuilds, so it can move on a quiet
-      day – but only because weights change, never because it’s being smoothed towards
-      anything.</>) },
-    /* The ▲ ▼ figures measure against three different things depending on
-       where they sit, and the panels only say which in a hover title. */
-    { id: "changes", q: "What are the ▲ and ▼ figures measured against?", a: (
-      <>It depends on where they sit.
-      <ul className="info-list">
-        <li><strong>Beside a figure in a panel</strong> (the two-party headline, preferred prime
-        minister, leader approval, national direction, the undecided share, and where One
-        Nation’s new voters came from): the change on a month ago. It is the same estimate, built
-        the same way from the polls of 30 days earlier. When the move is smaller than its margin
-        of error, the headline says “within the margin”.</li>
-        <li><strong>On the primary vote chips:</strong> the change since the 2025 election, where
-        every line on that chart begins.</li>
-        <li><strong>Inside a poll’s breakdown and in the All polls table:</strong> the change on
-        that pollster’s own previous poll. It doesn’t pass through the average at all.</li>
-      </ul>
-      Hovering over any of them names its reference, and the date where there is one. A green ▲
-      is a rise and a red ▼ a fall: a direction, not a verdict on anyone. The undecided share
-      reverses the colours, since more undecided voters is the less settled reading, and where
-      One Nation’s voters came from stays grey either way.</>) },
-    { id: "polls-disagree", q: "Two new polls say different things. Which of them is right?", a: (
-      <>Usually both are doing their job. Each is a sample, so two honest polls of an unchanged
-      electorate will differ. The question is whether they differ by more than luck allows, and
-      the {xref("poll-disagreement", "polls disagree", "Poll disagreement")} panel answers it. A
-      gap that comes from method rather than luck – one pollster leaning the same way poll after
-      poll – shows up as a {xref("house-effect", "polls disagree", "house effect")}, which the
-      aggregate measures and removes instead of splitting the difference.</>) },
-    { id: "why-2pp-headline", q: "Why does the headline lead with two-party preferred and not the primary vote?", a: (
-      <>Because seats are decided between the final two candidates. Preferences are distributed
-      until one candidate has a majority, so “who’s ahead” is a
-      {" "}{xref("two-party-preferred", "why 2pp headline", "two-party")} question that first
-      preferences alone can’t answer. With One Nation near {onp}% of the primary vote, the two
-      views of the race are far apart. The primary votes get their own weighted, adjusted series
-      in the panels below.</>) },
-    { id: "poll-without-2pp", q: "What happens to a poll that publishes no two-party figure?", a: (
-      <>It still counts. Its primary votes run through the same fixed
-      {" "}{xref("preference-flows", "poll without 2pp", "preference table")} as every other
-      poll’s, so it feeds the {xref("implied-2pp", "poll without 2pp", "implied 2PP")} the
-      headline leads with, as well as the primary vote series and, where it asked, the leader
-      panels. It can’t join the pollsters’ own published two-party series, because there’s no
-      figure to add, and the site won’t invent one.</>) },
-    { id: "primaries-not-100", q: "Why don’t the primary votes add up to 100?", a: (
-      <>Sometimes on purpose. Some pollsters keep voters who won’t name a party inside their
-      published shares instead of setting them aside, so the parties add up to less than 100 by
-      exactly that {xref("undecided", "primaries not 100", "undecided")} share. The aggregate
-      keeps that shortfall, because it says something real about the electorate. Where the
-      undecided were set aside first, the primaries add up to 100. Each poll’s breakdown says
-      which approach it used.</>) },
-    { id: "essential-pair-not-100", q: "One pollster’s two-party figures add up to less than 100. Are they rescaled?", a: (
-      <>Yes, before they’re averaged. Essential leaves
-      {" "}{xref("undecided", "essential pair not 100", "undecided")} voters inside its published
-      two-party figures, so the pair falls short of 100 by that share. Averaging it as published
-      against pairs that do add to 100 would mix a share of everyone with a share of the decided,
-      and give Essential a false lean. So every poll enters the
-      {" "}{xref("weighted-aggregate", "essential pair not 100", "weighted aggregate")} as Labor’s
-      share of the two, which changes nothing for pairs that already add to 100.
-      <span className="info-p">That differs from the primaries, where the shortfall is kept: a
-      primary share can be read on its own, but the two-party pair is pooled across pollsters, so
-      it has to be comparable. The shortfall isn’t thrown away either; it’s kept as Essential’s
-      own undecided line. Rescaling splits the undecided in proportion. That isn’t a claim they’d
-      break that way, only that a pair on its own gives no basis for splitting them any other
-      way.</span></>) },
-    { id: "is-this-a-forecast", q: "Is the headline a prediction of the election result?", a: (
-      <>No. Everything here describes where opinion stands now, from polls already published.
-      Nothing projects it forward through a campaign, and final polls have missed on the day
-      before{acc ? <>: by {acc.meanAbs} points on average</> : null} – see
-      {" "}{xref("how-wrong-are-the-polls", "is this a forecast", "How wrong have the polls been")}.
-      Nor does the site project seats – see
-      {" "}{xref("two-party-to-seats", "is this a forecast", "What would these numbers mean in seats")}.</>) },
-    { id: "how-wrong-are-the-polls", q: "How wrong have the polls been at past elections?", a: acc ? (
-      <>The{" "}<button type="button" className="hi-term"
-        onClick={() => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()}>How the final polls did</button>{" "}panel in Past cycles scores each pollster’s last two-party
-      figure in the {acc.windowDays} days before polling day against the result. Across {accSpan},
-      the final polls missed by {acc.meanAbs} points on average, and by
-      {" "}{Math.abs(acc.worstCycle.err)} at worst, in {acc.worstCycle.year}.
-      {accShared ? <> In {accShared.year} all {accShared.n} houses missed on the same side, by
-      {" "}{accShared.absErr}.</> : null} An error every pollster shares is one no aggregate can
-      see, which is why the {xref("interval", "how wrong are the polls", "95% interval")} never
-      claims to cover it.</>) : (
-      <>The{" "}<button type="button" className="hi-term"
-        onClick={() => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()}>How the final polls did</button>{" "}panel in Past cycles scores each pollster’s last two-party
-      figure of the campaign against the result, election by election, house by house.</>) },
-    { id: "two-party-to-seats", q: "What would these numbers mean in seats?", a: (
-      <>The site doesn’t turn them into seats, on purpose. Converting a national two-party figure
-      into seats assumes the swing is the same everywhere. With One Nation near {onp}% of the
-      primary vote, that assumption fails in exactly the seats that would decide the election: a
-      large minor party wins where its vote is concentrated and nowhere else, and a national
-      figure can’t see where that is. Where a pollster modelled seats one by one, its poll carries
-      the {xref("mrp", "two party to seats", "MRP")} tag in the archive.</>) },
-    { id: "next-poll-when", q: "How does the site know when the next poll is coming?", a: (
-      <>It doesn’t know; it forecasts. Each pollster’s next date comes from the gaps between its
-      recent releases. If a date passes with no poll, the row stays and counts the days until the
-      poll arrives. {xref("next-polls", "next poll when", "Next polls")} explains the
-      method.</>) },
-    { id: "poll-i-saw-not-here", q: "I saw a poll in the news that isn’t here. Where is it?", a: (
-      <>Most likely in the archive. The Latest polls table shows only each active pollster’s
-      newest poll, so an earlier one leaves that table as soon as a newer one lands. The All polls
-      archive keeps every poll this term, and Past cycles the ones before. If a published poll is
-      missing from the archive too, that’s an error: please
-      {" "}<a className="fb-link" href="/feedback/">report it</a>.</>) },
+      entries: [] },
+    { id: "s-decided", title: "Decidedness", nav: "Decidedness",
+      lead: { id: "decidedness", body: (
+        <>How settled the vote is. Some voters won’t name a party (undecided), some name one but
+        might still change their mind (not firm), and the rest are firm. These are different
+        questions, mostly from different pollsters, so each is its own line.
+        <span className="info-p"><b>Undecided</b> is the “can’t say” share, and each poll’s
+        breakdown says how its pollster treats it.
+        {undWho("first") ? <> {undWho("first")} {undVerb("first", "sets", "set")} it aside before
+        calculating party shares, so the primaries sum to 100.</> : null}
+        {undWho("tpp") ? <> {undWho("tpp")} {undVerb("tpp", "leaves", "leave")} it inside the
+        published two-party pair, which sums to less than 100; the shortfall is the
+        after-preferences line.</> : null}</span>
+        <span className="info-p"><b>Not firm.</b> {undWho("soft") || "Resolve"} {undVerb("soft", "asks", "ask")} those
+        who named a party, “How firm are you with your vote?” The not-firm share is everyone who
+        might still change. <b>Of every 100 voters</b> combines it with the undecided share, so it
+        is approximate.</span>
+        <span className="info-p"><b>By party</b> shows the share of each party’s voters RedBridge
+        finds solid: certain to vote that way. Each figure pools RedBridge’s last {firmPool} polls,
+        weighted by how many of the party’s voters each held, against its first {firmPool} of the
+        term. <b>By age</b> pools Resolve’s not-firm share by age band the same way, {agePool} polls
+        at a time; Resolve publishes no count for each band, so a band’s sample is the poll’s
+        effective sample times the band’s share of adults.</span>
+        <span className="info-p"><b>How it’s built.</b> Each pollster’s figure answers its own
+        question, so none takes a house adjustment. The lines are monthly averages weighted by
+        sample size, and the all-voters figures pool the last six weeks of polls. A change since
+        the election is tested within each pollster’s own polls, with the bar raised for testing
+        several lines at once.</span></>) },
+      entries: [] },
+    { id: "s-cycles", title: "Past cycles", nav: "Past cycles",
+      lead: { id: "past-cycles", body: (
+        <>Every term since 1972, lined up on its own election day, so a given month is the same
+        distance into every term. Compare this term with every past term, or only those whose
+        government was re-elected or ousted, as a level or as the change since the election.
+        <span className="info-p"><b>How it’s built.</b> Past terms are averaged month by month the
+        way this term is. A month with no poll is filled in from the months either side, dashed on
+        a drawn term. A line’s dotted start runs from the election’s count to the term’s first
+        poll, and its dotted end from the final poll to the next election’s count.</span>
+        <span className="info-p"><b>The measures.</b> Two-party preferred is implied from each
+        poll’s primary votes, through the
+        {" "}{xref("last-election-flows", "past cycles", "flows of the election that opened its term")}.
+        The primary vote is the governing party’s and the main opposition party’s. The leaders are
+        rated by net approval since 1972 and preferred prime minister since 1984, following
+        whoever held the office; the earliest terms’ ratings are the Morgan Gallup Poll’s, and
+        favourability ratings are left out. How the final polls did scores the polls against each
+        result (see {xref("how-wrong-are-the-polls", "past cycles", "How accurate are the polls?")}).
+        The CSV download holds every poll behind the terms shown.</span></>) },
+      entries: [
+        { id: "last-election-flows", term: "Last-election flows", body: (
+          <>The flow table a term’s implied 2PP is read through: the preferences counted at the
+          election that opened the term. It’s the only table anyone inside the term could have
+          used, so each past term sits on the same footing as today’s
+          {" "}{xref("implied-2pp", "last-election flows", "implied 2PP")}. The sitting term follows
+          the rival Labor is doing worse against, as the headline does{onSince ? <>: the Coalition
+          until {onSince}, One Nation since</> : null}, and the chart marks the change.
+          {lefMean != null ? (
+            <span className="info-p"><b>How well it works.</b> Applied to the next election’s
+            actual primary votes, each table misses the official 2PP by {lefMean.toFixed(1)} points
+            on average. The biggest misses were {lefBigText}.</span>
+          ) : null}
+          <span className="info-p"><b>Where the tables come from.</b> From 2004, the AEC’s count of
+          every ballot between Labor and the Coalition, in every seat. For 1996–2001, its official
+          statistics, from the nine seats in ten where the final two were Labor and the Coalition.
+          Before 1996 no flows by party were published, so the 1987–93 tables are each the single
+          minor-party flow the official result implies. The Morgan Gallup polls of 1972–84
+          published no two-party figure at all, so those terms are read through tables calibrated
+          to the election that opened each term: one flow each for the DLP, the Democrats (a debut
+          assumption where an election met them for the first time) and all other votes.</span>
+          {working(lefWork)}</>) },
+      ] },
+    { id: "s-allpolls", title: "All polls", nav: "All polls",
+      lead: { id: "all-polls", body: (
+        <>Every national poll since the 2025 election, newest first, each linked to its source. Its
+        views give each poll’s two-party figures, primary votes, leader ratings, national
+        direction, issues, and group breakdowns (a party’s vote in one of the poll’s groups minus its
+        vote in another).
+        <span className="info-p">The two-party view reads every poll’s primary votes through the
+        2025 flows, so the polls compare like for like, with the pollster’s own figure beneath
+        where it published one. Those flows carry the same doubt for every poll, so each poll’s
+        interval is sampling error alone. A poll’s {xref("poll-lean", "all polls", "lean")} is how
+        far it sits from that month’s aggregate. Open a row for the poll’s full breakdown, and use
+        Download CSV for the polls the table is showing.</span></>) },
+      entries: [
+        { id: "poll-lean", term: "Poll lean", body: (
+          <>How far one poll sits from the aggregate for the month it was taken. It describes that
+          poll, not the pollster: sampling luck alone can put a single poll off the pace. A pollster
+          whose polls lean the same way again and again is showing its
+          {" "}{xref("house-effect", "poll lean", "house effect")}.</>) },
+        { id: "aggregate-effect", term: "Aggregate effect", body: (
+          <>How much one poll moves the headline. The poll’s breakdown recalculates the
+          {" "}{xref("weighted-aggregate", "aggregate effect", "weighted aggregate")} without it:
+          “+0.1 for ALP” means today’s two-party figure is a tenth of a point higher because this
+          poll is in the window. One line appears for each figure the poll feeds: the published
+          two-party figure, the {xref("implied-2pp", "aggregate effect", "implied 2PP")}, and Labor
+          v One Nation where the poll asked it. A poll older than 21 days moves nothing now, and
+          says so, with what it was worth when published where that can still be worked out. House
+          effects are left as measured, since they belong to the pollster, not the poll.</>) },
+        { id: "apc-statement", term: "APC statement", body: (
+          <>The methodology statement a pollster publishes for each poll under the Australian
+          Polling Council’s Code of Conduct: fieldwork dates and method, the raw sample, the
+          effective sample (what that sample is worth after weighting), the weighting used, and the
+          question order. It is the pollster’s own publication; nothing is lodged with the council.
+          A poll’s breakdown links it, and its effective sample sets the poll’s weight in the
+          {" "}{xref("weighted-aggregate", "APC statement", "weighted aggregate")}. Newspoll, YouGov,
+          Essential, DemosAU, RedBridge/Accent, and Fox & Hedgehog publish one. Where a pollster
+          publishes none, the {eff} column shows a dash: the site doesn’t invent a figure the
+          pollster never published.</>) },
+        { id: "mrp", term: "MRP", body: (
+          <>Multilevel regression and post-stratification: a model that estimates each seat
+          separately instead of applying one national swing everywhere. Seat figures appear only
+          where a pollster built such a model and published the results, and the MRP tag marks
+          those polls.</>) },
+        { id: "poll-disagreement", term: "Poll disagreement", body: (
+          <>Whether the pollsters disagree more than chance explains. No two polls match even when
+          opinion hasn’t moved, because each surveys a different sample. The panel compares how far
+          the polls actually spread with how far their sample sizes alone would scatter them, and
+          the ratio gives one of four verdicts:
+          <span className="info-p"><b>{verdict.herd}</b> (under 0.80×): closer together than
+          independent samples can be, which suggests pollsters are adjusting towards each
+          other.</span>
+          <span className="info-p"><b>{verdict.ok}</b> (0.80–1.20×): as close as sampling allows,
+          which is what healthy polling looks like.</span>
+          <span className="info-p"><b>{verdict.mild}</b> (1.20–1.60×): something real sits on top
+          of chance, such as different weighting, different voters reached, or opinion moving at
+          different speeds.</span>
+          <span className="info-p"><b>{verdict.wide}</b> (1.60× or more): the gap can’t be chance.
+          The pollsters aren’t measuring one number with different luck.</span></>) },
+        { id: "house-lean", term: "House lean", body: (
+          <>Each pollster’s {xref("house-effect", "house lean", "house effect")} traced month by
+          month, so a change of method or ownership shows where it happened instead of being
+          smeared across its history.{RD ? <> The One Nation–Coalition split view is a pollster’s
+          lean on One Nation’s primary vote less its lean on the Coalition’s: how it splits the
+          right’s vote.</> : null}</>) },
+      ] },
   ];
 
   /* What the site is and how to follow it. */
   const about = (
     <>
       <p className="info-about-p">auspol tracker is an unofficial aggregator of Australian federal
-      political polls. It collects published polls, adjusts them for the pollster’s lean, weights
-      them by recency, and other things, and uses them to derive aggregate estimates. To be clear,
-      the site does not
-      conduct polls of its own but just accrues and presents those published by others. It aims to
-      cut through the noise and provide a clear view of Australian political sentiment, of how
-      Australians intend to vote and their views on leaders, issues, and our country’s
+      political polls. It collects published polls, adjusts each for its pollster’s lean, weights
+      them by recency and sample size, and pools them into aggregate estimates. To be clear, the
+      site runs no polls of its own; it only gathers and presents those published by others. It
+      aims to cut through the noise and give a clear view of Australian political sentiment: how
+      Australians intend to vote, and their views on leaders, issues, and our country’s
       direction.</p>
       <p className="info-about-p"><b>Updates.</b> New polls are added as they are released, mostly
       by automated checks but also manually by me (some guy). Every figure is rebuilt when a new
@@ -7237,7 +7304,13 @@ function infoTerms(D) {
       {" "}<a className="fb-link" href="/archives/newspoll/">here</a> for safekeeping.</p>
     </>
   );
-  return { groups, faqs, about };
+  /* Every entry, for lookup by id (TermPop, the scroll target): a section's
+     lead takes the section's title as its name. */
+  const all = [
+    ...faqs, ...method,
+    ...sections.flatMap((s) => [{ ...s.lead, term: s.title, lead: true }, ...s.entries]),
+  ];
+  return { faqs, method, sections, about, all };
 }
 
 /* One question target renders the same back-home affordance either section
@@ -7257,31 +7330,51 @@ function InfoBack({ onBack, backLabel }) {
 
 /* Entries merged into another keep their old ids working: panels across the
    site open terms by id, and a link that once landed on "Seat projection"
-   should now land on the question that absorbed it. */
+   should now land on the question that absorbed it. The second block is the
+   October 2026 regrouping (one explainer per section), which folded six
+   questions into the entries that answer them. */
 const INFO_ALIAS = {
   "change-arrows": "changes",
   "deltas": "changes",
   "individual-poll": "what-am-i-looking-at",
   "polling-error": "how-wrong-are-the-polls",
-  "seat-projection": "two-party-to-seats",
+  "seat-projection": "is-this-a-forecast",
   "sources": "where-does-data-come-from",
   "lead-interval-double": "interval",
   "chance-consistent": "poll-disagreement",
   "mild-divergence": "poll-disagreement",
   "real-disagreement": "poll-disagreement",
-  "leadership": "approval",
+  "dots-past-the-line": "what-am-i-looking-at",
+  "headline-moved-no-poll": "weighted-aggregate",
+  "polls-disagree": "newest-poll-not-headline",
+  "two-party-to-seats": "is-this-a-forecast",
+  "poll-without-2pp": "implied-2pp",
+  "essential-pair-not-100": "two-party-preferred",
+  "primaries-not-100": "primary-vote",
+  "next-poll-when": "next-polls",
+  "poll-i-saw-not-here": "latest-polls",
+  "net-approval": "approval",
+  "undecided": "decidedness",
 };
 
 function InfoView({ focus, onBack, backLabel }) {
   const { D } = window.AP;
-  const { groups, faqs, about } = infoTerms(D);
+  const { faqs, method, sections, about } = infoTerms(D);
   const target = focus ? (INFO_ALIAS[focus] || focus) : null;
   /* A layout effect, for the reason the archive's restore uses one: the view
      has to be in the DOM before it is tall enough to take the scroll. */
+  /* A short entry is centred. A tall one (a section's lead, the issues) is
+     brought in at its top instead, clear of the pinned bars, or the reader
+     lands mid-paragraph; a lead brings its section heading with it, since
+     that heading is its name. */
   React.useLayoutEffect(() => {
     if (!target) return;
     const el = document.getElementById("term-" + target);
-    if (el) el.scrollIntoView({ block: "center", behavior: "auto" });
+    if (!el) return;
+    const prev = el.previousElementSibling;
+    const head = prev && prev.classList.contains("info-group") ? prev : null;
+    const tall = el.getBoundingClientRect().height > window.innerHeight * 0.5;
+    (head || el).scrollIntoView({ block: head || tall ? "start" : "center", behavior: "auto" });
   }, [target]);
   /* The index scrolls rather than links: the hash already names the tab
      (#info), so an in-page #anchor would navigate away from it. */
@@ -7290,11 +7383,15 @@ function InfoView({ focus, onBack, backLabel }) {
     if (el) el.scrollIntoView({ block: "start", behavior: "smooth" });
   };
   /* Each entry's name is a real heading (h3/h4) so assistive tech can walk
-     them, set inline so the definition still runs straight on from it. */
-  const entry = (id, head, body, H) => (
-    <div key={id} id={"term-" + id} className={"info-term" + (target === id ? " lit" : "")}>
-      <H className="info-t">{head}</H> {body}
-      {target === id && onBack && <InfoBack onBack={onBack} backLabel={backLabel} />}
+     them, set inline so the definition still runs straight on from it. A
+     question keeps its own punctuation; a term gets a full stop. A section's
+     lead entry has no name of its own: the section heading above it is its
+     name. */
+  const entry = (t, H) => (
+    <div key={t.id} id={"term-" + t.id} className={"info-term" + (target === t.id ? " lit" : "")}>
+      {t.q ? <><H className="info-t">{t.q}</H> </> : t.term ? <><H className="info-t">{t.term + "."}</H> </> : null}
+      {t.a || t.body}
+      {target === t.id && onBack && <InfoBack onBack={onBack} backLabel={backLabel} />}
     </div>
   );
   return (
@@ -7302,19 +7399,23 @@ function InfoView({ focus, onBack, backLabel }) {
       <nav className="info-index" aria-label="On this page">
         <button type="button" onClick={() => jump("info-about")}>About</button>
         <button type="button" onClick={() => jump("info-faq")}>Questions</button>
-        {groups.map((g) => (
-          <button key={g.id} type="button" onClick={() => jump(g.id)}>{g.title}</button>
+        <button type="button" onClick={() => jump("info-method")}>Method</button>
+        {sections.map((g) => (
+          <button key={g.id} type="button" onClick={() => jump(g.id)}>{g.nav}</button>
         ))}
       </nav>
       <h2 id="info-about" className="card-title info-h">About</h2>
       <div className="info-about">{about}</div>
       <h2 id="info-faq" className="card-title info-h info-h-faq">Questions</h2>
-      {faqs.map((f) => entry(f.id, f.q, f.a, "h3"))}
-      <h2 className="card-title info-h info-h-faq">Glossary</h2>
-      {groups.map((g) => (
+      {faqs.map((f) => entry(f, "h3"))}
+      <h2 id="info-method" className="card-title info-h info-h-faq">How the figures are built</h2>
+      {method.map((t) => entry(t, "h3"))}
+      <h2 id="info-sections" className="card-title info-h info-h-faq">Section by section</h2>
+      {sections.map((g) => (
         <React.Fragment key={g.id}>
           <h3 id={g.id} className="info-group">{g.title}</h3>
-          {g.entries.map((t) => entry(t.id, t.term + ".", t.body, "h4"))}
+          {entry(g.lead, "h4")}
+          {g.entries.map((t) => entry(t, "h4"))}
         </React.Fragment>
       ))}
     </section>
@@ -7327,10 +7428,9 @@ function InfoView({ focus, onBack, backLabel }) {
    page, and the full Info page is one step further for whoever wants it. */
 function TermPop({ id, onClose, onMore }) {
   const { D } = window.AP;
-  const { groups, faqs } = React.useMemo(() => infoTerms(D), []);
+  const { all } = React.useMemo(() => infoTerms(D), []);
   const key = INFO_ALIAS[id] || id;
-  const hit = faqs.find((f) => f.id === key)
-    || groups.flatMap((g) => g.entries).find((t) => t.id === key);
+  const hit = all.find((t) => t.id === key);
   const boxRef = React.useRef(null);
   React.useEffect(() => {
     const prev = document.activeElement;
@@ -7339,7 +7439,7 @@ function TermPop({ id, onClose, onMore }) {
     document.addEventListener("keydown", onKey);
     return () => { document.removeEventListener("keydown", onKey); prev && prev.focus && prev.focus(); };
   }, [id]);
-  // an id the glossary doesn't carry: fall back to the Info page trip
+  // an id Info doesn't carry: fall back to the Info page trip
   React.useEffect(() => { if (!hit) onMore(); }, [hit]);
   if (!hit) return null;
   const head = hit.q || hit.term;
@@ -7353,7 +7453,7 @@ function TermPop({ id, onClose, onMore }) {
         </div>
         <div className="term-pop-body info-term">{hit.a || hit.body}</div>
         <button type="button" className="term-pop-more" onClick={onMore}>
-          Read it in Info, with the rest of the glossary →
+          Read it in Info →
         </button>
       </div>
     </div>, document.body);
