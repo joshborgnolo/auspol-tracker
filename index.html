@@ -81315,7 +81315,7 @@ const rdApPrimFig = v => {
 };
 function rdApChg(d, dec) {
   if (d == null) return null;
-  if (Math.abs(d) < (dec ? 0.05 : 0.5)) return "no change";
+  if (Math.abs(d) < (dec ? 0.05 : 0.5)) return dec ? 0 .toFixed(dec) : "0";
   return (d > 0 ? "▲ " : "▼ ") + (dec ? Math.abs(d).toFixed(dec) : String(Math.abs(Math.round(d))));
 }
 function rdApFig(p, onM, pub) {

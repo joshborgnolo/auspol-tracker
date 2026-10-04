@@ -57,10 +57,13 @@ const rdApPrimFig = (v) => {
   if (f === "5") return <span className="rd-ap-halfwrap">{i}<b className="rd-ap-frac rd-ap-half">½</b></span>;
   return <>{i}<b className="rd-ap-frac">{"." + f}</b></>;
 };
-/* a change on the same pollster's previous poll */
+/* a change on the same pollster's previous poll; a flat one prints as a
+   bare 0 (0.0 at one decimal) - the width of its ▲/▼ neighbours, where "no
+   change" overran a primary's 54-64px column, and no dash to mistake for
+   the tables' "not published" */
 function rdApChg(d, dec) {
   if (d == null) return null;
-  if (Math.abs(d) < (dec ? 0.05 : 0.5)) return "no change";
+  if (Math.abs(d) < (dec ? 0.05 : 0.5)) return dec ? (0).toFixed(dec) : "0";
   return (d > 0 ? "▲ " : "▼ ") + (dec ? Math.abs(d).toFixed(dec) : String(Math.abs(Math.round(d))));
 }
 /* the figure a row shows for the table's contest and basis, and the other
