@@ -74955,10 +74955,28 @@ function RdLeadership({
     order,
     mk
   });
-  const two = get("alb_pref") != null && get("taylor_pref") != null ? {
+  const twoNow = get("alb_pref") != null && get("taylor_pref") != null ? {
     label: pm.short + " v " + opp.short,
     segs: [seg(pm, "alb_pref", 0, "alb"), seg(opp, "taylor_pref", 2, "taylor")]
   } : null;
+  const twoLast = J && !twoNow ? (() => {
+    const r = LM.slice().reverse().find(m => m.alb_pref != null && m.taylor_pref != null && m.alb_who === pm.short);
+    if (!r) return null;
+    const one = (Ld, k, order, mk) => ({
+      name: Ld.short,
+      v: r[k],
+      color: Ld.color,
+      party: Ld.id === "alb" ? "alp" : "lnp",
+      ci: r[k + "Ci"] ?? null,
+      order,
+      mk
+    });
+    return {
+      label: pm.short + " v " + opp.short + ", " + rdMonthYear(r.ym),
+      segs: [one(pm, "alb_pref", 0, "alb"), one(opp, "taylor_pref", 2, "taylor")]
+    };
+  })() : null;
+  const two = twoNow || twoLast;
   const twoH = get("alb_prefH") != null && get("hanson_prefH") != null ? {
     label: pm.short + " v " + han.short,
     segs: [seg(pm, "alb_prefH", 0, "alb-h2h"), seg(han, "hanson_prefH", 2, "hanson")]
@@ -75090,7 +75108,7 @@ function RdLeadership({
   const ppmNote = (() => {
     if (ppmView === "two") {
       if (!three) return null;
-      const lastTwo = J && !two ? LM.slice().reverse().find(r => r.alb_pref != null && r.taylor_pref != null) : null;
+      const lastTwo = J && !twoNow && !two ? LM.slice().reverse().find(r => r.alb_pref != null && r.taylor_pref != null) : null;
       return (lastTwo ? "The head-to-head question was last asked in " + rdMonthYear(lastTwo.ym) + ". " : "") + "Asked to choose from all three: " + three.map(s => s.name + " " + r1(s.v) + "%").join(", ") + "." + (secondIsHanson ? " " + han.short + ", not " + opp.short + ", runs second." : "");
     }
     if (ppmView === "three") {
