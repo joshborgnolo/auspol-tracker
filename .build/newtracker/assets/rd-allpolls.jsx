@@ -3060,14 +3060,14 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
         {Object.keys(houses).map((h) => houses[h].filter((d) => ms.includes(d.ym)).map((d, i) => {
           const vid = "vtx|" + h + "|" + d.ym;
           const vx = X(d.ym), vy = Y(Math.max(-3.4, Math.min(3.4, d.v)));
-          const showV = (src) => setTip({ id: vid, src, hd: { h, ym: d.ym, v: d.v }, px: vx });
+          const showV = (src) => setTip({ id: vid, src, hd: { h, ym: d.ym, v: d.v, fl: d.fl ?? null }, px: vx });
           const hideV = (src) => setTip((tp) => (tp && tp.id === vid && (!src || tp.src === src) ? null : tp));
           return (
             <g key={h + i}>
               {tip && tip.id === vid && <circle cx={vx} cy={vy} r="6" className="rd-apd-dothi"></circle>}
               <circle cx={vx} cy={vy} r="8" className="rd-apd-hit rd-fl-vhit"
                       tabIndex="0" role="img"
-                      aria-label={`${h}, ${rdMonthYear(d.ym)}: this pollster’s gap that month, published minus implied ${s1(d.v)} points`}
+                      aria-label={`${h}, ${rdMonthYear(d.ym)}: this pollster’s gap that month, published minus implied ${s1(d.v)} points${d.fl != null ? `, respondent-allocated flow to Labor ${d.fl.toFixed(1)} percent` : ""}`}
                       onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
                       onPointerEnter={(ev) => { if (ev.pointerType === "mouse") { setHv(null); showV("mouse"); } }}
                       onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hideV("mouse"); }}
@@ -3102,7 +3102,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
               <circle cx={px} cy={py} r="2.2" className="rd-fl-wdot"></circle>
               <circle cx={px} cy={py} r="8" className={"rd-apd-hit" + (k ? " link" : "")}
                       tabIndex="0" role={k ? "button" : "img"}
-                      aria-label={`${d.pollster}, fieldwork ${d.dateLabel}: published minus implied ${s1(d.v)} points` + (k ? "; press Enter to open this poll" : "")}
+                      aria-label={`${d.pollster}, fieldwork ${d.dateLabel}: published minus implied ${s1(d.v)} points${d.fl != null ? `, respondent-allocated flow to Labor ${d.fl.toFixed(1)} percent` : ""}` + (k ? "; press Enter to open this poll" : "")}
                       onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
                       onPointerEnter={(ev) => { if (ev.pointerType === "mouse") { setHv(null); show("mouse"); } }}
                       onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide("mouse"); }}
@@ -3155,6 +3155,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
             <span className="tip-title">{hd.h}</span>
             <span className="tip-row"><span className="tip-label">Month</span><span className="tip-val">{rdMonthYear(hd.ym)}</span></span>
             <span className="tip-row"><span className="tip-label">House drift</span><span className="tip-val">{s1(hd.v)}</span></span>
+            {hd.fl != null && <span className="tip-row"><span className="tip-label">Respondent flow to Labor</span><span className="tip-val">{hd.fl.toFixed(1)}%</span></span>}
             <span className="tip-sub tip-hint">this pollster’s gap that month – not a published wave</span>
           </span>
         );
@@ -3163,6 +3164,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
           <span className="tip rd-fl-tip" style={{ left: Math.min(W - 110, Math.max(110, px)) }}>
             <span className="tip-title">{d.pollster}</span>
             <span className="tip-row"><span className="tip-label">Published minus implied</span><span className="tip-val">{s1(d.v)}</span></span>
+            {d.fl != null && <span className="tip-row"><span className="tip-label">Respondent flow to Labor</span><span className="tip-val">{d.fl.toFixed(1)}%</span></span>}
             <span className="tip-row"><span className="tip-label">Fieldwork</span><span className="tip-val">{d.dateLabel}</span></span>
             {d.sample != null && <span className="tip-row"><span className="tip-label">Sample</span><span className="tip-val">n = {d.sample.toLocaleString()}</span></span>}
             {k && <span className="tip-sub tip-hint">Click to open this poll</span>}

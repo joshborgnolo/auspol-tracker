@@ -2622,12 +2622,27 @@ const synthChg = (synthNow && synth1mo && synthNow.se != null && synth1mo.se != 
    if it were measured off the anomaly mean. */
 const FLOW_BASE_DAYS = 180;   // baseline anchor window after the election
 const FLOW_BASE_MIN = 3;      // min residuals to locate a house's baseline
+/* The published pair's own percent of preferences flowing to Labor,
+   recovered per wave from the primary votes the wave also filed:
+   (published ALP share − ALP primary) over the non-major share. The
+   published side is the house's allocation as filed (respondent-allocated
+   basis – share2pp has already rebased undecided-inclusive pairs to 100
+   before this point, so no rebase is needed here either). Carried into the
+   drift chart's hover tips so a reader can see WHERE preferences went, not
+   only that the pair wandered (user request 2026-10-05); the same helper
+   serves the ALP-v-ON pairing with onp as the other primary. */
+const flowToAlp = (pairA, own, other) => {
+  const prefs = 100 - own - other;
+  return prefs > 0.5 ? ((pairA - own) / prefs) * 100 : null;
+};
 const driftSynthByKey = new Map(tppRowsSynth.map((r) => [r.key, r.x]));
 const driftResid = [];
 for (const r of tppRows) {
   const imp = driftSynthByKey.get(r.key);
   if (imp == null) continue;
-  driftResid.push({ ...r, pq: (r.x / 100) * (1 - r.x / 100) * 1e4, x: r.x - imp });
+  const p = POLL_BY_KEY.get(r.key);
+  const fl = p && p.alp != null && p.lnp != null ? flowToAlp(r.x, p.alp, p.lnp) : null;
+  driftResid.push({ ...r, pq: (r.x / 100) * (1 - r.x / 100) * 1e4, x: r.x - imp, fl });
 }
 const driftByFirm = new Map();
 for (const r of driftResid) {
@@ -2656,7 +2671,8 @@ const FLOW_BASE_FROM = {};
 }
 const driftAnom = driftResid
   .filter((r) => FLOW_BASE_FROM[r.firm])
-  .map((r) => ({ ym: r.ym, mid: r.mid, x: r.x - FLOW_BASE_FROM[r.firm].base, n: r.n, pq: r.pq, firm: r.firm, key: r.key }));
+  .map((r) => ({ ym: r.ym, mid: r.mid, x: r.x - FLOW_BASE_FROM[r.firm].base, n: r.n, pq: r.pq, firm: r.firm, key: r.key,
+                 fl: r.fl ?? null }));
 /* The per-house implied-flow fit is deleted (2026-09-19). It asked whether
    each house's allocation could be recovered from its own published 2PP and
    primary swings, and the numbers answered no: the ridge's own standard
@@ -2683,13 +2699,17 @@ const flowDrift = {
   months: driftMonths,
   now: driftNow && { v: driftNow.v, ci95: driftNow.ci95, n: driftNow.n, nEff: driftNow.nEff },
   /* per-house anomaly series for the faint background lines – same ragged
-     {ym, v} shape houseLean carries, plain n-weighted monthly means */
+     {ym, v} shape houseLean carries, plain n-weighted monthly means;
+     fl is the same n-weighted mean of the respondent flow to Labor over the
+     waves that carry one */
   houses: Object.fromEntries(Object.keys(FLOW_BASE_FROM).sort().map((f) => [f,
     MONTHS.map((ym) => {
       const rs = driftAnom.filter((r) => r.firm === f && r.ym === ym);
       if (!rs.length) return null;
       const w = rs.reduce((s, r) => s + r.n, 0);
-      return { ym, v: r1(rs.reduce((s, r) => s + r.n * r.x, 0) / w) };
+      const fs = rs.filter((r) => r.fl != null), fw = fs.reduce((s, r) => s + r.n, 0);
+      return { ym, v: r1(rs.reduce((s, r) => s + r.n * r.x, 0) / w),
+               ...(fs.length ? { fl: r1(fs.reduce((s, r) => s + r.n * r.fl, 0) / fw) } : {}) };
     }).filter(Boolean),
   ])),
   meta: {
@@ -2707,7 +2727,8 @@ const flowDrift = {
     const p = POLL_BY_KEY.get(r.key);
     return p && { x: dx(p.date), v: r1(r.x), pollster: r.firm,
                   dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
-                  sample: p.sample ?? null };
+                  sample: p.sample ?? null,
+                  ...(r.fl != null ? { fl: r1(r.fl) } : {}) };
   }).filter(Boolean).sort((a, b) => a.x - b.x || a.pollster.localeCompare(b.pollster)),
 };
 
@@ -2770,7 +2791,8 @@ for (const [key, v] of ALT_BY.entries()) {
   if (!p || !impOk(p)) continue;
   const x = v.ao;                          // published ALP share of the pairing (0-100)
   driftOnResid.push({ ym: ymOf(p.date), mid: midMs(p), n: rowN(p), firm: key.split("|")[1], key,
-                      pq: (x / 100) * (1 - x / 100) * 1e4, x: x - impliedOn(p) });
+                      pq: (x / 100) * (1 - x / 100) * 1e4, x: x - impliedOn(p),
+                      fl: flowToAlp(x, p.alp, p.onp) });
 }
 const driftOnByFirm = new Map();
 for (const r of driftOnResid) {
@@ -2789,7 +2811,8 @@ for (const [firm, rows] of driftOnByFirm) {
 }
 const driftOnAnom = driftOnResid
   .filter((r) => FLOW_ON_BASE_FROM[r.firm])
-  .map((r) => ({ ym: r.ym, mid: r.mid, x: r.x - FLOW_ON_BASE_FROM[r.firm].base, n: r.n, pq: r.pq, firm: r.firm, key: r.key }));
+  .map((r) => ({ ym: r.ym, mid: r.mid, x: r.x - FLOW_ON_BASE_FROM[r.firm].base, n: r.n, pq: r.pq, firm: r.firm, key: r.key,
+                 fl: r.fl ?? null }));
 const driftOnMonths = MONTHS.map((ym) => {
   const r = monthWithSe(driftOnAnom, null, ym);
   return r && { ym, x: mx(ym), v: r1(r.v), ci95: r1(1.96 * r.se), k: r.n };
@@ -2799,13 +2822,16 @@ const flowDriftOn = driftOnAnom.length ? {
   months: driftOnMonths,
   now: driftOnNow && { v: driftOnNow.v, ci95: driftOnNow.ci95, n: driftOnNow.n, nEff: driftOnNow.nEff },
   /* per-house anomaly series for the faint background lines — same ragged
-     {ym, v} shape §7c's houses carry */
+     {ym, v} shape §7c's houses carry; fl is the n-weighted mean respondent
+     flow to Labor over the waves that carry one */
   houses: Object.fromEntries(Object.keys(FLOW_ON_BASE_FROM).sort().map((f) => [f,
     MONTHS.map((ym) => {
       const rs = driftOnAnom.filter((r) => r.firm === f && r.ym === ym);
       if (!rs.length) return null;
       const w = rs.reduce((s, r) => s + r.n, 0);
-      return { ym, v: r1(rs.reduce((s, r) => s + r.n * r.x, 0) / w) };
+      const fs = rs.filter((r) => r.fl != null), fw = fs.reduce((s, r) => s + r.n, 0);
+      return { ym, v: r1(rs.reduce((s, r) => s + r.n * r.x, 0) / w),
+               ...(fs.length ? { fl: r1(fs.reduce((s, r) => s + r.n * r.fl, 0) / fw) } : {}) };
     }).filter(Boolean),
   ])),
   meta: {
@@ -2820,7 +2846,8 @@ const flowDriftOn = driftOnAnom.length ? {
     const p = POLL_BY_KEY.get(r.key);
     return p && { x: dx(p.date), v: r1(r.x), pollster: r.firm,
                   dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
-                  sample: p.sample ?? null };
+                  sample: p.sample ?? null,
+                  ...(r.fl != null ? { fl: r1(r.fl) } : {}) };
   }).filter(Boolean).sort((a, b) => a.x - b.x || a.pollster.localeCompare(b.pollster)),
 } : null;
 
