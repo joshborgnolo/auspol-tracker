@@ -1157,7 +1157,8 @@ const items = feedWaves.map((w) => {
     if (w.alt.lnpVsOnp_lnp != null) alts.push(`L/NP ${r1(w.alt.lnpVsOnp_lnp)} – ON ${r1(100 - w.alt.lnpVsOnp_lnp)}`);
     if (alts.length) parts.push(`Other two-party contests: ${alts.join(" · ")}.`);
   }
-  if (w.ppm) parts.push(`Preferred PM: Albanese ${w.ppm.alb} – ${w.ppm.oppName || "opposition leader"} ${w.ppm.opp}.`);
+  if (w.ppm) parts.push(`Preferred PM: Albanese ${w.ppm.alb} – ${w.ppm.oppName || "opposition leader"} ${w.ppm.opp}` +
+    (w.ppm.han != null ? ` – Hanson ${w.ppm.han}` : "") + ".");
   if (w.h2h) parts.push(`Preferred PM, Albanese v Hanson: ${w.h2h.alb} – ${w.h2h.han}.`);
   if (w.approval) {
     const det = w.approval.detail || {};
