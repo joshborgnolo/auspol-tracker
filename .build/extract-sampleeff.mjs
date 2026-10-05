@@ -106,6 +106,7 @@ import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { fetchBuffer as fetchDauBuffer, passSgCaptcha } from "./demosau-fetch.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -456,7 +457,19 @@ function dauMonths(title) {
 }
 async function legDemosau(needRows) {
   const needYms = [...new Set(needRows.map((p) => p.date.slice(0, 7)))];
-  const html = await fetchText("https://demosau.com/methodology-statements/");
+  /* demosau.com sits behind SiteGround's sgcaptcha PoW wall (the shared
+     fetchBuffer/passSgCaptcha in demosau-fetch.mjs solve it once and carry
+     the pass cookie). The bare fetch silently serves the meta-refresh page —
+     a linkless index or HTML-as-PDF — so retry like extract-demosau does. */
+  const DAU_INDEX = "https://demosau.com/methodology-statements/";
+  let html = "";
+  for (let t = 1; ; t++) {
+    html = (await fetchDauBuffer(DAU_INDEX)).toString("utf8");
+    if (html.includes("/wp-content/uploads/")) break;
+    if (html.includes("sgcaptcha") && (await passSgCaptcha(html, DAU_INDEX))) continue;
+    if (t >= 3) throw new Error("DemosAU methodology page: no statement links (bot wall or restructure?)");
+    await new Promise((r) => setTimeout(r, 1500 * t));
+  }
   const out = [], naTitles = [];
   for (const m of html.matchAll(/href="(https:\/\/demosau\.com\/wp-content\/uploads\/[^"]+\.pdf)"/gi)) {
     const title = decodeURIComponent(m[1].split("/").pop());
@@ -475,7 +488,11 @@ async function legDemosau(needRows) {
     });
     if (!covered) continue;
     const slug = "demosau-" + title.replace(/\.pdf$/i, "").replace(/[^A-Za-z0-9]+/g, "_").slice(0, 60);
-    const rec = await parsePdfAt(m[1], slug);
+    /* a per-statement fetch/parse failure degrades to a warning, like the
+       release fallback below — one bad PDF must not poison the whole leg */
+    let rec = null;
+    try { rec = await parsePdfAt(m[1], slug, fetchDauBuffer); }
+    catch (e) { console.log("  warn: DemosAU statement failed " + title.slice(0, 60) + ": " + String(e.message).slice(0, 100)); continue; }
     if (!rec) { console.log("  warn: parse hole in DemosAU " + title.slice(0, 60)); continue; }
     /* n/a statements (MRP) stay in the stream as link-only records: the
        sampleEff matcher filters eff==null out, the methodUrl matcher still
@@ -493,7 +510,7 @@ async function legDemosau(needRows) {
     if (out.some((r) => r.href === p.url)) continue;
     const title = decodeURIComponent(p.url.split("/").pop());
     try {
-      const rec = await parsePdfAt(p.url, "demosau-release-" + title.replace(/\.pdf$/i, "").replace(/[^A-Za-z0-9]+/g, "_").slice(0, 60));
+      const rec = await parsePdfAt(p.url, "demosau-release-" + title.replace(/\.pdf$/i, "").replace(/[^A-Za-z0-9]+/g, "_").slice(0, 60), fetchDauBuffer);
       if (!rec) { console.log("  warn: parse hole in DemosAU release " + title.slice(0, 60)); continue; }
       if (rec.na) console.log("  note: house marks eff-size n/a for " + title.slice(0, 60));
       else if (!rec.end) { console.log("  warn: no fieldwork end in DemosAU release " + title.slice(0, 60)); continue; }
@@ -506,8 +523,8 @@ async function legDemosau(needRows) {
   return out;
 }
 
-async function parsePdfAt(url, slug) {
-  const buf = await fetchBuffer(url);
+async function parsePdfAt(url, slug, fetcher = fetchBuffer) {
+  const buf = await fetcher(url);
   const txt = cachedText(slug, pdfToText(buf, slug));
   return parseApcStatement(txt);
 }
