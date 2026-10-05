@@ -1876,6 +1876,7 @@ function MethodNote({ onInfo }) {
 
 // set once the body first carries its theme classes – see the effect below
 let chromeSettled = false;
+let flipsOpen = 0;
 
 // timestamp of the last pointer down/up inside the tab panel, and whether the
 // panel's current focus arrived through that pointer – see the panel itself
@@ -2425,6 +2426,22 @@ function App() {
   const applyChrome = () => {
     for (const c in want) document.body.classList.toggle(c, want[c]);
   };
+  /* A theme flip lands every colour at once. The crossfade snapshots the new
+     page, but the live page under it is what shows when the fade ends, and
+     there the controls with their own colour transitions (the nav, the 2PP
+     switch, the checkboxes, body's paper) were still easing from the old
+     palette – trailing the rest of the page by a beat. html.theme-flip
+     (template.html) holds every transition off until the flip is over;
+     lifting it starts none, as nothing's value changes then. */
+  const flipColours = () => {
+    flipsOpen++;
+    document.documentElement.classList.add("theme-flip");
+    applyChrome();
+  };
+  // a flip landing on another's tail ends the first; the class waits for both
+  const endFlip = () => {
+    if (--flipsOpen <= 0) { flipsOpen = 0; document.documentElement.classList.remove("theme-flip"); }
+  };
   /* The first application belongs to the first commit, before anything
      paints: from the passive effect below it landed a frame late, so a dark
      reader's first frame of the app was the light palette. The body-start
@@ -2461,8 +2478,11 @@ function App() {
        of on the load. */
     if (!chromeSettled || still || document.visibilityState === "hidden"
         || typeof document.startViewTransition !== "function") {
+      const first = !chromeSettled;
       chromeSettled = true;
-      applyChrome();
+      if (first) { applyChrome(); return; }
+      flipColours();
+      requestAnimationFrame(() => requestAnimationFrame(endFlip));
       return;
     }
     /* A skipped transition – a backgrounded tab, or a second flip landing on
@@ -2470,10 +2490,11 @@ function App() {
        reported to the console as an uncaught error. The class change has
        already been applied by then either way, so there is nothing to recover
        from and nothing to report: swallow both promises deliberately. */
-    const vt = document.startViewTransition(applyChrome);
+    const vt = document.startViewTransition(flipColours);
     if (vt) {
       if (vt.ready && vt.ready.catch) vt.ready.catch(() => {});
-      if (vt.finished && vt.finished.catch) vt.finished.catch(() => {});
+      if (vt.finished && vt.finished.then) vt.finished.then(endFlip, endFlip);
+      else endFlip();
     }
   }, [t.layout, t.accent, isDark]);
 

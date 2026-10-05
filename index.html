@@ -2922,7 +2922,8 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   .roll-reel, .roll-sep, .hg-span, .net { transition: none; }
 }
 ::view-transition-old(root),
-::view-transition-new(root) { animation-duration: .34s; animation-timing-function: ease; }
+::view-transition-new(root) { animation-duration: .24s; animation-timing-function: ease; }
+html.theme-flip, html.theme-flip *, html.theme-flip *::before, html.theme-flip *::after { transition: none !important; }
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .segmented, .legend-chip, .ap-popbtn, .ap-export {
     background: var(--glass-bg);
@@ -60727,7 +60728,7 @@ function PollDetail({
     className: "pd-meta-k"
   }, "Fieldwork"), React.createElement("span", {
     className: "pd-meta-v"
-  }, r.field)), React.createElement("span", {
+  }, r.fieldPending ? rdFieldTbc(r, true) : r.field)), React.createElement("span", {
     className: "pd-meta-i"
   }, React.createElement("span", {
     className: "pd-meta-k"
@@ -61331,7 +61332,7 @@ function PollsterTable({
       title: r.publishedLabel ? undefined : "Publication date not recorded for this poll – showing the last day of fieldwork"
     }, r.publishedLabel || r.releasedLabel)), React.createElement("td", {
       className: "ta-l muted"
-    }, r.field), React.createElement("td", {
+    }, r.fieldPending ? "TBC" : r.field), React.createElement("td", {
       className: "num muted hide-md"
     }, r.sample != null ? r.sample.toLocaleString() : "—"), facet === "twopp" && React.createElement(React.Fragment, null, React.createElement("td", {
       className: "ta-l apub-col hide-md"
@@ -64875,7 +64876,7 @@ function ArchPollDetail({
     className: "pd-meta-k"
   }, "Fieldwork"), React.createElement("span", {
     className: "pd-meta-v"
-  }, p.field)), React.createElement("span", {
+  }, p.fieldPending ? rdFieldTbc(p, true) : p.field)), React.createElement("span", {
     className: "pd-meta-i",
     key: "pub"
   }, React.createElement("span", {
@@ -64945,7 +64946,7 @@ function ArchPollDetail({
     d: "M19 12H5M11 18l-6-6 6-6"
   })), "Back to ", backLabel || "the chart"), (() => {
     const yr = p.year != null ? p.year : /^\d{4}-/.test(p.released || "") ? Number(p.released.slice(0, 4)) : null;
-    const when = p.field ? p.field + (yr ? " " + yr : "") : p.fullDate ? p.fullDate : "";
+    const when = p.fieldPending ? "fieldwork TBC" : p.field ? p.field + (yr ? " " + yr : "") : p.fullDate ? p.fullDate : "";
     return React.createElement("a", {
       className: "back-to-chart pd-report",
       key: "report",
@@ -66508,7 +66509,7 @@ function AllPollsView({
   const rows = [...D.individualPolls, ...dirOnly, ...issOnly].map(p => {
     const [y, mo] = p.ym.split("-").map(Number);
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
-    const fieldLabel = y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
+    const fieldLabel = p.fieldPending ? "TBC" : y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
     const tags = pollTagIds(p);
     const leanLnp = pubBasis ? p.alpN != null && aggByYm[p.ym] != null ? +(p.alpN - aggByYm[p.ym]).toFixed(1) : null : p.alpImp != null && synthByYm[p.ym] != null ? +(p.alpImp - synthByYm[p.ym]).toFixed(1) : null;
     const leanOn = pubBasis ? p.tppAlt && altOnByYm[p.ym] != null ? +(p.tppAlt.alp - altOnByYm[p.ym]).toFixed(1) : null : p.alpOnImp != null && synthOnByYm[p.ym] != null ? +(p.alpOnImp - synthOnByYm[p.ym]).toFixed(1) : null;
@@ -66763,7 +66764,7 @@ function AllPollsView({
     const next = L.pathname + (qs ? "?" + qs : "") + L.hash;
     if (next !== L.pathname + L.search + L.hash) window.history.replaceState(null, "", next);
   });
-  const CSV_COLS = [["Pollster", p => p.pollster], ["Fieldwork", p => p.field], ["Fieldwork end", p => p.released], ["Sample", p => p.sample], ["Effective sample", p => p.sampleEff == null ? "" : p.sampleEff], ["Primary ALP", p => p.p.alp], ["Primary L/NP", p => p.p.lnp], ["Primary GRN", p => p.p.grn], ["Primary ON", p => p.p.onp], ["Primary OTH", p => p.p.oth], ["2PP ALP", p => p.alp], ["2PP L/NP", p => p.lnp], ["ALP v ON", p => p.tppAlt ? p.tppAlt.alp : ""], ["L/NP v ON", p => p.tppAlt2 ? p.tppAlt2.lnp : ""], ["Poll lean", p => p.lean], ["House effect", p => p.hfx ? p.hfx.v : ""], ["PPM Albanese", p => {
+  const CSV_COLS = [["Pollster", p => p.pollster], ["Fieldwork", p => p.fieldPending ? "TBC" : p.field], ["Fieldwork end", p => p.released], ["Sample", p => p.sample], ["Effective sample", p => p.sampleEff == null ? "" : p.sampleEff], ["Primary ALP", p => p.p.alp], ["Primary L/NP", p => p.p.lnp], ["Primary GRN", p => p.p.grn], ["Primary ON", p => p.p.onp], ["Primary OTH", p => p.p.oth], ["2PP ALP", p => p.alp], ["2PP L/NP", p => p.lnp], ["ALP v ON", p => p.tppAlt ? p.tppAlt.alp : ""], ["L/NP v ON", p => p.tppAlt2 ? p.tppAlt2.lnp : ""], ["Poll lean", p => p.lean], ["House effect", p => p.hfx ? p.hfx.v : ""], ["PPM Albanese", p => {
     const c = ppmContests(p)[0];
     return c ? c.alb ?? "" : "";
   }], ["PPM Opp. ldr", p => {
@@ -75020,7 +75021,7 @@ function DpRug({
       setTip(null);
       window.AP.openPoll(rk, "leadership", "leadership");
     };
-    const lab = q.pollster + ", " + q.field + " · " + fmt(it.y) + (q.sample != null ? " · n≈" + q.sample : "");
+    const lab = q.pollster + ", " + (q.fieldPending ? "fieldwork TBC" : q.field) + " · " + fmt(it.y) + (q.sample != null ? " · n≈" + q.sample : "");
     const on = tip && tip.i === i;
     return React.createElement("b", {
       key: key,
@@ -75089,7 +75090,7 @@ function DpRug({
       className: "tip-label"
     }, "Field"), React.createElement("span", {
       className: "tip-val"
-    }, q.field)), q.sample != null && React.createElement("div", {
+    }, q.fieldPending ? "TBC" : q.field)), q.sample != null && React.createElement("div", {
       className: "tip-sub"
     }, "n ≈ " + (+q.sample).toLocaleString()), tip.src !== "touch" && React.createElement("div", {
       className: "tip-hint"
@@ -78357,7 +78358,11 @@ function rdPollRow(p) {
     appr: p.appr || {},
     chg: p.chg,
     url: p.url,
-    methodUrl: p.methodUrl
+    methodUrl: p.methodUrl,
+    ...(p.fieldPending ? {
+      fieldPending: true,
+      fieldUrl: p.fieldUrl
+    } : {})
   };
 }
 function RdPolls({
@@ -78685,7 +78690,7 @@ function RdPolls({
       className: "tip-title"
     }, q.pollster), React.createElement("div", {
       className: "rd-tl-tipdate"
-    }, "Fieldwork ", pr.field, ", published ", pr.publishedLabel), figCell({
+    }, "Fieldwork ", pr.fieldPending ? "TBC" : pr.field, ", published ", pr.publishedLabel), figCell({
       poll: pr
     }), q.sample ? React.createElement("div", {
       className: "tip-sub"
@@ -79208,7 +79213,7 @@ function RdPolls({
       className: "rd-pl-main"
     }, r.publishedLabel || r.releasedLabel), React.createElement("span", {
       className: "rd-pl-sub"
-    }, r.field, r.sample ? ", " + r.sample.toLocaleString() : "")), React.createElement("span", {
+    }, r.fieldPending ? "fieldwork TBC" : r.field, r.sample ? ", " + r.sample.toLocaleString() : "")), React.createElement("span", {
       role: "cell",
       className: "rd-pl-c-figs"
     }, React.createElement(RdSwap, {
@@ -79246,7 +79251,7 @@ function RdPolls({
     })))), React.createElement("span", {
       className: "rd-pl-foot1",
       "aria-hidden": "true"
-    }, React.createElement("span", null, React.createElement("b", null, r.publishedLabel || r.releasedLabel), ", ", r.field), React.createElement("span", {
+    }, React.createElement("span", null, React.createElement("b", null, r.publishedLabel || r.releasedLabel), ", ", r.fieldPending ? "fieldwork TBC" : r.field), React.createElement("span", {
       className: nx.missed ? "missed" : ""
     }, "Next ", React.createElement("b", null, nx.date), nx.sub ? ", " + nx.sub.replace(/, .*$/, "") : ""))), isOpen && detail(e));
   })), React.createElement(RdKey, {
@@ -81453,6 +81458,20 @@ function rdEffTbcNote(p) {
     title: note
   }, "TBC"));
 }
+const rdFieldTxt = q => q && q.fieldPending ? "TBC" : q && (q.field || q.dateLabel) || "";
+function rdFieldTbc(p, bare) {
+  const note = "Fieldwork dates not yet published for this poll; it is placed by provisional dates until they are";
+  return React.createElement(React.Fragment, null, bare ? "" : "Fieldwork ", p.fieldUrl ? React.createElement("a", {
+    className: "rd-tbc",
+    href: p.fieldUrl,
+    target: "_blank",
+    rel: "noopener noreferrer",
+    title: note,
+    onClick: e => e.stopPropagation()
+  }, "TBC") : React.createElement("span", {
+    title: note
+  }, "TBC"));
+}
 const RD_AP_BARE_CLIENTS = {
   News24: 1,
   "Capital Brief": 1,
@@ -81469,6 +81488,7 @@ function rdPollHead(p) {
   const out = rdApOut(p.published);
   const by = "published by " + (p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
   const field = p.field || p.dateLabel;
+  if (p.fieldPending) return React.createElement(React.Fragment, null, rdFieldTbc(p), ", from ", n, ", " + by + (out ? " on " + out : ""));
   return React.createElement(React.Fragment, null, field ? "Conducted on " + field + " from " : "From ", n, ", " + by + (out ? " on " + out : ""));
 }
 const RD_AP_PRIM_META = {
@@ -81923,7 +81943,7 @@ function RdApMini({
       "aria-hidden": "true"
     }, React.createElement("div", {
       className: "tip-title"
-    }, "Fieldwork ", d.q.field || d.q.released), React.createElement("div", {
+    }, "Fieldwork ", rdFieldTxt(d.q) || d.q.released), React.createElement("div", {
       className: "tip-sub"
     }, "Labor ", d.a.toFixed(1), " \u2013 ", (100 - d.a).toFixed(1), " ", rival, pub ? ", as published" : ""), d.q.sample != null && React.createElement("div", {
       className: "tip-sub"
@@ -82059,7 +82079,7 @@ function RdApDirMini({
       className: "rd-apd-hit" + (d.key ? " link" : ""),
       tabIndex: "0",
       role: d.key ? "button" : "img",
-      "aria-label": `Net ${rdApSigned(d.a)}, ${p.pollster}’s reading of ${d.q.dateLabel || d.q.released}` + (d.key ? "; press Enter to open it" : ""),
+      "aria-label": `Net ${rdApSigned(d.a)}, ${p.pollster}’s reading of ${d.q.fieldPending ? "fieldwork TBC" : d.q.dateLabel || d.q.released}` + (d.key ? "; press Enter to open it" : ""),
       onPointerDown: ev => {
         ptr.current = ev.pointerType;
       },
@@ -82125,7 +82145,7 @@ function RdApDirMini({
     "aria-hidden": "true"
   }, React.createElement("div", {
     className: "tip-title"
-  }, "Fieldwork ", dotTip.q.dateLabel || dotTip.q.released), React.createElement("div", {
+  }, "Fieldwork ", rdFieldTxt(dotTip.q) || dotTip.q.released), React.createElement("div", {
     className: "tip-sub"
   }, "Right direction ", rdApNum(dotTip.q.right), ", wrong track ", rdApNum(dotTip.q.wrong), ": net ", rdApSigned(dotTip.a)), dotTip.q.sample != null && React.createElement("div", {
     className: "tip-sub"
@@ -82376,7 +82396,7 @@ function RdApLdMini({
       className: "rd-apd-hit" + (k ? " link" : ""),
       tabIndex: "0",
       role: k ? "button" : "img",
-      "aria-label": "Albanese’s " + rdApLdMetWord(pr.met) + " minus " + pr.name + "’s, " + rdApLdWay(pr.gap, pr.name) + ", " + d.q.pollster + "’s poll of " + (d.q.field || d.q.released) + (k ? "; press Enter to open it" : ""),
+      "aria-label": "Albanese’s " + rdApLdMetWord(pr.met) + " minus " + pr.name + "’s, " + rdApLdWay(pr.gap, pr.name) + ", " + d.q.pollster + "’s poll of " + (d.q.fieldPending ? "fieldwork TBC" : d.q.field || d.q.released) + (k ? "; press Enter to open it" : ""),
       onPointerDown: ev => {
         ptr.current = ev.pointerType;
       },
@@ -82458,7 +82478,7 @@ function RdApLdMini({
     "aria-hidden": "true"
   }, React.createElement("div", {
     className: "tip-title"
-  }, "Fieldwork ", dotTip.q.field || dotTip.q.released), React.createElement("div", {
+  }, "Fieldwork ", rdFieldTxt(dotTip.q) || dotTip.q.released), React.createElement("div", {
     className: "tip-sub"
   }, "Albanese ", rdApSigned(dotTip.q.appr.albNet), ", ", dotTip.pr.name, " ", rdApSigned(dotTip.pr.net), " \u2013 ", Math.abs(dotTip.pr.gap).toFixed(1), " points ", rdApLdWay(dotTip.pr.gap, dotTip.pr.name), " (", rdApLdMetWord(dotTip.pr.met), ")"), dotTip.q.sample != null && React.createElement("div", {
     className: "tip-sub"
@@ -82713,7 +82733,7 @@ function RdApDetail({
   const move = e => rdApSigned(Math.round((e.hi - e.lo) * 10) / 10);
   const inside = lean == null || moe == null ? null : Math.abs(lean) < moe / 2 ? "well inside" : Math.abs(lean) <= moe ? "inside" : "outside";
   const yr = p.year != null ? p.year : Number(String(p.released).slice(0, 4));
-  const report = "/feedback/?msg=" + encodeURIComponent(`${p.pollster}, ${p.field} ${yr} – `);
+  const report = "/feedback/?msg=" + encodeURIComponent(`${p.pollster}, ${p.fieldPending ? "fieldwork TBC" : p.field} ${yr} – `);
   const from = D.MONTHS[Math.max(0, D.MONTHS.indexOf(p.ym) - 6)];
   const isDir = facet === "direction";
   const dirNow = isDir ? D.directionNow || null : null;
@@ -83828,11 +83848,11 @@ function RdAllPolls(P) {
   }, "\u2197")) : p.pollster), React.createElement("span", {
     className: "rd-ap-sub"
   }, p.client));
-  const fieldTxt = p => byDate ? p.field : p.field + " ’" + String(p.year).slice(2);
+  const fieldTxt = p => p.fieldPending ? "fieldwork TBC" : byDate ? p.field : p.field + " ’" + String(p.year).slice(2);
   const fieldCell = p => React.createElement("span", {
     role: "cell",
     className: "rd-ap-when"
-  }, React.createElement("b", null, fieldTxt(p)), p.published && React.createElement("span", {
+  }, React.createElement("b", null, p.fieldPending ? rdFieldTbc(p) : fieldTxt(p)), p.published && React.createElement("span", {
     className: "rd-ap-sub"
   }, "released ", rdDate(p.published.slice(0, 10))));
   const sampleCell = p => React.createElement("span", {
@@ -83855,7 +83875,7 @@ function RdAllPolls(P) {
       role: "tooltip"
     }, React.createElement("span", {
       className: "tip-title"
-    }, p.pollster, ", ", p.field), React.createElement("span", {
+    }, p.pollster, ", ", p.fieldPending ? "fieldwork TBC" : p.field), React.createElement("span", {
       className: "tip-row"
     }, React.createElement("span", {
       className: "tip-label"
@@ -84375,7 +84395,7 @@ function RdAllPolls(P) {
       type: "button",
       className: "rd-ap-chev" + (isOpen ? " open" : ""),
       "aria-expanded": isOpen,
-      "aria-label": (isOpen ? "Hide" : "Show") + " the full poll: " + p.pollster + ", " + p.field,
+      "aria-label": (isOpen ? "Hide" : "Show") + " the full poll: " + p.pollster + ", " + (p.fieldPending ? "fieldwork TBC" : p.field),
       onClick: e => {
         e.stopPropagation();
         toggle();
@@ -86545,7 +86565,7 @@ function Header({
     href: rdLatestUrl,
     target: "_blank",
     rel: "noopener noreferrer"
-  }, rdLatest.pollster + ", " + rdLatest.field) : rdLatest.pollster + ", " + rdLatest.field : D.latest.published;
+  }, rdLatest.pollster + ", " + (rdLatest.fieldPending ? "fieldwork TBC" : rdLatest.field)) : rdLatest.pollster + ", " + (rdLatest.fieldPending ? "fieldwork TBC" : rdLatest.field) : D.latest.published;
   const rdDue = (() => {
     const m = /(\d{1,2}) (\w+) (\d{4})/.exec(D.latest.nextElectionDue || "");
     if (!m) return null;
@@ -87840,6 +87860,7 @@ function MethodNote({
   }, "Read this page as plain text"), " ", "\u2013 every figure and the method, without charts."))));
 }
 let chromeSettled = false;
+let flipsOpen = 0;
 let viewPanelPokedAt = 0;
 let viewPanelFocusIsPointer = false;
 const TABS = [{
@@ -88325,6 +88346,17 @@ function App() {
   const applyChrome = () => {
     for (const c in want) document.body.classList.toggle(c, want[c]);
   };
+  const flipColours = () => {
+    flipsOpen++;
+    document.documentElement.classList.add("theme-flip");
+    applyChrome();
+  };
+  const endFlip = () => {
+    if (--flipsOpen <= 0) {
+      flipsOpen = 0;
+      document.documentElement.classList.remove("theme-flip");
+    }
+  };
   React.useLayoutEffect(() => {
     if (chromeSettled) return;
     chromeSettled = true;
@@ -88339,14 +88371,20 @@ function App() {
     if (!Object.keys(want).some(c => document.body.classList.contains(c) !== want[c])) return;
     const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!chromeSettled || still || document.visibilityState === "hidden" || typeof document.startViewTransition !== "function") {
+      const first = !chromeSettled;
       chromeSettled = true;
-      applyChrome();
+      if (first) {
+        applyChrome();
+        return;
+      }
+      flipColours();
+      requestAnimationFrame(() => requestAnimationFrame(endFlip));
       return;
     }
-    const vt = document.startViewTransition(applyChrome);
+    const vt = document.startViewTransition(flipColours);
     if (vt) {
       if (vt.ready && vt.ready.catch) vt.ready.catch(() => {});
-      if (vt.finished && vt.finished.catch) vt.finished.catch(() => {});
+      if (vt.finished && vt.finished.then) vt.finished.then(endFlip, endFlip);else endFlip();
     }
   }, [t.layout, t.accent, isDark]);
   const cycleTheme = () => setTweak("theme", isDark ? "light" : "dark");

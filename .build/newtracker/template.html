@@ -4825,7 +4825,10 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
    the lot on every frame. The browser now animates two snapshots instead, so
    the only thing left to say is how long it should take. */
 ::view-transition-old(root),
-::view-transition-new(root) { animation-duration: .34s; animation-timing-function: ease; }
+::view-transition-new(root) { animation-duration: .24s; animation-timing-function: ease; }
+/* Set for the length of a theme flip (flipColours() in views.jsx): every
+   colour lands with the class change, so nothing eases on after the fade. */
+html.theme-flip, html.theme-flip *, html.theme-flip *::before, html.theme-flip *::after { transition: none !important; }
 
 /* ---------- shared frosted glass across the floating chrome ----------
    One material for every interactive pill toggle and the pinned nav, matching
