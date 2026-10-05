@@ -420,6 +420,43 @@ centre — vertex tips are proven by strict-count), and clicking a vertex
 must never open a poll. The diag page rings the vhit marks magenta and
 names them MONTH MARK.
 
+## RdFlowChart tips follow the cross-chart tooltip idiom (shipped d262781, 2026-10-05)
+
+User report 2026-10-05: "the tooltip implementation isn't the same as in
+the 2pp chart — tapping away from an open tooltip on phone does not close
+it; on phone it says 'Open in all polls' which the 2pp chart doesn't show
+(and the button doesn't even work on phone); on laptop it says 'Click to
+open this poll in All polls', not just 'Click to open this poll', and in
+a different colour". RdFlowChart's tip JSX had drifted from the standard
+idiom in four ways; all fixed in rd-allpolls.jsx:
+
+1. **Dismiss-outside**: the chart root carries `ref={chartBox}` and
+   `window.useDismissOutside(chartBox, !!(tip && tip.src === "touch"),
+   () => setTip(null))` — the same ed2260de hook TrendChart wires at its
+   own root. A touch-opened tip now closes on any pointerdown outside the
+   chart. The hook is armed on touch-src tips only (mouse tips close on
+   leave, as elsewhere).
+2. **Hint element**: the hint is the standard bare `<div className=
+   "tip-hint">`. It WAS a `<span className="tip-sub tip-hint">` — the
+   `.tip-sub` rule (template.html:1696) is defined AFTER `.tip-hint`
+   (:1674), so it overrode `--accent` with `--ink-3` and the hint
+   rendered grey. Never stack `tip-sub` on `tip-hint`; the cascade
+   order makes tip-sub win the colour.
+3. **No hint on touch**: gated `{k && tip.src !== "touch" && …}` like
+   rd-panels/rd-polls — a touch tap READS a dot (the click branch
+   toggles the tip; it never navigates), which is exactly why the
+   "Open in all polls" affordance "didn't work" on phone. Standard
+   text: `tip.src === "focus" ? "Press Enter to open this poll in
+   All polls" : "Click to open this poll in All polls"`.
+4. Vertex tips carry NO hint — their sub-line ("this pollster's gap
+   that month – not a published wave") is a qualifier, not an action.
+
+Probe: `.matilda/probe-flow-drift-dots.mjs`'s touch block (phone
+viewport 390×780 isTouch, `touchscreen.tap` a wave `.rd-apd-hit`) asserts
+a touch-opened tip has NO `.tip-hint` and that a second tap outside the
+chart dismisses it; the desktop wave-hint check expects the standard
+"Click to open this poll in All polls" text.
+
 ## Check script traps
 
 - `.mjs` already implies ESM — run `node .build/flow-drift-check.mjs`; the
