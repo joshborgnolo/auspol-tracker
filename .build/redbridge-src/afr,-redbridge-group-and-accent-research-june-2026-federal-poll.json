@@ -49,5 +49,37 @@
     "onp": 21,
     "oth": 62
   },
-  "table1OnError": "4-row Labor-vs-One-Nation block but Coalition sub-primaries not printed in this PDF"
+  "table1OnError": "4-row Labor-vs-One-Nation block but Coalition sub-primaries not printed in this PDF",
+  "firmness": {
+    "all": [
+      49,
+      41,
+      10
+    ],
+    "alp": [
+      47,
+      43,
+      10
+    ],
+    "lnp": [
+      51,
+      37,
+      12
+    ],
+    "onp": [
+      53,
+      39,
+      8
+    ],
+    "grn": [
+      47,
+      46,
+      7
+    ],
+    "oth": [
+      44,
+      40,
+      16
+    ]
+  }
 }

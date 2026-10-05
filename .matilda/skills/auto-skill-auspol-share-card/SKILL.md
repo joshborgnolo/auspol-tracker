@@ -1,6 +1,6 @@
 ---
 name: auspol-share-card
-description: auspol-tracker — the og:image sharecard pipeline end-to-end (make-card.js design-in-page, render-card.mjs headless-Chrome driver, build.mjs stamp check + og:image cache-bust, wrapper/CI automation). Staleness is DATE+FIGURE (publishedISO + a fig block of the card's displayed strings); figure-only changes (decay drift, "cure" corrections, PR-merged waves) redraw via render-card's pre-launch gate, refresh_site owns build→render→restamp order in every wrapper, and the daily prediction-refresh backstop (puppeteer+CHROME wired) self-heals anything missed ≤24h. Shipped 2026-09-07.
+description: auspol-tracker — the og:image sharecard pipeline end-to-end (make-card.js design-in-page, render-card.mjs headless-Chrome driver, build.mjs stamp check + og:image cache-bust, wrapper/CI automation). Staleness is DATE+FIGURE (publishedISO + a fig block of the card's displayed strings); figure-only changes (decay drift, "cure" corrections, PR-merged waves) redraw via render-card's pre-launch gate, refresh_site owns build→render→restamp order in every wrapper, and the daily prediction-refresh backstop (puppeteer+CHROME wired) self-heals anything missed ≤24h. Shipped 2026-09-07. Since 2026-10-02 the card's CONTEST follows latest.rivalLead (Q normalised view: onImp primary implied ALP–ON with "flow range" wording, altLatest.alp_on only fallback; fig gains vs; build.mjs cardContest mirrors it and metaDesc deliberately stays classic).
 source: auto-skill
 extracted_at: '2026-09-07T00:00:00.000Z'
 ---
@@ -70,6 +70,44 @@ extracted_at: '2026-09-07T00:00:00.000Z'
    heals ≤24h.
 3. ~~Unconditional renders~~ — the pre-launch gate makes current cards a free
    no-op.
+
+## Contest selection follows the site's rival ruling (commit 19f65cb, 2026-10-02)
+
+Until then the card ALWAYS drew ALP v L/NP — so once One Nation took the
+deadbanded rival board (June 2026) the og:image previewed a contest the page
+no longer led with. User call: "it should take the two-party preferred of
+Labor's strongest rival". Now the card quotes the SAME contest the page leads
+with and flips with the site's own ruling:
+
+- **Selector**: `D.latest.rivalLead` (gen-data's RIVAL_DEADBAND=1.0 walk over
+  the implied pairing series) — never invent a new rule; the hero, masthead
+  dial and favicon already defer to it. (`rivalWalk`, `auspol-headline-estimator`.)
+- **make-card.js** builds ONE normalised `Q` view right after the `L` merge and
+  everything downstream reads Q:
+  - ON pairing leads: figures from `latest.onImp` (a/b/the `band` flow RANGE,
+    aPrev, n); ONLY fallback `altLatest.alp_on` (published head-to-heads
+    nowcast). Caveat line says "flow range ±X pts" for the implied pairing —
+    NEVER "95% interval" (the band is the frozen flow table's range, not a
+    sampling interval; the hero words it the same way).
+  - Otherwise: figures from `latest` (alp2pp, alp2ppCi95, "95% interval",
+    `method.nPolls`).
+  - Palette adds `onpFill`; masthead needle/standfirst/figures-row labels and
+    the trend (`TS = Q.series`) all follow the Q view.
+  - `fig` block gains `vs: "onp" | "lnp"` — keep make-card's fig and build.mjs's
+    `cardFigs()` mirrored (edit both together).
+- **build.mjs mirrors the selection in `cardContest()`** (grabs latest /
+  synthLatest / altLatest from the 9f09dca2 asset, same verse as the in-page
+  Q view) so auspol-latest.json, the stamp gate, cardFigs and the og:image:alt
+  describe the card actually drawn. The SERP **`metaDesc` deliberately keeps
+  the classic Labor v Coalition headline sentence** (via `grabLatest()`, not
+  cardContest) — og:image:alt must match the image, but the description
+  previews the site's main measure; user-approved asymmetry.
+- Masthead dial needle dropped its stale highest-published-2PP comparison and
+  now uses the rivalLead pair — the exact rule the favicon's 2026-09-21
+  buildFavicon fix had already retired (needle `deg = -clamp(margin/12, ±1)*34`,
+  leader-coloured).
+- Regenerated on the ON board: stamp and sidecar agree
+  `{"vs":"onp","alp":"51.7","lnp":"48.3","ci":"1.3",…,"basis":"imp"}`.
 
 Small print: demosau/essential updaters have early "confirm-skip" build+commit
 blocks (`git add ... || true`) that rebuild index.html WITHOUT rendering —

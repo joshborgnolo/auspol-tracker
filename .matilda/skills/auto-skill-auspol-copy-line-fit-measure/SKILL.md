@@ -59,6 +59,23 @@ the old literal overflows that 350px lane by just 1.5px).
 
 ## Traps
 
+- CLONING instead of mk() (the shrink-wrap idiom: clone the live node
+  into an offscreen host and measure the clone) hits a NEW gotcha when
+  the live element is itself a container-query container —
+  `container-type: inline-size` applies SIZE containment, which zeroes
+  the clone's intrinsic dimensions and every measure returns 0px.
+  Always strip it on the clone: `cl.style.containerType = "normal"`
+  (alongside the usual `display:inline-block;white-space:nowrap`).
+  Worked 2026-10-03 in `.matilda/probe-issmgmt-measure.mjs` when the
+  `.rd-ap-csub-sent` sentence div became the `@container` host for the
+  mgmt rung ladder.
+- Inserting test copy into a CLONED multi-span ladder sentence: the
+  first text node of the clone may belong to a HIDDEN future-rung span
+  (e.g. the `-s` span's text contains "3rd", not "1st"), so a regex
+  anchored on visible-sentence content (`/^(.*? )1st/`) silently
+  misses. Append to the first text node's TRAILING WORD
+  (`firstText.nodeValue.replace(/\S\s*$/, (m) => m + "ranked ")`) —
+  independent of which rung span owns it.
 - GUESSING from character counts is worthless — 60 chars vs 57 chars
   said "slightly shorter"; the measure said the 390px shell was
   overflowing by 1.5px and the reword flips exactly that shell.

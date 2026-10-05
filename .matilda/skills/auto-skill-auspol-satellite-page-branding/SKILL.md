@@ -1,6 +1,6 @@
 ---
 name: auspol-satellite-page-branding
-description: auspol-tracker — pages outside the main build (/preference-flows/, /prediction/, /atlas/, /feedback/, the /archives/* five; redirect stubs aside). CURRENT RECIPE (user requests 2026-09-24 + 2026-10-02): every satellite carries the SITE SHELL from .build/site-shell.mjs – the CURRENT (rd-redesign) main-page masthead replicated: the split lockup (wordmark <a href=/> beside a dial-only <a class=wm-glyph href=/#story> contour ellipse, 34px wordmark / 57px dial, no hover wash – see auspol-masthead-glyph-player) shellCopy'd from template.html's brand CSS + a LIVE dial swapped in by site-shell.js off /assets/auspol-now.json's dial spec, the rd three-fact status block + phone compact line (filled off auspol-now.json's latest.fact/factUrl), the rd sans FOUR-VIEW tab bar (Snapshot/Past cycles/All polls/Info – the Archives link was REMOVED from both navbars), the colour-theme switch (shares localStorage auspol.tweaks with the main page), the live 2PP (auspol-now.json), the main colophon and tide band – written between <!--shell:…--> markers by node .build/site-shell.mjs and by every satellite generator (applyShell before write). build.mjs publishes assets/site-shell.css|js, auspol-now.json, masthead-dial.svg and tile-art(-dark).svg each build and warns on drift; npm test fails on it (test-site-shell.mjs). /prediction/ and /atlas/ carry the shell but must stay UNLINKED (user: 'they're not very good'). The 2026-09-03 no-masthead/no-glyph/.ss-back recipe below is SUPERSEDED. Still true: sitemap ARCHIVE_STAMP trap, the archives' own tab strip homes, favicon link, font hashes, curly apostrophes.
+description: auspol-tracker — pages outside the main build (/preference-flows/, /prediction/, /atlas/, /feedback/, the /archives/* five; redirect stubs aside). CURRENT RECIPE (user requests 2026-09-24 + 2026-10-02): every satellite carries the SITE SHELL from .build/site-shell.mjs – the CURRENT (rd-redesign) main-page masthead replicated: the split lockup (wordmark <a href=/> beside a dial-only <a class=wm-glyph href=/#story> contour ellipse, 34px wordmark / 57px dial, no hover wash – see auspol-masthead-glyph-player) shellCopy'd from template.html's brand CSS + a LIVE dial swapped in by site-shell.js off /assets/auspol-now.json's dial spec, the rd three-fact status block + phone compact line (filled off auspol-now.json's latest.fact/factUrl), the rd sans FOUR-VIEW tab bar (Now/Past cycles/All polls/Info – the Archives link was REMOVED from both navbars; tab list LIFTED from the main page's TABS at apply time, 66c9c05), the colour-theme switch (shares localStorage auspol.tweaks with the main page), the live 2PP (auspol-now.json), the main colophon and tide band – written between <!--shell:…--> markers by node .build/site-shell.mjs and by every satellite generator (applyShell before write). build.mjs publishes assets/site-shell.css|js, auspol-now.json, masthead-dial.svg and tile-art(-dark).svg each build and warns on drift; npm test fails on it (test-site-shell.mjs). /prediction/ and /atlas/ carry the shell but must stay UNLINKED (user: 'they're not very good'). Frame margins mirror the main page's --rd-gutter/--rd-maxw as --sh-gutter/--sh-maxw (.sh-frame/.sh-top/.frame-wrap/archives-nav formulas + the frame-margins.mjs gate, 2026-10-03 7097422). The 2026-09-03 no-masthead/no-glyph/.ss-back recipe below is SUPERSEDED. Still true: sitemap ARCHIVE_STAMP trap, the archives' own tab strip homes, favicon link, font hashes, curly apostrophes. 2026-10-03 chrome contract (62b250a): ALL masthead WORDS + artwork lifted from the main page's compiled assets – parseChrome/mainChrome() in site-shell.mjs, ONE parse feeding THREE consumers (shellHeader bakes at apply = no-JS fallback; build.mjs emits auspol-now.json's `copy` block every build; site-shell.js fillCopy re-applies it on load = satellites follow every build with NO page commits). User-locked decisions: runtime JSON + baked fallback; scope masthead + tab bar at first, then the FOOTER COLOPHON joined the SAME contract hours later (b646fd4, user call 'make it the same story' – shellFooter's words are derived, never housed); build.mjs warns + keeps previous copy on a parse miss (lazy CHROME getter – module-eval never throws) while apply/test consumers THROW (shellCopy posture extended to words). Contract tabs are WORDS ONLY ({id,label,pinHide?}) – every tab-rendering path derives href ('/#'+id); 023d953 hotfix: fillCopy reading t.href coerced undefined to the string 'undefined' and satellite navbar clicks resolved <satellite>/undefined.
 source: auto-skill
 extracted_at: '2026-09-03T00:00:00.000Z'
 ---
@@ -26,12 +26,40 @@ the shell, but no page, tab or footer links to them (pinned by
 supersedes the 2026-09-03 "no masthead, no glyph" recipe further down.
 
 **One module, `.build/site-shell.mjs`**, owns it all:
-- `SHELL_PAGES` – the nine pages and their options (`page: "feedback" | "archives"`
+- `SHELL_PAGES` – the pages and their options (`page: "feedback" | "archives"`
   drops the colophon's self-reference). Adding a satellite = one entry here;
-  `applyShell` inserts the markers itself. The tab bar is the SAME four views as
-  the main page (Snapshot / Past cycles / All polls / Info, hrefs `/#<view>`);
-  there is no Archives entry anywhere (user asked for it off BOTH navbars
+  `applyShell` inserts the markers itself. The tab bar IS the main page's list,
+  lifted at apply time by `mainTabs()` (see below): hrefs `/#<view>`; there is
+  no Archives entry anywhere (user asked for it off BOTH navbars
   2026-09-24, and the archives are instead reachable from the footer colophon).
+
+  **Tab bar lifted, not copied (2026-10-03, 66c9c05)** – user call: "can't you
+  just Link the mastheads in the satellite page to the masthead in the main
+  page to keep it constant rather than independent". The main page had renamed
+  its Snapshot tab to "Now" (73de0c58 asset `const TABS`), but the shell's own
+  hand-copied `const TABS = [...]` was frozen at "Snapshot", so all ten
+  satellites went stale for ~a day. Now `mainTabs()` in site-shell.mjs reads
+  the main page's SOURCE OF TRUTH at apply time: finds the
+  `.build/newtracker/assets` file defining `const TABS = [` with a
+  `{ id: "snapshot", label: "` entry (grep the file list, hash-agnostic –
+  the asset hash rotates with main-page rebuilds), parses
+  id/label/pinHide out of the array, and merges the ONE shell-local extra
+  (`cycles.short: "Cycles"` for the pinned phone bar – the MAIN page has no
+  `short`). Same throw-don't-fallback philosophy as `shellCopy()`: if no
+  asset matches, the array won't parse, or the snapshot tab is missing first,
+  the apply THROWS – a main-page TABS change the parser can't read must stop
+  the apply, never silently ship a stale list. `SNAPSHOT_LABEL` (the lifted
+  snapshot label) also feeds the `.sh-score` tooltip "go to <label>" in
+  shellHeader AND shellJs – the day the tab was renamed every satellite's
+  tooltip said "go to Snapshot" too; that mismatch bumps SHELL_V via the
+  shellJs hash. A label change on the main page now lands on all satellites
+  with `node .build/site-shell.mjs` + republishing assets/site-shell.css|js
+  (republish standalone with a tmp+rename `node -e` calling shellCss()/
+  shellJs() when a full newtracker build is unsafe – e.g. a sibling session's
+  in-flight rd.css deletion). Gate: masthead-parity.mjs asserts the
+  satellite `.sh-tabs-set .sh-tab` innerText list JSON-equals the main
+  page's `.tabs-set .tab` list (innerText, NOT textContent – textContent
+  picks up the hidden `.sh-tab-short` "Cycles" span and fails falsely).
 - `applyShell(html, opts)` – idempotent. Writes `<!--shell:head-->` (link to
   /assets/site-shell.css, the inline pre-paint theme script, and `:root.sh-dark`
   copies of the page's own dark rules), `<!--shell:header-->` (skip link,
@@ -47,6 +75,25 @@ supersedes the 2026-09-03 "no masthead, no glyph" recipe further down.
   `node .build/site-shell.mjs` + committing the pages: build.mjs only WARNS on
   drift, because the build must never rewrite satellites (the updaters' commit
   lists name none of them – a rewritten page would leave the tree dirty).
+
+  **Stable-URL stale-cache trap (user-visible 2026-10-02, fixed 85f3df4)**:
+  the pages ship at stable URLs and `/assets/site-shell.css|js` were ALSO
+  stable paths, so a browser holding yesterday's cached css/js renders the
+  NEW markup through the old generation – that's what the user saw =
+  mispositioned glyph and the status block showing "Latest poll / published"
+  with its values empty at /feedback/. Local probes, live byte-compares and
+  geometry all pass in that state (they fetch fresh), which made "everything
+  is correct" temporarily convincing. Fix: both asset links in the shell
+  markup now carry `?v=${SHELL_V()}` where `SHELL_V()` in site-shell.mjs is
+  `createHash("sha256").update(shellCss() + "\n//\n" + shellJs()).digest("hex")
+  .slice(0, 10)` – markup and assets can never run mismatched again, and the
+  hash changes only when the css/js generator output changes (the
+  `.sh-meta[hidden]` / `.sh-head-compact` display guards that ride with it
+  were added the same pass). LESSON: any markup/CSS/JS system where pages
+  link assets at stable paths has the same hazard; if a later "user reports
+  wrong layout, but everything checks out clean locally AND remotely" recurs,
+  check for another unversioned asset link (fontPreloads is safe – fonts hash
+  by filename already).
 - Generators call it before writing: refresh-prediction (daily in CI),
   refresh-morgan-archive, refresh-galaxy-archive, refresh-trove-archive. Their
   templates no longer contain the pill or the satellite note.
@@ -65,6 +112,113 @@ is one and the same", extended to all satellites). Four wiring channels:
   template.html VERBATIM into site-shell.css (throws when markers go missing):
   tokens, tokens-dark, brand, dial. A brand-CSS change on the main page reaches
   every satellite with the next build, no page edit.
+- **Words – the chrome contract (2026-10-03, 62b250a)** – user call: "is the
+  masthead as a whole linked, not copied…?". Plan-mode decisions, locked:
+  propagation = Runtime JSON + baked fallback; scope = Masthead + tab bar at
+  first (the footer colophon was LEFT OUT as hand-copy, then joined the same
+  contract hours later in b646fd4 – see the footer bullet below);
+  fail = Warn + keep previous. **023d953 hotfix** (user report
+  2026-10-03, "clicking 'now' from predictions takes you to
+  /prediction/undefined"): the copy contract's tabs are WORDS ONLY
+  (`{id, label, pinHide?}` – parseChrome deliberately drops href), so each
+  of the TWO tab-writing paths must derive href itself: shellHeader at
+  apply time (straight from mainTabs()) and fillCopy on load. fillCopy had
+  written `a.setAttribute("href", t.href)` – setAttribute COERCED the
+  undefined to the literal string "undefined", a relative URL the browser
+  resolved against the satellite's own directory. The baked tab bar was
+  always right, so greps/test-applies/probes of the markup all passed
+  while the live navbar was broken – only the runtime overlay path shipped
+  the bug. Fix: `var h = "/#" + t.id; a.setAttribute("href", h);` and
+  match `act === h` for the active view, exactly as mainTabs() derives it.
+  Pinned: test-site-shell.mjs asserts the EMITTED shellJs never contains
+  `setAttribute("href", t.href)` and does contain the `"/#" +` derivation;
+  masthead-parity.mjs scrapes the LIVE satellite DOM after fillCopy has
+  run (the REBUILT tab set, not the bake) and JSON-equals every .sh-tab
+  href against `chrome.tabs.map((t) => "/#" + t.id)`, never null /
+  "undefined" / "#" / "". LESSON: when a "linked, not copied" contract
+  strips a field down to its words (same move as 66c9c05's tab-lift), a
+  runtime consumer re-reading the STRIPPED field degrades silently –
+  derive it the same way the source does, and probe the deployed DOM after
+  the reconcile, not just the baked markup.
+  `parseChrome(headSrc, scoreSrc, tabs)` lifts
+  EVERY masthead word + artwork out of the main page's OWN compiled
+  newtracker assets (JSX-source `className=` literals: wordmark
+  name/track/sr, tagline flanks (a re-suffixed trailing space + b), status
+  labels k1..k3 + published/polls/pollsters/months phrases, phone compact
+  head, theme labels + svg (jsxSvg normalises strokeWidth→stroke-width
+  etc.), score eyebrow from the ts-eyebrow asset, dial title/action, skip
+  link – the skip regex needs `[\s\S]*?` because the JSX onClick contains
+  `>`; slice windows +1600 chars from `rd-head-compact`, +3200 from
+  `head-meta rd-head-meta`). `mainChrome()` is the memoised scanner (head
+  asset = carries `className="wm-name"` && `className="tagline"`; score
+  asset = carries `ts-eyebrow`) feeding THREE consumers of ONE parse:
+  shellHeader bakes the words at apply time (the no-JS fallback; the
+  tagline's `.sh-past` "twenty" is the one placeholder, replaced live);
+  build.mjs emits `{ copy: mainChrome() }` into auspol-now.json every build
+  – the ONE soft consumer: it warns + keeps the previous copy block on a
+  parse miss so a cosmetic main edit can never hold the poll-data pipeline
+  hostage (possible ONLY because CHROME is a lazy getter –
+  `let CHROME_CACHE=null; const CHROME=()=>(CHROME_CACHE ||= mainChrome())`
+  – a module-top `const CHROME = mainChrome()` would make IMPORTING the
+  module throw, which is exactly the build.mjs import path); and
+  site-shell.js's `var fillCopy = function (cp)` re-applies the block on
+  load (tabs DOM rebuilt preserving active-by-href, wm texts + re-run
+  alignWm, tagline innerHTML preserving `.sh-past`, skip/meta/compact/
+  theme/dial/score swaps; `n.copy` handled BEFORE fillHead; snapLab derived
+  from `n.copy.tabs` at runtime) – so a main-page masthead word change
+  reaches every satellite with the NEXT BUILD, no page commits, and one
+  `node .build/site-shell.mjs` back-fills the bake. Apply/test-time
+  consumers all THROW on a parse miss – the shellCopy posture extended to
+  words: stop the apply, never ship yesterday's words. Any fillCopy edit
+  bumps SHELL_V → re-apply the satellites. Gates: test-site-shell.mjs
+  deepEquals auspol-now.json's copy vs `mainChrome()` verbatim, pins seven
+  shellHeader interpolations + three moved-anchor throw fixtures (assert
+  the EMITTED spelling `var fillCopy = function (cp)`, not
+  `function fillCopy(cp)` – it cost a red run); masthead-parity.mjs
+  asserts RENDERED words main == satellite == mainChrome() (selector maps
+  differ: main `a.skip-link` / `.tagline` / `.rd-head-meta .meta-k` /
+  `.theme-seg [aria-label$=" mode"]` / `.ts-eyebrow` / `button.wm-glyph`
+  vs satellite `a.sh-skip` / `.sh-tagline` / `.sh-meta .sh-meta-k` /
+  `.sh-theme [aria-label$=" mode"]` / `.sh-score .sh-eyebrow` / `a.wm-glyph`;
+  tagline compared as startsWith(a.trim) + endsWith(b) – the middle past
+  word differs by page, never string-equal whole) plus a
+  `setJavaScriptEnabled(false)` satellite load proving the whole contract
+  is baked (CDP evaluate() still runs with page JS off).
+- **Footer colophon rides the same contract (b646fd4, 2026-10-03, user:
+  "make it the same story" as the masthead)** – the user asked whether
+  footer changes carry over the way masthead ones do, found they did NOT
+  (shellFooter had been a hand-synced literal home), and had the lift
+  extended. parseChrome gained a `footer` block lifted out of MethodNote
+  (73de0c58 asset: colo-lede ~:1831, disclaimer ~:1834, fb-lede ~:1845,
+  colo-arch ~:1855/:1862): `lede` (strap-line), `disc` (disclaimer), the
+  fb-lede pieces (`infoLead`, `infoWord` – the "Read more" Info signpost,
+  bakes FIRST in sh-fb per test pin), `spot` (feedback clause), `linkWord`
+  (feedback link word), and the archives row (`archLead`, `archWord` with
+  the plink-mark ↗ span stripped, `archTail`, `archHref` =
+  "/archives/newspoll/" – the ONE real URL in the contract; the Info /#info
+  and /feedback/ hrefs stay shell-constant). Anchors are regexes on
+  `className="colo-lede"` / `"disclaimer"` / `"fb-lede"` / `"colo-arch"`; a
+  new `phrase()` normaliser strips the JSX idioms (`{" "}` text spacers,
+  tags, whitespace collapse); parseChrome still THROWS on a moved anchor
+  (pin: parseChrome with colo-lede renamed throws /colophon lede/).
+  shellFooter interpolates `CHROME().footer.*`; the page VARIANTS stay
+  keyed in MARKUP, not data (page:"feedback" drops the spot clause,
+  page:"archives" drops the arch row). fillCopy overlays
+  `.sh-lede`/`.sh-disc` via textContent and REBUILDS
+  `.sh-fb`/`.sh-arch` innerHTML – the runtime variant test reads the BAKED
+  DOM (does `.sh-fb-link` exist? `.sh-arch` present?), `esc()` for text,
+  raw archHref in the attribute, the whole overlay `if (F)` guarded. Scope
+  stayed words-plus-one-href on purpose: the colophon CSS is hand-mirrored
+  in shellCss (the same precedent the header set) and the main page's
+  "Read this page as plain text" row stays main-only. Knock-ons: the
+  strap-line and disclaimer copy skills went from THREE homes back to TWO
+  (MethodNote + build.mjs's ss-note – shellFooter is derivative), and
+  git-status watchers see satellite/index.html diffs that are `?v=`
+  re-stamps only. test-site-shell.mjs pins: every chrome.footer field
+  non-empty, shellFooter bakes each word + the archHref, the Info signpost
+  ordering, the `.sh-lede`/`.sh-arch` selectors present in shellJs, and
+  auspol-now.json's `copy` block deep-equalling the whole chrome contract
+  (footer included by construction).
 - **Dial** – build.mjs's buildFavicon() computes the glyph at MASTHEAD weights
   (r+2 bars, 3.4 stroke, needle 1.7 + tip r1.9, pivot r1.7 – NOT the favicon's
   2.4/4.6/3) and ships it twice: static `/assets/masthead-dial.svg` (the header
@@ -100,6 +254,35 @@ is one and the same", extended to all satellites). Four wiring channels:
 - **Ink-width squaring** – the wordmark aligns auspol/tracker by MEASURED ink
   width: site-shell.js runs the same letter-spacing align on load +
   document.fonts.ready.
+
+**Frame margins – the shell's frame IS the main page's .page box** (user
+report 2026-10-03, "mastered positioning changes in the satellite pages …
+In the margins, they should be the same as in the main page", fixed
+7097422): `.sh-frame` had hardcoded `max-width: 1200px` + a fixed 28px
+gutter (16/18px at <=640px) while `body.rd .page` rides rd.css's
+`--rd-gutter: clamp(20px, 5vw, 64px)` over `--rd-maxw: 1152px` (rd.css
+:47-49, :104-107) – the mastheads drifted apart at nearly every viewport
+(8px tighter on a 1280 laptop, 12px wider at 600px, narrower AND 2px lower
+at phone). shellCss() now declares `--sh-gutter`/`--sh-maxw` mirroring the
+rd tokens verbatim (the CSS comment says it: a main-page frame change
+moves here too) and `.sh-frame` computes
+`max-width: calc(var(--sh-maxw) + 2 * var(--sh-gutter))` with
+`padding-left/right: calc(var(--sh-gutter) + env(safe-area-inset-*, 0px))`.
+`.sh-top` keeps the 28px top pad and takes the MAIN PAGE's phone step to
+20px at **<=560px** (template.html's `.page { padding: 20px 16px 20px }`
+media rule – the shell's own <=640px frame overrides were deleted, they
+were the wrong breakpoint). `.frame-wrap` margin-left:
+`max(0px, calc(max(var(--sh-gutter), (100% - var(--sh-maxw)) / 2) - 28px))`
+– the −28px offsets the archive pages' own 28px body padding so article
+text lands on the frame content edge; the archives'
+`nav.tabs[aria-label="Poll archives"]` margins key off the same expression
+(the edge is the frame's content edge: its own gutter below the 1152px
+column, (100% − maxw)/2 once it floats). A CSS-only shellCss() change
+bumps SHELL_V() and only needs `node .build/site-shell.mjs` re-applied for
+the ?v= links. Gate: `.matilda/probe/frame-margins.mjs` (force-tracked,
+fresh loads per width over 18 widths 1440→320 comparing main `/` vs
+`/feedback/` – see auspol-headless-geometry-verify for why sequential
+setViewport on one tab lies), plus masthead-parity + test-site-shell.
 
 **Live 2PP**: build.mjs's favicon code already decides the masthead dial's
 contest (rivalLead, implied basis); it returns it as `fav.score` and writes

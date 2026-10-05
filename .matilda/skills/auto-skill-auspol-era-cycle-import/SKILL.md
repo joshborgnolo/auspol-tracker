@@ -151,3 +151,42 @@ pattern differs, (b) `oth` heterogeneity is larger, (c) election
 results before 1949 aren't in OFFICIAL_2PP. The LEF pattern
 generalises (opening-era dict + right-edge gate); the constants do
 NOT — re-derive from AEC/TUV room sources before importing.
+
+## Era backtest moved into DATA + the implied-2PP documentation map (2026-10-02)
+
+Asked why Past-cycles 2PP wasn't documented as implied-from-flows, the
+audit found the LEF story partially in Info but the 1972–84 era basis
+nowhere user-facing. Fixes worth remembering:
+
+- **FLOW_ERAS now carries `bt` per era** (each set applied to the
+  CLOSING election's primaries vs official 2PP, ALP points: −0.04…−0.35).
+  It used to live ONLY in the flows.mjs comment block — promote
+  mechanism-quality figures from comments into exported data field is
+  the pattern whenever Info's live stats/tables might need them.
+  `impliedEraAlp2pp` reads only dem/dlp/oth, and validate.mjs
+  dereferences `FLOW_ERAS[p.tppEra]`, so the extra field is inert to
+  both.
+- **gen-data `lefTables` (~:4681) now emits the seven era rows**
+  ({year, era:true, dlp, dem, oth, bt}) ahead of the FLOW_LEF rows and
+  the entityless 2025 FLOW row. Note: the emitted object's KEY names
+  get minified in the built 9f09dca2 data asset — grep the VALUES
+  (`{"year":1972,"era":true` matches; `lefTables` does not appear).
+- **The reader-facing documentation of implied 2PP lives in THREE
+  surfaces that must move together:**
+  1. Past-cycles 2PP card note (CYC_METRICS "tpp" in d1a1d215 ~:428;
+     the JS-comment there already named FLOW_LEF/FLOW_ERAS, but readers
+     see only the note) which `openTerm("last-election-flows", "Past cycles")`;
+  2. the g-2pp glossary group — implied-2pp says "Past cycles reads
+     every earlier term the same way", last-election-flows gives
+     sources + a LIVE working table off D.lefTables;
+  3. the working table + its note inside last-election-flows.
+  The 2026-10-02 change added the era story to (2) prose and (3)
+  (era rows render `"27.7 DLP, … others (calibrated)"`; note states
+  the 1975 Democrat debut assumption).
+- **Extending a live stat needs a display-diff check**: adding the
+  seven era rows took lefT from 13 to 20 rows, but lefMean still
+  rounds to "0.4" (era |bt| ≤ 0.35, mean 0.2) and lefBig's top-3
+  (1.04/0.97/0.83) is untouched — eras slot anywhere in the sorted
+  lefT because the miss pairing is positional (`lefT[i+1].year`), so
+  era correctness came free from the year ordering
+  1972→74→75→77→80→83→84→87.

@@ -1,6 +1,6 @@
 ---
 name: auspol-trendchart-evt-control
-description: "auspol-tracker — the CONTROLLED event-annotation pair (evt/onEvt) on TrendChart, the phone event-list tap wiring, AND the 2PP hero's phone swipe claim map (2015bf5 + 49a6bfe + 6d00601 + a0b0d97, 2026-09-30): rdEventBadges(idKey, events, x0, x1) idKey-first + MEMOISED on the function because the chart reconciles an open event by OBJECT IDENTITY (p.e === evt.e) and closes any tap whose object wasn't minted for this render — two fresh copies killed it (raw-object pushed into item.evs, then per-render recompute); RdEventList button rows (onPick/openKey, aria-pressed), rdEventReveal rAF scroll (-88px), evt-a-<badgeKey> anchor, the evtPrev render-guard anti-pattern that ate hand-over taps; swipe claims are MINIMAL after a0b0d97 undid two over-claims — ONLY the .rd-tpp-read figures strip (self-mark + __rdSwipe) and the chart svg (.chart inside [data-rd-swipe-exact]) flip the matchup; the lead gauge, event list, tabs and chrome claim NOTHING and page-turn via rowAt/goTab like any other surface; the absorb machinery (bare self-mark swallow, non-chart card swallow, 700ms __rdScrollAnchor arm) is DELETED, not narrowed; probe .matilda/probe/phone-evlist-tap.mjs (taps + glitch + swipe), section ids #primary-vote (NOT #primary) and section.rd-tpp."
+description: "auspol-tracker — the CONTROLLED event-annotation pair (evt/onEvt) on TrendChart, the phone event-list tap wiring (with the primary card's rd-evdrop fold-away dropdown, 2026-10-01), AND the 2PP hero's phone swipe claim map (2015bf5 + 49a6bfe + 6d00601 + a0b0d97, 2026-09-30): rdEventBadges(idKey, events, x0, x1) idKey-first + MEMOISED on the function because the chart reconciles an open event by OBJECT IDENTITY (p.e === evt.e) and closes any tap whose object wasn't minted for this render — two fresh copies killed it (raw-object pushed into item.evs, then per-render recompute); RdEventList button rows (onPick/openKey, aria-pressed), rdEventReveal rAF scroll (-88px), evt-a-<badgeKey> anchor, the evtPrev render-guard anti-pattern that ate hand-over taps; swipe claims are MINIMAL after a0b0d97 undid two over-claims — ONLY the .rd-tpp-read figures strip (self-mark + __rdSwipe) and the chart svg (.chart inside [data-rd-swipe-exact]) flip the matchup; the lead gauge, event list, tabs and chrome claim NOTHING and page-turn via rowAt/goTab like any other surface; the absorb machinery (bare self-mark swallow, non-chart card swallow, 700ms __rdScrollAnchor arm) is DELETED, not narrowed; probe .matilda/probe/phone-evlist-tap.mjs (taps + glitch + swipe + dropdown), section ids #primary-vote (NOT #primary) and section.rd-tpp."
 source: auto-skill
 extracted_at: '2026-09-30T03:44:42.189Z'
 ---
@@ -52,12 +52,19 @@ event annotation in the TrendChart above it. Four homes, in
    `rd-panels.jsx` RdPrimary ~:122-129 ("p1") and RdDirection ~:946
    ("dir", bondi), `rd-cycles.jsx` :151 ("cy" lone) and :650
    ("cy"+cur.year pairOf, "cy<year>"). Every call site must pass the
-   idKey — the 3-arg form is gone.
-4. **`rd.css` ~:341-348** — `.rd-evlist-b` button styles. Wash tokens:
+   idKey — the 3-arg form is gone. RdPrimary's list alone renders
+   INSIDE a `<details class="rd-evdrop">` fold-away (2026-10-01, see
+   the dedicated section below); every other call site is a bare list.
+4. **`rd.css` ~:278-290 + ~:341-348** — `.rd-evlist`/`.rd-evdrop` box
+   styles and the `.rd-evlist-b` button styles. Wash tokens:
    `var(--surface-2)` for :active and hover (there is **no `--wash`
    token** in this repo — grepping template.html:34 saved a ship of a
    dead var); `li:has(.rd-evlist-b) { padding: 0 }` so the button's own
    padding carries the row; `:focus-visible` outline `var(--accent)`.
+   Sibling-gap selectors assume the list is the chart card's direct
+   child — a fold-away card needs both `.rd-evdrop` variants (`.chart
+   + .rd-evdrop { margin-top: 0 }` when the copy-button band precedes,
+   and the widened `:is(.rd-evlist, .rd-evdrop) + .rd-ckey`).
 
 ## THE identity rule (why two fixes were needed, 2026-09-30)
 
@@ -129,6 +136,66 @@ const pickEv = (e) => { setEvtOpen((c) => (c && c.e === e ? c : { e })); rdEvent
   `setEvt({e, x, y})` → with ctl that's `onEvt(...)` → evtOpen
   round-trips through the parent and the list's aria-pressed follows —
   free, because client and list share one state.
+
+## The primary card's list folds away (rd-evdrop, 2026-10-01)
+
+The Primary vote card's phone list duplicates what the 2PP card above
+already lists over its own window, so RdPrimary alone wraps its
+`RdEventList` in a collapsed native `<details>` (user request: "hide
+them in a dropdown"). rd-panels.jsx, in the card JSX right after the
+TrendChart:
+
+```jsx
+{badges && badges.list.length > 0 && (
+  <details className="rd-evdrop">
+    <summary>The {badges.list.length === 1 ? "one event" : badges.list.length + " events"} marked on this chart</summary>
+    <RdEventList list={badges.list} onPick={pickEv}
+                 openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />
+  </details>
+)}
+```
+
+- Guard on `badges.list.length > 0`, not just `badges` — a window that
+  brackets no events must not mint an empty dropdown (plain RdEventList
+  renders null on its own, a details would not).
+- Summary copy is a counting noun phrase ("The N events marked on this
+  chart") — static text that reads right open AND closed, like the
+  repo's `.view-how` summaries. Sentence case in source.
+- The 2PP hero and all other callers keep bare lists; the dropdown is
+  RdPrimary-only. Everything inside (pick wiring, reconciliation) is
+  unchanged — the fold is presentational, and the details' native open
+  state survives React re-renders (open is not a controlled prop).
+- Styles in rd.css (~:282-290): `.rd-evdrop` keeps the bare list's
+  12px/0 top margins; summary `600 13px var(--sans) var(--ink-2)`,
+  hover-guarded; `.rd-evdrop .rd-evlist { margin-top: 8px }`. Widen
+  sibling selectors that assumed the list was a direct card child —
+  `:is(.rd-evlist, .rd-evdrop) + .rd-ckey`.
+
+### Probing a closed `<details>` (the trap that cost one probe FAIL)
+
+Chrome (154 measured headless) hides a closed details' contents
+WITHOUT display:none — the children keep real layout boxes: an
+`li.getBoundingClientRect()` inside a closed details returns an
+honest-looking rect (33px tall, mid-document y), `computed display` is
+`flex`, `content-visibility` computes `visible`. But the content does
+NOT paint, is NOT hit-testable (`elementFromPoint` at its spot finds
+nothing inside the details), and `li.scrollIntoView()` cannot land it
+(the rect stays off-viewport). So:
+
+- To assert collapsed: measure the DETAILS element's own height —
+  closed it is summary-only (`d.getBoundingClientRect().height` ≈ 27px
+  here; assert a sane band like `> 0 && < 60`). Never assert
+  `childRect.height === 0` — it will FAil (that was the first
+  assertion's mistake: `y` is also misleading).
+- To assert interactable: hit-test (`elementFromPoint` at the
+  scrolled-into-view row centre lands INSIDE the details only when
+  open) or just drive the real path — click the summary, then the row
+  buttons. The probe does both.
+- `.matilda/probe/phone-evlist-tap.mjs` now: asserts the fold
+  contract before the tap probes (dropdown exists, hero has NONE,
+  starts collapsed, summary-height only, summary text counts the
+  window's events), clicks the summary first when a section's list is
+  folded, then runs the unchanged tap/glitch assertions.
 
 ## Verification
 

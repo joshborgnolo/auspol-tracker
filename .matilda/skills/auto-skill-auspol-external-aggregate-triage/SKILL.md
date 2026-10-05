@@ -69,6 +69,12 @@ fully explained a 2–3pt divergence with zero bugs found. Companion skills:
      in Sep) — prefer the sidebar over re-fetching roundups. Method
      statements (MAIN aggregate only, he publishes no shadow-ON methods
      page): `/2025/09/2025-2028-2pp-aggregate-methods-page.html`.
+   - **Silver Bulletin (Nate Silver)**: US-ONLY — Trump net approval,
+     generic congressional ballot, Musk favourability; NO Australian
+     average (verified 2026-10-03), so "compare with Nate Silver" asks
+     are METHODOLOGY-only, never topline-vs-topline. Pages, free/
+     paywalled split, Substack extraction recipe and his published
+     method summary live in `auspol-silver-bulletin-comparison`.
    - Independent check on fresh polls: The Conversation (Beaumont) and
      news.com.au poll write-ups extract cleanly via web_search.
 3. **Decompose with a parity-gated replica**, never by staring at outputs.

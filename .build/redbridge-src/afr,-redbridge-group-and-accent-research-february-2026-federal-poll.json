@@ -24,5 +24,6 @@
     "lnp": 32,
     "grn": 89,
     "oth": 68
-  }
+  },
+  "firmnessError": "vote-softness table is not the wide six-group layout"
 }

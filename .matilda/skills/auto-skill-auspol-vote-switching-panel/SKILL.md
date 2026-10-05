@@ -67,21 +67,33 @@ extracted_at: '2026-09-30T13:30:01.000Z'
     clause, the "Stayed or went elsewhere" caption and `.rd-mo-else` are
     back, and `.matilda/probe/switching-reverse.mjs` was deleted by the
     revert (a probe pinning a dead encoding would fail from then on).
-  - Mosaic `pts` label chains (user's, 2026-09-30): the FIRST column's
-    points row descends "… of One Nation's gain" → "… of ON's gain" →
-    bare, the SECOND descends "… of the gain" → bare, all later columns
-    are bare ("≈ 3.1 points"); the chains are SVG-column-label only —
-    the phone `.rd-mo-rows` variant still shows "≈ N pts". The SHARE row
-    under the points row carries its tail on the FIRST column ONLY and
-    there as "of the gain" (never "of One Nation's gain" — that column's
-    pts row above already says it); the second column's share row is
-    bare for the same reason — each column says its counting tail once,
-    on exactly one of its two sub-rows (user's rule, 2026-09-30, two
-    follow-ups in a row). Pinned by
+  - Figure-label contract (REVISED 2026-10-03, user's calls — supersedes
+    the 2026-09-30 per-column-tail rule): the POINTS rows name
+    what they count on BOTH layouts. Desktop SVG: col 1 (lnp) descends
+    "… of One Nation's gain" → "… of ON's gain" → "… points" → bare,
+    col 2 (alp) descends "… of the gain" → "… points" → bare, later
+    cols bare ("≈ 3.1 points"). Phone `.rd-mo-rows`: the top-right
+    figure of row 1 is FIXED at the fitter's laptop wording "≈ 12.4
+    points of ON's gain" and row 2 at "≈ 4.9 points of the gain" — the
+    full "One Nation's gain" doesn't clear the party name even at
+    390px, and the user chose fixed-short over BOTH adaptive
+    measurement and exact-word wrap ("no, say 'ON's gain', like on
+    laptop"); later rows and the kept row stay "≈ N pts". The SHARE
+    (±) row is now TAIL-FREE EVERYWHERE: the old first-column-only
+    " of the gain" tail (2026-09-30's "name the tail once per column"
+    compromise) duplicated what the pts row above names, and the user
+    killed it on both layouts; the sh ladder is just
+    `["NN% ±X.X", "NN%"]`. Historical spec of the swap still pinned by
     `.matilda/probe/switching-title-dek-swap.mjs` (15 checks, 1280 +
     390px; floats its own http server — map "/" → "/index.html", and use
     `new Function` on the 9f09dca2 asset for live expectations;
     `S.series` is an ARRAY of `{id,…}` entries, not a keyed object).
+    The label contract is pinned by
+    `.matilda/probe-switching-gain-labels.mjs` (built page at
+    320/390/1440: asserts the two phone figure texts, tail-free ± rows
+    in both layouts, and `.rd-mo-rtop` scrollWidth ≤ clientWidth per
+    row — phone rows fit 320→390px with 0px overflow, no CSS change
+    needed).
 - **Glossary / Info:** `d1a1d215` ~:5212-5216 (all-polls table columns for
   `p.sw.{lnp,alp,grn,oth,onp}`), and the `vote-switching` term + "A check."
   paragraph (~:6280-6296) whose identity is kept-ON + each group's switch

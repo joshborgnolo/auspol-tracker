@@ -1,9 +1,9 @@
 ---
 name: ci-main-writer-races
-description: auspol-tracker — how writers (CI updaters, the laptop's launchd copies, agent repairs, humans) stay safe pushing to one main. Since 2026-09-25 there is NO shared concurrency group: each workflow queues in its own (poll-agent.yml's writers-<house>), and .build/git-push-main.sh push_main() resolves every push race — generated files rebuilt not merged, one wrapper re-run on a data conflict, "FAIL push race" (classified transient) only when a race is lost twice. HAZARD (2026-10-02): the rung-1 regen merge attributes cover `.build/newtracker/assets/**` SOURCE layers, so a racing commit touching the same rd-*/source file makes the blind driver silently KEEP ORIGIN'S version and rung 2 rebuilds index.html from the dropped source — the pushed commit's message describes a change its tree lacks (40a5f95); ALWAYS `git show origin/main:<source> | grep <marker>` after a rebase-path push and re-land on a zero. GOTCHA: git-push-main.sh is a SOURCED library, not a script — `bash`-ing it exits 0 and pushes NOTHING; agent/human sessions push with plain `git push origin HEAD:main` (rebase+rebuild+amend by hand on a lost race). A dirty shared checkout breaks push_main's rung-1 rebase (no autostash — log says "conflicted on data" but means "You have unstaged changes"): recover via a detached-worktree cherry-pick + rebuild + push, then MIXED (never --hard) reset the checkout, or rebase with `-c rebase.autoStash=true`. Adding a writer? Its own group, and push through push_main. Never re-add a shared group.
+description: auspol-tracker — how writers (CI updaters, the laptop's launchd copies, agent repairs, humans) stay safe pushing to one main. Since 2026-09-25 there is NO shared concurrency group: each workflow queues in its own (poll-agent.yml's writers-<house>), and .build/git-push-main.sh push_main() resolves every push race — generated files rebuilt not merged, one wrapper re-run on a data conflict, "FAIL push race" (classified transient) only when a race is lost twice. HAZARD (2026-10-02): the rung-1 regen merge attributes cover `.build/newtracker/assets/**` SOURCE layers, so a racing commit touching the same rd-*/source file makes the blind driver silently KEEP ORIGIN'S version and rung 2 rebuilds index.html from the dropped source — the pushed commit's message describes a change its tree lacks (40a5f95); ALWAYS `git show origin/main:<source> | grep <marker>` after a rebase-path push and re-land on a zero. The hazard also bites an INTERACTIVE hand rebase that replicates push_main's attrs dance (bf7adc8 vs ac705a7, 2026-10-03): drop the `.build/newtracker/assets/**` glob from the hand-written attrs file so the sources merge textually (stash the foreign dirty tree first, pop after). GOTCHA: git-push-main.sh is a SOURCED library, not a script — `bash`-ing it exits 0 and pushes NOTHING, and sourcing it BARE (`bash -c 'source … && push_main'`, 2026-10-03) fakes a lost race: unset LOG makes every git op redirect-fail (`line 67: : No such file or directory`) so nothing runs yet it logs "rebase conflicted on data (commit kept locally: )" with EMPTY parens — the tell — while `log` resolves to macOS's system binary; state is untouched, push plainly. Agent/human sessions push with plain `git push origin HEAD:main` (rebase+rebuild+amend by hand on a lost race). A dirty shared checkout breaks push_main's rung-1 rebase (no autostash — log says "conflicted on data" but means "You have unstaged changes"): recover via a detached-worktree cherry-pick + rebuild + push, then MIXED (never --hard) reset the checkout, or rebase with `-c rebase.autoStash=true`. Adding a writer? Its own group, and push through push_main. Never re-add a shared group.
 source: auto-skill
 extracted_at: '2026-09-04T13:36:12.593Z'
-updated_at: '2026-10-02'
+updated_at: '2026-10-03'
 ---
 
 # Writers racing origin/main
@@ -78,10 +78,39 @@ git show origin/main:index.html     | grep -c '<your marker>'  # compiled line, 
 ```
 
 A zero from the first command means the regen driver ate the hunk: re-apply the edit on
-the new origin/main tip, rebuild, re-verify, commit and push again. (An interactive
-session pushing plainly and rebasing by hand never registers the regen driver, so its
-rebase would CONFLICT on the same-file source touch — the silent form is specific to
-push_main callers and sessions that replicate its `-c core.attributesFile` dance.)
+the new origin/main tip, rebuild, re-verify, commit and push again. (2026-10-03 addendum:
+the parenthetical's "interactive sessions never register the driver" is only half true —
+a hand rebase replicating push_main's attrs dance CAN opt into it, and pushed bf7adc8 that
+way.)
+
+### Hand-replicating the attrs dance? Drop the SOURCE-assets glob (2026-10-03, bf7adc8)
+
+When an interactive session's push is rejected and the racing commit touched the same
+`.build/newtracker/assets/**` SOURCE files as yours (bf7adc8 vs ac705a7 — both edited
+73de0c58 + rd.jsx), writing push_main_regen_attrs VERBATIM into the scratch file would
+silently keep ONE side's sources wholesale (the hazard above, self-inflicted). The safe
+hand recipe:
+
+1. `git stash push -m <tag>` — a rebase needs a clean tree, and any foreign hunk sitting
+   in yours must not bake into YOUR commit (bf7adc8's tree held a sibling's uncommitted
+   `.rd-cc-row` rd.css hunk plus the rebuilt index.html carrying its compiled copy).
+2. Write `$(git rev-parse --git-dir)/auspol-regen.attributes` with ONLY the truly
+   regenerated paths: `printf '%s merge=auspol-regen\n' index.html feed.xml sitemap.xml robots.txt 'assets/**'`
+   — i.e. push_main_regen_attrs MINUS `'.build/newtracker/assets/**'`.
+3. `git -c core.attributesFile=<attrs> -c merge.auspol-regen.name=… -c merge.auspol-regen.driver=true pull --rebase origin main`
+   — index.html disappears into the driver (to be rebuilt), the SOURCE assets now merge
+   TEXTUALLY, cleanly here because the racing hunks touched different regions.
+4. validate + rebuild, then grep-verify the merged artifact carries BOTH sides' markers
+   (`grep -c '<racing commit's marker>' index.html` — ac705a7's `min(1152` gauge seed —
+   AND your own, e.g. zero `tagline-flip`), plus zero of the stashed foreign hunk.
+5. `git add index.html` (+ whatever regenerated), `--amend --no-edit`, push.
+6. `git stash pop` and confirm the foreign hunk is back in the working tree
+   (`git diff <file> | grep -c '<hunk line>'` == 1) and the tree's uncommitted state
+   matches the pre-race state.
+
+(`git -c rebase.autoStash=true pull --rebase` would have handled steps 1/6 too — the same
+clean checkout trick as below — but the attrs ADAPTATION in step 2 is the load-bearing
+bit.)
 
 ## Agent/human sessions push DIRECTLY — `bash`-ing the file is a silent no-op
 
@@ -89,7 +118,10 @@ push_main callers and sessions that replicate its `-c core.attributesFile` dance
 the wrapper defines REPO, LOG and log()") — it is NOT a runnable script. Executing
 `bash .build/git-push-main.sh` defines the functions, exits 0 immediately, and pushes
 NOTHING, with zero output — origin/main unmoved (observed 2026-09-28, an agent session
-ran it twice before noticing). An interactive session commits to local main and pushes
+ran it twice before noticing; recurred 2026-10-03 on a compaction-resume — the
+reconstructed "push the commit" step replayed the wrong recipe, and the diagnosis
+that caught it was `git rev-parse main origin/main` disagreeing after the "push").
+An interactive session commits to local main and pushes
 plainly: `git push origin HEAD:main`. If origin has raced ahead, replay push_main's
 rungs by hand: fetch, `git pull --rebase` (generated files — index.html, feed, sitemap,
 robots, `assets/**`, `.build/newtracker/assets/**` — fold via rebuild, never textual
@@ -119,6 +151,37 @@ now — index.html etc. are rebuilt, so on an index.html conflict take the rebui
 route: rebase with ours, `node .build/newtracker/build.mjs`, re-stage, amend),
 then `git push` again.
 
+### The push "did nothing" signature — TWO causes, check both (2026-10-02)
+
+`bash .build/git-push-main.sh` exit 0 with origin unmoved happened AGAIN
+2026-10-02, stacked under a second cause: the commit itself never existed.
+A pre-compaction "committed as <hash>" claim had been performed word-for-word
+after the resume, yet `git reflog` showed no commit entry — the working tree
+still carried every change, and the following push had literally nothing to
+send. Diagnosis is two commands: `git log --oneline -3` (or reflog) and
+`git status --porcelain --branch`. No `[ahead N]` with your files still
+` M`-flagged = phantom commit — re-commit the intact tree and push again.
+Never re-report a pre-compaction commit claim without seeing it in `git log`;
+never report "pushed" without `git log origin/main -1` agreeing.
+
+## A THIRD bad invocation: sourcing it bare fakes a lost race (2026-10-03)
+
+`bash -c 'source .build/git-push-main.sh && push_main msg files…'` — sourcing
+IN A BARE SHELL and calling push_main without the wrapper env — fails loudly
+and deceptively. push_main expects `REPO`, `LOG` and a `log()` function to
+already exist ("Source AFTER the wrapper defines REPO, LOG and log()"); with
+`LOG` unset, EVERY git op dies at its redirect (`git push … >> ""` →
+`.build/git-push-main.sh: line 67: : No such file or directory`), so the push
+never runs, push_main reads the failed call as a rejection, and its every
+`log "…"` call hits macOS's SYSTEM `log` binary (`log: Unknown subcommand
+'push rejected; rebasing…'`). Exit 1 with output that perfectly mimics a REAL
+lost race: "rebase onto origin/main conflicted on data (commit kept locally:
+)" — note the EMPTY parens, the tell. Nothing actually ran: no rebase, no
+reset, the local commit sits untouched ahead by N. If you see the phantom,
+there is nothing to recover — state is intact, just push plainly:
+`git push origin HEAD:main`, verify `git log origin/main -1`. Interactive
+sessions never call push_main, in ANY form: the wrappers own it.
+
 ## Dirty shared checkout: rung 1 has NO autoStash — recover via worktree
 
 Methods (worked 2026-09-28, local commit `20fd11b` vs racing `0200407`):
@@ -139,12 +202,27 @@ Methods (worked 2026-09-28, local commit `20fd11b` vs racing `0200407`):
   rebuild reproduced the auto-merge byte-identical here, leaving the tree
   clean so there was nothing to amend), `git push origin HEAD:main` from
   the worktree, `git worktree remove` it.
-- Realign the checkout afterwards (its commit is now the pushed one's
-  twin): `git reset origin/main` — MIXED, never `--hard`, which would wipe
-  sibling sessions' tracked uncommitted edits — then
-  `git checkout -- index.html <any other generated paths>` so the working
-  tree's generated copies refresh from HEAD. Old local commit dies in the
-  reflog; fine.
+- Worktree-in-/tmp variant (62e64b1, 2026-10-03) — `git worktree add
+  --detach /tmp/auspol-integ origin/main` keeps the integration out of the
+  repo entirely. Two operational snags: (1) run_shell_command's `directory`
+  param rejects paths outside the registered workspace — drive the worktree
+  with `cd /tmp/auspol-integ && …` inside the command instead; (2) npm test
+  needs the devDependencies, so `ln -s "$PWD/node_modules"
+  /tmp/auspol-integ/node_modules` before testing (build/validate ran fine
+  either way) and `rm` the symlink before `git worktree remove` — it shows
+  as untracked `?? node_modules` otherwise.
+- Realign the checkout afterwards **only when the tree's generated files
+  are clean** (its commit is now the pushed one's twin): `git reset
+  origin/main` — MIXED, never `--hard`, which would wipe sibling sessions'
+  tracked uncommitted edits — then `git checkout -- index.html <any other
+  generated paths>` so the working tree's generated copies refresh from
+  HEAD. Old local commit dies in the reflog; fine. **Skipped 2026-10-03**:
+  a sibling session had uncommitted index.html (its own rebuild products)
+  in the tree, and the `git checkout -- index.html` step would have
+  clobbered them. Equal alternative: leave local main sitting on the twin
+  commit — the next `git pull --rebase` drops it silently (patch already
+  upstream) and nothing else needs doing. Report this to the user instead
+  of realigning whenever sibling generated-file edits are present.
 - Small edits interactively: plain `git push` first (it usually wins); on
   rejection `git -c rebase.autoStash=true pull --rebase origin main`
   survives the dirty tree (stashes, replays, POPS the stash back — confirm

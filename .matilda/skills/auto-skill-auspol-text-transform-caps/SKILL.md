@@ -1,6 +1,6 @@
 ---
 name: auspol-text-transform-caps
-description: auspol-tracker — every ALL-CAPS UI string ("THIS POLL · FIELDWORK …", "HOW IT COUNTS", "V ONE NATION", "LATEST POLL" etc.) is SENTENCE CASE IN SOURCE; the shouting comes from CSS text-transform: uppercase in rd.css. A sentence-case request is a CSS-only diff (never edit JSX/data), and the copy-as-image poll card follows automatically.
+description: auspol-tracker — every ALL-CAPS UI string ("THIS POLL · FIELDWORK …", "HOW IT COUNTS", "V ONE NATION", "LATEST POLL", the glyph player's "THE TERM SO FAR · N OF N POLLS" etc.) is SENTENCE CASE IN SOURCE; the shouting comes from CSS text-transform: uppercase in rd.css (plus template.html's .gp-* glyph-player block). A sentence-case request is a CSS-only diff (never edit JSX/data), and the copy-as-image poll card follows automatically.
 source: auto-skill
 extracted_at: '2026-09-28T01:17:28.778Z'
 ---
@@ -14,9 +14,12 @@ Worked 2026-09-28 (sentence-case pass on masthead labels + poll header line +
 
 Every all-caps label on the redesign is **sentence case in JSX/source** and
 uppercased purely by `text-transform: uppercase` in
-`.build/newtracker/assets/rd.css`. A "make X sentence case" request is a
-CSS-only diff: remove the transform, tighten letter-spacing. Never touch the
-JSX, gen-data, or polls.json.
+`.build/newtracker/assets/rd.css` — with one exception: the glyph player's
+strip (`.gp-eyebrow`/`.gp-count`s rules) lives in **template.html's `.gp-*`
+block** (~:538-543), not rd.css, because the player overlay is plain CSS in
+the template (JSX in `assets/wm-story.jsx`). A "make X sentence case" request
+is a CSS-only diff: remove the transform, tighten letter-spacing. Never touch
+the JSX, gen-data, or polls.json.
 
 ## String → rule map (rd.css, post-change line numbers)
 
@@ -55,6 +58,16 @@ that no longer exist):
   + the exact rendered texts.
 
 De-SPACED (tracking removed after de-capping; do not re-add):
+
+- Glyph player eyebrow "The term so far · Winding back · N of N polls"
+  (7edab5b, 2026-10-04): template.html `.gp-eyebrow` lost
+  `text-transform: uppercase` with tracking .14em→.02em, and the `.gp-count`
+  figure span ("N of N polls") dropped its own .06em to inherit — the
+  de-spaced-figure-span lesson below, and with no letter-spacing left on the
+  span it now carries ONLY colour + tabular-nums. The mid-strip "Winding
+  back" rwmark rode the shared parent rule and de-capped with it. User ask:
+  "make eg this text in the glyph player sentence case … adjust the
+  character spacing accordingly".
 
 - Poll head sentence + its figures (3e34bc1, 2026-09-29): the rdPollHead
   "Conducted on … …" sentence kept `letter-spacing: 0.02em` on `.rd-pld-h`,

@@ -87,6 +87,14 @@ Every figure present; each value 0.5–60; primaries Σ=100±1.0; lib+nat ≈ ln
 undecided ≤25; sample 500–10000. The guard is the tripwire for the next prose-format change —
 a parser that silently returns partial rows is the failure mode to design against.
 
+**Lib mode (added 2026-10-02 for the layout healer):** the extractor now exports
+`guardRelease, parseRelease, fetchFeedPage, nextData, dmyToIso, FEED_DEFAULT` before its
+main block, and main runs only `if (!process.env.RM_LIB)` — so `.build/healer.mjs`
+imports the SAME guard functions for its LLM-output acceptance gate instead of copying
+or weakening them (healer exit-2 first aid is why the exit-2 contract matters: see
+auto-skill-auspol-layout-healer). Keep main() inside the guard when editing; keep the
+export list complete — the healer's acceptance breaks if its imports go stale.
+
 ## polls.json write contract
 
 - **Adjacent-rows only**: dedupe is "row with this `date` and `pollster:"Roy Morgan"` exists";
@@ -250,6 +258,15 @@ releases, emit the would-be row for each, and diff against the hand-entered poll
 the same dates. Divergence classes seen: parser era misses (fix parser), ONE genuine hand-entry
 error (dateStart off by one vs release text — the release wins), deleted posts (404). Don't
 "fix" hand rows that match the release; don't chase eras the guard rightly rejects.
+
+## Wave adjudication modes (added 2026-10-03)
+
+`--adjudicate` (gated on MATILDA_API_KEY) emits `double:`/`reissue:` cases into
+`status.ambiguous` instead of filing the ambiguous waves; `--decisions <verdict-file>` applies
+the LLM's routing on the wrapper's re-run; `--feed-dir` reads fixture feeds for tests (spawn
+from a tmp cwd — OUT/SRC_DIR are relative). The full chain, the `reissue` heal allowlist
+(tpp_flows/undecided/published/sample ONLY), the cwd-swap test seam and the fixture lead-shape
+gotcha live in auspol-wave-adjudication.
 
 ## Reverse-engineering RM's private flow table from the dual 2PP (analysis, done 2026-08-29)
 

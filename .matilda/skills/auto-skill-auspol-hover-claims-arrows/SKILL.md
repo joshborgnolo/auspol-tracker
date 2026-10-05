@@ -1,6 +1,6 @@
 ---
 name: auspol-hover-claims-arrows
-description: auspol-tracker — the pointer-claims-keys pattern (transient hover key-scope, "the claim never survives the pointer leaving the card"), shipped in SEVEN rungs 8e305ae (Latest card, rd-polls.jsx) → 9730f02 (All-polls card, rd-allpolls.jsx) → 0f163f6 (both vote cards, rd-hero.jsx + rd-panels.jsx) → dd087b4 (both Leadership panels, rd-panels.jsx) → becaa5b (Who votes for whom, The issues, Undecided, rd-panels.jsx) → 62f5521+a27c584 (Past cycles compare + measure rows, rd-cycles.jsx) → a877a98+590a74e (the claim escapes the arrow family: ↑/↓ on the issues trust grid, digit keys 1–5 on the who-votes party chips). The canonical guard block + per-site wiring (facetPick so the rdPinScroll pin fires, hero's combined swipe/hover ref, shared rangeId state stepping BOTH vote cards' menus, single ldHover ref naming which of two adjacent panels is hovered with an isConnected/rects liveness guard for the rd-hidden sibling, the Issues' two-claim one-listener (outer view row vs inner whom-card, inner claims by depth) and the Undecided effect's must-precede-its-practical-return placement), the reusable probe harness (viewport-clamped moveOver with sticky-bar inset; focus assertions via .focus() not coordinate clicks — page.click on a row scrolled under the sticky navbar hit a main-nav button; snapshot the NEIGHBOUR row's tab at phase start instead of asserting the default; the issues two-tier has THREE planes, so the view-claims-section assert requires moving to the row outside BOTH claims' card), and the add-one checklist for extending the claim to another row; plus the navbar pointer-click blur (leftover nav-tab focus vetoes EVERY claim — arrows turn the page on first hover until anything in-page is clicked; Tabs onClick blurs when e.detail>0). Sister of auspol-rdtabs-arrow-walk (the FOCUSED walk this pattern claims on behalf of).
+description: auspol-tracker — the pointer-claims-keys pattern (transient hover key-scope, "the claim never survives the pointer leaving the card"), shipped in SEVEN rungs 8e305ae (Latest card, rd-polls.jsx) → 9730f02 (All-polls card, rd-allpolls.jsx) → 0f163f6 (both vote cards, rd-hero.jsx + rd-panels.jsx) → dd087b4 (both Leadership panels, rd-panels.jsx) → becaa5b (Who votes for whom, The issues, Undecided, rd-panels.jsx) → 62f5521+a27c584 (Past cycles compare + measure rows, rd-cycles.jsx) → a877a98+590a74e (the claim escapes the arrow family: ↑/↓ on the issues trust grid, digit keys 1–5 on the who-votes party chips). The canonical guard block + per-site wiring (facetPick so the rdPinScroll pin fires, hero's combined swipe/hover ref, shared rangeId state stepping BOTH vote cards' menus, single ldHover ref naming which of two adjacent panels is hovered with an isConnected/rects liveness guard for the rd-hidden sibling, the Issues' two-claim one-listener (outer view row vs inner whom-card, inner claims by depth) and the Undecided effect's must-precede-its-practical-return placement), the reusable probe harness (viewport-clamped moveOver with sticky-bar inset; focus assertions via .focus() not coordinate clicks — page.click on a row scrolled under the sticky navbar hit a main-nav button; snapshot the NEIGHBOUR row's tab at phase start instead of asserting the default; the issues two-tier has THREE planes, so the view-claims-section assert requires moving to the row outside BOTH claims' card), and the add-one checklist for extending the claim to another row; plus the navbar pointer-click blur (leftover nav-tab focus vetoes EVERY claim — arrows turn the page on first hover until anything in-page is clicked; Tabs onClick blurs when e.detail>0), and the tabpanel pointer-park poke-record-release contract (2026-10-01, rung-8 family) — Chrome's mousedown implicit focus target is the nearest focusable ANCESTOR, so the ARIA-pattern tabIndex=0 role='tabpanel' div captures every inert in-view click and disarms ALL claims until the next body click; ONE-SITE contract on the panel — a poke stamps pointer DOWN AND UP (word-select gates fire a delayed re-park at release), onFocus RECORDS whether the panel's focus was pointer-caused (v1 blurred synchronously there instead — onFocus fires inside mousedown default processing and blur there aborted the caret path, killing text selection site-wide until the v2 rebuild), and one tick after pointer-up the parked panel blurs ONLY if its focus was pointer-caused and no selection is live (a drag's catch keeps its park; keyboard tab-order never pokes). Sister of auspol-rdtabs-arrow-walk (the FOCUSED walk this pattern claims on behalf of).
 source: auto-skill
 extracted_at: '2026-09-30'
 ---
@@ -117,6 +117,77 @@ steps the facet and the hash stays "allpolls". Probe placement
 respects the page-turn-last lesson: the phase sits before the final
 "leaving the card restores the page-level walk" phase and ends on the
 allpolls view so that final phase still works.
+
+## Tabpanel focus-parking disarms every claim (fixed 2026-10-01)
+
+User report: click out of "the issues" pane (an inert click anywhere in
+the current view), hover back over the Issues panel — including over the
+"Best on it" chart — and ↑/↓ do nothing. Not a claim bug — the SECOND
+focus-disarm surface, one level above the navbar:
+
+1. Chrome's mousedown implicit focus target is the nearest focusable
+   ANCESTOR of the point. The app shell renders the whole view as
+   `<div class="view-enter content" role="tabpanel" tabIndex={0}>` — the
+   ARIA tabs pattern REQUIRES the panel in tab order, so the `tabIndex`
+   cannot simply be dropped.
+2. Any inert pointer click inside a view therefore parks keyboard focus
+   on the panel div. The user never sees it (no focus ring on a
+   programmatically-focused div), but every claim's "focus must be
+   BODY/HTML" guard now bails — ALL hover claims page-wide stand down
+   until the next click that lands focus elsewhere.
+3. Diagnostic shortcut (same rule as the navbar case — check
+   `document.activeElement` FIRST): a `DIV.view-enter content` after an
+   inert click = focus-parked panel; the fix belongs at the PANEL, not
+   at the nine guard blocks.
+
+The fix (73de0c58 asset, ONE SITE beside the `tabIndex={0}`; shipped
+inside sibling commit 83dcc7d — swept under its message, verified
+present at HEAD via `git grep -c viewPanelPokedAt HEAD`):
+
+```jsx
+let viewPanelPokedAt = 0;                       // module level
+
+<div className="view-enter content"
+     role="tabpanel" tabIndex={0}
+     onPointerDownCapture={() => { viewPanelPokedAt = Date.now(); }}
+     onPointerUpCapture={() => { viewPanelPokedAt = Date.now(); }}
+     onFocus={(e) => {
+       if (e.target === e.currentTarget
+           && Date.now() - viewPanelPokedAt < 400) e.currentTarget.blur();
+     }}>
+```
+
+Why each piece is load-bearing:
+
+- **Time-windowed, not unconditional.** The blur only fires when the
+  focus lands within ~400ms of a pointer poke inside the panel.
+  Keyboard TAB and programmatic `.focus()` arrive with no fresh poke, so
+  the ARIA tabs pattern's tab order survives intact.
+- **Stamp on UP as well as DOWN.** Chrome's word-selection gate
+  (double-click / drag-select) fires a DELAYED re-park of the mousedown
+  focus target at release time — an event trace showed focusin on the
+  panel AFTER pointerup, long after a down-only stamp would be stale.
+- **Real focus is immune anyway.** With the panel ALREADY focused
+  (keyboard path), an inert click causes no focus transition — Chrome
+  fires no focus event on an already-focused element — so the blur
+  can't misfire on it. Probe P6 pins this.
+
+Regression probe `.matilda/probe-issue-clickout.mjs` (port 9005), P0–P6:
+baseline hover claim · inert clicks (two different sections) leave focus
+on BODY and the claim revives · control clicks still focus the control
+(claim stands aside by design, blur revives) · programmatic focus holds
+· TAB reaches the panel (sentinel `<button>` inserted before it in an
+evaluate) · a live text selection vetoes the claim and collapsing it
+revives · real panel focus survives an inert in-panel click. Greppable
+proof at HEAD: `viewPanelPokedAt` × 4 in source and × 4 in the built
+index.html (plus the compiled PointerUpCapture arrow).
+
+Probe-capability finding while building P5 — this rig's headless Chrome
+cannot synthesise text selections at ALL (drag, double/triple click,
+caret-placement clicks all leave `getSelection()` empty): see
+auspol-headless-geometry-verify. Selection-guard phases must drive
+`window.getSelection()` programmatically (`setBaseAndExtent` /
+`collapseToStart`) and assert on selection STATE, not gesture.
 
 ## The six ship sites
 

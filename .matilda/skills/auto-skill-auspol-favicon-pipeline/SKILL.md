@@ -1,8 +1,8 @@
 ---
 name: auspol-favicon-pipeline
-description: auspol-tracker — the favicon-192.png auto-redraw pipeline end-to-end (shipped 519c9bd, 2026-09-19). Why a PNG must exist beside the SVG data-URI (Google's crawler can't index data URIs and doesn't support SVG), render-favicon.mjs's sha256-of-favicon.svg staleness gate (copied from render-card's idiom), refresh_site's build→render-card→render-favicon→restamp order, the wrapper add-list trio, and the hash-the-exact-file-bytes gotcha (writeAtomic's trailing newline made the first build-side check false-positive).
+description: auspol-tracker — the favicon-192.png auto-redraw pipeline end-to-end (shipped 519c9bd, 2026-09-19). Why a PNG must exist beside the SVG data-URI (Google's crawler can't index data URIs and doesn't support SVG), render-favicon.mjs's sha256-of-favicon.svg staleness gate (copied from render-card's idiom), refresh_site's build→render-card→render-favicon→restamp order + build.mjs's own self-heal spawn (397eb36, 2026-10-02 — local builds no longer leave the PNG stale), the wrapper add-list trio, and the hash-the-exact-file-bytes gotcha (writeAtomic's trailing newline made the first build-side check false-positive).
 source: auto-skill
-extracted_at: '2026-09-19T00:00:00.000Z'
+extracted_at: '2026-10-02T09:29:17.122Z'
 ---
 
 # The favicon raster pipeline (assets/favicon-192.png)
@@ -74,6 +74,15 @@ printed the stale-glyph warning seconds after a clean draw+stamp. The check must
 `fav.svg + "\n"` to match the renderer byte-for-byte. Any future producer/consumer pair
 that cross-compares content hashes has to agree on the exact byte source (file vs string).
 
+## GOTCHA — a spawned tool's success is the STATE it left, never its exit code
+
+build.mjs's self-heal re-runs the stamp check after the spawn instead of trusting the
+child's exit code or stdout: `test-push-main.mjs` substitutes an empty render-favicon.mjs
+(and render-card.mjs) in its toy repo, and any future swapped/stubbed implementation can
+exit 0 without drawing. "Did the stamp come to match?" is the only question that survives
+the environment; don't tidy the double `favPngState()` call away, and never `die`/throw
+when the state stays wrong — absent-Chrome is a supported machine (warn only).
+
 ## Verifying a change to it
 
 Run the renderer **twice**: first run must print
@@ -83,6 +92,13 @@ line if already current), second run **must** print `favicon current (glyph unch
 `node .build/newtracker/build.mjs | grep favicon` must show only the `favicon: alp …`
 composition line, no stale warning. The PNG itself is deterministic given the glyph, so a
 no-data-change redraw produces byte-identical output (nothing new to commit).
+
+To exercise the **build-side self-heal** you can't wait for a glyph move, so fake one:
+write `{"svgSha256":"bogus","drawnISO":"…"}` into `assets/favicon-192.json` and run
+`node .build/newtracker/build.mjs` — the log must show `favicon PNG: re-rasterised for
+the current glyph` and the stamp must come back holding the real favicon.svg sha. The
+immediate second build must print NO `favicon PNG` line at all (grep exit 1): no spawn,
+no warning when nothing is owed.
 
 ## Related
 

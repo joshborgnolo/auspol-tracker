@@ -29,8 +29,14 @@ NEVER hand-edit the built page (tool header comments say so):
 
 ## Class 2: site-shell markup — one source, reapplied
 
-Header/footer copy (sh-meta lines, freshness strings) lives ONCE in
-`.build/site-shell.mjs`. Edit the module, then `node .build/site-shell.mjs`
+Header/footer copy (sh-meta lines, freshness strings, all MARKUP and CSS)
+lives ONCE in `.build/site-shell.mjs` — with one 2026-10-03 carve-out: the
+footer colophon's SENTENCES (strap-line, disclaimer, Info/feedback/archives
+links) are no longer typed in shellFooter at all; site-shell.mjs lifts them
+out of the main page's MethodNote via mainChrome (commit b646fd4), so a
+colophon wording sweep edits MethodNote + build.mjs's ss-note home and the
+shell derives (see auspol-satellite-page-branding, auspol-disclaimer-copy).
+Edit the module, then `node .build/site-shell.mjs`
 reapplies to all 10 pages and regenerates `assets/site-shell.js` (STAGE IT
 — my second commit nearly missed it). Verify: `--check` prints "site shell
 current on all 10 pages" and `node .build/test-site-shell.mjs` passes.
@@ -39,7 +45,13 @@ Topology: auto-skill-auspol-satellite-page-branding.
 ## Class 3: hand-maintained pages — edit in place
 
 archives/newspoll, archives/acnielsen, archives/index.html (redirect stub,
-title only), atlas/, feedback/, preference-flows/. Traps:
+title only), atlas/, feedback/, preference-flows/. The hand edit is SAFE
+against the shell: `applyShell` (and every `node .build/site-shell.mjs`
+reapply) rewrites ONLY the `<!--shell:head/header/footer-->` marker regions —
+the page's `<main>` body between them is page-owned, and `shellDrift` /
+test-site-shell fingerprint only the markers, so body copy edits never drift
+the shell (worked 2026-10-02: feedback/index.html's ss-sub sub-head rewritten
+in place, e2c316d, tests green). Traps:
 - **preference-flows/ is easy to leave out of the sweep plan** — it's a
   shell page, but its head/body copy is hand-owned like atlas.
 - atlas's separators live in JS string builders in its inline `<script>`

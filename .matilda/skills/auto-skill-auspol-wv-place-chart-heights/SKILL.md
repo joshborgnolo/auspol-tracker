@@ -36,6 +36,10 @@ location x-axis line == each bottom-row chart's x-axis line, within
 - Location card (~:2041+): `{head}` then one `TrendChart` with desktop
   `padPx={{l:40,r:12,t:12,b:30}}`. The b's differ: 30 loc vs 24 panels.
 
+(The same row's WIDTH contract — and the sub-1 flex-grow trap that made
+single-chart tabs stop short of the edge — lives in sibling skill
+auto-skill-auspol-wv-chart-row-width.)
+
 ## The enum that pins the 14
 
 `heightPx = Math.round(wvGridH) + 14`, desktop only, where:

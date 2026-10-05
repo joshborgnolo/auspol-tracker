@@ -1,6 +1,6 @@
 ---
 name: auspol-mobile-overflow-probe
-description: "auspol-tracker — symptom: on a phone the page is pannable/right-draggable and the site's wave line-art shows top-to-bottom down the RIGHT gutter (worked 2026-09-07: the All-polls implied-flows table, fix dc02e64). Cause is ALWAYS a too-wide element widening the document (iOS shrinks initial-scale; the html-level art + .tile-band fill the growth). Diagnose with a puppeteer-core probe: viewport 390×844 isMobile, compare documentElement.scrollWidth against the ORIGINAL captured innerWidth (never live innerWidth — the ICB EXPANDS and self-consistently hides the bug), then a per-element max-rect-width scan to name the culprit. Fix precedent: wrap it like .table-wrap { overflow-x: auto } (template.html:1883) / .info-work-wrap — keep the wrapper's max-width, don't touch the table. Verify with python3 -m http.server + re-probe at 360/375/390/414/430."
+description: "auspol-tracker — horizontal document-overflow probing and causes. Symptoms: on a phone the page is pannable/right-draggable with wave line-art down the RIGHT gutter (worked 2026-09-07, dc02e64); faces the wrong-direction trap that live innerWidth EXPANDS after overflow (capture it once, compare against the constant). ALSO transient classes: the click-triggered view-switch bounce (460a75c: unmeasured-sentinel so the first painted frame is already correct) and the LOAD-TIME flash (4181886: sampler installed via page.evaluateOnNewDocument so it runs before the page's own scripts, per-rAF scrollWidth recording during navigation; three cause classes — mount-time measurement against pre-boot-class DOM [fix: set the boot class in the boot script before render], visibility:hidden absolutely-positioned parked items still counting toward scrollWidth [fix: right: 0], and a persistent mid-width band the phone/desktop gates both miss [fix: a second useNarrow handoff breakpoint]). Probe traps: compare against ORIGINAL captured innerWidth, key the element scan on absolute rect width, return only serialisable values from evaluate, disambiguate shared CSS classes by a distinguishing child, click real tab labels. Verify: serve the rebuilt tree + re-probe a width grid, ship gate is zero overflow frames at every rung."
 source: auto-skill
 extracted_at: '2026-09-07T07:13:36.161Z'
 ---
@@ -112,6 +112,78 @@ frames overshoot a phone viewport (dot right edge observed at 408 on a
 `visibility: w ? visible : hidden`) so the FIRST painted geometry is
 already correct — never let a default-width frame paint when positions
 are CSS-transitioned. See `auspol-rd-tpp-hero` for the gauge specifics.
+
+## Load-time overflow flash — the per-rAF sampler during NAVIGATION (worked 2026-10-03, 4181886)
+
+Report shape: "on page load/reload a chunk of the right side of the
+screen flashes with the behind-area" (most visible on #allpolls). This
+is a third transient class: the overflow happens DURING the load
+sequence itself, so both post-state probes AND click-armed samplers
+miss it. Recipe (`.matilda/probe-load-overflow.mjs`, scratch):
+
+- Install the sampler with `page.evaluateOnNewDocument` (it must run
+  BEFORE the page's own scripts): per-rAF record
+  `[t, documentElement.scrollWidth, innerWidth, window.scrollX]`,
+  accumulate `maxSW`/frames, and on every overflowing frame run the
+  absolute-rect wide-element scan (Trap 2) — the wide elements only
+  exist for those frames. `window.__stopRec()` to halt; read state after
+  `waitUntil: "networkidle0"` + a settle sleep; also record final
+  `body.className` and compare final scrollWidth vs innerWidth.
+- Grid it: N desktop widths × every tab hash (pass hashes bare,
+  `"#allpolls"`) + a few mobile-emulation rungs. "frames: 0 at every
+  rung" is the ship gate. Note a real run can show overflow at only ONE
+  width (the 1024px rung caught the 1605px flash) — a single width is
+  not a sample.
+
+**Three cause classes found, each fixed at its root:**
+
+1. **Mount-time measurement against pre-boot-class DOM** — the load
+   flash itself. A boot class (body.rd) was applied by a PARENT layout
+   effect, and React runs child layout effects first, so a child's
+   mount-time width measurement (RdHouseLean svg: 912px) ran against
+   unstyled inline elements and grew the document to 1605px for 1–2
+   frames. Fix: apply synchronously-derivable boot classes in the boot
+   script BEFORE createRoot().render(). Full rule + safety checks in
+   auto-skill-auspol-boot-window.
+2. **visibility:hidden absolutely-positioned items still count toward
+   scrollWidth.** The NextPollTicker's parked items (.tn-item.tn-park)
+   are invisible but laid out; before the rAF first-fit pass the strip
+   is at its label-only width, so a default-static parked pile overshot
+   the right edge. Fix is one property: `right: 0` pins the park slot
+   inside the bar. Remember the mirror: `.sh-tn-item.sh-tn-park` in
+   `.build/site-shell.mjs` needs the same rule (re-render the 10
+   satellites with `node .build/site-shell.mjs`).
+3. **A persistent mid-width band neither phone nor desktop gates
+   cover.** The All-polls 2PP tab-row control (.rd-pl-ctl) was gated
+   only by `phone` (max-width 760), so at 761–~809px the tab row +
+   control exceeded the document by ~40px on EVERY frame (220 frames —
+   the sampler distinguishes persistent bands from flashes trivially).
+   Fix mirrors the Latest table's 900px ctlrow handoff: a second
+   `useNarrow("(max-width: 900px)")` keeps the control inline in the tab
+   row ≥901px and mounts it on its own `.rd-ap-pctl` row ≤900px (the
+   class is shared with house-lean's narrow strip and its rd.css rules
+   are width-ungated, so it dresses itself at any width).
+
+**Probe traps that cost turns this time:**
+
+- `page.evaluate` returning an object that contains a DOM element
+  resolves to `undefined` (not an error) — coerce to booleans INSIDE the
+  evaluate (`inline: !!el`) before returning anything.
+- The `.rd-ap-pctl` class is SHARED (house-lean's narrow strip at
+  rd-allpolls.jsx ~:2788 has it too) — `querySelector(".rd-ap-pctl")`
+  found the wrong component and made every failure look inverted.
+  Disambiguate by a distinguishing child (`find(el =>
+  el.querySelector(".rd-grow"))` for the table's row) or scope to a
+  known ancestor section.
+- Facet-walk probes must click the REAL tab label: the All-polls tabs
+  are "2PP"/"Primary"/"Leadership", not "Two-party" — a no-match click
+  silently did nothing and the "walk back" assertions failed on stale
+  state.
+
+Verification matrix at ship: zero overflow frames at 12 desktop widths
+× {#allpolls, #now, #cycles, #info} + mobile emulation at
+360/390/414/430, plus the interactive 850/1000px handoff probe through
+a twopp→primary→twopp facet walk.
 
 ## Probe-authoring trap: the double-slash URL
 

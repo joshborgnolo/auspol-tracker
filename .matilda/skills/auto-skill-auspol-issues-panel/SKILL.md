@@ -1,6 +1,6 @@
 ---
 name: auspol-issues-panel
-description: auspol-tracker — the Snapshot's "The issues" panel (shipped 2026-09-25; Ipsos added 2026-09-26) end to end - what each pollster publishes about issues, how .build/issues.mjs reads it into data/issues.json, how gen-data §7h pools it (houseEffectsFor on ownership, pairLeanFor on salience), the panel's two views plus the 2026-09-28 importance-weighted scoreboard tally row (and the rd-is-row five-column auto-placement trap), and the traps found building it (RedBridge's two table layouts, Resolve's double-counted July 2026, Ipsos's rolling page 2 and publication lag, why only three parties pool). 3cc1b40 (2026-09-30): the "Issue" kicker span over the phone chips row is GONE (aria-label covers it) — its 16px moved onto .rd-iw-chips; pinWhom pins the grouping menu first (rdPinScroll array form).
+description: auspol-tracker — the Snapshot's "The issues" panel (shipped 2026-09-25; Ipsos added 2026-09-26) end to end - what each pollster publishes about issues, how .build/issues.mjs reads it into data/issues.json, how gen-data §7h pools it (houseEffectsFor on ownership, pairLeanFor on salience), the panel's two views plus the 2026-09-28 importance-weighted scoreboard tally row (and the rd-is-row five-column auto-placement trap), and the traps found building it (RedBridge's two table layouts, Resolve's double-counted July 2026, Ipsos's rolling page 2 and publication lag, why only three parties pool). 3cc1b40 (2026-09-30): the "Issue" kicker span over the phone chips row is GONE (aria-label covers it) — its 16px moved onto .rd-iw-chips; pinWhom pins the grouping menu first (rdPinScroll array form). data/issues.json is GENERATED — .build/issues.mjs rebuilds it wholesale on every run (a hand-entered wave silently vanishes at the next run; never hand-edit it, and a RedBridge wave only exists once the poll row's releaseUrl points at a posted Accent page whose text is cached in .build/redbridge-src).
 source: auto-skill
 extracted_at: '2026-09-26'
 updated_at: '2026-09-30'
@@ -101,6 +101,30 @@ updated_at: '2026-09-30'
   can't-say combined. The secnewgate updater runs issues.mjs via
   refresh_crosstabs. Pre-May waves keep the older two- or
   three-row option sets in the bank but stay out of the pool.
+
+## data/issues.json is GENERATED — never hand-edit it (2026-10-04 lesson)
+
+`.build/issues.mjs` rebuilds the whole file from sources on every run: it
+constructs a fresh `doc` (line ~360, `issues.mjs` ~:356-381) and reads the
+previous file ONLY into `prev`/`had` to compute which waves it *added* — no
+row survives that the sources don't regenerate. A hand-entered wave looks
+right for hours, then vanishes silently at the next issues.mjs run (weekly
+crosstabs, RedBridge/Resolve/News24/Ipsos updaters).
+
+RedBridge waves specifically: issues.mjs pulls every RedBridge **poll row
+that carries `releaseUrl`** and requires the matching report text cached at
+`.build/redbridge-src/<slug>.json|.txt` (fetched by extract-redbridge off the
+posted Accent project page). So a wave hand-entered from the AFR article
+before Accent posts its page (the Aug 2026 and Oct 2026 hand-ingests) CANNOT
+have an issues wave yet — leave `salience`, `salienceGroups` and `ownership`
+alone; the pipeline fills them the weekend the Accent page lands. The AFR
+article's best-party table (ALP/Lib/Nat/ON/GRN/Oth) also lacks the
+`equal`/`none`/`unsure` split the schema needs and can't be split into
+ownership rows by hand.
+
+When the user hands you a poll wave (any house) from a news paste, the
+issues.json answer is: enter the polls.json sections only, and note in the
+commit that issues waves wait for the canonical source cache.
 
 ## Pooling (gen-data §7h)
 

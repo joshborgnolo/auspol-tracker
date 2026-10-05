@@ -69,3 +69,55 @@ four edits in ONE file (sequential edit calls — the same-file-edit race,
 see `auto-skill-same-file-edit-sequencing`). Grep the full old string
 `usual lean` across the asset directory before assuming you found them
 all; the sed-all-then-read-back pattern is safest.
+
+## The desktop twopp "House lean" COLUMN (shipped 2026-10-03)
+
+User call: "there's no house lean column in the 2P facet of the All polls
+table — add a 'house lean' column to the end … the column heading can be
+wrapped if it can't fit". The redesign All-polls table's twopp facet now
+ends with a House lean data column; the classic archive table (d1a1d215)
+ALREADY carries its "House effect" (hfx) column and was untouched.
+
+Homes (three — the four-homes column-surgery rule's fourth home, the
+classic table, didn't apply):
+
+1. `rd-allpolls.jsx` `colHead` twopp group, right after `th("Lean", …)`:
+   a NON-sortable `<span role="columnheader" className="rd-ap-th r wrap"
+   title="…">House lean</span>`. Deliberately not a `th()` sort key: the
+   classic table's `hfx` sort measures per-house consensus deviation — a
+   different quantity — so reusing a "house lean" sort key would cross
+   the two tables' semantics, and wiring a new sort key means touching
+   the AllPollsView `getVal` switch in d1a1d215 (cross-asset). The
+   existing `.rd-ap-th.wrap { white-space: normal; line-height: 1.3 }`
+   does the two-line wrap the user permitted.
+2. `rowFor` — the hl derivation is HOISTED to rowFor function scope
+   (one `let hl = null; if (facet === "twopp") …` block reading
+   `D.houseLean[pub?(onM?"onpub":"tpp"):(onM?"onimp":"imp")][pollster]`,
+   latest point `.v`), shared by BOTH the desktop cell
+   (`hlCell = <span role="cell" className="rd-ap-hl" style={{color:
+   rdApLeanInk(hl, onM)}}>{hl == null ? "—" : rdApSigned(hl)}</span>`,
+   assigned in the twopp branch) and the phone card's sub-line. The
+   desktop row JSX interleaves it:
+   `{figs}{pic}{val}{facet === "twopp" && <>{hlCell}<span></span></>}`
+   — the empty span is the filler-track occupant; row and hrow both
+   carry 10 children now.
+3. `rd.css` `.rd-ap-c2pp` grid-template-columns gains a fixed figure
+   track INSIDE the 1fr spacer at all three desktop rungs: base 200px
+   120px 76px 28px 150px minmax(0,400px) 64px **60px** minmax(0,1fr)
+   40px; ≤1240px …56px **52px** minmax(0,1fr) 32px; ≤1000px …minmax(0,1fr)
+   52px **48px** 0 28px. New rule `body.rd .rd-ap-hl { text-align:right;
+   font-size:14px; font-weight:600; color:var(--ink); white-space:nowrap
+   }` — the FIGURE never wraps; the wrap concession belongs to the
+   heading alone.
+
+Month rows (`rd-ap-mrow`) position by explicit grid-column spans, so the
+9→10 extension needed no mrow edit. Phone is cards (`{phone ? phoneHead
+: colHead}`) — hrow/rows don't exist ≤760px, no CSS rung there.
+
+Pinned in `.matilda/probe/ap-usual-lean-sub.mjs`'s desktop-1280 block:
+hrow 10 children with "House lean" the last heading cell
+(hlIdx == leanIdx+1), header height >25px (wrapped), every row 10
+children with `.rd-ap-hl` third-from-last, figures
+`^(—|±|[+−-]?\d+\.\d)$` with no overflow, Essential's cell "−0.3"
+matching the phone sub, all right edges equal, zero `.rd-ap-hl` / zero
+"House lean" headers on the other four facets.

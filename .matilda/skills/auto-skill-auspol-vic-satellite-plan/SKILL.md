@@ -1,9 +1,9 @@
 ---
 name: auspol-vic-satellite-plan
-description: auspol-tracker — the /vic/ Victorian election satellite, SHIPPED 2026-10-03 (landing commit 69f0061 as /vicpoll/, renamed /vic/ by user call the same day; election day 28 Nov 2026). Read this before touching anything Vic-related — records the locked user decisions, the shipped data schema + estimator constants, the wikitext heading-level regex trap (ED-15, wiki ==== era headings mis-filed dozens of leadership rows), the data-legitimate null-cell allowance, and what remains UN-built (CI/launchd watch cadence).
+description: auspol-tracker — the /vic/ Victorian election satellite, SHIPPED 2026-10-03 (landing commit 69f0061 as /vicpoll/, renamed /vic/ by user call the same day; election day 28 Nov 2026). Read this before touching anything Vic-related — records the locked user decisions, the shipped data schema + estimator constants, the wikitext heading-level regex trap (ED-15, wiki ==== era headings mis-filed dozens of leadership rows), the data-legitimate null-cell allowance, and what remains UN-built (CI/launchd watch cadence). The overnight vic-polish builder↔reviewer loop that grinds the page toward the main-page standard is its own skill: auspol-vic-polish-loop.
 source: auto-skill
 extracted_at: '2026-10-03T12:48:33.097Z'
-updated_at: '2026-10-03'
+updated_at: '2026-10-04'
 ---
 
 # auspol-vic — Victorian poll tracker satellite (SHIPPED 2026-10-03, 69f0061)

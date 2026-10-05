@@ -122,6 +122,14 @@ provenance; `N24_WIKI_FILE=<path>` parses saved wikitext instead of fetching;
 saved News24 article instead of opening Chrome. `--news24 <url>` is the
 single-article oracle and prints the parsed record without writing canon.
 
+**Lib mode (added 2026-10-02 for the layout healer):** the extractor exports
+`parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells, guard, WIKI_RAW` before
+its main block, and main runs only `if (!process.env.N24_LIB)` — `.build/healer.mjs`
+imports the SAME `guard` (with the wiki-wave options `{requirePublished:false,
+requireTpp:false, spanMin:0}`) to accept or reject LLM-extracted waves without
+copying/weakening the check (auto-skill-auspol-layout-healer). Keep main() inside
+the guard; don't let the export list go stale for either consumer.
+
 **Known honest divergence:** wiki shows 2026-06-16 ind=7/oth=5 vs canon 6/6 — the parser is
 truthful to the source; canon stands (only matters if that date ever falls back, which it
 can't while in canon).

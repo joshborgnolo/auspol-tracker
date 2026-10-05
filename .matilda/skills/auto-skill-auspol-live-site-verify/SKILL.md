@@ -109,6 +109,15 @@ lead figure is easy to miss) — a correct deploy can still LOOK unchanged.
   safer, a string value (`"2004-10-09"`).
 - Non-ASCII in JS strings is babel-escaped (`’` → `’` apostrophes)
   — see user skill **auspol-built-html-verification**.
+- **Anchor marker counts to origin, never the working tree** (2026-10-02,
+  `wvGridH` deploy check): with sibling sessions rebuilding in the shared
+  tree, YOUR local index.html can be dirty mid-rebuild and its `grep -c`
+  unstable — a remembered "×13 in HEAD" vs the live page's ×2 looked like a
+  mismatch until `git show origin/main:index.html | grep -c wvGridH` read
+  ×2 exactly like the live curl. The comparison pair is ALWAYS
+  `git show origin/main:index.html | grep -c <marker>` vs
+  `curl -sL https://auspoltracker.com/ | grep -c <marker>`; equal counts =
+  deployed regardless of what the dirty tree says.
 
 ## One anti-redherring check before concluding "cache"
 

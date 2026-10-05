@@ -1,11 +1,45 @@
 ---
 name: auspol-allpolls-phone-head-scale
-description: "auspol-tracker — the phone pinned scale header of the All-polls table (.rd-ap-phead/.rd-ap-hpic/.rd-ap-in/.rd-ap-tk): phoneHead JSX in rd-allpolls.jsx ~1045-1053 (per-facet branches), PMAX/pdx/ldx scales ~787-791, mounted in .rd-ap-headwrap ~1162. THE `cls` COLLISION HAZARD: the facet class (rd-ap-c2pp/-cprim/-clead/-cdir, built at rd-allpolls.jsx:767) is applied to the phead, every row/card/mrow AND the card's own primary-figures child row also carries a bare .rd-ap-cprim — so any phone-block rule on a bare facet class leaks onto every container sharing it. Worked bug (fixed b56e930, 2026-09-29): `.rd-ap-cprim { display:flex; justify-content: space-between }` (meant for the card's figures row) also matched .rd-ap-phead.rd-ap-cprim, making the pinned header a flex container whose .rd-ap-hpic span collapsed to width 0 (only abspos children = shrink-to-fit) and every 0..40% tick stacked at the left on phone Primary view; fix = scope the card rules to `.rd-ap-card .rd-ap-cprim`. CSS homes in rd.css: desktop hpic/in/tk rules 1689-1703, phone phead block 1917-1921 (note `body.rd .rd-ap-phead.rd-ap-c2pp .rd-ap-in` — the scoped-by-phead convention predates the fix), the card-row rules now at 1938-1941. Verification probes: .matilda/probe/ap-prim-phone-scale.mjs (tick rect spread at 390+320px) and .matilda/probe/overflow-320.mjs. Pre-existing overflow note: at 320px the page carries +13px scrollX from .ss-table and the rd-tabs rows — NOT from this header (verified against the deployed pre-fix site); don't chase it when gating tick fixes."
+description: "auspol-tracker — the phone pinned scale header of the All-polls table (.rd-ap-phead/.rd-ap-hpic/.rd-ap-in/.rd-ap-tk): phoneHead JSX in rd-allpolls.jsx ~1827-1836 (per-facet branches; file grew to ~2842 lines, the 2026-09-29 refs ~1045/~787 have drifted — grep 'const phoneHead'), PMAX/pdx/ldx scales ~1458-1462, mounted in .rd-ap-headwrap. The rd-ap-cap caption copy above the tickers lives in TWO renderers that move together (desktop colHead's per-facet hpic blocks ~:1473-1516, aria-hidden, + phoneHead ~:1830-1835, not hidden) — per-facet map in the body; primary's caption became plain 'Primary vote' 2026-10-03 (the ', %' went, user call: the 0..40% ticks already carry the sign). THE `cls` COLLISION HAZARD: the facet class (rd-ap-c2pp/-cprim/-clead/-cdir, built near the top of AllPollsView — was :767, the line drifts as the file grows) is applied to the phead, every row/card/mrow AND the card's own primary-figures child row also carries a bare .rd-ap-cprim — so any phone-block rule on a bare facet class leaks onto every container sharing it. Worked bug (fixed b56e930, 2026-09-29): `.rd-ap-cprim { display:flex; justify-content: space-between }` (meant for the card's figures row) also matched .rd-ap-phead.rd-ap-cprim, making the pinned header a flex container whose .rd-ap-hpic span collapsed to width 0 (only abspos children = shrink-to-fit) and every 0..40% tick stacked at the left on phone Primary view; fix = scope the card rules to `.rd-ap-card .rd-ap-cprim`. CSS homes in rd.css: desktop hpic/in/tk rules 1689-1703, phone phead block 1917-1921 (note `body.rd .rd-ap-phead.rd-ap-c2pp .rd-ap-in` — the scoped-by-phead convention predates the fix), the card-row rules now at 1938-1941. Verification probes: .matilda/probe/ap-prim-phone-scale.mjs (tick rect spread at 390+320px) and .matilda/probe/overflow-320.mjs. Pre-existing overflow note: at 320px the page carries +13px scrollX from .ss-table and the rd-tabs rows — NOT from this header (verified against the deployed pre-fix site); don't chase it when gating tick fixes."
 source: auto-skill
-extracted_at: '2026-09-29T00:04:22.712Z'
+extracted_at: '2026-10-03T08:30:40.829Z'
 ---
 
 # All-polls phone pinned scale header
+
+## Caption copy lives in TWO homes (worked 2026-10-03)
+
+The `.rd-ap-cap` caption that sits above the tick strip is duplicated per
+facet in TWO renderers of rd-allpolls.jsx — a copy change to "the axis
+label" is two edits in the same file (do them SEQUENTIALLY, per the
+same-file-edit race):
+
+- **Desktop `colHead`** per-facet `.rd-ap-hpic` blocks (~:1473-1516) — the
+  hpic span carries `aria-hidden="true"` (twopp's carries an aria-label
+  instead) because the party columns supply the accessible meaning.
+- **Phone `phoneHead`** per-facet branch (~:1830-1835) — the hpic span is
+  NOT hidden (nothing else labels the scale on phone).
+
+Caption map as of 2026-10-03:
+
+| facet | desktop | phone |
+|---|---|---|
+| twopp | `RdApScale` component (its own labels, no plain rd-ap-cap) | same component, `phone` prop |
+| primary | `Primary vote` (", %" dropped 2026-10-03 — user call: the 0–40% ticks already carry the sign) | `Primary vote` |
+| leadership | `Net rating: approve minus disapprove` | same |
+| direction | `Right direction or wrong track, %` (caption only, NO tick strip) | `rd-ap-hdir` variant ("…, unsure, wrong track, %"), no ticks |
+| issues | `Best on the top issue` | `Best on top issue` — the fuller wording swapped to the desktop side 2026-10-03 (user call); the asymmetry is deliberate, don't "unify" it |
+
+Verification recipe (2026-10-03, clean): grep `.matilda` probes for the
+caption literal FIRST (as of this date nothing pins caption copy — no
+probe edits needed); edit both homes; rebuild; then confirm in the BUILT
+index.html — babel compiles the JSX so grep the compiled form
+`}, "Primary vote")` at exactly two sites (~:79992 desktop, ~:80647
+phone). Watch the false friends when scoping: the detail-rail note
+("Primary vote, %. Changes are on…", rd-allpolls.jsx :967) and the
+Past-cycles y-labels ("Government's primary vote, %" in rd-cycles.jsx)
+are different strings, NOT this caption — they stay untouched unless the
+user scopes them in.
 
 ## Symptom → cause
 

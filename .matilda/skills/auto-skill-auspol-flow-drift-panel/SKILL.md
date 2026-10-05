@@ -538,34 +538,6 @@ OUTSIDE the svg for mouseout-clear (inside-svg out-taps are exactly the
 hv-persistence repro). Desktop mouse flow pinned unchanged (month tip on
 hover, wave swap, mouse-out clear).
 
-## X clamp IN RENDER — the tipW idiom (shipped 92fc5f4, 2026-10-06; supersedes f69254c's marginLeft clamp)
-
-The dot-to-dot overflow survived TWO earlier fixes (07bba15, f69254c)
-because both clamped after commit: `getBoundingClientRect()` on the mounted
-tip, then a `marginLeft` correction. `.tip` glides `left` .15s
-(template.html:1616) and React reuses the tip DOM node across a
-dot-to-dot swap, so the measure read the rect at the glide's START (the
-OLD dot's position) → off=0, "in bounds" → the card glided to the
-unclamped new `left`, 50–90px past the screen edge on the user's repro
-(mid chart → far-right Essential dot; mid → far-left). Probes missed it
-because they dismissed between taps (fresh mounts, no glide to measure
-mid-flight); the user never dismisses.
-
-The durable answer is TrendChart's `tipW` idiom (08b413e7:481-509,
-:940-960) — the user themselves pointed at it: **the layout effect
-measures ONLY the tip's WIDTH into state; the clamp is computed IN
-RENDER from that width**, so it holds on every frame of the glide instead
-of once against a stale position. In RdFlowChart: `FLOW_TIP_HALF =
-{ m: 90, w: 125, v: 155 }` first-paint fallbacks, `tipWs[kind]` measured
-widths, `tipLeft(kind, px) = min(W-8-h, max(8+h, px))` with the
-half-width capped at `W/2-8`; all three renders left: tipLeft(...); the
-layout effect keeps only width-measure + the 78px TOP clamp (safe: tips
-glide in x, never in y). GENERAL LESSON: never x-clamp a gliding element
-post-commit from its rect — the rect you measure is where the glide
-STARTED, not where it ends. Measure the INVARIANT (width) in the effect,
-clamp the rendered style. Probe section (c) tracks the tip rect across
-~12 frames of the glide (30ms samples) with NO dismiss between taps.
-
 ## Check script traps
 
 - `.mjs` already implies ESM — run `node .build/flow-drift-check.mjs`; the

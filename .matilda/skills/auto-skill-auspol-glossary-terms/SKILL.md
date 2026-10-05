@@ -107,6 +107,20 @@ one cryptic paragraph inside preference-flows and the user judged it
 - implied-2pp's ON branch and the preference-flows entry now cross-link
   to fp-flows; preference-flows keeps only the 2025 ALP–Coalition table.
 
+## The About block — same asset, right after the glossary (d060e6e, 2026-10-02)
+
+The Info view's "About" section ("auspol tracker is an unofficial
+aggregate…") is a SINGLE `const about` JSX block in the same d1a1d215
+asset, ~:7101, just above the `return { groups, faqs, about }`. It rendered
+as five `.info-about-p` paragraphs (About/Updates/Following along/Errors/
+Archives) whose RSS/feedback/archives LINKS are JSX anchors — a plain-line
+edit must keep them, and the tail `{" "}` before a trailing anchor. User
+dictated the full rewrite verbatim in one message ("actually scratch that,
+update the copy with this: …") and then iterated word-by-word in three
+follow-ups ("accrues and presents", dropped "on") — each tweak is source
+edit → build → validate → commit asset+index.html → push; grep the built
+index.html for the new ASCII phrase to confirm it landed.
+
 ## Layout hazard — the two-column `.info` media block (12221e0, 2026-09-08)
 
 At ≥1100px `.info` is `columns: 2` with `.info-term { break-inside: avoid }`.
@@ -117,3 +131,47 @@ in Safari only. Chart-bearing terms MUST keep
 template.html (with the chart directly inside an `.info-chart` wrapper —
 if that wrapper class changes, the selector must change with it). Full
 quirk anatomy + WebKit probing recipe: auto-skill-auspol-webkit-multicol-hover.
+
+## Engine-describing copy rots — diff the glossary against the engine (2026-10-02)
+
+Asked "is the Who-votes significance test explained in Info", the answer
+was no — and worse than the understood gap: the vote-by-group entry's
+"Changes over time" paragraph and working formula described a RETIRED
+per-poll regression (`yᵢ = αₕ + βtᵢ + εᵢ`, N − H − 1 df, Holm across
+groups, two-group tabs special-cased). The engine had been rewritten on
+2026-09-29 (§7gb `demoTrend`, per group-trend-proportionality) to a
+monthly two-stage test — gap slope AND ln-ratio slope, both at
+|t| ≥ 1.96, margin-precision weights, `thin` ≤ 7 monthly points — and
+the glossary carried the old model for three days. Lessons:
+
+- **An entry that explains a TEST must be diffed against the engine in
+  gen-data.mjs before and after editing**, not against the panel's own
+  note caught mid-read. The RdTsig note in rd-panels.jsx (~:2209) was
+  right all along ("both trend tests — gap and ratio — clear t 1.96");
+  the entry and the engine had silently forked.
+- **The fix cascaded three spans**: the prose paragraph, the working
+  formula, AND the "Limits" clause that claimed "the test over time
+  sidesteps … by comparing each pollster with itself" (false for the
+  monthly-line engine; the lean-removal now lives in stage-1
+  construction, each poll vs its own totals). A mid-entry terminology
+  change always sands neighbouring claims.
+- **The a11e1559 `DemographicsPanel` still holds the OLD hint copy**
+  ("compares each pollster only with itself …") — deliberately left
+  alone: its body is behind `if (window.AP.rd) return <RdDemographics/>`,
+  an unreachable classic fallback whose copy is accurate for its OWN
+  engine (`demoTrendVerdict`/`withinHouseSlope`, Holm). Grep hits for
+  rival phrasings in a11e1559 are not second homes to sync.
+- Site-unique phonemes for verification greps after a rebuild:
+  "two-thirds of the national figure", "keeping pace with a party on
+  the rise", "Five monthly readings". Curly typography — ASCII-safe
+  fragments per the header rule.
+
+## The pinned chapter index — `.info-index` y-scroll hazard (24f3ee0, 2026-10-04)
+
+The sticky About/Questions/Method strip has its OWN layout trap pair,
+full anatomy in **auto-skill-auspol-strip-xscroll-ylock**: (1) its
+`overflow-x:auto` phone rule computes `overflow-y` to `auto` and the
+44px `::after` tap-target protrusion becomes scroll slack (the thumb
+wobble), (2) every `body.rd .info-index` override in rd.css (~:2814,
+~:2825) wins over template.html's base-class rules on specificity, so
+layout properties for the redesign go in rd.css, not template.html.

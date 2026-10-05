@@ -7,6 +7,11 @@ extracted_at: '2026-09-24T05:28:31.987Z'
 
 # TrendChart dot pick → click → archive (08b413e7 asset)
 
+This skill is the INPUT side. The VISUAL of a picked dot (the `hotDot`
+ring+enlarge vs the summary strips' enlarge-only vs rest-state election
+rings) and the convention for which dot kind rings — map in
+auto-skill-auspol-dot-emphasis-languages.
+
 All pointer int the TrendChart component
 (`.build/newtracker/assets/08b413e7-…js`, `function TrendChart` ~:118).
 

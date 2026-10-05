@@ -1,6 +1,6 @@
 ---
 name: auspol-rd-tpp-hero
-description: auspol-tracker — the redesign front-page two-party hero (rd-hero.jsx, section.rd-tpp) — the chart a visitor actually sees: it draws Labor's share vs BOTH rivals at once (main + "other" line with "v Coalition"/"v One Nation" END labels), the "Compare published 2PP" overlay ("As published"/"Implied" end label), and the ON-flow sensitivity bracket whose `edge:true` renders its TOP edge as a PHANTOM second dotted line (renderer strokes area top-edges dashed; fill invisible at .rd-sens opacity .1) — restyled 1px/"1.8 3"/0.35 on 2026-09-28 via new parametric area options edgeWidth/edgeDash/edgeOpacity. Event markers are the UNION of keptEvents since the same day (user wanted identical markers on every matchup pill). Renderer dash encodings trap: dashed SERIES encode stroke-dasharray "6 6", area EDGES default "4 4"/custom — probe assertions must match the right pattern. Pinned by .matilda/rd-tpp-hero-probe.mjs (14 checks). Double-press figure flip: numPress (pointerdown pairing 500ms/30px, gated on .rd-tpp-num only, second-press preventDefault kills digit selection) steps the matchup one slot via chooseMatchup — shipped ada1ca1 (compiled layer rode along in sibling 0f1e189); probe .matilda/probe/tpp-num-dbltap.mjs
+description: auspol-tracker — the redesign front-page two-party hero (rd-hero.jsx, section.rd-tpp) — the chart a visitor actually sees: it draws Labor's share vs BOTH rivals at once (main + "other" line with "v Coalition"/"v One Nation" END labels), the "Compare published 2PP" overlay ("As published"/"Implied" end label), and the ON-flow sensitivity bracket whose `edge:true` renders its TOP edge as a PHANTOM second dotted line (renderer strokes area top-edges dashed; fill invisible at .rd-sens opacity .1) — restyled 1px/"1.8 3"/0.35 on 2026-09-28 via new parametric area options edgeWidth/edgeDash/edgeOpacity. Event markers are the UNION of keptEvents since the same day (user wanted identical markers on every matchup pill). SINCE 5bf0e64 (2026-10-02) a second overlay family "Compare outside estimates" draws BludgerTrack + a Bonham-method replica as muted-ink custom-dash series kbonham ("7 4", var(--ink-3)) / btrack ("1.6 3.4", var(--ink-2)) behind a Coalition-contest-only toggle (state local to RdHero) — full system map in auto-skill-auspol-external-aggregate-overlays. Renderer dash encodings trap: dashed SERIES encode stroke-dasharray "6 6", area EDGES default "4 4"/custom — probe assertions must match the right pattern. Pinned by .matilda/rd-tpp-hero-probe.mjs (14 checks). Double-press figure flip: numPress (pointerdown pairing 500ms/30px, gated on .rd-tpp-num only, second-press preventDefault kills digit selection) steps the matchup one slot via chooseMatchup — shipped ada1ca1 (compiled layer rode along in sibling 0f1e189); probe .matilda/probe/tpp-num-dbltap.mjs
 source: auto-skill
 extracted_at: '2026-09-28T06:34:26.389Z'
 ---
@@ -141,6 +141,30 @@ OPT-IN TrendChart prop (08b413e7):
   same primaries); ALP–ON has its own `latest.onImp.band`, no second
   bracket.
 
+## Outside-estimates overlay ("Compare outside estimates", 2026-10-02)
+
+Second overlay family, siblings the cmp block (data map +
+auto-skill-auspol-external-aggregate-overlays for the extractors/replica):
+
+- `showExt` state is LOCAL `useState` in RdHero (unlike showSynth, which
+  two hero layers share). `extOn = showExt && extAvail && !morph`;
+  `extAvail = shown === "alp_lnp" && (bt || replica present)` — the
+  checkbox and lines exist ONLY on the Coalition contest; flipping
+  contests hides them but the tick survives and re-arms.
+- Two series pushed before `main`: `kbonham` (bonham replica, var(--ink-3),
+  custom `dash: "7 4"`, desktop endLabel "Bonham (rebuilt)") and `btrack`
+  (BludgerTrack as-published, var(--ink-2), `dash: "1.6 3.4"`, endLabel
+  "BludgerTrack"). Renderer dash-encodings list below gains a third case:
+  custom `s.dash` strings land verbatim as stroke-dasharray.
+- Desktop check sits INSIDE RdTabs after the synth check; narrow below
+  the chart (both `label.rd-check`). Key/copyKey/narrow in-chart legend
+  all gain dash entries; RdFoot provenance sentence gated on extOn;
+  y-window folds comparator values in on the standing 5-pt lattice
+  (probe asserts ticks DON'T move).
+- Probe: `.matilda/probe/hero-ext-compare.mjs` (26 checks, gitignored).
+  Trap in it: RdQPop stays OPEN across a basis morph — re-opening it
+  toggles it SHUT; only click .rd-qbtn when `.rd-qpanel` is absent.
+
 ## X axis (election tick, 2026-09-30)
 
 - xTicks now run through `rdElectionTicks(xDomain, narrow, elec.x)` (from
@@ -172,7 +196,9 @@ OPT-IN TrendChart prop (08b413e7):
 ## Renderer dash encodings (08b413e7 — THE probe trap)
 
 - Dashed SERIES: `strokeDasharray={s.dash || (s.dashed ? "6 6" : "none")}`
-  (~:1286) — so solid trend paths also carry the literal "none" attribute.
+  (~:1286) — so solid trend paths also carry the literal "none" attribute,
+  and a custom `s.dash` string lands VERBATIM (comparators: `kbonham`
+  "7 4", `btrack` "1.6 3.4" — probe attributes, not "6 6").
 - Area EDGES: "4 4" by default, or the area's edgeDash (~:1089-1092).
 - Event rules: class `.evt-line`, dashed by CSS ("1 3" in rd.css).
 A 2026-09-28 probe "failure" was the probe expecting "4 4" for the compare

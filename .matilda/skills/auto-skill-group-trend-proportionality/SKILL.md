@@ -120,3 +120,15 @@ stay silent.
 - When reporting subgroup "climbs/falls", quote fitted start→end
   levels for BOTH the group and the anchor side by side — the pair
   makes the proportionality call legible to a reader instantly.
+
+## The Info glossary now describes THIS engine (synced 2026-10-02)
+
+The vote-by-group glossary entry (id "vote-by-group" in the d1a1d215
+asset) explains the §7gb test in its "Changes over time" prose + working
+formula — two fits, gap and ln-ratio, both |t| = 1.96, w = (1.96 ÷
+margin)² floored 0.5, months − 2 df, < 5 readings untested, ≤ 7 thin. If
+§7gb ever changes, that entry must move with it — it silently described
+the retired per-poll `αₕ + βtᵢ` regression for three days after the
+2026-09-29 engine swap until a reader asked whether the test was
+explained in Info. See auto-skill-auspol-glossary-terms's
+"Engine-describing copy rots" section.

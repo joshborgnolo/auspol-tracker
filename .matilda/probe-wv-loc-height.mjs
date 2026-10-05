@@ -1,12 +1,14 @@
-/* Probe: on laptop, the Who-votes "Place" tab's By-location chart plot runs
-   the full height of the 2x2 state grid beside it (rd-panels.jsx measures
-   .rd-wv-panels and sizes the location TrendChart to grid + its t/b pads,
-   pads t12+b30 = 42px). Asserts at 1440 and 820:
+/* Probe: on laptop, the Who-votes "Place" tab's By-location chart x axis
+   lands on the same line as the bottom row's x axes in the 2x2 state grid
+   beside it (rd-panels.jsx measures .rd-wv-panels and sizes the location
+   TrendChart to grid + 8 (.rd-wv-panels margin-top) + (its own b 30 −
+   panels' b 24) = grid + 14). An axis line sits at svg bottom − b pad.
+   Asserts at 1440 and 820:
      - the two cards sit side by side (same row),
-     - the location svg height == grid height + 42 (+-1.5px rounding),
-     - the svg is noticeably taller than the old fixed 260px;
+     - the location svg top sits 8px above the grid's top,
+     - the location x axis matches each bottom-row panel's +-1.75px,
    and at 390 (phone) the cards stack and the chart keeps its fixed 240px.
-   Also re-asserts the desktop equality after a party-chip morph (ALP). */
+   Also re-asserts the alignment after a party-chip morph (ALP). */
 import puppeteer from "puppeteer-core";
 import fs from "fs";
 import path from "path";
@@ -39,19 +41,34 @@ const measure = () => page.evaluate(() => {
   const state = cards.find((el) => el.querySelector(".rd-wv-panels"));
   const loc = cards.find((el) => !el.querySelector(".rd-wv-panels"));
   if (!state || !loc) return { missing: true };
-  const grid = state.querySelector(".rd-wv-panels").getBoundingClientRect();
+  const gridEl = state.querySelector(".rd-wv-panels");
+  const grid = gridEl.getBoundingClientRect();
   const svg = loc.querySelector("svg.chart-svg").getBoundingClientRect();
+  // the last two .rd-wv-panel svgs are the grid's bottom row
+  const bottomRow = [...gridEl.querySelectorAll(".rd-wv-panel")].slice(-2)
+    .map((p) => p.querySelector("svg.chart-svg").getBoundingClientRect());
   const s = state.getBoundingClientRect(), l = loc.getBoundingClientRect();
-  return { gridH: grid.height, svgH: svg.height, sTop: s.top, lTop: l.top, sBottom: s.bottom, lLeft: l.left, sRight: s.right };
+  // an x-axis line sits at svg top + height − the chart's b pad (loc 30, panels 24)
+  const locAxis = svg.top + svg.height - 30;
+  const rowAxis = bottomRow.map((r) => r.top + r.height - 24);
+  return { svgTop: svg.top, gridTop: grid.top, gridH: grid.height, svgH: svg.height,
+           locAxis, rowAxis, sTop: s.top, lTop: l.top, sBottom: s.bottom };
 });
+
+const axisChecks = (m, where) => {
+  check(!m.missing, `both Place cards render${where}`);
+  check(Math.abs(m.svgTop - (m.gridTop - 8)) <= 1, `location svg top 8px above the grid's top${where} (${m.svgTop?.toFixed(1)} vs ${m.gridTop?.toFixed(1)})`);
+  m.rowAxis.forEach((a, i) => check(Math.abs(m.locAxis - a) <= 1.75,
+    `location x axis on bottom-row chart ${i + 1}'s${where} (${m.locAxis?.toFixed(1)} vs ${a?.toFixed(1)})`));
+};
 
 console.log("desktop 1440:");
 await openPlace(1440);
 let m = await measure();
-check(!m.missing, "both Place cards render");
+axisChecks(m, "");
 check(Math.abs(m.sTop - m.lTop) <= 2, `cards share a row (tops ${m.sTop?.toFixed(1)} vs ${m.lTop?.toFixed(1)})`);
-check(Math.abs(m.svgH - (m.gridH + 42)) <= 1.5, `location svg ${m.svgH?.toFixed(1)} == grid ${m.gridH?.toFixed(1)} + 42 pads`);
 check(m.svgH > 300, `svg actually stretched (${m.svgH?.toFixed(1)} > 300, was 260)`);
+check(Math.abs(m.svgH - (Math.round(m.gridH) + 14)) <= 1, `svg height == round(grid)+14 (${m.svgH?.toFixed(1)} vs ${m.gridH?.toFixed(1)})`);
 
 // party morph keeps the contract
 await page.evaluate(() => {
@@ -60,14 +77,13 @@ await page.evaluate(() => {
 });
 await new Promise((r) => setTimeout(r, 700)); // intentional-sleep: party morph runs ~320ms, then RO re-measures
 m = await measure();
-check(Math.abs(m.svgH - (m.gridH + 42)) <= 1.5, `after party switch: svg ${m.svgH?.toFixed(1)} == grid ${m.gridH?.toFixed(1)} + 42`);
+axisChecks(m, " after party switch");
 
 console.log("desktop 820:");
 await openPlace(820);
 m = await measure();
-check(!m.missing, "both Place cards render at 820");
+axisChecks(m, " at 820");
 check(Math.abs(m.sTop - m.lTop) <= 2, `cards share a row at 820 (tops ${m.sTop?.toFixed(1)} vs ${m.lTop?.toFixed(1)})`);
-check(Math.abs(m.svgH - (m.gridH + 42)) <= 1.5, `at 820 svg ${m.svgH?.toFixed(1)} == grid ${m.gridH?.toFixed(1)} + 42`);
 
 console.log("phone 390:");
 await openPlace(390);

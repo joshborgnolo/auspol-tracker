@@ -221,6 +221,54 @@ didn't quote are cut. Implementation on the Undecided panel
   confirm `git status --short index.html .build/newtracker/assets/` is
   empty (zero drift), push again.
 
+## The sixth form: a significance-gated dictated clause (fd7f474)
+
+2026-10-01, Decidedness by-party sub-head. The user dictated
+"Coalition voters have softened while One Nation voters have hardened
+since July 2025 — keeping it dynamic, e.g. if One Nation's softness
+ceases to have changed significantly, just say 'Coalition voters have
+softened since July 2025'" (then reordered the clauses in the same
+message: "actually make it: 'Coalition voters have softened since July
+2025, while One Nation voters have hardened'"). The replacement is not a
+freeze, re-link or compositor: the dictated sentence becomes a TEMPLATE
+whose OPTIONAL tail clause fires only while the panel's own significance
+test flags the underlying move:
+
+```js
+const onpRow = rows.find((r) => r.id === "onp");
+const onpTail = onpRow && onpRow.sig && biggest && biggest.id !== "onp"
+  ? ", while One Nation voters have " + (onpRow.now < onpRow.base ? "softened" : "hardened") : "";
+const sub = biggest ? … + " since July 2025" + onpTail : "No party’s voters have softened significantly since July 2025";
+```
+
+Lessons that hold for any new gated clause:
+
+- **The dictated full sentence is a POSSIBLE RENDER, not today's render.**
+  Reproduce the gate against the live payload BEFORE shipping and quote
+  the sentence the user will actually see: on 2026-10-01 only lnp was
+  significant, so the page said "Coalition voters have softened since
+  July 2025" — the dictated "; while One Nation…" tail was correct to be
+  SILENT (ON's 51.8→56.2 move sat inside its pooled margins). The user's
+  fallback example exactly described the current render. Recipe (window
+  shim on the data asset) is in
+  auto-skill-auspol-decidedness-panel.
+- **Significance kinds must match the panel's**, not a fresh test of
+  your own devising — here `aparat` on gen-data's pooled ci95s (3-wave
+  pools both ends), i.e. the very `r.sig` the by-party rows already
+  carry; reuse the row's computed flag rather than re-deriving it.
+- **De-duplicate against the lead clause**: when the tail subject is
+  itself the biggest mover (`biggest.id === "onp"`), the lead clause
+  already names it — the tail must NOT append a second mention.
+- **Direction verbs ride the same switch as the lead** (softened/firmed
+  from now<base), even when the user names a single direction in their
+  example — they sense-check the today's-wording, not the grammar.
+- When the dictation also renames a temporal anchor ("mid-2025" →
+  "July 2025"), grep for the old wording ACROSS the panel — the same
+  window is named by the ShiftPlot source line and dot key (left
+  as-is by scope, flagged in the reply). The exact-dates key
+  ("Mid-2025 (19–30 Jun to 25 Sep–7 Oct)") is generated and stays
+  authoritative; the nominal phrasing is what moves.
+
 ## The un-freeze, an eighth form (issues trustDek, 2026-10-05)
 
 The reverse of the freeze: the user quotes the curated string and says
@@ -272,3 +320,4 @@ via `dek: trustDek`):
 - **Leave the framework intact for a RE-FREEZE.** The head (`trustHead`)
   stayed data-driven through the freeze and the un-freeze; either
   direction of curation touches only the `trustDek` binding, one hunk.
+

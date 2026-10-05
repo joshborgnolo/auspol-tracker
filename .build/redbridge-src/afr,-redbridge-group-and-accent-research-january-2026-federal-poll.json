@@ -11,5 +11,6 @@
   "afrUrl": null,
   "extractedAt": "2026-08-29T07:05:08.065Z",
   "table1Error": "preference-split table (Table 1) not found",
-  "table1OnError": "preference-split table (Table 1) not found"
+  "table1OnError": "preference-split table (Table 1) not found",
+  "firmnessError": "vote-softness table is not the wide six-group layout"
 }

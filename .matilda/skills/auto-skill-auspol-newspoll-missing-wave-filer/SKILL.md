@@ -75,8 +75,9 @@ rules — the filer is a separate contract, not an exception carved into theirs.
 - **The 3-day value.** Anchored to the 2026-08-28 wave that sat as a candidate for 4
   days and motivated the chain — gives the extractor its Sun×2/Mon/Tue slots plus the
   repair agent before any LLM touches data.
-- **matilda-CLI pin sites are now FOUR**: poll-agent.yml, roymorgan-update.yml,
-  coverage-check.yml, and newspoll-watch.yml (the file-missing job). Bump together —
+- **matilda-CLI pin sites are now FIVE**: poll-agent.yml, roymorgan-update.yml,
+  coverage-check.yml, newspoll-watch.yml (the file-missing job), and healer.yml
+  (2026-10-02 — the layout healer's `file` job). Bump together —
   see auto-skill-ci-main-writer-races.
 
 ## Testing it (all local, no CI)
@@ -105,6 +106,10 @@ territory already.
 
 ## Cross-refs
 
+- `auto-skill-auspol-layout-healer` — the NEXT filing agent (shipped 2026-10-02): the
+  filer's trust pattern (breaker, pinned CLI, prompt-as-contract, alert-issue) reused,
+  but the healer's trigger is an exit-2 GUARD TRIP on an intact fetch, not a missing
+  wave, and its trust class is lower — review branch + human, never a commit to main.
 - `auto-skill-newspoll-extraction` — the extractor, rung A/B spec, the watchdog's
   original detect-only contract, canonical row conventions the filer must mirror.
 - `auto-skill-ci-main-writer-races` — per-workflow queues + the push_main system

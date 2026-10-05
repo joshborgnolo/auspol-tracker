@@ -60,6 +60,30 @@ national-direction heal; the traps below cost four broken probes.
 - Rebuild caveats: `build.mjs` may leave other hashed assets (e.g. `cycle-source.<hash>.json`)
   at the same name — their absence from `git status` is normal, not a failed build.
 
+## Audit a UI GATE'S precondition offline before probing it in the browser
+
+When a UI element/state is gated on a data condition (a toggle that appears
+"when favourability is available", a pill that shows "when the window mixes
+metrics"), a browser probe that can never reach the state is DIAGNOSTIC,
+not flaky — don't keep re-clicking. First replay the gate offline over the
+evaluated bundle: `new Function("window", src)({})` → `window.AUSPOL`, then
+iterate `individualPolls` implementing the JSX predicate exactly and count
+what fires. Worked 2026-10-01 (metric-toggle, commit 59436ee): the planned
+trigger was "window whose wave pairs carry both metric stamps" — the offline
+replay printed 0, because `metricOf` is keyed per (firm,leader) with
+FAV_FIRMS firm-wide, so a mixed pair window is structurally impossible; the
+real signal was `appr.alt`, gen-data buildAppr's second-question channel
+(`sp.fav` from a row's `detail`, NOT polls.json `splits.fav` — polling
+polls.json shows 0 rows and misleads). Zero-fire = redesign the gate around
+what the payload actually carries (here: `appr.alt` exists today only at
+Resolve, 6 waves), THEN reopen the browser probe. Rule of thumb: when a
+zero-match replay contradicts a worked example in a request AND the
+predicate is one step removed from the emitted payload (here, pair gates on
+`metricBy` instead of the raw `alt` field), trust the payload. Also read
+gen-data's own assembler for the const before trusting any polls.json view
+of it — the bundle's `appr.alt` is assembled from `detail`, invisible in
+`approval[].splits`.
+
 ## Adjacent gotchas
 
 Grepping the built `index.html` for curly-typography copy returns zero matches even when

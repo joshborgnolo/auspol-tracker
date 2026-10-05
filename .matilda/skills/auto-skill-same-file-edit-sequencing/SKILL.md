@@ -1,8 +1,8 @@
 ---
 name: same-file-edit-sequencing
-description: Matilda edit tool — two edit calls against the SAME file in one assistant turn race and one edit is silently lost (the second call's write appears to be computed from the pre-edit buffer; its success result still prints, so nothing errors). Observed 2 Sep 2026: a windowItems insertion into sim-next-polls.mjs vanished when a cadSlip edit in the SAME block landed — caught only because the sim then printed the old ticker behaviour and 6 expectations failed. Sequence same-file edits one call per message, and after any multi-edit turn grep for one marker line from EACH edit.
+description: Matilda edit tool — two edit calls against the SAME file in one assistant turn race and one edit is silently lost (the second call's write appears to be computed from the pre-edit buffer; its success result still prints, so nothing errors). Observed 2 Sep 2026: a windowItems insertion into sim-next-polls.mjs vanished when a cadSlip edit in the SAME block landed — caught only because the sim then printed the old ticker behaviour and 6 expectations failed. Sequence same-file edits one call per message, and after any multi-edit turn grep for one marker line from EACH edit. Inherited variant (2026-10-01): the damage outlives the turn — resuming a sibling's uncommitted WIP found four call sites of rdPinScrollBy/RD_SCROLL_TO with zero definitions in tree OR build (the authoring edit never landed); resume protocol = identifier-closure check on the dirty diff (grep usages vs definitions in working file + git show HEAD:<file> + repo), read the author's uncommitted auto-skill SKILL.md diffs in the same git status as the spec for the lost hunk, rebuild and grep the ARTIFACT for the definitions too, and smoke the user's pending manual step headlessly before handing it over.
 source: auto-skill
-extracted_at: '2026-09-02T06:10:00.000Z'
+extracted_at: '2026-10-01T01:00:15.147Z'
 ---
 
 # Same-file edits must be sequential, not parallel
@@ -47,3 +47,37 @@ went green immediately. The cost of sequencing is one extra round-trip per
 edit; the cost of the clobber was a full confused debug loop that could
 just as easily have been burned "fixing" perfectly correct expectations
 against a file that silently reverted.
+
+## Inherited variant: resuming a sibling's torn WIP (2026-10-01)
+
+The clobber's damage outlives the turn that caused it. User asked to
+resume a sibling session's uncommitted Safari-pin instrumentation
+(rd.jsx): the working tree AND the rebuilt index.html both carried FOUR
+call/log sites of `rdPinScrollBy(drift)` and `RD_SCROLL_TO` with ZERO
+definitions anywhere — the authoring edit for the helpers never landed,
+nothing had errored, and the user's pending manual step (paste a console
+snippet against localhost) would have hit a first-pin ReferenceError.
+
+**Resume protocol for uncommitted WIP (sibling or own compacted session):**
+
+1. **Identifier-closure check on the dirty diff.** `git diff` the modified
+   source, list every identifier the diff *uses* that the diff doesn't
+   define, and grep each one through (a) the working file, (b)
+   `git show HEAD:<file>`, (c) the repo. A usage with no definition in any
+   of the three = a lost edit, exactly the pattern above. Nothing clinches
+   it by absence of errors — the file reads fine in isolation.
+2. **The author's own uncommitted skill notes are the spec.** The dirty
+   set included the sibling's freshly-updated auto-skill SKILL.md whose
+   history paragraphs described the intended-but-missing scaffolding
+   ("?rdscroll=to A/B routes the two correction sites through scrollTo vs
+   scrollBy") precisely enough to re-derive the lost hunk. Read the skill
+   diffs in the same `git status` before writing anything.
+3. **Check the BUILT artifact too.** index.html had already been rebuilt
+   onto the torn source and carried the same holes — after repairing the
+   source, rebuild and grep the artifact for the definitions, not just
+   the usages.
+4. **Smoke the user's pending manual step headlessly first.** A
+   one-click probe (`.matilda/dbg-pin-taps.mjs`, Chrome headless against
+   the localhost serve) was already in the sibling's scratch kit; running
+   it — plus its A/B variant — proved both modes populate their log
+   before telling the user to spend their turn in Safari's console.

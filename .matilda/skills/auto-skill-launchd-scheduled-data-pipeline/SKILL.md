@@ -73,14 +73,30 @@ and federal MRPs occasionally.
 Newspoll (`local.auspol.newspoll`) and RedBridge (`local.auspol.redbridge`) are both INSTALLED
 as of 2026-08-29 — Newspoll with extractor+wrapper commit `8cf633d`, RedBridge later the same
 day straight from its repo-prepared plist (`cp` + `bootstrap`, manual wrapper smoke run exit 0,
-`changed:false` with all existing waves `verified`). RedBridge schedule: Sun 06:00 plus daily
-06:00 across the 28th–4th month-window (monthly AFR release lands on the first-weekend Sunday);
-status `RB_STATUS`. Newspoll releases land roughly every
-~3 weeks, Sunday evening ~20:00 AEST (canonical `published` values). `.build/newspoll-updater.sh`
-mirrors `roymorgan-updater.sh` one-for-one (status `NP_STATUS`; add-list
-`data/polls.json .build/newspoll-src/ index.html feed.xml sitemap.xml robots.txt` plus
-`assets/auspol-card.png assets/auspol-card.json` since 2026-08-31; commit
-`Update Newspoll data <date>`), plist with Sun 19:00 + 22:30, Mon 06:00, Tue 06:00, Thu 06:00.
+`changed:false` with all existing waves `verified`).
+
+Schedules as of 2026-10-05 (commit `1de87e8`, user call "can you make it run at 5 and 10 mins
+too" — the launchd release-night reader used to probe only at +20 min after release):
+
+- RedBridge: Sun 06:00; daily 06:00 across the 28th–4th month-window; Mon 07:30; and dense
+  release-night probes Sun 18:05/18:10/18:20 + 19:00 + 20:05/20:10/20:20 + 21:30 — AFR posts
+  the chart ~18:00 (some months ~20:00), so each release hour carries +5/+10/+20 slots. Status
+  `RB_STATUS`.
+- Newspoll: Sun 19:00, 20:05/20:10/20:20 (+5/+10/+20 around the ~20:00 Sunday release from
+  canonical `published` values), 21:15, 21:45, 22:30; Mon/Tue/Thu 06:00. Releases land roughly
+  3-weekly. Status `NP_STATUS`; `.build/newspoll-updater.sh` mirrors `roymorgan-updater.sh`
+  one-for-one (add-list `data/polls.json .build/newspoll-src/ index.html feed.xml sitemap.xml
+  robots.txt` plus `assets/auspol-card.png assets/auspol-card.json` since 2026-08-31; commit
+  `Update Newspoll data <date>`).
+
+Why these probe times live ONLY in the launchd plists: the release-night reader is each house's
+Chrome article pass (`extract-redbridge-afr.mjs` files the wave from the AFR chart via the
+logged-in Chrome; Newspoll has the equivalent Chrome read + Matilda reader), and Chrome runs
+only on this laptop — there is no CI cron slot that can do that read, so "when does the wave
+land on release night" is answered from and tuned in these plists. Cost evidence for the
+density: a quiet launchd slot costs one sitemap/RSS fetch (already-read articles are skipped
+via `afr-seen.json` and the seen-list), so +5/+10/+20 sibling slots are free in practice — the
+worked expression of the "cheap slot, don't move the early ones" calibration rule below.
 
 ## Wrapper script pattern (`.build/resolve-rpm-updater.sh`)
 
