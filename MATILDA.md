@@ -12,6 +12,8 @@ a GENERATED build artifact — never hand-edit it.
     (~lines 100–300)
   - `build.mjs` — builder; rebuild with `node .build/newtracker/build.mjs`
   - `validate.mjs` — validation: `node .build/newtracker/validate.mjs`
+    (errors are repeated after the documented-exceptions block — CI keeps
+    log tails, where ~270 exception lines had pushed ERRORS out of view)
   - `render-card.mjs` — og:share card redraw (needs `puppeteer-core` +
     `CHROME` env)
 - `data/polls.json` — canonical poll rows (never hand-edit; extractors write it)
@@ -47,7 +49,11 @@ a GENERATED build artifact — never hand-edit it.
     rewrites it (`--apply`; `--check` for drift); `schedule-tune.yml` runs
     it after every updater completes and weekly for the DST offset, pushing
     under the `SCHEDULE_TUNER_TOKEN` PAT (GITHUB_TOKEN can't touch workflow
-    files; the weekly run warns three weeks before it expires). Never
+    files; the weekly run warns three weeks before it expires). Recipes
+    beyond the dense comb: `slip` (a lighter every-20-min comb the day
+    after the habit day — Roy Morgan and Resolve, whose releases
+    sometimes slip a day) and `medianComb` (DemosAU's daily comb over
+    Capital Brief's filing minutes). Never
     hand-edit inside the markers — change the recipe in the script.
   - GitHub's cron ran those blocks 2–5h late at the median in Sep 2026. The
     tuner also writes `.build/dispatch-clock/schedule.json` (the same slots,
@@ -104,11 +110,91 @@ a GENERATED build artifact — never hand-edit it.
   poll-agent.yml passes `MATILDA_API_KEY`; without it (forks, PRs, the
   laptop launchd copies) every case is skipped and the extractors behave
   exactly as before. Pinned by `test-adjudicate.mjs`.
-- `.build/extract-essential-report.mjs` runs a PREFLIGHT before its
-  ~10-minute crawl: the REST listings' (id, modified) pairs are hashed into
+- LLM READERS (cite-then-verify; shipped 2026-10-04/05 by a second
+  agent): where a source's figures defeat a regex parser, the FILING
+  path runs Matilda — but Matilda never supplies a number the pipeline
+  keeps. `.build/<house>-read-prompt.md` has the model cite, per figure,
+  the paragraph (or OCR line) and the exact words;
+  `.build/<house>-read.mjs` keeps a figure only if (1) the quote is
+  verbatim in the cited text, (2) the figure is among the quote's
+  numbers, (3) the sentence — or the one before, for a pronoun — names
+  what it measures (never an issue-rating sentence, never the
+  three-way PPM for the two-way), and (4) the printed change it reports
+  reconciles with the PREVIOUS committed wave ("fell from 29 to 27",
+  OCR'd "(+1)" brackets); arithmetic checks (sat−dis = net, Σ ≤ 100)
+  run behind. An unverified figure files NOTHING — the deterministic
+  path (regex parser, house PDF, exit-3 hand-entry prompt) continues as
+  before. `.build/matilda-json.mjs` is the shared call: the CLI on PATH,
+  else the pinned package where MATILDA_API_KEY is set, one retry;
+  unavailable → deterministic fallback, never a hard dependency. Houses:
+  - NEWSPOLL — `newspoll-read.mjs` (+`test-newspoll-read.mjs`), used for
+    stories on a wave not yet on the site, ≤6 reads a run, publisher
+    first, readings cached in `newspoll-src/readings/`; the regex parser
+    still supplies date window and sample and is the whole fallback
+    (no CLI, or `NP_READER=regex`), and the merge, Infogram and
+    cross-outlet guards stand unchanged behind it. Backtest Jul
+    2025–Sep 2026: verified figures 174 right / 0 wrong (regex: 95/34).
+    The laptop job reads The Australian through the user's Chrome
+    (newspoll-updater.sh sets NEWSIE_CHROME=1); the topic page — free
+    headlines behind the same cookie check as News24's — reads through
+    `fetchWithCookies`, and committed-wave stories are skipped, so a
+    quiet laptop run opens no Chrome tabs.
+  - DEMOSAU — `demosau-read.mjs` (+`test-demosau-read.mjs`): the Capital
+    Brief article (free text, ~18h before DemosAU's methodology PDF)
+    FILES the wave when all five primaries reconcile with the previous
+    wave (every primary needs the quoted change, or a second verbatim
+    quote's change phrase; prose alone never files a figure). The row
+    carries `fieldworkPending: true` with a provisional window
+    (CB_FIELD_LAG/CB_FIELD_SPAN = the Jul–Sep release habit) that places
+    it on the charts and in the headline — every visible fieldwork
+    label instead says "Fieldwork TBC", linked to the house's
+    methodology-statements page (gen-data §6 emits fieldPending/fieldUrl
+    on individualPolls and pollsterTable) — and `samplePending: true`
+    when the article states no n. When the PDF lands the match writes
+    the real window and sample IN PLACE and drops the flags
+    (status.fieldworkFilled). validate.mjs excuses `fieldwork-pending`
+    and FAILS the flag on a row that already has its methodUrl.
+  - REDBRIDGE/ACCENT — `extract-redbridge-afr.mjs` (+`test-redbridge-afr.mjs`,
+    `.build/ocr-image.swift`): AFR's Sunday 18:00 article, 4–6 days
+    before Accent's PDF; the key figures (Coalition primary, Other, the
+    ALP-v-Coalition 2PPs) exist only as pixels in the chart image.
+    Images are read by macOS Vision OCR (compiled on demand; at 1600px —
+    at 960 it once read "9 (0)" as "90"; a lone "O" is a zero). Matilda
+    names WHICH OCR LINE holds each figure; a headline figure is kept
+    only if its printed bracketed change reconciles with the previous
+    committed wave — a printed change that does NOT reconcile rejects
+    outright (leader figures and the ALP-v-ON 2PP may instead be backed
+    by a prose sentence stating the same number; primaries and the
+    ALP-v-Coalition 2PPs may not). Filing then needs all five primaries
+    plus the respondent 2PP verified AND extract-redbridge.mjs's own
+    guardNewWave (RB_LIB lib mode — the healer's import pattern);
+    anything less files nothing and the Accent PDF fills the wave as
+    before (its pass matches the wave, verifies field by field, and
+    firstSight-fills tpp_flows, favourability detail and missing leader
+    rows). Settled articles sit in `redbridge-src/afr-seen.json` so
+    slots don't reopen them. In CI (2026-10-05): a ~1s Ubuntu `afr-gate`
+    job (`--discover-only`) starts the `afr` job's macos-15 runner only
+    when a story is pending — poll-agent.yml gained a pinned `runner`
+    input for this (default ubuntu-24.04; test-workflows pins both
+    labels) — and `redbridge-afr-updater.sh` runs the usual
+    discover → chart → validate → build → push_main path. The laptop job
+    stays installed; whichever files first wins, the other finds the
+    wave committed.
+- `.build/extract-essential-report.mjs` runs a PREFLIGHT before its crawl:
+  the REST listings' (id, modified) pairs are hashed into
   `.build/essential-src/site-fingerprint.json` (committed by the wrapper);
   the crawl runs only when that moved, the newest report is under 3 days
-  old, or `--force`. A skipped run says `crawl: "skipped"` in its status.
+  old, or `--force`. Since 2026-10-05 the crawl is INCREMENTAL: the
+  fingerprint keeps every page's `modified`, and a crawl re-reads only the
+  pages that moved plus reports inside RECENT_REPORT_DAYS (3d — a
+  Flourish chart can fill after the post); the merge is a union, so rows
+  from unre-read pages stand. A quiet or release-night run now takes
+  seconds, not the ~10-minute full crawl of ~1,050 pages every run used
+  to cost (its long writers-queue holds got other houses' runs
+  cancelled). A FULL crawl still runs on `--force`, with no per-page
+  record, or when the last one is FULL_EVERY_DAYS (7) old — the net for
+  a Flourish chart edited on a page whose `modified` never moved.
+  Status: `crawl: "full" | "incremental" | "skipped"`.
 - Wikipedia's federal polling table is read by TWO scripts — `check-coverage`
   (dates only) and `extract-news24` (YouGov's News24-only waves). Its layout
   changed on 2026-09-11 (rowspan data-cell dates; IND+OTH merged into one
@@ -141,9 +227,21 @@ a GENERATED build artifact — never hand-edit it.
   extractor + updater + plist + workflow + repair-prompt kit, modelled
   on Spectre's a584829) is human work — agent as scaffolding, not
   permanent infrastructure.
-- `news24-update.yml` (2026-09-22) runs the YouGov updater in the cloud —
-  Chrome leg off under GITHUB_ACTIONS; the launchd job with Chrome upgrades
-  News24-only rows in place later.
+- `news24-update.yml` (2026-09-22) runs the YouGov updater in the cloud.
+  News24's "Nocookies" wall is an Akamai COOKIE-CHECK redirect (a 302 to
+  /remote/check_cookie.html that sets a cookie and redirects back), passed
+  since 2026-10-05 by `fetchWithCookies` in `extract-common.mjs` (a
+  per-call cookie jar + manual redirects — `test-fetch-cookies.mjs`);
+  Chrome stays the fallback (off under GITHUB_ACTIONS), and the launchd
+  job with Chrome upgrades News24-only rows in place later. Discovery no
+  longer waits on Wikipedia either: `pulseWaves()` reads News24's own
+  Pulse topic page and a story whose Infogram embeds carry voting
+  intention plus a fieldwork window becomes a wave through the same
+  merge, enrichment, cross-checks and guard as a Wikipedia-found one. A
+  wave whose article states no sample files with `samplePending`;
+  `extract-sampleeff.mjs` fills n from YouGov's APC methodology
+  statement — the only authority for YouGov samples (no Wikipedia or
+  prose stand-in).
 - `.github/workflows/agent-repair.yml` — the CENTRAL Matilda repair agent.
   A watched workflow failing on main triggers it (workflow_run); tests,
   site-check, newspoll-watch, citation-check and schedule-tune are
@@ -251,3 +349,7 @@ relevant one before touching an area. Most load-bearing:
 3. Never weaken extractor guard checks.
 4. Pollster copy/methodology text often lives in 2–4 places that must move
    together — check the relevant skill before editing copy.
+5. An LLM may LOCATE evidence but never supply a figure on the filing
+   path: every number it touches is re-read from the cited text and
+   verified deterministically before it can land (see LLM READERS);
+   weakening that verification IS weakening a guard check (rule 3).
