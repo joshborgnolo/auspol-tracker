@@ -334,6 +334,29 @@ the last month's x can shadow the monthly hover in a probe — the wave
 hit-target wins the tip (`hv && !tip`), so walk the pointer column to an
 x-off-dot row before asserting the monthly tip.
 
+## RdFlowChart — the hit-shadow contract (painted-over layers are click-through)
+
+Shipped 2026-10-05 (user: "if the poll dots line up with the month line
+they are not selectable by hover"). The wave dots' `.rd-apd-hit` circles
+(r=8) are painted BEFORE the month line, end dots, pick line, guide and
+axis — each default `pointer-events: visiblePainted` — so a dot sitting on
+any of them kept its pixels dead to `onPointerEnter` (the svg's month
+`onMouseMove` answered instead). Baseline: 9 of 177 hit circles shadowed
+at centre (7 by `.rd-fl-line`, 2 by the `.rd-fl-enddot` over the clamped
+RedBridge 2 Oct rail dot). Fix in rd.css: `pointer-events: none` scoped
+`.rd-fl-chart` on `.rd-fl-line`, `.rd-fl-enddot`, `.rd-fl-pick`,
+`.rd-dis-guide`, `.rd-dis-base`, `.rd-fl-note`, `.rd-fl-empty` — display
+only there (the month hover comes from the svg's own handler; nothing
+needs pointer events on those layers). Rule: anything rdAllpolls adds
+above the hit circles joins the list; anything that needs a pointer goes
+BENEATH the polls map or stays interactive. `rd-dis-*` scoping keeps the
+discord panel's own guide/base untouched. In a dense clump a later-painted
+neighbour's r=8 circle legitimately wins the centre (any wave tip is
+correct) — the contract is only "never the month tip, never nothing".
+Pinned by `.matilda/probe-flow-drift-dots.mjs` (static: every hit circle's
+centre resolves to a `.rd-apd-hit`; hover: every centre raises a wave
+tip).
+
 ## Check script traps
 
 - `.mjs` already implies ESM — run `node .build/flow-drift-check.mjs`; the
