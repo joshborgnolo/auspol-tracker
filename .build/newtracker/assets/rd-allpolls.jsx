@@ -3022,34 +3022,49 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
      user was seeing the narrow month card replace the wave card, not a
      clean dismiss) */
   window.useDismissOutside(chartBox, !!(tip && tip.src === "touch"), () => { setTip(null); setHv(null); });
-  /* the tips' x clamp is MEASURED on the mounted card, never computed from
-     an assumed width: a static [110, W-110] clamp assumed a half-width of
-     <=110px, but the cards run wider (the vertex qualifier line alone is
-     ~290px), so a phone tip opened past the screen edge (user report
-     2026-10-06). It clamps against the CHART BOX, not window.innerWidth —
-     on a phone an overhanging abspos card widens the layout viewport (the
-     whole page visibly zooms out), so a viewport-based clamp chases a
-     moving target and never converges, while the chart box is a width:auto
-     block that never reads its own overflow. Same marginLeft idiom as the
-     RdAp detail charts. */
+  /* The tips' x clamp is computed IN RENDER from the tip's own measured
+     WIDTH — TrendChart's tipW idiom, and the reason this block is on its
+     second rewrite: the base .tip GLIDES left .15s between positions
+     (site-wide and deliberate — trend readouts chase the pointer), and
+     React reuses the tip node across dot-to-dot opens, so an imperative
+     post-commit clamp (reset marginLeft → measure the rect, the RdAp
+     detail pattern) reads the rect at the glide's START. The user repro
+     2026-10-06: tap a mid dot, then the far-right Essential, then
+     far-left — the correction hung on the OLD position and the card
+     glided 50–90px past the screen edge (probe: [189,420] and [−69,161]
+     of a [20,370] box). Clamping in render keeps every glide frame
+     between two in-bounds positions, and doing it in chart-local px (the
+     svg is width W exactly) means a too-wide card can never widen the
+     phone's layout viewport either — by construction, not by chase.
+     Width is measured per KIND in the LAYOUT effect below (the corrected
+     left lands in the same paint) and kept across closes, since the next
+     tip of a kind carries the same rows; the per-kind halve-fallback
+     seeds a kind's first mount and runs GENEROUS, so the first commit
+     errs toward the centre, never past an edge, and the measured value
+     replaces it before the frame paints. */
+  const FLOW_TIP_HALF = { m: 90, w: 125, v: 155 };
+  const [tipWs, setTipWs] = useState({ m: 0, w: 0, v: 0 });
+  const tipLeft = (kind, px) => {
+    const half = (tipWs[kind] || 0) / 2 || FLOW_TIP_HALF[kind];
+    const h = Math.min(half, W / 2 - 8);   // a card wider than the chart clamps dead centre
+    return Math.min(W - 8 - h, Math.max(8 + h, px));
+  };
   React.useLayoutEffect(() => {
     const el = tipBox.current, box = chartBox.current;
     if (!el || !box) return;
-    el.style.marginLeft = "0px";
+    const kind = tip ? (tip.hd ? "v" : "w") : "m";
+    const w = el.offsetWidth;
+    setTipWs((p) => (Math.abs((p[kind] || 0) - w) > 0.5 ? { ...p, [kind]: w } : p));
+    /* the card hangs UP from top:-6px (translate -100%): right after the
+       chart is scrolled into view — chart top at the screen's top, the
+       classic first-press shape — a tall card (~150px) opened 50+px ABOVE
+       the screen (probe repro −56/−59px). Slide it DOWN until its top
+       clears the 72px sticky-bar scroll-margin + 6. Vertical overhang
+       never widens the layout viewport, so viewport coords are the
+       stable clamp line here — unlike the x clamp, nothing here reads a
+       gliding value. */
     el.style.top = "";
-    const r = el.getBoundingClientRect();
     const b = box.getBoundingClientRect();
-    const off = Math.min(0, b.right - 8 - r.right) - Math.min(0, r.left - (b.left + 8));
-    if (off) el.style.marginLeft = off + "px";
-    /* the card also hangs UP from top:-6px (translate -100%): right after
-       the chart is scrolled into view — chart top at the screen's top, the
-       classic first-press shape — a tall card (vertex qualifier, fieldwork
-       rows, ~150px) opened 50+px ABOVE the screen (the "just first press"
-       side of the same phone report; probe: phone top tips at −56/−59px).
-       Slide it DOWN until its top clears 78px — the 72px sticky-bar
-       clearance the whole site scrolls with, plus breathing room. Vertical
-       overhang never widens the layout viewport, so the box rect's
-       viewport position is a stable clamp line here. */
     const minTop = 78 - b.top + el.offsetHeight;
     if (minTop > -6) el.style.top = Math.round(minTop) + "px";
   }, [tip, hv]);
@@ -3193,7 +3208,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
         {hv && !tip && <circle cx={X(hv.ym)} cy={Y(Math.max(-3.4, Math.min(3.4, hv.v)))} r="4" className="rd-fl-enddot"></circle>}
       </svg>
       {hv && !tip && (
-        <span ref={tipBox} className="tip rd-fl-tip" style={{ left: X(hv.ym) }}>
+        <span ref={tipBox} className="tip rd-fl-tip" style={{ left: tipLeft("m", X(hv.ym)) }}>
           <span className="tip-title">{rdMonthYear(hv.ym)}</span>
           <span className="tip-row"><span className="tip-label">All pollsters</span><span className="tip-val">{s1(hv.v)}</span></span>
           <span className="tip-row"><span className="tip-label">95% interval</span><span className="tip-val">±{hv.ci95.toFixed(1)}</span></span>
@@ -3203,7 +3218,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
       {tip && (() => {
         const { d, px, hd } = tip;
         if (hd) return (
-          <span ref={tipBox} className="tip rd-fl-tip" style={{ left: px }}>
+          <span ref={tipBox} className="tip rd-fl-tip" style={{ left: tipLeft("v", px) }}>
             <span className="tip-title">{hd.h}</span>
             <span className="tip-row"><span className="tip-label">Month</span><span className="tip-val">{rdMonthYear(hd.ym)}</span></span>
             <span className="tip-row"><span className="tip-label">House drift</span><span className="tip-val">{s1(hd.v)}</span></span>
@@ -3213,7 +3228,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
         );
         const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.pollster, released: d.released }) : null;
         return (
-          <span ref={tipBox} className="tip rd-fl-tip" style={{ left: px }}>
+          <span ref={tipBox} className="tip rd-fl-tip" style={{ left: tipLeft("w", px) }}>
             <span className="tip-title">{d.pollster}</span>
             <span className="tip-row"><span className="tip-label">Published minus implied</span><span className="tip-val">{s1(d.v)}</span></span>
             {d.fl != null && <span className="tip-row"><span className="tip-label">Respondent flow to Labor</span><span className="tip-val">{d.fl.toFixed(1)}%</span></span>}

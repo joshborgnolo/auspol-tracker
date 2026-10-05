@@ -87702,16 +87702,33 @@ function RdFlowChart({
     setTip(null);
     setHv(null);
   });
+  const FLOW_TIP_HALF = {
+    m: 90,
+    w: 125,
+    v: 155
+  };
+  const [tipWs, setTipWs] = useState({
+    m: 0,
+    w: 0,
+    v: 0
+  });
+  const tipLeft = (kind, px) => {
+    const half = (tipWs[kind] || 0) / 2 || FLOW_TIP_HALF[kind];
+    const h = Math.min(half, W / 2 - 8);
+    return Math.min(W - 8 - h, Math.max(8 + h, px));
+  };
   React.useLayoutEffect(() => {
     const el = tipBox.current,
       box = chartBox.current;
     if (!el || !box) return;
-    el.style.marginLeft = "0px";
+    const kind = tip ? tip.hd ? "v" : "w" : "m";
+    const w = el.offsetWidth;
+    setTipWs(p => Math.abs((p[kind] || 0) - w) > 0.5 ? {
+      ...p,
+      [kind]: w
+    } : p);
     el.style.top = "";
-    const r = el.getBoundingClientRect();
     const b = box.getBoundingClientRect();
-    const off = Math.min(0, b.right - 8 - r.right) - Math.min(0, r.left - (b.left + 8));
-    if (off) el.style.marginLeft = off + "px";
     const minTop = 78 - b.top + el.offsetHeight;
     if (minTop > -6) el.style.top = Math.round(minTop) + "px";
   }, [tip, hv]);
@@ -87983,7 +88000,7 @@ function RdFlowChart({
     ref: tipBox,
     className: "tip rd-fl-tip",
     style: {
-      left: X(hv.ym)
+      left: tipLeft("m", X(hv.ym))
     }
   }, React.createElement("span", {
     className: "tip-title"
@@ -88015,7 +88032,7 @@ function RdFlowChart({
       ref: tipBox,
       className: "tip rd-fl-tip",
       style: {
-        left: px
+        left: tipLeft("v", px)
       }
     }, React.createElement("span", {
       className: "tip-title"
@@ -88048,7 +88065,7 @@ function RdFlowChart({
       ref: tipBox,
       className: "tip rd-fl-tip",
       style: {
-        left: px
+        left: tipLeft("w", px)
       }
     }, React.createElement("span", {
       className: "tip-title"
