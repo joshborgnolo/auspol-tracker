@@ -3009,8 +3009,12 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
   const tipBox = React.useRef(null);
   /* a touch-opened tip has no pointer-leave, so the next gesture starting
      OUTSIDE the chart puts it away — the shared capture-phase dismiss every
-     panel tip here already uses (user report 2026-10-05) */
-  window.useDismissOutside(chartBox, !!(tip && tip.src === "touch"), () => setTip(null));
+     panel tip here already uses (user report 2026-10-05) — and any stray
+     month-hover goes with it, or the month-guide card swaps IN as the tip
+     card unmounts (the "closes weirdly" half of the 2026-10-06 report: the
+     user was seeing the narrow month card replace the wave card, not a
+     clean dismiss) */
+  window.useDismissOutside(chartBox, !!(tip && tip.src === "touch"), () => { setTip(null); setHv(null); });
   /* the tips' x clamp is MEASURED on the mounted card, never computed from
      an assumed width: a static [110, W-110] clamp assumed a half-width of
      <=110px, but the cards run wider (the vertex qualifier line alone is
@@ -3025,10 +3029,22 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
     const el = tipBox.current, box = chartBox.current;
     if (!el || !box) return;
     el.style.marginLeft = "0px";
+    el.style.top = "";
     const r = el.getBoundingClientRect();
     const b = box.getBoundingClientRect();
     const off = Math.min(0, b.right - 8 - r.right) - Math.min(0, r.left - (b.left + 8));
     if (off) el.style.marginLeft = off + "px";
+    /* the card also hangs UP from top:-6px (translate -100%): right after
+       the chart is scrolled into view — chart top at the screen's top, the
+       classic first-press shape — a tall card (vertex qualifier, fieldwork
+       rows, ~150px) opened 50+px ABOVE the screen (the "just first press"
+       side of the same phone report; probe: phone top tips at −56/−59px).
+       Slide it DOWN until its top clears 78px — the 72px sticky-bar
+       clearance the whole site scrolls with, plus breathing room. Vertical
+       overhang never widens the layout viewport, so the box rect's
+       viewport position is a stable clamp line here. */
+    const minTop = 78 - b.top + el.offsetHeight;
+    if (minTop > -6) el.style.top = Math.round(minTop) + "px";
   }, [tip, hv]);
   const H = phone ? 210 : 250;
   const x0 = phone ? 26 : 40, rpad = phone ? 66 : 76, top = 14, bot = phone ? 178 : 214;
@@ -3071,7 +3087,11 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
   const s1 = (v) => (Math.abs(v) < 0.05 ? "0.0" : rdSigned(v, 1));
   return (
     <div className="rd-fl-chart" ref={chartBox}>
-      <svg width={W} height={H + 12} viewBox={`0 0 ${W} ${H + 12}`} role="img" onMouseMove={onMove} onMouseLeave={() => setHv(null)}
+      {/* hover is MOUSE-ONLY: a touch tap raises compat mousemoves, and a
+          tap-seeded hv left the month-guide tip standing when the wave tip
+          closed (the "closes weirdly" report 2026-10-06). Gate on pointer
+          type, same as the hit circles' pointerenter below. */}
+      <svg width={W} height={H + 12} viewBox={`0 0 ${W} ${H + 12}`} role="img" onPointerMove={(ev) => { if (ev.pointerType === "mouse") onMove(ev); }} onMouseLeave={() => setHv(null)}
            aria-label={`Published minus implied two-party figure against ${rival}, pooled across pollsters by month: now ${s1(nw.v)} points, 95% interval ±${nw.ci95.toFixed(1)}.`}>
         {[-3, -2, -1, 1, 2, 3].map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className="rd-dis-gl"></path>)}
         <path d={`M${x0} ${zero}H${x1}`} className="rd-fl-zero"></path>

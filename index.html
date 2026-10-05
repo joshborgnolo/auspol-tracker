@@ -87628,16 +87628,22 @@ function RdFlowChart({
   const ptr = React.useRef(null);
   const chartBox = React.useRef(null);
   const tipBox = React.useRef(null);
-  window.useDismissOutside(chartBox, !!(tip && tip.src === "touch"), () => setTip(null));
+  window.useDismissOutside(chartBox, !!(tip && tip.src === "touch"), () => {
+    setTip(null);
+    setHv(null);
+  });
   React.useLayoutEffect(() => {
     const el = tipBox.current,
       box = chartBox.current;
     if (!el || !box) return;
     el.style.marginLeft = "0px";
+    el.style.top = "";
     const r = el.getBoundingClientRect();
     const b = box.getBoundingClientRect();
     const off = Math.min(0, b.right - 8 - r.right) - Math.min(0, r.left - (b.left + 8));
     if (off) el.style.marginLeft = off + "px";
+    const minTop = 78 - b.top + el.offsetHeight;
+    if (minTop > -6) el.style.top = Math.round(minTop) + "px";
   }, [tip, hv]);
   const H = phone ? 210 : 250;
   const x0 = phone ? 26 : 40,
@@ -87691,7 +87697,9 @@ function RdFlowChart({
     height: H + 12,
     viewBox: `0 0 ${W} ${H + 12}`,
     role: "img",
-    onMouseMove: onMove,
+    onPointerMove: ev => {
+      if (ev.pointerType === "mouse") onMove(ev);
+    },
     onMouseLeave: () => setHv(null),
     "aria-label": `Published minus implied two-party figure against ${rival}, pooled across pollsters by month: now ${s1(nw.v)} points, 95% interval ±${nw.ci95.toFixed(1)}.`
   }, [-3, -2, -1, 1, 2, 3].map(v => React.createElement("path", {
