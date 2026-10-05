@@ -357,21 +357,26 @@ Pinned by `.matilda/probe-flow-drift-dots.mjs` (static: every hit circle's
 centre resolves to a `.rd-apd-hit`; hover: every centre raises a wave
 tip).
 
-## Vertex hover — the drift-line month marks (2026-10-05, 9e523bf)
+## Per-house month marks — painted dots REMOVED, invisible hover stays (2026-10-05)
 
-The house drift lines' month VERTICES (`.rd-fl-hdot`, 109 across the two
-halves, exact month-column x) look exactly like poll dots but were never
-interactive — the user's "all dots are ringed except ones i cannot hover
-over". Each vertex now hosts an invisible r=8 `.rd-fl-vhit` hit circle
-(same `.rd-apd-hit` idiom: pointerenter/leave, focus-visible keyboard,
-touch toggle; click is a deliberate no-op — it is not a poll) raising a
-tip with the house title, Month + House drift rows and a "monthly mark on
-this house's drift line" hint. Probes scope wave queries with
-`:not(.rd-fl-vhit)` so the two ring populations never confuse each other;
-dense-clump rule applies (a later-painted wave ring or a neighbour
-house's vertex ring may legitimately win a shared centre — vertex tips are
-proven by strict-count, 39/17), and clicking a vertex must never open a
-poll. The diag page rings vertex marks magenta and names them MONTH MARK.
+The chart's per-house monthly gaps (109 across the two halves, exact
+month-column x) rendered as `.rd-fl-hdot` circles sized like poll dots —
+there is NO per-house polyline, the dots WERE the house representation.
+Two user calls on 2026-10-05: first "all dots are ringed except ones i
+cannot hover over" (shipped 9e523bf — each vertex got an invisible r=8
+`.rd-fl-vhit` hit ring with the house+month+drift tip); then "what's the
+point of a dot for that — doesn't it only serve to confuse" → the user
+picked "Remove the dots": the painted `.rd-fl-hdot` circles, their `.on`/
+`.off` pick styling and the "One pollster's gap that month" keydot key
+item are GONE; the invisible hit rings stay (tip sub: "this pollster's
+gap that month – not a published wave"), and the key line gained a
+swatchless hint "Each pollster's own gap – hover its month spot to read".
+Probes scope wave queries with `:not(.rd-fl-vhit)` so the two ring
+populations never confuse each other; the dense-clump rule applies (a
+later-painted wave ring or a neighbour house's ring may win a shared
+centre — vertex tips are proven by strict-count), and clicking a vertex
+must never open a poll. The diag page rings the vhit marks magenta and
+names them MONTH MARK.
 
 ## Check script traps
 
