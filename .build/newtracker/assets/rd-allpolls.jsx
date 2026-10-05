@@ -2123,8 +2123,14 @@ function RdAllPolls(P) {
   const facetPick = (id) => { pinAp(); onFacet(id); };
   /* Pointing at the card makes its facet row the arrow-key target without
      moving DOM focus. Real keyboard focus still wins, and the capture phase
-     beats the page's own left/right page turn. */
+     beats the page's own left/right page turn. Pointing at the Split by
+     row claims the keys deeper still (the row's own radio walk; the focus
+     rules are identical), and the facet row takes the keys back as soon as
+     the pointer leaves it. */
   const hoverKeys = React.useRef(false);
+  const splitEl = React.useRef(null);
+  const splitHover = React.useRef(false);
+  const splitArrowLive = React.useRef(null);
   React.useEffect(() => {
     const sec = document.getElementById("rd-ap-top");
     if (!sec) return undefined;
@@ -2133,6 +2139,14 @@ function RdAllPolls(P) {
     hoverKeys.current = sec.matches(":hover");
     sec.addEventListener("pointerenter", enter);
     sec.addEventListener("pointerleave", leave);
+    const dp = splitEl.current;
+    const dpEnter = () => { splitHover.current = true; };
+    const dpLeave = () => { splitHover.current = false; };
+    if (dp) {
+      splitHover.current = dp.matches(":hover");
+      dp.addEventListener("pointerenter", dpEnter);
+      dp.addEventListener("pointerleave", dpLeave);
+    } else splitHover.current = false;
     const key = (e) => {
       if (!hoverKeys.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -2140,6 +2154,15 @@ function RdAllPolls(P) {
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
+      if (splitHover.current) {
+        const el = splitEl.current;
+        if (el && el.isConnected && el.getClientRects().length && splitArrowLive.current) {
+          e.preventDefault();
+          splitArrowLive.current(e.key === "ArrowRight" ? 1 : -1);
+          return;
+        }
+        splitHover.current = false;
+      }
       e.preventDefault();
       const i = FACETS.findIndex((x) => x.id === facet);
       if (i < 0) return;
@@ -2150,6 +2173,10 @@ function RdAllPolls(P) {
     return () => {
       sec.removeEventListener("pointerenter", enter);
       sec.removeEventListener("pointerleave", leave);
+      if (dp) {
+        dp.removeEventListener("pointerenter", dpEnter);
+        dp.removeEventListener("pointerleave", dpLeave);
+      }
       document.removeEventListener("keydown", key, true);
     };
   }, [facet]);
@@ -2158,8 +2185,11 @@ function RdAllPolls(P) {
      group names, picked like a facet - the table holds its spot through the
      reflow, and the arrow keys walk the words the way they walk the tabs */
   const splitPick = (id) => { pinAp(); setDemSplit(id); };
+  splitArrowLive.current = facet === "demographics" && SPLITS.length > 1
+    ? (dir) => splitPick(SPLITS[(SPLITS.findIndex((x) => x.id === demSplit) + dir + SPLITS.length) % SPLITS.length].id)
+    : null;
   const splitPicker = (
-    <span className="rd-ap-dpick">
+    <span className="rd-ap-dpick" ref={splitEl}>
       <span className="rd-pl-ctl-l">Split by:</span>
       {/* one of five, so a radio group - which also keeps it out of the
           facet tabs' own [role=group] */}
@@ -2169,17 +2199,25 @@ function RdAllPolls(P) {
     </span>
   );
   const basisPick = () => { pinAp(); setTppBasis(pub ? "imp" : "resp"); };
-  /* Spacebar flips the two-party contest and p the published/implied
-     basis while the table is on screen - the tab row's "Labor v X ⇄"
-     button and the "Show the pollsters’ published figures" switch, by
-     key. The claim is the viewport (IntersectionObserver, not the
-     pointer) and twopp-facet only; in every other state, or while real
-     focus is anywhere but the page, space keeps its scroll day job and
-     p is left alone. */
+  /* Spacebar walks what the facet can step, p flips the published/implied
+     basis, and 1-5 pick a demographics group outright while the table is
+     on screen - the tab row's "Labor v X ⇄" button, the Split by radio
+     row, and the "Show the pollsters’ published figures" switch, by key.
+     The claim is the viewport (IntersectionObserver, not the pointer);
+     away from the owning facet, or while real focus is anywhere but the
+     page, the keys keep their day jobs (space scrolls, digits type). */
   const spaceFlip = React.useRef(null);
   spaceFlip.current = facet === "twopp" ? flipPick : null;
   const pubFlip = React.useRef(null);
   pubFlip.current = facet === "twopp" ? basisPick : null;
+  const splitWalk = React.useRef(null);
+  splitWalk.current = facet === "demographics"
+    ? () => splitPick(SPLITS[(SPLITS.findIndex((x) => x.id === demSplit) + 1) % SPLITS.length].id)
+    : null;
+  const splitAt = React.useRef(null);
+  splitAt.current = facet === "demographics"
+    ? (i) => { if (SPLITS[i]) splitPick(SPLITS[i].id); }
+    : null;
   React.useEffect(() => {
     const sec = document.getElementById("rd-ap-top");
     if (!sec) return undefined;
@@ -2189,16 +2227,18 @@ function RdAllPolls(P) {
     const key = (e) => {
       if (!inView.current) return;
       const isPub = e.key === "p" || e.key === "P";
-      if (!isPub && e.key !== " ") return;
-      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || (!isPub && e.shiftKey)) return;
+      const isSpace = e.key === " ";
+      const dig = e.key.length === 1 && e.key >= "1" && e.key <= "9" ? e.key.charCodeAt(0) - 49 : -1;
+      if (!isPub && !isSpace && dig < 0) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || (isSpace && e.shiftKey)) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
-      const act = isPub ? pubFlip.current : spaceFlip.current;
-      if (!act) return;
+      const act = isPub ? pubFlip.current : isSpace ? (splitWalk.current || spaceFlip.current) : splitAt.current;
+      if (!act || dig >= SPLITS.length) return;
       e.preventDefault();
-      if (!e.repeat) act();
+      if (!e.repeat) act(dig >= 0 ? dig : undefined);
     };
     document.addEventListener("keydown", key, true);
     return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };

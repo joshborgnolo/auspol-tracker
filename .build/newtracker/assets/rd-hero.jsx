@@ -576,6 +576,36 @@ function RdHero(p) {
     };
   }, [rangeId]);
 
+  /* Spacebar steps the 2PP contest while this section is on screen - the
+     "Switch 2PP" chips by key, one matchup on like the chart card's
+     sideways swipe. The claim is the viewport (an IntersectionObserver
+     read, the all-polls table's shape), never the pointer: off the
+     section, with Shift held (space's scroll-back), or with real focus on
+     a control, the key keeps its day job. */
+  const spaceStep = React.useRef(null);
+  spaceStep.current = orderedMatchups.length > 1 ? () => swipeLive.current(1) : null;
+  React.useEffect(() => {
+    const sec = document.getElementById("two-party");
+    if (!sec) return undefined;
+    const inView = { current: false };
+    const io = new IntersectionObserver((es) => es.forEach((en) => { inView.current = en.isIntersecting; }));
+    io.observe(sec);
+    const key = (e) => {
+      if (e.key !== " " || !inView.current) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const act = spaceStep.current;
+      if (!act) return;
+      e.preventDefault();
+      if (!e.repeat) act();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
+  }, []);
+
   return (
     <section className="rd-sec rd-first rd-tpp" id="two-party" aria-labelledby="rd-tpp-t">
       <div className="rd-eyebrow">

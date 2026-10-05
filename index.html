@@ -72687,6 +72687,36 @@ function RdHero(p) {
       document.removeEventListener("keydown", key, true);
     };
   }, [rangeId]);
+  const spaceStep = React.useRef(null);
+  spaceStep.current = orderedMatchups.length > 1 ? () => swipeLive.current(1) : null;
+  React.useEffect(() => {
+    const sec = document.getElementById("two-party");
+    if (!sec) return undefined;
+    const inView = {
+      current: false
+    };
+    const io = new IntersectionObserver(es => es.forEach(en => {
+      inView.current = en.isIntersecting;
+    }));
+    io.observe(sec);
+    const key = e => {
+      if (e.key !== " " || !inView.current) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const act = spaceStep.current;
+      if (!act) return;
+      e.preventDefault();
+      if (!e.repeat) act();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
   return React.createElement("section", {
     className: "rd-sec rd-first rd-tpp",
     id: "two-party",
@@ -84562,6 +84592,9 @@ function RdAllPolls(P) {
     onFacet(id);
   };
   const hoverKeys = React.useRef(false);
+  const splitEl = React.useRef(null);
+  const splitHover = React.useRef(false);
+  const splitArrowLive = React.useRef(null);
   React.useEffect(() => {
     const sec = document.getElementById("rd-ap-top");
     if (!sec) return undefined;
@@ -84574,6 +84607,18 @@ function RdAllPolls(P) {
     hoverKeys.current = sec.matches(":hover");
     sec.addEventListener("pointerenter", enter);
     sec.addEventListener("pointerleave", leave);
+    const dp = splitEl.current;
+    const dpEnter = () => {
+      splitHover.current = true;
+    };
+    const dpLeave = () => {
+      splitHover.current = false;
+    };
+    if (dp) {
+      splitHover.current = dp.matches(":hover");
+      dp.addEventListener("pointerenter", dpEnter);
+      dp.addEventListener("pointerleave", dpLeave);
+    } else splitHover.current = false;
     const key = e => {
       if (!hoverKeys.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -84581,6 +84626,15 @@ function RdAllPolls(P) {
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
+      if (splitHover.current) {
+        const el = splitEl.current;
+        if (el && el.isConnected && el.getClientRects().length && splitArrowLive.current) {
+          e.preventDefault();
+          splitArrowLive.current(e.key === "ArrowRight" ? 1 : -1);
+          return;
+        }
+        splitHover.current = false;
+      }
       e.preventDefault();
       const i = FACETS.findIndex(x => x.id === facet);
       if (i < 0) return;
@@ -84591,6 +84645,10 @@ function RdAllPolls(P) {
     return () => {
       sec.removeEventListener("pointerenter", enter);
       sec.removeEventListener("pointerleave", leave);
+      if (dp) {
+        dp.removeEventListener("pointerenter", dpEnter);
+        dp.removeEventListener("pointerleave", dpLeave);
+      }
       document.removeEventListener("keydown", key, true);
     };
   }, [facet]);
@@ -84602,8 +84660,10 @@ function RdAllPolls(P) {
     pinAp();
     setDemSplit(id);
   };
+  splitArrowLive.current = facet === "demographics" && SPLITS.length > 1 ? dir => splitPick(SPLITS[(SPLITS.findIndex(x => x.id === demSplit) + dir + SPLITS.length) % SPLITS.length].id) : null;
   const splitPicker = React.createElement("span", {
-    className: "rd-ap-dpick"
+    className: "rd-ap-dpick",
+    ref: splitEl
   }, React.createElement("span", {
     className: "rd-pl-ctl-l"
   }, "Split by:"), React.createElement("span", {
@@ -84628,6 +84688,12 @@ function RdAllPolls(P) {
   spaceFlip.current = facet === "twopp" ? flipPick : null;
   const pubFlip = React.useRef(null);
   pubFlip.current = facet === "twopp" ? basisPick : null;
+  const splitWalk = React.useRef(null);
+  splitWalk.current = facet === "demographics" ? () => splitPick(SPLITS[(SPLITS.findIndex(x => x.id === demSplit) + 1) % SPLITS.length].id) : null;
+  const splitAt = React.useRef(null);
+  splitAt.current = facet === "demographics" ? i => {
+    if (SPLITS[i]) splitPick(SPLITS[i].id);
+  } : null;
   React.useEffect(() => {
     const sec = document.getElementById("rd-ap-top");
     if (!sec) return undefined;
@@ -84641,16 +84707,18 @@ function RdAllPolls(P) {
     const key = e => {
       if (!inView.current) return;
       const isPub = e.key === "p" || e.key === "P";
-      if (!isPub && e.key !== " ") return;
-      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || !isPub && e.shiftKey) return;
+      const isSpace = e.key === " ";
+      const dig = e.key.length === 1 && e.key >= "1" && e.key <= "9" ? e.key.charCodeAt(0) - 49 : -1;
+      if (!isPub && !isSpace && dig < 0) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || isSpace && e.shiftKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
       const sel = window.getSelection && window.getSelection();
       if (sel && !sel.isCollapsed) return;
-      const act = isPub ? pubFlip.current : spaceFlip.current;
-      if (!act) return;
+      const act = isPub ? pubFlip.current : isSpace ? splitWalk.current || spaceFlip.current : splitAt.current;
+      if (!act || dig >= SPLITS.length) return;
       e.preventDefault();
-      if (!e.repeat) act();
+      if (!e.repeat) act(dig >= 0 ? dig : undefined);
     };
     document.addEventListener("keydown", key, true);
     return () => {
@@ -88044,11 +88112,14 @@ const KBD_ROWS = [{
   keys: ["1–9"],
   what: "Pick a numbered party or term on a chips row"
 }, {
+  keys: ["1–5"],
+  what: "In the all-polls demographics view, pick the Split by group"
+}, {
   keys: ["Space"],
-  what: "In the all-polls two-party table, flip the matchup"
+  what: "Flip the matchup in the two-party views; step the all-polls demographics split"
 }, {
   keys: ["P"],
-  what: "In that table, published figures only"
+  what: "In the all-polls two-party table, published figures only"
 }, {
   keys: ["?"],
   what: "This sheet"
