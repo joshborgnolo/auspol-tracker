@@ -76950,7 +76950,43 @@ function RdIssues({
   const trTop = chTop && chTop.trend;
   const minor = trTop && trTop.up.length === 1 && trTop.up[0] === "onp" ? "onp" : null;
   const trustHead = !own ? rdCap(phrase.replace(/^the /, "")) + " tops voters’ concerns" : own.leadSig ? rdPartyStart(own.lead) + " is most trusted on " + phrase + ", voters’ top concern" : minor ? "One Nation has drawn level with the major parties on " + phrase : "No party is clearly trusted most on " + phrase + ", voters’ top concern";
-  const trustDek = !top.imp ? null : "The cost of living is by far the issue most important to voters, but no party is more trusted on it than another. " + "Labor leads on housing, health, and climate change, while One Nation leads on crime and immigration. " + "The Coalition retains its age-old lead on economic management.";
+  const trustDek = (() => {
+    if (!top.imp) return null;
+    const sents = [];
+    const nextV = list.filter(x => x.id !== top.id && x.imp && x.imp.v != null).reduce((a, x) => Math.max(a, x.imp.v), -1);
+    const byFar = nextV >= 0 && top.imp.v >= 1.5 * nextV && top.imp.v - nextV >= 10;
+    const trustClause = !own ? null : own.leadSig ? ", where " + rdPartyIn(own.lead) + " holds a clear lead" : ", but no party is more trusted on it than another";
+    sents.push(rdCap(phrase) + " is " + (byFar ? "by far " : "") + "the issue most important to voters" + (trustClause || "") + ".");
+    const phraseOf = x => (ISS_PHRASE[x.id] || x.label.toLowerCase()).replace(/^the /, "");
+    const listOf = xs => xs.length === 1 ? xs[0] : xs.length === 2 ? xs.join(" and ") : xs.slice(0, -1).join(", ") + ", and " + xs[xs.length - 1];
+    const salRank = (a, b) => (b.imp && b.imp.v != null ? b.imp.v : -1) - (a.imp && a.imp.v != null ? a.imp.v : -1);
+    const econ = list.find(x => x.id === "economy");
+    const econLnp = !!(econ && econ.own && econ.own.leadSig && econ.own.lead === "lnp");
+    const ledBy = {};
+    for (const x of list) {
+      if (!x.own || !x.own.leadSig || x.id === top.id) continue;
+      if (econLnp && x.id === "economy") continue;
+      (ledBy[x.own.lead] = ledBy[x.own.lead] || []).push(x);
+    }
+    const blocks = [];
+    for (const q of ["alp", "onp", "lnp"]) {
+      if (q === "lnp" && econLnp) continue;
+      const xs = (ledBy[q] || []).sort(salRank);
+      if (xs.length) blocks.push({
+        q,
+        xs: xs.map(phraseOf)
+      });
+    }
+    for (let i = 0; i < blocks.length; i += 2) {
+      const chx = blocks.slice(i, i + 2);
+      sents.push(chx.map((b, j) => (j === 0 ? rdPartyStart(b.q) : rdPartyIn(b.q)) + " leads on " + listOf(b.xs)).join(", while ") + ".");
+    }
+    if (econLnp) {
+      const others = (ledBy.lnp || []).sort(salRank).map(phraseOf);
+      sents.push("The Coalition retains its age-old lead on economic management" + (others.length ? ", and leads on " + listOf(others) : "") + ".");
+    }
+    return sents.join(" ");
+  })();
   const dotLo = 20,
     dotHi = 50;
   const dx = v => (Math.max(dotLo, Math.min(dotHi, v)) - dotLo) / (dotHi - dotLo) * 100;

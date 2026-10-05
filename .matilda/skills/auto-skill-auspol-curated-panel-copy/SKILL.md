@@ -1,6 +1,6 @@
 ---
 name: auspol-curated-panel-copy
-description: auspol-tracker — the user's dictate-pattern for Snapshot panel copy ("change this copy to …" on a panel dek). FIVE forms now: FREEZE the generator into a hand-curated static string (RD_DEMO_HOME convention; issues trustDek c1b1fb3), RE-LINK the frozen skeleton's figures to the live payload (vote-switching dek d59d855), TRIM the generator ("keep only the first sentence" — delete the appended-sentence block, leave the kept sentences dynamic; undecided dek a6f2e60), COMPOSE dictated phrase-pieces around a data payload (Who-votes trend block, 2026-09-29), or SWAP the head and dek's roles while keeping every figure computed ("undo this reversal. but make the title … So a sort of title/dek reversal. but keep it all dynamic" — RdSwitching 2026-09-30, shipped as a git-revert + reframe in ONE commit 3caa1c3). VERIFY every factual claim of dictated copy against the live pooled data BEFORE shipping and flag mismatches ("2.5 times" vs pooled 2.75, corrected on follow-up). Keep heads/rows data-driven, keep null-guards, record the curation in-source and in the panel's skill. Expect the "is it dynamic?" follow-up — state the drift trade-off proactively.
+description: auspol-tracker — the user's dictate-pattern for Snapshot/section copy ("change this copy to …" on a dek). EIGHT forms now: FREEZE the generator into a hand-curated static string (RD_DEMO_HOME convention; issues trustDek c1b1fb3), RE-LINK the frozen skeleton's figures to the live payload (vote-switching dek d59d855), TRIM the generator ("keep only the first sentence" — delete the appended-sentence block, leave the kept sentences dynamic; undecided dek a6f2e60), COMPOSE dictated phrase-pieces around a data payload (Who-votes trend block, 2026-09-29), SWAP the head and dek's roles while keeping every figure computed ("undo this reversal. but make the title … So a sort of title/dek reversal. but keep it all dynamic" — RdSwitching 2026-09-30, shipped as a git-revert + reframe in ONE commit 3caa1c3), GATE a dictated conditional clause on its own significance test (Decidedness by-party sub's ", while One Nation voters have hardened" tail, fd7f474 2026-10-01 — renders only while ON's move stays significant; the dictated full sentence did NOT render at ship time, verify the gate against the payload and report the ACTUALLY-RENDERING sentence), RESTRUCTURE a dynamic generator to the dictated SENTENCE ORDER while keeping every figure computed AND freezing it across a control state (Past-cycles summary finding 2026-10-02 — "keep it dynamic … this is the copy regardless of whether All past terms / Re-elected / Ousted is selected"; storyFor dropped its cmp/tail machinery and ranks the full past-term set always; machinery in auto-skill-auspol-cyc-summary-finding), or UN-FREEZE a hand-curated string back into a dynamic generator when the user calls it out as static ("this text isn't dynamic. make it dynamic" — issues trustDek, 2026-10-05: the curated sentence shapes survive as gated clauses; staleness the freeze had already accrued — housing's lead gone non-significant — surfaced at un-freeze time and was user-adjudicated). VERIFY every factual claim of dictated copy against the live pooled data BEFORE shipping and flag mismatches ("2.5 times" vs pooled 2.75, corrected on follow-up). Keep heads/rows data-driven, keep null-guards, record the curation in-source and in the panel's skill. Expect the "is it dynamic?" follow-up — state the drift trade-off proactively.
 source: auto-skill
 extracted_at: '2026-09-28T09:30:49.812Z'
 ---
@@ -126,6 +126,10 @@ a bigger design call — claims dropping out breaks the sentence shape).
   trim, a third form); the Roy-Morgan range quartile block and the
   conditional latest-pooled-figure tail deleted from RdUndecided's story
   IIFE, kept sentence left dynamic off withinHouseSlope.
+- **2026-10-05** — issues trustDek UN-FROZEN (the eighth form, see §The
+  un-freeze): the curated string is now a gated generator again; housing
+  left the Labor list (lead not significant, user-approved) and will
+  re-enter by itself.
 
 ## The fourth form: composed phrase-pieces around a payload (2026-09-29)
 
@@ -216,3 +220,55 @@ didn't quote are cut. Implementation on the Undecided panel
   `git -c rebase.autoStash=true pull --rebase origin main`, rebuild,
   confirm `git status --short index.html .build/newtracker/assets/` is
   empty (zero drift), push again.
+
+## The un-freeze, an eighth form (issues trustDek, 2026-10-05)
+
+The reverse of the freeze: the user quotes the curated string and says
+"this text isn't dynamic. make it dynamic". The curated wording stays the
+SHAPE — every sentence survives as a clause — but each clause gates on
+the live payload, so the copy regenerates from the data it once froze.
+Worked on the Who's-trusted dek (`trustDek` in RdIssues' story IIFE,
+rd-panels.jsx; the c1b1fb3 string replaced by an IIFE, still rendered
+via `dek: trustDek`):
+
+- **Staleness first, before writing a line of generator.** A frozen
+  string accrues drift the day it ships — the whole point of un-freezing
+  is that the pool has moved. Reproduce every claim of the curated text
+  against the CURRENT payload and adjudicate the mismatches with the
+  user BEFORE coding: on 2026-10-05 the frozen dek's "Labor leads on
+  housing" had gone non-significant (38.9 vs 34.5), so the dynamic
+  version drops housing today (user approved the drop) and re-enters it
+  by itself when the lead re-signifies. The first render of the new
+  generator is therefore NOT the quoted string — say that in the plan.
+- **Franchise the wording's editorial calls into gates.** Every judgement
+  baked into the curated string needs an explicit rule, and each rule is
+  a user decision where it changes today's render (ask, don't assume —
+  three were asked here): ordering of issue lists (SALIENCE order, so
+  the frozen "crime and immigration" renders "immigration and crime");
+  the "by far" intensifier's gate (kept: ≥1.5× the runner-up AND ≥10pts,
+  with a new "where ‹party› holds a clear lead" clause for a significant
+  top-issue lead); and lore words like "age-old" (user: the Coalition's
+  HISTORICAL perception on economic management — gate only on the
+  current significant Coalition lead, no this-term tenure check; other
+  Coalition leads ride the same sentence as ", and leads on …" rather
+  than earning a fourth sentence).
+- **Run-on discipline:** cap who-says-what at two parties per sentence
+  joined by ", while "; a third party starts its own sentence (the
+  probe's "no double-while" check pins it). Sentence-initial parties use
+  the capitalised display form (`rdPartyStart`), mid-sentence the
+  article form (`rdPartyIn`) — "Labor leads …, while One Nation leads
+  …. The Coalition retains …".
+- **Null-shape guards ride along from the freeze era:** no `own` block
+  on the top issue drops the trust clause (never invent "no party is
+  more trusted" without data); no `imp` on the top issue drops the whole
+  dek (`null`), same contract the generator had before c1b1fb3.
+- **Pin with a compiled-source probe, not a copy of the JSX:**
+  `.matilda/probe-issues-trustdek.mjs` brace-walks the compiled IIFE out
+  of the built index.html, evaluates it against the live payload plus
+  ten payload mutations (each gate and each dropped clause), and asserts
+  the exact live render. Seventeen checks — the live string plus every
+  flip: housing re-entry, trust-clause swap, age-old gain/loss,
+  double-while ban, by-far gate, null drops.
+- **Leave the framework intact for a RE-FREEZE.** The head (`trustHead`)
+  stayed data-driven through the freeze and the un-freeze; either
+  direction of curation touches only the `trustDek` binding, one hunk.

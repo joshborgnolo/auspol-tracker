@@ -208,13 +208,33 @@ updated_at: '2026-09-30'
     Probe: `.matilda/probe-issues-tally.mjs` serves the repo and asserts the scoreboard at 1440 (+dark)/900/761/390 — three equal chips, chip-label overflow, 24px figure, the exact sentence-case label text + `text-transform: none` on both the label and the `i` chip names (casing by regex, order by the scoreboard-descending rule, legend and row figures in agreement), flush join to the last data row, no horizontal scroll.
 - With the redesign on (`window.AP.rd`), a11e1559 defers to `RdIssues`
   (rd-panels.jsx ~:1617) and its head/dek come from `trustHead`/`trustDek`
-  (~:1700). `trustHead` stays data-driven; `trustDek` has been
-  HAND-CURATED since 2026-09-28 (the user's verbatim wording: "The cost of
-  living is by far the issue most important to voters… The Coalition
-  retains its age-old lead on economic management."), same convention as
-  RD_DEMO_HOME — every lead it names must be a currently-significant
-  pooled gap, refreshed by hand when the pool moves; it no longer
-  regenerates from the data.
+  (~:1700). `trustHead` stays data-driven. `trustDek` was hand-curated
+  2026-09-28 (c1b1fb3), then RE-LINKED to a dynamic generator 2026-10-05
+  ("this text isn't dynamic. make it dynamic") — the generator keeps the
+  curated sentence SHAPES but every clause gates on the live payload:
+  - S1: "‹top issue› is [by far ]the issue most important to voters" —
+    "by far" needs top salience ≥1.5× the runner-up AND a ≥10pt gap.
+    Trust clause: ", where ‹party› holds a clear lead" when the top
+    issue's `own.leadSig`; else ", but no party is more trusted on it
+    than another"; clause dropped entirely when `top.own` is absent.
+    The top issue never re-appears in a lead list.
+  - S2: per-party "‹Party› leads on ‹issues›" sentences in
+    SALIENCE order (user call), Oxford-comma `listOf`, parties paired
+    two-per-sentence joined ", while " — a third party starts its own
+    sentence, never a double-while run-on. Only `own.leadSig` leads
+    are named; a party leading nothing significant is absent.
+  - S3: "The Coalition retains its age-old lead on economic management"
+    renders ONLY while the Coalition's economy lead stays significant
+    (user call 2026-10-05: "age-old" = the Coalition's longstanding
+    HISTORICAL perception, NOT a this-term tenure check). Extra
+    Coalition leads ride the same sentence (", and leads on …"), so a
+    Coalition-without-economy renders as an ordinary S2 sentence and
+    takes "the Coalition" mid-sentence form.
+  Housing sits OUTSIDE the curated wording already (its Labor lead is
+  not significant at link time — user approved the drop) and re-enters
+  the list by itself when the pool moves. Probed by
+  `.matilda/probe-issues-trustdek.mjs` (extracts the compiled IIFE from
+  the built page, 17 checks across 11 payload mutations).
 - "What matters to whom": table of top-three shares by group, sentences from
   `issGroupVerdict` (the vote-by-group test). Its gist line is `whomHead`
   (rd-panels.jsx ~:1790, per-tab generated) — user-trimmed 2026-09-28 to the

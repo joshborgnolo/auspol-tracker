@@ -2748,13 +2748,51 @@ function RdIssues({ rangeId = "all" }) {
     : own.leadSig ? rdPartyStart(own.lead) + " is most trusted on " + phrase + ", voters’ top concern"
     : minor ? "One Nation has drawn level with the major parties on " + phrase
     : "No party is clearly trusted most on " + phrase + ", voters’ top concern";
-  /* Hand-curated dek (user's wording, 2026-09-28), same convention as
-     RD_DEMO_HOME: every lead named is a currently-significant pooled gap,
-     refreshed by hand when the pool moves — it no longer regenerates. */
-  const trustDek = !top.imp ? null
-    : "The cost of living is by far the issue most important to voters, but no party is more trusted on it than another. "
-    + "Labor leads on housing, health, and climate change, while One Nation leads on crime and immigration. "
-    + "The Coalition retains its age-old lead on economic management.";
+  /* Dynamic dek with the user's 2026-09-28 curated sentence shapes (re-linked from frozen
+     text 2026-10-05, user call "make it dynamic"). Every named lead is a live-significant
+     pooled gap, so the sentences shed a clause rather than print a stale one. "By far"
+     needs the top salience at 1.5x and 10 points clear of the runner-up; the Coalition's
+     "age-old" economy lead is the lore claim (the longstanding perception edge), gated
+     only on the live significant lead - not a this-term tenure check. */
+  const trustDek = (() => {
+    if (!top.imp) return null;
+    const sents = [];
+    const nextV = list.filter((x) => x.id !== top.id && x.imp && x.imp.v != null).reduce((a, x) => Math.max(a, x.imp.v), -1);
+    const byFar = nextV >= 0 && top.imp.v >= 1.5 * nextV && top.imp.v - nextV >= 10;
+    const trustClause = !own ? null
+      : own.leadSig ? ", where " + rdPartyIn(own.lead) + " holds a clear lead"
+      : ", but no party is more trusted on it than another";
+    sents.push(rdCap(phrase) + " is " + (byFar ? "by far " : "") + "the issue most important to voters" + (trustClause || "") + ".");
+    /* per-party lead lists (significant leads only, salience order), Oxford-comma list
+       as in the curated text; the top issue is never re-named in a lead list */
+    const phraseOf = (x) => (ISS_PHRASE[x.id] || x.label.toLowerCase()).replace(/^the /, "");
+    const listOf = (xs) => (xs.length === 1 ? xs[0] : xs.length === 2 ? xs.join(" and ")
+      : xs.slice(0, -1).join(", ") + ", and " + xs[xs.length - 1]);
+    const salRank = (a, b) => (b.imp && b.imp.v != null ? b.imp.v : -1) - (a.imp && a.imp.v != null ? a.imp.v : -1);
+    const econ = list.find((x) => x.id === "economy");
+    const econLnp = !!(econ && econ.own && econ.own.leadSig && econ.own.lead === "lnp");
+    const ledBy = {};
+    for (const x of list) {
+      if (!x.own || !x.own.leadSig || x.id === top.id) continue;
+      if (econLnp && x.id === "economy") continue;
+      (ledBy[x.own.lead] = ledBy[x.own.lead] || []).push(x);
+    }
+    const blocks = [];
+    for (const q of ["alp", "onp", "lnp"]) {
+      if (q === "lnp" && econLnp) continue;
+      const xs = (ledBy[q] || []).sort(salRank);
+      if (xs.length) blocks.push({ q, xs: xs.map(phraseOf) });
+    }
+    for (let i = 0; i < blocks.length; i += 2) {
+      const chx = blocks.slice(i, i + 2);
+      sents.push(chx.map((b, j) => (j === 0 ? rdPartyStart(b.q) : rdPartyIn(b.q)) + " leads on " + listOf(b.xs)).join(", while ") + ".");
+    }
+    if (econLnp) {
+      const others = (ledBy.lnp || []).sort(salRank).map(phraseOf);
+      sents.push("The Coalition retains its age-old lead on economic management" + (others.length ? ", and leads on " + listOf(others) : "") + ".");
+    }
+    return sents.join(" ");
+  })();
 
   /* ---- who's trusted: the rows -------------------------------------------- */
   const dotLo = 20, dotHi = 50;
