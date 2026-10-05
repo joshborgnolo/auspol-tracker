@@ -1105,7 +1105,7 @@ const ARCHIVE_STAMP = "2026-09-24";
 /* prediction/ is not hand-maintained: it regenerates daily via
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
-const PREDICTION_STAMP = "2026-10-04";
+const PREDICTION_STAMP = "2026-10-05";
 /* vic/ likewise: .build/refresh-vic.mjs regenerates the page on each
    new wave and bumps this stamp itself, through election day 2026-11-28. */
 const VIC_STAMP = "2026-10-03";
