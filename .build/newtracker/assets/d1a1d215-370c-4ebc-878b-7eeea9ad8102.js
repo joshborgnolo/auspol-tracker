@@ -4753,6 +4753,16 @@ function FlowDriftPanel({ rangeId }) {
   pooledPts.forEach((p) => vals.push(p.y));
   if (!hidden[POOLED]) ciArea.forEach((a) => vals.push(a.y0, a.y1));
 
+  /* One dot per published wave, as every other chart's poll cloud reports:
+     the wave's OWN gap (published minus implied, its house baseline off it)
+     at its fieldwork end, in its house's colour – hover reads the wave and a
+     click opens it in All polls. Dots ride the same hidden state as the
+     house lines. */
+  const dots = (fd.polls || [])
+    .filter((d) => !hidden[d.pollster] && d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1])
+    .map((d) => ({ x: d.x, y: d.v, color: houseLeanColour(d.pollster), label: "Drift", meta: d }));
+  dots.forEach((p) => vals.push(p.y));
+
   const series = [];
   if (pooledPts.length > 1) {
     series.push({ id: POOLED, label: POOLED, color: "var(--ink)", width: 3,
@@ -4801,7 +4811,7 @@ function FlowDriftPanel({ rangeId }) {
         ]}
         areas={hidden[POOLED] ? undefined : [{ id: "ci", color: "var(--ink-faint)", opacity: 0.18, points: ciArea }]}
         refLines={[{ y: 0, color: "var(--ink-3)" }]}
-        series={series} spine={spine}
+        series={series} spine={spine} scatter={dots} pollFacet="twopp"
         tooltipTitle={(i) => monthLabelFull(spineYm[i])}
         ariaLabel="Preference-flow drift over time – how far published 2PPs sit from what the same polls’ primaries imply under the frozen election flow table, above zero friendlier to Labor"
         fmt={(v) => (v === 0 ? "" : sgn(v))}
@@ -4831,7 +4841,8 @@ function FlowDriftPanel({ rangeId }) {
         {lateFirms.length > 0 && <> – {lateFirms.join(", ")} began polling later and anchor on
           {" "}their own first waves instead, so their lines read only the drift since they started</>}.</>,
         <>The pooled line and its band are the cross-house aggregate with the same sample weighting
-        as the aggregates above. A wave that publishes no two-party figure carries no gap, so a
+        as the aggregates above. Each dot is one published wave’s own gap, in its house’s colour – hover
+        it to read the wave. A wave that publishes no two-party figure carries no gap, so a
         house that reports a 2PP only irregularly reads through a thinner line.</>,
         <>The whole panel is a diagnostic read on published figures: it corrects no other number on
         this page.</>,
@@ -4885,6 +4896,11 @@ function FlowDriftOnPanel({ rangeId }) {
   pooledPts.forEach((p) => vals.push(p.y));
   if (!hidden[POOLED]) ciArea.forEach((a) => vals.push(a.y0, a.y1));
 
+  const dots = (fd.polls || [])
+    .filter((d) => !hidden[d.pollster] && d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1])
+    .map((d) => ({ x: d.x, y: d.v, color: houseLeanColour(d.pollster), label: "Drift", meta: d }));
+  dots.forEach((p) => vals.push(p.y));
+
   const series = [];
   if (pooledPts.length > 1) {
     series.push({ id: POOLED, label: POOLED, color: "var(--ink)", width: 3,
@@ -4933,7 +4949,7 @@ function FlowDriftOnPanel({ rangeId }) {
         ]}
         areas={hidden[POOLED] ? undefined : [{ id: "ci", color: "var(--ink-faint)", opacity: 0.18, points: ciArea }]}
         refLines={[{ y: 0, color: "var(--ink-3)" }]}
-        series={series} spine={spine}
+        series={series} spine={spine} scatter={dots} pollFacet="twopp"
         tooltipTitle={(i) => monthLabelFull(spineYm[i])}
         ariaLabel="Preference-flow drift on Labor-v-One Nation head-to-heads over time – how far published head-to-head shares sit from frozen preference flows, above zero friendlier to Labor"
         fmt={(v) => (v === 0 ? "" : sgn(v))}
@@ -4966,7 +4982,8 @@ function FlowDriftOnPanel({ rangeId }) {
         pairing on the panel above can be read at the election, but no count of this pairing
         exists, so the chart speaks only about drift since each house began.</>,
         <>The pooled line and its band are the cross-house aggregate with the same sample weighting
-        as the aggregates above. A wave that publishes no head-to-head carries no gap.</>,
+        as the aggregates above. Each dot is one published wave’s own gap, in its house’s colour – hover
+        it to read the wave. A wave that publishes no head-to-head carries no gap.</>,
         <>The whole panel is a diagnostic read on published figures: it corrects no other number on
         this page.</>,
       ]} />

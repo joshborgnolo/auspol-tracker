@@ -2987,11 +2987,22 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
 function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
   const D = window.AUSPOL;
   const [hv, setHv] = useState(null);
+  const [tip, setTip] = useState(null);        // the wave dot being read: { id, src, d, px }
+  const ptr = React.useRef(null);
   const H = phone ? 210 : 250;
   const x0 = phone ? 26 : 40, rpad = phone ? 66 : 76, top = 14, bot = phone ? 178 : 214;
   const x1 = W - rpad;
   const ms = rdApMonths("2025-06");
   const X = (ym) => x0 + (ms.indexOf(ym) / (ms.length - 1)) * (x1 - x0);
+  /* a wave's released date sits INSIDE its month: the month's own x plus the
+     date's fraction of that month, so a dot lands where the wave was, not at
+     the month's mid-point */
+  const Xw = (iso) => {
+    const i = ms.indexOf(iso.slice(0, 7));
+    if (i < 0) return null;
+    const dim = new Date(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)), 0)).getUTCDate();
+    return x0 + ((i + (Number(iso.slice(8, 10)) - 1) / dim) / (ms.length - 1)) * (x1 - x0);
+  };
   const zero = (top + bot) / 2;
   const Y = (v) => zero - (v / 3.5) * (zero - top);
   const mo = (fd.months || []).filter((d) => ms.includes(d.ym));
@@ -3007,6 +3018,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
   const houses = fd.houses || {};
   const pickS = pick && houses[pick] ? houses[pick].filter((d) => ms.includes(d.ym)) : null;
   const onMove = (ev) => {
+    if (tip) return;                     // a wave dot is being read – no month guide behind it
     const r = ev.currentTarget.getBoundingClientRect();
     const x = ev.clientX - r.left;
     if (x > x1 + 8) { setHv(null); return; }
@@ -3027,6 +3039,46 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
           <circle key={h + i} cx={X(d.ym)} cy={Y(Math.max(-3.4, Math.min(3.4, d.v)))} r={pick === h ? 3.5 : 2.5}
                   className={"rd-fl-hdot" + (pick ? (pick === h ? " on" : " off") : "")}></circle>
         )))}
+        {/* one dot per published wave: the wave's OWN gap at its release
+            date, reading like the dots on every other poll chart – hover to
+            read the wave, click to open the poll in the table (RdApMini's
+            hit-circle idiom) */}
+        {(fd.polls || []).map((d, i) => {
+          const px = Xw(d.released);
+          if (px == null) return null;
+          const py = Y(Math.max(-3.4, Math.min(3.4, d.v)));
+          const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.pollster, released: d.released }) : null;
+          const id = d.pollster + "|" + d.released + "#" + i;
+          const show = (src) => setTip({ id, src, d, px });
+          const hide = (src) => setTip((tp) => (tp && tp.id === id && (!src || tp.src === src) ? null : tp));
+          const open = () => { if (k && window.AP.openPoll) { setTip(null); window.AP.openPoll(k, "twopp", "the preference-flow chart"); } };
+          return (
+            <g key={id}>
+              {tip && tip.id === id && <circle cx={px} cy={py} r="6" className="rd-apd-dothi"></circle>}
+              <circle cx={px} cy={py} r="2.2" className="rd-fl-wdot"></circle>
+              <circle cx={px} cy={py} r="8" className={"rd-apd-hit" + (k ? " link" : "")}
+                      tabIndex="0" role={k ? "button" : "img"}
+                      aria-label={`${d.pollster}, fieldwork ${d.dateLabel}: published minus implied ${s1(d.v)} points` + (k ? "; press Enter to open this poll" : "")}
+                      onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+                      onPointerEnter={(ev) => { if (ev.pointerType === "mouse") { setHv(null); show("mouse"); } }}
+                      onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide("mouse"); }}
+                      onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show("focus"); }}
+                      onBlur={() => hide("focus")}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        const pt = ev.detail === 0 ? "key" : ptr.current;
+                        ptr.current = null;
+                        if (pt === "mouse" || pt === "key") { open(); return; }
+                        if (tip && tip.id === id) setTip(null); else show("touch");
+                      }}
+                      onKeyDown={(ev) => {
+                        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+                        ev.preventDefault();
+                        open();
+                      }}></circle>
+            </g>
+          );
+        })}
         {pickS && pickS.length > 1 && <path d={monotoneXY(pickS.map((d) => [X(d.ym), Y(Math.max(-3.4, Math.min(3.4, d.v)))]))} className="rd-fl-pick"></path>}
         <path d={monotoneXY(mo.map((d) => [X(d.ym), Y(d.v)]))} className="rd-fl-line"></path>
         <circle cx={X(e.ym)} cy={Y(e.v)} r="3" className="rd-fl-enddot"></circle>
@@ -3040,10 +3092,10 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
         {emptyNote && X(mo[0].ym) - x0 > 110 && <text x={(x0 + X(mo[0].ym)) / 2} y={Y(1.4)} className="rd-fl-empty" textAnchor="middle">{emptyNote}</text>}
         <path d={`M${x0} ${bot}H${x1}` + ticks.map(([ym]) => `M${X(ym)} ${bot}v4`).join("")} className="rd-dis-base"></path>
         {ticks.map(([ym, lab]) => <text key={ym} x={X(ym)} y={bot + 20} className="rd-dis-ax" textAnchor="middle">{lab}</text>)}
-        {hv && <path d={`M${X(hv.ym)} ${top}V${bot}`} className="rd-dis-guide"></path>}
-        {hv && <circle cx={X(hv.ym)} cy={Y(hv.v)} r="4" className="rd-fl-enddot"></circle>}
+        {hv && !tip && <path d={`M${X(hv.ym)} ${top}V${bot}`} className="rd-dis-guide"></path>}
+        {hv && !tip && <circle cx={X(hv.ym)} cy={Y(hv.v)} r="4" className="rd-fl-enddot"></circle>}
       </svg>
-      {hv && (
+      {hv && !tip && (
         <span className="tip rd-fl-tip" style={{ left: Math.min(W - 110, Math.max(110, X(hv.ym))) }}>
           <span className="tip-title">{rdMonthYear(hv.ym)}</span>
           <span className="tip-row"><span className="tip-label">All pollsters</span><span className="tip-val">{s1(hv.v)}</span></span>
@@ -3051,6 +3103,19 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
           {hv.k != null && <span className="tip-row"><span className="tip-label">Polls</span><span className="tip-val">{hv.k}</span></span>}
         </span>
       )}
+      {tip && (() => {
+        const { d, px } = tip;
+        const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.pollster, released: d.released }) : null;
+        return (
+          <span className="tip rd-fl-tip" style={{ left: Math.min(W - 110, Math.max(110, px)) }}>
+            <span className="tip-title">{d.pollster}</span>
+            <span className="tip-row"><span className="tip-label">Published minus implied</span><span className="tip-val">{s1(d.v)}</span></span>
+            <span className="tip-row"><span className="tip-label">Fieldwork</span><span className="tip-val">{d.dateLabel}</span></span>
+            {d.sample != null && <span className="tip-row"><span className="tip-label">Sample</span><span className="tip-val">n = {d.sample.toLocaleString()}</span></span>}
+            {k && <span className="tip-sub tip-hint">Click to open this poll</span>}
+          </span>
+        );
+      })()}
     </div>
   );
 }
@@ -3133,6 +3198,7 @@ function RdFlows() {
       </div>
       <RdKey className="rd-ckey rd-fl-key" items={[{ kind: "line", color: "var(--ink)", label: "All pollsters, combined month by month" }, { kind: "band", color: "var(--ink-3)", label: "95% interval" }]}>
         <span className="rd-key-item"><span className="rd-fl-keydot" aria-hidden="true"></span>One pollster’s gap that month</span>
+        <span className="rd-key-item"><span className="rd-fl-keywd" aria-hidden="true"></span>One published wave’s own gap – hover to read the wave</span>
         <span className="rd-key-item"><span className="rd-fl-keynow" aria-hidden="true"><i></i></span>Now: the latest weeks pooled, with its 95% interval</span>
       </RdKey>
       {/* the drift battery: has each pollster's gap MOVED over the term,

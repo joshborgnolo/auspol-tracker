@@ -2602,6 +2602,16 @@ const flowDrift = {
     baseFrom: Object.fromEntries(Object.entries(FLOW_BASE_FROM).map(([f, b]) => [f, b.from])),
     houses: Object.keys(FLOW_BASE_FROM).sort(),
   },
+  /* one dot per published wave, so the drift chart's poll cloud can report a
+     wave's own gap on hover like every other chart's – the anomaly the
+     houses' lines average, in the scatter shape the other poll clouds carry.
+     Display-only: the estimator inputs are driftAnom above. */
+  polls: driftAnom.map((r) => {
+    const p = POLL_BY_KEY.get(r.key);
+    return p && { x: dx(p.date), v: r1(r.x), pollster: r.firm,
+                  dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
+                  sample: p.sample ?? null };
+  }).filter(Boolean).sort((a, b) => a.x - b.x || a.pollster.localeCompare(b.pollster)),
 };
 
 /* ---- 7d. flow-drift, Labor-vs-One-Nation pairing --------------------------
@@ -2708,6 +2718,13 @@ const flowDriftOn = driftOnAnom.length ? {
     baseFrom: Object.fromEntries(Object.entries(FLOW_ON_BASE_FROM).map(([f, b]) => [f, b.from])),
     houses: Object.keys(FLOW_ON_BASE_FROM).sort(),
   },
+  // display-only per-wave dots, §7c-parity: the anomaly behind each hover
+  polls: driftOnAnom.map((r) => {
+    const p = POLL_BY_KEY.get(r.key);
+    return p && { x: dx(p.date), v: r1(r.x), pollster: r.firm,
+                  dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
+                  sample: p.sample ?? null };
+  }).filter(Boolean).sort((a, b) => a.x - b.x || a.pollster.localeCompare(b.pollster)),
 } : null;
 
 /* Nowcasts for the alternative matchups, on the same window/half-life. Null

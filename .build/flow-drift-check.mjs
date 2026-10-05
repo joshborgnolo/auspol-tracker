@@ -40,6 +40,21 @@ const mx = (ym) => { const [y, m] = ym.split("-").map(Number); return y + (m - 1
 const ymOf = (d) => d.slice(0, 7);
 const r1 = (v) => Math.round(v * 10) / 10;
 const r2 = (v) => Math.round(v * 100) / 100;
+/* helpers the §7c/§7d per-wave poll dots read (gen-data.mjs, verbatim) */
+const MN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const monthName = (m) => MN[m - 1];
+const dayOf = (d) => Number(d.slice(8, 10));
+const dx = (iso) => {
+  const [y, m, d] = iso.split("-").map(Number);
+  const doy = (Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 1)) / 86400000;
+  return y + doy / 365;
+};
+function fwLabel(startISO, endISO) {
+  const d2 = dayOf(endISO), m2 = Number(endISO.slice(5, 7));
+  if (!startISO) return `${d2} ${monthName(m2)}`;
+  const d1 = dayOf(startISO), m1 = Number(startISO.slice(5, 7));
+  return m1 === m2 ? `${d1}–${d2} ${monthName(m2)}` : `${d1} ${monthName(m1)}–${d2} ${monthName(m2)}`;
+}
 const LATEST_ISO = POLLS.reduce((m, p) => (p.date > m ? p.date : m), "0000");
 const MONTHS = [];
 {
@@ -281,16 +296,33 @@ const eq = (label, a, b) => {
   const ok = JSON.stringify(a) === JSON.stringify(b);
   if (!ok) { bad++; console.error(`MISMATCH ${label}\n  fresh:   ${JSON.stringify(a)}\n  emitted: ${JSON.stringify(b)}`); }
 };
+/* §7c/§7d per-wave poll dots (gen-data.mjs's polls builders, verbatim) –
+   derived here, after both anomaly sets and POLL_BY_KEY exist, rather than
+   inside the section blocks above */
+const driftPolls = driftAnom.map((r) => {
+  const p = POLL_BY_KEY.get(r.key);
+  return p && { x: dx(p.date), v: r1(r.x), pollster: r.firm,
+                dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
+                sample: p.sample ?? null };
+}).filter(Boolean).sort((a, b) => a.x - b.x || a.pollster.localeCompare(b.pollster));
+const driftOnPolls = driftOnAnom.map((r) => {
+  const p = POLL_BY_KEY.get(r.key);
+  return p && { x: dx(p.date), v: r1(r.x), pollster: r.firm,
+                dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
+                sample: p.sample ?? null };
+}).filter(Boolean).sort((a, b) => a.x - b.x || a.pollster.localeCompare(b.pollster));
 eq("houses list", Object.keys(FLOW_BASE_FROM).sort(), emitted.meta.houses);
 eq("last month", driftMonths[driftMonths.length - 1], emitted.months[emitted.months.length - 1]);
 eq("2nd-last month", driftMonths[driftMonths.length - 2], emitted.months[emitted.months.length - 2]);
 eq("3rd-last month", driftMonths[driftMonths.length - 3], emitted.months[emitted.months.length - 3]);
 eq("nowcast", driftNow && { v: driftNow.v, ci95: driftNow.ci95, n: driftNow.n, nEff: driftNow.nEff }, emitted.now);
+eq("poll dots", driftPolls, emitted.polls);
 eq("on: houses list", Object.keys(FLOW_ON_BASE_FROM).sort(), emittedOn.meta.houses);
 eq("on: last month", driftOnMonths[driftOnMonths.length - 1], emittedOn.months[emittedOn.months.length - 1]);
 eq("on: 2nd-last month", driftOnMonths[driftOnMonths.length - 2], emittedOn.months[emittedOn.months.length - 2]);
 eq("on: 3rd-last month", driftOnMonths[driftOnMonths.length - 3], emittedOn.months[emittedOn.months.length - 3]);
 eq("on: nowcast", driftOnNow && { v: driftOnNow.v, ci95: driftOnNow.ci95, n: driftOnNow.n, nEff: driftOnNow.nEff }, emittedOn.now);
+eq("on: poll dots", driftOnPolls, emittedOn.polls);
 
 if (bad) process.exit(1);
 console.log(`flow-drift OK: ${emitted.meta.houses.length} houses checked against ${driftAnom.length} anomalies;`,

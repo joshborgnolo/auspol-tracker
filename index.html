@@ -5120,6 +5120,7 @@ body.rd.dark .rd-fl-band { opacity: 0.22; }
 body.rd .rd-fl-hdot { fill: var(--ink-3); opacity: 0.4; transition: opacity .2s ease; }
 body.rd .rd-fl-hdot.on { fill: var(--ink); opacity: 1; }
 body.rd .rd-fl-hdot.off { opacity: 0.15; }
+body.rd .rd-fl-wdot { fill: var(--ink-2); opacity: 0.5; }
 body.rd .rd-fl-pick { fill: none; stroke: var(--ink); stroke-width: 1.25; opacity: 0.6; }
 body.rd .rd-fl-line { fill: none; stroke: var(--ink); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
 body.rd .rd-fl-enddot { fill: var(--ink); }
@@ -5135,6 +5136,7 @@ body.rd .rd-fl-note { font-size: 12px; fill: var(--ink-2); }
 body.rd .rd-fl-empty { font-size: 12px; font-style: italic; fill: var(--ink-3); }
 body.rd .rd-fl-key { margin-top: 14px; }
 body.rd .rd-fl-keydot { display: inline-block; width: 6px; height: 6px; margin: 0 4px; border-radius: 50%; background: var(--ink-3); opacity: 0.55; }
+body.rd .rd-fl-keywd { display: inline-block; width: 6px; height: 6px; margin: 0 4px; border-radius: 50%; background: var(--ink-2); opacity: 0.5; }
 body.rd .rd-fl-keynow { position: relative; display: inline-block; width: 14px; height: 18px; }
 body.rd .rd-fl-keynow::before { content: ""; position: absolute; left: 6px; top: 2px; bottom: 2px; width: 2px; border-radius: 1px; background: var(--ink); opacity: 0.35; }
 body.rd .rd-fl-keynow i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ink); }
@@ -11724,7 +11726,876 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "Fox & Hedgehog": "2026-03-25"
       },
       "houses": ["Essential", "Fox & Hedgehog", "Freshwater", "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy", "YouGov"]
-    }
+    },
+    "polls": [{
+      "x": 2025.4136986301369,
+      "v": 0.9,
+      "pollster": "Roy Morgan",
+      "dateLabel": "5 May–1 Jun",
+      "released": "2025-06-01",
+      "sample": 5128
+    }, {
+      "x": 2025.4712328767123,
+      "v": 0,
+      "pollster": "Roy Morgan",
+      "dateLabel": "2–22 Jun",
+      "released": "2025-06-22",
+      "sample": 3957
+    }, {
+      "x": 2025.490410958904,
+      "v": 0.4,
+      "pollster": "Roy Morgan",
+      "dateLabel": "23–29 Jun",
+      "released": "2025-06-29",
+      "sample": 1522
+    }, {
+      "x": 2025.4931506849316,
+      "v": 0.3,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "19–30 Jun",
+      "released": "2025-06-30",
+      "sample": 4036
+    }, {
+      "x": 2025.495890410959,
+      "v": 1,
+      "pollster": "Spectre Strategy",
+      "dateLabel": "27 Jun–1 Jul",
+      "released": "2025-07-01",
+      "sample": 1001
+    }, {
+      "x": 2025.5397260273974,
+      "v": 0.1,
+      "pollster": "Newspoll",
+      "dateLabel": "14–17 Jul",
+      "released": "2025-07-17",
+      "sample": 1264
+    }, {
+      "x": 2025.5424657534247,
+      "v": -0.3,
+      "pollster": "Resolve",
+      "dateLabel": "13–18 Jul",
+      "released": "2025-07-18",
+      "sample": 2311
+    }, {
+      "x": 2025.5671232876712,
+      "v": -0.3,
+      "pollster": "Roy Morgan",
+      "dateLabel": "30 Jun–27 Jul",
+      "released": "2025-07-27",
+      "sample": 5159
+    }, {
+      "x": 2025.6164383561643,
+      "v": -0.1,
+      "pollster": "Newspoll",
+      "dateLabel": "11–14 Aug",
+      "released": "2025-08-14",
+      "sample": 1283
+    }, {
+      "x": 2025.6219178082192,
+      "v": 1.6,
+      "pollster": "Resolve",
+      "dateLabel": "9–16 Aug",
+      "released": "2025-08-16",
+      "sample": 1800
+    }, {
+      "x": 2025.6438356164383,
+      "v": 0.4,
+      "pollster": "Roy Morgan",
+      "dateLabel": "28 Jul–24 Aug",
+      "released": "2025-08-24",
+      "sample": 5001
+    }, {
+      "x": 2025.6849315068494,
+      "v": -0.7,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "19 Aug–8 Sep",
+      "released": "2025-09-08",
+      "sample": 5326
+    }, {
+      "x": 2025.6931506849314,
+      "v": 0.3,
+      "pollster": "Newspoll",
+      "dateLabel": "8–11 Sep",
+      "released": "2025-09-11",
+      "sample": 1264
+    }, {
+      "x": 2025.6986301369864,
+      "v": -0.9,
+      "pollster": "Resolve",
+      "dateLabel": "9–13 Sep",
+      "released": "2025-09-13",
+      "sample": 1800
+    }, {
+      "x": 2025.7205479452055,
+      "v": -0.5,
+      "pollster": "Roy Morgan",
+      "dateLabel": "25 Aug–21 Sep",
+      "released": "2025-09-21",
+      "sample": 5084
+    }, {
+      "x": 2025.7424657534248,
+      "v": 1,
+      "pollster": "Essential",
+      "dateLabel": "24–29 Sep",
+      "released": "2025-09-29",
+      "sample": 1001
+    }, {
+      "x": 2025.7506849315068,
+      "v": 0,
+      "pollster": "Newspoll",
+      "dateLabel": "29 Sep–2 Oct",
+      "released": "2025-10-02",
+      "sample": 1264
+    }, {
+      "x": 2025.7643835616439,
+      "v": 0.6,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "25 Sep–7 Oct",
+      "released": "2025-10-07",
+      "sample": 1997
+    }, {
+      "x": 2025.7780821917809,
+      "v": -0.4,
+      "pollster": "Resolve",
+      "dateLabel": "7–12 Oct",
+      "released": "2025-10-12",
+      "sample": 1800
+    }, {
+      "x": 2025.7972602739726,
+      "v": -0.7,
+      "pollster": "Roy Morgan",
+      "dateLabel": "22 Sep–19 Oct",
+      "released": "2025-10-19",
+      "sample": 4908
+    }, {
+      "x": 2025.8,
+      "v": 1.2,
+      "pollster": "Freshwater",
+      "dateLabel": "15–20 Oct",
+      "released": "2025-10-20",
+      "sample": 1530
+    }, {
+      "x": 2025.8191780821917,
+      "v": 0.2,
+      "pollster": "Essential",
+      "dateLabel": "22–27 Oct",
+      "released": "2025-10-27",
+      "sample": 1041
+    }, {
+      "x": 2025.827397260274,
+      "v": -0.3,
+      "pollster": "Newspoll",
+      "dateLabel": "27–30 Oct",
+      "released": "2025-10-30",
+      "sample": 1265
+    }, {
+      "x": 2025.827397260274,
+      "v": 0.3,
+      "pollster": "YouGov",
+      "dateLabel": "23–30 Oct",
+      "released": "2025-10-30",
+      "sample": 4578
+    }, {
+      "x": 2025.8520547945207,
+      "v": -0.6,
+      "pollster": "Resolve",
+      "dateLabel": "4–8 Nov",
+      "released": "2025-11-08",
+      "sample": 1804
+    }, {
+      "x": 2025.8657534246574,
+      "v": -0.1,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "7–13 Nov",
+      "released": "2025-11-13",
+      "sample": 1011
+    }, {
+      "x": 2025.8739726027397,
+      "v": 0.5,
+      "pollster": "Roy Morgan",
+      "dateLabel": "20 Oct–16 Nov",
+      "released": "2025-11-16",
+      "sample": 5248
+    }, {
+      "x": 2025.876712328767,
+      "v": -1.7,
+      "pollster": "Spectre Strategy",
+      "dateLabel": "4–17 Nov",
+      "released": "2025-11-17",
+      "sample": 1007
+    }, {
+      "x": 2025.8849315068494,
+      "v": 0.1,
+      "pollster": "Newspoll",
+      "dateLabel": "17–20 Nov",
+      "released": "2025-11-20",
+      "sample": 1245
+    }, {
+      "x": 2025.8958904109588,
+      "v": -1.1,
+      "pollster": "Essential",
+      "dateLabel": "19–24 Nov",
+      "released": "2025-11-24",
+      "sample": 1020
+    }, {
+      "x": 2025.9013698630138,
+      "v": 0,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "7–26 Nov",
+      "released": "2025-11-26",
+      "sample": 4775
+    }, {
+      "x": 2025.9315068493152,
+      "v": -0.8,
+      "pollster": "Resolve",
+      "dateLabel": "2–7 Dec",
+      "released": "2025-12-07",
+      "sample": 1800
+    }, {
+      "x": 2025.9342465753425,
+      "v": 0.2,
+      "pollster": "Essential",
+      "dateLabel": "3–8 Dec",
+      "released": "2025-12-08",
+      "sample": 1030
+    }, {
+      "x": 2025.945205479452,
+      "v": 0.7,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "5–12 Dec",
+      "released": "2025-12-12",
+      "sample": 1012
+    }, {
+      "x": 2025.9506849315069,
+      "v": 0.6,
+      "pollster": "Roy Morgan",
+      "dateLabel": "8–14 Dec",
+      "released": "2025-12-14",
+      "sample": 1574
+    }, {
+      "x": 2025.9671232876713,
+      "v": 0.9,
+      "pollster": "Resolve",
+      "dateLabel": "17–20 Dec",
+      "released": "2025-12-20",
+      "sample": 1010
+    }, {
+      "x": 2026.013698630137,
+      "v": 1.3,
+      "pollster": "Fox & Hedgehog",
+      "dateLabel": "5–6 Jan",
+      "released": "2026-01-06",
+      "sample": 1608
+    }, {
+      "x": 2026.027397260274,
+      "v": -0.8,
+      "pollster": "Roy Morgan",
+      "dateLabel": "5–11 Jan",
+      "released": "2026-01-11",
+      "sample": 1676
+    }, {
+      "x": 2026.041095890411,
+      "v": -0.4,
+      "pollster": "Newspoll",
+      "dateLabel": "12–16 Jan",
+      "released": "2026-01-16",
+      "sample": 1224
+    }, {
+      "x": 2026.041095890411,
+      "v": 1,
+      "pollster": "Resolve",
+      "dateLabel": "12–16 Jan",
+      "released": "2026-01-16",
+      "sample": 1800
+    }, {
+      "x": 2026.0465753424658,
+      "v": 0.6,
+      "pollster": "Freshwater",
+      "dateLabel": "16–18 Jan",
+      "released": "2026-01-18",
+      "sample": 1050
+    }, {
+      "x": 2026.0465753424658,
+      "v": -0.4,
+      "pollster": "Roy Morgan",
+      "dateLabel": "12–18 Jan",
+      "released": "2026-01-18",
+      "sample": 1630
+    }, {
+      "x": 2026.0657534246575,
+      "v": 1.5,
+      "pollster": "Roy Morgan",
+      "dateLabel": "19–25 Jan",
+      "released": "2026-01-25",
+      "sample": 1933
+    }, {
+      "x": 2026.0712328767124,
+      "v": -0.1,
+      "pollster": "YouGov",
+      "dateLabel": "20–27 Jan",
+      "released": "2026-01-27",
+      "sample": 1500
+    }, {
+      "x": 2026.0767123287671,
+      "v": 0.6,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "22–29 Jan",
+      "released": "2026-01-29",
+      "sample": 1003
+    }, {
+      "x": 2026.0849315068492,
+      "v": 0.8,
+      "pollster": "Roy Morgan",
+      "dateLabel": "26 Jan–1 Feb",
+      "released": "2026-02-01",
+      "sample": 1401
+    }, {
+      "x": 2026.1041095890412,
+      "v": -0.2,
+      "pollster": "Roy Morgan",
+      "dateLabel": "2–8 Feb",
+      "released": "2026-02-08",
+      "sample": 1584
+    }, {
+      "x": 2026.109589041096,
+      "v": -0.4,
+      "pollster": "YouGov",
+      "dateLabel": "3–10 Feb",
+      "released": "2026-02-10",
+      "sample": 1561
+    }, {
+      "x": 2026.1178082191782,
+      "v": 2.8,
+      "pollster": "Roy Morgan",
+      "dateLabel": "9–13 Feb",
+      "released": "2026-02-13",
+      "sample": 1216
+    }, {
+      "x": 2026.1205479452055,
+      "v": 1,
+      "pollster": "Resolve",
+      "dateLabel": "8–14 Feb",
+      "released": "2026-02-14",
+      "sample": 1800
+    }, {
+      "x": 2026.1260273972603,
+      "v": -0.3,
+      "pollster": "Roy Morgan",
+      "dateLabel": "13–16 Feb",
+      "released": "2026-02-16",
+      "sample": 526
+    }, {
+      "x": 2026.1342465753426,
+      "v": 0.1,
+      "pollster": "Fox & Hedgehog",
+      "dateLabel": "17–19 Feb",
+      "released": "2026-02-19",
+      "sample": 1625
+    }, {
+      "x": 2026.1424657534246,
+      "v": -0.8,
+      "pollster": "Roy Morgan",
+      "dateLabel": "16–22 Feb",
+      "released": "2026-02-22",
+      "sample": 1649
+    }, {
+      "x": 2026.145205479452,
+      "v": 0,
+      "pollster": "Essential",
+      "dateLabel": "18–23 Feb",
+      "released": "2026-02-23",
+      "sample": 1002
+    }, {
+      "x": 2026.1479452054793,
+      "v": -0.8,
+      "pollster": "YouGov",
+      "dateLabel": "17–24 Feb",
+      "released": "2026-02-24",
+      "sample": 1500
+    }, {
+      "x": 2026.1561643835616,
+      "v": -0.3,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "23–27 Feb",
+      "released": "2026-02-27",
+      "sample": 1006
+    }, {
+      "x": 2026.1616438356164,
+      "v": 1.9,
+      "pollster": "Roy Morgan",
+      "dateLabel": "23 Feb–1 Mar",
+      "released": "2026-03-01",
+      "sample": 1554
+    }, {
+      "x": 2026.1808219178083,
+      "v": 1.1,
+      "pollster": "Roy Morgan",
+      "dateLabel": "2–8 Mar",
+      "released": "2026-03-08",
+      "sample": 1532
+    }, {
+      "x": 2026.186301369863,
+      "v": -0.3,
+      "pollster": "YouGov",
+      "dateLabel": "3–10 Mar",
+      "released": "2026-03-10",
+      "sample": 1425
+    }, {
+      "x": 2026.2,
+      "v": 0.9,
+      "pollster": "Roy Morgan",
+      "dateLabel": "9–15 Mar",
+      "released": "2026-03-15",
+      "sample": 1654
+    }, {
+      "x": 2026.2191780821918,
+      "v": 0.8,
+      "pollster": "Roy Morgan",
+      "dateLabel": "16–22 Mar",
+      "released": "2026-03-22",
+      "sample": 1664
+    }, {
+      "x": 2026.2219178082191,
+      "v": -1.2,
+      "pollster": "Essential",
+      "dateLabel": "18–23 Mar",
+      "released": "2026-03-23",
+      "sample": 1008
+    }, {
+      "x": 2026.2246575342465,
+      "v": -0.5,
+      "pollster": "YouGov",
+      "dateLabel": "17–24 Mar",
+      "released": "2026-03-24",
+      "sample": 1501
+    }, {
+      "x": 2026.227397260274,
+      "v": -1.4,
+      "pollster": "Fox & Hedgehog",
+      "dateLabel": "24–25 Mar",
+      "released": "2026-03-25",
+      "sample": 1810
+    }, {
+      "x": 2026.2328767123288,
+      "v": -2.4,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "23–27 Mar",
+      "released": "2026-03-27",
+      "sample": 1003
+    }, {
+      "x": 2026.2383561643835,
+      "v": -2.3,
+      "pollster": "Freshwater",
+      "dateLabel": "27–29 Mar",
+      "released": "2026-03-29",
+      "sample": 1050
+    }, {
+      "x": 2026.2383561643835,
+      "v": 1.8,
+      "pollster": "Roy Morgan",
+      "dateLabel": "23–29 Mar",
+      "released": "2026-03-29",
+      "sample": 1562
+    }, {
+      "x": 2026.2575342465752,
+      "v": 1.8,
+      "pollster": "Roy Morgan",
+      "dateLabel": "30 Mar–5 Apr",
+      "released": "2026-04-05",
+      "sample": 1411
+    }, {
+      "x": 2026.2630136986302,
+      "v": -0.6,
+      "pollster": "YouGov",
+      "dateLabel": "31 Mar–7 Apr",
+      "released": "2026-04-07",
+      "sample": 1502
+    }, {
+      "x": 2026.2657534246575,
+      "v": 0.7,
+      "pollster": "Spectre Strategy",
+      "dateLabel": "2–8 Apr",
+      "released": "2026-04-08",
+      "sample": 1002
+    }, {
+      "x": 2026.2767123287672,
+      "v": 1.9,
+      "pollster": "Roy Morgan",
+      "dateLabel": "6–12 Apr",
+      "released": "2026-04-12",
+      "sample": 1512
+    }, {
+      "x": 2026.2931506849316,
+      "v": 0.9,
+      "pollster": "Resolve",
+      "dateLabel": "13–18 Apr",
+      "released": "2026-04-18",
+      "sample": 1807
+    }, {
+      "x": 2026.295890410959,
+      "v": 0.3,
+      "pollster": "Roy Morgan",
+      "dateLabel": "13–19 Apr",
+      "released": "2026-04-19",
+      "sample": 1620
+    }, {
+      "x": 2026.3013698630136,
+      "v": -0.4,
+      "pollster": "YouGov",
+      "dateLabel": "14–21 Apr",
+      "released": "2026-04-21",
+      "sample": 1501
+    }, {
+      "x": 2026.3150684931506,
+      "v": -0.6,
+      "pollster": "Roy Morgan",
+      "dateLabel": "20–26 Apr",
+      "released": "2026-04-26",
+      "sample": 1587
+    }, {
+      "x": 2026.317808219178,
+      "v": -0.8,
+      "pollster": "Essential",
+      "dateLabel": "22–27 Apr",
+      "released": "2026-04-27",
+      "sample": 1067
+    }, {
+      "x": 2026.3260273972603,
+      "v": -0.3,
+      "pollster": "Freshwater",
+      "dateLabel": "28–30 Apr",
+      "released": "2026-04-30",
+      "sample": 1046
+    }, {
+      "x": 2026.3260273972603,
+      "v": 1.2,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "24–30 Apr",
+      "released": "2026-04-30",
+      "sample": 1014
+    }, {
+      "x": 2026.3342465753424,
+      "v": 0.5,
+      "pollster": "Roy Morgan",
+      "dateLabel": "27 Apr–3 May",
+      "released": "2026-05-03",
+      "sample": 1681
+    }, {
+      "x": 2026.3397260273973,
+      "v": -1.1,
+      "pollster": "YouGov",
+      "dateLabel": "28 Apr–5 May",
+      "released": "2026-05-05",
+      "sample": 1500
+    }, {
+      "x": 2026.3534246575343,
+      "v": 0.2,
+      "pollster": "Roy Morgan",
+      "dateLabel": "4–10 May",
+      "released": "2026-05-10",
+      "sample": 1605
+    }, {
+      "x": 2026.3671232876711,
+      "v": -0.2,
+      "pollster": "Freshwater",
+      "dateLabel": "13–15 May",
+      "released": "2026-05-15",
+      "sample": 1384
+    }, {
+      "x": 2026.372602739726,
+      "v": 0,
+      "pollster": "Newspoll",
+      "dateLabel": "14–17 May",
+      "released": "2026-05-17",
+      "sample": 1252
+    }, {
+      "x": 2026.372602739726,
+      "v": 1.3,
+      "pollster": "Roy Morgan",
+      "dateLabel": "11–17 May",
+      "released": "2026-05-17",
+      "sample": 1668
+    }, {
+      "x": 2026.3780821917808,
+      "v": -0.5,
+      "pollster": "YouGov",
+      "dateLabel": "12–19 May",
+      "released": "2026-05-19",
+      "sample": 1504
+    }, {
+      "x": 2026.3917808219178,
+      "v": 1.6,
+      "pollster": "Essential",
+      "dateLabel": "20–24 May",
+      "released": "2026-05-24",
+      "sample": 1062
+    }, {
+      "x": 2026.3917808219178,
+      "v": 0.3,
+      "pollster": "Roy Morgan",
+      "dateLabel": "18–24 May",
+      "released": "2026-05-24",
+      "sample": 1613
+    }, {
+      "x": 2026.3972602739725,
+      "v": 0.4,
+      "pollster": "Fox & Hedgehog",
+      "dateLabel": "25–26 May",
+      "released": "2026-05-26",
+      "sample": 1700
+    }, {
+      "x": 2026.4027397260274,
+      "v": 0,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "25–28 May",
+      "released": "2026-05-28",
+      "sample": 1005
+    }, {
+      "x": 2026.4109589041095,
+      "v": 1.8,
+      "pollster": "Roy Morgan",
+      "dateLabel": "25–31 May",
+      "released": "2026-05-31",
+      "sample": 1542
+    }, {
+      "x": 2026.4164383561645,
+      "v": -0.5,
+      "pollster": "YouGov",
+      "dateLabel": "26 May–2 Jun",
+      "released": "2026-06-02",
+      "sample": 1471
+    }, {
+      "x": 2026.4301369863015,
+      "v": 1.5,
+      "pollster": "Roy Morgan",
+      "dateLabel": "1–7 Jun",
+      "released": "2026-06-07",
+      "sample": 1631
+    }, {
+      "x": 2026.4493150684932,
+      "v": -0.7,
+      "pollster": "Roy Morgan",
+      "dateLabel": "8–14 Jun",
+      "released": "2026-06-14",
+      "sample": 1583
+    }, {
+      "x": 2026.454794520548,
+      "v": 0.2,
+      "pollster": "YouGov",
+      "dateLabel": "9–16 Jun",
+      "released": "2026-06-16",
+      "sample": 1492
+    }, {
+      "x": 2026.468493150685,
+      "v": 0.3,
+      "pollster": "Roy Morgan",
+      "dateLabel": "15–21 Jun",
+      "released": "2026-06-21",
+      "sample": 1575
+    }, {
+      "x": 2026.482191780822,
+      "v": -0.3,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "22–26 Jun",
+      "released": "2026-06-26",
+      "sample": 1006
+    }, {
+      "x": 2026.4876712328767,
+      "v": 0.1,
+      "pollster": "Roy Morgan",
+      "dateLabel": "22–28 Jun",
+      "released": "2026-06-28",
+      "sample": 1639
+    }, {
+      "x": 2026.490410958904,
+      "v": -0.2,
+      "pollster": "Essential",
+      "dateLabel": "24–29 Jun",
+      "released": "2026-06-29",
+      "sample": 1017
+    }, {
+      "x": 2026.4931506849316,
+      "v": -0.8,
+      "pollster": "YouGov",
+      "dateLabel": "23–30 Jun",
+      "released": "2026-06-30",
+      "sample": 1502
+    }, {
+      "x": 2026.5068493150684,
+      "v": 0.2,
+      "pollster": "Roy Morgan",
+      "dateLabel": "28 Jun–5 Jul",
+      "released": "2026-07-05",
+      "sample": 1584
+    }, {
+      "x": 2026.5260273972603,
+      "v": 0.7,
+      "pollster": "Roy Morgan",
+      "dateLabel": "6–12 Jul",
+      "released": "2026-07-12",
+      "sample": 1612
+    }, {
+      "x": 2026.531506849315,
+      "v": -0.5,
+      "pollster": "YouGov",
+      "dateLabel": "7–14 Jul",
+      "released": "2026-07-14",
+      "sample": 1468
+    }, {
+      "x": 2026.545205479452,
+      "v": 2.3,
+      "pollster": "Roy Morgan",
+      "dateLabel": "13–19 Jul",
+      "released": "2026-07-19",
+      "sample": 1679
+    }, {
+      "x": 2026.5561643835617,
+      "v": 0.2,
+      "pollster": "Spectre Strategy",
+      "dateLabel": "11–23 Jul",
+      "released": "2026-07-23",
+      "sample": 1434
+    }, {
+      "x": 2026.5643835616438,
+      "v": 0.6,
+      "pollster": "Roy Morgan",
+      "dateLabel": "20–26 Jul",
+      "released": "2026-07-26",
+      "sample": 1643
+    }, {
+      "x": 2026.5698630136985,
+      "v": 0,
+      "pollster": "YouGov",
+      "dateLabel": "21–28 Jul",
+      "released": "2026-07-28",
+      "sample": 1519
+    }, {
+      "x": 2026.5753424657535,
+      "v": -1.7,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "27–30 Jul",
+      "released": "2026-07-30",
+      "sample": 1001
+    }, {
+      "x": 2026.5835616438355,
+      "v": -1.4,
+      "pollster": "Roy Morgan",
+      "dateLabel": "27 Jul–2 Aug",
+      "released": "2026-08-02",
+      "sample": 1531
+    }, {
+      "x": 2026.6027397260275,
+      "v": 0.1,
+      "pollster": "Roy Morgan",
+      "dateLabel": "3–9 Aug",
+      "released": "2026-08-09",
+      "sample": 1647
+    }, {
+      "x": 2026.6054794520549,
+      "v": -1,
+      "pollster": "YouGov",
+      "dateLabel": "4–10 Aug",
+      "released": "2026-08-10",
+      "sample": 1511
+    }, {
+      "x": 2026.6219178082192,
+      "v": -0.7,
+      "pollster": "Roy Morgan",
+      "dateLabel": "10–16 Aug",
+      "released": "2026-08-16",
+      "sample": 1576
+    }, {
+      "x": 2026.641095890411,
+      "v": -1.3,
+      "pollster": "Roy Morgan",
+      "dateLabel": "17–23 Aug",
+      "released": "2026-08-23",
+      "sample": 1508
+    }, {
+      "x": 2026.6438356164383,
+      "v": -0.4,
+      "pollster": "YouGov",
+      "dateLabel": "18–24 Aug",
+      "released": "2026-08-24",
+      "sample": 1510
+    }, {
+      "x": 2026.654794520548,
+      "v": -3.3,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "24–28 Aug",
+      "released": "2026-08-28",
+      "sample": 1006
+    }, {
+      "x": 2026.6602739726027,
+      "v": 0.5,
+      "pollster": "Roy Morgan",
+      "dateLabel": "24–30 Aug",
+      "released": "2026-08-30",
+      "sample": 1585
+    }, {
+      "x": 2026.66301369863,
+      "v": -0.1,
+      "pollster": "Essential",
+      "dateLabel": "26–31 Aug",
+      "released": "2026-08-31",
+      "sample": 1017
+    }, {
+      "x": 2026.6794520547944,
+      "v": -0.3,
+      "pollster": "Roy Morgan",
+      "dateLabel": "31 Aug–6 Sep",
+      "released": "2026-09-06",
+      "sample": 1541
+    }, {
+      "x": 2026.6849315068494,
+      "v": -0.5,
+      "pollster": "YouGov",
+      "dateLabel": "1–8 Sep",
+      "released": "2026-09-08",
+      "sample": 1504
+    }, {
+      "x": 2026.6986301369864,
+      "v": 1.6,
+      "pollster": "Roy Morgan",
+      "dateLabel": "7–13 Sep",
+      "released": "2026-09-13",
+      "sample": 1583
+    }, {
+      "x": 2026.717808219178,
+      "v": 0,
+      "pollster": "Roy Morgan",
+      "dateLabel": "14–20 Sep",
+      "released": "2026-09-20",
+      "sample": 1561
+    }, {
+      "x": 2026.7205479452055,
+      "v": -0.4,
+      "pollster": "YouGov",
+      "dateLabel": "15–21 Sep",
+      "released": "2026-09-21",
+      "sample": 1500
+    }, {
+      "x": 2026.7369863013698,
+      "v": 0.2,
+      "pollster": "Roy Morgan",
+      "dateLabel": "14–27 Sep",
+      "released": "2026-09-27",
+      "sample": 2569
+    }, {
+      "x": 2026.7424657534248,
+      "v": 0.4,
+      "pollster": "Essential",
+      "dateLabel": "24–29 Sep",
+      "released": "2026-09-29",
+      "sample": 1008
+    }, {
+      "x": 2026.7506849315068,
+      "v": -4.7,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "28 Sep–2 Oct",
+      "released": "2026-10-02",
+      "sample": 1000
+    }]
   };
   const flowDriftOn = {
     "months": [{
@@ -11898,7 +12769,379 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "Roy Morgan": "2026-05-31"
       },
       "houses": ["Fox & Hedgehog", "Freshwater", "RedBridge/Accent", "Roy Morgan", "YouGov"]
-    }
+    },
+    "polls": [{
+      "x": 2026.013698630137,
+      "v": 0.1,
+      "pollster": "Fox & Hedgehog",
+      "dateLabel": "5–6 Jan",
+      "released": "2026-01-06",
+      "sample": 1608
+    }, {
+      "x": 2026.0465753424658,
+      "v": 0.4,
+      "pollster": "Freshwater",
+      "dateLabel": "16–18 Jan",
+      "released": "2026-01-18",
+      "sample": 1050
+    }, {
+      "x": 2026.0712328767124,
+      "v": 0.2,
+      "pollster": "YouGov",
+      "dateLabel": "20–27 Jan",
+      "released": "2026-01-27",
+      "sample": 1500
+    }, {
+      "x": 2026.109589041096,
+      "v": 0.1,
+      "pollster": "YouGov",
+      "dateLabel": "3–10 Feb",
+      "released": "2026-02-10",
+      "sample": 1561
+    }, {
+      "x": 2026.1342465753426,
+      "v": -0.7,
+      "pollster": "Fox & Hedgehog",
+      "dateLabel": "17–19 Feb",
+      "released": "2026-02-19",
+      "sample": 1625
+    }, {
+      "x": 2026.1479452054793,
+      "v": -0.3,
+      "pollster": "YouGov",
+      "dateLabel": "17–24 Feb",
+      "released": "2026-02-24",
+      "sample": 1500
+    }, {
+      "x": 2026.1561643835616,
+      "v": -0.1,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "23–27 Feb",
+      "released": "2026-02-27",
+      "sample": 1006
+    }, {
+      "x": 2026.186301369863,
+      "v": -1.4,
+      "pollster": "YouGov",
+      "dateLabel": "3–10 Mar",
+      "released": "2026-03-10",
+      "sample": 1425
+    }, {
+      "x": 2026.2246575342465,
+      "v": -2.4,
+      "pollster": "YouGov",
+      "dateLabel": "17–24 Mar",
+      "released": "2026-03-24",
+      "sample": 1501
+    }, {
+      "x": 2026.227397260274,
+      "v": 0.6,
+      "pollster": "Fox & Hedgehog",
+      "dateLabel": "24–25 Mar",
+      "released": "2026-03-25",
+      "sample": 1810
+    }, {
+      "x": 2026.2328767123288,
+      "v": -1.3,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "23–27 Mar",
+      "released": "2026-03-27",
+      "sample": 1003
+    }, {
+      "x": 2026.2383561643835,
+      "v": 0.6,
+      "pollster": "Freshwater",
+      "dateLabel": "27–29 Mar",
+      "released": "2026-03-29",
+      "sample": 1050
+    }, {
+      "x": 2026.2630136986302,
+      "v": -2.2,
+      "pollster": "YouGov",
+      "dateLabel": "31 Mar–7 Apr",
+      "released": "2026-04-07",
+      "sample": 1502
+    }, {
+      "x": 2026.3013698630136,
+      "v": -2.6,
+      "pollster": "YouGov",
+      "dateLabel": "14–21 Apr",
+      "released": "2026-04-21",
+      "sample": 1501
+    }, {
+      "x": 2026.3260273972603,
+      "v": 1.2,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "24–30 Apr",
+      "released": "2026-04-30",
+      "sample": 1014
+    }, {
+      "x": 2026.3397260273973,
+      "v": -0.3,
+      "pollster": "YouGov",
+      "dateLabel": "28 Apr–5 May",
+      "released": "2026-05-05",
+      "sample": 1500
+    }, {
+      "x": 2026.3671232876711,
+      "v": -0.7,
+      "pollster": "Freshwater",
+      "dateLabel": "13–15 May",
+      "released": "2026-05-15",
+      "sample": 1384
+    }, {
+      "x": 2026.372602739726,
+      "v": -0.1,
+      "pollster": "Roy Morgan",
+      "dateLabel": "11–17 May",
+      "released": "2026-05-17",
+      "sample": 1668
+    }, {
+      "x": 2026.3780821917808,
+      "v": -2.1,
+      "pollster": "YouGov",
+      "dateLabel": "12–19 May",
+      "released": "2026-05-19",
+      "sample": 1504
+    }, {
+      "x": 2026.3917808219178,
+      "v": -0.1,
+      "pollster": "Roy Morgan",
+      "dateLabel": "18–24 May",
+      "released": "2026-05-24",
+      "sample": 1613
+    }, {
+      "x": 2026.3972602739725,
+      "v": 2.7,
+      "pollster": "Fox & Hedgehog",
+      "dateLabel": "25–26 May",
+      "released": "2026-05-26",
+      "sample": 1700
+    }, {
+      "x": 2026.4027397260274,
+      "v": 0.6,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "25–28 May",
+      "released": "2026-05-28",
+      "sample": 1005
+    }, {
+      "x": 2026.4109589041095,
+      "v": 0.3,
+      "pollster": "Roy Morgan",
+      "dateLabel": "25–31 May",
+      "released": "2026-05-31",
+      "sample": 1542
+    }, {
+      "x": 2026.4164383561645,
+      "v": -0.2,
+      "pollster": "YouGov",
+      "dateLabel": "26 May–2 Jun",
+      "released": "2026-06-02",
+      "sample": 1471
+    }, {
+      "x": 2026.4301369863015,
+      "v": 0.8,
+      "pollster": "Roy Morgan",
+      "dateLabel": "1–7 Jun",
+      "released": "2026-06-07",
+      "sample": 1631
+    }, {
+      "x": 2026.4493150684932,
+      "v": -0.2,
+      "pollster": "Roy Morgan",
+      "dateLabel": "8–14 Jun",
+      "released": "2026-06-14",
+      "sample": 1583
+    }, {
+      "x": 2026.454794520548,
+      "v": -1,
+      "pollster": "YouGov",
+      "dateLabel": "9–16 Jun",
+      "released": "2026-06-16",
+      "sample": 1492
+    }, {
+      "x": 2026.468493150685,
+      "v": -0.4,
+      "pollster": "Roy Morgan",
+      "dateLabel": "15–21 Jun",
+      "released": "2026-06-21",
+      "sample": 1575
+    }, {
+      "x": 2026.482191780822,
+      "v": 2.5,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "22–26 Jun",
+      "released": "2026-06-26",
+      "sample": 1006
+    }, {
+      "x": 2026.4876712328767,
+      "v": -0.7,
+      "pollster": "Roy Morgan",
+      "dateLabel": "22–28 Jun",
+      "released": "2026-06-28",
+      "sample": 1639
+    }, {
+      "x": 2026.4931506849316,
+      "v": -0.2,
+      "pollster": "YouGov",
+      "dateLabel": "23–30 Jun",
+      "released": "2026-06-30",
+      "sample": 1502
+    }, {
+      "x": 2026.5068493150684,
+      "v": 0.1,
+      "pollster": "Roy Morgan",
+      "dateLabel": "28 Jun–5 Jul",
+      "released": "2026-07-05",
+      "sample": 1584
+    }, {
+      "x": 2026.5260273972603,
+      "v": -0.1,
+      "pollster": "Roy Morgan",
+      "dateLabel": "6–12 Jul",
+      "released": "2026-07-12",
+      "sample": 1612
+    }, {
+      "x": 2026.531506849315,
+      "v": 1.2,
+      "pollster": "YouGov",
+      "dateLabel": "7–14 Jul",
+      "released": "2026-07-14",
+      "sample": 1468
+    }, {
+      "x": 2026.545205479452,
+      "v": -0.4,
+      "pollster": "Roy Morgan",
+      "dateLabel": "13–19 Jul",
+      "released": "2026-07-19",
+      "sample": 1679
+    }, {
+      "x": 2026.5643835616438,
+      "v": -0.5,
+      "pollster": "Roy Morgan",
+      "dateLabel": "20–26 Jul",
+      "released": "2026-07-26",
+      "sample": 1643
+    }, {
+      "x": 2026.5698630136985,
+      "v": 0.7,
+      "pollster": "YouGov",
+      "dateLabel": "21–28 Jul",
+      "released": "2026-07-28",
+      "sample": 1519
+    }, {
+      "x": 2026.5753424657535,
+      "v": 3.3,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "27–30 Jul",
+      "released": "2026-07-30",
+      "sample": 1001
+    }, {
+      "x": 2026.5835616438355,
+      "v": -0.8,
+      "pollster": "Roy Morgan",
+      "dateLabel": "27 Jul–2 Aug",
+      "released": "2026-08-02",
+      "sample": 1531
+    }, {
+      "x": 2026.6027397260275,
+      "v": -0.3,
+      "pollster": "Roy Morgan",
+      "dateLabel": "3–9 Aug",
+      "released": "2026-08-09",
+      "sample": 1647
+    }, {
+      "x": 2026.6054794520549,
+      "v": 0.5,
+      "pollster": "YouGov",
+      "dateLabel": "4–10 Aug",
+      "released": "2026-08-10",
+      "sample": 1511
+    }, {
+      "x": 2026.6219178082192,
+      "v": -0.9,
+      "pollster": "Roy Morgan",
+      "dateLabel": "10–16 Aug",
+      "released": "2026-08-16",
+      "sample": 1576
+    }, {
+      "x": 2026.641095890411,
+      "v": -0.2,
+      "pollster": "Roy Morgan",
+      "dateLabel": "17–23 Aug",
+      "released": "2026-08-23",
+      "sample": 1508
+    }, {
+      "x": 2026.6438356164383,
+      "v": 0.9,
+      "pollster": "YouGov",
+      "dateLabel": "18–24 Aug",
+      "released": "2026-08-24",
+      "sample": 1510
+    }, {
+      "x": 2026.654794520548,
+      "v": 0,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "24–28 Aug",
+      "released": "2026-08-28",
+      "sample": 1006
+    }, {
+      "x": 2026.6602739726027,
+      "v": -0.6,
+      "pollster": "Roy Morgan",
+      "dateLabel": "24–30 Aug",
+      "released": "2026-08-30",
+      "sample": 1585
+    }, {
+      "x": 2026.6794520547944,
+      "v": 0,
+      "pollster": "Roy Morgan",
+      "dateLabel": "31 Aug–6 Sep",
+      "released": "2026-09-06",
+      "sample": 1541
+    }, {
+      "x": 2026.6849315068494,
+      "v": 0.8,
+      "pollster": "YouGov",
+      "dateLabel": "1–8 Sep",
+      "released": "2026-09-08",
+      "sample": 1504
+    }, {
+      "x": 2026.6986301369864,
+      "v": 0.6,
+      "pollster": "Roy Morgan",
+      "dateLabel": "7–13 Sep",
+      "released": "2026-09-13",
+      "sample": 1583
+    }, {
+      "x": 2026.717808219178,
+      "v": 0.5,
+      "pollster": "Roy Morgan",
+      "dateLabel": "14–20 Sep",
+      "released": "2026-09-20",
+      "sample": 1561
+    }, {
+      "x": 2026.7205479452055,
+      "v": 1.1,
+      "pollster": "YouGov",
+      "dateLabel": "15–21 Sep",
+      "released": "2026-09-21",
+      "sample": 1500
+    }, {
+      "x": 2026.7369863013698,
+      "v": 0.4,
+      "pollster": "Roy Morgan",
+      "dateLabel": "14–27 Sep",
+      "released": "2026-09-27",
+      "sample": 2569
+    }, {
+      "x": 2026.7506849315068,
+      "v": 1.1,
+      "pollster": "RedBridge/Accent",
+      "dateLabel": "28 Sep–2 Oct",
+      "released": "2026-10-02",
+      "sample": 1000
+    }]
   };
   const leaderMonths = [{
     "ym": "2025-05",
@@ -65902,6 +67145,14 @@ function FlowDriftPanel({
   }
   pooledPts.forEach(p => vals.push(p.y));
   if (!hidden[POOLED]) ciArea.forEach(a => vals.push(a.y0, a.y1));
+  const dots = (fd.polls || []).filter(d => !hidden[d.pollster] && d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1]).map(d => ({
+    x: d.x,
+    y: d.v,
+    color: houseLeanColour(d.pollster),
+    label: "Drift",
+    meta: d
+  }));
+  dots.forEach(p => vals.push(p.y));
   const series = [];
   if (pooledPts.length > 1) {
     series.push({
@@ -65996,6 +67247,8 @@ function FlowDriftPanel({
     }],
     series: series,
     spine: spine,
+    scatter: dots,
+    pollFacet: "twopp",
     tooltipTitle: i => monthLabelFull(spineYm[i]),
     ariaLabel: "Preference-flow drift over time \u2013 how far published 2PPs sit from what the same polls\u2019 primaries imply under the frozen election flow table, above zero friendlier to Labor",
     fmt: v => v === 0 ? "" : sgn(v)
@@ -66003,7 +67256,7 @@ function FlowDriftPanel({
     className: "table-hint ap-var-note"
   }, "Above zero \u2013 the red ground \u2013 the published 2PPs are running friendlier to Labor than the frozen table reads their own primaries; below it, friendlier to the Coalition."), React.createElement(HowTo, {
     cls: "table-hint ap-var-note",
-    paras: [React.createElement(React.Fragment, null, "Each house\u2019s gap against the table is centred on its own polls in the ", fd.meta.baseDays, " days after the election \u2013 the one moment the electorate\u2019s actual flows are counted, and a house\u2019s fixed allocation habits absorbed into the zero", lateFirms.length > 0 && React.createElement(React.Fragment, null, " \u2013 ", lateFirms.join(", "), " began polling later and anchor on", " ", "their own first waves instead, so their lines read only the drift since they started"), "."), React.createElement(React.Fragment, null, "The pooled line and its band are the cross-house aggregate with the same sample weighting as the aggregates above. A wave that publishes no two-party figure carries no gap, so a house that reports a 2PP only irregularly reads through a thinner line."), React.createElement(React.Fragment, null, "The whole panel is a diagnostic read on published figures: it corrects no other number on this page.")]
+    paras: [React.createElement(React.Fragment, null, "Each house\u2019s gap against the table is centred on its own polls in the ", fd.meta.baseDays, " days after the election \u2013 the one moment the electorate\u2019s actual flows are counted, and a house\u2019s fixed allocation habits absorbed into the zero", lateFirms.length > 0 && React.createElement(React.Fragment, null, " \u2013 ", lateFirms.join(", "), " began polling later and anchor on", " ", "their own first waves instead, so their lines read only the drift since they started"), "."), React.createElement(React.Fragment, null, "The pooled line and its band are the cross-house aggregate with the same sample weighting as the aggregates above. Each dot is one published wave\u2019s own gap, in its house\u2019s colour \u2013 hover it to read the wave. A wave that publishes no two-party figure carries no gap, so a house that reports a 2PP only irregularly reads through a thinner line."), React.createElement(React.Fragment, null, "The whole panel is a diagnostic read on published figures: it corrects no other number on this page.")]
   }));
 }
 function FlowDriftOnPanel({
@@ -66052,6 +67305,14 @@ function FlowDriftOnPanel({
   }
   pooledPts.forEach(p => vals.push(p.y));
   if (!hidden[POOLED]) ciArea.forEach(a => vals.push(a.y0, a.y1));
+  const dots = (fd.polls || []).filter(d => !hidden[d.pollster] && d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1]).map(d => ({
+    x: d.x,
+    y: d.v,
+    color: houseLeanColour(d.pollster),
+    label: "Drift",
+    meta: d
+  }));
+  dots.forEach(p => vals.push(p.y));
   const series = [];
   if (pooledPts.length > 1) {
     series.push({
@@ -66145,6 +67406,8 @@ function FlowDriftOnPanel({
     }],
     series: series,
     spine: spine,
+    scatter: dots,
+    pollFacet: "twopp",
     tooltipTitle: i => monthLabelFull(spineYm[i]),
     ariaLabel: "Preference-flow drift on Labor-v-One Nation head-to-heads over time \u2013 how far published head-to-head shares sit from frozen preference flows, above zero friendlier to Labor",
     fmt: v => v === 0 ? "" : sgn(v)
@@ -66152,7 +67415,7 @@ function FlowDriftOnPanel({
     className: "table-hint ap-var-note"
   }, "Above zero \u2013 the red ground \u2013 the published head-to-heads are running friendlier to Labor than the frozen table reads their own primaries; below it, friendlier to One Nation."), React.createElement(HowTo, {
     cls: "table-hint ap-var-note",
-    paras: [React.createElement(React.Fragment, null, "Each house\u2019s gap against the table is centred on its own first waves \u2013 the classic pairing on the panel above can be read at the election, but no count of this pairing exists, so the chart speaks only about drift since each house began."), React.createElement(React.Fragment, null, "The pooled line and its band are the cross-house aggregate with the same sample weighting as the aggregates above. A wave that publishes no head-to-head carries no gap."), React.createElement(React.Fragment, null, "The whole panel is a diagnostic read on published figures: it corrects no other number on this page.")]
+    paras: [React.createElement(React.Fragment, null, "Each house\u2019s gap against the table is centred on its own first waves \u2013 the classic pairing on the panel above can be read at the election, but no count of this pairing exists, so the chart speaks only about drift since each house began."), React.createElement(React.Fragment, null, "The pooled line and its band are the cross-house aggregate with the same sample weighting as the aggregates above. Each dot is one published wave\u2019s own gap, in its house\u2019s colour \u2013 hover it to read the wave. A wave that publishes no head-to-head carries no gap."), React.createElement(React.Fragment, null, "The whole panel is a diagnostic read on published figures: it corrects no other number on this page.")]
   }));
 }
 function AllPollsView({
@@ -86047,6 +87310,8 @@ function RdFlowChart({
 }) {
   const D = window.AUSPOL;
   const [hv, setHv] = useState(null);
+  const [tip, setTip] = useState(null);
+  const ptr = React.useRef(null);
   const H = phone ? 210 : 250;
   const x0 = phone ? 26 : 40,
     rpad = phone ? 66 : 76,
@@ -86055,6 +87320,12 @@ function RdFlowChart({
   const x1 = W - rpad;
   const ms = rdApMonths("2025-06");
   const X = ym => x0 + ms.indexOf(ym) / (ms.length - 1) * (x1 - x0);
+  const Xw = iso => {
+    const i = ms.indexOf(iso.slice(0, 7));
+    if (i < 0) return null;
+    const dim = new Date(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)), 0)).getUTCDate();
+    return x0 + (i + (Number(iso.slice(8, 10)) - 1) / dim) / (ms.length - 1) * (x1 - x0);
+  };
   const zero = (top + bot) / 2;
   const Y = v => zero - v / 3.5 * (zero - top);
   const mo = (fd.months || []).filter(d => ms.includes(d.ym));
@@ -86067,6 +87338,7 @@ function RdFlowChart({
   const houses = fd.houses || {};
   const pickS = pick && houses[pick] ? houses[pick].filter(d => ms.includes(d.ym)) : null;
   const onMove = ev => {
+    if (tip) return;
     const r = ev.currentTarget.getBoundingClientRect();
     const x = ev.clientX - r.left;
     if (x > x1 + 8) {
@@ -86116,7 +87388,81 @@ function RdFlowChart({
     cy: Y(Math.max(-3.4, Math.min(3.4, d.v))),
     r: pick === h ? 3.5 : 2.5,
     className: "rd-fl-hdot" + (pick ? pick === h ? " on" : " off" : "")
-  }))), pickS && pickS.length > 1 && React.createElement("path", {
+  }))), (fd.polls || []).map((d, i) => {
+    const px = Xw(d.released);
+    if (px == null) return null;
+    const py = Y(Math.max(-3.4, Math.min(3.4, d.v)));
+    const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+      pollster: d.pollster,
+      released: d.released
+    }) : null;
+    const id = d.pollster + "|" + d.released + "#" + i;
+    const show = src => setTip({
+      id,
+      src,
+      d,
+      px
+    });
+    const hide = src => setTip(tp => tp && tp.id === id && (!src || tp.src === src) ? null : tp);
+    const open = () => {
+      if (k && window.AP.openPoll) {
+        setTip(null);
+        window.AP.openPoll(k, "twopp", "the preference-flow chart");
+      }
+    };
+    return React.createElement("g", {
+      key: id
+    }, tip && tip.id === id && React.createElement("circle", {
+      cx: px,
+      cy: py,
+      r: "6",
+      className: "rd-apd-dothi"
+    }), React.createElement("circle", {
+      cx: px,
+      cy: py,
+      r: "2.2",
+      className: "rd-fl-wdot"
+    }), React.createElement("circle", {
+      cx: px,
+      cy: py,
+      r: "8",
+      className: "rd-apd-hit" + (k ? " link" : ""),
+      tabIndex: "0",
+      role: k ? "button" : "img",
+      "aria-label": `${d.pollster}, fieldwork ${d.dateLabel}: published minus implied ${s1(d.v)} points` + (k ? "; press Enter to open this poll" : ""),
+      onPointerDown: ev => {
+        ptr.current = ev.pointerType;
+      },
+      onPointerEnter: ev => {
+        if (ev.pointerType === "mouse") {
+          setHv(null);
+          show("mouse");
+        }
+      },
+      onPointerLeave: ev => {
+        if (ev.pointerType === "mouse") hide("mouse");
+      },
+      onFocus: ev => {
+        if (ev.target.matches(":focus-visible")) show("focus");
+      },
+      onBlur: () => hide("focus"),
+      onClick: ev => {
+        ev.stopPropagation();
+        const pt = ev.detail === 0 ? "key" : ptr.current;
+        ptr.current = null;
+        if (pt === "mouse" || pt === "key") {
+          open();
+          return;
+        }
+        if (tip && tip.id === id) setTip(null);else show("touch");
+      },
+      onKeyDown: ev => {
+        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+        ev.preventDefault();
+        open();
+      }
+    }));
+  }), pickS && pickS.length > 1 && React.createElement("path", {
     d: monotoneXY(pickS.map(d => [X(d.ym), Y(Math.max(-3.4, Math.min(3.4, d.v)))])),
     className: "rd-fl-pick"
   }), React.createElement("path", {
@@ -86170,15 +87516,15 @@ function RdFlowChart({
     y: bot + 20,
     className: "rd-dis-ax",
     textAnchor: "middle"
-  }, lab)), hv && React.createElement("path", {
+  }, lab)), hv && !tip && React.createElement("path", {
     d: `M${X(hv.ym)} ${top}V${bot}`,
     className: "rd-dis-guide"
-  }), hv && React.createElement("circle", {
+  }), hv && !tip && React.createElement("circle", {
     cx: X(hv.ym),
     cy: Y(hv.v),
     r: "4",
     className: "rd-fl-enddot"
-  })), hv && React.createElement("span", {
+  })), hv && !tip && React.createElement("span", {
     className: "tip rd-fl-tip",
     style: {
       left: Math.min(W - 110, Math.max(110, X(hv.ym)))
@@ -86203,7 +87549,44 @@ function RdFlowChart({
     className: "tip-label"
   }, "Polls"), React.createElement("span", {
     className: "tip-val"
-  }, hv.k))));
+  }, hv.k))), tip && (() => {
+    const {
+      d,
+      px
+    } = tip;
+    const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+      pollster: d.pollster,
+      released: d.released
+    }) : null;
+    return React.createElement("span", {
+      className: "tip rd-fl-tip",
+      style: {
+        left: Math.min(W - 110, Math.max(110, px))
+      }
+    }, React.createElement("span", {
+      className: "tip-title"
+    }, d.pollster), React.createElement("span", {
+      className: "tip-row"
+    }, React.createElement("span", {
+      className: "tip-label"
+    }, "Published minus implied"), React.createElement("span", {
+      className: "tip-val"
+    }, s1(d.v))), React.createElement("span", {
+      className: "tip-row"
+    }, React.createElement("span", {
+      className: "tip-label"
+    }, "Fieldwork"), React.createElement("span", {
+      className: "tip-val"
+    }, d.dateLabel)), d.sample != null && React.createElement("span", {
+      className: "tip-row"
+    }, React.createElement("span", {
+      className: "tip-label"
+    }, "Sample"), React.createElement("span", {
+      className: "tip-val"
+    }, "n = ", d.sample.toLocaleString())), k && React.createElement("span", {
+      className: "tip-sub tip-hint"
+    }, "Click to open this poll"));
+  })());
 }
 function RdFlows() {
   const D = window.AUSPOL;
@@ -86351,6 +87734,11 @@ function RdFlows() {
     className: "rd-fl-keydot",
     "aria-hidden": "true"
   }), "One pollster\u2019s gap that month"), React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-fl-keywd",
+    "aria-hidden": "true"
+  }), "One published wave\u2019s own gap \u2013 hover to read the wave"), React.createElement("span", {
     className: "rd-key-item"
   }, React.createElement("span", {
     className: "rd-fl-keynow",

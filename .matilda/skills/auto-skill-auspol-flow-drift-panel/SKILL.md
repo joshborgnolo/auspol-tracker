@@ -150,8 +150,11 @@ prefixed `FLOW_ON_*`. The differences are the ones the data forces:
   print from gen-data.
 - **Payload shape**: `{months: [{ym,x,v,ci95,k}], now: {v,ci95,n,nEff},
   houses: {firm: [{ym,v}] n-weighted monthly means, ragged}, meta: {table,
-  baseDays, anchor, baseFrom, houses, aec}, flows}` — `flows`/`meta.aec`
-  added 2026-09 with the implied-flows table (next section).
+  baseDays, anchor, baseFrom, houses, aec}, polls}` — `polls` added
+  2026-10-05: one dot per published wave `{x: dx(date), v: r1(anomaly),
+  pollster, dateLabel, released, sample}` (display-only, from driftAnom +
+  POLL_BY_KEY; flowDriftOn mirrors it), driving per-wave hover tooltips and
+  click-to-open on the drift charts like every other chart's poll cloud.
 
 ## Implied-flows table (added 2026-09, under the drift chart)
 
@@ -275,6 +278,12 @@ the check is whether the fallback share-scale variance is meaningful for it.
 - Pooled ink line width 3 (series id `"Pooled, all houses"`); per-house
   width-1.5 opacity-0.4 faint lines via `houseLeanColour(f)`; hidden-chip
   opacity toggling; chips read the FULL series (lean-panel consistency rule).
+- Per-wave dots (2026-10-05): `fd.polls` → one scatter dot per published
+  wave at the wave's own x/anomaly in `houseLeanColour(f)` (label "Drift",
+  meta straight from the payload — pollster/dateLabel/sample/released), so
+  hover shows the standard poll tooltip and click opens the wave in All
+  polls (`pollFacet="twopp"`). Dots filter out with the house's hidden
+  chip and feed `vals` for fitDomain.
 - CI ribbon via TrendChart `areas=[{id, color:"var(--ink-faint)", opacity:0.18,
   points:[{x,y0,y1}]}]` — VariancePanel floor-ribbon precedent; dropped when
   the pooled series is hidden. Ground halves via `bands` className slot
