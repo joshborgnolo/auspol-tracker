@@ -3052,11 +3052,11 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
         <path d={`M${x0} ${zero}H${x1}`} className="rd-fl-zero"></path>
         {[-3, -2, -1, 0, 1, 2, 3].map((v) => <text key={"t" + v} x={x0 - 8} y={Y(v) + 4} className="rd-dis-ax" textAnchor="end">{v === 0 ? "0" : rdSigned(v, 0)}</text>)}
         <path d={band} className="rd-fl-band"></path>
-        {/* the house line's month vertices read as poll dots (they sit at the
-            month x, dot-sized) but were never interactive — user report
-            2026-10-05. Same hit-circle idiom as the wave dots below: hover to
-            read the house + month figure; a vertex opens nothing on click
-            (it is a line mark, not a poll), touch toggles the tip. */}
+        {/* the per-house monthly gaps carry NO painted dot — they read as
+            poll dots and "only served to confuse" (user call 2026-10-05);
+            an invisible hit ring remains at each house's month x so
+            hover/focus can still read the house's gap. A mark opens nothing
+            on click (it is not a poll); touch toggles the tip. */}
         {Object.keys(houses).map((h) => houses[h].filter((d) => ms.includes(d.ym)).map((d, i) => {
           const vid = "vtx|" + h + "|" + d.ym;
           const vx = X(d.ym), vy = Y(Math.max(-3.4, Math.min(3.4, d.v)));
@@ -3065,11 +3065,9 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
           return (
             <g key={h + i}>
               {tip && tip.id === vid && <circle cx={vx} cy={vy} r="6" className="rd-apd-dothi"></circle>}
-              <circle cx={vx} cy={vy} r={pick === h ? 3.5 : 2.5}
-                      className={"rd-fl-hdot" + (pick ? (pick === h ? " on" : " off") : "")}></circle>
               <circle cx={vx} cy={vy} r="8" className="rd-apd-hit rd-fl-vhit"
                       tabIndex="0" role="img"
-                      aria-label={`${h}, ${rdMonthYear(d.ym)}: drift-line monthly mark, published minus implied ${s1(d.v)} points`}
+                      aria-label={`${h}, ${rdMonthYear(d.ym)}: this pollster’s gap that month, published minus implied ${s1(d.v)} points`}
                       onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
                       onPointerEnter={(ev) => { if (ev.pointerType === "mouse") { setHv(null); showV("mouse"); } }}
                       onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hideV("mouse"); }}
@@ -3157,7 +3155,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
             <span className="tip-title">{hd.h}</span>
             <span className="tip-row"><span className="tip-label">Month</span><span className="tip-val">{rdMonthYear(hd.ym)}</span></span>
             <span className="tip-row"><span className="tip-label">House drift</span><span className="tip-val">{s1(hd.v)}</span></span>
-            <span className="tip-sub tip-hint">monthly mark on this house’s drift line</span>
+            <span className="tip-sub tip-hint">this pollster’s gap that month – not a published wave</span>
           </span>
         );
         const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.pollster, released: d.released }) : null;
@@ -3252,7 +3250,7 @@ function RdFlows() {
         </div>
       </div>
       <RdKey className="rd-ckey rd-fl-key" items={[{ kind: "line", color: "var(--ink)", label: "All pollsters, combined month by month" }, { kind: "band", color: "var(--ink-3)", label: "95% interval" }]}>
-        <span className="rd-key-item"><span className="rd-fl-keydot" aria-hidden="true"></span>One pollster’s gap that month</span>
+        <span className="rd-key-item">Each pollster’s own gap – hover its month spot to read</span>
         <span className="rd-key-item"><span className="rd-fl-keywd" aria-hidden="true"></span>One published wave’s own gap – hover to read the wave</span>
         <span className="rd-key-item"><span className="rd-fl-keynow" aria-hidden="true"><i></i></span>Now: the latest weeks pooled, with its 95% interval</span>
       </RdKey>

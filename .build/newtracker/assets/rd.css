@@ -2746,9 +2746,6 @@ body.rd .rd-fl-chart svg { display: block; overflow: visible; }
 body.rd .rd-fl-zero { stroke: var(--ink-faint); stroke-width: 1; }
 body.rd .rd-fl-band { fill: var(--ink-3); opacity: 0.14; }
 body.rd.dark .rd-fl-band { opacity: 0.22; }
-body.rd .rd-fl-hdot { fill: var(--ink-3); opacity: 0.4; transition: opacity .2s ease; }
-body.rd .rd-fl-hdot.on { fill: var(--ink); opacity: 1; }
-body.rd .rd-fl-hdot.off { opacity: 0.15; }
 body.rd .rd-fl-wdot { fill: var(--ink-2); opacity: 0.5; }
 body.rd .rd-fl-pick { fill: none; stroke: var(--ink); stroke-width: 1.25; opacity: 0.6; }
 body.rd .rd-fl-line { fill: none; stroke: var(--ink); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
@@ -2771,7 +2768,6 @@ body.rd .rd-fl-nowci { font-size: 12px; fill: var(--ink-3); }
 body.rd .rd-fl-note { font-size: 12px; fill: var(--ink-2); }
 body.rd .rd-fl-empty { font-size: 12px; font-style: italic; fill: var(--ink-3); }
 body.rd .rd-fl-key { margin-top: 14px; }
-body.rd .rd-fl-keydot { display: inline-block; width: 6px; height: 6px; margin: 0 4px; border-radius: 50%; background: var(--ink-3); opacity: 0.55; }
 body.rd .rd-fl-keywd { display: inline-block; width: 6px; height: 6px; margin: 0 4px; border-radius: 50%; background: var(--ink-2); opacity: 0.5; }
 body.rd .rd-fl-keynow { position: relative; display: inline-block; width: 14px; height: 18px; }
 body.rd .rd-fl-keynow::before { content: ""; position: absolute; left: 6px; top: 2px; bottom: 2px; width: 2px; border-radius: 1px; background: var(--ink); opacity: 0.35; }
