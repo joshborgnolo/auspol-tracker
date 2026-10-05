@@ -3006,10 +3006,30 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
   const [tip, setTip] = useState(null);        // the wave dot being read: { id, src, d, px }
   const ptr = React.useRef(null);
   const chartBox = React.useRef(null);
+  const tipBox = React.useRef(null);
   /* a touch-opened tip has no pointer-leave, so the next gesture starting
      OUTSIDE the chart puts it away — the shared capture-phase dismiss every
      panel tip here already uses (user report 2026-10-05) */
   window.useDismissOutside(chartBox, !!(tip && tip.src === "touch"), () => setTip(null));
+  /* the tips' x clamp is MEASURED on the mounted card, never computed from
+     an assumed width: a static [110, W-110] clamp assumed a half-width of
+     <=110px, but the cards run wider (the vertex qualifier line alone is
+     ~290px), so a phone tip opened past the screen edge (user report
+     2026-10-06). It clamps against the CHART BOX, not window.innerWidth —
+     on a phone an overhanging abspos card widens the layout viewport (the
+     whole page visibly zooms out), so a viewport-based clamp chases a
+     moving target and never converges, while the chart box is a width:auto
+     block that never reads its own overflow. Same marginLeft idiom as the
+     RdAp detail charts. */
+  React.useLayoutEffect(() => {
+    const el = tipBox.current, box = chartBox.current;
+    if (!el || !box) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const b = box.getBoundingClientRect();
+    const off = Math.min(0, b.right - 8 - r.right) - Math.min(0, r.left - (b.left + 8));
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip, hv]);
   const H = phone ? 210 : 250;
   const x0 = phone ? 26 : 40, rpad = phone ? 66 : 76, top = 14, bot = phone ? 178 : 214;
   const x1 = W - rpad;
@@ -3146,7 +3166,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
         {hv && !tip && <circle cx={X(hv.ym)} cy={Y(Math.max(-3.4, Math.min(3.4, hv.v)))} r="4" className="rd-fl-enddot"></circle>}
       </svg>
       {hv && !tip && (
-        <span className="tip rd-fl-tip" style={{ left: Math.min(W - 110, Math.max(110, X(hv.ym))) }}>
+        <span ref={tipBox} className="tip rd-fl-tip" style={{ left: X(hv.ym) }}>
           <span className="tip-title">{rdMonthYear(hv.ym)}</span>
           <span className="tip-row"><span className="tip-label">All pollsters</span><span className="tip-val">{s1(hv.v)}</span></span>
           <span className="tip-row"><span className="tip-label">95% interval</span><span className="tip-val">±{hv.ci95.toFixed(1)}</span></span>
@@ -3156,7 +3176,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
       {tip && (() => {
         const { d, px, hd } = tip;
         if (hd) return (
-          <span className="tip rd-fl-tip" style={{ left: Math.min(W - 110, Math.max(110, px)) }}>
+          <span ref={tipBox} className="tip rd-fl-tip" style={{ left: px }}>
             <span className="tip-title">{hd.h}</span>
             <span className="tip-row"><span className="tip-label">Month</span><span className="tip-val">{rdMonthYear(hd.ym)}</span></span>
             <span className="tip-row"><span className="tip-label">House drift</span><span className="tip-val">{s1(hd.v)}</span></span>
@@ -3166,7 +3186,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
         );
         const k = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: d.pollster, released: d.released }) : null;
         return (
-          <span className="tip rd-fl-tip" style={{ left: Math.min(W - 110, Math.max(110, px)) }}>
+          <span ref={tipBox} className="tip rd-fl-tip" style={{ left: px }}>
             <span className="tip-title">{d.pollster}</span>
             <span className="tip-row"><span className="tip-label">Published minus implied</span><span className="tip-val">{s1(d.v)}</span></span>
             {d.fl != null && <span className="tip-row"><span className="tip-label">Respondent flow to Labor</span><span className="tip-val">{d.fl.toFixed(1)}%</span></span>}

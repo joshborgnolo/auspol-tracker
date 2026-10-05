@@ -87627,7 +87627,18 @@ function RdFlowChart({
   const [tip, setTip] = useState(null);
   const ptr = React.useRef(null);
   const chartBox = React.useRef(null);
+  const tipBox = React.useRef(null);
   window.useDismissOutside(chartBox, !!(tip && tip.src === "touch"), () => setTip(null));
+  React.useLayoutEffect(() => {
+    const el = tipBox.current,
+      box = chartBox.current;
+    if (!el || !box) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const b = box.getBoundingClientRect();
+    const off = Math.min(0, b.right - 8 - r.right) - Math.min(0, r.left - (b.left + 8));
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip, hv]);
   const H = phone ? 210 : 250;
   const x0 = phone ? 26 : 40,
     rpad = phone ? 66 : 76,
@@ -87891,9 +87902,10 @@ function RdFlowChart({
     r: "4",
     className: "rd-fl-enddot"
   })), hv && !tip && React.createElement("span", {
+    ref: tipBox,
     className: "tip rd-fl-tip",
     style: {
-      left: Math.min(W - 110, Math.max(110, X(hv.ym)))
+      left: X(hv.ym)
     }
   }, React.createElement("span", {
     className: "tip-title"
@@ -87922,9 +87934,10 @@ function RdFlowChart({
       hd
     } = tip;
     if (hd) return React.createElement("span", {
+      ref: tipBox,
       className: "tip rd-fl-tip",
       style: {
-        left: Math.min(W - 110, Math.max(110, px))
+        left: px
       }
     }, React.createElement("span", {
       className: "tip-title"
@@ -87954,9 +87967,10 @@ function RdFlowChart({
       released: d.released
     }) : null;
     return React.createElement("span", {
+      ref: tipBox,
       className: "tip rd-fl-tip",
       style: {
-        left: Math.min(W - 110, Math.max(110, px))
+        left: px
       }
     }, React.createElement("span", {
       className: "tip-title"
