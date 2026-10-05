@@ -32,6 +32,22 @@ the fact, from the git history and any alert issue the gate opens.
   - `.matilda/skills/auto-skill-redbridge-accent-extraction/SKILL.md`
   - `.matilda/skills/auto-skill-auspol-build-pipeline/SKILL.md`
 
+### The `afr` job (macos-15, since 2026-10-05)
+
+redbridge-update.yml has a second path: an Ubuntu `afr-gate` job runs
+`node .build/extract-redbridge-afr.mjs --discover-only` (AFR topic stories
+after the latest committed wave, less the ledger
+`.build/redbridge-src/afr-seen.json`) and starts the `afr` job on macos-15
+only when one is pending. That job runs `.build/redbridge-afr-updater.sh`:
+the article's PUBLIC page names its images, the chart is OCR'd with macOS
+Vision (`.build/ocr-image.swift`, compiled on demand), Matilda only says
+which OCR line holds each figure, and every headline figure must reconcile
+with the change printed beside it against the previous committed wave —
+anything less files nothing (the Accent PDF fills the wave later). Its log
+is `.build/logs/redbridge-afr.log`. Never loosen the reconciliation, the
+guard, or the "Matilda never supplies a number" rule to get a filing
+through; a run that files nothing is a correct outcome.
+
 ## Procedure
 
 1. Run `node .build/extract-redbridge.mjs` and read the failing output /

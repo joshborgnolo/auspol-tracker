@@ -3,6 +3,12 @@
 # the tune-schedules markers by .build/tune-schedules.mjs from the house's
 # recorded release times; the extractor drives Chrome via CDP itself —
 # ubuntu runners ship google-chrome and CHROME is set by the reusable workflow.
+# Second path (2026-10-05, the `afr` job): AFR's Sunday 18:00 article is read
+# from its chart on a macos-15 runner, gated by a cheap Ubuntu discovery job,
+# so the wave lands within minutes of release without the laptop
+# (.build/redbridge-afr-updater.sh). Smoke-tested on macos-15 against the
+# 2026-10-02 wave with that wave removed: discovery 1s, chart read 96s, all
+# 14 figures reconciled, a row identical to the committed one.
 
 name: redbridge-update
 
@@ -43,4 +49,38 @@ jobs:
       house: redbridge
       wrapper: .build/redbridge-updater.sh
       simulate_failure: ${{ inputs.simulate_failure }}
+    secrets: inherit
+
+  # The AFR chart path in CI (2026-10-05): AFR publishes each wave Sunday
+  # 18:00, days before the Accent report the job above reads. The chart is
+  # read with macOS Vision OCR, so it needs a macOS runner — started only when
+  # this gate finds an AFR story after the latest committed wave that the
+  # ledger hasn't settled (no Mac for a quiet slot). Same release-night combs
+  # as above, so a wave lands minutes after 18:00 without the laptop.
+  afr-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    outputs:
+      pending: ${{ steps.discover.outputs.pending }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      # the image's own node: discovery needs no packages
+      - name: Any unread AFR story after the latest wave?
+        id: discover
+        run: |
+          out="$(node .build/extract-redbridge-afr.mjs --discover-only | tail -1)" || { echo "pending=0" >> "$GITHUB_OUTPUT"; echo "::warning::AFR discovery failed: $out"; exit 0; }
+          echo "$out"
+          n="$(echo "$out" | sed -n 's/.*"pending":\([0-9]*\).*/\1/p')"
+          echo "pending=${n:-0}" >> "$GITHUB_OUTPUT"
+
+  afr:
+    needs: afr-gate
+    if: needs.afr-gate.outputs.pending != '' && needs.afr-gate.outputs.pending != '0'
+    uses: ./.github/workflows/poll-agent.yml
+    with:
+      house: redbridge-afr
+      wrapper: .build/redbridge-afr-updater.sh
+      runner: macos-15
     secrets: inherit

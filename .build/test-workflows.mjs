@@ -3,7 +3,10 @@
    checked are simple, and a parse that stops matching fails loudly).
 
    1. runs-on is pinned (ubuntu-24.04), never a moving label — ubuntu-latest
-      moves to Ubuntu 26 from 2026-10-19.
+      moves to Ubuntu 26 from 2026-10-19. poll-agent.yml's update job takes
+      its runner from the `runner` input (2026-10-05: RedBridge's AFR chart
+      needs macOS for Vision OCR), so that input must default to
+      ubuntu-24.04 and every caller's `runner:` must be a pinned label too.
    2. every third-party action is pinned to a full commit SHA.
    3. the reusable-workflow permissions CEILING: every caller of
       poll-agent.yml grants at least what each of poll-agent's jobs asks
@@ -24,14 +27,26 @@ const text = Object.fromEntries(files.map((f) => [f, readFileSync(`${DIR}/${f}`,
 const nameOf = (t) => /^name:\s*(.+?)\s*$/m.exec(t)?.[1];
 
 // ---- 1 + 2 -----------------------------------------------------------------------
+const PINNED_RUNNERS = ["ubuntu-24.04", "macos-15"];
 for (const f of files) {
-  for (const m of text[f].matchAll(/^\s*runs-on:\s*(.+?)\s*$/gm))
+  for (const m of text[f].matchAll(/^\s*runs-on:\s*(.+?)\s*$/gm)) {
+    if (f === "poll-agent.yml" && m[1] === "${{ inputs.runner }}") continue; // checked below
     assert.equal(m[1], "ubuntu-24.04", `${f}: runs-on ${m[1]} — pin the image`);
+  }
+  for (const m of text[f].matchAll(/^\s*runner:\s*([^\s#]+)\s*$/gm))
+    assert.ok(PINNED_RUNNERS.includes(m[1]), `${f}: runner ${m[1]} — pin the image (${PINNED_RUNNERS.join(" / ")})`);
   for (const m of text[f].matchAll(/^\s*(?:-\s*)?uses:\s*([^\s#]+)/gm)) {
     const ref = m[1];
     if (ref.startsWith("./")) continue; // a reusable workflow in this repo
     assert.match(ref, /^[\w.-]+\/[\w.-]+(?:\/[\w./-]+)?@[0-9a-f]{40}$/, `${f}: ${ref} is not pinned to a commit SHA`);
   }
+}
+
+{
+  const pa = text["poll-agent.yml"];
+  const inp = /\n\s{6}runner:\n([\s\S]*?)(?=\n\s{6}\w[\w-]*:\n|\njobs:)/.exec(pa);
+  assert.ok(inp, "poll-agent.yml: no `runner` input");
+  assert.match(inp[1], /default:\s*'ubuntu-24\.04'/, "poll-agent.yml: the `runner` input must default to ubuntu-24.04");
 }
 
 // ---- 3: the permissions ceiling ----------------------------------------------------

@@ -50,8 +50,16 @@
 // Ledger: .build/redbridge-src/afr-seen.json — articles already settled
 // (filed, no chart, not federal, unverifiable…) are skipped; --force rereads.
 //
+// CI (2026-10-05): .build/redbridge-afr-updater.sh runs this with --discover
+// on a GitHub macOS runner (Vision OCR needs macOS), so a wave lands on
+// release night without the laptop; no Chrome there — the chart and the
+// public lede are enough, the headline figures needing a reconciling change
+// regardless.
+//
 // Usage:
 //   node .build/extract-redbridge-afr.mjs --status '<RB_STATUS json>'   (wrapper)
+//   node .build/extract-redbridge-afr.mjs --discover [--check]          (CI wrapper)
+//   node .build/extract-redbridge-afr.mjs --discover-only               (CI gate: list, exit)
 //   node .build/extract-redbridge-afr.mjs --url <afr-url> [--html <file>] [--check]
 //   --check computes and prints, never writes; with --check a wave that is
 //   already committed is compared against the committed row (backtesting).
@@ -65,7 +73,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 
 process.env.RB_LIB = "1";
-const { guardNewWave } = await import("./extract-redbridge.mjs");
+const { guardNewWave, parseAfrTopic } = await import("./extract-redbridge.mjs");
 const { askMatildaJson } = await import("./matilda-json.mjs");
 const { fetchWithCookies } = await import("./extract-common.mjs");
 
@@ -93,6 +101,30 @@ if (argOf("--url")) urls = [argOf("--url")];
 else if (argOf("--status")) {
   try { urls = JSON.parse(argOf("--status")).afrTopicNotes || []; }
   catch (e) { status.notes.push(`--status is not JSON: ${e.message}`); finish(1); }
+}
+// --discover: find the stories itself — the AFR RedBridge-Accent topic page's
+// articles dated after the latest committed wave's publication, less those
+// already settled in the ledger (the CI job, which has no extract-redbridge
+// RB_STATUS to hand). --discover-only prints them and exits: the cheap gate
+// that decides whether the macOS job is worth starting.
+const AFR_TOPIC = process.env.RB_AFR_TOPIC || "https://www.afr.com/topic/redbridge-accent-poll-6ikd";
+const SEEN_FILE = join(process.env.RBAFR_SRC || ".build/redbridge-src", "afr-seen.json");
+async function discoverAfr() {
+  const D0 = JSON.parse(readFileSync("data/polls.json", "utf8"));
+  const latestPub = Math.max(...D0.polls.filter((r) => r.pollster === "RedBridge/Accent")
+    .map((r) => +(r.published || r.date).slice(0, 10).replace(/-/g, "")));
+  const stories = parseAfrTopic((await fetchWithCookies(AFR_TOPIC)).text);
+  if (!stories) throw new Error("AFR topic page: no story list in its hydration JSON (layout change?)");
+  const seenNow = existsSync(SEEN_FILE) ? JSON.parse(readFileSync(SEEN_FILE, "utf8")) : {};
+  return [...new Set(stories.map((x) => x.path))]
+    .filter((path) => +((path.match(/-(20\d{6})-p[0-9a-z]+$/) || [])[1] || 0) > latestPub)
+    .map((path) => (path.startsWith("http") ? path : `https://www.afr.com${path}`))
+    .filter((u) => !seenNow[(u.match(/-(20\d{6}-p[0-9a-z]+)$/) || [])[1]]);
+}
+if (!urls.length && !LIB && (argv.includes("--discover") || argv.includes("--discover-only"))) {
+  try { urls = await discoverAfr(); }
+  catch (e) { status.notes.push(`discovery failed: ${e.message}`); finish(1); }
+  if (argv.includes("--discover-only")) { console.log("RBAFR_DISCOVER " + JSON.stringify({ pending: urls.length, urls })); process.exit(0); }
 }
 if (!urls.length && !LIB) { status.notes.push("no AFR article to read"); finish(0); }
 
@@ -235,7 +267,7 @@ mkdirSync(SRC_DIR, { recursive: true });
 // a tab in the user's Chrome and spend a Matilda call on the same opinion
 // piece or state poll until the next wave lands. Transient outcomes (Chrome
 // logged out, Matilda down, an image that failed to load) are retried.
-const SEEN = join(SRC_DIR, "afr-seen.json");
+const SEEN = SEEN_FILE;
 const seen = existsSync(SEEN) ? JSON.parse(readFileSync(SEEN, "utf8")) : {};
 const FINAL = new Set(["no-chart", "no-fieldwork", "not-federal", "not-filed", "already-committed", "filed"]);
 
@@ -275,7 +307,8 @@ for (const url of urls) {
     finally { try { execFileSync("rm", ["-f", file]); } catch { /* best effort */ } }
   }
   if (!charts.length) { rec.result = "no-chart"; continue; }
-  if (!argOf("--html")) {
+  // CI (the macOS runner) has no logged-in Chrome: the public lede stands in
+  if (!argOf("--html") && !process.env.CI) {
     try {
       const full = articleParts(execFileSync("node", [".build/chrome-article.mjs", url],
         { encoding: "utf8", timeout: 180_000, maxBuffer: 64 << 20, stdio: ["ignore", "pipe", "pipe"] }));

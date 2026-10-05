@@ -54,6 +54,11 @@ on:
         required: false
         type: string
         default: 'false'
+      runner:
+        description: "The update job's runner. ubuntu-24.04 for every house; macos-15 only for a step that needs macOS (RedBridge's AFR chart is read with Vision OCR)"
+        required: false
+        type: string
+        default: 'ubuntu-24.04'
 
 jobs:
   # Only a cron-triggered run can be a backup. A slot the clock started (and
@@ -91,7 +96,8 @@ jobs:
     # Pinned, not ubuntu-latest: the label moves to Ubuntu 26 from
     # 2026-10-19, and these jobs lean on the image's apt, poppler and
     # /usr/bin/google-chrome. Move deliberately, all workflows at once.
-    runs-on: ubuntu-24.04
+    # (`runner` is ubuntu-24.04 unless a caller needs macOS — see inputs.)
+    runs-on: ${{ inputs.runner }}
     timeout-minutes: 25
     concurrency:
       group: writers-${{ inputs.house }}
@@ -117,7 +123,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Install apt packages
-        if: inputs.apt_packages != ''
+        if: inputs.apt_packages != '' && runner.os == 'Linux'
         env:
           APT_PACKAGES: ${{ inputs.apt_packages }}
         run: |
@@ -142,7 +148,7 @@ jobs:
       - name: Run the ${{ inputs.house }} updater
         id: updater
         env:
-          CHROME: /usr/bin/google-chrome
+          CHROME: ${{ runner.os == 'macOS' && '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' || '/usr/bin/google-chrome' }}
           WRAPPER: ${{ inputs.wrapper }}
           SIMULATE: ${{ inputs.simulate_failure }}
           # wave adjudication's LLM pass (extractor --adjudicate →
