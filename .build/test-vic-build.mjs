@@ -54,4 +54,14 @@ const asked = D.individualPolls.filter((q) => q.ppm || q.ppmSets || (q.appr && q
 assert.ok(asked.length && asked.every((q) => q.who && q.who.alb && q.who.opp), "every leadership poll names who held each office");
 const early = asked.find((q) => q.released < "2023-09-27");
 if (early) assert.equal(early.who.alb, "Andrews", "a 2023 poll asks about Andrews, not today's Premier");
+// the lines are the Kalman smoother's trend (gen-data §1a), and say so
+assert.equal(D.latest.method.kind, "kalman", "Victoria's figures are the trend's");
+const line = D.synth2pp.filter((m) => !m.election);
+assert.equal(line[line.length - 1].alp, D.synthLatest.alp, "the 2PP line ends on the headline");
+const moves = line.slice(1).map((m, i) => Math.abs(m.alp - line[i].alp));
+const meanMove = moves.reduce((a, b) => a + b, 0) / moves.length;
+assert.ok(meanMove < 1.0, `the 2PP trend moves ${meanMove.toFixed(2)} pts a month on average (the monthly average moved 1.7)`);
+assert.ok(line.every((m) => m.ci95 > 0), "every month carries the trend's interval, empty months included");
+assert.ok(D.individualPolls.filter((q) => q.eff && q.eff.imp).every((q) => q.eff.imp.w === 1), "every poll counts in the trend");
+assert.ok(D.synthLatest.changeSe > 0 && typeof D.synthLatest.changeSig === "boolean", "the month's change is tested");
 console.log(`vic build ok: ${D.individualPolls.length} polls, ${rm.length} Roy Morgan SMS archived, Premier now ${albWho[albWho.length - 1]}`);

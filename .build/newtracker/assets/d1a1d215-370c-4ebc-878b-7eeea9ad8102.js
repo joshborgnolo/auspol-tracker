@@ -7377,15 +7377,33 @@ function infoTerms(D) {
     const keepMethod = new Set(["house-effect", "monthly-average", "interval", "margin-of-error", "effective-sample", "significance"]);
     const keepAll = new Set(["poll-lean", "aggregate-effect", "mrp", "poll-disagreement", "house-lean"]);
     const fedAll = (sections.find((s) => s.id === "s-allpolls") || { entries: [] }).entries;
+    const KAL = !!(L.method && L.method.kind === "kalman");
+    const perMonth = (k) => (J.kalman && J.kalman.series[k] ? (J.kalman.series[k].s * Math.sqrt(30)).toFixed(1) : null);
     const vFaqs = [
-      faqs.find((f) => f.id === "what-am-i-looking-at"),
+      KAL ? { id: "what-am-i-looking-at", q: "What am I looking at?", a: (
+        <>In the main chart, each dot is one published poll, placed at the midpoint of its
+        fieldwork. The line is a smoothed trend through all the polls, adjusted for each
+        pollster’s {xref("house-effect", "what am i looking at", "lean")}, with its
+        {" "}{xref("interval", "what am i looking at", "95% interval")} shaded around it (see
+        {" "}{xref("weighted-aggregate", "what am i looking at", "Smoothed trend")}). Where two
+        bands overlap, the polls can’t separate the parties. The figure at the top is the trend’s
+        estimate today, where the line ends. Other charts follow the same pattern. A dash (—) in a
+        table means the pollster didn’t ask that question.</>) } : faqs.find((f) => f.id === "what-am-i-looking-at"),
       { id: "where-does-data-come-from", q: "Where do the numbers come from?", a: (
         <>From the pollsters: every Victorian voting-intention poll published since the {eMonth}
         {" "}{eY} election, from these {Object.keys(houseCounts).length} houses, most polls first:
         {" "}{sources}. A pollster’s MRP or SMS polls count under its own name. All polls files each
         one with its fieldwork dates, sample size, a link to the release and, where one exists, its
         {" "}{xref("apc-statement", "where does data come from", "APC statement")}.</>) },
-      faqs.find((f) => f.id === "headline-how"),
+      KAL ? { id: "headline-how", q: "How is the headline worked out?", a: (
+        <>It is the smoothed trend’s estimate today, from every poll so far, with each pollster’s
+        usual lean taken out (see {xref("weighted-aggregate", "how is the headline worked out", "Smoothed trend")}).
+        Rather than average the pollsters’ own two-party figures, each worked out a different way,
+        the two-party figure reads every poll’s primary votes through one fixed
+        {" "}{xref("preference-flows", "how is the headline worked out", "preference table")} (see
+        {" "}{xref("implied-2pp", "how is the headline worked out", "Implied 2PP")}). The headline
+        follows the rival Labor is doing worse against
+        {headFig ? <>: today {headFig.rival}, at {headFig.a.toFixed(1)}–{headFig.b.toFixed(1)}</> : null}.</>) } : faqs.find((f) => f.id === "headline-how"),
       { id: "how-wrong-are-the-polls", q: "How accurate are the polls?", a: (
         <>The {xref("interval", "how accurate are the polls", "95% interval")} says how far chance
         alone could put a figure off: ±{hl.ci.toFixed(1)} points on each party’s share for Labor
@@ -7400,9 +7418,91 @@ function infoTerms(D) {
         pollster modelled seats one by one, its poll carries the {xref("mrp", "is it a forecast", "MRP")}
         {" "}tag in All polls.</>) },
       faqs.find((f) => f.id === "why-2pp-headline"),
-      faqs.find((f) => f.id === "newest-poll-not-headline"),
+      KAL ? { id: "newest-poll-not-headline", q: "Why doesn’t the newest poll match the headline?", a: (
+        <>Usually neither is wrong. A poll is one pollster’s reading of one week, and chance alone
+        can put it off by its {xref("margin-of-error", "newest poll", "margin of error")}, so two
+        honest polls of an unchanged electorate will differ too. The headline is a trend through
+        every poll after removing each pollster’s
+        {" "}{xref("house-effect", "newest poll", "house effect")}, its habit of leaning one way. One
+        poll moves it by its weight, not its news value: its
+        {" "}{xref("aggregate-effect", "newest poll", "aggregate effect")} shows how much.
+        {" "}{xref("poll-disagreement", "newest poll", "Poll disagreement")} tests whether the polls
+        differ by more than chance allows.</>) } : faqs.find((f) => f.id === "newest-poll-not-headline"),
     ].filter(Boolean);
-    const vMethod = [
+    const vMethod = KAL ? [
+      { id: "weighted-aggregate", term: "Smoothed trend", body: (
+        <>How the headline and every line on this page are built. Victoria publishes only a poll
+        or two a month, so rather than average each month’s polls, the site draws a smoothed trend
+        through all of them, with a Kalman smoother. It treats opinion as drifting from day to day,
+        and each poll as a reading of it, off by its pollster’s
+        {" "}{xref("house-effect", "smoothed trend", "lean")} and by chance.
+        <span className="info-p"><b>How much a poll counts.</b> Larger samples count for more.
+        Where a pollster publishes an {xref("effective-sample", "smoothed trend", "effective sample")},
+        that figure is used. Otherwise the raw sample is discounted by 1.6, roughly what weighting
+        costs the pollsters that do publish, and capped at 3,000.</span>
+        <span className="info-p"><b>How smooth.</b> How far opinion may drift in a day is the one
+        setting, fitted to Victoria’s own polls for each line: about {perMonth("imp")} points a
+        month for the two-party figure. On a change of Premier or Opposition Leader the trend may
+        step at once.</span>
+        <span className="info-p"><b>The line and the headline.</b> The line uses every poll, earlier
+        and later, so a month’s point can shift a little as later polls come in. The headline is
+        the trend’s estimate today, from the polls published so far, and the line ends on it.</span>
+        <span className="info-p"><b>Months with no poll.</b> The trend carries on through them, and
+        its 95% interval widens until the next poll arrives.</span>
+        <span className="info-p"><b>One exclusion.</b> Roy Morgan’s Victorian polls are all SMS
+        polls. They stay in the archive but count towards no figure: SMS polls have a strong
+        selection bias.</span>
+        <span className="info-p"><b>Why not a monthly average?</b> With one or two polls behind each
+        month, a monthly line jumps by a poll’s sampling error alone. A trial on this page’s polls
+        found the trend moves half as much from month to month, and predicts each new poll from the
+        polls before it as well as the federal page’s three-week average does.</span>
+        {working(<>
+          <span className="info-p">Opinion μ follows a random walk: μₜ = μₜ₋₁ + ηₜ, with
+          ηₜ ~ N(0, s²) a day. A poll on day t reads yᵢ = μₜ + hⱼ + εᵢ, where hⱼ is its pollster’s
+          lean and εᵢ ~ N(0, 1.6 × p(1−p) ÷ nᵢ + τ²). s and τ are fitted by maximum likelihood on
+          Victoria’s polls, line by line. The leans are estimated with the trend, average zero
+          across the polls, and start from a prior worth about one and a half polls sitting on the
+          others. A change of leader adds a 2-point standard deviation on its day.</span>
+          <span className="info-p">The filter runs a day at a time from the election’s count; the
+          line is its Rauch–Tung–Striebel smooth, and the 95% interval 1.96 times its standard
+          deviation. The change on a month ago is tested against the posterior uncertainty of the
+          trend’s move over those 30 days.</span>
+        </>)}</>) },
+      { id: "house-effect", term: "House effect", body: (
+        <>A pollster’s consistent lean relative to the others. The trend estimates each pollster’s
+        lean alongside the line, from all its polls, and takes it out; the leans average zero
+        across the polls. A lean measured from few polls is shrunk toward zero. Each line gets its
+        own leans, since a pollster that leans to Labor on the two-party figure need not on a
+        primary vote. {xref("house-lean", "house effect", "House lean")} in All polls traces each
+        pollster’s lean month by month, measured the federal page’s way.</>) },
+      method.find((m) => m.id === "monthly-average"),
+      { id: "interval", term: "95% interval", body: (
+        <>How far a figure could plausibly be off by chance. For the two-party figure against the
+        Coalition today, that’s ±{hl.ci.toFixed(1)} points on each party’s share, and
+        ±{(2 * hl.ci).toFixed(1)} on the lead. It is the trend’s own interval: it narrows where
+        polls come thick and widens through months with none.
+        <span className="info-p">Unfortunately, it can’t see an error every poll shares. When the
+        whole industry leans one way, the interval has no way to know.</span></>) },
+      method.find((m) => m.id === "margin-of-error"),
+      { id: "effective-sample", term: "Effective sample", body: (
+        <>What a sample is worth once weighting is counted. A pollster’s
+        {" "}{xref("apc-statement", "effective sample", "APC statement")} gives one for each poll,
+        shown as {eff} beside its sample, and it sets how much the poll counts in the
+        {" "}{xref("weighted-aggregate", "effective sample", "trend")}.</>) },
+      method.find((m) => m.id === "significance"),
+      { id: "changes", q: "What are the ▲ and ▼ figures measured against?", a: (
+        <>It depends on where they sit.
+        <ul className="info-list">
+          <li><strong>Beside a current figure:</strong> the trend’s move over the past month. It
+          counts as a change only when it is larger than its own margin, the 95% interval of that
+          move; otherwise the figure says “within the margin”.</li>
+          <li><strong>On the primary vote figures:</strong> the change since the {eY} election,
+          where the lines on that chart begin.</li>
+          <li><strong>In a poll’s breakdown and the poll tables:</strong> the change on that
+          pollster’s own previous poll.</li>
+        </ul>
+        Most say what they are measured against beside them, or when you point at them.</>) },
+    ].filter(Boolean) : [
       { id: "weighted-aggregate", term: "Weighted aggregate", body: (
         <>How the headline and every other current figure are built. It averages the recent polls,
         giving more weight to newer and larger ones, after removing each pollster’s
@@ -7534,18 +7634,21 @@ function infoTerms(D) {
         ] },
       { id: "s-primary", title: "Primary vote", nav: "Primary vote",
         lead: { id: "primary-vote", body: (
-          <>The share of voters who put a party first, before any preferences are distributed. Each
-          party’s figure is built like the headline, from the last three weeks of polls with each
-          pollster’s lean taken out (see {xref("weighted-aggregate", "primary vote", "Weighted aggregate")}).
-          The lines start at the {eY} election result, and the figures beside the chart give the
+          <>The share of voters who put a party first, before any preferences are distributed.
+          {KAL ? <> Each party’s line is a smoothed trend through every poll, with each pollster’s
+          lean taken out, built like the two-party trend (see {xref("weighted-aggregate", "primary vote", "Smoothed trend")}).</>
+            : <> Each party’s figure is built like the headline, from the last three weeks of polls
+          with each pollster’s lean taken out (see {xref("weighted-aggregate", "primary vote", "Weighted aggregate")}).</>}
+          {" "}The lines start at the {eY} election result, and the figures beside the chart give the
           change since then.{onFirst ? <> One Nation’s line starts in {onFirst}: until then, the
           polls counted it among others.</> : null}
           <span className="info-p"><b>Why they may not add up to 100.</b> Some pollsters keep
           voters who won’t name a party inside their published shares, so the parties fall short of
-          100 by exactly that undecided share. The aggregate keeps the shortfall, because it says
-          something real about the electorate: the five parties are rescaled only if their total
-          sits more than half a point from the plain average’s. Each poll’s breakdown says which
-          approach its pollster used.</span></>) },
+          100 by exactly that undecided share. {KAL ? <>Each party’s trend is estimated on its own,
+          so the five need not add to exactly 100 either.</> : <>The aggregate keeps the shortfall,
+          because it says something real about the electorate: the five parties are rescaled only if
+          their total sits more than half a point from the plain average’s.</>} Each poll’s breakdown
+          says which approach its pollster used.</span></>) },
         entries: [] },
       { id: "s-latest", title: "Latest and next polls", nav: "Latest polls",
         lead: { id: "latest-polls", body: (
@@ -7617,7 +7720,15 @@ function infoTerms(D) {
           far it sits from that month’s aggregate. Open a row for the poll’s full breakdown, and use
           Download CSV for the polls the table is showing.</span></>) },
         entries: [
-          ...fedAll.filter((e) => keepAll.has(e.id) && e.id !== "mrp" && e.id !== "poll-disagreement" && e.id !== "house-lean"),
+          ...fedAll.filter((e) => keepAll.has(e.id) && e.id !== "mrp" && e.id !== "poll-disagreement" && e.id !== "house-lean" && !(KAL && e.id === "aggregate-effect")),
+          ...(KAL ? [{ id: "aggregate-effect", term: "Aggregate effect", body: (
+            <>How much one poll moves the headline. The poll’s breakdown reruns the
+            {" "}{xref("weighted-aggregate", "aggregate effect", "trend")} without it: “+0.1 for ALP”
+            means today’s two-party figure is a tenth of a point higher because this poll is in it.
+            Every poll this term counts, the older ones for less. One line appears for each figure the
+            poll feeds: the published two-party figure, the
+            {" "}{xref("implied-2pp", "aggregate effect", "implied 2PP")}, and Labor v One Nation where
+            the poll asked it.</>) }] : []),
           { id: "apc-statement", term: "APC statement", body: (
             <>The methodology statement a pollster publishes for each poll under the Australian
             Polling Council’s Code of Conduct: fieldwork dates and method, the raw sample, the

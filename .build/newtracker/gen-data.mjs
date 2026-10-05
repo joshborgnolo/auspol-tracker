@@ -16,6 +16,7 @@ import vm from "node:vm";
 import { writeAtomic } from "../atomic-write.mjs";
 import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp } from "./flows.mjs";
 import { bonhamReplica } from "./bonham-replica.mjs";
+import { kalmanRun, kalmanFit } from "./kalman.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -684,6 +685,60 @@ const houseEffect = houseEffectsFor(tppRows);
    (never borrow between measures) applies doubly here. */
 const synthEffect = houseEffectsFor(tppRowsSynth);
 
+/* ---- 1a. /vic/'s trend lines: a Kalman smoother (kalman.mjs) ------------
+   Victoria polls ~1.3 times a month, so the calendar-month average below
+   rests on one or two polls a point and its lines jump by sampling error
+   alone. There (JUR.kalman) every 2PP and primary line is instead the
+   smoothed trend through every poll: each series' monthly rows keep their
+   shape ({ym, x, value, ci95, k}), sampled at mid-month from the series'
+   first polled month, the current month's point at the newest poll so the
+   line ends on the headline; each current figure is the filter's own
+   estimate, and its change on a month ago is tested against the posterior
+   uncertainty of the trend's move (kalman.mjs's frozen copy), not two
+   independent windows. Smoothness per series is a fixed setting
+   (JUR.kalman.series, the maximum-likelihood fit on Victoria's own polls);
+   kfLog reports the current fit beside it, a refit being a hand call.
+   Federally none of this runs: KF is null. */
+const KF = JUR && JUR.kalman ? JUR.kalman : null;
+const kfDay = (ms) => Math.round(ms / 86400000);
+const KF_T0 = kfDay(Date.parse(ELECTION.date + "T00:00:00Z")), KF_T1 = kfDay(refNow);
+// a change of Premier or Opposition Leader may move every series at once
+const KF_JUMPS = KF ? ["alb", "opp"].flatMap((slot) => JUR.eras[slot].slice(1)
+  .map((e) => ({ t: kfDay(Date.parse(e.from + "T00:00:00Z")), v: KF.jumpSd ** 2 }))) : [];
+const KF_NOW = {}, kfLog = [];
+function kfSeries(rows, key, mu0) {
+  const obs = rows.map((r) => ({ t: kfDay(r.mid), y: r.x, n: r.n, house: r.firm, key: r.key, ym: r.ym }))
+    .filter((o) => o.t <= KF_T1).sort((a, b) => a.t - b.t || (a.house < b.house ? -1 : a.house > b.house ? 1 : 0));
+  if (!obs.length) return null;
+  // a series first reported long after the election (One Nation, counted
+  // among others until 2026) starts at its first reading, not the count
+  const late = mu0 == null || obs[0].t - KF_T0 > 180;
+  const t0 = late ? obs[0].t - 1 : KF_T0;
+  const set = KF.series[key];
+  const opts = { s: set.s, tau: set.tau, sh: KF.leanSd, deff: HL_DEFF, mu0: late ? obs[0].y : mu0, sd0: late ? 5 : 0.5,
+                 t0, t1: KF_T1, jumps: KF_JUMPS.filter((j) => j.t > t0) };
+  const sm = kalmanRun(obs, { ...opts, smooth: true });
+  const ch = KF_T1 - 30 >= t0 ? kalmanRun(obs, { ...opts, snapAt: KF_T1 - 30 }).change : null;
+  const fit = kalmanFit(obs, opts);
+  kfLog.push(`${key}: ${obs.length} polls, drift ${set.s}/day tau ${set.tau}; a refit today says ${fit.s}, ${fit.tau}`);
+  return { key, obs, t0, opts, path: sm.path, final: sm.final, change: ch, leans: sm.leans };
+}
+// the trend at a day (the path's), or the filter's own at the newest poll
+const kfAt = (kf, day) => (day >= KF_T1 ? kf.final : kf.path[Math.max(0, day - kf.t0)]);
+// the monthly rows the charts read: mid-month from the first polled month,
+// the current month's point at the newest poll
+function kfMonths(kf, firstYm = kf.obs[0].ym) {
+  const ms = MONTHS.filter((ym) => ym >= firstYm);
+  return ms.map((ym, i) => {
+    const last = i === ms.length - 1, p = kfAt(kf, last ? KF_T1 : kfDay(ymMidMs(ym)));
+    return { ym, x: last ? dx(LATEST_ISO) : mx(ym), v: p.mu, ci: 1.96 * p.sd, k: kf.obs.filter((o) => o.ym === ym).length };
+  });
+}
+const kfNow = (kf) => kf && { alp: r1(kf.final.mu), n: kf.obs.length, se: r2(kf.final.sd), nEff: kf.obs.length, ci95: r1(1.96 * kf.final.sd) };
+const kfChgOf = (kf) => (kf && kf.change
+  ? { changeSe: r1(kf.change.sd), changeCi95: r1(1.96 * kf.change.sd), changeSig: Math.abs(kf.change.chg) > 1.96 * kf.change.sd }
+  : {});
+
 /* ---- 1. monthly 2PP (weighted, debiased) + election-day anchor --------- */
 /* Each month carries its own 95% interval. The hero draws it as a ribbon
    around the line: the headline already refuses to call a move real unless it
@@ -697,6 +752,10 @@ const agg2pp = MONTHS.map((ym) => {
 // the election is a COUNT, not an estimate, so its interval is zero and the
 // ribbon pinches shut on it - the one point on the chart that is simply known
 agg2pp.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: ELECTION.tpp_alp, lnp: ELECTION.tpp_lnp, ci95: 0, k: 0, election: true });
+if (KF) {                                   // /vic/: the trend (§1a)
+  const kf = KF_NOW.tpp = kfSeries(tppRows, "tpp", ELECTION.tpp_alp);
+  if (kf) agg2pp.splice(1, Infinity, ...kfMonths(kf).map((m) => ({ ym: m.ym, x: m.x, alp: r1(m.v), lnp: r1(100 - m.v), ci95: r1(m.ci), k: m.k })));
+}
 
 /* ---- 1b. monthly synthetic 2PP (same estimator, flows.mjs table) ---------
    Same monthly machinery as the published series above, run on the synthetic
@@ -714,6 +773,10 @@ const agg2ppSynth = MONTHS.map((ym) => {
 }).filter(Boolean);
 // computed from the data, never hardcoded – flows.mjs changes, this moves
 agg2ppSynth.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: r1(impliedAlp2pp(ELECTION)), lnp: r1(100 - impliedAlp2pp(ELECTION)), ci95: 0, k: 0, election: true });
+if (KF) {
+  const kf = KF_NOW.imp = kfSeries(tppRowsSynth, "imp", impliedAlp2pp(ELECTION));
+  if (kf) agg2ppSynth.splice(1, Infinity, ...kfMonths(kf).map((m) => ({ ym: m.ym, x: m.x, alp: r1(m.v), lnp: r1(100 - m.v), ci95: r1(m.ci), k: m.k })));
+}
 
 /* ---- 1c. flow-sensitivity band --------------------------------------------
    The conversion cell that actually moves between elections is One Nation's:
@@ -739,6 +802,10 @@ const agg2ppSynth22 = MONTHS.map((ym) => {
 }).filter(Boolean);
 const sensElec22 = impliedAlp2pp(ELECTION) + (ONP_FLOW_2022 - FLOW.onp) * ELECTION.onp;
 agg2ppSynth22.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: r1(sensElec22), lnp: r1(100 - sensElec22), ci95: 0, k: 0, election: true });
+if (KF) {                                   // the sensitivity edge, built as the line it brackets
+  const kf = kfSeries(tppRowsSynth22, "imp", sensElec22);
+  if (kf) agg2ppSynth22.splice(1, Infinity, ...kfMonths(kf).map((m) => ({ ym: m.ym, x: m.x, alp: r1(m.v), lnp: r1(100 - m.v), ci95: r1(m.ci), k: m.k })));
+}
 // lo/hi per month; the 2022 share sends ONP further ALP-side, so 22 ≥ 25
 // month for month and min/max only guards a rounding tie
 const synthBand = agg2ppSynth.map((m) => {
@@ -769,6 +836,17 @@ const agg2ppSynthOn = MONTHS.map((ym) => {
   }
   return { ym, x: mx(ym), a: r1(r.v), b: r1(100 - r.v), ci95: r1(bnSum / nSum), k: r.n };
 }).filter(Boolean);
+if (KF) {   // /vic/: the trend's line; the band stays the flow range, carried through a month with no poll
+  const kf = KF_NOW.on = kfSeries(tppRowsSynthOn, "on", null);
+  if (kf) {
+    let band = null;
+    agg2ppSynthOn.splice(0, Infinity, ...kfMonths(kf).map((m) => {
+      const rs = tppRowsSynthOn.filter((q) => q.ym === m.ym);
+      if (rs.length) band = rs.reduce((t, q) => t + q.n * q.bn, 0) / rs.reduce((t, q) => t + q.n, 0);
+      return { ym: m.ym, x: m.x, a: r1(m.v), b: r1(100 - m.v), ci95: r1(band), k: m.k };
+    }));
+  }
+}
 
 /* ---- 2. monthly primary vote + election-day anchor --------------------- */
 /* Primaries get the SAME treatment as the monthly 2PP – sample-weighted and
@@ -819,6 +897,22 @@ aggPrimary.unshift({
   alp: ELECTION.alp, lnp: ELECTION.lnp, grn: ELECTION.grn,
   onp: ELECTION.onp ?? 0, oth: r1(ELECTION.oth ?? 0),
 });
+if (KF) {   // /vic/: each party's trend (§1a); a party first reported late is null before it
+  const per = KF_NOW.primary = {};
+  for (const k of PRIMARY_KEYS) { const kf = kfSeries(primaryRows[k], k, ELECTION[k] ?? 0); if (kf) per[k] = kf; }
+  const firstYm = Object.values(per).map((kf) => kf.obs[0].ym).sort()[0];
+  const ms = MONTHS.filter((ym) => ym >= firstYm);
+  aggPrimary.splice(1, Infinity, ...ms.map((ym, i) => {
+    const last = i === ms.length - 1, o = { ym, x: last ? dx(LATEST_ISO) : mx(ym), ci: {} };
+    for (const k of PRIMARY_KEYS) {
+      const kf = per[k];
+      if (!kf || ym < kf.obs[0].ym) { o[k] = null; continue; }
+      const p = kfAt(kf, last ? KF_T1 : Math.max(kf.t0, kfDay(ymMidMs(ym))));
+      o[k] = r1(p.mu); o.ci[k] = r1(1.96 * p.sd);
+    }
+    return o;
+  }));
+}
 
 /* ---- 3. alt head-to-head 2PP (ALP v ON, L/NP v ON) --------------------- */
 /* The ON head-to-heads are published figures, so they get the same weighted,
@@ -931,6 +1025,23 @@ const houseLean = Object.fromEntries([
    empty 21-day window for the classic/implied nowcast emits nothing rather
    than mixing bases against the monthly-fallback the headline would show. */
 const effByKey = (() => {
+  /* /vic/: every poll sits in the trend (w is always 1), so its footprint
+     is today's trend without it, rerun through the filter */
+  if (KF) {
+    const out = new Map();
+    const series = [["lnp", KF_NOW.tpp], ["imp", KF_NOW.imp], ["onimp", KF_NOW.on]].filter(([, kf]) => kf);
+    for (const p of POLLS) {
+      if (NO_AGG_HOUSES.has(p.pollster)) continue;
+      const key = p.date + "|" + p.pollster, eff = {};
+      for (const [k, kf] of series) {
+        if (!kf.obs.some((o) => o.key === key)) continue;
+        const lo = kalmanRun(kf.obs.filter((o) => o.key !== key), { ...kf.opts, smooth: false }).final.mu;
+        eff[k] = { lo: r1(lo), hi: r1(kf.final.mu), w: 1 };
+      }
+      if (Object.keys(eff).length) out.set(key, eff);
+    }
+    return out;
+  }
   const ref = new Date(LATEST_ISO).getTime();
   const cur2pp = nowcastAdj(tppRows, houseEffect, ref);
   const curSynth = nowcastAdj(tppRowsSynth, synthEffect, ref);
@@ -2575,8 +2686,8 @@ const headlineTpp = (ref) => {
   const r = nowcastAdj(tppRows, houseEffect, ref);
   return r ? { alp: r.v, n: r.n, se: r.se, nEff: r.nEff, ci95: r.ci95 } : null;
 };
-const hlNow = headlineTpp(refNow) || { alp: agg2pp[agg2pp.length - 1].alp, n: 0 };
-const hl1mo = headlineTpp(refNow - 30 * 86400000);
+const hlNow = (KF ? kfNow(KF_NOW.tpp) : headlineTpp(refNow)) || { alp: agg2pp[agg2pp.length - 1].alp, n: 0 };
+const hl1mo = KF ? (KF_NOW.tpp && KF_NOW.tpp.change ? { alp: r1(KF_NOW.tpp.change.prev) } : null) : headlineTpp(refNow - 30 * 86400000);
 
 /* The synthetic series' nowcast, on the identical window/half-life/house-
    effect machinery as the headline. Kept next to it in the payload so the
@@ -2588,13 +2699,13 @@ const synthHeadline = (ref) => {
   const r = nowcastAdj(tppRowsSynth, synthEffect, ref);
   return r ? { alp: r.v, n: r.n, se: r.se, nEff: r.nEff, ci95: r.ci95 } : null;
 };
-const synthNow = synthHeadline(refNow);
-const synth1mo = synthHeadline(refNow - 30 * 86400000);
+const synthNow = KF ? kfNow(KF_NOW.imp) : synthHeadline(refNow);
+const synth1mo = KF ? (KF_NOW.imp && KF_NOW.imp.change ? { alp: r1(KF_NOW.imp.change.prev) } : null) : synthHeadline(refNow - 30 * 86400000);
 /* The implied headline's month-on-month significance, on the same RSS rule
    the published headline uses (two independent 21d windows). Emitted beside
    synthLatest so the hero's "within the margin" caveat reads the implied
    basis it displays. */
-const synthChg = (synthNow && synth1mo && synthNow.se != null && synth1mo.se != null)
+const synthChg = KF ? kfChgOf(KF_NOW.imp) : (synthNow && synth1mo && synthNow.se != null && synth1mo.se != null)
   ? (() => {
       const seChg = Math.sqrt(synthNow.se ** 2 + synth1mo.se ** 2);
       return { changeSe: r1(seChg), changeCi95: r1(1.96 * seChg), changeSig: Math.abs(synthNow.alp - synth1mo.alp) > 1.96 * seChg };
@@ -2880,6 +2991,15 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
    debiased per party, plain-window total alongside, renormalised only if the
    totals disagree by more than half a point. */
 const primaryNowAt = (ref) => {
+  if (KF) {   // /vic/: each party's trend at that day (§1a); null before a party's first reading
+    const per = KF_NOW.primary || {}, out = {};
+    for (const k of PRIMARY_KEYS) {
+      const kf = per[k], day = kfDay(ref);
+      if (!kf || day < kf.t0) return null;
+      out[k] = r1(kfAt(kf, day).mu);
+    }
+    return { ...out, n: Math.max(...PRIMARY_KEYS.map((k) => per[k].obs.length)), parties: {}, plainTotal: null, adjTotal: null, rescaled: false };
+  }
   const win = (k) => primaryRows[k].filter((r) => { const d = ddays(ref, r.mid); return d >= 0 && d <= HL_WINDOW; });
   const adj = {}, parties = {};
   let plainTotal = 0, adjTotal = 0, n = 0;
@@ -3530,9 +3650,9 @@ const onImp = primaryNow && (() => {
      three of the four basis x contest cells made this call already, the
      PUBLISHED ALP-v-ON among them. Only ci95 stays the flow range; nothing
      here renames it, and the hero still labels the ribbon "flow range". */
-  const nw = nowcastAdj(tppRowsSynthOn, synthOnEffect, refNow);
-  const pv = nowcastAdj(tppRowsSynthOn, synthOnEffect, refNow - 30 * 86400000);
-  const chg = (nw && pv && nw.se != null && pv.se != null)
+  const nw = KF ? null : nowcastAdj(tppRowsSynthOn, synthOnEffect, refNow);
+  const pv = KF ? null : nowcastAdj(tppRowsSynthOn, synthOnEffect, refNow - 30 * 86400000);
+  const chg = KF ? kfChgOf(KF_NOW.on) : (nw && pv && nw.se != null && pv.se != null)
     ? (() => {
         const seChg = Math.sqrt(nw.se ** 2 + pv.se ** 2);
         return { changeSe: r1(seChg), changeCi95: r1(1.96 * seChg),
@@ -3637,7 +3757,7 @@ const latest = {
   alp2ppSe: hlNow.se ?? null,
   alp2ppCi95: hlNow.ci95 ?? null,
   alp2ppNEff: hlNow.nEff ?? null,
-  ...(hl1mo && hlNow.se != null ? (() => {
+  ...(KF ? kfChgOf(KF_NOW.tpp) : hl1mo && hlNow.se != null ? (() => {
     const seChg = Math.sqrt(hlNow.se ** 2 + hl1mo.se ** 2);
     const chg = hlNow.alp - hl1mo.alp;
     return { changeSe: r1(seChg), changeCi95: r1(1.96 * seChg), changeSig: Math.abs(chg) > 1.96 * seChg };
@@ -3666,7 +3786,7 @@ const latest = {
   /* deff rides in the payload so the page's discord engine reads the SAME
      constant the node estimator used (it lives in an untransformed asset and
      used to mirror 1.6 by hand, free to drift). */
-  method: { kind: "weighted house-effect-adjusted mean", windowDays: HL_WINDOW, halfLifeDays: HL_HALF, taperDays: HL_TAPER, shrinkK: SHRINK_K, nPolls: hlNow.n, deff: HL_DEFF },
+  method: { kind: KF ? "kalman" : "weighted house-effect-adjusted mean", windowDays: HL_WINDOW, halfLifeDays: HL_HALF, taperDays: HL_TAPER, shrinkK: SHRINK_K, nPolls: hlNow.n, deff: HL_DEFF },
 };
 
 /* ---- 8b. show-your-working: the rows behind the two headline estimates ---
@@ -3690,7 +3810,7 @@ const fwText = (p) => {
     ? `${s.getUTCDate()}–${dayMon(e.getTime())}`
     : `${dayMon(s.getTime())} – ${dayMon(e.getTime())}`;
 };
-const showWorking = (() => {
+const showWorking = KF ? {} : (() => {   // /vic/'s figures are the trend's: no 21-day tables
   // 2PP: polls whose fieldwork mid falls inside the trailing window – the
   // filter is nowcastAdj's own predicate, ref and constants included
   const tppRowsIn = tppRows.filter((a) => { const d = ddays(refNow, a.mid); return d >= 0 && d <= HL_WINDOW; });
@@ -3751,7 +3871,7 @@ const showWorking = (() => {
    warn-and-ship a page that disagrees with itself. */
 if (showWorking.tpp && showWorking.tpp.v !== hlNow.alp)
   throw new Error(`show-working 2pp ${showWorking.tpp.v} != headline ${hlNow.alp} – emitted table would contradict the hero`);
-if (showWorking.primary && showWorking.primary.v !== primaryNow.alp)
+if (!KF && showWorking.primary && showWorking.primary.v !== primaryNow.alp)
   throw new Error(`show-working primary ${showWorking.primary.v} != primaryNow ${primaryNow.alp} – emitted table would contradict the hero`);
 console.log("showWorking:",
   showWorking.tpp ? `2pp mean ${showWorking.tpp.mean}% over ${showWorking.tpp.k} polls` : "2pp window empty",
@@ -5132,6 +5252,7 @@ console.log("MONTHS:", MONTHS.length, MONTHS[0], "→", MONTHS[MONTHS.length - 1
 console.log("agg2pp:", agg2pp.length, "pts | first:", agg2pp[0], "| last:", agg2pp[agg2pp.length - 1]);
 console.log("synth2pp:", agg2ppSynth.length, "pts | anchor(implied):", agg2ppSynth[0].alp, "vs count 55.2 | last:", agg2ppSynth[agg2ppSynth.length - 1]);
 console.log("synthOn:", agg2ppSynthOn.length, "pts | no anchor (no ALP–ON count exists) | last:", agg2ppSynthOn[agg2ppSynthOn.length - 1]);
+if (KF) console.log("kalman trend (smoothness per series; a refit is a hand call):\n  " + kfLog.join("\n  "));
 console.log("synthLatest:", synthNow ? `ALP ${synthNow.alp} (n=${synthNow.n}, se=${synthNow.se.toFixed(2)}) vs published ${hlNow.alp} → Δ${r1(synthNow.alp - hlNow.alp)}` : "none (window empty)");
 console.log("flowSens:", synthBand.length, "pts | bracket at election:", synthBand[0].lo + "–" + synthBand[0].hi, "| last month:", (synthBand[synthBand.length - 1].lo) + "–" + (synthBand[synthBand.length - 1].hi), `(width ${r1(synthBand[synthBand.length - 1].hi - synthBand[synthBand.length - 1].lo)}pt)`);
 console.log("aggPrimary last:", aggPrimary[aggPrimary.length - 1]);

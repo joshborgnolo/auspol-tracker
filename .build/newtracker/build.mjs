@@ -775,10 +775,14 @@ function buildStaticSummaryVic() {
         (&#177;${(2 * L.alp2ppCi95).toFixed(1)} on the lead)${L.basis === "imp" ? `
         on implied preference flows &#8211; every poll&#8217;s primary votes re-allocated by
         ${esc(J.flowsLabel)}, so every poll that publishes primaries counts, not only those that
-        file a two-party figure` : ""}. The aggregate is a sample- and recency-weighted,
+        file a two-party figure` : ""}. ${L.method.kind === "kalman"
+          ? `The figure is a smoothed trend (a Kalman smoother) through every poll this term,
+        each counted by its sample and adjusted for its pollster&#8217;s lean, carrying a 95% interval
+        of &#177;${L.alp2ppCi95.toFixed(1)} points on each share.`
+          : `The aggregate is a sample- and recency-weighted,
         house-effect-adjusted mean over a ${L.method.windowDays}-day window
         (${L.method.halfLifeDays}-day half-life), carrying a 95% interval of
-        &#177;${L.alp2ppCi95.toFixed(1)} points on each share from ${L.method.nPolls} polls.</p>
+        &#177;${L.alp2ppCi95.toFixed(1)} points on each share from ${L.method.nPolls} polls.`}</p>
 
       <h2>Primary vote</h2>
       <table class="ss-primary">

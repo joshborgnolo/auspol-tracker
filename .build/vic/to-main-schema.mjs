@@ -118,6 +118,30 @@ export const VIC_JURISDICTION = {
   flows: VIC_FLOWS,
   flowsLabel: "the 2022 Victorian election's flows (measured from the VEC's district counts; One Nation's from the 2025 federal count)",
   eras: VIC_ERAS,
+  /* The lines are a Kalman smoother's trend (gen-data §1a, kalman.mjs) – user
+     call 2026-10-06 "proceed as recommended", after a trial found it halves
+     the monthly lines' jumps at no cost in predicting the next poll, given
+     Victoria's own smoothness. s: how far the trend may drift in a day (sd,
+     points); tau: extra noise a poll carries beyond sampling error. Each is
+     the maximum-likelihood fit on Victoria's own polls as at 28 Sep 2026;
+     gen-data logs a refit beside them every build, and changing them is a
+     hand call. jumpSd: how far opinion may move at once on a
+     change of Premier or Opposition Leader. leanSd: the prior on each
+     pollster's lean (the site's shrinkage, about 1.5 polls' worth). */
+  kalman: {
+    jumpSd: 2,
+    leanSd: 1.6,
+    series: {
+      tpp: { s: 0.16, tau: 0 },       // the pollsters' published 2PPs
+      imp: { s: 0.2, tau: 0 },        // the implied 2PP (and its flow-sensitivity edge)
+      on: { s: 0.16, tau: 0 },        // Labor v One Nation, implied
+      alp: { s: 0.25, tau: 0.5 },
+      lnp: { s: 0.3, tau: 0 },
+      grn: { s: 0.03, tau: 0 },
+      onp: { s: 0.5, tau: 1.5 },
+      oth: { s: 0.25, tau: 0 },
+    },
+  },
   path: "/vic/",
 };
 

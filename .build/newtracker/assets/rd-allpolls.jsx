@@ -359,14 +359,14 @@ function RdApMini({ p, onM, pub, avgFor }) {
   return (
     <div ref={box} className="rd-apd-mini">
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
-           aria-label={`${p.pollster}’s polls since ${rdMonthYear(ms[0])} against the monthly average; this poll ${S.own.toFixed(1)}.`}>
+           aria-label={`${p.pollster}’s polls since ${rdMonthYear(ms[0])} against the monthly ${RD_AP_AVG}; this poll ${S.own.toFixed(1)}.`}>
         {avgClip && (
           <defs><clipPath id={clipId}><rect x={X(avgClip[0]) - 2} y={-20} width={Math.max(0, X(avgClip[1]) - X(avgClip[0]) + 4)} height={H + 40} /></clipPath></defs>
         )}
         {ticks.map((v) => { const op = tickOp(v); return op <= 0 ? null : <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === 50 ? "rd-apd-even" : "rd-apd-gl"} style={op < 1 ? { opacity: op } : null}></path>; })}
         {ticks.map((v) => { const op = tickOp(v); return op <= 0 ? null : <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end" style={op < 1 ? { opacity: op } : null}>{v}</text>; })}
         {avgPts.length > 1 && <path d={monotoneXY(avgPts.map((a) => [X(a.x), Y(a.v)]))} className="rd-apd-avgline" clipPath={avgClip ? `url(#${clipId})` : undefined}></path>}
-        {avgFirst && <text x={X(avgFirst.x)} y={Y(avgFirst.v) - 9} className="rd-apd-lab">Monthly average</text>}
+        {avgFirst && <text x={X(avgFirst.x)} y={Y(avgFirst.v) - 9} className="rd-apd-lab">{RD_AP_KAL ? "Trend" : "Monthly average"}</text>}
         {dots.map((d) => {
           const { id, key: k } = d;
           const open = () => { if (k && window.AP.openPoll) { setTip(null); window.AP.openPoll(k, "twopp", "the poll you were reading"); } };
@@ -1245,7 +1245,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
         <span className="rd-apd-h">How it counts</span>
         {!isDir && !isIss && !isLd && !isDem && fig.a != null && (
           <>
-            <span className="rd-apd-ct">{p.pollster}’s polls since {D.monthNameFull(Number(from.slice(5)))} against the average, Labor v {onM ? "One Nation" : "Coalition"}{pub ? " as published" : ""}</span>
+            <span className="rd-apd-ct">{p.pollster}’s polls since {D.monthNameFull(Number(from.slice(5)))} against the {RD_AP_AVG}, Labor v {onM ? "One Nation" : "Coalition"}{pub ? " as published" : ""}</span>
             <RdApMini p={p} onM={onM} pub={pub} avgFor={avgFor} />
           </>
         )}
@@ -1373,12 +1373,12 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
           {lean != null && avg != null && <>
             <span className="rd-apd-k">Against {D.monthNameFull(Number(p.ym.slice(5)))}</span>
             <span>{Math.abs(lean) < 0.05
-              ? <>Level with the month’s average of {avg.toFixed(1)}{moe != null ? ", inside its ±" + moe.toFixed(1) + " margin" : ""}</>
-              : <><b style={{ color: rdApLeanInk(lean, onM) }}>{Math.abs(lean).toFixed(1)}</b> more {lean > 0 ? "Labor’s" : onM ? "One Nation’s" : "the Coalition’s"} way than the month’s average of {avg.toFixed(1)}{moe != null ? ", " + inside + " its ±" + moe.toFixed(1) + " margin" : ""}</>}</span>
+              ? <>Level with the month’s {RD_AP_AVG} of {avg.toFixed(1)}{moe != null ? ", inside its ±" + moe.toFixed(1) + " margin" : ""}</>
+              : <><b style={{ color: rdApLeanInk(lean, onM) }}>{Math.abs(lean).toFixed(1)}</b> more {lean > 0 ? "Labor’s" : onM ? "One Nation’s" : "the Coalition’s"} way than the month’s {RD_AP_AVG} of {avg.toFixed(1)}{moe != null ? ", " + inside + " its ±" + moe.toFixed(1) + " margin" : ""}</>}</span>
           </>}
           {fig.a == null && <>
             <span className="rd-apd-k">Two-party</span>
-            <span>{fig.none[0].toUpperCase() + fig.none.slice(1)}, so this poll has no {pub ? "published" : "implied"} figure to set against the average.</span>
+            <span>{fig.none[0].toUpperCase() + fig.none.slice(1)}, so this poll has no {pub ? "published" : "implied"} figure to set against the {RD_AP_AVG}.</span>
           </>}
           <span className="rd-apd-k">{p.pollster}’s house lean</span>
           <span>{hl == null ? "Not measured yet: too few polls on this contest"
@@ -1387,7 +1387,7 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
           {today && <>
             <span className="rd-apd-k">In today’s {today.a.toFixed(1)}</span>
             <span>{eff && eff.w
-              ? <>One of the {rdNumWord(winN)} polls it’s built from; this one moves it <b>{move(eff)}</b></>
+              ? <>One of the {rdNumWord(winN)} polls {RD_AP_KAL ? "the trend is" : "it’s"} built from; this one moves it <b>{move(eff)}</b></>
               : eff && eff.t
                 ? <>Not one of them: today’s figure uses the last three weeks of polls. When it came out, it moved the figure <b>{move(eff.t)}</b></>
                 : <>Not one of them: today’s figure uses the last three weeks of polls</>}</span>
@@ -1512,7 +1512,10 @@ function RdAllPolls(P) {
     const lo = Math.min(...vals), hi = Math.max(...vals);
     const f = (v) => (pub ? rdApNum(v) : v.toFixed(1));
     const n = win.length;
-    head = "Labor’s " + today.a.toFixed(1) + " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s")
+    head = RD_AP_KAL
+      ? "Labor’s " + today.a.toFixed(1) + " is the trend through every poll; "
+        + (n === 1 ? "the last three weeks hold one, at " + f(lo) : "the last three weeks’ " + rdNumWord(n) + (lo === hi ? " all put Labor on " + f(lo) : " range from " + f(lo) + " to " + f(hi)))
+      : "Labor’s " + today.a.toFixed(1) + " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s")
       + (n === 1 ? "" : lo === hi ? ", which all put Labor on " + f(lo) : ", which range from " + f(lo) + " to " + f(hi));
     const ahead = vals.filter((v) => v > 50).length;
     const outN = win.filter((p) => { const m = rdPollMargin(p, contest, pub); return p.lean != null && m != null && Math.abs(p.lean) > m; }).length;
@@ -1520,10 +1523,10 @@ function RdAllPolls(P) {
       : ahead === n ? (n === 2 ? "Both have" : "All " + rdNumWord(n) + " have")
       : ahead === 0 ? "None of them has"
       : rdCap(rdNumWord(ahead)) + " of them " + (ahead === 1 ? "has" : "have");
-    const tail = n === 1 ? (outN ? "it sits further from the average than its own margin of error. " : "it sits within its own margin of error of the average. ")
-      : outN === 0 ? "none sits further from the average than its own margin of error. "
-      : outN === 1 ? "one sits further from the average than its own margin of error. "
-      : rdNumWord(outN) + " sit further from the average than their own margin of error. ";
+    const tail = n === 1 ? (outN ? "it sits further from the " + RD_AP_AVG + " than its own margin of error. " : "it sits within its own margin of error of the " + RD_AP_AVG + ". ")
+      : outN === 0 ? "none sits further from the " + RD_AP_AVG + " than its own margin of error. "
+      : outN === 1 ? "one sits further from the " + RD_AP_AVG + " than its own margin of error. "
+      : rdNumWord(outN) + " sit further from the " + RD_AP_AVG + " than their own margin of error. ";
     dek = lead + " Labor ahead of " + rival + ", and " + tail
       + "Below is every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election, newest first, each linked to its source.";
   }
@@ -1725,7 +1728,7 @@ function RdAllPolls(P) {
       <span></span>
       {facet === "twopp" && <>
         {th("Labor v " + (onM ? "One Nation" : "Coalition"), "alp", { title: "Sort by Labor’s share", wrap: true })}
-        <span role="columnheader" aria-label="Poll lean against the average of its month" className="rd-ap-hpic"><RdApScale onM={onM} /></span>
+        <span role="columnheader" aria-label={"Poll lean against the " + RD_AP_AVG + " of its month"} className="rd-ap-hpic"><RdApScale onM={onM} /></span>
         {th("Lean", "lean", { right: true, title: "Sort by poll lean, towards Labor first" })}
         {/* the desktop table's last column (user call 2026-10-03: "the
             column heading can be wrapped if it can't fit" - .rd-ap-th.wrap
@@ -1830,7 +1833,7 @@ function RdAllPolls(P) {
       figs = <span role="cell" className="rd-ap-fig">{main}{sub && <span className="rd-ap-sub">{sub}</span>}</span>;
       const hovered = tip === id && p.lean != null && !phone;
       const aria = p.lean == null ? "No figure to set against its month"
-        : (Math.abs(p.lean) < 0.05 ? "Level with the average of its month" : rdSigned(p.lean, 1) + " points against the average of its month, towards " + (p.lean > 0 ? "Labor" : rival))
+        : (Math.abs(p.lean) < 0.05 ? "Level with the " + RD_AP_AVG + " of its month" : rdSigned(p.lean, 1) + " points against the " + RD_AP_AVG + " of its month, towards " + (p.lean > 0 ? "Labor" : rival))
           + (m != null ? "; 95% margin ±" + m.toFixed(1) : "");
       pic = (
         <span className="rd-ap-pic" role="img" aria-label={aria} onMouseEnter={() => setTip(id)} onMouseLeave={() => setTip(null)}>
@@ -2007,7 +2010,7 @@ function RdAllPolls(P) {
     }
     const detail = isOpen && (
       <div className="rd-ap-open" role="row">
-        <RdApDetail p={p} onM={onM} pub={pub} today={today} winN={win.length} avgBy={avgBy} avgFor={avgFor}
+        <RdApDetail p={p} onM={onM} pub={pub} today={today} winN={RD_AP_KAL ? rows.filter((r) => !r.noAgg && figOf(r).a != null).length : win.length} avgBy={avgBy} avgFor={avgFor}
                     facet={facet} onBack={arrived ? onBack : null} backLabel={backLabel} demSplit={demSplit} />
       </div>
     );
@@ -2052,7 +2055,7 @@ function RdAllPolls(P) {
       return (
         <div className={"rd-ap-mrow " + cls} role="row" key={"m" + g.ym}>
           <span className="rd-ap-mlab" role="rowheader"><b>{lab}</b><span>{note}</span></span>
-          {avg != null && <span className="rd-ap-mavg">{phone ? "Avg " : "Average "}<b>{avg.toFixed(1)}{phone ? "" : " – " + (100 - avg).toFixed(1)}</b></span>}
+          {avg != null && <span className="rd-ap-mavg">{RD_AP_KAL ? "Trend " : phone ? "Avg " : "Average "}<b>{avg.toFixed(1)}{phone ? "" : " – " + (100 - avg).toFixed(1)}</b></span>}
         </div>
       );
     }
@@ -2060,7 +2063,7 @@ function RdAllPolls(P) {
       const A = (D.aggPrimary || []).find((x) => x.ym === g.ym);
       return (
         <div className={"rd-ap-mrow " + cls} role="row" key={"m" + g.ym}>
-          <span className="rd-ap-mlab" role="rowheader"><b>{lab}</b><span>{A && !phone ? "average, drawn as rings" : count}</span></span>
+          <span className="rd-ap-mlab" role="rowheader"><b>{lab}</b><span>{A && !phone ? RD_AP_AVG + ", drawn as rings" : count}</span></span>
           {A && !phone && <span className="rd-ap-pnums rd-ap-mpn">{prims.map((k) => <span key={k.id}>{A[k.id] != null ? A[k.id].toFixed(1) : "—"}</span>)}</span>}
           {A && !phone && (
             <span className="rd-ap-pic rd-ap-mpic" aria-hidden="true"><span className="rd-ap-in">
@@ -2278,7 +2281,7 @@ function RdAllPolls(P) {
   );
   const qpop = (
     <RdQPop label="How the two-party figures are counted, and the pollsters’ published figures" align="left">
-      <p>{pub ? "Each poll’s two-party figure as its pollster published it, against the average of the published figures that month."
+      <p>{pub ? "Each poll’s two-party figure as its pollster published it, against the " + RD_AP_AVG + " of the published figures that month."
         : "Each poll’s primary votes read through the same preference flows, the " + rdElecYear + " election’s, so the polls compare like for like. The pollster’s own figure sits beneath."}</p>
       <div className="rd-qrow"><span>Show the pollsters’ published figures</span>
         <RdSwitch on={pub} onToggle={basisPick} label="Show the pollsters’ published figures" /></div>
@@ -2387,7 +2390,7 @@ function RdAllPolls(P) {
       )}
       {facet === "primary" && (
         <RdKey className="rd-ckey rd-ap-key" items={[{ kind: "dot-solid", color: "var(--ink-3)", label: "A poll’s figure, in its party’s colour" }]}>
-          <span className="rd-key-item"><span className="rd-ap-keyring" aria-hidden="true"></span>The month’s average</span>
+          <span className="rd-key-item"><span className="rd-ap-keyring" aria-hidden="true"></span>The month’s {RD_AP_AVG}</span>
         </RdKey>
       )}
       {facet === "issues" && (
@@ -2413,7 +2416,7 @@ function RdAllPolls(P) {
       ]} />
       <div className="rd-foot">
         <span className="rd-foot-text">{facet === "twopp"
-          ? (pub ? "Each poll’s own published figure, against the average of the published figures that month. A dash marks a figure the pollster didn’t publish."
+          ? (pub ? "Each poll’s own published figure, against the " + RD_AP_AVG + " of the published figures that month. A dash marks a figure the pollster didn’t publish."
             : (phone ? "Every poll is read through the " + rdElecYear + " election’s preference flows, so polls compare like for like; the pollster’s own figure sits beneath. Each interval is sampling error alone. A dash marks a figure the pollster didn’t publish."
               : "Every poll’s primary votes are read through the same preference flows, the " + rdElecYear + " election’s, so the polls compare like for like; the pollster’s own figure sits beneath where it published one. Those flows carry doubt of their own, but the same doubt for every poll, so each interval is sampling error alone. A dash marks a figure the pollster didn’t publish."))
           : "A dash marks a figure the pollster didn’t publish. Open any row for the poll in full."}</span>
@@ -2438,6 +2441,10 @@ function RdAllPolls(P) {
 const RD_AP_TERM0 = (() => { const c = (window.AUSPOL.cycles || []).find((x) => x.current); return c && c.eDate ? c.eDate.slice(0, 7) : "2025-05"; })();
 const RD_AP_TERM1 = (() => { const [y, m] = RD_AP_TERM0.split("-").map(Number); return m === 12 ? (y + 1) + "-01" : y + "-" + String(m + 1).padStart(2, "0"); })();
 const RD_AP_POLLS = window.JUR ? window.JUR.adj : "national";
+/* /vic/'s figures are a smoothed trend through every poll (gen-data §1a):
+   a month's figure is the trend's, and every poll this term counts */
+const RD_AP_KAL = !!(window.AUSPOL.latest.method && window.AUSPOL.latest.method.kind === "kalman");
+const RD_AP_AVG = RD_AP_KAL ? "trend" : "average";
 function rdApMonths(from) {
   const D = window.AUSPOL;
   const i = Math.max(0, D.MONTHS.indexOf(from));

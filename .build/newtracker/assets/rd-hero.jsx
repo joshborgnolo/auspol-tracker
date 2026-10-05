@@ -98,6 +98,11 @@ function RdHero(p) {
           latest, unc, monthDelta, leadSwing, impOffered, impOnOffered, impBasis, impOnBasis, adjusted,
           iDataOf, iScatOf, showScatter, showSynth, setShowSynth, otherContests, xDomain, domainRef } = p;
   const { D, filterPts, blendRows, mixC, blendDomain, monthLabelFull } = window.AP;
+  /* /vic/'s lines are a Kalman smoother's trend through every poll (gen-data
+     §1a), its figures the trend's own; only the published Labor v One Nation,
+     too thin to adjust, stays a plain monthly average */
+  const KAL = !!(D.latest.method && D.latest.method.kind === "kalman");
+  const lineWord = (contest, basis) => (KAL && !(contest === "alp_on" && basis === "resp") ? "trend" : "monthly average");
   const M = window.AP.tppMatchups;
   const m = M[matchup];
   const narrow = useNarrow("(max-width: 640px)");
@@ -136,10 +141,15 @@ function RdHero(p) {
     : onImp ? (narrow ? "Implied flows" : "Implied preference flows") : (narrow ? "As published" : "Pollsters’ published figures");
   const provenance = (
     <>
+      {KAL && adjusted ? (
+        <>{basisWords}, <RdTerm id="weighted-aggregate" from="two-party preferred" title="What the smoothed trend means">smoothed trend</RdTerm>
+          {unc && <>{" "}of {unc.n} polls to {rdDate(D.latest.updatedISO)}</>}</>
+      ) : (<>
       {basisWords}, <RdTerm id={adjusted ? "weighted-aggregate" : "monthly-average"} from="two-party preferred"
         title={"What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means"}>
         {adjusted ? "weighted aggregate" : "monthly average"}</RdTerm>
       {unc && <>{" "}of {unc.n} poll{unc.n === 1 ? "" : "s"} {narrow ? "to " : "in the " + D.latest.method.windowDays + " days to "}{rdDate(D.latest.updatedISO)}</>}
+      </>)}
     </>
   );
   /* what the other basis would say, quoted in the "?" before anyone switches */
@@ -151,13 +161,14 @@ function RdHero(p) {
   const howCounted = !hasBases
     ? "The pollsters’ own head-to-head figures, averaged. Too few pollsters ask this pairing for it to be weighted or corrected for each one’s lean."
     : !onImp
-      ? "The pollsters’ own two-party figures, from where their respondents say their preferences would go, weighted towards the most recent and adjusted for each pollster’s lean. The ± is the 95% margin."
+      ? (KAL ? "The pollsters’ own two-party figures, from where their respondents say their preferences would go, as a smoothed trend through every poll, adjusted for each pollster’s lean. The ± is its 95% interval."
+        : "The pollsters’ own two-party figures, from where their respondents say their preferences would go, weighted towards the most recent and adjusted for each pollster’s lean. The ± is the 95% margin.")
       : matchup === "alp_on"
         ? (window.JUR
-            ? "Each poll’s primary votes, run through preference flows taken from counted ballots. No " + window.JUR.adj + " election has counted Labor against One Nation, so for that pairing the site borrows the flows it builds for the federal page, and the ± is the doubt about them."
+            ? "Each poll’s primary votes, run through preference flows taken from counted ballots. No " + window.JUR.adj + " election has counted Labor against One Nation, so for that pairing the site borrows the flows it builds for the federal page, and the ± is the doubt about them." + (KAL ? " The line is a smoothed trend through every poll." : "")
             : "Each poll’s primary votes, run through preference flows taken from counted ballots. No federal election has counted Labor against One Nation, so for that pairing the site builds the flows itself, and the ± is the doubt about them.")
         : window.JUR
-          ? "Each poll’s primary votes, run through the preference flows counted at the " + rdElecYear + " election (One Nation’s, too few then to measure, from the 2025 federal count). The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error."
+          ? "Each poll’s primary votes, run through the preference flows counted at the " + rdElecYear + " election (One Nation’s, too few then to measure, from the 2025 federal count)." + (KAL ? " The line is a smoothed trend through every poll, and the ± its 95% interval." : " The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error.")
           : "Each poll’s primary votes, run through the preference flows counted at the 2025 election. The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error.";
   const qPanel = (
     <RdQPop label="How this is counted, and the pollsters’ published figures" align="left">
@@ -451,9 +462,9 @@ function RdHero(p) {
   const keyItems = [
     showScatter && settled.length ? { kind: "dot", color: mainCol, label: "One poll, " + (hasBases ? (onImp ? "implied flows" : "as published") : "as published") } : null,
     (adjusted || morph) ? { kind: bandPts.length >= 2 ? "lineband" : "line", color: mainCol,
-      label: (narrow ? "Monthly" : "Monthly average") + (bandPts.length >= 2 ? (flowsBand ? (narrow ? ", flow range" : " and flow range") : (narrow ? ", 95% interval" : " and its 95% interval")) : "") } : null,
-    (!narrow && labelOther) ? { kind: "line", color: otherCol, label: labelOther + ", monthly average" } : null,
-    cmpOn ? { kind: "dash", color: mainCol, label: cmpName + ", monthly average" } : null,
+      label: (lineWord(shown, b0) === "trend" ? "Trend" : narrow ? "Monthly" : "Monthly average") + (bandPts.length >= 2 ? (flowsBand ? (narrow ? ", flow range" : " and flow range") : (narrow ? ", 95% interval" : " and its 95% interval")) : "") } : null,
+    (!narrow && labelOther) ? { kind: "line", color: otherCol, label: labelOther + ", " + lineWord(otherOf(shown), b0) } : null,
+    cmpOn ? { kind: "dash", color: mainCol, label: cmpName + ", " + lineWord(matchup, onImp ? "resp" : "imp") } : null,
     extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBt, href: extBtHref } : null,
     extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: lblExtKb, href: extKbHref } : null,
     extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: lblExtSh, href: extKbHref } : null,
@@ -467,9 +478,9 @@ function RdHero(p) {
   const copyKey = [
     keyItems.find((k) => k && k.kind === "dot"),
     (adjusted || morph) ? { kind: "line", color: mainCol,
-      label: labelMain + ", monthly average" + (bandPts.length >= 2 ? (flowsBand ? " and flow range" : " and its 95% interval") : "") } : null,
-    labelOther ? { kind: "line", color: otherCol, label: labelOther + ", monthly average" } : null,
-    cmpOn ? { kind: "dashed", color: mainCol, label: cmpName + ", monthly average" } : null,
+      label: labelMain + ", " + lineWord(shown, b0) + (bandPts.length >= 2 ? (flowsBand ? " and flow range" : " and its 95% interval") : "") } : null,
+    labelOther ? { kind: "line", color: otherCol, label: labelOther + ", " + lineWord(otherOf(shown), b0) } : null,
+    cmpOn ? { kind: "dashed", color: mainCol, label: cmpName + ", " + lineWord(matchup, onImp ? "resp" : "imp") } : null,
     extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBt } : null,
     extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: lblExtKb } : null,
     extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: lblExtSh } : null,
@@ -710,7 +721,8 @@ function RdHero(p) {
           copy={{ title: chartTitle.replace(/, %$/, ""),
                   sub: (story && M[matchup].vsLabor ? story.head + ". " : "")
                     + basisWords.replace(/^Implied flows$/, "Implied preference flows").replace(/^As published$/, "Pollsters’ published figures")
-                    + ", monthly averages" + (unc ? "; the latest reading pools the " + unc.n + " poll" + (unc.n === 1 ? "" : "s") + " in the " + D.latest.method.windowDays + " days to " + rdDate(D.latest.updatedISO, true) : "") + ".",
+                    + (KAL ? ", smoothed trend through every poll" + (unc ? ", " + unc.n + " polls to " + rdDate(D.latest.updatedISO, true) : "")
+                      : ", monthly averages" + (unc ? "; the latest reading pools the " + unc.n + " poll" + (unc.n === 1 ? "" : "s") + " in the " + D.latest.method.windowDays + " days to " + rdDate(D.latest.updatedISO, true) : "")) + ".",
                   legend: copyKey.map((k) => ({ label: k.label, color: k.color, kind: k.kind })) }}
         />
         {badges && <RdEventList list={badges.list} from={badgesWas ? badgesWas.list : null} mix={t} onPick={pickEv} openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />}
@@ -718,8 +730,9 @@ function RdHero(p) {
         {narrow && cmpAvail && <RdCheck checked={showSynth} onChange={setShowSynth}>{cmpBox}</RdCheck>}
         {narrow && extAvail && <RdCheck checked={showExt} onChange={setShowExt}>{extBox}</RdCheck>}
       </div>
-      <RdFoot how={{ href: "/preference-flows/" }}>
-        Figures pool the last {D.latest.method.windowDays} days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above.
+      <RdFoot how={KAL ? { term: "weighted-aggregate", from: "Two-party preferred" } : { href: "/preference-flows/" }}>
+        {KAL ? "Figures are a smoothed trend through every poll this term, adjusted for each pollster’s lean, and can step at a change of leader. Changes are on a month ago. The chart follows the matchup chosen above."
+          : "Figures pool the last " + D.latest.method.windowDays + " days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above."}
         {extOn && isCoal && <> BludgerTrack’s line is its published trend. Bonham’s is his published figure, averaged by month like ours, from the launch of his aggregate in September 2025.</>}
         {extOn && isOn && <> Bonham’s line is his published shadow-2PP, averaged by month like ours. He converts each poll’s primary votes with his own estimates of 2025 preferences and averages the latest ten polls, at most two from each pollster. Our flows differ, so the two lines need not agree.</>}
       </RdFoot>

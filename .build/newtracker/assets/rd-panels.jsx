@@ -157,6 +157,8 @@ function RdPrimary({ rangeId, setRangeId }) {
   const eDate = (D.cycles.find((c) => c.current) || {}).eDate;
   /* the polls the meta line counts: "national" here, "Victorian" on /vic/ */
   const pollsWord = window.JUR ? window.JUR.adj : "national";
+  /* /vic/'s lines are a smoothed trend through every poll (gen-data §1a) */
+  const KAL = !!(D.latest.method && D.latest.method.kind === "kalman");
   const meta = narrow
     ? D.latest.pollsTracked + " " + pollsWord + " polls, latest fieldwork " + rdDate(D.latest.updatedISO)
     : D.latest.pollsTracked + " " + pollsWord + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true);
@@ -293,9 +295,9 @@ function RdPrimary({ rangeId, setRangeId }) {
           /* read away from the page, the copy names its measure and its
              base as well as the finding: "Primary vote" over "Labor and One
              Nation are level" said neither whose votes nor how many polls */
-          copy={{ title: "First-preference vote for each party", sub: story.head + ". Monthly averages of " + D.latest.pollsTracked + " " + pollsWord
+          copy={{ title: "First-preference vote for each party", sub: story.head + (KAL ? ". Smoothed trends through " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord
                     + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + ".",
-                  caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
+                  caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
                   legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
         />
         {/* the 2PP card above already lists this window's events under its
@@ -316,7 +318,7 @@ function RdPrimary({ rangeId, setRangeId }) {
         )}
         <RdKey className="rd-ckey" items={[
           { kind: "dot", color: "var(--ink-3)", label: "One poll" },
-          { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
+          { kind: "lineband", color: "var(--ink-3)", label: KAL ? (narrow ? "Trend, 95% interval" : "Trend and its 95% interval") : narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
           base ? { kind: "ring", label: rdElecYear + " election result" } : null,
         ]}>
           <span className="rd-grow"></span>
