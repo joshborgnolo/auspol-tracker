@@ -41,8 +41,10 @@ is viable ONLY as a diagnostic — this panel corrects no other figure.
    (`est-console-backtest.mjs`): COPIED, not imported — any intentional
    estimator change must update the replica in the same commit. The §7d
    replica needs `ALT_BY` (altTpp keyed date|pollster) and the shared
-   `POLL_BY_KEY` map built before it; the published-alt-TPP curve builder
-   must run before the §7d block so the join has rows to read.
+   `POLL_BY_KEY` map built before it (since 61963fd: hoisted beside §7c's
+   preamble — §7c's own fl derivation reads it too); the published-alt-TPP
+   curve builder must run before the §7d block so the join has rows to
+   read.
 5. **`flows.mjs` `FLOW_TABLE`** — display-copy string
    ("the AEC's 2025-election flow table (TPP cut)"), interpolated by the
    panel's note so a future re-anchor can't leave the page describing
@@ -356,6 +358,46 @@ correct) — the contract is only "never the month tip, never nothing".
 Pinned by `.matilda/probe-flow-drift-dots.mjs` (static: every hit circle's
 centre resolves to a `.rd-apd-hit`; hover: every centre raises a wave
 tip).
+
+## Respondent-allocated flow to Labor on the tooltips (shipped 61963fd, 2026-10-05)
+
+User request ("can u include in those tooltips percent respondent-allocated
+flow to labor", carried as "Flow share to Labor" on BOTH tip types — the
+wave dots and the house month-vertex hit rings).
+
+- **Formula** (`flowToAlp(pairA, own, other)` in gen-data.mjs after
+  `FLOW_BASE_MIN`): `(pairA − own) / (100 − own − other) × 100`, null when
+  either primary is absent or `100 − own − other ≤ 0.5`. §7c feeds it
+  `(r.x, p.alp, p.lnp)`; §7d `(v.ao, p.alp, p.onp)`. It answers "of the
+  non-major respondent-allocated preferences this wave published, what
+  share went to Labor" — a wave-level figure, independent of the frozen
+  table, for any house with full primaries.
+- **Payload**: `fl` rides residuals → anomalies → (a) each `polls` dot as
+  `r1(fl)` spread CONDITIONALLY (`...(r.fl != null ? {fl: …} : {})`) after
+  `sample` so eq()'s key-order-sensitive JSON stays stable; (b) each
+  houses-month row as the n-weighted mean over the month's fl-carrying
+  waves, also conditional. flows rows do NOT carry fl.
+- **Renderer**: rd-allpolls.jsx RdFlowChart — wave-dot tip row "Respondent
+  flow to Labor" `{d.fl.toFixed(1)}%` under "Published minus implied";
+  vertex tip row under "House drift"; both hit circles' aria-labels append
+  ", respondent-allocated flow to Labor X.X percent".
+- **checker**: flow-drift-check.mjs replicates the formula; `POLL_BY_KEY`
+  was hoisted beside §7c's preamble (§7d then shares it; `ALT_BY` stays
+  §7d-local) so fl can be derived inside `driftResid`. The checker eq()
+  never compares houses-month objects, so ONLY the poll-dot fl needs the
+  verbatim replica — that asymmetry is documented in a check-file comment;
+  if eq() ever starts comparing months, mirror the mean too.
+- **probe** (gitignored `.matilda/probe-flow-drift-dots.mjs`: every wave
+  tip's fl row matches its payload fl to a decimal (or the row is absent
+  exactly when payload fl is null); every STRICT vertex win's fl row
+  matches the month-payload fl. Vertex ym is parsed off the tip's Month
+  row — `rdMonthYear` (rd.jsx) emits FULL month names ("October 2026"), so
+  month-name → zero-padded `YYYY-MM` is the parse; if that format ever
+  abbreviates the probe's month-name array must follow.
+- Baseline: waves with null fl are normal — any house whose own/rival
+  primaries are absent or sum past 99.5 fails the formula's gate by
+  design; tips on those waves simply omit the row. 2026-10-05 run:
+  all-green including 39/17 strict vertex wins.
 
 ## Per-house month marks — painted dots REMOVED, invisible hover stays (2026-10-05)
 
