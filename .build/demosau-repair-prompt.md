@@ -37,6 +37,18 @@ the fact, from the git history and any alert issue the gate opens.
 
 ## Exit 3 — Capital Brief wave ahead of the DemosAU index
 
+Since 2026-10-05 the extractor FILES the wave from the Capital Brief article
+itself when Matilda's citations verify (`.build/demosau-read.mjs`: all five
+primaries quoted verbatim, each change reconciling with the previous DemosAU
+wave): the row carries `fieldworkPending: true` with a provisional window
+(ending 4 days before the article, 4 days long) and, if the article states no
+sample, `samplePending: true`; the site shows "Fieldwork TBC", and the PDF
+later writes the real dates and sample and drops the flags. Exit 3 now means
+that reading did NOT verify (the status `notes` say why) — only then does the
+hand-entry procedure below apply. Never relax the reconciliation to make an
+article file, and give a hand-entered row the same `fieldworkPending` flag
+and provisional window when the article states no fieldwork dates.
+
 Exit 3 with `cb_ahead` in the status JSON means Capital Brief has published
 a federal DemosAU poll article (VI figures sit in the free lead; the rest is
 paywalled) but the methodology PDF is not yet on the DemosAU index. Capital

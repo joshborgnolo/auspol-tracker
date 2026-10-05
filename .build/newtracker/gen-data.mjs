@@ -2199,6 +2199,8 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
 }
 
 /* ---- 6. individual polls (full archive) -------------------------------- */
+// where a house publishes the fieldwork dates a pending row is waiting for
+const FIELD_TBC_URL = { DemosAU: "https://demosau.com/methodology-statements/" };
 const individualPolls = POLLS.map((p) => {
   const ym = ymOf(p.date), day = dayOf(p.date);
   const fym = p.dateStart ? ymOf(p.dateStart) : null;
@@ -2212,6 +2214,12 @@ const individualPolls = POLLS.map((p) => {
        differs from ym, so the byte cost lands only on straddling waves. */
     ...(fym != null && fym !== ym ? { fym } : {}),
     field, dateLabel: field, released: p.date, sample: p.sample ?? null,
+    /* fieldwork not yet published (a DemosAU wave filed from the Capital
+       Brief article before DemosAU's methodology PDF): `field` is the
+       provisional window that places it on the charts and in the headline,
+       and the views say "Fieldwork TBC" instead, linking `fieldUrl`, where
+       the dates will be published. Leaves with the PDF (extract-demosau.mjs). */
+    ...(p.fieldworkPending ? { fieldPending: true, fieldUrl: FIELD_TBC_URL[p.pollster] ?? null } : {}),
     /* fieldwork mid-date ISO (see fmidIso) – the x basis every detail
        mini-chart draws the wave's own marker on; `released` is fieldwork's
        last day, so a marker at it sits right of the window it claims */
@@ -2418,6 +2426,8 @@ const pollsterTable = [...perHouse.values()].map((p) => {
   return {
     pollster: p.pollster, client: p.client && p.client !== "—" ? p.client : "Self-published",
     field: fwLabel(p.dateStart, p.date), released: p.date, releasedLabel: `${day} ${monthName(m)}`,
+    // fieldwork not yet published: the views say TBC (see individualPolls)
+    ...(p.fieldworkPending ? { fieldPending: true, fieldUrl: FIELD_TBC_URL[p.pollster] ?? null } : {}),
     /* When the poll was PUBLISHED, where the cited source says so. `released`
        above is the last day of fieldwork, which is not the same thing and is
        what the "Published" column had been showing for want of anything else.

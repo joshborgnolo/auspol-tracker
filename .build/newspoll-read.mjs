@@ -112,20 +112,20 @@ function lex(field, era) {
 }
 // does the quote's own change phrase take `from` to `value`? "fell a point
 // to 29" (30 → 29), "up two points to 11", "remained at 30" (30 → 30)
-function changeImplies(quote, value, from) {
+export function changeImplies(quote, value, from) {
   const q = norm(quote).toLowerCase();
   if (from === value) return /\b(remain(?:s|ed)?|stay(?:s|ed)?|steady|unchanged|static|held|holds?|flat)\b/.test(q);
   const m = q.match(/\b(a|one|two|three|four|five|six|seven|eight|nine|ten|\d+(?:\.\d+)?)\s+(?:percentage\s+)?points?\b/);
   if (!m) return false;
   const size = m[1] === "a" ? 1 : WORDS[m[1]] ?? +m[1];
-  const down = /\b(fell|fall(?:s|ing)?|drop(?:s|ped|ping)?|down|slid|slip(?:s|ped)?|lost|los(?:es|ing)|declin\w*|dipp?\w*|eased|shed)\b/.test(q);
-  const up = /\b(rose|ris(?:es|ing)|up|gain\w*|climb\w*|jump\w*|lift\w*|increas\w*|grew|improv\w*|edged up)\b/.test(q);
+  const down = /\b(fell|fall(?:s|ing)?|drop(?:s|ped|ping)?|down|slid|slip(?:s|ped)?|lost|los(?:es|ing)|declin\w*|dipp?\w*|eased|shed|tumbl\w*|plung\w*|plummet\w*|sank|sunk|slump\w*|crash\w*|collaps\w*)\b/.test(q);
+  const up = /\b(rose|ris(?:es|ing)|up|gain\w*|climb\w*|jump\w*|lift\w*|increas\w*|grew|improv\w*|edged up|surg\w*|soar\w*)\b/.test(q);
   if (down === up) return false;
   return Math.abs((value - from) - (down ? -size : size)) < 0.05;
 }
 
 // the sentence(s) of `para` that hold `quote` (quote is verbatim in para)
-function sentenceAround(para, quote) {
+export function sentenceAround(para, quote) {
   const i = para.indexOf(quote), j = i + quote.length;
   const bounds = [0, ...[...para.matchAll(/[.!?]["']?\s+/g)].map((m) => m.index + m[0].length), para.length];
   const start = Math.max(...bounds.filter((b) => b <= i));
@@ -134,7 +134,7 @@ function sentenceAround(para, quote) {
   return { ctx: para.slice(start, end), before: para.slice(prevStart, start) };
 }
 const PRIMARY = new Set(["alp", "lnp", "grn", "onp", "ind", "oth"]);
-const ISSUE_TALK = /\b(handle|handling|manage|management|trust(?:ed)?|best party|better party|issues?)\b/i;
+export const ISSUE_TALK = /\b(handle|handling|manage|management|trust(?:ed)?|best party|better party|issues?)\b/i;
 
 // --------------------------------------------------------------- verify
 // `prev`: the previous committed Newspoll's figure per field (null where

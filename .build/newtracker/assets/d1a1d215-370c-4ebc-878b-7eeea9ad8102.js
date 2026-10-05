@@ -3824,7 +3824,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
     p.client && <span className="pd-meta-i" key="client"><span className="pd-meta-k">Commissioned by</span>
       <span className="pd-meta-v">{p.client}</span></span>,
     <span className="pd-meta-i" key="field"><span className="pd-meta-k">Fieldwork</span>
-      <span className="pd-meta-v">{p.field}</span></span>,
+      <span className="pd-meta-v">{p.fieldPending ? rdFieldTbc(p, true) : p.field}</span></span>,
     /* The date the poll came OUT, and the hour where the release recorded
        one. This line has always been labelled "Published" and has always
        printed `fullDate`, which is the last day of FIELDWORK - the same
@@ -3907,7 +3907,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
       const yr = p.year != null ? p.year
         : /^\d{4}-/.test(p.released || "") ? Number(p.released.slice(0, 4))
         : null;
-      const when = p.field ? p.field + (yr ? " " + yr : "")
+      const when = p.fieldPending ? "fieldwork TBC" : p.field ? p.field + (yr ? " " + yr : "")
         : p.fullDate ? p.fullDate : "";
       return (
         <a className="back-to-chart pd-report" key="report"
@@ -5309,7 +5309,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const rows = [...D.individualPolls, ...dirOnly, ...issOnly].map((p) => {
     const [y, mo] = p.ym.split("-").map(Number);
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
-    const fieldLabel = y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
+    const fieldLabel = p.fieldPending ? "TBC" : y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
     const tags = pollTagIds(p);
     /* poll lean follows the basis: the implied 2PP minus the month's implied
        aggregate, or the NORMALISED published share (alpN) minus the month's
@@ -5553,7 +5553,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   // the rows the filters left on screen, in the order they're shown.
   const CSV_COLS = [
     ["Pollster", (p) => p.pollster],
-    ["Fieldwork", (p) => p.field],
+    ["Fieldwork", (p) => (p.fieldPending ? "TBC" : p.field)],
     ["Fieldwork end", (p) => p.released],
     ["Sample", (p) => p.sample],
     // the figure each row is weighted on, and the house-filed original it

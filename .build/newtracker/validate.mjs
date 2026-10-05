@@ -257,6 +257,16 @@ export function validate(D) {
       fail("sample", `sample = ${p.sample}`);
     if (!p.isElection && p.samplePending && noSample)
       excuse("sample-pending", "no sample", "house per-wave n unpublished at landing; implicit 1200 until backfill");
+    // 5a. `fieldworkPending`: a DemosAU wave filed from the Capital Brief
+    //     article before the methodology PDF (extract-demosau.mjs, user call
+    //     2026-10-05). Its date/dateStart are a provisional window — placing
+    //     it on the charts and in the headline — and the site says "Fieldwork
+    //     TBC". The PDF writes the real window and drops the flag; a flag on a
+    //     row that already carries its methodology link has outlived that.
+    if (p.fieldworkPending) {
+      if (p.methodUrl) fail("fieldwork-pending", "fieldworkPending on a row that already has its methodUrl");
+      else excuse("fieldwork-pending", "provisional fieldwork window", "published before the house's methodology statement; dates replaced when it lands");
+    }
   });
 
   // 5b. election rows are labelled as elections, and only elections carry the

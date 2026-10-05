@@ -358,8 +358,8 @@ function Header({ isDark, onToggleTheme, rd }) {
   const rdLatestUrl = rdLatest ? (rdLatest.releaseUrl || rdLatest.url) : null;
   const rdLatestFact = rdLatest
     ? (rdLatestUrl
-        ? <a className="mh-latest" href={rdLatestUrl} target="_blank" rel="noopener noreferrer">{rdLatest.pollster + ", " + rdLatest.field}</a>
-        : rdLatest.pollster + ", " + rdLatest.field)
+        ? <a className="mh-latest" href={rdLatestUrl} target="_blank" rel="noopener noreferrer">{rdLatest.pollster + ", " + (rdLatest.fieldPending ? "fieldwork TBC" : rdLatest.field)}</a>
+        : rdLatest.pollster + ", " + (rdLatest.fieldPending ? "fieldwork TBC" : rdLatest.field))
     : D.latest.published;
   const rdDue = (() => {
     const m = /(\d{1,2}) (\w+) (\d{4})/.exec(D.latest.nextElectionDue || "");

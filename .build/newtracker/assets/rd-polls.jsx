@@ -25,7 +25,9 @@ function rdPollRow(p) {
   return { pollster: p.pollster, client: p.client, field: p.dateLabel || p.field, released: p.released,
            published: p.published, publishedLabel: lab, pubSort: pub, sample: p.sample,
            alpImp: p.alpImp, alpOnImp: p.alpOnImp, alp2pp: p.alp, lnp2pp: p.lnp, p: p.p || {},
-           tppAlt: p.tppAlt, tppAlt2: p.tppAlt2, ppmSets: p.ppmSets, appr: p.appr || {}, chg: p.chg, url: p.url, methodUrl: p.methodUrl };
+           tppAlt: p.tppAlt, tppAlt2: p.tppAlt2, ppmSets: p.ppmSets, appr: p.appr || {}, chg: p.chg, url: p.url, methodUrl: p.methodUrl,
+           // fieldwork not yet published: shown as TBC (see rdFieldTxt)
+           ...(p.fieldPending ? { fieldPending: true, fieldUrl: p.fieldUrl } : {}) };
 }
 
 function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
@@ -250,7 +252,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     return (
       <div ref={tlTipRef} className="tip tip-dot rd-tl-tip" style={{ left: t.left + "%", top: "50%" }} aria-hidden="true">
         <div className="tip-title">{q.pollster}</div>
-        <div className="rd-tl-tipdate">Fieldwork {pr.field}, published {pr.publishedLabel}</div>
+        <div className="rd-tl-tipdate">Fieldwork {pr.fieldPending ? "TBC" : pr.field}, published {pr.publishedLabel}</div>
         {figCell({ poll: pr })}
         {q.sample ? <div className="tip-sub">n = {q.sample.toLocaleString()}</div> : null}
         {t.src !== "touch" && <div className="tip-hint">{t.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"}</div>}
@@ -598,7 +600,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                 </span>
                 <span role="cell" className="rd-pl-c-latest">
                   <span className="rd-pl-main">{r.publishedLabel || r.releasedLabel}</span>
-                  <span className="rd-pl-sub">{r.field}{r.sample ? ", " + r.sample.toLocaleString() : ""}</span>
+                  <span className="rd-pl-sub">{r.fieldPending ? "fieldwork TBC" : r.field}{r.sample ? ", " + r.sample.toLocaleString() : ""}</span>
                 </span>
                 <span role="cell" className="rd-pl-c-figs"><RdSwap k={facet}>{figCell(e)}</RdSwap></span>
                 <span role="cell" className="rd-pl-c-tl">{strip(e)}</span>
@@ -612,7 +614,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                           onClick={(ev) => { ev.stopPropagation(); setOpen(isOpen ? null : r.pollster); }}><svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 1.5L7.5 5 3 8.5z"></path></svg></button>
                 </span>
                 <span className="rd-pl-foot1" aria-hidden="true">
-                  <span><b>{r.publishedLabel || r.releasedLabel}</b>, {r.field}</span>
+                  <span><b>{r.publishedLabel || r.releasedLabel}</b>, {r.fieldPending ? "fieldwork TBC" : r.field}</span>
                   <span className={nx.missed ? "missed" : ""}>Next <b>{nx.date}</b>{nx.sub ? ", " + nx.sub.replace(/, .*$/, "") : ""}</span>
                 </span>
               </div>

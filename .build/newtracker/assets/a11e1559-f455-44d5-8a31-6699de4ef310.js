@@ -4039,7 +4039,7 @@ function PollDetail({ r }) {
       <div className="pd-meta">
         <span className="pd-meta-items">
           <span className="pd-meta-i"><span className="pd-meta-k">Fieldwork</span>
-            <span className="pd-meta-v">{r.field}</span></span>
+            <span className="pd-meta-v">{r.fieldPending ? rdFieldTbc(r, true) : r.field}</span></span>
           <span className="pd-meta-i"><span className="pd-meta-k">Published</span>
             <span className="pd-meta-v">
               {pubStamp(r.published, { year: true })
@@ -4796,7 +4796,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                         {r.publishedLabel || r.releasedLabel}
                       </span>
                     </td>
-                    <td className="ta-l muted">{r.field}</td>
+                    <td className="ta-l muted">{r.fieldPending ? "TBC" : r.field}</td>
                     <td className="num muted hide-md">{r.sample != null ? r.sample.toLocaleString() : "—"}</td>
 
                     {facet === "twopp" && (<>

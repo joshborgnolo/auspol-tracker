@@ -72,6 +72,22 @@
 //     file-is-authoritative semantics (missing rows surface in
 //     DEMOSAU_STATUS.missing_rows).
 //
+// CAPITAL BRIEF FILING (2026-10-05, user call: "file from the article as
+// soon as it appears, verified the same way as newspoll"; "if there's no
+// fieldwork in the article, just say fieldwork TBC"): the watch below now
+// FILES the wave from the article when Matilda's citations verify
+// (.build/demosau-read.mjs — all five primaries, each reconciling with the
+// previous wave's figure through the change the article states). The row
+// carries `fieldworkPending: true` with a provisional window (ending
+// CB_FIELD_LAG days before publication, CB_FIELD_SPAN days long — the
+// recent waves ran 3–5 days to publication) that places it on the chart
+// and in the headline; the site shows "Fieldwork TBC" linked to the
+// methodology statements. `samplePending` likewise when the article states
+// no sample. When the PDF lands, the match below writes the PDF's dates
+// and sample over the provisional ones and clears both flags. A reading
+// that doesn't verify files nothing: exit 3 and the hand-entry prompt, as
+// before.
+//
 // SECONDARY WATCH — Capital Brief publishes the federal poll article (free
 // lead carries the full VI set + sample; the rest is paywalled) a few hours
 // to a day BEFORE the methodology PDF lands on the DemosAU index above
@@ -106,6 +122,8 @@ import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fetchBuffer, passSgCaptcha, FETCH_TRIES } from "./demosau-fetch.mjs";
+import { readDemosau } from "./demosau-read.mjs";
+import { matildaCli } from "./matilda-json.mjs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
@@ -656,6 +674,41 @@ const STATE_RE = /victoria|tasmania|queensland|\bWA\b|western australia|\bNSW\b|
 const CB_TOPIC_URL = "https://www.capitalbrief.com/topic/polling/";
 const CB_SECTION_RE = /demos\s*au\s*poll/i; // articleSection of a wave release
 const CB_MAX_ARTICLES = 5; // fetch cap per run; the topic list is newest-first
+const CB_FIELD_LAG = 4;  // provisional fieldwork end: days before the article
+const CB_FIELD_SPAN = 4; // ...and its length (Jul–Sep 2026: 3–5 / 2–5 days)
+const sydneyMinute = (isoStr) => {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-AU", { timeZone: "Australia/Sydney", year: "numeric", month: "2-digit",
+    day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date(isoStr)).map((x) => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
+};
+const shiftDay = (day, n) => new Date(Date.parse(day + "T00:00:00Z") + n * 86400000).toISOString().slice(0, 10);
+
+// The wave as a row from the Capital Brief article, or null (with a note)
+// when anything fails to verify — see CAPITAL BRIEF FILING in the header.
+async function rowFromCapitalBrief(ahead, D, notes) {
+  if (!matildaCli()) { notes.push("capital brief article not read: no Matilda CLI or key"); return null; }
+  const html = (await fetchBuffer(ahead.url)).toString("utf8");
+  const art = jsonLdNodes(html).find((n) => [].concat(n["@type"]).includes("NewsArticle"));
+  if (!art?.datePublished) { notes.push("capital brief article: no datePublished"); return null; }
+  const prev = D.polls.filter((r) => r.pollster === "DemosAU").sort((a, b) => (a.date < b.date ? -1 : 1)).pop();
+  const read = readDemosau({ url: ahead.url, html, cacheDir: `${SRC_DIR}/readings`, onNote: (n) => notes.push(n),
+    prev: prev ? { alp: prev.alp, lnp: prev.lnp, grn: prev.grn, onp: prev.onp, oth: prev.ind } : null });
+  if (read.errors.length) { notes.push(`capital brief article not filed: ${read.errors.join("; ")}`); return null; }
+  const published = sydneyMinute(art.datePublished);
+  const date = shiftDay(published.slice(0, 10), -CB_FIELD_LAG);
+  if (D.polls.some((r) => r.pollster === "DemosAU" && Math.abs(daysBetween(r.date, date)) <= 10)) {
+    notes.push(`capital brief article not filed: a DemosAU row already sits within 10 days of ${date}`);
+    return null;
+  }
+  return {
+    date, dateStart: shiftDay(date, -CB_FIELD_SPAN), published, pollster: "DemosAU", client: "Capital Brief",
+    sample: read.sample,
+    alp: read.ok.alp, lnp: read.ok.lnp, grn: read.ok.grn, onp: read.ok.onp, ind: read.ok.oth, oth: null,
+    tpp_alp: null, tpp_lnp: null, url: ahead.url,
+    fieldworkPending: true,
+    ...(read.sample == null ? { samplePending: true } : {}),
+  };
+}
 
 const sydneyDay = (isoStr) =>
   new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Sydney", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(isoStr));
@@ -714,7 +767,8 @@ function latestDemosauStamp(D) {
 }
 
 // -------------------------------------------------------------------- main
-const status = { changed: false, check: CHECK, added: [], backfilled: [], verified: [], mismatches: [], notes: [], skipped_titles: [], out_of_cycle: [], missing_rows: [] };
+const status = { changed: false, check: CHECK, added: [], backfilled: [], verified: [], mismatches: [], notes: [], skipped_titles: [], out_of_cycle: [], missing_rows: [], fieldworkFilled: [] };
+let touched = false; // an existing row was edited in place (fieldwork/sample from the PDF)
 try {
   const orig = readFileSync(OUT, "utf8");
   const D = JSON.parse(orig);
@@ -766,6 +820,21 @@ try {
 
     if (match) {
       matched.add(match);
+      // a wave filed from the Capital Brief article: the PDF's fieldwork and
+      // sample replace the provisional ones (CAPITAL BRIEF FILING)
+      if (match.fieldworkPending && w.date && w.dateStart) {
+        status.fieldworkFilled.push({ from: `${match.dateStart}..${match.date}`, to: `${w.dateStart}..${w.date}`, slug });
+        match.date = w.date;
+        match.dateStart = w.dateStart;
+        delete match.fieldworkPending;
+        touched = true;
+      }
+      if (match.samplePending && w.sample != null) {
+        match.sample = w.sample;
+        delete match.samplePending;
+        status.fieldworkFilled.push({ sample: w.sample, slug });
+        touched = true;
+      }
       const led = leadershipDiffs(match.date, w, D);
       const diffs = [...viDiffs(match, w), ...led.diffs];
       // parseable leadership data for a wave whose section row is absent is
@@ -854,7 +923,7 @@ try {
   }
 
   let wrote = false;
-  if (newRows.length || newPpmRows.length || newApprovalRows.length) {
+  if (newRows.length || newPpmRows.length || newApprovalRows.length || touched) {
     const byDate = (a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
     D.polls = [...D.polls, ...newRows].sort(byDate);
     D.ppm = [...D.ppm, ...newPpmRows].sort(byDate);
@@ -877,12 +946,29 @@ try {
   // flag rides the status line either way. Watch failure is a note only.
   try {
     const ahead = await capitalBriefAheadOf(latestDemosauStamp(D));
-    if (ahead) status.cb_ahead = ahead;
+    if (ahead) {
+      status.cb_ahead = ahead;
+      const row = await rowFromCapitalBrief(ahead, D, status.notes);
+      if (row) {
+        D.polls = [...D.polls, row].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+        const next = JSON.stringify(D, null, 2) + (orig.endsWith("\n") ? "\n" : "");
+        status.changed = next !== orig;
+        status.added.push({ date: row.date, pollster: row.pollster, via: "capital-brief", fieldworkPending: true,
+          ...(row.samplePending ? { samplePending: true } : {}), alp: row.alp, lnp: row.lnp, onp: row.onp, url: row.url });
+        if (!CHECK) {
+          writeFileSync(OUT + ".tmp", next);
+          renameSync(OUT + ".tmp", OUT);
+          wrote = true;
+          console.log(`wrote ${OUT}: DemosAU wave from Capital Brief (fieldwork TBC, provisional ${row.dateStart}..${row.date})`);
+        }
+        delete status.cb_ahead; // filed, so not a hand-entry prompt
+      }
+    }
   } catch (err) {
     status.notes.push(`capital brief watch failed: ${err?.message || err}`);
   }
   console.log("DEMOSAU_STATUS " + JSON.stringify(status));
-  if (status.cb_ahead && !wrote) process.exit(3);
+  if (status.cb_ahead && !wrote && !(CHECK && status.added.some((a) => a.via === "capital-brief"))) process.exit(3);
 } catch (err) {
   console.error("DEMOSAU_ERROR " + (err?.message || err));
   status.error = String(err?.message || err);

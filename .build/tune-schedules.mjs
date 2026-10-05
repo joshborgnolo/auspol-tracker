@@ -133,7 +133,11 @@ const TARGETS = [
   { workflow: "news24-update.yml", houses: ["YouGov"], mode: "dense", sweep: "06:20", phase: 3 },
   // the daily 07:05 sweep stays hand-authored in the file (the run gate
   // names its cron string), so the tuner adds the bracketing checks only
-  { workflow: "demosau-update.yml", houses: ["DemosAU"], mode: "dense" },
+  // `medianComb`: a house with no weekday still has a habitual HOUR — Capital
+  // Brief's DemosAU articles land 08:30–08:51 — and since 2026-10-05 the wave
+  // files from that article (extract-demosau.mjs), so the hour gets a daily
+  // 10-minute comb [median-10, median+60] beside the bracketing checks.
+  { workflow: "demosau-update.yml", houses: ["DemosAU"], mode: "dense", medianComb: [-10, 60] },
   { workflow: "spectre-update.yml", houses: ["Spectre Strategy"], mode: "dense", sweep: "06:50" },
   { workflow: "foxhedgehog-update.yml", houses: ["Fox & Hedgehog"], mode: "dense", sweep: "06:35" },
 ];
@@ -261,6 +265,11 @@ function layout(target, m) {
     add(null, start, "release hours (no weekday habit)");
     add(null, floorTo(m.median, DENSE_STEP), "release hours (no weekday habit)");
     add(null, end, "release hours (no weekday habit)");
+    if (target.medianComb) {
+      const [lo, hi] = target.medianComb;
+      for (let t = floorTo(m.median + lo, DENSE_STEP); t <= ceilTo(m.median + hi, DENSE_STEP); t += DENSE_STEP)
+        add(null, t, "the habitual hour, every 10 min");
+    }
     notes.push(`${m.house}: no weekday habit${m.calMonth ? " (calendar-month rhythm)" : ""} — daily checks at ${hm(start)}, ${hm(floorTo(m.median, DENSE_STEP))}, ${hm(end)}`);
     return { slots, notes };
   }

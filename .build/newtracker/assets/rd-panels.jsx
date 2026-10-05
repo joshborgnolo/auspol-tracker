@@ -1411,7 +1411,7 @@ function DpRug({ items, color, dxp, fmt }) {
           setTip(null);
           window.AP.openPoll(rk, "leadership", "leadership");
         };
-        const lab = q.pollster + ", " + q.field + " · " + fmt(it.y) + (q.sample != null ? " · n≈" + q.sample : "");
+        const lab = q.pollster + ", " + (q.fieldPending ? "fieldwork TBC" : q.field) + " · " + fmt(it.y) + (q.sample != null ? " · n≈" + q.sample : "");
         const on = tip && tip.i === i;
         return (
           <b key={key} className={[(it.fav ? "open" : ""), (rk ? "on" : ""), (on ? "hi" : "")].filter(Boolean).join(" ") || undefined}
@@ -1439,7 +1439,7 @@ function DpRug({ items, color, dxp, fmt }) {
             {on && <span ref={tipBox} className="tip tip-dot rd-dp-rtip" aria-hidden="true">
               <span className="tip-title">{q.pollster}</span>
               <span className="tip-row"><span className="tip-swatch" style={{ background: color }}></span><span className="tip-label">{it.label}</span><span className="tip-val">{fmt(it.y)}</span></span>
-              <span className="tip-row"><span className="tip-label">Field</span><span className="tip-val">{q.field}</span></span>
+              <span className="tip-row"><span className="tip-label">Field</span><span className="tip-val">{q.fieldPending ? "TBC" : q.field}</span></span>
               {q.sample != null && <div className="tip-sub">{"n ≈ " + (+q.sample).toLocaleString()}</div>}
               {tip.src !== "touch" && <div className="tip-hint">{rk ? (tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls") : "Released " + q.released}</div>}
             </span>}
