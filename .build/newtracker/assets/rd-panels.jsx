@@ -28,9 +28,16 @@ const rdPlural = (id) => id === "grn" || id === "oth";
    the chart may fall back to when the word cannot sit between its neighbours -
    a small multiple's election tick never has room for "Election" */
 function rdElectionTicks(x0, x1, narrow, elecX) {
-  const t = rdXTicks(x0, x1, narrow, { step: x1 - x0 > 1.1 ? (narrow ? 4 : 2) : undefined });
+  /* a window past two and a half years (/vic/'s four-year term) ticks each
+     January, which carries its year: finer steps had the chart thin out
+     alternate labels, and the Januaries went with them ("E, Jul, Jul") */
+  const span = x1 - x0;
+  const t = rdXTicks(x0, x1, narrow, { step: span > 2.5 ? 12 : span > 1.1 ? (narrow ? 4 : 2) : undefined });
   if (elecX == null || elecX < x0 - 0.01) return t;
-  const rest = t.filter((k) => k.x - elecX > 0.1);
+  /* a tick crowding the election's own leaves it the room: on a long window
+     (/vic/'s November election, then January) the axis's thinning otherwise
+     drops every other label to fit the pair, Januaries and all */
+  const rest = t.filter((k) => k.x - elecX > Math.max(0.1, span * 0.06));
   /* "Election" already dates the axis, so the next tick drops a repeat of its year */
   const ey = String(Math.floor(elecX));
   if (rest.length) {
@@ -69,6 +76,8 @@ function RdPrimary({ rangeId, setRangeId }) {
     v: now[id], was: base ? base[id] : null, ci: (lastM.ci && lastM.ci[id]) || 0,
   })).sort((a, b) => b.v - a.v);
   const top = parts[0];
+  const firstPolled = Object.fromEntries(parts.map((p) => [p.id, D.aggPrimary.find((d) => !d.election && d[p.id] != null)]));
+  const lateParties = base ? parts.map((p) => p.id).filter((id) => firstPolled[id] && firstPolled[id].x - base.x > 0.5) : [];
   /* the parties the leader cannot be told apart from: the gap to each is
      inside the two figures' 95% margins combined */
   let k = 1;
@@ -96,13 +105,29 @@ function RdPrimary({ rangeId, setRangeId }) {
       dek += " " + rdPartyStart(f.id) + ", on " + pc(f.v) + ", " + (rdPlural(f.id) ? "have" : "has") + " lost "
         + rdShareWords((f.was - f.v) / f.was) + " of " + (rdPlural(f.id) ? "their" : "its") + " election-night vote.";
     }
+    /* a party the polls only began reporting apart long after the election
+       (/vic/'s One Nation, among others until February 2026) says where its
+       line starts; federally all five run from the first month */
+    for (const id of lateParties) {
+      dek += " " + rdPartyStart(id) + "’s line starts in " + rdMonthYear(firstPolled[id].ym)
+        + ": until then, the polls counted " + (rdPlural(id) ? "them" : "it") + " among others.";
+    }
     return { head, dek };
   })();
 
   const pts = filterPts(D.aggPrimary, xDomain[0]);
   const visible = parts.filter((p) => !hidden[p.id]);
+  /* a monthly series drops the months that never carried the party's
+     figure - the chart engine has no null-run guard (/vic/ has sparse ON
+     months; federally every month carries the five, so this is a no-op) -
+     and a party first reported apart long after the election starts its
+     line at that month, not with a lead-in from the election's ring */
+  const live = (id) => {
+    const L = pts.filter((d) => d[id] != null);
+    return lateParties.includes(id) && L.length > 1 && L[0].election ? L.slice(1) : L;
+  };
   const chartSeries = parts.slice().reverse().map((p) => ({
-    id: p.id, label: p.name, color: p.color, points: series(pts, p.id),
+    id: p.id, label: p.name, color: p.color, points: series(live(p.id), p.id),
     rdWidth: p.id === "oth" ? 2 : 2.5, dashed: p.id === "oth", dash: p.id === "oth" ? "6 4" : undefined,
     opacity: hidden[p.id] ? 0 : 1, endLabel: narrow ? ABBR[p.id] : SHORT[p.id], rdCap: 4,
   }));
@@ -130,9 +155,11 @@ function RdPrimary({ rangeId, setRangeId }) {
   const [evtOpen, setEvtOpen] = useState(null);
   const pickEv = (e) => { setEvtOpen((cur) => (cur && cur.e === e ? cur : { e })); rdEventReveal("evt-a-" + e.badgeKey); };
   const eDate = (D.cycles.find((c) => c.current) || {}).eDate;
+  /* the polls the meta line counts: "national" here, "Victorian" on /vic/ */
+  const pollsWord = window.JUR ? window.JUR.adj : "national";
   const meta = narrow
-    ? D.latest.pollsTracked + " national polls, latest fieldwork " + rdDate(D.latest.updatedISO)
-    : D.latest.pollsTracked + " national polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true);
+    ? D.latest.pollsTracked + " " + pollsWord + " polls, latest fieldwork " + rdDate(D.latest.updatedISO)
+    : D.latest.pollsTracked + " " + pollsWord + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true);
   const toggle = (id) => setHidden((h) => {
     const next = { ...h, [id]: !h[id] };
     return parts.every((p) => next[p.id]) ? {} : next;   // never an empty chart
@@ -252,7 +279,7 @@ function RdPrimary({ rangeId, setRangeId }) {
           xDomain={xDomain} yDomain={[0, 40]} yTicks={[0, 10, 20, 30, 40]}
           yTickFmt={(v) => (v === 0 ? "" : v + "%")} baseline
           xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)}
-          series={chartSeries} spine={series(pts, "alp")} areas={areas}
+          series={chartSeries} spine={series(live("alp"), "alp")} areas={areas}
           scatter={shownScatter} pollFacet="primary" marks={marks} ringAtX={base ? base.x : null}
           events={badges ? badges.events : evs}
           evt={evtOpen} onEvt={setEvtOpen}
@@ -266,7 +293,7 @@ function RdPrimary({ rangeId, setRangeId }) {
           /* read away from the page, the copy names its measure and its
              base as well as the finding: "Primary vote" over "Labor and One
              Nation are level" said neither whose votes nor how many polls */
-          copy={{ title: "First-preference vote for each party", sub: story.head + ". Monthly averages of " + D.latest.pollsTracked + " " + (D.pollsWord || "national")
+          copy={{ title: "First-preference vote for each party", sub: story.head + ". Monthly averages of " + D.latest.pollsTracked + " " + pollsWord
                     + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + ".",
                   caption: "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
                   legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
@@ -290,7 +317,7 @@ function RdPrimary({ rangeId, setRangeId }) {
         <RdKey className="rd-ckey" items={[
           { kind: "dot", color: "var(--ink-3)", label: "One poll" },
           { kind: "lineband", color: "var(--ink-3)", label: narrow ? "Monthly average, 95% interval" : "Monthly average and its 95% interval" },
-          base ? { kind: "ring", label: "2025 election result" } : null,
+          base ? { kind: "ring", label: rdElecYear + " election result" } : null,
         ]}>
           <span className="rd-grow"></span>
           <RdHow term="primary-vote" from="Primary vote" />
@@ -379,7 +406,29 @@ function RdLeadership({ rangeId }) {
   const L = {};
   D.LEADERS.forEach((x) => { L[x.id] = x; });
   const opp = L.taylor, han = L.hanson, pm = L.alb;
-  const [ppmView, setPpmView] = useState("two");
+  /* /vic/ (window.JUR): an office there has passed through several hands
+     inside one key - Andrews → Allan → Carroll all in alb_*, Pesutto →
+     Battin in ley_* - so its lines split wherever gen-data's monthly holder
+     (alb_who, ley_who, hanson_who) changes, and a poll's own holder is read
+     off its date. Every J branch below is /vic/'s; the federal panel runs
+     as it did. The words name people, never pronouns. */
+  const J = window.JUR;
+  const SLOT = { alb: "alb", taylor: "opp", ley: "opp", hanson: "han" };
+  const holderAt = (slot, iso) => { let n = null; if (J && iso) for (const e of J.eras[slot]) if (iso >= e.from) n = e.name; return n; };
+  const sinceOf = (slot) => (J ? J.eras[slot][J.eras[slot].length - 1].from : null);
+  /* the houses that ask a leader question, for the copy's credits: the
+     federal lists are written out, /vic/'s are read off its polls */
+  const jHouses = (test) => {
+    const n = new Map();
+    D.individualPolls.forEach((q) => { if (test(q)) n.set(q.pollster, (n.get(q.pollster) || 0) + 1); });
+    const l = [...n.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).map(([k]) => k);
+    return l.length > 4 ? l.slice(0, 3).join(", ") + " and others" : rdList(l);
+  };
+  const jApprBy = (fav) => jHouses((q) => q.appr && ["alb", "taylor", "hanson"].some((k) => q.appr[k + "Net"] != null && ((q.appr.metricBy || {})[k] === "fav") === fav));
+  const [ppmView, setPpmView] = useState(() => (
+    /* /vic/'s polls moved to the three-way question with One Nation's
+       arrival: with no current two-way reading, it opens on the three-way */
+    J && !(N.alb_pref && N.taylor_pref) && N.alb_pref3 ? "three" : "two"));
   /* two-way <-> three-way is the same people asked a differently shaped
      question, so the chart reshapes rather than being replaced - the gesture
      useMorph gives every such switch. "Both" keeps the lead chart in this slot
@@ -388,7 +437,9 @@ function RdLeadership({ rangeId }) {
   const ppmSlot = (v) => (v === "three" ? "three" : "two");
   const [ppmMorph, choosePpm] = window.AP.useMorph(ppmView, (v) => setPpmView(v), (from, to) => ppmSlot(from) !== ppmSlot(to));
   const [expanded, setExpanded] = useState(null);
-  const [own, setOwn] = useState("net");
+  /* /vic/ opens on whichever rating its pollsters currently ask: most ask
+     favourability, and job approval can go six weeks unasked */
+  const [own, setOwn] = useState(() => (J && !N.alb_net && !N.taylor_net && (N.alb_fav || N.taylor_fav) ? "fav" : "net"));
   const [rawMorph, chooseMetric] = window.AP.useMorph(own, (v) => setOwn(v), (from, to) => from !== "both" && to !== "both" && from !== to);
   const morph = rawMorph;
   const metric = own;
@@ -398,7 +449,28 @@ function RdLeadership({ rangeId }) {
   const get = (k) => (N[k] ? N[k].v : null);
 
   /* ---- the headline: preferred PM against net approval ------------------ */
-  const story = (() => {
+  const story = J ? (() => {
+    /* /vic/: who leads now (head to head where the current pairing has a
+       reading, else from all three), then the same opposition leader's
+       gap against the previous Premier, the last month that was polled */
+    const a = get("alb_pref"), o = get("taylor_pref");
+    const t3 = ["alb_pref3", "taylor_pref3", "hanson_pref3"].every((k) => get(k) != null)
+      ? [[pm, get("alb_pref3")], [opp, get("taylor_pref3")], [han, get("hanson_pref3")]].sort((x, y) => y[1] - x[1]) : null;
+    if ((a == null || o == null) && !t3) return null;
+    const two = a != null && o != null;
+    const top = two ? (a >= o ? pm : opp) : t3[0][0];
+    const head = top.short + " leads as preferred " + J.office.alb;
+    let dek = two
+      ? "Head to head, " + top.short + " leads " + (top === pm ? opp : pm).short + " " + r1(Math.max(a, o)) + "–" + r1(Math.min(a, o)) + "."
+      : "Asked to choose from all three, " + t3.map(([Ld, v], i) => (i === 0 ? "" : i === t3.length - 1 ? " and " : ", ") + Ld.short + " has " + r1(v) + "%").join("") + ".";
+    const prev = LM.slice().reverse().find((r) => r.lead_taylor != null && r.alb_who && r.alb_who !== pm.short);
+    if (prev) {
+      const pl = prev.lead_taylor;
+      dek += " Against " + prev.alb_who + ", in " + rdMonthYear(prev.ym) + ", " + (pl >= 0 ? prev.alb_who : opp.short)
+        + " led by " + r1(Math.abs(pl)) + " point" + (r1(Math.abs(pl)) === 1 ? "" : "s") + " head to head.";
+    }
+    return { head, dek };
+  })() : (() => {
     const a = get("alb_pref"), o = get("taylor_pref"), aH = get("alb_prefH"), h = get("hanson_prefH");
     const net = get("alb_net");
     const first = LM.find((r) => r.alb_net != null);
@@ -534,7 +606,9 @@ function RdLeadership({ rangeId }) {
   const ppmNote = (() => {
     if (ppmView === "two") {
       if (!three) return null;
-      return "Asked to choose from all three: " + three.map((s) => s.name + " " + r1(s.v) + "%").join(", ") + "."
+      const lastTwo = J && !two ? LM.slice().reverse().find((r) => r.alb_pref != null && r.taylor_pref != null) : null;
+      return (lastTwo ? "The head-to-head question was last asked in " + rdMonthYear(lastTwo.ym) + ". " : "")
+        + "Asked to choose from all three: " + three.map((s) => s.name + " " + r1(s.v) + "%").join(", ") + "."
         + (secondIsHanson ? " " + han.short + ", not " + opp.short + ", runs second." : "");
     }
     if (ppmView === "three") {
@@ -544,7 +618,9 @@ function RdLeadership({ rangeId }) {
       const ahead = rows.every((r) => gapOf(r) > 0);
       const peak = rows.reduce((m, r) => (gapOf(r) > gapOf(m) ? r : m), rows[0]);
       const last = rows[rows.length - 1];
+      const behind = rows.every((r) => gapOf(r) < 0);
       let s = ahead ? han.short + " has run ahead of the Coalition leader in every month’s three-way average since " + D.monthNameFull(Number(rows[0].ym.slice(5)))
+        : behind ? han.short + " has trailed the Coalition leader in every month’s three-way average since " + D.monthNameFull(Number(rows[0].ym.slice(5)))
         : han.short + " and the Coalition leader have swapped places in the three-way average";
       if (ahead && gapOf(peak) - gapOf(last) >= 3)
         s += ", though " + opp.short + " has cut the gap from " + r1(gapOf(peak)) + " points in " + D.monthNameFull(Number(peak.ym.slice(5))) + " to " + r1(gapOf(last));
@@ -570,11 +646,52 @@ function RdLeadership({ rangeId }) {
   if (memo.current.key !== memoKey) memo.current = { key: memoKey, m: new Map() };
   const kept = (k, f) => { const mm = memo.current.m; if (!mm.has(k)) mm.set(k, f()); return mm.get(k); };
   const handover = (D.events || []).find((e) => e.date === "2026-02-12");
-  const evs = handover ? [{ ...handover, short: "Ley → Taylor" }] : [];
+  /* /vic/ flags its changes of Premier, named as the federal handover is
+     ("Allan → Carroll"). Its opposition changes go unflagged: the chart
+     engine names at most two events on a half-width chart, and the lines'
+     own labels ("over Battin", "Wilson") already say who took over when */
+  const evs = J
+    ? ["alb"].flatMap((slot) => J.eras[slot].slice(1).map((e, i) => {
+        const ev = (D.events || []).find((x) => x.date === e.from);
+        return ev ? { ...ev, short: J.eras[slot][i].name + " → " + e.name } : null;
+      })).filter(Boolean).sort((a, b) => a.x - b.x)
+    : handover ? [{ ...handover, short: "Ley → Taylor" }] : [];
   /* each month's lead is its polls' own margins averaged (gen-data's
      lead_*), so its 95% band carries a margin's variance rather than two
      shares' bands stacked as if they were independent */
   const run = (k) => pts.filter((r) => r[k] != null).map((r) => ({ x: r.x, y: r[k], ym: r.ym, ci: r[k + "Ci"] }));
+  /* J: a key's points cut into runs of one holder - or one pairing - each */
+  const runsJ = (k, whoOf) => {
+    const out = [];
+    pts.forEach((r) => {
+      if (r[k] == null) return;
+      const w = whoOf(r), last = out[out.length - 1];
+      const p = { x: r.x, y: r[k], ym: r.ym, ci: r[k + "Ci"] };
+      if (last && last.who === w) last.points.push(p); else out.push({ who: w, points: [p] });
+    });
+    return out;
+  };
+  const lastOpp = J ? J.eras.opp[J.eras.opp.length - 1].name : null;
+  /* J: the months a chart's hover reads are every month any of its lines
+     has (one family's months alone would leave the earlier holders' unread) */
+  /* J: holders' name notes that would print over each other (two lines
+     ending in the same months) take turns above and below their points;
+     `span` is how close in value counts as a clash, in the chart's units */
+  const unclash = (notes, span) => {
+    const placed = [];
+    return notes.slice().sort((a, b) => a.x - b.x).map((n) => {
+      const clash = (q) => Math.abs(q.x - n.x) < 0.5 && Math.abs(q.y - n.y) < span && Math.sign(q.dy) === Math.sign(n.dy);
+      let out = n;
+      if (placed.some(clash)) out = { ...n, dy: n.dy > 0 ? -9 : 18 };
+      placed.push(out);
+      return out;
+    });
+  };
+  const spineOf = (series) => {
+    const by = new Map();
+    series.forEach((s) => s.points.forEach((p) => { if (p.ym && !by.has(p.ym)) by.set(p.ym, p); }));
+    return [...by.values()].sort((a, b) => a.x - b.x);
+  };
   /* mid-switch a line's points carry its band's own edges (ciLo/ciHi, see
      blendRows), which the band is drawn from */
   const bandsOf = (series) => series.map((s) => ({
@@ -590,7 +707,22 @@ function RdLeadership({ rangeId }) {
     const cs = series.map((s) => { const p = s.points.find((q) => q.ym === r.ym); return p && p.ci != null ? s.label + " ±" + p.ci.toFixed(1) : null; }).filter(Boolean);
     return cs.length ? [{ label: "95% intervals", value: cs.join(", ") }] : [];
   };
-  const leadSeries = kept("leadSeries", () => [
+  const leadSeries = kept("leadSeries", () => J ? (() => {
+    /* /vic/: one line per PAIRING, so a change of Premier breaks the line
+       as a change of opposition leader does; each family's latest run is
+       the one the three-way view's lines reshape into */
+    const runs = [
+      ...runsJ("lead_ley", (r) => (r.alb_who || "") + "|" + (r.ley_who || "")).map((x) => ({ ...x, fam: "ley" })),
+      ...runsJ("lead_taylor", (r) => (r.alb_who || "") + "|" + lastOpp).map((x) => ({ ...x, fam: "taylor" })),
+      ...runsJ("lead_hanson", (r) => (r.alb_who || "") + "|" + (r.hanson_who || "")).map((x) => ({ ...x, fam: "hanson" })),
+    ];
+    return runs.map((x, i) => {
+      const fin = x.fam !== "ley" && !runs.slice(i + 1).some((y) => y.fam === x.fam);
+      const rival = x.who.split("|")[1];
+      return { id: fin ? x.fam : "lead:" + x.who, label: "over " + rival, color: x.fam === "hanson" ? han.color : opp.color,
+               points: x.points, rdWidth: 2.5, ...(fin ? { endLabel: "over " + rival } : { endCap: false }) };
+    });
+  })() : [
     { id: "ley", label: "over Ley", color: opp.color, points: run("lead_ley"), rdWidth: 2.5, endCap: false },
     /* the lines are named at their ends on a phone too, as the canvas drew
        them: no key under the chart names them */
@@ -606,24 +738,53 @@ function RdLeadership({ rangeId }) {
       const o = mode === "ah" ? "hanson" : c.taylor != null ? "taylor" : c.ley != null ? "ley" : null;
       if (!o || c[o] == null) return null;
       return { x: q.x, y: c.alb - c[o], color: o === "hanson" ? han.color : opp.color, who: o,
-               label: "Albanese over " + (o === "hanson" ? "Hanson" : o === "ley" ? "Ley" : opp.short), meta: q };
+               label: J ? (holderAt("alb", q.released) || pm.short) + " over " + (holderAt(SLOT[o], q.released) || L[o === "ley" ? "taylor" : o].short)
+                 : "Albanese over " + (o === "hanson" ? "Hanson" : o === "ley" ? "Ley" : opp.short), meta: q };
     })).filter(Boolean));
   const bandVals = (series) => series.flatMap((s) => s.points.flatMap((p) => (p.ci != null ? [p.y - p.ci, p.y + p.ci] : [p.y])));
   const leadVals = bandVals(leadSeries).concat(leadDots.map((d) => d.y));
   const leadFit = fitDomain(leadVals.length ? leadVals : [0, 20], 10, 0);
   const leyPeak = leadSeries.find((s) => s.id === "ley");
-  const leadNotes = leyPeak && leyPeak.points.length ? (() => {
+  /* J: each earlier opposition leader named once, over the peak of the
+     lines against them (the latest one is named at its line's end) */
+  const leadNotes = J ? (() => {
+    const peaks = new Map();
+    leadSeries.filter((s) => s.id.startsWith("lead:") && s.label !== "over " + lastOpp).forEach((s) => {
+      const pk = s.points.reduce((m, p) => (p.y > m.y ? p : m), s.points[0]);
+      const was = peaks.get(s.label);
+      if (!was || pk.y > was.pk.y) peaks.set(s.label, { pk, color: s.color });
+    });
+    return unclash([...peaks.entries()].map(([text, { pk, color }]) => ({ x: pk.x, y: pk.y, dy: -9, text, anchor: "middle", color: inkOf(color), weight: 600 })),
+      (leadFit.domain[1] - leadFit.domain[0]) * 0.12);
+  })() : leyPeak && leyPeak.points.length ? (() => {
     const pk = leyPeak.points.reduce((m, p) => (p.y > m.y ? p : m), leyPeak.points[0]);
     return [{ x: pk.x, y: pk.y, dy: -9, text: "over Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 }];
   })() : [];
-  const threeSeries = kept("threeSeries", () => {
+  const threeSeries = kept("threeSeries", () => J ? (() => {
+    /* J: one line per holder; the latest holder of each office is the line
+       the two-way view's runs reshape into, earlier ones end in a cap */
+    const fam = (k, id, Ld, whoOf) => {
+      const rs = runsJ(k, whoOf);
+      return rs.map((x, i) => {
+        const fin = i === rs.length - 1 && (id !== "ley");
+        return { id: fin ? id : "3:" + id + ":" + x.who, label: x.who || Ld.short, color: Ld.color, points: x.points, rdWidth: 2.5,
+                 ...(fin ? { endLabel: x.who || Ld.short } : { endCap: true }) };
+      });
+    };
+    return [
+      ...fam("alb_pref3", "alb", pm, (r) => r.alb_who),
+      ...fam("hanson_pref3", "hanson", han, (r) => r.hanson_who),
+      ...fam("ley_pref3", "ley", opp, (r) => r.ley_who),
+      ...fam("taylor_pref3", "taylor", opp, () => lastOpp),
+    ];
+  })() : (() => {
     return [
       { id: "alb", label: pm.short, color: pm.color, points: run("alb_pref3"), rdWidth: 2.5, endLabel: pm.short },
       { id: "hanson", label: han.short, color: han.color, points: run("hanson_pref3"), rdWidth: 2.5, endLabel: han.short },
       { id: "ley", label: "Ley", color: opp.color, points: run("ley_pref3"), rdWidth: 2.5, endCap: true },
       { id: "taylor", label: opp.short, color: opp.color, points: run("taylor_pref3"), rdWidth: 2.5, endLabel: opp.short },
     ].filter((s) => s.points.length);
-  });
+  })());
   const firstThree = threeSeries.length ? Math.min(...threeSeries.map((s) => s.points[0].x)) : null;
   /* each poll's three-way shares, one dot per leader in his or her colour -
      the spread the key tells readers to expect, shown rather than asserted */
@@ -632,7 +793,8 @@ function RdLeadership({ rangeId }) {
       const c = ppmMatch(q, "3");
       if (!c) return [];
       const oppK = c.taylor != null ? "taylor" : c.ley != null ? "ley" : null;
-      return [["alb", pm.color, pm.short], [oppK, opp.color, oppK === "ley" ? "Ley" : opp.short], ["hanson", han.color, han.short]]
+      return (J ? [["alb", pm.color, holderAt("alb", q.released) || pm.short], [oppK, opp.color, holderAt("opp", q.released) || opp.short], ["hanson", han.color, holderAt("han", q.released) || han.short]]
+        : [["alb", pm.color, pm.short], [oppK, opp.color, oppK === "ley" ? "Ley" : opp.short], ["hanson", han.color, han.short]])
         .filter(([k]) => k && c[k] != null)
         .map(([k, color, label]) => ({ x: q.x, y: c[k], color, label, meta: q, who: k }));
     }));
@@ -645,7 +807,8 @@ function RdLeadership({ rangeId }) {
   const threeFrom = (() => { const r = LM.find((m) => m.alb_pref3 != null); return r ? rdMonthYear(r.ym).replace(" ", "\u00a0") : ""; })();
   const threeNotes = [
     firstThree != null && firstThree - xDomain[0] > 0.2 ? { span: ["left", { data: Math.min(firstThree, ...threeDots.filter((d) => d.x >= xDomain[0]).map((d) => d.x)) }], y: threeTop * 0.62, text: ["Three-way questions began in " + threeFrom, "First asked in " + threeFrom], cls: "rd-note-it" } : null,
-    leyRun && leyRun.points.length ? { x: leyRun.points[leyRun.points.length - 1].x, y: leyRun.points[leyRun.points.length - 1].y, dy: 18, text: "Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 } : null,
+    ...(J ? unclash(threeSeries.filter((s) => s.id.startsWith("3:")).map((s) => ({ x: s.points[s.points.length - 1].x, y: s.points[s.points.length - 1].y, dy: 18, text: s.label, anchor: "middle", color: inkOf(s.color), weight: 600 })), threeTop * 0.12)
+      : [leyRun && leyRun.points.length ? { x: leyRun.points[leyRun.points.length - 1].x, y: leyRun.points[leyRun.points.length - 1].y, dy: 18, text: "Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 } : null]),
   ].filter(Boolean);
   /* a phone's title runs the chart's width, so the Ley → Taylor flag needs
      its own band above the plot or it prints over the title */
@@ -671,21 +834,21 @@ function RdLeadership({ rangeId }) {
      their ends, so it wants no legend. */
   const keyDots = "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.";
   const keyThree = "Shares of all respondents. Pollsters leave different shares undecided, so read the order and the gaps rather than the levels.";
-  const keyLead = "Lead is " + pm.short + "’s share minus his opponent’s";
+  const keyLead = J ? "Lead is the " + J.office.alb + "’s share minus the " + J.office.opp + "’s" : "Lead is " + pm.short + "’s share minus his opponent’s";
   const ppmModel = (v) => v === "three" ? {
     title: "Share in the three-way question, month by month", series: threeSeries, dots: threeDots,
     domain: [0, threeTop], yTicks: rdYTicks(0, threeTop, 10), yTickFmt: (y) => (y === 0 ? "0" : y % 20 === 0 ? y + "%" : ""),
-    refLines: [], notes: threeNotes, spine: (threeSeries[0] || { points: [] }).points,
-    copy: { title: "Preferred prime minister: " + pm.short + ", " + opp.short + " or " + han.short,
+    refLines: [], notes: threeNotes, spine: J ? spineOf(threeSeries) : (threeSeries[0] || { points: [] }).points,
+    copy: { title: (J ? "Preferred " + J.office.alb : "Preferred prime minister") + ": " + pm.short + ", " + opp.short + " or " + han.short,
             sub: "Each leader’s share when voters are asked to choose from all three, month by month",
             legend: [], caption: keyDots + " " + keyThree },
   } : {
-    title: pm.short + "’s lead" + (ppmView === "both" ? " head to head" : "") + ", month by month", series: leadSeries, dots: leadDots,
+    title: (J ? "The " + J.office.alb : pm.short) + "’s lead" + (ppmView === "both" ? " head to head" : "") + ", month by month", series: leadSeries, dots: leadDots,
     domain: leadFit.domain, yTicks: rdYTicks(leadFit.domain[0], leadFit.domain[1], 10).filter((y) => y >= 0 || y === leadFit.domain[0]),
     yTickFmt: (y) => (y === 0 ? "Tied" : y > 0 ? "+" + y : "−" + Math.abs(y)),
     refLines: [{ y: 0, color: "var(--ink-3)" }], notes: leadNotes,
-    spine: (leadSeries.find((s) => s.id === "taylor") || leadSeries[0] || { points: [] }).points,
-    copy: { title: pm.short + "’s lead as preferred prime minister",
+    spine: J ? spineOf(leadSeries) : (leadSeries.find((s) => s.id === "taylor") || leadSeries[0] || { points: [] }).points,
+    copy: { title: J ? "The " + J.office.alb + "’s lead as preferred " + J.office.alb : pm.short + "’s lead as preferred prime minister",
             sub: "Points ahead of each rival when voters are asked to choose between the two, month by month",
             legend: [], caption: keyDots + " " + keyLead + "." },
   };
@@ -731,10 +894,20 @@ function RdLeadership({ rangeId }) {
 
   /* ---- net approval and favourability ------------------------------------ */
   const leaders = RD_LEAD_ORDER.map((id) => L[id]).filter(Boolean);
-  const erasOf = (Ld) => (Ld.id === "taylor" ? ["ley", "taylor"] : [null]);
+  /* J: an era is a holder - its key family, and the month's holder field
+     that picks its months out of a shared family */
+  const erasOf = J
+    ? (Ld) => {
+        const slot = SLOT[Ld.id], list = J.eras[slot], last = list.length - 1;
+        return list.map((e, i) => ({ who: e.name, final: i === last,
+          key: slot === "opp" ? (i === last ? "taylor" : "ley") : Ld.id,
+          whoKey: slot === "opp" ? (i === last ? null : "ley_who") : Ld.id === "alb" ? "alb_who" : "hanson_who" }));
+      }
+    : (Ld) => (Ld.id === "taylor" ? ["ley", "taylor"] : [null]);
   const lineFor = (Ld, mt, era) => {
-    const k = (era || Ld.id) + "_" + mt;
-    return pts.filter((d) => d[k] != null).map((d) => ({ ym: d.ym, x: d.x, v: d[k], ci: d[k + "Ci"] != null ? d[k + "Ci"] : null }));
+    const k = (J ? era.key : era || Ld.id) + "_" + mt;
+    return pts.filter((d) => d[k] != null && (!J || !era.whoKey || d[era.whoKey] === era.who))
+      .map((d) => ({ ym: d.ym, x: d.x, v: d[k], ci: d[k + "Ci"] != null ? d[k + "Ci"] : null }));
   };
   const cloudFor = (mt) => {
     const wantFav = mt === "fav";
@@ -745,7 +918,7 @@ function RdLeadership({ rangeId }) {
         if (a[Ld.id + "Net"] != null && isFav === wantFav) out.push(a[Ld.id + "Net"]);
         const alt = a.alt && a.alt[Ld.id];
         if (alt && alt.net != null && (alt.metric === "fav") === wantFav) out.push(alt.net);
-        const lab = Ld.id === "taylor" ? (a.oppName || Ld.short) : Ld.short;
+        const lab = J ? holderAt(SLOT[Ld.id], q.released) || Ld.short : Ld.id === "taylor" ? (a.oppName || Ld.short) : Ld.short;
         return out.map((y) => ({ x: q.x, y, color: Ld.color, label: lab, meta: q, leader: Ld.id }));
       }));
   };
@@ -757,13 +930,17 @@ function RdLeadership({ rangeId }) {
       return b ? { era, rows: b.rows, clip: b.clip, ciClip: b.clips.ci } : { era, rows: lineFor(Ld, mt, era), clip: null };
     }).filter((d) => d.rows.length);
     const drawn = leaders.map((Ld) => ({ Ld, runs: runs(Ld) }));
-    const series = drawn.flatMap(({ Ld, runs: rs }) => rs.map((d) => ({
+    const series = drawn.flatMap(({ Ld, runs: rs }) => rs.map((d) => (J ? {
+      id: Ld.id + "-" + d.era.who, label: d.era.who, color: Ld.color,
+      points: d.rows.map((r) => ({ x: r.x, y: r.v })), rdWidth: 2.5, clipX: d.clip,
+      endCap: d.era.final, endLabel: d.era.final ? d.era.who : null,
+    } : {
       id: Ld.id + (d.era ? "-" + d.era : ""), label: d.era === "ley" ? "Ley" : Ld.short, color: Ld.color,
       points: d.rows.map((r) => ({ x: r.x, y: r.v })), rdWidth: 2.5, clipX: d.clip,
       endCap: d.era !== "ley", endLabel: d.era === "ley" ? null : Ld.short,
     })));
     const areas = drawn.flatMap(({ Ld, runs: rs }) => rs.map((d) => ({
-      id: "ci-" + Ld.id + (d.era ? "-" + d.era : ""), color: Ld.color, className: "ci-band", edge: false, clipX: d.ciClip || d.clip,
+      id: "ci-" + Ld.id + (J ? "-" + d.era.who : d.era ? "-" + d.era : ""), color: Ld.color, className: "ci-band", edge: false, clipX: d.ciClip || d.clip,
       points: d.ciClip
         ? d.rows.filter((r) => r.ciHi != null && r.ciLo != null).map((r) => ({ x: r.x, y0: r.ciLo, y1: r.ciHi }))
         : d.rows.filter((r) => r.ci != null).map((r) => ({ x: r.x, y0: r.v - r.ci, y1: r.v + r.ci })) }))).filter((a) => a.points.length >= 2);
@@ -775,8 +952,16 @@ function RdLeadership({ rangeId }) {
     const dom = m ? window.AP.blendDomain(fitFor(m.from).domain, tgt.domain, m.t) : tgt.domain;
     const leyRun = drawn.find((d) => d.Ld.id === "taylor");
     const ley = leyRun && leyRun.runs.find((r) => r.era === "ley");
-    const notes = ley && ley.rows.length ? [{ x: ley.rows[ley.rows.length - 1].x, y: ley.rows[ley.rows.length - 1].v, dy: 18, text: "Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 }] : [];
-    const spine = (drawn[0] && drawn[0].runs[0] ? drawn[0].runs[0].rows.filter((r) => !r.mid) : []);
+    /* an earlier holder's line ends in a cap, named under its last point */
+    const notes = J
+      ? unclash(drawn.flatMap(({ Ld, runs: rs }) => rs.filter((d) => !d.era.final).map((d) => {
+          const r = d.rows[d.rows.length - 1];
+          return { x: r.x, y: r.v, dy: 18, text: d.era.who, anchor: "middle", color: inkOf(Ld.color), weight: 600 };
+        })), (dom[1] - dom[0]) * 0.12)
+      : ley && ley.rows.length ? [{ x: ley.rows[ley.rows.length - 1].x, y: ley.rows[ley.rows.length - 1].v, dy: 18, text: "Ley", anchor: "middle", color: inkOf(opp.color), weight: 600 }] : [];
+    const spine = J
+      ? spineOf(drawn.flatMap((d) => d.runs.map((r) => ({ points: r.rows.filter((x) => !x.mid) }))))
+      : (drawn[0] && drawn[0].runs[0] ? drawn[0].runs[0].rows.filter((r) => !r.mid) : []);
     const title = (mt === "fav" ? "Favourability" : "Net approval") + ", month by month";
     /* the copy names the leaders: "Leaders’ net approval" left a reader of
        the image to work out whose lines these were from the end labels */
@@ -795,9 +980,9 @@ function RdLeadership({ rangeId }) {
       /* read away from the panel: its name, its measure, and the key */
       copy: mt === "fav"
         ? { title: "Net favourability of " + leaderNames, sub: "Favourable minus unfavourable views of each leader as a person, month by month",
-            legend: [], caption: keyDots + " Polls by RedBridge, DemosAU, Freshwater and Spectre Strategy." }
+            legend: [], caption: keyDots + (J ? " Polls by " + jApprBy(true) + "." : " Polls by RedBridge, DemosAU, Freshwater and Spectre Strategy.") }
         : { title: "Net approval of " + leaderNames, sub: "Approve minus disapprove of the job each leader is doing, month by month",
-            legend: [], caption: keyDots + " Polls by Newspoll, YouGov, Resolve, Essential and others." },
+            legend: [], caption: keyDots + (J ? " Polls by " + jApprBy(false) + "." : " Polls by Newspoll, YouGov, Resolve, Essential and others.") },
       extraRows: (i) => { const r = spine[i]; if (!r) return []; const cs = leaders.map((Ld) => { const row = pts.find((p) => p.ym === r.ym); const k = (Ld.id === "taylor" && row && row.taylor_net == null && row.ley_net != null ? "ley" : Ld.id) + "_" + mt + "Ci"; return row && row[k] != null ? "±" + row[k].toFixed(1) : null; }).filter(Boolean); return cs.length ? [{ label: "95% intervals", value: cs.join(", ") }] : []; },
     });
   };
@@ -820,11 +1005,12 @@ function RdLeadership({ rangeId }) {
   const poolItems = (Ld, mt, both) => {
     const wantFav = mt === "fav";
     const ref = Date.parse(D.latest.updatedISO);
-    const win = wantFav || Ld.id === "hanson" ? 42 : 21;
+    const win = wantFav || Ld.id === "hanson" || J ? 42 : 21;
     const lab = Ld.short + (both ? (wantFav ? " favourability" : " approval") : "");
     return D.individualPolls.flatMap((q) => {
       const a = q.appr;
       if (!a) return [];
+      if (J && q.released < sinceOf(SLOT[Ld.id])) return [];   // the holder's own polls, as leaderNow pools them
       const mid = q.fmid ? Date.parse(q.fmid) : Date.parse(q.released);
       const d = (ref - mid) / 86400000;
       if (d < 0 || d > win) return [];
@@ -841,6 +1027,7 @@ function RdLeadership({ rangeId }) {
     const rowsA = dotRows("net"), rowsF = dotRows("fav");
     const both = mode === "both";
     const list = both ? leaders.map((Ld) => ({ Ld, a: N[Ld.id + "_net"], f: N[Ld.id + "_fav"] })) : (mode === "fav" ? rowsF : rowsA).map((r) => ({ Ld: r.Ld, a: r.n }));
+    if (J && !list.length) return null;   // the note under it says why (apprNote)
     return (
       <div className={"rd-dp" + (both ? " both" : "")} role="table" aria-label={both ? "Net approval and favourability now" : (mode === "fav" ? "Net favourability now" : "Net approval now") + ", with 95% intervals and change"}>
         <div className="rd-dp-head" role="row">
@@ -884,12 +1071,26 @@ function RdLeadership({ rangeId }) {
       const d = leaders.map((Ld) => ({ Ld, a: get(Ld.id + "_net"), f: get(Ld.id + "_fav") })).filter((x) => x.a != null && x.f != null);
       const worseJob = d.filter((x) => x.a < x.f - 3), betterJob = d.filter((x) => x.a > x.f + 3);
       const bits = [];
+      if (J) {
+        const rate = (xs, how) => xs.map((x) => x.Ld.short).join(" and ") + (xs.length > 1 ? " rate " : " rates ") + how + " on the job than as " + (xs.length > 1 ? "people" : "a person");
+        if (worseJob.length) bits.push(rate(worseJob, "worse"));
+        if (betterJob.length) bits.push(rate(betterJob, "better"));
+      } else {
       if (worseJob.length) bits.push("Voters rate " + worseJob.map((x) => x.Ld.short).join(" and ") + "’s job worse than they rate " + (worseJob.length > 1 ? "them" : "him"));
       if (betterJob.length) bits.push((bits.length ? "" : "Voters rate ") + betterJob.map((x) => x.Ld.short).join(" and ") + (bits.length ? " the reverse" : "’s job better than they rate " + (betterJob.length > 1 ? "them" : "her")));
+      }
       return (bits.length ? bits.join(", and ") + ". " : "") + "Different pollsters ask each question, so part of each gap reflects who asked.";
     }
     const mt = metric;
     const rows = leaders.map((Ld) => ({ Ld, n: N[Ld.id + "_" + mt] })).filter((r) => r.n);
+    if (J && !rows.length) {
+      /* /vic/: a measure no pollster asked in the window, said plainly */
+      const wantFav = mt === "fav";
+      const asked = D.individualPolls.filter((q) => q.appr && ["alb", "taylor", "hanson"].some((k) => q.appr[k + "Net"] != null && ((q.appr.metricBy || {})[k] === "fav") === wantFav));
+      const last = asked[asked.length - 1];
+      return "No pollster has asked about " + (wantFav ? "favourability" : "job approval") + " in the last six weeks"
+        + (last ? "; the latest reading is " + last.pollster + "’s, from " + rdDate(last.released, true) + "." : ".");
+    }
     const sig = rows.filter((r) => r.n.changeSig);
     let s = "Bars are 95% intervals. ";
     s += !sig.length ? "None of the changes is significant." : sig.length === 1
@@ -984,7 +1185,7 @@ function RdLeadership({ rangeId }) {
   }, [ppmView, metric]);
 
   return (
-    <RdSec id="leadership" cls="rd-lead" title="Leadership" meta="Preferred PM and net approval, Newspoll, YouGov, Resolve, Essential and others">
+    <RdSec id="leadership" cls="rd-lead" title="Leadership" meta={J ? "Preferred " + J.office.alb + " and net approval, " + jHouses((q) => !!(q.ppm || q.ppmSets || (q.appr && (q.appr.albNet != null || q.appr.taylorNet != null)))) : "Preferred PM and net approval, Newspoll, YouGov, Resolve, Essential and others"}>
       {story && <RdHed head={story.head} dek={story.dek} />}
       {/* "free" frees the panels from the shared desktop row grid: a "Both"
           view gives its panel extra children (a second chart, the dot-plot
@@ -993,10 +1194,10 @@ function RdLeadership({ rangeId }) {
           rows, centre themselves in the stretched track and hang in space
           above or below their own charts. Not shared, each panel stacks. */}
       <div className={"rd-ld-grid" + (expanded ? " one" : ppmView === "both" || metric === "both" ? " free" : "")}>
-        {panel("ppm", "Preferred prime minister", "“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.",
-          <RdTabs swipe value={ppmView} onChange={ppmPick} ariaLabel="Preferred prime minister question"
+        {panel("ppm", J ? "Preferred " + J.office.alb : "Preferred prime minister", J ? "“Who would make the better " + J.office.alb + "?” Asked head to head, and three-way where pollsters offer it." : "“Who would make the better PM?” Asked head to head, and three-way where pollsters offer it.",
+          <RdTabs swipe value={ppmView} onChange={ppmPick} ariaLabel={J ? "Preferred " + J.office.alb + " question" : "Preferred prime minister question"}
                   options={[{ id: "two", label: "Two-way" }, { id: "three", label: "Three-way" }, { id: "both", label: "Both" }]}>
-            {!narrow && expandBtn("ppm", "preferred prime minister")}
+            {!narrow && expandBtn("ppm", J ? "preferred " + J.office.alb : "preferred prime minister")}
           </RdTabs>,
           <>
             {/* two bars or one, a note a line longer or shorter: each glides
@@ -1022,8 +1223,8 @@ function RdLeadership({ rangeId }) {
           </>)}
         {panel("appr", metric === "both" ? "Approval and favourability" : metric === "fav" ? "Net favourability" : "Net approval",
           metric === "both" ? "Net ratings of the job each leader is doing, and of each leader as a person."
-            : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. RedBridge, DemosAU, Freshwater and Spectre Strategy."
-            : "Approve minus disapprove of the job each leader is doing. Newspoll, YouGov, Resolve, Essential and others.",
+            : metric === "fav" ? "Favourable minus unfavourable views of each leader as a person. " + (J ? jApprBy(true) + "." : "RedBridge, DemosAU, Freshwater and Spectre Strategy.")
+            : "Approve minus disapprove of the job each leader is doing. " + (J ? jApprBy(false) + "." : "Newspoll, YouGov, Resolve, Essential and others."),
           <RdTabs swipe value={metric} onChange={pickMetric} ariaLabel="Leader rating"
                   options={[{ id: "net", label: "Approval" }, { id: "fav", label: "Favourability" }, { id: "both", label: "Both" }]}>
             {!narrow && expandBtn("appr", "leader ratings")}
@@ -1041,7 +1242,8 @@ function RdLeadership({ rangeId }) {
           </>)}
       </div>
       <RdFoot how={{ term: "leadership", from: "Leadership" }}>
-        Albanese’s and Taylor’s approval pool the last three weeks of polls; the other figures, the last six. Changes are on a month ago; ▼ in bold marks a significant change.
+        {J ? "Every figure pools the last six weeks of polls, counting only those since the leader took the job. Changes are on a month ago; ▼ in bold marks a significant change."
+          : "Albanese’s and Taylor’s approval pool the last three weeks of polls; the other figures, the last six. Changes are on a month ago; ▼ in bold marks a significant change."}
       </RdFoot>
     </RdSec>
   );

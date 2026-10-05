@@ -32,3 +32,6 @@ node_modules/
 # wrangler's local build/state dir, left beside the dispatch-clock Worker by
 # `npx wrangler deploy` (see .build/dispatch-clock/README.md)
 .wrangler/
+
+# /vic/ build: the converted dataset and gen-data outputs (regenerated every build)
+.build/vic/out/

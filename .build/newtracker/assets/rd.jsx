@@ -873,6 +873,12 @@ function rdFraction(p) {
 }
 const rdSigned = (v, dp = 1) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(dp);
 const rdArrow = (v) => (v > 0 ? "▲" : v < 0 ? "▼" : "→");
+/* the last election, as the copy names it ("since the 2025 election"): the
+   current term's own, so /vic/ reads 2022 */
+const rdElecYear = (() => {
+  const c = (window.AUSPOL.cycles || []).find((x) => x.current);
+  return c && c.eDate ? c.eDate.slice(0, 4) : "2025";
+})();
 
 /* "21 Sep", and "21 Sep 2026" with the year */
 function rdDate(iso, withYear) {

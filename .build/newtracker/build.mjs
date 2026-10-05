@@ -20,15 +20,25 @@ import { createRequire } from "node:module";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
+import zlibVic from "node:zlib";
 import { validate } from "./validate.mjs";
 import { shellCss, shellJs, shellDrift, mainChrome } from "../site-shell.mjs";
 
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
+/* BUILD_JUR=vic builds /vic/ – the Victorian state-election page – from this
+   same file, the same template and the same components, on the Victorian
+   dataset (.build/vic/to-main-schema.mjs maps data/vic-polls.json onto
+   data/polls.json's shape; gen-data reads its `jurisdiction`). It writes
+   vic/index.html and nothing else: the federal page's side outputs (tab icon
+   files, the satellites' shell assets, the share-card stamp, Past cycles'
+   source rows, feed, sitemap, robots) are this build's alone. BUILD_OUT
+   writes the page somewhere else (tests). */
+const VIC = process.env.BUILD_JUR === "vic";
 /* index.html, so a static host serves it at the site root with no config and
    no redirect. The name is the deploy contract, not a description. */
-const OUT = path.join(ROOT, "index.html");
+const OUT = process.env.BUILD_OUT || (VIC ? path.join(ROOT, "vic", "index.html") : path.join(ROOT, "index.html"));
 
 /* Where this page is published. Open Graph requires og:image and og:url to be
    ABSOLUTE – a relative path is invalid per the spec and Facebook, LinkedIn,
@@ -41,30 +51,40 @@ const OUT = path.join(ROOT, "index.html");
    moves, or set SITE_URL= in the environment. */
 const SITE_URL = (process.env.SITE_URL || "https://auspoltracker.com/")
   .replace(/\/*$/, "/");
+const PAGE_URL = SITE_URL + (VIC ? "vic/" : "");
 const A = (f) => path.join(HERE, "assets", f);
+/* gen-data's two outputs: beside the components federally, in .build/vic/out
+   (gitignored) for /vic/ so the two builds never overwrite each other */
+const GEN_OUT = VIC ? path.join(ROOT, ".build", "vic", "out") : path.join(HERE, "assets");
+const DATASET = "9f09dca2-bd46-49a8-8ae1-51847608cf92.js";
+const DA = (f) => path.join(GEN_OUT, f);
 
 /* The report-an-error form lives on /feedback/ – a hand-maintained standalone
    page carrying the Formspree endpoint itself. FORMSPREE_ID once went into the
    page here as window.AP_FEEDBACK; the move made the wiring unnecessary. */
 
 /* ---- 1. the data must be sound before anything is built ---------------- */
-const DATA = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
+const DATA = VIC
+  ? (await import("../vic/to-main-schema.mjs")).vicToMain(JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vic-polls.json"), "utf8")))
+  : JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
+if (VIC) { fs.mkdirSync(GEN_OUT, { recursive: true }); writeAtomic(DA("polls.json"), JSON.stringify(DATA, null, 2) + "\n"); }
 const { errors, exempted, orphans } = validate(DATA);
 if (errors.length) {
-  console.error(`\ndata/polls.json – ${errors.length} problem(s), build stopped:`);
+  console.error(`\n${VIC ? "data/vic-polls.json (as the main dataset)" : "data/polls.json"} – ${errors.length} problem(s), build stopped:`);
   errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`));
   process.exit(1);
 }
 console.log(`validated ${DATA.polls.length} polls · ${exempted.length} documented exceptions · ${orphans.length} leadership-only rows`);
 
 /* ---- 2. regenerate the derived dataset --------------------------------- */
-execFileSync(process.execPath, [path.join(HERE, "gen-data.mjs")], { stdio: ["ignore", "ignore", "inherit"] });
+execFileSync(process.execPath, [path.join(HERE, "gen-data.mjs")], { stdio: ["ignore", "ignore", "inherit"],
+  ...(VIC ? { env: { ...process.env, GEN_DATA_POLLS: DA("polls.json"), GEN_DATA_OUT: GEN_OUT } } : {}) });
 /* gen-data's whole job is these two files. Everything downstream of this
    line reads them by name, so if either is missing or empty the diagnosis
    belongs here, not in a readFileSync ENOENT two hundred lines later. */
 for (const rel of ["9f09dca2-bd46-49a8-8ae1-51847608cf92.js", "cycle-source.json"]) {
-  const exists = fs.existsSync(A(rel));
-  if (!exists || fs.statSync(A(rel)).size === 0) {
+  const exists = fs.existsSync(DA(rel));
+  if (!exists || fs.statSync(DA(rel)).size === 0) {
     console.error(`\n.build/newtracker/${"assets/" + rel} is ${exists ? "empty" : "missing"} after gen-data – build stopped`);
     process.exit(1);
   }
@@ -263,7 +283,7 @@ const PARTY_HEX = {
 
 function buildFavicon() {
   // pull the derived series straight out of the asset gen-data just wrote
-  const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const src = fs.readFileSync(DA(DATASET), "utf8");
   const grab = (name) => {
     const i = src.indexOf("const " + name + " = ");
     if (i < 0) throw new Error("favicon: " + name + " not found in dataset");
@@ -381,7 +401,7 @@ const headlineView = (L, S) => (S && S.alp != null)
       pub: { alp2pp: L.alp2pp, lnp2pp: L.lnp2pp, alp2ppCi95: L.alp2ppCi95 } };
 
 function grabLatest() {
-  const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const src = fs.readFileSync(DA(DATASET), "utf8");
   const grab = (name) => {
     const i = src.indexOf("const " + name + " = ");
     if (i < 0) throw new Error(name + " not found in dataset");
@@ -415,7 +435,7 @@ const CYCLE_COUNT_WORDS = ["zero","one","two","three","four","five","six","seven
                            "eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen",
                            "eighteen","nineteen","twenty"];
 function pastCycleWord() {
-  const n = Object.keys(JSON.parse(fs.readFileSync(A("cycle-source.json"), "utf8"))).length;
+  const n = Object.keys(JSON.parse(fs.readFileSync(DA("cycle-source.json"), "utf8"))).length;
   return CYCLE_COUNT_WORDS[n] || String(n);
 }
 
@@ -426,11 +446,11 @@ console.log(`  theme-color: ${THEME_LIGHT} light · ${THEME_DARK} dark (matches 
    icon instead of carrying their own copies, so every page shows the
    masthead's current glyph. Stable unhashed name - the satellites' <link> is
    the point; a content hash would orphan them. */
-writeAtomic(path.join(ROOT, "assets", "favicon.svg"), fav.svg + "\n");
+if (!VIC) writeAtomic(path.join(ROOT, "assets", "favicon.svg"), fav.svg + "\n");
 /* The satellites' lockup glyph: the masthead dial itself at its own weight,
    as a static stand-in for before JS draws the live one (the spec rides
    auspol-now.json just below). Same unhashed-name contract as the favicon. */
-writeAtomic(path.join(ROOT, "assets", "masthead-dial.svg"), fav.masthead.svg + "\n");
+if (!VIC) writeAtomic(path.join(ROOT, "assets", "masthead-dial.svg"), fav.masthead.svg + "\n");
 
 /* The shared chrome of the pages outside this build (.build/site-shell.mjs):
    its stylesheet and script, the live figure its header docks, the dial the
@@ -441,6 +461,7 @@ writeAtomic(path.join(ROOT, "assets", "masthead-dial.svg"), fav.masthead.svg + "
    figure is the favicon dial's own contest and basis, which are the main
    page's. The band's drawings are lifted out of this template's --tile-art
    data URIs, so the satellites close on exactly the main page's tide. */
+if (!VIC) {   // the satellites' shell follows the FEDERAL page (closed below)
 writeAtomic(path.join(ROOT, "assets", "site-shell.css"), shellCss());
 writeAtomic(path.join(ROOT, "assets", "site-shell.js"), shellJs());
 /* …and what the satellites' masthead and tab bar show beside it, off the same
@@ -451,7 +472,7 @@ writeAtomic(path.join(ROOT, "assets", "site-shell.js"), shellJs());
    from at view time (np-project.js, run by site-shell.js), so the countdown
    stays right as a page ages between builds. */
 const shellNow = (() => {
-  const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const src = fs.readFileSync(DA(DATASET), "utf8");
   const grab = (name) => {
     const i = src.indexOf("const " + name + " = ");
     if (i < 0) throw new Error("site shell: " + name + " not found in dataset");
@@ -494,6 +515,7 @@ for (const [token, file] of [["--tile-art", "tile-art.svg"], ["--tile-art-dark",
   const drift = shellDrift();
   if (drift.length) console.warn(`  site shell out of step on ${drift.join(", ")} – run node .build/site-shell.mjs and commit the pages`);
 }
+}   // !VIC – the satellites' shell
 const favicon = encodeURIComponent(fav.svg);
 
 /* The raster copy Google Search needs, rasterised by render-favicon.mjs and
@@ -524,12 +546,12 @@ const favPngState = () => {
    without either still builds; it keeps the old raster and the reminder
    below. Warn, never fail: a wrapper mid-refresh_site is already consistent
    by the time the commit goes out. */
-const favWas = favPngState();
+const favWas = VIC ? null : favPngState();
 if (favWas) {
   try { execFileSync(process.execPath, [path.join(HERE, "render-favicon.mjs")], { cwd: ROOT, stdio: "ignore" }); }
   catch (_) { /* no Chrome, no puppeteer-core - the report below says what's left */ }
 }
-const favPng = fs.existsSync(FAV_PNG);
+const favPng = !VIC && fs.existsSync(FAV_PNG);
 const favNow = favPngState();
 if (favWas && !favNow) console.log("  favicon PNG: re-rasterised for the current glyph");
 if (favNow === "absent") console.log("  favicon PNG: absent – run render-favicon.mjs (Google Search shows no icon without it)");
@@ -551,7 +573,7 @@ if (favNow === "stale") console.log("  favicon PNG: drawn from an older glyph �
    Derived from the same generated dataset as everything else, so it cannot
    drift from the charts. */
 function buildStaticSummary() {
-  const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const src = fs.readFileSync(DA(DATASET), "utf8");
   const grab = (name) => {
     const i = src.indexOf("const " + name + " = ");
     if (i < 0) throw new Error("static summary: " + name + " not found");
@@ -708,8 +730,88 @@ function buildStaticSummary() {
     </article>`;
 }
 
+/* The same article for /vic/, in the Victorian page's terms: its baseline is
+   the 2022 state election, its flows the 2022 Victorian ones, and it has no
+   past cycles or accuracy record yet. */
+function buildStaticSummaryVic() {
+  const src = fs.readFileSync(DA(DATASET), "utf8");
+  const grab = (name) => {
+    const i = src.indexOf("const " + name + " = ");
+    if (i < 0) throw new Error("static summary: " + name + " not found");
+    return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
+  };
+  const L = headlineView(grab("latest"), grab("synthLatest")), prim = L.primary;
+  const J = DATA.jurisdiction, E = DATA.elections[J.baseline], eYear = E.date.slice(0, 4);
+  const table = grab("pollsterTable"), polls = grab("individualPolls");
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const lead = (L.alp2pp - L.lnp2pp).toFixed(1);
+  const who = L.alp2pp >= L.lnp2pp ? "Labor" : "the Coalition";
+  const PARTY = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "Others" };
+  const rows = table.slice(0, 6).map((r) => `
+        <tr>
+          <th scope="row">${esc(r.pollster)}</th>
+          <td>${esc(r.field)}</td>
+          <td>${r.sample ? r.sample.toLocaleString("en-AU") : "&#8211;"}</td>
+          <td>${r.alpImp != null ? r.alpImp.toFixed(1) + "%" : "&#8211;"}</td>
+          <td>${r.alpImp != null ? (100 - r.alpImp).toFixed(1) + "%" : "&#8211;"}</td>
+        </tr>`).join("");
+  const primary = ["alp", "lnp", "grn", "onp", "oth"]
+    .filter((k) => prim[k] != null)
+    .map((k) => `<tr><th scope="row">${PARTY[k]}</th><td>${E[k].toFixed(1)}%</td><td>${prim[k].toFixed(1)}%</td></tr>`).join("\n          ");
+  const counts = {};
+  polls.forEach((p) => { counts[p.pollster] = (counts[p.pollster] || 0) + 1; });
+  const sources = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).join(", ");
+  return `<article class="static-summary">
+      <h1>${esc(J.brand)} tracker</h1>
+      <p class="ss-sub">Aggregated opinion polling for the next ${esc(J.electionWords)} election.
+        ${raceLine(L)} two-party preferred${basisClause(L)} (&#177;${L.alp2ppCi95}) &#8211; updated <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time> from
+        ${L.pollsTracked} published polls across ${L.housesTracked} polling houses. Election day: ${esc(L.nextElectionDue)}.</p>
+
+      <h2>Two-party preferred</h2>
+      <p class="ss-lead"><b>Labor ${L.alp2pp.toFixed(1)}%</b>, <b>Coalition ${L.lnp2pp.toFixed(1)}%</b>${L.basis === "imp" ? `
+        on implied preference flows &#8212; the pollsters&#8217; own published
+        figures read <b>Labor ${L.pub.alp2pp.toFixed(1)}%</b>, <b>Coalition ${L.pub.lnp2pp.toFixed(1)}%</b>` : ""}</p>
+      <p>${who} leads by ${Math.abs(lead).toFixed(1)} points
+        (&#177;${(2 * L.alp2ppCi95).toFixed(1)} on the lead)${L.basis === "imp" ? `
+        on implied preference flows &#8211; every poll&#8217;s primary votes re-allocated by
+        ${esc(J.flowsLabel)}, so every poll that publishes primaries counts, not only those that
+        file a two-party figure` : ""}. The aggregate is a sample- and recency-weighted,
+        house-effect-adjusted mean over a ${L.method.windowDays}-day window
+        (${L.method.halfLifeDays}-day half-life), carrying a 95% interval of
+        &#177;${L.alp2ppCi95.toFixed(1)} points on each share from ${L.method.nPolls} polls.</p>
+
+      <h2>Primary vote</h2>
+      <table class="ss-primary">
+        <thead>
+          <tr><th scope="col">Party</th><th scope="col">${eYear} election</th><th scope="col">Now</th></tr>
+        </thead>
+        <tbody>
+          ${primary}
+        </tbody>
+      </table>
+
+      <h2>Latest polls</h2>
+      <p class="ss-cap" id="ss-polls-cap">Most recent published ${esc(J.adj)} polls &#8211; the two-party
+        figures read each poll&#8217;s primaries at the same preference flows, so the table compares
+        house to house on one fixed allocation.</p>
+      <div class="ss-tblwrap">
+      <table class="ss-table" aria-labelledby="ss-polls-cap">
+        <thead><tr><th scope="col">Pollster</th><th scope="col">Fieldwork</th><th scope="col">Sample</th><th scope="col">ALP 2PP</th><th scope="col">L/NP 2PP</th></tr></thead>
+        <tbody>${rows}
+        </tbody>
+      </table>
+      </div>
+
+      <h2>Sources</h2>
+      <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
+
+      <p class="ss-note" data-nosnippet>${esc(J.brand)} tracker is an unofficial aggregator of published ${esc(J.adj)} opinion polling,
+        part of <a href="${SITE_URL}">auspol tracker</a>. The figures are estimates only.</p>
+    </article>`;
+}
+
 if (!html.includes("<!--STATIC_SUMMARY-->")) throw new Error("STATIC_SUMMARY marker not found in template");
-html = html.replace("<!--STATIC_SUMMARY-->", "\n    " + buildStaticSummary() + "\n  ");
+html = html.replace("<!--STATIC_SUMMARY-->", "\n    " + (VIC ? buildStaticSummaryVic() : buildStaticSummary()) + "\n  ");
 
 /* The share card carries live figures, so it can be WRONG in a way the old
    generic one could not. build.mjs cannot draw it - no rasteriser here, and it
@@ -733,7 +835,7 @@ html = html.replace("<!--STATIC_SUMMARY-->", "\n    " + buildStaticSummary() + "
    dataset - the two must never disagree about what the card says, or the
    stamp below calls a current card stale. */
 function cardContest() {
-  const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const src = fs.readFileSync(DA(DATASET), "utf8");
   const grab = (name) => {
     const i = src.indexOf("const " + name + " = ");
     if (i < 0) throw new Error(name + " not found in dataset");
@@ -767,7 +869,7 @@ function cardFigs(L) {
            basis: L.basis };
 }
 const cardNow = cardContest();
-writeAtomic(path.join(ROOT, "assets", "auspol-latest.json"),
+if (!VIC) writeAtomic(path.join(ROOT, "assets", "auspol-latest.json"),
   JSON.stringify({ publishedISO: cardNow.publishedISO, fig: cardFigs(cardNow) }) + "\n");
 let cardStamp = null, cardFigsDrawn = null;
 try {
@@ -776,7 +878,10 @@ try {
   cardFigsDrawn = drawn.fig || null;
 } catch (_) { /* no stamp: reported below */ }
 const dataStamp = cardNow.publishedISO;
-if (cardStamp !== dataStamp) {
+if (VIC) {
+  /* /vic/ has no share card of its own yet: its previews carry the title and
+     description only (no og:image), so there is no stamp to check */
+} else if (cardStamp !== dataStamp) {
   /* Warn-only locally: the unattended pipelines build on every new poll and
      redraw the card in a separate step, so a hard fail would stop data
      updates over a stale preview image. In the tests workflow the mismatch
@@ -822,7 +927,12 @@ const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, ${cl.oppLab} ${c
    race sentence - Labor v the Coalition - even when the share card is
    quoting the leading contest (the cardAlt above follows the card). */
 const hl = grabLatest();
-const metaDesc = `auspol tracker averages every published Australian federal opinion poll. `
+const JV = VIC ? DATA.jurisdiction : null;
+const metaDesc = VIC
+  ? `${JV.brand} tracker averages every published ${JV.adj} state opinion poll. `
+    + `As of ${hl.updated}, ${raceLine(hl).replace(/^The /, "the ")} two-party preferred${basisClause(hl)} (±${hl.alp2ppCi95}), `
+    + `from ${hl.pollsTracked} polls by ${hl.housesTracked} pollsters. Election day: ${hl.nextElectionDue}.`
+  : `auspol tracker averages every published Australian federal opinion poll. `
   + `As of ${hl.updated}, ${raceLine(hl).replace(/^The /, "the ")} two-party preferred${basisClause(hl)} (±${hl.alp2ppCi95}), `
   + `from ${hl.pollsTracked} polls by ${hl.housesTracked} pollsters. `
   + `Primary votes, every poll, and the last ${pastCycleWord()} elections for comparison.`;
@@ -857,8 +967,20 @@ const websiteJsonLd = `<script type="application/ld+json">${
    "Two-party preferred" win. The domain keeps the two distinct. */
 const OG_ANCHOR = '<meta property="og:type" content="website">';
 if (!html.includes(OG_ANCHOR)) throw new Error("og:type meta anchor not found in template");
-html = html.replace(OG_ANCHOR,
-  `<meta name="description" content="${metaDesc}">
+html = html.replace(OG_ANCHOR, VIC
+  ? `<meta name="description" content="${metaDesc}">
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="${metaDesc}">
+  <meta property="og:site_name" content="auspoltracker.com">
+  <meta property="og:locale" content="en_AU">
+  <meta property="og:url" content="${PAGE_URL}">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="${THEME_LIGHT}" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="${THEME_DARK}" media="(prefers-color-scheme: dark)">
+  <link rel="canonical" href="${PAGE_URL}">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,${favicon}">
+  ${fontLinks.join("\n  ")}`
+  : `<meta name="description" content="${metaDesc}">
   <meta property="og:type" content="website">
   <meta property="og:description" content="${metaDesc}">
   <meta property="og:site_name" content="auspoltracker.com">
@@ -879,6 +1001,12 @@ html = html.replace(OG_ANCHOR,
   ${fontLinks.join("\n  ")}
   ${websiteJsonLd}`);
 
+if (VIC) {
+  const t = `${JV.brand} tracker – ${JV.electionWords} election polling`;
+  html = html.replace("<title>auspol tracker – Australian federal election polling</title>", `<title>${t}</title>`)
+    .replace('<meta property="og:title" content="auspol tracker – Australian federal election polling">', `<meta property="og:title" content="${t}">`);
+}
+
 /* ---- 5. inline every script ------------------------------------------- */
 const parts = [];
 /* The cycle-source rows are the individual polls behind every past term. They
@@ -888,18 +1016,22 @@ const parts = [];
    they ever opened that tab.
    They are a file now, fetched when the tab opens. Named by a hash of its own
    bytes so it caches immutably and a new build invalidates it on its own. */
-const cycleSourceJson = fs.readFileSync(A("cycle-source.json"), "utf8");
+const cycleSourceJson = fs.readFileSync(DA("cycle-source.json"), "utf8");
 const cycleSrcName = `cycle-source.${hash8(Buffer.from(cycleSourceJson))}.json`;
+/* /vic/ has no past terms yet, so no source rows to fetch – and its build must
+   not sweep the federal page's file out of assets/ */
+if (!VIC) {
 for (const old of fs.readdirSync(path.join(ROOT, "assets"))) {
   if (/^cycle-source\..*\.json$/.test(old) && old !== cycleSrcName)
     fs.unlinkSync(path.join(ROOT, "assets", old));
 }
 writeAtomic(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
-parts.push(`<script>window.AP_CYCLE_SRC=${JSON.stringify("assets/" + cycleSrcName)};<\/script>`);
+}
+parts.push(`<script>window.AP_CYCLE_SRC=${VIC ? "null" : JSON.stringify("assets/" + cycleSrcName)};<\/script>`);
 for (const f of ["react.production.min.js", "react-dom.production.min.js"])
   parts.push(`<script>${inlineJs(fs.readFileSync(path.join(HERE, "vendor", f), "utf8"))}</script>`);
 for (const f of PLAIN)
-  parts.push(`<script>${inlineJs(stripJs(fs.readFileSync(A(f), "utf8"), f))}</script>`);
+  parts.push(`<script>${inlineJs(stripJs(fs.readFileSync(f === DATASET ? DA(f) : A(f), "utf8"), f))}</script>`);
 for (const f of JSX)
   parts.push(`<script>${inlineJs(transpile(fs.readFileSync(A(f), "utf8"), f))}</script>`);
 
@@ -914,8 +1046,15 @@ if (!html.includes("<!--SCRIPTS-->")) throw new Error("SCRIPTS marker not found 
 html = html.replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/g, (_, open, css, close) =>
   open + css.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\n[ \t]*(?=\n)/g, "").replace(/\n{2,}/g, "\n") + close);
 html = html.replace("<!--SCRIPTS-->", parts.join("\n  "));
+/* /vic/ sits one folder down: the shared fonts are site-root assets */
+if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\("assets\//g, 'url("/assets/');
 
 writeAtomic(OUT, html);
+if (VIC) {
+  const vsize = fs.statSync(OUT).size;
+  console.log(`built ${path.relative(ROOT, OUT)} · ${(vsize / 1024 / 1024).toFixed(2)} MB raw · ${(zlibVic.gzipSync(fs.readFileSync(OUT), { level: 9 }).length / 1024).toFixed(0)} KB gzipped`);
+  process.exit(0);
+}
 
 /* ---- 5b. feed.xml – one item per poll ----------------------------------
    The page is a single document that changes in place, so there was no way to
@@ -1106,9 +1245,18 @@ const ARCHIVE_STAMP = "2026-09-24";
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
 const PREDICTION_STAMP = "2026-10-05";
-/* vic/ likewise: .build/refresh-vic.mjs regenerates the page on each
-   new wave and bumps this stamp itself, through election day 2026-11-28. */
-const VIC_STAMP = "2026-10-03";
+/* vic/ is rebuilt from data/vic-polls.json (npm run build:vic), so it is
+   dated as this page is, by its data – the newest Victorian poll's
+   fieldwork end – or by the rebuild onto this page's code, 2026-10-05,
+   whichever is later. */
+const VIC_STAMP = (() => {
+  const CODE = "2026-10-05";
+  try {
+    const v = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vic-polls.json"), "utf8"));
+    const data = [...(v.polls || []), ...(v.leadership || [])].map((r) => r.fwEnd || r.date).filter(Boolean).sort().pop() || CODE;
+    return data > CODE ? data : CODE;
+  } catch { return CODE; }
+})();
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>

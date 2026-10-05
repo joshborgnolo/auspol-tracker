@@ -202,12 +202,12 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       const net = (v) => (v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v));
       const ppmTxt = ppm && ppm.alb != null
         ? (() => { const o = Object.keys(ppm).find((k) => k !== "alb" && k !== "unc");
-                   const L = (window.LEADER_META || {})[o]; return "Albanese " + ppm.alb + "–" + ppm[o] + " " + (L ? L.label : rdCap(o)); })()
+                   const L = (window.LEADER_META || {})[o]; return apWho(r, "alb", "Albanese") + " " + ppm.alb + "–" + ppm[o] + " " + apWho(r, o, L ? L.label : rdCap(o)); })()
         : null;
       return (
         <div className="rd-pl-lead">
-          <span className="rd-pl-main">{ppmTxt || <span className="rd-pl-none">No preferred-PM question</span>}</span>
-          <span className="rd-pl-sub"><span className="rd-pl-netl">Net: </span>Albanese {net(a.albNet)}, {opp} {net(a.taylorNet)}{a.hansonNet != null ? ", Hanson " + net(a.hansonNet) : ""}</span>
+          <span className="rd-pl-main">{ppmTxt || <span className="rd-pl-none">{window.JUR ? "No preferred-" + window.JUR.office.alb + " question" : "No preferred-PM question"}</span>}</span>
+          <span className="rd-pl-sub"><span className="rd-pl-netl">Net: </span>{apWho(r, "alb", "Albanese")}{" "}{net(a.albNet)}, {opp} {net(a.taylorNet)}{a.hansonNet != null ? ", " + apWho(r, "hanson", "Hanson") + " " + net(a.hansonNet) : ""}</span>
         </div>
       );
     }
@@ -237,7 +237,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const figHead = facet === "primary"
     ? <div className="rd-pl-prim rd-pl-primh">{plParties.map(([id, lab]) => (
         <span key={id} style={{ color: id === "oth" ? "var(--ink-2)" : inkOf("var(--" + id + ")") }}>{lab}</span>))}</div>
-    : facet === "leadership" ? "Preferred PM, net approval" : "Labor v " + rivalName;
+    : facet === "leadership" ? (window.JUR ? "Preferred " + window.JUR.office.alb + ", net approval" : "Preferred PM, net approval") : "Labor v " + rivalName;
 
   /* ---- the release strip -------------------------------------------------- */
   const L = t0 - 43 * DAY_MS, R = t0 + 23 * DAY_MS;
@@ -349,11 +349,11 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     const ppm = ppmContests(r).map((s) => {
       const o = Object.keys(s).find((k) => k !== "alb" && k !== "unc");
       const Lm = (window.LEADER_META || {})[o];
-      return "Albanese " + s.alb + ", " + (Lm ? Lm.label : rdCap(o)) + " " + s[o];
+      return apWho(r, "alb", "Albanese") + " " + s.alb + ", " + apWho(r, o, Lm ? Lm.label : rdCap(o)) + " " + s[o];
     }).join("; ");
     const a = r.appr || {};
     const net = (v) => (v == null ? null : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v));
-    const nets = clause([["Albanese", a.albNet, "albNet"], [a.oppName || "Taylor", a.taylorNet, "taylorNet"], ["Hanson", a.hansonNet, "hansonNet"]]
+    const nets = clause([[apWho(r, "alb", "Albanese"), a.albNet, "albNet"], [a.oppName || "Taylor", a.taylorNet, "taylorNet"], [apWho(r, "hanson", "Hanson"), a.hansonNet, "hansonNet"]]
       .filter(([, v]) => v != null).map(([n, v, k]) => [n + " " + net(v), k, 0]));
     /* where a change marker shows, name the poll it is measured against,
        as the All-polls expansion's note does */
@@ -379,7 +379,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
           <dl className="rd-pld-dl">
             {imp.length > 0 && <><dt>Two-party, implied</dt><dd>{imp}</dd></>}
             {pub.length > 0 && <><dt>As published</dt><dd>{pub}</dd></>}
-            {ppm && <><dt>Preferred prime minister</dt><dd>{ppm}</dd></>}
+            {ppm && <><dt>{window.JUR ? "Preferred " + window.JUR.office.alb : "Preferred prime minister"}</dt><dd>{ppm}</dd></>}
             {nets.length > 0 && <><dt>Net approval</dt><dd>{nets}</dd></>}
           </dl>
           {prev && <div className="rd-apd-sub rd-apd-note">Changes are on {r.pollster}’s {prev.field} poll.</div>}

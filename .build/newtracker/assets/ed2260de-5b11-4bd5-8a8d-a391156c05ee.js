@@ -65,6 +65,24 @@ window.useDismissOutside = function useDismissOutside(ref, open, onDismiss, igno
   }, [open]);
 };
 
+/* The page's jurisdiction (2026-10-05). The federal dataset carries none,
+   so every reader of it falls back to the federal page's own words; /vic/'s
+   dataset names its own (gen-data's `jur`, from .build/vic/to-main-schema.mjs):
+   brand, election words, office titles, the eras each slot's leaders held. */
+window.JUR = (window.AUSPOL && window.AUSPOL.jur) || null;
+/* The name a poll's leader figure carries. Federally it is the caller's own
+   word, passed in and returned unchanged; /vic/'s polls (and their approval
+   figures) carry who held each office on the poll's date - gen-data's
+   `who` - so a 2023 poll names Andrews and Pesutto, not Carroll and Wilson.
+   id: "alb" (the head of government), "taylor"/"ley"/"opp" (the opposition
+   leader), "hanson"/"han" (One Nation's) */
+window.apWho = function apWho(src, id, fed) {
+  const w = src && src.who;
+  if (!w) return fed;
+  const n = id === "alb" ? w.alb : id === "hanson" || id === "han" ? w.han : w.opp;
+  return n || fed;
+};
+
 window.AP = (function () {
   const D = window.AUSPOL;
 

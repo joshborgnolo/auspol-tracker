@@ -199,6 +199,15 @@ function buildDialStory(D) {
   if (O && O.b != null) { last.labO = O.a; last.oppO = O.b; last.live = true; }
   const lp = D.latest && D.latest.primary;
   if (last.live && lp) GP_IDS.forEach((id) => { if (lp[id] != null) last.vals[id] = +lp[id]; });
+  /* /vic/: a party its polls began reporting apart only long after the
+     election (One Nation, counted among others until 2026) has nothing to
+     carry in the months before - its bar sits empty there and reads "—",
+     rather than holding the election's 0.3 as if that had been polled */
+  if (window.JUR) GP_IDS.forEach((id) => {
+    const first = frames.findIndex((f, i) => i > 0 && f.vals[id] != null);
+    if (first > 1 && frames[first].x - frames[0].x > 0.5)
+      for (let i = 1; i < first; i++) { frames[i].vals[id] = 0; (frames[i].na || (frames[i].na = {}))[id] = true; }
+  });
   GP_IDS.forEach((id) => {          // carry a missing reading across from a neighbour
     let prev = null;
     frames.forEach((f) => { if (f.vals[id] == null) f.vals[id] = prev; else prev = f.vals[id]; });
@@ -254,7 +263,8 @@ function buildDialStory(D) {
     const oL = L(A.oppL, B.oppL), oO = L(A.oppO, B.oppO), on = oO != null && oO > oL;
     const lab = on ? L(A.labO, B.labO) : L(A.labL, B.labL), opp = on ? oO : oL;
     const order = GP_IDS.slice().sort((a, b) => vals[b] - vals[a]);
-    return { lab, opp, oppId: on ? "onp" : "lnp", margin: lab - opp, deg: gpDeg(lab - opp), vals, order, fe: k + e };
+    return { lab, opp, oppId: on ? "onp" : "lnp", margin: lab - opp, deg: gpDeg(lab - opp), vals, order, fe: k + e,
+             na: (e < 0.5 ? A.na : B.na) || null };
   };
 
   const perMonth = {};
@@ -877,7 +887,7 @@ function gpEngine(M, N, cb, opt) {
       const R = tip.r * G.k + 6 + Math.abs(sx) * box.w * 0.5 + Math.abs(cy) * box.h * 0.5;
       css(el, "transform", "translate(" + (G.pivX + sx * R - box.w / 2).toFixed(1) + "px," + (G.pivY + cy * R - box.h / 2).toFixed(1) + "px)");
       css(el, "opacity", lop.toFixed(3));
-      const txt = tg.vals[b.id].toFixed(1);
+      const txt = tg.na && tg.na[b.id] ? "—" : tg.vals[b.id].toFixed(1);
       if (el.__v !== txt) { el.__v = txt; el.lastChild.textContent = txt; }
     });
     // needle, bead, pivot

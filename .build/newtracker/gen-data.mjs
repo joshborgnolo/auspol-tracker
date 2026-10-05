@@ -14,7 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp, FLOW, FLOW_TABLE, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp } from "./flows.mjs";
+import { impliedAlp2pp as impliedAlp2ppFed, makeImpliedAlp2pp, FLOW as FLOW_FED, FLOW_TABLE as FLOW_TABLE_FED, FLOW_LEF, FLOW_ERAS, impliedLefAlp2pp } from "./flows.mjs";
 import { bonhamReplica } from "./bonham-replica.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -24,6 +24,19 @@ const ROOT = path.resolve(HERE, "..", "..");
    and GEN_DATA_OUT writes the two assets into another directory, so a replay
    never touches the shared working tree's files. Unset in every real build. */
 const D = JSON.parse(fs.readFileSync(process.env.GEN_DATA_POLLS || path.join(ROOT, "data", "polls.json"), "utf8"));
+
+/* ---- jurisdiction -------------------------------------------------------
+   The same pipeline builds /vic/ (2026-10-05): .build/vic/to-main-schema.mjs
+   maps the Victorian polls onto this file's dataset shape and adds
+   `jurisdiction` - the baseline election, the next one, the leader slots'
+   eras, the preference flows and the words the views use. Absent here, which
+   is the federal page: every value below then falls back to the federal one,
+   so the federal dataset this file writes is byte-identical with or without
+   this block. JUR is null federally; read it through the helpers. */
+const JUR = D.jurisdiction || null;
+const FLOW = JUR ? JUR.flows : FLOW_FED;
+const impliedAlp2pp = JUR ? makeImpliedAlp2pp(JUR.flows, JUR.flows.threeCorner || 0) : impliedAlp2ppFed;
+const FLOW_TABLE = JUR ? (JUR.flowsLabel || "the jurisdiction's flow table") : FLOW_TABLE_FED;
 
 /* ---- one house, one name ----------------------------------------------
    A pollster that changes its letterhead is still the same pollster. Left
@@ -206,7 +219,7 @@ const medianOf = (a) => {
 };
 const meanOf = (rows, f) => { const v = rows.map(f).filter((x) => x != null); return v.length ? mean(v) : null; };
 
-const ELECTION = ELECTIONS.e2025;                       // 3 May 2025 baseline
+const ELECTION = ELECTIONS[JUR ? JUR.baseline : "e2025"];   // 3 May 2025 baseline federally
 const LATEST_ISO = POLLS.reduce((m, p) => (p.date > m ? p.date : m), "0000");
 /* the instant every current figure is read at: the newest poll's fieldwork end */
 const refNow = new Date(LATEST_ISO).getTime();
@@ -318,7 +331,8 @@ const tppRows = POLLS.filter((p) => p.tpp_alp != null && !NO_AGG_HOUSES.has(p.po
    One aggregate predicate, hoisted, because every consumer of the implied
    series (the rows below, the flow-drift join) must agree on which waves
    have one. The per-poll DISPLAY rule is wider – see impShow below. */
-const impOk = (p) => p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote;
+const onpOk = (p) => p.onp != null || !!(JUR && JUR.onpOptional && (p.ind != null || p.oth != null));
+const impOk = (p) => p.alp != null && p.lnp != null && p.grn != null && onpOk(p) && !p.sumNote;
 /* Per-poll DISPLAY eligibility, wider than impOk (user calls 2026-10-03):
    a wave whose primaries miss 100 ONLY through a documented anomaly
    (sumNote – Essential's undecided-exclusive ind wave; YouGov's
@@ -332,7 +346,7 @@ const impOk = (p) => p.alp != null && p.lnp != null && p.grn != null && p.onp !=
 const PRIM_SUM_KEYS = ["alp", "lnp", "grn", "onp", "ind", "oth"];
 const primSum = (p) => PRIM_SUM_KEYS.reduce((a, k) => a + (p[k] || 0), 0);
 const impShow = (p) =>
-  p.alp != null && p.lnp != null && p.grn != null && p.onp != null
+  p.alp != null && p.lnp != null && p.grn != null && onpOk(p)
   && (!!p.sumNote || Math.abs(primSum(p) - 100) <= 2);
 /* The rebase behind impShow: a documented-anomaly set (the only kind that
    fails the ±2 check and still displays) is scaled onto the 100-pt base
@@ -352,7 +366,9 @@ const impShowRow = (p) => {
 const impFields = (p) => {
   if (!impShow(p)) return {};
   const q = impShowRow(p);
-  return { alpImp: r1(impliedAlp2pp(q)), alpOnImp: r1(impliedOn(q)) };
+  // the ALP-v-ON reading needs One Nation as a column of its own: folded into
+  // "others" (onpOptional waves), its voters would be read as preferencing
+  return { alpImp: r1(impliedAlp2pp(q)), ...(p.onp != null ? { alpOnImp: r1(impliedOn(q)) } : {}) };
 };
 /* The frozen flow table for the ALP-v-ON PAIRING, in ALP-shares, with the
    set's own ± range in FP_ON_BAND. No House count of an ALP-v-ON final
@@ -401,7 +417,7 @@ const tppRowsSynth = POLLS
    just the n-weighted mean of its rows' ranges, which §1d lifts directly –
    no ratio, no simulation. */
 const tppRowsSynthOn = POLLS
-  .filter((p) => impOk(p) && !NO_AGG_HOUSES.has(p.pollster))
+  .filter((p) => impOk(p) && p.onp != null && !NO_AGG_HOUSES.has(p.pollster))
   .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedOn(p),
                  bn: p.lnp * FP_ON_BAND.lnp + p.grn * FP_ON_BAND.grn
                      + ((p.ind || 0) + (p.oth || 0)) * FP_ON_BAND.oth,
@@ -533,7 +549,25 @@ const OPP_SPLICE_ISO = "2026-02-13";         // Taylor replaces Ley – a differ
 /* Which opposition-leader era a reading belongs to. Ley's last published
    reading is Resolve's 8–12 Feb 2026 poll; Taylor's first is 14 Feb – so the
    13th is the first Taylor-only day, and every date falls one side of it. */
-const eraOf = (iso) => (iso < OPP_SPLICE_ISO ? "ley" : "taylor");
+/* Another jurisdiction (JUR) names its own leaders in jurisdiction.eras, a
+   list per office. The slot keeps the federal page's keys – "taylor" the
+   opposition's holder now, "ley" everyone before – and the leadership views
+   split a key's line wherever its holder changes: /vic/'s Premier slot runs
+   Andrews → Allan → Carroll inside alb_*, so each monthly row names the
+   month's holders (alb_who, ley_who, hanson_who; leaderMonths). */
+const eraOf = JUR
+  ? (iso) => { const eras = JUR.eras.opp; return iso >= eras[eras.length - 1].from ? "taylor" : "ley"; }
+  : (iso) => (iso < OPP_SPLICE_ISO ? "ley" : "taylor");
+// who held an office on a date (JUR only) – "alb", "opp" or "han"
+const holderOf = (slot, iso) => { let n = null; for (const e of JUR.eras[slot]) if (iso >= e.from) n = e.name; return n; };
+// a reading is the office's CURRENT holder's: a current reading pools only
+// these, so Carroll's window never reaches back into Allan's polls (federally
+// Albanese and Hanson held theirs all term – every reading passes)
+const curOf = (slot) => (JUR ? (p) => p.date >= JUR.eras[slot][JUR.eras[slot].length - 1].from : () => true);
+// JUR: who held each office on a poll's date, stamped on the poll (and its
+// approval figures) so every view names the right people – /vic/'s Premier
+// was Andrews, Allan or Carroll depending on the poll
+const whoAt = (iso) => ({ alb: holderOf("alb", iso), opp: holderOf("opp", iso), han: holderOf("han", iso) });
 // sample-weighted, house-effect-adjusted monthly mean of a row set - the
 // plain-value twin of monthWithSe, so one construction carries both and no
 // series can drift onto its own weighting rule again
@@ -764,17 +798,20 @@ const aggPrimary = MONTHS.map((ym) => {
   let plainTotal = 0;
   for (const k of PRIMARY_KEYS) {
     const rs = primaryRows[k].filter((r) => r.ym === ym);
-    if (!rs.length) { o[k] = 0; continue; }
+    // a party no poll that month reported: /vic/'s One Nation before 2026,
+    // folded into others (null, never 0 – it was polled, just not apart);
+    // federally every month carries all five
+    if (!rs.length) { o[k] = JUR ? null : 0; continue; }
     const est = monthWithSe(primaryRows[k], primaryHE[k], ym);
     o[k] = est.v;
     o.ci[k] = r1(1.96 * est.se);
     plainTotal += mean(rs.map((r) => r.x));
   }
-  const adjTotal = PRIMARY_KEYS.reduce((s, k) => s + o[k], 0);
+  const adjTotal = PRIMARY_KEYS.reduce((s, k) => s + (o[k] ?? 0), 0);
   if (adjTotal > 0 && Math.abs(adjTotal - plainTotal) > 0.5) {
-    for (const k of PRIMARY_KEYS) o[k] *= plainTotal / adjTotal;
+    for (const k of PRIMARY_KEYS) if (o[k] != null) o[k] *= plainTotal / adjTotal;
   }
-  for (const k of PRIMARY_KEYS) o[k] = r1(o[k]);
+  for (const k of PRIMARY_KEYS) if (o[k] != null) o[k] = r1(o[k]);
   return o;
 }).filter(Boolean);
 aggPrimary.unshift({
@@ -1190,6 +1227,26 @@ const leaderMonths = MONTHS.map((ym) => {
     alb_fav: A.fav, ley_fav: OL.fav, taylor_fav: OT.fav, hanson_fav: H.fav,
     alb_netCi: A.netCi, ley_netCi: OL.netCi, taylor_netCi: OT.netCi, hanson_netCi: H.netCi,
     alb_favCi: A.favCi, ley_favCi: OL.favCi, taylor_favCi: OT.favCi, hanson_favCi: H.favCi,
+    /* JUR: the month's holder of each multi-holder key, read off its
+       readings' dates. A month whose readings straddle a change would
+       average two people into one figure, so it is flagged here (none
+       does yet: every change fell between two months' polls) */
+    ...(JUR ? (() => {
+      const o = {};
+      const name = (slot, dates) => {
+        const ns = [...new Set(dates.map((d) => holderOf(slot, d)).filter(Boolean))];
+        if (ns.length > 1) console.warn(`  leadership ${ym}: the ${slot} readings straddle ${ns.join(" → ")} – the month averages both`);
+        return ns.length ? ns[ns.length - 1] : null;
+      };
+      const albD = pp.concat(ppH).map((p) => p.date).concat(rows.filter((p) => p.alb != null).map((p) => p.date));
+      const leyD = pp2L.concat(pp3L).filter((p) => p.opp != null).map((p) => p.date)
+        .concat(rows.filter((p) => p.opp != null && eraOf(p.date) === "ley").map((p) => p.date));
+      const hanD = pp3.concat(ppH).map((p) => p.date).concat(rows.filter((p) => p.han != null).map((p) => p.date));
+      if (albD.length) o.alb_who = name("alb", albD);
+      if (leyD.length) o.ley_who = name("opp", leyD);
+      if (hanD.length) o.hanson_who = name("han", hanD);
+      return o;
+    })() : {}),
   };
 }).filter(Boolean);
 
@@ -1209,7 +1266,7 @@ const leaderNow = (() => {
   const out = {};
   const put = (key, r) => { if (r) out[key] = { ...r, v: r1n(r.v), prev: r.prev != null ? r1n(r.prev) : null }; };
   const taylorEra = (p) => eraOf(p.date) === "taylor";
-  for (const [prop, lk, id, pool] of [["alb", "alb", "alb", apprAgg], ["opp", "opp", "taylor", apprAgg.filter(taylorEra)], ["han", "han", "hanson", apprAgg]]) {
+  for (const [prop, lk, id, pool] of [["alb", "alb", "alb", apprAgg.filter(curOf("alb"))], ["opp", "opp", "taylor", apprAgg.filter(taylorEra)], ["han", "han", "hanson", apprAgg.filter(curOf("han"))]]) {
     for (const metric of ["net", "fav"]) {
       const rows = [];
       for (const p of pool) {
@@ -1224,17 +1281,23 @@ const leaderNow = (() => {
       // every three weeks; favourability, and Hanson's approval, by two or so
       // (Apr–Sep 2026: a single house in the three weeks before 40 of 176
       // days), so those read the six-week window
-      put(id + "_" + metric, currentReading(rows, apprHE[lk], metric === "net" && id !== "hanson" ? HEADLINE_K : SPARSE_K));
+      // (/vic/'s pollsters ask every leader measure only now and then, so
+      // all of them read the six-week window there)
+      put(id + "_" + metric, currentReading(rows, apprHE[lk], metric === "net" && id !== "hanson" && !JUR ? HEADLINE_K : SPARSE_K));
     }
   }
   const ppRows = (pool, f) => pool.map((p) => ({ firm: p.firm, mid: midMs({ date: p.date }), x: f(p), n: ppmN(p) }))
     .filter((r) => r.x != null);
   const pp2 = ppm.filter((p) => p.han == null), pp3 = ppm.filter((p) => p.han != null);
+  // a contest is its current PAIRING's: both sides from polls under the
+  // sitting holders (curOf passes every federal reading)
+  const cur2 = pp2.filter(curOf("alb")), cur3 = pp3.filter(curOf("alb")).filter(curOf("han"));
+  const curH = D.ppmHeadToHead.filter(curOf("alb")).filter(curOf("han"));
   const sets = {
-    alb_pref: ppRows(pp2, (p) => p.alb), taylor_pref: ppRows(pp2.filter(taylorEra), (p) => p.opp),
-    alb_pref3: ppRows(pp3, (p) => p.alb), taylor_pref3: ppRows(pp3.filter(taylorEra), (p) => p.opp),
-    hanson_pref3: ppRows(pp3, (p) => p.han),
-    alb_prefH: ppRows(D.ppmHeadToHead, (r) => r.alb), hanson_prefH: ppRows(D.ppmHeadToHead, (r) => r.han),
+    alb_pref: ppRows(cur2, (p) => p.alb), taylor_pref: ppRows(cur2.filter(taylorEra), (p) => p.opp),
+    alb_pref3: ppRows(cur3, (p) => p.alb), taylor_pref3: ppRows(cur3.filter(taylorEra), (p) => p.opp),
+    hanson_pref3: ppRows(cur3, (p) => p.han),
+    alb_prefH: ppRows(curH, (r) => r.alb), hanson_prefH: ppRows(curH, (r) => r.han),
   };
   for (const [key, rows] of Object.entries(sets)) put(key, currentReading(rows, null, SPARSE_K));
   return out;
@@ -1245,7 +1308,7 @@ const leaderNow = (() => {
    Taylor's era; sample-weighted, never house-adjusted, the six-week window,
    as the preferred-PM readings are. A margin is a difference of two shares,
    so it carries a net's sampling variance. */
-const ppmMarginNow = currentReading(ppm.filter((p) => p.alb != null && p.opp != null && eraOf(p.date) === "taylor")
+const ppmMarginNow = currentReading(ppm.filter((p) => p.alb != null && p.opp != null && eraOf(p.date) === "taylor" && curOf("alb")(p))
   .map((p) => ({ firm: p.firm, mid: midMs({ date: p.date }), x: p.alb - p.opp, n: ppmN(p),
                  pq: Math.max(0, 100 * (p.alb + p.opp) - (p.alb - p.opp) ** 2) })), null, SPARSE_K);
 /* Albanese-over-Hanson preferred-PM margin now, for the sitting term's
@@ -1518,10 +1581,12 @@ const directionOnlyPolls = DIR
    join classes fails the build here. ISSUES_FILE is hoisted out of §7h,
    which pools the same file. */
 const ISSUES_FILE = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "issues.json"), "utf8")); }
   catch { return null; }
 })();
 const SEC_ISSUES_FILE = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "sec-issues.json"), "utf8")); }
   catch { return null; }
 })();
@@ -1655,7 +1720,9 @@ const directionNow = (() => {
 })();
 
 /* ---- per-poll leadership / alt builders -------------------------------- */
-const oppKey = (name) => (name === "Ley" ? "ley" : "taylor");
+const oppKey = JUR
+  ? (name) => (name === JUR.eras.opp[JUR.eras.opp.length - 1].name ? "taylor" : "ley")   // see eraOf
+  : (name) => (name === "Ley" ? "ley" : "taylor");
 function buildPpm(date, firm) {
   const k = date + "|" + firm, p = PPM_BY.get(k);
   if (!p) return {};
@@ -1679,7 +1746,7 @@ function buildPpm(date, firm) {
 }
 function buildAppr(date, firm) {
   const a = APPR_BY.get(date + "|" + firm);
-  if (!a) return { alb: null, taylor: null, hanson: null, albNet: null, taylorNet: null, hansonNet: null, oppName: null, metric: null };
+  if (!a) return { alb: null, taylor: null, hanson: null, albNet: null, taylorNet: null, hansonNet: null, oppName: null, metric: null, ...(JUR ? { who: whoAt(date) } : {}) };
   const sp = a.splits || {};
   // the SECOND measure, where a firm published both for the same leader. Skipped
   // when favourability is already that leader's primary metric at this firm, so
@@ -1701,6 +1768,7 @@ function buildAppr(date, firm) {
     // per-leader metric – a poll can be approval for some, favourability for others
     metricBy: { alb: metricOf(firm, "alb", date), taylor: metricOf(firm, "opp", date), hanson: metricOf(firm, "han", date) },
     ...(anyAlt ? { alt } : {}),
+    ...(JUR ? { who: whoAt(date) } : {}),
   };
 }
 function buildAlt(date, firm) {
@@ -1982,6 +2050,7 @@ const firmness = firmWaves.length >= FIRM_POOL ? (() => {
    - DemosAU's table stores only segments that round above zero, so a group
      row with no One Nation cell is a 0. */
 const VOTE_SWITCHING = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-switching.json"), "utf8")); }
   catch { return null; }
 })();
@@ -2146,6 +2215,7 @@ const onSources = onSourceWaves.length ? {
    wave, as published. The figures built from them are §7g: they anchor on
    the current primaries (§7e), so they are assembled after those. */
 const DEMOGRAPHICS = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "demographics.json"), "utf8")); }
   catch { return null; }
 })();
@@ -2259,6 +2329,7 @@ const individualPolls = POLLS.map((p) => {
     ...impFields(p),
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
+    ...(JUR ? { who: whoAt(p.date) } : {}),
     // link back to the published release/report this row came from (the
     // citation Wikipedia carries for it). Omitted where no source is cited,
     // so the views can fall back to plain text.
@@ -2323,6 +2394,7 @@ const individualPolls = POLLS.map((p) => {
    itself draws; the view adds the credit
    and the links. */
 const readDataJson = (name) => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", name), "utf8")); }
   catch { return null; }
 };
@@ -2479,6 +2551,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     alp2pp: p.tpp_alp ?? null, lnp2pp: p.tpp_lnp ?? null,
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
+    ...(JUR ? { who: whoAt(p.date) } : {}),
     ...(p.url ? { url: p.url } : {}),
     // the pollster's own release page when `url` cites something else (same
     // rule as the archive emitter above — RedBridge/Accent AFR citations,
@@ -3558,7 +3631,11 @@ const latest = {
   /* the primary-vote facet's column order in the poll tables – highest
      aggregate leftmost, an overtake only once a full point clears */
   primaryOrder,
-  nextElectionDue: "By 20 May 2028", pollsTracked: individualPolls.length, housesTracked: houses.size,
+  /* the masthead's "Next election" fact: the federal term's latest legal
+     date, or another jurisdiction's own (Victoria's is fixed by law) */
+  nextElectionDue: JUR ? JUR.nextElection.label : "By 20 May 2028",
+  ...(JUR ? { nextElectionISO: JUR.nextElection.date, nextElectionFixed: !!JUR.nextElection.fixed } : {}),
+  pollsTracked: individualPolls.length, housesTracked: houses.size,
   /* deff rides in the payload so the page's discord engine reads the SAME
      constant the node estimator used (it lives in an untransformed asset and
      used to mirror 1.6 by hand, free to drift). */
@@ -3705,7 +3782,21 @@ function cycleSeries(points, base, cap = 36) {
   return { months: idxs, vals: idxs.map((i) => (i < firstKnown ? null : r1(filled[i]))),
            obs: idxs.map((i) => i >= firstKnown && i in known) };
 }
-const CYC_META = [
+/* Another jurisdiction carries only its sitting term until its own past
+   terms are gathered (the /vic/ Past cycles tab is a follow-up): the term
+   started by the baseline election, with each office's handovers as the
+   splices the federal rows carry. */
+function jurCycles() {
+  const year = Number(ELECTION.date.slice(0, 4));
+  const spl = (eras) => (eras.length > 1
+    ? { isos: eras.slice(1).map((e) => e.from), names: eras.map((e) => e.name) } : null);
+  const pmE = JUR.eras.alb, opE = JUR.eras.opp;
+  const pmSpl = spl(pmE), oppSpl = spl(opE);
+  return [{ year, gov: "alp", opp: "lnp", pm: pmE.map((e) => e.name).join(" → "), lead: pmE[pmE.length - 1].name,
+    oppLead: opE.map((e) => e.name).join(" → "), current: true, eDate: ELECTION.date,
+    ...(pmSpl ? { pmSpl } : {}), ...(oppSpl ? { oppSpl } : {}) }];
+}
+const CYC_META = JUR ? jurCycles() : [
   /* Pre-1987 rows ship against the aeforecasts F2F Morgan import: their 2PP
      series is the IMPLIED last-election-flows figure (FLOW_ERAS in flows.mjs,
      tppEra-tagged rows), not anything Morgan itself published — the method
@@ -4672,6 +4763,7 @@ const cycleSource = {};
    say how thick its newspaper record is; missing files (no local harvest)
    leave no key and the panel shows nothing. */
 const troveByTerm = (() => {
+  if (JUR) return null;   // federal newspaper record – absent for another jurisdiction
   try {
     const monFile = path.join(ROOT, "data", "trove-mentions-monthly.csv");
     if (!fs.existsSync(monFile)) return null;
@@ -4727,9 +4819,9 @@ for (const c of CYC_META) {
 }
 
 /* ---- emit the dataset asset -------------------------------------------- */
-const out = `/* auspol tracker – REAL Australian federal polling data.
-   Generated from data/polls.json by .build/newtracker/gen-data.mjs – do
-   not edit by hand.  Spine: 2025 federal election (3 May 2025) → ${latest.updated}.
+const out = `/* auspol tracker – REAL Australian ${JUR ? JUR.adj + " state" : "federal"} polling data.
+   Generated from ${JUR ? "data/vic-polls.json (via .build/vic/to-main-schema.mjs)" : "data/polls.json"} by .build/newtracker/gen-data.mjs – do
+   not edit by hand.  Spine: ${JUR ? ELECTION.date.slice(0, 4) + " " + JUR.adj + " election (" + ELECTION.date + ")" : "2025 federal election (3 May 2025)"} → ${latest.updated}.
    2PP aggregate: sample- & recency-weighted, house-effect-adjusted mean;
    every monthly estimate deflates a house's repeat waves in the month to
    the square root of their number, the same rule the nowcast window applies.
@@ -4752,11 +4844,13 @@ window.AUSPOL = (function () {
   const monthName = (m) => MN[m - 1];
   const monthNameFull = (m) => MNF[m - 1];
 
-  const LEADERS = [
+  const LEADERS = ${JUR ? JSON.stringify([
+    ["alb", "alb", "ALP", "var(--alp)"], ["taylor", "opp", "L/NP", "var(--lnp)"], ["hanson", "han", "ON", "var(--onp)"],
+  ].map(([id, slot, party, color]) => { const e = JUR.eras[slot][JUR.eras[slot].length - 1]; return { id, name: e.name, short: e.name, party, color }; })) : `[
     { id: "alb", name: "Albanese", short: "Albanese", party: "ALP", color: "var(--alp)" },
     { id: "taylor", name: "Taylor", short: "Taylor", party: "L/NP", color: "var(--lnp)" },
     { id: "hanson", name: "Hanson", short: "Hanson", party: "ON", color: "var(--onp)" },
-  ];
+  ]`};
 
   const agg2pp = ${JSON.stringify(agg2pp)};
   const aggPrimary = ${JSON.stringify(aggPrimary)};
@@ -4987,7 +5081,9 @@ window.AUSPOL = (function () {
     get cycleSource() { return _cycleSource || {}; },
     loadCycleSource,
     pollCadence,
-    domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },
+    domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },${JUR ? `
+    // the jurisdiction this page covers (absent on the federal page)
+    jur: ${JSON.stringify(JUR)},` : ""}
   };
 })();
 `;

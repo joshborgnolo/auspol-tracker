@@ -347,6 +347,13 @@ function Header({ isDark, onToggleTheme, rd }) {
                      "eighteen","nineteen","twenty"];
   const pastTerms = D.cycles.filter((c) => !c.current).length;
   const pastWord = TAGLINE_N[pastTerms] || String(pastTerms);
+  /* /vic/'s words (window.JUR): "vicpol", "Victorian state". Each line the
+     satellites' shell lifts from this source (site-shell.mjs parseChrome)
+     keeps its federal JSX verbatim; the jurisdiction's variant writes its
+     class as an expression (className={"wm-name"}), the same DOM, which the
+     parser's literal anchors never match - so a moved federal anchor still
+     fails loudly instead of lifting /vic/'s words onto the satellites. */
+  const J = window.JUR;
   /* The redesign's status block names the newest poll by its pollster and
      fieldwork, so the masthead and the sections' "to 21 Sep" agree; the
      election line counts the months left before it must be held. */
@@ -366,6 +373,12 @@ function Header({ isDark, onToggleTheme, rd }) {
     if (!m) return null;
     const t = Date.parse(m[1] + " " + m[2] + " " + m[3] + " UTC");
     if (isNaN(t)) return null;
+    /* a fixed-date election (Victoria's last Saturday in November) counts
+       the days to it; the federal one, a deadline, the months before it */
+    if (J && J.nextElection && J.nextElection.fixed) {
+      const days = Math.round((t - easternNow().day) / 86400000);
+      return days > 1 ? "in " + days + " days" : days === 1 ? "tomorrow" : days === 0 ? "today" : null;
+    }
     const months = Math.round((t - easternNow().day) / (86400000 * 30.44));
     return months > 1 ? months + " months at most" : null;
   })();
@@ -376,11 +389,13 @@ function Header({ isDark, onToggleTheme, rd }) {
         <div className="lockup">
           <h1 className="wordmark stacked">
             <span className="wm-textcol">
-              <span className="wm-name" ref={wmName}>auspol</span>
+              {!J ? <span className="wm-name" ref={wmName}>auspol</span>
+                  : <span className={"wm-name"} ref={wmName}>{J.brand}</span>}
               <span className="sr-only"> </span>
               <span className="wm-track" ref={wmTrack}>tracker</span>
             </span>
-            <span className="wm-sr">– Australian federal polling</span>
+            {!J ? <span className="wm-sr">– Australian federal polling</span>
+                : <span className={"wm-sr"}>– {J.electionWords} polling</span>}
           </h1>
           {/* The story player is wired to the DIAL alone - the wordmark
               carries no click. With the words out of the button the old
@@ -404,7 +419,8 @@ function Header({ isDark, onToggleTheme, rd }) {
         {/* plain text: the design flip this sentence used to carry moved
             off the page 2026-10-03; the old design is viewable at
             ?design=old while its code ships (see the design flag below). */}
-        <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the last {pastWord}.</p>
+        {!J ? <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the last {pastWord}.</p>
+            : <p className={"tagline"}>Aggregated opinion polling for the next {J.electionWords.split(" ")[0]} <br className="tagline-br"></br>{J.electionWords.split(" ").slice(1).join(" ")} election{pastTerms ? ", set against the last " + pastWord : ""}.</p>}
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot fresh-toggle " + fresh.state}
                 onClick={() => setStaticView(true)}></span>{" "}
@@ -1820,6 +1836,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
    column each belongs in; the copy is unchanged word for word, which matters
    because it is a two-homes pair (the ss-note in build.mjs is the other). */
 function MethodNote({ onInfo }) {
+  const J = window.JUR;
   return (
     <footer className="method">
       <div className="colophon">
@@ -1828,9 +1845,15 @@ function MethodNote({ onInfo }) {
             statement over its own quieter footnote, which is why they balance
             at four lines apiece without either being padded to fit. */}
         <div className="colo-about" data-nosnippet="">
+          {!J ? (
           <p className="colo-lede">
             auspol tracker is an unofficial aggregator of published federal opinion polling.
           </p>
+          ) : (
+          <p className={"colo-lede"}>
+            {J.brand} tracker is an unofficial aggregator of published {J.electionWords} opinion polling.
+          </p>
+          )}
           <p className="disclaimer">
             Best efforts are made to make the aggregate figures transparent, trustworthy,
             statistically sound, and informative, but they are, in the end, estimates only.
@@ -1852,6 +1875,7 @@ function MethodNote({ onInfo }) {
             Spot an error, a missing poll, or have any other feedback? Please{" "}
             <a className="fb-link" href="/feedback/">let me know</a>.
           </p>
+          {!J ? (
           <p className="colo-arch">
             Federal polling archives I’ve located are stored{" "}
             <a className="colo-link" href="/archives/newspoll/">
@@ -1859,6 +1883,13 @@ function MethodNote({ onInfo }) {
             </a>{" "}
             for safekeeping and convenience.
           </p>
+          ) : (
+            /* /vic/ has no archives of its own; its way out is home */
+            <p className={"colo-arch"}>
+              Federal polling is tracked on{" "}
+              <a className="colo-link" href="/">auspol tracker</a>.
+            </p>
+          )}
           <p className="colo-arch">
             <button type="button" className="hi-term colo-plain"
                     onClick={() => window.AP.openStatic && window.AP.openStatic()}>Read this page as plain text</button>
@@ -1898,6 +1929,9 @@ const TABS = [
   { id: "info", label: "Info", pinHide: true,
     tip: "About this site – how it works, what it tracks, and the terms it uses" },
 ];
+/* a page with no past terms in its cycle data (/vic/, until its earlier
+   terms' polls are gathered) has no Past cycles tab */
+if (!window.AUSPOL.cycles.some((c) => !c.current)) TABS.splice(TABS.findIndex((t) => t.id === "cycles"), 1);
 const TAB_IDS = TABS.map((t) => t.id);
 
 /* The sections that take nothing from the two-party switches, kept from
@@ -2023,13 +2057,14 @@ class RootBoundary extends React.Component {
    in here; rd.css does the chiclet chrome. ⌥ is Alt on non-Apple
    keyboards, said once beside the one shortcut that needs it. */
 const KBD_ROWS = [
-  { keys: ["←", "→"], what: "Turn between Now, All polls, Past cycles and Info" },
+  /* /vic/ has no Past cycles (TABS above) and no demographics view */
+  { keys: ["←", "→"], what: window.JUR ? "Turn between Now, All polls and Info" : "Turn between Now, All polls, Past cycles and Info" },
   { keys: ["⌥", "D"], what: "Dark mode, on or off — ⌥ is Alt on a PC" },
   { keys: ["C"], what: "Copy the chart or poll breakdown under the pointer as an image" },
   { keys: ["←", "→"], what: "Walk a card's tabs or chips while the pointer is over it" },
   { keys: ["1–9"], what: "Pick a numbered party or term on a chips row" },
-  { keys: ["1–5"], what: "In the all-polls demographics view, pick the Split by group" },
-  { keys: ["Space"], what: "Flip the matchup in the two-party views; step the all-polls demographics split" },
+  ...(window.JUR ? [] : [{ keys: ["1–5"], what: "In the all-polls demographics view, pick the Split by group" }]),
+  { keys: ["Space"], what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; step the all-polls demographics split" },
   { keys: ["P"], what: "In the all-polls two-party table, published figures only" },
   { keys: ["?"], what: "This sheet" },
 ];
@@ -2073,7 +2108,8 @@ function App() {
     try { const q = new URLSearchParams(window.location.search).get("design"); return q === "old" || q === "new" ? q : null; }
     catch (_) { return null; }
   })();
-  const rd = qDesign !== "old";
+  /* /vic/ was built on the redesign alone: no ?design=old there */
+  const rd = qDesign !== "old" || !!window.JUR;
   window.AP.rd = rd;
   /* The class first goes on in the boot script before render() is called
      (children's layout effects would otherwise measure the pre-rd,
@@ -2741,7 +2777,7 @@ if (staticSummary) {
 try {
   document.body.classList.toggle(
     "rd",
-    new URLSearchParams(window.location.search).get("design") !== "old"
+    new URLSearchParams(window.location.search).get("design") !== "old" || !!window.JUR
   );
 } catch (_) {
   document.body.classList.add("rd");

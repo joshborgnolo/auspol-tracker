@@ -125,7 +125,7 @@ function RdHero(p) {
       {m.a.name} {moved ? <>{rdArrow(monthDelta)} <RollNum value={Math.abs(monthDelta).toFixed(1)} /> on a month ago</> : "unchanged on a month ago"}
       {moved && sig === false && <>, within the <RdTerm id="margin-of-error" from="two-party preferred">margin</RdTerm></>}
       {moved && sig === true && <>, a significant {monthDelta > 0 ? "rise" : "fall"}</>}
-      {leadSwing != null && Math.abs(leadSwing) >= 0.05 && <>, {rdArrow(leadSwing)} {Math.abs(leadSwing).toFixed(1)} since the 2025 election</>}
+      {leadSwing != null && Math.abs(leadSwing) >= 0.05 && <>, {rdArrow(leadSwing)} {Math.abs(leadSwing).toFixed(1)} since the {rdElecYear} election</>}
     </>
   );
   const hasBases = (matchup === "alp_lnp" && impOffered) || (matchup === "alp_on" && impOnOffered);
@@ -153,8 +153,12 @@ function RdHero(p) {
     : !onImp
       ? "The pollsters’ own two-party figures, from where their respondents say their preferences would go, weighted towards the most recent and adjusted for each pollster’s lean. The ± is the 95% margin."
       : matchup === "alp_on"
-        ? "Each poll’s primary votes, run through preference flows taken from counted ballots. No federal election has counted Labor against One Nation, so for that pairing the site builds the flows itself, and the ± is the doubt about them."
-        : "Each poll’s primary votes, run through the preference flows counted at the 2025 election. The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error.";
+        ? (window.JUR
+            ? "Each poll’s primary votes, run through preference flows taken from counted ballots. No " + window.JUR.adj + " election has counted Labor against One Nation, so for that pairing the site borrows the flows it builds for the federal page, and the ± is the doubt about them."
+            : "Each poll’s primary votes, run through preference flows taken from counted ballots. No federal election has counted Labor against One Nation, so for that pairing the site builds the flows itself, and the ± is the doubt about them.")
+        : window.JUR
+          ? "Each poll’s primary votes, run through the preference flows counted at the " + rdElecYear + " election (One Nation’s, too few then to measure, from the 2025 federal count). The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error."
+          : "Each poll’s primary votes, run through the preference flows counted at the 2025 election. The ± is the 95% margin: how far the polls in the window disagree, plus their sampling error.";
   const qPanel = (
     <RdQPop label="How this is counted, and the pollsters’ published figures" align="left">
       <h4>How this is counted</h4>
@@ -212,6 +216,9 @@ function RdHero(p) {
   const cmpName = onImp ? "As published" : "Implied";
   const cmpBox = onImp ? "Compare published 2PP" : "Compare implied 2PP";
   const sensOn = cmpOn && matchup === "alp_lnp" && D.flowSens && D.flowSens.length > 1;
+  /* the band re-prices One Nation's flow at the 2022 FEDERAL table's; /vic/'s
+     own 2022 election is a different count, so it says which */
+  const sensLabel = "Range if One Nation preferences flowed as " + (window.JUR ? "at the 2022 federal election" : "in 2022");
 
   /* the outside-aggregate overlay, offered on the Coalition and One
      Nation contests - the two where a comparator publishes the matchup.
@@ -314,11 +321,11 @@ function RdHero(p) {
   const scatterMove = !split ? [] : split.travel.map(([a, b]) => ({
     x: a.x, y: a.y + (b.y - a.y) * t, color: mixC(a.color, b.color, t), label: b.label, meta: b.meta }));
 
-  /* the 2025 result, a count rather than a poll: the Coalition contest's first
+  /* the last election's result, a count rather than a poll: the Coalition contest's first
      point, rung in that contest line's colour as the primary chart's rings are */
   const elec = D.agg2pp.find((d) => d.election);
   const ringOn = elec && (shown === "alp_lnp" || otherOf(shown) === "alp_lnp");
-  const marks = ringOn ? [{ x: elec.x, y: elec.alp, color: M.alp_lnp.b.color, label: narrow ? null : "2025 election: " + elec.alp.toFixed(1) }] : [];
+  const marks = ringOn ? [{ x: elec.x, y: elec.alp, color: M.alp_lnp.b.color, label: narrow ? null : rdElecYear + " election: " + elec.alp.toFixed(1) }] : [];
 
   /* the window fits everything drawn, both contests, their dots and interval */
   const domainOf = (id, b) => kept("d" + id + b + ringOn, () => {
@@ -450,8 +457,8 @@ function RdHero(p) {
     extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBt, href: extBtHref } : null,
     extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: lblExtKb, href: extKbHref } : null,
     extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: lblExtSh, href: extKbHref } : null,
-    sensOn ? { kind: "band", color: "var(--lnp)", label: "Range if One Nation preferences flowed as in 2022" } : null,
-    ringOn ? { kind: "ring", label: narrow ? "2025 election" : "2025 election result" } : null,
+    sensOn ? { kind: "band", color: "var(--lnp)", label: sensLabel } : null,
+    ringOn ? { kind: "ring", label: narrow ? rdElecYear + " election" : rdElecYear + " election result" } : null,
   ];
   /* The copy's key, worded as a laptop words it whatever the screen: the
      image is laid out wide, and a phone's lines carry no names at their
@@ -466,8 +473,8 @@ function RdHero(p) {
     extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBt } : null,
     extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: lblExtKb } : null,
     extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: lblExtSh } : null,
-    sensOn ? { kind: "shade", color: "var(--lnp)", label: "Range if One Nation preferences flowed as in 2022" } : null,
-    ringOn && narrow ? { kind: "ring", color: "var(--ink)", label: "2025 election result" } : null,
+    sensOn ? { kind: "shade", color: "var(--lnp)", label: sensLabel } : null,
+    ringOn && narrow ? { kind: "ring", color: "var(--ink)", label: rdElecYear + " election result" } : null,
   ].filter(Boolean);
 
   const tooltipTitle = (i) => { const d = spine[i] || spine[spine.length - 1]; return d && d.ym ? monthLabelFull(d.ym) : ""; };
@@ -491,9 +498,9 @@ function RdHero(p) {
   const snapNav = [
     ["latest-polls", "Latest and next polls"],
     ["leadership", "Leadership"],
-    ["who-votes", "Who votes for whom"],
-    ["issues", "The issues"],
-  ];
+    D.demographics ? ["who-votes", "Who votes for whom"] : null,   // /vic/ has neither
+    D.issues ? ["issues", "The issues"] : null,
+  ].filter(Boolean);
   const snapGo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
 
   /* a sideways swipe on the chart flips the 2PP contest, wrapping round the

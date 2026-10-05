@@ -7356,6 +7356,305 @@ function infoTerms(D) {
       {" "}<a className="fb-link" href="/archives/newspoll/">here</a> for safekeeping.</p>
     </>
   );
+  /* /vic/ (window.JUR): the same Info tab in Victoria's words. The method
+     entries that hold for any electorate are the federal page's own; the
+     questions and sections that name the federal election, its flows, its
+     archives, or sections /vic/ doesn't have are written for Victoria
+     here. Every id the page's links open is kept. */
+  if (window.JUR) {
+    const J = window.JUR;
+    const eYear = ((D.cycles || []).find((c) => c.current) || {}).eDate || "2022";
+    const eY = eYear.slice(0, 4), eMonth = D.monthNameFull(Number(eYear.slice(5, 7)) || 11);
+    const pct = (v) => (100 * v).toFixed(1) + "%";
+    const FL = J.flows;
+    const names = (slot) => J.eras[slot].map((e) => e.name);
+    const onFirst = (() => {
+      const base = (D.aggPrimary || []).find((d) => d.election);
+      const f = (D.aggPrimary || []).find((d) => !d.election && d.onp != null);
+      return base && f && f.x - base.x > 0.5 ? D.monthNameFull(Number(f.ym.slice(5))) + " " + f.ym.slice(0, 4) : null;
+    })();
+    const topHouses = Object.keys(houseCounts).sort((a, b) => houseCounts[b] - houseCounts[a]).slice(0, 3);
+    const keepMethod = new Set(["house-effect", "monthly-average", "interval", "margin-of-error", "effective-sample", "significance"]);
+    const keepAll = new Set(["poll-lean", "aggregate-effect", "mrp", "poll-disagreement", "house-lean"]);
+    const fedAll = (sections.find((s) => s.id === "s-allpolls") || { entries: [] }).entries;
+    const vFaqs = [
+      faqs.find((f) => f.id === "what-am-i-looking-at"),
+      { id: "where-does-data-come-from", q: "Where do the numbers come from?", a: (
+        <>From the pollsters: every Victorian voting-intention poll published since the {eMonth}
+        {" "}{eY} election, from these {Object.keys(houseCounts).length} houses, most polls first:
+        {" "}{sources}. A pollster’s MRP or SMS polls count under its own name. All polls files each
+        one with its fieldwork dates, sample size, a link to the release and, where one exists, its
+        {" "}{xref("apc-statement", "where does data come from", "APC statement")}.</>) },
+      faqs.find((f) => f.id === "headline-how"),
+      { id: "how-wrong-are-the-polls", q: "How accurate are the polls?", a: (
+        <>The {xref("interval", "how accurate are the polls", "95% interval")} says how far chance
+        alone could put a figure off: ±{hl.ci.toFixed(1)} points on each party’s share for Labor
+        against the Coalition today. Unfortunately, no aggregate can see an error every pollster
+        shares, which is why the interval never claims to cover it.</>) },
+      { id: "is-this-a-forecast", q: "Is it a forecast? What would it mean in seats?", a: (
+        <>No to both. Everything here describes where opinion stands now, from polls already
+        published, and final polls have missed past results. Turning a statewide figure into seats
+        would assume the swing is the same everywhere. With One Nation near {onp}% of the primary
+        vote, that fails in exactly the seats that would decide the election: a large minor party
+        wins where its vote is concentrated, and a statewide figure can’t see where that is. Where a
+        pollster modelled seats one by one, its poll carries the {xref("mrp", "is it a forecast", "MRP")}
+        {" "}tag in All polls.</>) },
+      faqs.find((f) => f.id === "why-2pp-headline"),
+      faqs.find((f) => f.id === "newest-poll-not-headline"),
+    ].filter(Boolean);
+    const vMethod = [
+      { id: "weighted-aggregate", term: "Weighted aggregate", body: (
+        <>How the headline and every other current figure are built. It averages the recent polls,
+        giving more weight to newer and larger ones, after removing each pollster’s
+        {" "}{xref("house-effect", "weighted aggregate", "house effect")}.
+        <span className="info-p"><b>Recency.</b> A poll’s weight halves every seven days, and it
+        fades out over its third week, leaving the window on day 21. So the figure can move on a day
+        with no new poll, as newer polls take over from older ones.</span>
+        <span className="info-p"><b>Size.</b> Larger samples count for more. Where a pollster
+        publishes an {xref("effective-sample", "weighted aggregate", "effective sample")}, that figure
+        is used. Otherwise the raw sample is discounted by 1.6, roughly what weighting costs the
+        pollsters that do publish, and capped at 3,000.</span>
+        <span className="info-p"><b>Repeat polls.</b> A pollster with several polls in the window
+        counts for the square root of their number, so three polls from one pollster count as 1.7,
+        not 3.</span>
+        <span className="info-p"><b>One exclusion.</b> Roy Morgan’s Victorian polls are all SMS
+        polls. They stay in the archive but count towards no aggregate: SMS polls have a strong
+        selection bias.</span>
+        <span className="info-p"><b>Sparse measures.</b> Victorian pollsters ask about the leaders
+        only now and then, so every leader rating and preferred {J.office.alb} use a six-week
+        window. There a poll’s weight halves every 14 days.</span>
+        <span className="info-p"><b>Monthly lines.</b> Each chart’s line uses the same method
+        without the recency weighting: one point per calendar month, from that month’s polls. A few
+        measures depart from all this, and their sections say how.</span>
+        {working(<>
+          <span className="info-p">The headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window,
+          where xᵢ is a poll’s figure minus its house effect and wᵢ = nᵢ × 2^(−d/7) × t(d) ÷ √m.</span>
+          <span className="info-p"><b>nᵢ</b> is the poll’s sample: its published effective sample
+          × 1.6 (the design factor) where the pollster publishes one, otherwise its raw sample capped
+          at 3,000, or 1,200 if no sample is given. <b>d</b> is the poll’s age in days, counted from
+          its fieldwork midpoint. <b>t(d)</b> is 1 up to day 14, then a half-cosine taper to 0 at day
+          21. <b>m</b> is the number of polls that pollster has in the window. The window’s effective
+          sample is (Σwᵢ)² ÷ Σwᵢ². If the window is empty, the last monthly point stands in. The
+          six-week window doubles every timescale: half-life 14 days, taper from day 28 to day
+          42.</span>
+          <span className="info-p"><b>Worked example: the Labor primary.</b> Each party’s primary
+          is estimated the same way. The five are rescaled only if their total sits more than half
+          a point from the plain-average total, so a real shortfall from undecided voters is
+          kept.</span>
+          {primWork}
+          <span className="info-p"><b>Worked example: the published 2PP.</b> A pair published
+          with undecided voters still inside it is rebased to 100 first. A pollster that publishes
+          no pair adds no row.</span>
+          {tppWork}
+        </>)}</>) },
+      ...method.filter((m) => keepMethod.has(m.id)),
+      { id: "changes", q: "What are the ▲ and ▼ figures measured against?", a: (
+        <>It depends on where they sit.
+        <ul className="info-list">
+          <li><strong>Beside a current figure:</strong> the change on a month ago, from the same
+          estimate built from the polls of 30 days earlier. It counts as a change only when it is
+          larger than its own margin, which combines both readings’ intervals; otherwise the figure
+          says “within the margin”.</li>
+          <li><strong>On the primary vote figures:</strong> the change since the {eY} election,
+          where the lines on that chart begin.</li>
+          <li><strong>In a poll’s breakdown and the poll tables:</strong> the change on that
+          pollster’s own previous poll.</li>
+        </ul>
+        Most say what they are measured against beside them, or when you point at them.</>) },
+    ];
+    const vSections = [
+      { id: "s-2pp", title: "Two-party preferred", nav: "Two-party",
+        lead: { id: "two-party-preferred", body: (
+          <>Each party’s share after every other candidate’s preferences have been distributed
+          between the final two. It’s the figure that decides seats. The section shows Labor against
+          the Coalition and, where pollsters ask it, against One Nation, and leads with the one
+          Labor is doing worse against{onSince ? <>: the Coalition until {onSince}, One Nation
+          since</> : null}. Both are {xref("implied-2pp", "two-party preferred", "implied")} from
+          each poll’s primary votes, with the pollsters’ own published figures a switch away.
+          <span className="info-p"><b>Published figures</b> are averaged as Labor’s share of the
+          two. A pair published with undecided voters still inside it is rescaled to 100 first,
+          splitting them in proportion, only because a pair on its own gives no basis for splitting
+          them any other way.</span></>) },
+        entries: [
+          { id: "implied-2pp", term: "Implied 2PP", body: (
+            <>The site’s main two-party figure, on the hero and the summary. It takes each poll’s
+            primary votes and distributes the minor parties’ shares using one fixed
+            {" "}{xref("preference-flows", "implied 2PP", "preference table")}: against the
+            Coalition, the flows of the {eY} Victorian election. Every pollster allocates
+            preferences its own way, so one table for all of them means the figure moves when voters
+            do, not when the mix of pollsters changes. It also counts every poll that publishes
+            primaries, including those with no two-party figure of their own.
+            <span className="info-p">Neither it nor the published figure is the true 2PP.
+            {D.synthLatest && D.synth2pp && D.synth2pp.length > 1 ? (
+              <> Against the Coalition today, the implied figure reads {D.synthLatest.alp.toFixed(1)}
+              {" "}and the published {L.alp2pp.toFixed(1)}. With One Nation on {onp}% of the primary
+              vote, five points of doubt about where its preferences go moves the two-party figure
+              {" "}{(prim.onp * 0.05).toFixed(1)} points either way.</>
+            ) : null}</span>
+            {L.onImp ? (
+              <span className="info-p">Labor v One Nation uses a different table, the
+              {" "}{xref("fp-flows", "implied 2PP", "first-principles flow set")}, because no
+              election has ever counted that pairing: {L.onImp.a.toFixed(1)} to Labor,
+              {" "}{L.onImp.b.toFixed(1)} to One Nation, ±{L.onImp.band.toFixed(1)}.</span>
+            ) : null}</>) },
+          { id: "preference-flows", term: "Preference flows", body: (
+            <>How minor-party votes split between the final two candidates once preferences are
+            distributed. The {xref("implied-2pp", "preference flows", "implied 2PP")} against the
+            Coalition uses the flows of the {eY} Victorian election: Greens {pct(FL.grn)} and all
+            others {pct(FL.oth)} to Labor. The Victorian Electoral Commission publishes each
+            district’s count but no statewide flow by party, so the site measured them: the
+            Greens’ from the districts where Labor and the Coalition were the final two, and the
+            others’ set so that the official {eY} primary votes give the official 55.0–45.0 result.
+            One Nation won 0.3% in {eY}, too little to measure, so its flow is the 2025 federal
+            election’s: {pct(FL.onp)} to Labor.
+            <span className="info-p"><b>Are they still flowing that way?</b> The Preference flows
+            panel in All polls checks. The pollsters’ own two-party figures come largely from where
+            their respondents say their preferences would go, so if those drift from where the
+            pollster’s primary votes and the {eY} flows put them, voters may be sending preferences
+            differently. The check corrects no other figure.</span></>) },
+          { id: "fp-flows", term: "First-principles flow set", body: (
+            <>The preference table behind the Labor v One Nation figure. No election has ever
+            counted that contest, so the site built the table for the federal page, and Victoria’s
+            figure borrows it unchanged. Three settings do all the work: Coalition voters give 31.5%
+            to Labor (±2.5), Greens 89% (±3) and everyone else 53% (±3). The rest go to One Nation.
+            {L.onImp && prim ? (
+              <span className="info-p">On today’s primaries: Labor’s {prim.alp.toFixed(1)}, plus
+              31.5% of the Coalition’s {prim.lnp.toFixed(1)}, 89% of the Greens’
+              {" "}{prim.grn.toFixed(1)} and 53% of the others’ {prim.oth.toFixed(1)}, gives
+              {" "}{L.onImp.a.toFixed(1)} to Labor and {L.onImp.b.toFixed(1)} to One Nation. The
+              ±{L.onImp.band.toFixed(1)} adds up the three settings’ ranges, and doubles to
+              ±{(2 * L.onImp.band).toFixed(1)} on the lead, the flow range the hero shows. It
+              measures doubt about the table, not sampling chance.</span>
+            ) : null}
+            <span className="info-p"><b>Where the numbers come from.</b> The counted ballots that
+            do exist, all federal or from other states: the AEC’s 2025 Senate ballot data, re-checked
+            against the 2026 lower-house contests where One Nation made the final two, the SA state
+            election and the Secret Harbour by-election. The table stays fixed between such counts
+            and is never fitted to current polls.</span></>) },
+        ] },
+      { id: "s-primary", title: "Primary vote", nav: "Primary vote",
+        lead: { id: "primary-vote", body: (
+          <>The share of voters who put a party first, before any preferences are distributed. Each
+          party’s figure is built like the headline, from the last three weeks of polls with each
+          pollster’s lean taken out (see {xref("weighted-aggregate", "primary vote", "Weighted aggregate")}).
+          The lines start at the {eY} election result, and the figures beside the chart give the
+          change since then.{onFirst ? <> One Nation’s line starts in {onFirst}: until then, the
+          polls counted it among others.</> : null}
+          <span className="info-p"><b>Why they may not add up to 100.</b> Some pollsters keep
+          voters who won’t name a party inside their published shares, so the parties fall short of
+          100 by exactly that undecided share. The aggregate keeps the shortfall, because it says
+          something real about the electorate: the five parties are rescaled only if their total
+          sits more than half a point from the plain average’s. Each poll’s breakdown says which
+          approach its pollster used.</span></>) },
+        entries: [] },
+      { id: "s-latest", title: "Latest and next polls", nav: "Latest polls",
+        lead: { id: "latest-polls", body: (
+          <>The newest poll from each pollster, and when its next is likely to land. An earlier poll
+          leaves the table once a newer one comes out, and All polls keeps every poll this term. If
+          a published poll is missing from All polls too, that’s an error: please
+          {" "}<a className="fb-link" href="/feedback/">report it</a>.</>) },
+        entries: [
+          { id: "house", term: "House", body: (
+            <>A polling company: {topHouses.join(", ")} and the rest. The industry calls them
+            houses. A single poll release is often called a wave.</>) },
+          { id: "next-polls", term: "Next polls", body: (
+            <>When each pollster is likely to publish next, forecast from its own track record. The
+            dates are merely estimates.
+            <span className="info-p"><b>The date</b> is the house’s last release plus the median of
+            its last eight gaps between releases, nudged by up to three days onto the weekday it
+            usually publishes. <b>The ±</b> is half the spread of those gaps, leaving out the
+            longest and shortest, and widens for releases further out. A house too irregular for a
+            date gets a window instead.</span>
+            <span className="info-p"><b>Late polls.</b> When a date passes with no poll, the row
+            stays and keeps counting, turns red once the whole window has passed, and leaves only
+            when the poll is added. The countdown in the tab bar works the same way.</span>
+            <span className="info-p">Open a row to check the forecast against the house’s five most
+            recent releases.</span></>) },
+        ] },
+      { id: "s-leaders", title: "Leadership", nav: "Leadership",
+        lead: { id: "leadership", body: (
+          <>Three questions, each kept apart: who would make the better
+          {" "}{xref("preferred-pm", "leadership", J.office.alb)}, how each leader is doing the job
+          ({xref("approval", "leadership", "approval")}), and what voters think of each as a person
+          ({xref("favourability", "leadership", "favourability")}).
+          <span className="info-p"><b>Approval and favourability</b> are monthly averages adjusted
+          for each pollster’s lean, as the vote is, except that every poll counts equally, whatever
+          its sample: a handful of houses answering the same question is not one pooled sample. A
+          pollster that publishes both measures lends its second reading to the other line.</span>
+          <span className="info-p"><b>Preferred {J.office.alb}</b> is averaged by sample size with
+          no house adjustment. Pollsters leave very different shares uncommitted, so one pollster’s
+          figures run high or low for both leaders at once. That is a difference of format, not a
+          lean, so levels can’t be compared across pollsters, though gaps and trends can. Two-way
+          and three-way questions are never averaged together.</span>
+          <span className="info-p"><b>One office, several people.</b> {andList(names("alb"))} have
+          led Labor this term, and {andList(names("opp"))} the Liberals. Each leader’s readings are
+          kept apart, so a change of leader never reads as a move in one person’s numbers.</span>
+          <span className="info-p"><b>The current figures</b> are built like the headline, from the
+          last six weeks of polls, since Victorian pollsters ask about the leaders only now and then.
+          Each counts only the polls taken since its leader took the job.</span></>) },
+        entries: [
+          { id: "preferred-pm", term: "Preferred " + J.office.alb, body: (
+            <>Who voters say would make the better {J.office.alb}. Pollsters ask it head to head,
+            the {J.office.alb} against the {J.office.opp}, and some ask it three-way, with One
+            Nation’s leader too. Each format is its own line.</>) },
+          { id: "approval", term: "Approval", body: (
+            <>A rating of how a leader is doing the job: the share who approve minus the share who
+            disapprove, called net approval.</>) },
+          { id: "favourability", term: "Favourability", body: (
+            <>A rating of the leader as a person: favourable minus unfavourable. A leader can be
+            approved of for the job and disliked as a person, so
+            {" "}{xref("approval", "favourability", "approval")} and favourability are never averaged
+            together.</>) },
+        ] },
+      { id: "s-allpolls", title: "All polls", nav: "All polls",
+        lead: { id: "all-polls", body: (
+          <>Every Victorian poll since the {eY} election, newest first, each linked to its source.
+          Its views give each poll’s two-party figures, primary votes and leader ratings.
+          <span className="info-p">The two-party view reads every poll’s primary votes through the
+          {" "}{eY} flows, so the polls compare like for like, with the pollster’s own figure beneath
+          where it published one. Those flows carry the same doubt for every poll, so each poll’s
+          interval is sampling error alone. A poll’s {xref("poll-lean", "all polls", "lean")} is how
+          far it sits from that month’s aggregate. Open a row for the poll’s full breakdown, and use
+          Download CSV for the polls the table is showing.</span></>) },
+        entries: [
+          ...fedAll.filter((e) => keepAll.has(e.id) && e.id !== "mrp" && e.id !== "poll-disagreement" && e.id !== "house-lean"),
+          { id: "apc-statement", term: "APC statement", body: (
+            <>The methodology statement a pollster publishes for each poll under the Australian
+            Polling Council’s Code of Conduct: fieldwork dates and method, the raw sample, the
+            effective sample (what that sample is worth after weighting), the weighting used, and
+            the question order. It is the pollster’s own publication; nothing is lodged with the
+            council. A poll’s breakdown links it, and its effective sample sets the poll’s weight in
+            the {xref("weighted-aggregate", "APC statement", "weighted aggregate")}. Where a pollster
+            publishes none, the {eff} column shows a dash: the site doesn’t invent a figure the
+            pollster never published.</>) },
+          ...fedAll.filter((e) => e.id === "mrp" || e.id === "poll-disagreement" || e.id === "house-lean"),
+        ] },
+    ];
+    const vAbout = (
+      <>
+        <p className="info-about-p">{J.brand} tracker is the Victorian edition of auspol tracker,
+        an unofficial aggregator of Victorian state political polls. It collects published polls,
+        adjusts each for its pollster’s lean, weights them by recency and sample size, and pools
+        them into aggregate estimates. To be clear, the site runs no polls of its own; it only
+        gathers and presents those published by others. It aims to give a clear view of how
+        Victorians intend to vote at the {J.nextElection.label.replace(/^\w+day /, "")} election,
+        and what they think of the leaders.</p>
+        <p className="info-about-p"><b>Updates.</b> New polls are added as they are released, and
+        every figure is rebuilt when one lands.</p>
+        <p className="info-about-p"><b>Feedback.</b> Spot a wrong number or have any other feedback?
+        {" "}<a className="fb-link" href="/feedback/">Let me know</a>.</p>
+        <p className="info-about-p"><b>Federal polling.</b> The federal edition,
+        {" "}<a className="fb-link" href="/">auspol tracker</a>, tracks the next Australian federal
+        election.</p>
+      </>
+    );
+    const vAll = [
+      ...vFaqs, ...vMethod,
+      ...vSections.flatMap((s) => [{ ...s.lead, term: s.title, lead: true }, ...s.entries]),
+    ];
+    return { faqs: vFaqs, method: vMethod, sections: vSections, about: vAbout, all: vAll };
+  }
+
   /* Every entry, for lookup by id (TermPop, the scroll target): a section's
      lead takes the section's title as its name. */
   const all = [

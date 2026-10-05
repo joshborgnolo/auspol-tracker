@@ -438,7 +438,7 @@
       c.font = "600 15px " + model.fontFamily;
       c.fillStyle = inkVar("--pd-ink-2");
       c.textAlign = "right";
-      c.fillText("auspoltracker.com", CARD_W - PAD - 52, H - PAD - 3);
+      c.fillText("auspoltracker.com" + (window.JUR ? window.JUR.path.replace(/\/$/, "") : ""), CARD_W - PAD - 52, H - PAD - 3);
       c.textAlign = "left";
 
       cv.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob returned null"))), "image/png");
@@ -488,7 +488,7 @@
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .slice(0, 70);
-    return "auspol-breakdown-" + (label || "poll") + ".png";
+    return (window.JUR ? window.JUR.brand : "auspol") + "-breakdown-" + (label || "poll") + ".png";
   };
 
   /* ---- composition + delivery --------------------------------------- */

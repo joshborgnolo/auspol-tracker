@@ -62,6 +62,19 @@ export const impliedAlp2pp = (p) => {
     + FLOW.oth * (n0(p.ind) + n0(p.oth))
     + FLOW_3CNR;
 };
+/* The same reading through another jurisdiction's table — /vic/ passes the
+   2022 Victorian flows (.build/vic/to-main-schema.mjs) as `flow`, with its
+   own three-cornered term. Same formula, so the two pages can never read
+   primaries differently except by their constants. */
+export const makeImpliedAlp2pp = (flow, threeCorner = 0) => (p) => {
+  if (p.alp == null) return null;
+  const n0 = (v) => (v == null ? 0 : v);
+  return p.alp
+    + flow.grn * n0(p.grn)
+    + flow.onp * n0(p.onp)
+    + flow.oth * (n0(p.ind) + n0(p.oth))
+    + threeCorner;
+};
 
 /* FLOW_ERAS – the pre-1987 counterpart of FLOW. F2F Morgan Gallup waves of
    the 1972–87 era (the aeforecasts mirror import) publish NO 2PP – Morgan

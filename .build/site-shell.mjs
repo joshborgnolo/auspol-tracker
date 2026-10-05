@@ -55,8 +55,11 @@
    on copies of them keyed to :root.sh-dark. The switch in the header writes
    the same key, so a choice made on any page holds on every page.
 
-   /prediction/, /vic/ and /atlas/ carry the shell but no page links to
-   them – the user wants them left unlisted – so no tab is theirs.
+   /prediction/ and /atlas/ carry the shell but no page links to them – the
+   user wants them left unlisted – so no tab is theirs. /vic/ is unlisted
+   too, but carries no shell: since 2026-10-05 it is the main page's own
+   build on Victorian data (BUILD_JUR=vic node .build/newtracker/build.mjs),
+   masthead and colophon included.
 
    Usage: node .build/site-shell.mjs            apply to every page listed below
           node .build/site-shell.mjs --check    list pages out of step (exit 1 if any) */
@@ -78,7 +81,6 @@ export const ROOT = path.resolve(HERE, "..");
 export const SHELL_PAGES = [
   { file: "preference-flows/index.html" },
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
-  { file: "vic/index.html" },                              // written by .build/refresh-vic.mjs
   { file: "atlas/index.html" },
   { file: "feedback/index.html", page: "feedback" },
   { file: "archives/newspoll/index.html", page: "archives" },

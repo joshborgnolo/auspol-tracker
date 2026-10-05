@@ -35,7 +35,9 @@ assert.equal((shellHeader({}).match(/class="sh-tab[" ]/g) || []).length, 4, "the
 // compiled views (a page's own canonical <link> and og:url are not links)
 const unlisted = /(?:<a\b[^>]*\bhref=|\bhref:\s*)"(?:https:\/\/auspoltracker\.com)?\/(?:prediction|atlas|vic)\//;
 assert.ok(!unlisted.test(shellHeader({}) + shellFooter({})), "the shell links neither /prediction/, /atlas/ nor /vic/");
-for (const f of ["index.html", ...SHELL_PAGES.map((p) => p.file)])
+// (vic/ is the main page's own build on Victorian data, shell-less, and
+// unlisted all the same)
+for (const f of ["index.html", "vic/index.html", ...SHELL_PAGES.map((p) => p.file)])
   assert.ok(!unlisted.test(fs.readFileSync(path.join(ROOT, f), "utf8")), `${f} links /prediction/ or /atlas/ or /vic/`);
 
 // ---- applyShell on a page it has never seen ------------------------------------------------

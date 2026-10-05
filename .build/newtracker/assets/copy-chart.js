@@ -186,7 +186,7 @@
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .slice(0, 60) || "chart";
-    return `auspol-${label}.png`;
+    return `${window.JUR ? window.JUR.brand : "auspol"}-${label}.png`;
   };
 
   const pageBg = () => {
@@ -525,7 +525,7 @@
     const titleBase = (own && own.title) || (board0 && board0.title)
       || txt(target.querySelector(".card-title, h2, h3"))
       /* the redesign names a chart in the head over it, not in a heading */
-      || txt(target.querySelector(".rd-chead-t")) || "auspol tracker";
+      || txt(target.querySelector(".rd-chead-t")) || (window.JUR ? window.JUR.brand : "auspol") + " tracker";
     const sub = own && own.sub != null ? own.sub : txt(target.querySelector(".card-sub"));
     /* the drift panels' ground note opens with the sentence that reads the
        chart's two colours ("Above zero – the red ground – …"); the image
@@ -1042,7 +1042,8 @@
 
         c.font = "600 15px " + sans; c.fillStyle = T.ink2;
         c.textAlign = "right";
-        c.fillText("auspoltracker.com", W - PAD, H - 34);
+        // the page's own address: /vic/'s images say where they came from
+        c.fillText("auspoltracker.com" + (window.JUR ? window.JUR.path.replace(/\/$/, "") : ""), W - PAD, H - 34);
         c.textAlign = "left";
 
         cv.toBlob((b2) => (b2 ? resolve(b2) : reject(new Error("toBlob returned null"))), "image/png");
