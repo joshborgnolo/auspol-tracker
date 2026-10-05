@@ -4,6 +4,8 @@
 // extract-bonham-sidebar.mjs + bonham-wayback-backfill.mjs) — the honest
 // answer to "how close does the replica track the lines he actually
 // published?". Prints one line of deviation stats plus the worst dates.
+// Since 2026-10-05 the hero draws his published figures themselves; the
+// rebuild is a check on how much of them his published method explains.
 //
 // A reminder inside the file about meaning: his methods page gives us the
 // recipe but not every ingredient (per-house accuracy weights beyond

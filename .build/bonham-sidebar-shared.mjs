@@ -57,3 +57,37 @@ export function figureOk(parsed) {
     && parsed.alp >= ALP_RANGE[0] && parsed.alp <= ALP_RANGE[1]
     && parsed.stamp && parsed.stamp.mon;
 }
+
+/* His stamps are Hobart dates, so "is this stamp in the future?" and "which
+   year is it?" must be asked on Hobart's calendar. From 13:00 or 14:00 UTC
+   Hobart is already on the next day: a UTC comparison rejected his fresh
+   morning updates as future-dated (ten valid Wayback captures in the
+   2026-10-05 sweep). */
+const HOBART_DAY = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Hobart", year: "numeric", month: "2-digit", day: "2-digit" });
+export const hobartIso = (date) => HOBART_DAY.format(date);
+/* a Wayback timestamp (YYYYMMDDhhmmss, UTC) as the Hobart date it was taken on */
+export const waybackHobartIso = (ts) => hobartIso(new Date(Date.UTC(
+  +ts.slice(0, 4), +ts.slice(4, 6) - 1, +ts.slice(6, 8), +ts.slice(8, 10) || 0, +ts.slice(10, 12) || 0, +ts.slice(12, 14) || 0)));
+
+/* The One Nation shadow-2PP rows are change points: [date, alpShare] is
+   added only when his figure differs from the last row, so the series
+   holds what he published and when, and a reading of an unchanged figure
+   writes nothing (keying rows by fetch day added a duplicate every day and
+   sent the poll agent through a full build and push for it). The widget
+   has no stamp of its own. It moves when he adds a poll, which is when the
+   classic stamp moves too, so a change is dated at that stamp when the
+   stamp is newer than the last row; otherwise at the reading's own Hobart
+   date. Two changes on one date keep the later. Mutates rows; returns
+   whether anything changed. */
+export function shadowChange(rows, value, stampIso, seenIso) {
+  const last = rows.length ? rows[rows.length - 1] : null;
+  if (last && last[1] === value) return false;
+  const date = stampIso && stampIso <= seenIso && (!last || stampIso > last[0]) ? stampIso : seenIso;
+  if (last && date <= last[0]) { last[1] = value; return true; }
+  rows.push([date, value]);
+  return true;
+}
+
+/* collapse runs of an unchanged figure to their first date, the change-point
+   form shadowChange keeps */
+export const changePoints = (rows) => rows.filter((r, i) => i === 0 || r[1] !== rows[i - 1][1]);

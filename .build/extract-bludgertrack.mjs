@@ -34,7 +34,7 @@
 //     file extract-pollbludger maintains) is used if under CACHE_MAX_DAYS
 //     old, flagged stale, else the run is inconclusive (exit 1).
 //   * shape: the feed must carry a root date, a federal/charts block with at
-//     least MIN_POINTS points, every point an ALP2in/LNC2in pair summing to
+//     least MIN_POINTS points, every point an ALP2out/LNC2out pair summing to
 //     100, values in range, dates non-decreasing, and the series must start
 //     within START_MAX of the 2025 election — a canary that the block and
 //     the parse are what this script expects. Any failure → exit 2.

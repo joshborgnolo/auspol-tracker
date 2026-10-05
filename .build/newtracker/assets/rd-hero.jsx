@@ -214,39 +214,32 @@ function RdHero(p) {
   const sensOn = cmpOn && matchup === "alp_lnp" && D.flowSens && D.flowSens.length > 1;
 
   /* the outside-aggregate overlay, offered on the Coalition and One
-     Nation contests - the two where a comparator publishes the matchup:
-     BludgerTrack's machine series as THEY publish it and this site's
-     reconstruction of Kevin Bonham's published method over the same
-     polls ride on the Coalition contest (bonham-replica.mjs - his own
-     sidebar figures are that reconstruction's validation data, kept in
-     data/bonham-2pp.json); on the One Nation contest the only outside
-     line is Bonham's shadow-2PP stamps, drawn as he publishes them
-     (respondent-allocated), never rebuilt */
+     Nation contests - the two where a comparator publishes the matchup.
+     Every line is its author's own published figures: BludgerTrack's trend
+     and Kevin Bonham's 2PP ride the Coalition contest, Bonham's shadow-2PP
+     the One Nation one. His are monthly averages of the figure his sidebar
+     showed each day, ending on his current one (gen-data §6b); until
+     2026-10-05 the Coalition line was a rebuild of his method, which ran
+     half a point high and zig-zagged */
   const EXT_KB = "#7e52a8", EXT_BT = "#10998d";
   const [showExt, setShowExt] = useState(false);
   const ext = D.extAgg || null;
   const extBt = ext && ext.bt && ext.bt.points && ext.bt.points.length > 1 ? ext.bt.points : null;
-  const extKb = ext && ext.bonham && ext.bonham.replica && ext.bonham.replica.length > 1 ? ext.bonham.replica : null;
+  const extKb = ext && ext.bonham && ext.bonham.line && ext.bonham.line.length > 1 ? ext.bonham.line : null;
   const extSh = ext && ext.bonham && ext.bonham.shadow && ext.bonham.shadow.length > 1 ? ext.bonham.shadow : null;
-  /* his OWN current figure rides the key (the drawn line beside it stays the
-     reconstruction): the as-published sidebar stamps, replica tail only as
-     the file-absent fallback - 2026-10-02 user catch: the key read 52.0 off
-     the replica where he publishes 52.3 */
-  const extKbPub = ext && ext.bonham && ext.bonham.published && ext.bonham.published.length ? ext.bonham.published : null;
   const isCoal = shown === "alp_lnp", isOn = shown === "alp_on";
   const extAvail = (isCoal && !!(extBt || extKb)) || (isOn && !!extSh);
   const extOn = showExt && extAvail && !morph;
   const extBox = "Compare outside estimates";
   /* the key entries name the publisher, carry his CURRENT figure as HE
-     publishes it (Bonham's is the sidebar stamp, never the reconstruction's
-     tail), and link out to where he publishes (RdKey grows an href branch
-     for them) */
+     publishes it - each line's last point, which is his latest figure, not
+     a monthly average - and link out to where he publishes (RdKey grows an
+     href branch for them) */
   const extFig = (pts) => pts && pts.length ? " (" + pts[pts.length - 1].y.toFixed(1) + "%)" : "";
   const extBtHref = "https://" + (ext && ext.bt && ext.bt.feed ? ext.bt.feed : "");
   const extKbHref = "https://" + (ext && ext.bonham && ext.bonham.site ? ext.bonham.site : "");
-  const lblExtBt = "BludgerTrack’s estimate" + extFig(extBt) + ", as published";
-  const lblExtBtNar = "BludgerTrack’s estimate" + extFig(extBt);
-  const lblExtKb = "Bonham’s estimate" + extFig(extKbPub || extKb);
+  const lblExtBt = "BludgerTrack’s estimate" + extFig(extBt);
+  const lblExtKb = "Bonham’s estimate" + extFig(extKb);
   const lblExtSh = "Bonham’s estimate" + extFig(extSh);
 
   const series = [];
@@ -265,9 +258,8 @@ function RdHero(p) {
      look dotted). NO end labels (user 2026-10-02): the key below the
      chart already names them, and publisher names have no -text token so
      the engine ink-diluted them away from the line colour anyway. On the
-     One Nation contest the only outside line is Bonham's shadow-2PP
-     stamps, drawn as-published; BludgerTrack carries no One Nation
-     pairing */
+     One Nation contest the only outside line is Bonham's shadow-2PP;
+     BludgerTrack carries no One Nation pairing */
   if (extOn) {
     if (isCoal && extKb)
       series.push({ id: "kbonham", label: "Bonham’s estimate", color: EXT_KB, rdWidth: 1.5, endCap: false,
@@ -680,7 +672,7 @@ function RdHero(p) {
             { kind: "line", color: mainCol, label: labelMain },
             labelOther ? { kind: "line", color: otherCol, label: labelOther } : null,
             cmpOn ? { kind: "dash", color: mainCol, label: cmpName } : null,
-            extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBtNar, href: extBtHref } : null,
+            extOn && isCoal && extBt ? { kind: "line", color: EXT_BT, label: lblExtBt, href: extBtHref } : null,
             extOn && isCoal && extKb ? { kind: "line", color: EXT_KB, label: lblExtKb, href: extKbHref } : null,
             extOn && isOn && extSh ? { kind: "line", color: EXT_KB, label: lblExtSh, href: extKbHref } : null,
           ]} />
@@ -721,8 +713,8 @@ function RdHero(p) {
       </div>
       <RdFoot how={{ href: "/preference-flows/" }}>
         Figures pool the last {D.latest.method.windowDays} days of polls, weighted towards the most recent and adjusted for each pollster’s lean. Changes are on a month ago. The chart follows the matchup chosen above.
-        {extOn && isCoal && <> BludgerTrack’s line is its published series; the Bonham line is rebuilt here from his published method over the same polls (the key quotes his current published figure), and tracks the figures he publishes to within about half a point.</>}
-        {extOn && isOn && <> Bonham’s shadow-2PP rides as he publishes it: primaries off his own estimates of 2025 preferences, pooled as the latest ten polls with at most two a house — a different conversion from the implied-flows line it sits beside, so it need not hug it.</>}
+        {extOn && isCoal && <> BludgerTrack’s line is its published trend. Bonham’s is his published figure, averaged by month like ours, from the launch of his aggregate in September 2025.</>}
+        {extOn && isOn && <> Bonham’s line is his published shadow-2PP, averaged by month like ours. He converts each poll’s primary votes with his own estimates of 2025 preferences and averages the latest ten polls, at most two from each pollster. Our flows differ, so the two lines need not agree.</>}
       </RdFoot>
     </section>
   );

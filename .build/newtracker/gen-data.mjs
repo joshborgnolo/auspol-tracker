@@ -2299,26 +2299,28 @@ const individualPolls = POLLS.map((p) => {
 /* ---- 6b. external aggregates — the comparator lines the hero can draw ----
    Two other public 2PP aggregates cover this term, and a reader who lands on
    the front page reasonably asks "what do they say?" – so the hero can
-   overlay both. BludgerTrack's line arrives machine-ready (the dated
-   outliers-excluded trend values its own page draws as the trend line and
-   prints as its headline 2PP — ALP2out, fixed from ALP2in 2026-10-02,
-   .matilda/bt-line-accuracy-2026-10.md — mirrored to
-   data/bludgertrack-2pp.json by .build/extract-bludgertrack.mjs); Kevin
-   Bonham's publishes only the
-   CURRENT two figures in his blog sidebar, so his line is a reconstruction —
-   his published method (.build/newtracker/bonham-replica.mjs, every constant
-   taken from his methods page and its update log) run over this tracker's
-   poll set, pinned against the as-published stamps the sidebar scraper and
-   the Wayback backfill keep in data/bonham-2pp.json (62 stamps as of
-   2026-10-02; the replica sits a mean 0.54 pts from them, so it is drawn as
-   his method's line, never as his numbers). The `published` array below is
-   that validation set AND the source of the hero key's "Bonham's estimate
-   (N.N%)" figure — the label quotes his current published estimate while
-   the line beside it stays the reconstruction (2026-10-02 user catch: the
-   key read the replica's tail, 0.3pt off his figure). Both sources are
-   levelled as
-   ALP's share of the classic two-party preferred, exactly the line the
-   hero itself draws; the view adds the credit, the reconstruction caveat
+   overlay both, each drawn from the figures its author published.
+   BludgerTrack's arrives machine-ready: the dated outliers-excluded trend
+   values its own page draws as the trend line and prints as its headline
+   2PP (ALP2out, fixed from ALP2in 2026-10-02,
+   .matilda/bt-line-accuracy-2026-10.md), mirrored to
+   data/bludgertrack-2pp.json by .build/extract-bludgertrack.mjs. Kevin
+   Bonham publishes only his CURRENT figures, in his blog's sidebar, but every
+   page of the blog carries them, so the archive's captures of the whole site
+   recover his record (.build/bonham-wayback-backfill.mjs) and the sidebar
+   scraper grows it forward (.build/extract-bonham-sidebar.mjs), both into
+   data/bonham-2pp.json.
+   Until 2026-10-05 his Coalition line was instead a rebuild of his method
+   over our polls (.build/newtracker/bonham-replica.mjs), sampled on the 15th
+   of each month. Against 104 of his published figures it ran a mean 0.44
+   high and swung harder than he did, so the chart showed him half a point
+   kinder to Labor than BludgerTrack, where his own figures sit level with
+   it, and zig-zagged from February to May 2026
+   (.matilda/outside-estimates-review-2026-10-05.md). The rebuild stays as a
+   check: .build/check-bonham-replica.mjs, and the line gen-data logs below
+   when run on its own.
+   Both are ALP's share of a two-party contest, exactly the lines the hero
+   itself draws; the view adds the credit
    and the links. */
 const readDataJson = (name) => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", name), "utf8")); }
@@ -2348,6 +2350,40 @@ const btMidMonth = (ym) => {
   const w = (t - prev[0]) / (next[0] - prev[0]);
   return prev[1] + w * (next[1] - prev[1]);
 };
+/* Bonham's figures are a daily index he updates every few days, so the
+   figure on show on any day is his latest stamp. His lines are drawn as ours
+   is: each complete calendar month's average of the figure on show each
+   day, at mid-month. A one-day reading per month aliased his three-to-
+   four-week poll cycle into a zig-zag (eight changes of direction in ten
+   months; six for monthly averages, his own rhythm). Each line starts at
+   his first figure (the aggregate's launch, the shadow's introduction) and
+   ends on his current one, the figure the hero's key quotes. A month
+   counts as complete once the data (the newest poll's release or his
+   newest stamp) has reached its last day: data dates, never the wall
+   clock, as everywhere else here. */
+const KB_ASOF = [LATEST_PUB_ISO, KBONHAM?.series?.at(-1)?.[0], KBONHAM?.shadow?.at(-1)?.[0]]
+  .filter(Boolean).sort().at(-1);
+function publishedMonthly(rows) {
+  const DAY = 86400000;
+  const sums = new Map();                          // ym -> [sum, days]
+  let k = 0, cur = null;
+  for (let t = Date.parse(rows[0][0] + "T00:00:00Z"), end = Date.parse(KB_ASOF + "T00:00:00Z"); t <= end; t += DAY) {
+    const iso = new Date(t).toISOString().slice(0, 10);
+    while (k < rows.length && rows[k][0] <= iso) cur = rows[k++][1];
+    const s = sums.get(ymOf(iso)) || [0, 0];
+    s[0] += cur; s[1] += 1;
+    sums.set(ymOf(iso), s);
+  }
+  const pts = [{ x: xOfIso(rows[0][0]), y: rows[0][1] }];
+  for (const [ym, [sum, n]] of sums) {
+    const [y, m] = ym.split("-").map(Number);
+    if (n < new Date(Date.UTC(y, m, 0)).getUTCDate()) continue;   // the first month, or one still running
+    pts.push({ x: mx(ym), y: r2(sum / n) });
+  }
+  const [lastIso, lastAlp] = rows[rows.length - 1];
+  if (xOfIso(lastIso) > pts[pts.length - 1].x + 0.002) pts.push({ x: xOfIso(lastIso), y: lastAlp });
+  return pts;
+}
 const extAgg = {
   bt: BTRACK && BTRACK.series?.length
     ? {
@@ -2364,39 +2400,27 @@ const extAgg = {
         feed: "www.pollbludger.net/fed2028/bludgertrack",
       }
     : null,
-  bonham: (() => {
-    const rep = bonhamReplica(POLLS, LATEST_ISO);
-    const daily = rep.daily.filter((d) => d.sm != null);
-    if (!daily.length) return null;
-    /* drawn on the same month-anchor lattice as every other line the hero
-       overlays – a daily polyline of his 7-day-smoothed index renders as
-       jitter beside the month-anchored house lines. The daily series itself
-       stays the validation substrate (.build/check-bonham-replica.mjs runs
-       bonham-replica.mjs directly); sampling changes nothing he published */
-    const smByIso = new Map(daily.map((d) => [d.iso, d.sm]));
-    const replica = MONTHS.map((ym) => {
-      const y = smByIso.get(ym + "-15");
-      return y == null ? null : { x: mx(ym), y };
-    }).filter(Boolean);
-    /* the live head: the latest smoothed day rides past the last month
-       anchor, so the right edge breathes with the data like the main line */
-    const tail = daily[daily.length - 1];
-    const tx = xOfIso(tail.iso);
-    if (!replica.length || tx > replica[replica.length - 1].x + 0.002) replica.push({ x: tx, y: tail.sm });
-    if (!replica.length) return null;
-    return {
-      replica,
-      published: (KBONHAM?.series || []).map(([iso, alp]) => ({ x: xOfIso(iso), y: alp })),
-      /* his One Nation shadow-2PP stamps ride AS PUBLISHED: primary-
-         derived off his own 2025-preference estimates and pooled as the
-         latest ten polls (≤2 a house), so nothing here to rebuild and
-         no comparability claim with our frozen-flow implied line; the
-         hero draws them only on the Labor v One Nation contest */
-      shadow: (KBONHAM?.shadow || []).map(([iso, alp]) => ({ x: xOfIso(iso), y: alp })),
-      site: "kevinbonham.blogspot.com",
-    };
-  })(),
+  bonham: KBONHAM && KBONHAM.series?.length
+    ? {
+        line: publishedMonthly(KBONHAM.series),
+        /* his One Nation shadow-2PP: primary-derived off his own
+           2025-preference estimates and pooled as the latest ten polls
+           (≤2 a house), so no comparability claim with our frozen-flow
+           implied line; the hero draws it only on the Labor v One Nation
+           contest */
+        shadow: KBONHAM.shadow?.length ? publishedMonthly(KBONHAM.shadow) : null,
+        site: "kevinbonham.blogspot.com",
+      }
+    : null,
 };
+/* the rebuild of his method, kept as a check on his figures: its reading
+   on the day of his newest stamp, beside the stamp */
+if (KBONHAM?.series?.length) {
+  const [kbIso, kbAlp] = KBONHAM.series[KBONHAM.series.length - 1];
+  const reb = bonhamReplica(POLLS, kbIso).daily.at(-1);
+  console.log("bonham: as published", kbAlp, "on", kbIso, "| his method rebuilt over our polls", reb ? reb.sm : null,
+    "|", KBONHAM.series.length, "stamps,", KBONHAM.shadow?.length || 0, "shadow change points");
+}
 
 /* ---- 7. latest polls – the most recent reading from each ACTIVE house ----
    This was a flat three-week window, which is a rule about weekly houses. It

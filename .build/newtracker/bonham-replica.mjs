@@ -1,18 +1,22 @@
 /* bonham-replica.mjs – a reconstruction of Kevin Bonham's 2025-2028 federal
-   2PP aggregate from the tracker's own poll dataset, for the hero chart's
-   external-comparator overlay.
+   2PP aggregate from the tracker's own poll dataset. From 2026-10-02 to
+   2026-10-05 the hero chart drew it as his line; it now draws his own
+   published figures (gen-data §6b), recovered from the archive's captures
+   of his whole blog, and this stays as a check on them: a line in
+   gen-data's own log and .build/check-bonham-replica.mjs.
 
    WHY A RECONSTRUCTION AT ALL
    Bonham publishes only the CURRENT two figures in his blog sidebar
    (classic 2PP and One Nation shadow-2PP) plus occasional roundups; the
-   historical series is not downloadable. His METHOD, however, is published
-   in full (the 2025-09-26 methods page and its update log), his conversion
-   formula is published with exact coefficients (the "Interim Last-Election
-   Preference Flows" block in the 2025-09 poll roundup), and his published
-   figures since Oct 2025 are recoverable (sidebar scrapes + Wayback). So
-   the comparator line is our run of HIS documented method over OUR poll
-   set, validated against his real published stamps; it is labelled a
-   reconstruction wherever it is drawn.
+   historical series is not downloadable. His METHOD, however, is
+   published in full (the 2025-09-26 methods page and its update log), his
+   conversion formula is published with exact coefficients (the "Interim
+   Last-Election Preference Flows" block in the 2025-09 poll roundup), and
+   his published figures since Oct 2025 are recoverable (sidebar scrapes +
+   Wayback). So the rebuild is our run of HIS documented method over OUR
+   poll set, validated against his real published stamps. Recovering those
+   stamps from every archived page of the blog, not just the front page,
+   later made the record dense enough to draw, and the rebuild a check.
 
    THE METHOD AS PUBLISHED (methods page, kevinbonham.blogspot.com/2025/09/
    2025-2028-2pp-aggregate-methods-page.html, retrieved 2026-10-02):
@@ -57,11 +61,13 @@
    the 26 Sep 25 methods page; raw-daily extrema 57.2 high / 55.5 low; the
    two roundup worked examples to about half a point) and the published
    sidebar stamps kept in data/bonham-2pp.json — measured by
-   .build/check-bonham-replica.mjs: over the 49 stamps of 2025-10-05 ..
-   2026-09-30, mean |dev| 0.56 pts, median 0.5, max 1.5, signed mean +0.54
-   (the replica runs about half a point ALP-above his: exactly the
-   accuracy-weights missing from the recipe, whose direction is
-   Newspoll-heavy), and dead-on 52.3 at the latest stamp. */
+   .build/check-bonham-replica.mjs: over the 104 stamps of 2025-09-26 ..
+   2026-10-04, mean |dev| 0.46 pts, median 0.4, max 1.5, signed mean +0.44.
+   The replica runs ALP-above his, plausibly the accuracy weights missing
+   from the recipe (Newspoll-heavy), but not by a constant: by month +0.46
+   to +0.75 from December 2025 to May 2026 (October +0.94, November +0.03),
+   +0.35 in June and July, +0.15 in August and +0.05 in September
+   (.matilda/outside-estimates-review-2026-10-05.md). */
 
 const DAY = 86400000;
 const d2iso = (ms) => new Date(ms).toISOString().slice(0, 10);
@@ -79,7 +85,7 @@ const B_ACC_NEW_HOUSES = new Set(["DemosAU", "Spectre Strategy", "Fox & Hedgehog
 /* houses his aggregate does NOT carry at all: not on his inclusion list
    (Agenda C Synesis – his named commissioned example – Wolf & Smith), the
    SMS-majority Morgan variant (25 Feb 26 rule), and MRP products */
-const B_EXCLUDED = new Set(["Agenda C Synesis", "Wolf & Smith", "Election Result", "Roy Morgan (SMS)"]);
+export const B_EXCLUDED = new Set(["Agenda C Synesis", "Wolf & Smith", "Election Result", "Roy Morgan (SMS)"]);
 const B_RULE_DATES = { onpBan: "2026-01-24", smsBan: "2026-02-25", undBan: "2026-05-31", mrpBan: "2026-07-27" };
 const RESET_AT = "2025-05-03"; // the term; a PM change would reset this (none yet)
 const AGE_MAX_W = 5, AGE_FREE = 7, AGE_WEEK_DECAY = 0.618; // published constants

@@ -17,6 +17,10 @@
 # skippedMonths), or a house declared stopped, is classified clean before
 # either of the noisy classes is considered.
 #
+# The same job checks the hero's outside-estimate mirrors (2026-10-05,
+# .build/check-comparators.mjs): a stale one files a ci-alert issue and
+# stays green.
+#
 # The heartbeat job (2026-09-07) covers the failure the doctor cannot see:
 # automation that runs "green" while doing nothing — the gitignored-
 # .build/locks outage ran every writer as an instant no-op for two days. It
@@ -78,6 +82,37 @@ jobs:
             echo "$OUT" | grep -E '^  ' | head -n 20 > doctor-detail.txt || true
           fi
           [ "$CODE" -ne 2 ]
+
+      # The hero's outside-estimate lines (BludgerTrack, Bonham) refresh
+      # inside pollbludger-updater.sh, where a failed extract only logs a
+      # WARN, so a broken scraper would freeze a line silently. Stale (exit
+      # 3) files an issue and stays green: a comparator is never a defect.
+      - name: Check the outside-estimate mirrors are fresh
+        id: comparators
+        if: always()
+        run: |
+          set +e
+          OUT="$(node .build/check-comparators.mjs 2>&1)"
+          CODE=$?
+          echo "$OUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          if [ "$CODE" -ne 0 ]; then
+            echo "::warning::outside-estimate mirror check exit $CODE — see the ci-alert issue or the log above"
+            echo "$OUT" > comparators-detail.txt
+          fi
+          exit 0
+
+      - name: File a ci-alert issue for a stale outside-estimate mirror
+        if: always() && steps.comparators.outputs.code == '3'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DETAIL="$(cat comparators-detail.txt 2>/dev/null || true)"
+          BODY="A comparator line on the hero 2PP chart has stopped moving while new polls landed. Check the BT_STATUS / KB_STATUS lines in the latest pollbludger-fallback runs, or whether the author has paused. [workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+          BODY="${BODY}"$'\n\n```\n'"${DETAIL}"$'\n```'
+          bash .build/alert-issue.sh \
+            "Outside estimates: a comparator mirror is stale" \
+            "$BODY" || echo "::warning::could not file the ci-alert issue"
 
       - name: File a ci-alert issue for provisionally covered waves
         if: steps.doctor.outputs.verdict == '3'

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Kevin Bonham's sidebar aggregate — keeps the tracker's record of his
-// AS-PUBLISHED figures growing forward, so the hero chart can pin its
-// Bonham-method reconstruction (bonham-replica.mjs) against his real
-// published stamps, the honest version of asking "how close did we get?".
+// AS-PUBLISHED figures growing forward. The hero chart draws both his lines
+// from this record (monthly averages of the figure he showed each day, ending
+// on his current one), and the key quotes his latest figure.
 //
 // WHAT IS SCRAPED
 // Bonham publishes no series, only the current figures, in the sidebar of
@@ -11,12 +11,12 @@
 // "Last update 30 Sep (Essential)" stamp) and the "One Nation Shadow-2PP
 // Estimate" widget below it. The monthly archive page
 // (kevinbonham.blogspot.com/YYYY/MM/) is a static fetch that always
-// carries the sidebar, so one plain curl a week keeps the record whole;
-// the history before install day is the one-off Wayback backfill's job
+// carries the sidebar. pollbludger-updater.sh runs this four times a day,
+// and he updates every few days, so the record misses little; the history
+// before 2026-10-02 is the Wayback backfill's job
 // (.build/bonham-wayback-backfill.mjs), which writes the same file with
-// the same row shape. The One Nation series rides AS PUBLISHED wherever
-// the page draws it: it was "recorded but never drawn" until the
-// 2026-10-02 hero overlay took it onto the Labor v One Nation contest.
+// the same row shapes. The One Nation series is drawn as published on the
+// hero's Labor v One Nation contest.
 // Its basis, from his methods-page update log: introduced 28 Jan 26 as
 // a regression trend estimate that "uses my estimate of 2025
 // preferences" (his estimate: 72% of Coalition and 9% of Greens voters
@@ -34,13 +34,20 @@
 // per-wave converted figures are never published.
 //
 // WHAT A ROW IS
-// [date, alpShare] where the date is HIS "Last update D Mon" stamp, not
-// the fetch day: a week of fetches between his updates appends nothing.
-// A changed figure on a stamp date we already hold REPLACES it (he
-// occasionally corrects a value). Year is inferred from the page being
-// read (his stamp carries no year): the stamp month is the page month or
-// the one just before; a stamp month AHEAD of the page month means last
-// year's December tail.
+// series: [date, alpShare] where the date is HIS "Last update D Mon"
+// stamp, not the fetch day: a week of fetches between his updates appends
+// nothing. A changed figure on a stamp date we already hold REPLACES it
+// (he occasionally corrects a value). Year is inferred from today's date
+// in Hobart (his stamp carries no year, and Hobart is his calendar: from
+// 13:00 or 14:00 UTC it is already tomorrow there, and a UTC clock took
+// his fresh morning stamps for future dates): the stamp month is this
+// month or the one before, and only a December stamp read in January is
+// last year's.
+// shadow: [date, alpShare] change points of his One Nation figure: a row
+// only when the figure moves, dated at his classic stamp when that moved
+// with it (shadowChange in the shared module). Keying it by fetch day
+// added a duplicate row every day, and each one sent the poll agent
+// through a full build and push.
 //
 // ROBUSTNESS
 //   * fetch: browser UA, 45 s timeout, three attempts with backoff; on
@@ -67,7 +74,7 @@
 
 import { readFileSync, existsSync } from "node:fs";
 import { writeJsonAtomic } from "./atomic-write.mjs";
-import { stripTags, parseSidebar, stampDate, figureOk } from "./bonham-sidebar-shared.mjs";
+import { stripTags, parseSidebar, stampDate, figureOk, hobartIso, shadowChange } from "./bonham-sidebar-shared.mjs";
 
 const SITE = "https://kevinbonham.blogspot.com";
 const OUT = process.env.OUT_JSON || "data/bonham-2pp.json";
@@ -78,6 +85,7 @@ const APPLY = argv.includes("--apply");
 const argOf = (k) => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : null);
 const PAGE_ARG = argOf("--page");
 const NOW = argOf("--now") ? new Date(argOf("--now")) : new Date();
+const TODAY = hobartIso(NOW);   // his calendar, not UTC's
 
 const status = { changed: false, source: null, figure: null, stamp: null, shadow: null, note: null, error: null };
 const done = (code) => { console.log("KB_STATUS " + JSON.stringify(status)); process.exit(code); };
@@ -130,9 +138,8 @@ if (!parsed) {
 }
 try { guard(parsed); } catch (e) { status.error = e.message; done(2); }
 
-const pageY = NOW.getUTCFullYear(), pageM = NOW.getUTCMonth() + 1;
-const date = stampDate(parsed.stamp, pageY, pageM);
-if (!date || date > NOW.toISOString().slice(0, 10)) {
+const date = stampDate(parsed.stamp, +TODAY.slice(0, 4), +TODAY.slice(5, 7));
+if (!date || date > TODAY) {
   status.error = `stamp resolves to ${date}, missing or in the future — page structure changed`;
   done(2);
 }
@@ -153,7 +160,7 @@ const upsert = (rows, row) => {
   return true;
 };
 const chgA = upsert(doc.series, [date, parsed.alp]);
-const chgB = parsed.shadow != null ? upsert(doc.shadow, [NOW.toISOString().slice(0, 10), parsed.shadow]) : false;
+const chgB = parsed.shadow != null ? shadowChange(doc.shadow, parsed.shadow, date, TODAY) : false;
 doc.series.sort((a, b) => (a[0] < b[0] ? -1 : 1));
 doc.shadow.sort((a, b) => (a[0] < b[0] ? -1 : 1));
 status.changed = chgA || chgB;

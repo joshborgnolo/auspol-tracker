@@ -18,8 +18,10 @@
 # THIRD DUTY (2026-10-02): freshen Kevin Bonham's published sidebar stamps
 # (extract-bonham-sidebar.mjs -> data/bonham-2pp.json). The stamps only move
 # when HE updates, so the extractor ran unscheduled until the hero key
-# started quoting his published current figure - an unfreshened stamp now
-# shows up as a wrong label on the front page. Its own fetch of his blog's
+# started quoting his published current figure - and since 2026-10-05 his
+# hero lines are drawn from these stamps too, so an unfreshened stamp shows
+# up on the front page. A reading of unchanged figures writes nothing
+# (the shadow rows are change points). Its own fetch of his blog's
 # monthly archive (the widget is sitewide); same best-effort contract as the
 # BT mirror - a wobble logs WARN and can never fail the poll agent.
 #
