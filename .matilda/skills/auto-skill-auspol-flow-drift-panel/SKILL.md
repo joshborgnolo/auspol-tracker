@@ -357,6 +357,22 @@ Pinned by `.matilda/probe-flow-drift-dots.mjs` (static: every hit circle's
 centre resolves to a `.rd-apd-hit`; hover: every centre raises a wave
 tip).
 
+## Vertex hover — the drift-line month marks (2026-10-05, 9e523bf)
+
+The house drift lines' month VERTICES (`.rd-fl-hdot`, 109 across the two
+halves, exact month-column x) look exactly like poll dots but were never
+interactive — the user's "all dots are ringed except ones i cannot hover
+over". Each vertex now hosts an invisible r=8 `.rd-fl-vhit` hit circle
+(same `.rd-apd-hit` idiom: pointerenter/leave, focus-visible keyboard,
+touch toggle; click is a deliberate no-op — it is not a poll) raising a
+tip with the house title, Month + House drift rows and a "monthly mark on
+this house's drift line" hint. Probes scope wave queries with
+`:not(.rd-fl-vhit)` so the two ring populations never confuse each other;
+dense-clump rule applies (a later-painted wave ring or a neighbour
+house's vertex ring may legitimately win a shared centre — vertex tips are
+proven by strict-count, 39/17), and clicking a vertex must never open a
+poll. The diag page rings vertex marks magenta and names them MONTH MARK.
+
 ## Check script traps
 
 - `.mjs` already implies ESM — run `node .build/flow-drift-check.mjs`; the
