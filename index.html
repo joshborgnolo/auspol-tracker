@@ -80319,9 +80319,12 @@ function RdPolls({
       const opp = a.oppName || "Taylor";
       const net = v => v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v);
       const ppmTxt = ppm && ppm.alb != null ? (() => {
-        const o = Object.keys(ppm).find(k => k !== "alb" && k !== "unc");
-        const L = (window.LEADER_META || {})[o];
-        return apWho(r, "alb", "Albanese") + " " + ppm.alb + "–" + ppm[o] + " " + apWho(r, o, L ? L.label : rdCap(o));
+        const os = Object.keys(ppm).filter(k => k !== "alb" && k !== "unc");
+        const who = o => {
+          const L = (window.LEADER_META || {})[o];
+          return apWho(r, o, L ? L.label : rdCap(o));
+        };
+        return os.length > 1 ? apWho(r, "alb", "Albanese") + " " + ppm.alb + ", " + os.map(o => who(o) + " " + ppm[o]).join(", ") : apWho(r, "alb", "Albanese") + " " + ppm.alb + "–" + ppm[os[0]] + " " + who(os[0]);
       })() : null;
       return React.createElement("div", {
         className: "rd-pl-lead"
@@ -80582,9 +80585,11 @@ function RdPolls({
     const imp = clause([r.alpOnImp != null ? ["Labor " + r.alpOnImp.toFixed(1) + " – " + (100 - r.alpOnImp).toFixed(1) + " One Nation", "impOn", 1] : null, r.alpImp != null ? ["Labor " + r.alpImp.toFixed(1) + " – " + (100 - r.alpImp).toFixed(1) + " Coalition", "imp", 1] : null].filter(Boolean));
     const pub = clause([r.tppAlt ? ["Labor " + r.tppAlt.alp + " – " + r.tppAlt.onp + " One Nation", "altAlpOn", 0] : null, r.alp2pp != null ? ["Labor " + r.alp2pp + " – " + (r.lnp2pp != null ? r.lnp2pp : 100 - r.alp2pp) + " Coalition", "alp2pp", 0] : null].filter(Boolean));
     const ppm = ppmContests(r).map(s => {
-      const o = Object.keys(s).find(k => k !== "alb" && k !== "unc");
-      const Lm = (window.LEADER_META || {})[o];
-      return apWho(r, "alb", "Albanese") + " " + s.alb + ", " + apWho(r, o, Lm ? Lm.label : rdCap(o)) + " " + s[o];
+      const os = Object.keys(s).filter(k => k !== "alb" && k !== "unc");
+      return [apWho(r, "alb", "Albanese") + " " + s.alb, ...os.map(o => {
+        const Lm = (window.LEADER_META || {})[o];
+        return apWho(r, o, Lm ? Lm.label : rdCap(o)) + " " + s[o];
+      })].join(", ");
     }).join("; ");
     const a = r.appr || {};
     const net = v => v == null ? null : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v);
