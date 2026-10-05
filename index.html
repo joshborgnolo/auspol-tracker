@@ -87626,6 +87626,8 @@ function RdFlowChart({
   const [hv, setHv] = useState(null);
   const [tip, setTip] = useState(null);
   const ptr = React.useRef(null);
+  const chartBox = React.useRef(null);
+  window.useDismissOutside(chartBox, !!(tip && tip.src === "touch"), () => setTip(null));
   const H = phone ? 210 : 250;
   const x0 = phone ? 26 : 40,
     rpad = phone ? 66 : 76,
@@ -87671,7 +87673,8 @@ function RdFlowChart({
   };
   const s1 = v => Math.abs(v) < 0.05 ? "0.0" : rdSigned(v, 1);
   return React.createElement("div", {
-    className: "rd-fl-chart"
+    className: "rd-fl-chart",
+    ref: chartBox
   }, React.createElement("svg", {
     width: W,
     height: H + 12,
@@ -87981,9 +87984,9 @@ function RdFlowChart({
       className: "tip-label"
     }, "Sample"), React.createElement("span", {
       className: "tip-val"
-    }, "n = ", d.sample.toLocaleString())), k && React.createElement("span", {
-      className: "tip-sub tip-hint"
-    }, "Click to open this poll"));
+    }, "n = ", d.sample.toLocaleString())), k && tip.src !== "touch" && React.createElement("div", {
+      className: "tip-hint"
+    }, tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"));
   })());
 }
 function RdFlows() {

@@ -3005,6 +3005,11 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
   const [hv, setHv] = useState(null);
   const [tip, setTip] = useState(null);        // the wave dot being read: { id, src, d, px }
   const ptr = React.useRef(null);
+  const chartBox = React.useRef(null);
+  /* a touch-opened tip has no pointer-leave, so the next gesture starting
+     OUTSIDE the chart puts it away — the shared capture-phase dismiss every
+     panel tip here already uses (user report 2026-10-05) */
+  window.useDismissOutside(chartBox, !!(tip && tip.src === "touch"), () => setTip(null));
   const H = phone ? 210 : 250;
   const x0 = phone ? 26 : 40, rpad = phone ? 66 : 76, top = 14, bot = phone ? 178 : 214;
   const x1 = W - rpad;
@@ -3045,7 +3050,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
   };
   const s1 = (v) => (Math.abs(v) < 0.05 ? "0.0" : rdSigned(v, 1));
   return (
-    <div className="rd-fl-chart">
+    <div className="rd-fl-chart" ref={chartBox}>
       <svg width={W} height={H + 12} viewBox={`0 0 ${W} ${H + 12}`} role="img" onMouseMove={onMove} onMouseLeave={() => setHv(null)}
            aria-label={`Published minus implied two-party figure against ${rival}, pooled across pollsters by month: now ${s1(nw.v)} points, 95% interval ±${nw.ci95.toFixed(1)}.`}>
         {[-3, -2, -1, 1, 2, 3].map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className="rd-dis-gl"></path>)}
@@ -3167,7 +3172,11 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
             {d.fl != null && <span className="tip-row"><span className="tip-label">Respondent flow to Labor</span><span className="tip-val">{d.fl.toFixed(1)}%</span></span>}
             <span className="tip-row"><span className="tip-label">Fieldwork</span><span className="tip-val">{d.dateLabel}</span></span>
             {d.sample != null && <span className="tip-row"><span className="tip-label">Sample</span><span className="tip-val">n = {d.sample.toLocaleString()}</span></span>}
-            {k && <span className="tip-sub tip-hint">Click to open this poll</span>}
+            {/* standard tip-hint chrome (accent colour, div not span —
+                .tip-sub sits later in the cascade and would grey it) and
+                only for an input that can actually open the poll: a touch
+                tap READS the dot, it never navigates */}
+            {k && tip.src !== "touch" && <div className="tip-hint">{tip.src === "focus" ? "Press Enter to open this poll in All polls" : "Click to open this poll in All polls"}</div>}
           </span>
         );
       })()}
