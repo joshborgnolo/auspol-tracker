@@ -457,6 +457,46 @@ a touch-opened tip has NO `.tip-hint` and that a second tap outside the
 chart dismisses it; the desktop wave-hint check expects the standard
 "Click to open this poll in All polls" text.
 
+## RdFlowChart tips clamp INSIDE THE CHART BOX (shipped 07bba15, 2026-10-06)
+
+User report 2026-10-06: "some tooltips on phone open over edge of phone
+screen". The three rd-fl-tip renders (`hv` month tip, vertex tip,
+wave-dot tip) used a STATIC x clamp (`style={{ left: Math.min(W - 110,
+Math.max(110, px)) }}`) that assumed a tip half-width ≤110px but never
+measured the mounted card; the vertex qualifier line ("this pollster's
+gap that month – not a published wave") makes the card ~293px wide (half
+~147), so early-month vertex tips opened ~17px past the LEFT edge of a
+390px phone (right-edge dots symmetric).
+
+The fix keeps the RdAp detail charts' MEASURED idiom (shared `tipBox`
+ref + `React.useLayoutEffect([tip, hv])` + marginLeft shift) but clamps
+against the CHART'S OWN `getBoundingClientRect()` (±8px margins), NOT
+`window.innerWidth` — the innerWidth variant of the idiom fails on
+phones: an overhanging absolutely-positioned tip widens the page's
+scrollable overflow, Chrome mobile's overview layout responds by
+EXPANDING the layout viewport (debug probe measured innerWidth growing
+390→413 to fit the open tip), so a viewport-anchored clamp chases a
+moving target, never converges, and the user watches the whole page
+zoom out while the tip reads. `.rd-fl-chart` is a width:auto block that
+never reads its own overflow, so its rect is stable while the tip
+mounts and measures. The static clamp is GONE from the style props —
+tips place at raw `X(hv.ym)` / `px` and the effect re-anchors.
+
+Pin probe (gitignored) `.matilda/probe-flow-tip-overflow.mjs`,
+BASE=<built tree>: phone rung (390×780 isMobile/hasTouch) taps every
+near-edge wave + vertex ring (170px/100px edge windows) in BOTH halves
+and asserts each open tip's rect inside [0, innerWidth]; desktop rung
+hovers the same rings plus extreme month-guide columns. Phone sweep
+mechanics that cost three probe rewrites: recentre EACH half
+(`scrollIntoView {block:"center"}`) immediately before collecting THAT
+half's targets — rings sitting below the viewport are `elementFromPoint`
+NULL and a CDP tap there hits document.body (the documented touchend
+page-turn trap again); and dismiss each opened touch tip (synthetic
+bubbling `pointerdown` on `document.body`) before the next tap, or a
+clumped second tap TOGGLES the already-open tip closed and reads as a
+product no-op. Post-fix phone tips live in [28, 362] of 390 with widest
+cards 293px (vertex) / 231px (wave).
+
 ## Check script traps
 
 - `.mjs` already implies ESM — run `node .build/flow-drift-check.mjs`; the
