@@ -307,6 +307,33 @@ the check is whether the fallback share-scale variance is meaningful for it.
   `fd.now.ci95 != null` — ci95 can regress to null if a future data change
   reintroduces degenerate variance.
 
+## RdFlowChart (All-polls detail flow chart) — the ±3.5 scale and the ±3.4 clamp contract
+
+`RdFlowChart` in rd-allpolls.jsx (~:2987) draws the detail view's two
+`.rd-fl-one` halves ("Against the Coalition …" / "Against One Nation …",
+mounted at #flow-drift ~:3185/3196) on ONE hand-rolled fixed scale —
+values NEVER drive the domain: `Y = zero − (v/3.5)·(zero−top)`, plot
+bottom bot=214 (178 phone) ↔ −3.5, and everything drawn must be clamped
+before it calls `Y`:
+
+- house dots, wave dots and the per-house pick line: **±3.4**;
+- the CI band and the "Now" whisker: **±3.5** (they may touch the rails);
+- the monthly line, its r-3 end dot and the hover end dot: **±3.4**
+  (shipped 2026-10-05 — they were UNclamped, and October 2026, the first
+  month ever outside the scale at −4.7 on RedBridge's 2 Oct wave, drew the
+  line end at y≈248 — through the baseline and into the tick labels,
+  reading as a point BELOW the ±3.4-clamped RedBridge wave dot).
+
+The clamp is DISPLAY-only: every tooltip (monthly "All pollsters" tip and
+the wave-dot tip) reports the true unclamped figure. Keep the comment on
+the line (`{/* the line and its end dots obey the dots' ±3.4 clamp … */}`)
+with the clamps. Probe: `.matilda/probe-flow-line-clamp.mjs` asserts the
+line/end dots never cross the baseline, the last-month end dot sits on the
+lowest wave dot's row, and the October tooltip still reads −4.7. A dot at
+the last month's x can shadow the monthly hover in a probe — the wave
+hit-target wins the tip (`hv && !tip`), so walk the pointer column to an
+x-off-dot row before asserting the monthly tip.
+
 ## Check script traps
 
 - `.mjs` already implies ESM — run `node .build/flow-drift-check.mjs`; the

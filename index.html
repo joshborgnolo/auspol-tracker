@@ -87466,11 +87466,11 @@ function RdFlowChart({
     d: monotoneXY(pickS.map(d => [X(d.ym), Y(Math.max(-3.4, Math.min(3.4, d.v)))])),
     className: "rd-fl-pick"
   }), React.createElement("path", {
-    d: monotoneXY(mo.map(d => [X(d.ym), Y(d.v)])),
+    d: monotoneXY(mo.map(d => [X(d.ym), Y(Math.max(-3.4, Math.min(3.4, d.v)))])),
     className: "rd-fl-line"
   }), React.createElement("circle", {
     cx: X(e.ym),
-    cy: Y(e.v),
+    cy: Y(Math.max(-3.4, Math.min(3.4, e.v))),
     r: "3",
     className: "rd-fl-enddot"
   }), React.createElement("path", {
@@ -87521,7 +87521,7 @@ function RdFlowChart({
     className: "rd-dis-guide"
   }), hv && !tip && React.createElement("circle", {
     cx: X(hv.ym),
-    cy: Y(hv.v),
+    cy: Y(Math.max(-3.4, Math.min(3.4, hv.v))),
     r: "4",
     className: "rd-fl-enddot"
   })), hv && !tip && React.createElement("span", {

@@ -3080,8 +3080,9 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
           );
         })}
         {pickS && pickS.length > 1 && <path d={monotoneXY(pickS.map((d) => [X(d.ym), Y(Math.max(-3.4, Math.min(3.4, d.v)))]))} className="rd-fl-pick"></path>}
-        <path d={monotoneXY(mo.map((d) => [X(d.ym), Y(d.v)]))} className="rd-fl-line"></path>
-        <circle cx={X(e.ym)} cy={Y(e.v)} r="3" className="rd-fl-enddot"></circle>
+        {/* the line and its end dots obey the dots' ±3.4 clamp, or a month past the ±3.5 scale (Oct '26 −4.7, the first) dives through the axis into the tick labels and reads as a point BELOW the clamped wave dots; the true figure still reads in every tooltip */}
+        <path d={monotoneXY(mo.map((d) => [X(d.ym), Y(Math.max(-3.4, Math.min(3.4, d.v)))]))} className="rd-fl-line"></path>
+        <circle cx={X(e.ym)} cy={Y(Math.max(-3.4, Math.min(3.4, e.v)))} r="3" className="rd-fl-enddot"></circle>
         <path d={`M${nx} ${Y(Math.min(3.5, nw.v + nw.ci95))}V${Y(Math.max(-3.5, nw.v - nw.ci95))}`} className="rd-fl-nowwh"></path>
         <circle cx={nx} cy={Y(nw.v)} r="5" className="rd-fl-now"></circle>
         <text x={nx} y={top - 2} className="rd-fl-nowh" textAnchor="middle">Now</text>
@@ -3093,7 +3094,7 @@ function RdFlowChart({ fd, rival, W, phone, pick, emptyNote }) {
         <path d={`M${x0} ${bot}H${x1}` + ticks.map(([ym]) => `M${X(ym)} ${bot}v4`).join("")} className="rd-dis-base"></path>
         {ticks.map(([ym, lab]) => <text key={ym} x={X(ym)} y={bot + 20} className="rd-dis-ax" textAnchor="middle">{lab}</text>)}
         {hv && !tip && <path d={`M${X(hv.ym)} ${top}V${bot}`} className="rd-dis-guide"></path>}
-        {hv && !tip && <circle cx={X(hv.ym)} cy={Y(hv.v)} r="4" className="rd-fl-enddot"></circle>}
+        {hv && !tip && <circle cx={X(hv.ym)} cy={Y(Math.max(-3.4, Math.min(3.4, hv.v)))} r="4" className="rd-fl-enddot"></circle>}
       </svg>
       {hv && !tip && (
         <span className="tip rd-fl-tip" style={{ left: Math.min(W - 110, Math.max(110, X(hv.ym))) }}>
