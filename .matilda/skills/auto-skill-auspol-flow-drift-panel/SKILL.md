@@ -497,6 +497,47 @@ clumped second tap TOGGLES the already-open tip closed and reads as a
 product no-op. Post-fix phone tips live in [28, 362] of 390 with widest
 cards 293px (vertex) / 231px (wave).
 
+## Touch hover pollution + top-edge clamp (shipped f69254c, 2026-10-06)
+
+Two follow-up defects surfaced the same day on the user's phone, both pinned
+by the new gitignored probe `.matilda/probe-flow-tip-close.mjs`:
+
+1. **"Close weirdly / one frame / not smooth like the 2PP chart"** —
+   a touch tap raises COMPAT mouse events (mousemove→…→click). The svg's
+   `onMouseMove` had no pointer-type guard, so tap 1 seeded the month-hover
+   `hv` *behind* the open tip; on dismiss or toggle-close the commit
+   rendered `{hv && !tip && month-guide}`, swapping the wave card for the
+   narrow month card (guide line included). That also produced the
+   user's "second press falls within the screen": the second press closed
+   the wave tip and the NARROW month card appeared in its place — they
+   were comparing two different tip TYPES. (An out-tap that lands inside
+   the svg cleared nothing; one landing outside the svg fired mouseout →
+   hv cleared → why it looked "sometimes".) Fix: the svg hover runs
+   through `onPointerMove` gated `ev.pointerType === "mouse"` (compat
+   mousemoves never surface as pointer events; touch pointermoves carry
+   pointerType touch — same gate the hit circles already used on enter),
+   and `useDismissOutside`'s callback clears hv with the tip. LESSON:
+   whenever a chart shows a touch-opened tip AND a hover-only auxiliary
+   card, gate the hover to a real mouse or the aux card becomes the
+   dismiss stutter.
+2. **"First press opens over the edge of the screen" (the TOP edge)** —
+   the card hangs UP from `top:-6px; translate(-50%,-100%)`; with the
+   chart fresh-scrolled to the viewport top (the classic first-press
+   shape) a tall card (~150px) opened −56/−59px ABOVE the screen. The
+   measured layout effect now also slides the tip DOWN until its top
+   clears **78px** — the site's 72px sticky-bar scroll-margin + 6 —
+   using viewport-relative box coords, which are stable vertically
+   (vertical overhang never widens the mobile layout viewport).
+
+Probe traps that cost extra runs: a tap at viewport y < ~72 hits the
+STICKY TAB BAR and switches the facet (unpicks the run) — filter tap
+targets to cy ≥ 80 and park the svg top at 76px with a 3-pass
+`scrollBy` helper; a "hover open chart" desktop spot needs no hit circle
+within 18px or it lands on a wave dot; the out-tap target point must be
+OUTSIDE the svg for mouseout-clear (inside-svg out-taps are exactly the
+hv-persistence repro). Desktop mouse flow pinned unchanged (month tip on
+hover, wave swap, mouse-out clear).
+
 ## Check script traps
 
 - `.mjs` already implies ESM — run `node .build/flow-drift-check.mjs`; the
