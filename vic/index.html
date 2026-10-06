@@ -49546,7 +49546,7 @@ function RdApDetail({
     ley: "var(--lnp-text)",
     hanson: "var(--onp-text)"
   };
-  const ppmCell = (s, three) => React.createElement("span", {
+  const ppmCell = s => React.createElement("span", {
     className: "rd-apd-cell"
   }, React.createElement("span", null, ["alb", "taylor", "ley", "hanson"].filter(k => s[k] != null).map((k, i) => React.createElement(React.Fragment, {
     key: k
@@ -49556,15 +49556,15 @@ function RdApDetail({
     }
   }, s[k])))), React.createElement("span", {
     className: "rd-apd-sub"
-  }, three ? "three-way" + (s.unc != null ? ", " + s.unc + " undecided" : "") : s.unc != null ? s.unc + " undecided" : ""));
+  }, s.unc ? s.unc + " undecided" : ""));
   const setHan = sets.find(s => s.hanson != null && s.taylor == null && s.ley == null);
   const setOpp = sets.find(s => (s.taylor != null || s.ley != null) && s.hanson == null);
   const setThree = sets.find(s => s.hanson != null && (s.taylor != null || s.ley != null));
   const ppmBy = {
     onp: setHan ? ppmCell(setHan) : null,
-    lnp: setOpp ? ppmCell(setOpp) : setThree ? ppmCell(setThree, true) : null
+    lnp: setOpp ? ppmCell(setOpp) : null
   };
-  const hasMatchup = p.alpOnImp != null || p.alpImp != null || !!ta || p.alp != null && p.lnp != null || ppmBy.onp != null || ppmBy.lnp != null;
+  const hasMatchup = p.alpOnImp != null || p.alpImp != null || !!ta || p.alp != null && p.lnp != null || ppmBy.onp != null || ppmBy.lnp != null || !!setThree;
   const a = p.appr || {};
   const mb = a.metricBy || {};
   const leaders = [["alb", "albNet", rdApPm(a)], ["taylor", "taylorNet", a.oppName || "Taylor"], ["hanson", "hansonNet", apWho(a, "hanson", "Hanson")]].filter(([, nk]) => a[nk] != null);
@@ -49919,7 +49919,13 @@ function RdApDetail({
     className: "rd-apd-k"
   }, window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister"), cols.map(k => React.createElement("span", {
     key: k.id
-  }, ppmBy[k.id] || none)))), leaders.length > 0 && React.createElement("div", {
+  }, ppmBy[k.id] || none))), setThree && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-k"
+  }, (window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister") + ", three‑way"), React.createElement("span", {
+    style: {
+      gridColumn: "2 / -1"
+    }
+  }, ppmCell(setThree)))), leaders.length > 0 && React.createElement("div", {
     className: "rd-apd-grid rd-apd-grid1"
   }, React.createElement("span", {
     className: "rd-apd-k"
