@@ -88715,7 +88715,7 @@ function RdDirection({
     yDomain: [lo, hi],
     yTicks: rdYTicks(lo, hi, 10),
     yTickFmt: v => v === hi ? v + "%" : String(v),
-    xTicks: rdXTicks(xDomain[0], xDomain[1], narrow),
+    xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365),
     baseline: true,
     series: [{
       id: "wrong",

@@ -1357,7 +1357,11 @@ function RdDirection({ rangeId }) {
         <TrendChart key="rd-dir" heightPx={narrow ? 280 : 360}
           padPx={narrow ? { l: 34, r: 8, t: 30, b: 28 } : { l: 40, r: 16, t: 40, b: 30 }}
           xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => (v === hi ? v + "%" : String(v))}
-          xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline
+          /* the axis opens on the election tick, as the 2PP, primary and
+             mood charts do - 2025 + 122/365 is 3 May 2025 on gen-data's dx
+             counting (rdXTicks's month grid would open at July, May falling
+             between its quarter steps) */
+          xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365)} baseline
           series={[
             { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong"), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Wrong track" },
             { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right"), rdWidth: 2.5, endCap: false, endLabel: narrow ? null : "Right direction" },
