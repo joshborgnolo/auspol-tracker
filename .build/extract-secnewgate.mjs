@@ -69,6 +69,11 @@
 
    Usage: node .build/extract-secnewgate.mjs [--force]  (--force refetches)
    SECNEWGATE_SRC_DIR redirects the cache.
+   --probe asks the media API alone and names the PDFs a real run would
+   fetch (a month's first candidate not cached, or a grid page still to
+   back-fill), writing nothing: poll-agent.yml's quiet-run gate, which
+   skips the runner's apt/npm setup and the updater when the line is
+   PROBE {"new":[],"warnings":[]}. Needs no pdftotext and no npm package.
    Last line: SECNEWGATE_STATUS {"changed":…,"added":[…],"healed":[…],
    "pending":[…],"stale":[…],"warnings":[…]} */
 import fs from "node:fs";
@@ -79,6 +84,7 @@ import { fileURLToPath } from "node:url";
 import { TRACKER_UA, MONTHS, writeAtomic } from "./extract-common.mjs";
 
 const FORCE = process.argv.includes("--force");
+const PROBE = process.argv.includes("--probe");
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = process.env.SECNEWGATE_SRC_DIR || path.join(ROOT, ".build", "secnewgate-src");
 const POLLS = process.env.SECNEWGATE_POLLS || path.join(ROOT, "data", "polls.json");
@@ -550,6 +556,7 @@ async function main() {
   catch (e) {
     console.log("warning media API: " + e.message);
     status.warnings.push(`media API: ${e.message}`);
+    if (PROBE) { console.log("PROBE " + JSON.stringify({ new: [], warnings: status.warnings })); return; }
     // a cached wave still needs its quiet check below even when discovery failed
     fin(status);
     return;
@@ -560,6 +567,21 @@ async function main() {
   }
   const groups = pickReports(items);
   if (groups.length < 5) status.warnings.push(`only ${groups.length} report wave(s) found from ${SEC_FIRST} on – has the media library changed?`);
+  if (PROBE) {
+    // mirrors the loop below: it fetches a month's FIRST candidate unless
+    // that one's text and chart page are cached, and back-fills a missing
+    // grid page whenever the report has one
+    const todo = [];
+    for (const g of groups) {
+      const slug = slugOf(g.urls[0].url);
+      const txtPath = path.join(SRC, slug + ".txt");
+      if (FORCE || !fs.existsSync(txtPath) || !fs.existsSync(path.join(SRC, slug + ".bbox.html"))) todo.push(slug);
+      else if (!fs.existsSync(path.join(SRC, slug + ".grid.bbox.html")) && gridPageOf(fs.readFileSync(txtPath, "utf8")).page)
+        todo.push(slug + " (grid page)");
+    }
+    console.log("PROBE " + JSON.stringify({ new: todo, warnings: status.warnings }));
+    return;
+  }
 
   const waves = new Map();   // wave ordinal -> { slug, meta, cols: […], page, published }
   for (const g of groups) {

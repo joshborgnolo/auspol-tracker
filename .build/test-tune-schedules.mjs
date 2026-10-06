@@ -37,8 +37,12 @@ const polls = [
   // Fox & Hedgehog: declared stopped
   poll("Fox & Hedgehog", "2026-05-31T06:42"),
 ];
+// SEC Newgate: direction-only, so its upload stamps live on data.direction
+const direction = ["2025-07-29T16:58", "2025-09-24T11:16", "2025-11-10T17:24", "2026-02-17T16:51",
+  "2026-05-27T13:03", "2026-07-21T16:50", "2026-09-22T15:29"]
+  .map((published) => ({ pollster: "SEC Newgate", published, date: published.slice(0, 10), right: 30, wrong: 50 }));
 const data = {
-  polls,
+  polls, direction,
   pollsterRules: {
     "Roy Morgan": { release: { dow: 1, time: "16:30" } },
     "DemosAU": { release: { month: true } },
@@ -50,7 +54,7 @@ const data = {
 const dir = mkdtempSync(path.join(tmpdir(), "tune-"));
 const files = ["roymorgan-update.yml", "resolve-update.yml", "essential-update.yml",
   "redbridge-update.yml", "newspoll-update.yml", "newspoll-watch.yml", "news24-update.yml", "demosau-update.yml",
-  "spectre-update.yml", "foxhedgehog-update.yml"];
+  "spectre-update.yml", "foxhedgehog-update.yml", "secnewgate-update.yml", "ipsos-update.yml"];
 // each file keeps one hand-authored slot on a minute of its own (nine
 // writers on one minute would trip the collision audit, rightly)
 files.forEach((f, i) => {
@@ -114,6 +118,22 @@ assert.ok(readFileSync(path.join(dir, "foxhedgehog-update.yml"), "utf8").include
 const sp = crons(readFileSync(path.join(dir, "spectre-update.yml"), "utf8"));
 assert.deepEqual(sp.map((c) => c.cron), ["50 20 * * *", "10 19 * * *"], JSON.stringify(sp));
 
+// weekdays mode. SEC Newgate's hours measured off data.direction
+// (11:16–17:24, untrimmed): Mon–Fri 11:00–18:00 every 20 min, two hourly
+// follow-ups, the late backstop; nothing on a weekend
+const sec = crons(readFileSync(path.join(dir, "secnewgate-update.yml"), "utf8"));
+assert.ok(sec.some((c) => c.cron === "0,20,40 1 * * 1,2,3,4,5" && /Mon\/Tue\/Wed\/Thu\/Fri 11:00–11:40/.test(c.note)), "SEC comb start " + JSON.stringify(sec));
+assert.ok(sec.some((c) => c.cron === "0 8 * * 1,2,3,4,5" && /18:00 — weekday release hours/.test(c.note)), "SEC comb end");
+assert.deepEqual(sec.filter((c) => /follow-up|late backstop/.test(c.note)).map((c) => c.cron),
+  ["0 9 * * 1,2,3,4,5", "0 10 * * 1,2,3,4,5", "30 12 * * 1,2,3,4,5"]);
+assert.ok(sec.filter((c) => !/hand-authored/.test(c.note)).every((c) => c.cron.endsWith(" * * 1,2,3,4,5")), "weekdays only");
+assert.ok(readFileSync(path.join(dir, "secnewgate-update.yml"), "utf8").includes("files 11:16–17:24 eastern (last 7 timed releases"));
+// Ipsos's hours are declared on its TARGETS entry (11:43–16:34): 11:20–17:00
+const ip = crons(readFileSync(path.join(dir, "ipsos-update.yml"), "utf8"));
+assert.ok(ip.some((c) => c.cron === "20,40 1 * * 1,2,3,4,5"), "Ipsos comb start " + JSON.stringify(ip));
+assert.ok(ip.some((c) => c.cron === "0 7 * * 1,2,3,4,5" && /17:00 — weekday release hours/.test(c.note)), "Ipsos comb end");
+assert.ok(readFileSync(path.join(dir, "ipsos-update.yml"), "utf8").includes("declared in tune-schedules TARGETS"));
+
 // idempotent: a second apply is a no-op, --check would pass
 res = tune({ data, workflowsDir: dir, now: new Date("2026-09-22T00:00:00Z"), apply: false });
 assert.deepEqual(res.map((r) => r.status), files.map(() => "current"), "second run finds everything current");
@@ -141,6 +161,9 @@ assert.ok(rmSlots.some((x) => x.day === "Mon" && x.time === "17:40"), "comb end"
 assert.ok(rmSlots.some((x) => x.day === "daily" && x.time === "06:00" && x.label === "daily sweep"), "daily sweep");
 assert.ok(!rmSlots.some((x) => x.day === "Tue" && x.time === "06:00"), "next-day morning folds into the daily sweep, as in cron");
 assert.ok(tj.slots.some((x) => x.workflow === "newspoll-watch.yml" && x.day === "Sun" && x.time === "20:04"), "the watchdog's comb is dispatched too");
+const ipSlots = tj.slots.filter((x) => x.workflow === "ipsos-update.yml");
+assert.deepEqual([...new Set(ipSlots.map((x) => x.day))], ["Mon", "Tue", "Wed", "Thu", "Fri"], "Ipsos is dispatched on weekdays only");
+assert.equal(ipSlots.filter((x) => x.day === "Wed").length, 21, "Ipsos: 18 comb slots (11:20–17:00), follow-ups at 18:00 and 19:00, the 22:30 backstop");
 assert.equal(tableText.split("\n").filter((l) => l.startsWith("  {")).length, tj.slots.length, "one slot per line");
 // DST rewrites every cron block; the table has no UTC in it and stays put
 res = tune({ data, workflowsDir: dir, now: new Date("2027-01-12T00:00:00Z"), apply: true, tablePath: table });

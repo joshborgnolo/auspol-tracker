@@ -1,14 +1,16 @@
 #!/bin/bash
-# Daily SEC Newgate "Mood of the Nation" catch-up: extract-secnewgate.mjs
+# SEC Newgate "Mood of the Nation" catch-up: extract-secnewgate.mjs
 # -> validate -> render-card -> build -> commit -> push. Run in CI by
-# secnewgate-update.yml.
+# secnewgate-update.yml: every 20 minutes through weekday office hours (the
+# dispatch clock), each run gated by `extract-secnewgate.mjs --probe` so a
+# quiet one never reaches this script, plus one full run each evening.
 #
 # SEC Newgate publishes no voting intention. Its bi-monthly Mood of the
 # Nation tracking study asks the national-direction question (right
 # direction / wrong track) and feeds the National-direction panel alone –
 # no house row in "Next expected polls". A report goes up within days of
-# its fieldwork closing, on no fixed weekday, so this checks daily; before
-# this workflow existed there was no fetcher at all. The weekly crosstabs
+# its fieldwork closing, on no fixed weekday, in office hours, so those
+# hours are combed; before this workflow existed there was no fetcher at all. The weekly crosstabs
 # run runs the extractor too, and stays the alarm for the house gone quiet
 # (QUIET_DAYS in extract-secnewgate.mjs).
 #

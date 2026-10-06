@@ -1,14 +1,17 @@
 #!/bin/bash
-# Daily Ipsos Issues Monitor catch-up: extract-ipsos.mjs -> if it cached a new
+# Ipsos Issues Monitor catch-up: extract-ipsos.mjs -> if it cached a new
 # report or methodology statement -> issues.mjs -> validate -> render-card ->
-# build -> commit -> push. Run in CI by ipsos-update.yml.
+# build -> commit -> push. Run in CI by ipsos-update.yml: every 20 minutes
+# through weekday office hours (the dispatch clock), each run gated by
+# `extract-ipsos.mjs --probe` so a quiet one never reaches this script, plus
+# one full run each evening.
 #
 # Ipsos publishes no voting intention, so it has no house updater and no row
 # in "Next expected polls": its monthly Issues Monitor feeds the Snapshot's
 # issues panel alone. A report goes up about three weeks after its fieldwork
 # closes, on no fixed weekday and mostly in the afternoon, and the panel
-# counts Ipsos's newest poll for only part of each month – so this checks
-# daily. The weekly crosstabs run, the only fetcher before 2026-09-26, would
+# counts Ipsos's newest poll for only part of each month – so it is combed
+# through the hours it uploads in. The weekly crosstabs run, the only fetcher before 2026-09-26, would
 # have picked 2026's reports up 2 to 7 days after they went up. That run
 # still fetches Ipsos too, and stays the alarm for a month left unread
 # (stale) and for Ipsos gone quiet (IP_QUIET_DAYS in issues.mjs).

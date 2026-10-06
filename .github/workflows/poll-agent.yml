@@ -54,6 +54,11 @@ on:
         required: false
         type: string
         default: 'false'
+      probe:
+        description: "An extractor with a --probe mode (prints PROBE {\"new\":[…],\"warnings\":[…]}): a dispatched run whose probe finds nothing new and nothing wrong skips the setup and the updater"
+        required: false
+        type: string
+        default: ''
       runner:
         description: "The update job's runner. ubuntu-24.04 for every house; macos-15 only for a step that needs macOS (RedBridge's AFR chart is read with Vision OCR)"
         required: false
@@ -117,13 +122,35 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
+      # The quiet-run gate. A clock-dispatched slot (a comb runs a dozen a
+      # day) asks the pollster's listing whether anything is new before the
+      # runner pays for apt, npm and the updater: a quiet run ends here in
+      # seconds. Anything but the exact all-clear line runs the updater as
+      # before, so a probe that breaks, or a page that won't load (which the
+      # updater has to classify), costs only the old setup. The cron backup
+      # run (and simulate_failure) skips the probe: the daily full run keeps
+      # every bank rebuilt even on days with nothing new.
+      - name: Probe upstream for anything new
+        id: probe
+        if: inputs.probe != '' && github.event_name != 'schedule' && inputs.simulate_failure != 'true'
+        env:
+          PROBE: ${{ inputs.probe }}
+        run: |
+          out="$(node "$PROBE" --probe 2>&1)" && last="$(echo "$out" | tail -1)" || last=""
+          echo "$out" | tail -5
+          if [ "$last" = 'PROBE {"new":[],"warnings":[]}' ]; then
+            echo "nothing new upstream; skipping the updater"
+            echo "quiet=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Configure git identity
+        if: steps.probe.outputs.quiet != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Install apt packages
-        if: inputs.apt_packages != '' && runner.os == 'Linux'
+        if: steps.probe.outputs.quiet != 'true' && inputs.apt_packages != '' && runner.os == 'Linux'
         env:
           APT_PACKAGES: ${{ inputs.apt_packages }}
         run: |
@@ -139,6 +166,7 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq $APT_PACKAGES
 
       - name: Install puppeteer-core (best effort, for the share-card redraw)
+        if: steps.probe.outputs.quiet != 'true'
         # Version lives in package-lock.json; render-card.mjs resolves it from
         # repo node_modules. --ignore-scripts: nothing here needs postinstall.
         run: npm ci --ignore-scripts --no-audit --no-fund || true
@@ -147,6 +175,7 @@ jobs:
       # every other failure keeps the wrapper's own exit code.
       - name: Run the ${{ inputs.house }} updater
         id: updater
+        if: steps.probe.outputs.quiet != 'true'
         env:
           CHROME: ${{ runner.os == 'macOS' && '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' || '/usr/bin/google-chrome' }}
           WRAPPER: ${{ inputs.wrapper }}

@@ -29,7 +29,12 @@
 
    Usage: node .build/extract-ipsos.mjs [--force]   (--force refetches PDFs
    already cached). IPSOS_SRC_DIR redirects the cache.
-   Last line: IPSOS_STATUS {"fetched":[…],"cached":n,"warnings":[…]} */
+   Last line: IPSOS_STATUS {"fetched":[…],"cached":n,"warnings":[…]}
+
+   --probe reads the two pages and names the PDFs a real run would fetch,
+   fetching none and writing nothing: poll-agent.yml's quiet-run gate,
+   which skips the runner's apt/npm setup and the updater when the line is
+   PROBE {"new":[],"warnings":[]}. Needs no pdftotext and no npm package. */
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
@@ -39,6 +44,7 @@ import { ROOT } from "./crosstab-sources.mjs";
 import { IP_FIRST } from "./issues-parse.mjs";
 
 const FORCE = process.argv.includes("--force");
+const PROBE = process.argv.includes("--probe");
 const SRC = process.env.IPSOS_SRC_DIR || path.join(ROOT, ".build", "ipsos-src");
 const PAGES = {
   report: "https://www.ipsos.com/en-au/issuesmonitor",
@@ -96,11 +102,15 @@ const slugOf = (href) => decodeURIComponent(href.split("/").pop()).replace(/\.pd
 
 async function main() {
   const fetched = [], warnings = [];
-  fs.mkdirSync(SRC, { recursive: true });
-  for (const [kind, page] of Object.entries(PAGES)) {
-    let html;
-    try { html = (await get(page)).toString("utf8"); }
-    catch (e) { warnings.push(`${kind} page: ${e.message}`); continue; }
+  if (!PROBE) fs.mkdirSync(SRC, { recursive: true });
+  // both pages at once. A query string misses ipsos.com's page cache, which
+  // holds a copy for up to 32 days (max-age 2764800; one read 7 days old on
+  // 2026-10-06): a purge that misses would otherwise hide a new report for weeks
+  const fresh = `?fresh=${Math.floor(Date.now() / 60_000)}`;
+  const pages = await Promise.all(Object.entries(PAGES).map(([kind, page]) =>
+    get(page + fresh).then((b) => ({ kind, html: b.toString("utf8") }), (e) => ({ kind, error: e.message }))));
+  for (const { kind, html, error } of pages) {
+    if (error) { warnings.push(`${kind} page: ${error}`); continue; }
     const hrefs = [...new Set([...html.matchAll(/href="([^"]+\.pdf)"/gi)].map((m) => m[1]))];
     const wanted = hrefs.map((h) => ({ h, ym: coverOf(kind, h) })).filter((x) => x.ym && x.ym >= IP_FIRST);
     if (!wanted.length) warnings.push(`${kind} page: no ${kind === "report" ? "national report" : "Issues Monitor statement"} linked from ${IP_FIRST} on – has the page changed?`);
@@ -109,6 +119,7 @@ async function main() {
       const slug = slugOf(h);
       const txt = path.join(SRC, slug + ".txt");
       if (fs.existsSync(txt) && !FORCE) continue;
+      if (PROBE) { fetched.push(slug); continue; }
       try {
         const buf = await get(url);
         if (buf.subarray(0, 5).toString("latin1") !== "%PDF-") throw new Error("not a PDF");
@@ -121,6 +132,7 @@ async function main() {
       } catch (e) { warnings.push(`${slug}: ${e.message}`); }
     }
   }
+  if (PROBE) { console.log("PROBE " + JSON.stringify({ new: fetched, warnings })); return; }
   for (const w of warnings) console.log("warning", w);
   const cached = fs.readdirSync(SRC).filter((f) => f.endsWith(".txt")).length;
   console.log("IPSOS_STATUS " + JSON.stringify({ fetched, cached, warnings }));

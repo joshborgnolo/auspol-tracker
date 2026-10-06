@@ -16,7 +16,8 @@
    4. agent-repair's watch list and schedule-tune's trigger list name real
       workflows, and every updater with a tuned cron block retriggers the
       tuner when it lands a wave (news24-update was missing until
-      2026-09-25, so its block only moved weekly).
+      2026-09-25, so its block only moved weekly), unless the caller
+      declares `# schedule-tune: weekly only`.
    Run: node .build/test-workflows.mjs */
 import { readFileSync, readdirSync } from "node:fs";
 import assert from "node:assert/strict";
@@ -91,8 +92,12 @@ assert.ok(!repairList.includes("agent-repair"), "agent-repair must not watch its
 
 const tuneList = listUnder(text["schedule-tune.yml"], "workflows");
 for (const w of tuneList) assert.ok(names.has(w), `schedule-tune listens for '${w}', which is no workflow's name`);
+// `# schedule-tune: weekly only` opts a house out: a comb that runs ~25
+// times a weekday for a wave every month or two (SEC Newgate), or whose
+// hours are declared rather than measured (Ipsos), would only spawn no-op
+// tuner runs; the weekly tune moves its block soon enough
 for (const f of callers)
-  if (text[f].includes("# tune-schedules:begin"))
+  if (text[f].includes("# tune-schedules:begin") && !text[f].includes("# schedule-tune: weekly only"))
     assert.ok(tuneList.includes(nameOf(text[f])), `${f} has a tuned block but schedule-tune.yml doesn't run when it lands a wave`);
 
 const healerList = listUnder(text["healer.yml"], "workflows");

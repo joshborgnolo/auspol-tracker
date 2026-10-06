@@ -140,6 +140,19 @@ const TARGETS = [
   { workflow: "demosau-update.yml", houses: ["DemosAU"], mode: "dense", medianComb: [-10, 60] },
   { workflow: "spectre-update.yml", houses: ["Spectre Strategy"], mode: "dense", sweep: "06:50" },
   { workflow: "foxhedgehog-update.yml", houses: ["Fox & Hedgehog"], mode: "dense", sweep: "06:35" },
+  // The two houses with no voting intention, combed through their weekday
+  // office hours (mode "weekdays"): until 2026-10-06 each had one evening
+  // cron line, which GitHub ran 4–9 hours late, so a report up at 4pm sat
+  // until the small hours. Each quiet run ends at its probe in seconds
+  // (poll-agent.yml's `probe`), so a 20-minute comb is cheap.
+  // SEC Newgate's hours are measured from the upload stamps on its direction
+  // rows (rows: "direction"): Mon–Wed so far, 11:16–17:24.
+  { workflow: "secnewgate-update.yml", houses: ["SEC Newgate"], rows: "direction", mode: "weekdays", step: 20 },
+  // Ipsos keeps no publication stamp (nothing in data/ dates a report), so
+  // its hours are declared: the national reports' first-upload Last-Modified
+  // stamps in 2026 read 11:43–16:34 Sydney, every one on a weekday (Feb–Sep;
+  // June's re-uploaded v4 set aside). Recheck them when the comb misses.
+  { workflow: "ipsos-update.yml", houses: ["Ipsos"], window: ["11:43", "16:34"], mode: "weekdays", step: 20 },
 ];
 
 // ---- helpers --------------------------------------------------------------
@@ -166,12 +179,12 @@ function easternOffsetMinutes(now) {
 }
 
 // ---- measure the habit ----------------------------------------------------
-function measure(data, house) {
+function measure(data, house, rows = "polls") {
   const rules = data.pollsterRules?.[house] || {};
   // one release per publication minute (see gen-data's byHouse collapse)
   const seen = new Set();
   const releases = [];
-  for (const p of data.polls) {
+  for (const p of data[rows] || []) {
     if (p.pollster !== house || !p.published) continue;
     if (seen.has(p.published)) continue;
     seen.add(p.published);
@@ -232,6 +245,15 @@ function measure(data, house) {
   };
 }
 
+/* A house whose release hours are declared on its TARGETS entry (`window`:
+   [earliest, latest]), not measured: nothing in data/ stamps its releases. */
+function declared(house, [a, b]) {
+  const from = toMins(a), to = toMins(b);
+  return { house, stopped: false, calMonth: false, dow: null, dowEvidence: null,
+    from, to, rawTo: to, span: [from, to], timedN: 0, timedFrom: null, timedTo: null,
+    hourEvidence: "declared in tune-schedules TARGETS", median: medianOf([from, to]) };
+}
+
 // ---- lay out slots (eastern local) ----------------------------------------
 /* A slot is { dow: 0-6 | null (daily), mins, label }. Labels are what the
    generated comments say; the same label on adjacent slots merges them. */
@@ -253,6 +275,22 @@ function layout(target, m) {
   }
   if (m.from == null) {
     notes.push(`${m.house}: no timed releases recorded and no declared hour — sweep only`);
+    return { slots, notes };
+  }
+
+  if (target.mode === "weekdays") {
+    // Mon–Fri, every `step` minutes from PRE_ROLL before the earliest release
+    // to RAW_TAIL past the latest (untrimmed: the record is short and an
+    // outlier hour is exactly the one to catch), then two hourly follow-ups
+    // and the late backstop; the daily sweep covers a weekend upload
+    const step = target.step || DENSE_STEP;
+    const lo = floorTo(m.span[0] - PRE_ROLL, step), hi = ceilTo(m.span[1] + RAW_TAIL, step);
+    const firstHour = ceilTo(hi + 1, 60);
+    for (let d = 1; d <= 5; d++) {
+      for (let t = lo; t <= hi; t += step) add(d, t, `weekday release hours, every ${step} min`);
+      for (let i = 0; i < 2; i++) add(d, firstHour + i * 60, "follow-up");
+      if (toMins(LATE_BACKSTOP) > firstHour + 60) add(d, toMins(LATE_BACKSTOP), "late backstop");
+    }
     return { slots, notes };
   }
 
@@ -368,7 +406,7 @@ function toCron(slots, offset) {
 function blockFor(target, data, now) {
   const offset = easternOffsetMinutes(now);
   const offLabel = `UTC${offset >= 0 ? "+" : "-"}${Math.floor(Math.abs(offset) / 60)}${offset % 60 ? ":" + String(Math.abs(offset) % 60).padStart(2, "0") : ""}`;
-  const ms = target.houses.map((h) => measure(data, h));
+  const ms = target.houses.map((h) => target.window ? declared(h, target.window) : measure(data, h, target.rows));
   const slots = [], notes = [];
   for (const m of ms) { const l = layout(target, m); slots.push(...l.slots); notes.push(...l.notes); }
   const header = [
