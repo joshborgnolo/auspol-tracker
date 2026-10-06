@@ -95935,8 +95935,8 @@ function rdApOut(stamp) {
 function rdEffTbc(p) {
   if (p.sampleEff != null || !p.published) return false;
   if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
-  const prev = window.AUSPOL.individualPolls.filter(q => q.pollster === p.pollster && q.released < p.released && q.sampleEff != null).sort((a, b) => a.released < b.released ? -1 : 1).pop();
-  return !!prev;
+  const since = Date.parse(p.released) - 90 * 86400000;
+  return window.AUSPOL.individualPolls.some(q => q.pollster === p.pollster && q.sampleEff != null && q.released < p.released && Date.parse(q.released) >= since);
 }
 const RD_EFF_TBC_URL = {
   YouGov: "https://yougov.com/about/methodology/australian-polling-council",

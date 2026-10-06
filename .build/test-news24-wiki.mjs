@@ -9,7 +9,7 @@
 import assert from "node:assert/strict";
 
 process.env.N24_LIB = "1";
-const { parseWikiYouGov, wikiOthersSplit } = await import("./extract-news24.mjs");
+const { parseWikiYouGov, wikiOthersSplit, n24ConflictPlan } = await import("./extract-news24.mjs");
 
 const head = `==Voting intention==
 ===2026===
@@ -120,5 +120,25 @@ const noise = head + `|-
 `;
 r = parseWikiYouGov(noise);
 assert.equal(r.waves.length, 0, JSON.stringify(r));
+
+// ---- a News24 merge blocked by a source conflict (n24ConflictPlan) -------------
+// The 2026-10-06 shape: the row exists unstamped, Wikipedia and the embed
+// disagree. The row takes the article's stamp and none of Wikipedia's
+// figures - here Wikipedia's oth is the deliberately wrong side.
+{
+  const existing = { date: "2026-10-06", oth: 6, published: undefined };
+  const wave = { date: "2026-10-06", vi: { oth: 9 } };
+  let plan = n24ConflictPlan({ existing, wave, articlePublished: "2026-10-07T05:00" });
+  assert.deepEqual(plan, { fileWave: false, stamp: "2026-10-07T05:00" }, "existing row: stamp only, no figure write");
+  plan = n24ConflictPlan({ existing: { ...existing, published: "2026-10-07T05:00" }, wave, articlePublished: "2026-10-07T06:10" });
+  assert.deepEqual(plan, { fileWave: false, stamp: null }, "an existing stamp is never replaced");
+  plan = n24ConflictPlan({ existing, wave, articlePublished: "2026-09-30T05:00" });
+  assert.equal(plan.stamp, null, "a stamp before fieldwork ends is a misread");
+  plan = n24ConflictPlan({ existing, wave, articlePublished: null });
+  assert.deepEqual(plan, { fileWave: false, stamp: null }, "no article stamp: still no figure write");
+  // a wave not yet on file still files from Wikipedia, carrying the stamp
+  plan = n24ConflictPlan({ existing: null, wave, articlePublished: "2026-10-07T05:00" });
+  assert.deepEqual(plan, { fileWave: true, stamp: "2026-10-07T05:00" });
+}
 
 console.log("test-news24-wiki: ok");

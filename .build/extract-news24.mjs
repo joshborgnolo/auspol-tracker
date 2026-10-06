@@ -841,10 +841,24 @@ function parseWikiYouGov(text) {
   return { waves, unparsed: realFails };
 }
 
+// A News24 merge blocked by a cross-source conflict: the article's
+// publication stamp is transfer-state metadata, not a checked figure, so it
+// still lands (the All-polls "eff. TBC" gate keys off it — the 2026-10-06
+// wave lost both to an oth/OL-net conflict). An existing row takes the stamp
+// and NOTHING else: the conflict is exactly the case where Wikipedia's
+// figures may be the wrong side, so they must not overwrite the row. A new
+// wave still files from Wikipedia, as before, now carrying the stamp. A
+// stamp dated before the fieldwork ends is a misread and is dropped.
+function n24ConflictPlan({ existing, wave, articlePublished }) {
+  const ok = typeof articlePublished === "string" && articlePublished.slice(0, 10) >= wave.date;
+  if (existing) return { fileWave: false, stamp: !existing.published && ok ? articlePublished : null };
+  return { fileWave: true, stamp: !wave.published && ok ? articlePublished : null };
+}
+
 // --------------------------------------------------------------- entry
 // N24_LIB=1: import the parsers and guards (tests, the layout healer's
 // acceptance step) without running the extraction.
-export { parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells, guard, WIKI_RAW };
+export { parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells, guard, n24ConflictPlan, WIKI_RAW };
 if (!process.env.N24_LIB) {
 const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [], releaseFilled: [] };
 
@@ -983,7 +997,7 @@ try {
   status.fallback = { source: "wikipedia", checked: 0, added: [], skipped_existing: 0, unparsed: [] };
   status.news24 = {
     enabled: !!(process.env.NEWSIE_CHROME || NEWS24_FILE),
-    attempted: 0, enriched: [], skipped: [], problems: [], adjudicated: [],
+    attempted: 0, enriched: [], skipped: [], problems: [], adjudicated: [], stamped: [],
     sources: {}, // date -> "anon"|"chrome"|"file" (which leg served the article DOM)
     infogram: {}, // date -> {ids, kinds, problems}
   };
@@ -1025,7 +1039,7 @@ try {
         && !!news24Url;
       if ((existing || newDates.has(wikiWave.date)) && !canUpgrade) { status.fallback.skipped_existing++; continue; }
 
-      let h = wikiWave, n24 = null, ig = null, rescuedPub = false;
+      let h = wikiWave, n24 = null, ig = null, stampOnly = false;
       if (news24Url) {
         status.news24.attempted++;
         const art = await fetchNews24Article(news24Url);
@@ -1047,11 +1061,12 @@ try {
               ...rawProblems.filter((p) => !allProblems.includes(p)).map((p) => `${wikiWave.date}: ${p}`));
           if (allProblems.length) {
             status.news24.problems.push(`${wikiWave.date}: ${allProblems.join(" | ")}`);
-            // A blocked figure merge must not cost the wave its publication
-            // stamp: `published` is article transfer-state metadata, not a
-            // checked figure, and the All-polls "eff. TBC" gate keys off it
-            // (2026-10-06 wave: the oth/OL-net problems held the stamp back).
-            if (!h.published && parsed.published) { h.published = parsed.published; rescuedPub = true; }
+            // the stamp still lands; an existing row takes nothing else
+            const plan = n24ConflictPlan({ existing, wave: wikiWave, articlePublished: parsed.published });
+            if (!plan.fileWave) {
+              stampOnly = true;
+              if (plan.stamp) { existing.published = plan.stamp; status.news24.stamped.push(wikiWave.date); }
+            } else if (plan.stamp) h = { ...wikiWave, published: plan.stamp };
           } else {
             h = merged.wave;
             n24 = merged.news24;
@@ -1062,7 +1077,7 @@ try {
           status.news24.skipped.push(`${wikiWave.date}: News24 ${art.via ?? "fetch"}/parse failed`);
         }
       }
-      if (canUpgrade && !n24 && !rescuedPub) continue;
+      if (stampOnly || (canUpgrade && !n24)) continue;
 
       // a wave found on the Pulse page may have no stated sample (the Sep 2026
       // article style dropped the methodology line): it files with
@@ -1150,7 +1165,7 @@ try {
     process.exit(2);
   }
 
-  if (sources.length || status.releaseFilled.length) {
+  if (sources.length || status.releaseFilled.length || status.news24?.stamped?.length) {
     if (newPolls.length) D.polls = [...D.polls, ...newPolls].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
     for (const [key, rows] of [["ppm", newPpm], ["approval", newAppr], ["altTpp", newAlt], ["ppmHeadToHead", newPpmH]]) {
       if (!rows.length) continue;
@@ -1167,6 +1182,7 @@ try {
       const parts = [];
       if (newPolls.length) parts.push(`+${newPolls.length} YouGov wave(s): ${status.added.map((a) => a.date).join(", ")}`);
       if (status.news24.upgraded.length) parts.push(`enriched latest News24 wave: ${status.news24.upgraded.join(", ")}`);
+      if (status.news24?.stamped?.length) parts.push(`published stamp only (source conflict): ${status.news24.stamped.join(", ")}`);
       if (status.releaseFilled.length) parts.push(`releaseUrl filled: ${status.releaseFilled.join(", ")}`);
       console.log(`wrote ${OUT}: ${parts.join(", ")}`);
     }

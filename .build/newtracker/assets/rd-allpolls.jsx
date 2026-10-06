@@ -118,20 +118,21 @@ function rdApOut(stamp) {
   return s;
 }
 
-/* the effective sample is still to come: the house's most recent poll WITH
-   one is its filing habit (any age — a statement lag can outrun the wave
-   cadence, as YouGov's did in Sept-Oct 2026) and this wave is inside three
-   weeks of release (older gaps are left unsaid). The previous-poll version
-   of this check went dark for BOTH unstamped waves once one statement
-   lagged: the lagging wave's neighbour carried no eff, so it gated off the
-   one after it too. One rule for the header and the table's Sample column,
-   so they agree. */
+/* the effective sample is still to come: the house filed one for a poll
+   released in the 90 days before this one (its filing habit — looked for
+   past unfiled waves, since a statement lag can outrun the wave cadence, as
+   YouGov's did in Sept-Oct 2026; the previous-poll version went dark for
+   both unfiled waves once one statement lagged) and this wave is inside
+   three weeks of release (older gaps are left unsaid). The 90-day bound
+   retires the promise for a house that stops filing, rather than marking
+   every new wave TBC indefinitely. One rule for the header and the table's
+   Sample column, so they agree. */
 function rdEffTbc(p) {
   if (p.sampleEff != null || !p.published) return false;
   if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
-  const prev = window.AUSPOL.individualPolls.filter((q) => q.pollster === p.pollster && q.released < p.released && q.sampleEff != null)
-    .sort((a, b) => (a.released < b.released ? -1 : 1)).pop();
-  return !!prev;
+  const since = Date.parse(p.released) - 90 * 86400000;
+  return window.AUSPOL.individualPolls.some((q) => q.pollster === p.pollster && q.sampleEff != null
+    && q.released < p.released && Date.parse(q.released) >= since);
 }
 /* "TBC" links to where the house will publish the figure: YouGov's APC
    methodology page (it sets out why the effective sample trails the
