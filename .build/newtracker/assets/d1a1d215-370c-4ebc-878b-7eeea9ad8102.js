@@ -6537,8 +6537,11 @@ function infoTerms(D) {
           own heading is its name) and carries the id that section's "How
           it's built" link opens, so the pop-over shows the whole method for
           what the reader was just looking at; the section's terms follow.
-     What shows is what a figure means, how it's built, how to read it and
-     its limits. Formulas, worked tables, exact question wordings,
+     The four parts print numbered (1-4, the sections 4.1-4.12) and the
+     pinned index carries the same numbers (InfoView; probe-info-num pins
+     the two agreeing). What shows is what a figure means, how it's built,
+     how to read it and its limits. Formulas, worked tables, exact
+     question wordings,
      pollster-by-pollster lists, data checks and source lists sit in each
      entry's "Show the working" fold. An id merged into another lives on in
      INFO_ALIAS, so no link breaks. */
@@ -7858,6 +7861,36 @@ function InfoView({ focus, onBack, backLabel }) {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ block: "start", behavior: "smooth" });
   };
+  /* The page reads as a short numbered document - chapters 1-4, the
+     twelve section explainers 4.1-4.12 - and the pinned index's buttons
+     carry the same numbers, so "see 4.6" resolves the same way on the
+     walk, the heading and the page. Entries keep their plain ids: those
+     are the link targets, not an outline. probe-info-num pins pill and
+     heading agreeing. A pop-over entry shows no number: it has left the
+     page the number refers to. */
+  const CH_PILLS = [["info-about", "1.", "About"], ["info-faq", "2.", "Questions"], ["info-method", "3.", "Method"]];
+  const secNum = (i) => "4." + (i + 1);
+  /* The index wears the redesign's pinned-walk idiom (All polls'
+     rd-ap-pinl): the heading reading under the bar owns the lit button.
+     A scroll spy walks the sixteen headings; the last one still above a
+     line just under the bar's bottom edge is current. */
+  const [on, setOn] = React.useState("info-about");
+  React.useEffect(() => {
+    const els = ["info-about", "info-faq", "info-method", "info-sections",
+      ...sections.map((g) => g.id)]
+      .map((id) => document.getElementById(id)).filter(Boolean);
+    if (els.length < 2) return;
+    const spy = () => {
+      const bar = document.querySelector(".info-index");
+      const line = (bar ? bar.getBoundingClientRect().bottom : 60) + 8;
+      let cur = els[0].id;
+      for (const el of els) if (el.getBoundingClientRect().top <= line) cur = el.id;
+      setOn((prev) => (prev === cur ? prev : cur));
+    };
+    spy();
+    window.addEventListener("scroll", spy, { passive: true });
+    return () => window.removeEventListener("scroll", spy);
+  }, []);
   /* Each entry's name is a real heading (h3/h4) so assistive tech can walk
      them, set inline so the definition still runs straight on from it. A
      question keeps its own punctuation; a term gets a full stop. A section's
@@ -7873,23 +7906,27 @@ function InfoView({ focus, onBack, backLabel }) {
   return (
     <section className="card info">
       <nav className="info-index" aria-label="On this page">
-        <button type="button" onClick={() => jump("info-about")}>About</button>
-        <button type="button" onClick={() => jump("info-faq")}>Questions</button>
-        <button type="button" onClick={() => jump("info-method")}>Method</button>
-        {sections.map((g) => (
-          <button key={g.id} type="button" onClick={() => jump(g.id)}>{g.nav}</button>
+        {CH_PILLS.map(([id, num, label]) => (
+          <button key={id} type="button" className={on === id ? "on" : ""}
+            aria-current={on === id ? "true" : undefined} onClick={() => jump(id)}>
+            <span className="info-num">{num}</span> {label}</button>
+        ))}
+        {sections.map((g, i) => (
+          <button key={g.id} type="button" className={on === g.id ? "on" : ""}
+            aria-current={on === g.id ? "true" : undefined} onClick={() => jump(g.id)}>
+            <span className="info-num">{secNum(i)}</span> {g.nav}</button>
         ))}
       </nav>
-      <h2 id="info-about" className="card-title info-h">About</h2>
+      <h2 id="info-about" className="card-title info-h"><span className="info-num">1.</span> About</h2>
       <div className="info-about">{about}</div>
-      <h2 id="info-faq" className="card-title info-h info-h-faq">Questions</h2>
+      <h2 id="info-faq" className="card-title info-h info-h-faq"><span className="info-num">2.</span> Questions</h2>
       {faqs.map((f) => entry(f, "h3"))}
-      <h2 id="info-method" className="card-title info-h info-h-faq">How the figures are built</h2>
+      <h2 id="info-method" className="card-title info-h info-h-faq"><span className="info-num">3.</span> How the figures are built</h2>
       {method.map((t) => entry(t, "h3"))}
-      <h2 id="info-sections" className="card-title info-h info-h-faq">Section by section</h2>
-      {sections.map((g) => (
+      <h2 id="info-sections" className="card-title info-h info-h-faq"><span className="info-num">4.</span> Section by section</h2>
+      {sections.map((g, i) => (
         <React.Fragment key={g.id}>
-          <h3 id={g.id} className="info-group">{g.title}</h3>
+          <h3 id={g.id} className="info-group"><span className="info-num">{secNum(i)}</span> {g.title}</h3>
           {entry(g.lead, "h4")}
           {g.entries.map((t) => entry(t, "h4"))}
         </React.Fragment>

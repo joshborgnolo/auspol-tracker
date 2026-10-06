@@ -1448,9 +1448,12 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   .info-index::-webkit-scrollbar { display: none; }
 }
 .info-index button { background: none; border: 0; padding: 0; cursor: pointer;
-  color: var(--ink-3); font: inherit; text-decoration: underline;
-  text-decoration-color: var(--line-2); text-underline-offset: 3px; }
-.info-index button:hover { color: var(--ink); text-decoration-color: currentColor; }
+  color: var(--ink-3); font: inherit; }
+.info-index button:hover { color: var(--ink); }
+.info-index button.on { color: var(--ink); font-weight: 600;
+  text-decoration: underline; text-decoration-thickness: 2px;
+  text-decoration-color: var(--ink); text-underline-offset: 4px; }
+.info-num { color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .info-about-p { margin: 0 0 12px; font-size: 15px; line-height: 1.62;
   color: var(--ink-2); text-wrap: pretty; }
 .info-about { margin-bottom: 8px; }
@@ -5197,6 +5200,7 @@ body.rd .rd-foot-links { display: inline-flex; align-items: center; gap: 24px; f
 body.rd .info { padding-top: 4px; }
 body.rd .info-index { top: 46px; gap: 6px 20px; padding: 12px 0 10px; }
 body.rd .info-index button { font-weight: 500; color: var(--ink-2); }
+body.rd .info-index button.on { color: var(--ink); font-weight: 600; }
 body.rd .info-h {
   margin: 10px 0 16px; padding-top: 12px; border-top: 2px solid var(--rd-rule);
   font-family: var(--sans); font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em;
@@ -82178,6 +82182,25 @@ function InfoView({
       behavior: "smooth"
     });
   };
+  const CH_PILLS = [["info-about", "1.", "About"], ["info-faq", "2.", "Questions"], ["info-method", "3.", "Method"]];
+  const secNum = i => "4." + (i + 1);
+  const [on, setOn] = React.useState("info-about");
+  React.useEffect(() => {
+    const els = ["info-about", "info-faq", "info-method", "info-sections", ...sections.map(g => g.id)].map(id => document.getElementById(id)).filter(Boolean);
+    if (els.length < 2) return;
+    const spy = () => {
+      const bar = document.querySelector(".info-index");
+      const line = (bar ? bar.getBoundingClientRect().bottom : 60) + 8;
+      let cur = els[0].id;
+      for (const el of els) if (el.getBoundingClientRect().top <= line) cur = el.id;
+      setOn(prev => prev === cur ? prev : cur);
+    };
+    spy();
+    window.addEventListener("scroll", spy, {
+      passive: true
+    });
+    return () => window.removeEventListener("scroll", spy);
+  }, []);
   const entry = (t, H) => React.createElement("div", {
     key: t.id,
     id: "term-" + t.id,
@@ -82195,39 +82218,52 @@ function InfoView({
   }, React.createElement("nav", {
     className: "info-index",
     "aria-label": "On this page"
-  }, React.createElement("button", {
+  }, CH_PILLS.map(([id, num, label]) => React.createElement("button", {
+    key: id,
     type: "button",
-    onClick: () => jump("info-about")
-  }, "About"), React.createElement("button", {
-    type: "button",
-    onClick: () => jump("info-faq")
-  }, "Questions"), React.createElement("button", {
-    type: "button",
-    onClick: () => jump("info-method")
-  }, "Method"), sections.map(g => React.createElement("button", {
+    className: on === id ? "on" : "",
+    "aria-current": on === id ? "true" : undefined,
+    onClick: () => jump(id)
+  }, React.createElement("span", {
+    className: "info-num"
+  }, num), " ", label)), sections.map((g, i) => React.createElement("button", {
     key: g.id,
     type: "button",
+    className: on === g.id ? "on" : "",
+    "aria-current": on === g.id ? "true" : undefined,
     onClick: () => jump(g.id)
-  }, g.nav))), React.createElement("h2", {
+  }, React.createElement("span", {
+    className: "info-num"
+  }, secNum(i)), " ", g.nav))), React.createElement("h2", {
     id: "info-about",
     className: "card-title info-h"
-  }, "About"), React.createElement("div", {
+  }, React.createElement("span", {
+    className: "info-num"
+  }, "1."), " About"), React.createElement("div", {
     className: "info-about"
   }, about), React.createElement("h2", {
     id: "info-faq",
     className: "card-title info-h info-h-faq"
-  }, "Questions"), faqs.map(f => entry(f, "h3")), React.createElement("h2", {
+  }, React.createElement("span", {
+    className: "info-num"
+  }, "2."), " Questions"), faqs.map(f => entry(f, "h3")), React.createElement("h2", {
     id: "info-method",
     className: "card-title info-h info-h-faq"
-  }, "How the figures are built"), method.map(t => entry(t, "h3")), React.createElement("h2", {
+  }, React.createElement("span", {
+    className: "info-num"
+  }, "3."), " How the figures are built"), method.map(t => entry(t, "h3")), React.createElement("h2", {
     id: "info-sections",
     className: "card-title info-h info-h-faq"
-  }, "Section by section"), sections.map(g => React.createElement(React.Fragment, {
+  }, React.createElement("span", {
+    className: "info-num"
+  }, "4."), " Section by section"), sections.map((g, i) => React.createElement(React.Fragment, {
     key: g.id
   }, React.createElement("h3", {
     id: g.id,
     className: "info-group"
-  }, g.title), entry(g.lead, "h4"), g.entries.map(t => entry(t, "h4")))));
+  }, React.createElement("span", {
+    className: "info-num"
+  }, secNum(i)), " ", g.title), entry(g.lead, "h4"), g.entries.map(t => entry(t, "h4")))));
 }
 function TermPop({
   id,

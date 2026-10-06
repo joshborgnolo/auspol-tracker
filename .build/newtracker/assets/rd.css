@@ -2862,6 +2862,9 @@ body.rd .rd-foot-links { display: inline-flex; align-items: center; gap: 24px; f
 body.rd .info { padding-top: 4px; }
 body.rd .info-index { top: 46px; gap: 6px 20px; padding: 12px 0 10px; }
 body.rd .info-index button { font-weight: 500; color: var(--ink-2); }
+/* the template's .on rule loses specificity to the one above; the walk's
+   lit button must out-vote it (ink + the 600 of the pinned-tab idiom) */
+body.rd .info-index button.on { color: var(--ink); font-weight: 600; }
 body.rd .info-h {
   margin: 10px 0 16px; padding-top: 12px; border-top: 2px solid var(--rd-rule);
   font-family: var(--sans); font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em;

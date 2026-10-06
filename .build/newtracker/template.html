@@ -2274,10 +2274,19 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
     overflow-y: clip; scrollbar-width: none; white-space: nowrap; }
   .info-index::-webkit-scrollbar { display: none; }
 }
+/* the walk is the redesign's pinned-tab idiom (All polls' rd-ap-pinl), not
+   a links list: no resting underline; the button owning the heading at the
+   bar takes ink, the 600 weight and a 2px underline. The decoration pulls
+   no box with it, so the row never moves as it walks (a border would) */
 .info-index button { background: none; border: 0; padding: 0; cursor: pointer;
-  color: var(--ink-3); font: inherit; text-decoration: underline;
-  text-decoration-color: var(--line-2); text-underline-offset: 3px; }
-.info-index button:hover { color: var(--ink); text-decoration-color: currentColor; }
+  color: var(--ink-3); font: inherit; }
+.info-index button:hover { color: var(--ink); }
+.info-index button.on { color: var(--ink); font-weight: 600;
+  text-decoration: underline; text-decoration-thickness: 2px;
+  text-decoration-color: var(--ink); text-underline-offset: 4px; }
+/* a chapter/section number, quieter than the title it leads: the count is
+   the walk, the words are the reading */
+.info-num { color: var(--ink-3); font-variant-numeric: tabular-nums; }
 /* About reads as the page's opening, in the glossary's typography */
 .info-about-p { margin: 0 0 12px; font-size: 15px; line-height: 1.62;
   color: var(--ink-2); text-wrap: pretty; }
