@@ -2192,7 +2192,8 @@ function RdAllPolls(P) {
     const count = n + " poll" + (n === 1 ? "" : "s");
     if (facet === "twopp") {
       const k = g.list.filter(inToday).length;
-      const note = count + (todayTxt && k ? (k === n ? ", all in today’s " + todayTxt : ", " + k + " in today’s " + todayTxt) : "");
+      const allWord = n === 1 ? "in" : n === 2 ? "both in" : "all in";
+      const note = count + (todayTxt && k ? (k === n ? ", " + allWord + " today’s " + todayTxt : ", " + k + " in today’s " + todayTxt) : "");
       const avg = monthAvg[g.ym];
       return (
         <div className={"rd-ap-mrow " + cls} role="row" key={"m" + g.ym}>
