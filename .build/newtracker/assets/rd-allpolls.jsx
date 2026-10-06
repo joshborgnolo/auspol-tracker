@@ -224,8 +224,11 @@ const rdApX = (v) => ((Math.max(-RD_AP_M, Math.min(RD_AP_M, v)) + RD_AP_M) / (2 
 /* ---------------------------------------------------------------- the lean picture
    One poll against the average of the other polls fielded around it
    (rdApYd): the centre line is that average, the dot the poll's lean, the whisker its 95% margin from sampling
-   alone. `tip` is the readout, drawn on hover by the row. */
-function RdApStrip({ lean, moe, onM, tip, phone }) {
+   alone, and the tick its pollster's usual lean as of the poll (`he`) - where
+   its polls land with nothing but sampling at work, so a whisker that clears
+   the tick, not the centre line, is the surprise. `tip` is the readout, drawn
+   on hover by the row. */
+function RdApStrip({ lean, moe, he, onM, tip, phone }) {
   const grid = phone ? [-3, 3] : [-4, -2, 2, 4];
   const lo = lean != null && moe != null ? lean - moe : null;
   const hi = lean != null && moe != null ? lean + moe : null;
@@ -233,6 +236,7 @@ function RdApStrip({ lean, moe, onM, tip, phone }) {
     <span className="rd-ap-in">
       {grid.map((v) => <i key={v} className="rd-ap-gl" style={{ left: rdApX(v) + "%" }}></i>)}
       <i className="rd-ap-avg" style={{ left: "50%" }}></i>
+      {he != null && Math.abs(he) >= 0.05 && <i className="rd-ap-he" style={{ left: rdApX(he) + "%" }}></i>}
       {lo != null && <i className="rd-ap-wh" style={{ left: rdApX(lo) + "%", width: rdApX(hi) - rdApX(lo) + "%" }}></i>}
       {lo != null && <i className={"rd-ap-clip l" + (lo < -RD_AP_M ? " on" : "")}></i>}
       {hi != null && <i className={"rd-ap-clip r" + (hi > RD_AP_M ? " on" : "")}></i>}
@@ -285,6 +289,11 @@ const rdApTickStep = (lo, hi) => (hi - lo > 24 ? (hi - lo > 48 ? 10 : 8) : 4);
 /* a house's name in the rail's narrow key column may break after its slash
    ("RedBridge/Accent’s" ran into its value on a phone) */
 const rdApBreakable = (name) => String(name).replace(/\//g, "/\u200b");
+/* a poll's house lean as of the poll on a contest and basis, as printed, and
+   its lean with that taken out - the gap its margin is judged on (the raw
+   lean where the house has no measured lean) */
+const rdApHe = (p, onM, pub) => { const y = rdApYd(p, onM, pub); return y && y.he != null ? Math.round(y.he * 10) / 10 : null; };
+const rdApAdj = (p, onM, pub) => { const h = rdApHe(p, onM, pub); return p.lean == null ? null : h == null ? p.lean : Math.round((p.lean - h) * 10) / 10; };
 const rdApR1 = (v) => (v == null ? null : Math.round(v * 10) / 10);
 /* the line that yardstick lies on, as {ym, x, v} rows from t0 to t1: the
    series' line with the stretch this wave reaches redrawn without it (the
@@ -1037,6 +1046,18 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
   const ldOwn = isLd ? rdApLdPairs(p.appr) : [];
   const ldWin = isLd && ldOwn.length ? rdApLdWindow(p) : null;
   const ldWord = ldWin && ldWin.waves.length ? rdApLdWord(ldWin.waves) : null;
+  /* the caption names every rival the window's dots are set against, in the
+     order they held the job ("Ley then Taylor" across Feb 2026) - this
+     poll's names alone mislabelled the earlier dots */
+  const ldNames = (() => {
+    if (!ldWin || !ldWin.waves.length) return ldOwn.map((pr) => pr.name);
+    const byRiv = {};
+    [...ldWin.waves].sort((a, b) => a.q.released.localeCompare(b.q.released)).forEach((w) => w.pairs.forEach((pr) => {
+      const l = byRiv[pr.riv] || (byRiv[pr.riv] = []);
+      if (!l.includes(pr.name)) l.push(pr.name);
+    }));
+    return RD_AP_LD_RIVALS.filter((R) => byRiv[R.riv]).map((R) => byRiv[R.riv].join(" then "));
+  })();
   /* the caption's metric word is a toggle when the house prints BOTH
      questions: approvals are its primary (metricOf is firm-steady, so every
      window wave's pair is approval) and at least one window wave carries the
@@ -1350,7 +1371,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
                         aria-label={"Showing " + rdApLdMetWord(ldAct) + ". Switch to " + rdApLdMetWord(ldAct === "fav" ? "approval" : "fav")}
                         title={"Switch to " + rdApLdMetWord(ldAct === "fav" ? "approval" : "fav")}
                         onClick={(e) => { e.stopPropagation(); setLdMet(ldAct === "fav" ? "approval" : "fav"); }}>{rdApLdMetWord(ldAct)}</button>
-              : ldWord}, {rdApPmOffice()} minus {rdApLdJoin(ldOwn.map((pr) => pr.name))}</span>
+              : ldWord}, {rdApPmOffice()} minus {rdApLdJoin(ldNames)}</span>
             <RdApLdMini p={p} met={ldAct} />
           </>
         )}
@@ -1633,15 +1654,15 @@ function RdAllPolls(P) {
       : "Labor’s " + today.a.toFixed(1) + " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s")
       + (n === 1 ? "" : lo === hi ? ", which all put Labor on " + f(lo) : ", which range from " + f(lo) + " to " + f(hi));
     const ahead = vals.filter((v) => v > 50).length;
-    const outN = win.filter((p) => rdApInside(p.lean, rdPollMargin(p, contest, pub)) === "outside").length;
+    const outN = win.filter((p) => rdApInside(rdApAdj(p, onM, pub), rdPollMargin(p, contest, pub)) === "outside").length;
     const lead = n === 1 ? (ahead ? "It has" : "It doesn’t have")
       : ahead === n ? (n === 2 ? "Both have" : "All " + rdNumWord(n) + " have")
       : ahead === 0 ? "None of them has"
       : rdCap(rdNumWord(ahead)) + " of them " + (ahead === 1 ? "has" : "have");
-    const tail = n === 1 ? (outN ? "it sits further from the " + RD_AP_AVG + " than its own margin of error. " : "it sits within its own margin of error of the " + RD_AP_AVG + ". ")
-      : outN === 0 ? "none sits further from the " + RD_AP_AVG + " than its own margin of error. "
-      : outN === 1 ? "one sits further from the " + RD_AP_AVG + " than its own margin of error. "
-      : rdNumWord(outN) + " sit further from the " + RD_AP_AVG + " than their own margin of error. ";
+    const tail = n === 1 ? (outN ? "it sits further from where its pollster usually lands than its own margin of error. " : "it sits within its own margin of error of where its pollster usually lands. ")
+      : outN === 0 ? "none sits further from where its pollster usually lands than its own margin of error. "
+      : outN === 1 ? "one sits further from where its pollster usually lands than its own margin of error. "
+      : rdNumWord(outN) + " sit further from where their pollsters usually land than their own margin of error. ";
     dek = lead + " Labor ahead of " + rival + ", and " + tail
       + "Below is every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election, newest first, each linked to its source.";
   }
@@ -1911,16 +1932,19 @@ function RdAllPolls(P) {
   );
   const tipCard = (p, f, m) => {
     const lean = p.lean;
-    const outside = rdApInside(lean, m) === "outside";
+    const he = rdApHe(p, onM, pub);
+    const outside = rdApInside(rdApAdj(p, onM, pub), m) === "outside";
+    const way = (v) => (Math.abs(v) < 0.05 ? "level" : rdSigned(v, 1) + " to " + (v > 0 ? "Labor" : onM ? "One Nation" : "Coalition"));
     const left = Math.max(22, Math.min(78, rdApX(lean)));
     return (
       <span className="tip rd-ap-tip" style={{ left: left + "%" }} role="tooltip">
         <span className="tip-title">{p.pollster}, {p.fieldPending ? "fieldwork TBC" : p.field}</span>
         <span className="tip-row"><span className="tip-label">Labor v {onM ? "One Nation" : "Coalition"}, {pub ? "published" : "implied"}</span><span className="tip-val">{f.txtA}</span></span>
         <span className="tip-row"><span className="tip-label">{RD_AP_KAL ? "The trend" : "The polls around it"}</span><span className="tip-val">{rdApYd(p, onM, pub) ? rdApYd(p, onM, pub).v.toFixed(1) : "—"}</span></span>
-        <span className="tip-row"><span className="tip-label">Lean</span><span className="tip-val">{Math.abs(lean) < 0.05 ? "level" : rdSigned(lean, 1) + " to " + (lean > 0 ? "Labor" : onM ? "One Nation" : "Coalition")}</span></span>
+        <span className="tip-row"><span className="tip-label">Lean</span><span className="tip-val">{way(lean)}</span></span>
+        {he != null && <span className="tip-row"><span className="tip-label">Usual lean</span><span className="tip-val">{way(he)}</span></span>}
         {m != null && <span className="tip-row"><span className="tip-label">95% margin</span><span className="tip-val">±{m.toFixed(1)}</span></span>}
-        {outside && <span className="rd-ap-tipnote">Outside its margin, as about one poll in 20 should be</span>}
+        {outside && <span className="rd-ap-tipnote">{he != null ? "Further from its pollster’s usual lean than its margin, as about one poll in 20 should be" : "Outside its margin, as about one poll in 20 should be"}</span>}
       </span>
     );
   };
@@ -1950,10 +1974,11 @@ function RdAllPolls(P) {
       const against = RD_AP_KAL ? "the trend" : "the other polls fielded around it";
       const aria = p.lean == null ? "No figure to set against " + against
         : (Math.abs(p.lean) < 0.05 ? "Level with " + against : rdSigned(p.lean, 1) + " points against " + against + ", towards " + (p.lean > 0 ? "Labor" : rival))
+          + (rdApHe(p, onM, pub) != null && Math.abs(rdApHe(p, onM, pub)) >= 0.05 ? "; its pollster usually leans " + rdSigned(rdApHe(p, onM, pub), 1) : "")
           + (m != null ? "; 95% margin ±" + m.toFixed(1) : "");
       pic = (
         <span className="rd-ap-pic" role="img" aria-label={aria} onMouseEnter={() => setTip(id)} onMouseLeave={() => setTip(null)}>
-          <RdApStrip lean={p.lean} moe={m} onM={onM} phone={phone} tip={hovered ? tipCard(p, f, m) : null} />
+          <RdApStrip lean={p.lean} moe={m} he={rdApHe(p, onM, pub)} onM={onM} phone={phone} tip={hovered ? tipCard(p, f, m) : null} />
         </span>
       );
       val = <span role="cell" className="rd-ap-val" style={{ color: rdApLeanInk(p.lean, onM) }}>{p.lean == null ? "—" : rdApSigned(p.lean)}</span>;
@@ -2502,6 +2527,7 @@ function RdAllPolls(P) {
         ]}>
           <span className="rd-key-item"><span className="rd-ap-keywh" aria-hidden="true"><i></i></span>{phone ? "95% interval, from its sample" : "95% interval, from the poll’s own sample"}</span>
           <span className="rd-key-item"><span className="rd-ap-keyavg" aria-hidden="true"></span>{RD_AP_KAL ? "The trend" : phone ? "Average of the polls around it" : "Average of the other polls fielded around it"}</span>
+          <span className="rd-key-item"><span className="rd-ap-keyhe" aria-hidden="true"></span>{phone ? "Its pollster’s usual lean" : "Where its pollster usually lands (its house lean)"}</span>
         </RdKey>
       )}
       {facet === "primary" && (
@@ -2523,9 +2549,9 @@ function RdAllPolls(P) {
       <HowTo label="How to read this table" paras={[
         <>Dates are fieldwork; the day the poll came out sits beneath. A dash means the pollster didn’t publish that figure. Open any row for the poll in full, with what it does to today’s figure.</>,
         facet === "twopp" && <>{pub
-          ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", and the whisker the 95% interval its sample alone would give it."
-          : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows."}
-          {" "}About one poll in 20 should sit outside its interval by chance.</>,
+          ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it."
+          : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows."}
+          {" "}A pollster’s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance.</>,
         facet === "issues" && <>Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; "Level" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn’t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them.</>,
         facet === "demographics" && <>Each figure is a party’s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18–34 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party’s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation’s have widened that way as its vote has grown. Open any row for the poll’s whole table.</>,
         <><b>Sample</b> is the number of people polled; <b>eff.</b> is the pollster’s own effective sample after weighting, where it publishes one. Where it doesn’t, the interval assumes weighting costs what it does on average.</>,

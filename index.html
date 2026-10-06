@@ -4726,6 +4726,8 @@ body.rd .rd-ap-chev:focus-visible { outline: 2px solid var(--accent); outline-of
 body.rd .rd-ap-pic { position: relative; align-self: stretch; display: block; min-height: 28px; }
 body.rd .rd-ap-gl { top: 0; bottom: 0; width: 1px; margin-left: -0.5px; background: var(--line-2); }
 body.rd .rd-ap-avg { top: 0; bottom: 0; width: 1.5px; margin-left: -0.75px; background: var(--rd-avgline); }
+body.rd .rd-ap-he { top: 50%; height: 14px; width: 2px; margin: -7px 0 0 -1px; border-radius: 1px; background: var(--ink-3);
+  transition: left .32s var(--morph-ease); }
 body.rd .rd-ap-wh { top: 50%; height: 2px; margin-top: -1px; border-radius: 1px; background: var(--rd-whisker);
   transition: left .32s var(--morph-ease), width .32s var(--morph-ease); }
 body.rd .rd-ap-clip { top: 50%; width: 0; height: 0; margin-top: -4px; border-top: 4px solid transparent; border-bottom: 4px solid transparent;
@@ -4738,7 +4740,7 @@ body.rd .rd-ap-dot {
   box-shadow: 0 0 0 1.5px var(--rd-rowbg); transition: left .32s var(--morph-ease), background-color .32s ease;
 }
 @media (prefers-reduced-motion: reduce) {
-  body.rd .rd-ap-dot, body.rd .rd-ap-wh, body.rd .rd-ap-clip { transition: none; }
+  body.rd .rd-ap-dot, body.rd .rd-ap-wh, body.rd .rd-ap-clip, body.rd .rd-ap-he { transition: none; }
 }
 body.rd .rd-ap-ring {
   top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; box-sizing: border-box;
@@ -4804,6 +4806,7 @@ body.rd .rd-ap-keywh { position: relative; display: inline-block; width: 34px; h
 body.rd .rd-ap-keywh::before { content: ""; position: absolute; left: 2px; right: 2px; top: 5px; height: 2px; border-radius: 1px; background: var(--rd-whisker); }
 body.rd .rd-ap-keywh i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ink-3); }
 body.rd .rd-ap-keyavg { display: inline-block; width: 1.5px; height: 16px; margin: 0 3px; background: var(--rd-avgline); }
+body.rd .rd-ap-keyhe { display: inline-block; width: 2px; height: 12px; margin: 0 3px; border-radius: 1px; background: var(--ink-3); vertical-align: -1px; }
 body.rd .rd-ap-keybar { width: 40px; flex: none; vertical-align: middle; }
 body.rd .rd-ap-keyring { display: inline-block; width: 9px; height: 9px; box-sizing: border-box; border-radius: 50%; border: 1.75px solid var(--ink-3); }
 body.rd .rd-ap ~ .rd-sec .view-how, body.rd .rd-ap .view-how { margin-top: 10px; }
@@ -92013,6 +92016,7 @@ const rdApX = v => (Math.max(-RD_AP_M, Math.min(RD_AP_M, v)) + RD_AP_M) / (2 * R
 function RdApStrip({
   lean,
   moe,
+  he,
   onM,
   tip,
   phone
@@ -92032,6 +92036,11 @@ function RdApStrip({
     className: "rd-ap-avg",
     style: {
       left: "50%"
+    }
+  }), he != null && Math.abs(he) >= 0.05 && React.createElement("i", {
+    className: "rd-ap-he",
+    style: {
+      left: rdApX(he) + "%"
     }
   }), lo != null && React.createElement("i", {
     className: "rd-ap-wh",
@@ -92096,6 +92105,14 @@ const rdApInside = (gap, moe) => {
 const rdApAgainst = pub => RD_AP_KAL ? "the trend through the other polls" : "the average of the other " + (pub ? "published figures" : "polls") + " fielded within three weeks of it";
 const rdApTickStep = (lo, hi) => hi - lo > 24 ? hi - lo > 48 ? 10 : 8 : 4;
 const rdApBreakable = name => String(name).replace(/\//g, "/\u200b");
+const rdApHe = (p, onM, pub) => {
+  const y = rdApYd(p, onM, pub);
+  return y && y.he != null ? Math.round(y.he * 10) / 10 : null;
+};
+const rdApAdj = (p, onM, pub) => {
+  const h = rdApHe(p, onM, pub);
+  return p.lean == null ? null : h == null ? p.lean : Math.round((p.lean - h) * 10) / 10;
+};
 const rdApR1 = v => v == null ? null : Math.round(v * 10) / 10;
 function rdApYdLine(line, y, xm, t0, t1) {
   const vs = (line || []).map(r => r[1]);
@@ -93249,6 +93266,15 @@ function RdApDetail({
   const ldOwn = isLd ? rdApLdPairs(p.appr) : [];
   const ldWin = isLd && ldOwn.length ? rdApLdWindow(p) : null;
   const ldWord = ldWin && ldWin.waves.length ? rdApLdWord(ldWin.waves) : null;
+  const ldNames = (() => {
+    if (!ldWin || !ldWin.waves.length) return ldOwn.map(pr => pr.name);
+    const byRiv = {};
+    [...ldWin.waves].sort((a, b) => a.q.released.localeCompare(b.q.released)).forEach(w => w.pairs.forEach(pr => {
+      const l = byRiv[pr.riv] || (byRiv[pr.riv] = []);
+      if (!l.includes(pr.name)) l.push(pr.name);
+    }));
+    return RD_AP_LD_RIVALS.filter(R => byRiv[R.riv]).map(R => byRiv[R.riv].join(" then "));
+  })();
   const ldAltWin = !!(ldWin && ldWin.waves.some(w => rdApLdAltPairs(w.q.appr).length));
   const ldBoth = !!(ldAltWin && ldWin.waves.every(w => w.pairs.every(pr => pr.met === "approval")));
   const [ldMet, setLdMet] = React.useState(null);
@@ -93696,7 +93722,7 @@ function RdApDetail({
       e.stopPropagation();
       setLdMet(ldAct === "fav" ? "approval" : "fav");
     }
-  }, rdApLdMetWord(ldAct)) : ldWord, ", ", rdApPmOffice(), " minus ", rdApLdJoin(ldOwn.map(pr => pr.name))), React.createElement(RdApLdMini, {
+  }, rdApLdMetWord(ldAct)) : ldWord, ", ", rdApPmOffice(), " minus ", rdApLdJoin(ldNames)), React.createElement(RdApLdMini, {
     p: p,
     met: ldAct
   })), isDir && d && React.createElement(React.Fragment, null, React.createElement("span", {
@@ -93968,9 +93994,9 @@ function RdAllPolls(P) {
     const n = win.length;
     head = RD_AP_KAL ? "Labor’s " + today.a.toFixed(1) + " is the trend through every poll; " + (n === 1 ? "the last three weeks hold one, at " + f(lo) : "the last three weeks’ " + rdNumWord(n) + (lo === hi ? " all put Labor on " + f(lo) : " range from " + f(lo) + " to " + f(hi))) : "Labor’s " + today.a.toFixed(1) + " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s") + (n === 1 ? "" : lo === hi ? ", which all put Labor on " + f(lo) : ", which range from " + f(lo) + " to " + f(hi));
     const ahead = vals.filter(v => v > 50).length;
-    const outN = win.filter(p => rdApInside(p.lean, rdPollMargin(p, contest, pub)) === "outside").length;
+    const outN = win.filter(p => rdApInside(rdApAdj(p, onM, pub), rdPollMargin(p, contest, pub)) === "outside").length;
     const lead = n === 1 ? ahead ? "It has" : "It doesn’t have" : ahead === n ? n === 2 ? "Both have" : "All " + rdNumWord(n) + " have" : ahead === 0 ? "None of them has" : rdCap(rdNumWord(ahead)) + " of them " + (ahead === 1 ? "has" : "have");
-    const tail = n === 1 ? outN ? "it sits further from the " + RD_AP_AVG + " than its own margin of error. " : "it sits within its own margin of error of the " + RD_AP_AVG + ". " : outN === 0 ? "none sits further from the " + RD_AP_AVG + " than its own margin of error. " : outN === 1 ? "one sits further from the " + RD_AP_AVG + " than its own margin of error. " : rdNumWord(outN) + " sit further from the " + RD_AP_AVG + " than their own margin of error. ";
+    const tail = n === 1 ? outN ? "it sits further from where its pollster usually lands than its own margin of error. " : "it sits within its own margin of error of where its pollster usually lands. " : outN === 0 ? "none sits further from where its pollster usually lands than its own margin of error. " : outN === 1 ? "one sits further from where its pollster usually lands than its own margin of error. " : rdNumWord(outN) + " sit further from where their pollsters usually land than their own margin of error. ";
     dek = lead + " Labor ahead of " + rival + ", and " + tail + "Below is every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election, newest first, each linked to its source.";
   }
   const todayTxt = today ? today.a.toFixed(1) : null;
@@ -94345,7 +94371,9 @@ function RdAllPolls(P) {
   }, rdEffTbcNote(p)) : null);
   const tipCard = (p, f, m) => {
     const lean = p.lean;
-    const outside = rdApInside(lean, m) === "outside";
+    const he = rdApHe(p, onM, pub);
+    const outside = rdApInside(rdApAdj(p, onM, pub), m) === "outside";
+    const way = v => Math.abs(v) < 0.05 ? "level" : rdSigned(v, 1) + " to " + (v > 0 ? "Labor" : onM ? "One Nation" : "Coalition");
     const left = Math.max(22, Math.min(78, rdApX(lean)));
     return React.createElement("span", {
       className: "tip rd-ap-tip",
@@ -94373,7 +94401,13 @@ function RdAllPolls(P) {
       className: "tip-label"
     }, "Lean"), React.createElement("span", {
       className: "tip-val"
-    }, Math.abs(lean) < 0.05 ? "level" : rdSigned(lean, 1) + " to " + (lean > 0 ? "Labor" : onM ? "One Nation" : "Coalition"))), m != null && React.createElement("span", {
+    }, way(lean))), he != null && React.createElement("span", {
+      className: "tip-row"
+    }, React.createElement("span", {
+      className: "tip-label"
+    }, "Usual lean"), React.createElement("span", {
+      className: "tip-val"
+    }, way(he))), m != null && React.createElement("span", {
       className: "tip-row"
     }, React.createElement("span", {
       className: "tip-label"
@@ -94381,7 +94415,7 @@ function RdAllPolls(P) {
       className: "tip-val"
     }, "\xB1", m.toFixed(1))), outside && React.createElement("span", {
       className: "rd-ap-tipnote"
-    }, "Outside its margin, as about one poll in 20 should be"));
+    }, he != null ? "Further from its pollster’s usual lean than its margin, as about one poll in 20 should be" : "Outside its margin, as about one poll in 20 should be"));
   };
   const rowFor = p => {
     const id = rowKey(p);
@@ -94427,7 +94461,7 @@ function RdAllPolls(P) {
       }, sub));
       const hovered = tip === id && p.lean != null && !phone;
       const against = RD_AP_KAL ? "the trend" : "the other polls fielded around it";
-      const aria = p.lean == null ? "No figure to set against " + against : (Math.abs(p.lean) < 0.05 ? "Level with " + against : rdSigned(p.lean, 1) + " points against " + against + ", towards " + (p.lean > 0 ? "Labor" : rival)) + (m != null ? "; 95% margin ±" + m.toFixed(1) : "");
+      const aria = p.lean == null ? "No figure to set against " + against : (Math.abs(p.lean) < 0.05 ? "Level with " + against : rdSigned(p.lean, 1) + " points against " + against + ", towards " + (p.lean > 0 ? "Labor" : rival)) + (rdApHe(p, onM, pub) != null && Math.abs(rdApHe(p, onM, pub)) >= 0.05 ? "; its pollster usually leans " + rdSigned(rdApHe(p, onM, pub), 1) : "") + (m != null ? "; 95% margin ±" + m.toFixed(1) : "");
       pic = React.createElement("span", {
         className: "rd-ap-pic",
         role: "img",
@@ -94437,6 +94471,7 @@ function RdAllPolls(P) {
       }, React.createElement(RdApStrip, {
         lean: p.lean,
         moe: m,
+        he: rdApHe(p, onM, pub),
         onM: onM,
         phone: phone,
         tip: hovered ? tipCard(p, f, m) : null
@@ -95460,7 +95495,12 @@ function RdAllPolls(P) {
   }, React.createElement("span", {
     className: "rd-ap-keyavg",
     "aria-hidden": "true"
-  }), RD_AP_KAL ? "The trend" : phone ? "Average of the polls around it" : "Average of the other polls fielded around it")), facet === "primary" && React.createElement(RdKey, {
+  }), RD_AP_KAL ? "The trend" : phone ? "Average of the polls around it" : "Average of the other polls fielded around it"), React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-ap-keyhe",
+    "aria-hidden": "true"
+  }), phone ? "Its pollster’s usual lean" : "Where its pollster usually lands (its house lean)")), facet === "primary" && React.createElement(RdKey, {
     className: "rd-ckey rd-ap-key",
     items: [{
       kind: "dot-solid",
@@ -95511,7 +95551,7 @@ function RdAllPolls(P) {
     "aria-hidden": "true"
   }), "Even: the same vote in both groups")), React.createElement(HowTo, {
     label: "How to read this table",
-    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "About one poll in 20 should sit outside its interval by chance."), facet === "issues" && React.createElement(React.Fragment, null, "Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; \"Level\" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn\u2019t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled; ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
+    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork; the day the poll came out sits beneath. A dash means the pollster didn\u2019t publish that figure. Open any row for the poll in full, with what it does to today\u2019s figure."), facet === "twopp" && React.createElement(React.Fragment, null, pub ? "Each figure is the pollster’s own, as published. The dot is its gap to " + rdApAgainst(true) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it." : "Each figure reads the poll’s primary votes through the " + rdElecYear + " election’s preference flows, one table for every poll, so the polls compare like for like. The dot is its gap to " + rdApAgainst(false) + ", the tick its pollster’s usual lean, and the whisker the 95% interval its sample alone would give it, worked out from its primaries and those flows.", " ", "A pollster\u2019s polls scatter around its usual lean, not the average, so about one poll in 20 should have its whisker miss its tick by chance."), facet === "issues" && React.createElement(React.Fragment, null, "Each column is an issue. The party named is the one rated best on it by the most voters in that poll, and the figure is its lead over the next party, in points, from the shares as the pollster printed them; \"Level\" means under half a point apart. The bar draws those shares, and the grey is everyone else, unsure or naming no one. Pollsters word the question differently, Resolve doesn\u2019t offer the Greens, and SEC Newgate asks only about cost of living. Open any row for every issue the poll asked about, and where voters ranked them."), facet === "demographics" && React.createElement(React.Fragment, null, "Each figure is a party\u2019s vote in the first group minus its vote in the second, in points, from the groups as the pollster printed them. Pollsters cut voters differently, so each row names the pair it compares: Resolve and DemosAU print 18\u201334 and 55+, RedBridge and YouGov print generations. A gap in points also grows with the party: when a party\u2019s vote doubles, so do its gaps, even if its voters are the same mix of people. One Nation\u2019s have widened that way as its vote has grown. Open any row for the poll\u2019s whole table."), React.createElement(React.Fragment, null, React.createElement("b", null, "Sample"), " is the number of people polled; ", React.createElement("b", null, "eff."), " is the pollster\u2019s own effective sample after weighting, where it publishes one. Where it doesn\u2019t, the interval assumes weighting costs what it does on average.")]
   }), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {

@@ -2262,6 +2262,11 @@ body.rd .rd-ap-chev:focus-visible { outline: 2px solid var(--accent); outline-of
 body.rd .rd-ap-pic { position: relative; align-self: stretch; display: block; min-height: 28px; }
 body.rd .rd-ap-gl { top: 0; bottom: 0; width: 1px; margin-left: -0.5px; background: var(--line-2); }
 body.rd .rd-ap-avg { top: 0; bottom: 0; width: 1.5px; margin-left: -0.75px; background: var(--rd-avgline); }
+/* the pollster's usual lean: a short tick through the whisker's line, under
+   the dot - where the poll's whisker has to reach for sampling alone to
+   explain it */
+body.rd .rd-ap-he { top: 50%; height: 14px; width: 2px; margin: -7px 0 0 -1px; border-radius: 1px; background: var(--ink-3);
+  transition: left .32s var(--morph-ease); }
 /* A switch of contest or basis moves every poll's lean: the dot, its margin
    and the arrow that says the margin runs off the scale all travel on the
    switch's curve, so the whisker no longer jumps while its dot glides. */
@@ -2277,7 +2282,7 @@ body.rd .rd-ap-dot {
   box-shadow: 0 0 0 1.5px var(--rd-rowbg); transition: left .32s var(--morph-ease), background-color .32s ease;
 }
 @media (prefers-reduced-motion: reduce) {
-  body.rd .rd-ap-dot, body.rd .rd-ap-wh, body.rd .rd-ap-clip { transition: none; }
+  body.rd .rd-ap-dot, body.rd .rd-ap-wh, body.rd .rd-ap-clip, body.rd .rd-ap-he { transition: none; }
 }
 /* hollow centre: overlapping rings cross like a Venn instead of the
    later-painted party erasing the earlier (nothing else sits under them) */
@@ -2367,6 +2372,7 @@ body.rd .rd-ap-keywh { position: relative; display: inline-block; width: 34px; h
 body.rd .rd-ap-keywh::before { content: ""; position: absolute; left: 2px; right: 2px; top: 5px; height: 2px; border-radius: 1px; background: var(--rd-whisker); }
 body.rd .rd-ap-keywh i { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ink-3); }
 body.rd .rd-ap-keyavg { display: inline-block; width: 1.5px; height: 16px; margin: 0 3px; background: var(--rd-avgline); }
+body.rd .rd-ap-keyhe { display: inline-block; width: 2px; height: 12px; margin: 0 3px; border-radius: 1px; background: var(--ink-3); vertical-align: -1px; }
 body.rd .rd-ap-keybar { width: 40px; flex: none; vertical-align: middle; }
 body.rd .rd-ap-keyring { display: inline-block; width: 9px; height: 9px; box-sizing: border-box; border-radius: 50%; border: 1.75px solid var(--ink-3); }
 body.rd .rd-ap ~ .rd-sec .view-how, body.rd .rd-ap .view-how { margin-top: 10px; }
