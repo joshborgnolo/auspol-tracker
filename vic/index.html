@@ -52565,7 +52565,7 @@ function RdAllPolls(P) {
   }), React.createElement("span", {
     role: "columnheader",
     className: "rd-ap-th r wrap",
-    title: "The pollster\u2019s standing lean against the pooled average \u2014 the House-lean panel below traces it month by month"
+    title: "The pollster\u2019s lean against the other pollsters as of this poll \u2013 what the average takes out of it, and the tick on the strip. The House-lean panel below traces it month by month"
   }, "House lean"), React.createElement("span", null)), facet === "primary" && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-ap-pnums rd-ap-hpn"
   }, prims.map(k => k.id === "oth" ? React.createElement("span", {
@@ -52727,11 +52727,7 @@ function RdAllPolls(P) {
       right2 = null,
       body = null,
       hlCell = null;
-    let hl = null;
-    if (facet === "twopp") {
-      const hls = ((D.houseLean || {})[pub ? onM ? "onpub" : "tpp" : onM ? "onimp" : "imp"] || {})[p.pollster];
-      hl = hls && hls.length ? hls[hls.length - 1].v : null;
-    }
+    const hl = facet === "twopp" ? rdApHe(p, onM, pub) : null;
     if (facet === "twopp") {
       const f = figOf(p);
       const m = f.a != null ? rdPollMargin(p, contest, pub) : null;

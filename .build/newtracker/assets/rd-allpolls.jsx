@@ -1869,9 +1869,9 @@ function RdAllPolls(P) {
         {/* the desktop table's last column (user call 2026-10-03: "the
             column heading can be wrapped if it can't fit" - .rd-ap-th.wrap
             lets it break onto a second line; not sortable: its figure is the
-            house's standing lean, constant down a house's rows, and the
-            classic table's hfx sort key measures a different quantity) */}
-        <span role="columnheader" className="rd-ap-th r wrap" title="The pollster’s standing lean against the pooled average — the House-lean panel below traces it month by month">House lean</span>
+            house's lean as of each poll, and the classic table's hfx sort key
+            measures a different quantity) */}
+        <span role="columnheader" className="rd-ap-th r wrap" title="The pollster’s lean against the other pollsters as of this poll – what the average takes out of it, and the tick on the strip. The House-lean panel below traces it month by month">House lean</span>
         <span></span>
       </>}
       {facet === "primary" && <>
@@ -1954,15 +1954,16 @@ function RdAllPolls(P) {
     const arrived = !!focus && focus.key === id;
     const toggle = () => setOpen(isOpen ? null : id);
     let figs, pic, val = <span></span>, right1 = null, right2 = null, body = null, hlCell = null;
-    /* the house's standing lean, the latest D.houseLean point on the table's
-       basis and matchup - ONE derivation for the desktop twopp table's last
-       column (user call 2026-10-03: "add a 'house lean' column to the end of
-       the all poles table"), the phone card's sub-line and the detail rail */
-    let hl = null;
-    if (facet === "twopp") {
-      const hls = ((D.houseLean || {})[pub ? (onM ? "onpub" : "tpp") : (onM ? "onimp" : "imp")] || {})[p.pollster];
-      hl = hls && hls.length ? hls[hls.length - 1].v : null;
-    }
+    /* the house's lean AS OF THIS POLL on the table's basis and matchup
+       (rdApHe, gen-data §3c) - ONE derivation for the desktop twopp table's
+       last column (user call 2026-10-03: "add a 'house lean' column to the
+       end of the all poles table") and the phone card's sub-line. It was the
+       house's latest lean, constant down its rows, but the strip's tick and
+       its margin test use the lean the average took out of THIS poll, and
+       on older rows the two parted by up to 2.5 points, so Lean minus House
+       lean stopped equalling the gap judged (user call 2026-10-06). Recent
+       rows still read today's lean. */
+    const hl = facet === "twopp" ? rdApHe(p, onM, pub) : null;
     if (facet === "twopp") {
       const f = figOf(p);
       const m = f.a != null ? rdPollMargin(p, contest, pub) : null;
@@ -1984,14 +1985,14 @@ function RdAllPolls(P) {
       val = <span role="cell" className="rd-ap-val" style={{ color: rdApLeanInk(p.lean, onM) }}>{p.lean == null ? "—" : rdApSigned(p.lean)}</span>;
       right1 = main;
       right2 = sub ? <span className="rd-ap-sub">{sub}</span> : null;
-      /* the desktop table's last column: the standing lean at a glance, the
+      /* the desktop table's last column: the house's lean as of the poll, the
          same figure the phone card's sub-line carries (hl is derived above
          the branch) */
       hlCell = <span role="cell" className="rd-ap-hl" style={{ color: rdApLeanInk(hl, onM) }}>{hl == null ? "—" : rdApSigned(hl)}</span>;
-      /* phone card: the house's standing lean rides under the figure (user
+      /* phone card: the house's lean as of the poll rides under the figure (user
          calls 2026-10-03: "add below '+1.7', 'Usual lean -0.3'", then
          renamed House lean - black label, party-tinted number - the
-         same D.houseLean latest point the detail expands on); the figure
+         same figure the strip's tick marks); the figure
          itself then got its own "Lean " label (user call same day: "also
          add the word Lean to the lean above it - eg ... 'Lean +1.7'"),
          same label-plain/figure-tinted pattern as the sub-line */
