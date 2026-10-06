@@ -3887,8 +3887,6 @@ function RdMood({ rangeId }) {
   const sePoints = new Map(lanes.map((l) => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({ x: p.x, y: p.y + l.shift, ym: rows.get(l.k)[i].ym, ...(l.shift ? { raw: rows.get(l.k)[i].v } : {}) }))]));
   const vals = lanes.flatMap((l) => rawPoints.get(l.k).map((p) => p.y)).concat([100]);
   const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10, hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
-  const years = [];
-  for (let y = Math.ceil(x0); y <= x1 + 0.001; y++) years.push({ x: y, label: String(y) });
   const spine = rawPoints.get(lanes[0].k);
   const copyLegend = lanes.map((l) => ({ label: l.lab + " (latest " + l.vfmt(l.lat.v) + ")", color: l.color, kind: l.dash ? "dashed" : "line" }));
   const fmt = (v, p) => (p && p.raw != null ? NICE(p.raw) : v.toFixed(1));
@@ -3909,7 +3907,7 @@ function RdMood({ rangeId }) {
         <TrendChart key="rd-mood" heightPx={narrow ? 260 : 340}
           padPx={narrow ? { l: 34, r: 8, t: 10, b: 28 } : { l: 40, r: 16, t: 14, b: 30 }}
           xDomain={[x0, x1]} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => String(v)}
-          xTicks={years} baseline
+          xTicks={rdElectionTicks(x0, x1, narrow, x0)} baseline
           refLines={[{ y: 100, label: "100 = neutral", align: "left", color: "var(--ink-3)" }]}
           series={lanes.map((l) => ({ id: l.k, label: l.lab, color: l.color, rdWidth: l.dash ? 1.6 : 2.2, dash: l.dash || undefined,
             endCap: false, endLabel: narrow ? null : l.lab, points: sePoints.get(l.k) }))}

@@ -24,8 +24,11 @@
      RENDER. Scales are fitted FROM THE DOM, not reimplemented (the rd
      engine sizes the viewBox from the measured container width and grows
      the right pad for end labels): y from the gridlines' data-k="y<tick>"
-     groups, x from the rd-axis year ticks, pad read back off the grid
-     lines. Then:
+     groups, x from the rd-axis tick marks against the known [x0,x1]
+     domain - the axis opens on the Election landmark tick at x0 and
+     carries rdElectionTicks' election-window month cadence (the panel's
+     own helper, evaluated in-page, IS the expected list; a January tick
+     carries its year). pad read back off the grid lines. Then:
      - viewBox is 0 0 1000 (1000*heightPx/cw) - pins heightPx 340/260,
      - each series-line passes through the recomputed kernel smooth at the
        reading dates (tolerance priced in screen px), with a vertex count
@@ -84,6 +87,7 @@ check(gloss.includes("recency-weighted kernel (half-life 14 days on the weekly c
 check(gloss.includes("NAB is drawn 100 points up."), "glossary discloses the NAB +100 draw");
 check(gloss.includes("The chart opens at the May 2025 election"), "glossary dates the chart window to the May 2025 election");
 check(panels.includes("const x0 = 2025 + 122 / 365"), "the panel opens the x-window at the 2025 election (x0 = 2025 + 122/365)");
+check(panels.includes("xTicks={rdElectionTicks(x0, x1, narrow, x0)}"), "the x axis uses the election-window tick set (Election + months), not bare years");
 const genData = fs.readFileSync(path.join(BASE, ".build/newtracker/gen-data.mjs"), "utf8");
 check(genData.includes("recency-weighted smoothed trend on top (render"), "gen-data §5j comment still promises the raw payload");
 
@@ -167,13 +171,14 @@ for (const l of live) {
 }
 
 /* ---- scales fitted from the DOM (never reimplemented) ----
-   y: the "y<tick>"-keyed gridline groups. x: the election-windowed domain
-   shows only a year tick or two, so the scale is READ off the measured
-   plot insets (the gridlines' x1/x2 give the exact plot box) against the
-   known [x0, x1] domain, with whatever integer-year ticks exist as an
-   exact cross-check on it (the first rd-base line is the baseline rule,
-   the rest are integer-year ticks, ascending). pad read straight off the
-   gridline x1/x2. */
+   y: the "y<tick>"-keyed gridline groups. x: the election-windowed axis
+   opens on the Election landmark and carries the election-window month
+   cadence, so the scale is READ off the measured plot insets (the
+   gridlines' x1/x2 give the exact plot box) against the known [x0, x1]
+   domain, with the tick marks cross-checked against the page's own
+   rdElectionTicks list (the first rd-base line is the baseline rule,
+   the rest are tick marks, ascending; the axis-label texts come along
+   for the name checks). pad read straight off the gridline x1/x2. */
 const fitScales = () => page.evaluate(() => {
   const root = document.querySelector("#mood .rd-mood-chart svg.chart-svg");
   if (!root) return null;
@@ -185,9 +190,12 @@ const fitScales = () => page.evaluate(() => {
   const xt = [...root.querySelectorAll("g.rd-axis line.rd-base")]
     .map((l) => ({ x1: parseFloat(l.getAttribute("x1")), x2: parseFloat(l.getAttribute("x2")) }));
   const ticks = xt.filter((d) => d.x1 === d.x2).map((d) => d.x1);
+  const labels = [...root.querySelectorAll("text.axis-label.x")].map((t) => ({
+    t: (t.textContent || "").trim().replace(/\s+/g, " "), x: parseFloat(t.getAttribute("x")),
+  }));
   const vb = root.viewBox.baseVal;
   const rect = root.getBoundingClientRect();
-  return { ys, ticks, vbW: vb.width, vbH: vb.height, cw: rect.width };
+  return { ys, ticks, labels, vbW: vb.width, vbH: vb.height, cw: rect.width };
 });
 const linfit = (pts) => { // pts [[x,y]] -> {a, b, res}: y = a + b*x
   const n = pts.length;
@@ -210,7 +218,6 @@ const knotYs = (sel, xs) => page.evaluate(([s, arr]) => {
   });
 }, [sel, xs]);
 
-const firstYear = Math.ceil(x0);
 const hpPx = (rung) => (rung > 640 ? 340 : 260);
 const padPxL = (rung) => (rung > 640 ? 40 : 34);
 const padPxR = (rung) => (rung > 640 ? 16 : 8);
@@ -236,13 +243,29 @@ async function checkChart(rung) {
   const padL = fit.ys[0].x1, padR = fit.vbW - fit.ys[0].x2;
   check(Math.abs(padL - padPxL(rung) / k0) < 0.3, `left pad is padPx ${padPxL(rung)} (${padL.toFixed(2)}u vs ${(padPxL(rung) / k0).toFixed(2)})`);
   check(padR >= padPxR(rung) / k0 - 0.01, `right pad >= padPx ${padPxR(rung)} (${padR.toFixed(2)}u, label room may grow it)`);
-  /* x: the plot box maps linearly onto the known [x0, x1] domain; every
-     integer-year tick must sit exactly on that scale (one or two may be
-     all the election window spans) */
+  /* x: the plot box maps linearly onto the known [x0, x1] domain; the
+     axis opens on the Election landmark at x0 and then carries the
+     election-window month cadence. The expected list is the page's OWN
+     rdElectionTicks against the live domain (nothing reimplemented
+     here), so every drawn tick mark must sit exactly on one of its
+     positions, and every axis label must sit on an expected tick -
+     labels may thin or shorten to "E" on the phone, but the Election
+     landmark keeps its name or its E, and a January keeps its year */
   const sx = (x) => padL + (x - x0) * ((fit.vbW - padR - padL) / (x1 - x0));
+  const expTicks = await page.evaluate(([ex, ex1, nr]) =>
+    rdElectionTicks(ex, ex1, nr, ex).map((t) => ({ x: t.x, label: t.label })),
+    [x0, x1, rung <= 640]);
+  const expXs = expTicks.map((t) => sx(t.x)).sort((a, b) => a - b);
   const ticks = [...fit.ticks].sort((a, b) => a - b);
-  const tickRes = ticks.length ? Math.max(...ticks.map((t, i) => Math.abs(t - sx(firstYear + i)))) : Infinity;
-  check(ticks.length >= 1 && tickRes < 0.01, `${ticks.length} year tick(s) sit on the [x0,x1] domain scale from ${firstYear} (residual ${tickRes === Infinity ? "n/a" : tickRes.toFixed(4) + "u"})`);
+  check(ticks.length === expXs.length && ticks.every((t, i) => Math.abs(t - expXs[i]) < 0.01),
+    `${ticks.length} axis tick marks sit exactly on the election-window cadence (Election + ${expXs.length - 1} months)`);
+  const expLab = (x) => { const m = expTicks.find((t) => Math.abs(sx(t.x) - x) < 0.05); return m ? m.label : null; };
+  check(fit.labels.every((t) => expLab(t.x) != null), `every axis label sits on an expected tick (${fit.labels.length} labels)`);
+  const firstLab = fit.labels.find((t) => Math.abs(t.x - expXs[0]) < 0.05);
+  check(!!firstLab && (firstLab.t === "Election" || firstLab.t === "E"),
+    `the ${rung}px axis opens on the Election tick at 3 May 2025 (got ${firstLab ? '"' + firstLab.t + '"' : "none"})`);
+  check(fit.labels.some((t) => /\b\d{4}\b|’\d{2}$/.test(t.t)), "a January tick carries the year");
+  check(fit.labels.length >= 3, `${fit.labels.length} axis labels rendered`);
 
   check(await page.evaluate(() => {
     const el = document.querySelector("#mood");
