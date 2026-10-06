@@ -126,7 +126,7 @@ push_main_rerun() {
   [ -n "$PUSH_MAIN_SELF" ] && [ -f "$PUSH_MAIN_SELF" ] || return 1
   [ "${AUSPOL_PUSH_RERUN:-}" = "1" ] && return 1
   log "push race ($1); resetting to origin/main and re-running $(basename "$PUSH_MAIN_SELF") once — the extractors are idempotent"
-  git fetch -q origin >> "$LOG" 2>&1 || true
+  git fetch -q origin main >> "$LOG" 2>&1 || true
   git reset -q --hard origin/main >> "$LOG" 2>&1 || return 1
   # exec skips the EXIT trap, so hand the writers lock back first — the
   # re-run takes it again
@@ -246,7 +246,9 @@ acquire_slot_lock() {
 # Callers expect: fresh tree check is the caller's job (dirty tree → no
 # sync at all, as before); returns 0 when main is synced, 1 to skip.
 freshness_sync() {
-  git fetch origin -q || true
+  # main only: in CI's depth-1 checkout a bare `git fetch origin` pulled the
+  # other branches' whole history, 8–9s of every run (0.6s for main alone)
+  git fetch -q origin main || true
   if git merge --ff-only origin/main >> "$LOG" 2>&1; then
     return 0
   fi

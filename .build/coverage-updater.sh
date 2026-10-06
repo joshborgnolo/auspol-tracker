@@ -28,7 +28,7 @@ log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$LOG"; }
 # the check is only meaningful against current main. Untracked files don't
 # count as dirty.
 if git diff --quiet && git diff --cached --quiet; then
-  git fetch origin -q || true
+  git fetch -q origin main || true
   git merge --ff-only origin/main >> "$LOG" 2>&1 || log "note: ff-only sync failed; checking against local main"
 fi
 

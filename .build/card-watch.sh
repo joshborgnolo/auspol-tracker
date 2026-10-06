@@ -27,7 +27,7 @@ log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
 # mid-edit, and a rebuild commit must not land on a base it did not read.
 # The next hourly slot retries.
 if git diff --quiet && git diff --cached --quiet; then
- git fetch origin -q || true
+ git fetch -q origin main || true
  if ! git merge --ff-only origin/main >> "$LOG" 2>&1; then
  log "local main diverged from origin/main; skipping slot"
  exit 0

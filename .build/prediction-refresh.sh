@@ -30,7 +30,7 @@ done
 # mid-edit, and the generator's write must not land on a base it did not
 # read. The next daily slot retries.
 if git diff --quiet && git diff --cached --quiet; then
- git fetch origin -q || true
+ git fetch -q origin main || true
  if ! git merge --ff-only origin/main >> "$LOG" 2>&1; then
  log "local main diverged from origin/main; skipping slot"
  exit 0
