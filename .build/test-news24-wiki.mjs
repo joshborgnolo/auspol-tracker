@@ -9,7 +9,7 @@
 import assert from "node:assert/strict";
 
 process.env.N24_LIB = "1";
-const { parseWikiYouGov, wikiOthersSplit, n24ConflictPlan } = await import("./extract-news24.mjs");
+const { parseWikiYouGov, wikiOthersSplit, n24ConflictPlan, n24Prefer, n24PrevWave, news24Sat } = await import("./extract-news24.mjs");
 
 const head = `==Voting intention==
 ===2026===
@@ -139,6 +139,40 @@ assert.equal(r.waves.length, 0, JSON.stringify(r));
   // a wave not yet on file still files from Wikipedia, carrying the stamp
   plan = n24ConflictPlan({ existing: null, wave, articlePublished: "2026-10-07T05:00" });
   assert.deepEqual(plan, { fileWave: true, stamp: "2026-10-07T05:00" });
+}
+
+// ---- embed vs prose precedence (n24Prefer, owner's rule 2026-10-07) -------------
+{
+  const P = (o) => n24Prefer({ hasIg: true, hasProse: true, stale: false, disagree: false, proseContradicts: false, ...o }).use;
+  // the 6 Oct PPM embed repeated 21 Sep's tables: prose if any, else nothing
+  assert.equal(P({ stale: true }), "prose", "stale embed: the prose figure");
+  assert.equal(P({ stale: true, hasProse: false }), "none", "stale embed, no prose: left for a person");
+  assert.equal(P({ stale: true, proseContradicts: true }), "none", "stale embed, self-contradicting prose: nothing");
+  // this week's embed vs this week's prose: the prose
+  assert.equal(P({ disagree: true }), "prose", "a fresh embed loses to disagreeing prose");
+  // ...unless the prose contradicts itself (Taylor -16 with 31/51)
+  assert.equal(P({ disagree: true, proseContradicts: true }), "ig", "self-contradicting prose: the fresh embed stands");
+  assert.equal(P({}), "ig", "agreeing sources: the embed's fuller figures");
+  assert.equal(P({ hasProse: false }), "ig");
+  assert.equal(P({ hasIg: false }), "prose");
+  // the prose's own net is read even when "net" is unsaid
+  const t = news24Sat("Opposition Leader Angus Taylor’s performance was also at an all-time low of -16%, with 31% satisfied and 51% dissatisfied.");
+  assert.deepEqual(t, { app: 31, dis: 51, net: -16, stated: -16 }, "bare stated net captured beside the split");
+  const a = news24Sat("Satisfaction with Prime Minister Anthony Albanese was dismally low at -28%, with 1 in 3 voters satisfied and about 2 in 3 voters dissatisfied.");
+  assert.deepEqual(a, { app: null, dis: null, net: -28, stated: -28 });
+  assert.equal(news24Sat("Mr Albanese had 35% satisfied and 58% dissatisfied.").net, -23, "no stated net: derived, not stated");
+  assert.equal(news24Sat("Mr Albanese had 35% satisfied and 58% dissatisfied.").stated, null);
+  // the previous wave the stale check compares against
+  const D = {
+    polls: [{ pollster: "YouGov", date: "2026-09-08" }, { pollster: "YouGov", date: "2026-09-21" }, { pollster: "Newspoll", date: "2026-10-01" }],
+    ppm: [{ firm: "YouGov", date: "2026-09-21", alb: 41, opp: 37 }],
+    ppmHeadToHead: [{ firm: "YouGov", date: "2026-09-21", alb: 50, han: 38 }],
+  };
+  const pw = n24PrevWave(D, "2026-10-06");
+  assert.equal(pw.date, "2026-09-21");
+  assert.deepEqual([pw.ppm.alb, pw.ppm.opp, pw.han.alb, pw.han.han], [41, 37, 50, 38]);
+  assert.equal(pw.appr, null);
+  assert.equal(n24PrevWave(D, "2026-09-08"), null, "no earlier wave");
 }
 
 console.log("test-news24-wiki: ok");

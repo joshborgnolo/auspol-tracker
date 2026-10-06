@@ -6172,8 +6172,8 @@
     {
       "date": "2026-10-06",
       "firm": "YouGov",
-      "alb": 41,
-      "opp": 37,
+      "alb": 40,
+      "opp": 39,
       "oppName": "Taylor",
       "han": null,
       "extra": null
@@ -8015,7 +8015,7 @@
       "date": "2026-10-06",
       "firm": "YouGov",
       "alb": 50,
-      "han": 38
+      "han": 40
     }
   ],
   "altTpp": [

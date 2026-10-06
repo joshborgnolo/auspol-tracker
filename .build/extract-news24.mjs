@@ -240,12 +240,45 @@ async function fetchNews24Article(url) {
 // which carry proven errors and can never block a wave). Mutates `wave`
 // (vi/dateStart) and `prose` (the parsed News24 rec: sat/ppm/alt/
 // ppmHeadToHead, which derived rows read).
-async function infogramEnrichNews24(html, wave, prose) {
+// Embed-vs-prose precedence for one figure group (owner's rule, 2026-10-07).
+// An embed that repeats the previous wave's figures is stale: News24
+// re-titles and re-saves last wave's project without new data (the 6 Oct
+// 2026 PPM embed, "06102026", carried 21 Sep's 41/22/37 and 50/12/38 while
+// the wave's real figures were 40/21/39 and 50/10/40). Stale -> the prose
+// figure, else nothing (a person fills it). Fresh embed vs this week's
+// prose -> the prose. The exception is prose that contradicts itself
+// (6 Oct: Taylor "-16, with 31 satisfied and 51 dissatisfied"), which
+// cannot be the better source: the fresh embed stands. Returns
+// { use: "ig" | "prose" | "none", why }.
+function n24Prefer({ hasIg, hasProse, stale, disagree, proseContradicts }) {
+  if (stale) return hasProse && !proseContradicts
+    ? { use: "prose", why: "embed repeats the previous wave" }
+    : { use: "none", why: "embed repeats the previous wave; no usable prose figure" };
+  if (!hasIg) return { use: hasProse ? "prose" : "none", why: null };
+  if (!hasProse) return { use: "ig", why: null };
+  if (proseContradicts) return { use: "ig", why: "prose contradicts itself" };
+  if (disagree) return { use: "prose", why: "prose disagrees with the embed" };
+  return { use: "ig", why: null };
+}
+
+// The previous YouGov wave's figures, for the stale-embed check: its
+// primaries, PPM pairs and approval splits as filed.
+function n24PrevWave(D, date) {
+  const prev = (D?.polls ?? []).filter((p) => p.pollster === "YouGov" && p.date < date)
+    .sort((a, b) => (a.date < b.date ? -1 : 1)).pop();
+  if (!prev) return null;
+  const row = (key) => (D[key] ?? []).find((r) => r.firm === "YouGov" && r.date === prev.date) ?? null;
+  return { date: prev.date, vi: prev, ppm: row("ppm"), han: row("ppmHeadToHead"), appr: row("approval") };
+}
+
+async function infogramEnrichNews24(html, wave, prose, prevOf = null) {
   const problems = [], notes = [];
   const ids = n24IdsOf(html);
   if (!ids.length) return { ig: null, problems, notes };
   const projects = await n24InfogramFetch(fetchIgEmbed, ids);
   const fig = n24Figures(projects);
+  // the wave's date may come only from the embed window (prose-only parse)
+  const prev = prevOf ? prevOf(wave.date ?? fig.window?.end ?? null) : null;
   for (const p of fig.problems) (/^horserace .* sums to/.test(p) ? notes : problems).push(p);
   // Snapshot pre-overlay values so every crosscheck names its source.
   const pv = prose?.vi ?? {};
@@ -257,8 +290,19 @@ async function infogramEnrichNews24(html, wave, prose) {
       problems.push(`Infogram ${label} ${igV} != ${was[0]} ${was[1]}`);
   };
 
-  if (fig.vi) for (const k of ["alp", "lnp", "grn", "onp", "ind", "oth"]) {
+  // a crosstab repeating the previous wave's six primaries is a stale
+  // embed; the headline figures stop for a person rather than file it
+  const VI = ["alp", "lnp", "grn", "onp", "ind", "oth"];
+  const viStale = !!(fig.vi && prev?.vi && VI.every((k) => fig.vi[k] != null && fig.vi[k] === prev.vi[k]));
+  if (viStale) problems.push(`Infogram crosstab repeats the ${prev.date} wave's primaries (stale embed)`);
+  if (fig.vi && !viStale) for (const k of VI) {
     if (fig.vi[k] == null) continue;
+    // this week's prose beats this week's embed; Wikipedia still blocks
+    if (pv[k] != null && Math.abs(fig.vi[k] - pv[k]) > 0.5) {
+      notes.push(`${k}: prose ${pv[k]} kept over Infogram ${fig.vi[k]} (prose disagrees with the embed)`);
+      wave.vi[k] = pv[k];
+      continue;
+    }
     shift(k, fig.vi[k], wasV(k));
     wave.vi[k] = fig.vi[k];
   }
@@ -273,12 +317,25 @@ async function infogramEnrichNews24(html, wave, prose) {
   }
   const net = (p) => (p?.app != null && p?.dis != null ? Math.round((p.app - p.dis) * 10) / 10 : null);
   if (fig.approval?.alb) {
-    shift("PM net", net(fig.approval.alb), wasP(prose?.sat?.pmNet));
-    shift("OL net", net(fig.approval.opp), wasP(prose?.sat?.oppNet));
-    if (prose) prose.sat = {
-      pmApp: fig.approval.alb.app, pmDis: fig.approval.alb.dis, pmNet: net(fig.approval.alb),
-      oppApp: fig.approval.opp?.app ?? null, oppDis: fig.approval.opp?.dis ?? null, oppNet: net(fig.approval.opp),
-    };
+    const pa = prev?.appr?.detail;
+    const same = (ig, p) => !!(ig && p && ig.app === p.app && ig.dis === p.dis);
+    const apprStale = same(fig.approval.alb, pa?.alb) && same(fig.approval.opp, pa?.opp);
+    const ps = prose?.sat ?? {};
+    const out = {};
+    for (const [L, ig, pre] of [["PM", fig.approval.alb, "pm"], ["OL", fig.approval.opp, "opp"]]) {
+      const pr = { app: ps[pre + "App"] ?? null, dis: ps[pre + "Dis"] ?? null, net: ps[pre + "Net"] ?? null, stated: ps[pre + "Stated"] ?? null };
+      const igNet = net(ig);
+      const contradicts = pr.stated != null && pr.app != null && pr.dis != null && Math.abs(pr.stated - (pr.app - pr.dis)) > 0.5;
+      const disagree = pr.net != null && igNet != null && Math.abs(pr.net - igNet) > 0.5
+        || ["app", "dis"].some((k) => pr[k] != null && ig?.[k] != null && Math.abs(pr[k] - ig[k]) > 0.5);
+      const pick = n24Prefer({ hasIg: igNet != null, hasProse: pr.net != null, stale: apprStale, disagree, proseContradicts: contradicts });
+      if (pick.why) notes.push(`${L} approval: ${pick.use === "ig" ? "Infogram" : pick.use} used (${pick.why}; Infogram ${ig?.app ?? "?"}/${ig?.dis ?? "?"}, prose ${pr.app ?? "?"}/${pr.dis ?? "?"} net ${pr.stated ?? pr.net ?? "?"})`);
+      const v = pick.use === "ig" ? { app: ig.app, dis: ig.dis, net: igNet }
+        : pick.use === "prose" ? { app: pr.app, dis: pr.dis, net: pr.stated ?? pr.net }
+        : { app: null, dis: null, net: null };
+      out[pre + "App"] = v.app ?? null; out[pre + "Dis"] = v.dis ?? null; out[pre + "Net"] = v.net ?? null;
+    }
+    if (prose) prose.sat = out;
     // Era drift detector: charts name the OL; LEADERS is a hand-kept table.
     const eraNow = olFor(wave.date ?? today());
     if (fig.approval.oppName && eraNow && fig.approval.oppName !== eraNow.surname)
@@ -286,15 +343,20 @@ async function infogramEnrichNews24(html, wave, prose) {
   }
   const olTable = fig.ppm.find((p) => p.alb != null && !/hanson/i.test(p.oppRaw ?? ""));
   const hanTable = fig.ppm.find((p) => /hanson/i.test(p.oppRaw ?? ""));
-  if (olTable) {
-    shift("ppm ALP", olTable.alb, wasP(prose?.ppmA));
-    shift("ppm OPP", olTable.opp, wasP(prose?.ppmO));
-    if (prose) { prose.ppmA = olTable.alb; prose.ppmO = olTable.opp; }
-  }
-  if (hanTable) {
-    shift("ppm ALP (vs Hanson)", hanTable.alb, wasP(prose?.ppmHan));
-    shift("ppm Hanson", hanTable.opp, wasP(prose?.ppmHanOpp));
-    if (prose) { prose.ppmHan = hanTable.alb; prose.ppmHanOpp = hanTable.opp; }
+  // both PPM tables ride one embed project, so it is stale as a whole:
+  // every table it carries repeats the previous wave's pair
+  const seen = [[olTable, prev?.ppm, "opp"], [hanTable, prev?.han, "han"]].filter(([t]) => t);
+  const ppmStale = seen.length > 0 && seen.every(([t, p, k]) => p && t.alb === p.alb && t.opp === p[k]);
+  for (const [t, L, aK, oK] of [[olTable, "PPM v OL", "ppmA", "ppmO"], [hanTable, "PPM v Hanson", "ppmHan", "ppmHanOpp"]]) {
+    if (!t) continue;
+    const pr = [prose?.[aK] ?? null, prose?.[oK] ?? null];
+    const hasProse = pr[0] != null && pr[1] != null;
+    const disagree = hasProse && (Math.abs(pr[0] - t.alb) > 0.5 || Math.abs(pr[1] - t.opp) > 0.5);
+    const pick = n24Prefer({ hasIg: t.alb != null && t.opp != null, hasProse, stale: ppmStale, disagree, proseContradicts: false });
+    if (pick.why) notes.push(`${L}: ${pick.use === "ig" ? "Infogram" : pick.use} used (${pick.why}; Infogram ${t.alb}/${t.opp}, prose ${pr[0] ?? "?"}/${pr[1] ?? "?"})`);
+    if (!prose) continue;
+    if (pick.use === "ig") { prose[aK] = t.alb; prose[oK] = t.opp; }
+    else if (pick.use === "none") { prose[aK] = null; prose[oK] = null; }
   }
   if (fig.window) {
     if (wave.date && fig.window.end !== wave.date)
@@ -382,10 +444,15 @@ function news24Sat(s) {
   const net = s.match(/net(?:\s+(?:approval|satisfaction)(?:\s+rating)?)?\s*(?:of\s+)?\s*(-?\d+(?:\.\d+)?)/i)?.[1];
   const app = s.match(/(\d+(?:\.\d+)?)\s*%\s+satisfied\b/i)?.[1];
   const dis = s.match(/(\d+(?:\.\d+)?)\s*%\s+dissatisfied\b/i)?.[1];
+  // a net stated bare ("an all-time low of -16 per cent", normalised to
+  // "-16%") counts as stated, so the prose can be checked against itself
+  const bare = net == null ? s.match(/(?:^|[\s(])([-−]\d+(?:\.\d+)?)\s*%/)?.[1]?.replace("−", "-") : null;
+  const stated = net ?? bare;
   const pm = {
     app: app == null ? null : +app,
     dis: dis == null ? null : +dis,
-    net: net == null ? null : +net,
+    net: stated == null ? null : +stated,
+    stated: stated == null ? null : +stated,
   };
   if (pm.net == null && pm.app != null && pm.dis != null)
     pm.net = Math.round((pm.app - pm.dis) * 10) / 10;
@@ -434,8 +501,8 @@ function parseNews24Article(html, url) {
       tpp_lnp: tpp ? parseFloat(tpp[2]) : null,
     },
     sat: (pm || opp) ? {
-      pmApp: pm?.app ?? null, pmDis: pm?.dis ?? null, pmNet: pm?.net ?? null,
-      oppApp: opp?.app ?? null, oppDis: opp?.dis ?? null, oppNet: opp?.net ?? null,
+      pmApp: pm?.app ?? null, pmDis: pm?.dis ?? null, pmNet: pm?.net ?? null, pmStated: pm?.stated ?? null,
+      oppApp: opp?.app ?? null, oppDis: opp?.dis ?? null, oppNet: opp?.net ?? null, oppStated: opp?.stated ?? null,
     } : null,
     ppmA: ppmPair ? parseFloat(ppmPair[1]) : null,
     ppmO: ppmPair ? parseFloat(ppmPair[2]) : null,
@@ -858,7 +925,7 @@ function n24ConflictPlan({ existing, wave, articlePublished }) {
 // --------------------------------------------------------------- entry
 // N24_LIB=1: import the parsers and guards (tests, the layout healer's
 // acceptance step) without running the extraction.
-export { parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells, guard, n24ConflictPlan, WIKI_RAW };
+export { parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells, guard, n24ConflictPlan, n24Prefer, n24PrevWave, news24Sat, WIKI_RAW };
 if (!process.env.N24_LIB) {
 const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [], releaseFilled: [] };
 
@@ -867,7 +934,8 @@ if (NEWS24_OF) { // dev oracle: parse one News24 article, print the record, exit
   if (!art.html) { console.error("News24 fetch failed: set NEWSIE_CHROME=1 or N24_NEWS24_FILE"); process.exit(1); }
   const rec = parseNews24Article(art.html, NEWS24_OF);
   if (!rec) { console.error("not a News24 Pulse / YouGov federal-poll article"); process.exit(1); }
-  const { ig, problems, notes } = await infogramEnrichNews24(art.html, rec, rec);
+  const { ig, problems, notes } = await infogramEnrichNews24(art.html, rec, rec,
+    (d) => d && n24PrevWave(JSON.parse(readFileSync(OUT, "utf8")), d));
   console.log(JSON.stringify({
     url: rec.url, via: art.via, date: rec.date, dateStart: rec.dateStart, sample: rec.sample,
     published: rec.published, vi: rec.vi, sat: rec.sat,
@@ -988,9 +1056,9 @@ try {
   // cent dissatisfied" — 31−51=−20, not −16); the Infogram approvals table
   // (taylor 34/51/15, albanese 33/61/6, both Σ=100, leader-named rows) is
   // the authoritative record, and the embed has precedence over prose.
-  const N24_ADJUDICATED = new Set([
-    "2026-10-06|Infogram OL net -17 != News24 prose -20",
-  ]);
+  // (The 2026-10-06 OL-net entry retired once n24Prefer took self-
+  // contradicting prose as the embed's case; the set stays for the next.)
+  const N24_ADJUDICATED = new Set([]);
   // Fallback: waves YouGov never released on yougov.com. Wikipedia discovers
   // the wave and its canonical article URL; with NEWSIE_CHROME=1, News24 then
   // enriches that wave before Wikipedia fills the fields News24 omits.
@@ -1046,7 +1114,7 @@ try {
         const parsed = art.html ? parseNews24Article(art.html, news24Url) : null;
         if (parsed) {
           const merged = mergeNews24Wave(wikiWave, parsed);
-          const enriched = await infogramEnrichNews24(art.html, merged.wave, merged.news24);
+          const enriched = await infogramEnrichNews24(art.html, merged.wave, merged.news24, (d) => d && n24PrevWave(D, d));
           status.news24.sources[wikiWave.date] = art.via;
           if (enriched.ig)
             status.news24.infogram[wikiWave.date] = {
