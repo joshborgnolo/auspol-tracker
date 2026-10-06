@@ -384,6 +384,13 @@
       "label": "2026 federal Budget",
       "desc": "Treasurer Jim Chalmers delivers the Albanese government’s fifth federal budget, rated, according to Newspoll, as the worst for the economy since 1993.",
       "major": true
+    },
+    {
+      "date": "2026-09-29",
+      "short": "RBA hikes to 4.60%",
+      "label": "RBA lifts cash rate to 4.60%",
+      "desc": "The Reserve Bank raises the cash-rate target to its highest level in 15 years.",
+      "major": true
     }
   ],
   "direction": [
