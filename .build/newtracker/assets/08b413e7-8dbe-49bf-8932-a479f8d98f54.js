@@ -659,7 +659,8 @@ function TrendChart(props) {
     if (!evPlaced.length) return null;
     const rU = radiusPx / Math.max(scale, 0.0001);
     let near = null, nearD = Infinity;
-    for (const q of evPlaced) {
+    for (let i = 0; i < evPlaced.length; i++) {
+      const q = evPlaced[i];
       if (q.leaving) continue;
       // the rule, from the label's baseline down to the axis
       let d = (p.y >= q.y - rU && p.y <= H - pad.b + rU) ? Math.abs(p.x - q.ex) : Infinity;
@@ -668,6 +669,13 @@ function TrendChart(props) {
         const dx = p.x < q.x ? q.x - p.x : p.x > q.x + q.w ? p.x - (q.x + q.w) : 0;
         const dy = p.y < q.y - q.fsz ? (q.y - q.fsz) - p.y : p.y > q.y + q.fsz * 0.3 ? p.y - (q.y + q.fsz * 0.3) : 0;
         d = Math.min(d, Math.hypot(dx, dy));
+      }
+      /* a numbered badge carries its own circle wherever the spread parked
+         it - the tie leads the eye to the number, not back down the rule,
+         which the cluster has no reason to follow */
+      if (q.row == null && q.e.badge != null) {
+        const bx = badgeAt.current && badgeAt.current[i] != null ? badgeAt.current[i] : q.ex;
+        d = Math.min(d, Math.hypot(p.x - bx, p.y - (pad.t - PX(13))));
       }
       if (d < nearD) { nearD = d; near = q; }
     }

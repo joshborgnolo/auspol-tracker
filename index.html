@@ -64326,13 +64326,18 @@ function TrendChart(props) {
     const rU = radiusPx / Math.max(scale, 0.0001);
     let near = null,
       nearD = Infinity;
-    for (const q of evPlaced) {
+    for (let i = 0; i < evPlaced.length; i++) {
+      const q = evPlaced[i];
       if (q.leaving) continue;
       let d = p.y >= q.y - rU && p.y <= H - pad.b + rU ? Math.abs(p.x - q.ex) : Infinity;
       if (q.row != null) {
         const dx = p.x < q.x ? q.x - p.x : p.x > q.x + q.w ? p.x - (q.x + q.w) : 0;
         const dy = p.y < q.y - q.fsz ? q.y - q.fsz - p.y : p.y > q.y + q.fsz * 0.3 ? p.y - (q.y + q.fsz * 0.3) : 0;
         d = Math.min(d, Math.hypot(dx, dy));
+      }
+      if (q.row == null && q.e.badge != null) {
+        const bx = badgeAt.current && badgeAt.current[i] != null ? badgeAt.current[i] : q.ex;
+        d = Math.min(d, Math.hypot(p.x - bx, p.y - (pad.t - PX(13))));
       }
       if (d < nearD) {
         nearD = d;
@@ -91483,9 +91488,12 @@ function RdPastCycles(p) {
     ppmm: null,
     oppnet: null
   });
-  const onEvtOf = key => v => setEvt(s => s[key] === v ? s : {
-    ...s,
-    [key]: v
+  const onEvtOf = key => v => setEvt(s => {
+    const nx = typeof v === "function" ? v(s[key]) : v;
+    return nx === s[key] ? s : {
+      ...s,
+      [key]: nx
+    };
   });
   const pickPair = (pair, keys) => e => {
     const k = keys.find(c => !e.metrics || e.metrics.includes(c));

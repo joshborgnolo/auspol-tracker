@@ -1264,7 +1264,13 @@ function RdPastCycles(p) {
      time. A metric-less event draws in both, so its pick goes to the
      left-hand chart and its scroll anchor exists only there. */
   const [evt, setEvt] = useState({ primary: null, oppr: null, ppmm: null, oppnet: null });
-  const onEvtOf = (key) => (v) => setEvt((s) => (s[key] === v ? s : { ...s, [key]: v }));
+  /* the chart's own opens and closes report UP as React functional
+     updaters - resolve one against the slot it targets before storing, or
+     a hover pick would land in state as the function itself and never draw */
+  const onEvtOf = (key) => (v) => setEvt((s) => {
+    const nx = typeof v === "function" ? v(s[key]) : v;
+    return nx === s[key] ? s : { ...s, [key]: nx };
+  });
   const pickPair = (pair, keys) => (e) => {
     const k = keys.find((c) => !e.metrics || e.metrics.includes(c));
     if (k) setEvt((s) => {
