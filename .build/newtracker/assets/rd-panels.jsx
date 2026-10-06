@@ -1794,6 +1794,10 @@ function RdDemographics({ rangeId = "all" }) {
      falls with age", "…back the Coalition" */
   const pName = party === "oth" ? "others & independents" : party === "lnp" ? "the Coalition" : party === "grn" ? "the Greens" : P.name;
   const pPoss = pName + (/s$/.test(pName) ? "’" : "’s"), pColor = P.color;
+  /* the vote noun phrase: others & independents can't carry a possessive, so it
+     reads "vote for others & independents" (user dictate 2026-10-07; the
+     composition-trend dek below made the same call for "…'s vote" in 2026-09-30) */
+  const pVote = party === "oth" ? "vote for others & independents" : pPoss + " vote";
   const all = T.all[party];
   const ki = T.order.indexOf(party), gpi = DEMO_GRP_PARTY.indexOf(party);
   const short = (g) => RD_DEMO_SHORT[g.label] || DEMO_WHO[g.label] || g.label;
@@ -1805,10 +1809,10 @@ function RdDemographics({ rangeId = "all" }) {
     let finding;
     const m = /^Support for .* (rises|falls) significantly (.*)\.$/.exec(verdict);
     const noDiff = /no significant difference/.test(verdict);
-    if (m && st0.id === "age") finding = pPoss + " vote " + (m[1] === "rises" ? "climbs" : "falls") + " with age";
-    else if (m && st0.id === "generation") finding = pPoss + " vote " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";
-    else if (m && st0.id === "location") finding = pPoss + " vote " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";
-    else if (noDiff) finding = pPoss + " vote is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");
+    if (m && st0.id === "age") finding = pVote + " " + (m[1] === "rises" ? "climbs" : "falls") + " with age";
+    else if (m && st0.id === "generation") finding = pVote + " " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";
+    else if (m && st0.id === "location") finding = pVote + " " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";
+    else if (noDiff) finding = pVote + " is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");
     else finding = verdict.replace(/ significantly/, "").replace(/\.$/, "");
     const gs = st0.groups.filter((g) => g.v[party] != null);
     const byV = gs.slice().sort((a, b) => b.v[party] - a.v[party]);
@@ -1915,12 +1919,16 @@ function RdDemographics({ rangeId = "all" }) {
     const nameD = RD_TREND_NAME_DEK[party] || pName;
     const isAre = party === "oth" ? "are" : "is";
     const poss = (s) => s + (/s$/.test(s) ? "’" : "’s");
+    /* the head's vote noun phrase: others & independents takes "the vote for
+       others & independents" — the 2026-10-07 dictate (pVote above) applied
+       to the trends' headline form as the 2026-09-30 one did the dek's */
+    const voteHead = party === "oth" ? "the vote for others & independents" : poss(nameT) + " vote";
     const serial = (ls) => ls.length < 2 ? (ls[0] || "") : ls.length === 2 ? ls[0] + " and " + ls[1] : ls.slice(0, -1).join(", ") + ", and " + ls[ls.length - 1];
     const since = "Since " + rdMonthYear(dt.windowYm) + ", ";
     if (!solid.length) {
       const skew = RD_TREND_SKEW[party];
       return {
-        head: "The composition of " + poss(nameT) + " vote is unchanged",
+        head: "The composition of " + voteHead + " is unchanged",
         dek: since + "no group has moved significantly towards or away from " + nameD + " relative to all voters" + (skew ? ". " + skew : "."),
       };
     }
@@ -2024,7 +2032,7 @@ function RdDemographics({ rangeId = "all" }) {
         if (!head) head = nameT + " " + isAre + " " + (m.dir > 0 ? "gaining in " : "losing voters faster in ") + loc.ref;
         parts.push(...locDek(m));
       } else {
-        if (!head) head = "The composition of " + poss(nameT) + " vote is shifting";
+        if (!head) head = "The composition of " + voteHead + " is shifting";
         groupMoves.push(bestOf(ms));
       }
     }
@@ -2289,7 +2297,7 @@ function RdDemographics({ rangeId = "all" }) {
                     tooltipTitle={(i) => (seY != null && i === 0 ? monthLabelFull("2025-05") : c.allPts[seY != null ? i - 1 : i] ? monthLabelFull(c.allPts[seY != null ? i - 1 : i].ym) : "")}
                     extraRows={seY != null ? ((i) => (i === 0 ? [{ label: "", value: "The election result" }] : ciUnshifted(i - 1))) : ciUnshifted}
                     fmt={(v) => v.toFixed(1)}
-                    copy={{ title: rdCap(pPoss) + " vote: " + name, sub: "Share of this group who would vote for " + pName + ", month by month, against all voters",
+                    copy={{ title: rdCap(pVote) + ": " + name, sub: "Share of this group who would vote for " + pName + ", month by month, against all voters",
                             legend: [{ label: name, color: pColor, kind: "line" }, { label: "95% interval", color: pColor, kind: "band" }, { label: "All voters", color: "var(--ink)", kind: "dashed" }] }}
                   />
                 </div>
@@ -2354,7 +2362,7 @@ function RdDemographics({ rangeId = "all" }) {
         fmt={(v) => v.toFixed(1)}
         /* keyed in full: a phone names no line at its end, and "All voters"
            loses its name wherever the groups crowd it */
-        copy={{ title: rdCap(pPoss) + " vote " + (c.st.label || "By " + tab.label).toLowerCase(), sub: "Share of each group who would vote for " + pName + ", month by month, against all voters",
+        copy={{ title: rdCap(pVote) + " " + (c.st.label || "By " + tab.label).toLowerCase(), sub: "Share of each group who would vote for " + pName + ", month by month, against all voters",
                 legend: c.drawn.map((l) => ({ label: l.g.label, color: l.color, kind: "line" }))
                   .concat([{ label: "95% interval", color: pColor, kind: "band" }, { label: "All voters", color: "var(--ink)", kind: "dashed" }]) }}
       />
