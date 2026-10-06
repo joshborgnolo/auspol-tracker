@@ -81127,7 +81127,7 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "100 is neutral."), " Each index is built from the balance of optimists and pessimists on Roy Morgan\u2019s questions, so a reading above 100 means optimists outnumber pessimists and one below 100 the reverse."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Drawn as published."), " Each point is a release\u2019s own headline figure, linked to it; the site does no averaging and applies no", " ", xref("house-effect", "mood", "house-effect"), " adjustment, so this is a record, not an estimate. The change shown beside each index is the one Roy Morgan printed with it, kept only where it agrees with the previous printed reading."), React.createElement("span", {
+      }, React.createElement("b", null, "Smoothed, not averaged across sources."), " Each dot is a release\u2019s own headline figure, linked to it; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly consumer index, 60 days on the monthly business index) so weekly noise reads as trend. The quoted figures are the raw prints, and no", " ", xref("house-effect", "mood", "house-effect"), " adjustment applies. The change shown beside each index is the one Roy Morgan printed with it, kept only where it agrees with the previous printed reading."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Context, not a predictor."), " The series sit below the term\u2019s polls because the mood of the economy frames what voters hear; neither series forecasts how they\u2019ll answer."))
     },
@@ -91874,6 +91874,23 @@ function RdMood({
   const cUnder = cLat.v < 100,
     bUnder = bLat.v < 100;
   const word = v => v < 100 ? "underwater" : "above water";
+  const smooth = (polls, halfLifeDays) => {
+    const decay = Math.LN2 / (halfLifeDays / 365.25);
+    return polls.map(p => {
+      let wsum = 0,
+        wtot = 0;
+      for (const q of polls) {
+        const w = Math.exp(-decay * Math.abs(q.x - p.x));
+        if (w < 0.02) continue;
+        wsum += w;
+        wtot += w * q.v;
+      }
+      return {
+        x: p.x,
+        y: wtot / wsum
+      };
+    });
+  };
   const head = cUnder && bUnder ? "Confidence is underwater on both counts." : !cUnder && !bUnder ? "Confidence is above water on both counts." : cUnder ? "Consumers are underwater; businesses aren’t." : "Businesses are underwater; consumers aren’t.";
   const trough = s => {
     const lo = s.polls.reduce((m, p) => p.v < m.v ? p : m, s.polls[0]);
@@ -91902,7 +91919,8 @@ function RdMood({
     color: "var(--ink)",
     lat: cLat,
     period: "week",
-    by: "ANZ–Roy Morgan"
+    by: "ANZ–Roy Morgan",
+    hl: 14
   }, {
     s: B,
     id: "business",
@@ -91911,7 +91929,8 @@ function RdMood({
     color: "var(--ink-2)",
     lat: bLat,
     period: "month",
-    by: "Roy Morgan"
+    by: "Roy Morgan",
+    hl: 60
   }];
   const x1 = D.domain.x1;
   const x0 = Math.min(C.polls[0].x, B.polls[0].x) - 0.04;
@@ -91985,7 +92004,7 @@ function RdMood({
       rdWidth: 2.2,
       endCap: false,
       endLabel: narrow ? null : r.name,
-      points: series(r.s.polls.filter(p => p.x >= x0), "v")
+      points: smooth(r.s.polls.filter(p => p.x >= x0), r.hl)
     })),
     spine: series(C.polls.filter(p => p.x >= x0), "v"),
     scatter: rows.flatMap(r => r.s.polls.filter(p => p.x >= x0).map(q => ({
@@ -92005,7 +92024,7 @@ function RdMood({
     copy: {
       title: "Consumer and business confidence",
       sub: head + " ANZ–Roy Morgan Consumer Confidence, weekly, and Roy Morgan Business Confidence, monthly; on each index 100 separates optimists from pessimists.",
-      caption: "Each dot is one Roy Morgan release; the lines join the house’s own published readings back to 2019 — no averaging or adjustment.",
+      caption: "Each dot is one Roy Morgan release as printed; the lines are a recency-weighted smooth of those readings (half-life 14 days for the weekly consumer index, 60 days for the monthly business index). No combining, no adjustment.",
       legend: copyLegend
     }
   }), React.createElement(RdKey, {
@@ -92013,14 +92032,14 @@ function RdMood({
     items: [{
       kind: "dot",
       color: "var(--ink-3)",
-      label: "One release"
+      label: "One release, as printed"
     }, {
       kind: "line",
       color: "var(--ink-3)",
-      label: "The published index readings, joined"
+      label: "Smoothed trend of the releases"
     }]
   })), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "These are Roy Morgan\u2019s own index series, set out as published: the weekly ANZ\u2013Roy Morgan consumer index and the monthly business index, back to 2019 so today\u2019s reading can be seen against COVID and the recovery. No averaging, no adjustment for lean, no election anchor is applied."), React.createElement(React.Fragment, null, "On each index 100 is neutral \u2014 above it optimists outnumber pessimists. Reading the mood beside the polls is context, not a predictor of the vote.")]
+    paras: [React.createElement(React.Fragment, null, "These are Roy Morgan\u2019s own index series: the weekly ANZ\u2013Roy Morgan consumer index and the monthly business index, back to 2019 so today\u2019s reading can be seen against COVID and the recovery. Each dot is the reading as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 on the monthly), so week-to-week noise reads as trend. The figures quoted above are the raw prints. No combining across sources, no adjustment for lean, no election anchor is applied."), React.createElement(React.Fragment, null, "On each index 100 is neutral \u2014 above it optimists outnumber pessimists. Reading the mood beside the polls is context, not a predictor of the vote.")]
   }), React.createElement(RdFoot, {
     how: {
       term: "mood",

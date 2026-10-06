@@ -1939,7 +1939,9 @@ const SEC_ISSUES_FILE = (() => {
   catch { return null; }
 })();
 /* The mood panel's series (§5j): business and consumer confidence, built by
-   .build/mood.mjs from Roy Morgan's own releases. */
+   .build/mood.mjs from Roy Morgan's own releases. The panel dots these
+   prints raw and draws a recency-weighted smoothed trend on top (render
+   side, rd-panels.jsx) - this payload stays the published readings. */
 const MOOD_FILE = (() => {
   if (JUR) return null;   // federal side data – absent for another jurisdiction
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "mood.json"), "utf8")); }

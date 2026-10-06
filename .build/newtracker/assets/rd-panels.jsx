@@ -3785,11 +3785,15 @@ function RdUndecided({ rangeId }) {
 
 /* ---------------------------------------------------- The economic mood
    Business and consumer confidence — Roy Morgan's OWN index series (weekly
-   ANZ-Roy Morgan consumer, monthly business), drawn as published over the
-   whole run back to 2019 rather than this term: the long record is exactly
-   what makes today's reading legible (the COVID trough, the 2022 bounce).
-   No aggregation, no house effects, no election anchor — context, not a
-   predictor. Data: data/mood.json → gen-data §5j → D.mood.
+   ANZ-Roy Morgan consumer, monthly business), drawn over the whole run
+   back to 2019 rather than this term: the long record is exactly what
+   makes today's reading legible (the COVID trough, the 2022 bounce). Each
+   dot is the published reading; the line is a recency-weighted smooth of
+   those readings (half-life 14 days on the weekly consumer index, 60 days
+   on the monthly business index), so weekly noise reads as trend. The
+   quoted figures stay the raw prints. No aggregation across houses, no
+   house effects, no election anchor — context, not a predictor.
+   Data: data/mood.json → gen-data §5j → D.mood.
 */
 function RdMood({ rangeId }) {
   const { D, series, monthLabelFull } = window.AP;
@@ -3800,6 +3804,23 @@ function RdMood({ rangeId }) {
   const cLat = C.latest, bLat = B.latest;
   const cUnder = cLat.v < 100, bUnder = bLat.v < 100;
   const word = (v) => (v < 100 ? "underwater" : "above water");
+  // Symmetric half-life kernel over the raw readings (x units are years).
+  // Evaluated at each reading's date; week-to-week sampling noise on the
+  // consumer index is ~2pts, so two weeks of half-life is enough to clear
+  // it without rounding off real turns (COVID, budget shocks).
+  const smooth = (polls, halfLifeDays) => {
+    const decay = Math.LN2 / (halfLifeDays / 365.25);
+    return polls.map((p) => {
+      let wsum = 0, wtot = 0;
+      for (const q of polls) {
+        const w = Math.exp(-decay * Math.abs(q.x - p.x));
+        if (w < 0.02) continue;
+        wsum += w;
+        wtot += w * q.v;
+      }
+      return { x: p.x, y: wtot / wsum };
+    });
+  };
   const head = cUnder && bUnder ? "Confidence is underwater on both counts."
     : !cUnder && !bUnder ? "Confidence is above water on both counts."
     : (cUnder ? "Consumers are underwater; businesses aren’t." : "Businesses are underwater; consumers aren’t.");
@@ -3820,8 +3841,8 @@ function RdMood({ rangeId }) {
   const dek = sent("Consumers", cLat, "week", C) + " " + sent("Businesses", bLat, "month", B);
   const water = (v) => v < 100 ? "pessimists lead" : "optimists lead";
   const rows = [
-    { s: C, id: "consumer", name: "Consumers", short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly. " + water(cLat.v) + ".", color: "var(--ink)", lat: cLat, period: "week", by: "ANZ–Roy Morgan" },
-    { s: B, id: "business", name: "Businesses", short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly. " + water(bLat.v) + ".", color: "var(--ink-2)", lat: bLat, period: "month", by: "Roy Morgan" },
+    { s: C, id: "consumer", name: "Consumers", short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly. " + water(cLat.v) + ".", color: "var(--ink)", lat: cLat, period: "week", by: "ANZ–Roy Morgan", hl: 14 },
+    { s: B, id: "business", name: "Businesses", short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly. " + water(bLat.v) + ".", color: "var(--ink-2)", lat: bLat, period: "month", by: "Roy Morgan", hl: 60 },
   ];
   const x1 = D.domain.x1;
   const x0 = Math.min(C.polls[0].x, B.polls[0].x) - 0.04;
@@ -3850,22 +3871,22 @@ function RdMood({ rangeId }) {
           xTicks={years} baseline
           refLines={[{ y: 100, label: "100 = neutral", align: "left", color: "var(--ink-3)" }]}
           series={rows.map((r) => ({ id: r.id, label: r.name, color: r.color, rdWidth: 2.2, endCap: false,
-            endLabel: narrow ? null : r.name, points: series(r.s.polls.filter((p) => p.x >= x0), "v") }))}
+            endLabel: narrow ? null : r.name, points: smooth(r.s.polls.filter((p) => p.x >= x0), r.hl) }))}
           spine={series(C.polls.filter((p) => p.x >= x0), "v")}
           scatter={rows.flatMap((r) => r.s.polls.filter((p) => p.x >= x0).map((q) => ({ x: q.x, y: q.v, color: r.color, label: r.name, meta: { pollster: r.by } })))}
           tooltipTitle={(i) => { const p = C.polls.filter((q) => q.x >= x0)[i]; return p ? monthLabelFull(p.ym) : ""; }}
           fmt={(v) => v.toFixed(1)}
           copy={{ title: "Consumer and business confidence",
                   sub: head + " ANZ–Roy Morgan Consumer Confidence, weekly, and Roy Morgan Business Confidence, monthly; on each index 100 separates optimists from pessimists.",
-                  caption: "Each dot is one Roy Morgan release; the lines join the house’s own published readings back to 2019 — no averaging or adjustment.",
+                  caption: "Each dot is one Roy Morgan release as printed; the lines are a recency-weighted smooth of those readings (half-life 14 days for the weekly consumer index, 60 days for the monthly business index). No combining, no adjustment.",
                   legend: copyLegend }} />
         <RdKey className="rd-ckey" items={[
-          { kind: "dot", color: "var(--ink-3)", label: "One release" },
-          { kind: "line", color: "var(--ink-3)", label: "The published index readings, joined" },
+          { kind: "dot", color: "var(--ink-3)", label: "One release, as printed" },
+          { kind: "line", color: "var(--ink-3)", label: "Smoothed trend of the releases" },
         ]} />
       </div>
       <HowTo paras={[
-        <>These are Roy Morgan’s own index series, set out as published: the weekly ANZ–Roy Morgan consumer index and the monthly business index, back to 2019 so today’s reading can be seen against COVID and the recovery. No averaging, no adjustment for lean, no election anchor is applied.</>,
+        <>These are Roy Morgan’s own index series: the weekly ANZ–Roy Morgan consumer index and the monthly business index, back to 2019 so today’s reading can be seen against COVID and the recovery. Each dot is the reading as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 on the monthly), so week-to-week noise reads as trend. The figures quoted above are the raw prints. No combining across sources, no adjustment for lean, no election anchor is applied.</>,
         <>On each index 100 is neutral — above it optimists outnumber pessimists. Reading the mood beside the polls is context, not a predictor of the vote.</>,
       ]} />
       <RdFoot how={{ term: "mood", from: "The economic mood" }}>Weekly consumer and monthly business readings from Roy Morgan, the term-long record behind today’s mood. Context, not a predictor.</RdFoot>
