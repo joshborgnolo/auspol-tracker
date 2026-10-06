@@ -83165,9 +83165,13 @@ function rdEffTbc(p) {
   const prev = window.AUSPOL.individualPolls.filter(q => q.pollster === p.pollster && q.released < p.released).sort((a, b) => a.released < b.released ? -1 : 1).pop();
   return !!(prev && prev.sampleEff != null);
 }
+const RD_EFF_TBC_URL = {
+  YouGov: "https://yougov.com/about/methodology/australian-polling-council",
+  "RedBridge/Accent": "https://www.accent-research.com/projects"
+};
 function rdEffTbcNote(p) {
   const note = "The pollster publishes an effective sample, but not yet for this poll";
-  const url = p.pollster === "YouGov" ? "https://yougov.com/about/methodology/australian-polling-council" : null;
+  const url = RD_EFF_TBC_URL[p.pollster] || null;
   return React.createElement(React.Fragment, null, "eff. ", url ? React.createElement("a", {
     className: "rd-tbc",
     href: url,

@@ -116,11 +116,17 @@ function rdEffTbc(p) {
     .sort((a, b) => (a.released < b.released ? -1 : 1)).pop();
   return !!(prev && prev.sampleEff != null);
 }
-/* "TBC" links to the house's APC methodology page, where the house keeps one —
-   YouGov's sets out why the effective sample trails the release. */
+/* "TBC" links to where the house will publish the figure: YouGov's APC
+   methodology page (it sets out why the effective sample trails the
+   release), Accent Research's projects page (the RedBridge report and its
+   methodology PDF land there days after the AFR story). */
+const RD_EFF_TBC_URL = {
+  YouGov: "https://yougov.com/about/methodology/australian-polling-council",
+  "RedBridge/Accent": "https://www.accent-research.com/projects",
+};
 function rdEffTbcNote(p) {
   const note = "The pollster publishes an effective sample, but not yet for this poll";
-  const url = p.pollster === "YouGov" ? "https://yougov.com/about/methodology/australian-polling-council" : null;
+  const url = RD_EFF_TBC_URL[p.pollster] || null;
   return <>eff. {url
     ? <a className="rd-tbc" href={url} target="_blank" rel="noopener noreferrer" title={note} onClick={(e) => e.stopPropagation()}>TBC</a>
     : <span title={note}>TBC</span>}</>;
