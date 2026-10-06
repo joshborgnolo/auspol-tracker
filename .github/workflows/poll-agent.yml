@@ -116,12 +116,6 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0 (node24; v6+ moves the persisted credential out of .git/config — see agent-repair.yml)
 
-      - name: Pin Node
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-
       # The quiet-run gate. A clock-dispatched slot (a comb runs a dozen a
       # day) asks the pollster's listing whether anything is new before the
       # runner pays for apt, npm and the updater: a quiet run ends here in
@@ -129,7 +123,9 @@ jobs:
       # before, so a probe that breaks, or a page that won't load (which the
       # updater has to classify), costs only the old setup. The cron backup
       # run (and simulate_failure) skips the probe: the daily full run keeps
-      # every bank rebuilt even on days with nothing new.
+      # every bank rebuilt even on days with nothing new. It runs on the
+      # image's own node, ahead of Pin Node's 5-second npm-cache restore:
+      # the probes import nothing from npm.
       - name: Probe upstream for anything new
         id: probe
         if: inputs.probe != '' && github.event_name != 'schedule' && inputs.simulate_failure != 'true'
@@ -142,6 +138,13 @@ jobs:
             echo "nothing new upstream; skipping the updater"
             echo "quiet=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Pin Node
+        if: steps.probe.outputs.quiet != 'true'
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
 
       - name: Configure git identity
         if: steps.probe.outputs.quiet != 'true'
