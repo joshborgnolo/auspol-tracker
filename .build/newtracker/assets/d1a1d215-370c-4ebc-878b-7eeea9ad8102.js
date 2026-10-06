@@ -7213,13 +7213,13 @@ function infoTerms(D) {
         the election is tested within each pollster’s own polls, with the bar raised for testing
         several lines at once.</span></>) },
       entries: [] },
-    { id: "s-mood", title: "The economic mood", nav: "Mood",
+    { id: "s-mood", title: "Economic mood", nav: "Mood",
       lead: { id: "mood", body: (
         <>Four published confidence gauges of the same economy: the ANZ–Roy Morgan Consumer
         Confidence index, published weekly; the Westpac–Melbourne Institute Consumer Sentiment
         index, monthly; Roy Morgan’s Business Confidence index, monthly; and NAB’s Monthly
-        Business Survey. Each series runs back as far as its figure source reaches — 2019 for
-        the Roy Morgan series, 2022 for Westpac, and April 2025 for NAB.
+        Business Survey. The chart opens at the May 2025 election; the figures on file run
+        further back — 2019 for the Roy Morgan series, 2022 for Westpac, and April 2025 for NAB.
         <span className="info-p"><b>100 is neutral.</b> The three index series are built from the
         balance of optimists and pessimists on each house’s questions, so a reading above 100
         means optimists outnumber pessimists and one below 100 the reverse.</span>

@@ -3783,14 +3783,13 @@ function RdUndecided({ rangeId }) {
   );
 }
 
-/* ---------------------------------------------------- The economic mood
+/* ---------------------------------------------------- Economic mood --
    Four published gauges of business and consumer confidence on ONE plot —
    ANZ–Roy Morgan consumer confidence (weekly) and Roy Morgan business
    confidence (monthly), Westpac–MI consumer sentiment and the NAB Business
-   Survey (monthly) — drawn as published over each series' whole run on
-   file: the long record is exactly what makes today's reading legible (the
-   COVID trough, the 2022 bounce, this term). Each dot is the published
-   reading; each line is a recency-weighted smooth of those readings
+   Survey (monthly) — drawn as published from the 2025 election on. Each
+   dot is the published reading; each line is a recency-weighted smooth
+   of those readings
    (half-life 14 days on the weekly index, 60 days on the monthly ones),
    so release-to-release noise reads as trend while every quoted figure
    stays the raw print. The first three are 100-neutral indices; NAB
@@ -3798,8 +3797,8 @@ function RdUndecided({ rangeId }) {
    shared neutral line holds — the read rows and tooltips print NAB's own
    figures off each point's `raw`. The second gauge of each subject is
    the dashed twin of its line colour. NAB's conditions reading rides the
-   read row, not a fifth line. No aggregation, no house effects, no
-   election anchor — context, not a predictor.
+   read row, not a fifth line. No aggregation, no house effects — context,
+   not a predictor.
    Data: data/mood.json → gen-data §5j → D.mood.
 */
 function RdMood({ rangeId }) {
@@ -3857,25 +3856,29 @@ function RdMood({ rangeId }) {
     : cSide === "under" && bSide === "above" ? "Consumers are underwater; businesses aren’t."
     : cSide === "above" && bSide === "under" ? "Businesses are underwater; consumers aren’t."
     : "The gauges disagree on which side of the line the mood sits.";
-  const trough = (s) => {
-    const lo = s.polls.reduce((m, p) => (p.v < m.v ? p : m), s.polls[0]);
-    const hi = s.polls.reduce((m, p) => (p.v > m.v ? p : m), s.polls[0]);
+  const trough = (polls) => {
+    const lo = polls.reduce((m, p) => (p.v < m.v ? p : m), polls[0]);
+    const hi = polls.reduce((m, p) => (p.v > m.v ? p : m), polls[0]);
     return { lo, hi };
   };
   const sent = (l) => {
     let t = l.dekName + " at " + l.vfmt(l.lat.v)
       + (l.lat.chg == null ? "" : Math.abs(l.lat.chg) < 0.05 ? ", holding steady"
         : ", " + (l.lat.chg < 0 ? "down " : "up ") + NICE(Math.abs(l.lat.chg)) + " on the " + l.period);
-    const { lo, hi } = trough(l.s);
+    const { lo, hi } = trough(rows.get(l.k));
     if (Math.abs(l.lat.v - lo.v) <= 2.5) t += ", not far off its low of " + l.vfmt(lo.v) + " in " + monthLabelFull(lo.ym);
     else if (Math.abs(l.lat.v - hi.v) <= 2.5) t += ", close to its high of " + l.vfmt(hi.v) + " in " + monthLabelFull(hi.ym);
     if (l.k === "nabBusiness" && l.lat.cond != null) t += " (conditions " + NICE(l.lat.cond) + ")";
     return t + ".";
   };
-  const dek = lanes.map(sent).join(" ");
+  /* The plot opens at the 3 May 2025 election - 122 days fall before that
+     date in 2025, so its year-fraction x is 2025 + 122/365, the same
+     counting gen-data's dx uses. Pre-election history stays in the
+     payload, off-screen; the dek's high/low reads are windowed with it. */
+  const x0 = 2025 + 122 / 365;
   const x1 = D.domain.x1;
-  const x0 = Math.min(...lanes.map((l) => l.s.polls[0].x)) - 0.04;
   const rows = new Map(lanes.map((l) => [l.k, l.s.polls.filter((p) => p.x >= x0)]));
+  const dek = lanes.map(sent).join(" ");
   /* The dots, spine and domain ride the raw prints; the series lines are
      the kernel smooth of the same readings. The NAB display shift is a
      constant, so smoothing then shifting equals shifting and smoothing —
@@ -3890,7 +3893,7 @@ function RdMood({ rangeId }) {
   const copyLegend = lanes.map((l) => ({ label: l.lab + " (latest " + l.vfmt(l.lat.v) + ")", color: l.color, kind: l.dash ? "dashed" : "line" }));
   const fmt = (v, p) => (p && p.raw != null ? NICE(p.raw) : v.toFixed(1));
   return (
-    <RdSec id="mood" cls="rd-mood" title="The economic mood" meta={"Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")}>
+    <RdSec id="mood" cls="rd-mood" title="Economic mood" meta={"Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")}>
       <RdHed head={head} dek={dek} />
       <div className="card rd-card rd-mood-chart">
         <div className="rd-un-ptitle"><b>Consumer and business confidence</b><span>100 = neutral on each index; NAB’s net balance drawn 100 points up</span></div>
@@ -3925,11 +3928,11 @@ function RdMood({ rangeId }) {
         ]} />
       </div>
       <HowTo paras={[
-        <>Four published gauges of the same mood, set out as each house prints them: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses, no adjustment for lean and no election anchor — a record, not an estimate.</>,
+        <>Four published gauges of the same mood, set out as each house prints them from the 2025 election on: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
         <>Three of the four are indices where 100 is neutral. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
         <>Reading the mood beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />
-      <RdFoot how={{ term: "mood", from: "The economic mood" }}>Four published gauges — ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB — joined as released. Context, not a predictor.</RdFoot>
+      <RdFoot how={{ term: "mood", from: "Economic mood" }}>Four published gauges — ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB — joined as released. Context, not a predictor.</RdFoot>
     </RdSec>
   );
 }

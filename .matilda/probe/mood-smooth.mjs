@@ -1,10 +1,15 @@
-/* Probe: the Snapshot's "The economic mood" panel (RdMood, rd-panels.jsx).
+/* Probe: the Snapshot's "Economic mood" panel (RdMood, rd-panels.jsx).
    The panel draws FOUR published gauges on one plot (ANZ–Roy Morgan
    consumer weekly, Westpac–MI consumer monthly, Roy Morgan business
    monthly, NAB business monthly) as RAW-PRINT dots plus a render-side
    recency-weighted smooth per series (symmetric half-life kernel, 14d on
    the weekly index, 60d on the monthly ones); NAB is a net balance drawn
    100 points up, and the payload D.mood stays the published readings.
+   The plot's x-window opens at the 3 May 2025 election
+   (x0 = 2025 + 122/365, gen-data's dx counting); the payload keeps the
+   full on-file history, off-screen, so the payload pins below still run
+   to the 2019-08-13 coverage clip while the render expectations window
+   at x0.
 
    Asserts headlessly against BASE (repo root or a worktree):
      SOURCES (node-side):
@@ -77,6 +82,8 @@ const gloss = glossFile ? fs.readFileSync(path.join(BASE, ".build/newtracker/ass
 check(gloss.includes("Smoothed, not averaged across sources."), "glossary 'mood' entry leads with the smoothing note");
 check(gloss.includes("recency-weighted kernel (half-life 14 days on the weekly consumer index, 60 days"), "glossary names both half-lives");
 check(gloss.includes("NAB is drawn 100 points up."), "glossary discloses the NAB +100 draw");
+check(gloss.includes("The chart opens at the May 2025 election"), "glossary dates the chart window to the May 2025 election");
+check(panels.includes("const x0 = 2025 + 122 / 365"), "the panel opens the x-window at the 2025 election (x0 = 2025 + 122/365)");
 const genData = fs.readFileSync(path.join(BASE, ".build/newtracker/gen-data.mjs"), "utf8");
 check(genData.includes("recency-weighted smoothed trend on top (render"), "gen-data §5j comment still promises the raw payload");
 
@@ -137,8 +144,10 @@ for (const lane of LANES) {
     `${k}: latest is the last printed row (${last.date}, ${last.v})`);
 }
 
-/* ---- expectations recomputed from the payload ---- */
-const x0 = Math.min(...live.map((l) => P[l.k].polls[0].x)) - 0.04;
+/* ---- expectations recomputed from the payload ----
+   x0 is the panel's election anchor constant (source-pinned above); the
+   payload pins stay on the full on-file history. */
+const x0 = 2025 + 122 / 365;
 const x1 = P.x1;
 const fil = {}, exp = {};
 for (const l of live) {
@@ -158,9 +167,13 @@ for (const l of live) {
 }
 
 /* ---- scales fitted from the DOM (never reimplemented) ----
-   y: the "y<tick>"-keyed gridline groups. x: the rd-axis year-tick marks
-   (the first rd-base line is the baseline rule, the rest are integer-year
-   ticks, ascending). pad read straight off the gridline x1/x2. */
+   y: the "y<tick>"-keyed gridline groups. x: the election-windowed domain
+   shows only a year tick or two, so the scale is READ off the measured
+   plot insets (the gridlines' x1/x2 give the exact plot box) against the
+   known [x0, x1] domain, with whatever integer-year ticks exist as an
+   exact cross-check on it (the first rd-base line is the baseline rule,
+   the rest are integer-year ticks, ascending). pad read straight off the
+   gridline x1/x2. */
 const fitScales = () => page.evaluate(() => {
   const root = document.querySelector("#mood .rd-mood-chart svg.chart-svg");
   if (!root) return null;
@@ -211,20 +224,25 @@ async function checkChart(rung) {
   check(fit.vbW === 1000, `viewBox width is the fixed 1000 units (got ${fit.vbW})`);
   const expH = 1000 * hpPx(rung) / fit.cw;
   check(Math.abs(fit.vbH - expH) < 2, `viewBox height ${fit.vbH.toFixed(1)} = 1000 × heightPx ${hpPx(rung)} / cw ${fit.cw.toFixed(0)} (${expH.toFixed(1)})`);
-  check(fit.ys.length >= 6, `${fit.ys.length} y-gridlines to fit on`);
+  /* the election window narrows the decade gridlines (e.g. 80-110 = 4);
+     three or more still pins the fit plus residual */
+  check(fit.ys.length >= 3, `${fit.ys.length} y-gridlines to fit on`);
   const fy = linfit(fit.ys.map((d) => [d.t, d.y]));
   check(fy.res < 0.01, `y-scale linear across the gridlines (residual ${fy.res.toFixed(4)}u)`);
   const sy = (v) => fy.a + fy.b * v;
-  const yrs = fit.ticks.map((p, i) => [firstYear + i, p]);
-  const fx = linfit(yrs);
-  check(fit.ticks.length >= 6 && fx.res < 0.01, `x-scale linear across ${fit.ticks.length} year ticks from ${firstYear} (residual ${fx.res.toFixed(4)}u)`);
-  const sx = (x) => fx.a + fx.b * x;
   /* pad read back: left pad is untouched by the end-label growth, right
      pad must be at least padPx.r worth of units (labels may grow it) */
   const k0 = fit.cw / 1000;
   const padL = fit.ys[0].x1, padR = fit.vbW - fit.ys[0].x2;
   check(Math.abs(padL - padPxL(rung) / k0) < 0.3, `left pad is padPx ${padPxL(rung)} (${padL.toFixed(2)}u vs ${(padPxL(rung) / k0).toFixed(2)})`);
   check(padR >= padPxR(rung) / k0 - 0.01, `right pad >= padPx ${padPxR(rung)} (${padR.toFixed(2)}u, label room may grow it)`);
+  /* x: the plot box maps linearly onto the known [x0, x1] domain; every
+     integer-year tick must sit exactly on that scale (one or two may be
+     all the election window spans) */
+  const sx = (x) => padL + (x - x0) * ((fit.vbW - padR - padL) / (x1 - x0));
+  const ticks = [...fit.ticks].sort((a, b) => a - b);
+  const tickRes = ticks.length ? Math.max(...ticks.map((t, i) => Math.abs(t - sx(firstYear + i)))) : Infinity;
+  check(ticks.length >= 1 && tickRes < 0.01, `${ticks.length} year tick(s) sit on the [x0,x1] domain scale from ${firstYear} (residual ${tickRes === Infinity ? "n/a" : tickRes.toFixed(4) + "u"})`);
 
   check(await page.evaluate(() => {
     const el = document.querySelector("#mood");
@@ -315,7 +333,7 @@ const expHead = cSide === "under" && bSide === "under" ? "Confidence is underwat
 
 async function checkCopy() {
   const title = await texts("#mood .rd-title");
-  check(title[0] === "The economic mood", `section title "The economic mood" (got "${title[0]}")`);
+  check(title[0] === "Economic mood", `section title "Economic mood" (got "${title[0]}")`);
   const head = await texts("#mood h3.rd-hed");
   check(head[0] === expHead, `headline is the data-composed mood verdict ("${head[0]}")`);
   const dek = (await texts("#mood p.rd-dek"))[0] || "";
@@ -343,6 +361,7 @@ async function checkCopy() {
   check(how.includes("half-life 14 days") && how.includes("60 days on the monthly"), "HowTo names the half-lives");
   check(how.includes("recency-weighted kernel") && how.includes("raw prints"), "HowTo says kernel-smoothed lines, raw-print figures");
   check(how.includes("100 points up") && how.includes("net balance"), "HowTo discloses NAB's net balance and the +100 draw");
+  check(how.includes("from the 2025 election on"), "HowTo dates the chart window to the 2025 election");
   const foot = (await texts("#mood .rd-foot")).join(" ");
   check(foot.includes("ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB") && foot.includes("Context, not a predictor"),
     "foot names the four sources and the context caveat");
