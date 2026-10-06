@@ -113,6 +113,23 @@ async function get(url) {
   }
   throw new Error(`${url}: ${last.message}`);
 }
+
+/* A JSON endpoint over get(): the host briefly answered the API 200 with
+   an HTML interstitial (maintenance/WAF page, 2026-10-06) — neither the
+   fetch layer nor a status check can see a healthy-looking 200 with the
+   wrong body, so the parse itself is what a retry waits for. Six tries
+   twenty seconds apart ride out a blip of a minute or two. */
+async function getJson(url) {
+  let last;
+  for (let i = 1; i <= 6; i++) {
+    try { return JSON.parse((await get(url)).toString("utf8")); }
+    catch (e) {
+      last = e;
+      if (i < 6) await new Promise((r) => setTimeout(r, 20_000));
+    }
+  }
+  throw new Error(`${url}: ${last.message}`);
+}
 const pdfToText = (buf, slug, args) => {
   const f = path.join(tmpdir(), `secnewgate-${slug}.pdf`);
   fs.writeFileSync(f, buf);
@@ -552,7 +569,7 @@ async function main() {
   fs.mkdirSync(SRC, { recursive: true });
 
   let items;
-  try { items = JSON.parse((await get(API)).toString("utf8")); }
+  try { items = await getJson(API); }
   catch (e) {
     console.log("warning media API: " + e.message);
     status.warnings.push(`media API: ${e.message}`);
