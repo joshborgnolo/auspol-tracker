@@ -7215,22 +7215,29 @@ function infoTerms(D) {
       entries: [] },
     { id: "s-mood", title: "The economic mood", nav: "Mood",
       lead: { id: "mood", body: (
-        <>Two confidence series, both Roy Morgan’s own: the ANZ–Roy Morgan Consumer Confidence
-        index, published weekly, and Roy Morgan’s Business Confidence index, published monthly.
-        The chart shows every release back to 2019, when both series began their current run.
-        <span className="info-p"><b>100 is neutral.</b> Each index is built from the balance of
-        optimists and pessimists on Roy Morgan’s questions, so a reading above 100 means optimists
-        outnumber pessimists and one below 100 the reverse.</span>
+        <>Four published confidence gauges of the same economy: the ANZ–Roy Morgan Consumer
+        Confidence index, published weekly; the Westpac–Melbourne Institute Consumer Sentiment
+        index, monthly; Roy Morgan’s Business Confidence index, monthly; and NAB’s Monthly
+        Business Survey. Each series runs back as far as its figure source reaches — 2019 for
+        the Roy Morgan series, 2022 for Westpac, and April 2025 for NAB.
+        <span className="info-p"><b>100 is neutral.</b> The three index series are built from the
+        balance of optimists and pessimists on each house’s questions, so a reading above 100
+        means optimists outnumber pessimists and one below 100 the reverse.</span>
+        <span className="info-p"><b>NAB is drawn 100 points up.</b> NAB reports a net balance —
+        optimistic firms minus pessimistic ones — where 0 is neutral, so its dashed line is
+        drawn 100 points up to share the neutral line with the others. The figure shown beside
+        it and in its tooltips is NAB’s own printed number; the row also carries the survey’s
+        conditions reading, which is not charted.</span>
         <span className="info-p"><b>Smoothed, not averaged across sources.</b> Each dot is a
         release’s own headline figure, linked to it; each line is the same readings smoothed
         with a recency-weighted kernel (half-life 14 days on the weekly consumer index, 60 days
-        on the monthly business index) so weekly noise reads as trend. The quoted figures are
-        the raw prints, and no
-        {" "}{xref("house-effect", "mood", "house-effect")} adjustment applies. The change shown
-        beside each index is the one Roy Morgan printed with it, kept only where it agrees with
-        the previous printed reading.</span>
+        on the monthly series) so release-to-release noise reads as trend. The quoted figures
+        are the raw prints, and no
+        {" "}{xref("house-effect", "mood", "house-effect")} adjustment applies — a record, not an
+        estimate. The change shown beside each series is the one the house printed with it, kept
+        only where it agrees with the previous printed reading.</span>
         <span className="info-p"><b>Context, not a predictor.</b> The series sit below the term’s
-        polls because the mood of the economy frames what voters hear; neither series forecasts
+        polls because the mood of the economy frames what voters hear; none of them forecasts
         how they’ll answer.</span></>) },
       entries: [] },
     { id: "s-cycles", title: "Past cycles", nav: "Past cycles",

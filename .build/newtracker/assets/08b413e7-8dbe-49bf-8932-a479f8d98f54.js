@@ -152,7 +152,10 @@ function straightPath(pts, sx, sy) {
  *  yTicks:  [numbers]   xTicks: [{x,label}]
  *  refLines:[{y,label?,color?,labelColor?,align?}]  color paints the hairline,
  *           labelColor the text (defaults to --ink-3 – see the label below)
- *  fmt:     (y) => string  for tooltip/axis
+ *  fmt:     (y, point?) => string  for tooltip/axis – the point comes along
+ *            when one exists (scatter dot or series point), so a caller can
+ *            print a true value where the plotted y is a display transform
+ *            (the mood panel's NAB line is drawn +100 but tips the net balance)
  *  bands:   [{y0,y1,color,className?}]  shaded horizontal regions (optional). `className`
  *           lands on the rect so CSS can theme the fill – same contract as the
  *           areas below, and how the house-lean panel's red/blue ground is
@@ -905,7 +908,7 @@ function TrendChart(props) {
     tip = {
       left: (sx(dot.x) / W) * 100, top: (sy(dot.y) / H) * 100,
       title: dot.meta.pollster, rows: [
-        { label: dot.label || "2PP", value: fmt(dot.y) + unit, color: dot.color },
+        { label: dot.label || "2PP", value: fmt(dot.y, dot) + unit, color: dot.color },
         { label: dot.meta.dateLabel ? "Field" : "", value: dot.meta.dateLabel || "" },
       ].filter((r) => r.label),
       sub: dot.meta.sample ? `n = ${dot.meta.sample.toLocaleString()}` : "",
@@ -936,7 +939,7 @@ function TrendChart(props) {
             if (claimed.has(s.label)) return null;
             claimed.add(s.label);
           }
-          return { label: s.label, value: fmt(p.y) + unit, color: s.color, y: p.y, note: p.note };
+          return { label: s.label, value: fmt(p.y, p) + unit, color: s.color, y: p.y, note: p.note };
         }).filter(Boolean).sort((a, b) => b.y - a.y)
           .concat(extraRows ? extraRows(i).filter(Boolean) : []);
       })(),

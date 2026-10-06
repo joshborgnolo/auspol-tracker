@@ -1938,8 +1938,11 @@ const SEC_ISSUES_FILE = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "sec-issues.json"), "utf8")); }
   catch { return null; }
 })();
-/* The mood panel's series (§5j): business and consumer confidence, built by
-   .build/mood.mjs from Roy Morgan's own releases. The panel dots these
+/* The mood panel's series (§5j): four published confidence gauges — the
+   ANZ–Roy Morgan and Roy Morgan index series, Westpac–MI consumer
+   sentiment and NAB's monthly business survey (a net balance the panel
+   draws shifted +100; this payload keeps its printed figures) — built by
+   .build/mood.mjs from each house's own releases. The panel dots these
    prints raw and draws a recency-weighted smoothed trend on top (render
    side, rd-panels.jsx) - this payload stays the published readings. */
 const MOOD_FILE = (() => {
@@ -2387,24 +2390,33 @@ const firmness = firmWaves.length >= FIRM_POOL ? (() => {
 })() : null;
 
 /* ---- 5j. the mood – business and consumer confidence -----------------------
-   Roy Morgan's two sentiment indices (data/mood.json, built by
-   .build/mood.mjs from the house's own releases): the ANZ-Roy Morgan
-   Consumer Confidence weekly reading and the monthly Business Confidence.
-   Both are index series with 100 as neutral, so like the undecided lines
-   they are a house's own series, not an aggregate – no house effect is
-   estimable against a single publisher, and no election-result anchor
-   exists to adjust toward. The panel draws the published series; the
-   current reading is the latest release, with the change it printed. */
-const mood = MOOD_FILE ? Object.fromEntries(["consumer", "business"].map((k) => {
+   Four published sentiment gauges on one plot (data/mood.json, built by
+   .build/mood.mjs from each house's own releases): the ANZ-Roy Morgan
+   Consumer Confidence weekly reading and Westpac–Melbourne Institute's
+   monthly Consumer Sentiment; Roy Morgan's monthly Business Confidence and
+   the NAB Monthly Business Survey. The first three are index series with
+   100 as neutral; NAB prints a NET BALANCE (share optimistic minus
+   pessimistic, 0 = neutral) – its rows stay true published figures and the
+   PANEL shifts the line +100 so the shared neutral line holds. Conditions
+   (cond/condChg) ride the NAB rows for the read-row text. Like the
+   undecided lines these are each house's own series, not an aggregate – no
+   house effect is estimable against a single publisher, and no
+   election-result anchor exists to adjust toward. The panel draws the
+   published series; the current reading is the latest release, with the
+   change it printed. */
+const mood = MOOD_FILE ? Object.fromEntries(["consumer", "westpacConsumer", "business", "nabBusiness"].map((k) => {
   const s = MOOD_FILE[k];
-  const polls = s.rows.map((r) => ({ x: dx(r.date), ym: ymOf(r.date), released: r.date, v: r.v, chg: r.chg ?? null, url: r.url }))
-    .filter((r) => r.x >= dx("2019-08-13"))   // the feed's dense coverage begins here
+  if (!s) return [k, null];   // a lane added to the file later never breaks an older checkout
+  const polls = s.rows.map((r) => ({ x: dx(r.date), ym: ymOf(r.date), released: r.date, v: r.v, chg: r.chg ?? null, url: r.url,
+    ...(k === "nabBusiness" ? { cond: r.cond, condChg: r.condChg ?? null } : {}) }))
+    .filter((r) => r.x >= dx("2019-08-13"))   // the feed's dense coverage begins here (later lanes start later)
     .sort((a, b) => a.x - b.x);
   const last = polls[polls.length - 1];
   return [k, {
     label: s.label, base: s.base,
     polls,
-    latest: last ? { v: last.v, chg: last.chg, released: last.released, url: last.url } : null,
+    latest: last ? { v: last.v, chg: last.chg, released: last.released, url: last.url,
+      ...(k === "nabBusiness" ? { cond: last.cond, condChg: last.condChg } : {}) } : null,
   }];
 })) : null;
 

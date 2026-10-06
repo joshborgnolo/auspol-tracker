@@ -1594,6 +1594,7 @@ body.rd .rd-un-read { display: flex; gap: 10px; align-items: flex-start; margin-
 body.rd .rd-un-read svg { margin-top: 4px; }
 body.rd .rd-un-rtop { display: flex; align-items: baseline; gap: 10px; }
 body.rd .rd-un-rtop b { font-size: 14px; font-weight: 600; color: var(--ink); }
+body.rd .rd-un-rhouse { font-size: 12px; color: var(--ink-3); }
 body.rd .rd-un-rv { font-size: 19px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 body.rd .rd-un-rci { font-size: 12px; color: var(--ink-3); }
 body.rd .rd-un-read p { margin: 2px 0 0; font-size: 13px; color: var(--ink-3); }

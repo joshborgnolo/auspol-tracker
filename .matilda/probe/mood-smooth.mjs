@@ -1,13 +1,15 @@
 /* Probe: the Snapshot's "The economic mood" panel (RdMood, rd-panels.jsx).
-   The WIP converts the panel from join-the-dots lines to RAW-PRINT dots
-   plus a render-side recency-weighted smooth (symmetric half-life kernel,
-   14d on the weekly consumer index, 60d on the monthly business index);
-   the payload D.mood stays the published readings.
+   The panel draws FOUR published gauges on one plot (ANZ–Roy Morgan
+   consumer weekly, Westpac–MI consumer monthly, Roy Morgan business
+   monthly, NAB business monthly) as RAW-PRINT dots plus a render-side
+   recency-weighted smooth per series (symmetric half-life kernel, 14d on
+   the weekly index, 60d on the monthly ones); NAB is a net balance drawn
+   100 points up, and the payload D.mood stays the published readings.
 
    Asserts headlessly against BASE (repo root or a worktree):
      SOURCES (node-side):
-     - rd-panels.jsx carries the smooth() kernel, hl 14/60 on the two rows,
-       the smoothed series.points AND the RAW spine/scatter,
+     - rd-panels.jsx carries the smooth() kernel, hl 14/60 on the lanes,
+       smoothed sePoints AND the RAW spine/scatter (rawPoints),
      - the Info glossary's "mood" entry explains the smoothing
        (d1a1d215 asset), gen-data §5j's comment promises a raw payload.
      PAYLOAD (page's window.AP.D.mood vs BASE/data/mood.json):
@@ -16,22 +18,24 @@
      - latest == the last printed row on each series.
      RENDER. Scales are fitted FROM THE DOM, not reimplemented (the rd
      engine sizes the viewBox from the measured container width and grows
-     the right pad for end labels): y from the gridlines' data-k="y50"
+     the right pad for end labels): y from the gridlines' data-k="y<tick>"
      groups, x from the rd-axis year ticks, pad read back off the grid
      lines. Then:
      - viewBox is 0 0 1000 (1000*heightPx/cw) - pins heightPx 340/260,
      - each series-line passes through the recomputed kernel smooth at the
-       reading dates (tolerance 0.05 viewBox units), with a vertex count
+       reading dates (tolerance priced in screen px), with a vertex count
        equal to the number of readings - so the line is NOT the raw joins,
-     - smoothing is live: a healthy share of smoothed values deviate from
-       their raw prints (fractions printed, floored at 15%),
-     - scatter dots are the raw prints: per-series counts match the
-       readings, each series pinned to its row colour, and the LAST dot
-       of each series sits at the printed (x, v) exactly,
-     - head quotes nothing, dek/readouts quote the RAW latest prints,
-       the key says dot = printed release / line = smoothed trend, and
-       the HowTo explains the half-lives,
-     - desktop rungs 1366/860 get in-chart end labels, phone 390 doesn't
+     - smoothing is live on the two long-running index series: a healthy
+       share of smoothed values deviate from their raw prints (the short
+       NAB run and the quiet Westpac read are reported, not gated),
+     - scatter dots are the raw prints: total count matches the readings,
+       the 0.5 fill-opacity rides, and every lane's LAST print has a dot
+       at its exact (x, plotted y) - NAB's at v + 100,
+     - head is the data-composed verdict from the four latest prints,
+       dek/readouts quote the RAW latest prints (NAB's as its own net
+       balance), the key says dot = printed release / line = smoothed
+       trend, and the HowTo explains the half-lives and the +100 draw,
+     - desktop rungs get one in-chart end label per lane, phone gets none
        and stays inside its viewport;
      - #mood renders on the default tab with no interaction, and no
        page errors on any rung. */
@@ -47,18 +51,32 @@ const fails = [];
 const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!ok) fails.push(msg); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/* The four lanes, mirroring rd-panels.jsx: hl per lane, NAB drawn +100. */
+const LANES = [
+  { k: "consumer", hl: 14, gate: 0.5, live: true, color: "var(--ink)", lab: "Consumers" },
+  { k: "westpacConsumer", hl: 60, gate: 1.0, live: false, color: "var(--ink)", lab: "Consumers · Westpac–MI" },
+  { k: "business", hl: 60, gate: 1.0, live: true, color: "var(--ink-2)", lab: "Businesses" },
+  { k: "nabBusiness", hl: 60, gate: 1.0, live: false, color: "var(--ink-2)", shift: 100, lab: "Businesses · NAB" },
+];
+const NICE = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+const laneVfmt = (k) => (k === "nabBusiness" ? NICE : (v) => v.toFixed(1));
+
 /* ========================= sources (node-side) ========================= */
 console.log("sources:");
 const panels = fs.readFileSync(path.join(BASE, ".build/newtracker/assets/rd-panels.jsx"), "utf8");
 check(panels.includes("const smooth = (polls, halfLifeDays)"), "rd-panels.jsx defines the half-life kernel smooth()");
-check(panels.includes('"ANZ–Roy Morgan", hl: 14'), "consumer row carries hl: 14 (weekly index, 14d half-life)");
-check(panels.includes('"Roy Morgan", hl: 60'), "business row carries hl: 60 (monthly index, 60d half-life)");
-check(panels.includes("points: smooth(r.s.polls.filter((p) => p.x >= x0), r.hl)"), "series points are the smoothed readings");
-check(panels.includes('spine={series(C.polls.filter((p) => p.x >= x0), "v")}'), "the hover spine stays the raw prints");
+check(panels.includes('"ANZ–Roy Morgan", hl: 14'), "consumer lane carries hl: 14 (weekly index, 14d half-life)");
+check(panels.includes('"Roy Morgan", hl: 60'), "business lane carries hl: 60 (monthly index, 60d half-life)");
+check(panels.includes('"Westpac–MI", hl: 60'), "Westpac–MI lane carries hl: 60");
+check(panels.includes('"NAB", hl: 60'), "NAB lane carries hl: 60");
+check(panels.includes("smooth(rows.get(l.k), l.hl)"), "series points are the smoothed readings");
+check(panels.includes("const spine = rawPoints.get(lanes[0].k)"), "the hover spine stays the raw prints");
+check(panels.includes("scatter={lanes.flatMap((l) => rawPoints.get(l.k)"), "the scatter dots stay the raw prints");
 const glossFile = fs.readdirSync(path.join(BASE, ".build/newtracker/assets")).find((f) => f.startsWith("d1a1d215-") && f.endsWith(".js"));
 const gloss = glossFile ? fs.readFileSync(path.join(BASE, ".build/newtracker/assets", glossFile), "utf8") : "";
 check(gloss.includes("Smoothed, not averaged across sources."), "glossary 'mood' entry leads with the smoothing note");
 check(gloss.includes("recency-weighted kernel (half-life 14 days on the weekly consumer index, 60 days"), "glossary names both half-lives");
+check(gloss.includes("NAB is drawn 100 points up."), "glossary discloses the NAB +100 draw");
 const genData = fs.readFileSync(path.join(BASE, ".build/newtracker/gen-data.mjs"), "utf8");
 check(genData.includes("recency-weighted smoothed trend on top (render"), "gen-data §5j comment still promises the raw payload");
 
@@ -96,12 +114,19 @@ await open(1366);
 const P = await page.evaluate(() => {
   const D = window.AP.D;
   const pick = (s) => ({ polls: s.polls.map((p) => ({ x: p.x, v: p.v, ym: p.ym, released: p.released })), latest: s.latest });
-  return { x1: D.domain.x1, consumer: pick(D.mood.consumer), business: pick(D.mood.business) };
+  const out = { x1: D.domain.x1 };
+  for (const k of ["consumer", "westpacConsumer", "business", "nabBusiness"]) if (D.mood[k]) out[k] = pick(D.mood[k]);
+  return out;
 });
 
 /* ---- payload pins against data/mood.json ---- */
 console.log("payload:");
-for (const k of ["consumer", "business"]) {
+const live = [];
+for (const lane of LANES) {
+  const k = lane.k;
+  check(!!(moodJson[k] && P[k]), `${k}: series present in mood.json and the payload`);
+  if (!(moodJson[k] && P[k])) continue;
+  live.push(lane);
   const want = moodJson[k].rows.filter((r) => r.date >= "2019-08-13").sort((a, b) => a.date < b.date ? -1 : 1);
   const got = P[k].polls;
   check(got.length === want.length, `${k}: ${got.length} readings emitted (mood.json has ${want.length} since 2019-08-13)`);
@@ -113,22 +138,27 @@ for (const k of ["consumer", "business"]) {
 }
 
 /* ---- expectations recomputed from the payload ---- */
-const x0 = Math.min(P.consumer.polls[0].x, P.business.polls[0].x) - 0.04;
+const x0 = Math.min(...live.map((l) => P[l.k].polls[0].x)) - 0.04;
 const x1 = P.x1;
-const fil = { consumer: P.consumer.polls.filter((p) => p.x >= x0), business: P.business.polls.filter((p) => p.x >= x0) };
-const exp = { consumer: smooth(fil.consumer, 14), business: smooth(fil.business, 60) };
-console.log(`kernel: consumer ${exp.consumer.length} pts (hl 14d), business ${exp.business.length} pts (hl 60d)`);
+const fil = {}, exp = {};
+for (const l of live) {
+  fil[l.k] = P[l.k].polls.filter((p) => p.x >= x0);
+  exp[l.k] = smooth(fil[l.k], l.hl).map((p) => ({ x: p.x, y: p.y + (l.shift || 0) }));
+}
+console.log("kernel: " + live.map((l) => `${l.k} ${exp[l.k].length} pts (hl ${l.hl}d${l.shift ? ", +" + l.shift : ""})`).join(", "));
 
-for (const k of ["consumer", "business"]) {
-  const devs = exp[k].map((s, i) => Math.abs(s.y - fil[k][i].v));
-  const gate = k === "consumer" ? 0.5 : 1.0;
-  const frac = devs.filter((d) => d > gate).length / devs.length;
+for (const l of live) {
+  const devs = exp[l.k].map((s, i) => Math.abs((s.y - (l.shift || 0)) - fil[l.k][i].v));
+  const frac = devs.filter((d) => d > l.gate).length / devs.length;
   const mean = devs.reduce((a, b) => a + b, 0) / devs.length;
-  check(frac >= 0.15, `${k}: smoothing is live - ${(frac * 100).toFixed(0)}% of readings move >${gate}pt (mean |move| ${mean.toFixed(2)})`);
+  if (l.live)
+    check(frac >= 0.15, `${l.k}: smoothing is live - ${(frac * 100).toFixed(0)}% of readings move >${l.gate}pt (mean |move| ${mean.toFixed(2)})`);
+  else
+    console.log(`  .. ${l.k}: ${(frac * 100).toFixed(0)}% of readings move >${l.gate}pt (mean |move| ${mean.toFixed(2)}) - reported, not gated (short/quiet series)`);
 }
 
 /* ---- scales fitted from the DOM (never reimplemented) ----
-   y: the "y50"-keyed gridline groups. x: the rd-axis year-tick marks
+   y: the "y<tick>"-keyed gridline groups. x: the rd-axis year-tick marks
    (the first rd-base line is the baseline rule, the rest are integer-year
    ticks, ascending). pad read straight off the gridline x1/x2. */
 const fitScales = () => page.evaluate(() => {
@@ -201,7 +231,8 @@ async function checkChart(rung) {
     return !!el && el.getBoundingClientRect().width > 0;
   }), "#mood renders on the default tab with no interaction");
 
-  for (const k of ["consumer", "business"]) {
+  for (const l of live) {
+    const k = l.k;
     const sel = `#mood .rd-mood-chart svg.chart-svg path.series-line[data-series="${k}"]`;
     const d = await page.$eval(sel, (el) => el.getAttribute("d")).catch(() => null);
     check(!!d, `${k} series line drawn`);
@@ -224,29 +255,43 @@ async function checkChart(rung) {
        path, worst on the near-vertical COVID cliff */
     const worstPx = worst * (fit.cw / 1000);
     check(ys && worstPx <= 0.06,
-      `${k}: line passes through the recomputed kernel smooth at ${idx.length} sampled dates (worst ${worst.toFixed(4)}u = ${worstPx.toFixed(4)}px${wi >= 0 ? " at " + fil[k][wi].released : ""})`);
-    const rawGap = ys ? Math.max(...idx.map((pIdx, j) => Math.abs(ys[j] - sy(fil[k][pIdx].v)))) : 0;
+      `${k}: line passes through the recomputed kernel smooth${l.shift ? " +" + l.shift : ""} at ${idx.length} sampled dates (worst ${worst.toFixed(4)}u = ${worstPx.toFixed(4)}px${wi >= 0 ? " at " + fil[k][wi].released : ""})`);
+    const rawGap = ys ? Math.max(...idx.map((pIdx, j) => Math.abs(ys[j] - sy(fil[k][pIdx].v + (l.shift || 0))))) : 0;
     check(rawGap > 1, `${k}: the line is NOT the raw join-the-dots (departs from a raw print by up to ${rawGap.toFixed(2)}u)`);
   }
 
-  for (const k of ["consumer", "business"]) {
-    const fill = k === "consumer" ? "var(--ink)" : "var(--ink-2)";
-    const dots = await page.$$eval(
-      `#mood .rd-mood-chart svg.chart-svg circle.scatter-dot[fill="${fill}"]`,
-      (els) => els.map((e) => ({ cx: parseFloat(e.getAttribute("cx")), cy: parseFloat(e.getAttribute("cy")), op: e.getAttribute("fill-opacity") })));
-    check(dots.length === fil[k].length, `${k}: ${dots.length} raw-print dots on the ${fill} series (${fil[k].length} readings)`);
-    if (!dots.length) continue;
-    check(dots.every((d) => d.op === "0.5"), `${k}: dots ride the rd 0.5 fill-opacity`);
-    const last = fil[k][fil[k].length - 1], d = dots[dots.length - 1];
-    check(Math.abs(d.cx - sx(last.x)) < 0.02 && Math.abs(d.cy - sy(last.v)) < 0.02,
-      `${k}: the last dot sits exactly on the raw print (${last.released}, ${last.v})`);
+  /* dots: colours repeat across lanes (Westpac's twin is dashed ink), so
+     assert per expected PRINT by proximity, then totals and opacity */
+  const allDots = await page.$$eval(
+    "#mood .rd-mood-chart svg.chart-svg circle.scatter-dot",
+    (els) => els.map((e) => ({ cx: parseFloat(e.getAttribute("cx")), cy: parseFloat(e.getAttribute("cy")), fill: e.getAttribute("fill"), op: e.getAttribute("fill-opacity") })));
+  const totalWant = live.reduce((a, l) => a + fil[l.k].length, 0);
+  check(allDots.length === totalWant, `scatter: ${allDots.length} raw-print dots across ${live.length} lanes (${totalWant} readings)`);
+  check(allDots.every((d) => d.op === "0.5"), "dots ride the rd 0.5 fill-opacity");
+  for (const l of live) {
+    const k = l.k;
+    const dots = allDots.filter((d) => d.fill === l.color);
+    const idx = [];
+    const n = fil[k].length, stride = Math.max(1, Math.floor(n / 26));
+    for (let i = 0; i < n; i += stride) idx.push(i);
+    if (idx[idx.length - 1] !== n - 1) idx.push(n - 1);
+    let miss = -1;
+    for (const i of idx) {
+      const p = fil[k][i], tx = sx(p.x), ty = sy(p.v + (l.shift || 0));
+      if (!dots.some((d) => Math.abs(d.cx - tx) < 0.05 && Math.abs(d.cy - ty) < 0.05)) { miss = i; break; }
+    }
+    check(miss < 0, `${k}: every sampled raw print has a dot at its plotted spot${miss >= 0 ? " (missing " + fil[k][miss].released + ")" : ""}`);
+    const last = fil[k][fil[k].length - 1], tx = sx(last.x), ty = sy(last.v + (l.shift || 0));
+    const hit = dots.find((d) => Math.abs(d.cx - tx) < 0.02 && Math.abs(d.cy - ty) < 0.02);
+    check(!!hit, `${k}: the last print's dot sits exactly on it (${last.released}, ${last.v}${l.shift ? " plotted " + (last.v + l.shift) : ""})`);
   }
 
   const labels = await texts("#mood svg.chart-svg text.end-label");
   if (rung > 640) {
-    check(labels.includes("Consumers") && labels.includes("Businesses"), `end labels name both series (${labels.join(", ")})`);
+    check(labels.length === live.length && live.every((l) => labels.includes(l.lab)),
+      `one in-chart end label per lane (${labels.join(", ")})`);
   } else {
-    check(!labels.includes("Consumers") && !labels.includes("Businesses"), "no in-chart end labels on the phone (the readouts above name them)");
+    check(labels.length === 0, "no in-chart end labels on the phone (the readouts above name them)");
   }
   await checkCopy();
   check(pageErrors.length === 0, `no page errors at ${rung}px${pageErrors.length ? ": " + pageErrors.join(" | ") : ""}`);
@@ -254,10 +299,19 @@ async function checkChart(rung) {
 }
 
 const texts = (sel) => page.$$eval(sel, (els) => els.map((e) => (e.textContent || "").trim().replace(/\s+/g, " ")));
-const cUnder = P.consumer.latest.v < 100, bUnder = P.business.latest.v < 100;
-const expHead = cUnder && bUnder ? "Confidence is underwater on both counts."
-  : !cUnder && !bUnder ? "Confidence is above water on both counts."
-  : (cUnder ? "Consumers are underwater; businesses aren’t." : "Businesses are underwater; consumers aren’t.");
+/* head verdict, mirroring RdMood's side() ladder over the live lanes */
+const sideOf = (name) => {
+  const ls = live.filter((l) => l.lab.split(" · ")[0] === name);
+  if (!ls.length) return null;
+  const neut = (l) => 100 - (l.shift || 0);
+  return ls.every((l) => P[l.k].latest.v < neut(l)) ? "under" : ls.every((l) => P[l.k].latest.v >= neut(l)) ? "above" : "split";
+};
+const cSide = sideOf("Consumers"), bSide = sideOf("Businesses");
+const expHead = cSide === "under" && bSide === "under" ? "Confidence is underwater on both counts."
+  : cSide === "above" && bSide === "above" ? "Confidence is above water on both counts."
+  : cSide === "under" && bSide === "above" ? "Consumers are underwater; businesses aren’t."
+  : cSide === "above" && bSide === "under" ? "Businesses are underwater; consumers aren’t."
+  : "The gauges disagree on which side of the line the mood sits.";
 
 async function checkCopy() {
   const title = await texts("#mood .rd-title");
@@ -265,22 +319,33 @@ async function checkCopy() {
   const head = await texts("#mood h3.rd-hed");
   check(head[0] === expHead, `headline is the data-composed mood verdict ("${head[0]}")`);
   const dek = (await texts("#mood p.rd-dek"))[0] || "";
-  check(dek.includes("Consumers at " + P.consumer.latest.v.toFixed(1)), `dek quotes the RAW consumer print (${P.consumer.latest.v.toFixed(1)})`);
-  check(dek.includes("Businesses at " + P.business.latest.v.toFixed(1)), `dek quotes the RAW business print (${P.business.latest.v.toFixed(1)})`);
-  if (Math.abs(P.consumer.latest.chg) >= 0.05)
-    check(dek.includes(" " + Math.abs(P.consumer.latest.chg).toFixed(1) + " on the week"), "dek carries the printed weekly change");
+  if (P.consumer) check(dek.includes("Consumers at " + P.consumer.latest.v.toFixed(1)), `dek quotes the RAW ANZ–Roy Morgan consumer print (${P.consumer.latest.v.toFixed(1)})`);
+  if (P.business) check(dek.includes("Businesses at " + P.business.latest.v.toFixed(1)), `dek quotes the RAW Roy Morgan business print (${P.business.latest.v.toFixed(1)})`);
+  if (P.consumer && P.consumer.latest.chg != null && Math.abs(P.consumer.latest.chg) >= 0.05)
+    check(dek.includes(" " + NICE(Math.abs(P.consumer.latest.chg)) + " on the week"), "dek carries the printed weekly change");
+  if (P.nabBusiness && P.nabBusiness.latest.cond != null)
+    check(dek.includes("(conditions " + NICE(P.nabBusiness.latest.cond) + ")"), "dek carries NAB's printed conditions figure");
   const rv = await texts("#mood .rd-un-rv");
-  check(rv.length === 2 && rv[0] === P.consumer.latest.v.toFixed(1) && rv[1] === P.business.latest.v.toFixed(1),
-    `readout figures are the raw prints (${rv.join(" / ")})`);
+  const wantRv = live.map((l) => laneVfmt(l.k)(P[l.k].latest.v));
+  check(rv.length === wantRv.length && wantRv.every((w, i) => rv[i] === w),
+    `readout figures are the raw prints in lane order (${rv.join(" / ")})`);
+  const pt = (await texts("#mood .rd-mood-chart .rd-un-ptitle")).join(" ");
+  check(pt.includes("NAB’s net balance drawn 100 points up"), "chart card discloses the NAB +100 draw");
+  const who = await texts("#mood .rd-un-rhouse");
+  check(live.every((l, i) => ["ANZ–Roy Morgan", "Westpac–MI", "Roy Morgan", "NAB"].includes(who[i])),
+    `each read row names its house (${who.join(" / ")})`);
   const key = await texts("#mood .rd-ckey .rd-key-item");
   check(key.some((t) => t === "One release, as printed") && key.some((t) => t === "Smoothed trend of the releases"),
     "key reads dot = one release as printed, line = smoothed trend");
+  check(key.some((t) => t === "The Westpac–MI and NAB reads of the same subjects"), "key names the dashed twin gauges");
   const how = (await texts("#mood details.view-how")).join(" ");
   check((await texts("#mood details.view-how summary"))[0] === "How to read this chart", "HowTo summary standard");
-  check(how.includes("half-life 14 days") && how.includes("60 on the monthly"), "HowTo names the half-lives");
+  check(how.includes("half-life 14 days") && how.includes("60 days on the monthly"), "HowTo names the half-lives");
   check(how.includes("recency-weighted kernel") && how.includes("raw prints"), "HowTo says kernel-smoothed lines, raw-print figures");
+  check(how.includes("100 points up") && how.includes("net balance"), "HowTo discloses NAB's net balance and the +100 draw");
   const foot = (await texts("#mood .rd-foot")).join(" ");
-  check(foot.includes("term-long record behind"), "foot keeps the Roy Morgan provenance line");
+  check(foot.includes("ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB") && foot.includes("Context, not a predictor"),
+    "foot names the four sources and the context caveat");
 }
 
 console.log("desktop 1366:");

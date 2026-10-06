@@ -3784,30 +3784,50 @@ function RdUndecided({ rangeId }) {
 }
 
 /* ---------------------------------------------------- The economic mood
-   Business and consumer confidence — Roy Morgan's OWN index series (weekly
-   ANZ-Roy Morgan consumer, monthly business), drawn over the whole run
-   back to 2019 rather than this term: the long record is exactly what
-   makes today's reading legible (the COVID trough, the 2022 bounce). Each
-   dot is the published reading; the line is a recency-weighted smooth of
-   those readings (half-life 14 days on the weekly consumer index, 60 days
-   on the monthly business index), so weekly noise reads as trend. The
-   quoted figures stay the raw prints. No aggregation across houses, no
-   house effects, no election anchor — context, not a predictor.
+   Four published gauges of business and consumer confidence on ONE plot —
+   ANZ–Roy Morgan consumer confidence (weekly) and Roy Morgan business
+   confidence (monthly), Westpac–MI consumer sentiment and the NAB Business
+   Survey (monthly) — drawn as published over each series' whole run on
+   file: the long record is exactly what makes today's reading legible (the
+   COVID trough, the 2022 bounce, this term). Each dot is the published
+   reading; each line is a recency-weighted smooth of those readings
+   (half-life 14 days on the weekly index, 60 days on the monthly ones),
+   so release-to-release noise reads as trend while every quoted figure
+   stays the raw print. The first three are 100-neutral indices; NAB
+   prints a NET BALANCE (0 = neutral) and its line is drawn +100 so the
+   shared neutral line holds — the read rows and tooltips print NAB's own
+   figures off each point's `raw`. The second gauge of each subject is
+   the dashed twin of its line colour. NAB's conditions reading rides the
+   read row, not a fifth line. No aggregation, no house effects, no
+   election anchor — context, not a predictor.
    Data: data/mood.json → gen-data §5j → D.mood.
 */
 function RdMood({ rangeId }) {
-  const { D, series, monthLabelFull } = window.AP;
+  const { D, monthLabelFull } = window.AP;
   const narrow = useNarrow("(max-width: 640px)");
   const M = D.mood;
   if (!M || !M.consumer || !M.business || !M.consumer.polls.length || !M.business.polls.length) return null;
-  const C = M.consumer, B = M.business;
-  const cLat = C.latest, bLat = B.latest;
-  const cUnder = cLat.v < 100, bUnder = bLat.v < 100;
-  const word = (v) => (v < 100 ? "underwater" : "above water");
+  const NICE = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+  const lanes = [
+    { k: "consumer", s: M.consumer, name: "Consumers", dekName: "Consumers", by: "ANZ–Roy Morgan", hl: 14, lab: "Consumers",
+      period: "week", color: "var(--ink)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
+      short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly." },
+    { k: "westpacConsumer", s: M.westpacConsumer, name: "Consumers", dekName: "Consumers on Westpac–MI’s read", by: "Westpac–MI", hl: 60, lab: "Consumers · Westpac–MI",
+      period: "month", color: "var(--ink)", dash: "4 3", shift: 0, vfmt: (v) => v.toFixed(1),
+      short: "The Westpac–Melbourne Institute’s monthly gauge of the same household mood; 100 is neutral on this scale too." },
+    { k: "business", s: M.business, name: "Businesses", dekName: "Businesses", by: "Roy Morgan", hl: 60, lab: "Businesses",
+      period: "month", color: "var(--ink-2)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
+      short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly." },
+    { k: "nabBusiness", s: M.nabBusiness, name: "Businesses", dekName: "Businesses on NAB’s survey", by: "NAB", hl: 60, lab: "Businesses · NAB",
+      period: "month", color: "var(--ink-2)", dash: "4 3", shift: 100, vfmt: NICE,
+      short: "x" },
+  ].filter((l) => l.s && l.s.polls.length);
+  if (!lanes.length) return null;
+  for (const l of lanes) l.lat = l.s.latest;
   // Symmetric half-life kernel over the raw readings (x units are years).
   // Evaluated at each reading's date; week-to-week sampling noise on the
-  // consumer index is ~2pts, so two weeks of half-life is enough to clear
-  // it without rounding off real turns (COVID, budget shocks).
+  // weekly consumer index is ~2pts, so two weeks of half-life is enough
+  // to clear it without rounding off real turns (COVID, budget shocks).
   const smooth = (polls, halfLifeDays) => {
     const decay = Math.LN2 / (halfLifeDays / 365.25);
     return polls.map((p) => {
@@ -3821,47 +3841,65 @@ function RdMood({ rangeId }) {
       return { x: p.x, y: wtot / wsum };
     });
   };
-  const head = cUnder && bUnder ? "Confidence is underwater on both counts."
-    : !cUnder && !bUnder ? "Confidence is above water on both counts."
-    : (cUnder ? "Consumers are underwater; businesses aren’t." : "Businesses are underwater; consumers aren’t.");
+  const neut = (l) => 100 - l.shift;   // the published-scale reading that sits on the 100 line
+  const water = (l, v) => v < neut(l) ? "pessimists lead" : "optimists lead";
+  const nab = lanes.find((l) => l.k === "nabBusiness");
+  if (nab) nab.short = "Business confidence as a net balance — optimistic firms minus pessimistic ones, 0 = neutral on NAB’s own scale. The line is drawn 100 points up so the neutral line is shared; the figure here is NAB’s own. Conditions printed "
+    + NICE(nab.lat.cond) + (nab.lat.condChg == null ? "" : ", " + (nab.lat.condChg < 0 ? "down " : "up ") + NICE(Math.abs(nab.lat.condChg))) + " on the month. " + water(nab, nab.lat.v) + ".";
+  const side = (nm) => {
+    const ls = lanes.filter((l) => l.name === nm);
+    if (!ls.length) return null;
+    return ls.every((l) => l.lat.v < neut(l)) ? "under" : ls.every((l) => l.lat.v >= neut(l)) ? "above" : "split";
+  };
+  const cSide = side("Consumers"), bSide = side("Businesses");
+  const head = cSide === "under" && bSide === "under" ? "Confidence is underwater on both counts."
+    : cSide === "above" && bSide === "above" ? "Confidence is above water on both counts."
+    : cSide === "under" && bSide === "above" ? "Consumers are underwater; businesses aren’t."
+    : cSide === "above" && bSide === "under" ? "Businesses are underwater; consumers aren’t."
+    : "The gauges disagree on which side of the line the mood sits.";
   const trough = (s) => {
     const lo = s.polls.reduce((m, p) => (p.v < m.v ? p : m), s.polls[0]);
     const hi = s.polls.reduce((m, p) => (p.v > m.v ? p : m), s.polls[0]);
     return { lo, hi };
   };
-  const sent = (who, lat, period, s) => {
-    let t = who + " at " + lat.v.toFixed(1)
-      + (lat.chg == null ? "" : Math.abs(lat.chg) < 0.05 ? ", holding steady"
-        : ", " + (lat.chg < 0 ? "down " : "up ") + Math.abs(lat.chg).toFixed(1) + " on the " + period);
-    const { lo, hi } = trough(s);
-    if (Math.abs(lat.v - lo.v) <= 2.5) t += ", not far off its low of " + lo.v.toFixed(1) + " in " + monthLabelFull(lo.ym);
-    else if (Math.abs(lat.v - hi.v) <= 2.5) t += ", close to its high of " + hi.v.toFixed(1) + " in " + monthLabelFull(hi.ym);
+  const sent = (l) => {
+    let t = l.dekName + " at " + l.vfmt(l.lat.v)
+      + (l.lat.chg == null ? "" : Math.abs(l.lat.chg) < 0.05 ? ", holding steady"
+        : ", " + (l.lat.chg < 0 ? "down " : "up ") + NICE(Math.abs(l.lat.chg)) + " on the " + l.period);
+    const { lo, hi } = trough(l.s);
+    if (Math.abs(l.lat.v - lo.v) <= 2.5) t += ", not far off its low of " + l.vfmt(lo.v) + " in " + monthLabelFull(lo.ym);
+    else if (Math.abs(l.lat.v - hi.v) <= 2.5) t += ", close to its high of " + l.vfmt(hi.v) + " in " + monthLabelFull(hi.ym);
+    if (l.k === "nabBusiness" && l.lat.cond != null) t += " (conditions " + NICE(l.lat.cond) + ")";
     return t + ".";
   };
-  const dek = sent("Consumers", cLat, "week", C) + " " + sent("Businesses", bLat, "month", B);
-  const water = (v) => v < 100 ? "pessimists lead" : "optimists lead";
-  const rows = [
-    { s: C, id: "consumer", name: "Consumers", short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly. " + water(cLat.v) + ".", color: "var(--ink)", lat: cLat, period: "week", by: "ANZ–Roy Morgan", hl: 14 },
-    { s: B, id: "business", name: "Businesses", short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly. " + water(bLat.v) + ".", color: "var(--ink-2)", lat: bLat, period: "month", by: "Roy Morgan", hl: 60 },
-  ];
+  const dek = lanes.map(sent).join(" ");
   const x1 = D.domain.x1;
-  const x0 = Math.min(C.polls[0].x, B.polls[0].x) - 0.04;
-  const vals = C.polls.concat(B.polls).map((p) => p.v).concat([100]);
+  const x0 = Math.min(...lanes.map((l) => l.s.polls[0].x)) - 0.04;
+  const rows = new Map(lanes.map((l) => [l.k, l.s.polls.filter((p) => p.x >= x0)]));
+  /* The dots, spine and domain ride the raw prints; the series lines are
+     the kernel smooth of the same readings. The NAB display shift is a
+     constant, so smoothing then shifting equals shifting and smoothing —
+     the smooth runs on the printed figures themselves. */
+  const rawPoints = new Map(lanes.map((l) => [l.k, rows.get(l.k).map((p) => ({ x: p.x, y: p.v + l.shift, ym: p.ym, ...(l.shift ? { raw: p.v } : {}) }))]));
+  const sePoints = new Map(lanes.map((l) => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({ x: p.x, y: p.y + l.shift, ym: rows.get(l.k)[i].ym, ...(l.shift ? { raw: rows.get(l.k)[i].v } : {}) }))]));
+  const vals = lanes.flatMap((l) => rawPoints.get(l.k).map((p) => p.y)).concat([100]);
   const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10, hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
   const years = [];
   for (let y = Math.ceil(x0); y <= x1 + 0.001; y++) years.push({ x: y, label: String(y) });
-  const copyLegend = rows.map((r) => ({ label: r.name + " (latest " + r.lat.v.toFixed(1) + ")", color: r.color, kind: "line" }));
+  const spine = rawPoints.get(lanes[0].k);
+  const copyLegend = lanes.map((l) => ({ label: l.lab + " (latest " + l.vfmt(l.lat.v) + ")", color: l.color, kind: l.dash ? "dashed" : "line" }));
+  const fmt = (v, p) => (p && p.raw != null ? NICE(p.raw) : v.toFixed(1));
   return (
-    <RdSec id="mood" cls="rd-mood" title="The economic mood" meta={"Confidence indices, 100 = neutral" + (narrow ? "" : ", Roy Morgan’s own series")}>
+    <RdSec id="mood" cls="rd-mood" title="The economic mood" meta={"Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")}>
       <RdHed head={head} dek={dek} />
       <div className="card rd-card rd-mood-chart">
-        <div className="rd-un-ptitle"><b>Consumer and business confidence</b><span>index readings, 100 = neutral</span></div>
-        {rows.map((r) => (
-          <div key={r.id} className="rd-un-read">
-            <RdSwatch kind="line" color={r.color} />
+        <div className="rd-un-ptitle"><b>Consumer and business confidence</b><span>100 = neutral on each index; NAB’s net balance drawn 100 points up</span></div>
+        {lanes.map((l) => (
+          <div key={l.k} className="rd-un-read">
+            <RdSwatch kind={l.dash ? "dash" : "line"} color={l.color} />
             <div>
-              <div className="rd-un-rtop"><b>{r.name}</b><span className="rd-un-rv">{r.lat.v.toFixed(1)}</span>{r.lat.chg != null && Math.abs(r.lat.chg) >= 0.05 && <span className="rd-un-rci">{rdArrow(r.lat.chg)} {Math.abs(r.lat.chg).toFixed(1)} on the {r.period}</span>}</div>
-              <p>{r.short}</p>
+              <div className="rd-un-rtop"><b>{l.name}</b><span className="rd-un-rhouse">{l.by}</span><span className="rd-un-rv">{l.vfmt(l.lat.v)}</span>{l.lat.chg != null && Math.abs(l.lat.chg) >= 0.05 && <span className="rd-un-rci">{rdArrow(l.lat.chg)} {NICE(Math.abs(l.lat.chg))} on the {l.period}</span>}</div>
+              <p>{l.short + (l.k === "nabBusiness" ? "" : " " + water(l, l.lat.v) + ".")}</p>
             </div>
           </div>
         ))}
@@ -3870,26 +3908,28 @@ function RdMood({ rangeId }) {
           xDomain={[x0, x1]} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => String(v)}
           xTicks={years} baseline
           refLines={[{ y: 100, label: "100 = neutral", align: "left", color: "var(--ink-3)" }]}
-          series={rows.map((r) => ({ id: r.id, label: r.name, color: r.color, rdWidth: 2.2, endCap: false,
-            endLabel: narrow ? null : r.name, points: smooth(r.s.polls.filter((p) => p.x >= x0), r.hl) }))}
-          spine={series(C.polls.filter((p) => p.x >= x0), "v")}
-          scatter={rows.flatMap((r) => r.s.polls.filter((p) => p.x >= x0).map((q) => ({ x: q.x, y: q.v, color: r.color, label: r.name, meta: { pollster: r.by } })))}
-          tooltipTitle={(i) => { const p = C.polls.filter((q) => q.x >= x0)[i]; return p ? monthLabelFull(p.ym) : ""; }}
-          fmt={(v) => v.toFixed(1)}
+          series={lanes.map((l) => ({ id: l.k, label: l.lab, color: l.color, rdWidth: l.dash ? 1.6 : 2.2, dash: l.dash || undefined,
+            endCap: false, endLabel: narrow ? null : l.lab, points: sePoints.get(l.k) }))}
+          spine={spine}
+          scatter={lanes.flatMap((l) => rawPoints.get(l.k).map((q) => ({ x: q.x, y: q.y, color: l.color, label: l.lab, ...(q.raw != null ? { raw: q.raw } : {}), meta: { pollster: l.by } })))}
+          tooltipTitle={(i) => { const p = spine[i]; return p ? monthLabelFull(p.ym) : ""; }}
+          fmt={fmt}
           copy={{ title: "Consumer and business confidence",
-                  sub: head + " ANZ–Roy Morgan Consumer Confidence, weekly, and Roy Morgan Business Confidence, monthly; on each index 100 separates optimists from pessimists.",
-                  caption: "Each dot is one Roy Morgan release as printed; the lines are a recency-weighted smooth of those readings (half-life 14 days for the weekly consumer index, 60 days for the monthly business index). No combining, no adjustment.",
+                  sub: head + " Four published gauges on one 100-neutral scale: ANZ–Roy Morgan consumer confidence (weekly), Westpac–MI consumer sentiment, Roy Morgan business confidence and NAB business confidence (monthly).",
+                  caption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly series). NAB prints a net balance (0 = neutral), so its dashed line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. No combining, no adjustment.",
                   legend: copyLegend }} />
         <RdKey className="rd-ckey" items={[
           { kind: "dot", color: "var(--ink-3)", label: "One release, as printed" },
           { kind: "line", color: "var(--ink-3)", label: "Smoothed trend of the releases" },
+          { kind: "dash", color: "var(--ink-3)", label: "The Westpac–MI and NAB reads of the same subjects" },
         ]} />
       </div>
       <HowTo paras={[
-        <>These are Roy Morgan’s own index series: the weekly ANZ–Roy Morgan consumer index and the monthly business index, back to 2019 so today’s reading can be seen against COVID and the recovery. Each dot is the reading as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 on the monthly), so week-to-week noise reads as trend. The figures quoted above are the raw prints. No combining across sources, no adjustment for lean, no election anchor is applied.</>,
-        <>On each index 100 is neutral — above it optimists outnumber pessimists. Reading the mood beside the polls is context, not a predictor of the vote.</>,
+        <>Four published gauges of the same mood, set out as each house prints them: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses, no adjustment for lean and no election anchor — a record, not an estimate.</>,
+        <>Three of the four are indices where 100 is neutral. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
+        <>Reading the mood beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />
-      <RdFoot how={{ term: "mood", from: "The economic mood" }}>Weekly consumer and monthly business readings from Roy Morgan, the term-long record behind today’s mood. Context, not a predictor.</RdFoot>
+      <RdFoot how={{ term: "mood", from: "The economic mood" }}>Four published gauges — ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB — joined as released. Context, not a predictor.</RdFoot>
     </RdSec>
   );
 }

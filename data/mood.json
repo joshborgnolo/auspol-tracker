@@ -1,5 +1,5 @@
 {
- "_about": "Business and consumer confidence, from Roy Morgan's findings feed. consumer: ANZ-Roy Morgan Consumer Confidence (weekly; feed coverage dense from Aug 2019; 100 = neutral). business: Roy Morgan Business Confidence (monthly since 2019). Rows: {date, v, chg (printed period change, null when none printed or unreconciled), url, slug}. Built by .build/mood.mjs — see its header.",
+ "_about": "Business and consumer confidence. consumer/business: Roy Morgan's findings feed (weekly, dense from Aug 2019 / monthly since 2019; 100 = neutral). westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment (monthly; IQ-sitemap coverage Jan 2022 →; 100 = neutral). nabBusiness: NAB Monthly Business Survey (monthly; AEM-sitemap coverage Apr 2025 →; the earlier WP-era archive is offline). Rows: {date, v, chg (printed period change; null when none printed or unreconciled), url, slug}. NAB rows add {cond, condChg, ym}; NAB figures are NET BALANCES (0 = neutral) — the site plots them SHIFTED +100 so the shared neutral line holds. Lane details: .build/mood.mjs header.",
  "consumer": {
   "label": "ANZ-Roy Morgan Consumer Confidence",
   "base": "ANZ-Roy Morgan, index, 100 = neutral",
@@ -3033,6 +3033,539 @@
     "chg": 3.1,
     "url": "https://www.roymorgan.com/findings/10336-roy-morgan-business-confidence-august-2026",
     "slug": "10336-roy-morgan-business-confidence-august-2026"
+   }
+  ]
+ },
+ "westpacConsumer": {
+  "label": "Westpac–MI Consumer Sentiment",
+  "base": "Westpac–Melbourne Institute, index, 100 = neutral",
+  "rows": [
+   {
+    "date": "2022-02-09",
+    "v": 100.8,
+    "chg": -1.4,
+    "url": "https://www.westpaciq.com.au/economics/2022/02/inflation-and-interest-rates-weigh-on-consumer-sentiment/",
+    "slug": "inflation-and-interest-rates-weigh-on-consumer-sentiment"
+   },
+   {
+    "date": "2022-05-11",
+    "v": 90.4,
+    "chg": -5.4,
+    "url": "https://www.westpaciq.com.au/economics/2022/05/inflation-and-the-rate-increase-sink-consumer-sentiment/",
+    "slug": "inflation-and-the-rate-increase-sink-consumer-sentiment"
+   },
+   {
+    "date": "2022-08-09",
+    "v": 81.2,
+    "chg": -2.6,
+    "url": "https://www.westpaciq.com.au/economics/2022/08/consumer-sentiment-august-2022/",
+    "slug": "consumer-sentiment-august-2022"
+   },
+   {
+    "date": "2022-09-13",
+    "v": 84.4,
+    "chg": 3.2,
+    "url": "https://www.westpaciq.com.au/economics/2022/09/consumer-sentiment-september-2022/",
+    "slug": "consumer-sentiment-september-2022"
+   },
+   {
+    "date": "2022-10-11",
+    "v": 83.7,
+    "chg": -0.7,
+    "url": "https://www.westpaciq.com.au/economics/2022/10/consumer-sentiment-october-2022/",
+    "slug": "consumer-sentiment-october-2022"
+   },
+   {
+    "date": "2022-11-08",
+    "v": 78,
+    "chg": -5.7,
+    "url": "https://www.westpaciq.com.au/economics/2022/11/consumer-sentiment-november-2022/",
+    "slug": "consumer-sentiment-november-2022"
+   },
+   {
+    "date": "2022-12-13",
+    "v": 80.3,
+    "chg": 2.3,
+    "url": "https://www.westpaciq.com.au/economics/2022/12/consumer-sentiment-december-2022/",
+    "slug": "consumer-sentiment-december-2022"
+   },
+   {
+    "date": "2023-01-17",
+    "v": 84.3,
+    "chg": 4,
+    "url": "https://www.westpaciq.com.au/economics/2023/01/consumer-sentiment-january-2023/",
+    "slug": "consumer-sentiment-january-2023"
+   },
+   {
+    "date": "2023-02-14",
+    "v": 78.5,
+    "chg": -5.8,
+    "url": "https://www.westpaciq.com.au/economics/2023/02/consumer-sentiment-february-2023/",
+    "slug": "consumer-sentiment-february-2023"
+   },
+   {
+    "date": "2023-03-14",
+    "v": 78.5,
+    "chg": null,
+    "url": "https://www.westpaciq.com.au/economics/2023/03/consumer-sentiment-march-2023/",
+    "slug": "consumer-sentiment-march-2023"
+   },
+   {
+    "date": "2023-04-11",
+    "v": 85.8,
+    "chg": 7.4,
+    "url": "https://www.westpaciq.com.au/economics/2023/04/consumer-sentiment-april-2023/",
+    "slug": "consumer-sentiment-april-2023"
+   },
+   {
+    "date": "2023-05-16",
+    "v": 79,
+    "chg": -6.8,
+    "url": "https://www.westpaciq.com.au/economics/2023/05/consumer-sentiment-may-2023/",
+    "slug": "consumer-sentiment-may-2023"
+   },
+   {
+    "date": "2023-06-13",
+    "v": 79.2,
+    "chg": 0.2,
+    "url": "https://www.westpaciq.com.au/economics/2023/06/consumer-sentiment-june-2023/",
+    "slug": "consumer-sentiment-june-2023"
+   },
+   {
+    "date": "2023-07-11",
+    "v": 81.3,
+    "chg": 2.1,
+    "url": "https://www.westpaciq.com.au/economics/2023/07/consumer-sentiment-july-2023/",
+    "slug": "consumer-sentiment-july-2023"
+   },
+   {
+    "date": "2023-08-08",
+    "v": 81,
+    "chg": -0.3,
+    "url": "https://www.westpaciq.com.au/economics/2023/08/consumer-sentiment-august-2023/",
+    "slug": "consumer-sentiment-august-2023"
+   },
+   {
+    "date": "2023-09-12",
+    "v": 79.7,
+    "chg": -1.3,
+    "url": "https://www.westpaciq.com.au/economics/2023/09/consumer-sentiment-september-2023/",
+    "slug": "consumer-sentiment-september-2023"
+   },
+   {
+    "date": "2023-10-10",
+    "v": 82,
+    "chg": 2.3,
+    "url": "https://www.westpaciq.com.au/economics/2023/10/consumer-sentiment-october-2023/",
+    "slug": "consumer-sentiment-october-2023"
+   },
+   {
+    "date": "2023-11-14",
+    "v": 79.9,
+    "chg": -2.1,
+    "url": "https://www.westpaciq.com.au/economics/2023/11/consumer-sentiment-november-2023/",
+    "slug": "consumer-sentiment-november-2023"
+   },
+   {
+    "date": "2023-12-12",
+    "v": 82.1,
+    "chg": 2.2,
+    "url": "https://www.westpaciq.com.au/economics/2023/12/consumer-sentiment-december-2023/",
+    "slug": "consumer-sentiment-december-2023"
+   },
+   {
+    "date": "2024-01-16",
+    "v": 81,
+    "chg": -1.1,
+    "url": "https://www.westpaciq.com.au/economics/2024/01/consumer-sentiment-january-2024/",
+    "slug": "consumer-sentiment-january-2024"
+   },
+   {
+    "date": "2024-02-13",
+    "v": 86,
+    "chg": 5,
+    "url": "https://www.westpaciq.com.au/economics/2024/02/consumer-sentiment-february-2024/",
+    "slug": "consumer-sentiment-february-2024"
+   },
+   {
+    "date": "2024-03-26",
+    "v": 84.4,
+    "chg": -1.6,
+    "url": "https://www.westpaciq.com.au/economics/2024/03/consumer-sentiment-march-2024/",
+    "slug": "consumer-sentiment-march-2024"
+   },
+   {
+    "date": "2024-04-09",
+    "v": 82.4,
+    "chg": -2,
+    "url": "https://www.westpaciq.com.au/economics/2024/04/consumer-sentiment-april-2024/",
+    "slug": "consumer-sentiment-april-2024"
+   },
+   {
+    "date": "2024-05-21",
+    "v": 82.2,
+    "chg": -0.2,
+    "url": "https://www.westpaciq.com.au/economics/2024/05/consumer-sentiment-may-2024/",
+    "slug": "consumer-sentiment-may-2024"
+   },
+   {
+    "date": "2024-06-25",
+    "v": 83.6,
+    "chg": 1.4,
+    "url": "https://www.westpaciq.com.au/economics/2024/06/consumer-sentiment-june-2024/",
+    "slug": "consumer-sentiment-june-2024"
+   },
+   {
+    "date": "2024-07-09",
+    "v": 82.7,
+    "chg": -0.9,
+    "url": "https://www.westpaciq.com.au/economics/2024/07/consumer-sentiment-july-2024/",
+    "slug": "consumer-sentiment-july-2024"
+   },
+   {
+    "date": "2024-08-13",
+    "v": 85,
+    "chg": 2.3,
+    "url": "https://www.westpaciq.com.au/economics/2024/08/consumer-sentiment-august-2024/",
+    "slug": "consumer-sentiment-august-2024"
+   },
+   {
+    "date": "2024-09-10",
+    "v": 84.6,
+    "chg": -0.4,
+    "url": "https://www.westpaciq.com.au/economics/2024/09/consumer-sentiment-september-2024/",
+    "slug": "consumer-sentiment-september-2024"
+   },
+   {
+    "date": "2024-10-08",
+    "v": 89.8,
+    "chg": 5.2,
+    "url": "https://www.westpaciq.com.au/economics/2024/10/consumer-sentiment-october-2024/",
+    "slug": "consumer-sentiment-october-2024"
+   },
+   {
+    "date": "2024-11-12",
+    "v": 94.6,
+    "chg": 4.8,
+    "url": "https://www.westpaciq.com.au/economics/2024/11/consumer-sentiment-november-2024/",
+    "slug": "consumer-sentiment-november-2024"
+   },
+   {
+    "date": "2024-12-17",
+    "v": 92.8,
+    "chg": -1.8,
+    "url": "https://www.westpaciq.com.au/economics/2024/12/consumer-sentiment-december-2024/",
+    "slug": "consumer-sentiment-december-2024"
+   },
+   {
+    "date": "2025-01-14",
+    "v": 92.1,
+    "chg": -0.7,
+    "url": "https://www.westpaciq.com.au/economics/2025/01/consumer-sentiment-january-2025/",
+    "slug": "consumer-sentiment-january-2025"
+   },
+   {
+    "date": "2025-02-11",
+    "v": 92.2,
+    "chg": 0.1,
+    "url": "https://www.westpaciq.com.au/economics/2025/02/consumer-sentiment-february-2025/",
+    "slug": "consumer-sentiment-february-2025"
+   },
+   {
+    "date": "2025-03-11",
+    "v": 95.9,
+    "chg": 3.7,
+    "url": "https://www.westpaciq.com.au/economics/2025/03/consumer-sentiment-march-2025/",
+    "slug": "consumer-sentiment-march-2025"
+   },
+   {
+    "date": "2025-04-08",
+    "v": 90.1,
+    "chg": -5.8,
+    "url": "https://www.westpaciq.com.au/economics/2025/04/consumer-sentiment-april-2025/",
+    "slug": "consumer-sentiment-april-2025"
+   },
+   {
+    "date": "2025-05-13",
+    "v": 92.1,
+    "chg": 2,
+    "url": "https://www.westpaciq.com.au/economics/2025/05/consumer-sentiment-may-2025/",
+    "slug": "consumer-sentiment-may-2025"
+   },
+   {
+    "date": "2025-06-10",
+    "v": 92.6,
+    "chg": 0.5,
+    "url": "https://www.westpaciq.com.au/economics/2025/06/consumer-sentiment-june-2025/",
+    "slug": "consumer-sentiment-june-2025"
+   },
+   {
+    "date": "2025-07-15",
+    "v": 93.1,
+    "chg": 0.5,
+    "url": "https://www.westpaciq.com.au/economics/2025/07/consumer-sentiment-june-2025/",
+    "slug": "consumer-sentiment-june-2025"
+   },
+   {
+    "date": "2025-08-19",
+    "v": 98.5,
+    "chg": 5.4,
+    "url": "https://www.westpaciq.com.au/economics/2025/08/consumer-sentiment-august-2025/",
+    "slug": "consumer-sentiment-august-2025"
+   },
+   {
+    "date": "2025-09-09",
+    "v": 95.4,
+    "chg": -3.1,
+    "url": "https://www.westpaciq.com.au/economics/2025/09/consumer-sentiment-september-2025/",
+    "slug": "consumer-sentiment-september-2025"
+   },
+   {
+    "date": "2025-10-07",
+    "v": 92.1,
+    "chg": -3.3,
+    "url": "https://www.westpaciq.com.au/economics/2025/10/consumer-sentiment-october-2025/",
+    "slug": "consumer-sentiment-october-2025"
+   },
+   {
+    "date": "2025-11-11",
+    "v": 103.8,
+    "chg": 11.7,
+    "url": "https://www.westpaciq.com.au/economics/2025/11/consumer-sentiment-november-2025/",
+    "slug": "consumer-sentiment-november-2025"
+   },
+   {
+    "date": "2025-12-16",
+    "v": 94.5,
+    "chg": -9.3,
+    "url": "https://www.westpaciq.com.au/economics/2025/12/consumer-sentiment-decembere-2025/",
+    "slug": "consumer-sentiment-decembere-2025"
+   },
+   {
+    "date": "2026-01-13",
+    "v": 92.9,
+    "chg": -1.6,
+    "url": "https://www.westpaciq.com.au/economics/2026/01/consumer-sentiment-january-2026/",
+    "slug": "consumer-sentiment-january-2026"
+   },
+   {
+    "date": "2026-02-10",
+    "v": 90.5,
+    "chg": -2.4,
+    "url": "https://www.westpaciq.com.au/economics/2026/02/consumer-sentiment-february-2026/",
+    "slug": "consumer-sentiment-february-2026"
+   },
+   {
+    "date": "2026-03-10",
+    "v": 91.6,
+    "chg": 1.1,
+    "url": "https://www.westpaciq.com.au/economics/2026/03/consumer-sentiment-march-2026/",
+    "slug": "consumer-sentiment-march-2026"
+   },
+   {
+    "date": "2026-04-14",
+    "v": 80.1,
+    "chg": -11.5,
+    "url": "https://www.westpaciq.com.au/economics/2026/04/consumer-sentiment-april-2026/",
+    "slug": "consumer-sentiment-april-2026"
+   },
+   {
+    "date": "2026-05-19",
+    "v": 83,
+    "chg": 2.9,
+    "url": "https://www.westpaciq.com.au/economics/2026/05/consumer-sentiment-may-2026/",
+    "slug": "consumer-sentiment-may-2026"
+   },
+   {
+    "date": "2026-06-09",
+    "v": 80.6,
+    "chg": -2.4,
+    "url": "https://www.westpaciq.com.au/economics/2026/06/consumer-sentiment-june-2026/",
+    "slug": "consumer-sentiment-june-2026"
+   },
+   {
+    "date": "2026-07-14",
+    "v": 83.9,
+    "chg": 3.3,
+    "url": "https://www.westpaciq.com.au/economics/2026/07/consumer-sentiment-july-2026/",
+    "slug": "consumer-sentiment-july-2026"
+   },
+   {
+    "date": "2026-08-18",
+    "v": 88.9,
+    "chg": 5,
+    "url": "https://www.westpaciq.com.au/economics/2026/08/consumer-sentiment-august-2026/",
+    "slug": "consumer-sentiment-august-2026"
+   },
+   {
+    "date": "2026-09-08",
+    "v": 84.4,
+    "chg": -4.5,
+    "url": "https://www.westpaciq.com.au/economics/2026/09/consumer-sentiment-september-2026/",
+    "slug": "consumer-sentiment-september-2026"
+   },
+   {
+    "date": "2026-10-06",
+    "v": 80.4,
+    "chg": -4,
+    "url": "https://www.westpaciq.com.au/economics/2026/10/consumer-sentiment-october-2026/",
+    "slug": "consumer-sentiment-october-2026"
+   }
+  ]
+ },
+ "nabBusiness": {
+  "label": "NAB Business Confidence",
+  "base": "NAB, net balance, 0 = neutral (plotted +100)",
+  "rows": [
+   {
+    "date": "2025-05-13",
+    "v": -1,
+    "chg": 1,
+    "cond": 2,
+    "condChg": null,
+    "ym": "2025-04",
+    "url": "https://www.nab.com.au/news/economy-markets/nabs-april-monthly-business-survey-steady-as-she-goes",
+    "slug": "nabs-april-monthly-business-survey-steady-as-she-goes"
+   },
+   {
+    "date": "2025-06-10",
+    "v": 2,
+    "chg": 3,
+    "cond": 0,
+    "condChg": null,
+    "ym": "2025-05",
+    "url": "https://www.nab.com.au/news/economy-markets/narrowing-gap-between-conditions-and-confidence-nab-monthly-business-survey",
+    "slug": "narrowing-gap-between-conditions-and-confidence-nab-monthly-business-survey"
+   },
+   {
+    "date": "2025-07-08",
+    "v": 5,
+    "chg": 3,
+    "cond": 9,
+    "condChg": null,
+    "ym": "2025-06",
+    "url": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey",
+    "slug": "nab-monthly-business-survey"
+   },
+   {
+    "date": "2025-08-12",
+    "v": 7,
+    "chg": 2,
+    "cond": 5,
+    "condChg": -2,
+    "ym": "2025-07",
+    "url": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey-july-2025-confidence-continues-to-lift",
+    "slug": "nab-monthly-business-survey-july-2025-confidence-continues-to-lift"
+   },
+   {
+    "date": "2025-09-09",
+    "v": 4,
+    "chg": -3,
+    "cond": 7,
+    "condChg": 2,
+    "ym": "2025-08",
+    "url": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey-august-2025-confidence-continues-to-lift",
+    "slug": "nab-monthly-business-survey-august-2025-confidence-continues-to-lift"
+   },
+   {
+    "date": "2025-10-14",
+    "v": 7,
+    "chg": 3,
+    "cond": 7,
+    "condChg": null,
+    "ym": "2025-09",
+    "url": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey-september-2025",
+    "slug": "nab-monthly-business-survey-september-2025"
+   },
+   {
+    "date": "2025-11-11",
+    "v": 6,
+    "chg": -2,
+    "cond": 9,
+    "condChg": 2,
+    "ym": "2025-10",
+    "url": "https://www.nab.com.au/news/economy-markets/october-monthly-business-survey-business-conditions-rise",
+    "slug": "october-monthly-business-survey-business-conditions-rise"
+   },
+   {
+    "date": "2025-12-09",
+    "v": 1,
+    "chg": -5,
+    "cond": 7,
+    "condChg": -3,
+    "ym": "2025-11",
+    "url": "https://www.nab.com.au/news/economy-markets/nab-business-survey-november-2025-confidence-and-conditions-fall",
+    "slug": "nab-business-survey-november-2025-confidence-and-conditions-fall"
+   },
+   {
+    "date": "2026-03-10",
+    "v": -1,
+    "chg": -4,
+    "cond": 7,
+    "condChg": null,
+    "ym": "2026-02",
+    "url": "https://www.nab.com.au/news/economy-markets/nab-business-survey-february-2026-conditions-hold-while-confidence-falls",
+    "slug": "nab-business-survey-february-2026-conditions-hold-while-confidence-falls"
+   },
+   {
+    "date": "2026-04-14",
+    "v": -29,
+    "chg": -29,
+    "cond": 6,
+    "condChg": null,
+    "ym": "2026-03",
+    "url": "https://www.nab.com.au/news/economy-markets/nab-march-business-survey-confidence-plunges-echoing-gfc-and-covid-falls",
+    "slug": "nab-march-business-survey-confidence-plunges-echoing-gfc-and-covid-falls"
+   },
+   {
+    "date": "2026-05-12",
+    "v": -24,
+    "chg": 5,
+    "cond": 3,
+    "condChg": -3,
+    "ym": "2026-04",
+    "url": "https://www.nab.com.au/news/economy-markets/costs-surge-activity-cools-in-april-business-survey",
+    "slug": "costs-surge-activity-cools-in-april-business-survey"
+   },
+   {
+    "date": "2026-06-09",
+    "v": -14,
+    "chg": 10,
+    "cond": 3,
+    "condChg": null,
+    "ym": "2026-05",
+    "url": "https://www.nab.com.au/news/economy-markets/costs-ease-confidence-lifts-off-a-low-base",
+    "slug": "costs-ease-confidence-lifts-off-a-low-base"
+   },
+   {
+    "date": "2026-07-14",
+    "v": -5,
+    "chg": 9,
+    "cond": 3,
+    "condChg": 2,
+    "ym": "2026-06",
+    "url": "https://www.nab.com.au/news/economy-markets/business-confidence-continues-recovery-nab-monthly-business-survey-june-2026",
+    "slug": "business-confidence-continues-recovery-nab-monthly-business-survey-june-2026"
+   },
+   {
+    "date": "2026-08-11",
+    "v": -6,
+    "chg": -1,
+    "cond": 4,
+    "condChg": 1,
+    "ym": "2026-07",
+    "url": "https://www.nab.com.au/news/economy-markets/nab-business-survey-july-2026",
+    "slug": "nab-business-survey-july-2026"
+   },
+   {
+    "date": "2026-09-08",
+    "v": -8,
+    "chg": -2,
+    "cond": -1,
+    "condChg": -5,
+    "ym": "2026-08",
+    "url": "https://www.nab.com.au/news/economy-markets/business-conditions-drop-into-negative-territory-business-survey-august26",
+    "slug": "business-conditions-drop-into-negative-territory-business-survey-august26"
    }
   ]
  }
