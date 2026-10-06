@@ -2592,7 +2592,9 @@ const extAgg = {
            implied line; the hero draws it only on the Labor v One Nation
            contest */
         shadow: KBONHAM.shadow?.length ? publishedMonthly(KBONHAM.shadow) : null,
-        site: "kevinbonham.blogspot.com",
+        /* ?m=0 pins Blogspot's desktop template so the link opens his
+           sidebar (where the figure lives) even on a phone */
+        site: "kevinbonham.blogspot.com/?m=0",
       }
     : null,
 };
