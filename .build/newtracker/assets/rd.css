@@ -825,6 +825,7 @@ body.rd .rd-pld-prim > span > span:not(.rd-apd-chg) { font-size: 19px; font-weig
 body.rd .rd-pld-dl { display: grid; grid-template-columns: 180px minmax(0, 1fr); row-gap: 5px; column-gap: 12px; margin: 0; }
 body.rd .rd-pld-dl dt { color: var(--ink-3); }
 body.rd .rd-pld-dl dd { margin: 0; color: var(--ink); }
+body.rd .rd-pld-site { margin-left: -4px; }
 body.rd .rd-pld-links { display: flex; flex-wrap: wrap; column-gap: 12px; margin-top: 8px; margin-left: -4px; }
 body.rd .rd-pld-tab { border-collapse: collapse; width: 100%; font-size: 13px; }
 body.rd .rd-pld-tab th { text-align: left; font-weight: 400; color: var(--ink-3); padding: 0 12px 4px 0; }

@@ -44,6 +44,18 @@ function rdPollLinks(links) {
   ));
 }
 
+/* where a pollster's NAME goes, in every row that shows one poll: that
+   poll's own release where there is one, else the report it was read from -
+   never its methodology statement, nor a page about the house as a whole.
+   The title says which, since the name can't. */
+function rdPollNameLink(p, mark = "plink-mark") {
+  const ok = (p.links || []).filter((x) => !x.pending);
+  const l = ok.find((x) => x.k === "release") || ok.find((x) => x.k === "cite");
+  return l
+    ? <a href={l.href} target="_blank" rel="noopener noreferrer" title={"Opens " + l.t} onClick={(ev) => ev.stopPropagation()}>{p.pollster}<span className={mark} aria-hidden="true">↗</span></a>
+    : p.pollster;
+}
+
 function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const { D } = window.AP;
   /* [id, label] pairs in the aggregate's current order; an unknown key
@@ -430,6 +442,9 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                   : <>Median {pj.cadence} days between {pj.basis === "published" ? "publications" : "fieldwork ends"} across the last {pj.gapsUsed} gaps.{" "}
                     <b>Next: {nx.date}{hourWords(pj) ? ", " + hourWords(pj).replace(/^about /, "about ") + " " + easternAbbr(pj.release) : ""}</b>, at the earliest{then ? "; then " + wdm(then.release) : ""}.</>}
             </p>
+            {/* the house's "where it lands first" page (pollsterRules.site) belongs
+                with the wait for the next poll, not on the name of the last one */}
+            {e.next && e.next.site && <a className="rd-link rd-link-ext rd-pld-site" href={e.next.site} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}><span className="rd-link-t">Where the next one lands first</span> <span className="rd-apd-ext" aria-hidden="true">↗</span></a>}
           </div>
         )}
       </div>
@@ -610,9 +625,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
               <div className="rd-pl-row" role="row" onClick={() => setOpen(isOpen ? null : r.pollster)} tabIndex={0} aria-expanded={isOpen} onKeyDown={(ev) => rowNav(ev, i)}>
                 <span role="cell" className="rd-pl-c-name">
                   <span className="rd-pl-main">
-                    {e.next && e.next.site
-                      ? <a href={e.next.site} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()} title={"Where " + r.pollster + " publishes"}>{r.pollster}<span className="plink-mark" aria-hidden="true">↗</span></a>
-                      : r.pollster}
+                    {rdPollNameLink(r)}
                   </span>
                   <span className="rd-pl-sub">{r.client}{cad ? ", " + cad : ""}{e.stale ? <span className="rd-pl-long">, no poll in six weeks</span> : null}</span>
                 </span>

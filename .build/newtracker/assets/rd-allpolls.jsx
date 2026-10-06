@@ -1792,7 +1792,7 @@ function RdAllPolls(P) {
 
   const pollsterCell = (p) => (
     <span role="rowheader" className="rd-ap-who">
-      <b>{p.url ? <a href={p.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{p.pollster}<span className="rd-ap-ext" aria-hidden="true">↗</span></a> : p.pollster}</b>
+      <b>{rdPollNameLink(p, "rd-ap-ext")}</b>
       <span className="rd-ap-sub">{p.client}</span>
     </span>
   );
@@ -2030,7 +2030,7 @@ function RdAllPolls(P) {
         <React.Fragment key={id}>
           <div className={"rd-ap-card " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle} tabIndex={0} onKeyDown={(e) => rowNav(e, p)}>
             <div className="rd-ap-c1">
-              <span className="rd-ap-firm">{p.url ? <a href={p.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{p.pollster}<span className="rd-ap-ext" aria-hidden="true">↗</span></a> : p.pollster}</span>
+              <span className="rd-ap-firm">{rdPollNameLink(p, "rd-ap-ext")}</span>
               <span className="rd-grow"></span>{right1}
             </div>
             <div className="rd-ap-c2"><span className="rd-ap-sub">{sub}</span><span className="rd-grow"></span>{right2}</div>

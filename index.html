@@ -3641,6 +3641,7 @@ body.rd .rd-pld-prim > span > span:not(.rd-apd-chg) { font-size: 19px; font-weig
 body.rd .rd-pld-dl { display: grid; grid-template-columns: 180px minmax(0, 1fr); row-gap: 5px; column-gap: 12px; margin: 0; }
 body.rd .rd-pld-dl dt { color: var(--ink-3); }
 body.rd .rd-pld-dl dd { margin: 0; color: var(--ink); }
+body.rd .rd-pld-site { margin-left: -4px; }
 body.rd .rd-pld-links { display: flex; flex-wrap: wrap; column-gap: 12px; margin-top: 8px; margin-left: -4px; }
 body.rd .rd-pld-tab { border-collapse: collapse; width: 100%; font-size: 13px; }
 body.rd .rd-pld-tab th { text-align: left; font-weight: 400; color: var(--ink-3); padding: 0 12px 4px 0; }
@@ -53567,7 +53568,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "releaseDowN": 12,
     "declared": [],
     "waves": 13,
-    "site": "https://essentialreport.com.au/#latest-reports",
+    "site": "https://www.theguardian.com/australia-news/essential-poll",
     "skipped": ["2026-08-26"],
     "skippedMonths": [],
     "recent": [{
@@ -53630,7 +53631,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "calMonth": true,
     "calDays": [9, 27],
     "waves": 10,
-    "site": "https://demosau.com/methodology-statements/",
+    "site": "https://www.capitalbrief.com/topic/polling/",
     "skipped": [],
     "skippedMonths": [],
     "recent": [{
@@ -81663,6 +81664,20 @@ function rdPollLinks(links) {
     "aria-hidden": "true"
   }, "\u2197")));
 }
+function rdPollNameLink(p, mark = "plink-mark") {
+  const ok = (p.links || []).filter(x => !x.pending);
+  const l = ok.find(x => x.k === "release") || ok.find(x => x.k === "cite");
+  return l ? React.createElement("a", {
+    href: l.href,
+    target: "_blank",
+    rel: "noopener noreferrer",
+    title: "Opens " + l.t,
+    onClick: ev => ev.stopPropagation()
+  }, p.pollster, React.createElement("span", {
+    className: mark,
+    "aria-hidden": "true"
+  }, "\u2197")) : p.pollster;
+}
 function RdPolls({
   tppBasis,
   setTppBasis,
@@ -82242,7 +82257,18 @@ function RdPolls({
       onClick: ev => ev.stopPropagation()
     }, WDs(Date.parse(x.pub)) + " " + isoD(x.pub)) : WDs(Date.parse(x.pub)) + " " + isoD(x.pub) : "—"), React.createElement("td", null, x.gap != null ? x.gap + " days" : ""))))), React.createElement("p", {
       className: "rd-pld-foot"
-    }, pj.calMonth ? React.createElement(React.Fragment, null, "One release a month, on no set day: between the ", pj.calDays ? pj.calDays[0] + "th and the " + pj.calDays[1] + "th" : "start and the end", " so far. ", React.createElement("b", null, "Next: ", nx.date, ".")) : irregular(pj) ? React.createElement(React.Fragment, null, "Median ", Math.round(pj.cadence), " days between releases across the last ", pj.gapsUsed, " gaps, give or take ", Math.round(pj.spread), ". ", React.createElement("b", null, "Next: ", nx.date.replace(/^About/, "about"), ".")) : React.createElement(React.Fragment, null, "Median ", pj.cadence, " days between ", pj.basis === "published" ? "publications" : "fieldwork ends", " across the last ", pj.gapsUsed, " gaps.", " ", React.createElement("b", null, "Next: ", nx.date, hourWords(pj) ? ", " + hourWords(pj).replace(/^about /, "about ") + " " + easternAbbr(pj.release) : ""), ", at the earliest", then ? "; then " + wdm(then.release) : "", "."))));
+    }, pj.calMonth ? React.createElement(React.Fragment, null, "One release a month, on no set day: between the ", pj.calDays ? pj.calDays[0] + "th and the " + pj.calDays[1] + "th" : "start and the end", " so far. ", React.createElement("b", null, "Next: ", nx.date, ".")) : irregular(pj) ? React.createElement(React.Fragment, null, "Median ", Math.round(pj.cadence), " days between releases across the last ", pj.gapsUsed, " gaps, give or take ", Math.round(pj.spread), ". ", React.createElement("b", null, "Next: ", nx.date.replace(/^About/, "about"), ".")) : React.createElement(React.Fragment, null, "Median ", pj.cadence, " days between ", pj.basis === "published" ? "publications" : "fieldwork ends", " across the last ", pj.gapsUsed, " gaps.", " ", React.createElement("b", null, "Next: ", nx.date, hourWords(pj) ? ", " + hourWords(pj).replace(/^about /, "about ") + " " + easternAbbr(pj.release) : ""), ", at the earliest", then ? "; then " + wdm(then.release) : "", ".")), e.next && e.next.site && React.createElement("a", {
+      className: "rd-link rd-link-ext rd-pld-site",
+      href: e.next.site,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      onClick: ev => ev.stopPropagation()
+    }, React.createElement("span", {
+      className: "rd-link-t"
+    }, "Where the next one lands first"), " ", React.createElement("span", {
+      className: "rd-apd-ext",
+      "aria-hidden": "true"
+    }, "\u2197"))));
   };
   const pinPl = () => {
     const sec = document.getElementById("latest-polls");
@@ -82473,16 +82499,7 @@ function RdPolls({
       className: "rd-pl-c-name"
     }, React.createElement("span", {
       className: "rd-pl-main"
-    }, e.next && e.next.site ? React.createElement("a", {
-      href: e.next.site,
-      target: "_blank",
-      rel: "noopener noreferrer",
-      onClick: ev => ev.stopPropagation(),
-      title: "Where " + r.pollster + " publishes"
-    }, r.pollster, React.createElement("span", {
-      className: "plink-mark",
-      "aria-hidden": "true"
-    }, "\u2197")) : r.pollster), React.createElement("span", {
+    }, rdPollNameLink(r)), React.createElement("span", {
       className: "rd-pl-sub"
     }, r.client, cad ? ", " + cad : "", e.stale ? React.createElement("span", {
       className: "rd-pl-long"
@@ -87109,15 +87126,7 @@ function RdAllPolls(P) {
   const pollsterCell = p => React.createElement("span", {
     role: "rowheader",
     className: "rd-ap-who"
-  }, React.createElement("b", null, p.url ? React.createElement("a", {
-    href: p.url,
-    target: "_blank",
-    rel: "noopener noreferrer",
-    onClick: e => e.stopPropagation()
-  }, p.pollster, React.createElement("span", {
-    className: "rd-ap-ext",
-    "aria-hidden": "true"
-  }, "\u2197")) : p.pollster), React.createElement("span", {
+  }, React.createElement("b", null, rdPollNameLink(p, "rd-ap-ext")), React.createElement("span", {
     className: "rd-ap-sub"
   }, p.client));
   const fieldTxt = p => p.fieldPending ? "fieldwork TBC" : byDate ? p.field : p.field + " ’" + String(p.year).slice(2);
@@ -87636,15 +87645,7 @@ function RdAllPolls(P) {
         className: "rd-ap-c1"
       }, React.createElement("span", {
         className: "rd-ap-firm"
-      }, p.url ? React.createElement("a", {
-        href: p.url,
-        target: "_blank",
-        rel: "noopener noreferrer",
-        onClick: e => e.stopPropagation()
-      }, p.pollster, React.createElement("span", {
-        className: "rd-ap-ext",
-        "aria-hidden": "true"
-      }, "\u2197")) : p.pollster), React.createElement("span", {
+      }, rdPollNameLink(p, "rd-ap-ext")), React.createElement("span", {
         className: "rd-grow"
       }), right1), React.createElement("div", {
         className: "rd-ap-c2"
