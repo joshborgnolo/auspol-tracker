@@ -3093,6 +3093,34 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
     if (sec) rdPinScroll([sec.querySelector(".rd-hl-tabs"), sec.querySelector(".rd-ap-pctl")].filter(Boolean));
     onMeasure(onM ? "lnp" : "onp");
   };
+  /* Space flips the two-party contest while the panel is on screen - the
+     claim the All-polls table and the Latest card run, with the same
+     guards; its flipPick also renders the table's own flip button, so
+     where both sections intersect the table's earlier listener wins and
+     both walks agree. Away from the panel, or while real focus is
+     anywhere but the page, space keeps its day job (scroll) */
+  const spaceFlip = React.useRef(null);
+  spaceFlip.current = view === "tpp" ? flipPick : null;
+  React.useEffect(() => {
+    const sec = document.getElementById("house-lean");
+    if (!sec) return undefined;
+    const inView = { current: false };
+    const io = new IntersectionObserver((es) => es.forEach((en) => { inView.current = en.isIntersecting; }));
+    io.observe(sec);
+    const key = (e) => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!spaceFlip.current) return;
+      e.preventDefault();
+      if (!e.repeat) spaceFlip.current();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
+  }, []);
   const flip = (
     <button type="button" className="rd-pl-flip" title={"Switch the page to Labor v " + (onM ? "Coalition" : "One Nation")}
             onClick={flipPick}>Labor v {onM ? "One Nation" : "Coalition"} <span aria-hidden="true">⇄</span></button>
