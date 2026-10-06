@@ -2382,6 +2382,75 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
 /* ---- 6. individual polls (full archive) -------------------------------- */
 // where a house publishes the fieldwork dates a pending row is waiting for
 const FIELD_TBC_URL = { DemosAU: "https://demosau.com/methodology-statements/" };
+
+/* ---- 6a. a poll's outbound links, named for what is behind each -------- */
+/* One list, built here, that both redesign views render as is, so a link
+   can't open the AFR article in Latest polls and Accent's page in All polls
+   under the same words. Each link says whose it is: the house's own release
+   ("Accent’s release"), its APC methodology statement, or the press report
+   the row was read from, named by outlet ("AFR report"), which also tells
+   a reader before the click that it is probably paywalled. */
+// hosts that are the pollster's own (its release, report PDF or statement)
+const OWN_HOSTS = ["roymorgan.com", "spectrestrategy.com", "demosau.com", "essentialreport.com.au",
+  "usrfiles.com", "accent-research.com", "foxhedgehog.com.au", "freshwaterstrategy.com", "yougov.com",
+  "pyxispolling.com", "resolvestrategic.com"];
+// the press or commissioning page a row cites, as its link reads
+const CITE_LABEL = {
+  "afr.com": "AFR report", "theaustralian.com.au": "The Australian’s report", "smh.com.au": "SMH report",
+  "theage.com.au": "The Age’s report", "thenewdaily.com.au": "The New Daily’s report",
+  "thenightly.com.au": "The Nightly’s report", "skynews.com.au": "Sky News report", "news24.com.au": "News24 report",
+  "capitalbrief.com": "Capital Brief report", "theguardian.com": "Guardian report",
+  "dailytelegraph.com.au": "Telegraph report", "heraldsun.com.au": "Herald Sun report",
+  "couriermail.com.au": "Courier-Mail report", "thechronicle.com.au": "Chronicle report",
+  "news.com.au": "news.com.au report", "theadvertiser.com.au": "Advertiser report",
+  "thewest.com.au": "West Australian report", "abc.net.au": "ABC report", "heraldsun.com": "Herald Sun report",
+  "pollbludger.net": "Poll Bludger post", "x.com": "Post on X", "twitter.com": "Post on X",
+  "australiainstitute.org.au": "Australia Institute report", "climatecouncil.org.au": "Climate Council report",
+};
+// the house as its own release is signed (Accent files RedBridge/Accent's)
+const RELEASE_BY = { "RedBridge/Accent": "Accent", Redbridge: "RedBridge", "Spectre Strategy": "Spectre" };
+/* Where a house files each wave's release / APC statement, for a link it
+   has not posted yet: only houses that post one for every wave, at an
+   address that lists them. DemosAU's report is its statement (oneDoc). */
+const PENDING_AT = {
+  "RedBridge/Accent": { release: "https://www.accent-research.com/projects", method: "https://www.accent-research.com/projects" },
+  DemosAU: { release: "https://demosau.com/methodology-statements/", method: "https://demosau.com/methodology-statements/", oneDoc: true },
+  Newspoll: { method: "https://pyxispolling.com/apc" },
+  YouGov: { method: "https://yougov.com/about/methodology/australian-polling-council" },
+  Essential: { method: "https://essentialreport.com.au/methodology" },
+};
+// a pending link only on the house's newest wave, and only while it is recent
+// (a wave the house never posted for stops promising once the next one lands)
+const PENDING_DAYS = 60;
+const NEWEST_OF = new Map();
+for (const p of POLLS) if (!NEWEST_OF.has(p.pollster) || p.date > NEWEST_OF.get(p.pollster)) NEWEST_OF.set(p.pollster, p.date);
+const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } };
+const onHost = (h, list) => list.some((d) => h === d || h.endsWith("." + d));
+const linksOf = (p) => {
+  const urlOwn = p.url && onHost(hostOf(p.url), OWN_HOSTS);
+  const rel = p.releaseUrl || (urlOwn ? p.url : null);
+  const house = p.pollster.replace(/\s*\(.*\)$/, "");   // "Roy Morgan (SMS)", "DemosAU (MRP)"
+  const by = RELEASE_BY[house] || house;
+  const at = PENDING_AT[p.pollster] || {};
+  const waiting = NEWEST_OF.get(p.pollster) === p.date && (Date.parse(LATEST_ISO) - Date.parse(p.date)) / 86400000 <= PENDING_DAYS;
+  const both = rel && p.methodUrl === rel;
+  const out = [];
+  if (rel) out.push({ k: "release", t: by + "’s release" + (both ? ", with methodology" : ""), href: rel,
+    title: both ? by + "’s own release of this poll, which includes its APC methodology statement" : by + "’s own release of this poll" });
+  else if (waiting && at.release) out.push({ k: "release", pending: true, t: by + "’s release" + (at.release === at.method ? (at.oneDoc ? ", with methodology" : " and methodology") : "") + ": not yet out", href: at.release,
+    title: by + " hasn’t posted this poll’s release yet. This opens the page where it files them." });
+  if (p.methodUrl && !both) out.push({ k: "method", t: "APC methodology", href: p.methodUrl, title: "This poll’s Australian Polling Council methodology statement" });
+  else if (!p.methodUrl && waiting && at.method && !(!rel && at.release === at.method))
+    out.push({ k: "method", pending: true, t: "APC methodology: not yet out", href: at.method,
+      title: by + " hasn’t posted this poll’s Australian Polling Council methodology statement yet. This opens the page where it files them." });
+  if (p.url && !urlOwn) {
+    const h = hostOf(p.url);
+    const key = Object.keys(CITE_LABEL).find((d) => onHost(h, [d]));
+    out.push({ k: "cite", t: key ? CITE_LABEL[key] : "Report (" + h + ")", href: p.url, title: "The published report this poll’s figures were read from" });
+  }
+  return out;
+};
+
 const individualPolls = POLLS.map((p) => {
   const ym = ymOf(p.date), day = dayOf(p.date);
   const fym = p.dateStart ? ymOf(p.dateStart) : null;
@@ -2457,6 +2526,8 @@ const individualPolls = POLLS.map((p) => {
     ...(p.releaseUrl && RELEASE_HUB.has(p.pollster) ? { releaseHub: RELEASE_HUB.get(p.pollster) } : {}),
     // the wave's APC methodology statement (YouGov/Newspoll only)
     ...(p.methodUrl ? { methodUrl: p.methodUrl } : {}),
+    // the links the redesign's opened poll shows, each named for its source (§6a)
+    links: linksOf(p),
     /* a PROVISIONAL row: filed from Poll Bludger's poll-data feed by the
        fallback agent because the house's own extractor had not landed the
        wave (see mergedPolls above). The view names the source and says the
@@ -2675,6 +2746,8 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     ...(p.releaseUrl && RELEASE_HUB.has(p.pollster) ? { releaseHub: RELEASE_HUB.get(p.pollster) } : {}),
     // APC methodology statement link (YouGov/Newspoll only)
     ...(p.methodUrl ? { methodUrl: p.methodUrl } : {}),
+    // the same named links as the archive emitter (§6a)
+    links: linksOf(p),
     ...(DIR_BY.has(p.date + "|" + p.pollster) ? { dir: DIR_BY.get(p.date + "|" + p.pollster) } : {}),
     ...(ISS_BY.has(p.date + "|" + p.pollster) ? { iss: ISS_BY.get(p.date + "|" + p.pollster) } : {}),
     // a modelled chamber travels with the poll here too, not only into the

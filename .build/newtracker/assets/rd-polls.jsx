@@ -25,9 +25,23 @@ function rdPollRow(p) {
   return { pollster: p.pollster, client: p.client, field: p.dateLabel || p.field, released: p.released,
            published: p.published, publishedLabel: lab, pubSort: pub, sample: p.sample,
            alpImp: p.alpImp, alpOnImp: p.alpOnImp, alp2pp: p.alp, lnp2pp: p.lnp, p: p.p || {},
-           tppAlt: p.tppAlt, tppAlt2: p.tppAlt2, ppmSets: p.ppmSets, appr: p.appr || {}, chg: p.chg, url: p.url, methodUrl: p.methodUrl,
+           tppAlt: p.tppAlt, tppAlt2: p.tppAlt2, ppmSets: p.ppmSets, appr: p.appr || {}, chg: p.chg, url: p.url, methodUrl: p.methodUrl, links: p.links,
            // fieldwork not yet published: shown as TBC (see rdFieldTxt)
            ...(p.fieldPending ? { fieldPending: true, fieldUrl: p.fieldUrl } : {}) };
+}
+
+/* a poll's outbound links as gen-data names them (§6a): the house's own
+   release, its APC methodology statement and the press report it was read
+   from, each labelled for its source. A link the house hasn't posted yet
+   reads "not yet out" in a fainter ink and opens the page it files them on.
+   Shared by the Latest polls detail and the opened poll in All polls. */
+function rdPollLinks(links) {
+  return (links || []).map((l) => (
+    <a key={l.k} className={"rd-link rd-link-ext" + (l.pending ? " rd-link-pend" : "")} href={l.href} target="_blank" rel="noopener noreferrer"
+       title={l.title} onClick={(ev) => ev.stopPropagation()}>
+      <span className="rd-link-t">{l.t}</span> <span className="rd-apd-ext" aria-hidden="true">↗</span>
+    </a>
+  ));
 }
 
 function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
@@ -390,8 +404,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
           {prev && <div className="rd-apd-sub rd-apd-note">Changes are on {r.pollster}’s {prev.field} poll.</div>}
           <div className="rd-pld-links">
             {key && window.AP.openPoll && <button type="button" className="rd-link" onClick={(ev) => { ev.stopPropagation(); window.AP.openPoll(key, facet, "latest and next polls"); }}>Open in All polls →</button>}
-            {r.url && <a className="rd-link rd-link-ext" href={r.url} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}><span className="rd-link-t">Read the release</span> <span className="rd-apd-ext" aria-hidden="true">↗</span></a>}
-            {r.methodUrl && <a className="rd-link rd-link-ext" href={r.methodUrl} target="_blank" rel="noopener noreferrer" title={"This poll’s Australian Polling Council methodology statement" + (r.methodUrl === r.url ? ", part of the release" : "")} onClick={(ev) => ev.stopPropagation()}><span className="rd-link-t">APC methodology</span> <span className="rd-apd-ext" aria-hidden="true">↗</span></a>}
+            {rdPollLinks(r.links)}
           </div>
         </div>
         {pj && (

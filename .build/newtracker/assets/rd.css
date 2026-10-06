@@ -416,6 +416,9 @@ body.rd .rd-link:focus-visible { outline: 2px solid var(--accent); outline-offse
    underline to a text-only span instead (keeps the ↗ un-underlined) */
 body.rd .rd-link-ext { text-decoration: none; }
 body.rd .rd-link-ext .rd-link-t { text-decoration: underline; text-underline-offset: 3px; }
+/* a link the pollster hasn't posted yet: fainter, dotted like Fieldwork TBC */
+body.rd .rd-link-pend { color: var(--ink-3); font-weight: 400; }
+body.rd .rd-link-pend .rd-link-t { text-decoration-style: dotted; }
 
 /* ---------- masthead ------------------------------------------------------
    Identity left - the lockup a size up, the tagline in the serif - and on
@@ -2398,6 +2401,7 @@ body.rd .rd-apd-cell { display: flex; flex-direction: column; gap: 1px; min-widt
 body.rd .rd-apd-cell b { font-weight: 600; }
 body.rd .rd-apd-leaders { display: flex; flex-wrap: wrap; gap: 6px 28px; }
 body.rd .rd-apd-links { margin: 10px 0 0 -4px; padding-right: 40px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; }
+body.rd .rd-apd-srcs { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; }
 body.rd .rd-apd-ext { display: inline-block; margin-left: 3px; font-size: 11px; color: var(--ink-faint); text-decoration: none; }
 body.rd .rd-apd-ct { margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--ink); }
 body.rd .rd-apd-met { all: unset; cursor: pointer; font: inherit; color: inherit; font-weight: inherit;
