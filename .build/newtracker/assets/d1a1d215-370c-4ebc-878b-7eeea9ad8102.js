@@ -3857,7 +3857,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
         {[p.leanLnp != null && <React.Fragment key="l">{signed1(p.leanLnp)} for ALP vs L/NP</React.Fragment>,
           p.leanOn != null && <React.Fragment key="o">{signed1(p.leanOn)} for ALP vs ON</React.Fragment>]
           .filter(Boolean).reduce((acc, x, i) => (i ? [...acc, "; ", x] : [x]), [])}
-        <span className="pd-s-note">, against the {p.pubBasis ? "published" : "implied"} aggregate that month</span>
+        <span className="pd-s-note">, against the {p.pubBasis ? "published" : "implied"} average of the other polls fielded around it</span>
       </span></span>,
     (p.hfxLnp != null || p.hfxOn != null) && <span className="pd-meta-i" key="hfx"><span className="pd-meta-k">House effect</span>
       <span className="pd-meta-v">
@@ -5293,23 +5293,6 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const onSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: -1 }));
   const toggleHouse = (h) => setSel((s) => { const n = new Set(s); n.has(h) ? n.delete(h) : n.add(h); return n; });
 
-  /* Poll lean is held against the monthly aggregate ON THE TABLE'S BASIS –
-     the implied basis the headline aggregate reads, or the published one
-     when the table flips; the row never mixes bases. Last write for a ym
-     wins, so the month's own estimate overwrites its unshifted
-     election-anchor row. */
-  const synthByYm = {};
-  (D.synth2pp || []).forEach((d) => { synthByYm[d.ym] = d.alp; });
-  const aggByYm = {};
-  (D.agg2pp || []).forEach((d) => { aggByYm[d.ym] = d.alp; });
-  /* the ALP-v-ON aggregates on the same two bases: the implied ALP–ON
-     monthly line (synthOn, the pairing's default basis) and the pooled
-     published head-to-heads (alt2pp.alp_on) */
-  const synthOnByYm = {};
-  (D.synthOn || []).forEach((d) => { synthOnByYm[d.ym] = d.a; });
-  const altOnByYm = {};
-  ((D.alt2pp || {}).alp_on || []).forEach((d) => { altOnByYm[d.ym] = d.a; });
-
   /* the fieldwork label carries no year (gen-data's fwLabel is a day–month
      range), so a row from a previous year can read as this year's – an old
      "25–30 Sep" looks like next week. Rows outside the current calendar
@@ -5328,21 +5311,24 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
     const fieldLabel = p.fieldPending ? "TBC" : y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
     const tags = pollTagIds(p);
-    /* poll lean follows the basis: the implied 2PP minus the month's implied
-       aggregate, or the NORMALISED published share (alpN) minus the month's
-       published aggregate – normalised so undecided-inclusive pairs compare
-       fairly with the aggregate. A wave with no figure on that basis has no
+    /* poll lean follows the basis: the implied 2PP minus the implied
+       average of the OTHER polls fielded around it, or the NORMALISED
+       published share (alpN) minus the published one – normalised so
+       undecided-inclusive pairs compare fairly. The average is gen-data's
+       §3c yardstick (p.yd): the headline's estimator read at the wave's
+       fieldwork midpoint, the wave left out. It was the calendar month's
+       average, which early in a month could be the wave itself. A wave with
+       no figure on that basis, or no other poll within three weeks, has no
        lean at all. */
-    const leanLnp = pubBasis
-      ? (p.alpN != null && aggByYm[p.ym] != null ? +(p.alpN - aggByYm[p.ym]).toFixed(1) : null)
-      : (p.alpImp != null && synthByYm[p.ym] != null ? +(p.alpImp - synthByYm[p.ym]).toFixed(1) : null);
+    const ydv = (k) => (p.yd && p.yd[k] ? p.yd[k].v : null);
+    // on the average as printed (one decimal), so the detail's sentences add up
+    const leanOf = (x, k) => (x != null && ydv(k) != null ? +(x - Math.round(ydv(k) * 10) / 10).toFixed(1) : null);
+    const leanLnp = pubBasis ? leanOf(p.alpN, "lnp") : leanOf(p.alpImp, "imp");
     /* the same lean on ALP v ON: the house's own head-to-head against the
        pooled published ones, or its implied ALP–ON reading against the
-       implied ALP–ON line – a genuinely separate quantity, carried by the
-       One Nation primary rather than the Coalition's */
-    const leanOn = pubBasis
-      ? (p.tppAlt && altOnByYm[p.ym] != null ? +(p.tppAlt.alp - altOnByYm[p.ym]).toFixed(1) : null)
-      : (p.alpOnImp != null && synthOnByYm[p.ym] != null ? +(p.alpOnImp - synthOnByYm[p.ym]).toFixed(1) : null);
+       implied ALP–ON average – a genuinely separate quantity, carried by
+       the One Nation primary rather than the Coalition's */
+    const leanOn = pubBasis ? leanOf(p.tppAlt ? p.tppAlt.alp : null, "onp") : leanOf(p.alpOnImp, "onimp");
     /* house effect is the emitted all-history snapshot per pollster ON THE
        TABLE'S BASIS (gen-data runs the same estimator over tppRowsSynth as
        houseEffects.synth and over the published series as houseEffects.tpp –
@@ -5640,7 +5626,6 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         tagSel={tagSel} setTagSel={setTagSel} toggleTag={toggleTag} pop={pop} setPop={setPop}
         pills={pills} clearAll={clearAll} sort={sort} onSort={onSort} open={open} setOpen={setOpen}
         focus={focus} onBack={onBack} backLabel={backLabel} exportCsv={exportCsv} bodyRef={bodyRef}
-        synthByYm={synthByYm} aggByYm={aggByYm} synthOnByYm={synthOnByYm} altOnByYm={altOnByYm}
         ofTotal={totalAll} ofHouses={housesAll.length} demSplit={demSplit} setDemSplit={setDemSplit} />
       <RdDisagree />
       <RdHouseLean measure={measure} onMeasure={onMeasure} tppBasis={tppBasis} />
@@ -5982,7 +5967,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                       ? <span className="dash" title={!["lnp", "onp"].includes(measure) ? "No aggregate on this matchup to hold the poll against"
                             : pubBasis ? "No published figure on this matchup to compare with the aggregate" : "No implied figure this wave, so no lean against the implied aggregate"}>—</span>
                       : <span className={"arch-lean " + (p.lean > 0.05 ? "alp" : p.lean < -0.05 ? (measure === "onp" ? "onp" : "lnp") : "flat")}
-                              title={(pubBasis ? "Published " : "Implied ") + MEASURE_LAB[measure] + (pubBasis ? " minus the aggregate that month" : " minus the implied aggregate that month")}>
+                              title={(pubBasis ? "Published " : "Implied ") + MEASURE_LAB[measure] + (pubBasis ? " minus the average of the other polls fielded around it" : " minus the implied average of the other polls fielded around it")}>
                           {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)}
                         </span>}
                   </td>
@@ -6071,8 +6056,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         site prices no implied series for them).
         <span className="hint-wide"> {CANT_HOVER ? "Tap" : "Click"} the “{pubBasis ? "As published" : "Implied 2PP"}”
         heading to switch bases.</span><span className="hint-narrow"> The Basis switch above the table changes bases.</span></>,
-        <><strong>Poll lean</strong> is the poll’s {pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate"} for
-        that month. <strong>House effect</strong> is how far a pollster systematically sits from the
+        <><strong>Poll lean</strong> is the poll’s {pubBasis ? "published 2PP minus the average" : "implied 2PP minus the implied average"} of the
+        other polls fielded within three weeks of it, weighted as the headline is. <strong>House effect</strong> is how far a pollster systematically sits from the
         cross-house consensus on {pubBasis ? "published" : "implied"} 2PP – pooled from its polls with a
         90-day half-life, so its recent methods count for more, and shrunk toward zero while it has
         published few. The aggregates subtract it, read as of each figure’s own time, and it is a
@@ -7279,11 +7264,13 @@ function infoTerms(D) {
         2025 flows, so the polls compare like for like, with the pollster’s own figure beneath
         where it published one. Those flows carry the same doubt for every poll, so each poll’s
         interval is sampling error alone. A poll’s {xref("poll-lean", "all polls", "lean")} is how
-        far it sits from that month’s aggregate. Open a row for the poll’s full breakdown, and use
+        far it sits from the other polls fielded within three weeks of it, averaged as the headline
+        is. Open a row for the poll’s full breakdown, and use
         Download CSV for the polls the table is showing.</span></>) },
       entries: [
         { id: "poll-lean", term: "Poll lean", body: (
-          <>How far one poll sits from the aggregate for the month it was taken. It describes that
+          <>How far one poll sits from the other polls fielded around the same time, averaged as the
+          headline is. It describes that
           poll, not the pollster: sampling luck alone can put a single poll off the pace. A pollster
           whose polls lean the same way again and again is showing its
           {" "}{xref("house-effect", "poll lean", "house effect")}.</>) },
@@ -7717,7 +7704,7 @@ function infoTerms(D) {
           {" "}{eY} flows, so the polls compare like for like, with the pollster’s own figure beneath
           where it published one. Those flows carry the same doubt for every poll, so each poll’s
           interval is sampling error alone. A poll’s {xref("poll-lean", "all polls", "lean")} is how
-          far it sits from that month’s aggregate. Open a row for the poll’s full breakdown, and use
+          far it sits from the trend through the other polls. Open a row for the poll’s full breakdown, and use
           Download CSV for the polls the table is showing.</span></>) },
         entries: [
           ...fedAll.filter((e) => keepAll.has(e.id) && e.id !== "mrp" && e.id !== "poll-disagreement" && e.id !== "house-lean" && !(KAL && e.id === "aggregate-effect")),

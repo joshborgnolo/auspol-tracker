@@ -1126,6 +1126,132 @@ for (const [k, eff] of effByKey) {
   }
 }
 
+/* ---- 3c. each poll against the polls around it ---------------------------
+   What an opened poll's "How it counts" holds it against, and the line its
+   chart draws. It used to be the calendar month's average of the month the
+   fieldwork ENDED in, which (a) early in a month rests on one or two polls -
+   on 6 Oct 2026 October's was RedBridge's 2 Oct wave alone, so that wave was
+   compared with itself and its "lean" was its own house lean back - and
+   (b) put a wave fielded across a month's end against the wrong month.
+   Now it is the headline's own estimator (sample weights, recency weights
+   with the taper, sqrt(m) repeat deflation, each house's lean as of the
+   day) read AT the wave's fieldwork midpoint with the window open both
+   ways, so a past wave meets the polls either side of it and the newest
+   meets the polls before it - at the latest poll the line is exactly the
+   headline nowcast, so the chart ends on today's figure.
+     yd[k]: { v, he, n } - v the estimate from the OTHER polls (the wave
+            left out, as §3b's footprint leaves it out), he this house's lean
+            at the midpoint (what the aggregate takes out of the wave), n how
+            many other polls v rests on. Absent where none sits in the window.
+     yardLine[k]: [[iso, v], ...] every 4 days plus the newest poll's day,
+            every poll in; v null where the window holds none.
+   /vic/ (KF): the trend is the Kalman smoother's path, so v is the path
+   rerun without the wave and the line the path itself; he the filter's lean. */
+const YARD_STEP = 4;
+/* a patch keeps only the stretch where leaving the wave out changes the
+   line as printed (one decimal) - its ends usually don't */
+const trimPatch = (p, line) => {
+  if (!p) return null;
+  const same = (j) => p.v[j] === line[p.i + j][1];
+  let a = 0, b = p.v.length - 1;
+  while (a <= b && same(a)) a++;
+  while (b >= a && same(b)) b--;
+  return a > b ? null : { i: p.i + a, v: p.v.slice(a, b + 1) };
+};
+function aroundPts(rows, he, ref, skip, k = HEADLINE_K) {
+  const pts = [], waves = new Map();
+  for (const a of rows) {
+    if (skip && a.key === skip) continue;
+    const d = Math.abs(ddays(ref, a.mid));
+    if (d > k.window) continue;
+    waves.set(a.firm, (waves.get(a.firm) || 0) + 1);
+    pts.push({ w: (a.w0 ?? a.n) * k.weight(d), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm, ...(a.pq != null ? { pq: a.pq } : {}) });
+  }
+  for (const p of pts) p.w /= Math.sqrt(waves.get(p.firm));
+  return pts;
+}
+function yardSeries(rows, he, kf) {
+  const at = new Map();                          // key -> { v, he, n, p }
+  const DAY = 86400000, isoOf = (d) => new Date(d * DAY).toISOString().slice(0, 10);
+  /* the grid: whole days, every YARD_STEP from the first poll, and the
+     newest poll's day; the line is the estimate at each */
+  const grid = (d0) => { const g = []; for (let d = d0; d < KF_T1; d += YARD_STEP) g.push(d); g.push(KF_T1); return g; };
+  /* p: the stretch of line this wave sits in, redrawn WITHOUT it - the grid
+     points within the window either side ({ i: first index, v: [...] }) - so
+     the opened poll's chart draws the line its comparison was made against
+     and the gap a reader sees is the gap the sentence states */
+  const patch = (g, valAt, mid, win) => {
+    const idx = g.map((d, i) => (Math.abs(d * DAY - mid) <= win * DAY ? i : -1)).filter((i) => i >= 0);
+    return idx.length ? { i: idx[0], v: idx.map((i) => { const v = valAt(g[i]); return v == null ? null : r1(v); }) } : null;
+  };
+  if (kf) {
+    const day = (ms) => Math.min(KF_T1, kfDay(ms));
+    const pathAt = (run, d) => (d >= KF_T1 ? run.final.mu : run.path[Math.max(0, d - kf.t0)].mu);
+    const g = grid(kf.t0 + 1);
+    for (const r of rows) {
+      const o = kf.obs.find((q) => q.key === r.key);
+      if (!o) continue;
+      const rest = kf.obs.filter((q) => q !== o);
+      if (!rest.length) continue;
+      const run = kalmanRun(rest, { ...kf.opts, smooth: true });
+      /* a wave reaches the whole smoothed path, but past ~two months either
+         side its pull is under a hundredth of a point */
+      at.set(r.key, { v: r2(pathAt(run, day(r.mid))), he: r2(kf.leans[r.firm] || 0), n: rest.length,
+                      p: patch(g, (d) => pathAt(run, d), r.mid, 60) });
+    }
+    const line = g.map((d) => [isoOf(d), r1(kfAt(kf, d).mu)]);
+    for (const y of at.values()) { const t = trimPatch(y.p, line); if (t) y.p = t; else delete y.p; }
+    return { at, line, member: new Set(kf.obs.map((o) => o.key)), outside: (mid, firm) => ({ v: r2(kfAt(kf, day(mid)).mu), he: kf.leans[firm] != null ? r2(kf.leans[firm]) : null, n: kf.obs.length }) };
+  }
+  if (!rows.length) return { at, line: [], member: new Set(), outside: () => null };
+  const g = grid(Math.floor(Math.min(...rows.map((r) => r.mid)) / DAY));
+  const est = (t, skip) => { const e = weightedWithSe(aroundPts(rows, he, t, skip)); return e ? e.v : null; };
+  for (const r of rows) {
+    const e = weightedWithSe(aroundPts(rows, he, r.mid, r.key));
+    if (e) at.set(r.key, { v: r2(e.v), he: r2(heV(he, r.firm, r.mid)), n: e.n,
+                           p: patch(g, (d) => est(Math.min(d * DAY, refNow), r.key), r.mid, HEADLINE_K.window) });
+  }
+  const line = g.map((d) => { const v = est(Math.min(d * DAY, refNow), null); return [isoOf(d), v == null ? null : r1(v)]; });
+  for (const y of at.values()) { const t = trimPatch(y.p, line); if (t) y.p = t; else delete y.p; }
+  /* a wave the series never took - an SMS poll (NO_AGG_HOUSES), or one whose
+     primaries show rebased under a documented anomaly but stay out of the
+     implied aggregate - still meets the polls around it, all of them in;
+     he is its house's lean where the series measured one, else null */
+  const outside = (mid, firm) => {
+    const e = weightedWithSe(aroundPts(rows, he, mid, null));
+    const hv = he && he.evidenceN && he.evidenceN[firm] != null ? r2(heV(he, firm, mid)) : null;
+    return e ? { v: r2(e.v), he: hv, n: e.n } : null;
+  };
+  return { at, line, member: new Set(rows.map((r) => r.key)), outside };
+}
+const yardBy = {
+  lnp: yardSeries(tppRows, houseEffect, KF ? KF_NOW.tpp : null),
+  imp: yardSeries(tppRowsSynth, synthEffect, KF ? KF_NOW.imp : null),
+  onimp: yardSeries(tppRowsSynthOn, synthOnEffect, KF ? KF_NOW.on : null),
+  onp: yardSeries(altAON.rows, altAON.adjusted ? altAON.he : null, null),
+};
+const yardLine = Object.fromEntries(Object.entries(yardBy).map(([k, s]) => [k, s.line]));
+// which waves have a figure on each series (an SMS wave's yardstick is only
+// worth carrying where it has a figure to hold against it)
+const YARD_HAS = { lnp: (p) => p.tpp_alp != null, imp: (p) => impFields(p).alpImp != null, onimp: (p) => impFields(p).alpOnImp != null,
+                   onp: (p) => !!(ALT_BY.get(p.date + "|" + p.pollster) || {}).ao };
+const ydOf = (p) => {
+  const key = p.date + "|" + p.pollster, o = {};
+  for (const [k, s] of Object.entries(yardBy)) {
+    // a member with no other poll in reach has nothing to be held against
+    const y = s.at.has(key) ? s.at.get(key) : !s.member.has(key) && YARD_HAS[k](p) ? s.outside(midMs(p), p.pollster) : null;
+    if (y) o[k] = y;
+  }
+  return Object.keys(o).length ? o : null;
+};
+// a two-party share outside 20-80 is arithmetic gone wrong, not data
+for (const [k, s] of Object.entries(yardBy)) {
+  for (const [key, y] of s.at) {
+    if (!Number.isFinite(y.v) || !Number.isFinite(y.he) || y.v < 20 || y.v > 80)
+      throw new Error(`poll yardstick out of range (${k} ${key}): ${JSON.stringify(y)}`);
+  }
+}
+
 /* ---- 4. leadership monthly – gap-aware (no interpolation) --------------
    Rows exist only for months with at least one published leadership reading;
    a leader not polled that month carries null. The panels filter nulls, so
@@ -1414,6 +1540,83 @@ const leaderNow = (() => {
   return out;
 })();
 
+/* ---- 4c. each wave's leader gaps against the waves around it -----------
+   §3c for the leadership rail: Albanese's net minus a rival's, on the one
+   question a wave put to both (approval with approval, favourability with
+   favourability), held against the same gap from the OTHER waves around its
+   fieldwork midpoint. Each side is leaderNow's reading - houses weighted
+   equally, the stratified leans taken out, the same window (three weeks for
+   the majors' approval federally, six otherwise) - read with the window open
+   both ways, among readings of the SAME office-holder (Ley and Taylor are
+   different people; on /vic/ so are Andrews, Allan and Carroll).
+     ldYd["opp|net" | "opp|fav" | "han|net" | "han|fav"]: { v, he, n, p }
+       v the other waves' gap, he this house's lean on the gap then (its
+       Albanese lean minus its rival lean), p the line without this wave.
+     ldYardLine[combo]: [[iso, v]] the gap line every 4 days to the newest
+       poll, null where either side has no reading in reach. */
+const ldYard = (() => {
+  const MONTH_SET = new Set(MONTHS);
+  const DAY = 86400000;
+  const holderAt = (slot, iso) => (JUR ? holderOf(slot, iso) : slot === "opp" ? eraOf(iso) : slot);
+  const K = (slot, metric) => (metric === "net" && slot !== "han" && !JUR ? HEADLINE_K : SPARSE_K);
+  const rows = {};                                // slot|metric -> rows with holder
+  for (const slot of ["alb", "opp", "han"]) {
+    for (const metric of ["net", "fav"]) {
+      const out = rows[slot + "|" + metric] = [];
+      for (const a of apprAgg) {
+        const P = POLL_BY_KEY.get(a.date + "|" + a.firm);
+        const base = { key: a.date + "|" + a.firm, firm: a.firm, mid: P ? midMs(P) : midMs({ date: a.date }), n: rowN(P), w0: 1, holder: holderAt(slot, a.date) };
+        const own = metricOf(a.firm, slot, a.date) === "fav" ? "fav" : "net";
+        if (a[slot] != null && own === metric) out.push({ ...base, x: a[slot], pq: netPq(a[slot], a.splits ? a.splits[slot] : null) });
+        const alt = a.splits && a.splits.fav ? a.splits.fav[slot] : null;
+        if (metric === "fav" && alt != null && own !== "fav") out.push({ ...base, x: alt, pq: netPq(alt, null) });
+      }
+    }
+  }
+  const side = (slot, metric, t, skip) => {
+    const holder = holderAt(slot, new Date(t).toISOString().slice(0, 10));
+    const rs = rows[slot + "|" + metric].filter((r) => r.holder === holder);
+    const e = weightedWithSe(aroundPts(rs, apprHE[slot], t, skip, K(slot, metric)));
+    return e;
+  };
+  const gapAt = (riv, metric, t, skip) => {
+    const A = side("alb", metric, t, skip), R = side(riv, metric, t, skip);
+    return A && R ? { v: A.v - R.v, n: Math.min(A.n, R.n) } : null;
+  };
+  const first = apprAgg.length ? Math.min(...apprAgg.filter((a) => MONTH_SET.has(ymOf(a.date))).map((a) => midMs({ date: a.date }))) : null;
+  const g = [];
+  if (first != null && Number.isFinite(first)) { for (let d = Math.floor(first / DAY); d < KF_T1; d += YARD_STEP) g.push(d); g.push(KF_T1); }
+  const line = {}, at = new Map(), breaks = {};
+  for (const riv of ["opp", "han"]) {
+    for (const metric of ["net", "fav"]) {
+      const combo = riv + "|" + metric;
+      const vAt = (d, skip) => { const e = gapAt(riv, metric, Math.min(d * DAY, refNow), skip); return e ? r1(e.v) : null; };
+      line[combo] = g.map((d) => [new Date(d * DAY).toISOString().slice(0, 10), vAt(d, null)]);
+      /* where either office changes hands the gap is between other people:
+         the first grid day under the new holders, so the line breaks there */
+      const who = (d) => { const iso = new Date(d * DAY).toISOString().slice(0, 10); return holderAt("alb", iso) + "|" + holderAt(riv, iso); };
+      breaks[combo] = g.filter((d, i) => i > 0 && who(d) !== who(g[i - 1])).map((d) => new Date(d * DAY).toISOString().slice(0, 10));
+      const has = (r) => rows["alb|" + metric].some((q) => q.key === r.key) && rows[riv + "|" + metric].some((q) => q.key === r.key);
+      for (const r of rows[riv + "|" + metric]) {
+        if (!MONTH_SET.has(ymOf(r.key.slice(0, 10))) || !has(r)) continue;
+        const e = gapAt(riv, metric, r.mid, r.key);
+        if (!e) continue;
+        const win = Math.max(K("alb", metric).window, K(riv, metric).window);
+        const idx = g.map((d, i) => (Math.abs(d * DAY - r.mid) <= win * DAY ? i : -1)).filter((i) => i >= 0);
+        const o = at.get(r.key) || {};
+        o[combo] = { v: r2(e.v), he: r2(heV(apprHE.alb, r.firm, r.mid) - heV(apprHE[riv], r.firm, r.mid)), n: e.n,
+                     ...(idx.length ? { p: { i: idx[0], v: idx.map((i) => vAt(g[i], r.key)) } } : {}) };
+        at.set(r.key, o);
+      }
+    }
+  }
+  for (const o of at.values()) for (const [c, y] of Object.entries(o)) { const t = trimPatch(y.p, line[c]); if (t) y.p = t; else delete y.p; }
+  // drop a combo no wave was ever asked on, so the payload carries no empty line
+  for (const c of Object.keys(line)) if (line[c].every((r) => r[1] == null)) delete line[c];
+  for (const c of Object.keys(breaks)) if (!line[c] || !breaks[c].length) delete breaks[c];
+  return { at, line, breaks };
+})();
+
 /* The preferred-PM margin now – PM minus opponent, every format, as Past
    cycles draws it – for the sitting term's latest point there (§10).
    Taylor's era; sample-weighted, never house-adjusted, the six-week window,
@@ -1543,6 +1746,39 @@ const dirEffByKey = (() => {
   }
   return out;
 })();
+/* Each reading against the readings around it (§3c's construction on the
+   headline's own terms: the net is the right nowcast minus the wrong one,
+   each house-adjusted on its own series), and the line the chart draws.
+   yd: { v, he, n } - the other readings' net at this one's fieldwork
+   midpoint, and this house's net lean then (right lean minus wrong lean). */
+const dirYard = (() => {
+  const keyed = (field) => DIR.filter((d) => d[field] != null).map((d) =>
+    ({ key: d.date + "|" + d.pollster, mid: midMs(d), x: d[field], n: dirSample(d), firm: d.pollster }));
+  const rowsR = keyed("right"), rowsW = keyed("wrong");
+  const netAt = (t, skip) => {
+    const r = weightedWithSe(aroundPts(rowsR, dirHe.right, t, skip)), w = weightedWithSe(aroundPts(rowsW, dirHe.wrong, t, skip));
+    return r && w ? { v: r.v - w.v, n: Math.max(r.n, w.n) } : null;
+  };
+  const DAY = 86400000, ms = new Set(MONTHS);
+  const first = DIR.filter((d) => ms.has(ymOf(d.date))).map(midMs);
+  const g = [];
+  if (first.length) { for (let d = Math.floor(Math.min(...first) / DAY); d < KF_T1; d += YARD_STEP) g.push(d); g.push(KF_T1); }
+  const netV = (d, skip) => { const e = netAt(Math.min(d * DAY, refNow), skip); return e ? r1(e.v) : null; };
+  const at = new Map();
+  for (const d of DIR) {
+    if (d.right == null || d.wrong == null || !ms.has(ymOf(d.date))) continue;
+    const key = d.date + "|" + d.pollster, mid = midMs(d);
+    const e = netAt(mid, key);
+    if (!e) continue;
+    // the line without this reading where it reaches (see §3c's patch)
+    const idx = g.map((x, i) => (Math.abs(x * DAY - mid) <= HEADLINE_K.window * DAY ? i : -1)).filter((i) => i >= 0);
+    at.set(key, { v: r2(e.v), he: r2(heV(dirHe.right, d.pollster, mid) - heV(dirHe.wrong, d.pollster, mid)), n: e.n,
+                  ...(idx.length ? { p: { i: idx[0], v: idx.map((i) => netV(g[i], key)) } } : {}) });
+  }
+  const line = g.map((d) => [new Date(d * DAY).toISOString().slice(0, 10), netV(d, null)]);
+  for (const y of at.values()) { const t = trimPatch(y.p, line); if (t) y.p = t; else delete y.p; }
+  return { at, line };
+})();
 /* a lone wave carries real weight in a 21-day window of this thin series:
    its post-election window legitimately swung 8 points on one wave. Unlike
    the 2PP footprint's ±4 (ten-poll windows), the tripwire here only catches
@@ -1632,6 +1868,7 @@ const DIR_BY = new Map();
     DIR_BY.set(d.date + "|" + d.pollster, {
       right: d.right, wrong: d.wrong, unsure: d.unsure, net,
       ...(dirEffByKey.has(d.date + "|" + d.pollster) ? { eff: dirEffByKey.get(d.date + "|" + d.pollster) } : {}),
+      ...(dirYard.at.has(d.date + "|" + d.pollster) ? { yd: dirYard.at.get(d.date + "|" + d.pollster) } : {}),
       ...(prev ? { chg: { net: r1(net - prev.net), right: r1(d.right - prev.right),
                           wrong: r1(d.wrong - prev.wrong) }, ref: prev.date } : {}),
     });
@@ -2506,6 +2743,10 @@ const individualPolls = POLLS.map((p) => {
     // this poll's pull on the standing aggregates (leave-one-out, §3b) –
     // absent where the wave sits in none of the three series
     ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),
+    // the polls around this one, each series it has a figure on (§3c),
+    // and its leader gaps against the waves around it (§4c)
+    ...(ydOf(p) ? { yd: ydOf(p) } : {}),
+    ...(ldYard.at.has(p.date + "|" + p.pollster) ? { ldYd: ldYard.at.get(p.date + "|" + p.pollster) } : {}),
     alp: p.tpp_alp ?? null, lnp: p.tpp_lnp ?? null, alpN: alpNOf(p),
     // this wave's implied 2PP (its own primaries at the 2025 flow table) –
     // emitted under impShow's display rule: documented sum anomalies show
@@ -5107,6 +5348,16 @@ window.AUSPOL = (function () {
      (alt2pp.alp_on/altLatest). ci95 here is the flow-table RANGE, not a
      sampling interval, and it has no election anchor. */
   const synthOn = ${JSON.stringify(agg2ppSynthOn)};
+  /* What an opened poll is held against (gen-data §3c): the headline's
+     estimator read along the term with its window open both ways, every 4
+     days to the newest poll, per series (lnp, imp, onimp, onp) and for the
+     national-direction net (dir). The poll's own comparison (its yd) leaves
+     the poll out. */
+  const yardLine = ${JSON.stringify({ ...yardLine, dir: dirYard.line })};
+  // the leader-gap lines the same way (§4c), keyed rival|question
+  const ldYardLine = ${JSON.stringify(ldYard.line)};
+  // the first day under new office-holders on each of those lines: they break there
+  const ldYardBreaks = ${JSON.stringify(ldYard.breaks)};
   /* Flow-sensitivity bracket for the implied series above (gen-data §1c):
      each month's {lo, hi} = implied ALP 2PP with the ONP→ALP share at its
      last two COUNTED election tables (2022 and 2025, TPP cut). A
@@ -5301,7 +5552,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
