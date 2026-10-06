@@ -403,6 +403,10 @@ function RdLeadership({ rangeId }) {
   const { D, rangeDomain, filterPts, monthLabelFull } = window.AP;
   const narrow = useNarrow("(max-width: 640px)");
   const xDomain = rangeDomain(rangeId);
+  /* the jurisdiction's baseline election rides the axis as in RdPrimary:
+     data-driven, so /vic/ never sees the federal mark (its own gritting
+     falls back to the plain month grid when the window opens past it) */
+  const base = (D.aggPrimary || []).find((d) => d.election) || null;
   const N = D.leaderNow || {};
   const LM = D.leaderMonths;
   const L = {};
@@ -831,7 +835,7 @@ function RdLeadership({ rangeId }) {
     <div className="card rd-card rd-ld-chart" key={key}>
       <div className="rd-chead"><span className="rd-chead-t">{title}</span></div>
       <TrendChart key={key} heightPx={narrow ? 250 : 270} padPx={chartPad} xDomain={xDomain}
-                  xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline events={evs}
+                  xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)} baseline events={evs}
                   tooltipTitle={(i) => { const s = props.spine || []; return s[i] && s[i].ym ? monthLabelFull(s[i].ym) : ""; }}
                   fmt={(v) => v.toFixed(1)} {...props} />
     </div>
@@ -3458,6 +3462,9 @@ function RdUndecided({ rangeId }) {
   const first = byId.first, tpp = byId.tpp, soft = byId.soft;
   const nowOf = (s) => (s ? (s.now ? s.now.v : s.latest.v) : null);
   const xDomain = rangeDomain(rangeId);
+  /* the axis opens on the election tick, as the 2PP, primary, mood and
+     direction charts do - data-driven so /vic/ never sees the federal mark */
+  const base = (D.aggPrimary || []).find((d) => d.election) || null;
   const slopeOf = (s) => (s ? withinHouseSlope(s.polls.map((d) => ({ h: d.pollster, t: d.x, w: d.sample || 1000, y: d.v }))) : null);
 
   /* ---- the finding ----------------------------------------------------------- */
@@ -3516,7 +3523,7 @@ function RdUndecided({ rangeId }) {
         ))}
         <TrendChart key={"rd-un-" + key} heightPx={narrow ? 200 : 230} padPx={{ l: 36, r: 10, t: 14, b: 28 }}
           xDomain={xDomain} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, step)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
-          xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline
+          xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)} baseline
           series={drawn.map((d) => ({ id: d.s.id, label: d.s.label, color: COL(d.s), rdWidth: 2, dashed: d.s.dashed, rdCap: 3.5, points: series(d.pts, "v") }))}
           spine={series(drawn[0].pts, "v")}
           scatter={drawn.flatMap((d) => d.dots.map((q) => ({ x: q.x, y: q.v, color: COL(d.s), hollow: d.s.id === "tpp", label: d.s.label, meta: q })))} pollFacet="twopp"
@@ -3719,7 +3726,7 @@ function RdUndecided({ rangeId }) {
                 <div className="rd-sm-top"><span style={{ color: inkOf(D.PARTIES[k].color) }}>{k === "oth" ? "Others" : D.PARTIES[k].name}</span><b>{F.now[k].v.toFixed(1)}%</b></div>
                 <TrendChart key={"rd-firm-" + k} heightPx={narrow ? 120 : 140} padPx={{ l: 30, r: 6, t: 10, b: 24 }}
                   xDomain={xDomain} yDomain={[partyView.sLo, partyView.sHi]} yTicks={rdYTicks(partyView.sLo, partyView.sHi, 20)}
-                  yTickFmt={(v) => v + "%"} xTicks={rdXTicks(xDomain[0], xDomain[1], true)} baseline
+                  yTickFmt={(v) => v + "%"} xTicks={rdElectionTicks(xDomain[0], xDomain[1], true, base ? base.x : null)} baseline
                   series={[{ id: "all", label: "All voters", color: "var(--ink)", dashed: true, dash: "4 3", rdWidth: 1.2, endCap: false, points: partyView.lines.map((w) => ({ x: w.x, y: w.all })) },
                            { id: k, label: D.PARTIES[k].name, color: D.PARTIES[k].color, rdWidth: 2.2, rdCap: 3.5, points: partyView.lines.map((w) => ({ x: w.x, y: w[k] })) }]}
                   spine={partyView.lines.map((w) => ({ x: w.x, y: w[k] }))}
@@ -3764,7 +3771,7 @@ function RdUndecided({ rangeId }) {
           <div className="card rd-card rd-un-age">
             <TrendChart key="rd-soft-age" heightPx={narrow ? 240 : 250} padPx={narrow ? { l: 34, r: 8, t: 14, b: 28 } : { l: 40, r: 12, t: 14, b: 30 }}
               xDomain={xDomain} yDomain={[0, 40]} yTicks={rdYTicks(0, 40, 10)} yTickFmt={(v) => (v === 0 ? "0" : v + "%")}
-              xTicks={rdXTicks(xDomain[0], xDomain[1], narrow)} baseline
+              xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)} baseline
               series={[{ id: "all", label: "All voters", color: "var(--ink)", dashed: true, dash: "4 3", rdWidth: 1.4, endCap: false,
                          points: soft ? filterPts(soft.monthly, xDomain[0]).map((m) => ({ x: m.x, y: m.v })) : [], endLabel: narrow ? null : "All voters" },
                        ...ageView.B.map((b, i) => ({ id: b.id, label: b.label, color: ageView.grey(i), rdWidth: 2.2, rdCap: 3.5,

@@ -87244,6 +87244,7 @@ function RdLeadership({
   } = window.AP;
   const narrow = useNarrow("(max-width: 640px)");
   const xDomain = rangeDomain(rangeId);
+  const base = (D.aggPrimary || []).find(d => d.election) || null;
   const N = D.leaderNow || {};
   const LM = D.leaderMonths;
   const L = {};
@@ -87832,7 +87833,7 @@ function RdLeadership({
     heightPx: narrow ? 250 : 270,
     padPx: chartPad,
     xDomain: xDomain,
-    xTicks: rdXTicks(xDomain[0], xDomain[1], narrow),
+    xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null),
     baseline: true,
     events: evs,
     tooltipTitle: i => {
@@ -91742,6 +91743,7 @@ function RdUndecided({
     soft = byId.soft;
   const nowOf = s => s ? s.now ? s.now.v : s.latest.v : null;
   const xDomain = rangeDomain(rangeId);
+  const base = (D.aggPrimary || []).find(d => d.election) || null;
   const slopeOf = s => s ? withinHouseSlope(s.polls.map(d => ({
     h: d.pollster,
     t: d.x,
@@ -91819,7 +91821,7 @@ function RdUndecided({
       yDomain: [lo, hi],
       yTicks: rdYTicks(lo, hi, step),
       yTickFmt: v => v === 0 ? "0" : v + "%",
-      xTicks: rdXTicks(xDomain[0], xDomain[1], narrow),
+      xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null),
       baseline: true,
       series: drawn.map(d => ({
         id: d.s.id,
@@ -92202,7 +92204,7 @@ function RdUndecided({
     yDomain: [partyView.sLo, partyView.sHi],
     yTicks: rdYTicks(partyView.sLo, partyView.sHi, 20),
     yTickFmt: v => v + "%",
-    xTicks: rdXTicks(xDomain[0], xDomain[1], true),
+    xTicks: rdElectionTicks(xDomain[0], xDomain[1], true, base ? base.x : null),
     baseline: true,
     series: [{
       id: "all",
@@ -92331,7 +92333,7 @@ function RdUndecided({
     yDomain: [0, 40],
     yTicks: rdYTicks(0, 40, 10),
     yTickFmt: v => v === 0 ? "0" : v + "%",
-    xTicks: rdXTicks(xDomain[0], xDomain[1], narrow),
+    xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null),
     baseline: true,
     series: [{
       id: "all",
