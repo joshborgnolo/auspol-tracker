@@ -5380,7 +5380,8 @@
       "oth": 6,
       "tpp_alp": 52,
       "tpp_lnp": 48,
-      "url": "https://www.news24.com.au/politics/australian-politics/albanese-government-hits-new-polling-low-as-pauline-hansons-one-nation-surges-ahead-in-news24-pulse/news-story/dc75633341ddf1d90db9c3eb78061e20"
+      "url": "https://www.news24.com.au/politics/australian-politics/albanese-government-hits-new-polling-low-as-pauline-hansons-one-nation-surges-ahead-in-news24-pulse/news-story/dc75633341ddf1d90db9c3eb78061e20",
+      "published": "2026-10-07T05:00"
     }
   ],
   "ppm": [
@@ -6166,6 +6167,15 @@
       "opp": 15,
       "oppName": "Taylor",
       "han": 26,
+      "extra": null
+    },
+    {
+      "date": "2026-10-06",
+      "firm": "YouGov",
+      "alb": 41,
+      "opp": 37,
+      "oppName": "Taylor",
+      "han": null,
       "extra": null
     }
   ],
@@ -7878,6 +7888,24 @@
       "oppName": "Taylor",
       "han": -10,
       "detail": null
+    },
+    {
+      "date": "2026-10-06",
+      "firm": "YouGov",
+      "alb": -28,
+      "opp": -17,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 33,
+          "dis": 61
+        },
+        "opp": {
+          "app": 34,
+          "dis": 51
+        }
+      }
     }
   ],
   "ppmHeadToHead": [
@@ -7979,6 +8007,12 @@
     },
     {
       "date": "2026-09-21",
+      "firm": "YouGov",
+      "alb": 50,
+      "han": 38
+    },
+    {
+      "date": "2026-10-06",
       "firm": "YouGov",
       "alb": 50,
       "han": 38

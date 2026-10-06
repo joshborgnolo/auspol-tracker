@@ -1,0 +1,103 @@
+{
+  "source": "news24+wikipedia",
+  "title": "Opinion_polling_for_the_next_Australian_federal_election",
+  "url": "https://www.news24.com.au/politics/australian-politics/albanese-government-hits-new-polling-low-as-pauline-hansons-one-nation-surges-ahead-in-news24-pulse/news-story/dc75633341ddf1d90db9c3eb78061e20",
+  "published": "2026-10-07T05:00",
+  "fieldwork": {
+    "date": "2026-10-06",
+    "dateStart": "2026-09-29",
+    "sample": 1500
+  },
+  "vi": {
+    "alp": 25,
+    "lnp": 21,
+    "grn": 15,
+    "onp": 28,
+    "ind": 5,
+    "oth": 6,
+    "tpp_alp": 52,
+    "tpp_lnp": 48
+  },
+  "satisfaction": {
+    "pmApp": 33,
+    "pmDis": 61,
+    "pmNet": -28,
+    "oppApp": 34,
+    "oppDis": 51,
+    "oppNet": -17
+  },
+  "ppm": {
+    "alb": 41,
+    "opp": 37,
+    "albVsHanson": 50,
+    "hanson": 38
+  },
+  "altTpp": {
+    "alpVsOnp_alp": null,
+    "alpVsOnp_onp": null
+  },
+  "infogram": {
+    "via": "anon",
+    "ids": [
+      "_/z8eX4xFGRCiCNWMyRyTI",
+      "_/k58LEJVsGG4OersOUxEA",
+      "_/T053xH7M79vRYatiePwn",
+      "_/fZGHngatIJgOgihyguxQ",
+      "_/WaCCXdcAEV5kRmRrRwmC",
+      "_/Odslu4VSlJvLA4KIYKfS",
+      "_/UYH7EJcGvPKMVgKyglNB"
+    ],
+    "kinds": [
+      "horserace",
+      "crosstab",
+      "approvals",
+      "ppm",
+      "unmodelled",
+      "unmodelled",
+      "unmodelled"
+    ],
+    "window": {
+      "start": "2026-09-29",
+      "end": "2026-10-06"
+    },
+    "vi": {
+      "alp": 25,
+      "lnp": 21,
+      "onp": 28,
+      "grn": 15,
+      "ind": 5,
+      "oth": 6
+    },
+    "tpp": null,
+    "altTpp": null,
+    "approval": {
+      "alb": {
+        "app": 33,
+        "dis": 61,
+        "unc": 6
+      },
+      "opp": {
+        "app": 34,
+        "dis": 51,
+        "unc": 15
+      },
+      "oppName": "taylor"
+    },
+    "ppm": [
+      {
+        "alb": 50,
+        "dk": 12,
+        "opp": 38,
+        "oppRaw": "Pauline Hanson",
+        "table": "ppm"
+      },
+      {
+        "alb": 41,
+        "dk": 22,
+        "opp": 37,
+        "oppRaw": "Angus Taylor",
+        "table": "ppm"
+      }
+    ]
+  }
+}

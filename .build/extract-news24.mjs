@@ -964,13 +964,26 @@ try {
     status.added.push({ date: rec.date, primaries: `${rec.vi.alp}/${rec.vi.lnp}/${rec.vi.grn}/${rec.vi.onp}/${rec.vi.ind}`, tpp: `${rec.vi.tpp_alp}/${rec.vi.tpp_lnp}`, ppm: rec.ppmA == null ? null : `${rec.ppmA}/${rec.ppmO}`, pmNet: rec.sat?.pmNet ?? null, oppNet: rec.sat?.oppNet ?? null });
   }
 
+  // Adjudicated cross-source disagreements: exact `date|problem` strings a
+  // human has verified against the source text (the live embed tables and
+  // the article prose) and ruled for the higher-precedence figure. They
+  // stop their own wave from re-blocking; any disagreement not listed here
+  // — a different wave, different figure, different values — still blocks.
+  // 2026-10-06 OL net: News24's Taylor sentence is self-contradictory
+  // ("all-time low of -16 per cent, with 31 per cent satisfied and 51 per
+  // cent dissatisfied" — 31−51=−20, not −16); the Infogram approvals table
+  // (taylor 34/51/15, albanese 33/61/6, both Σ=100, leader-named rows) is
+  // the authoritative record, and the embed has precedence over prose.
+  const N24_ADJUDICATED = new Set([
+    "2026-10-06|Infogram OL net -17 != News24 prose -20",
+  ]);
   // Fallback: waves YouGov never released on yougov.com. Wikipedia discovers
   // the wave and its canonical article URL; with NEWSIE_CHROME=1, News24 then
   // enriches that wave before Wikipedia fills the fields News24 omits.
   status.fallback = { source: "wikipedia", checked: 0, added: [], skipped_existing: 0, unparsed: [] };
   status.news24 = {
     enabled: !!(process.env.NEWSIE_CHROME || NEWS24_FILE),
-    attempted: 0, enriched: [], skipped: [], problems: [],
+    attempted: 0, enriched: [], skipped: [], problems: [], adjudicated: [],
     sources: {}, // date -> "anon"|"chrome"|"file" (which leg served the article DOM)
     infogram: {}, // date -> {ids, kinds, problems}
   };
@@ -1004,10 +1017,15 @@ try {
         try { return /(^|\.)news24\.com\.au$/.test(new URL(wikiWave.url ?? "").hostname) ? wikiWave.url : null; }
         catch { return null; }
       })();
-      const canUpgrade = !!existing && wikiWave.date === latestYg && existing.client === "News24" && !existing.published && !!news24Url;
+      // Every News24 wave so far carries ppm + approval derived rows; the
+      // latest wave missing them (a figure merge once blocked) still has an
+      // unfinished enrichment, same as one missing its publication stamp.
+      const canUpgrade = !!existing && wikiWave.date === latestYg && existing.client === "News24"
+        && (!existing.published || !firmRowExists("ppm", wikiWave.date) || !firmRowExists("approval", wikiWave.date))
+        && !!news24Url;
       if ((existing || newDates.has(wikiWave.date)) && !canUpgrade) { status.fallback.skipped_existing++; continue; }
 
-      let h = wikiWave, n24 = null, ig = null;
+      let h = wikiWave, n24 = null, ig = null, rescuedPub = false;
       if (news24Url) {
         status.news24.attempted++;
         const art = await fetchNews24Article(news24Url);
@@ -1022,9 +1040,18 @@ try {
               problems: enriched.problems, notes: enriched.notes,
             };
           if (enriched.notes.length) console.error(`N24_NOTE ${wikiWave.date}: ${enriched.notes.join(" | ")}`);
-          const allProblems = [...merged.problems, ...enriched.problems];
+          const rawProblems = [...merged.problems, ...enriched.problems];
+          const allProblems = rawProblems.filter((p) => !N24_ADJUDICATED.has(`${wikiWave.date}|${p}`));
+          if (allProblems.length !== rawProblems.length)
+            status.news24.adjudicated.push(
+              ...rawProblems.filter((p) => !allProblems.includes(p)).map((p) => `${wikiWave.date}: ${p}`));
           if (allProblems.length) {
             status.news24.problems.push(`${wikiWave.date}: ${allProblems.join(" | ")}`);
+            // A blocked figure merge must not cost the wave its publication
+            // stamp: `published` is article transfer-state metadata, not a
+            // checked figure, and the All-polls "eff. TBC" gate keys off it
+            // (2026-10-06 wave: the oth/OL-net problems held the stamp back).
+            if (!h.published && parsed.published) { h.published = parsed.published; rescuedPub = true; }
           } else {
             h = merged.wave;
             n24 = merged.news24;
@@ -1035,7 +1062,7 @@ try {
           status.news24.skipped.push(`${wikiWave.date}: News24 ${art.via ?? "fetch"}/parse failed`);
         }
       }
-      if (canUpgrade && !n24) continue;
+      if (canUpgrade && !n24 && !rescuedPub) continue;
 
       // a wave found on the Pulse page may have no stated sample (the Sep 2026
       // article style dropped the methodology line): it files with

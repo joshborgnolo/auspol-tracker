@@ -79,6 +79,19 @@ eq("tpp pairs", parseN24Tpp(dataOf("_/jSJgw3l3groFHC28VREB")).tpp,
   }
   const bad = parseN24Crosstab(tampered);
   ok("crosstab Σ tamper declines", bad.vi === null && /Σ=/.test(bad.why));
+  // CSA row label drift: the 6 Oct 2026 wave shipped "Community Strong
+  // Australia" where previous waves shipped "Community Strong" — the fold
+  // into oth must survive the long form (missed fold once undercounted oth)
+  const longLabel = JSON.parse(JSON.stringify(dataOf("_/YM46DvOTftyx9pNzV67y")));
+  for (const e of Object.values(longLabel.elements.content.content.entities)) {
+    if (e.type === "CHART" && e.props.chartData?.data?.[0]?.[0]?.[0]?.value === "Party") {
+      const row = e.props.chartData.data[0].find((r) => /^community strong$/i.test(r[0].value));
+      row[0].value = "Community Strong Australia";
+    }
+  }
+  const drift = parseN24Crosstab(longLabel);
+  eq("crosstab CSA long label", drift.detail, { other: 5, csa: 2 });
+  eq("crosstab CSA long label fold", drift.vi.oth, 7);
 }
 
 // ---- horserace: corroboration-only, Σ-guarded

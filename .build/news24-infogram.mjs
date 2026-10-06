@@ -148,6 +148,9 @@ export function parseN24Tpp(data) {
 // Strong (verified vs canon oth:7 = 5+2 on 2026-08-24); both constituents are
 // returned separately as provenance. Σ100 on the Total column is the
 // authority gate — fail ⇒ null, the caller falls back to prose/Wikipedia.
+// The CSA row's label drifts between waves: "Community Strong" (Aug–Sep
+// 2026) and "Community Strong Australia" (6 Oct 2026) — a missed row folds
+// CSA out of oth silently (canon 2026-10-06 oth:6 = 5+1), so match both.
 export function parseN24Crosstab(data) {
   for (const t of chartEntitiesOf(data)) {
     const head = t.rows[0];
@@ -156,7 +159,9 @@ export function parseN24Crosstab(data) {
     const vi = {
       alp: get(/^labor$/i), lnp: get(/^coalition$/i), onp: get(/^one nation$/i),
       grn: get(/^the greens$/i), ind: get(/^independent$/i),
-      other: get(/^other$/i), csa: get(/^community strong$/i),
+      // the CSA row's label drifted between waves (2026-10-06 wave shipped
+      // "Community Strong Australia"; earlier waves "Community Strong")
+      other: get(/^other$/i), csa: get(/^community strong(?:\s+australia)?$/i),
     };
     if ([vi.alp, vi.lnp, vi.onp, vi.grn].some((v) => v == null))
       return { vi: null, why: "crosstab missing a core party row" };
