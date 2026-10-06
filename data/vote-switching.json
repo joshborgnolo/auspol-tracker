@@ -1503,6 +1503,81 @@
     "oth": 5,
     "community-strong": 1
    }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-10-06",
+   "dateStart": "2026-09-29",
+   "sample": 1500,
+   "article": "https://www.news24.com.au/politics/australian-politics/albanese-government-hits-new-polling-low-as-pauline-hansons-one-nation-surges-ahead-in-news24-pulse/news-story/dc75633341ddf1d90db9c3eb78061e20",
+   "onp": 28,
+   "source": "https://e.infogram.com/_/k58LEJVsGG4OersOUxEA",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 67,
+     "lnp": 8,
+     "onp": 13,
+     "grn": 8,
+     "community-strong-australia": 1,
+     "ind": 1,
+     "oth": 2
+    },
+    "lnp": {
+     "alp": 5,
+     "lnp": 52,
+     "onp": 39,
+     "grn": 2,
+     "community-strong-australia": 0,
+     "ind": 0,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 5,
+     "lnp": 3,
+     "onp": 8,
+     "grn": 78,
+     "community-strong-australia": 1,
+     "ind": 2,
+     "oth": 4
+    },
+    "onp": {
+     "alp": 0,
+     "lnp": 2,
+     "onp": 92,
+     "grn": 1,
+     "community-strong-australia": 0,
+     "ind": 2,
+     "oth": 3
+    },
+    "ind": {
+     "alp": 9,
+     "lnp": 8,
+     "onp": 14,
+     "grn": 6,
+     "community-strong-australia": 3,
+     "ind": 59,
+     "oth": 1
+    },
+    "oth": {
+     "alp": 7,
+     "lnp": 7,
+     "onp": 46,
+     "grn": 1,
+     "community-strong-australia": 3,
+     "ind": 0,
+     "oth": 35
+    }
+   },
+   "total": {
+    "alp": 25,
+    "lnp": 21,
+    "onp": 28,
+    "grn": 15,
+    "community-strong-australia": 1,
+    "ind": 5,
+    "oth": 5
+   }
   }
  ],
  "skipped": [

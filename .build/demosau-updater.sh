@@ -52,8 +52,20 @@ case "$LAST_LINE" in
   *) log "FAIL extract (no DEMOSAU_STATUS line): $LAST_LINE"; exit 1 ;;
 esac
 
-if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
-  # No new wave: give the skip-confirm a go. It verifies — from the
+# The wave's crosstabs join data/vote-switching.json and
+# data/demographics.json, and a "trust more to handle" table (asked Feb
+# 2026) joins data/issues.json (non-fatal; see refresh_crosstabs in
+# git-push-main.sh). Retry on EVERY run, not only after a changed extract:
+# a wave's table can become readable after the wave row has landed
+# (the report PDF lag), and gating on "changed" left those pending.
+refresh_crosstabs vote-switching demographics issues
+
+WAVE_CHANGED=1
+echo "$LAST_LINE" | grep -q '"changed":true' || WAVE_CHANGED=0
+
+if [ $WAVE_CHANGED -eq 0 ] && git diff --quiet -- data/vote-switching.json data/demographics.json data/issues.json; then
+  # No new wave and the crosstab refresh moved nothing: give the
+  # skip-confirm a go. It verifies — from the
   # extractor's own status emitted a moment ago, not a cached state file —
   # that the publisher's newest wave predates a passed slot MONTH and that
   # it's at least 5am Sydney the day after the measured window closed; exit 3
@@ -96,12 +108,13 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
   exit 0
 fi
 
-log "new DemosAU wave(s) detected; running validate/build/commit/push"
-# The wave's crosstabs join data/vote-switching.json and
-# data/demographics.json, and a "trust more to handle" table (asked Feb
-# 2026) joins data/issues.json, in this same commit (non-fatal; see
-# refresh_crosstabs in git-push-main.sh).
-refresh_crosstabs vote-switching demographics issues
+if [ $WAVE_CHANGED -eq 0 ]; then
+  log "no new wave, but pending crosstabs resolved; running validate/build/commit/push"
+  MSG="Catch up DemosAU crosstabs $(date '+%Y-%m-%d')"
+else
+  log "new DemosAU wave(s) detected; running validate/build/commit/push"
+  MSG="Update DemosAU poll data $(date '+%Y-%m-%d')"
+fi
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
@@ -115,7 +128,6 @@ fi
 
 FILES=(data/polls.json data/vote-switching.json data/demographics.json data/issues.json .build/demosau-src/ "${SITE_FILES[@]}")
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
-MSG="Update DemosAU poll data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1

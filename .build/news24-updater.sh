@@ -68,15 +68,25 @@ case "$LAST_LINE" in
   *) log "FAIL extract (no N24_STATUS line): $LAST_LINE"; exit 1 ;;
 esac
 
-if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
-  exit 0
-fi
-
-log "new YouGov/News24 wave(s) detected; running validate/build/commit/push"
 # The wave's crosstabs join data/vote-switching.json and
 # data/demographics.json in this same commit (non-fatal; see
-# refresh_crosstabs in git-push-main.sh).
+# refresh_crosstabs in git-push-main.sh). Retry on EVERY run, not only
+# after a changed extract: a wave's chart ids can land in
+# .build/news24-src/ a run after the wave itself (the 6-Oct-2026 wave's
+# ids arrived in a follow-up adjudication commit), and gating on
+# "changed" left its crosstab to the weekly catch-up.
 refresh_crosstabs vote-switching demographics issues
+
+if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
+  if git diff --quiet -- data/vote-switching.json data/demographics.json data/issues.json; then
+    exit 0
+  fi
+  log "no new wave, but pending crosstabs resolved; running validate/build/commit/push"
+  MSG="Catch up YouGov News24 crosstabs $(date '+%Y-%m-%d')"
+else
+  log "new YouGov/News24 wave(s) detected; running validate/build/commit/push"
+  MSG="Update YouGov News24 Pulse data $(date '+%Y-%m-%d')"
+fi
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
