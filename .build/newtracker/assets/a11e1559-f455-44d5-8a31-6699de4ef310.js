@@ -1531,6 +1531,64 @@ function DirectionPanel({ rangeId }) {
   );
 }
 
+// ---- The economic mood (consumer & business confidence) --------------
+/* Roy Morgan's own index series, drawn as published back to 2019 - context
+   for the mood, not a predictor. No aggregation: one house, its own figures.
+   Data: data/mood.json -> gen-data -> D.mood. */
+function MoodPanel({ rangeId }) {
+  if (window.AP.rd) return <RdMood rangeId={rangeId} />;
+  const { D, buildXTicks, series } = window.AP;
+  const narrow = useNarrow();
+  const M = D.mood;
+  if (!M || !M.consumer || !M.business || !M.consumer.polls.length || !M.business.polls.length) return null;
+  const C = M.consumer, B = M.business;
+  const x0 = Math.min(C.polls[0].x, B.polls[0].x) - 0.04;
+  const x1 = D.domain.x1;
+  const vals = C.polls.concat(B.polls).map((p) => p.v).concat([100]);
+  const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10, hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
+  const yTicks = [];
+  for (let v = lo; v <= hi + 1e-9; v += 10) yTicks.push(v);
+  const drawn = {
+    c: C.polls.filter((p) => p.x >= x0),
+    b: B.polls.filter((p) => p.x >= x0),
+  };
+  const scatter = drawn.c.map((q) => ({ x: q.x, y: q.v, color: "var(--ink)", label: "Consumers", meta: { pollster: "ANZ\u2013Roy Morgan" } }))
+    .concat(drawn.b.map((q) => ({ x: q.x, y: q.v, color: "var(--ink-2)", label: "Businesses", meta: { pollster: "Roy Morgan" } })));
+  return (
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="card-title">The economic mood</h2>
+          <p className="card-sub">Consumer and business confidence, 100 = neutral {"\u2013"} Roy Morgan{"\u2019"}s own series</p>
+        </div>
+      </div>
+      <TrendChart
+        key="mood"
+        height={narrow ? 460 : 340} xDomain={[x0, x1]} yDomain={[lo, hi]}
+        yTicks={yTicks} axisFont={narrow ? 28 : 20}
+        pad={{ l: 58, r: 22, t: 16, b: 42 }}
+        xTicks={buildXTicks(x0, x1)}
+        refLines={[{ y: 100, label: "100 = neutral", align: "left", color: "var(--ink-3)" }]}
+        series={[
+          { id: "consumer", label: "Consumers", color: "var(--ink)", points: series(drawn.c, "v"), endLabel: "Consumers" },
+          { id: "business", label: "Businesses", color: "var(--ink-2)", points: series(drawn.b, "v"), endLabel: "Businesses" },
+        ]}
+        spine={series(drawn.c, "v")}
+        scatter={scatter}
+        tooltipTitle={(i) => window.AP.monthLabelFull(drawn.c[i].ym)}
+        fmt={(v) => v.toFixed(1)}
+      />
+      <HowTo paras={[
+        <>Roy Morgan{"\u2019"}s own index series, set out as published {"\u2013"} the weekly ANZ{"\u2013"}Roy Morgan
+        consumer index and the monthly business index, back to 2019. No averaging, no adjustment
+        for lean, no election anchor is applied.</>,
+        <>On each index 100 is neutral {"\u2013"} above it optimists outnumber pessimists. Reading the mood
+        beside the polls is context, not a predictor of the vote.</>,
+      ]} />
+    </section>
+  );
+}
+
 // ---- Undecided ("can't say who they would vote for") -----------------
 /* The people the primaries have already set aside. Roy Morgan publishes this
    figure beside its shares - which is WHY a Roy Morgan wave sums to 100 - and
@@ -4863,7 +4921,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   );
 }
 
-Object.assign(window, { Segmented, TextToggle, Delta, HowTo, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, OnSourcesPanel, DemographicsPanel, PollsterTable, NextPollsPanel,
+Object.assign(window, { Segmented, TextToggle, Delta, HowTo, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, MoodPanel, OnSourcesPanel, DemographicsPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
   ShareBar, NetVal, FavMark, ChgTag, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
   PollLedger, PdSec, TppLine, ApprLine, ChgParen, releaseMetaRows, EffLines, sampleValue,

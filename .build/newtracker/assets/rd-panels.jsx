@@ -3783,4 +3783,94 @@ function RdUndecided({ rangeId }) {
   );
 }
 
-Object.assign(window, { RdPrimary, rdShareWords, rdPartyIn, rdPartyStart, rdElectionTicks, RdLeadership, RdHeadBar, RdDirection, rdList, rdRoughPts, RdDemographics, RdSwitching, useRdWidth, RdIssues, RdUndecided, RdShiftPlot, rdOneIn, RdTsig, rdTsSgn });
+/* ---------------------------------------------------- The economic mood
+   Business and consumer confidence — Roy Morgan's OWN index series (weekly
+   ANZ-Roy Morgan consumer, monthly business), drawn as published over the
+   whole run back to 2019 rather than this term: the long record is exactly
+   what makes today's reading legible (the COVID trough, the 2022 bounce).
+   No aggregation, no house effects, no election anchor — context, not a
+   predictor. Data: data/mood.json → gen-data §5j → D.mood.
+*/
+function RdMood({ rangeId }) {
+  const { D, series, monthLabelFull } = window.AP;
+  const narrow = useNarrow("(max-width: 640px)");
+  const M = D.mood;
+  if (!M || !M.consumer || !M.business || !M.consumer.polls.length || !M.business.polls.length) return null;
+  const C = M.consumer, B = M.business;
+  const cLat = C.latest, bLat = B.latest;
+  const cUnder = cLat.v < 100, bUnder = bLat.v < 100;
+  const word = (v) => (v < 100 ? "underwater" : "above water");
+  const head = cUnder && bUnder ? "Confidence is underwater on both counts."
+    : !cUnder && !bUnder ? "Confidence is above water on both counts."
+    : (cUnder ? "Consumers are underwater; businesses aren’t." : "Businesses are underwater; consumers aren’t.");
+  const trough = (s) => {
+    const lo = s.polls.reduce((m, p) => (p.v < m.v ? p : m), s.polls[0]);
+    const hi = s.polls.reduce((m, p) => (p.v > m.v ? p : m), s.polls[0]);
+    return { lo, hi };
+  };
+  const sent = (who, lat, period, s) => {
+    let t = who + " at " + lat.v.toFixed(1)
+      + (lat.chg == null ? "" : Math.abs(lat.chg) < 0.05 ? ", holding steady"
+        : ", " + (lat.chg < 0 ? "down " : "up ") + Math.abs(lat.chg).toFixed(1) + " on the " + period);
+    const { lo, hi } = trough(s);
+    if (Math.abs(lat.v - lo.v) <= 2.5) t += ", not far off its low of " + lo.v.toFixed(1) + " in " + monthLabelFull(lo.ym);
+    else if (Math.abs(lat.v - hi.v) <= 2.5) t += ", close to its high of " + hi.v.toFixed(1) + " in " + monthLabelFull(hi.ym);
+    return t + ".";
+  };
+  const dek = sent("Consumers", cLat, "week", C) + " " + sent("Businesses", bLat, "month", B);
+  const water = (v) => v < 100 ? "pessimists lead" : "optimists lead";
+  const rows = [
+    { s: C, id: "consumer", name: "Consumers", short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly. " + water(cLat.v) + ".", color: "var(--ink)", lat: cLat, period: "week", by: "ANZ–Roy Morgan" },
+    { s: B, id: "business", name: "Businesses", short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly. " + water(bLat.v) + ".", color: "var(--ink-2)", lat: bLat, period: "month", by: "Roy Morgan" },
+  ];
+  const x1 = D.domain.x1;
+  const x0 = Math.min(C.polls[0].x, B.polls[0].x) - 0.04;
+  const vals = C.polls.concat(B.polls).map((p) => p.v).concat([100]);
+  const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10, hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
+  const years = [];
+  for (let y = Math.ceil(x0); y <= x1 + 0.001; y++) years.push({ x: y, label: String(y) });
+  const copyLegend = rows.map((r) => ({ label: r.name + " (latest " + r.lat.v.toFixed(1) + ")", color: r.color, kind: "line" }));
+  return (
+    <RdSec id="mood" cls="rd-mood" title="The economic mood" meta={"Confidence indices, 100 = neutral" + (narrow ? "" : ", Roy Morgan’s own series")}>
+      <RdHed head={head} dek={dek} />
+      <div className="card rd-card rd-mood-chart">
+        <div className="rd-un-ptitle"><b>Consumer and business confidence</b><span>index readings, 100 = neutral</span></div>
+        {rows.map((r) => (
+          <div key={r.id} className="rd-un-read">
+            <RdSwatch kind="line" color={r.color} />
+            <div>
+              <div className="rd-un-rtop"><b>{r.name}</b><span className="rd-un-rv">{r.lat.v.toFixed(1)}</span>{r.lat.chg != null && Math.abs(r.lat.chg) >= 0.05 && <span className="rd-un-rci">{rdArrow(r.lat.chg)} {Math.abs(r.lat.chg).toFixed(1)} on the {r.period}</span>}</div>
+              <p>{r.short}</p>
+            </div>
+          </div>
+        ))}
+        <TrendChart key="rd-mood" heightPx={narrow ? 260 : 340}
+          padPx={narrow ? { l: 34, r: 8, t: 10, b: 28 } : { l: 40, r: 16, t: 14, b: 30 }}
+          xDomain={[x0, x1]} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => String(v)}
+          xTicks={years} baseline
+          refLines={[{ y: 100, label: "100 = neutral", align: "left", color: "var(--ink-3)" }]}
+          series={rows.map((r) => ({ id: r.id, label: r.name, color: r.color, rdWidth: 2.2, endCap: false,
+            endLabel: narrow ? null : r.name, points: series(r.s.polls.filter((p) => p.x >= x0), "v") }))}
+          spine={series(C.polls.filter((p) => p.x >= x0), "v")}
+          scatter={rows.flatMap((r) => r.s.polls.filter((p) => p.x >= x0).map((q) => ({ x: q.x, y: q.v, color: r.color, label: r.name, meta: { pollster: r.by } })))}
+          tooltipTitle={(i) => { const p = C.polls.filter((q) => q.x >= x0)[i]; return p ? monthLabelFull(p.ym) : ""; }}
+          fmt={(v) => v.toFixed(1)}
+          copy={{ title: "Consumer and business confidence",
+                  sub: head + " ANZ–Roy Morgan Consumer Confidence, weekly, and Roy Morgan Business Confidence, monthly; on each index 100 separates optimists from pessimists.",
+                  caption: "Each dot is one Roy Morgan release; the lines join the house’s own published readings back to 2019 — no averaging or adjustment.",
+                  legend: copyLegend }} />
+        <RdKey className="rd-ckey" items={[
+          { kind: "dot", color: "var(--ink-3)", label: "One release" },
+          { kind: "line", color: "var(--ink-3)", label: "The published index readings, joined" },
+        ]} />
+      </div>
+      <HowTo paras={[
+        <>These are Roy Morgan’s own index series, set out as published: the weekly ANZ–Roy Morgan consumer index and the monthly business index, back to 2019 so today’s reading can be seen against COVID and the recovery. No averaging, no adjustment for lean, no election anchor is applied.</>,
+        <>On each index 100 is neutral — above it optimists outnumber pessimists. Reading the mood beside the polls is context, not a predictor of the vote.</>,
+      ]} />
+      <RdFoot how={{ term: "mood", from: "The economic mood" }}>Weekly consumer and monthly business readings from Roy Morgan, the term-long record behind today’s mood. Context, not a predictor.</RdFoot>
+    </RdSec>
+  );
+}
+
+Object.assign(window, { RdPrimary, rdShareWords, rdPartyIn, rdPartyStart, rdElectionTicks, RdLeadership, RdHeadBar, RdDirection, rdList, rdRoughPts, RdDemographics, RdSwitching, useRdWidth, RdIssues, RdUndecided, RdMood, RdShiftPlot, rdOneIn, RdTsig, rdTsSgn });

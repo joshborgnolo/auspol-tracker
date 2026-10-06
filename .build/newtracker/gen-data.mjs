@@ -1938,6 +1938,13 @@ const SEC_ISSUES_FILE = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "sec-issues.json"), "utf8")); }
   catch { return null; }
 })();
+/* The mood panel's series (§5j): business and consumer confidence, built by
+   .build/mood.mjs from Roy Morgan's own releases. */
+const MOOD_FILE = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "mood.json"), "utf8")); }
+  catch { return null; }
+})();
 const ISSUE_SHARED = ["col", "housing", "health", "economy", "immigration", "climate", "crime", "security"];
 const ISS_ONLY = new Set(["Ipsos"]);   // issues houses with no poll/direction rows to join
 const ISS_BY = new Map();              // "date|pollster" → the wave's issues payload
@@ -2376,6 +2383,28 @@ const firmness = firmWaves.length >= FIRM_POOL ? (() => {
     base: { from: firmWaves[0].dateLabel, to: firmWaves[FIRM_POOL - 1].dateLabel, ...firmPooled(firmWaves.slice(0, FIRM_POOL)) },
   };
 })() : null;
+
+/* ---- 5j. the mood – business and consumer confidence -----------------------
+   Roy Morgan's two sentiment indices (data/mood.json, built by
+   .build/mood.mjs from the house's own releases): the ANZ-Roy Morgan
+   Consumer Confidence weekly reading and the monthly Business Confidence.
+   Both are index series with 100 as neutral, so like the undecided lines
+   they are a house's own series, not an aggregate – no house effect is
+   estimable against a single publisher, and no election-result anchor
+   exists to adjust toward. The panel draws the published series; the
+   current reading is the latest release, with the change it printed. */
+const mood = MOOD_FILE ? Object.fromEntries(["consumer", "business"].map((k) => {
+  const s = MOOD_FILE[k];
+  const polls = s.rows.map((r) => ({ x: dx(r.date), ym: ymOf(r.date), released: r.date, v: r.v, chg: r.chg ?? null, url: r.url }))
+    .filter((r) => r.x >= dx("2019-08-13"))   // the feed's dense coverage begins here
+    .sort((a, b) => a.x - b.x);
+  const last = polls[polls.length - 1];
+  return [k, {
+    label: s.label, base: s.base,
+    polls,
+    latest: last ? { v: last.v, chg: last.chg, released: last.released, url: last.url } : null,
+  }];
+})) : null;
 
 /* ---- 5b. where One Nation's gains came from ------------------------------
    From the vote-switching tables DemosAU and YouGov publish (built into
@@ -5295,8 +5324,9 @@ const out = `/* auspol tracker – REAL Australian ${JUR ? JUR.adj + " state" : 
    every monthly estimate deflates a house's repeat waves in the month to
    the square root of their number, the same rule the nowcast window applies.
    Opposition-leader figures splice Sussan Ley → Angus Taylor (13 Feb 2026);
-   the opposition slot is an office, not a person.  "National direction"
-   carries no source series yet and renders an empty state. */
+   the opposition slot is an office, not a person.  "The mood" pairs Roy
+   Morgan's consumer- and business-confidence indices (the house's own
+   series, 100 = neutral) – context, not a predictor. */
 
 window.AUSPOL = (function () {
   const PARTIES = {
@@ -5438,6 +5468,10 @@ window.AUSPOL = (function () {
   const issuesOnlyPolls = ${JSON.stringify(issuesOnlyPolls)};
   const directionAvailable = ${direction.length > 0};
   const undecided = ${JSON.stringify(undecided)};
+  /* The mood (§5j): Roy Morgan's consumer- and business-confidence index
+     series, 100 = neutral, one publisher apiece – the published line, not
+     an aggregate. */
+  const mood = ${JSON.stringify(mood)};
   /* How firm each party's vote is (§5c2): RedBridge's vote-softness table,
      the share of each party's voters certain of their vote. */
   const firmness = ${JSON.stringify(firmness)};
@@ -5552,7 +5586,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, mood, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

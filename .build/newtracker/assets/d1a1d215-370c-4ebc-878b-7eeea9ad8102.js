@@ -7213,6 +7213,23 @@ function infoTerms(D) {
         the election is tested within each pollster’s own polls, with the bar raised for testing
         several lines at once.</span></>) },
       entries: [] },
+    { id: "s-mood", title: "The economic mood", nav: "Mood",
+      lead: { id: "mood", body: (
+        <>Two confidence series, both Roy Morgan’s own: the ANZ–Roy Morgan Consumer Confidence
+        index, published weekly, and Roy Morgan’s Business Confidence index, published monthly.
+        The chart shows every release back to 2019, when both series began their current run.
+        <span className="info-p"><b>100 is neutral.</b> Each index is built from the balance of
+        optimists and pessimists on Roy Morgan’s questions, so a reading above 100 means optimists
+        outnumber pessimists and one below 100 the reverse.</span>
+        <span className="info-p"><b>Drawn as published.</b> Each point is a release’s own
+        headline figure, linked to it; the site does no averaging and applies no
+        {" "}{xref("house-effect", "mood", "house-effect")} adjustment, so this is a record, not an
+        estimate. The change shown beside each index is the one Roy Morgan printed with it, kept
+        only where it agrees with the previous printed reading.</span>
+        <span className="info-p"><b>Context, not a predictor.</b> The series sit below the term’s
+        polls because the mood of the economy frames what voters hear; neither series forecasts
+        how they’ll answer.</span></>) },
+      entries: [] },
     { id: "s-cycles", title: "Past cycles", nav: "Past cycles",
       lead: { id: "past-cycles", body: (
         <>Every term since 1972, lined up on its own election day, so a given month is the same

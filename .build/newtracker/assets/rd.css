@@ -1083,6 +1083,8 @@ body.rd .rd-dir-uns > span { position: absolute; bottom: calc(100% + 6px); left:
 body.rd .rd-dir-net { margin: 32px 0 0; font-size: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 body.rd .rd-dir-net b { font-weight: 600; color: var(--ink); }
 body.rd .rd-dir-chart { margin-top: 40px; }
+/* the economic mood's single card sits at the same drop as direction's */
+body.rd .rd-mood-chart { margin-top: 40px; }
 body.rd .view-how { margin-top: 16px; }
 @media (max-width: 640px) {
   /* centred over its block at the bar's edge the label would hit the
@@ -1099,6 +1101,7 @@ body.rd .view-how { margin-top: 16px; }
      caption's gap, well inside the 28px the section then steps to the chart */
   body.rd .rd-dir-net { margin-top: 14px; font-size: 14px; text-align: center; }
   body.rd .rd-dir-chart { margin-top: 28px; }
+  body.rd .rd-mood-chart { margin-top: 28px; }
 }
 
 /* ---------- who votes for whom --------------------------------------------- */

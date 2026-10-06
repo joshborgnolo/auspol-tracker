@@ -1947,6 +1947,7 @@ const DemographicsMemo = React.memo(DemographicsPanel);
 const OnSourcesMemo = React.memo(OnSourcesPanel);
 const IssuesMemo = React.memo(IssuesPanel);
 const UndecidedMemo = React.memo(UndecidedPanel);
+const MoodMemo = React.memo(MoodPanel);
 
 function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup, setTppMatchup, tppBasis, setTppBasis }) {
   /* The redesign sets its range tabs over the two-party and primary-vote
@@ -2000,6 +2001,9 @@ function SnapshotView({ rangeId: heroRange, setRangeId, showScatter, tppMatchup,
         {/* closes the page: the electorate's mood rather than its party
             choice - how many can't say who they would vote for */}
         <UndecidedMemo rangeId={rangeId} />
+        {/* the coda after decidedness: how confident voters and businesses
+            feel, on Roy Morgan's own indices - context, not a predictor */}
+        <MoodMemo rangeId={rangeId} />
       </>}
     </>
   );

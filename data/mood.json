@@ -1,0 +1,3039 @@
+{
+ "_about": "Business and consumer confidence, from Roy Morgan's findings feed. consumer: ANZ-Roy Morgan Consumer Confidence (weekly; feed coverage dense from Aug 2019; 100 = neutral). business: Roy Morgan Business Confidence (monthly since 2019). Rows: {date, v, chg (printed period change, null when none printed or unreconciled), url, slug}. Built by .build/mood.mjs — see its header.",
+ "consumer": {
+  "label": "ANZ-Roy Morgan Consumer Confidence",
+  "base": "ANZ-Roy Morgan, index, 100 = neutral",
+  "rows": [
+   {
+    "date": "2016-12-13",
+    "v": 113.4,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-plunges-to-113-4-down-5-2pts-after-shockingly-weak-gdp-data",
+    "slug": "anz-roy-morgan-consumer-confidence-plunges-to-113-4-down-5-2pts-after-shockingly-weak-gdp-data"
+   },
+   {
+    "date": "2019-02-19",
+    "v": 115.2,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-australian-consumer-confidence-recovers-to-115-2",
+    "slug": "anz-roy-morgan-australian-consumer-confidence-recovers-to-115-2"
+   },
+   {
+    "date": "2019-08-13",
+    "v": 115.5,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-115-5",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-115-5"
+   },
+   {
+    "date": "2019-08-20",
+    "v": 112.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-to-112-8",
+    "slug": "anz-roy-morgan-consumer-confidence-down-to-112-8"
+   },
+   {
+    "date": "2019-08-27",
+    "v": 114.1,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-to-114-1",
+    "slug": "anz-roy-morgan-consumer-confidence-up-to-114-1"
+   },
+   {
+    "date": "2019-09-10",
+    "v": 113.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-falls-to-113-3",
+    "slug": "anz-roy-morgan-consumer-confidence-falls-to-113-3"
+   },
+   {
+    "date": "2019-09-17",
+    "v": 109.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-to-a-two-year-low-at-109-3",
+    "slug": "anz-roy-morgan-consumer-confidence-down-to-a-two-year-low-at-109-3"
+   },
+   {
+    "date": "2019-09-24",
+    "v": 110.1,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-consolidates-to-110-1",
+    "slug": "anz-roy-morgan-consumer-confidence-consolidates-to-110-1"
+   },
+   {
+    "date": "2019-10-01",
+    "v": 114.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-jumps-to-114-7",
+    "slug": "anz-roy-morgan-consumer-confidence-jumps-to-114-7"
+   },
+   {
+    "date": "2019-10-08",
+    "v": 112.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-reverses-to-112-3",
+    "slug": "anz-roy-morgan-consumer-confidence-reverses-to-112-3"
+   },
+   {
+    "date": "2019-10-15",
+    "v": 110.9,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-to-110-9",
+    "slug": "anz-roy-morgan-consumer-confidence-down-to-110-9"
+   },
+   {
+    "date": "2019-10-22",
+    "v": 111.6,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-recovering-to-111-6",
+    "slug": "anz-roy-morgan-consumer-confidence-recovering-to-111-6"
+   },
+   {
+    "date": "2019-10-29",
+    "v": 110.4,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-slips-to-110-4",
+    "slug": "anz-roy-morgan-consumer-confidence-slips-to-110-4"
+   },
+   {
+    "date": "2019-11-05",
+    "v": 113.5,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-to-113-5",
+    "slug": "anz-roy-morgan-consumer-confidence-up-to-113-5"
+   },
+   {
+    "date": "2019-11-12",
+    "v": 111.1,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-to-111-1",
+    "slug": "anz-roy-morgan-consumer-confidence-down-to-111-1"
+   },
+   {
+    "date": "2019-11-19",
+    "v": 109.9,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-to-109-9",
+    "slug": "anz-roy-morgan-consumer-confidence-down-to-109-9"
+   },
+   {
+    "date": "2019-11-26",
+    "v": 106.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-falls-to-106-8",
+    "slug": "anz-roy-morgan-consumer-confidence-falls-to-106-8"
+   },
+   {
+    "date": "2019-12-03",
+    "v": 108.1,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-to-108-1",
+    "slug": "anz-roy-morgan-consumer-confidence-up-to-108-1"
+   },
+   {
+    "date": "2019-12-10",
+    "v": 109,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-to-109-0",
+    "slug": "anz-roy-morgan-consumer-confidence-up-to-109-0"
+   },
+   {
+    "date": "2019-12-17",
+    "v": 108,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-to-108-0",
+    "slug": "anz-roy-morgan-consumer-confidence-down-to-108-0"
+   },
+   {
+    "date": "2020-01-14",
+    "v": 107.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-bounces-to-107-3",
+    "slug": "anz-roy-morgan-consumer-confidence-bounces-to-107-3"
+   },
+   {
+    "date": "2020-01-21",
+    "v": 108.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-rises-to-108-3",
+    "slug": "anz-roy-morgan-consumer-confidence-rises-to-108-3"
+   },
+   {
+    "date": "2020-01-29",
+    "v": 108,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-108-0",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-108-0"
+   },
+   {
+    "date": "2020-02-11",
+    "v": 107.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-to-107-8",
+    "slug": "anz-roy-morgan-consumer-confidence-down-to-107-8"
+   },
+   {
+    "date": "2020-02-18",
+    "v": 109.1,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-to-109-1",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-to-109-1"
+   },
+   {
+    "date": "2020-02-25",
+    "v": 108.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-decreases-to-108-3",
+    "slug": "anz-roy-morgan-consumer-confidence-decreases-to-108-3"
+   },
+   {
+    "date": "2020-03-03",
+    "v": 104.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-tumbles-to-104-8",
+    "slug": "anz-roy-morgan-consumer-confidence-tumbles-to-104-8"
+   },
+   {
+    "date": "2020-03-10",
+    "v": 100.4,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-falls-sharply-to-100-4",
+    "slug": "anz-roy-morgan-consumer-confidence-falls-sharply-to-100-4"
+   },
+   {
+    "date": "2020-03-17",
+    "v": 100,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-hits-decade-low-at-100-0",
+    "slug": "anz-roy-morgan-consumer-confidence-hits-decade-low-at-100-0"
+   },
+   {
+    "date": "2020-03-24",
+    "v": 72.2,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-plunges-to-30-year-low-at-72-2",
+    "slug": "anz-roy-morgan-consumer-confidence-plunges-to-30-year-low-at-72-2"
+   },
+   {
+    "date": "2020-03-31",
+    "v": 65.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-plunges-to-lowest-historical-record-at-65-3",
+    "slug": "anz-roy-morgan-consumer-confidence-plunges-to-lowest-historical-record-at-65-3"
+   },
+   {
+    "date": "2020-04-07",
+    "v": 71.9,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-bounces-from-historical-low-to-71-9",
+    "slug": "anz-roy-morgan-consumer-confidence-bounces-from-historical-low-to-71-9"
+   },
+   {
+    "date": "2020-04-15",
+    "v": 78.2,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-lifts-to-78-2",
+    "slug": "anz-roy-morgan-consumer-confidence-lifts-to-78-2"
+   },
+   {
+    "date": "2020-04-21",
+    "v": 84.2,
+    "chg": 6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-third-straight-week-up-6pts-to-84-2",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-third-straight-week-up-6pts-to-84-2"
+   },
+   {
+    "date": "2020-04-28",
+    "v": 85,
+    "chg": 0.8,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-fourth-straight-week-up-0-8pts-to-85-0",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-fourth-straight-week-up-0-8pts-to-85-0"
+   },
+   {
+    "date": "2020-05-05",
+    "v": 89.5,
+    "chg": 4.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-fifth-straight-week-up-4-5pts-to-89-5",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-fifth-straight-week-up-4-5pts-to-89-5"
+   },
+   {
+    "date": "2020-05-12",
+    "v": 90.3,
+    "chg": 0.8,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-sixth-straight-week-up-0-8pts-to-90-3",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-sixth-straight-week-up-0-8pts-to-90-3"
+   },
+   {
+    "date": "2020-05-19",
+    "v": 92.3,
+    "chg": 2,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-seventh-straight-week-up-2-0pts-to-92-3",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-seventh-straight-week-up-2-0pts-to-92-3"
+   },
+   {
+    "date": "2020-05-26",
+    "v": 92.7,
+    "chg": 0.4,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-eighth-straight-week-up-0-4pts-to-92-7",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-eighth-straight-week-up-0-4pts-to-92-7"
+   },
+   {
+    "date": "2020-06-02",
+    "v": 98.3,
+    "chg": 5.6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-ninth-straight-week-up-5-6pts-to-98-3",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-ninth-straight-week-up-5-6pts-to-98-3"
+   },
+   {
+    "date": "2020-06-10",
+    "v": 97,
+    "chg": -1.3,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-ends-record-nine-week-run-down-1-3pts-to-97-0",
+    "slug": "anz-roy-morgan-consumer-confidence-ends-record-nine-week-run-down-1-3pts-to-97-0"
+   },
+   {
+    "date": "2020-06-16",
+    "v": 97.5,
+    "chg": 0.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-0-5pts-to-97-5",
+    "slug": "anz-roy-morgan-consumer-confidence-up-0-5pts-to-97-5"
+   },
+   {
+    "date": "2020-06-23",
+    "v": 97.5,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-unchanged-at-97-5",
+    "slug": "anz-roy-morgan-consumer-confidence-unchanged-at-97-5"
+   },
+   {
+    "date": "2020-06-29",
+    "v": 93,
+    "chg": -4.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-4-5-pts-to-93-0-after-covid-19-cases-surge-in-melbourne",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-4-5-pts-to-93-0-after-covid-19-cases-surge-in-melbourne"
+   },
+   {
+    "date": "2020-07-07",
+    "v": 92.1,
+    "chg": -0.9,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-0-9-pts-to-92-1-after-covid-19-cases-surge-in-melbourne-forcing-melbourne-back-into-lockdown-for-six-weeks-starting-midnight-tomorrow-wednesday-july-8",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-0-9-pts-to-92-1-after-covid-19-cases-surge-in-melbourne-forcing-melbourne-back-into-lockdown-for-six-weeks-starting-midnight-tomorrow-wednesday-july-8"
+   },
+   {
+    "date": "2020-07-14",
+    "v": 91.6,
+    "chg": -0.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-slips-0-5-pts-to-91-6-after-melbourne-forced-back-into-lockdown-after-surge-of-covid-19-cases",
+    "slug": "anz-roy-morgan-consumer-confidence-slips-0-5-pts-to-91-6-after-melbourne-forced-back-into-lockdown-after-surge-of-covid-19-cases"
+   },
+   {
+    "date": "2020-07-21",
+    "v": 90.7,
+    "chg": -0.9,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-slips-0-9-pts-to-90-7-but-down-2-6pts-to-84-8-in-melbourne-as-covid-19-cases-surge",
+    "slug": "anz-roy-morgan-consumer-confidence-slips-0-9-pts-to-90-7-but-down-2-6pts-to-84-8-in-melbourne-as-covid-19-cases-surge"
+   },
+   {
+    "date": "2020-07-28",
+    "v": 89,
+    "chg": -1.7,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-1-7-pts-to-89-0-driven-by-falls-in-melbourne-and-sydney",
+    "slug": "anz-roy-morgan-consumer-confidence-down-1-7-pts-to-89-0-driven-by-falls-in-melbourne-and-sydney"
+   },
+   {
+    "date": "2020-08-04",
+    "v": 88.6,
+    "chg": -0.4,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-slips-0-4-pts-to-88-6-before-melbourne-enters-stage-4-restrictions-on-sunday-night",
+    "slug": "anz-roy-morgan-consumer-confidence-slips-0-4-pts-to-88-6-before-melbourne-enters-stage-4-restrictions-on-sunday-night"
+   },
+   {
+    "date": "2020-08-11",
+    "v": 86.5,
+    "chg": -2.1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-2-1pts-to-86-5-driven-down-by-consumer-confidence-in-melbourne-plunging-4-1pts-to-81-in-first-week-of-stage-4-lockdown",
+    "slug": "anz-roy-morgan-consumer-confidence-down-2-1pts-to-86-5-driven-down-by-consumer-confidence-in-melbourne-plunging-4-1pts-to-81-in-first-week-of-stage-4-lockdown"
+   },
+   {
+    "date": "2020-08-18",
+    "v": 88.6,
+    "chg": 2.1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-2-1pts-to-88-6-as-new-cases-of-covid-19-in-victoria-continue-decline-from-august-5-peak",
+    "slug": "anz-roy-morgan-consumer-confidence-up-2-1pts-to-88-6-as-new-cases-of-covid-19-in-victoria-continue-decline-from-august-5-peak"
+   },
+   {
+    "date": "2020-08-25",
+    "v": 92.7,
+    "chg": 4.1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-4-1pts-to-92-7-as-new-cases-of-covid-19-in-victoria-plunge-to-lowest-since-early-july",
+    "slug": "anz-roy-morgan-consumer-confidence-up-4-1pts-to-92-7-as-new-cases-of-covid-19-in-victoria-plunge-to-lowest-since-early-july"
+   },
+   {
+    "date": "2020-09-01",
+    "v": 90.2,
+    "chg": -2.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-2-5pts-to-90-2-as-new-outbreaks-of-covid-19-continue-in-nsw-queensland",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-2-5pts-to-90-2-as-new-outbreaks-of-covid-19-continue-in-nsw-queensland"
+   },
+   {
+    "date": "2020-09-08",
+    "v": 91.1,
+    "chg": 0.9,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-0-9pts-to-91-1-before-premier-daniel-andrews-confirmed-extension-of-victorian-lockdown",
+    "slug": "anz-roy-morgan-consumer-confidence-up-0-9pts-to-91-1-before-premier-daniel-andrews-confirmed-extension-of-victorian-lockdown"
+   },
+   {
+    "date": "2020-09-15",
+    "v": 92.4,
+    "chg": 1.3,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-3pts-to-92-4-as-new-cases-of-covid-19-in-victoria-continued-declining",
+    "slug": "anz-roy-morgan-consumer-confidence-up-1-3pts-to-92-4-as-new-cases-of-covid-19-in-victoria-continued-declining"
+   },
+   {
+    "date": "2020-09-22",
+    "v": 93.5,
+    "chg": 1.1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-1pts-to-93-5-as-new-cases-of-covid-19-continue-decline-and-restrictions-ease-in-country-victoria",
+    "slug": "anz-roy-morgan-consumer-confidence-up-1-1pts-to-93-5-as-new-cases-of-covid-19-continue-decline-and-restrictions-ease-in-country-victoria"
+   },
+   {
+    "date": "2020-09-29",
+    "v": 95,
+    "chg": 1.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-fourth-straight-week-up-1-5pts-to-95-0-driven-by-increases-in-sydney-perth-but-down-4-8-points-in-melbourne-to-86-9",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-fourth-straight-week-up-1-5pts-to-95-0-driven-by-increases-in-sydney-perth-but-down-4-8-points-in-melbourne-to-86-9"
+   },
+   {
+    "date": "2020-10-06",
+    "v": 95.7,
+    "chg": 0.7,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-fifth-straight-week-up-0-7pts-to-95-7-driven-by-increases-in-melbourne-adelaide",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-fifth-straight-week-up-0-7pts-to-95-7-driven-by-increases-in-melbourne-adelaide"
+   },
+   {
+    "date": "2020-10-13",
+    "v": 97.7,
+    "chg": 2,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-sixth-straight-week-up-2pts-to-97-7-up-in-melbourne-brisbane-perth",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-sixth-straight-week-up-2pts-to-97-7-up-in-melbourne-brisbane-perth"
+   },
+   {
+    "date": "2020-10-20",
+    "v": 98.1,
+    "chg": 0.4,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-seventh-straight-week-up-0-4pts-to-98-1-up-in-brisbane-sydney-down-in-melbourne",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-seventh-straight-week-up-0-4pts-to-98-1-up-in-brisbane-sydney-down-in-melbourne"
+   },
+   {
+    "date": "2020-10-27",
+    "v": 99.7,
+    "chg": 1.6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-eighth-straight-week-up-1-6pts-to-99-7-up-in-sydney-melbourne-perth",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-eighth-straight-week-up-1-6pts-to-99-7-up-in-sydney-melbourne-perth"
+   },
+   {
+    "date": "2020-11-03",
+    "v": 99.9,
+    "chg": 0.2,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-ninth-straight-week-up-0-2pts-to-99-9-up-in-melbourne-as-16-week-lockdown-ends",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-ninth-straight-week-up-0-2pts-to-99-9-up-in-melbourne-as-16-week-lockdown-ends"
+   },
+   {
+    "date": "2020-11-10",
+    "v": 103.1,
+    "chg": 3.2,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-tenth-straight-week-up-3-2pts-to-103-1-first-time-above-100-since-early-march",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-tenth-straight-week-up-3-2pts-to-103-1-first-time-above-100-since-early-march"
+   },
+   {
+    "date": "2020-11-17",
+    "v": 106.6,
+    "chg": 3.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-eleventh-straight-week-up-3-5pts-to-106-6-highest-since-late-february",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-eleventh-straight-week-up-3-5pts-to-106-6-highest-since-late-february"
+   },
+   {
+    "date": "2020-11-24",
+    "v": 104.5,
+    "chg": -2.1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-2-1pts-to-104-5-ending-record-streak-of-eleven-consecutive-weekly-increases",
+    "slug": "anz-roy-morgan-consumer-confidence-down-2-1pts-to-104-5-ending-record-streak-of-eleven-consecutive-weekly-increases"
+   },
+   {
+    "date": "2020-12-01",
+    "v": 107.5,
+    "chg": 3,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-3pts-to-107-5-as-confidence-grows-about-australias-economic-performance-over-the-next-year",
+    "slug": "anz-roy-morgan-consumer-confidence-up-3pts-to-107-5-as-confidence-grows-about-australias-economic-performance-over-the-next-year"
+   },
+   {
+    "date": "2020-12-15",
+    "v": 111.2,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-9pts-to-111-2-as-australians-become-more-confident-about-their-personal-finances",
+    "slug": "anz-roy-morgan-consumer-confidence-up-1-9pts-to-111-2-as-australians-become-more-confident-about-their-personal-finances"
+   },
+   {
+    "date": "2020-12-22",
+    "v": 109,
+    "chg": -2.2,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-2-2pts-to-109-0-as-sydney-covid-19-outbreak-dents-confidence-leading-up-to-christmas",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-2-2pts-to-109-0-as-sydney-covid-19-outbreak-dents-confidence-leading-up-to-christmas"
+   },
+   {
+    "date": "2021-01-12",
+    "v": 108.9,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-108-9-to-start-2021-but-2-7pts-higher-than-a-year-ago",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-108-9-to-start-2021-but-2-7pts-higher-than-a-year-ago"
+   },
+   {
+    "date": "2021-01-19",
+    "v": 108.7,
+    "chg": -0.2,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-slightly-to-108-7-0-4pts-higher-than-the-same-weekend-a-year-ago",
+    "slug": "anz-roy-morgan-consumer-confidence-down-slightly-to-108-7-0-4pts-higher-than-the-same-weekend-a-year-ago"
+   },
+   {
+    "date": "2021-01-27",
+    "v": 111.2,
+    "chg": 2.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-2-5pts-to-111-2-now-3-2pts-higher-than-the-same-weekend-a-year-ago",
+    "slug": "anz-roy-morgan-consumer-confidence-up-2-5pts-to-111-2-now-3-2pts-higher-than-the-same-weekend-a-year-ago"
+   },
+   {
+    "date": "2021-02-02",
+    "v": 112.1,
+    "chg": 0.9,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-0-9pts-to-112-1-boosted-by-greater-confidence-about-personal-finances",
+    "slug": "anz-roy-morgan-consumer-confidence-up-0-9pts-to-112-1-boosted-by-greater-confidence-about-personal-finances"
+   },
+   {
+    "date": "2021-02-09",
+    "v": 111.4,
+    "chg": -0.7,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-0-7pts-to-111-4-following-quarantine-breach-in-melbourne",
+    "slug": "anz-roy-morgan-consumer-confidence-down-0-7pts-to-111-4-following-quarantine-breach-in-melbourne"
+   },
+   {
+    "date": "2021-02-16",
+    "v": 109.9,
+    "chg": -1.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-declines-1-5pts-to-109-9-during-victorias-5-day-lockdown-and-border-closures",
+    "slug": "anz-roy-morgan-consumer-confidence-declines-1-5pts-to-109-9-during-victorias-5-day-lockdown-and-border-closures"
+   },
+   {
+    "date": "2021-02-23",
+    "v": 109.2,
+    "chg": -0.7,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-0-7pts-to-109-2-following-victorias-five-day-lockdown",
+    "slug": "anz-roy-morgan-consumer-confidence-down-0-7pts-to-109-2-following-victorias-five-day-lockdown"
+   },
+   {
+    "date": "2021-03-02",
+    "v": 110.3,
+    "chg": 1.1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-1pts-to-110-3-as-covid-19-vaccine-rollout-begins-confidence-up-in-victoria-after-third-lockdown-ends",
+    "slug": "anz-roy-morgan-consumer-confidence-up-1-1pts-to-110-3-as-covid-19-vaccine-rollout-begins-confidence-up-in-victoria-after-third-lockdown-ends"
+   },
+   {
+    "date": "2021-03-09",
+    "v": 111.9,
+    "chg": 1.6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-6pts-to-111-9",
+    "slug": "anz-roy-morgan-consumer-confidence-up-1-6pts-to-111-9"
+   },
+   {
+    "date": "2021-03-16",
+    "v": 110.9,
+    "chg": -1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-1pt-to-110-9",
+    "slug": "anz-roy-morgan-consumer-confidence-down-1pt-to-110-9"
+   },
+   {
+    "date": "2021-03-23",
+    "v": 110.4,
+    "chg": -0.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-0-5pts-to-110-4",
+    "slug": "anz-roy-morgan-consumer-confidence-down-0-5pts-to-110-4"
+   },
+   {
+    "date": "2021-03-30",
+    "v": 112.3,
+    "chg": 1.9,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-9pts-to-112-3",
+    "slug": "anz-roy-morgan-consumer-confidence-up-1-9pts-to-112-3"
+   },
+   {
+    "date": "2021-04-07",
+    "v": 107.7,
+    "chg": -4.6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-4-6pts-to-107-7-after-greater-brisbane-goes-into-lockdown-lowest-since-november-2020",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-4-6pts-to-107-7-after-greater-brisbane-goes-into-lockdown-lowest-since-november-2020"
+   },
+   {
+    "date": "2021-04-13",
+    "v": 114.1,
+    "chg": 6.4,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-6-4pts-to-114-1-after-greater-brisbane-lockdown-ends-highest-since-september-2019",
+    "slug": "anz-roy-morgan-consumer-confidence-up-6-4pts-to-114-1-after-greater-brisbane-lockdown-ends-highest-since-september-2019"
+   },
+   {
+    "date": "2021-04-20",
+    "v": 114,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-114-0",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-114-0"
+   },
+   {
+    "date": "2021-04-27",
+    "v": 112.4,
+    "chg": -1.6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-1-6pts-to-112-4-as-greater-perth-enters-three-day-lockdown",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-1-6pts-to-112-4-as-greater-perth-enters-three-day-lockdown"
+   },
+   {
+    "date": "2021-05-04",
+    "v": 112.7,
+    "chg": 0.3,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-slightly-to-112-7",
+    "slug": "anz-roy-morgan-consumer-confidence-up-slightly-to-112-7"
+   },
+   {
+    "date": "2021-05-11",
+    "v": 111.6,
+    "chg": -1.1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-slightly-by-1-1pts-to-111-6-driven-by-steep-fall-in-sydney-as-new-covid-19-cases-discovered",
+    "slug": "anz-roy-morgan-consumer-confidence-down-slightly-by-1-1pts-to-111-6-driven-by-steep-fall-in-sydney-as-new-covid-19-cases-discovered"
+   },
+   {
+    "date": "2021-05-25",
+    "v": 114.2,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-to-114-2-and-now-at-its-highest-since-sep-2019-pre-pandemic",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-to-114-2-and-now-at-its-highest-since-sep-2019-pre-pandemic"
+   },
+   {
+    "date": "2021-06-01",
+    "v": 111.4,
+    "chg": -2.8,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-2-8pts-to-111-4-as-melbourne-victoria-enter-lockdown-4-0",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-2-8pts-to-111-4-as-melbourne-victoria-enter-lockdown-4-0"
+   },
+   {
+    "date": "2021-06-08",
+    "v": 110.7,
+    "chg": -0.7,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-0-7pts-to-110-7-after-melbournes-lockdown-is-extended-into-a-second-week",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-0-7pts-to-110-7-after-melbournes-lockdown-is-extended-into-a-second-week"
+   },
+   {
+    "date": "2021-06-16",
+    "v": 111,
+    "chg": 0.3,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-0-3pts-to-111-0-after-melbournes-two-week-lockdown-ends-but-restrictions-remain",
+    "slug": "anz-roy-morgan-consumer-confidence-up-0-3pts-to-111-0-after-melbournes-two-week-lockdown-ends-but-restrictions-remain"
+   },
+   {
+    "date": "2021-06-21",
+    "v": 112.2,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-112-2-but-down-in-sydney-4-6-as-melbourne-recovers-2-4",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-112-2-but-down-in-sydney-4-6-as-melbourne-recovers-2-4"
+   },
+   {
+    "date": "2021-06-22",
+    "v": 112.4,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-4pts-to-112-4-after-melbournes-restrictions-ease-further",
+    "slug": "anz-roy-morgan-consumer-confidence-up-1-4pts-to-112-4-after-melbournes-restrictions-ease-further"
+   },
+   {
+    "date": "2021-07-13",
+    "v": 110,
+    "chg": 2.2,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-2-2pts-to-110-0-after-government-increases-support-to-those-in-lockdown-in-nsw",
+    "slug": "anz-roy-morgan-consumer-confidence-up-2-2pts-to-110-0-after-government-increases-support-to-those-in-lockdown-in-nsw"
+   },
+   {
+    "date": "2021-07-20",
+    "v": 104.3,
+    "chg": -5.7,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-plunges-5-7pts-to-104-3-its-lowest-since-early-november-2020-as-lockdown-extended-in-sydney-and-melbourne-goes-into-fifth-lockdown",
+    "slug": "anz-roy-morgan-consumer-confidence-plunges-5-7pts-to-104-3-its-lowest-since-early-november-2020-as-lockdown-extended-in-sydney-and-melbourne-goes-into-fifth-lockdown"
+   },
+   {
+    "date": "2021-07-27",
+    "v": 100.7,
+    "chg": -3.6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-a-further-3-6pts-to-100-7-as-covid-19-cases-numbers-remain-stubbornly-high-in-nsw-despite-lockdown",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-a-further-3-6pts-to-100-7-as-covid-19-cases-numbers-remain-stubbornly-high-in-nsw-despite-lockdown"
+   },
+   {
+    "date": "2021-08-03",
+    "v": 101.8,
+    "chg": 1.1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-slightly-to-101-8-as-melbourne-adelaide-lockdowns-end",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-slightly-to-101-8-as-melbourne-adelaide-lockdowns-end"
+   },
+   {
+    "date": "2021-08-10",
+    "v": 98.6,
+    "chg": -3.2,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-below-neutral-level-of-100-after-se-queensland-victoria-plunged-into-lockdown",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-below-neutral-level-of-100-after-se-queensland-victoria-plunged-into-lockdown"
+   },
+   {
+    "date": "2021-08-17",
+    "v": 101.1,
+    "chg": 2.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-bounces-back-into-positive-territory-after-south-east-queensland-emerges-from-lockdown",
+    "slug": "anz-roy-morgan-consumer-confidence-bounces-back-into-positive-territory-after-south-east-queensland-emerges-from-lockdown"
+   },
+   {
+    "date": "2021-08-24",
+    "v": 101.6,
+    "chg": 0.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-slightly-to-101-6-despite-lockdown-extensions-in-sydney-melbourne-and-canberra",
+    "slug": "anz-roy-morgan-consumer-confidence-up-slightly-to-101-6-despite-lockdown-extensions-in-sydney-melbourne-and-canberra"
+   },
+   {
+    "date": "2021-08-31",
+    "v": 101.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-101-8-as-vaccination-levels-rise-but-lockdowns-continue",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-101-8-as-vaccination-levels-rise-but-lockdowns-continue"
+   },
+   {
+    "date": "2021-09-07",
+    "v": 100,
+    "chg": -1.8,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-falls-1-8pts-to-a-neutral-result-of-100-0-with-positive-and-negative-sentiment-now-evenly-balanced",
+    "slug": "anz-roy-morgan-consumer-confidence-falls-1-8pts-to-a-neutral-result-of-100-0-with-positive-and-negative-sentiment-now-evenly-balanced"
+   },
+   {
+    "date": "2021-09-14",
+    "v": 103.1,
+    "chg": 3.1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-3-1pts-to-103-1-after-nsw-government-outlines-re-opening-plan-for-mid-october",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-3-1pts-to-103-1-after-nsw-government-outlines-re-opening-plan-for-mid-october"
+   },
+   {
+    "date": "2021-09-21",
+    "v": 103.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-103-3-before-victorian-re-opening-plan-outlined-on-sunday",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-103-3-before-victorian-re-opening-plan-outlined-on-sunday"
+   },
+   {
+    "date": "2021-09-28",
+    "v": 103.7,
+    "chg": 0.4,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-for-third-straight-week-to-103-7-as-australians-focused-on-domestic-issues",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-for-third-straight-week-to-103-7-as-australians-focused-on-domestic-issues"
+   },
+   {
+    "date": "2021-10-26",
+    "v": 106.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-106-8-as-melbournes-sixth-lockdown-ends",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-106-8-as-melbournes-sixth-lockdown-ends"
+   },
+   {
+    "date": "2021-11-02",
+    "v": 108.4,
+    "chg": 1.6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-6pts-to-108-4-highest-since-early-july",
+    "slug": "anz-roy-morgan-consumer-confidence-up-1-6pts-to-108-4-highest-since-early-july"
+   },
+   {
+    "date": "2021-11-09",
+    "v": 109,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-109-0-up-0-6pts-in-the-first-week-of-november-up-in-sydney-but-down-in-melbourne",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-109-0-up-0-6pts-in-the-first-week-of-november-up-in-sydney-but-down-in-melbourne"
+   },
+   {
+    "date": "2021-11-11",
+    "v": 98.6,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-continued-to-slowly-increase-this-week-but-there-were-divergent-moves-in-re-opened-sydney-and-melbourne",
+    "slug": "anz-roy-morgan-consumer-confidence-continued-to-slowly-increase-this-week-but-there-were-divergent-moves-in-re-opened-sydney-and-melbourne"
+   },
+   {
+    "date": "2021-11-16",
+    "v": 106,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-3pts-to-106-0-as-worries-about-inflation-mount",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-3pts-to-106-0-as-worries-about-inflation-mount"
+   },
+   {
+    "date": "2021-12-07",
+    "v": 107.5,
+    "chg": 1.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-1-5pts-to-107-5-as-vaccination-rates-continue-to-rise",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-1-5pts-to-107-5-as-vaccination-rates-continue-to-rise"
+   },
+   {
+    "date": "2021-12-14",
+    "v": 108,
+    "chg": 0.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-0-5pts-to-108-0-in-the-leadup-to-christmas-but-falls-6-2pts-in-nsw",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-0-5pts-to-108-0-in-the-leadup-to-christmas-but-falls-6-2pts-in-nsw"
+   },
+   {
+    "date": "2021-12-21",
+    "v": 108.4,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-108-4-in-the-leadup-to-the-holidays",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-108-4-in-the-leadup-to-the-holidays"
+   },
+   {
+    "date": "2022-01-02",
+    "v": 101.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increased-1-7pts-to-101-8pts-as-omicron-wave-of-covid-19-continues-to-recede",
+    "slug": "anz-roy-morgan-consumer-confidence-increased-1-7pts-to-101-8pts-as-omicron-wave-of-covid-19-continues-to-recede"
+   },
+   {
+    "date": "2022-01-11",
+    "v": 106,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-2-4pts-to-106-0-in-the-first-week-of-2022",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-2-4pts-to-106-0-in-the-first-week-of-2022"
+   },
+   {
+    "date": "2022-01-18",
+    "v": 97.9,
+    "chg": -8.1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-8-1pts-to-97-9-as-omicron-variant-surges-and-there-are-shortages-of-pcr-tests-rapid-antigen-tests-and-broader-supply-chain-issues",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-8-1pts-to-97-9-as-omicron-variant-surges-and-there-are-shortages-of-pcr-tests-rapid-antigen-tests-and-broader-supply-chain-issues"
+   },
+   {
+    "date": "2022-02-08",
+    "v": 99.9,
+    "chg": -1.9,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-decreases-1-9pts-to-99-9-as-western-australias-border-remains-closed",
+    "slug": "anz-roy-morgan-consumer-confidence-decreases-1-9pts-to-99-9-as-western-australias-border-remains-closed"
+   },
+   {
+    "date": "2022-02-15",
+    "v": 103.2,
+    "chg": 3.3,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-3-3pts-to-103-2-as-the-omicron-variant-continues-to-recede-around-australia",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-3-3pts-to-103-2-as-the-omicron-variant-continues-to-recede-around-australia"
+   },
+   {
+    "date": "2022-02-22",
+    "v": 101.8,
+    "chg": -1.4,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-slightly-by-1-4pts-to-101-8-in-the-third-week-of-february",
+    "slug": "anz-roy-morgan-consumer-confidence-down-slightly-by-1-4pts-to-101-8-in-the-third-week-of-february"
+   },
+   {
+    "date": "2022-03-01",
+    "v": 99.2,
+    "chg": -2.6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-by-2-6pts-to-99-2-as-flooding-impacts-queensland-and-covid-soars-in-wa",
+    "slug": "anz-roy-morgan-consumer-confidence-down-by-2-6pts-to-99-2-as-flooding-impacts-queensland-and-covid-soars-in-wa"
+   },
+   {
+    "date": "2022-03-08",
+    "v": 100.1,
+    "chg": 0.9,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-0-9pts-to-100-1-as-omicron-variant-recedes-but-floods-and-geopolitical-troubles-mount",
+    "slug": "anz-roy-morgan-consumer-confidence-up-0-9pts-to-100-1-as-omicron-variant-recedes-but-floods-and-geopolitical-troubles-mount"
+   },
+   {
+    "date": "2022-03-15",
+    "v": 95.8,
+    "chg": -4.3,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-4-3pts-to-95-8-as-russian-invasion-of-ukraine-causes-spike-in-fuel-prices",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-4-3pts-to-95-8-as-russian-invasion-of-ukraine-causes-spike-in-fuel-prices"
+   },
+   {
+    "date": "2022-03-22",
+    "v": 91.2,
+    "chg": -4.6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-4-6pts-to-91-2-as-nation-faces-a-jump-in-fuel-prices-lowest-since-september-2020",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-4-6pts-to-91-2-as-nation-faces-a-jump-in-fuel-prices-lowest-since-september-2020"
+   },
+   {
+    "date": "2022-03-29",
+    "v": 91.1,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-91-1-after-two-weeks-of-steep-falls",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-91-1-after-two-weeks-of-steep-falls"
+   },
+   {
+    "date": "2022-04-05",
+    "v": 93.4,
+    "chg": 2.3,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-2-3-points-to-93-4-as-average-petrol-prices-drop-significantly",
+    "slug": "anz-roy-morgan-consumer-confidence-up-2-3-points-to-93-4-as-average-petrol-prices-drop-significantly"
+   },
+   {
+    "date": "2022-04-12",
+    "v": 94.6,
+    "chg": 1.2,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-2-points-to-94-6-as-average-petrol-prices-now-down-40-cents-per-litre-from-peak",
+    "slug": "anz-roy-morgan-consumer-confidence-up-1-2-points-to-94-6-as-average-petrol-prices-now-down-40-cents-per-litre-from-peak"
+   },
+   {
+    "date": "2022-04-20",
+    "v": 96.8,
+    "chg": 2.2,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-2-2-points-to-96-8-as-petrol-prices-continue-to-decrease-now-down-46-cents-in-four-weeks",
+    "slug": "anz-roy-morgan-consumer-confidence-up-2-2-points-to-96-8-as-petrol-prices-continue-to-decrease-now-down-46-cents-in-four-weeks"
+   },
+   {
+    "date": "2022-04-27",
+    "v": 96.5,
+    "chg": -0.3,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-96-5-as-many-australians-enjoy-a-week-away-between-easter-anzac-day",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-96-5-as-many-australians-enjoy-a-week-away-between-easter-anzac-day"
+   },
+   {
+    "date": "2022-05-03",
+    "v": 90.7,
+    "chg": -5.8,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-5-8pts-to-90-7-as-inflation-is-reported-higher-than-expected-and-interest-rate-rises-are-predicted",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-5-8pts-to-90-7-as-inflation-is-reported-higher-than-expected-and-interest-rate-rises-are-predicted"
+   },
+   {
+    "date": "2022-05-24",
+    "v": 90.8,
+    "chg": 1.5,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-increases-1-5-points-to-90-8-in-the-lead-up-to-the-federal-election",
+    "slug": "anz-roy-morgan-consumer-confidence-increases-1-5-points-to-90-8-in-the-lead-up-to-the-federal-election"
+   },
+   {
+    "date": "2022-05-31",
+    "v": 90.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-90-7-following-anthony-albanese-led-alps-election-victory",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-90-7-following-anthony-albanese-led-alps-election-victory"
+   },
+   {
+    "date": "2022-06-07",
+    "v": 87,
+    "chg": -3.7,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-3-7pts-to-87-as-rba-set-to-increase-interest-rates-again",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-3-7pts-to-87-as-rba-set-to-increase-interest-rates-again"
+   },
+   {
+    "date": "2022-06-15",
+    "v": 80.4,
+    "chg": -6.6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-6-6pts-to-80-4-after-rba-increases-interest-rates-by-0-50-largest-increase-for-over-20-years",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-6-6pts-to-80-4-after-rba-increases-interest-rates-by-0-50-largest-increase-for-over-20-years"
+   },
+   {
+    "date": "2022-06-21",
+    "v": 81.7,
+    "chg": 1.3,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-3pts-to-81-7-while-inflation-expectations-soar-to-highest-since-late-march",
+    "slug": "anz-roy-morgan-consumer-confidence-up-1-3pts-to-81-7-while-inflation-expectations-soar-to-highest-since-late-march"
+   },
+   {
+    "date": "2022-06-28",
+    "v": 84.7,
+    "chg": 3,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-3pts-to-84-7-as-buying-intentions-improve-for-eofy-sales",
+    "slug": "anz-roy-morgan-consumer-confidence-up-3pts-to-84-7-as-buying-intentions-improve-for-eofy-sales"
+   },
+   {
+    "date": "2022-07-05",
+    "v": 83.7,
+    "chg": -1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-1pt-to-83-7-as-rba-set-to-raise-interest-rates-for-third-month-in-a-row",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-1pt-to-83-7-as-rba-set-to-raise-interest-rates-for-third-month-in-a-row"
+   },
+   {
+    "date": "2022-07-12",
+    "v": 81.6,
+    "chg": -2.1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-2-1pts-to-81-6-lowest-rating-for-a-month",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-2-1pts-to-81-6-lowest-rating-for-a-month"
+   },
+   {
+    "date": "2022-07-19",
+    "v": 81.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-81-8-after-albanese-reinstates-750-covid-payments",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-81-8-after-albanese-reinstates-750-covid-payments"
+   },
+   {
+    "date": "2022-07-26",
+    "v": 82.4,
+    "chg": 0.6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-slightly-by-0-6pts-to-82-4-a-second-straight-weekly-increase",
+    "slug": "anz-roy-morgan-consumer-confidence-up-slightly-by-0-6pts-to-82-4-a-second-straight-weekly-increase"
+   },
+   {
+    "date": "2022-08-02",
+    "v": 84.1,
+    "chg": 1.7,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-by-1-7pts-to-84-1-a-third-straight-weekly-increase",
+    "slug": "anz-roy-morgan-consumer-confidence-up-by-1-7pts-to-84-1-a-third-straight-weekly-increase"
+   },
+   {
+    "date": "2022-08-09",
+    "v": 80.3,
+    "chg": -3.8,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-drops-by-3-8pts-to-80-3-after-rba-raises-interest-rates-for-fourth-straight-month",
+    "slug": "anz-roy-morgan-consumer-confidence-drops-by-3-8pts-to-80-3-after-rba-raises-interest-rates-for-fourth-straight-month"
+   },
+   {
+    "date": "2022-08-16",
+    "v": 84.2,
+    "chg": 3.9,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-rebounds-up-by-3-9pts-to-84-2-highest-since-late-june-2022",
+    "slug": "anz-roy-morgan-consumer-confidence-rebounds-up-by-3-9pts-to-84-2-highest-since-late-june-2022"
+   },
+   {
+    "date": "2022-08-23",
+    "v": 85.6,
+    "chg": 1.4,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-by-1-4pts-to-85-6-highest-since-early-june-2022",
+    "slug": "anz-roy-morgan-consumer-confidence-up-by-1-4pts-to-85-6-highest-since-early-june-2022"
+   },
+   {
+    "date": "2022-08-30",
+    "v": 85,
+    "chg": -0.6,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-down-slightly-by-0-6pts-to-85-0-in-late-august-as-buying-intentions-worsen",
+    "slug": "anz-roy-morgan-consumer-confidence-down-slightly-by-0-6pts-to-85-0-in-late-august-as-buying-intentions-worsen"
+   },
+   {
+    "date": "2022-09-06",
+    "v": 86.1,
+    "chg": 1.1,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-by-1-1pts-to-86-1-highest-for-three-months-since-early-june",
+    "slug": "anz-roy-morgan-consumer-confidence-up-by-1-1pts-to-86-1-highest-for-three-months-since-early-june"
+   },
+   {
+    "date": "2022-09-13",
+    "v": 85.7,
+    "chg": -0.4,
+    "url": "https://www.roymorgan.com/findings/9065-anz-roy-morgan-consumer-confidence-september-13",
+    "slug": "9065-anz-roy-morgan-consumer-confidence-september-13"
+   },
+   {
+    "date": "2022-09-20",
+    "v": 86,
+    "chg": 0.3,
+    "url": "https://www.roymorgan.com/findings/9070-anz-roy-morgan-consumer-confidence-september-20",
+    "slug": "9070-anz-roy-morgan-consumer-confidence-september-20"
+   },
+   {
+    "date": "2022-09-27",
+    "v": 87.8,
+    "chg": 1.8,
+    "url": "https://www.roymorgan.com/findings/9075-anz-roy-morgan-consumer-confidence-september-27",
+    "slug": "9075-anz-roy-morgan-consumer-confidence-september-27"
+   },
+   {
+    "date": "2022-10-04",
+    "v": 85.5,
+    "chg": -2.3,
+    "url": "https://www.roymorgan.com/findings/9080-anz-roy-morgan-consumer-confidence-october-4",
+    "slug": "9080-anz-roy-morgan-consumer-confidence-october-4"
+   },
+   {
+    "date": "2022-10-11",
+    "v": 84.6,
+    "chg": -0.9,
+    "url": "https://www.roymorgan.com/findings/9085-anz-roy-morgan-consumer-confidence-october-11",
+    "slug": "9085-anz-roy-morgan-consumer-confidence-october-11"
+   },
+   {
+    "date": "2022-10-18",
+    "v": 82.2,
+    "chg": -2.4,
+    "url": "https://www.roymorgan.com/findings/9090-anz-roy-morgan-consumer-confidence-october-18",
+    "slug": "9090-anz-roy-morgan-consumer-confidence-october-18"
+   },
+   {
+    "date": "2022-10-25",
+    "v": 81.1,
+    "chg": -1.1,
+    "url": "https://www.roymorgan.com/findings/9095-anz-roy-morgan-consumer-confidence-october-25",
+    "slug": "9095-anz-roy-morgan-consumer-confidence-october-25"
+   },
+   {
+    "date": "2022-11-01",
+    "v": 79.9,
+    "chg": -1.2,
+    "url": "https://www.roymorgan.com/findings/9100-anz-roy-morgan-consumer-confidence-november-1",
+    "slug": "9100-anz-roy-morgan-consumer-confidence-november-1"
+   },
+   {
+    "date": "2022-11-08",
+    "v": 78.7,
+    "chg": -1.2,
+    "url": "https://www.roymorgan.com/findings/9105-anz-roy-morgan-consumer-confidence-november-8",
+    "slug": "9105-anz-roy-morgan-consumer-confidence-november-8"
+   },
+   {
+    "date": "2022-11-15",
+    "v": 80.8,
+    "chg": 2.1,
+    "url": "https://www.roymorgan.com/findings/9110-anz-roy-morgan-consumer-confidence-november-15",
+    "slug": "9110-anz-roy-morgan-consumer-confidence-november-15"
+   },
+   {
+    "date": "2022-11-22",
+    "v": 81.6,
+    "chg": 0.8,
+    "url": "https://www.roymorgan.com/findings/9115-anz-roy-morgan-consumer-confidence-november-22",
+    "slug": "9115-anz-roy-morgan-consumer-confidence-november-22"
+   },
+   {
+    "date": "2022-11-29",
+    "v": 83.1,
+    "chg": 1.5,
+    "url": "https://www.roymorgan.com/findings/9120-anz-roy-morgan-consumer-confidence-november-29",
+    "slug": "9120-anz-roy-morgan-consumer-confidence-november-29"
+   },
+   {
+    "date": "2022-12-06",
+    "v": 82.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9125-anz-roy-morgan-consumer-confidence-december-6",
+    "slug": "9125-anz-roy-morgan-consumer-confidence-december-6"
+   },
+   {
+    "date": "2022-12-13",
+    "v": 82.9,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9130-anz-roy-morgan-consumer-confidence-december-13",
+    "slug": "9130-anz-roy-morgan-consumer-confidence-december-13"
+   },
+   {
+    "date": "2022-12-20",
+    "v": 82.5,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9135-anz-roy-morgan-consumer-confidence-december-20",
+    "slug": "9135-anz-roy-morgan-consumer-confidence-december-20"
+   },
+   {
+    "date": "2023-01-10",
+    "v": 87.4,
+    "chg": 4.9,
+    "url": "https://www.roymorgan.com/findings/9140-anz-roy-morgan-consumer-confidence-january-10",
+    "slug": "9140-anz-roy-morgan-consumer-confidence-january-10"
+   },
+   {
+    "date": "2023-01-17",
+    "v": 87.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-virtually-unchanged-at-87-7-in-second-week-of-january-highest-since-september-2022",
+    "slug": "anz-roy-morgan-consumer-confidence-virtually-unchanged-at-87-7-in-second-week-of-january-highest-since-september-2022"
+   },
+   {
+    "date": "2023-01-24",
+    "v": 85.9,
+    "chg": -1.8,
+    "url": "https://www.roymorgan.com/findings/9150-anz-roy-morgan-consumer-confidence-january-24",
+    "slug": "9150-anz-roy-morgan-consumer-confidence-january-24"
+   },
+   {
+    "date": "2023-01-31",
+    "v": 86.8,
+    "chg": 0.9,
+    "url": "https://www.roymorgan.com/findings/9155-anz-roy-morgan-consumer-confidence-january-31",
+    "slug": "9155-anz-roy-morgan-consumer-confidence-january-31"
+   },
+   {
+    "date": "2023-02-07",
+    "v": 83.6,
+    "chg": -3.2,
+    "url": "https://www.roymorgan.com/findings/9160-anz-roy-morgan-consumer-confidence-february-7",
+    "slug": "9160-anz-roy-morgan-consumer-confidence-february-7"
+   },
+   {
+    "date": "2023-02-14",
+    "v": 78.1,
+    "chg": -5.5,
+    "url": "https://www.roymorgan.com/findings/9165-anz-roy-morgan-consumer-confidence-february-14",
+    "slug": "9165-anz-roy-morgan-consumer-confidence-february-14"
+   },
+   {
+    "date": "2023-02-21",
+    "v": 80.4,
+    "chg": 2.3,
+    "url": "https://www.roymorgan.com/findings/9170-anz-roy-morgan-consumer-confidence-february-21",
+    "slug": "9170-anz-roy-morgan-consumer-confidence-february-21"
+   },
+   {
+    "date": "2023-02-28",
+    "v": 80,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9175-anz-roy-morgan-consumer-confidence-february-28",
+    "slug": "9175-anz-roy-morgan-consumer-confidence-february-28"
+   },
+   {
+    "date": "2023-03-07",
+    "v": 79.9,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9180-anz-roy-morgan-consumer-confidence-march-7",
+    "slug": "9180-anz-roy-morgan-consumer-confidence-march-7"
+   },
+   {
+    "date": "2023-03-14",
+    "v": 77,
+    "chg": -2.9,
+    "url": "https://www.roymorgan.com/findings/9185-anz-roy-morgan-consumer-confidence-march-14",
+    "slug": "9185-anz-roy-morgan-consumer-confidence-march-14"
+   },
+   {
+    "date": "2023-03-21",
+    "v": 76.5,
+    "chg": -0.5,
+    "url": "https://www.roymorgan.com/findings/9190-anz-roy-morgan-consumer-confidence-march-21",
+    "slug": "9190-anz-roy-morgan-consumer-confidence-march-21"
+   },
+   {
+    "date": "2023-03-28",
+    "v": 76.6,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9195-anz-roy-morgan-consumer-confidence-march-28",
+    "slug": "9195-anz-roy-morgan-consumer-confidence-march-28"
+   },
+   {
+    "date": "2023-04-04",
+    "v": 78.2,
+    "chg": 1.6,
+    "url": "https://www.roymorgan.com/findings/9200-anz-roy-morgan-consumer-confidence-april-4",
+    "slug": "9200-anz-roy-morgan-consumer-confidence-april-4"
+   },
+   {
+    "date": "2023-04-12",
+    "v": 79.3,
+    "chg": 1.1,
+    "url": "https://www.roymorgan.com/findings/9205-anz-roy-morgan-consumer-confidence-april-12",
+    "slug": "9205-anz-roy-morgan-consumer-confidence-april-12"
+   },
+   {
+    "date": "2023-04-18",
+    "v": 77.2,
+    "chg": -2.1,
+    "url": "https://www.roymorgan.com/findings/9210-anz-roy-morgan-consumer-confidence-april-18",
+    "slug": "9210-anz-roy-morgan-consumer-confidence-april-18"
+   },
+   {
+    "date": "2023-04-26",
+    "v": 78,
+    "chg": 0.8,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-was-up-0-8pts-to-78-0",
+    "slug": "anz-roy-morgan-consumer-confidence-was-up-0-8pts-to-78-0"
+   },
+   {
+    "date": "2023-05-02",
+    "v": 79.8,
+    "chg": 1.8,
+    "url": "https://www.roymorgan.com/findings/anz-roy-morgan-consumer-confidence-up-1-8pts-to-79-8-and-has-now-spent-a-record-nine-straight-weeks-below-80",
+    "slug": "anz-roy-morgan-consumer-confidence-up-1-8pts-to-79-8-and-has-now-spent-a-record-nine-straight-weeks-below-80"
+   },
+   {
+    "date": "2023-05-09",
+    "v": 77.7,
+    "chg": -2.1,
+    "url": "https://www.roymorgan.com/findings/9225-anz-roy-morgan-consumer-confidence-may-9",
+    "slug": "9225-anz-roy-morgan-consumer-confidence-may-9"
+   },
+   {
+    "date": "2023-05-16",
+    "v": 75.9,
+    "chg": -1.8,
+    "url": "https://www.roymorgan.com/findings/9230-anz-roy-morgan-consumer-confidence-may-16",
+    "slug": "9230-anz-roy-morgan-consumer-confidence-may-16"
+   },
+   {
+    "date": "2023-05-23",
+    "v": 77.3,
+    "chg": 1.4,
+    "url": "https://www.roymorgan.com/findings/9235-anz-roy-morgan-consumer-confidence-may-23",
+    "slug": "9235-anz-roy-morgan-consumer-confidence-may-23"
+   },
+   {
+    "date": "2023-05-30",
+    "v": 76.2,
+    "chg": -1.1,
+    "url": "https://www.roymorgan.com/findings/9240-anz-roy-morgan-consumer-confidence-may-30",
+    "slug": "9240-anz-roy-morgan-consumer-confidence-may-30"
+   },
+   {
+    "date": "2023-06-06",
+    "v": 75.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9245-anz-roy-morgan-consumer-confidence-june-6",
+    "slug": "9245-anz-roy-morgan-consumer-confidence-june-6"
+   },
+   {
+    "date": "2023-06-14",
+    "v": 72.7,
+    "chg": -3.1,
+    "url": "https://www.roymorgan.com/findings/9250-anz-roy-morgan-consumer-confidence-june-13",
+    "slug": "9250-anz-roy-morgan-consumer-confidence-june-13"
+   },
+   {
+    "date": "2023-06-20",
+    "v": 72.4,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9255-anz-roy-morgan-consumer-confidence-june-20",
+    "slug": "9255-anz-roy-morgan-consumer-confidence-june-20"
+   },
+   {
+    "date": "2023-06-27",
+    "v": 74.9,
+    "chg": 2.5,
+    "url": "https://www.roymorgan.com/findings/9260-anz-roy-morgan-consumer-confidence-june-27",
+    "slug": "9260-anz-roy-morgan-consumer-confidence-june-27"
+   },
+   {
+    "date": "2023-07-04",
+    "v": 74.1,
+    "chg": -0.8,
+    "url": "https://www.roymorgan.com/findings/9265-anz-roy-morgan-consumer-confidence-july-4",
+    "slug": "9265-anz-roy-morgan-consumer-confidence-july-4"
+   },
+   {
+    "date": "2023-07-11",
+    "v": 73.3,
+    "chg": -0.8,
+    "url": "https://www.roymorgan.com/findings/9270-anz-roy-morgan-consumer-confidence-july-11",
+    "slug": "9270-anz-roy-morgan-consumer-confidence-july-11"
+   },
+   {
+    "date": "2023-07-18",
+    "v": 72.6,
+    "chg": -0.7,
+    "url": "https://www.roymorgan.com/findings/9275-anz-roy-morgan-consumer-confidence-july-18",
+    "slug": "9275-anz-roy-morgan-consumer-confidence-july-18"
+   },
+   {
+    "date": "2023-07-25",
+    "v": 75.2,
+    "chg": 2.6,
+    "url": "https://www.roymorgan.com/findings/9280-anz-roy-morgan-consumer-confidence-july-25",
+    "slug": "9280-anz-roy-morgan-consumer-confidence-july-25"
+   },
+   {
+    "date": "2023-08-01",
+    "v": 78.4,
+    "chg": 3.2,
+    "url": "https://www.roymorgan.com/findings/9285-anz-roy-morgan-consumer-confidence-august-1",
+    "slug": "9285-anz-roy-morgan-consumer-confidence-august-1"
+   },
+   {
+    "date": "2023-08-08",
+    "v": 75,
+    "chg": -3.4,
+    "url": "https://www.roymorgan.com/findings/9290-anz-roy-morgan-consumer-confidence-august-8",
+    "slug": "9290-anz-roy-morgan-consumer-confidence-august-8"
+   },
+   {
+    "date": "2023-08-15",
+    "v": 78.2,
+    "chg": 3.2,
+    "url": "https://www.roymorgan.com/findings/9295-anz-roy-morgan-consumer-confidence-august-15",
+    "slug": "9295-anz-roy-morgan-consumer-confidence-august-15"
+   },
+   {
+    "date": "2023-08-22",
+    "v": 75.8,
+    "chg": -2.4,
+    "url": "https://www.roymorgan.com/findings/9300-anz-roy-morgan-consumer-confidence-august-22",
+    "slug": "9300-anz-roy-morgan-consumer-confidence-august-22"
+   },
+   {
+    "date": "2023-08-29",
+    "v": 78.1,
+    "chg": 2.3,
+    "url": "https://www.roymorgan.com/findings/9305-anz-roy-morgan-consumer-confidence-august-29",
+    "slug": "9305-anz-roy-morgan-consumer-confidence-august-29"
+   },
+   {
+    "date": "2023-09-05",
+    "v": 78.7,
+    "chg": 0.6,
+    "url": "https://www.roymorgan.com/findings/9310-anz-roy-morgan-consumer-confidence-september-5",
+    "slug": "9310-anz-roy-morgan-consumer-confidence-september-5"
+   },
+   {
+    "date": "2023-09-12",
+    "v": 77.6,
+    "chg": -1.1,
+    "url": "https://www.roymorgan.com/findings/9315-anz-roy-morgan-consumer-confidence-september-12",
+    "slug": "9315-anz-roy-morgan-consumer-confidence-september-12"
+   },
+   {
+    "date": "2023-09-19",
+    "v": 79.8,
+    "chg": 2.2,
+    "url": "https://www.roymorgan.com/findings/9320-anz-roy-morgan-consumer-confidence-september-19",
+    "slug": "9320-anz-roy-morgan-consumer-confidence-september-19"
+   },
+   {
+    "date": "2023-09-26",
+    "v": 76.4,
+    "chg": -3.4,
+    "url": "https://www.roymorgan.com/findings/9325-anz-roy-morgan-consumer-confidence-september-26",
+    "slug": "9325-anz-roy-morgan-consumer-confidence-september-26"
+   },
+   {
+    "date": "2023-10-03",
+    "v": 78.2,
+    "chg": 1.8,
+    "url": "https://www.roymorgan.com/findings/9330-anz-roy-morgan-consumer-confidence-october-3",
+    "slug": "9330-anz-roy-morgan-consumer-confidence-october-3"
+   },
+   {
+    "date": "2023-10-10",
+    "v": 80.1,
+    "chg": 1.9,
+    "url": "https://www.roymorgan.com/findings/9335-anz-roy-morgan-consumer-confidence-october-10",
+    "slug": "9335-anz-roy-morgan-consumer-confidence-october-10"
+   },
+   {
+    "date": "2023-10-17",
+    "v": 76.4,
+    "chg": -3.7,
+    "url": "https://www.roymorgan.com/findings/9340-anz-roy-morgan-consumer-confidence-october-17",
+    "slug": "9340-anz-roy-morgan-consumer-confidence-october-17"
+   },
+   {
+    "date": "2023-10-24",
+    "v": 78.2,
+    "chg": 1.8,
+    "url": "https://www.roymorgan.com/findings/9345-anz-roy-morgan-consumer-confidence-october-24",
+    "slug": "9345-anz-roy-morgan-consumer-confidence-october-24"
+   },
+   {
+    "date": "2023-10-31",
+    "v": 75,
+    "chg": -3.2,
+    "url": "https://www.roymorgan.com/findings/9350-anz-roy-morgan-consumer-confidence-october-31",
+    "slug": "9350-anz-roy-morgan-consumer-confidence-october-31"
+   },
+   {
+    "date": "2023-11-07",
+    "v": 77.8,
+    "chg": 2.8,
+    "url": "https://www.roymorgan.com/findings/9355-anz-roy-morgan-consumer-confidence-november-7",
+    "slug": "9355-anz-roy-morgan-consumer-confidence-november-7"
+   },
+   {
+    "date": "2023-11-14",
+    "v": 74.3,
+    "chg": -3.5,
+    "url": "https://www.roymorgan.com/findings/9360-anz-roy-morgan-consumer-confidence-november-14",
+    "slug": "9360-anz-roy-morgan-consumer-confidence-november-14"
+   },
+   {
+    "date": "2023-11-21",
+    "v": 74.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9365-anz-roy-morgan-consumer-confidence-november-21",
+    "slug": "9365-anz-roy-morgan-consumer-confidence-november-21"
+   },
+   {
+    "date": "2023-11-28",
+    "v": 76.7,
+    "chg": 2,
+    "url": "https://www.roymorgan.com/findings/9370-anz-roy-morgan-consumer-confidence-november-28",
+    "slug": "9370-anz-roy-morgan-consumer-confidence-november-28"
+   },
+   {
+    "date": "2023-12-05",
+    "v": 76.4,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9375-anz-roy-morgan-consumer-confidence-december-5",
+    "slug": "9375-anz-roy-morgan-consumer-confidence-december-5"
+   },
+   {
+    "date": "2023-12-12",
+    "v": 80.8,
+    "chg": 4.4,
+    "url": "https://www.roymorgan.com/findings/9380-anz-roy-morgan-consumer-confidence-december-12",
+    "slug": "9380-anz-roy-morgan-consumer-confidence-december-12"
+   },
+   {
+    "date": "2023-12-19",
+    "v": 81.8,
+    "chg": 1,
+    "url": "https://www.roymorgan.com/findings/9385-anz-roy-morgan-consumer-confidence-december-19",
+    "slug": "9385-anz-roy-morgan-consumer-confidence-december-19"
+   },
+   {
+    "date": "2024-01-09",
+    "v": 84.8,
+    "chg": 3,
+    "url": "https://www.roymorgan.com/findings/9390-anz-roy-morgan-consumer-confidence-january-9",
+    "slug": "9390-anz-roy-morgan-consumer-confidence-january-9"
+   },
+   {
+    "date": "2024-01-16",
+    "v": 84.4,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9395-anz-roy-morgan-consumer-confidence-january-16",
+    "slug": "9395-anz-roy-morgan-consumer-confidence-january-16"
+   },
+   {
+    "date": "2024-01-23",
+    "v": 84.4,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9400-anz-roy-morgan-consumer-confidence-january-23",
+    "slug": "9400-anz-roy-morgan-consumer-confidence-january-23"
+   },
+   {
+    "date": "2024-01-30",
+    "v": 82.5,
+    "chg": -1.9,
+    "url": "https://www.roymorgan.com/findings/9405-anz-roy-morgan-consumer-confidence-january-30",
+    "slug": "9405-anz-roy-morgan-consumer-confidence-january-30"
+   },
+   {
+    "date": "2024-02-06",
+    "v": 83.8,
+    "chg": 1.3,
+    "url": "https://www.roymorgan.com/findings/9410-anz-roy-morgan-consumer-confidence-febuary-6",
+    "slug": "9410-anz-roy-morgan-consumer-confidence-febuary-6"
+   },
+   {
+    "date": "2024-02-13",
+    "v": 82.6,
+    "chg": -1.2,
+    "url": "https://www.roymorgan.com/findings/9415-anz-roy-morgan-consumer-confidence-february-13",
+    "slug": "9415-anz-roy-morgan-consumer-confidence-february-13"
+   },
+   {
+    "date": "2024-02-20",
+    "v": 82.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9420-anz-roy-morgan-consumer-confidence-february-20",
+    "slug": "9420-anz-roy-morgan-consumer-confidence-february-20"
+   },
+   {
+    "date": "2024-02-27",
+    "v": 83.2,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9425-anz-roy-morgan-consumer-confidence-february-27",
+    "slug": "9425-anz-roy-morgan-consumer-confidence-february-27"
+   },
+   {
+    "date": "2024-03-05",
+    "v": 81,
+    "chg": -2.2,
+    "url": "https://www.roymorgan.com/findings/9430-anz-roy-morgan-consumer-confidence-march-5",
+    "slug": "9430-anz-roy-morgan-consumer-confidence-march-5"
+   },
+   {
+    "date": "2024-03-12",
+    "v": 82.2,
+    "chg": 1.2,
+    "url": "https://www.roymorgan.com/findings/9435-anz-roy-morgan-consumer-confidence-march-12",
+    "slug": "9435-anz-roy-morgan-consumer-confidence-march-12"
+   },
+   {
+    "date": "2024-03-19",
+    "v": 81.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9440-anz-roy-morgan-consumer-confidence-march-19",
+    "slug": "9440-anz-roy-morgan-consumer-confidence-march-19"
+   },
+   {
+    "date": "2024-03-26",
+    "v": 83.1,
+    "chg": 1.4,
+    "url": "https://www.roymorgan.com/findings/9445-anz-roy-morgan-consumer-confidence-march-26",
+    "slug": "9445-anz-roy-morgan-consumer-confidence-march-26"
+   },
+   {
+    "date": "2024-04-03",
+    "v": 82.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9450-anz-roy-morgan-consumer-confidence-april-3",
+    "slug": "9450-anz-roy-morgan-consumer-confidence-april-3"
+   },
+   {
+    "date": "2024-04-09",
+    "v": 81.9,
+    "chg": -0.9,
+    "url": "https://www.roymorgan.com/findings/9455-anz-roy-morgan-consumer-confidence-april-9",
+    "slug": "9455-anz-roy-morgan-consumer-confidence-april-9"
+   },
+   {
+    "date": "2024-04-16",
+    "v": 83.5,
+    "chg": 1.6,
+    "url": "https://www.roymorgan.com/findings/9460-anz-roy-morgan-consumer-confidence-april-16",
+    "slug": "9460-anz-roy-morgan-consumer-confidence-april-16"
+   },
+   {
+    "date": "2024-04-23",
+    "v": 80.3,
+    "chg": -3.2,
+    "url": "https://www.roymorgan.com/findings/9465-anz-roy-morgan-consumer-confidence-april-23",
+    "slug": "9465-anz-roy-morgan-consumer-confidence-april-23"
+   },
+   {
+    "date": "2024-04-30",
+    "v": 81.1,
+    "chg": 0.8,
+    "url": "https://www.roymorgan.com/findings/9470-anz-roy-morgan-consumer-confidence-april-30",
+    "slug": "9470-anz-roy-morgan-consumer-confidence-april-30"
+   },
+   {
+    "date": "2024-05-07",
+    "v": 80.5,
+    "chg": -0.6,
+    "url": "https://www.roymorgan.com/findings/9475-anz-roy-morgan-consumer-confidence-may-7",
+    "slug": "9475-anz-roy-morgan-consumer-confidence-may-7"
+   },
+   {
+    "date": "2024-05-14",
+    "v": 80.2,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9480-anz-roy-morgan-consumer-confidence-may-14",
+    "slug": "9480-anz-roy-morgan-consumer-confidence-may-14"
+   },
+   {
+    "date": "2024-05-21",
+    "v": 82,
+    "chg": 1.8,
+    "url": "https://www.roymorgan.com/findings/9485-anz-roy-morgan-consumer-confidence-may-21",
+    "slug": "9485-anz-roy-morgan-consumer-confidence-may-21"
+   },
+   {
+    "date": "2024-05-28",
+    "v": 80.2,
+    "chg": -1.8,
+    "url": "https://www.roymorgan.com/findings/9490-anz-roy-morgan-consumer-confidence-may-28",
+    "slug": "9490-anz-roy-morgan-consumer-confidence-may-28"
+   },
+   {
+    "date": "2024-06-04",
+    "v": 80.5,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9495-anz-roy-morgan-consumer-confidence-june-4",
+    "slug": "9495-anz-roy-morgan-consumer-confidence-june-4"
+   },
+   {
+    "date": "2024-06-12",
+    "v": 77,
+    "chg": -3.5,
+    "url": "https://www.roymorgan.com/findings/9500-anz-roy-morgan-consumer-confidence-june-12",
+    "slug": "9500-anz-roy-morgan-consumer-confidence-june-12"
+   },
+   {
+    "date": "2024-06-18",
+    "v": 80.3,
+    "chg": 3.3,
+    "url": "https://www.roymorgan.com/findings/9505-anz-roy-morgan-consumer-confidence-june-18",
+    "slug": "9505-anz-roy-morgan-consumer-confidence-june-18"
+   },
+   {
+    "date": "2024-06-25",
+    "v": 80.4,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9510-anz-roy-morgan-consumer-confidence-june-25",
+    "slug": "9510-anz-roy-morgan-consumer-confidence-june-25"
+   },
+   {
+    "date": "2024-07-02",
+    "v": 81.3,
+    "chg": 0.9,
+    "url": "https://www.roymorgan.com/findings/9515-anz-roy-morgan-consumer-confidence-july-2",
+    "slug": "9515-anz-roy-morgan-consumer-confidence-july-2"
+   },
+   {
+    "date": "2024-07-09",
+    "v": 79,
+    "chg": -2.3,
+    "url": "https://www.roymorgan.com/findings/9520-anz-roy-morgan-consumer-confidence-july-9",
+    "slug": "9520-anz-roy-morgan-consumer-confidence-july-9"
+   },
+   {
+    "date": "2024-07-16",
+    "v": 78.5,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9525-anz-roy-morgan-consumer-confidence-july-16",
+    "slug": "9525-anz-roy-morgan-consumer-confidence-july-16"
+   },
+   {
+    "date": "2024-07-23",
+    "v": 84.4,
+    "chg": 5.9,
+    "url": "https://www.roymorgan.com/findings/9530-anz-roy-morgan-consumer-confidence-july-23",
+    "slug": "9530-anz-roy-morgan-consumer-confidence-july-23"
+   },
+   {
+    "date": "2024-07-30",
+    "v": 83.1,
+    "chg": -1.3,
+    "url": "https://www.roymorgan.com/findings/9535-anz-roy-morgan-consumer-confidence-july-30",
+    "slug": "9535-anz-roy-morgan-consumer-confidence-july-30"
+   },
+   {
+    "date": "2024-08-06",
+    "v": 81.3,
+    "chg": -1.8,
+    "url": "https://www.roymorgan.com/findings/9540-anz-roy-morgan-consumer-confidence-august-6",
+    "slug": "9540-anz-roy-morgan-consumer-confidence-august-6"
+   },
+   {
+    "date": "2024-08-13",
+    "v": 83.9,
+    "chg": 2.6,
+    "url": "https://www.roymorgan.com/findings/9545-anz-roy-morgan-consumer-confidence-august-13",
+    "slug": "9545-anz-roy-morgan-consumer-confidence-august-13"
+   },
+   {
+    "date": "2024-08-20",
+    "v": 83,
+    "chg": -0.9,
+    "url": "https://www.roymorgan.com/findings/9550-anz-roy-morgan-consumer-confidence-august-20",
+    "slug": "9550-anz-roy-morgan-consumer-confidence-august-20"
+   },
+   {
+    "date": "2024-08-27",
+    "v": 82.6,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9555-anz-roy-morgan-consumer-confidence-august-27",
+    "slug": "9555-anz-roy-morgan-consumer-confidence-august-27"
+   },
+   {
+    "date": "2024-09-03",
+    "v": 83.1,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9560-anz-roy-morgan-consumer-confidence-september-3",
+    "slug": "9560-anz-roy-morgan-consumer-confidence-september-3"
+   },
+   {
+    "date": "2024-09-10",
+    "v": 82.3,
+    "chg": -0.8,
+    "url": "https://www.roymorgan.com/findings/9565-anz-roy-morgan-consumer-confidence-september-10",
+    "slug": "9565-anz-roy-morgan-consumer-confidence-september-10"
+   },
+   {
+    "date": "2024-09-17",
+    "v": 84.1,
+    "chg": 1.8,
+    "url": "https://www.roymorgan.com/findings/9570-anz-roy-morgan-consumer-confidence-september-17",
+    "slug": "9570-anz-roy-morgan-consumer-confidence-september-17"
+   },
+   {
+    "date": "2024-09-24",
+    "v": 84.9,
+    "chg": 0.8,
+    "url": "https://www.roymorgan.com/findings/9575-anz-roy-morgan-consumer-confidence-september-24",
+    "slug": "9575-anz-roy-morgan-consumer-confidence-september-24"
+   },
+   {
+    "date": "2024-10-01",
+    "v": 82,
+    "chg": -2.9,
+    "url": "https://www.roymorgan.com/findings/9580-anz-roy-morgan-consumer-confidence-october-1",
+    "slug": "9580-anz-roy-morgan-consumer-confidence-october-1"
+   },
+   {
+    "date": "2024-10-08",
+    "v": 83.5,
+    "chg": 1.5,
+    "url": "https://www.roymorgan.com/findings/9585-anz-roy-morgan-consumer-confidence-october-8",
+    "slug": "9585-anz-roy-morgan-consumer-confidence-october-8"
+   },
+   {
+    "date": "2024-10-15",
+    "v": 83.4,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9590-anz-roy-morgan-consumer-confidence-october-15",
+    "slug": "9590-anz-roy-morgan-consumer-confidence-october-15"
+   },
+   {
+    "date": "2024-10-22",
+    "v": 87.5,
+    "chg": 4.1,
+    "url": "https://www.roymorgan.com/findings/9595-anz-roy-morgan-consumer-confidence-october-22",
+    "slug": "9595-anz-roy-morgan-consumer-confidence-october-22"
+   },
+   {
+    "date": "2024-10-29",
+    "v": 86.4,
+    "chg": -1.1,
+    "url": "https://www.roymorgan.com/findings/9600-anz-roy-morgan-consumer-confidence-october-29",
+    "slug": "9600-anz-roy-morgan-consumer-confidence-october-29"
+   },
+   {
+    "date": "2024-11-05",
+    "v": 86.5,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9605-anz-roy-morgan-consumer-confidence-november-5",
+    "slug": "9605-anz-roy-morgan-consumer-confidence-november-5"
+   },
+   {
+    "date": "2024-11-12",
+    "v": 86.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9610-anz-roy-morgan-consumer-confidence-november-12",
+    "slug": "9610-anz-roy-morgan-consumer-confidence-november-12"
+   },
+   {
+    "date": "2024-11-19",
+    "v": 86.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9615-anz-roy-morgan-consumer-confidence-november-19",
+    "slug": "9615-anz-roy-morgan-consumer-confidence-november-19"
+   },
+   {
+    "date": "2024-11-26",
+    "v": 85.7,
+    "chg": -1.1,
+    "url": "https://www.roymorgan.com/findings/9620-anz-roy-morgan-consumer-confidence-november-26",
+    "slug": "9620-anz-roy-morgan-consumer-confidence-november-26"
+   },
+   {
+    "date": "2024-12-03",
+    "v": 88.4,
+    "chg": 2.7,
+    "url": "https://www.roymorgan.com/findings/9625-anz-roy-morgan-consumer-confidence-december-3",
+    "slug": "9625-anz-roy-morgan-consumer-confidence-december-3"
+   },
+   {
+    "date": "2024-12-10",
+    "v": 85.5,
+    "chg": -2.9,
+    "url": "https://www.roymorgan.com/findings/9630-anz-roy-morgan-consumer-confidence-december-10",
+    "slug": "9630-anz-roy-morgan-consumer-confidence-december-10"
+   },
+   {
+    "date": "2024-12-17",
+    "v": 83.9,
+    "chg": -1.6,
+    "url": "https://www.roymorgan.com/findings/9635-anz-roy-morgan-consumer-confidence-december-17",
+    "slug": "9635-anz-roy-morgan-consumer-confidence-december-17"
+   },
+   {
+    "date": "2025-01-07",
+    "v": 87.5,
+    "chg": 3.6,
+    "url": "https://www.roymorgan.com/findings/9640-anz-roy-morgan-consumer-confidence-january-7",
+    "slug": "9640-anz-roy-morgan-consumer-confidence-january-7"
+   },
+   {
+    "date": "2025-01-14",
+    "v": 87.1,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9645-anz-roy-morgan-consumer-confidence-january-14",
+    "slug": "9645-anz-roy-morgan-consumer-confidence-january-14"
+   },
+   {
+    "date": "2025-01-21",
+    "v": 85.8,
+    "chg": -1.3,
+    "url": "https://www.roymorgan.com/findings/9650-anz-roy-morgan-consumer-confidence-january-21",
+    "slug": "9650-anz-roy-morgan-consumer-confidence-january-21"
+   },
+   {
+    "date": "2025-01-29",
+    "v": 86,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9655-anz-roy-morgan-consumer-confidence-january-29",
+    "slug": "9655-anz-roy-morgan-consumer-confidence-january-29"
+   },
+   {
+    "date": "2025-02-04",
+    "v": 88.5,
+    "chg": 2.5,
+    "url": "https://www.roymorgan.com/findings/9660-anz-roy-morgan-consumer-confidence-february-4",
+    "slug": "9660-anz-roy-morgan-consumer-confidence-february-4"
+   },
+   {
+    "date": "2025-02-11",
+    "v": 86.7,
+    "chg": -1.8,
+    "url": "https://www.roymorgan.com/findings/9665-anz-roy-morgan-consumer-confidence-february-11",
+    "slug": "9665-anz-roy-morgan-consumer-confidence-february-11"
+   },
+   {
+    "date": "2025-02-18",
+    "v": 85.1,
+    "chg": -1.6,
+    "url": "https://www.roymorgan.com/findings/9670-anz-roy-morgan-consumer-confidence-february-18",
+    "slug": "9670-anz-roy-morgan-consumer-confidence-february-18"
+   },
+   {
+    "date": "2025-02-25",
+    "v": 89.8,
+    "chg": 4.7,
+    "url": "https://www.roymorgan.com/findings/9675-anz-roy-morgan-consumer-confidence-february-25",
+    "slug": "9675-anz-roy-morgan-consumer-confidence-february-25"
+   },
+   {
+    "date": "2025-03-04",
+    "v": 87.7,
+    "chg": -2.1,
+    "url": "https://www.roymorgan.com/findings/9680-anz-roy-morgan-consumer-confidence-march-4",
+    "slug": "9680-anz-roy-morgan-consumer-confidence-march-4"
+   },
+   {
+    "date": "2025-03-11",
+    "v": 86.9,
+    "chg": -0.8,
+    "url": "https://www.roymorgan.com/findings/9685-anz-roy-morgan-consumer-confidence-march-11",
+    "slug": "9685-anz-roy-morgan-consumer-confidence-march-11"
+   },
+   {
+    "date": "2025-03-18",
+    "v": 83.8,
+    "chg": -3.1,
+    "url": "https://www.roymorgan.com/findings/9690-anz-roy-morgan-consumer-confidence-march-17",
+    "slug": "9690-anz-roy-morgan-consumer-confidence-march-17"
+   },
+   {
+    "date": "2025-03-25",
+    "v": 84.2,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9695-anz-roy-morgan-consumer-confidence-march-25",
+    "slug": "9695-anz-roy-morgan-consumer-confidence-march-25"
+   },
+   {
+    "date": "2025-04-01",
+    "v": 85.3,
+    "chg": 1.1,
+    "url": "https://www.roymorgan.com/findings/9700-anz-roy-morgan-consumer-confidence-april-1",
+    "slug": "9700-anz-roy-morgan-consumer-confidence-april-1"
+   },
+   {
+    "date": "2025-04-08",
+    "v": 86.8,
+    "chg": 1.5,
+    "url": "https://www.roymorgan.com/findings/9705-anz-roy-morgan-consumer-confidence-april-8",
+    "slug": "9705-anz-roy-morgan-consumer-confidence-april-8"
+   },
+   {
+    "date": "2025-04-15",
+    "v": 84.2,
+    "chg": -2.6,
+    "url": "https://www.roymorgan.com/findings/9710-anz-roy-morgan-consumer-confidence-april-15",
+    "slug": "9710-anz-roy-morgan-consumer-confidence-april-15"
+   },
+   {
+    "date": "2025-04-23",
+    "v": 85.5,
+    "chg": 1.3,
+    "url": "https://www.roymorgan.com/findings/9715-anz-roy-morgan-consumer-confidence-april-23",
+    "slug": "9715-anz-roy-morgan-consumer-confidence-april-23"
+   },
+   {
+    "date": "2025-04-29",
+    "v": 83.4,
+    "chg": -2.1,
+    "url": "https://www.roymorgan.com/findings/9720-anz-roy-morgan-consumer-confidence-april-29",
+    "slug": "9720-anz-roy-morgan-consumer-confidence-april-29"
+   },
+   {
+    "date": "2025-05-06",
+    "v": 87.5,
+    "chg": 4.1,
+    "url": "https://www.roymorgan.com/findings/9725-anz-roy-morgan-consumer-confidence-may-6",
+    "slug": "9725-anz-roy-morgan-consumer-confidence-may-6"
+   },
+   {
+    "date": "2025-05-13",
+    "v": 88.3,
+    "chg": 0.8,
+    "url": "https://www.roymorgan.com/findings/9730-anz-roy-morgan-consumer-confidence-may-11",
+    "slug": "9730-anz-roy-morgan-consumer-confidence-may-11"
+   },
+   {
+    "date": "2025-05-20",
+    "v": 88.8,
+    "chg": 0.5,
+    "url": "https://www.roymorgan.com/findings/9735-anz-roy-morgan-consumer-confidence-may-18",
+    "slug": "9735-anz-roy-morgan-consumer-confidence-may-18"
+   },
+   {
+    "date": "2025-05-27",
+    "v": 87,
+    "chg": -1.8,
+    "url": "https://www.roymorgan.com/findings/9740-anz-roy-morgan-consumer-confidence-may-25",
+    "slug": "9740-anz-roy-morgan-consumer-confidence-may-25"
+   },
+   {
+    "date": "2025-06-02",
+    "v": 86.4,
+    "chg": -0.6,
+    "url": "https://www.roymorgan.com/findings/9745-anz-roy-morgan-consumer-confidence-june-3",
+    "slug": "9745-anz-roy-morgan-consumer-confidence-june-3"
+   },
+   {
+    "date": "2025-06-11",
+    "v": 86.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9750-anz-roy-morgan-consumer-confidence-june-8",
+    "slug": "9750-anz-roy-morgan-consumer-confidence-june-8"
+   },
+   {
+    "date": "2025-06-17",
+    "v": 85.4,
+    "chg": -1.3,
+    "url": "https://www.roymorgan.com/findings/9755-anz-roy-morgan-consumer-confidence-june-17",
+    "slug": "9755-anz-roy-morgan-consumer-confidence-june-17"
+   },
+   {
+    "date": "2025-06-24",
+    "v": 86.7,
+    "chg": 1.3,
+    "url": "https://www.roymorgan.com/findings/9760-anz-roy-morgan-consumer-confidence-june-24",
+    "slug": "9760-anz-roy-morgan-consumer-confidence-june-24"
+   },
+   {
+    "date": "2025-07-01",
+    "v": 87.2,
+    "chg": 0.5,
+    "url": "https://www.roymorgan.com/findings/9765-anz-roy-morgan-consumer-confidence-july-1",
+    "slug": "9765-anz-roy-morgan-consumer-confidence-july-1"
+   },
+   {
+    "date": "2025-07-08",
+    "v": 88.6,
+    "chg": 1.4,
+    "url": "https://www.roymorgan.com/findings/9770-anz-roy-morgan-consumer-confidence-july-8",
+    "slug": "9770-anz-roy-morgan-consumer-confidence-july-8"
+   },
+   {
+    "date": "2025-07-15",
+    "v": 86.5,
+    "chg": -2.1,
+    "url": "https://www.roymorgan.com/findings/9775-anz-roy-morgan-consumer-confidence-july-15",
+    "slug": "9775-anz-roy-morgan-consumer-confidence-july-15"
+   },
+   {
+    "date": "2025-07-22",
+    "v": 86.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9780-anz-roy-morgan-consumer-confidence-july-22",
+    "slug": "9780-anz-roy-morgan-consumer-confidence-july-22"
+   },
+   {
+    "date": "2025-07-29",
+    "v": 86.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9785-anz-roy-morgan-consumer-confidence-july-29",
+    "slug": "9785-anz-roy-morgan-consumer-confidence-july-29"
+   },
+   {
+    "date": "2025-08-05",
+    "v": 90.6,
+    "chg": 3.9,
+    "url": "https://www.roymorgan.com/findings/9790-anz-roy-morgan-consumer-confidence-august-5",
+    "slug": "9790-anz-roy-morgan-consumer-confidence-august-5"
+   },
+   {
+    "date": "2025-08-12",
+    "v": 89.3,
+    "chg": -1.3,
+    "url": "https://www.roymorgan.com/findings/9795-anz-roy-morgan-consumer-confidence-august-12",
+    "slug": "9795-anz-roy-morgan-consumer-confidence-august-12"
+   },
+   {
+    "date": "2025-08-19",
+    "v": 89.4,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9800-anz-roy-morgan-consumer-confidence-august-19",
+    "slug": "9800-anz-roy-morgan-consumer-confidence-august-19"
+   },
+   {
+    "date": "2025-08-26",
+    "v": 86,
+    "chg": -3.4,
+    "url": "https://www.roymorgan.com/findings/9805-anz-roy-morgan-consumer-confidence-august-26",
+    "slug": "9805-anz-roy-morgan-consumer-confidence-august-26"
+   },
+   {
+    "date": "2025-09-02",
+    "v": 88,
+    "chg": 2,
+    "url": "https://www.roymorgan.com/findings/9810-anz-roy-morgan-consumer-confidence-september-2",
+    "slug": "9810-anz-roy-morgan-consumer-confidence-september-2"
+   },
+   {
+    "date": "2025-09-09",
+    "v": 89.3,
+    "chg": 1.3,
+    "url": "https://www.roymorgan.com/findings/9815-anz-roy-morgan-consumer-confidence-september-9",
+    "slug": "9815-anz-roy-morgan-consumer-confidence-september-9"
+   },
+   {
+    "date": "2025-09-16",
+    "v": 85.9,
+    "chg": -3.4,
+    "url": "https://www.roymorgan.com/findings/9820-anz-roy-morgan-consumer-confidence-september-16",
+    "slug": "9820-anz-roy-morgan-consumer-confidence-september-16"
+   },
+   {
+    "date": "2025-09-23",
+    "v": 84.6,
+    "chg": -1.3,
+    "url": "https://www.roymorgan.com/findings/9825-anz-roy-morgan-consumer-confidence-september-23",
+    "slug": "9825-anz-roy-morgan-consumer-confidence-september-23"
+   },
+   {
+    "date": "2025-09-30",
+    "v": 86.3,
+    "chg": 1.7,
+    "url": "https://www.roymorgan.com/findings/9830-anz-roy-morgan-consumer-confidence-september-30",
+    "slug": "9830-anz-roy-morgan-consumer-confidence-september-30"
+   },
+   {
+    "date": "2025-10-07",
+    "v": 85.1,
+    "chg": -1.2,
+    "url": "https://www.roymorgan.com/findings/9835-anz-roy-morgan-consumer-confidence-october-7",
+    "slug": "9835-anz-roy-morgan-consumer-confidence-october-7"
+   },
+   {
+    "date": "2025-10-14",
+    "v": 83,
+    "chg": -2.1,
+    "url": "https://www.roymorgan.com/findings/9840-anz-roy-morgan-consumer-confidence-october-14",
+    "slug": "9840-anz-roy-morgan-consumer-confidence-october-14"
+   },
+   {
+    "date": "2025-10-21",
+    "v": 84,
+    "chg": 1,
+    "url": "https://www.roymorgan.com/findings/9845-anz-roy-morgan-consumer-confidence-october-21",
+    "slug": "9845-anz-roy-morgan-consumer-confidence-october-21"
+   },
+   {
+    "date": "2025-10-28",
+    "v": 85.8,
+    "chg": 1.8,
+    "url": "https://www.roymorgan.com/findings/9850-anz-roy-morgan-consumer-confidence-october-28",
+    "slug": "9850-anz-roy-morgan-consumer-confidence-october-28"
+   },
+   {
+    "date": "2025-11-04",
+    "v": 84.5,
+    "chg": -1.3,
+    "url": "https://www.roymorgan.com/findings/9855-anz-roy-morgan-consumer-confidence-november-4",
+    "slug": "9855-anz-roy-morgan-consumer-confidence-november-4"
+   },
+   {
+    "date": "2025-11-11",
+    "v": 83.5,
+    "chg": -1,
+    "url": "https://www.roymorgan.com/findings/9860-anz-roy-morgan-consumer-confidence-november-11",
+    "slug": "9860-anz-roy-morgan-consumer-confidence-november-11"
+   },
+   {
+    "date": "2025-11-18",
+    "v": 84.2,
+    "chg": 0.7,
+    "url": "https://www.roymorgan.com/findings/9865-anz-roy-morgan-consumer-confidence-november-18",
+    "slug": "9865-anz-roy-morgan-consumer-confidence-november-18"
+   },
+   {
+    "date": "2025-11-25",
+    "v": 87.1,
+    "chg": 2.9,
+    "url": "https://www.roymorgan.com/findings/9870-anz-roy-morgan-consumer-confidence-november-25",
+    "slug": "9870-anz-roy-morgan-consumer-confidence-november-25"
+   },
+   {
+    "date": "2025-12-02",
+    "v": 85.5,
+    "chg": -1.6,
+    "url": "https://www.roymorgan.com/findings/9875-anz-roy-morgan-consumer-confidence-december-2",
+    "slug": "9875-anz-roy-morgan-consumer-confidence-december-2"
+   },
+   {
+    "date": "2025-12-09",
+    "v": 83.5,
+    "chg": -2,
+    "url": "https://www.roymorgan.com/findings/9880-anz-roy-morgan-consumer-confidence-december-9",
+    "slug": "9880-anz-roy-morgan-consumer-confidence-december-9"
+   },
+   {
+    "date": "2025-12-16",
+    "v": 81.5,
+    "chg": -2,
+    "url": "https://www.roymorgan.com/findings/9885-anz-roy-morgan-consumer-confidence-december-16",
+    "slug": "9885-anz-roy-morgan-consumer-confidence-december-16"
+   },
+   {
+    "date": "2026-01-13",
+    "v": 84.5,
+    "chg": 3,
+    "url": "https://www.roymorgan.com/findings/9890-anz-roy-morgan-consumer-confidence-january-13",
+    "slug": "9890-anz-roy-morgan-consumer-confidence-january-13"
+   },
+   {
+    "date": "2026-01-20",
+    "v": 79.3,
+    "chg": -5.2,
+    "url": "https://www.roymorgan.com/findings/9895-anz-roy-morgan-consumer-confidence-january-20",
+    "slug": "9895-anz-roy-morgan-consumer-confidence-january-20"
+   },
+   {
+    "date": "2026-01-28",
+    "v": 84,
+    "chg": 4.7,
+    "url": "https://www.roymorgan.com/findings/9900-anz-roy-morgan-consumer-confidence-january-28",
+    "slug": "9900-anz-roy-morgan-consumer-confidence-january-28"
+   },
+   {
+    "date": "2026-02-03",
+    "v": 80.5,
+    "chg": -3.5,
+    "url": "https://www.roymorgan.com/findings/9905-anz-roy-morgan-consumer-confidence-february-3",
+    "slug": "9905-anz-roy-morgan-consumer-confidence-february-3"
+   },
+   {
+    "date": "2026-02-10",
+    "v": 76.9,
+    "chg": -3.6,
+    "url": "https://www.roymorgan.com/findings/9910-anz-roy-morgan-consumer-confidence-february-10",
+    "slug": "9910-anz-roy-morgan-consumer-confidence-february-10"
+   },
+   {
+    "date": "2026-02-17",
+    "v": 77.1,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9915-anz-roy-morgan-consumer-confidence-february-17",
+    "slug": "9915-anz-roy-morgan-consumer-confidence-february-17"
+   },
+   {
+    "date": "2026-02-24",
+    "v": 80.2,
+    "chg": 3.1,
+    "url": "https://www.roymorgan.com/findings/9920-anz-roy-morgan-consumer-confidence-february-24",
+    "slug": "9920-anz-roy-morgan-consumer-confidence-february-24"
+   },
+   {
+    "date": "2026-03-03",
+    "v": 77.1,
+    "chg": -3.1,
+    "url": "https://www.roymorgan.com/findings/9925-anz-roy-morgan-consumer-confidence-march-3",
+    "slug": "9925-anz-roy-morgan-consumer-confidence-march-3"
+   },
+   {
+    "date": "2026-03-10",
+    "v": 73.4,
+    "chg": -3.7,
+    "url": "https://www.roymorgan.com/findings/9930-anz-roy-morgan-consumer-confidence-march-10",
+    "slug": "9930-anz-roy-morgan-consumer-confidence-march-10"
+   },
+   {
+    "date": "2026-03-17",
+    "v": 68.5,
+    "chg": -4.9,
+    "url": "https://www.roymorgan.com/findings/9935-anz-roy-morgan-consumer-confidence-march-17",
+    "slug": "9935-anz-roy-morgan-consumer-confidence-march-17"
+   },
+   {
+    "date": "2026-03-24",
+    "v": 63.1,
+    "chg": -5.4,
+    "url": "https://www.roymorgan.com/findings/9940-anz-roy-morgan-consumer-confidence-march-24",
+    "slug": "9940-anz-roy-morgan-consumer-confidence-march-24"
+   },
+   {
+    "date": "2026-03-31",
+    "v": 58.8,
+    "chg": -4.3,
+    "url": "https://www.roymorgan.com/findings/9945-anz-roy-morgan-consumer-confidence-march-31",
+    "slug": "9945-anz-roy-morgan-consumer-confidence-march-31"
+   },
+   {
+    "date": "2026-04-08",
+    "v": 62.3,
+    "chg": 3.5,
+    "url": "https://www.roymorgan.com/findings/9950-anz-roy-morgan-consumer-confidence-april-8",
+    "slug": "9950-anz-roy-morgan-consumer-confidence-april-8"
+   },
+   {
+    "date": "2026-04-14",
+    "v": 64.5,
+    "chg": 2.2,
+    "url": "https://www.roymorgan.com/findings/9955-anz-roy-morgan-consumer-confidence-april-14",
+    "slug": "9955-anz-roy-morgan-consumer-confidence-april-14"
+   },
+   {
+    "date": "2026-04-21",
+    "v": 64.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9960-anz-roy-morgan-consumer-confidence-april-21",
+    "slug": "9960-anz-roy-morgan-consumer-confidence-april-21"
+   },
+   {
+    "date": "2026-04-28",
+    "v": 67.8,
+    "chg": 3.5,
+    "url": "https://www.roymorgan.com/findings/9965-anz-roy-morgan-consumer-confidence-april-28",
+    "slug": "9965-anz-roy-morgan-consumer-confidence-april-28"
+   },
+   {
+    "date": "2026-05-05",
+    "v": 67.2,
+    "chg": -0.6,
+    "url": "https://www.roymorgan.com/findings/9970-anz-roy-morgan-consumer-confidence-may-5",
+    "slug": "9970-anz-roy-morgan-consumer-confidence-may-5"
+   },
+   {
+    "date": "2026-05-12",
+    "v": 64.1,
+    "chg": -3.1,
+    "url": "https://www.roymorgan.com/findings/9975-anz-roy-morgan-consumer-confidence-may-12",
+    "slug": "9975-anz-roy-morgan-consumer-confidence-may-12"
+   },
+   {
+    "date": "2026-05-19",
+    "v": 66.4,
+    "chg": 2.3,
+    "url": "https://www.roymorgan.com/findings/9980-anz-roy-morgan-consumer-confidence-may-19",
+    "slug": "9980-anz-roy-morgan-consumer-confidence-may-19"
+   },
+   {
+    "date": "2026-05-26",
+    "v": 66.1,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9985-anz-roy-morgan-consumer-confidence-may-26",
+    "slug": "9985-anz-roy-morgan-consumer-confidence-may-26"
+   },
+   {
+    "date": "2026-06-02",
+    "v": 68.8,
+    "chg": 2.7,
+    "url": "https://www.roymorgan.com/findings/9990-anz-roy-morgan-consumer-confidence-june-2",
+    "slug": "9990-anz-roy-morgan-consumer-confidence-june-2"
+   },
+   {
+    "date": "2026-06-10",
+    "v": 70.8,
+    "chg": 2,
+    "url": "https://www.roymorgan.com/findings/9995-anz-roy-morgan-consumer-confidence-june-10",
+    "slug": "9995-anz-roy-morgan-consumer-confidence-june-10"
+   },
+   {
+    "date": "2026-06-16",
+    "v": 70.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/10000-anz-roy-morgan-consumer-confidence-june-16",
+    "slug": "10000-anz-roy-morgan-consumer-confidence-june-16"
+   },
+   {
+    "date": "2026-06-23",
+    "v": 72.8,
+    "chg": 2.1,
+    "url": "https://www.roymorgan.com/findings/10005-anz-roy-morgan-consumer-confidence-june-23",
+    "slug": "10005-anz-roy-morgan-consumer-confidence-june-23"
+   },
+   {
+    "date": "2026-06-30",
+    "v": 75.9,
+    "chg": 3.1,
+    "url": "https://www.roymorgan.com/findings/10010-anz-roy-morgan-consumer-confidence-june-30",
+    "slug": "10010-anz-roy-morgan-consumer-confidence-june-30"
+   },
+   {
+    "date": "2026-07-07",
+    "v": 74.7,
+    "chg": -1.2,
+    "url": "https://www.roymorgan.com/findings/10015-anz-roy-morgan-consumer-confidence-july-7",
+    "slug": "10015-anz-roy-morgan-consumer-confidence-july-7"
+   },
+   {
+    "date": "2026-07-14",
+    "v": 75.3,
+    "chg": 0.6,
+    "url": "https://www.roymorgan.com/findings/10020-anz-roy-morgan-consumer-confidence-july-14",
+    "slug": "10020-anz-roy-morgan-consumer-confidence-july-14"
+   },
+   {
+    "date": "2026-07-21",
+    "v": 75.6,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/10025-anz-roy-morgan-consumer-confidence-july-21",
+    "slug": "10025-anz-roy-morgan-consumer-confidence-july-21"
+   },
+   {
+    "date": "2026-07-28",
+    "v": 71.2,
+    "chg": -4.4,
+    "url": "https://www.roymorgan.com/findings/10030-anz-roy-morgan-consumer-confidence-july-28",
+    "slug": "10030-anz-roy-morgan-consumer-confidence-july-28"
+   },
+   {
+    "date": "2026-08-04",
+    "v": 74.7,
+    "chg": 3.5,
+    "url": "https://www.roymorgan.com/findings/10035-anz-roy-morgan-consumer-confidence-august-4",
+    "slug": "10035-anz-roy-morgan-consumer-confidence-august-4"
+   },
+   {
+    "date": "2026-08-11",
+    "v": 75,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/10040-anz-roy-morgan-consumer-confidence-august-11",
+    "slug": "10040-anz-roy-morgan-consumer-confidence-august-11"
+   },
+   {
+    "date": "2026-08-18",
+    "v": 76.5,
+    "chg": 1.5,
+    "url": "https://www.roymorgan.com/findings/10045-anz-roy-morgan-consumer-confidence-august-18",
+    "slug": "10045-anz-roy-morgan-consumer-confidence-august-18"
+   },
+   {
+    "date": "2026-08-25",
+    "v": 77.5,
+    "chg": 1,
+    "url": "https://www.roymorgan.com/findings/10045-anz-roy-morgan-consumer-confidence-august-25",
+    "slug": "10045-anz-roy-morgan-consumer-confidence-august-25"
+   },
+   {
+    "date": "2026-09-01",
+    "v": 74.9,
+    "chg": -2.6,
+    "url": "https://www.roymorgan.com/findings/10055-anz-roy-morgan-consumer-confidence-september-1",
+    "slug": "10055-anz-roy-morgan-consumer-confidence-september-1"
+   },
+   {
+    "date": "2026-09-08",
+    "v": 71.9,
+    "chg": -3,
+    "url": "https://www.roymorgan.com/findings/10060-anz-roy-morgan-consumer-confidence-september-8",
+    "slug": "10060-anz-roy-morgan-consumer-confidence-september-8"
+   },
+   {
+    "date": "2026-09-15",
+    "v": 73.9,
+    "chg": 2,
+    "url": "https://www.roymorgan.com/findings/10065-anz-roy-morgan-consumer-confidence-september-15",
+    "slug": "10065-anz-roy-morgan-consumer-confidence-september-15"
+   },
+   {
+    "date": "2026-09-22",
+    "v": 72,
+    "chg": -1.9,
+    "url": "https://www.roymorgan.com/findings/10070-anz-roy-morgan-consumer-confidence-september-22",
+    "slug": "10070-anz-roy-morgan-consumer-confidence-september-22"
+   },
+   {
+    "date": "2026-09-29",
+    "v": 70.5,
+    "chg": -1.5,
+    "url": "https://www.roymorgan.com/findings/10075-anz-roy-morgan-consumer-confidence-september-29",
+    "slug": "10075-anz-roy-morgan-consumer-confidence-september-29"
+   },
+   {
+    "date": "2026-10-06",
+    "v": 67.1,
+    "chg": -3.4,
+    "url": "https://www.roymorgan.com/findings/10080-anz-roy-morgan-consumer-confidence-october-6",
+    "slug": "10080-anz-roy-morgan-consumer-confidence-october-6"
+   }
+  ]
+ },
+ "business": {
+  "label": "Roy Morgan Business Confidence",
+  "base": "Roy Morgan, index, 100 = neutral",
+  "rows": [
+   {
+    "date": "2019-09-09",
+    "v": 114.3,
+    "chg": 0.3,
+    "url": "https://www.roymorgan.com/findings/business-confidence-post-election-bounce-continues",
+    "slug": "business-confidence-post-election-bounce-continues"
+   },
+   {
+    "date": "2019-10-11",
+    "v": 110.6,
+    "chg": -3.7,
+    "url": "https://www.roymorgan.com/findings/business-confidence-declines-after-low-gdp-growth-figure",
+    "slug": "business-confidence-declines-after-low-gdp-growth-figure"
+   },
+   {
+    "date": "2019-11-11",
+    "v": 106,
+    "chg": -4.6,
+    "url": "https://www.roymorgan.com/findings/federal-election-bounce-over-business-confidence-drops-to-lowest-since-april",
+    "slug": "federal-election-bounce-over-business-confidence-drops-to-lowest-since-april"
+   },
+   {
+    "date": "2019-12-09",
+    "v": 108.4,
+    "chg": 2.4,
+    "url": "https://www.roymorgan.com/findings/business-confidence-improves-up-2-4pts-to-108-4-in-november",
+    "slug": "business-confidence-improves-up-2-4pts-to-108-4-in-november"
+   },
+   {
+    "date": "2020-01-20",
+    "v": 104.5,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/business-confidence-ended-2019-at-8-month-low-of-104-5",
+    "slug": "business-confidence-ended-2019-at-8-month-low-of-104-5"
+   },
+   {
+    "date": "2020-02-03",
+    "v": 101.6,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/business-confidence-drops-to-9-year-low-of-101-6-in-january",
+    "slug": "business-confidence-drops-to-9-year-low-of-101-6-in-january"
+   },
+   {
+    "date": "2020-03-10",
+    "v": 104.6,
+    "chg": 3,
+    "url": "https://www.roymorgan.com/findings/february-business-confidence-rebounded-with-bushfires-out-and-covid-19-yet-to-have-full-economic-impact",
+    "slug": "february-business-confidence-rebounded-with-bushfires-out-and-covid-19-yet-to-have-full-economic-impact"
+   },
+   {
+    "date": "2020-04-06",
+    "v": 95.1,
+    "chg": -9.5,
+    "url": "https://www.roymorgan.com/findings/business-confidence-hits-a-record-low-of-95-1-in-march-declines-accelerated-throughout-the-month",
+    "slug": "business-confidence-hits-a-record-low-of-95-1-in-march-declines-accelerated-throughout-the-month"
+   },
+   {
+    "date": "2020-05-08",
+    "v": 76.9,
+    "chg": -18.2,
+    "url": "https://www.roymorgan.com/findings/business-confidence-plunged-to-record-low-of-76-9-in-april",
+    "slug": "business-confidence-plunged-to-record-low-of-76-9-in-april"
+   },
+   {
+    "date": "2020-06-05",
+    "v": 89.9,
+    "chg": 13,
+    "url": "https://www.roymorgan.com/findings/business-confidence-jumps-in-may-up-13pts-to-89-9-highest-in-western-australia-south-australia",
+    "slug": "business-confidence-jumps-in-may-up-13pts-to-89-9-highest-in-western-australia-south-australia"
+   },
+   {
+    "date": "2020-07-03",
+    "v": 95,
+    "chg": 5.1,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-5-1pts-to-95-0-in-june-highest-in-western-australia-110-5-new-south-wales-100-7",
+    "slug": "roy-morgan-business-confidence-up-5-1pts-to-95-0-in-june-highest-in-western-australia-110-5-new-south-wales-100-7"
+   },
+   {
+    "date": "2020-08-03",
+    "v": 84.3,
+    "chg": -10.7,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plunged-10-7pts-to-84-3-in-july-before-victoria-introduced-stage-4-restrictions-to-stop-covid-19-confidence-lowest-in-victoria-73-9-queensland-83-0-and-so",
+    "slug": "roy-morgan-business-confidence-plunged-10-7pts-to-84-3-in-july-before-victoria-introduced-stage-4-restrictions-to-stop-covid-19-confidence-lowest-in-victoria-73-9-queensland-83-0-and-so"
+   },
+   {
+    "date": "2020-09-08",
+    "v": 83.1,
+    "chg": -1.2,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-1-2pts-to-83-1-in-august-confidence-lowest-in-victoria-76-1-and-queensland-77-0",
+    "slug": "roy-morgan-business-confidence-down-1-2pts-to-83-1-in-august-confidence-lowest-in-victoria-76-1-and-queensland-77-0"
+   },
+   {
+    "date": "2020-10-06",
+    "v": 85.6,
+    "chg": 2.5,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-2-5pts-to-85-6-in-september-confidence-lowest-in-victoria-77-0-south-australia-75-0-and-queensland-71-6",
+    "slug": "roy-morgan-business-confidence-up-2-5pts-to-85-6-in-september-confidence-lowest-in-victoria-77-0-south-australia-75-0-and-queensland-71-6"
+   },
+   {
+    "date": "2020-11-10",
+    "v": 98.7,
+    "chg": 13.1,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-13-1pts-to-98-7-in-october-confidence-highest-in-new-south-wales-105-4-and-western-australia-108-4",
+    "slug": "roy-morgan-business-confidence-up-13-1pts-to-98-7-in-october-confidence-highest-in-new-south-wales-105-4-and-western-australia-108-4"
+   },
+   {
+    "date": "2020-11-26",
+    "v": 109.1,
+    "chg": 10.4,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-10-4pts-to-109-1-in-november-confidence-is-now-above-100-in-four-states-nsw-qld-wa-sa",
+    "slug": "roy-morgan-business-confidence-up-10-4pts-to-109-1-in-november-confidence-is-now-above-100-in-four-states-nsw-qld-wa-sa"
+   },
+   {
+    "date": "2021-02-08",
+    "v": 120.5,
+    "chg": -2.7,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-2-7pts-to-120-5-in-january-majority-of-businesses-expect-good-times-for-the-next-12-months",
+    "slug": "roy-morgan-business-confidence-down-2-7pts-to-120-5-in-january-majority-of-businesses-expect-good-times-for-the-next-12-months"
+   },
+   {
+    "date": "2021-02-20",
+    "v": 123.2,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-14-1pts-to-123-2-in-december-confidence-jump-powered-by-large-increase-in-victoria-nsw",
+    "slug": "roy-morgan-business-confidence-up-14-1pts-to-123-2-in-december-confidence-jump-powered-by-large-increase-in-victoria-nsw"
+   },
+   {
+    "date": "2021-03-02",
+    "v": 120.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-0-3pts-to-120-8-in-february-majority-of-businesses-say-next-12-months-is-a-good-time-to-invest",
+    "slug": "roy-morgan-business-confidence-up-0-3pts-to-120-8-in-february-majority-of-businesses-say-next-12-months-is-a-good-time-to-invest"
+   },
+   {
+    "date": "2021-03-30",
+    "v": 124,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-hits-7-year-high-of-124-in-march-despite-impending-end-of-jobkeeper-wage-subsidy-59-4-of-businesses-say-the-next-12-months-is-a-good-time-to-invest",
+    "slug": "roy-morgan-business-confidence-hits-7-year-high-of-124-in-march-despite-impending-end-of-jobkeeper-wage-subsidy-59-4-of-businesses-say-the-next-12-months-is-a-good-time-to-invest"
+   },
+   {
+    "date": "2021-05-11",
+    "v": 125.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-hits-7-year-high-of-125-3-in-april-up-48-4-pts-62-9-on-a-year-ago",
+    "slug": "roy-morgan-business-confidence-hits-7-year-high-of-125-3-in-april-up-48-4-pts-62-9-on-a-year-ago"
+   },
+   {
+    "date": "2021-06-11",
+    "v": 129.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-hit-a-7-year-high-of-129-3-in-may-largely-before-victoria-was-plunged-into-a-fourth-lockdown",
+    "slug": "roy-morgan-business-confidence-hit-a-7-year-high-of-129-3-in-may-largely-before-victoria-was-plunged-into-a-fourth-lockdown"
+   },
+   {
+    "date": "2021-06-29",
+    "v": 128.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-only-slightly-in-june-to-128-3-but-new-covid-19-restrictions-a-clear-threat-to-the-recovery",
+    "slug": "roy-morgan-business-confidence-down-only-slightly-in-june-to-128-3-but-new-covid-19-restrictions-a-clear-threat-to-the-recovery"
+   },
+   {
+    "date": "2021-08-06",
+    "v": 117.2,
+    "chg": -11.1,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plunges-by-11-1pts-8-7-to-117-2-after-sydney-melbourne-and-adelaide-placed-in-lockdowns",
+    "slug": "roy-morgan-business-confidence-plunges-by-11-1pts-8-7-to-117-2-after-sydney-melbourne-and-adelaide-placed-in-lockdowns"
+   },
+   {
+    "date": "2021-08-31",
+    "v": 101.5,
+    "chg": -15.7,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plunges-by-15-7pts-13-4-to-101-5-as-sydney-and-melbourne-endure-extended-lockdowns",
+    "slug": "roy-morgan-business-confidence-plunges-by-15-7pts-13-4-to-101-5-as-sydney-and-melbourne-endure-extended-lockdowns"
+   },
+   {
+    "date": "2021-09-28",
+    "v": 104.6,
+    "chg": 3.1,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-increases-by-3-1pts-3-1-to-104-6-in-september-as-nsw-and-victoria-outline-re-opening-plans",
+    "slug": "roy-morgan-business-confidence-increases-by-3-1pts-3-1-to-104-6-in-september-as-nsw-and-victoria-outline-re-opening-plans"
+   },
+   {
+    "date": "2021-10-25",
+    "v": 115.3,
+    "chg": 10.7,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-jumps-by-10-7pts-10-2-to-115-3-in-october-as-lockdowns-end-in-sydney-and-melbourne",
+    "slug": "roy-morgan-business-confidence-jumps-by-10-7pts-10-2-to-115-3-in-october-as-lockdowns-end-in-sydney-and-melbourne"
+   },
+   {
+    "date": "2021-12-06",
+    "v": 113,
+    "chg": -2.3,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-drops-by-2-3pts-to-113-0-in-november-as-the-international-border-opens-for-nsw-victoria",
+    "slug": "roy-morgan-business-confidence-drops-by-2-3pts-to-113-0-in-november-as-the-international-border-opens-for-nsw-victoria"
+   },
+   {
+    "date": "2022-01-31",
+    "v": 120.2,
+    "chg": 7.2,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-jumped-7-2pts-to-120-2-in-december-up-strongly-in-nsw-victoria-and-queensland-before-the-full-impact-of-the-omicron-variant-hit",
+    "slug": "roy-morgan-business-confidence-jumped-7-2pts-to-120-2-in-december-up-strongly-in-nsw-victoria-and-queensland-before-the-full-impact-of-the-omicron-variant-hit"
+   },
+   {
+    "date": "2022-02-10",
+    "v": 101.5,
+    "chg": -18.7,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-january-2022",
+    "slug": "roy-morgan-business-confidence-january-2022"
+   },
+   {
+    "date": "2022-03-15",
+    "v": 120.5,
+    "chg": 19,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-jumped-19pts-to-120-5-in-february-as-omicron-variant-rapidly-receded",
+    "slug": "roy-morgan-business-confidence-jumped-19pts-to-120-5-in-february-as-omicron-variant-rapidly-receded"
+   },
+   {
+    "date": "2022-04-11",
+    "v": 106.7,
+    "chg": -13.8,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plunged-13-8pts-to-106-7-in-march-after-russian-invasion-of-ukraine-and-large-spike-in-petrol-price",
+    "slug": "roy-morgan-business-confidence-plunged-13-8pts-to-106-7-in-march-after-russian-invasion-of-ukraine-and-large-spike-in-petrol-price"
+   },
+   {
+    "date": "2022-05-08",
+    "v": 113,
+    "chg": 6.3,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-jumped-6-3pts-to-113-0-in-april-after-the-federal-budget-but-before-this-weeks-interest-rate-increase",
+    "slug": "roy-morgan-business-confidence-jumped-6-3pts-to-113-0-in-april-after-the-federal-budget-but-before-this-weeks-interest-rate-increase"
+   },
+   {
+    "date": "2022-06-06",
+    "v": 100.2,
+    "chg": -12.8,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-fell-12-8pts-to-100-2-in-may-as-australians-faced-a-pivotal-federal-election",
+    "slug": "roy-morgan-business-confidence-fell-12-8pts-to-100-2-in-may-as-australians-faced-a-pivotal-federal-election"
+   },
+   {
+    "date": "2022-06-27",
+    "v": 97.3,
+    "chg": -2.9,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-2-9pts-to-97-3-after-federal-election-lowest-rating-since-september-2020-85-6",
+    "slug": "roy-morgan-business-confidence-down-2-9pts-to-97-3-after-federal-election-lowest-rating-since-september-2020-85-6"
+   },
+   {
+    "date": "2022-08-02",
+    "v": 94.9,
+    "chg": -2.4,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-2-4pts-to-94-9-lowest-since-september-2020",
+    "slug": "roy-morgan-business-confidence-down-2-4pts-to-94-9-lowest-since-september-2020"
+   },
+   {
+    "date": "2022-08-29",
+    "v": 96,
+    "chg": 1.1,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-1-1pts-to-96-0",
+    "slug": "roy-morgan-business-confidence-up-1-1pts-to-96-0"
+   },
+   {
+    "date": "2022-10-04",
+    "v": 100.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-for-a-second-straight-month-and-back-in-positive-territory-at-100-7",
+    "slug": "roy-morgan-business-confidence-up-for-a-second-straight-month-and-back-in-positive-territory-at-100-7"
+   },
+   {
+    "date": "2022-11-07",
+    "v": 96.6,
+    "chg": -4.1,
+    "url": "https://www.roymorgan.com/findings/9092-roy-morgan-business-confidence-october-2022",
+    "slug": "9092-roy-morgan-business-confidence-october-2022"
+   },
+   {
+    "date": "2022-12-02",
+    "v": 90.2,
+    "chg": -6.4,
+    "url": "https://www.roymorgan.com/findings/9112-roy-morgan-business-confidence-november-2022",
+    "slug": "9112-roy-morgan-business-confidence-november-2022"
+   },
+   {
+    "date": "2023-01-17",
+    "v": 96,
+    "chg": 5.8,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-rebounded-by-5-8-points-to-96-0-in-december-as-australians-spent-big-for-christmas",
+    "slug": "roy-morgan-business-confidence-rebounded-by-5-8-points-to-96-0-in-december-as-australians-spent-big-for-christmas"
+   },
+   {
+    "date": "2023-02-14",
+    "v": 106.4,
+    "chg": 10.4,
+    "url": "https://www.roymorgan.com/findings/9153-roy-morgan-business-confidence-january-2023",
+    "slug": "9153-roy-morgan-business-confidence-january-2023"
+   },
+   {
+    "date": "2023-03-14",
+    "v": 95.8,
+    "chg": -10.6,
+    "url": "https://www.roymorgan.com/findings/9173-roy-morgan-business-confidence-february-2023",
+    "slug": "9173-roy-morgan-business-confidence-february-2023"
+   },
+   {
+    "date": "2023-04-12",
+    "v": 93.6,
+    "chg": -2.2,
+    "url": "https://www.roymorgan.com/findings/9183-roy-morgan-business-confidence-march-2023",
+    "slug": "9183-roy-morgan-business-confidence-march-2023"
+   },
+   {
+    "date": "2023-05-09",
+    "v": 90.2,
+    "chg": -3.4,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-3-4-points-to-90-2-in-april-before-the-rba-hiked-interest-rates-in-may",
+    "slug": "roy-morgan-business-confidence-down-3-4-points-to-90-2-in-april-before-the-rba-hiked-interest-rates-in-may"
+   },
+   {
+    "date": "2023-06-13",
+    "v": 90.3,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9263-roy-morgan-business-confidence-may-2023",
+    "slug": "9263-roy-morgan-business-confidence-may-2023"
+   },
+   {
+    "date": "2023-07-10",
+    "v": 88.8,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9283-roy-morgan-business-confidence-june-2023",
+    "slug": "9283-roy-morgan-business-confidence-june-2023"
+   },
+   {
+    "date": "2023-08-07",
+    "v": 87.5,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-july-2023",
+    "slug": "roy-morgan-business-confidence-july-2023"
+   },
+   {
+    "date": "2023-09-01",
+    "v": 94.7,
+    "chg": 7.2,
+    "url": "https://www.roymorgan.com/findings/9323-roy-morgan-business-confidence-august-2023",
+    "slug": "9323-roy-morgan-business-confidence-august-2023"
+   },
+   {
+    "date": "2023-10-17",
+    "v": 87.1,
+    "chg": -7.6,
+    "url": "https://www.roymorgan.com/findings/9333-roy-morgan-business-confidence-september-2023",
+    "slug": "9333-roy-morgan-business-confidence-september-2023"
+   },
+   {
+    "date": "2023-11-14",
+    "v": 90.4,
+    "chg": 3.3,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-october-2023",
+    "slug": "roy-morgan-business-confidence-october-2023"
+   },
+   {
+    "date": "2023-12-05",
+    "v": 85.8,
+    "chg": -4.6,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-november-2023",
+    "slug": "roy-morgan-business-confidence-november-2023"
+   },
+   {
+    "date": "2024-01-23",
+    "v": 91.1,
+    "chg": 5.3,
+    "url": "https://www.roymorgan.com/findings/9423-roy-morgan-business-confidence-december-2023",
+    "slug": "9423-roy-morgan-business-confidence-december-2023"
+   },
+   {
+    "date": "2024-02-20",
+    "v": 93.2,
+    "chg": 2.1,
+    "url": "https://www.roymorgan.com/findings/9463-roy-morgan-business-confidence-january-2024",
+    "slug": "9463-roy-morgan-business-confidence-january-2024"
+   },
+   {
+    "date": "2024-03-15",
+    "v": 101.5,
+    "chg": 8.3,
+    "url": "https://www.roymorgan.com/findings/9493-roy-morgan-business-confidence-february-2024",
+    "slug": "9493-roy-morgan-business-confidence-february-2024"
+   },
+   {
+    "date": "2024-04-16",
+    "v": 98,
+    "chg": -3.5,
+    "url": "https://www.roymorgan.com/findings/9513-roy-morgan-business-confidence-march-2024",
+    "slug": "9513-roy-morgan-business-confidence-march-2024"
+   },
+   {
+    "date": "2024-05-07",
+    "v": 99.3,
+    "chg": 1.3,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-april-2024",
+    "slug": "roy-morgan-business-confidence-april-2024"
+   },
+   {
+    "date": "2024-06-18",
+    "v": 97,
+    "chg": -2.3,
+    "url": "https://www.roymorgan.com/findings/9613-roy-morgan-business-confidence-may-2024",
+    "slug": "9613-roy-morgan-business-confidence-may-2024"
+   },
+   {
+    "date": "2024-07-09",
+    "v": 91.5,
+    "chg": -5.5,
+    "url": "https://www.roymorgan.com/findings/9633-roy-morgan-business-confidence-june-2024",
+    "slug": "9633-roy-morgan-business-confidence-june-2024"
+   },
+   {
+    "date": "2024-08-13",
+    "v": 95.1,
+    "chg": 3.6,
+    "url": "https://www.roymorgan.com/findings/9653-roy-morgan-business-confidence-july-2024",
+    "slug": "9653-roy-morgan-business-confidence-july-2024"
+   },
+   {
+    "date": "2024-09-10",
+    "v": 101.3,
+    "chg": 6.2,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-jumps-6-2pts-to-101-3-due-to-increased-confidence-about-the-economy",
+    "slug": "roy-morgan-business-confidence-jumps-6-2pts-to-101-3-due-to-increased-confidence-about-the-economy"
+   },
+   {
+    "date": "2024-10-08",
+    "v": 94.3,
+    "chg": -7,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-slumps-7pts-to-94-3-in-september-with-rising-concerns-about-the-next-12-months",
+    "slug": "roy-morgan-business-confidence-slumps-7pts-to-94-3-in-september-with-rising-concerns-about-the-next-12-months"
+   },
+   {
+    "date": "2024-11-12",
+    "v": 106.7,
+    "chg": 12.4,
+    "url": "https://www.roymorgan.com/findings/9753-roy-morgan-business-confidence-october-2024",
+    "slug": "9753-roy-morgan-business-confidence-october-2024"
+   },
+   {
+    "date": "2025-01-21",
+    "v": 105.9,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9803-roy-morgan-business-confidence-december-2024",
+    "slug": "9803-roy-morgan-business-confidence-december-2024"
+   },
+   {
+    "date": "2025-02-11",
+    "v": 108.2,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9843-roy-morgan-business-confidence-january-2025",
+    "slug": "9843-roy-morgan-business-confidence-january-2025"
+   },
+   {
+    "date": "2025-03-11",
+    "v": 108.5,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/9873-roy-morgan-business-confidence-february-2025",
+    "slug": "9873-roy-morgan-business-confidence-february-2025"
+   },
+   {
+    "date": "2025-04-08",
+    "v": 106,
+    "chg": -2.5,
+    "url": "https://www.roymorgan.com/findings/9903-roy-morgan-business-confidence-march-2025",
+    "slug": "9903-roy-morgan-business-confidence-march-2025"
+   },
+   {
+    "date": "2025-05-06",
+    "v": 96.7,
+    "chg": -9.3,
+    "url": "https://www.roymorgan.com/findings/9933-roy-morgan-business-confidence-april-2025",
+    "slug": "9933-roy-morgan-business-confidence-april-2025"
+   },
+   {
+    "date": "2025-06-11",
+    "v": 99.6,
+    "chg": 2.9,
+    "url": "https://www.roymorgan.com/findings/9953-roy-morgan-business-confidence-may-2025",
+    "slug": "9953-roy-morgan-business-confidence-may-2025"
+   },
+   {
+    "date": "2025-07-07",
+    "v": 102.4,
+    "chg": 2.8,
+    "url": "https://www.roymorgan.com/findings/9993-roy-morgan-business-confidence-june-2025",
+    "slug": "9993-roy-morgan-business-confidence-june-2025"
+   },
+   {
+    "date": "2025-08-04",
+    "v": 103,
+    "chg": 0.6,
+    "url": "https://www.roymorgan.com/findings/9994-roy-morgan-business-confidence-july-2025",
+    "slug": "9994-roy-morgan-business-confidence-july-2025"
+   },
+   {
+    "date": "2025-09-09",
+    "v": 98.6,
+    "chg": -4.4,
+    "url": "https://www.roymorgan.com/findings/10004-roy-morgan-business-confidence-august-2025",
+    "slug": "10004-roy-morgan-business-confidence-august-2025"
+   },
+   {
+    "date": "2025-10-07",
+    "v": 101.6,
+    "chg": 3,
+    "url": "https://www.roymorgan.com/findings/10044-roy-morgan-business-confidence-september-2025",
+    "slug": "10044-roy-morgan-business-confidence-september-2025"
+   },
+   {
+    "date": "2025-11-11",
+    "v": 101.7,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/10064-roy-morgan-business-confidence-october-2025",
+    "slug": "10064-roy-morgan-business-confidence-october-2025"
+   },
+   {
+    "date": "2025-12-08",
+    "v": 98.7,
+    "chg": -3,
+    "url": "https://www.roymorgan.com/findings/10096-roy-morgan-business-confidence-november-2025",
+    "slug": "10096-roy-morgan-business-confidence-november-2025"
+   },
+   {
+    "date": "2026-01-09",
+    "v": 105,
+    "chg": 6.3,
+    "url": "https://www.roymorgan.com/findings/10106-roy-morgan-business-confidence-december-2025",
+    "slug": "10106-roy-morgan-business-confidence-december-2025"
+   },
+   {
+    "date": "2026-02-10",
+    "v": 97.4,
+    "chg": -7.6,
+    "url": "https://www.roymorgan.com/findings/10116-roy-morgan-business-confidence-january-2026",
+    "slug": "10116-roy-morgan-business-confidence-january-2026"
+   },
+   {
+    "date": "2026-03-17",
+    "v": 88.6,
+    "chg": -8.8,
+    "url": "https://www.roymorgan.com/findings/10166-roy-morgan-business-confidence-february-2026",
+    "slug": "10166-roy-morgan-business-confidence-february-2026"
+   },
+   {
+    "date": "2026-04-08",
+    "v": 90.7,
+    "chg": 2.1,
+    "url": "https://www.roymorgan.com/findings/10186-roy-morgan-business-confidence-march-2026",
+    "slug": "10186-roy-morgan-business-confidence-march-2026"
+   },
+   {
+    "date": "2026-05-04",
+    "v": 76.5,
+    "chg": -14.2,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plummeted-14-2pts-to-a-new-record-low-of-only-76-5-in-april-as-the-conflict-in-the-middle-east-continued-without-resolution",
+    "slug": "roy-morgan-business-confidence-plummeted-14-2pts-to-a-new-record-low-of-only-76-5-in-april-as-the-conflict-in-the-middle-east-continued-without-resolution"
+   },
+   {
+    "date": "2026-06-10",
+    "v": 76.1,
+    "chg": null,
+    "url": "https://www.roymorgan.com/findings/10236-roy-morgan-business-confidence-may-2026",
+    "slug": "10236-roy-morgan-business-confidence-may-2026"
+   },
+   {
+    "date": "2026-07-07",
+    "v": 77.5,
+    "chg": 1.4,
+    "url": "https://www.roymorgan.com/findings/10276-roy-morgan-business-confidence-june-2026",
+    "slug": "10276-roy-morgan-business-confidence-june-2026"
+   },
+   {
+    "date": "2026-08-04",
+    "v": 76,
+    "chg": -1.5,
+    "url": "https://www.roymorgan.com/findings/10296-roy-morgan-business-confidence-july-2026",
+    "slug": "10296-roy-morgan-business-confidence-july-2026"
+   },
+   {
+    "date": "2026-09-08",
+    "v": 79.1,
+    "chg": 3.1,
+    "url": "https://www.roymorgan.com/findings/10336-roy-morgan-business-confidence-august-2026",
+    "slug": "10336-roy-morgan-business-confidence-august-2026"
+   }
+  ]
+ }
+}
