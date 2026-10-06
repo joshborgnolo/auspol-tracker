@@ -4834,7 +4834,7 @@ body.rd .rd-apd-none { color: var(--ink-3); }
 body.rd .rd-apd-cell { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 body.rd .rd-apd-cell b { font-weight: 600; }
 body.rd .rd-apd-leaders { display: flex; flex-wrap: wrap; gap: 6px 28px; }
-body.rd .rd-apd-links { margin: 10px 0 0 -4px; padding-right: 40px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; }
+body.rd .rd-apd-links { margin: 10px 0 0 -4px; padding-right: 40px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; font-size: 13px; }
 body.rd .rd-apd-srcs { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; }
 body.rd .rd-apd-ext { display: inline-block; margin-left: 3px; font-size: 11px; color: var(--ink-faint); text-decoration: none; }
 body.rd .rd-apd-ct { margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--ink); }
@@ -82188,6 +82188,17 @@ function RdPolls({
         return apWho(r, o, Lm ? Lm.label : rdCap(o)) + " " + s[o];
       })].join(", ");
     }).join("; ");
+    const ip = D.individualPolls.find(q => q.pollster === r.pollster && q.released === r.released);
+    const moeOf = isPub => {
+      if (!ip) return null;
+      const ms = [isPub ? r.tppAlt ? "onp" : null : r.alpOnImp != null ? "onp" : null, isPub ? r.alp2pp != null ? "lnp" : null : r.alpImp != null ? "lnp" : null].filter(Boolean).map(c => rdPollMargin(ip, c, isPub)).filter(m => m != null).map(m => m.toFixed(1));
+      if (!ms.length) return null;
+      const lo = Math.min(...ms),
+        hi = Math.max(...ms);
+      return "±" + (lo === hi ? lo.toFixed(1) : lo.toFixed(1) + "–" + hi.toFixed(1)) + (isPub ? " on the published" : " on the implied");
+    };
+    const moes = [imp.length > 0 && moeOf(false), pub.length > 0 && moeOf(true)].filter(Boolean);
+    const moeTxt = moes.length ? moes.join(", ") + (moes.length > 1 ? " figures" : " figure") + ", " + rdMarginBasis(ip) : null;
     const a = r.appr || {};
     const net = v => v == null ? null : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v);
     const nets = clause([[apWho(r, "alb", "Albanese"), a.albNet, "albNet"], [a.oppName || "Taylor", a.taylorNet, "taylorNet"], [apWho(r, "hanson", "Hanson"), a.hansonNet, "hansonNet"]].filter(([, v]) => v != null).map(([n, v, k]) => [n + " " + net(v), k, 0]));
@@ -82231,7 +82242,7 @@ function RdPolls({
       oth: "pOth"
     }[id]], 0) || "\u00a0")))), React.createElement("dl", {
       className: "rd-pld-dl"
-    }, imp.length > 0 && React.createElement(React.Fragment, null, React.createElement("dt", null, "Two-party, implied"), React.createElement("dd", null, imp)), pub.length > 0 && React.createElement(React.Fragment, null, React.createElement("dt", null, "As published"), React.createElement("dd", null, pub)), ppm && React.createElement(React.Fragment, null, React.createElement("dt", null, window.JUR ? "Preferred " + window.JUR.office.alb : "Preferred prime minister"), React.createElement("dd", null, ppm)), nets.length > 0 && React.createElement(React.Fragment, null, React.createElement("dt", null, "Net approval"), React.createElement("dd", null, nets))), prev && React.createElement("div", {
+    }, imp.length > 0 && React.createElement(React.Fragment, null, React.createElement("dt", null, "Two-party, implied"), React.createElement("dd", null, imp)), pub.length > 0 && React.createElement(React.Fragment, null, React.createElement("dt", null, "As published"), React.createElement("dd", null, pub)), moeTxt && React.createElement(React.Fragment, null, React.createElement("dt", null, "Margin of error"), React.createElement("dd", null, moeTxt)), ppm && React.createElement(React.Fragment, null, React.createElement("dt", null, window.JUR ? "Preferred " + window.JUR.office.alb : "Preferred prime minister"), React.createElement("dd", null, ppm)), nets.length > 0 && React.createElement(React.Fragment, null, React.createElement("dt", null, "Net approval"), React.createElement("dd", null, nets))), prev && React.createElement("div", {
       className: "rd-apd-sub rd-apd-note"
     }, "Changes are on ", r.pollster, "\u2019s ", prev.field, " poll."), React.createElement("div", {
       className: "rd-pld-links"
@@ -84674,6 +84685,12 @@ function rdPollMargin(p, contest, pub) {
   });
   return 196 * Math.sqrt(Math.max(0, e2 - e1 * e1) / n);
 }
+function rdMarginBasis(p) {
+  if (p.sampleEff != null) return "from its effective sample of " + p.sampleEff.toLocaleString();
+  if (!p.sample) return null;
+  const n = Math.round(p.sample / rdApDeff() / 10) * 10;
+  return "assuming its " + p.sample.toLocaleString() + " respondents are worth about " + n.toLocaleString() + (rdEffTbc(p) ? ", until its effective sample is out" : ", as " + p.pollster + " published no effective sample for this poll");
+}
 const rdApNum = v => v == null ? "—" : String(+(+v).toFixed(1));
 const rdApPrimFig = v => {
   if (v == null) return "—";
@@ -86573,7 +86590,9 @@ function RdApDetail({
     style: {
       color: rdApLeanInk(lean, onM)
     }
-  }, Math.abs(lean).toFixed(1)), " more ", lean > 0 ? "Labor’s" : onM ? "One Nation’s" : "the Coalition’s", " way than the month\u2019s ", RD_AP_AVG, " of ", avg.toFixed(1), moe != null ? ", " + inside + " its ±" + moe.toFixed(1) + " margin" : ""))), fig.a == null && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, Math.abs(lean).toFixed(1)), " more ", lean > 0 ? "Labor’s" : onM ? "One Nation’s" : "the Coalition’s", " way than the month\u2019s ", RD_AP_AVG, " of ", avg.toFixed(1), moe != null ? ", " + inside + " its ±" + moe.toFixed(1) + " margin" : ""))), fig.a != null && moe != null && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Margin of error"), React.createElement("span", null, "\xB1", moe.toFixed(1), " on its ", pub ? "published" : "implied", " two-party figure, at 95%, ", rdMarginBasis(p))), fig.a == null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
   }, "Two-party"), React.createElement("span", null, fig.none[0].toUpperCase() + fig.none.slice(1), ", so this poll has no ", pub ? "published" : "implied", " figure to set against the ", RD_AP_AVG, ".")), React.createElement("span", {
     className: "rd-apd-k"

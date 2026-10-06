@@ -382,6 +382,21 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
         return apWho(r, o, Lm ? Lm.label : rdCap(o)) + " " + s[o];
       })].join(", ");
     }).join("; ");
+    /* the two-party figures' 95% margins (All polls' rdPollMargin, read off
+       the archive's copy of this poll, which carries every field it needs),
+       one per basis: a range where the two contests' margins differ */
+    const ip = D.individualPolls.find((q) => q.pollster === r.pollster && q.released === r.released);
+    const moeOf = (isPub) => {
+      if (!ip) return null;
+      const ms = [isPub ? (r.tppAlt ? "onp" : null) : (r.alpOnImp != null ? "onp" : null),
+                  isPub ? (r.alp2pp != null ? "lnp" : null) : (r.alpImp != null ? "lnp" : null)]
+        .filter(Boolean).map((c) => rdPollMargin(ip, c, isPub)).filter((m) => m != null).map((m) => m.toFixed(1));
+      if (!ms.length) return null;
+      const lo = Math.min(...ms), hi = Math.max(...ms);
+      return "±" + (lo === hi ? lo.toFixed(1) : lo.toFixed(1) + "–" + hi.toFixed(1)) + (isPub ? " on the published" : " on the implied");
+    };
+    const moes = [imp.length > 0 && moeOf(false), pub.length > 0 && moeOf(true)].filter(Boolean);
+    const moeTxt = moes.length ? moes.join(", ") + (moes.length > 1 ? " figures" : " figure") + ", " + rdMarginBasis(ip) : null;
     const a = r.appr || {};
     const net = (v) => (v == null ? null : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v));
     const nets = clause([[apWho(r, "alb", "Albanese"), a.albNet, "albNet"], [a.oppName || "Taylor", a.taylorNet, "taylorNet"], [apWho(r, "hanson", "Hanson"), a.hansonNet, "hansonNet"]]
@@ -410,6 +425,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
           <dl className="rd-pld-dl">
             {imp.length > 0 && <><dt>Two-party, implied</dt><dd>{imp}</dd></>}
             {pub.length > 0 && <><dt>As published</dt><dd>{pub}</dd></>}
+            {moeTxt && <><dt>Margin of error</dt><dd>{moeTxt}</dd></>}
             {ppm && <><dt>{window.JUR ? "Preferred " + window.JUR.office.alb : "Preferred prime minister"}</dt><dd>{ppm}</dd></>}
             {nets.length > 0 && <><dt>Net approval</dt><dd>{nets}</dd></>}
           </dl>

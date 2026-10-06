@@ -43,6 +43,18 @@ function rdPollMargin(p, contest, pub) {
   return 196 * Math.sqrt(Math.max(0, e2 - e1 * e1) / n);
 }
 
+/* what a poll's margin stands on, said beside it wherever it shows: the
+   pollster's own effective sample (its APC statement), or, where it printed
+   none for this poll, the raw sample over the design effect rdPollMargin
+   assumes. Null when there is no sample at all (no margin either). */
+function rdMarginBasis(p) {
+  if (p.sampleEff != null) return "from its effective sample of " + p.sampleEff.toLocaleString();
+  if (!p.sample) return null;
+  const n = Math.round(p.sample / rdApDeff() / 10) * 10;
+  return "assuming its " + p.sample.toLocaleString() + " respondents are worth about " + n.toLocaleString()
+    + (rdEffTbc(p) ? ", until its effective sample is out" : ", as " + p.pollster + " published no effective sample for this poll");
+}
+
 /* a published figure as the pollster printed it: 55, 54.5 */
 const rdApNum = (v) => (v == null ? "—" : String(+(+v).toFixed(1)));
 /* the same figure cast the Latest table's way (its primFig): a half prints
@@ -1385,6 +1397,10 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
             <span>{Math.abs(lean) < 0.05
               ? <>Level with the month’s {RD_AP_AVG} of {avg.toFixed(1)}{moe != null ? ", inside its ±" + moe.toFixed(1) + " margin" : ""}</>
               : <><b style={{ color: rdApLeanInk(lean, onM) }}>{Math.abs(lean).toFixed(1)}</b> more {lean > 0 ? "Labor’s" : onM ? "One Nation’s" : "the Coalition’s"} way than the month’s {RD_AP_AVG} of {avg.toFixed(1)}{moe != null ? ", " + inside + " its ±" + moe.toFixed(1) + " margin" : ""}</>}</span>
+          </>}
+          {fig.a != null && moe != null && <>
+            <span className="rd-apd-k">Margin of error</span>
+            <span>±{moe.toFixed(1)} on its {pub ? "published" : "implied"} two-party figure, at 95%, {rdMarginBasis(p)}</span>
           </>}
           {fig.a == null && <>
             <span className="rd-apd-k">Two-party</span>

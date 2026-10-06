@@ -2401,7 +2401,9 @@ body.rd .rd-apd-none { color: var(--ink-3); }
 body.rd .rd-apd-cell { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 body.rd .rd-apd-cell b { font-weight: 600; }
 body.rd .rd-apd-leaders { display: flex; flex-wrap: wrap; gap: 6px 28px; }
-body.rd .rd-apd-links { margin: 10px 0 0 -4px; padding-right: 40px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; }
+body.rd .rd-apd-links { margin: 10px 0 0 -4px; padding-right: 40px; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; font-size: 13px; }
+/* 13px, as in the Latest polls detail (.rd-pl-detail): .rd-link's `all: unset`
+   otherwise lets these inherit the page's 16px, larger than the panel's own text */
 body.rd .rd-apd-srcs { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; column-gap: 18px; }
 body.rd .rd-apd-ext { display: inline-block; margin-left: 3px; font-size: 11px; color: var(--ink-faint); text-decoration: none; }
 body.rd .rd-apd-ct { margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--ink); }
