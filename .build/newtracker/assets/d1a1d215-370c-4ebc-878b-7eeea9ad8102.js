@@ -3957,6 +3957,14 @@ const POLL_TAGS = [
   { id: "iss",   label: "Iss",   title: "Issues – what voters say matters, and the party rated best on it" },
 ];
 const POLL_TAG_META = Object.fromEntries(POLL_TAGS.map((t) => [t.id, t]));
+/* a client's name as a reader is likelier to type it, for the names that
+   abbreviate themselves: the haystack carries the alias beside the printed
+   name, so "australian financial review" finds AFR's polls too */
+const AP_CLIENT_ALIASES = {
+  "afr": "australian financial review",
+  "smh/age": "sydney morning herald the age",
+  "australia inst.": "australia institute",
+};
 /* URL state for the archive's two multi-selects (pollsters w=, tags h=) rides
    as a bitmask, same scheme as the cycles tab's ?c=: bit i = order[i]
    selected, rendered in base 36 and prefixed "b" – a shape no legacy value
@@ -5357,6 +5365,13 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       lean != null ? (lean > 0 ? "+" : "") + lean.toFixed(1) : null,
       f1(p.p.alp), f1(p.p.lnp), f1(p.p.grn), f1(p.p.onp), f1(p.p.oth),
     ].filter(Boolean);
+    // the publisher as printed, so "news24" / "afr" / "smh" finds the waves it
+    // put its name to – "Self-published" is gen-data's stand-in, not a name
+    if (p.client && p.client !== "Self-published") {
+      hayParts.push(p.client);
+      const clientAlias = AP_CLIENT_ALIASES[p.client.toLowerCase()];
+      if (clientAlias) hayParts.push(clientAlias);
+    }
     if (p.tpp3) hayParts.push(p.tpp3.alp.toFixed(1), p.tpp3.lnp.toFixed(1), p.tpp3.onp.toFixed(1), "3-cornered 3cp");
     if (p.tppAlt) hayParts.push(p.tppAlt.alp.toFixed(1), p.tppAlt.onp.toFixed(1), "alp v on one nation matchup");
     if (p.tppAlt2) hayParts.push(p.tppAlt2.lnp.toFixed(1), p.tppAlt2.onp.toFixed(1), "lnp v on one nation matchup");

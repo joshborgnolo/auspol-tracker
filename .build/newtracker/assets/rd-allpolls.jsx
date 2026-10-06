@@ -2474,7 +2474,7 @@ function RdAllPolls(P) {
         <label className="rd-ap-search">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
           <input ref={searchRef} type="search" value={q} onChange={(e) => setQ(e.target.value)} autoCorrect="off" spellCheck={false}
-                 placeholder="Search a pollster, a date or a figure" aria-label="Search the polls" />
+                 placeholder="Search a pollster, a publisher, a date or a figure" aria-label="Search the polls" />
           {q && <button type="button" className="rd-ap-x" onClick={() => setQ("")} aria-label="Clear search">×</button>}
         </label>
         <span className="rd-ap-pops">
