@@ -5926,6 +5926,236 @@
     "grn": 14.5,
     "oth": 11
    }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-10-06",
+   "dateStart": "2026-09-29",
+   "sample": 1500,
+   "article": "https://www.news24.com.au/politics/australian-politics/albanese-government-hits-new-polling-low-as-pauline-hansons-one-nation-surges-ahead-in-news24-pulse/news-story/dc75633341ddf1d90db9c3eb78061e20",
+   "source": "https://e.infogram.com/_/k58LEJVsGG4OersOUxEA",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 27,
+      "lnp": 23,
+      "onp": 27,
+      "grn": 12,
+      "oth": 11
+     },
+     "Women": {
+      "alp": 24,
+      "lnp": 19,
+      "onp": 29,
+      "grn": 16,
+      "oth": 12
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 30,
+      "lnp": 10,
+      "onp": 16,
+      "grn": 31,
+      "oth": 13
+     },
+     "35–49": {
+      "alp": 28,
+      "lnp": 19,
+      "onp": 28,
+      "grn": 15,
+      "oth": 9
+     },
+     "50+": {
+      "alp": 22,
+      "lnp": 27,
+      "onp": 35,
+      "grn": 6,
+      "oth": 10
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 34,
+      "lnp": 7,
+      "onp": 11,
+      "grn": 41,
+      "oth": 7
+     },
+     "Millennials": {
+      "alp": 25,
+      "lnp": 17,
+      "onp": 26,
+      "grn": 18,
+      "oth": 14
+     },
+     "Gen X": {
+      "alp": 26,
+      "lnp": 21,
+      "onp": 33,
+      "grn": 7,
+      "oth": 13
+     },
+     "Boomers": {
+      "alp": 21,
+      "lnp": 28,
+      "onp": 36,
+      "grn": 5,
+      "oth": 9
+     },
+     "Silent": {
+      "alp": 10,
+      "lnp": 52,
+      "onp": 28,
+      "grn": 1,
+      "oth": 8
+     }
+    },
+    "state": {
+     "NSW": {
+      "alp": 25,
+      "lnp": 20,
+      "onp": 29,
+      "grn": 17,
+      "oth": 10
+     },
+     "Vic": {
+      "alp": 26,
+      "lnp": 25,
+      "onp": 24,
+      "grn": 15,
+      "oth": 10
+     },
+     "Qld": {
+      "alp": 22,
+      "lnp": 20,
+      "onp": 39,
+      "grn": 11,
+      "oth": 8
+     },
+     "SA": {
+      "alp": 39,
+      "lnp": 18,
+      "onp": 22,
+      "grn": 11,
+      "oth": 10
+     },
+     "WA": {
+      "alp": 20,
+      "lnp": 19,
+      "onp": 27,
+      "grn": 19,
+      "oth": 15
+     },
+     "ACT/NT/Tas": {
+      "alp": 30,
+      "lnp": 22,
+      "onp": 15,
+      "grn": 11,
+      "oth": 22
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 25,
+      "lnp": 25,
+      "onp": 17,
+      "grn": 21,
+      "oth": 12
+     },
+     "Outer metro": {
+      "alp": 26,
+      "lnp": 19,
+      "onp": 30,
+      "grn": 16,
+      "oth": 9
+     },
+     "Provincial": {
+      "alp": 35,
+      "lnp": 19,
+      "onp": 33,
+      "grn": 6,
+      "oth": 7
+     },
+     "Rural": {
+      "alp": 19,
+      "lnp": 19,
+      "onp": 38,
+      "grn": 11,
+      "oth": 13
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 23,
+      "lnp": 22,
+      "onp": 36,
+      "grn": 11,
+      "oth": 9
+     },
+     "TAFE or college": {
+      "alp": 21,
+      "lnp": 20,
+      "onp": 29,
+      "grn": 17,
+      "oth": 13
+     },
+     "University": {
+      "alp": 34,
+      "lnp": 20,
+      "onp": 17,
+      "grn": 18,
+      "oth": 11
+     }
+    },
+    "language": {
+     "Other language": {
+      "alp": 33,
+      "lnp": 23,
+      "onp": 14,
+      "grn": 18,
+      "oth": 12
+     },
+     "English only": {
+      "alp": 24,
+      "lnp": 21,
+      "onp": 31,
+      "grn": 14,
+      "oth": 11
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 21,
+      "lnp": 31,
+      "onp": 32,
+      "grn": 7,
+      "oth": 9
+     },
+     "Mortgage": {
+      "alp": 27,
+      "lnp": 20,
+      "onp": 28,
+      "grn": 13,
+      "oth": 12
+     },
+     "Renting": {
+      "alp": 25,
+      "lnp": 11,
+      "onp": 28,
+      "grn": 21,
+      "oth": 14
+     }
+    }
+   },
+   "total": {
+    "alp": 25,
+    "lnp": 21,
+    "onp": 28,
+    "grn": 15,
+    "oth": 11
+   }
   }
  ],
  "skipped": [
