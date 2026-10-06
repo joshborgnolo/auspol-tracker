@@ -5365,6 +5365,22 @@
       "tpp_lnp": 54,
       "tpp_flows": 50,
       "url": "https://www.afr.com/politics/federal/voters-turn-on-albanese-and-chalmers-as-economic-concerns-bite-20261004-p612n5"
+    },
+    {
+      "date": "2026-10-06",
+      "dateStart": "2026-09-29",
+      "pollster": "YouGov",
+      "client": "News24",
+      "sample": 1500,
+      "alp": 25,
+      "lnp": 21,
+      "grn": 15,
+      "onp": 28,
+      "ind": 5,
+      "oth": 6,
+      "tpp_alp": 52,
+      "tpp_lnp": 48,
+      "url": "https://www.news24.com.au/politics/australian-politics/albanese-government-hits-new-polling-low-as-pauline-hansons-one-nation-surges-ahead-in-news24-pulse/news-story/dc75633341ddf1d90db9c3eb78061e20"
     }
   ],
   "ppm": [
