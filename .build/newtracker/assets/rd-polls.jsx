@@ -459,8 +459,9 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                     <b>Next: {nx.date}{hourWords(pj) ? ", " + hourWords(pj).replace(/^about /, "about ") + " " + easternAbbr(pj.release) : ""}</b>, at the earliest{then ? "; then " + wdm(then.release) : ""}.</>}
             </p>
             {/* the house's "where it lands first" page (pollsterRules.site) belongs
-                with the wait for the next poll, not on the name of the last one */}
-            {e.next && e.next.site && <a className="rd-link rd-link-ext rd-pld-site" href={e.next.site} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}><span className="rd-link-t">Where the next one lands first</span> <span className="rd-apd-ext" aria-hidden="true">↗</span></a>}
+                with the wait for the next poll, not on the name of the last one;
+                the date it carries is the Next column's own projection */}
+            {e.next && e.next.site && <a className="rd-link rd-link-ext rd-pld-site" href={e.next.site} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}><span className="rd-link-t">Where the next one lands first — {nx.date.replace(/^About /, "about ")}</span> <span className="rd-apd-ext" aria-hidden="true">↗</span></a>}
           </div>
         )}
       </div>
