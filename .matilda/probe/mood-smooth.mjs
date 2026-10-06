@@ -43,8 +43,10 @@
        dek/readouts quote the RAW latest prints (NAB's as its own net
        balance), the key says dot = printed release / line = smoothed
        trend, and the HowTo explains the half-lives and the +100 draw,
-     - the window's major events (incl. the Hormuz crisis, the 2026
-       budget and the RBA's September rise) ride the chart as ruled
+     - the window's major events less the party-politics changes of
+       hand (both Coalition splits, Joyce to One Nation, Taylor's
+       leadership stay off; the Hormuz crisis, the 2026 budget and the
+       RBA's September rise ride) ride the chart as ruled
        g.evt marks; a phone numbers them with the names folded out
        under the chart, a desktop labels them on the plot,
      - desktop rungs get one in-chart end label per lane, phone gets none
@@ -92,7 +94,10 @@ check(gloss.includes("NAB is drawn 100 points up."), "glossary discloses the NAB
 check(gloss.includes("The chart opens at the May 2025 election"), "glossary dates the chart window to the May 2025 election");
 check(panels.includes("const x0 = 2025 + 122 / 365"), "the panel opens the x-window at the 2025 election (x0 = 2025 + 122/365)");
 check(panels.includes("xTicks={rdElectionTicks(x0, x1, narrow, x0)}"), "the x axis uses the election-window tick set (Election + months), not bare years");
-check(panels.includes("const evs = rdChartEvents(D.events, x0, x1)"), "the panel marks the window's major events (rdChartEvents over x0..x1)");
+check(panels.includes("const evs = rdChartEvents(D.events, x0, x1).filter((e) => !MOOD_OFF.includes(e.date))"), "the panel marks the window's major events (rdChartEvents over x0..x1, less MOOD_OFF)");
+/* the party-politics events kept off this chart, mirroring rd-panels.jsx */
+const MOOD_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+check(panels.includes('const MOOD_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"]'), "MOOD_OFF names both Coalition splits, Joyce to ONP and Taylor's leadership");
 check(panels.includes('rdEventBadges("mood", evs, x0, x1)'), "a phone's events ride as numbered badges under the \"mood\" key");
 check(panels.includes("events={badges ? badges.events : evs}\n          evt={evtOpen} onEvt={setEvtOpen}"), "the chart takes the events with the controlled evt/onEvt pair");
 const genData = fs.readFileSync(path.join(BASE, ".build/newtracker/gen-data.mjs"), "utf8");
@@ -170,12 +175,14 @@ console.log("kernel: " + live.map((l) => `${l.k} ${exp[l.k].length} pts (hl ${l.
 /* the window's marked events: the page's own rdChartEvents and
    rdEventBadges against the live domain (the same machinery the panel
    rides, nothing reimplemented here) */
-const expEvs = await page.evaluate(([ex, ex1]) =>
-  rdChartEvents(window.AP.D.events, ex, ex1).map((e) => ({ date: e.date, label: e.label })), [x0, x1]);
-const expList = await page.evaluate(([ex, ex1]) => {
-  const b = rdEventBadges("mood", rdChartEvents(window.AP.D.events, ex, ex1), ex, ex1);
+const expEvs = await page.evaluate(([ex, ex1, off]) =>
+  rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => !off.includes(e.date)).map((e) => ({ date: e.date, label: e.label })), [x0, x1, MOOD_OFF]);
+const offEvs = await page.evaluate(([ex, ex1, off]) =>
+  rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => off.includes(e.date)).map((e) => ({ date: e.date, label: e.label })), [x0, x1, MOOD_OFF]);
+const expList = await page.evaluate(([ex, ex1, off]) => {
+  const b = rdEventBadges("mood", rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => !off.includes(e.date)), ex, ex1);
   return b.list.map((l) => ({ n: l.n, t: l.labels.join(", ") }));
-}, [x0, x1]);
+}, [x0, x1, MOOD_OFF]);
 console.log("events: " + expEvs.map((e) => e.date).join(", ") + " (" + expEvs.length + ")");
 
 for (const l of live) {
@@ -364,6 +371,8 @@ async function checkChart(rung) {
   check(expEvs.length > 0 && evArias.length === expEvs.length, `${expEvs.length} marked events ride the chart (${evArias.length} rules)`);
   check(expEvs.every((e) => evArias.some((a) => a.startsWith(e.label))),
     `every windowed event carries its own rule (${expEvs.map((e) => e.date).join(", ")})`);
+  check(offEvs.length === 4 && offEvs.every((e) => !evArias.some((a) => a.startsWith(e.label))),
+    `the four party-politics events stay off the chart (${offEvs.map((e) => e.date).join(", ")})`);
   for (const d of ["2026-03-02", "2026-05-12", "2026-09-29"]) {
     const ev = expEvs.find((e) => e.date === d);
     check(ev && evArias.some((a) => a.startsWith(ev.label)), `the ${d} event rides the chart ("${ev ? ev.label : "?"}")`);

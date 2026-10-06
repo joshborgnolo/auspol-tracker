@@ -3896,10 +3896,13 @@ function RdMood({ rangeId }) {
      payload, off-screen; the dek's high/low reads are windowed with it. */
   const x0 = 2025 + 122 / 365;
   const x1 = D.domain.x1;
-  /* the numbered events: the same set the hero marks, over this chart's
-     window - the Hormuz blockade, the 2026 budget and the RBA's September
-     hike all moved one or more of these gauges */
-  const evs = rdChartEvents(D.events, x0, x1);
+  /* the numbered events: the hero's set over this chart's window, less the
+     party-politics changes of hand (both Coalition splits, Joyce to One
+     Nation, Taylor's leadership) - the economy's events stay: the Hormuz
+     blockade, the 2026 budget and the RBA's September hike all moved one
+     or more of these gauges */
+  const MOOD_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+  const evs = rdChartEvents(D.events, x0, x1).filter((e) => !MOOD_OFF.includes(e.date));
   const badges = narrow ? rdEventBadges("mood", evs, x0, x1) : null;
   /* the phone list under the chart opens an event's panel by tapping its
      number; a tap on another number hands the panel over, and an event that

@@ -92585,7 +92585,8 @@ function RdMood({
   };
   const x0 = 2025 + 122 / 365;
   const x1 = D.domain.x1;
-  const evs = rdChartEvents(D.events, x0, x1);
+  const MOOD_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+  const evs = rdChartEvents(D.events, x0, x1).filter(e => !MOOD_OFF.includes(e.date));
   const badges = narrow ? rdEventBadges("mood", evs, x0, x1) : null;
   const [evtOpen, setEvtOpen] = useState(null);
   const pickEv = e => {
