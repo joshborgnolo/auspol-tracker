@@ -826,28 +826,32 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
   ];
   if (!onM) cols.reverse();
   /* better PM: Hanson's contest beside One Nation, the opposition leader's
-     beside the Coalition; a three-way contest takes the Coalition's cell */
+     beside the Coalition; a three-way contest belongs to neither column, so
+     it takes a full-width row of its own (Newspoll and DemosAU ask both
+     forms - parking it in the Coalition cell dropped it whenever that cell
+     already held the head-to-head) */
   const sets = window.ppmContests ? window.ppmContests(p) : (p.ppmSets || []);
   const NAME = { alb: "Albanese", taylor: "Taylor", ley: "Ley", hanson: "Hanson" };
   const INK = { alb: "var(--alp-text)", taylor: "var(--lnp-text)", ley: "var(--lnp-text)", hanson: "var(--onp-text)" };
-  const ppmCell = (s, three) => (
+  const ppmCell = (s) => (
     <span className="rd-apd-cell">
       <span>{["alb", "taylor", "ley", "hanson"].filter((k) => s[k] != null).map((k, i) => (
         <React.Fragment key={k}>{i > 0 ? ", " : ""}{apWho(p, k, NAME[k])} <b style={{ color: INK[k] }}>{s[k]}</b></React.Fragment>
       ))}</span>
-      <span className="rd-apd-sub">{three ? "three-way" + (s.unc != null ? ", " + s.unc + " undecided" : "") : s.unc != null ? s.unc + " undecided" : ""}</span>
+      {/* a contest summing to 100 was printed without its undecided, not measured at none */}
+      <span className="rd-apd-sub">{s.unc ? s.unc + " undecided" : ""}</span>
     </span>
   );
   const setHan = sets.find((s) => s.hanson != null && s.taylor == null && s.ley == null);
   const setOpp = sets.find((s) => (s.taylor != null || s.ley != null) && s.hanson == null);
   const setThree = sets.find((s) => s.hanson != null && (s.taylor != null || s.ley != null));
-  const ppmBy = { onp: setHan ? ppmCell(setHan) : null, lnp: setOpp ? ppmCell(setOpp) : setThree ? ppmCell(setThree, true) : null };
+  const ppmBy = { onp: setHan ? ppmCell(setHan) : null, lnp: setOpp ? ppmCell(setOpp) : null };
   /* a wave with no voting intention behind it (SEC Newgate's direction-only
      surveys, Essential's three mood-only waves of 2025) leaves every matchup
      cell a dash — nothing to imply from, nothing published, no better-PM — so
      the grid removes itself entirely */
   const hasMatchup = p.alpOnImp != null || p.alpImp != null || !!ta
-    || (p.alp != null && p.lnp != null) || ppmBy.onp != null || ppmBy.lnp != null;
+    || (p.alp != null && p.lnp != null) || ppmBy.onp != null || ppmBy.lnp != null || !!setThree;
   const a = p.appr || {};
   const mb = a.metricBy || {};
   const leaders = [["alb", "albNet", rdApPm(a)], ["taylor", "taylorNet", a.oppName || "Taylor"], ["hanson", "hansonNet", apWho(a, "hanson", "Hanson")]]
@@ -1154,6 +1158,10 @@ function RdApDetail({ p, onM, pub, today, winN, avgBy, avgFor, facet, onBack, ba
             {(ppmBy.onp || ppmBy.lnp) && <>
               <span className="rd-apd-k">{window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister"}</span>
               {cols.map((k) => <span key={k.id}>{ppmBy[k.id] || none}</span>)}
+            </>}
+            {setThree && <>
+              <span className="rd-apd-k">{(window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister") + ", three‑way"}</span>
+              <span style={{ gridColumn: "2 / -1" }}>{ppmCell(setThree)}</span>
             </>}
           </div>
         )}
