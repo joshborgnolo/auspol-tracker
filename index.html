@@ -82390,7 +82390,7 @@ function RdPolls({
       onClick: ev => ev.stopPropagation()
     }, React.createElement("span", {
       className: "rd-link-t"
-    }, "Where the next one lands first \u2014 ", nx.date.replace(/^About /, "about ")), " ", React.createElement("span", {
+    }, "Where the next one lands first"), " ", React.createElement("span", {
       className: "rd-apd-ext",
       "aria-hidden": "true"
     }, "\u2197"))));
@@ -82650,7 +82650,16 @@ function RdPolls({
       className: "rd-pl-main"
     }, React.createElement("span", {
       className: "rd-pl-short"
-    }, "Next "), nx.date), React.createElement("span", {
+    }, "Next "), e.next && e.next.site ? React.createElement("a", {
+      href: e.next.site,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      title: "Where " + r.pollster + "’s next poll lands first",
+      onClick: ev => ev.stopPropagation()
+    }, nx.date, React.createElement("span", {
+      className: "plink-mark",
+      "aria-hidden": "true"
+    }, "\u2197")) : nx.date), React.createElement("span", {
       className: "rd-pl-sub"
     }, nx.sub)), React.createElement("span", {
       className: "rd-pl-c-exp"

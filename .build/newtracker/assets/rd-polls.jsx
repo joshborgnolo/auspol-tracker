@@ -460,8 +460,8 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
             </p>
             {/* the house's "where it lands first" page (pollsterRules.site) belongs
                 with the wait for the next poll, not on the name of the last one;
-                the date it carries is the Next column's own projection */}
-            {e.next && e.next.site && <a className="rd-link rd-link-ext rd-pld-site" href={e.next.site} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}><span className="rd-link-t">Where the next one lands first — {nx.date.replace(/^About /, "about ")}</span> <span className="rd-apd-ext" aria-hidden="true">↗</span></a>}
+                the row's Next date carries the same link */}
+            {e.next && e.next.site && <a className="rd-link rd-link-ext rd-pld-site" href={e.next.site} target="_blank" rel="noopener noreferrer" onClick={(ev) => ev.stopPropagation()}><span className="rd-link-t">Where the next one lands first</span> <span className="rd-apd-ext" aria-hidden="true">↗</span></a>}
           </div>
         )}
       </div>
@@ -653,7 +653,12 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                 <span role="cell" className="rd-pl-c-figs"><RdSwap k={facet}>{figCell(e)}</RdSwap></span>
                 <span role="cell" className="rd-pl-c-tl">{strip(e)}</span>
                 <span role="cell" className={"rd-pl-c-next" + (nx.missed ? " missed" : "")}>
-                  <span className="rd-pl-main"><span className="rd-pl-short">Next </span>{nx.date}</span>
+                  <span className="rd-pl-main"><span className="rd-pl-short">Next </span>{e.next && e.next.site
+                    /* the house's "where it lands first" page rides the projected
+                       date: same treatment as the pollster name's link (rd.css
+                       .rd-pl-main a + plink-mark) */
+                    ? <a href={e.next.site} target="_blank" rel="noopener noreferrer" title={"Where " + r.pollster + "’s next poll lands first"} onClick={(ev) => ev.stopPropagation()}>{nx.date}<span className="plink-mark" aria-hidden="true">↗</span></a>
+                    : nx.date}</span>
                   <span className="rd-pl-sub">{nx.sub}</span>
                 </span>
                 <span className="rd-pl-c-exp">
