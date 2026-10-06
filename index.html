@@ -92514,6 +92514,15 @@ function RdMood({
   };
   const x0 = 2025 + 122 / 365;
   const x1 = D.domain.x1;
+  const evs = rdChartEvents(D.events, x0, x1);
+  const badges = narrow ? rdEventBadges("mood", evs, x0, x1) : null;
+  const [evtOpen, setEvtOpen] = useState(null);
+  const pickEv = e => {
+    setEvtOpen(cur => cur && cur.e === e ? cur : {
+      e
+    });
+    rdEventReveal("evt-a-" + e.badgeKey);
+  };
   const rows = new Map(lanes.map(l => [l.k, l.s.polls.filter(p => p.x >= x0)]));
   const dek = lanes.map(sent).join(" ");
   const rawPoints = new Map(lanes.map(l => [l.k, rows.get(l.k).map(p => ({
@@ -92574,12 +92583,12 @@ function RdMood({
     padPx: narrow ? {
       l: 34,
       r: 8,
-      t: 10,
+      t: 34,
       b: 28
     } : {
       l: 40,
       r: 16,
-      t: 14,
+      t: 44,
       b: 30
     },
     xDomain: [x0, x1],
@@ -92605,6 +92614,9 @@ function RdMood({
       points: sePoints.get(l.k)
     })),
     spine: spine,
+    events: badges ? badges.events : evs,
+    evt: evtOpen,
+    onEvt: setEvtOpen,
     scatter: lanes.flatMap(l => rawPoints.get(l.k).map(q => ({
       x: q.x,
       y: q.y,
@@ -92628,7 +92640,17 @@ function RdMood({
       caption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly series). NAB prints a net balance (0 = neutral), so its dashed line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. No combining, no adjustment.",
       legend: copyLegend
     }
-  }), React.createElement(RdKey, {
+  }), badges && badges.list.length === 1 && React.createElement(RdEventList, {
+    list: badges.list,
+    onPick: pickEv,
+    openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
+  }), badges && badges.list.length > 1 && React.createElement("details", {
+    className: "rd-evdrop"
+  }, React.createElement("summary", null, "The marked events"), React.createElement(RdEventList, {
+    list: badges.list,
+    onPick: pickEv,
+    openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
+  })), React.createElement(RdKey, {
     className: "rd-ckey",
     items: [{
       kind: "dot",

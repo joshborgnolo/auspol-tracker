@@ -3888,6 +3888,16 @@ function RdMood({ rangeId }) {
      payload, off-screen; the dek's high/low reads are windowed with it. */
   const x0 = 2025 + 122 / 365;
   const x1 = D.domain.x1;
+  /* the numbered events: the same set the hero marks, over this chart's
+     window - the Hormuz blockade, the 2026 budget and the RBA's September
+     hike all moved one or more of these gauges */
+  const evs = rdChartEvents(D.events, x0, x1);
+  const badges = narrow ? rdEventBadges("mood", evs, x0, x1) : null;
+  /* the phone list under the chart opens an event's panel by tapping its
+     number; a tap on another number hands the panel over, and an event that
+     leaves the window is put away by the chart's own reconciliation */
+  const [evtOpen, setEvtOpen] = useState(null);
+  const pickEv = (e) => { setEvtOpen((cur) => (cur && cur.e === e ? cur : { e })); rdEventReveal("evt-a-" + e.badgeKey); };
   const rows = new Map(lanes.map((l) => [l.k, l.s.polls.filter((p) => p.x >= x0)]));
   const dek = lanes.map(sent).join(" ");
   /* The dots, spine and domain ride the raw prints; the series lines are
@@ -3916,13 +3926,17 @@ function RdMood({ rangeId }) {
           </div>
         ))}
         <TrendChart key="rd-mood" heightPx={narrow ? 260 : 340}
-          padPx={narrow ? { l: 34, r: 8, t: 10, b: 28 } : { l: 40, r: 16, t: 14, b: 30 }}
+          /* the top pad buys the numbered event badges their row above
+             the plot, as the primary card's does */
+          padPx={narrow ? { l: 34, r: 8, t: 34, b: 28 } : { l: 40, r: 16, t: 44, b: 30 }}
           xDomain={[x0, x1]} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => String(v)}
           xTicks={rdElectionTicks(x0, x1, narrow, x0)} baseline
           refLines={[{ y: 100, label: "100 = neutral", align: "left", color: "var(--ink-3)" }]}
           series={lanes.map((l) => ({ id: l.k, label: l.lab, color: l.color, rdWidth: l.dash ? 1.6 : 2.2, dash: l.dash || undefined,
             endCap: false, endLabel: narrow ? null : l.lab, points: sePoints.get(l.k) }))}
           spine={spine}
+          events={badges ? badges.events : evs}
+          evt={evtOpen} onEvt={setEvtOpen}
           scatter={lanes.flatMap((l) => rawPoints.get(l.k).map((q) => ({ x: q.x, y: q.y, color: l.color, label: l.lab, ...(q.raw != null ? { raw: q.raw } : {}), meta: { pollster: l.by } })))}
           tooltipTitle={(i) => { const p = spine[i]; return p ? monthLabelFull(p.ym) : ""; }}
           fmt={fmt}
@@ -3930,6 +3944,21 @@ function RdMood({ rangeId }) {
                   sub: head + " Four published gauges on one 100-neutral scale: ANZ–Roy Morgan consumer confidence (weekly), Westpac–MI consumer sentiment, Roy Morgan business confidence and NAB business confidence (monthly).",
                   caption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly series). NAB prints a net balance (0 = neutral), so its dashed line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. No combining, no adjustment.",
                   legend: copyLegend }} />
+        {/* the hero's list above already names this window's events, so
+            two or more fold away behind a disclosure the reader opens when
+            a mark puzzles them; a lone marked event just sits out as the
+            single row, with no "The marked events" wrapping it */}
+        {badges && badges.list.length === 1 && (
+          <RdEventList list={badges.list} onPick={pickEv}
+                       openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />
+        )}
+        {badges && badges.list.length > 1 && (
+          <details className="rd-evdrop">
+            <summary>The marked events</summary>
+            <RdEventList list={badges.list} onPick={pickEv}
+                         openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />
+          </details>
+        )}
         <RdKey className="rd-ckey" items={[
           { kind: "dot", color: "var(--ink-3)", label: "One release, as printed" },
           { kind: "line", color: "var(--ink-3)", label: "Smoothed trend of the releases" },

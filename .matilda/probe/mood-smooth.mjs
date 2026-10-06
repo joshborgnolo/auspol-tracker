@@ -43,6 +43,10 @@
        dek/readouts quote the RAW latest prints (NAB's as its own net
        balance), the key says dot = printed release / line = smoothed
        trend, and the HowTo explains the half-lives and the +100 draw,
+     - the window's major events (incl. the Hormuz crisis, the 2026
+       budget and the RBA's September rise) ride the chart as ruled
+       g.evt marks; a phone numbers them with the names folded out
+       under the chart, a desktop labels them on the plot,
      - desktop rungs get one in-chart end label per lane, phone gets none
        and stays inside its viewport;
      - #mood renders on the default tab with no interaction, and no
@@ -88,6 +92,9 @@ check(gloss.includes("NAB is drawn 100 points up."), "glossary discloses the NAB
 check(gloss.includes("The chart opens at the May 2025 election"), "glossary dates the chart window to the May 2025 election");
 check(panels.includes("const x0 = 2025 + 122 / 365"), "the panel opens the x-window at the 2025 election (x0 = 2025 + 122/365)");
 check(panels.includes("xTicks={rdElectionTicks(x0, x1, narrow, x0)}"), "the x axis uses the election-window tick set (Election + months), not bare years");
+check(panels.includes("const evs = rdChartEvents(D.events, x0, x1)"), "the panel marks the window's major events (rdChartEvents over x0..x1)");
+check(panels.includes('rdEventBadges("mood", evs, x0, x1)'), "a phone's events ride as numbered badges under the \"mood\" key");
+check(panels.includes("events={badges ? badges.events : evs}\n          evt={evtOpen} onEvt={setEvtOpen}"), "the chart takes the events with the controlled evt/onEvt pair");
 const genData = fs.readFileSync(path.join(BASE, ".build/newtracker/gen-data.mjs"), "utf8");
 check(genData.includes("recency-weighted smoothed trend on top (render"), "gen-data §5j comment still promises the raw payload");
 
@@ -159,6 +166,17 @@ for (const l of live) {
   exp[l.k] = smooth(fil[l.k], l.hl).map((p) => ({ x: p.x, y: p.y + (l.shift || 0) }));
 }
 console.log("kernel: " + live.map((l) => `${l.k} ${exp[l.k].length} pts (hl ${l.hl}d${l.shift ? ", +" + l.shift : ""})`).join(", "));
+
+/* the window's marked events: the page's own rdChartEvents and
+   rdEventBadges against the live domain (the same machinery the panel
+   rides, nothing reimplemented here) */
+const expEvs = await page.evaluate(([ex, ex1]) =>
+  rdChartEvents(window.AP.D.events, ex, ex1).map((e) => ({ date: e.date, label: e.label })), [x0, x1]);
+const expList = await page.evaluate(([ex, ex1]) => {
+  const b = rdEventBadges("mood", rdChartEvents(window.AP.D.events, ex, ex1), ex, ex1);
+  return b.list.map((l) => ({ n: l.n, t: l.labels.join(", ") }));
+}, [x0, x1]);
+console.log("events: " + expEvs.map((e) => e.date).join(", ") + " (" + expEvs.length + ")");
 
 for (const l of live) {
   const devs = exp[l.k].map((s, i) => Math.abs((s.y - (l.shift || 0)) - fil[l.k][i].v));
@@ -333,6 +351,34 @@ async function checkChart(rung) {
       `one in-chart end label per lane (${labels.join(", ")})`);
   } else {
     check(labels.length === 0, "no in-chart end labels on the phone (the readouts above name them)");
+  }
+
+  /* the marked events: every windowed major (and the two changes of
+     hand) carries a ruled g.evt[role=img] whose aria names it; the
+     triple this panel was asked to mark - Hormuz, the 2026 budget, the
+     RBA hike - ride among them. A desktop's LABEL pass draws a second
+     aria-hidden g.evt per named event (the redesign sets every name
+     after every rule), so the count pins the ruled role="img" groups.
+     A phone numbers them and folds the names out under the chart */
+  const evArias = await page.$$eval('#mood .rd-mood-chart svg.chart-svg g.evt[role="img"]', (els) => els.map((el) => el.getAttribute("aria-label") || ""));
+  check(expEvs.length > 0 && evArias.length === expEvs.length, `${expEvs.length} marked events ride the chart (${evArias.length} rules)`);
+  check(expEvs.every((e) => evArias.some((a) => a.startsWith(e.label))),
+    `every windowed event carries its own rule (${expEvs.map((e) => e.date).join(", ")})`);
+  for (const d of ["2026-03-02", "2026-05-12", "2026-09-29"]) {
+    const ev = expEvs.find((e) => e.date === d);
+    check(ev && evArias.some((a) => a.startsWith(ev.label)), `the ${d} event rides the chart ("${ev ? ev.label : "?"}")`);
+  }
+  if (rung > 640) {
+    check((await page.$$eval("#mood .rd-mood-chart svg.chart-svg g.rd-badge circle", (els) => els.length)) === 0,
+      "no phone badge row on desktop (the events label themselves)");
+    check((await texts("#mood .rd-evdrop")).length === 0, "no events list on desktop");
+  } else {
+    const circles = await page.$$eval("#mood .rd-mood-chart svg.chart-svg g.rd-badge circle", (els) => els.length);
+    check(circles === expEvs.length, `${expEvs.length} numbered event badges ride above the plot (${circles} circles)`);
+    check((await texts("#mood .rd-evdrop summary"))[0] === "The marked events", 'the events fold opens with "The marked events"');
+    const lis = await texts("#mood .rd-evdrop li");
+    check(lis.length === expEvs.length, `${expEvs.length} events listed under the chart (${lis.length} rows)`);
+    check(expList.every((l) => lis.some((t) => t.includes(l.t))), "each numbered badge's name is in the list");
   }
   await checkCopy();
   check(pageErrors.length === 0, `no page errors at ${rung}px${pageErrors.length ? ": " + pageErrors.join(" | ") : ""}`);
