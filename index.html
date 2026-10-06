@@ -129,6 +129,8 @@
   --chart-bg: var(--surface);
   --mood-pos: oklch(0.52 0.085 200);
   --mood-neg: oklch(0.44 0.045 50);
+  --mood-consumer: oklch(0.60 0.115 83);
+  --mood-business: oklch(0.50 0.105 305);
   --chg-up:   oklch(0.505 0.110 152);
   --chg-down: oklch(0.510 0.140 25);
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
@@ -179,6 +181,8 @@ body.dark {
   --accent: oklch(0.70 0.080 205);
   --mood-pos: oklch(0.70 0.105 200);
   --mood-neg: oklch(0.68 0.05 45);
+  --mood-consumer: oklch(0.72 0.115 83);
+  --mood-business: oklch(0.70 0.105 305);
   --chg-up:   oklch(0.735 0.135 152);
   --chg-down: oklch(0.700 0.145 25);
   --shadow: 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 28px oklch(0 0 0 / 0.40);
@@ -92409,7 +92413,7 @@ function RdMood({
     hl: 14,
     lab: "Consumers",
     period: "week",
-    color: "var(--ink)",
+    color: "var(--mood-consumer)",
     dash: null,
     shift: 0,
     vfmt: v => v.toFixed(1),
@@ -92423,7 +92427,7 @@ function RdMood({
     hl: 60,
     lab: "Consumers · Westpac–MI",
     period: "month",
-    color: "var(--ink)",
+    color: "var(--mood-consumer)",
     dash: "4 3",
     shift: 0,
     vfmt: v => v.toFixed(1),
@@ -92437,7 +92441,7 @@ function RdMood({
     hl: 60,
     lab: "Businesses",
     period: "month",
-    color: "var(--ink-2)",
+    color: "var(--mood-business)",
     dash: null,
     shift: 0,
     vfmt: v => v.toFixed(1),
@@ -92451,7 +92455,7 @@ function RdMood({
     hl: 60,
     lab: "Businesses · NAB",
     period: "month",
-    color: "var(--ink-2)",
+    color: "var(--mood-business)",
     dash: "4 3",
     shift: 100,
     vfmt: NICE,

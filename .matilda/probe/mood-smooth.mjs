@@ -53,10 +53,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* The four lanes, mirroring rd-panels.jsx: hl per lane, NAB drawn +100. */
 const LANES = [
-  { k: "consumer", hl: 14, gate: 0.5, live: true, color: "var(--ink)", lab: "Consumers" },
-  { k: "westpacConsumer", hl: 60, gate: 1.0, live: false, color: "var(--ink)", lab: "Consumers · Westpac–MI" },
-  { k: "business", hl: 60, gate: 1.0, live: true, color: "var(--ink-2)", lab: "Businesses" },
-  { k: "nabBusiness", hl: 60, gate: 1.0, live: false, color: "var(--ink-2)", shift: 100, lab: "Businesses · NAB" },
+  { k: "consumer", hl: 14, gate: 0.5, live: true, color: "var(--mood-consumer)", lab: "Consumers" },
+  { k: "westpacConsumer", hl: 60, gate: 1.0, live: false, color: "var(--mood-consumer)", lab: "Consumers · Westpac–MI" },
+  { k: "business", hl: 60, gate: 1.0, live: true, color: "var(--mood-business)", lab: "Businesses" },
+  { k: "nabBusiness", hl: 60, gate: 1.0, live: false, color: "var(--mood-business)", shift: 100, lab: "Businesses · NAB" },
 ];
 const NICE = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
 const laneVfmt = (k) => (k === "nabBusiness" ? NICE : (v) => v.toFixed(1));

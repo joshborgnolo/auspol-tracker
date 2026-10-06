@@ -3810,16 +3810,16 @@ function RdMood({ rangeId }) {
   const NICE = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const lanes = [
     { k: "consumer", s: M.consumer, name: "Consumers", dekName: "Consumers", by: "ANZ–Roy Morgan", hl: 14, lab: "Consumers",
-      period: "week", color: "var(--ink)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
+      period: "week", color: "var(--mood-consumer)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly." },
     { k: "westpacConsumer", s: M.westpacConsumer, name: "Consumers", dekName: "Consumers on Westpac–MI’s read", by: "Westpac–MI", hl: 60, lab: "Consumers · Westpac–MI",
-      period: "month", color: "var(--ink)", dash: "4 3", shift: 0, vfmt: (v) => v.toFixed(1),
+      period: "month", color: "var(--mood-consumer)", dash: "4 3", shift: 0, vfmt: (v) => v.toFixed(1),
       short: "The Westpac–Melbourne Institute’s monthly gauge of the same household mood; 100 is neutral on this scale too." },
     { k: "business", s: M.business, name: "Businesses", dekName: "Businesses", by: "Roy Morgan", hl: 60, lab: "Businesses",
-      period: "month", color: "var(--ink-2)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
+      period: "month", color: "var(--mood-business)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly." },
     { k: "nabBusiness", s: M.nabBusiness, name: "Businesses", dekName: "Businesses on NAB’s survey", by: "NAB", hl: 60, lab: "Businesses · NAB",
-      period: "month", color: "var(--ink-2)", dash: "4 3", shift: 100, vfmt: NICE,
+      period: "month", color: "var(--mood-business)", dash: "4 3", shift: 100, vfmt: NICE,
       short: "x" },
   ].filter((l) => l.s && l.s.polls.length);
   if (!lanes.length) return null;
