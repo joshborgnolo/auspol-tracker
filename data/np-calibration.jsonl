@@ -23,3 +23,4 @@
 {"ts":"2026-09-29T21:15:44.564Z","syd":"2026-09-30 07:15","pollster":"Roy Morgan","kind":"dated","anchor":"2026-09-29","release":"2026-10-05","open":"2026-10-05","close":"2026-10-05","winHalf":0,"rolled":false,"ahead":0}
 {"ts":"2026-09-29T21:15:44.564Z","syd":"2026-09-30 07:15","pollster":"Essential","kind":"dated","anchor":"2026-09-29","release":"2026-10-28","open":"2026-10-21","close":"2026-11-04","winHalf":7,"rolled":false,"ahead":0}
 {"ts":"2026-10-04T20:16:15.309Z","syd":"2026-10-05 07:16","pollster":"RedBridge/Accent","kind":"dated","anchor":"2026-10-04","release":"2026-11-01","open":"2026-10-25","close":"2026-11-08","winHalf":7,"rolled":false,"ahead":0}
+{"ts":"2026-10-06T20:16:13.063Z","syd":"2026-10-07 07:16","pollster":"YouGov","kind":"dated","anchor":"2026-10-06","release":"2026-10-21","open":"2026-10-21","close":"2026-10-21","winHalf":0,"rolled":false,"ahead":0}
