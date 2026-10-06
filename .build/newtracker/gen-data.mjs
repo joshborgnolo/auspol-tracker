@@ -2393,7 +2393,7 @@ const FIELD_TBC_URL = { DemosAU: "https://demosau.com/methodology-statements/" }
 // hosts that are the pollster's own (its release, report PDF or statement)
 const OWN_HOSTS = ["roymorgan.com", "spectrestrategy.com", "demosau.com", "essentialreport.com.au",
   "usrfiles.com", "accent-research.com", "foxhedgehog.com.au", "freshwaterstrategy.com", "yougov.com",
-  "pyxispolling.com", "resolvestrategic.com"];
+  "pyxispolling.com", "resolvestrategic.com", "secnewgate.com.au", "ipsos.com"];
 // the press or commissioning page a row cites, as its link reads
 const CITE_LABEL = {
   "afr.com": "AFR report", "theaustralian.com.au": "The Australian’s report", "smh.com.au": "SMH report",
@@ -2450,6 +2450,12 @@ const linksOf = (p) => {
   }
   return out;
 };
+
+// the rows built before linksOf (SEC Newgate's and Essential's mood-only
+// waves, Ipsos's issues waves) carry `url` alone; they take the same list,
+// or the views, which read only `links`, show them none
+for (const p of [...directionOnlyPolls, ...issuesOnlyPolls])
+  p.links = linksOf({ pollster: p.pollster, url: p.url, date: p.released });
 
 const individualPolls = POLLS.map((p) => {
   const ym = ymOf(p.date), day = dayOf(p.date);
