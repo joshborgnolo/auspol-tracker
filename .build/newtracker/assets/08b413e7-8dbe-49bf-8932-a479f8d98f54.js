@@ -637,9 +637,12 @@ function TrendChart(props) {
      dot you are already hovering is a link to it. Deliberately mouse-only: a
      finger's tap is how a phone READS a dot at all (the tooltip has nowhere
      else to come from), and turning that same tap into a navigation would take
-     the tooltip away from the only input that needs it. */
+     the tooltip away from the only input that needs it. A caller that passes
+     pollFacet={null} (the mood chart under the facet menu's width cut) is
+     saying there is nothing to open - meta still feeds the tooltip, but the
+     trip is neither offered by the hint nor taken by a click. */
   const rowKey = dot && window.AP.pollRowKey ? window.AP.pollRowKey(dot.meta) : null;
-  const openable = !!(dot && dotSrc.current === "mouse" && rowKey && window.AP.openPoll);
+  const openable = !!(dot && dotSrc.current === "mouse" && rowKey && window.AP.openPoll && pollFacet);
   /* A touch tap is read entirely on pointerup below - and then the browser
      dispatches the tap's synthesized click, which would register the same
      tap a second time (reading every single tap as a double). Only a real

@@ -314,10 +314,12 @@ window.AP = (function () {
 
      The direction-only catalogues join the key set (SEC Newgate's waves and
      Essential's three national-mood-only waves of 2025) now that they are
-     rows of their own on the archive table's direction facet - a dot with a
-     row to land on gets the "open this poll" trip; a key outside the set
-     still reads null, so a chart can ask before it offers one. */
-  const ROW_KEYS = new Set([...D.individualPolls, ...(D.directionOnlyPolls || [])]
+     rows of their own on the archive table's direction facet, and the
+     confidence gauges' releases join for the confidence facet (the Economic
+     sentiment chart's dots land on them) - a dot with a row to land on
+     gets the "open this poll" trip; a key outside the set still reads
+     null, so a chart can ask before it offers one. */
+  const ROW_KEYS = new Set([...D.individualPolls, ...(D.directionOnlyPolls || []), ...(D.confidenceOnlyPolls || [])]
     .map((p) => p.pollster + "|" + p.released));
   const pollRowKey = (m) => {
     if (!m || !m.pollster || !m.released) return null;

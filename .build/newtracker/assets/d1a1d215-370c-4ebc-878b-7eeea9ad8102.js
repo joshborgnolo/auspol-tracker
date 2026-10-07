@@ -5106,6 +5106,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const defaultScopeFor = (f, m) =>
     (!FACET_SCOPE[f] ? false : f === "twopp" ? Boolean(CONTEST_SCOPE[m]) || pubBasis : true);
 
+  /* seven tabs fit the facet menu from ~610px up (measured 2026-10-07 on
+     the 320–820px sweep); below that Confidence drops out of the menu - the
+     redesign's own row pulls the same veto over its six-base list there */
+  const confWide = useNarrow("(min-width: 601px)");
   const FACETS = [
     { id: "twopp", label: "2PP" },
     { id: "primary", label: "Primary" },
@@ -5116,7 +5120,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
        files none for a jurisdiction), so a data-gated append doubles as
        the /vic/ filter the redesign's own FACETS hand-writes */
     ...((D.confidenceOnlyPolls || []).length ? [{ id: "confidence", label: "Confidence" }] : []),
-  ];
+  ].filter((f) => f.id !== "confidence" || confWide);
   /* Party columns rank by the aggregate (gen-data's latest.primaryOrder –
      highest leftmost, a party only overtaking once it leads by a full point,
      same deadband rule as the hero's rival ruling). Presentation travels
@@ -5253,6 +5257,12 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     }
     setOpen(focus.key);
   }, [focus]);
+  // the menu drops Confidence on narrow viewports (confWide); a reader
+  // sitting on the facet as the window shrinks re-seats on 2PP rather
+  // than viewing a facet whose tab is no longer on offer
+  React.useEffect(() => {
+    if (!confWide && facet === "confidence") onFacet("twopp");
+  }, [confWide, facet]);
   // …and once the row is actually on the page, put it under the reader's eye.
   // The row and its open detail are centred as one block - centring the
   // skinny summary row alone leaves the whole breakdown hanging below the

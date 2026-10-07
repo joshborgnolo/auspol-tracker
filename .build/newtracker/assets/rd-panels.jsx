@@ -3824,6 +3824,9 @@ function RdUndecided({ rangeId }) {
 function RdMood({ rangeId }) {
   const { D, monthLabelFull } = window.AP;
   const narrow = useNarrow("(max-width: 640px)");
+  /* the confidence-facet menu only renders from 601px up, so the open
+     trip below is offered on the same cut */
+  const confWide = useNarrow("(min-width: 601px)");
   const M = D.mood;
   if (!M || !M.consumer || !M.business || !M.consumer.polls.length || !M.business.polls.length) return null;
   const NICE = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
@@ -3916,7 +3919,7 @@ function RdMood({ rangeId }) {
      the kernel smooth of the same readings. The NAB display shift is a
      constant, so smoothing then shifting equals shifting and smoothing —
      the smooth runs on the printed figures themselves. */
-  const rawPoints = new Map(lanes.map((l) => [l.k, rows.get(l.k).map((p) => ({ x: p.x, y: p.v + l.shift, ym: p.ym, ...(l.shift ? { raw: p.v } : {}) }))]));
+  const rawPoints = new Map(lanes.map((l) => [l.k, rows.get(l.k).map((p) => ({ x: p.x, y: p.v + l.shift, ym: p.ym, released: p.released, ...(l.shift ? { raw: p.v } : {}) }))]));
   const sePoints = new Map(lanes.map((l) => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({ x: p.x, y: p.y + l.shift, ym: rows.get(l.k)[i].ym, ...(l.shift ? { raw: rows.get(l.k)[i].v } : {}) }))]));
   const vals = lanes.flatMap((l) => rawPoints.get(l.k).map((p) => p.y)).concat([100]);
   const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10, hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
@@ -3949,7 +3952,16 @@ function RdMood({ rangeId }) {
           spine={spine}
           events={badges ? badges.events : evs}
           evt={evtOpen} onEvt={setEvtOpen}
-          scatter={lanes.flatMap((l) => rawPoints.get(l.k).map((q) => ({ x: q.x, y: q.y, color: l.color, label: l.lab, ...(q.raw != null ? { raw: q.raw } : {}), meta: { pollster: l.by } })))}
+          scatter={lanes.flatMap((l) => rawPoints.get(l.k).map((q) => ({ x: q.x, y: q.y, color: l.color, label: l.lab, ...(q.raw != null ? { raw: q.raw } : {}), meta: { pollster: l.by, released: q.released } })))}
+          /* each release is a row on the archive's confidence facet, so a
+             dot under a mouse offers the same open trip every poll chart
+             does (the engine's ROW_KEYS knows the confidence rows) - but
+             only where the facet menu itself is offered; under the 600px
+             cut the menu drops the tab and ?f=c coerces to 2PP, so the
+             trip would land on nothing. pollFacet={null} is the engine's
+             own opt-out: openable requires a real facet, so meta stays
+             for the tooltip and neither hint nor trip appears */
+          pollFacet={confWide ? "confidence" : null}
           tooltipTitle={(i) => { const p = spine[i]; return p ? monthLabelFull(p.ym) : ""; }}
           fmt={fmt}
           copy={{ title: "Consumer and business confidence",

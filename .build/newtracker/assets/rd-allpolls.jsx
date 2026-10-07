@@ -1783,6 +1783,13 @@ function RdAllPolls(P) {
      ~1150px the column shrinks (273px at 1001) and "40 pts 30" collide, so
      the head keeps the phone's five */
   const demMid = useNarrow("(max-width: 1150px)");
+  /* seven tabs fit the facet menu from ~610px up (measured 2026-10-07 on
+     the 320–820px sweep; the 510–519 straddle is a rung fluke of the bold
+     active tab). Under that the Confidence row drops out of the menu so
+     the rest fit without a sideways scroll; a reader parked on the facet
+     as the window narrows snaps back to 2PP (the effect just below the
+     fKey reset) */
+  const confW = useNarrow("(max-width: 600px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const contest = onM ? "onp" : "lnp";
@@ -1855,6 +1862,10 @@ function RdAllPolls(P) {
   const [showAll, setShowAll] = useState(false);
   const fKey = [q, [...sel].join(","), range, [...tagSel].join(","), facet, sort.key, sort.dir, measure, tppBasis].join("|");
   React.useEffect(() => { setMinShown(30); setFlatLimit(40); setShowAll(false); }, [fKey]);
+  /* the menu drops Confidence under ~610px (confW above); a reader sitting
+     on it as the window narrows (or deep-linked onto a phone) is snapped
+     back to 2PP rather than left in a view whose tab is no longer shown */
+  React.useEffect(() => { if (facet === "confidence" && confW) onFacet("twopp"); }, [facet, confW]);
   const rowKey = (p) => p.pollster + "|" + p.released;
   const openRow = open ? sorted.find((p) => rowKey(p) === open) : null;
   let groups = null, flat = null, nShown = 0;
@@ -1888,8 +1899,11 @@ function RdAllPolls(P) {
                   { id: "leadership", label: phone ? "Leaders" : "Leadership" }, { id: "direction", label: "Direction" },
                   { id: "issues", label: "Issues" }, { id: "demographics", label: phone ? "Groups" : "Demographics" }]
     /* the confidence facet exists only where the mood file's releases do –
-       never on /vic/ (the JUR build ships no confidenceOnlyPolls at all) */
-    .concat((D.confidenceOnlyPolls || []).length ? [{ id: "confidence", label: "Confidence" }] : [])
+       never on /vic/ (the JUR build ships no confidenceOnlyPolls at all),
+       and only on viewports where the seven-tab menu fits (confW gate);
+       the data still ships, so a phone follows a ?f=c link as far as the
+       row below before the facet snaps to 2PP */
+    .concat((D.confidenceOnlyPolls || []).length && !confW ? [{ id: "confidence", label: "Confidence" }] : [])
     /* /vic/'s polls carry no direction, issues or group figures */
     .filter((f) => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f.id));
   const rowNav = (e, p) => {
@@ -2611,7 +2625,7 @@ function RdAllPolls(P) {
   const splitPicker = (
     <span className="rd-ap-dpick" ref={splitEl}>
       <span className="rd-pl-ctl-l">Split by:</span>
-      {/* one of five, so a radio group - which also keeps it out of the
+      {/* one of six, so a radio group - which also keeps it out of the
           facet tabs' own [role=group] */}
       <span role="radiogroup" aria-label="Split the vote by" onKeyDown={rdTabsKey(SPLITS, splitPick)} onClick={rdTabFocus}>
         {SPLITS.map((x) => <button key={x.id} type="button" role="radio" aria-checked={x.id === demSplit} onClick={() => splitPick(x.id)}><RdTabW t={x.label} /></button>)}
@@ -2620,7 +2634,7 @@ function RdAllPolls(P) {
   );
   const basisPick = () => { pinAp(); setTppBasis(pub ? "imp" : "resp"); };
   /* Spacebar walks what the facet can step, p flips the published/implied
-     basis, and 1-5 pick a demographics group outright while the table is
+     basis, and 1-6 pick a demographics group outright while the table is
      on screen - the tab row's "Labor v X ⇄" button, the Split by radio
      row, and the "Show the pollsters’ published figures" switch, by key.
      The claim is the viewport (IntersectionObserver, not the pointer);

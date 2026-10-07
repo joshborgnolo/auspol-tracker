@@ -68790,7 +68790,7 @@ window.AP = function () {
       verb: "far beyond sampling error"
     };
   }
-  const ROW_KEYS = new Set([...D.individualPolls, ...(D.directionOnlyPolls || [])].map(p => p.pollster + "|" + p.released));
+  const ROW_KEYS = new Set([...D.individualPolls, ...(D.directionOnlyPolls || []), ...(D.confidenceOnlyPolls || [])].map(p => p.pollster + "|" + p.released));
   const pollRowKey = m => {
     if (!m || !m.pollster || !m.released) return null;
     const k = m.pollster + "|" + m.released;
@@ -71716,7 +71716,7 @@ function TrendChart(props) {
     onHoverIndex && onHoverIndex(null);
   };
   const rowKey = dot && window.AP.pollRowKey ? window.AP.pollRowKey(dot.meta) : null;
-  const openable = !!(dot && dotSrc.current === "mouse" && rowKey && window.AP.openPoll);
+  const openable = !!(dot && dotSrc.current === "mouse" && rowKey && window.AP.openPoll && pollFacet);
   const touchTapAt = useRef(0);
   const handleClick = e => {
     if (performance.now() - touchTapAt.current < 400) return;
@@ -83618,6 +83618,7 @@ function AllPollsView({
     }
   };
   const defaultScopeFor = (f, m) => !FACET_SCOPE[f] ? false : f === "twopp" ? Boolean(CONTEST_SCOPE[m]) || pubBasis : true;
+  const confWide = useNarrow("(min-width: 601px)");
   const FACETS = [{
     id: "twopp",
     label: "2PP"
@@ -83636,7 +83637,7 @@ function AllPollsView({
   }, ...((D.confidenceOnlyPolls || []).length ? [{
     id: "confidence",
     label: "Confidence"
-  }] : [])];
+  }] : [])].filter(f => f.id !== "confidence" || confWide);
   const pOrder = D.latest && D.latest.primaryOrder || ["alp", "lnp", "grn", "onp", "oth"];
   const PCOLS = {
     alp: {
@@ -83792,6 +83793,9 @@ function AllPollsView({
     }
     setOpen(focus.key);
   }, [focus]);
+  React.useEffect(() => {
+    if (!confWide && facet === "confidence") onFacet("twopp");
+  }, [confWide, facet]);
   const bodyRef = useRef(null);
   React.useEffect(() => {
     if (!focus || open !== focus.key || !bodyRef.current) return;
@@ -96401,6 +96405,7 @@ function RdMood({
     monthLabelFull
   } = window.AP;
   const narrow = useNarrow("(max-width: 640px)");
+  const confWide = useNarrow("(min-width: 601px)");
   const M = D.mood;
   if (!M || !M.consumer || !M.business || !M.consumer.polls.length || !M.business.polls.length) return null;
   const NICE = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
@@ -96528,6 +96533,7 @@ function RdMood({
     x: p.x,
     y: p.v + l.shift,
     ym: p.ym,
+    released: p.released,
     ...(l.shift ? {
       raw: p.v
     } : {})
@@ -96625,9 +96631,11 @@ function RdMood({
         raw: q.raw
       } : {}),
       meta: {
-        pollster: l.by
+        pollster: l.by,
+        released: q.released
       }
     }))),
+    pollFacet: confWide ? "confidence" : null,
     tooltipTitle: i => {
       const p = spine[i];
       return p ? monthLabelFull(p.ym) : "";
@@ -102183,6 +102191,7 @@ function RdAllPolls(P) {
   const phone = useNarrow("(max-width: 760px)");
   const ctlNarrow = useNarrow("(max-width: 1000px)");
   const demMid = useNarrow("(max-width: 1150px)");
+  const confW = useNarrow("(max-width: 600px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const contest = onM ? "onp" : "lnp";
@@ -102235,6 +102244,9 @@ function RdAllPolls(P) {
     setFlatLimit(40);
     setShowAll(false);
   }, [fKey]);
+  React.useEffect(() => {
+    if (facet === "confidence" && confW) onFacet("twopp");
+  }, [facet, confW]);
   const rowKey = p => p.pollster + "|" + p.released;
   const openRow = open ? sorted.find(p => rowKey(p) === open) : null;
   let groups = null,
@@ -102280,7 +102292,7 @@ function RdAllPolls(P) {
   }, {
     id: "demographics",
     label: phone ? "Groups" : "Demographics"
-  }].concat((D.confidenceOnlyPolls || []).length ? [{
+  }].concat((D.confidenceOnlyPolls || []).length && !confW ? [{
     id: "confidence",
     label: "Confidence"
   }] : []).filter(f => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f.id));
