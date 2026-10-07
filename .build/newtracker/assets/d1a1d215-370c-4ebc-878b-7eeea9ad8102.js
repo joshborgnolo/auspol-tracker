@@ -5472,6 +5472,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       case "ppm.alb": { const c = ppmContests(p)[0]; return c && c.alb != null ? c.alb : -Infinity; }
       case "dir.right": return p.dir ? p.dir.right : -Infinity;
       case "dir.wrong": return p.dir ? p.dir.wrong : -Infinity;
+      case "dir.unsure": return p.dir ? p.dir.unsure : -Infinity;
       case "dir.net": return p.dir ? p.dir.net : -Infinity;
       case "iss.topv": { const t = issTopOf(p.iss); return t ? t[1] : -Infinity; }
       case "iss.bestv": { const b = issBestOf(p.iss); return b ? b.v : -Infinity; }
@@ -5912,7 +5913,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
               {facet === "direction" && (<>
                 <ArchSortTh label="Right direction" short="Right" k="dir.right" sort={sort} onSort={onSort} />
                 <ArchSortTh label="Wrong track" short="Wrong" k="dir.wrong" sort={sort} onSort={onSort} />
-                <th scope="col" className="hide-md">Unsure</th>
+                <ArchSortTh label="Unsure" k="dir.unsure" className="hide-md" sort={sort} onSort={onSort} />
                 <ArchSortTh label="Net" k="dir.net" sort={sort} onSort={onSort} />
               </>)}
               {facet === "issues" && (<>

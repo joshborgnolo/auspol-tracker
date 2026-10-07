@@ -80613,6 +80613,8 @@ function AllPollsView({
         return p.dir ? p.dir.right : -Infinity;
       case "dir.wrong":
         return p.dir ? p.dir.wrong : -Infinity;
+      case "dir.unsure":
+        return p.dir ? p.dir.unsure : -Infinity;
       case "dir.net":
         return p.dir ? p.dir.net : -Infinity;
       case "iss.topv":
@@ -81231,10 +81233,13 @@ function AllPollsView({
     k: "dir.wrong",
     sort: sort,
     onSort: onSort
-  }), React.createElement("th", {
-    scope: "col",
-    className: "hide-md"
-  }, "Unsure"), React.createElement(ArchSortTh, {
+  }), React.createElement(ArchSortTh, {
+    label: "Unsure",
+    k: "dir.unsure",
+    className: "hide-md",
+    sort: sort,
+    onSort: onSort
+  }), React.createElement(ArchSortTh, {
     label: "Net",
     k: "dir.net",
     sort: sort,
@@ -98827,9 +98832,7 @@ function RdAllPolls(P) {
     color: "var(--mood-pos)"
   }), th("Wrong", "dir.wrong", {
     color: "var(--mood-neg)"
-  }), React.createElement("span", {
-    className: "rd-ap-th"
-  }, "Unsure"), React.createElement("span", {
+  }), th("Unsure", "dir.unsure"), React.createElement("span", {
     className: "rd-ap-hpic rd-ap-hdir"
   }, React.createElement("span", {
     className: "rd-ap-cap"

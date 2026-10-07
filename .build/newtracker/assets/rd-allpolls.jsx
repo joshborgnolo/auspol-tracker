@@ -1903,7 +1903,7 @@ function RdAllPolls(P) {
       {facet === "direction" && <>
         {th("Right", "dir.right", { color: "var(--mood-pos)" })}
         {th("Wrong", "dir.wrong", { color: "var(--mood-neg)" })}
-        <span className="rd-ap-th">Unsure</span>
+        {th("Unsure", "dir.unsure")}
         <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap">Right direction or wrong track, %</span></span>
         {th("Net", "dir.net", { right: true })}
       </>}
