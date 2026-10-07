@@ -896,6 +896,7 @@ body { --bar-track: color-mix(in oklch, var(--ink) 8%, var(--bg)); }
 .hero-interval.hi-fitting { flex-wrap: nowrap; }
 .hero-interval.hi-fitting > * { white-space: nowrap; }
 .hi-term {
+  display: inline;
   font: inherit; color: inherit; background: none; border: 0; padding: 0;
   cursor: pointer; text-decoration: underline;
   text-decoration-color: var(--line-2); text-underline-offset: 3px;
@@ -2797,6 +2798,7 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   border: 1px solid currentColor;
 }
 .vr-pill.hi-term {
+  display: inline-block;
   font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
   border-radius: 999px; padding: 3px 9px; border: 1px solid currentColor;
   text-decoration: none;
@@ -74205,10 +74207,13 @@ function PrimaryVotePanel({
     tooltipTitle: i => window.AP.monthLabelFull(pts[i].ym),
     fmt: v => v.toFixed(1)
   }), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Each dot is one published poll\u2019s first-preference figure; the lines are monthly averages. Each chip\u2019s \u25B2 \u25BC is its", " ", React.createElement("button", {
-      type: "button",
+    paras: [React.createElement(React.Fragment, null, "Each dot is one published poll\u2019s first-preference figure; the lines are monthly averages. Each chip\u2019s \u25B2 \u25BC is its", " ", React.createElement("a", {
       className: "hi-term",
-      onClick: () => window.AP.openTerm && window.AP.openTerm("changes", "Primary vote")
+      href: "#info",
+      onClick: e => {
+        e.preventDefault();
+        window.AP.openTerm && window.AP.openTerm("changes", "Primary vote");
+      }
     }, "change since the 2025 election"), ". Use the chips to isolate one party."), React.createElement(React.Fragment, null, "The lines are weighted by sample and adjusted for each house\u2019s lean."), React.createElement(React.Fragment, null, "The 2025 election is where every line here begins. A party on its own draws with the 95% interval around its line", solo ? ", shaded here" : "", ".")]
   }));
 }
@@ -76635,10 +76640,13 @@ function DemographicsPanel({
     className: "table-hint"
   }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the rest of Australia at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups" : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups" : "", "."), tab.id === "age" && React.createElement("p", {
     className: "table-hint"
-  }, "Neither pollster publishes the birth years behind its generations; the usual ones, and what is uncertain about them, are under", " ", React.createElement("button", {
-    type: "button",
+  }, "Neither pollster publishes the birth years behind its generations; the usual ones, and what is uncertain about them, are under", " ", React.createElement("a", {
     className: "hi-term",
-    onClick: () => window.AP.openTerm && window.AP.openTerm("generations", "Who votes for whom")
+    href: "#info",
+    onClick: e => {
+      e.preventDefault();
+      window.AP.openTerm && window.AP.openTerm("generations", "Who votes for whom");
+    }
   }, "Generations"), "."))))));
 }
 const ISS_PARTY = {
@@ -107161,6 +107169,10 @@ function MethodNote({
   onInfo
 }) {
   const J = window.JUR;
+  const infoClick = e => {
+    e.preventDefault();
+    onInfo();
+  };
   return React.createElement("footer", {
     className: "method"
   }, React.createElement("div", {
@@ -107178,10 +107190,10 @@ function MethodNote({
     className: "colo-ways"
   }, React.createElement("p", {
     className: "fb-lede"
-  }, onInfo && React.createElement(React.Fragment, null, "How the figures are built is in", " ", React.createElement("button", {
-    type: "button",
+  }, onInfo && React.createElement(React.Fragment, null, "How the figures are built is in", " ", React.createElement("a", {
+    href: "#info",
     className: "hi-term",
-    onClick: onInfo
+    onClick: infoClick
   }, "Info"), ".", " "), "Spot an error, a missing poll, or have any other feedback? Please", " ", React.createElement("a", {
     className: "fb-link",
     href: "/feedback/"

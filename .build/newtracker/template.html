@@ -1316,9 +1316,18 @@ body { --bar-track: color-mix(in oklch, var(--ink) 8%, var(--bg)); }
 .hero-interval.hi-fitting { flex-wrap: nowrap; }
 .hero-interval.hi-fitting > * { white-space: nowrap; }
 /* A word that is also the way into its own definition. Reset far enough that
-   a <button> stops looking like one, and no further - whatever rule styles the
-   label itself still sets its size and colour, so this can wrap any of them. */
+   a <button> or <a> stops looking like one, and no further - whatever rule
+   styles the label itself still sets its size and colour, so this can wrap
+   any of them. (Term links that sit inside prose are anchors: a button's
+   atomic inline-level box gives the line a break opportunity between the
+   term and following punctuation, stranding a comma or full stop alone on
+   the next line.) */
 .hi-term {
+  /* declarative only: the element decides. An anchor is inline already; a
+     <button> keeps its atomic inline-block box whatever this says (and wraps
+     a lone comma onto the next line) – which is why prose term links are
+     anchors, and structural hi-term spots stay buttons */
+  display: inline;
   font: inherit; color: inherit; background: none; border: 0; padding: 0;
   cursor: pointer; text-decoration: underline;
   text-decoration-color: var(--line-2); text-underline-offset: 3px;
@@ -4604,8 +4613,10 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   border: 1px solid currentColor;
 }
 /* a pill that opens its own glossary entry keeps the pill shape – the
-   hi-term reset would strip its padding and border */
+   hi-term reset would strip its padding and border, and drop it to
+   inline (a box with padding needs the atomic display to sit right) */
 .vr-pill.hi-term {
+  display: inline-block;
   font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
   border-radius: 999px; padding: 3px 9px; border: 1px solid currentColor;
   text-decoration: none;

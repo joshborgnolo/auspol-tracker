@@ -367,9 +367,10 @@ function PrimaryVotePanel({ rangeId, setRangeId }) {
       <HowTo paras={[
         <>Each dot is one published poll’s first-preference figure; the lines are
         monthly averages. Each chip’s ▲ ▼ is its{" "}
-        <button type="button" className="hi-term"
-                onClick={() => window.AP.openTerm && window.AP.openTerm("changes", "Primary vote")}>change
-          since the 2025 election</button>. Use the chips to isolate one party.</>,
+        <a className="hi-term" href="#info"
+           onClick={(e) => { e.preventDefault();
+                             window.AP.openTerm && window.AP.openTerm("changes", "Primary vote"); }}>change
+          since the 2025 election</a>. Use the chips to isolate one party.</>,
         <>The lines are weighted by sample and adjusted for each house’s lean.</>,
         <>The 2025 election is where every line here begins. A party on its own draws with the
         95% interval around its line{solo ? ", shaded here" : ""}.</>,
@@ -2611,9 +2612,10 @@ function DemographicsPanel({ rangeId = "all" }) {
           <p className="table-hint">
             Neither pollster publishes the birth years behind its generations; the usual ones, and
             what is uncertain about them, are under{" "}
-            <button type="button" className="hi-term"
-                    onClick={() => window.AP.openTerm && window.AP.openTerm("generations", "Who votes for whom")}>
-              Generations</button>.
+            <a className="hi-term" href="#info"
+               onClick={(e) => { e.preventDefault();
+                                 window.AP.openTerm && window.AP.openTerm("generations", "Who votes for whom"); }}>
+              Generations</a>.
           </p>
         )}
       </details>

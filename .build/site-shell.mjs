@@ -194,7 +194,7 @@ export function parseChrome(headSrc, scoreSrc, tabs) {
   const disc = coloBlock("disclaimer", "colophon disclaimer");
   const fbM = headSrc.match(/className="fb-lede">([\s\S]*?)<\/p>/);
   if (!fbM) miss("colophon feedback line", "the header asset");
-  const infoM = fbM[1].match(/\{onInfo && \(\s*<>\s*([\s\S]*?)\{" "\}\s*<button[^>]*>([^<]+)<\/button>\.\{" "\}\s*<\/>\s*\)\}/);
+  const infoM = fbM[1].match(/\{onInfo && \(\s*<>\s*([\s\S]*?)\{" "\}\s*<(?:button|a)\b[^>]*>([^<]+)<\/(?:button|a)>\.\{" "\}\s*<\/>\s*\)\}/);
   if (!infoM) miss("colophon Info signpost", "the colophon feedback line");
   const spotM = fbM[1].match(/\)\}\s*([\s\S]*?)\{" "\}\s*<a className="fb-link"[^>]*>([^<]+)<\/a>\./);
   if (!spotM) miss("colophon feedback clause", "the colophon feedback line");

@@ -1837,6 +1837,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
    because it is a two-homes pair (the ss-note in build.mjs is the other). */
 function MethodNote({ onInfo }) {
   const J = window.JUR;
+  /* Named rather than an inline arrow: an arrow's `=>` puts a literal `>`
+     inside the tag, which site-shell.mjs parseChrome's `[^>]*` tag-body
+     match then reads as the tag's end (the footer copy lift must see only
+     "Info" here). */
+  const infoClick = (e) => { e.preventDefault(); onInfo(); };
   return (
     <footer className="method">
       <div className="colophon">
@@ -1869,7 +1874,8 @@ function MethodNote({ onInfo }) {
             {onInfo && (
               <>
                 How the figures are built is in{" "}
-                <button type="button" className="hi-term" onClick={onInfo}>Info</button>.{" "}
+                <a href="#info" className="hi-term"
+                   onClick={infoClick}>Info</a>.{" "}
               </>
             )}
             Spot an error, a missing poll, or have any other feedback? Please{" "}
