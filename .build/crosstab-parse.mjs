@@ -79,16 +79,41 @@ export function ygGroup(h) {
   // language spoken at home (Jun on)
   if (/^only english spoken at home$/i.test(s)) return ["language", "English only"];
   if (/^other language spoken at home$/i.test(s)) return ["language", "Other language"];
+  // household income: the four-bracket "Household income <50k"–"150k+" set, or
+  // the earlier two-bracket scheme ("Income less than $100k" – re-schemed
+  // mid-2026, so the brackets themselves ride in the tidied label). These join
+  // nothing across houses; they are read for the All-polls demographics facet,
+  // which contrasts a poll's own groups and names the pair.
+  if ((m = s.match(/^(?:household\s+)?income:?\s*(?:<|under|less than)\s*\$?(\d+)\s*k$/i))) return ["income", `Under $${m[1]}k`];
+  if ((m = s.match(/^(?:household\s+)?income:?\s*(?:>|over|more than)\s*\$?(\d+)\s*k\s*\+?$/i))) return ["income", `$${m[1]}k or more`];
+  if ((m = s.match(/^(?:household\s+)?income:?\s*\$?(\d+)\s*k?\s*-\s*\$?(\d+)\s*k$/i))) return ["income", `$${m[1]}–${m[2]}k`];
+  if ((m = s.match(/^(?:household\s+)?income:?\s*\$?(\d+)\s*k\s*\+$/i))) return ["income", `$${m[1]}k+`];
   return null;
 }
 export function youGovDims(t) {
   const dims = {}, total = {};
   const totalAt = t.head.findIndex((h) => /^total$/i.test(h));
   const cols = t.head.map((h, n) => [ygGroup(h), n]).filter(([g]) => g);
+  // a wave can print the same group as two columns (21 Apr 2026: "Household
+  // income: <100k" beside an identical copy headed "Income: <100k") – the
+  // first sighting of each column pair stands (checked row by row, so the
+  // folded Independent/Other party rows are untouched); a copy that
+  // disagrees is kept and piles up, tripping the gate's sum-to-100 instead
+  const firstAt = new Map(), kept = [];
+  for (const [g, n] of cols) {
+    const k = g[0] + "|" + g[1];
+    if (firstAt.has(k) && t.rows.every((r) => {
+      const a = r[firstAt.get(k)], b = r[n];
+      if (b === "" || b == null) return true;
+      return a !== "" && a != null && Math.abs(+a - +b) <= 1;
+    })) continue;
+    if (!firstAt.has(k)) firstAt.set(k, n);
+    kept.push([g, n]);
+  }
   for (const r of t.rows) {
     const p = ygParty(r[0]);
     if (totalAt >= 0 && r[totalAt] !== "") total[p] = (total[p] || 0) + +r[totalAt];
-    for (const [[dim, label], n] of cols) {
+    for (const [[dim, label], n] of kept) {
       if (r[n] === "" || r[n] == null) continue;
       const g = ((dims[dim] ||= {})[label] ||= {});
       g[p] = (g[p] || 0) + +r[n];
@@ -97,14 +122,24 @@ export function youGovDims(t) {
   return { dims, total };
 }
 
-// ---- DemosAU: the Gender / Age / Education / Location / Housing / Language charts ----
+// ---- DemosAU: the Gender / Age / Education / Income / Location / Housing / Language charts ----
 /* Location and Housing Tenure from the April 2026 report, Language Status
-   from May; a report without one of them just has no such group. */
-export const DEMOS_DIM = { Gender: "gender", Age: "age", Education: "education",
+   from May; a report without one of them just has no such group. Its Income
+   chart is personal income, "$K" brackets ("<$45K", "$45-125K", "$125K+") -
+   it joins nothing across houses either and rides to the same facet as
+   YouGov's household-income columns. */
+export const DEMOS_DIM = { Gender: "gender", Age: "age", Education: "education", Income: "income",
   Location: "location", "Housing Tenure": "housing", "Language Status": "language" };
 export function demosLabel(dim, label) {
-  const s = label.replace(/\s+/g, " ").trim();
+  const s = label.replace(/\s+/g, " ").trim(), n = s.replace(/,/g, "");
   if (dim === "gender") return /^fem/i.test(s) ? "Women" : /^male/i.test(s) ? "Men" : s;
+  if (dim === "income") {
+    let mm;
+    if ((mm = n.match(/^<\s*\$?(\d+)\s*k$/i))) return `Under $${mm[1]}k`;
+    if ((mm = n.match(/^\$?(\d+)\s*k?\s*[-–]\s*\$?(\d+)\s*k$/i))) return `$${mm[1]}–${mm[2]}k`;
+    if ((mm = n.match(/^\$?(\d+)\s*k\s*\+$/i))) return `$${mm[1]}k+`;
+    return s;
+  }
   if (dim === "age") return s.replace(/(\d)\s*-\s*(\d)/, "$1–$2");
   if (dim === "education") return /^school/i.test(s) ? "School" : /^tafe/i.test(s) ? "TAFE" : /^univ/i.test(s) ? "University" : s;
   // "Regional/Rural" is provincial and rural voters together

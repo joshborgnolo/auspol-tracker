@@ -1777,8 +1777,10 @@ function RdAllPolls(P) {
      of the viewport, so the pair needs ~991px - under 1000px both controls
      take their own row (at 901 they had run the page 38px and 17px wide).
      .rd-ap-pctl's rules are ungated, so it dresses itself the same at 990
-     as at 430. */
-  const ctlNarrow = useNarrow("(max-width: 1000px)");
+     as at 430. The Confidence tab and the picker's sixth button (Income)
+     moved it again, measured 2026-10-07: the picker is 412px and the row
+     fits from 1150px up, so under 1140px both controls take their row. */
+  const ctlNarrow = useNarrow("(max-width: 1140px)");
   /* the demographics scale's nine ticks need the strip's full 410px: under
      ~1150px the column shrinks (273px at 1001) and "40 pts 30" collide, so
      the head keeps the phone's five */

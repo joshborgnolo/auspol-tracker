@@ -1,5 +1,5 @@
 {
- "_about": "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
+ "_about": "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
  "waves": [
   {
    "pollster": "Resolve",
@@ -778,6 +778,22 @@
       "grn": 7,
       "oth": 13
      }
+    },
+    "income": {
+     "$100–149k": {
+      "alp": 36,
+      "lnp": 20,
+      "onp": 14,
+      "grn": 13,
+      "oth": 12
+     },
+     "$150k+": {
+      "alp": 31,
+      "lnp": 22,
+      "onp": 13,
+      "grn": 14,
+      "oth": 15
+     }
     }
    },
    "total": {
@@ -1538,6 +1554,22 @@
       "grn": 17,
       "oth": 12
      }
+    },
+    "income": {
+     "Under $100k": {
+      "alp": 30,
+      "lnp": 19,
+      "onp": 24,
+      "grn": 10,
+      "oth": 17
+     },
+     "$100k or more": {
+      "alp": 31,
+      "lnp": 20,
+      "onp": 27,
+      "grn": 13,
+      "oth": 9
+     }
     }
    },
    "total": {
@@ -1617,6 +1649,29 @@
       "lnp": 24,
       "grn": 17,
       "oth": 12
+     }
+    },
+    "income": {
+     "Under $45k": {
+      "alp": 25,
+      "onp": 28,
+      "lnp": 21,
+      "grn": 12,
+      "oth": 14
+     },
+     "$45–125k": {
+      "alp": 27,
+      "onp": 24,
+      "lnp": 25,
+      "grn": 15,
+      "oth": 9
+     },
+     "$125k+": {
+      "alp": 31,
+      "onp": 26,
+      "lnp": 23,
+      "grn": 10,
+      "oth": 10
      }
     },
     "location": {
@@ -1835,6 +1890,22 @@
       "onp": 35,
       "grn": 8,
       "oth": 13
+     }
+    },
+    "income": {
+     "Under $100k": {
+      "alp": 29,
+      "lnp": 19,
+      "onp": 29,
+      "grn": 13,
+      "oth": 10
+     },
+     "$100k or more": {
+      "alp": 29,
+      "lnp": 21,
+      "onp": 27,
+      "grn": 12,
+      "oth": 11
      }
     },
     "housing": {
@@ -2131,6 +2202,22 @@
       "oth": 13
      }
     },
+    "income": {
+     "Under $100k": {
+      "alp": 30,
+      "lnp": 20,
+      "onp": 28,
+      "grn": 12,
+      "oth": 10
+     },
+     "$100k or more": {
+      "alp": 31,
+      "lnp": 20,
+      "onp": 23,
+      "grn": 15,
+      "oth": 11
+     }
+    },
     "housing": {
      "Own outright": {
       "alp": 29,
@@ -2332,6 +2419,22 @@
       "oth": 18
      }
     },
+    "income": {
+     "Under $100k": {
+      "alp": 30,
+      "lnp": 23,
+      "onp": 24,
+      "grn": 11,
+      "oth": 11
+     },
+     "$100k or more": {
+      "alp": 27,
+      "lnp": 23,
+      "onp": 23,
+      "grn": 16,
+      "oth": 11
+     }
+    },
     "housing": {
      "Own outright": {
       "alp": 27,
@@ -2433,6 +2536,29 @@
       "lnp": 27,
       "grn": 13,
       "oth": 8
+     }
+    },
+    "income": {
+     "Under $45k": {
+      "alp": 24,
+      "onp": 29,
+      "lnp": 19,
+      "grn": 15,
+      "oth": 13
+     },
+     "$45–125k": {
+      "alp": 28,
+      "onp": 30,
+      "lnp": 25,
+      "grn": 10,
+      "oth": 7
+     },
+     "$125k+": {
+      "alp": 28,
+      "onp": 21,
+      "lnp": 32,
+      "grn": 13,
+      "oth": 6
      }
     },
     "location": {
@@ -2829,6 +2955,22 @@
       "oth": 14
      }
     },
+    "income": {
+     "Under $100k": {
+      "alp": 26,
+      "lnp": 18,
+      "onp": 31,
+      "grn": 15,
+      "oth": 10
+     },
+     "$100k or more": {
+      "alp": 27,
+      "lnp": 20,
+      "onp": 29,
+      "grn": 13,
+      "oth": 11
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 23,
@@ -3045,6 +3187,29 @@
       "alp": 31,
       "lnp": 23,
       "grn": 14,
+      "oth": 8
+     }
+    },
+    "income": {
+     "Under $45k": {
+      "onp": 31,
+      "alp": 24,
+      "lnp": 15,
+      "grn": 14,
+      "oth": 16
+     },
+     "$45–125k": {
+      "onp": 29,
+      "alp": 31,
+      "lnp": 19,
+      "grn": 13,
+      "oth": 8
+     },
+     "$125k+": {
+      "onp": 30,
+      "alp": 23,
+      "lnp": 31,
+      "grn": 8,
       "oth": 8
      }
     },
@@ -3442,6 +3607,22 @@
       "oth": 14
      }
     },
+    "income": {
+     "Under $100k": {
+      "alp": 27,
+      "lnp": 16,
+      "onp": 34,
+      "grn": 12,
+      "oth": 11
+     },
+     "$100k or more": {
+      "alp": 30,
+      "lnp": 20,
+      "onp": 28,
+      "grn": 12,
+      "oth": 10
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 26,
@@ -3582,6 +3763,29 @@
       "lnp": 19,
       "grn": 19,
       "oth": 10
+     }
+    },
+    "income": {
+     "Under $45k": {
+      "alp": 23,
+      "onp": 30,
+      "lnp": 21,
+      "grn": 15,
+      "oth": 11
+     },
+     "$45–125k": {
+      "alp": 29,
+      "onp": 28,
+      "lnp": 21,
+      "grn": 13,
+      "oth": 9
+     },
+     "$125k+": {
+      "alp": 26,
+      "onp": 27,
+      "lnp": 25,
+      "grn": 11,
+      "oth": 11
      }
     },
     "location": {
@@ -3885,6 +4089,22 @@
       "oth": 14
      }
     },
+    "income": {
+     "Under $100k": {
+      "alp": 28,
+      "lnp": 16,
+      "onp": 30,
+      "grn": 12,
+      "oth": 14
+     },
+     "$100k or more": {
+      "alp": 28,
+      "lnp": 25,
+      "onp": 24,
+      "grn": 10,
+      "oth": 13
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 26,
@@ -4113,6 +4333,22 @@
       "onp": 35,
       "grn": 7,
       "oth": 18
+     }
+    },
+    "income": {
+     "Under $100k": {
+      "alp": 28,
+      "lnp": 19,
+      "onp": 27,
+      "grn": 15,
+      "oth": 12
+     },
+     "$100k or more": {
+      "alp": 30,
+      "lnp": 23,
+      "onp": 25,
+      "grn": 10,
+      "oth": 12
      }
     },
     "education": {
@@ -4515,6 +4751,22 @@
       "oth": 20
      }
     },
+    "income": {
+     "Under $100k": {
+      "alp": 26,
+      "lnp": 21,
+      "onp": 29,
+      "grn": 10,
+      "oth": 14
+     },
+     "$100k or more": {
+      "alp": 28,
+      "lnp": 22,
+      "onp": 21,
+      "grn": 14,
+      "oth": 14
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 28,
@@ -4732,6 +4984,29 @@
       "oth": 11,
       "onp": 15,
       "lnp": 31
+     }
+    },
+    "income": {
+     "Under $45k": {
+      "alp": 25,
+      "grn": 13,
+      "oth": 17,
+      "onp": 24,
+      "lnp": 21
+     },
+     "$45–125k": {
+      "alp": 26,
+      "grn": 12,
+      "oth": 8,
+      "onp": 26,
+      "lnp": 28
+     },
+     "$125k+": {
+      "alp": 34,
+      "grn": 10,
+      "oth": 14,
+      "onp": 14,
+      "lnp": 28
      }
     },
     "location": {
@@ -4956,6 +5231,22 @@
       "onp": 35,
       "grn": 12,
       "oth": 15
+     }
+    },
+    "income": {
+     "Under $100k": {
+      "alp": 26,
+      "lnp": 17,
+      "onp": 34,
+      "grn": 13,
+      "oth": 10
+     },
+     "$100k or more": {
+      "alp": 30,
+      "lnp": 23,
+      "onp": 23,
+      "grn": 12,
+      "oth": 11
      }
     },
     "education": {
@@ -5358,6 +5649,22 @@
       "oth": 13
      }
     },
+    "income": {
+     "Under $100k": {
+      "alp": 24,
+      "lnp": 19,
+      "onp": 35,
+      "grn": 11,
+      "oth": 10
+     },
+     "$100k or more": {
+      "alp": 27,
+      "lnp": 19,
+      "onp": 27,
+      "grn": 12,
+      "oth": 14
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 26,
@@ -5575,6 +5882,29 @@
       "oth": 13,
       "lnp": 25,
       "onp": 17
+     }
+    },
+    "income": {
+     "Under $45k": {
+      "alp": 26,
+      "grn": 12,
+      "oth": 17,
+      "lnp": 18,
+      "onp": 27
+     },
+     "$45–125k": {
+      "alp": 30,
+      "grn": 14,
+      "oth": 10,
+      "lnp": 21,
+      "onp": 25
+     },
+     "$125k+": {
+      "alp": 27,
+      "grn": 11,
+      "oth": 8,
+      "lnp": 31,
+      "onp": 23
      }
     },
     "location": {
@@ -5799,6 +6129,22 @@
       "onp": 36,
       "grn": 9,
       "oth": 19
+     }
+    },
+    "income": {
+     "Under $100k": {
+      "alp": 26,
+      "lnp": 22,
+      "onp": 31,
+      "grn": 12,
+      "oth": 9
+     },
+     "$100k or more": {
+      "alp": 25,
+      "lnp": 22,
+      "onp": 27,
+      "grn": 14,
+      "oth": 13
      }
     },
     "education": {
@@ -6084,6 +6430,22 @@
       "onp": 38,
       "grn": 11,
       "oth": 13
+     }
+    },
+    "income": {
+     "Under $100k": {
+      "alp": 23,
+      "lnp": 22,
+      "onp": 33,
+      "grn": 12,
+      "oth": 10
+     },
+     "$100k or more": {
+      "alp": 29,
+      "lnp": 19,
+      "onp": 25,
+      "grn": 15,
+      "oth": 11
      }
     },
     "education": {

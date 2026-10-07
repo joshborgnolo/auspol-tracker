@@ -3451,6 +3451,16 @@ const DEM_SPLITS = [
     pairs: [["Inner metro", "Rural", "Inner metro v rural"], ["Inner metro", "Regional or rural", "Inner metro v regional"]] },
   { id: "home", label: "Home", lo: "Owners", hi: "Renters", scope: "With a housing breakdown",
     pairs: [["Renting", "Own outright", "Renters v owners"], ["Renting and other", "Own outright", "Renters v owners"]] },
+  /* Income is the odd one out in this list: the houses don't just slip on
+     bracket widths (age) or name the same groups two ways (education) -
+     they disagree on the quantity. YouGov's brackets are HOUSEHOLD income,
+     DemosAU's personal, so a paper "low v high" contrast would pool people
+     grouped by different yardsticks and the section excludes it from the
+     pooling. The pairs below stay named within-poll contrasts (YouGov's
+     two splits of its household brackets, DemosAU's personal-income split);
+     the row and its Where-it-sits note say whose pair it is. */
+  { id: "income", label: "Income", lo: "Lower income", hi: "Higher income", scope: "With an income breakdown",
+    pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]] },
 ];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];   // grp's party order
 // a poll's groups by label: its printed table, with the pooled groups
@@ -5159,7 +5169,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const FACET_BY_URL = { p: "primary", l: "leadership", d: "direction", i: "issues", c: "confidence", primary: "primary", leadership: "leadership", direction: "direction", issues: "issues", confidence: "confidence",
                          ...(window.AP.rd ? { g: "demographics", demographics: "demographics" } : {}) };
   // the demographics facet's split → URL letter's inverse; age, the default, rides no letter
-  const DEM_BY_URL = { a: "age", g: "gender", e: "education", p: "place", h: "home" };
+  const DEM_BY_URL = { a: "age", g: "gender", e: "education", p: "place", h: "home", n: "income" };
   const MEAS_BY_URL = { o: "onp", lo: "lnponp", "3": "3cp", c: "lnp", onp: "onp", lnponp: "lnponp", "3cp": "3cp", lnp: "lnp" };
   /* The lead column opens on the rival Labor is doing WORST against – the
      hero's own ruling (latest.rivalLead, deadbanded in gen-data so it
@@ -5624,7 +5634,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      without it the URL was normalised every render, and this effect also
      runs for the reader who typed a stale or partial query by hand. */
   const FACET_BY_ID = { primary: "p", leadership: "l", direction: "d", issues: "i", confidence: "c", demographics: "g" };  // facet → URL letter (inverse of the restore map)
-  const DEM_BY_ID = { gender: "g", education: "e", place: "p", home: "h" };   // split → URL letter; age is the omitted default
+  const DEM_BY_ID = { gender: "g", education: "e", place: "p", home: "h", income: "n" };   // split → URL letter; age is the omitted default
   const MEAS_BY_ID = { lnp: "c", onp: "o", lnponp: "lo", "3cp": "3" };    // matchup → URL letter; the page's default matchup is omitted
   const LEAD_BY_ID = { alp: "a", lnp: "l", onp: "o" };                    // holder → URL letter; "all" is the omitted default
   React.useEffect(() => {

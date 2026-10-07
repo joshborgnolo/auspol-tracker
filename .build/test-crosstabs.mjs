@@ -61,9 +61,16 @@ const HEADERS = {
   "Own home outright": ["housing", "Own outright"], "Mortgaging home": ["housing", "Mortgage"],
   "Renting home": ["housing", "Renting"],                                                                 // Jun on
   "Only English spoken at home": ["language", "English only"], "Other language spoken at home": ["language", "Other language"],
-  // not read: income (its brackets never settled beside another house's), the 2025 vote (the
-  // One Nation panel's), parental status ("parent" is not "rent"), employment and class
-  "Household income 100-149k": null, "Income: <100k": null, "Income less than $100k": null, "Voted Labor in 2025": null,
+  // household income: the four-bracket scheme, and the two-bracket scheme it
+  // replaced mid-2026 – the brackets ride in the label so the facet's pair
+  // naming stays honest about which scheme a wave printed
+  "Household income <50k": ["income", "Under $50k"], "Household income 50-99k": ["income", "$50–99k"],
+  "Household income 100-149k": ["income", "$100–149k"], "Household income 150k+": ["income", "$150k+"],
+  "Income: <100k": ["income", "Under $100k"], "Income less than $100k": ["income", "Under $100k"],
+  "Income more than $100k": ["income", "$100k or more"],
+  // not read: the 2025 vote (the One Nation panel's), parental status
+  // ("parent" is not "rent"), employment and class
+  "Voted Labor in 2025": null,
   "No, I am neither a parent or guardian": null, "Parental Status: Yes, children <18": null,
   "Full time": null, Retired: null, "Class: Working class": null,
 };
@@ -74,6 +81,25 @@ assert.deepEqual(Object.keys(d.dims.state), ["NSW", "Vic", "Qld", "SA", "WA", "A
 assert.deepEqual(d.dims.location.Rural, { alp: 18, lnp: 21, onp: 35, grn: 12, oth: 15 });
 assert.deepEqual(d.dims.housing.Renting, { alp: 29, lnp: 8, onp: 27, grn: 21, oth: 16 });
 assert.deepEqual(d.dims.language["Other language"], { alp: 34, lnp: 22, onp: 22, grn: 15, oth: 8 });
+// … and its income columns, in the two-bracket scheme of the time
+assert.deepEqual(d.dims.income, {
+  "Under $100k": { alp: 26, lnp: 17, onp: 34, grn: 13, oth: 10 },
+  "$100k or more": { alp: 30, lnp: 23, onp: 23, grn: 12, oth: 11 },
+}, "24 Aug 2026 printed the two-bracket income scheme");
+// a group printed as two columns: 21 Apr 2026 carried income twice
+// ("Household income: <100k" and "Income: <100k", figures identical) – the
+// first sighting of the pair stands, folded party rows untouched
+const dupOf = (offset) => ({ head: ["", "Total", "Household income: <100k", "Income: <100k"], rows: [
+  ["Labor", "30", "29", String(29 + offset)],
+  ["Coalition", "20", "19", String(19 + offset)],
+  ["One Nation", "28", "29", String(29 + offset)],
+  ["The Greens", "12", "13", String(13 + offset)],
+  ["Independent", "4", "4", String(4 + offset)],
+  ["Other", "6", "6", String(6 + offset)],
+] });
+assert.deepEqual(youGovDims(dupOf(0)).dims.income,
+  { "Under $100k": { alp: 29, lnp: 19, onp: 29, grn: 13, oth: 10 } }, "an identical copy reads once");
+assert.match(sharesProblem(youGovDims(dupOf(2)).dims.income), /sum to/, "a copy that disagrees stays and trips the gate");
 
 // ---- RedBridge: the first-preference table, read by its own column header ---------------
 const RB_DIR = path.join(ROOT, ".build", "redbridge-src");
@@ -153,6 +179,10 @@ assert.equal(demosLabel("housing", "Renter"), "Renting");
 assert.equal(demosLabel("language", "English"), "English only");
 assert.equal(demosLabel("language", "LOTE"), "Other language");
 assert.equal(demosLabel("language", "Other language at home"), "Other language");
+// the Income chart's brackets, tidied to YouGov's label scheme
+assert.equal(demosLabel("income", "<$45K"), "Under $45k");
+assert.equal(demosLabel("income", "$45-125K"), "$45–125k");
+assert.equal(demosLabel("income", "$125K+"), "$125k+");
 
 // ---- the gate --------------------------------------------------------------------------
 assert.equal(sharesProblem({ Men: { alp: 50, lnp: 48 } }), null, "rounding passes");
@@ -224,7 +254,12 @@ assert.deepEqual(Object.keys(rbPlace.housing), ["Own outright", "Mortgage"], "Re
 assert.deepEqual(Object.keys(harmonize({ pollster: "Resolve", dims: { state: {
   NSW: sh(28, 25, 29, 12, 6), Vic: sh(30, 24, 23, 15, 8), Qld: sh(24, 25, 28, 10, 13), "Rest of Australia": sh(31, 24, 24, 11, 10) } } }).state),
   ["NSW", "Vic", "Qld", "Rest of Australia"]);
+// income is read per house for the All-polls demographics facet, but the
+// brackets share no cut point (and YouGov's are household, DemosAU's personal),
+// so it joins no common group
+assert.equal(harmonize({ pollster: "YouGov", dims: { income: { "Under $50k": sh(26, 20, 30, 14, 10), "$150k+": sh(38, 28, 18, 6, 10) } } }).income,
+  undefined, "income joins no common group");
 // every common group has a population share for its sampling-error floor
 for (const set of DEMO_SETS) for (const g of set.groups) assert.ok(DEMO_SHARE[g] > 0 && DEMO_SHARE[g] < 1, `share for ${g}`);
 
-console.log("PASS: crosstab readers – YouGov crosstab, RedBridge tables (three layouts), Resolve series, DemosAU labels, the gate, the common groups (place and home too)");
+console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts), Resolve series, DemosAU labels, the gate, the common groups (place and home too)");

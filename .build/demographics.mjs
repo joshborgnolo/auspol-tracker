@@ -1,6 +1,6 @@
 /* demographics.mjs – builds data/demographics.json: first-preference vote by
-   gender, age (or generation), education, state, location, housing and
-   language at home, per poll wave, as each pollster groups it. The
+   gender, age (or generation), education, income, state, location, housing
+   and language at home, per poll wave, as each pollster groups it. The
    Snapshot's vote-by-group panel and its Info entry are drawn from this file.
 
    Runs itself: the YouGov/News24, DemosAU, RedBridge and Resolve updaters
@@ -11,13 +11,17 @@
                  sources.mjs): gender, age bands, generations, education,
                  location (Feb 2026 on), housing (Mar on), state and language
                  (Jun on) – whichever columns that wave carries (they changed
-                 over 2026). Its income, employment, parental-status and class
-                 columns are not read.
+                 over 2026). Its household-income columns are read too, but
+                 only for the All-polls demographics facet (no house cuts
+                 income like another, so it joins no common group –
+                 .build/newtracker/demo-groups.mjs' header). Its employment,
+                 parental-status and class columns are not read.
      DemosAU   – the Gender, Age, Education, Location and Housing Tenure
                  charts (and Language Status from May) in the wave's report
                  PDF, measured from the rendered bars (.build/demosau-charts
                  .mjs); from the April 2026 report (earlier reports used
-                 another layout without them). Its Income chart is not read.
+                 another layout without them). Its Income chart (personal
+                 income) is read to the same facet-only end as YouGov's.
      RedBridge – the "First preference vote intention" table in the report
                  text extract-redbridge.mjs caches (.build/redbridge-src/),
                  from February 2026 (earlier reports printed it as figures):
@@ -238,7 +242,7 @@ for (const house of HOUSES) {
 }
 
 const doc = {
-  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
+  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
   waves,
   skipped,
 };

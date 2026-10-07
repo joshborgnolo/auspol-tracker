@@ -34,7 +34,15 @@
                  RedBridge's Renting and other is wider than renters, so it
                  joins only at the two owner groups.
      language    English only and Other language at home – YouGov and
-                 DemosAU. */
+                 DemosAU.
+
+   Income is the ruled-out cut: YouGov's brackets (household income;
+   <50k/50–99k/100–149k/150k+, earlier just under/over $100k) share no cut
+   point with DemosAU's (personal income; <$45k/$45–125k/$125k+), and
+   Resolve, RedBridge and Morgan print none. Nothing here is reconcilable
+   without an estimate, so income joins no common group – the All-polls
+   demographics facet contrasts each poll's own brackets instead (the "same
+   people" rule above applied, 2026-10-07). */
 
 export const DEMO_TABS = [
   { id: "age", label: "Age" },

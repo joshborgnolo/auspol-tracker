@@ -2067,7 +2067,7 @@ const KBD_ROWS = [
   { keys: ["C"], what: "Copy the chart or poll breakdown under the pointer as an image" },
   { keys: ["←", "→"], what: "Walk a card's tabs or chips while the pointer is over it" },
   { keys: ["1–9"], what: "Pick a numbered party or term on a chips row" },
-  ...(window.JUR ? [] : [{ keys: ["1–5"], what: "In the all-polls demographics view, pick the Split by group" }]),
+  ...(window.JUR ? [] : [{ keys: ["1–6"], what: "In the all-polls demographics view, pick the Split by group" }]),
   { keys: ["Space"], what: window.JUR ? "Flip the matchup in the two-party views" : "Flip the matchup in the two-party views; step the all-polls demographics split" },
   { keys: ["P"], what: "In the all-polls two-party table, published figures only" },
   { keys: ["?"], what: "This sheet" },
