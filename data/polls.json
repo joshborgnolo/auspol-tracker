@@ -8360,6 +8360,12 @@
       "firm": "RedBridge/Accent",
       "alpVsOnp_alp": 52,
       "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-10-06",
+      "firm": "YouGov",
+      "alpVsOnp_alp": 53,
+      "lnpVsOnp_lnp": null
     }
   ],
   "cyclePolls": {

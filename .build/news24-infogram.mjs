@@ -122,11 +122,27 @@ export function parseN24Ppm(data) {
   return out.length ? out : null;
 }
 
-// 2PP: cornerless, header ["", "Labor vs Coalition", "Labor vs One Nation"];
-// blanks are structural (each pairing occupies its own column).
+// 2PP, two layouts. Until Sep 2026 one table, cornerless, header ["",
+// "Labor vs Coalition", "Labor vs One Nation"]; blanks are structural (each
+// pairing occupies its own column). From the 6 Oct 2026 wave, one embed per
+// pairing, a demographic crosstab: corner "Column %", second column
+// "Total", exactly two party rows - Labor and Coalition, or Labor and One
+// Nation (the Labor-v-One-Nation one went unread for a wave as
+// "unmodelled"). The Total pair must sum to 100.
 export function parseN24Tpp(data) {
   for (const t of chartEntitiesOf(data)) {
     const head = t.rows[0];
+    if (/^total$/i.test(head[1] ?? "") && t.rows.length === 3) {
+      const lab = t.rows.find((r) => /^labor$/i.test(r[0]));
+      const coa = t.rows.find((r) => /^coalition$/i.test(r[0]));
+      const onp = t.rows.find((r) => /^one nation$/i.test(r[0]));
+      const rival = coa && !onp ? coa : onp && !coa ? onp : null;
+      if (!lab || !rival) continue;
+      const a = num(lab[1]), o = num(rival[1]);
+      if (a == null || o == null) return { tpp: null, why: "2pp Total cell missing" };
+      if (Math.abs(a + o - 100) > 0.5) return { tpp: null, why: `2pp Total Σ=${a + o}` };
+      return { tpp: rival === coa ? { coalition: { alp: a, lnp: o } } : { oneNation: { alp: a, onp: o } }, why: null };
+    }
     const ci = head.findIndex((h) => /labor vs coalition/i.test(h));
     const hi = head.findIndex((h) => /labor vs one nation/i.test(h));
     if (ci < 0 && hi < 0) continue;

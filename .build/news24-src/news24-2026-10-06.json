@@ -36,8 +36,8 @@
     "note": "hand-entered 2026-10-07 from the owner: the Preferred PM embed (_/fZGHngatIJgOgihyguxQ, titled 06102026) repeated the 21 Sep wave (41/22/37, 50/12/38) and the prose states no PPM figures; Albanese 40, Taylor 39, don’t know 21; Albanese 50, Hanson 40, don’t know 10"
   },
   "altTpp": {
-    "alpVsOnp_alp": null,
-    "alpVsOnp_onp": null
+    "alpVsOnp_alp": 53,
+    "alpVsOnp_onp": 47
   },
   "infogram": {
     "via": "anon",
@@ -55,8 +55,8 @@
       "crosstab",
       "approvals",
       "ppm",
-      "unmodelled",
-      "unmodelled",
+      "tpp",
+      "tpp",
       "unmodelled"
     ],
     "window": {
@@ -71,8 +71,14 @@
       "ind": 5,
       "oth": 6
     },
-    "tpp": null,
-    "altTpp": null,
+    "tpp": {
+      "tpp_alp": 52,
+      "tpp_lnp": 48
+    },
+    "altTpp": {
+      "alpVsOnp_alp": 53,
+      "alpVsOnp_onp": 47
+    },
     "approval": {
       "alb": {
         "app": 33,

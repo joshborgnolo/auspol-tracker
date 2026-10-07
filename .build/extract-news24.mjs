@@ -922,10 +922,23 @@ function n24ConflictPlan({ existing, wave, articlePublished }) {
   return { fileWave: true, stamp: !wave.published && ok ? articlePublished : null };
 }
 
+// A source record's section a person filled by hand carries a `note`
+// (the 2026-10-06 PPM, entered from the owner when the embed was stale);
+// a re-run that rewrites the record keeps those sections as they are.
+function n24KeepHand(oldText, newText) {
+  let o, n;
+  try { o = JSON.parse(oldText); n = JSON.parse(newText); } catch { return newText; }
+  let kept = false;
+  for (const [k, v] of Object.entries(o ?? {}))
+    if (v && typeof v === "object" && typeof v.note === "string") { n[k] = v; kept = true; }
+  return kept ? JSON.stringify(n, null, 2) + "\n" : newText;
+}
+const readOr = (f) => { try { return readFileSync(f, "utf8"); } catch { return null; } };
+
 // --------------------------------------------------------------- entry
 // N24_LIB=1: import the parsers and guards (tests, the layout healer's
 // acceptance step) without running the extraction.
-export { parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells, guard, n24ConflictPlan, n24Prefer, n24PrevWave, news24Sat, WIKI_RAW };
+export { parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells, guard, n24ConflictPlan, n24KeepHand, n24Prefer, n24PrevWave, news24Sat, WIKI_RAW };
 if (!process.env.N24_LIB) {
 const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [], releaseFilled: [] };
 
@@ -1099,11 +1112,12 @@ try {
         try { return /(^|\.)news24\.com\.au$/.test(new URL(wikiWave.url ?? "").hostname) ? wikiWave.url : null; }
         catch { return null; }
       })();
-      // Every News24 wave so far carries ppm + approval derived rows; the
-      // latest wave missing them (a figure merge once blocked) still has an
+      // Every News24 wave since Feb 2026 carries ppm, approval and ALP-v-ONP
+      // 2PP derived rows; the latest wave missing one (a figure merge once
+      // blocked; a 2PP embed layout once went unread) still has an
       // unfinished enrichment, same as one missing its publication stamp.
       const canUpgrade = !!existing && wikiWave.date === latestYg && existing.client === "News24"
-        && (!existing.published || !firmRowExists("ppm", wikiWave.date) || !firmRowExists("approval", wikiWave.date))
+        && (!existing.published || ["ppm", "approval", "altTpp"].some((k) => !firmRowExists(k, wikiWave.date)))
         && !!news24Url;
       if ((existing || newDates.has(wikiWave.date)) && !canUpgrade) { status.fallback.skipped_existing++; continue; }
 
@@ -1246,7 +1260,7 @@ try {
     if (status.changed && !CHECK) {
       writeAtomic(OUT, next);
       mkdirSync(SRC_DIR, { recursive: true });
-      for (const s of sources) writeFileSync(`${SRC_DIR}/${s.file}`, s.json);
+      for (const s of sources) writeFileSync(`${SRC_DIR}/${s.file}`, n24KeepHand(readOr(`${SRC_DIR}/${s.file}`), s.json));
       const parts = [];
       if (newPolls.length) parts.push(`+${newPolls.length} YouGov wave(s): ${status.added.map((a) => a.date).join(", ")}`);
       if (status.news24.upgraded.length) parts.push(`enriched latest News24 wave: ${status.news24.upgraded.join(", ")}`);

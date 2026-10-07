@@ -94,6 +94,22 @@ eq("tpp pairs", parseN24Tpp(dataOf("_/jSJgw3l3groFHC28VREB")).tpp,
   eq("crosstab CSA long label fold", drift.vi.oth, 7);
 }
 
+// ---- 2PP, per-pairing crosstab layout (6 Oct 2026 wave: one embed per
+// pairing, corner "Column %", Total column) - the ALP-v-ONP 53/47 the
+// old parser filed as "unmodelled"
+{
+  const FX10 = path.join(DIR, ".build/news24-src/ig-fixtures-2026-10-06");
+  const d10 = (id) => infographicDataOf(readFileSync(path.join(FX10, `ig-${id}.html`), "utf8"));
+  eq("tpp crosstab layout: Labor v One Nation", parseN24Tpp(d10("WaCCXdcAEV5kRmRrRwmC")).tpp, { oneNation: { alp: 53, onp: 47 } });
+  eq("tpp crosstab layout: Labor v Coalition", parseN24Tpp(d10("Odslu4VSlJvLA4KIYKfS")).tpp, { coalition: { alp: 52, lnp: 48 } });
+  const bad = JSON.parse(JSON.stringify(d10("WaCCXdcAEV5kRmRrRwmC")));
+  for (const e of Object.values(bad.elements.content.content.entities))
+    if (e.type === "CHART") e.props.chartData.data[0][1][1].value = "55";
+  ok("tpp crosstab Σ tamper declines", parseN24Tpp(bad).tpp === null && /Σ=/.test(parseN24Tpp(bad).why));
+  const crossNot = parseN24Crosstab(d10("WaCCXdcAEV5kRmRrRwmC"));
+  ok("a 2PP crosstab is not read as the voting-intention crosstab", crossNot.vi === null);
+}
+
 // ---- horserace: corroboration-only, Σ-guarded
 {
   const hr = parseN24Horserace(dataOf("_/pWKd54huH0REqno4nuue"));

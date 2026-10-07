@@ -9,7 +9,7 @@
 import assert from "node:assert/strict";
 
 process.env.N24_LIB = "1";
-const { parseWikiYouGov, wikiOthersSplit, n24ConflictPlan, n24Prefer, n24PrevWave, news24Sat } = await import("./extract-news24.mjs");
+const { parseWikiYouGov, wikiOthersSplit, n24ConflictPlan, n24KeepHand, n24Prefer, n24PrevWave, news24Sat } = await import("./extract-news24.mjs");
 
 const head = `==Voting intention==
 ===2026===
@@ -173,6 +173,16 @@ assert.equal(r.waves.length, 0, JSON.stringify(r));
   assert.deepEqual([pw.ppm.alb, pw.ppm.opp, pw.han.alb, pw.han.han], [41, 37, 50, 38]);
   assert.equal(pw.appr, null);
   assert.equal(n24PrevWave(D, "2026-09-08"), null, "no earlier wave");
+}
+
+// ---- a re-run keeps hand-entered source sections (n24KeepHand)
+{
+  const old = JSON.stringify({ ppm: { alb: 40, opp: 39, note: "hand-entered" }, altTpp: { alpVsOnp_alp: null } });
+  const fresh = JSON.stringify({ ppm: { alb: null, opp: null }, altTpp: { alpVsOnp_alp: 53 } });
+  const out = JSON.parse(n24KeepHand(old, fresh));
+  assert.deepEqual(out.ppm, { alb: 40, opp: 39, note: "hand-entered" }, "hand section kept");
+  assert.deepEqual(out.altTpp, { alpVsOnp_alp: 53 }, "machine section refreshed");
+  assert.equal(n24KeepHand(null, fresh), fresh, "no old record: the new one as written");
 }
 
 console.log("test-news24-wiki: ok");
