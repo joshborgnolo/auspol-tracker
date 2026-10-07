@@ -6,7 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
-import { titleMonthOf, pickReports, methodologyOf, directionPageOf, directionChartOf, stateTableOf, concernTableOf, g4BestPartyOf, gridPageOf, heatGridOf }
+import { titleMonthOf, pickReports, methodologyOf, directionPageOf, directionChartOf, stateTableOf, concernTableOf, g4BestPartyOf, gridPageOf, heatGridOf, motnStatementsOf, motnStatementYm }
   from "./extract-secnewgate.mjs";
 
 const SRC = ".build/secnewgate-src";
@@ -37,6 +37,15 @@ assert.deepEqual(reports.map((r) => [r.sidecar.wave, r.sidecar.url, r.sidecar.pu
   [26, "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-report-july-2026/", "2026-07-21T16:50"],
   [27, "https://www.secnewgate.com.au/sec-newgate-mood-of-the-nation-september-2026-report/", "2026-09-22T15:29"],
 ], "the sidecar release links and publish stamps (site-local times)");
+assert.deepEqual(reports.map((r) => [r.sidecar.wave, r.sidecar.method]), [
+  [21, "https://www.secnewgate.com.au/wp-content/uploads/2025/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2025-1.pdf"],
+  [22, "https://www.secnewgate.com.au/wp-content/uploads/2025/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2025.pdf"],
+  [23, "https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf"],
+  [24, "https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf"],
+  [25, "https://www.secnewgate.com.au/wp-content/uploads/2026/05/NGR-2203003-MOTN-Methodology-Disclosure-Statement-May-2026.pdf"],
+  [26, "https://www.secnewgate.com.au/wp-content/uploads/2026/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2026.pdf"],
+  [27, "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf"],
+], "the sidecar APC statement links off the disclosure library");
 
 // ---- titleMonthOf ------------------------------------------------------------
 assert.equal(titleMonthOf("SEC Newgate Mood of the Nation &#8211; September 2026 Report"), "2026-09",
@@ -331,6 +340,24 @@ const special = "\fcover\n\fThe findings\n\nNo direction question was asked.\f";
 assert.equal(methodologyOf("no wave ordinal here\n" + special), null, "a special: no tracking marker");
 assert.equal(directionPageOf(special), 0, "a special: no direction page");
 
+// ---- the disclosure-statements library --------------------------------------
+assert.equal(motnStatementYm("https://www.secnewgate.com.au/wp-content/uploads/2025/07/NGR-2203003-MOTN-Methodology-Disclosure-Statement-July-2025-1.pdf"), "2025-07", "re-upload --1 suffix");
+assert.equal(motnStatementYm("https://www.secnewgate.com.au/wp-content/uploads/2025/11/NGR-2203003-MOTN-Methodology-Disclosure-Statement-November-2025-F1-1.pdf"), "2025-11", "the -F1-1 suffix");
+assert.equal(motnStatementYm("https://www.secnewgate.com.au/wp-content/uploads/2026/02/NGR-2203003-MOTN-Methodology-Disclosure-Statement-FEBRUARY-2026.pdf"), "2026-02", "caps month");
+assert.equal(motnStatementYm("https://www.secnewgate.com.au/wp-content/uploads/2025/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-NotAMonth-2025.pdf"), null, "an unknown month is null");
+{
+  const lib = `
+    <a href="https://www.secnewgate.com.au/wp-content/uploads/2026/10/NGR-2203003-MOTN-Methodology-Disclosure-Statement-October-2026.pdf">October</a>
+    <a href="https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf">Sep</a>
+    <a href="https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026-1.pdf">Sep re-upload</a>
+    <a href="https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-RMP-Methodology-Disclosure-Statement-September-2026.pdf">other study</a>
+    <a href="/some/page-not-pdf">not a pdf</a>`;
+  assert.deepEqual([...motnStatementsOf(lib).entries()], [
+    ["2026-10", "https://www.secnewgate.com.au/wp-content/uploads/2026/10/NGR-2203003-MOTN-Methodology-Disclosure-Statement-October-2026.pdf"],
+    ["2026-09", "https://www.secnewgate.com.au/wp-content/uploads/2026/09/NGR-2203003-MOTN-Methodology-Disclosure-Statement-September-2026.pdf"],
+  ], "MOTN only, first sighting of a month wins");
+}
+
 // the newest chart's series reprints history: every earlier wave's own
 // endpoint sits at series[wave-1] of the newest report's chart
 {
@@ -356,6 +383,7 @@ assert.equal(directionPageOf(special), 0, "a special: no direction page");
     ...(r.sidecar.sample != null ? { sample: r.sidecar.sample } : {}),
     ...(r.sidecar.url != null ? { url: r.sidecar.url } : {}),
     ...(r.sidecar.published != null ? { published: r.sidecar.published } : {}),
+    ...(r.sidecar.method != null ? { methodUrl: r.sidecar.method } : {}),
   })), "the SEC Newgate direction rows, date-sorted, match the cached reports");
 }
 

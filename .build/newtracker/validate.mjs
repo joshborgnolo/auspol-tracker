@@ -375,6 +375,16 @@ export function validate(D) {
     const sum = n0(d.right) + n0(d.wrong) + n0(d.unsure);
     if (Math.abs(sum - 100) > 1)
       errors.push({ type: "direction-sum", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `Σ = ${sum.toFixed(1)}` });
+    // methodUrl, where present, is the wave's APC methodology statement —
+    // SEC Newgate's MOTN statement PDF off its disclosure-statements
+    // library (the per-wave statements list at
+    // secnewgate.com.au/disclosure-statements, stamped by
+    // extract-secnewgate.mjs) — an absolute https URL, on the same terms
+    // as the poll rows' check 2c2. Only SEC has a source to link.
+    if (d.methodUrl != null && (typeof d.methodUrl !== "string" || !/^https:\/\/.+\..+\//.test(d.methodUrl)))
+      errors.push({ type: "method-url", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `methodUrl = ${JSON.stringify(d.methodUrl)}` });
+    if (d.methodUrl != null && d.pollster !== "SEC Newgate")
+      errors.push({ type: "method-url", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: "methodUrl on a direction row with no APC statement source" });
   });
 
   /* 7. a 2PP column has to agree with the primaries printed beside it.

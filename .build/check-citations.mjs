@@ -60,6 +60,7 @@ const ROOT = process.env.CITATION_CHECK_ROOT ||
   fileURLToPath(new URL("../", import.meta.url));
 const POLLS = process.env.CITATION_CHECK_POLLS || join(ROOT, "data/polls.json");
 const STATE = process.env.CITATION_CHECK_STATE || join(ROOT, "data/link-health.json");
+const ISSUES = process.env.CITATION_CHECK_ISSUES || join(ROOT, "data/issues.json");
 const DELAY_MS = Number(process.env.CITATION_CHECK_DELAY_MS ?? 300);
 const TIMEOUT_MS = Number(process.env.CITATION_CHECK_TIMEOUT_MS ?? 20_000);
 const BACKOFF_429_MS = Number(process.env.CITATION_CHECK_429_BACKOFF_MS ?? 5000);
@@ -245,6 +246,20 @@ function collect() {
     add(p.url, "url");
     add(p.releaseUrl, "releaseUrl");
     add(p.methodUrl, "methodUrl");
+  }
+  // the direction-only rows (SEC Newgate) carry the same outbound pair
+  for (const d of data.direction || []) {
+    add(d.url, "url");
+    add(d.methodUrl, "methodUrl");
+  }
+  // Ipsos's issues waves (polled by nobody else) cite their report PDF and
+  // APC statement from issues.json, not polls.json
+  if (existsSync(ISSUES)) {
+    const iss = JSON.parse(readFileSync(ISSUES, "utf8"));
+    for (const w of [...(iss.salience || []), ...(iss.ownership || [])]) {
+      add(w.source, "issues.source");
+      add(w.methodUrl, "methodUrl");
+    }
   }
   // pollsterRules is an object keyed by pollster name
   for (const rule of Object.values(data.pollsterRules || {})) {

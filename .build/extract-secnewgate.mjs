@@ -33,7 +33,8 @@
    { date = fieldwork END, dateStart, pollster: "SEC Newgate",
      right, wrong, unsure = 100 − right − wrong,
      sample = the wave's n from the report's methodology block,
-     url = the report's article page, published = its upload time }
+     url = the report's article page, published = its upload time,
+     methodUrl = the wave's APC methodology statement }
    and the array re-sorted by date, like every house's writer. A rerun
    heals a row of the same wave within HEAL_DAYS of a prior entry, and
    rewrites any row of an exact date whose figures, span or n moved. The
@@ -45,7 +46,7 @@
    report), <slug>.bbox.html (pdftotext -bbox, the direction page only),
    <slug>.grid.bbox.html (pdftotext -bbox, the national-priorities summary
    grid page), <slug>.json ({ pdf, wave, date, dateStart, sample, url,
-   published }). Written once when
+   published, method }). Written once when
    first fetched and never touched again, so a run that finds nothing new
    changes nothing (a cache file added later, as the grid page was for the
    heat-score bank, is back-filled from the still-listed PDF alone, the
@@ -69,11 +70,13 @@
 
    Usage: node .build/extract-secnewgate.mjs [--force]  (--force refetches)
    SECNEWGATE_SRC_DIR redirects the cache.
-   --probe asks the media API alone and names the PDFs a real run would
-   fetch (a month's first candidate not cached, or a grid page still to
-   back-fill), writing nothing: poll-agent.yml's quiet-run gate, which
-   skips the runner's apt/npm setup and the updater when the line is
-   PROBE {"new":[],"warnings":[]}. Needs no pdftotext and no npm package.
+   --probe asks the media API and the disclosure-statements library, and
+   names the work a real run would do (a month's first candidate not
+   cached, a grid page still to back-fill, a filed wave whose statement
+   link no longer matches the library), writing nothing: poll-agent.yml's
+   quiet-run gate, which skips the runner's apt/npm setup and the updater
+   when the line is PROBE {"new":[],"warnings":[]}. Needs no pdftotext and
+   no npm package.
    Last line: SECNEWGATE_STATUS {"changed":…,"added":[…],"healed":[…],
    "pending":[…],"stale":[…],"warnings":[…]} */
 import fs from "node:fs";
@@ -91,6 +94,8 @@ const POLLS = process.env.SECNEWGATE_POLLS || path.join(ROOT, "data", "polls.jso
 const STATES_OUT = process.env.SECNEWGATE_STATES || path.join(ROOT, "data", "sec-direction-states.json");
 const ISSUES_OUT = process.env.SECNEWGATE_ISSUES || path.join(ROOT, "data", "sec-issues.json");
 const API = "https://www.secnewgate.com.au/wp-json/wp/v2/media?search=Mood&per_page=100";
+const DISCLOSE = "https://www.secnewgate.com.au/disclosure-statements/";
+const DISCLOSE_PAGES = 8;    // the statements library paginates newest-first; 2025-07 sits on page 3 today
 const SEC_FIRST = "2025-07";   // waves on file run Jul 2025 on; older reports stay untouched
 const QUIET_DAYS = 75;         // bi-monthly cadence plus slack before the house counts as quiet
 const HEAL_DAYS = 8;           // a wave re-dated within this window is the same wave
@@ -184,6 +189,30 @@ export function pickReports(items) {
   }
   return [...byMonth.entries()].sort(([a], [b]) => (a < b ? -1 : 1))
     .map(([ym, urls]) => ({ ym, urls: urls.map(({ url, page, published }) => ({ url, page, published })) }));
+}
+
+/* The disclosure-statements library's MOTN links as ym → statement PDF.
+   The tracking study's statement file is
+   "NGR-2203003-MOTN-Methodology-Disclosure-Statement-<Month>-<Year>.pdf" –
+   capitalisation and "-1"/"-F1-1" re-upload suffixes vary, other studies'
+   statements share the page so only "-MOTN-" files count, and the first
+   sighting of a month wins (pages walk newest-first). */
+export function motnStatementsOf(html) {
+  const out = new Map();
+  for (const m of String(html).matchAll(/href="([^"]*\/wp-content\/uploads\/[^"]+?\.pdf)"/gi)) {
+    const file = m[1].split("?")[0].split("#")[0];
+    if (!/-MOTN-/.test(file)) continue;
+    const ym = motnStatementYm(file);
+    if (ym && !out.has(ym)) out.set(ym, file);
+  }
+  return out;
+}
+export function motnStatementYm(url) {
+  const name = decodeURIComponent(url.split("/").pop());
+  const m = name.match(/-Statement-([A-Za-z]+)-(\d{4})/);
+  if (!m) return null;
+  const mo = MONTHS[m[1].toLowerCase()];
+  return mo == null ? null : `${m[2]}-${String(mo + 1).padStart(2, "0")}`;
 }
 
 /* The methodology page facts of a tracking wave: its ordinal, fieldwork
@@ -584,6 +613,29 @@ async function main() {
   }
   const groups = pickReports(items);
   if (groups.length < 5) status.warnings.push(`only ${groups.length} report wave(s) found from ${SEC_FIRST} on – has the media library changed?`);
+  /* The APC methodology statements, keyed by wave month and walked only as
+     deep as the waves on the board: each wave's direction row links its
+     statement (the All-polls "APC methodology" link). A statement's URL
+     moves when the house re-uploads it, so a row's link heals whenever the
+     library disagrees. A library fetch failure never touches the rows –
+     stmts.ok false keeps the links they have. */
+  const needYms = new Set(groups.map((g) => g.ym));
+  const stmts = await (async () => {
+    const map = new Map();
+    let seenAny = false;
+    try {
+      for (let page = 1; page <= DISCLOSE_PAGES; page++) {
+        const html = (await get(page === 1 ? DISCLOSE : DISCLOSE + "page/" + page)).toString("utf8");
+        const found = motnStatementsOf(html);
+        if (page === 1 && !found.size) throw new Error("no MOTN statements on the disclosure page – has it changed?");
+        if (!found.size) break;   // past the library's statement pages
+        seenAny = true;
+        for (const [ym, url] of found) if (!map.has(ym)) map.set(ym, url);
+        if ([...needYms].every((ym) => map.has(ym))) break;
+      }
+    } catch (e) { status.warnings.push(`disclosure statements: ${e.message}`); }
+    return { ok: seenAny, map };
+  })();
   if (PROBE) {
     // mirrors the loop below: it fetches a month's FIRST candidate unless
     // that one's text and chart page are cached, and back-fills a missing
@@ -595,6 +647,17 @@ async function main() {
       if (FORCE || !fs.existsSync(txtPath) || !fs.existsSync(path.join(SRC, slug + ".bbox.html"))) todo.push(slug);
       else if (!fs.existsSync(path.join(SRC, slug + ".grid.bbox.html")) && gridPageOf(fs.readFileSync(txtPath, "utf8")).page)
         todo.push(slug + " (grid page)");
+    }
+    // …and a filed wave whose statement link no longer matches the library
+    // (statements post AFTER the wave's report run, so this is the only
+    // gate that ever sees them land)
+    if (stmts.ok) {
+      let dir = [];
+      try { dir = JSON.parse(fs.readFileSync(POLLS, "utf8")).direction || []; } catch {}
+      for (const ym of needYms) {
+        const row = dir.find((d) => d.pollster === POLLSTER && d.date.startsWith(ym));
+        if (row && (row.methodUrl || null) !== (stmts.map.get(ym) || null)) todo.push(`${ym} (disclosure statement)`);
+      }
     }
     console.log("PROBE " + JSON.stringify({ new: todo, warnings: status.warnings }));
     return;
@@ -664,7 +727,8 @@ async function main() {
       }
       fs.writeFileSync(path.join(SRC, slug + ".json"),
         JSON.stringify({ pdf: url, wave: meta.wave, date: meta.date, dateStart: meta.dateStart, sample: meta.sample,
-          ...(cand.page ? { url: cand.page } : {}), ...(cand.published ? { published: cand.published } : {}) }, null, 1) + "\n");
+          ...(cand.page ? { url: cand.page } : {}), ...(cand.published ? { published: cand.published } : {}),
+          ...(stmts.ok && stmts.map.get(meta.date.slice(0, 7)) ? { method: stmts.map.get(meta.date.slice(0, 7)) } : {}) }, null, 1) + "\n");
       // the per-state direction table banks separately from the national
       // rows: a state misread alarms WITHOUT holding the national row back
       let table = stateTableOf(bbox);
@@ -704,7 +768,8 @@ async function main() {
           status.pending.push(`${g.ym}: the heat grid didn't read (${grid.problems[0]})`);
         } else heat = grid.items;
       }
-      waves.set(meta.wave, { slug, meta, cols: chart.columns, page: cand.page, published: cand.published, table, concerns, g4, heat });
+      waves.set(meta.wave, { slug, meta, cols: chart.columns, page: cand.page, published: cand.published,
+        method: stmts.ok ? stmts.map.get(meta.date.slice(0, 7)) || null : null, table, concerns, g4, heat });
       done = true;
     }
     if (!done && ![...waves.values()].some((w) => w.meta.date.startsWith(g.ym))) {
@@ -896,13 +961,16 @@ async function main() {
                   right: last.right, wrong: last.wrong, unsure: 100 - last.right - last.wrong,
                   ...(meta.sample != null ? { sample: meta.sample } : {}),
                   ...(x.page ? { url: x.page } : {}),
-                  ...(x.published ? { published: x.published } : {}) };
+                  ...(x.published ? { published: x.published } : {}),
+                  ...(x.method ? { methodUrl: x.method } : {}) };
     const exact = dir.findIndex((d) => d.pollster === POLLSTER && d.date === row.date);
     if (exact >= 0) {
       const cur = dir[exact];
+      if (!stmts.ok && cur.methodUrl && !row.methodUrl) row.methodUrl = cur.methodUrl;   // the library was unreachable this run: keep the link we had
       if (cur.right !== row.right || cur.wrong !== row.wrong || cur.unsure !== row.unsure
           || cur.dateStart !== row.dateStart || cur.sample !== row.sample
-          || cur.url !== row.url || cur.published !== row.published) {
+          || cur.url !== row.url || cur.published !== row.published
+          || cur.methodUrl !== row.methodUrl) {
         dir[exact] = row;
         status.healed.push(row.date);
       }
@@ -910,6 +978,7 @@ async function main() {
     }
     const near = dir.findIndex((d) => d.pollster === POLLSTER && days(d.date, row.date) <= HEAL_DAYS);
     if (near >= 0) {
+      if (!stmts.ok && dir[near].methodUrl && !row.methodUrl) row.methodUrl = dir[near].methodUrl;
       dir[near] = row;
       status.healed.push(row.date);
     } else {

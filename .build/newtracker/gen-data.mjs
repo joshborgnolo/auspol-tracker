@@ -1907,6 +1907,7 @@ const directionOnlyPolls = DIR
       ...(d.dateStart ? { fmid: fmidIso(d.dateStart, d.date) } : {}),
       ...(d.url ? { url: d.url } : {}),
       ...(d.published ? { published: d.published } : {}),
+      ...(d.methodUrl ? { methodUrl: d.methodUrl } : {}),
       client: CLIENT_BY_HOUSE.get(d.pollster) || "Self-published",
       p: {}, appr: {}, chg: null,
       dir: DIR_BY.get(d.date + "|" + d.pollster),
@@ -2034,6 +2035,7 @@ const issuesOnlyPolls = (() => {
       ...(w.dateStart ? { fmid: fmidIso(w.dateStart, w.date) } : {}),
       ...(w.sampleEff != null ? { sampleEff: w.sampleEff } : {}),
       ...(w.source ? { url: w.source } : {}),
+      ...(w.methodUrl ? { methodUrl: w.methodUrl } : {}),
       client: "Self-published",
       p: {}, appr: {}, chg: null,
       iss: ISS_BY.get(w.date + "|" + w.pollster),
@@ -2735,7 +2737,7 @@ const linksOf = (p) => {
 // waves, Ipsos's issues waves) carry `url` alone; they take the same list,
 // or the views, which read only `links`, show them none
 for (const p of [...directionOnlyPolls, ...issuesOnlyPolls])
-  p.links = linksOf({ pollster: p.pollster, url: p.url, date: p.released });
+  p.links = linksOf({ pollster: p.pollster, url: p.url, methodUrl: p.methodUrl, date: p.released });
 
 const individualPolls = POLLS.map((p) => {
   const ym = ymOf(p.date), day = dayOf(p.date);

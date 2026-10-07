@@ -26,6 +26,8 @@
      inconclusive            everything refuses -> exit 1
      error carry-forward     a transient error keeps the old verdict
      state idempotence       a no-change run leaves the file byte-identical
+     direction + issues      SEC direction[] and Ipsos issues.json rows are
+                             swept beside the poll rows
 
    Run:  node .build/test-citation-check.mjs    exits non-zero on failure
    ==================================================================== */
@@ -92,6 +94,8 @@ async function run(dir, wallRules, extraEnv = {}) {
     ...process.env,
     CITATION_CHECK_POLLS: join(dir, "polls.json"),
     CITATION_CHECK_STATE: join(dir, "link-health.json"),
+    // the script's default is the repo's own issues.json — never the fixture's
+    CITATION_CHECK_ISSUES: join(dir, "issues.json"),
     CITATION_CHECK_DELAY_MS: "0",
     CITATION_CHECK_TIMEOUT_MS: "8000",
     CITATION_CHECK_429_BACKOFF_MS: "20",
@@ -308,6 +312,37 @@ for (const [name, seedVerdict] of [["ok", "ok"], ["wall", "wall"], ["moved", "mo
   ok("small sweep: state holds all six entries", state.links.length === 6);
   srv.server.close();
   fx.cleanup();
+}
+
+/* --- direction-only and issues rows join the sweep ----------------------
+   SEC Newgate's direction[] waves and Ipsos's issues.json waves cite the
+   same outbound pair (report + APC statement); a rot there is exactly as
+   silent as a rot in polls[].url */
+{
+  const srv = await serve((path) => path.endsWith(".pdf")
+    ? [200, "%PDF-simulated-bytes", { "content-type": "application/pdf" }]
+    : [200, PAGE]);
+  const port = srv.port;
+  const dir = mkdtempSync(join(tmpdir(), "cite-check-"));
+  writeFileSync(join(dir, "polls.json"), JSON.stringify({
+    polls: [],
+    direction: [{ url: `http://127.0.0.1:${port}/dir-story`, methodUrl: `http://127.0.0.1:${port}/dir-statement.pdf` }],
+    pollsterRules: {},
+  }));
+  writeFileSync(join(dir, "issues.json"), JSON.stringify({
+    salience: [{ source: `http://127.0.0.1:${port}/ipsos-report.pdf`, methodUrl: `http://127.0.0.1:${port}/ipsos-statement.pdf` }],
+    ownership: [],
+  }));
+  const r = await run(dir, []);
+  ok("direction+issues: exit 0, all four urls swept", r.code === 0 && r.status?.checked === 4,
+    `code=${r.code} ${JSON.stringify(r.status)}\n${r.stdout}${r.stderr}`);
+  ok("direction+issues: statement urls land in the ledger",
+    !!verdictOf(dir, `http://127.0.0.1:${port}/dir-statement.pdf`) &&
+    !!verdictOf(dir, `http://127.0.0.1:${port}/ipsos-statement.pdf`));
+  ok("direction+issues: issues report tagged issues.source",
+    verdictOf(dir, `http://127.0.0.1:${port}/ipsos-report.pdf`)?.fields?.includes("issues.source"));
+  srv.server.close();
+  rmSync(dir, { recursive: true, force: true });
 }
 
 console.log(fails ? `\n${fails} FAILED` : "\ncitation-check test: all expectations held");

@@ -259,7 +259,7 @@ for (const f of fs.existsSync(ipDir) ? fs.readdirSync(ipDir).filter((x) => x.end
   let meta = {};
   try { meta = JSON.parse(fs.readFileSync(path.join(ipDir, f.replace(/\.txt$/, ".json")), "utf8")); } catch {}
   const st = ipStatement(t);
-  if (st) { ipStat.set(st.ym, st); continue; }
+  if (st) { ipStat.set(st.ym, { ...st, pdf: meta.pdf || null }); continue; }
   for (const r of ipReports(t)) {
     if (r.ym < IP_FIRST) continue;
     for (const u of r.unknown) unknown.add(`Ipsos ${r.ym}: ${u}`);
@@ -292,6 +292,7 @@ for (const [ym, prints] of [...ipOwn.entries()].sort()) {
   if (bad.length) { pending.push(`${IP}|${date}: ${[...new Set(bad)].slice(0, 3).join("; ")}`); continue; }
   const row = {
     pollster: IP, date, dateStart, sample: (st && st.sample) || r.sample || null, sampleEff: (st && st.sampleEff) || null, source: main.pdf,
+    ...(st && st.pdf ? { methodUrl: st.pdf } : {}),
     ...(st && st.end && (st.start !== r.start || st.end !== r.end)
       ? { note: `fieldwork dates from Ipsos's methodology statement; the report prints ${r.start} to ${r.end}` } : {}),
   };

@@ -198,6 +198,16 @@ assert.equal(coverOf("report", "/x/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%
 assert.equal(coverOf("report", "/x/IM_States_Jun_26_v4.pdf"), null, "the state reports are skipped");
 assert.equal(coverOf("statement", "/x/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20July%202026_0.pdf"), "2026-07");
 assert.equal(coverOf("statement", "/x/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20Q2%202023.pdf"), null);
+// the committed rows link the wave's APC statement (issues.mjs threads
+// ipStat.pdf onto every Ipsos wave)
+{
+  const iss = JSON.parse(fs.readFileSync("data/issues.json", "utf8"));
+  const rows = [...iss.salience, ...iss.ownership].filter((r) => r.pollster === "Ipsos");
+  assert.ok(rows.length >= 18, `enough Ipsos rows to pin (${rows.length})`);
+  for (const r of rows)
+    assert.match(r.methodUrl || "", /^https:\/\/www\.ipsos\.com\/.+Issues%20Monitor/,
+      `${r.date}: links the wave's APC methodology statement`);
+}
 // ---- DemosAU: "Which political party do you trust more to handle…" (February 2026) ----
 const daRep = (f) => fs.readFileSync(path.join(".build/demosau-src", f + ".txt"), "utf8");
 const da = daOwnership(daRep("DemosAU-Federal-Poll-Feb-2026"));

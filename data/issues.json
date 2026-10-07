@@ -42,6 +42,7 @@
    "sample": 1000,
    "sampleEff": 948,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-02/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%20JAN-DEC%20REPORTS%202025.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-01/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20December%202025.pdf",
    "read": "report",
    "question": "pick 3 of 19",
    "issues": {
@@ -147,6 +148,7 @@
    "sample": 1000,
    "sampleEff": 951,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-02/IM_Nat_Jan26_v2.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-02/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20January%202026.pdf",
    "note": "fieldwork dates from Ipsos's methodology statement; the report prints 2026-01-08 to 2026-01-11",
    "read": "report",
    "question": "pick 3 of 19",
@@ -253,6 +255,7 @@
    "sample": 1000,
    "sampleEff": 945,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-03/IM_Nat_Feb26_v2_Final.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-03/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20February%202026.pdf",
    "read": "report",
    "question": "pick 3 of 19",
    "issues": {
@@ -370,6 +373,7 @@
    "sample": 1000,
    "sampleEff": 892,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-03/IM_Nat_March_26.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-04/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20March%202026_1.pdf",
    "read": "report",
    "question": "pick 3 of 19",
    "issues": {
@@ -535,6 +539,7 @@
    "sample": 1000,
    "sampleEff": 954,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-05/IM_Nat_Apr26_v1.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-06/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20April%202026_0.pdf",
    "read": "report",
    "question": "pick 3 of 19",
    "issues": {
@@ -700,6 +705,7 @@
    "sample": 1000,
    "sampleEff": 512,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-06/IM_Nat_May26_v2.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-08/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20May%202026_0.pdf",
    "read": "report",
    "question": "pick 3 of 19",
    "issues": {
@@ -865,6 +871,7 @@
    "sample": 1000,
    "sampleEff": 930,
    "source": "https://www.ipsos.com/sites/default/files/IM_Nat_Jun_26_v4_0.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-08/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20June%202026.pdf",
    "read": "report",
    "question": "pick 3 of 19",
    "issues": {
@@ -1030,6 +1037,7 @@
    "sample": 1001,
    "sampleEff": 988,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-08/IM_Nat_Jul_26_v2.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-08/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20July%202026_0.pdf",
    "read": "report",
    "question": "pick 3 of 19",
    "issues": {
@@ -1195,6 +1203,7 @@
    "sample": 1000,
    "sampleEff": 936,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-09/IM_Nat_Aug_26_v1.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-08/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20August%202026.pdf",
    "read": "report",
    "question": "pick 3 of 19",
    "issues": {
@@ -15287,6 +15296,7 @@
    "sample": 1000,
    "sampleEff": 948,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-02/AU%20NATIONAL%20IPSOS%20ISSUES%20MONITOR%20-%20JAN-DEC%20REPORTS%202025.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-01/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20December%202025.pdf",
    "read": "report",
    "question": "most capable of managing",
    "options": [
@@ -15549,6 +15559,7 @@
    "sample": 1000,
    "sampleEff": 951,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-02/IM_Nat_Jan26_v2.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-02/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20January%202026.pdf",
    "note": "fieldwork dates from Ipsos's methodology statement; the report prints 2026-01-08 to 2026-01-11",
    "read": "report",
    "question": "most capable of managing",
@@ -15812,6 +15823,7 @@
    "sample": 1000,
    "sampleEff": 945,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-03/IM_Nat_Feb26_v2_Final.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-03/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20February%202026.pdf",
    "read": "report",
    "question": "most capable of managing",
    "options": [
@@ -16177,6 +16189,7 @@
    "sample": 1000,
    "sampleEff": 892,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-03/IM_Nat_March_26.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-04/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20March%202026_1.pdf",
    "read": "report",
    "question": "most capable of managing",
    "options": [
@@ -16466,6 +16479,7 @@
    "sample": 1000,
    "sampleEff": 954,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-05/IM_Nat_Apr26_v1.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-06/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20April%202026_0.pdf",
    "read": "report",
    "question": "most capable of managing",
    "options": [
@@ -16910,6 +16924,7 @@
    "sample": 1000,
    "sampleEff": 512,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-06/IM_Nat_May26_v2.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-08/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20May%202026_0.pdf",
    "read": "report",
    "question": "most capable of managing",
    "options": [
@@ -17072,6 +17087,7 @@
    "sample": 1000,
    "sampleEff": 930,
    "source": "https://www.ipsos.com/sites/default/files/IM_Nat_Jun_26_v4_0.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-08/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20June%202026.pdf",
    "read": "report",
    "question": "most capable of managing",
    "options": [
@@ -17542,6 +17558,7 @@
    "sample": 1001,
    "sampleEff": 988,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-08/IM_Nat_Jul_26_v2.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-08/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20July%202026_0.pdf",
    "read": "report",
    "question": "most capable of managing",
    "options": [
@@ -17710,6 +17727,7 @@
    "sample": 1000,
    "sampleEff": 936,
    "source": "https://www.ipsos.com/sites/default/files/ct/publication/documents/2026-09/IM_Nat_Aug_26_v1.pdf",
+   "methodUrl": "https://www.ipsos.com/sites/default/files/2026-08/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20August%202026.pdf",
    "read": "report",
    "question": "most capable of managing",
    "options": [
