@@ -2057,7 +2057,7 @@ function RdAllPolls(P) {
   const CONF_TKS = [40, 60, 80, 100, 120];
   const confScale = (short) => (
     <>
-      <span className="rd-ap-cap">100 = neutral; NAB’s net balance drawn 100 points up</span>
+      <span className="rd-ap-cap">100 = neutral; NAB drawn +100</span>
       <span className="rd-ap-in">
         {(short ? CONF_TKS.filter((v) => v === 40 || v === 100 || v === 120) : CONF_TKS).map((v) => (
           <span key={v} className={"rd-ap-tk" + (v === 100 ? " mid" : "")} style={{ left: cfx(v) + "%" }}>{v === 100 ? "Neutral" : v}</span>

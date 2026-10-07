@@ -3927,7 +3927,7 @@ function RdMood({ rangeId }) {
     <RdSec id="mood" cls="rd-mood" title="Economic sentiment" meta={"Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")}>
       <RdHed head={head} dek={dek} />
       <div className="card rd-card rd-mood-chart">
-        <div className="rd-un-ptitle"><b>Consumer and business confidence</b><span>100 = neutral on each index; NAB’s net balance drawn 100 points up</span></div>
+        <div className="rd-un-ptitle"><b>Consumer and business confidence</b><span>100 = neutral on each index; NAB drawn +100</span></div>
         {lanes.map((l) => (
           <div key={l.k} className="rd-un-read">
             <RdSwatch kind={l.dash ? "dash" : "line"} color={l.color} />
