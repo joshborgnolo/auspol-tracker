@@ -365,17 +365,26 @@ function surveyMonthOf(row) {
   return { mon: p.getUTCMonth(), yr: p.getUTCFullYear() };
 }
 
-// A business findings post: the state chart's dated source-line pairs
-// ("…Single Source, August 2025, n=1,189, August 2026, n=1,094.").
+// A business findings post carries SEVERAL dated "…Single Source, …"
+// lines — the long-run trend line ("Dec 2010-Aug 2026. Average monthly
+// sample … = 1,159."), the per-month pairs ("August 2025, n=1,189,
+// August 2026, n=1,094.") and a trailing-quarter line ("June – August
+// 2026, n=3,300."). The pair lines are the only per-MONTH n: a line
+// must hold ≥2 dated pairs to be trusted (the quarterly line's lone
+// pair names the survey month with a 3-month sum — not the month's n).
 function parseRmBusinessPost(txt, survey) {
-  const src = /Source:?\s*(?:&nbsp;|\s)*Roy Morgan Business Single Source[^.]*\./i.exec(txt);
+  const lines = txt.match(/Source:?\s*(?:&nbsp;|\s)*Roy Morgan Business Single Source[^.]*\./gi) || [];
   let n = null;
-  if (src && survey) {
-    const re = /([A-Z][a-z]{2,8})\s+(20\d\d),\s*n=([\d,]+)/g;
-    let m;
-    while ((m = re.exec(src[0]))) {
-      if (monIdx(m[1]) != null && monIdx(m[1]) === survey.mon && +m[2] === survey.yr) n = +m[3].replace(/,/g, "");
+  if (survey) {
+    const seen = new Set();
+    for (const line of lines) {
+      const pairs = [...line.matchAll(/([A-Z][a-z]{2,8})\s+(20\d\d),\s*n=([\d,]+)/g)];
+      if (pairs.length < 2) continue;
+      for (const m of pairs) {
+        if (monIdx(m[1]) != null && monIdx(m[1]) === survey.mon && +m[2] === survey.yr) seen.add(+m[3].replace(/,/g, ""));
+      }
     }
+    if (seen.size === 1) n = [...seen][0];
   }
   // cross-check against the trailing block quote (month word may lag; its
   // figure has always agreed) — a disagreement files no n at all

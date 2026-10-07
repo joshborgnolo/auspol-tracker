@@ -312,8 +312,13 @@ for (const [slug, v, n, win] of [
 // null; the others file n from the dated Single Source pairs, with the
 // trailing sentence as a figure-only cross-check (its month lags)
 const nextData = (content) => `<html><head><script id="__NEXT_DATA__" type="application/json">${JSON.stringify({ props: { pageProps: { findingData: { postBy: { content } } } } })}</script></head><body/></html>`;
+// 10336 mirrors the live page's THREE Source lines: the long-run trend
+// line first (its "Dec 2010-Aug 2026" range matches no n= pair), the
+// per-month dated pairs second, then the trailing-quarter line whose
+// single "June – August 2026, n=3,300" pair is a 3-month sum that must
+// not be misread as the survey month's n (expects >=2 pairs per line).
 fix(FEED, rmUrl("10336-roy-morgan-business-confidence-august-2026"), ".page.html",
-  nextData(`<p>Roy Morgan Business Confidence fell in August.</p><p>Source: Roy Morgan Business Single Source, July 2026, n=1,189, August 2026, n=1,094.</p><blockquote><p>Roy Morgan Business Confidence results for July are based on 1,094 detailed interviews.</p></blockquote>`));
+  nextData(`<p>Roy Morgan Business Confidence fell in August.</p><p>Source: Roy Morgan Business Single Source, Dec 2010-Aug 2026. Average monthly sample over the last 12 months = 1,159.</p><p>Source: Roy Morgan Business Single Source, July 2026, n=1,189, August 2026, n=1,094.</p><p>Source: Roy Morgan Business Single Source, June – August 2026, n=3,300.</p><blockquote><p>Roy Morgan Business Confidence results for July are based on 1,094 detailed interviews.</p></blockquote>`));
 fix(FEED, rmUrl("10330-roy-morgan-business-confidence-july-2026"), ".page.html",
   nextData(`<p>Source: Roy Morgan Business Single Source, June 2026, n=1,150, July 2026, n=985.</p><blockquote><p>Roy Morgan Business Confidence results for July are based on 985 detailed interviews.</p></blockquote>`));
 fix(FEED, rmUrl("10300-roy-morgan-business-confidence-plummeted-14-2pts-to-a-new-record-low-of-only-76-5-in-april"), ".page.html",
