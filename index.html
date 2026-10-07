@@ -3270,12 +3270,14 @@ body.rd .rd-swap-now.in { animation: rd-xf-in .2s ease-out both; }
 @keyframes rd-ap-in-cdir { from { opacity: 0; } }
 @keyframes rd-ap-in-ciss { from { opacity: 0; } }
 @keyframes rd-ap-in-cdem { from { opacity: 0; } }
+@keyframes rd-ap-in-cconf { from { opacity: 0; } }
 body.rd .rd-ap-sw.rd-ap-c2pp { --rd-ap-in: rd-ap-in-c2pp; }
 body.rd .rd-ap-sw.rd-ap-cprim { --rd-ap-in: rd-ap-in-cprim; }
 body.rd .rd-ap-sw.rd-ap-clead { --rd-ap-in: rd-ap-in-clead; }
 body.rd .rd-ap-sw.rd-ap-cdir { --rd-ap-in: rd-ap-in-cdir; }
 body.rd .rd-ap-sw.rd-ap-ciss { --rd-ap-in: rd-ap-in-ciss; }
 body.rd .rd-ap-sw.rd-ap-cdem { --rd-ap-in: rd-ap-in-cdem; }
+body.rd .rd-ap-sw.rd-ap-cconf { --rd-ap-in: rd-ap-in-cconf; }
 body.rd :is(.rd-ap-row, .rd-ap-hrow).rd-ap-sw > :nth-child(n+5):not(.rd-ap-chev),
 body.rd .rd-ap-card.rd-ap-sw > :is(.rd-ap-c1, .rd-ap-c2) > :last-child,
 body.rd .rd-ap-card.rd-ap-sw > :nth-child(n+3),
@@ -4658,6 +4660,7 @@ body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 1fr) 0 40px; }
 body.rd .rd-ap-cdem { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-cconf { grid-template-columns: 200px 120px 76px 36px 84px minmax(0, 356px) 64px minmax(0, 1fr) 40px; }
 body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint);
   box-sizing: border-box; min-height: 57px;  }
 body.rd .rd-ap-hrow > * { min-width: 0; }
@@ -4915,6 +4918,7 @@ body.rd .rd-apd-dv.lead { background: color-mix(in oklab, var(--lead) 20%, trans
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 1fr) 0 32px; }
   body.rd .rd-ap-cdem { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-cconf { grid-template-columns: 170px 110px 70px 16px 70px minmax(0, 356px) 56px minmax(0, 1fr) 32px; }
   body.rd .rd-ap-long { display: none; }
 }
 body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
@@ -4923,6 +4927,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
+  body.rd .rd-ap-cconf { grid-template-columns: 150px 104px 0 12px 70px minmax(0, 356px) 56px minmax(0, 1fr) 28px; }
   body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-imap { column-gap: 8px; padding-right: 4px; }
   body.rd .rd-ap-icell > b { font-size: 13px; }
@@ -4964,13 +4969,13 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-phead .rd-ap-in, body.rd .rd-ap-card .rd-ap-in { left: 8px; right: 8px; }
   body.rd .rd-ap-phead.rd-ap-c2pp .rd-ap-in, body.rd .rd-ap-card.rd-ap-c2pp .rd-ap-in { right: 46px; }
   body.rd .rd-ap-phead .rd-ap-cap { left: 8px; }
-  body.rd .rd-ap-c2pp, body.rd .rd-ap-cprim, body.rd .rd-ap-clead, body.rd .rd-ap-cdir, body.rd .rd-ap-ciss, body.rd .rd-ap-cdem { grid-template-columns: none; }
+  body.rd .rd-ap-c2pp, body.rd .rd-ap-cprim, body.rd .rd-ap-clead, body.rd .rd-ap-cdir, body.rd .rd-ap-ciss, body.rd .rd-ap-cdem, body.rd .rd-ap-cconf { grid-template-columns: none; }
   body.rd .rd-ap-mrow { display: flex; align-items: baseline; gap: 8px; padding: 22px 0 6px; }
   body.rd .rd-ap-mlab { padding-left: 0; gap: 8px; }
   body.rd .rd-ap-mlab span { font-size: 12px; }
   body.rd .rd-ap-mavg { margin-left: auto; font-size: 12px; }
   body.rd .rd-ap-card { padding: 11px 0 8px; border-bottom: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
-  body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss, .rd-ap-cdem) { min-height: 122px; }
+  body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss, .rd-ap-cdem, .rd-ap-cconf) { min-height: 122px; }
   body.rd .rd-ap-card:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   body.rd .rd-ap-card.open { border-bottom-color: transparent; }
   body.rd .rd-ap-card.arrived { box-shadow: inset 3px 0 0 var(--accent); padding-left: 8px; }
@@ -16974,6 +16979,3331 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "APC methodology",
       "href": "https://www.ipsos.com/sites/default/files/2026-08/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20August%202026.pdf",
       "title": "This poll’s Australian Polling Council methodology statement"
+    }]
+  }];
+  const confidenceOnlyPolls = [{
+    "ym": "2025-05",
+    "x": 2025.3503424657533,
+    "day": 6,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "6 May",
+    "dateLabel": "6 May",
+    "released": "2025-05-06",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9725-anz-roy-morgan-consumer-confidence-may-6",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 87.5,
+      "chg": 4.1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9725-anz-roy-morgan-consumer-confidence-may-6",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-05",
+    "x": 2025.3503424657533,
+    "day": 6,
+    "pollster": "Roy Morgan",
+    "field": "6 May",
+    "dateLabel": "6 May",
+    "released": "2025-05-06",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9933-roy-morgan-business-confidence-april-2025",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 96.7,
+      "chg": -9.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9933-roy-morgan-business-confidence-april-2025",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-05",
+    "x": 2025.3695205479453,
+    "day": 13,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "13 May",
+    "dateLabel": "13 May",
+    "released": "2025-05-13",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9730-anz-roy-morgan-consumer-confidence-may-11",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 88.3,
+      "chg": 0.8,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9730-anz-roy-morgan-consumer-confidence-may-11",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-05",
+    "x": 2025.3695205479453,
+    "day": 13,
+    "pollster": "Westpac–MI",
+    "field": "13 May",
+    "dateLabel": "13 May",
+    "released": "2025-05-13",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2025/05/consumer-sentiment-may-2025/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 92.1,
+      "chg": 2,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2025/05/consumer-sentiment-may-2025/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-05",
+    "x": 2025.3695205479453,
+    "day": 13,
+    "pollster": "NAB",
+    "field": "13 May",
+    "dateLabel": "13 May",
+    "released": "2025-05-13",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/nabs-april-monthly-business-survey-steady-as-she-goes",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": -1,
+      "chg": 1,
+      "vs": 0,
+      "cond": 2,
+      "condChg": null
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/nabs-april-monthly-business-survey-steady-as-she-goes",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-05",
+    "x": 2025.388698630137,
+    "day": 20,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "20 May",
+    "dateLabel": "20 May",
+    "released": "2025-05-20",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9735-anz-roy-morgan-consumer-confidence-may-18",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 88.8,
+      "chg": 0.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9735-anz-roy-morgan-consumer-confidence-may-18",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-05",
+    "x": 2025.4078767123287,
+    "day": 27,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "27 May",
+    "dateLabel": "27 May",
+    "released": "2025-05-27",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9740-anz-roy-morgan-consumer-confidence-may-25",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 87,
+      "chg": -1.8,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9740-anz-roy-morgan-consumer-confidence-may-25",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-06",
+    "x": 2025.4227168949772,
+    "day": 2,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "2 Jun",
+    "dateLabel": "2 Jun",
+    "released": "2025-06-02",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9745-anz-roy-morgan-consumer-confidence-june-3",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 86.4,
+      "chg": -0.6,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9745-anz-roy-morgan-consumer-confidence-june-3",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-06",
+    "x": 2025.4446347031962,
+    "day": 10,
+    "pollster": "Westpac–MI",
+    "field": "10 Jun",
+    "dateLabel": "10 Jun",
+    "released": "2025-06-10",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2025/06/consumer-sentiment-june-2025/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 92.6,
+      "chg": 0.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2025/06/consumer-sentiment-june-2025/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-06",
+    "x": 2025.4446347031962,
+    "day": 10,
+    "pollster": "NAB",
+    "field": "10 Jun",
+    "dateLabel": "10 Jun",
+    "released": "2025-06-10",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/narrowing-gap-between-conditions-and-confidence-nab-monthly-business-survey",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": 2,
+      "chg": 3,
+      "vs": 0,
+      "cond": 0,
+      "condChg": null
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/narrowing-gap-between-conditions-and-confidence-nab-monthly-business-survey",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-06",
+    "x": 2025.4473744292236,
+    "day": 11,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "11 Jun",
+    "dateLabel": "11 Jun",
+    "released": "2025-06-11",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9750-anz-roy-morgan-consumer-confidence-june-8",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 86.7,
+      "chg": null,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9750-anz-roy-morgan-consumer-confidence-june-8",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-06",
+    "x": 2025.4473744292236,
+    "day": 11,
+    "pollster": "Roy Morgan",
+    "field": "11 Jun",
+    "dateLabel": "11 Jun",
+    "released": "2025-06-11",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9953-roy-morgan-business-confidence-may-2025",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 99.6,
+      "chg": 2.9,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9953-roy-morgan-business-confidence-may-2025",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-06",
+    "x": 2025.463812785388,
+    "day": 17,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "17 Jun",
+    "dateLabel": "17 Jun",
+    "released": "2025-06-17",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9755-anz-roy-morgan-consumer-confidence-june-17",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 85.4,
+      "chg": -1.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9755-anz-roy-morgan-consumer-confidence-june-17",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-06",
+    "x": 2025.48299086758,
+    "day": 24,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "24 Jun",
+    "dateLabel": "24 Jun",
+    "released": "2025-06-24",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9760-anz-roy-morgan-consumer-confidence-june-24",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 86.7,
+      "chg": 1.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9760-anz-roy-morgan-consumer-confidence-june-24",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-07",
+    "x": 2025.5033105022833,
+    "day": 1,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "1 Jul",
+    "dateLabel": "1 Jul",
+    "released": "2025-07-01",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9765-anz-roy-morgan-consumer-confidence-july-1",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 87.2,
+      "chg": 0.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9765-anz-roy-morgan-consumer-confidence-july-1",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-07",
+    "x": 2025.5197488584477,
+    "day": 7,
+    "pollster": "Roy Morgan",
+    "field": "7 Jul",
+    "dateLabel": "7 Jul",
+    "released": "2025-07-07",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9993-roy-morgan-business-confidence-june-2025",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 102.4,
+      "chg": 2.8,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9993-roy-morgan-business-confidence-june-2025",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-07",
+    "x": 2025.522488584475,
+    "day": 8,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "8 Jul",
+    "dateLabel": "8 Jul",
+    "released": "2025-07-08",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9770-anz-roy-morgan-consumer-confidence-july-8",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 88.6,
+      "chg": 1.4,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9770-anz-roy-morgan-consumer-confidence-july-8",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-07",
+    "x": 2025.522488584475,
+    "day": 8,
+    "pollster": "NAB",
+    "field": "8 Jul",
+    "dateLabel": "8 Jul",
+    "released": "2025-07-08",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": 5,
+      "chg": 3,
+      "vs": 0,
+      "cond": 9,
+      "condChg": null
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-07",
+    "x": 2025.5416666666667,
+    "day": 15,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "15 Jul",
+    "dateLabel": "15 Jul",
+    "released": "2025-07-15",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9775-anz-roy-morgan-consumer-confidence-july-15",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 86.5,
+      "chg": -2.1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9775-anz-roy-morgan-consumer-confidence-july-15",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-07",
+    "x": 2025.5416666666667,
+    "day": 15,
+    "pollster": "Westpac–MI",
+    "field": "15 Jul",
+    "dateLabel": "15 Jul",
+    "released": "2025-07-15",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2025/07/consumer-sentiment-june-2025/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 93.1,
+      "chg": 0.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2025/07/consumer-sentiment-june-2025/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-07",
+    "x": 2025.5608447488585,
+    "day": 22,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "22 Jul",
+    "dateLabel": "22 Jul",
+    "released": "2025-07-22",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9780-anz-roy-morgan-consumer-confidence-july-22",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 86.3,
+      "chg": null,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9780-anz-roy-morgan-consumer-confidence-july-22",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-07",
+    "x": 2025.5800228310502,
+    "day": 29,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "29 Jul",
+    "dateLabel": "29 Jul",
+    "released": "2025-07-29",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9785-anz-roy-morgan-consumer-confidence-july-29",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 86.7,
+      "chg": null,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9785-anz-roy-morgan-consumer-confidence-july-29",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-08",
+    "x": 2025.5948630136986,
+    "day": 4,
+    "pollster": "Roy Morgan",
+    "field": "4 Aug",
+    "dateLabel": "4 Aug",
+    "released": "2025-08-04",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9994-roy-morgan-business-confidence-july-2025",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 103,
+      "chg": 0.6,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9994-roy-morgan-business-confidence-july-2025",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-08",
+    "x": 2025.597602739726,
+    "day": 5,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "5 Aug",
+    "dateLabel": "5 Aug",
+    "released": "2025-08-05",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9790-anz-roy-morgan-consumer-confidence-august-5",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 90.6,
+      "chg": 3.9,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9790-anz-roy-morgan-consumer-confidence-august-5",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-08",
+    "x": 2025.6167808219177,
+    "day": 12,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "12 Aug",
+    "dateLabel": "12 Aug",
+    "released": "2025-08-12",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9795-anz-roy-morgan-consumer-confidence-august-12",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 89.3,
+      "chg": -1.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9795-anz-roy-morgan-consumer-confidence-august-12",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-08",
+    "x": 2025.6167808219177,
+    "day": 12,
+    "pollster": "NAB",
+    "field": "12 Aug",
+    "dateLabel": "12 Aug",
+    "released": "2025-08-12",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey-july-2025-confidence-continues-to-lift",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": 7,
+      "chg": 2,
+      "vs": 0,
+      "cond": 5,
+      "condChg": -2
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey-july-2025-confidence-continues-to-lift",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-08",
+    "x": 2025.6359589041097,
+    "day": 19,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "19 Aug",
+    "dateLabel": "19 Aug",
+    "released": "2025-08-19",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9800-anz-roy-morgan-consumer-confidence-august-19",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 89.4,
+      "chg": null,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9800-anz-roy-morgan-consumer-confidence-august-19",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-08",
+    "x": 2025.6359589041097,
+    "day": 19,
+    "pollster": "Westpac–MI",
+    "field": "19 Aug",
+    "dateLabel": "19 Aug",
+    "released": "2025-08-19",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2025/08/consumer-sentiment-august-2025/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 98.5,
+      "chg": 5.4,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2025/08/consumer-sentiment-august-2025/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-08",
+    "x": 2025.6551369863014,
+    "day": 26,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "26 Aug",
+    "dateLabel": "26 Aug",
+    "released": "2025-08-26",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9805-anz-roy-morgan-consumer-confidence-august-26",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 86,
+      "chg": -3.4,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9805-anz-roy-morgan-consumer-confidence-august-26",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-09",
+    "x": 2025.6727168949772,
+    "day": 2,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "2 Sep",
+    "dateLabel": "2 Sep",
+    "released": "2025-09-02",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9810-anz-roy-morgan-consumer-confidence-september-2",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 88,
+      "chg": 2,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9810-anz-roy-morgan-consumer-confidence-september-2",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-09",
+    "x": 2025.6918949771689,
+    "day": 9,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "9 Sep",
+    "dateLabel": "9 Sep",
+    "released": "2025-09-09",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9815-anz-roy-morgan-consumer-confidence-september-9",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 89.3,
+      "chg": 1.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9815-anz-roy-morgan-consumer-confidence-september-9",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-09",
+    "x": 2025.6918949771689,
+    "day": 9,
+    "pollster": "Westpac–MI",
+    "field": "9 Sep",
+    "dateLabel": "9 Sep",
+    "released": "2025-09-09",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2025/09/consumer-sentiment-september-2025/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 95.4,
+      "chg": -3.1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2025/09/consumer-sentiment-september-2025/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-09",
+    "x": 2025.6918949771689,
+    "day": 9,
+    "pollster": "Roy Morgan",
+    "field": "9 Sep",
+    "dateLabel": "9 Sep",
+    "released": "2025-09-09",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10004-roy-morgan-business-confidence-august-2025",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 98.6,
+      "chg": -4.4,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10004-roy-morgan-business-confidence-august-2025",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-09",
+    "x": 2025.6918949771689,
+    "day": 9,
+    "pollster": "NAB",
+    "field": "9 Sep",
+    "dateLabel": "9 Sep",
+    "released": "2025-09-09",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey-august-2025-confidence-continues-to-lift",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": 4,
+      "chg": -3,
+      "vs": 0,
+      "cond": 7,
+      "condChg": 2
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey-august-2025-confidence-continues-to-lift",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-09",
+    "x": 2025.7110730593606,
+    "day": 16,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "16 Sep",
+    "dateLabel": "16 Sep",
+    "released": "2025-09-16",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9820-anz-roy-morgan-consumer-confidence-september-16",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 85.9,
+      "chg": -3.4,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9820-anz-roy-morgan-consumer-confidence-september-16",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-09",
+    "x": 2025.7302511415523,
+    "day": 23,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "23 Sep",
+    "dateLabel": "23 Sep",
+    "released": "2025-09-23",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9825-anz-roy-morgan-consumer-confidence-september-23",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 84.6,
+      "chg": -1.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9825-anz-roy-morgan-consumer-confidence-september-23",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-09",
+    "x": 2025.7494292237443,
+    "day": 30,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "30 Sep",
+    "dateLabel": "30 Sep",
+    "released": "2025-09-30",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9830-anz-roy-morgan-consumer-confidence-september-30",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 86.3,
+      "chg": 1.7,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9830-anz-roy-morgan-consumer-confidence-september-30",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-10",
+    "x": 2025.7697488584477,
+    "day": 7,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "7 Oct",
+    "dateLabel": "7 Oct",
+    "released": "2025-10-07",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9835-anz-roy-morgan-consumer-confidence-october-7",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 85.1,
+      "chg": -1.2,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9835-anz-roy-morgan-consumer-confidence-october-7",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-10",
+    "x": 2025.7697488584477,
+    "day": 7,
+    "pollster": "Westpac–MI",
+    "field": "7 Oct",
+    "dateLabel": "7 Oct",
+    "released": "2025-10-07",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2025/10/consumer-sentiment-october-2025/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 92.1,
+      "chg": -3.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2025/10/consumer-sentiment-october-2025/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-10",
+    "x": 2025.7697488584477,
+    "day": 7,
+    "pollster": "Roy Morgan",
+    "field": "7 Oct",
+    "dateLabel": "7 Oct",
+    "released": "2025-10-07",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10044-roy-morgan-business-confidence-september-2025",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 101.6,
+      "chg": 3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10044-roy-morgan-business-confidence-september-2025",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-10",
+    "x": 2025.7889269406394,
+    "day": 14,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "14 Oct",
+    "dateLabel": "14 Oct",
+    "released": "2025-10-14",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9840-anz-roy-morgan-consumer-confidence-october-14",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 83,
+      "chg": -2.1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9840-anz-roy-morgan-consumer-confidence-october-14",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-10",
+    "x": 2025.7889269406394,
+    "day": 14,
+    "pollster": "NAB",
+    "field": "14 Oct",
+    "dateLabel": "14 Oct",
+    "released": "2025-10-14",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey-september-2025",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": 7,
+      "chg": 3,
+      "vs": 0,
+      "cond": 7,
+      "condChg": null
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey-september-2025",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-10",
+    "x": 2025.8081050228311,
+    "day": 21,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "21 Oct",
+    "dateLabel": "21 Oct",
+    "released": "2025-10-21",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9845-anz-roy-morgan-consumer-confidence-october-21",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 84,
+      "chg": 1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9845-anz-roy-morgan-consumer-confidence-october-21",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-10",
+    "x": 2025.8272831050228,
+    "day": 28,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "28 Oct",
+    "dateLabel": "28 Oct",
+    "released": "2025-10-28",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9850-anz-roy-morgan-consumer-confidence-october-28",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 85.8,
+      "chg": 1.8,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9850-anz-roy-morgan-consumer-confidence-october-28",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-11",
+    "x": 2025.8448630136986,
+    "day": 4,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "4 Nov",
+    "dateLabel": "4 Nov",
+    "released": "2025-11-04",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9855-anz-roy-morgan-consumer-confidence-november-4",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 84.5,
+      "chg": -1.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9855-anz-roy-morgan-consumer-confidence-november-4",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-11",
+    "x": 2025.8640410958903,
+    "day": 11,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "11 Nov",
+    "dateLabel": "11 Nov",
+    "released": "2025-11-11",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9860-anz-roy-morgan-consumer-confidence-november-11",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 83.5,
+      "chg": -1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9860-anz-roy-morgan-consumer-confidence-november-11",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-11",
+    "x": 2025.8640410958903,
+    "day": 11,
+    "pollster": "Westpac–MI",
+    "field": "11 Nov",
+    "dateLabel": "11 Nov",
+    "released": "2025-11-11",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2025/11/consumer-sentiment-november-2025/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 103.8,
+      "chg": 11.7,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2025/11/consumer-sentiment-november-2025/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-11",
+    "x": 2025.8640410958903,
+    "day": 11,
+    "pollster": "Roy Morgan",
+    "field": "11 Nov",
+    "dateLabel": "11 Nov",
+    "released": "2025-11-11",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10064-roy-morgan-business-confidence-october-2025",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 101.7,
+      "chg": null,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10064-roy-morgan-business-confidence-october-2025",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-11",
+    "x": 2025.8640410958903,
+    "day": 11,
+    "pollster": "NAB",
+    "field": "11 Nov",
+    "dateLabel": "11 Nov",
+    "released": "2025-11-11",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/october-monthly-business-survey-business-conditions-rise",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": 6,
+      "chg": -2,
+      "vs": 0,
+      "cond": 9,
+      "condChg": 2
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/october-monthly-business-survey-business-conditions-rise",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-11",
+    "x": 2025.8832191780823,
+    "day": 18,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "18 Nov",
+    "dateLabel": "18 Nov",
+    "released": "2025-11-18",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9865-anz-roy-morgan-consumer-confidence-november-18",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 84.2,
+      "chg": 0.7,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9865-anz-roy-morgan-consumer-confidence-november-18",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-11",
+    "x": 2025.902397260274,
+    "day": 25,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "25 Nov",
+    "dateLabel": "25 Nov",
+    "released": "2025-11-25",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9870-anz-roy-morgan-consumer-confidence-november-25",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 87.1,
+      "chg": 2.9,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9870-anz-roy-morgan-consumer-confidence-november-25",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-12",
+    "x": 2025.9227168949772,
+    "day": 2,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "2 Dec",
+    "dateLabel": "2 Dec",
+    "released": "2025-12-02",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9875-anz-roy-morgan-consumer-confidence-december-2",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 85.5,
+      "chg": -1.6,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9875-anz-roy-morgan-consumer-confidence-december-2",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-12",
+    "x": 2025.9391552511415,
+    "day": 8,
+    "pollster": "Roy Morgan",
+    "field": "8 Dec",
+    "dateLabel": "8 Dec",
+    "released": "2025-12-08",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10096-roy-morgan-business-confidence-november-2025",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 98.7,
+      "chg": -3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10096-roy-morgan-business-confidence-november-2025",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-12",
+    "x": 2025.9418949771689,
+    "day": 9,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "9 Dec",
+    "dateLabel": "9 Dec",
+    "released": "2025-12-09",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9880-anz-roy-morgan-consumer-confidence-december-9",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 83.5,
+      "chg": -2,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9880-anz-roy-morgan-consumer-confidence-december-9",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-12",
+    "x": 2025.9418949771689,
+    "day": 9,
+    "pollster": "NAB",
+    "field": "9 Dec",
+    "dateLabel": "9 Dec",
+    "released": "2025-12-09",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/nab-business-survey-november-2025-confidence-and-conditions-fall",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": 1,
+      "chg": -5,
+      "vs": 0,
+      "cond": 7,
+      "condChg": -3
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/nab-business-survey-november-2025-confidence-and-conditions-fall",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2025-12",
+    "x": 2025.9610730593606,
+    "day": 16,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "16 Dec",
+    "dateLabel": "16 Dec",
+    "released": "2025-12-16",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9885-anz-roy-morgan-consumer-confidence-december-16",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 81.5,
+      "chg": -2,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9885-anz-roy-morgan-consumer-confidence-december-16",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2025-12",
+    "x": 2025.9610730593606,
+    "day": 16,
+    "pollster": "Westpac–MI",
+    "field": "16 Dec",
+    "dateLabel": "16 Dec",
+    "released": "2025-12-16",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2025/12/consumer-sentiment-decembere-2025/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 94.5,
+      "chg": -9.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2025/12/consumer-sentiment-decembere-2025/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-01",
+    "x": 2026.0252283105024,
+    "day": 9,
+    "pollster": "Roy Morgan",
+    "field": "9 Jan",
+    "dateLabel": "9 Jan",
+    "released": "2026-01-09",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10106-roy-morgan-business-confidence-december-2025",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 105,
+      "chg": 6.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10106-roy-morgan-business-confidence-december-2025",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-01",
+    "x": 2026.036187214612,
+    "day": 13,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "13 Jan",
+    "dateLabel": "13 Jan",
+    "released": "2026-01-13",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9890-anz-roy-morgan-consumer-confidence-january-13",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 84.5,
+      "chg": 3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9890-anz-roy-morgan-consumer-confidence-january-13",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-01",
+    "x": 2026.036187214612,
+    "day": 13,
+    "pollster": "Westpac–MI",
+    "field": "13 Jan",
+    "dateLabel": "13 Jan",
+    "released": "2026-01-13",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2026/01/consumer-sentiment-january-2026/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 92.9,
+      "chg": -1.6,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2026/01/consumer-sentiment-january-2026/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-01",
+    "x": 2026.0553652968038,
+    "day": 20,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "20 Jan",
+    "dateLabel": "20 Jan",
+    "released": "2026-01-20",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9895-anz-roy-morgan-consumer-confidence-january-20",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 79.3,
+      "chg": -5.2,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9895-anz-roy-morgan-consumer-confidence-january-20",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-01",
+    "x": 2026.0772831050228,
+    "day": 28,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "28 Jan",
+    "dateLabel": "28 Jan",
+    "released": "2026-01-28",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9900-anz-roy-morgan-consumer-confidence-january-28",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 84,
+      "chg": 4.7,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9900-anz-roy-morgan-consumer-confidence-january-28",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-02",
+    "x": 2026.0921232876713,
+    "day": 3,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "3 Feb",
+    "dateLabel": "3 Feb",
+    "released": "2026-02-03",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9905-anz-roy-morgan-consumer-confidence-february-3",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 80.5,
+      "chg": -3.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9905-anz-roy-morgan-consumer-confidence-february-3",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-02",
+    "x": 2026.111301369863,
+    "day": 10,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "10 Feb",
+    "dateLabel": "10 Feb",
+    "released": "2026-02-10",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9910-anz-roy-morgan-consumer-confidence-february-10",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 76.9,
+      "chg": -3.6,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9910-anz-roy-morgan-consumer-confidence-february-10",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-02",
+    "x": 2026.111301369863,
+    "day": 10,
+    "pollster": "Westpac–MI",
+    "field": "10 Feb",
+    "dateLabel": "10 Feb",
+    "released": "2026-02-10",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2026/02/consumer-sentiment-february-2026/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 90.5,
+      "chg": -2.4,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2026/02/consumer-sentiment-february-2026/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-02",
+    "x": 2026.111301369863,
+    "day": 10,
+    "pollster": "Roy Morgan",
+    "field": "10 Feb",
+    "dateLabel": "10 Feb",
+    "released": "2026-02-10",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10116-roy-morgan-business-confidence-january-2026",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 97.4,
+      "chg": -7.6,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10116-roy-morgan-business-confidence-january-2026",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-02",
+    "x": 2026.1304794520547,
+    "day": 17,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "17 Feb",
+    "dateLabel": "17 Feb",
+    "released": "2026-02-17",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9915-anz-roy-morgan-consumer-confidence-february-17",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 77.1,
+      "chg": null,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9915-anz-roy-morgan-consumer-confidence-february-17",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-02",
+    "x": 2026.1496575342467,
+    "day": 24,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "24 Feb",
+    "dateLabel": "24 Feb",
+    "released": "2026-02-24",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9920-anz-roy-morgan-consumer-confidence-february-24",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 80.2,
+      "chg": 3.1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9920-anz-roy-morgan-consumer-confidence-february-24",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-03",
+    "x": 2026.1754566210045,
+    "day": 3,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "3 Mar",
+    "dateLabel": "3 Mar",
+    "released": "2026-03-03",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9925-anz-roy-morgan-consumer-confidence-march-3",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 77.1,
+      "chg": -3.1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9925-anz-roy-morgan-consumer-confidence-march-3",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-03",
+    "x": 2026.1946347031962,
+    "day": 10,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "10 Mar",
+    "dateLabel": "10 Mar",
+    "released": "2026-03-10",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9930-anz-roy-morgan-consumer-confidence-march-10",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 73.4,
+      "chg": -3.7,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9930-anz-roy-morgan-consumer-confidence-march-10",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-03",
+    "x": 2026.1946347031962,
+    "day": 10,
+    "pollster": "Westpac–MI",
+    "field": "10 Mar",
+    "dateLabel": "10 Mar",
+    "released": "2026-03-10",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2026/03/consumer-sentiment-march-2026/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 91.6,
+      "chg": 1.1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2026/03/consumer-sentiment-march-2026/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-03",
+    "x": 2026.1946347031962,
+    "day": 10,
+    "pollster": "NAB",
+    "field": "10 Mar",
+    "dateLabel": "10 Mar",
+    "released": "2026-03-10",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/nab-business-survey-february-2026-conditions-hold-while-confidence-falls",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": -1,
+      "chg": -4,
+      "vs": 0,
+      "cond": 7,
+      "condChg": null
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/nab-business-survey-february-2026-conditions-hold-while-confidence-falls",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-03",
+    "x": 2026.213812785388,
+    "day": 17,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "17 Mar",
+    "dateLabel": "17 Mar",
+    "released": "2026-03-17",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9935-anz-roy-morgan-consumer-confidence-march-17",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 68.5,
+      "chg": -4.9,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9935-anz-roy-morgan-consumer-confidence-march-17",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-03",
+    "x": 2026.213812785388,
+    "day": 17,
+    "pollster": "Roy Morgan",
+    "field": "17 Mar",
+    "dateLabel": "17 Mar",
+    "released": "2026-03-17",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10166-roy-morgan-business-confidence-february-2026",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 88.6,
+      "chg": -8.8,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10166-roy-morgan-business-confidence-february-2026",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-03",
+    "x": 2026.23299086758,
+    "day": 24,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "24 Mar",
+    "dateLabel": "24 Mar",
+    "released": "2026-03-24",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9940-anz-roy-morgan-consumer-confidence-march-24",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 63.1,
+      "chg": -5.4,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9940-anz-roy-morgan-consumer-confidence-march-24",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-03",
+    "x": 2026.2521689497717,
+    "day": 31,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "31 Mar",
+    "dateLabel": "31 Mar",
+    "released": "2026-03-31",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9945-anz-roy-morgan-consumer-confidence-march-31",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 58.8,
+      "chg": -4.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9945-anz-roy-morgan-consumer-confidence-march-31",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-04",
+    "x": 2026.272488584475,
+    "day": 8,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "8 Apr",
+    "dateLabel": "8 Apr",
+    "released": "2026-04-08",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9950-anz-roy-morgan-consumer-confidence-april-8",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 62.3,
+      "chg": 3.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9950-anz-roy-morgan-consumer-confidence-april-8",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-04",
+    "x": 2026.272488584475,
+    "day": 8,
+    "pollster": "Roy Morgan",
+    "field": "8 Apr",
+    "dateLabel": "8 Apr",
+    "released": "2026-04-08",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10186-roy-morgan-business-confidence-march-2026",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 90.7,
+      "chg": 2.1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10186-roy-morgan-business-confidence-march-2026",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-04",
+    "x": 2026.2889269406394,
+    "day": 14,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "14 Apr",
+    "dateLabel": "14 Apr",
+    "released": "2026-04-14",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9955-anz-roy-morgan-consumer-confidence-april-14",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 64.5,
+      "chg": 2.2,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9955-anz-roy-morgan-consumer-confidence-april-14",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-04",
+    "x": 2026.2889269406394,
+    "day": 14,
+    "pollster": "Westpac–MI",
+    "field": "14 Apr",
+    "dateLabel": "14 Apr",
+    "released": "2026-04-14",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2026/04/consumer-sentiment-april-2026/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 80.1,
+      "chg": -11.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2026/04/consumer-sentiment-april-2026/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-04",
+    "x": 2026.2889269406394,
+    "day": 14,
+    "pollster": "NAB",
+    "field": "14 Apr",
+    "dateLabel": "14 Apr",
+    "released": "2026-04-14",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/nab-march-business-survey-confidence-plunges-echoing-gfc-and-covid-falls",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": -29,
+      "chg": -29,
+      "vs": 0,
+      "cond": 6,
+      "condChg": null
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/nab-march-business-survey-confidence-plunges-echoing-gfc-and-covid-falls",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-04",
+    "x": 2026.3081050228311,
+    "day": 21,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "21 Apr",
+    "dateLabel": "21 Apr",
+    "released": "2026-04-21",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9960-anz-roy-morgan-consumer-confidence-april-21",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 64.3,
+      "chg": null,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9960-anz-roy-morgan-consumer-confidence-april-21",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-04",
+    "x": 2026.3272831050228,
+    "day": 28,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "28 Apr",
+    "dateLabel": "28 Apr",
+    "released": "2026-04-28",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9965-anz-roy-morgan-consumer-confidence-april-28",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 67.8,
+      "chg": 3.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9965-anz-roy-morgan-consumer-confidence-april-28",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-05",
+    "x": 2026.3448630136986,
+    "day": 4,
+    "pollster": "Roy Morgan",
+    "field": "4 May",
+    "dateLabel": "4 May",
+    "released": "2026-05-04",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plummeted-14-2pts-to-a-new-record-low-of-only-76-5-in-april-as-the-conflict-in-the-middle-east-continued-without-resolution",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 76.5,
+      "chg": -14.2,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plummeted-14-2pts-to-a-new-record-low-of-only-76-5-in-april-as-the-conflict-in-the-middle-east-continued-without-resolution",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-05",
+    "x": 2026.347602739726,
+    "day": 5,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "5 May",
+    "dateLabel": "5 May",
+    "released": "2026-05-05",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9970-anz-roy-morgan-consumer-confidence-may-5",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 67.2,
+      "chg": -0.6,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9970-anz-roy-morgan-consumer-confidence-may-5",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-05",
+    "x": 2026.3667808219177,
+    "day": 12,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "12 May",
+    "dateLabel": "12 May",
+    "released": "2026-05-12",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9975-anz-roy-morgan-consumer-confidence-may-12",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 64.1,
+      "chg": -3.1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9975-anz-roy-morgan-consumer-confidence-may-12",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-05",
+    "x": 2026.3667808219177,
+    "day": 12,
+    "pollster": "NAB",
+    "field": "12 May",
+    "dateLabel": "12 May",
+    "released": "2026-05-12",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/costs-surge-activity-cools-in-april-business-survey",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": -24,
+      "chg": 5,
+      "vs": 0,
+      "cond": 3,
+      "condChg": -3
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/costs-surge-activity-cools-in-april-business-survey",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-05",
+    "x": 2026.3859589041097,
+    "day": 19,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "19 May",
+    "dateLabel": "19 May",
+    "released": "2026-05-19",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9980-anz-roy-morgan-consumer-confidence-may-19",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 66.4,
+      "chg": 2.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9980-anz-roy-morgan-consumer-confidence-may-19",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-05",
+    "x": 2026.3859589041097,
+    "day": 19,
+    "pollster": "Westpac–MI",
+    "field": "19 May",
+    "dateLabel": "19 May",
+    "released": "2026-05-19",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2026/05/consumer-sentiment-may-2026/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 83,
+      "chg": 2.9,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2026/05/consumer-sentiment-may-2026/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-05",
+    "x": 2026.4051369863014,
+    "day": 26,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "26 May",
+    "dateLabel": "26 May",
+    "released": "2026-05-26",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9985-anz-roy-morgan-consumer-confidence-may-26",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 66.1,
+      "chg": null,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9985-anz-roy-morgan-consumer-confidence-may-26",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-06",
+    "x": 2026.4227168949772,
+    "day": 2,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "2 Jun",
+    "dateLabel": "2 Jun",
+    "released": "2026-06-02",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9990-anz-roy-morgan-consumer-confidence-june-2",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 68.8,
+      "chg": 2.7,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9990-anz-roy-morgan-consumer-confidence-june-2",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-06",
+    "x": 2026.4418949771689,
+    "day": 9,
+    "pollster": "Westpac–MI",
+    "field": "9 Jun",
+    "dateLabel": "9 Jun",
+    "released": "2026-06-09",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2026/06/consumer-sentiment-june-2026/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 80.6,
+      "chg": -2.4,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2026/06/consumer-sentiment-june-2026/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-06",
+    "x": 2026.4418949771689,
+    "day": 9,
+    "pollster": "NAB",
+    "field": "9 Jun",
+    "dateLabel": "9 Jun",
+    "released": "2026-06-09",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/costs-ease-confidence-lifts-off-a-low-base",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": -14,
+      "chg": 10,
+      "vs": 0,
+      "cond": 3,
+      "condChg": null
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/costs-ease-confidence-lifts-off-a-low-base",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-06",
+    "x": 2026.4446347031962,
+    "day": 10,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "10 Jun",
+    "dateLabel": "10 Jun",
+    "released": "2026-06-10",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/9995-anz-roy-morgan-consumer-confidence-june-10",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 70.8,
+      "chg": 2,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/9995-anz-roy-morgan-consumer-confidence-june-10",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-06",
+    "x": 2026.4446347031962,
+    "day": 10,
+    "pollster": "Roy Morgan",
+    "field": "10 Jun",
+    "dateLabel": "10 Jun",
+    "released": "2026-06-10",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10236-roy-morgan-business-confidence-may-2026",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 76.1,
+      "chg": null,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10236-roy-morgan-business-confidence-may-2026",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-06",
+    "x": 2026.4610730593606,
+    "day": 16,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "16 Jun",
+    "dateLabel": "16 Jun",
+    "released": "2026-06-16",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10000-anz-roy-morgan-consumer-confidence-june-16",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 70.7,
+      "chg": null,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10000-anz-roy-morgan-consumer-confidence-june-16",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-06",
+    "x": 2026.4802511415523,
+    "day": 23,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "23 Jun",
+    "dateLabel": "23 Jun",
+    "released": "2026-06-23",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10005-anz-roy-morgan-consumer-confidence-june-23",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 72.8,
+      "chg": 2.1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10005-anz-roy-morgan-consumer-confidence-june-23",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-06",
+    "x": 2026.4994292237443,
+    "day": 30,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "30 Jun",
+    "dateLabel": "30 Jun",
+    "released": "2026-06-30",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10010-anz-roy-morgan-consumer-confidence-june-30",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 75.9,
+      "chg": 3.1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10010-anz-roy-morgan-consumer-confidence-june-30",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-07",
+    "x": 2026.5197488584477,
+    "day": 7,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "7 Jul",
+    "dateLabel": "7 Jul",
+    "released": "2026-07-07",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10015-anz-roy-morgan-consumer-confidence-july-7",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 74.7,
+      "chg": -1.2,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10015-anz-roy-morgan-consumer-confidence-july-7",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-07",
+    "x": 2026.5197488584477,
+    "day": 7,
+    "pollster": "Roy Morgan",
+    "field": "7 Jul",
+    "dateLabel": "7 Jul",
+    "released": "2026-07-07",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10276-roy-morgan-business-confidence-june-2026",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 77.5,
+      "chg": 1.4,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10276-roy-morgan-business-confidence-june-2026",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-07",
+    "x": 2026.5389269406394,
+    "day": 14,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "14 Jul",
+    "dateLabel": "14 Jul",
+    "released": "2026-07-14",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10020-anz-roy-morgan-consumer-confidence-july-14",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 75.3,
+      "chg": 0.6,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10020-anz-roy-morgan-consumer-confidence-july-14",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-07",
+    "x": 2026.5389269406394,
+    "day": 14,
+    "pollster": "Westpac–MI",
+    "field": "14 Jul",
+    "dateLabel": "14 Jul",
+    "released": "2026-07-14",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2026/07/consumer-sentiment-july-2026/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 83.9,
+      "chg": 3.3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2026/07/consumer-sentiment-july-2026/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-07",
+    "x": 2026.5389269406394,
+    "day": 14,
+    "pollster": "NAB",
+    "field": "14 Jul",
+    "dateLabel": "14 Jul",
+    "released": "2026-07-14",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/business-confidence-continues-recovery-nab-monthly-business-survey-june-2026",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": -5,
+      "chg": 9,
+      "vs": 0,
+      "cond": 3,
+      "condChg": 2
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/business-confidence-continues-recovery-nab-monthly-business-survey-june-2026",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-07",
+    "x": 2026.5581050228311,
+    "day": 21,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "21 Jul",
+    "dateLabel": "21 Jul",
+    "released": "2026-07-21",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10025-anz-roy-morgan-consumer-confidence-july-21",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 75.6,
+      "chg": null,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10025-anz-roy-morgan-consumer-confidence-july-21",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-07",
+    "x": 2026.5772831050228,
+    "day": 28,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "28 Jul",
+    "dateLabel": "28 Jul",
+    "released": "2026-07-28",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10030-anz-roy-morgan-consumer-confidence-july-28",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 71.2,
+      "chg": -4.4,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10030-anz-roy-morgan-consumer-confidence-july-28",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-08",
+    "x": 2026.5948630136986,
+    "day": 4,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "4 Aug",
+    "dateLabel": "4 Aug",
+    "released": "2026-08-04",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10035-anz-roy-morgan-consumer-confidence-august-4",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 74.7,
+      "chg": 3.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10035-anz-roy-morgan-consumer-confidence-august-4",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-08",
+    "x": 2026.5948630136986,
+    "day": 4,
+    "pollster": "Roy Morgan",
+    "field": "4 Aug",
+    "dateLabel": "4 Aug",
+    "released": "2026-08-04",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10296-roy-morgan-business-confidence-july-2026",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 76,
+      "chg": -1.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10296-roy-morgan-business-confidence-july-2026",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-08",
+    "x": 2026.6140410958903,
+    "day": 11,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "11 Aug",
+    "dateLabel": "11 Aug",
+    "released": "2026-08-11",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10040-anz-roy-morgan-consumer-confidence-august-11",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 75,
+      "chg": null,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10040-anz-roy-morgan-consumer-confidence-august-11",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-08",
+    "x": 2026.6140410958903,
+    "day": 11,
+    "pollster": "NAB",
+    "field": "11 Aug",
+    "dateLabel": "11 Aug",
+    "released": "2026-08-11",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/nab-business-survey-july-2026",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": -6,
+      "chg": -1,
+      "vs": 0,
+      "cond": 4,
+      "condChg": 1
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/nab-business-survey-july-2026",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-08",
+    "x": 2026.6332191780823,
+    "day": 18,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "18 Aug",
+    "dateLabel": "18 Aug",
+    "released": "2026-08-18",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10045-anz-roy-morgan-consumer-confidence-august-18",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 76.5,
+      "chg": 1.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10045-anz-roy-morgan-consumer-confidence-august-18",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-08",
+    "x": 2026.6332191780823,
+    "day": 18,
+    "pollster": "Westpac–MI",
+    "field": "18 Aug",
+    "dateLabel": "18 Aug",
+    "released": "2026-08-18",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2026/08/consumer-sentiment-august-2026/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 88.9,
+      "chg": 5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2026/08/consumer-sentiment-august-2026/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-08",
+    "x": 2026.652397260274,
+    "day": 25,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "25 Aug",
+    "dateLabel": "25 Aug",
+    "released": "2026-08-25",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10045-anz-roy-morgan-consumer-confidence-august-25",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 77.5,
+      "chg": 1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10045-anz-roy-morgan-consumer-confidence-august-25",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-09",
+    "x": 2026.6699771689498,
+    "day": 1,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "1 Sep",
+    "dateLabel": "1 Sep",
+    "released": "2026-09-01",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10055-anz-roy-morgan-consumer-confidence-september-1",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 74.9,
+      "chg": -2.6,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10055-anz-roy-morgan-consumer-confidence-september-1",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-09",
+    "x": 2026.6891552511415,
+    "day": 8,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "8 Sep",
+    "dateLabel": "8 Sep",
+    "released": "2026-09-08",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10060-anz-roy-morgan-consumer-confidence-september-8",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 71.9,
+      "chg": -3,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10060-anz-roy-morgan-consumer-confidence-september-8",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-09",
+    "x": 2026.6891552511415,
+    "day": 8,
+    "pollster": "Westpac–MI",
+    "field": "8 Sep",
+    "dateLabel": "8 Sep",
+    "released": "2026-09-08",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2026/09/consumer-sentiment-september-2026/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 84.4,
+      "chg": -4.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2026/09/consumer-sentiment-september-2026/",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-09",
+    "x": 2026.6891552511415,
+    "day": 8,
+    "pollster": "Roy Morgan",
+    "field": "8 Sep",
+    "dateLabel": "8 Sep",
+    "released": "2026-09-08",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10336-roy-morgan-business-confidence-august-2026",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "business",
+      "lab": "Business Confidence",
+      "v": 79.1,
+      "chg": 3.1,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10336-roy-morgan-business-confidence-august-2026",
+      "title": "Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-09",
+    "x": 2026.6891552511415,
+    "day": 8,
+    "pollster": "NAB",
+    "field": "8 Sep",
+    "dateLabel": "8 Sep",
+    "released": "2026-09-08",
+    "sample": null,
+    "url": "https://www.nab.com.au/news/economy-markets/business-conditions-drop-into-negative-territory-business-survey-august26",
+    "client": "Business Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "nabBusiness",
+      "lab": "Business Confidence",
+      "v": -8,
+      "chg": -2,
+      "vs": 0,
+      "cond": -1,
+      "condChg": -5
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (nab.com.au)",
+      "href": "https://www.nab.com.au/news/economy-markets/business-conditions-drop-into-negative-territory-business-survey-august26",
+      "title": "The published report this poll’s figures were read from"
+    }]
+  }, {
+    "ym": "2026-09",
+    "x": 2026.7083333333333,
+    "day": 15,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "15 Sep",
+    "dateLabel": "15 Sep",
+    "released": "2026-09-15",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10065-anz-roy-morgan-consumer-confidence-september-15",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 73.9,
+      "chg": 2,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10065-anz-roy-morgan-consumer-confidence-september-15",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-09",
+    "x": 2026.727511415525,
+    "day": 22,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "22 Sep",
+    "dateLabel": "22 Sep",
+    "released": "2026-09-22",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10070-anz-roy-morgan-consumer-confidence-september-22",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 72,
+      "chg": -1.9,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10070-anz-roy-morgan-consumer-confidence-september-22",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-09",
+    "x": 2026.7466894977167,
+    "day": 29,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "29 Sep",
+    "dateLabel": "29 Sep",
+    "released": "2026-09-29",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10075-anz-roy-morgan-consumer-confidence-september-29",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 70.5,
+      "chg": -1.5,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10075-anz-roy-morgan-consumer-confidence-september-29",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-10",
+    "x": 2026.76700913242,
+    "day": 6,
+    "pollster": "ANZ–Roy Morgan",
+    "field": "6 Oct",
+    "dateLabel": "6 Oct",
+    "released": "2026-10-06",
+    "sample": null,
+    "url": "https://www.roymorgan.com/findings/10080-anz-roy-morgan-consumer-confidence-october-6",
+    "client": "Consumer Confidence",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "consumer",
+      "lab": "Consumer Confidence",
+      "v": 67.1,
+      "chg": -3.4,
+      "vs": 100
+    },
+    "links": [{
+      "k": "release",
+      "t": "ANZ–Roy Morgan’s release",
+      "href": "https://www.roymorgan.com/findings/10080-anz-roy-morgan-consumer-confidence-october-6",
+      "title": "ANZ–Roy Morgan’s own release of this poll"
+    }]
+  }, {
+    "ym": "2026-10",
+    "x": 2026.76700913242,
+    "day": 6,
+    "pollster": "Westpac–MI",
+    "field": "6 Oct",
+    "dateLabel": "6 Oct",
+    "released": "2026-10-06",
+    "sample": null,
+    "url": "https://www.westpaciq.com.au/economics/2026/10/consumer-sentiment-october-2026/",
+    "client": "Consumer Sentiment",
+    "p": {},
+    "appr": {},
+    "chg": null,
+    "conf": {
+      "k": "westpacConsumer",
+      "lab": "Consumer Sentiment",
+      "v": 80.4,
+      "chg": -4,
+      "vs": 100
+    },
+    "links": [{
+      "k": "cite",
+      "t": "Report (westpaciq.com.au)",
+      "href": "https://www.westpaciq.com.au/economics/2026/10/consumer-sentiment-october-2026/",
+      "title": "The published report this poll’s figures were read from"
     }]
   }];
   const directionAvailable = true;
@@ -65064,6 +68394,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     directionPolls,
     directionOnlyPolls,
     issuesOnlyPolls,
+    confidenceOnlyPolls,
     directionNow,
     leaderNow,
     undecided,
@@ -71851,7 +75182,7 @@ function MoodPanel({
     className: "card-head"
   }, React.createElement("div", null, React.createElement("h2", {
     className: "card-title"
-  }, "The economic mood"), React.createElement("p", {
+  }, "Economic sentiment"), React.createElement("p", {
     className: "card-sub"
   }, "Consumer and business confidence, 100 = neutral ", "\u2013", " Roy Morgan", "\u2019", "s own series"))), React.createElement(TrendChart, {
     key: "mood",
@@ -78834,7 +82165,7 @@ function ArchPollDetail({
     key: "client"
   }, React.createElement("span", {
     className: "pd-meta-k"
-  }, "Commissioned by"), React.createElement("span", {
+  }, p.conf ? "Gauge" : "Commissioned by"), React.createElement("span", {
     className: "pd-meta-v"
   }, p.client)), React.createElement("span", {
     className: "pd-meta-i",
@@ -78990,6 +82321,10 @@ const POLL_TAGS = [{
   id: "iss",
   label: "Iss",
   title: "Issues – what voters say matters, and the party rated best on it"
+}, {
+  id: "conf",
+  label: "Conf",
+  title: "Confidence – an economic-confidence gauge's published release"
 }];
 const POLL_TAG_META = Object.fromEntries(POLL_TAGS.map(t => [t.id, t]));
 const AP_CLIENT_ALIASES = {
@@ -78997,7 +82332,7 @@ const AP_CLIENT_ALIASES = {
   "smh/age": "sydney morning herald the age",
   "australia inst.": "australia institute"
 };
-const URL_HOUSES = ["Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater", "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy", "Wolf & Smith", "YouGov", "SEC Newgate", "Ipsos"];
+const URL_HOUSES = ["Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater", "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy", "Wolf & Smith", "YouGov", "SEC Newgate", "Ipsos", "ANZ–Roy Morgan", "Westpac–MI", "NAB"];
 const archMask = (order, set) => {
   let m = 0;
   order.forEach((name, i) => {
@@ -79038,6 +82373,7 @@ function pollTagIds(p) {
   if (p.seats && p.seats.p) t.push("seats");
   if (p.dir) t.push("dir");
   if (p.iss) t.push("iss");
+  if (p.conf) t.push("conf");
   return t;
 }
 function FilterPop({
@@ -80188,7 +83524,14 @@ function AllPollsView({
     if (!housesIss.includes(b)) housesIss.push(b);
   });
   housesIss.sort();
-  const housesAll = [...housesIss];
+  const confOnlyAll = D.confidenceOnlyPolls || [];
+  const housesConf = [...housesIss];
+  confOnlyAll.forEach(p => {
+    const b = baseHouse(p.pollster);
+    if (!housesConf.includes(b)) housesConf.push(b);
+  });
+  housesConf.sort();
+  const housesAll = [...housesConf];
   const FACET_SCOPE = {
     twopp: {
       has: p => (pubBasis ? p.alp != null : p.alpImp != null) || p.tppAlt || p.tppAlt2 || p.tpp3,
@@ -80241,7 +83584,10 @@ function AllPollsView({
   }, {
     id: "issues",
     label: "Issues"
-  }];
+  }, ...((D.confidenceOnlyPolls || []).length ? [{
+    id: "confidence",
+    label: "Confidence"
+  }] : [])];
   const pOrder = D.latest && D.latest.primaryOrder || ["alp", "lnp", "grn", "onp", "oth"];
   const PCOLS = {
     alp: {
@@ -80286,10 +83632,12 @@ function AllPollsView({
     l: "leadership",
     d: "direction",
     i: "issues",
+    c: "confidence",
     primary: "primary",
     leadership: "leadership",
     direction: "direction",
     issues: "issues",
+    confidence: "confidence",
     ...(window.AP.rd ? {
       g: "demographics",
       demographics: "demographics"
@@ -80338,7 +83686,7 @@ function AllPollsView({
       who: (() => {
         const raw = get("w", "who") || "";
         const mask = archUnpack(raw, URL_HOUSES);
-        const known = view === "direction" ? housesDir : view === "issues" ? housesIss : houses;
+        const known = view === "direction" ? housesDir : view === "issues" ? housesIss : view === "confidence" ? housesConf : houses;
         return (mask ? [...mask] : raw.split(",").map(baseHouse)).filter(h => known.includes(h));
       })(),
       has: (() => {
@@ -80482,8 +83830,9 @@ function AllPollsView({
   const NOW_YEAR = new Date().getFullYear();
   const dirOnly = facet === "direction" ? dirOnlyAll : facet === "issues" ? dirOnlyAll.filter(p => p.iss) : [];
   const issOnly = facet === "issues" ? issOnlyAll : [];
-  const housesV = facet === "issues" ? housesIss : dirOnly.length ? housesDir : houses;
-  const rows = [...D.individualPolls, ...dirOnly, ...issOnly].map(p => {
+  const confOnly = facet === "confidence" ? confOnlyAll : [];
+  const housesV = facet === "issues" ? housesIss : confOnly.length ? housesConf : dirOnly.length ? housesDir : houses;
+  const rows = (facet === "confidence" ? confOnly : [...D.individualPolls, ...dirOnly, ...issOnly]).map(p => {
     const [y, mo] = p.ym.split("-").map(Number);
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
     const fieldLabel = p.fieldPending ? "TBC" : y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
@@ -80522,6 +83871,10 @@ function AllPollsView({
       (p.iss.sal || []).concat(p.iss.conc || []).forEach(([lab, v]) => hayParts.push(lab, String(v)));
       const ib = issBestOf(p.iss);
       if (ib) hayParts.push(ib.who, String(ib.v));
+    }
+    if (p.conf) {
+      hayParts.push("confidence economic sentiment consumer business", p.conf.lab, String(p.conf.v));
+      if (p.conf.cond != null) hayParts.push("conditions", String(p.conf.cond));
     }
     hayParts.push(...tags);
     const hay = hayParts.join(" ").toLowerCase();
@@ -80627,6 +83980,14 @@ function AllPollsView({
           const b = issBestOf(p.iss);
           return b ? b.v : -Infinity;
         }
+      case "conf.lab":
+        return p.conf && p.conf.lab || "";
+      case "conf.v":
+        return p.conf ? p.conf.v : -Infinity;
+      case "conf.chg":
+        return p.conf && p.conf.chg != null ? p.conf.chg : -Infinity;
+      case "conf.cond":
+        return p.conf && p.conf.cond != null ? p.conf.cond : -Infinity;
       default:
         {
           if (!key.startsWith("dem.")) return 0;
@@ -80649,6 +84010,7 @@ function AllPollsView({
   }, [ql, sel, lead, range, tagSel, scope, facet, sort.key, sort.dir, measure]);
   const openIdx = open ? sorted.findIndex(p => p.pollster + "|" + p.released === open) : -1;
   const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
+  const fmtConfFig = (v, signed) => (v < 0 ? "−" : signed && v > 0 ? "+" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const total = rows.length;
   const totalAll = D.individualPolls.length + dirOnlyAll.length + issOnlyAll.length;
   const clearAll = () => {
@@ -80715,6 +84077,7 @@ function AllPollsView({
     leadership: "l",
     direction: "d",
     issues: "i",
+    confidence: "c",
     demographics: "g"
   };
   const DEM_BY_ID = {
@@ -80776,7 +84139,7 @@ function AllPollsView({
   }], ["Best on it %", p => {
     const b = issBestOf(p.iss);
     return b ? b.v : "";
-  }]];
+  }], ["Confidence series", p => p.conf ? p.conf.lab : ""], ["Confidence figure", p => p.conf ? p.conf.v : ""], ["Confidence change", p => p.conf && p.conf.chg != null ? p.conf.chg : ""], ["NAB conditions", p => p.conf && p.conf.cond != null ? p.conf.cond : ""]];
   const exportCsv = () => downloadCsv(`auspol-tracker-polls-${D.latest.updatedISO}.csv`, [CSV_COLS.map(c => c[0]), ...sorted.map(p => CSV_COLS.map(c => c[1](p)))]);
   if (window.AP.rd) return React.createElement("div", {
     className: "view view-allpolls"
@@ -80835,11 +84198,13 @@ function AllPollsView({
     className: "ap-head"
   }, React.createElement("div", null, React.createElement("h2", {
     className: "card-title"
-  }, "All polls"), React.createElement("p", {
+  }, facet === "confidence" ? "Economic sentiment" : "All polls"), React.createElement("p", {
     className: "card-sub"
-  }, "Every individual national poll in the archive, ", total, totalAll !== total ? " of " + totalAll : "", " polls from ", housesAll.length, " pollsters,", " ", (() => {
-    const f = D.individualPolls[0],
-      l = D.individualPolls[D.individualPolls.length - 1];
+  }, facet === "confidence" ? React.createElement(React.Fragment, null, "Every release of the four confidence gauges this term \u2013 ANZ\u2013Roy Morgan\u2019s consumer weekly, Westpac\u2013MI\u2019s monthly, and Roy Morgan\u2019s and NAB\u2019s business reads: ", total, " releases,") : React.createElement(React.Fragment, null, "Every individual national poll in the archive, ", total, totalAll !== total ? " of " + totalAll : "", " polls from ", housesAll.length, " pollsters,"), " ", (() => {
+    const src = facet === "confidence" ? confOnlyAll : D.individualPolls;
+    const f = src[0],
+      l = src[src.length - 1];
+    if (!f || !l) return null;
     const lab = ym => {
       const [y, m] = ym.split("-").map(Number);
       return D.monthNameFull(m) + " " + y;
@@ -81118,7 +84483,7 @@ function AllPollsView({
     className: "poll-table archive"
   }, React.createElement("caption", {
     className: "sr-only"
-  }, "All polls, ", (FACETS.find(f => f.id === facet) || {}).label, " columns \u2013", " ", sorted.length, " of ", totalAll, " polls"), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
+  }, "All polls, ", (FACETS.find(f => f.id === facet) || {}).label, " columns \u2013", " ", sorted.length, " of ", facet === "confidence" ? confOnlyAll.length : totalAll, " ", facet === "confidence" ? "releases" : "polls"), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
     scope: "col",
     className: "exp-col",
     "aria-hidden": "true"
@@ -81257,6 +84622,19 @@ function AllPollsView({
     sort: sort,
     onSort: onSort,
     title: "The party voters trust most on that issue, and its share"
+  })), facet === "confidence" && React.createElement(React.Fragment, null, React.createElement(ArchSortTh, {
+    label: "Figure",
+    k: "conf.v",
+    sort: sort,
+    onSort: onSort
+  }), React.createElement(ArchSortTh, {
+    label: "Change",
+    short: "Chg",
+    k: "conf.chg",
+    sort: sort,
+    onSort: onSort,
+    className: "hide-md",
+    title: "Change on the series' previous release \u2013 NAB's rows add its trading-conditions reading"
   })))), React.createElement("tbody", {
     ref: bodyRef
   }, shownRows.map((p, i) => {
@@ -81264,7 +84642,7 @@ function AllPollsView({
     const rowId = p.pollster + "|" + p.released;
     const arrived = !!focus && focus.key === rowId;
     const isOpen = open === rowId;
-    const colCount = facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "direction" ? 9 : facet === "issues" ? 8 : 9;
+    const colCount = facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "direction" ? 9 : facet === "issues" ? 8 : facet === "confidence" ? 7 : 9;
     return React.createElement(React.Fragment, {
       key: rowId
     }, React.createElement("tr", {
@@ -81395,7 +84773,18 @@ function AllPollsView({
       className: "num"
     }, React.createElement(ArchIssBest, {
       iss: p.iss
-    })))), isOpen && React.createElement("tr", {
+    }))), facet === "confidence" && React.createElement(React.Fragment, null, React.createElement("td", {
+      className: "num",
+      style: {
+        fontWeight: 600
+      }
+    }, p.conf ? fmtConfFig(p.conf.v) : React.createElement("span", {
+      className: "dash"
+    }, "\u2014")), React.createElement("td", {
+      className: "num muted hide-md"
+    }, p.conf && p.conf.chg != null ? React.createElement(React.Fragment, null, fmtConfFig(p.conf.chg, true), p.conf.cond != null && React.createElement("span", {
+      className: "muted"
+    }, " (" + fmtConfFig(p.conf.cond) + " cond.)")) : "—"))), isOpen && React.createElement("tr", {
       className: "detail-row"
     }, React.createElement("td", {
       colSpan: colCount
@@ -81407,7 +84796,7 @@ function AllPollsView({
   }), sorted.length === 0 && React.createElement("tr", {
     className: "arch-empty"
   }, React.createElement("td", {
-    colSpan: facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "issues" ? 8 : 9
+    colSpan: facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "issues" ? 8 : facet === "confidence" ? 7 : 9
   }, "No polls match these filters. ", React.createElement("button", {
     className: "ap-clear",
     onClick: clearAll
@@ -82156,8 +85545,8 @@ function infoTerms(D) {
     entries: []
   }, {
     id: "s-mood",
-    title: "Economic mood",
-    nav: "Mood",
+    title: "Economic sentiment",
+    nav: "Sentiment",
     lead: {
       id: "mood",
       body: React.createElement(React.Fragment, null, "Four published confidence gauges of the same economy: the ANZ\u2013Roy Morgan Consumer Confidence index, published weekly; the Westpac\u2013Melbourne Institute Consumer Sentiment index, monthly; Roy Morgan\u2019s Business Confidence index, monthly; and NAB\u2019s Monthly Business Survey. The chart opens at the May 2025 election; the figures on file run further back \u2014 2019 for the Roy Morgan series, 2022 for Westpac, and April 2025 for NAB.", React.createElement("span", {
@@ -93091,7 +96480,7 @@ function RdMood({
   return React.createElement(RdSec, {
     id: "mood",
     cls: "rd-mood",
-    title: "Economic mood",
+    title: "Economic sentiment",
     meta: "Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")
   }, React.createElement(RdHed, {
     head: head,
@@ -93207,7 +96596,7 @@ function RdMood({
   }), React.createElement(RdFoot, {
     how: {
       term: "mood",
-      from: "Economic mood"
+      from: "Economic sentiment"
     }
   }, "Four published gauges \u2014 ANZ\u2013Roy Morgan, Westpac\u2013MI, Roy Morgan and NAB \u2014 joined as released. Context, not a predictor."));
 }
@@ -97155,6 +100544,200 @@ function RdApDirMini({
     className: "tip-hint"
   }, tip.src === "focus" ? "Press Enter to open this reading" : "Click to open this reading") : null)));
 }
+function RdApConfMini({
+  p
+}) {
+  const D = window.AUSPOL;
+  const c = p.conf;
+  const box = React.useRef(null);
+  const W = useRdWidth(box, 470);
+  const H = 176;
+  const iM = D.MONTHS.indexOf(p.ym);
+  const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
+  const t0 = rdApDays(ms[0] + "-01");
+  const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
+  const t1 = Date.UTC(ly, lm, 1) - 864e5;
+  const ser = ((D.mood || {})[c.k] || {}).polls || [];
+  const mine = ser.filter(q => rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1);
+  if (!mine.length) return React.createElement("div", {
+    ref: box
+  });
+  const fmt = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+  const outLabel = q => {
+    const d = new Date(rdApDays(q.released));
+    return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1);
+  };
+  const neut = c.vs;
+  const vals = mine.map(q => q.v).concat([neut]);
+  let lo = Math.floor(Math.min(...vals) / 4) * 4,
+    hi = Math.ceil(Math.max(...vals) / 4) * 4;
+  if (hi - lo < 8) {
+    const cMid = (lo + hi) / 2;
+    lo = Math.floor((cMid - 4) / 4) * 4;
+    hi = lo + 8;
+  }
+  const step = rdApTickStep(lo, hi);
+  lo = Math.floor(lo / step) * step;
+  hi = Math.ceil(hi / step) * step;
+  const x0 = 30,
+    x1 = W - 16,
+    top = 10,
+    bot = H - 26;
+  const X = tt => x0 + (tt - t0) / (t1 - t0) * (x1 - x0);
+  const Y = v => bot - (v - lo) / (hi - lo) * (bot - top);
+  const ticks = [];
+  for (let v = lo; v <= hi + 1e-9; v += step) ticks.push(v);
+  const cx = X(rdApDays(p.released)),
+    cy = Y(c.v);
+  const labLeft = cx > W * 0.45;
+  const [tip, setTip] = useState(null);
+  const tipBox = React.useRef(null);
+  const ptr = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = tipBox.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip]);
+  const dots = mine.filter(q => q.released !== p.released).map(q => {
+    const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+      pollster: p.pollster,
+      released: q.released
+    }) : null;
+    const dup = mine.some(z => z !== q && z.released === q.released);
+    return {
+      q,
+      key: !raw || dup ? null : raw,
+      id: q.released,
+      cx: X(rdApDays(q.released)),
+      a: q.v
+    };
+  });
+  const show = (id, src) => setTip({
+    id,
+    src
+  });
+  const hide = (id, src) => setTip(tp => tp && tp.id === id && (!src || tp.src === src) ? null : tp);
+  const dotTip = tip && dots.find(d => d.id === tip.id);
+  return React.createElement("div", {
+    ref: box,
+    className: "rd-apd-mini"
+  }, React.createElement("svg", {
+    width: W,
+    height: H,
+    viewBox: `0 0 ${W} ${H}`,
+    role: "img",
+    "aria-label": `${c.lab} releases since ${D.monthName(+ms[0].slice(5, 7)) + " " + ms[0].slice(0, 4)}, as published; this release ${fmt(c.v)}${neut === 0 ? ", a net balance, 0 neutral" : ", 100 neutral"}.`
+  }, ticks.map(v => React.createElement("path", {
+    key: v,
+    d: `M${x0} ${Y(v)}H${x1}`,
+    className: v === neut ? "rd-apd-even" : "rd-apd-gl"
+  })), ticks.map(v => React.createElement("text", {
+    key: "t" + v,
+    x: x0 - 6,
+    y: Y(v) + 4,
+    className: "rd-apd-ax",
+    textAnchor: "end"
+  }, v === neut ? neut === 0 ? "0 ±" : "100" : v)), dots.map(d => {
+    const open = () => {
+      if (d.key && window.AP.openPoll) {
+        setTip(null);
+        window.AP.openPoll(d.key, "confidence", "the release you were looking at");
+      }
+    };
+    return React.createElement("g", {
+      key: d.id
+    }, tip && tip.id === d.id && React.createElement("circle", {
+      cx: d.cx,
+      cy: Y(d.a),
+      r: "7.5",
+      className: "rd-apd-dothi"
+    }), React.createElement("circle", {
+      cx: d.cx,
+      cy: Y(d.a),
+      r: "4",
+      className: "rd-apd-dot"
+    }), React.createElement("circle", {
+      cx: d.cx,
+      cy: Y(d.a),
+      r: "9",
+      className: "rd-apd-hit" + (d.key ? " link" : ""),
+      tabIndex: "0",
+      role: d.key ? "button" : "img",
+      "aria-label": `${fmt(d.a)}, ${c.lab} released ${outLabel(d.q)}` + (d.key ? "; press Enter to open it" : ""),
+      onPointerDown: ev => {
+        ptr.current = ev.pointerType;
+      },
+      onPointerEnter: ev => {
+        if (ev.pointerType === "mouse") show(d.id, "mouse");
+      },
+      onPointerLeave: ev => {
+        if (ev.pointerType === "mouse") hide(d.id, "mouse");
+      },
+      onFocus: ev => {
+        if (ev.target.matches(":focus-visible")) show(d.id, "focus");
+      },
+      onBlur: () => hide(d.id, "focus"),
+      onClick: ev => {
+        ev.stopPropagation();
+        const pt = ev.detail === 0 ? "key" : ptr.current;
+        ptr.current = null;
+        if (pt === "mouse" || pt === "key") {
+          open();
+          return;
+        }
+        if (tip && tip.id === d.id) setTip(null);else setTip({
+          id: d.id,
+          src: "touch"
+        });
+      },
+      onKeyDown: ev => {
+        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+        ev.preventDefault();
+        open();
+      }
+    }));
+  }), React.createElement("circle", {
+    cx: cx,
+    cy: cy,
+    r: "8",
+    className: "rd-apd-ring"
+  }), React.createElement("circle", {
+    cx: cx,
+    cy: cy,
+    r: "4.5",
+    className: "rd-apd-this"
+  }), React.createElement("text", {
+    x: labLeft ? cx - 12 : cx + 12,
+    y: cy - 12,
+    className: "rd-apd-thislab",
+    textAnchor: labLeft ? "end" : "start"
+  }, "This release " + fmt(c.v)), React.createElement("path", {
+    d: `M${x0} ${bot}H${x1}`,
+    className: "rd-apd-base"
+  }), ms.map((ym, i) => i % 2 === (ms.length - 1) % 2 ? React.createElement("text", {
+    key: ym,
+    x: X(rdApDays(ym + "-01")),
+    y: bot + 18,
+    className: "rd-apd-ax",
+    textAnchor: "middle"
+  }, D.monthName(Number(ym.slice(5)))) : null)), dotTip && React.createElement("div", {
+    ref: tipBox,
+    className: "tip rd-apd-tip",
+    style: {
+      left: dotTip.cx + "px"
+    },
+    "aria-hidden": "true"
+  }, React.createElement("div", {
+    className: "tip-title"
+  }, "Released ", outLabel(dotTip.q)), React.createElement("div", {
+    className: "tip-sub"
+  }, c.lab, " ", fmt(dotTip.a), dotTip.q.chg != null ? ", " + (dotTip.q.chg < 0 ? "down " : "up ") + fmt(Math.abs(dotTip.q.chg)) + " on the previous release" : ""), tip.src !== "touch" && (dotTip.key ? React.createElement("div", {
+    className: "tip-hint"
+  }, tip.src === "focus" ? "Press Enter to open this release" : "Click to open this release") : null)));
+}
 const RD_AP_LD_RIVALS = [{
   riv: "opp",
   net: "taylorNet",
@@ -97942,6 +101525,21 @@ function RdApDetail({
       className: "rd-apd-k"
     }, "In today\u2019s figures"), React.createElement("span", null, inWin ? React.createElement(React.Fragment, null, "One of the polls the panel\u2019s current figures draw on (the last ", T.window, ").") : React.createElement(React.Fragment, null, "Outside the ", T.window, " the panel\u2019s current figures draw on."))));
   })();
+  const isConf = facet === "confidence";
+  const conf = isConf ? p.conf || null : null;
+  const confSer = conf && D.mood && D.mood[conf.k] ? D.mood[conf.k] : null;
+  const confFmt = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+  const outLabel = q => {
+    const d = new Date(rdApDays(q.released));
+    return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1);
+  };
+  const confPeriod = !conf ? "month" : conf.k === "consumer" ? "week" : "month";
+  const CONF_BLURB = {
+    consumer: "Consumer confidence – who feels optimistic about their finances and the economy, read weekly by ANZ–Roy Morgan.",
+    westpacConsumer: "The Westpac–Melbourne Institute’s monthly gauge of household sentiment – the same territory as the weekly consumer index on a slower clock.",
+    business: "Business confidence – how firms rate trading conditions and the year ahead, read monthly by Roy Morgan.",
+    nabBusiness: "Business confidence as a net balance – optimistic firms minus pessimistic ones – from NAB’s monthly business survey."
+  };
   const issTable = (() => {
     if (!isIss || !p.iss) return null;
     const iq = p.iss;
@@ -98045,7 +101643,23 @@ function RdApDetail({
     "data-pollster": p.pollster
   }, React.createElement("span", {
     className: "rd-apd-h"
-  }, rdPollHead(p)), prim.length > 0 && React.createElement("div", {
+  }, rdPollHead(p)), conf && React.createElement("div", {
+    className: "rd-apd-grid rd-apd-grid1"
+  }, React.createElement("span", {
+    className: "rd-apd-k"
+  }, conf.lab), React.createElement("span", {
+    className: "rd-apd-cell"
+  }, React.createElement("span", null, React.createElement("b", null, confFmt(conf.v)), conf.chg != null && Math.abs(conf.chg) >= 0.05 ? ", " + (conf.chg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.chg)) + " on the " + confPeriod : ""), React.createElement("span", {
+    className: "rd-apd-sub"
+  }, conf.vs === 0 ? "Net balance, optimistic minus pessimistic – 0 neutral" : "Index reading – 100 neutral"))), conf && conf.cond != null && React.createElement("div", {
+    className: "rd-apd-grid rd-apd-grid1"
+  }, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Business conditions"), React.createElement("span", {
+    className: "rd-apd-cell"
+  }, React.createElement("span", null, React.createElement("b", null, confFmt(conf.cond)), conf.condChg != null && Math.abs(conf.condChg) >= 0.05 ? ", " + (conf.condChg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.condChg)) + " on the month" : ""), React.createElement("span", {
+    className: "rd-apd-sub"
+  }, "NAB prints conditions beside confidence"))), prim.length > 0 && React.createElement("div", {
     className: "rd-apd-prim"
   }, prim.map(k => React.createElement("span", {
     key: k.id
@@ -98222,7 +101836,7 @@ function RdApDetail({
     className: "rd-apd-r"
   }, React.createElement("span", {
     className: "rd-apd-h"
-  }, "How it counts"), !isDir && !isIss && !isLd && !isDem && fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, isConf ? "How it reads" : "How it counts"), !isDir && !isIss && !isLd && !isDem && !isConf && fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-ct"
   }, p.pollster, "\u2019s polls since ", D.monthNameFull(Number(from.slice(5))), " against the ", RD_AP_AVG, ", Labor v ", onM ? "One Nation" : "Coalition", pub ? " as published" : ""), React.createElement(RdApMini, {
     p: p,
@@ -98254,9 +101868,26 @@ function RdApDetail({
     }, "Who voters rate best on ", cTit, " since ", D.monthNameFull(Number(from.slice(5))), ", the monthly pooled line and this wave\u2019s own figures on the same basis \u2014 shares of those naming one of the three parties"), React.createElement(RdApIssMini, {
       p: p
     }));
-  })(), React.createElement("div", {
+  })(), isConf && conf && confSer && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-ct"
+  }, p.pollster, "\u2019s ", conf.lab, " releases since ", D.monthNameFull(Number(from.slice(5))), ", as published \u2014 no average; the gauge is the publisher\u2019s own series"), React.createElement(RdApConfMini, {
+    p: p
+  })), React.createElement("div", {
     className: "rd-apd-facts"
-  }, demFacts, isIss && iss && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, demFacts, isConf && conf && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "The gauge"), React.createElement("span", null, CONF_BLURB[conf.k] || conf.lab + "."), React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Neutral"), React.createElement("span", null, conf.vs === 0 ? React.createElement(React.Fragment, null, "Printed as a net balance \u2013 optimists minus pessimists \u2013 so the neutral print is 0. It enters the mood panel\u2019s 40\u2013120 meter shifted up 100, beside the index gauges.") : React.createElement(React.Fragment, null, "An index print \u2013 100 is neutral; above it optimists outnumber pessimists", confPeriod === "week" ? ", read weekly" : "", ".")), React.createElement("span", {
+    className: "rd-apd-k"
+  }, "In today\u2019s panel"), React.createElement("span", null, confSer && confSer.latest && confSer.latest.released === p.released ? React.createElement(React.Fragment, null, "This is the latest ", conf.lab, " release, so the economic-sentiment panel reads the gauge at it.") : confSer && confSer.latest ? React.createElement(React.Fragment, null, "The panel\u2019s current read of this gauge is the ", outLabel(confSer.latest), " release at ", confFmt(confSer.latest.v), confSer.latest.url ? React.createElement(React.Fragment, null, ", ", React.createElement("a", {
+    className: "rd-link",
+    href: confSer.latest.url,
+    onClick: e => e.stopPropagation()
+  }, "its source", React.createElement("span", {
+    className: "rd-apd-ext",
+    "aria-hidden": "true"
+  }, "\u2197"))) : "", ".") : React.createElement(React.Fragment, null, "The gauge\u2019s series carries no published releases to panel against."))), isIss && iss && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
   }, "Asked"), React.createElement("span", null, issPrompted ? React.createElement(React.Fragment, null, "Voters picked the three issues that matter most", iss.q ? React.createElement(React.Fragment, null, " \u2013 ", p.pollster, "\u2019s wording: \u201C", iss.q, "\u201D") : p.pollster === "Ipsos" ? " – Ipsos asks its standing list of 19 issues, best party on the month’s five leaders" : "", ". SEC Newgate\u2019s mentions count can\u2019t sit in the same series, so each house\u2019s wording is pooled against its pair first.") : iss.conc ? React.createElement(React.Fragment, null, "SEC Newgate asks what concerns Australians, unprompted \u2013 anyone can name anything, so the shares are any-mentions, not forced picks. That reading can\u2019t mix with the top-three series the issues panel pools, so it isn\u2019t counted toward it.") : React.createElement(React.Fragment, null, p.pollster, " asked only who\u2019d be best on each issue", iss.q ? React.createElement(React.Fragment, null, " \u2013 its wording: \u201C", iss.q, "\u201D \u2013") : ",", " not which issues matter most, so this wave feeds the pooled best-party line and there\u2019s no top-three list for it to join.")), issPair != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
@@ -98302,7 +101933,7 @@ function RdApDetail({
     key: n.name
   }, i > 0 ? "; against " + n.name + ", " : "", React.createElement("b", null, Math.abs(n.gap) < 0.05 ? "level" : Math.abs(n.gap).toFixed(1) + " points " + rdApLdWay(n.gap, n.name, rdApPmNow())), " (", rdApPmNow(), " ", rdApSigned(n.a), ", ", n.name, " ", rdApSigned(n.o), ") on ", rdApLdMetWord(n.met))), ldOwn.some(pr => pr.met === "fav") ? " – favourability and approval are different questions, so each gap here stays on its own" : ""))), isLd && !ldOwn.length && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
-  }, "Leader ratings"), React.createElement("span", null, p.pollster, " didn\u2019t ask ", rdApPm(p.appr), " and ", p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader", " on the same question in this poll, so there\u2019s no net-approval gap to set against the leadership figures.")), !isDir && !isIss && !isLd && !isDem && React.createElement(React.Fragment, null, p.noAgg && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, "Leader ratings"), React.createElement("span", null, p.pollster, " didn\u2019t ask ", rdApPm(p.appr), " and ", p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader", " on the same question in this poll, so there\u2019s no net-approval gap to set against the leadership figures.")), !isDir && !isIss && !isLd && !isDem && !isConf && React.createElement(React.Fragment, null, p.noAgg && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
   }, "In the aggregates"), React.createElement("span", null, "Because SMS polls have a strong selection bias, they do not count towards any aggregates.")), fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
@@ -98338,7 +101969,9 @@ function RdApSheet({
   toggleTag,
   tagN,
   count,
-  clearAll
+  clearAll,
+  noun1,
+  noun
 }) {
   const [allHouses, setAllHouses] = useState(false);
   React.useEffect(() => {
@@ -98421,7 +102054,7 @@ function RdApSheet({
     type: "button",
     className: "rd-ap-sheetgo",
     onClick: onClose
-  }, "Show ", count, " poll", count === 1 ? "" : "s")));
+  }, "Show ", count, " ", count === 1 ? noun1 : noun)));
 }
 function RdAllPolls(P) {
   const {
@@ -98472,6 +102105,8 @@ function RdAllPolls(P) {
   const D = window.AUSPOL;
   const ofT = ofTotal != null && ofTotal !== total ? ofTotal : null;
   const ofTxt = ofT ? " of " + ofT : "";
+  const noun1 = facet === "confidence" ? "release" : "poll";
+  const noun = noun1 + "s";
   const phone = useNarrow("(max-width: 760px)");
   const ctlNarrow = useNarrow("(max-width: 1000px)");
   const demMid = useNarrow("(max-width: 1150px)");
@@ -98572,7 +102207,10 @@ function RdAllPolls(P) {
   }, {
     id: "demographics",
     label: phone ? "Groups" : "Demographics"
-  }].filter(f => !window.JUR || !["direction", "issues", "demographics"].includes(f.id));
+  }].concat((D.confidenceOnlyPolls || []).length ? [{
+    id: "confidence",
+    label: "Confidence"
+  }] : []).filter(f => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f.id));
   const rowNav = (e, p) => {
     if (e.target !== e.currentTarget) return;
     const id = rowKey(p);
@@ -98682,7 +102320,8 @@ function RdAllPolls(P) {
     leadership: "rd-ap-clead",
     direction: "rd-ap-cdir",
     issues: "rd-ap-ciss",
-    demographics: "rd-ap-cdem"
+    demographics: "rd-ap-cdem",
+    confidence: "rd-ap-cconf"
   }[facet] + (facetSwaps.current ? " rd-ap-sw" : "");
   const th = (label, k, o) => {
     const on = sort.key === k;
@@ -98760,6 +102399,25 @@ function RdAllPolls(P) {
       }
     }, lab))));
   };
+  const CF_LO = 40,
+    CF_HI = 120;
+  const cfx = v => (Math.max(CF_LO, Math.min(CF_HI, v)) - CF_LO) / (CF_HI - CF_LO) * 100;
+  const confPlot = c => c.v + (c.vs === 0 ? 100 : 0);
+  const confInk = c => c.k === "consumer" || c.k === "westpacConsumer" ? "var(--mood-consumer)" : "var(--mood-business)";
+  const confFig = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+  const confChg = v => (v < 0 ? "−" : v > 0 ? "+" : "") + confFig(Math.abs(v));
+  const CONF_TKS = [40, 60, 80, 100, 120];
+  const confScale = short => React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-ap-cap"
+  }, "100 = neutral; NAB\u2019s net balance drawn 100 points up"), React.createElement("span", {
+    className: "rd-ap-in"
+  }, (short ? CONF_TKS.filter(v => v === 40 || v === 100 || v === 120) : CONF_TKS).map(v => React.createElement("span", {
+    key: v,
+    className: "rd-ap-tk" + (v === 100 ? " mid" : ""),
+    style: {
+      left: cfx(v) + "%"
+    }
+  }, v === 100 ? "Neutral" : v))));
   const colHead = React.createElement("div", {
     className: "rd-ap-hrow " + cls,
     role: "row"
@@ -98856,7 +102514,16 @@ function RdAllPolls(P) {
     role: "columnheader",
     "aria-label": "Each party’s gap between the two groups, from stronger with " + spl.lo.toLowerCase() + " to stronger with " + spl.hi.toLowerCase() + " voters",
     className: "rd-ap-hpic"
-  }, demScale(demMid)), React.createElement("span", null)), React.createElement("span", null));
+  }, demScale(demMid)), React.createElement("span", null)), facet === "confidence" && React.createElement(React.Fragment, null, th("Figure", "conf.v", {
+    title: "Sort by the gauge’s printed figure (the mood chart’s dot)"
+  }), React.createElement("span", {
+    role: "columnheader",
+    "aria-label": "Each gauge\u2019s figure on a fixed 40\u2013120 scale, 100 neutral \u2013 NAB\u2019s net balance drawn 100 points up, its figure printed as NAB\u2019s own",
+    className: "rd-ap-hpic"
+  }, confScale(demMid)), th("Change", "conf.chg", {
+    right: true,
+    title: "Change on the gauge’s own previous release – NAB’s rows also carry its trading-conditions reading"
+  }), React.createElement("span", null)), React.createElement("span", null));
   const pollsterCell = p => React.createElement("span", {
     role: "rowheader",
     className: "rd-ap-who"
@@ -99353,6 +103020,62 @@ function RdAllPolls(P) {
       }, pr ? gapTxt(pr.gap[k.id]) : "—")))), React.createElement("div", {
         className: "rd-ap-cpic"
       }, pic));
+    } else if (facet === "confidence") {
+      const c = p.conf;
+      figs = React.createElement("span", {
+        role: "cell",
+        className: "rd-ap-fig"
+      }, React.createElement("b", null, confFig(c.v)), c.cond != null && React.createElement("span", {
+        className: "rd-ap-sub"
+      }, "conditions ", confFig(c.cond)));
+      pic = React.createElement("span", {
+        className: "rd-ap-pic",
+        role: "img",
+        "aria-label": p.client + ", " + confFig(c.v) + (c.chg != null ? ", " + confChg(c.chg) + " on the gauge’s previous release" : "") + (c.vs === 0 ? " – a net balance (0 = neutral), drawn 100 points up" : ", 100 = neutral")
+      }, React.createElement("span", {
+        className: "rd-ap-in"
+      }, [60, 80, 120].map(v => React.createElement("i", {
+        key: v,
+        className: "rd-ap-gl",
+        style: {
+          left: cfx(v) + "%"
+        }
+      })), React.createElement("i", {
+        className: "rd-ap-avg",
+        style: {
+          left: cfx(100) + "%"
+        }
+      }), React.createElement("i", {
+        className: "rd-ap-dot",
+        style: {
+          left: cfx(confPlot(c)) + "%",
+          background: confInk(c)
+        }
+      })));
+      const chgInk = c.chg == null || Math.abs(c.chg) < 0.05 ? null : c.chg > 0 ? "var(--mood-pos)" : "var(--mood-neg)";
+      val = React.createElement("span", {
+        role: "cell",
+        className: "rd-ap-val",
+        style: chgInk ? {
+          color: chgInk
+        } : null
+      }, c.chg != null ? confChg(c.chg) : "—");
+      right1 = React.createElement("b", null, confFig(c.v));
+      right2 = c.chg != null ? React.createElement("span", {
+        className: "rd-ap-sub",
+        style: chgInk ? {
+          color: chgInk
+        } : null
+      }, confChg(c.chg), " on last") : null;
+      body = React.createElement(React.Fragment, null, React.createElement("div", {
+        className: "rd-ap-cpic"
+      }, pic), React.createElement("div", {
+        className: "rd-ap-csub"
+      }, c.chg != null ? React.createElement(React.Fragment, null, "Change ", React.createElement("b", {
+        style: chgInk ? {
+          color: chgInk
+        } : null
+      }, confChg(c.chg)), " on last release") : "The gauge’s first release this term", c.cond != null && React.createElement(React.Fragment, null, "; conditions ", confFig(c.cond))));
     }
     const detail = isOpen && React.createElement("div", {
       className: "rd-ap-open",
@@ -99402,11 +103125,11 @@ function RdAllPolls(P) {
       onClick: toggle,
       tabIndex: 0,
       onKeyDown: e => rowNav(e, p)
-    }, pollsterCell(p), fieldCell(p), sampleCell(p), React.createElement("span", null), figs, pic, val, facet === "twopp" && React.createElement(React.Fragment, null, hlCell, React.createElement("span", null)), React.createElement("button", {
+    }, pollsterCell(p), fieldCell(p), sampleCell(p), React.createElement("span", null), figs, pic, val, facet === "twopp" && React.createElement(React.Fragment, null, hlCell, React.createElement("span", null)), facet === "confidence" && React.createElement("span", null), React.createElement("button", {
       type: "button",
       className: "rd-ap-chev" + (isOpen ? " open" : ""),
       "aria-expanded": isOpen,
-      "aria-label": (isOpen ? "Hide" : "Show") + " the full poll: " + p.pollster + ", " + (p.fieldPending ? "fieldwork TBC" : p.field),
+      "aria-label": (isOpen ? "Hide" : "Show") + " the full " + (facet === "confidence" ? "release" : "poll") + ": " + p.pollster + ", " + (p.fieldPending ? "fieldwork TBC" : p.field),
       onClick: e => {
         e.stopPropagation();
         toggle();
@@ -99468,6 +103191,16 @@ function RdAllPolls(P) {
         }
       })))));
     }
+    if (facet === "confidence") {
+      return React.createElement("div", {
+        className: "rd-ap-mrow " + cls,
+        role: "row",
+        key: "m" + g.ym
+      }, React.createElement("span", {
+        className: "rd-ap-mlab",
+        role: "rowheader"
+      }, React.createElement("b", null, lab), React.createElement("span", null, n + " release" + (n === 1 ? "" : "s"))));
+    }
     return React.createElement("div", {
       className: "rd-ap-mrow " + cls,
       role: "row",
@@ -99526,7 +103259,9 @@ function RdAllPolls(P) {
     key: id
   }, issHyph(id)))), facet === "demographics" && React.createElement("span", {
     className: "rd-ap-hpic"
-  }, demScale(true)));
+  }, demScale(true)), facet === "confidence" && React.createElement("span", {
+    className: "rd-ap-hpic"
+  }, confScale(true)));
   const NAV = [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagree"], ["house-lean", "Lean"], ["flow-drift", "Flows"]];
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
@@ -99741,7 +103476,7 @@ function RdAllPolls(P) {
     d: "M21 21l-4.3-4.3"
   }))), React.createElement("span", {
     className: "rd-ap-pinn"
-  }, React.createElement("b", null, sorted.length), sorted.length !== total ? " of " + (ofT || total) : ofTxt, " polls")));
+  }, React.createElement("b", null, sorted.length), sorted.length !== total ? " of " + (ofT || total) : ofTxt, " ", noun)));
   const qpop = React.createElement(RdQPop, {
     label: "How the two-party figures are counted, and the pollsters\u2019 published figures",
     align: "left"
@@ -99770,9 +103505,9 @@ function RdAllPolls(P) {
   }, React.createElement("h2", {
     className: "rd-title",
     id: "rd-ap-t"
-  }, "All polls"), React.createElement("span", {
+  }, facet === "confidence" ? "Economic sentiment" : "All polls"), React.createElement("span", {
     className: "rd-meta"
-  }, "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"), !phone && React.createElement("nav", {
+  }, facet === "confidence" ? "Every release of the four confidence gauges this term – ANZ–Roy Morgan’s consumer weekly, Westpac–MI’s monthly, and Roy Morgan’s and NAB’s business reads" : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"), !phone && React.createElement("nav", {
     className: "rd-eyebrow-tools rd-ap-nav",
     "aria-label": "On this page"
   }, React.createElement("button", {
@@ -99910,11 +103645,11 @@ function RdAllPolls(P) {
     className: "rd-grow"
   }), React.createElement("span", {
     className: "rd-ap-count"
-  }, React.createElement("b", null, sorted.length), sorted.length !== total ? " of " + (ofT || total) : ofTxt, " polls"), React.createElement("button", {
+  }, React.createElement("b", null, sorted.length), sorted.length !== total ? " of " + (ofT || total) : ofTxt, " ", noun), React.createElement("button", {
     type: "button",
     className: phone ? "rd-link rd-ap-csv" : "rd-chip rd-ap-csv",
     onClick: exportCsv,
-    "aria-label": "Download these " + sorted.length + " polls as a CSV file"
+    "aria-label": "Download these " + sorted.length + " " + noun + " as a CSV file"
   }, React.createElement("svg", {
     viewBox: "0 0 24 24",
     width: "14",
@@ -99945,7 +103680,7 @@ function RdAllPolls(P) {
   }, "Clear all")), React.createElement("div", {
     className: "rd-ap-table",
     role: "table",
-    "aria-label": "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election, " + (byDate ? "newest first" : "sorted") + (sorted.length !== total ? ", " + sorted.length + " of " + (ofT || total) : ofT ? ", " + sorted.length + ofTxt : ""),
+    "aria-label": "Every " + RD_AP_POLLS + " " + noun1 + " since the " + rdElecYear + " election, " + (byDate ? "newest first" : "sorted") + (sorted.length !== total ? ", " + sorted.length + " of " + (ofT || total) : ofT ? ", " + sorted.length + ofTxt : ""),
     ref: bodyRef
   }, React.createElement("span", {
     ref: sentRef,
@@ -99958,7 +103693,7 @@ function RdAllPolls(P) {
     key: g.ym
   }, monthRow(g), g.list.map(rowFor))) : flat.map(rowFor), sorted.length === 0 && React.createElement("div", {
     className: "rd-ap-empty"
-  }, "No polls match these filters. ", React.createElement("button", {
+  }, "No ", noun, " match these filters. ", React.createElement("button", {
     type: "button",
     className: "rd-link",
     onClick: clearAll
@@ -99980,7 +103715,7 @@ function RdAllPolls(P) {
     className: "rd-grow"
   }), React.createElement("span", {
     className: "rd-ap-shown"
-  }, nShown, " of ", sorted.length, phone ? "" : " polls shown")), facet === "twopp" && React.createElement(RdKey, {
+  }, nShown, " of ", sorted.length, phone ? "" : " " + noun + " shown")), facet === "twopp" && React.createElement(RdKey, {
     className: "rd-ckey rd-ap-key",
     items: [{
       kind: "dot-solid",
@@ -100086,7 +103821,9 @@ function RdAllPolls(P) {
     toggleTag: toggleTag,
     tagN: tagN,
     count: sorted.length,
-    clearAll: clearAll
+    clearAll: clearAll,
+    noun1: noun1,
+    noun: noun
   }));
 }
 const RD_AP_TERM0 = (() => {

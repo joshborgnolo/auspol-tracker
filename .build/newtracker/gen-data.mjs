@@ -2422,6 +2422,43 @@ const mood = MOOD_FILE ? Object.fromEntries(["consumer", "westpacConsumer", "bus
   }];
 })) : null;
 
+/* The mood's four gauges as ARCHIVE RELEASES for the All-polls table's
+   confidence facet: one row per release in the term so far, shaped like
+   directionOnlyPolls with its empty p / appr stubs, so a release never
+   counts as a poll and the other facets never see these rows. The lane's
+   product sits where a poll row's client sits; the figure and its printed
+   change are the release's own, and `vs` is the lane's neutral print (NAB
+   is the odd one out at 0 – drawn +100 only where a shared neutral line
+   is plotted; here it keeps the figure the survey printed). */
+const CONF_LANES = [
+  ["consumer", "ANZ–Roy Morgan", "Consumer Confidence", 100],
+  ["westpacConsumer", "Westpac–MI", "Consumer Sentiment", 100],
+  ["business", "Roy Morgan", "Business Confidence", 100],
+  ["nabBusiness", "NAB", "Business Confidence", 0],
+];
+const confidenceOnlyPolls = (() => {
+  if (!MOOD_FILE) return [];
+  const out = [], eX = dx(ELECTION.date);
+  for (const [k, by, product, vs] of CONF_LANES) {
+    const s = MOOD_FILE[k];
+    if (!s) continue;
+    for (const r of s.rows) {
+      if (dx(r.date) < eX) continue;
+      const ym = ymOf(r.date), field = fwLabel(null, r.date);
+      out.push({
+        ym, x: mx(ym) + (dayOf(r.date) - 15) / 365, day: dayOf(r.date),
+        pollster: by, field, dateLabel: field, released: r.date, sample: null,
+        ...(r.url ? { url: r.url } : {}),
+        client: product,
+        p: {}, appr: {}, chg: null,
+        conf: { k, lab: product, v: r.v, chg: r.chg ?? null, vs,
+          ...(k === "nabBusiness" && r.cond != null ? { cond: r.cond, condChg: r.condChg ?? null } : {}) },
+      });
+    }
+  }
+  return out.sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
+})();
+
 /* ---- 5b. where One Nation's gains came from ------------------------------
    From the vote-switching tables DemosAU and YouGov publish (built into
    data/vote-switching.json by .build/vote-switching.mjs): each 2025-vote
@@ -2734,9 +2771,10 @@ const linksOf = (p) => {
 };
 
 // the rows built before linksOf (SEC Newgate's and Essential's mood-only
-// waves, Ipsos's issues waves) carry `url` alone; they take the same list,
-// or the views, which read only `links`, show them none
-for (const p of [...directionOnlyPolls, ...issuesOnlyPolls])
+// waves, Ipsos's issues waves, the confidence gauges' releases) carry
+// `url` alone; they take the same list, or the views, which read only
+// `links`, show them none
+for (const p of [...directionOnlyPolls, ...issuesOnlyPolls, ...confidenceOnlyPolls])
   p.links = linksOf({ pollster: p.pollster, url: p.url, methodUrl: p.methodUrl, date: p.released });
 
 const individualPolls = POLLS.map((p) => {
@@ -5482,6 +5520,10 @@ window.AUSPOL = (function () {
      are rows of their own for the All-polls table's issues facet – every
      other house's issues data hangs off its poll/direction rows via iss */
   const issuesOnlyPolls = ${JSON.stringify(issuesOnlyPolls)};
+  /* The mood gauges' term releases (§5j) as rows of their own for the
+     All-polls table's confidence facet – releases, not polls, so they
+     never join the other facets' rows or the poll count */
+  const confidenceOnlyPolls = ${JSON.stringify(confidenceOnlyPolls)};
   const directionAvailable = ${direction.length > 0};
   const undecided = ${JSON.stringify(undecided)};
   /* The mood (§5j): Roy Morgan's consumer- and business-confidence index
@@ -5602,7 +5644,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, directionNow, leaderNow, undecided, mood, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, undecided, mood, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

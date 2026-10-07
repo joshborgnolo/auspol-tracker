@@ -3821,7 +3821,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
   /* The meta items as a list rather than loose children, so the controls
      bracketed to the right of the band sit clear of them. */
   const metaItems = [
-    p.client && <span className="pd-meta-i" key="client"><span className="pd-meta-k">Commissioned by</span>
+    p.client && <span className="pd-meta-i" key="client"><span className="pd-meta-k">{p.conf ? "Gauge" : "Commissioned by"}</span>
       <span className="pd-meta-v">{p.client}</span></span>,
     <span className="pd-meta-i" key="field"><span className="pd-meta-k">Fieldwork</span>
       <span className="pd-meta-v">{p.fieldPending ? rdFieldTbc(p, true) : p.field}</span></span>,
@@ -3955,6 +3955,7 @@ const POLL_TAGS = [
   { id: "seats", label: "Seats", title: "Modelled seat projection with range – MRP polls only" },
   { id: "dir",   label: "Dir",   title: "National direction – right direction / wrong track" },
   { id: "iss",   label: "Iss",   title: "Issues – what voters say matters, and the party rated best on it" },
+  { id: "conf",  label: "Conf",  title: "Confidence – an economic-confidence gauge's published release" },
 ];
 const POLL_TAG_META = Object.fromEntries(POLL_TAGS.map((t) => [t.id, t]));
 /* a client's name as a reader is likelier to type it, for the names that
@@ -3979,6 +3980,10 @@ const URL_HOUSES = [
   "Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater",
   "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy",
   "Wolf & Smith", "YouGov", "SEC Newgate", "Ipsos",
+  // the confidence facet's gauges are publishers, not pollsters – Roy
+  // Morgan's business index reuses "Roy Morgan" above, so only the three
+  // new names take fresh bits
+  "ANZ–Roy Morgan", "Westpac–MI", "NAB",
 ];
 const archMask = (order, set) => {
   let m = 0;
@@ -4022,6 +4027,7 @@ function pollTagIds(p) {
   if (p.seats && p.seats.p) t.push("seats");
   if (p.dir) t.push("dir");
   if (p.iss) t.push("iss");
+  if (p.conf) t.push("conf");
   return t;
 }
 
@@ -5030,9 +5036,19 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const housesIss = [...housesDir];
   issOnlyAll.forEach((p) => { const b = baseHouse(p.pollster); if (!housesIss.includes(b)) housesIss.push(b); });
   housesIss.sort();
+  /* The mood panel's four gauges publish on their own rhythm, unrelated to
+     any poll (gen-data §5j): confidenceOnlyPolls shapes their releases for
+     this table, and they join the row set (and their publishers the panel
+     and the URL's valid-who set) on the confidence facet only. They are
+     releases, not polls – no sample, no voting figures, and never a count
+     added to a poll total. */
+  const confOnlyAll = D.confidenceOnlyPolls || [];
+  const housesConf = [...housesIss];
+  confOnlyAll.forEach((p) => { const b = baseHouse(p.pollster); if (!housesConf.includes(b)) housesConf.push(b); });
+  housesConf.sort();
   /* every house appearing on ANY facet – the "of N pollsters" tallies count
      the archive's full house list, not the facet the reader is standing on */
-  const housesAll = [...housesIss];
+  const housesAll = [...housesConf];
 
   /* What each view needs a poll to have published. Primary vote is on every
      poll in the archive, so it has nothing to scope and gets no pill. It sits
@@ -5090,6 +5106,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     { id: "leadership", label: "Leadership" },
     { id: "direction", label: "Direction" },
     { id: "issues", label: "Issues" },
+    /* the confidence releases exist only on the federal page (gen-data
+       files none for a jurisdiction), so a data-gated append doubles as
+       the /vic/ filter the redesign's own FACETS hand-writes */
+    ...((D.confidenceOnlyPolls || []).length ? [{ id: "confidence", label: "Confidence" }] : []),
   ];
   /* Party columns rank by the aggregate (gen-data's latest.primaryOrder –
      highest leftmost, a party only overtaking once it leads by a full point,
@@ -5126,7 +5146,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      and tag values out as comma-joined names. All spellings are still read
      here, the short key winning if a hand-edited URL carries both; only
      the short keys and mask values are ever written. */
-  const FACET_BY_URL = { p: "primary", l: "leadership", d: "direction", i: "issues", primary: "primary", leadership: "leadership", direction: "direction", issues: "issues",
+  const FACET_BY_URL = { p: "primary", l: "leadership", d: "direction", i: "issues", c: "confidence", primary: "primary", leadership: "leadership", direction: "direction", issues: "issues", confidence: "confidence",
                          ...(window.AP.rd ? { g: "demographics", demographics: "demographics" } : {}) };
   // the demographics facet's split → URL letter's inverse; age, the default, rides no letter
   const DEM_BY_URL = { a: "age", g: "gender", e: "education", p: "place", h: "home" };
@@ -5156,7 +5176,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
            house's rows exist only on the direction facet (an issues-only one
            likewise on the issues facet), so its selection is stale anywhere
            else */
-        const known = view === "direction" ? housesDir : view === "issues" ? housesIss : houses;
+        const known = view === "direction" ? housesDir : view === "issues" ? housesIss : view === "confidence" ? housesConf : houses;
         return (mask ? [...mask] : raw.split(",").map(baseHouse)).filter((h) => known.includes(h));
       })(),
       has: (() => {
@@ -5309,12 +5329,17 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   /* The direction-only rows land here (why/what they are is at dirOnlyAll
      above): every count, panel option and filter below derives from this
      one merged list, so a SEC Newgate wave is rankable, searchable and
-     self-scoping on its facet and invisible everywhere else. */
+     self-scoping on its facet and invisible everywhere else. The
+     confidence facet is the one that REPLACES the row set rather than
+     adding to it: its release rows share no month with a poll because
+     they live beside none – a release is a gauge's own event, and every
+     column it doesn't borrow from the poll world is empty by design. */
   const dirOnly = facet === "direction" ? dirOnlyAll
     : facet === "issues" ? dirOnlyAll.filter((p) => p.iss) : [];
   const issOnly = facet === "issues" ? issOnlyAll : [];
-  const housesV = facet === "issues" ? housesIss : dirOnly.length ? housesDir : houses;
-  const rows = [...D.individualPolls, ...dirOnly, ...issOnly].map((p) => {
+  const confOnly = facet === "confidence" ? confOnlyAll : [];
+  const housesV = facet === "issues" ? housesIss : confOnly.length ? housesConf : dirOnly.length ? housesDir : houses;
+  const rows = (facet === "confidence" ? confOnly : [...D.individualPolls, ...dirOnly, ...issOnly]).map((p) => {
     const [y, mo] = p.ym.split("-").map(Number);
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
     const fieldLabel = p.fieldPending ? "TBC" : y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
@@ -5392,6 +5417,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       (p.iss.sal || []).concat(p.iss.conc || []).forEach(([lab, v]) => hayParts.push(lab, String(v)));
       const ib = issBestOf(p.iss);
       if (ib) hayParts.push(ib.who, String(ib.v));
+    }
+    if (p.conf) {
+      hayParts.push("confidence economic sentiment consumer business", p.conf.lab, String(p.conf.v));
+      if (p.conf.cond != null) hayParts.push("conditions", String(p.conf.cond));
     }
     hayParts.push(...tags);   // so "fav", "ppm" etc. match in the search box too
     const hay = hayParts.join(" ").toLowerCase();
@@ -5476,6 +5505,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       case "dir.net": return p.dir ? p.dir.net : -Infinity;
       case "iss.topv": { const t = issTopOf(p.iss); return t ? t[1] : -Infinity; }
       case "iss.bestv": { const b = issBestOf(p.iss); return b ? b.v : -Infinity; }
+      case "conf.lab": return (p.conf && p.conf.lab) || "";
+      case "conf.v": return p.conf ? p.conf.v : -Infinity;
+      case "conf.chg": return p.conf && p.conf.chg != null ? p.conf.chg : -Infinity;
+      case "conf.cond": return p.conf && p.conf.cond != null ? p.conf.cond : -Infinity;
       // dem.<party>: that party's gap across the split in view
       default: {
         if (!key.startsWith("dem.")) return 0;
@@ -5501,6 +5534,13 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   React.useEffect(() => { setLimit(PAGE); }, [ql, sel, lead, range, tagSel, scope, facet, sort.key, sort.dir, measure]);
   const openIdx = open ? sorted.findIndex((p) => p.pollster + "|" + p.released === open) : -1;
   const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
+
+  /* the confidence facet's print: the indices publish decimals, NAB's net
+     balance prints as integers - keep each house's own typography (the mood
+     panel's NICE does the same) */
+  const fmtConfFig = (v, signed) =>
+    (v < 0 ? "−" : signed && v > 0 ? "+" : "") +
+    (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
 
   const total = rows.length;
   /* the archive's full extent, direction-only and issues-only waves
@@ -5543,7 +5583,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      can never clobber each other. The guard against a no-op write matters:
      without it the URL was normalised every render, and this effect also
      runs for the reader who typed a stale or partial query by hand. */
-  const FACET_BY_ID = { primary: "p", leadership: "l", direction: "d", issues: "i", demographics: "g" };  // facet → URL letter (inverse of the restore map)
+  const FACET_BY_ID = { primary: "p", leadership: "l", direction: "d", issues: "i", confidence: "c", demographics: "g" };  // facet → URL letter (inverse of the restore map)
   const DEM_BY_ID = { gender: "g", education: "e", place: "p", home: "h" };   // split → URL letter; age is the omitted default
   const MEAS_BY_ID = { lnp: "c", onp: "o", lnponp: "lo", "3cp": "3" };    // matchup → URL letter; the page's default matchup is omitted
   const LEAD_BY_ID = { alp: "a", lnp: "l", onp: "o" };                    // holder → URL letter; "all" is the omitted default
@@ -5626,6 +5666,12 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     ["Top issue %", (p) => { const t = issTopOf(p.iss); return t ? t[1] : ""; }],
     ["Best on it", (p) => { const b = issBestOf(p.iss); return b ? (ISS_PARTY_META[b.who] || [b.who])[0] : ""; }],
     ["Best on it %", (p) => { const b = issBestOf(p.iss); return b ? b.v : ""; }],
+    // confidence releases: the gauge's index (or NAB's printed net balance),
+    // its printed change, and NAB's conditions reading riding its rows
+    ["Confidence series", (p) => (p.conf ? p.conf.lab : "")],
+    ["Confidence figure", (p) => (p.conf ? p.conf.v : "")],
+    ["Confidence change", (p) => (p.conf && p.conf.chg != null ? p.conf.chg : "")],
+    ["NAB conditions", (p) => (p.conf && p.conf.cond != null ? p.conf.cond : "")],
   ];
   const exportCsv = () => downloadCsv(
     `auspol-tracker-polls-${D.latest.updatedISO}.csv`,
@@ -5654,11 +5700,15 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     <div className="view view-allpolls">
       <div className="ap-head">
         <div>
-          <h2 className="card-title">All polls</h2>
+          <h2 className="card-title">{facet === "confidence" ? "Economic sentiment" : "All polls"}</h2>
           <p className="card-sub">
-            Every individual national poll in the archive, {total}{totalAll !== total ? " of " + totalAll : ""} polls from {housesAll.length} pollsters,
-            {" "}{(() => {  // span computed from the data, so it stays honest as polls are added
-              const f = D.individualPolls[0], l = D.individualPolls[D.individualPolls.length - 1];
+            {facet === "confidence"
+              ? <>Every release of the four confidence gauges this term – ANZ–Roy Morgan’s consumer weekly, Westpac–MI’s monthly, and Roy Morgan’s and NAB’s business reads: {total} releases,</>
+              : <>Every individual national poll in the archive, {total}{totalAll !== total ? " of " + totalAll : ""} polls from {housesAll.length} pollsters,</>}
+            {" "}{(() => {  // span computed from the data, so it stays honest as rows are added
+              const src = facet === "confidence" ? confOnlyAll : D.individualPolls;
+              const f = src[0], l = src[src.length - 1];
+              if (!f || !l) return null;
               const lab = (ym) => { const [y, m] = ym.split("-").map(Number); return D.monthNameFull(m) + " " + y; };
               /* the start is the first fieldwork's OPENING month (fym), not
                  the close-month the ym bucket is named for: the term's first
@@ -5862,7 +5912,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
               knowing what it is and how much of it the filters left. */}
           <caption className="sr-only">
             All polls, {(FACETS.find((f) => f.id === facet) || {}).label} columns –
-            {" "}{sorted.length} of {totalAll} polls
+            {" "}{sorted.length} of {facet === "confidence" ? confOnlyAll.length : totalAll}
+            {" "}{facet === "confidence" ? "releases" : "polls"}
           </caption>
           <thead>
             <tr>
@@ -5922,6 +5973,15 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                 <ArchSortTh label="Best on it" k="iss.bestv" sort={sort} onSort={onSort}
                   title="The party voters trust most on that issue, and its share" />
               </>)}
+              {/* confidence: three gauges print an index (100 = neutral), NAB
+                  a net balance (0 = neutral) - every figure is the house's own
+                  printed number, so no basis switch and no lean column. The
+                  gauge itself sits in the pollster cell's second line. */}
+              {facet === "confidence" && (<>
+                <ArchSortTh label="Figure" k="conf.v" sort={sort} onSort={onSort} />
+                <ArchSortTh label="Change" short="Chg" k="conf.chg" sort={sort} onSort={onSort} className="hide-md"
+                  title="Change on the series' previous release – NAB's rows add its trading-conditions reading" />
+              </>)}
             </tr>
           </thead>
           <tbody ref={bodyRef}>
@@ -5934,7 +5994,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
               const rowId = p.pollster + "|" + p.released;
               const arrived = !!focus && focus.key === rowId;
               const isOpen = open === rowId;
-              const colCount = facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "direction" ? 9 : facet === "issues" ? 8 : 9;
+              const colCount = facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "direction" ? 9 : facet === "issues" ? 8 : facet === "confidence" ? 7 : 9;
               return (
                 <React.Fragment key={rowId}>
                 <tr className={"poll-row arch-row" + (isOpen ? " open" : "") + (arrived ? " arrived" : "")}
@@ -6027,6 +6087,20 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                   <td className="ta-l"><ArchIssTop iss={p.iss} /></td>
                   <td className="num"><ArchIssBest iss={p.iss} /></td>
                   </>)}
+                  {facet === "confidence" && (<>
+                  <td className="num" style={{ fontWeight: 600 }}>
+                    {p.conf ? fmtConfFig(p.conf.v) : <span className="dash">—</span>}
+                  </td>
+                  {/* NAB's conditions reading (businesses only) rides the
+                      change column, paren-wrapped, on its own rows */}
+                  <td className="num muted hide-md">
+                    {p.conf && p.conf.chg != null
+                      ? <>{fmtConfFig(p.conf.chg, true)}
+                          {p.conf.cond != null && <span className="muted">{" (" + fmtConfFig(p.conf.cond) + " cond.)"}</span>}
+                        </>
+                      : "—"}
+                  </td>
+                  </>)}
                 </tr>
                 {isOpen && (
                   <tr className="detail-row">
@@ -6040,7 +6114,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
             })}
             {sorted.length === 0 && (
               <tr className="arch-empty">
-                <td colSpan={facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "issues" ? 8 : 9}>
+                <td colSpan={facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "issues" ? 8 : facet === "confidence" ? 7 : 9}>
                   No polls match these filters. <button className="ap-clear" onClick={clearAll}>Clear filters</button>
                 </td>
               </tr>
@@ -7233,7 +7307,7 @@ function infoTerms(D) {
         the election is tested within each pollster’s own polls, with the bar raised for testing
         several lines at once.</span></>) },
       entries: [] },
-    { id: "s-mood", title: "Economic mood", nav: "Mood",
+    { id: "s-mood", title: "Economic sentiment", nav: "Sentiment",
       lead: { id: "mood", body: (
         <>Four published confidence gauges of the same economy: the ANZ–Roy Morgan Consumer
         Confidence index, published weekly; the Westpac–Melbourne Institute Consumer Sentiment

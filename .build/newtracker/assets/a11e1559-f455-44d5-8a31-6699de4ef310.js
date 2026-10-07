@@ -1558,7 +1558,7 @@ function MoodPanel({ rangeId }) {
     <section className="card">
       <div className="card-head">
         <div>
-          <h2 className="card-title">The economic mood</h2>
+          <h2 className="card-title">Economic sentiment</h2>
           <p className="card-sub">Consumer and business confidence, 100 = neutral {"\u2013"} Roy Morgan{"\u2019"}s own series</p>
         </div>
       </div>

@@ -3924,7 +3924,7 @@ function RdMood({ rangeId }) {
   const copyLegend = lanes.map((l) => ({ label: l.lab + " (latest " + l.vfmt(l.lat.v) + ")", color: l.color, kind: l.dash ? "dashed" : "line" }));
   const fmt = (v, p) => (p && p.raw != null ? NICE(p.raw) : v.toFixed(1));
   return (
-    <RdSec id="mood" cls="rd-mood" title="Economic mood" meta={"Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")}>
+    <RdSec id="mood" cls="rd-mood" title="Economic sentiment" meta={"Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")}>
       <RdHed head={head} dek={dek} />
       <div className="card rd-card rd-mood-chart">
         <div className="rd-un-ptitle"><b>Consumer and business confidence</b><span>100 = neutral on each index; NAB’s net balance drawn 100 points up</span></div>
@@ -3982,7 +3982,7 @@ function RdMood({ rangeId }) {
         <>Three of the four are indices where 100 is neutral. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
         <>Reading the mood beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />
-      <RdFoot how={{ term: "mood", from: "Economic mood" }}>Four published gauges — ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB — joined as released. Context, not a predictor.</RdFoot>
+      <RdFoot how={{ term: "mood", from: "Economic sentiment" }}>Four published gauges — ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB — joined as released. Context, not a predictor.</RdFoot>
     </RdSec>
   );
 }

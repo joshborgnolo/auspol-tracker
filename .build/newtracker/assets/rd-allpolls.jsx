@@ -600,6 +600,119 @@ function RdApDirMini({ p }) {
   );
 }
 
+/* A confidence release's version of RdApDirMini: the gauge's own releases
+   over seven months with this one ringed, everything as printed - the
+   gauges are each publisher's own series (§5j), so there is no average
+   line to draw against. The neutral line is emphasised (100 on the index
+   gauges, 0 on NAB's net balance, which sits at its true printed figure
+   here, not the mood panel's +100 shift); every dot opens its own row. */
+function RdApConfMini({ p }) {
+  const D = window.AUSPOL;
+  const c = p.conf;
+  const box = React.useRef(null);
+  const W = useRdWidth(box, 470);
+  const H = 176;
+  const iM = D.MONTHS.indexOf(p.ym);
+  const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
+  const t0 = rdApDays(ms[0] + "-01");
+  const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
+  const t1 = Date.UTC(ly, lm, 1) - 864e5;
+  const ser = (((D.mood || {})[c.k]) || {}).polls || [];
+  const mine = ser.filter((q) => rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1);
+  if (!mine.length) return <div ref={box}></div>;
+  const fmt = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+  const outLabel = (q) => {
+    const d = new Date(rdApDays(q.released));
+    return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1);
+  };
+  const neut = c.vs;              // the gauge's neutral print (0 on NAB's net balance)
+  const vals = mine.map((q) => q.v).concat([neut]);
+  let lo = Math.floor(Math.min(...vals) / 4) * 4, hi = Math.ceil(Math.max(...vals) / 4) * 4;
+  if (hi - lo < 8) { const cMid = (lo + hi) / 2; lo = Math.floor((cMid - 4) / 4) * 4; hi = lo + 8; }
+  const step = rdApTickStep(lo, hi);
+  lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+  const x0 = 30, x1 = W - 16, top = 10, bot = H - 26;
+  const X = (tt) => x0 + ((tt - t0) / (t1 - t0)) * (x1 - x0);
+  const Y = (v) => bot - ((v - lo) / (hi - lo)) * (bot - top);
+  const ticks = [];
+  for (let v = lo; v <= hi + 1e-9; v += step) ticks.push(v);
+  const cx = X(rdApDays(p.released)), cy = Y(c.v);
+  const labLeft = cx > W * 0.45;
+  const [tip, setTip] = useState(null);
+  const tipBox = React.useRef(null);
+  const ptr = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = tipBox.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip]);
+  const dots = mine.filter((q) => q.released !== p.released).map((q) => {
+    const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({ pollster: p.pollster, released: q.released }) : null;
+    const dup = mine.some((z) => z !== q && z.released === q.released);
+    return { q, key: (!raw || dup) ? null : raw, id: q.released, cx: X(rdApDays(q.released)), a: q.v };
+  });
+  const show = (id, src) => setTip({ id, src });
+  const hide = (id, src) => setTip((tp) => (tp && tp.id === id && (!src || tp.src === src) ? null : tp));
+  const dotTip = tip && dots.find((d) => d.id === tip.id);
+  return (
+    <div ref={box} className="rd-apd-mini">
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img"
+           aria-label={`${c.lab} releases since ${D.monthName(+ms[0].slice(5, 7)) + " " + ms[0].slice(0, 4)}, as published; this release ${fmt(c.v)}${neut === 0 ? ", a net balance, 0 neutral" : ", 100 neutral"}.`}>
+        {ticks.map((v) => <path key={v} d={`M${x0} ${Y(v)}H${x1}`} className={v === neut ? "rd-apd-even" : "rd-apd-gl"}></path>)}
+        {ticks.map((v) => <text key={"t" + v} x={x0 - 6} y={Y(v) + 4} className="rd-apd-ax" textAnchor="end">{v === neut ? (neut === 0 ? "0 ±" : "100") : v}</text>)}
+        {dots.map((d) => {
+          const open = () => { if (d.key && window.AP.openPoll) { setTip(null); window.AP.openPoll(d.key, "confidence", "the release you were looking at"); } };
+          return (
+            <g key={d.id}>
+              {tip && tip.id === d.id && <circle cx={d.cx} cy={Y(d.a)} r="7.5" className="rd-apd-dothi"></circle>}
+              <circle cx={d.cx} cy={Y(d.a)} r="4" className="rd-apd-dot"></circle>
+              <circle cx={d.cx} cy={Y(d.a)} r="9" className={"rd-apd-hit" + (d.key ? " link" : "")}
+                      tabIndex="0" role={d.key ? "button" : "img"}
+                      aria-label={`${fmt(d.a)}, ${c.lab} released ${outLabel(d.q)}` + (d.key ? "; press Enter to open it" : "")}
+                      onPointerDown={(ev) => { ptr.current = ev.pointerType; }}
+                      onPointerEnter={(ev) => { if (ev.pointerType === "mouse") show(d.id, "mouse"); }}
+                      onPointerLeave={(ev) => { if (ev.pointerType === "mouse") hide(d.id, "mouse"); }}
+                      onFocus={(ev) => { if (ev.target.matches(":focus-visible")) show(d.id, "focus"); }}
+                      onBlur={() => hide(d.id, "focus")}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        const pt = ev.detail === 0 ? "key" : ptr.current;
+                        ptr.current = null;
+                        if (pt === "mouse" || pt === "key") { open(); return; }
+                        if (tip && tip.id === d.id) setTip(null); else setTip({ id: d.id, src: "touch" });
+                      }}
+                      onKeyDown={(ev) => {
+                        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+                        ev.preventDefault();
+                        open();
+                      }}></circle>
+            </g>
+          );
+        })}
+        <circle cx={cx} cy={cy} r="8" className="rd-apd-ring"></circle>
+        <circle cx={cx} cy={cy} r="4.5" className="rd-apd-this"></circle>
+        <text x={labLeft ? cx - 12 : cx + 12} y={cy - 12} className="rd-apd-thislab" textAnchor={labLeft ? "end" : "start"}>{"This release " + fmt(c.v)}</text>
+        <path d={`M${x0} ${bot}H${x1}`} className="rd-apd-base"></path>
+        {ms.map((ym, i) => (i % 2 === (ms.length - 1) % 2 ? (
+          <text key={ym} x={X(rdApDays(ym + "-01"))} y={bot + 18} className="rd-apd-ax" textAnchor="middle">{D.monthName(Number(ym.slice(5)))}</text>
+        ) : null))}
+      </svg>
+      {dotTip && (
+        <div ref={tipBox} className="tip rd-apd-tip" style={{ left: dotTip.cx + "px" }} aria-hidden="true">
+          <div className="tip-title">Released {outLabel(dotTip.q)}</div>
+          <div className="tip-sub">{c.lab} {fmt(dotTip.a)}{dotTip.q.chg != null ? ", " + (dotTip.q.chg < 0 ? "down " : "up ") + fmt(Math.abs(dotTip.q.chg)) + " on the previous release" : ""}</div>
+          {tip.src !== "touch" && (dotTip.key
+            ? <div className="tip-hint">{tip.src === "focus" ? "Press Enter to open this release" : "Click to open this release"}</div>
+            : null)}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* A leadership wave's version of the mini charts: the gap between Albanese's
    net rating and each rival's, this pollster's own waves against the monthly
    average gap. A gap is only read on the question both names were asked the
@@ -1181,6 +1294,25 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     </>;
   })();
 
+  /* on the confidence facet the rail tells the gauge's own story: what it
+     measures, the neutral figure as printed, and whether this release is
+     the one today's economic-sentiment panel heads with. The series is the
+     publisher's own (§5j), so there is no aggregate or lean to count toward
+     - and the generic twopp facts (the "no implied figure" line, the house
+     lean) would misread it, so isConf keeps them out below */
+  const isConf = facet === "confidence";
+  const conf = isConf ? p.conf || null : null;
+  const confSer = (conf && D.mood && D.mood[conf.k]) ? D.mood[conf.k] : null;
+  const confFmt = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+  const outLabel = (q) => { const d = new Date(rdApDays(q.released)); return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1); };
+  const confPeriod = !conf ? "month" : conf.k === "consumer" ? "week" : "month";
+  const CONF_BLURB = {
+    consumer: "Consumer confidence – who feels optimistic about their finances and the economy, read weekly by ANZ–Roy Morgan.",
+    westpacConsumer: "The Westpac–Melbourne Institute’s monthly gauge of household sentiment – the same territory as the weekly consumer index on a slower clock.",
+    business: "Business confidence – how firms rate trading conditions and the year ahead, read monthly by Roy Morgan.",
+    nabBusiness: "Business confidence as a net balance – optimistic firms minus pessimistic ones – from NAB’s monthly business survey.",
+  };
+
   /* on the issues facet the poll's every issue leads the opened poll, full
      width: where voters ranked it among the issues that matter most (where
      the poll asked), and the four parties' printed best-party shares with
@@ -1250,6 +1382,24 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
       {issTable}
       <div className="rd-apd-l poll-detail" data-pollster={p.pollster}>
         <span className="rd-apd-h">{rdPollHead(p)}</span>
+        {conf && (
+          <div className="rd-apd-grid rd-apd-grid1">
+            <span className="rd-apd-k">{conf.lab}</span>
+            <span className="rd-apd-cell">
+              <span><b>{confFmt(conf.v)}</b>{conf.chg != null && Math.abs(conf.chg) >= 0.05 ? ", " + (conf.chg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.chg)) + " on the " + confPeriod : ""}</span>
+              <span className="rd-apd-sub">{conf.vs === 0 ? "Net balance, optimistic minus pessimistic – 0 neutral" : "Index reading – 100 neutral"}</span>
+            </span>
+          </div>
+        )}
+        {conf && conf.cond != null && (
+          <div className="rd-apd-grid rd-apd-grid1">
+            <span className="rd-apd-k">Business conditions</span>
+            <span className="rd-apd-cell">
+              <span><b>{confFmt(conf.cond)}</b>{conf.condChg != null && Math.abs(conf.condChg) >= 0.05 ? ", " + (conf.condChg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.condChg)) + " on the month" : ""}</span>
+              <span className="rd-apd-sub">NAB prints conditions beside confidence</span>
+            </span>
+          </div>
+        )}
         {prim.length > 0 && (
           <div className="rd-apd-prim">
             {prim.map((k) => (
@@ -1363,8 +1513,8 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
         </div>
       </div>
       <div className="rd-apd-r">
-        <span className="rd-apd-h">How it counts</span>
-        {!isDir && !isIss && !isLd && !isDem && fig.a != null && (
+        <span className="rd-apd-h">{isConf ? "How it reads" : "How it counts"}</span>
+        {!isDir && !isIss && !isLd && !isDem && !isConf && fig.a != null && (
           <>
             <span className="rd-apd-ct">{p.pollster}’s polls since {D.monthNameFull(Number(from.slice(5)))} against the {RD_AP_AVG}, Labor v {onM ? "One Nation" : "Coalition"}{pub ? " as published" : ""}</span>
             <RdApMini p={p} onM={onM} pub={pub} />
@@ -1399,8 +1549,28 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
             </>
           );
         })()}
+        {isConf && conf && confSer && (
+          <>
+            <span className="rd-apd-ct">{p.pollster}’s {conf.lab} releases since {D.monthNameFull(Number(from.slice(5)))}, as published — no average; the gauge is the publisher’s own series</span>
+            <RdApConfMini p={p} />
+          </>
+        )}
         <div className="rd-apd-facts">
           {demFacts}
+          {isConf && conf && <>
+            <span className="rd-apd-k">The gauge</span>
+            <span>{CONF_BLURB[conf.k] || conf.lab + "."}</span>
+            <span className="rd-apd-k">Neutral</span>
+            <span>{conf.vs === 0
+              ? <>Printed as a net balance – optimists minus pessimists – so the neutral print is 0. It enters the mood panel’s 40–120 meter shifted up 100, beside the index gauges.</>
+              : <>An index print – 100 is neutral; above it optimists outnumber pessimists{confPeriod === "week" ? ", read weekly" : ""}.</>}</span>
+            <span className="rd-apd-k">In today’s panel</span>
+            <span>{confSer && confSer.latest && confSer.latest.released === p.released
+              ? <>This is the latest {conf.lab} release, so the economic-sentiment panel reads the gauge at it.</>
+              : confSer && confSer.latest
+                ? <>The panel’s current read of this gauge is the {outLabel(confSer.latest)} release at {confFmt(confSer.latest.v)}{confSer.latest.url ? <>, <a className="rd-link" href={confSer.latest.url} onClick={(e) => e.stopPropagation()}>its source<span className="rd-apd-ext" aria-hidden="true">↗</span></a></> : ""}.</>
+                : <>The gauge’s series carries no published releases to panel against.</>}</span>
+          </>}
           {isIss && iss && <>
             <span className="rd-apd-k">Asked</span>
             <span>{issPrompted
@@ -1487,7 +1657,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
             <span className="rd-apd-k">Leader ratings</span>
             <span>{p.pollster} didn’t ask {rdApPm(p.appr)} and {p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader"} on the same question in this poll, so there’s no net-approval gap to set against the leadership figures.</span>
           </>}
-          {!isDir && !isIss && !isLd && !isDem && <>
+          {!isDir && !isIss && !isLd && !isDem && !isConf && <>
           {p.noAgg && <>
             <span className="rd-apd-k">In the aggregates</span>
             <span>Because SMS polls have a strong selection bias, they do not count towards any aggregates.</span>
@@ -1539,7 +1709,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
    sheet from the bottom of the screen, with the count of what's left on its
    button. */
 function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range, setRange,
-                     shownTags, tagSel, toggleTag, tagN, count, clearAll }) {
+                     shownTags, tagSel, toggleTag, tagN, count, clearAll, noun1, noun }) {
   const [allHouses, setAllHouses] = useState(false);
   React.useEffect(() => {
     const esc = (e) => { if (e.key === "Escape") onClose(); };
@@ -1572,7 +1742,7 @@ function RdApSheet({ onClose, houses, houseRank, houseN, sel, toggleHouse, range
             {shownTags.map((t) => <PopRow key={t.id} on={tagSel.has(t.id)} label={rdApTagLab(t.id)} n={tagN[t.id] || 0} onClick={() => toggleTag(t.id)} />)}
           </div>
         </div>
-        <button type="button" className="rd-ap-sheetgo" onClick={onClose}>Show {count} poll{count === 1 ? "" : "s"}</button>
+        <button type="button" className="rd-ap-sheetgo" onClick={onClose}>Show {count} {count === 1 ? noun1 : noun}</button>
       </div>
     </div>
   );
@@ -1591,6 +1761,10 @@ function RdAllPolls(P) {
      ("163 of 173 polls") instead of implying the facet's rows are everything */
   const ofT = ofTotal != null && ofTotal !== total ? ofTotal : null;
   const ofTxt = ofT ? " of " + ofT : "";
+  /* releases, not polls: the confidence facet's rows never count toward
+     a poll total, so its count lines say what they number */
+  const noun1 = facet === "confidence" ? "release" : "poll";
+  const noun = noun1 + "s";
   const phone = useNarrow("(max-width: 760px)");
   /* The tab row only holds the two-party control (and the demographics
      facet's split picker) while the tabs and the control fit between the
@@ -1713,8 +1887,11 @@ function RdAllPolls(P) {
   const FACETS = [{ id: "twopp", label: "2PP" }, { id: "primary", label: "Primary" },
                   { id: "leadership", label: phone ? "Leaders" : "Leadership" }, { id: "direction", label: "Direction" },
                   { id: "issues", label: "Issues" }, { id: "demographics", label: phone ? "Groups" : "Demographics" }]
+    /* the confidence facet exists only where the mood file's releases do –
+       never on /vic/ (the JUR build ships no confidenceOnlyPolls at all) */
+    .concat((D.confidenceOnlyPolls || []).length ? [{ id: "confidence", label: "Confidence" }] : [])
     /* /vic/'s polls carry no direction, issues or group figures */
-    .filter((f) => !window.JUR || !["direction", "issues", "demographics"].includes(f.id));
+    .filter((f) => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f.id));
   const rowNav = (e, p) => {
     if (e.target !== e.currentTarget) return;
     const id = rowKey(p);
@@ -1800,7 +1977,7 @@ function RdAllPolls(P) {
      table inside the press, tripling what it cost. */
   const facetWas = useRef(facet), facetSwaps = useRef(0);
   if (facetWas.current !== facet) { facetWas.current = facet; facetSwaps.current += 1; }
-  const cls = { twopp: "rd-ap-c2pp", primary: "rd-ap-cprim", leadership: "rd-ap-clead", direction: "rd-ap-cdir", issues: "rd-ap-ciss", demographics: "rd-ap-cdem" }[facet]
+  const cls = { twopp: "rd-ap-c2pp", primary: "rd-ap-cprim", leadership: "rd-ap-clead", direction: "rd-ap-cdir", issues: "rd-ap-ciss", demographics: "rd-ap-cdem", confidence: "rd-ap-cconf" }[facet]
     + (facetSwaps.current ? " rd-ap-sw" : "");
   const th = (label, k, o) => {
     const on = sort.key === k;
@@ -1861,6 +2038,33 @@ function RdAllPolls(P) {
       </span>
     );
   };
+  /* the confidence facet's meter: the four gauges' own printed figures on
+     ONE fixed 40–120 scale - fixed so no release's dot moves under the
+     reader as the filters change. The indices print 100-neutral; NAB's net
+     balance prints 0-neutral and its dot is drawn +100 just as the mood
+     chart draws its line up, while the figure shown stays NAB's own. */
+  const CF_LO = 40, CF_HI = 120;
+  const cfx = (v) => ((Math.max(CF_LO, Math.min(CF_HI, v)) - CF_LO) / (CF_HI - CF_LO)) * 100;
+  const confPlot = (c) => c.v + (c.vs === 0 ? 100 : 0);
+  /* the mood panel's inks: one colour per subject, the second gauge of a
+     subject its dashed twin - the table can't dash one dot, so the twin
+     shares its subject's ink and its house is named in the row */
+  const confInk = (c) => (c.k === "consumer" || c.k === "westpacConsumer" ? "var(--mood-consumer)" : "var(--mood-business)");
+  /* each house's own print: the indices carry decimals, NAB's net balance
+     whole numbers (the mood panel's NICE does the same) */
+  const confFig = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+  const confChg = (v) => (v < 0 ? "−" : v > 0 ? "+" : "") + confFig(Math.abs(v));
+  const CONF_TKS = [40, 60, 80, 100, 120];
+  const confScale = (short) => (
+    <>
+      <span className="rd-ap-cap">100 = neutral; NAB’s net balance drawn 100 points up</span>
+      <span className="rd-ap-in">
+        {(short ? CONF_TKS.filter((v) => v === 40 || v === 100 || v === 120) : CONF_TKS).map((v) => (
+          <span key={v} className={"rd-ap-tk" + (v === 100 ? " mid" : "")} style={{ left: cfx(v) + "%" }}>{v === 100 ? "Neutral" : v}</span>
+        ))}
+      </span>
+    </>
+  );
 
   const colHead = (
     <div className={"rd-ap-hrow " + cls} role="row">
@@ -1914,6 +2118,14 @@ function RdAllPolls(P) {
       {facet === "demographics" && <>
         <span className="rd-ap-pnums rd-ap-hpn">{prims.map((k) => <React.Fragment key={k.id}>{th(k.lab, "dem." + k.id, { color: k.ink, title: "Sort by " + DEM_PNAME[k.id] + "’s gap between the two groups" })}</React.Fragment>)}</span>
         <span role="columnheader" aria-label={"Each party’s gap between the two groups, from stronger with " + spl.lo.toLowerCase() + " to stronger with " + spl.hi.toLowerCase() + " voters"} className="rd-ap-hpic">{demScale(demMid)}</span>
+        <span></span>
+      </>}
+      {/* the demographics breakpoint stands in for this head too: under
+          ~1150px the strip keeps only the ends and the neutral mark */}
+      {facet === "confidence" && <>
+        {th("Figure", "conf.v", { title: "Sort by the gauge’s printed figure (the mood chart’s dot)" })}
+        <span role="columnheader" aria-label="Each gauge’s figure on a fixed 40–120 scale, 100 neutral – NAB’s net balance drawn 100 points up, its figure printed as NAB’s own" className="rd-ap-hpic">{confScale(demMid)}</span>
+        {th("Change", "conf.chg", { right: true, title: "Change on the gauge’s own previous release – NAB’s rows also carry its trading-conditions reading" })}
         <span></span>
       </>}
       <span></span>
@@ -2153,6 +2365,44 @@ function RdAllPolls(P) {
         <div className="rd-ap-cprim">{prims.map((k) => <span key={k.id}><em>{k.lab}</em><b style={{ color: k.ink }}>{pr ? gapTxt(pr.gap[k.id]) : "—"}</b></span>)}</div>
         <div className="rd-ap-cpic">{pic}</div>
       </>;
+    } else if (facet === "confidence") {
+      /* one release of one gauge: the figure as the house printed it (NAB
+         keeps its own net-balance number), drawn on the shared 40–120
+         meter; NAB's trading-conditions read rides under its figure */
+      const c = p.conf;
+      figs = (
+        <span role="cell" className="rd-ap-fig">
+          <b>{confFig(c.v)}</b>
+          {c.cond != null && <span className="rd-ap-sub">conditions {confFig(c.cond)}</span>}
+        </span>
+      );
+      pic = (
+        <span className="rd-ap-pic" role="img"
+              aria-label={p.client + ", " + confFig(c.v)
+                + (c.chg != null ? ", " + confChg(c.chg) + " on the gauge’s previous release" : "")
+                + (c.vs === 0 ? " – a net balance (0 = neutral), drawn 100 points up" : ", 100 = neutral")}>
+          <span className="rd-ap-in">
+            {[60, 80, 120].map((v) => <i key={v} className="rd-ap-gl" style={{ left: cfx(v) + "%" }}></i>)}
+            <i className="rd-ap-avg" style={{ left: cfx(100) + "%" }}></i>
+            <i className="rd-ap-dot" style={{ left: cfx(confPlot(c)) + "%", background: confInk(c) }}></i>
+          </span>
+        </span>
+      );
+      const chgInk = c.chg == null || Math.abs(c.chg) < 0.05 ? null : c.chg > 0 ? "var(--mood-pos)" : "var(--mood-neg)";
+      val = (
+        <span role="cell" className="rd-ap-val" style={chgInk ? { color: chgInk } : null}>
+          {c.chg != null ? confChg(c.chg) : "—"}
+        </span>
+      );
+      right1 = <b>{confFig(c.v)}</b>;
+      right2 = c.chg != null ? <span className="rd-ap-sub" style={chgInk ? { color: chgInk } : null}>{confChg(c.chg)} on last</span> : null;
+      body = <>
+        <div className="rd-ap-cpic">{pic}</div>
+        <div className="rd-ap-csub">
+          {c.chg != null ? <>Change <b style={chgInk ? { color: chgInk } : null}>{confChg(c.chg)}</b> on last release</> : "The gauge’s first release this term"}
+          {c.cond != null && <>; conditions {confFig(c.cond)}</>}
+        </div>
+      </>;
     }
     const detail = isOpen && (
       <div className="rd-ap-open" role="row">
@@ -2180,9 +2430,9 @@ function RdAllPolls(P) {
       <React.Fragment key={id}>
         <div className={"rd-ap-row " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle} tabIndex={0} onKeyDown={(e) => rowNav(e, p)}>
           {pollsterCell(p)}{fieldCell(p)}{sampleCell(p)}<span></span>
-          {figs}{pic}{val}{facet === "twopp" && <>{hlCell}<span></span></>}
+          {figs}{pic}{val}{facet === "twopp" && <>{hlCell}<span></span></>}{facet === "confidence" && <span></span>}
           <button type="button" className={"rd-ap-chev" + (isOpen ? " open" : "")} aria-expanded={isOpen}
-                  aria-label={(isOpen ? "Hide" : "Show") + " the full poll: " + p.pollster + ", " + (p.fieldPending ? "fieldwork TBC" : p.field)}
+                  aria-label={(isOpen ? "Hide" : "Show") + " the full " + (facet === "confidence" ? "release" : "poll") + ": " + p.pollster + ", " + (p.fieldPending ? "fieldwork TBC" : p.field)}
                   onClick={(e) => { e.stopPropagation(); toggle(); }}><svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true"><path d="M3 1.5L7.5 5 3 8.5z"></path></svg></button>
         </div>
         {detail}
@@ -2220,6 +2470,15 @@ function RdAllPolls(P) {
         </div>
       );
     }
+    /* releases, not polls: the confidence facet's rows never count toward
+       a poll total, so its month rows say what they number */
+    if (facet === "confidence") {
+      return (
+        <div className={"rd-ap-mrow " + cls} role="row" key={"m" + g.ym}>
+          <span className="rd-ap-mlab" role="rowheader"><b>{lab}</b><span>{n + " release" + (n === 1 ? "" : "s")}</span></span>
+        </div>
+      );
+    }
     return (
       <div className={"rd-ap-mrow " + cls} role="row" key={"m" + g.ym}>
         <span className="rd-ap-mlab" role="rowheader"><b>{lab}</b><span>{count}</span></span>
@@ -2235,6 +2494,7 @@ function RdAllPolls(P) {
       {facet === "direction" && <span className="rd-ap-hpic rd-ap-hdir"><span className="rd-ap-cap"><span style={{ color: "var(--mood-pos)" }}>Right direction</span>, unsure, <span style={{ color: "var(--mood-neg)" }}>wrong track</span>, %</span></span>}
       {facet === "issues" && <span className="rd-ap-hpic rd-ap-imaph">{IMAP.map((id) => <span key={id}>{issHyph(id)}</span>)}</span>}
       {facet === "demographics" && <span className="rd-ap-hpic">{demScale(true)}</span>}
+      {facet === "confidence" && <span className="rd-ap-hpic">{confScale(true)}</span>}
     </div>
   );
   /* the pinned bar's section links are the short names at every width - the
@@ -2422,7 +2682,7 @@ function RdAllPolls(P) {
         <button type="button" className="rd-ap-pins" aria-label="Search the polls" tabIndex={pinned ? 0 : -1} onClick={toSearch}>
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
         </button>
-        <span className="rd-ap-pinn"><b>{sorted.length}</b>{sorted.length !== total ? " of " + (ofT || total) : ofTxt} polls</span>
+        <span className="rd-ap-pinn"><b>{sorted.length}</b>{sorted.length !== total ? " of " + (ofT || total) : ofTxt} {noun}</span>
       </>}
     </div>
   );
@@ -2442,8 +2702,10 @@ function RdAllPolls(P) {
   return (
     <section className="rd-sec rd-first rd-ap" id="rd-ap-top" aria-labelledby="rd-ap-t" data-facet={facet}>
       <div className="rd-eyebrow">
-        <h2 className="rd-title" id="rd-ap-t">All polls</h2>
-        <span className="rd-meta">{"Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"}</span>
+        <h2 className="rd-title" id="rd-ap-t">{facet === "confidence" ? "Economic sentiment" : "All polls"}</h2>
+        <span className="rd-meta">{facet === "confidence"
+          ? "Every release of the four confidence gauges this term – ANZ–Roy Morgan’s consumer weekly, Westpac–MI’s monthly, and Roy Morgan’s and NAB’s business reads"
+          : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"}</span>
         {!phone && (
           <nav className="rd-eyebrow-tools rd-ap-nav" aria-label="On this page">
             <button type="button" onClick={() => jump("poll-disagreement")}>How much the polls disagree</button>
@@ -2494,8 +2756,8 @@ function RdAllPolls(P) {
           </FilterPop>
         </span>
         <span className="rd-grow"></span>
-        <span className="rd-ap-count"><b>{sorted.length}</b>{sorted.length !== total ? " of " + (ofT || total) : ofTxt} polls</span>
-        <button type="button" className={phone ? "rd-link rd-ap-csv" : "rd-chip rd-ap-csv"} onClick={exportCsv} aria-label={"Download these " + sorted.length + " polls as a CSV file"}>
+        <span className="rd-ap-count"><b>{sorted.length}</b>{sorted.length !== total ? " of " + (ofT || total) : ofTxt} {noun}</span>
+        <button type="button" className={phone ? "rd-link rd-ap-csv" : "rd-chip rd-ap-csv"} onClick={exportCsv} aria-label={"Download these " + sorted.length + " " + noun + " as a CSV file"}>
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
           Download CSV
         </button>
@@ -2508,14 +2770,14 @@ function RdAllPolls(P) {
         </div>
       )}
 
-      <div className="rd-ap-table" role="table" aria-label={"Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election, " + (byDate ? "newest first" : "sorted") + (sorted.length !== total ? ", " + sorted.length + " of " + (ofT || total) : ofT ? ", " + sorted.length + ofTxt : "")} ref={bodyRef}>
+      <div className="rd-ap-table" role="table" aria-label={"Every " + RD_AP_POLLS + " " + noun1 + " since the " + rdElecYear + " election, " + (byDate ? "newest first" : "sorted") + (sorted.length !== total ? ", " + sorted.length + " of " + (ofT || total) : ofT ? ", " + sorted.length + ofTxt : "")} ref={bodyRef}>
         <span ref={sentRef} className="rd-ap-sent" aria-hidden="true"></span>
         <div ref={headRef} className={"rd-ap-headwrap" + (pinned ? " pinned" : "")}>
           {pinBar}
           {phone ? phoneHead : colHead}
         </div>
         {byDate ? groups.map((g) => <React.Fragment key={g.ym}>{monthRow(g)}{g.list.map(rowFor)}</React.Fragment>) : flat.map(rowFor)}
-        {sorted.length === 0 && <div className="rd-ap-empty">No polls match these filters. <button type="button" className="rd-link" onClick={clearAll}>Clear filters</button></div>}
+        {sorted.length === 0 && <div className="rd-ap-empty">No {noun} match these filters. <button type="button" className="rd-link" onClick={clearAll}>Clear filters</button></div>}
       </div>
       {more && (
         <div className="rd-ap-more">
@@ -2523,7 +2785,7 @@ function RdAllPolls(P) {
             : <button type="button" className="rd-chip" onClick={() => setFlatLimit((n) => n + 40)}>Show {Math.min(40, sorted.length - nShown)} more</button>}
           <button type="button" className="rd-link" onClick={() => setShowAll(true)}>Show all {sorted.length}</button>
           <span className="rd-grow"></span>
-          <span className="rd-ap-shown">{nShown} of {sorted.length}{phone ? "" : " polls shown"}</span>
+          <span className="rd-ap-shown">{nShown} of {sorted.length}{phone ? "" : " " + noun + " shown"}</span>
         </div>
       )}
       {facet === "twopp" && (
@@ -2574,7 +2836,8 @@ function RdAllPolls(P) {
       {sheet && phone && (
         <RdApSheet onClose={() => setSheet(false)} houses={houses} houseRank={houseRank} houseN={houseN} sel={sel}
                    toggleHouse={toggleHouse} range={range} setRange={setRange} shownTags={shownTags}
-                   tagSel={tagSel} toggleTag={toggleTag} tagN={tagN} count={sorted.length} clearAll={clearAll} />
+                   tagSel={tagSel} toggleTag={toggleTag} tagN={tagN} count={sorted.length} clearAll={clearAll}
+                   noun1={noun1} noun={noun} />
       )}
     </section>
   );
