@@ -80181,6 +80181,7 @@ function AllPollsView({
     },
     oth: {
       label: "OTH",
+      k: "p.oth",
       cls: " muted hide-md"
     }
   };
@@ -80499,6 +80500,8 @@ function AllPollsView({
         return p.p.grn;
       case "p.onp":
         return p.p.onp;
+      case "p.oth":
+        return p.p.oth;
       case "appr.albNet":
         return p.appr.albNet != null ? p.appr.albNet : -Infinity;
       case "appr.taylorNet":
@@ -98683,13 +98686,7 @@ function RdAllPolls(P) {
     title: "The pollster\u2019s lean against the other pollsters as of this poll \u2013 what the average takes out of it, and the tick on the strip. The House-lean panel below traces it month by month"
   }, "House lean"), React.createElement("span", null)), facet === "primary" && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-ap-pnums rd-ap-hpn"
-  }, prims.map(k => k.id === "oth" ? React.createElement("span", {
-    key: k.id,
-    className: "rd-ap-th",
-    style: {
-      color: k.ink
-    }
-  }, k.lab) : React.createElement(React.Fragment, {
+  }, prims.map(k => React.createElement(React.Fragment, {
     key: k.id
   }, th(k.lab, "p." + k.id, {
     color: k.ink

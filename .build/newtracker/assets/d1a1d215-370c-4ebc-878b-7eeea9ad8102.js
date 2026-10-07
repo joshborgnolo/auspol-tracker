@@ -5104,7 +5104,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     // row detail still carries the figure one tap away
     grn: { label: "GRN", k: "p.grn", cls: " hide-sm", style: { color: "var(--grn-text)" } },
     onp: { label: "ON", k: "p.onp", style: { color: "var(--onp-text)" } },
-    oth: { label: "OTH", cls: " muted hide-md" },   // the residual stays non-sortable
+    oth: { label: "OTH", k: "p.oth", cls: " muted hide-md" },
   };
   /* The filtered table is a page in its own right, so its filters ride in
      the URL: every non-default selection sits in the query string beside
@@ -5465,6 +5465,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       case "p.lnp": return p.p.lnp;
       case "p.grn": return p.p.grn;
       case "p.onp": return p.p.onp;
+      case "p.oth": return p.p.oth;
       case "appr.albNet": return p.appr.albNet != null ? p.appr.albNet : -Infinity;
       case "appr.taylorNet": return p.appr.taylorNet != null ? p.appr.taylorNet : -Infinity;
       case "appr.hansonNet": return p.appr.hansonNet != null ? p.appr.hansonNet : -Infinity;

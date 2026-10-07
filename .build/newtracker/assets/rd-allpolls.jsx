@@ -1881,9 +1881,7 @@ function RdAllPolls(P) {
         <span></span>
       </>}
       {facet === "primary" && <>
-        <span className="rd-ap-pnums rd-ap-hpn">{prims.map((k) => (k.id === "oth"
-          ? <span key={k.id} className="rd-ap-th" style={{ color: k.ink }}>{k.lab}</span>
-          : <React.Fragment key={k.id}>{th(k.lab, "p." + k.id, { color: k.ink })}</React.Fragment>))}</span>
+        <span className="rd-ap-pnums rd-ap-hpn">{prims.map((k) => <React.Fragment key={k.id}>{th(k.lab, "p." + k.id, { color: k.ink })}</React.Fragment>)}</span>
         <span className="rd-ap-hpic" aria-hidden="true">
           <span className="rd-ap-cap">Primary vote</span>
           <span className="rd-ap-in">{[0, 10, 20, 30, 40].map((v) => <span key={v} className="rd-ap-tk" style={{ left: pdx(v) + "%" }}>{v}{v === 40 ? "%" : ""}</span>)}</span>
