@@ -3231,7 +3231,8 @@
     "chg": 0.6,
     "url": "https://www.roymorgan.com/findings/9994-roy-morgan-business-confidence-july-2025",
     "slug": "9994-roy-morgan-business-confidence-july-2025",
-    "fwm": "2025-07"
+    "fwm": "2025-07",
+    "n": 1246
    },
    {
     "date": "2025-09-09",
@@ -3257,7 +3258,8 @@
     "chg": null,
     "url": "https://www.roymorgan.com/findings/10064-roy-morgan-business-confidence-october-2025",
     "slug": "10064-roy-morgan-business-confidence-october-2025",
-    "fwm": "2025-10"
+    "fwm": "2025-10",
+    "n": 1411
    },
    {
     "date": "2025-12-08",
@@ -3328,7 +3330,8 @@
     "chg": 1.4,
     "url": "https://www.roymorgan.com/findings/10276-roy-morgan-business-confidence-june-2026",
     "slug": "10276-roy-morgan-business-confidence-june-2026",
-    "fwm": "2026-06"
+    "fwm": "2026-06",
+    "n": 1109
    },
    {
     "date": "2026-08-04",

@@ -230,15 +230,33 @@ console.log("1b. westpac+NAB grammar: OK");
   assert.equal(g2.n, 1476, "looser 2022 phrasing still files the n");
   assert.deepEqual(g2.win, { d1: 17, m1: 9, d2: 23, m2: 9 }, "the 2022 '(17–23 Oct)' cell");
 }
-// the business post: dated source-line n beats the lagging block quote
+// the business post: the dated pair line files the survey month's n; the
+// trailing block quote is boilerplate that CAN survive a release unedited
+// (live posts 10064/10276 quote the previous wave's n) — it vetoes only
+// when its month word verifiably names the survey month
 {
   const post = [
     "Source: Roy Morgan Business Single Source, August 2025, n=1,189, August 2026, n=1,094.",
     "The latest Roy Morgan Business Confidence results for July are based on 1,094 detailed interviews with a cross-section of Australian businesses.",
   ].join(" ");
-  assert.deepEqual(parseRmBusinessPost(post, { mon: 7, yr: 2026 }), { n: 1094 }, "the stale 'for July' month word never costs the n");
-  const clash = post.replace("1,094 detailed interviews", "1,200 detailed interviews");
-  assert.deepEqual(parseRmBusinessPost(clash, { mon: 7, yr: 2026 }), { n: null }, "a quote/line disagreement files nothing");
+  assert.deepEqual(parseRmBusinessPost(post, { mon: 7, yr: 2026 }, 1097), { n: 1094 }, "the stale 'for July' month word never costs the n");
+  const clash = post.replace("results for July", "results for August").replace("1,094 detailed interviews", "1,200 detailed interviews");
+  assert.deepEqual(parseRmBusinessPost(clash, { mon: 7, yr: 2026 }, 1097), { n: null }, "a quote naming the survey month and disagreeing files nothing");
+  const staleClash = post.replace("1,094 detailed interviews", "1,198 detailed interviews");
+  assert.deepEqual(parseRmBusinessPost(staleClash, { mon: 7, yr: 2026 }, 1097), { n: 1094 }, "a quote about ANOTHER month is stale boilerplate, not a veto (live 10064/10276)");
+  // live post 9994 (Jul-2025 wave): the pair line mislabels the survey
+  // month ("June 2025, n=1,246" — June's own post printed 1,215); the
+  // two-month sum ends at the survey month, so 2,461 − 1,215 (the
+  // previous committed wave) recovers 1,246, printed verbatim twice on
+  // the post (the mislabeled pair and the block quote)
+  const mis = [
+    "Source: Roy Morgan Business Single Source, July 2024, n=1,501, June 2025, n=1,246.",
+    "Source: Roy Morgan Business Single Source, June & July 2025, n=2,461.",
+    "…results for May are based on 1,246 detailed interviews…",
+  ].join(" ");
+  assert.deepEqual(parseRmBusinessPost(mis, { mon: 6, yr: 2025 }, 1215), { n: 1246 }, "the mislabeled pair recovers off the two-month sum (live post 9994)");
+  assert.deepEqual(parseRmBusinessPost(mis, { mon: 6, yr: 2025 }, null), { n: null }, "no previous committed wave, no recovery");
+  assert.deepEqual(parseRmBusinessPost(mis.replaceAll("1,246", "1,300"), { mon: 6, yr: 2025 }, 1215), { n: null }, "a derived figure printed nowhere verbatim never files");
 }
 // the westpac bulletin print (a genuine 4-day window); the 2025-era
 // bulletins wrap mid-phrase ("conducted in the\nweek from …")
@@ -640,13 +658,14 @@ for (const k of ["consumer", "business", "westpacConsumer", "nabBusiness"]) {
 // own steady-state enrichment run (≤40d gate) passes, so rows younger than the
 // enrich horizon are exempt here — the facet's em-dash for them is transient,
 // and the steady-state "no candidates older than horizon remain" pin above is
-// what chases them. Older than the horizon every row must carry its figures;
-// the three business dates below are genuinely bare releases (no dated n in
-// print), so the facet honestly shows an em-dash for them and only them.
+// what chases them. Older than the horizon every row must carry its figures.
+// (The 2025-08-04/2025-11-11/2026-07-07 business waves once sat here as
+// "genuinely bare"; posts 9994/10064/10276 do print the n — 9994's pair
+// line mislabels the survey month and is recovered off the two-month sum,
+// the other two died to a stale blockquote veto. See the 1c grammar pins.)
 const TERM = "2025-05-03";
 const ENRICH_HORIZON = new Date(Date.now() - 40 * 864e5).toISOString().slice(0, 10);
 const inTerm = (r) => r.date >= TERM && r.date < ENRICH_HORIZON;
-const BARE_BUSINESS_N = new Set(["2025-08-04", "2025-11-11", "2026-07-07"]);
 for (const r of live.consumer.rows) if (inTerm(r)) {
   assert.ok(r.n != null, `consumer ${r.date} term row has n`);
   assert.ok(r.fwStart != null, `consumer ${r.date} term row has fieldwork`);
@@ -661,7 +680,7 @@ for (const r of live.nabBusiness.rows) if (inTerm(r)) {
 }
 for (const r of live.business.rows) if (inTerm(r)) {
   assert.ok(r.fwm != null, `business ${r.date} term row has survey month`);
-  assert.ok(r.n != null || BARE_BUSINESS_N.has(r.date), `business ${r.date} term row has n (or is a known bare release)`);
+  assert.ok(r.n != null, `business ${r.date} term row has n`);
 }
 for (const k of ["westpacConsumer", "nabBusiness"]) {
   const dates = live[k].rows.map((r) => r.date);

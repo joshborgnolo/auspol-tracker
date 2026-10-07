@@ -63,16 +63,26 @@ test-mood.mjs; any checker failure files NOTHING for that row):
   on N interviews"; window from the "Last week" cell; year resolved
   within 35 d behind / 5 d ahead of release.
 - **RM Business**: dated `Single Source, Mon YYYY, n=N` pairs.
-  f9c2b9b grader: parseRmBusinessPost collects pairs PER LINE, trusts
-  only lines with 2+ dated pairs, and needs ONE agreed value for the
-  survey month across them. The traps it rejects live on the real post:
+  parseRmBusinessPost(txt, survey, prevN) collects pairs PER LINE,
+  trusts only lines with 2+ dated pairs, and needs ONE agreed value for
+  the survey month across them. The traps it rejects live on real posts:
   a first-match read parks on the long-run trend line ("Dec 2010–Aug
   2026. Average monthly sample … = 1,159" — a 12-month AVERAGE, not a
-  wave's n; filed nothing), and a naive any-line read takes the trailing
-  quarter's lone pair ("June – August 2026, n=3,300" — a 3-month sum).
-  Disagreement (like the cross-check against the trailing interviews
-  sentence, whose month word may lag) files nothing. The live three-line
-  shape is the 10336 fixture; the 2026-09-08 wave files n=1094.
+  wave's n), and a naive any-line read takes the trailing sum line's
+  lone pair-shaped match ("June – August 2026, n=3,300" — a multi-month
+  sum named by its END month). Two 2026-10-08 repair forms (pinned in
+  test-mood.mjs's 1c block): (1) the trailing blockquote ("…results for
+  <month> are based on N…") is BOILERPLATE that survives a release
+  unedited — live posts 10064/10276 quote the previous wave's n under a
+  month-stale word — so it vetoes a pair figure only when its month word
+  verifiably names the survey month, and never costs a pair figure
+  otherwise; (2) a mislabeled second pair (live 9994: "June 2025" where
+  July 2025 should be, so the survey month never appears in the pairs)
+  recovers from the two-month sum ending at the survey month minus the
+  PREVIOUS committed wave's n, filed only when the derived figure is
+  also printed verbatim elsewhere on the post — arithmetic alone never
+  files. The live canonical shape is the 10336 fixture; the 2026-09-08
+  wave files n=1094.
 - **Westpac bulletins**: "latest survey is based on N adults" (400–4000)
   + "week from d Mon to d Mon".
 - **NAB PDFs** (`pdftotext -layout`): footer "Survey conducted from

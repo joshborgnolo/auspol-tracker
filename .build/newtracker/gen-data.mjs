@@ -2470,7 +2470,10 @@ const confidenceOnlyPolls = (() => {
         pollster: by, field, dateLabel: field, released: r.date,
         sample: r.n ?? sample,
         ...(r.fwStart ? { fmid: fmidIso(r.fwStart, r.fwEnd || r.date) } : {}),
-        year: +r.date.slice(0, 4),
+        // the field cell prints the survey month (business lane) — the
+        // printed year must be that month's own year, or a January
+        // release covering December renders "Dec '26"
+        year: r.fwm && !r.fwStart ? +r.fwm.slice(0, 4) : +r.date.slice(0, 4),
         ...(r.url ? { url: r.url } : {}),
         client: product,
         p: {}, appr: {}, chg: null,

@@ -306,10 +306,16 @@ async function pdfText(url, dir = NAB_DIR, plain = false) {
                   "Source: Roy Morgan Business Single Source, August 2025,
                   n=1,189, August 2026, n=1,094." dates each wave's n; the
                   survey month IS the window (fwm) — Roy Morgan prints no
-                  day window. The post's trailing "…results for July are
-                  based on 1,094 detailed interviews" has always matched
-                  the line's figure but its MONTH WORD can lag a release —
-                  it stays a cross-checker, never a source.
+                  day window. The post's trailing "…results for … based on
+                  N detailed interviews" is boilerplate that survives a
+                  release unedited (posts 10064/10276 quote the PREVIOUS
+                  wave's n under a one-month-stale month word) — it can
+                  veto only when it verifiably names the survey month,
+                  else it's a corroborant, never a source. A pair line
+                  whose survey month is mislabeled (post 9994) is
+                  recovered from the two-month sum minus the previous
+                  wave's committed n, verbatim-printed on the post or
+                  not at all.
    westpacConsumer — the bulletin PDF linked from the IQ article: "This
                   latest survey is based on 1200 adults … It was conducted
                   in the week from 28 September to 1 October." (a genuine
@@ -377,28 +383,57 @@ function surveyMonthOf(row) {
 // A business findings post carries SEVERAL dated "…Single Source, …"
 // lines — the long-run trend line ("Dec 2010-Aug 2026. Average monthly
 // sample … = 1,159."), the per-month pairs ("August 2025, n=1,189,
-// August 2026, n=1,094.") and a trailing-quarter line ("June – August
+// August 2026, n=1,094.") and a trailing-sum line ("June – August
 // 2026, n=3,300."). The pair lines are the only per-MONTH n: a line
-// must hold ≥2 dated pairs to be trusted (the quarterly line's lone
-// pair names the survey month with a 3-month sum — not the month's n).
-function parseRmBusinessPost(txt, survey) {
+// must hold ≥2 dated pairs to be trusted (the sum line's lone
+// pair-shaped match names its END month with a multi-month sum — not
+// the month's n). Two failure shapes the live posts have produced:
+//  - posts 10064/10276 (Oct-2025, Jun-2026 waves): the trailing block
+//    quote is the PREVIOUS release's boilerplate carried across
+//    unedited ("…results for August are based on 1,198…" on the October
+//    post — 1,198 is September's committed n). So the quote can veto a
+//    pair figure ONLY when its month word verifiably names the survey
+//    month; a quote about another month is ignored, never weighed.
+//  - post 9994 (Jul-2025 wave): the pair line's second pair is
+//    mislabeled ("June 2025, n=1,246" — June's own post printed 1,215),
+//    so the survey month never appears in the pairs. The two-month sum
+//    line ending at the survey month ("June & July 2025, n=2,461")
+//    gives the n back arithmetically — sum minus the PREVIOUS wave's
+//    committed n (2,461 − 1,215 = 1,246) — filed only when that derived
+//    figure is ALSO printed verbatim on the post (here: the mislabeled
+//    pair's figure and the block quote's). Arithmetic alone never files.
+function parseRmBusinessPost(txt, survey, prevN) {
   const lines = txt.match(/Source:?\s*(?:&nbsp;|\s)*Roy Morgan Business Single Source[^.]*\./gi) || [];
+  const bq = /Business Confidence results for (\w+) are based on ([\d,]+) detailed interviews/i.exec(txt);
+  const bqFig = bq ? +bq[2].replace(/,/g, "") : null;
+  const figs = new Set(bqFig != null ? [bqFig] : []); // every verbatim figure (quote + trusted pairs)
+  const seen = new Set();
   let n = null;
   if (survey) {
-    const seen = new Set();
     for (const line of lines) {
       const pairs = [...line.matchAll(/([A-Z][a-z]{2,8})\s+(20\d\d),\s*n=([\d,]+)/g)];
       if (pairs.length < 2) continue;
       for (const m of pairs) {
-        if (monIdx(m[1]) != null && monIdx(m[1]) === survey.mon && +m[2] === survey.yr) seen.add(+m[3].replace(/,/g, ""));
+        const v = +m[3].replace(/,/g, "");
+        figs.add(v);
+        if (monIdx(m[1]) != null && monIdx(m[1]) === survey.mon && +m[2] === survey.yr) seen.add(v);
       }
     }
     if (seen.size === 1) n = [...seen][0];
+    if (n == null && seen.size === 0 && prevN != null) {
+      const prevMon = (survey.mon + 11) % 12, sums = new Set();
+      for (const line of lines) {
+        for (const m of line.matchAll(/([A-Z][a-z]{2,8})\s*(?:&amp;|&|[-–—])\s*([A-Z][a-z]{2,8})\s+(20\d\d),\s*n=([\d,]+)/g)) {
+          if (monIdx(m[1]) === prevMon && monIdx(m[2]) === survey.mon && +m[3] === survey.yr) sums.add(+m[4].replace(/,/g, ""));
+        }
+      }
+      if (sums.size === 1) {
+        const derived = [...sums][0] - prevN;
+        if (figs.has(derived)) n = derived;
+      }
+    }
   }
-  // cross-check against the trailing block quote (month word may lag; its
-  // figure has always agreed) — a disagreement files no n at all
-  const bq = /Business Confidence results for \w+ are based on ([\d,]+) detailed interviews/i.exec(txt);
-  if (bq != null && n != null && +bq[1].replace(/,/g, "") !== n) n = null;
+  if (bq != null && n != null && survey && monIdx(bq[1]) === survey.mon && bqFig !== n) n = null;
   if (n != null && (n < 200 || n > 5000)) n = null;
   return { n };
 }
@@ -450,10 +485,8 @@ const enrichable = (r) => ENRICH_SINCE
 async function enrichRmRows(name, rows) {
   let fetched = 0;
   for (const r of rows) {
-    if (name === "business") {
-      const s = surveyMonthOf(r);
-      r.fwm = r.fwm ?? `${s.yr}-${String(s.mon + 1).padStart(2, "0")}`; // derivable, no fetch
-    }
+    const s = name === "business" ? surveyMonthOf(r) : null;
+    if (s) r.fwm = r.fwm ?? `${s.yr}-${String(s.mon + 1).padStart(2, "0")}`; // derivable, no fetch
     const want = name === "consumer" ? (r.n == null || r.fwStart == null) : r.n == null;
     if (!want || !enrichable(r)) continue;
     const page = FEED_DIR ? laneFile(FEED_DIR, r.url, ".page.html") : await fetchText(r.url).catch(() => null);
@@ -484,7 +517,11 @@ async function enrichRmRows(name, rows) {
         const content = JSON.parse(pm[1]).props.pageProps.findingData.postBy.content;
         if (content) text = htmlToText(content);
       } catch { /* fall through to the page-wide read */ }
-      const g = parseRmBusinessPost(text ?? htmlToText(page), surveyMonthOf(r));
+      // the previous committed wave's n feeds the sum-line recovery — rows
+      // ascend by date, so an earlier wave's n is filed before it's needed
+      const pf = `${s.mon === 0 ? s.yr - 1 : s.yr}-${String(((s.mon + 11) % 12) + 1).padStart(2, "0")}`;
+      const prevN = rows.find((q) => q.fwm === pf && q.n != null)?.n ?? null;
+      const g = parseRmBusinessPost(text ?? htmlToText(page), s, prevN);
       if (g.n != null) r.n = r.n ?? g.n;
     }
     if (!FEED_DIR && fetched % 12 === 0) await new Promise((s) => setTimeout(s, 600)); // politeness pacing
