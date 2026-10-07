@@ -125,14 +125,17 @@ export function parseN24Ppm(data) {
 // 2PP, two layouts. Until Sep 2026 one table, cornerless, header ["",
 // "Labor vs Coalition", "Labor vs One Nation"]; blanks are structural (each
 // pairing occupies its own column). From the 6 Oct 2026 wave, one embed per
-// pairing, a demographic crosstab: corner "Column %", second column
-// "Total", exactly two party rows - Labor and Coalition, or Labor and One
-// Nation (the Labor-v-One-Nation one went unread for a wave as
-// "unmodelled"). The Total pair must sum to 100.
+// pairing, a demographic crosstab: corner "Column %" (any corner that is
+// not the voting-intention crosstab's "Party"), second column "Total", two
+// party rows - Labor and Coalition, or Labor and One Nation (the
+// Labor-v-One-Nation one went unread for a wave as "unmodelled"). Shape
+// detection, not a row-count gate: extra rows (demographics, an undecided
+// row) must not throw the table back to "unmodelled". The Total pair must
+// sum to 100.
 export function parseN24Tpp(data) {
   for (const t of chartEntitiesOf(data)) {
     const head = t.rows[0];
-    if (/^total$/i.test(head[1] ?? "") && t.rows.length === 3) {
+    if (head[0] !== "Party" && /^total$/i.test(head[1] ?? "")) {
       const lab = t.rows.find((r) => /^labor$/i.test(r[0]));
       const coa = t.rows.find((r) => /^coalition$/i.test(r[0]));
       const onp = t.rows.find((r) => /^one nation$/i.test(r[0]));
@@ -262,7 +265,13 @@ export async function n24InfogramFetch(fetchEmbed, ids) {
     else if (ppm) { proj.kind = "ppm"; proj.ppm = ppm; }
     else if (tppR.tpp) { proj.kind = "tpp"; proj.tpp = tppR.tpp; }
     else if (hr.rows) { proj.kind = "horserace"; proj.horserace = hr.rows; proj.horseraceBad = hr.bad; }
-    else if (staticChartsOf(data).length) { proj.kind = "unmodelled"; } // e.g. issue ownership
+    // The issues-ownership chart ships in every article (title "N24P voter
+    // issues <date>"); issues.mjs is its reader. Classify it so that
+    // "unmodelled" means GENUINELY unknown — a new chart kind the extractor
+    // has never seen — which the extractor pages on instead of dropping
+    // silently (the 6 Oct 2026 2PP failure mode).
+    else if (staticChartsOf(data).length && /issues/i.test(proj.title ?? "")) { proj.kind = "issues"; }
+    else if (staticChartsOf(data).length) { proj.kind = "unmodelled"; }
     else { proj.state = "note"; proj.why = [ct.why, ap.why, tppR.why, hr.why].filter(Boolean).join("; "); }
     projects.push(proj);
   }

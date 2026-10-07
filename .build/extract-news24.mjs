@@ -262,23 +262,33 @@ function n24Prefer({ hasIg, hasProse, stale, disagree, proseContradicts }) {
 }
 
 // The previous YouGov wave's figures, for the stale-embed check: its
-// primaries, PPM pairs and approval splits as filed.
+// primaries, 2PP pair, alt-2PP pair, PPM pairs and approval splits as filed.
 function n24PrevWave(D, date) {
   const prev = (D?.polls ?? []).filter((p) => p.pollster === "YouGov" && p.date < date)
     .sort((a, b) => (a.date < b.date ? -1 : 1)).pop();
   if (!prev) return null;
   const row = (key) => (D[key] ?? []).find((r) => r.firm === "YouGov" && r.date === prev.date) ?? null;
-  return { date: prev.date, vi: prev, ppm: row("ppm"), han: row("ppmHeadToHead"), appr: row("approval") };
+  return { date: prev.date, vi: prev, ppm: row("ppm"), han: row("ppmHeadToHead"), appr: row("approval"), alt: row("altTpp") };
 }
 
 async function infogramEnrichNews24(html, wave, prose, prevOf = null) {
-  const problems = [], notes = [];
+  const problems = [], notes = [], warnings = [];
   const ids = n24IdsOf(html);
-  if (!ids.length) return { ig: null, problems, notes };
+  if (!ids.length) return { ig: null, problems, notes, warnings };
   const projects = await n24InfogramFetch(fetchIgEmbed, ids);
   const fig = n24Figures(projects);
   // the wave's date may come only from the embed window (prose-only parse)
   const prev = prevOf ? prevOf(wave.date ?? fig.window?.end ?? null) : null;
+  // An embed the pipeline has no shape for used to vanish without a trace
+  // (the 6 Oct 2026 ALP-v-ONP 2PP, filed "unmodelled" and silently lost).
+  // Genuinely unknown kinds now page a person via status.warnings — the
+  // wave still files from the modelled embeds (a decorative new chart must
+  // not suppress a wave), and the known-benign issues chart is classified
+  // in news24-infogram.mjs and never reaches this list.
+  for (const p of projects) {
+    if (p.kind === "unmodelled") warnings.push(`embed ${p.id} ("${p.title ?? "?"}") is unmodelled — decide the kind or fold it into news24-infogram.mjs`);
+    else if (p.state === "note") warnings.push(`embed ${p.id} unread: ${p.why}`);
+  }
   for (const p of fig.problems) (/^horserace .* sums to/.test(p) ? notes : problems).push(p);
   // Snapshot pre-overlay values so every crosscheck names its source.
   const pv = prose?.vi ?? {};
@@ -306,14 +316,44 @@ async function infogramEnrichNews24(html, wave, prose, prevOf = null) {
     shift(k, fig.vi[k], wasV(k));
     wave.vi[k] = fig.vi[k];
   }
+  // 2PP embeds can be stale exactly like the PPM one was on 2026-10-06
+  // (News24 re-saves last wave's project under today's title): the owner's
+  // stale-embed rule — prose if stated, nothing otherwise — applies to the
+  // 2PP pair and the ALP-v-ONP pair too. "Nothing" leaves the wave's own
+  // value (Wikipedia's for the fallback path) and pages via warnings;
+  // exact-pair repeats of a fresh wave are rare but possible, so nothing
+  // here blocks silently.
   if (fig.tpp) {
-    shift("tpp_alp", fig.tpp.tpp_alp, wasP(pv.tpp_alp));
-    wave.vi.tpp_alp = fig.tpp.tpp_alp;
-    wave.vi.tpp_lnp = fig.tpp.tpp_lnp;
+    const hasIg = fig.tpp.tpp_alp != null && fig.tpp.tpp_lnp != null;
+    const hasProse = pv.tpp_alp != null && pv.tpp_lnp != null;
+    const stale = hasIg && prev?.vi?.tpp_alp != null
+      && fig.tpp.tpp_alp === prev.vi.tpp_alp && fig.tpp.tpp_lnp === prev.vi.tpp_lnp;
+    const disagree = hasIg && hasProse && Math.abs(fig.tpp.tpp_alp - pv.tpp_alp) > 0.5;
+    const pick = n24Prefer({ hasIg, hasProse, stale, disagree, proseContradicts: false });
+    if (stale) warnings.push(`2PP embed repeats the ${prev.date} wave's ${fig.tpp.tpp_alp}/${fig.tpp.tpp_lnp} (${pick.why})`);
+    else if (pick.why) notes.push(`2PP: ${pick.use === "ig" ? "Infogram" : pick.use} used (${pick.why}; Infogram ${fig.tpp.tpp_alp}/${fig.tpp.tpp_lnp}, prose ${pv.tpp_alp ?? "?"}/${pv.tpp_lnp ?? "?"})`);
+    if (pick.use === "ig") {
+      shift("tpp_alp", fig.tpp.tpp_alp, wasP(pv.tpp_alp));
+      wave.vi.tpp_alp = fig.tpp.tpp_alp;
+      wave.vi.tpp_lnp = fig.tpp.tpp_lnp;
+    } else if (pick.use === "prose") {
+      wave.vi.tpp_alp = pv.tpp_alp;
+      wave.vi.tpp_lnp = pv.tpp_lnp;
+    }
   }
   if (fig.altTpp) {
-    shift("alt TPP ALP", fig.altTpp.alpVsOnp_alp, wasP(prose?.altAlp));
-    if (prose) { prose.altAlp = fig.altTpp.alpVsOnp_alp; prose.altOnp = fig.altTpp.alpVsOnp_onp; }
+    const hasIg = fig.altTpp.alpVsOnp_alp != null && fig.altTpp.alpVsOnp_onp != null;
+    const hasProse = prose?.altAlp != null && prose?.altOnp != null;
+    const stale = hasIg && prev?.alt?.alpVsOnp_alp != null
+      && fig.altTpp.alpVsOnp_alp === prev.alt.alpVsOnp_alp;
+    const disagree = hasIg && hasProse && Math.abs(fig.altTpp.alpVsOnp_alp - prose.altAlp) > 0.5;
+    const pick = n24Prefer({ hasIg, hasProse, stale, disagree, proseContradicts: false });
+    if (stale) warnings.push(`ALP-v-ONP 2PP embed repeats the ${prev.date} wave's ${fig.altTpp.alpVsOnp_alp}/${fig.altTpp.alpVsOnp_onp} (${pick.why})`);
+    else if (pick.why) notes.push(`ALP-v-ONP 2PP: ${pick.use === "ig" ? "Infogram" : pick.use} used (${pick.why}; Infogram ${fig.altTpp.alpVsOnp_alp}/${fig.altTpp.alpVsOnp_onp}, prose ${prose?.altAlp ?? "?"}/${prose?.altOnp ?? "?"})`);
+    if (prose) {
+      if (pick.use === "ig") { prose.altAlp = fig.altTpp.alpVsOnp_alp; prose.altOnp = fig.altTpp.alpVsOnp_onp; }
+      else if (pick.use === "none") { prose.altAlp = null; prose.altOnp = null; }
+    }
   }
   const net = (p) => (p?.app != null && p?.dis != null ? Math.round((p.app - p.dis) * 10) / 10 : null);
   if (fig.approval?.alb) {
@@ -578,14 +618,16 @@ function parseVi(rows) {
   };
 }
 
-// Leader-satisfaction chart: header cells carry "<Surname> Satisfaction" and
-// "<Surname> Dissatisfaction"; the first data row is the latest wave.
+// Leader-satisfaction chart: header cells carry "<Leader> Satisfaction" and
+// "<Leader> Dissatisfaction"; the first data row is the latest wave. The
+// leader may be labelled with a given name ("Anthony Albanese
+// Satisfaction") or the bare surname, so match the surname word-bounded
+// anywhere before the kind.
 function parseSatisfaction(rows, olSurname) {
   const head = rows[0] ?? [];
-  const col = (who, kind) => head.findIndex((c) => new RegExp(`^${who} ${kind}$`, "i").test(c));
-  const prefix = whoPrefix(olSurname);
+  const col = (who, kind) => head.findIndex((c) => new RegExp(`(?:^|\\s)${who} ${kind}$`, "i").test(c));
   const pmS = col("Albanese", "Satisfaction"), pmD = col("Albanese", "Dissatisfaction");
-  const opS = col(prefix, "Satisfaction"), opD = col(prefix, "Dissatisfaction");
+  const opS = col(olSurname, "Satisfaction"), opD = col(olSurname, "Dissatisfaction");
   if ([pmS, pmD, opS, opD].some((i) => i < 0)) return null;
   const row = rows.slice(1).find((r) => r.length > Math.max(pmS, pmD, opS, opD) && /\d/.test(r[pmS]));
   if (!row) return null;
@@ -598,11 +640,6 @@ function parseSatisfaction(rows, olSurname) {
     oppNet: Math.round((op.app - op.dis) * 10) / 10,
   };
 }
-// Chart headers use the leader's given name sometimes ("Anthony Albanese")
-// and surname elsewhere; the OL header matched so far starts with the
-// surname's first name unknown — try the surname itself anywhere in the
-// header cell.
-function whoPrefix(olSurname) { return olSurname; }
 
 // ppm chart (present in some articles): rows [label, total] with leader
 // full names and a "Don't know" row.
@@ -938,9 +975,9 @@ const readOr = (f) => { try { return readFileSync(f, "utf8"); } catch { return n
 // --------------------------------------------------------------- entry
 // N24_LIB=1: import the parsers and guards (tests, the layout healer's
 // acceptance step) without running the extraction.
-export { parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells, guard, n24ConflictPlan, n24KeepHand, n24Prefer, n24PrevWave, news24Sat, WIKI_RAW };
+export { parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells, guard, n24ConflictPlan, n24KeepHand, n24Prefer, n24PrevWave, news24Sat, parseSatisfaction, WIKI_RAW };
 if (!process.env.N24_LIB) {
-const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [], releaseFilled: [] };
+const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [], releaseFilled: [], warnings: [] };
 
 if (NEWS24_OF) { // dev oracle: parse one News24 article, print the record, exit
   const art = await fetchNews24Article(NEWS24_OF);
@@ -954,7 +991,7 @@ if (NEWS24_OF) { // dev oracle: parse one News24 article, print the record, exit
     published: rec.published, vi: rec.vi, sat: rec.sat,
     ppmA: rec.ppmA, ppmO: rec.ppmO, ppmHan: rec.ppmHan, ppmHanOpp: rec.ppmHanOpp,
     altAlp: rec.altAlp, altOnp: rec.altOnp,
-    infogram: ig, igProblems: problems, igNotes: notes,
+    infogram: ig, igProblems: problems, igNotes: notes, igWarnings: warnings,
   }, null, 2));
   process.exit(0);
 }
@@ -1106,19 +1143,30 @@ try {
     const addDerived = (key, rows, row) => {
       if (!firmRowExists(key, row.date)) rows.push(row);
     };
+    const isNews24Url = (u) => {
+      try { return /(^|\.)news24\.com\.au$/.test(new URL(u ?? "").hostname) ? u : null; }
+      catch { return null; }
+    };
+    // Unfinished upgrades, walk-back (2026-10-07): this gate once upgraded
+    // the LATEST wave alone, so a wave whose enrichment leg failed two
+    // fortnights running could never catch up. Any existing News24-client
+    // wave from Feb 2026 on — every News24 wave since carries ppm, approval
+    // and ALP-v-ONP 2PP derived rows alongside the publication stamp — that
+    // is missing the stamp or one of those rows queues here, newest first,
+    // capped per run so a backlog drains over a few runs.
+    const TRIO_ERA = "2026-02-01";
+    const MAX_UPGRADES = 3;
+    const upgradeSet = new Set(waves
+      .filter((w) => {
+        const ex = existingByDate.get(w.date);
+        return ex && ex.client === "News24" && w.date >= TRIO_ERA && isNews24Url(w.url)
+          && (!ex.published || ["ppm", "approval", "altTpp"].some((k) => !firmRowExists(k, w.date)));
+      })
+      .map((w) => w.date).sort().reverse().slice(0, MAX_UPGRADES));
     for (const wikiWave of waves) {
       const existing = existingByDate.get(wikiWave.date) ?? null;
-      const news24Url = (() => {
-        try { return /(^|\.)news24\.com\.au$/.test(new URL(wikiWave.url ?? "").hostname) ? wikiWave.url : null; }
-        catch { return null; }
-      })();
-      // Every News24 wave since Feb 2026 carries ppm, approval and ALP-v-ONP
-      // 2PP derived rows; the latest wave missing one (a figure merge once
-      // blocked; a 2PP embed layout once went unread) still has an
-      // unfinished enrichment, same as one missing its publication stamp.
-      const canUpgrade = !!existing && wikiWave.date === latestYg && existing.client === "News24"
-        && (!existing.published || ["ppm", "approval", "altTpp"].some((k) => !firmRowExists(k, wikiWave.date)))
-        && !!news24Url;
+      const news24Url = isNews24Url(wikiWave.url);
+      const canUpgrade = !!existing && upgradeSet.has(wikiWave.date);
       if ((existing || newDates.has(wikiWave.date)) && !canUpgrade) { status.fallback.skipped_existing++; continue; }
 
       let h = wikiWave, n24 = null, ig = null, stampOnly = false;
@@ -1136,6 +1184,7 @@ try {
               problems: enriched.problems, notes: enriched.notes,
             };
           if (enriched.notes.length) console.error(`N24_NOTE ${wikiWave.date}: ${enriched.notes.join(" | ")}`);
+          for (const w of enriched.warnings) status.warnings.push(`${wikiWave.date}: ${w}`);
           const rawProblems = [...merged.problems, ...enriched.problems];
           const allProblems = rawProblems.filter((p) => !N24_ADJUDICATED.has(`${wikiWave.date}|${p}`));
           if (allProblems.length !== rawProblems.length)
@@ -1143,6 +1192,7 @@ try {
               ...rawProblems.filter((p) => !allProblems.includes(p)).map((p) => `${wikiWave.date}: ${p}`));
           if (allProblems.length) {
             status.news24.problems.push(`${wikiWave.date}: ${allProblems.join(" | ")}`);
+            status.warnings.push(`${wikiWave.date}: figure merge blocked — ${allProblems[0]}`);
             // the stamp still lands; an existing row takes nothing else
             const plan = n24ConflictPlan({ existing, wave: wikiWave, articlePublished: parsed.published });
             if (!plan.fileWave) {
@@ -1157,6 +1207,7 @@ try {
           }
         } else {
           status.news24.skipped.push(`${wikiWave.date}: News24 ${art.via ?? "fetch"}/parse failed`);
+          status.warnings.push(`${wikiWave.date}: News24 ${art.via ?? "fetch"}/parse failed — enrichment leg down`);
         }
       }
       if (stampOnly || (canUpgrade && !n24)) continue;
@@ -1181,7 +1232,13 @@ try {
         ...(h.url ? { url: h.url } : {}),
       };
       if (existing) {
-        Object.assign(existing, pollRow);
+        // Upgrade in place, but never let a figure this run did not read
+        // erase one already filed (a fallback wave's sample can still be
+        // null here while the canon row carries one).
+        for (const [k, v] of Object.entries(pollRow)) if (v != null) existing[k] = v;
+        // the pending flag resolves the moment a real sample lands, whether
+        // from extract-sampleeff or from this upgrade itself
+        if (existing.sample != null) delete existing.samplePending;
         status.news24.upgraded.push(h.date);
       } else {
         newPolls.push(pollRow);
@@ -1239,6 +1296,9 @@ try {
     console.error(`N24_NOTE wiki fallback skipped: ${e.message}`);
     status.fallback.error = String(e?.message || e);
   }
+  // Every wave that hit the fallback and did not file is page-worthy: the
+  // run's output is green otherwise and these vanish into the log tail.
+  for (const u of status.fallback?.unparsed ?? []) status.warnings.push(`wave not filed: ${u}`);
 
   if (guardFails.length) {
     console.error("N24_GUARD " + guardFails.join(" || "));

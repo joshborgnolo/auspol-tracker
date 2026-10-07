@@ -171,6 +171,10 @@ const near = (dates, targetIso) => {
 const D = JSON.parse(readFileSync("data/polls.json", "utf8"));
 const existing = D.polls.filter((p) => p.pollster === "Essential");
 const horizon = existing.reduce((m, p) => (p.date < m ? p.date : m), "9999");
+// Warnings that must reach the wrapper (status-warn.mjs): they fail the run
+// after anything landable is committed and pushed, so a logged WARNING like
+// an unmapped leader series can no longer sit unread in the log for weeks.
+const statusWarnings = [];
 
 // WP record date = publish day on UTC, wave date = publish day on Sydney;
 // the record can sit a day behind, never ahead of its wave.
@@ -291,7 +295,7 @@ for (let i = 0; i < D.polls.length; i++) {
 }
 
 // --- insert pass: voting intention + 2PP ---
-const added = [], skippedDateDup = [], skippedFigureDup = [], skippedPreHorizon = [];
+const added = [], skippedDateDup = [], skippedFigureDup = [], skippedPreHorizon = [], skippedNullCore = [];
 for (const waveDate of [...vi.keys()].sort()) {
   const a = vi.get(waveDate);
   const date = iso(Date.parse(waveDate) - DAY);
@@ -319,6 +323,15 @@ for (const waveDate of [...vi.keys()].sort()) {
     ...(releaseFor(waveDate) ? { releaseUrl: releaseFor(waveDate) } : {}),
     assimilated: true,
   };
+  // A wave whose CORE primaries are null (chart answered "–") is a parse gap,
+  // not a poll: refuse to file a thin row and page instead. tpp can be null
+  // legitimately early (the 2PP chart lands after the primaries).
+  const nullCore = ["alp", "lnp", "grn", "onp"].filter((k) => row[k] == null);
+  if (nullCore.length) {
+    skippedNullCore.push({ csvWave: waveDate, missing: nullCore });
+    statusWarnings.push(`csv wave ${waveDate} has null core primaries (${nullCore.join(", ")}); wave not filed`);
+    continue;
+  }
   const figDup = existing.find((p) => daysApart(p.date, row.date) <= 10 && sameFigures(p, row));
   if (figDup) { skippedFigureDup.push({ csvWave: waveDate, matchesRow: figDup.date }); continue; }
   const at = D.polls.findIndex((p) => p.date > row.date);
@@ -420,6 +433,7 @@ for (const r of D.direction.filter((r) => r.pollster === "Essential")) {
 console.log(`mode: ${APPLY ? "APPLY" : "dry-run"}`);
 console.log(`VI waves in CSV: ${vi.size} (2PP waves: ${tppDates.length} · approval waves: alb ${appWaves.alb.size} / opp ${appWaves.opp.size} · mood waves: ${mood.size})`);
 unknownApproval.forEach((u) => console.log(`WARNING: unmapped approval dataset "${u.dataset}" ("${u.question}") — if it is a new leader series, extend LEADER_APPROVAL in .build/assimilate-essential-vi.mjs`));
+unknownApproval.forEach((u) => statusWarnings.push(`unmapped approval dataset ${u.dataset} ("${u.question}")`));
 console.log(`retro-filled rows: ${retro.length}`);
 retro.forEach((x) => console.log(`  ~ ${x.date}: ${x.fixes.join("; ")}`));
 console.log(`added rows: ${added.length}`);
@@ -431,7 +445,8 @@ correctedDir.forEach((d) => console.log(`  ~ direction ${d}: published corrected
 skippedFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} duplicates curated row ${x.matchesRow} (same figures)`));
 skippedApprFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} approval duplicates ${x.matchesRow} (same figures)`));
 skippedDirFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} direction duplicates ${x.matchesRow} (same figures)`));
-console.log(`skipped: ${skippedDateDup.length} date-dup, ${skippedFigureDup.length} figure-dup, ${skippedPreHorizon.length} at/before horizon ${horizon}`);
+skippedNullCore.forEach((x) => console.log(`  ! csv ${x.csvWave}: null core primaries (${x.missing.join(", ")}) — wave NOT filed`));
+console.log(`skipped: ${skippedDateDup.length} date-dup, ${skippedFigureDup.length} figure-dup, ${skippedPreHorizon.length} at/before horizon ${horizon}, ${skippedNullCore.length} null-core refused`);
 console.log(`skipped approval: ${skippedApprDateDup.length} date-dup, ${skippedApprFigureDup.length} figure-dup · direction: ${skippedDirDateDup.length} date-dup, ${skippedDirFigureDup.length} figure-dup`);
 
 const touched = added.length + retro.length + addedAppr.length + addedDir.length + healedDir.length + correctedDir.length;
@@ -444,11 +459,12 @@ if (APPLY && touched) {
   mkdirSync(".build/essential-src", { recursive: true });
   writeFileSync(".build/essential-src/assimilate-vi-proof.json", JSON.stringify({
     generatedAt: new Date().toISOString(), horizon, retro, added,
-    addedAppr, addedDir, skippedDateDup, skippedFigureDup, skippedPreHorizon,
+    addedAppr, addedDir, skippedDateDup, skippedFigureDup, skippedPreHorizon, skippedNullCore,
     skippedApprDateDup, skippedApprFigureDup, skippedDirDateDup, skippedDirFigureDup,
   }, null, 2) + "\n");
 }
 console.log(`ASSIMILATE_STATUS ${JSON.stringify({
   pollster: "Essential", added: added.length, retro: retro.length,
   approval: addedAppr.length, direction: addedDir.length, changed: touched > 0,
+  null_core_refused: skippedNullCore.length, warnings: statusWarnings,
 })}`);

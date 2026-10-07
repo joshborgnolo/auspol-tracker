@@ -508,3 +508,91 @@ land it by hand rather than forcing it through the extractor:
    should show wave-only hunks (~20 rewritten minified lines) before you
    stage it. Commit message heredocs break on apostrophes — write the
    message to a file under `.matilda/` and `git commit -F`.
+
+## Post-2026-10-05 state, and the 6 Oct 2026 wave's two defects (addendum)
+
+**Staleness corrections to this file:**
+
+- The "News24 enrichment cannot move to CI" section above is SUPERSEDED:
+  since 2026-10-05 `fetchWithCookies` (extract-common.mjs) passes the
+  Akamai cookie check, so `fetchNews24Article` reads the DOM
+  anonymously ("anon" leg) and keeps logged-in Chrome only as the
+  fallback (`status.news24.sources[date]` records which leg served).
+- A FOURTH discovery leg exists: `pulseWaves()` scrapes News24's Pulse
+  topic page (`PULSE_TOPIC`, newest PULSE_MAX=6 stories) and can file a
+  wave straight from its Infogram embeds + prose, with `samplePending`
+  when the article states no n (extract-sampleeff.mjs owns the fill).
+- `N24_LIB` export list grew: `n24ConflictPlan, n24KeepHand, n24Prefer,
+  n24PrevWave, news24Sat` joined the original five — keep it in sync for
+  healer.mjs and test-news24-wiki.mjs.
+
+**Defect 1 — "unmodelled" 2PP embed layout (fixed 60e95bb).** The 6 Oct
+wave's 2PP embeds switched from one cornerless two-pairing table to ONE
+DEMOGRAPHIC CROSSTAB PER PAIRING (corner "Column %", a "Total" column,
+exactly two party rows: header + Labor + rival = 3 sheets rows).
+`parseN24Tpp` didn't know it → both projects classified `unmodelled` →
+`altTpp` (ALP-v-ONP 2PP) silently lost; the wave filed thin and looked
+complete. Fix: `parseN24Tpp` reads the new layout behind a Total Σ100
+gate (fixtures `ig-fixtures-2026-10-06`, pinned in
+test-news24-infogram), and `canUpgrade` now also re-checks a latest wave
+whose `altTpp` row is missing (previously only missing `published`,
+plus ppm/approval via firm-row absence), so the extractor repaired the
+row itself on the next run.
+
+**Defect 2 — stale PPM embed filed as fresh (fixed d0c2b6b).** News24
+re-titles/re-saves the PREVIOUS wave's Infogram project without new
+data: the "06102026" PPM embed carried 21 Sep's exact tables (41/22/37,
+50/12/38). Real figures were 40/21/39 and 50/10/40 — hand-entered from
+the owner, protected in provenance by `note` via `n24KeepHand`. The
+fix introduced the EMBED-VS-PROSE PRECEDENCE LADDER, `n24Prefer({hasIg,
+hasProse, stale, disagree, proseContradicts})`:
+- embed repeats the previous wave's figures (staleness, per figure
+  GROUP, via `n24PrevWave`) → take prose if usable, else NOTHING (file
+  without that group; a stale crosstab pushes a BLOCKING problem);
+- fresh embed vs disagreeing this-week prose → PROSE wins (note logged);
+- self-contradictory prose (the 6 Oct Taylor line "all-time low of -16
+  per cent, with 31 per cent satisfied and 51 per cent dissatisfied" —
+  31−51=−20) → fresh embed stands. `news24Sat` reads a bare stated net
+  ("-16%", minus-U+2212 normalised) so contradiction is checkable.
+Stale detection exists per group: primaries = all six equal prev
+(`viStale`, blocking); PPM = BOTH tables' pairs equal prev; approval =
+BOTH leaders' app+dis equal prev. `n24ConflictPlan` (2026-10-06 lesson):
+on a blocking merge conflict, the article's `published` stamp still
+lands (an existing row takes ONLY the stamp, never the conflicting
+figures); a stamp before fieldwork-end is dropped as a misread.
+
+**Remaining defects found in the 2026-10-07 audit (NOT yet fixed — the
+watch for these):**
+
+1. HIGH: any NEW unmodelled embed kind still fails silently —
+   `n24Figures` ignores `kind:"unmodelled"` and `state:"note"` projects
+   with zero problems/notes; only `status.news24.infogram[date].kinds`
+   records it, and nothing surfaces that. The 60e95bb fix taught the
+   parser one layout; the next layout change fails invisibly again.
+   (Also: `parseN24Tpp`'s new-layout gate is `rows.length === 3`
+   exactly — a "Don't know" third row returns the embed to unmodelled.)
+2. HIGH: staleness checks do NOT cover `fig.tpp`/`fig.altTpp` —
+   `n24PrevWave` loads the previous wave's VI/ppm/ppmHeadToHead/approval
+   but not its 2PP or altTpp rows, and infogramEnrichNews24 overlays
+   those embed values with no prev-wave comparison. A stale 2PP embed
+   would still file.
+3. MEDIUM: `parseSatisfaction`'s header regex is anchored
+   `^Surname Satisfaction$` despite comments claiming given+family-name
+   tolerance ("Anthony Albanese Satisfaction" does NOT match) — a
+   canonical-path YouGov header restyle silently drops the whole
+   approval section (sat null; guard doesn't require it).
+4. MEDIUM: `canUpgrade` repairs ONLY the latest YouGov wave
+   (`wikiWave.date === latestYg`, and only when wiki carries a
+   news24.com.au URL). A wave that lands thin and isn't repaired before
+   the next wave files stays thin forever.
+5. MEDIUM: `n24KeepHand` protects hand-entered sections in the
+   PROVENANCE file only — `Object.assign(existing, pollRow)` on an
+   in-place upgrade overwrites canon polls-row figures wholesale, so a
+   hand correction to a canon primary would be silently reverted.
+6. LOW: a `samplePending` flag survives an in-place upgrade that fills
+   `sample` (Object.assign never deletes; contrast
+   extract-demosau.mjs:832 which deletes it). Harmless to validate but
+   the flag lies.
+7. LOW: `n24PrevWave` reads the pre-run snapshot — in a two-wave run
+   the newer wave's staleness check compares against the wave before
+   BOTH.

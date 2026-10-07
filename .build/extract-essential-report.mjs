@@ -471,6 +471,7 @@ try {
       rows_kept: existingCount,
       rows_total: existingCount,
       new_dates: [],
+      warnings: [],
       fingerprint_at: saved.at,
       latest_report_date: latestReport ? latestReport.date : null,
       latest_report_title: latestReport ? latestReport.title : null,
@@ -491,6 +492,7 @@ try {
   // losing fresh rows would trip the merge-shrink guard on write.
   const reportCards = [];
   const zeroCard = [];
+  const zeroCardEmbed = []; // zero-card pages that DID carry embeds — extraction gap
   const failedPages = [];
   const reportResults = await pool(crawlReports, CONCURRENCY, async (r) => {
     try {
@@ -504,7 +506,10 @@ try {
   const cardHistogram = new Map();
   for (const { report, parsed } of reportResults) {
     cardHistogram.set(parsed.cards.length, (cardHistogram.get(parsed.cards.length) || 0) + 1);
-    if (parsed.cards.length === 0) zeroCard.push(report.link);
+    if (parsed.cards.length === 0) {
+      zeroCard.push(report.link);
+      if (parsed.anyEmbed) zeroCardEmbed.push(report.link);
+    }
     reportCards.push(...parsed.cards);
   }
   console.log("cards per report:", [...cardHistogram.entries()].sort((a, b) => a[0] - b[0]).map(([n, c]) => `${n}x${c}`).join(" "));
@@ -594,6 +599,16 @@ try {
     }
   }
 
+  // Wrapper warn→fatal surfaces (see .build/status-warn.mjs). A zero-card
+  // report only warns when the page carried embeds — chart-free posts are
+  // normal. Failed pages/flourishes stay fetch-time tolerant above but must
+  // page: a persistent one means a wave is being missed silently.
+  const cap = (list) => list.slice(0, 5).join(" ; ") + (list.length > 5 ? ` … +${list.length - 5} more` : "");
+  const warnings = [];
+  if (zeroCardEmbed.length) warnings.push(`${zeroCardEmbed.length} report page(s) parsed zero cards despite embeds (extraction gap): ${cap(zeroCardEmbed)}`);
+  if (failedPages.length) warnings.push(`${failedPages.length} page(s) failed to load this crawl: ${cap(failedPages)}`);
+  if (failedFlourishes.length) warnings.push(`${failedFlourishes.length} flourish visualisation(s) failed to load: ${cap(failedFlourishes)}`);
+
   console.log(`ESSENTIAL_STATUS ${JSON.stringify({
     changed: changed && !CHECK,
     check: CHECK,
@@ -604,6 +619,7 @@ try {
     question_pages: questions.length,
     failed_pages: failedPages.length,
     failed_flourishes: failedFlourishes.length,
+    warnings,
     charts: counters.charts,
     rows_kept: existingRows.length,
     rows_fresh: rowsOut.length,

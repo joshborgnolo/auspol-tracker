@@ -108,6 +108,31 @@ eq("tpp pairs", parseN24Tpp(dataOf("_/jSJgw3l3groFHC28VREB")).tpp,
   ok("tpp crosstab Σ tamper declines", parseN24Tpp(bad).tpp === null && /Σ=/.test(parseN24Tpp(bad).why));
   const crossNot = parseN24Crosstab(d10("WaCCXdcAEV5kRmRrRwmC"));
   ok("a 2PP crosstab is not read as the voting-intention crosstab", crossNot.vi === null);
+  // shape detection, not a row-count gate: extra rows (demographics, an
+  // undecided row) must not throw the pairing table back to "unmodelled"
+  const crowded = JSON.parse(JSON.stringify(d10("WaCCXdcAEV5kRmRrRwmC")));
+  for (const e of Object.values(crowded.elements.content.content.entities))
+    if (e.type === "CHART") {
+      const sheet = e.props.chartData.data[0];
+      sheet.splice(1, 0, [{ value: "" }, { value: "" }],
+        [{ value: "18-24" }, { value: "" }],
+        [{ value: "Undecided" }, { value: "" }]);
+    }
+  eq("tpp crosstab tolerates extra rows", parseN24Tpp(crowded).tpp, { oneNation: { alp: 53, onp: 47 } });
+}
+
+// ---- unknown chart kinds: the issues embed is classified, anything else is
+// a genuine "unmodelled" the extractor pages on
+{
+  const issues = await n24InfogramFetch(async (id) => fx(id), ["_/TBlBtAE3k0f4YBE6MIpF"]);
+  eq("issues ownership chart classified", issues[0].kind, "issues");
+  const renamed = async () => {
+    const d = dataOf("_/TBlBtAE3k0f4YBE6MIpF");
+    const html = JSON.stringify(d).replace("\"N24P voter issues 24082026\"", "\"N24P something new 24082026\"");
+    return `<html><script>window.infographicData=${html}</script></html>`;
+  };
+  const unknown = await n24InfogramFetch(renamed, ["_/TBlBtAE3k0f4YBE6MIpF"]);
+  eq("unrecognised chart stays unmodelled", unknown[0].kind, "unmodelled");
 }
 
 // ---- horserace: corroboration-only, Σ-guarded
@@ -133,7 +158,7 @@ eq("tpp pairs", parseN24Tpp(dataOf("_/jSJgw3l3groFHC28VREB")).tpp,
     ["_/1HmxLVdMCZuLu6przWpP", "_/jSJgw3l3groFHC28VREB", "_/KHPe2ut8KWwbhpNt9NFM",
       "_/pWKd54huH0REqno4nuue", "_/TBlBtAE3k0f4YBE6MIpF", "_/YM46DvOTftyx9pNzV67y"]);
   eq("classified kinds", projects.map((p) => [p.state, p.kind ?? null]),
-    [["ok", "approvals"], ["ok", "tpp"], ["ok", "ppm"], ["ok", "horserace"], ["ok", "unmodelled"], ["ok", "crosstab"]]);
+    [["ok", "approvals"], ["ok", "tpp"], ["ok", "ppm"], ["ok", "horserace"], ["ok", "issues"], ["ok", "crosstab"]]);
   const fig = n24Figures(projects);
   eq("assembly window", fig.window, { start: "2026-08-18", end: "2026-08-24" });
   eq("assembly vi", fig.vi, { alp: 29, lnp: 21, onp: 26, grn: 12, ind: 5, oth: 7 });

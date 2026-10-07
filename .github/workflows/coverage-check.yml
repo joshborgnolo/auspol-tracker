@@ -221,6 +221,22 @@ jobs:
       - name: Check landed waves for missing derived rows
         run: node .build/check-poll-thinness.mjs
 
+  # Same contract as thinness, different failure: a wave that landed as an
+  # exact clone of the wave before it (the stale-source mode — YouGov's 6 Oct
+  # 2026 PPM embed re-serving 21 Sep's tables). Email-only, no repair agent.
+  staleness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - name: Pin Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Check the latest waves for exact repeats of the wave before
+        run: node .build/check-poll-staleness.mjs
+
   # Once a day, close the ci-alert issues whose workflow has run green since
   # they were last updated (.build/resolve-alerts.sh) — before Sep 2026
   # nothing ever closed one, so open alerts stopped meaning anything. Never

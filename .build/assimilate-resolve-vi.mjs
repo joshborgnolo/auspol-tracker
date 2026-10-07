@@ -135,9 +135,17 @@ function currentLeader(dataset) {
 }
 const pmName = currentLeader("pm_performance");
 const oppLeaderName = currentLeader("opp_leader_performance");
-if (pmName && !/albanese/i.test(pmName))
+// statusWarnings is declared below with the report object; these notes are
+// collected silently here and promoted into it there.
+const leaderNotes = [];
+if (pmName && !/albanese/i.test(pmName)) {
   console.log(`note: pm_performance names "${pmName}" — approval section skipped (PM slot is hardcoded Albanese)`);
-if (!oppLeaderName) console.log("note: could not parse opposition-leader name from opp_leader_performance question text — approval section skipped");
+  leaderNotes.push(`pm_performance names "${pmName}" — approval section skipped (leadership change?)`);
+}
+if (!oppLeaderName) {
+  console.log("note: could not parse opposition-leader name from opp_leader_performance question text — approval section skipped");
+  leaderNotes.push("could not parse opposition-leader name from opp_leader_performance question text — approval section skipped");
+}
 
 const D = JSON.parse(readFileSync("data/polls.json", "utf8"));
 const horizon = (list) => list.reduce((m, p) => (p.date < m ? p.date : m), "9999");
@@ -148,6 +156,10 @@ const insertByDate = (list, row) => {
 const waveDateOf = (csvDate) => iso(Date.parse(csvDate) - DAY);
 
 const report = { vi: { added: [], skipped: null }, ppm: { added: [], skipped: null }, approval: { added: [], skipped: null } };
+// Warnings that must reach the wrapper (status-warn.mjs): figure-dups mean
+// the payload moved backwards or a row is wrong; a ppm wave whose names
+// don't fit PM + one opponent means the survey quietly changed shape.
+const statusWarnings = [...leaderNotes];
 
 // ---- VI ------------------------------------------------------------------
 {
@@ -181,7 +193,11 @@ const report = { vi: { added: [], skipped: null }, ppm: { added: [], skipped: nu
       assimilated: true,
     };
     const figDup = existing.find((p) => days(p.date, row.date) <= 10 && sameFigures(p, row));
-    if (figDup) { skippedFigureDup.push({ csvWave: waveDate, matchesRow: figDup.date }); continue; }
+    if (figDup) {
+      skippedFigureDup.push({ csvWave: waveDate, matchesRow: figDup.date });
+      statusWarnings.push(`csv VI wave ${waveDate} duplicates row ${figDup.date} figure-for-figure (payload renumbering or a wrong row)`);
+      continue;
+    }
     insertByDate(D.polls, row);
     existing.push(row);
     report.vi.added.push({ csvWave: waveDate, row });
@@ -205,6 +221,7 @@ const report = { vi: { added: [], skipped: null }, ppm: { added: [], skipped: nu
     const others = names.filter(([n]) => n !== pm?.[0] && n !== han?.[0]);
     if (!pm || others.length !== 1) {
       skippedShape.push({ csvWave: waveDate, names: Object.keys(a) });
+      statusWarnings.push(`ppm wave ${waveDate} names don't fit PM + one opposition leader: ${Object.keys(a).join("; ")}`);
       console.log(`ppm: wave ${waveDate} skipped — names don't fit PM + one opposition leader: ${Object.keys(a).join("; ")}`);
       continue;
     }
@@ -238,6 +255,7 @@ if (pmName && /albanese/i.test(pmName) && oppLeaderName) {
     const pmW = pmPerf.get(waveDate), oppW = oppPerf.get(waveDate);
     if (!pmW?.["TOTAL GOOD"] || !pmW?.["TOTAL POOR"] || !oppW?.["TOTAL GOOD"] || !oppW?.["TOTAL POOR"]) {
       console.log(`approval: wave ${waveDate} skipped — incomplete leadership ratings`);
+      statusWarnings.push(`approval wave ${waveDate} skipped — incomplete leadership ratings`);
       continue;
     }
     const row = {
@@ -285,4 +303,5 @@ console.log(`ASSIMILATE_STATUS ${JSON.stringify({
   added_ppm: report.ppm.added.length,
   added_approval: report.approval.added.length,
   changed: total > 0,
+  warnings: statusWarnings,
 })}`);

@@ -68,6 +68,12 @@ case "$LAST_LINE" in
   *) log "FAIL extract (no N24_STATUS line): $LAST_LINE"; exit 1 ;;
 esac
 
+# A warning the extractor logged but didn't exit on (a degraded enrichment
+# leg, an unmodelled embed, a wave not filed) fails the run — but only AFTER
+# anything that did land is committed and pushed, so a page nobody would
+# otherwise read never costs a wave. SEC Newgate established the pattern.
+WARN="$(node .build/status-warn.mjs N24_STATUS "$LAST_LINE")"
+
 # The wave's crosstabs join data/vote-switching.json and
 # data/demographics.json in this same commit (non-fatal; see
 # refresh_crosstabs in git-push-main.sh). Retry on EVERY run, not only
@@ -79,6 +85,7 @@ refresh_crosstabs vote-switching demographics issues
 
 if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
   if git diff --quiet -- data/vote-switching.json data/demographics.json data/issues.json; then
+    [ -n "$WARN" ] && { log "FAIL extract (exit 1): $WARN"; exit 1; }
     exit 0
   fi
   log "no new wave, but pending crosstabs resolved; running validate/build/commit/push"
@@ -109,4 +116,6 @@ if ! push_main "$MSG" "${FILES[@]}"; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"
+# The alarm, last: everything that landed is committed and pushed.
+[ -n "$WARN" ] && { log "FAIL extract (exit 1): $WARN"; exit 1; }
 exit 0

@@ -533,6 +533,25 @@ const dates = [...new Set(rowsOut.map((r) => r.date))].sort();
 console.log("fresh dates:", dates[0], "->", dates.at(-1));
 console.log("source updated:", data.updated);
 
+// source_updated tripwire (wrapper warn→fatal via status-warn.mjs): if the
+// interactive was just republished (updated within UPDATED_FRESH_DAYS) but
+// its newest wave date lags that republish by more than UPDATED_LAG_DAYS,
+// Nine republished without a wave we could read — extraction gap at release
+// time (an editorial re-touch pages at most a couple of runs, then ages out).
+const UPDATED_FRESH_DAYS = 2;
+const UPDATED_LAG_DAYS = 3;
+const warnings = [];
+{
+  const updatedMs = Date.parse(data.updated ?? "");
+  const latestWaveMs = Date.parse(dates.at(-1) ?? "");
+  if (Number.isFinite(updatedMs) && Number.isFinite(latestWaveMs)) {
+    const ageDays = (Date.now() - updatedMs) / 86400000;
+    const lagDays = (updatedMs - latestWaveMs) / 86400000;
+    if (ageDays <= UPDATED_FRESH_DAYS && lagDays > UPDATED_LAG_DAYS)
+      warnings.push(`interactive republished ${data.updated} but newest wave is ${dates.at(-1)} (${lagDays.toFixed(1)}d lag) — new wave not extracted?`);
+  }
+}
+
 // Machine-readable single-line status for scheduled runs (see header comment).
 const newDates = previous === null ? dates : dates.filter((d) => !existingBody.some((l) => l.includes(`,${d},`)));
 console.log(`RPM_STATUS ${JSON.stringify({
@@ -559,6 +578,7 @@ console.log(`RPM_STATUS ${JSON.stringify({
   verbatim_comments_skipped: verbatimCount,
   new_dates: newDates,
   source_updated: data.updated ?? null,
+  warnings,
 })}`);
 } catch (err) {
   console.error(`RPM_ERROR ${err.message}`);

@@ -9,7 +9,7 @@
 import assert from "node:assert/strict";
 
 process.env.N24_LIB = "1";
-const { parseWikiYouGov, wikiOthersSplit, n24ConflictPlan, n24KeepHand, n24Prefer, n24PrevWave, news24Sat } = await import("./extract-news24.mjs");
+const { parseWikiYouGov, wikiOthersSplit, n24ConflictPlan, n24KeepHand, n24Prefer, n24PrevWave, news24Sat, parseSatisfaction } = await import("./extract-news24.mjs");
 
 const head = `==Voting intention==
 ===2026===
@@ -164,15 +164,35 @@ assert.equal(r.waves.length, 0, JSON.stringify(r));
   assert.equal(news24Sat("Mr Albanese had 35% satisfied and 58% dissatisfied.").stated, null);
   // the previous wave the stale check compares against
   const D = {
-    polls: [{ pollster: "YouGov", date: "2026-09-08" }, { pollster: "YouGov", date: "2026-09-21" }, { pollster: "Newspoll", date: "2026-10-01" }],
+    polls: [{ pollster: "YouGov", date: "2026-09-08" }, { pollster: "YouGov", date: "2026-09-21", tpp_alp: 52, tpp_lnp: 48 }, { pollster: "Newspoll", date: "2026-10-01" }],
     ppm: [{ firm: "YouGov", date: "2026-09-21", alb: 41, opp: 37 }],
     ppmHeadToHead: [{ firm: "YouGov", date: "2026-09-21", alb: 50, han: 38 }],
+    altTpp: [{ firm: "YouGov", date: "2026-09-21", alpVsOnp_alp: 55, lnpVsOnp_lnp: null }],
   };
   const pw = n24PrevWave(D, "2026-10-06");
   assert.equal(pw.date, "2026-09-21");
   assert.deepEqual([pw.ppm.alb, pw.ppm.opp, pw.han.alb, pw.han.han], [41, 37, 50, 38]);
+  assert.deepEqual([pw.vi.tpp_alp, pw.vi.tpp_lnp], [52, 48], "prev tpp pair available for the stale 2PP check");
+  assert.equal(pw.alt?.alpVsOnp_alp, 55, "prev altTpp row available for the stale ALP-v-ONP check");
   assert.equal(pw.appr, null);
   assert.equal(n24PrevWave(D, "2026-09-08"), null, "no earlier wave");
+}
+
+// ---- satisfaction chart headers: surname word-bounded (given-name forms ok)
+{
+  const rows = [
+    ["Wave", "Anthony Albanese Satisfaction", "Anthony Albanese Dissatisfaction", "Angus Taylor Satisfaction", "Angus Taylor Dissatisfaction"],
+    ["Sep 21", "35", "59", "33", "49"],
+  ];
+  const s = parseSatisfaction(rows, "taylor");
+  assert.deepEqual([s.pmApp, s.pmDis, s.oppApp, s.oppDis, s.pmNet, s.oppNet], [35, 59, 33, 49, -24, -16],
+    "given-name headers read (\"Anthony Albanese Satisfaction\")");
+  const bare = parseSatisfaction([
+    ["Wave", "Albanese Satisfaction", "Albanese Dissatisfaction", "Taylor Satisfaction", "Taylor Dissatisfaction"],
+    ["Sep 21", "35", "59", "33", "49"],
+  ], "taylor");
+  assert.deepEqual([bare.pmNet, bare.oppNet], [-24, -16], "bare-surname headers still read");
+  assert.equal(parseSatisfaction([["Wave", "Satisfaction"], ["Sep 21", "35"]], "taylor"), null, "no leader columns: decline");
 }
 
 // ---- a re-run keeps hand-entered source sections (n24KeepHand)

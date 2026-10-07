@@ -49,6 +49,19 @@ case "$LAST_LINE" in
   *) log "FAIL extract (no ESSENTIAL_STATUS line): $LAST_LINE"; exit 1 ;;
 esac
 
+# A warning the extractor logged but didn't exit on (a report that parsed
+# zero cards, a page that never loaded) fails the run — but only AFTER
+# anything that did land is committed and pushed, so the page never costs a
+# wave. SEC Newgate established the pattern; WARN/ASSIM_WARN are honoured at
+# every remaining exit-0 site by warn_check.
+WARN="$(node .build/status-warn.mjs ESSENTIAL_STATUS "$LAST_LINE")"
+ASSIM_WARN=""
+warn_check() {
+  [ -n "$WARN" ] && { log "FAIL extract (exit 1): $WARN"; exit 1; }
+  [ -n "$ASSIM_WARN" ] && { log "FAIL assimilate (exit 1): $ASSIM_WARN"; exit 1; }
+  return 0
+}
+
 # Runs the assimilator, teeing output to the log. Sets ASSIM_LAST to the
 # run's ASSIMILATE_STATUS line; non-zero return means failure (already
 # logged). A no-op run writes nothing (no CSV rewrite, no proof-file
@@ -64,7 +77,10 @@ run_assimilator() {
   fi
   ASSIM_LAST="$(echo "$ASSIM_OUT" | tail -1)"
   case "$ASSIM_LAST" in
-    ASSIMILATE_STATUS*) log "$ASSIM_LAST"; return 0 ;;
+    ASSIMILATE_STATUS*)
+      log "$ASSIM_LAST"
+      ASSIM_WARN="$(node .build/status-warn.mjs ASSIMILATE_STATUS "$ASSIM_LAST")"
+      return 0 ;;
     *) log "FAIL assimilate (no ASSIMILATE_STATUS line): $ASSIM_LAST"; return 1 ;;
   esac
 }
@@ -166,6 +182,7 @@ if [ "$DATA_CHANGED" = false ]; then
   elif [ $CONFIRM -ne 0 ]; then
     log "skip-confirm refused (see above); human review needed"
   fi
+  warn_check # everything any commit carried is already pushed
   exit 0
 fi
 
@@ -195,4 +212,5 @@ if ! push_main "$MSG" "${ESS_FILES[@]}"; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"
+warn_check # the alarms, last: everything that landed is committed and pushed
 exit 0
