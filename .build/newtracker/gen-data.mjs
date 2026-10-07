@@ -2436,12 +2436,17 @@ const mood = MOOD_FILE ? Object.fromEntries(["consumer", "westpacConsumer", "bus
    is the odd one out at 0 – drawn +100 only where a shared neutral line
    is plotted; here it keeps the figure the survey printed). */
 /* Lane tuple: [mood key, byline client, product line, neutral anchor,
-   published sample]. Only Westpac–MI prints a CONSTANT sample (every
-   bulletin: "The survey is conducted by OZINFO & DYNATA… based on 1200
-   adults") – the ANZ weekly varies release to release (1,025/1,030 over
-   2025–2026), RM Business prints a 12‑month AVERAGE (1,159 at Aug 2026)
-   and NAB's is per‑month prose ("around 507 businesses", May 2026). Any
-   other lane's cell is an honest em‑dash, never an invented constant. */
+   constant sample fallback]. The sample law is per-release provenance: a
+   row's cell is the release's OWN printed figure (mood.json row.n, read
+   off its release by .build/mood.mjs), the lane constant standing in
+   where a house prints one (Westpac–MI's every bulletin: "conducted by
+   OZINFO & DYNATA… based on 1200 adults"), else an honest em‑dash – never
+   an invented constant. The fieldwork column is the release's own
+   window (fwLabel of row.fwStart–row.fwEnd); a business release's one‑date
+   survey month (row.fwm) prints as its month label; what wasn't printed
+   stays a release date. Any sort of the table appends the fieldwork
+   year's 'YY suffix, so `year` rides every row – String(undefined) would
+   print "’de". */
 const CONF_LANES = [
   ["consumer", "ANZ–Roy Morgan", "Consumer Confidence", 100, null],
   ["westpacConsumer", "Westpac–MI", "Consumer Sentiment", 100, 1200],
@@ -2456,10 +2461,16 @@ const confidenceOnlyPolls = (() => {
     if (!s) continue;
     for (const r of s.rows) {
       if (dx(r.date) < eX) continue;
-      const ym = ymOf(r.date), field = fwLabel(null, r.date);
+      const ym = ymOf(r.date);
+      const field = r.fwStart ? fwLabel(r.fwStart, r.fwEnd || r.date)
+        : r.fwm ? monthName(+r.fwm.slice(5, 7))
+        : fwLabel(null, r.date);
       out.push({
         ym, x: mx(ym) + (dayOf(r.date) - 15) / 365, day: dayOf(r.date),
-        pollster: by, field, dateLabel: field, released: r.date, sample,
+        pollster: by, field, dateLabel: field, released: r.date,
+        sample: r.n ?? sample,
+        ...(r.fwStart ? { fmid: fmidIso(r.fwStart, r.fwEnd || r.date) } : {}),
+        year: +r.date.slice(0, 4),
         ...(r.url ? { url: r.url } : {}),
         client: product,
         p: {}, appr: {}, chg: null,
