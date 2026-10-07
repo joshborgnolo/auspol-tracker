@@ -102385,7 +102385,7 @@ function RdAllPolls(P) {
     const t = rdApDays(p.released);
     return t > upd - winDays * 864e5 && t <= upd && figOf(p).a != null;
   };
-  const win = rows.filter(inToday);
+  const win = (facet === "confidence" ? D.individualPolls : rows).filter(inToday);
   let head = null,
     dek = null;
   if (today && win.length) {

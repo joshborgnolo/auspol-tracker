@@ -1830,7 +1830,10 @@ function RdAllPolls(P) {
   const upd = rdApDays(D.latest.updatedISO);
   const winDays = (D.latest.method && D.latest.method.windowDays) || 21;
   const inToday = (p) => { const t = rdApDays(p.released); return t > upd - winDays * 864e5 && t <= upd && figOf(p).a != null; };
-  const win = rows.filter(inToday);
+  /* the confidence facet replaces `rows` with its releases, which carry no
+     2PP figure - the where-things-stand head/dek stays poll-based there, so
+     it reads the same polls the other facets compute it from */
+  const win = (facet === "confidence" ? D.individualPolls : rows).filter(inToday);
   let head = null, dek = null;
   if (today && win.length) {
     const vals = win.map((p) => figOf(p).a);
