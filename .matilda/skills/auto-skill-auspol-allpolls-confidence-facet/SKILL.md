@@ -1,6 +1,6 @@
 ---
 name: auspol-allpolls-confidence-facet
-description: auspol-tracker — the All-polls CONFIDENCE facet (?f=c, 7th facet; row set shipped 4328ee3, lane-constant sample column 4b15150, PER-RELEASE Sample + Fieldwork columns 5adfeb5, all 2026-10-07; user's brief "the home of the data used in the economic mood chart") end-to-end: gen-data.mjs confidenceOnlyPolls emitter + CONF_LANES lane tuples (~:2438, reads the SAME data/mood.json as the Snapshot mood panel — releases not polls, so like issuesOnlyPolls/directionOnlyPolls the facet REPLACES the row set with empty p:{}/appr:{} stubs and threads the "release/releases" noun through pinbar, count, CSV aria, empty state, sheet and chevron labels; no scope pill, no poll counts), the shared 40–120 meter with neutral-100 emphasised (NAB prints its true net balance, drawn +100), printed change + NAB conditions riding the change cell, sortable Figure/Change, month rows "N releases", and the Sample + Fieldwork columns' PER-RELEASE provenance law (data half committed 3fc015f + f9c2b9b): a row's figure is the release's OWN printed number (mood.json row.n, read off its release by .build/mood.mjs — ANZ 1,019 / RM Business 1,094 / NAB ~507 land per release), the tuple slot-5 constant stands in ONLY where a house prints one (Westpac–MI's 1200 adults), else an honest em-dash; field = fwLabel(row.fwStart–row.fwEnd), business rows print their survey MONTH (row.fwm → "Apr '25"), and year + conditional fmid keys ride every row (a missing year prints "'de" — renderer contract). Also the where-things-stand head/dek law (fixed 2026-10-07): the rebuild's RdHed renders on EVERY facet by design, but its window is computed from the facet's row set, so on this row-REPLACING facet it silently vanished — the window reads D.individualPolls here (probe conf-headline.mjs pins head/dek parity with the 2PP facet incl. ?f=c deep links). Also the paired "Economic mood" → "Economic sentiment" rename contract (visible copy moved, every identifier frozen).
+description: auspol-tracker — the All-polls CONFIDENCE facet (?f=c, 7th facet; row set shipped 4328ee3, lane-constant sample column 4b15150, PER-RELEASE Sample + Fieldwork columns 5adfeb5, all 2026-10-07; user's brief "the home of the data used in the economic mood chart") end-to-end: gen-data.mjs confidenceOnlyPolls emitter + CONF_LANES lane tuples (~:2438, reads the SAME data/mood.json as the Snapshot mood panel — releases not polls, so like issuesOnlyPolls/directionOnlyPolls the facet REPLACES the row set with empty p:{}/appr:{} stubs and threads the "release/releases" noun through pinbar, count, CSV aria, empty state, sheet and chevron labels; no scope pill, no poll counts), the shared 40–120 meter with neutral-100 emphasised (NAB prints its true net balance, drawn +100), printed change + NAB conditions riding the change cell, sortable Figure/Change, month rows "N releases", and the Sample + Fieldwork columns' PER-RELEASE provenance law (data half committed 3fc015f + f9c2b9b): a row's figure is the release's OWN printed number (mood.json row.n, read off its release by .build/mood.mjs — ANZ 1,019 / RM Business 1,094 / NAB ~507 land per release), the tuple slot-5 constant stands in ONLY where a house prints one (Westpac–MI's 1200 adults), else an honest em-dash; field = fwLabel(row.fwStart–row.fwEnd), business rows print their survey MONTH (row.fwm → "Apr '25"), and year + conditional fmid keys ride every row (a missing year prints "'de" — renderer contract). Also the where-things-stand head/dek law (fixed 2026-10-07): the rebuild's RdHed renders on EVERY facet by design, but its window is computed from the facet's row set, so on this row-REPLACING facet it silently vanished — the window reads D.individualPolls here (probe conf-headline.mjs pins head/dek parity with the 2PP facet incl. ?f=c deep links). Also the paired "Economic mood" → "Economic sentiment" rename contract (visible copy moved, every identifier frozen). Also the opened-row byline fix (facac9e, 2026-10-07): the shared rdPollHead header sentence treated any non-self client as a PUBLISHER, so confidence rows printed "published by the Consumer Confidence" — p.conf rows now byline the house slot (pollster), never the product-line client; probe conf-byline.mjs (18 checks) pins all four lanes + a 2PP regression guard.
 source: auto-skill
 extracted_at: '2026-10-07'
 ---
@@ -123,6 +123,45 @@ confined to those key names before committing (worked: a sibling
 session's rebuild leaked live rd-allpollls WIP into the built page
 mid-commit; see auspol-clean-artifact-commit's shelve-rebuild recipe).
 
+## The opened-row header sentence byline (fixed 2026-10-07, facac9e)
+
+The shared detail header sentence ("Conducted on … from a sample of
+…, published by …") is `rdPollHead(p)` (rd-allpolls.jsx ~:176),
+consumed by BOTH the All-polls detail renderer (rd-allpolls.jsx :1384)
+and the Latest-polls PollDetail (rd-polls.jsx :415). Its byline rule
+was "a non-self client is the publisher" — fine for polls, but THIS
+facet's emitter law parks the PRODUCT LINE in the client slot
+("Consumer Confidence"), so every confidence row printed the absurd
+"published by the Consumer Confidence" (user report 2026-10-07).
+Fix: confidence rows (`p.conf` truthy) byline the house slot like a
+self-published poll:
+
+    "published by " + (p.conf ? p.pollster : p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster)
+
+The client path is untouched for real polls. Lesson: the `client =
+product line, pollster = byline house` emitter law is a LOCAL display
+convention of this facet — every downstream consumer of `client` must
+know a confidence row's client is not a publisher. The fix comment in
+rdPollHead documents exactly this.
+
+Pin: `.matilda/probe/conf-byline.mjs` (18 checks, committed with the
+fix, force-added past the gitignored `.matilda/` dir) — walks to
+`?f=c#allpolls`, opens one row per lane asserting "published by
+<house>" and never /published by the (Consumer|Business)
+(Confidence|Sentiment)/, opens a 2PP-facet row as the regression guard
+for the client/pollster path, ends with a SOURCE pin on the p.conf
+branch. Probe-author traps pinned there: the All-polls 2PP facet tab
+label is EXACTLY "2PP" (clicking "Two-party preferred" times out —
+FACETS rd-allpolls.jsx :1907), and the Roy Morgan business lane's row
+must be matched excluding "ANZ–Roy" (both lanes contain "Roy Morgan"
+and TWO lanes print the product "Business Confidence").
+
+Shipped from a sidecar worktree at 34b23d0 (`.worktrees/conf-byline`;
+recipe + 2026-10-07 variant in auspol-worktree-scratch-files) because
+the live sibling lane carried an uncommitted edit to the SAME file —
+parking was untouchable while the sibling was actively growing their
+lane during the polling windows.
+
 ## The where-things-stand head/dek law (fixed 2026-10-07)
 
 The redesign's All-polls headline+dek ("Labor's 51.4 comes from seven
@@ -138,13 +177,19 @@ alone — no error anywhere, the `<RdHed>` just isn't there. User call
 `const win = (facet === "confidence" ? D.individualPolls : rows).filter(inToday)`
 (rd-allpolls.jsx ~:1833). `D.individualPolls` is the seed of the mapped
 `rows` on every poll facet, so the computed text is byte-identical in
-every branch (kalman/trend wording, resp/imp basis, lnp/onp matchup);
-section chrome (`.rd-title` "Economic sentiment", `.rd-meta`) untouched.
+every branch (kalman/trend wording, resp/imp basis, lnp/onp matchup).
+The `.rd-title` stays "Economic sentiment"; the `.rd-meta` was trimmed
+the same day (second user call 2026-10-07) to exactly "Every release of
+the four confidence indices since the <rdElecYear> election" — the
+house-name dek is gone, and the classic view's `card-sub` confidence
+branch carries the same plain sentence (d1a1d215; its count/span tail
+now renders only on the poll facets).
 
-Pin: `.matilda/probe/conf-headline.mjs` (13 checks) — tab walk to
+Pin: `.matilda/probe/conf-headline.mjs` (18 checks) — tab walk to
 Confidence at 760/1366px asserts head+dek equal the 2PP facet's, deep
 link `?f=c#allpolls` asserts them on first paint, chrome still reads
-"Economic sentiment", and a SOURCE pin
+"Economic sentiment", the CONF_META line renders in place of the old
+house-name dek (poll-facet meta asserted intact), and a SOURCE pin
 (`src.includes('const win = (facet === "confidence" ? D.individualPolls : rows)')`)
 catches the edit being reverted (it caught the 2026-10-07 sibling
 stash-park, see shared-repo-session-race). **Any future facet that

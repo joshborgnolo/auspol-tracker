@@ -84541,8 +84541,8 @@ function AllPollsView({
     className: "card-title"
   }, facet === "confidence" ? "Economic sentiment" : "All polls"), React.createElement("p", {
     className: "card-sub"
-  }, facet === "confidence" ? React.createElement(React.Fragment, null, "Every release of the four confidence gauges this term \u2013 ANZ\u2013Roy Morgan\u2019s consumer weekly, Westpac\u2013MI\u2019s monthly, and Roy Morgan\u2019s and NAB\u2019s business reads: ", total, " releases,") : React.createElement(React.Fragment, null, "Every individual national poll in the archive, ", total, totalAll !== total ? " of " + totalAll : "", " polls from ", housesAll.length, " pollsters,"), " ", (() => {
-    const src = facet === "confidence" ? confOnlyAll : D.individualPolls;
+  }, facet === "confidence" ? "Every release of the four confidence indices since the 2025 election" : React.createElement(React.Fragment, null, "Every individual national poll in the archive, ", total, totalAll !== total ? " of " + totalAll : "", " polls from ", housesAll.length, " pollsters,", " ", (() => {
+    const src = D.individualPolls;
     const f = src[0],
       l = src[src.length - 1];
     if (!f || !l) return null;
@@ -84551,7 +84551,7 @@ function AllPollsView({
       return D.monthNameFull(m) + " " + y;
     };
     return lab(f.fym || f.ym) + "–" + lab(l.ym);
-  })())), React.createElement("div", {
+  })()))), React.createElement("div", {
     className: "ap-head-side"
   }, React.createElement(TextToggle, {
     value: facet,
@@ -103856,7 +103856,7 @@ function RdAllPolls(P) {
     id: "rd-ap-t"
   }, facet === "confidence" ? "Economic sentiment" : "All polls"), React.createElement("span", {
     className: "rd-meta"
-  }, facet === "confidence" ? "Every release of the four confidence gauges this term – ANZ–Roy Morgan’s consumer weekly, Westpac–MI’s monthly, and Roy Morgan’s and NAB’s business reads" : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"), !phone && React.createElement("nav", {
+  }, facet === "confidence" ? "Every release of the four confidence indices since the " + rdElecYear + " election" : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"), !phone && React.createElement("nav", {
     className: "rd-eyebrow-tools rd-ap-nav",
     "aria-label": "On this page"
   }, React.createElement("button", {

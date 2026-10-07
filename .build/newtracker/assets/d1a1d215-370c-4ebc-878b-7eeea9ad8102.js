@@ -5753,19 +5753,21 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
           <h2 className="card-title">{facet === "confidence" ? "Economic sentiment" : "All polls"}</h2>
           <p className="card-sub">
             {facet === "confidence"
-              ? <>Every release of the four confidence gauges this term – ANZ–Roy Morgan’s consumer weekly, Westpac–MI’s monthly, and Roy Morgan’s and NAB’s business reads: {total} releases,</>
-              : <>Every individual national poll in the archive, {total}{totalAll !== total ? " of " + totalAll : ""} polls from {housesAll.length} pollsters,</>}
-            {" "}{(() => {  // span computed from the data, so it stays honest as rows are added
-              const src = facet === "confidence" ? confOnlyAll : D.individualPolls;
-              const f = src[0], l = src[src.length - 1];
-              if (!f || !l) return null;
-              const lab = (ym) => { const [y, m] = ym.split("-").map(Number); return D.monthNameFull(m) + " " + y; };
-              /* the start is the first fieldwork's OPENING month (fym), not
-                 the close-month the ym bucket is named for: the term's first
-                 wave ran 5 May–1 Jun, and this span read "June 2025" until
-                 the opening month was admitted */
-              return lab(f.fym || f.ym) + "–" + lab(l.ym);   // range: tight en dash, never spaced
-            })()}
+              ? "Every release of the four confidence indices since the 2025 election"
+              : <>
+                  Every individual national poll in the archive, {total}{totalAll !== total ? " of " + totalAll : ""} polls from {housesAll.length} pollsters,
+                  {" "}{(() => {  // span computed from the data, so it stays honest as rows are added
+                    const src = D.individualPolls;
+                    const f = src[0], l = src[src.length - 1];
+                    if (!f || !l) return null;
+                    const lab = (ym) => { const [y, m] = ym.split("-").map(Number); return D.monthNameFull(m) + " " + y; };
+                    /* the start is the first fieldwork's OPENING month (fym), not
+                       the close-month the ym bucket is named for: the term's first
+                       wave ran 5 May–1 Jun, and this span read "June 2025" until
+                       the opening month was admitted */
+                    return lab(f.fym || f.ym) + "–" + lab(l.ym);   // range: tight en dash, never spaced
+                  })()}
+                </>}
           </p>
         </div>
         {/* phone only (CSS hides it wider): the filter bar's own copy of

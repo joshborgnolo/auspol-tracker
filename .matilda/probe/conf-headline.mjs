@@ -6,7 +6,10 @@
    window from D.individualPolls there (rd-allpolls.jsx). Asserts the head
    and dek on the Confidence facet are byte-identical to the 2PP facet's,
    on a tab walk at two widths and on a first-paint deep link, and that the
-   section chrome (the "Economic sentiment" title) was untouched. */
+   section chrome (the "Economic sentiment" title) was untouched. Later the
+   same day the facet's .rd-meta was trimmed to CONF_META (the house-name
+   dek dropped) — pinned here on the walk and the deep link, with the
+   poll-facet meta asserted unchanged. */
 import puppeteer from "puppeteer-core";
 import path from "path";
 import process from "process";
@@ -24,12 +27,15 @@ const hedOf = () => page.evaluate(() => {
   const h = document.querySelector(".rd-ap h2.rd-hed");
   const d = document.querySelector(".rd-ap p.rd-dek");
   const title = document.querySelector(".rd-ap h2.rd-title");
+  const meta = document.querySelector(".rd-ap .rd-eyebrow .rd-meta");
   return {
     head: h ? h.textContent.trim() : null,
     dek: d ? d.textContent.trim() : null,
     title: title ? title.textContent.trim() : null,
+    meta: meta ? meta.textContent.trim() : null,
   };
 });
+const CONF_META = "Every release of the four confidence indices since the 2025 election";
 const gotoPolls = async (w) => {
   await page.setViewport({ width: w, height: 980, deviceScaleFactor: 1 });
   await page.goto(PAGE + "#allpolls", { waitUntil: "networkidle0", timeout: 60000 });
@@ -43,6 +49,7 @@ for (const w of [760, 1366]) {
   const base = await hedOf();
   check(base.head && base.head.startsWith("Labor’s"), `${w}px 2PP: head computed (${base.head && base.head.slice(0, 60)}…)`);
   check(base.dek && base.dek.includes("none sits further"), `${w}px 2PP: dek computed`);
+  check(base.meta && base.meta.includes("poll since"), `${w}px 2PP: meta unchanged (${JSON.stringify((base.meta || "").slice(0, 50))})`);
   await page.evaluate(() => {
     [...document.querySelectorAll(".rd-ap-tabs .rd-tab")].find((el) => el.textContent.trim() === "Confidence").click();
   });
@@ -63,6 +70,7 @@ for (const w of [760, 1366]) {
   check(onConf.head === base.head, `${w}px Confidence: head identical (${JSON.stringify((onConf.head || "").slice(0, 50))})`);
   check(onConf.dek === base.dek, `${w}px Confidence: dek identical`);
   check(onConf.title === "Economic sentiment", `${w}px Confidence: chrome still reads Economic sentiment`);
+  check(onConf.meta === CONF_META, `${w}px Confidence: meta is the trimmed indices line (${JSON.stringify((onConf.meta || "").slice(0, 60))})`);
 }
 
 /* 2. first-paint deep link, no tab walk involved */
@@ -79,6 +87,7 @@ await page.waitForFunction(
 const deep = await hedOf();
 check(deep.head === wantFromWalk.head && deep.head != null, `deep link ?f=c: head identical on first paint (${JSON.stringify((deep.head || "").slice(0, 50))})`);
 check(deep.dek === wantFromWalk.dek && deep.dek != null, "deep link ?f=c: dek identical on first paint");
+check(deep.meta === CONF_META, "deep link ?f=c: meta is the trimmed indices line on first paint");
 
 /* 3. SOURCE pin: the window comes from D.individualPolls on the facet */
 const src = await import("fs").then((fs) => fs.default.readFileSync(path.resolve(process.cwd(), ".build/newtracker/assets/rd-allpolls.jsx"), "utf8"));
