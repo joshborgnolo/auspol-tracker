@@ -403,6 +403,10 @@ function TrendChart(props) {
   React.useEffect(() => { if (!travelling.current) prev.current = fresh; });
 
   const ref = useRef(null);
+  /* toVB's measured viewport rect, held between events: it moves only when
+     the page scrolls or the layout can have shifted the svg, and the
+     invalidators below drop it then */
+  const svgRect = useRef(null);
   const badgeAt = useRef({});                // the redesign's spread event badges, by event
   const labOff = useRef(new Map());          // each end name's dodge, eased mid-switch
   // axis text in real on-screen px – normalise by measured width so every
@@ -418,17 +422,30 @@ function TrendChart(props) {
   React.useLayoutEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
-    const update = () => setCw(el.getBoundingClientRect().width || VB.W);
+    const update = () => { svgRect.current = null; setCw(el.getBoundingClientRect().width || VB.W); };
     if (widthSeed == null) update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
+    /* scrolling moves every rect in the viewport, and content changing
+       height above the chart (an expanded poll) moves this one without a
+       scroll – a body resize sees that. The scroll listener runs in the
+       capture phase so the pinned strips' inner scrolls drop it too. */
+    const drop = () => { svgRect.current = null; };
+    window.addEventListener("scroll", drop, true);
+    window.addEventListener("resize", drop);
+    const bro = new ResizeObserver(drop);
+    bro.observe(document.body);
     /* copy-chart.js flags the host data-copying for an image's layout. A
        chart already 1120px wide gets no resize from that, and rendered
        without the flag it kept the screen's tight event spacing in the copy,
        so the flag itself re-renders the chart, on and off. */
     const mo = new MutationObserver(() => setCopyTick((t) => t + 1));
     mo.observe(el, { attributes: true, attributeFilter: ["data-copying"] });
-    return () => { ro.disconnect(); mo.disconnect(); };
+    return () => {
+      ro.disconnect(); mo.disconnect(); bro.disconnect();
+      window.removeEventListener("scroll", drop, true);
+      window.removeEventListener("resize", drop);
+    };
   }, []);
   const k0 = cw / VB.W;
   /* A copy is at least 0.3 of its width tall: a small multiple's 140px,
@@ -565,7 +582,11 @@ function TrendChart(props) {
   // reader could point - always the lowest-running series first, which is
   // the newest readings on that panel.
   const toVB = (e) => {
-    const rect = ref.current.querySelector("svg").getBoundingClientRect();
+    /* cached: a pointermove reads this every frame, and reading it back
+       then forced a layout flush on the DOM state the previous move had
+       just dirtied. The invalidators above re-measure the moment the rect
+       can actually have moved. */
+    const rect = svgRect.current || (svgRect.current = ref.current.querySelector("svg").getBoundingClientRect());
     return {
       x: ((e.clientX - rect.left) / rect.width) * W,
       y: ((e.clientY - rect.top) / rect.height) * H,
@@ -1078,6 +1099,31 @@ function TrendChart(props) {
     return p ? <path key={"m" + i} d={p} {...common} /> : <circle key={"m" + i} cx={cx} cy={cy} r={DOT_R} {...common} />;
   });
 
+  /* An area's edge paths (the CI ribbon is the busy one) depend only on its
+     series and the geometry: hoisting them behind the same geom key the
+     dots ride keeps a hover scrub from re-stringing curves that cannot
+     have moved. The wipe signature re-keys a band whose line is mid-erasure
+     without window travel forcing the issue. */
+  const wipeSig = series.some((s) => s.wipe != null)
+    ? series.map((s) => (s.wipe == null ? "-" : s.wipe)).join("|")
+    : "";
+  const areaGeo = React.useMemo(() => areas.map((a) => {
+    if (!a.points || a.points.length < 2) return { a };
+    if (a.wipeOf != null && wipedOut.has(a.wipeOf)) return { a };
+    /* `smooth` follows the same curve the trend lines use (the spline, or
+       the redesign's monotone). An interval ribbon has to be drawn with the
+       curve it belongs to – straight edges under a curved line pull away
+       from it mid-month and read as a second, disagreeing series. The
+       redesign curves every band unless it opts out (`smooth: false`): its
+       lines are all monotone, so a straight band is always the odd one. */
+    const edgePath = (pts, key, lead) => rd && a.smooth !== false
+      ? monotoneXY(pts.map((d) => [sx(d.x), sy(d[key])]), lead)
+      : a.smooth
+      ? smoothPath(pts.map((d) => ({ x: d.x, y: d[key] })), sx, sy).replace(/^M/, lead)
+      : pts.map((d, i) => `${i ? "L" : lead} ${sx(d.x).toFixed(2)} ${sy(d[key]).toFixed(2)}`).join(" ");
+    return { a, top: edgePath(a.points, "y1", "M"), bot: edgePath(a.points.slice().reverse(), "y0", "L") };
+  }), [areas, geom, wipeSig, rd]);
+
   /* ---- key events ---------------------------------------------------------
      A busy set (the hero's history) shows only when the chart is genuinely
      wide ON SCREEN (measured px, so phones and narrow columns stay
@@ -1178,7 +1224,11 @@ function TrendChart(props) {
     });
   };
   const evKey = (e) => e.date + "|" + (e.short || e.label);
-  const evPlaced = (() => {
+  /* memoised on the same geom key the dots already ride: a hover scrub
+     re-renders dozens of times a second with the geometry unmoved, and the
+     sort-plus-pack work here is the render's expensive pure part. `copying`
+     re-keys it because a copy packs wider and names every label. */
+  const evPlaced = React.useMemo(() => {
     const to = placeEvents(events);
     if (!eventsFrom || eventMix >= 1) return to;
     const from = placeEvents(eventsFrom), t = eventMix;
@@ -1193,7 +1243,7 @@ function TrendChart(props) {
     });
     byKey.forEach((q) => out.push({ ...q, op: 1 - t, leaving: true }));
     return out.sort((a, b) => a.ex - b.ex);
-  })();
+  }, [events, eventsFrom, eventMix, copying, geom, rd]);
   /* A controlled evt follows the placement of whatever set is on screen now
      (a list that stayed open over a matchup or range switch is re-hung where
      its event sits today, and put away when the new window drops the event);
@@ -1288,22 +1338,8 @@ function TrendChart(props) {
                 height={Math.abs(sy(b.y0) - sy(b.y1))} fill={b.color} />
         ))}
         {/* x-varying shaded areas – drawn under everything, clipped to the plot */}
-        {areas.map((a) => {
-          if (!a.points || a.points.length < 2) return null;
-          if (a.wipeOf != null && wipedOut.has(a.wipeOf)) return null;
-          /* `smooth` follows the same curve the trend lines use (the spline,
-             or the redesign's monotone). An interval ribbon has to be drawn
-             with the curve it belongs to – straight edges under a curved line
-             pull away from it mid-month and read as a second, disagreeing series.
-             The redesign curves every band unless it opts out (`smooth: false`):
-             its lines are all monotone, so a straight band is always the odd one. */
-          const edgePath = (pts, key, lead) => rd && a.smooth !== false
-            ? monotoneXY(pts.map((d) => [sx(d.x), sy(d[key])]), lead)
-            : a.smooth
-            ? smoothPath(pts.map((d) => ({ x: d.x, y: d[key] })), sx, sy).replace(/^M/, lead)
-            : pts.map((d, i) => `${i ? "L" : lead} ${sx(d.x).toFixed(2)} ${sy(d[key]).toFixed(2)}`).join(" ");
-          const top = edgePath(a.points, "y1", "M");
-          const bot = edgePath(a.points.slice().reverse(), "y0", "L");
+        {areaGeo.map(({ a, top, bot }) => {
+          if (top == null) return null;
           return (
             /* the chart's window outside, the area's own inside: an interval
                that belongs to one line has to grow and retreat with it, or it

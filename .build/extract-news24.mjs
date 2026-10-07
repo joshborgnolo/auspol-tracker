@@ -95,7 +95,7 @@
 //     N24_IG_DIR reads Infogram embeds from ig-<id>.html fixture captures
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { fetchText, fetchWithCookies, MONTHS, clean, writeAtomic } from "./extract-common.mjs";
+import { fetchText, fetchWithCookies, MONTHS, clean, writeAtomic, pool } from "./extract-common.mjs";
 import { IG_EMBED } from "./infogram.mjs";
 import { n24IdsOf, n24InfogramFetch, n24Figures, n24Corroborate } from "./news24-infogram.mjs";
 import { melbourneMinute } from "./melbourne-time.mjs";
@@ -218,17 +218,26 @@ async function pulseWaves(D, wikiWaves, notes) {
   return [...byDate.values()];
 }
 
+// the same story can surface from the Pulse scan AND the Wikipedia table in
+// one run – fetch its DOM once (igCache above does the same for the embeds)
+const artCache = new Map();
 async function fetchNews24Article(url) {
   if (NEWS24_FILE) return { html: readFileSync(NEWS24_FILE, "utf8"), via: "file" };
+  if (artCache.has(url)) return artCache.get(url);
   // The Akamai "wall" is a cookie check (302 to check_cookie.html, which
   // sets a cookie and bounces back): a fetch that keeps the cookie reads the
   // article with no browser, so CI and agents get it too (2026-10-05).
+  let out;
   try {
     const { text } = await fetchWithCookies(url);
-    if (/News24 Pulse/i.test(text) || n24IdsOf(text).length) return { html: text, via: "anon" };
+    if (/News24 Pulse/i.test(text) || n24IdsOf(text).length) out = { html: text, via: "anon" };
   } catch { /* wall changed or site down; Chrome is the fallback */ }
-  const html = fetchNews24Chrome(url);
-  return html ? { html, via: "chrome" } : { html: null, via: null };
+  if (!out) {
+    const html = fetchNews24Chrome(url);
+    out = html ? { html, via: "chrome" } : { html: null, via: null };
+  }
+  artCache.set(url, out);
+  return out;
 }
 
 // Figure precedence inside a News24 wave: Infogram crosstab + dedicated
@@ -718,13 +727,19 @@ async function parseArticle(url, id) {
   const era = olFor(date) ?? LEADERS.ols[LEADERS.ols.length - 1];
   let vi = null, sat = null, ppmChart = null;
   const charts = {};
-  for (const cid of ids) {
-    const rows = await chartRows(`https://datawrapper.dwcdn.net/${cid}/dataset.csv`);
+  // chart pulls three at a time; the parse below still walks them in embed
+  // order, so ??= first-match precedence (vi > sat > ppm) and a failure
+  // throwing at its chart behave exactly as the serial walk did
+  const pulled = await pool(ids, 3, (cid) =>
+    chartRows(`https://datawrapper.dwcdn.net/${cid}/dataset.csv`).then((rows) => ({ rows }), (error) => ({ error })));
+  ids.forEach((cid, i) => {
+    if (pulled[i].error) throw pulled[i].error;
+    const rows = pulled[i].rows;
     charts[cid] = rows;
     vi ??= parseVi(rows);
     sat ??= parseSatisfaction(rows, era.surname);
     ppmChart ??= parsePpmChart(rows, era.surname);
-  }
+  });
   if (!vi) return null;
 
   // ppm prose fallback ("leading 44% to 35%" or "leading 44% versus 35%"
@@ -1038,17 +1053,26 @@ try {
 
   const recs = [];
   const seen = new Set();
+  const work = [];
   for (const it of cands) {
     const id = +(it.link.match(/articles\/(\d+)/) ?? [])[1];
     if (!id || seen.has(id)) continue;
     seen.add(id);
+    work.push({ it, id });
+  }
+  // articles read two at a time; status records are replayed in candidate
+  // order below, so the STATUS JSON a run emits stays deterministic
+  const pulled = await pool(work, 2, async ({ it, id }) => {
+    try { return { rec: await parseArticle(it.link, id) }; }
+    catch (e) { return { note: `N24_NOTE fetch/parse failed ${it.link}: ${e.message}` }; }
+  });
+  for (let i = 0; i < work.length; i++) {
+    const { it } = work[i], p = pulled[i];
     status.candidates.push(it.title.slice(0, 90));
-    let rec;
-    try { rec = await parseArticle(it.link, id); }
-    catch (e) { console.error(`N24_NOTE fetch/parse failed ${it.link}: ${e.message}`); continue; }
-    if (!rec) continue; // not the federal Public Data series
-    status.candidates.push(`  -> parsed ${rec.date}`);
-    recs.push(rec);
+    if (p.note) { console.error(p.note); continue; }
+    if (!p.rec) continue; // not the federal Public Data series
+    status.candidates.push(`  -> parsed ${p.rec.date}`);
+    recs.push(p.rec);
   }
 
   const guardFails = [];

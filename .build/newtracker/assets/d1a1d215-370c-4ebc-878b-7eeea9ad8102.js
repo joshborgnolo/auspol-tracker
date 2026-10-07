@@ -5014,41 +5014,47 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      count speak in houses. The table rows themselves keep the full name, so
      an MRP or SMS release is still labelled as one. */
   const baseHouse = (h) => h.replace(/ \((MRP|SMS)\)$/, "");
-  const houses = [];
-  D.individualPolls.forEach((p) => { const b = baseHouse(p.pollster); if (!houses.includes(b)) houses.push(b); });
-  houses.sort();
-  /* SEC Newgate asks the direction question and nothing else, so its waves
-     carry no row in individualPolls – gen-data files them as
-     directionOnlyPolls, shaped for this table. They join the row set (and
-     the house joins the Pollster panel and the URL's valid-who set) on the
-     direction facet ONLY: off it a SEC row is a row of dashes, and an
-     "SEC Newgate" chip would select an empty table. */
-  const dirOnlyAll = D.directionOnlyPolls || [];
-  const housesDir = [...houses];
-  dirOnlyAll.forEach((p) => { const b = baseHouse(p.pollster); if (!housesDir.includes(b)) housesDir.push(b); });
-  housesDir.sort();
-  /* Ipsos is the direction-only case one question further still: it asks
-     issues and nothing else, so its waves come as issuesOnlyPolls and join
-     the row set (and its house the panel and URL set) on the issues facet
-     only. SEC Newgate's direction-only rows ride there too – they carry the
-     wave's concerns and best-party readings in their iss payload. */
-  const issOnlyAll = D.issuesOnlyPolls || [];
-  const housesIss = [...housesDir];
-  issOnlyAll.forEach((p) => { const b = baseHouse(p.pollster); if (!housesIss.includes(b)) housesIss.push(b); });
-  housesIss.sort();
-  /* The mood panel's four gauges publish on their own rhythm, unrelated to
-     any poll (gen-data §5j): confidenceOnlyPolls shapes their releases for
-     this table, and they join the row set (and their publishers the panel
-     and the URL's valid-who set) on the confidence facet only. They are
-     releases, not polls – no sample, no voting figures, and never a count
-     added to a poll total. */
-  const confOnlyAll = D.confidenceOnlyPolls || [];
-  const housesConf = [...housesIss];
-  confOnlyAll.forEach((p) => { const b = baseHouse(p.pollster); if (!housesConf.includes(b)) housesConf.push(b); });
-  housesConf.sort();
-  /* every house appearing on ANY facet – the "of N pollsters" tallies count
-     the archive's full house list, not the facet the reader is standing on */
-  const housesAll = [...housesConf];
+  /* The house lists are memoised behind stable identities: the row build
+     and the filter pipeline below key their own memos on these arrays, so
+     re-deriving them per render would make every one of those memos miss. */
+  const { houses, housesDir, housesIss, housesConf, housesAll, dirOnlyAll, issOnlyAll, confOnlyAll } = React.useMemo(() => {
+    const houses = [];
+    D.individualPolls.forEach((p) => { const b = baseHouse(p.pollster); if (!houses.includes(b)) houses.push(b); });
+    houses.sort();
+    /* SEC Newgate asks the direction question and nothing else, so its waves
+       carry no row in individualPolls – gen-data files them as
+       directionOnlyPolls, shaped for this table. They join the row set (and
+       the house joins the Pollster panel and the URL's valid-who set) on the
+       direction facet ONLY: off it a SEC row is a row of dashes, and an
+       "SEC Newgate" chip would select an empty table. */
+    const dirOnlyAll = D.directionOnlyPolls || [];
+    const housesDir = [...houses];
+    dirOnlyAll.forEach((p) => { const b = baseHouse(p.pollster); if (!housesDir.includes(b)) housesDir.push(b); });
+    housesDir.sort();
+    /* Ipsos is the direction-only case one question further still: it asks
+       issues and nothing else, so its waves come as issuesOnlyPolls and join
+       the row set (and its house the panel and URL set) on the issues facet
+       only. SEC Newgate's direction-only rows ride there too – they carry the
+       wave's concerns and best-party readings in their iss payload. */
+    const issOnlyAll = D.issuesOnlyPolls || [];
+    const housesIss = [...housesDir];
+    issOnlyAll.forEach((p) => { const b = baseHouse(p.pollster); if (!housesIss.includes(b)) housesIss.push(b); });
+    housesIss.sort();
+    /* The mood panel's four gauges publish on their own rhythm, unrelated to
+       any poll (gen-data §5j): confidenceOnlyPolls shapes their releases for
+       this table, and they join the row set (and their publishers the panel
+       and the URL's valid-who set) on the confidence facet only. They are
+       releases, not polls – no sample, no voting figures, and never a count
+       added to a poll total. */
+    const confOnlyAll = D.confidenceOnlyPolls || [];
+    const housesConf = [...housesIss];
+    confOnlyAll.forEach((p) => { const b = baseHouse(p.pollster); if (!housesConf.includes(b)) housesConf.push(b); });
+    housesConf.sort();
+    /* every house appearing on ANY facet – the "of N pollsters" tallies count
+       the archive's full house list, not the facet the reader is standing on */
+    return { houses, housesDir, housesIss, housesConf, housesAll: [...housesConf],
+      dirOnlyAll, issOnlyAll, confOnlyAll };
+  }, []);
 
   /* What each view needs a poll to have published. Primary vote is on every
      poll in the archive, so it has nothing to scope and gets no pill. It sits
@@ -5321,11 +5327,6 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const onSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: -1 }));
   const toggleHouse = (h) => setSel((s) => { const n = new Set(s); n.has(h) ? n.delete(h) : n.add(h); return n; });
 
-  /* the fieldwork label carries no year (gen-data's fwLabel is a day–month
-     range), so a row from a previous year can read as this year's – an old
-     "25–30 Sep" looks like next week. Rows outside the current calendar
-     year get a two-digit suffix ("… ’25"); current-year rows stay clean. */
-  const NOW_YEAR = new Date().getFullYear();
   /* The direction-only rows land here (why/what they are is at dirOnlyAll
      above): every count, panel option and filter below derives from this
      one merged list, so a SEC Newgate wave is rankable, searchable and
@@ -5333,102 +5334,115 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      confidence facet is the one that REPLACES the row set rather than
      adding to it: its release rows share no month with a poll because
      they live beside none – a release is a gauge's own event, and every
-     column it doesn't borrow from the poll world is empty by design. */
-  const dirOnly = facet === "direction" ? dirOnlyAll
-    : facet === "issues" ? dirOnlyAll.filter((p) => p.iss) : [];
-  const issOnly = facet === "issues" ? issOnlyAll : [];
-  const confOnly = facet === "confidence" ? confOnlyAll : [];
-  const housesV = facet === "issues" ? housesIss : confOnly.length ? housesConf : dirOnly.length ? housesDir : houses;
-  const rows = (facet === "confidence" ? confOnly : [...D.individualPolls, ...dirOnly, ...issOnly]).map((p) => {
-    const [y, mo] = p.ym.split("-").map(Number);
-    const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
-    const fieldLabel = p.fieldPending ? "TBC" : y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
-    const tags = pollTagIds(p);
-    /* poll lean follows the basis: the implied 2PP minus the implied
-       average of the OTHER polls fielded around it, or the NORMALISED
-       published share (alpN) minus the published one – normalised so
-       undecided-inclusive pairs compare fairly. The average is gen-data's
-       §3c yardstick (p.yd): the headline's estimator read at the wave's
-       fieldwork midpoint, the wave left out. It was the calendar month's
-       average, which early in a month could be the wave itself. A wave with
-       no figure on that basis, or no other poll within three weeks, has no
-       lean at all. */
-    const ydv = (k) => (p.yd && p.yd[k] ? p.yd[k].v : null);
-    // on the average as printed (one decimal), so the detail's sentences add up
-    const leanOf = (x, k) => (x != null && ydv(k) != null ? +(x - Math.round(ydv(k) * 10) / 10).toFixed(1) : null);
-    const leanLnp = pubBasis ? leanOf(p.alpN, "lnp") : leanOf(p.alpImp, "imp");
-    /* the same lean on ALP v ON: the house's own head-to-head against the
-       pooled published ones, or its implied ALP–ON reading against the
-       implied ALP–ON average – a genuinely separate quantity, carried by
-       the One Nation primary rather than the Coalition's */
-    const leanOn = pubBasis ? leanOf(p.tppAlt ? p.tppAlt.alp : null, "onp") : leanOf(p.alpOnImp, "onimp");
-    /* house effect is the emitted all-history snapshot per pollster ON THE
-       TABLE'S BASIS (gen-data runs the same estimator over tppRowsSynth as
-       houseEffects.synth and over the published series as houseEffects.tpp –
-       a house's implied bias is a different thing from its published-2PP
-       lean and the two are never borrowed across), so the same value rides
-       on every row that pollster owns; null when unmeasured. ALP v ON has
-       the same two snapshots (synthOn / alp_on). */
-    const HE = D.houseEffects || {};
-    const hfxLnp = ((HE[pubBasis ? "tpp" : "synth"] || {})[p.pollster]) || null;
-    const hfxOn = ((HE[pubBasis ? "alp_on" : "synthOn"] || {})[p.pollster]) || null;
-    /* the Lean / House effect COLUMNS show the table's matchup; the
-       matchups with no aggregate to be held against (L/NP v ON,
-       3-cornered) show none. The breakdown prints both contests. */
-    const lean = measure === "onp" ? leanOn : measure === "lnp" ? leanLnp : null;
-    const hfx = measure === "onp" ? hfxOn : measure === "lnp" ? hfxLnp : null;
-    // searchable haystack – everything a row knows, so the search box matches
-    // fieldwork dates, samples, 2PP / primary / matchup figures, nets, flags
-    const f1 = (v) => (v != null ? v.toFixed(1) : null);
-    const hayParts = [
-      p.pollster, p.field, fullDate, p.sample != null ? String(p.sample) : null,
-      // the month the row is filed under, spelt for the search box: "Feb 26"
-      // shows the year as two digits, so "feb 2026" / "february 2026" would
-      // otherwise miss every poll they name
-      D.monthName(mo) + " " + y, D.monthNameFull(mo) + " " + y,
-      f1(p.alp), f1(p.lnp),
-      lean != null ? (lean > 0 ? "+" : "") + lean.toFixed(1) : null,
-      f1(p.p.alp), f1(p.p.lnp), f1(p.p.grn), f1(p.p.onp), f1(p.p.oth),
-    ].filter(Boolean);
-    // the publisher as printed, so "news24" / "afr" / "smh" finds the waves it
-    // put its name to – "Self-published" is gen-data's stand-in, not a name
-    if (p.client && p.client !== "Self-published") {
-      hayParts.push(p.client);
-      const clientAlias = AP_CLIENT_ALIASES[p.client.toLowerCase()];
-      if (clientAlias) hayParts.push(clientAlias);
-    }
-    if (p.tpp3) hayParts.push(p.tpp3.alp.toFixed(1), p.tpp3.lnp.toFixed(1), p.tpp3.onp.toFixed(1), "3-cornered 3cp");
-    if (p.tppAlt) hayParts.push(p.tppAlt.alp.toFixed(1), p.tppAlt.onp.toFixed(1), "alp v on one nation matchup");
-    if (p.tppAlt2) hayParts.push(p.tppAlt2.lnp.toFixed(1), p.tppAlt2.onp.toFixed(1), "lnp v on one nation matchup");
-    if (p.appr.albNet != null) hayParts.push("albanese " + p.appr.albNet);
-    if (p.appr.taylorNet != null) hayParts.push("taylor " + p.appr.taylorNet);
-    if (p.appr.hansonNet != null) hayParts.push("hanson " + p.appr.hansonNet);
-    if (p.seats && p.seats.p) {
-      hayParts.push("seat projection mrp");
-      for (const k in p.seats.p) hayParts.push(k + " " + p.seats.p[k].est + " seats");
-    }
-    if (p.dir) {
-      hayParts.push("direction right track wrong track",
-        f1(p.dir.right), f1(p.dir.wrong), f1(p.dir.unsure),
-        (p.dir.net > 0 ? "+" : "") + p.dir.net);
-    }
-    if (p.iss) {
-      hayParts.push("issues salience best party");
-      (p.iss.sal || []).concat(p.iss.conc || []).forEach(([lab, v]) => hayParts.push(lab, String(v)));
-      const ib = issBestOf(p.iss);
-      if (ib) hayParts.push(ib.who, String(ib.v));
-    }
-    if (p.conf) {
-      hayParts.push("confidence economic sentiment consumer business", p.conf.lab, String(p.conf.v));
-      if (p.conf.cond != null) hayParts.push("conditions", String(p.conf.cond));
-    }
-    hayParts.push(...tags);   // so "fav", "ppm" etc. match in the search box too
-    const hay = hayParts.join(" ").toLowerCase();
-    return {
-      ...p, year: y, mo, fullDate, fieldLabel, lean, hfx, leanLnp, leanOn, hfxLnp, hfxOn, pubBasis, tags,
-      hay: hay + " " + hay.replace(/–/g, "-"),   // hyphen typed in search matches the en dash
-    };
-  });
+     column it doesn't borrow from the poll world is empty by design. The
+     build is memoised – it composes every row's lean, tags and search
+     haystack, and the filter pipeline below keys its own memo on the
+     result's identity, so the rows rebuild when an input moves, never on
+     a keystroke. */
+  const rows = React.useMemo(() => {
+    const dirOnly = facet === "direction" ? dirOnlyAll
+      : facet === "issues" ? dirOnlyAll.filter((p) => p.iss) : [];
+    const issOnly = facet === "issues" ? issOnlyAll : [];
+    const confOnly = facet === "confidence" ? confOnlyAll : [];
+    /* the fieldwork label carries no year (gen-data's fwLabel is a day–month
+       range), so a row from a previous year can read as this year's – an old
+       "25–30 Sep" looks like next week. Rows outside the current calendar
+       year get a two-digit suffix ("… ’25"); current-year rows stay clean. */
+    const NOW_YEAR = new Date().getFullYear();
+    return (facet === "confidence" ? confOnly : [...D.individualPolls, ...dirOnly, ...issOnly]).map((p) => {
+      const [y, mo] = p.ym.split("-").map(Number);
+      const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
+      const fieldLabel = p.fieldPending ? "TBC" : y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
+      const tags = pollTagIds(p);
+      /* poll lean follows the basis: the implied 2PP minus the implied
+         average of the OTHER polls fielded around it, or the NORMALISED
+         published share (alpN) minus the published one – normalised so
+         undecided-inclusive pairs compare fairly. The average is gen-data's
+         §3c yardstick (p.yd): the headline's estimator read at the wave's
+         fieldwork midpoint, the wave left out. It was the calendar month's
+         average, which early in a month could be the wave itself. A wave with
+         no figure on that basis, or no other poll within three weeks, has no
+         lean at all. */
+      const ydv = (k) => (p.yd && p.yd[k] ? p.yd[k].v : null);
+      // on the average as printed (one decimal), so the detail's sentences add up
+      const leanOf = (x, k) => (x != null && ydv(k) != null ? +(x - Math.round(ydv(k) * 10) / 10).toFixed(1) : null);
+      const leanLnp = pubBasis ? leanOf(p.alpN, "lnp") : leanOf(p.alpImp, "imp");
+      /* the same lean on ALP v ON: the house's own head-to-head against the
+         pooled published ones, or its implied ALP–ON reading against the
+         implied ALP–ON average – a genuinely separate quantity, carried by
+         the One Nation primary rather than the Coalition's */
+      const leanOn = pubBasis ? leanOf(p.tppAlt ? p.tppAlt.alp : null, "onp") : leanOf(p.alpOnImp, "onimp");
+      /* house effect is the emitted all-history snapshot per pollster ON THE
+         TABLE'S BASIS (gen-data runs the same estimator over tppRowsSynth as
+         houseEffects.synth and over the published series as houseEffects.tpp –
+         a house's implied bias is a different thing from its published-2PP
+         lean and the two are never borrowed across), so the same value rides
+         on every row that pollster owns; null when unmeasured. ALP v ON has
+         the same two snapshots (synthOn / alp_on). */
+      const HE = D.houseEffects || {};
+      const hfxLnp = ((HE[pubBasis ? "tpp" : "synth"] || {})[p.pollster]) || null;
+      const hfxOn = ((HE[pubBasis ? "alp_on" : "synthOn"] || {})[p.pollster]) || null;
+      /* the Lean / House effect COLUMNS show the table's matchup; the
+         matchups with no aggregate to be held against (L/NP v ON,
+         3-cornered) show none. The breakdown prints both contests. */
+      const lean = measure === "onp" ? leanOn : measure === "lnp" ? leanLnp : null;
+      const hfx = measure === "onp" ? hfxOn : measure === "lnp" ? hfxLnp : null;
+      // searchable haystack – everything a row knows, so the search box matches
+      // fieldwork dates, samples, 2PP / primary / matchup figures, nets, flags
+      const f1 = (v) => (v != null ? v.toFixed(1) : null);
+      const hayParts = [
+        p.pollster, p.field, fullDate, p.sample != null ? String(p.sample) : null,
+        // the month the row is filed under, spelt for the search box: "Feb 26"
+        // shows the year as two digits, so "feb 2026" / "february 2026" would
+        // otherwise miss every poll they name
+        D.monthName(mo) + " " + y, D.monthNameFull(mo) + " " + y,
+        f1(p.alp), f1(p.lnp),
+        lean != null ? (lean > 0 ? "+" : "") + lean.toFixed(1) : null,
+        f1(p.p.alp), f1(p.p.lnp), f1(p.p.grn), f1(p.p.onp), f1(p.p.oth),
+      ].filter(Boolean);
+      // the publisher as printed, so "news24" / "afr" / "smh" finds the waves it
+      // put its name to – "Self-published" is gen-data's stand-in, not a name
+      if (p.client && p.client !== "Self-published") {
+        hayParts.push(p.client);
+        const clientAlias = AP_CLIENT_ALIASES[p.client.toLowerCase()];
+        if (clientAlias) hayParts.push(clientAlias);
+      }
+      if (p.tpp3) hayParts.push(p.tpp3.alp.toFixed(1), p.tpp3.lnp.toFixed(1), p.tpp3.onp.toFixed(1), "3-cornered 3cp");
+      if (p.tppAlt) hayParts.push(p.tppAlt.alp.toFixed(1), p.tppAlt.onp.toFixed(1), "alp v on one nation matchup");
+      if (p.tppAlt2) hayParts.push(p.tppAlt2.lnp.toFixed(1), p.tppAlt2.onp.toFixed(1), "lnp v on one nation matchup");
+      if (p.appr.albNet != null) hayParts.push("albanese " + p.appr.albNet);
+      if (p.appr.taylorNet != null) hayParts.push("taylor " + p.appr.taylorNet);
+      if (p.appr.hansonNet != null) hayParts.push("hanson " + p.appr.hansonNet);
+      if (p.seats && p.seats.p) {
+        hayParts.push("seat projection mrp");
+        for (const k in p.seats.p) hayParts.push(k + " " + p.seats.p[k].est + " seats");
+      }
+      if (p.dir) {
+        hayParts.push("direction right track wrong track",
+          f1(p.dir.right), f1(p.dir.wrong), f1(p.dir.unsure),
+          (p.dir.net > 0 ? "+" : "") + p.dir.net);
+      }
+      if (p.iss) {
+        hayParts.push("issues salience best party");
+        (p.iss.sal || []).concat(p.iss.conc || []).forEach(([lab, v]) => hayParts.push(lab, String(v)));
+        const ib = issBestOf(p.iss);
+        if (ib) hayParts.push(ib.who, String(ib.v));
+      }
+      if (p.conf) {
+        hayParts.push("confidence economic sentiment consumer business", p.conf.lab, String(p.conf.v));
+        if (p.conf.cond != null) hayParts.push("conditions", String(p.conf.cond));
+      }
+      hayParts.push(...tags);   // so "fav", "ppm" etc. match in the search box too
+      const hay = hayParts.join(" ").toLowerCase();
+      return {
+        ...p, year: y, mo, fullDate, fieldLabel, lean, hfx, leanLnp, leanOn, hfxLnp, hfxOn, pubBasis, tags,
+        hay: hay + " " + hay.replace(/–/g, "-"),   // hyphen typed in search matches the en dash
+      };
+    });
+  }, [facet, pubBasis, measure, dirOnlyAll, issOnlyAll, confOnlyAll]);
+  const housesV = facet === "issues" ? housesIss
+    : (facet === "confidence" && confOnlyAll.length) ? housesConf
+    : (facet === "direction" && dirOnlyAll.length) ? housesDir : houses;
 
   // only offer tag filters for data types actually present in the archive, so
   // e.g. "3PP" appears as a chip only once a three-cornered poll exists
@@ -5437,93 +5451,109 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const shownTags = POLL_TAGS.filter((t) => availableTags.has(t.id));
 
   const latestX = D.mx(D.MONTHS[D.MONTHS.length - 1]);
-  const x0 = range === "all" ? -Infinity : latestX - Number(range) / 12 - 0.06;
-  const ql = q.trim().toLowerCase();
+  /* The box stays on `q`, the FILTER on the deferred echo: with the whole
+     pipeline memoised below, a keystroke's urgent render finds every input
+     unchanged and skips it, and the filtering runs once the query settles
+     rather than once per keystroke. */
+  const dq = React.useDeferredValue(q);
+  const ql = dq.trim().toLowerCase();
 
   /* One predicate per filter, kept as a list rather than inlined, so the
      panels can ask the question the numbers beside each option answer: how
      many polls would this leave, given everything else already set. That means
-     counting with exactly one predicate lifted out – `without(f)`. */
+     counting with exactly one predicate lifted out – `without(f)`. The whole
+     filter→count→sort run sits behind one memo keyed on every input, so the
+     work happens when a filter actually moves, not on every render. */
   /* A published-only matchup stands in for its facet's scope while it is
      picked (CONTEST_SCOPE notes why), so the pill reads "With an
      L/NP v ON 2PP" rather than the everything-but-nothing "With a 2PP". */
-  const scoping = scope && ((facet === "twopp" && CONTEST_SCOPE[measure]) || FACET_SCOPE[facet]);
-  const TESTS = [
-    ["who", (p) => !sel.size || sel.has(baseHouse(p.pollster))],
-    // a row must contain EVERY selected data type (AND)
-    ["has", (p) => !tagSel.size || [...tagSel].every((tg) => p.tags.includes(tg))],
-    ["lead", (p) => { if (lead === "all") return true; const li = archLeadInfo(p, measure, tppBasis); return !!li && li.who === lead; }],
-    ["when", (p) => range === "all" || p.x >= x0],
-    ["q", (p) => !ql || ql.split(/\s+/).every((t) => p.hay.includes(t))],
-    ["scope", (p) => !scoping || scoping.has(p)],
-  ];
-  const passing = (p, skip) => TESTS.every(([k, f]) => k === skip || f(p));
-  const filtered = rows.filter((p) => passing(p, null));
-  const without = (skip) => rows.filter((p) => passing(p, skip));
+  const { scoping, without, houseN, tagN, rangeN, houseRank, sorted } = React.useMemo(() => {
+    const x0 = range === "all" ? -Infinity : latestX - Number(range) / 12 - 0.06;
+    const scoping = scope && ((facet === "twopp" && CONTEST_SCOPE[measure]) || FACET_SCOPE[facet]);
+    const TESTS = [
+      ["who", (p) => !sel.size || sel.has(baseHouse(p.pollster))],
+      // a row must contain EVERY selected data type (AND)
+      ["has", (p) => !tagSel.size || [...tagSel].every((tg) => p.tags.includes(tg))],
+      ["lead", (p) => { if (lead === "all") return true; const li = archLeadInfo(p, measure, tppBasis); return !!li && li.who === lead; }],
+      ["when", (p) => range === "all" || p.x >= x0],
+      ["q", (p) => !ql || ql.split(/\s+/).every((t) => p.hay.includes(t))],
+      ["scope", (p) => !scoping || scoping.has(p)],
+    ];
+    const passing = (p, skip) => TESTS.every(([k, f]) => k === skip || f(p));
+    const filtered = rows.filter((p) => passing(p, null));
+    const without = (skip) => rows.filter((p) => passing(p, skip));
 
-  // option counts, each against every other filter
-  const houseRows = without("who");
-  const houseN = {};
-  houseRows.forEach((p) => { const b = baseHouse(p.pollster); houseN[b] = (houseN[b] || 0) + 1; });
-  const tagRows = without("has");
-  const tagN = {};
-  tagRows.forEach((p) => p.tags.forEach((t) => { tagN[t] = (tagN[t] || 0) + 1; }));
-  const whenRows = without("when");
-  const rangeN = (r) => (r === "all" ? whenRows.length
-    : whenRows.filter((p) => p.x >= latestX - Number(r) / 12 - 0.06).length);
-  /* Ranked by how much a house polls, not alphabetically: Roy Morgan has 42
-     waves here and Agenda C Synesis one, and an A–Z list buries the names a
-     reader is looking for among the ones they have never heard of. Ranked by
-     the count IN VIEW, which doesn't reshuffle under the reader's hand –
-     selecting a pollster can't change a number computed with the pollster
-     filter lifted out, so the order only moves when another panel does. */
-  const houseRank = [...housesV].sort((a, b) => (houseN[b] || 0) - (houseN[a] || 0) || a.localeCompare(b));
+    // option counts, each against every other filter
+    const houseRows = without("who");
+    const houseN = {};
+    houseRows.forEach((p) => { const b = baseHouse(p.pollster); houseN[b] = (houseN[b] || 0) + 1; });
+    const tagRows = without("has");
+    const tagN = {};
+    tagRows.forEach((p) => p.tags.forEach((t) => { tagN[t] = (tagN[t] || 0) + 1; }));
+    const whenRows = without("when");
+    const rangeN = (r) => (r === "all" ? whenRows.length
+      : whenRows.filter((p) => p.x >= latestX - Number(r) / 12 - 0.06).length);
+    /* Ranked by how much a house polls, not alphabetically: Roy Morgan has 42
+       waves here and Agenda C Synesis one, and an A–Z list buries the names a
+       reader is looking for among the ones they have never heard of. Ranked by
+       the count IN VIEW, which doesn't reshuffle under the reader's hand –
+       selecting a pollster can't change a number computed with the pollster
+       filter lifted out, so the order only moves when another panel does. */
+    const houseRank = [...housesV].sort((a, b) => (houseN[b] || 0) - (houseN[a] || 0) || a.localeCompare(b));
 
-  const getVal = (p, key) => {
-    switch (key) {
-      case "date": return p.x;
-      case "pollster": return p.pollster;
-      case "sample": return p.sample ?? -Infinity;
-      case "alp": {
-        const li = archLeadInfo(p, measure, tppBasis);
-        return li ? li.m : -Infinity;
+    const getVal = (p, key) => {
+      switch (key) {
+        case "date": return p.x;
+        case "pollster": return p.pollster;
+        case "sample": return p.sample ?? -Infinity;
+        case "alp": {
+          const li = archLeadInfo(p, measure, tppBasis);
+          return li ? li.m : -Infinity;
+        }
+        case "lean": return p.lean ?? -Infinity;
+        case "hfx": return p.hfx ? p.hfx.v : -Infinity;
+        case "p.alp": return p.p.alp;
+        case "p.lnp": return p.p.lnp;
+        case "p.grn": return p.p.grn;
+        case "p.onp": return p.p.onp;
+        case "p.oth": return p.p.oth;
+        case "appr.albNet": return p.appr.albNet != null ? p.appr.albNet : -Infinity;
+        case "appr.taylorNet": return p.appr.taylorNet != null ? p.appr.taylorNet : -Infinity;
+        case "appr.hansonNet": return p.appr.hansonNet != null ? p.appr.hansonNet : -Infinity;
+        case "ppm.alb": { const c = ppmContests(p)[0]; return c && c.alb != null ? c.alb : -Infinity; }
+        case "dir.right": return p.dir ? p.dir.right : -Infinity;
+        case "dir.wrong": return p.dir ? p.dir.wrong : -Infinity;
+        case "dir.unsure": return p.dir ? p.dir.unsure : -Infinity;
+        case "dir.net": return p.dir ? p.dir.net : -Infinity;
+        case "iss.topv": { const t = issTopOf(p.iss); return t ? t[1] : -Infinity; }
+        case "iss.bestv": { const b = issBestOf(p.iss); return b ? b.v : -Infinity; }
+        case "conf.lab": return (p.conf && p.conf.lab) || "";
+        case "conf.v": return p.conf ? p.conf.v : -Infinity;
+        case "conf.chg": return p.conf && p.conf.chg != null ? p.conf.chg : -Infinity;
+        case "conf.cond": return p.conf && p.conf.cond != null ? p.conf.cond : -Infinity;
+        // dem.<party>: that party's gap across the split in view
+        default: {
+          if (!key.startsWith("dem.")) return 0;
+          const pr = demPairOf(p, demSplit);
+          return pr && pr.gap[key.slice(4)] != null ? pr.gap[key.slice(4)] : -Infinity;
+        }
       }
-      case "lean": return p.lean ?? -Infinity;
-      case "hfx": return p.hfx ? p.hfx.v : -Infinity;
-      case "p.alp": return p.p.alp;
-      case "p.lnp": return p.p.lnp;
-      case "p.grn": return p.p.grn;
-      case "p.onp": return p.p.onp;
-      case "p.oth": return p.p.oth;
-      case "appr.albNet": return p.appr.albNet != null ? p.appr.albNet : -Infinity;
-      case "appr.taylorNet": return p.appr.taylorNet != null ? p.appr.taylorNet : -Infinity;
-      case "appr.hansonNet": return p.appr.hansonNet != null ? p.appr.hansonNet : -Infinity;
-      case "ppm.alb": { const c = ppmContests(p)[0]; return c && c.alb != null ? c.alb : -Infinity; }
-      case "dir.right": return p.dir ? p.dir.right : -Infinity;
-      case "dir.wrong": return p.dir ? p.dir.wrong : -Infinity;
-      case "dir.unsure": return p.dir ? p.dir.unsure : -Infinity;
-      case "dir.net": return p.dir ? p.dir.net : -Infinity;
-      case "iss.topv": { const t = issTopOf(p.iss); return t ? t[1] : -Infinity; }
-      case "iss.bestv": { const b = issBestOf(p.iss); return b ? b.v : -Infinity; }
-      case "conf.lab": return (p.conf && p.conf.lab) || "";
-      case "conf.v": return p.conf ? p.conf.v : -Infinity;
-      case "conf.chg": return p.conf && p.conf.chg != null ? p.conf.chg : -Infinity;
-      case "conf.cond": return p.conf && p.conf.cond != null ? p.conf.cond : -Infinity;
-      // dem.<party>: that party's gap across the split in view
-      default: {
-        if (!key.startsWith("dem.")) return 0;
-        const pr = demPairOf(p, demSplit);
-        return pr && pr.gap[key.slice(4)] != null ? pr.gap[key.slice(4)] : -Infinity;
-      }
-    }
-  };
-  const sorted = [...filtered].sort((a, b) => {
-    const va = getVal(a, sort.key), vb = getVal(b, sort.key);
-    if (va < vb) return -sort.dir;
-    if (va > vb) return sort.dir;
-    // stable tiebreak: newest first
-    return b.x - a.x;
-  });
+    };
+    /* A row's sort key is derived work – archLeadInfo, ppmContests,
+       issTopOf, demPairOf – and the comparator asks for it ~n·log n times,
+       so each row's key is computed once ahead of the sort, not again per
+       comparison. */
+    const keyed = filtered.map((p) => [getVal(p, sort.key), p]);
+    keyed.sort((a, b) => {
+      const va = a[0], vb = b[0];
+      if (va < vb) return -sort.dir;
+      if (va > vb) return sort.dir;
+      // stable tiebreak: newest first
+      return b[1].x - a[1].x;
+    });
+    const sorted = keyed.map((kv) => kv[1]);
+    return { scoping, without, houseN, tagN, rangeN, houseRank, sorted };
+  }, [rows, ql, sel, tagSel, lead, range, scope, facet, measure, pubBasis, sort, demSplit, housesV]);
 
   /* The table shows a page at a time. At ~90px a row, all 163 made a
      19,600px page and buried the diagnostics under it. Any change to what is

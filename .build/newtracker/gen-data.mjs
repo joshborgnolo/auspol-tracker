@@ -472,14 +472,19 @@ function houseEffectsFor(rows) {
   // can distinguish "no lean" from "not enough polls to say"
   const evidenceN = {};
   const evidenceFrom = {};
+  // devs grouped per firm once (push order preserved = the flat list's
+  // filtered order): at() is queried per row by aroundPts/heV across every
+  // series and used to re-scan this whole list for its firm each time
+  const devsByFirm = Object.create(null);
   for (const d of devs) {
     evidenceN[d.firm] = (evidenceN[d.firm] || 0) + 1;
     if (evidenceFrom[d.firm] == null || d.mid < evidenceFrom[d.firm]) evidenceFrom[d.firm] = d.mid;
+    (devsByFirm[d.firm] || (devsByFirm[d.firm] = [])).push(d);
   }
   const at = (firm, t) => {
     let sw = 0, swx = 0;
-    for (const d of devs) {
-      if (d.firm !== firm || d.mid > t) continue;
+    for (const d of devsByFirm[firm] || []) {
+      if (d.mid > t) continue;
       // t = Infinity reads the whole history undecayed: equal weights, shrink
       // on the raw count – the all-time pooled constant this page always
       // showed, used for the emitted {v, n} snapshots

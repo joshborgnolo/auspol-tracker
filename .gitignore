@@ -35,3 +35,6 @@ node_modules/
 
 # /vic/ build: the converted dataset and gen-data outputs (regenerated every build)
 .build/vic/out/
+
+# Babel reprint cache for the site build (content-addressed; safe to delete)
+.build/newtracker/.transpile-cache/

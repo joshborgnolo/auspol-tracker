@@ -120,7 +120,7 @@
 //   - --check computes everything, prints RM_STATUS, never writes
 //   - writes are atomic (.tmp + rename)
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
-import { fetchText, TRACKER_UA, FETCH_TRIES, FETCH_TIMEOUT_MS, MONTHS, clean, writeAtomic } from "./extract-common.mjs";
+import { fetchText, TRACKER_UA, FETCH_TRIES, FETCH_TIMEOUT_MS, MONTHS, clean, writeAtomic, pool } from "./extract-common.mjs";
 import { RM_DOUBLE_DAYS, RM_REISSUE_PT } from "./adjudicate-cases.mjs";
 
 const argv = process.argv.slice(2);
@@ -502,24 +502,31 @@ try {
   const altAdds = [];
   const dirAdds = [];
   const parsed = []; // one record per candidate: {c, post, r, existed}
-  for (const c of candidates) {
-    let post;
+  // release pages pulled two at a time so one slow/404 page can't hold the
+  // queue; everything from the parse down still walks in feed order, so
+  // warnings, guard-fails and filing order are exactly the serial run's
+  const pages = await pool(candidates, 2, async (c) => {
     try {
       if (FEED_DIR) {
         const f = `${FEED_DIR}/post-${c.slug}.json`;
         if (!existsSync(f)) throw new Error(`no fixture ${f}`);
-        post = JSON.parse(readFileSync(f, "utf8"))?.props?.pageProps?.findingData?.postBy;
-      } else {
-        post = nextData((await fetchText(`https://www.roymorgan.com/findings/${c.slug}`, { ua: TRACKER_UA })).text, c.slug)
-          ?.props?.pageProps?.findingData?.postBy;
+        return { post: JSON.parse(readFileSync(f, "utf8"))?.props?.pageProps?.findingData?.postBy };
       }
-    } catch (err) {
+      return { post: nextData((await fetchText(`https://www.roymorgan.com/findings/${c.slug}`, { ua: TRACKER_UA })).text, c.slug)
+        ?.props?.pageProps?.findingData?.postBy };
+    } catch (err) { return { error: err }; }
+  });
+  for (let ci = 0; ci < candidates.length; ci++) {
+    const c = candidates[ci];
+    if (pages[ci].error) {
       // Deleted posts still appear as feed slugs but 404 individually — a
       // warning, never a reason to abandon the run's other candidates.
+      const err = pages[ci].error;
       status.warnings.push(`${c.slug}: release page fetch failed (${err?.message || err})`);
       console.warn(`RM_WARN ${c.slug}: release page fetch failed (${err?.message || err})`);
       continue;
     }
+    const post = pages[ci].post;
     if (!post?.content) { guardFails.push(`${c.slug}: no findingData.postBy.content`); continue; }
     const r = parseRelease(post);
     if (r.flowsPairMissing) status.warnings.push(`${c.slug}: "allocated based on how Australians voted" anchor present but no flows pair parsed`);

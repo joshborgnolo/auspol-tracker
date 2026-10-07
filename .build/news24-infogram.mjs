@@ -6,6 +6,7 @@
 // hand-maintained with proven errors (Jul-14 Σ=94, Jan-8 Σ=102) and is
 // corroboration only, never a figure source.
 import { infographicDataOf, staticChartsOf, liveChartsOf, IG_EMBED } from "./infogram.mjs";
+import { pool } from "./extract-common.mjs";
 
 // Id format: "data-id=\"_/…\"" in the article DOM. The DOM normaliser
 // handles JSON \" and \/ escapes plus the &#47; entity before matching;
@@ -244,12 +245,16 @@ export function parseN24Horserace(data) {
 // production, a fixture dir under N24_IG_DIR in tests). classify only — the
 // summary step below assigns figures.
 export async function n24InfogramFetch(fetchEmbed, ids) {
+  // pulls bounded three at a time, then classified in id order — the
+  // projects array below is exactly what the serial walk produced
+  const got = await pool(ids, 3, (id) => fetchEmbed(id).then((html) => ({ html }), (error) => ({ error })));
   const projects = [];
-  for (const id of ids) {
-    let html;
-    try { html = await fetchEmbed(id); } catch (e) {
-      projects.push({ id, state: "note", why: `embed fetch: ${e.message}` }); continue;
+  for (let i = 0; i < ids.length; i++) {
+    const id = ids[i];
+    if (got[i].error) {
+      projects.push({ id, state: "note", why: `embed fetch: ${got[i].error.message}` }); continue;
     }
+    const html = got[i].html;
     const data = infographicDataOf(html);
     if (!data) { projects.push({ id, state: "note", why: "no infographicData in embed" }); continue; }
     if (liveChartsOf(data).length) { projects.push({ id, state: "note", why: "unexpected live charts" }); continue; }

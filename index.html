@@ -71520,6 +71520,7 @@ function TrendChart(props) {
     if (!travelling.current) prev.current = fresh;
   });
   const ref = useRef(null);
+  const svgRect = useRef(null);
   const badgeAt = useRef({});
   const labOff = useRef(new Map());
   const [cw, setCw] = useState(widthSeed || VB.W);
@@ -71527,10 +71528,20 @@ function TrendChart(props) {
   React.useLayoutEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
-    const update = () => setCw(el.getBoundingClientRect().width || VB.W);
+    const update = () => {
+      svgRect.current = null;
+      setCw(el.getBoundingClientRect().width || VB.W);
+    };
     if (widthSeed == null) update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
+    const drop = () => {
+      svgRect.current = null;
+    };
+    window.addEventListener("scroll", drop, true);
+    window.addEventListener("resize", drop);
+    const bro = new ResizeObserver(drop);
+    bro.observe(document.body);
     const mo = new MutationObserver(() => setCopyTick(t => t + 1));
     mo.observe(el, {
       attributes: true,
@@ -71539,6 +71550,9 @@ function TrendChart(props) {
     return () => {
       ro.disconnect();
       mo.disconnect();
+      bro.disconnect();
+      window.removeEventListener("scroll", drop, true);
+      window.removeEventListener("resize", drop);
     };
   }, []);
   const k0 = cw / VB.W;
@@ -71641,7 +71655,7 @@ function TrendChart(props) {
   };
   const spinePts = spine || (series[0] ? series[0].points : []);
   const toVB = e => {
-    const rect = ref.current.querySelector("svg").getBoundingClientRect();
+    const rect = svgRect.current || (svgRect.current = ref.current.querySelector("svg").getBoundingClientRect());
     return {
       x: (e.clientX - rect.left) / rect.width * W,
       y: (e.clientY - rect.top) / rect.height * H,
@@ -72125,6 +72139,24 @@ function TrendChart(props) {
       r: DOT_R
     }, common));
   });
+  const wipeSig = series.some(s => s.wipe != null) ? series.map(s => s.wipe == null ? "-" : s.wipe).join("|") : "";
+  const areaGeo = React.useMemo(() => areas.map(a => {
+    if (!a.points || a.points.length < 2) return {
+      a
+    };
+    if (a.wipeOf != null && wipedOut.has(a.wipeOf)) return {
+      a
+    };
+    const edgePath = (pts, key, lead) => rd && a.smooth !== false ? monotoneXY(pts.map(d => [sx(d.x), sy(d[key])]), lead) : a.smooth ? smoothPath(pts.map(d => ({
+      x: d.x,
+      y: d[key]
+    })), sx, sy).replace(/^M/, lead) : pts.map((d, i) => `${i ? "L" : lead} ${sx(d.x).toFixed(2)} ${sy(d[key]).toFixed(2)}`).join(" ");
+    return {
+      a,
+      top: edgePath(a.points, "y1", "M"),
+      bot: edgePath(a.points.slice().reverse(), "y0", "L")
+    };
+  }), [areas, geom, wipeSig, rd]);
   const copying = !!(ref.current && ref.current.hasAttribute("data-copying"));
   const placeEvents = list => {
     const evs = list.map(e => copying && e.badge != null ? {
@@ -72216,7 +72248,7 @@ function TrendChart(props) {
     });
   };
   const evKey = e => e.date + "|" + (e.short || e.label);
-  const evPlaced = (() => {
+  const evPlaced = React.useMemo(() => {
     const to = placeEvents(events);
     if (!eventsFrom || eventMix >= 1) return to;
     const from = placeEvents(eventsFrom),
@@ -72247,7 +72279,7 @@ function TrendChart(props) {
       leaving: true
     }));
     return out.sort((a, b) => a.ex - b.ex);
-  })();
+  }, [events, eventsFrom, eventMix, copying, geom, rd]);
   if (ctl && evt) {
     const q = evPlaced.find(p => p.e === evt.e && !p.leaving);
     if (!q) {
@@ -72359,15 +72391,12 @@ function TrendChart(props) {
     width: W - pad.l - pad.r,
     height: Math.abs(sy(b.y0) - sy(b.y1)),
     fill: b.color
-  })), areas.map(a => {
-    if (!a.points || a.points.length < 2) return null;
-    if (a.wipeOf != null && wipedOut.has(a.wipeOf)) return null;
-    const edgePath = (pts, key, lead) => rd && a.smooth !== false ? monotoneXY(pts.map(d => [sx(d.x), sy(d[key])]), lead) : a.smooth ? smoothPath(pts.map(d => ({
-      x: d.x,
-      y: d[key]
-    })), sx, sy).replace(/^M/, lead) : pts.map((d, i) => `${i ? "L" : lead} ${sx(d.x).toFixed(2)} ${sy(d[key]).toFixed(2)}`).join(" ");
-    const top = edgePath(a.points, "y1", "M");
-    const bot = edgePath(a.points.slice().reverse(), "y0", "L");
+  })), areaGeo.map(({
+    a,
+    top,
+    bot
+  }) => {
+    if (top == null) return null;
     return (React.createElement("g", {
         key: "a" + a.id,
         clipPath: `url(#${clipId})`
@@ -83504,34 +83533,54 @@ function AllPollsView({
   } = window;
   const pubBasis = tppBasis === "resp";
   const baseHouse = h => h.replace(/ \((MRP|SMS)\)$/, "");
-  const houses = [];
-  D.individualPolls.forEach(p => {
-    const b = baseHouse(p.pollster);
-    if (!houses.includes(b)) houses.push(b);
-  });
-  houses.sort();
-  const dirOnlyAll = D.directionOnlyPolls || [];
-  const housesDir = [...houses];
-  dirOnlyAll.forEach(p => {
-    const b = baseHouse(p.pollster);
-    if (!housesDir.includes(b)) housesDir.push(b);
-  });
-  housesDir.sort();
-  const issOnlyAll = D.issuesOnlyPolls || [];
-  const housesIss = [...housesDir];
-  issOnlyAll.forEach(p => {
-    const b = baseHouse(p.pollster);
-    if (!housesIss.includes(b)) housesIss.push(b);
-  });
-  housesIss.sort();
-  const confOnlyAll = D.confidenceOnlyPolls || [];
-  const housesConf = [...housesIss];
-  confOnlyAll.forEach(p => {
-    const b = baseHouse(p.pollster);
-    if (!housesConf.includes(b)) housesConf.push(b);
-  });
-  housesConf.sort();
-  const housesAll = [...housesConf];
+  const {
+    houses,
+    housesDir,
+    housesIss,
+    housesConf,
+    housesAll,
+    dirOnlyAll,
+    issOnlyAll,
+    confOnlyAll
+  } = React.useMemo(() => {
+    const houses = [];
+    D.individualPolls.forEach(p => {
+      const b = baseHouse(p.pollster);
+      if (!houses.includes(b)) houses.push(b);
+    });
+    houses.sort();
+    const dirOnlyAll = D.directionOnlyPolls || [];
+    const housesDir = [...houses];
+    dirOnlyAll.forEach(p => {
+      const b = baseHouse(p.pollster);
+      if (!housesDir.includes(b)) housesDir.push(b);
+    });
+    housesDir.sort();
+    const issOnlyAll = D.issuesOnlyPolls || [];
+    const housesIss = [...housesDir];
+    issOnlyAll.forEach(p => {
+      const b = baseHouse(p.pollster);
+      if (!housesIss.includes(b)) housesIss.push(b);
+    });
+    housesIss.sort();
+    const confOnlyAll = D.confidenceOnlyPolls || [];
+    const housesConf = [...housesIss];
+    confOnlyAll.forEach(p => {
+      const b = baseHouse(p.pollster);
+      if (!housesConf.includes(b)) housesConf.push(b);
+    });
+    housesConf.sort();
+    return {
+      houses,
+      housesDir,
+      housesIss,
+      housesConf,
+      housesAll: [...housesConf],
+      dirOnlyAll,
+      issOnlyAll,
+      confOnlyAll
+    };
+  }, []);
   const FACET_SCOPE = {
     twopp: {
       has: p => (pubBasis ? p.alp != null : p.alpImp != null) || p.tppAlt || p.tppAlt2 || p.tpp3,
@@ -83827,182 +83876,206 @@ function AllPollsView({
     n.has(h) ? n.delete(h) : n.add(h);
     return n;
   });
-  const NOW_YEAR = new Date().getFullYear();
-  const dirOnly = facet === "direction" ? dirOnlyAll : facet === "issues" ? dirOnlyAll.filter(p => p.iss) : [];
-  const issOnly = facet === "issues" ? issOnlyAll : [];
-  const confOnly = facet === "confidence" ? confOnlyAll : [];
-  const housesV = facet === "issues" ? housesIss : confOnly.length ? housesConf : dirOnly.length ? housesDir : houses;
-  const rows = (facet === "confidence" ? confOnly : [...D.individualPolls, ...dirOnly, ...issOnly]).map(p => {
-    const [y, mo] = p.ym.split("-").map(Number);
-    const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
-    const fieldLabel = p.fieldPending ? "TBC" : y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
-    const tags = pollTagIds(p);
-    const ydv = k => p.yd && p.yd[k] ? p.yd[k].v : null;
-    const leanOf = (x, k) => x != null && ydv(k) != null ? +(x - Math.round(ydv(k) * 10) / 10).toFixed(1) : null;
-    const leanLnp = pubBasis ? leanOf(p.alpN, "lnp") : leanOf(p.alpImp, "imp");
-    const leanOn = pubBasis ? leanOf(p.tppAlt ? p.tppAlt.alp : null, "onp") : leanOf(p.alpOnImp, "onimp");
-    const HE = D.houseEffects || {};
-    const hfxLnp = (HE[pubBasis ? "tpp" : "synth"] || {})[p.pollster] || null;
-    const hfxOn = (HE[pubBasis ? "alp_on" : "synthOn"] || {})[p.pollster] || null;
-    const lean = measure === "onp" ? leanOn : measure === "lnp" ? leanLnp : null;
-    const hfx = measure === "onp" ? hfxOn : measure === "lnp" ? hfxLnp : null;
-    const f1 = v => v != null ? v.toFixed(1) : null;
-    const hayParts = [p.pollster, p.field, fullDate, p.sample != null ? String(p.sample) : null, D.monthName(mo) + " " + y, D.monthNameFull(mo) + " " + y, f1(p.alp), f1(p.lnp), lean != null ? (lean > 0 ? "+" : "") + lean.toFixed(1) : null, f1(p.p.alp), f1(p.p.lnp), f1(p.p.grn), f1(p.p.onp), f1(p.p.oth)].filter(Boolean);
-    if (p.client && p.client !== "Self-published") {
-      hayParts.push(p.client);
-      const clientAlias = AP_CLIENT_ALIASES[p.client.toLowerCase()];
-      if (clientAlias) hayParts.push(clientAlias);
-    }
-    if (p.tpp3) hayParts.push(p.tpp3.alp.toFixed(1), p.tpp3.lnp.toFixed(1), p.tpp3.onp.toFixed(1), "3-cornered 3cp");
-    if (p.tppAlt) hayParts.push(p.tppAlt.alp.toFixed(1), p.tppAlt.onp.toFixed(1), "alp v on one nation matchup");
-    if (p.tppAlt2) hayParts.push(p.tppAlt2.lnp.toFixed(1), p.tppAlt2.onp.toFixed(1), "lnp v on one nation matchup");
-    if (p.appr.albNet != null) hayParts.push("albanese " + p.appr.albNet);
-    if (p.appr.taylorNet != null) hayParts.push("taylor " + p.appr.taylorNet);
-    if (p.appr.hansonNet != null) hayParts.push("hanson " + p.appr.hansonNet);
-    if (p.seats && p.seats.p) {
-      hayParts.push("seat projection mrp");
-      for (const k in p.seats.p) hayParts.push(k + " " + p.seats.p[k].est + " seats");
-    }
-    if (p.dir) {
-      hayParts.push("direction right track wrong track", f1(p.dir.right), f1(p.dir.wrong), f1(p.dir.unsure), (p.dir.net > 0 ? "+" : "") + p.dir.net);
-    }
-    if (p.iss) {
-      hayParts.push("issues salience best party");
-      (p.iss.sal || []).concat(p.iss.conc || []).forEach(([lab, v]) => hayParts.push(lab, String(v)));
-      const ib = issBestOf(p.iss);
-      if (ib) hayParts.push(ib.who, String(ib.v));
-    }
-    if (p.conf) {
-      hayParts.push("confidence economic sentiment consumer business", p.conf.lab, String(p.conf.v));
-      if (p.conf.cond != null) hayParts.push("conditions", String(p.conf.cond));
-    }
-    hayParts.push(...tags);
-    const hay = hayParts.join(" ").toLowerCase();
-    return {
-      ...p,
-      year: y,
-      mo,
-      fullDate,
-      fieldLabel,
-      lean,
-      hfx,
-      leanLnp,
-      leanOn,
-      hfxLnp,
-      hfxOn,
-      pubBasis,
-      tags,
-      hay: hay + " " + hay.replace(/–/g, "-")
-    };
-  });
+  const rows = React.useMemo(() => {
+    const dirOnly = facet === "direction" ? dirOnlyAll : facet === "issues" ? dirOnlyAll.filter(p => p.iss) : [];
+    const issOnly = facet === "issues" ? issOnlyAll : [];
+    const confOnly = facet === "confidence" ? confOnlyAll : [];
+    const NOW_YEAR = new Date().getFullYear();
+    return (facet === "confidence" ? confOnly : [...D.individualPolls, ...dirOnly, ...issOnly]).map(p => {
+      const [y, mo] = p.ym.split("-").map(Number);
+      const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
+      const fieldLabel = p.fieldPending ? "TBC" : y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
+      const tags = pollTagIds(p);
+      const ydv = k => p.yd && p.yd[k] ? p.yd[k].v : null;
+      const leanOf = (x, k) => x != null && ydv(k) != null ? +(x - Math.round(ydv(k) * 10) / 10).toFixed(1) : null;
+      const leanLnp = pubBasis ? leanOf(p.alpN, "lnp") : leanOf(p.alpImp, "imp");
+      const leanOn = pubBasis ? leanOf(p.tppAlt ? p.tppAlt.alp : null, "onp") : leanOf(p.alpOnImp, "onimp");
+      const HE = D.houseEffects || {};
+      const hfxLnp = (HE[pubBasis ? "tpp" : "synth"] || {})[p.pollster] || null;
+      const hfxOn = (HE[pubBasis ? "alp_on" : "synthOn"] || {})[p.pollster] || null;
+      const lean = measure === "onp" ? leanOn : measure === "lnp" ? leanLnp : null;
+      const hfx = measure === "onp" ? hfxOn : measure === "lnp" ? hfxLnp : null;
+      const f1 = v => v != null ? v.toFixed(1) : null;
+      const hayParts = [p.pollster, p.field, fullDate, p.sample != null ? String(p.sample) : null, D.monthName(mo) + " " + y, D.monthNameFull(mo) + " " + y, f1(p.alp), f1(p.lnp), lean != null ? (lean > 0 ? "+" : "") + lean.toFixed(1) : null, f1(p.p.alp), f1(p.p.lnp), f1(p.p.grn), f1(p.p.onp), f1(p.p.oth)].filter(Boolean);
+      if (p.client && p.client !== "Self-published") {
+        hayParts.push(p.client);
+        const clientAlias = AP_CLIENT_ALIASES[p.client.toLowerCase()];
+        if (clientAlias) hayParts.push(clientAlias);
+      }
+      if (p.tpp3) hayParts.push(p.tpp3.alp.toFixed(1), p.tpp3.lnp.toFixed(1), p.tpp3.onp.toFixed(1), "3-cornered 3cp");
+      if (p.tppAlt) hayParts.push(p.tppAlt.alp.toFixed(1), p.tppAlt.onp.toFixed(1), "alp v on one nation matchup");
+      if (p.tppAlt2) hayParts.push(p.tppAlt2.lnp.toFixed(1), p.tppAlt2.onp.toFixed(1), "lnp v on one nation matchup");
+      if (p.appr.albNet != null) hayParts.push("albanese " + p.appr.albNet);
+      if (p.appr.taylorNet != null) hayParts.push("taylor " + p.appr.taylorNet);
+      if (p.appr.hansonNet != null) hayParts.push("hanson " + p.appr.hansonNet);
+      if (p.seats && p.seats.p) {
+        hayParts.push("seat projection mrp");
+        for (const k in p.seats.p) hayParts.push(k + " " + p.seats.p[k].est + " seats");
+      }
+      if (p.dir) {
+        hayParts.push("direction right track wrong track", f1(p.dir.right), f1(p.dir.wrong), f1(p.dir.unsure), (p.dir.net > 0 ? "+" : "") + p.dir.net);
+      }
+      if (p.iss) {
+        hayParts.push("issues salience best party");
+        (p.iss.sal || []).concat(p.iss.conc || []).forEach(([lab, v]) => hayParts.push(lab, String(v)));
+        const ib = issBestOf(p.iss);
+        if (ib) hayParts.push(ib.who, String(ib.v));
+      }
+      if (p.conf) {
+        hayParts.push("confidence economic sentiment consumer business", p.conf.lab, String(p.conf.v));
+        if (p.conf.cond != null) hayParts.push("conditions", String(p.conf.cond));
+      }
+      hayParts.push(...tags);
+      const hay = hayParts.join(" ").toLowerCase();
+      return {
+        ...p,
+        year: y,
+        mo,
+        fullDate,
+        fieldLabel,
+        lean,
+        hfx,
+        leanLnp,
+        leanOn,
+        hfxLnp,
+        hfxOn,
+        pubBasis,
+        tags,
+        hay: hay + " " + hay.replace(/–/g, "-")
+      };
+    });
+  }, [facet, pubBasis, measure, dirOnlyAll, issOnlyAll, confOnlyAll]);
+  const housesV = facet === "issues" ? housesIss : facet === "confidence" && confOnlyAll.length ? housesConf : facet === "direction" && dirOnlyAll.length ? housesDir : houses;
   const availableTags = new Set();
   rows.forEach(r => r.tags.forEach(tg => availableTags.add(tg)));
   const shownTags = POLL_TAGS.filter(t => availableTags.has(t.id));
   const latestX = D.mx(D.MONTHS[D.MONTHS.length - 1]);
-  const x0 = range === "all" ? -Infinity : latestX - Number(range) / 12 - 0.06;
-  const ql = q.trim().toLowerCase();
-  const scoping = scope && (facet === "twopp" && CONTEST_SCOPE[measure] || FACET_SCOPE[facet]);
-  const TESTS = [["who", p => !sel.size || sel.has(baseHouse(p.pollster))], ["has", p => !tagSel.size || [...tagSel].every(tg => p.tags.includes(tg))], ["lead", p => {
-    if (lead === "all") return true;
-    const li = archLeadInfo(p, measure, tppBasis);
-    return !!li && li.who === lead;
-  }], ["when", p => range === "all" || p.x >= x0], ["q", p => !ql || ql.split(/\s+/).every(t => p.hay.includes(t))], ["scope", p => !scoping || scoping.has(p)]];
-  const passing = (p, skip) => TESTS.every(([k, f]) => k === skip || f(p));
-  const filtered = rows.filter(p => passing(p, null));
-  const without = skip => rows.filter(p => passing(p, skip));
-  const houseRows = without("who");
-  const houseN = {};
-  houseRows.forEach(p => {
-    const b = baseHouse(p.pollster);
-    houseN[b] = (houseN[b] || 0) + 1;
-  });
-  const tagRows = without("has");
-  const tagN = {};
-  tagRows.forEach(p => p.tags.forEach(t => {
-    tagN[t] = (tagN[t] || 0) + 1;
-  }));
-  const whenRows = without("when");
-  const rangeN = r => r === "all" ? whenRows.length : whenRows.filter(p => p.x >= latestX - Number(r) / 12 - 0.06).length;
-  const houseRank = [...housesV].sort((a, b) => (houseN[b] || 0) - (houseN[a] || 0) || a.localeCompare(b));
-  const getVal = (p, key) => {
-    switch (key) {
-      case "date":
-        return p.x;
-      case "pollster":
-        return p.pollster;
-      case "sample":
-        return p.sample ?? -Infinity;
-      case "alp":
-        {
-          const li = archLeadInfo(p, measure, tppBasis);
-          return li ? li.m : -Infinity;
-        }
-      case "lean":
-        return p.lean ?? -Infinity;
-      case "hfx":
-        return p.hfx ? p.hfx.v : -Infinity;
-      case "p.alp":
-        return p.p.alp;
-      case "p.lnp":
-        return p.p.lnp;
-      case "p.grn":
-        return p.p.grn;
-      case "p.onp":
-        return p.p.onp;
-      case "p.oth":
-        return p.p.oth;
-      case "appr.albNet":
-        return p.appr.albNet != null ? p.appr.albNet : -Infinity;
-      case "appr.taylorNet":
-        return p.appr.taylorNet != null ? p.appr.taylorNet : -Infinity;
-      case "appr.hansonNet":
-        return p.appr.hansonNet != null ? p.appr.hansonNet : -Infinity;
-      case "ppm.alb":
-        {
-          const c = ppmContests(p)[0];
-          return c && c.alb != null ? c.alb : -Infinity;
-        }
-      case "dir.right":
-        return p.dir ? p.dir.right : -Infinity;
-      case "dir.wrong":
-        return p.dir ? p.dir.wrong : -Infinity;
-      case "dir.unsure":
-        return p.dir ? p.dir.unsure : -Infinity;
-      case "dir.net":
-        return p.dir ? p.dir.net : -Infinity;
-      case "iss.topv":
-        {
-          const t = issTopOf(p.iss);
-          return t ? t[1] : -Infinity;
-        }
-      case "iss.bestv":
-        {
-          const b = issBestOf(p.iss);
-          return b ? b.v : -Infinity;
-        }
-      case "conf.lab":
-        return p.conf && p.conf.lab || "";
-      case "conf.v":
-        return p.conf ? p.conf.v : -Infinity;
-      case "conf.chg":
-        return p.conf && p.conf.chg != null ? p.conf.chg : -Infinity;
-      case "conf.cond":
-        return p.conf && p.conf.cond != null ? p.conf.cond : -Infinity;
-      default:
-        {
-          if (!key.startsWith("dem.")) return 0;
-          const pr = demPairOf(p, demSplit);
-          return pr && pr.gap[key.slice(4)] != null ? pr.gap[key.slice(4)] : -Infinity;
-        }
-    }
-  };
-  const sorted = [...filtered].sort((a, b) => {
-    const va = getVal(a, sort.key),
-      vb = getVal(b, sort.key);
-    if (va < vb) return -sort.dir;
-    if (va > vb) return sort.dir;
-    return b.x - a.x;
-  });
+  const dq = React.useDeferredValue(q);
+  const ql = dq.trim().toLowerCase();
+  const {
+    scoping,
+    without,
+    houseN,
+    tagN,
+    rangeN,
+    houseRank,
+    sorted
+  } = React.useMemo(() => {
+    const x0 = range === "all" ? -Infinity : latestX - Number(range) / 12 - 0.06;
+    const scoping = scope && (facet === "twopp" && CONTEST_SCOPE[measure] || FACET_SCOPE[facet]);
+    const TESTS = [["who", p => !sel.size || sel.has(baseHouse(p.pollster))], ["has", p => !tagSel.size || [...tagSel].every(tg => p.tags.includes(tg))], ["lead", p => {
+      if (lead === "all") return true;
+      const li = archLeadInfo(p, measure, tppBasis);
+      return !!li && li.who === lead;
+    }], ["when", p => range === "all" || p.x >= x0], ["q", p => !ql || ql.split(/\s+/).every(t => p.hay.includes(t))], ["scope", p => !scoping || scoping.has(p)]];
+    const passing = (p, skip) => TESTS.every(([k, f]) => k === skip || f(p));
+    const filtered = rows.filter(p => passing(p, null));
+    const without = skip => rows.filter(p => passing(p, skip));
+    const houseRows = without("who");
+    const houseN = {};
+    houseRows.forEach(p => {
+      const b = baseHouse(p.pollster);
+      houseN[b] = (houseN[b] || 0) + 1;
+    });
+    const tagRows = without("has");
+    const tagN = {};
+    tagRows.forEach(p => p.tags.forEach(t => {
+      tagN[t] = (tagN[t] || 0) + 1;
+    }));
+    const whenRows = without("when");
+    const rangeN = r => r === "all" ? whenRows.length : whenRows.filter(p => p.x >= latestX - Number(r) / 12 - 0.06).length;
+    const houseRank = [...housesV].sort((a, b) => (houseN[b] || 0) - (houseN[a] || 0) || a.localeCompare(b));
+    const getVal = (p, key) => {
+      switch (key) {
+        case "date":
+          return p.x;
+        case "pollster":
+          return p.pollster;
+        case "sample":
+          return p.sample ?? -Infinity;
+        case "alp":
+          {
+            const li = archLeadInfo(p, measure, tppBasis);
+            return li ? li.m : -Infinity;
+          }
+        case "lean":
+          return p.lean ?? -Infinity;
+        case "hfx":
+          return p.hfx ? p.hfx.v : -Infinity;
+        case "p.alp":
+          return p.p.alp;
+        case "p.lnp":
+          return p.p.lnp;
+        case "p.grn":
+          return p.p.grn;
+        case "p.onp":
+          return p.p.onp;
+        case "p.oth":
+          return p.p.oth;
+        case "appr.albNet":
+          return p.appr.albNet != null ? p.appr.albNet : -Infinity;
+        case "appr.taylorNet":
+          return p.appr.taylorNet != null ? p.appr.taylorNet : -Infinity;
+        case "appr.hansonNet":
+          return p.appr.hansonNet != null ? p.appr.hansonNet : -Infinity;
+        case "ppm.alb":
+          {
+            const c = ppmContests(p)[0];
+            return c && c.alb != null ? c.alb : -Infinity;
+          }
+        case "dir.right":
+          return p.dir ? p.dir.right : -Infinity;
+        case "dir.wrong":
+          return p.dir ? p.dir.wrong : -Infinity;
+        case "dir.unsure":
+          return p.dir ? p.dir.unsure : -Infinity;
+        case "dir.net":
+          return p.dir ? p.dir.net : -Infinity;
+        case "iss.topv":
+          {
+            const t = issTopOf(p.iss);
+            return t ? t[1] : -Infinity;
+          }
+        case "iss.bestv":
+          {
+            const b = issBestOf(p.iss);
+            return b ? b.v : -Infinity;
+          }
+        case "conf.lab":
+          return p.conf && p.conf.lab || "";
+        case "conf.v":
+          return p.conf ? p.conf.v : -Infinity;
+        case "conf.chg":
+          return p.conf && p.conf.chg != null ? p.conf.chg : -Infinity;
+        case "conf.cond":
+          return p.conf && p.conf.cond != null ? p.conf.cond : -Infinity;
+        default:
+          {
+            if (!key.startsWith("dem.")) return 0;
+            const pr = demPairOf(p, demSplit);
+            return pr && pr.gap[key.slice(4)] != null ? pr.gap[key.slice(4)] : -Infinity;
+          }
+      }
+    };
+    const keyed = filtered.map(p => [getVal(p, sort.key), p]);
+    keyed.sort((a, b) => {
+      const va = a[0],
+        vb = b[0];
+      if (va < vb) return -sort.dir;
+      if (va > vb) return sort.dir;
+      return b[1].x - a[1].x;
+    });
+    const sorted = keyed.map(kv => kv[1]);
+    return {
+      scoping,
+      without,
+      houseN,
+      tagN,
+      rangeN,
+      houseRank,
+      sorted
+    };
+  }, [rows, ql, sel, tagSel, lead, range, scope, facet, measure, pubBasis, sort, demSplit, housesV]);
   const PAGE = 40;
   const [limit, setLimit] = useState(PAGE);
   React.useEffect(() => {

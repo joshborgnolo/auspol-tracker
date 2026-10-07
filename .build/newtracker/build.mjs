@@ -77,8 +77,16 @@ if (errors.length) {
 console.log(`validated ${DATA.polls.length} polls · ${exempted.length} documented exceptions · ${orphans.length} leadership-only rows`);
 
 /* ---- 2. regenerate the derived dataset --------------------------------- */
-execFileSync(process.execPath, [path.join(HERE, "gen-data.mjs")], { stdio: ["ignore", "ignore", "inherit"],
-  ...(VIC ? { env: { ...process.env, GEN_DATA_POLLS: DA("polls.json"), GEN_DATA_OUT: GEN_OUT } } : {}) });
+/* Runs in-process now: the child spawn cost ~0.3s per build to save the main
+   nothing. The module is import-safe (no process.exit/argv, env seams read
+   on import), and `node gen-data.mjs` still runs standalone – np-backtest
+   spawns it that way. Its ~40 diagnostic lines stay muted, exactly what the
+   child's ignored stdout did. */
+if (VIC) { process.env.GEN_DATA_POLLS = DA("polls.json"); process.env.GEN_DATA_OUT = GEN_OUT; }
+const _mutelog = console.log, _mutewarn = console.warn;
+console.log = console.warn = () => {};
+try { await import("./gen-data.mjs"); }
+finally { console.log = _mutelog; console.warn = _mutewarn; }
 /* gen-data's whole job is these two files. Everything downstream of this
    line reads them by name, so if either is missing or empty the diagnosis
    belongs here, not in a readFileSync ENOENT two hundred lines later. */
@@ -123,9 +131,36 @@ const Babel = require("./vendor/babel-standalone.js");
    against the committed build, and that is rebuilt by this same file. */
 const BABEL_OUT = { compact: false, babelrc: false, configFile: false,
   shouldPrintComment: (c) => /@license|@preserve/.test(c) };
-const transpile = (code, name) =>
-  Babel.transform(code, { ...BABEL_OUT, presets: [["react", { runtime: "classic" }]], filename: name }).code;
-const stripJs = (code, name) => Babel.transform(code, { ...BABEL_OUT, filename: name }).code;
+/* Both transforms are pure in (source, options, vendored Babel) – Babel's
+   parse+print of the 17 modules is the build's slowest second, and between
+   builds barely any of those modules change. The output is cached under a
+   hash of all three inputs; a miss costs exactly what it always did, a hit
+   is a read. Initialised lazily on first call so the hash helper below can
+   live under it, and pruned of fortnight-old entries then. The cache dir is
+   gitignored scratch – deleting it just makes the next build recompute. */
+let tcInit = null;
+const babelCached = (mode, code, name, extra) => {
+  if (!tcInit) {
+    tcInit = {
+      dir: path.join(HERE, ".transpile-cache"),
+      key: hash8(fs.readFileSync(path.join(HERE, "vendor", "babel-standalone.js"))),
+    };
+    fs.mkdirSync(tcInit.dir, { recursive: true });
+    for (const old of fs.readdirSync(tcInit.dir)) {
+      if (Date.now() - fs.statSync(path.join(tcInit.dir, old)).mtimeMs > 14 * 864e5)
+        fs.unlinkSync(path.join(tcInit.dir, old));
+    }
+  }
+  const opts = JSON.stringify({ ...BABEL_OUT, shouldPrintComment: String(BABEL_OUT.shouldPrintComment), ...extra });
+  const src = `${mode}${opts}${tcInit.key}${code}`;
+  const hit = path.join(tcInit.dir, `${hash8(Buffer.from(src, "utf8"))}.js`);
+  try { return fs.readFileSync(hit, "utf8"); } catch {}
+  const out = Babel.transform(code, { ...BABEL_OUT, ...extra, filename: name }).code;
+  writeAtomic(hit, out);
+  return out;
+};
+const transpile = (code, name) => babelCached("jsx", code, name, { presets: [["react", { runtime: "classic" }]] });
+const stripJs = (code, name) => babelCached("plain", code, name, {});
 
 /* An inline <script> ends at the first literal "</script", wherever it appears
    – including inside a JS string. Escaping the slash is inert in JS. */
@@ -434,9 +469,13 @@ const basisClause = (v) => v.basis === "imp" ? " on implied preference flows" : 
 const CYCLE_COUNT_WORDS = ["zero","one","two","three","four","five","six","seven","eight","nine","ten",
                            "eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen",
                            "eighteen","nineteen","twenty"];
+/* Called from the tagline, the meta description and the summary table –
+   ~240KB of JSON parsed once, not per call. cycle-source.json is gen-data's
+   last word for the whole build, so the count cannot move mid-run. */
+let pastCycleN = null;
 function pastCycleWord() {
-  const n = Object.keys(JSON.parse(fs.readFileSync(DA("cycle-source.json"), "utf8"))).length;
-  return CYCLE_COUNT_WORDS[n] || String(n);
+  if (pastCycleN == null) pastCycleN = Object.keys(JSON.parse(fs.readFileSync(DA("cycle-source.json"), "utf8"))).length;
+  return CYCLE_COUNT_WORDS[pastCycleN] || String(pastCycleN);
 }
 
 const fav = buildFavicon();
@@ -580,7 +619,9 @@ function buildStaticSummary() {
     return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
   };
   const L = headlineView(grab("latest"), grab("synthLatest")), prim = L.primary;
-  const EL25 = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8")).elections.e2025;
+  /* federal-only caller (VIC has its own summary), so DATA is polls.json
+     already parsed up top – no second read */
+  const EL25 = DATA.elections.e2025;
   const table = grab("pollsterTable"), acc = grab("accuracy");
   const polls = grab("individualPolls");
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -1056,7 +1097,7 @@ if (VIC) html = html.replace(/href="assets\//g, 'href="/assets/').replace(/url\(
 writeAtomic(OUT, html);
 if (VIC) {
   const vsize = fs.statSync(OUT).size;
-  console.log(`built ${path.relative(ROOT, OUT)} · ${(vsize / 1024 / 1024).toFixed(2)} MB raw · ${(zlibVic.gzipSync(fs.readFileSync(OUT), { level: 9 }).length / 1024).toFixed(0)} KB gzipped`);
+  console.log(`built ${path.relative(ROOT, OUT)} · ${(vsize / 1024 / 1024).toFixed(2)} MB raw · ${(zlibVic.gzipSync(html, { level: 6 }).length / 1024).toFixed(0)} KB gzipped`);
   process.exit(0);
 }
 
@@ -1321,7 +1362,10 @@ writeAtomic(path.join(ROOT, "robots.txt"),
 /* ---- 6. report --------------------------------------------------------- */
 import zlib from "node:zlib";
 const size = fs.statSync(OUT).size;
-const gz = zlib.gzipSync(fs.readFileSync(OUT), { level: 9 }).length;
+/* wire-size estimate from the in-memory page: level 6 is what static hosts
+   roughly serve, and re-reading + level 9 cost a quarter-second for a log
+   line nothing parses */
+const gz = zlib.gzipSync(html, { level: 6 }).length;
 console.log(`built ${path.basename(OUT)}`);
 console.log(`  ${(size / 1024 / 1024).toFixed(2)} MB raw · ${(gz / 1024).toFixed(0)} KB over the wire (gzipped)`);
 console.log(`  + assets/fonts · ${[...fontKeep].length} faces, ${(FONTS.reduce((n, f) => n + fs.statSync(path.join(HERE, "fonts", f.file)).size, 0) / 1024).toFixed(0)} KB, cached by hash`);

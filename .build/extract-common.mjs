@@ -119,3 +119,21 @@ export function writeAtomic(path, str) {
   writeFileSync(path + ".tmp", str);
   renameSync(path + ".tmp", path);
 }
+
+// Bounded fan-out: `job(item, i)` over `items` with at most `limit` promises
+// in flight, results in item order. A rejection propagates (and drops the
+// run) unless the caller's job wrapper handles it, matching the serial loops
+// these replace. Fetch fan-outs stay at 2–3 — one wedged host response
+// (FETCH_TIMEOUT_MS) then costs seconds of overlap, not a stalled run, and
+// the pollster's server still sees a trickle rather than a burst.
+export async function pool(items, limit, job) {
+  const out = new Array(items.length);
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (next < items.length) {
+      const i = next++;
+      out[i] = await job(items[i], i);
+    }
+  }));
+  return out;
+}
