@@ -3,7 +3,8 @@
 // poll's groups minus its vote in another, on the Primary facet's five
 // figures and strip). Mirrors iss-facet.mjs's harness.
 //
-//  1. The sixth facet tab reads "Demographics" (phones: "Groups"), sits last
+//  1. The sixth facet tab reads "Demographics" (phones too, since the phone
+//     menu scrolls - 2026-10-08; it read "Groups" there before), sits last
 //     in the arrow-key walk, and ?f=g deep-links onto it
 //  2. Each split (Age, Gender, Education, Place, Home) lists exactly the
 //     polls window.demPairOf finds that pair for - expectations computed
@@ -76,7 +77,9 @@ const geometry = (page, phone) => page.evaluate((phone) => {
   return {
     tabs: +R(document.querySelector(".rd-ap-tabs")).height.toFixed(2),
     head: +R(document.querySelector(phone ? ".rd-ap-phead" : ".rd-ap-hrow")).height.toFixed(2),
-    top: +(R(document.querySelector(".rd-ap-table")).top + scrollY).toFixed(2),
+    /* from the tab row, not the page: since 2026-10-08 each facet heads the
+       table with its own head and dek, so the doc-top differs by design */
+    top: +(R(document.querySelector(".rd-ap-table")).top - R(document.querySelector(".rd-ap-tabs")).top).toFixed(2),
     med: sorted[Math.floor(sorted.length / 2)], lo: sorted[0], hi: sorted[sorted.length - 1], n: rows.length,
     docW: document.documentElement.scrollWidth,
   };
@@ -87,7 +90,7 @@ console.log("== desktop 1280: tab, splits, rows ==");
 {
   const page = await open(1280, "f=g");
   const tabs = await page.evaluate(() => [...document.querySelectorAll(".rd-ap-tabs > [role=group] > button")].map((b) => [b.textContent.trim(), b.getAttribute("aria-pressed")]));
-  check("sixth facet tab reads Demographics", tabs.length === 6 && tabs[5][0] === "Demographics", JSON.stringify(tabs.map((t) => t[0])));
+  check("sixth facet tab reads Demographics", tabs.length >= 6 && tabs[5][0] === "Demographics", JSON.stringify(tabs.map((t) => t[0])));
   check("?f=g lands on it", tabs[5] && tabs[5][1] === "true");
   const SPLITS = [["age", "Age", null], ["gender", "Gender", "g"], ["education", "Education", "e"], ["place", "Place", "p"], ["home", "Home", "h"]];
   for (const [id, lab, letter] of SPLITS) {
@@ -157,15 +160,15 @@ for (const [vw, phone] of [[1440, false], [1280, false], [1001, false], [1000, f
     G[name] = await geometry(page, phone);
   }
   const d = G.dem, pr = G.primary, tw = G.twopp;
-  const ctlRow = vw <= 1000;
+  const ctlRow = vw <= 1140;   // the control row's own-row cut, 1140px since 2026-10-07
   check(`${vw}: tab row 44px`, d.tabs === 44 && pr.tabs === 44, `${d.tabs}/${pr.tabs}`);
   check(`${vw}: headings match Primary`, Math.abs(d.head - pr.head) < 0.5, `${d.head} v ${pr.head}`);
   check(`${vw}: rows match Primary (${phone ? "122" : "58"}px)`, Math.abs(d.med - pr.med) < 0.5 && d.hi - d.lo < 0.75, `${d.lo}-${d.hi} v ${pr.med}`);
   check(`${vw}: table top ${ctlRow ? "= 2PP's (control row)" : "= Primary's"}`, Math.abs(d.top - (ctlRow ? tw.top : pr.top)) < 0.5, `${d.top} v ${ctlRow ? tw.top : pr.top}`);
   check(`${vw}: no sideways overflow`, d.docW <= vw && tw.docW <= vw, `${d.docW}/${tw.docW}`);
   if (phone) {
-    const lab = await page.evaluate(() => [...document.querySelectorAll(".rd-ap-tabs > [role=group] > button")].map((b) => b.textContent.trim()).pop());
-    check(`${vw}: phone tab reads Groups`, lab === "Groups", lab);
+    const lab = await page.evaluate(() => [...document.querySelectorAll(".rd-ap-tabs > [role=group] > button")].map((b) => b.textContent.trim())[5]);
+    check(`${vw}: phone tab reads Demographics`, lab === "Demographics", lab);
   }
   check(`${vw}: no page errors`, page.errs.length === 0, page.errs.join(" | "));
   await page.close();

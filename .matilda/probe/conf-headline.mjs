@@ -1,98 +1,142 @@
-/* Probe (run: node .matilda/probe/conf-headline.mjs): the 2026-10-07 change
-   that keeps the All-polls where-things-stand head/dek on the CONFIDENCE
-   facet. The facet replaces its row set with confidence releases (no 2PP
-   figure), which silently emptied the window the RdHed is computed from and
-   the headline vanished on that facet alone; RdAllPolls now derives the
-   window from D.individualPolls there (rd-allpolls.jsx). Asserts the head
-   and dek on the Confidence facet are byte-identical to the 2PP facet's,
-   on a tab walk at two widths and on a first-paint deep link, and that the
-   section chrome (the "Economic sentiment" title) was untouched. Later the
-   same day the facet's .rd-meta was trimmed to CONF_META (the house-name
-   dek dropped) — pinned here on the walk and the deep link, with the
-   poll-facet meta asserted unchanged. */
+/* Probe (run: node .matilda/probe/conf-headline.mjs; PAGE=http://… to load
+   the webfonts): the All-polls table's per-facet headlines and the phone's
+   scrolling facet menu (user call 2026-10-08).
+
+   Until then every facet sat under the 2PP's head and dek, and under 600px
+   the menu dropped Confidence (and named Demographics "Groups") so six
+   tabs fit. Now:
+   1. each facet heads the table with its own head and dek - all seven
+      present and distinct, the 2PP's unchanged in shape, the confidence
+      facet's chrome ("Economic sentiment" + the trimmed indices meta)
+      intact, and the demographics head following the split picker
+   2. at 320-760px all seven tabs are in the menu (Demographics in full),
+      the strip scrolls sideways inside itself (never the page), its fade
+      class marks the hidden edge, and a pick glides its tab into view;
+      ?f=c deep-links onto Confidence on a phone and stays there
+   3. the fixed view holds: scrolled into the table, a walk through every
+      facet (heads of different lengths above it) leaves the search bar /
+      table top exactly where it was - the pin ignores drifts under 3px, so
+      the probe allows 0.5px */
 import puppeteer from "puppeteer-core";
 import path from "path";
 import process from "process";
 
 const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-const PAGE = "file://" + path.resolve(process.cwd(), "index.html");
+const PAGE = process.env.PAGE || "file://" + path.resolve(process.cwd(), "index.html");
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!ok) fails++; };
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: "new", args: ["--no-sandbox"] });
 const page = await browser.newPage();
 page.on("pageerror", (e) => { console.log("PAGEERROR", String(e).slice(0, 300)); fails++; });
 
-const hedOf = () => page.evaluate(() => {
-  const h = document.querySelector(".rd-ap h2.rd-hed");
-  const d = document.querySelector(".rd-ap p.rd-dek");
-  const title = document.querySelector(".rd-ap h2.rd-title");
-  const meta = document.querySelector(".rd-ap .rd-eyebrow .rd-meta");
-  return {
-    head: h ? h.textContent.trim() : null,
-    dek: d ? d.textContent.trim() : null,
-    title: title ? title.textContent.trim() : null,
-    meta: meta ? meta.textContent.trim() : null,
-  };
-});
 const CONF_META = "Every release of the four confidence indices since the 2025 election";
-const gotoPolls = async (w) => {
-  await page.setViewport({ width: w, height: 980, deviceScaleFactor: 1 });
-  await page.goto(PAGE + "#allpolls", { waitUntil: "networkidle0", timeout: 60000 });
+const LAB = { twopp: "2PP", primary: "Primary", leadership: /^Leader/, direction: "Direction", issues: "Issues", demographics: "Demographics", confidence: "Confidence" };
+const IDS = Object.keys(LAB);
+const open = async (w, qs = "") => {
+  const phone = w <= 760;
+  await page.setViewport({ width: w, height: 900, deviceScaleFactor: 1, isMobile: phone, hasTouch: phone });
+  await page.goto(PAGE + qs + "#allpolls", { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector(".rd-ap-tabs .rd-tab", { timeout: 30000 });
-  await page.waitForFunction(() => !!document.querySelector(".rd-ap h2.rd-hed"), { timeout: 30000 });
+  await sleep(600);
 };
+const pick = (id, sel = ".rd-ap-tabs .rd-tab") => page.evaluate((lab, sel) => {
+  const re = lab.startsWith("/") ? new RegExp(lab.slice(1, -1)) : null;
+  const b = [...document.querySelectorAll(sel)].find((x) => (re ? re.test(x.textContent.trim()) : x.textContent.trim() === lab));
+  if (!b) return false;
+  b.click();
+  return true;
+}, String(LAB[id] instanceof RegExp ? LAB[id] : LAB[id]), sel);
+const hed = () => page.evaluate(() => ({
+  facet: document.querySelector(".rd-ap").dataset.facet,
+  head: (document.querySelector(".rd-ap h2.rd-hed") || {}).textContent || null,
+  dek: (document.querySelector(".rd-ap p.rd-dek") || {}).textContent || null,
+  title: (document.querySelector(".rd-ap h2.rd-title") || {}).textContent || null,
+  meta: (document.querySelector(".rd-ap .rd-eyebrow .rd-meta") || {}).textContent || null,
+}));
 
-/* 1. tab walk, two widths: same head/dek before and after opening Confidence */
-for (const w of [760, 1366]) {
-  await gotoPolls(w);
-  const base = await hedOf();
-  check(base.head && base.head.startsWith("Labor’s"), `${w}px 2PP: head computed (${base.head && base.head.slice(0, 60)}…)`);
-  check(base.dek && base.dek.includes("none sits further"), `${w}px 2PP: dek computed`);
-  check(base.meta && base.meta.includes("poll since"), `${w}px 2PP: meta unchanged (${JSON.stringify((base.meta || "").slice(0, 50))})`);
-  await page.evaluate(() => {
-    [...document.querySelectorAll(".rd-ap-tabs .rd-tab")].find((el) => el.textContent.trim() === "Confidence").click();
-  });
-  await page.waitForFunction(
-    () => {
-      const a = document.querySelector(".rd-ap-tabs .rd-tab[aria-pressed='true']");
-      return a && a.textContent.trim() === "Confidence";
-    },
-    { timeout: 10000 });
-  await page.waitForFunction(
-    (want) => {
-      const h = document.querySelector(".rd-ap h2.rd-hed");
-      const d = document.querySelector(".rd-ap p.rd-dek");
-      return h && d && h.textContent.trim() === want.head && d.textContent.trim() === want.dek;
-    },
-    { timeout: 10000 }, base).catch(() => {});
-  const onConf = await hedOf();
-  check(onConf.head === base.head, `${w}px Confidence: head identical (${JSON.stringify((onConf.head || "").slice(0, 50))})`);
-  check(onConf.dek === base.dek, `${w}px Confidence: dek identical`);
-  check(onConf.title === "Economic sentiment", `${w}px Confidence: chrome still reads Economic sentiment`);
-  check(onConf.meta === CONF_META, `${w}px Confidence: meta is the trimmed indices line (${JSON.stringify((onConf.meta || "").slice(0, 60))})`);
+/* 1. a head and dek of its own on every facet */
+console.log("== 1. per-facet headlines (1280) ==");
+await open(1280);
+const seen = {};
+for (const id of IDS) {
+  check(await pick(id), `tab for ${id} present`);
+  await sleep(500);
+  const h = await hed();
+  seen[id] = h;
+  check(h.facet === id && h.head && h.dek, `${id}: head + dek (${JSON.stringify((h.head || "").slice(0, 70))})`);
 }
+check(seen.twopp.head.startsWith("Labor’s") && seen.twopp.dek.includes("Below is every"), "2PP head keeps its shape");
+check(new Set(IDS.map((id) => seen[id].head)).size === IDS.length, "seven distinct heads");
+check(new Set(IDS.map((id) => seen[id].dek)).size === IDS.length, "seven distinct deks");
+check(/primary vote comes from|primary vote is the trend/.test(seen.primary.head), "Primary head quotes the primary vote");
+check(/net (approval|favourability) of/.test(seen.leadership.head), "Leadership head quotes the net rating");
+check(/^The net mood of/.test(seen.direction.head), "Direction head quotes the net mood");
+check(/issues/.test(seen.issues.head), "Issues head counts the issues");
+check(/gauges sit (below|above) neutral/.test(seen.confidence.head), "Confidence head reads the gauges");
+check(seen.confidence.title === "Economic sentiment" && seen.confidence.meta === CONF_META, "Confidence chrome intact (title + trimmed meta)");
+check(seen.twopp.meta && seen.twopp.meta.includes("poll since"), "poll-facet meta unchanged");
+/* the demographics head follows the split picker */
+await pick("demographics");
+await sleep(400);
+const demHeads = [];
+for (const s of ["Age", "Gender", "Education", "Place", "Home", "Income"]) {
+  const ok = await page.evaluate((s) => { const b = [...document.querySelectorAll(".rd-ap-dpick button")].find((x) => x.textContent.trim() === s); if (b) b.click(); return !!b; }, s);
+  if (!ok) continue;
+  await sleep(400);
+  demHeads.push((await hed()).head);
+}
+check(demHeads.length >= 5 && new Set(demHeads).size === demHeads.length, `demographics head changes with each split (${demHeads.length})`);
 
-/* 2. first-paint deep link, no tab walk involved */
-await gotoPolls(760);
-const wantFromWalk = await hedOf();
-await page.goto(PAGE + "?f=c#allpolls", { waitUntil: "networkidle0" });
-await page.waitForSelector(".rd-ap-tabs .rd-tab", { timeout: 30000 });
-await page.waitForFunction(
-  () => {
-    const a = document.querySelector(".rd-ap-tabs .rd-tab[aria-pressed='true']");
-    return a && a.textContent.trim() === "Confidence" && !!document.querySelector(".rd-ap h2.rd-hed");
-  },
-  { timeout: 10000 }).catch(() => {});
-const deep = await hedOf();
-check(deep.head === wantFromWalk.head && deep.head != null, `deep link ?f=c: head identical on first paint (${JSON.stringify((deep.head || "").slice(0, 50))})`);
-check(deep.dek === wantFromWalk.dek && deep.dek != null, "deep link ?f=c: dek identical on first paint");
-check(deep.meta === CONF_META, "deep link ?f=c: meta is the trimmed indices line on first paint");
+/* 2. the phone menu */
+console.log("== 2. phone menu, 320-760 ==");
+for (const w of [320, 360, 390, 430, 520, 600, 700, 760]) {
+  await open(w);
+  const m = await page.evaluate(() => {
+    const g = document.querySelector('.rd-ap-tabs > [role="group"]');
+    return { labs: [...g.querySelectorAll(".rd-tab")].map((b) => b.textContent.trim()), sw: g.scrollWidth, cw: g.clientWidth, cls: g.className, docW: document.documentElement.scrollWidth, rowH: document.querySelector(".rd-ap-tabs").getBoundingClientRect().height };
+  });
+  check(m.labs.length === 7 && m.labs.includes("Confidence") && m.labs.includes("Demographics"), `${w}: seven tabs incl. Confidence, Demographics in full`);
+  check(m.docW <= w, `${w}: no page overflow (${m.docW})`);
+  check(m.rowH === 44, `${w}: tab row 44px (${m.rowH})`);
+  if (m.sw > m.cw + 1) check(/\bovf-r\b/.test(m.cls) && !/\bovf-l\b/.test(m.cls), `${w}: strip scrolls, right fade only at the start`);
+  await pick("confidence");
+  await sleep(900);
+  const v = await page.evaluate(() => {
+    const g = document.querySelector('.rd-ap-tabs > [role="group"]');
+    const a = g.querySelector('[aria-pressed="true"]').getBoundingClientRect(), r = g.getBoundingClientRect();
+    return { facet: document.querySelector(".rd-ap").dataset.facet, vis: a.left >= r.left - 1 && a.right <= r.right + 1 };
+  });
+  check(v.facet === "confidence" && v.vis, `${w}: Confidence opens and its tab is in view`);
+}
+await open(390, "?f=c");
+await sleep(600);
+check((await hed()).facet === "confidence", "390: ?f=c deep link stays on Confidence");
 
-/* 3. SOURCE pin: the window comes from D.individualPolls on the facet */
-const src = await import("fs").then((fs) => fs.default.readFileSync(path.resolve(process.cwd(), ".build/newtracker/assets/rd-allpolls.jsx"), "utf8"));
-check(src.includes('const win = (facet === "confidence" ? D.individualPolls : rows).filter(inToday)'),
-  "rd-allpolls.jsx sources the head/dek window from D.individualPolls on the confidence facet");
+/* 3. the fixed view holds through a facet walk */
+console.log("== 3. facet walk holds the table ==");
+for (const w of [390, 820, 1024, 1180, 1280]) {
+  await open(w);
+  for (const where of ["mid", "deep"]) {
+    await page.evaluate((where) => {
+      const t = document.querySelector(".rd-ap-tabs").getBoundingClientRect().top + scrollY;
+      window.scrollTo(0, where === "deep" ? t + 1500 : t - 300);
+    }, where);
+    await sleep(500);
+    let worst = 0;
+    for (const id of ["primary", "leadership", "direction", "issues", "demographics", "confidence", "twopp", "confidence", "primary", "issues", "twopp"]) {
+      const anchor = where === "deep" ? ".rd-ap-table" : ".rd-ap-bar";
+      const y0 = await page.evaluate((s) => document.querySelector(s).getBoundingClientRect().top, anchor);
+      const pinned = await page.evaluate(() => !!document.querySelector(".rd-ap-pinbar.on .rd-ap-pint"));
+      await pick(id, where === "deep" && pinned ? ".rd-ap-pint" : ".rd-ap-tabs .rd-tab");
+      await sleep(1100);
+      const y1 = await page.evaluate((s) => document.querySelector(s).getBoundingClientRect().top, anchor);
+      if (Math.abs(y1 - y0) > Math.abs(worst)) worst = y1 - y0;
+    }
+    check(Math.abs(worst) < 0.5, `${w} ${where}: table held through the walk (worst ${worst.toFixed(2)}px)`);
+  }
+}
 
 await browser.close();
 console.log(fails ? `FAIL (${fails})` : "ALL CHECKS PASSED");

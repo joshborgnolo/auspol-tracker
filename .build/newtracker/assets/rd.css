@@ -2089,6 +2089,31 @@ body.rd .rd-snap-nav button:focus-visible { outline: 2px solid var(--accent); ou
 body.rd .rd-snap-nav { gap: 16px; }
 @media (max-width: 1189px) { body.rd .rd-snap-nav { display: none; } }
 body.rd .rd-ap-tabs { margin-top: 28px; }
+/* each facet heads the table with its own head and dek (2026-10-08), so a
+   switch adds or drops lines above the held table. The pin scrolls them
+   away in whole px and leaves any drift under 3px alone (its Safari rule),
+   so every height that comes and goes on a switch sits on a 3px lattice
+   and the net change is 0 or a correctable 3+: the hed at 51 (46 x 1.108,
+   a hair over the 1.08 elsewhere; phones' 30 x 1.1 is 33), the dek's 27
+   and 21, the phone meta at 18 (its font's normal is 17.39) and the 2PP /
+   Demographics control row at 45 (its buttons' 44). Fractional lines had
+   nudged the table 0.3-0.4px per switch, and issues -> 2PP at 390px netted
+   2px (the 44px control row against a line more of dek). */
+body.rd .rd-ap .rd-hed { line-height: 51px; }
+body.rd .rd-ap .rd-ap-pctl { min-height: 45px; }
+/* the eyebrow's section links share the title's row while it holds them
+   and drop under it once it doesn't - which happened below ~1200px on
+   Confidence (its meta is the longer) but only below ~850 on the other
+   facets, so a switch in between added or dropped a 21.39px row above the
+   table (measured 2026-10-08 with the webfonts). Under 1240 they take
+   their own row on every facet, right-aligned as the wrap put them */
+@media (min-width: 761px) and (max-width: 1239px) {
+  body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav { flex-basis: 100%; justify-content: flex-end; }
+}
+@media (max-width: 640px) {
+  body.rd .rd-ap .rd-hed { line-height: 33px; }
+  body.rd .rd-ap .rd-eyebrow .rd-meta { line-height: 18px; }
+}
 body.rd .rd-ap-pctl { display: flex; align-items: center; gap: 4px; min-height: 40px; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-ap-pctl .rd-pl-flip { font-size: 13px; }
 
@@ -2541,8 +2566,33 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd { --rd-pin: 45px; }
   body.rd .rd-ap-nav { display: none; }
   body.rd .rd-ap-tabs { margin-top: 20px; }
-  body.rd .rd-ap-tabs .rd-tab { flex: 1; }
-  body.rd .rd-ap-tabs > div[role="group"] { flex: 1; }
+  /* the seven facet tabs share the row out while they fit and scroll
+     sideways once they don't (2026-10-08: Confidence had dropped off
+     the menu under 600px, and Demographics had shrunk to "Groups").
+     The fade marks whichever edge has tabs past it - rd-allpolls sets
+     .ovf-l/.ovf-r from the strip's own scroll. overflow-y needs the
+     explicit lock (a bare overflow-x:auto computes overflow-y to auto and
+     the fraction-of-px slack wobbles under a thumb - the house-lean
+     strip's lesson), and the 1px of padding keeps the chosen tab's
+     underline, which hangs 1px over the row's rule, inside the clip */
+  body.rd .rd-ap-tabs .rd-tab { flex: 1 0 auto; }
+  body.rd .rd-ap-tabs > div[role="group"] {
+    flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden;
+    overflow-y: clip; scrollbar-width: none; padding-bottom: 1px; margin-bottom: -1px;
+  }
+  body.rd .rd-ap-tabs > div[role="group"]::-webkit-scrollbar { display: none; }
+  body.rd .rd-ap-tabs > div[role="group"].ovf-r {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+  body.rd .rd-ap-tabs > div[role="group"].ovf-l {
+    -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent);
+  }
+  body.rd .rd-ap-tabs > div[role="group"].ovf-l.ovf-r {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+  }
   body.rd .rd-ap-bar { margin-top: 12px; flex-wrap: wrap; row-gap: 10px; column-gap: 8px; }
   body.rd .rd-ap-search { width: 100%; flex-shrink: 0; }
   body.rd .rd-ap-pops { width: 100%; gap: 8px; }
@@ -2659,34 +2709,12 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
 }
 
 
-/* the six facet tabs - Direction the long one, Groups the demographics
-   tab's phone name - outgrow the phone shell at their menu size. Step the
-   lettering down like the issues menu does rather than crowd the page edge
-   (measured 2026-10-04 with every label in the pressed tab's 600 weight,
-   the worst case: 15px sums 298px, 14px 278, 12.5px 248, plus the pads and
-   the group's 4px gaps against the shell, the viewport less 40px. 15px over
-   12px pads needs a 502px viewport · 6px pads 430 · 2px 382 · 14px over 1px
-   with 2px gaps 340 · 12.5px 310 - each rung switches in ~10px before its
-   limit, so the 390 and 320 phones keep 8 and 10px spare) */
+/* the facet tabs on a phone: the strip scrolls (the <=760px block above),
+   so the labels keep the menu's lettering and only the pads tighten, to
+   show as many tabs as the row holds before the fade */
 @media (max-width: 519px) {
-  body.rd .rd-ap-tabs .rd-tab { padding: 0 6px; }
-  /* where the six nearly fill the row, they span it edge to edge, the
-     spare width shared out as equal gaps rather than left after the last
-     tab (user report 2026-10-04: "excessive space after 'groups' on the
-     right-side of the screen"); wider, they keep the laptop's packed row */
-  body.rd .rd-ap-tabs .rd-tab { flex: none; }
-  body.rd .rd-ap-tabs > div[role="group"] { justify-content: space-between; }
+  body.rd .rd-ap-tabs .rd-tab { padding: 0 10px; }
   body.rd .rd-ap-tabs > .rd-tabs-grow { display: none; }
-}
-@media (max-width: 439px) {
-  body.rd .rd-ap-tabs .rd-tab { padding: 0 2px; }
-}
-@media (max-width: 389px) {
-  body.rd .rd-ap-tabs > div[role="group"] { gap: 2px !important; }
-  body.rd .rd-ap-tabs .rd-tab { padding: 0 1px; font-size: 14px; }
-}
-@media (max-width: 349px) {
-  body.rd .rd-ap-tabs .rd-tab { font-size: 12.5px; }
 }
 
 /* the phone's filters sheet */

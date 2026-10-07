@@ -5116,10 +5116,13 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const defaultScopeFor = (f, m) =>
     (!FACET_SCOPE[f] ? false : f === "twopp" ? Boolean(CONTEST_SCOPE[m]) || pubBasis : true);
 
-  /* seven tabs fit the facet menu from ~610px up (measured 2026-10-07 on
-     the 320–820px sweep); below that Confidence drops out of the menu - the
-     redesign's own row pulls the same veto over its six-base list there */
-  const confWide = useNarrow("(min-width: 601px)");
+  /* this design's six-tab menu fits from ~610px up (measured 2026-10-07
+     on the 320–820px sweep); below that Confidence drops out of it. The
+     redesign keeps the tab at every width - its row scrolls on a phone
+     (rd-allpolls' .ovf effect, 2026-10-08) - so the veto is this design's
+     alone (confWide stays true under window.AP.rd) */
+  const confNarrow = useNarrow("(max-width: 600px)");
+  const confWide = !confNarrow || !!(window.AP && window.AP.rd);
   const FACETS = [
     { id: "twopp", label: "2PP" },
     { id: "primary", label: "Primary" },
@@ -5267,9 +5270,9 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     }
     setOpen(focus.key);
   }, [focus]);
-  // the menu drops Confidence on narrow viewports (confWide); a reader
-  // sitting on the facet as the window shrinks re-seats on 2PP rather
-  // than viewing a facet whose tab is no longer on offer
+  // this design's menu drops Confidence on narrow viewports (confWide); a
+  // reader sitting on the facet as the window shrinks re-seats on 2PP
+  // rather than viewing a facet whose tab is no longer on offer
   React.useEffect(() => {
     if (!confWide && facet === "confidence") onFacet("twopp");
   }, [confWide, facet]);

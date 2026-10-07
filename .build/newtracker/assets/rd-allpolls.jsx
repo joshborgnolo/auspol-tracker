@@ -1708,6 +1708,238 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
   );
 }
 
+/* ---------------------------------------------------------------- each facet's headline
+   The table's head and dek name the facet's own measure (user call
+   2026-10-08: the 2PP's words had sat over every facet). Each quotes the
+   current figure exactly as its section of the page builds it (the
+   nowcasts gen-data ships), then reads the polls in the table against it:
+   how many sit in the figure's window and how far apart they run. The
+   window follows the measure's own (three weeks, six for the sparse ones),
+   counted by release date as the 2PP head counts it. Returns null when the
+   measure has nothing current to say, and the table opens on its tabs. */
+const RD_AP_DEM_NOUN = {
+  "18–34": "18–34-year-olds", "55+": "over-55s", "65+": "over-65s", "50+": "over-50s", "Gen Z": "Gen Z", Boomers: "Boomers",
+  Women: "women", Men: "men", University: "university graduates", "Year 12 or less": "voters who left school by Year 12",
+  School: "voters who left school by Year 12", "Inner metro": "inner-city voters", Rural: "rural voters",
+  "Regional or rural": "regional voters", Renting: "renters", "Renting and other": "renters", "Own outright": "outright owners",
+  "$150k+": "those on $150k or more", "Under $50k": "those on under $50k", "$125k+": "those on $125k or more",
+  "Under $45k": "those on under $45k", "$100k or more": "those on $100k or more", "Under $100k": "those on under $100k",
+};
+const rdApDemNoun = (g) => RD_AP_DEM_NOUN[g] || "the " + g + " group";
+function rdApFacetStory(facet, rows, upd, demSplit) {
+  const D = window.AUSPOL;
+  const J = window.JUR;
+  const inWin = (p, days) => { const t = rdApDays(p.released); return t > upd - days * 864e5 && t <= upd; };
+  const span = (days) => (days > 21 ? "six weeks" : "three weeks");
+  const poss = (id) => rdPartyStart(id) + (rdPlural(id) ? "’" : "’s");
+  /* "comes from six polls, which range from 24 to 30" - the 2PP head's shape */
+  const fromPolls = (n, lo, hi, f) => " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s")
+    + (n === 1 ? "" : lo === hi ? ", which all read " + f(lo) : ", which range from " + f(lo) + " to " + f(hi));
+  /* "All six have", "Four of them have", "None of them has" */
+  const tally = (k, n, has) => (n === 1 ? (k ? "It " + has : "It doesn’t " + (has === "has" ? "have" : has.replace(/s$/, "")))
+    : k === n ? (n === 2 ? "Both " : "All " + rdNumWord(n) + " ") + (has === "has" ? "have" : has.replace(/s$/, ""))
+    : k === 0 ? "None of them " + has
+    : rdCap(rdNumWord(k)) + " of them " + (k === 1 ? has : has === "has" ? "have" : has.replace(/s$/, "")));
+  const below = (what) => "Below is every " + RD_AP_POLLS + " poll" + (what ? " " + what : "") + " since the " + rdElecYear + " election, newest first, each linked to its source.";
+  const range = (vals) => [Math.min(...vals), Math.max(...vals)];
+
+  if (facet === "primary") {
+    const now = D.latest.primary || {};
+    const ids = Object.keys(now).filter((k) => now[k] != null).sort((a, b) => now[b] - now[a]);
+    if (ids.length < 2) return null;
+    const [t1, t2] = ids;
+    const days = (D.latest.method && D.latest.method.windowDays) || 21;
+    const ps = rows.filter((p) => inWin(p, days) && p.p && p.p[t1] != null);
+    if (!ps.length) return null;
+    const n = ps.length, [lo, hi] = range(ps.map((p) => p.p[t1]));
+    const f = rdApNum;
+    const head = RD_AP_KAL
+      ? poss(t1) + " " + now[t1].toFixed(1) + " primary vote is the trend through every poll; "
+        + (n === 1 ? "the last three weeks hold one, at " + f(lo) : "the last three weeks’ " + rdNumWord(n) + (lo === hi ? " all read " + f(lo) : " range from " + f(lo) + " to " + f(hi)))
+      : poss(t1) + " " + now[t1].toFixed(1) + " primary vote" + fromPolls(n, lo, hi, f);
+    /* the leader's margin as RdPrimary rules it: level when the gap is
+       inside the two figures' 95% margins combined */
+    const lastM = (D.aggPrimary || [])[(D.aggPrimary || []).length - 1] || {};
+    const ci = (id) => (lastM.ci && lastM.ci[id]) || 0;
+    const gap = now[t1] - now[t2];
+    const level = gap < Math.sqrt(ci(t1) ** 2 + ci(t2) ** 2);
+    const both = ps.filter((p) => p.p[t2] != null);
+    const ahead = both.filter((p) => p.p[t1] > p.p[t2]).length;
+    const m = both.length;
+    const tl = !m ? "" : m === 1 ? (ahead ? "It has " : "It doesn’t have ")
+      : ahead === m ? (m === 2 ? "Both have " : "All " + rdNumWord(m) + " have ")
+      : ahead === 0 ? "None of the " + rdNumWord(m) + " has "
+      : rdCap(rdNumWord(ahead)) + " of the " + rdNumWord(m) + " " + (ahead === 1 ? "has " : "have ");
+    const dek = (m ? tl + rdPartyIn(t1) + " ahead of " + rdPartyIn(t2) + ". " : "")
+      + rdPartyStart(t2) + (rdPlural(t2) ? " are " : " is ") + gap.toFixed(1) + " points behind on " + now[t2].toFixed(1)
+      + (level ? ", too close to separate. " : ". ")
+      + below("");
+    return { head, dek };
+  }
+
+  if (facet === "leadership") {
+    const N = D.leaderNow || {};
+    const L = {};
+    (D.LEADERS || []).forEach((x) => { L[x.id] = x; });
+    const pm = L.alb, opp = L.taylor;
+    if (!pm || !opp) return null;
+    /* approval where it is asked, else favourability (/vic/'s pollsters
+       mostly ask the latter); the federal majors' approval reads three
+       weeks, every other leader measure six (gen-data's §4 rule) */
+    const fav = !(N.alb_net && N.alb_net.v != null) && N.alb_fav && N.alb_fav.v != null;
+    const a = N[fav ? "alb_fav" : "alb_net"];
+    if (!a || a.v == null) return null;
+    const what = fav ? "net favourability" : "net approval";
+    const days = !fav && !J ? 21 : 42;
+    const isFav = (p) => ((p.appr.metricBy || {}).alb === "fav");
+    const ps = rows.filter((p) => inWin(p, days) && p.appr && p.appr.albNet != null && isFav(p) === !!fav);
+    if (!ps.length) return null;
+    const n = ps.length, [lo, hi] = range(ps.map((p) => p.appr.albNet));
+    const f = (v) => rdSigned(v, 0);
+    const head = pm.short + "’s " + what + " of " + rdSigned(a.v, 1) + fromPolls(n, lo, hi, f);
+    const t = N[fav ? "taylor_fav" : "taylor_net"];
+    const both = ps.filter((p) => p.appr.taylorNet != null);
+    const above = both.filter((p) => p.appr.taylorNet > p.appr.albNet).length;
+    let dek = "";
+    if (t && t.v != null && both.length) {
+      dek += tally(above, both.length, "rates") + " " + opp.short + " above " + pm.short + ", and " + opp.short + "’s own " + what + " is " + rdSigned(t.v, 1) + ". ";
+    }
+    const office = J ? J.office.alb : "PM";
+    const pa = N.alb_pref && N.alb_pref.v, po = N.taylor_pref && N.taylor_pref.v;
+    if (pa != null && po != null) {
+      const ra = Math.round(pa), ro = Math.round(po);
+      dek += ra === ro ? "As preferred " + office + ", " + pm.short + " and " + opp.short + " are level at " + ra + ". "
+        : "As preferred " + office + ", " + (ra > ro ? pm.short + " leads " + opp.short : opp.short + " leads " + pm.short)
+          + " " + Math.max(ra, ro) + "–" + Math.min(ra, ro) + ". ";
+    }
+    return { head, dek: dek + below("with leadership numbers") };
+  }
+
+  if (facet === "direction") {
+    const now = D.directionNow;
+    if (!now) return null;
+    const ps = rows.filter((p) => inWin(p, 21) && p.dir && p.dir.net != null);
+    if (!ps.length) return null;
+    const n = ps.length, [lo, hi] = range(ps.map((p) => p.dir.net));
+    const head = "The net mood of " + rdSigned(now.net, 1) + fromPolls(n, lo, hi, (v) => rdSigned(v, 0));
+    const wrongLeads = now.wrong >= now.right;
+    const k = ps.filter((p) => (wrongLeads ? p.dir.wrong > p.dir.right : p.dir.right > p.dir.wrong)).length;
+    const dek = tally(k, n, "has") + " more voters saying Australia is " + (wrongLeads ? "on the wrong track than heading in the right direction"
+      : "heading in the right direction than on the wrong track") + ". Taken together, " + Math.round(wrongLeads ? now.wrong : now.right)
+      + "% say it’s " + (wrongLeads ? "on the wrong track" : "heading in the right direction") + " and " + Math.round(wrongLeads ? now.right : now.wrong)
+      + "% that it’s " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". " + below("with a direction reading");
+    return { head, dek };
+  }
+
+  if (facet === "issues") {
+    /* the Issues section's pooled readings: who voters rate best on each
+       issue over six weeks, and whether the lead clears its margin */
+    const list = ((D.issues && D.issues.list) || []).filter((it) => it.own && it.own.lead);
+    if (!list.length) return null;
+    const by = {};
+    list.forEach((it) => { (by[it.own.lead] = by[it.own.lead] || []).push(it); });
+    const lab = (it) => it.label.charAt(0).toLowerCase() + it.label.slice(1);
+    const sig = (its) => its.filter((it) => it.own.leadSig);
+    const order = Object.keys(by).sort((x, y) => by[y].length - by[x].length || sig(by[y]).length - sig(by[x]).length);
+    const top = order[0], mine = by[top], clear = sig(mine).length, N = list.length;
+    let head;
+    if (order.length > 1 && by[order[1]].length === mine.length) head = "No party leads on more of the " + rdNumWord(N) + " issues than the others";
+    else head = rdPartyStart(top) + " leads on " + (mine.length === N ? "all " + rdNumWord(N) + " issues" : rdNumWord(mine.length) + " of the " + rdNumWord(N) + " issues")
+      + (clear === mine.length ? "" : clear === 0 ? ", but on none of them clearly" : ", but clearly on only " + rdNumWord(clear));
+    const rest = order.slice(head.startsWith("No party") ? 0 : 1);
+    const parts = rest.map((id) => rdPartyIn(id) + " on " + rdList(by[id].map(lab)));
+    let dek = parts.length ? rdCap(parts[0].replace(" on ", " leads on ")) + (parts.length > 1 ? ", and " + parts.slice(1).join(", and ") : "") + ". " : "";
+    const soft = mine.filter((it) => !it.own.leadSig);
+    if (!head.startsWith("No party") && soft.length && clear > 0)
+      dek += poss(top) + " edge on " + rdList(soft.map(lab)) + " is inside the margin of error. ";
+    dek += "Each figure pools the last " + (D.issues.window || "six weeks") + "’ polls. " + below("with issues figures");
+    return { head, dek };
+  }
+
+  if (facet === "demographics") {
+    const sp = (window.DEM_SPLITS || []).find((s) => s.id === demSplit);
+    if (!sp) return null;
+    const DG = D.demographics || {};
+    const pooled = {};
+    (DG.tabs || []).forEach((t) => t.sets.forEach((s) => s.groups.forEach((g) => { if (!pooled[g.label]) pooled[g.label] = g; })));
+    const pair = sp.pairs.find(([x, y]) => pooled[x] && pooled[y]);
+    const close = below(sp.scope.charAt(0).toLowerCase() + sp.scope.slice(1)).replace("each linked to its source", "each split into its own pollster’s groups");
+    if (pair) {
+      /* the Who-votes section's pooled six-week groups: each party's gap
+         between the split's two ends, in whole points as the table prints
+         them, and whether it clears the two groups' margins combined */
+      const [a, b] = pair, A = pooled[a], B = pooled[b];
+      const gaps = (DG.order || Object.keys(A.v)).filter((k) => A.v[k] != null && B.v[k] != null).map((k) => {
+        const g = A.v[k] - B.v[k];
+        return { k, g, hi: g >= 0 ? a : b, lo: g >= 0 ? b : a, sig: Math.abs(g) > Math.sqrt(((A.ci || {})[k] || 0) ** 2 + ((B.ci || {})[k] || 0) ** 2) };
+      }).sort((x, y) => Math.abs(y.g) - Math.abs(x.g));
+      if (!gaps.length) return null;
+      const pts = (g) => Math.round(Math.abs(g)) + " point" + (Math.round(Math.abs(g)) === 1 ? "" : "s");
+      const n = Math.min(A.n || 0, B.n || 0);
+      const pool = n ? " The figures pool " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s") + " from the last " + (DG.window || "six weeks") + ". " : " ";
+      const w = gaps[0];
+      if (!w.sig) {
+        return { head: rdCap(rdApDemNoun(a)) + " and " + rdApDemNoun(b) + " vote much alike",
+          dek: "No party’s vote differs between them by more than the margin of error; the widest gap is " + poss(w.k).replace(/^T/, "t") + ", " + pts(w.g) + "." + pool + close };
+      }
+      const head = poss(w.k) + " vote is " + pts(w.g) + " higher among " + rdApDemNoun(w.hi) + " than " + rdApDemNoun(w.lo);
+      /* the next two gaps that clear their margins, gathered by the group
+         they favour: "One Nation’s is 18 points and the Coalition’s 12
+         points higher among over-55s" */
+      const nx = gaps.slice(1).filter((x) => x.sig).slice(0, 2);
+      const sides = [...new Set(nx.map((x) => x.hi))].map((hi) => {
+        const xs = nx.filter((x) => x.hi === hi);
+        return xs.map((x, i) => poss(x.k).replace(/^The /, "the ") + (i === 0 ? " is " : " ") + pts(x.g)).join(" and ") + " higher among " + rdApDemNoun(hi);
+      });
+      const dek = (sides.length ? rdCap(sides.join(", and ")) + "." : "No other party’s gap clears the margin of error.") + pool + close;
+      return { head, dek };
+    }
+    /* a split the section doesn't pool (income: the houses bracket
+       different quantities) - the newest poll's own pair */
+    const ps = rows.filter((p) => window.demPairOf(p, demSplit)).sort((x, y) => (x.released < y.released ? 1 : -1));
+    if (!ps.length) return null;
+    const p = ps[0], pr = window.demPairOf(p, demSplit);
+    const gs = Object.keys(pr.gap).filter((k) => pr.gap[k] != null).sort((x, y) => Math.abs(pr.gap[y]) - Math.abs(pr.gap[x]));
+    if (!gs.length) return null;
+    const k = gs[0], g = pr.gap[k];
+    const head = rdCap(sp.label.toLowerCase()) + " splits aren’t pooled: each pollster draws its own brackets";
+    const dek = rdCap(rdNumWord(ps.length)) + " poll" + (ps.length === 1 ? " has" : "s have") + " split the vote by " + sp.label.toLowerCase()
+      + ". The newest, " + p.pollster + "’s, puts " + rdPartyIn(k) + " " + Math.round(Math.abs(g)) + " points higher among "
+      + rdApDemNoun(g >= 0 ? pr.a : pr.b) + " than " + rdApDemNoun(g >= 0 ? pr.b : pr.a) + ". " + close;
+    return { head, dek };
+  }
+
+  if (facet === "confidence") {
+    const M = D.mood || {};
+    const G = [["consumer", "ANZ–Roy Morgan’s consumer confidence", 100], ["westpacConsumer", "Westpac–MI’s consumer sentiment", 100],
+               ["business", "Roy Morgan’s business confidence", 100], ["nabBusiness", "NAB’s business confidence", 0]]
+      .filter(([k]) => M[k] && M[k].latest && M[k].latest.v != null)
+      .map(([k, name, neut]) => ({ k, name, neut, lat: M[k].latest }));
+    if (!G.length) return null;
+    const fig = (g, v) => (g.neut === 0 ? rdSigned(v, Number.isInteger(v) ? 0 : 1).replace(/^\+/, "") : v.toFixed(1));
+    const nG = G.length, under = G.filter((g) => g.lat.v < g.neut).length;
+    const all = nG === 2 ? "Both" : "All " + rdNumWord(nG);
+    const head = under === nG ? all + " confidence gauges sit below neutral"
+      : under === 0 ? all + " confidence gauges sit above neutral"
+      : rdCap(rdNumWord(under)) + " of the " + rdNumWord(nG) + " confidence gauges sit below neutral";
+    const moved = G.filter((g) => g.lat.chg != null);
+    const fell = moved.filter((g) => g.lat.chg < 0).length;
+    const fellTxt = !moved.length ? "" : (fell === moved.length ? (moved.length === 2 ? "Both" : "All " + rdNumWord(moved.length)) + " fell in their latest release. "
+      : fell === 0 ? "None fell in its latest release. "
+      : rdCap(rdNumWord(fell)) + " of the " + rdNumWord(moved.length) + " fell in their latest release. ");
+    const newest = G.reduce((m, g) => (g.lat.released > m ? g.lat.released : m), "");
+    const [, mo, dd] = newest.split("-").map(Number);
+    const at = (g) => g.name + " at " + fig(g, g.lat.v)
+      + (g.lat.chg == null ? "" : Math.abs(g.lat.chg) < 0.05 ? " (unchanged)" : (g.lat.chg < 0 ? " (down " : " (up ") + rdApNum(Math.abs(g.lat.chg)) + ")");
+    const latest = G.filter((g) => g.lat.released === newest);
+    const dek = fellTxt + "The newest release" + (latest.length > 1 ? "s" : "") + ", on " + dd + " " + D.monthNameFull(mo) + ", put"
+      + (latest.length > 1 ? "" : "s") + " " + rdList(latest.map(at)) + ". "
+      + "Below is every release of the four indices since the " + rdElecYear + " election, newest first, each linked to its source.";
+    return { head, dek };
+  }
+  return null;
+}
+
 /* ---------------------------------------------------------------- the phone's filters
    "Filters" on the pinned bar opens the pollster, time and includes lists as a
    sheet from the bottom of the screen, with the count of what's left on its
@@ -1789,13 +2021,6 @@ function RdAllPolls(P) {
      ~1150px the column shrinks (273px at 1001) and "40 pts 30" collide, so
      the head keeps the phone's five */
   const demMid = useNarrow("(max-width: 1150px)");
-  /* seven tabs fit the facet menu from ~610px up (measured 2026-10-07 on
-     the 320–820px sweep; the 510–519 straddle is a rung fluke of the bold
-     active tab). Under that the Confidence row drops out of the menu so
-     the rest fit without a sideways scroll; a reader parked on the facet
-     as the window narrows snaps back to 2PP (the effect just below the
-     fKey reset) */
-  const confW = useNarrow("(max-width: 600px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
   const contest = onM ? "onp" : "lnp";
@@ -1835,11 +2060,14 @@ function RdAllPolls(P) {
   const winDays = (D.latest.method && D.latest.method.windowDays) || 21;
   const inToday = (p) => { const t = rdApDays(p.released); return t > upd - winDays * 864e5 && t <= upd && figOf(p).a != null; };
   /* the confidence facet replaces `rows` with its releases, which carry no
-     2PP figure - the where-things-stand head/dek stays poll-based there, so
-     it reads the same polls the other facets compute it from */
+     2PP figure - the window stays poll-based there, so an opened release's
+     detail counts the same polls the other facets do */
   const win = (facet === "confidence" ? D.individualPolls : rows).filter(inToday);
   let head = null, dek = null;
-  if (today && win.length) {
+  /* every facet but 2PP heads the table with its own measure (user call
+     2026-10-08): rdApFacetStory, below the table's helpers */
+  if (facet !== "twopp") ({ head, dek } = rdApFacetStory(facet, rows, upd, demSplit) || {});
+  else if (today && win.length) {
     const vals = win.map((p) => figOf(p).a);
     const lo = Math.min(...vals), hi = Math.max(...vals);
     const f = (v) => (pub ? rdApNum(v) : v.toFixed(1));
@@ -1871,10 +2099,37 @@ function RdAllPolls(P) {
   const [showAll, setShowAll] = useState(false);
   const fKey = [q, [...sel].join(","), range, [...tagSel].join(","), facet, sort.key, sort.dir, measure, tppBasis].join("|");
   React.useEffect(() => { setMinShown(30); setFlatLimit(40); setShowAll(false); }, [fKey]);
-  /* the menu drops Confidence under ~610px (confW above); a reader sitting
-     on it as the window narrows (or deep-linked onto a phone) is snapped
-     back to 2PP rather than left in a view whose tab is no longer shown */
-  React.useEffect(() => { if (facet === "confidence" && confW) onFacet("twopp"); }, [facet, confW]);
+  /* where the seven tabs outrun the row (phones, rd.css's .rd-ap-tabs
+     scroller) the strip scrolls under a right-edge fade; .ovf turns the
+     fade on only while something sits past an edge, so a row that fits
+     never dims its last tab. A facet change - a tap, a swipe under the
+     row, an arrow walk - glides the strip to show the chosen tab: the
+     strip's own scroller only, never scrollIntoView, which would drag the
+     page to the row (the house-lean strip's rule) */
+  const apSec = () => document.getElementById("rd-ap-top");
+  React.useEffect(() => {
+    const sc = apSec() && apSec().querySelector('.rd-ap-tabs > [role="group"]');
+    if (!sc) return undefined;
+    const mark = () => {
+      const over = sc.scrollWidth > sc.clientWidth + 1;
+      sc.classList.toggle("ovf", over);
+      sc.classList.toggle("ovf-l", over && sc.scrollLeft > 1);
+      sc.classList.toggle("ovf-r", over && sc.scrollLeft < sc.scrollWidth - sc.clientWidth - 1);
+    };
+    mark();
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(mark) : null;
+    if (ro) ro.observe(sc);
+    sc.addEventListener("scroll", mark, { passive: true });
+    return () => { if (ro) ro.disconnect(); sc.removeEventListener("scroll", mark); };
+  }, []);
+  React.useEffect(() => {
+    const btn = apSec() && apSec().querySelector('.rd-ap-tabs [aria-pressed="true"]');
+    const sc = btn && btn.closest('[role="group"]');
+    if (!sc || sc.scrollWidth <= sc.clientWidth + 1) return;
+    const r = btn.getBoundingClientRect(), s = sc.getBoundingClientRect();
+    if (r.left < s.left + 28) sc.scrollTo({ left: sc.scrollLeft + r.left - s.left - 28, behavior: "smooth" });
+    else if (r.right > s.right - 28) sc.scrollTo({ left: sc.scrollLeft + r.right - s.right + 28, behavior: "smooth" });
+  }, [facet]);
   const rowKey = (p) => p.pollster + "|" + p.released;
   const openRow = open ? sorted.find((p) => rowKey(p) === open) : null;
   let groups = null, flat = null, nShown = 0;
@@ -1906,13 +2161,13 @@ function RdAllPolls(P) {
   const visRows = byDate ? groups.flatMap((g) => g.list) : flat;
   const FACETS = [{ id: "twopp", label: "2PP" }, { id: "primary", label: "Primary" },
                   { id: "leadership", label: phone ? "Leaders" : "Leadership" }, { id: "direction", label: "Direction" },
-                  { id: "issues", label: "Issues" }, { id: "demographics", label: phone ? "Groups" : "Demographics" }]
+                  { id: "issues", label: "Issues" }, { id: "demographics", label: "Demographics" }]
     /* the confidence facet exists only where the mood file's releases do –
-       never on /vic/ (the JUR build ships no confidenceOnlyPolls at all),
-       and only on viewports where the seven-tab menu fits (confW gate);
-       the data still ships, so a phone follows a ?f=c link as far as the
-       row below before the facet snaps to 2PP */
-    .concat((D.confidenceOnlyPolls || []).length && !confW ? [{ id: "confidence", label: "Confidence" }] : [])
+       never on /vic/ (the JUR build ships no confidenceOnlyPolls at all).
+       It shows at every width: where the seven tabs outrun a phone's row
+       the strip scrolls (the .ovf effect above), which also let Demographics keep
+       its full name there (it was "Groups" while six had to fit) */
+    .concat((D.confidenceOnlyPolls || []).length ? [{ id: "confidence", label: "Confidence" }] : [])
     /* /vic/'s polls carry no direction, issues or group figures */
     .filter((f) => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f.id));
   const rowNav = (e, p) => {

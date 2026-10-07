@@ -121,6 +121,8 @@
   --chart-bg: var(--surface);
   --mood-pos: oklch(0.52 0.085 200);
   --mood-neg: oklch(0.44 0.045 50);
+  --mood-consumer: oklch(0.60 0.115 83);
+  --mood-business: oklch(0.50 0.105 305);
   --chg-up:   oklch(0.505 0.110 152);
   --chg-down: oklch(0.510 0.140 25);
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
@@ -171,6 +173,8 @@ body.dark {
   --accent: oklch(0.70 0.080 205);
   --mood-pos: oklch(0.70 0.105 200);
   --mood-neg: oklch(0.68 0.05 45);
+  --mood-consumer: oklch(0.72 0.115 83);
+  --mood-business: oklch(0.70 0.105 305);
   --chg-up:   oklch(0.735 0.135 152);
   --chg-down: oklch(0.700 0.145 25);
   --shadow: 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 28px oklch(0 0 0 / 0.40);
@@ -884,6 +888,7 @@ body { --bar-track: color-mix(in oklch, var(--ink) 8%, var(--bg)); }
 .hero-interval.hi-fitting { flex-wrap: nowrap; }
 .hero-interval.hi-fitting > * { white-space: nowrap; }
 .hi-term {
+  display: inline;
   font: inherit; color: inherit; background: none; border: 0; padding: 0;
   cursor: pointer; text-decoration: underline;
   text-decoration-color: var(--line-2); text-underline-offset: 3px;
@@ -1436,9 +1441,12 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   .info-index::-webkit-scrollbar { display: none; }
 }
 .info-index button { background: none; border: 0; padding: 0; cursor: pointer;
-  color: var(--ink-3); font: inherit; text-decoration: underline;
-  text-decoration-color: var(--line-2); text-underline-offset: 3px; }
-.info-index button:hover { color: var(--ink); text-decoration-color: currentColor; }
+  color: var(--ink-3); font: inherit; }
+.info-index button:hover { color: var(--ink); }
+.info-index button.on { color: var(--ink); font-weight: 600;
+  text-decoration: underline; text-decoration-thickness: 2px;
+  text-decoration-color: var(--ink); text-underline-offset: 4px; }
+.info-num { color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .info-about-p { margin: 0 0 12px; font-size: 15px; line-height: 1.62;
   color: var(--ink-2); text-wrap: pretty; }
 .info-about { margin-bottom: 8px; }
@@ -2782,6 +2790,7 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   border: 1px solid currentColor;
 }
 .vr-pill.hi-term {
+  display: inline-block;
   font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
   border-radius: 999px; padding: 3px 9px; border: 1px solid currentColor;
   text-decoration: none;
@@ -3255,12 +3264,14 @@ body.rd .rd-swap-now.in { animation: rd-xf-in .2s ease-out both; }
 @keyframes rd-ap-in-cdir { from { opacity: 0; } }
 @keyframes rd-ap-in-ciss { from { opacity: 0; } }
 @keyframes rd-ap-in-cdem { from { opacity: 0; } }
+@keyframes rd-ap-in-cconf { from { opacity: 0; } }
 body.rd .rd-ap-sw.rd-ap-c2pp { --rd-ap-in: rd-ap-in-c2pp; }
 body.rd .rd-ap-sw.rd-ap-cprim { --rd-ap-in: rd-ap-in-cprim; }
 body.rd .rd-ap-sw.rd-ap-clead { --rd-ap-in: rd-ap-in-clead; }
 body.rd .rd-ap-sw.rd-ap-cdir { --rd-ap-in: rd-ap-in-cdir; }
 body.rd .rd-ap-sw.rd-ap-ciss { --rd-ap-in: rd-ap-in-ciss; }
 body.rd .rd-ap-sw.rd-ap-cdem { --rd-ap-in: rd-ap-in-cdem; }
+body.rd .rd-ap-sw.rd-ap-cconf { --rd-ap-in: rd-ap-in-cconf; }
 body.rd :is(.rd-ap-row, .rd-ap-hrow).rd-ap-sw > :nth-child(n+5):not(.rd-ap-chev),
 body.rd .rd-ap-card.rd-ap-sw > :is(.rd-ap-c1, .rd-ap-c2) > :last-child,
 body.rd .rd-ap-card.rd-ap-sw > :nth-child(n+3),
@@ -3662,6 +3673,7 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
   body.rd .rd-pl-row:hover { background: none; }
   body.rd .rd-pl-row > .rd-pl-c-name { grid-area: name; padding: 0; }
   body.rd .rd-pl-row > .rd-pl-c-name .rd-pl-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body.rd .rd-pl-row > .rd-pl-c-name .rd-pl-main { overflow: hidden; text-overflow: ellipsis; }
   body.rd .rd-pl-row > .rd-pl-c-figs { grid-area: figs; padding: 0; align-items: flex-end; text-align: right; }
   body.rd .rd-pl-row > .rd-pl-c-tl { grid-area: tl; min-height: 36px; }
   body.rd .rd-pl-row > .rd-pl-c-latest, body.rd .rd-pl-row > .rd-pl-c-next, body.rd .rd-pl-row > .rd-pl-c-exp { display: none; }
@@ -3670,6 +3682,7 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
   body.rd .rd-pl-foot1 .missed, body.rd .rd-pl-foot1 .missed b { color: var(--mood-neg); }
   body.rd .rd-pl-main { font-size: 15px; }
   body.rd .rd-pl-c-figs .rd-pl-main { font-size: 17px; justify-content: flex-end; }
+  body.rd .rd-polls[data-facet="leadership"] .rd-pl-row > .rd-pl-c-figs .rd-pl-main { font-size: 15px; }
   body.rd .rd-pl-c-figs .rd-pl-main .rd-pl-tag { display: none; }
   body.rd .rd-pl-c-figs .rd-pl-sub .rd-pl-tag { margin-left: 0; margin-right: 8px; }
   body.rd .rd-pl-long { display: none; }
@@ -3821,6 +3834,7 @@ body.rd .rd-dir-uns > span { position: absolute; bottom: calc(100% + 6px); left:
 body.rd .rd-dir-net { margin: 32px 0 0; font-size: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 body.rd .rd-dir-net b { font-weight: 600; color: var(--ink); }
 body.rd .rd-dir-chart { margin-top: 40px; }
+body.rd .rd-mood-chart { margin-top: 40px; }
 body.rd .view-how { margin-top: 16px; }
 @media (max-width: 640px) {
   body.rd .rd-dir-uns > span { bottom: calc(100% + 14px); left: calc(50% + 6px); transform: none; }
@@ -3832,6 +3846,7 @@ body.rd .view-how { margin-top: 16px; }
   body.rd .rd-dir-bar { height: 14px; }
   body.rd .rd-dir-net { margin-top: 14px; font-size: 14px; text-align: center; }
   body.rd .rd-dir-chart { margin-top: 28px; }
+  body.rd .rd-mood-chart { margin-top: 28px; }
 }
 body.rd .rd-wv-tabs { margin-top: 28px; }
 body.rd .rd-chips { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -4170,9 +4185,10 @@ body.rd .rd-un-ptitle { display: flex; align-items: baseline; gap: 10px; margin-
 body.rd .rd-un-ptitle b { font-size: 16px; font-weight: 600; color: var(--ink); }
 body.rd .rd-un-ptitle span { font-size: 13px; color: var(--ink-3); }
 body.rd .rd-un-read { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
-body.rd .rd-un-read svg { margin-top: 4px; }
+body.rd .rd-un-read svg { margin-top: 4px; flex-shrink: 0; }
 body.rd .rd-un-rtop { display: flex; align-items: baseline; gap: 10px; }
 body.rd .rd-un-rtop b { font-size: 14px; font-weight: 600; color: var(--ink); }
+body.rd .rd-un-rhouse { font-size: 12px; color: var(--ink-3); }
 body.rd .rd-un-rv { font-size: 19px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 body.rd .rd-un-rci { font-size: 12px; color: var(--ink-3); }
 body.rd .rd-un-read p { margin: 2px 0 0; font-size: 13px; color: var(--ink-3); }
@@ -4548,6 +4564,15 @@ body.rd .rd-snap-nav button:focus-visible { outline: 2px solid var(--accent); ou
 body.rd .rd-snap-nav { gap: 16px; }
 @media (max-width: 1189px) { body.rd .rd-snap-nav { display: none; } }
 body.rd .rd-ap-tabs { margin-top: 28px; }
+body.rd .rd-ap .rd-hed { line-height: 51px; }
+body.rd .rd-ap .rd-ap-pctl { min-height: 45px; }
+@media (min-width: 761px) and (max-width: 1239px) {
+  body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav { flex-basis: 100%; justify-content: flex-end; }
+}
+@media (max-width: 640px) {
+  body.rd .rd-ap .rd-hed { line-height: 33px; }
+  body.rd .rd-ap .rd-eyebrow .rd-meta { line-height: 18px; }
+}
 body.rd .rd-ap-pctl { display: flex; align-items: center; gap: 4px; min-height: 40px; font-size: 13px; color: var(--ink-3); }
 body.rd .rd-ap-pctl .rd-pl-flip { font-size: 13px; }
 body.rd .rd-ap-bar { margin-top: 16px; display: flex; align-items: center; gap: 10px; }
@@ -4640,6 +4665,7 @@ body.rd .rd-ap-clead { grid-template-columns: 200px 120px 76px 36px 176px minmax
 body.rd .rd-ap-cdir { grid-template-columns: 200px 120px 76px 36px 84px 84px 76px minmax(0, 356px) minmax(0, 1fr) 40px; }
 body.rd .rd-ap-ciss { grid-template-columns: 200px 120px 76px 36px minmax(0, 1fr) 0 40px; }
 body.rd .rd-ap-cdem { grid-template-columns: 200px 120px 76px 36px 230px minmax(0, 410px) minmax(0, 1fr) 40px; }
+body.rd .rd-ap-cconf { grid-template-columns: 200px 120px 76px 36px 84px minmax(0, 356px) 64px minmax(0, 1fr) 40px; }
 body.rd .rd-ap-hrow { display: grid; align-items: end; padding: 12px 0 6px; border-bottom: 1px solid var(--ink-faint);
   box-sizing: border-box; min-height: 57px;  }
 body.rd .rd-ap-hrow > * { min-width: 0; }
@@ -4897,6 +4923,7 @@ body.rd .rd-apd-dv.lead { background: color-mix(in oklab, var(--lead) 20%, trans
   body.rd .rd-ap-cdir { grid-template-columns: 170px 110px 70px 16px 70px 70px 64px minmax(0, 356px) minmax(0, 1fr) 32px; }
   body.rd .rd-ap-ciss { grid-template-columns: 170px 110px 70px 16px minmax(0, 1fr) 0 32px; }
   body.rd .rd-ap-cdem { grid-template-columns: 170px 110px 70px 16px 230px minmax(0, 410px) minmax(0, 1fr) 32px; }
+  body.rd .rd-ap-cconf { grid-template-columns: 170px 110px 70px 16px 70px minmax(0, 356px) 56px minmax(0, 1fr) 32px; }
   body.rd .rd-ap-long { display: none; }
 }
 body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
@@ -4905,6 +4932,7 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-cprim { grid-template-columns: 150px 104px 0 12px 200px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-clead { grid-template-columns: 150px 104px 0 12px 150px minmax(0, 1fr) 132px 28px; }
   body.rd .rd-ap-cdir { grid-template-columns: 150px 104px 0 12px 56px 56px 56px minmax(0, 1fr) 44px 28px; }
+  body.rd .rd-ap-cconf { grid-template-columns: 150px 104px 0 12px 70px minmax(0, 356px) 56px minmax(0, 1fr) 28px; }
   body.rd .rd-ap-ciss { grid-template-columns: 150px 104px 0 12px minmax(0, 1fr) 0 28px; }
   body.rd .rd-ap-imap { column-gap: 8px; padding-right: 4px; }
   body.rd .rd-ap-icell > b { font-size: 13px; }
@@ -4928,8 +4956,24 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd { --rd-pin: 45px; }
   body.rd .rd-ap-nav { display: none; }
   body.rd .rd-ap-tabs { margin-top: 20px; }
-  body.rd .rd-ap-tabs .rd-tab { flex: 1; }
-  body.rd .rd-ap-tabs > div[role="group"] { flex: 1; }
+  body.rd .rd-ap-tabs .rd-tab { flex: 1 0 auto; }
+  body.rd .rd-ap-tabs > div[role="group"] {
+    flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden;
+    overflow-y: clip; scrollbar-width: none; padding-bottom: 1px; margin-bottom: -1px;
+  }
+  body.rd .rd-ap-tabs > div[role="group"]::-webkit-scrollbar { display: none; }
+  body.rd .rd-ap-tabs > div[role="group"].ovf-r {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+  body.rd .rd-ap-tabs > div[role="group"].ovf-l {
+    -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent);
+  }
+  body.rd .rd-ap-tabs > div[role="group"].ovf-l.ovf-r {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+  }
   body.rd .rd-ap-bar { margin-top: 12px; flex-wrap: wrap; row-gap: 10px; column-gap: 8px; }
   body.rd .rd-ap-search { width: 100%; flex-shrink: 0; }
   body.rd .rd-ap-pops { width: 100%; gap: 8px; }
@@ -4946,13 +4990,13 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-ap-phead .rd-ap-in, body.rd .rd-ap-card .rd-ap-in { left: 8px; right: 8px; }
   body.rd .rd-ap-phead.rd-ap-c2pp .rd-ap-in, body.rd .rd-ap-card.rd-ap-c2pp .rd-ap-in { right: 46px; }
   body.rd .rd-ap-phead .rd-ap-cap { left: 8px; }
-  body.rd .rd-ap-c2pp, body.rd .rd-ap-cprim, body.rd .rd-ap-clead, body.rd .rd-ap-cdir, body.rd .rd-ap-ciss, body.rd .rd-ap-cdem { grid-template-columns: none; }
+  body.rd .rd-ap-c2pp, body.rd .rd-ap-cprim, body.rd .rd-ap-clead, body.rd .rd-ap-cdir, body.rd .rd-ap-ciss, body.rd .rd-ap-cdem, body.rd .rd-ap-cconf { grid-template-columns: none; }
   body.rd .rd-ap-mrow { display: flex; align-items: baseline; gap: 8px; padding: 22px 0 6px; }
   body.rd .rd-ap-mlab { padding-left: 0; gap: 8px; }
   body.rd .rd-ap-mlab span { font-size: 12px; }
   body.rd .rd-ap-mavg { margin-left: auto; font-size: 12px; }
   body.rd .rd-ap-card { padding: 11px 0 8px; border-bottom: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
-  body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss, .rd-ap-cdem) { min-height: 122px; }
+  body.rd .rd-ap-card:is(.rd-ap-cprim, .rd-ap-clead, .rd-ap-cdir, .rd-ap-ciss, .rd-ap-cdem, .rd-ap-cconf) { min-height: 122px; }
   body.rd .rd-ap-card:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   body.rd .rd-ap-card.open { border-bottom-color: transparent; }
   body.rd .rd-ap-card.arrived { box-shadow: inset 3px 0 0 var(--accent); padding-left: 8px; }
@@ -5015,20 +5059,8 @@ body.rd .rd-ap-th.wrap { white-space: normal; line-height: 1.3; }
   body.rd .rd-apd-dem.isn5 > .rd-apd-isr:not(.rd-apd-demh) + .rd-apd-isr { border-top: 1px solid var(--line-2); }
 }
 @media (max-width: 519px) {
-  body.rd .rd-ap-tabs .rd-tab { padding: 0 6px; }
-  body.rd .rd-ap-tabs .rd-tab { flex: none; }
-  body.rd .rd-ap-tabs > div[role="group"] { justify-content: space-between; }
+  body.rd .rd-ap-tabs .rd-tab { padding: 0 10px; }
   body.rd .rd-ap-tabs > .rd-tabs-grow { display: none; }
-}
-@media (max-width: 439px) {
-  body.rd .rd-ap-tabs .rd-tab { padding: 0 2px; }
-}
-@media (max-width: 389px) {
-  body.rd .rd-ap-tabs > div[role="group"] { gap: 2px !important; }
-  body.rd .rd-ap-tabs .rd-tab { padding: 0 1px; font-size: 14px; }
-}
-@media (max-width: 349px) {
-  body.rd .rd-ap-tabs .rd-tab { font-size: 12.5px; }
 }
 body.rd .rd-ap-sheetwrap { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-end; background: color-mix(in oklab, var(--ink) 38%, transparent); }
 body.rd .rd-ap-sheet {
@@ -5182,6 +5214,7 @@ body.rd .rd-foot-links { display: inline-flex; align-items: center; gap: 24px; f
 body.rd .info { padding-top: 4px; }
 body.rd .info-index { top: 46px; gap: 6px 20px; padding: 12px 0 10px; }
 body.rd .info-index button { font-weight: 500; color: var(--ink-2); }
+body.rd .info-index button.on { color: var(--ink); font-weight: 600; }
 body.rd .info-h {
   margin: 10px 0 16px; padding-top: 12px; border-top: 2px solid var(--rd-rule);
   font-family: var(--sans); font-size: 22px; font-weight: 600; line-height: 1.2; letter-spacing: -0.005em;
@@ -11088,8 +11121,10 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   const directionPolls = [];
   const directionOnlyPolls = [];
   const issuesOnlyPolls = [];
+  const confidenceOnlyPolls = [];
   const directionAvailable = false;
   const undecided = null;
+  const mood = null;
   const firmness = null;
   const onSources = null;
   const leaderNow = {
@@ -19185,9 +19220,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     directionPolls,
     directionOnlyPolls,
     issuesOnlyPolls,
+    confidenceOnlyPolls,
     directionNow,
     leaderNow,
     undecided,
+    mood,
     firmness,
     onSources,
     demographics,
@@ -19694,7 +19731,7 @@ window.AP = function () {
       verb: "far beyond sampling error"
     };
   }
-  const ROW_KEYS = new Set([...D.individualPolls, ...(D.directionOnlyPolls || [])].map(p => p.pollster + "|" + p.released));
+  const ROW_KEYS = new Set([...D.individualPolls, ...(D.directionOnlyPolls || []), ...(D.confidenceOnlyPolls || [])].map(p => p.pollster + "|" + p.released));
   const pollRowKey = m => {
     if (!m || !m.pollster || !m.released) return null;
     const k = m.pollster + "|" + m.released;
@@ -22424,6 +22461,7 @@ function TrendChart(props) {
     if (!travelling.current) prev.current = fresh;
   });
   const ref = useRef(null);
+  const svgRect = useRef(null);
   const badgeAt = useRef({});
   const labOff = useRef(new Map());
   const [cw, setCw] = useState(widthSeed || VB.W);
@@ -22431,10 +22469,20 @@ function TrendChart(props) {
   React.useLayoutEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
-    const update = () => setCw(el.getBoundingClientRect().width || VB.W);
+    const update = () => {
+      svgRect.current = null;
+      setCw(el.getBoundingClientRect().width || VB.W);
+    };
     if (widthSeed == null) update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
+    const drop = () => {
+      svgRect.current = null;
+    };
+    window.addEventListener("scroll", drop, true);
+    window.addEventListener("resize", drop);
+    const bro = new ResizeObserver(drop);
+    bro.observe(document.body);
     const mo = new MutationObserver(() => setCopyTick(t => t + 1));
     mo.observe(el, {
       attributes: true,
@@ -22443,6 +22491,9 @@ function TrendChart(props) {
     return () => {
       ro.disconnect();
       mo.disconnect();
+      bro.disconnect();
+      window.removeEventListener("scroll", drop, true);
+      window.removeEventListener("resize", drop);
     };
   }, []);
   const k0 = cw / VB.W;
@@ -22545,7 +22596,7 @@ function TrendChart(props) {
   };
   const spinePts = spine || (series[0] ? series[0].points : []);
   const toVB = e => {
-    const rect = ref.current.querySelector("svg").getBoundingClientRect();
+    const rect = svgRect.current || (svgRect.current = ref.current.querySelector("svg").getBoundingClientRect());
     return {
       x: (e.clientX - rect.left) / rect.width * W,
       y: (e.clientY - rect.top) / rect.height * H,
@@ -22606,7 +22657,7 @@ function TrendChart(props) {
     onHoverIndex && onHoverIndex(null);
   };
   const rowKey = dot && window.AP.pollRowKey ? window.AP.pollRowKey(dot.meta) : null;
-  const openable = !!(dot && dotSrc.current === "mouse" && rowKey && window.AP.openPoll);
+  const openable = !!(dot && dotSrc.current === "mouse" && rowKey && window.AP.openPoll && pollFacet);
   const touchTapAt = useRef(0);
   const handleClick = e => {
     if (performance.now() - touchTapAt.current < 400) return;
@@ -22624,13 +22675,18 @@ function TrendChart(props) {
     const rU = radiusPx / Math.max(scale, 0.0001);
     let near = null,
       nearD = Infinity;
-    for (const q of evPlaced) {
+    for (let i = 0; i < evPlaced.length; i++) {
+      const q = evPlaced[i];
       if (q.leaving) continue;
       let d = p.y >= q.y - rU && p.y <= H - pad.b + rU ? Math.abs(p.x - q.ex) : Infinity;
       if (q.row != null) {
         const dx = p.x < q.x ? q.x - p.x : p.x > q.x + q.w ? p.x - (q.x + q.w) : 0;
         const dy = p.y < q.y - q.fsz ? q.y - q.fsz - p.y : p.y > q.y + q.fsz * 0.3 ? p.y - (q.y + q.fsz * 0.3) : 0;
         d = Math.min(d, Math.hypot(dx, dy));
+      }
+      if (q.row == null && q.e.badge != null) {
+        const bx = badgeAt.current && badgeAt.current[i] != null ? badgeAt.current[i] : q.ex;
+        d = Math.min(d, Math.hypot(p.x - bx, p.y - (pad.t - PX(13))));
       }
       if (d < nearD) {
         nearD = d;
@@ -22882,7 +22938,7 @@ function TrendChart(props) {
       title: dot.meta.pollster,
       rows: [{
         label: dot.label || "2PP",
-        value: fmt(dot.y) + unit,
+        value: fmt(dot.y, dot) + unit,
         color: dot.color
       }, {
         label: dot.meta.dateLabel ? "Field" : "",
@@ -22911,7 +22967,7 @@ function TrendChart(props) {
           }
           return {
             label: s.label,
-            value: fmt(p.y) + unit,
+            value: fmt(p.y, p) + unit,
             color: s.color,
             y: p.y,
             note: p.note
@@ -23024,6 +23080,24 @@ function TrendChart(props) {
       r: DOT_R
     }, common));
   });
+  const wipeSig = series.some(s => s.wipe != null) ? series.map(s => s.wipe == null ? "-" : s.wipe).join("|") : "";
+  const areaGeo = React.useMemo(() => areas.map(a => {
+    if (!a.points || a.points.length < 2) return {
+      a
+    };
+    if (a.wipeOf != null && wipedOut.has(a.wipeOf)) return {
+      a
+    };
+    const edgePath = (pts, key, lead) => rd && a.smooth !== false ? monotoneXY(pts.map(d => [sx(d.x), sy(d[key])]), lead) : a.smooth ? smoothPath(pts.map(d => ({
+      x: d.x,
+      y: d[key]
+    })), sx, sy).replace(/^M/, lead) : pts.map((d, i) => `${i ? "L" : lead} ${sx(d.x).toFixed(2)} ${sy(d[key]).toFixed(2)}`).join(" ");
+    return {
+      a,
+      top: edgePath(a.points, "y1", "M"),
+      bot: edgePath(a.points.slice().reverse(), "y0", "L")
+    };
+  }), [areas, geom, wipeSig, rd]);
   const copying = !!(ref.current && ref.current.hasAttribute("data-copying"));
   const placeEvents = list => {
     const evs = list.map(e => copying && e.badge != null ? {
@@ -23115,7 +23189,7 @@ function TrendChart(props) {
     });
   };
   const evKey = e => e.date + "|" + (e.short || e.label);
-  const evPlaced = (() => {
+  const evPlaced = React.useMemo(() => {
     const to = placeEvents(events);
     if (!eventsFrom || eventMix >= 1) return to;
     const from = placeEvents(eventsFrom),
@@ -23146,7 +23220,7 @@ function TrendChart(props) {
       leaving: true
     }));
     return out.sort((a, b) => a.ex - b.ex);
-  })();
+  }, [events, eventsFrom, eventMix, copying, geom, rd]);
   if (ctl && evt) {
     const q = evPlaced.find(p => p.e === evt.e && !p.leaving);
     if (!q) {
@@ -23258,15 +23332,12 @@ function TrendChart(props) {
     width: W - pad.l - pad.r,
     height: Math.abs(sy(b.y0) - sy(b.y1)),
     fill: b.color
-  })), areas.map(a => {
-    if (!a.points || a.points.length < 2) return null;
-    if (a.wipeOf != null && wipedOut.has(a.wipeOf)) return null;
-    const edgePath = (pts, key, lead) => rd && a.smooth !== false ? monotoneXY(pts.map(d => [sx(d.x), sy(d[key])]), lead) : a.smooth ? smoothPath(pts.map(d => ({
-      x: d.x,
-      y: d[key]
-    })), sx, sy).replace(/^M/, lead) : pts.map((d, i) => `${i ? "L" : lead} ${sx(d.x).toFixed(2)} ${sy(d[key]).toFixed(2)}`).join(" ");
-    const top = edgePath(a.points, "y1", "M");
-    const bot = edgePath(a.points.slice().reverse(), "y0", "L");
+  })), areaGeo.map(({
+    a,
+    top,
+    bot
+  }) => {
+    if (top == null) return null;
     return (React.createElement("g", {
         key: "a" + a.id,
         clipPath: `url(#${clipId})`
@@ -24924,10 +24995,13 @@ function PrimaryVotePanel({
     tooltipTitle: i => window.AP.monthLabelFull(pts[i].ym),
     fmt: v => v.toFixed(1)
   }), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Each dot is one published poll\u2019s first-preference figure; the lines are monthly averages. Each chip\u2019s \u25B2 \u25BC is its", " ", React.createElement("button", {
-      type: "button",
+    paras: [React.createElement(React.Fragment, null, "Each dot is one published poll\u2019s first-preference figure; the lines are monthly averages. Each chip\u2019s \u25B2 \u25BC is its", " ", React.createElement("a", {
       className: "hi-term",
-      onClick: () => window.AP.openTerm && window.AP.openTerm("changes", "Primary vote")
+      href: "#info",
+      onClick: e => {
+        e.preventDefault();
+        window.AP.openTerm && window.AP.openTerm("changes", "Primary vote");
+      }
     }, "change since the 2025 election"), ". Use the chips to isolate one party."), React.createElement(React.Fragment, null, "The lines are weighted by sample and adjusted for each house\u2019s lean."), React.createElement(React.Fragment, null, "The 2025 election is where every line here begins. A party on its own draws with the 95% interval around its line", solo ? ", shaded here" : "", ".")]
   }));
 }
@@ -26029,6 +26103,99 @@ function DirectionPanel({
     fmt: dirFmt
   }), React.createElement(HowTo, {
     paras: [React.createElement(React.Fragment, null, "Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals."), React.createElement(React.Fragment, null, "The lines are adjusted for house effects. Only ", asked ? D.directionHouses.length : 0, " houses ask this question, so some months rest on a single poll \u2013 the dots show which, and the shading shows what that costs in confidence.")]
+  }));
+}
+function MoodPanel({
+  rangeId
+}) {
+  if (window.AP.rd) return React.createElement(RdMood, {
+    rangeId: rangeId
+  });
+  const {
+    D,
+    buildXTicks,
+    series
+  } = window.AP;
+  const narrow = useNarrow();
+  const M = D.mood;
+  if (!M || !M.consumer || !M.business || !M.consumer.polls.length || !M.business.polls.length) return null;
+  const C = M.consumer,
+    B = M.business;
+  const x0 = Math.min(C.polls[0].x, B.polls[0].x) - 0.04;
+  const x1 = D.domain.x1;
+  const vals = C.polls.concat(B.polls).map(p => p.v).concat([100]);
+  const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10,
+    hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
+  const yTicks = [];
+  for (let v = lo; v <= hi + 1e-9; v += 10) yTicks.push(v);
+  const drawn = {
+    c: C.polls.filter(p => p.x >= x0),
+    b: B.polls.filter(p => p.x >= x0)
+  };
+  const scatter = drawn.c.map(q => ({
+    x: q.x,
+    y: q.v,
+    color: "var(--ink)",
+    label: "Consumers",
+    meta: {
+      pollster: "ANZ\u2013Roy Morgan"
+    }
+  })).concat(drawn.b.map(q => ({
+    x: q.x,
+    y: q.v,
+    color: "var(--ink-2)",
+    label: "Businesses",
+    meta: {
+      pollster: "Roy Morgan"
+    }
+  })));
+  return React.createElement("section", {
+    className: "card"
+  }, React.createElement("div", {
+    className: "card-head"
+  }, React.createElement("div", null, React.createElement("h2", {
+    className: "card-title"
+  }, "Economic sentiment"), React.createElement("p", {
+    className: "card-sub"
+  }, "Consumer and business confidence, 100 = neutral ", "\u2013", " Roy Morgan", "\u2019", "s own series"))), React.createElement(TrendChart, {
+    key: "mood",
+    height: narrow ? 460 : 340,
+    xDomain: [x0, x1],
+    yDomain: [lo, hi],
+    yTicks: yTicks,
+    axisFont: narrow ? 28 : 20,
+    pad: {
+      l: 58,
+      r: 22,
+      t: 16,
+      b: 42
+    },
+    xTicks: buildXTicks(x0, x1),
+    refLines: [{
+      y: 100,
+      label: "100 = neutral",
+      align: "left",
+      color: "var(--ink-3)"
+    }],
+    series: [{
+      id: "consumer",
+      label: "Consumers",
+      color: "var(--ink)",
+      points: series(drawn.c, "v"),
+      endLabel: "Consumers"
+    }, {
+      id: "business",
+      label: "Businesses",
+      color: "var(--ink-2)",
+      points: series(drawn.b, "v"),
+      endLabel: "Businesses"
+    }],
+    spine: series(drawn.c, "v"),
+    scatter: scatter,
+    tooltipTitle: i => window.AP.monthLabelFull(drawn.c[i].ym),
+    fmt: v => v.toFixed(1)
+  }), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Roy Morgan", "\u2019", "s own index series, set out as published ", "\u2013", " the weekly ANZ", "\u2013", "Roy Morgan consumer index and the monthly business index, back to 2019. No averaging, no adjustment for lean, no election anchor is applied."), React.createElement(React.Fragment, null, "On each index 100 is neutral ", "\u2013", " above it optimists outnumber pessimists. Reading the mood beside the polls is context, not a predictor of the vote.")]
   }));
 }
 function UndecidedPanel({
@@ -27261,10 +27428,13 @@ function DemographicsPanel({
     className: "table-hint"
   }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the rest of Australia at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups" : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups" : "", "."), tab.id === "age" && React.createElement("p", {
     className: "table-hint"
-  }, "Neither pollster publishes the birth years behind its generations; the usual ones, and what is uncertain about them, are under", " ", React.createElement("button", {
-    type: "button",
+  }, "Neither pollster publishes the birth years behind its generations; the usual ones, and what is uncertain about them, are under", " ", React.createElement("a", {
     className: "hi-term",
-    onClick: () => window.AP.openTerm && window.AP.openTerm("generations", "Who votes for whom")
+    href: "#info",
+    onClick: e => {
+      e.preventDefault();
+      window.AP.openTerm && window.AP.openTerm("generations", "Who votes for whom");
+    }
   }, "Generations"), "."))))));
 }
 const ISS_PARTY = {
@@ -29514,6 +29684,7 @@ Object.assign(window, {
   ApprovalPanel,
   DirectionPanel,
   UndecidedPanel,
+  MoodPanel,
   OnSourcesPanel,
   DemographicsPanel,
   PollsterTable,
@@ -32499,6 +32670,13 @@ const DEM_SPLITS = [{
   hi: "Renters",
   scope: "With a housing breakdown",
   pairs: [["Renting", "Own outright", "Renters v owners"], ["Renting and other", "Own outright", "Renters v owners"]]
+}, {
+  id: "income",
+  label: "Income",
+  lo: "Lower income",
+  hi: "Higher income",
+  scope: "With an income breakdown",
+  pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]]
 }];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
 function demGroupsOf(p) {
@@ -32970,7 +33148,7 @@ function ArchPollDetail({
     key: "client"
   }, React.createElement("span", {
     className: "pd-meta-k"
-  }, "Commissioned by"), React.createElement("span", {
+  }, p.conf ? "Gauge" : "Commissioned by"), React.createElement("span", {
     className: "pd-meta-v"
   }, p.client)), React.createElement("span", {
     className: "pd-meta-i",
@@ -33126,9 +33304,18 @@ const POLL_TAGS = [{
   id: "iss",
   label: "Iss",
   title: "Issues – what voters say matters, and the party rated best on it"
+}, {
+  id: "conf",
+  label: "Conf",
+  title: "Confidence – an economic-confidence gauge's published release"
 }];
 const POLL_TAG_META = Object.fromEntries(POLL_TAGS.map(t => [t.id, t]));
-const URL_HOUSES = ["Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater", "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy", "Wolf & Smith", "YouGov", "SEC Newgate", "Ipsos"];
+const AP_CLIENT_ALIASES = {
+  "afr": "australian financial review",
+  "smh/age": "sydney morning herald the age",
+  "australia inst.": "australia institute"
+};
+const URL_HOUSES = ["Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater", "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy", "Wolf & Smith", "YouGov", "SEC Newgate", "Ipsos", "ANZ–Roy Morgan", "Westpac–MI", "NAB"];
 const archMask = (order, set) => {
   let m = 0;
   order.forEach((name, i) => {
@@ -33169,6 +33356,7 @@ function pollTagIds(p) {
   if (p.seats && p.seats.p) t.push("seats");
   if (p.dir) t.push("dir");
   if (p.iss) t.push("iss");
+  if (p.conf) t.push("conf");
   return t;
 }
 function FilterPop({
@@ -34299,27 +34487,54 @@ function AllPollsView({
   } = window;
   const pubBasis = tppBasis === "resp";
   const baseHouse = h => h.replace(/ \((MRP|SMS)\)$/, "");
-  const houses = [];
-  D.individualPolls.forEach(p => {
-    const b = baseHouse(p.pollster);
-    if (!houses.includes(b)) houses.push(b);
-  });
-  houses.sort();
-  const dirOnlyAll = D.directionOnlyPolls || [];
-  const housesDir = [...houses];
-  dirOnlyAll.forEach(p => {
-    const b = baseHouse(p.pollster);
-    if (!housesDir.includes(b)) housesDir.push(b);
-  });
-  housesDir.sort();
-  const issOnlyAll = D.issuesOnlyPolls || [];
-  const housesIss = [...housesDir];
-  issOnlyAll.forEach(p => {
-    const b = baseHouse(p.pollster);
-    if (!housesIss.includes(b)) housesIss.push(b);
-  });
-  housesIss.sort();
-  const housesAll = [...housesIss];
+  const {
+    houses,
+    housesDir,
+    housesIss,
+    housesConf,
+    housesAll,
+    dirOnlyAll,
+    issOnlyAll,
+    confOnlyAll
+  } = React.useMemo(() => {
+    const houses = [];
+    D.individualPolls.forEach(p => {
+      const b = baseHouse(p.pollster);
+      if (!houses.includes(b)) houses.push(b);
+    });
+    houses.sort();
+    const dirOnlyAll = D.directionOnlyPolls || [];
+    const housesDir = [...houses];
+    dirOnlyAll.forEach(p => {
+      const b = baseHouse(p.pollster);
+      if (!housesDir.includes(b)) housesDir.push(b);
+    });
+    housesDir.sort();
+    const issOnlyAll = D.issuesOnlyPolls || [];
+    const housesIss = [...housesDir];
+    issOnlyAll.forEach(p => {
+      const b = baseHouse(p.pollster);
+      if (!housesIss.includes(b)) housesIss.push(b);
+    });
+    housesIss.sort();
+    const confOnlyAll = D.confidenceOnlyPolls || [];
+    const housesConf = [...housesIss];
+    confOnlyAll.forEach(p => {
+      const b = baseHouse(p.pollster);
+      if (!housesConf.includes(b)) housesConf.push(b);
+    });
+    housesConf.sort();
+    return {
+      houses,
+      housesDir,
+      housesIss,
+      housesConf,
+      housesAll: [...housesConf],
+      dirOnlyAll,
+      issOnlyAll,
+      confOnlyAll
+    };
+  }, []);
   const FACET_SCOPE = {
     twopp: {
       has: p => (pubBasis ? p.alp != null : p.alpImp != null) || p.tppAlt || p.tppAlt2 || p.tpp3,
@@ -34357,6 +34572,8 @@ function AllPollsView({
     }
   };
   const defaultScopeFor = (f, m) => !FACET_SCOPE[f] ? false : f === "twopp" ? Boolean(CONTEST_SCOPE[m]) || pubBasis : true;
+  const confNarrow = useNarrow("(max-width: 600px)");
+  const confWide = !confNarrow || !!(window.AP && window.AP.rd);
   const FACETS = [{
     id: "twopp",
     label: "2PP"
@@ -34372,7 +34589,10 @@ function AllPollsView({
   }, {
     id: "issues",
     label: "Issues"
-  }];
+  }, ...((D.confidenceOnlyPolls || []).length ? [{
+    id: "confidence",
+    label: "Confidence"
+  }] : [])].filter(f => f.id !== "confidence" || confWide);
   const pOrder = D.latest && D.latest.primaryOrder || ["alp", "lnp", "grn", "onp", "oth"];
   const PCOLS = {
     alp: {
@@ -34408,6 +34628,7 @@ function AllPollsView({
     },
     oth: {
       label: "OTH",
+      k: "p.oth",
       cls: " muted hide-md"
     }
   };
@@ -34416,10 +34637,12 @@ function AllPollsView({
     l: "leadership",
     d: "direction",
     i: "issues",
+    c: "confidence",
     primary: "primary",
     leadership: "leadership",
     direction: "direction",
     issues: "issues",
+    confidence: "confidence",
     ...(window.AP.rd ? {
       g: "demographics",
       demographics: "demographics"
@@ -34430,7 +34653,8 @@ function AllPollsView({
     g: "gender",
     e: "education",
     p: "place",
-    h: "home"
+    h: "home",
+    n: "income"
   };
   const MEAS_BY_URL = {
     o: "onp",
@@ -34468,7 +34692,7 @@ function AllPollsView({
       who: (() => {
         const raw = get("w", "who") || "";
         const mask = archUnpack(raw, URL_HOUSES);
-        const known = view === "direction" ? housesDir : view === "issues" ? housesIss : houses;
+        const known = view === "direction" ? housesDir : view === "issues" ? housesIss : view === "confidence" ? housesConf : houses;
         return (mask ? [...mask] : raw.split(",").map(baseHouse)).filter(h => known.includes(h));
       })(),
       has: (() => {
@@ -34525,6 +34749,9 @@ function AllPollsView({
     }
     setOpen(focus.key);
   }, [focus]);
+  React.useEffect(() => {
+    if (!confWide && facet === "confidence") onFacet("twopp");
+  }, [confWide, facet]);
   const bodyRef = useRef(null);
   React.useEffect(() => {
     if (!focus || open !== focus.key || !bodyRef.current) return;
@@ -34609,160 +34836,206 @@ function AllPollsView({
     n.has(h) ? n.delete(h) : n.add(h);
     return n;
   });
-  const NOW_YEAR = new Date().getFullYear();
-  const dirOnly = facet === "direction" ? dirOnlyAll : facet === "issues" ? dirOnlyAll.filter(p => p.iss) : [];
-  const issOnly = facet === "issues" ? issOnlyAll : [];
-  const housesV = facet === "issues" ? housesIss : dirOnly.length ? housesDir : houses;
-  const rows = [...D.individualPolls, ...dirOnly, ...issOnly].map(p => {
-    const [y, mo] = p.ym.split("-").map(Number);
-    const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
-    const fieldLabel = p.fieldPending ? "TBC" : y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
-    const tags = pollTagIds(p);
-    const ydv = k => p.yd && p.yd[k] ? p.yd[k].v : null;
-    const leanOf = (x, k) => x != null && ydv(k) != null ? +(x - Math.round(ydv(k) * 10) / 10).toFixed(1) : null;
-    const leanLnp = pubBasis ? leanOf(p.alpN, "lnp") : leanOf(p.alpImp, "imp");
-    const leanOn = pubBasis ? leanOf(p.tppAlt ? p.tppAlt.alp : null, "onp") : leanOf(p.alpOnImp, "onimp");
-    const HE = D.houseEffects || {};
-    const hfxLnp = (HE[pubBasis ? "tpp" : "synth"] || {})[p.pollster] || null;
-    const hfxOn = (HE[pubBasis ? "alp_on" : "synthOn"] || {})[p.pollster] || null;
-    const lean = measure === "onp" ? leanOn : measure === "lnp" ? leanLnp : null;
-    const hfx = measure === "onp" ? hfxOn : measure === "lnp" ? hfxLnp : null;
-    const f1 = v => v != null ? v.toFixed(1) : null;
-    const hayParts = [p.pollster, p.field, fullDate, p.sample != null ? String(p.sample) : null, D.monthName(mo) + " " + y, D.monthNameFull(mo) + " " + y, f1(p.alp), f1(p.lnp), lean != null ? (lean > 0 ? "+" : "") + lean.toFixed(1) : null, f1(p.p.alp), f1(p.p.lnp), f1(p.p.grn), f1(p.p.onp), f1(p.p.oth)].filter(Boolean);
-    if (p.tpp3) hayParts.push(p.tpp3.alp.toFixed(1), p.tpp3.lnp.toFixed(1), p.tpp3.onp.toFixed(1), "3-cornered 3cp");
-    if (p.tppAlt) hayParts.push(p.tppAlt.alp.toFixed(1), p.tppAlt.onp.toFixed(1), "alp v on one nation matchup");
-    if (p.tppAlt2) hayParts.push(p.tppAlt2.lnp.toFixed(1), p.tppAlt2.onp.toFixed(1), "lnp v on one nation matchup");
-    if (p.appr.albNet != null) hayParts.push("albanese " + p.appr.albNet);
-    if (p.appr.taylorNet != null) hayParts.push("taylor " + p.appr.taylorNet);
-    if (p.appr.hansonNet != null) hayParts.push("hanson " + p.appr.hansonNet);
-    if (p.seats && p.seats.p) {
-      hayParts.push("seat projection mrp");
-      for (const k in p.seats.p) hayParts.push(k + " " + p.seats.p[k].est + " seats");
-    }
-    if (p.dir) {
-      hayParts.push("direction right track wrong track", f1(p.dir.right), f1(p.dir.wrong), f1(p.dir.unsure), (p.dir.net > 0 ? "+" : "") + p.dir.net);
-    }
-    if (p.iss) {
-      hayParts.push("issues salience best party");
-      (p.iss.sal || []).concat(p.iss.conc || []).forEach(([lab, v]) => hayParts.push(lab, String(v)));
-      const ib = issBestOf(p.iss);
-      if (ib) hayParts.push(ib.who, String(ib.v));
-    }
-    hayParts.push(...tags);
-    const hay = hayParts.join(" ").toLowerCase();
-    return {
-      ...p,
-      year: y,
-      mo,
-      fullDate,
-      fieldLabel,
-      lean,
-      hfx,
-      leanLnp,
-      leanOn,
-      hfxLnp,
-      hfxOn,
-      pubBasis,
-      tags,
-      hay: hay + " " + hay.replace(/–/g, "-")
-    };
-  });
+  const rows = React.useMemo(() => {
+    const dirOnly = facet === "direction" ? dirOnlyAll : facet === "issues" ? dirOnlyAll.filter(p => p.iss) : [];
+    const issOnly = facet === "issues" ? issOnlyAll : [];
+    const confOnly = facet === "confidence" ? confOnlyAll : [];
+    const NOW_YEAR = new Date().getFullYear();
+    return (facet === "confidence" ? confOnly : [...D.individualPolls, ...dirOnly, ...issOnly]).map(p => {
+      const [y, mo] = p.ym.split("-").map(Number);
+      const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
+      const fieldLabel = p.fieldPending ? "TBC" : y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
+      const tags = pollTagIds(p);
+      const ydv = k => p.yd && p.yd[k] ? p.yd[k].v : null;
+      const leanOf = (x, k) => x != null && ydv(k) != null ? +(x - Math.round(ydv(k) * 10) / 10).toFixed(1) : null;
+      const leanLnp = pubBasis ? leanOf(p.alpN, "lnp") : leanOf(p.alpImp, "imp");
+      const leanOn = pubBasis ? leanOf(p.tppAlt ? p.tppAlt.alp : null, "onp") : leanOf(p.alpOnImp, "onimp");
+      const HE = D.houseEffects || {};
+      const hfxLnp = (HE[pubBasis ? "tpp" : "synth"] || {})[p.pollster] || null;
+      const hfxOn = (HE[pubBasis ? "alp_on" : "synthOn"] || {})[p.pollster] || null;
+      const lean = measure === "onp" ? leanOn : measure === "lnp" ? leanLnp : null;
+      const hfx = measure === "onp" ? hfxOn : measure === "lnp" ? hfxLnp : null;
+      const f1 = v => v != null ? v.toFixed(1) : null;
+      const hayParts = [p.pollster, p.field, fullDate, p.sample != null ? String(p.sample) : null, D.monthName(mo) + " " + y, D.monthNameFull(mo) + " " + y, f1(p.alp), f1(p.lnp), lean != null ? (lean > 0 ? "+" : "") + lean.toFixed(1) : null, f1(p.p.alp), f1(p.p.lnp), f1(p.p.grn), f1(p.p.onp), f1(p.p.oth)].filter(Boolean);
+      if (p.client && p.client !== "Self-published") {
+        hayParts.push(p.client);
+        const clientAlias = AP_CLIENT_ALIASES[p.client.toLowerCase()];
+        if (clientAlias) hayParts.push(clientAlias);
+      }
+      if (p.tpp3) hayParts.push(p.tpp3.alp.toFixed(1), p.tpp3.lnp.toFixed(1), p.tpp3.onp.toFixed(1), "3-cornered 3cp");
+      if (p.tppAlt) hayParts.push(p.tppAlt.alp.toFixed(1), p.tppAlt.onp.toFixed(1), "alp v on one nation matchup");
+      if (p.tppAlt2) hayParts.push(p.tppAlt2.lnp.toFixed(1), p.tppAlt2.onp.toFixed(1), "lnp v on one nation matchup");
+      if (p.appr.albNet != null) hayParts.push("albanese " + p.appr.albNet);
+      if (p.appr.taylorNet != null) hayParts.push("taylor " + p.appr.taylorNet);
+      if (p.appr.hansonNet != null) hayParts.push("hanson " + p.appr.hansonNet);
+      if (p.seats && p.seats.p) {
+        hayParts.push("seat projection mrp");
+        for (const k in p.seats.p) hayParts.push(k + " " + p.seats.p[k].est + " seats");
+      }
+      if (p.dir) {
+        hayParts.push("direction right track wrong track", f1(p.dir.right), f1(p.dir.wrong), f1(p.dir.unsure), (p.dir.net > 0 ? "+" : "") + p.dir.net);
+      }
+      if (p.iss) {
+        hayParts.push("issues salience best party");
+        (p.iss.sal || []).concat(p.iss.conc || []).forEach(([lab, v]) => hayParts.push(lab, String(v)));
+        const ib = issBestOf(p.iss);
+        if (ib) hayParts.push(ib.who, String(ib.v));
+      }
+      if (p.conf) {
+        hayParts.push("confidence economic sentiment consumer business", p.conf.lab, String(p.conf.v));
+        if (p.conf.cond != null) hayParts.push("conditions", String(p.conf.cond));
+      }
+      hayParts.push(...tags);
+      const hay = hayParts.join(" ").toLowerCase();
+      return {
+        ...p,
+        year: y,
+        mo,
+        fullDate,
+        fieldLabel,
+        lean,
+        hfx,
+        leanLnp,
+        leanOn,
+        hfxLnp,
+        hfxOn,
+        pubBasis,
+        tags,
+        hay: hay + " " + hay.replace(/–/g, "-")
+      };
+    });
+  }, [facet, pubBasis, measure, dirOnlyAll, issOnlyAll, confOnlyAll]);
+  const housesV = facet === "issues" ? housesIss : facet === "confidence" && confOnlyAll.length ? housesConf : facet === "direction" && dirOnlyAll.length ? housesDir : houses;
   const availableTags = new Set();
   rows.forEach(r => r.tags.forEach(tg => availableTags.add(tg)));
   const shownTags = POLL_TAGS.filter(t => availableTags.has(t.id));
   const latestX = D.mx(D.MONTHS[D.MONTHS.length - 1]);
-  const x0 = range === "all" ? -Infinity : latestX - Number(range) / 12 - 0.06;
-  const ql = q.trim().toLowerCase();
-  const scoping = scope && (facet === "twopp" && CONTEST_SCOPE[measure] || FACET_SCOPE[facet]);
-  const TESTS = [["who", p => !sel.size || sel.has(baseHouse(p.pollster))], ["has", p => !tagSel.size || [...tagSel].every(tg => p.tags.includes(tg))], ["lead", p => {
-    if (lead === "all") return true;
-    const li = archLeadInfo(p, measure, tppBasis);
-    return !!li && li.who === lead;
-  }], ["when", p => range === "all" || p.x >= x0], ["q", p => !ql || ql.split(/\s+/).every(t => p.hay.includes(t))], ["scope", p => !scoping || scoping.has(p)]];
-  const passing = (p, skip) => TESTS.every(([k, f]) => k === skip || f(p));
-  const filtered = rows.filter(p => passing(p, null));
-  const without = skip => rows.filter(p => passing(p, skip));
-  const houseRows = without("who");
-  const houseN = {};
-  houseRows.forEach(p => {
-    const b = baseHouse(p.pollster);
-    houseN[b] = (houseN[b] || 0) + 1;
-  });
-  const tagRows = without("has");
-  const tagN = {};
-  tagRows.forEach(p => p.tags.forEach(t => {
-    tagN[t] = (tagN[t] || 0) + 1;
-  }));
-  const whenRows = without("when");
-  const rangeN = r => r === "all" ? whenRows.length : whenRows.filter(p => p.x >= latestX - Number(r) / 12 - 0.06).length;
-  const houseRank = [...housesV].sort((a, b) => (houseN[b] || 0) - (houseN[a] || 0) || a.localeCompare(b));
-  const getVal = (p, key) => {
-    switch (key) {
-      case "date":
-        return p.x;
-      case "pollster":
-        return p.pollster;
-      case "sample":
-        return p.sample ?? -Infinity;
-      case "alp":
-        {
-          const li = archLeadInfo(p, measure, tppBasis);
-          return li ? li.m : -Infinity;
-        }
-      case "lean":
-        return p.lean ?? -Infinity;
-      case "hfx":
-        return p.hfx ? p.hfx.v : -Infinity;
-      case "p.alp":
-        return p.p.alp;
-      case "p.lnp":
-        return p.p.lnp;
-      case "p.grn":
-        return p.p.grn;
-      case "p.onp":
-        return p.p.onp;
-      case "appr.albNet":
-        return p.appr.albNet != null ? p.appr.albNet : -Infinity;
-      case "appr.taylorNet":
-        return p.appr.taylorNet != null ? p.appr.taylorNet : -Infinity;
-      case "appr.hansonNet":
-        return p.appr.hansonNet != null ? p.appr.hansonNet : -Infinity;
-      case "ppm.alb":
-        {
-          const c = ppmContests(p)[0];
-          return c && c.alb != null ? c.alb : -Infinity;
-        }
-      case "dir.right":
-        return p.dir ? p.dir.right : -Infinity;
-      case "dir.wrong":
-        return p.dir ? p.dir.wrong : -Infinity;
-      case "dir.net":
-        return p.dir ? p.dir.net : -Infinity;
-      case "iss.topv":
-        {
-          const t = issTopOf(p.iss);
-          return t ? t[1] : -Infinity;
-        }
-      case "iss.bestv":
-        {
-          const b = issBestOf(p.iss);
-          return b ? b.v : -Infinity;
-        }
-      default:
-        {
-          if (!key.startsWith("dem.")) return 0;
-          const pr = demPairOf(p, demSplit);
-          return pr && pr.gap[key.slice(4)] != null ? pr.gap[key.slice(4)] : -Infinity;
-        }
-    }
-  };
-  const sorted = [...filtered].sort((a, b) => {
-    const va = getVal(a, sort.key),
-      vb = getVal(b, sort.key);
-    if (va < vb) return -sort.dir;
-    if (va > vb) return sort.dir;
-    return b.x - a.x;
-  });
+  const dq = React.useDeferredValue(q);
+  const ql = dq.trim().toLowerCase();
+  const {
+    scoping,
+    without,
+    houseN,
+    tagN,
+    rangeN,
+    houseRank,
+    sorted
+  } = React.useMemo(() => {
+    const x0 = range === "all" ? -Infinity : latestX - Number(range) / 12 - 0.06;
+    const scoping = scope && (facet === "twopp" && CONTEST_SCOPE[measure] || FACET_SCOPE[facet]);
+    const TESTS = [["who", p => !sel.size || sel.has(baseHouse(p.pollster))], ["has", p => !tagSel.size || [...tagSel].every(tg => p.tags.includes(tg))], ["lead", p => {
+      if (lead === "all") return true;
+      const li = archLeadInfo(p, measure, tppBasis);
+      return !!li && li.who === lead;
+    }], ["when", p => range === "all" || p.x >= x0], ["q", p => !ql || ql.split(/\s+/).every(t => p.hay.includes(t))], ["scope", p => !scoping || scoping.has(p)]];
+    const passing = (p, skip) => TESTS.every(([k, f]) => k === skip || f(p));
+    const filtered = rows.filter(p => passing(p, null));
+    const without = skip => rows.filter(p => passing(p, skip));
+    const houseRows = without("who");
+    const houseN = {};
+    houseRows.forEach(p => {
+      const b = baseHouse(p.pollster);
+      houseN[b] = (houseN[b] || 0) + 1;
+    });
+    const tagRows = without("has");
+    const tagN = {};
+    tagRows.forEach(p => p.tags.forEach(t => {
+      tagN[t] = (tagN[t] || 0) + 1;
+    }));
+    const whenRows = without("when");
+    const rangeN = r => r === "all" ? whenRows.length : whenRows.filter(p => p.x >= latestX - Number(r) / 12 - 0.06).length;
+    const houseRank = [...housesV].sort((a, b) => (houseN[b] || 0) - (houseN[a] || 0) || a.localeCompare(b));
+    const getVal = (p, key) => {
+      switch (key) {
+        case "date":
+          return p.x;
+        case "pollster":
+          return p.pollster;
+        case "sample":
+          return p.sample ?? -Infinity;
+        case "alp":
+          {
+            const li = archLeadInfo(p, measure, tppBasis);
+            return li ? li.m : -Infinity;
+          }
+        case "lean":
+          return p.lean ?? -Infinity;
+        case "hfx":
+          return p.hfx ? p.hfx.v : -Infinity;
+        case "p.alp":
+          return p.p.alp;
+        case "p.lnp":
+          return p.p.lnp;
+        case "p.grn":
+          return p.p.grn;
+        case "p.onp":
+          return p.p.onp;
+        case "p.oth":
+          return p.p.oth;
+        case "appr.albNet":
+          return p.appr.albNet != null ? p.appr.albNet : -Infinity;
+        case "appr.taylorNet":
+          return p.appr.taylorNet != null ? p.appr.taylorNet : -Infinity;
+        case "appr.hansonNet":
+          return p.appr.hansonNet != null ? p.appr.hansonNet : -Infinity;
+        case "ppm.alb":
+          {
+            const c = ppmContests(p)[0];
+            return c && c.alb != null ? c.alb : -Infinity;
+          }
+        case "dir.right":
+          return p.dir ? p.dir.right : -Infinity;
+        case "dir.wrong":
+          return p.dir ? p.dir.wrong : -Infinity;
+        case "dir.unsure":
+          return p.dir ? p.dir.unsure : -Infinity;
+        case "dir.net":
+          return p.dir ? p.dir.net : -Infinity;
+        case "iss.topv":
+          {
+            const t = issTopOf(p.iss);
+            return t ? t[1] : -Infinity;
+          }
+        case "iss.bestv":
+          {
+            const b = issBestOf(p.iss);
+            return b ? b.v : -Infinity;
+          }
+        case "conf.lab":
+          return p.conf && p.conf.lab || "";
+        case "conf.v":
+          return p.conf ? p.conf.v : -Infinity;
+        case "conf.chg":
+          return p.conf && p.conf.chg != null ? p.conf.chg : -Infinity;
+        case "conf.cond":
+          return p.conf && p.conf.cond != null ? p.conf.cond : -Infinity;
+        default:
+          {
+            if (!key.startsWith("dem.")) return 0;
+            const pr = demPairOf(p, demSplit);
+            return pr && pr.gap[key.slice(4)] != null ? pr.gap[key.slice(4)] : -Infinity;
+          }
+      }
+    };
+    const keyed = filtered.map(p => [getVal(p, sort.key), p]);
+    keyed.sort((a, b) => {
+      const va = a[0],
+        vb = b[0];
+      if (va < vb) return -sort.dir;
+      if (va > vb) return sort.dir;
+      return b[1].x - a[1].x;
+    });
+    const sorted = keyed.map(kv => kv[1]);
+    return {
+      scoping,
+      without,
+      houseN,
+      tagN,
+      rangeN,
+      houseRank,
+      sorted
+    };
+  }, [rows, ql, sel, tagSel, lead, range, scope, facet, measure, pubBasis, sort, demSplit, housesV]);
   const PAGE = 40;
   const [limit, setLimit] = useState(PAGE);
   React.useEffect(() => {
@@ -34770,6 +35043,7 @@ function AllPollsView({
   }, [ql, sel, lead, range, tagSel, scope, facet, sort.key, sort.dir, measure]);
   const openIdx = open ? sorted.findIndex(p => p.pollster + "|" + p.released === open) : -1;
   const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
+  const fmtConfFig = (v, signed) => (v < 0 ? "−" : signed && v > 0 ? "+" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const total = rows.length;
   const totalAll = D.individualPolls.length + dirOnlyAll.length + issOnlyAll.length;
   const clearAll = () => {
@@ -34836,13 +35110,15 @@ function AllPollsView({
     leadership: "l",
     direction: "d",
     issues: "i",
+    confidence: "c",
     demographics: "g"
   };
   const DEM_BY_ID = {
     gender: "g",
     education: "e",
     place: "p",
-    home: "h"
+    home: "h",
+    income: "n"
   };
   const MEAS_BY_ID = {
     lnp: "c",
@@ -34897,7 +35173,7 @@ function AllPollsView({
   }], ["Best on it %", p => {
     const b = issBestOf(p.iss);
     return b ? b.v : "";
-  }]];
+  }], ["Confidence series", p => p.conf ? p.conf.lab : ""], ["Confidence figure", p => p.conf ? p.conf.v : ""], ["Confidence change", p => p.conf && p.conf.chg != null ? p.conf.chg : ""], ["NAB conditions", p => p.conf && p.conf.cond != null ? p.conf.cond : ""]];
   const exportCsv = () => downloadCsv(`auspol-tracker-polls-${D.latest.updatedISO}.csv`, [CSV_COLS.map(c => c[0]), ...sorted.map(p => CSV_COLS.map(c => c[1](p)))]);
   if (window.AP.rd) return React.createElement("div", {
     className: "view view-allpolls"
@@ -34956,17 +35232,19 @@ function AllPollsView({
     className: "ap-head"
   }, React.createElement("div", null, React.createElement("h2", {
     className: "card-title"
-  }, "All polls"), React.createElement("p", {
+  }, facet === "confidence" ? "Economic sentiment" : "All polls"), React.createElement("p", {
     className: "card-sub"
-  }, "Every individual national poll in the archive, ", total, totalAll !== total ? " of " + totalAll : "", " polls from ", housesAll.length, " pollsters,", " ", (() => {
-    const f = D.individualPolls[0],
-      l = D.individualPolls[D.individualPolls.length - 1];
+  }, facet === "confidence" ? "Every release of the four confidence indices since the 2025 election" : React.createElement(React.Fragment, null, "Every individual national poll in the archive, ", total, totalAll !== total ? " of " + totalAll : "", " polls from ", housesAll.length, " pollsters,", " ", (() => {
+    const src = D.individualPolls;
+    const f = src[0],
+      l = src[src.length - 1];
+    if (!f || !l) return null;
     const lab = ym => {
       const [y, m] = ym.split("-").map(Number);
       return D.monthNameFull(m) + " " + y;
     };
     return lab(f.fym || f.ym) + "–" + lab(l.ym);
-  })())), React.createElement("div", {
+  })()))), React.createElement("div", {
     className: "ap-head-side"
   }, React.createElement(TextToggle, {
     value: facet,
@@ -35239,7 +35517,7 @@ function AllPollsView({
     className: "poll-table archive"
   }, React.createElement("caption", {
     className: "sr-only"
-  }, "All polls, ", (FACETS.find(f => f.id === facet) || {}).label, " columns \u2013", " ", sorted.length, " of ", totalAll, " polls"), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
+  }, "All polls, ", (FACETS.find(f => f.id === facet) || {}).label, " columns \u2013", " ", sorted.length, " of ", facet === "confidence" ? confOnlyAll.length : totalAll, " ", facet === "confidence" ? "releases" : "polls"), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
     scope: "col",
     className: "exp-col",
     "aria-hidden": "true"
@@ -35354,10 +35632,13 @@ function AllPollsView({
     k: "dir.wrong",
     sort: sort,
     onSort: onSort
-  }), React.createElement("th", {
-    scope: "col",
-    className: "hide-md"
-  }, "Unsure"), React.createElement(ArchSortTh, {
+  }), React.createElement(ArchSortTh, {
+    label: "Unsure",
+    k: "dir.unsure",
+    className: "hide-md",
+    sort: sort,
+    onSort: onSort
+  }), React.createElement(ArchSortTh, {
     label: "Net",
     k: "dir.net",
     sort: sort,
@@ -35375,6 +35656,19 @@ function AllPollsView({
     sort: sort,
     onSort: onSort,
     title: "The party voters trust most on that issue, and its share"
+  })), facet === "confidence" && React.createElement(React.Fragment, null, React.createElement(ArchSortTh, {
+    label: "Figure",
+    k: "conf.v",
+    sort: sort,
+    onSort: onSort
+  }), React.createElement(ArchSortTh, {
+    label: "Change",
+    short: "Chg",
+    k: "conf.chg",
+    sort: sort,
+    onSort: onSort,
+    className: "hide-md",
+    title: "Change on the series' previous release \u2013 NAB's rows add its trading-conditions reading"
   })))), React.createElement("tbody", {
     ref: bodyRef
   }, shownRows.map((p, i) => {
@@ -35382,7 +35676,7 @@ function AllPollsView({
     const rowId = p.pollster + "|" + p.released;
     const arrived = !!focus && focus.key === rowId;
     const isOpen = open === rowId;
-    const colCount = facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "direction" ? 9 : facet === "issues" ? 8 : 9;
+    const colCount = facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "direction" ? 9 : facet === "issues" ? 8 : facet === "confidence" ? 7 : 9;
     return React.createElement(React.Fragment, {
       key: rowId
     }, React.createElement("tr", {
@@ -35513,7 +35807,18 @@ function AllPollsView({
       className: "num"
     }, React.createElement(ArchIssBest, {
       iss: p.iss
-    })))), isOpen && React.createElement("tr", {
+    }))), facet === "confidence" && React.createElement(React.Fragment, null, React.createElement("td", {
+      className: "num",
+      style: {
+        fontWeight: 600
+      }
+    }, p.conf ? fmtConfFig(p.conf.v) : React.createElement("span", {
+      className: "dash"
+    }, "\u2014")), React.createElement("td", {
+      className: "num muted hide-md"
+    }, p.conf && p.conf.chg != null ? React.createElement(React.Fragment, null, fmtConfFig(p.conf.chg, true), p.conf.cond != null && React.createElement("span", {
+      className: "muted"
+    }, " (" + fmtConfFig(p.conf.cond) + " cond.)")) : "—"))), isOpen && React.createElement("tr", {
       className: "detail-row"
     }, React.createElement("td", {
       colSpan: colCount
@@ -35525,7 +35830,7 @@ function AllPollsView({
   }), sorted.length === 0 && React.createElement("tr", {
     className: "arch-empty"
   }, React.createElement("td", {
-    colSpan: facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "issues" ? 8 : 9
+    colSpan: facet === "primary" ? 10 : facet === "leadership" ? 9 : facet === "issues" ? 8 : facet === "confidence" ? 7 : 9
   }, "No polls match these filters. ", React.createElement("button", {
     className: "ap-clear",
     onClick: clearAll
@@ -36273,6 +36578,23 @@ function infoTerms(D) {
     },
     entries: []
   }, {
+    id: "s-mood",
+    title: "Economic sentiment",
+    nav: "Sentiment",
+    lead: {
+      id: "mood",
+      body: React.createElement(React.Fragment, null, "Four published confidence gauges of the same economy: the ANZ\u2013Roy Morgan Consumer Confidence index, published weekly; the Westpac\u2013Melbourne Institute Consumer Sentiment index, monthly; Roy Morgan\u2019s Business Confidence index, monthly; and NAB\u2019s Monthly Business Survey. The chart opens at the May 2025 election; the figures on file run further back \u2014 2019 for the Roy Morgan series, 2022 for Westpac, and April 2025 for NAB.", React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "100 is neutral."), " The three index series are built from the balance of optimists and pessimists on each house\u2019s questions, so a reading above 100 means optimists outnumber pessimists and one below 100 the reverse."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "NAB is drawn 100 points up."), " NAB reports a net balance \u2014 optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so its dashed line is drawn 100 points up to share the neutral line with the others. The figure shown beside it and in its tooltips is NAB\u2019s own printed number; the row also carries the survey\u2019s conditions reading, which is not charted."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Smoothed, not averaged across sources."), " Each dot is a release\u2019s own headline figure, linked to it; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly consumer index, 60 days on the monthly series) so release-to-release noise reads as trend. The quoted figures are the raw prints, and no", " ", xref("house-effect", "mood", "house-effect"), " adjustment applies \u2014 a record, not an estimate. The change shown beside each series is the one the house printed with it, kept only where it agrees with the previous printed reading."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Context, not a predictor."), " The series sit below the term\u2019s polls because the mood of the economy frames what voters hear; none of them forecasts how they\u2019ll answer."))
+    },
+    entries: []
+  }, {
     id: "s-cycles",
     title: "Past cycles",
     nav: "Past cycles",
@@ -36712,6 +37034,25 @@ function InfoView({
       behavior: "smooth"
     });
   };
+  const CH_PILLS = [["info-about", "1.", "About"], ["info-faq", "2.", "Questions"], ["info-method", "3.", "Method"]];
+  const secNum = i => "4." + (i + 1);
+  const [on, setOn] = React.useState("info-about");
+  React.useEffect(() => {
+    const els = ["info-about", "info-faq", "info-method", "info-sections", ...sections.map(g => g.id)].map(id => document.getElementById(id)).filter(Boolean);
+    if (els.length < 2) return;
+    const spy = () => {
+      const bar = document.querySelector(".info-index");
+      const line = (bar ? bar.getBoundingClientRect().bottom : 60) + 8;
+      let cur = els[0].id;
+      for (const el of els) if (el.getBoundingClientRect().top <= line) cur = el.id;
+      setOn(prev => prev === cur ? prev : cur);
+    };
+    spy();
+    window.addEventListener("scroll", spy, {
+      passive: true
+    });
+    return () => window.removeEventListener("scroll", spy);
+  }, []);
   const entry = (t, H) => React.createElement("div", {
     key: t.id,
     id: "term-" + t.id,
@@ -36729,39 +37070,52 @@ function InfoView({
   }, React.createElement("nav", {
     className: "info-index",
     "aria-label": "On this page"
-  }, React.createElement("button", {
+  }, CH_PILLS.map(([id, num, label]) => React.createElement("button", {
+    key: id,
     type: "button",
-    onClick: () => jump("info-about")
-  }, "About"), React.createElement("button", {
-    type: "button",
-    onClick: () => jump("info-faq")
-  }, "Questions"), React.createElement("button", {
-    type: "button",
-    onClick: () => jump("info-method")
-  }, "Method"), sections.map(g => React.createElement("button", {
+    className: on === id ? "on" : "",
+    "aria-current": on === id ? "true" : undefined,
+    onClick: () => jump(id)
+  }, React.createElement("span", {
+    className: "info-num"
+  }, num), " ", label)), sections.map((g, i) => React.createElement("button", {
     key: g.id,
     type: "button",
+    className: on === g.id ? "on" : "",
+    "aria-current": on === g.id ? "true" : undefined,
     onClick: () => jump(g.id)
-  }, g.nav))), React.createElement("h2", {
+  }, React.createElement("span", {
+    className: "info-num"
+  }, secNum(i)), " ", g.nav))), React.createElement("h2", {
     id: "info-about",
     className: "card-title info-h"
-  }, "About"), React.createElement("div", {
+  }, React.createElement("span", {
+    className: "info-num"
+  }, "1."), " About"), React.createElement("div", {
     className: "info-about"
   }, about), React.createElement("h2", {
     id: "info-faq",
     className: "card-title info-h info-h-faq"
-  }, "Questions"), faqs.map(f => entry(f, "h3")), React.createElement("h2", {
+  }, React.createElement("span", {
+    className: "info-num"
+  }, "2."), " Questions"), faqs.map(f => entry(f, "h3")), React.createElement("h2", {
     id: "info-method",
     className: "card-title info-h info-h-faq"
-  }, "How the figures are built"), method.map(t => entry(t, "h3")), React.createElement("h2", {
+  }, React.createElement("span", {
+    className: "info-num"
+  }, "3."), " How the figures are built"), method.map(t => entry(t, "h3")), React.createElement("h2", {
     id: "info-sections",
     className: "card-title info-h info-h-faq"
-  }, "Section by section"), sections.map(g => React.createElement(React.Fragment, {
+  }, React.createElement("span", {
+    className: "info-num"
+  }, "4."), " Section by section"), sections.map((g, i) => React.createElement(React.Fragment, {
     key: g.id
   }, React.createElement("h3", {
     id: g.id,
     className: "info-group"
-  }, g.title), entry(g.lead, "h4"), g.entries.map(t => entry(t, "h4")))));
+  }, React.createElement("span", {
+    className: "info-num"
+  }, secNum(i)), " ", g.title), entry(g.lead, "h4"), g.entries.map(t => entry(t, "h4")))));
 }
 function TermPop({
   id,
@@ -41847,6 +42201,7 @@ function RdLeadership({
   } = window.AP;
   const narrow = useNarrow("(max-width: 640px)");
   const xDomain = rangeDomain(rangeId);
+  const base = (D.aggPrimary || []).find(d => d.election) || null;
   const N = D.leaderNow || {};
   const LM = D.leaderMonths;
   const L = {};
@@ -42435,7 +42790,7 @@ function RdLeadership({
     heightPx: narrow ? 250 : 270,
     padPx: chartPad,
     xDomain: xDomain,
-    xTicks: rdXTicks(xDomain[0], xDomain[1], narrow),
+    xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null),
     baseline: true,
     events: evs,
     tooltipTitle: i => {
@@ -43318,7 +43673,7 @@ function RdDirection({
     yDomain: [lo, hi],
     yTicks: rdYTicks(lo, hi, 10),
     yTickFmt: v => v === hi ? v + "%" : String(v),
-    xTicks: rdXTicks(xDomain[0], xDomain[1], narrow),
+    xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, 2025 + 122 / 365),
     baseline: true,
     series: [{
       id: "wrong",
@@ -43911,6 +44266,7 @@ function RdDemographics({
   const pName = party === "oth" ? "others & independents" : party === "lnp" ? "the Coalition" : party === "grn" ? "the Greens" : P.name;
   const pPoss = pName + (/s$/.test(pName) ? "’" : "’s"),
     pColor = P.color;
+  const pVote = party === "oth" ? "the vote for others & independents" : pPoss + " vote";
   const all = T.all[party];
   const ki = T.order.indexOf(party),
     gpi = DEMO_GRP_PARTY.indexOf(party);
@@ -43921,7 +44277,7 @@ function RdDemographics({
     let finding;
     const m = /^Support for .* (rises|falls) significantly (.*)\.$/.exec(verdict);
     const noDiff = /no significant difference/.test(verdict);
-    if (m && st0.id === "age") finding = pPoss + " vote " + (m[1] === "rises" ? "climbs" : "falls") + " with age";else if (m && st0.id === "generation") finding = pPoss + " vote " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";else if (m && st0.id === "location") finding = pPoss + " vote " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";else if (noDiff) finding = pPoss + " vote is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");else finding = verdict.replace(/ significantly/, "").replace(/\.$/, "");
+    if (m && st0.id === "age") finding = pVote + " " + (m[1] === "rises" ? "climbs" : "falls") + " with age";else if (m && st0.id === "generation") finding = pVote + " " + (m[1] === "rises" ? "climbs" : "falls") + " with each older generation";else if (m && st0.id === "location") finding = pVote + " " + (m[1] === "rises" ? "climbs" : "falls") + " with distance from the city";else if (noDiff) finding = pVote + " is much the same across " + ((DEMO_SET_WORDS[st0.id] || {}).all || "these groups");else finding = verdict.replace(/ significantly/, "").replace(/\.$/, "");
     const gs = st0.groups.filter(g => g.v[party] != null);
     const byV = gs.slice().sort((a, b) => b.v[party] - a.v[party]);
     const top = byV[0],
@@ -44007,12 +44363,13 @@ function RdDemographics({
     const nameD = RD_TREND_NAME_DEK[party] || pName;
     const isAre = party === "oth" ? "are" : "is";
     const poss = s => s + (/s$/.test(s) ? "’" : "’s");
+    const voteHead = party === "oth" ? "the vote for others & independents" : poss(nameT) + " vote";
     const serial = ls => ls.length < 2 ? ls[0] || "" : ls.length === 2 ? ls[0] + " and " + ls[1] : ls.slice(0, -1).join(", ") + ", and " + ls[ls.length - 1];
     const since = "Since " + rdMonthYear(dt.windowYm) + ", ";
     if (!solid.length) {
       const skew = RD_TREND_SKEW[party];
       return {
-        head: "The composition of " + poss(nameT) + " vote is unchanged",
+        head: "The composition of " + voteHead + " is unchanged",
         dek: since + "no group has moved significantly towards or away from " + nameD + " relative to all voters" + (skew ? ". " + skew : ".")
       };
     }
@@ -44103,7 +44460,7 @@ function RdDemographics({
         if (!head) head = nameT + " " + isAre + " " + (m.dir > 0 ? "gaining in " : "losing voters faster in ") + loc.ref;
         parts.push(...locDek(m));
       } else {
-        if (!head) head = "The composition of " + poss(nameT) + " vote is shifting";
+        if (!head) head = "The composition of " + voteHead + " is shifting";
         groupMoves.push(bestOf(ms));
       }
     }
@@ -44537,7 +44894,7 @@ function RdDemographics({
           }] : ciUnshifted(i - 1) : ciUnshifted,
           fmt: v => v.toFixed(1),
           copy: {
-            title: rdCap(pPoss) + " vote: " + name,
+            title: rdCap(pVote) + ": " + name,
             sub: "Share of this group who would vote for " + pName + ", month by month, against all voters",
             legend: [{
               label: name,
@@ -44651,7 +45008,7 @@ function RdDemographics({
         }] : ciLoc(i - 1) : ciLoc,
         fmt: v => v.toFixed(1),
         copy: {
-          title: rdCap(pPoss) + " vote " + (c.st.label || "By " + tab.label).toLowerCase(),
+          title: rdCap(pVote) + " " + (c.st.label || "By " + tab.label).toLowerCase(),
           sub: "Share of each group who would vote for " + pName + ", month by month, against all voters",
           legend: c.drawn.map(l => ({
             label: l.g.label,
@@ -46345,6 +46702,7 @@ function RdUndecided({
     soft = byId.soft;
   const nowOf = s => s ? s.now ? s.now.v : s.latest.v : null;
   const xDomain = rangeDomain(rangeId);
+  const base = (D.aggPrimary || []).find(d => d.election) || null;
   const slopeOf = s => s ? withinHouseSlope(s.polls.map(d => ({
     h: d.pollster,
     t: d.x,
@@ -46422,7 +46780,7 @@ function RdUndecided({
       yDomain: [lo, hi],
       yTicks: rdYTicks(lo, hi, step),
       yTickFmt: v => v === 0 ? "0" : v + "%",
-      xTicks: rdXTicks(xDomain[0], xDomain[1], narrow),
+      xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null),
       baseline: true,
       series: drawn.map(d => ({
         id: d.s.id,
@@ -46805,7 +47163,7 @@ function RdUndecided({
     yDomain: [partyView.sLo, partyView.sHi],
     yTicks: rdYTicks(partyView.sLo, partyView.sHi, 20),
     yTickFmt: v => v + "%",
-    xTicks: rdXTicks(xDomain[0], xDomain[1], true),
+    xTicks: rdElectionTicks(xDomain[0], xDomain[1], true, base ? base.x : null),
     baseline: true,
     series: [{
       id: "all",
@@ -46934,7 +47292,7 @@ function RdUndecided({
     yDomain: [0, 40],
     yTicks: rdYTicks(0, 40, 10),
     yTickFmt: v => v === 0 ? "0" : v + "%",
-    xTicks: rdXTicks(xDomain[0], xDomain[1], narrow),
+    xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null),
     baseline: true,
     series: [{
       id: "all",
@@ -46996,6 +47354,289 @@ function RdUndecided({
     }
   }, "Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined."))));
 }
+function RdMood({
+  rangeId
+}) {
+  const {
+    D,
+    monthLabelFull
+  } = window.AP;
+  const narrow = useNarrow("(max-width: 640px)");
+  const M = D.mood;
+  if (!M || !M.consumer || !M.business || !M.consumer.polls.length || !M.business.polls.length) return null;
+  const NICE = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+  const lanes = [{
+    k: "consumer",
+    s: M.consumer,
+    name: "Consumers",
+    dekName: "Consumers",
+    by: "ANZ–Roy Morgan",
+    hl: 14,
+    lab: "Consumers",
+    period: "week",
+    color: "var(--mood-consumer)",
+    dash: null,
+    shift: 0,
+    vfmt: v => v.toFixed(1),
+    short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly."
+  }, {
+    k: "westpacConsumer",
+    s: M.westpacConsumer,
+    name: "Consumers",
+    dekName: "Consumers on Westpac–MI’s read",
+    by: "Westpac–MI",
+    hl: 60,
+    lab: "Consumers · Westpac–MI",
+    period: "month",
+    color: "var(--mood-consumer)",
+    dash: "4 3",
+    shift: 0,
+    vfmt: v => v.toFixed(1),
+    short: "The Westpac–Melbourne Institute’s monthly gauge of the same household mood; 100 is neutral on this scale too."
+  }, {
+    k: "business",
+    s: M.business,
+    name: "Businesses",
+    dekName: "Businesses",
+    by: "Roy Morgan",
+    hl: 60,
+    lab: "Businesses",
+    period: "month",
+    color: "var(--mood-business)",
+    dash: null,
+    shift: 0,
+    vfmt: v => v.toFixed(1),
+    short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly."
+  }, {
+    k: "nabBusiness",
+    s: M.nabBusiness,
+    name: "Businesses",
+    dekName: "Businesses on NAB’s survey",
+    by: "NAB",
+    hl: 60,
+    lab: "Businesses · NAB",
+    period: "month",
+    color: "var(--mood-business)",
+    dash: "4 3",
+    shift: 100,
+    vfmt: NICE,
+    short: "x"
+  }].filter(l => l.s && l.s.polls.length);
+  if (!lanes.length) return null;
+  for (const l of lanes) l.lat = l.s.latest;
+  const smooth = (polls, halfLifeDays) => {
+    const decay = Math.LN2 / (halfLifeDays / 365.25);
+    return polls.map(p => {
+      let wsum = 0,
+        wtot = 0;
+      for (const q of polls) {
+        const w = Math.exp(-decay * Math.abs(q.x - p.x));
+        if (w < 0.02) continue;
+        wsum += w;
+        wtot += w * q.v;
+      }
+      return {
+        x: p.x,
+        y: wtot / wsum
+      };
+    });
+  };
+  const neut = l => 100 - l.shift;
+  const water = (l, v) => v < neut(l) ? "pessimists lead" : "optimists lead";
+  const nab = lanes.find(l => l.k === "nabBusiness");
+  if (nab) nab.short = "Business confidence as a net balance — optimistic firms minus pessimistic ones, 0 = neutral on NAB’s own scale. The line is drawn 100 points up so the neutral line is shared; the figure here is NAB’s own. Conditions printed " + NICE(nab.lat.cond) + (nab.lat.condChg == null ? "" : ", " + (nab.lat.condChg < 0 ? "down " : "up ") + NICE(Math.abs(nab.lat.condChg))) + " on the month. " + water(nab, nab.lat.v) + ".";
+  const side = nm => {
+    const ls = lanes.filter(l => l.name === nm);
+    if (!ls.length) return null;
+    return ls.every(l => l.lat.v < neut(l)) ? "under" : ls.every(l => l.lat.v >= neut(l)) ? "above" : "split";
+  };
+  const cSide = side("Consumers"),
+    bSide = side("Businesses");
+  const head = cSide === "under" && bSide === "under" ? "Confidence is underwater on both counts." : cSide === "above" && bSide === "above" ? "Confidence is above water on both counts." : cSide === "under" && bSide === "above" ? "Consumers are underwater; businesses aren’t." : cSide === "above" && bSide === "under" ? "Businesses are underwater; consumers aren’t." : "The gauges disagree on which side of the line the mood sits.";
+  const trough = polls => {
+    const lo = polls.reduce((m, p) => p.v < m.v ? p : m, polls[0]);
+    const hi = polls.reduce((m, p) => p.v > m.v ? p : m, polls[0]);
+    return {
+      lo,
+      hi
+    };
+  };
+  const sent = l => {
+    let t = l.dekName + " at " + l.vfmt(l.lat.v) + (l.lat.chg == null ? "" : Math.abs(l.lat.chg) < 0.05 ? ", holding steady" : ", " + (l.lat.chg < 0 ? "down " : "up ") + NICE(Math.abs(l.lat.chg)) + " on the " + l.period);
+    const {
+      lo,
+      hi
+    } = trough(rows.get(l.k));
+    if (Math.abs(l.lat.v - lo.v) <= 2.5) t += ", not far off its low of " + l.vfmt(lo.v) + " in " + monthLabelFull(lo.ym);else if (Math.abs(l.lat.v - hi.v) <= 2.5) t += ", close to its high of " + l.vfmt(hi.v) + " in " + monthLabelFull(hi.ym);
+    if (l.k === "nabBusiness" && l.lat.cond != null) t += " (conditions " + NICE(l.lat.cond) + ")";
+    return t + ".";
+  };
+  const x0 = 2025 + 122 / 365;
+  const x1 = D.domain.x1;
+  const MOOD_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+  const evs = rdChartEvents(D.events, x0, x1).filter(e => !MOOD_OFF.includes(e.date));
+  const badges = narrow ? rdEventBadges("mood", evs, x0, x1) : null;
+  const [evtOpen, setEvtOpen] = useState(null);
+  const pickEv = e => {
+    setEvtOpen(cur => cur && cur.e === e ? cur : {
+      e
+    });
+    rdEventReveal("evt-a-" + e.badgeKey);
+  };
+  const rows = new Map(lanes.map(l => [l.k, l.s.polls.filter(p => p.x >= x0)]));
+  const dek = lanes.map(sent).join(" ");
+  const rawPoints = new Map(lanes.map(l => [l.k, rows.get(l.k).map(p => ({
+    x: p.x,
+    y: p.v + l.shift,
+    ym: p.ym,
+    released: p.released,
+    ...(l.shift ? {
+      raw: p.v
+    } : {})
+  }))]));
+  const sePoints = new Map(lanes.map(l => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({
+    x: p.x,
+    y: p.y + l.shift,
+    ym: rows.get(l.k)[i].ym,
+    ...(l.shift ? {
+      raw: rows.get(l.k)[i].v
+    } : {})
+  }))]));
+  const vals = lanes.flatMap(l => rawPoints.get(l.k).map(p => p.y)).concat([100]);
+  const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10,
+    hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
+  const spine = rawPoints.get(lanes[0].k);
+  const copyLegend = lanes.map(l => ({
+    label: l.lab + " (latest " + l.vfmt(l.lat.v) + ")",
+    color: l.color,
+    kind: l.dash ? "dashed" : "line"
+  }));
+  const fmt = (v, p) => p && p.raw != null ? NICE(p.raw) : v.toFixed(1);
+  return React.createElement(RdSec, {
+    id: "mood",
+    cls: "rd-mood",
+    title: "Economic sentiment",
+    meta: "Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")
+  }, React.createElement(RdHed, {
+    head: head,
+    dek: dek
+  }), React.createElement("div", {
+    className: "card rd-card rd-mood-chart"
+  }, React.createElement("div", {
+    className: "rd-un-ptitle"
+  }, React.createElement("b", null, "Consumer and business confidence"), React.createElement("span", null, "100 = neutral on each index; NAB drawn +100")), lanes.map(l => React.createElement("div", {
+    key: l.k,
+    className: "rd-un-read"
+  }, React.createElement(RdSwatch, {
+    kind: l.dash ? "dash" : "line",
+    color: l.color
+  }), React.createElement("div", null, React.createElement("div", {
+    className: "rd-un-rtop"
+  }, React.createElement("b", null, l.name), React.createElement("span", {
+    className: "rd-un-rhouse"
+  }, l.by), React.createElement("span", {
+    className: "rd-un-rv"
+  }, l.vfmt(l.lat.v)), l.lat.chg != null && Math.abs(l.lat.chg) >= 0.05 && React.createElement("span", {
+    className: "rd-un-rci"
+  }, rdArrow(l.lat.chg), " ", NICE(Math.abs(l.lat.chg)), " on the ", l.period)), React.createElement("p", null, l.short + (l.k === "nabBusiness" ? "" : " " + water(l, l.lat.v) + "."))))), React.createElement(TrendChart, {
+    key: "rd-mood",
+    heightPx: narrow ? 260 : 340,
+    padPx: narrow ? {
+      l: 34,
+      r: 8,
+      t: 34,
+      b: 28
+    } : {
+      l: 40,
+      r: 16,
+      t: 44,
+      b: 30
+    },
+    xDomain: [x0, x1],
+    yDomain: [lo, hi],
+    yTicks: rdYTicks(lo, hi, 10),
+    yTickFmt: v => String(v),
+    xTicks: rdElectionTicks(x0, x1, narrow, x0),
+    baseline: true,
+    refLines: [{
+      y: 100,
+      label: "100 = neutral",
+      align: "left",
+      color: "var(--ink-3)"
+    }],
+    series: lanes.map(l => ({
+      id: l.k,
+      label: l.lab,
+      color: l.color,
+      rdWidth: l.dash ? 1.6 : 2.2,
+      dash: l.dash || undefined,
+      endCap: false,
+      endLabel: narrow ? null : l.lab,
+      points: sePoints.get(l.k)
+    })),
+    spine: spine,
+    events: badges ? badges.events : evs,
+    evt: evtOpen,
+    onEvt: setEvtOpen,
+    scatter: lanes.flatMap(l => rawPoints.get(l.k).map(q => ({
+      x: q.x,
+      y: q.y,
+      color: l.color,
+      label: l.lab,
+      ...(q.raw != null ? {
+        raw: q.raw
+      } : {}),
+      meta: {
+        pollster: l.by,
+        released: q.released
+      }
+    }))),
+    pollFacet: "confidence",
+    tooltipTitle: i => {
+      const p = spine[i];
+      return p ? monthLabelFull(p.ym) : "";
+    },
+    fmt: fmt,
+    copy: {
+      title: "Consumer and business confidence",
+      sub: head + " Four published gauges on one 100-neutral scale: ANZ–Roy Morgan consumer confidence (weekly), Westpac–MI consumer sentiment, Roy Morgan business confidence and NAB business confidence (monthly).",
+      caption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly series). NAB prints a net balance (0 = neutral), so its dashed line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. No combining, no adjustment.",
+      legend: copyLegend
+    }
+  }), badges && badges.list.length === 1 && React.createElement(RdEventList, {
+    list: badges.list,
+    onPick: pickEv,
+    openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
+  }), badges && badges.list.length > 1 && React.createElement("details", {
+    className: "rd-evdrop"
+  }, React.createElement("summary", null, "The marked events"), React.createElement(RdEventList, {
+    list: badges.list,
+    onPick: pickEv,
+    openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
+  })), React.createElement(RdKey, {
+    className: "rd-ckey",
+    items: [{
+      kind: "dot",
+      color: "var(--ink-3)",
+      label: "One release, as printed"
+    }, {
+      kind: "line",
+      color: "var(--ink-3)",
+      label: "Smoothed trend of the releases"
+    }, {
+      kind: "dash",
+      color: "var(--ink-3)",
+      label: "The Westpac–MI and NAB reads of the same subjects"
+    }]
+  })), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Four published gauges of the same mood, set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "Reading the mood beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
+  }), React.createElement(RdFoot, {
+    how: {
+      term: "mood",
+      from: "Economic sentiment"
+    }
+  }, "Four published gauges \u2014 ANZ\u2013Roy Morgan, Westpac\u2013MI, Roy Morgan and NAB \u2014 joined as released. Context, not a predictor."));
+}
 Object.assign(window, {
   RdPrimary,
   rdShareWords,
@@ -47012,6 +47653,7 @@ Object.assign(window, {
   useRdWidth,
   RdIssues,
   RdUndecided,
+  RdMood,
   RdShiftPlot,
   rdOneIn,
   RdTsig,
@@ -49781,9 +50423,12 @@ function RdPastCycles(p) {
     ppmm: null,
     oppnet: null
   });
-  const onEvtOf = key => v => setEvt(s => s[key] === v ? s : {
-    ...s,
-    [key]: v
+  const onEvtOf = key => v => setEvt(s => {
+    const nx = typeof v === "function" ? v(s[key]) : v;
+    return nx === s[key] ? s : {
+      ...s,
+      [key]: nx
+    };
   });
   const pickPair = (pair, keys) => e => {
     const k = keys.find(c => !e.metrics || e.metrics.includes(c));
@@ -50184,8 +50829,8 @@ function rdApOut(stamp) {
 function rdEffTbc(p) {
   if (p.sampleEff != null || !p.published) return false;
   if (Date.now() - Date.parse(p.published.slice(0, 10)) >= 21 * 86400000) return false;
-  const prev = window.AUSPOL.individualPolls.filter(q => q.pollster === p.pollster && q.released < p.released).sort((a, b) => a.released < b.released ? -1 : 1).pop();
-  return !!(prev && prev.sampleEff != null);
+  const since = Date.parse(p.released) - 90 * 86400000;
+  return window.AUSPOL.individualPolls.some(q => q.pollster === p.pollster && q.sampleEff != null && q.released < p.released && Date.parse(q.released) >= since);
 }
 const RD_EFF_TBC_URL = {
   YouGov: "https://yougov.com/about/methodology/australian-polling-council",
@@ -50233,7 +50878,7 @@ function rdPollHead(p) {
     className: "rd-nocaps"
   }, p.sample.toLocaleString(), p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? React.createElement(React.Fragment, null, " (", rdEffTbcNote(p), ")") : "")) : "an unpublished sample";
   const out = rdApOut(p.published);
-  const by = "published by " + (p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
+  const by = "published by " + (p.conf ? p.pollster : p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
   const field = p.field || p.dateLabel;
   if (p.fieldPending) return React.createElement(React.Fragment, null, rdFieldTbc(p), ", from ", n, ", " + by + (out ? " on " + out : ""));
   return React.createElement(React.Fragment, null, field ? "Conducted on " + field + " from " : "From ", n, ", " + by + (out ? " on " + out : ""));
@@ -50935,6 +51580,200 @@ function RdApDirMini({
   }, "n = ", dotTip.q.sample.toLocaleString()), tip.src !== "touch" && (dotTip.key ? React.createElement("div", {
     className: "tip-hint"
   }, tip.src === "focus" ? "Press Enter to open this reading" : "Click to open this reading") : null)));
+}
+function RdApConfMini({
+  p
+}) {
+  const D = window.AUSPOL;
+  const c = p.conf;
+  const box = React.useRef(null);
+  const W = useRdWidth(box, 470);
+  const H = 176;
+  const iM = D.MONTHS.indexOf(p.ym);
+  const ms = D.MONTHS.slice(Math.max(0, iM - 6), iM + 1);
+  const t0 = rdApDays(ms[0] + "-01");
+  const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
+  const t1 = Date.UTC(ly, lm, 1) - 864e5;
+  const ser = ((D.mood || {})[c.k] || {}).polls || [];
+  const mine = ser.filter(q => rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1);
+  if (!mine.length) return React.createElement("div", {
+    ref: box
+  });
+  const fmt = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+  const outLabel = q => {
+    const d = new Date(rdApDays(q.released));
+    return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1);
+  };
+  const neut = c.vs;
+  const vals = mine.map(q => q.v).concat([neut]);
+  let lo = Math.floor(Math.min(...vals) / 4) * 4,
+    hi = Math.ceil(Math.max(...vals) / 4) * 4;
+  if (hi - lo < 8) {
+    const cMid = (lo + hi) / 2;
+    lo = Math.floor((cMid - 4) / 4) * 4;
+    hi = lo + 8;
+  }
+  const step = rdApTickStep(lo, hi);
+  lo = Math.floor(lo / step) * step;
+  hi = Math.ceil(hi / step) * step;
+  const x0 = 30,
+    x1 = W - 16,
+    top = 10,
+    bot = H - 26;
+  const X = tt => x0 + (tt - t0) / (t1 - t0) * (x1 - x0);
+  const Y = v => bot - (v - lo) / (hi - lo) * (bot - top);
+  const ticks = [];
+  for (let v = lo; v <= hi + 1e-9; v += step) ticks.push(v);
+  const cx = X(rdApDays(p.released)),
+    cy = Y(c.v);
+  const labLeft = cx > W * 0.45;
+  const [tip, setTip] = useState(null);
+  const tipBox = React.useRef(null);
+  const ptr = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = tipBox.current;
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const off = Math.min(0, window.innerWidth - 8 - r.right) - Math.min(0, r.left - 8);
+    if (off) el.style.marginLeft = off + "px";
+  }, [tip]);
+  const dots = mine.filter(q => q.released !== p.released).map(q => {
+    const raw = window.AP && window.AP.pollRowKey ? window.AP.pollRowKey({
+      pollster: p.pollster,
+      released: q.released
+    }) : null;
+    const dup = mine.some(z => z !== q && z.released === q.released);
+    return {
+      q,
+      key: !raw || dup ? null : raw,
+      id: q.released,
+      cx: X(rdApDays(q.released)),
+      a: q.v
+    };
+  });
+  const show = (id, src) => setTip({
+    id,
+    src
+  });
+  const hide = (id, src) => setTip(tp => tp && tp.id === id && (!src || tp.src === src) ? null : tp);
+  const dotTip = tip && dots.find(d => d.id === tip.id);
+  return React.createElement("div", {
+    ref: box,
+    className: "rd-apd-mini"
+  }, React.createElement("svg", {
+    width: W,
+    height: H,
+    viewBox: `0 0 ${W} ${H}`,
+    role: "img",
+    "aria-label": `${c.lab} releases since ${D.monthName(+ms[0].slice(5, 7)) + " " + ms[0].slice(0, 4)}, as published; this release ${fmt(c.v)}${neut === 0 ? ", a net balance, 0 neutral" : ", 100 neutral"}.`
+  }, ticks.map(v => React.createElement("path", {
+    key: v,
+    d: `M${x0} ${Y(v)}H${x1}`,
+    className: v === neut ? "rd-apd-even" : "rd-apd-gl"
+  })), ticks.map(v => React.createElement("text", {
+    key: "t" + v,
+    x: x0 - 6,
+    y: Y(v) + 4,
+    className: "rd-apd-ax",
+    textAnchor: "end"
+  }, v === neut ? neut === 0 ? "0 ±" : "100" : v)), dots.map(d => {
+    const open = () => {
+      if (d.key && window.AP.openPoll) {
+        setTip(null);
+        window.AP.openPoll(d.key, "confidence", "the release you were looking at");
+      }
+    };
+    return React.createElement("g", {
+      key: d.id
+    }, tip && tip.id === d.id && React.createElement("circle", {
+      cx: d.cx,
+      cy: Y(d.a),
+      r: "7.5",
+      className: "rd-apd-dothi"
+    }), React.createElement("circle", {
+      cx: d.cx,
+      cy: Y(d.a),
+      r: "4",
+      className: "rd-apd-dot"
+    }), React.createElement("circle", {
+      cx: d.cx,
+      cy: Y(d.a),
+      r: "9",
+      className: "rd-apd-hit" + (d.key ? " link" : ""),
+      tabIndex: "0",
+      role: d.key ? "button" : "img",
+      "aria-label": `${fmt(d.a)}, ${c.lab} released ${outLabel(d.q)}` + (d.key ? "; press Enter to open it" : ""),
+      onPointerDown: ev => {
+        ptr.current = ev.pointerType;
+      },
+      onPointerEnter: ev => {
+        if (ev.pointerType === "mouse") show(d.id, "mouse");
+      },
+      onPointerLeave: ev => {
+        if (ev.pointerType === "mouse") hide(d.id, "mouse");
+      },
+      onFocus: ev => {
+        if (ev.target.matches(":focus-visible")) show(d.id, "focus");
+      },
+      onBlur: () => hide(d.id, "focus"),
+      onClick: ev => {
+        ev.stopPropagation();
+        const pt = ev.detail === 0 ? "key" : ptr.current;
+        ptr.current = null;
+        if (pt === "mouse" || pt === "key") {
+          open();
+          return;
+        }
+        if (tip && tip.id === d.id) setTip(null);else setTip({
+          id: d.id,
+          src: "touch"
+        });
+      },
+      onKeyDown: ev => {
+        if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+        ev.preventDefault();
+        open();
+      }
+    }));
+  }), React.createElement("circle", {
+    cx: cx,
+    cy: cy,
+    r: "8",
+    className: "rd-apd-ring"
+  }), React.createElement("circle", {
+    cx: cx,
+    cy: cy,
+    r: "4.5",
+    className: "rd-apd-this"
+  }), React.createElement("text", {
+    x: labLeft ? cx - 12 : cx + 12,
+    y: cy - 12,
+    className: "rd-apd-thislab",
+    textAnchor: labLeft ? "end" : "start"
+  }, "This release " + fmt(c.v)), React.createElement("path", {
+    d: `M${x0} ${bot}H${x1}`,
+    className: "rd-apd-base"
+  }), ms.map((ym, i) => i % 2 === (ms.length - 1) % 2 ? React.createElement("text", {
+    key: ym,
+    x: X(rdApDays(ym + "-01")),
+    y: bot + 18,
+    className: "rd-apd-ax",
+    textAnchor: "middle"
+  }, D.monthName(Number(ym.slice(5)))) : null)), dotTip && React.createElement("div", {
+    ref: tipBox,
+    className: "tip rd-apd-tip",
+    style: {
+      left: dotTip.cx + "px"
+    },
+    "aria-hidden": "true"
+  }, React.createElement("div", {
+    className: "tip-title"
+  }, "Released ", outLabel(dotTip.q)), React.createElement("div", {
+    className: "tip-sub"
+  }, c.lab, " ", fmt(dotTip.a), dotTip.q.chg != null ? ", " + (dotTip.q.chg < 0 ? "down " : "up ") + fmt(Math.abs(dotTip.q.chg)) + " on the previous release" : ""), tip.src !== "touch" && (dotTip.key ? React.createElement("div", {
+    className: "tip-hint"
+  }, tip.src === "focus" ? "Press Enter to open this release" : "Click to open this release") : null)));
 }
 const RD_AP_LD_RIVALS = [{
   riv: "opp",
@@ -51723,6 +52562,21 @@ function RdApDetail({
       className: "rd-apd-k"
     }, "In today\u2019s figures"), React.createElement("span", null, inWin ? React.createElement(React.Fragment, null, "One of the polls the panel\u2019s current figures draw on (the last ", T.window, ").") : React.createElement(React.Fragment, null, "Outside the ", T.window, " the panel\u2019s current figures draw on."))));
   })();
+  const isConf = facet === "confidence";
+  const conf = isConf ? p.conf || null : null;
+  const confSer = conf && D.mood && D.mood[conf.k] ? D.mood[conf.k] : null;
+  const confFmt = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+  const outLabel = q => {
+    const d = new Date(rdApDays(q.released));
+    return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1);
+  };
+  const confPeriod = !conf ? "month" : conf.k === "consumer" ? "week" : "month";
+  const CONF_BLURB = {
+    consumer: "Consumer confidence – who feels optimistic about their finances and the economy, read weekly by ANZ–Roy Morgan.",
+    westpacConsumer: "The Westpac–Melbourne Institute’s monthly gauge of household sentiment – the same territory as the weekly consumer index on a slower clock.",
+    business: "Business confidence – how firms rate trading conditions and the year ahead, read monthly by Roy Morgan.",
+    nabBusiness: "Business confidence as a net balance – optimistic firms minus pessimistic ones – from NAB’s monthly business survey."
+  };
   const issTable = (() => {
     if (!isIss || !p.iss) return null;
     const iq = p.iss;
@@ -51826,7 +52680,23 @@ function RdApDetail({
     "data-pollster": p.pollster
   }, React.createElement("span", {
     className: "rd-apd-h"
-  }, rdPollHead(p)), prim.length > 0 && React.createElement("div", {
+  }, rdPollHead(p)), conf && React.createElement("div", {
+    className: "rd-apd-grid rd-apd-grid1"
+  }, React.createElement("span", {
+    className: "rd-apd-k"
+  }, conf.lab), React.createElement("span", {
+    className: "rd-apd-cell"
+  }, React.createElement("span", null, React.createElement("b", null, confFmt(conf.v)), conf.chg != null && Math.abs(conf.chg) >= 0.05 ? ", " + (conf.chg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.chg)) + " on the " + confPeriod : ""), React.createElement("span", {
+    className: "rd-apd-sub"
+  }, conf.vs === 0 ? "Net balance, optimistic minus pessimistic – 0 neutral" : "Index reading – 100 neutral"))), conf && conf.cond != null && React.createElement("div", {
+    className: "rd-apd-grid rd-apd-grid1"
+  }, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Business conditions"), React.createElement("span", {
+    className: "rd-apd-cell"
+  }, React.createElement("span", null, React.createElement("b", null, confFmt(conf.cond)), conf.condChg != null && Math.abs(conf.condChg) >= 0.05 ? ", " + (conf.condChg < 0 ? "down " : "up ") + confFmt(Math.abs(conf.condChg)) + " on the month" : ""), React.createElement("span", {
+    className: "rd-apd-sub"
+  }, "NAB prints conditions beside confidence"))), prim.length > 0 && React.createElement("div", {
     className: "rd-apd-prim"
   }, prim.map(k => React.createElement("span", {
     key: k.id
@@ -52003,7 +52873,7 @@ function RdApDetail({
     className: "rd-apd-r"
   }, React.createElement("span", {
     className: "rd-apd-h"
-  }, "How it counts"), !isDir && !isIss && !isLd && !isDem && fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, isConf ? "How it reads" : "How it counts"), !isDir && !isIss && !isLd && !isDem && !isConf && fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-ct"
   }, p.pollster, "\u2019s polls since ", D.monthNameFull(Number(from.slice(5))), " against the ", RD_AP_AVG, ", Labor v ", onM ? "One Nation" : "Coalition", pub ? " as published" : ""), React.createElement(RdApMini, {
     p: p,
@@ -52035,9 +52905,26 @@ function RdApDetail({
     }, "Who voters rate best on ", cTit, " since ", D.monthNameFull(Number(from.slice(5))), ", the monthly pooled line and this wave\u2019s own figures on the same basis \u2014 shares of those naming one of the three parties"), React.createElement(RdApIssMini, {
       p: p
     }));
-  })(), React.createElement("div", {
+  })(), isConf && conf && confSer && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-ct"
+  }, p.pollster, "\u2019s ", conf.lab, " releases since ", D.monthNameFull(Number(from.slice(5))), ", as published \u2014 no average; the gauge is the publisher\u2019s own series"), React.createElement(RdApConfMini, {
+    p: p
+  })), React.createElement("div", {
     className: "rd-apd-facts"
-  }, demFacts, isIss && iss && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, demFacts, isConf && conf && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-apd-k"
+  }, "The gauge"), React.createElement("span", null, CONF_BLURB[conf.k] || conf.lab + "."), React.createElement("span", {
+    className: "rd-apd-k"
+  }, "Neutral"), React.createElement("span", null, conf.vs === 0 ? React.createElement(React.Fragment, null, "Printed as a net balance \u2013 optimists minus pessimists \u2013 so the neutral print is 0. It enters the mood panel\u2019s 40\u2013120 meter shifted up 100, beside the index gauges.") : React.createElement(React.Fragment, null, "An index print \u2013 100 is neutral; above it optimists outnumber pessimists", confPeriod === "week" ? ", read weekly" : "", ".")), React.createElement("span", {
+    className: "rd-apd-k"
+  }, "In today\u2019s panel"), React.createElement("span", null, confSer && confSer.latest && confSer.latest.released === p.released ? React.createElement(React.Fragment, null, "This is the latest ", conf.lab, " release, so the economic-sentiment panel reads the gauge at it.") : confSer && confSer.latest ? React.createElement(React.Fragment, null, "The panel\u2019s current read of this gauge is the ", outLabel(confSer.latest), " release at ", confFmt(confSer.latest.v), confSer.latest.url ? React.createElement(React.Fragment, null, ", ", React.createElement("a", {
+    className: "rd-link",
+    href: confSer.latest.url,
+    onClick: e => e.stopPropagation()
+  }, "its source", React.createElement("span", {
+    className: "rd-apd-ext",
+    "aria-hidden": "true"
+  }, "\u2197"))) : "", ".") : React.createElement(React.Fragment, null, "The gauge\u2019s series carries no published releases to panel against."))), isIss && iss && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
   }, "Asked"), React.createElement("span", null, issPrompted ? React.createElement(React.Fragment, null, "Voters picked the three issues that matter most", iss.q ? React.createElement(React.Fragment, null, " \u2013 ", p.pollster, "\u2019s wording: \u201C", iss.q, "\u201D") : p.pollster === "Ipsos" ? " – Ipsos asks its standing list of 19 issues, best party on the month’s five leaders" : "", ". SEC Newgate\u2019s mentions count can\u2019t sit in the same series, so each house\u2019s wording is pooled against its pair first.") : iss.conc ? React.createElement(React.Fragment, null, "SEC Newgate asks what concerns Australians, unprompted \u2013 anyone can name anything, so the shares are any-mentions, not forced picks. That reading can\u2019t mix with the top-three series the issues panel pools, so it isn\u2019t counted toward it.") : React.createElement(React.Fragment, null, p.pollster, " asked only who\u2019d be best on each issue", iss.q ? React.createElement(React.Fragment, null, " \u2013 its wording: \u201C", iss.q, "\u201D \u2013") : ",", " not which issues matter most, so this wave feeds the pooled best-party line and there\u2019s no top-three list for it to join.")), issPair != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
@@ -52083,7 +52970,7 @@ function RdApDetail({
     key: n.name
   }, i > 0 ? "; against " + n.name + ", " : "", React.createElement("b", null, Math.abs(n.gap) < 0.05 ? "level" : Math.abs(n.gap).toFixed(1) + " points " + rdApLdWay(n.gap, n.name, rdApPmNow())), " (", rdApPmNow(), " ", rdApSigned(n.a), ", ", n.name, " ", rdApSigned(n.o), ") on ", rdApLdMetWord(n.met))), ldOwn.some(pr => pr.met === "fav") ? " – favourability and approval are different questions, so each gap here stays on its own" : ""))), isLd && !ldOwn.length && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
-  }, "Leader ratings"), React.createElement("span", null, p.pollster, " didn\u2019t ask ", rdApPm(p.appr), " and ", p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader", " on the same question in this poll, so there\u2019s no net-approval gap to set against the leadership figures.")), !isDir && !isIss && !isLd && !isDem && React.createElement(React.Fragment, null, p.noAgg && React.createElement(React.Fragment, null, React.createElement("span", {
+  }, "Leader ratings"), React.createElement("span", null, p.pollster, " didn\u2019t ask ", rdApPm(p.appr), " and ", p.appr && p.appr.oppName ? p.appr.oppName : "the opposition leader", " on the same question in this poll, so there\u2019s no net-approval gap to set against the leadership figures.")), !isDir && !isIss && !isLd && !isDem && !isConf && React.createElement(React.Fragment, null, p.noAgg && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
   }, "In the aggregates"), React.createElement("span", null, "Because SMS polls have a strong selection bias, they do not count towards any aggregates.")), fig.a != null && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-apd-k"
@@ -52105,6 +52992,246 @@ function RdApDetail({
     className: "rd-apd-k"
   }, "In today\u2019s ", today.a.toFixed(1)), React.createElement("span", null, eff && eff.w ? React.createElement(React.Fragment, null, "One of the ", rdNumWord(winN), " polls ", RD_AP_KAL ? "the trend is" : "it’s", " built from; this one moves it ", React.createElement("b", null, move(eff))) : eff && eff.t ? React.createElement(React.Fragment, null, "Not one of them: today\u2019s figure uses the last three weeks of polls. When it came out, it moved the figure ", React.createElement("b", null, move(eff.t))) : React.createElement(React.Fragment, null, "Not one of them: today\u2019s figure uses the last three weeks of polls")))))));
 }
+const RD_AP_DEM_NOUN = {
+  "18–34": "18–34-year-olds",
+  "55+": "over-55s",
+  "65+": "over-65s",
+  "50+": "over-50s",
+  "Gen Z": "Gen Z",
+  Boomers: "Boomers",
+  Women: "women",
+  Men: "men",
+  University: "university graduates",
+  "Year 12 or less": "voters who left school by Year 12",
+  School: "voters who left school by Year 12",
+  "Inner metro": "inner-city voters",
+  Rural: "rural voters",
+  "Regional or rural": "regional voters",
+  Renting: "renters",
+  "Renting and other": "renters",
+  "Own outright": "outright owners",
+  "$150k+": "those on $150k or more",
+  "Under $50k": "those on under $50k",
+  "$125k+": "those on $125k or more",
+  "Under $45k": "those on under $45k",
+  "$100k or more": "those on $100k or more",
+  "Under $100k": "those on under $100k"
+};
+const rdApDemNoun = g => RD_AP_DEM_NOUN[g] || "the " + g + " group";
+function rdApFacetStory(facet, rows, upd, demSplit) {
+  const D = window.AUSPOL;
+  const J = window.JUR;
+  const inWin = (p, days) => {
+    const t = rdApDays(p.released);
+    return t > upd - days * 864e5 && t <= upd;
+  };
+  const span = days => days > 21 ? "six weeks" : "three weeks";
+  const poss = id => rdPartyStart(id) + (rdPlural(id) ? "’" : "’s");
+  const fromPolls = (n, lo, hi, f) => " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s") + (n === 1 ? "" : lo === hi ? ", which all read " + f(lo) : ", which range from " + f(lo) + " to " + f(hi));
+  const tally = (k, n, has) => n === 1 ? k ? "It " + has : "It doesn’t " + (has === "has" ? "have" : has.replace(/s$/, "")) : k === n ? (n === 2 ? "Both " : "All " + rdNumWord(n) + " ") + (has === "has" ? "have" : has.replace(/s$/, "")) : k === 0 ? "None of them " + has : rdCap(rdNumWord(k)) + " of them " + (k === 1 ? has : has === "has" ? "have" : has.replace(/s$/, ""));
+  const below = what => "Below is every " + RD_AP_POLLS + " poll" + (what ? " " + what : "") + " since the " + rdElecYear + " election, newest first, each linked to its source.";
+  const range = vals => [Math.min(...vals), Math.max(...vals)];
+  if (facet === "primary") {
+    const now = D.latest.primary || {};
+    const ids = Object.keys(now).filter(k => now[k] != null).sort((a, b) => now[b] - now[a]);
+    if (ids.length < 2) return null;
+    const [t1, t2] = ids;
+    const days = D.latest.method && D.latest.method.windowDays || 21;
+    const ps = rows.filter(p => inWin(p, days) && p.p && p.p[t1] != null);
+    if (!ps.length) return null;
+    const n = ps.length,
+      [lo, hi] = range(ps.map(p => p.p[t1]));
+    const f = rdApNum;
+    const head = RD_AP_KAL ? poss(t1) + " " + now[t1].toFixed(1) + " primary vote is the trend through every poll; " + (n === 1 ? "the last three weeks hold one, at " + f(lo) : "the last three weeks’ " + rdNumWord(n) + (lo === hi ? " all read " + f(lo) : " range from " + f(lo) + " to " + f(hi))) : poss(t1) + " " + now[t1].toFixed(1) + " primary vote" + fromPolls(n, lo, hi, f);
+    const lastM = (D.aggPrimary || [])[(D.aggPrimary || []).length - 1] || {};
+    const ci = id => lastM.ci && lastM.ci[id] || 0;
+    const gap = now[t1] - now[t2];
+    const level = gap < Math.sqrt(ci(t1) ** 2 + ci(t2) ** 2);
+    const both = ps.filter(p => p.p[t2] != null);
+    const ahead = both.filter(p => p.p[t1] > p.p[t2]).length;
+    const m = both.length;
+    const tl = !m ? "" : m === 1 ? ahead ? "It has " : "It doesn’t have " : ahead === m ? m === 2 ? "Both have " : "All " + rdNumWord(m) + " have " : ahead === 0 ? "None of the " + rdNumWord(m) + " has " : rdCap(rdNumWord(ahead)) + " of the " + rdNumWord(m) + " " + (ahead === 1 ? "has " : "have ");
+    const dek = (m ? tl + rdPartyIn(t1) + " ahead of " + rdPartyIn(t2) + ". " : "") + rdPartyStart(t2) + (rdPlural(t2) ? " are " : " is ") + gap.toFixed(1) + " points behind on " + now[t2].toFixed(1) + (level ? ", too close to separate. " : ". ") + below("");
+    return {
+      head,
+      dek
+    };
+  }
+  if (facet === "leadership") {
+    const N = D.leaderNow || {};
+    const L = {};
+    (D.LEADERS || []).forEach(x => {
+      L[x.id] = x;
+    });
+    const pm = L.alb,
+      opp = L.taylor;
+    if (!pm || !opp) return null;
+    const fav = !(N.alb_net && N.alb_net.v != null) && N.alb_fav && N.alb_fav.v != null;
+    const a = N[fav ? "alb_fav" : "alb_net"];
+    if (!a || a.v == null) return null;
+    const what = fav ? "net favourability" : "net approval";
+    const days = !fav && !J ? 21 : 42;
+    const isFav = p => (p.appr.metricBy || {}).alb === "fav";
+    const ps = rows.filter(p => inWin(p, days) && p.appr && p.appr.albNet != null && isFav(p) === !!fav);
+    if (!ps.length) return null;
+    const n = ps.length,
+      [lo, hi] = range(ps.map(p => p.appr.albNet));
+    const f = v => rdSigned(v, 0);
+    const head = pm.short + "’s " + what + " of " + rdSigned(a.v, 1) + fromPolls(n, lo, hi, f);
+    const t = N[fav ? "taylor_fav" : "taylor_net"];
+    const both = ps.filter(p => p.appr.taylorNet != null);
+    const above = both.filter(p => p.appr.taylorNet > p.appr.albNet).length;
+    let dek = "";
+    if (t && t.v != null && both.length) {
+      dek += tally(above, both.length, "rates") + " " + opp.short + " above " + pm.short + ", and " + opp.short + "’s own " + what + " is " + rdSigned(t.v, 1) + ". ";
+    }
+    const office = J ? J.office.alb : "PM";
+    const pa = N.alb_pref && N.alb_pref.v,
+      po = N.taylor_pref && N.taylor_pref.v;
+    if (pa != null && po != null) {
+      const ra = Math.round(pa),
+        ro = Math.round(po);
+      dek += ra === ro ? "As preferred " + office + ", " + pm.short + " and " + opp.short + " are level at " + ra + ". " : "As preferred " + office + ", " + (ra > ro ? pm.short + " leads " + opp.short : opp.short + " leads " + pm.short) + " " + Math.max(ra, ro) + "–" + Math.min(ra, ro) + ". ";
+    }
+    return {
+      head,
+      dek: dek + below("with leadership numbers")
+    };
+  }
+  if (facet === "direction") {
+    const now = D.directionNow;
+    if (!now) return null;
+    const ps = rows.filter(p => inWin(p, 21) && p.dir && p.dir.net != null);
+    if (!ps.length) return null;
+    const n = ps.length,
+      [lo, hi] = range(ps.map(p => p.dir.net));
+    const head = "The net mood of " + rdSigned(now.net, 1) + fromPolls(n, lo, hi, v => rdSigned(v, 0));
+    const wrongLeads = now.wrong >= now.right;
+    const k = ps.filter(p => wrongLeads ? p.dir.wrong > p.dir.right : p.dir.right > p.dir.wrong).length;
+    const dek = tally(k, n, "has") + " more voters saying Australia is " + (wrongLeads ? "on the wrong track than heading in the right direction" : "heading in the right direction than on the wrong track") + ". Taken together, " + Math.round(wrongLeads ? now.wrong : now.right) + "% say it’s " + (wrongLeads ? "on the wrong track" : "heading in the right direction") + " and " + Math.round(wrongLeads ? now.right : now.wrong) + "% that it’s " + (wrongLeads ? "heading in the right direction" : "on the wrong track") + ". " + below("with a direction reading");
+    return {
+      head,
+      dek
+    };
+  }
+  if (facet === "issues") {
+    const list = (D.issues && D.issues.list || []).filter(it => it.own && it.own.lead);
+    if (!list.length) return null;
+    const by = {};
+    list.forEach(it => {
+      (by[it.own.lead] = by[it.own.lead] || []).push(it);
+    });
+    const lab = it => it.label.charAt(0).toLowerCase() + it.label.slice(1);
+    const sig = its => its.filter(it => it.own.leadSig);
+    const order = Object.keys(by).sort((x, y) => by[y].length - by[x].length || sig(by[y]).length - sig(by[x]).length);
+    const top = order[0],
+      mine = by[top],
+      clear = sig(mine).length,
+      N = list.length;
+    let head;
+    if (order.length > 1 && by[order[1]].length === mine.length) head = "No party leads on more of the " + rdNumWord(N) + " issues than the others";else head = rdPartyStart(top) + " leads on " + (mine.length === N ? "all " + rdNumWord(N) + " issues" : rdNumWord(mine.length) + " of the " + rdNumWord(N) + " issues") + (clear === mine.length ? "" : clear === 0 ? ", but on none of them clearly" : ", but clearly on only " + rdNumWord(clear));
+    const rest = order.slice(head.startsWith("No party") ? 0 : 1);
+    const parts = rest.map(id => rdPartyIn(id) + " on " + rdList(by[id].map(lab)));
+    let dek = parts.length ? rdCap(parts[0].replace(" on ", " leads on ")) + (parts.length > 1 ? ", and " + parts.slice(1).join(", and ") : "") + ". " : "";
+    const soft = mine.filter(it => !it.own.leadSig);
+    if (!head.startsWith("No party") && soft.length && clear > 0) dek += poss(top) + " edge on " + rdList(soft.map(lab)) + " is inside the margin of error. ";
+    dek += "Each figure pools the last " + (D.issues.window || "six weeks") + "’ polls. " + below("with issues figures");
+    return {
+      head,
+      dek
+    };
+  }
+  if (facet === "demographics") {
+    const sp = (window.DEM_SPLITS || []).find(s => s.id === demSplit);
+    if (!sp) return null;
+    const DG = D.demographics || {};
+    const pooled = {};
+    (DG.tabs || []).forEach(t => t.sets.forEach(s => s.groups.forEach(g => {
+      if (!pooled[g.label]) pooled[g.label] = g;
+    })));
+    const pair = sp.pairs.find(([x, y]) => pooled[x] && pooled[y]);
+    const close = below(sp.scope.charAt(0).toLowerCase() + sp.scope.slice(1)).replace("each linked to its source", "each split into its own pollster’s groups");
+    if (pair) {
+      const [a, b] = pair,
+        A = pooled[a],
+        B = pooled[b];
+      const gaps = (DG.order || Object.keys(A.v)).filter(k => A.v[k] != null && B.v[k] != null).map(k => {
+        const g = A.v[k] - B.v[k];
+        return {
+          k,
+          g,
+          hi: g >= 0 ? a : b,
+          lo: g >= 0 ? b : a,
+          sig: Math.abs(g) > Math.sqrt(((A.ci || {})[k] || 0) ** 2 + ((B.ci || {})[k] || 0) ** 2)
+        };
+      }).sort((x, y) => Math.abs(y.g) - Math.abs(x.g));
+      if (!gaps.length) return null;
+      const pts = g => Math.round(Math.abs(g)) + " point" + (Math.round(Math.abs(g)) === 1 ? "" : "s");
+      const n = Math.min(A.n || 0, B.n || 0);
+      const pool = n ? " The figures pool " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s") + " from the last " + (DG.window || "six weeks") + ". " : " ";
+      const w = gaps[0];
+      if (!w.sig) {
+        return {
+          head: rdCap(rdApDemNoun(a)) + " and " + rdApDemNoun(b) + " vote much alike",
+          dek: "No party’s vote differs between them by more than the margin of error; the widest gap is " + poss(w.k).replace(/^T/, "t") + ", " + pts(w.g) + "." + pool + close
+        };
+      }
+      const head = poss(w.k) + " vote is " + pts(w.g) + " higher among " + rdApDemNoun(w.hi) + " than " + rdApDemNoun(w.lo);
+      const nx = gaps.slice(1).filter(x => x.sig).slice(0, 2);
+      const sides = [...new Set(nx.map(x => x.hi))].map(hi => {
+        const xs = nx.filter(x => x.hi === hi);
+        return xs.map((x, i) => poss(x.k).replace(/^The /, "the ") + (i === 0 ? " is " : " ") + pts(x.g)).join(" and ") + " higher among " + rdApDemNoun(hi);
+      });
+      const dek = (sides.length ? rdCap(sides.join(", and ")) + "." : "No other party’s gap clears the margin of error.") + pool + close;
+      return {
+        head,
+        dek
+      };
+    }
+    const ps = rows.filter(p => window.demPairOf(p, demSplit)).sort((x, y) => x.released < y.released ? 1 : -1);
+    if (!ps.length) return null;
+    const p = ps[0],
+      pr = window.demPairOf(p, demSplit);
+    const gs = Object.keys(pr.gap).filter(k => pr.gap[k] != null).sort((x, y) => Math.abs(pr.gap[y]) - Math.abs(pr.gap[x]));
+    if (!gs.length) return null;
+    const k = gs[0],
+      g = pr.gap[k];
+    const head = rdCap(sp.label.toLowerCase()) + " splits aren’t pooled: each pollster draws its own brackets";
+    const dek = rdCap(rdNumWord(ps.length)) + " poll" + (ps.length === 1 ? " has" : "s have") + " split the vote by " + sp.label.toLowerCase() + ". The newest, " + p.pollster + "’s, puts " + rdPartyIn(k) + " " + Math.round(Math.abs(g)) + " points higher among " + rdApDemNoun(g >= 0 ? pr.a : pr.b) + " than " + rdApDemNoun(g >= 0 ? pr.b : pr.a) + ". " + close;
+    return {
+      head,
+      dek
+    };
+  }
+  if (facet === "confidence") {
+    const M = D.mood || {};
+    const G = [["consumer", "ANZ–Roy Morgan’s consumer confidence", 100], ["westpacConsumer", "Westpac–MI’s consumer sentiment", 100], ["business", "Roy Morgan’s business confidence", 100], ["nabBusiness", "NAB’s business confidence", 0]].filter(([k]) => M[k] && M[k].latest && M[k].latest.v != null).map(([k, name, neut]) => ({
+      k,
+      name,
+      neut,
+      lat: M[k].latest
+    }));
+    if (!G.length) return null;
+    const fig = (g, v) => g.neut === 0 ? rdSigned(v, Number.isInteger(v) ? 0 : 1).replace(/^\+/, "") : v.toFixed(1);
+    const nG = G.length,
+      under = G.filter(g => g.lat.v < g.neut).length;
+    const all = nG === 2 ? "Both" : "All " + rdNumWord(nG);
+    const head = under === nG ? all + " confidence gauges sit below neutral" : under === 0 ? all + " confidence gauges sit above neutral" : rdCap(rdNumWord(under)) + " of the " + rdNumWord(nG) + " confidence gauges sit below neutral";
+    const moved = G.filter(g => g.lat.chg != null);
+    const fell = moved.filter(g => g.lat.chg < 0).length;
+    const fellTxt = !moved.length ? "" : fell === moved.length ? (moved.length === 2 ? "Both" : "All " + rdNumWord(moved.length)) + " fell in their latest release. " : fell === 0 ? "None fell in its latest release. " : rdCap(rdNumWord(fell)) + " of the " + rdNumWord(moved.length) + " fell in their latest release. ";
+    const newest = G.reduce((m, g) => g.lat.released > m ? g.lat.released : m, "");
+    const [, mo, dd] = newest.split("-").map(Number);
+    const at = g => g.name + " at " + fig(g, g.lat.v) + (g.lat.chg == null ? "" : Math.abs(g.lat.chg) < 0.05 ? " (unchanged)" : (g.lat.chg < 0 ? " (down " : " (up ") + rdApNum(Math.abs(g.lat.chg)) + ")");
+    const latest = G.filter(g => g.lat.released === newest);
+    const dek = fellTxt + "The newest release" + (latest.length > 1 ? "s" : "") + ", on " + dd + " " + D.monthNameFull(mo) + ", put" + (latest.length > 1 ? "" : "s") + " " + rdList(latest.map(at)) + ". " + "Below is every release of the four indices since the " + rdElecYear + " election, newest first, each linked to its source.";
+    return {
+      head,
+      dek
+    };
+  }
+  return null;
+}
 function RdApSheet({
   onClose,
   houses,
@@ -52119,7 +53246,9 @@ function RdApSheet({
   toggleTag,
   tagN,
   count,
-  clearAll
+  clearAll,
+  noun1,
+  noun
 }) {
   const [allHouses, setAllHouses] = useState(false);
   React.useEffect(() => {
@@ -52202,7 +53331,7 @@ function RdApSheet({
     type: "button",
     className: "rd-ap-sheetgo",
     onClick: onClose
-  }, "Show ", count, " poll", count === 1 ? "" : "s")));
+  }, "Show ", count, " ", count === 1 ? noun1 : noun)));
 }
 function RdAllPolls(P) {
   const {
@@ -52253,8 +53382,10 @@ function RdAllPolls(P) {
   const D = window.AUSPOL;
   const ofT = ofTotal != null && ofTotal !== total ? ofTotal : null;
   const ofTxt = ofT ? " of " + ofT : "";
+  const noun1 = facet === "confidence" ? "release" : "poll";
+  const noun = noun1 + "s";
   const phone = useNarrow("(max-width: 760px)");
-  const ctlNarrow = useNarrow("(max-width: 1000px)");
+  const ctlNarrow = useNarrow("(max-width: 1140px)");
   const demMid = useNarrow("(max-width: 1150px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
@@ -52281,10 +53412,13 @@ function RdAllPolls(P) {
     const t = rdApDays(p.released);
     return t > upd - winDays * 864e5 && t <= upd && figOf(p).a != null;
   };
-  const win = rows.filter(inToday);
+  const win = (facet === "confidence" ? D.individualPolls : rows).filter(inToday);
   let head = null,
     dek = null;
-  if (today && win.length) {
+  if (facet !== "twopp") ({
+    head,
+    dek
+  } = rdApFacetStory(facet, rows, upd, demSplit) || {});else if (today && win.length) {
     const vals = win.map(p => figOf(p).a);
     const lo = Math.min(...vals),
       hi = Math.max(...vals);
@@ -52308,6 +53442,41 @@ function RdAllPolls(P) {
     setFlatLimit(40);
     setShowAll(false);
   }, [fKey]);
+  const apSec = () => document.getElementById("rd-ap-top");
+  React.useEffect(() => {
+    const sc = apSec() && apSec().querySelector('.rd-ap-tabs > [role="group"]');
+    if (!sc) return undefined;
+    const mark = () => {
+      const over = sc.scrollWidth > sc.clientWidth + 1;
+      sc.classList.toggle("ovf", over);
+      sc.classList.toggle("ovf-l", over && sc.scrollLeft > 1);
+      sc.classList.toggle("ovf-r", over && sc.scrollLeft < sc.scrollWidth - sc.clientWidth - 1);
+    };
+    mark();
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(mark) : null;
+    if (ro) ro.observe(sc);
+    sc.addEventListener("scroll", mark, {
+      passive: true
+    });
+    return () => {
+      if (ro) ro.disconnect();
+      sc.removeEventListener("scroll", mark);
+    };
+  }, []);
+  React.useEffect(() => {
+    const btn = apSec() && apSec().querySelector('.rd-ap-tabs [aria-pressed="true"]');
+    const sc = btn && btn.closest('[role="group"]');
+    if (!sc || sc.scrollWidth <= sc.clientWidth + 1) return;
+    const r = btn.getBoundingClientRect(),
+      s = sc.getBoundingClientRect();
+    if (r.left < s.left + 28) sc.scrollTo({
+      left: sc.scrollLeft + r.left - s.left - 28,
+      behavior: "smooth"
+    });else if (r.right > s.right - 28) sc.scrollTo({
+      left: sc.scrollLeft + r.right - s.right + 28,
+      behavior: "smooth"
+    });
+  }, [facet]);
   const rowKey = p => p.pollster + "|" + p.released;
   const openRow = open ? sorted.find(p => rowKey(p) === open) : null;
   let groups = null,
@@ -52352,8 +53521,11 @@ function RdAllPolls(P) {
     label: "Issues"
   }, {
     id: "demographics",
-    label: phone ? "Groups" : "Demographics"
-  }].filter(f => !window.JUR || !["direction", "issues", "demographics"].includes(f.id));
+    label: "Demographics"
+  }].concat((D.confidenceOnlyPolls || []).length ? [{
+    id: "confidence",
+    label: "Confidence"
+  }] : []).filter(f => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f.id));
   const rowNav = (e, p) => {
     if (e.target !== e.currentTarget) return;
     const id = rowKey(p);
@@ -52463,7 +53635,8 @@ function RdAllPolls(P) {
     leadership: "rd-ap-clead",
     direction: "rd-ap-cdir",
     issues: "rd-ap-ciss",
-    demographics: "rd-ap-cdem"
+    demographics: "rd-ap-cdem",
+    confidence: "rd-ap-cconf"
   }[facet] + (facetSwaps.current ? " rd-ap-sw" : "");
   const th = (label, k, o) => {
     const on = sort.key === k;
@@ -52541,6 +53714,25 @@ function RdAllPolls(P) {
       }
     }, lab))));
   };
+  const CF_LO = 40,
+    CF_HI = 120;
+  const cfx = v => (Math.max(CF_LO, Math.min(CF_HI, v)) - CF_LO) / (CF_HI - CF_LO) * 100;
+  const confPlot = c => c.v + (c.vs === 0 ? 100 : 0);
+  const confInk = c => c.k === "consumer" || c.k === "westpacConsumer" ? "var(--mood-consumer)" : "var(--mood-business)";
+  const confFig = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
+  const confChg = v => (v < 0 ? "−" : v > 0 ? "+" : "") + confFig(Math.abs(v));
+  const CONF_TKS = [40, 60, 80, 100, 120];
+  const confScale = short => React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-ap-cap"
+  }, "100 = neutral; NAB drawn +100"), React.createElement("span", {
+    className: "rd-ap-in"
+  }, (short ? CONF_TKS.filter(v => v === 40 || v === 100 || v === 120) : CONF_TKS).map(v => React.createElement("span", {
+    key: v,
+    className: "rd-ap-tk" + (v === 100 ? " mid" : ""),
+    style: {
+      left: cfx(v) + "%"
+    }
+  }, v === 100 ? "Neutral" : v))));
   const colHead = React.createElement("div", {
     className: "rd-ap-hrow " + cls,
     role: "row"
@@ -52568,13 +53760,7 @@ function RdAllPolls(P) {
     title: "The pollster\u2019s lean against the other pollsters as of this poll \u2013 what the average takes out of it, and the tick on the strip. The House-lean panel below traces it month by month"
   }, "House lean"), React.createElement("span", null)), facet === "primary" && React.createElement(React.Fragment, null, React.createElement("span", {
     className: "rd-ap-pnums rd-ap-hpn"
-  }, prims.map(k => k.id === "oth" ? React.createElement("span", {
-    key: k.id,
-    className: "rd-ap-th",
-    style: {
-      color: k.ink
-    }
-  }, k.lab) : React.createElement(React.Fragment, {
+  }, prims.map(k => React.createElement(React.Fragment, {
     key: k.id
   }, th(k.lab, "p." + k.id, {
     color: k.ink
@@ -52619,9 +53805,7 @@ function RdAllPolls(P) {
     color: "var(--mood-pos)"
   }), th("Wrong", "dir.wrong", {
     color: "var(--mood-neg)"
-  }), React.createElement("span", {
-    className: "rd-ap-th"
-  }, "Unsure"), React.createElement("span", {
+  }), th("Unsure", "dir.unsure"), React.createElement("span", {
     className: "rd-ap-hpic rd-ap-hdir"
   }, React.createElement("span", {
     className: "rd-ap-cap"
@@ -52645,7 +53829,16 @@ function RdAllPolls(P) {
     role: "columnheader",
     "aria-label": "Each party’s gap between the two groups, from stronger with " + spl.lo.toLowerCase() + " to stronger with " + spl.hi.toLowerCase() + " voters",
     className: "rd-ap-hpic"
-  }, demScale(demMid)), React.createElement("span", null)), React.createElement("span", null));
+  }, demScale(demMid)), React.createElement("span", null)), facet === "confidence" && React.createElement(React.Fragment, null, th("Figure", "conf.v", {
+    title: "Sort by the gauge’s printed figure (the mood chart’s dot)"
+  }), React.createElement("span", {
+    role: "columnheader",
+    "aria-label": "Each gauge\u2019s figure on a fixed 40\u2013120 scale, 100 neutral \u2013 NAB\u2019s net balance drawn 100 points up, its figure printed as NAB\u2019s own",
+    className: "rd-ap-hpic"
+  }, confScale(demMid)), th("Change", "conf.chg", {
+    right: true,
+    title: "Change on the gauge’s own previous release – NAB’s rows also carry its trading-conditions reading"
+  }), React.createElement("span", null)), React.createElement("span", null));
   const pollsterCell = p => React.createElement("span", {
     role: "rowheader",
     className: "rd-ap-who"
@@ -53142,6 +54335,62 @@ function RdAllPolls(P) {
       }, pr ? gapTxt(pr.gap[k.id]) : "—")))), React.createElement("div", {
         className: "rd-ap-cpic"
       }, pic));
+    } else if (facet === "confidence") {
+      const c = p.conf;
+      figs = React.createElement("span", {
+        role: "cell",
+        className: "rd-ap-fig"
+      }, React.createElement("b", null, confFig(c.v)), c.cond != null && React.createElement("span", {
+        className: "rd-ap-sub"
+      }, "conditions ", confFig(c.cond)));
+      pic = React.createElement("span", {
+        className: "rd-ap-pic",
+        role: "img",
+        "aria-label": p.client + ", " + confFig(c.v) + (c.chg != null ? ", " + confChg(c.chg) + " on the gauge’s previous release" : "") + (c.vs === 0 ? " – a net balance (0 = neutral), drawn 100 points up" : ", 100 = neutral")
+      }, React.createElement("span", {
+        className: "rd-ap-in"
+      }, [60, 80, 120].map(v => React.createElement("i", {
+        key: v,
+        className: "rd-ap-gl",
+        style: {
+          left: cfx(v) + "%"
+        }
+      })), React.createElement("i", {
+        className: "rd-ap-avg",
+        style: {
+          left: cfx(100) + "%"
+        }
+      }), React.createElement("i", {
+        className: "rd-ap-dot",
+        style: {
+          left: cfx(confPlot(c)) + "%",
+          background: confInk(c)
+        }
+      })));
+      const chgInk = c.chg == null || Math.abs(c.chg) < 0.05 ? null : c.chg > 0 ? "var(--mood-pos)" : "var(--mood-neg)";
+      val = React.createElement("span", {
+        role: "cell",
+        className: "rd-ap-val",
+        style: chgInk ? {
+          color: chgInk
+        } : null
+      }, c.chg != null ? confChg(c.chg) : "—");
+      right1 = React.createElement("b", null, confFig(c.v));
+      right2 = c.chg != null ? React.createElement("span", {
+        className: "rd-ap-sub",
+        style: chgInk ? {
+          color: chgInk
+        } : null
+      }, confChg(c.chg), " on last") : null;
+      body = React.createElement(React.Fragment, null, React.createElement("div", {
+        className: "rd-ap-cpic"
+      }, pic), React.createElement("div", {
+        className: "rd-ap-csub"
+      }, c.chg != null ? React.createElement(React.Fragment, null, "Change ", React.createElement("b", {
+        style: chgInk ? {
+          color: chgInk
+        } : null
+      }, confChg(c.chg)), " on last release") : "The gauge’s first release this term", c.cond != null && React.createElement(React.Fragment, null, "; conditions ", confFig(c.cond))));
     }
     const detail = isOpen && React.createElement("div", {
       className: "rd-ap-open",
@@ -53191,11 +54440,11 @@ function RdAllPolls(P) {
       onClick: toggle,
       tabIndex: 0,
       onKeyDown: e => rowNav(e, p)
-    }, pollsterCell(p), fieldCell(p), sampleCell(p), React.createElement("span", null), figs, pic, val, facet === "twopp" && React.createElement(React.Fragment, null, hlCell, React.createElement("span", null)), React.createElement("button", {
+    }, pollsterCell(p), fieldCell(p), sampleCell(p), React.createElement("span", null), figs, pic, val, facet === "twopp" && React.createElement(React.Fragment, null, hlCell, React.createElement("span", null)), facet === "confidence" && React.createElement("span", null), React.createElement("button", {
       type: "button",
       className: "rd-ap-chev" + (isOpen ? " open" : ""),
       "aria-expanded": isOpen,
-      "aria-label": (isOpen ? "Hide" : "Show") + " the full poll: " + p.pollster + ", " + (p.fieldPending ? "fieldwork TBC" : p.field),
+      "aria-label": (isOpen ? "Hide" : "Show") + " the full " + (facet === "confidence" ? "release" : "poll") + ": " + p.pollster + ", " + (p.fieldPending ? "fieldwork TBC" : p.field),
       onClick: e => {
         e.stopPropagation();
         toggle();
@@ -53216,7 +54465,8 @@ function RdAllPolls(P) {
     const count = n + " poll" + (n === 1 ? "" : "s");
     if (facet === "twopp") {
       const k = g.list.filter(inToday).length;
-      const note = count + (todayTxt && k ? k === n ? ", all in today’s " + todayTxt : ", " + k + " in today’s " + todayTxt : "");
+      const allWord = n === 1 ? "in" : n === 2 ? "both in" : "all in";
+      const note = count + (todayTxt && k ? k === n ? ", " + allWord + " today’s " + todayTxt : ", " + k + " in today’s " + todayTxt : "");
       const avg = monthAvg[g.ym];
       return React.createElement("div", {
         className: "rd-ap-mrow " + cls,
@@ -53255,6 +54505,16 @@ function RdAllPolls(P) {
           borderColor: k.dot
         }
       })))));
+    }
+    if (facet === "confidence") {
+      return React.createElement("div", {
+        className: "rd-ap-mrow " + cls,
+        role: "row",
+        key: "m" + g.ym
+      }, React.createElement("span", {
+        className: "rd-ap-mlab",
+        role: "rowheader"
+      }, React.createElement("b", null, lab), React.createElement("span", null, n + " release" + (n === 1 ? "" : "s"))));
     }
     return React.createElement("div", {
       className: "rd-ap-mrow " + cls,
@@ -53314,7 +54574,9 @@ function RdAllPolls(P) {
     key: id
   }, issHyph(id)))), facet === "demographics" && React.createElement("span", {
     className: "rd-ap-hpic"
-  }, demScale(true)));
+  }, demScale(true)), facet === "confidence" && React.createElement("span", {
+    className: "rd-ap-hpic"
+  }, confScale(true)));
   const NAV = [["rd-ap-top", "The polls"], ["poll-disagreement", "Disagree"], ["house-lean", "Lean"], ["flow-drift", "Flows"]];
   const pinAp = () => {
     const sec = document.getElementById("rd-ap-top");
@@ -53529,7 +54791,7 @@ function RdAllPolls(P) {
     d: "M21 21l-4.3-4.3"
   }))), React.createElement("span", {
     className: "rd-ap-pinn"
-  }, React.createElement("b", null, sorted.length), sorted.length !== total ? " of " + (ofT || total) : ofTxt, " polls")));
+  }, React.createElement("b", null, sorted.length), sorted.length !== total ? " of " + (ofT || total) : ofTxt, " ", noun)));
   const qpop = React.createElement(RdQPop, {
     label: "How the two-party figures are counted, and the pollsters\u2019 published figures",
     align: "left"
@@ -53558,9 +54820,9 @@ function RdAllPolls(P) {
   }, React.createElement("h2", {
     className: "rd-title",
     id: "rd-ap-t"
-  }, "All polls"), React.createElement("span", {
+  }, facet === "confidence" ? "Economic sentiment" : "All polls"), React.createElement("span", {
     className: "rd-meta"
-  }, "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"), !phone && React.createElement("nav", {
+  }, facet === "confidence" ? "Every release of the four confidence indices since the " + rdElecYear + " election" : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"), !phone && React.createElement("nav", {
     className: "rd-eyebrow-tools rd-ap-nav",
     "aria-label": "On this page"
   }, React.createElement("button", {
@@ -53623,7 +54885,7 @@ function RdAllPolls(P) {
     onChange: e => setQ(e.target.value),
     autoCorrect: "off",
     spellCheck: false,
-    placeholder: "Search a pollster, a date or a figure",
+    placeholder: "Search a pollster, a publisher, a date or a figure",
     "aria-label": "Search the polls"
   }), q && React.createElement("button", {
     type: "button",
@@ -53698,11 +54960,11 @@ function RdAllPolls(P) {
     className: "rd-grow"
   }), React.createElement("span", {
     className: "rd-ap-count"
-  }, React.createElement("b", null, sorted.length), sorted.length !== total ? " of " + (ofT || total) : ofTxt, " polls"), React.createElement("button", {
+  }, React.createElement("b", null, sorted.length), sorted.length !== total ? " of " + (ofT || total) : ofTxt, " ", noun), React.createElement("button", {
     type: "button",
     className: phone ? "rd-link rd-ap-csv" : "rd-chip rd-ap-csv",
     onClick: exportCsv,
-    "aria-label": "Download these " + sorted.length + " polls as a CSV file"
+    "aria-label": "Download these " + sorted.length + " " + noun + " as a CSV file"
   }, React.createElement("svg", {
     viewBox: "0 0 24 24",
     width: "14",
@@ -53733,7 +54995,7 @@ function RdAllPolls(P) {
   }, "Clear all")), React.createElement("div", {
     className: "rd-ap-table",
     role: "table",
-    "aria-label": "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election, " + (byDate ? "newest first" : "sorted") + (sorted.length !== total ? ", " + sorted.length + " of " + (ofT || total) : ofT ? ", " + sorted.length + ofTxt : ""),
+    "aria-label": "Every " + RD_AP_POLLS + " " + noun1 + " since the " + rdElecYear + " election, " + (byDate ? "newest first" : "sorted") + (sorted.length !== total ? ", " + sorted.length + " of " + (ofT || total) : ofT ? ", " + sorted.length + ofTxt : ""),
     ref: bodyRef
   }, React.createElement("span", {
     ref: sentRef,
@@ -53746,7 +55008,7 @@ function RdAllPolls(P) {
     key: g.ym
   }, monthRow(g), g.list.map(rowFor))) : flat.map(rowFor), sorted.length === 0 && React.createElement("div", {
     className: "rd-ap-empty"
-  }, "No polls match these filters. ", React.createElement("button", {
+  }, "No ", noun, " match these filters. ", React.createElement("button", {
     type: "button",
     className: "rd-link",
     onClick: clearAll
@@ -53768,7 +55030,7 @@ function RdAllPolls(P) {
     className: "rd-grow"
   }), React.createElement("span", {
     className: "rd-ap-shown"
-  }, nShown, " of ", sorted.length, phone ? "" : " polls shown")), facet === "twopp" && React.createElement(RdKey, {
+  }, nShown, " of ", sorted.length, phone ? "" : " " + noun + " shown")), facet === "twopp" && React.createElement(RdKey, {
     className: "rd-ckey rd-ap-key",
     items: [{
       kind: "dot-solid",
@@ -53874,7 +55136,9 @@ function RdAllPolls(P) {
     toggleTag: toggleTag,
     tagN: tagN,
     count: sorted.length,
-    clearAll: clearAll
+    clearAll: clearAll,
+    noun1: noun1,
+    noun: noun
   }));
 }
 const RD_AP_TERM0 = (() => {
@@ -54680,6 +55944,35 @@ function RdHouseLean({
     if (sec) rdPinScroll([sec.querySelector(".rd-hl-tabs"), sec.querySelector(".rd-ap-pctl")].filter(Boolean));
     onMeasure(onM ? "lnp" : "onp");
   };
+  const spaceFlip = React.useRef(null);
+  spaceFlip.current = view === "tpp" ? flipPick : null;
+  React.useEffect(() => {
+    const sec = document.getElementById("house-lean");
+    if (!sec) return undefined;
+    const inView = {
+      current: false
+    };
+    const io = new IntersectionObserver(es => es.forEach(en => {
+      inView.current = en.isIntersecting;
+    }));
+    io.observe(sec);
+    const key = e => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!spaceFlip.current) return;
+      e.preventDefault();
+      if (!e.repeat) spaceFlip.current();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("keydown", key, true);
+    };
+  }, []);
   const flip = React.createElement("button", {
     type: "button",
     className: "rd-pl-flip",
@@ -56938,6 +58231,10 @@ function MethodNote({
   onInfo
 }) {
   const J = window.JUR;
+  const infoClick = e => {
+    e.preventDefault();
+    onInfo();
+  };
   return React.createElement("footer", {
     className: "method"
   }, React.createElement("div", {
@@ -56955,10 +58252,10 @@ function MethodNote({
     className: "colo-ways"
   }, React.createElement("p", {
     className: "fb-lede"
-  }, onInfo && React.createElement(React.Fragment, null, "How the figures are built is in", " ", React.createElement("button", {
-    type: "button",
+  }, onInfo && React.createElement(React.Fragment, null, "How the figures are built is in", " ", React.createElement("a", {
+    href: "#info",
     className: "hi-term",
-    onClick: onInfo
+    onClick: infoClick
   }, "Info"), ".", " "), "Spot an error, a missing poll, or have any other feedback? Please", " ", React.createElement("a", {
     className: "fb-link",
     href: "/feedback/"
@@ -57012,6 +58309,7 @@ const DemographicsMemo = React.memo(DemographicsPanel);
 const OnSourcesMemo = React.memo(OnSourcesPanel);
 const IssuesMemo = React.memo(IssuesPanel);
 const UndecidedMemo = React.memo(UndecidedPanel);
+const MoodMemo = React.memo(MoodPanel);
 function SnapshotView({
   rangeId: heroRange,
   setRangeId,
@@ -57056,6 +58354,8 @@ function SnapshotView({
   }), React.createElement(IssuesMemo, {
     rangeId: rangeId
   }), React.createElement(UndecidedMemo, {
+    rangeId: rangeId
+  }), React.createElement(MoodMemo, {
     rangeId: rangeId
   })));
 }
@@ -57133,7 +58433,7 @@ const KBD_ROWS = [{
   keys: ["1–9"],
   what: "Pick a numbered party or term on a chips row"
 }, ...(window.JUR ? [] : [{
-  keys: ["1–5"],
+  keys: ["1–6"],
   what: "In the all-polls demographics view, pick the Split by group"
 }]), {
   keys: ["Space"],
