@@ -1941,462 +1941,660 @@
     "v": 87.5,
     "chg": 4.1,
     "url": "https://www.roymorgan.com/findings/9725-anz-roy-morgan-consumer-confidence-may-6",
-    "slug": "9725-anz-roy-morgan-consumer-confidence-may-6"
+    "slug": "9725-anz-roy-morgan-consumer-confidence-may-6",
+    "n": 1034,
+    "fwStart": "2025-04-28",
+    "fwEnd": "2025-05-04"
    },
    {
     "date": "2025-05-13",
     "v": 88.3,
     "chg": 0.8,
     "url": "https://www.roymorgan.com/findings/9730-anz-roy-morgan-consumer-confidence-may-11",
-    "slug": "9730-anz-roy-morgan-consumer-confidence-may-11"
+    "slug": "9730-anz-roy-morgan-consumer-confidence-may-11",
+    "n": 1006,
+    "fwStart": "2025-05-05",
+    "fwEnd": "2025-05-11"
    },
    {
     "date": "2025-05-20",
     "v": 88.8,
     "chg": 0.5,
     "url": "https://www.roymorgan.com/findings/9735-anz-roy-morgan-consumer-confidence-may-18",
-    "slug": "9735-anz-roy-morgan-consumer-confidence-may-18"
+    "slug": "9735-anz-roy-morgan-consumer-confidence-may-18",
+    "n": 1015,
+    "fwStart": "2025-05-12",
+    "fwEnd": "2025-05-18"
    },
    {
     "date": "2025-05-27",
     "v": 87,
     "chg": -1.8,
     "url": "https://www.roymorgan.com/findings/9740-anz-roy-morgan-consumer-confidence-may-25",
-    "slug": "9740-anz-roy-morgan-consumer-confidence-may-25"
+    "slug": "9740-anz-roy-morgan-consumer-confidence-may-25",
+    "n": 1035,
+    "fwStart": "2025-05-19",
+    "fwEnd": "2025-05-25"
    },
    {
     "date": "2025-06-02",
     "v": 86.4,
     "chg": -0.6,
     "url": "https://www.roymorgan.com/findings/9745-anz-roy-morgan-consumer-confidence-june-3",
-    "slug": "9745-anz-roy-morgan-consumer-confidence-june-3"
+    "slug": "9745-anz-roy-morgan-consumer-confidence-june-3",
+    "n": 1006,
+    "fwStart": "2025-05-26",
+    "fwEnd": "2025-06-01"
    },
    {
     "date": "2025-06-11",
     "v": 86.7,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/9750-anz-roy-morgan-consumer-confidence-june-8",
-    "slug": "9750-anz-roy-morgan-consumer-confidence-june-8"
+    "slug": "9750-anz-roy-morgan-consumer-confidence-june-8",
+    "n": 1040,
+    "fwStart": "2025-06-02",
+    "fwEnd": "2025-06-08"
    },
    {
     "date": "2025-06-17",
     "v": 85.4,
     "chg": -1.3,
     "url": "https://www.roymorgan.com/findings/9755-anz-roy-morgan-consumer-confidence-june-17",
-    "slug": "9755-anz-roy-morgan-consumer-confidence-june-17"
+    "slug": "9755-anz-roy-morgan-consumer-confidence-june-17",
+    "n": 1003,
+    "fwStart": "2025-06-09",
+    "fwEnd": "2025-06-15"
    },
    {
     "date": "2025-06-24",
     "v": 86.7,
     "chg": 1.3,
     "url": "https://www.roymorgan.com/findings/9760-anz-roy-morgan-consumer-confidence-june-24",
-    "slug": "9760-anz-roy-morgan-consumer-confidence-june-24"
+    "slug": "9760-anz-roy-morgan-consumer-confidence-june-24",
+    "n": 1002,
+    "fwStart": "2025-06-16",
+    "fwEnd": "2025-06-22"
    },
    {
     "date": "2025-07-01",
     "v": 87.2,
     "chg": 0.5,
     "url": "https://www.roymorgan.com/findings/9765-anz-roy-morgan-consumer-confidence-july-1",
-    "slug": "9765-anz-roy-morgan-consumer-confidence-july-1"
+    "slug": "9765-anz-roy-morgan-consumer-confidence-july-1",
+    "n": 1001,
+    "fwStart": "2025-06-23",
+    "fwEnd": "2025-06-29"
    },
    {
     "date": "2025-07-08",
     "v": 88.6,
     "chg": 1.4,
     "url": "https://www.roymorgan.com/findings/9770-anz-roy-morgan-consumer-confidence-july-8",
-    "slug": "9770-anz-roy-morgan-consumer-confidence-july-8"
+    "slug": "9770-anz-roy-morgan-consumer-confidence-july-8",
+    "n": 1001,
+    "fwStart": "2025-06-30",
+    "fwEnd": "2025-07-06"
    },
    {
     "date": "2025-07-15",
     "v": 86.5,
     "chg": -2.1,
     "url": "https://www.roymorgan.com/findings/9775-anz-roy-morgan-consumer-confidence-july-15",
-    "slug": "9775-anz-roy-morgan-consumer-confidence-july-15"
+    "slug": "9775-anz-roy-morgan-consumer-confidence-july-15",
+    "n": 1029,
+    "fwStart": "2025-07-07",
+    "fwEnd": "2025-07-13"
    },
    {
     "date": "2025-07-22",
     "v": 86.3,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/9780-anz-roy-morgan-consumer-confidence-july-22",
-    "slug": "9780-anz-roy-morgan-consumer-confidence-july-22"
+    "slug": "9780-anz-roy-morgan-consumer-confidence-july-22",
+    "n": 1005,
+    "fwStart": "2025-07-14",
+    "fwEnd": "2025-07-20"
    },
    {
     "date": "2025-07-29",
     "v": 86.7,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/9785-anz-roy-morgan-consumer-confidence-july-29",
-    "slug": "9785-anz-roy-morgan-consumer-confidence-july-29"
+    "slug": "9785-anz-roy-morgan-consumer-confidence-july-29",
+    "n": 1046,
+    "fwStart": "2025-07-21",
+    "fwEnd": "2025-07-27"
    },
    {
     "date": "2025-08-05",
     "v": 90.6,
     "chg": 3.9,
     "url": "https://www.roymorgan.com/findings/9790-anz-roy-morgan-consumer-confidence-august-5",
-    "slug": "9790-anz-roy-morgan-consumer-confidence-august-5"
+    "slug": "9790-anz-roy-morgan-consumer-confidence-august-5",
+    "n": 1012,
+    "fwStart": "2025-07-28",
+    "fwEnd": "2025-08-03"
    },
    {
     "date": "2025-08-12",
     "v": 89.3,
     "chg": -1.3,
     "url": "https://www.roymorgan.com/findings/9795-anz-roy-morgan-consumer-confidence-august-12",
-    "slug": "9795-anz-roy-morgan-consumer-confidence-august-12"
+    "slug": "9795-anz-roy-morgan-consumer-confidence-august-12",
+    "n": 1034,
+    "fwStart": "2025-08-04",
+    "fwEnd": "2025-08-10"
    },
    {
     "date": "2025-08-19",
     "v": 89.4,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/9800-anz-roy-morgan-consumer-confidence-august-19",
-    "slug": "9800-anz-roy-morgan-consumer-confidence-august-19"
+    "slug": "9800-anz-roy-morgan-consumer-confidence-august-19",
+    "n": 1007,
+    "fwStart": "2025-08-11",
+    "fwEnd": "2025-08-17"
    },
    {
     "date": "2025-08-26",
     "v": 86,
     "chg": -3.4,
     "url": "https://www.roymorgan.com/findings/9805-anz-roy-morgan-consumer-confidence-august-26",
-    "slug": "9805-anz-roy-morgan-consumer-confidence-august-26"
+    "slug": "9805-anz-roy-morgan-consumer-confidence-august-26",
+    "n": 1010,
+    "fwStart": "2025-08-18",
+    "fwEnd": "2025-08-24"
    },
    {
     "date": "2025-09-02",
     "v": 88,
     "chg": 2,
     "url": "https://www.roymorgan.com/findings/9810-anz-roy-morgan-consumer-confidence-september-2",
-    "slug": "9810-anz-roy-morgan-consumer-confidence-september-2"
+    "slug": "9810-anz-roy-morgan-consumer-confidence-september-2",
+    "n": 1037,
+    "fwStart": "2025-08-25",
+    "fwEnd": "2025-08-31"
    },
    {
     "date": "2025-09-09",
     "v": 89.3,
     "chg": 1.3,
     "url": "https://www.roymorgan.com/findings/9815-anz-roy-morgan-consumer-confidence-september-9",
-    "slug": "9815-anz-roy-morgan-consumer-confidence-september-9"
+    "slug": "9815-anz-roy-morgan-consumer-confidence-september-9",
+    "n": 1023,
+    "fwStart": "2025-09-01",
+    "fwEnd": "2025-09-07"
    },
    {
     "date": "2025-09-16",
     "v": 85.9,
     "chg": -3.4,
     "url": "https://www.roymorgan.com/findings/9820-anz-roy-morgan-consumer-confidence-september-16",
-    "slug": "9820-anz-roy-morgan-consumer-confidence-september-16"
+    "slug": "9820-anz-roy-morgan-consumer-confidence-september-16",
+    "n": 1027,
+    "fwStart": "2025-09-08",
+    "fwEnd": "2025-09-14"
    },
    {
     "date": "2025-09-23",
     "v": 84.6,
     "chg": -1.3,
     "url": "https://www.roymorgan.com/findings/9825-anz-roy-morgan-consumer-confidence-september-23",
-    "slug": "9825-anz-roy-morgan-consumer-confidence-september-23"
+    "slug": "9825-anz-roy-morgan-consumer-confidence-september-23",
+    "n": 1024,
+    "fwStart": "2025-09-15",
+    "fwEnd": "2025-09-21"
    },
    {
     "date": "2025-09-30",
     "v": 86.3,
     "chg": 1.7,
     "url": "https://www.roymorgan.com/findings/9830-anz-roy-morgan-consumer-confidence-september-30",
-    "slug": "9830-anz-roy-morgan-consumer-confidence-september-30"
+    "slug": "9830-anz-roy-morgan-consumer-confidence-september-30",
+    "n": 1024,
+    "fwStart": "2025-09-22",
+    "fwEnd": "2025-09-28"
    },
    {
     "date": "2025-10-07",
     "v": 85.1,
     "chg": -1.2,
     "url": "https://www.roymorgan.com/findings/9835-anz-roy-morgan-consumer-confidence-october-7",
-    "slug": "9835-anz-roy-morgan-consumer-confidence-october-7"
+    "slug": "9835-anz-roy-morgan-consumer-confidence-october-7",
+    "n": 1012,
+    "fwStart": "2025-09-29",
+    "fwEnd": "2025-10-05"
    },
    {
     "date": "2025-10-14",
     "v": 83,
     "chg": -2.1,
     "url": "https://www.roymorgan.com/findings/9840-anz-roy-morgan-consumer-confidence-october-14",
-    "slug": "9840-anz-roy-morgan-consumer-confidence-october-14"
+    "slug": "9840-anz-roy-morgan-consumer-confidence-october-14",
+    "n": 1008,
+    "fwStart": "2025-10-06",
+    "fwEnd": "2025-10-12"
    },
    {
     "date": "2025-10-21",
     "v": 84,
     "chg": 1,
     "url": "https://www.roymorgan.com/findings/9845-anz-roy-morgan-consumer-confidence-october-21",
-    "slug": "9845-anz-roy-morgan-consumer-confidence-october-21"
+    "slug": "9845-anz-roy-morgan-consumer-confidence-october-21",
+    "n": 1031,
+    "fwStart": "2025-10-13",
+    "fwEnd": "2025-10-19"
    },
    {
     "date": "2025-10-28",
     "v": 85.8,
     "chg": 1.8,
     "url": "https://www.roymorgan.com/findings/9850-anz-roy-morgan-consumer-confidence-october-28",
-    "slug": "9850-anz-roy-morgan-consumer-confidence-october-28"
+    "slug": "9850-anz-roy-morgan-consumer-confidence-october-28",
+    "n": 1030,
+    "fwStart": "2025-10-20",
+    "fwEnd": "2025-10-26"
    },
    {
     "date": "2025-11-04",
     "v": 84.5,
     "chg": -1.3,
     "url": "https://www.roymorgan.com/findings/9855-anz-roy-morgan-consumer-confidence-november-4",
-    "slug": "9855-anz-roy-morgan-consumer-confidence-november-4"
+    "slug": "9855-anz-roy-morgan-consumer-confidence-november-4",
+    "n": 1044,
+    "fwStart": "2025-10-27",
+    "fwEnd": "2025-11-02"
    },
    {
     "date": "2025-11-11",
     "v": 83.5,
     "chg": -1,
     "url": "https://www.roymorgan.com/findings/9860-anz-roy-morgan-consumer-confidence-november-11",
-    "slug": "9860-anz-roy-morgan-consumer-confidence-november-11"
+    "slug": "9860-anz-roy-morgan-consumer-confidence-november-11",
+    "n": 1024,
+    "fwStart": "2025-11-03",
+    "fwEnd": "2025-11-09"
    },
    {
     "date": "2025-11-18",
     "v": 84.2,
     "chg": 0.7,
     "url": "https://www.roymorgan.com/findings/9865-anz-roy-morgan-consumer-confidence-november-18",
-    "slug": "9865-anz-roy-morgan-consumer-confidence-november-18"
+    "slug": "9865-anz-roy-morgan-consumer-confidence-november-18",
+    "n": 1041,
+    "fwStart": "2025-11-10",
+    "fwEnd": "2025-11-16"
    },
    {
     "date": "2025-11-25",
     "v": 87.1,
     "chg": 2.9,
     "url": "https://www.roymorgan.com/findings/9870-anz-roy-morgan-consumer-confidence-november-25",
-    "slug": "9870-anz-roy-morgan-consumer-confidence-november-25"
+    "slug": "9870-anz-roy-morgan-consumer-confidence-november-25",
+    "n": 1019,
+    "fwStart": "2025-11-17",
+    "fwEnd": "2025-11-23"
    },
    {
     "date": "2025-12-02",
     "v": 85.5,
     "chg": -1.6,
     "url": "https://www.roymorgan.com/findings/9875-anz-roy-morgan-consumer-confidence-december-2",
-    "slug": "9875-anz-roy-morgan-consumer-confidence-december-2"
+    "slug": "9875-anz-roy-morgan-consumer-confidence-december-2",
+    "n": 1052,
+    "fwStart": "2025-11-24",
+    "fwEnd": "2025-11-30"
    },
    {
     "date": "2025-12-09",
     "v": 83.5,
     "chg": -2,
     "url": "https://www.roymorgan.com/findings/9880-anz-roy-morgan-consumer-confidence-december-9",
-    "slug": "9880-anz-roy-morgan-consumer-confidence-december-9"
+    "slug": "9880-anz-roy-morgan-consumer-confidence-december-9",
+    "n": 1022,
+    "fwStart": "2025-12-01",
+    "fwEnd": "2025-12-07"
    },
    {
     "date": "2025-12-16",
     "v": 81.5,
     "chg": -2,
     "url": "https://www.roymorgan.com/findings/9885-anz-roy-morgan-consumer-confidence-december-16",
-    "slug": "9885-anz-roy-morgan-consumer-confidence-december-16"
+    "slug": "9885-anz-roy-morgan-consumer-confidence-december-16",
+    "n": 1016,
+    "fwStart": "2025-12-08",
+    "fwEnd": "2025-12-14"
    },
    {
     "date": "2026-01-13",
     "v": 84.5,
     "chg": 3,
     "url": "https://www.roymorgan.com/findings/9890-anz-roy-morgan-consumer-confidence-january-13",
-    "slug": "9890-anz-roy-morgan-consumer-confidence-january-13"
+    "slug": "9890-anz-roy-morgan-consumer-confidence-january-13",
+    "n": 1005,
+    "fwStart": "2026-01-05",
+    "fwEnd": "2026-01-11"
    },
    {
     "date": "2026-01-20",
     "v": 79.3,
     "chg": -5.2,
     "url": "https://www.roymorgan.com/findings/9895-anz-roy-morgan-consumer-confidence-january-20",
-    "slug": "9895-anz-roy-morgan-consumer-confidence-january-20"
+    "slug": "9895-anz-roy-morgan-consumer-confidence-january-20",
+    "n": 1009,
+    "fwStart": "2026-01-12",
+    "fwEnd": "2026-01-18"
    },
    {
     "date": "2026-01-28",
     "v": 84,
     "chg": 4.7,
     "url": "https://www.roymorgan.com/findings/9900-anz-roy-morgan-consumer-confidence-january-28",
-    "slug": "9900-anz-roy-morgan-consumer-confidence-january-28"
+    "slug": "9900-anz-roy-morgan-consumer-confidence-january-28",
+    "n": 1009,
+    "fwStart": "2026-01-19",
+    "fwEnd": "2026-01-25"
    },
    {
     "date": "2026-02-03",
     "v": 80.5,
     "chg": -3.5,
     "url": "https://www.roymorgan.com/findings/9905-anz-roy-morgan-consumer-confidence-february-3",
-    "slug": "9905-anz-roy-morgan-consumer-confidence-february-3"
+    "slug": "9905-anz-roy-morgan-consumer-confidence-february-3",
+    "n": 1007,
+    "fwStart": "2026-01-26",
+    "fwEnd": "2026-02-01"
    },
    {
     "date": "2026-02-10",
     "v": 76.9,
     "chg": -3.6,
     "url": "https://www.roymorgan.com/findings/9910-anz-roy-morgan-consumer-confidence-february-10",
-    "slug": "9910-anz-roy-morgan-consumer-confidence-february-10"
+    "slug": "9910-anz-roy-morgan-consumer-confidence-february-10",
+    "n": 1041,
+    "fwStart": "2026-02-02",
+    "fwEnd": "2026-02-08"
    },
    {
     "date": "2026-02-17",
     "v": 77.1,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/9915-anz-roy-morgan-consumer-confidence-february-17",
-    "slug": "9915-anz-roy-morgan-consumer-confidence-february-17"
+    "slug": "9915-anz-roy-morgan-consumer-confidence-february-17",
+    "n": 1010,
+    "fwStart": "2026-02-09",
+    "fwEnd": "2026-02-15"
    },
    {
     "date": "2026-02-24",
     "v": 80.2,
     "chg": 3.1,
     "url": "https://www.roymorgan.com/findings/9920-anz-roy-morgan-consumer-confidence-february-24",
-    "slug": "9920-anz-roy-morgan-consumer-confidence-february-24"
+    "slug": "9920-anz-roy-morgan-consumer-confidence-february-24",
+    "n": 1025,
+    "fwStart": "2026-02-16",
+    "fwEnd": "2026-02-22"
    },
    {
     "date": "2026-03-03",
     "v": 77.1,
     "chg": -3.1,
     "url": "https://www.roymorgan.com/findings/9925-anz-roy-morgan-consumer-confidence-march-3",
-    "slug": "9925-anz-roy-morgan-consumer-confidence-march-3"
+    "slug": "9925-anz-roy-morgan-consumer-confidence-march-3",
+    "n": 1033,
+    "fwStart": "2026-02-23",
+    "fwEnd": "2026-03-01"
    },
    {
     "date": "2026-03-10",
     "v": 73.4,
     "chg": -3.7,
     "url": "https://www.roymorgan.com/findings/9930-anz-roy-morgan-consumer-confidence-march-10",
-    "slug": "9930-anz-roy-morgan-consumer-confidence-march-10"
+    "slug": "9930-anz-roy-morgan-consumer-confidence-march-10",
+    "n": 1001,
+    "fwStart": "2026-02-23",
+    "fwEnd": "2026-03-01"
    },
    {
     "date": "2026-03-17",
     "v": 68.5,
     "chg": -4.9,
     "url": "https://www.roymorgan.com/findings/9935-anz-roy-morgan-consumer-confidence-march-17",
-    "slug": "9935-anz-roy-morgan-consumer-confidence-march-17"
+    "slug": "9935-anz-roy-morgan-consumer-confidence-march-17",
+    "n": 1042,
+    "fwStart": "2026-03-09",
+    "fwEnd": "2026-03-15"
    },
    {
     "date": "2026-03-24",
     "v": 63.1,
     "chg": -5.4,
     "url": "https://www.roymorgan.com/findings/9940-anz-roy-morgan-consumer-confidence-march-24",
-    "slug": "9940-anz-roy-morgan-consumer-confidence-march-24"
+    "slug": "9940-anz-roy-morgan-consumer-confidence-march-24",
+    "n": 1039,
+    "fwStart": "2026-03-16",
+    "fwEnd": "2026-03-22"
    },
    {
     "date": "2026-03-31",
     "v": 58.8,
     "chg": -4.3,
     "url": "https://www.roymorgan.com/findings/9945-anz-roy-morgan-consumer-confidence-march-31",
-    "slug": "9945-anz-roy-morgan-consumer-confidence-march-31"
+    "slug": "9945-anz-roy-morgan-consumer-confidence-march-31",
+    "n": 1031,
+    "fwStart": "2026-03-23",
+    "fwEnd": "2026-03-29"
    },
    {
     "date": "2026-04-08",
     "v": 62.3,
     "chg": 3.5,
     "url": "https://www.roymorgan.com/findings/9950-anz-roy-morgan-consumer-confidence-april-8",
-    "slug": "9950-anz-roy-morgan-consumer-confidence-april-8"
+    "slug": "9950-anz-roy-morgan-consumer-confidence-april-8",
+    "n": 1004,
+    "fwStart": "2026-03-30",
+    "fwEnd": "2026-04-05"
    },
    {
     "date": "2026-04-14",
     "v": 64.5,
     "chg": 2.2,
     "url": "https://www.roymorgan.com/findings/9955-anz-roy-morgan-consumer-confidence-april-14",
-    "slug": "9955-anz-roy-morgan-consumer-confidence-april-14"
+    "slug": "9955-anz-roy-morgan-consumer-confidence-april-14",
+    "n": 1016,
+    "fwStart": "2026-04-06",
+    "fwEnd": "2026-04-12"
    },
    {
     "date": "2026-04-21",
     "v": 64.3,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/9960-anz-roy-morgan-consumer-confidence-april-21",
-    "slug": "9960-anz-roy-morgan-consumer-confidence-april-21"
+    "slug": "9960-anz-roy-morgan-consumer-confidence-april-21",
+    "n": 1013,
+    "fwStart": "2026-04-13",
+    "fwEnd": "2026-04-19"
    },
    {
     "date": "2026-04-28",
     "v": 67.8,
     "chg": 3.5,
     "url": "https://www.roymorgan.com/findings/9965-anz-roy-morgan-consumer-confidence-april-28",
-    "slug": "9965-anz-roy-morgan-consumer-confidence-april-28"
+    "slug": "9965-anz-roy-morgan-consumer-confidence-april-28",
+    "n": 1002,
+    "fwStart": "2026-04-20",
+    "fwEnd": "2026-04-26"
    },
    {
     "date": "2026-05-05",
     "v": 67.2,
     "chg": -0.6,
     "url": "https://www.roymorgan.com/findings/9970-anz-roy-morgan-consumer-confidence-may-5",
-    "slug": "9970-anz-roy-morgan-consumer-confidence-may-5"
+    "slug": "9970-anz-roy-morgan-consumer-confidence-may-5",
+    "n": 1003,
+    "fwStart": "2026-04-27",
+    "fwEnd": "2026-05-03"
    },
    {
     "date": "2026-05-12",
     "v": 64.1,
     "chg": -3.1,
     "url": "https://www.roymorgan.com/findings/9975-anz-roy-morgan-consumer-confidence-may-12",
-    "slug": "9975-anz-roy-morgan-consumer-confidence-may-12"
+    "slug": "9975-anz-roy-morgan-consumer-confidence-may-12",
+    "n": 1044,
+    "fwStart": "2026-05-04",
+    "fwEnd": "2026-05-10"
    },
    {
     "date": "2026-05-19",
     "v": 66.4,
     "chg": 2.3,
     "url": "https://www.roymorgan.com/findings/9980-anz-roy-morgan-consumer-confidence-may-19",
-    "slug": "9980-anz-roy-morgan-consumer-confidence-may-19"
+    "slug": "9980-anz-roy-morgan-consumer-confidence-may-19",
+    "n": 1025,
+    "fwStart": "2026-05-11",
+    "fwEnd": "2026-05-17"
    },
    {
     "date": "2026-05-26",
     "v": 66.1,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/9985-anz-roy-morgan-consumer-confidence-may-26",
-    "slug": "9985-anz-roy-morgan-consumer-confidence-may-26"
+    "slug": "9985-anz-roy-morgan-consumer-confidence-may-26",
+    "n": 1032,
+    "fwStart": "2026-05-18",
+    "fwEnd": "2026-05-24"
    },
    {
     "date": "2026-06-02",
     "v": 68.8,
     "chg": 2.7,
     "url": "https://www.roymorgan.com/findings/9990-anz-roy-morgan-consumer-confidence-june-2",
-    "slug": "9990-anz-roy-morgan-consumer-confidence-june-2"
+    "slug": "9990-anz-roy-morgan-consumer-confidence-june-2",
+    "n": 1030,
+    "fwStart": "2026-05-25",
+    "fwEnd": "2026-05-31"
    },
    {
     "date": "2026-06-10",
     "v": 70.8,
     "chg": 2,
     "url": "https://www.roymorgan.com/findings/9995-anz-roy-morgan-consumer-confidence-june-10",
-    "slug": "9995-anz-roy-morgan-consumer-confidence-june-10"
+    "slug": "9995-anz-roy-morgan-consumer-confidence-june-10",
+    "n": 1026,
+    "fwStart": "2026-06-01",
+    "fwEnd": "2026-06-07"
    },
    {
     "date": "2026-06-16",
     "v": 70.7,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/10000-anz-roy-morgan-consumer-confidence-june-16",
-    "slug": "10000-anz-roy-morgan-consumer-confidence-june-16"
+    "slug": "10000-anz-roy-morgan-consumer-confidence-june-16",
+    "n": 1027,
+    "fwStart": "2026-06-08",
+    "fwEnd": "2026-06-14"
    },
    {
     "date": "2026-06-23",
     "v": 72.8,
     "chg": 2.1,
     "url": "https://www.roymorgan.com/findings/10005-anz-roy-morgan-consumer-confidence-june-23",
-    "slug": "10005-anz-roy-morgan-consumer-confidence-june-23"
+    "slug": "10005-anz-roy-morgan-consumer-confidence-june-23",
+    "n": 1030,
+    "fwStart": "2026-06-15",
+    "fwEnd": "2026-06-21"
    },
    {
     "date": "2026-06-30",
     "v": 75.9,
     "chg": 3.1,
     "url": "https://www.roymorgan.com/findings/10010-anz-roy-morgan-consumer-confidence-june-30",
-    "slug": "10010-anz-roy-morgan-consumer-confidence-june-30"
+    "slug": "10010-anz-roy-morgan-consumer-confidence-june-30",
+    "n": 1073,
+    "fwStart": "2026-06-22",
+    "fwEnd": "2026-06-28"
    },
    {
     "date": "2026-07-07",
     "v": 74.7,
     "chg": -1.2,
     "url": "https://www.roymorgan.com/findings/10015-anz-roy-morgan-consumer-confidence-july-7",
-    "slug": "10015-anz-roy-morgan-consumer-confidence-july-7"
+    "slug": "10015-anz-roy-morgan-consumer-confidence-july-7",
+    "n": 1022,
+    "fwStart": "2026-06-29",
+    "fwEnd": "2026-07-05"
    },
    {
     "date": "2026-07-14",
     "v": 75.3,
     "chg": 0.6,
     "url": "https://www.roymorgan.com/findings/10020-anz-roy-morgan-consumer-confidence-july-14",
-    "slug": "10020-anz-roy-morgan-consumer-confidence-july-14"
+    "slug": "10020-anz-roy-morgan-consumer-confidence-july-14",
+    "n": 1031,
+    "fwStart": "2026-07-06",
+    "fwEnd": "2026-07-12"
    },
    {
     "date": "2026-07-21",
     "v": 75.6,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/10025-anz-roy-morgan-consumer-confidence-july-21",
-    "slug": "10025-anz-roy-morgan-consumer-confidence-july-21"
+    "slug": "10025-anz-roy-morgan-consumer-confidence-july-21",
+    "n": 1041,
+    "fwStart": "2026-07-13",
+    "fwEnd": "2026-07-19"
    },
    {
     "date": "2026-07-28",
     "v": 71.2,
     "chg": -4.4,
     "url": "https://www.roymorgan.com/findings/10030-anz-roy-morgan-consumer-confidence-july-28",
-    "slug": "10030-anz-roy-morgan-consumer-confidence-july-28"
+    "slug": "10030-anz-roy-morgan-consumer-confidence-july-28",
+    "n": 1047,
+    "fwStart": "2026-07-20",
+    "fwEnd": "2026-07-26"
    },
    {
     "date": "2026-08-04",
     "v": 74.7,
     "chg": 3.5,
     "url": "https://www.roymorgan.com/findings/10035-anz-roy-morgan-consumer-confidence-august-4",
-    "slug": "10035-anz-roy-morgan-consumer-confidence-august-4"
+    "slug": "10035-anz-roy-morgan-consumer-confidence-august-4",
+    "n": 1009,
+    "fwStart": "2026-07-27",
+    "fwEnd": "2026-08-02"
    },
    {
     "date": "2026-08-11",
     "v": 75,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/10040-anz-roy-morgan-consumer-confidence-august-11",
-    "slug": "10040-anz-roy-morgan-consumer-confidence-august-11"
+    "slug": "10040-anz-roy-morgan-consumer-confidence-august-11",
+    "n": 1046,
+    "fwStart": "2026-08-03",
+    "fwEnd": "2026-08-09"
    },
    {
     "date": "2026-08-18",
     "v": 76.5,
     "chg": 1.5,
     "url": "https://www.roymorgan.com/findings/10045-anz-roy-morgan-consumer-confidence-august-18",
-    "slug": "10045-anz-roy-morgan-consumer-confidence-august-18"
+    "slug": "10045-anz-roy-morgan-consumer-confidence-august-18",
+    "n": 1048,
+    "fwStart": "2026-08-10",
+    "fwEnd": "2026-08-16"
    },
    {
     "date": "2026-08-25",
     "v": 77.5,
     "chg": 1,
     "url": "https://www.roymorgan.com/findings/10045-anz-roy-morgan-consumer-confidence-august-25",
-    "slug": "10045-anz-roy-morgan-consumer-confidence-august-25"
+    "slug": "10045-anz-roy-morgan-consumer-confidence-august-25",
+    "n": 1054,
+    "fwStart": "2026-08-17",
+    "fwEnd": "2026-08-23"
    },
    {
     "date": "2026-09-01",
@@ -3006,7 +3204,8 @@
     "chg": -9.3,
     "url": "https://www.roymorgan.com/findings/9933-roy-morgan-business-confidence-april-2025",
     "slug": "9933-roy-morgan-business-confidence-april-2025",
-    "fwm": "2025-04"
+    "fwm": "2025-04",
+    "n": 1549
    },
    {
     "date": "2025-06-11",
@@ -3014,7 +3213,8 @@
     "chg": 2.9,
     "url": "https://www.roymorgan.com/findings/9953-roy-morgan-business-confidence-may-2025",
     "slug": "9953-roy-morgan-business-confidence-may-2025",
-    "fwm": "2025-05"
+    "fwm": "2025-05",
+    "n": 1218
    },
    {
     "date": "2025-07-07",
@@ -3022,7 +3222,8 @@
     "chg": 2.8,
     "url": "https://www.roymorgan.com/findings/9993-roy-morgan-business-confidence-june-2025",
     "slug": "9993-roy-morgan-business-confidence-june-2025",
-    "fwm": "2025-06"
+    "fwm": "2025-06",
+    "n": 1215
    },
    {
     "date": "2025-08-04",
@@ -3038,7 +3239,8 @@
     "chg": -4.4,
     "url": "https://www.roymorgan.com/findings/10004-roy-morgan-business-confidence-august-2025",
     "slug": "10004-roy-morgan-business-confidence-august-2025",
-    "fwm": "2025-08"
+    "fwm": "2025-08",
+    "n": 1189
    },
    {
     "date": "2025-10-07",
@@ -3046,7 +3248,8 @@
     "chg": 3,
     "url": "https://www.roymorgan.com/findings/10044-roy-morgan-business-confidence-september-2025",
     "slug": "10044-roy-morgan-business-confidence-september-2025",
-    "fwm": "2025-09"
+    "fwm": "2025-09",
+    "n": 1198
    },
    {
     "date": "2025-11-11",
@@ -3062,7 +3265,8 @@
     "chg": -3,
     "url": "https://www.roymorgan.com/findings/10096-roy-morgan-business-confidence-november-2025",
     "slug": "10096-roy-morgan-business-confidence-november-2025",
-    "fwm": "2025-11"
+    "fwm": "2025-11",
+    "n": 1233
    },
    {
     "date": "2026-01-09",
@@ -3070,7 +3274,8 @@
     "chg": 6.3,
     "url": "https://www.roymorgan.com/findings/10106-roy-morgan-business-confidence-december-2025",
     "slug": "10106-roy-morgan-business-confidence-december-2025",
-    "fwm": "2025-12"
+    "fwm": "2025-12",
+    "n": 1174
    },
    {
     "date": "2026-02-10",
@@ -3078,7 +3283,8 @@
     "chg": -7.6,
     "url": "https://www.roymorgan.com/findings/10116-roy-morgan-business-confidence-january-2026",
     "slug": "10116-roy-morgan-business-confidence-january-2026",
-    "fwm": "2026-01"
+    "fwm": "2026-01",
+    "n": 940
    },
    {
     "date": "2026-03-17",
@@ -3086,7 +3292,8 @@
     "chg": -8.8,
     "url": "https://www.roymorgan.com/findings/10166-roy-morgan-business-confidence-february-2026",
     "slug": "10166-roy-morgan-business-confidence-february-2026",
-    "fwm": "2026-02"
+    "fwm": "2026-02",
+    "n": 1053
    },
    {
     "date": "2026-04-08",
@@ -3094,7 +3301,8 @@
     "chg": 2.1,
     "url": "https://www.roymorgan.com/findings/10186-roy-morgan-business-confidence-march-2026",
     "slug": "10186-roy-morgan-business-confidence-march-2026",
-    "fwm": "2026-03"
+    "fwm": "2026-03",
+    "n": 1054
    },
    {
     "date": "2026-05-04",
@@ -3102,7 +3310,8 @@
     "chg": -14.2,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plummeted-14-2pts-to-a-new-record-low-of-only-76-5-in-april-as-the-conflict-in-the-middle-east-continued-without-resolution",
     "slug": "roy-morgan-business-confidence-plummeted-14-2pts-to-a-new-record-low-of-only-76-5-in-april-as-the-conflict-in-the-middle-east-continued-without-resolution",
-    "fwm": "2026-04"
+    "fwm": "2026-04",
+    "n": 1368
    },
    {
     "date": "2026-06-10",
@@ -3110,7 +3319,8 @@
     "chg": null,
     "url": "https://www.roymorgan.com/findings/10236-roy-morgan-business-confidence-may-2026",
     "slug": "10236-roy-morgan-business-confidence-may-2026",
-    "fwm": "2026-05"
+    "fwm": "2026-05",
+    "n": 1181
    },
    {
     "date": "2026-07-07",
@@ -3126,7 +3336,8 @@
     "chg": -1.5,
     "url": "https://www.roymorgan.com/findings/10296-roy-morgan-business-confidence-july-2026",
     "slug": "10296-roy-morgan-business-confidence-july-2026",
-    "fwm": "2026-07"
+    "fwm": "2026-07",
+    "n": 1097
    },
    {
     "date": "2026-09-08",
@@ -3393,112 +3604,160 @@
     "v": 92.1,
     "chg": 2,
     "url": "https://www.westpaciq.com.au/economics/2025/05/consumer-sentiment-may-2025/",
-    "slug": "consumer-sentiment-may-2025"
+    "slug": "consumer-sentiment-may-2025",
+    "n": 1200,
+    "fwStart": "2025-05-05",
+    "fwEnd": "2025-05-09"
    },
    {
     "date": "2025-06-10",
     "v": 92.6,
     "chg": 0.5,
     "url": "https://www.westpaciq.com.au/economics/2025/06/consumer-sentiment-june-2025/",
-    "slug": "consumer-sentiment-june-2025"
+    "slug": "consumer-sentiment-june-2025",
+    "n": 1200,
+    "fwStart": "2025-06-03",
+    "fwEnd": "2025-06-05"
    },
    {
     "date": "2025-07-15",
     "v": 93.1,
     "chg": 0.5,
     "url": "https://www.westpaciq.com.au/economics/2025/07/consumer-sentiment-june-2025/",
-    "slug": "consumer-sentiment-june-2025"
+    "slug": "consumer-sentiment-june-2025",
+    "n": 1200,
+    "fwStart": "2025-07-07",
+    "fwEnd": "2025-07-11"
    },
    {
     "date": "2025-08-19",
     "v": 98.5,
     "chg": 5.4,
     "url": "https://www.westpaciq.com.au/economics/2025/08/consumer-sentiment-august-2025/",
-    "slug": "consumer-sentiment-august-2025"
+    "slug": "consumer-sentiment-august-2025",
+    "n": 1200,
+    "fwStart": "2025-08-11",
+    "fwEnd": "2025-08-15"
    },
    {
     "date": "2025-09-09",
     "v": 95.4,
     "chg": -3.1,
     "url": "https://www.westpaciq.com.au/economics/2025/09/consumer-sentiment-september-2025/",
-    "slug": "consumer-sentiment-september-2025"
+    "slug": "consumer-sentiment-september-2025",
+    "n": 1200,
+    "fwStart": "2025-09-01",
+    "fwEnd": "2025-09-05"
    },
    {
     "date": "2025-10-07",
     "v": 92.1,
     "chg": -3.3,
     "url": "https://www.westpaciq.com.au/economics/2025/10/consumer-sentiment-october-2025/",
-    "slug": "consumer-sentiment-october-2025"
+    "slug": "consumer-sentiment-october-2025",
+    "n": 1200,
+    "fwStart": "2025-09-29",
+    "fwEnd": "2025-10-03"
    },
    {
     "date": "2025-11-11",
     "v": 103.8,
     "chg": 11.7,
     "url": "https://www.westpaciq.com.au/economics/2025/11/consumer-sentiment-november-2025/",
-    "slug": "consumer-sentiment-november-2025"
+    "slug": "consumer-sentiment-november-2025",
+    "n": 1200,
+    "fwStart": "2025-11-03",
+    "fwEnd": "2025-11-08"
    },
    {
     "date": "2025-12-16",
     "v": 94.5,
     "chg": -9.3,
     "url": "https://www.westpaciq.com.au/economics/2025/12/consumer-sentiment-decembere-2025/",
-    "slug": "consumer-sentiment-decembere-2025"
+    "slug": "consumer-sentiment-decembere-2025",
+    "n": 1200,
+    "fwStart": "2025-12-08",
+    "fwEnd": "2025-12-12"
    },
    {
     "date": "2026-01-13",
     "v": 92.9,
     "chg": -1.6,
     "url": "https://www.westpaciq.com.au/economics/2026/01/consumer-sentiment-january-2026/",
-    "slug": "consumer-sentiment-january-2026"
+    "slug": "consumer-sentiment-january-2026",
+    "n": 1200,
+    "fwStart": "2025-12-08",
+    "fwEnd": "2025-12-12"
    },
    {
     "date": "2026-02-10",
     "v": 90.5,
     "chg": -2.4,
     "url": "https://www.westpaciq.com.au/economics/2026/02/consumer-sentiment-february-2026/",
-    "slug": "consumer-sentiment-february-2026"
+    "slug": "consumer-sentiment-february-2026",
+    "n": 1200,
+    "fwStart": "2026-02-02",
+    "fwEnd": "2026-02-06"
    },
    {
     "date": "2026-03-10",
     "v": 91.6,
     "chg": 1.1,
     "url": "https://www.westpaciq.com.au/economics/2026/03/consumer-sentiment-march-2026/",
-    "slug": "consumer-sentiment-march-2026"
+    "slug": "consumer-sentiment-march-2026",
+    "n": 1200,
+    "fwStart": "2026-03-02",
+    "fwEnd": "2026-03-06"
    },
    {
     "date": "2026-04-14",
     "v": 80.1,
     "chg": -11.5,
     "url": "https://www.westpaciq.com.au/economics/2026/04/consumer-sentiment-april-2026/",
-    "slug": "consumer-sentiment-april-2026"
+    "slug": "consumer-sentiment-april-2026",
+    "n": 1200,
+    "fwStart": "2026-04-06",
+    "fwEnd": "2026-04-11"
    },
    {
     "date": "2026-05-19",
     "v": 83,
     "chg": 2.9,
     "url": "https://www.westpaciq.com.au/economics/2026/05/consumer-sentiment-may-2026/",
-    "slug": "consumer-sentiment-may-2026"
+    "slug": "consumer-sentiment-may-2026",
+    "n": 1200,
+    "fwStart": "2026-05-11",
+    "fwEnd": "2026-05-15"
    },
    {
     "date": "2026-06-09",
     "v": 80.6,
     "chg": -2.4,
     "url": "https://www.westpaciq.com.au/economics/2026/06/consumer-sentiment-june-2026/",
-    "slug": "consumer-sentiment-june-2026"
+    "slug": "consumer-sentiment-june-2026",
+    "n": 1200,
+    "fwStart": "2026-06-01",
+    "fwEnd": "2026-06-05"
    },
    {
     "date": "2026-07-14",
     "v": 83.9,
     "chg": 3.3,
     "url": "https://www.westpaciq.com.au/economics/2026/07/consumer-sentiment-july-2026/",
-    "slug": "consumer-sentiment-july-2026"
+    "slug": "consumer-sentiment-july-2026",
+    "n": 1200,
+    "fwStart": "2026-07-06",
+    "fwEnd": "2026-07-09"
    },
    {
     "date": "2026-08-18",
     "v": 88.9,
     "chg": 5,
     "url": "https://www.westpaciq.com.au/economics/2026/08/consumer-sentiment-august-2026/",
-    "slug": "consumer-sentiment-august-2026"
+    "slug": "consumer-sentiment-august-2026",
+    "n": 1200,
+    "fwStart": "2026-08-10",
+    "fwEnd": "2026-08-14"
    },
    {
     "date": "2026-09-08",
@@ -3534,7 +3793,10 @@
     "condChg": null,
     "ym": "2025-04",
     "url": "https://www.nab.com.au/news/economy-markets/nabs-april-monthly-business-survey-steady-as-she-goes",
-    "slug": "nabs-april-monthly-business-survey-steady-as-she-goes"
+    "slug": "nabs-april-monthly-business-survey-steady-as-she-goes",
+    "n": 350,
+    "fwStart": "2025-04-22",
+    "fwEnd": "2025-04-30"
    },
    {
     "date": "2025-06-10",
@@ -3544,7 +3806,10 @@
     "condChg": null,
     "ym": "2025-05",
     "url": "https://www.nab.com.au/news/economy-markets/narrowing-gap-between-conditions-and-confidence-nab-monthly-business-survey",
-    "slug": "narrowing-gap-between-conditions-and-confidence-nab-monthly-business-survey"
+    "slug": "narrowing-gap-between-conditions-and-confidence-nab-monthly-business-survey",
+    "n": 500,
+    "fwStart": "2025-05-26",
+    "fwEnd": "2025-05-30"
    },
    {
     "date": "2025-07-08",
@@ -3554,7 +3819,10 @@
     "condChg": null,
     "ym": "2025-06",
     "url": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey",
-    "slug": "nab-monthly-business-survey"
+    "slug": "nab-monthly-business-survey",
+    "n": 340,
+    "fwStart": "2025-06-23",
+    "fwEnd": "2025-06-30"
    },
    {
     "date": "2025-08-12",
@@ -3564,7 +3832,10 @@
     "condChg": -2,
     "ym": "2025-07",
     "url": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey-july-2025-confidence-continues-to-lift",
-    "slug": "nab-monthly-business-survey-july-2025-confidence-continues-to-lift"
+    "slug": "nab-monthly-business-survey-july-2025-confidence-continues-to-lift",
+    "n": 370,
+    "fwStart": "2025-07-23",
+    "fwEnd": "2025-07-31"
    },
    {
     "date": "2025-09-09",
@@ -3574,7 +3845,10 @@
     "condChg": 2,
     "ym": "2025-08",
     "url": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey-august-2025-confidence-continues-to-lift",
-    "slug": "nab-monthly-business-survey-august-2025-confidence-continues-to-lift"
+    "slug": "nab-monthly-business-survey-august-2025-confidence-continues-to-lift",
+    "n": 370,
+    "fwStart": "2025-08-25",
+    "fwEnd": "2025-08-29"
    },
    {
     "date": "2025-10-14",
@@ -3584,7 +3858,10 @@
     "condChg": null,
     "ym": "2025-09",
     "url": "https://www.nab.com.au/news/economy-markets/nab-monthly-business-survey-september-2025",
-    "slug": "nab-monthly-business-survey-september-2025"
+    "slug": "nab-monthly-business-survey-september-2025",
+    "n": 370,
+    "fwStart": "2025-09-23",
+    "fwEnd": "2025-09-30"
    },
    {
     "date": "2025-11-11",
@@ -3594,7 +3871,10 @@
     "condChg": 2,
     "ym": "2025-10",
     "url": "https://www.nab.com.au/news/economy-markets/october-monthly-business-survey-business-conditions-rise",
-    "slug": "october-monthly-business-survey-business-conditions-rise"
+    "slug": "october-monthly-business-survey-business-conditions-rise",
+    "n": 370,
+    "fwStart": "2025-10-23",
+    "fwEnd": "2025-10-30"
    },
    {
     "date": "2025-12-09",
@@ -3604,7 +3884,10 @@
     "condChg": -3,
     "ym": "2025-11",
     "url": "https://www.nab.com.au/news/economy-markets/nab-business-survey-november-2025-confidence-and-conditions-fall",
-    "slug": "nab-business-survey-november-2025-confidence-and-conditions-fall"
+    "slug": "nab-business-survey-november-2025-confidence-and-conditions-fall",
+    "n": 370,
+    "fwStart": "2025-11-17",
+    "fwEnd": "2025-11-24"
    },
    {
     "date": "2026-03-10",
@@ -3614,7 +3897,10 @@
     "condChg": null,
     "ym": "2026-02",
     "url": "https://www.nab.com.au/news/economy-markets/nab-business-survey-february-2026-conditions-hold-while-confidence-falls",
-    "slug": "nab-business-survey-february-2026-conditions-hold-while-confidence-falls"
+    "slug": "nab-business-survey-february-2026-conditions-hold-while-confidence-falls",
+    "n": 516,
+    "fwStart": "2026-02-23",
+    "fwEnd": "2026-03-02"
    },
    {
     "date": "2026-04-14",
@@ -3624,7 +3910,10 @@
     "condChg": null,
     "ym": "2026-03",
     "url": "https://www.nab.com.au/news/economy-markets/nab-march-business-survey-confidence-plunges-echoing-gfc-and-covid-falls",
-    "slug": "nab-march-business-survey-confidence-plunges-echoing-gfc-and-covid-falls"
+    "slug": "nab-march-business-survey-confidence-plunges-echoing-gfc-and-covid-falls",
+    "n": 315,
+    "fwStart": "2026-03-24",
+    "fwEnd": "2026-03-31"
    },
    {
     "date": "2026-05-12",
@@ -3634,7 +3923,10 @@
     "condChg": -3,
     "ym": "2026-04",
     "url": "https://www.nab.com.au/news/economy-markets/costs-surge-activity-cools-in-april-business-survey",
-    "slug": "costs-surge-activity-cools-in-april-business-survey"
+    "slug": "costs-surge-activity-cools-in-april-business-survey",
+    "n": 299,
+    "fwStart": "2026-04-23",
+    "fwEnd": "2026-04-30"
    },
    {
     "date": "2026-06-09",
@@ -3644,7 +3936,10 @@
     "condChg": null,
     "ym": "2026-05",
     "url": "https://www.nab.com.au/news/economy-markets/costs-ease-confidence-lifts-off-a-low-base",
-    "slug": "costs-ease-confidence-lifts-off-a-low-base"
+    "slug": "costs-ease-confidence-lifts-off-a-low-base",
+    "n": 507,
+    "fwStart": "2026-05-23",
+    "fwEnd": "2026-05-30"
    },
    {
     "date": "2026-07-14",
@@ -3654,7 +3949,10 @@
     "condChg": 2,
     "ym": "2026-06",
     "url": "https://www.nab.com.au/news/economy-markets/business-confidence-continues-recovery-nab-monthly-business-survey-june-2026",
-    "slug": "business-confidence-continues-recovery-nab-monthly-business-survey-june-2026"
+    "slug": "business-confidence-continues-recovery-nab-monthly-business-survey-june-2026",
+    "n": 307,
+    "fwStart": "2026-06-23",
+    "fwEnd": "2026-07-01"
    },
    {
     "date": "2026-08-11",
@@ -3664,7 +3962,10 @@
     "condChg": 1,
     "ym": "2026-07",
     "url": "https://www.nab.com.au/news/economy-markets/nab-business-survey-july-2026",
-    "slug": "nab-business-survey-july-2026"
+    "slug": "nab-business-survey-july-2026",
+    "n": 288,
+    "fwStart": "2026-07-21",
+    "fwEnd": "2026-07-31"
    },
    {
     "date": "2026-09-08",

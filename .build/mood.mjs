@@ -42,9 +42,10 @@
    Sample and fieldwork cells) file where the source's own release print
    carries them — details at the "release enrichment" block below. A row
    missing them backfills from its findings post/bulletin for
-   ENRICH_TRY_DAYS after release (--enrich-all reaches every row), then
-   stops retrying; the fields are advisory, never figure-bearing, so a
-   miss files nothing extra rather than failing the lane.
+   ENRICH_TRY_DAYS after release (--enrich-all reaches every row, or every
+   row on/after an ISO date that follows the flag), then stops retrying;
+   the fields are advisory, never figure-bearing, so a miss files nothing
+   extra rather than failing the lane.
 
    The printed change is kept only
    where it reconciles with the previous measured reading of the chain
@@ -89,9 +90,14 @@ const WESTPAC_DIR = argOf("--westpac-dir");
 const NAB_DIR = argOf("--nab-dir");
 // Steady-state: rows file their n/window within this many days of release,
 // then never retry (a chronic miss would fetch its post every weekly run
-// forever). --enrich-all reaches every unenriched row on file.
+// forever). --enrich-all reaches every unenriched row on file, or only the
+// cohort on/after an ISO date that follows the flag (the Confidence facet's
+// term-window backfill: `--enrich-all 2025-05-03`).
 const ENRICH_TRY_DAYS = 40;
 const ENRICH_ALL = argv.includes("--enrich-all");
+const ENRICH_SINCE = ENRICH_ALL && /^\d{4}-\d{2}-\d{2}$/.test(argv[argv.indexOf("--enrich-all") + 1] || "")
+  ? argv[argv.indexOf("--enrich-all") + 1]
+  : null;
 const FEED_BASE = "https://wp.roymorgan.com/wp-json/rmr/v1/findings-search";
 // The posting page a row links to.
 const postUrl = (slug) => `https://www.roymorgan.com/findings/${slug}`;
@@ -265,11 +271,14 @@ const htmlToText = (h) => clean(String(h)
   .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n))
   .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)))
   .replace(/&(nbsp|amp|ndash|mdash|quot|apos|lt|gt);/gi, (s, k) => ({ nbsp: " ", amp: "&", ndash: "–", mdash: "—", quot: '"', apos: "'", lt: "<", gt: ">" }[k.toLowerCase()])));
-// A PDF's text via pdftotext (layout). Absent poppler is an environment
-// failure — a loud exit 1, never a silently empty lane. `dir` is the
-// fixture seam: a cached safeName(url)+".txt" stands in for the fetch.
-async function pdfText(url, dir = NAB_DIR) {
-  const cached = laneFile(dir, url, ".txt");
+// A PDF's text via pdftotext (layout, unless `plain`). Absent poppler is
+// an environment failure — a loud exit 1, never a silently empty lane.
+// `dir` is the fixture seam: a cached safeName(url)+".txt" stands in for
+// the fetch (plain mode takes safeName(url)+".plain.txt" when the fixture
+// needs the other mode, falling back to the shared ".txt").
+async function pdfText(url, dir = NAB_DIR, plain = false) {
+  const cached = plain ? laneFile(dir, url, ".plain.txt") ?? laneFile(dir, url, ".txt")
+    : laneFile(dir, url, ".txt");
   if (cached != null) return cached;
   const res = await fetch(url, { headers: { "user-agent": TRACKER_UA }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
   if (!res.ok) throw new Error(`pdf ${url} HTTP ${res.status}`);
@@ -277,7 +286,7 @@ async function pdfText(url, dir = NAB_DIR) {
   try {
     const p = join(tmp, "m.pdf");
     writeFileSync(p, Buffer.from(await res.arrayBuffer()));
-    return execFileSync("pdftotext", ["-layout", p, "-"], { encoding: "utf8", maxBuffer: 8 << 20 });
+    return execFileSync("pdftotext", plain ? [p, "-"] : ["-layout", p, "-"], { encoding: "utf8", maxBuffer: 8 << 20 });
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
@@ -395,31 +404,44 @@ function parseRmBusinessPost(txt, survey) {
 }
 
 // The Westpac bulletin: "This latest survey is based on 1200 adults … It
-// was conducted in the week from 28 September to 1 October."
+// was conducted in the week from 28 September to 1 October." — the phrase
+// wraps mid-"the week" in the 2025-era bulletins' extracted text.
 function parseWestpacPdf(txt) {
   const nm = /latest survey is based on ([\d,]+) adults/i.exec(txt);
   let n = nm ? +nm[1].replace(/,/g, "") : null;
   if (n != null && (n < 400 || n > 4000)) n = null;
-  const wm = new RegExp(`conducted in the week\\s+(?:from\\s+|between\\s+)?(\\d{1,2})\\s+${MON_ANY}\\s+(?:to|–|-)\\s+(\\d{1,2})\\s+${MON_ANY}`, "i").exec(txt);
+  const wm = new RegExp(`conducted\\s+in\\s+the\\s+week\\s+(?:from\\s+|between\\s+)?(\\d{1,2})\\s+${MON_ANY}\\s+(?:to|–|-)\\s+(\\d{1,2})\\s+${MON_ANY}`, "i").exec(txt);
   const win = wm && monIdx(wm[2]) != null && monIdx(wm[4]) != null
     ? { d1: +wm[1], m1: monIdx(wm[2]), d2: +wm[3], m2: monIdx(wm[4]) } : null;
   return { n, win };
 }
 
 // The NAB PDF footer: "Survey conducted from 24 August to 31 August,
-// covering around 455 businesses across the non-farm sector."
+// covering around 455 businesses across the non-farm sector." The 2025-era
+// two-column pages print the range form ("from 22 to 30 April") — month
+// stated once — and may tag a year on ("to 30 June 2025"); both sweep into
+// the same sentence. Layout text has the other column's words interleaved
+// inside the sentence — read it from plain pdftotext output instead.
 function parseNabFw(txt) {
-  const m = new RegExp(`Survey conducted from\\s+(\\d{1,2})\\s+${MON_ANY}\\s+to\\s+(\\d{1,2})\\s+${MON_ANY}\\s*,\\s*covering around\\s+([\\d,]+)\\s+businesses`, "i").exec(txt);
-  if (!m || monIdx(m[2]) == null || monIdx(m[4]) == null) return { n: null, win: null };
-  const n = +m[5].replace(/,/g, "");
-  if (n < 100 || n > 3000) return { n: null, win: null };
-  return { n, win: { d1: +m[1], m1: monIdx(m[2]), d2: +m[3], m2: monIdx(m[4]) } };
+  const m = new RegExp(
+    `Survey\\s+conducted\\s+from\\s+(?:(\\d{1,2})\\s+${MON_ANY}\\s+to\\s+|(\\d{1,2})\\s+to\\s+)(\\d{1,2})\\s+${MON_ANY}(?:\\s+\\d{4})?\\s*,\\s*covering\\s+around\\s+([\\d,]+)\\s+businesses`,
+    "i"
+  ).exec(txt);
+  if (!m) return { n: null, win: null };
+  const mon1 = m[1] != null ? m[2] : m[5];
+  if (monIdx(mon1) == null || monIdx(m[5]) == null) return { n: null, win: null };
+  const n = +m[6].replace(/,/g, "");
+  if (!(n >= 100 && n <= 3000)) return { n: null, win: null };
+  return { n, win: { d1: +(m[1] ?? m[3]), m1: monIdx(mon1), d2: +m[4], m2: monIdx(m[5]) } };
 }
 
 // Fixture runs (the test seams) are hermetic and date-locked — they try
-// every row regardless of age.
+// every row regardless of age. A cohort bound narrows that too, so a
+// backfill's scope is exactly what's passed.
 const FIXTURE = !!(FEED_DIR || WESTPAC_DIR || NAB_DIR);
-const enrichable = (r) => ENRICH_ALL || FIXTURE || (Date.now() - Date.parse(r.date + "T00:00:00Z")) / 864e5 <= ENRICH_TRY_DAYS;
+const enrichable = (r) => ENRICH_SINCE
+  ? r.date >= ENRICH_SINCE
+  : ENRICH_ALL || FIXTURE || (Date.now() - Date.parse(r.date + "T00:00:00Z")) / 864e5 <= ENRICH_TRY_DAYS;
 
 // RM lanes: a row missing its window/n reaches back to its findings post
 // once; a filed row never fetches again. Post pages and release-PDF text
@@ -507,7 +529,7 @@ async function enrichNabRows(rows) {
     if (!pm) continue;
     const pdfUrl = pm[0].startsWith("http") ? pm[0] : `https://www.nab.com.au${pm[0]}`;
     fetched++;
-    const g = parseNabFw(await pdfText(pdfUrl, NAB_DIR).catch(() => null) ?? "");
+    const g = parseNabFw(await pdfText(pdfUrl, NAB_DIR, true).catch(() => null) ?? "");
     if (g.n != null) r.n = r.n ?? g.n;
     if (g.win && r.fwStart == null) {
       const w = resolveWinYear(g.win, r.date);
@@ -626,7 +648,9 @@ function nabMeasure(txt, measure) {
 // The PDF carries everything (pdftotext -layout): the survey-month label
 // ("NAB Monthly Business Survey Nov-25", or a bare "August 2026" heading),
 // the release date (embargo line; 2025 era), and the measure sentences.
-function parseNabPdf(txt) {
+// `fwTxt` is the same PDF in PLAIN mode — the footer sentence survives
+// un-interleaved there (2025-era two-column pages scramble it in layout).
+function parseNabPdf(txt, fwTxt = null) {
   // the Table-1 caption interleaves into a wrapped bullet's line, splitting
   // "…to +6 index <caption> points…" — strip it before squeezing
   const sq = txt.replace(/Table 1:\s*Key Monthly Business Survey Statistics/g, "").replace(/\s+/g, " ");
@@ -657,7 +681,7 @@ function parseNabPdf(txt) {
   if (emb) date = `${emb[3]}-${String(monIdx(emb[2]) + 1).padStart(2, "0")}-${emb[1].padStart(2, "0")}`;
   // the footer's survey-conduct line: window + approximate n (advisory
   // extras — never figure-bearing, never a reason to drop the wave)
-  const fw = parseNabFw(sq);
+  const fw = parseNabFw(fwTxt ?? sq);
   const conf = nabMeasure(mtxt, "confidence"), cond = nabMeasure(mtxt, "conditions");
   if (big) {
     // banner levels are a second witness; a sentential level that dis­agrees
@@ -703,8 +727,10 @@ async function nabRows() {
     if (!pm) { console.log(`nabBusiness ${u.url}: no PDF link — skipped`); continue; }
     const pdfUrl = pm[0].startsWith("http") ? pm[0] : `https://www.nab.com.au${pm[0]}`;
     let g;
-    try { g = parseNabPdf(await pdfText(pdfUrl)); }
-    catch (e) { console.log(`nabBusiness ${u.url}: pdf failed (${e.message}) — skipped`); continue; }
+    try {
+      // plain mode is only for the footer read; its failure never drops a wave
+      g = parseNabPdf(await pdfText(pdfUrl), await pdfText(pdfUrl, NAB_DIR, true).catch(() => null));
+    } catch (e) { console.log(`nabBusiness ${u.url}: pdf failed (${e.message}) — skipped`); continue; }
     if (!g.survey) { console.log(`nabBusiness ${u.url}: no survey-month label — skipped`); continue; }
     const { mon, yr } = g.survey;
     // levels: PDF values, cross-checked against the article prose where it
@@ -825,7 +851,17 @@ async function rowsFor(name) {
       else if (u) row = { v: u.v, chg: u.chg ?? t?.chg ?? null };
       if (!row) continue; // a non-wave posting (statement, think-piece) — skip
       pageParsed++;
-      byDate.set(iso, { date: iso, v: row.v, chg: row.chg, url: postUrl(slug), slug });
+      const nxt = { date: iso, v: row.v, chg: row.chg, url: postUrl(slug), slug };
+      // A re-surfaced wave is rebuilt from its title/summary — carry the
+      // advisory fields its release already filed (they describe the wave,
+      // not our parse of the headline), else a steady-state run would
+      // prune everything the 40d enrich horizon can't re-read. Key order
+      // mirrors the enrich write order so file bytes stay stable.
+      const old = byDate.get(iso);
+      if (old && old.v === nxt.v) for (const k of ["fwm", "n", "fwStart", "fwEnd"]) {
+        if (old[k] != null) nxt[k] = old[k];
+      }
+      byDate.set(iso, nxt);
     }
     const oldest = dmyToIso(arr[arr.length - 1].release_date);
     // GUARD: pages of this topic must yield candidates — silence means the

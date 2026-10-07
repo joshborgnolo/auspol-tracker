@@ -182,6 +182,22 @@ W("Consumer sentiment fell to 13.6 in June from 82.2 in May.", null);
   assert.equal(g.conf.level, null, "banner/prose disagreement drops the measure");
   assert.equal(g.cond.level, -1, "conditions still takes the banner level (no conflicting sentence)");
 }
+// the footer's survey-conduct line rides the PLAIN witness: layout mode on
+// a 2025-era two-column page interleaves the other column's words into the
+// sentence, where neither footer grammar branch matches
+{
+  const scrambled = [
+    "May 2025",
+    "NAB Monthly Business Survey",
+    "   Survey conducted from 22   Table 2 key results    30 April, covering around 350 businesses across the non-farm sector.",
+  ].join("\n");
+  const plain = "May 2025\nNAB Monthly Business Survey\nSurvey conducted from 22 to 30 April, covering around 350 businesses across the non-farm sector.";
+  const g = parseNabPdf(scrambled, plain);
+  assert.deepEqual(g.survey, { mon: 4, yr: 2025 });
+  assert.equal(g.fw.n, 350, "footer n comes from the plain witness");
+  assert.deepEqual(g.fw.win, { d1: 22, m1: 3, d2: 30, m2: 3 }, "footer window comes from the plain witness");
+  assert.equal(parseNabPdf(scrambled).fw.n, null, "an interleaved footer in layout mode files nothing");
+}
 console.log("1b. westpac+NAB grammar: OK");
 
 /* ------------------------------------------- 1c. enrichment window + lanes */
@@ -224,17 +240,30 @@ console.log("1b. westpac+NAB grammar: OK");
   const clash = post.replace("1,094 detailed interviews", "1,200 detailed interviews");
   assert.deepEqual(parseRmBusinessPost(clash, { mon: 7, yr: 2026 }), { n: null }, "a quote/line disagreement files nothing");
 }
-// the westpac bulletin print (a genuine 4-day window)
+// the westpac bulletin print (a genuine 4-day window); the 2025-era
+// bulletins wrap mid-phrase ("conducted in the\nweek from …")
 {
   const g = parseWestpacPdf("This latest survey is based on 1200 adults aged 18 years and over, across Australia. It was conducted in the week from 28 September to 1 October.");
   assert.equal(g.n, 1200);
   assert.deepEqual(g.win, { d1: 28, m1: 8, d2: 1, m2: 9 });
+  const w = parseWestpacPdf("This latest survey is based on 1200 adults aged 18 years and over, across Australia. It was conducted in the\nweek from 11 August to 15 August 2025.");
+  assert.equal(w.n, 1200);
+  assert.deepEqual(w.win, { d1: 11, m1: 7, d2: 15, m2: 7 }, "the wrapped 'in the week' still files");
 }
-// the NAB footer (an approximate n, filed as printed)
+// the NAB footer (an approximate n, filed as printed); the 2025-era PDFs
+// print the range form — month once, optional trailing year
 {
   const g = parseNabFw("Survey conducted from 24 August to 31 August, covering around 455 businesses across the non-farm sector.");
   assert.equal(g.n, 455);
   assert.deepEqual(g.win, { d1: 24, m1: 7, d2: 31, m2: 7 });
+  const r = parseNabFw("Survey conducted from 22 to 30 April, covering around 350 businesses across the non-farm sector.");
+  assert.equal(r.n, 350);
+  assert.deepEqual(r.win, { d1: 22, m1: 3, d2: 30, m2: 3 }, "the month-once range form");
+  const y = parseNabFw("Survey conducted from 22 to 30 April 2025, covering around 350 businesses.");
+  assert.equal(y.n, 350);
+  assert.deepEqual(y.win, r.win, "a printed year changes nothing");
+  const c = parseNabFw("Survey conducted from 24 August to 31 August, covering around 1,094 businesses.");
+  assert.equal(c.n, 1094, "a comma'd n parses");
 }
 // the business survey month: slug-titled wave, then the release-minus-one rule
 assert.deepEqual(surveyMonthOf({ slug: "10336-roy-morgan-business-confidence-august-2026", date: "2026-09-08" }), { mon: 7, yr: 2026 });
@@ -377,6 +406,9 @@ fix(NAB_DIR, PDF_A, ".txt", [
   "Survey conducted from 4 August to 8 August, covering around 462 businesses across the non-farm sector.",
 ].join("\n"));
 fix(NAB_DIR, NAB_S, ".html", nabArt("/content/dam/nab/documents/news/2026/september-monthly-business-survey.pdf"));
+// the 2025-era two-column layout: the footer sentence survives only in the
+// plain witness — in layout mode the other column's words interleave into
+// it, where no footer grammar branch matches (no figure may come of it)
 fix(NAB_DIR, PDF_S, ".txt", [
   "Embargoed until 11:30am AEST, 9 September 2026",
   "NAB Monthly Business Survey Sep-26",
@@ -387,7 +419,14 @@ fix(NAB_DIR, PDF_S, ".txt", [
   "Net balance",
   "Business confidence                        6           6            4",
   "Business conditions                        2           2            0",
-  "Survey conducted from 31 August to 4 September, covering around 470 businesses.",
+  "   Survey conducted from 1   Table 2 chart heading   8 September, covering around 350 businesses across the non-farm sector.",
+].join("\n"));
+fix(NAB_DIR, PDF_S, ".plain.txt", [
+  "Embargoed until 11:30am AEST, 9 September 2026",
+  "NAB Monthly Business Survey Sep-26",
+  "Summary",
+  "Business confidence fell 2pts to +4 index points in September. Business conditions eased to 0 index points.",
+  "Survey conducted from 1 to 8 September, covering around 350 businesses across the non-farm sector.",
 ].join("\n"));
 // PDF says confidence +4 (banner + Summary agree); the article prose says +9
 // — the disagreement drops the whole wave (never pick a side).
@@ -484,8 +523,8 @@ assert.equal(wRows["2026-09-09"].n, 1200);
 assert.deepEqual([wRows["2026-09-09"].fwStart, wRows["2026-09-09"].fwEnd], ["2026-09-01", "2026-09-05"]);
 assert.equal(nRows["2026-08-11"].n, 462);
 assert.deepEqual([nRows["2026-08-11"].fwStart, nRows["2026-08-11"].fwEnd], ["2026-08-04", "2026-08-08"]);
-assert.equal(nRows["2026-09-09"].n, 470);
-assert.equal(nRows["2026-09-09"].fwStart, "2026-08-31");
+assert.equal(nRows["2026-09-09"].n, 350, "the September wave's n rides the plain witness (layout interleaved it)");
+assert.deepEqual([nRows["2026-09-09"].fwStart, nRows["2026-09-09"].fwEnd], ["2026-09-01", "2026-09-08"], "its window too");
 
 // idempotent: rerun, no write, changed:false
 const before = fs.readFileSync(path.join(tmp, "data", "mood.json"), "utf8");
@@ -493,6 +532,40 @@ const again = run(FEED);
 assert.equal(again.status, 0, again.out);
 assert.ok(again.out.includes('"changed":false'), "second run unchanged: " + again.out.split("\n").pop());
 assert.equal(fs.readFileSync(path.join(tmp, "data", "mood.json"), "utf8"), before, "file bytes identical");
+
+// cohort backfill: strip the advisory fields off the on-file rows, then
+// `--enrich-all <ISO>` must re-read only rows released on/after the date —
+// everything older keeps its now-empty advisory fields. Fresh discovery
+// always parses a new wave straight out of its own print, so the bound
+// gates the RETRO-fitting pass on rows already on file.
+const stripRow = (r, drop) => Object.fromEntries(Object.entries(r).filter(([k]) => !drop.includes(k)));
+const ADVISORY = ["n", "fwStart", "fwEnd"];
+const seeded = JSON.parse(before);
+seeded.consumer.rows = seeded.consumer.rows.map((r) => stripRow(r, ADVISORY));
+seeded.business.rows = seeded.business.rows.map((r) => stripRow(r, [...ADVISORY, "fwm"])); // re-derives off the slug, no fetch
+seeded.westpacConsumer.rows = seeded.westpacConsumer.rows.map((r) => stripRow(r, ADVISORY));
+seeded.nabBusiness.rows = seeded.nabBusiness.rows.map((r) => stripRow(r, ADVISORY));
+fs.writeFileSync(path.join(tmp, "data", "mood.json"), JSON.stringify(seeded, null, 1) + "\n");
+const cohort = run(FEED, ["--enrich-all", "2026-09-20"]);
+assert.equal(cohort.status, 0, cohort.out);
+const cst = JSON.parse(cohort.out.match(/MOOD_STATUS (\{.*\})/)[1]);
+assert.deepEqual(cst.rows, { consumer: 4, business: 4, westpacConsumer: 2, nabBusiness: 2 }, "a bound never costs a wave row");
+assert.deepEqual(cst.enrich.consumer, { n: 2, fw: 2 }, "bound 09-20 re-reads the 09-22 and 09-29 waves only");
+assert.deepEqual(cst.enrich.business, { n: 0, fw: 4 }, "every business wave is pre-bound: no n fetched, but fwm still derives off the slug");
+assert.deepEqual(cst.enrich.westpacConsumer, { n: 0, fw: 0 }, "September's bulletin is pre-bound; October's has none");
+assert.deepEqual(cst.enrich.nabBusiness, { n: 0, fw: 0 }, "both NAB waves pre-date the bound");
+const cdoc = JSON.parse(fs.readFileSync(path.join(tmp, "data", "mood.json"), "utf8"));
+const cRows = Object.fromEntries(cdoc.consumer.rows.map((r) => [r.date, r]));
+assert.equal(cRows["2026-09-29"].n, 1019, "the newest wave is inside the cohort");
+assert.deepEqual([cRows["2026-09-22"].fwStart, cRows["2026-09-22"].fwEnd], ["2026-09-16", "2026-09-22"], "the 09-22 wave is inside the cohort");
+assert.equal(cRows["2026-09-15"].n, undefined, "the 09-15 wave sits before the bound: unenriched");
+assert.equal(cRows["2026-09-15"].fwStart, undefined, "its window is unenriched too");
+assert.equal(cRows["2026-08-18"].n, undefined, "pre-bound rows never fetch inside a cohort run");
+const cBus = Object.fromEntries(cdoc.business.rows.map((r) => [r.date, r]));
+assert.equal(cBus["2026-09-08"].n, undefined, "pre-bound business wave skips the post fetch");
+assert.equal(cBus["2026-09-08"].fwm, "2026-08", "but its survey month still derives from the slug with no fetch");
+// restore the full-enrichment file for the sections that follow
+run(FEED);
 
 // GUARD: a topic returning no candidates trips exit 2
 const emptyDir = path.join(tmp, "empty-src");
@@ -560,6 +633,35 @@ for (const k of ["consumer", "business", "westpacConsumer", "nabBusiness"]) {
       if (sm && MON[sm[1].toLowerCase()]) assert.equal(r.fwm, `${sm[2]}-${MON[sm[1].toLowerCase()]}`, `${r.date} fwm matches its slug month`);
     }
   }
+}
+// term-coverage pin: every confidence-facet row (since the 2025-05-03 election)
+// carries its provenance — n + fieldwork where the house prints them. Release
+// dates are RELEASE dates: a new release files without its figures until its
+// own steady-state enrichment run (≤40d gate) passes, so rows younger than the
+// enrich horizon are exempt here — the facet's em-dash for them is transient,
+// and the steady-state "no candidates older than horizon remain" pin above is
+// what chases them. Older than the horizon every row must carry its figures;
+// the three business dates below are genuinely bare releases (no dated n in
+// print), so the facet honestly shows an em-dash for them and only them.
+const TERM = "2025-05-03";
+const ENRICH_HORIZON = new Date(Date.now() - 40 * 864e5).toISOString().slice(0, 10);
+const inTerm = (r) => r.date >= TERM && r.date < ENRICH_HORIZON;
+const BARE_BUSINESS_N = new Set(["2025-08-04", "2025-11-11", "2026-07-07"]);
+for (const r of live.consumer.rows) if (inTerm(r)) {
+  assert.ok(r.n != null, `consumer ${r.date} term row has n`);
+  assert.ok(r.fwStart != null, `consumer ${r.date} term row has fieldwork`);
+}
+for (const r of live.westpacConsumer.rows) if (inTerm(r)) {
+  assert.ok(r.n != null, `westpacConsumer ${r.date} term row has n`);
+  assert.ok(r.fwStart != null, `westpacConsumer ${r.date} term row has fieldwork`);
+}
+for (const r of live.nabBusiness.rows) if (inTerm(r)) {
+  assert.ok(r.n != null, `nabBusiness ${r.date} term row has n`);
+  assert.ok(r.fwStart != null, `nabBusiness ${r.date} term row has fieldwork`);
+}
+for (const r of live.business.rows) if (inTerm(r)) {
+  assert.ok(r.fwm != null, `business ${r.date} term row has survey month`);
+  assert.ok(r.n != null || BARE_BUSINESS_N.has(r.date), `business ${r.date} term row has n (or is a known bare release)`);
 }
 for (const k of ["westpacConsumer", "nabBusiness"]) {
   const dates = live[k].rows.map((r) => r.date);
