@@ -1795,9 +1795,10 @@ function RdDemographics({ rangeId = "all" }) {
   const pName = party === "oth" ? "others & independents" : party === "lnp" ? "the Coalition" : party === "grn" ? "the Greens" : P.name;
   const pPoss = pName + (/s$/.test(pName) ? "’" : "’s"), pColor = P.color;
   /* the vote noun phrase: others & independents can't carry a possessive, so it
-     reads "vote for others & independents" (user dictate 2026-10-07; the
-     composition-trend dek below made the same call for "…'s vote" in 2026-09-30) */
-  const pVote = party === "oth" ? "vote for others & independents" : pPoss + " vote";
+     reads "the vote for others & independents" (user dictate 2026-10-07 —
+     takes the definite article like the composition-trend dek's voteOf at
+     :1948, which made the same call for "…'s vote" in 2026-09-30) */
+  const pVote = party === "oth" ? "the vote for others & independents" : pPoss + " vote";
   const all = T.all[party];
   const ki = T.order.indexOf(party), gpi = DEMO_GRP_PARTY.indexOf(party);
   const short = (g) => RD_DEMO_SHORT[g.label] || DEMO_WHO[g.label] || g.label;

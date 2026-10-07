@@ -89843,7 +89843,7 @@ function RdDemographics({
   const pName = party === "oth" ? "others & independents" : party === "lnp" ? "the Coalition" : party === "grn" ? "the Greens" : P.name;
   const pPoss = pName + (/s$/.test(pName) ? "’" : "’s"),
     pColor = P.color;
-  const pVote = party === "oth" ? "vote for others & independents" : pPoss + " vote";
+  const pVote = party === "oth" ? "the vote for others & independents" : pPoss + " vote";
   const all = T.all[party];
   const ki = T.order.indexOf(party),
     gpi = DEMO_GRP_PARTY.indexOf(party);
