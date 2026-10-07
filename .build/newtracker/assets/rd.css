@@ -869,6 +869,12 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
      every row below slid on the switch. It ellipsizes instead; the row's
      expansion carries the release rhythm in full */
   body.rd .rd-pl-row > .rd-pl-c-name .rd-pl-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* and the name itself: Leadership's three-name ppm line is ~242px wide, so
+     the flexible name track bites down hard on 375px phones - a nowrap name
+     with no overflow rule printed over the right-aligned figures
+     (RedBridge/Accent's covered its ppm line by 75px). The row's expansion
+     carries the full name, as it already does the client line above */
+  body.rd .rd-pl-row > .rd-pl-c-name .rd-pl-main { overflow: hidden; text-overflow: ellipsis; }
   body.rd .rd-pl-row > .rd-pl-c-figs { grid-area: figs; padding: 0; align-items: flex-end; text-align: right; }
   body.rd .rd-pl-row > .rd-pl-c-tl { grid-area: tl; min-height: 36px; }
   body.rd .rd-pl-row > .rd-pl-c-latest, body.rd .rd-pl-row > .rd-pl-c-next, body.rd .rd-pl-row > .rd-pl-c-exp { display: none; }
@@ -880,6 +886,12 @@ body.rd .rd-pld-foot b { font-weight: 600; color: var(--ink); }
      its text never sees the cell's text-align: when the sub line sets the
      width the main line's text parked at the left (leadership ppm readouts) */
   body.rd .rd-pl-c-figs .rd-pl-main { font-size: 17px; justify-content: flex-end; }
+  /* ... except leadership's ppm line: three full leader names at 17px is
+     ~273px of ink (~77% of a 375px phone), which starved the name track to
+     70px and ellipsized every ppm house. At 15px (~242px) every house name
+     fits bar RedBridge/Accent's, and row geometry is untouched - the
+     minmax floor above is a calc, not the font size */
+  body.rd .rd-polls[data-facet="leadership"] .rd-pl-row > .rd-pl-c-figs .rd-pl-main { font-size: 15px; }
   body.rd .rd-pl-c-figs .rd-pl-main .rd-pl-tag { display: none; }
   body.rd .rd-pl-c-figs .rd-pl-sub .rd-pl-tag { margin-left: 0; margin-right: 8px; }
   body.rd .rd-pl-long { display: none; }
