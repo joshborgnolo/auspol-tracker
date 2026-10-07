@@ -1,5 +1,5 @@
 {
- "_about": "Business and consumer confidence. consumer/business: Roy Morgan's findings feed (weekly, dense from Aug 2019 / monthly since 2019; 100 = neutral). westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment (monthly; IQ-sitemap coverage Jan 2022 →; 100 = neutral). nabBusiness: NAB Monthly Business Survey (monthly; AEM-sitemap coverage Apr 2025 →; the earlier WP-era archive is offline). Rows: {date, v, chg (printed period change; null when none printed or unreconciled), url, slug}. NAB rows add {cond, condChg, ym}; NAB figures are NET BALANCES (0 = neutral) — the site plots them SHIFTED +100 so the shared neutral line holds. Lane details: .build/mood.mjs header.",
+ "_about": "Business and consumer confidence. consumer/business: Roy Morgan's findings feed (weekly, dense from Aug 2019 / monthly since 2019; 100 = neutral). westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment (monthly; IQ-sitemap coverage Jan 2022 →; 100 = neutral). nabBusiness: NAB Monthly Business Survey (monthly; AEM-sitemap coverage Apr 2025 →; the earlier WP-era archive is offline). Rows: {date, v, chg (printed period change; null when none printed or unreconciled), url, slug}. NAB rows add {cond, condChg, ym}; NAB figures are NET BALANCES (0 = neutral) — the site plots them SHIFTED +100 so the shared neutral line holds. Advisory per-release fields, each lane's own release print only: n (sample; NAB's is the printed 'around' figure), fwStart/fwEnd (ISO survey window; business files fwm 'YYYY-MM' instead — the survey month IS its window). Lane details: .build/mood.mjs header.",
  "consumer": {
   "label": "ANZ-Roy Morgan Consumer Confidence",
   "base": "ANZ-Roy Morgan, index, 100 = neutral",
@@ -2403,42 +2403,60 @@
     "v": 74.9,
     "chg": -2.6,
     "url": "https://www.roymorgan.com/findings/10055-anz-roy-morgan-consumer-confidence-september-1",
-    "slug": "10055-anz-roy-morgan-consumer-confidence-september-1"
+    "slug": "10055-anz-roy-morgan-consumer-confidence-september-1",
+    "n": 1055,
+    "fwStart": "2026-08-24",
+    "fwEnd": "2026-08-30"
    },
    {
     "date": "2026-09-08",
     "v": 71.9,
     "chg": -3,
     "url": "https://www.roymorgan.com/findings/10060-anz-roy-morgan-consumer-confidence-september-8",
-    "slug": "10060-anz-roy-morgan-consumer-confidence-september-8"
+    "slug": "10060-anz-roy-morgan-consumer-confidence-september-8",
+    "n": 1041,
+    "fwStart": "2026-08-31",
+    "fwEnd": "2026-09-06"
    },
    {
     "date": "2026-09-15",
     "v": 73.9,
     "chg": 2,
     "url": "https://www.roymorgan.com/findings/10065-anz-roy-morgan-consumer-confidence-september-15",
-    "slug": "10065-anz-roy-morgan-consumer-confidence-september-15"
+    "slug": "10065-anz-roy-morgan-consumer-confidence-september-15",
+    "n": 1025,
+    "fwStart": "2026-09-07",
+    "fwEnd": "2026-09-13"
    },
    {
     "date": "2026-09-22",
     "v": 72,
     "chg": -1.9,
     "url": "https://www.roymorgan.com/findings/10070-anz-roy-morgan-consumer-confidence-september-22",
-    "slug": "10070-anz-roy-morgan-consumer-confidence-september-22"
+    "slug": "10070-anz-roy-morgan-consumer-confidence-september-22",
+    "n": 1025,
+    "fwStart": "2026-09-14",
+    "fwEnd": "2026-09-20"
    },
    {
     "date": "2026-09-29",
     "v": 70.5,
     "chg": -1.5,
     "url": "https://www.roymorgan.com/findings/10075-anz-roy-morgan-consumer-confidence-september-29",
-    "slug": "10075-anz-roy-morgan-consumer-confidence-september-29"
+    "slug": "10075-anz-roy-morgan-consumer-confidence-september-29",
+    "n": 1029,
+    "fwStart": "2026-09-21",
+    "fwEnd": "2026-09-27"
    },
    {
     "date": "2026-10-06",
     "v": 67.1,
     "chg": -3.4,
     "url": "https://www.roymorgan.com/findings/10080-anz-roy-morgan-consumer-confidence-october-6",
-    "slug": "10080-anz-roy-morgan-consumer-confidence-october-6"
+    "slug": "10080-anz-roy-morgan-consumer-confidence-october-6",
+    "n": 1019,
+    "fwStart": "2026-09-28",
+    "fwEnd": "2026-10-04"
    }
   ]
  },
@@ -2451,588 +2469,672 @@
     "v": 114.3,
     "chg": 0.3,
     "url": "https://www.roymorgan.com/findings/business-confidence-post-election-bounce-continues",
-    "slug": "business-confidence-post-election-bounce-continues"
+    "slug": "business-confidence-post-election-bounce-continues",
+    "fwm": "2019-08"
    },
    {
     "date": "2019-10-11",
     "v": 110.6,
     "chg": -3.7,
     "url": "https://www.roymorgan.com/findings/business-confidence-declines-after-low-gdp-growth-figure",
-    "slug": "business-confidence-declines-after-low-gdp-growth-figure"
+    "slug": "business-confidence-declines-after-low-gdp-growth-figure",
+    "fwm": "2019-09"
    },
    {
     "date": "2019-11-11",
     "v": 106,
     "chg": -4.6,
     "url": "https://www.roymorgan.com/findings/federal-election-bounce-over-business-confidence-drops-to-lowest-since-april",
-    "slug": "federal-election-bounce-over-business-confidence-drops-to-lowest-since-april"
+    "slug": "federal-election-bounce-over-business-confidence-drops-to-lowest-since-april",
+    "fwm": "2019-10"
    },
    {
     "date": "2019-12-09",
     "v": 108.4,
     "chg": 2.4,
     "url": "https://www.roymorgan.com/findings/business-confidence-improves-up-2-4pts-to-108-4-in-november",
-    "slug": "business-confidence-improves-up-2-4pts-to-108-4-in-november"
+    "slug": "business-confidence-improves-up-2-4pts-to-108-4-in-november",
+    "fwm": "2019-11"
    },
    {
     "date": "2020-01-20",
     "v": 104.5,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/business-confidence-ended-2019-at-8-month-low-of-104-5",
-    "slug": "business-confidence-ended-2019-at-8-month-low-of-104-5"
+    "slug": "business-confidence-ended-2019-at-8-month-low-of-104-5",
+    "fwm": "2019-12"
    },
    {
     "date": "2020-02-03",
     "v": 101.6,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/business-confidence-drops-to-9-year-low-of-101-6-in-january",
-    "slug": "business-confidence-drops-to-9-year-low-of-101-6-in-january"
+    "slug": "business-confidence-drops-to-9-year-low-of-101-6-in-january",
+    "fwm": "2020-01"
    },
    {
     "date": "2020-03-10",
     "v": 104.6,
     "chg": 3,
     "url": "https://www.roymorgan.com/findings/february-business-confidence-rebounded-with-bushfires-out-and-covid-19-yet-to-have-full-economic-impact",
-    "slug": "february-business-confidence-rebounded-with-bushfires-out-and-covid-19-yet-to-have-full-economic-impact"
+    "slug": "february-business-confidence-rebounded-with-bushfires-out-and-covid-19-yet-to-have-full-economic-impact",
+    "fwm": "2020-02"
    },
    {
     "date": "2020-04-06",
     "v": 95.1,
     "chg": -9.5,
     "url": "https://www.roymorgan.com/findings/business-confidence-hits-a-record-low-of-95-1-in-march-declines-accelerated-throughout-the-month",
-    "slug": "business-confidence-hits-a-record-low-of-95-1-in-march-declines-accelerated-throughout-the-month"
+    "slug": "business-confidence-hits-a-record-low-of-95-1-in-march-declines-accelerated-throughout-the-month",
+    "fwm": "2020-03"
    },
    {
     "date": "2020-05-08",
     "v": 76.9,
     "chg": -18.2,
     "url": "https://www.roymorgan.com/findings/business-confidence-plunged-to-record-low-of-76-9-in-april",
-    "slug": "business-confidence-plunged-to-record-low-of-76-9-in-april"
+    "slug": "business-confidence-plunged-to-record-low-of-76-9-in-april",
+    "fwm": "2020-04"
    },
    {
     "date": "2020-06-05",
     "v": 89.9,
     "chg": 13,
     "url": "https://www.roymorgan.com/findings/business-confidence-jumps-in-may-up-13pts-to-89-9-highest-in-western-australia-south-australia",
-    "slug": "business-confidence-jumps-in-may-up-13pts-to-89-9-highest-in-western-australia-south-australia"
+    "slug": "business-confidence-jumps-in-may-up-13pts-to-89-9-highest-in-western-australia-south-australia",
+    "fwm": "2020-05"
    },
    {
     "date": "2020-07-03",
     "v": 95,
     "chg": 5.1,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-5-1pts-to-95-0-in-june-highest-in-western-australia-110-5-new-south-wales-100-7",
-    "slug": "roy-morgan-business-confidence-up-5-1pts-to-95-0-in-june-highest-in-western-australia-110-5-new-south-wales-100-7"
+    "slug": "roy-morgan-business-confidence-up-5-1pts-to-95-0-in-june-highest-in-western-australia-110-5-new-south-wales-100-7",
+    "fwm": "2020-06"
    },
    {
     "date": "2020-08-03",
     "v": 84.3,
     "chg": -10.7,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plunged-10-7pts-to-84-3-in-july-before-victoria-introduced-stage-4-restrictions-to-stop-covid-19-confidence-lowest-in-victoria-73-9-queensland-83-0-and-so",
-    "slug": "roy-morgan-business-confidence-plunged-10-7pts-to-84-3-in-july-before-victoria-introduced-stage-4-restrictions-to-stop-covid-19-confidence-lowest-in-victoria-73-9-queensland-83-0-and-so"
+    "slug": "roy-morgan-business-confidence-plunged-10-7pts-to-84-3-in-july-before-victoria-introduced-stage-4-restrictions-to-stop-covid-19-confidence-lowest-in-victoria-73-9-queensland-83-0-and-so",
+    "fwm": "2020-07"
    },
    {
     "date": "2020-09-08",
     "v": 83.1,
     "chg": -1.2,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-1-2pts-to-83-1-in-august-confidence-lowest-in-victoria-76-1-and-queensland-77-0",
-    "slug": "roy-morgan-business-confidence-down-1-2pts-to-83-1-in-august-confidence-lowest-in-victoria-76-1-and-queensland-77-0"
+    "slug": "roy-morgan-business-confidence-down-1-2pts-to-83-1-in-august-confidence-lowest-in-victoria-76-1-and-queensland-77-0",
+    "fwm": "2020-08"
    },
    {
     "date": "2020-10-06",
     "v": 85.6,
     "chg": 2.5,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-2-5pts-to-85-6-in-september-confidence-lowest-in-victoria-77-0-south-australia-75-0-and-queensland-71-6",
-    "slug": "roy-morgan-business-confidence-up-2-5pts-to-85-6-in-september-confidence-lowest-in-victoria-77-0-south-australia-75-0-and-queensland-71-6"
+    "slug": "roy-morgan-business-confidence-up-2-5pts-to-85-6-in-september-confidence-lowest-in-victoria-77-0-south-australia-75-0-and-queensland-71-6",
+    "fwm": "2020-09"
    },
    {
     "date": "2020-11-10",
     "v": 98.7,
     "chg": 13.1,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-13-1pts-to-98-7-in-october-confidence-highest-in-new-south-wales-105-4-and-western-australia-108-4",
-    "slug": "roy-morgan-business-confidence-up-13-1pts-to-98-7-in-october-confidence-highest-in-new-south-wales-105-4-and-western-australia-108-4"
+    "slug": "roy-morgan-business-confidence-up-13-1pts-to-98-7-in-october-confidence-highest-in-new-south-wales-105-4-and-western-australia-108-4",
+    "fwm": "2020-10"
    },
    {
     "date": "2020-11-26",
     "v": 109.1,
     "chg": 10.4,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-10-4pts-to-109-1-in-november-confidence-is-now-above-100-in-four-states-nsw-qld-wa-sa",
-    "slug": "roy-morgan-business-confidence-up-10-4pts-to-109-1-in-november-confidence-is-now-above-100-in-four-states-nsw-qld-wa-sa"
+    "slug": "roy-morgan-business-confidence-up-10-4pts-to-109-1-in-november-confidence-is-now-above-100-in-four-states-nsw-qld-wa-sa",
+    "fwm": "2020-10"
    },
    {
     "date": "2021-02-08",
     "v": 120.5,
     "chg": -2.7,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-2-7pts-to-120-5-in-january-majority-of-businesses-expect-good-times-for-the-next-12-months",
-    "slug": "roy-morgan-business-confidence-down-2-7pts-to-120-5-in-january-majority-of-businesses-expect-good-times-for-the-next-12-months"
+    "slug": "roy-morgan-business-confidence-down-2-7pts-to-120-5-in-january-majority-of-businesses-expect-good-times-for-the-next-12-months",
+    "fwm": "2021-01"
    },
    {
     "date": "2021-02-20",
     "v": 123.2,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-14-1pts-to-123-2-in-december-confidence-jump-powered-by-large-increase-in-victoria-nsw",
-    "slug": "roy-morgan-business-confidence-up-14-1pts-to-123-2-in-december-confidence-jump-powered-by-large-increase-in-victoria-nsw"
+    "slug": "roy-morgan-business-confidence-up-14-1pts-to-123-2-in-december-confidence-jump-powered-by-large-increase-in-victoria-nsw",
+    "fwm": "2021-01"
    },
    {
     "date": "2021-03-02",
     "v": 120.8,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-0-3pts-to-120-8-in-february-majority-of-businesses-say-next-12-months-is-a-good-time-to-invest",
-    "slug": "roy-morgan-business-confidence-up-0-3pts-to-120-8-in-february-majority-of-businesses-say-next-12-months-is-a-good-time-to-invest"
+    "slug": "roy-morgan-business-confidence-up-0-3pts-to-120-8-in-february-majority-of-businesses-say-next-12-months-is-a-good-time-to-invest",
+    "fwm": "2021-02"
    },
    {
     "date": "2021-03-30",
     "v": 124,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-hits-7-year-high-of-124-in-march-despite-impending-end-of-jobkeeper-wage-subsidy-59-4-of-businesses-say-the-next-12-months-is-a-good-time-to-invest",
-    "slug": "roy-morgan-business-confidence-hits-7-year-high-of-124-in-march-despite-impending-end-of-jobkeeper-wage-subsidy-59-4-of-businesses-say-the-next-12-months-is-a-good-time-to-invest"
+    "slug": "roy-morgan-business-confidence-hits-7-year-high-of-124-in-march-despite-impending-end-of-jobkeeper-wage-subsidy-59-4-of-businesses-say-the-next-12-months-is-a-good-time-to-invest",
+    "fwm": "2021-02"
    },
    {
     "date": "2021-05-11",
     "v": 125.3,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-hits-7-year-high-of-125-3-in-april-up-48-4-pts-62-9-on-a-year-ago",
-    "slug": "roy-morgan-business-confidence-hits-7-year-high-of-125-3-in-april-up-48-4-pts-62-9-on-a-year-ago"
+    "slug": "roy-morgan-business-confidence-hits-7-year-high-of-125-3-in-april-up-48-4-pts-62-9-on-a-year-ago",
+    "fwm": "2021-04"
    },
    {
     "date": "2021-06-11",
     "v": 129.3,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-hit-a-7-year-high-of-129-3-in-may-largely-before-victoria-was-plunged-into-a-fourth-lockdown",
-    "slug": "roy-morgan-business-confidence-hit-a-7-year-high-of-129-3-in-may-largely-before-victoria-was-plunged-into-a-fourth-lockdown"
+    "slug": "roy-morgan-business-confidence-hit-a-7-year-high-of-129-3-in-may-largely-before-victoria-was-plunged-into-a-fourth-lockdown",
+    "fwm": "2021-05"
    },
    {
     "date": "2021-06-29",
     "v": 128.3,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-only-slightly-in-june-to-128-3-but-new-covid-19-restrictions-a-clear-threat-to-the-recovery",
-    "slug": "roy-morgan-business-confidence-down-only-slightly-in-june-to-128-3-but-new-covid-19-restrictions-a-clear-threat-to-the-recovery"
+    "slug": "roy-morgan-business-confidence-down-only-slightly-in-june-to-128-3-but-new-covid-19-restrictions-a-clear-threat-to-the-recovery",
+    "fwm": "2021-05"
    },
    {
     "date": "2021-08-06",
     "v": 117.2,
     "chg": -11.1,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plunges-by-11-1pts-8-7-to-117-2-after-sydney-melbourne-and-adelaide-placed-in-lockdowns",
-    "slug": "roy-morgan-business-confidence-plunges-by-11-1pts-8-7-to-117-2-after-sydney-melbourne-and-adelaide-placed-in-lockdowns"
+    "slug": "roy-morgan-business-confidence-plunges-by-11-1pts-8-7-to-117-2-after-sydney-melbourne-and-adelaide-placed-in-lockdowns",
+    "fwm": "2021-07"
    },
    {
     "date": "2021-08-31",
     "v": 101.5,
     "chg": -15.7,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plunges-by-15-7pts-13-4-to-101-5-as-sydney-and-melbourne-endure-extended-lockdowns",
-    "slug": "roy-morgan-business-confidence-plunges-by-15-7pts-13-4-to-101-5-as-sydney-and-melbourne-endure-extended-lockdowns"
+    "slug": "roy-morgan-business-confidence-plunges-by-15-7pts-13-4-to-101-5-as-sydney-and-melbourne-endure-extended-lockdowns",
+    "fwm": "2021-07"
    },
    {
     "date": "2021-09-28",
     "v": 104.6,
     "chg": 3.1,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-increases-by-3-1pts-3-1-to-104-6-in-september-as-nsw-and-victoria-outline-re-opening-plans",
-    "slug": "roy-morgan-business-confidence-increases-by-3-1pts-3-1-to-104-6-in-september-as-nsw-and-victoria-outline-re-opening-plans"
+    "slug": "roy-morgan-business-confidence-increases-by-3-1pts-3-1-to-104-6-in-september-as-nsw-and-victoria-outline-re-opening-plans",
+    "fwm": "2021-08"
    },
    {
     "date": "2021-10-25",
     "v": 115.3,
     "chg": 10.7,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-jumps-by-10-7pts-10-2-to-115-3-in-october-as-lockdowns-end-in-sydney-and-melbourne",
-    "slug": "roy-morgan-business-confidence-jumps-by-10-7pts-10-2-to-115-3-in-october-as-lockdowns-end-in-sydney-and-melbourne"
+    "slug": "roy-morgan-business-confidence-jumps-by-10-7pts-10-2-to-115-3-in-october-as-lockdowns-end-in-sydney-and-melbourne",
+    "fwm": "2021-09"
    },
    {
     "date": "2021-12-06",
     "v": 113,
     "chg": -2.3,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-drops-by-2-3pts-to-113-0-in-november-as-the-international-border-opens-for-nsw-victoria",
-    "slug": "roy-morgan-business-confidence-drops-by-2-3pts-to-113-0-in-november-as-the-international-border-opens-for-nsw-victoria"
+    "slug": "roy-morgan-business-confidence-drops-by-2-3pts-to-113-0-in-november-as-the-international-border-opens-for-nsw-victoria",
+    "fwm": "2021-11"
    },
    {
     "date": "2022-01-31",
     "v": 120.2,
     "chg": 7.2,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-jumped-7-2pts-to-120-2-in-december-up-strongly-in-nsw-victoria-and-queensland-before-the-full-impact-of-the-omicron-variant-hit",
-    "slug": "roy-morgan-business-confidence-jumped-7-2pts-to-120-2-in-december-up-strongly-in-nsw-victoria-and-queensland-before-the-full-impact-of-the-omicron-variant-hit"
+    "slug": "roy-morgan-business-confidence-jumped-7-2pts-to-120-2-in-december-up-strongly-in-nsw-victoria-and-queensland-before-the-full-impact-of-the-omicron-variant-hit",
+    "fwm": "2021-12"
    },
    {
     "date": "2022-02-10",
     "v": 101.5,
     "chg": -18.7,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-january-2022",
-    "slug": "roy-morgan-business-confidence-january-2022"
+    "slug": "roy-morgan-business-confidence-january-2022",
+    "fwm": "2022-01"
    },
    {
     "date": "2022-03-15",
     "v": 120.5,
     "chg": 19,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-jumped-19pts-to-120-5-in-february-as-omicron-variant-rapidly-receded",
-    "slug": "roy-morgan-business-confidence-jumped-19pts-to-120-5-in-february-as-omicron-variant-rapidly-receded"
+    "slug": "roy-morgan-business-confidence-jumped-19pts-to-120-5-in-february-as-omicron-variant-rapidly-receded",
+    "fwm": "2022-02"
    },
    {
     "date": "2022-04-11",
     "v": 106.7,
     "chg": -13.8,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plunged-13-8pts-to-106-7-in-march-after-russian-invasion-of-ukraine-and-large-spike-in-petrol-price",
-    "slug": "roy-morgan-business-confidence-plunged-13-8pts-to-106-7-in-march-after-russian-invasion-of-ukraine-and-large-spike-in-petrol-price"
+    "slug": "roy-morgan-business-confidence-plunged-13-8pts-to-106-7-in-march-after-russian-invasion-of-ukraine-and-large-spike-in-petrol-price",
+    "fwm": "2022-03"
    },
    {
     "date": "2022-05-08",
     "v": 113,
     "chg": 6.3,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-jumped-6-3pts-to-113-0-in-april-after-the-federal-budget-but-before-this-weeks-interest-rate-increase",
-    "slug": "roy-morgan-business-confidence-jumped-6-3pts-to-113-0-in-april-after-the-federal-budget-but-before-this-weeks-interest-rate-increase"
+    "slug": "roy-morgan-business-confidence-jumped-6-3pts-to-113-0-in-april-after-the-federal-budget-but-before-this-weeks-interest-rate-increase",
+    "fwm": "2022-04"
    },
    {
     "date": "2022-06-06",
     "v": 100.2,
     "chg": -12.8,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-fell-12-8pts-to-100-2-in-may-as-australians-faced-a-pivotal-federal-election",
-    "slug": "roy-morgan-business-confidence-fell-12-8pts-to-100-2-in-may-as-australians-faced-a-pivotal-federal-election"
+    "slug": "roy-morgan-business-confidence-fell-12-8pts-to-100-2-in-may-as-australians-faced-a-pivotal-federal-election",
+    "fwm": "2022-05"
    },
    {
     "date": "2022-06-27",
     "v": 97.3,
     "chg": -2.9,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-2-9pts-to-97-3-after-federal-election-lowest-rating-since-september-2020-85-6",
-    "slug": "roy-morgan-business-confidence-down-2-9pts-to-97-3-after-federal-election-lowest-rating-since-september-2020-85-6"
+    "slug": "roy-morgan-business-confidence-down-2-9pts-to-97-3-after-federal-election-lowest-rating-since-september-2020-85-6",
+    "fwm": "2022-05"
    },
    {
     "date": "2022-08-02",
     "v": 94.9,
     "chg": -2.4,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-2-4pts-to-94-9-lowest-since-september-2020",
-    "slug": "roy-morgan-business-confidence-down-2-4pts-to-94-9-lowest-since-september-2020"
+    "slug": "roy-morgan-business-confidence-down-2-4pts-to-94-9-lowest-since-september-2020",
+    "fwm": "2022-07"
    },
    {
     "date": "2022-08-29",
     "v": 96,
     "chg": 1.1,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-1-1pts-to-96-0",
-    "slug": "roy-morgan-business-confidence-up-1-1pts-to-96-0"
+    "slug": "roy-morgan-business-confidence-up-1-1pts-to-96-0",
+    "fwm": "2022-07"
    },
    {
     "date": "2022-10-04",
     "v": 100.7,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-up-for-a-second-straight-month-and-back-in-positive-territory-at-100-7",
-    "slug": "roy-morgan-business-confidence-up-for-a-second-straight-month-and-back-in-positive-territory-at-100-7"
+    "slug": "roy-morgan-business-confidence-up-for-a-second-straight-month-and-back-in-positive-territory-at-100-7",
+    "fwm": "2022-09"
    },
    {
     "date": "2022-11-07",
     "v": 96.6,
     "chg": -4.1,
     "url": "https://www.roymorgan.com/findings/9092-roy-morgan-business-confidence-october-2022",
-    "slug": "9092-roy-morgan-business-confidence-october-2022"
+    "slug": "9092-roy-morgan-business-confidence-october-2022",
+    "fwm": "2022-10"
    },
    {
     "date": "2022-12-02",
     "v": 90.2,
     "chg": -6.4,
     "url": "https://www.roymorgan.com/findings/9112-roy-morgan-business-confidence-november-2022",
-    "slug": "9112-roy-morgan-business-confidence-november-2022"
+    "slug": "9112-roy-morgan-business-confidence-november-2022",
+    "fwm": "2022-11"
    },
    {
     "date": "2023-01-17",
     "v": 96,
     "chg": 5.8,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-rebounded-by-5-8-points-to-96-0-in-december-as-australians-spent-big-for-christmas",
-    "slug": "roy-morgan-business-confidence-rebounded-by-5-8-points-to-96-0-in-december-as-australians-spent-big-for-christmas"
+    "slug": "roy-morgan-business-confidence-rebounded-by-5-8-points-to-96-0-in-december-as-australians-spent-big-for-christmas",
+    "fwm": "2022-12"
    },
    {
     "date": "2023-02-14",
     "v": 106.4,
     "chg": 10.4,
     "url": "https://www.roymorgan.com/findings/9153-roy-morgan-business-confidence-january-2023",
-    "slug": "9153-roy-morgan-business-confidence-january-2023"
+    "slug": "9153-roy-morgan-business-confidence-january-2023",
+    "fwm": "2023-01"
    },
    {
     "date": "2023-03-14",
     "v": 95.8,
     "chg": -10.6,
     "url": "https://www.roymorgan.com/findings/9173-roy-morgan-business-confidence-february-2023",
-    "slug": "9173-roy-morgan-business-confidence-february-2023"
+    "slug": "9173-roy-morgan-business-confidence-february-2023",
+    "fwm": "2023-02"
    },
    {
     "date": "2023-04-12",
     "v": 93.6,
     "chg": -2.2,
     "url": "https://www.roymorgan.com/findings/9183-roy-morgan-business-confidence-march-2023",
-    "slug": "9183-roy-morgan-business-confidence-march-2023"
+    "slug": "9183-roy-morgan-business-confidence-march-2023",
+    "fwm": "2023-03"
    },
    {
     "date": "2023-05-09",
     "v": 90.2,
     "chg": -3.4,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-down-3-4-points-to-90-2-in-april-before-the-rba-hiked-interest-rates-in-may",
-    "slug": "roy-morgan-business-confidence-down-3-4-points-to-90-2-in-april-before-the-rba-hiked-interest-rates-in-may"
+    "slug": "roy-morgan-business-confidence-down-3-4-points-to-90-2-in-april-before-the-rba-hiked-interest-rates-in-may",
+    "fwm": "2023-04"
    },
    {
     "date": "2023-06-13",
     "v": 90.3,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/9263-roy-morgan-business-confidence-may-2023",
-    "slug": "9263-roy-morgan-business-confidence-may-2023"
+    "slug": "9263-roy-morgan-business-confidence-may-2023",
+    "fwm": "2023-05"
    },
    {
     "date": "2023-07-10",
     "v": 88.8,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/9283-roy-morgan-business-confidence-june-2023",
-    "slug": "9283-roy-morgan-business-confidence-june-2023"
+    "slug": "9283-roy-morgan-business-confidence-june-2023",
+    "fwm": "2023-06"
    },
    {
     "date": "2023-08-07",
     "v": 87.5,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-july-2023",
-    "slug": "roy-morgan-business-confidence-july-2023"
+    "slug": "roy-morgan-business-confidence-july-2023",
+    "fwm": "2023-07"
    },
    {
     "date": "2023-09-01",
     "v": 94.7,
     "chg": 7.2,
     "url": "https://www.roymorgan.com/findings/9323-roy-morgan-business-confidence-august-2023",
-    "slug": "9323-roy-morgan-business-confidence-august-2023"
+    "slug": "9323-roy-morgan-business-confidence-august-2023",
+    "fwm": "2023-08"
    },
    {
     "date": "2023-10-17",
     "v": 87.1,
     "chg": -7.6,
     "url": "https://www.roymorgan.com/findings/9333-roy-morgan-business-confidence-september-2023",
-    "slug": "9333-roy-morgan-business-confidence-september-2023"
+    "slug": "9333-roy-morgan-business-confidence-september-2023",
+    "fwm": "2023-09"
    },
    {
     "date": "2023-11-14",
     "v": 90.4,
     "chg": 3.3,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-october-2023",
-    "slug": "roy-morgan-business-confidence-october-2023"
+    "slug": "roy-morgan-business-confidence-october-2023",
+    "fwm": "2023-10"
    },
    {
     "date": "2023-12-05",
     "v": 85.8,
     "chg": -4.6,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-november-2023",
-    "slug": "roy-morgan-business-confidence-november-2023"
+    "slug": "roy-morgan-business-confidence-november-2023",
+    "fwm": "2023-11"
    },
    {
     "date": "2024-01-23",
     "v": 91.1,
     "chg": 5.3,
     "url": "https://www.roymorgan.com/findings/9423-roy-morgan-business-confidence-december-2023",
-    "slug": "9423-roy-morgan-business-confidence-december-2023"
+    "slug": "9423-roy-morgan-business-confidence-december-2023",
+    "fwm": "2023-12"
    },
    {
     "date": "2024-02-20",
     "v": 93.2,
     "chg": 2.1,
     "url": "https://www.roymorgan.com/findings/9463-roy-morgan-business-confidence-january-2024",
-    "slug": "9463-roy-morgan-business-confidence-january-2024"
+    "slug": "9463-roy-morgan-business-confidence-january-2024",
+    "fwm": "2024-01"
    },
    {
     "date": "2024-03-15",
     "v": 101.5,
     "chg": 8.3,
     "url": "https://www.roymorgan.com/findings/9493-roy-morgan-business-confidence-february-2024",
-    "slug": "9493-roy-morgan-business-confidence-february-2024"
+    "slug": "9493-roy-morgan-business-confidence-february-2024",
+    "fwm": "2024-02"
    },
    {
     "date": "2024-04-16",
     "v": 98,
     "chg": -3.5,
     "url": "https://www.roymorgan.com/findings/9513-roy-morgan-business-confidence-march-2024",
-    "slug": "9513-roy-morgan-business-confidence-march-2024"
+    "slug": "9513-roy-morgan-business-confidence-march-2024",
+    "fwm": "2024-03"
    },
    {
     "date": "2024-05-07",
     "v": 99.3,
     "chg": 1.3,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-april-2024",
-    "slug": "roy-morgan-business-confidence-april-2024"
+    "slug": "roy-morgan-business-confidence-april-2024",
+    "fwm": "2024-04"
    },
    {
     "date": "2024-06-18",
     "v": 97,
     "chg": -2.3,
     "url": "https://www.roymorgan.com/findings/9613-roy-morgan-business-confidence-may-2024",
-    "slug": "9613-roy-morgan-business-confidence-may-2024"
+    "slug": "9613-roy-morgan-business-confidence-may-2024",
+    "fwm": "2024-05"
    },
    {
     "date": "2024-07-09",
     "v": 91.5,
     "chg": -5.5,
     "url": "https://www.roymorgan.com/findings/9633-roy-morgan-business-confidence-june-2024",
-    "slug": "9633-roy-morgan-business-confidence-june-2024"
+    "slug": "9633-roy-morgan-business-confidence-june-2024",
+    "fwm": "2024-06"
    },
    {
     "date": "2024-08-13",
     "v": 95.1,
     "chg": 3.6,
     "url": "https://www.roymorgan.com/findings/9653-roy-morgan-business-confidence-july-2024",
-    "slug": "9653-roy-morgan-business-confidence-july-2024"
+    "slug": "9653-roy-morgan-business-confidence-july-2024",
+    "fwm": "2024-07"
    },
    {
     "date": "2024-09-10",
     "v": 101.3,
     "chg": 6.2,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-jumps-6-2pts-to-101-3-due-to-increased-confidence-about-the-economy",
-    "slug": "roy-morgan-business-confidence-jumps-6-2pts-to-101-3-due-to-increased-confidence-about-the-economy"
+    "slug": "roy-morgan-business-confidence-jumps-6-2pts-to-101-3-due-to-increased-confidence-about-the-economy",
+    "fwm": "2024-08"
    },
    {
     "date": "2024-10-08",
     "v": 94.3,
     "chg": -7,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-slumps-7pts-to-94-3-in-september-with-rising-concerns-about-the-next-12-months",
-    "slug": "roy-morgan-business-confidence-slumps-7pts-to-94-3-in-september-with-rising-concerns-about-the-next-12-months"
+    "slug": "roy-morgan-business-confidence-slumps-7pts-to-94-3-in-september-with-rising-concerns-about-the-next-12-months",
+    "fwm": "2024-09"
    },
    {
     "date": "2024-11-12",
     "v": 106.7,
     "chg": 12.4,
     "url": "https://www.roymorgan.com/findings/9753-roy-morgan-business-confidence-october-2024",
-    "slug": "9753-roy-morgan-business-confidence-october-2024"
+    "slug": "9753-roy-morgan-business-confidence-october-2024",
+    "fwm": "2024-10"
    },
    {
     "date": "2025-01-21",
     "v": 105.9,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/9803-roy-morgan-business-confidence-december-2024",
-    "slug": "9803-roy-morgan-business-confidence-december-2024"
+    "slug": "9803-roy-morgan-business-confidence-december-2024",
+    "fwm": "2024-12"
    },
    {
     "date": "2025-02-11",
     "v": 108.2,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/9843-roy-morgan-business-confidence-january-2025",
-    "slug": "9843-roy-morgan-business-confidence-january-2025"
+    "slug": "9843-roy-morgan-business-confidence-january-2025",
+    "fwm": "2025-01"
    },
    {
     "date": "2025-03-11",
     "v": 108.5,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/9873-roy-morgan-business-confidence-february-2025",
-    "slug": "9873-roy-morgan-business-confidence-february-2025"
+    "slug": "9873-roy-morgan-business-confidence-february-2025",
+    "fwm": "2025-02"
    },
    {
     "date": "2025-04-08",
     "v": 106,
     "chg": -2.5,
     "url": "https://www.roymorgan.com/findings/9903-roy-morgan-business-confidence-march-2025",
-    "slug": "9903-roy-morgan-business-confidence-march-2025"
+    "slug": "9903-roy-morgan-business-confidence-march-2025",
+    "fwm": "2025-03"
    },
    {
     "date": "2025-05-06",
     "v": 96.7,
     "chg": -9.3,
     "url": "https://www.roymorgan.com/findings/9933-roy-morgan-business-confidence-april-2025",
-    "slug": "9933-roy-morgan-business-confidence-april-2025"
+    "slug": "9933-roy-morgan-business-confidence-april-2025",
+    "fwm": "2025-04"
    },
    {
     "date": "2025-06-11",
     "v": 99.6,
     "chg": 2.9,
     "url": "https://www.roymorgan.com/findings/9953-roy-morgan-business-confidence-may-2025",
-    "slug": "9953-roy-morgan-business-confidence-may-2025"
+    "slug": "9953-roy-morgan-business-confidence-may-2025",
+    "fwm": "2025-05"
    },
    {
     "date": "2025-07-07",
     "v": 102.4,
     "chg": 2.8,
     "url": "https://www.roymorgan.com/findings/9993-roy-morgan-business-confidence-june-2025",
-    "slug": "9993-roy-morgan-business-confidence-june-2025"
+    "slug": "9993-roy-morgan-business-confidence-june-2025",
+    "fwm": "2025-06"
    },
    {
     "date": "2025-08-04",
     "v": 103,
     "chg": 0.6,
     "url": "https://www.roymorgan.com/findings/9994-roy-morgan-business-confidence-july-2025",
-    "slug": "9994-roy-morgan-business-confidence-july-2025"
+    "slug": "9994-roy-morgan-business-confidence-july-2025",
+    "fwm": "2025-07"
    },
    {
     "date": "2025-09-09",
     "v": 98.6,
     "chg": -4.4,
     "url": "https://www.roymorgan.com/findings/10004-roy-morgan-business-confidence-august-2025",
-    "slug": "10004-roy-morgan-business-confidence-august-2025"
+    "slug": "10004-roy-morgan-business-confidence-august-2025",
+    "fwm": "2025-08"
    },
    {
     "date": "2025-10-07",
     "v": 101.6,
     "chg": 3,
     "url": "https://www.roymorgan.com/findings/10044-roy-morgan-business-confidence-september-2025",
-    "slug": "10044-roy-morgan-business-confidence-september-2025"
+    "slug": "10044-roy-morgan-business-confidence-september-2025",
+    "fwm": "2025-09"
    },
    {
     "date": "2025-11-11",
     "v": 101.7,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/10064-roy-morgan-business-confidence-october-2025",
-    "slug": "10064-roy-morgan-business-confidence-october-2025"
+    "slug": "10064-roy-morgan-business-confidence-october-2025",
+    "fwm": "2025-10"
    },
    {
     "date": "2025-12-08",
     "v": 98.7,
     "chg": -3,
     "url": "https://www.roymorgan.com/findings/10096-roy-morgan-business-confidence-november-2025",
-    "slug": "10096-roy-morgan-business-confidence-november-2025"
+    "slug": "10096-roy-morgan-business-confidence-november-2025",
+    "fwm": "2025-11"
    },
    {
     "date": "2026-01-09",
     "v": 105,
     "chg": 6.3,
     "url": "https://www.roymorgan.com/findings/10106-roy-morgan-business-confidence-december-2025",
-    "slug": "10106-roy-morgan-business-confidence-december-2025"
+    "slug": "10106-roy-morgan-business-confidence-december-2025",
+    "fwm": "2025-12"
    },
    {
     "date": "2026-02-10",
     "v": 97.4,
     "chg": -7.6,
     "url": "https://www.roymorgan.com/findings/10116-roy-morgan-business-confidence-january-2026",
-    "slug": "10116-roy-morgan-business-confidence-january-2026"
+    "slug": "10116-roy-morgan-business-confidence-january-2026",
+    "fwm": "2026-01"
    },
    {
     "date": "2026-03-17",
     "v": 88.6,
     "chg": -8.8,
     "url": "https://www.roymorgan.com/findings/10166-roy-morgan-business-confidence-february-2026",
-    "slug": "10166-roy-morgan-business-confidence-february-2026"
+    "slug": "10166-roy-morgan-business-confidence-february-2026",
+    "fwm": "2026-02"
    },
    {
     "date": "2026-04-08",
     "v": 90.7,
     "chg": 2.1,
     "url": "https://www.roymorgan.com/findings/10186-roy-morgan-business-confidence-march-2026",
-    "slug": "10186-roy-morgan-business-confidence-march-2026"
+    "slug": "10186-roy-morgan-business-confidence-march-2026",
+    "fwm": "2026-03"
    },
    {
     "date": "2026-05-04",
     "v": 76.5,
     "chg": -14.2,
     "url": "https://www.roymorgan.com/findings/roy-morgan-business-confidence-plummeted-14-2pts-to-a-new-record-low-of-only-76-5-in-april-as-the-conflict-in-the-middle-east-continued-without-resolution",
-    "slug": "roy-morgan-business-confidence-plummeted-14-2pts-to-a-new-record-low-of-only-76-5-in-april-as-the-conflict-in-the-middle-east-continued-without-resolution"
+    "slug": "roy-morgan-business-confidence-plummeted-14-2pts-to-a-new-record-low-of-only-76-5-in-april-as-the-conflict-in-the-middle-east-continued-without-resolution",
+    "fwm": "2026-04"
    },
    {
     "date": "2026-06-10",
     "v": 76.1,
     "chg": null,
     "url": "https://www.roymorgan.com/findings/10236-roy-morgan-business-confidence-may-2026",
-    "slug": "10236-roy-morgan-business-confidence-may-2026"
+    "slug": "10236-roy-morgan-business-confidence-may-2026",
+    "fwm": "2026-05"
    },
    {
     "date": "2026-07-07",
     "v": 77.5,
     "chg": 1.4,
     "url": "https://www.roymorgan.com/findings/10276-roy-morgan-business-confidence-june-2026",
-    "slug": "10276-roy-morgan-business-confidence-june-2026"
+    "slug": "10276-roy-morgan-business-confidence-june-2026",
+    "fwm": "2026-06"
    },
    {
     "date": "2026-08-04",
     "v": 76,
     "chg": -1.5,
     "url": "https://www.roymorgan.com/findings/10296-roy-morgan-business-confidence-july-2026",
-    "slug": "10296-roy-morgan-business-confidence-july-2026"
+    "slug": "10296-roy-morgan-business-confidence-july-2026",
+    "fwm": "2026-07"
    },
    {
     "date": "2026-09-08",
     "v": 79.1,
     "chg": 3.1,
     "url": "https://www.roymorgan.com/findings/10336-roy-morgan-business-confidence-august-2026",
-    "slug": "10336-roy-morgan-business-confidence-august-2026"
+    "slug": "10336-roy-morgan-business-confidence-august-2026",
+    "fwm": "2026-08"
    }
   ]
  },
@@ -3402,14 +3504,20 @@
     "v": 84.4,
     "chg": -4.5,
     "url": "https://www.westpaciq.com.au/economics/2026/09/consumer-sentiment-september-2026/",
-    "slug": "consumer-sentiment-september-2026"
+    "slug": "consumer-sentiment-september-2026",
+    "n": 1200,
+    "fwStart": "2026-08-31",
+    "fwEnd": "2026-09-03"
    },
    {
     "date": "2026-10-06",
     "v": 80.4,
     "chg": -4,
     "url": "https://www.westpaciq.com.au/economics/2026/10/consumer-sentiment-october-2026/",
-    "slug": "consumer-sentiment-october-2026"
+    "slug": "consumer-sentiment-october-2026",
+    "n": 1200,
+    "fwStart": "2026-09-28",
+    "fwEnd": "2026-10-01"
    }
   ]
  },
@@ -3565,7 +3673,10 @@
     "condChg": -5,
     "ym": "2026-08",
     "url": "https://www.nab.com.au/news/economy-markets/business-conditions-drop-into-negative-territory-business-survey-august26",
-    "slug": "business-conditions-drop-into-negative-territory-business-survey-august26"
+    "slug": "business-conditions-drop-into-negative-territory-business-survey-august26",
+    "n": 455,
+    "fwStart": "2026-08-24",
+    "fwEnd": "2026-08-31"
    }
   ]
  }

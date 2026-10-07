@@ -19,7 +19,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MOOD = path.join(ROOT, ".build", "mood.mjs");
 
 process.env.MOOD_LIB = "1";
-const { parseText, SERIES, dmyToIso, parseWMDesc, parseNabPdf, nabMeasure, safeName } = await import("./mood.mjs");
+const { parseText, SERIES, dmyToIso, parseWMDesc, parseNabPdf, nabMeasure, safeName,
+        resolveWinYear, parseRmConsumerPdf, parseRmBusinessPost, parseWestpacPdf, parseNabFw, surveyMonthOf } = await import("./mood.mjs");
 
 /* ---------------------------------------------------------------- 1. grammar */
 const C = { anchor: SERIES.consumer.anchor, band: SERIES.consumer.band };
@@ -183,6 +184,63 @@ W("Consumer sentiment fell to 13.6 in June from 82.2 in May.", null);
 }
 console.log("1b. westpac+NAB grammar: OK");
 
+/* ------------------------------------------- 1c. enrichment window + lanes */
+// the yearless printed window resolves its year off the release date
+{
+  const w = resolveWinYear({ d1: 28, m1: 8, d2: 4, m2: 9 }, "2026-10-06");
+  assert.deepEqual(w, { fwStart: "2026-09-28", fwEnd: "2026-10-04" }, "28 Sep–4 Oct before a 6 Oct release");
+  const x = resolveWinYear({ d1: 29, m1: 11, d2: 4, m2: 0 }, "2022-01-04");
+  assert.deepEqual(x, { fwStart: "2021-12-29", fwEnd: "2022-01-04" }, "the Christmas window crosses the year");
+  assert.equal(resolveWinYear({ d1: 1, m1: 1, d2: 7, m2: 1 }, "2026-10-06"), null, "a stale window files nothing");
+}
+// the consumer release PDF: n sentence + both printed "Last week" cell forms
+{
+  const t26 = [
+    "ANZ-Roy Morgan Australian Consumer Confidence",
+    "Last week           Weekly          Four-week",
+    "28 Sep\u20124 Oct       change, pts     average",
+    "Consumer confidence fell 3.4pts last week to 67.1pts after the RBA raised rates.",
+    "The weekly ANZ-Roy Morgan Australian Consumer Confidence rating is based on 1,019 interviews conducted online and over the telephone during the week to Sunday.",
+  ].join("\n");
+  const g = parseRmConsumerPdf(t26);
+  assert.equal(g.n, 1019);
+  assert.deepEqual(g.win, { d1: 28, m1: 8, d2: 4, m2: 9 }, "the 2026 '28 Sep–4 Oct' cell");
+  const t22 = [
+    "Last week       Weekly      Four-week",
+    " (17\u201323 Oct)    change, %      average",
+    "Rating is based on 1,476 interviews conducted online and by telephone during the week to Sunday.",
+  ].join("\n");
+  const g2 = parseRmConsumerPdf(t22);
+  assert.equal(g2.n, 1476, "looser 2022 phrasing still files the n");
+  assert.deepEqual(g2.win, { d1: 17, m1: 9, d2: 23, m2: 9 }, "the 2022 '(17–23 Oct)' cell");
+}
+// the business post: dated source-line n beats the lagging block quote
+{
+  const post = [
+    "Source: Roy Morgan Business Single Source, August 2025, n=1,189, August 2026, n=1,094.",
+    "The latest Roy Morgan Business Confidence results for July are based on 1,094 detailed interviews with a cross-section of Australian businesses.",
+  ].join(" ");
+  assert.deepEqual(parseRmBusinessPost(post, { mon: 7, yr: 2026 }), { n: 1094 }, "the stale 'for July' month word never costs the n");
+  const clash = post.replace("1,094 detailed interviews", "1,200 detailed interviews");
+  assert.deepEqual(parseRmBusinessPost(clash, { mon: 7, yr: 2026 }), { n: null }, "a quote/line disagreement files nothing");
+}
+// the westpac bulletin print (a genuine 4-day window)
+{
+  const g = parseWestpacPdf("This latest survey is based on 1200 adults aged 18 years and over, across Australia. It was conducted in the week from 28 September to 1 October.");
+  assert.equal(g.n, 1200);
+  assert.deepEqual(g.win, { d1: 28, m1: 8, d2: 1, m2: 9 });
+}
+// the NAB footer (an approximate n, filed as printed)
+{
+  const g = parseNabFw("Survey conducted from 24 August to 31 August, covering around 455 businesses across the non-farm sector.");
+  assert.equal(g.n, 455);
+  assert.deepEqual(g.win, { d1: 24, m1: 7, d2: 31, m2: 7 });
+}
+// the business survey month: slug-titled wave, then the release-minus-one rule
+assert.deepEqual(surveyMonthOf({ slug: "10336-roy-morgan-business-confidence-august-2026", date: "2026-09-08" }), { mon: 7, yr: 2026 });
+assert.deepEqual(surveyMonthOf({ slug: "roy-morgan-business-confidence-plummeted-14-2pts", date: "2026-05-04" }), { mon: 3, yr: 2026 });
+console.log("1c. enrichment grammar: OK");
+
 /* ------------------------------------------------------- 2. full pipeline */
 const tmp = fs.mkdtempSync(path.join(fs.realpathSync.native ? "/tmp/" : "/tmp/", "mood-test-"));
 fs.mkdirSync(path.join(tmp, "data"));
@@ -225,6 +283,42 @@ fs.writeFileSync(path.join(FEED, "business-confidence-page-1.json"), JSON.string
   mkItem(14, "10330-roy-morgan-business-confidence-july-2026", "2026-08-05", "Roy Morgan Business Confidence down 8.4pts to 78.0 in July as Middle East tensions drag on", ""),
 ]));
 
+/* ------------------------------ 2a2. RM enrichment fixtures: post pages
+   keyed safeName(postUrl)+".page.html" and release-PDF texts keyed
+   safeName(pdfUrl)+".pdf.txt" — the consumer sample sentence and its
+   yearless Last-week window; the business state chart's dated source
+   pairs. */
+const rmUrl = (slug) => `https://www.roymorgan.com/findings/${slug}`;
+// consumer: the 81.5 wave's window is "(17–23 October)" — a year-bracketed
+// cell that resolves to no window within reach of an August release, so
+// that row files its n but never a fieldwork window
+const clPdf = (id) => `https://www.roymorgan.com/wp-content/uploads/2026/09/anz-rm-consumer-confidence-${id}.pdf`;
+for (const [slug, v, n, win] of [
+  ["10098-anz-roy-morgan-consumer-confidence-september-29", "83.4", "1,019", "(28 Sep – 4 Oct)"],
+  ["10097-anz-roy-morgan-consumer-confidence-september-22", "82.2", "1,076", "(16–22 September)"],
+  ["10096-anz-roy-morgan-consumer-confidence-september-15", "82.9", "1,054", "(30 Aug – 5 Sep)"],
+  ["10094-anz-roy-morgan-consumer-confidence-august-18", "81.5", "1,476", "(17–23 October)"],
+]) {
+  const pdf = clPdf(slug.slice(0, 5));
+  fix(FEED, rmUrl(slug), ".page.html", `<html><body><p>ANZ-Roy Morgan Australian Consumer Confidence</p><a href="${pdf}">Download the release (PDF)</a></body></html>`);
+  fix(FEED, pdf, ".pdf.txt", [
+    `ANZ-Roy Morgan Australian Consumer Confidence ${v}`,
+    `The weekly ANZ-Roy Morgan Australian Consumer Confidence rating is based on ${n} interviews conducted online and over the telephone during the week to Sunday.`,
+    `           This week        A week ago        Last week`,
+    `Index         ${v.padStart(6)}              ${v}              ${win} ${v}`,
+  ].join("\n"));
+}
+// business: the June wave's post is absent (no fixture), so its n stays
+// null; the others file n from the dated Single Source pairs, with the
+// trailing sentence as a figure-only cross-check (its month lags)
+const nextData = (content) => `<html><head><script id="__NEXT_DATA__" type="application/json">${JSON.stringify({ props: { pageProps: { findingData: { postBy: { content } } } } })}</script></head><body/></html>`;
+fix(FEED, rmUrl("10336-roy-morgan-business-confidence-august-2026"), ".page.html",
+  nextData(`<p>Roy Morgan Business Confidence fell in August.</p><p>Source: Roy Morgan Business Single Source, July 2026, n=1,189, August 2026, n=1,094.</p><blockquote><p>Roy Morgan Business Confidence results for July are based on 1,094 detailed interviews.</p></blockquote>`));
+fix(FEED, rmUrl("10330-roy-morgan-business-confidence-july-2026"), ".page.html",
+  nextData(`<p>Source: Roy Morgan Business Single Source, June 2026, n=1,150, July 2026, n=985.</p><blockquote><p>Roy Morgan Business Confidence results for July are based on 985 detailed interviews.</p></blockquote>`));
+fix(FEED, rmUrl("10300-roy-morgan-business-confidence-plummeted-14-2pts-to-a-new-record-low-of-only-76-5-in-april"), ".page.html",
+  nextData(`<p>Source: Roy Morgan Business Single Source, March 2026, n=1,087, April 2026, n=372.</p><blockquote><p>Roy Morgan Business Confidence results for April are based on 372 detailed interviews.</p></blockquote>`));
+
 /* --------------------------------------------- 2b. westpac + NAB fixtures
    Same contract as --feed-dir: sitemap.xml in the dir, pages and PDF text
    keyed by safeName(url)+".html"/".txt". Westpac pages carry the meta
@@ -238,8 +332,12 @@ fs.writeFileSync(path.join(WP_DIR, "sitemap.xml"), `<?xml version="1.0"?>
 <url><loc>https://www.westpaciq.com.au/economics/2026/11/consumer-sentiment-november-2026/</loc></url>
 <url><loc>https://www.westpaciq.com.au/economics/2026/09/video-consumer-sentiment/</loc></url>
 </urlset>`);
+// enrichment: the September bulletin rides a library PDF on the page; the
+// October wave carries no bulletin link, so its row stays bare
+const WP_PDF = "https://library.westpaciq.com.au/content/dam/public/westpaciq/secure/ER20260909BullConsumerSentiment.pdf";
 fix(WP_DIR, "https://www.westpaciq.com.au/economics/2026/09/consumer-sentiment-september-2026/", ".html",
-  wpPage("Consumer sentiment rose 2.2% to 100.0 in September from 97.8 in August.", "September 09 2026"));
+  wpPage("Consumer sentiment rose 2.2% to 100.0 in September from 97.8 in August.", "September 09 2026").replace("</body>", `<a href="${WP_PDF}">Read the full report</a></body>`));
+fix(WP_DIR, WP_PDF, ".txt", "Westpac Consumer Sentiment Bulletin September 2026 … This latest survey is based on 1200 adults aged 18 years and over, across Australia. It was conducted in the week from 1 September to 5 September.");
 fix(WP_DIR, "https://www.westpaciq.com.au/economics/2026/10/consumer-sentiment-october-2026/", ".html",
   wpPage("Consumer sentiment fell 3.4% to 96.6 in October from 100.0 in September.", "October 06 2026"));
 // a percentage that contradicts the levels: the wave never files
@@ -271,6 +369,7 @@ fix(NAB_DIR, PDF_A, ".txt", [
   "   Business Confidence                                Business Conditions",
   "Summary",
   "Business confidence rose 6pts to +6 index points. Business conditions improved 2pts to +2 index points.",
+  "Survey conducted from 4 August to 8 August, covering around 462 businesses across the non-farm sector.",
 ].join("\n"));
 fix(NAB_DIR, NAB_S, ".html", nabArt("/content/dam/nab/documents/news/2026/september-monthly-business-survey.pdf"));
 fix(NAB_DIR, PDF_S, ".txt", [
@@ -283,6 +382,7 @@ fix(NAB_DIR, PDF_S, ".txt", [
   "Net balance",
   "Business confidence                        6           6            4",
   "Business conditions                        2           2            0",
+  "Survey conducted from 31 August to 4 September, covering around 470 businesses.",
 ].join("\n"));
 // PDF says confidence +4 (banner + Summary agree); the article prose says +9
 // — the disagreement drops the whole wave (never pick a side).
@@ -354,6 +454,34 @@ assert.ok(!nRows["2026-10-06"], "PDF/article disagreement drops the wave");
 assert.equal(doc.nabBusiness.base.includes("+100"), true, "shift disclosure rides the series base");
 assert.equal(doc._about.includes("SHIFTED +100"), true, "shift disclosure in _about");
 
+// per-release enrichment: sample + survey window from each lane's own print
+assert.deepEqual(st.enrich.consumer, { n: 4, fw: 3 }, "every consumer wave files its n; the 81.5 wave's year-bracket window resolves nowhere near its release");
+assert.deepEqual(st.enrich.business, { n: 3, fw: 4 }, "the 07-07 post names no dated n; every wave still knows its survey month");
+assert.deepEqual(st.enrich.westpacConsumer, { n: 1, fw: 1 }, "October's bulletin isn't out yet");
+assert.deepEqual(st.enrich.nabBusiness, { n: 2, fw: 2 }, "both PDFs carry the footer line");
+assert.equal(consRows["2026-08-18"].n, 1476, "the 2010s short body parses too");
+assert.ok(consRows["2026-08-18"].fwStart == null, "its year-(17–23 Oct) cell resolves no honest window near an August release");
+assert.equal(consRows["2026-09-22"].n, 1076);
+assert.deepEqual([consRows["2026-09-22"].fwStart, consRows["2026-09-22"].fwEnd], ["2026-09-16", "2026-09-22"]);
+assert.equal(consRows["2026-09-15"].n, 1054);
+assert.equal(consRows["2026-09-15"].fwStart, "2026-08-30", "a cross-month window ending ten days back still resolves");
+assert.equal(consRows["2026-09-29"].n, 1019);
+assert.deepEqual([consRows["2026-09-29"].fwStart, consRows["2026-09-29"].fwEnd], ["2026-09-28", "2026-10-04"]);
+assert.equal(busRows["2026-05-04"].n, 372, "the short business body parses too");
+assert.equal(busRows["2026-05-04"].fwm, "2026-04");
+assert.equal(busRows["2026-07-07"].n, undefined, "the 07-07 post names no dated n");
+assert.equal(busRows["2026-07-07"].fwm, "2026-06", "a monthless slug falls back to the month before release");
+assert.equal(busRows["2026-08-05"].n, 985);
+assert.equal(busRows["2026-08-05"].fwm, "2026-07");
+assert.equal(busRows["2026-09-08"].n, 1094);
+assert.equal(busRows["2026-09-08"].fwm, "2026-08");
+assert.equal(wRows["2026-09-09"].n, 1200);
+assert.deepEqual([wRows["2026-09-09"].fwStart, wRows["2026-09-09"].fwEnd], ["2026-09-01", "2026-09-05"]);
+assert.equal(nRows["2026-08-11"].n, 462);
+assert.deepEqual([nRows["2026-08-11"].fwStart, nRows["2026-08-11"].fwEnd], ["2026-08-04", "2026-08-08"]);
+assert.equal(nRows["2026-09-09"].n, 470);
+assert.equal(nRows["2026-09-09"].fwStart, "2026-08-31");
+
 // idempotent: rerun, no write, changed:false
 const before = fs.readFileSync(path.join(tmp, "data", "mood.json"), "utf8");
 const again = run(FEED);
@@ -407,6 +535,27 @@ for (const r of live.nabBusiness.rows) {
 }
 assert.ok(live.nabBusiness.rows.length >= 14, "nabBusiness backfill depth (Apr 2025 -> )");
 assert.ok(live.nabBusiness.base.includes("plotted +100"), "shift disclosure on the series base");
+// per-release enrichment pins (advisory fields; coverage grows as releases land)
+for (const k of ["consumer", "business", "westpacConsumer", "nabBusiness"]) {
+  for (const r of live[k].rows) {
+    if (r.n != null) assert.ok(Number.isInteger(r.n) && r.n >= 100 && r.n <= 6000, `${k} ${r.date} sane n: ${r.n}`);
+    if (r.fwStart != null) {
+      assert.ok(r.fwStart <= r.fwEnd && r.fwEnd <= r.date, `${k} ${r.date} window ends at/before release`);
+      assert.ok((Date.parse(r.date) - Date.parse(r.fwEnd)) / 864e5 <= 40, `${k} ${r.date} window within reach of release`);
+    }
+    if (r.fwm != null) {
+      assert.ok(/^\d{4}-\d{2}$/.test(r.fwm), `${k} ${r.date} fwm ${r.fwm}`);
+      assert.ok(r.fwm <= r.date.slice(0, 7), `${k} ${r.date} survey month never after release`);
+    }
+  }
+  if (k === "business") {
+    const MON = { january: "01", february: "02", march: "03", april: "04", may: "05", june: "06", july: "07", august: "08", september: "09", october: "10", november: "11", december: "12" };
+    for (const r of live[k].rows) {
+      const sm = /business-confidence-(\w+)-(\d{4})/.exec(r.slug || "");
+      if (sm && MON[sm[1].toLowerCase()]) assert.equal(r.fwm, `${sm[2]}-${MON[sm[1].toLowerCase()]}`, `${r.date} fwm matches its slug month`);
+    }
+  }
+}
 for (const k of ["westpacConsumer", "nabBusiness"]) {
   const dates = live[k].rows.map((r) => r.date);
   assert.deepEqual([...dates].sort(), dates, k + " sorted");

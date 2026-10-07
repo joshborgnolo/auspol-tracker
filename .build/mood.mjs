@@ -36,7 +36,17 @@
    they must agree (the headline title wins the one disagreement on record);
    a release the grammar can't parse files nothing — the series simply skips
    that week (two such items exist: a bush-fires statement and a Budget
-   think-piece that print no index value). The printed change is kept only
+   think-piece that print no index value).
+
+   Per-release sample + survey window (the All-polls Confidence facet's
+   Sample and fieldwork cells) file where the source's own release print
+   carries them — details at the "release enrichment" block below. A row
+   missing them backfills from its findings post/bulletin for
+   ENRICH_TRY_DAYS after release (--enrich-all reaches every row), then
+   stops retrying; the fields are advisory, never figure-bearing, so a
+   miss files nothing extra rather than failing the lane.
+
+   The printed change is kept only
    where it reconciles with the previous measured reading of the chain
    (cadence-gated: a Christmas gap's printed change refers to the last
    release before it, not to our previous row); a conflicting change is
@@ -77,6 +87,11 @@ const FEED_DIR = argOf("--feed-dir");
 // safeName(url)+".txt" for PDF text already through pdftotext.
 const WESTPAC_DIR = argOf("--westpac-dir");
 const NAB_DIR = argOf("--nab-dir");
+// Steady-state: rows file their n/window within this many days of release,
+// then never retry (a chronic miss would fetch its post every weekly run
+// forever). --enrich-all reaches every unenriched row on file.
+const ENRICH_TRY_DAYS = 40;
+const ENRICH_ALL = argv.includes("--enrich-all");
 const FEED_BASE = "https://wp.roymorgan.com/wp-json/rmr/v1/findings-search";
 // The posting page a row links to.
 const postUrl = (slug) => `https://www.roymorgan.com/findings/${slug}`;
@@ -251,20 +266,246 @@ const htmlToText = (h) => clean(String(h)
   .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)))
   .replace(/&(nbsp|amp|ndash|mdash|quot|apos|lt|gt);/gi, (s, k) => ({ nbsp: " ", amp: "&", ndash: "–", mdash: "—", quot: '"', apos: "'", lt: "<", gt: ">" }[k.toLowerCase()])));
 // A PDF's text via pdftotext (layout). Absent poppler is an environment
-// failure — a loud exit 1, never a silently empty lane.
-async function pdfText(url) {
-  const cached = laneFile(NAB_DIR, url, ".txt");
+// failure — a loud exit 1, never a silently empty lane. `dir` is the
+// fixture seam: a cached safeName(url)+".txt" stands in for the fetch.
+async function pdfText(url, dir = NAB_DIR) {
+  const cached = laneFile(dir, url, ".txt");
   if (cached != null) return cached;
   const res = await fetch(url, { headers: { "user-agent": TRACKER_UA }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
   if (!res.ok) throw new Error(`pdf ${url} HTTP ${res.status}`);
-  const dir = mkdtempSync(join(tmpdir(), "mood-nab-"));
+  const tmp = mkdtempSync(join(tmpdir(), "mood-pdf-"));
   try {
-    const p = join(dir, "nab.pdf");
+    const p = join(tmp, "m.pdf");
     writeFileSync(p, Buffer.from(await res.arrayBuffer()));
     return execFileSync("pdftotext", ["-layout", p, "-"], { encoding: "utf8", maxBuffer: 8 << 20 });
   } finally {
-    rmSync(dir, { recursive: true, force: true });
+    rmSync(tmp, { recursive: true, force: true });
   }
+}
+
+/* ---- release enrichment: per-release n + survey window -------------------
+   The All-polls Confidence facet's Sample and fieldwork cells. Each lane
+   files them only where its own release print carries them:
+   consumer     — the ANZ release PDF linked from the findings post: the
+                  "…rating is based on 1,019 interviews … during the week to
+                  Sunday." sentence, and the page-1 table's yearless
+                  "Last week" cell ("28 Sep‒4 Oct"; the 2022 cut printed it
+                  "(17–23 Oct)"). The year's a derivation: the cell ends
+                  within ENRICH_WIN_DAYS before the release (matches the
+                  PDF's own "…interviews … Monday to Sunday" footnote).
+   business     — the findings post itself: the state chart's source line
+                  "Source: Roy Morgan Business Single Source, August 2025,
+                  n=1,189, August 2026, n=1,094." dates each wave's n; the
+                  survey month IS the window (fwm) — Roy Morgan prints no
+                  day window. The post's trailing "…results for July are
+                  based on 1,094 detailed interviews" has always matched
+                  the line's figure but its MONTH WORD can lag a release —
+                  it stays a cross-checker, never a source.
+   westpacConsumer — the bulletin PDF linked from the IQ article: "This
+                  latest survey is based on 1200 adults … It was conducted
+                  in the week from 28 September to 1 October." (a genuine
+                  4-day window — parsed, never assumed seven).
+   nabBusiness  — the figures' own PDF footer: "Survey conducted from
+                  24 August to 31 August, covering around 455 businesses
+                  across the non-farm sector." (NAB's n is approximate —
+                  "around" — and files as printed.)
+   Fields: row.n (integer), row.fwStart/fwEnd (ISO day window), row.fwm
+   ("YYYY-MM" month-precision window, business lane only). */
+// The window a printed survey cell may lag its release by before the year
+// resolution files no window rather than a guessed one.
+const ENRICH_WIN_DAYS = 35;
+const MON_ANY = "(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]{0,8}";
+
+// Resolve a yearless printed window {d1,m1,d2,m2} against the release
+// date: the year whose end date sits at/past…behind the release within
+// ENRICH_WIN_DAYS (+5d slack ahead for timezones). Null = window skips.
+const resolveWinYear = (win, relIso) => {
+  const rel = Date.parse(relIso + "T00:00:00Z");
+  const y0 = +relIso.slice(0, 4);
+  const fits = [y0, y0 - 1, y0 + 1]
+    .map((y) => ({ y, end: Date.UTC(y, win.m2, win.d2) }))
+    .filter((c) => c.end <= rel + 5 * 864e5 && (rel - c.end) / 864e5 <= ENRICH_WIN_DAYS)
+    .sort((a, b) => b.end - a.end);
+  if (!fits.length) return null;
+  const y = fits[0].y;
+  const sy = win.m1 > win.m2 ? y - 1 : y; // a December→January window
+  const pad = (n) => String(n).padStart(2, "0");
+  if (Date.UTC(sy, win.m1, win.d1) > Date.UTC(y, win.m2, win.d2)) return null;
+  return { fwStart: `${sy}-${pad(win.m1 + 1)}-${pad(win.d1)}`, fwEnd: `${y}-${pad(win.m2 + 1)}-${pad(win.d2)}` };
+};
+
+// The consumer release PDF: "…rating is based on 1,019 interviews…" plus
+// the page-1 "Last week" table cell's yearless window.
+function parseRmConsumerPdf(txt) {
+  const nm = /rating\s+is\s+based\s+on\s+([\d,]+)\s+interviews/i.exec(txt);
+  let n = nm ? +nm[1].replace(/,/g, "") : null;
+  if (n != null && (n < 200 || n > 4000)) n = null;
+  let win = null;
+  const li = txt.indexOf("Last week"); // table header; prose is lowercase
+  if (li >= 0) {
+    const w = txt.slice(li, li + 500);
+    let m = new RegExp(`\\(?\\s*(\\d{1,2})\\s*[–‒-]\\s*(\\d{1,2})\\s+${MON_ANY}\\s*\\)?`).exec(w);
+    if (m && monIdx(m[3]) != null) win = { d1: +m[1], m1: monIdx(m[3]), d2: +m[2], m2: monIdx(m[3]) };
+    if (!win) {
+      m = new RegExp(`(\\d{1,2})\\s+${MON_ANY}\\s*[‒–-]\\s*(\\d{1,2})\\s+${MON_ANY}`).exec(w);
+      if (m && monIdx(m[2]) != null && monIdx(m[4]) != null) win = { d1: +m[1], m1: monIdx(m[2]), d2: +m[3], m2: monIdx(m[4]) };
+    }
+  }
+  return { n, win };
+}
+
+// The month a business wave measures: the slug names it where the desk
+// titles it ("…business-confidence-august-2026"), else the wave precedes
+// the release month.
+function surveyMonthOf(row) {
+  const sm = /business-confidence-(\w+)-(\d{4})-?/i.exec(row.slug || "");
+  if (sm && monIdx(sm[1]) != null) return { mon: monIdx(sm[1]), yr: +sm[2] };
+  const d = new Date(Date.parse(row.date + "T00:00:00Z"));
+  const p = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - 1, 1));
+  return { mon: p.getUTCMonth(), yr: p.getUTCFullYear() };
+}
+
+// A business findings post: the state chart's dated source-line pairs
+// ("…Single Source, August 2025, n=1,189, August 2026, n=1,094.").
+function parseRmBusinessPost(txt, survey) {
+  const src = /Source:?\s*(?:&nbsp;|\s)*Roy Morgan Business Single Source[^.]*\./i.exec(txt);
+  let n = null;
+  if (src && survey) {
+    const re = /([A-Z][a-z]{2,8})\s+(20\d\d),\s*n=([\d,]+)/g;
+    let m;
+    while ((m = re.exec(src[0]))) {
+      if (monIdx(m[1]) != null && monIdx(m[1]) === survey.mon && +m[2] === survey.yr) n = +m[3].replace(/,/g, "");
+    }
+  }
+  // cross-check against the trailing block quote (month word may lag; its
+  // figure has always agreed) — a disagreement files no n at all
+  const bq = /Business Confidence results for \w+ are based on ([\d,]+) detailed interviews/i.exec(txt);
+  if (bq != null && n != null && +bq[1].replace(/,/g, "") !== n) n = null;
+  if (n != null && (n < 200 || n > 5000)) n = null;
+  return { n };
+}
+
+// The Westpac bulletin: "This latest survey is based on 1200 adults … It
+// was conducted in the week from 28 September to 1 October."
+function parseWestpacPdf(txt) {
+  const nm = /latest survey is based on ([\d,]+) adults/i.exec(txt);
+  let n = nm ? +nm[1].replace(/,/g, "") : null;
+  if (n != null && (n < 400 || n > 4000)) n = null;
+  const wm = new RegExp(`conducted in the week\\s+(?:from\\s+|between\\s+)?(\\d{1,2})\\s+${MON_ANY}\\s+(?:to|–|-)\\s+(\\d{1,2})\\s+${MON_ANY}`, "i").exec(txt);
+  const win = wm && monIdx(wm[2]) != null && monIdx(wm[4]) != null
+    ? { d1: +wm[1], m1: monIdx(wm[2]), d2: +wm[3], m2: monIdx(wm[4]) } : null;
+  return { n, win };
+}
+
+// The NAB PDF footer: "Survey conducted from 24 August to 31 August,
+// covering around 455 businesses across the non-farm sector."
+function parseNabFw(txt) {
+  const m = new RegExp(`Survey conducted from\\s+(\\d{1,2})\\s+${MON_ANY}\\s+to\\s+(\\d{1,2})\\s+${MON_ANY}\\s*,\\s*covering around\\s+([\\d,]+)\\s+businesses`, "i").exec(txt);
+  if (!m || monIdx(m[2]) == null || monIdx(m[4]) == null) return { n: null, win: null };
+  const n = +m[5].replace(/,/g, "");
+  if (n < 100 || n > 3000) return { n: null, win: null };
+  return { n, win: { d1: +m[1], m1: monIdx(m[2]), d2: +m[3], m2: monIdx(m[4]) } };
+}
+
+// Fixture runs (the test seams) are hermetic and date-locked — they try
+// every row regardless of age.
+const FIXTURE = !!(FEED_DIR || WESTPAC_DIR || NAB_DIR);
+const enrichable = (r) => ENRICH_ALL || FIXTURE || (Date.now() - Date.parse(r.date + "T00:00:00Z")) / 864e5 <= ENRICH_TRY_DAYS;
+
+// RM lanes: a row missing its window/n reaches back to its findings post
+// once; a filed row never fetches again. Post pages and release-PDF text
+// share the FEED_DIR fixture seam — safeName(url)+".page.html" for the
+// post, safeName(pdfUrl)+".pdf.txt" for its text.
+async function enrichRmRows(name, rows) {
+  let fetched = 0;
+  for (const r of rows) {
+    if (name === "business") {
+      const s = surveyMonthOf(r);
+      r.fwm = r.fwm ?? `${s.yr}-${String(s.mon + 1).padStart(2, "0")}`; // derivable, no fetch
+    }
+    const want = name === "consumer" ? (r.n == null || r.fwStart == null) : r.n == null;
+    if (!want || !enrichable(r)) continue;
+    const page = FEED_DIR ? laneFile(FEED_DIR, r.url, ".page.html") : await fetchText(r.url).catch(() => null);
+    if (!page) continue;
+    fetched++;
+    if (name === "consumer") {
+      // the release PDF link rides the page's embedded JSON blobs; prefer
+      // confidence-named files, verify the row's own headline value is in
+      // the text so a side-load PDF (method statement) can never file
+      const urls = [...new Set(page.match(/https?:\/\/[^"'\\\s)]+\.pdf[^"'\\\s)]*/gi) || [])];
+      const vRe = new RegExp(`(?<![\\d.])${r.v.toFixed(1)}(?![\\d.])`);
+      const cand = urls.filter((u) => /confiden|consumer-confidence/i.test(u)).concat(urls).slice(0, 3);
+      for (const pdfUrl of [...new Set(cand)]) {
+        const txt = FEED_DIR ? laneFile(FEED_DIR, pdfUrl, ".pdf.txt") : await pdfText(pdfUrl, null).catch(() => null);
+        if (txt == null || !vRe.test(txt)) continue;
+        const g = parseRmConsumerPdf(txt);
+        if (g.n != null) r.n = r.n ?? g.n;
+        if (g.win && r.fwStart == null) {
+          const w = resolveWinYear(g.win, r.date);
+          if (w) { r.fwStart = w.fwStart; r.fwEnd = w.fwEnd; }
+        }
+        break;
+      }
+    } else {
+      let text = null;
+      const pm = page.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+      try {
+        const content = JSON.parse(pm[1]).props.pageProps.findingData.postBy.content;
+        if (content) text = htmlToText(content);
+      } catch { /* fall through to the page-wide read */ }
+      const g = parseRmBusinessPost(text ?? htmlToText(page), surveyMonthOf(r));
+      if (g.n != null) r.n = r.n ?? g.n;
+    }
+    if (!FEED_DIR && fetched % 12 === 0) await new Promise((s) => setTimeout(s, 600)); // politeness pacing
+  }
+  if (fetched) console.log(`${name}: enrichment read ${fetched} post(s)`);
+}
+
+// Westpac posters: the bulletin's own PDF back page.
+async function enrichWestpacRows(rows) {
+  let fetched = 0;
+  for (const r of rows) {
+    if (r.n != null && r.fwStart != null) continue;
+    if (!enrichable(r)) continue;
+    const html = laneFile(WESTPAC_DIR, r.url, ".html") ?? await fetchText(r.url).catch(() => null);
+    if (!html) continue;
+    const pm = /https:\/\/library\.westpaciq\.com\.au\/[^"'\s)]+ConsumerSentiment[^"'\s)]*\.pdf/i.exec(html)
+      || /https:\/\/library\.westpaciq\.com\.au\/[^"'\s)]+\.pdf/i.exec(html);
+    if (!pm) continue;
+    fetched++;
+    const txt = WESTPAC_DIR ? laneFile(WESTPAC_DIR, pm[0], ".txt") : await pdfText(pm[0], null).catch(() => null);
+    if (txt == null) continue;
+    const g = parseWestpacPdf(txt);
+    if (g.n != null) r.n = r.n ?? g.n;
+    if (g.win && r.fwStart == null) {
+      const w = resolveWinYear(g.win, r.date);
+      if (w) { r.fwStart = w.fwStart; r.fwEnd = w.fwEnd; }
+    }
+  }
+  if (fetched) console.log(`westpacConsumer: enrichment read ${fetched} bulletin(s)`);
+}
+
+// NAB rows filed before the footer parse existed: one pass over their PDFs
+// (fresh parses get the same fields straight out of parseNabPdf).
+async function enrichNabRows(rows) {
+  let fetched = 0;
+  for (const r of rows) {
+    if (r.n != null && r.fwStart != null) continue;
+    if (!enrichable(r)) continue;
+    const html = laneFile(NAB_DIR, r.url, ".html") ?? await fetchText(r.url).catch(() => null);
+    if (!html) continue;
+    const pm = /\/content\/dam\/nab(?:-email-composer\/[^"'\s)]*)?\/[^"'\s)]*?monthly[^"'\s)]*?business[^"'\s)]*?survey[^"'\s)]*?\.pdf/i.exec(html);
+    if (!pm) continue;
+    const pdfUrl = pm[0].startsWith("http") ? pm[0] : `https://www.nab.com.au${pm[0]}`;
+    fetched++;
+    const g = parseNabFw(await pdfText(pdfUrl, NAB_DIR).catch(() => null) ?? "");
+    if (g.n != null) r.n = r.n ?? g.n;
+    if (g.win && r.fwStart == null) {
+      const w = resolveWinYear(g.win, r.date);
+      if (w) { r.fwStart = w.fwStart; r.fwEnd = w.fwEnd; }
+    }
+  }
+  if (fetched) console.log(`nabBusiness: enrichment read ${fetched} PDF(s)`);
 }
 
 // Westpac description grammar: a TO level and a FROM level (verbatim),
@@ -335,7 +576,9 @@ async function westpacRows() {
     byMonth.set(mk, row);
   }
   if (fetched) console.log(`westpacConsumer: fetched ${fetched} article(s)`);
-  return [...byMonth.values()].sort((a, b) => a.date.localeCompare(b.date));
+  const rows = [...byMonth.values()].sort((a, b) => a.date.localeCompare(b.date));
+  await enrichWestpacRows(rows);
+  return rows;
 }
 
 // NAB measure window: from each "business confidence|conditions" mention
@@ -403,6 +646,9 @@ function parseNabPdf(txt) {
   let date = null;
   const emb = new RegExp(`Embargoed until[^,\\n]*,\\s*(\\d{1,2})\\s+${MON_FULL}\\s+(20\\d{2})`, "i").exec(txt);
   if (emb) date = `${emb[3]}-${String(monIdx(emb[2]) + 1).padStart(2, "0")}-${emb[1].padStart(2, "0")}`;
+  // the footer's survey-conduct line: window + approximate n (advisory
+  // extras — never figure-bearing, never a reason to drop the wave)
+  const fw = parseNabFw(sq);
   const conf = nabMeasure(mtxt, "confidence"), cond = nabMeasure(mtxt, "conditions");
   if (big) {
     // banner levels are a second witness; a sentential level that dis­agrees
@@ -420,7 +666,7 @@ function parseNabPdf(txt) {
     const t = new RegExp(`Business ${measure}\\s+(-?\\d+)\\s+(-?\\d+)\\s+(-?\\d+)\\b`, "i").exec(txt);
     if (t && +t[3] !== got.level) got.level = null;
   }
-  return { date, survey: smon != null ? { mon: smon, yr: syr } : null, conf, cond };
+  return { date, survey: smon != null ? { mon: smon, yr: syr } : null, conf, cond, fw };
 }
 
 async function nabRows() {
@@ -470,6 +716,13 @@ async function nabRows() {
     if (!date) { console.log(`nabBusiness ${u.url}: ${yr}-${mon + 1} has no release date (embargo/lastmod) — skipped`); continue; }
     const ym = `${yr}-${String(mon + 1).padStart(2, "0")}`;
     const row = { date, v: conf, chg: g.conf.chg ?? null, cond, condChg: g.cond.chg ?? null, ym, url: u.url, slug: u.slug };
+    if (g.fw) {
+      if (g.fw.n != null) row.n = g.fw.n;
+      if (g.fw.win) {
+        const w = resolveWinYear(g.fw.win, date);
+        if (w) { row.fwStart = w.fwStart; row.fwEnd = w.fwEnd; }
+      }
+    }
     if (byMonth.has(ym)) {
       const old = byMonth.get(ym);
       if (old.v !== row.v || old.cond !== row.cond) console.log(`nabBusiness ${u.url}: ${ym} CONFLICT with ${old.url} (${old.v}/${old.cond} vs ${row.v}/${row.cond}) — keeping first`);
@@ -494,6 +747,7 @@ async function nabRows() {
     console.error("GUARD TRIP: nabBusiness yielded no rows from a populated sitemap — lane broken");
     process.exit(2);
   }
+  await enrichNabRows(rows);
   return rows;
 }
 
@@ -602,15 +856,18 @@ async function rowsFor(name) {
 }
 
 // -------------------------------------------------------------------- main
-export { parseText, SERIES, dmyToIso, parseWMDesc, parseNabPdf, nabMeasure, safeName, htmlToText };
+export { parseText, SERIES, dmyToIso, parseWMDesc, parseNabPdf, nabMeasure, safeName, htmlToText,
+         resolveWinYear, parseRmConsumerPdf, parseRmBusinessPost, parseWestpacPdf, parseNabFw, surveyMonthOf };
 if (!process.env.MOOD_LIB) {
 const consumer = await rowsFor("consumer");
 const business = await rowsFor("business");
+await enrichRmRows("consumer", consumer);
+await enrichRmRows("business", business);
 const westpac = await westpacRows();
 const nab = await nabRows();
 
 const doc = {
-  _about: "Business and consumer confidence. consumer/business: Roy Morgan's findings feed (weekly, dense from Aug 2019 / monthly since 2019; 100 = neutral). westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment (monthly; IQ-sitemap coverage Jan 2022 →; 100 = neutral). nabBusiness: NAB Monthly Business Survey (monthly; AEM-sitemap coverage Apr 2025 →; the earlier WP-era archive is offline). Rows: {date, v, chg (printed period change; null when none printed or unreconciled), url, slug}. NAB rows add {cond, condChg, ym}; NAB figures are NET BALANCES (0 = neutral) — the site plots them SHIFTED +100 so the shared neutral line holds. Lane details: .build/mood.mjs header.",
+  _about: "Business and consumer confidence. consumer/business: Roy Morgan's findings feed (weekly, dense from Aug 2019 / monthly since 2019; 100 = neutral). westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment (monthly; IQ-sitemap coverage Jan 2022 →; 100 = neutral). nabBusiness: NAB Monthly Business Survey (monthly; AEM-sitemap coverage Apr 2025 →; the earlier WP-era archive is offline). Rows: {date, v, chg (printed period change; null when none printed or unreconciled), url, slug}. NAB rows add {cond, condChg, ym}; NAB figures are NET BALANCES (0 = neutral) — the site plots them SHIFTED +100 so the shared neutral line holds. Advisory per-release fields, each lane's own release print only: n (sample; NAB's is the printed 'around' figure), fwStart/fwEnd (ISO survey window; business files fwm 'YYYY-MM' instead — the survey month IS its window). Lane details: .build/mood.mjs header.",
   consumer: { label: SERIES.consumer.label, base: "ANZ-Roy Morgan, index, 100 = neutral", rows: consumer },
   business: { label: SERIES.business.label, base: "Roy Morgan, index, 100 = neutral", rows: business },
   westpacConsumer: { label: "Westpac–MI Consumer Sentiment", base: "Westpac–Melbourne Institute, index, 100 = neutral", rows: westpac },
@@ -632,6 +889,10 @@ console.log("MOOD_STATUS " + JSON.stringify({
   changed, added,
   rows: Object.fromEntries(KEYS.map((k) => [k, doc[k].rows.length])),
   newest: Object.fromEntries(KEYS.map((k) => [k, doc[k].rows.at(-1)?.date ?? null])),
+  enrich: Object.fromEntries(KEYS.map((k) => [k, {
+    n: doc[k].rows.filter((x) => x.n != null).length,
+    fw: doc[k].rows.filter((x) => x.fwStart != null || x.fwm != null).length,
+  }])),
   stale,
 }));
 } // MOOD_LIB
