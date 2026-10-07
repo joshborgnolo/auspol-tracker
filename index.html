@@ -100090,7 +100090,7 @@ function rdPollHead(p) {
     className: "rd-nocaps"
   }, p.sample.toLocaleString(), p.sampleEff != null ? " (eff. " + p.sampleEff.toLocaleString() + ")" : tbc ? React.createElement(React.Fragment, null, " (", rdEffTbcNote(p), ")") : "")) : "an unpublished sample";
   const out = rdApOut(p.published);
-  const by = "published by " + (p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
+  const by = "published by " + (p.conf ? p.pollster : p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
   const field = p.field || p.dateLabel;
   if (p.fieldPending) return React.createElement(React.Fragment, null, rdFieldTbc(p), ", from ", n, ", " + by + (out ? " on " + out : ""));
   return React.createElement(React.Fragment, null, field ? "Conducted on " + field + " from " : "From ", n, ", " + by + (out ? " on " + out : ""));

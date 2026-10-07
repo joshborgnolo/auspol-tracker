@@ -170,7 +170,9 @@ function rdFieldTbc(p, bare) {
    older gaps are left unsaid, since some waves never get one). A wave filed
    under a client is "published by the AFR" (mastheads take the article,
    brands like News24 go bare); a self-published poll is published by its
-   pollster, and says so. */
+   pollster, and says so. A confidence release's "client" is its product
+   line (Consumer Confidence &c), not a publisher - its byline comes from
+   the house slot like a self-published poll's. */
 const RD_AP_BARE_CLIENTS = { News24: 1, "Capital Brief": 1, "News.com.au": 1, "News Australia": 1, Amplify: 1 };
 const rdApThe = (name) => (/^the /i.test(name) || RD_AP_BARE_CLIENTS[name] ? name : "the " + name);
 function rdPollHead(p) {
@@ -183,8 +185,10 @@ function rdPollHead(p) {
     : "an unpublished sample";
   const out = rdApOut(p.published);
   // a commissioned wave credits its client; a self-published poll is
-  // published by its pollster, and says so
-  const by = "published by " + (p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
+  // published by its pollster, and says so. A confidence release keeps its
+  // product line (the mood lane's index name) in the client slot, so the
+  // byline comes from the house slot, not the product.
+  const by = "published by " + (p.conf ? p.pollster : p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
   const field = p.field || p.dateLabel;
   if (p.fieldPending) return <>{rdFieldTbc(p)}, from {n}{", " + by + (out ? " on " + out : "")}</>;
   return <>{field ? "Conducted on " + field + " from " : "From "}{n}{", " + by + (out ? " on " + out : "")}</>;
