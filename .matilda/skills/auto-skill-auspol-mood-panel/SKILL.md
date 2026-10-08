@@ -1,6 +1,6 @@
 ---
 name: auspol-mood-panel
-description: auspol-tracker — the Snapshot's confidence panel (titled "Economic sentiment" since the 2026-10-08 mood→confidence rename, below Decidedness) end-to-end: FOUR published confidence gauges on ONE plot, windowed from the 3 May 2025 election (x0 = 2025 + 122/365; full history stays in the payload off-screen) (ANZ–RM consumer weekly, Westpac–MI sentiment monthly dashed, RM business monthly, NAB business monthly dashed). .build/mood.mjs → data/mood.json four lanes (nabBusiness carries conditions on the row, not a 5th line); rows ALSO carry per-release n + fieldwork window + business survey month (advisory fields n / fwStart / fwEnd / fwm — ENRICH_TRY_DAYS=40 re-reads each release's own source through per-lane checker seams; `--enrich-all <ISO>` backfills a date bound, and rowsFor() carries advisory fields forward across feed re-surfaces so steady-state/weekly runs never prune the backfill — 2d29d92 backfilled the whole term window: consumer 72/72, westpac 18/18, NAB 15/15, business 14/17 n with fwm 17/17; shipped 3fc015f with the RM Business multi-line grader fix f9c2b9b) feeding the All-polls confidence facet's Sample/Fieldwork columns (display half 5adfeb5, see auspol-allpolls-confidence-facet). NAB is a net balance drawn shifted +100 so the shared 100=neutral line holds while tooltips/read rows print TRUE published figures; lines are a render-side half-life kernel smooth (14d weekly/60d monthly) over raw-print dots (shipped 283984d on top of b42de69's two-lane smoothing). Probe: .matilda/probe/mood-smooth.mjs (LANES table, x scale re-fit off the measured plot box — the window spans a single year tick, 1366/860/390 rungs).
+description: auspol-tracker — the Snapshot's confidence panel (titled "Economic sentiment" since the 2026-10-08 mood→confidence rename, below Decidedness) end-to-end: FOUR published confidence gauges on ONE plot, windowed from the 3 May 2025 election (x0 = 2025 + 122/365; full history stays in the payload off-screen) (ANZ–RM consumer weekly, Westpac–MI sentiment monthly, RM business monthly, NAB business monthly; alt-house lane deep gold since 2026-10-08, was dashed before). .build/mood.mjs → data/mood.json four lanes (nabBusiness carries conditions on the row, not a 5th line); rows ALSO carry per-release n + fieldwork window + business survey month (advisory fields n / fwStart / fwEnd / fwm — ENRICH_TRY_DAYS=40 re-reads each release's own source through per-lane checker seams; `--enrich-all <ISO>` backfills a date bound, and rowsFor() carries advisory fields forward across feed re-surfaces so steady-state/weekly runs never prune the backfill — 2d29d92 backfilled the whole term window: consumer 72/72, westpac 18/18, NAB 15/15, business 14/17 n with fwm 17/17; shipped 3fc015f with the RM Business multi-line grader fix f9c2b9b) feeding the All-polls confidence facet's Sample/Fieldwork columns (display half 5adfeb5, see auspol-allpolls-confidence-facet). NAB is a net balance drawn shifted +100 so the shared 100=neutral line holds while tooltips/read rows print TRUE published figures; lines are a render-side half-life kernel smooth (14d weekly/60d monthly) over raw-print dots (shipped 283984d on top of b42de69's two-lane smoothing). Probe: .matilda/probe/mood-smooth.mjs (LANES table, x scale re-fit off the measured plot box — the window spans a single year tick, 1366/860/390 rungs).
 source: auto-skill
 extracted_at: '2026-10-06T11:26:54.223Z'
 ---
@@ -59,6 +59,20 @@ it. Every claim verified by grep in current sources (2026-10-08):
   `rd-confidence-cc` ×3, `-chart` ×10, `-csv` ×1, `-draw` ×2, `-tabs` ×4,
   `Economic sentiment` ×6, ariaLabel `Confidence of`.
 
+HUE-SPLIT RESTYLE (shipped 2026-10-08, "split the lane hues by house" +
+follow-on copy/key commit): each view's pair no longer reads main-line +
+DASHED twin. The template vars went from per-SUBJECT
+(`--confidence-consumer` gold / `--confidence-business` plum) to per-HOUSE
+role: the Roy Morgan gauge is plum (`--confidence-main`), the other
+house's gauge deep gold (`--confidence-alt`), BOTH full lines —
+`dash: null` on all four lanes (Westpac–MI's and NAB's `dash: "4 3"` are
+gone), and the RdKey's third item is `{ kind: "line",
+color: "var(--confidence-alt)", label: vc.altKey }` (vc carries `altKey`
+where it once carried `dashKey`). NAB keeps its +100 draw shift; the
+copy/key speak of a "gold line", never a "dashed line" — the only dashed
+marks left in the panel are the past-terms band average (that "dashed
+line" phrasing stands) and the all-terms mean.
+
 Pipeline-side the v1 plan was "keep `.build/mood.mjs`/`data/mood.json` and
 payload key `mood`"; the WIP cluster shows the fuller rename coming
 (confidence.mjs/confidence.json — once it lands, `mood` mentions ANYWHERE
@@ -66,11 +80,22 @@ in pipeline docs below are pre-rename rot). The ARCHIVED classic layer
 (rule 5, frozen — never renamed) still bears the old names:
 `a11e1559`…js :1539 `function MoodPanel` (non-rd fallback, reads only
 M.consumer/M.business) and `73de0c58`…js :1956 `MoodMemo =
-React.memo(MoodPanel)`. NOTE its rd-branch is now DANGLING:
-`a11e1559`…js :1540 returns `<RdMood rangeId={…}>` and `RdMood` is defined
-nowhere — any rd-mode render of classic MoodPanel would throw
-ReferenceError. Frozen archived design, so left as-shipped (rule 5); flag
-it if the classic design is ever revived rather than "fixing" it here.
+React.memo(MoodPanel)`. CORRECTED 2026-10-08 — the bridge bit production:
+this note previously recorded the rd-branch at `a11e1559`…js :1540 as
+"dangling but frozen, leave it (rule 5)". WRONG CALL — that branch is
+LIVE runtime code, not dead classic code: `MoodPanel` runs on every page
+boot and, under `window.AP.rd` (always, in the redesign), returned
+`<RdMood/>`, which the rename deleted → `ReferenceError: RdMood is not
+defined` → Snapshot view error boundary on the live site within hours of
+`afb406c` (the user-reported live break that same day). Hotfix
+**9abe224** renamed the bridge call to `<RdConfidence rangeId={…}/>` —
+one line of LIVE code, not a "change to the old design"; the classic
+non-rd fallback below it stays untouched and frozen. LESSON: rule 5
+freezes the classic DESIGN, but archived-asset shim branches that call
+INTO the live redesign are live code — any rename of an exported
+identifier must grep the archived asset layers too (`grep -rn <OldName>
+.build/newtracker/assets/ index.html`). Full triage: Variant 2 of
+`auspol-torn-build-hotfix`.
 GLOSSARY: the Info glossary section keeps anchor id `s-mood` (d1a1d215-*.js
 :7365, `{ id: "s-mood", title: "Economic sentiment", nav: "Sentiment", … }`,
 lead id "mood") — the rename changed its TITLE but left the anchor, the
@@ -173,6 +198,53 @@ GICNBC — NAB's confidence workbook lead above did NOT pan out: the RBA is
 contractually barred and only the H3 deviation series is free). Extractor,
 dead-ends map (TradingEconomics guest dead, MI CASiE paid) and the
 independent-lane fixture lesson: see `auspol-mood-history-backfill`.
+
+## "Show complete history" toggle (shipped 2026-10-08, 68d1e58)
+
+User-dictated feature wording: "a 'Show complete history' button that
+shows the whole historical series, revealing it behind the current chart
+view and extending the current lines backwards."
+
+- DATA: gen-data.mjs §5l `confDeep` (right after §5k confHistory ~:4537)
+  maps `["consumer","westpacConsumer","business"]` from CONF_HISTORY_FILE
+  (data/confidence-history.json — the adf8abe deep backfill, see
+  auto-skill-auspol-mood-history-backfill) to calendar `{ym, v}` rows;
+  `nabConditions` stays OUT of the payload (its deviation basis is a
+  different measure — the never-merge trap). `confDeep` sits in the data
+  template and the `D` key list.
+- RENDER (rd-panels.jsx, inside RdConfidence): `[hist,setHist]` state
+  ~:3924 with `deepPoints` (x = year+(mo−1)/12, y = v+shift, filtered
+  `x < live0` so deep meets live with no overlap) → `deepDrawn` →
+  `histOn = hist && deepDrawn.length>0` (any lane without deep history
+  silently degrades the toggle). `wideRaw`/`wideSe` ~:4023 re-run the
+  SAME kernel smoothing over the whole release file — that is the
+  "extending the current lines backwards" piece. `deepSeries` draws rdWidth
+  1.3 opacity 0.5 with the lane's own `l.dash` and labels
+  `l.by + " (monthly history)"`; `histX0` (floor of earliest deep x) and
+  `histTicks` (5y steps two-lane / 10y one-lane, to D.domain.x1−0.9) price
+  the calendar ruler.
+- TrendChart carries NO x-scale morph — the toggle REMOUNTS the chart via
+  key suffix `-hist` (instant swap, no glide). All different-props-at-once
+  switches live on the one JSX ~:4233: `xDomain`, `xTicks`,
+  `areas={histOn ? undefined : …}`, `events={histOn ? [] : …}`,
+  `evt={histOn ? null : …}`, series/scatter from the `chartSeries`/
+  `chartRaw` selects, y-domain `vals` re-priced to wide+deep ys, and the
+  `copy` caption flips to `vc.copyHist` per view (names each lane's true
+  start year; NAB's absence is explained in the business caption).
+- CONTROLS: the chip row (~:4166) is `(hband || deepDrawn.length>0) &&`;
+  the new `<button className="rd-chip rd-confidence-hist" aria-pressed>`
+  label flips `"＋ Show complete history"` (`"＋ Full history"` narrow) ↔
+  `"Back to this term"` and clears `evtOpen`. The Draw-a-term chip, lifted
+  term pills, the draw board and the "Middle half/death rates" RdKey rows
+  are all guarded `!histOn` (historical mode has no past-term plumbing);
+  in history mode RdKey gains one row "Monthly history back to {histX0},
+  as the house published it" (rd-cs-keythin swatch). HowTo para 2 ends
+  with the mode's sentence. CSV export is untouched (already full-length).
+- PROBE: `.matilda/probe/conf-history.mjs` (puppeteer round-trip: term →
+  history → term) asserts no error boundary, chip label flips, a calendar
+  tick of "1990" appears/disappears, the "Draw a past term" chip
+  disappears/returns, and the "Monthly history back to 1973" key row
+  shows in history mode.
 
 ## Per-release enrichment (3fc015f + f9c2b9b, 2026-10-07)
 

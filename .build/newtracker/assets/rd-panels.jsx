@@ -3806,10 +3806,10 @@ function RdUndecided({ rangeId }) {
 /* ------------------------------------------------ Economic confidence --
    Four published gauges of business and consumer confidence in TWO views
    on one card, switched by the tabs above it — Consumers (the weekly
-   ANZ–Roy Morgan index with Westpac–MI's monthly sentiment as its dashed
-   twin) opens first, and Businesses (Roy Morgan's monthly index with the
-   NAB survey as its dashed twin) — each drawn as published from the 2025
-   election on. Each
+   ANZ–Roy Morgan index with Westpac–MI's monthly sentiment joining it)
+   opens first, and Businesses (Roy Morgan's monthly index with the NAB
+   survey joining it) — each drawn as published from the 2025 election
+   on. Each
    dot is the published reading; each line is a recency-weighted smooth
    of those readings
    (half-life 14 days on the weekly index, 60 days on the monthly ones),
@@ -3817,10 +3817,11 @@ function RdUndecided({ rangeId }) {
    stays the raw print. The first three are 100-neutral indices; NAB
    prints a NET BALANCE (0 = neutral) and its line is drawn +100 so the
    shared neutral line holds — the read rows and tooltips print NAB's own
-   figures off each point's `raw`. The second gauge of each view is
-   the dashed twin of its line colour. NAB's conditions reading rides the
-   read row, not a fifth line. No aggregation, no house effects — context,
-   not a predictor.
+   figures off each point's `raw`. Colour splits each view's pair — the
+   Roy Morgan gauge plum, the other house's deep gold, both full lines
+   (a dash marked the second gauge until 2026-10-08; colour took the
+   job over). NAB's conditions reading rides the read row, not a fifth
+   line. No aggregation, no house effects — context, not a predictor.
    The bottom axis counts MONTHS since the election, not calendar years,
    and the view's main gauge carries its own past terms behind the
    current one — gen-data §5k lines every term up on its own election
@@ -3872,13 +3873,13 @@ function RdConfidence({ rangeId }) {
       period: "week", color: "var(--confidence-main)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly." },
     { k: "westpacConsumer", view: "consumer", s: M.westpacConsumer, name: "Consumers", dekName: "Consumers on Westpac–MI’s read", by: "Westpac–MI", hl: 60,
-      period: "month", color: "var(--confidence-alt)", dash: "4 3", shift: 0, vfmt: (v) => v.toFixed(1),
+      period: "month", color: "var(--confidence-alt)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "The Westpac–Melbourne Institute’s monthly gauge of the same household mood; 100 is neutral on this scale too." },
     { k: "business", view: "business", s: M.business, name: "Businesses", dekName: "Businesses", by: "Roy Morgan", hl: 60,
       period: "month", color: "var(--confidence-main)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly." },
     { k: "nabBusiness", view: "business", s: M.nabBusiness, name: "Businesses", dekName: "Businesses on NAB’s survey", by: "NAB", hl: 60,
-      period: "month", color: "var(--confidence-alt)", dash: "4 3", shift: 100, vfmt: NICE,
+      period: "month", color: "var(--confidence-alt)", dash: null, shift: 100, vfmt: NICE,
       short: "x" },
   ].filter((l) => l.s && l.s.polls.length);
   if (!lanes.length) return null;
@@ -4136,7 +4137,7 @@ function RdConfidence({ rangeId }) {
   const vc = view === "consumer" ? {
     title: "Consumer confidence",
     note: "100 = neutral on both gauges",
-    dashKey: "The Westpac–MI monthly read of the same household mood",
+    altKey: "The Westpac–MI monthly read of the same household mood",
     copyTitle: "Consumer confidence (two gauges)",
     copySub: head + " Two published consumer gauges on one 100-neutral scale: the weekly ANZ–Roy Morgan consumer confidence index and Westpac–MI’s monthly consumer sentiment.",
     copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series). The band pools the ANZ–Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. No combining, no adjustment.",
@@ -4144,11 +4145,11 @@ function RdConfidence({ rangeId }) {
   } : {
     title: "Business confidence",
     note: "100 = neutral on the index; NAB’s net balance drawn 100 points up",
-    dashKey: "NAB’s net-balance read, drawn 100 points up",
+    altKey: "NAB’s net-balance read, drawn 100 points up",
     copyTitle: "Business confidence (two gauges)",
     copySub: head + " Two published business gauges on one 100-neutral scale: Roy Morgan’s monthly business confidence index and NAB’s Monthly Business Survey.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its dashed line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. The band pools the Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. No combining, no adjustment.",
-    copyHist: "Business confidence as far back as the series go, on one 100-neutral scale (NAB drawn 100 points up, as the live view draws it). The heavier lines are the smoothed trend of the live release file (each dot one release, as printed; 60-day half-life on both series); the lighter line underneath is Roy Morgan’s monthly history, from 2010. NAB’s own deep series is a deviation from average on another basis, so it never joins — its dashed line widens only to its own releases. No combining, no adjustment.",
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its gold line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. The band pools the Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. No combining, no adjustment.",
+    copyHist: "Business confidence as far back as the series go, on one 100-neutral scale (NAB drawn 100 points up, as the live view draws it). The heavier lines are the smoothed trend of the live release file (each dot one release, as printed; 60-day half-life on both series); the lighter line underneath is Roy Morgan’s monthly history, from 2010. NAB’s own deep series is a deviation from average on another basis, so it never joins — its gold line widens only to its own releases. No combining, no adjustment.",
   };
   /* Election / 1 yr / 2 yrs / 3 yrs, plus Now where the sitting term
      stands — the same ruler gen-data §5k aligns the past terms on */
@@ -4266,7 +4267,7 @@ function RdConfidence({ rangeId }) {
         <RdKey className="rd-ckey" items={[
           { kind: "dot", color: "var(--ink-3)", label: "One release, as printed" },
           { kind: "line", color: "var(--ink-3)", label: "Smoothed trend of the releases" },
-          { kind: "dash", color: "var(--ink-3)", label: vc.dashKey },
+          { kind: "line", color: "var(--confidence-alt)", label: vc.altKey },
         ]}>
           {hband && !histOn && <>
             <span className="rd-key-item"><span className="rd-cs-keyband" aria-hidden="true"><i></i></span>Middle half and middle 80% of past terms</span>
