@@ -365,6 +365,40 @@ function RdPrimary({ rangeId, setRangeId }) {
     };
   }, []);
 
+  /* Space walks the group menu while the panel is on screen - the viewport
+     claim, not the pointer (the latest card's matchup flip and the
+     house-lean flip are the same claim on their own sections): All voters
+     first, each menu option after, round to All voters again. With no
+     demographics payload (/vic/) there is no menu and Space keeps its
+     scroll day job. */
+  const spaceGrp = React.useRef(null);
+  spaceGrp.current = T && T.tabs ? () => {
+    const opts = [""];
+    T.tabs.forEach((t) => t.sets.forEach((s) => s.groups.forEach((g) => opts.push(g.label))));
+    setGrpId(opts[(opts.indexOf(grpId) + 1) % opts.length]);
+  } : null;
+  React.useEffect(() => {
+    const sec = document.getElementById("primary-vote");
+    if (!sec) return undefined;
+    const inView = { current: false };
+    const io = new IntersectionObserver(
+      (es) => es.forEach((en) => { inView.current = en.isIntersecting; }));
+    io.observe(sec);
+    const key = (e) => {
+      if (!inView.current || e.key !== " ") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (!spaceGrp.current) return;
+      e.preventDefault();
+      if (!e.repeat) spaceGrp.current();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => { io.disconnect(); document.removeEventListener("keydown", key, true); };
+  }, []);
+
   return (
     <RdSec id="primary-vote" title="Primary vote" meta={meta}>
       <div className="rd-pv-head">

@@ -24,7 +24,11 @@
           wave PRINTED, the .rd-note under the chart must disclose the lift,
           and the copy-card caption must not say the bare "Each dot is one
           poll" (2026-10-08); the tooltip's sample line must read
-          "n ≈ …" — the group's estimated subsample (2026-10-08) */
+          "n ≈ …" — the group's estimated subsample (2026-10-08)
+       6. Space walks the menu while the panel is on screen (the viewport
+          claim, 2026-10-08): All voters -> 18–34 -> … -> wrap to All
+          voters; off the viewport Space keeps its scroll day job, and a
+          FOCUSED menu keeps its own native Space */
 import { createServer } from "node:http";
 import { readFile, writeFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -422,6 +426,106 @@ for (const { view, group } of [{ view: "Gen Z", group: "Gen Z" }, { view: "Renti
     ok(`${name}: copy caption is the all-voters one`, !!got && got.caption === "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
       got && got.caption);
   }
+}
+
+/* ---- Space walks the group menu while the panel is on screen (viewport
+        claim): All voters -> each option in DOM order -> wrap to All
+        voters. The neighbouring sections claim Space too — the hero
+        (#two-party) while it is even 1px in view and the Latest card
+        (#latest-polls) on its two-party facet — so the positive checks
+        park the page in the window where #primary-vote is the ONLY
+        claiming section on screen. Off both, Space keeps its scroll day
+        job (pressed past the Latest card, where no section claims);
+        a FOCUSED select keeps its own native Space. ---- */
+console.log("== Space walks the group menu ==");
+{
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1280, height: 900 });
+  await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#primary-vote select.rd-pv-sel", { timeout: 20000 });
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const curVal = () => page.evaluate(() => document.querySelector("#primary-vote select.rd-pv-sel").value);
+  const order = await page.evaluate(() =>
+    [...document.querySelectorAll("#primary-vote select.rd-pv-sel option")].map((o) => o.value));
+  ok("menu order pins All voters to first group 18–34", order[0] === "" && order[1] === "18–34" && order.length === 26,
+     order.slice(0, 4).join("|") + " | n=" + order.length);
+
+  /* park where #primary-vote alone holds the key: below the hero's whole
+     section, above the point the Latest card's section starts to show */
+  const parked = await page.evaluate(() => {
+    const hero = document.getElementById("two-party");
+    const prim = document.getElementById("primary-vote");
+    const latest = document.getElementById("latest-polls");
+    const lo = hero.offsetTop + hero.offsetHeight + 20;
+    const hi = latest.offsetTop - window.innerHeight - 20;
+    const y = Math.min(lo, hi);
+    window.scrollTo(0, y);
+    const r = prim.getBoundingClientRect();
+    return { y, primInView: r.bottom > 0 && r.top < window.innerHeight,
+             heroInView: hero.getBoundingClientRect().bottom > 0,
+             latestInView: latest.getBoundingClientRect().top < window.innerHeight };
+  });
+  ok("parked with only the primary panel claiming", parked.primInView && !parked.heroInView && !parked.latestInView,
+     JSON.stringify(parked));
+  await sleep(500);
+  ok("claim baseline: starts on All voters", (await curVal()) === "", await curVal());
+  const yClaim = await page.evaluate(() => window.scrollY);
+  const seen = [await curVal()];
+  let firstGap = -1;
+  for (let i = 1; i < order.length; i++) {
+    await page.keyboard.press("Space");
+    await sleep(120);
+    seen.push(await curVal());
+    if (seen[i] !== order[i] && firstGap < 0) firstGap = i;
+  }
+  ok("each Space steps to the menu's next option (all 25 groups)", JSON.stringify(seen) === JSON.stringify(order),
+     firstGap >= 0 ? `press ${firstGap}: got ${JSON.stringify(seen[firstGap])}, want ${JSON.stringify(order[firstGap])}` : seen.slice(0, 4).join(" -> "));
+  await page.keyboard.press("Space");
+  await sleep(150);
+  ok("wraps round to All voters", (await curVal()) === "", await curVal());
+  ok("page never scrolled while the claim held", (await page.evaluate(() => window.scrollY)) === yClaim,
+     "scrollY " + (await page.evaluate(() => window.scrollY)) + " vs " + yClaim);
+
+  /* figures follow the walk: one more press lands on the first age group */
+  await page.keyboard.press("Space");
+  await sleep(400);
+  const walked = await page.evaluate(() => {
+    const sec = document.querySelector("#primary-vote");
+    return { hed: sec.querySelector(".rd-hed") ? sec.querySelector(".rd-hed").textContent.trim() : null,
+             val: sec.querySelector("select.rd-pv-sel").value };
+  });
+  ok("next press after wrap lands on the first age group", walked.val === "18–34", walked.val);
+  ok("panel head follows the walk", walked.hed && walked.hed.includes("18–34"), walked.hed && walked.hed.slice(0, 90));
+
+  /* a FOCUSED select keeps its own Space (native menu-opening behaviour;
+     the claim stands aside by the BODY/HTML guard) */
+  await page.evaluate(() => document.querySelector("#primary-vote select.rd-pv-sel").focus());
+  await sleep(100);
+  await page.keyboard.press("Space");
+  await sleep(200);
+  ok("focused select keeps its own Space (no step)", (await curVal()) === "18–34", await curVal());
+  await page.evaluate(() => { document.activeElement && document.activeElement.blur && document.activeElement.blur(); });
+
+  /* past the Latest card no section claims: Space scrolls and leaves the
+     menu untouched (scrolling past #primary-vote by its own height would
+     park INSIDE the Latest card's claim and the key would be eaten) */
+  await page.evaluate(() => {
+    const latest = document.getElementById("latest-polls");
+    window.scrollTo(0, latest.offsetTop + latest.offsetHeight + 200);
+  });
+  await sleep(400);
+  const offState = await page.evaluate(() => {
+    const r = document.getElementById("primary-vote").getBoundingClientRect();
+    return { primInView: r.bottom > 0 && r.top < window.innerHeight };
+  });
+  ok("panel fully off-screen for the negative case", !offState.primInView, "");
+  const yOff0 = await page.evaluate(() => window.scrollY);
+  await page.keyboard.press("Space");
+  await sleep(400);
+  ok("off-claim Space scrolls (day job)", (await page.evaluate(() => window.scrollY)) > yOff0,
+     "scrollY " + (await page.evaluate(() => window.scrollY)) + " vs " + yOff0);
+  ok("off-claim Space leaves the menu alone", (await curVal()) === "18–34", await curVal());
+  await page.close();
 }
 
 const fails = results.filter(([, p]) => !p);
