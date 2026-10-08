@@ -96778,6 +96778,41 @@ function RdMood({
   if (!lanes.length) return null;
   for (const l of lanes) l.lat = l.s.latest;
   const [view, setView] = useState("consumer");
+  const moodHover = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById("mood");
+    if (!sec) return undefined;
+    const enter = () => {
+      moodHover.current = true;
+    };
+    const leave = () => {
+      moodHover.current = false;
+    };
+    moodHover.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const ids = RD_MOOD_VIEWS.map(v => v.id);
+    const key = e => {
+      if (!moodHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const i = ids.indexOf(view);
+      if (i < 0 || ids.length < 2) return;
+      e.preventDefault();
+      const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
+      rdPinScroll(document.getElementById("mood") && document.getElementById("mood").querySelector(".rd-mood-tabs"));
+      setView(nxt);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [view]);
   const viewLanes = lanes.filter(l => l.view === view);
   const smooth = (polls, halfLifeDays) => {
     const decay = Math.LN2 / (halfLifeDays / 365.25);

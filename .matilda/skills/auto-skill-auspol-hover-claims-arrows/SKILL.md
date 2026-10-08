@@ -1,6 +1,6 @@
 ---
 name: auspol-hover-claims-arrows
-description: auspol-tracker — the pointer-claims-keys pattern (transient hover key-scope, "the claim never survives the pointer leaving the card"), shipped in SEVEN rungs 8e305ae (Latest card, rd-polls.jsx) → 9730f02 (All-polls card, rd-allpolls.jsx) → 0f163f6 (both vote cards, rd-hero.jsx + rd-panels.jsx) → dd087b4 (both Leadership panels, rd-panels.jsx) → becaa5b (Who votes for whom, The issues, Undecided, rd-panels.jsx) → 62f5521+a27c584 (Past cycles compare + measure rows, rd-cycles.jsx) → a877a98+590a74e (the claim escapes the arrow family: ↑/↓ on the issues trust grid, digit keys 1–5 on the who-votes party chips). The canonical guard block + per-site wiring (facetPick so the rdPinScroll pin fires, hero's combined swipe/hover ref, shared rangeId state stepping BOTH vote cards' menus, single ldHover ref naming which of two adjacent panels is hovered with an isConnected/rects liveness guard for the rd-hidden sibling, the Issues' two-claim one-listener (outer view row vs inner whom-card, inner claims by depth) and the Undecided effect's must-precede-its-practical-return placement), the reusable probe harness (viewport-clamped moveOver with sticky-bar inset; focus assertions via .focus() not coordinate clicks — page.click on a row scrolled under the sticky navbar hit a main-nav button; snapshot the NEIGHBOUR row's tab at phase start instead of asserting the default; the issues two-tier has THREE planes, so the view-claims-section assert requires moving to the row outside BOTH claims' card), and the add-one checklist for extending the claim to another row; plus the navbar pointer-click blur (leftover nav-tab focus vetoes EVERY claim — arrows turn the page on first hover until anything in-page is clicked; Tabs onClick blurs when e.detail>0), and the tabpanel pointer-park poke-record-release contract (2026-10-01, rung-8 family) — Chrome's mousedown implicit focus target is the nearest focusable ANCESTOR, so the ARIA-pattern tabIndex=0 role='tabpanel' div captures every inert in-view click and disarms ALL claims until the next body click; ONE-SITE contract on the panel — a poke stamps pointer DOWN AND UP (word-select gates fire a delayed re-park at release), onFocus RECORDS whether the panel's focus was pointer-caused (v1 blurred synchronously there instead — onFocus fires inside mousedown default processing and blur there aborted the caret path, killing text selection site-wide until the v2 rebuild), and one tick after pointer-up the parked panel blurs ONLY if its focus was pointer-caused and no selection is live (a drag's catch keeps its park; keyboard tab-order never pokes). Sister of auspol-rdtabs-arrow-walk (the FOCUSED walk this pattern claims on behalf of).
+description: auspol-tracker — the pointer-claims-keys pattern (transient hover key-scope, "the claim never survives the pointer leaving the card"), shipped in SEVEN rungs 8e305ae (Latest card, rd-polls.jsx) → 9730f02 (All-polls card, rd-allpolls.jsx) → 0f163f6 (both vote cards, rd-hero.jsx + rd-panels.jsx) → dd087b4 (both Leadership panels, rd-panels.jsx) → becaa5b (Who votes for whom, The issues, Undecided, rd-panels.jsx) → 62f5521+a27c584 (Past cycles compare + measure rows, rd-cycles.jsx) → a877a98+590a74e (the claim escapes the arrow family: ↑/↓ on the issues trust grid, digit keys 1–5 on the who-votes party chips). The canonical guard block + per-site wiring (facetPick so the rdPinScroll pin fires, hero's combined swipe/hover ref, shared rangeId state stepping BOTH vote cards' menus, single ldHover ref naming which of two adjacent panels is hovered with an isConnected/rects liveness guard for the rd-hidden sibling, the Issues' two-claim one-listener (outer view row vs inner whom-card, inner claims by depth) and the Undecided effect's must-precede-its-practical-return placement), the reusable probe harness (viewport-clamped moveOver with sticky-bar inset; focus assertions via .focus() not coordinate clicks — page.click on a row scrolled under the sticky navbar hit a main-nav button; snapshot the NEIGHBOUR row's tab at phase start instead of asserting the default; the issues two-tier has THREE planes, so the view-claims-section assert requires moving to the row outside BOTH claims' card), and the add-one checklist for extending the claim to another row; plus the navbar pointer-click blur (leftover nav-tab focus vetoes EVERY claim — arrows turn the page on first hover until anything in-page is clicked; Tabs onClick blurs when e.detail>0), and the tabpanel pointer-park poke-record-release contract (2026-10-01, rung-8 family) — Chrome's mousedown implicit focus target is the nearest focusable ANCESTOR, so the ARIA-pattern tabIndex=0 role='tabpanel' div captures every inert in-view click and disarms ALL claims until the next body click; ONE-SITE contract on the panel — a poke stamps pointer DOWN AND UP (word-select gates fire a delayed re-park at release), onFocus RECORDS whether the panel's focus was pointer-caused (v1 blurred synchronously there instead — onFocus fires inside mousedown default processing and blur there aborted the caret path, killing text selection site-wide until the v2 rebuild), and one tick after pointer-up the parked panel blurs ONLY if its focus was pointer-caused and no selection is live (a drag's catch keeps its park; keyboard tab-order never pokes); + 2026-10-08 the mood panel's Consumers/Businesses row (the tab split 7d2aa6f shipped `<RdTabs swipe pin>` without the claim, so hovered arrows turned the page — a new tabbed panel ships focused walk + `swipe` + claim TOGETHER). Sister of auspol-rdtabs-arrow-walk (the FOCUSED walk this pattern claims on behalf of).
 source: auto-skill
 extracted_at: '2026-09-30'
 ---
@@ -416,6 +416,22 @@ auspol-headless-geometry-verify. Selection-guard phases must drive
     BEFORE the page-turn phase. First digit-probe run failed
     `failed to find element matching selector "#issues"` in the
     off-panel phase's wake — probe bug, app untouched.
+- **Mood panel ("Economic sentiment")** — rd-panels.jsx RdMood, section
+  `#mood`, steps `setView` over the module-level `RD_MOOD_VIEWS`
+  (Consumers/Businesses) after
+  `rdPinScroll(document.getElementById("mood").querySelector(".rd-mood-tabs"))`,
+  mirroring the Undecided effect line-for-line (wired below
+  `useState("consumer")`, deps `[view]`). Shipped 2026-10-08 after the
+  user reported hovered arrows turning the PAGE instead of walking the
+  confidence views: the consumer/business tab split (7d2aa6f) had
+  carried `<RdTabs swipe pin>` — the FOCUSED walk and the phone swipe —
+  but no hover claim, so the keys fell through to the page-level walk.
+  **A new tabbed panel ships all three inputs together**: focused walk
+  (RdTabs free), phone swipe (`swipe` prop), hover claim (this effect).
+  Any "arrows behave differently here" report on a later panel → check
+  for the missing effect BEFORE touching rdTabsKey. Probe:
+  `.matilda/probe-hover-mood.mjs` (port 9010) — both wraps on the
+  2-tab row, focused-tab priority, off-panel page-turn last.
 
 ## Probe harness (reusable)
 
@@ -425,8 +441,9 @@ auspol-headless-geometry-verify. Selection-guard phases must drive
 `.matilda/probe-hover-snapshotpanels.mjs` (port 8999),
 `.matilda/probe-hover-pastcycles.mjs` (port 9000; debug tap
 `.matilda/dbg-hover-pastcycles.mjs`, port 9001),
-`.matilda/probe-hover-issues-vert.mjs` (port 9003) and
-`.matilda/probe-hover-whovotes-digits.mjs` (port 9004) — a static
+`.matilda/probe-hover-issues-vert.mjs` (port 9003),
+`.matilda/probe-hover-whovotes-digits.mjs` (port 9004) and
+`.matilda/probe-hover-mood.mjs` (port 9010) — a static
 server (`PROBE_ROOT` env switches between live tree and a clean-room
 snapshot bind-mount), headless Chrome via puppeteer-core at
 `/Applications/Google Chrome.app/…/Google Chrome`, 1440×960.

@@ -3849,6 +3849,40 @@ function RdMood({ rangeId }) {
   /* the tabs over the chart open on the consumer pair; each view draws
      only its own lanes, dots and domain */
   const [view, setView] = useState("consumer");
+  /* hovering the panel hands the arrow keys to the Consumers/Businesses
+     row (the claim never survives the pointer leaving the card), pinned
+     through the crossfade exactly as the row's own pin does */
+  const moodHover = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById("mood");
+    if (!sec) return undefined;
+    const enter = () => { moodHover.current = true; };
+    const leave = () => { moodHover.current = false; };
+    moodHover.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const ids = RD_MOOD_VIEWS.map((v) => v.id);
+    const key = (e) => {
+      if (!moodHover.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const i = ids.indexOf(view);
+      if (i < 0 || ids.length < 2) return;
+      e.preventDefault();
+      const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
+      rdPinScroll(document.getElementById("mood") && document.getElementById("mood").querySelector(".rd-mood-tabs"));
+      setView(nxt);
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, [view]);
   const viewLanes = lanes.filter((l) => l.view === view);
   // Symmetric half-life kernel over the raw readings (x units are years).
   // Evaluated at each reading's date; week-to-week sampling noise on the
@@ -3952,8 +3986,8 @@ function RdMood({ rangeId }) {
     <RdSec id="mood" cls="rd-mood" title="Economic sentiment" meta={"Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")}>
       <RdHed head={head} dek={dek} />
       {/* the views are pages of their own, so the row walks them by arrow
-          keys and a phone swipe; rdPinScroll holds the row's spot through
-          the crossfade (pin) */}
+          keys (focused, or hovering the panel) and a phone swipe;
+          rdPinScroll holds the row's spot through the crossfade (pin) */}
       <RdTabs swipe pin value={view} onChange={setView} options={RD_MOOD_VIEWS} ariaLabel="Confidence of" className="rd-mood-tabs" />
       <RdCrossfade k={view}>
       <div className="card rd-card rd-mood-chart">
