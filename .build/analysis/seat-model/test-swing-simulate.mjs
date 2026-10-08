@@ -10,6 +10,8 @@ import { readFileSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { NATIONAL_FLOWS, nationalFlowRow } from "./flow-recipients.mjs";
+import { FLOW } from "../../newtracker/flows.mjs";
 
 const OUT = "data/seat-model-2028-nowcast.json";
 const HISTORY = "data/seat-model-2028-history.jsonl";
@@ -20,6 +22,8 @@ const INPUTS = [
   "data/seat-candidate-set-2028.json",
   "data/census-2021-divisions-2025.json",
   "data/polls.json",
+  ".build/newtracker/flows.mjs",
+  ".build/analysis/seat-model/flow-recipients.mjs",
 ];
 const P5 = ["alp", "lnp", "on", "grn", "oth"];
 
@@ -98,6 +102,30 @@ if (existsSync(HISTORY)) {
       Math.abs(hSum - 150) <= 0.5, String(hSum));
   }
 }
+
+/* ---- 2b. national fallback flow rows (W5.1) ------------------------------ */
+// every national-row row sums to 1, minor-bucket ALP shares anchor to FLOW,
+// and the lookup maps the sim's member:<name> vocabulary onto the member row
+for (const [g, row] of Object.entries(NATIONAL_FLOWS)) {
+  const t = Object.values(row).reduce((a, b) => a + b, 0);
+  check(`national flow row '${g}' sums to 1`, Math.abs(t - 1) <= 1e-9, String(t));
+  for (const [k, v] of Object.entries(row))
+    check(`national flow row '${g}' destination '${k}' in [0,1]`, v >= 0 && v <= 1, String(v));
+}
+check("grn fallback ALP share = FLOW.grn", NATIONAL_FLOWS.grn.alp === FLOW.grn);
+check("on fallback ALP share = FLOW.onp", NATIONAL_FLOWS.on.alp === FLOW.onp);
+check("oth fallback ALP share = FLOW.oth", NATIONAL_FLOWS.oth.alp === FLOW.oth);
+/* the W5 bias was a Coalition fallback sending ~half its pile to ALP and
+   none to ON — the derived Coalition row must send strictly more to ON
+   than to ALP (both stated constants: leak 0.178 v COAL_TO_ON 0.65) */
+for (const g of ["lp", "np", "lnp", "clp"])
+  check(`coalition fallback '${g}' favours ON over ALP`,
+    NATIONAL_FLOWS[g].on > NATIONAL_FLOWS[g].alp,
+    `on ${NATIONAL_FLOWS[g].on} vs alp ${NATIONAL_FLOWS[g].alp}`);
+check("member:<name> maps to the member row",
+  nationalFlowRow("member:wilkie") === NATIONAL_FLOWS.member);
+check("unknown group falls back to bucket row",
+  nationalFlowRow("alp") === NATIONAL_FLOWS.alp);
 
 /* ---- 3. null-mode GES replay (deterministic - small draw count) -------- */
 const nullOut = join(tmpdir(), "auspol-sim-null-test.json");

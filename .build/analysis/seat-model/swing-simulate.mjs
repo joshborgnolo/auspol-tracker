@@ -27,8 +27,14 @@
    have; named in HARD LIMITS). Groups contesting in 2028 but absent from a
    seat in 2025 (ONE NATION in the three ACT seats, per the W6 candidate
    set's run-everywhere assumption) have no seat flow row: the national
-   aggregate row for their group substitutes, and 2025 receiver rows in
-   those seats never name them — both facts documented in _about.
+   fallback row for their group substitutes, and 2025 receiver rows in
+   those seats never name them — both facts documented in _about. W5.1: the
+   national fallback rows are derived from the site's canonical 2PP flow
+   constants (.build/newtracker/flows.mjs via ./flow-recipients.mjs), with a
+   stated Coalition→ON modelling constant where no 2025 measurement exists —
+   replacing the W2 seat-row aggregate, whose Coalition-exclusion rows cover
+   only 25 teal-type seats and so leaked ~half of every excluded Coalition
+   pile to ALP in simulated ALP v ON finals.
 
    Layer 5 — Monte Carlo. DRAWS independent elections: national level per
    party ~ N(Δnat, σ_poll²) with σ_poll measured from the per-poll primary
@@ -53,6 +59,7 @@ import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync, appendFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { nationalFlowRow } from "./flow-recipients.mjs";
 
 /* draw count: 20k for the committed nowcast; the null-replay invariant is
    draw-deterministic, so the test runs it small via AUSPOL_SIM_DRAWS */
@@ -138,12 +145,13 @@ for (const s of FLOWS.seats) {
     Object.fromEntries(Object.entries(f.to).map(([k, v]) => [ids[+k], v]))]));
 }
 
-/* national aggregate exclusion row per group (fallback for new groups) */
-const natFlows = {};
-for (const s of FLOWS.seats) for (const [g, row] of Object.entries(s.groups)) {
-  natFlows[g] ??= {};
-  for (const [h, v] of Object.entries(row)) natFlows[g][h] = (natFlows[g][h] || 0) + v;
-}
+/* national fallback exclusion rows come from flow-recipients.mjs (W5.1):
+   derived from the site's canonical 2PP flow constants in
+   .build/newtracker/flows.mjs, NOT aggregated from the 2025 seat rows — the
+   2025 counts only ever excluded a Coalition candidate in 25 teal-type
+   seats, so the W2 aggregate leaked ~half of every excluded Coalition pile
+   to ALP and ~0% to ON in simulated ALP v ON finals. */
+const natFlows = { get: nationalFlowRow };
 
 /* census X per seat in the vote layer's cells */
 const W = VOTE.beta.populationWeights;
@@ -259,12 +267,16 @@ function simulate() {
       let counts = keys.map((k) => seat.flows.get(excl)?.[k] || 0);
       if (counts.reduce((a, b) => a + b, 0) === 0) {
         // no usable certified row (synthetic candidate, or every receiver
-        // already out): national group row, split within group by votes
-        const grow = natFlows[groupOf[excl]] || {};
+        // already out): national row derived from the site's 2PP flow
+        // constants (flow-recipients.mjs), split within group by votes
+        const grow = natFlows.get(groupOf[excl]) || {};
+        // the derived row carries shares, not ballots — scale it back to an
+        // effective count so the Dirichlet concentration matches what the
+        // certified rows (tens of thousands of ballots) implied
         counts = keys.map((k) => {
           const others = keys.filter((d) => groupOf[d] === groupOf[k]);
           const gsum = others.reduce((s, d) => s + standing[d], 0) || 1;
-          return (grow[groupOf[k]] || 0) * standing[k] / gsum;
+          return ((grow[groupOf[k]] ?? grow[groupOf[k].split(":")[0]]) || 0) * 50000 * standing[k] / gsum;
         });
       }
       if (counts.reduce((a, b) => a + b, 0) === 0) counts = keys.map(() => 1);
@@ -318,10 +330,10 @@ const pct = (xs, q) => { const s = xs.slice().sort((a, b) => a - b); return s[Ma
 const tcpVals = tcpSamples.filter((v) => v != null);
 const expected = Object.fromEntries(Object.entries(groupSeats).map(([g, t]) => [g, r2(t / DRAWS)]));
 const out = {
-  _about: "W5 of .build/analysis/seat-model-plan.md — swing + simulation engine (layers 3–5). 20,000 simulated elections off the W4 vote layer (Δnat, state deviations, age/gender β), the W2 certified 2025 per-seat flow matrices (Dirichlet-drawn at count scale, drift 0), the W6 2028 candidate set and the W1b census demographics on 2025 boundaries. HARD LIMITS: structural constants (PROP_MIX 0.5, seat residual 2.0 + state 1.5 pp, incumbency 0) are declared, not fitted — the holdout gate (plan §Validation.3) is where they earn their keep; One Nation in Bean/Canberra/Fenner runs on a national flow row and never receives transfers modelled from 2025 ACT rows (none name ON); flows are 2025-anchored; marginals only. Seat residuals are model, not measurement. Intervals are floor, not ceiling.",
+  _about: "W5 of .build/analysis/seat-model-plan.md — swing + simulation engine (layers 3–5). 20,000 simulated elections off the W4 vote layer (Δnat, state deviations, age/gender β), the W2 certified 2025 per-seat flow matrices (Dirichlet-drawn at count scale, drift 0), the W6 2028 candidate set and the W1b census demographics on 2025 boundaries. W5.1: the national flow fallback is derived from the site's canonical 2PP flow constants (flows.mjs FLOW.grn/onp/oth via flow-recipients.mjs), replacing the W2 seat-row aggregate whose Coalition-exclusion rows existed only in 25 teal-type seats and leaked ~49.7% of excluded Coalition ballots to ALP, 0% to ON — the mechanism behind the inflated 86.7-seat ALP nowcast of 2026-10-08. Coalition-excluded rows use the FLOW_3CNR per-ballot leak (0.178→ALP) plus a STATED modelling constant COAL_TO_ON=0.65 for the Coalition→ON share (reciprocal-consistent with the certified on→Coalition 61.5% row; no 2025 Coalition→ON measurement exists — zero seats produced that count). HARD LIMITS: structural constants (PROP_MIX 0.5, seat residual 2.0 + state 1.5 pp, incumbency 0) are declared, not fitted — the holdout gate (plan §Validation.3) is where they earn their keep; One Nation in Bean/Canberra/Fenner runs on the national fallback row and never receives transfers modelled from 2025 ACT rows (none name ON); flows are 2025-anchored; marginals only. Seat residuals are model, not measurement. Intervals are floor, not ceiling.",
   _provenance: {
     generated: new Date().toISOString().slice(0, 10),
-    inputs: Object.fromEntries(["data/seat-vote-layer.json", "data/aec-2025-seat-flows.json", "data/seat-candidate-set-2028.json", "data/census-2021-divisions-2025.json", "data/polls.json"].map((f) => [f, sha16(f)])),
+    inputs: Object.fromEntries(["data/seat-vote-layer.json", "data/aec-2025-seat-flows.json", "data/seat-candidate-set-2028.json", "data/census-2021-divisions-2025.json", "data/polls.json", ".build/newtracker/flows.mjs", ".build/analysis/seat-model/flow-recipients.mjs"].map((f) => [f, sha16(f)])),
   },
   meta: { draws: DRAWS, seed: SEED, propMix: PROP_MIX, incumbencyPP: INCUMBENCY_PP, sigSeat: SIG_SEAT, sigState: SIG_STATE, flowDrift: FLOW_DRIFT, windowDays: WINDOW_DAYS, sigmaNat: Object.fromEntries(Object.entries(sigmaNat).map(([k, v]) => [k, r2(v)])), windowFrom: winFrom, latestPoll, runtimeMs: Date.now() - t0 },
   national: {
