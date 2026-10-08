@@ -1,0 +1,2126 @@
+{
+ "_about": "W5 of .build/analysis/seat-model-plan.md — swing + simulation engine (layers 3–5). 20,000 simulated elections off the W4 vote layer (Δnat, state deviations, age/gender β), the W2 certified 2025 per-seat flow matrices (Dirichlet-drawn at count scale, drift 0), the W6 2028 candidate set and the W1b census demographics on 2025 boundaries. HARD LIMITS: structural constants (PROP_MIX 0.5, seat residual 2.0 + state 1.5 pp, incumbency 0) are declared, not fitted — the holdout gate (plan §Validation.3) is where they earn their keep; One Nation in Bean/Canberra/Fenner runs on a national flow row and never receives transfers modelled from 2025 ACT rows (none name ON); flows are 2025-anchored; marginals only. Seat residuals are model, not measurement. Intervals are floor, not ceiling.",
+ "_provenance": {
+  "generated": "2026-10-08",
+  "inputs": {
+   "data/seat-vote-layer.json": "13806de7ac755c7d",
+   "data/aec-2025-seat-flows.json": "9749abc1582b8a3a",
+   "data/seat-candidate-set-2028.json": "897e05c652758de1",
+   "data/census-2021-divisions-2025.json": "a9c8f688b59b1c9f",
+   "data/polls.json": "db65936c2c08de63"
+  }
+ },
+ "meta": {
+  "draws": 20000,
+  "seed": 20261008,
+  "propMix": 0.5,
+  "incumbencyPP": 0,
+  "sigSeat": 2,
+  "sigState": 1.5,
+  "flowDrift": 0,
+  "windowDays": 60,
+  "sigmaNat": {
+   "alp": 1.46,
+   "lnp": 1.92,
+   "on": 2.02,
+   "grn": 1.41,
+   "oth": 1.4
+  },
+  "windowFrom": "2026-08-07",
+  "latestPoll": "2026-10-06",
+  "runtimeMs": 78647
+ },
+ "national": {
+  "expectedSeats": {
+   "alp": 86.71,
+   "lnp": 31.68,
+   "on": 17.46,
+   "grn": 3.03,
+   "oth": 2.85,
+   "member": 8.27
+  },
+  "majority": {
+   "alp": 0.9492,
+   "coalition": 0,
+   "noMajority": 0.0509
+  },
+  "twoPartyClassic": {
+   "meanAlp": 51.11,
+   "p10": 49.22,
+   "p90": 53.02,
+   "coverage": 100,
+   "note": "mean over classic-final seats within each draw; coverage = mean share of DRAWS where ≥1 classic final exists"
+  }
+ },
+ "seats": [
+  {
+   "name": "Banks",
+   "state": "NSW",
+   "win": {
+    "lp": 0.6932,
+    "alp": 0.3069
+   },
+   "finalPairs": {
+    "alp|lp": 0.9262,
+    "alp|on": 0.0721,
+    "alp|grn": 0.001,
+    "grn|lp": 0.0007,
+    "lp|on": 0.0001
+   }
+  },
+  {
+   "name": "Barton",
+   "state": "NSW",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.8888,
+    "alp|grn": 0.0957,
+    "alp|lp": 0.0156
+   }
+  },
+  {
+   "name": "Bennelong",
+   "state": "NSW",
+   "win": {
+    "alp": 0.9743,
+    "lp": 0.0258
+   },
+   "finalPairs": {
+    "alp|lp": 0.9833,
+    "alp|on": 0.0142,
+    "alp|grn": 0.0026
+   }
+  },
+  {
+   "name": "Berowra",
+   "state": "NSW",
+   "win": {
+    "lp": 0.9687,
+    "alp": 0.0314
+   },
+   "finalPairs": {
+    "alp|lp": 0.9852,
+    "alp|on": 0.0117,
+    "lp|oth": 0.0015,
+    "lp|on": 0.001,
+    "grn|lp": 0.0004,
+    "alp|grn": 0.0002,
+    "alp|oth": 0.0001
+   }
+  },
+  {
+   "name": "Blaxland",
+   "state": "NSW",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|oth": 0.7159,
+    "alp|on": 0.2634,
+    "alp|lp": 0.0203,
+    "alp|grn": 0.0005
+   }
+  },
+  {
+   "name": "Bradfield",
+   "state": "NSW",
+   "win": {
+    "lp": 0.6997,
+    "member:boele": 0.2967,
+    "alp": 0.0037
+   },
+   "finalPairs": {
+    "lp|member:boele": 0.9807,
+    "alp|lp": 0.0168,
+    "alp|member:boele": 0.0014,
+    "lp|on": 0.0013
+   }
+  },
+  {
+   "name": "Calare",
+   "state": "NSW",
+   "win": {
+    "on": 0.8753,
+    "member:gee": 0.1139,
+    "np": 0.0107,
+    "oth": 0.0003
+   },
+   "finalPairs": {
+    "member:gee|on": 0.936,
+    "on|oth": 0.0374,
+    "member:gee|np": 0.0182,
+    "np|on": 0.0084,
+    "np|oth": 0.0001
+   }
+  },
+  {
+   "name": "Chifley",
+   "state": "NSW",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.9953,
+    "alp|grn": 0.0034,
+    "alp|lp": 0.0014
+   }
+  },
+  {
+   "name": "Cook",
+   "state": "NSW",
+   "win": {
+    "lp": 0.9955,
+    "alp": 0.0046
+   },
+   "finalPairs": {
+    "alp|lp": 0.9717,
+    "lp|on": 0.0238,
+    "alp|on": 0.0043,
+    "grn|lp": 0.0002
+   }
+  },
+  {
+   "name": "Cowper",
+   "state": "NSW",
+   "win": {
+    "on": 0.7124,
+    "np": 0.2743,
+    "oth": 0.0134
+   },
+   "finalPairs": {
+    "on|oth": 0.6125,
+    "np|oth": 0.2875,
+    "np|on": 0.1001
+   }
+  },
+  {
+   "name": "Cunningham",
+   "state": "NSW",
+   "win": {
+    "alp": 0.9999,
+    "grn": 0.0001
+   },
+   "finalPairs": {
+    "alp|on": 0.8478,
+    "alp|grn": 0.1521,
+    "alp|lp": 0.0001,
+    "grn|on": 0.0001
+   }
+  },
+  {
+   "name": "Dobell",
+   "state": "NSW",
+   "win": {
+    "alp": 0.9998,
+    "lp": 0.0002
+   },
+   "finalPairs": {
+    "alp|on": 0.9994,
+    "alp|lp": 0.0006
+   }
+  },
+  {
+   "name": "Eden-Monaro",
+   "state": "NSW",
+   "win": {
+    "alp": 0.9864,
+    "lp": 0.0136
+   },
+   "finalPairs": {
+    "alp|on": 0.9704,
+    "alp|lp": 0.0296,
+    "alp|grn": 0.0001
+   }
+  },
+  {
+   "name": "Farrer",
+   "state": "NSW",
+   "win": {
+    "on": 0.6869,
+    "lp": 0.1641,
+    "oth": 0.149
+   },
+   "finalPairs": {
+    "lp|on": 0.7431,
+    "lp|oth": 0.1457,
+    "on|oth": 0.1112
+   }
+  },
+  {
+   "name": "Fowler",
+   "state": "NSW",
+   "win": {
+    "member:le": 0.9799,
+    "alp": 0.019,
+    "on": 0.0012
+   },
+   "finalPairs": {
+    "alp|member:le": 0.9978,
+    "alp|on": 0.0018,
+    "member:le|on": 0.0005
+   }
+  },
+  {
+   "name": "Gilmore",
+   "state": "NSW",
+   "win": {
+    "alp": 0.7937,
+    "lp": 0.2063
+   },
+   "finalPairs": {
+    "alp|on": 0.7115,
+    "alp|lp": 0.2885,
+    "lp|on": 0.0001
+   }
+  },
+  {
+   "name": "Grayndler",
+   "state": "NSW",
+   "win": {
+    "alp": 0.9987,
+    "grn": 0.0013
+   },
+   "finalPairs": {
+    "alp|grn": 0.9836,
+    "alp|on": 0.0164
+   }
+  },
+  {
+   "name": "Greenway",
+   "state": "NSW",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.6683,
+    "alp|lp": 0.32,
+    "alp|grn": 0.0118
+   }
+  },
+  {
+   "name": "Hughes",
+   "state": "NSW",
+   "win": {
+    "alp": 0.5272,
+    "lp": 0.4729
+   },
+   "finalPairs": {
+    "alp|lp": 0.5942,
+    "alp|on": 0.4052,
+    "alp|grn": 0.0005,
+    "lp|on": 0.0002
+   }
+  },
+  {
+   "name": "Hume",
+   "state": "NSW",
+   "win": {
+    "lp": 0.851,
+    "alp": 0.1479,
+    "on": 0.0012
+   },
+   "finalPairs": {
+    "lp|on": 0.8102,
+    "alp|on": 0.1479,
+    "alp|lp": 0.042
+   }
+  },
+  {
+   "name": "Hunter",
+   "state": "NSW",
+   "win": {
+    "on": 0.9989,
+    "alp": 0.0012
+   },
+   "finalPairs": {
+    "alp|on": 1
+   }
+  },
+  {
+   "name": "Kingsford Smith",
+   "state": "NSW",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.8778,
+    "alp|lp": 0.0667,
+    "alp|grn": 0.0555
+   }
+  },
+  {
+   "name": "Lindsay",
+   "state": "NSW",
+   "win": {
+    "alp": 0.5407,
+    "lp": 0.4592,
+    "on": 0.0001
+   },
+   "finalPairs": {
+    "alp|on": 0.534,
+    "alp|lp": 0.3099,
+    "lp|on": 0.1562
+   }
+  },
+  {
+   "name": "Lyne",
+   "state": "NSW",
+   "win": {
+    "on": 0.9276,
+    "np": 0.0634,
+    "alp": 0.0091
+   },
+   "finalPairs": {
+    "np|on": 0.5823,
+    "on|oth": 0.352,
+    "alp|on": 0.0623,
+    "alp|np": 0.0034,
+    "np|oth": 0.0001
+   }
+  },
+  {
+   "name": "Macarthur",
+   "state": "NSW",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.9975,
+    "alp|grn": 0.0018,
+    "alp|lp": 0.0007
+   }
+  },
+  {
+   "name": "Mackellar",
+   "state": "NSW",
+   "win": {
+    "member:scamps": 0.7692,
+    "lp": 0.2288,
+    "on": 0.0021
+   },
+   "finalPairs": {
+    "lp|member:scamps": 0.965,
+    "member:scamps|on": 0.035,
+    "grn|member:scamps": 0.0001,
+    "alp|member:scamps": 0.0001
+   }
+  },
+  {
+   "name": "Macquarie",
+   "state": "NSW",
+   "win": {
+    "alp": 0.9984,
+    "lp": 0.0017
+   },
+   "finalPairs": {
+    "alp|on": 0.9963,
+    "alp|lp": 0.0037,
+    "alp|grn": 0.0001
+   }
+  },
+  {
+   "name": "McMahon",
+   "state": "NSW",
+   "win": {
+    "alp": 0.9974,
+    "lp": 0.0027
+   },
+   "finalPairs": {
+    "alp|on": 0.9775,
+    "alp|lp": 0.0226
+   }
+  },
+  {
+   "name": "Mitchell",
+   "state": "NSW",
+   "win": {
+    "lp": 0.9786,
+    "alp": 0.0214
+   },
+   "finalPairs": {
+    "alp|lp": 0.989,
+    "grn|lp": 0.0052,
+    "lp|on": 0.004,
+    "alp|on": 0.0019,
+    "alp|grn": 0.0001
+   }
+  },
+  {
+   "name": "New England",
+   "state": "NSW",
+   "win": {
+    "on": 0.707,
+    "np": 0.293
+   },
+   "finalPairs": {
+    "np|on": 0.9998,
+    "alp|on": 0.0002
+   }
+  },
+  {
+   "name": "Newcastle",
+   "state": "NSW",
+   "win": {
+    "alp": 0.9982,
+    "grn": 0.0018
+   },
+   "finalPairs": {
+    "alp|grn": 0.7122,
+    "alp|on": 0.2878
+   }
+  },
+  {
+   "name": "Page",
+   "state": "NSW",
+   "win": {
+    "np": 0.8267,
+    "on": 0.1586,
+    "alp": 0.0148
+   },
+   "finalPairs": {
+    "np|on": 0.738,
+    "alp|np": 0.1448,
+    "grn|on": 0.05,
+    "grn|np": 0.0394,
+    "alp|on": 0.028
+   }
+  },
+  {
+   "name": "Parkes",
+   "state": "NSW",
+   "win": {
+    "on": 1
+   },
+   "finalPairs": {
+    "np|on": 0.9888,
+    "alp|on": 0.0112,
+    "grn|on": 0.0001
+   }
+  },
+  {
+   "name": "Parramatta",
+   "state": "NSW",
+   "win": {
+    "alp": 0.9979,
+    "lp": 0.0021
+   },
+   "finalPairs": {
+    "alp|lp": 0.9037,
+    "alp|on": 0.0679,
+    "alp|grn": 0.0285
+   }
+  },
+  {
+   "name": "Paterson",
+   "state": "NSW",
+   "win": {
+    "alp": 0.996,
+    "lp": 0.004
+   },
+   "finalPairs": {
+    "alp|on": 0.9866,
+    "alp|lp": 0.0134,
+    "lp|on": 0.0001
+   }
+  },
+  {
+   "name": "Reid",
+   "state": "NSW",
+   "win": {
+    "alp": 0.9986,
+    "lp": 0.0014
+   },
+   "finalPairs": {
+    "alp|lp": 0.9692,
+    "alp|on": 0.0212,
+    "alp|grn": 0.0097
+   }
+  },
+  {
+   "name": "Richmond",
+   "state": "NSW",
+   "win": {
+    "alp": 0.5875,
+    "grn": 0.3704,
+    "on": 0.0421,
+    "np": 0.0001
+   },
+   "finalPairs": {
+    "alp|on": 0.5821,
+    "grn|on": 0.4037,
+    "alp|grn": 0.0141,
+    "alp|np": 0.0001,
+    "grn|np": 0.0001
+   }
+  },
+  {
+   "name": "Riverina",
+   "state": "NSW",
+   "win": {
+    "on": 0.9894,
+    "np": 0.0106
+   },
+   "finalPairs": {
+    "np|on": 0.9962,
+    "alp|on": 0.0036,
+    "on|oth": 0.0003
+   }
+  },
+  {
+   "name": "Robertson",
+   "state": "NSW",
+   "win": {
+    "alp": 0.9958,
+    "lp": 0.0042
+   },
+   "finalPairs": {
+    "alp|on": 0.9822,
+    "alp|lp": 0.0178
+   }
+  },
+  {
+   "name": "Shortland",
+   "state": "NSW",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.9999,
+    "alp|lp": 0.0001
+   }
+  },
+  {
+   "name": "Sydney",
+   "state": "NSW",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|grn": 0.9556,
+    "alp|on": 0.0337,
+    "alp|lp": 0.0108
+   }
+  },
+  {
+   "name": "Warringah",
+   "state": "NSW",
+   "win": {
+    "member:steggall": 0.991,
+    "lp": 0.009,
+    "on": 0.0001
+   },
+   "finalPairs": {
+    "lp|member:steggall": 0.9778,
+    "member:steggall|on": 0.0194,
+    "alp|member:steggall": 0.0024,
+    "grn|member:steggall": 0.0006
+   }
+  },
+  {
+   "name": "Watson",
+   "state": "NSW",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|oth": 0.8263,
+    "alp|on": 0.1703,
+    "alp|lp": 0.003,
+    "alp|grn": 0.0004
+   }
+  },
+  {
+   "name": "Wentworth",
+   "state": "NSW",
+   "win": {
+    "member:spender": 0.9476,
+    "lp": 0.0524,
+    "on": 0.0001
+   },
+   "finalPairs": {
+    "lp|member:spender": 0.9968,
+    "member:spender|on": 0.0031,
+    "grn|member:spender": 0.0001,
+    "alp|member:spender": 0.0001
+   }
+  },
+  {
+   "name": "Werriwa",
+   "state": "NSW",
+   "win": {
+    "alp": 0.8776,
+    "lp": 0.1225
+   },
+   "finalPairs": {
+    "alp|lp": 0.7879,
+    "alp|on": 0.2042,
+    "alp|grn": 0.0079
+   }
+  },
+  {
+   "name": "Whitlam",
+   "state": "NSW",
+   "win": {
+    "alp": 0.9972,
+    "lp": 0.0028
+   },
+   "finalPairs": {
+    "alp|on": 0.9942,
+    "alp|lp": 0.0057,
+    "lp|on": 0.0001,
+    "alp|grn": 0.0001
+   }
+  },
+  {
+   "name": "Aston",
+   "state": "VIC",
+   "win": {
+    "lp": 0.6373,
+    "alp": 0.3628
+   },
+   "finalPairs": {
+    "alp|lp": 0.9977,
+    "alp|on": 0.0021,
+    "grn|lp": 0.0001,
+    "alp|grn": 0.0001
+   }
+  },
+  {
+   "name": "Ballarat",
+   "state": "VIC",
+   "win": {
+    "alp": 0.9924,
+    "lp": 0.0076
+   },
+   "finalPairs": {
+    "alp|on": 0.845,
+    "alp|lp": 0.1407,
+    "alp|grn": 0.0143,
+    "lp|on": 0.0001
+   }
+  },
+  {
+   "name": "Bendigo",
+   "state": "VIC",
+   "win": {
+    "np": 0.8833,
+    "alp": 0.1166,
+    "grn": 0.0001,
+    "on": 0.0001
+   },
+   "finalPairs": {
+    "alp|np": 0.9873,
+    "alp|on": 0.0112,
+    "grn|np": 0.0013,
+    "np|on": 0.0002,
+    "grn|on": 0.0001
+   }
+  },
+  {
+   "name": "Bruce",
+   "state": "VIC",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.9841,
+    "alp|lp": 0.0121,
+    "alp|grn": 0.0039
+   }
+  },
+  {
+   "name": "Calwell",
+   "state": "VIC",
+   "win": {
+    "alp": 0.6267,
+    "oth": 0.3733
+   },
+   "finalPairs": {
+    "alp|oth": 0.9749,
+    "alp|on": 0.0212,
+    "alp|lp": 0.0033,
+    "alp|grn": 0.0006,
+    "lp|oth": 0.0001
+   }
+  },
+  {
+   "name": "Casey",
+   "state": "VIC",
+   "win": {
+    "lp": 0.9949,
+    "alp": 0.0052
+   },
+   "finalPairs": {
+    "alp|lp": 0.9861,
+    "lp|on": 0.0066,
+    "alp|on": 0.0042,
+    "lp|oth": 0.0026,
+    "grn|lp": 0.0007
+   }
+  },
+  {
+   "name": "Chisholm",
+   "state": "VIC",
+   "win": {
+    "alp": 0.678,
+    "lp": 0.3221
+   },
+   "finalPairs": {
+    "alp|lp": 1
+   }
+  },
+  {
+   "name": "Cooper",
+   "state": "VIC",
+   "win": {
+    "alp": 0.9972,
+    "grn": 0.0029
+   },
+   "finalPairs": {
+    "alp|grn": 0.9959,
+    "alp|on": 0.004,
+    "alp|lp": 0.0001
+   }
+  },
+  {
+   "name": "Corangamite",
+   "state": "VIC",
+   "win": {
+    "alp": 0.8677,
+    "lp": 0.1323
+   },
+   "finalPairs": {
+    "alp|lp": 0.9903,
+    "alp|grn": 0.0059,
+    "alp|on": 0.0029,
+    "grn|lp": 0.0009
+   }
+  },
+  {
+   "name": "Corio",
+   "state": "VIC",
+   "win": {
+    "alp": 0.9998,
+    "lp": 0.0003
+   },
+   "finalPairs": {
+    "alp|on": 0.9669,
+    "alp|grn": 0.0223,
+    "alp|lp": 0.0108
+   }
+  },
+  {
+   "name": "Deakin",
+   "state": "VIC",
+   "win": {
+    "lp": 0.7721,
+    "alp": 0.228
+   },
+   "finalPairs": {
+    "alp|lp": 0.9993,
+    "grn|lp": 0.0006,
+    "alp|on": 0.0001,
+    "alp|grn": 0.0001
+   }
+  },
+  {
+   "name": "Dunkley",
+   "state": "VIC",
+   "win": {
+    "alp": 0.7554,
+    "lp": 0.2446
+   },
+   "finalPairs": {
+    "alp|lp": 0.5286,
+    "alp|on": 0.4701,
+    "alp|grn": 0.0014
+   }
+  },
+  {
+   "name": "Flinders",
+   "state": "VIC",
+   "win": {
+    "lp": 0.953,
+    "oth": 0.0348,
+    "alp": 0.0102,
+    "on": 0.0021
+   },
+   "finalPairs": {
+    "lp|oth": 0.6988,
+    "lp|on": 0.2348,
+    "alp|lp": 0.0506,
+    "alp|on": 0.0101,
+    "on|oth": 0.0052,
+    "alp|oth": 0.0007
+   }
+  },
+  {
+   "name": "Fraser",
+   "state": "VIC",
+   "win": {
+    "alp": 0.874,
+    "grn": 0.126,
+    "lp": 0.0001
+   },
+   "finalPairs": {
+    "alp|grn": 0.9962,
+    "alp|on": 0.0021,
+    "alp|lp": 0.0017,
+    "grn|lp": 0.0001
+   }
+  },
+  {
+   "name": "Gellibrand",
+   "state": "VIC",
+   "win": {
+    "alp": 0.9999,
+    "lp": 0.0001
+   },
+   "finalPairs": {
+    "alp|lp": 0.4252,
+    "alp|on": 0.322,
+    "alp|grn": 0.2527,
+    "grn|lp": 0.0001
+   }
+  },
+  {
+   "name": "Gippsland",
+   "state": "VIC",
+   "win": {
+    "on": 0.7684,
+    "np": 0.2317
+   },
+   "finalPairs": {
+    "np|on": 1,
+    "alp|on": 0.0001
+   }
+  },
+  {
+   "name": "Goldstein",
+   "state": "VIC",
+   "win": {
+    "lp": 0.8048,
+    "oth": 0.1953
+   },
+   "finalPairs": {
+    "lp|oth": 1,
+    "alp|lp": 0.0001
+   }
+  },
+  {
+   "name": "Gorton",
+   "state": "VIC",
+   "win": {
+    "alp": 0.9796,
+    "lp": 0.0204
+   },
+   "finalPairs": {
+    "alp|lp": 0.6591,
+    "alp|on": 0.3394,
+    "alp|grn": 0.0015
+   }
+  },
+  {
+   "name": "Hawke",
+   "state": "VIC",
+   "win": {
+    "alp": 0.9462,
+    "lp": 0.0539
+   },
+   "finalPairs": {
+    "alp|on": 0.8902,
+    "alp|lp": 0.1096,
+    "alp|grn": 0.0002,
+    "lp|on": 0.0001
+   }
+  },
+  {
+   "name": "Holt",
+   "state": "VIC",
+   "win": {
+    "alp": 0.9998,
+    "lp": 0.0002
+   },
+   "finalPairs": {
+    "alp|on": 0.931,
+    "alp|lp": 0.0649,
+    "alp|grn": 0.0041
+   }
+  },
+  {
+   "name": "Hotham",
+   "state": "VIC",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|lp": 0.5498,
+    "alp|on": 0.2794,
+    "alp|grn": 0.1707
+   }
+  },
+  {
+   "name": "Indi",
+   "state": "VIC",
+   "win": {
+    "member:haines": 0.7473,
+    "on": 0.2438,
+    "lp": 0.009
+   },
+   "finalPairs": {
+    "member:haines|on": 0.9342,
+    "lp|member:haines": 0.0644,
+    "lp|on": 0.0014
+   }
+  },
+  {
+   "name": "Isaacs",
+   "state": "VIC",
+   "win": {
+    "alp": 0.9989,
+    "lp": 0.0011
+   },
+   "finalPairs": {
+    "alp|lp": 0.7482,
+    "alp|on": 0.192,
+    "alp|grn": 0.0598
+   }
+  },
+  {
+   "name": "Jagajaga",
+   "state": "VIC",
+   "win": {
+    "alp": 0.9953,
+    "lp": 0.0048
+   },
+   "finalPairs": {
+    "alp|lp": 0.8959,
+    "alp|grn": 0.0586,
+    "alp|on": 0.0456
+   }
+  },
+  {
+   "name": "Kooyong",
+   "state": "VIC",
+   "win": {
+    "lp": 0.709,
+    "member:ryan": 0.291
+   },
+   "finalPairs": {
+    "lp|member:ryan": 1
+   }
+  },
+  {
+   "name": "La Trobe",
+   "state": "VIC",
+   "win": {
+    "lp": 0.9288,
+    "alp": 0.0712
+   },
+   "finalPairs": {
+    "alp|lp": 0.8885,
+    "alp|on": 0.0694,
+    "lp|on": 0.0413,
+    "grn|lp": 0.0008,
+    "alp|grn": 0.0001
+   }
+  },
+  {
+   "name": "Lalor",
+   "state": "VIC",
+   "win": {
+    "alp": 0.9992,
+    "lp": 0.0008
+   },
+   "finalPairs": {
+    "alp|on": 0.5231,
+    "alp|lp": 0.3723,
+    "alp|grn": 0.1046,
+    "grn|lp": 0.0001
+   }
+  },
+  {
+   "name": "Macnamara",
+   "state": "VIC",
+   "win": {
+    "alp": 0.5923,
+    "lp": 0.4072,
+    "grn": 0.0006
+   },
+   "finalPairs": {
+    "alp|lp": 0.5545,
+    "grn|lp": 0.4062,
+    "alp|grn": 0.0393,
+    "alp|on": 0.0001
+   }
+  },
+  {
+   "name": "Mallee",
+   "state": "VIC",
+   "win": {
+    "np": 0.643,
+    "on": 0.3571
+   },
+   "finalPairs": {
+    "np|on": 1,
+    "alp|np": 0.0001
+   }
+  },
+  {
+   "name": "Maribyrnong",
+   "state": "VIC",
+   "win": {
+    "alp": 0.9846,
+    "lp": 0.0155
+   },
+   "finalPairs": {
+    "alp|lp": 0.4148,
+    "alp|grn": 0.3259,
+    "alp|on": 0.2512,
+    "grn|lp": 0.008,
+    "lp|on": 0.0001
+   }
+  },
+  {
+   "name": "McEwen",
+   "state": "VIC",
+   "win": {
+    "alp": 0.5038,
+    "lp": 0.4962
+   },
+   "finalPairs": {
+    "alp|lp": 0.7002,
+    "alp|on": 0.2976,
+    "alp|grn": 0.0019,
+    "lp|on": 0.0003,
+    "grn|lp": 0.0001
+   }
+  },
+  {
+   "name": "Melbourne",
+   "state": "VIC",
+   "win": {
+    "grn": 0.551,
+    "alp": 0.4312,
+    "lp": 0.0179
+   },
+   "finalPairs": {
+    "alp|grn": 0.8857,
+    "grn|lp": 0.1128,
+    "alp|lp": 0.0016
+   }
+  },
+  {
+   "name": "Menzies",
+   "state": "VIC",
+   "win": {
+    "lp": 0.8277,
+    "alp": 0.1724
+   },
+   "finalPairs": {
+    "alp|lp": 1,
+    "grn|lp": 0.0001
+   }
+  },
+  {
+   "name": "Monash",
+   "state": "VIC",
+   "win": {
+    "lp": 0.88,
+    "oth": 0.0743,
+    "alp": 0.0458
+   },
+   "finalPairs": {
+    "lp|on": 0.4294,
+    "lp|oth": 0.2966,
+    "alp|lp": 0.1545,
+    "on|oth": 0.0741,
+    "alp|on": 0.0452,
+    "alp|oth": 0.0002
+   }
+  },
+  {
+   "name": "Nicholls",
+   "state": "VIC",
+   "win": {
+    "on": 0.7643,
+    "np": 0.2358
+   },
+   "finalPairs": {
+    "np|on": 0.9979,
+    "alp|on": 0.0013,
+    "alp|np": 0.0009
+   }
+  },
+  {
+   "name": "Scullin",
+   "state": "VIC",
+   "win": {
+    "alp": 1,
+    "lp": 0.0001
+   },
+   "finalPairs": {
+    "alp|on": 0.9765,
+    "alp|lp": 0.0204,
+    "alp|grn": 0.0032
+   }
+  },
+  {
+   "name": "Wannon",
+   "state": "VIC",
+   "win": {
+    "lp": 0.9415,
+    "oth": 0.0555,
+    "on": 0.0031
+   },
+   "finalPairs": {
+    "lp|oth": 0.9878,
+    "lp|on": 0.0112,
+    "on|oth": 0.0011
+   }
+  },
+  {
+   "name": "Wills",
+   "state": "VIC",
+   "win": {
+    "grn": 0.8309,
+    "alp": 0.1691,
+    "lp": 0.0001
+   },
+   "finalPairs": {
+    "alp|grn": 0.9999,
+    "grn|lp": 0.0001
+   }
+  },
+  {
+   "name": "Blair",
+   "state": "QLD",
+   "win": {
+    "alp": 0.9313,
+    "on": 0.0688
+   },
+   "finalPairs": {
+    "alp|on": 1
+   }
+  },
+  {
+   "name": "Bonner",
+   "state": "QLD",
+   "win": {
+    "alp": 0.915,
+    "lnp": 0.0851
+   },
+   "finalPairs": {
+    "alp|on": 0.67,
+    "alp|lnp": 0.3216,
+    "alp|grn": 0.0085
+   }
+  },
+  {
+   "name": "Bowman",
+   "state": "QLD",
+   "win": {
+    "alp": 0.9517,
+    "lnp": 0.0476,
+    "on": 0.0008
+   },
+   "finalPairs": {
+    "alp|on": 0.9518,
+    "lnp|on": 0.0301,
+    "alp|lnp": 0.0182
+   }
+  },
+  {
+   "name": "Brisbane",
+   "state": "QLD",
+   "win": {
+    "alp": 0.5901,
+    "lnp": 0.3741,
+    "grn": 0.0357
+   },
+   "finalPairs": {
+    "grn|lnp": 0.3969,
+    "alp|grn": 0.3494,
+    "alp|lnp": 0.2461,
+    "alp|on": 0.0074,
+    "lnp|on": 0.0001,
+    "grn|on": 0.0001
+   }
+  },
+  {
+   "name": "Capricornia",
+   "state": "QLD",
+   "win": {
+    "on": 0.9012,
+    "alp": 0.0988
+   },
+   "finalPairs": {
+    "alp|on": 0.9475,
+    "lnp|on": 0.0526
+   }
+  },
+  {
+   "name": "Dawson",
+   "state": "QLD",
+   "win": {
+    "on": 0.6541,
+    "alp": 0.2664,
+    "lnp": 0.0796
+   },
+   "finalPairs": {
+    "lnp|on": 0.6423,
+    "alp|on": 0.3577
+   }
+  },
+  {
+   "name": "Dickson",
+   "state": "QLD",
+   "win": {
+    "alp": 0.8589,
+    "lnp": 0.1411
+   },
+   "finalPairs": {
+    "alp|on": 0.7299,
+    "alp|lnp": 0.2701,
+    "alp|oth": 0.0001
+   }
+  },
+  {
+   "name": "Fadden",
+   "state": "QLD",
+   "win": {
+    "alp": 0.7185,
+    "lnp": 0.1935,
+    "on": 0.0881
+   },
+   "finalPairs": {
+    "alp|on": 0.7241,
+    "lnp|on": 0.2754,
+    "alp|lnp": 0.0005
+   }
+  },
+  {
+   "name": "Fairfax",
+   "state": "QLD",
+   "win": {
+    "alp": 0.9146,
+    "lnp": 0.0761,
+    "on": 0.0082,
+    "oth": 0.0012
+   },
+   "finalPairs": {
+    "alp|on": 0.915,
+    "lnp|on": 0.0728,
+    "alp|lnp": 0.0078,
+    "on|oth": 0.0043,
+    "grn|on": 0.0001,
+    "lnp|oth": 0.0001
+   }
+  },
+  {
+   "name": "Fisher",
+   "state": "QLD",
+   "win": {
+    "alp": 0.5565,
+    "lnp": 0.2165,
+    "on": 0.1328,
+    "oth": 0.0943
+   },
+   "finalPairs": {
+    "alp|on": 0.5565,
+    "on|oth": 0.2229,
+    "lnp|on": 0.1858,
+    "alp|lnp": 0.0323,
+    "lnp|oth": 0.0021,
+    "grn|on": 0.0004
+   }
+  },
+  {
+   "name": "Flynn",
+   "state": "QLD",
+   "win": {
+    "on": 0.9755,
+    "alp": 0.0244,
+    "lnp": 0.0001
+   },
+   "finalPairs": {
+    "alp|on": 0.6647,
+    "lnp|on": 0.3354
+   }
+  },
+  {
+   "name": "Forde",
+   "state": "QLD",
+   "win": {
+    "alp": 0.9371,
+    "on": 0.0628,
+    "grn": 0.0001,
+    "lnp": 0.0001
+   },
+   "finalPairs": {
+    "alp|on": 0.9998,
+    "lnp|on": 0.0002,
+    "grn|on": 0.0001
+   }
+  },
+  {
+   "name": "Griffith",
+   "state": "QLD",
+   "win": {
+    "alp": 0.5417,
+    "grn": 0.4277,
+    "lnp": 0.0307
+   },
+   "finalPairs": {
+    "alp|grn": 0.9225,
+    "grn|lnp": 0.0643,
+    "alp|lnp": 0.011,
+    "alp|on": 0.0023,
+    "grn|on": 0.0001
+   }
+  },
+  {
+   "name": "Groom",
+   "state": "QLD",
+   "win": {
+    "on": 0.8236,
+    "oth": 0.1106,
+    "lnp": 0.0575,
+    "alp": 0.0084
+   },
+   "finalPairs": {
+    "lnp|on": 0.5272,
+    "on|oth": 0.4458,
+    "alp|on": 0.0267,
+    "lnp|oth": 0.0004
+   }
+  },
+  {
+   "name": "Herbert",
+   "state": "QLD",
+   "win": {
+    "lnp": 0.989,
+    "alp": 0.011
+   },
+   "finalPairs": {
+    "lnp|on": 0.5311,
+    "alp|lnp": 0.4579,
+    "alp|on": 0.011,
+    "grn|lnp": 0.0001
+   }
+  },
+  {
+   "name": "Hinkler",
+   "state": "QLD",
+   "win": {
+    "on": 0.8541,
+    "alp": 0.1456,
+    "lnp": 0.0003
+   },
+   "finalPairs": {
+    "alp|on": 0.8856,
+    "lnp|on": 0.1144
+   }
+  },
+  {
+   "name": "Kennedy",
+   "state": "QLD",
+   "win": {
+    "member:katter": 0.8374,
+    "on": 0.1336,
+    "alp": 0.0291
+   },
+   "finalPairs": {
+    "member:katter|on": 0.9076,
+    "alp|on": 0.0792,
+    "alp|member:katter": 0.0133
+   }
+  },
+  {
+   "name": "Leichhardt",
+   "state": "QLD",
+   "win": {
+    "alp": 0.9756,
+    "on": 0.0245
+   },
+   "finalPairs": {
+    "alp|on": 1
+   }
+  },
+  {
+   "name": "Lilley",
+   "state": "QLD",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.8689,
+    "alp|grn": 0.1206,
+    "alp|lnp": 0.0106
+   }
+  },
+  {
+   "name": "Longman",
+   "state": "QLD",
+   "win": {
+    "alp": 0.9549,
+    "on": 0.0438,
+    "lnp": 0.0014
+   },
+   "finalPairs": {
+    "alp|on": 0.9968,
+    "lnp|on": 0.0032
+   }
+  },
+  {
+   "name": "Maranoa",
+   "state": "QLD",
+   "win": {
+    "on": 0.9964,
+    "lnp": 0.0036
+   },
+   "finalPairs": {
+    "lnp|on": 1,
+    "alp|on": 0.0001
+   }
+  },
+  {
+   "name": "McPherson",
+   "state": "QLD",
+   "win": {
+    "lnp": 0.495,
+    "alp": 0.4699,
+    "oth": 0.0195,
+    "on": 0.0157
+   },
+   "finalPairs": {
+    "alp|on": 0.4698,
+    "alp|lnp": 0.4273,
+    "lnp|on": 0.062,
+    "on|oth": 0.034,
+    "lnp|oth": 0.0069,
+    "alp|oth": 0.0001
+   }
+  },
+  {
+   "name": "Moncrieff",
+   "state": "QLD",
+   "win": {
+    "lnp": 0.7314,
+    "alp": 0.2656,
+    "on": 0.003
+   },
+   "finalPairs": {
+    "lnp|on": 0.6476,
+    "alp|on": 0.2656,
+    "alp|lnp": 0.0867
+   }
+  },
+  {
+   "name": "Moreton",
+   "state": "QLD",
+   "win": {
+    "alp": 0.9994,
+    "grn": 0.0005,
+    "lnp": 0.0001
+   },
+   "finalPairs": {
+    "alp|grn": 0.7974,
+    "alp|on": 0.1828,
+    "alp|lnp": 0.0197,
+    "grn|lnp": 0.0001
+   }
+  },
+  {
+   "name": "Oxley",
+   "state": "QLD",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.9968,
+    "alp|grn": 0.0033
+   }
+  },
+  {
+   "name": "Petrie",
+   "state": "QLD",
+   "win": {
+    "alp": 0.9706,
+    "lnp": 0.0294,
+    "on": 0.0001
+   },
+   "finalPairs": {
+    "alp|on": 0.9661,
+    "alp|lnp": 0.0314,
+    "lnp|on": 0.0026
+   }
+  },
+  {
+   "name": "Rankin",
+   "state": "QLD",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 1
+   }
+  },
+  {
+   "name": "Ryan",
+   "state": "QLD",
+   "win": {
+    "grn": 0.6455,
+    "alp": 0.293,
+    "lnp": 0.0615
+   },
+   "finalPairs": {
+    "grn|lnp": 0.5682,
+    "alp|grn": 0.3913,
+    "alp|lnp": 0.029,
+    "grn|on": 0.0061,
+    "alp|on": 0.0054
+   }
+  },
+  {
+   "name": "Wide Bay",
+   "state": "QLD",
+   "win": {
+    "on": 0.7976,
+    "alp": 0.2017,
+    "lnp": 0.0008
+   },
+   "finalPairs": {
+    "alp|on": 0.8066,
+    "lnp|on": 0.1934
+   }
+  },
+  {
+   "name": "Wright",
+   "state": "QLD",
+   "win": {
+    "on": 0.997,
+    "alp": 0.0031
+   },
+   "finalPairs": {
+    "alp|on": 0.9072,
+    "lnp|on": 0.0928,
+    "grn|on": 0.0001
+   }
+  },
+  {
+   "name": "Adelaide",
+   "state": "SA",
+   "win": {
+    "alp": 1,
+    "lp": 0.0001
+   },
+   "finalPairs": {
+    "alp|grn": 0.5583,
+    "alp|lp": 0.3151,
+    "alp|on": 0.1267,
+    "grn|lp": 0.0001
+   }
+  },
+  {
+   "name": "Barker",
+   "state": "SA",
+   "win": {
+    "lp": 0.9931,
+    "on": 0.0056,
+    "alp": 0.0013
+   },
+   "finalPairs": {
+    "lp|on": 0.9942,
+    "alp|lp": 0.0045,
+    "alp|on": 0.0013
+   }
+  },
+  {
+   "name": "Boothby",
+   "state": "SA",
+   "win": {
+    "alp": 0.9982,
+    "lp": 0.0018
+   },
+   "finalPairs": {
+    "alp|lp": 0.9071,
+    "alp|grn": 0.0584,
+    "alp|on": 0.0344,
+    "grn|lp": 0.0002
+   }
+  },
+  {
+   "name": "Grey",
+   "state": "SA",
+   "win": {
+    "lp": 0.7826,
+    "alp": 0.1311,
+    "oth": 0.0783,
+    "on": 0.0081
+   },
+   "finalPairs": {
+    "lp|on": 0.7601,
+    "alp|on": 0.1312,
+    "on|oth": 0.0754,
+    "alp|lp": 0.0281,
+    "lp|oth": 0.0053,
+    "alp|oth": 0.0001
+   }
+  },
+  {
+   "name": "Hindmarsh",
+   "state": "SA",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.8586,
+    "alp|lp": 0.0715,
+    "alp|grn": 0.07
+   }
+  },
+  {
+   "name": "Kingston",
+   "state": "SA",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.9735,
+    "alp|grn": 0.024,
+    "alp|lp": 0.0025
+   }
+  },
+  {
+   "name": "Makin",
+   "state": "SA",
+   "win": {
+    "alp": 1,
+    "lp": 0.0001
+   },
+   "finalPairs": {
+    "alp|on": 0.9577,
+    "alp|lp": 0.0285,
+    "alp|grn": 0.0139
+   }
+  },
+  {
+   "name": "Mayo",
+   "state": "SA",
+   "win": {
+    "member:sharkie": 0.491,
+    "on": 0.3973,
+    "lp": 0.0783,
+    "grn": 0.0275,
+    "alp": 0.006
+   },
+   "finalPairs": {
+    "member:sharkie|on": 0.5989,
+    "alp|member:sharkie": 0.1849,
+    "lp|member:sharkie": 0.0824,
+    "lp|on": 0.0678,
+    "grn|on": 0.0342,
+    "grn|member:sharkie": 0.0168,
+    "grn|lp": 0.0087,
+    "alp|on": 0.0058,
+    "alp|lp": 0.0006,
+    "alp|grn": 0.0001
+   }
+  },
+  {
+   "name": "Spence",
+   "state": "SA",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.997,
+    "alp|grn": 0.0028,
+    "alp|lp": 0.0003
+   }
+  },
+  {
+   "name": "Sturt",
+   "state": "SA",
+   "win": {
+    "alp": 0.6803,
+    "lp": 0.3198
+   },
+   "finalPairs": {
+    "alp|lp": 0.9592,
+    "alp|grn": 0.0165,
+    "grn|lp": 0.0125,
+    "alp|on": 0.0118,
+    "lp|on": 0.0001
+   }
+  },
+  {
+   "name": "Brand",
+   "state": "WA",
+   "win": {
+    "alp": 0.9994,
+    "on": 0.0006
+   },
+   "finalPairs": {
+    "alp|on": 0.9999,
+    "alp|grn": 0.0001
+   }
+  },
+  {
+   "name": "Bullwinkel",
+   "state": "WA",
+   "win": {
+    "alp": 0.76,
+    "lp": 0.24
+   },
+   "finalPairs": {
+    "alp|on": 0.7353,
+    "alp|lp": 0.2536,
+    "lp|on": 0.0112
+   }
+  },
+  {
+   "name": "Burt",
+   "state": "WA",
+   "win": {
+    "alp": 1,
+    "on": 0.0001
+   },
+   "finalPairs": {
+    "alp|on": 0.9998,
+    "alp|grn": 0.0002
+   }
+  },
+  {
+   "name": "Canning",
+   "state": "WA",
+   "win": {
+    "lp": 0.5387,
+    "alp": 0.4436,
+    "on": 0.0177
+   },
+   "finalPairs": {
+    "lp|on": 0.5448,
+    "alp|on": 0.4445,
+    "alp|lp": 0.0107
+   }
+  },
+  {
+   "name": "Cowan",
+   "state": "WA",
+   "win": {
+    "alp": 1,
+    "lp": 0.0001
+   },
+   "finalPairs": {
+    "alp|on": 0.7576,
+    "alp|lp": 0.2022,
+    "alp|grn": 0.0402
+   }
+  },
+  {
+   "name": "Curtin",
+   "state": "WA",
+   "win": {
+    "member:chaney": 0.8068,
+    "lp": 0.1932,
+    "on": 0.0001
+   },
+   "finalPairs": {
+    "lp|member:chaney": 0.9992,
+    "member:chaney|on": 0.0005,
+    "lp|on": 0.0003,
+    "alp|lp": 0.0001,
+    "alp|member:chaney": 0.0001
+   }
+  },
+  {
+   "name": "Durack",
+   "state": "WA",
+   "win": {
+    "lp": 0.9194,
+    "alp": 0.0786,
+    "on": 0.0021
+   },
+   "finalPairs": {
+    "lp|on": 0.8758,
+    "alp|on": 0.0786,
+    "alp|lp": 0.0457
+   }
+  },
+  {
+   "name": "Forrest",
+   "state": "WA",
+   "win": {
+    "alp": 0.4623,
+    "lp": 0.2945,
+    "oth": 0.2433
+   },
+   "finalPairs": {
+    "alp|on": 0.4623,
+    "on|oth": 0.2289,
+    "lp|on": 0.1405,
+    "alp|lp": 0.1195,
+    "lp|oth": 0.0405,
+    "alp|oth": 0.0085
+   }
+  },
+  {
+   "name": "Fremantle",
+   "state": "WA",
+   "win": {
+    "oth": 0.9284,
+    "alp": 0.0712,
+    "on": 0.0004
+   },
+   "finalPairs": {
+    "alp|oth": 0.9498,
+    "alp|on": 0.049,
+    "on|oth": 0.0011,
+    "alp|lp": 0.0001
+   }
+  },
+  {
+   "name": "Hasluck",
+   "state": "WA",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|on": 0.9849,
+    "alp|grn": 0.0087,
+    "alp|lp": 0.0065
+   }
+  },
+  {
+   "name": "Moore",
+   "state": "WA",
+   "win": {
+    "lp": 0.7355,
+    "alp": 0.2646
+   },
+   "finalPairs": {
+    "alp|lp": 0.9329,
+    "alp|on": 0.0668,
+    "alp|grn": 0.0003,
+    "alp|oth": 0.0001
+   }
+  },
+  {
+   "name": "O'Connor",
+   "state": "WA",
+   "win": {
+    "lp": 0.8897,
+    "on": 0.0572,
+    "alp": 0.0531
+   },
+   "finalPairs": {
+    "lp|on": 0.9426,
+    "alp|on": 0.0532,
+    "alp|lp": 0.0042,
+    "grn|lp": 0.0001
+   }
+  },
+  {
+   "name": "Pearce",
+   "state": "WA",
+   "win": {
+    "alp": 0.9627,
+    "lp": 0.0373
+   },
+   "finalPairs": {
+    "alp|on": 0.9303,
+    "alp|lp": 0.0683,
+    "alp|grn": 0.0014,
+    "lp|on": 0.0001
+   }
+  },
+  {
+   "name": "Perth",
+   "state": "WA",
+   "win": {
+    "alp": 0.9895,
+    "grn": 0.0071,
+    "lp": 0.0034
+   },
+   "finalPairs": {
+    "alp|grn": 0.7832,
+    "alp|on": 0.1564,
+    "alp|lp": 0.0572,
+    "grn|lp": 0.0033
+   }
+  },
+  {
+   "name": "Swan",
+   "state": "WA",
+   "win": {
+    "alp": 0.9993,
+    "lp": 0.0008
+   },
+   "finalPairs": {
+    "alp|grn": 0.3969,
+    "alp|on": 0.3368,
+    "alp|lp": 0.2662,
+    "grn|lp": 0.0002
+   }
+  },
+  {
+   "name": "Tangney",
+   "state": "WA",
+   "win": {
+    "alp": 0.8628,
+    "lp": 0.1372
+   },
+   "finalPairs": {
+    "alp|lp": 0.9248,
+    "alp|on": 0.0649,
+    "alp|grn": 0.0103
+   }
+  },
+  {
+   "name": "Bass",
+   "state": "TAS",
+   "win": {
+    "alp": 0.9099,
+    "lp": 0.0901
+   },
+   "finalPairs": {
+    "alp|lp": 0.5082,
+    "alp|on": 0.4864,
+    "alp|grn": 0.0054,
+    "grn|lp": 0.0001,
+    "lp|on": 0.0001
+   }
+  },
+  {
+   "name": "Braddon",
+   "state": "TAS",
+   "win": {
+    "alp": 0.9938,
+    "lp": 0.0063
+   },
+   "finalPairs": {
+    "alp|on": 0.9334,
+    "alp|lp": 0.065,
+    "lp|on": 0.0017
+   }
+  },
+  {
+   "name": "Clark",
+   "state": "TAS",
+   "win": {
+    "member:wilkie": 0.9936,
+    "on": 0.0061,
+    "grn": 0.0004
+   },
+   "finalPairs": {
+    "alp|member:wilkie": 0.511,
+    "member:wilkie|on": 0.2653,
+    "grn|member:wilkie": 0.1934,
+    "lp|member:wilkie": 0.03,
+    "grn|on": 0.0003
+   }
+  },
+  {
+   "name": "Franklin",
+   "state": "TAS",
+   "win": {
+    "alp": 0.9495,
+    "oth": 0.0505,
+    "on": 0.0001,
+    "lp": 0.0001
+   },
+   "finalPairs": {
+    "alp|oth": 0.9099,
+    "alp|on": 0.0721,
+    "alp|lp": 0.0178,
+    "alp|grn": 0.0002
+   }
+  },
+  {
+   "name": "Lyons",
+   "state": "TAS",
+   "win": {
+    "alp": 0.999,
+    "lp": 0.0011
+   },
+   "finalPairs": {
+    "alp|on": 0.8839,
+    "alp|lp": 0.114,
+    "alp|grn": 0.0022
+   }
+  },
+  {
+   "name": "Lingiari",
+   "state": "NT",
+   "win": {
+    "alp": 0.626,
+    "clp": 0.2362,
+    "on": 0.1378,
+    "grn": 0.0001
+   },
+   "finalPairs": {
+    "alp|on": 0.6057,
+    "alp|clp": 0.3941,
+    "alp|grn": 0.0003
+   }
+  },
+  {
+   "name": "Solomon",
+   "state": "NT",
+   "win": {
+    "clp": 0.9573,
+    "alp": 0.0319,
+    "on": 0.0092,
+    "oth": 0.0017
+   },
+   "finalPairs": {
+    "alp|clp": 0.974,
+    "alp|on": 0.0226,
+    "clp|on": 0.0018,
+    "clp|oth": 0.0013,
+    "alp|oth": 0.0003,
+    "on|oth": 0.0001
+   }
+  },
+  {
+   "name": "Bean",
+   "state": "ACT",
+   "win": {
+    "alp": 0.5774,
+    "oth": 0.4226
+   },
+   "finalPairs": {
+    "alp|oth": 0.8452,
+    "alp|lp": 0.1538,
+    "alp|grn": 0.0011
+   }
+  },
+  {
+   "name": "Canberra",
+   "state": "ACT",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|grn": 0.8937,
+    "alp|lp": 0.1063,
+    "alp|oth": 0.0001
+   }
+  },
+  {
+   "name": "Fenner",
+   "state": "ACT",
+   "win": {
+    "alp": 1
+   },
+   "finalPairs": {
+    "alp|lp": 0.7541,
+    "alp|grn": 0.2459
+   }
+  }
+ ]
+}
