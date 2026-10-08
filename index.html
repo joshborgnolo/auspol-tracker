@@ -97650,6 +97650,15 @@ function RdPrimary({
     election: true,
     ...Object.fromEntries(T.order.map((kk, i) => [kk, gElec.groups[sel.label][i]]))
   } : null : allBase;
+  const gWas = G && !base && G.monthly && G.monthly.length > 1 ? (() => {
+    const o = {
+      ym: G.monthly[0][0]
+    };
+    T.order.forEach((kk, i) => {
+      o[kk] = G.monthly[0][1 + i];
+    });
+    return o;
+  })() : null;
   const GRPV_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
   const mkParts = (V, C, W) => ["alp", "lnp", "grn", "onp", "oth"].map(id => ({
     id,
@@ -97809,6 +97818,22 @@ function RdPrimary({
     r: 4.5,
     hidden: !!hidden[p.id]
   })) : [];
+  const leads = G && base ? parts.map(p => {
+    const pLive = series(live(p.id), p.id);
+    return pLive.length && pLive[0].x > base.x ? {
+      id: "ld-" + p.id,
+      label: p.name,
+      color: p.color,
+      dash: RD_ELECTION_LEAD,
+      rdWidth: p.id === "oth" ? 2 : 2.5,
+      endCap: false,
+      opacity: hidden[p.id] ? 0 : 1,
+      points: [{
+        x: base.x,
+        y: base[p.id]
+      }, pLive[0]]
+    } : null;
+  }).filter(Boolean) : [];
   const evs = rdChartEvents(D.events, xDomain[0], xDomain[1]);
   const badges = narrow ? rdEventBadges("p1", evs, xDomain[0], xDomain[1]) : null;
   const [evtOpen, setEvtOpen] = useState(null);
@@ -97859,9 +97884,18 @@ function RdPrimary({
     className: "rd-pv-val"
   }, p.v.toFixed(1), React.createElement("span", {
     className: "rd-pv-pct"
-  }, "%")), p.was != null && React.createElement("span", {
-    className: "rd-pv-chg"
-  }, rdArrow(p.v - p.was), " ", Math.abs(p.v - p.was).toFixed(1), " since the election"));
+  }, "%")), (() => {
+    const w = p.was != null ? {
+      v: p.was,
+      since: "the election"
+    } : gWas && gWas[p.id] != null ? {
+      v: gWas[p.id],
+      since: rdMonthYear(gWas.ym)
+    } : null;
+    return w && React.createElement("span", {
+      className: "rd-pv-chg"
+    }, rdArrow(p.v - w.v), " ", Math.abs(p.v - w.v).toFixed(1), " since ", w.since);
+  })());
   const rangeLive = React.useRef(null);
   const cardEl = React.useRef(null);
   rangeLive.current = dir => {
@@ -97976,8 +98010,8 @@ function RdPrimary({
     yTicks: yTickSet,
     yTickFmt: v => v === 0 ? "" : v + "%",
     baseline: true,
-    xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null),
-    series: chartSeries,
+    xTicks: rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : allBase ? allBase.x : null),
+    series: leads.length ? chartSeries.concat(leads) : chartSeries,
     spine: series(live("alp"), "alp"),
     areas: areas,
     scatter: shownScatter,
@@ -99701,7 +99735,7 @@ const RD_DEMO_SHORT = {
   NSW: "NSW voters",
   Vic: "Victorians",
   Qld: "Queenslanders",
-  "Rest of Australia": "voters in the other states",
+  "Rest of Australia": "voters in the non-eastern-mainland states",
   "Inner metro": "inner-suburban voters",
   "Outer metro": "outer-suburban voters",
   Provincial: "provincial voters",

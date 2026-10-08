@@ -10,7 +10,12 @@
        2. the All-voters state is unchanged from the baseline
        3. selections (Men / 18–34 / 55+ / Gen Z / NSW / University / Rural /
           Rest of Australia) drive figures, bracket, head/dek/meta, y-domain,
-          election sub-lines — figures asserted against window.AUSPOL itself */
+          election sub-lines — figures asserted against window.AUSPOL itself.
+          Every selection's x axis carries the Election landmark (2026-10-08:
+          was "May 2025" for groups with no own election row); a cut group
+          whose poll lines open after the election joins its ring marks with
+          the 0.5 4 dotted lead-in; a group with no election base delta-rows
+          from its first polled month ("since July 2025") */
 import { createServer } from "node:http";
 import { readFile, writeFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -72,8 +77,10 @@ const collect = (VW, VH, selValue) => (async () => {
     const dek = sec.querySelector(".rd-dek");
     const yTicks = [...sec.querySelectorAll(".rd-pv-chart .axis-label.y, .rd-pv-chart .axis.y text, .rd-pv-chart .axis-label")]
       .map((n) => n.textContent.trim()).filter((t) => /%$/.test(t));
+    const xTexts = [...sec.querySelectorAll(".rd-pv-chart svg text")].map((n) => n.textContent.trim()).filter((t) => !/%$/.test(t));
+    const dashes = [...sec.querySelectorAll(".rd-pv-chart svg [stroke-dasharray]")].map((n) => n.getAttribute("stroke-dasharray"));
     return {
-      hed: txt(".rd-hed"), dek: txt(".rd-dek"), meta: txt(".rd-meta"),
+      hed: txt(".rd-hed"), dek: txt(".rd-dek"), meta: txt(".rd-meta"), xTexts, dashes,
       stats,
       bracket: bracket ? bracket.textContent.trim() + " |span " + bracket.style.gridColumn : null,
       groupBox: groupBox ? (groupBox.querySelector(".rd-pv-grouph") || {}).textContent : null,
@@ -124,7 +131,10 @@ const expectedFor = (groupLabel) => (async () => {
       let g = null; outer: for (const t of T.tabs) for (const s of t.sets) { const f = s.groups.find((x) => x.label === label); if (f) { g = f; break outer; } }
       if (g) {
         const parts = mk(g.v, g.ci);
-        res.group = { parts, k: levelK(parts), houses: g.houses, window: T.window };
+        const elec = !!((D.demoStateElection && D.demoStateElection.groups && D.demoStateElection.groups[label]) ||
+          (D.demoLocElection && D.demoLocElection.groups && D.demoLocElection.groups[label]));
+        res.group = { parts, k: levelK(parts), houses: g.houses, window: T.window,
+          elec, monthly0: g.monthly && g.monthly.length > 1 ? g.monthly[0][0] : null };
       }
     }
     return res;
@@ -170,6 +180,7 @@ for (const [W, H] of [[1280, 900], [768, 1024], [390, 844]]) {
     ok("bottom-aligned with the dek's last line (±3px)", g.selRect && g.dek && Math.abs(g.selRect.bottom - g.dek.bottom) <= 3,
       g.selRect && g.dek ? `sel bottom ${g.selRect.bottom} vs dek bottom ${g.dek.bottom}` : "missing");
     ok("same row as the dek (tops overlap)", g.selRect && g.dek && g.selRect.y < g.dek.bottom && g.selRect.bottom > g.dek.y);
+    ok("x axis carries the Election landmark", s.xTexts && s.xTexts.some((t) => t === "Election"), JSON.stringify((s.xTexts || []).slice(0, 8)));
   } else {
     ok("stacked under the dek", g.selRect && g.dek && g.selRect.y >= g.dek.bottom - 1,
       g.selRect && g.dek ? `sel top ${g.selRect.y} vs dek bottom ${g.dek.bottom}` : "missing");
@@ -198,9 +209,10 @@ if (!baseline) {
 }
 
 console.log("== selections ==");
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const SHORT = {
   Men: "men", "18–34": "18–34s", "55+": "over-55s", "Gen Z": "Gen Z", University: "university graduates",
-  NSW: "NSW voters", Rural: "rural voters", "Rest of Australia": "voters in the other states",
+  NSW: "NSW voters", Rural: "rural voters", "Rest of Australia": "voters in the non-eastern-mainland states",
 };
 for (const [label, ev] of [["Men", { level: true, chg: false }], ["18–34", {}], ["55+", { lead: "One Nation" }], ["Gen Z", {}],
                            ["NSW", { chg: true }], ["University", {}], ["Rural", { tallTicks: true, chg: true }], ["Rest of Australia", { chg: true }]]) {
@@ -228,6 +240,16 @@ for (const [label, ev] of [["Men", { level: true, chg: false }], ["18–34", {}]
     const gotChg = s.stats.some((x) => x.chg && /since the election/.test(x.chg));
     ok(`election sub-lines ${wantChg ? "present" : "absent"}`, gotChg === wantChg,
       JSON.stringify(s.stats.map((x) => x.chg && x.chg.split(" ").slice(-3).join(" "))));
+    ok("x axis carries the Election landmark", s.xTexts && s.xTexts.some((t) => t === "Election"),
+      JSON.stringify((s.xTexts || []).slice(0, 8)));
+    if (g.elec && g.monthly0 && g.monthly0 > "2025-05") {
+      ok("dotted ring-to-line lead-in present", s.dashes && s.dashes.some((d) => d === "0.5 4"), JSON.stringify(s.dashes));
+    }
+    if (!g.elec && g.monthly0) {
+      const want = "since " + MONTH_NAMES[+g.monthly0.slice(5, 7) - 1] + " " + g.monthly0.slice(0, 4);
+      ok(`deltas from first polled month (${want})`, s.stats.some((x) => x.chg && x.chg.includes(want)),
+        JSON.stringify(s.stats.map((x) => x.chg)) + " — want a line containing “" + want + "”");
+    }
     if (ev.lead) ok(`head says lead for ${ev.lead}`, s.hed && s.hed.includes(ev.lead + " leads"), s.hed);
     if (ev.level) ok("head says level", s.hed && /are level/.test(s.hed), s.hed);
     if (ev.tallTicks) ok("y axis stretches past 40 for this group", s.yTicks.some((t) => t === "50%"), JSON.stringify(s.yTicks));

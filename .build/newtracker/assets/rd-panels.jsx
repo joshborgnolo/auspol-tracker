@@ -81,15 +81,22 @@ function RdPrimary({ rangeId, setRangeId }) {
   const lastM = D.aggPrimary[D.aggPrimary.length - 1];
   const allBase = D.aggPrimary.find((d) => d.election) || null;
   /* a group's election base exists only where the count itself was cut -
-     the AEC's state and division-class sums. The ring, the "since the
-     election" sub-lines and the dek's faller clause drop for every other
-     group, rather than reaching for a figure that was never counted. */
+     the AEC's state and division-class sums. The ring and the dek's faller
+     clause drop for every other group, rather than reaching for a figure
+     that was never counted; the stat rows' "since" instead casts back from
+     the first month the group's monthly line runs, naming that month */
   const gElec = G
     ? [D.demoStateElection, D.demoLocElection].find((E) => E && E.groups && E.groups[sel.label])
     : null;
   const base = G
     ? (gElec ? { x: gElec.x, election: true, ...Object.fromEntries(T.order.map((kk, i) => [kk, gElec.groups[sel.label][i]])) } : null)
     : allBase;
+  /* the baseline named above: the group line's first monthly row, keyed by
+     party as the election rows are - a party unpolled that month keeps no
+     change row, as it had no election row before */
+  const gWas = G && !base && G.monthly && G.monthly.length > 1
+    ? (() => { const o = { ym: G.monthly[0][0] }; T.order.forEach((kk, i) => { o[kk] = G.monthly[0][1 + i]; }); return o; })()
+    : null;
   /* a poll row's grp.v slots are gen-data's alp/lnp/grn/onp/oth order, NOT
      §7g's DEMO_KEYS (alp/lnp/onp/grn/oth): map by key, never by a shared
      index across the two */
@@ -231,6 +238,19 @@ function RdPrimary({ rangeId, setRangeId }) {
     }), [T, G, xDomain[0], xDomain[1]]);
   const shownScatter = React.useMemo(() => scatter.map((d) => (hidden[d.party] ? { ...d, op: 0 } : d)), [scatter, hidden]);
   const marks = base ? parts.map((p) => ({ x: base.x, y: base[p.id], color: p.color, r: 4.5, hidden: !!hidden[p.id] })) : [];
+  /* a group's lines open at the first month the houses polled the cut,
+     sometimes nearly a year after the election, and the months between
+     were never polled - so each ring joins its line with the who-votes
+     panels' dotted lead-in, sharing the line's label and both endpoints */
+  const leads = G && base
+    ? parts.map((p) => {
+        const pLive = series(live(p.id), p.id);
+        return pLive.length && pLive[0].x > base.x
+          ? { id: "ld-" + p.id, label: p.name, color: p.color, dash: RD_ELECTION_LEAD, rdWidth: p.id === "oth" ? 2 : 2.5,
+              endCap: false, opacity: hidden[p.id] ? 0 : 1, points: [{ x: base.x, y: base[p.id] }, pLive[0]] }
+          : null;
+      }).filter(Boolean)
+    : [];
   /* the numbered events: the same set the 2PP hero marks, over this chart's
      window */
   const evs = rdChartEvents(D.events, xDomain[0], xDomain[1]);
@@ -276,9 +296,12 @@ function RdPrimary({ rangeId, setRangeId }) {
         {p.id === "oth" && !narrow ? <><span className="rd-pv-long">{p.name}</span><span className="rd-pv-short">Others</span></> : p.name}
       </span>
       <span className="rd-pv-val">{p.v.toFixed(1)}<span className="rd-pv-pct">%</span></span>
-      {p.was != null && (
-        <span className="rd-pv-chg">{rdArrow(p.v - p.was)} {Math.abs(p.v - p.was).toFixed(1)} since the election</span>
-      )}
+      {(() => {
+        const w = p.was != null ? { v: p.was, since: "the election" } : (gWas && gWas[p.id] != null ? { v: gWas[p.id], since: rdMonthYear(gWas.ym) } : null);
+        return w && (
+          <span className="rd-pv-chg">{rdArrow(p.v - w.v)} {Math.abs(p.v - w.v).toFixed(1)} since {w.since}</span>
+        );
+      })()}
     </button>
   );
 
@@ -387,8 +410,12 @@ function RdPrimary({ rangeId, setRangeId }) {
           padPx={narrow ? { l: 34, r: 6, t: 34, b: 28 } : { l: 40, r: 16, t: 44, b: 30 }}
           xDomain={xDomain} yDomain={[0, yTop]} yTicks={yTickSet}
           yTickFmt={(v) => (v === 0 ? "" : v + "%")} baseline
-          xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)}
-          series={chartSeries} spine={series(live("alp"), "alp")} areas={areas}
+          /* the axis landmark is the election itself even where a group's
+             count was never cut (no ring, no sub-lines there): the window
+             opens on election night, so without it the first tick reads
+             "May 2025" against the all-voters chart's "Election" */
+          xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : allBase ? allBase.x : null)}
+          series={leads.length ? chartSeries.concat(leads) : chartSeries} spine={series(live("alp"), "alp")} areas={areas}
           scatter={shownScatter} pollFacet="primary" marks={marks} ringAtX={base ? base.x : null}
           events={badges ? badges.events : evs}
           evt={evtOpen} onEvt={setEvtOpen}
@@ -1512,7 +1539,7 @@ const RD_DEMO_SHORT = {
   "18–34": "18–34s", "35–54": "35–54s", "55+": "over-55s", "Gen Z": "Gen Z", Millennials: "Millennials",
   "Gen X": "Gen X", Boomers: "Boomers", Men: "men", Women: "women",
   "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "TAFE- or trade-qualified voters", University: "university graduates",
-  NSW: "NSW voters", Vic: "Victorians", Qld: "Queenslanders", "Rest of Australia": "voters in the other states",
+  NSW: "NSW voters", Vic: "Victorians", Qld: "Queenslanders", "Rest of Australia": "voters in the non-eastern-mainland states",
   "Inner metro": "inner-suburban voters", "Outer metro": "outer-suburban voters", Provincial: "provincial voters", Rural: "rural voters",
   "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
   "English only": "English-only speakers", "Other language": "voters who speak another language at home",
