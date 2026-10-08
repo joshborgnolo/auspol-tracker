@@ -4797,6 +4797,23 @@
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_e09c2025b9df424e98b0f2737e7ae4ca.pdf"
     },
     {
+      "date": "2026-07-31",
+      "published": "2026-09-15T16:39",
+      "dateStart": "2026-01-01",
+      "pollster": "Roy Morgan (pooled)",
+      "client": "—",
+      "sample": 26418,
+      "alp": 34,
+      "lnp": 22,
+      "grn": 13,
+      "onp": 24,
+      "ind": 7,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.roymorgan.com/findings/10341-voting-intentions-by-country-of-birth-september-2026"
+    },
+    {
       "date": "2026-08-02",
       "published": "2026-08-03T16:25",
       "dateStart": "2026-07-27",

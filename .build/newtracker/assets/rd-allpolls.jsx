@@ -1700,7 +1700,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
           {!isDir && !isIss && !isLd && !isDem && !isConf && <>
           {p.noAgg && <>
             <span className="rd-apd-k">In the aggregates</span>
-            <span>Because SMS polls have a strong selection bias, they do not count towards any aggregates.</span>
+            <span>{p.noAggWhy || "Because SMS polls have a strong selection bias, they do not count towards any aggregates."}</span>
           </>}
           {fig.a != null && <>
             <span className="rd-apd-k">{RD_AP_KAL ? "Against the trend" : "Against the polls around it"}</span>

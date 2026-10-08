@@ -45,6 +45,7 @@ export function validate(D) {
     "Wolf & Smith",      // boutique house (AFR-commissioned, ad hoc)
     "Redbridge",         // pre-"RedBridge/Accent" Australia Institute waves
     "Roy Morgan (SMS)",  // single SMS-mode Morgan release, mode tag not a house
+    "Roy Morgan (pooled)", // finding 10341's 7-month Single Source cross-section
     "Agenda C Synesis",  // one-off news.com.au poll
   ]);
 

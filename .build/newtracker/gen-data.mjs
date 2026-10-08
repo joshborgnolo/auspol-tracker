@@ -118,12 +118,25 @@ const POLLS = mergedPolls.filter((p) => !p.isElection);
    Roy Morgan's SMS wave was an opt-in SMS blast to a non-probability sample -
    a selection-biased mode a house-effect cannot repair, so the wave never
    enters tppRows, the implied series, the primary series, the alt matchup
-   aggregates or the leadership monthly lines. It still renders as an archive
-   row (individualPolls stays unfiltered), flagged noAgg so the detail view can
-   say why its figures sit outside the aggregates. Checks here key the full
-   suffix string; the houses inventory (:3322) already folds "(SMS)" back into
-   "Roy Morgan" for counting. */
-const NO_AGG_HOUSES = new Set(["Roy Morgan (SMS)"]);
+   aggregates or the leadership monthly lines. The same goes for a wave whose
+   published cross-section is built for a one-off display rather than a
+   comparable point in the house's weekly cadence: finding 10341 (published
+   2026-09-15) pools seven months of Single Source interviewing (Jan-Jul 2026,
+   n=26,418) into a single all-electors reading - a timespan average, not a
+   fieldwork wave - so it stays out of the aggregates too. Both still render
+   as archive rows (individualPolls stays unfiltered), flagged noAgg so the
+   detail view can say why its figures sit outside the aggregates; the shown
+   reason rides the row via NO_AGG_NOTE. Checks here key the full suffix
+   string; the houses inventory (:3322) already folds "(SMS)" back into
+   "Roy Morgan" for counting, as does "(pooled)". */
+const NO_AGG_HOUSES = new Set(["Roy Morgan (SMS)", "Roy Morgan (pooled)"]);
+/* why each no-aggregate house's figures sit outside the aggregates - the
+   archive detail rail's note line (the SMS label keeps its established
+   selection-bias wording; the pooled label reads as the timespan average) */
+const NO_AGG_NOTE = {
+  "Roy Morgan (SMS)": "Because SMS polls have a strong selection bias, they do not count towards any aggregates.",
+  "Roy Morgan (pooled)": "Because this release averages seven months of interviewing (January\u2013July 2026) into a single reading, it does not count towards any aggregates.",
+};
 const ppm = D.ppm;
 /* Leader satisfaction the fallback filed (D.fallbackApproval) joins the
    approval rows on the same terms as fallbackPolls above, but on its own:
@@ -2855,7 +2868,7 @@ const individualPolls = POLLS.map((p) => {
     // a no-aggregate wave: the row renders with its figures whole, but every
     // series, monthly point and house effect above was built WITHOUT it -
     // the detail view's "How it counts" rail says why (see NO_AGG_HOUSES)
-    ...(NO_AGG_HOUSES.has(p.pollster) ? { noAgg: true } : {}),
+    ...(NO_AGG_HOUSES.has(p.pollster) ? { noAgg: true, noAggWhy: NO_AGG_NOTE[p.pollster] } : {}),
     /* When the wave was PUBLISHED, where the cited release says so. The
        archive's row detail has always had a line labelled "Published" and has
        always filled it with `released`, which is the last day of FIELDWORK -
@@ -3113,7 +3126,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),
     // same no-aggregate flag as the archive emitter (see NO_AGG_HOUSES), so a
     // no-agg wave that ever lands in the Latest window carries the note too
-    ...(NO_AGG_HOUSES.has(p.pollster) ? { noAgg: true } : {}),
+    ...(NO_AGG_HOUSES.has(p.pollster) ? { noAgg: true, noAggWhy: NO_AGG_NOTE[p.pollster] } : {}),
     alp2pp: p.tpp_alp ?? null, lnp2pp: p.tpp_lnp ?? null,
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
@@ -4124,7 +4137,7 @@ const onImp = primaryNow && (() => {
 /* The reader-facing count. Products stay distinct series everywhere above –
    an (MRP) release is its own schedule, its own house effect – but this
    number says POLLSTERS, and "YouGov (MRP)" is YouGov. */
-const houses = new Set(POLLS.map((p) => p.pollster.replace(/ \((MRP|SMS)\)$/, "")));
+const houses = new Set(POLLS.map((p) => p.pollster.replace(/ \((MRP|SMS|pooled)\)$/, "")));
 const fmtDate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return `${d} ${MNF[m - 1]} ${y}`; };
 /* Which rival leads the board: the contest Labor is doing WORST in goes
    first, in the hero and in every legend that lists the two.

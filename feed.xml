@@ -211,6 +211,13 @@
       <description>Primary vote: ALP 27.5, L/NP 23.5, GRN 15, ON 24, Ind/Oth 10. Two-party preferred: ALP 52 – L/NP 48. Undecided 8.5%. Other two-party contests: ALP 54 – ON 46. National direction: right direction 27% · wrong track 59.5% · unsure 13.5%. Sample 1,531. Fieldwork 27 Jul – 2 Aug 2026.</description>
     </item>
     <item>
+      <title>Roy Morgan (pooled), 1 Jan – 31 Jul 2026 – ALP 34, L/NP 22, GRN 13, ON 24, Ind/Oth 7</title>
+      <link>https://www.roymorgan.com/findings/10341-voting-intentions-by-country-of-birth-september-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-31|Roy Morgan (pooled)</guid>
+      <pubDate>Fri, 31 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 34, L/NP 22, GRN 13, ON 24, Ind/Oth 7. No two-party figure published. Sample 26,418. Fieldwork 1 Jan – 31 Jul 2026.</description>
+    </item>
+    <item>
       <title>RedBridge/Accent, 27–30 Jul 2026 – 2PP ALP 48 – L/NP 52</title>
       <link>https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6</link>
       <guid isPermaLink="false">auspol-tracker:2026-07-30|RedBridge/Accent</guid>
@@ -279,13 +286,6 @@
       <guid isPermaLink="false">auspol-tracker:2026-07-13|SEC Newgate</guid>
       <pubDate>Mon, 13 Jul 2026 12:00:00 GMT</pubDate>
       <description>National direction: right direction 32% · wrong track 68% · unsure 0%. And the party voters see as best on each: Cost of living: ALP 24% · L/NP 14% · ON 23% · GRN 10% · other 29%. Sample 1,975. Fieldwork 2–13 Jul 2026.</description>
-    </item>
-    <item>
-      <title>Resolve, 12 Jul 2026 – the vote by group</title>
-      <link>https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html</link>
-      <guid isPermaLink="false">auspol-tracker:2026-07-12|Resolve</guid>
-      <pubDate>Sun, 12 Jul 2026 12:00:00 GMT</pubDate>
-      <description>The vote by group (age, gender, state): age – 18–34: L/NP 22.9 · ALP 29.4 · GRN 21.2 · ON 18.1 · OTH 8.5; 35–54: L/NP 19.3 · ALP 32.1 · GRN 10.8 · ON 27 · OTH 10.8; 55+: L/NP 26.7 · ALP 24.5 · GRN 4.9 · ON 31.6 · OTH 12.4. gender – Men: L/NP 24 · ALP 29.9 · GRN 8.4 · ON 27 · OTH 10.6; Women: L/NP 22.3 · ALP 26.9 · GRN 14.5 · ON 25.5 · OTH 10.9. state – NSW: L/NP 23.1 · ALP 26.9 · GRN 10 · ON 30.9 · OTH 9.1; Vic: L/NP 24.9 · ALP 26.6 · GRN 13.4 · ON 24.4 · OTH 10.8; Qld: L/NP 23.8 · ALP 25.6 · GRN 10.9 · ON 25.6 · OTH 14.1; Rest of Australia: L/NP 20.5 · ALP 35.2 · GRN 12.1 · ON 22 · OTH 10.2. Fieldwork 12 Jul 2026.</description>
     </item>
   </channel>
 </rss>
