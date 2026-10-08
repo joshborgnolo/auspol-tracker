@@ -119,19 +119,25 @@ async function get(url) {
   throw new Error(`${url}: ${last.message}`);
 }
 
-/* A JSON endpoint over get(): the host briefly answered the API 200 with
-   an HTML interstitial (maintenance/WAF page, 2026-10-06) — neither the
+/* A JSON endpoint over get(): the host sometimes answers the API 200 with
+   an HTML interstitial (maintenance/WAF page — 2026-10-06 a blip of a
+   minute or two; 2026-10-08 a window of ≥4½ minutes that outlasted six
+   tries twenty seconds apart in the probe AND the full run). Neither the
    fetch layer nor a status check can see a healthy-looking 200 with the
-   wrong body, so the parse itself is what a retry waits for. Six tries
-   twenty seconds apart ride out a blip of a minute or two. */
+   wrong body, so the parse itself is what a retry waits for: three quick
+   tries for the blip class, then a widening ramp that keeps the ladder
+   standing ~12 minutes. An HTML body is named the interstitial it is, so
+   the run's FAIL line says what happened, not "Unexpected token '<'". */
+const JSON_WAITS = [20, 20, 20, 60, 120, 180, 300];   // seven retries ≈ 12 min
 async function getJson(url) {
   let last;
-  for (let i = 1; i <= 6; i++) {
-    try { return JSON.parse((await get(url)).toString("utf8")); }
-    catch (e) {
-      last = e;
-      if (i < 6) await new Promise((r) => setTimeout(r, 20_000));
-    }
+  for (let i = 0; i <= JSON_WAITS.length; i++) {
+    if (i) await new Promise((r) => setTimeout(r, JSON_WAITS[i - 1] * 1000));
+    try {
+      const body = (await get(url)).toString("utf8");
+      if (/^\s*</.test(body)) throw new Error("the host answered an HTML page, not JSON (maintenance/WAF interstitial)");
+      return JSON.parse(body);
+    } catch (e) { last = e; }
   }
   throw new Error(`${url}: ${last.message}`);
 }
