@@ -2455,10 +2455,10 @@ function RdAllPolls(P) {
   const CF_LO = 40, CF_HI = 120;
   const cfx = (v) => ((Math.max(CF_LO, Math.min(CF_HI, v)) - CF_LO) / (CF_HI - CF_LO)) * 100;
   const confPlot = (c) => c.v + (c.vs === 0 ? 100 : 0);
-  /* the confidence panel's inks: one colour per subject, the second gauge
-     of a subject its dashed twin - the table can't dash one dot, so the
-     twin shares its subject's ink and its house is named in the row */
-  const confInk = (c) => (c.k === "consumer" || c.k === "westpacConsumer" ? "var(--confidence-consumer)" : "var(--confidence-business)");
+  /* the confidence panel's inks, per house as the panel splits them: the
+     Roy Morgan gauges plum, the other house's gold - the table can't dash
+     one dot, so the twin's house is named in the row */
+  const confInk = (c) => (c.k === "consumer" || c.k === "business" ? "var(--confidence-main)" : "var(--confidence-alt)");
   /* each house's own print: the indices carry decimals, NAB's net balance
      whole numbers (the panel's NICE does the same) */
   const confFig = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));

@@ -91,14 +91,15 @@
      and quieter now, twice the distance, still 4.5:1 as text. */
   --mood-neg: oklch(0.44 0.045 50);
 
-  /* The economic-confidence PANEL's lane hues (rd-confidence) - one hue per SUBJECT, the
-     house's secondary gauge dashed in the same hue. A deep gold / plum pair
-     chosen off the yellow-blue axis so the subjects split under every
+  /* The economic-confidence PANEL's lane hues (rd-confidence) - one hue per HOUSE
+     within a view: the Roy Morgan gauges plum, the other house's gauge deep
+     gold, the second gauge's dash kept ON TOP of the colour split. The pair
+     was chosen off the yellow-blue axis so the two houses split under every
      dichromacy; clear of the party palette (golden, not One Nation orange;
      violet, not Coalition blue) and deliberately NOT the teal/brick pair
      above - the lanes carry no good/bad valence. */
-  --confidence-consumer: oklch(0.60 0.115 83);
-  --confidence-business: oklch(0.50 0.105 305);
+  --confidence-main: oklch(0.50 0.105 305);
+  --confidence-alt: oklch(0.60 0.115 83);
 
   /* The change indicator's direction colours. The standing rule elsewhere is
      that "up" is not inherently good – which is why the NET and the mood axis
@@ -194,9 +195,9 @@ body.dark {
   /* national-mood colours – lifted for dark (brick stays browner/duller than ON) */
   --mood-pos: oklch(0.70 0.105 200);
   --mood-neg: oklch(0.68 0.05 45);
-  /* economic-confidence panel lane hues, lifted the same way */
-  --confidence-consumer: oklch(0.72 0.115 83);
-  --confidence-business: oklch(0.70 0.105 305);
+  /* economic-confidence panel lane hues (the house split), lifted the same way */
+  --confidence-main: oklch(0.70 0.105 305);
+  --confidence-alt: oklch(0.72 0.115 83);
   /* the change indicator, lifted the same way */
   --chg-up:   oklch(0.735 0.135 152);
   --chg-down: oklch(0.700 0.145 25);

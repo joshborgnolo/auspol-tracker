@@ -3869,16 +3869,16 @@ function RdConfidence({ rangeId }) {
   const NICE = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const lanes = [
     { k: "consumer", view: "consumer", s: M.consumer, name: "Consumers", dekName: "Consumers", by: "ANZ–Roy Morgan", hl: 14,
-      period: "week", color: "var(--confidence-consumer)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
+      period: "week", color: "var(--confidence-main)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly." },
     { k: "westpacConsumer", view: "consumer", s: M.westpacConsumer, name: "Consumers", dekName: "Consumers on Westpac–MI’s read", by: "Westpac–MI", hl: 60,
-      period: "month", color: "var(--confidence-consumer)", dash: "4 3", shift: 0, vfmt: (v) => v.toFixed(1),
+      period: "month", color: "var(--confidence-alt)", dash: "4 3", shift: 0, vfmt: (v) => v.toFixed(1),
       short: "The Westpac–Melbourne Institute’s monthly gauge of the same household mood; 100 is neutral on this scale too." },
     { k: "business", view: "business", s: M.business, name: "Businesses", dekName: "Businesses", by: "Roy Morgan", hl: 60,
-      period: "month", color: "var(--confidence-business)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
+      period: "month", color: "var(--confidence-main)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly." },
     { k: "nabBusiness", view: "business", s: M.nabBusiness, name: "Businesses", dekName: "Businesses on NAB’s survey", by: "NAB", hl: 60,
-      period: "month", color: "var(--confidence-business)", dash: "4 3", shift: 100, vfmt: NICE,
+      period: "month", color: "var(--confidence-alt)", dash: "4 3", shift: 100, vfmt: NICE,
       short: "x" },
   ].filter((l) => l.s && l.s.polls.length);
   if (!lanes.length) return null;
@@ -4129,7 +4129,7 @@ function RdConfidence({ rangeId }) {
   const chartSeries = histOn ? deepSeries.concat(liveSeries(wideSe))
                              : liveSeries(sePoints).concat(meanSeries ? [meanSeries] : [], drawnSeries);
   const chartRaw = histOn ? wideRaw : rawPoints;
-  const copyLegend = viewLanes.map((l) => ({ label: l.lab + " (latest " + l.vfmt(l.lat.v) + ")", color: l.color, kind: l.dash ? "dashed" : "line" }));
+  const copyLegend = viewLanes.map((l) => ({ label: l.by + " (latest " + l.vfmt(l.lat.v) + ")", color: l.color, kind: l.dash ? "dashed" : "line" }));
   const fmt = (v, p) => (p && p.raw != null ? NICE(p.raw) : v.toFixed(1));
   /* the per-view copy: ptitles, the key's dash note and the copy card all
      speak only for the view's own pair */

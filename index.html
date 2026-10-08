@@ -129,8 +129,8 @@
   --chart-bg: var(--surface);
   --mood-pos: oklch(0.52 0.085 200);
   --mood-neg: oklch(0.44 0.045 50);
-  --confidence-consumer: oklch(0.60 0.115 83);
-  --confidence-business: oklch(0.50 0.105 305);
+  --confidence-main: oklch(0.50 0.105 305);
+  --confidence-alt: oklch(0.60 0.115 83);
   --chg-up:   oklch(0.505 0.110 152);
   --chg-down: oklch(0.510 0.140 25);
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
@@ -181,8 +181,8 @@ body.dark {
   --accent: oklch(0.70 0.080 205);
   --mood-pos: oklch(0.70 0.105 200);
   --mood-neg: oklch(0.68 0.05 45);
-  --confidence-consumer: oklch(0.72 0.115 83);
-  --confidence-business: oklch(0.70 0.105 305);
+  --confidence-main: oklch(0.70 0.105 305);
+  --confidence-alt: oklch(0.72 0.115 83);
   --chg-up:   oklch(0.735 0.135 152);
   --chg-down: oklch(0.700 0.145 25);
   --shadow: 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 28px oklch(0 0 0 / 0.40);
@@ -100370,7 +100370,7 @@ function RdConfidence({
     by: "ANZ–Roy Morgan",
     hl: 14,
     period: "week",
-    color: "var(--confidence-consumer)",
+    color: "var(--confidence-main)",
     dash: null,
     shift: 0,
     vfmt: v => v.toFixed(1),
@@ -100384,7 +100384,7 @@ function RdConfidence({
     by: "Westpac–MI",
     hl: 60,
     period: "month",
-    color: "var(--confidence-consumer)",
+    color: "var(--confidence-alt)",
     dash: "4 3",
     shift: 0,
     vfmt: v => v.toFixed(1),
@@ -100398,7 +100398,7 @@ function RdConfidence({
     by: "Roy Morgan",
     hl: 60,
     period: "month",
-    color: "var(--confidence-business)",
+    color: "var(--confidence-main)",
     dash: null,
     shift: 0,
     vfmt: v => v.toFixed(1),
@@ -100412,7 +100412,7 @@ function RdConfidence({
     by: "NAB",
     hl: 60,
     period: "month",
-    color: "var(--confidence-business)",
+    color: "var(--confidence-alt)",
     dash: "4 3",
     shift: 100,
     vfmt: NICE,
@@ -100715,7 +100715,7 @@ function RdConfidence({
   const chartSeries = histOn ? deepSeries.concat(liveSeries(wideSe)) : liveSeries(sePoints).concat(meanSeries ? [meanSeries] : [], drawnSeries);
   const chartRaw = histOn ? wideRaw : rawPoints;
   const copyLegend = viewLanes.map(l => ({
-    label: l.lab + " (latest " + l.vfmt(l.lat.v) + ")",
+    label: l.by + " (latest " + l.vfmt(l.lat.v) + ")",
     color: l.color,
     kind: l.dash ? "dashed" : "line"
   }));
@@ -107166,7 +107166,7 @@ function RdAllPolls(P) {
     CF_HI = 120;
   const cfx = v => (Math.max(CF_LO, Math.min(CF_HI, v)) - CF_LO) / (CF_HI - CF_LO) * 100;
   const confPlot = c => c.v + (c.vs === 0 ? 100 : 0);
-  const confInk = c => c.k === "consumer" || c.k === "westpacConsumer" ? "var(--confidence-consumer)" : "var(--confidence-business)";
+  const confInk = c => c.k === "consumer" || c.k === "business" ? "var(--confidence-main)" : "var(--confidence-alt)";
   const confFig = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const confChg = v => (v < 0 ? "−" : v > 0 ? "+" : "") + confFig(Math.abs(v));
   const CONF_TKS = [40, 60, 80, 100, 120];
