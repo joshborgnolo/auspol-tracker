@@ -116,15 +116,17 @@ await new Promise((r) => setTimeout(r, 800));
 const s2 = await readState();
 check("back to term", s2, { found: true, boundary: false, histLabel: true, backLabel: false, tick1990: false, drawTerm: true });
 
-/* ---- draw a past term: a lifted term charts its house's line in the
-   house's own colour, and on the consumer view the other house's take on
-   the same year follows as a gold DOTTED twin. The business view stays
+/* ---- draw a past term: EVERY lifted term line renders smoothed (the
+   same kernel the monthly gauges get — a curve path, not straight
+   segments) and DOTTED in its house's colour; the consumer twin is the
+   gold Westpac–MI read of the same year. The business view stays
    single — NAB's long series is a different measure and never joins. */
 const seriesInfo = (id) => page.evaluate((sid) => {
   const sec = document.getElementById("confidence");
   const p = [...sec.querySelectorAll("svg path")].find((el) =>
     el.getAttribute("data-series") === sid && !el.closest(".rd-crossfade-out"));
-  return p ? { stroke: p.getAttribute("stroke"), dash: p.getAttribute("stroke-dasharray") } : null;
+  return p ? { stroke: p.getAttribute("stroke"), dash: p.getAttribute("stroke-dasharray"),
+               curve: /c/i.test(p.getAttribute("d") || "") } : null;
 }, id);
 const clearGhost = async () => {
   for (let i = 0; i < 20; i++) {
@@ -140,12 +142,19 @@ if (s2.found && s2.drawTerm) {
     await new Promise((r) => setTimeout(r, 500));
     const cm = await seriesInfo("conf-term-2019"), ct = await seriesInfo("conf-term-2019-alt");
     if (!cm) fails.push("consumer 2019: main term line missing");
-    else if (cm.stroke !== "var(--confidence-main)") fails.push("consumer 2019: main line stroke is " + cm.stroke);
+    else {
+      if (cm.stroke !== "var(--confidence-main)") fails.push("consumer 2019: main line stroke is " + cm.stroke);
+      if (cm.dash !== "0.1 3.6") fails.push("consumer 2019: main line not dotted: dash=" + cm.dash);
+      if (!cm.curve) fails.push("consumer 2019: main line not a smoothed curve");
+    }
     if (!ct) fails.push("consumer 2019: Westpac–MI dotted twin missing");
-    else if (ct.stroke !== "var(--confidence-alt)" || ct.dash === "none")
-      fails.push("consumer 2019: twin is not a gold dotted line: " + JSON.stringify(ct));
-    if (cm && ct && ct.stroke === "var(--confidence-alt)" && ct.dash !== "none")
-      console.log("consumer 2019: plum main + gold dotted(" + ct.dash + ") twin — ok");
+    else {
+      if (ct.stroke !== "var(--confidence-alt)" || ct.dash !== "0.1 3.6")
+        fails.push("consumer 2019: twin is not a gold dotted line: " + JSON.stringify(ct));
+      if (ct.stroke === "var(--confidence-alt)" && !ct.curve) fails.push("consumer 2019: twin not a smoothed curve");
+    }
+    if (cm && ct && cm.dash === "0.1 3.6" && ct.dash === "0.1 3.6" && cm.curve && ct.curve)
+      console.log("consumer 2019: plum + gold smoothed curves, both dotted(" + cm.dash + ") — ok");
   } else fails.push("2019 term button not found on the consumer board");
   await clickButtonMatching(/^Businesses$/);
   await clearGhost();
@@ -154,9 +163,13 @@ if (s2.found && s2.drawTerm) {
     await new Promise((r) => setTimeout(r, 500));
     const bm = await seriesInfo("conf-term-2019"), bt = await seriesInfo("conf-term-2019-alt");
     if (!bm) fails.push("business 2019: main term line missing");
-    else if (bm.stroke !== "var(--confidence-main)") fails.push("business 2019: main line stroke is " + bm.stroke);
-    if (bt) fails.push("business 2019: unexpected dotted twin (NAB has no same-basis deep series)");
-    if (bm && !bt) console.log("business 2019: single plum term line, no twin — ok");
+    else {
+      if (bm.stroke !== "var(--confidence-main)") fails.push("business 2019: main line stroke is " + bm.stroke);
+      if (bm.dash !== "0.1 3.6") fails.push("business 2019: main line not dotted: dash=" + bm.dash);
+      if (!bm.curve) fails.push("business 2019: main line not a smoothed curve");
+    }
+    if (bt) fails.push("business 2019: unexpected twin (NAB has no same-basis deep series)");
+    if (bm && !bt && bm.dash === "0.1 3.6" && bm.curve) console.log("business 2019: single dotted smoothed plum term line, no twin — ok");
   } else fails.push("2019 term button not found on the business board");
 }
 
