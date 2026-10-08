@@ -129,8 +129,8 @@
   --chart-bg: var(--surface);
   --mood-pos: oklch(0.52 0.085 200);
   --mood-neg: oklch(0.44 0.045 50);
-  --mood-consumer: oklch(0.60 0.115 83);
-  --mood-business: oklch(0.50 0.105 305);
+  --confidence-consumer: oklch(0.60 0.115 83);
+  --confidence-business: oklch(0.50 0.105 305);
   --chg-up:   oklch(0.505 0.110 152);
   --chg-down: oklch(0.510 0.140 25);
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
@@ -181,8 +181,8 @@ body.dark {
   --accent: oklch(0.70 0.080 205);
   --mood-pos: oklch(0.70 0.105 200);
   --mood-neg: oklch(0.68 0.05 45);
-  --mood-consumer: oklch(0.72 0.115 83);
-  --mood-business: oklch(0.70 0.105 305);
+  --confidence-consumer: oklch(0.72 0.115 83);
+  --confidence-business: oklch(0.70 0.105 305);
   --chg-up:   oklch(0.735 0.135 152);
   --chg-down: oklch(0.700 0.145 25);
   --shadow: 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 28px oklch(0 0 0 / 0.40);
@@ -3842,8 +3842,10 @@ body.rd .rd-dir-uns > span { position: absolute; bottom: calc(100% + 6px); left:
 body.rd .rd-dir-net { margin: 32px 0 0; font-size: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 body.rd .rd-dir-net b { font-weight: 600; color: var(--ink); }
 body.rd .rd-dir-chart { margin-top: 40px; }
-body.rd .rd-mood-tabs { margin-top: 40px; }
-body.rd .rd-mood-chart { margin-top: 28px; }
+body.rd .rd-confidence-tabs { margin-top: 40px; }
+body.rd .rd-cc.rd-confidence-cc { margin-top: 24px; }
+body.rd .rd-confidence-draw { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; }
+body.rd .rd-confidence-chart { margin-top: 28px; }
 body.rd .view-how { margin-top: 16px; }
 @media (max-width: 640px) {
   body.rd .rd-dir-uns > span { bottom: calc(100% + 14px); left: calc(50% + 6px); transform: none; }
@@ -3855,8 +3857,9 @@ body.rd .view-how { margin-top: 16px; }
   body.rd .rd-dir-bar { height: 14px; }
   body.rd .rd-dir-net { margin-top: 14px; font-size: 14px; text-align: center; }
   body.rd .rd-dir-chart { margin-top: 28px; }
-  body.rd .rd-mood-tabs { margin-top: 28px; }
-  body.rd .rd-mood-chart { margin-top: 28px; }
+  body.rd .rd-confidence-tabs { margin-top: 28px; }
+  body.rd .rd-cc.rd-confidence-cc { margin-top: 18px; }
+  body.rd .rd-confidence-chart { margin-top: 20px; }
 }
 body.rd .rd-wv-tabs { margin-top: 28px; }
 body.rd .rd-chips { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -4202,14 +4205,14 @@ body.rd .rd-un-rhouse { font-size: 12px; color: var(--ink-3); }
 body.rd .rd-un-rv { font-size: 19px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 body.rd .rd-un-rci { font-size: 12px; color: var(--ink-3); }
 body.rd .rd-un-read p { margin: 2px 0 0; font-size: 13px; color: var(--ink-3); }
-body.rd .rd-mood-chart .rd-un-read > div { flex: 1 1 auto; min-width: 0; }
-body.rd .rd-mood-chart .rd-un-rtop { display: grid; grid-template-columns: auto 110px 3em auto; gap: 0 10px; justify-content: start; }
-body.rd .rd-mood-chart .rd-un-rv { text-align: right; }
-body.rd .rd-mood-chart .rd-un-rfig { display: contents; }
+body.rd .rd-confidence-chart .rd-un-read > div { flex: 1 1 auto; min-width: 0; }
+body.rd .rd-confidence-chart .rd-un-rtop { display: grid; grid-template-columns: auto 110px 3em auto; gap: 0 10px; justify-content: start; }
+body.rd .rd-confidence-chart .rd-un-rv { text-align: right; }
+body.rd .rd-confidence-chart .rd-un-rfig { display: contents; }
 @media (max-width: 560px) {
-  body.rd .rd-mood-chart .rd-un-rtop { display: flex; flex-wrap: wrap; gap: 2px 10px; }
-  body.rd .rd-mood-chart .rd-un-rfig { display: flex; gap: 10px; flex: 0 0 100%; }
-  body.rd .rd-mood-chart .rd-un-rfig .rd-un-rv { text-align: left; }
+  body.rd .rd-confidence-chart .rd-un-rtop { display: flex; flex-wrap: wrap; gap: 2px 10px; }
+  body.rd .rd-confidence-chart .rd-un-rfig { display: flex; gap: 10px; flex: 0 0 100%; }
+  body.rd .rd-confidence-chart .rd-un-rfig .rd-un-rv { text-align: left; }
 }
 body.rd .rd-un-sp { margin-top: 28px; }
 body.rd .rd-un-sm { grid-template-columns: repeat(5, minmax(0, 1fr)); }
@@ -4473,6 +4476,12 @@ body.rd .cyc-band.lo.thin { opacity: 0.045; }
 body.rd .cyc-band.hi.thin { opacity: 0.075; }
 body.rd.dark .cyc-band.lo { fill: var(--ink-2); opacity: 0.1; }
 body.rd.dark .cyc-band.hi { fill: var(--ink-2); opacity: 0.18; }
+body.rd .conf-band.lo { fill: var(--ink-3); opacity: 0.1; }
+body.rd .conf-band.hi { fill: var(--ink-3); opacity: 0.17; }
+body.rd .conf-band.lo.thin { opacity: 0.045; }
+body.rd .conf-band.hi.thin { opacity: 0.075; }
+body.rd.dark .conf-band.lo { fill: var(--ink-2); opacity: 0.1; }
+body.rd.dark .conf-band.hi { fill: var(--ink-2); opacity: 0.18; }
 body.rd .rd-acc-card { margin-top: 32px; }
 body.rd .rd-acc-card .rd-chead { gap: 12px; }
 body.rd .rd-acc-head, body.rd .rd-acc-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) 70px 170px; column-gap: 16px; align-items: center; }
@@ -21753,7 +21762,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "n": 66,
     "houses": ["Roy Morgan", "Essential", "Resolve", "DemosAU"]
   };
-  const mood = {
+  const confidence = {
     "consumer": {
       "label": "ANZ-Roy Morgan Consumer Confidence",
       "base": "ANZ-Roy Morgan, index, 100 = neutral",
@@ -25315,6 +25324,707 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "cond": -1,
         "condChg": -5
       }
+    }
+  };
+  const confHistory = {
+    "consumer": {
+      "terms": [{
+        "year": 1974,
+        "span": 19,
+        "eYm": "1974-05",
+        "v": [98.13, 95.6, 93.93, 92.27, 90.6, 91.13, 91.67, 92.2, 99.47, 106.73, 114, 110.73, 107.47, 104.2, 103.07, 101.93, 100.8, 101.53, 102.27, 103, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
+      }, {
+        "year": 1975,
+        "span": 24,
+        "eYm": "1975-12",
+        "v": [103, 113.6, 110.3, 107, 110.2, 108.6, 107, 105.6, 106.8, 108, 108.8, 101.2, 102.7, 104.2, 101.4, 98.6, 101.6, 102.7, 103.8, 99.4, 102.2, 105, 104.4, 109.4, null, null, null, null, null, null, null, null, null, null, null, null, null]
+      }, {
+        "year": 1977,
+        "span": 34,
+        "eYm": "1977-12",
+        "v": [114.3, 119.2, 117, 114.8, 110.8, 110.2, 109.6, 101.6, 96.4, 91.2, 104.4, 103.6, 106.9, 110.2, 108.2, 106.2, 109.4, 101, 92.6, 90.2, 94.8, 99.4, 97.6, 98.8, 98.8, 98.8, 99.8, 100.8, 97.4, 99.5, 101.6, 98.2, 101.3, 104.4, 109.8, null, null]
+      }, {
+        "year": 1980,
+        "span": 29,
+        "eYm": "1980-10",
+        "v": [109.8, 106.4, 109.9, 113.4, 112.6, 111.8, 101.8, 101.3, 100.8, 95, 93.7, 92.4, 98.2, 98, 95.2, 92.4, 92.1, 91.8, 93.6, 92.9, 92.2, 80.4, 82.5, 84.6, 81.2, 75.2, 81.5, 87.8, 92.6, 97.4, null, null, null, null, null, null, null]
+      }, {
+        "year": 1983,
+        "span": 21,
+        "eYm": "1983-03",
+        "v": [97.4, 96, 95.7, 95.4, 98.2, 99.4, 100.6, 106.4, 113.2, 118.9, 124.6, 122.7, 120.8, 120.8, 118.2, 115.6, 116.6, 117.4, 118.2, 117.8, 114.6, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
+      }, {
+        "year": 1984,
+        "span": 31,
+        "eYm": "1984-12",
+        "v": [114.7, 114.8, 112.5, 110.2, 99.4, 98.7, 98, 100.8, 103.8, 106.8, 107.8, 94.8, 100.1, 105.4, 104.6, 103.8, 94.6, 94.8, 91.6, 79.8, 79.8, 78.8, 89.8, 85.6, 88.8, 90.4, 88, 86.8, 90.8, 91.8, 93.4, 98.6, null, null, null, null, null]
+      }, {
+        "year": 1987,
+        "span": 32,
+        "eYm": "1987-07",
+        "v": [98.6, 96.4, 94.8, 104, 87.2, 93, 100.4, 98.8, 103.6, 106.2, 104, 104, 107.6, 108.2, 112.4, 108.8, 104.2, 105.8, 105, 94.6, 88.4, 88.4, 87.4, 72.8, 73, 78.8, 82, 79, 81, 80, 101.6, 95.6, 83.4, null, null, null, null]
+      }, {
+        "year": 1990,
+        "span": 36,
+        "eYm": "1990-03",
+        "v": [83.4, 88.3, 84.7, 83.1, 79.6, 83.9, 75.6, 71.4, 73.1, 71.3, 78.5, 85.4, 85, 87.2, 87.7, 88.6, 98.1, 95.2, 93.3, 95.8, 91.1, 83, 93.6, 95.9, 96.2, 105.4, 101.6, 97.7, 95.4, 96.9, 96.8, 101.2, 93.6, 92.9, 100.8, 100.4, 105.9]
+      }, {
+        "year": 1993,
+        "span": 36,
+        "eYm": "1993-03",
+        "v": [105.9, 102.3, 102.2, 96.2, 96.6, 100.8, 90.2, 103.5, 111.9, 108.5, 120.5, 127.5, 125.7, 127.7, 125.2, 128, 127.6, 123.8, 123.6, 124.6, 118.1, 118, 112.3, 112.4, 113.9, 114.7, 112, 112.4, 110.2, 115.5, 111.7, 116.2, 114.3, 111.9, 116.7, 119.1, 123.7]
+      }, {
+        "year": 1996,
+        "span": 31,
+        "eYm": "1996-03",
+        "v": [123.7, 121.5, 118.8, 117.8, 112.3, 114.4, 113.2, 111.3, 113.4, 113.2, 119.2, 115.1, 116.2, 112.5, 114.2, 115.5, 110.7, 111.7, 112.4, 112.8, 111.6, 110.6, 117.8, 116, 114.9, 110.2, 114.4, 109.8, 107.6, 111.1, 111, 113.9, null, null, null, null, null]
+      }, {
+        "year": 1998,
+        "span": 36,
+        "eYm": "1998-10",
+        "v": [113.9, 114.2, 114.7, 122.1, 121.8, 122.5, 119.6, 122.5, 122.2, 118.2, 122.8, 122.3, 119.6, 122.8, 122.2, 122.3, 119.9, 112.9, 116.6, 112, 108.7, 114.8, 119.1, 115.8, 115.6, 110.3, 112.3, 119.9, 109.5, 106.2, 103.6, 107.4, 108.6, 115.3, 116.4, 120.9, 106.8]
+      }, {
+        "year": 2001,
+        "span": 35,
+        "eYm": "2001-11",
+        "v": [109.4, 113.3, 124.8, 123, 122.3, 123.2, 124, 116.4, 123.4, 119.9, 122.1, 117.2, 114, 109.6, 122.5, 113.4, 109.9, 120.8, 127, 122.4, 123.2, 122.4, 123.2, 121.2, 124.2, 120.4, 126, 126.8, 130.4, 124.4, 125, 125.6, 128.9, 127.6, 126, 128.9, null]
+      }, {
+        "year": 2004,
+        "span": 36,
+        "eYm": "2004-10",
+        "v": [128.9, 124.8, 125.5, 133.2, 132, 121.5, 119.4, 119.5, 118.8, 116.8, 120.6, 114.3, 105.4, 110.6, 117.7, 124.3, 124.5, 124.4, 120.1, 106.8, 115.1, 118.1, 103.7, 108.6, 115.8, 111.5, 117.4, 123.9, 123.8, 120.7, 124.3, 122.5, 122.3, 126.8, 125.2, 118.2, 126.2]
+      }, {
+        "year": 2007,
+        "span": 33,
+        "eYm": "2007-11",
+        "v": [124.9, 126.8, 118.6, 115.8, 109.5, 100.1, 97.1, 90.7, 92, 94.7, 101.2, 90.4, 93.1, 99.8, 101.1, 94.9, 95.8, 102, 101.8, 109.6, 114.9, 121.4, 122.9, 127, 125.9, 123.2, 128.7, 126.3, 127.6, 125.4, 119.9, 119.2, 123.9, 125.6, null, null, null]
+      }, {
+        "year": 2010,
+        "span": 36,
+        "eYm": "2010-08",
+        "v": [125.6, 123.5, 127.5, 123.7, 120.6, 122.3, 118.5, 117, 119.3, 117, 111, 108.6, 107.8, 112, 111.3, 114.6, 111, 117.5, 114.9, 111.6, 110.7, 110.6, 109.7, 109.8, 113, 114.1, 114.8, 114.1, 115.7, 120.9, 119.7, 121, 121.9, 115.3, 114.6, 116.2, 115.6]
+      }, {
+        "year": 2013,
+        "span": 34,
+        "eYm": "2013-09",
+        "v": [122.3, 121.8, 121.1, 116.3, 116.7, 113.4, 112.8, 113.4, 102.4, 103.3, 109.8, 112.4, 112.5, 112.9, 114.2, 112.2, 112.6, 111.2, 111.3, 110.5, 111.9, 113.5, 111.7, 112.9, 110, 112.4, 115.3, 114.8, 114, 112.7, 114.6, 113.5, 114.6, 116.3, 115.6, null, null]
+      }, {
+        "year": 2016,
+        "span": 34,
+        "eYm": "2016-07",
+        "v": [115.6, 118, 116.6, 118.5, 115.9, 115.8, 118.6, 116.7, 113.2, 112.2, 111.1, 112.5, 114.7, 112, 113.2, 113.3, 114.3, 115.6, 121.4, 118.9, 117.7, 116.8, 119.9, 120.7, 120.1, 116.9, 117.3, 116.8, 117.2, 118.4, 116.1, 115.4, 112, 115.7, 116.7, null, null]
+      }, {
+        "year": 2019,
+        "span": 36,
+        "eYm": "2019-05",
+        "v": [116.7, 116.1, 116.6, 115.7, 112.8, 111.9, 111.2, 108.4, 107.4, 108.4, 88.5, 79.8, 92.6, 96.3, 90.8, 89.1, 91.8, 96.6, 102.3, 109.8, 109.6, 110.6, 110.9, 112.1, 112.8, 111.4, 108.6, 100.6, 101.6, 104.9, 107.5, 107.5, 101.4, 101, 94.6, 95.3, 90.3]
+      }, {
+        "year": 2022,
+        "span": 36,
+        "eYm": "2022-05",
+        "v": [90.3, 85, 82.8, 83.6, 85.7, 84.2, 80.2, 82.8, 86.9, 80.5, 77.5, 78.5, 76.8, 73.9, 73.8, 76.8, 78.5, 77.9, 75.5, 79, 84, 83.1, 82, 81.9, 80.7, 79.5, 80.8, 82.8, 83, 84.3, 86.6, 85.9, 86.6, 87.5, 85.7, 83.4, 87.9]
+      }],
+      "band": [{
+        "m": 0,
+        "n": 19,
+        "mean": 110.34,
+        "q1": 100.8,
+        "q3": 119.5,
+        "p10": 95.98,
+        "p90": 125.04
+      }, {
+        "m": 1,
+        "n": 19,
+        "mean": 110.4,
+        "q1": 99.35,
+        "q3": 120.35,
+        "p10": 94.14,
+        "p90": 123.76
+      }, {
+        "m": 2,
+        "n": 19,
+        "mean": 109.9,
+        "q1": 98.95,
+        "q3": 118.7,
+        "p10": 92.08,
+        "p90": 124.94
+      }, {
+        "m": 3,
+        "n": 19,
+        "mean": 109.79,
+        "q1": 100.1,
+        "q3": 118.15,
+        "p10": 90.54,
+        "p90": 123.14
+      }, {
+        "m": 4,
+        "n": 19,
+        "mean": 107.09,
+        "q1": 97.4,
+        "q3": 116.3,
+        "p10": 86.9,
+        "p90": 121.9
+      }, {
+        "m": 5,
+        "n": 19,
+        "mean": 106.68,
+        "q1": 99.05,
+        "q3": 115.1,
+        "p10": 89.74,
+        "p90": 122.34
+      }, {
+        "m": 6,
+        "n": 19,
+        "mean": 104.71,
+        "q1": 97.55,
+        "q3": 115.85,
+        "p10": 88.2,
+        "p90": 119.44
+      }, {
+        "m": 7,
+        "n": 19,
+        "mean": 104.23,
+        "q1": 99.8,
+        "q3": 114.9,
+        "p10": 89.12,
+        "p90": 117.5
+      }, {
+        "m": 8,
+        "n": 19,
+        "mean": 105.69,
+        "q1": 100.13,
+        "q3": 113.3,
+        "p10": 90.98,
+        "p90": 119.88
+      }, {
+        "m": 9,
+        "n": 19,
+        "mean": 105.1,
+        "q1": 99.15,
+        "q3": 115,
+        "p10": 89.06,
+        "p90": 118.34
+      }, {
+        "m": 10,
+        "n": 19,
+        "mean": 107.37,
+        "q1": 102.6,
+        "q3": 119.85,
+        "p10": 86.5,
+        "p90": 122.24
+      }, {
+        "m": 11,
+        "n": 19,
+        "mean": 104.92,
+        "q1": 93.6,
+        "q3": 114.7,
+        "p10": 84.28,
+        "p90": 122.38
+      }, {
+        "m": 12,
+        "n": 19,
+        "mean": 105.64,
+        "q1": 99.15,
+        "q3": 114.35,
+        "p10": 91.08,
+        "p90": 119.84
+      }, {
+        "m": 13,
+        "n": 19,
+        "mean": 106.75,
+        "q1": 102,
+        "q3": 112.25,
+        "p10": 94.48,
+        "p90": 121.2
+      }, {
+        "m": 14,
+        "n": 19,
+        "mean": 107.21,
+        "q1": 101.25,
+        "q3": 115.95,
+        "p10": 90.18,
+        "p90": 122.26
+      }, {
+        "m": 15,
+        "n": 19,
+        "mean": 106.33,
+        "q1": 96.75,
+        "q3": 115.05,
+        "p10": 89,
+        "p90": 122.7
+      }, {
+        "m": 16,
+        "n": 19,
+        "mean": 106,
+        "q1": 96.95,
+        "q3": 113.45,
+        "p10": 92.04,
+        "p90": 120.82
+      }, {
+        "m": 17,
+        "n": 19,
+        "mean": 106.56,
+        "q1": 98.8,
+        "q3": 116.5,
+        "p10": 94.2,
+        "p90": 121.4
+      }, {
+        "m": 18,
+        "n": 19,
+        "mean": 106.7,
+        "q1": 97.7,
+        "q3": 117.4,
+        "p10": 92.4,
+        "p90": 121.84
+      }, {
+        "m": 19,
+        "n": 19,
+        "mean": 104.82,
+        "q1": 95.2,
+        "q3": 112.4,
+        "p10": 88.12,
+        "p90": 119.6
+      }, {
+        "m": 20,
+        "n": 18,
+        "mean": 104.92,
+        "q1": 92.85,
+        "q3": 114.83,
+        "p10": 87.08,
+        "p90": 117.82
+      }, {
+        "m": 21,
+        "n": 17,
+        "mean": 104.41,
+        "q1": 88.4,
+        "q3": 116.8,
+        "p10": 81.96,
+        "p90": 119.42
+      }, {
+        "m": 22,
+        "n": 17,
+        "mean": 105.21,
+        "q1": 93.6,
+        "q3": 117.8,
+        "p10": 85.44,
+        "p90": 121.1
+      }, {
+        "m": 23,
+        "n": 17,
+        "mean": 105.03,
+        "q1": 95.9,
+        "q3": 115.8,
+        "p10": 83.52,
+        "p90": 120.9
+      }, {
+        "m": 24,
+        "n": 16,
+        "mean": 105.31,
+        "q1": 94.35,
+        "q3": 115.65,
+        "p10": 80.95,
+        "p90": 122.15
+      }, {
+        "m": 25,
+        "n": 16,
+        "mean": 104.58,
+        "q1": 96.7,
+        "q3": 114.25,
+        "p10": 79.15,
+        "p90": 118.65
+      }, {
+        "m": 26,
+        "n": 16,
+        "mean": 106.28,
+        "q1": 96.85,
+        "q3": 115.8,
+        "p10": 81.75,
+        "p90": 121.7
+      }, {
+        "m": 27,
+        "n": 16,
+        "mean": 106.27,
+        "q1": 95.22,
+        "q3": 117.58,
+        "p10": 84.8,
+        "p90": 125.1
+      }, {
+        "m": 28,
+        "n": 16,
+        "mean": 106.11,
+        "q1": 94.7,
+        "q3": 116.08,
+        "p10": 86.9,
+        "p90": 125.7
+      }, {
+        "m": 29,
+        "n": 16,
+        "mean": 106.88,
+        "q1": 97.28,
+        "q3": 118.98,
+        "p10": 88.05,
+        "p90": 122.65
+      }, {
+        "m": 30,
+        "n": 15,
+        "mean": 108.89,
+        "q1": 101.6,
+        "q3": 117.9,
+        "p10": 94.76,
+        "p90": 122.54
+      }, {
+        "m": 31,
+        "n": 15,
+        "mean": 109.45,
+        "q1": 99.9,
+        "q3": 117.7,
+        "p10": 96.64,
+        "p90": 121.9
+      }, {
+        "m": 32,
+        "n": 13,
+        "mean": 108.68,
+        "q1": 101.3,
+        "q3": 121.9,
+        "p10": 88,
+        "p90": 123.58
+      }, {
+        "m": 33,
+        "n": 12,
+        "mean": 111.69,
+        "q1": 103.55,
+        "q3": 118.63,
+        "p10": 93.71,
+        "p90": 126.68
+      }, {
+        "m": 34,
+        "n": 11,
+        "mean": 111.1,
+        "q1": 105.3,
+        "q3": 116.7,
+        "p10": 94.6,
+        "p90": 125.2
+      }, {
+        "m": 35,
+        "n": 8,
+        "mean": 110.3,
+        "q1": 99.13,
+        "q3": 119.55,
+        "p10": 91.73,
+        "p90": 123.3
+      }, {
+        "m": 36,
+        "n": 7,
+        "mean": 108.06,
+        "q1": 98.1,
+        "q3": 119.65,
+        "p10": 89.34,
+        "p90": 124.7
+      }]
+    },
+    "business": {
+      "terms": [{
+        "year": 2013,
+        "span": 34,
+        "eYm": "2013-09",
+        "v": [134.3, 136.3, 131.1, 125.2, 131.5, 117.3, 120.6, 120.9, 114.3, 108.1, 119.1, 116.1, 122.9, 114.9, 123, 105.3, 114.9, 105.7, 112.4, 105.1, 114.7, 114.8, 112.3, 102.6, 112.8, 119.3, 118.7, 114.5, 110.6, 113.3, 115.7, 123.1, 111.9, 119.5, 116.1, null, null]
+      }, {
+        "year": 2016,
+        "span": 34,
+        "eYm": "2016-07",
+        "v": [116.1, 108.6, 114.9, 116.2, 116.7, 114.1, 116.8, 111.4, 113.8, 116.6, 113.8, 111.8, 117, 114.4, 113.2, 112.7, 114.1, 117.4, 123.5, 120, 115.4, 118.6, 117.1, 114.4, 113.6, 110.2, 111.5, 113.1, 113.8, 112.2, 105.9, 105.6, 106.7, 102.9, 114.4, null, null]
+      }, {
+        "year": 2019,
+        "span": 36,
+        "eYm": "2019-05",
+        "v": [114.4, 114.7, 114, 114.3, 110.6, 106, 108.4, 104.5, 101.6, 104.6, 95.1, 76.9, 89.9, 95, 84.3, 83.1, 85.6, 98.7, 109.1, 123.2, 120.5, 120.8, 124, 125.3, 129.3, 128.3, 117.2, 101.5, 104.6, 115.3, 113, 120.2, 101.5, 120.5, 106.7, 113, 100.2]
+      }, {
+        "year": 2022,
+        "span": 36,
+        "eYm": "2022-05",
+        "v": [100.2, 97.3, 94.9, 96, 100.7, 96.6, 90.2, 96, 106.4, 95.8, 93.6, 90.2, 90.3, 88.8, 87.5, 94.7, 87.1, 90.4, 85.8, 91.1, 93.2, 101.5, 98, 99.3, 97, 91.5, 95.1, 101.3, 94.3, 106.7, 106.9, 105.9, 108.2, 108.5, 106, 96.7, 99.6]
+      }],
+      "band": [{
+        "m": 0,
+        "n": 4,
+        "mean": 116.25,
+        "q1": 110.85,
+        "q3": 120.65,
+        "p10": 104.46,
+        "p90": 128.84
+      }, {
+        "m": 1,
+        "n": 4,
+        "mean": 114.22,
+        "q1": 105.77,
+        "q3": 120.1,
+        "p10": 100.69,
+        "p90": 129.82
+      }, {
+        "m": 2,
+        "n": 4,
+        "mean": 113.72,
+        "q1": 109.22,
+        "q3": 118.95,
+        "p10": 100.63,
+        "p90": 126.24
+      }, {
+        "m": 3,
+        "n": 4,
+        "mean": 112.92,
+        "q1": 109.72,
+        "q3": 118.45,
+        "p10": 101.49,
+        "p90": 122.5
+      }, {
+        "m": 4,
+        "n": 4,
+        "mean": 114.88,
+        "q1": 108.13,
+        "q3": 120.4,
+        "p10": 103.67,
+        "p90": 127.06
+      }, {
+        "m": 5,
+        "n": 4,
+        "mean": 108.5,
+        "q1": 103.65,
+        "q3": 114.9,
+        "p10": 99.42,
+        "p90": 116.34
+      }, {
+        "m": 6,
+        "n": 4,
+        "mean": 109,
+        "q1": 103.85,
+        "q3": 117.75,
+        "p10": 95.66,
+        "p90": 119.46
+      }, {
+        "m": 7,
+        "n": 4,
+        "mean": 108.2,
+        "q1": 102.38,
+        "q3": 113.78,
+        "p10": 98.55,
+        "p90": 118.05
+      }, {
+        "m": 8,
+        "n": 4,
+        "mean": 109.03,
+        "q1": 105.2,
+        "q3": 113.92,
+        "p10": 103.04,
+        "p90": 114.15
+      }, {
+        "m": 9,
+        "n": 4,
+        "mean": 106.28,
+        "q1": 102.4,
+        "q3": 110.22,
+        "p10": 98.44,
+        "p90": 114.05
+      }, {
+        "m": 10,
+        "n": 4,
+        "mean": 105.4,
+        "q1": 94.72,
+        "q3": 115.13,
+        "p10": 94.05,
+        "p90": 117.51
+      }, {
+        "m": 11,
+        "n": 4,
+        "mean": 98.75,
+        "q1": 86.88,
+        "q3": 112.88,
+        "p10": 80.89,
+        "p90": 114.81
+      }, {
+        "m": 12,
+        "n": 4,
+        "mean": 105.03,
+        "q1": 90.2,
+        "q3": 118.47,
+        "p10": 90.02,
+        "p90": 121.13
+      }, {
+        "m": 13,
+        "n": 4,
+        "mean": 103.28,
+        "q1": 93.45,
+        "q3": 114.53,
+        "p10": 90.66,
+        "p90": 114.75
+      }, {
+        "m": 14,
+        "n": 4,
+        "mean": 102,
+        "q1": 86.7,
+        "q3": 115.65,
+        "p10": 85.26,
+        "p90": 120.06
+      }, {
+        "m": 15,
+        "n": 4,
+        "mean": 98.95,
+        "q1": 91.8,
+        "q3": 107.15,
+        "p10": 86.58,
+        "p90": 110.48
+      }, {
+        "m": 16,
+        "n": 4,
+        "mean": 100.42,
+        "q1": 86.72,
+        "q3": 114.3,
+        "p10": 86.05,
+        "p90": 114.66
+      }, {
+        "m": 17,
+        "n": 4,
+        "mean": 103.05,
+        "q1": 96.63,
+        "q3": 108.63,
+        "p10": 92.89,
+        "p90": 113.89
+      }, {
+        "m": 18,
+        "n": 4,
+        "mean": 107.7,
+        "q1": 103.27,
+        "q3": 115.18,
+        "p10": 92.79,
+        "p90": 120.17
+      }, {
+        "m": 19,
+        "n": 4,
+        "mean": 109.85,
+        "q1": 101.6,
+        "q3": 120.8,
+        "p10": 95.3,
+        "p90": 122.24
+      }, {
+        "m": 20,
+        "n": 4,
+        "mean": 110.95,
+        "q1": 109.33,
+        "q3": 116.68,
+        "p10": 99.65,
+        "p90": 118.97
+      }, {
+        "m": 21,
+        "n": 4,
+        "mean": 113.92,
+        "q1": 111.47,
+        "q3": 119.15,
+        "p10": 105.49,
+        "p90": 120.14
+      }, {
+        "m": 22,
+        "n": 4,
+        "mean": 112.85,
+        "q1": 108.72,
+        "q3": 118.82,
+        "p10": 102.29,
+        "p90": 121.93
+      }, {
+        "m": 23,
+        "n": 4,
+        "mean": 110.4,
+        "q1": 101.77,
+        "q3": 117.13,
+        "p10": 100.29,
+        "p90": 122.03
+      }, {
+        "m": 24,
+        "n": 4,
+        "mean": 113.17,
+        "q1": 108.85,
+        "q3": 117.53,
+        "p10": 101.74,
+        "p90": 124.59
+      }, {
+        "m": 25,
+        "n": 4,
+        "mean": 112.33,
+        "q1": 105.53,
+        "q3": 121.55,
+        "p10": 97.11,
+        "p90": 125.6
+      }, {
+        "m": 26,
+        "n": 4,
+        "mean": 110.63,
+        "q1": 107.4,
+        "q3": 117.58,
+        "p10": 100.02,
+        "p90": 118.25
+      }, {
+        "m": 27,
+        "n": 4,
+        "mean": 107.6,
+        "q1": 101.45,
+        "q3": 113.45,
+        "p10": 101.36,
+        "p90": 114.08
+      }, {
+        "m": 28,
+        "n": 4,
+        "mean": 105.83,
+        "q1": 102.02,
+        "q3": 111.4,
+        "p10": 97.39,
+        "p90": 112.84
+      }, {
+        "m": 29,
+        "n": 4,
+        "mean": 111.88,
+        "q1": 110.83,
+        "q3": 113.8,
+        "p10": 108.35,
+        "p90": 114.7
+      }, {
+        "m": 30,
+        "n": 4,
+        "mean": 110.38,
+        "q1": 106.65,
+        "q3": 113.67,
+        "p10": 106.2,
+        "p90": 114.89
+      }, {
+        "m": 31,
+        "n": 4,
+        "mean": 113.7,
+        "q1": 105.83,
+        "q3": 120.92,
+        "p10": 105.69,
+        "p90": 122.23
+      }, {
+        "m": 32,
+        "n": 4,
+        "mean": 107.07,
+        "q1": 105.4,
+        "q3": 109.13,
+        "p10": 103.06,
+        "p90": 110.79
+      }, {
+        "m": 33,
+        "n": 4,
+        "mean": 112.85,
+        "q1": 107.1,
+        "q3": 119.75,
+        "p10": 104.58,
+        "p90": 120.2
+      }, {
+        "m": 34,
+        "n": 4,
+        "mean": 110.8,
+        "q1": 106.53,
+        "q3": 114.83,
+        "p10": 106.21,
+        "p90": 115.59
+      }]
     }
   };
   const firmness = {
@@ -68675,7 +69385,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     directionNow,
     leaderNow,
     undecided,
-    mood,
+    confidence,
+    confHistory,
     firmness,
     onSources,
     demographics,
@@ -96696,14 +97407,41 @@ function RdUndecided({
     }
   }, "Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined."))));
 }
-const RD_MOOD_VIEWS = [{
+const confCsvCell = v => {
+  if (v == null) return "";
+  const s = String(v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+};
+const confCsvText = rows => "﻿" + rows.map(r => r.map(confCsvCell).join(",")).join("\r\n");
+const confDownloadCsv = (filename, rows) => {
+  const blob = new Blob([confCsvText(rows)], {
+    type: "text/csv;charset=utf-8"
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+const CONF_SHEET = {
+  consumer: "ANZ–Roy Morgan Consumer Confidence",
+  westpacConsumer: "Westpac–MI Consumer Sentiment",
+  business: "Roy Morgan Business Confidence",
+  nabBusiness: "NAB Monthly Business Survey (net balance)"
+};
+const confYmIdx = ym => +ym.slice(0, 4) * 12 + (+ym.slice(5, 7) - 1);
+const confYmOf = i => Math.floor(i / 12) + "-" + String(i % 12 + 1).padStart(2, "0");
+const RD_CONF_VIEWS = [{
   id: "consumer",
   label: "Consumers"
 }, {
   id: "business",
   label: "Businesses"
 }];
-function RdMood({
+function RdConfidence({
   rangeId
 }) {
   const {
@@ -96711,7 +97449,7 @@ function RdMood({
     monthLabelFull
   } = window.AP;
   const narrow = useNarrow("(max-width: 640px)");
-  const M = D.mood;
+  const M = D.confidence;
   if (!M || !M.consumer || !M.business || !M.consumer.polls.length || !M.business.polls.length) return null;
   const NICE = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const lanes = [{
@@ -96724,7 +97462,7 @@ function RdMood({
     hl: 14,
     lab: "Consumers",
     period: "week",
-    color: "var(--mood-consumer)",
+    color: "var(--confidence-consumer)",
     dash: null,
     shift: 0,
     vfmt: v => v.toFixed(1),
@@ -96739,7 +97477,7 @@ function RdMood({
     hl: 60,
     lab: "Consumers · Westpac–MI",
     period: "month",
-    color: "var(--mood-consumer)",
+    color: "var(--confidence-consumer)",
     dash: "4 3",
     shift: 0,
     vfmt: v => v.toFixed(1),
@@ -96754,7 +97492,7 @@ function RdMood({
     hl: 60,
     lab: "Businesses",
     period: "month",
-    color: "var(--mood-business)",
+    color: "var(--confidence-business)",
     dash: null,
     shift: 0,
     vfmt: v => v.toFixed(1),
@@ -96769,7 +97507,7 @@ function RdMood({
     hl: 60,
     lab: "Businesses · NAB",
     period: "month",
-    color: "var(--mood-business)",
+    color: "var(--confidence-business)",
     dash: "4 3",
     shift: 100,
     vfmt: NICE,
@@ -96778,22 +97516,22 @@ function RdMood({
   if (!lanes.length) return null;
   for (const l of lanes) l.lat = l.s.latest;
   const [view, setView] = useState("consumer");
-  const moodHover = React.useRef(false);
+  const confHover = React.useRef(false);
   React.useEffect(() => {
-    const sec = document.getElementById("mood");
+    const sec = document.getElementById("confidence");
     if (!sec) return undefined;
     const enter = () => {
-      moodHover.current = true;
+      confHover.current = true;
     };
     const leave = () => {
-      moodHover.current = false;
+      confHover.current = false;
     };
-    moodHover.current = sec.matches(":hover");
+    confHover.current = sec.matches(":hover");
     sec.addEventListener("pointerenter", enter);
     sec.addEventListener("pointerleave", leave);
-    const ids = RD_MOOD_VIEWS.map(v => v.id);
+    const ids = RD_CONF_VIEWS.map(v => v.id);
     const key = e => {
-      if (!moodHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      if (!confHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
@@ -96803,7 +97541,7 @@ function RdMood({
       if (i < 0 || ids.length < 2) return;
       e.preventDefault();
       const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
-      rdPinScroll(document.getElementById("mood") && document.getElementById("mood").querySelector(".rd-mood-tabs"));
+      rdPinScroll(document.getElementById("confidence") && document.getElementById("confidence").querySelector(".rd-confidence-tabs"));
       setView(nxt);
     };
     document.addEventListener("keydown", key, true);
@@ -96863,9 +97601,15 @@ function RdMood({
   };
   const x0 = 2025 + 122 / 365;
   const x1 = D.domain.x1;
-  const MOOD_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
-  const evs = rdChartEvents(D.events, x0, x1).filter(e => !MOOD_OFF.includes(e.date));
-  const badges = narrow ? rdEventBadges("mood", evs, x0, x1) : null;
+  const toM = x => (x - x0) * 12;
+  const nowM = toM(x1);
+  const xMax = Math.max(36, Math.ceil(nowM)) + 0.6;
+  const CONF_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+  const evs = rdChartEvents(D.events, x0, x1).filter(e => !CONF_OFF.includes(e.date)).map(e => ({
+    ...e,
+    x: toM(e.x)
+  }));
+  const badges = narrow ? rdEventBadges("confidence", evs, 0, xMax) : null;
   const [evtOpen, setEvtOpen] = useState(null);
   const pickEv = e => {
     setEvtOpen(cur => cur && cur.e === e ? cur : {
@@ -96876,7 +97620,7 @@ function RdMood({
   const rows = new Map(lanes.map(l => [l.k, l.s.polls.filter(p => p.x >= x0)]));
   const dek = lanes.map(sent).join(" ");
   const rawPoints = new Map(viewLanes.map(l => [l.k, rows.get(l.k).map(p => ({
-    x: p.x,
+    x: toM(p.x),
     y: p.v + l.shift,
     ym: p.ym,
     released: p.released,
@@ -96885,14 +97629,115 @@ function RdMood({
     } : {})
   }))]));
   const sePoints = new Map(viewLanes.map(l => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({
-    x: p.x,
+    x: toM(p.x),
     y: p.y + l.shift,
     ym: rows.get(l.k)[i].ym,
     ...(l.shift ? {
       raw: rows.get(l.k)[i].v
     } : {})
   }))]));
+  const HIST = D.confHistory || null;
+  const histLane = view === "consumer" ? "consumer" : "business";
+  const hband = HIST && HIST[histLane] && HIST[histLane].band.length ? HIST[histLane] : null;
+  const histTerms = hband ? hband.terms : [];
+  const [board, setBoard] = useState(false);
+  const [liftedBy, setLiftedBy] = useState({
+    consumer: new Set(),
+    business: new Set()
+  });
+  const lifted = liftedBy[histLane];
+  const lift = yr => setLiftedBy(s => {
+    const n = new Set(s[histLane]);
+    n.has(yr) ? n.delete(yr) : n.add(yr);
+    return {
+      ...s,
+      [histLane]: n
+    };
+  });
+  let bandAreas = null;
+  if (hband) {
+    const floor = Math.max(3, Math.ceil(histTerms.length * 0.75));
+    const segs = [];
+    hband.band.forEach((r, i) => {
+      const thin = r.n < floor;
+      const last = segs[segs.length - 1];
+      if (!last || last.thin !== thin) segs.push({
+        thin,
+        pts: i ? [hband.band[i - 1], r] : [r]
+      });else last.pts.push(r);
+    });
+    bandAreas = segs.filter(s => s.pts.length > 1).flatMap((s, i) => [{
+      id: "conf-band-lo" + i,
+      className: "conf-band lo" + (s.thin ? " thin" : ""),
+      color: "var(--ink-3)",
+      opacity: 0.07,
+      edge: false,
+      points: s.pts.map(r => ({
+        x: r.m,
+        y0: r.p10,
+        y1: r.p90
+      }))
+    }, {
+      id: "conf-band-hi" + i,
+      className: "conf-band hi" + (s.thin ? " thin" : ""),
+      color: "var(--ink-3)",
+      opacity: 0.13,
+      edge: false,
+      points: s.pts.map(r => ({
+        x: r.m,
+        y0: r.q1,
+        y1: r.q3
+      }))
+    }]);
+  }
+  const meanSeries = hband ? {
+    id: "conf-band-mean",
+    label: "Mean of past terms",
+    color: "var(--ink-2)",
+    rdWidth: 1.9,
+    opacity: 0.85,
+    dash: "2 3.4",
+    smooth: false,
+    endCap: false,
+    points: hband.band.map(r => ({
+      x: r.m,
+      y: r.mean
+    }))
+  } : null;
+  const drawnSeries = histTerms.filter(t => lifted.has(t.year)).map(t => ({
+    id: "conf-term-" + t.year,
+    label: "The " + t.year + " term",
+    color: "var(--ink)",
+    rdWidth: 1.7,
+    opacity: 0.9,
+    smooth: false,
+    endCap: false,
+    endLabel: narrow ? null : String(t.year),
+    points: t.v.map((v, m) => v == null || m > xMax ? null : {
+      x: m,
+      y: v
+    }).filter(Boolean)
+  }));
+  const exportCsv = () => {
+    const rr = [["kind", "series", "term_opened", "months_into_term", "month", "value", "url"]];
+    for (const l of lanes) for (const p of l.s.polls) rr.push(["release", CONF_SHEET[l.k], "", "", p.ym, p.v, p.url || ""]);
+    for (const k of ["consumer", "business"]) {
+      const h = HIST && HIST[k];
+      if (!h) continue;
+      for (const t of h.terms) {
+        const e = confYmIdx(t.eYm);
+        t.v.forEach((v, m) => {
+          if (v != null) rr.push(["history", CONF_SHEET[k], t.year, m, confYmOf(e + m), v, ""]);
+        });
+      }
+    }
+    confDownloadCsv(`auspol-tracker-confidence-${D.latest.updatedISO}.csv`, rr);
+  };
   const vals = viewLanes.flatMap(l => rawPoints.get(l.k).map(p => p.y)).concat([100]);
+  if (hband) hband.band.forEach(r => {
+    if (r.m <= xMax) vals.push(r.p10, r.p90, r.mean);
+  });
+  drawnSeries.forEach(s => s.points.forEach(p => vals.push(p.y)));
   const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10,
     hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
   const spine = rawPoints.get(viewLanes[0].k);
@@ -96908,18 +97753,36 @@ function RdMood({
     dashKey: "The Westpac–MI monthly read of the same household mood",
     copyTitle: "Consumer confidence (two gauges)",
     copySub: head + " Two published consumer gauges on one 100-neutral scale: the weekly ANZ–Roy Morgan consumer confidence index and Westpac–MI’s monthly consumer sentiment.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series). No combining, no adjustment."
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series). The band pools the ANZ–Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. No combining, no adjustment."
   } : {
     title: "Business confidence",
     note: "100 = neutral on the index; NAB’s net balance drawn 100 points up",
     dashKey: "NAB’s net-balance read, drawn 100 points up",
     copyTitle: "Business confidence (two gauges)",
     copySub: head + " Two published business gauges on one 100-neutral scale: Roy Morgan’s monthly business confidence index and NAB’s Monthly Business Survey.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its dashed line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. No combining, no adjustment."
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its dashed line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. The band pools the Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. No combining, no adjustment."
   };
+  const xTicks = [{
+    x: 0,
+    label: "Election"
+  }, {
+    x: 12,
+    label: "1 yr"
+  }, {
+    x: 24,
+    label: "2 yrs"
+  }, {
+    x: 36,
+    label: "3 yrs"
+  }];
+  if (nowM < xMax - 1.4) xTicks.push({
+    x: +nowM.toFixed(1),
+    label: "Now"
+  });
+  xTicks.sort((a, b) => a.x - b.x);
   return React.createElement(RdSec, {
-    id: "mood",
-    cls: "rd-mood",
+    id: "confidence",
+    cls: "rd-confidence",
     title: "Economic sentiment",
     meta: "Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")
   }, React.createElement(RdHed, {
@@ -96930,13 +97793,83 @@ function RdMood({
     pin: true,
     value: view,
     onChange: setView,
-    options: RD_MOOD_VIEWS,
+    options: RD_CONF_VIEWS,
     ariaLabel: "Confidence of",
-    className: "rd-mood-tabs"
+    className: "rd-confidence-tabs"
   }), React.createElement(RdCrossfade, {
     k: view
+  }, hband && React.createElement("div", {
+    className: "rd-cc rd-confidence-cc"
   }, React.createElement("div", {
-    className: "card rd-card rd-mood-chart"
+    className: "rd-confidence-draw"
+  }, React.createElement("button", {
+    type: "button",
+    className: "rd-chip",
+    "aria-expanded": board,
+    onClick: () => setBoard(b => !b)
+  }, "\uFF0B ", narrow ? "Draw a term" : "Draw a past term"), lifted.size > 0 && React.createElement("span", {
+    className: "rd-cc-drawn"
+  }, React.createElement("span", {
+    className: "rd-cc-l"
+  }, "Drawn over the band"), [...lifted].sort((a, b) => a - b).map(y => React.createElement("span", {
+    key: y,
+    className: "rd-cc-pill",
+    style: {
+      borderColor: "var(--ink)"
+    }
+  }, React.createElement("span", {
+    className: "rd-cc-rule",
+    style: {
+      background: "var(--ink)"
+    }
+  }), y, React.createElement("button", {
+    type: "button",
+    "aria-label": "Return " + y + " to the band",
+    onClick: () => lift(y)
+  }, "\xD7"))))), board && React.createElement("div", {
+    className: "rd-cc-board",
+    role: "dialog",
+    "aria-label": "Past terms"
+  }, React.createElement("div", {
+    className: "rd-cc-bhead"
+  }, React.createElement("b", null, "Past terms"), React.createElement("span", null, histTerms.length, " on file", lifted.size ? ", " + lifted.size + " drawn as their own " + (lifted.size === 1 ? "line" : "lines") : ""), React.createElement("span", {
+    className: "rd-grow"
+  }), lifted.size > 0 && React.createElement("button", {
+    type: "button",
+    className: "rd-link",
+    onClick: () => setLiftedBy(s => ({
+      ...s,
+      [histLane]: new Set()
+    }))
+  }, "Clear lines"), React.createElement("button", {
+    type: "button",
+    className: "rd-iconbtn",
+    "aria-label": "Close",
+    onClick: () => setBoard(false)
+  }, "\xD7")), React.createElement("div", {
+    className: "rd-cc-grid"
+  }, histTerms.map(t => {
+    const on = lifted.has(t.year);
+    return React.createElement("span", {
+      key: t.year,
+      className: "rd-cc-term" + (on ? " drawn" : "")
+    }, React.createElement("button", {
+      type: "button",
+      className: "rd-cc-main",
+      "aria-pressed": on,
+      onClick: () => lift(t.year),
+      title: on ? "Return " + t.year + " to the band" : "Draw " + t.year + " as its own line"
+    }, React.createElement("span", {
+      className: "rd-cc-rule",
+      style: {
+        background: "var(--ink)",
+        opacity: on ? 1 : 0.4
+      }
+    }), React.createElement("b", null, t.year)));
+  })), React.createElement("p", {
+    className: "rd-note"
+  }, "Click a term to draw its ", histLane === "consumer" ? "consumer" : "business", " confidence line over the band, and again to put it back. Each line is lined up on its own election month, as the band is, and runs to the next election or 36 months, whichever came first."))), React.createElement("div", {
+    className: "card rd-card rd-confidence-chart"
   }, React.createElement("div", {
     className: "rd-un-ptitle"
   }, React.createElement("b", null, vc.title), React.createElement("span", null, vc.note)), viewLanes.map(l => React.createElement("div", {
@@ -96956,7 +97889,7 @@ function RdMood({
   }, l.vfmt(l.lat.v)), l.lat.chg != null && Math.abs(l.lat.chg) >= 0.05 && React.createElement("span", {
     className: "rd-un-rci"
   }, rdArrow(l.lat.chg), " ", NICE(Math.abs(l.lat.chg)), " on the ", l.period))), React.createElement("p", null, l.short + (l.k === "nabBusiness" ? "" : " " + water(l, l.lat.v) + "."))))), React.createElement(TrendChart, {
-    key: "rd-mood-" + view,
+    key: "rd-confidence-" + view,
     heightPx: narrow ? 260 : 340,
     padPx: narrow ? {
       l: 34,
@@ -96969,11 +97902,11 @@ function RdMood({
       t: 44,
       b: 30
     },
-    xDomain: [x0, x1],
+    xDomain: [0, xMax],
     yDomain: [lo, hi],
     yTicks: rdYTicks(lo, hi, 10),
     yTickFmt: v => String(v),
-    xTicks: rdElectionTicks(x0, x1, narrow, x0),
+    xTicks: xTicks,
     baseline: true,
     refLines: [{
       y: 100,
@@ -96981,6 +97914,7 @@ function RdMood({
       align: "left",
       color: "var(--ink-3)"
     }],
+    areas: bandAreas || undefined,
     series: viewLanes.map(l => ({
       id: l.k,
       label: l.lab,
@@ -96990,7 +97924,7 @@ function RdMood({
       endCap: false,
       endLabel: narrow ? null : l.lab,
       points: sePoints.get(l.k)
-    })),
+    })).concat(meanSeries ? [meanSeries] : [], drawnSeries),
     spine: spine,
     events: badges ? badges.events : evs,
     evt: evtOpen,
@@ -97045,14 +97979,49 @@ function RdMood({
       color: "var(--ink-3)",
       label: vc.dashKey
     }]
-  }))), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Four published gauges of the same mood, split into two views \u2014 the consumer pair and the business pair, switched by the tabs over the chart \u2014 and set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
-  }), React.createElement(RdFoot, {
-    how: {
-      term: "mood",
-      from: "Economic sentiment"
-    }
-  }, "Four published gauges \u2014 ANZ\u2013Roy Morgan, Westpac\u2013MI, Roy Morgan and NAB \u2014 joined as released. Context, not a predictor."));
+  }, hband && React.createElement(React.Fragment, null, React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-cs-keyband",
+    "aria-hidden": "true"
+  }, React.createElement("i", null)), "Middle half and middle 80% of past terms"), React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement(RdSwatch, {
+    kind: "dash",
+    color: "var(--ink-2)"
+  }), "Their average"), React.createElement("span", {
+    className: "rd-key-item"
+  }, React.createElement("span", {
+    className: "rd-cs-keythin",
+    "aria-hidden": "true"
+  }), "Paler: fewer terms ran this long"))))), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Four published gauges of the same mood, split into two views \u2014 the consumer pair and the business pair, switched by the tabs over the chart \u2014 and set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Behind the current term, the band pools that view\u2019s main gauge over past terms \u2014 each term lined up on its own election month, so the bottom axis (months since this term\u2019s election) is every term\u2019s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. \u201CDraw a past term\u201D lifts any single term out of the band as its own line, and \u201CSource data, CSV\u201D in the footer downloads every release and past-term reading."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
+  }), React.createElement("div", {
+    className: "rd-foot"
+  }, React.createElement("span", {
+    className: "rd-foot-text"
+  }, "Four published gauges \u2014 ANZ\u2013Roy Morgan, Westpac\u2013MI, Roy Morgan and NAB \u2014 joined as released. Context, not a predictor."), React.createElement("span", {
+    className: "rd-grow"
+  }), React.createElement("button", {
+    type: "button",
+    className: "rd-how rd-confidence-csv",
+    onClick: exportCsv
+  }, React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    width: "14",
+    height: "14",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": "true"
+  }, React.createElement("path", {
+    d: "M12 3v12M12 15l-4-4M12 15l4-4M4 19h16"
+  })), " Source data, CSV"), React.createElement(RdHow, {
+    term: "confidence",
+    from: "Economic sentiment"
+  })));
 }
 Object.assign(window, {
   RdPrimary,
@@ -97070,7 +98039,7 @@ Object.assign(window, {
   useRdWidth,
   RdIssues,
   RdUndecided,
-  RdMood,
+  RdConfidence,
   RdShiftPlot,
   rdOneIn,
   RdTsig,
@@ -101012,7 +101981,7 @@ function RdApConfMini({
   const t0 = rdApDays(ms[0] + "-01");
   const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
   const t1 = Date.UTC(ly, lm, 1) - 864e5;
-  const ser = ((D.mood || {})[c.k] || {}).polls || [];
+  const ser = ((D.confidence || {})[c.k] || {}).polls || [];
   const mine = ser.filter(q => rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1);
   if (!mine.length) return React.createElement("div", {
     ref: box
@@ -101982,7 +102951,7 @@ function RdApDetail({
   })();
   const isConf = facet === "confidence";
   const conf = isConf ? p.conf || null : null;
-  const confSer = conf && D.mood && D.mood[conf.k] ? D.mood[conf.k] : null;
+  const confSer = conf && D.confidence && D.confidence[conf.k] ? D.confidence[conf.k] : null;
   const confFmt = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const outLabel = q => {
     const d = new Date(rdApDays(q.released));
@@ -102333,7 +103302,7 @@ function RdApDetail({
     className: "rd-apd-k"
   }, "The gauge"), React.createElement("span", null, CONF_BLURB[conf.k] || conf.lab + "."), React.createElement("span", {
     className: "rd-apd-k"
-  }, "Neutral"), React.createElement("span", null, conf.vs === 0 ? React.createElement(React.Fragment, null, "Printed as a net balance \u2013 optimists minus pessimists \u2013 so the neutral print is 0. It enters the mood panel\u2019s 40\u2013120 meter shifted up 100, beside the index gauges.") : React.createElement(React.Fragment, null, "An index print \u2013 100 is neutral; above it optimists outnumber pessimists", confPeriod === "week" ? ", read weekly" : "", ".")), React.createElement("span", {
+  }, "Neutral"), React.createElement("span", null, conf.vs === 0 ? React.createElement(React.Fragment, null, "Printed as a net balance \u2013 optimists minus pessimists \u2013 so the neutral print is 0. It enters the confidence panel\u2019s 40\u2013120 meter shifted up 100, beside the index gauges.") : React.createElement(React.Fragment, null, "An index print \u2013 100 is neutral; above it optimists outnumber pessimists", confPeriod === "week" ? ", read weekly" : "", ".")), React.createElement("span", {
     className: "rd-apd-k"
   }, "In today\u2019s panel"), React.createElement("span", null, confSer && confSer.latest && confSer.latest.released === p.released ? React.createElement(React.Fragment, null, "This is the latest ", conf.lab, " release, so the economic-sentiment panel reads the gauge at it.") : confSer && confSer.latest ? React.createElement(React.Fragment, null, "The panel\u2019s current read of this gauge is the ", outLabel(confSer.latest), " release at ", confFmt(confSer.latest.v), confSer.latest.url ? React.createElement(React.Fragment, null, ", ", React.createElement("a", {
     className: "rd-link",
@@ -102622,7 +103591,7 @@ function rdApFacetStory(facet, upd, demSplit) {
     };
   }
   if (facet === "confidence") {
-    const M = D.mood || {};
+    const M = D.confidence || {};
     const G = [["consumer", "ANZ–Roy Morgan’s consumer confidence", 100], ["westpacConsumer", "Westpac–MI’s consumer sentiment", 100], ["business", "Roy Morgan’s business confidence", 100], ["nabBusiness", "NAB’s business confidence", 0]].filter(([k]) => M[k] && M[k].latest && M[k].latest.v != null).map(([k, name, neut]) => ({
       k,
       name,
@@ -103220,7 +104189,7 @@ function RdAllPolls(P) {
     CF_HI = 120;
   const cfx = v => (Math.max(CF_LO, Math.min(CF_HI, v)) - CF_LO) / (CF_HI - CF_LO) * 100;
   const confPlot = c => c.v + (c.vs === 0 ? 100 : 0);
-  const confInk = c => c.k === "consumer" || c.k === "westpacConsumer" ? "var(--mood-consumer)" : "var(--mood-business)";
+  const confInk = c => c.k === "consumer" || c.k === "westpacConsumer" ? "var(--confidence-consumer)" : "var(--confidence-business)";
   const confFig = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const confChg = v => (v < 0 ? "−" : v > 0 ? "+" : "") + confFig(Math.abs(v));
   const CONF_TKS = [40, 60, 80, 100, 120];
@@ -103332,7 +104301,7 @@ function RdAllPolls(P) {
     "aria-label": "Each party’s gap between the two groups, from stronger with " + spl.lo.toLowerCase() + " to stronger with " + spl.hi.toLowerCase() + " voters",
     className: "rd-ap-hpic"
   }, demScale(demMid)), React.createElement("span", null)), facet === "confidence" && React.createElement(React.Fragment, null, th("Figure", "conf.v", {
-    title: "Sort by the gauge’s printed figure (the mood chart’s dot)"
+    title: "Sort by the gauge’s printed figure (the panel chart’s dot)"
   }), React.createElement("span", {
     role: "columnheader",
     "aria-label": "Each gauge\u2019s figure on a fixed 40\u2013120 scale, 100 neutral \u2013 NAB\u2019s net balance drawn 100 points up, its figure printed as NAB\u2019s own",

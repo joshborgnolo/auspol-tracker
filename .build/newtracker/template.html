@@ -80,7 +80,8 @@
      labels. Card surface in panelled mode, page paper in editorial. */
   --chart-bg: var(--surface);
 
-  /* national-mood colours – distinct from party palette.
+  /* national-mood colours – distinct from party palette (they tint the
+     confidence panel's gauges too, and it ships no `.net.pos` spans).
      mood-neg is a muted brick/clay (darker + duller than One Nation's
      bright orange, browner than Labor red) so the right/wrong-track axis
      never reads as a party hue. */
@@ -90,14 +91,14 @@
      and quieter now, twice the distance, still 4.5:1 as text. */
   --mood-neg: oklch(0.44 0.045 50);
 
-  /* The economic-mood PANEL's lane hues (rd-mood) - one hue per SUBJECT, the
+  /* The economic-confidence PANEL's lane hues (rd-confidence) - one hue per SUBJECT, the
      house's secondary gauge dashed in the same hue. A deep gold / plum pair
      chosen off the yellow-blue axis so the subjects split under every
      dichromacy; clear of the party palette (golden, not One Nation orange;
      violet, not Coalition blue) and deliberately NOT the teal/brick pair
      above - the lanes carry no good/bad valence. */
-  --mood-consumer: oklch(0.60 0.115 83);
-  --mood-business: oklch(0.50 0.105 305);
+  --confidence-consumer: oklch(0.60 0.115 83);
+  --confidence-business: oklch(0.50 0.105 305);
 
   /* The change indicator's direction colours. The standing rule elsewhere is
      that "up" is not inherently good – which is why the NET and the mood axis
@@ -193,9 +194,9 @@ body.dark {
   /* national-mood colours – lifted for dark (brick stays browner/duller than ON) */
   --mood-pos: oklch(0.70 0.105 200);
   --mood-neg: oklch(0.68 0.05 45);
-  /* economic-mood panel lane hues, lifted the same way */
-  --mood-consumer: oklch(0.72 0.115 83);
-  --mood-business: oklch(0.70 0.105 305);
+  /* economic-confidence panel lane hues, lifted the same way */
+  --confidence-consumer: oklch(0.72 0.115 83);
+  --confidence-business: oklch(0.70 0.105 305);
   /* the change indicator, lifted the same way */
   --chg-up:   oklch(0.735 0.135 152);
   --chg-down: oklch(0.700 0.145 25);

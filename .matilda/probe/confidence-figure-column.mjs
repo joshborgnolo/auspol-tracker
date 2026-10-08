@@ -1,10 +1,10 @@
-/* Check: the four mood read-rows lay their headline figures out cleanly.
+/* Check: the four confidence read-rows lay their headline figures out cleanly.
    Desktop/tablet (>560px): the .rd-un-rtop grid gives every figure the SAME
    left edge (a shared column), publisher names sit in their own track, and
    nothing overflows or overlaps. Phone (<=560px): the row wraps to two
    lines — line 1 label+publisher, line 2 figure+change badge, the figure at
    the text column's left edge. Fails (exit 1) on any violation.
-   Run: node .matilda/probe/mood-figure-column.mjs */
+   Run: node .matilda/probe/confidence-figure-column.mjs */
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -37,10 +37,10 @@ async function probe(W, H) {
   const errs = [];
   page.on("pageerror", (e) => errs.push(String(e)));
   await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: "networkidle0", timeout: 60000 });
-  await page.waitForSelector(".rd-mood .rd-un-read", { timeout: 15000 });
+  await page.waitForSelector(".rd-confidence .rd-un-read", { timeout: 15000 });
   await new Promise((r) => setTimeout(r, 400));
   const rows = await page.evaluate(() => {
-    return [...document.querySelectorAll(".rd-mood .rd-un-read")].map((row) => {
+    return [...document.querySelectorAll(".rd-confidence .rd-un-read")].map((row) => {
       const r = (n) => { const b = n ? n.getBoundingClientRect() : null; return b ? { x: +b.left.toFixed(1), y: +b.top.toFixed(1), w: +b.width.toFixed(1), r: +(b.left + b.width).toFixed(1) } : null; };
       const txt = row.children[1];
       return {
@@ -112,5 +112,5 @@ for (const [W, H] of [[1280, 900], [820, 900], [390, 844], [320, 844]]) {
 
 await browser.close();
 server.close();
-console.log(failures ? `\n${failures} FAILURES` : "\nAll mood-figure-column checks passed.");
+console.log(failures ? `\n${failures} FAILURES` : "\nAll confidence-figure-column checks passed.");
 process.exit(failures ? 1 : 0);

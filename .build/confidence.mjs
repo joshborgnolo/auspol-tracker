@@ -1,6 +1,6 @@
-/* mood.mjs – builds data/mood.json, the business- and consumer-confidence
-   series behind the Snapshot panel "The mood" (below Decidedness) and its
-   Info glossary entry. Four series, two per side of the mood:
+/* confidence.mjs – builds data/confidence.json, the business- and consumer-confidence
+   series behind the Snapshot panel "The confidence" (below Decidedness) and its
+   Info glossary entry. Four series, two per side of the confidence:
      consumer – ANZ-Roy Morgan Consumer Confidence, weekly; the feed's topic
                 index is dense from August 2019 (a few isolated items earlier).
      business – Roy Morgan Business Confidence, monthly since 2019.
@@ -30,7 +30,7 @@
    printed change), so no per-post fetches are needed.
 
    The figure grammar (parseText) was shaped offline against a full dump of
-   both topics (.matilda/probe/mood-grammar.mjs): five patterns cover every
+   both topics (.matilda/probe/confidence-grammar.mjs): five patterns cover every
    headline form the desk has used. A row files only when its value lands in
    the series' plausible band; when title and summary BOTH carry the value
    they must agree (the headline title wins the one disagreement on record);
@@ -57,21 +57,21 @@
    Runs itself: the weekly crosstabs-update workflow (.build/crosstabs-updater.sh)
    calls it; steady-state runs fetch page 1 of each topic and stop (any
    release older than the newest recorded row by more than STRAGGLER_MARGIN_DAYS
-   is already on file). First run (no data/mood.json) backfills both topics
+   is already on file). First run (no data/confidence.json) backfills both topics
    to their starts.
 
    Automation contract (same as the poll extractors):
    - idempotent: re-running with unchanged upstream data writes nothing
    - exit 0 = success (changed or not); final stdout line is
-     `MOOD_STATUS {json}` with changed, added, rows, newest, stale
+     `CONFIDENCE_STATUS {json}` with changed, added, rows, newest, stale
    - exit 1 = fetch/parse error; exit 2 = a safety guard tripped (a topic
      page returned no candidates at all — the feed's item shape changed —
      or the consumer series lost every post-2016 wave)
-   - --check computes everything, prints MOOD_STATUS, never writes
+   - --check computes everything, prints CONFIDENCE_STATUS, never writes
    - --feed-dir <dir> reads saved fixtures (<topic>-page-N.json) instead of
      fetching (test seam, same shape as extract-roymorgan.mjs)
    - writes are atomic (.tmp + rename) */
-/* MOOD_LIB=1: import the grammar/series/table constants (tests) without
+/* CONFIDENCE_LIB=1: import the grammar/series/table constants (tests) without
    running the extraction. Same pattern as extract-roymorgan.mjs's RM_LIB. */
 import { readFileSync, existsSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -101,7 +101,7 @@ const ENRICH_SINCE = ENRICH_ALL && /^\d{4}-\d{2}-\d{2}$/.test(argv[argv.indexOf(
 const FEED_BASE = "https://wp.roymorgan.com/wp-json/rmr/v1/findings-search";
 // The posting page a row links to.
 const postUrl = (slug) => `https://www.roymorgan.com/findings/${slug}`;
-const OUT = "data/mood.json";
+const OUT = "data/confidence.json";
 // Hard ceiling on the page walk (any mode) so a stop-miss can never fetch
 // without bound; the consumer topic is ~47 pages deep at present.
 const MAX_FEED_PAGES = 70;
@@ -198,7 +198,7 @@ function parseText(s, anchor, band) {
 }
 
 // ===================== Westpac–MI consumer sentiment & NAB business ======
-// Two more sources join data/mood.json (rows share the RM {date, v, chg,
+// Two more sources join data/confidence.json (rows share the RM {date, v, chg,
 // url, slug} shape; NAB rows add cond/condChg/ym):
 //  westpacConsumer – Westpac–Melbourne Institute Consumer Sentiment,
 //                    monthly; coverage Jan 2022 → (the IQ sitemap's own
@@ -282,7 +282,7 @@ async function pdfText(url, dir = NAB_DIR, plain = false) {
   if (cached != null) return cached;
   const res = await fetch(url, { headers: { "user-agent": TRACKER_UA }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
   if (!res.ok) throw new Error(`pdf ${url} HTTP ${res.status}`);
-  const tmp = mkdtempSync(join(tmpdir(), "mood-pdf-"));
+  const tmp = mkdtempSync(join(tmpdir(), "confidence-pdf-"));
   try {
     const p = join(tmp, "m.pdf");
     writeFileSync(p, Buffer.from(await res.arrayBuffer()));
@@ -940,7 +940,7 @@ async function rowsFor(name) {
 // -------------------------------------------------------------------- main
 export { parseText, SERIES, dmyToIso, parseWMDesc, parseNabPdf, nabMeasure, safeName, htmlToText,
          resolveWinYear, parseRmConsumerPdf, parseRmBusinessPost, parseWestpacPdf, parseNabFw, surveyMonthOf };
-if (!process.env.MOOD_LIB) {
+if (!process.env.CONFIDENCE_LIB) {
 const consumer = await rowsFor("consumer");
 const business = await rowsFor("business");
 await enrichRmRows("consumer", consumer);
@@ -949,7 +949,7 @@ const westpac = await westpacRows();
 const nab = await nabRows();
 
 const doc = {
-  _about: "Business and consumer confidence. consumer/business: Roy Morgan's findings feed (weekly, dense from Aug 2019 / monthly since 2019; 100 = neutral). westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment (monthly; IQ-sitemap coverage Jan 2022 →; 100 = neutral). nabBusiness: NAB Monthly Business Survey (monthly; AEM-sitemap coverage Apr 2025 →; the earlier WP-era archive is offline). Rows: {date, v, chg (printed period change; null when none printed or unreconciled), url, slug}. NAB rows add {cond, condChg, ym}; NAB figures are NET BALANCES (0 = neutral) — the site plots them SHIFTED +100 so the shared neutral line holds. Advisory per-release fields, each lane's own release print only: n (sample; NAB's is the printed 'around' figure), fwStart/fwEnd (ISO survey window; business files fwm 'YYYY-MM' instead — the survey month IS its window). Lane details: .build/mood.mjs header.",
+  _about: "Business and consumer confidence. consumer/business: Roy Morgan's findings feed (weekly, dense from Aug 2019 / monthly since 2019; 100 = neutral). westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment (monthly; IQ-sitemap coverage Jan 2022 →; 100 = neutral). nabBusiness: NAB Monthly Business Survey (monthly; AEM-sitemap coverage Apr 2025 →; the earlier WP-era archive is offline). Rows: {date, v, chg (printed period change; null when none printed or unreconciled), url, slug}. NAB rows add {cond, condChg, ym}; NAB figures are NET BALANCES (0 = neutral) — the site plots them SHIFTED +100 so the shared neutral line holds. Advisory per-release fields, each lane's own release print only: n (sample; NAB's is the printed 'around' figure), fwStart/fwEnd (ISO survey window; business files fwm 'YYYY-MM' instead — the survey month IS its window). Lane details: .build/confidence.mjs header.",
   consumer: { label: SERIES.consumer.label, base: "ANZ-Roy Morgan, index, 100 = neutral", rows: consumer },
   business: { label: SERIES.business.label, base: "Roy Morgan, index, 100 = neutral", rows: business },
   westpacConsumer: { label: "Westpac–MI Consumer Sentiment", base: "Westpac–Melbourne Institute, index, 100 = neutral", rows: westpac },
@@ -967,7 +967,7 @@ const stale = KEYS.filter((k) => {
   const rows = doc[k].rows;
   return rows.length && daysAgo(rows[rows.length - 1].date) > (STALE_DAYS[k] ?? 45);
 });
-console.log("MOOD_STATUS " + JSON.stringify({
+console.log("CONFIDENCE_STATUS " + JSON.stringify({
   changed, added,
   rows: Object.fromEntries(KEYS.map((k) => [k, doc[k].rows.length])),
   newest: Object.fromEntries(KEYS.map((k) => [k, doc[k].rows.at(-1)?.date ?? null])),
@@ -977,4 +977,4 @@ console.log("MOOD_STATUS " + JSON.stringify({
   }])),
   stale,
 }));
-} // MOOD_LIB
+} // CONFIDENCE_LIB

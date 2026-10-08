@@ -1,4 +1,4 @@
-/* Probe: the Snapshot's "Economic mood" panel (RdMood, rd-panels.jsx).
+/* Probe: the Snapshot's "Economic confidence" panel (RdMood, rd-panels.jsx).
    The panel's FOUR published gauges sit in TWO views switched by the
    tabs over the chart card — Consumers (ANZ–Roy Morgan's weekly index
    with Westpac–MI's monthly as its dashed twin) opens first; Businesses
@@ -7,7 +7,7 @@
    plus a render-side recency-weighted smooth per series (symmetric
    half-life kernel, 14d on the weekly index, 60d on the monthly ones)
    and prices its own y-domain; NAB is a net balance drawn 100 points up,
-   and the payload D.mood stays the published readings.
+   and the payload D.confidence stays the published readings.
    The plot's x-window opens at the 3 May 2025 election
    (x0 = 2025 + 122/365, gen-data's dx counting); the payload keeps the
    full on-file history, off-screen, so the payload pins below still run
@@ -18,9 +18,9 @@
      SOURCES (node-side):
      - rd-panels.jsx carries the smooth() kernel, hl 14/60 on the lanes,
        smoothed sePoints AND the RAW spine/scatter (rawPoints),
-     - the Info glossary's "mood" entry explains the smoothing
+     - the Info glossary's "confidence" entry explains the smoothing
        (d1a1d215 asset), gen-data §5j's comment promises a raw payload.
-     PAYLOAD (page's window.AP.D.mood vs BASE/data/mood.json):
+     PAYLOAD (page's window.AP.D.confidence vs BASE/data/confidence.json):
      - the polls are exactly the published rows with date >= 2019-08-13
        (gen-data's coverage clip) - value-for-value, date-for-date,
      - latest == the last printed row on each series.
@@ -54,7 +54,7 @@
        under the chart, a desktop labels them on the plot,
      - desktop rungs get one in-chart end label per lane, phone gets none
        and stays inside its viewport;
-     - #mood renders on the default tab with no interaction, and no
+     - #confidence renders on the default tab with no interaction, and no
        page errors on any rung. */
 import puppeteer from "puppeteer-core";
 import fs from "fs";
@@ -71,15 +71,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 /* The four lanes, mirroring rd-panels.jsx: hl per lane, NAB drawn +100;
    each lane belongs to exactly one of the two tab-switched views. */
 const LANES = [
-  { k: "consumer", view: "consumer", hl: 14, gate: 0.5, live: true, color: "var(--mood-consumer)", lab: "Consumers" },
-  { k: "westpacConsumer", view: "consumer", hl: 60, gate: 1.0, live: false, color: "var(--mood-consumer)", lab: "Consumers · Westpac–MI" },
-  { k: "business", view: "business", hl: 60, gate: 1.0, live: true, color: "var(--mood-business)", lab: "Businesses" },
-  { k: "nabBusiness", view: "business", hl: 60, gate: 1.0, live: false, color: "var(--mood-business)", shift: 100, lab: "Businesses · NAB" },
+  { k: "consumer", view: "consumer", hl: 14, gate: 0.5, live: true, color: "var(--confidence-consumer)", lab: "Consumers" },
+  { k: "westpacConsumer", view: "consumer", hl: 60, gate: 1.0, live: false, color: "var(--confidence-consumer)", lab: "Consumers · Westpac–MI" },
+  { k: "business", view: "business", hl: 60, gate: 1.0, live: true, color: "var(--confidence-business)", lab: "Businesses" },
+  { k: "nabBusiness", view: "business", hl: 60, gate: 1.0, live: false, color: "var(--confidence-business)", shift: 100, lab: "Businesses · NAB" },
 ];
 const VIEW_TAB = { consumer: "Consumers", business: "Businesses" };
 const VIEW_HOUSES = { consumer: ["ANZ–Roy Morgan", "Westpac–MI"], business: ["Roy Morgan", "NAB"] };
 const VIEW_DASHKEY = {
-  consumer: "The Westpac–MI monthly read of the same household mood",
+  consumer: "The Westpac–MI monthly read of the same household confidence",
   business: "NAB’s net-balance read, drawn 100 points up",
 };
 /* the read rows name their subject; each view's pair shares it */
@@ -105,12 +105,12 @@ check(panels.includes("smooth(rows.get(l.k), l.hl)"), "series points are the smo
 check(panels.includes("const spine = rawPoints.get(viewLanes[0].k)"), "the hover spine stays the view's raw prints");
 check(panels.includes("scatter={viewLanes.flatMap((l) => rawPoints.get(l.k)"), "the scatter dots stay the view's raw prints");
 check(panels.includes('useState("consumer")'), "the view tabs open on the consumer pair by default");
-check(panels.includes('className="rd-mood-tabs"'), "the consumer/business views ride the shared RdTabs row");
-check(panels.includes('key={"rd-mood-" + view}'), "the chart remounts per view (its pair's own domain)");
+check(panels.includes('className="rd-confidence-tabs"'), "the consumer/business views ride the shared RdTabs row");
+check(panels.includes('key={"rd-confidence-" + view}'), "the chart remounts per view (its pair's own domain)");
 const glossFile = fs.readdirSync(path.join(BASE, ".build/newtracker/assets")).find((f) => f.startsWith("d1a1d215-") && f.endsWith(".js"));
 const gloss = glossFile ? fs.readFileSync(path.join(BASE, ".build/newtracker/assets", glossFile), "utf8") : "";
 const glossFlat = gloss.replace(/\s+/g, " "); /* the JSX source wraps its prose across lines */
-check(glossFlat.includes("Smoothed, not averaged across sources."), "glossary 'mood' entry leads with the smoothing note");
+check(glossFlat.includes("Smoothed, not averaged across sources."), "glossary 'confidence' entry leads with the smoothing note");
 check(glossFlat.includes("recency-weighted kernel (half-life 14 days on the weekly consumer index, 60 days"), "glossary names both half-lives");
 check(glossFlat.includes("NAB is drawn 100 points up."), "glossary discloses the NAB +100 draw");
 check(glossFlat.includes("The chart opens at the May 2025 election"), "glossary dates the chart window to the May 2025 election");
@@ -118,11 +118,11 @@ check(glossFlat.includes("sit in two views, switched by the tabs over the chart 
   "glossary names the two tab-switched views and the consumer default");
 check(panels.includes("const x0 = 2025 + 122 / 365"), "the panel opens the x-window at the 2025 election (x0 = 2025 + 122/365)");
 check(panels.includes("xTicks={rdElectionTicks(x0, x1, narrow, x0)}"), "the x axis uses the election-window tick set (Election + months), not bare years");
-check(panels.includes("const evs = rdChartEvents(D.events, x0, x1).filter((e) => !MOOD_OFF.includes(e.date))"), "the panel marks the window's major events (rdChartEvents over x0..x1, less MOOD_OFF)");
+check(panels.includes("const evs = rdChartEvents(D.events, x0, x1).filter((e) => !CONF_OFF.includes(e.date))"), "the panel marks the window's major events (rdChartEvents over x0..x1, less CONF_OFF)");
 /* the party-politics events kept off this chart, mirroring rd-panels.jsx */
-const MOOD_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
-check(panels.includes('const MOOD_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"]'), "MOOD_OFF names both Coalition splits, Joyce to ONP and Taylor's leadership");
-check(panels.includes('rdEventBadges("mood", evs, x0, x1)'), "a phone's events ride as numbered badges under the \"mood\" key");
+const CONF_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+check(panels.includes('const CONF_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"]'), "CONF_OFF names both Coalition splits, Joyce to ONP and Taylor's leadership");
+check(panels.includes('rdEventBadges("confidence", evs, x0, x1)'), "a phone's events ride as numbered badges under the \"confidence\" key");
 check(panels.includes("events={badges ? badges.events : evs}\n          evt={evtOpen} onEvt={setEvtOpen}"), "the chart takes the events with the controlled evt/onEvt pair");
 const genData = fs.readFileSync(path.join(BASE, ".build/newtracker/gen-data.mjs"), "utf8");
 check(genData.includes("recency-weighted smoothed trend on top (render"), "gen-data §5j comment still promises the raw payload");
@@ -142,7 +142,7 @@ const smooth = (polls, halfLifeDays) => {
   });
 };
 
-const moodJson = JSON.parse(fs.readFileSync(path.join(BASE, "data/mood.json"), "utf8"));
+const confJson = JSON.parse(fs.readFileSync(path.join(BASE, "data/confidence.json"), "utf8"));
 
 /* ============================ browser ============================ */
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: "new", args: ["--no-sandbox"] });
@@ -153,18 +153,18 @@ page.on("pageerror", (e) => pageErrors.push(String(e)));
 async function open(width) {
   await page.setViewport({ width, height: 980, deviceScaleFactor: 1 });
   await page.goto("file://" + path.join(BASE, "index.html"), { waitUntil: "networkidle0", timeout: 60000 });
-  await page.waitForSelector("#mood .rd-xf-now .rd-mood-chart svg.chart-svg path.series-line", { timeout: 30000 });
+  await page.waitForSelector("#confidence .rd-xf-now .rd-confidence-chart svg.chart-svg path.series-line", { timeout: 30000 });
 }
 
 /* walk the tabs over the card to a view; wait until its pair is drawn
    and the other view's lines have left the plot (the crossfade settles) */
 async function switchView(view) {
   await page.evaluate((tab) => {
-    const t = [...document.querySelectorAll("#mood .rd-mood-tabs .rd-tab")].find((b) => (b.textContent || "").trim() === tab);
+    const t = [...document.querySelectorAll("#confidence .rd-confidence-tabs .rd-tab")].find((b) => (b.textContent || "").trim() === tab);
     if (t) t.click();
   }, VIEW_TAB[view] || view);
   await page.waitForFunction((v) => {
-    const svg = document.querySelector("#mood .rd-xf-now .rd-mood-chart svg.chart-svg");
+    const svg = document.querySelector("#confidence .rd-xf-now .rd-confidence-chart svg.chart-svg");
     if (!svg) return false;
     const here = v === "business" ? ["business", "nabBusiness"] : ["consumer", "westpacConsumer"];
     const gone = v === "business" ? ["consumer", "westpacConsumer"] : ["business", "nabBusiness"];
@@ -174,7 +174,7 @@ async function switchView(view) {
   /* the outgoing card lives on as the crossfade's .rd-xf-was ghost for
      MORPH_MS+40; every chart query is already scoped to .rd-xf-now, and
      the switch is only done once the ghost has fully left the DOM */
-  await page.waitForFunction(() => !document.querySelector("#mood .rd-xf-was"), { timeout: 15000 });
+  await page.waitForFunction(() => !document.querySelector("#confidence .rd-xf-was"), { timeout: 15000 });
 }
 
 /* first open: pull the payload the page actually rendered */
@@ -183,21 +183,21 @@ const P = await page.evaluate(() => {
   const D = window.AP.D;
   const pick = (s) => ({ polls: s.polls.map((p) => ({ x: p.x, v: p.v, ym: p.ym, released: p.released })), latest: s.latest });
   const out = { x1: D.domain.x1 };
-  for (const k of ["consumer", "westpacConsumer", "business", "nabBusiness"]) if (D.mood[k]) out[k] = pick(D.mood[k]);
+  for (const k of ["consumer", "westpacConsumer", "business", "nabBusiness"]) if (D.confidence[k]) out[k] = pick(D.confidence[k]);
   return out;
 });
 
-/* ---- payload pins against data/mood.json ---- */
+/* ---- payload pins against data/confidence.json ---- */
 console.log("payload:");
 const live = [];
 for (const lane of LANES) {
   const k = lane.k;
-  check(!!(moodJson[k] && P[k]), `${k}: series present in mood.json and the payload`);
-  if (!(moodJson[k] && P[k])) continue;
+  check(!!(confJson[k] && P[k]), `${k}: series present in confidence.json and the payload`);
+  if (!(confJson[k] && P[k])) continue;
   live.push(lane);
-  const want = moodJson[k].rows.filter((r) => r.date >= "2019-08-13").sort((a, b) => a.date < b.date ? -1 : 1);
+  const want = confJson[k].rows.filter((r) => r.date >= "2019-08-13").sort((a, b) => a.date < b.date ? -1 : 1);
   const got = P[k].polls;
-  check(got.length === want.length, `${k}: ${got.length} readings emitted (mood.json has ${want.length} since 2019-08-13)`);
+  check(got.length === want.length, `${k}: ${got.length} readings emitted (confidence.json has ${want.length} since 2019-08-13)`);
   const same = got.length === want.length && got.every((p, i) => p.released === want[i].date && p.v === want[i].v);
   check(same, `${k}: every emitted reading IS the printed row (date and figure, unsmoothed)`);
   const last = want[want.length - 1];
@@ -221,13 +221,13 @@ console.log("kernel: " + live.map((l) => `${l.k} ${exp[l.k].length} pts (hl ${l.
    rdEventBadges against the live domain (the same machinery the panel
    rides, nothing reimplemented here) */
 const expEvs = await page.evaluate(([ex, ex1, off]) =>
-  rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => !off.includes(e.date)).map((e) => ({ date: e.date, label: e.label })), [x0, x1, MOOD_OFF]);
+  rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => !off.includes(e.date)).map((e) => ({ date: e.date, label: e.label })), [x0, x1, CONF_OFF]);
 const offEvs = await page.evaluate(([ex, ex1, off]) =>
-  rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => off.includes(e.date)).map((e) => ({ date: e.date, label: e.label })), [x0, x1, MOOD_OFF]);
+  rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => off.includes(e.date)).map((e) => ({ date: e.date, label: e.label })), [x0, x1, CONF_OFF]);
 const expList = await page.evaluate(([ex, ex1, off]) => {
-  const b = rdEventBadges("mood", rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => !off.includes(e.date)), ex, ex1);
+  const b = rdEventBadges("confidence", rdChartEvents(window.AP.D.events, ex, ex1).filter((e) => !off.includes(e.date)), ex, ex1);
   return b.list.map((l) => ({ n: l.n, t: l.labels.join(", ") }));
-}, [x0, x1, MOOD_OFF]);
+}, [x0, x1, CONF_OFF]);
 console.log("events: " + expEvs.map((e) => e.date).join(", ") + " (" + expEvs.length + ")");
 
 for (const l of live) {
@@ -250,7 +250,7 @@ for (const l of live) {
    the rest are tick marks, ascending; the axis-label texts come along
    for the name checks). pad read straight off the gridline x1/x2. */
 const fitScales = () => page.evaluate(() => {
-  const root = document.querySelector("#mood .rd-xf-now .rd-mood-chart svg.chart-svg");
+  const root = document.querySelector("#confidence .rd-xf-now .rd-confidence-chart svg.chart-svg");
   if (!root) return null;
   const ys = [...root.querySelectorAll('g[data-k^="y"] line.grid')].map((l) => ({
     t: parseFloat(l.closest("g").getAttribute("data-k").slice(1)),
@@ -339,24 +339,24 @@ async function checkChart(rung, viewKey) {
   check(fit.labels.length >= 3, `${fit.labels.length} axis labels rendered`);
 
   check(await page.evaluate(() => {
-    const el = document.querySelector("#mood");
+    const el = document.querySelector("#confidence");
     return !!el && el.getBoundingClientRect().width > 0;
-  }), "#mood renders on the default tab with no interaction");
+  }), "#confidence renders on the default tab with no interaction");
 
   /* the tabs state: exactly the pair, the current view's pressed; and the
      plot draws ONLY this view's series lines */
-  const tabState = await page.$$eval("#mood .rd-mood-tabs .rd-tab", (els) => els.map((e) => ({ t: (e.textContent || "").trim(), on: e.getAttribute("aria-pressed") })));
+  const tabState = await page.$$eval("#confidence .rd-confidence-tabs .rd-tab", (els) => els.map((e) => ({ t: (e.textContent || "").trim(), on: e.getAttribute("aria-pressed") })));
   check(tabState.length === 2 && (tabState.find((x) => x.t === VIEW_TAB[viewKey]) || {}).on === "true"
     && tabState.every((x) => x.t === VIEW_TAB[viewKey] || x.on === "false"),
     `"${VIEW_TAB[viewKey]}" is the pressed tab of the pair (${tabState.map((x) => x.t + " " + x.on).join(", ")})`);
   for (const o of live.filter((l) => l.view !== viewKey)) {
-    check(!(await page.$(`#mood .rd-xf-now .rd-mood-chart svg.chart-svg path.series-line[data-series="${o.k}"]`)),
+    check(!(await page.$(`#confidence .rd-xf-now .rd-confidence-chart svg.chart-svg path.series-line[data-series="${o.k}"]`)),
       `the other view's ${o.k} line stays off the plot`);
   }
 
   for (const l of vl) {
     const k = l.k;
-    const sel = `#mood .rd-xf-now .rd-mood-chart svg.chart-svg path.series-line[data-series="${k}"]`;
+    const sel = `#confidence .rd-xf-now .rd-confidence-chart svg.chart-svg path.series-line[data-series="${k}"]`;
     const d = await page.$eval(sel, (el) => el.getAttribute("d")).catch(() => null);
     check(!!d, `${k} series line drawn`);
     if (!d) continue;
@@ -386,7 +386,7 @@ async function checkChart(rung, viewKey) {
   /* dots: colours repeat across lanes (Westpac's twin is dashed ink), so
      assert per expected PRINT by proximity, then totals and opacity */
   const allDots = await page.$$eval(
-    "#mood .rd-xf-now .rd-mood-chart svg.chart-svg circle.scatter-dot",
+    "#confidence .rd-xf-now .rd-confidence-chart svg.chart-svg circle.scatter-dot",
     (els) => els.map((e) => ({ cx: parseFloat(e.getAttribute("cx")), cy: parseFloat(e.getAttribute("cy")), fill: e.getAttribute("fill"), op: e.getAttribute("fill-opacity") })));
   const totalWant = vl.reduce((a, l) => a + fil[l.k].length, 0);
   check(allDots.length === totalWant, `scatter: ${allDots.length} raw-print dots across the view's ${vl.length} lanes (${totalWant} readings)`);
@@ -409,7 +409,7 @@ async function checkChart(rung, viewKey) {
     check(!!hit, `${k}: the last print's dot sits exactly on it (${last.released}, ${last.v}${l.shift ? " plotted " + (last.v + l.shift) : ""})`);
   }
 
-  const labels = await texts("#mood .rd-xf-now svg.chart-svg text.end-label");
+  const labels = await texts("#confidence .rd-xf-now svg.chart-svg text.end-label");
   if (rung > 640) {
     check(labels.length === vl.length && vl.every((l) => labels.includes(l.lab)),
       `one in-chart end label per lane of the view (${labels.join(", ")})`);
@@ -424,7 +424,7 @@ async function checkChart(rung, viewKey) {
      aria-hidden g.evt per named event (the redesign sets every name
      after every rule), so the count pins the ruled role="img" groups.
      A phone numbers them and folds the names out under the chart */
-  const evArias = await page.$$eval('#mood .rd-xf-now .rd-mood-chart svg.chart-svg g.evt[role="img"]', (els) => els.map((el) => el.getAttribute("aria-label") || ""));
+  const evArias = await page.$$eval('#confidence .rd-xf-now .rd-confidence-chart svg.chart-svg g.evt[role="img"]', (els) => els.map((el) => el.getAttribute("aria-label") || ""));
   check(expEvs.length > 0 && evArias.length === expEvs.length, `${expEvs.length} marked events ride the chart (${evArias.length} rules)`);
   check(expEvs.every((e) => evArias.some((a) => a.startsWith(e.label))),
     `every windowed event carries its own rule (${expEvs.map((e) => e.date).join(", ")})`);
@@ -435,14 +435,14 @@ async function checkChart(rung, viewKey) {
     check(ev && evArias.some((a) => a.startsWith(ev.label)), `the ${d} event rides the chart ("${ev ? ev.label : "?"}")`);
   }
   if (rung > 640) {
-    check((await page.$$eval("#mood .rd-xf-now .rd-mood-chart svg.chart-svg g.rd-badge circle", (els) => els.length)) === 0,
+    check((await page.$$eval("#confidence .rd-xf-now .rd-confidence-chart svg.chart-svg g.rd-badge circle", (els) => els.length)) === 0,
       "no phone badge row on desktop (the events label themselves)");
-    check((await texts("#mood .rd-xf-now .rd-evdrop")).length === 0, "no events list on desktop");
+    check((await texts("#confidence .rd-xf-now .rd-evdrop")).length === 0, "no events list on desktop");
   } else {
-    const circles = await page.$$eval("#mood .rd-xf-now .rd-mood-chart svg.chart-svg g.rd-badge circle", (els) => els.length);
+    const circles = await page.$$eval("#confidence .rd-xf-now .rd-confidence-chart svg.chart-svg g.rd-badge circle", (els) => els.length);
     check(circles === expEvs.length, `${expEvs.length} numbered event badges ride above the plot (${circles} circles)`);
-    check((await texts("#mood .rd-xf-now .rd-evdrop summary"))[0] === "The marked events", 'the events fold opens with "The marked events"');
-    const lis = await texts("#mood .rd-xf-now .rd-evdrop li");
+    check((await texts("#confidence .rd-xf-now .rd-evdrop summary"))[0] === "The marked events", 'the events fold opens with "The marked events"');
+    const lis = await texts("#confidence .rd-xf-now .rd-evdrop li");
     check(lis.length === expEvs.length, `${expEvs.length} events listed under the chart (${lis.length} rows)`);
     check(expList.every((l) => lis.some((t) => t.includes(l.t))), "each numbered badge's name is in the list");
   }
@@ -464,15 +464,15 @@ const expHead = cSide === "under" && bSide === "under" ? "Confidence is underwat
   : cSide === "above" && bSide === "above" ? "Confidence is above water on both counts."
   : cSide === "under" && bSide === "above" ? "Consumers are underwater; businesses aren’t."
   : cSide === "above" && bSide === "under" ? "Businesses are underwater; consumers aren’t."
-  : "The gauges disagree on which side of the line the mood sits.";
+  : "The gauges disagree on which side of the line the confidence sits.";
 
 async function checkCopy(viewKey) {
   const vl = live.filter((l) => l.view === viewKey);
-  const title = await texts("#mood .rd-title");
+  const title = await texts("#confidence .rd-title");
   check(title[0] === "Economic sentiment", `section title "Economic sentiment" (got "${title[0]}")`);
-  const head = await texts("#mood h3.rd-hed");
-  check(head[0] === expHead, `headline is the data-composed mood verdict ("${head[0]}")`);
-  const dek = (await texts("#mood p.rd-dek"))[0] || "";
+  const head = await texts("#confidence h3.rd-hed");
+  check(head[0] === expHead, `headline is the data-composed confidence verdict ("${head[0]}")`);
+  const dek = (await texts("#confidence p.rd-dek"))[0] || "";
   if (P.consumer) check(dek.includes("Consumers at " + P.consumer.latest.v.toFixed(1)), `dek quotes the RAW ANZ–Roy Morgan consumer print (${P.consumer.latest.v.toFixed(1)})`);
   if (P.business) check(dek.includes("Businesses at " + P.business.latest.v.toFixed(1)), `dek quotes the RAW Roy Morgan business print (${P.business.latest.v.toFixed(1)})`);
   if (P.consumer && P.consumer.latest.chg != null && Math.abs(P.consumer.latest.chg) >= 0.05)
@@ -480,31 +480,31 @@ async function checkCopy(viewKey) {
   if (P.nabBusiness && P.nabBusiness.latest.cond != null)
     check(dek.includes("(conditions " + NICE(P.nabBusiness.latest.cond) + ")"), "dek carries NAB's printed conditions figure");
   /* everything below the tabs speaks for the view's own pair alone */
-  const pt = (await texts("#mood .rd-xf-now .rd-mood-chart .rd-un-ptitle")).join(" ");
+  const pt = (await texts("#confidence .rd-xf-now .rd-confidence-chart .rd-un-ptitle")).join(" ");
   check(pt.includes(VIEW_PTITLE[viewKey]) && pt.includes(VIEW_NOTE[viewKey]),
     `card title is "${VIEW_PTITLE[viewKey]}" with its pair's note (got "${pt.slice(0, 110)}")`);
-  const rn = await texts("#mood .rd-xf-now .rd-mood-chart .rd-un-rtop b");
+  const rn = await texts("#confidence .rd-xf-now .rd-confidence-chart .rd-un-rtop b");
   check(rn.length === vl.length && rn.every((t) => t === VIEW_RDNAME[viewKey]),
     `the view's read rows name "${VIEW_RDNAME[viewKey]}" (${rn.join(" / ")})`);
-  const who = await texts("#mood .rd-xf-now .rd-un-rhouse");
+  const who = await texts("#confidence .rd-xf-now .rd-un-rhouse");
   check(who.length === vl.length && VIEW_HOUSES[viewKey].every((h, i) => who[i] === h),
     `each read row names its house (${who.join(" / ")})`);
-  const rv = await texts("#mood .rd-xf-now .rd-un-rv");
+  const rv = await texts("#confidence .rd-xf-now .rd-un-rv");
   const wantRv = vl.map((l) => laneVfmt(l.k)(P[l.k].latest.v));
   check(rv.length === wantRv.length && wantRv.every((w, i) => rv[i] === w),
     `readout figures are the view's raw prints in lane order (${rv.join(" / ")})`);
-  const key = await texts("#mood .rd-xf-now .rd-ckey .rd-key-item");
+  const key = await texts("#confidence .rd-xf-now .rd-ckey .rd-key-item");
   check(key.some((t) => t === "One release, as printed") && key.some((t) => t === "Smoothed trend of the releases"),
     "key reads dot = one release as printed, line = smoothed trend");
   check(key.some((t) => t === VIEW_DASHKEY[viewKey]), "key names the view's dashed twin gauge");
-  const how = (await texts("#mood details.view-how")).join(" ");
-  check((await texts("#mood details.view-how summary"))[0] === "How to read this chart", "HowTo summary standard");
+  const how = (await texts("#confidence details.view-how")).join(" ");
+  check((await texts("#confidence details.view-how summary"))[0] === "How to read this chart", "HowTo summary standard");
   check(how.includes("split into two views") && how.includes("switched by the tabs"), "HowTo says the gauges split into two tab-switched views");
   check(how.includes("half-life 14 days") && how.includes("60 days on the monthly"), "HowTo names the half-lives");
   check(how.includes("recency-weighted kernel") && how.includes("raw prints"), "HowTo says kernel-smoothed lines, raw-print figures");
   check(how.includes("100 points up") && how.includes("net balance"), "HowTo discloses NAB's net balance and the +100 draw");
   check(how.includes("from the 2025 election on"), "HowTo dates the chart window to the 2025 election");
-  const foot = (await texts("#mood .rd-foot")).join(" ");
+  const foot = (await texts("#confidence .rd-foot")).join(" ");
   check(foot.includes("ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB") && foot.includes("Context, not a predictor"),
     "foot names the four sources and the context caveat");
 }

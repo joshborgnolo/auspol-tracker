@@ -1,14 +1,14 @@
-/* Tests for mood-history.mjs — the extractor behind data/mood-history.json
-   (the deep monthly back-history sibling of the mood panel's data/mood.json).
-   Three stages, same shape as test-mood.mjs:
-     1. MOOD_HISTORY_LIB import: parseYearGrid / parseH3 / guardLane pins
+/* Tests for confidence-history.mjs — the extractor behind data/confidence-history.json
+   (the deep monthly back-history sibling of the confidence panel's data/confidence.json).
+   Three stages, same shape as test-confidence.mjs:
+     1. CONFIDENCE_HISTORY_LIB import: parseYearGrid / parseH3 / guardLane pins
         (footnote-marked cells, yearly-average column ignored, name-located
         H3 columns, contiguity/range/floor/first-month trips).
      2. --fixture-dir subprocess: synthetic full-depth fixtures drive the
         pipeline in a temp cwd — status shape, idempotency, --check, a
         guard trip on a shapeless page.
-     3. Live structural pins on the committed data/mood-history.json.
-   Run: node .build/test-mood-history.mjs */
+     3. Live structural pins on the committed data/confidence-history.json.
+   Run: node .build/test-confidence-history.mjs */
 import fs from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
@@ -16,10 +16,10 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SCRIPT = path.join(ROOT, ".build", "mood-history.mjs");
+const SCRIPT = path.join(ROOT, ".build", "confidence-history.mjs");
 
-process.env.MOOD_HISTORY_LIB = "1";
-const { parseYearGrid, parseH3, guardLane } = await import("./mood-history.mjs");
+process.env.CONFIDENCE_HISTORY_LIB = "1";
+const { parseYearGrid, parseH3, guardLane } = await import("./confidence-history.mjs");
 
 /* ---------------------------------------------------------------- 1. parsers */
 // footnote-marked cells parse; the yearly-average column is ignored; a
@@ -91,7 +91,7 @@ assert.throws(() => parseYearGrid("<p>no tables here</p>"), /no YEAR×month grid
 console.log("1. parsers + guards: OK");
 
 /* ------------------------------------------------------- 2. fixture pipeline */
-const tmp = fs.mkdtempSync(path.join("/tmp/", "mood-history-test-"));
+const tmp = fs.mkdtempSync(path.join("/tmp/", "confidence-history-test-"));
 fs.mkdirSync(path.join(tmp, "data"));
 const FIX = path.join(tmp, "fixtures");
 fs.mkdirSync(FIX);
@@ -172,7 +172,7 @@ fs.writeFileSync(path.join(FIX, "h3.csv"), h3Lines.join("\n"));
 
 const run = (args = []) => {
   const env = { ...process.env };
-  delete env.MOOD_HISTORY_LIB;
+  delete env.CONFIDENCE_HISTORY_LIB;
   let out = "", status = 0;
   try { out = execFileSync("node", [SCRIPT, "--fixture-dir", FIX, ...args], { cwd: tmp, encoding: "utf8", env }); }
   catch (e) { status = e.status; out = (e.stdout || "") + (e.stderr || ""); }
@@ -181,11 +181,11 @@ const run = (args = []) => {
 {
   const { out, status } = run();
   assert.equal(status, 0, out);
-  const st = JSON.parse(out.trim().split("\n").at(-1).replace(/^MOOD_HISTORY_STATUS /, ""));
+  const st = JSON.parse(out.trim().split("\n").at(-1).replace(/^CONFIDENCE_HISTORY_STATUS /, ""));
   assert.equal(st.changed, true, "first run writes");
   assert.deepEqual(st.oldest, { consumer: "1973-03", business: "2010-12", westpacConsumer: "2010-01", nabConditions: "1997-03" });
   assert.deepEqual(st.newest, { consumer: "2026-09", business: "2026-05", westpacConsumer: "2026-10", nabConditions: "2026-08" });
-  const doc = JSON.parse(fs.readFileSync(path.join(tmp, "data", "mood-history.json"), "utf8"));
+  const doc = JSON.parse(fs.readFileSync(path.join(tmp, "data", "confidence-history.json"), "utf8"));
   assert.equal(doc.consumer.rows.length, st.rows.consumer);
   assert.equal(doc.consumer.rows.at(-1).ym, "2026-09");
   assert.equal(doc.westpacConsumer.rows[0].ym, "2010-01", "westpac starts 2010-01");
@@ -193,7 +193,7 @@ const run = (args = []) => {
   // idempotent second run
   const second = run();
   assert.equal(second.status, 0, second.out);
-  const st2 = JSON.parse(second.out.trim().split("\n").at(-1).replace(/^MOOD_HISTORY_STATUS /, ""));
+  const st2 = JSON.parse(second.out.trim().split("\n").at(-1).replace(/^CONFIDENCE_HISTORY_STATUS /, ""));
   assert.equal(st2.changed, false, "unchanged upstream writes nothing");
   assert.equal(st2.added.consumer.length, 0);
   // --check computes but never writes (nab keeps its publication lag: its
@@ -202,14 +202,14 @@ const run = (args = []) => {
     + "\n01/09/2026,8.8,9.1,1000,,3.1\n01/10/2026,8.8,9.1,1000,,2.8\n01/11/2026,8.8,9.1,1000,81.1,2.5");
   const chk = run(["--check"]);
   assert.equal(chk.status, 0, chk.out);
-  const st3 = JSON.parse(chk.out.trim().split("\n").at(-1).replace(/^MOOD_HISTORY_STATUS /, ""));
+  const st3 = JSON.parse(chk.out.trim().split("\n").at(-1).replace(/^CONFIDENCE_HISTORY_STATUS /, ""));
   assert.equal(st3.changed, true, "new h3 month detected");
-  const onDisk = JSON.parse(fs.readFileSync(path.join(tmp, "data", "mood-history.json"), "utf8"));
+  const onDisk = JSON.parse(fs.readFileSync(path.join(tmp, "data", "confidence-history.json"), "utf8"));
   assert.equal(onDisk.westpacConsumer.rows.at(-1).ym, "2026-10", "--check never writes");
   // then the real run files it
   const third = run();
   assert.equal(third.status, 0, third.out);
-  const st4 = JSON.parse(third.out.trim().split("\n").at(-1).replace(/^MOOD_HISTORY_STATUS /, ""));
+  const st4 = JSON.parse(third.out.trim().split("\n").at(-1).replace(/^CONFIDENCE_HISTORY_STATUS /, ""));
   assert.deepEqual(st4.added.westpacConsumer, ["2026-11"], "the pending month files on the next real run");
   assert.deepEqual(st4.added.nabConditions, ["2026-09", "2026-10", "2026-11"], "nab fills its lagged cells too");
   // guard trip: shapeless page → exit 2
@@ -222,7 +222,7 @@ console.log("2. fixture pipeline: OK");
 
 /* ------------------------------------------------ 3. committed data sanity */
 {
-  const doc = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "mood-history.json"), "utf8"));
+  const doc = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "confidence-history.json"), "utf8"));
   assert.deepEqual(Object.keys(doc), ["_about", "consumer", "business", "westpacConsumer", "nabConditions"]);
   assert.ok(doc.consumer.rows.length >= 550 && doc.consumer.rows[0].ym === "1973-03");
   assert.ok(doc.business.rows.length >= 170 && doc.business.rows[0].ym === "2010-12");
@@ -238,7 +238,7 @@ console.log("2. fixture pipeline: OK");
     assert.ok(yms.has(ym), `committed consumer history missing ${ym}`);
     m++; if (m > 12) { m = 1; y++; }
   }
-  console.log("3. committed data/mood-history.json: OK",
+  console.log("3. committed data/confidence-history.json: OK",
     Object.fromEntries(["consumer", "business", "westpacConsumer", "nabConditions"].map((k) => [k, doc[k].rows.length])));
 }
-console.log("all mood-history tests passed");
+console.log("all confidence-history tests passed");

@@ -1,5 +1,5 @@
-/* mood-history.mjs – builds data/mood-history.json, the DEEP back-history
-   sibling of data/mood.json behind the Snapshot panel "The mood". One row
+/* confidence-history.mjs – builds data/confidence-history.json, the DEEP back-history
+   sibling of data/confidence.json behind the Snapshot panel "The confidence". One row
    per SURVEY MONTH, four lanes:
      consumer – ANZ-Roy Morgan Consumer Confidence monthly, Mar 1973 →
                 (quarterly to 1986, monthly from Jan 1987), read from Roy
@@ -7,21 +7,21 @@
                 The table's figure for a month since Oct 2010 is the average
                 of that month's weekly readings; the WEEKLY series itself
                 (Aug 2008 →) is mirrored nowhere free — weekly history lives
-                in data/mood.json only (Dec 2016 →).
+                in data/confidence.json only (Dec 2016 →).
      business – Roy Morgan Business Confidence, Dec 2010 → (the series'
                 inception), read from RM's own mirror table page. The mirror
                 can trail the newest couple of months; recent months are the
-                live lane's business (data/mood.json), which reconciles on
+                live lane's business (data/confidence.json), which reconciles on
                 the overlap.
      westpacConsumer – Westpac–Melbourne Institute Consumer Sentiment,
                 Jan 2010 →, from RBA Statistical Table H3 (csv/h3-data.csv,
-                series GICWMICS). The values match data/mood.json's live
+                series GICWMICS). The values match data/confidence.json's live
                 westpac lane 1:1 over its 2022 → overlap. The 1974–2009
                 archive is a paid Melbourne Institute product — not here.
      nabConditions – NAB monthly business CONDITIONS as RBA H3 carries
                 them: seasonally adjusted, deviation from the long-run
                 average, percentage points, Mar 1997 → (series GICNBC).
-                NOT the same basis as data/mood.json's raw net-balance
+                NOT the same basis as data/confidence.json's raw net-balance
                 `cond` (the difference wobbles month to month —
                 seasonal/reference effects — so no arithmetic conversion is
                 ever derived or applied). NAB business CONFIDENCE proper
@@ -34,9 +34,9 @@
    The Roy Morgan consumer table carries footnote-marked cells
    ("94.7#", "72.1**") — the mark is stripped, the figure kept.
 
-   Automation contract (same as mood.mjs):
+   Automation contract (same as confidence.mjs):
    - idempotent: re-running with unchanged upstream data writes nothing
-   - exit 0 = success; final stdout line is `MOOD_HISTORY_STATUS {json}`
+   - exit 0 = success; final stdout line is `CONFIDENCE_HISTORY_STATUS {json}`
    - exit 1 = fetch/parse error; exit 2 = a structure guard tripped (page
      payload missing, year grid gone, implausible figure, series depth or
      contiguity floor broken)
@@ -44,7 +44,7 @@
    - --fixture-dir <dir> reads saved copies (cc.html, bc.html, h3.csv)
      instead of fetching (test seam)
    - writes are atomic (.tmp + rename) */
-/* MOOD_HISTORY_LIB=1: import the parsers (tests) without running. */
+/* CONFIDENCE_HISTORY_LIB=1: import the parsers (tests) without running. */
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { TRACKER_UA, FETCH_TIMEOUT_MS, FETCH_TRIES, writeAtomic } from "./extract-common.mjs";
@@ -53,7 +53,7 @@ const argv = process.argv.slice(2);
 const argOf = (k) => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : null);
 const CHECK = argv.includes("--check");
 const FIXTURE_DIR = argOf("--fixture-dir");
-const OUT = "data/mood-history.json";
+const OUT = "data/confidence-history.json";
 
 const RM_CC_URL = "https://www.roymorgan.com/morgan-poll/consumer-confidence-anz-roy-morgan-australian-cc-monthly-ratings";
 const RM_BC_URL = "https://www.roymorgan.com/morgan-poll/consumer-confidence-roy-morgan-business-confidence";
@@ -172,7 +172,7 @@ function nextDataContent(html, label) {
 
 export { parseYearGrid, parseH3, guardLane, nextDataContent, RM_CC_URL, RM_BC_URL, H3_CSV_URL };
 
-if (!process.env.MOOD_HISTORY_LIB) {
+if (!process.env.CONFIDENCE_HISTORY_LIB) {
   const prev = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : null;
   const grab = (file, label, url) =>
     FIXTURE_DIR ? readFileSync(join(FIXTURE_DIR, file), "utf8") : fetchWithRetry(label, url);
@@ -190,7 +190,7 @@ if (!process.env.MOOD_HISTORY_LIB) {
 
     const rowsOf = (yms, map) => yms.map((ym) => ({ ym, v: map.get(ym) }));
     doc = {
-      _about: "Deep back-history for the Snapshot's mood series — one row per SURVEY MONTH, {ym, v}; the monthly-frequency sibling of data/mood.json (recent months reconcile there). consumer: ANZ–Roy Morgan Consumer Confidence, Mar 1973 → (quarterly to 1986, monthly from Jan 1987), from Roy Morgan's own monthly-ratings table (roymorgan.com/morgan-poll/consumer-confidence-anz-roy-morgan-australian-cc-monthly-ratings); since Oct 2010 each month is the average of that month's weekly readings — the WEEKLY series (Aug 2008 →) is mirrored nowhere free and lives in data/mood.json (Dec 2016 →) only. business: Roy Morgan Business Confidence, Dec 2010 → (series inception), RM's own mirror table (roymorgan.com/morgan-poll/consumer-confidence-roy-morgan-business-confidence) — the mirror can trail the newest couple of months. westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment, Jan 2010 →, RBA Statistical Table H3 series GICWMICS (rba.gov.au/statistics/tables); matches data/mood.json's live lane 1:1 over the overlap. The 1974–2009 archive is a paid Melbourne Institute product. nabConditions: NAB monthly business conditions, DEVIATION FROM LONG-RUN AVERAGE, sa, percentage points, Mar 1997 →, RBA H3 series GICNBC — never arithmetic-merge with the raw net-balance `cond` in data/mood.json (different basis by source definition). NAB business CONFIDENCE (net balance, since 1989) has no free machine-readable source. Never hand-edit; regenerated by .build/mood-history.mjs.",
+      _about: "Deep back-history for the Snapshot's confidence series — one row per SURVEY MONTH, {ym, v}; the monthly-frequency sibling of data/confidence.json (recent months reconcile there). consumer: ANZ–Roy Morgan Consumer Confidence, Mar 1973 → (quarterly to 1986, monthly from Jan 1987), from Roy Morgan's own monthly-ratings table (roymorgan.com/morgan-poll/consumer-confidence-anz-roy-morgan-australian-cc-monthly-ratings); since Oct 2010 each month is the average of that month's weekly readings — the WEEKLY series (Aug 2008 →) is mirrored nowhere free and lives in data/confidence.json (Dec 2016 →) only. business: Roy Morgan Business Confidence, Dec 2010 → (series inception), RM's own mirror table (roymorgan.com/morgan-poll/consumer-confidence-roy-morgan-business-confidence) — the mirror can trail the newest couple of months. westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment, Jan 2010 →, RBA Statistical Table H3 series GICWMICS (rba.gov.au/statistics/tables); matches data/confidence.json's live lane 1:1 over the overlap. The 1974–2009 archive is a paid Melbourne Institute product. nabConditions: NAB monthly business conditions, DEVIATION FROM LONG-RUN AVERAGE, sa, percentage points, Mar 1997 →, RBA H3 series GICNBC — never arithmetic-merge with the raw net-balance `cond` in data/confidence.json (different basis by source definition). NAB business CONFIDENCE (net balance, since 1989) has no free machine-readable source. Never hand-edit; regenerated by .build/confidence-history.mjs.",
       consumer: { label: "ANZ–Roy Morgan Consumer Confidence (monthly)", base: "Roy Morgan, index, 100 = neutral", source: RM_CC_URL, rows: rowsOf(cc, consumerMap) },
       business: { label: "Roy Morgan Business Confidence", base: "Roy Morgan, index, 100 = neutral", source: RM_BC_URL, rows: rowsOf(bc, businessMap) },
       westpacConsumer: { label: "Westpac–MI Consumer Sentiment", base: "Westpac–Melbourne Institute, index, 100 = neutral (sa)", source: H3_CSV_URL, seriesId: "GICWMICS", rows: rowsOf(wp, westpac) },
@@ -210,7 +210,7 @@ if (!process.env.MOOD_HISTORY_LIB) {
     const prevSet = new Set((((prev || {})[k] || {}).rows || []).map((x) => x.ym));
     added[k] = doc[k].rows.filter((x) => !prevSet.has(x.ym)).map((x) => x.ym);
   }
-  console.log("MOOD_HISTORY_STATUS " + JSON.stringify({
+  console.log("CONFIDENCE_HISTORY_STATUS " + JSON.stringify({
     changed,
     added,
     rows: Object.fromEntries(KEYS.map((k) => [k, doc[k].rows.length])),

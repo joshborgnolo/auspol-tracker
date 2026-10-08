@@ -1,14 +1,14 @@
-/* Tests for mood.mjs — the extractor behind data/mood.json and the
-   Snapshot's "The economic mood" panel. Three stages:
-     1. MOOD_LIB import: parseText grammar pins against real feed headlines
+/* Tests for confidence.mjs — the extractor behind data/confidence.json and the
+   Snapshot's "The economic confidence" panel. Three stages:
+     1. CONFIDENCE_LIB import: parseText grammar pins against real feed headlines
         (the forms the desk has actually used, copied from the 2019–2026
         dump), out-of-band rejection, NZ/Indonesia filters.
      2. --feed-dir subprocess: a synthetic two-topic fixture drives the full
         pipeline in a temp cwd — title-wins disagreement, chain
         reconciliation dropping a printed change, idempotency, guard trips.
-     3. Live structural pins on the committed data/mood.json (drift-tolerant:
+     3. Live structural pins on the committed data/confidence.json (drift-tolerant:
         counts are >=, not ==).
-   Run: node .build/test-mood.mjs */
+   Run: node .build/test-confidence.mjs */
 import fs from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
@@ -16,11 +16,11 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MOOD = path.join(ROOT, ".build", "mood.mjs");
+const CONFIDENCE = path.join(ROOT, ".build", "confidence.mjs");
 
-process.env.MOOD_LIB = "1";
+process.env.CONFIDENCE_LIB = "1";
 const { parseText, SERIES, dmyToIso, parseWMDesc, parseNabPdf, nabMeasure, safeName,
-        resolveWinYear, parseRmConsumerPdf, parseRmBusinessPost, parseWestpacPdf, parseNabFw, surveyMonthOf } = await import("./mood.mjs");
+        resolveWinYear, parseRmConsumerPdf, parseRmBusinessPost, parseWestpacPdf, parseNabFw, surveyMonthOf } = await import("./confidence.mjs");
 
 /* ---------------------------------------------------------------- 1. grammar */
 const C = { anchor: SERIES.consumer.anchor, band: SERIES.consumer.band };
@@ -289,7 +289,7 @@ assert.deepEqual(surveyMonthOf({ slug: "roy-morgan-business-confidence-plummeted
 console.log("1c. enrichment grammar: OK");
 
 /* ------------------------------------------------------- 2. full pipeline */
-const tmp = fs.mkdtempSync(path.join(fs.realpathSync.native ? "/tmp/" : "/tmp/", "mood-test-"));
+const tmp = fs.mkdtempSync(path.join(fs.realpathSync.native ? "/tmp/" : "/tmp/", "confidence-test-"));
 fs.mkdirSync(path.join(tmp, "data"));
 const FEED = path.join(tmp, "feed-src");
 const WP_DIR = path.join(tmp, "westpac-src");
@@ -299,9 +299,9 @@ fs.mkdirSync(WP_DIR);
 fs.mkdirSync(NAB_DIR);
 const run = (dir, args = []) => {
   const env = { ...process.env };
-  delete env.MOOD_LIB; // the import-stage lib seam must not leak into the child
+  delete env.CONFIDENCE_LIB; // the import-stage lib seam must not leak into the child
   let out = "", status = 0;
-  try { out = execFileSync("node", [MOOD, ...args, "--feed-dir", dir, "--westpac-dir", WP_DIR, "--nab-dir", NAB_DIR], { cwd: tmp, encoding: "utf8", env }); }
+  try { out = execFileSync("node", [CONFIDENCE, ...args, "--feed-dir", dir, "--westpac-dir", WP_DIR, "--nab-dir", NAB_DIR], { cwd: tmp, encoding: "utf8", env }); }
   catch (e) { status = e.status; out = (e.stdout || "") + (e.stderr || ""); }
   return { out, status };
 };
@@ -462,14 +462,14 @@ fix(NAB_DIR, PDF_O, ".txt", [
 
 const first = run(FEED);
 assert.equal(first.status, 0, first.out);
-const m = first.out.match(/MOOD_STATUS (\{.*\})/);
-assert.ok(m, "MOOD_STATUS line printed");
+const m = first.out.match(/CONFIDENCE_STATUS (\{.*\})/);
+assert.ok(m, "CONFIDENCE_STATUS line printed");
 const st = JSON.parse(m[1]);
 assert.equal(st.changed, true);
 assert.equal(st.rows.consumer, 4, "four parseable consumer waves");
 assert.equal(st.rows.business, 4, "four business waves");
 assert.deepEqual(st.added.consumer, ["2026-08-18", "2026-09-15", "2026-09-22", "2026-09-29"]);
-const doc = JSON.parse(fs.readFileSync(path.join(tmp, "data", "mood.json"), "utf8"));
+const doc = JSON.parse(fs.readFileSync(path.join(tmp, "data", "confidence.json"), "utf8"));
 const consRows = Object.fromEntries(doc.consumer.rows.map((r) => [r.date, r]));
 assert.equal(consRows["2026-08-18"].v, 81.5);
 assert.equal(consRows["2026-08-18"].chg, 0.1, "first row keeps its printed change (no chain yet)");
@@ -545,11 +545,11 @@ assert.equal(nRows["2026-09-09"].n, 350, "the September wave's n rides the plain
 assert.deepEqual([nRows["2026-09-09"].fwStart, nRows["2026-09-09"].fwEnd], ["2026-09-01", "2026-09-08"], "its window too");
 
 // idempotent: rerun, no write, changed:false
-const before = fs.readFileSync(path.join(tmp, "data", "mood.json"), "utf8");
+const before = fs.readFileSync(path.join(tmp, "data", "confidence.json"), "utf8");
 const again = run(FEED);
 assert.equal(again.status, 0, again.out);
 assert.ok(again.out.includes('"changed":false'), "second run unchanged: " + again.out.split("\n").pop());
-assert.equal(fs.readFileSync(path.join(tmp, "data", "mood.json"), "utf8"), before, "file bytes identical");
+assert.equal(fs.readFileSync(path.join(tmp, "data", "confidence.json"), "utf8"), before, "file bytes identical");
 
 // cohort backfill: strip the advisory fields off the on-file rows, then
 // `--enrich-all <ISO>` must re-read only rows released on/after the date —
@@ -563,16 +563,16 @@ seeded.consumer.rows = seeded.consumer.rows.map((r) => stripRow(r, ADVISORY));
 seeded.business.rows = seeded.business.rows.map((r) => stripRow(r, [...ADVISORY, "fwm"])); // re-derives off the slug, no fetch
 seeded.westpacConsumer.rows = seeded.westpacConsumer.rows.map((r) => stripRow(r, ADVISORY));
 seeded.nabBusiness.rows = seeded.nabBusiness.rows.map((r) => stripRow(r, ADVISORY));
-fs.writeFileSync(path.join(tmp, "data", "mood.json"), JSON.stringify(seeded, null, 1) + "\n");
+fs.writeFileSync(path.join(tmp, "data", "confidence.json"), JSON.stringify(seeded, null, 1) + "\n");
 const cohort = run(FEED, ["--enrich-all", "2026-09-20"]);
 assert.equal(cohort.status, 0, cohort.out);
-const cst = JSON.parse(cohort.out.match(/MOOD_STATUS (\{.*\})/)[1]);
+const cst = JSON.parse(cohort.out.match(/CONFIDENCE_STATUS (\{.*\})/)[1]);
 assert.deepEqual(cst.rows, { consumer: 4, business: 4, westpacConsumer: 2, nabBusiness: 2 }, "a bound never costs a wave row");
 assert.deepEqual(cst.enrich.consumer, { n: 2, fw: 2 }, "bound 09-20 re-reads the 09-22 and 09-29 waves only");
 assert.deepEqual(cst.enrich.business, { n: 0, fw: 4 }, "every business wave is pre-bound: no n fetched, but fwm still derives off the slug");
 assert.deepEqual(cst.enrich.westpacConsumer, { n: 0, fw: 0 }, "September's bulletin is pre-bound; October's has none");
 assert.deepEqual(cst.enrich.nabBusiness, { n: 0, fw: 0 }, "both NAB waves pre-date the bound");
-const cdoc = JSON.parse(fs.readFileSync(path.join(tmp, "data", "mood.json"), "utf8"));
+const cdoc = JSON.parse(fs.readFileSync(path.join(tmp, "data", "confidence.json"), "utf8"));
 const cRows = Object.fromEntries(cdoc.consumer.rows.map((r) => [r.date, r]));
 assert.equal(cRows["2026-09-29"].n, 1019, "the newest wave is inside the cohort");
 assert.deepEqual([cRows["2026-09-22"].fwStart, cRows["2026-09-22"].fwEnd], ["2026-09-16", "2026-09-22"], "the 09-22 wave is inside the cohort");
@@ -594,8 +594,8 @@ const guard = run(emptyDir);
 assert.equal(guard.status, 2, "empty first page trips the guard");
 console.log("2. pipeline: OK");
 
-/* ------------------------------------------- 3. live data/mood.json pins */
-const live = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "mood.json"), "utf8"));
+/* ------------------------------------------- 3. live data/confidence.json pins */
+const live = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "confidence.json"), "utf8"));
 for (const [k, band] of [["consumer", SERIES.consumer.band], ["business", SERIES.business.band]]) {
   const rows = live[k].rows;
   assert.ok(rows.length >= (k === "consumer" ? 300 : 80), k + " has hundreds of waves");
@@ -688,4 +688,4 @@ for (const k of ["westpacConsumer", "nabBusiness"]) {
   assert.equal(new Set(dates).size, dates.length, k + " has no duplicate dates");
 }
 console.log("3. live data: OK");
-console.log("test-mood: all pass");
+console.log("test-confidence: all pass");

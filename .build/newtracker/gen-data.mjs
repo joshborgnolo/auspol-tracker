@@ -1944,16 +1944,29 @@ const SEC_ISSUES_FILE = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "sec-issues.json"), "utf8")); }
   catch { return null; }
 })();
-/* The mood panel's series (§5j): four published confidence gauges — the
-   ANZ–Roy Morgan and Roy Morgan index series, Westpac–MI consumer
+/* The confidence panel's series (§5j): four published confidence gauges —
+   the ANZ–Roy Morgan and Roy Morgan index series, Westpac–MI consumer
    sentiment and NAB's monthly business survey (a net balance the panel
    draws shifted +100; this payload keeps its printed figures) — built by
-   .build/mood.mjs from each house's own releases. The panel dots these
-   prints raw and draws a recency-weighted smoothed trend on top (render
-   side, rd-panels.jsx) - this payload stays the published readings. */
-const MOOD_FILE = (() => {
+   .build/confidence.mjs from each house's own releases. The panel dots
+   these prints raw and draws a recency-weighted smoothed trend on top
+   (render side, rd-panels.jsx) - this payload stays the published
+   readings. */
+const CONF_FILE = (() => {
   if (JUR) return null;   // federal side data – absent for another jurisdiction
-  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "mood.json"), "utf8")); }
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "confidence.json"), "utf8")); }
+  catch { return null; }
+})();
+/* Its DEEP back-history (§5k): the four gauges back to their series
+   starts (consumer 1973, NAB conditions 1997, Westpac 2010, business
+   2010), built by .build/confidence-history.mjs — one row per survey
+   month {ym, v}, the monthly-frequency sibling of the releases file.
+   This is what the past-term bands and the draw-a-term lines are
+   aligned from; the current term never reads it (its monthly rows
+   duplicate the live releases, which win). */
+const CONF_HISTORY_FILE = (() => {
+  if (JUR) return null;   // federal side data – absent for another jurisdiction
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "confidence-history.json"), "utf8")); }
   catch { return null; }
 })();
 const ISSUE_SHARED = ["col", "housing", "health", "economy", "immigration", "climate", "crime", "security"];
@@ -2396,23 +2409,23 @@ const firmness = firmWaves.length >= FIRM_POOL ? (() => {
   };
 })() : null;
 
-/* ---- 5j. the mood – business and consumer confidence -----------------------
-   Four published sentiment gauges on one plot (data/mood.json, built by
-   .build/mood.mjs from each house's own releases): the ANZ-Roy Morgan
-   Consumer Confidence weekly reading and Westpac–Melbourne Institute's
-   monthly Consumer Sentiment; Roy Morgan's monthly Business Confidence and
-   the NAB Monthly Business Survey. The first three are index series with
-   100 as neutral; NAB prints a NET BALANCE (share optimistic minus
-   pessimistic, 0 = neutral) – its rows stay true published figures and the
-   PANEL shifts the line +100 so the shared neutral line holds. Conditions
-   (cond/condChg) ride the NAB rows for the read-row text. Like the
-   undecided lines these are each house's own series, not an aggregate – no
-   house effect is estimable against a single publisher, and no
-   election-result anchor exists to adjust toward. The panel draws the
-   published series; the current reading is the latest release, with the
-   change it printed. */
-const mood = MOOD_FILE ? Object.fromEntries(["consumer", "westpacConsumer", "business", "nabBusiness"].map((k) => {
-  const s = MOOD_FILE[k];
+/* ---- 5j. economic sentiment – business and consumer confidence ---------
+   Four published sentiment gauges on one plot (data/confidence.json, built
+   by .build/confidence.mjs from each house's own releases): the ANZ-Roy
+   Morgan Consumer Confidence weekly reading and Westpac–Melbourne
+   Institute's monthly Consumer Sentiment; Roy Morgan's monthly Business
+   Confidence and the NAB Monthly Business Survey. The first three are
+   index series with 100 as neutral; NAB prints a NET BALANCE (share
+   optimistic minus pessimistic, 0 = neutral) – its rows stay true
+   published figures and the PANEL shifts the line +100 so the shared
+   neutral line holds. Conditions (cond/condChg) ride the NAB rows for
+   the read-row text. Like the undecided lines these are each house's own
+   series, not an aggregate – no house effect is estimable against a
+   single publisher, and no election-result anchor exists to adjust
+   toward. The panel draws the published series; the current reading is
+   the latest release, with the change it printed. */
+const confidence = CONF_FILE ? Object.fromEntries(["consumer", "westpacConsumer", "business", "nabBusiness"].map((k) => {
+  const s = CONF_FILE[k];
   if (!s) return [k, null];   // a lane added to the file later never breaks an older checkout
   const polls = s.rows.map((r) => ({ x: dx(r.date), ym: ymOf(r.date), released: r.date, v: r.v, chg: r.chg ?? null, url: r.url,
     ...(k === "nabBusiness" ? { cond: r.cond, condChg: r.condChg ?? null } : {}) }))
@@ -2427,7 +2440,7 @@ const mood = MOOD_FILE ? Object.fromEntries(["consumer", "westpacConsumer", "bus
   }];
 })) : null;
 
-/* The mood's four gauges as ARCHIVE RELEASES for the All-polls table's
+/* The four confidence gauges as ARCHIVE RELEASES for the All-polls table's
    confidence facet: one row per release in the term so far, shaped like
    directionOnlyPolls with its empty p / appr stubs, so a release never
    counts as a poll and the other facets never see these rows. The lane's
@@ -2435,13 +2448,14 @@ const mood = MOOD_FILE ? Object.fromEntries(["consumer", "westpacConsumer", "bus
    change are the release's own, and `vs` is the lane's neutral print (NAB
    is the odd one out at 0 – drawn +100 only where a shared neutral line
    is plotted; here it keeps the figure the survey printed). */
-/* Lane tuple: [mood key, byline client, product line, neutral anchor,
+/* Lane tuple: [confidence key, byline client, product line, neutral anchor,
    constant sample fallback]. The sample law is per-release provenance: a
-   row's cell is the release's OWN printed figure (mood.json row.n, read
-   off its release by .build/mood.mjs), the lane constant standing in
-   where a house prints one (Westpac–MI's every bulletin: "conducted by
-   OZINFO & DYNATA… based on 1200 adults"), else an honest em‑dash – never
-   an invented constant. The fieldwork column is the release's own
+   row's cell is the release's OWN printed figure (confidence.json row.n,
+   read off its release by .build/confidence.mjs), the lane constant
+   standing in where a house prints one (Westpac–MI's every bulletin:
+   "conducted by OZINFO & DYNATA… based on 1200 adults"), else an honest
+   em‑dash – never an invented constant. The fieldwork column is the
+   release's own
    window (fwLabel of row.fwStart–row.fwEnd); a business release's one‑date
    survey month (row.fwm) prints as its month label; what wasn't printed
    stays a release date. Any sort of the table appends the fieldwork
@@ -2454,10 +2468,10 @@ const CONF_LANES = [
   ["nabBusiness", "NAB", "Business Confidence", 0, null],
 ];
 const confidenceOnlyPolls = (() => {
-  if (!MOOD_FILE) return [];
+  if (!CONF_FILE) return [];
   const out = [], eX = dx(ELECTION.date);
   for (const [k, by, product, vs, sample] of CONF_LANES) {
-    const s = MOOD_FILE[k];
+    const s = CONF_FILE[k];
     if (!s) continue;
     for (const r of s.rows) {
       if (dx(r.date) < eX) continue;
@@ -4449,6 +4463,78 @@ for (const c of CYC_META) {
   c.ePrim = e[c.gov];
   c.eTpp = e["tpp_" + c.gov];
 }
+
+/* ---- 5k. confidence against past terms ---------------------------------
+   The confidence panel's month-since-election reframe, past-cycles style:
+   this term's gauge line over the middle half and middle 80% of the past
+   terms the deep history (data/confidence-history.json, CONF_HISTORY_FILE)
+   reaches. Each view's PRIMARY gauge bands (the ANZ–Roy Morgan consumer
+   and Roy Morgan business index series): Westpac's live lane has no
+   pre-2010 history worth pooling beside the fifty-year ANZ–RM run and
+   stays live-only, and NAB's deep series is a conditions DEVIATION, not a
+   confidence figure, so neither lanes in. A term joins its lane's pool
+   only when interpolation reaches its election month (the consumer
+   history opens March 1973, inside the already-running 1972 term, so
+   that term never bands); quarterly-era months fill straight-line
+   between anchors, as the past-cycles charts do. Values are per survey
+   month on the election-relative month grid (0 = the term's election
+   month), the band is over every month 0..36 with three or more terms
+   standing, and `n` travels with each row so the renderer can PALER the
+   stretches built from few terms (long parliaments outlive short ones,
+   exactly as the past-cycles ribbon thins). */
+const CONF_HIST_MAXM = 36;
+const confHistory = (() => {
+  if (!CONF_HISTORY_FILE) return null;   // the back-history file simply isn't there (JUR, fresh clone)
+  const ymIdx = (ym) => +ym.slice(0, 4) * 12 + (+ym.slice(5, 7) - 1);
+  return Object.fromEntries(["consumer", "business"].map((k) => {
+    const s = CONF_HISTORY_FILE[k];
+    if (!s || !Array.isArray(s.rows) || !s.rows.length) return [k, null];
+    const byIdx = new Map(s.rows.map((r) => [ymIdx(r.ym), r.v]));
+    const first = ymIdx(s.rows[0].ym), last = ymIdx(s.rows[s.rows.length - 1].ym);
+    const terms = [];
+    for (let i = 0; i + 1 < CYC_META.length; i++) {
+      const c = CYC_META[i];
+      const start = ymIdx(c.eDate.slice(0, 7));
+      const span = Math.min(ymIdx(CYC_META[i + 1].eDate.slice(0, 7)) - start, CONF_HIST_MAXM);
+      if (start < first || start > last) continue;   // the history starts mid-term (1972) or never reached it
+      /* Anchor window reaches back before the term: the pre-1987 rows are
+         quarterly and even later the odd month is skipped, so the term's
+         election month itself usually sits BETWEEN two readings – the
+         straight-line join across it is exactly what the quarterly-era
+         fill below does for every other gap. What the guard demands is
+         the join: a reading at or before the election month and one
+         after it. */
+      const anchors = [];
+      for (let m = -12; m <= span; m++) { const v = byIdx.get(start + m); if (v != null) anchors.push({ m, v }); }
+      if (anchors.length < 2 || anchors[0].m > 0 || anchors[anchors.length - 1].m <= 0) continue;
+      const v = [];
+      for (let m = 0; m <= CONF_HIST_MAXM; m++) {
+        if (m > span || m > anchors[anchors.length - 1].m) { v.push(null); continue; }
+        let j = 0;
+        while (j < anchors.length - 1 && anchors[j + 1].m <= m) j++;
+        const a = anchors[j], b = anchors[Math.min(j + 1, anchors.length - 1)];
+        const t = b.m === a.m ? 0 : (m - a.m) / (b.m - a.m);
+        v.push(+(a.v + (b.v - a.v) * t).toFixed(2));
+      }
+      terms.push({ year: c.year, span, eYm: c.eDate.slice(0, 7), v });
+    }
+    /* The band needs its three-term crowd, as the past-cycles ribbon
+       does; below that a "band" is just the two lines' gap relabelled. */
+    const band = [];
+    if (terms.length >= 3) {
+      for (let m = 0; m <= CONF_HIST_MAXM; m++) {
+        const nums = terms.map((t) => t.v[m]).filter((v) => v != null).sort((a, b) => a - b);
+        if (nums.length < 3) continue;
+        const pct = (p) => { const i = (nums.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i); return nums[lo] + (nums[hi] - nums[lo]) * (i - lo); };
+        band.push({ m, n: nums.length,
+          mean: +(nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(2),
+          q1: +pct(0.25).toFixed(2), q3: +pct(0.75).toFixed(2),
+          p10: +pct(0.1).toFixed(2), p90: +pct(0.9).toFixed(2) });
+      }
+    }
+    return [k, { terms, band }];
+  }));
+})();
 /* A term that changed leaders mid-stream is not one line. The pooled net /
    oppnet series stay (they fit the domain, the change-since base and the
    peer average), and beside them each person gets his own monthly run, built
@@ -5404,8 +5490,8 @@ const out = `/* auspol tracker – REAL Australian ${JUR ? JUR.adj + " state" : 
    every monthly estimate deflates a house's repeat waves in the month to
    the square root of their number, the same rule the nowcast window applies.
    Opposition-leader figures splice Sussan Ley → Angus Taylor (13 Feb 2026);
-   the opposition slot is an office, not a person.  "The mood" pairs Roy
-   Morgan's consumer- and business-confidence indices (the house's own
+   the opposition slot is an office, not a person.  The confidence panel
+   pairs consumer- and business-confidence indices (each house's own
    series, 100 = neutral) – context, not a predictor. */
 
 window.AUSPOL = (function () {
@@ -5546,16 +5632,20 @@ window.AUSPOL = (function () {
      are rows of their own for the All-polls table's issues facet – every
      other house's issues data hangs off its poll/direction rows via iss */
   const issuesOnlyPolls = ${JSON.stringify(issuesOnlyPolls)};
-  /* The mood gauges' term releases (§5j) as rows of their own for the
+  /* The confidence gauges' term releases (§5j) as rows of their own for the
      All-polls table's confidence facet – releases, not polls, so they
      never join the other facets' rows or the poll count */
   const confidenceOnlyPolls = ${JSON.stringify(confidenceOnlyPolls)};
   const directionAvailable = ${direction.length > 0};
   const undecided = ${JSON.stringify(undecided)};
-  /* The mood (§5j): Roy Morgan's consumer- and business-confidence index
-     series, 100 = neutral, one publisher apiece – the published line, not
-     an aggregate. */
-  const mood = ${JSON.stringify(mood)};
+  /* The confidence gauges (§5j): the consumer- and business-confidence
+     series, 100 = neutral (NAB its own 0-neutral net balance), one
+     publisher apiece – the published line, not an aggregate. */
+  const confidence = ${JSON.stringify(confidence)};
+  /* The gauges' past-term context (§5k): per view-primary lane, each term
+     aligned to its election month and the pooled middle-half / middle-80%
+     band – what the "past terms" ribbon and draw-a-term lines read. */
+  const confHistory = ${JSON.stringify(confHistory)};
   /* How firm each party's vote is (§5c2): RedBridge's vote-softness table,
      the share of each party's voters certain of their vote. */
   const firmness = ${JSON.stringify(firmness)};
@@ -5670,7 +5760,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, undecided, mood, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, undecided, confidence, confHistory, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –

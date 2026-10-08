@@ -3803,7 +3803,7 @@ function RdUndecided({ rangeId }) {
   );
 }
 
-/* ---------------------------------------------------- Economic mood --
+/* ------------------------------------------------ Economic confidence --
    Four published gauges of business and consumer confidence in TWO views
    on one card, switched by the tabs above it — Consumers (the weekly
    ANZ–Roy Morgan index with Westpac–MI's monthly sentiment as its dashed
@@ -3821,27 +3821,64 @@ function RdUndecided({ rangeId }) {
    the dashed twin of its line colour. NAB's conditions reading rides the
    read row, not a fifth line. No aggregation, no house effects — context,
    not a predictor.
-   Data: data/mood.json → gen-data §5j → D.mood.
+   The bottom axis counts MONTHS since the election, not calendar years,
+   and the view's main gauge carries its own past terms behind the
+   current one — gen-data §5k lines every term up on its own election
+   month and pools them into a band (the middle half and middle 80% of
+   past terms, their average the dashed line, exactly as the past-cycles
+   charts pool past terms; "Draw a past term" lifts any one out as its
+   own line). The footer's "Source data, CSV" downloads every release
+   and every past-term reading.
+   Data: data/confidence.json + data/confidence-history.json → gen-data
+   §5j/§5k → D.confidence / D.confHistory.
 */
-const RD_MOOD_VIEWS = [{ id: "consumer", label: "Consumers" }, { id: "business", label: "Businesses" }];
-function RdMood({ rangeId }) {
+/* The CSV plumbing of the archive asset, again: each module is its own
+   <script>, so the tabbed views' copies are private to it and a
+   page-level const can't be declared twice. Names carry a conf- prefix
+   for that reason. */
+const confCsvCell = (v) => {
+  if (v == null) return "";
+  const s = String(v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+};
+const confCsvText = (rows) => "﻿" + rows.map((r) => r.map(confCsvCell).join(",")).join("\r\n");
+const confDownloadCsv = (filename, rows) => {
+  const blob = new Blob([confCsvText(rows)], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+/* series display names for the download */
+const CONF_SHEET = {
+  consumer: "ANZ–Roy Morgan Consumer Confidence",
+  westpacConsumer: "Westpac–MI Consumer Sentiment",
+  business: "Roy Morgan Business Confidence",
+  nabBusiness: "NAB Monthly Business Survey (net balance)",
+};
+const confYmIdx = (ym) => +ym.slice(0, 4) * 12 + (+ym.slice(5, 7) - 1);
+const confYmOf = (i) => Math.floor(i / 12) + "-" + String((i % 12) + 1).padStart(2, "0");
+const RD_CONF_VIEWS = [{ id: "consumer", label: "Consumers" }, { id: "business", label: "Businesses" }];
+function RdConfidence({ rangeId }) {
   const { D, monthLabelFull } = window.AP;
   const narrow = useNarrow("(max-width: 640px)");
-  const M = D.mood;
+  const M = D.confidence;
   if (!M || !M.consumer || !M.business || !M.consumer.polls.length || !M.business.polls.length) return null;
   const NICE = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const lanes = [
     { k: "consumer", view: "consumer", s: M.consumer, name: "Consumers", dekName: "Consumers", by: "ANZ–Roy Morgan", hl: 14, lab: "Consumers",
-      period: "week", color: "var(--mood-consumer)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
+      period: "week", color: "var(--confidence-consumer)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly." },
     { k: "westpacConsumer", view: "consumer", s: M.westpacConsumer, name: "Consumers", dekName: "Consumers on Westpac–MI’s read", by: "Westpac–MI", hl: 60, lab: "Consumers · Westpac–MI",
-      period: "month", color: "var(--mood-consumer)", dash: "4 3", shift: 0, vfmt: (v) => v.toFixed(1),
+      period: "month", color: "var(--confidence-consumer)", dash: "4 3", shift: 0, vfmt: (v) => v.toFixed(1),
       short: "The Westpac–Melbourne Institute’s monthly gauge of the same household mood; 100 is neutral on this scale too." },
     { k: "business", view: "business", s: M.business, name: "Businesses", dekName: "Businesses", by: "Roy Morgan", hl: 60, lab: "Businesses",
-      period: "month", color: "var(--mood-business)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
+      period: "month", color: "var(--confidence-business)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly." },
     { k: "nabBusiness", view: "business", s: M.nabBusiness, name: "Businesses", dekName: "Businesses on NAB’s survey", by: "NAB", hl: 60, lab: "Businesses · NAB",
-      period: "month", color: "var(--mood-business)", dash: "4 3", shift: 100, vfmt: NICE,
+      period: "month", color: "var(--confidence-business)", dash: "4 3", shift: 100, vfmt: NICE,
       short: "x" },
   ].filter((l) => l.s && l.s.polls.length);
   if (!lanes.length) return null;
@@ -3852,18 +3889,18 @@ function RdMood({ rangeId }) {
   /* hovering the panel hands the arrow keys to the Consumers/Businesses
      row (the claim never survives the pointer leaving the card), pinned
      through the crossfade exactly as the row's own pin does */
-  const moodHover = React.useRef(false);
+  const confHover = React.useRef(false);
   React.useEffect(() => {
-    const sec = document.getElementById("mood");
+    const sec = document.getElementById("confidence");
     if (!sec) return undefined;
-    const enter = () => { moodHover.current = true; };
-    const leave = () => { moodHover.current = false; };
-    moodHover.current = sec.matches(":hover");
+    const enter = () => { confHover.current = true; };
+    const leave = () => { confHover.current = false; };
+    confHover.current = sec.matches(":hover");
     sec.addEventListener("pointerenter", enter);
     sec.addEventListener("pointerleave", leave);
-    const ids = RD_MOOD_VIEWS.map((v) => v.id);
+    const ids = RD_CONF_VIEWS.map((v) => v.id);
     const key = (e) => {
-      if (!moodHover.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
+      if (!confHover.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       const a = document.activeElement;
       if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
@@ -3873,7 +3910,7 @@ function RdMood({ rangeId }) {
       if (i < 0 || ids.length < 2) return;
       e.preventDefault();
       const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
-      rdPinScroll(document.getElementById("mood") && document.getElementById("mood").querySelector(".rd-mood-tabs"));
+      rdPinScroll(document.getElementById("confidence") && document.getElementById("confidence").querySelector(".rd-confidence-tabs"));
       setView(nxt);
     };
     document.addEventListener("keydown", key, true);
@@ -3932,20 +3969,28 @@ function RdMood({ rangeId }) {
     if (l.k === "nabBusiness" && l.lat.cond != null) t += " (conditions " + NICE(l.lat.cond) + ")";
     return t + ".";
   };
-  /* The plot opens at the 3 May 2025 election - 122 days fall before that
-     date in 2025, so its year-fraction x is 2025 + 122/365, the same
-     counting gen-data's dx uses. Pre-election history stays in the
-     payload, off-screen; the dek's high/low reads are windowed with it. */
+  /* The axis counts MONTHS since the 3 May 2025 election - 122 days
+     fall before that date in 2025, so its year-fraction x is
+     2025 + 122/365, the same counting gen-data's dx uses, and everything
+     drawn is converted with toM. Pre-election history stays in the
+     payload, off-screen (the past terms come from confHistory instead);
+     the dek's high/low reads are windowed with x0. */
   const x0 = 2025 + 122 / 365;
   const x1 = D.domain.x1;
+  const toM = (x) => (x - x0) * 12;
+  const nowM = toM(x1);
+  /* the band and any drawn past term run to month 36, so the window
+     holds the whole ruler even while the sitting term is younger */
+  const xMax = Math.max(36, Math.ceil(nowM)) + 0.6;
   /* the numbered events: the hero's set over this chart's window, less the
      party-politics changes of hand (both Coalition splits, Joyce to One
      Nation, Taylor's leadership) - the economy's events stay: the Hormuz
      blockade, the 2026 budget and the RBA's September hike all moved one
      or more of these gauges */
-  const MOOD_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
-  const evs = rdChartEvents(D.events, x0, x1).filter((e) => !MOOD_OFF.includes(e.date));
-  const badges = narrow ? rdEventBadges("mood", evs, x0, x1) : null;
+  const CONF_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
+  const evs = rdChartEvents(D.events, x0, x1).filter((e) => !CONF_OFF.includes(e.date))
+    .map((e) => ({ ...e, x: toM(e.x) }));
+  const badges = narrow ? rdEventBadges("confidence", evs, 0, xMax) : null;
   /* the phone list under the chart opens an event's panel by tapping its
      number; a tap on another number hands the panel over, and an event that
      leaves the window is put away by the chart's own reconciliation */
@@ -3958,9 +4003,84 @@ function RdMood({ rangeId }) {
      constant, so smoothing then shifting equals shifting and smoothing —
      the smooth runs on the printed figures themselves. Only the view's
      own lanes price the domain, so the two views fit their own ranges. */
-  const rawPoints = new Map(viewLanes.map((l) => [l.k, rows.get(l.k).map((p) => ({ x: p.x, y: p.v + l.shift, ym: p.ym, released: p.released, ...(l.shift ? { raw: p.v } : {}) }))]));
-  const sePoints = new Map(viewLanes.map((l) => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({ x: p.x, y: p.y + l.shift, ym: rows.get(l.k)[i].ym, ...(l.shift ? { raw: rows.get(l.k)[i].v } : {}) }))]));
+  const rawPoints = new Map(viewLanes.map((l) => [l.k, rows.get(l.k).map((p) => ({ x: toM(p.x), y: p.v + l.shift, ym: p.ym, released: p.released, ...(l.shift ? { raw: p.v } : {}) }))]));
+  const sePoints = new Map(viewLanes.map((l) => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({ x: toM(p.x), y: p.y + l.shift, ym: rows.get(l.k)[i].ym, ...(l.shift ? { raw: rows.get(l.k)[i].v } : {}) }))]));
+  /* ---- past terms: the band, its average, and the board --------------
+     A straight lift of the past-cycles ribbon (its comment stands at the
+     top of the file's History section): the middle half fills heavy, the
+     middle 80% fills light, stretches built from fewer than three-quarters
+     of the terms go fainter by class, and each term can be drawn as its
+     own line. Only the view's MAIN gauge carries a past-terms panel –
+     §5k ships consumer history for the consumer view, business for the
+     business one (Westpac–MI 2010-, NAB 1997- but a deviation series -
+     never banded). */
+  const HIST = D.confHistory || null;
+  const histLane = view === "consumer" ? "consumer" : "business";
+  const hband = HIST && HIST[histLane] && HIST[histLane].band.length ? HIST[histLane] : null;
+  const histTerms = hband ? hband.terms : [];
+  /* which past terms are lifted out of the band, per view: a lift on the
+     consumer view never reads as a phantom pill on the business one */
+  const [board, setBoard] = useState(false);
+  const [liftedBy, setLiftedBy] = useState({ consumer: new Set(), business: new Set() });
+  const lifted = liftedBy[histLane];
+  const lift = (yr) => setLiftedBy((s) => {
+    const n = new Set(s[histLane]);
+    n.has(yr) ? n.delete(yr) : n.add(yr);
+    return { ...s, [histLane]: n };
+  });
+  let bandAreas = null;
+  if (hband) {
+    const floor = Math.max(3, Math.ceil(histTerms.length * 0.75));
+    const segs = [];
+    hband.band.forEach((r, i) => {
+      const thin = r.n < floor;
+      const last = segs[segs.length - 1];
+      if (!last || last.thin !== thin) segs.push({ thin, pts: i ? [hband.band[i - 1], r] : [r] });
+      else last.pts.push(r);
+    });
+    /* the weight lives in rd.css (.conf-band), not the inline fallbacks
+       below, so the fills carry a heavier tint in dark; a thinned stretch
+       asks by CLASS, exactly as the cycles band does */
+    bandAreas = segs.filter((s) => s.pts.length > 1).flatMap((s, i) => [
+      { id: "conf-band-lo" + i, className: "conf-band lo" + (s.thin ? " thin" : ""),
+        color: "var(--ink-3)", opacity: 0.07, edge: false,
+        points: s.pts.map((r) => ({ x: r.m, y0: r.p10, y1: r.p90 })) },
+      { id: "conf-band-hi" + i, className: "conf-band hi" + (s.thin ? " thin" : ""),
+        color: "var(--ink-3)", opacity: 0.13, edge: false,
+        points: s.pts.map((r) => ({ x: r.m, y0: r.q1, y1: r.q3 })) },
+    ]);
+  }
+  const meanSeries = hband ? {
+    id: "conf-band-mean", label: "Mean of past terms", color: "var(--ink-2)",
+    rdWidth: 1.9, opacity: 0.85, dash: "2 3.4", smooth: false, endCap: false,
+    points: hband.band.map((r) => ({ x: r.m, y: r.mean })),
+  } : null;
+  const drawnSeries = histTerms.filter((t) => lifted.has(t.year)).map((t) => ({
+    id: "conf-term-" + t.year, label: "The " + t.year + " term", color: "var(--ink)",
+    rdWidth: 1.7, opacity: 0.9, smooth: false, endCap: false,
+    endLabel: narrow ? null : String(t.year),
+    points: t.v.map((v, m) => (v == null || m > xMax ? null : { x: m, y: v })).filter(Boolean),
+  }));
+  /* the footer download: every release behind the chart, every past-term
+     reading behind the band - releases carry their release dates (and a
+     link where there is one), history rows carry the term's opening
+     election and the month it counts */
+  const exportCsv = () => {
+    const rr = [["kind", "series", "term_opened", "months_into_term", "month", "value", "url"]];
+    for (const l of lanes) for (const p of l.s.polls) rr.push(["release", CONF_SHEET[l.k], "", "", p.ym, p.v, p.url || ""]);
+    for (const k of ["consumer", "business"]) {
+      const h = HIST && HIST[k];
+      if (!h) continue;
+      for (const t of h.terms) {
+        const e = confYmIdx(t.eYm);
+        t.v.forEach((v, m) => { if (v != null) rr.push(["history", CONF_SHEET[k], t.year, m, confYmOf(e + m), v, ""]); });
+      }
+    }
+    confDownloadCsv(`auspol-tracker-confidence-${D.latest.updatedISO}.csv`, rr);
+  };
   const vals = viewLanes.flatMap((l) => rawPoints.get(l.k).map((p) => p.y)).concat([100]);
+  if (hband) hband.band.forEach((r) => { if (r.m <= xMax) vals.push(r.p10, r.p90, r.mean); });
+  drawnSeries.forEach((s) => s.points.forEach((p) => vals.push(p.y)));
   const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10, hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
   const spine = rawPoints.get(viewLanes[0].k);
   const copyLegend = viewLanes.map((l) => ({ label: l.lab + " (latest " + l.vfmt(l.lat.v) + ")", color: l.color, kind: l.dash ? "dashed" : "line" }));
@@ -3973,24 +4093,73 @@ function RdMood({ rangeId }) {
     dashKey: "The Westpac–MI monthly read of the same household mood",
     copyTitle: "Consumer confidence (two gauges)",
     copySub: head + " Two published consumer gauges on one 100-neutral scale: the weekly ANZ–Roy Morgan consumer confidence index and Westpac–MI’s monthly consumer sentiment.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series). No combining, no adjustment.",
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series). The band pools the ANZ–Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. No combining, no adjustment.",
   } : {
     title: "Business confidence",
     note: "100 = neutral on the index; NAB’s net balance drawn 100 points up",
     dashKey: "NAB’s net-balance read, drawn 100 points up",
     copyTitle: "Business confidence (two gauges)",
     copySub: head + " Two published business gauges on one 100-neutral scale: Roy Morgan’s monthly business confidence index and NAB’s Monthly Business Survey.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its dashed line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. No combining, no adjustment.",
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its dashed line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. The band pools the Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. No combining, no adjustment.",
   };
+  /* Election / 1 yr / 2 yrs / 3 yrs, plus Now where the sitting term
+     stands — the same ruler gen-data §5k aligns the past terms on */
+  const xTicks = [{ x: 0, label: "Election" }, { x: 12, label: "1 yr" }, { x: 24, label: "2 yrs" }, { x: 36, label: "3 yrs" }];
+  if (nowM < xMax - 1.4) xTicks.push({ x: +nowM.toFixed(1), label: "Now" });
+  xTicks.sort((a, b) => a.x - b.x);
   return (
-    <RdSec id="mood" cls="rd-mood" title="Economic sentiment" meta={"Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")}>
+    <RdSec id="confidence" cls="rd-confidence" title="Economic sentiment" meta={"Confidence indices, 100 = neutral" + (narrow ? "" : ", four published series")}>
       <RdHed head={head} dek={dek} />
       {/* the views are pages of their own, so the row walks them by arrow
           keys (focused, or hovering the panel) and a phone swipe;
           rdPinScroll holds the row's spot through the crossfade (pin) */}
-      <RdTabs swipe pin value={view} onChange={setView} options={RD_MOOD_VIEWS} ariaLabel="Confidence of" className="rd-mood-tabs" />
+      <RdTabs swipe pin value={view} onChange={setView} options={RD_CONF_VIEWS} ariaLabel="Confidence of" className="rd-confidence-tabs" />
       <RdCrossfade k={view}>
-      <div className="card rd-card rd-mood-chart">
+      {hband && (
+      <div className="rd-cc rd-confidence-cc">
+        <div className="rd-confidence-draw">
+          <button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
+          {lifted.size > 0 && (
+            <span className="rd-cc-drawn">
+              <span className="rd-cc-l">Drawn over the band</span>
+              {[...lifted].sort((a, b) => a - b).map((y) => (
+                <span key={y} className="rd-cc-pill" style={{ borderColor: "var(--ink)" }}>
+                  <span className="rd-cc-rule" style={{ background: "var(--ink)" }}></span>{y}
+                  <button type="button" aria-label={"Return " + y + " to the band"} onClick={() => lift(y)}>×</button>
+                </span>
+              ))}
+            </span>
+          )}
+        </div>
+        {board && (
+          <div className="rd-cc-board" role="dialog" aria-label="Past terms">
+            <div className="rd-cc-bhead">
+              <b>Past terms</b>
+              <span>{histTerms.length} on file{lifted.size ? ", " + lifted.size + " drawn as their own " + (lifted.size === 1 ? "line" : "lines") : ""}</span>
+              <span className="rd-grow"></span>
+              {lifted.size > 0 && <button type="button" className="rd-link" onClick={() => setLiftedBy((s) => ({ ...s, [histLane]: new Set() }))}>Clear lines</button>}
+              <button type="button" className="rd-iconbtn" aria-label="Close" onClick={() => setBoard(false)}>×</button>
+            </div>
+            <div className="rd-cc-grid">
+              {histTerms.map((t) => {
+                const on = lifted.has(t.year);
+                return (
+                  <span key={t.year} className={"rd-cc-term" + (on ? " drawn" : "")}>
+                    <button type="button" className="rd-cc-main" aria-pressed={on} onClick={() => lift(t.year)}
+                            title={on ? "Return " + t.year + " to the band" : "Draw " + t.year + " as its own line"}>
+                      <span className="rd-cc-rule" style={{ background: "var(--ink)", opacity: on ? 1 : 0.4 }}></span>
+                      <b>{t.year}</b>
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+            <p className="rd-note">Click a term to draw its {histLane === "consumer" ? "consumer" : "business"} confidence line over the band, and again to put it back. Each line is lined up on its own election month, as the band is, and runs to the next election or 36 months, whichever came first.</p>
+          </div>
+        )}
+      </div>
+      )}
+      <div className="card rd-card rd-confidence-chart">
         <div className="rd-un-ptitle"><b>{vc.title}</b><span>{vc.note}</span></div>
         {viewLanes.map((l) => (
           <div key={l.k} className="rd-un-read">
@@ -4001,15 +4170,17 @@ function RdMood({ rangeId }) {
             </div>
           </div>
         ))}
-        <TrendChart key={"rd-mood-" + view} heightPx={narrow ? 260 : 340}
+        <TrendChart key={"rd-confidence-" + view} heightPx={narrow ? 260 : 340}
           /* the top pad buys the numbered event badges their row above
              the plot, as the primary card's does */
           padPx={narrow ? { l: 34, r: 8, t: 34, b: 28 } : { l: 40, r: 16, t: 44, b: 30 }}
-          xDomain={[x0, x1]} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => String(v)}
-          xTicks={rdElectionTicks(x0, x1, narrow, x0)} baseline
+          xDomain={[0, xMax]} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => String(v)}
+          xTicks={xTicks} baseline
           refLines={[{ y: 100, label: "100 = neutral", align: "left", color: "var(--ink-3)" }]}
+          areas={bandAreas || undefined}
           series={viewLanes.map((l) => ({ id: l.k, label: l.lab, color: l.color, rdWidth: l.dash ? 1.6 : 2.2, dash: l.dash || undefined,
-            endCap: false, endLabel: narrow ? null : l.lab, points: sePoints.get(l.k) }))}
+            endCap: false, endLabel: narrow ? null : l.lab, points: sePoints.get(l.k) }))
+            .concat(meanSeries ? [meanSeries] : [], drawnSeries)}
           spine={spine}
           events={badges ? badges.events : evs}
           evt={evtOpen} onEvt={setEvtOpen}
@@ -4042,17 +4213,29 @@ function RdMood({ rangeId }) {
           { kind: "dot", color: "var(--ink-3)", label: "One release, as printed" },
           { kind: "line", color: "var(--ink-3)", label: "Smoothed trend of the releases" },
           { kind: "dash", color: "var(--ink-3)", label: vc.dashKey },
-        ]} />
+        ]}>
+          {hband && <>
+            <span className="rd-key-item"><span className="rd-cs-keyband" aria-hidden="true"><i></i></span>Middle half and middle 80% of past terms</span>
+            <span className="rd-key-item"><RdSwatch kind="dash" color="var(--ink-2)" />Their average</span>
+            <span className="rd-key-item"><span className="rd-cs-keythin" aria-hidden="true"></span>Paler: fewer terms ran this long</span>
+          </>}
+        </RdKey>
       </div>
       </RdCrossfade>
       <HowTo paras={[
         <>Four published gauges of the same mood, split into two views — the consumer pair and the business pair, switched by the tabs over the chart — and set out as each house prints them from the 2025 election on: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
+        <>Behind the current term, the band pools that view’s main gauge over past terms — each term lined up on its own election month, so the bottom axis (months since this term’s election) is every term’s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own line, and “Source data, CSV” in the footer downloads every release and past-term reading.</>,
         <>Three of the four are indices where 100 is neutral. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
         <>Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />
-      <RdFoot how={{ term: "mood", from: "Economic sentiment" }}>Four published gauges — ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB — joined as released. Context, not a predictor.</RdFoot>
+      <div className="rd-foot">
+        <span className="rd-foot-text">Four published gauges — ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB — joined as released. Context, not a predictor.</span>
+        <span className="rd-grow"></span>
+        <button type="button" className="rd-how rd-confidence-csv" onClick={exportCsv}><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12M12 15l-4-4M12 15l4-4M4 19h16"></path></svg> Source data, CSV</button>
+        <RdHow term="confidence" from="Economic sentiment" />
+      </div>
     </RdSec>
   );
 }
 
-Object.assign(window, { RdPrimary, rdShareWords, rdPartyIn, rdPartyStart, rdElectionTicks, RdLeadership, RdHeadBar, RdDirection, rdList, rdRoughPts, RdDemographics, RdSwitching, useRdWidth, RdIssues, RdUndecided, RdMood, RdShiftPlot, rdOneIn, RdTsig, rdTsSgn });
+Object.assign(window, { RdPrimary, rdShareWords, rdPartyIn, rdPartyStart, rdElectionTicks, RdLeadership, RdHeadBar, RdDirection, rdList, rdRoughPts, RdDemographics, RdSwitching, useRdWidth, RdIssues, RdUndecided, RdConfidence, RdShiftPlot, rdOneIn, RdTsig, rdTsSgn });
