@@ -89023,6 +89023,7 @@ const rdPinClip = (row, rowTop) => {
     o.__rdFrozen = true;
     o.style.transition = "none";
     o.style.overflowY = "clip";
+    o.style.overflowX = "clip";
     o.style.height = r.height + "px";
     held.push(o);
   };
@@ -89062,6 +89063,7 @@ const rdPinThaw = () => {
     o.style.transition = "";
     o.style.height = "";
     o.style.overflowY = "";
+    o.style.overflowX = "";
   });
 };
 function rdPinScroll(row, fine) {
@@ -89246,6 +89248,7 @@ function RdGlide({
         o.style.transition = "";
         o.style.height = "";
         o.style.overflowY = "";
+        o.style.overflowX = "";
         if (window.__rdPinObserve) window.__rdPinObserve(o);
         return;
       }
@@ -89256,6 +89259,7 @@ function RdGlide({
     clearTimeout(timer.current);
     o.style.transition = "none";
     o.style.overflowY = "clip";
+    o.style.overflowX = "clip";
     o.style.height = cur + "px";
     void o.offsetHeight;
     o.style.transition = "height " + (AP.MORPH_MS || 320) + "ms " + (AP.MORPH_CSS || "ease");
@@ -89265,6 +89269,7 @@ function RdGlide({
       o.style.transition = "";
       o.style.height = "";
       o.style.overflowY = "";
+      o.style.overflowX = "";
     }, (AP.MORPH_MS || 320) + 60);
   });
   React.useEffect(() => {
@@ -89281,6 +89286,7 @@ function RdGlide({
           o.style.transition = "";
           o.style.height = "";
           o.style.overflowY = "";
+          o.style.overflowX = "";
         }, (AP.MORPH_MS || 320) + 60);
       }
       last.current = h;

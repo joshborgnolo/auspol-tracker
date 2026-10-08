@@ -188,6 +188,11 @@ const rdPinClip = (row, rowTop) => {
     o.__rdFrozen = true;
     o.style.transition = "none";
     o.style.overflowY = "clip";
+    /* a pinned height can force a wrapping flex row's overflow into a
+       second COLUMN that protrudes past the element's right edge (the
+       eyebrows' facet swap did exactly this on the phone, inflating the
+       viewport - user report 2026-10-08): clip X for the pin's life too */
+    o.style.overflowX = "clip";
     o.style.height = r.height + "px";
     held.push(o);
   };
@@ -241,6 +246,7 @@ const rdPinThaw = () => {
     o.style.transition = "";
     o.style.height = "";
     o.style.overflowY = "";
+    o.style.overflowX = "";
   });
 };
 function rdPinScroll(row, fine) {
@@ -555,7 +561,7 @@ function RdGlide({ children, className, as, watch }) {
       o.style.height = cur + "px";
       if (Math.abs(pinRow.getBoundingClientRect().top - y1) >= 0.5) {
         clearTimeout(timer.current);
-        o.style.transition = ""; o.style.height = ""; o.style.overflowY = "";
+        o.style.transition = ""; o.style.height = ""; o.style.overflowY = ""; o.style.overflowX = "";
         if (window.__rdPinObserve) window.__rdPinObserve(o);
         return;
       }
@@ -565,6 +571,11 @@ function RdGlide({ children, className, as, watch }) {
     clearTimeout(timer.current);
     o.style.transition = "none";
     o.style.overflowY = "clip";
+    /* a pinned height can force a wrapping flex row's overflow into a
+       second COLUMN that protrudes past the element's right edge (the
+       eyebrows' facet swap did exactly this on the phone, inflating the
+       viewport - user report 2026-10-08): clip X for the pin's life too */
+    o.style.overflowX = "clip";
     o.style.height = cur + "px";
     void o.offsetHeight;
     o.style.transition = "height " + (AP.MORPH_MS || 320) + "ms " + (AP.MORPH_CSS || "ease");
@@ -574,7 +585,7 @@ function RdGlide({ children, className, as, watch }) {
        its cause does (Safari paints an rAF-time scroll a frame late, and
        the strip under the reader breathed with every frame of the glide) */
     if (window.__rdPinObserve) window.__rdPinObserve(o);
-    timer.current = setTimeout(() => { o.style.transition = ""; o.style.height = ""; o.style.overflowY = ""; }, (AP.MORPH_MS || 320) + 60);
+    timer.current = setTimeout(() => { o.style.transition = ""; o.style.height = ""; o.style.overflowY = ""; o.style.overflowX = ""; }, (AP.MORPH_MS || 320) + 60);
   });
   /* a height that changes for any other reason - a resize, a font arriving -
      is simply noted, so the next glide starts from where the block is */
@@ -591,7 +602,7 @@ function RdGlide({ children, className, as, watch }) {
         const AP = window.AP || {};
         o.style.height = h + "px";
         clearTimeout(timer.current);
-        timer.current = setTimeout(() => { o.style.transition = ""; o.style.height = ""; o.style.overflowY = ""; }, (AP.MORPH_MS || 320) + 60);
+        timer.current = setTimeout(() => { o.style.transition = ""; o.style.height = ""; o.style.overflowY = ""; o.style.overflowX = ""; }, (AP.MORPH_MS || 320) + 60);
       }
       last.current = h;
     });
