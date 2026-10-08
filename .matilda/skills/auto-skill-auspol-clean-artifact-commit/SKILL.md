@@ -1,9 +1,9 @@
 ---
 name: auspol-clean-artifact-commit
-description: auspol-tracker — WRITE-side shared-tree hygiene when your deliverable is the REGENERATED index.html and a sibling session's WIP dirties the worktree. `node .build/newtracker/build.mjs` folds EVERY dirty build input into index.html — template.html AND the hashed rd asset layers (73de0c58/a11e1559/d1a1d215 are hand-edited JSX SOURCE layers the build only inlines, unlike the 9f09dca2 gen-dataset it rewrites) — so committing the build as-is ships the sibling's uncommitted work to origin/main = the live site (Pages deploys instantly). Recipe: `git stash push -m <tag> -- <their modified paths, from git status>` → rebuild → `git diff HEAD -- index.html` must show ONLY your hunk → commit only your source + its artifacts → `git push origin HEAD:main` → `git stash pop` to hand the tree back exactly as found. Worked 2026-10-06: Bonham ?m=0 desktop-pin link shipped as 52f538a with 8 sibling-dirty files + vic untracked dirs sitting in the tree the whole time. Field notes add push races, complementary-feature adoption, the mirrored live case (2026-10-06, RBA 4.6% event 99871f5): the sibling runs THIS recipe against you — your edited file path-vanishes into THEIR stash (pop theirs to restore, never re-apply by hand), `stash pop` aborts "local changes would be overwritten" when an `apply` re-dirties the path under you, and the cheapest unravelling of a mutual-shelving knot is a ~45s wait for their commit to land, then the standard flow on the new HEAD. Sixth case (2026-10-07, income split 0087ceb) covers the sibling STAGED mid-dance: build crashes caused by foreign worktree files vs committed state (diagnose before "fixing" a committed checker — park the cluster instead), `git commit -- <paths>` bypasses a foreign-staged index, `git stash pop --index` can fail where plain pop works, HEAD can move under you mid-restore (verify post-pop state fresh), and `.matilda/probe/*` files are force-add-tracked by convention. Seventh case (2026-10-07, anchor swap dc860e6) covers the SYMMETRIC mirror deadlock — you parked their build input, they parked yours, both waiting: a fully clean tree + unmoved HEAD means YOU were parked (identify stash identity by `stash show --name-only`, not by their park's message text), break symmetry by popping YOUR park of THEIR content first, then the multi-60/90s-window wait; `rd-allpolls.jsx` is a build input (park it with the hashed layers), and recover your files from THEIR park via path-checkout not pop.
+description: auspol-tracker — WRITE-side shared-tree hygiene when your deliverable is the REGENERATED index.html and a sibling session's WIP dirties the worktree. `node .build/newtracker/build.mjs` folds EVERY dirty build input into index.html — template.html AND the hashed rd asset layers (73de0c58/a11e1559/d1a1d215 are hand-edited JSX SOURCE layers the build only inlines, unlike the 9f09dca2 gen-dataset it rewrites) — so committing the build as-is ships the sibling's uncommitted work to origin/main = the live site (Pages deploys instantly). Recipe: `git stash push -m <tag> -- <their modified paths, from git status>` → rebuild → `git diff HEAD -- index.html` must show ONLY your hunk → commit only your source + its artifacts → `git push origin HEAD:main` → `git stash pop` to hand the tree back exactly as found. Worked 2026-10-06: Bonham ?m=0 desktop-pin link shipped as 52f538a with 8 sibling-dirty files + vic untracked dirs sitting in the tree the whole time. Field notes add push races, complementary-feature adoption, the mirrored live case (2026-10-06, RBA 4.6% event 99871f5): the sibling runs THIS recipe against you — your edited file path-vanishes into THEIR stash (pop theirs to restore, never re-apply by hand), `stash pop` aborts "local changes would be overwritten" when an `apply` re-dirties the path under you, and the cheapest unravelling of a mutual-shelving knot is a ~45s wait for their commit to land, then the standard flow on the new HEAD. Sixth case (2026-10-07, income split 0087ceb) covers the sibling STAGED mid-dance: build crashes caused by foreign worktree files vs committed state (diagnose before "fixing" a committed checker — park the cluster instead), `git commit -- <paths>` bypasses a foreign-staged index, `git stash pop --index` can fail where plain pop works, HEAD can move under you mid-restore (verify post-pop state fresh), and `.matilda/probe/*` files are force-add-tracked by convention. Seventh case (2026-10-07, anchor swap dc860e6) covers the SYMMETRIC mirror deadlock — you parked their build input, they parked yours, both waiting: a fully clean tree + unmoved HEAD means YOU were parked (identify stash identity by `stash show --name-only`, not by their park's message text), break symmetry by popping YOUR park of THEIR content first, then the multi-60/90s-window wait; `rd-allpolls.jsx` is a build input (park it with the hashed layers), and recover your files from THEIR park via path-checkout not pop. Eighth case (2026-10-09, P2 hygiene a861faa) covers restoring YOUR OWN holds after a raced push, against a sibling who iterated the same files while shelved: a pop conflict there is usually stale-snapshot-vs-live-tree overlap, not loss — prove coherence (grep the hunk's distinctive symbol, `git diff stash@{N} -- <path>` as the decisive older-vs-newer read, pinned feature test green on the untouched tree) then `git stash drop` your stale hold as the sanctioned destroy; drop a hold blind only after a 0-line WT-vs-stash diff; and park dirt blocking `git rebase origin/main` in its own named hold (`git stash push -m "hold: … rebase" -- <paths>`), rebasing then popping by message. Ninth case (2026-10-09, Essential-demographics 783084a+99c6f32) covers the INVERSE failure — UNDER-staging your own regenerated artifacts: sources committed while index.html+feed.xml sat dirty (a "site build" follow-up commit is the tell), and build.mjs PRUNES root hashed copies when a font leaves the FONTS list or a layer is retired, leaving unstaged DELETIONS that are also yours (stage by directory, `git add assets/fonts/`). The working completion check is never "status looks clean" (porcelain noise from .matilda scratch/sibling WIP trains the eye to skip the block) but "none of MY enumerated owned paths — sources + every regenerated file incl. deletions — appears in `git status --porcelain`".
 source: auto-skill
 extracted_at: '2026-10-06T05:12:00.000Z'
-updated_at: '2026-10-07T06:39:28.599Z'
+updated_at: '2026-10-09'
 ---
 
 # Clean-artifact commit: shelve the sibling's WIP, rebuild, ship only yours
@@ -318,3 +318,40 @@ moves beyond the fifth/sixth cases:
   status` == only their returned WIP, `origin/main -1` == my dc860e6,
   and every stash I created this session popped or dropped — remaining
   stashes were all their owns.
+
+## Field notes, ninth case (2026-10-09, Essential-demographics commits 783084a + 99c6f32) — the INVERSE failure: under-staging your OWN regenerated artifacts
+
+Every case above guards against committing too much (the sibling's work
+riding your commit). This run committed too little and it produced the
+same class of mess in mirror image:
+
+- **Sources committed, artifacts left dirty.** The Essential-demographics
+  change (crosstab-parse/demographics readers, template, build.mjs,
+  data) was staged and committed as 783084a — while `index.html` and
+  `feed.xml`, regenerated by the build I'd run minutes earlier, sat
+  modified in the worktree. The follow-up "Site build…" commit 99c6f32
+  is the tell: a second commit that carries ONLY generated files means
+  the first commit was incomplete (step 5 of the recipe skipped). The
+  launchd-refusal hazard the dataset convention exists to prevent
+  applies to every SITE_FILE, not just 9f09dca2.
+- **The build DELETES root hashed files, and deletions are yours too.**
+  The commit dropped `crimsontext-italic-600` from build.mjs's FONTS
+  list; build.mjs then pruned the root copy
+  `assets/fonts/crimsontext-italic-600-latin.<hash>.woff2` — an unstaged
+  DELETION that survived both commits. Same shape when a hashed asset
+  layer is retired (the `052e810c…jsx` source deletion needed its
+  build-side bookkeeping). `git add <deleted-path>` works, but the
+  robust move is staging by DIRECTORY
+  (`git add assets/fonts/ index.html feed.xml …`) so pruned children
+  ride along without being enumerated.
+- **Why it slipped: porcelain-noise fatigue.** `git status` in this repo
+  NEVER reads clean — `.matilda/` scratch, sibling WIP, untracked vic
+  dirs sit in every listing, so the eye learns to dismiss the whole
+  block and dismisses your own leftovers inside it. "Status looks close
+  enough" is not a check.
+- **The check that works**: before pushing, enumerate YOUR owned paths —
+  sources you edited PLUS the full regenerated set the build actually
+  touched (index.html, feed.xml/sitemap/robots when data moved,
+  9f09dca2, root `assets/**` including deletions) — and confirm
+  `git status --porcelain -- <those paths>` is EMPTY. "None of mine in
+  the porcelain", never "porcelain looks clean".
