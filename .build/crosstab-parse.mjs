@@ -193,11 +193,17 @@ export function redbridgeTable(txt) {
   const head = lines.slice(start + 1, start + 8).find((l) => /^Labor\s/.test(l.trim()));
   const cols = head && rbColumns(head);
   if (!cols) return null;
-  const dims = {}; let cur = null, total = null, blank = 0;
+  /* No blank-line end-of-table heuristic: the September 2026 PDF paginated
+     mid-table (a standalone page number + blank lines between Women and Men)
+     and such a heuristic truncated the read there. The real terminator is
+     below: a section title seen again is the next chart's title. The 90-line
+     cap is the backstop, and a junk row that does slip in fails the
+     sum-to-100 gate downstream rather than saving a wrong figure.
+     Blank lines and standalone page numbers are skipped. */
+  const dims = {}; let cur = null, total = null;
   for (let i = start + 1; i < Math.min(lines.length, start + 90); i++) {
     const t = lines[i].trim();
-    if (!t) { if (++blank > 3 && Object.keys(dims).length) break; continue; }
-    blank = 0;
+    if (!t || /^\d+$/.test(t)) continue;
     if (RB_SECTIONS[t]) {
       if (dims[RB_SECTIONS[t]]) break;               // a section seen again is the next chart's title
       cur = RB_SECTIONS[t]; continue;

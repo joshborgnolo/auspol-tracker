@@ -6342,6 +6342,96 @@
       "onp": 28,
       "grn": 14,
       "oth": 12
+     },
+     "Men": {
+      "alp": 30,
+      "lnp": 21,
+      "onp": 31,
+      "grn": 8,
+      "oth": 10
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 30,
+      "lnp": 26,
+      "onp": 23,
+      "grn": 13,
+      "oth": 8
+     },
+     "Outer metro": {
+      "alp": 31,
+      "lnp": 19,
+      "onp": 30,
+      "grn": 11,
+      "oth": 9
+     },
+     "Provincial": {
+      "alp": 26,
+      "lnp": 17,
+      "onp": 36,
+      "grn": 13,
+      "oth": 8
+     },
+     "Rural": {
+      "alp": 23,
+      "lnp": 21,
+      "onp": 32,
+      "grn": 7,
+      "oth": 17
+     }
+    },
+    "education": {
+     "Below Year 12": {
+      "alp": 16,
+      "lnp": 20,
+      "onp": 50,
+      "grn": 5,
+      "oth": 9
+     },
+     "Year 12": {
+      "alp": 30,
+      "lnp": 21,
+      "onp": 29,
+      "grn": 15,
+      "oth": 5
+     },
+     "TAFE or trade": {
+      "alp": 26,
+      "lnp": 21,
+      "onp": 32,
+      "grn": 8,
+      "oth": 13
+     },
+     "University": {
+      "alp": 34,
+      "lnp": 22,
+      "onp": 16,
+      "grn": 15,
+      "oth": 13
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 26,
+      "lnp": 27,
+      "onp": 33,
+      "grn": 5,
+      "oth": 9
+     },
+     "Mortgage": {
+      "alp": 30,
+      "lnp": 19,
+      "onp": 28,
+      "grn": 10,
+      "oth": 13
+     },
+     "Renting and other": {
+      "alp": 27,
+      "lnp": 17,
+      "onp": 26,
+      "grn": 21,
+      "oth": 9
      }
     }
    },
