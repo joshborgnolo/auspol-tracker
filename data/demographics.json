@@ -6274,6 +6274,86 @@
    }
   },
   {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-10-02",
+   "dateStart": "2026-09-28",
+   "sample": 1000,
+   "article": "https://www.afr.com/politics/federal/voters-turn-on-albanese-and-chalmers-as-economic-concerns-bite-20261004-p612n5",
+   "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-september-2026-federal-poll",
+   "read": "published table",
+   "dims": {
+    "softness": {
+     "Solid": {
+      "alp": 28,
+      "lnp": 19,
+      "onp": 37,
+      "grn": 9,
+      "oth": 7
+     },
+     "Soft": {
+      "alp": 26,
+      "lnp": 24,
+      "onp": 23,
+      "grn": 13,
+      "oth": 14
+     },
+     "Very soft": {
+      "alp": 30,
+      "lnp": 21,
+      "onp": 22,
+      "grn": 13,
+      "oth": 14
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 30,
+      "lnp": 16,
+      "onp": 21,
+      "grn": 24,
+      "oth": 9
+     },
+     "Millennials": {
+      "alp": 33,
+      "lnp": 18,
+      "onp": 22,
+      "grn": 16,
+      "oth": 11
+     },
+     "Gen X": {
+      "alp": 23,
+      "lnp": 21,
+      "onp": 37,
+      "grn": 6,
+      "oth": 13
+     },
+     "Boomers": {
+      "alp": 26,
+      "lnp": 27,
+      "onp": 34,
+      "grn": 4,
+      "oth": 9
+     }
+    },
+    "gender": {
+     "Women": {
+      "alp": 24,
+      "lnp": 22,
+      "onp": 28,
+      "grn": 14,
+      "oth": 12
+     }
+    }
+   },
+   "total": {
+    "alp": 28,
+    "lnp": 21,
+    "onp": 29,
+    "grn": 11,
+    "oth": 11
+   }
+  },
+  {
    "pollster": "YouGov",
    "date": "2026-10-06",
    "dateStart": "2026-09-29",

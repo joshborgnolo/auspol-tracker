@@ -1,0 +1,89 @@
+{
+  "slug": "afr-redbridge-group-and-accent-research-september-2026-federal-poll",
+  "sample": 1000,
+  "label": "Sep 2026",
+  "year": 2026,
+  "month": 8,
+  "alp": 28,
+  "lnp": 21,
+  "onp": 29,
+  "grn": 11,
+  "ind": 11,
+  "tppHist": 50,
+  "tppResp": 46,
+  "tppVsOn": 52,
+  "waveRows": 18,
+  "tppSplit": {
+    "grn": 82,
+    "onp": 15,
+    "oth": 50
+  },
+  "tppSplitOn": {
+    "lnp": 41,
+    "grn": 90,
+    "oth": 57
+  },
+  "dateStart": "2026-09-28",
+  "date": "2026-10-02",
+  "firmness": {
+    "all": [
+      46,
+      43,
+      11
+    ],
+    "alp": [
+      47,
+      41,
+      12
+    ],
+    "lnp": [
+      40,
+      49,
+      11
+    ],
+    "onp": [
+      58,
+      34,
+      8
+    ],
+    "grn": [
+      37,
+      51,
+      12
+    ],
+    "oth": [
+      29,
+      57,
+      14
+    ]
+  },
+  "ppm": {
+    "alb": 31,
+    "opp": 15,
+    "han": 26
+  },
+  "oppName": "Taylor",
+  "nets": {
+    "alb": -27,
+    "opp": -6,
+    "han": -10
+  },
+  "detail": {
+    "alb": {
+      "app": 26,
+      "dis": 53
+    },
+    "opp": {
+      "app": 22,
+      "dis": 28
+    },
+    "han": {
+      "app": 37,
+      "dis": 47
+    }
+  },
+  "pubIso": "2026-10-04",
+  "pdfUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_db6216a1a7594e93b08dbc9ca3c9e51b.pdf",
+  "afrUrl": null,
+  "extractedAt": "2026-10-08T07:24:30.455Z"
+}

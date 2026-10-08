@@ -124,7 +124,9 @@ const CYCLE_START = "2025-05-04";
 const FETCH_TIMEOUT_MS = 60_000;
 const PDF_TIMEOUT_MS = 180_000;
 const FETCH_TRIES = 3;
-const CHROME = process.env.RB_CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+// Every other .build script and poll-agent.yml agree on CHROME; RB_CHROME
+// (set by nothing) predates the CI move — keep it only as a back-compat alias.
+const CHROME = process.env.CHROME || process.env.RB_CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 // Accent dropped the encoded comma from slug prefixes with the August 2026
 // wave (`afr-redbridge-…` vs the historical `afr%2C-redbridge-…`) — accept both.
 const PAGE_SLUG_RE = /^\/projects\/afr(?:%2C)?-redbridge-group-and-accent-research-(?:([a-z]+)-(\d{4})-)?federal-poll$/i;
