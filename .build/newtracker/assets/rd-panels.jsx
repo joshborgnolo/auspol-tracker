@@ -221,7 +221,9 @@ function RdPrimary({ rangeId, setRangeId }) {
   /* group mode's per-poll dots: each wave's own reading of the group, sat
      against its month's all-voters figure - exactly the point §7g's pooling
      averages (never the raw group share, so a wave from a house that leans
-     toward the group still lands on the line the site draws) */
+     toward the group still lands on the line the site draws). The wave's
+     printed group figure rides on the dot as `gv`, so the tooltip can tip
+     what was printed rather than the lifted y the dot is drawn at */
   const gi = G && D.demoGroups ? D.demoGroups.indexOf(sel.label) : -1;
   const aggByYm = React.useMemo(() => (!G ? null
     : new Map(D.aggPrimary.filter((d) => !d.election).map((d) => [d.ym, d]))), [G]);
@@ -236,7 +238,7 @@ function RdPrimary({ rangeId, setRangeId }) {
       if (!M) return [];
       return parts.map((p) => {
         const i = GRPV_KEYS.indexOf(p.id);
-        return { x: q.x, y: M[p.id] + (gv[i] - tt[i]), color: p.color, label: p.name, meta: q, party: p.id };
+        return { x: q.x, y: M[p.id] + (gv[i] - tt[i]), gv: gv[i], color: p.color, label: p.name, meta: q, party: p.id };
       });
     }), [T, G, xDomain[0], xDomain[1]]);
   const shownScatter = React.useMemo(() => scatter.map((d) => (hidden[d.party] ? { ...d, op: 0 } : d)), [scatter, hidden]);
@@ -433,13 +435,19 @@ function RdPrimary({ rangeId, setRangeId }) {
             if (!d || !d.ci || d.election) return d && d.election ? [{ label: "", value: "The election result" }] : [];
             return [{ label: "95% intervals", value: visible.map((p) => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ") }];
           }}
-          fmt={(v) => v.toFixed(1)}
+          /* a group view's dot is drawn at a lifted y (the trend plus this
+             wave's group-vs-all-voters gap) but tips the figure the wave
+             printed - the engine's own display-transform precedent (the
+             mood panel's NAB line, drawn +100, tips the net balance) */
+          fmt={(v, pt) => (G && pt && pt.gv != null ? pt.gv : v).toFixed(1)}
           /* read away from the page, the copy names its measure and its
              base as well as the finding: "Primary vote" over "Labor and One
              Nation are level" said neither whose votes nor how many polls */
           copy={{ title: "First-preference vote for each party" + (G ? ", " + sel.who : ""), sub: story.head + (G ? ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork " + rdDate(D.latest.updatedISO, true) + "." : (KAL ? ". Smoothed trends through " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord
                     + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
-                  caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
+                  caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals."
+                    : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals."
+                    : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
                   legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
         />
         {/* the 2PP card above already lists this window's events under its
@@ -457,6 +465,12 @@ function RdPrimary({ rangeId, setRangeId }) {
             <RdEventList list={badges.list} onPick={pickEv}
                          openKey={evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null} />
           </details>
+        )}
+        {/* the lift mapping, where the dots are read - the glossary's "The
+            group views" paragraph is the deep version; a dot's tooltip
+            tips the printed figure and the Demographics facet lists them */}
+        {G && (
+          <p className="rd-note">Each dot is one poll’s reading of {sel.who} less that poll’s own all-voters figure, drawn onto the trend; it is never the cut the poll printed, which sits beside every other poll’s in All polls’ Demographics view.</p>
         )}
         <RdKey className="rd-ckey" items={[
           { kind: "dot", color: "var(--ink-3)", label: "One poll" },

@@ -18,7 +18,12 @@
           from its first polled month ("since July 2025").
        4. a dot click in a group view opens the poll in All polls on the
           Demographics facet with that view's split picked (2026-10-08); the
-          All-voters view's dots keep the Primary facet */
+          All-voters view's dots keep the Primary facet
+       5. a group view's dot is drawn at a LIFTED y (trend plus the wave's
+          group-vs-all-voters gap) but its tooltip must tip the figure the
+          wave PRINTED, the .rd-note under the chart must disclose the lift,
+          and the copy-card caption must not say the bare "Each dot is one
+          poll" (2026-10-08) */
 import { createServer } from "node:http";
 import { readFile, writeFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -325,6 +330,92 @@ for (const { view, wantFacet, wantSplit } of [{ view: "Gen Z", wantFacet: "Demog
   ok(`${name}: click lands in All polls on the ${wantFacet} facet`, !!landed && landed.active === wantFacet, landed && `facet: ${landed.active}`);
   ok(`${name}: the clicked poll opens`, !!landed && landed.open === true, landed && `open=${landed.open}`);
   if (wantSplit) ok(`${name}: split radio matches the view (${wantSplit})`, !!landed && landed.split === wantSplit, landed && `split: ${landed.split}`);
+}
+
+/* ---- a group dot is drawn at a lifted y (trend plus the wave's group-vs-
+        all-voters gap) but TIPS the figure the wave printed - recomputed
+        here from window.AUSPOL, never the site copy. The .rd-note under
+        the chart and the copy-card caption carry the lift disclosure in
+        the reader's own view; the all-voters view keeps its classic
+        caption and no note. ---- */
+const hoverTip = async (selValue, groupLabel) => {
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1280, height: 900 });
+  await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#primary-vote .rd-pv-chart svg", { timeout: 20000 });
+  if (selValue) {
+    await page.select("#primary-vote select.rd-pv-sel", selValue);
+    await new Promise((r) => setTimeout(r, 600));
+  } else {
+    await new Promise((r) => setTimeout(r, 300));
+  }
+  const dot = await page.evaluate(() => {
+    const svg = document.querySelector("#primary-vote .rd-pv-chart svg");
+    svg.scrollIntoView({ block: "center" });
+    const cs = [...svg.querySelectorAll("circle.scatter-dot")].filter((c) => c.getAttribute("fill") !== "var(--chart-bg)");
+    if (!cs.length) return null;
+    const r = cs[cs.length - 1].getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  });
+  let got = null;
+  if (dot) {
+    await page.mouse.move(dot.x - 30, dot.y - 30);
+    await new Promise((r) => setTimeout(r, 150));
+    await page.mouse.move(dot.x, dot.y);
+    try {
+      await page.waitForSelector("#primary-vote .rd-pv-chart .tip .tip-val", { timeout: 4000 });
+      got = await page.evaluate((gLabel) => {
+        const sec = document.querySelector("#primary-vote");
+        const t = sec.querySelector(".rd-pv-chart .tip");
+        const rows = [...t.querySelectorAll(".tip-row")].map((r) => ({
+          label: ((r.querySelector(".tip-label") || {}).textContent || "").trim(),
+          value: ((r.querySelector(".tip-val") || {}).textContent || "").trim(),
+        }));
+        const title = ((t.querySelector(".tip-title") || {}).textContent || "").trim();
+        const field = (rows.find((r) => r.label === "Field") || {}).value || "";
+        const partyRow = rows.find((r) => r.label !== "Field") || null;
+        /* the figure the wave printed, recomputed from the payload */
+        const D = window.AUSPOL;
+        const KEYS = ["alp", "lnp", "grn", "onp", "oth"];
+        const pi = partyRow ? KEYS.findIndex((k) => (k === "oth" ? "Others & independents" : D.PARTIES[k].name) === partyRow.label) : -1;
+        const q = D.individualPolls.find((x) => x.pollster === title && x.dateLabel === field);
+        let printed = null;
+        if (q && pi >= 0) {
+          if (gLabel) {
+            const gi = D.demoGroups.indexOf(gLabel);
+            if (q.grp && q.grp.v && q.grp.v[gi]) printed = q.grp.v[gi][pi].toFixed(1);
+          } else if (q.p) printed = q.p[KEYS[pi]].toFixed(1);
+        }
+        const note = sec.querySelector(".rd-pv-chart .rd-note");
+        let caption = null;
+        const cd = sec.querySelector(".rd-pv-chart .chart[data-copy]");
+        if (cd) { try { caption = JSON.parse(cd.getAttribute("data-copy")).caption; } catch {} }
+        return { title, partyRow, field, printed, noteText: note ? note.textContent : null, caption };
+      }, groupLabel);
+    } catch {}
+  }
+  await page.close();
+  return { dot, got };
+};
+console.log("== group dots tip the printed figure, and the lift is disclosed ==");
+for (const { view, group } of [{ view: "Gen Z", group: "Gen Z" }, { view: "Renting", group: "Renting" }, { view: null, group: null }]) {
+  const name = view || "All voters";
+  const { dot, got } = await hoverTip(view, group);
+  console.log(`--- ${name} dot tooltip`);
+  ok(`${name}: tooltip renders for a solid dot`, !!dot && !!got && !!got.partyRow, got && got.partyRow ? got.partyRow.label : "");
+  if (got && got.partyRow) {
+    ok(`${name}: tip value is the printed figure`, got.printed != null && got.partyRow.value === got.printed,
+      `tip ${got.partyRow.value} vs printed ${got.printed} (${got.title}, ${got.field})`);
+  }
+  if (group) {
+    ok(`${name}: lift note under the chart`, !!got && !!got.noteText && got.noteText.includes("own all-voters figure") && got.noteText.includes("Demographics"),
+      got && String(got.noteText).slice(0, 80));
+    ok(`${name}: copy caption discloses the lift`, !!got && !!got.caption && got.caption.includes("less its own all-voters figure"), got && got.caption);
+  } else {
+    ok(`${name}: no lift note in the all-voters view`, !!got && got.noteText === null, got && String(got.noteText).slice(0, 60));
+    ok(`${name}: copy caption is the all-voters one`, !!got && got.caption === "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
+      got && got.caption);
+  }
 }
 
 const fails = results.filter(([, p]) => !p);

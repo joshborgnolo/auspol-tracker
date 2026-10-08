@@ -97803,6 +97803,7 @@ function RdPrimary({
       return {
         x: q.x,
         y: M[p.id] + (gv[i] - tt[i]),
+        gv: gv[i],
         color: p.color,
         label: p.name,
         meta: q,
@@ -98037,11 +98038,11 @@ function RdPrimary({
         value: visible.map(p => "±" + (d.ci[p.id] != null ? d.ci[p.id].toFixed(1) : "–")).join(" ")
       }];
     },
-    fmt: v => v.toFixed(1),
+    fmt: (v, pt) => (G && pt && pt.gv != null ? pt.gv : v).toFixed(1),
     copy: {
       title: "First-preference vote for each party" + (G ? ", " + sel.who : ""),
       sub: story.head + (G ? ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork " + rdDate(D.latest.updatedISO, true) + "." : (KAL ? ". Smoothed trends through " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
-      caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
+      caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : G ? "Each dot is one poll’s reading of " + sel.who + " less its own all-voters figure, drawn onto the trend; lines are monthly averages, shaded bands their 95% intervals." : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
       legend: visible.map(p => ({
         label: p.name,
         color: p.color,
@@ -98058,7 +98059,9 @@ function RdPrimary({
     list: badges.list,
     onPick: pickEv,
     openKey: evtOpen && evtOpen.e ? evtOpen.e.badgeKey : null
-  })), React.createElement(RdKey, {
+  })), G && React.createElement("p", {
+    className: "rd-note"
+  }, "Each dot is one poll\u2019s reading of ", sel.who, " less that poll\u2019s own all-voters figure, drawn onto the trend; it is never the cut the poll printed, which sits beside every other poll\u2019s in All polls\u2019 Demographics view."), React.createElement(RdKey, {
     className: "rd-ckey",
     items: [{
       kind: "dot",
