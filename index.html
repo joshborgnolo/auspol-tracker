@@ -3842,7 +3842,8 @@ body.rd .rd-dir-uns > span { position: absolute; bottom: calc(100% + 6px); left:
 body.rd .rd-dir-net { margin: 32px 0 0; font-size: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 body.rd .rd-dir-net b { font-weight: 600; color: var(--ink); }
 body.rd .rd-dir-chart { margin-top: 40px; }
-body.rd .rd-mood-chart { margin-top: 40px; }
+body.rd .rd-mood-tabs { margin-top: 40px; }
+body.rd .rd-mood-chart { margin-top: 28px; }
 body.rd .view-how { margin-top: 16px; }
 @media (max-width: 640px) {
   body.rd .rd-dir-uns > span { bottom: calc(100% + 14px); left: calc(50% + 6px); transform: none; }
@@ -3854,6 +3855,7 @@ body.rd .view-how { margin-top: 16px; }
   body.rd .rd-dir-bar { height: 14px; }
   body.rd .rd-dir-net { margin-top: 14px; font-size: 14px; text-align: center; }
   body.rd .rd-dir-chart { margin-top: 28px; }
+  body.rd .rd-mood-tabs { margin-top: 28px; }
   body.rd .rd-mood-chart { margin-top: 28px; }
 }
 body.rd .rd-wv-tabs { margin-top: 28px; }
@@ -85917,7 +85919,7 @@ function infoTerms(D) {
     nav: "Sentiment",
     lead: {
       id: "mood",
-      body: React.createElement(React.Fragment, null, "Four published confidence gauges of the same economy: the ANZ\u2013Roy Morgan Consumer Confidence index, published weekly; the Westpac\u2013Melbourne Institute Consumer Sentiment index, monthly; Roy Morgan\u2019s Business Confidence index, monthly; and NAB\u2019s Monthly Business Survey. The chart opens at the May 2025 election; the figures on file run further back \u2014 2019 for the Roy Morgan series, 2022 for Westpac, and April 2025 for NAB.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "Four published confidence gauges of the same economy: the ANZ\u2013Roy Morgan Consumer Confidence index, published weekly; the Westpac\u2013Melbourne Institute Consumer Sentiment index, monthly; Roy Morgan\u2019s Business Confidence index, monthly; and NAB\u2019s Monthly Business Survey. The consumer pair and the business pair sit in two views, switched by the tabs over the chart \u2014 the consumer pair opens first. The chart opens at the May 2025 election; the figures on file run further back \u2014 2019 for the Roy Morgan series, 2022 for Westpac, and April 2025 for NAB.", React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "100 is neutral."), " The three index series are built from the balance of optimists and pessimists on each house\u2019s questions, so a reading above 100 means optimists outnumber pessimists and one below 100 the reverse."), React.createElement("span", {
         className: "info-p"
@@ -96694,6 +96696,13 @@ function RdUndecided({
     }
   }, "Figures pool three waves at a time. Two figures differ significantly when the gap between them is larger than their two margins combined."))));
 }
+const RD_MOOD_VIEWS = [{
+  id: "consumer",
+  label: "Consumers"
+}, {
+  id: "business",
+  label: "Businesses"
+}];
 function RdMood({
   rangeId
 }) {
@@ -96707,6 +96716,7 @@ function RdMood({
   const NICE = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const lanes = [{
     k: "consumer",
+    view: "consumer",
     s: M.consumer,
     name: "Consumers",
     dekName: "Consumers",
@@ -96721,6 +96731,7 @@ function RdMood({
     short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly."
   }, {
     k: "westpacConsumer",
+    view: "consumer",
     s: M.westpacConsumer,
     name: "Consumers",
     dekName: "Consumers on Westpac–MI’s read",
@@ -96735,6 +96746,7 @@ function RdMood({
     short: "The Westpac–Melbourne Institute’s monthly gauge of the same household mood; 100 is neutral on this scale too."
   }, {
     k: "business",
+    view: "business",
     s: M.business,
     name: "Businesses",
     dekName: "Businesses",
@@ -96749,6 +96761,7 @@ function RdMood({
     short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly."
   }, {
     k: "nabBusiness",
+    view: "business",
     s: M.nabBusiness,
     name: "Businesses",
     dekName: "Businesses on NAB’s survey",
@@ -96764,6 +96777,8 @@ function RdMood({
   }].filter(l => l.s && l.s.polls.length);
   if (!lanes.length) return null;
   for (const l of lanes) l.lat = l.s.latest;
+  const [view, setView] = useState("consumer");
+  const viewLanes = lanes.filter(l => l.view === view);
   const smooth = (polls, halfLifeDays) => {
     const decay = Math.LN2 / (halfLifeDays / 365.25);
     return polls.map(p => {
@@ -96825,7 +96840,7 @@ function RdMood({
   };
   const rows = new Map(lanes.map(l => [l.k, l.s.polls.filter(p => p.x >= x0)]));
   const dek = lanes.map(sent).join(" ");
-  const rawPoints = new Map(lanes.map(l => [l.k, rows.get(l.k).map(p => ({
+  const rawPoints = new Map(viewLanes.map(l => [l.k, rows.get(l.k).map(p => ({
     x: p.x,
     y: p.v + l.shift,
     ym: p.ym,
@@ -96834,7 +96849,7 @@ function RdMood({
       raw: p.v
     } : {})
   }))]));
-  const sePoints = new Map(lanes.map(l => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({
+  const sePoints = new Map(viewLanes.map(l => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({
     x: p.x,
     y: p.y + l.shift,
     ym: rows.get(l.k)[i].ym,
@@ -96842,16 +96857,31 @@ function RdMood({
       raw: rows.get(l.k)[i].v
     } : {})
   }))]));
-  const vals = lanes.flatMap(l => rawPoints.get(l.k).map(p => p.y)).concat([100]);
+  const vals = viewLanes.flatMap(l => rawPoints.get(l.k).map(p => p.y)).concat([100]);
   const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10,
     hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
-  const spine = rawPoints.get(lanes[0].k);
-  const copyLegend = lanes.map(l => ({
+  const spine = rawPoints.get(viewLanes[0].k);
+  const copyLegend = viewLanes.map(l => ({
     label: l.lab + " (latest " + l.vfmt(l.lat.v) + ")",
     color: l.color,
     kind: l.dash ? "dashed" : "line"
   }));
   const fmt = (v, p) => p && p.raw != null ? NICE(p.raw) : v.toFixed(1);
+  const vc = view === "consumer" ? {
+    title: "Consumer confidence",
+    note: "100 = neutral on both gauges",
+    dashKey: "The Westpac–MI monthly read of the same household mood",
+    copyTitle: "Consumer confidence (two gauges)",
+    copySub: head + " Two published consumer gauges on one 100-neutral scale: the weekly ANZ–Roy Morgan consumer confidence index and Westpac–MI’s monthly consumer sentiment.",
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series). No combining, no adjustment."
+  } : {
+    title: "Business confidence",
+    note: "100 = neutral on the index; NAB’s net balance drawn 100 points up",
+    dashKey: "NAB’s net-balance read, drawn 100 points up",
+    copyTitle: "Business confidence (two gauges)",
+    copySub: head + " Two published business gauges on one 100-neutral scale: Roy Morgan’s monthly business confidence index and NAB’s Monthly Business Survey.",
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its dashed line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. No combining, no adjustment."
+  };
   return React.createElement(RdSec, {
     id: "mood",
     cls: "rd-mood",
@@ -96860,11 +96890,21 @@ function RdMood({
   }, React.createElement(RdHed, {
     head: head,
     dek: dek
-  }), React.createElement("div", {
+  }), React.createElement(RdTabs, {
+    swipe: true,
+    pin: true,
+    value: view,
+    onChange: setView,
+    options: RD_MOOD_VIEWS,
+    ariaLabel: "Confidence of",
+    className: "rd-mood-tabs"
+  }), React.createElement(RdCrossfade, {
+    k: view
+  }, React.createElement("div", {
     className: "card rd-card rd-mood-chart"
   }, React.createElement("div", {
     className: "rd-un-ptitle"
-  }, React.createElement("b", null, "Consumer and business confidence"), React.createElement("span", null, "100 = neutral on each index; NAB drawn +100")), lanes.map(l => React.createElement("div", {
+  }, React.createElement("b", null, vc.title), React.createElement("span", null, vc.note)), viewLanes.map(l => React.createElement("div", {
     key: l.k,
     className: "rd-un-read"
   }, React.createElement(RdSwatch, {
@@ -96881,7 +96921,7 @@ function RdMood({
   }, l.vfmt(l.lat.v)), l.lat.chg != null && Math.abs(l.lat.chg) >= 0.05 && React.createElement("span", {
     className: "rd-un-rci"
   }, rdArrow(l.lat.chg), " ", NICE(Math.abs(l.lat.chg)), " on the ", l.period))), React.createElement("p", null, l.short + (l.k === "nabBusiness" ? "" : " " + water(l, l.lat.v) + "."))))), React.createElement(TrendChart, {
-    key: "rd-mood",
+    key: "rd-mood-" + view,
     heightPx: narrow ? 260 : 340,
     padPx: narrow ? {
       l: 34,
@@ -96906,7 +96946,7 @@ function RdMood({
       align: "left",
       color: "var(--ink-3)"
     }],
-    series: lanes.map(l => ({
+    series: viewLanes.map(l => ({
       id: l.k,
       label: l.lab,
       color: l.color,
@@ -96920,7 +96960,7 @@ function RdMood({
     events: badges ? badges.events : evs,
     evt: evtOpen,
     onEvt: setEvtOpen,
-    scatter: lanes.flatMap(l => rawPoints.get(l.k).map(q => ({
+    scatter: viewLanes.flatMap(l => rawPoints.get(l.k).map(q => ({
       x: q.x,
       y: q.y,
       color: l.color,
@@ -96940,9 +96980,9 @@ function RdMood({
     },
     fmt: fmt,
     copy: {
-      title: "Consumer and business confidence",
-      sub: head + " Four published gauges on one 100-neutral scale: ANZ–Roy Morgan consumer confidence (weekly), Westpac–MI consumer sentiment, Roy Morgan business confidence and NAB business confidence (monthly).",
-      caption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly series). NAB prints a net balance (0 = neutral), so its dashed line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. No combining, no adjustment.",
+      title: vc.copyTitle,
+      sub: vc.copySub,
+      caption: vc.copyCaption,
       legend: copyLegend
     }
   }), badges && badges.list.length === 1 && React.createElement(RdEventList, {
@@ -96968,10 +97008,10 @@ function RdMood({
     }, {
       kind: "dash",
       color: "var(--ink-3)",
-      label: "The Westpac–MI and NAB reads of the same subjects"
+      label: vc.dashKey
     }]
-  })), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Four published gauges of the same mood, set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
+  }))), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Four published gauges of the same mood, split into two views \u2014 the consumer pair and the business pair, switched by the tabs over the chart \u2014 and set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
   }), React.createElement(RdFoot, {
     how: {
       term: "mood",

@@ -1,10 +1,13 @@
 /* Probe: the Snapshot's "Economic mood" panel (RdMood, rd-panels.jsx).
-   The panel draws FOUR published gauges on one plot (ANZ–Roy Morgan
-   consumer weekly, Westpac–MI consumer monthly, Roy Morgan business
-   monthly, NAB business monthly) as RAW-PRINT dots plus a render-side
-   recency-weighted smooth per series (symmetric half-life kernel, 14d on
-   the weekly index, 60d on the monthly ones); NAB is a net balance drawn
-   100 points up, and the payload D.mood stays the published readings.
+   The panel's FOUR published gauges sit in TWO views switched by the
+   tabs over the chart card — Consumers (ANZ–Roy Morgan's weekly index
+   with Westpac–MI's monthly as its dashed twin) opens first; Businesses
+   (Roy Morgan's monthly index with the NAB survey as its dashed twin) is
+   the other tab. Each view draws only its own pair as RAW-PRINT dots
+   plus a render-side recency-weighted smooth per series (symmetric
+   half-life kernel, 14d on the weekly index, 60d on the monthly ones)
+   and prices its own y-domain; NAB is a net balance drawn 100 points up,
+   and the payload D.mood stays the published readings.
    The plot's x-window opens at the 3 May 2025 election
    (x0 = 2025 + 122/365, gen-data's dx counting); the payload keeps the
    full on-file history, off-screen, so the payload pins below still run
@@ -65,13 +68,28 @@ const fails = [];
 const check = (ok, msg) => { console.log((ok ? "  ok " : "FAIL ") + msg); if (!ok) fails.push(msg); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/* The four lanes, mirroring rd-panels.jsx: hl per lane, NAB drawn +100. */
+/* The four lanes, mirroring rd-panels.jsx: hl per lane, NAB drawn +100;
+   each lane belongs to exactly one of the two tab-switched views. */
 const LANES = [
-  { k: "consumer", hl: 14, gate: 0.5, live: true, color: "var(--mood-consumer)", lab: "Consumers" },
-  { k: "westpacConsumer", hl: 60, gate: 1.0, live: false, color: "var(--mood-consumer)", lab: "Consumers · Westpac–MI" },
-  { k: "business", hl: 60, gate: 1.0, live: true, color: "var(--mood-business)", lab: "Businesses" },
-  { k: "nabBusiness", hl: 60, gate: 1.0, live: false, color: "var(--mood-business)", shift: 100, lab: "Businesses · NAB" },
+  { k: "consumer", view: "consumer", hl: 14, gate: 0.5, live: true, color: "var(--mood-consumer)", lab: "Consumers" },
+  { k: "westpacConsumer", view: "consumer", hl: 60, gate: 1.0, live: false, color: "var(--mood-consumer)", lab: "Consumers · Westpac–MI" },
+  { k: "business", view: "business", hl: 60, gate: 1.0, live: true, color: "var(--mood-business)", lab: "Businesses" },
+  { k: "nabBusiness", view: "business", hl: 60, gate: 1.0, live: false, color: "var(--mood-business)", shift: 100, lab: "Businesses · NAB" },
 ];
+const VIEW_TAB = { consumer: "Consumers", business: "Businesses" };
+const VIEW_HOUSES = { consumer: ["ANZ–Roy Morgan", "Westpac–MI"], business: ["Roy Morgan", "NAB"] };
+const VIEW_DASHKEY = {
+  consumer: "The Westpac–MI monthly read of the same household mood",
+  business: "NAB’s net-balance read, drawn 100 points up",
+};
+/* the read rows name their subject; each view's pair shares it */
+const VIEW_RDNAME = { consumer: "Consumers", business: "Businesses" };
+/* the per-view card note (rd-panels.jsx vc.title / vc.note) */
+const VIEW_PTITLE = { consumer: "Consumer confidence", business: "Business confidence" };
+const VIEW_NOTE = {
+  consumer: "100 = neutral on both gauges",
+  business: "100 = neutral on the index; NAB’s net balance drawn 100 points up",
+};
 const NICE = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
 const laneVfmt = (k) => (k === "nabBusiness" ? NICE : (v) => v.toFixed(1));
 
@@ -84,14 +102,20 @@ check(panels.includes('"Roy Morgan", hl: 60'), "business lane carries hl: 60 (mo
 check(panels.includes('"Westpac–MI", hl: 60'), "Westpac–MI lane carries hl: 60");
 check(panels.includes('"NAB", hl: 60'), "NAB lane carries hl: 60");
 check(panels.includes("smooth(rows.get(l.k), l.hl)"), "series points are the smoothed readings");
-check(panels.includes("const spine = rawPoints.get(lanes[0].k)"), "the hover spine stays the raw prints");
-check(panels.includes("scatter={lanes.flatMap((l) => rawPoints.get(l.k)"), "the scatter dots stay the raw prints");
+check(panels.includes("const spine = rawPoints.get(viewLanes[0].k)"), "the hover spine stays the view's raw prints");
+check(panels.includes("scatter={viewLanes.flatMap((l) => rawPoints.get(l.k)"), "the scatter dots stay the view's raw prints");
+check(panels.includes('useState("consumer")'), "the view tabs open on the consumer pair by default");
+check(panels.includes('className="rd-mood-tabs"'), "the consumer/business views ride the shared RdTabs row");
+check(panels.includes('key={"rd-mood-" + view}'), "the chart remounts per view (its pair's own domain)");
 const glossFile = fs.readdirSync(path.join(BASE, ".build/newtracker/assets")).find((f) => f.startsWith("d1a1d215-") && f.endsWith(".js"));
 const gloss = glossFile ? fs.readFileSync(path.join(BASE, ".build/newtracker/assets", glossFile), "utf8") : "";
-check(gloss.includes("Smoothed, not averaged across sources."), "glossary 'mood' entry leads with the smoothing note");
-check(gloss.includes("recency-weighted kernel (half-life 14 days on the weekly consumer index, 60 days"), "glossary names both half-lives");
-check(gloss.includes("NAB is drawn 100 points up."), "glossary discloses the NAB +100 draw");
-check(gloss.includes("The chart opens at the May 2025 election"), "glossary dates the chart window to the May 2025 election");
+const glossFlat = gloss.replace(/\s+/g, " "); /* the JSX source wraps its prose across lines */
+check(glossFlat.includes("Smoothed, not averaged across sources."), "glossary 'mood' entry leads with the smoothing note");
+check(glossFlat.includes("recency-weighted kernel (half-life 14 days on the weekly consumer index, 60 days"), "glossary names both half-lives");
+check(glossFlat.includes("NAB is drawn 100 points up."), "glossary discloses the NAB +100 draw");
+check(glossFlat.includes("The chart opens at the May 2025 election"), "glossary dates the chart window to the May 2025 election");
+check(glossFlat.includes("sit in two views, switched by the tabs over the chart — the consumer pair opens first"),
+  "glossary names the two tab-switched views and the consumer default");
 check(panels.includes("const x0 = 2025 + 122 / 365"), "the panel opens the x-window at the 2025 election (x0 = 2025 + 122/365)");
 check(panels.includes("xTicks={rdElectionTicks(x0, x1, narrow, x0)}"), "the x axis uses the election-window tick set (Election + months), not bare years");
 check(panels.includes("const evs = rdChartEvents(D.events, x0, x1).filter((e) => !MOOD_OFF.includes(e.date))"), "the panel marks the window's major events (rdChartEvents over x0..x1, less MOOD_OFF)");
@@ -129,7 +153,28 @@ page.on("pageerror", (e) => pageErrors.push(String(e)));
 async function open(width) {
   await page.setViewport({ width, height: 980, deviceScaleFactor: 1 });
   await page.goto("file://" + path.join(BASE, "index.html"), { waitUntil: "networkidle0", timeout: 60000 });
-  await page.waitForSelector('#mood .rd-mood-chart svg.chart-svg path.series-line[data-series="consumer"]', { timeout: 30000 });
+  await page.waitForSelector("#mood .rd-xf-now .rd-mood-chart svg.chart-svg path.series-line", { timeout: 30000 });
+}
+
+/* walk the tabs over the card to a view; wait until its pair is drawn
+   and the other view's lines have left the plot (the crossfade settles) */
+async function switchView(view) {
+  await page.evaluate((tab) => {
+    const t = [...document.querySelectorAll("#mood .rd-mood-tabs .rd-tab")].find((b) => (b.textContent || "").trim() === tab);
+    if (t) t.click();
+  }, VIEW_TAB[view] || view);
+  await page.waitForFunction((v) => {
+    const svg = document.querySelector("#mood .rd-xf-now .rd-mood-chart svg.chart-svg");
+    if (!svg) return false;
+    const here = v === "business" ? ["business", "nabBusiness"] : ["consumer", "westpacConsumer"];
+    const gone = v === "business" ? ["consumer", "westpacConsumer"] : ["business", "nabBusiness"];
+    return here.every((k) => svg.querySelector(`path.series-line[data-series="${k}"]`))
+      && gone.every((k) => !svg.querySelector(`path.series-line[data-series="${k}"]`));
+  }, { timeout: 15000 }, view);
+  /* the outgoing card lives on as the crossfade's .rd-xf-was ghost for
+     MORPH_MS+40; every chart query is already scoped to .rd-xf-now, and
+     the switch is only done once the ghost has fully left the DOM */
+  await page.waitForFunction(() => !document.querySelector("#mood .rd-xf-was"), { timeout: 15000 });
 }
 
 /* first open: pull the payload the page actually rendered */
@@ -205,7 +250,7 @@ for (const l of live) {
    the rest are tick marks, ascending; the axis-label texts come along
    for the name checks). pad read straight off the gridline x1/x2. */
 const fitScales = () => page.evaluate(() => {
-  const root = document.querySelector("#mood .rd-mood-chart svg.chart-svg");
+  const root = document.querySelector("#mood .rd-xf-now .rd-mood-chart svg.chart-svg");
   if (!root) return null;
   const ys = [...root.querySelectorAll('g[data-k^="y"] line.grid')].map((l) => ({
     t: parseFloat(l.closest("g").getAttribute("data-k").slice(1)),
@@ -247,7 +292,8 @@ const hpPx = (rung) => (rung > 640 ? 340 : 260);
 const padPxL = (rung) => (rung > 640 ? 40 : 34);
 const padPxR = (rung) => (rung > 640 ? 16 : 8);
 
-async function checkChart(rung) {
+async function checkChart(rung, viewKey) {
+  const vl = live.filter((l) => l.view === viewKey);
   const fit = await fitScales();
   check(!!fit, "chart svg measurable at " + rung + "px");
   if (!fit) return;
@@ -297,9 +343,20 @@ async function checkChart(rung) {
     return !!el && el.getBoundingClientRect().width > 0;
   }), "#mood renders on the default tab with no interaction");
 
-  for (const l of live) {
+  /* the tabs state: exactly the pair, the current view's pressed; and the
+     plot draws ONLY this view's series lines */
+  const tabState = await page.$$eval("#mood .rd-mood-tabs .rd-tab", (els) => els.map((e) => ({ t: (e.textContent || "").trim(), on: e.getAttribute("aria-pressed") })));
+  check(tabState.length === 2 && (tabState.find((x) => x.t === VIEW_TAB[viewKey]) || {}).on === "true"
+    && tabState.every((x) => x.t === VIEW_TAB[viewKey] || x.on === "false"),
+    `"${VIEW_TAB[viewKey]}" is the pressed tab of the pair (${tabState.map((x) => x.t + " " + x.on).join(", ")})`);
+  for (const o of live.filter((l) => l.view !== viewKey)) {
+    check(!(await page.$(`#mood .rd-xf-now .rd-mood-chart svg.chart-svg path.series-line[data-series="${o.k}"]`)),
+      `the other view's ${o.k} line stays off the plot`);
+  }
+
+  for (const l of vl) {
     const k = l.k;
-    const sel = `#mood .rd-mood-chart svg.chart-svg path.series-line[data-series="${k}"]`;
+    const sel = `#mood .rd-xf-now .rd-mood-chart svg.chart-svg path.series-line[data-series="${k}"]`;
     const d = await page.$eval(sel, (el) => el.getAttribute("d")).catch(() => null);
     check(!!d, `${k} series line drawn`);
     if (!d) continue;
@@ -329,12 +386,12 @@ async function checkChart(rung) {
   /* dots: colours repeat across lanes (Westpac's twin is dashed ink), so
      assert per expected PRINT by proximity, then totals and opacity */
   const allDots = await page.$$eval(
-    "#mood .rd-mood-chart svg.chart-svg circle.scatter-dot",
+    "#mood .rd-xf-now .rd-mood-chart svg.chart-svg circle.scatter-dot",
     (els) => els.map((e) => ({ cx: parseFloat(e.getAttribute("cx")), cy: parseFloat(e.getAttribute("cy")), fill: e.getAttribute("fill"), op: e.getAttribute("fill-opacity") })));
-  const totalWant = live.reduce((a, l) => a + fil[l.k].length, 0);
-  check(allDots.length === totalWant, `scatter: ${allDots.length} raw-print dots across ${live.length} lanes (${totalWant} readings)`);
+  const totalWant = vl.reduce((a, l) => a + fil[l.k].length, 0);
+  check(allDots.length === totalWant, `scatter: ${allDots.length} raw-print dots across the view's ${vl.length} lanes (${totalWant} readings)`);
   check(allDots.every((d) => d.op === "0.5"), "dots ride the rd 0.5 fill-opacity");
-  for (const l of live) {
+  for (const l of vl) {
     const k = l.k;
     const dots = allDots.filter((d) => d.fill === l.color);
     const idx = [];
@@ -352,10 +409,10 @@ async function checkChart(rung) {
     check(!!hit, `${k}: the last print's dot sits exactly on it (${last.released}, ${last.v}${l.shift ? " plotted " + (last.v + l.shift) : ""})`);
   }
 
-  const labels = await texts("#mood svg.chart-svg text.end-label");
+  const labels = await texts("#mood .rd-xf-now svg.chart-svg text.end-label");
   if (rung > 640) {
-    check(labels.length === live.length && live.every((l) => labels.includes(l.lab)),
-      `one in-chart end label per lane (${labels.join(", ")})`);
+    check(labels.length === vl.length && vl.every((l) => labels.includes(l.lab)),
+      `one in-chart end label per lane of the view (${labels.join(", ")})`);
   } else {
     check(labels.length === 0, "no in-chart end labels on the phone (the readouts above name them)");
   }
@@ -367,7 +424,7 @@ async function checkChart(rung) {
      aria-hidden g.evt per named event (the redesign sets every name
      after every rule), so the count pins the ruled role="img" groups.
      A phone numbers them and folds the names out under the chart */
-  const evArias = await page.$$eval('#mood .rd-mood-chart svg.chart-svg g.evt[role="img"]', (els) => els.map((el) => el.getAttribute("aria-label") || ""));
+  const evArias = await page.$$eval('#mood .rd-xf-now .rd-mood-chart svg.chart-svg g.evt[role="img"]', (els) => els.map((el) => el.getAttribute("aria-label") || ""));
   check(expEvs.length > 0 && evArias.length === expEvs.length, `${expEvs.length} marked events ride the chart (${evArias.length} rules)`);
   check(expEvs.every((e) => evArias.some((a) => a.startsWith(e.label))),
     `every windowed event carries its own rule (${expEvs.map((e) => e.date).join(", ")})`);
@@ -378,18 +435,18 @@ async function checkChart(rung) {
     check(ev && evArias.some((a) => a.startsWith(ev.label)), `the ${d} event rides the chart ("${ev ? ev.label : "?"}")`);
   }
   if (rung > 640) {
-    check((await page.$$eval("#mood .rd-mood-chart svg.chart-svg g.rd-badge circle", (els) => els.length)) === 0,
+    check((await page.$$eval("#mood .rd-xf-now .rd-mood-chart svg.chart-svg g.rd-badge circle", (els) => els.length)) === 0,
       "no phone badge row on desktop (the events label themselves)");
-    check((await texts("#mood .rd-evdrop")).length === 0, "no events list on desktop");
+    check((await texts("#mood .rd-xf-now .rd-evdrop")).length === 0, "no events list on desktop");
   } else {
-    const circles = await page.$$eval("#mood .rd-mood-chart svg.chart-svg g.rd-badge circle", (els) => els.length);
+    const circles = await page.$$eval("#mood .rd-xf-now .rd-mood-chart svg.chart-svg g.rd-badge circle", (els) => els.length);
     check(circles === expEvs.length, `${expEvs.length} numbered event badges ride above the plot (${circles} circles)`);
-    check((await texts("#mood .rd-evdrop summary"))[0] === "The marked events", 'the events fold opens with "The marked events"');
-    const lis = await texts("#mood .rd-evdrop li");
+    check((await texts("#mood .rd-xf-now .rd-evdrop summary"))[0] === "The marked events", 'the events fold opens with "The marked events"');
+    const lis = await texts("#mood .rd-xf-now .rd-evdrop li");
     check(lis.length === expEvs.length, `${expEvs.length} events listed under the chart (${lis.length} rows)`);
     check(expList.every((l) => lis.some((t) => t.includes(l.t))), "each numbered badge's name is in the list");
   }
-  await checkCopy();
+  await checkCopy(viewKey);
   check(pageErrors.length === 0, `no page errors at ${rung}px${pageErrors.length ? ": " + pageErrors.join(" | ") : ""}`);
   pageErrors = [];
 }
@@ -409,9 +466,10 @@ const expHead = cSide === "under" && bSide === "under" ? "Confidence is underwat
   : cSide === "above" && bSide === "under" ? "Businesses are underwater; consumers aren’t."
   : "The gauges disagree on which side of the line the mood sits.";
 
-async function checkCopy() {
+async function checkCopy(viewKey) {
+  const vl = live.filter((l) => l.view === viewKey);
   const title = await texts("#mood .rd-title");
-  check(title[0] === "Economic mood", `section title "Economic mood" (got "${title[0]}")`);
+  check(title[0] === "Economic sentiment", `section title "Economic sentiment" (got "${title[0]}")`);
   const head = await texts("#mood h3.rd-hed");
   check(head[0] === expHead, `headline is the data-composed mood verdict ("${head[0]}")`);
   const dek = (await texts("#mood p.rd-dek"))[0] || "";
@@ -421,21 +479,27 @@ async function checkCopy() {
     check(dek.includes(" " + NICE(Math.abs(P.consumer.latest.chg)) + " on the week"), "dek carries the printed weekly change");
   if (P.nabBusiness && P.nabBusiness.latest.cond != null)
     check(dek.includes("(conditions " + NICE(P.nabBusiness.latest.cond) + ")"), "dek carries NAB's printed conditions figure");
-  const rv = await texts("#mood .rd-un-rv");
-  const wantRv = live.map((l) => laneVfmt(l.k)(P[l.k].latest.v));
-  check(rv.length === wantRv.length && wantRv.every((w, i) => rv[i] === w),
-    `readout figures are the raw prints in lane order (${rv.join(" / ")})`);
-  const pt = (await texts("#mood .rd-mood-chart .rd-un-ptitle")).join(" ");
-  check(pt.includes("NAB’s net balance drawn 100 points up"), "chart card discloses the NAB +100 draw");
-  const who = await texts("#mood .rd-un-rhouse");
-  check(live.every((l, i) => ["ANZ–Roy Morgan", "Westpac–MI", "Roy Morgan", "NAB"].includes(who[i])),
+  /* everything below the tabs speaks for the view's own pair alone */
+  const pt = (await texts("#mood .rd-xf-now .rd-mood-chart .rd-un-ptitle")).join(" ");
+  check(pt.includes(VIEW_PTITLE[viewKey]) && pt.includes(VIEW_NOTE[viewKey]),
+    `card title is "${VIEW_PTITLE[viewKey]}" with its pair's note (got "${pt.slice(0, 110)}")`);
+  const rn = await texts("#mood .rd-xf-now .rd-mood-chart .rd-un-rtop b");
+  check(rn.length === vl.length && rn.every((t) => t === VIEW_RDNAME[viewKey]),
+    `the view's read rows name "${VIEW_RDNAME[viewKey]}" (${rn.join(" / ")})`);
+  const who = await texts("#mood .rd-xf-now .rd-un-rhouse");
+  check(who.length === vl.length && VIEW_HOUSES[viewKey].every((h, i) => who[i] === h),
     `each read row names its house (${who.join(" / ")})`);
-  const key = await texts("#mood .rd-ckey .rd-key-item");
+  const rv = await texts("#mood .rd-xf-now .rd-un-rv");
+  const wantRv = vl.map((l) => laneVfmt(l.k)(P[l.k].latest.v));
+  check(rv.length === wantRv.length && wantRv.every((w, i) => rv[i] === w),
+    `readout figures are the view's raw prints in lane order (${rv.join(" / ")})`);
+  const key = await texts("#mood .rd-xf-now .rd-ckey .rd-key-item");
   check(key.some((t) => t === "One release, as printed") && key.some((t) => t === "Smoothed trend of the releases"),
     "key reads dot = one release as printed, line = smoothed trend");
-  check(key.some((t) => t === "The Westpac–MI and NAB reads of the same subjects"), "key names the dashed twin gauges");
+  check(key.some((t) => t === VIEW_DASHKEY[viewKey]), "key names the view's dashed twin gauge");
   const how = (await texts("#mood details.view-how")).join(" ");
   check((await texts("#mood details.view-how summary"))[0] === "How to read this chart", "HowTo summary standard");
+  check(how.includes("split into two views") && how.includes("switched by the tabs"), "HowTo says the gauges split into two tab-switched views");
   check(how.includes("half-life 14 days") && how.includes("60 days on the monthly"), "HowTo names the half-lives");
   check(how.includes("recency-weighted kernel") && how.includes("raw prints"), "HowTo says kernel-smoothed lines, raw-print figures");
   check(how.includes("100 points up") && how.includes("net balance"), "HowTo discloses NAB's net balance and the +100 draw");
@@ -445,14 +509,25 @@ async function checkCopy() {
     "foot names the four sources and the context caveat");
 }
 
-console.log("desktop 1366:");
-await checkChart(1366);
-console.log("desktop 860:");
+/* each rung: the page opens on the consumer default; then the tabs walk
+   to the business view and the same checks run against its own pair */
+console.log("desktop 1366 consumers:");
+await checkChart(1366, "consumer");
+console.log("desktop 1366 businesses:");
+await switchView("business");
+await checkChart(1366, "business");
+console.log("desktop 860 consumers:");
 await open(860);
-await checkChart(860);
-console.log("phone 390:");
+await checkChart(860, "consumer");
+console.log("desktop 860 businesses:");
+await switchView("business");
+await checkChart(860, "business");
+console.log("phone 390 consumers:");
 await open(390);
-await checkChart(390);
+await checkChart(390, "consumer");
+console.log("phone 390 businesses:");
+await switchView("business");
+await checkChart(390, "business");
 await page.setViewport({ width: 390, height: 520, deviceScaleFactor: 1 });
 await sleep(250); // intentional-sleep: media-query hooks settle after resize
 const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);

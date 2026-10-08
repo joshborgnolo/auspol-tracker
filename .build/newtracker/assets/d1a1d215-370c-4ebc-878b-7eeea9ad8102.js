@@ -7367,7 +7367,9 @@ function infoTerms(D) {
         <>Four published confidence gauges of the same economy: the ANZ–Roy Morgan Consumer
         Confidence index, published weekly; the Westpac–Melbourne Institute Consumer Sentiment
         index, monthly; Roy Morgan’s Business Confidence index, monthly; and NAB’s Monthly
-        Business Survey. The chart opens at the May 2025 election; the figures on file run
+        Business Survey. The consumer pair and the business pair sit in two views, switched by
+        the tabs over the chart — the consumer pair opens first. The chart opens at the May
+        2025 election; the figures on file run
         further back — 2019 for the Roy Morgan series, 2022 for Westpac, and April 2025 for NAB.
         <span className="info-p"><b>100 is neutral.</b> The three index series are built from the
         balance of optimists and pessimists on each house’s questions, so a reading above 100
