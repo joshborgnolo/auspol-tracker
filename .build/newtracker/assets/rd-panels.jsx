@@ -2233,7 +2233,9 @@ function RdDemographics({ rangeId = "all" }) {
     }
     /* thin moves trail the solid claim (the thin locDek and the hedged
        stateDek render "appears to"; a group sentence of only thin moves
-       hedges too); a set already carried by a solid move stays out */
+       hedges too); a set already carried by a solid move stays out. Thin
+       sentences collect apart and join LAST — a hedged sentence never
+       opens the dek, so the first claim is always solid */
     const carried = new Set(setsRanked.map(({ ms }) => ms[0].tab + "|" + ms[0].set));
     const thinSets = new Map();
     for (const m of thin) {
@@ -2242,15 +2244,16 @@ function RdDemographics({ rangeId = "all" }) {
       if (!thinSets.has(k)) thinSets.set(k, []);
       thinSets.get(k).push(m);
     }
+    const thinParts = [], thinGroupMoves = [];
     [...thinSets.values()]
       .map((ms) => ({ ms, top: Math.max(...ms.map((m) => Math.abs(m.tLR))) }))
       .sort((a, b) => b.top - a.top)
       .slice(0, 2)
       .forEach(({ ms }) => {
         const m0 = ms[0];
-        if (m0.set === "state") parts.push(stateDek(ms, true).dek);
-        else if (m0.set === "location") parts.push(...locDek(bestOf(ms)));
-        else groupMoves.push(bestOf(ms));
+        if (m0.set === "state") thinParts.push(stateDek(ms, true).dek);
+        else if (m0.set === "location") thinParts.push(...locDek(bestOf(ms)));
+        else thinGroupMoves.push(bestOf(ms));
       });
     /* a dek the group sentence OPENS drops the "also" and stays lower-case
        ("Since …, it has shifted towards renters (+0.9 points)"); after a
@@ -2259,9 +2262,13 @@ function RdDemographics({ rangeId = "all" }) {
       const s = groupSentence(groupMoves);
       parts.push(parts.length ? s : s.replace(/^I(t|ts)/, (w) => w.toLowerCase()).replace(" also ", " "));
     }
+    /* thin group moves close the dek in their own sentence (all-thin, so
+       groupSentence hedges it) — never mixed unhedged into the solid one */
+    if (thinGroupMoves.length) thinParts.push(groupSentence(thinGroupMoves));
+    const ordered = parts.concat(thinParts);
     /* sentences after the first start a sentence of their own, so a
        lower-case name ("others & independents") still opens capitalised */
-    return { head, dek: since + parts.map((s, i) => (i === 0 ? s : rdCap(s))).join(". ") + "." };
+    return { head, dek: since + ordered.map((s, i) => (i === 0 ? s : rdCap(s))).join(". ") + "." };
   })();
 
   /* the full significance battery behind the dek: every tested group, pass

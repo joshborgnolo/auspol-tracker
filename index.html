@@ -100537,6 +100537,8 @@ function RdDemographics({
       if (!thinSets.has(k)) thinSets.set(k, []);
       thinSets.get(k).push(m);
     }
+    const thinParts = [],
+      thinGroupMoves = [];
     [...thinSets.values()].map(ms => ({
       ms,
       top: Math.max(...ms.map(m => Math.abs(m.tLR)))
@@ -100544,15 +100546,17 @@ function RdDemographics({
       ms
     }) => {
       const m0 = ms[0];
-      if (m0.set === "state") parts.push(stateDek(ms, true).dek);else if (m0.set === "location") parts.push(...locDek(bestOf(ms)));else groupMoves.push(bestOf(ms));
+      if (m0.set === "state") thinParts.push(stateDek(ms, true).dek);else if (m0.set === "location") thinParts.push(...locDek(bestOf(ms)));else thinGroupMoves.push(bestOf(ms));
     });
     if (groupMoves.length) {
       const s = groupSentence(groupMoves);
       parts.push(parts.length ? s : s.replace(/^I(t|ts)/, w => w.toLowerCase()).replace(" also ", " "));
     }
+    if (thinGroupMoves.length) thinParts.push(groupSentence(thinGroupMoves));
+    const ordered = parts.concat(thinParts);
     return {
       head,
-      dek: since + parts.map((s, i) => i === 0 ? s : rdCap(s)).join(". ") + "."
+      dek: since + ordered.map((s, i) => i === 0 ? s : rdCap(s)).join(". ") + "."
     };
   })();
   const sgn1 = (v, s) => (v < 0 ? "−" : s && v > 0 ? "+" : "") + Math.abs(v).toFixed(1);
