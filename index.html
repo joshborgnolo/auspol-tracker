@@ -76593,6 +76593,27 @@ function TrendChart(props) {
     for (let i = 0; i < s.points.length; i++) if (s.points[i].x === x) return s.points[i];
     return null;
   };
+  const ptAtXLine = (s, x) => {
+    const p = ptAtX(s, x);
+    if (p || !s.interpHover) return p;
+    const pts = s.points;
+    if (!pts.length || x < pts[0].x || x > pts[pts.length - 1].x) return null;
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1],
+        b = pts[i];
+      if (x <= b.x) {
+        const f = b.x - a.x ? (x - a.x) / (b.x - a.x) : 0;
+        return {
+          x,
+          y: a.y + (b.y - a.y) * f,
+          ...(a.raw != null && b.raw != null ? {
+            raw: a.raw + (b.raw - a.raw) * f
+          } : {})
+        };
+      }
+    }
+    return null;
+  };
   const visEnd = s => {
     const pts = s.points,
       last = pts[pts.length - 1];
@@ -77187,7 +77208,7 @@ function TrendChart(props) {
         const claimed = new Set();
         return series.map(s => {
           if (s.opacity === 0 || spx == null) return null;
-          const p = ptAtX(s, spx);
+          const p = ptAtXLine(s, spx);
           if (!p) return null;
           if (s.label != null) {
             if (claimed.has(s.label)) return null;
@@ -77935,7 +77956,7 @@ function TrendChart(props) {
   }))), series.map(s => {
     if (s.opacity === 0 || s.wipe != null && s.wipe >= 1) return null;
     const spx = hi != null && !dot && !evt && spinePts[hi] ? spinePts[hi].x : null;
-    const p = spx != null ? ptAtX(s, spx) : null;
+    const p = spx != null ? ptAtXLine(s, spx) : null;
     const last = visEnd(s);
     const at = p || last;
     if (!at) return null;
@@ -101852,6 +101873,7 @@ function RdConfidence({
       dash: l.dash || undefined,
       smooth: false,
       endCap: false,
+      interpHover: true,
       points: deepPoints.get(k)
     };
   }) : [];
@@ -101874,6 +101896,8 @@ function RdConfidence({
     consumer: new Set(),
     business: new Set()
   });
+  const ccRef = React.useRef(null);
+  window.useDismissOutside(ccRef, board, () => setBoard(false));
   const lifted = liftedBy[histLane];
   const lift = yr => setLiftedBy(s => {
     const n = new Set(s[histLane]);
@@ -101928,6 +101952,7 @@ function RdConfidence({
     dash: "2 3.4",
     smooth: false,
     endCap: false,
+    interpHover: true,
     points: hband.band.map(r => ({
       x: r.m,
       y: r.mean
@@ -101942,6 +101967,7 @@ function RdConfidence({
     smooth: false,
     endCap: false,
     endLabel: narrow ? null : String(t.year),
+    interpHover: true,
     points: t.v.map((v, m) => v == null || m > xMax ? null : {
       x: m,
       y: v
@@ -101981,6 +102007,7 @@ function RdConfidence({
     color: l.color,
     rdWidth: l.dash ? 1.6 : 2.2,
     dash: l.dash || undefined,
+    interpHover: true,
     endCap: false,
     endLabel: narrow ? null : l.by,
     points: ptsMap.get(l.k)
@@ -102047,7 +102074,8 @@ function RdConfidence({
   }), React.createElement(RdCrossfade, {
     k: view
   }, (hband || deepDrawn.length > 0) && React.createElement("div", {
-    className: "rd-cc rd-confidence-cc"
+    className: "rd-cc rd-confidence-cc",
+    ref: ccRef
   }, React.createElement("div", {
     className: "rd-confidence-draw"
   }, deepDrawn.length > 0 && React.createElement("button", {

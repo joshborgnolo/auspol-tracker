@@ -4032,7 +4032,10 @@ function RdConfidence({ rangeId }) {
     const l = viewLanes.find((v) => v.k === k);
     return { id: "deep-" + k, label: l.by + " (monthly history)", color: l.color,
       rdWidth: 1.3, opacity: 0.5, dash: l.dash || undefined, smooth: false, endCap: false,
-      points: deepPoints.get(k) };
+      /* quarterly early readings on a monthly spine: hold the row and the
+         marker on the line between its own prints, or the readout flickers
+         on and off mid-sweep (interpHover, the engine's opt-in) */
+      interpHover: true, points: deepPoints.get(k) };
   }) : [];
   const histX0 = histOn ? Math.floor(Math.min(...deepDrawn.map((k) => deepPoints.get(k)[0].x))) : 0;
   const histTicks = histOn ? (() => {
@@ -4057,6 +4060,12 @@ function RdConfidence({ rangeId }) {
      consumer view never reads as a phantom pill on the business one */
   const [board, setBoard] = useState(false);
   const [liftedBy, setLiftedBy] = useState({ consumer: new Set(), business: new Set() });
+  /* the board opens under a chip but hangs like a popover: a gesture that
+     begins anywhere outside .rd-cc puts it away (the chip itself is inside
+     the ref, so it keeps working as a close toggle), the same dismiss the
+     past-cycles board gets */
+  const ccRef = React.useRef(null);
+  window.useDismissOutside(ccRef, board, () => setBoard(false));
   const lifted = liftedBy[histLane];
   const lift = (yr) => setLiftedBy((s) => {
     const n = new Set(s[histLane]);
@@ -4088,12 +4097,13 @@ function RdConfidence({ rangeId }) {
   const meanSeries = hband ? {
     id: "conf-band-mean", label: "Mean of past terms", color: "var(--ink-2)",
     rdWidth: 1.9, opacity: 0.85, dash: "2 3.4", smooth: false, endCap: false,
-    points: hband.band.map((r) => ({ x: r.m, y: r.mean })),
+    interpHover: true, points: hband.band.map((r) => ({ x: r.m, y: r.mean })),
   } : null;
   const drawnSeries = histTerms.filter((t) => lifted.has(t.year)).map((t) => ({
     id: "conf-term-" + t.year, label: "The " + t.year + " term", color: "var(--ink)",
     rdWidth: 1.7, opacity: 0.9, smooth: false, endCap: false,
     endLabel: narrow ? null : String(t.year),
+    interpHover: true,
     points: t.v.map((v, m) => (v == null || m > xMax ? null : { x: m, y: v })).filter(Boolean),
   }));
   /* the footer download: every release behind the chart, every past-term
@@ -4135,6 +4145,9 @@ function RdConfidence({ rangeId }) {
      are the smoothed trend over the window's releases; in the history
      window the deep monthly lines go UNDER the live ones */
   const liveSeries = (ptsMap) => viewLanes.map((l) => ({ id: l.k, label: l.by, color: l.color, rdWidth: l.dash ? 1.6 : 2.2, dash: l.dash || undefined,
+    /* the monthly lane's prints land on the weekly lane's spine by luck
+       alone - ride the line between its own prints instead */
+    interpHover: true,
     endCap: false, endLabel: narrow ? null : l.by, points: ptsMap.get(l.k) }));
   const chartSeries = histOn ? deepSeries.concat(liveSeries(wideSe))
                              : liveSeries(sePoints).concat(meanSeries ? [meanSeries] : [], drawnSeries);
@@ -4174,7 +4187,7 @@ function RdConfidence({ rangeId }) {
       <RdTabs swipe pin value={view} onChange={setView} options={RD_CONF_VIEWS} ariaLabel="Confidence of" className="rd-confidence-tabs" />
       <RdCrossfade k={view}>
       {(hband || deepDrawn.length > 0) && (
-      <div className="rd-cc rd-confidence-cc">
+      <div className="rd-cc rd-confidence-cc" ref={ccRef}>
         <div className="rd-confidence-draw">
           {deepDrawn.length > 0 && (
             <button type="button" className="rd-chip rd-confidence-hist" aria-pressed={histOn}

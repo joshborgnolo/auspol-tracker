@@ -301,6 +301,34 @@ function TrendChart(props) {
     for (let i = 0; i < s.points.length; i++) if (s.points[i].x === x) return s.points[i];
     return null;
   };
+  /* A series opts into interpHover when its line interpolates faithfully
+     between its own points but the hover spine doesn't sample there – the
+     confidence panel's monthly-history lanes (quarterly readings on a
+     monthly spine) and its two out-of-step live lanes (monthly readings on
+     the other house's weekly spine). Exact matching then drops the line's
+     tooltip row on every off-month, and the row's appearing and vanishing
+     mid-sweep reads as the tooltip bouncing to a random point. The line
+     itself answers for that x everywhere between the points (a straight
+     path exactly, a smooth curve to within sub-pixel), so the row and the
+     hover marker ride the line between readings and hold one row per drawn
+     line. `raw` rides the interpolation so a shifted line (NAB's) prints
+     its true basis, never the shifted plot value. Default stays exact:
+     the ragged leader months deliberately have no in-between. */
+  const ptAtXLine = (s, x) => {
+    const p = ptAtX(s, x);
+    if (p || !s.interpHover) return p;
+    const pts = s.points;
+    if (!pts.length || x < pts[0].x || x > pts[pts.length - 1].x) return null;
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1], b = pts[i];
+      if (x <= b.x) {
+        const f = b.x - a.x ? (x - a.x) / (b.x - a.x) : 0;
+        return { x, y: a.y + (b.y - a.y) * f,
+                 ...(a.raw != null && b.raw != null ? { raw: a.raw + (b.raw - a.raw) * f } : {}) };
+      }
+    }
+    return null;
+  };
   /* Where a line visibly ends. Mid-switch its points run on under its
      travelling window (clipX), so its end cap and its name sit where the
      window cuts it - and arrive, with the last frame, exactly where the
@@ -957,7 +985,7 @@ function TrendChart(props) {
         const claimed = new Set();
         return series.map((s) => {
           if (s.opacity === 0 || spx == null) return null;
-          const p = ptAtX(s, spx);
+          const p = ptAtXLine(s, spx);
           if (!p) return null;
           if (s.label != null) {
             if (claimed.has(s.label)) return null;
@@ -1621,7 +1649,7 @@ function TrendChart(props) {
           // a line that is gone, or rubbed out, has no marker to glide along
           if (s.opacity === 0 || (s.wipe != null && s.wipe >= 1)) return null;
           const spx = hi != null && !dot && !evt && spinePts[hi] ? spinePts[hi].x : null;
-          const p = spx != null ? ptAtX(s, spx) : null;
+          const p = spx != null ? ptAtXLine(s, spx) : null;
           const last = visEnd(s);
           const at = p || last;
           if (!at) return null;
