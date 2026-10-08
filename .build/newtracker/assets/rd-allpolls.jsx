@@ -1716,7 +1716,10 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
    how many sit in the figure's window and how far apart they run. The
    window follows the measure's own (three weeks, six for the sparse ones),
    counted by release date as the 2PP head counts it. Returns null when the
-   measure has nothing current to say, and the table opens on its tabs. */
+   measure has nothing current to say, and the table opens on its tabs.
+   Each reads the whole poll set off the bundle, never the table's live
+   rows: the walk floor (RdAllPolls) writes every state's words at once,
+   whichever facet is open. */
 const RD_AP_DEM_NOUN = {
   "18–34": "18–34-year-olds", "55+": "over-55s", "65+": "over-65s", "50+": "over-50s", "Gen Z": "Gen Z", Boomers: "Boomers",
   Women: "women", Men: "men", University: "university graduates", "Year 12 or less": "voters who left school by Year 12",
@@ -1726,11 +1729,13 @@ const RD_AP_DEM_NOUN = {
   "Under $45k": "those on under $45k", "$100k or more": "those on $100k or more", "Under $100k": "those on under $100k",
 };
 const rdApDemNoun = (g) => RD_AP_DEM_NOUN[g] || "the " + g + " group";
-function rdApFacetStory(facet, rows, upd, demSplit) {
+function rdApFacetStory(facet, upd, demSplit) {
   const D = window.AUSPOL;
   const J = window.JUR;
+  /* the polls the facets' rows hold; direction adds the waves that asked
+     only the direction question (the d1a1 asset's rows build) */
+  const polls = D.individualPolls || [];
   const inWin = (p, days) => { const t = rdApDays(p.released); return t > upd - days * 864e5 && t <= upd; };
-  const span = (days) => (days > 21 ? "six weeks" : "three weeks");
   const poss = (id) => rdPartyStart(id) + (rdPlural(id) ? "’" : "’s");
   /* "comes from six polls, which range from 24 to 30" - the 2PP head's shape */
   const fromPolls = (n, lo, hi, f) => " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s")
@@ -1749,7 +1754,7 @@ function rdApFacetStory(facet, rows, upd, demSplit) {
     if (ids.length < 2) return null;
     const [t1, t2] = ids;
     const days = (D.latest.method && D.latest.method.windowDays) || 21;
-    const ps = rows.filter((p) => inWin(p, days) && p.p && p.p[t1] != null);
+    const ps = polls.filter((p) => inWin(p, days) && p.p && p.p[t1] != null);
     if (!ps.length) return null;
     const n = ps.length, [lo, hi] = range(ps.map((p) => p.p[t1]));
     const f = rdApNum;
@@ -1792,7 +1797,7 @@ function rdApFacetStory(facet, rows, upd, demSplit) {
     const what = fav ? "net favourability" : "net approval";
     const days = !fav && !J ? 21 : 42;
     const isFav = (p) => ((p.appr.metricBy || {}).alb === "fav");
-    const ps = rows.filter((p) => inWin(p, days) && p.appr && p.appr.albNet != null && isFav(p) === !!fav);
+    const ps = polls.filter((p) => inWin(p, days) && p.appr && p.appr.albNet != null && isFav(p) === !!fav);
     if (!ps.length) return null;
     const n = ps.length, [lo, hi] = range(ps.map((p) => p.appr.albNet));
     const f = (v) => rdSigned(v, 0);
@@ -1818,7 +1823,7 @@ function rdApFacetStory(facet, rows, upd, demSplit) {
   if (facet === "direction") {
     const now = D.directionNow;
     if (!now) return null;
-    const ps = rows.filter((p) => inWin(p, 21) && p.dir && p.dir.net != null);
+    const ps = polls.concat(D.directionOnlyPolls || []).filter((p) => inWin(p, 21) && p.dir && p.dir.net != null);
     if (!ps.length) return null;
     const n = ps.length, [lo, hi] = range(ps.map((p) => p.dir.net));
     const head = "The net mood of " + rdSigned(now.net, 1) + fromPolls(n, lo, hi, (v) => rdSigned(v, 0));
@@ -1896,7 +1901,7 @@ function rdApFacetStory(facet, rows, upd, demSplit) {
     }
     /* a split the section doesn't pool (income: the houses bracket
        different quantities) - the newest poll's own pair */
-    const ps = rows.filter((p) => window.demPairOf(p, demSplit)).sort((x, y) => (x.released < y.released ? 1 : -1));
+    const ps = polls.filter((p) => window.demPairOf(p, demSplit)).sort((x, y) => (x.released < y.released ? 1 : -1));
     if (!ps.length) return null;
     const p = ps[0], pr = window.demPairOf(p, demSplit);
     const gs = Object.keys(pr.gap).filter((k) => pr.gap[k] != null).sort((x, y) => Math.abs(pr.gap[y]) - Math.abs(pr.gap[x]));
@@ -1938,6 +1943,53 @@ function rdApFacetStory(facet, rows, upd, demSplit) {
     return { head, dek };
   }
   return null;
+}
+
+/* a poll's lean on a contest and basis, as the table's rows compute it
+   (the d1a1 asset's rows build): its figure less the yardstick average of
+   the polls around it, that average as printed to one decimal. The walk
+   floor writes the 2PP's words for every contest and basis at once, so it
+   reads the lean off the poll - the live rows carry only the live pair's */
+const rdApLeanFor = (p, onM, pub) => {
+  const y = rdApYd(p, onM, pub);
+  const x = pub ? (onM ? (p.tppAlt ? p.tppAlt.alp : null) : p.alpN) : (onM ? p.alpOnImp : p.alpImp);
+  return x != null && y && y.v != null ? +(x - Math.round(y.v * 10) / 10).toFixed(1) : null;
+};
+/* the 2PP facet's head and dek on one contest (onM: Labor v One Nation)
+   and basis (pub: as published): today's figure, the polls in its window
+   and how far apart they run, how many have Labor ahead, and how many sit
+   outside their own margin of where their pollster usually lands */
+function rdApTppStory(onM, pub, upd) {
+  const D = window.AUSPOL;
+  const today = window.AP.tppLatest(onM ? "alp_on" : "alp_lnp", pub ? "resp" : "imp");
+  const winDays = (D.latest.method && D.latest.method.windowDays) || 21;
+  const figOf = (p) => rdApFig(p, onM, pub);
+  const win = (D.individualPolls || []).filter((p) => { const t = rdApDays(p.released); return t > upd - winDays * 864e5 && t <= upd && figOf(p).a != null; });
+  if (!today || !win.length) return null;
+  const rival = onM ? "One Nation" : "the Coalition";
+  const contest = onM ? "onp" : "lnp";
+  const vals = win.map((p) => figOf(p).a);
+  const lo = Math.min(...vals), hi = Math.max(...vals);
+  const f = (v) => (pub ? rdApNum(v) : v.toFixed(1));
+  const n = win.length;
+  const head = RD_AP_KAL
+    ? "Labor’s " + today.a.toFixed(1) + " is the trend through every poll; "
+      + (n === 1 ? "the last three weeks hold one, at " + f(lo) : "the last three weeks’ " + rdNumWord(n) + (lo === hi ? " all put Labor on " + f(lo) : " range from " + f(lo) + " to " + f(hi)))
+    : "Labor’s " + today.a.toFixed(1) + " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s")
+    + (n === 1 ? "" : lo === hi ? ", which all put Labor on " + f(lo) : ", which range from " + f(lo) + " to " + f(hi));
+  const ahead = vals.filter((v) => v > 50).length;
+  const outN = win.filter((p) => rdApInside(rdApAdj({ ...p, lean: rdApLeanFor(p, onM, pub) }, onM, pub), rdPollMargin(p, contest, pub)) === "outside").length;
+  const lead = n === 1 ? (ahead ? "It has" : "It doesn’t have")
+    : ahead === n ? (n === 2 ? "Both have" : "All " + rdNumWord(n) + " have")
+    : ahead === 0 ? "None of them has"
+    : rdCap(rdNumWord(ahead)) + " of them " + (ahead === 1 ? "has" : "have");
+  const tail = n === 1 ? (outN ? "it sits further from where its pollster usually lands than its own margin of error. " : "it sits within its own margin of error of where its pollster usually lands. ")
+    : outN === 0 ? "none sits further from where its pollster usually lands than its own margin of error. "
+    : outN === 1 ? "one sits further from where its pollster usually lands than its own margin of error. "
+    : rdNumWord(outN) + " sit further from where their pollsters usually land than their own margin of error. ";
+  const dek = lead + " Labor ahead of " + rival + ", and " + tail
+    + "Below is every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election, newest first, each linked to its source.";
+  return { head, dek };
 }
 
 /* ---------------------------------------------------------------- the phone's filters
@@ -2054,6 +2106,14 @@ function RdAllPolls(P) {
      table: the rare contests live in Includes now */
   React.useEffect(() => { if (measure !== "lnp" && measure !== "onp") onMeasure("onp"); }, [measure]);
 
+  /* the facets this build walks: Confidence only where the mood file's
+     releases ship (never /vic/: the JUR build files no
+     confidenceOnlyPolls), and /vic/'s polls carry no direction, issues or
+     group figures */
+  const FACET_IDS = ["twopp", "primary", "leadership", "direction", "issues", "demographics"]
+    .concat((D.confidenceOnlyPolls || []).length ? ["confidence"] : [])
+    .filter((f) => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f));
+
   /* ---- today's figure and the polls it's built from ----------------------- */
   const today = window.AP.tppLatest(onM ? "alp_on" : "alp_lnp", pub ? "resp" : "imp");
   const upd = rdApDays(D.latest.updatedISO);
@@ -2063,33 +2123,108 @@ function RdAllPolls(P) {
      2PP figure - the window stays poll-based there, so an opened release's
      detail counts the same polls the other facets do */
   const win = (facet === "confidence" ? D.individualPolls : rows).filter(inToday);
-  let head = null, dek = null;
-  /* every facet but 2PP heads the table with its own measure (user call
-     2026-10-08): rdApFacetStory, below the table's helpers */
-  if (facet !== "twopp") ({ head, dek } = rdApFacetStory(facet, rows, upd, demSplit) || {});
-  else if (today && win.length) {
-    const vals = win.map((p) => figOf(p).a);
-    const lo = Math.min(...vals), hi = Math.max(...vals);
-    const f = (v) => (pub ? rdApNum(v) : v.toFixed(1));
-    const n = win.length;
-    head = RD_AP_KAL
-      ? "Labor’s " + today.a.toFixed(1) + " is the trend through every poll; "
-        + (n === 1 ? "the last three weeks hold one, at " + f(lo) : "the last three weeks’ " + rdNumWord(n) + (lo === hi ? " all put Labor on " + f(lo) : " range from " + f(lo) + " to " + f(hi)))
-      : "Labor’s " + today.a.toFixed(1) + " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s")
-      + (n === 1 ? "" : lo === hi ? ", which all put Labor on " + f(lo) : ", which range from " + f(lo) + " to " + f(hi));
-    const ahead = vals.filter((v) => v > 50).length;
-    const outN = win.filter((p) => rdApInside(rdApAdj(p, onM, pub), rdPollMargin(p, contest, pub)) === "outside").length;
-    const lead = n === 1 ? (ahead ? "It has" : "It doesn’t have")
-      : ahead === n ? (n === 2 ? "Both have" : "All " + rdNumWord(n) + " have")
-      : ahead === 0 ? "None of them has"
-      : rdCap(rdNumWord(ahead)) + " of them " + (ahead === 1 ? "has" : "have");
-    const tail = n === 1 ? (outN ? "it sits further from where its pollster usually lands than its own margin of error. " : "it sits within its own margin of error of where its pollster usually lands. ")
-      : outN === 0 ? "none sits further from where its pollster usually lands than its own margin of error. "
-      : outN === 1 ? "one sits further from where its pollster usually lands than its own margin of error. "
-      : rdNumWord(outN) + " sit further from where their pollsters usually land than their own margin of error. ";
-    dek = lead + " Labor ahead of " + rival + ", and " + tail
-      + "Below is every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election, newest first, each linked to its source.";
-  }
+  /* ---- the head and dek, and the walk floor --------------------------------
+     Each facet heads the table with its own head and dek (user call
+     2026-10-08): the 2PP's from rdApTppStory, the rest from rdApFacetStory.
+     Their words run to different lengths, and a hop that changes the height
+     of anything above the table makes the pin scroll the difference back -
+     which Safari.app's scroller lands ~±2css off and never lets it correct,
+     so an arrow walk crept the table down the screen (user report, same
+     day; the round-13 lesson of the rdpinscroll skill: delete the reflow,
+     never chase the correction). So the slot stands at the tallest of
+     every state a walk can reach - each facet, the Split-by picker's six
+     splits and the 2PP's four contest and basis pairs - written invisibly
+     in .rd-ap-storyvar and measured by the floor effect below: a hop
+     rewrites the words inside a box whose height never changes, and the
+     pin has nothing to scroll (the past-cycles walk floor, 6f25cf4) */
+  const stories = React.useMemo(() => {
+    const out = [];
+    const add = (key, st) => { if (st && st.head) out.push({ key, head: st.head, dek: st.dek }); };
+    for (const id of FACET_IDS) {
+      if (id === "twopp") {
+        for (const m of ["lnp", "onp"]) for (const b of ["imp", "resp"]) add("twopp|" + m + "|" + b, rdApTppStory(m === "onp", b === "resp", upd));
+      } else if (id === "demographics") {
+        for (const sp of window.DEM_SPLITS || []) add("demographics|" + sp.id, rdApFacetStory(id, upd, sp.id));
+      } else add(id, rdApFacetStory(id, upd));
+    }
+    return out;
+  }, [upd]);
+  const liveKey = facet === "twopp" ? "twopp|" + (onM ? "onp" : "lnp") + "|" + (pub ? "resp" : "imp")
+    : facet === "demographics" ? "demographics|" + demSplit : facet;
+  const live = stories.find((st) => st.key === liveKey);
+  const head = live ? live.head : null, dek = live ? live.dek : null;
+  /* the floor: the tallest written state, re-measured if any of them
+     re-wraps (a resize, a font arriving). Every state is in the stack,
+     the live one too, so a hop never moves the floor */
+  const hedVarRef = useRef(null);
+  const [hedFloor, setHedFloor] = useState(0);
+  const storiesKey = stories.map((st) => st.key + "\u0000" + st.head + "\u0000" + st.dek).join("\u0001");
+  React.useLayoutEffect(() => {
+    const box = hedVarRef.current;
+    if (!box) return undefined;
+    const measure = () => {
+      let h = 0;
+      for (const c of box.children) h = Math.max(h, c.getBoundingClientRect().height);
+      h = Math.ceil(h - 0.01);
+      setHedFloor((f) => (f === h ? f : h));
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver(measure);
+    [...box.children].forEach((c) => ro.observe(c));
+    return () => ro.disconnect();
+  }, [storiesKey]);
+  /* the narrow control row walks the same floor: under 1140px the 2PP
+     and Demographics facets keep their controls in a row of their own
+     beneath the tabs, which mounted and unmounted as the facet changed
+     (the .rd-ap-pctl lesson Latest polls' pinPl comment calls "the live
+     height change" - a 45px reflow the pin answered with a scroll
+     correction, and Safari lands those ~±2css off and never lets it
+     correct, so the table crawled, user report 2026-10-08). The slot
+     stands at the tallest of the two rows, measured invisibly in
+     .rd-ap-ctlvar: the split picker as-is, and the 2PP row with its
+     longest labels ("One Nation" out-lists "Coalition", "implied flows"
+     out-lists "as published"), so no facet hop, split pick or basis
+     flip reflows it either */
+  const ctlVarRef = useRef(null);
+  const [ctlFloor, setCtlFloor] = useState(0);
+  React.useLayoutEffect(() => {
+    const box = ctlVarRef.current;
+    if (!box) return undefined;
+    const measure = () => {
+      let h = 0;
+      for (const c of box.children) h = Math.max(h, c.getBoundingClientRect().height);
+      h = Math.ceil(h - 0.01);
+      setCtlFloor((f) => (f === h ? f : h));
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver(measure);
+    [...box.children].forEach((c) => ro.observe(c));
+    return () => ro.disconnect();
+  }, [ctlNarrow]);
+  /* and the eyebrow itself walks the same floor: Confidence's title and
+     meta are both the longer pair, and past the phone wrap widths its
+     meta alone went to a second line and lifted the whole section-head
+     row 18px over the walk (same user report). The two states measure
+     invisibly in .rd-ap-ebvar so only the words swap, never a height */
+  const ebVarRef = useRef(null);
+  const [ebFloor, setEbFloor] = useState(0);
+  React.useLayoutEffect(() => {
+    const box = ebVarRef.current;
+    if (!box) return undefined;
+    const measure = () => {
+      let h = 0;
+      for (const c of box.children) h = Math.max(h, c.getBoundingClientRect().height);
+      h = Math.ceil(h - 0.01);
+      setEbFloor((f) => (f === h ? f : h));
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver(measure);
+    [...box.children].forEach((c) => ro.observe(c));
+    return () => ro.disconnect();
+  }, [phone]);
   const todayTxt = today ? today.a.toFixed(1) : null;
 
   /* ---- paging, by whole months ---------------------------------------------- */
@@ -2159,17 +2294,13 @@ function RdAllPolls(P) {
      onFacet, the focus re-seated at the same position when the new facet's
      scope hides the poll it sat on; Enter or space toggles. */
   const visRows = byDate ? groups.flatMap((g) => g.list) : flat;
-  const FACETS = [{ id: "twopp", label: "2PP" }, { id: "primary", label: "Primary" },
-                  { id: "leadership", label: phone ? "Leaders" : "Leadership" }, { id: "direction", label: "Direction" },
-                  { id: "issues", label: "Issues" }, { id: "demographics", label: "Demographics" }]
-    /* the confidence facet exists only where the mood file's releases do –
-       never on /vic/ (the JUR build ships no confidenceOnlyPolls at all).
-       It shows at every width: where the seven tabs outrun a phone's row
-       the strip scrolls (the .ovf effect above), which also let Demographics keep
-       its full name there (it was "Groups" while six had to fit) */
-    .concat((D.confidenceOnlyPolls || []).length ? [{ id: "confidence", label: "Confidence" }] : [])
-    /* /vic/'s polls carry no direction, issues or group figures */
-    .filter((f) => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f.id));
+  /* Confidence shows at every width: where the seven tabs outrun a phone's
+     row the strip scrolls (the .ovf effect above), which also let
+     Demographics keep its full name there (it was "Groups" while six had
+     to fit) */
+  const FACET_LAB = { twopp: "2PP", primary: "Primary", leadership: phone ? "Leaders" : "Leadership", direction: "Direction",
+                      issues: "Issues", demographics: "Demographics", confidence: "Confidence" };
+  const FACETS = FACET_IDS.map((id) => ({ id, label: FACET_LAB[id] }));
   const rowNav = (e, p) => {
     if (e.target !== e.currentTarget) return;
     const id = rowKey(p);
@@ -2977,22 +3108,37 @@ function RdAllPolls(P) {
             onClick={flipPick}>Labor v {onM ? "One Nation" : "Coalition"} <span aria-hidden="true">⇄</span></button>
   );
 
+  /* the eyebrow's copy by facet pair, written once so .rd-ap-ebvar can
+     lay both states out invisibly for the eyebrow floor above. keyId
+     keeps the section's aria-labelledby id on the live copy only */
+  const eyebrowCopy = (conf, keyId) => (<>
+    <h2 className="rd-title" {...(keyId ? { id: "rd-ap-t" } : {})}>{conf ? "Economic sentiment" : "All polls"}</h2>
+    <span className="rd-meta">{conf
+      ? "Every confidence-index release (business and consumer) since the " + rdElecYear + " election"
+      : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"}</span>
+    {!phone && (
+      <nav className="rd-eyebrow-tools rd-ap-nav" aria-label="On this page">
+        <button type="button" onClick={() => jump("poll-disagreement")}>How much the polls disagree</button>
+        <button type="button" onClick={() => jump("house-lean")}>How each pollster leans</button>
+        <button type="button" onClick={() => jump("flow-drift")}>and Preference flows</button>
+      </nav>
+    )}
+  </>);
   return (
     <section className="rd-sec rd-first rd-ap" id="rd-ap-top" aria-labelledby="rd-ap-t" data-facet={facet}>
-      <div className="rd-eyebrow">
-        <h2 className="rd-title" id="rd-ap-t">{facet === "confidence" ? "Economic sentiment" : "All polls"}</h2>
-        <span className="rd-meta">{facet === "confidence"
-          ? "Every confidence-index release (business and consumer) since the " + rdElecYear + " election"
-          : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"}</span>
-        {!phone && (
-          <nav className="rd-eyebrow-tools rd-ap-nav" aria-label="On this page">
-            <button type="button" onClick={() => jump("poll-disagreement")}>How much the polls disagree</button>
-            <button type="button" onClick={() => jump("house-lean")}>How each pollster leans</button>
-            <button type="button" onClick={() => jump("flow-drift")}>and Preference flows</button>
-          </nav>
-        )}
+      <div className="rd-eyebrow" style={ebFloor ? { minHeight: ebFloor + "px" } : null}>
+        {eyebrowCopy(facet === "confidence", true)}
       </div>
-      {head && <RdHed head={head} dek={dek} level={2} />}
+      <div className="rd-ap-ebvar" ref={ebVarRef} aria-hidden="true">
+        <div className="rd-eyebrow">{eyebrowCopy(false, false)}</div>
+        <div className="rd-eyebrow">{eyebrowCopy(true, false)}</div>
+      </div>
+      <div className="rd-ap-hedslot" style={hedFloor ? { minHeight: hedFloor + "px" } : null}>
+        {head && <RdHed head={head} dek={dek} level={2} />}
+      </div>
+      <div className="rd-ap-storyvar" ref={hedVarRef} aria-hidden="true">
+        {stories.map((st) => <div key={st.key}><h2 className="rd-hed">{st.head}</h2><p className="rd-dek">{st.dek}</p></div>)}
+      </div>
 
       <RdTabs swipe value={facet} onChange={facetPick} options={FACETS} ariaLabel="Figures" className="rd-ap-tabs">
         {facet === "twopp" && !ctlNarrow && (
@@ -3003,10 +3149,23 @@ function RdAllPolls(P) {
         )}
         {facet === "demographics" && !ctlNarrow && splitPicker}
       </RdTabs>
-      {facet === "twopp" && ctlNarrow && (
-        <div className="rd-ap-pctl">{flip}<span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span><span className="rd-grow"></span>{qpop}</div>
+      {ctlNarrow && (
+        <>
+          <div className="rd-ap-ctlslot" style={ctlFloor ? { minHeight: ctlFloor + "px" } : null}>
+            {facet === "twopp" && (
+              <div className="rd-ap-pctl">{flip}<span className="rd-pl-ctl-l">, {pub ? "as published" : "implied flows"}</span><span className="rd-grow"></span>{qpop}</div>
+            )}
+            {facet === "demographics" && <div className="rd-ap-pctl">{splitPicker}</div>}
+          </div>
+          <div className="rd-ap-ctlvar" ref={ctlVarRef} aria-hidden="true">
+            <div className="rd-ap-pctl">
+              <button type="button" className="rd-pl-flip">Labor v One Nation <span aria-hidden="true">⇄</span></button>
+              <span className="rd-pl-ctl-l">, implied flows</span><span className="rd-grow"></span>{qpop}
+            </div>
+            <div className="rd-ap-pctl">{splitPicker}</div>
+          </div>
+        </>
       )}
-      {facet === "demographics" && ctlNarrow && <div className="rd-ap-pctl">{splitPicker}</div>}
 
       <div className="rd-ap-bar">
         <label className="rd-ap-search">

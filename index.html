@@ -4273,6 +4273,7 @@ body.rd .rd-cyc-nav button { all: unset; cursor: pointer; font-size: 12px; font-
 body.rd .rd-cyc-nav button:hover { text-decoration: underline; text-underline-offset: 3px; }
 body.rd .rd-cc { position: relative; margin-top: 32px; }
 body.rd .rd-cyc-storyvar { height: 0; overflow: hidden; visibility: hidden; }
+body.rd .rd-ap-storyvar, body.rd .rd-ap-ctlvar, body.rd .rd-ap-ebvar { height: 0; overflow: hidden; visibility: hidden; }
 body.rd .rd-cc-row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 body.rd .rd-cyc-chipmove {
   position: absolute; top: calc(var(--cyc-chip-pad, var(--rd-sec-pad)) + 1px); left: 0; z-index: 1;
@@ -4584,9 +4585,9 @@ body.rd .rd-ap-tabs { margin-top: 28px; }
 body.rd .rd-ap .rd-hed { line-height: 51px; }
 body.rd .rd-ap .rd-ap-pctl { min-height: 45px; }
 @media (min-width: 761px) and (max-width: 1239px) {
-  body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav { flex-basis: 100%; justify-content: flex-end; }
+  body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav, body.rd .rd-ap-ebvar > .rd-eyebrow > .rd-ap-nav { flex-basis: 100%; justify-content: flex-end; }
 }
-body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav { gap: 14px; }
+body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav, body.rd .rd-ap-ebvar > .rd-eyebrow > .rd-ap-nav { gap: 14px; }
 @media (max-width: 640px) {
   body.rd .rd-ap .rd-hed { line-height: 33px; }
   body.rd .rd-ap .rd-eyebrow .rd-meta { line-height: 18px; }
@@ -100058,7 +100059,8 @@ Object.assign(window, {
   rdCycPeers,
   rdCycRank
 });</script>
-  <script>const RD_AP_FLOWS = {
+  <script>function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
+const RD_AP_FLOWS = {
   lnp: {
     alp: 1,
     lnp: 0,
@@ -102359,14 +102361,14 @@ const RD_AP_DEM_NOUN = {
   "Under $100k": "those on under $100k"
 };
 const rdApDemNoun = g => RD_AP_DEM_NOUN[g] || "the " + g + " group";
-function rdApFacetStory(facet, rows, upd, demSplit) {
+function rdApFacetStory(facet, upd, demSplit) {
   const D = window.AUSPOL;
   const J = window.JUR;
+  const polls = D.individualPolls || [];
   const inWin = (p, days) => {
     const t = rdApDays(p.released);
     return t > upd - days * 864e5 && t <= upd;
   };
-  const span = days => days > 21 ? "six weeks" : "three weeks";
   const poss = id => rdPartyStart(id) + (rdPlural(id) ? "’" : "’s");
   const fromPolls = (n, lo, hi, f) => " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s") + (n === 1 ? "" : lo === hi ? ", which all read " + f(lo) : ", which range from " + f(lo) + " to " + f(hi));
   const tally = (k, n, has) => n === 1 ? k ? "It " + has : "It doesn’t " + (has === "has" ? "have" : has.replace(/s$/, "")) : k === n ? (n === 2 ? "Both " : "All " + rdNumWord(n) + " ") + (has === "has" ? "have" : has.replace(/s$/, "")) : k === 0 ? "None of them " + has : rdCap(rdNumWord(k)) + " of them " + (k === 1 ? has : has === "has" ? "have" : has.replace(/s$/, ""));
@@ -102378,7 +102380,7 @@ function rdApFacetStory(facet, rows, upd, demSplit) {
     if (ids.length < 2) return null;
     const [t1, t2] = ids;
     const days = D.latest.method && D.latest.method.windowDays || 21;
-    const ps = rows.filter(p => inWin(p, days) && p.p && p.p[t1] != null);
+    const ps = polls.filter(p => inWin(p, days) && p.p && p.p[t1] != null);
     if (!ps.length) return null;
     const n = ps.length,
       [lo, hi] = range(ps.map(p => p.p[t1]));
@@ -102413,7 +102415,7 @@ function rdApFacetStory(facet, rows, upd, demSplit) {
     const what = fav ? "net favourability" : "net approval";
     const days = !fav && !J ? 21 : 42;
     const isFav = p => (p.appr.metricBy || {}).alb === "fav";
-    const ps = rows.filter(p => inWin(p, days) && p.appr && p.appr.albNet != null && isFav(p) === !!fav);
+    const ps = polls.filter(p => inWin(p, days) && p.appr && p.appr.albNet != null && isFav(p) === !!fav);
     if (!ps.length) return null;
     const n = ps.length,
       [lo, hi] = range(ps.map(p => p.appr.albNet));
@@ -102442,7 +102444,7 @@ function rdApFacetStory(facet, rows, upd, demSplit) {
   if (facet === "direction") {
     const now = D.directionNow;
     if (!now) return null;
-    const ps = rows.filter(p => inWin(p, 21) && p.dir && p.dir.net != null);
+    const ps = polls.concat(D.directionOnlyPolls || []).filter(p => inWin(p, 21) && p.dir && p.dir.net != null);
     if (!ps.length) return null;
     const n = ps.length,
       [lo, hi] = range(ps.map(p => p.dir.net));
@@ -102529,7 +102531,7 @@ function rdApFacetStory(facet, rows, upd, demSplit) {
         dek
       };
     }
-    const ps = rows.filter(p => window.demPairOf(p, demSplit)).sort((x, y) => x.released < y.released ? 1 : -1);
+    const ps = polls.filter(p => window.demPairOf(p, demSplit)).sort((x, y) => x.released < y.released ? 1 : -1);
     if (!ps.length) return null;
     const p = ps[0],
       pr = window.demPairOf(p, demSplit);
@@ -102572,6 +102574,42 @@ function rdApFacetStory(facet, rows, upd, demSplit) {
     };
   }
   return null;
+}
+const rdApLeanFor = (p, onM, pub) => {
+  const y = rdApYd(p, onM, pub);
+  const x = pub ? onM ? p.tppAlt ? p.tppAlt.alp : null : p.alpN : onM ? p.alpOnImp : p.alpImp;
+  return x != null && y && y.v != null ? +(x - Math.round(y.v * 10) / 10).toFixed(1) : null;
+};
+function rdApTppStory(onM, pub, upd) {
+  const D = window.AUSPOL;
+  const today = window.AP.tppLatest(onM ? "alp_on" : "alp_lnp", pub ? "resp" : "imp");
+  const winDays = D.latest.method && D.latest.method.windowDays || 21;
+  const figOf = p => rdApFig(p, onM, pub);
+  const win = (D.individualPolls || []).filter(p => {
+    const t = rdApDays(p.released);
+    return t > upd - winDays * 864e5 && t <= upd && figOf(p).a != null;
+  });
+  if (!today || !win.length) return null;
+  const rival = onM ? "One Nation" : "the Coalition";
+  const contest = onM ? "onp" : "lnp";
+  const vals = win.map(p => figOf(p).a);
+  const lo = Math.min(...vals),
+    hi = Math.max(...vals);
+  const f = v => pub ? rdApNum(v) : v.toFixed(1);
+  const n = win.length;
+  const head = RD_AP_KAL ? "Labor’s " + today.a.toFixed(1) + " is the trend through every poll; " + (n === 1 ? "the last three weeks hold one, at " + f(lo) : "the last three weeks’ " + rdNumWord(n) + (lo === hi ? " all put Labor on " + f(lo) : " range from " + f(lo) + " to " + f(hi))) : "Labor’s " + today.a.toFixed(1) + " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s") + (n === 1 ? "" : lo === hi ? ", which all put Labor on " + f(lo) : ", which range from " + f(lo) + " to " + f(hi));
+  const ahead = vals.filter(v => v > 50).length;
+  const outN = win.filter(p => rdApInside(rdApAdj({
+    ...p,
+    lean: rdApLeanFor(p, onM, pub)
+  }, onM, pub), rdPollMargin(p, contest, pub)) === "outside").length;
+  const lead = n === 1 ? ahead ? "It has" : "It doesn’t have" : ahead === n ? n === 2 ? "Both have" : "All " + rdNumWord(n) + " have" : ahead === 0 ? "None of them has" : rdCap(rdNumWord(ahead)) + " of them " + (ahead === 1 ? "has" : "have");
+  const tail = n === 1 ? outN ? "it sits further from where its pollster usually lands than its own margin of error. " : "it sits within its own margin of error of where its pollster usually lands. " : outN === 0 ? "none sits further from where its pollster usually lands than its own margin of error. " : outN === 1 ? "one sits further from where its pollster usually lands than its own margin of error. " : rdNumWord(outN) + " sit further from where their pollsters usually land than their own margin of error. ";
+  const dek = lead + " Labor ahead of " + rival + ", and " + tail + "Below is every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election, newest first, each linked to its source.";
+  return {
+    head,
+    dek
+  };
 }
 function RdApSheet({
   onClose,
@@ -102746,6 +102784,7 @@ function RdAllPolls(P) {
   React.useEffect(() => {
     if (measure !== "lnp" && measure !== "onp") onMeasure("onp");
   }, [measure]);
+  const FACET_IDS = ["twopp", "primary", "leadership", "direction", "issues", "demographics"].concat((D.confidenceOnlyPolls || []).length ? ["confidence"] : []).filter(f => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f));
   const today = window.AP.tppLatest(onM ? "alp_on" : "alp_lnp", pub ? "resp" : "imp");
   const upd = rdApDays(D.latest.updatedISO);
   const winDays = D.latest.method && D.latest.method.windowDays || 21;
@@ -102754,24 +102793,80 @@ function RdAllPolls(P) {
     return t > upd - winDays * 864e5 && t <= upd && figOf(p).a != null;
   };
   const win = (facet === "confidence" ? D.individualPolls : rows).filter(inToday);
-  let head = null,
-    dek = null;
-  if (facet !== "twopp") ({
-    head,
-    dek
-  } = rdApFacetStory(facet, rows, upd, demSplit) || {});else if (today && win.length) {
-    const vals = win.map(p => figOf(p).a);
-    const lo = Math.min(...vals),
-      hi = Math.max(...vals);
-    const f = v => pub ? rdApNum(v) : v.toFixed(1);
-    const n = win.length;
-    head = RD_AP_KAL ? "Labor’s " + today.a.toFixed(1) + " is the trend through every poll; " + (n === 1 ? "the last three weeks hold one, at " + f(lo) : "the last three weeks’ " + rdNumWord(n) + (lo === hi ? " all put Labor on " + f(lo) : " range from " + f(lo) + " to " + f(hi))) : "Labor’s " + today.a.toFixed(1) + " comes from " + rdNumWord(n) + " poll" + (n === 1 ? "" : "s") + (n === 1 ? "" : lo === hi ? ", which all put Labor on " + f(lo) : ", which range from " + f(lo) + " to " + f(hi));
-    const ahead = vals.filter(v => v > 50).length;
-    const outN = win.filter(p => rdApInside(rdApAdj(p, onM, pub), rdPollMargin(p, contest, pub)) === "outside").length;
-    const lead = n === 1 ? ahead ? "It has" : "It doesn’t have" : ahead === n ? n === 2 ? "Both have" : "All " + rdNumWord(n) + " have" : ahead === 0 ? "None of them has" : rdCap(rdNumWord(ahead)) + " of them " + (ahead === 1 ? "has" : "have");
-    const tail = n === 1 ? outN ? "it sits further from where its pollster usually lands than its own margin of error. " : "it sits within its own margin of error of where its pollster usually lands. " : outN === 0 ? "none sits further from where its pollster usually lands than its own margin of error. " : outN === 1 ? "one sits further from where its pollster usually lands than its own margin of error. " : rdNumWord(outN) + " sit further from where their pollsters usually land than their own margin of error. ";
-    dek = lead + " Labor ahead of " + rival + ", and " + tail + "Below is every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election, newest first, each linked to its source.";
-  }
+  const stories = React.useMemo(() => {
+    const out = [];
+    const add = (key, st) => {
+      if (st && st.head) out.push({
+        key,
+        head: st.head,
+        dek: st.dek
+      });
+    };
+    for (const id of FACET_IDS) {
+      if (id === "twopp") {
+        for (const m of ["lnp", "onp"]) for (const b of ["imp", "resp"]) add("twopp|" + m + "|" + b, rdApTppStory(m === "onp", b === "resp", upd));
+      } else if (id === "demographics") {
+        for (const sp of window.DEM_SPLITS || []) add("demographics|" + sp.id, rdApFacetStory(id, upd, sp.id));
+      } else add(id, rdApFacetStory(id, upd));
+    }
+    return out;
+  }, [upd]);
+  const liveKey = facet === "twopp" ? "twopp|" + (onM ? "onp" : "lnp") + "|" + (pub ? "resp" : "imp") : facet === "demographics" ? "demographics|" + demSplit : facet;
+  const live = stories.find(st => st.key === liveKey);
+  const head = live ? live.head : null,
+    dek = live ? live.dek : null;
+  const hedVarRef = useRef(null);
+  const [hedFloor, setHedFloor] = useState(0);
+  const storiesKey = stories.map(st => st.key + "\u0000" + st.head + "\u0000" + st.dek).join("\u0001");
+  React.useLayoutEffect(() => {
+    const box = hedVarRef.current;
+    if (!box) return undefined;
+    const measure = () => {
+      let h = 0;
+      for (const c of box.children) h = Math.max(h, c.getBoundingClientRect().height);
+      h = Math.ceil(h - 0.01);
+      setHedFloor(f => f === h ? f : h);
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver(measure);
+    [...box.children].forEach(c => ro.observe(c));
+    return () => ro.disconnect();
+  }, [storiesKey]);
+  const ctlVarRef = useRef(null);
+  const [ctlFloor, setCtlFloor] = useState(0);
+  React.useLayoutEffect(() => {
+    const box = ctlVarRef.current;
+    if (!box) return undefined;
+    const measure = () => {
+      let h = 0;
+      for (const c of box.children) h = Math.max(h, c.getBoundingClientRect().height);
+      h = Math.ceil(h - 0.01);
+      setCtlFloor(f => f === h ? f : h);
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver(measure);
+    [...box.children].forEach(c => ro.observe(c));
+    return () => ro.disconnect();
+  }, [ctlNarrow]);
+  const ebVarRef = useRef(null);
+  const [ebFloor, setEbFloor] = useState(0);
+  React.useLayoutEffect(() => {
+    const box = ebVarRef.current;
+    if (!box) return undefined;
+    const measure = () => {
+      let h = 0;
+      for (const c of box.children) h = Math.max(h, c.getBoundingClientRect().height);
+      h = Math.ceil(h - 0.01);
+      setEbFloor(f => f === h ? f : h);
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver(measure);
+    [...box.children].forEach(c => ro.observe(c));
+    return () => ro.disconnect();
+  }, [phone]);
   const todayTxt = today ? today.a.toFixed(1) : null;
   const byDate = sort.key === "date" && sort.dir < 0;
   const [minShown, setMinShown] = useState(30);
@@ -102845,28 +102940,19 @@ function RdAllPolls(P) {
   }
   const more = nShown < sorted.length;
   const visRows = byDate ? groups.flatMap(g => g.list) : flat;
-  const FACETS = [{
-    id: "twopp",
-    label: "2PP"
-  }, {
-    id: "primary",
-    label: "Primary"
-  }, {
-    id: "leadership",
-    label: phone ? "Leaders" : "Leadership"
-  }, {
-    id: "direction",
-    label: "Direction"
-  }, {
-    id: "issues",
-    label: "Issues"
-  }, {
-    id: "demographics",
-    label: "Demographics"
-  }].concat((D.confidenceOnlyPolls || []).length ? [{
-    id: "confidence",
-    label: "Confidence"
-  }] : []).filter(f => !window.JUR || !["direction", "issues", "demographics", "confidence"].includes(f.id));
+  const FACET_LAB = {
+    twopp: "2PP",
+    primary: "Primary",
+    leadership: phone ? "Leaders" : "Leadership",
+    direction: "Direction",
+    issues: "Issues",
+    demographics: "Demographics",
+    confidence: "Confidence"
+  };
+  const FACETS = FACET_IDS.map(id => ({
+    id,
+    label: FACET_LAB[id]
+  }));
   const rowNav = (e, p) => {
     if (e.target !== e.currentTarget) return;
     const id = rowKey(p);
@@ -104151,19 +104237,13 @@ function RdAllPolls(P) {
   }, "Labor v ", onM ? "One Nation" : "Coalition", " ", React.createElement("span", {
     "aria-hidden": "true"
   }, "\u21C4"));
-  return React.createElement("section", {
-    className: "rd-sec rd-first rd-ap",
-    id: "rd-ap-top",
-    "aria-labelledby": "rd-ap-t",
-    "data-facet": facet
-  }, React.createElement("div", {
-    className: "rd-eyebrow"
-  }, React.createElement("h2", {
-    className: "rd-title",
+  const eyebrowCopy = (conf, keyId) => React.createElement(React.Fragment, null, React.createElement("h2", _extends({
+    className: "rd-title"
+  }, keyId ? {
     id: "rd-ap-t"
-  }, facet === "confidence" ? "Economic sentiment" : "All polls"), React.createElement("span", {
+  } : {}), conf ? "Economic sentiment" : "All polls"), React.createElement("span", {
     className: "rd-meta"
-  }, facet === "confidence" ? "Every confidence-index release (business and consumer) since the " + rdElecYear + " election" : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"), !phone && React.createElement("nav", {
+  }, conf ? "Every confidence-index release (business and consumer) since the " + rdElecYear + " election" : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"), !phone && React.createElement("nav", {
     className: "rd-eyebrow-tools rd-ap-nav",
     "aria-label": "On this page"
   }, React.createElement("button", {
@@ -104175,11 +104255,45 @@ function RdAllPolls(P) {
   }, "How each pollster leans"), React.createElement("button", {
     type: "button",
     onClick: () => jump("flow-drift")
-  }, "and Preference flows"))), head && React.createElement(RdHed, {
+  }, "and Preference flows")));
+  return React.createElement("section", {
+    className: "rd-sec rd-first rd-ap",
+    id: "rd-ap-top",
+    "aria-labelledby": "rd-ap-t",
+    "data-facet": facet
+  }, React.createElement("div", {
+    className: "rd-eyebrow",
+    style: ebFloor ? {
+      minHeight: ebFloor + "px"
+    } : null
+  }, eyebrowCopy(facet === "confidence", true)), React.createElement("div", {
+    className: "rd-ap-ebvar",
+    ref: ebVarRef,
+    "aria-hidden": "true"
+  }, React.createElement("div", {
+    className: "rd-eyebrow"
+  }, eyebrowCopy(false, false)), React.createElement("div", {
+    className: "rd-eyebrow"
+  }, eyebrowCopy(true, false))), React.createElement("div", {
+    className: "rd-ap-hedslot",
+    style: hedFloor ? {
+      minHeight: hedFloor + "px"
+    } : null
+  }, head && React.createElement(RdHed, {
     head: head,
     dek: dek,
     level: 2
-  }), React.createElement(RdTabs, {
+  })), React.createElement("div", {
+    className: "rd-ap-storyvar",
+    ref: hedVarRef,
+    "aria-hidden": "true"
+  }, stories.map(st => React.createElement("div", {
+    key: st.key
+  }, React.createElement("h2", {
+    className: "rd-hed"
+  }, st.head), React.createElement("p", {
+    className: "rd-dek"
+  }, st.dek)))), React.createElement(RdTabs, {
     swipe: true,
     value: facet,
     onChange: facetPick,
@@ -104192,15 +104306,37 @@ function RdAllPolls(P) {
     className: "rd-pl-ctl-l"
   }, "Two-party:"), flip, React.createElement("span", {
     className: "rd-pl-ctl-l"
-  }, ", ", pub ? "as published" : "implied flows"), qpop), facet === "demographics" && !ctlNarrow && splitPicker), facet === "twopp" && ctlNarrow && React.createElement("div", {
+  }, ", ", pub ? "as published" : "implied flows"), qpop), facet === "demographics" && !ctlNarrow && splitPicker), ctlNarrow && React.createElement(React.Fragment, null, React.createElement("div", {
+    className: "rd-ap-ctlslot",
+    style: ctlFloor ? {
+      minHeight: ctlFloor + "px"
+    } : null
+  }, facet === "twopp" && React.createElement("div", {
     className: "rd-ap-pctl"
   }, flip, React.createElement("span", {
     className: "rd-pl-ctl-l"
   }, ", ", pub ? "as published" : "implied flows"), React.createElement("span", {
     className: "rd-grow"
-  }), qpop), facet === "demographics" && ctlNarrow && React.createElement("div", {
+  }), qpop), facet === "demographics" && React.createElement("div", {
     className: "rd-ap-pctl"
-  }, splitPicker), React.createElement("div", {
+  }, splitPicker)), React.createElement("div", {
+    className: "rd-ap-ctlvar",
+    ref: ctlVarRef,
+    "aria-hidden": "true"
+  }, React.createElement("div", {
+    className: "rd-ap-pctl"
+  }, React.createElement("button", {
+    type: "button",
+    className: "rd-pl-flip"
+  }, "Labor v One Nation ", React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u21C4")), React.createElement("span", {
+    className: "rd-pl-ctl-l"
+  }, ", implied flows"), React.createElement("span", {
+    className: "rd-grow"
+  }), qpop), React.createElement("div", {
+    className: "rd-ap-pctl"
+  }, splitPicker))), React.createElement("div", {
     className: "rd-ap-bar"
   }, React.createElement("label", {
     className: "rd-ap-search"

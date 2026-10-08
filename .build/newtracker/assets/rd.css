@@ -1719,6 +1719,12 @@ body.rd .rd-cc { position: relative; margin-top: 32px; }
 /* the walk floor's measurement stack: every walkable finding state laid out
    invisibly so the live slot can stand at the tallest (rd-cycles.jsx) */
 body.rd .rd-cyc-storyvar { height: 0; overflow: hidden; visibility: hidden; }
+/* the All-polls slots walk the same floor: the hed (every facet, split
+   and contest or basis state) and the narrow control row (the 2PP's
+   contest row, Demographics' split picker) stand at their tallest
+   state so a hop changes no height above the table - the measurement
+   stacks stay laid out for their heights but never paint */
+body.rd .rd-ap-storyvar, body.rd .rd-ap-ctlvar, body.rd .rd-ap-ebvar { height: 0; overflow: hidden; visibility: hidden; }
 body.rd .rd-cc-row { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 /* the Draw-a-term chip and the drawn-over-the-band pills, moved off the
    controls row onto the Two-party section's own divider: the band floats
@@ -2134,7 +2140,7 @@ body.rd .rd-ap .rd-ap-pctl { min-height: 45px; }
    table (measured 2026-10-08 with the webfonts). Under 1240 they take
    their own row on every facet, right-aligned as the wrap put them */
 @media (min-width: 761px) and (max-width: 1239px) {
-  body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav { flex-basis: 100%; justify-content: flex-end; }
+  body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav, body.rd .rd-ap-ebvar > .rd-eyebrow > .rd-ap-nav { flex-basis: 100%; justify-content: flex-end; }
 }
 /* the longer Confidence meta ("…(business and consumer)…", 2026-10-08)
    pushed its eyebrow sum ~3px past the 1152 content cap, so the nav
@@ -2142,7 +2148,7 @@ body.rd .rd-ap .rd-ap-pctl { min-height: 45px; }
    jolt (conf-headline "table held through the walk" at 1280). Shaving
    the tools gap inside rd-ap buys ~12px; every facet's eyebrow stays
    one line above the band, so the per-facet geometry matches */
-body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav { gap: 14px; }
+body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav, body.rd .rd-ap-ebvar > .rd-eyebrow > .rd-ap-nav { gap: 14px; }
 @media (max-width: 640px) {
   body.rd .rd-ap .rd-hed { line-height: 33px; }
   body.rd .rd-ap .rd-eyebrow .rd-meta { line-height: 18px; }
