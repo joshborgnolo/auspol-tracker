@@ -37,15 +37,40 @@
                  days) and headline primaries. Independents/other and
                  undecided fold together into oth, as the poll rows' ind
                  field does.
-     Roy Morgan– "Primary Vote by State" and city/country tables appeared in
-                 one release PDF to date (10363, the Sep-29-2026 fortnight
-                 aggregate) – earlier 2026 releases gate state detail behind
-                 "contact Julian McCrann". Hand-entered in ROYMORGAN_STATE
-                 below until the format proves recurring and a reader is
-                 worth building; harmonize joins only NSW/Vic/Qld (no Tas or
-                 ACT/NT cut → no Rest of Australia). Not in HOUSES: most
-                 weekly waves carry no state table, so stale/dropped checks
-                 would misfire.
+     Roy Morgan– three recurring formats carry public breakdowns, all
+                 hand-entered in ROYMORGAN_DEMO below and verified against
+                 the release text, figure by figure (Wikipedia's
+                 subpopulation tables carry the same numbers and reconcile
+                 except where the release itself was re-read to settle a
+                 transcription slip): the four-weekly aggregates of Nov 2025,
+                 Dec 2025 and Feb 2026 print prose breakdowns by gender, age
+                 band and the six states; the weekly releases of Mar 30 –
+                 May 10 2026 print a full demographic table on the page;
+                 release 10363's PDF (Sep 29 2026) prints state tables.
+                 Before Nov 2025 the aggregates print two-party-by-group
+                 only, and from mid-May 2026 the weekly releases carry no
+                 demographic table at all ("contact Julian McCrann" for
+                 detail). Not in HOUSES: which waves print which dims is
+                 unpredictable, so stale/dropped checks would misfire.
+                 harmonize joins only NSW/Vic/Qld (no Tas or ACT/NT cut →
+                 no Rest of Australia).
+   Fox & Hedgehog – every release's full-report PDF prints a
+                 "PRIMARY VOTE, 3PP & TPP – DEMOGRAPHICS" table (page 8):
+                 gender, age bands 18–34/35–49/50–64/65+, state as
+                 NSW/Vic/Qld/"Other States/Terr." and education
+                 High School / Trade Cert. / University, hand-entered in
+                 FOXHEDGEHOG_DEMO below and verified against the PDFs
+                 figure by figure. Four waves ran (Jan, Feb, Mar, May 2026)
+                 then the series stopped. Not in HOUSES, so no
+                 stale/dropped checks.
+   Freshwater –  each release post's Data-Tables xlsx carries a Primary
+                 Vote crosstab "by CROSSBREAKS": gender, three age bands,
+                 household income and the state split, hand-entered in
+                 FRESHWATER_DEMO after extraction and cell-by-cell
+                 verification. Only the Oct 2025 and Jan 2026 data tables
+                 print it – from March 2026 the workbook's Primary Vote is
+                 national totals only, so later waves file nothing.
+                 Not in HOUSES.
    Groups are kept exactly as each house draws them – the age bands differ
    (Resolve and DemosAU 18–34/35–54/55+, YouGov 18–34/35–49/50+, RedBridge by
    generation) – with labels only tidied. Party keys alp/lnp/onp/grn/oth;
@@ -102,19 +127,374 @@ const KNOWN_DROP = {
   "YouGov|age|65+|2026-03-24": "YouGov printed 50–64 and 65+ only in Feb–Mar 2026; from 24 Mar it cut by generation instead, and from Jun its oldest band is 50+",
 };
 
-/* Roy Morgan state tables, hand-entered from release PDFs (see the house
-   note in the header). Keyed by the poll row's date; shares as printed. */
-const ROYMORGAN_STATE = {
+/* Roy Morgan breakdowns, hand-entered from the releases (see the house note
+   in the header). Keyed by the poll row's date; shares as printed, every
+   figure re-read from the release text before entry. Weekly table waves
+   carry `total` from the table's All-electors column (it matches the poll
+   row exactly). The three prose four-weekly aggregates carry none – their
+   national primary is a 4-week pool, not any single poll row. */
+const ROYMORGAN_DEMO = {
+  "2025-11-16": {
+    source: "https://www.roymorgan.com/findings/9951-federal-voting-intention-november-16-2025",
+    dims: {
+      gender: {
+        Women: { alp: 34, lnp: 26, onp: 11.5, grn: 15, oth: 13.5 },
+        Men: { alp: 31.5, lnp: 28.5, onp: 16.5, grn: 10, oth: 13.5 },
+      },
+      age: {
+        "18–34": { alp: 31.5, lnp: 19.5, onp: 8, grn: 25, oth: 16 },
+        "35–49": { alp: 32, lnp: 24, onp: 14, grn: 14.5, oth: 15.5 },
+        "50–64": { alp: 33.5, lnp: 26, onp: 18.5, grn: 7.5, oth: 14.5 },
+        "65+": { alp: 34, lnp: 39, onp: 15, grn: 3.5, oth: 8.5 },
+      },
+      state: {
+        NSW: { alp: 33.5, lnp: 28.5, onp: 14.5, grn: 10.5, oth: 13 },
+        Vic: { alp: 33.5, lnp: 27.5, onp: 10.5, grn: 16, oth: 12.5 },
+        Qld: { alp: 28, lnp: 27, onp: 18, grn: 12, oth: 15 },
+        WA: { alp: 32.5, lnp: 27.5, onp: 16.5, grn: 11, oth: 12.5 },
+        SA: { alp: 37.5, lnp: 26, onp: 11.5, grn: 15, oth: 10 },
+        Tas: { alp: 35.5, lnp: 26.5, onp: 9, grn: 11, oth: 18 },
+      },
+    },
+  },
+  "2025-12-14": {
+    source: "https://www.roymorgan.com/findings/9956-federal-voting-intention-december-14-2025",
+    dims: {
+      gender: {
+        Women: { alp: 31.5, lnp: 26, onp: 13, grn: 17.5, oth: 12 },
+        Men: { alp: 32.5, lnp: 27.5, onp: 18, grn: 9, oth: 13 },
+      },
+      age: {
+        "18–34": { alp: 32.5, lnp: 17, onp: 10, grn: 26.5, oth: 14 },
+        "35–49": { alp: 32.5, lnp: 23.5, onp: 15.5, grn: 15, oth: 13.5 },
+        "50–64": { alp: 30.5, lnp: 29, onp: 20.5, grn: 8, oth: 12 },
+        "65+": { alp: 33, lnp: 37, onp: 16, grn: 4.5, oth: 9.5 },
+      },
+      state: {
+        NSW: { alp: 33.5, lnp: 25.5, onp: 17.5, grn: 11.5, oth: 12 },
+        Vic: { alp: 32.5, lnp: 28.5, onp: 10, grn: 15.5, oth: 13.5 },
+        Qld: { alp: 28, lnp: 27, onp: 22, grn: 12.5, oth: 10.5 },
+        WA: { alp: 30, lnp: 24, onp: 17.5, grn: 15.5, oth: 13 },
+        SA: { alp: 35.5, lnp: 29, onp: 13.5, grn: 12.5, oth: 9.5 },
+        Tas: { alp: 38.5, lnp: 19, onp: 12, grn: 12, oth: 18.5 },
+      },
+    },
+  },
+  "2026-02-01": {
+    source: "https://www.roymorgan.com/findings/9971-federal-voting-intention-february-2-2026",
+    dims: {
+      gender: {
+        Women: { alp: 30, lnp: 25, onp: 17.5, grn: 15.5, oth: 12 },
+        Men: { alp: 30, onp: 26, lnp: 23, grn: 9.5, oth: 11.5 },
+      },
+      age: {
+        "18–34": { alp: 27.5, grn: 25.5, lnp: 17.5, onp: 15, oth: 14.5 },
+        "35–49": { alp: 31.5, onp: 20, lnp: 21.5, grn: 13.5, oth: 13.5 },
+        "50–64": { alp: 31, onp: 27, lnp: 24, grn: 8, oth: 10 },
+        "65+": { alp: 30, lnp: 32, onp: 24.5, grn: 4, oth: 9.5 },
+      },
+      state: {
+        NSW: { alp: 30, onp: 25.5, lnp: 22, grn: 11.5, oth: 11 },
+        Vic: { alp: 30.5, lnp: 27, onp: 17.5, grn: 13, oth: 12 },
+        Qld: { alp: 27.5, onp: 24, lnp: 23.5, grn: 14, oth: 11 },
+        WA: { alp: 29, lnp: 27, onp: 20, grn: 13, oth: 11 },
+        SA: { alp: 33.5, lnp: 22, onp: 20.5, grn: 12, oth: 12 },
+        Tas: { alp: 31, lnp: 21, grn: 17, onp: 15.5, oth: 15.5 },
+      },
+    },
+  },
+  "2026-04-05": {
+    source: "https://www.roymorgan.com/findings/10178-federal-voting-intention-april-7-2026",
+    total: { alp: 30.5, lnp: 24, onp: 21.5, grn: 12, oth: 12 },
+    dims: {
+      gender: {
+        Men: { alp: 29, lnp: 22.5, onp: 27, grn: 9, oth: 12.5 },
+        Women: { alp: 32.5, lnp: 25, onp: 16.5, grn: 15, oth: 11 },
+      },
+      age: {
+        "18–34": { alp: 26.5, lnp: 14, onp: 18.5, grn: 27, oth: 14 },
+        "35–49": { alp: 37.5, lnp: 19.5, onp: 20, grn: 10.5, oth: 12.5 },
+        "50–64": { alp: 31, lnp: 24, onp: 30.5, grn: 6.5, oth: 8 },
+        "65+": { alp: 27.5, lnp: 36.5, onp: 18, grn: 5, oth: 13 },
+      },
+    },
+  },
+  "2026-04-12": {
+    source: "https://www.roymorgan.com/findings/10187-federal-voting-intention-april-13-2026",
+    total: { alp: 30, onp: 24.5, lnp: 22.5, grn: 12.5, oth: 10.5 },
+    dims: {
+      gender: {
+        Men: { alp: 28, onp: 29.5, lnp: 23, grn: 9, oth: 10.5 },
+        Women: { alp: 32.5, onp: 19, lnp: 21.5, grn: 16.5, oth: 10.5 },
+      },
+      age: {
+        "18–34": { alp: 26.5, onp: 19, lnp: 15, grn: 27.5, oth: 12 },
+        "35–49": { alp: 30.5, onp: 23.5, lnp: 20, grn: 14, oth: 12 },
+        "50–64": { alp: 31, onp: 29, lnp: 20.5, grn: 6, oth: 13.5 },
+        "65+": { alp: 32.5, onp: 25.5, lnp: 33, grn: 3, oth: 6 },
+      },
+    },
+  },
+  "2026-04-19": {
+    source: "https://www.roymorgan.com/findings/10191-federal-voting-intention-april-20-2026",
+    total: { alp: 30.5, lnp: 23, onp: 21.5, grn: 13.5, oth: 11.5 },
+    dims: {
+      gender: {
+        Men: { alp: 28.5, lnp: 24.5, onp: 24, grn: 11, oth: 12 },
+        Women: { alp: 33, lnp: 21, onp: 19, grn: 15.5, oth: 11.5 },
+      },
+      age: {
+        "18–34": { alp: 33, lnp: 12, onp: 15, grn: 27.5, oth: 12.5 },
+        "35–49": { alp: 29, lnp: 16.5, onp: 22, grn: 16, oth: 16.5 },
+        "50–64": { alp: 27, lnp: 29, onp: 28.5, grn: 5.5, oth: 10 },
+        "65+": { alp: 34, lnp: 34, onp: 20.5, grn: 3.5, oth: 8 },
+      },
+    },
+  },
+  "2026-04-26": {
+    source: "https://www.roymorgan.com/findings/10201-federal-voting-intention-april-27-2026",
+    total: { alp: 30, lnp: 22.5, onp: 22.5, grn: 14, oth: 11 },
+    dims: {
+      gender: {
+        Men: { alp: 26, lnp: 23, onp: 27.5, grn: 11.5, oth: 12 },
+        Women: { alp: 33.5, lnp: 22, onp: 17.5, grn: 16, oth: 11 },
+      },
+      age: {
+        "18–34": { alp: 33, lnp: 14.5, onp: 13, grn: 25, oth: 14.5 },
+        "35–49": { alp: 29, lnp: 20, onp: 21.5, grn: 16.5, oth: 13 },
+        "50–64": { alp: 28.5, lnp: 20, onp: 33.5, grn: 9, oth: 9 },
+        "65+": { alp: 29, lnp: 35.5, onp: 22, grn: 4.5, oth: 9 },
+      },
+    },
+  },
+  "2026-05-03": {
+    source: "https://www.roymorgan.com/findings/10211-federal-voting-intention-may-4-2026",
+    total: { alp: 29.5, lnp: 24, onp: 21.5, grn: 13, oth: 12 },
+    dims: {
+      gender: {
+        Men: { alp: 28.5, lnp: 23.5, onp: 24.5, grn: 12, oth: 11.5 },
+        Women: { alp: 30.5, lnp: 24.5, onp: 18.5, grn: 14, oth: 12.5 },
+      },
+      age: {
+        "18–34": { alp: 24.5, lnp: 11.5, onp: 17, grn: 31, oth: 16 },
+        "35–49": { alp: 38, lnp: 19, onp: 18.5, grn: 11.5, oth: 13 },
+        "50–64": { alp: 28.5, lnp: 26, onp: 28.5, grn: 6.5, oth: 10.5 },
+        "65+": { alp: 26.5, lnp: 40, onp: 22.5, grn: 3, oth: 8 },
+      },
+    },
+  },
+  "2026-05-10": {
+    source: "https://www.roymorgan.com/findings/10218-federal-voting-intention-may-11-2026",
+    total: { alp: 30.5, lnp: 25, onp: 22, grn: 11.5, oth: 11 },
+    dims: {
+      gender: {
+        Men: { alp: 28.5, lnp: 26, onp: 26.5, grn: 7.5, oth: 11.5 },
+        Women: { alp: 32.5, lnp: 24.5, onp: 17.5, grn: 15.5, oth: 10 },
+      },
+      age: {
+        "18–34": { alp: 31, lnp: 17, onp: 15.5, grn: 23, oth: 13.5 },
+        "35–49": { alp: 29.5, lnp: 20, onp: 22.5, grn: 14, oth: 14 },
+        "50–64": { alp: 30, lnp: 25, onp: 26.5, grn: 9.5, oth: 9 },
+        "65+": { alp: 31, lnp: 37.5, onp: 23, grn: 1.5, oth: 7 },
+      },
+    },
+  },
   "2026-09-27": {
     source: "https://roymorgan-cms-prod.s3.ap-southeast-2.amazonaws.com/wp-content/uploads/2026/09/29053832/10363-Federal-Voting-Intention-September-29-2026.pdf",
-    state: {
-      NSW: { alp: 28.5, lnp: 22, onp: 26.5, grn: 12, oth: 11 },
-      Vic: { alp: 25.5, lnp: 26.5, onp: 23, grn: 16.5, oth: 9 },
-      Qld: { alp: 20.5, lnp: 21, onp: 32.5, grn: 16, oth: 10 },
-      SA: { alp: 28, lnp: 26.5, onp: 18.5, grn: 15.5, oth: 10.5 },
-      WA: { alp: 27.5, lnp: 20, onp: 26, grn: 15, oth: 12 },
-    },
     total: { alp: 26, lnp: 22.5, onp: 25.5, grn: 14.5, oth: 11 },
+    dims: {
+      state: {
+        NSW: { alp: 28.5, lnp: 22, onp: 26.5, grn: 12, oth: 11 },
+        Vic: { alp: 25.5, lnp: 26.5, onp: 23, grn: 16.5, oth: 9 },
+        Qld: { alp: 20.5, lnp: 21, onp: 32.5, grn: 16, oth: 10 },
+        SA: { alp: 28, lnp: 26.5, onp: 18.5, grn: 15.5, oth: 10.5 },
+        WA: { alp: 27.5, lnp: 20, onp: 26, grn: 15, oth: 12 },
+      },
+    },
+  },
+};
+
+/* Fox & Hedgehog breakdowns, hand-entered from each release's full-report
+   PDF ("PRIMARY VOTE, 3PP & TPP – DEMOGRAPHICS", page 8). Their pure-black
+   cells render as images, so the few cells the text layer drops were read
+   off a 300-dpi render and confirmed by the row sums (every row sums to
+   exactly 100, and each table's All row matches the poll row exactly). */
+const FOXHEDGEHOG_DEMO = {
+  "2026-01-06": {
+    source: "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-national-voter-sentiment-survey",
+    dims: {
+      gender: {
+        Men: { alp: 31, lnp: 27, onp: 23, grn: 9, oth: 10 },
+        Women: { alp: 27, lnp: 23, onp: 19, grn: 20, oth: 11 },
+      },
+      state: {
+        NSW: { alp: 29, lnp: 27, onp: 19, grn: 13, oth: 12 },
+        Vic: { alp: 26, lnp: 28, onp: 19, grn: 18, oth: 9 },
+        Qld: { alp: 27, lnp: 25, onp: 25, grn: 11, oth: 12 },
+        "Other States/Terr.": { alp: 33, lnp: 17, onp: 23, grn: 17, oth: 10 },
+      },
+      age: {
+        "18–34": { alp: 27, lnp: 18, onp: 14, grn: 29, oth: 12 },
+        "35–49": { alp: 32, lnp: 24, onp: 19, grn: 14, oth: 11 },
+        "50–64": { alp: 28, lnp: 23, onp: 28, grn: 10, oth: 11 },
+        "65+": { alp: 28, lnp: 35, onp: 24, grn: 4, oth: 9 },
+      },
+      education: {
+        "High School": { alp: 30, lnp: 26, onp: 25, grn: 11, oth: 8 },
+        "Trade Cert.": { alp: 27, lnp: 23, onp: 25, grn: 14, oth: 11 },
+        University: { alp: 29, lnp: 24, onp: 12, grn: 21, oth: 14 },
+      },
+    },
+    total: { alp: 29, lnp: 25, onp: 21, grn: 14, oth: 11 },
+  },
+  "2026-02-19": {
+    source: "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-february-2026-national-voter-sentiment-survey",
+    dims: {
+      gender: {
+        Men: { alp: 30, lnp: 24, onp: 28, grn: 9, oth: 9 },
+        Women: { alp: 30, lnp: 24, onp: 23, grn: 15, oth: 8 },
+      },
+      state: {
+        NSW: { alp: 31, lnp: 26, onp: 22, grn: 10, oth: 11 },
+        Vic: { alp: 26, lnp: 23, onp: 30, grn: 13, oth: 8 },
+        Qld: { alp: 28, lnp: 25, onp: 29, grn: 10, oth: 8 },
+        "Other States/Terr.": { alp: 37, lnp: 22, onp: 21, grn: 15, oth: 5 },
+      },
+      age: {
+        "18–34": { alp: 35, lnp: 21, onp: 15, grn: 21, oth: 8 },
+        "35–49": { alp: 32, lnp: 20, onp: 26, grn: 14, oth: 8 },
+        "50–64": { alp: 27, lnp: 22, onp: 31, grn: 8, oth: 12 },
+        "65+": { alp: 25, lnp: 34, onp: 30, grn: 3, oth: 8 },
+      },
+      education: {
+        "High School": { alp: 26, lnp: 23, onp: 33, grn: 10, oth: 8 },
+        "Trade Cert.": { alp: 31, lnp: 23, onp: 25, grn: 11, oth: 10 },
+        University: { alp: 34, lnp: 28, onp: 15, grn: 15, oth: 8 },
+      },
+    },
+    total: { alp: 30, lnp: 24, onp: 25, grn: 12, oth: 9 },
+  },
+  "2026-03-25": {
+    source: "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-march-2026-national-voter-sentiment-survey",
+    dims: {
+      gender: {
+        Men: { alp: 33, lnp: 25, onp: 23, grn: 8, oth: 11 },
+        Women: { alp: 27, lnp: 22, onp: 23, grn: 17, oth: 11 },
+      },
+      state: {
+        NSW: { alp: 34, lnp: 21, onp: 22, grn: 13, oth: 10 },
+        Vic: { alp: 29, lnp: 28, onp: 18, grn: 14, oth: 11 },
+        Qld: { alp: 23, lnp: 26, onp: 30, grn: 10, oth: 11 },
+        "Other States/Terr.": { alp: 31, lnp: 19, onp: 23, grn: 15, oth: 12 },
+      },
+      age: {
+        "18–34": { alp: 32, lnp: 22, onp: 11, grn: 26, oth: 9 },
+        "35–49": { alp: 35, lnp: 18, onp: 25, grn: 14, oth: 8 },
+        "50–64": { alp: 26, lnp: 24, onp: 28, grn: 6, oth: 16 },
+        "65+": { alp: 26, lnp: 31, onp: 29, grn: 3, oth: 11 },
+      },
+      education: {
+        "High School": { alp: 29, lnp: 19, onp: 29, grn: 12, oth: 11 },
+        "Trade Cert.": { alp: 27, lnp: 24, onp: 27, grn: 11, oth: 11 },
+        University: { alp: 34, lnp: 28, onp: 11, grn: 16, oth: 11 },
+      },
+    },
+    total: { alp: 30, lnp: 23, onp: 23, grn: 13, oth: 11 },
+  },
+  "2026-05-26": {
+    source: "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-may-2026-national-voter-sentiment-survey",
+    dims: {
+      gender: {
+        Men: { alp: 30, lnp: 27, onp: 27, grn: 8, oth: 8 },
+        Women: { alp: 28, lnp: 23, onp: 27, grn: 13, oth: 9 },
+      },
+      state: {
+        NSW: { alp: 31, lnp: 25, onp: 25, grn: 10, oth: 9 },
+        Vic: { alp: 29, lnp: 27, onp: 23, grn: 13, oth: 8 },
+        Qld: { alp: 25, lnp: 23, onp: 35, grn: 8, oth: 9 },
+        "Other States/Terr.": { alp: 32, lnp: 23, onp: 25, grn: 11, oth: 9 },
+      },
+      age: {
+        "18–34": { alp: 35, lnp: 25, onp: 17, grn: 18, oth: 5 },
+        "35–49": { alp: 32, lnp: 19, onp: 27, grn: 11, oth: 11 },
+        "50–64": { alp: 25, lnp: 24, onp: 32, grn: 8, oth: 11 },
+        "65+": { alp: 23, lnp: 32, onp: 32, grn: 4, oth: 9 },
+      },
+      education: {
+        "High School": { alp: 27, lnp: 26, onp: 30, grn: 8, oth: 9 },
+        "Trade Cert.": { alp: 29, lnp: 20, onp: 33, grn: 12, oth: 6 },
+        University: { alp: 29, lnp: 31, onp: 17, grn: 14, oth: 9 },
+      },
+    },
+    total: { alp: 29, lnp: 25, onp: 27, grn: 10, oth: 9 },
+  },
+};
+
+/* Freshwater breakdowns, from each release post's Data-Tables xlsx (the
+   Primary Vote crosstab "by CROSSBREAKS"), extracted and verified figure by
+   figure (every group sums within rounding of 100.0 and each table's Total
+   column matches the poll row; the Oct wave's Men/Women rows reconcile with
+   Wikipedia's subpopulation tables too). The Oct 2025 and Jan 2026 data
+   tables carry it; from the March 2026 release the workbook prints the
+   Primary Vote as national totals only (every other question keeps its
+   crosstab), so the March, April and May 2026 waves have no breakdowns to
+   file. */
+const FRESHWATER_DEMO = {
+  "2025-10-20": {
+    source: "https://freshwaterstrategy.com/2025/11/10/daily-telegraph-freshwater-strategy-october-polling-data",
+    dims: {
+      gender: {
+        Men: { alp: 36.2, lnp: 32.3, onp: 9.8, grn: 10.7, oth: 10.9 },
+        Women: { alp: 30.3, lnp: 29.6, onp: 11.1, grn: 17.2, oth: 11.7 },
+      },
+      age: {
+        "18–35": { alp: 35, lnp: 25.9, onp: 3.6, grn: 27.8, oth: 7.8 },
+        "36–53": { alp: 34.8, lnp: 24.5, onp: 11.1, grn: 15.9, oth: 13.6 },
+        "54+": { alp: 30.8, lnp: 39.6, onp: 14.4, grn: 3.6, oth: 11.7 },
+      },
+      income: {
+        "Under $75k": { alp: 31.5, lnp: 29.9, onp: 12.2, grn: 13.8, oth: 12.7 },
+        "$75–150k": { alp: 35.3, lnp: 32.8, onp: 10.8, grn: 14, oth: 7.2 },
+        "$150k or more": { alp: 32.4, lnp: 34.2, onp: 6.3, grn: 14.8, oth: 12.3 },
+      },
+      state: {
+        NSW: { alp: 31.5, lnp: 36.6, onp: 9.9, grn: 13.4, oth: 8.6 },
+        Vic: { alp: 31.6, lnp: 29.8, onp: 7.5, grn: 13.3, oth: 17.7 },
+        Qld: { alp: 29.8, lnp: 28.6, onp: 18.2, grn: 13.7, oth: 9.7 },
+        WA: { alp: 45.4, lnp: 24.5, onp: 6.9, grn: 18, oth: 5.2 },
+        SA: { alp: 35.4, lnp: 32.9, onp: 8.5, grn: 17.6, oth: 5.5 },
+        Other: { alp: 39.6, lnp: 20.6, onp: 7.5, grn: 9.8, oth: 22.6 },
+      },
+    },
+    total: { alp: 33.2, lnp: 31, onp: 10.5, grn: 14, oth: 11.3 },
+  },
+  "2026-01-18": {
+    source: "https://freshwaterstrategy.com/2026/02/02/news-australia-freshwater-strategy-january-polling-data",
+    dims: {
+      gender: {
+        Men: { alp: 33.3, lnp: 30.4, onp: 18, grn: 8, oth: 10.3 },
+        Women: { alp: 32.6, lnp: 25.3, onp: 20.1, grn: 13.6, oth: 8.4 },
+      },
+      age: {
+        "18–34": { alp: 38.7, lnp: 22.9, onp: 10.6, grn: 22.6, oth: 5.2 },
+        "35–54": { alp: 35.2, lnp: 25.2, onp: 18.4, grn: 8.9, oth: 12.2 },
+        "55+": { alp: 27.4, lnp: 33.2, onp: 25, grn: 4.8, oth: 9.7 },
+      },
+      income: {
+        "Under $75k": { alp: 29.4, lnp: 24.8, onp: 22.9, grn: 11.4, oth: 11.5 },
+        "$75–150k": { alp: 33.7, lnp: 28.5, onp: 18.4, grn: 11, oth: 8.4 },
+        "$150k or more": { alp: 40.5, lnp: 31.9, onp: 11.5, grn: 9.6, oth: 6.5 },
+      },
+      state: {
+        NSW: { alp: 32.8, lnp: 37.1, onp: 21.2, grn: 5.2, oth: 3.6 },
+        Vic: { alp: 31.5, lnp: 26.1, onp: 15.9, grn: 12.2, oth: 14.3 },
+        Qld: { alp: 27.5, lnp: 24.3, onp: 24.4, grn: 13.3, oth: 10.6 },
+        WA: { alp: 37.8, lnp: 19.4, onp: 9.6, grn: 20.8, oth: 12.4 },
+        SA: { alp: 46, lnp: 18.4, onp: 14.2, grn: 12, oth: 9.3 },
+        Other: { alp: 34.4, lnp: 24.5, onp: 25.3, grn: 6.4, oth: 9.5 },
+      },
+    },
+    total: { alp: 33, lnp: 27.8, onp: 19, grn: 10.8, oth: 9.3 },
   },
 };
 
@@ -198,19 +578,36 @@ try {
       pend(k, String(e.message || e).slice(0, 160));
     }
   }
-  // Roy Morgan: hand-entered state tables (ROYMORGAN_STATE) — not every
-  // release carries one, so waves with none are left alone, not pending
-  for (const [date, h] of Object.entries(ROYMORGAN_STATE)) {
+  // Roy Morgan: hand-entered breakdowns (ROYMORGAN_DEMO) — most releases
+  // carry none, so waves with none are left alone, not pending
+  for (const [date, h] of Object.entries(ROYMORGAN_DEMO)) {
     const k = "Roy Morgan|" + date;
     if (!refresh && have.has(k)) { waves.push(have.get(k)); continue; }
     const p = polls.find((x) => x.pollster === "Roy Morgan" && x.date === date);
     if (!p) { pend(k, "no Roy Morgan poll row for this wave's date yet"); continue; }
-    const dims = { state: h.state };
-    const bad = dimsProblem(dims) || totalProblem(h.total, p);
-    if (bad) { pend(k, `the hand-entered state table failed the gate – ${bad}`); continue; }
+    const bad = dimsProblem(h.dims) || totalProblem(h.total, p);
+    if (bad) { pend(k, `the hand-entered table failed the gate – ${bad}`); continue; }
     push({ pollster: "Roy Morgan", date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
-           article: p.url ?? null, source: h.source, read: "published table", dims, total: h.total });
-    console.log(`${k}: state(${Object.keys(h.state).join("/")})`);
+           article: p.url ?? null, source: h.source, read: "published table", dims: h.dims,
+           ...(h.total ? { total: h.total } : {}) });
+    console.log(`${k}: ${Object.entries(h.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
+  }
+  // Fox & Hedgehog and Freshwater: hand-entered breakdowns (FOXHEDGEHOG_DEMO,
+  // FRESHWATER_DEMO) — releases without a crosstab file nothing, so waves
+  // with none are left alone, not pending
+  for (const [house, table] of [["Fox & Hedgehog", FOXHEDGEHOG_DEMO], ["Freshwater", FRESHWATER_DEMO]]) {
+    for (const [date, h] of Object.entries(table)) {
+      const k = house + "|" + date;
+      if (!refresh && have.has(k)) { waves.push(have.get(k)); continue; }
+      const p = polls.find((x) => x.pollster === house && x.date === date);
+      if (!p) { pend(k, `no ${house} poll row for this wave's date yet`); continue; }
+      const bad = dimsProblem(h.dims) || totalProblem(h.total, p);
+      if (bad) { pend(k, `the hand-entered table failed the gate – ${bad}`); continue; }
+      push({ pollster: house, date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
+             article: p.url ?? null, source: h.source, read: "published table", dims: h.dims,
+             ...(h.total ? { total: h.total } : {}) });
+      console.log(`${k}: ${Object.entries(h.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
+    }
   }
   // Resolve: one fetch carries every month; rebuilt whole each run, or kept
   // whole from the file when the fetch or any month fails the gate
