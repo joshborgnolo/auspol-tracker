@@ -7,7 +7,10 @@
    C. The menu FITS: every tab's text sits inside its own slot at 390 and
       320, the row never overflows the card, and nothing spills the page.
    D. The menu still switches the list (click re-reads the rows); the
-      laptop desktop layout (ctl row) is untouched at 1280. */
+      laptop desktop layout (ctl row) is untouched at 1280.
+   E. A dot click on the trust chart opens the poll in All polls on the
+      ISSUES facet (`pollFacet="issues"` — was wrongly "primary", so a
+      click landed on the Primary facet instead). */
 import http from "node:http";
 import path from "node:path";
 import fs from "node:fs";
@@ -148,6 +151,45 @@ for (const vw of [320, 360, 375]) {
   /* the table still sits under it */
   const tbl = await page.evaluate(() => !!document.querySelector("#issues .rd-iw-table"));
   ok("1280: desktop table beneath", tbl);
+  await page.close();
+}
+
+/* ---- E: trust-chart dot click opens the poll on the ISSUES facet ------- */
+{
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1280, height: 1200, deviceScaleFactor: 1 });
+  await page.goto(`http://localhost:${port}/`, { waitUntil: "domcontentloaded", timeout: 60000 });
+  await page.waitForSelector("#issues .rd-is-chart svg", { timeout: 30000 });
+  await new Promise((r) => setTimeout(r, 800));
+  const dot = await page.evaluate(() => {
+    const svg = document.querySelector("#issues .rd-is-chart svg");
+    svg.scrollIntoView({ block: "center" });
+    /* solid scatter dots only - the tail circle is a hollow ring mark
+       (fill var(--chart-bg)) with no poll row behind it */
+    const cs = [...svg.querySelectorAll("circle.scatter-dot")].filter((c) => c.getAttribute("fill") !== "var(--chart-bg)");
+    if (!cs.length) return null;
+    const r = cs[cs.length - 1].getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2, n: cs.length };
+  });
+  ok("E: trust chart renders poll dots", !!dot && dot.n > 2, dot && `${dot.n} solid dots`);
+  if (dot) {
+    await page.mouse.move(dot.x - 30, dot.y - 30);
+    await new Promise((r) => setTimeout(r, 150));
+    await page.mouse.move(dot.x, dot.y);
+    await new Promise((r) => setTimeout(r, 300));
+    await page.mouse.click(dot.x, dot.y);
+    let landed = null;
+    try {
+      await page.waitForFunction(() => location.hash === "#allpolls" && document.querySelector(".rd-ap-tabs button"), { timeout: 10000 });
+      landed = await page.evaluate(() => {
+        const active = ([...document.querySelectorAll(".rd-ap-tabs button")].find((b) => b.getAttribute("aria-pressed") === "true") || {}).textContent || null;
+        return { active, open: !!document.querySelector(".rd-ap-open"), issTbl: !!document.querySelector(".rd-apd-isr") };
+      });
+    } catch {}
+    ok("E: dot click lands in All polls on the Issues facet", !!landed && landed.active === "Issues", landed && `facet: ${landed.active}`);
+    ok("E: the clicked poll opens (issues issue-by-issue table)", !!landed && landed.open && landed.issTbl,
+      landed && `open=${landed.open} issTbl=${landed.issTbl}`);
+  }
   await page.close();
 }
 
