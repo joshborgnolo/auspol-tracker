@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { ROOT, crosstabOfHtml, decodeUx } from "./crosstab-sources.mjs";
 import {
   switchingOf, ygGroup, youGovDims, demosLabel, redbridgeTable, resolveWaves,
+  essentialWaves, essentialMatch,
   sharesProblem, dimsProblem, totalProblem,
 } from "./crosstab-parse.mjs";
 import { harmonize, DEMO_SETS, DEMO_SHARE } from "./newtracker/demo-groups.mjs";
@@ -184,6 +185,38 @@ assert.equal(demosLabel("income", "<$45K"), "Under $45k");
 assert.equal(demosLabel("income", "$45-125K"), "$45–125k");
 assert.equal(demosLabel("income", "$125K+"), "$125k+");
 
+// ---- Essential: the Primary Vote+ visuals, matched wave by wave ----------------------------
+// the fold and the question filter, on a synthetic two-group wave
+const essRow = (vis, ans, v) => `2026-09-30,primary,"Primary Vote+",${vis},${ans},${v}`;
+const essCsv = ["date,dataset,question,visual,answer,value_pct",
+  essRow("Overall", "Labor", 29), essRow("Overall", "TOTAL: Coalition", 22), essRow("Overall", "Greens", 12),
+  essRow("Overall", "One Nation", 25), essRow("Overall", "Independent or Other Party", 9), essRow("Overall", "Undecided", 3),
+  essRow("Male", "Labor", 26), essRow("Male", "TOTAL: Coalition", 24), essRow("Male", "Greens", 9),
+  essRow("Male", "One Nation", 29), essRow("Male", "Independent or Other Party", 8), essRow("Male", "Undecided", 4),
+  "2026-09-30,primary,\"Some other question\",Overall,Labor,50"].join("\n");
+const mini = essentialWaves(essCsv).get("2026-09-30");
+assert.deepEqual(mini.total, { alp: 29, lnp: 22, grn: 12, onp: 25, oth: 12 }, "Independent/other and undecided fold into oth");
+assert.deepEqual(mini.dims.gender.Men, { alp: 26, lnp: 24, grn: 9, onp: 29, oth: 12 });
+assert.equal(Object.keys(mini.dims).length, 1, "age bars absent are simply absent; another question's row is ignored");
+// the matcher: five days, nearest agreeing wave, nothing waved past 0.6 off
+const mkWave = (a, l, o, g) => ({ total: { alp: a, lnp: l, onp: o, grn: g, oth: 10 }, dims: {} });
+const two = new Map([["2026-09-30", mkWave(29, 22, 25, 12)], ["2026-10-03", mkWave(29.5, 22, 25, 12)]]);
+assert.equal(essentialMatch(two, { date: "2026-09-29", alp: 29.2, lnp: 22, onp: 25, grn: 12 }), "2026-09-30", "the closer, nearest figure wins");
+assert.equal(essentialMatch(two, { date: "2026-10-09", alp: 29, lnp: 22, onp: 25, grn: 12 }), null, "five days is the window");
+assert.ok(!essentialMatch(new Map([["2026-09-30", mkWave(29, 20, 25, 12)]]), { date: "2026-09-29", alp: 29, lnp: 22, onp: 25, grn: 12 }), "0.6 off the published row never matches");
+// the committed CSV keeps every on-file Essential row green end to end
+const ew = essentialWaves(readFileSync(path.join(ROOT, "data", "essential-report.csv"), "utf8"));
+for (const p of polls.filter((x) => x.pollster === "Essential" && x.date >= "2025-05-03")) {
+  const dte = essentialMatch(ew, p);
+  assert.ok(dte, `Essential ${p.date} matches a Primary Vote+ wave in the CSV`);
+  const w = ew.get(dte);
+  assert.equal(dimsProblem(w.dims), null, `Essential ${p.date}: every group sums to about 100`);
+  assert.equal(totalProblem(w.total, p), null, `Essential ${p.date}: Overall matches the published primaries`);
+}
+const essSep = ew.get(essentialMatch(ew, poll("Essential", "2026-09-29")));
+assert.deepEqual(essSep.dims.age["55+"], { alp: 25, lnp: 28, onp: 28, grn: 4, oth: 15 });
+assert.deepEqual(essSep.dims.gender.Men, { alp: 29, lnp: 25, onp: 28, grn: 9, oth: 9 });
+
 // ---- the gate --------------------------------------------------------------------------
 assert.equal(sharesProblem({ Men: { alp: 50, lnp: 48 } }), null, "rounding passes");
 assert.match(sharesProblem({ Men: { alp: 32, lnp: 13, onp: 4, grn: 2, oth: 28 } }), /sum to 79/, "a misread column fails");
@@ -262,4 +295,4 @@ assert.equal(harmonize({ pollster: "YouGov", dims: { income: { "Under $50k": sh(
 // every common group has a population share for its sampling-error floor
 for (const set of DEMO_SETS) for (const g of set.groups) assert.ok(DEMO_SHARE[g] > 0 && DEMO_SHARE[g] < 1, `share for ${g}`);
 
-console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts), Resolve series, DemosAU labels, the gate, the common groups (place and home too)");
+console.log("PASS: crosstab readers – YouGov crosstab (income brackets too), RedBridge tables (three layouts), Resolve series, Essential Primary Vote visuals, DemosAU labels, the gate, the common groups (place and home too)");

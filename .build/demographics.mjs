@@ -30,6 +30,13 @@
      Resolve   – the SMH Political Monitor interactive's age, gender and
                  state series, every month of the term, rebuilt each run from
                  one fetch (values decoded as extract-resolve-rpm.mjs does).
+     Essential – the report's "Primary Vote" chart visual bars (Overall,
+                 Male/Female, 18-34/35-54/55+), already crawled weekly into
+                 data/essential-report.csv by extract-essential-report.mjs;
+                 the wave is matched to the poll row on date (within five
+                 days) and headline primaries. Independents/other and
+                 undecided fold together into oth, as the poll rows' ind
+                 field does.
      Roy Morgan– "Primary Vote by State" and city/country tables appeared in
                  one release PDF to date (10363, the Sep-29-2026 fortnight
                  aggregate) – earlier 2026 releases gate state detail behind
@@ -71,12 +78,13 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { ROOT, youGovSource, youGovCrosstab, demosauReport, resolveData } from "./crosstab-sources.mjs";
-import { youGovDims, DEMOS_DIM, demosLabel, redbridgeTable, resolveWaves, dimsProblem, totalProblem } from "./crosstab-parse.mjs";
+import { youGovDims, DEMOS_DIM, demosLabel, redbridgeTable, resolveWaves, essentialWaves, essentialMatch, dimsProblem, totalProblem } from "./crosstab-parse.mjs";
 import { measureCharts, FIT_LIMIT } from "./demosau-charts.mjs";
 
 const OUT = path.join(ROOT, "data", "demographics.json");
 const FIRST = "2026-02-01";            // no house published these breakdowns earlier this term
-const HOUSES = ["YouGov", "DemosAU", "RedBridge/Accent", "Resolve"];
+const FIRST_ESS = "2025-05-03";        // Essential's CSV visuals run since 2023 – read from the term's start
+const HOUSES = ["YouGov", "DemosAU", "RedBridge/Accent", "Resolve", "Essential"];
 const STALE_DAYS = 16;                 // a week to publish, then a weekly retry, then someone looks
 const RESOLVE_MATCH_DAYS = 4;          // the interactive can date a month a day or two off the poll row
 
@@ -132,8 +140,10 @@ const push = (w) => { waves.push(w); if (!have.has(key(w))) added.push(key(w)); 
 // not readable this run: retried next run, and a wave already on file stays
 const pend = (k, why) => { pending.push(`${k}: ${why}`); if (have.has(k)) waves.push(have.get(k)); };
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "demographics-"));
+const essWaves = essentialWaves(fs.readFileSync(path.join(ROOT, "data", "essential-report.csv"), "utf8"));
 try {
-  const candidates = polls.filter((p) => ["YouGov", "DemosAU", "RedBridge/Accent"].includes(p.pollster) && p.date >= FIRST);
+  const candidates = polls.filter((p) => (["YouGov", "DemosAU", "RedBridge/Accent"].includes(p.pollster) && p.date >= FIRST)
+    || (p.pollster === "Essential" && p.date >= FIRST_ESS));
   for (const p of candidates) {
     const k = key(p);
     if (KNOWN_SKIP[k]) { skipped.push({ pollster: p.pollster, date: p.date, reason: KNOWN_SKIP[k] }); continue; }
@@ -167,6 +177,14 @@ try {
         if (bad) { pend(k, bad); continue; }
         push({ ...base, source: rep.url, read: "measured from the charts", dims, fit });
         console.log(`${k}: ${Object.keys(dims).join(", ")} (fit ${fit})`);
+      } else if (p.pollster === "Essential") {
+        const dte = essentialMatch(essWaves, p);
+        if (!dte) { pend(k, "no Primary Vote+ wave in essential-report.csv within five days of this row"); continue; }
+        const w = essWaves.get(dte);
+        const bad = dimsProblem(w.dims) || totalProblem(w.total, p);
+        if (bad) { pend(k, `the Primary Vote+ table didn't read cleanly – ${bad}`); continue; }
+        push({ ...base, source: p.releaseUrl ?? p.url ?? null, read: "published table", dims: w.dims, total: w.total });
+        console.log(`${k}: ${Object.entries(w.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
       } else {
         const txt = redbridgeCache(p.date);
         if (!txt) { pend(k, "no RedBridge extractor cache for this wave yet"); continue; }

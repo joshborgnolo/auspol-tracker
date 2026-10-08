@@ -310,6 +310,63 @@
    }
   },
   {
+   "pollster": "Essential",
+   "date": "2025-09-29",
+   "dateStart": "2025-09-24",
+   "sample": 1001,
+   "article": "https://essentialreport.com.au/reports/federal-political-insights",
+   "source": "https://essentialreport.com.au/reports/30-september-2025",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 36,
+      "lnp": 20,
+      "grn": 25,
+      "onp": 7,
+      "oth": 12
+     },
+     "35–54": {
+      "alp": 36,
+      "lnp": 26,
+      "grn": 9,
+      "onp": 11,
+      "oth": 13
+     },
+     "55+": {
+      "alp": 35,
+      "lnp": 32,
+      "grn": 3,
+      "onp": 18,
+      "oth": 11
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 36,
+      "lnp": 30,
+      "grn": 9,
+      "onp": 11,
+      "oth": 12
+     },
+     "Women": {
+      "alp": 35,
+      "lnp": 24,
+      "grn": 14,
+      "onp": 14,
+      "oth": 12
+     }
+    }
+   },
+   "total": {
+    "alp": 35,
+    "lnp": 27,
+    "grn": 11,
+    "onp": 13,
+    "oth": 12
+   }
+  },
+  {
    "pollster": "Resolve",
    "date": "2025-10-12",
    "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
@@ -384,6 +441,63 @@
       "oth": 18.08
      }
     }
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2025-10-27",
+   "dateStart": "2025-10-22",
+   "sample": 1041,
+   "article": "https://essentialreport.com.au/reports/federal-political-insights",
+   "source": "https://essentialreport.com.au/reports/29-october-2025",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 39,
+      "lnp": 21,
+      "grn": 18,
+      "onp": 7,
+      "oth": 13
+     },
+     "35–54": {
+      "alp": 38,
+      "lnp": 20,
+      "grn": 8,
+      "onp": 16,
+      "oth": 17
+     },
+     "55+": {
+      "alp": 31,
+      "lnp": 36,
+      "grn": 4,
+      "onp": 19,
+      "oth": 9
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 39,
+      "lnp": 27,
+      "grn": 6,
+      "onp": 16,
+      "oth": 11
+     },
+     "Women": {
+      "alp": 32,
+      "lnp": 26,
+      "grn": 13,
+      "onp": 14,
+      "oth": 15
+     }
+    }
+   },
+   "total": {
+    "alp": 36,
+    "lnp": 26,
+    "grn": 9,
+    "onp": 15,
+    "oth": 13
    }
   },
   {
@@ -464,6 +578,63 @@
    }
   },
   {
+   "pollster": "Essential",
+   "date": "2025-11-24",
+   "dateStart": "2025-11-19",
+   "sample": 1020,
+   "article": "https://essentialreport.com.au/reports/federal-political-insights",
+   "source": "https://essentialreport.com.au/reports/26-november-2025",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 36,
+      "lnp": 21,
+      "grn": 21,
+      "onp": 9,
+      "oth": 12
+     },
+     "35–54": {
+      "alp": 41,
+      "lnp": 22,
+      "grn": 10,
+      "onp": 15,
+      "oth": 13
+     },
+     "55+": {
+      "alp": 31,
+      "lnp": 36,
+      "grn": 4,
+      "onp": 18,
+      "oth": 11
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 37,
+      "lnp": 30,
+      "grn": 7,
+      "onp": 15,
+      "oth": 10
+     },
+     "Women": {
+      "alp": 35,
+      "lnp": 23,
+      "grn": 14,
+      "onp": 14,
+      "oth": 14
+     }
+    }
+   },
+   "total": {
+    "alp": 36,
+    "lnp": 27,
+    "grn": 11,
+    "onp": 15,
+    "oth": 12
+   }
+  },
+  {
    "pollster": "Resolve",
    "date": "2025-12-07",
    "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
@@ -538,6 +709,63 @@
       "oth": 12.94
      }
     }
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2025-12-08",
+   "dateStart": "2025-12-03",
+   "sample": 1030,
+   "article": "https://essentialreport.com.au/reports/federal-political-insights",
+   "source": "https://essentialreport.com.au/reports/10-december-2025",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 38,
+      "lnp": 22,
+      "grn": 19,
+      "onp": 10,
+      "oth": 9
+     },
+     "35–54": {
+      "alp": 35,
+      "lnp": 22,
+      "grn": 9,
+      "onp": 19,
+      "oth": 13
+     },
+     "55+": {
+      "alp": 30,
+      "lnp": 32,
+      "grn": 4,
+      "onp": 21,
+      "oth": 13
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 35,
+      "lnp": 27,
+      "grn": 7,
+      "onp": 19,
+      "oth": 11
+     },
+     "Women": {
+      "alp": 33,
+      "lnp": 25,
+      "grn": 12,
+      "onp": 16,
+      "oth": 13
+     }
+    }
+   },
+   "total": {
+    "alp": 34,
+    "lnp": 26,
+    "grn": 10,
+    "onp": 17,
+    "oth": 12
    }
   },
   {
@@ -692,6 +920,63 @@
       "oth": 18.48
      }
     }
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2026-01-23",
+   "dateStart": "2026-01-20",
+   "sample": 1022,
+   "article": "https://www.theguardian.com/australia-news/2026/jan/28/guardian-essential-poll-one-nation-coalition-liberal-national-labor-anthony-albanese-bondi-attack-ntwnfb",
+   "source": "https://essentialreport.com.au/reports/28th-january-2026",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 31,
+      "lnp": 28,
+      "grn": 17,
+      "onp": 12,
+      "oth": 12
+     },
+     "35–54": {
+      "alp": 32,
+      "lnp": 19,
+      "grn": 8,
+      "onp": 26,
+      "oth": 14
+     },
+     "55+": {
+      "alp": 30,
+      "lnp": 28,
+      "grn": 4,
+      "onp": 26,
+      "oth": 12
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 32,
+      "lnp": 31,
+      "grn": 7,
+      "onp": 21,
+      "oth": 8
+     },
+     "Women": {
+      "alp": 29,
+      "lnp": 20,
+      "grn": 11,
+      "onp": 23,
+      "oth": 17
+     }
+    }
+   },
+   "total": {
+    "alp": 31,
+    "lnp": 25,
+    "grn": 9,
+    "onp": 22,
+    "oth": 13
    }
   },
   {
@@ -879,6 +1164,63 @@
       "oth": 11.63
      }
     }
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2026-02-23",
+   "dateStart": "2026-02-18",
+   "sample": 1002,
+   "article": "https://essentialreport.com.au/reports/federal-political-insights",
+   "source": "https://essentialreport.com.au/reports/25-february-2026",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 35,
+      "lnp": 25,
+      "grn": 17,
+      "onp": 10,
+      "oth": 12
+     },
+     "35–54": {
+      "alp": 30,
+      "lnp": 25,
+      "grn": 11,
+      "onp": 23,
+      "oth": 9
+     },
+     "55+": {
+      "alp": 25,
+      "lnp": 27,
+      "grn": 5,
+      "onp": 29,
+      "oth": 13
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 33,
+      "lnp": 29,
+      "grn": 6,
+      "onp": 22,
+      "oth": 9
+     },
+     "Women": {
+      "alp": 27,
+      "lnp": 22,
+      "grn": 16,
+      "onp": 21,
+      "oth": 14
+     }
+    }
+   },
+   "total": {
+    "alp": 30,
+    "lnp": 26,
+    "grn": 11,
+    "onp": 22,
+    "oth": 11
    }
   },
   {
@@ -1314,6 +1656,63 @@
       "oth": 17.94
      }
     }
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2026-03-23",
+   "dateStart": "2026-03-18",
+   "sample": 1008,
+   "article": "https://www.theguardian.com/australia-news/2026/mar/25/guardian-essential-poll-only-a-quarter-of-australians-approve-of-us-israel-war-on-iran",
+   "source": "https://essentialreport.com.au/reports/25-march-2026",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 33,
+      "lnp": 25,
+      "grn": 19,
+      "onp": 10,
+      "oth": 12
+     },
+     "35–54": {
+      "alp": 28,
+      "lnp": 21,
+      "grn": 8,
+      "onp": 26,
+      "oth": 16
+     },
+     "55+": {
+      "alp": 30,
+      "lnp": 26,
+      "grn": 4,
+      "onp": 33,
+      "oth": 8
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 33,
+      "lnp": 26,
+      "grn": 8,
+      "onp": 23,
+      "oth": 10
+     },
+     "Women": {
+      "alp": 28,
+      "lnp": 22,
+      "grn": 12,
+      "onp": 25,
+      "oth": 13
+     }
+    }
+   },
+   "total": {
+    "alp": 31,
+    "lnp": 24,
+    "grn": 10,
+    "onp": 24,
+    "oth": 12
    }
   },
   {
@@ -1938,6 +2337,63 @@
     "onp": 27,
     "grn": 14,
     "oth": 12
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2026-04-27",
+   "dateStart": "2026-04-22",
+   "sample": 1067,
+   "article": "https://www.theguardian.com/australia-news/2026/apr/28/pauline-hanson-one-nation-leadership-guardian-essential-poll-ntwnfb",
+   "source": "https://essentialreport.com.au/reports/29-april-2026",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 32,
+      "lnp": 24,
+      "grn": 23,
+      "onp": 14,
+      "oth": 8
+     },
+     "35–54": {
+      "alp": 32,
+      "lnp": 20,
+      "grn": 8,
+      "onp": 28,
+      "oth": 11
+     },
+     "55+": {
+      "alp": 27,
+      "lnp": 29,
+      "grn": 3,
+      "onp": 29,
+      "oth": 11
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 31,
+      "lnp": 26,
+      "grn": 10,
+      "onp": 26,
+      "oth": 7
+     },
+     "Women": {
+      "alp": 29,
+      "lnp": 23,
+      "grn": 11,
+      "onp": 23,
+      "oth": 14
+     }
+    }
+   },
+   "total": {
+    "alp": 30,
+    "lnp": 24,
+    "grn": 11,
+    "onp": 25,
+    "oth": 10
    }
   },
   {
@@ -2625,6 +3081,63 @@
     }
    },
    "fit": 0.32
+  },
+  {
+   "pollster": "Essential",
+   "date": "2026-05-24",
+   "dateStart": "2026-05-20",
+   "sample": 1062,
+   "article": "https://www.theguardian.com/australia-news/2026/may/27/guardian-essential-poll-labors-housing-and-tax-changes-fail-to-win-over-voters-as-support-for-one-nation-swells",
+   "source": "https://essentialreport.com.au/reports/27-may-2026",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 30,
+      "lnp": 20,
+      "grn": 23,
+      "onp": 17,
+      "oth": 9
+     },
+     "35–54": {
+      "alp": 29,
+      "lnp": 21,
+      "grn": 11,
+      "onp": 28,
+      "oth": 12
+     },
+     "55+": {
+      "alp": 29,
+      "lnp": 25,
+      "grn": 2,
+      "onp": 35,
+      "oth": 9
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 33,
+      "lnp": 23,
+      "grn": 8,
+      "onp": 28,
+      "oth": 8
+     },
+     "Women": {
+      "alp": 25,
+      "lnp": 22,
+      "grn": 13,
+      "onp": 28,
+      "oth": 11
+     }
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 23,
+    "grn": 11,
+    "onp": 28,
+    "oth": 9
+   }
   },
   {
    "pollster": "RedBridge/Accent",
@@ -3449,6 +3962,63 @@
    }
   },
   {
+   "pollster": "Essential",
+   "date": "2026-06-29",
+   "dateStart": "2026-06-24",
+   "sample": 1017,
+   "article": "https://www.theguardian.com/australia-news/2026/jun/30/guardian-essential-poll-voters-reject-key-one-nation-policies-as-support-drops",
+   "source": "https://essentialreport.com.au/reports/30-june-2026",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 31,
+      "lnp": 26,
+      "grn": 20,
+      "onp": 15,
+      "oth": 7
+     },
+     "35–54": {
+      "alp": 32,
+      "lnp": 20,
+      "grn": 8,
+      "onp": 29,
+      "oth": 11
+     },
+     "55+": {
+      "alp": 28,
+      "lnp": 22,
+      "grn": 6,
+      "onp": 32,
+      "oth": 12
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 32,
+      "lnp": 24,
+      "grn": 8,
+      "onp": 27,
+      "oth": 8
+     },
+     "Women": {
+      "alp": 29,
+      "lnp": 21,
+      "grn": 13,
+      "onp": 25,
+      "oth": 11
+     }
+    }
+   },
+   "total": {
+    "alp": 30,
+    "lnp": 23,
+    "grn": 10,
+    "onp": 26,
+    "oth": 10
+   }
+  },
+  {
    "pollster": "YouGov",
    "date": "2026-06-30",
    "dateStart": "2026-06-23",
@@ -4174,6 +4744,63 @@
     "onp": 26,
     "grn": 12,
     "oth": 14
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2026-07-27",
+   "dateStart": "2026-07-22",
+   "sample": 1060,
+   "article": "https://www.theguardian.com/australia-news/2026/jul/29/guardian-essential-poll-angus-taylors-approval-rating-crashes-and-one-nation-support-plateaus",
+   "source": "https://essentialreport.com.au/reports/28-july-2026",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 39,
+      "lnp": 20,
+      "grn": 19,
+      "onp": 14,
+      "oth": 8
+     },
+     "35–54": {
+      "alp": 29,
+      "lnp": 18,
+      "grn": 16,
+      "onp": 25,
+      "oth": 13
+     },
+     "55+": {
+      "alp": 26,
+      "lnp": 28,
+      "grn": 3,
+      "onp": 33,
+      "oth": 10
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 34,
+      "lnp": 23,
+      "grn": 7,
+      "onp": 26,
+      "oth": 10
+     },
+     "Women": {
+      "alp": 28,
+      "lnp": 22,
+      "grn": 16,
+      "onp": 23,
+      "oth": 11
+     }
+    }
+   },
+   "total": {
+    "alp": 31,
+    "lnp": 22,
+    "grn": 12,
+    "onp": 25,
+    "oth": 10
    }
   },
   {
@@ -5491,6 +6118,63 @@
    }
   },
   {
+   "pollster": "Essential",
+   "date": "2026-08-31",
+   "dateStart": "2026-08-26",
+   "sample": 1017,
+   "article": "https://www.theguardian.com/australia-news/2026/sep/02/guardian-essential-poll-one-nation-popularity-slips-albanese-records-lowest-approval-as-prime-minister-ntwnfb",
+   "source": "https://essentialreport.com.au/reports/01-september-2026",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 34,
+      "lnp": 20,
+      "grn": 26,
+      "onp": 15,
+      "oth": 5
+     },
+     "35–54": {
+      "alp": 24,
+      "lnp": 26,
+      "grn": 13,
+      "onp": 25,
+      "oth": 12
+     },
+     "55+": {
+      "alp": 23,
+      "lnp": 31,
+      "grn": 4,
+      "onp": 28,
+      "oth": 14
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 29,
+      "lnp": 26,
+      "grn": 12,
+      "onp": 27,
+      "oth": 7
+     },
+     "Women": {
+      "alp": 24,
+      "lnp": 26,
+      "grn": 15,
+      "onp": 20,
+      "oth": 15
+     }
+    }
+   },
+   "total": {
+    "alp": 26,
+    "lnp": 26,
+    "grn": 13,
+    "onp": 23,
+    "oth": 11
+   }
+  },
+  {
    "pollster": "YouGov",
    "date": "2026-09-08",
    "dateStart": "2026-09-01",
@@ -6271,6 +6955,63 @@
     "onp": 25.5,
     "grn": 14.5,
     "oth": 11
+   }
+  },
+  {
+   "pollster": "Essential",
+   "date": "2026-09-29",
+   "dateStart": "2026-09-24",
+   "sample": 1008,
+   "article": "https://www.theguardian.com/australia-news/2026/sep/29/guardian-essential-poll-coalitions-primary-vote-sinks-to-lowest-ever-as-majority-support-hardline-immigration-ideas",
+   "source": "https://essentialreport.com.au/reports/30-september-2026",
+   "read": "published table",
+   "dims": {
+    "age": {
+     "18–34": {
+      "alp": 31,
+      "lnp": 19,
+      "grn": 24,
+      "onp": 16,
+      "oth": 9
+     },
+     "35–54": {
+      "alp": 32,
+      "lnp": 19,
+      "grn": 9,
+      "onp": 27,
+      "oth": 12
+     },
+     "55+": {
+      "alp": 25,
+      "lnp": 28,
+      "grn": 4,
+      "onp": 28,
+      "oth": 15
+     }
+    },
+    "gender": {
+     "Men": {
+      "alp": 29,
+      "lnp": 25,
+      "grn": 9,
+      "onp": 28,
+      "oth": 9
+     },
+     "Women": {
+      "alp": 29,
+      "lnp": 20,
+      "grn": 15,
+      "onp": 21,
+      "oth": 15
+     }
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 22,
+    "grn": 12,
+    "onp": 25,
+    "oth": 12
    }
   },
   {

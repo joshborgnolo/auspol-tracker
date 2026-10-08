@@ -109,7 +109,6 @@ const PLAIN = [
 ];
 const JSX = [
   "08b413e7-8dbe-49bf-8932-a479f8d98f54.js",  // chart toolkit
-  "052e810c-b1c8-4847-a954-426d3af38e6d.jsx", // tweaks panel
   "a11e1559-f455-44d5-8a31-6699de4ef310.js",  // panels
   "d1a1d215-370c-4ebc-878b-7eeea9ad8102.js",  // tabbed views
   "wm-story.jsx",                             // the wordmark dial, replayed
@@ -188,7 +187,8 @@ const FONTS = [
      it can arrive with the page instead of queueing ahead of the hero. */
   { file: "crimsontext-700-latin.woff2",        family: "Crimson Text", style: "normal", weight: "700" },
   { file: "crimsontext-italic-400-latin.woff2", family: "Crimson Text", style: "italic", weight: "400" },
-  { file: "crimsontext-italic-600-latin.woff2", family: "Crimson Text", style: "italic", weight: "600" },
+  /* italic-600 had no consumer (italic serif runs at 400 or 700 on the
+     live page); the subset stays in fonts/ so re-registering it is one line. */
   { file: "crimsontext-italic-700-latin.woff2", family: "Crimson Text", style: "italic", weight: "700" },
   /* Source Serif 4 retired Sep 2026: the tab labels and docked score set in
      Crimson Text, the page's one serif. The source subset stays in fonts/. */
@@ -957,6 +957,11 @@ const cardFigKey = cardFigsDrawn
   ? "-" + crypto.createHash("sha1").update(JSON.stringify(cardFigsDrawn)).digest("hex").slice(0, 8)
   : "";
 const cardUrl = `${SITE_URL}assets/auspol-card.png?v=${(cardStamp || dataStamp) + cardFigKey}`;
+/* PNG, not WebP: several social/chat crawlers (Slack, LinkedIn, older
+   Discord clients, some verification bots) reject WebP og:images outright
+   and fall back to a blank card. The ~35 KB saved isn't worth a conservative
+   render for those embeds. WebP could ride parallel og:image entries once
+   verified across every consumer of the share card. */
 /* The card is now a chart with figures on it, so its alt says them. Someone
    who cannot see the preview should get the same reading from it. */
 const cl = cardContest();

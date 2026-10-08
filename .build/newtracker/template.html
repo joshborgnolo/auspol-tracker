@@ -4254,7 +4254,10 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   padding: 9px 30px 9px 34px; transition: border-color .15s ease;
 }
 .ap-search input::placeholder { color: var(--ink-3); }
-.ap-search input:focus { outline: none; border-color: var(--accent); }
+/* the accent border is the mouse focus cue; the keyboard cue is the page's
+   shared :focus-visible ring (its border-radius: 4px is the pill's own
+   999px anyway inside the curve, so the base rule stands unclipped). */
+.ap-search input:focus:not(:focus-visible) { outline: none; border-color: var(--accent); }
 .ap-search-x {
   position: absolute; right: 8px; border: 0; background: none; cursor: pointer;
   font-size: 19px; line-height: 1; color: var(--ink-3); padding: 2px 4px;

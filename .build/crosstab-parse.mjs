@@ -297,3 +297,46 @@ export function totalProblem(total, poll) {
   }
   return null;
 }
+
+// ---- Essential: the Primary Vote+ visuals already in data/essential-report.csv ----
+/* extract-essential-report.mjs crawls every report weekly and keeps each
+   wave's "Primary Vote" chart as Overall, Male/Female and 18-34/35-54/55+
+   bars – the demographics file reads the same CSV the assimilator reads.
+   Independents/other party and undecided fold into oth, the fold the
+   polls.json rows' ind field already carries. */
+const ESS_ANSWER = { Labor: "alp", "TOTAL: Coalition": "lnp", Greens: "grn", "One Nation": "onp" };
+const ESS_VISUAL = { Male: ["gender", "Men"], Female: ["gender", "Women"],
+  "18-34": ["age", "18–34"], "35-54": ["age", "35–54"], "55+": ["age", "55+"] };
+const ESS_FOLD = ["Independent or Other Party", "Undecided"];
+export function essentialWaves(csvText) {
+  const lines = csvText.trim().split("\n");
+  const header = lines[0].split(",");
+  const ix = (name) => header.indexOf(name);
+  const waves = new Map();
+  for (const line of lines.slice(1)) {
+    const f = line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map((x) => x.replace(/^"|"$/g, ""));
+    if (f[ix("dataset")] !== "primary" || !f[ix("question")].startsWith("Primary Vote+")) continue;
+    const w = waves.get(f[ix("date")]) || { total: {}, dims: {} };
+    const vis = f[ix("visual")], answer = f[ix("answer")], pct = +f[ix("value_pct")];
+    const target = vis === "Overall" ? w.total
+      : ESS_VISUAL[vis] ? (((w.dims[ESS_VISUAL[vis][0]] ||= {})[ESS_VISUAL[vis][1]] ||= {})) : null;
+    if (target && ESS_ANSWER[answer]) target[ESS_ANSWER[answer]] = pct;
+    else if (target && ESS_FOLD.includes(answer)) target.oth = +((target.oth || 0) + pct).toFixed(1);
+    waves.set(f[ix("date")], w);
+  }
+  return waves;
+}
+/* The CSV dates a wave at publication and the poll row at fieldwork's end –
+   match within five days, keeping the wave whose Overall agrees with the
+   row's published primaries (they are the one fieldwork). */
+export function essentialMatch(waves, poll) {
+  let best = null;
+  for (const [date, w] of waves) {
+    const dd = Math.abs(Date.parse(date) - Date.parse(poll.date)) / 864e5;
+    if (dd > 5) continue;
+    const off = ["alp", "lnp", "onp", "grn"].reduce((m, k) =>
+      Math.max(m, Math.abs((w.total[k] ?? NaN) - (poll[k] ?? NaN))), 0);
+    if (off <= 0.6 && (!best || off < best.off || (off === best.off && dd < best.dd))) best = { date, off, dd };
+  }
+  return best && best.date;
+}
