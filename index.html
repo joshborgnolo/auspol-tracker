@@ -101973,7 +101973,8 @@ function RdConfidence({
   }
   const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10,
     hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
-  const spine = histOn ? wideRaw.get(viewLanes[0].k) : rawPoints.get(viewLanes[0].k);
+  const histSpine = histOn ? [...new Map(deepDrawn.flatMap(k => deepPoints.get(k)).concat(wideRaw.get(viewLanes[0].k)).map(p => [p.x, p])).values()].sort((a, b) => a.x - b.x) : null;
+  const spine = histOn ? histSpine : rawPoints.get(viewLanes[0].k);
   const liveSeries = ptsMap => viewLanes.map(l => ({
     id: l.k,
     label: l.by,

@@ -4121,7 +4121,16 @@ function RdConfidence({ rangeId }) {
     deepDrawn.forEach((k) => deepPoints.get(k).forEach((p) => vals.push(p.y)));
   }
   const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10, hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
-  const spine = histOn ? wideRaw.get(viewLanes[0].k) : rawPoints.get(viewLanes[0].k);
+  /* the history window's hover spine pairs the pale lines' own months with
+     the release dates, so the guide can land a monthly reading where the
+     live file hasn't started yet (its spine would park on the first
+     release, years to the right of anything old being pointed at) */
+  const histSpine = histOn ? [...new Map(
+    deepDrawn.flatMap((k) => deepPoints.get(k))
+      .concat(wideRaw.get(viewLanes[0].k))
+      .map((p) => [p.x, p])
+  ).values()].sort((a, b) => a.x - b.x) : null;
+  const spine = histOn ? histSpine : rawPoints.get(viewLanes[0].k);
   /* the chart's series and dots, shared by both windows: the live lines
      are the smoothed trend over the window's releases; in the history
      window the deep monthly lines go UNDER the live ones */
