@@ -2860,6 +2860,12 @@ const individualPolls = POLLS.map((p) => {
        fall back honestly where no release recorded one. */
     ...(p.published ? { published: p.published } : {}),
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
+    /* RedBridge/Accent's decidedness reading on a fourth basis: the
+       vote-softness table's all-voters [solid, soft, verySoft] triple.
+       Beside undecidedOf's three bases, never through it – the Undecided
+       series counts only the "can't say" share, which this isn't. The
+       expanded poll shows it where other houses show their basis. */
+    ...(p.firmness && p.firmness.all ? { firmAll: p.firmness.all } : {}),
     // election-flows 2PP, ALP share (Roy Morgan; RedBridge/Accent since the
     // Aug 2026 wave) – absent, not zero, where no flows pair was published
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
@@ -3091,6 +3097,8 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     sample: p.sample ?? null,
     ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
+    // RedBridge/Accent's vote-softness triple, same as the archive emitter
+    ...(p.firmness && p.firmness.all ? { firmAll: p.firmness.all } : {}),
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
     // this poll's own primaries implied at the fixed 2025 flows (same
     // impShow display rule as the archive emitter above) – the implied

@@ -397,6 +397,23 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
     };
     const moes = [imp.length > 0 && moeOf(false), pub.length > 0 && moeOf(true)].filter(Boolean);
     const moeTxt = moes.length ? moes.join(", ") + (moes.length > 1 ? " figures" : " figure") + ", " + rdMarginBasis(ip) : null;
+    /* the movable share of the electorate as this wave reads it, on whichever
+       basis the house asks: can't-say (first), the not-firm share of the
+       decided (soft), the residue inside a printed two-party pair (tpp), or
+       RedBridge's vote-softness triple (gen-data's firmAll) - the All-polls
+       expansion's Decidedness row reads the same four bases */
+    const dec = (() => {
+      if (r.undecided != null) {
+        const b = r.undecidedBasis || "first";
+        return <>{r.undecided}% {b === "soft" ? "not firm" : "undecided"}{plus("und", 1)}{" – "}
+          {b === "soft" ? "named a party, but might yet change their mind"
+            : b === "tpp" ? "unallocated inside the printed two-party pair"
+            : "couldn’t name a party when first asked"}</>;
+      }
+      const f = Array.isArray(r.firmAll) && r.firmAll.length === 3 ? r.firmAll : null;
+      if (f) return <>{f[1] + f[2]}% not firm{" – solid " + f[0] + ", soft " + f[1] + ", very soft " + f[2] + ", on the wave’s own vote-softness table"}</>;
+      return null;
+    })();
     const a = r.appr || {};
     const net = (v) => (v == null ? null : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v));
     const nets = clause([[apWho(r, "alb", "Albanese"), a.albNet, "albNet"], [a.oppName || "Taylor", a.taylorNet, "taylorNet"], [apWho(r, "hanson", "Hanson"), a.hansonNet, "hansonNet"]]
@@ -426,6 +443,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
             {imp.length > 0 && <><dt>Two-party, implied</dt><dd>{imp}</dd></>}
             {pub.length > 0 && <><dt>As published</dt><dd>{pub}</dd></>}
             {moeTxt && <><dt>Margin of error</dt><dd>{moeTxt}</dd></>}
+            {dec && <><dt>Decidedness</dt><dd>{dec}</dd></>}
             {ppm && <><dt>{window.JUR ? "Preferred " + window.JUR.office.alb : "Preferred prime minister"}</dt><dd>{ppm}</dd></>}
             {nets.length > 0 && <><dt>Net approval</dt><dd>{nets}</dd></>}
           </dl>

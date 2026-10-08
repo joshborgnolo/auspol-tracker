@@ -1380,6 +1380,33 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     );
   })();
 
+  /* the movable share of the electorate as THIS wave reads it, each house
+     on its own question: can't-say beside the primaries (first basis), the
+     not-firm share of the decided (soft), the residue a printed two-party
+     pair leaves inside its hundred (tpp), and RedBridge's vote-softness
+     triple read as its not-firm share (gen-data's firmAll) */
+  const decRow = (() => {
+    if (p.undecided != null) {
+      const b = p.undecidedBasis || "first";
+      return {
+        h: p.undecided + "%",
+        w: b === "soft" ? "not firm" : "undecided",
+        s: b === "soft" ? "Named a party, but might yet change their mind"
+          : b === "tpp" ? "Unallocated inside the printed two-party pair"
+          : "Couldn’t name a party when first asked",
+        d: c.und != null ? c.und : null,
+      };
+    }
+    const f = Array.isArray(p.firmAll) && p.firmAll.length === 3 ? p.firmAll : null;
+    if (f) return {
+      h: f[1] + f[2] + "%",
+      w: "not firm",
+      s: `Solid ${f[0]}, soft ${f[1]}, very soft ${f[2]} – from the wave’s own vote-softness table`,
+      d: null,
+    };
+    return null;
+  })();
+
   return (
     <div className="rd-apd">
       {demTable}
@@ -1429,6 +1456,15 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
               <span className="rd-apd-k">{(window.JUR ? "Better " + window.JUR.office.alb : "Better prime minister") + ", three‑way"}</span>
               <span style={{ gridColumn: "2 / -1" }}>{ppmCell(setThree)}</span>
             </>}
+          </div>
+        )}
+        {!isConf && decRow && (
+          <div className="rd-apd-grid rd-apd-grid1">
+            <span className="rd-apd-k">Decidedness</span>
+            <span className="rd-apd-cell">
+              <span><b>{decRow.h}</b> {decRow.w} {chg(decRow.d, 1)}</span>
+              <span className="rd-apd-sub">{decRow.s}</span>
+            </span>
           </div>
         )}
         {leaders.length > 0 && (
