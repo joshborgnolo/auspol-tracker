@@ -1,0 +1,5879 @@
+{
+  "_about": "W3 of .build/analysis/seat-model-plan.md — certified 2025 House result per seat: candidate-grouped first preferences (alp/lp/lnp/np/clp/on/grn/oth plus a member:<surname> key for any elected crossbencher outside those groups), TCP final pair + votes, TPP (ALP v Coalition), elected member, informal and formal totals. Raw COUNTS; shares are model-layer business. GES invariant pinned by test-2025-baseline.mjs (reproduces 150/150 members; regenerate with .build/analysis/seat-model/extract-2025-baseline.mjs). By-elections/redistributions after 2025 land as a W6 overlay, never here.",
+  "_provenance": {
+    "source": "https://results.aec.gov.au/31496/Website/Downloads/",
+    "dir": "atlas/data/aec-2025",
+    "files": {
+      "HouseFirstPrefsByCandidateByVoteTypeDownload-31496.csv": "b4ff38969ed49fc0",
+      "HouseTcpByCandidateByVoteTypeDownload-31496.csv": "870d7d326df7f59c",
+      "HouseTppByDivisionDownload-31496.csv": "6f48350be330f9d3",
+      "HouseNonClassicDivisionsDownload-31496.csv": "050a151a81263e2a",
+      "HouseMembersElectedDownload-31496.csv": "2bb8da54d136fcb9"
+    },
+    "extractedAt": "2026-10-08"
+  },
+  "seats": [
+    {
+      "name": "Banks",
+      "state": "NSW",
+      "aecId": "103",
+      "primaries": {
+        "alp": 36039,
+        "lp": 38683,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3666,
+        "grn": 11756,
+        "oth": 8791
+      },
+      "formal": 98935,
+      "informal": 10998,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 51830
+          },
+          {
+            "group": "lp",
+            "votes": 47105
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 51830,
+        "coalition": 47105
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Zhi Soon"
+      }
+    },
+    {
+      "name": "Barton",
+      "state": "NSW",
+      "aecId": "104",
+      "primaries": {
+        "alp": 47098,
+        "lp": 24162,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5573,
+        "grn": 15885,
+        "oth": 7233
+      },
+      "formal": 99951,
+      "informal": 10256,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 65971
+          },
+          {
+            "group": "lp",
+            "votes": 33980
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 65971,
+        "coalition": 33980
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Ash Ambihaipahar"
+      }
+    },
+    {
+      "name": "Bennelong",
+      "state": "NSW",
+      "aecId": "105",
+      "primaries": {
+        "alp": 49801,
+        "lp": 38510,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2534,
+        "grn": 12931,
+        "oth": 6036
+      },
+      "formal": 109812,
+      "informal": 7196,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 44736
+          },
+          {
+            "group": "alp",
+            "votes": 65076
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 65076,
+        "coalition": 44736
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Jerome Laxale"
+      }
+    },
+    {
+      "name": "Berowra",
+      "state": "NSW",
+      "aecId": "106",
+      "primaries": {
+        "alp": 31220,
+        "lp": 48210,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4705,
+        "grn": 13781,
+        "oth": 17652
+      },
+      "formal": 115568,
+      "informal": 7892,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 55895
+          },
+          {
+            "group": "lp",
+            "votes": 59673
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 55895,
+        "coalition": 59673
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Julian Leeser"
+      }
+    },
+    {
+      "name": "Blaxland",
+      "state": "NSW",
+      "aecId": "107",
+      "primaries": {
+        "alp": 40001,
+        "lp": 17023,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3086,
+        "grn": 6854,
+        "oth": 19922
+      },
+      "formal": 86886,
+      "informal": 12822,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 24412
+          },
+          {
+            "group": "alp",
+            "votes": 62474
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 62474,
+        "coalition": 24412
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Jason Clare"
+      }
+    },
+    {
+      "name": "Bradfield",
+      "state": "NSW",
+      "aecId": "108",
+      "primaries": {
+        "alp": 22768,
+        "lp": 42676,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 1725,
+        "grn": 7551,
+        "oth": 7173,
+        "member:boele": 30309
+      },
+      "formal": 112202,
+      "informal": 6656,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 56088
+          },
+          {
+            "group": "member:boele",
+            "votes": 56114
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 50544,
+        "coalition": 61658
+      },
+      "member": {
+        "party": "IND",
+        "group": "member:boele",
+        "name": "Nicolette Boele"
+      }
+    },
+    {
+      "name": "Calare",
+      "state": "NSW",
+      "aecId": "109",
+      "primaries": {
+        "alp": 11086,
+        "lp": 0,
+        "lnp": 0,
+        "np": 31577,
+        "clp": 0,
+        "on": 8200,
+        "grn": 3753,
+        "oth": 26479,
+        "member:gee": 25172
+      },
+      "formal": 106267,
+      "informal": 9271,
+      "tcp": {
+        "pair": [
+          {
+            "group": "member:gee",
+            "votes": 60338
+          },
+          {
+            "group": "np",
+            "votes": 45929
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 40109,
+        "coalition": 66158
+      },
+      "member": {
+        "party": "IND",
+        "group": "member:gee",
+        "name": "Andrew Gee"
+      }
+    },
+    {
+      "name": "Chifley",
+      "state": "NSW",
+      "aecId": "111",
+      "primaries": {
+        "alp": 47078,
+        "lp": 17613,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5338,
+        "grn": 8724,
+        "oth": 10661
+      },
+      "formal": 89414,
+      "informal": 14013,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 62440
+          },
+          {
+            "group": "lp",
+            "votes": 26974
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 62440,
+        "coalition": 26974
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Ed Husic"
+      }
+    },
+    {
+      "name": "Cook",
+      "state": "NSW",
+      "aecId": "112",
+      "primaries": {
+        "alp": 33474,
+        "lp": 51121,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4638,
+        "grn": 10575,
+        "oth": 6556
+      },
+      "formal": 106364,
+      "informal": 5044,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 60834
+          },
+          {
+            "group": "alp",
+            "votes": 45530
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 45530,
+        "coalition": 60834
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Simon Kennedy"
+      }
+    },
+    {
+      "name": "Cowper",
+      "state": "NSW",
+      "aecId": "113",
+      "primaries": {
+        "alp": 12713,
+        "lp": 0,
+        "lnp": 0,
+        "np": 40836,
+        "clp": 0,
+        "on": 6856,
+        "grn": 4552,
+        "oth": 42778
+      },
+      "formal": 107735,
+      "informal": 11864,
+      "tcp": {
+        "pair": [
+          {
+            "group": "np",
+            "votes": 56609
+          },
+          {
+            "group": "oth",
+            "votes": 51126
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 44089,
+        "coalition": 63646
+      },
+      "member": {
+        "party": "NP",
+        "group": "np",
+        "name": "Pat Conaghan"
+      }
+    },
+    {
+      "name": "Cunningham",
+      "state": "NSW",
+      "aecId": "114",
+      "primaries": {
+        "alp": 51607,
+        "lp": 26813,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 8765,
+        "grn": 23584,
+        "oth": 4705
+      },
+      "formal": 115474,
+      "informal": 6586,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 77970
+          },
+          {
+            "group": "lp",
+            "votes": 37504
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 77970,
+        "coalition": 37504
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Alison Byrnes"
+      }
+    },
+    {
+      "name": "Dobell",
+      "state": "NSW",
+      "aecId": "115",
+      "primaries": {
+        "alp": 44268,
+        "lp": 28757,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 9040,
+        "grn": 10647,
+        "oth": 10715
+      },
+      "formal": 103427,
+      "informal": 8680,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 41962
+          },
+          {
+            "group": "alp",
+            "votes": 61465
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 61465,
+        "coalition": 41962
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Emma Mcbride"
+      }
+    },
+    {
+      "name": "Eden-Monaro",
+      "state": "NSW",
+      "aecId": "117",
+      "primaries": {
+        "alp": 46088,
+        "lp": 34142,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7451,
+        "grn": 10739,
+        "oth": 8668
+      },
+      "formal": 107088,
+      "informal": 6808,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 45818
+          },
+          {
+            "group": "alp",
+            "votes": 61270
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 61270,
+        "coalition": 45818
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Kristy Mcbain"
+      }
+    },
+    {
+      "name": "Farrer",
+      "state": "NSW",
+      "aecId": "118",
+      "primaries": {
+        "alp": 15551,
+        "lp": 44743,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 6803,
+        "grn": 5085,
+        "oth": 30881
+      },
+      "formal": 103063,
+      "informal": 10234,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 57916
+          },
+          {
+            "group": "oth",
+            "votes": 45147
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 38251,
+        "coalition": 64812
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Sussan Ley"
+      }
+    },
+    {
+      "name": "Fowler",
+      "state": "NSW",
+      "aecId": "119",
+      "primaries": {
+        "alp": 34909,
+        "lp": 11404,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3835,
+        "grn": 6288,
+        "oth": 5394,
+        "member:le": 31108
+      },
+      "formal": 92938,
+      "informal": 15079,
+      "tcp": {
+        "pair": [
+          {
+            "group": "member:le",
+            "votes": 48956
+          },
+          {
+            "group": "alp",
+            "votes": 43982
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 63371,
+        "coalition": 29567
+      },
+      "member": {
+        "party": "IND",
+        "group": "member:le",
+        "name": "Dai Le"
+      }
+    },
+    {
+      "name": "Gilmore",
+      "state": "NSW",
+      "aecId": "120",
+      "primaries": {
+        "alp": 42342,
+        "lp": 38247,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5557,
+        "grn": 7932,
+        "oth": 16975
+      },
+      "formal": 111053,
+      "informal": 8225,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 61223
+          },
+          {
+            "group": "lp",
+            "votes": 49830
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 61223,
+        "coalition": 49830
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Fiona Phillips"
+      }
+    },
+    {
+      "name": "Grayndler",
+      "state": "NSW",
+      "aecId": "121",
+      "primaries": {
+        "alp": 59364,
+        "lp": 15867,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3505,
+        "grn": 27847,
+        "oth": 4295
+      },
+      "formal": 110878,
+      "informal": 4763,
+      "tcp": {
+        "pair": [
+          {
+            "group": "grn",
+            "votes": 36740
+          },
+          {
+            "group": "alp",
+            "votes": 74138
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 88897,
+        "coalition": 21981
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Anthony Albanese"
+      }
+    },
+    {
+      "name": "Greenway",
+      "state": "NSW",
+      "aecId": "122",
+      "primaries": {
+        "alp": 51802,
+        "lp": 28230,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4700,
+        "grn": 11018,
+        "oth": 7005
+      },
+      "formal": 102755,
+      "informal": 7700,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 37237
+          },
+          {
+            "group": "alp",
+            "votes": 65518
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 65518,
+        "coalition": 37237
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Michelle Rowland"
+      }
+    },
+    {
+      "name": "Hughes",
+      "state": "NSW",
+      "aecId": "124",
+      "primaries": {
+        "alp": 38331,
+        "lp": 35831,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5253,
+        "grn": 11221,
+        "oth": 7659
+      },
+      "formal": 98295,
+      "informal": 9205,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 52152
+          },
+          {
+            "group": "lp",
+            "votes": 46143
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 52152,
+        "coalition": 46143
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "David Moncrieff"
+      }
+    },
+    {
+      "name": "Hume",
+      "state": "NSW",
+      "aecId": "125",
+      "primaries": {
+        "alp": 27073,
+        "lp": 43615,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7967,
+        "grn": 8455,
+        "oth": 12357
+      },
+      "formal": 99467,
+      "informal": 9729,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 57747
+          },
+          {
+            "group": "alp",
+            "votes": 41720
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 41720,
+        "coalition": 57747
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Angus Taylor"
+      }
+    },
+    {
+      "name": "Hunter",
+      "state": "NSW",
+      "aecId": "126",
+      "primaries": {
+        "alp": 48582,
+        "lp": 0,
+        "lnp": 0,
+        "np": 20290,
+        "clp": 0,
+        "on": 18011,
+        "grn": 8286,
+        "oth": 16503
+      },
+      "formal": 111672,
+      "informal": 9782,
+      "tcp": {
+        "pair": [
+          {
+            "group": "on",
+            "votes": 45746
+          },
+          {
+            "group": "alp",
+            "votes": 65926
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 66424,
+        "coalition": 45248
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Dan Repacholi"
+      }
+    },
+    {
+      "name": "Kingsford Smith",
+      "state": "NSW",
+      "aecId": "127",
+      "primaries": {
+        "alp": 50346,
+        "lp": 25924,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5865,
+        "grn": 13440,
+        "oth": 3557
+      },
+      "formal": 99132,
+      "informal": 6126,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 66604
+          },
+          {
+            "group": "lp",
+            "votes": 32528
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 66604,
+        "coalition": 32528
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Matt Thistlethwaite"
+      }
+    },
+    {
+      "name": "Lindsay",
+      "state": "NSW",
+      "aecId": "128",
+      "primaries": {
+        "alp": 31502,
+        "lp": 39003,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 6736,
+        "grn": 9416,
+        "oth": 11489
+      },
+      "formal": 98146,
+      "informal": 12020,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 51804
+          },
+          {
+            "group": "alp",
+            "votes": 46342
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 46342,
+        "coalition": 51804
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Melissa Mcintosh"
+      }
+    },
+    {
+      "name": "Lyne",
+      "state": "NSW",
+      "aecId": "130",
+      "primaries": {
+        "alp": 21667,
+        "lp": 0,
+        "lnp": 0,
+        "np": 39629,
+        "clp": 0,
+        "on": 9174,
+        "grn": 6977,
+        "oth": 31903
+      },
+      "formal": 109350,
+      "informal": 10979,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 43981
+          },
+          {
+            "group": "np",
+            "votes": 65369
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 43981,
+        "coalition": 65369
+      },
+      "member": {
+        "party": "NP",
+        "group": "np",
+        "name": "Alison Penfold"
+      }
+    },
+    {
+      "name": "Macarthur",
+      "state": "NSW",
+      "aecId": "131",
+      "primaries": {
+        "alp": 45080,
+        "lp": 21593,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7336,
+        "grn": 12012,
+        "oth": 7515
+      },
+      "formal": 93536,
+      "informal": 10188,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 61365
+          },
+          {
+            "group": "lp",
+            "votes": 32171
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 61365,
+        "coalition": 32171
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Mike Freelander"
+      }
+    },
+    {
+      "name": "Mackellar",
+      "state": "NSW",
+      "aecId": "132",
+      "primaries": {
+        "alp": 13499,
+        "lp": 39647,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2825,
+        "grn": 6858,
+        "oth": 6536,
+        "member:scamps": 42482
+      },
+      "formal": 111847,
+      "informal": 8894,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 49592
+          },
+          {
+            "group": "member:scamps",
+            "votes": 62255
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 51833,
+        "coalition": 60014
+      },
+      "member": {
+        "party": "IND",
+        "group": "member:scamps",
+        "name": "Sophie Scamps"
+      }
+    },
+    {
+      "name": "Macquarie",
+      "state": "NSW",
+      "aecId": "133",
+      "primaries": {
+        "alp": 46773,
+        "lp": 34643,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 9587,
+        "grn": 13666,
+        "oth": 5036
+      },
+      "formal": 109705,
+      "informal": 4758,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 46399
+          },
+          {
+            "group": "alp",
+            "votes": 63306
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 63306,
+        "coalition": 46399
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Susan Templeman"
+      }
+    },
+    {
+      "name": "McMahon",
+      "state": "NSW",
+      "aecId": "315",
+      "primaries": {
+        "alp": 44537,
+        "lp": 26218,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 8544,
+        "grn": 8923,
+        "oth": 9613
+      },
+      "formal": 97835,
+      "informal": 11581,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 40093
+          },
+          {
+            "group": "alp",
+            "votes": 57742
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 57742,
+        "coalition": 40093
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Chris Bowen"
+      }
+    },
+    {
+      "name": "Mitchell",
+      "state": "NSW",
+      "aecId": "134",
+      "primaries": {
+        "alp": 36396,
+        "lp": 50758,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4680,
+        "grn": 15044,
+        "oth": 2675
+      },
+      "formal": 109553,
+      "informal": 6156,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 58949
+          },
+          {
+            "group": "alp",
+            "votes": 50604
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 50604,
+        "coalition": 58949
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Alex Hawke"
+      }
+    },
+    {
+      "name": "New England",
+      "state": "NSW",
+      "aecId": "135",
+      "primaries": {
+        "alp": 23233,
+        "lp": 0,
+        "lnp": 0,
+        "np": 59711,
+        "clp": 0,
+        "on": 11387,
+        "grn": 9023,
+        "oth": 10992
+      },
+      "formal": 114346,
+      "informal": 5816,
+      "tcp": {
+        "pair": [
+          {
+            "group": "np",
+            "votes": 76680
+          },
+          {
+            "group": "alp",
+            "votes": 37666
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 37666,
+        "coalition": 76680
+      },
+      "member": {
+        "party": "NP",
+        "group": "np",
+        "name": "Barnaby Joyce"
+      }
+    },
+    {
+      "name": "Newcastle",
+      "state": "NSW",
+      "aecId": "136",
+      "primaries": {
+        "alp": 49054,
+        "lp": 20638,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5789,
+        "grn": 24061,
+        "oth": 8724
+      },
+      "formal": 108266,
+      "informal": 8145,
+      "tcp": {
+        "pair": [
+          {
+            "group": "grn",
+            "votes": 37022
+          },
+          {
+            "group": "alp",
+            "votes": 71244
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 76644,
+        "coalition": 31622
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Sharon Claydon"
+      }
+    },
+    {
+      "name": "Page",
+      "state": "NSW",
+      "aecId": "138",
+      "primaries": {
+        "alp": 23711,
+        "lp": 0,
+        "lnp": 0,
+        "np": 48049,
+        "clp": 0,
+        "on": 6132,
+        "grn": 16265,
+        "oth": 13437
+      },
+      "formal": 107594,
+      "informal": 11145,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 43806
+          },
+          {
+            "group": "np",
+            "votes": 63788
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 43806,
+        "coalition": 63788
+      },
+      "member": {
+        "party": "NP",
+        "group": "np",
+        "name": "Kevin Hogan"
+      }
+    },
+    {
+      "name": "Parkes",
+      "state": "NSW",
+      "aecId": "139",
+      "primaries": {
+        "alp": 20630,
+        "lp": 0,
+        "lnp": 0,
+        "np": 41912,
+        "clp": 0,
+        "on": 14320,
+        "grn": 6404,
+        "oth": 21621
+      },
+      "formal": 104887,
+      "informal": 11855,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 38840
+          },
+          {
+            "group": "np",
+            "votes": 66047
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 38840,
+        "coalition": 66047
+      },
+      "member": {
+        "party": "NP",
+        "group": "np",
+        "name": "Jamie Chaffey"
+      }
+    },
+    {
+      "name": "Parramatta",
+      "state": "NSW",
+      "aecId": "140",
+      "primaries": {
+        "alp": 46427,
+        "lp": 29860,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2653,
+        "grn": 11766,
+        "oth": 6484
+      },
+      "formal": 97190,
+      "informal": 9556,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 60790
+          },
+          {
+            "group": "lp",
+            "votes": 36400
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 60790,
+        "coalition": 36400
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Andrew Charlton"
+      }
+    },
+    {
+      "name": "Paterson",
+      "state": "NSW",
+      "aecId": "249",
+      "primaries": {
+        "alp": 40290,
+        "lp": 29602,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 8254,
+        "grn": 8219,
+        "oth": 22339
+      },
+      "formal": 108704,
+      "informal": 9957,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 61841
+          },
+          {
+            "group": "lp",
+            "votes": 46863
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 61841,
+        "coalition": 46863
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Meryl Swanson"
+      }
+    },
+    {
+      "name": "Reid",
+      "state": "NSW",
+      "aecId": "144",
+      "primaries": {
+        "alp": 49166,
+        "lp": 32107,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2352,
+        "grn": 11680,
+        "oth": 5912
+      },
+      "formal": 101217,
+      "informal": 6426,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 38455
+          },
+          {
+            "group": "alp",
+            "votes": 62762
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 62762,
+        "coalition": 38455
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Sally Sitou"
+      }
+    },
+    {
+      "name": "Richmond",
+      "state": "NSW",
+      "aecId": "145",
+      "primaries": {
+        "alp": 31901,
+        "lp": 0,
+        "lnp": 0,
+        "np": 25795,
+        "clp": 0,
+        "on": 5709,
+        "grn": 27783,
+        "oth": 13764
+      },
+      "formal": 104952,
+      "informal": 8600,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 62975
+          },
+          {
+            "group": "np",
+            "votes": 41977
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 62975,
+        "coalition": 41977
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Justine Elliot"
+      }
+    },
+    {
+      "name": "Riverina",
+      "state": "NSW",
+      "aecId": "250",
+      "primaries": {
+        "alp": 19506,
+        "lp": 0,
+        "lnp": 0,
+        "np": 42678,
+        "clp": 0,
+        "on": 10427,
+        "grn": 4767,
+        "oth": 28459
+      },
+      "formal": 105837,
+      "informal": 13443,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 39561
+          },
+          {
+            "group": "np",
+            "votes": 66276
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 39561,
+        "coalition": 66276
+      },
+      "member": {
+        "party": "NP",
+        "group": "np",
+        "name": "Michael Mccormack"
+      }
+    },
+    {
+      "name": "Robertson",
+      "state": "NSW",
+      "aecId": "146",
+      "primaries": {
+        "alp": 45411,
+        "lp": 30831,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7032,
+        "grn": 9119,
+        "oth": 9070
+      },
+      "formal": 101463,
+      "informal": 4876,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 41228
+          },
+          {
+            "group": "alp",
+            "votes": 60235
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 60235,
+        "coalition": 41228
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Gordon Reid"
+      }
+    },
+    {
+      "name": "Shortland",
+      "state": "NSW",
+      "aecId": "148",
+      "primaries": {
+        "alp": 48222,
+        "lp": 28331,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 9813,
+        "grn": 12257,
+        "oth": 9485
+      },
+      "formal": 108108,
+      "informal": 6731,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 66494
+          },
+          {
+            "group": "lp",
+            "votes": 41614
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 66494,
+        "coalition": 41614
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Pat Conroy"
+      }
+    },
+    {
+      "name": "Sydney",
+      "state": "NSW",
+      "aecId": "149",
+      "primaries": {
+        "alp": 59153,
+        "lp": 18860,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3698,
+        "grn": 23162,
+        "oth": 2376
+      },
+      "formal": 107249,
+      "informal": 4161,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 76089
+          },
+          {
+            "group": "grn",
+            "votes": 31160
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 83737,
+        "coalition": 23512
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Tanya Plibersek"
+      }
+    },
+    {
+      "name": "Warringah",
+      "state": "NSW",
+      "aecId": "151",
+      "primaries": {
+        "alp": 16738,
+        "lp": 36446,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 1978,
+        "grn": 10051,
+        "oth": 4092,
+        "member:steggall": 45590
+      },
+      "formal": 114895,
+      "informal": 5520,
+      "tcp": {
+        "pair": [
+          {
+            "group": "member:steggall",
+            "votes": 70318
+          },
+          {
+            "group": "lp",
+            "votes": 44577
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 62634,
+        "coalition": 52261
+      },
+      "member": {
+        "party": "IND",
+        "group": "member:steggall",
+        "name": "Zali Steggall"
+      }
+    },
+    {
+      "name": "Watson",
+      "state": "NSW",
+      "aecId": "251",
+      "primaries": {
+        "alp": 39763,
+        "lp": 12585,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2674,
+        "grn": 7399,
+        "oth": 20413
+      },
+      "formal": 82834,
+      "informal": 16983,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 55099
+          },
+          {
+            "group": "oth",
+            "votes": 27735
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 60352,
+        "coalition": 22482
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Tony Burke"
+      }
+    },
+    {
+      "name": "Wentworth",
+      "state": "NSW",
+      "aecId": "152",
+      "primaries": {
+        "alp": 14779,
+        "lp": 40155,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2625,
+        "grn": 11241,
+        "oth": 1347,
+        "member:spender": 40284
+      },
+      "formal": 110431,
+      "informal": 3106,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 46002
+          },
+          {
+            "group": "member:spender",
+            "votes": 64429
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 55829,
+        "coalition": 54602
+      },
+      "member": {
+        "party": "IND",
+        "group": "member:spender",
+        "name": "Allegra Spender"
+      }
+    },
+    {
+      "name": "Werriwa",
+      "state": "NSW",
+      "aecId": "153",
+      "primaries": {
+        "alp": 35785,
+        "lp": 27003,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3499,
+        "grn": 9747,
+        "oth": 11580
+      },
+      "formal": 87614,
+      "informal": 18274,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 49742
+          },
+          {
+            "group": "lp",
+            "votes": 37872
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 49742,
+        "coalition": 37872
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Anne Maree Stanley"
+      }
+    },
+    {
+      "name": "Whitlam",
+      "state": "NSW",
+      "aecId": "150",
+      "primaries": {
+        "alp": 42230,
+        "lp": 30908,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 8379,
+        "grn": 13558,
+        "oth": 14241
+      },
+      "formal": 109316,
+      "informal": 11909,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 47830
+          },
+          {
+            "group": "alp",
+            "votes": 61486
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 61486,
+        "coalition": 47830
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Carol Berry"
+      }
+    },
+    {
+      "name": "Aston",
+      "state": "VIC",
+      "aecId": "197",
+      "primaries": {
+        "alp": 40926,
+        "lp": 41382,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3738,
+        "grn": 12669,
+        "oth": 11134
+      },
+      "formal": 109849,
+      "informal": 5814,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 51159
+          },
+          {
+            "group": "alp",
+            "votes": 58690
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 58690,
+        "coalition": 51159
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Mary Doyle"
+      }
+    },
+    {
+      "name": "Ballarat",
+      "state": "VIC",
+      "aecId": "198",
+      "primaries": {
+        "alp": 44273,
+        "lp": 29883,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 8029,
+        "grn": 14984,
+        "oth": 7371
+      },
+      "formal": 104540,
+      "informal": 3955,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 41121
+          },
+          {
+            "group": "alp",
+            "votes": 63419
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 63419,
+        "coalition": 41121
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Catherine King"
+      }
+    },
+    {
+      "name": "Bendigo",
+      "state": "VIC",
+      "aecId": "200",
+      "primaries": {
+        "alp": 35771,
+        "lp": 11176,
+        "lnp": 0,
+        "np": 31707,
+        "clp": 0,
+        "on": 5262,
+        "grn": 12079,
+        "oth": 10622
+      },
+      "formal": 106617,
+      "informal": 6228,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 54800
+          },
+          {
+            "group": "np",
+            "votes": 51817
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 54800,
+        "coalition": 51817
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Lisa Chesters"
+      }
+    },
+    {
+      "name": "Bruce",
+      "state": "VIC",
+      "aecId": "201",
+      "primaries": {
+        "alp": 49610,
+        "lp": 25162,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 8931,
+        "grn": 13213,
+        "oth": 12578
+      },
+      "formal": 109494,
+      "informal": 7165,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 70751
+          },
+          {
+            "group": "lp",
+            "votes": 38743
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 70751,
+        "coalition": 38743
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Julian Hill"
+      }
+    },
+    {
+      "name": "Calwell",
+      "state": "VIC",
+      "aecId": "203",
+      "primaries": {
+        "alp": 27423,
+        "lp": 14102,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3375,
+        "grn": 7439,
+        "oth": 37492
+      },
+      "formal": 89831,
+      "informal": 10657,
+      "tcp": {
+        "pair": [
+          {
+            "group": "oth",
+            "votes": 40350
+          },
+          {
+            "group": "alp",
+            "votes": 49481
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 58127,
+        "coalition": 31704
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Basem Abdo"
+      }
+    },
+    {
+      "name": "Casey",
+      "state": "VIC",
+      "aecId": "204",
+      "primaries": {
+        "alp": 26820,
+        "lp": 45194,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5603,
+        "grn": 12107,
+        "oth": 20839
+      },
+      "formal": 110563,
+      "informal": 5089,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 52084
+          },
+          {
+            "group": "lp",
+            "votes": 58479
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 52084,
+        "coalition": 58479
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Aaron Violi"
+      }
+    },
+    {
+      "name": "Chisholm",
+      "state": "VIC",
+      "aecId": "205",
+      "primaries": {
+        "alp": 43655,
+        "lp": 41966,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2156,
+        "grn": 14086,
+        "oth": 10833
+      },
+      "formal": 112696,
+      "informal": 2747,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 49923
+          },
+          {
+            "group": "alp",
+            "votes": 62773
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 62773,
+        "coalition": 49923
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Carina Garland"
+      }
+    },
+    {
+      "name": "Cooper",
+      "state": "VIC",
+      "aecId": "320",
+      "primaries": {
+        "alp": 45151,
+        "lp": 16280,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5684,
+        "grn": 27123,
+        "oth": 13348
+      },
+      "formal": 107586,
+      "informal": 3227,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 64246
+          },
+          {
+            "group": "grn",
+            "votes": 43340
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 84489,
+        "coalition": 23097
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Ged Kearney"
+      }
+    },
+    {
+      "name": "Corangamite",
+      "state": "VIC",
+      "aecId": "328",
+      "primaries": {
+        "alp": 38814,
+        "lp": 35488,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3343,
+        "grn": 14925,
+        "oth": 11450
+      },
+      "formal": 104020,
+      "informal": 4023,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 60381
+          },
+          {
+            "group": "lp",
+            "votes": 43639
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 60381,
+        "coalition": 43639
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Libby Coker"
+      }
+    },
+    {
+      "name": "Corio",
+      "state": "VIC",
+      "aecId": "208",
+      "primaries": {
+        "alp": 47221,
+        "lp": 27423,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 10953,
+        "grn": 17491,
+        "oth": 7139
+      },
+      "formal": 110227,
+      "informal": 3593,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 40529
+          },
+          {
+            "group": "alp",
+            "votes": 69698
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 69698,
+        "coalition": 40529
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Richard Marles"
+      }
+    },
+    {
+      "name": "Deakin",
+      "state": "VIC",
+      "aecId": "209",
+      "primaries": {
+        "alp": 40177,
+        "lp": 44732,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3043,
+        "grn": 13758,
+        "oth": 13797
+      },
+      "formal": 115507,
+      "informal": 4692,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 61014
+          },
+          {
+            "group": "lp",
+            "votes": 54493
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 61014,
+        "coalition": 54493
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Matt Gregg"
+      }
+    },
+    {
+      "name": "Dunkley",
+      "state": "VIC",
+      "aecId": "210",
+      "primaries": {
+        "alp": 41792,
+        "lp": 35288,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7494,
+        "grn": 12649,
+        "oth": 11951
+      },
+      "formal": 109174,
+      "informal": 5559,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 46860
+          },
+          {
+            "group": "alp",
+            "votes": 62314
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 62314,
+        "coalition": 46860
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Jodie Belyea"
+      }
+    },
+    {
+      "name": "Flinders",
+      "state": "VIC",
+      "aecId": "211",
+      "primaries": {
+        "alp": 25622,
+        "lp": 47375,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 6091,
+        "grn": 7305,
+        "oth": 28530
+      },
+      "formal": 114923,
+      "informal": 4246,
+      "tcp": {
+        "pair": [
+          {
+            "group": "oth",
+            "votes": 54833
+          },
+          {
+            "group": "lp",
+            "votes": 60090
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 51966,
+        "coalition": 62957
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Zoe Mckenzie"
+      }
+    },
+    {
+      "name": "Fraser",
+      "state": "VIC",
+      "aecId": "321",
+      "primaries": {
+        "alp": 45786,
+        "lp": 18125,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5135,
+        "grn": 27171,
+        "oth": 11250
+      },
+      "formal": 107467,
+      "informal": 4250,
+      "tcp": {
+        "pair": [
+          {
+            "group": "grn",
+            "votes": 43818
+          },
+          {
+            "group": "alp",
+            "votes": 63649
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 77401,
+        "coalition": 30066
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Daniel Mulino"
+      }
+    },
+    {
+      "name": "Gellibrand",
+      "state": "VIC",
+      "aecId": "212",
+      "primaries": {
+        "alp": 49044,
+        "lp": 27539,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 6290,
+        "grn": 17933,
+        "oth": 4396
+      },
+      "formal": 105202,
+      "informal": 3538,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 68489
+          },
+          {
+            "group": "lp",
+            "votes": 36713
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 68489,
+        "coalition": 36713
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Tim Watts"
+      }
+    },
+    {
+      "name": "Gippsland",
+      "state": "VIC",
+      "aecId": "213",
+      "primaries": {
+        "alp": 22291,
+        "lp": 0,
+        "lnp": 0,
+        "np": 55036,
+        "clp": 0,
+        "on": 15118,
+        "grn": 8897,
+        "oth": 3416
+      },
+      "formal": 104758,
+      "informal": 3904,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 32102
+          },
+          {
+            "group": "np",
+            "votes": 72656
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 32102,
+        "coalition": 72656
+      },
+      "member": {
+        "party": "NP",
+        "group": "np",
+        "name": "Darren Chester"
+      }
+    },
+    {
+      "name": "Goldstein",
+      "state": "VIC",
+      "aecId": "214",
+      "primaries": {
+        "alp": 15812,
+        "lp": 50228,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2037,
+        "grn": 8320,
+        "oth": 39276
+      },
+      "formal": 115673,
+      "informal": 3198,
+      "tcp": {
+        "pair": [
+          {
+            "group": "oth",
+            "votes": 57749
+          },
+          {
+            "group": "lp",
+            "votes": 57924
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 53246,
+        "coalition": 62427
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Tim Wilson"
+      }
+    },
+    {
+      "name": "Gorton",
+      "state": "VIC",
+      "aecId": "309",
+      "primaries": {
+        "alp": 48834,
+        "lp": 33087,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7137,
+        "grn": 12244,
+        "oth": 12128
+      },
+      "formal": 113430,
+      "informal": 5210,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 68380
+          },
+          {
+            "group": "lp",
+            "votes": 45050
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 68380,
+        "coalition": 45050
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Alice Jordan-baird"
+      }
+    },
+    {
+      "name": "Hawke",
+      "state": "VIC",
+      "aecId": "326",
+      "primaries": {
+        "alp": 40619,
+        "lp": 31383,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 10035,
+        "grn": 10178,
+        "oth": 11602
+      },
+      "formal": 103817,
+      "informal": 4431,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 59830
+          },
+          {
+            "group": "lp",
+            "votes": 43987
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 59830,
+        "coalition": 43987
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Sam Rae"
+      }
+    },
+    {
+      "name": "Holt",
+      "state": "VIC",
+      "aecId": "216",
+      "primaries": {
+        "alp": 44686,
+        "lp": 24840,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 8655,
+        "grn": 11122,
+        "oth": 9930
+      },
+      "formal": 99233,
+      "informal": 3923,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 63538
+          },
+          {
+            "group": "lp",
+            "votes": 35695
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 63538,
+        "coalition": 35695
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Cassandra Fernando"
+      }
+    },
+    {
+      "name": "Hotham",
+      "state": "VIC",
+      "aecId": "217",
+      "primaries": {
+        "alp": 51880,
+        "lp": 27346,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4959,
+        "grn": 15780,
+        "oth": 6246
+      },
+      "formal": 106211,
+      "informal": 3692,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 71012
+          },
+          {
+            "group": "lp",
+            "votes": 35199
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 71012,
+        "coalition": 35199
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Clare O'neil"
+      }
+    },
+    {
+      "name": "Indi",
+      "state": "VIC",
+      "aecId": "218",
+      "primaries": {
+        "alp": 8824,
+        "lp": 32475,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7611,
+        "grn": 3839,
+        "oth": 8289,
+        "member:haines": 44723
+      },
+      "formal": 105761,
+      "informal": 6279,
+      "tcp": {
+        "pair": [
+          {
+            "group": "member:haines",
+            "votes": 62014
+          },
+          {
+            "group": "lp",
+            "votes": 43747
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 45836,
+        "coalition": 59925
+      },
+      "member": {
+        "party": "IND",
+        "group": "member:haines",
+        "name": "Helen Haines"
+      }
+    },
+    {
+      "name": "Isaacs",
+      "state": "VIC",
+      "aecId": "219",
+      "primaries": {
+        "alp": 53454,
+        "lp": 30660,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4989,
+        "grn": 15200,
+        "oth": 3878
+      },
+      "formal": 108181,
+      "informal": 3958,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 69604
+          },
+          {
+            "group": "lp",
+            "votes": 38577
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 69604,
+        "coalition": 38577
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Mark Dreyfus"
+      }
+    },
+    {
+      "name": "Jagajaga",
+      "state": "VIC",
+      "aecId": "220",
+      "primaries": {
+        "alp": 47284,
+        "lp": 32724,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4297,
+        "grn": 17334,
+        "oth": 9460
+      },
+      "formal": 111099,
+      "informal": 3288,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 41241
+          },
+          {
+            "group": "alp",
+            "votes": 69858
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 69858,
+        "coalition": 41241
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Kate Thwaites"
+      }
+    },
+    {
+      "name": "Kooyong",
+      "state": "VIC",
+      "aecId": "221",
+      "primaries": {
+        "alp": 13671,
+        "lp": 49542,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 1201,
+        "grn": 8900,
+        "oth": 2599,
+        "member:ryan": 38955
+      },
+      "formal": 114868,
+      "informal": 2402,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 56668
+          },
+          {
+            "group": "member:ryan",
+            "votes": 58200
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 54709,
+        "coalition": 60159
+      },
+      "member": {
+        "party": "IND",
+        "group": "member:ryan",
+        "name": "Monique Ryan"
+      }
+    },
+    {
+      "name": "La Trobe",
+      "state": "VIC",
+      "aecId": "223",
+      "primaries": {
+        "alp": 33289,
+        "lp": 40547,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7956,
+        "grn": 13386,
+        "oth": 8440
+      },
+      "formal": 103618,
+      "informal": 3689,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 49674
+          },
+          {
+            "group": "lp",
+            "votes": 53944
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 49674,
+        "coalition": 53944
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Jason Wood"
+      }
+    },
+    {
+      "name": "Lalor",
+      "state": "VIC",
+      "aecId": "222",
+      "primaries": {
+        "alp": 43284,
+        "lp": 25869,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 6986,
+        "grn": 15181,
+        "oth": 7964
+      },
+      "formal": 99284,
+      "informal": 4120,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 62761
+          },
+          {
+            "group": "lp",
+            "votes": 36523
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 62761,
+        "coalition": 36523
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Joanne Ryan"
+      }
+    },
+    {
+      "name": "Macnamara",
+      "state": "VIC",
+      "aecId": "322",
+      "primaries": {
+        "alp": 36228,
+        "lp": 32606,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2803,
+        "grn": 25561,
+        "oth": 3140
+      },
+      "formal": 100338,
+      "informal": 2246,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 62004
+          },
+          {
+            "group": "lp",
+            "votes": 38334
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 62004,
+        "coalition": 38334
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Josh Burns"
+      }
+    },
+    {
+      "name": "Mallee",
+      "state": "VIC",
+      "aecId": "224",
+      "primaries": {
+        "alp": 19839,
+        "lp": 0,
+        "lnp": 0,
+        "np": 51553,
+        "clp": 0,
+        "on": 11414,
+        "grn": 9477,
+        "oth": 11424
+      },
+      "formal": 103707,
+      "informal": 7540,
+      "tcp": {
+        "pair": [
+          {
+            "group": "np",
+            "votes": 71597
+          },
+          {
+            "group": "alp",
+            "votes": 32110
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 32110,
+        "coalition": 71597
+      },
+      "member": {
+        "party": "NP",
+        "group": "np",
+        "name": "Anne Webster"
+      }
+    },
+    {
+      "name": "Maribyrnong",
+      "state": "VIC",
+      "aecId": "225",
+      "primaries": {
+        "alp": 46064,
+        "lp": 33874,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7665,
+        "grn": 23594,
+        "oth": 0
+      },
+      "formal": 111197,
+      "informal": 3098,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 69660
+          },
+          {
+            "group": "lp",
+            "votes": 41537
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 69660,
+        "coalition": 41537
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Jo Briskey"
+      }
+    },
+    {
+      "name": "McEwen",
+      "state": "VIC",
+      "aecId": "226",
+      "primaries": {
+        "alp": 39079,
+        "lp": 34023,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 6869,
+        "grn": 11611,
+        "oth": 13034
+      },
+      "formal": 104616,
+      "informal": 5691,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 47328
+          },
+          {
+            "group": "alp",
+            "votes": 57288
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 57288,
+        "coalition": 47328
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Rob Mitchell"
+      }
+    },
+    {
+      "name": "Melbourne",
+      "state": "VIC",
+      "aecId": "228",
+      "primaries": {
+        "alp": 30541,
+        "lp": 19267,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2438,
+        "grn": 38457,
+        "oth": 6745
+      },
+      "formal": 97448,
+      "informal": 2427,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 51663
+          },
+          {
+            "group": "grn",
+            "votes": 45785
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 72083,
+        "coalition": 25365
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Sarah Witty"
+      }
+    },
+    {
+      "name": "Menzies",
+      "state": "VIC",
+      "aecId": "229",
+      "primaries": {
+        "alp": 38012,
+        "lp": 44473,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2152,
+        "grn": 11998,
+        "oth": 12795
+      },
+      "formal": 109430,
+      "informal": 4523,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 53536
+          },
+          {
+            "group": "alp",
+            "votes": 55894
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 55894,
+        "coalition": 53536
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Gabriel Ng"
+      }
+    },
+    {
+      "name": "Monash",
+      "state": "VIC",
+      "aecId": "323",
+      "primaries": {
+        "alp": 20804,
+        "lp": 32579,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 8166,
+        "grn": 5062,
+        "oth": 35909
+      },
+      "formal": 102520,
+      "informal": 6330,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 47069
+          },
+          {
+            "group": "lp",
+            "votes": 55451
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 47069,
+        "coalition": 55451
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Mary Aldred"
+      }
+    },
+    {
+      "name": "Nicholls",
+      "state": "VIC",
+      "aecId": "324",
+      "primaries": {
+        "alp": 25560,
+        "lp": 0,
+        "lnp": 0,
+        "np": 48762,
+        "clp": 0,
+        "on": 12095,
+        "grn": 8235,
+        "oth": 10798
+      },
+      "formal": 105450,
+      "informal": 5556,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 37563
+          },
+          {
+            "group": "np",
+            "votes": 67887
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 37563,
+        "coalition": 67887
+      },
+      "member": {
+        "party": "NP",
+        "group": "np",
+        "name": "Sam Birrell"
+      }
+    },
+    {
+      "name": "Scullin",
+      "state": "VIC",
+      "aecId": "232",
+      "primaries": {
+        "alp": 43348,
+        "lp": 19807,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 6401,
+        "grn": 9090,
+        "oth": 17899
+      },
+      "formal": 96545,
+      "informal": 7961,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 34473
+          },
+          {
+            "group": "alp",
+            "votes": 62072
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 62072,
+        "coalition": 34473
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Andrew Giles"
+      }
+    },
+    {
+      "name": "Wannon",
+      "state": "VIC",
+      "aecId": "233",
+      "primaries": {
+        "alp": 11438,
+        "lp": 47312,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4529,
+        "grn": 3427,
+        "oth": 41697
+      },
+      "formal": 108403,
+      "informal": 6086,
+      "tcp": {
+        "pair": [
+          {
+            "group": "oth",
+            "votes": 50654
+          },
+          {
+            "group": "lp",
+            "votes": 57749
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 42365,
+        "coalition": 66038
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Dan Tehan"
+      }
+    },
+    {
+      "name": "Wills",
+      "state": "VIC",
+      "aecId": "234",
+      "primaries": {
+        "alp": 39069,
+        "lp": 14121,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3842,
+        "grn": 38834,
+        "oth": 13915
+      },
+      "formal": 109781,
+      "informal": 5106,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 56459
+          },
+          {
+            "group": "grn",
+            "votes": 53322
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 88770,
+        "coalition": 21011
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Peter Khalil"
+      }
+    },
+    {
+      "name": "Blair",
+      "state": "QLD",
+      "aecId": "304",
+      "primaries": {
+        "alp": 42825,
+        "lp": 0,
+        "lnp": 31797,
+        "np": 0,
+        "clp": 0,
+        "on": 11344,
+        "grn": 12104,
+        "oth": 18883
+      },
+      "formal": 116953,
+      "informal": 8219,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 51797
+          },
+          {
+            "group": "alp",
+            "votes": 65156
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 65156,
+        "coalition": 51797
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Shayne Neumann"
+      }
+    },
+    {
+      "name": "Bonner",
+      "state": "QLD",
+      "aecId": "310",
+      "primaries": {
+        "alp": 39154,
+        "lp": 0,
+        "lnp": 35156,
+        "np": 0,
+        "clp": 0,
+        "on": 3784,
+        "grn": 12314,
+        "oth": 8698
+      },
+      "formal": 99106,
+      "informal": 4597,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 44600
+          },
+          {
+            "group": "alp",
+            "votes": 54506
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 54506,
+        "coalition": 44600
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Kara Cook"
+      }
+    },
+    {
+      "name": "Bowman",
+      "state": "QLD",
+      "aecId": "155",
+      "primaries": {
+        "alp": 34247,
+        "lp": 0,
+        "lnp": 42777,
+        "np": 0,
+        "clp": 0,
+        "on": 7650,
+        "grn": 12689,
+        "oth": 10624
+      },
+      "formal": 107987,
+      "informal": 3986,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 51372
+          },
+          {
+            "group": "lnp",
+            "votes": 56615
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 51372,
+        "coalition": 56615
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Henry Pike"
+      }
+    },
+    {
+      "name": "Brisbane",
+      "state": "QLD",
+      "aecId": "156",
+      "primaries": {
+        "alp": 35607,
+        "lp": 0,
+        "lnp": 37951,
+        "np": 0,
+        "clp": 0,
+        "on": 2798,
+        "grn": 28663,
+        "oth": 5726
+      },
+      "formal": 110745,
+      "informal": 3645,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 65295
+          },
+          {
+            "group": "lnp",
+            "votes": 45450
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 65295,
+        "coalition": 45450
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Madonna Jarrett"
+      }
+    },
+    {
+      "name": "Capricornia",
+      "state": "QLD",
+      "aecId": "157",
+      "primaries": {
+        "alp": 31483,
+        "lp": 0,
+        "lnp": 36074,
+        "np": 0,
+        "clp": 0,
+        "on": 15355,
+        "grn": 6101,
+        "oth": 9645
+      },
+      "formal": 98658,
+      "informal": 3547,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 43573
+          },
+          {
+            "group": "lnp",
+            "votes": 55085
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 43573,
+        "coalition": 55085
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Michelle Landry"
+      }
+    },
+    {
+      "name": "Dawson",
+      "state": "QLD",
+      "aecId": "158",
+      "primaries": {
+        "alp": 25808,
+        "lp": 0,
+        "lnp": 41043,
+        "np": 0,
+        "clp": 0,
+        "on": 10258,
+        "grn": 6944,
+        "oth": 14415
+      },
+      "formal": 98468,
+      "informal": 4849,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 60881
+          },
+          {
+            "group": "alp",
+            "votes": 37587
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 37587,
+        "coalition": 60881
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Andrew Willcox"
+      }
+    },
+    {
+      "name": "Dickson",
+      "state": "QLD",
+      "aecId": "252",
+      "primaries": {
+        "alp": 35502,
+        "lp": 0,
+        "lnp": 36628,
+        "np": 0,
+        "clp": 0,
+        "on": 4429,
+        "grn": 8061,
+        "oth": 20959
+      },
+      "formal": 105579,
+      "informal": 4676,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 59115
+          },
+          {
+            "group": "lnp",
+            "votes": 46464
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 59115,
+        "coalition": 46464
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Ali France"
+      }
+    },
+    {
+      "name": "Fadden",
+      "state": "QLD",
+      "aecId": "159",
+      "primaries": {
+        "alp": 30526,
+        "lp": 0,
+        "lnp": 45627,
+        "np": 0,
+        "clp": 0,
+        "on": 8896,
+        "grn": 10359,
+        "oth": 15990
+      },
+      "formal": 111398,
+      "informal": 6793,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 48034
+          },
+          {
+            "group": "lnp",
+            "votes": 63364
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 48034,
+        "coalition": 63364
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Cameron Caldwell"
+      }
+    },
+    {
+      "name": "Fairfax",
+      "state": "QLD",
+      "aecId": "160",
+      "primaries": {
+        "alp": 27607,
+        "lp": 0,
+        "lnp": 42075,
+        "np": 0,
+        "clp": 0,
+        "on": 8232,
+        "grn": 11351,
+        "oth": 21783
+      },
+      "formal": 111048,
+      "informal": 6180,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 51938
+          },
+          {
+            "group": "lnp",
+            "votes": 59110
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 51938,
+        "coalition": 59110
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Ted O'brien"
+      }
+    },
+    {
+      "name": "Fisher",
+      "state": "QLD",
+      "aecId": "161",
+      "primaries": {
+        "alp": 26380,
+        "lp": 0,
+        "lnp": 44100,
+        "np": 0,
+        "clp": 0,
+        "on": 7199,
+        "grn": 11396,
+        "oth": 29397
+      },
+      "formal": 118472,
+      "informal": 6798,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 66385
+          },
+          {
+            "group": "alp",
+            "votes": 52087
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 52087,
+        "coalition": 66385
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Andrew Wallace"
+      }
+    },
+    {
+      "name": "Flynn",
+      "state": "QLD",
+      "aecId": "311",
+      "primaries": {
+        "alp": 24441,
+        "lp": 0,
+        "lnp": 36502,
+        "np": 0,
+        "clp": 0,
+        "on": 13874,
+        "grn": 5547,
+        "oth": 17179
+      },
+      "formal": 97543,
+      "informal": 6970,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 38781
+          },
+          {
+            "group": "lnp",
+            "votes": 58762
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 38781,
+        "coalition": 58762
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Colin Boyce"
+      }
+    },
+    {
+      "name": "Forde",
+      "state": "QLD",
+      "aecId": "162",
+      "primaries": {
+        "alp": 36821,
+        "lp": 0,
+        "lnp": 33023,
+        "np": 0,
+        "clp": 0,
+        "on": 11049,
+        "grn": 12280,
+        "oth": 14355
+      },
+      "formal": 107528,
+      "informal": 7440,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 51866
+          },
+          {
+            "group": "alp",
+            "votes": 55662
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 55662,
+        "coalition": 51866
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Rowan Holzberger"
+      }
+    },
+    {
+      "name": "Griffith",
+      "state": "QLD",
+      "aecId": "163",
+      "primaries": {
+        "alp": 37686,
+        "lp": 0,
+        "lnp": 29025,
+        "np": 0,
+        "clp": 0,
+        "on": 2684,
+        "grn": 34570,
+        "oth": 5247
+      },
+      "formal": 109212,
+      "informal": 2454,
+      "tcp": {
+        "pair": [
+          {
+            "group": "grn",
+            "votes": 43058
+          },
+          {
+            "group": "alp",
+            "votes": 66154
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 72015,
+        "coalition": 37197
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Renee Coffey"
+      }
+    },
+    {
+      "name": "Groom",
+      "state": "QLD",
+      "aecId": "164",
+      "primaries": {
+        "alp": 17172,
+        "lp": 0,
+        "lnp": 42302,
+        "np": 0,
+        "clp": 0,
+        "on": 9860,
+        "grn": 5757,
+        "oth": 28128
+      },
+      "formal": 103219,
+      "informal": 5276,
+      "tcp": {
+        "pair": [
+          {
+            "group": "oth",
+            "votes": 45752
+          },
+          {
+            "group": "lnp",
+            "votes": 57467
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 37829,
+        "coalition": 65390
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Garth Hamilton"
+      }
+    },
+    {
+      "name": "Herbert",
+      "state": "QLD",
+      "aecId": "165",
+      "primaries": {
+        "alp": 22646,
+        "lp": 0,
+        "lnp": 47941,
+        "np": 0,
+        "clp": 0,
+        "on": 5100,
+        "grn": 9228,
+        "oth": 13447
+      },
+      "formal": 98362,
+      "informal": 5300,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 62374
+          },
+          {
+            "group": "alp",
+            "votes": 35988
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 35988,
+        "coalition": 62374
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Phillip Thompson"
+      }
+    },
+    {
+      "name": "Hinkler",
+      "state": "QLD",
+      "aecId": "166",
+      "primaries": {
+        "alp": 34104,
+        "lp": 0,
+        "lnp": 41569,
+        "np": 0,
+        "clp": 0,
+        "on": 14498,
+        "grn": 8000,
+        "oth": 11199
+      },
+      "formal": 109370,
+      "informal": 5307,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 61534
+          },
+          {
+            "group": "alp",
+            "votes": 47836
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 47836,
+        "coalition": 61534
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "David Batt"
+      }
+    },
+    {
+      "name": "Kennedy",
+      "state": "QLD",
+      "aecId": "167",
+      "primaries": {
+        "alp": 15917,
+        "lp": 0,
+        "lnp": 23135,
+        "np": 0,
+        "clp": 0,
+        "on": 7541,
+        "grn": 5761,
+        "oth": 5589,
+        "member:katter": 39219
+      },
+      "formal": 97162,
+      "informal": 6460,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 33274
+          },
+          {
+            "group": "member:katter",
+            "votes": 63888
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 39521,
+        "coalition": 57641
+      },
+      "member": {
+        "party": "KAP",
+        "group": "member:katter",
+        "name": "Bob Katter"
+      }
+    },
+    {
+      "name": "Leichhardt",
+      "state": "QLD",
+      "aecId": "168",
+      "primaries": {
+        "alp": 34488,
+        "lp": 0,
+        "lnp": 25746,
+        "np": 0,
+        "clp": 0,
+        "on": 7568,
+        "grn": 8776,
+        "oth": 17902
+      },
+      "formal": 94480,
+      "informal": 7372,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 52967
+          },
+          {
+            "group": "lnp",
+            "votes": 41513
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 52967,
+        "coalition": 41513
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Matt Smith"
+      }
+    },
+    {
+      "name": "Lilley",
+      "state": "QLD",
+      "aecId": "169",
+      "primaries": {
+        "alp": 48582,
+        "lp": 0,
+        "lnp": 29205,
+        "np": 0,
+        "clp": 0,
+        "on": 4485,
+        "grn": 17294,
+        "oth": 5874
+      },
+      "formal": 105440,
+      "informal": 2555,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 68030
+          },
+          {
+            "group": "lnp",
+            "votes": 37410
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 68030,
+        "coalition": 37410
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Anika Wells"
+      }
+    },
+    {
+      "name": "Longman",
+      "state": "QLD",
+      "aecId": "302",
+      "primaries": {
+        "alp": 43238,
+        "lp": 0,
+        "lnp": 43960,
+        "np": 0,
+        "clp": 0,
+        "on": 12062,
+        "grn": 12014,
+        "oth": 10655
+      },
+      "formal": 121929,
+      "informal": 4998,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 61099
+          },
+          {
+            "group": "alp",
+            "votes": 60830
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 60830,
+        "coalition": 61099
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Terry Young"
+      }
+    },
+    {
+      "name": "Maranoa",
+      "state": "QLD",
+      "aecId": "170",
+      "primaries": {
+        "alp": 15675,
+        "lp": 0,
+        "lnp": 51947,
+        "np": 0,
+        "clp": 0,
+        "on": 12018,
+        "grn": 5032,
+        "oth": 13015
+      },
+      "formal": 97687,
+      "informal": 5606,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 68476
+          },
+          {
+            "group": "on",
+            "votes": 29211
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 25434,
+        "coalition": 72253
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "David Littleproud"
+      }
+    },
+    {
+      "name": "McPherson",
+      "state": "QLD",
+      "aecId": "171",
+      "primaries": {
+        "alp": 22778,
+        "lp": 0,
+        "lnp": 34918,
+        "np": 0,
+        "clp": 0,
+        "on": 4229,
+        "grn": 8175,
+        "oth": 27115
+      },
+      "formal": 97215,
+      "informal": 8968,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 52920
+          },
+          {
+            "group": "alp",
+            "votes": 44295
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 44295,
+        "coalition": 52920
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Leon Rebello"
+      }
+    },
+    {
+      "name": "Moncrieff",
+      "state": "QLD",
+      "aecId": "172",
+      "primaries": {
+        "alp": 24536,
+        "lp": 0,
+        "lnp": 42047,
+        "np": 0,
+        "clp": 0,
+        "on": 5894,
+        "grn": 9558,
+        "oth": 18291
+      },
+      "formal": 100326,
+      "informal": 7362,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 58991
+          },
+          {
+            "group": "alp",
+            "votes": 41335
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 41335,
+        "coalition": 58991
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Angie Bell"
+      }
+    },
+    {
+      "name": "Moreton",
+      "state": "QLD",
+      "aecId": "173",
+      "primaries": {
+        "alp": 39697,
+        "lp": 0,
+        "lnp": 24132,
+        "np": 0,
+        "clp": 0,
+        "on": 2686,
+        "grn": 20332,
+        "oth": 6984
+      },
+      "formal": 93831,
+      "informal": 4232,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 62014
+          },
+          {
+            "group": "lnp",
+            "votes": 31817
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 62014,
+        "coalition": 31817
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Julie-Ann Campbell"
+      }
+    },
+    {
+      "name": "Oxley",
+      "state": "QLD",
+      "aecId": "174",
+      "primaries": {
+        "alp": 54891,
+        "lp": 0,
+        "lnp": 21976,
+        "np": 0,
+        "clp": 0,
+        "on": 5738,
+        "grn": 13979,
+        "oth": 7478
+      },
+      "formal": 104062,
+      "informal": 4128,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 72003
+          },
+          {
+            "group": "lnp",
+            "votes": 32059
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 72003,
+        "coalition": 32059
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Milton Dick"
+      }
+    },
+    {
+      "name": "Petrie",
+      "state": "QLD",
+      "aecId": "175",
+      "primaries": {
+        "alp": 42538,
+        "lp": 0,
+        "lnp": 44196,
+        "np": 0,
+        "clp": 0,
+        "on": 7848,
+        "grn": 13802,
+        "oth": 8408
+      },
+      "formal": 116792,
+      "informal": 3746,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 59761
+          },
+          {
+            "group": "lnp",
+            "votes": 57031
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 59761,
+        "coalition": 57031
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Emma Comer"
+      }
+    },
+    {
+      "name": "Rankin",
+      "state": "QLD",
+      "aecId": "176",
+      "primaries": {
+        "alp": 45303,
+        "lp": 0,
+        "lnp": 18101,
+        "np": 0,
+        "clp": 0,
+        "on": 6021,
+        "grn": 10032,
+        "oth": 12212
+      },
+      "formal": 91669,
+      "informal": 6304,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 31577
+          },
+          {
+            "group": "alp",
+            "votes": 60092
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 60092,
+        "coalition": 31577
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Jim Chalmers"
+      }
+    },
+    {
+      "name": "Ryan",
+      "state": "QLD",
+      "aecId": "177",
+      "primaries": {
+        "alp": 29217,
+        "lp": 0,
+        "lnp": 35806,
+        "np": 0,
+        "clp": 0,
+        "on": 2327,
+        "grn": 29986,
+        "oth": 6126
+      },
+      "formal": 103462,
+      "informal": 3136,
+      "tcp": {
+        "pair": [
+          {
+            "group": "grn",
+            "votes": 55112
+          },
+          {
+            "group": "lnp",
+            "votes": 48350
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 59822,
+        "coalition": 43640
+      },
+      "member": {
+        "party": "GRN",
+        "group": "grn",
+        "name": "Elizabeth Watson-brown"
+      }
+    },
+    {
+      "name": "Wide Bay",
+      "state": "QLD",
+      "aecId": "178",
+      "primaries": {
+        "alp": 27271,
+        "lp": 0,
+        "lnp": 41055,
+        "np": 0,
+        "clp": 0,
+        "on": 12646,
+        "grn": 9080,
+        "oth": 15006
+      },
+      "formal": 105058,
+      "informal": 4908,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 44512
+          },
+          {
+            "group": "lnp",
+            "votes": 60546
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 44512,
+        "coalition": 60546
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Llew O'brien"
+      }
+    },
+    {
+      "name": "Wright",
+      "state": "QLD",
+      "aecId": "316",
+      "primaries": {
+        "alp": 29708,
+        "lp": 0,
+        "lnp": 39809,
+        "np": 0,
+        "clp": 0,
+        "on": 18998,
+        "grn": 11128,
+        "oth": 17237
+      },
+      "formal": 116880,
+      "informal": 7655,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lnp",
+            "votes": 67764
+          },
+          {
+            "group": "alp",
+            "votes": 49116
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 49116,
+        "coalition": 67764
+      },
+      "member": {
+        "party": "LNP",
+        "group": "lnp",
+        "name": "Scott Buchholz"
+      }
+    },
+    {
+      "name": "Adelaide",
+      "state": "SA",
+      "aecId": "179",
+      "primaries": {
+        "alp": 53036,
+        "lp": 27571,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4584,
+        "grn": 21642,
+        "oth": 7256
+      },
+      "formal": 114089,
+      "informal": 4478,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 78796
+          },
+          {
+            "group": "lp",
+            "votes": 35293
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 78796,
+        "coalition": 35293
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Steve Georganas"
+      }
+    },
+    {
+      "name": "Barker",
+      "state": "SA",
+      "aecId": "180",
+      "primaries": {
+        "alp": 24453,
+        "lp": 52460,
+        "lnp": 0,
+        "np": 1893,
+        "clp": 0,
+        "on": 8908,
+        "grn": 8866,
+        "oth": 12134
+      },
+      "formal": 108714,
+      "informal": 8934,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 68465
+          },
+          {
+            "group": "alp",
+            "votes": 40249
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 40249,
+        "coalition": 68465
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Tony Pasin"
+      }
+    },
+    {
+      "name": "Boothby",
+      "state": "SA",
+      "aecId": "182",
+      "primaries": {
+        "alp": 50015,
+        "lp": 38117,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3560,
+        "grn": 20046,
+        "oth": 5601
+      },
+      "formal": 117339,
+      "informal": 3113,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 71698
+          },
+          {
+            "group": "lp",
+            "votes": 45641
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 71698,
+        "coalition": 45641
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Louise Miller-frost"
+      }
+    },
+    {
+      "name": "Grey",
+      "state": "SA",
+      "aecId": "183",
+      "primaries": {
+        "alp": 24053,
+        "lp": 37287,
+        "lnp": 0,
+        "np": 3288,
+        "clp": 0,
+        "on": 10652,
+        "grn": 6323,
+        "oth": 25278
+      },
+      "formal": 106881,
+      "informal": 8194,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 48479
+          },
+          {
+            "group": "lp",
+            "votes": 58402
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 48479,
+        "coalition": 58402
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Tom Venning"
+      }
+    },
+    {
+      "name": "Hindmarsh",
+      "state": "SA",
+      "aecId": "185",
+      "primaries": {
+        "alp": 54145,
+        "lp": 25984,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5594,
+        "grn": 15246,
+        "oth": 11502
+      },
+      "formal": 112471,
+      "informal": 7624,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 37848
+          },
+          {
+            "group": "alp",
+            "votes": 74623
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 74623,
+        "coalition": 37848
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Mark Butler"
+      }
+    },
+    {
+      "name": "Kingston",
+      "state": "SA",
+      "aecId": "186",
+      "primaries": {
+        "alp": 59758,
+        "lp": 20994,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7018,
+        "grn": 15149,
+        "oth": 9776
+      },
+      "formal": 112695,
+      "informal": 4959,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 79721
+          },
+          {
+            "group": "lp",
+            "votes": 32974
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 79721,
+        "coalition": 32974
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Amanda Rishworth"
+      }
+    },
+    {
+      "name": "Makin",
+      "state": "SA",
+      "aecId": "187",
+      "primaries": {
+        "alp": 50764,
+        "lp": 23871,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7152,
+        "grn": 13134,
+        "oth": 11227
+      },
+      "formal": 106148,
+      "informal": 6985,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 37515
+          },
+          {
+            "group": "alp",
+            "votes": 68633
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 68633,
+        "coalition": 37515
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Tony Zappia"
+      }
+    },
+    {
+      "name": "Mayo",
+      "state": "SA",
+      "aecId": "188",
+      "primaries": {
+        "alp": 26718,
+        "lp": 29551,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7493,
+        "grn": 17048,
+        "oth": 6919,
+        "member:sharkie": 37453
+      },
+      "formal": 125182,
+      "informal": 4603,
+      "tcp": {
+        "pair": [
+          {
+            "group": "member:sharkie",
+            "votes": 81231
+          },
+          {
+            "group": "alp",
+            "votes": 43951
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 68820,
+        "coalition": 56362
+      },
+      "member": {
+        "party": "XEN",
+        "group": "member:sharkie",
+        "name": "Rebekha Sharkie"
+      }
+    },
+    {
+      "name": "Spence",
+      "state": "SA",
+      "aecId": "325",
+      "primaries": {
+        "alp": 49463,
+        "lp": 20852,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 10654,
+        "grn": 16166,
+        "oth": 14447
+      },
+      "formal": 111582,
+      "informal": 9968,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 38679
+          },
+          {
+            "group": "alp",
+            "votes": 72903
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 72903,
+        "coalition": 38679
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Matt Burnell"
+      }
+    },
+    {
+      "name": "Sturt",
+      "state": "SA",
+      "aecId": "190",
+      "primaries": {
+        "alp": 41333,
+        "lp": 40228,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4035,
+        "grn": 18295,
+        "oth": 13246
+      },
+      "formal": 117137,
+      "informal": 4049,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 66326
+          },
+          {
+            "group": "lp",
+            "votes": 50811
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 66326,
+        "coalition": 50811
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Claire Clutterham"
+      }
+    },
+    {
+      "name": "Brand",
+      "state": "WA",
+      "aecId": "235",
+      "primaries": {
+        "alp": 43014,
+        "lp": 18472,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 11960,
+        "grn": 12412,
+        "oth": 7935
+      },
+      "formal": 93793,
+      "informal": 3283,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 62766
+          },
+          {
+            "group": "lp",
+            "votes": 31027
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 62766,
+        "coalition": 31027
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Madeleine King"
+      }
+    },
+    {
+      "name": "Bullwinkel",
+      "state": "WA",
+      "aecId": "329",
+      "primaries": {
+        "alp": 33436,
+        "lp": 25433,
+        "lnp": 0,
+        "np": 16507,
+        "clp": 0,
+        "on": 9011,
+        "grn": 11728,
+        "oth": 8549
+      },
+      "formal": 104664,
+      "informal": 3867,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 51799
+          },
+          {
+            "group": "alp",
+            "votes": 52865
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 52865,
+        "coalition": 51799
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Trish Cook"
+      }
+    },
+    {
+      "name": "Burt",
+      "state": "WA",
+      "aecId": "317",
+      "primaries": {
+        "alp": 46123,
+        "lp": 18879,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 9789,
+        "grn": 11336,
+        "oth": 12564
+      },
+      "formal": 98691,
+      "informal": 4634,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 33846
+          },
+          {
+            "group": "alp",
+            "votes": 64845
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 64845,
+        "coalition": 33846
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Matt Keogh"
+      }
+    },
+    {
+      "name": "Canning",
+      "state": "WA",
+      "aecId": "236",
+      "primaries": {
+        "alp": 30098,
+        "lp": 42794,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 11488,
+        "grn": 8967,
+        "oth": 7300
+      },
+      "formal": 100647,
+      "informal": 3450,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 56917
+          },
+          {
+            "group": "alp",
+            "votes": 43730
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 43730,
+        "coalition": 56917
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Andrew Hastie"
+      }
+    },
+    {
+      "name": "Cowan",
+      "state": "WA",
+      "aecId": "237",
+      "primaries": {
+        "alp": 44826,
+        "lp": 23233,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4869,
+        "grn": 10367,
+        "oth": 12846
+      },
+      "formal": 96141,
+      "informal": 7194,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 34962
+          },
+          {
+            "group": "alp",
+            "votes": 61179
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 61179,
+        "coalition": 34962
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Anne Aly"
+      }
+    },
+    {
+      "name": "Curtin",
+      "state": "WA",
+      "aecId": "238",
+      "primaries": {
+        "alp": 15626,
+        "lp": 42436,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2731,
+        "grn": 8235,
+        "oth": 2368,
+        "member:chaney": 33952
+      },
+      "formal": 105348,
+      "informal": 1805,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 49230
+          },
+          {
+            "group": "member:chaney",
+            "votes": 56118
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 50399,
+        "coalition": 54949
+      },
+      "member": {
+        "party": "IND",
+        "group": "member:chaney",
+        "name": "Kate Chaney"
+      }
+    },
+    {
+      "name": "Durack",
+      "state": "WA",
+      "aecId": "312",
+      "primaries": {
+        "alp": 20583,
+        "lp": 28920,
+        "lnp": 0,
+        "np": 11972,
+        "clp": 0,
+        "on": 8868,
+        "grn": 7196,
+        "oth": 10423
+      },
+      "formal": 87962,
+      "informal": 5966,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 52912
+          },
+          {
+            "group": "alp",
+            "votes": 35050
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 35050,
+        "coalition": 52912
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Melissa Price"
+      }
+    },
+    {
+      "name": "Forrest",
+      "state": "WA",
+      "aecId": "239",
+      "primaries": {
+        "alp": 22423,
+        "lp": 31011,
+        "lnp": 0,
+        "np": 4771,
+        "clp": 0,
+        "on": 8670,
+        "grn": 7840,
+        "oth": 24742
+      },
+      "formal": 99457,
+      "informal": 5465,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 47505
+          },
+          {
+            "group": "lp",
+            "votes": 51952
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 47505,
+        "coalition": 51952
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Ben Small"
+      }
+    },
+    {
+      "name": "Fremantle",
+      "state": "WA",
+      "aecId": "240",
+      "primaries": {
+        "alp": 39427,
+        "lp": 19254,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 6245,
+        "grn": 11802,
+        "oth": 25402
+      },
+      "formal": 102130,
+      "informal": 3764,
+      "tcp": {
+        "pair": [
+          {
+            "group": "oth",
+            "votes": 50365
+          },
+          {
+            "group": "alp",
+            "votes": 51765
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 70145,
+        "coalition": 31985
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Josh Wilson"
+      }
+    },
+    {
+      "name": "Hasluck",
+      "state": "WA",
+      "aecId": "305",
+      "primaries": {
+        "alp": 46203,
+        "lp": 21173,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 7050,
+        "grn": 11912,
+        "oth": 9213
+      },
+      "formal": 95551,
+      "informal": 3978,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 63039
+          },
+          {
+            "group": "lp",
+            "votes": 32512
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 63039,
+        "coalition": 32512
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Tania Lawrence"
+      }
+    },
+    {
+      "name": "Moore",
+      "state": "WA",
+      "aecId": "242",
+      "primaries": {
+        "alp": 34734,
+        "lp": 33595,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4840,
+        "grn": 11877,
+        "oth": 21791
+      },
+      "formal": 106837,
+      "informal": 5367,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 56502
+          },
+          {
+            "group": "lp",
+            "votes": 50335
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 56502,
+        "coalition": 50335
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Tom French"
+      }
+    },
+    {
+      "name": "O'Connor",
+      "state": "WA",
+      "aecId": "243",
+      "primaries": {
+        "alp": 21080,
+        "lp": 34488,
+        "lnp": 0,
+        "np": 12812,
+        "clp": 0,
+        "on": 11053,
+        "grn": 10014,
+        "oth": 10668
+      },
+      "formal": 100115,
+      "informal": 5649,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 63356
+          },
+          {
+            "group": "alp",
+            "votes": 36759
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 36759,
+        "coalition": 63356
+      },
+      "member": {
+        "party": "LP",
+        "group": "lp",
+        "name": "Rick Wilson"
+      }
+    },
+    {
+      "name": "Pearce",
+      "state": "WA",
+      "aecId": "244",
+      "primaries": {
+        "alp": 39303,
+        "lp": 27979,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 9089,
+        "grn": 11640,
+        "oth": 10082
+      },
+      "formal": 98093,
+      "informal": 3094,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 42733
+          },
+          {
+            "group": "alp",
+            "votes": 55360
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 55360,
+        "coalition": 42733
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Tracey Roberts"
+      }
+    },
+    {
+      "name": "Perth",
+      "state": "WA",
+      "aecId": "245",
+      "primaries": {
+        "alp": 42947,
+        "lp": 26026,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 6316,
+        "grn": 24467,
+        "oth": 0
+      },
+      "formal": 99756,
+      "informal": 2491,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 33406
+          },
+          {
+            "group": "alp",
+            "votes": 66350
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 66350,
+        "coalition": 33406
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Patrick Gorman"
+      }
+    },
+    {
+      "name": "Swan",
+      "state": "WA",
+      "aecId": "247",
+      "primaries": {
+        "alp": 41897,
+        "lp": 26467,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5131,
+        "grn": 17186,
+        "oth": 7599
+      },
+      "formal": 98280,
+      "informal": 3114,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 62888
+          },
+          {
+            "group": "lp",
+            "votes": 35392
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 62888,
+        "coalition": 35392
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Zaneta Mascarenhas"
+      }
+    },
+    {
+      "name": "Tangney",
+      "state": "WA",
+      "aecId": "248",
+      "primaries": {
+        "alp": 47175,
+        "lp": 38027,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4520,
+        "grn": 14410,
+        "oth": 6859
+      },
+      "formal": 110991,
+      "informal": 2624,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 47738
+          },
+          {
+            "group": "alp",
+            "votes": 63253
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 63253,
+        "coalition": 47738
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Sam Lim"
+      }
+    },
+    {
+      "name": "Bass",
+      "state": "TAS",
+      "aecId": "192",
+      "primaries": {
+        "alp": 28375,
+        "lp": 22511,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 4639,
+        "grn": 9229,
+        "oth": 6840
+      },
+      "formal": 71594,
+      "informal": 3031,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 41532
+          },
+          {
+            "group": "lp",
+            "votes": 30062
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 41532,
+        "coalition": 30062
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Jess Teesdale"
+      }
+    },
+    {
+      "name": "Braddon",
+      "state": "TAS",
+      "aecId": "193",
+      "primaries": {
+        "alp": 29579,
+        "lp": 23700,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5709,
+        "grn": 6318,
+        "oth": 9534
+      },
+      "formal": 74840,
+      "informal": 3553,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 42809
+          },
+          {
+            "group": "lp",
+            "votes": 32031
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 42809,
+        "coalition": 32031
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Anne Urquhart"
+      }
+    },
+    {
+      "name": "Clark",
+      "state": "TAS",
+      "aecId": "319",
+      "primaries": {
+        "alp": 13539,
+        "lp": 9239,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 2834,
+        "grn": 8908,
+        "oth": 0,
+        "member:wilkie": 33011
+      },
+      "formal": 67531,
+      "informal": 1677,
+      "tcp": {
+        "pair": [
+          {
+            "group": "member:wilkie",
+            "votes": 47531
+          },
+          {
+            "group": "alp",
+            "votes": 20000
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 47871,
+        "coalition": 19660
+      },
+      "member": {
+        "party": "IND",
+        "group": "member:wilkie",
+        "name": "Andrew Wilkie"
+      }
+    },
+    {
+      "name": "Franklin",
+      "state": "TAS",
+      "aecId": "195",
+      "primaries": {
+        "alp": 29842,
+        "lp": 14403,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 3793,
+        "grn": 8016,
+        "oth": 20408
+      },
+      "formal": 76462,
+      "informal": 2340,
+      "tcp": {
+        "pair": [
+          {
+            "group": "oth",
+            "votes": 32283
+          },
+          {
+            "group": "alp",
+            "votes": 44179
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 53096,
+        "coalition": 23366
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Julie Collins"
+      }
+    },
+    {
+      "name": "Lyons",
+      "state": "TAS",
+      "aecId": "196",
+      "primaries": {
+        "alp": 33100,
+        "lp": 20135,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 5165,
+        "grn": 8362,
+        "oth": 10070
+      },
+      "formal": 76832,
+      "informal": 5715,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 29516
+          },
+          {
+            "group": "alp",
+            "votes": 47316
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 47316,
+        "coalition": 29516
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Rebecca White"
+      }
+    },
+    {
+      "name": "Lingiari",
+      "state": "NT",
+      "aecId": "306",
+      "primaries": {
+        "alp": 20372,
+        "lp": 0,
+        "lnp": 0,
+        "np": 0,
+        "clp": 14143,
+        "on": 4132,
+        "grn": 4646,
+        "oth": 2339
+      },
+      "formal": 45632,
+      "informal": 2157,
+      "tcp": {
+        "pair": [
+          {
+            "group": "alp",
+            "votes": 26524
+          },
+          {
+            "group": "clp",
+            "votes": 19108
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 26524,
+        "coalition": 19108
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Marion Scrymgour"
+      }
+    },
+    {
+      "name": "Solomon",
+      "state": "NT",
+      "aecId": "307",
+      "primaries": {
+        "alp": 19751,
+        "lp": 0,
+        "lnp": 0,
+        "np": 0,
+        "clp": 21642,
+        "on": 4033,
+        "grn": 6167,
+        "oth": 8537
+      },
+      "formal": 60130,
+      "informal": 2240,
+      "tcp": {
+        "pair": [
+          {
+            "group": "clp",
+            "votes": 29277
+          },
+          {
+            "group": "alp",
+            "votes": 30853
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 30853,
+        "coalition": 29277
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Luke John Gosling"
+      }
+    },
+    {
+      "name": "Bean",
+      "state": "ACT",
+      "aecId": "318",
+      "primaries": {
+        "alp": 42158,
+        "lp": 23665,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 0,
+        "grn": 9757,
+        "oth": 27120
+      },
+      "formal": 102700,
+      "informal": 2670,
+      "tcp": {
+        "pair": [
+          {
+            "group": "oth",
+            "votes": 51000
+          },
+          {
+            "group": "alp",
+            "votes": 51700
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 71161,
+        "coalition": 31539
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "David Smith"
+      }
+    },
+    {
+      "name": "Canberra",
+      "state": "ACT",
+      "aecId": "101",
+      "primaries": {
+        "alp": 45133,
+        "lp": 17101,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 0,
+        "grn": 18504,
+        "oth": 12667
+      },
+      "formal": 93405,
+      "informal": 2021,
+      "tcp": {
+        "pair": [
+          {
+            "group": "grn",
+            "votes": 28469
+          },
+          {
+            "group": "alp",
+            "votes": 64936
+          }
+        ],
+        "classic": false
+      },
+      "tpp": {
+        "alp": 71378,
+        "coalition": 22027
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Alicia Payne"
+      }
+    },
+    {
+      "name": "Fenner",
+      "state": "ACT",
+      "aecId": "102",
+      "primaries": {
+        "alp": 50819,
+        "lp": 20723,
+        "lnp": 0,
+        "np": 0,
+        "clp": 0,
+        "on": 0,
+        "grn": 15492,
+        "oth": 7426
+      },
+      "formal": 94460,
+      "informal": 2540,
+      "tcp": {
+        "pair": [
+          {
+            "group": "lp",
+            "votes": 26372
+          },
+          {
+            "group": "alp",
+            "votes": 68088
+          }
+        ],
+        "classic": true
+      },
+      "tpp": {
+        "alp": 68088,
+        "coalition": 26372
+      },
+      "member": {
+        "party": "ALP",
+        "group": "alp",
+        "name": "Andrew Leigh"
+      }
+    }
+  ]
+}
