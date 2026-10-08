@@ -4469,10 +4469,11 @@ for (const c of CYC_META) {
    this term's gauge line over the middle half and middle 80% of the past
    terms the deep history (data/confidence-history.json, CONF_HISTORY_FILE)
    reaches. Each view's PRIMARY gauge bands (the ANZ–Roy Morgan consumer
-   and Roy Morgan business index series): Westpac's live lane has no
-   pre-2010 history worth pooling beside the fifty-year ANZ–RM run and
-   stays live-only, and NAB's deep series is a conditions DEVIATION, not a
-   confidence figure, so neither lanes in. A term joins its lane's pool
+   and Roy Morgan business index series): Westpac–MI's file now runs
+   1974 → (§5l carries it), but the band stays the two MAIN gauges — a
+   whole-point-rounded pre-2010 lane has no business pooling beside the
+   fifty-year ANZ–RM decimal run — and NAB's deep series is a conditions
+   DEVIATION, not a confidence figure, so neither lanes in. A term joins its lane's pool
    only when interpolation reaches its election month (the consumer
    history opens March 1973, inside the already-running 1972 term, so
    that term never bands); quarterly-era months fill straight-line

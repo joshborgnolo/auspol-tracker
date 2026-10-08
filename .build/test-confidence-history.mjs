@@ -19,7 +19,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SCRIPT = path.join(ROOT, ".build", "confidence-history.mjs");
 
 process.env.CONFIDENCE_HISTORY_LIB = "1";
-const { parseYearGrid, parseH3, guardLane } = await import("./confidence-history.mjs");
+const { parseYearGrid, parseH3, parseFredCci, guardLane } = await import("./confidence-history.mjs");
 
 /* ---------------------------------------------------------------- 1. parsers */
 // footnote-marked cells parse; the yearly-average column is ignored; a
@@ -68,6 +68,22 @@ assert.throws(() => parseYearGrid("<p>no tables here</p>"), /no YEAR×month grid
   assert.deepEqual([...westpac.entries()], [["2010-01", 120.1], ["2010-03", 117.3], ["2026-08", 88.9]]);
   assert.deepEqual([...nabCondDev.entries()], [["2010-01", 3.6], ["2010-03", 1.2], ["2026-08", -4.2]]);
   assert.throws(() => parseH3("Title,Dwelling approvals\n31/01/2010,12.9"), /columns not found/);
+}
+
+// FRED/OECD: series column located by header name (never position), the
+// +100 rebase lands even on negative balances, "." gaps file nothing
+{
+  const csv = [
+    "observation_date,LOOKAHEADBANANA,CSCICP02AUM460S",
+    "1974-09-01,0,-9",
+    "1974-10-01,0,.",
+    "1974-11-01,0,7",
+    "2005-01-01,0,28",
+  ].join("\n");
+  const m = parseFredCci(csv);
+  assert.deepEqual([...m.entries()], [["1974-09", 91], ["1974-11", 107], ["2005-01", 128]], "gap filed nothing, +100 rebase");
+  assert.throws(() => parseFredCci("observation_date,SOMETHING_ELSE\n1974-09-01,-9"), /CSCICP02AUM460S column not found/);
+  assert.throws(() => parseFredCci("no header here\n1974-09-01,-9"), /no observation_date header/);
 }
 
 // guardLane: first month / floor / range / contiguity each trip on cue
@@ -151,20 +167,30 @@ const bcRows = [];
 }
 fs.writeFileSync(path.join(FIX, "cc.html"), yearsGridPage(ccGrid));
 fs.writeFileSync(path.join(FIX, "bc.html"), yearsGridPage(bcRows, "Annual Average"));
+// one generator drives BOTH the OECD mirror fixture and H3's westpac
+// column, so the extractor's OECD/H3 reconciliation passes by
+// construction; one overlap month (2015-06) sits 0.3 under the mirror's
+// read — inside the ±0.55 tolerance — proving H3 wins the overlap
+const wpSeries = (() => { const wm = fig("westpac"); return new Map(monthsFrom("1974-09", "2026-10").map((ym) => [ym, wm()])); })();
+const fredGood = ["observation_date,CSCICP02AUM460S",
+  ...monthsFrom("1974-09", "2026-08").map((ym) => `${ym}-01,${(wpSeries.get(ym) - 100).toFixed(1)}`)].join("\n");
+fs.writeFileSync(path.join(FIX, "fred-cci.csv"), fredGood);
+const wpOffset = Math.round(wpSeries.get("2015-06") * 10 - 3) / 10;  // H3's 2015-06 read, 0.3 below the mirror
 const h3Lines = [
   "H3 MONTHLY ACTIVITY INDICATORS",
   "Title,Private dwelling approvals,Private dwelling approvals trend,Private non-residential building approvals,Consumer sentiment,Business conditions",
   "Series ID,GISPSDA,GISDWPRITR,GISPSNBA,GICWMICS,GICNBC",
 ];
 {
-  const wm = fig("westpac"), nm = fig("nab");
+  const nm = fig("nab");
   const every = new Set([...monthsFrom("1997-03", "2026-08")].map((ym) => [ym, nm()]));
   const wset = new Set(monthsFrom("2010-01", "2026-10"));
   const have = new Set([...every].map(([ym]) => ym));
   const all = new Map([...every, ...monthsFrom("1965-01", "1997-02").map((ym) => [ym, null]),
     ...[...wset].filter((ym) => !have.has(ym)).map((ym) => [ym, null])]);
   for (const [ym, n] of [...all.entries()].sort()) {
-    const w = wset.has(ym) ? wm() : "";
+    const raw = wset.has(ym) ? wpSeries.get(ym) : null;
+    const w = raw == null ? "" : (ym === "2015-06" ? wpOffset : raw);
     h3Lines.push(`01/${ym.slice(5)}/${ym.slice(0, 4)},8.8,9.1,1000,${w},${n == null ? "" : n}`);
   }
 }
@@ -183,12 +209,19 @@ const run = (args = []) => {
   assert.equal(status, 0, out);
   const st = JSON.parse(out.trim().split("\n").at(-1).replace(/^CONFIDENCE_HISTORY_STATUS /, ""));
   assert.equal(st.changed, true, "first run writes");
-  assert.deepEqual(st.oldest, { consumer: "1973-03", business: "2010-12", westpacConsumer: "2010-01", nabConditions: "1997-03" });
+  assert.deepEqual(st.oldest, { consumer: "1973-03", business: "2010-12", westpacConsumer: "1974-09", nabConditions: "1997-03" });
   assert.deepEqual(st.newest, { consumer: "2026-09", business: "2026-05", westpacConsumer: "2026-10", nabConditions: "2026-08" });
   const doc = JSON.parse(fs.readFileSync(path.join(tmp, "data", "confidence-history.json"), "utf8"));
   assert.equal(doc.consumer.rows.length, st.rows.consumer);
   assert.equal(doc.consumer.rows.at(-1).ym, "2026-09");
-  assert.equal(doc.westpacConsumer.rows[0].ym, "2010-01", "westpac starts 2010-01");
+  assert.equal(doc.westpacConsumer.rows[0].ym, "1974-09", "westpac starts 1974-09 via the OECD mirror");
+  assert.equal(st.rows.westpacConsumer, 626, "1974-09 → 2026-10 merged rows");
+  assert.equal(doc.westpacConsumer.rows.at(-1).ym, "2026-10");
+  // the seam: pre-2010 rows carry the mirror's value, H3 wins the overlap
+  const wpRow = (ym) => doc.westpacConsumer.rows.find((r) => r.ym === ym).v;
+  assert.equal(wpRow("2009-12"), wpSeries.get("2009-12"), "pre-2010 month is the mirror's read");
+  assert.equal(wpRow("2010-01"), wpSeries.get("2010-01"), "seam month matches both sources (same generator)");
+  assert.equal(wpRow("2015-06"), wpOffset, "H3 wins the overlap inside the ±0.55 tolerance");
   assert.ok(doc.nabConditions.rows.every((r) => r.v >= -60 && r.v <= 60));
   // idempotent second run
   const second = run();
@@ -212,6 +245,14 @@ const run = (args = []) => {
   const st4 = JSON.parse(third.out.trim().split("\n").at(-1).replace(/^CONFIDENCE_HISTORY_STATUS /, ""));
   assert.deepEqual(st4.added.westpacConsumer, ["2026-11"], "the pending month files on the next real run");
   assert.deepEqual(st4.added.nabConditions, ["2026-09", "2026-10", "2026-11"], "nab fills its lagged cells too");
+  // a broken FRED mirror is exit 1 (never exit-2, never files nothing but
+  // confused with a structure trip) and the committed file survives intact
+  fs.writeFileSync(path.join(FIX, "fred-cci.csv"), "this is not a fred csv");
+  const freddie = run();
+  assert.equal(freddie.status, 1, "broken FRED csv is exit 1, got " + freddie.status + ": " + freddie.out);
+  assert.match(freddie.out, /FRED FETCH\/PARSE FAILURE/);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(tmp, "data", "confidence-history.json"), "utf8")).westpacConsumer.rows.at(-1).ym, "2026-11", "broken FRED filed nothing");
+  fs.writeFileSync(path.join(FIX, "fred-cci.csv"), fredGood);
   // guard trip: shapeless page → exit 2
   fs.writeFileSync(path.join(FIX, "cc.html"), "<html><body>nothing</body></html>");
   const boom = run();
@@ -226,8 +267,21 @@ console.log("2. fixture pipeline: OK");
   assert.deepEqual(Object.keys(doc), ["_about", "consumer", "business", "westpacConsumer", "nabConditions"]);
   assert.ok(doc.consumer.rows.length >= 550 && doc.consumer.rows[0].ym === "1973-03");
   assert.ok(doc.business.rows.length >= 170 && doc.business.rows[0].ym === "2010-12");
-  assert.ok(doc.westpacConsumer.rows.length >= 195 && doc.westpacConsumer.rows[0].ym === "2010-01");
+  assert.ok(doc.westpacConsumer.rows.length >= 600 && doc.westpacConsumer.rows[0].ym === "1974-09");
   assert.ok(doc.nabConditions.rows.length >= 340 && doc.nabConditions.rows[0].ym === "1997-03");
+  /* the westpac lane's character rows: the pre-2010 OECD mirror (whole
+     index points) against the printed record's iconic months, and the
+     2010 seam where H3's decimals take over */
+  const wpv = (ym) => doc.westpacConsumer.rows.find((r) => r.ym === ym).v;
+  assert.equal(wpv("1974-09"), 91, "series inception: OECD balance -9");
+  assert.equal(wpv("1990-11"), 64, "all-time low month, Nov 1990");
+  assert.equal(wpv("2005-01"), 128, "all-time high month, Jan 2005");
+  assert.equal(wpv("2020-04"), 75.6, "covid trough exact (H3's decimal — post-seam month)");
+  assert.equal(wpv("2008-07"), 79, "GFC-era 79 (mirror whole point)");
+  assert.equal(wpv("2009-12"), 114, "pre-seam mirror figure (balance 14)");
+  assert.equal(wpv("2010-01"), 120.1, "H3 decimal at the seam month");
+  const pre2010 = doc.westpacConsumer.rows.filter((r) => r.ym < "2010-01");
+  assert.ok(pre2010.every((r) => Number.isInteger(r.v)), "pre-2010 mirror months are whole index points");
   // consumer monthly-contiguous from 1987-01 through the newest row
   const yms = new Set(doc.consumer.rows.map((r) => r.ym));
   const end = doc.consumer.rows.at(-1).ym;
