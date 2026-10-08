@@ -92230,7 +92230,9 @@ function infoTerms(D) {
       id: "primary-vote",
       body: React.createElement(React.Fragment, null, "The share of voters who put a party first, before any preferences are distributed. Each party\u2019s figure is built like the headline, from the last three weeks of polls with each pollster\u2019s lean taken out (see ", xref("weighted-aggregate", "primary vote", "Weighted aggregate"), "). Every line starts at the 2025 election result, and the figures beside the chart give the change since then.", React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Why they may not add up to 100."), " Some pollsters keep voters who won\u2019t name a party inside their published shares, so the parties fall short of 100 by exactly that ", xref("decidedness", "primary vote", "undecided"), " share. The aggregate keeps the shortfall, because it says something real about the electorate: the five parties are rescaled only if their total sits more than half a point from the plain average\u2019s. Each poll\u2019s breakdown says which approach its pollster used."))
+      }, React.createElement("b", null, "Why they may not add up to 100."), " Some pollsters keep voters who won\u2019t name a party inside their published shares, so the parties fall short of 100 by exactly that ", xref("decidedness", "primary vote", "undecided"), " share. The aggregate keeps the shortfall, because it says something real about the electorate: the five parties are rescaled only if their total sits more than half a point from the plain average\u2019s. Each poll\u2019s breakdown says which approach its pollster used."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "The group views."), " Pick a group from the menu over the chart and each dot becomes that poll\u2019s reading of the group: the group\u2019s share in the poll less the poll\u2019s own all-voters figure, drawn onto the pooled all-voters line for its month. It is never the group share the poll printed, so a poll whose sample leans toward the group still lands on the one trend. The printed figures themselves sit beside each poll in All polls\u2019 ", xref("all-polls", "primary vote", "group breakdowns"), " (the Demographics view) \u2013 and a dot\u2019s click opens them there."))
     },
     entries: []
   }, {
@@ -97636,7 +97638,8 @@ function RdPrimary({
       if (g) return {
         label: grpId,
         g,
-        who: RD_DEMO_SHORT[grpId] || grpId
+        who: RD_DEMO_SHORT[grpId] || grpId,
+        tabId: t.id
       };
     }
     return null;
@@ -98015,7 +98018,8 @@ function RdPrimary({
     spine: series(live("alp"), "alp"),
     areas: areas,
     scatter: shownScatter,
-    pollFacet: "primary",
+    pollFacet: G ? "demographics" : "primary",
+    pollSplit: G ? sel.tabId : undefined,
     marks: marks,
     ringAtX: base ? base.x : null,
     events: badges ? badges.events : evs,

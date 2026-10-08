@@ -7017,7 +7017,14 @@ function infoTerms(D) {
         100 by exactly that {xref("decidedness", "primary vote", "undecided")} share. The aggregate
         keeps the shortfall, because it says something real about the electorate: the five parties
         are rescaled only if their total sits more than half a point from the plain average’s.
-        Each poll’s breakdown says which approach its pollster used.</span></>) },
+        Each poll’s breakdown says which approach its pollster used.</span>
+        <span className="info-p"><b>The group views.</b> Pick a group from the menu over the chart
+        and each dot becomes that poll’s reading of the group: the group’s share in the poll less
+        the poll’s own all-voters figure, drawn onto the pooled all-voters line for its month. It
+        is never the group share the poll printed, so a poll whose sample leans toward the group
+        still lands on the one trend. The printed figures themselves sit beside each poll in All
+        polls’ {xref("all-polls", "primary vote", "group breakdowns")} (the Demographics view) – and
+        a dot’s click opens them there.</span></>) },
       entries: [] },
     { id: "s-latest", title: "Latest and next polls", nav: "Latest polls",
       lead: { id: "latest-polls", body: (

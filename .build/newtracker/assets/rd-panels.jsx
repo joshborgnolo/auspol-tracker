@@ -73,7 +73,10 @@ function RdPrimary({ rangeId, setRangeId }) {
     if (!grpId || !T || !T.tabs) return null;
     for (const t of T.tabs) for (const s of t.sets) {
       const g = s.groups.find((x) => x.label === grpId);
-      if (g) return { label: grpId, g, who: RD_DEMO_SHORT[grpId] || grpId };
+      /* t.id is the group's demographics split (age/gender/education/
+         place/home) - the dot-open hands it to All polls so the opened
+         poll's Demographics detail already shows the clicked view's cut */
+      if (g) return { label: grpId, g, who: RD_DEMO_SHORT[grpId] || grpId, tabId: t.id };
     }
     return null;
   })();
@@ -416,7 +419,12 @@ function RdPrimary({ rangeId, setRangeId }) {
              "May 2025" against the all-voters chart's "Election" */
           xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : allBase ? allBase.x : null)}
           series={leads.length ? chartSeries.concat(leads) : chartSeries} spine={series(live("alp"), "alp")} areas={areas}
-          scatter={shownScatter} pollFacet="primary" marks={marks} ringAtX={base ? base.x : null}
+          /* a group view's dots open the poll on All polls' Demographics
+             facet, its split the view's own (Gen Z → Age, Renting → Home);
+             the all-voters chart keeps the Primary facet */
+          scatter={shownScatter} pollFacet={G ? "demographics" : "primary"}
+          pollSplit={G ? sel.tabId : undefined}
+          marks={marks} ringAtX={base ? base.x : null}
           events={badges ? badges.events : evs}
           evt={evtOpen} onEvt={setEvtOpen}
           tooltipTitle={(i) => (pts[i] ? monthLabelFull(pts[i].ym) : "")}

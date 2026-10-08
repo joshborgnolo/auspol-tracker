@@ -15,7 +15,10 @@
           was "May 2025" for groups with no own election row); a cut group
           whose poll lines open after the election joins its ring marks with
           the 0.5 4 dotted lead-in; a group with no election base delta-rows
-          from its first polled month ("since July 2025") */
+          from its first polled month ("since July 2025").
+       4. a dot click in a group view opens the poll in All polls on the
+          Demographics facet with that view's split picked (2026-10-08); the
+          All-voters view's dots keep the Primary facet */
 import { createServer } from "node:http";
 import { readFile, writeFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -265,6 +268,63 @@ for (const [label, ev] of [["Men", { level: true, chg: false }], ["18–34", {}]
   ok("phone figures match", s.stats.length === 5 && s.stats[0].val.replace(/\s+/g, "").endsWith("%"), JSON.stringify(s.stats.map((x) => x.val)));
   const sAll = await collect(390, 844, null);
   ok("back to All voters", sAll.hed === (baseline ? baseline["390"].hed : sAll.hed), sAll.hed);
+}
+
+/* ---- a dot click opens the clicked poll in All polls on the matching
+        facet: a group view (anything but All voters) lands on Demographics
+        with that view's split already picked (Gen Z → Age, Renting → Home,
+        NSW → Place); the All-voters chart keeps the Primary facet. The
+        tail hollow ring (fill var(--chart-bg)) is a border mark with no
+        poll behind it, like the issues panel's, so solid dots only. ---- */
+const clickDot = async (selValue) => {
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1280, height: 900 });
+  await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#primary-vote .rd-pv-chart svg", { timeout: 20000 });
+  if (selValue) {
+    await page.select("#primary-vote select.rd-pv-sel", selValue);
+    await new Promise((r) => setTimeout(r, 600));
+  } else {
+    await new Promise((r) => setTimeout(r, 300));
+  }
+  const dot = await page.evaluate(() => {
+    const svg = document.querySelector("#primary-vote .rd-pv-chart svg");
+    svg.scrollIntoView({ block: "center" });
+    const cs = [...svg.querySelectorAll("circle.scatter-dot")].filter((c) => c.getAttribute("fill") !== "var(--chart-bg)");
+    if (!cs.length) return null;
+    const r = cs[cs.length - 1].getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2, n: cs.length };
+  });
+  let landed = null;
+  if (dot) {
+    await page.mouse.move(dot.x - 30, dot.y - 30);
+    await new Promise((r) => setTimeout(r, 150));
+    await page.mouse.move(dot.x, dot.y);
+    await new Promise((r) => setTimeout(r, 300));
+    await page.mouse.click(dot.x, dot.y);
+    try {
+      await page.waitForFunction(() => location.hash === "#allpolls" && document.querySelector(".rd-ap-tabs button"), { timeout: 10000 });
+      landed = await page.evaluate(() => ({
+        active: (([...document.querySelectorAll(".rd-ap-tabs button")].find((b) => b.getAttribute("aria-pressed") === "true")) || {}).textContent || null,
+        split: (([...document.querySelectorAll('.rd-ap-dpick [role="radio"]')].find((b) => b.getAttribute("aria-checked") === "true")) || {}).textContent || null,
+        open: !!document.querySelector(".rd-ap-open"),
+      }));
+    } catch {}
+  }
+  await page.close();
+  return { dot, landed };
+};
+console.log("== dot clicks open All polls on the matching facet ==");
+for (const { view, wantFacet, wantSplit } of [{ view: "Gen Z", wantFacet: "Demographics", wantSplit: "Age" },
+                                              { view: "Renting", wantFacet: "Demographics", wantSplit: "Home" },
+                                              { view: null, wantFacet: "Primary", wantSplit: null }]) {
+  const name = view || "All voters";
+  const { dot, landed } = await clickDot(view);
+  console.log(`--- ${name} dot click`);
+  ok(`${name}: chart renders solid poll dots`, !!dot && dot.n > 2, dot && `${dot.n} solid dots`);
+  ok(`${name}: click lands in All polls on the ${wantFacet} facet`, !!landed && landed.active === wantFacet, landed && `facet: ${landed.active}`);
+  ok(`${name}: the clicked poll opens`, !!landed && landed.open === true, landed && `open=${landed.open}`);
+  if (wantSplit) ok(`${name}: split radio matches the view (${wantSplit})`, !!landed && landed.split === wantSplit, landed && `split: ${landed.split}`);
 }
 
 const fails = results.filter(([, p]) => !p);
