@@ -498,6 +498,36 @@ const FRESHWATER_DEMO = {
   },
 };
 
+/* Roy Morgan finding 10341 ("Voting Intentions by Country of Birth",
+   15 Sep 2026): the vote by birth country from one SEVEN-MONTH Single
+   Source pool (Jan–Jul 2026, n 26,418) — filed in polls.json as the
+   NO_AGG "Roy Morgan (pooled)" wave of 2026-07-31, not the house's
+   weekly series. Shares as printed on the release's voting-intention
+   charts (every prose-checked figure agrees); the five bar slivers too
+   small to read (one per group) are left OUT rather than back-filled
+   from the row sum — a complement is computed, not printed. */
+const ROYMORGAN_COUNTRY = {
+  "2026-07-31": {
+    source: "https://www.roymorgan.com/findings/10341-voting-intentions-by-country-of-birth-september-2026",
+    country: {
+      Australia: { alp: 32, lnp: 21, onp: 25, grn: 13, oth: 6 },
+      India: { alp: 43, lnp: 33, onp: 8, grn: 9, oth: 5 },
+      "United Kingdom": { alp: 41, lnp: 19, onp: 23, grn: 10, oth: 6 },
+      "Mainland China": { alp: 46, lnp: 34, onp: 5, grn: 9, oth: 5 },
+      "New Zealand": { alp: 32, lnp: 23, onp: 24, grn: 13, oth: 6 },
+      Philippines: { alp: 38, lnp: 30, onp: 16, grn: 11, oth: 2 },
+      Vietnam: { alp: 57, lnp: 29, onp: 7, oth: 4 },
+      "South Africa": { alp: 19, lnp: 25, onp: 36, grn: 14, oth: 5 },
+      Nepal: { alp: 52, lnp: 30, onp: 6, grn: 11 },
+      "Sri Lanka": { alp: 49, lnp: 27, onp: 7, grn: 13 },
+      Malaysia: { alp: 44, lnp: 29, onp: 10, grn: 10, oth: 5 },
+      Italy: { alp: 46, lnp: 18, onp: 30, grn: 5 },
+      Pakistan: { alp: 46, lnp: 12, onp: 7, grn: 32 },
+    },
+    total: { alp: 34, lnp: 22, onp: 24, grn: 13, oth: 7 },
+  },
+};
+
 function redbridgeCache(date) {
   const dir = path.join(ROOT, ".build", "redbridge-src");
   for (const f of fs.existsSync(dir) ? fs.readdirSync(dir) : []) {
@@ -608,6 +638,21 @@ try {
              ...(h.total ? { total: h.total } : {}) });
       console.log(`${k}: ${Object.entries(h.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
     }
+  }
+  // Roy Morgan birth-country table (ROYMORGAN_COUNTRY, the "Roy Morgan
+  // (pooled)" NO_AGG wave) — one special release, the same hand-entered
+  // treatment as a state-table wave
+  for (const [date, h] of Object.entries(ROYMORGAN_COUNTRY)) {
+    const k = "Roy Morgan (pooled)|" + date;
+    if (!refresh && have.has(k)) { waves.push(have.get(k)); continue; }
+    const p = polls.find((x) => x.pollster === "Roy Morgan (pooled)" && x.date === date);
+    if (!p) { pend(k, "no Roy Morgan (pooled) poll row for this wave's date yet"); continue; }
+    const dims = { country: h.country };
+    const bad = dimsProblem(dims) || totalProblem(h.total, p);
+    if (bad) { pend(k, `the hand-entered country table failed the gate – ${bad}`); continue; }
+    push({ pollster: "Roy Morgan (pooled)", date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
+           article: p.url ?? null, source: h.source, read: "published table", dims, total: h.total });
+    console.log(`${k}: country(${Object.keys(h.country).join("/")})`);
   }
   // Resolve: one fetch carries every month; rebuilt whole each run, or kept
   // whole from the file when the fetch or any month fails the gate

@@ -3461,6 +3461,17 @@ const DEM_SPLITS = [
      the row and its Where-it-sits note say whose pair it is. */
   { id: "income", label: "Income", lo: "Lower income", hi: "Higher income", scope: "With an income breakdown",
     pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]] },
+  /* Birth country is a ONE-OFF cut: Roy Morgan's finding 10341 pooled
+     seven months of Single Source interviewing (Jan–Jul 2026, n=26,418)
+     into the 13 groups its release charts (five bars unreadably small are
+     left out, not backed into), another special release beside the weekly
+     series rather than part of it. Nothing to pool across waves, and its
+     own poll is noAgg, so the split stands here as the row facet income
+     does: pairs name an overseas-born group against the Australia-born
+     baseline, the starkest gaps first. */
+  { id: "country", label: "Birth country", lo: "Australia-born", hi: "Overseas-born", scope: "With a birth-country breakdown",
+    pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born"], ["Mainland China", "Australia", "China-born v Australia-born"],
+            ["South Africa", "Australia", "South Africa-born v Australia-born"], ["United Kingdom", "Australia", "UK-born v Australia-born"]] },
 ];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];   // grp's party order
 // a poll's groups by label: its printed table, with the pooled groups
@@ -5172,7 +5183,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const FACET_BY_URL = { p: "primary", l: "leadership", d: "direction", i: "issues", c: "confidence", primary: "primary", leadership: "leadership", direction: "direction", issues: "issues", confidence: "confidence",
                          ...(window.AP.rd ? { g: "demographics", demographics: "demographics" } : {}) };
   // the demographics facet's split → URL letter's inverse; age, the default, rides no letter
-  const DEM_BY_URL = { a: "age", g: "gender", e: "education", p: "place", h: "home", n: "income" };
+  const DEM_BY_URL = { a: "age", g: "gender", e: "education", p: "place", h: "home", n: "income", b: "country" };
   const MEAS_BY_URL = { o: "onp", lo: "lnponp", "3": "3cp", c: "lnp", onp: "onp", lnponp: "lnponp", "3cp": "3cp", lnp: "lnp" };
   /* The lead column opens on the rival Labor is doing WORST against – the
      hero's own ruling (latest.rivalLead, deadbanded in gen-data so it
@@ -5637,7 +5648,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      without it the URL was normalised every render, and this effect also
      runs for the reader who typed a stale or partial query by hand. */
   const FACET_BY_ID = { primary: "p", leadership: "l", direction: "d", issues: "i", confidence: "c", demographics: "g" };  // facet → URL letter (inverse of the restore map)
-  const DEM_BY_ID = { gender: "g", education: "e", place: "p", home: "h", income: "n" };   // split → URL letter; age is the omitted default
+  const DEM_BY_ID = { gender: "g", education: "e", place: "p", home: "h", income: "n", country: "b" };   // split → URL letter; age is the omitted default
   const MEAS_BY_ID = { lnp: "c", onp: "o", lnponp: "lo", "3cp": "3" };    // matchup → URL letter; the page's default matchup is omitted
   const LEAD_BY_ID = { alp: "a", lnp: "l", onp: "o" };                    // holder → URL letter; "all" is the omitted default
   React.useEffect(() => {

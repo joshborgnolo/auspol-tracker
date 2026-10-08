@@ -6623,6 +6623,112 @@
    }
   },
   {
+   "pollster": "Roy Morgan (pooled)",
+   "date": "2026-07-31",
+   "dateStart": "2026-01-01",
+   "sample": 26418,
+   "article": "https://www.roymorgan.com/findings/10341-voting-intentions-by-country-of-birth-september-2026",
+   "source": "https://www.roymorgan.com/findings/10341-voting-intentions-by-country-of-birth-september-2026",
+   "read": "published table",
+   "dims": {
+    "country": {
+     "Australia": {
+      "alp": 32,
+      "lnp": 21,
+      "onp": 25,
+      "grn": 13,
+      "oth": 6
+     },
+     "India": {
+      "alp": 43,
+      "lnp": 33,
+      "onp": 8,
+      "grn": 9,
+      "oth": 5
+     },
+     "United Kingdom": {
+      "alp": 41,
+      "lnp": 19,
+      "onp": 23,
+      "grn": 10,
+      "oth": 6
+     },
+     "Mainland China": {
+      "alp": 46,
+      "lnp": 34,
+      "onp": 5,
+      "grn": 9,
+      "oth": 5
+     },
+     "New Zealand": {
+      "alp": 32,
+      "lnp": 23,
+      "onp": 24,
+      "grn": 13,
+      "oth": 6
+     },
+     "Philippines": {
+      "alp": 38,
+      "lnp": 30,
+      "onp": 16,
+      "grn": 11,
+      "oth": 2
+     },
+     "Vietnam": {
+      "alp": 57,
+      "lnp": 29,
+      "onp": 7,
+      "oth": 4
+     },
+     "South Africa": {
+      "alp": 19,
+      "lnp": 25,
+      "onp": 36,
+      "grn": 14,
+      "oth": 5
+     },
+     "Nepal": {
+      "alp": 52,
+      "lnp": 30,
+      "onp": 6,
+      "grn": 11
+     },
+     "Sri Lanka": {
+      "alp": 49,
+      "lnp": 27,
+      "onp": 7,
+      "grn": 13
+     },
+     "Malaysia": {
+      "alp": 44,
+      "lnp": 29,
+      "onp": 10,
+      "grn": 10,
+      "oth": 5
+     },
+     "Italy": {
+      "alp": 46,
+      "lnp": 18,
+      "onp": 30,
+      "grn": 5
+     },
+     "Pakistan": {
+      "alp": 46,
+      "lnp": 12,
+      "onp": 7,
+      "grn": 32
+     }
+    }
+   },
+   "total": {
+    "alp": 34,
+    "lnp": 22,
+    "onp": 24,
+    "grn": 13,
+    "oth": 7
+   }
+  },
+  {
    "pollster": "YouGov",
    "date": "2026-08-10",
    "dateStart": "2026-08-04",

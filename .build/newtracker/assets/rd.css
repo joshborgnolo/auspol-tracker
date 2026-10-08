@@ -2497,7 +2497,13 @@ body.rd .rd-ap-dpick button {
 body.rd .rd-ap-dpick button:hover { color: var(--ink); }
 body.rd .rd-ap-dpick button[aria-checked="true"] { color: var(--ink); font-weight: 600; }
 body.rd .rd-ap-dpick button:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; border-radius: 4px; }
-body.rd .rd-ap-pctl .rd-ap-dpick { font-size: 13px; }
+body.rd .rd-ap-pctl .rd-ap-dpick { font-size: 13px; flex: 1 1 auto; min-width: 0; }
+/* the seventh split word (Birth country, 2026-10-09) put the strip past any
+   phone's width: on its own row the radiogroup scrolls inside the control
+   row, never the page - the tab strip's own treatment, overflow-y clipped
+   beside overflow-x:auto for the same trap */
+body.rd .rd-ap-pctl .rd-ap-dpick > [role="radiogroup"] { min-width: 0; overflow-x: auto; overflow-y: hidden; overflow-y: clip; scrollbar-width: none; }
+body.rd .rd-ap-pctl .rd-ap-dpick > [role="radiogroup"]::-webkit-scrollbar { display: none; }
 /* 44px like the two-party flip, so the control row stands the same height
    under either facet and a hop between them moves nothing */
 body.rd .rd-ap-pctl .rd-ap-dpick button { padding: 0 6px; }

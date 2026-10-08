@@ -4862,7 +4862,9 @@ body.rd .rd-ap-dpick button {
 body.rd .rd-ap-dpick button:hover { color: var(--ink); }
 body.rd .rd-ap-dpick button[aria-checked="true"] { color: var(--ink); font-weight: 600; }
 body.rd .rd-ap-dpick button:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; border-radius: 4px; }
-body.rd .rd-ap-pctl .rd-ap-dpick { font-size: 13px; }
+body.rd .rd-ap-pctl .rd-ap-dpick { font-size: 13px; flex: 1 1 auto; min-width: 0; }
+body.rd .rd-ap-pctl .rd-ap-dpick > [role="radiogroup"] { min-width: 0; overflow-x: auto; overflow-y: hidden; overflow-y: clip; scrollbar-width: none; }
+body.rd .rd-ap-pctl .rd-ap-dpick > [role="radiogroup"]::-webkit-scrollbar { display: none; }
 body.rd .rd-ap-pctl .rd-ap-dpick button { padding: 0 6px; }
 body.rd .rd-ap-empty { padding: 28px 12px; font-size: 14px; color: var(--ink-2); }
 body.rd .rd-ap-tip {
@@ -67403,7 +67405,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "t": "Roy Morgan’s release",
       "href": "https://www.roymorgan.com/findings/10341-voting-intentions-by-country-of-birth-september-2026",
       "title": "Roy Morgan’s own release of this poll"
-    }]
+    }],
+    "grp": {
+      "r": "published table",
+      "v": [],
+      "d": {
+        "country": [["Australia", [32, 21, 13, 25, 6]], ["India", [43, 33, 9, 8, 5]], ["United Kingdom", [41, 19, 10, 23, 6]], ["Mainland China", [46, 34, 9, 5, 5]], ["New Zealand", [32, 23, 13, 24, 6]], ["Philippines", [38, 30, 11, 16, 2]], ["Vietnam", [57, 29, null, 7, 4]], ["South Africa", [19, 25, 14, 36, 5]], ["Nepal", [52, 30, 11, 6, null]], ["Sri Lanka", [49, 27, 13, 7, null]], ["Malaysia", [44, 29, 10, 10, 5]], ["Italy", [46, 18, 5, 30, null]], ["Pakistan", [46, 12, 32, 7, null]]]
+      },
+      "n": [],
+      "t": [34, 22, 13, 24, 7]
+    }
   }, {
     "ym": "2026-08",
     "x": 2026.589383561644,
@@ -88691,6 +88702,13 @@ const DEM_SPLITS = [{
   hi: "Higher income",
   scope: "With an income breakdown",
   pairs: [["$150k+", "Under $50k", "$150k+ v <$50k"], ["$125k+", "Under $45k", "$125k+ v <$45k"], ["$100k or more", "Under $100k", "$100k+ v <$100k"]]
+}, {
+  id: "country",
+  label: "Birth country",
+  lo: "Australia-born",
+  hi: "Overseas-born",
+  scope: "With a birth-country breakdown",
+  pairs: [["Vietnam", "Australia", "Vietnam-born v Australia-born"], ["Mainland China", "Australia", "China-born v Australia-born"], ["South Africa", "Australia", "South Africa-born v Australia-born"], ["United Kingdom", "Australia", "UK-born v Australia-born"]]
 }];
 const DEM_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
 function demGroupsOf(p) {
@@ -90668,7 +90686,8 @@ function AllPollsView({
     e: "education",
     p: "place",
     h: "home",
-    n: "income"
+    n: "income",
+    b: "country"
   };
   const MEAS_BY_URL = {
     o: "onp",
@@ -91132,7 +91151,8 @@ function AllPollsView({
     education: "e",
     place: "p",
     home: "h",
-    income: "n"
+    income: "n",
+    country: "b"
   };
   const MEAS_BY_ID = {
     lnp: "c",
@@ -109096,7 +109116,8 @@ function RdApDetail({
       state: "State",
       location: "Location",
       housing: "Housing",
-      language: "Language at home"
+      language: "Language at home",
+      country: "Birth country"
     };
     const cell = (v, k) => {
       const t = tot ? tot[K.indexOf(k)] : null;
@@ -109183,7 +109204,7 @@ function RdApDetail({
       className: "rd-apd-k"
     }, "Printed"), React.createElement("span", null, raw.length, " groups across ", rdNumWord(nCuts), " breakdown", nCuts === 1 ? "" : "s", ", ", p.grp.r === "measured from the charts" ? "read off its charts to the nearest point" : "from its own table", "."), React.createElement("span", {
       className: "rd-apd-k"
-    }, "In Who votes for whom"), React.createElement("span", null, pooled.length, " of its groups join the pooled figures", alone.length ? React.createElement(React.Fragment, null, "; ", rdApLdJoin(alone), " ", alone.length === 1 ? "stays" : "stay", " here alone, since no other pollster draws ", alone.length === 1 ? "that group" : "those groups", " the same way") : "", "."), T.window && React.createElement(React.Fragment, null, React.createElement("span", {
+    }, "In Who votes for whom"), React.createElement("span", null, pooled.length ? React.createElement(React.Fragment, null, pooled.length, " of its groups join") : "None of its groups joins", " the pooled figures", alone.length ? React.createElement(React.Fragment, null, "; ", rdApLdJoin(alone), " ", alone.length === 1 ? "stays" : "stay", " here alone, since no other pollster draws ", alone.length === 1 ? "that group" : "those groups", " the same way") : "", "."), T.window && React.createElement(React.Fragment, null, React.createElement("span", {
       className: "rd-apd-k"
     }, "In today\u2019s figures"), React.createElement("span", null, inWin ? React.createElement(React.Fragment, null, "One of the polls the panel\u2019s current figures draw on (the last ", T.window, ").") : React.createElement(React.Fragment, null, "Outside the ", T.window, " the panel\u2019s current figures draw on."))));
   })();
@@ -109667,7 +109688,12 @@ const RD_AP_DEM_NOUN = {
   "$125k+": "those on $125k or more",
   "Under $45k": "those on under $45k",
   "$100k or more": "those on $100k or more",
-  "Under $100k": "those on under $100k"
+  "Under $100k": "those on under $100k",
+  Vietnam: "voters born in Vietnam",
+  Australia: "voters born in Australia",
+  "Mainland China": "voters born in mainland China",
+  "South Africa": "voters born in South Africa",
+  "United Kingdom": "voters born in the UK"
 };
 const rdApDemNoun = g => RD_AP_DEM_NOUN[g] || "the " + g + " group";
 function rdApFacetStory(facet, upd, demSplit) {
@@ -109848,8 +109874,9 @@ function rdApFacetStory(facet, upd, demSplit) {
     if (!gs.length) return null;
     const k = gs[0],
       g = pr.gap[k];
-    const head = rdCap(sp.label.toLowerCase()) + " splits aren’t pooled: each pollster draws its own brackets";
-    const dek = rdCap(rdNumWord(ps.length)) + " poll" + (ps.length === 1 ? " has" : "s have") + " split the vote by " + sp.label.toLowerCase() + ". The newest, " + p.pollster + "’s, puts " + rdPartyIn(k) + " " + Math.round(Math.abs(g)) + " points higher among " + rdApDemNoun(g >= 0 ? pr.a : pr.b) + " than " + rdApDemNoun(g >= 0 ? pr.b : pr.a) + ". " + close;
+    const head = ps.length === 1 ? "One poll breaks the vote out by " + sp.label.toLowerCase() : rdCap(sp.label.toLowerCase()) + " splits aren’t pooled: each pollster draws its own brackets";
+    const who = p.pollster.replace(/^(.+?) \((.+?)\)$/, "$1’s $2 survey");
+    const dek = rdCap(rdNumWord(ps.length)) + " poll" + (ps.length === 1 ? " has" : "s have") + " split the vote by " + sp.label.toLowerCase() + ". The newest, " + (who === p.pollster ? who + "’s" : who) + ", puts " + rdPartyIn(k) + " " + Math.round(Math.abs(g)) + " points higher among " + rdApDemNoun(g >= 0 ? pr.a : pr.b) + " than " + rdApDemNoun(g >= 0 ? pr.b : pr.a) + ". " + close;
     return {
       head,
       dek
@@ -110073,7 +110100,7 @@ function RdAllPolls(P) {
   const noun1 = facet === "confidence" ? "release" : "poll";
   const noun = noun1 + "s";
   const phone = useNarrow("(max-width: 760px)");
-  const ctlNarrow = useNarrow("(max-width: 1140px)");
+  const ctlNarrow = useNarrow("(max-width: 1240px)");
   const demMid = useNarrow("(max-width: 1150px)");
   const pub = tppBasis === "resp";
   const onM = measure !== "lnp";
@@ -115219,7 +115246,7 @@ const KBD_ROWS = [{
   keys: ["1–9"],
   what: "Pick a numbered party or term on a chips row"
 }, ...(window.JUR ? [] : [{
-  keys: ["1–6"],
+  keys: ["1–7"],
   what: "In the all-polls demographics view, pick the Split by group"
 }]), {
   keys: ["Space"],

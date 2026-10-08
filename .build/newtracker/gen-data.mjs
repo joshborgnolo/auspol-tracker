@@ -2732,7 +2732,7 @@ const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm
    (YouGov's 65+ and DemosAU's regional-or-rural voters join no common
    group, so `v` alone can't serve them) and an opened poll shows the lot. */
 const DEMO_GROUPS = DEMO_SETS.flatMap((st) => st.groups);
-const DEMO_RAW_DIMS = ["gender", "age", "generation", "education", "income", "state", "location", "housing", "language"];
+const DEMO_RAW_DIMS = ["gender", "age", "generation", "education", "income", "country", "state", "location", "housing", "language"];
 const DEMO_BY_POLL = new Map();
 for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) {
   const p = demoPollOf(w);
@@ -2751,7 +2751,9 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
   const tot = demoTotalOf(w, p);
   const d = Object.fromEntries(DEMO_RAW_DIMS.filter((k) => w.dims && w.dims[k]).map((k) => [k,
     Object.entries(w.dims[k]).map(([g, s]) => [g, ["alp", "lnp", "grn", "onp", "oth"].map((q) => (s[q] != null ? r1(+s[q]) : null))])]));
-  if (v.some(Boolean)) DEMO_BY_POLL.set(p.date + "|" + p.pollster,
+  // a wave everything harmonised out of (the pooled birth-country release
+  // joins no common group) still carries its raw cuts to the facet
+  if (v.some(Boolean) || Object.keys(d).length) DEMO_BY_POLL.set(p.date + "|" + p.pollster,
     { r: w.read, v, d, n, ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => r1(tot[k])) } : {}) });
 }
 

@@ -160,7 +160,7 @@ for (const [vw, phone] of [[1440, false], [1280, false], [1001, false], [1000, f
     G[name] = await geometry(page, phone);
   }
   const d = G.dem, pr = G.primary, tw = G.twopp;
-  const ctlRow = vw <= 1140;   // the control row's own-row cut, 1140px since 2026-10-07
+  const ctlRow = vw <= 1240;   // the control row's own-row cut, 1240px since 2026-10-09 (the picker's seventh button, Birth country)
   check(`${vw}: tab row 44px`, d.tabs === 44 && pr.tabs === 44, `${d.tabs}/${pr.tabs}`);
   check(`${vw}: headings match Primary`, Math.abs(d.head - pr.head) < 0.5, `${d.head} v ${pr.head}`);
   check(`${vw}: rows match Primary (${phone ? "122" : "58"}px)`, Math.abs(d.med - pr.med) < 0.5 && d.hi - d.lo < 0.75, `${d.lo}-${d.hi} v ${pr.med}`);

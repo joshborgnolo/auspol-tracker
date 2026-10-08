@@ -1227,7 +1227,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     const cols = rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK);
     const tot = p.grp.t || null;
     const pr = window.demPairOf(p, demSplit);
-    const DN = { gender: "Gender", age: "Age", generation: "Generation", education: "Education", state: "State", location: "Location", housing: "Housing", language: "Language at home" };
+    const DN = { gender: "Gender", age: "Age", generation: "Generation", education: "Education", state: "State", location: "Location", housing: "Housing", language: "Language at home", country: "Birth country" };
     const cell = (v, k) => {
       const t = tot ? tot[K.indexOf(k)] : null;
       const d = v != null && t != null ? v - t : 0;
@@ -1290,7 +1290,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
       <span className="rd-apd-k">Printed</span>
       <span>{raw.length} groups across {rdNumWord(nCuts)} breakdown{nCuts === 1 ? "" : "s"}, {p.grp.r === "measured from the charts" ? "read off its charts to the nearest point" : "from its own table"}.</span>
       <span className="rd-apd-k">In Who votes for whom</span>
-      <span>{pooled.length} of its groups join the pooled figures{alone.length ? <>; {rdApLdJoin(alone)} {alone.length === 1 ? "stays" : "stay"} here alone, since no other pollster draws {alone.length === 1 ? "that group" : "those groups"} the same way</> : ""}.</span>
+      <span>{pooled.length ? <>{pooled.length} of its groups join</> : "None of its groups joins"} the pooled figures{alone.length ? <>; {rdApLdJoin(alone)} {alone.length === 1 ? "stays" : "stay"} here alone, since no other pollster draws {alone.length === 1 ? "that group" : "those groups"} the same way</> : ""}.</span>
       {T.window && <>
         <span className="rd-apd-k">In today’s figures</span>
         <span>{inWin ? <>One of the polls the panel’s current figures draw on (the last {T.window}).</> : <>Outside the {T.window} the panel’s current figures draw on.</>}</span>
@@ -1763,6 +1763,8 @@ const RD_AP_DEM_NOUN = {
   "Regional or rural": "regional voters", Renting: "renters", "Renting and other": "renters", "Own outright": "outright owners",
   "$150k+": "those on $150k or more", "Under $50k": "those on under $50k", "$125k+": "those on $125k or more",
   "Under $45k": "those on under $45k", "$100k or more": "those on $100k or more", "Under $100k": "those on under $100k",
+  Vietnam: "voters born in Vietnam", Australia: "voters born in Australia", "Mainland China": "voters born in mainland China",
+  "South Africa": "voters born in South Africa", "United Kingdom": "voters born in the UK",
 };
 const rdApDemNoun = (g) => RD_AP_DEM_NOUN[g] || "the " + g + " group";
 function rdApFacetStory(facet, upd, demSplit) {
@@ -1936,16 +1938,21 @@ function rdApFacetStory(facet, upd, demSplit) {
       return { head, dek };
     }
     /* a split the section doesn't pool (income: the houses bracket
-       different quantities) - the newest poll's own pair */
+       different quantities; birth country: one special pooled release, no
+       peer) - the newest poll's own pair */
     const ps = polls.filter((p) => window.demPairOf(p, demSplit)).sort((x, y) => (x.released < y.released ? 1 : -1));
     if (!ps.length) return null;
     const p = ps[0], pr = window.demPairOf(p, demSplit);
     const gs = Object.keys(pr.gap).filter((k) => pr.gap[k] != null).sort((x, y) => Math.abs(pr.gap[y]) - Math.abs(pr.gap[x]));
     if (!gs.length) return null;
     const k = gs[0], g = pr.gap[k];
-    const head = rdCap(sp.label.toLowerCase()) + " splits aren’t pooled: each pollster draws its own brackets";
+    const head = ps.length === 1 ? "One poll breaks the vote out by " + sp.label.toLowerCase()
+      : rdCap(sp.label.toLowerCase()) + " splits aren’t pooled: each pollster draws its own brackets";
+    /* the "Roy Morgan (pooled)" row is its special pooled survey, not the
+       weekly series - the apposition names it as one */
+    const who = p.pollster.replace(/^(.+?) \((.+?)\)$/, "$1’s $2 survey");
     const dek = rdCap(rdNumWord(ps.length)) + " poll" + (ps.length === 1 ? " has" : "s have") + " split the vote by " + sp.label.toLowerCase()
-      + ". The newest, " + p.pollster + "’s, puts " + rdPartyIn(k) + " " + Math.round(Math.abs(g)) + " points higher among "
+      + ". The newest, " + (who === p.pollster ? who + "’s" : who) + ", puts " + rdPartyIn(k) + " " + Math.round(Math.abs(g)) + " points higher among "
       + rdApDemNoun(g >= 0 ? pr.a : pr.b) + " than " + rdApDemNoun(g >= 0 ? pr.b : pr.a) + ". " + close;
     return { head, dek };
   }
@@ -2103,8 +2110,11 @@ function RdAllPolls(P) {
      .rd-ap-pctl's rules are ungated, so it dresses itself the same at 990
      as at 430. The Confidence tab and the picker's sixth button (Income)
      moved it again, measured 2026-10-07: the picker is 412px and the row
-     fits from 1150px up, so under 1140px both controls take their row. */
-  const ctlNarrow = useNarrow("(max-width: 1140px)");
+     fits from 1150px up, so under 1140px both controls take their row.
+     The picker's seventh button (Birth country, 2026-10-09) moved it
+     again, measured the same day: the picker is 513px and the row fits
+     from ~1221px up, so under 1240px both controls take their row. */
+  const ctlNarrow = useNarrow("(max-width: 1240px)");
   /* the demographics scale's nine ticks need the strip's full 410px: under
      ~1150px the column shrinks (273px at 1001) and "40 pts 30" collide, so
      the head keeps the phone's five */
@@ -2210,7 +2220,7 @@ function RdAllPolls(P) {
     [...box.children].forEach((c) => ro.observe(c));
     return () => ro.disconnect();
   }, [storiesKey]);
-  /* the narrow control row walks the same floor: under 1140px the 2PP
+  /* the narrow control row walks the same floor: under 1240px the 2PP
      and Demographics facets keep their controls in a row of their own
      beneath the tabs, which mounted and unmounted as the facet changed
      (the .rd-ap-pctl lesson Latest polls' pinPl comment calls "the live
@@ -3056,7 +3066,7 @@ function RdAllPolls(P) {
   const splitPicker = (
     <span className="rd-ap-dpick" ref={splitEl}>
       <span className="rd-pl-ctl-l">Split by:</span>
-      {/* one of six, so a radio group - which also keeps it out of the
+      {/* one of seven, so a radio group - which also keeps it out of the
           facet tabs' own [role=group] */}
       <span role="radiogroup" aria-label="Split the vote by" onKeyDown={rdTabsKey(SPLITS, splitPick)} onClick={rdTabFocus}>
         {SPLITS.map((x) => <button key={x.id} type="button" role="radio" aria-checked={x.id === demSplit} onClick={() => splitPick(x.id)}><RdTabW t={x.label} /></button>)}
@@ -3065,7 +3075,7 @@ function RdAllPolls(P) {
   );
   const basisPick = () => { pinAp(); setTppBasis(pub ? "imp" : "resp"); };
   /* Spacebar walks what the facet can step, p flips the published/implied
-     basis, and 1-6 pick a demographics group outright while the table is
+     basis, and 1-7 pick a demographics group outright while the table is
      on screen - the tab row's "Labor v X ⇄" button, the Split by radio
      row, and the "Show the pollsters’ published figures" switch, by key.
      The claim is the viewport (IntersectionObserver, not the pointer);
