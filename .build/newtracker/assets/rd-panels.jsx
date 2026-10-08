@@ -3868,16 +3868,16 @@ function RdConfidence({ rangeId }) {
   if (!M || !M.consumer || !M.business || !M.consumer.polls.length || !M.business.polls.length) return null;
   const NICE = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const lanes = [
-    { k: "consumer", view: "consumer", s: M.consumer, name: "Consumers", dekName: "Consumers", by: "ANZ–Roy Morgan", hl: 14, lab: "Consumers",
+    { k: "consumer", view: "consumer", s: M.consumer, name: "Consumers", dekName: "Consumers", by: "ANZ–Roy Morgan", hl: 14,
       period: "week", color: "var(--confidence-consumer)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly." },
-    { k: "westpacConsumer", view: "consumer", s: M.westpacConsumer, name: "Consumers", dekName: "Consumers on Westpac–MI’s read", by: "Westpac–MI", hl: 60, lab: "Consumers · Westpac–MI",
+    { k: "westpacConsumer", view: "consumer", s: M.westpacConsumer, name: "Consumers", dekName: "Consumers on Westpac–MI’s read", by: "Westpac–MI", hl: 60,
       period: "month", color: "var(--confidence-consumer)", dash: "4 3", shift: 0, vfmt: (v) => v.toFixed(1),
       short: "The Westpac–Melbourne Institute’s monthly gauge of the same household mood; 100 is neutral on this scale too." },
-    { k: "business", view: "business", s: M.business, name: "Businesses", dekName: "Businesses", by: "Roy Morgan", hl: 60, lab: "Businesses",
+    { k: "business", view: "business", s: M.business, name: "Businesses", dekName: "Businesses", by: "Roy Morgan", hl: 60,
       period: "month", color: "var(--confidence-business)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly." },
-    { k: "nabBusiness", view: "business", s: M.nabBusiness, name: "Businesses", dekName: "Businesses on NAB’s survey", by: "NAB", hl: 60, lab: "Businesses · NAB",
+    { k: "nabBusiness", view: "business", s: M.nabBusiness, name: "Businesses", dekName: "Businesses on NAB’s survey", by: "NAB", hl: 60,
       period: "month", color: "var(--confidence-business)", dash: "4 3", shift: 100, vfmt: NICE,
       short: "x" },
   ].filter((l) => l.s && l.s.polls.length);
@@ -3921,6 +3921,22 @@ function RdConfidence({ rangeId }) {
     };
   }, [view]);
   const viewLanes = lanes.filter((l) => l.view === view);
+  /* 'Show complete history' swaps the months-into-term ruler for the
+     calendar: the window widens to each lane's full published run (gen-data
+     §5l's D.confDeep payload), the live dots and smooth re-run over the
+     lane's WHOLE release file instead of the elected-term window, and the
+     deep monthly rows draw as a lighter line joining the tail into the
+     past. NAB's deep series never joins (a conditions deviation, another
+     basis), so its lane just widens to its own release file. */
+  const [hist, setHist] = useState(false);
+  const deepPoints = new Map((D.confDeep ? viewLanes.filter((l) => (D.confDeep[l.k] || []).length > 1) : []).map((l) => {
+    const live0 = l.s.polls[0].x;
+    return [l.k, D.confDeep[l.k]
+      .map((r) => ({ ym: r.ym, x: +r.ym.slice(0, 4) + (+r.ym.slice(5, 7) - 1) / 12, y: r.v + l.shift }))
+      .filter((p) => p.x < live0)];
+  }));
+  const deepDrawn = [...deepPoints.keys()].filter((k) => deepPoints.get(k).length > 1);
+  const histOn = hist && deepDrawn.length > 0;
   // Symmetric half-life kernel over the raw readings (x units are years).
   // Evaluated at each reading's date; week-to-week sampling noise on the
   // weekly consumer index is ~2pts, so two weeks of half-life is enough
@@ -3990,7 +4006,7 @@ function RdConfidence({ rangeId }) {
   const CONF_OFF = ["2025-05-28", "2025-12-08", "2026-01-22", "2026-02-12"];
   const evs = rdChartEvents(D.events, x0, x1).filter((e) => !CONF_OFF.includes(e.date))
     .map((e) => ({ ...e, x: toM(e.x) }));
-  const badges = narrow ? rdEventBadges("confidence", evs, 0, xMax) : null;
+  const badges = !histOn && narrow ? rdEventBadges("confidence", evs, 0, xMax) : null;
   /* the phone list under the chart opens an event's panel by tapping its
      number; a tap on another number hands the panel over, and an event that
      leaves the window is put away by the chart's own reconciliation */
@@ -4005,6 +4021,24 @@ function RdConfidence({ rangeId }) {
      own lanes price the domain, so the two views fit their own ranges. */
   const rawPoints = new Map(viewLanes.map((l) => [l.k, rows.get(l.k).map((p) => ({ x: toM(p.x), y: p.v + l.shift, ym: p.ym, released: p.released, ...(l.shift ? { raw: p.v } : {}) }))]));
   const sePoints = new Map(viewLanes.map((l) => [l.k, smooth(rows.get(l.k), l.hl).map((p, i) => ({ x: toM(p.x), y: p.y + l.shift, ym: rows.get(l.k)[i].ym, ...(l.shift ? { raw: rows.get(l.k)[i].v } : {}) }))]));
+  /* The complete-history window draws on the calendar, in the release
+     file's own year-fraction x (no toM re-base): the same dots and kernel
+     over every release the house has printed, with the deep monthly rows
+     as a lighter line underneath where they reach further back */
+  const wideRaw = histOn ? new Map(viewLanes.map((l) => [l.k, l.s.polls.map((p) => ({ x: p.x, y: p.v + l.shift, ym: p.ym, released: p.released, ...(l.shift ? { raw: p.v } : {}) }))])) : null;
+  const wideSe = histOn ? new Map(viewLanes.map((l) => [l.k, smooth(l.s.polls, l.hl).map((p, i) => ({ x: p.x, y: p.y + l.shift, ym: l.s.polls[i].ym, ...(l.shift ? { raw: l.s.polls[i].v } : {}) }))])) : null;
+  const deepSeries = histOn ? deepDrawn.map((k) => {
+    const l = viewLanes.find((v) => v.k === k);
+    return { id: "deep-" + k, label: l.by + " (monthly history)", color: l.color,
+      rdWidth: 1.3, opacity: 0.5, dash: l.dash || undefined, smooth: false, endCap: false,
+      points: deepPoints.get(k) };
+  }) : [];
+  const histX0 = histOn ? Math.floor(Math.min(...deepDrawn.map((k) => deepPoints.get(k)[0].x))) : 0;
+  const histTicks = histOn ? (() => {
+    const step = narrow ? 10 : 5, t = [];
+    for (let y = Math.ceil(histX0 / step) * step; y < D.domain.x1 - 0.9; y += step) t.push({ x: y, label: String(y) });
+    return t;
+  })() : null;
   /* ---- past terms: the band, its average, and the board --------------
      A straight lift of the past-cycles ribbon (its comment stands at the
      top of the file's History section): the middle half fills heavy, the
@@ -4081,8 +4115,20 @@ function RdConfidence({ rangeId }) {
   const vals = viewLanes.flatMap((l) => rawPoints.get(l.k).map((p) => p.y)).concat([100]);
   if (hband) hband.band.forEach((r) => { if (r.m <= xMax) vals.push(r.p10, r.p90, r.mean); });
   drawnSeries.forEach((s) => s.points.forEach((p) => vals.push(p.y)));
+  if (histOn) {
+    viewLanes.forEach((l) => wideRaw.get(l.k).forEach((p) => vals.push(p.y)));
+    deepDrawn.forEach((k) => deepPoints.get(k).forEach((p) => vals.push(p.y)));
+  }
   const lo = Math.floor((Math.min(...vals) - 2) / 10) * 10, hi = Math.ceil((Math.max(...vals) + 2) / 10) * 10;
-  const spine = rawPoints.get(viewLanes[0].k);
+  const spine = histOn ? wideRaw.get(viewLanes[0].k) : rawPoints.get(viewLanes[0].k);
+  /* the chart's series and dots, shared by both windows: the live lines
+     are the smoothed trend over the window's releases; in the history
+     window the deep monthly lines go UNDER the live ones */
+  const liveSeries = (ptsMap) => viewLanes.map((l) => ({ id: l.k, label: l.by, color: l.color, rdWidth: l.dash ? 1.6 : 2.2, dash: l.dash || undefined,
+    endCap: false, endLabel: narrow ? null : l.by, points: ptsMap.get(l.k) }));
+  const chartSeries = histOn ? deepSeries.concat(liveSeries(wideSe))
+                             : liveSeries(sePoints).concat(meanSeries ? [meanSeries] : [], drawnSeries);
+  const chartRaw = histOn ? wideRaw : rawPoints;
   const copyLegend = viewLanes.map((l) => ({ label: l.lab + " (latest " + l.vfmt(l.lat.v) + ")", color: l.color, kind: l.dash ? "dashed" : "line" }));
   const fmt = (v, p) => (p && p.raw != null ? NICE(p.raw) : v.toFixed(1));
   /* the per-view copy: ptitles, the key's dash note and the copy card all
@@ -4094,6 +4140,7 @@ function RdConfidence({ rangeId }) {
     copyTitle: "Consumer confidence (two gauges)",
     copySub: head + " Two published consumer gauges on one 100-neutral scale: the weekly ANZ–Roy Morgan consumer confidence index and Westpac–MI’s monthly consumer sentiment.",
     copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series). The band pools the ANZ–Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. No combining, no adjustment.",
+    copyHist: "Consumer confidence as far back as the series go, on one 100-neutral scale. The heavier lines are the smoothed trend of the live release file (each dot one release, as printed; half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series); the lighter lines underneath are the houses’ own monthly history files — ANZ–Roy Morgan consumer confidence from 1973, Westpac–MI consumer sentiment from 2010. No combining, no adjustment.",
   } : {
     title: "Business confidence",
     note: "100 = neutral on the index; NAB’s net balance drawn 100 points up",
@@ -4101,6 +4148,7 @@ function RdConfidence({ rangeId }) {
     copyTitle: "Business confidence (two gauges)",
     copySub: head + " Two published business gauges on one 100-neutral scale: Roy Morgan’s monthly business confidence index and NAB’s Monthly Business Survey.",
     copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its dashed line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. The band pools the Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. No combining, no adjustment.",
+    copyHist: "Business confidence as far back as the series go, on one 100-neutral scale (NAB drawn 100 points up, as the live view draws it). The heavier lines are the smoothed trend of the live release file (each dot one release, as printed; 60-day half-life on both series); the lighter line underneath is Roy Morgan’s monthly history, from 2010. NAB’s own deep series is a deviation from average on another basis, so it never joins — its dashed line widens only to its own releases. No combining, no adjustment.",
   };
   /* Election / 1 yr / 2 yrs / 3 yrs, plus Now where the sitting term
      stands — the same ruler gen-data §5k aligns the past terms on */
@@ -4115,11 +4163,19 @@ function RdConfidence({ rangeId }) {
           rdPinScroll holds the row's spot through the crossfade (pin) */}
       <RdTabs swipe pin value={view} onChange={setView} options={RD_CONF_VIEWS} ariaLabel="Confidence of" className="rd-confidence-tabs" />
       <RdCrossfade k={view}>
-      {hband && (
+      {(hband || deepDrawn.length > 0) && (
       <div className="rd-cc rd-confidence-cc">
         <div className="rd-confidence-draw">
-          <button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
-          {lifted.size > 0 && (
+          {deepDrawn.length > 0 && (
+            <button type="button" className="rd-chip rd-confidence-hist" aria-pressed={histOn}
+                    onClick={() => { setHist((h) => !h); setEvtOpen(null); }}>
+              {histOn ? "Back to this term" : "＋ " + (narrow ? "Full history" : "Show complete history")}
+            </button>
+          )}
+          {hband && !histOn && (
+            <button type="button" className="rd-chip" aria-expanded={board} onClick={() => setBoard((b) => !b)}>＋ {narrow ? "Draw a term" : "Draw a past term"}</button>
+          )}
+          {!histOn && lifted.size > 0 && (
             <span className="rd-cc-drawn">
               <span className="rd-cc-l">Drawn over the band</span>
               {[...lifted].sort((a, b) => a - b).map((y) => (
@@ -4131,7 +4187,7 @@ function RdConfidence({ rangeId }) {
             </span>
           )}
         </div>
-        {board && (
+        {board && !histOn && (
           <div className="rd-cc-board" role="dialog" aria-label="Past terms">
             <div className="rd-cc-bhead">
               <b>Past terms</b>
@@ -4165,26 +4221,24 @@ function RdConfidence({ rangeId }) {
           <div key={l.k} className="rd-un-read">
             <RdSwatch kind={l.dash ? "dash" : "line"} color={l.color} />
             <div>
-              <div className="rd-un-rtop"><b>{l.name}</b><span className="rd-un-rhouse">{l.by}</span><span className="rd-un-rfig"><span className="rd-un-rv">{l.vfmt(l.lat.v)}</span>{l.lat.chg != null && Math.abs(l.lat.chg) >= 0.05 && <span className="rd-un-rci">{rdArrow(l.lat.chg)} {NICE(Math.abs(l.lat.chg))} on the {l.period}</span>}</span></div>
+              <div className="rd-un-rtop"><b>{l.by}</b><span className="rd-un-rfig"><span className="rd-un-rv">{l.vfmt(l.lat.v)}</span>{l.lat.chg != null && Math.abs(l.lat.chg) >= 0.05 && <span className="rd-un-rci">{rdArrow(l.lat.chg)} {NICE(Math.abs(l.lat.chg))} on the {l.period}</span>}</span></div>
               <p>{l.short + (l.k === "nabBusiness" ? "" : " " + water(l, l.lat.v) + ".")}</p>
             </div>
           </div>
         ))}
-        <TrendChart key={"rd-confidence-" + view} heightPx={narrow ? 260 : 340}
+        <TrendChart key={"rd-confidence-" + view + (histOn ? "-hist" : "")} heightPx={narrow ? 260 : 340}
           /* the top pad buys the numbered event badges their row above
              the plot, as the primary card's does */
           padPx={narrow ? { l: 34, r: 8, t: 34, b: 28 } : { l: 40, r: 16, t: 44, b: 30 }}
-          xDomain={[0, xMax]} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => String(v)}
-          xTicks={xTicks} baseline
+          xDomain={histOn ? [histX0, D.domain.x1] : [0, xMax]} yDomain={[lo, hi]} yTicks={rdYTicks(lo, hi, 10)} yTickFmt={(v) => String(v)}
+          xTicks={histOn ? histTicks : xTicks} baseline
           refLines={[{ y: 100, label: "100 = neutral", align: "left", color: "var(--ink-3)" }]}
-          areas={bandAreas || undefined}
-          series={viewLanes.map((l) => ({ id: l.k, label: l.lab, color: l.color, rdWidth: l.dash ? 1.6 : 2.2, dash: l.dash || undefined,
-            endCap: false, endLabel: narrow ? null : l.lab, points: sePoints.get(l.k) }))
-            .concat(meanSeries ? [meanSeries] : [], drawnSeries)}
+          areas={histOn ? undefined : (bandAreas || undefined)}
+          series={chartSeries}
           spine={spine}
-          events={badges ? badges.events : evs}
-          evt={evtOpen} onEvt={setEvtOpen}
-          scatter={viewLanes.flatMap((l) => rawPoints.get(l.k).map((q) => ({ x: q.x, y: q.y, color: l.color, label: l.lab, ...(q.raw != null ? { raw: q.raw } : {}), meta: { pollster: l.by, released: q.released } })))}
+          events={histOn ? [] : (badges ? badges.events : evs)}
+          evt={histOn ? null : evtOpen} onEvt={setEvtOpen}
+          scatter={viewLanes.flatMap((l) => chartRaw.get(l.k).map((q) => ({ x: q.x, y: q.y, color: l.color, label: l.by, ...(q.raw != null ? { raw: q.raw } : {}), meta: { pollster: l.by, released: q.released } })))}
           /* each release is a row on the archive's confidence facet, so a
              dot under a mouse offers the same open trip every poll chart
              does (the engine's ROW_KEYS knows the confidence rows). The
@@ -4193,7 +4247,7 @@ function RdConfidence({ rangeId }) {
           pollFacet="confidence"
           tooltipTitle={(i) => { const p = spine[i]; return p ? monthLabelFull(p.ym) : ""; }}
           fmt={fmt}
-          copy={{ title: vc.copyTitle, sub: vc.copySub, caption: vc.copyCaption, legend: copyLegend }} />
+          copy={{ title: vc.copyTitle, sub: vc.copySub, caption: histOn ? vc.copyHist : vc.copyCaption, legend: copyLegend }} />
         {/* the hero's list above already names this window's events, so
             two or more fold away behind a disclosure the reader opens when
             a mark puzzles them; a lone marked event just sits out as the
@@ -4214,17 +4268,20 @@ function RdConfidence({ rangeId }) {
           { kind: "line", color: "var(--ink-3)", label: "Smoothed trend of the releases" },
           { kind: "dash", color: "var(--ink-3)", label: vc.dashKey },
         ]}>
-          {hband && <>
+          {hband && !histOn && <>
             <span className="rd-key-item"><span className="rd-cs-keyband" aria-hidden="true"><i></i></span>Middle half and middle 80% of past terms</span>
             <span className="rd-key-item"><RdSwatch kind="dash" color="var(--ink-2)" />Their average</span>
             <span className="rd-key-item"><span className="rd-cs-keythin" aria-hidden="true"></span>Paler: fewer terms ran this long</span>
+          </>}
+          {histOn && <>
+            <span className="rd-key-item"><span className="rd-cs-keythin" aria-hidden="true"></span>Monthly history back to {histX0}, as the house published it</span>
           </>}
         </RdKey>
       </div>
       </RdCrossfade>
       <HowTo paras={[
         <>Four published gauges of the same mood, split into two views — the consumer pair and the business pair, switched by the tabs over the chart — and set out as each house prints them from the 2025 election on: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
-        <>Behind the current term, the band pools that view’s main gauge over past terms — each term lined up on its own election month, so the bottom axis (months since this term’s election) is every term’s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own line, and “Source data, CSV” in the footer downloads every release and past-term reading.</>,
+        <>Behind the current term, the band pools that view’s main gauge over past terms — each term lined up on its own election month, so the bottom axis (months since this term’s election) is every term’s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own line, and “Source data, CSV” in the footer downloads every release and past-term reading. “Show complete history” instead draws whole years: each lane’s own published monthly series runs back as a pale line — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s and Roy Morgan’s business index to 2010 — with the releases and their smoothing re-drawn over the file. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB’s own releases.</>,
         <>Three of the four are indices where 100 is neutral. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
         <>Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />

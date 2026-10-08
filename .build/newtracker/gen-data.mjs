@@ -4535,6 +4535,24 @@ const confHistory = (() => {
     return [k, { terms, band }];
   }));
 })();
+/* --- §5l. confidence history as a CALENDAR series ----------------------
+   The past-terms payload above re-bases every term on its own election
+   month; this is the same history file as-calendar, one {ym, v} point per
+   survey month, so the confidence panel's "Show complete history" toggle
+   can widen the window to each house's full published run and extend the
+   live lines backwards. Only the three lanes whose printed basis the live
+   chart already draws travel: NAB's deep series is a conditions DEVIATION
+   (H3 CSV, never the printed net balance - the confidence-history skill's
+   "never arithmetic-merge" trap), so it stays on disk and out of the page. */
+const confDeep = (() => {
+  if (!CONF_HISTORY_FILE) return null;
+  const out = {};
+  for (const k of ["consumer", "westpacConsumer", "business"]) {
+    const s = CONF_HISTORY_FILE[k];
+    if (s && Array.isArray(s.rows) && s.rows.length) out[k] = s.rows.map((r) => ({ ym: r.ym, v: r.v }));
+  }
+  return Object.keys(out).length ? out : null;
+})();
 /* A term that changed leaders mid-stream is not one line. The pooled net /
    oppnet series stay (they fit the domain, the change-since base and the
    peer average), and beside them each person gets his own monthly run, built
@@ -5646,6 +5664,10 @@ window.AUSPOL = (function () {
      aligned to its election month and the pooled middle-half / middle-80%
      band – what the "past terms" ribbon and draw-a-term lines read. */
   const confHistory = ${JSON.stringify(confHistory)};
+  /* The history file as a calendar series (§5l): one {ym, v} point per
+     survey month per lane, what the confidence panel's complete-history
+     window draws behind the live lines. */
+  const confDeep = ${JSON.stringify(confDeep)};
   /* How firm each party's vote is (§5c2): RedBridge's vote-softness table,
      the share of each party's voters certain of their vote. */
   const firmness = ${JSON.stringify(firmness)};
@@ -5760,7 +5782,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, undecided, confidence, confHistory, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, yardLine, ldYardLine, ldYardBreaks, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, directionStoppedSince, favHouses, directionPolls, directionOnlyPolls, issuesOnlyPolls, confidenceOnlyPolls, directionNow, leaderNow, undecided, confidence, confHistory, confDeep, firmness, onSources, demographics, demoTrend, demoStateElection, demoLocElection, demoGroups, issues, accuracy,
     extAgg,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
