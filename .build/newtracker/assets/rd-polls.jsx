@@ -65,7 +65,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   /* a tablet has no room for the release strip beside five columns, so it
      takes the phone's cards too */
   const narrow = useNarrow("(max-width: 900px)");
-  const phone = useNarrow("(max-width: 640px)");
+  const phone = useNarrow(MQ_PHONE);
   const [facet, setFacet] = useState("twopp");
   const [sort, setSort] = useState({ key: "latest", dir: -1 });
   const [open, setOpen] = useState(null);

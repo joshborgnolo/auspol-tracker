@@ -2298,8 +2298,8 @@ function RdAllPolls(P) {
     const sc = btn && btn.closest('[role="group"]');
     if (!sc || sc.scrollWidth <= sc.clientWidth + 1) return;
     const r = btn.getBoundingClientRect(), s = sc.getBoundingClientRect();
-    if (r.left < s.left + 28) sc.scrollTo({ left: sc.scrollLeft + r.left - s.left - 28, behavior: "smooth" });
-    else if (r.right > s.right - 28) sc.scrollTo({ left: sc.scrollLeft + r.right - s.right + 28, behavior: "smooth" });
+    if (r.left < s.left + 28) sc.scrollTo({ left: sc.scrollLeft + r.left - s.left - 28, behavior: SM });
+    else if (r.right > s.right - 28) sc.scrollTo({ left: sc.scrollLeft + r.right - s.right + 28, behavior: SM });
   }, [facet]);
   const rowKey = (p) => p.pollster + "|" + p.released;
   const openRow = open ? sorted.find((p) => rowKey(p) === open) : null;
@@ -2403,11 +2403,11 @@ function RdAllPolls(P) {
     check();
     return () => { window.removeEventListener("scroll", on); window.removeEventListener("resize", onResize); if (raf) cancelAnimationFrame(raf); };
   }, [phone]);
-  const jump = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  const jump = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: SM, block: "start" }); };
   const toSearch = () => {
     const el = searchRef.current;
     if (!el) return;
-    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.scrollIntoView({ behavior: SM, block: "center" });
     setTimeout(() => el.focus({ preventScroll: true }), 350);
   };
   const nFilters = sel.size + tagSel.size + (range !== "all" ? 1 : 0) + (q.trim() ? 1 : 0);
@@ -3649,8 +3649,8 @@ function RdHouseLean({ measure, onMeasure, tppBasis }) {
     const sc = btn && btn.closest('[role="group"]');
     if (!sc) return;
     const r = btn.getBoundingClientRect(), s = sc.getBoundingClientRect();
-    if (r.left < s.left) sc.scrollTo({ left: sc.scrollLeft + r.left - s.left - 28, behavior: "smooth" });
-    else if (r.right > s.right) sc.scrollTo({ left: sc.scrollLeft + r.right - s.right + 28, behavior: "smooth" });
+    if (r.left < s.left) sc.scrollTo({ left: sc.scrollLeft + r.left - s.left - 28, behavior: SM });
+    else if (r.right > s.right) sc.scrollTo({ left: sc.scrollLeft + r.right - s.right + 28, behavior: SM });
   }, [view]);
   const HL0 = D.houseLean || {};
   /* One Nation against the Coalition: each pollster's lean on the gap

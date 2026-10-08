@@ -231,7 +231,30 @@ body.dark.editorial { --bg: oklch(0.205 0.010 65); }
 body.dark.editorial.cool { --bg: oklch(0.200 0.012 248); }
 
 * { box-sizing: border-box; }
+/* stop mobile Safari/Chrome re-inflating body text on rotate or after a
+   narrow reflow guess - every rung below already says exactly what size
+   it wants, and a page-level inflation guesses over the top of it. 100%
+   pins font size to the CSS we wrote, not the browser's. (Pinning at html
+   is what makes it hold for the phone-size .rd-tsig-table too, which
+   previously stated the same pair inline.) */
+html { text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
 html, body { margin: 0; }
+/* NOTE: the root deliberately does NOT get overflow-x: clip. It would end
+   the iOS sideways pan when a table overhangs the page, but it would also
+   pin documentElement.scrollWidth to clientWidth for good - and the probe
+   suite detects page overflow via exactly that gap (ap-facet-overflow,
+   overflow641, the mobile-overflow probes). Un-testable beats unpretty:
+   overhangs are fixed at their source (see .ap-wrap's -16px bleed below),
+   and the probes keep watching for the next one. */
+/* kill the grey flash a tap paints under links, buttons and tabs on iOS.
+   Every interactive element here already carries its own pressed/hover
+   state, so the system highlight is pure noise - but only on touch, so
+   scope it to coarse pointers and leave desktop focus rings alone. */
+@media (pointer: coarse) {
+  a, button, [role="tab"], [role="button"], summary, input, select, label {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
 body {
   /* re-declare at body level so it resolves against the THEME's surface –
      custom properties substitute where they're defined, and .dark/.editorial

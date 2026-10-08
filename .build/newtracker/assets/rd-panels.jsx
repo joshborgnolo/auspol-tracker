@@ -61,7 +61,7 @@ const RD_ELECTION_LEAD = "0.5 4";
 function RdPrimary({ rangeId, setRangeId }) {
   const { D, rangeDomain, filterPts, series, monthLabelFull } = window.AP;
   const xDomain = rangeDomain(rangeId);
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const [hidden, setHidden] = useState({});
   /* The group dropdown: any Who-votes-for-whom group, drawn from the §7g
      payload the Who-votes panel itself pools (never re-derived here).
@@ -535,7 +535,7 @@ function RdHeadBar({ label, right, rightColor, segs, cis }) {
   const neither = Math.max(0, 100 - total);
   /* "neither" is named only where it fits: a phone's tenth of the bar is
      narrower than the word, and the canvas left that one blank */
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   /* a segment too narrow for its name and number keeps the number: on a
      phone the three-way bar's smallest share is ~70px, a few short of
      "Taylor 21.3", which ran into the edge. The name moves beneath the bar,
@@ -595,7 +595,7 @@ function RdHeadBar({ label, right, rightColor, segs, cis }) {
 
 function RdLeadership({ rangeId }) {
   const { D, rangeDomain, filterPts, monthLabelFull } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const xDomain = rangeDomain(rangeId);
   /* the jurisdiction's baseline election rides the axis as in RdPrimary:
      data-driven, so /vic/ never sees the federal mark (its own gritting
@@ -1473,7 +1473,7 @@ function rdRoughPts(v) {
 }
 function RdDirection({ rangeId }) {
   const { D, rangeDomain, filterPts, series, monthLabelFull } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   if (!D.direction.length) return null;
   const xDomain = rangeDomain(rangeId);
   const pts = filterPts(D.direction, xDomain[0]);
@@ -1909,7 +1909,7 @@ const rdRamp = (party, n, i) => (n < 2 ? "var(--" + party + ")" : "var(--ramp-" 
 
 function RdDemographics({ rangeId = "all" }) {
   const { D, rangeDomain, filterPts, monthLabelFull } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const T = D.demographics;
   const [tabId, setTab] = useState("age");
   const [party, setParty] = useState("onp");
@@ -2728,7 +2728,7 @@ function useRdWidth(ref, fallback) {
 
 function RdSwitching({ rangeId }) {
   const { D, rangeDomain, filterPts } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const S = D.onSources;
   const boxRef = React.useRef(null);
   const W = useRdWidth(boxRef, 1152);
@@ -3626,44 +3626,22 @@ function RdShiftPlot({ rows, all, lo, hi, title, source, dp }) {
 
 function RdUndecided({ rangeId }) {
   const { D, rangeDomain, filterPts, series, monthLabelFull } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const [view, setView] = useState("all");
   const U = D.undecided;
   /* hovering the panel hands the arrow keys to the views row (the hooks sit
      above the early return, so the id list is computed from the data here,
      where `views` isn't in scope yet) */
-  const unHover = React.useRef(false);
-  React.useEffect(() => {
-    const sec = document.getElementById("undecided");
-    if (!sec || !U || !U.series || !U.series.length) return undefined;
-    const enter = () => { unHover.current = true; };
-    const leave = () => { unHover.current = false; };
-    unHover.current = sec.matches(":hover");
-    sec.addEventListener("pointerenter", enter);
-    sec.addEventListener("pointerleave", leave);
+  useHoverClaim("undecided", !!(U && U.series && U.series.length), null, (e) => {
     const ids = ["all"]
       .concat(D.firmness ? ["party"] : [])
       .concat(U.softAge ? ["age"] : []);
-    const key = (e) => {
-      if (!unHover.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
-      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
-      const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
-      const sel = window.getSelection && window.getSelection();
-      if (sel && !sel.isCollapsed) return;
-      const i = ids.indexOf(view);
-      if (i < 0 || ids.length < 2) return;
-      e.preventDefault();
-      const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
-      rdPinScroll(document.getElementById("undecided") && document.getElementById("undecided").querySelector(".rd-un-tabs"));
-      setView(nxt);
-    };
-    document.addEventListener("keydown", key, true);
-    return () => {
-      sec.removeEventListener("pointerenter", enter);
-      sec.removeEventListener("pointerleave", leave);
-      document.removeEventListener("keydown", key, true);
-    };
+    const i = ids.indexOf(view);
+    if (i < 0 || ids.length < 2) return false;
+    const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
+    rdPinScroll(document.getElementById("undecided") && document.getElementById("undecided").querySelector(".rd-un-tabs"));
+    setView(nxt);
+    return true;
   }, [U, D, view]);
   if (!U || !U.series.length) return null;
   const F = D.firmness, A = U.softAge;
@@ -4065,7 +4043,7 @@ const confYmOf = (i) => Math.floor(i / 12) + "-" + String((i % 12) + 1).padStart
 const RD_CONF_VIEWS = [{ id: "consumer", label: "Consumers" }, { id: "business", label: "Businesses" }];
 function RdConfidence({ rangeId }) {
   const { D, monthLabelFull } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const M = D.confidence;
   if (!M || !M.consumer || !M.business || !M.consumer.polls.length || !M.business.polls.length) return null;
   const NICE = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
@@ -4075,7 +4053,7 @@ function RdConfidence({ rangeId }) {
       short: "Consumer confidence — who feels optimistic about their finances and the economy. Weekly." },
     { k: "westpacConsumer", view: "consumer", s: M.westpacConsumer, name: "Consumers", dekName: "Consumers on Westpac–MI’s read", by: "Westpac–MI", hl: 60,
       period: "month", color: "var(--confidence-alt)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
-      short: "The Westpac–Melbourne Institute’s monthly gauge of the same household mood; 100 is neutral on this scale too." },
+      short: "The Westpac–Melbourne Institute’s monthly gauge of the same household confidence; 100 is neutral on this scale too." },
     { k: "business", view: "business", s: M.business, name: "Businesses", dekName: "Businesses", by: "Roy Morgan", hl: 60,
       period: "month", color: "var(--confidence-main)", dash: null, shift: 0, vfmt: (v) => v.toFixed(1),
       short: "Business confidence — how firms rate trading conditions and the year ahead. Monthly." },
@@ -4091,36 +4069,14 @@ function RdConfidence({ rangeId }) {
   /* hovering the panel hands the arrow keys to the Consumers/Businesses
      row (the claim never survives the pointer leaving the card), pinned
      through the crossfade exactly as the row's own pin does */
-  const confHover = React.useRef(false);
-  React.useEffect(() => {
-    const sec = document.getElementById("confidence");
-    if (!sec) return undefined;
-    const enter = () => { confHover.current = true; };
-    const leave = () => { confHover.current = false; };
-    confHover.current = sec.matches(":hover");
-    sec.addEventListener("pointerenter", enter);
-    sec.addEventListener("pointerleave", leave);
+  useHoverClaim("confidence", true, null, (e) => {
     const ids = RD_CONF_VIEWS.map((v) => v.id);
-    const key = (e) => {
-      if (!confHover.current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
-      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
-      const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
-      const sel = window.getSelection && window.getSelection();
-      if (sel && !sel.isCollapsed) return;
-      const i = ids.indexOf(view);
-      if (i < 0 || ids.length < 2) return;
-      e.preventDefault();
-      const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
-      rdPinScroll(document.getElementById("confidence") && document.getElementById("confidence").querySelector(".rd-confidence-tabs"));
-      setView(nxt);
-    };
-    document.addEventListener("keydown", key, true);
-    return () => {
-      sec.removeEventListener("pointerenter", enter);
-      sec.removeEventListener("pointerleave", leave);
-      document.removeEventListener("keydown", key, true);
-    };
+    const i = ids.indexOf(view);
+    if (i < 0 || ids.length < 2) return false;
+    const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
+    rdPinScroll(document.getElementById("confidence") && document.getElementById("confidence").querySelector(".rd-confidence-tabs"));
+    setView(nxt);
+    return true;
   }, [view]);
   const viewLanes = lanes.filter((l) => l.view === view);
   /* 'Show complete history' swaps the months-into-term ruler for the
@@ -4171,7 +4127,7 @@ function RdConfidence({ rangeId }) {
     : cSide === "above" && bSide === "above" ? "Confidence is above water on both counts."
     : cSide === "under" && bSide === "above" ? "Consumers are underwater; businesses aren’t."
     : cSide === "above" && bSide === "under" ? "Businesses are underwater; consumers aren’t."
-    : "The gauges disagree on which side of the line the mood sits.";
+    : "The gauges disagree on which side of the line confidence sits.";
   const trough = (polls) => {
     const lo = polls.reduce((m, p) => (p.v < m.v ? p : m), polls[0]);
     const hi = polls.reduce((m, p) => (p.v > m.v ? p : m), polls[0]);
@@ -4395,7 +4351,7 @@ function RdConfidence({ rangeId }) {
   const vc = view === "consumer" ? {
     title: "Consumer confidence",
     note: "100 = neutral on both gauges",
-    altKey: "The Westpac–MI monthly read of the same household mood",
+    altKey: "The Westpac–MI monthly read of the same household confidence",
     copyTitle: "Consumer confidence (two gauges)",
     copySub: head + " Two published consumer gauges on one 100-neutral scale: the weekly ANZ–Roy Morgan consumer confidence index and Westpac–MI’s monthly consumer sentiment.",
     copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series). The band pools the ANZ–Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. A drawn past term is its monthly series, smoothed at the monthly gauges’ 60-day half-life and drawn dotted in its house’s colour — ANZ–Roy Morgan plum, Westpac–MI gold where its series reaches back that far. No combining, no adjustment.",
@@ -4539,7 +4495,7 @@ function RdConfidence({ rangeId }) {
       </div>
       </RdCrossfade>
       <HowTo paras={[
-        <>Four published gauges of the same mood, split into two views — the consumer pair and the business pair, switched by the tabs over the chart — and set out as each house prints them from the 2025 election on: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
+        <>Four published gauges of economic confidence, split into two views — the consumer pair and the business pair, switched by the tabs over the chart — and set out as each house prints them from the 2025 election on: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
         <>Behind the current term, the band pools that view’s main gauge over past terms — each term lined up on its own election month, so the bottom axis (months since this term’s election) is every term’s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own smoothed, dotted line in the house’s own colour — and on the consumer view Westpac–MI’s reading of the same term draws beside it, dotted gold where its 1974 series reaches — and “Source data, CSV” in the footer downloads every release and past-term reading. “Show complete history” instead draws whole years: each lane’s own published monthly series runs back as a pale line — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010 — with the releases and their smoothing re-drawn over the file. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB’s own releases.</>,
         <>Three of the four are indices where 100 is neutral. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
         <>Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,

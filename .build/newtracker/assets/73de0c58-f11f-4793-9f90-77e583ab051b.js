@@ -2213,7 +2213,7 @@ function App() {
   const swipeRef = useRef(null);
   swipeRef.current = { tab, goTab };
   React.useEffect(() => {
-    const PHONE = window.matchMedia("(max-width: 640px)");
+    const PHONE = window.matchMedia(MQ_PHONE);
     const MIN_DX = 60;          // travel that makes it a swipe, not a nudge
     const EDGE = 24;            // the system back-gesture strip at either side
     const NEAR_BELOW = 120;     // the least a row reaches below itself, in px

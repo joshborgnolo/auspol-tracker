@@ -434,7 +434,7 @@ function RdPastCycles(p) {
   const { cycles, mode, setMode, hidden, lifted, hi, setHi, toggle, lift, unlift, chipClick, showAll, hideAll,
           showOutcome, outcomeShown, shapes, showHan, setShowHan, showOnp, setShowOnp, showComb, setShowComb, exportSource, srcFailed, retrySource } = p;
   const { D } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const [board, setBoard] = useState({ open: false, sheet: null });
   const [tip, setTip] = useState(null);
   /* the summary row opened to its ranked terms and records (one at a time),
@@ -860,7 +860,7 @@ function RdPastCycles(p) {
   })();
 
   /* ---- the summary table --------------------------------------------------------- */
-  const goTo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  const goTo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: SM, block: "start" }); };
   /* One Nation and the combined row belong to the primary section: its
      opposition chart draws these very series when its boxes are ticked */
   const SEC = { tpp: "cyc-tpp", primary: "cyc-primary", oppr: "cyc-primary", onp: "cyc-primary", comb: "cyc-primary", ppmm: "cyc-leaders", ppmh: "cyc-leaders", net: "cyc-leaders", oppnet: "cyc-leaders", han: "cyc-leaders" };

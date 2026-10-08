@@ -1036,12 +1036,19 @@ html = html.replace(OG_ANCHOR, VIC
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${cardAlt}">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="${cardUrl}">
+  <meta name="twitter:image:alt" content="${cardAlt}">
   <meta name="google-site-verification" content="sUMvJK3smMtuRAQNZiu9yW3FPS5rD4XI_eod7Dc6k5g">
   <meta name="theme-color" content="${THEME_LIGHT}" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="${THEME_DARK}" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="${SITE_URL}">
   <link rel="alternate" type="application/rss+xml" title="auspol tracker – new polls" href="${SITE_URL}feed.xml">
   ${favPng ? `<link rel="icon" type="image/png" sizes="192x192" href="${SITE_URL}assets/favicon-192.png">
+  ` : ""}${/* iOS scales the 192 to its 180 home-screen slot, and the PNG is
+      opaque, which a touch icon must be (iOS composites transparency onto
+      black) — so the one file serves both slots and the touch icon rides
+      render-favicon.mjs's staleness gate. */""}
+  ${favPng ? `<link rel="apple-touch-icon" href="${SITE_URL}assets/favicon-192.png">
   ` : ""}<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,${favicon}">
   ${fontLinks.join("\n  ")}
   ${websiteJsonLd}`);

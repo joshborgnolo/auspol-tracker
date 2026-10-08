@@ -316,7 +316,7 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
   // hero lives) and ride to the top. If already on Snapshot, just glide up.
   const goHero = () => {
     if (active !== "now") onChange("now");
-    else window.scrollTo({ top: 0, behavior: "smooth" });
+    else window.scrollTo({ top: 0, behavior: SM });
   };
   // A zero-height sentinel sits at the tab bar's natural flow position. When it
   // scrolls above the viewport top, the sticky bar has caught the top edge –
@@ -7395,7 +7395,7 @@ function infoTerms(D) {
         estimate. The change shown beside each series is the one the house printed with it, kept
         only where it agrees with the previous printed reading.</span>
         <span className="info-p"><b>Context, not a predictor.</b> The series sit below the term’s
-        polls because the mood of the economy frames what voters hear; none of them forecasts
+        polls because confidence in the economy frames what voters hear; none of them forecasts
         how they’ll answer.</span></>) },
       entries: [] },
     { id: "s-cycles", title: "Past cycles", nav: "Past cycles",
@@ -8014,7 +8014,7 @@ function InfoView({ focus, onBack, backLabel }) {
      (#info), so an in-page #anchor would navigate away from it. */
   const jump = (id) => {
     const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ block: "start", behavior: "smooth" });
+    if (el) el.scrollIntoView({ block: "start", behavior: SM });
   };
   /* The page reads as a short numbered document - chapters 1-4, the
      twelve section explainers 4.1-4.12 - and the pinned index's buttons

@@ -25,12 +25,16 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="auspol tracker: Labor 51.4, One Nation 48.6 two-party preferred on implied preference flows, ±1.3 points, updated 6 October 2026, with the trend since the 2025 election">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://auspoltracker.com/assets/auspol-card.png?v=2026-10-07-ae49a68e">
+  <meta name="twitter:image:alt" content="auspol tracker: Labor 51.4, One Nation 48.6 two-party preferred on implied preference flows, ±1.3 points, updated 6 October 2026, with the trend since the 2025 election">
   <meta name="google-site-verification" content="sUMvJK3smMtuRAQNZiu9yW3FPS5rD4XI_eod7Dc6k5g">
   <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="https://auspoltracker.com/">
   <link rel="alternate" type="application/rss+xml" title="auspol tracker – new polls" href="https://auspoltracker.com/feed.xml">
   <link rel="icon" type="image/png" sizes="192x192" href="https://auspoltracker.com/assets/favicon-192.png">
+  
+  <link rel="apple-touch-icon" href="https://auspoltracker.com/assets/favicon-192.png">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'-1.04%20-8.10%2041.63%2041.63'%3E%3Cpath%20d%3D'M%2010%2024.5%20A%2012%2012%200%200%201%2022%2012.5'%20fill%3D'none'%20stroke%3D'%23b9463f'%20stroke-width%3D'3.4'%20stroke-linecap%3D'round'%2F%3E%3Cpath%20d%3D'M%2022%2012.5%20A%2012%2012%200%200%201%2034%2024.5'%20fill%3D'none'%20stroke%3D'%23cc7c37'%20stroke-width%3D'3.4'%20stroke-linecap%3D'round'%2F%3E%3Cline%20x1%3D'10.35'%20y1%3D'16.04'%20x2%3D'1.86'%20y2%3D'9.86'%20stroke%3D'%23cc7c37'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'17.55'%20y1%3D'10.8'%20x2%3D'14.34'%20y2%3D'0.93'%20stroke%3D'%23b9463f'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'26.45'%20y1%3D'10.8'%20x2%3D'29.02'%20y2%3D'2.88'%20stroke%3D'%23356697'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'33.65'%20y1%3D'16.04'%20x2%3D'37.69'%20y2%3D'13.1'%20stroke%3D'%23439458'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'22'%20y1%3D'24.5'%20x2%3D'20.81'%20y2%3D'15.98'%20stroke%3D'%23b9463f'%20stroke-width%3D'3'%20stroke-linecap%3D'round'%2F%3E%3C%2Fsvg%3E">
   <link rel="preload" href="assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
@@ -207,7 +211,13 @@ body.dark.cool {
 body.dark.editorial { --bg: oklch(0.205 0.010 65); }
 body.dark.editorial.cool { --bg: oklch(0.200 0.012 248); }
 * { box-sizing: border-box; }
+html { text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
 html, body { margin: 0; }
+@media (pointer: coarse) {
+  a, button, [role="tab"], [role="button"], summary, input, select, label {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
 body {
   --chart-bg: var(--surface);
   background: var(--bg);
@@ -3090,7 +3100,7 @@ body.rd .page {
   padding-right: calc(var(--rd-gutter) + env(safe-area-inset-right, 0px));
 }
 body.rd .content { gap: 0; }
-body.rd .rd-sec { padding: var(--rd-sec-pad) 0; position: relative; }
+body.rd .rd-sec { padding: var(--rd-sec-pad) 0; position: relative; scroll-margin-top: 56px; }
 body.rd .rd-sec + .rd-sec { padding-top: var(--rd-sec-pad); }
 body.rd .rd-eyebrow {
   display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 16px; row-gap: 4px;
@@ -3413,6 +3423,11 @@ body.rd .ts-sep { background: var(--line); }
 }
 @media (max-width: 340px) {
   body.rd .tabs.show-score .ts-abbr { display: none; }
+}
+@media (orientation: landscape) and (max-height: 480px) {
+  body.rd .tabs.sticky { position: relative; top: auto; }
+  body.rd .rd-ap-headwrap { position: relative; top: auto; }
+  body.rd .rd-ap-pinbar { display: none; }
 }
 body.rd .rd-tpp-top { display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: 36px; }
 body.rd .rd-tpp-read {
@@ -4025,7 +4040,7 @@ body.rd .rd-tsig-table tbody > tr:first-child.rd-tsig-set th { padding-top: 8px;
 body.rd .rd-tsig-table tr:has(> td.rd-tsig-yes) > :is(th, td) { background: color-mix(in oklab, var(--chg-up) 9%, var(--surface)); }
 body.rd .rd-tsig-table td.rd-tsig-yes { font-weight: 600; color: var(--chg-up); }
 body.rd .rd-tsig-table tbody tr:not(.rd-tsig-set):not(:has(> td.rd-tsig-yes)) > :is(th, td) { color: var(--ink-3); }
-@media (max-width: 640px) { body.rd .rd-tsig-table { min-width: 600px; text-size-adjust: 100%; -webkit-text-size-adjust: 100%; } body.rd .rd-tsig-table tr.rd-tsig-set th { font-size: 12px; } }
+@media (max-width: 640px) { body.rd .rd-tsig-table { min-width: 600px; } body.rd .rd-tsig-table tr.rd-tsig-set th { font-size: 12px; } }
 @media (max-width: 900px) { body.rd .rd-sm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px; } }
 @media (max-width: 640px) { body.rd .rd-mo-wrap { margin-top: 28px; } body.rd .rd-sm-grid { column-gap: 16px; } body.rd .rd-sm-top { font-size: 13px; } body.rd .rd-sm-top b { font-size: 16px; } }
 body.rd .rd-is-tabs { margin-top: 20px; }
@@ -75296,6 +75311,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   <script>["useState", "useRef", "useMemo", "useCallback", "useEffect", "useId"].forEach(h => {
   window[h] = React[h];
 });
+window.MQ_PHONE = "(max-width: 640px)";
 window.useNarrow = function useNarrow(query) {
   const q = query || "(max-width: 620px)";
   const [narrow, setNarrow] = React.useState(() => typeof window !== "undefined" && window.matchMedia ? window.matchMedia(q).matches : false);
@@ -75313,6 +75329,8 @@ window.useNarrow = function useNarrow(query) {
   }, [q]);
   return narrow;
 };
+window.RD_REDUCED_MOTION = typeof window !== "undefined" && !!window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+window.SM = window.RD_REDUCED_MOTION ? "auto" : "smooth";
 window.inkOf = function inkOf(c) {
   return typeof c === "string" ? c.replace(/var\(--(alp|lnp|grn|onp|oth)\)/g, "var(--$1-text)") : c;
 };
@@ -85880,7 +85898,7 @@ function Tabs({
   const goHero = () => {
     if (active !== "now") onChange("now");else window.scrollTo({
       top: 0,
-      behavior: "smooth"
+      behavior: SM
     });
   };
   React.useEffect(() => {
@@ -92540,7 +92558,7 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "Smoothed, not averaged across sources."), " Each dot is a release\u2019s own headline figure, linked to it; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly consumer index, 60 days on the monthly series) so release-to-release noise reads as trend. The quoted figures are the raw prints, and no", " ", xref("house-effect", "mood", "house-effect"), " adjustment applies \u2014 a record, not an estimate. The change shown beside each series is the one the house printed with it, kept only where it agrees with the previous printed reading."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Context, not a predictor."), " The series sit below the term\u2019s polls because the mood of the economy frames what voters hear; none of them forecasts how they\u2019ll answer."))
+      }, React.createElement("b", null, "Context, not a predictor."), " The series sit below the term\u2019s polls because confidence in the economy frames what voters hear; none of them forecasts how they\u2019ll answer."))
     },
     entries: []
   }, {
@@ -92980,7 +92998,7 @@ function InfoView({
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({
       block: "start",
-      behavior: "smooth"
+      behavior: SM
     });
   };
   const CH_PILLS = [["info-about", "1.", "About"], ["info-faq", "2.", "Questions"], ["info-method", "3.", "Method"]];
@@ -96305,6 +96323,38 @@ function rdDigitKey(items, onChange) {
     onChange(items[n - 1].id);
   };
 }
+function useHoverClaim(secId, ready, keys, step, deps) {
+  const hover = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById(secId);
+    if (!sec || !ready) return undefined;
+    const enter = () => {
+      hover.current = true;
+    };
+    const leave = () => {
+      hover.current = false;
+    };
+    hover.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const arrow = k => k === "ArrowRight" || k === "ArrowLeft";
+    const key = e => {
+      if (!hover.current || !(keys ? keys(e.key) : arrow(e.key))) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (step(e)) e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, deps);
+}
 const RdTabW = ({
   t
 }) => React.createElement("span", {
@@ -96616,7 +96666,7 @@ function rdEventReveal(id) {
     const top = el.getBoundingClientRect().top + window.scrollY - 88;
     if (top < window.scrollY) window.scrollTo({
       top,
-      behavior: "smooth"
+      behavior: SM
     });
   });
 }
@@ -96635,6 +96685,7 @@ Object.assign(window, {
   rdTabsKey,
   rdTabFocus,
   rdDigitKey,
+  useHoverClaim,
   rdNumWord,
   rdCap,
   rdFraction,
@@ -96824,7 +96875,7 @@ function RdHero(p) {
   const lineWord = (contest, basis) => KAL && !(contest === "alp_on" && basis === "resp") ? "trend" : "monthly average";
   const M = window.AP.tppMatchups;
   const m = M[matchup];
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const b0 = basis || "imp";
   const lead = +(latest.a - latest.b).toFixed(1);
   const margin = unc ? +(2 * unc.ci95).toFixed(1) : null;
@@ -97311,7 +97362,7 @@ function RdHero(p) {
   const snapGo = id => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({
-      behavior: "smooth",
+      behavior: SM,
       block: "start"
     });
   };
@@ -97735,7 +97786,7 @@ function RdPrimary({
     monthLabelFull
   } = window.AP;
   const xDomain = rangeDomain(rangeId);
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const [hidden, setHidden] = useState({});
   const T = D.demographics;
   const [grpId, setGrpId] = useState("");
@@ -98235,7 +98286,7 @@ function RdHeadBar({
 }) {
   const total = segs.reduce((s, x) => s + x.v, 0);
   const neither = Math.max(0, 100 - total);
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const barRef = React.useRef(null);
   const [tight, setTight] = useState("");
   const key = segs.map(s => s.name + s.v).join("|");
@@ -98320,7 +98371,7 @@ function RdLeadership({
     filterPts,
     monthLabelFull
   } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const xDomain = rangeDomain(rangeId);
   const base = (D.aggPrimary || []).find(d => d.election) || null;
   const N = D.leaderNow || {};
@@ -99626,7 +99677,7 @@ function RdDirection({
     series,
     monthLabelFull
   } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   if (!D.direction.length) return null;
   const xDomain = rangeDomain(rangeId);
   const pts = filterPts(D.direction, xDomain[0]);
@@ -100322,7 +100373,7 @@ function RdDemographics({
     filterPts,
     monthLabelFull
   } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const T = D.demographics;
   const [tabId, setTab] = useState("age");
   const [party, setParty] = useState("onp");
@@ -101376,7 +101427,7 @@ function RdSwitching({
     rangeDomain,
     filterPts
   } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const S = D.onSources;
   const boxRef = React.useRef(null);
   const W = useRdWidth(boxRef, 1152);
@@ -102777,43 +102828,17 @@ function RdUndecided({
     series,
     monthLabelFull
   } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const [view, setView] = useState("all");
   const U = D.undecided;
-  const unHover = React.useRef(false);
-  React.useEffect(() => {
-    const sec = document.getElementById("undecided");
-    if (!sec || !U || !U.series || !U.series.length) return undefined;
-    const enter = () => {
-      unHover.current = true;
-    };
-    const leave = () => {
-      unHover.current = false;
-    };
-    unHover.current = sec.matches(":hover");
-    sec.addEventListener("pointerenter", enter);
-    sec.addEventListener("pointerleave", leave);
+  useHoverClaim("undecided", !!(U && U.series && U.series.length), null, e => {
     const ids = ["all"].concat(D.firmness ? ["party"] : []).concat(U.softAge ? ["age"] : []);
-    const key = e => {
-      if (!unHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
-      const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
-      const sel = window.getSelection && window.getSelection();
-      if (sel && !sel.isCollapsed) return;
-      const i = ids.indexOf(view);
-      if (i < 0 || ids.length < 2) return;
-      e.preventDefault();
-      const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
-      rdPinScroll(document.getElementById("undecided") && document.getElementById("undecided").querySelector(".rd-un-tabs"));
-      setView(nxt);
-    };
-    document.addEventListener("keydown", key, true);
-    return () => {
-      sec.removeEventListener("pointerenter", enter);
-      sec.removeEventListener("pointerleave", leave);
-      document.removeEventListener("keydown", key, true);
-    };
+    const i = ids.indexOf(view);
+    if (i < 0 || ids.length < 2) return false;
+    const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
+    rdPinScroll(document.getElementById("undecided") && document.getElementById("undecided").querySelector(".rd-un-tabs"));
+    setView(nxt);
+    return true;
   }, [U, D, view]);
   if (!U || !U.series.length) return null;
   const F = D.firmness,
@@ -103520,7 +103545,7 @@ function RdConfidence({
     D,
     monthLabelFull
   } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const M = D.confidence;
   if (!M || !M.consumer || !M.business || !M.consumer.polls.length || !M.business.polls.length) return null;
   const NICE = v => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
@@ -103551,7 +103576,7 @@ function RdConfidence({
     dash: null,
     shift: 0,
     vfmt: v => v.toFixed(1),
-    short: "The Westpac–Melbourne Institute’s monthly gauge of the same household mood; 100 is neutral on this scale too."
+    short: "The Westpac–Melbourne Institute’s monthly gauge of the same household confidence; 100 is neutral on this scale too."
   }, {
     k: "business",
     view: "business",
@@ -103584,40 +103609,14 @@ function RdConfidence({
   if (!lanes.length) return null;
   for (const l of lanes) l.lat = l.s.latest;
   const [view, setView] = useState("consumer");
-  const confHover = React.useRef(false);
-  React.useEffect(() => {
-    const sec = document.getElementById("confidence");
-    if (!sec) return undefined;
-    const enter = () => {
-      confHover.current = true;
-    };
-    const leave = () => {
-      confHover.current = false;
-    };
-    confHover.current = sec.matches(":hover");
-    sec.addEventListener("pointerenter", enter);
-    sec.addEventListener("pointerleave", leave);
+  useHoverClaim("confidence", true, null, e => {
     const ids = RD_CONF_VIEWS.map(v => v.id);
-    const key = e => {
-      if (!confHover.current || e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
-      const a = document.activeElement;
-      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
-      const sel = window.getSelection && window.getSelection();
-      if (sel && !sel.isCollapsed) return;
-      const i = ids.indexOf(view);
-      if (i < 0 || ids.length < 2) return;
-      e.preventDefault();
-      const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
-      rdPinScroll(document.getElementById("confidence") && document.getElementById("confidence").querySelector(".rd-confidence-tabs"));
-      setView(nxt);
-    };
-    document.addEventListener("keydown", key, true);
-    return () => {
-      sec.removeEventListener("pointerenter", enter);
-      sec.removeEventListener("pointerleave", leave);
-      document.removeEventListener("keydown", key, true);
-    };
+    const i = ids.indexOf(view);
+    if (i < 0 || ids.length < 2) return false;
+    const nxt = ids[(i + (e.key === "ArrowRight" ? 1 : -1) + ids.length) % ids.length];
+    rdPinScroll(document.getElementById("confidence") && document.getElementById("confidence").querySelector(".rd-confidence-tabs"));
+    setView(nxt);
+    return true;
   }, [view]);
   const viewLanes = lanes.filter(l => l.view === view);
   const [hist, setHist] = useState(false);
@@ -103659,7 +103658,7 @@ function RdConfidence({
   };
   const cSide = side("Consumers"),
     bSide = side("Businesses");
-  const head = cSide === "under" && bSide === "under" ? "Confidence is underwater on both counts." : cSide === "above" && bSide === "above" ? "Confidence is above water on both counts." : cSide === "under" && bSide === "above" ? "Consumers are underwater; businesses aren’t." : cSide === "above" && bSide === "under" ? "Businesses are underwater; consumers aren’t." : "The gauges disagree on which side of the line the mood sits.";
+  const head = cSide === "under" && bSide === "under" ? "Confidence is underwater on both counts." : cSide === "above" && bSide === "above" ? "Confidence is above water on both counts." : cSide === "under" && bSide === "above" ? "Consumers are underwater; businesses aren’t." : cSide === "above" && bSide === "under" ? "Businesses are underwater; consumers aren’t." : "The gauges disagree on which side of the line confidence sits.";
   const trough = polls => {
     const lo = polls.reduce((m, p) => p.v < m.v ? p : m, polls[0]);
     const hi = polls.reduce((m, p) => p.v > m.v ? p : m, polls[0]);
@@ -103922,7 +103921,7 @@ function RdConfidence({
   const vc = view === "consumer" ? {
     title: "Consumer confidence",
     note: "100 = neutral on both gauges",
-    altKey: "The Westpac–MI monthly read of the same household mood",
+    altKey: "The Westpac–MI monthly read of the same household confidence",
     copyTitle: "Consumer confidence (two gauges)",
     copySub: head + " Two published consumer gauges on one 100-neutral scale: the weekly ANZ–Roy Morgan consumer confidence index and Westpac–MI’s monthly consumer sentiment.",
     copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series). The band pools the ANZ–Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. A drawn past term is its monthly series, smoothed at the monthly gauges’ 60-day half-life and drawn dotted in its house’s colour — ANZ–Roy Morgan plum, Westpac–MI gold where its series reaches back that far. No combining, no adjustment.",
@@ -104172,7 +104171,7 @@ function RdConfidence({
     className: "rd-cs-keythin",
     "aria-hidden": "true"
   }), "Monthly history back to ", histX0, ", as the house published it"))))), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Four published gauges of the same mood, split into two views \u2014 the consumer pair and the business pair, switched by the tabs over the chart \u2014 and set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Behind the current term, the band pools that view\u2019s main gauge over past terms \u2014 each term lined up on its own election month, so the bottom axis (months since this term\u2019s election) is every term\u2019s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. \u201CDraw a past term\u201D lifts any single term out of the band as its own smoothed, dotted line in the house\u2019s own colour \u2014 and on the consumer view Westpac\u2013MI\u2019s reading of the same term draws beside it, dotted gold where its 1974 series reaches \u2014 and \u201CSource data, CSV\u201D in the footer downloads every release and past-term reading. \u201CShow complete history\u201D instead draws whole years: each lane\u2019s own published monthly series runs back as a pale line \u2014 ANZ\u2013Roy Morgan\u2019s consumer index to 1973, Westpac\u2013MI\u2019s consumer sentiment to 1974, Roy Morgan\u2019s business index to 2010 \u2014 with the releases and their smoothing re-drawn over the file. Westpac\u2013MI months before 2010 come from the OECD\u2019s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA\u2019s table carries Westpac\u2013MI\u2019s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB\u2019s own releases."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
+    paras: [React.createElement(React.Fragment, null, "Four published gauges of economic confidence, split into two views \u2014 the consumer pair and the business pair, switched by the tabs over the chart \u2014 and set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Behind the current term, the band pools that view\u2019s main gauge over past terms \u2014 each term lined up on its own election month, so the bottom axis (months since this term\u2019s election) is every term\u2019s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. \u201CDraw a past term\u201D lifts any single term out of the band as its own smoothed, dotted line in the house\u2019s own colour \u2014 and on the consumer view Westpac\u2013MI\u2019s reading of the same term draws beside it, dotted gold where its 1974 series reaches \u2014 and \u201CSource data, CSV\u201D in the footer downloads every release and past-term reading. \u201CShow complete history\u201D instead draws whole years: each lane\u2019s own published monthly series runs back as a pale line \u2014 ANZ\u2013Roy Morgan\u2019s consumer index to 1973, Westpac\u2013MI\u2019s consumer sentiment to 1974, Roy Morgan\u2019s business index to 2010 \u2014 with the releases and their smoothing re-drawn over the file. Westpac\u2013MI months before 2010 come from the OECD\u2019s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA\u2019s table carries Westpac\u2013MI\u2019s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB\u2019s own releases."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
   }), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {
@@ -104314,7 +104313,7 @@ function RdPolls({
   } = window.AP;
   const plParties = (D.latest && D.latest.primaryOrder || RD_PL_FALLBACK).filter(k => k in RD_PL_LABEL).map(k => [k, RD_PL_LABEL[k]]);
   const narrow = useNarrow("(max-width: 900px)");
-  const phone = useNarrow("(max-width: 640px)");
+  const phone = useNarrow(MQ_PHONE);
   const [facet, setFacet] = useState("twopp");
   const [sort, setSort] = useState({
     key: "latest",
@@ -105907,7 +105906,7 @@ function RdPastCycles(p) {
   const {
     D
   } = window.AP;
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const [board, setBoard] = useState({
     open: false,
     sheet: null
@@ -106308,7 +106307,7 @@ function RdPastCycles(p) {
   const goTo = id => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({
-      behavior: "smooth",
+      behavior: SM,
       block: "start"
     });
   };
@@ -110164,10 +110163,10 @@ function RdAllPolls(P) {
       s = sc.getBoundingClientRect();
     if (r.left < s.left + 28) sc.scrollTo({
       left: sc.scrollLeft + r.left - s.left - 28,
-      behavior: "smooth"
+      behavior: SM
     });else if (r.right > s.right - 28) sc.scrollTo({
       left: sc.scrollLeft + r.right - s.right + 28,
-      behavior: "smooth"
+      behavior: SM
     });
   }, [facet]);
   const rowKey = p => p.pollster + "|" + p.released;
@@ -110286,7 +110285,7 @@ function RdAllPolls(P) {
   const jump = id => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({
-      behavior: "smooth",
+      behavior: SM,
       block: "start"
     });
   };
@@ -110294,7 +110293,7 @@ function RdAllPolls(P) {
     const el = searchRef.current;
     if (!el) return;
     el.scrollIntoView({
-      behavior: "smooth",
+      behavior: SM,
       block: "center"
     });
     setTimeout(() => el.focus({
@@ -112392,10 +112391,10 @@ function RdHouseLean({
       s = sc.getBoundingClientRect();
     if (r.left < s.left) sc.scrollTo({
       left: sc.scrollLeft + r.left - s.left - 28,
-      behavior: "smooth"
+      behavior: SM
     });else if (r.right > s.right) sc.scrollTo({
       left: sc.scrollLeft + r.right - s.right + 28,
-      behavior: "smooth"
+      behavior: SM
     });
   }, [view]);
   const HL0 = D.houseLean || {};
@@ -115243,7 +115242,7 @@ function App() {
     goTab
   };
   React.useEffect(() => {
-    const PHONE = window.matchMedia("(max-width: 640px)");
+    const PHONE = window.matchMedia(MQ_PHONE);
     const MIN_DX = 60;
     const EDGE = 24;
     const NEAR_BELOW = 120;

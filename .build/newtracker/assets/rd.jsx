@@ -803,6 +803,48 @@ function rdDigitKey(items, onChange) {
     onChange(items[n - 1].id);
   };
 }
+/* The hover-claims-keys scaffold (the pointer-claims-keys contract: a row
+   that takes <-/-> when focused also accepts them while the pointer rests on
+   its section, and the claim never survives the pointer leaving). This hook
+   is the SHARED WIRING only - pointerenter/leave on the section, the capture
+   keydown, and the canonical guard chain in its canonical order (claimed +
+   key family, no modifiers/defaultPrevented, focus on body/html, selection
+   collapsed, bail before preventDefault when the step can't run). step(e)
+   returns truthy when the key landed; a falsy return keeps the key's day
+   job. Sites whose claim is bigger than a guard set can carry it - deeper
+   claims winning over outer ones, continuation windows, the focused-row
+   exception, vertical arrows, digit keys - keep their own effect: those
+   wrinkles are the site's, not the scaffold's. deps must name every state
+   the step closes over, as a hand-rolled effect's would. keys defaults to
+   the pair of horizontal arrows. */
+function useHoverClaim(secId, ready, keys, step, deps) {
+  const hover = React.useRef(false);
+  React.useEffect(() => {
+    const sec = document.getElementById(secId);
+    if (!sec || !ready) return undefined;
+    const enter = () => { hover.current = true; };
+    const leave = () => { hover.current = false; };
+    hover.current = sec.matches(":hover");
+    sec.addEventListener("pointerenter", enter);
+    sec.addEventListener("pointerleave", leave);
+    const arrow = (k) => k === "ArrowRight" || k === "ArrowLeft";
+    const key = (e) => {
+      if (!hover.current || !(keys ? keys(e.key) : arrow(e.key))) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const a = document.activeElement;
+      if (a && a.tagName !== "BODY" && a.tagName !== "HTML") return;
+      const sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      if (step(e)) e.preventDefault();
+    };
+    document.addEventListener("keydown", key, true);
+    return () => {
+      sec.removeEventListener("pointerenter", enter);
+      sec.removeEventListener("pointerleave", leave);
+      document.removeEventListener("keydown", key, true);
+    };
+  }, deps);
+}
 /* A label that holds its bold width: a pressed tab (or chip, or picked word)
    goes 600, so a plain label would widen it and nudge its neighbours on every
    switch. The hidden bold twin sizes the box; the visible text centres inside
@@ -1095,12 +1137,12 @@ function rdEventReveal(id) {
     const el = document.getElementById(id);
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY - 88;
-    if (top < window.scrollY) window.scrollTo({ top, behavior: "smooth" });
+    if (top < window.scrollY) window.scrollTo({ top, behavior: SM });
   });
 }
 
 Object.assign(window, { RdSec, RdHed, RdSub, RdSwatch, RdKey, RdHow, RdFoot, RdTabs, RdTabW, RdGlide, RdCrossfade,
-                        rdTabsKey, rdTabFocus, rdDigitKey,
+                        rdTabsKey, rdTabFocus, rdDigitKey, useHoverClaim,
                         rdNumWord, rdCap, rdFraction, rdSigned, rdArrow,
                         rdDate, rdMonthYear, rdPointsPhrase, rdXTicks, rdYTicks,
                         rdEventBadges, rdChartEvents, RdEventList, rdEventReveal, RdCheck, RdSwitch, RdTerm, RdQPop });

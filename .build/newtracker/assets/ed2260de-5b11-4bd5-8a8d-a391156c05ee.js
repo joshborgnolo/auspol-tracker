@@ -6,13 +6,14 @@
 ["useState", "useRef", "useMemo", "useCallback", "useEffect", "useId"]
   .forEach((h) => { window[h] = React[h]; });
 
-/* Charts are SVGs with a fixed viewBox, so their rendered height is a function
-   of the column they sit in: the 1000x420 box the hero draws at comes out about
-   150px tall inside a 358px phone column, which is not enough room for a
-   twenty-point band carrying 150 dots - the trend flattens into a smear. A
-   media query cannot fix that, because the aspect ratio lives in the viewBox
-   rather than in CSS, so the breakpoint has to reach the component and ask for
-   a TALLER box instead of a scaled-down wide one. */
+/* The two designs keep separate, self-consistent phone rungs: the classic
+   design is 620px (four (max-width: 620px) blocks in the template's CSS, and
+   every bare useNarrow() caller sits below an rd early-return, i.e. is
+   classic-only); the redesign is 640px (twenty-two blocks in rd.css, every
+   live component below named explicitly). The default therefore stays 620 -
+   it belongs to the frozen paths - and live components pass MQ_PHONE rather
+   than hard-coding their own copy of the redesign's rung. */
+window.MQ_PHONE = "(max-width: 640px)";
 window.useNarrow = function useNarrow(query) {
   const q = query || "(max-width: 620px)";
   const [narrow, setNarrow] = React.useState(() =>
@@ -27,6 +28,17 @@ window.useNarrow = function useNarrow(query) {
   }, [q]);
   return narrow;
 };
+
+/* prefers-reduced-motion asks for no animation, but nothing in the platform
+   gates a programmatic scroll on it — scrollIntoView({behavior:"smooth"})
+   animates for exactly the people who opted out. One shared behaviour
+   string, so every jump, pill and rewind in the page answers the same way
+   instead of hard-coding "smooth" at each call site. The page sets no
+   scroll-behavior in CSS, so "auto" here is the instant, spec-default
+   behaviour. */
+window.RD_REDUCED_MOTION = typeof window !== "undefined" && !!window.matchMedia &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+window.SM = window.RD_REDUCED_MOTION ? "auto" : "smooth";
 
 /* Mark colour -> text colour. The party tokens are tuned for dots and lines;
    at 10px Greens sits at 3.5:1 and One Nation at 3.0:1 on paper, so the same

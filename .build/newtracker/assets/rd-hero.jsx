@@ -105,7 +105,7 @@ function RdHero(p) {
   const lineWord = (contest, basis) => (KAL && !(contest === "alp_on" && basis === "resp") ? "trend" : "monthly average");
   const M = window.AP.tppMatchups;
   const m = M[matchup];
-  const narrow = useNarrow("(max-width: 640px)");
+  const narrow = useNarrow(MQ_PHONE);
   const b0 = basis || "imp";
 
   /* ---- the figures and the words under them ---------------------------- */
@@ -512,7 +512,7 @@ function RdHero(p) {
     D.demographics ? ["who-votes", "Who votes for whom"] : null,   // /vic/ has neither
     D.issues ? ["issues", "The issues"] : null,
   ].filter(Boolean);
-  const snapGo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  const snapGo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: SM, block: "start" }); };
 
   /* a sideways swipe on the chart flips the 2PP contest, wrapping round the
      matchups like the computer's arrow keys wrap a row - the card bears the

@@ -112,7 +112,10 @@ body.rd .content { gap: 0; }
    A dark rule over a sentence-case section title, the title's meta beside it
    (below it on a phone); then the finding as a serif headline and its deck.
    The first section sits under the masthead and takes no rule. */
-body.rd .rd-sec { padding: var(--rd-sec-pad) 0; position: relative; }
+/* scroll-margin-top keeps an eyebrow-nav/fragment jump's target below the
+   44px sticky tab bar (+12px air); the classic ids do the same job with a
+   72px scroll-margin in the template */
+body.rd .rd-sec { padding: var(--rd-sec-pad) 0; position: relative; scroll-margin-top: 56px; }
 body.rd .rd-sec + .rd-sec { padding-top: var(--rd-sec-pad); }
 body.rd .rd-eyebrow {
   display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 16px; row-gap: 4px;
@@ -514,6 +517,21 @@ body.rd .ts-sep { background: var(--line); }
    its party letters - the figures keep their party colours */
 @media (max-width: 340px) {
   body.rd .tabs.show-score .ts-abbr { display: none; }
+}
+/* short-screenscape phones (landscape, ~320-480px tall): everything unpins.
+   The tab bar plus the All-polls head and pinbar were ~150px of chrome stuck
+   to the top of a 390px-tall viewport - nearly half the screen owned by
+   navigation between every two scrolls. In landscape the bars scroll away as
+   plain content. The pinbar sits absolutely above the headwrap and has no
+   anchor when nothing sticks, so it goes entirely (its tabs still live in
+   the un-pinned head). --rd-pin and the .pinned toggles keep running either
+   way; with no sticky box their shadows and docks just ride off with the
+   rest of the page. Scoped to body.rd so the archived design's bar keeps
+   pinning as it always did. */
+@media (orientation: landscape) and (max-height: 480px) {
+  body.rd .tabs.sticky { position: relative; top: auto; }
+  body.rd .rd-ap-headwrap { position: relative; top: auto; }
+  body.rd .rd-ap-pinbar { display: none; }
 }
 
 /* ---------- two-party section ---------------------------------------------- */
@@ -1392,10 +1410,10 @@ body.rd .rd-tsig-table td.rd-tsig-yes { font-weight: 600; color: var(--chg-up); 
 /* not-significant rows drop to the quiet tier instead of a red: a No is
    the test failing to establish a shift, not evidence there is none */
 body.rd .rd-tsig-table tbody tr:not(.rd-tsig-set):not(:has(> td.rd-tsig-yes)) > :is(th, td) { color: var(--ink-3); }
-/* text-size-adjust: iOS inflates text in blocks wider than the viewport;
-   the 600px min-width table is exactly that, and the short one-line set
-   subheads were the rows it boosted */
-@media (max-width: 640px) { body.rd .rd-tsig-table { min-width: 600px; text-size-adjust: 100%; -webkit-text-size-adjust: 100%; } body.rd .rd-tsig-table tr.rd-tsig-set th { font-size: 12px; } }
+/* (No text-size-adjust pair here: iOS inflation was pinned at html level in
+   template.html - the 600px min-width on this table is exactly the
+   wider-than-viewport block iOS used to inflate, but the pin covers it.) */
+@media (max-width: 640px) { body.rd .rd-tsig-table { min-width: 600px; } body.rd .rd-tsig-table tr.rd-tsig-set th { font-size: 12px; } }
 @media (max-width: 900px) { body.rd .rd-sm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px; } }
 @media (max-width: 640px) { body.rd .rd-mo-wrap { margin-top: 28px; } body.rd .rd-sm-grid { column-gap: 16px; } body.rd .rd-sm-top { font-size: 13px; } body.rd .rd-sm-top b { font-size: 16px; } }
 
