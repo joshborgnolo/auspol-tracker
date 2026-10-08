@@ -1,0 +1,14 @@
+{
+  "_about": "W7 of .build/analysis/seat-model-plan.md — outside seat-model medians, entered by hand via .build/analysis/seat-model/benchmark-snapshot.mjs (nobody else archives them; the disagreements between these rows are the seat model's diagnostic surface). key alpMedian = the model's reported median Labor seats 'if an election were held today'. Analysis-side data: not part of the site build.",
+  "snapshots": [
+    {
+      "date": "2026-10-08",
+      "key": "alpMedian",
+      "poliwave": 78,
+      "ges": 73,
+      "swingison": 69,
+      "aef": 68,
+      "note": "seed — user-surveyed medians, the 68→78 spread that motivated the plan"
+    }
+  ]
+}
