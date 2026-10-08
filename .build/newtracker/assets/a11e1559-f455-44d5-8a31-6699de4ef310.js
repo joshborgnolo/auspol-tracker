@@ -1583,8 +1583,8 @@ function MoodPanel({ rangeId }) {
         <>Roy Morgan{"\u2019"}s own index series, set out as published {"\u2013"} the weekly ANZ{"\u2013"}Roy Morgan
         consumer index and the monthly business index, back to 2019. No averaging, no adjustment
         for lean, no election anchor is applied.</>,
-        <>On each index 100 is neutral {"\u2013"} above it optimists outnumber pessimists. Reading the mood
-        beside the polls is context, not a predictor of the vote.</>,
+        <>On each index 100 is neutral {"\u2013"} above it optimists outnumber pessimists. Reading economic
+        sentiment beside the polls is context, not a predictor of the vote.</>,
       ]} />
     </section>
   );

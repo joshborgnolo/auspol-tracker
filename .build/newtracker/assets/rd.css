@@ -2110,6 +2110,13 @@ body.rd .rd-ap .rd-ap-pctl { min-height: 45px; }
 @media (min-width: 761px) and (max-width: 1239px) {
   body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav { flex-basis: 100%; justify-content: flex-end; }
 }
+/* the longer Confidence meta ("…(business and consumer)…", 2026-10-08)
+   pushed its eyebrow sum ~3px past the 1152 content cap, so the nav
+   wrapped ONLY on Confidence at >=1240 and the pin walk read a 2.6px
+   jolt (conf-headline "table held through the walk" at 1280). Shaving
+   the tools gap inside rd-ap buys ~12px; every facet's eyebrow stays
+   one line above the band, so the per-facet geometry matches */
+body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav { gap: 14px; }
 @media (max-width: 640px) {
   body.rd .rd-ap .rd-hed { line-height: 33px; }
   body.rd .rd-ap .rd-eyebrow .rd-meta { line-height: 18px; }

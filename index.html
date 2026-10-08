@@ -4577,6 +4577,7 @@ body.rd .rd-ap .rd-ap-pctl { min-height: 45px; }
 @media (min-width: 761px) and (max-width: 1239px) {
   body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav { flex-basis: 100%; justify-content: flex-end; }
 }
+body.rd .rd-ap > .rd-eyebrow > .rd-ap-nav { gap: 14px; }
 @media (max-width: 640px) {
   body.rd .rd-ap .rd-hed { line-height: 33px; }
   body.rd .rd-ap .rd-eyebrow .rd-meta { line-height: 18px; }
@@ -75518,7 +75519,7 @@ function MoodPanel({
     tooltipTitle: i => window.AP.monthLabelFull(drawn.c[i].ym),
     fmt: v => v.toFixed(1)
   }), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Roy Morgan", "\u2019", "s own index series, set out as published ", "\u2013", " the weekly ANZ", "\u2013", "Roy Morgan consumer index and the monthly business index, back to 2019. No averaging, no adjustment for lean, no election anchor is applied."), React.createElement(React.Fragment, null, "On each index 100 is neutral ", "\u2013", " above it optimists outnumber pessimists. Reading the mood beside the polls is context, not a predictor of the vote.")]
+    paras: [React.createElement(React.Fragment, null, "Roy Morgan", "\u2019", "s own index series, set out as published ", "\u2013", " the weekly ANZ", "\u2013", "Roy Morgan consumer index and the monthly business index, back to 2019. No averaging, no adjustment for lean, no election anchor is applied."), React.createElement(React.Fragment, null, "On each index 100 is neutral ", "\u2013", " above it optimists outnumber pessimists. Reading economic sentiment beside the polls is context, not a predictor of the vote.")]
   }));
 }
 function UndecidedPanel({
@@ -84557,7 +84558,7 @@ function AllPollsView({
     className: "card-title"
   }, facet === "confidence" ? "Economic sentiment" : "All polls"), React.createElement("p", {
     className: "card-sub"
-  }, facet === "confidence" ? "Every release of the four confidence indices since the 2025 election" : React.createElement(React.Fragment, null, "Every individual national poll in the archive, ", total, totalAll !== total ? " of " + totalAll : "", " polls from ", housesAll.length, " pollsters,", " ", (() => {
+  }, facet === "confidence" ? "Every confidence-index release (business and consumer) since the 2025 election" : React.createElement(React.Fragment, null, "Every individual national poll in the archive, ", total, totalAll !== total ? " of " + totalAll : "", " polls from ", housesAll.length, " pollsters,", " ", (() => {
     const src = D.individualPolls;
     const f = src[0],
       l = src[src.length - 1];
@@ -96952,7 +96953,7 @@ function RdMood({
       label: "The Westpac–MI and NAB reads of the same subjects"
     }]
   })), React.createElement(HowTo, {
-    paras: [React.createElement(React.Fragment, null, "Four published gauges of the same mood, set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "Reading the mood beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
+    paras: [React.createElement(React.Fragment, null, "Four published gauges of the same mood, set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
   }), React.createElement(RdFoot, {
     how: {
       term: "mood",
@@ -104145,7 +104146,7 @@ function RdAllPolls(P) {
     id: "rd-ap-t"
   }, facet === "confidence" ? "Economic sentiment" : "All polls"), React.createElement("span", {
     className: "rd-meta"
-  }, facet === "confidence" ? "Every release of the four confidence indices since the " + rdElecYear + " election" : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"), !phone && React.createElement("nav", {
+  }, facet === "confidence" ? "Every confidence-index release (business and consumer) since the " + rdElecYear + " election" : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"), !phone && React.createElement("nav", {
     className: "rd-eyebrow-tools rd-ap-nav",
     "aria-label": "On this page"
   }, React.createElement("button", {

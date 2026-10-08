@@ -2982,7 +2982,7 @@ function RdAllPolls(P) {
       <div className="rd-eyebrow">
         <h2 className="rd-title" id="rd-ap-t">{facet === "confidence" ? "Economic sentiment" : "All polls"}</h2>
         <span className="rd-meta">{facet === "confidence"
-          ? "Every release of the four confidence indices since the " + rdElecYear + " election"
+          ? "Every confidence-index release (business and consumer) since the " + rdElecYear + " election"
           : "Every " + RD_AP_POLLS + " poll since the " + rdElecYear + " election"}</span>
         {!phone && (
           <nav className="rd-eyebrow-tools rd-ap-nav" aria-label="On this page">

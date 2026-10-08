@@ -5756,7 +5756,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
           <h2 className="card-title">{facet === "confidence" ? "Economic sentiment" : "All polls"}</h2>
           <p className="card-sub">
             {facet === "confidence"
-              ? "Every release of the four confidence indices since the 2025 election"
+              ? "Every confidence-index release (business and consumer) since the 2025 election"
               : <>
                   Every individual national poll in the archive, {total}{totalAll !== total ? " of " + totalAll : ""} polls from {housesAll.length} pollsters,
                   {" "}{(() => {  // span computed from the data, so it stays honest as rows are added

@@ -31,7 +31,7 @@ const browser = await puppeteer.launch({ executablePath: CHROME, headless: "new"
 const page = await browser.newPage();
 page.on("pageerror", (e) => { console.log("PAGEERROR", String(e).slice(0, 300)); fails++; });
 
-const CONF_META = "Every release of the four confidence indices since the 2025 election";
+const CONF_META = "Every confidence-index release (business and consumer) since the 2025 election";
 const LAB = { twopp: "2PP", primary: "Primary", leadership: /^Leader/, direction: "Direction", issues: "Issues", demographics: "Demographics", confidence: "Confidence" };
 const IDS = Object.keys(LAB);
 const open = async (w, qs = "") => {
