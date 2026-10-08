@@ -9,7 +9,7 @@
 import assert from "node:assert/strict";
 
 process.env.N24_LIB = "1";
-const { parseWikiYouGov, wikiOthersSplit, n24ConflictPlan, n24KeepHand, n24Prefer, n24PrevWave, news24Sat, parseSatisfaction } = await import("./extract-news24.mjs");
+const { parseWikiYouGov, wikiOthersSplit, waveFromCells, n24ConflictPlan, n24KeepHand, n24Prefer, n24PrevWave, news24Sat, parseSatisfaction } = await import("./extract-news24.mjs");
 
 const head = `==Voting intention==
 ===2026===
@@ -102,6 +102,155 @@ r = parseWikiYouGov(formA);
 assert.equal(r.waves.length, 1, JSON.stringify(r));
 assert.deepEqual(r.waves[0].vi, { alp: 28, lnp: 22, grn: 13, onp: 25, ind: 6, oth: 6, tpp_alp: 53, tpp_lnp: 47 });
 assert.equal(r.waves[0].date, "2026-07-14");
+
+// The 6 Oct section-sweep shape, one wave row with its own variants below;
+// the canon row is 2026-01-27 = 31/20/12/25/6/6 where 20 = LIB 14 + NAT 2 +
+// LNPQ 4. $EFNS marks where a named-efn body (or nothing) goes.
+const formDShell = (efnsBefore, efnsRow) => `==Voting intention==
+===2026===
+{| class="wikitable sortable"
+! rowspan="2" | Date
+! rowspan="2" | Polling firm
+! colspan="6" | Primary vote
+! colspan="2" | 2PP
+|-
+| ${efnsBefore}
+| filler-elsewhere
+|-
+! rowspan="2" | {{nowrap|20–27 Jan 2026}}
+| rowspan="2" | [[YouGov]]<ref name="sky27jan">{{cite web |title=t|url=https://www.skynews.com.au/australia-news/politics/x/news-story/43b93b2bc0936232a70553f2cea09a83|date=27 January 2026}}</ref>
+| rowspan="2" | [https://www.skynews.com.au/australia-news/politics/x/news-story/43b93b2bc0936232a70553f2cea09a83 ''Sky News'']
+| rowspan="2" | Online
+| rowspan="2" | 1,500
+| rowspan="2" style="background:#FFB6B6" |'''31%'''
+| rowspan="2" | 14%${efnsRow.lnp}
+| rowspan="2" | 2%
+| rowspan="2" | 12%
+| rowspan="2" | 25%
+| rowspan="2" | 12%${efnsRow.oth}
+! style=background:#FFB6B6 | 55%
+| 45%
+| {{N/A}}
+|-
+! style=background:#FFB6B6 | 58%
+| {{n/a}}
+|}
+`;
+const formDWant = { alp: 31, lnp: 20, grn: 12, onp: 25, ind: 6, oth: 6, tpp_alp: 55, tpp_lnp: 45 };
+
+// A. inline bodies on the wave row (live 3–10 Feb style: "{{efn|name=4lnp|4%
+// for the [[Liberal National Party of Queensland]] vote distributed…}}")
+r = parseWikiYouGov(formDShell("x", {
+  lnp: "{{efn|name=4lnp|4% for the [[Liberal National Party of Queensland]] vote distributed between both Liberal and National}}",
+  oth: "{{efn|name=6ind6oth|6% Independent and 6% Other}}",
+}));
+assert.equal(r.waves.length, 1, JSON.stringify(r));
+assert.deepEqual(r.waves[0].vi, formDWant, "inline efn bodies (form D)");
+assert.equal(r.waves[0].date, "2026-01-27");
+assert.equal(r.waves[0].dateStart, "2026-01-20");
+assert.equal(r.waves[0].sample, 1500);
+assert.equal(r.waves[0].client, "News24", "Sky News rows still file as News24");
+assert.deepEqual(r.unparsed, []);
+
+// B. elided names on the wave row, bodies carried by a DIFFERENT row's chunk
+// (live 27 Jan: "6ind6oth"'s body is line 912, "4lnp"'s line 1677)
+r = parseWikiYouGov(formDShell(
+  "{{efn|name=6ind6oth|6% Independent and 6% Other}}{{efn|name=4lnp|4% for the [[Liberal National Party of Queensland]] vote distributed between both Liberal and National}}",
+  { lnp: "{{efn|name=4lnp}}", oth: "{{efn|name=6ind6oth}}" },
+));
+assert.equal(r.waves.length, 1, JSON.stringify(r));
+assert.deepEqual(r.waves[0].vi, formDWant, "elided named efns resolve page-wide");
+assert.deepEqual(r.unparsed, []);
+
+// C. elided names with NO body anywhere — the name's own digits carry it
+// ("4lnp", "6ind6oth"), verified by the printed row sum before use
+r = parseWikiYouGov(formDShell("y", { lnp: "{{efn|name=4lnp}}", oth: "{{efn|name=6ind6oth}}" }));
+assert.equal(r.waves.length, 1, JSON.stringify(r));
+assert.deepEqual(r.waves[0].vi, formDWant, "name-slug digits verify against the printed sum");
+
+// D. without any efn the row must NOT file: 14+2 without the LNPQ share and
+// the Others cell without its split leave the sum at 96
+r = parseWikiYouGov(formDShell("z", { lnp: "", oth: "" }));
+assert.equal(r.waves.length, 0, JSON.stringify(r));
+assert.equal(r.unparsed.length, 1);
+assert.match(r.unparsed[0], /2026-01-27: primaries don't sum/);
+
+// an lnpq efn attached where the row does not split LIB/NAT is ignored
+// (legacy row keeps reading as form A)
+r = parseWikiYouGov(formA.replace("| 6%\n| 6%", "| 6%{{efn|name=4lnp|4% for the [[Liberal National Party of Queensland]] vote}}\n| 6%"));
+assert.equal(r.waves.length, 1, JSON.stringify(r));
+assert.deepEqual(r.waves[0].vi, { alp: 28, lnp: 22, grn: 13, onp: 25, ind: 6, oth: 6, tpp_alp: 53, tpp_lnp: 47 }, "6-token form A ignores lnpq");
+
+// ---- legacy row with undecided folded into Others ("14%{{efn|7% undecided}}") —
+// the 2025-09-30 canon shape (34+27+12+12+8+14 − 7 = 100)
+const und = `==Voting intention==
+===2025===
+{| class="wikitable sortable"
+! rowspan="2" | Date
+! colspan="6" | Primary vote
+! colspan="2" | 2PP
+|-
+| rowspan="2"; style="text-align:center;" | 25–30 Sep
+| rowspan="2"; align=left | [[YouGov]]<ref>{{cite tweet|title=y|date=30 September 2025}}</ref>
+| {{n/a}}
+| Online
+| 1,329
+| style="background:#FFB6B6" |'''34%'''
+| 27%
+| 12%
+| 12%
+| 8%
+| 14%{{efn|7% undecided|name=und7}}
+| style=background:#FFB6B6 | '''56%'''
+| 44%
+|-
+| filler
+|}
+`;
+r = parseWikiYouGov(und);
+assert.equal(r.waves.length, 1, JSON.stringify(r));
+assert.equal(r.waves[0].date, "2025-09-30");
+assert.deepEqual(r.waves[0].vi, { alp: 34, lnp: 27, grn: 12, onp: 12, ind: 8, oth: 14, tpp_alp: 56, tpp_lnp: 44 },
+  "undecided folded into Others kept at its printed value");
+assert.deepEqual(r.unparsed, []);
+
+// ---- the date orthographies the sweep introduced in one table -----------------
+for (const [dateCell, want] of [
+  ["Feb 3–10 2026", ["2026-02-03", "2026-02-10"]],
+  ["17-24th Feb 2026", ["2026-02-17", "2026-02-24"]],
+  ["31 Mar – 7th Apr 2026", ["2026-03-31", "2026-04-07"]],
+  ["15–21 Sept, 2026", ["2026-09-15", "2026-09-21"]],
+  ["June 23–30, 2026", ["2026-06-23", "2026-06-30"]],
+  ["May 26 – Jun 2 2026", ["2026-05-26", "2026-06-02"]],
+  ["29 Sept–6 Oct 2026, 2026", ["2026-09-29", "2026-10-06"]],
+  ["{{nowrap|29 Sept–6 Oct 2026}}", ["2026-09-29", "2026-10-06"]],
+  ["26 Nov – 2 Dec", ["2026-11-26", "2026-12-02"]],
+]) {
+  const page = head + `|-
+| rowspan="2" | ${dateCell}
+| rowspan="2" | [[YouGov]]<ref>{{cite news|title=t|url=https://www.news24.com.au/politics/x/news-story/abc|date=2 July 2026}}</ref>
+| rowspan="2" | [https://www.news24.com.au/politics/x/news-story/abc ''News24'']
+| rowspan="2" | Online
+| rowspan="2" | 1,500
+| rowspan="2" | 30%
+| rowspan="2" colspan=2 | 25%
+| rowspan="2" | 13%
+| rowspan="2" | 20%
+| rowspan="2" | 12%{{efn|name=6ind6oth|6% Independent and 6% Other}}
+! 55%
+| 45%
+| {{N/A}}
+|-
+| filler
+|}
+`;
+  const w = parseWikiYouGov(page).waves[0];
+  assert.deepEqual(
+    w && [w.dateStart, w.date],
+    want,
+    `date cell ${JSON.stringify(dateCell)}`,
+  );
+}
 
 // ---- an MRP row and a non-YouGov row are ignored ------------------------------------
 const noise = head + `|-

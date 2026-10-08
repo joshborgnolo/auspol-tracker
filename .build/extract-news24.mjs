@@ -810,11 +810,30 @@ function guard(rec, { requirePublished = true, requireTpp = true, spanMin = 1, r
 // are excluded.
 const wikiMonth = (s) => MONTHS[s.toLowerCase().replace(/\.$/, "")] ?? null;
 function parseWikiDate(cell, fallbackYear) {
-  const s = cell.replace(/\[\[|\]\]/g, "").trim();
+  // Editors type fieldwork dates in half a dozen ways, and the Oct 2026
+  // section-sweep introduced most of them in one table: ordinals ("7th
+  // Apr"), a comma before the year ("15–21 Sept, 2026"), a duplicated year
+  // ("29 Sept–6 Oct 2026, 2026") and month-lead ranges ("Feb 3–10 2026",
+  // "May 26 – Jun 2 2026"). Tidy those, then match the wikitext-canonical
+  // day-lead shapes and finally the month-lead ones.
+  const s = cell
+    .replace(/\[\[|\]\]/g, "")
+    .replace(/\b(\d{1,2})(st|nd|rd|th)\b/gi, "$1")
+    .replace(/,\s*(\d{4})\b/g, " $1")
+    .replace(/(\b(?:19|20)\d\d)\s+\1\b/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
   let m = s.match(/^(\d{1,2})\s*(?:([A-Za-z]{3,9})\.?)?\s*[–—-]\s*(\d{1,2})\s+([A-Za-z]{3,9})\.?(?:\s+(\d{4}))?$/);
   if (!m) {
     m = s.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\.?(?:\s+(\d{4}))?$/);
-    if (!m) return null;
+    if (!m) {
+      m = s.match(/^([A-Za-z]{3,9})\.?\s+(\d{1,2})\s*[–—-]\s*(?:([A-Za-z]{3,9})\.?\s+)?(\d{1,2})(?:\s+(\d{4}))?$/);
+      if (!m) return null;
+      const m2 = wikiMonth(m[3] ?? m[1]), m1 = wikiMonth(m[1]);
+      const y2 = m[5] ? +m[5] : fallbackYear;
+      if (m1 == null || m2 == null || y2 == null) return null;
+      return { date: iso(y2, m2, +m[4]), dateStart: iso(m1 > m2 ? y2 - 1 : y2, m1, +m[2]) };
+    }
     const mo = wikiMonth(m[2]), d = +m[1], y = m[3] ? +m[3] : fallbackYear;
     if (mo == null || y == null) return null;
     const dt = iso(y, mo, d);
@@ -827,12 +846,16 @@ function parseWikiDate(cell, fallbackYear) {
 }
 
 // Cell content = text after the final "|" (attributes precede it); refs and
-// templates, which contain pipes, are stripped beforehand. Citation data
-// (url, client) must be harvested from the raw chunk before this runs.
+// templates, which contain pipes, are stripped beforehand — except
+// {{nowrap|…}}, which merely protects its contents (the subpopulation tables
+// wrap date cells in it since Oct 2026) and is unwrapped rather than
+// dropped. Citation data (url, client) must be harvested from the raw chunk
+// before this runs.
 function wikiCells(chunk) {
   const t = chunk
     .replace(/<ref[^>]*\/>/g, " ")
     .replace(/<ref[^>]*>[\s\S]*?<\/ref>/g, " ")
+    .replace(/\{\{nowrap\|([^{}]*)\}\}/gi, "$1")
     .replace(/\{\{[^{}]*\}\}/g, " ")
     .replace(/\{\{[^{}]*\}\}/g, " ");
   const cells = [];
@@ -848,27 +871,128 @@ function wikiCells(chunk) {
 const near100 = (sum) => Math.abs(sum - 100) <= 2.5;
 const WIKI_PCT = /^'{0,3}(\d{1,2}(?:\.\d{1,2})?)%'{0,3}$/;
 
-/* The Others cell's footnote, where the table carries one: since Sep 2026
-   Wikipedia prints ONE "Others" column and moves the split into an efn —
-   "7% [[Independent politicians in Australia|Independent]], 2% [[Community
-   Strong Australia]] and 5% Other". Tracker convention for this series is
-   ind = Independents, oth = everything else (CSA + Other), so the footnote
-   is read off the RAW chunk before wikiCells strips templates. */
-function wikiOthersSplit(chunk) {
-  const efn = chunk.match(/\{\{efn\|[^{}]*?(\d{1,2}(?:\.\d)?)%\s*(?:\[\[[^\]]*Independent[^\]]*\]\]|Independents?)[^{}]*\}\}/i);
-  if (!efn) return null;
-  const body = efn[0];
-  const ind = parseFloat(efn[1]);
+/* Named {{efn}} footnotes live page-wide: the FIRST use carries the body
+   ("{{efn|name=6ind6oth|6% Independent and 6% Other}}"), every later use is
+   an elided "{{efn|name=6ind6oth}}" with no body. A row's chunk therefore
+   sees elided references only — the split figures the row needs sit in a
+   DIFFERENT row's chunk. Inventory the whole wikitext once so a chunk can
+   resolve its elided names. Both "{{efn|name=x|body}}" and
+   "{{efn|body|name=x}}" orders occur; an unnamed body's row can also be
+   read from the machine name itself ("5ind6oth" = 5 ind, 6 oth), verified
+   by the printed row's own sum before use. */
+function wikiEfns(text) {
+  const map = new Map();
+  for (const m of text.matchAll(/\{\{efn\|([^{}]*)\}\}/gi)) {
+    const parts = m[1].split("|").map((p) => p.trim());
+    let name = null;
+    const body = [];
+    for (const p of parts) {
+      const nm = p.match(/^name\s*=\s*(.+)$/i);
+      if (nm) name = nm[1].trim();
+      else body.push(p);
+    }
+    if (name && body.length && !map.has(name.toLowerCase())) map.set(name.toLowerCase(), body.join("|"));
+  }
+  return (name) => map.get(name.toLowerCase()) ?? null;
+}
+
+// The ind/oth split carried by ONE efn body ("6% Independent … 5% Other").
+function othersSplitFromBody(body) {
+  const indM = body.match(/(\d{1,2}(?:\.\d)?)%\s*(?:\[\[[^\]]*Independent[^\]]*\]\]|Independents?)/i);
+  if (!indM) return null;
+  const ind = parseFloat(indM[1]);
   let oth = 0, any = false;
   for (const m of body.matchAll(/(\d{1,2}(?:\.\d)?)%\s*(?:\[\[Community Strong Australia[^\]]*\]\]|CSA\b|Others?\b)/gi)) { oth += parseFloat(m[1]); any = true; }
   return any ? { ind, oth: Math.round(oth * 10) / 10 } : { ind, oth: null };
 }
 
+/* The Others cell's footnote, where the table carries one: since Sep 2026
+   Wikipedia prints ONE "Others" column and moves the split into an efn —
+   "7% [[Independent politicians in Australia|Independent]], 2% [[Community
+   Strong Australia]] and 5% Other". Tracker convention for this series is
+   ind = Independents, oth = everything else (CSA + Other), so the footnote
+   is read off the RAW chunk before wikiCells strips templates. efns
+   resolves the elided names (see wikiEfns); as a last resort the name's
+   own digits ("5ind6oth") supply the split, always verified against the
+   printed Others cell at wikiPrims. */
+function wikiOthersSplit(chunk, efns = null) {
+  const inline = chunk.match(/\{\{efn\|[^{}]*?(\d{1,2}(?:\.\d)?)%\s*(?:\[\[[^\]]*Independent[^\]]*\]\]|Independents?)[^{}]*\}\}/i);
+  if (inline) {
+    const ind = parseFloat(inline[1]);
+    let oth = 0, any = false;
+    for (const m of inline[0].matchAll(/(\d{1,2}(?:\.\d)?)%\s*(?:\[\[Community Strong Australia[^\]]*\]\]|CSA\b|Others?\b)/gi)) { oth += parseFloat(m[1]); any = true; }
+    if (any) return { ind, oth: Math.round(oth * 10) / 10 };
+    return { ind, oth: null };
+  }
+  if (efns) {
+    for (const m of chunk.matchAll(/\{\{efn\|name\s*=\s*([^|}]+)\s*\}\}/gi)) {
+      const body = efns(m[1]);
+      const split = body ? othersSplitFromBody(body) : null;
+      if (split) return split;
+      const digits = m[1].match(/^(\d{1,2}(?:\.\d)?)ind(\d{1,2}(?:\.\d)?)oth$/i);
+      if (digits) return { ind: parseFloat(digits[1]), oth: parseFloat(digits[2]) };
+    }
+  }
+  return null;
+}
+
+// Since Oct 2026 the table splits the Coalition vote into LIB and NAT
+// columns; polls whose print excludes LNP (Qld) carry its share in an efn
+// on the LIB cell — "{{efn|name=4lnp|4% for the [[Liberal National Party of
+// Queensland]] vote distributed between both Liberal and National}}". The
+// coalition total is LIB + NAT + that share (polls.json canon checks it:
+// 2026-01-27 20 = 14+2+4). Body text beats the name slug; both are verified
+// by the row sum at wikiPrims.
+function wikiLnpQld(chunk, efns = null) {
+  const body = chunk.match(/\{\{efn\|[^{}]*?(\d{1,2}(?:\.\d)?)% for the \[\[Liberal National Party/i)
+    ?? chunk.match(/\{\{efn\|[^{}]*?(\d{1,2}(?:\.\d)?)% for the .*?Liberal National Party/i);
+  if (body) return parseFloat(body[1]);
+  for (const m of chunk.matchAll(/\{\{efn\|name\s*=\s*([^|}]+)\s*\}\}/gi)) {
+    if (efns) {
+      const b = efns(m[1]);
+      const bm = b && b.match(/(\d{1,2}(?:\.\d)?)%\s+(?:for the )?(?:\[\[[^\]]*\]\]\s*)*of Queensland/i);
+      if (bm) return parseFloat(bm[1]);
+    }
+    const digits = m[1].match(/^(\d{1,2}(?:\.\d)?)lnp$/i);
+    if (digits) return parseFloat(digits[1]);
+  }
+  return 0;
+}
+
+// Legacy rows fold undecideds into the Others cell, noted as
+// "{{efn|name=und7|7% undecided}}" — 2025-09-30 canon keeps the printed 14
+// (34+27+12+12+8+14 = 107; the 7 means the decided share sums 100).
+function wikiUndecided(chunk, efns = null) {
+  const inline = chunk.match(/\{\{efn\|[^{}]*?(\d{1,2}(?:\.\d)?)%\s*[Uu]ndecided[^{}]*\}\}/i);
+  if (inline) return parseFloat(inline[1]);
+  for (const m of chunk.matchAll(/\{\{efn\|name\s*=\s*([^|}]+)\s*\}\}/gi)) {
+    if (efns) {
+      const b = efns(m[1]);
+      const bm = b && b.match(/(\d{1,2}(?:\.\d)?)%\s*[Uu]ndecided/i);
+      if (bm) return parseFloat(bm[1]);
+    }
+    const digits = m[1].match(/^und(\d{1,2}(?:\.\d)?)$/i);
+    if (digits) return parseFloat(digits[1]);
+  }
+  return 0;
+}
+
 // The Coalition shares one colspan cell in this series (form A: six
 // primary cells, IND and OTH separate — the layout until Sep 2026); tolerate
-// pollsters' lib/lnp/nat triple (form B); and since Sep 2026 form C: FIVE
-// cells with IND+OTH merged into "Others", split by footnote (wikiOthersSplit).
-function wikiPrims(tokens, split = null) {
+// pollsters' lib/lnp/nat triple (form B); since Sep 2026 form C: FIVE
+// cells with IND+OTH merged into "Others", split by footnote
+// (wikiOthersSplit); and since Oct 2026 form D: SIX cells with the Coalition
+// SPLIT into LIB and NAT columns ("Others" still merged + footnote), plus a
+// 3-column 2PP block (the third column is the ALP-v-ONP continuation row —
+// the first two 2PP cells remain the ALP-v-Coalition pair). Form D needs
+// the split evidence (the merged Others footnote) to fire, so a legacy
+// six-cell row keeps reading as form A. The LNP (Qld) share, when the
+// pollster's print excludes it, rides an efn on the LIB cell (wikiLnpQld)
+// and joins the coalition total; a legacy row carrying undecided inside
+// Others reads as form A with the undecided share backing off the sum.
+// extras = {split, lnpq, und} from the chunk's efns.
+function wikiPrims(tokens, extras = {}) {
+  const { split = null, lnpq = 0, und = 0 } = extras;
   if (tokens.length >= 5) {
     const p = tokens.slice(0, 5);
     if (p.every((v) => v != null) && near100(p.reduce((a, b) => a + b, 0))) {
@@ -879,8 +1003,19 @@ function wikiPrims(tokens, split = null) {
   }
   if (tokens.length >= 6) {
     const p = tokens.slice(0, 6);
-    if (p.every((v) => v != null) && near100(p.reduce((a, b) => a + b, 0)))
-      return { alp: p[0], lnp: p[1], grn: p[2], onp: p[3], ind: p[4], oth: p[5], used: 6 };
+    if (p.every((v) => v != null)) {
+      const raw = p.reduce((a, b) => a + b, 0);
+      // form D: ALP LIB NAT GRN ONP OTH(merged, efn-split) — lnp = LIB+NAT+lnpQ
+      if (split && split.ind != null && split.oth != null && Math.abs(split.ind + split.oth - p[5]) <= 0.6) {
+        const lnp = Math.round((p[1] + p[2] + lnpq) * 10) / 10;
+        if (near100(p[0] + lnp + p[3] + p[4] + p[5]))
+          return { alp: p[0], lnp, grn: p[3], onp: p[4], ind: split.ind, oth: split.oth, used: 6 };
+      }
+      // form A: ALP LNP GRN ONP IND OTH as printed (und covers legacy rows
+      // whose Others cell still folds in the undecided share)
+      if (near100(raw) || (und > 0 && near100(raw - und)))
+        return { alp: p[0], lnp: p[1], grn: p[2], onp: p[3], ind: p[4], oth: p[5], used: 6 };
+    }
   }
   if (tokens.length >= 8) {
     const coal = tokens.slice(1, 4).filter((v) => v != null);
@@ -894,7 +1029,7 @@ function wikiPrims(tokens, split = null) {
   return null;
 }
 
-function waveFromCells(cells, split = null) {
+function waveFromCells(cells, extras = {}) {
   const si = cells.findIndex((c) => !c.hdr && /^\d[\d,]{2,}$/.test(c.content));
   if (si < 0) return { fail: "no sample cell" };
   const sample = +cells[si].content.replace(/,/g, "");
@@ -906,7 +1041,7 @@ function waveFromCells(cells, split = null) {
     else return { fail: `unexpected cell "${c.content.slice(0, 40)}"` };
     if (tokens.length >= 11) break;
   }
-  const prims = wikiPrims(tokens, split);
+  const prims = wikiPrims(tokens, extras);
   if (!prims) return { fail: `primaries don't sum ~100 [${tokens.join(",")}]` };
   const [ta, tb] = tokens.slice(prims.used, prims.used + 2);
   const tpp = ta != null && tb != null && Math.abs(ta + tb - 100) <= 2
@@ -918,6 +1053,7 @@ function waveFromCells(cells, split = null) {
 
 function parseWikiYouGov(text) {
   const out = [], unparsed = [];
+  const efns = wikiEfns(text);
   let year = null, inVi = false;
   for (const chunk of text.split(/^\|-[^\n]*$/m)) {
     for (const h of chunk.matchAll(/^={2,4}\s*([^=]+?)\s*={2,4}\s*$/gm)) {
@@ -940,7 +1076,11 @@ function parseWikiYouGov(text) {
     const dd = cells.find((c) => parseWikiDate(c.content, year));
     if (!dd) { unparsed.push("no parseable date cell"); continue; }
     const fw = parseWikiDate(dd.content, year);
-    const w = waveFromCells(cells, wikiOthersSplit(chunk));
+    const w = waveFromCells(cells, {
+      split: wikiOthersSplit(chunk, efns),
+      lnpq: wikiLnpQld(chunk, efns),
+      und: wikiUndecided(chunk, efns),
+    });
     if (w.fail) { unparsed.push(`${fw.date}: ${w.fail}`); continue; }
     out.push({ ...fw, sample: w.sample, url, client, vi: w.vi });
   }
@@ -990,7 +1130,7 @@ const readOr = (f) => { try { return readFileSync(f, "utf8"); } catch { return n
 // --------------------------------------------------------------- entry
 // N24_LIB=1: import the parsers and guards (tests, the layout healer's
 // acceptance step) without running the extraction.
-export { parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells, guard, n24ConflictPlan, n24KeepHand, n24Prefer, n24PrevWave, news24Sat, parseSatisfaction, WIKI_RAW };
+export { parseWikiYouGov, wikiOthersSplit, wikiEfns, wikiLnpQld, wikiUndecided, waveFromCells, wikiCells, guard, n24ConflictPlan, n24KeepHand, n24Prefer, n24PrevWave, news24Sat, parseSatisfaction, WIKI_RAW };
 if (!process.env.N24_LIB) {
 const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [], releaseFilled: [], warnings: [] };
 
