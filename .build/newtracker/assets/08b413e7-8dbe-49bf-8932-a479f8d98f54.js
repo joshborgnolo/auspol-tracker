@@ -146,9 +146,12 @@ function straightPath(pts, sx, sy) {
  *            window can only describe one of them. `wipe` is how much of the line has been
  *            ERASED from the left, 0..1 – a line that has nowhere to travel to
  *            when the chart changes question is rubbed out rather than dimmed
- *  scatter: [{ x, y, color, meta, shape?, label? }]  shape is "triangle" or
+ *  scatter: [{ x, y, color, meta, shape?, label?, sub? }]  shape is "triangle" or
  *           "diamond"; anything else (or absent) is a circle. Only reach for
- *           one when two clouds on the same chart share a colour.
+ *           one when two clouds on the same chart share a colour. `sub`
+ *           replaces the tooltip's default "n = …" line (the primary-vote
+ *           panel's group view, whose dots rest on a subsample, not the
+ *           poll's full n).
  *  yTicks:  [numbers]   xTicks: [{x,label}]
  *  refLines:[{y,label?,color?,labelColor?,align?}]  color paints the hairline,
  *           labelColor the text (defaults to --ink-3 – see the label below)
@@ -963,7 +966,7 @@ function TrendChart(props) {
         { label: dot.label || "2PP", value: fmt(dot.y, dot) + unit, color: dot.color },
         { label: dot.meta.dateLabel ? "Field" : "", value: dot.meta.dateLabel || "" },
       ].filter((r) => r.label),
-      sub: dot.meta.sample ? `n = ${dot.meta.sample.toLocaleString()}` : "",
+      sub: dot.sub || (dot.meta.sample ? `n = ${dot.meta.sample.toLocaleString()}` : ""),
       hint: openable ? "Click to open this poll in All polls" : "",
     };
   } else if (hover && hoverX != null) {

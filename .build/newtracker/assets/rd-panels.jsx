@@ -238,7 +238,11 @@ function RdPrimary({ rangeId, setRangeId }) {
       if (!M) return [];
       return parts.map((p) => {
         const i = GRPV_KEYS.indexOf(p.id);
-        return { x: q.x, y: M[p.id] + (gv[i] - tt[i]), gv: gv[i], color: p.color, label: p.name, meta: q, party: p.id };
+        // the group's estimated subsample (gen-data's wave n × the group's
+        // share of voters) overrides the tip's whole-wave n, as the rug does
+        const subn = q.grp.n && q.grp.n[gi];
+        return { x: q.x, y: M[p.id] + (gv[i] - tt[i]), gv: gv[i], color: p.color, label: p.name, meta: q, party: p.id,
+                 sub: subn ? "n ≈ " + subn.toLocaleString() : undefined };
       });
     }), [T, G, xDomain[0], xDomain[1]]);
   const shownScatter = React.useMemo(() => scatter.map((d) => (hidden[d.party] ? { ...d, op: 0 } : d)), [scatter, hidden]);

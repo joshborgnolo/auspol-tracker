@@ -2730,12 +2730,16 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
     const sh = h[st.id] && h[st.id][g];
     return sh ? ["alp", "lnp", "grn", "onp", "oth"].map((k) => r1(sh[k])) : null;
   });
-  while (v.length && v[v.length - 1] == null) v.pop();
+  /* each group's subsample size, estimated exactly the wv rug's way (rowN
+     times the group's rough share of voters), so a group-view poll dot's
+     tooltip can say how many respondents its figure rests on */
+  const n = DEMO_GROUPS.map((g) => Math.round(rowN(p) * DEMO_SHARE[g]));
+  while (v.length && v[v.length - 1] == null) { v.pop(); n.pop(); }
   const tot = demoTotalOf(w, p);
   const d = Object.fromEntries(DEMO_RAW_DIMS.filter((k) => w.dims && w.dims[k]).map((k) => [k,
     Object.entries(w.dims[k]).map(([g, s]) => [g, ["alp", "lnp", "grn", "onp", "oth"].map((q) => (s[q] != null ? r1(+s[q]) : null))])]));
   if (v.some(Boolean)) DEMO_BY_POLL.set(p.date + "|" + p.pollster,
-    { r: w.read, v, d, ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => r1(tot[k])) } : {}) });
+    { r: w.read, v, d, n, ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => r1(tot[k])) } : {}) });
 }
 
 /* ---- 6. individual polls (full archive) -------------------------------- */

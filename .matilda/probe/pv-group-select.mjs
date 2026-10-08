@@ -23,7 +23,8 @@
           group-vs-all-voters gap) but its tooltip must tip the figure the
           wave PRINTED, the .rd-note under the chart must disclose the lift,
           and the copy-card caption must not say the bare "Each dot is one
-          poll" (2026-10-08) */
+          poll" (2026-10-08); the tooltip's sample line must read
+          "n ≈ …" — the group's estimated subsample (2026-10-08) */
 import { createServer } from "node:http";
 import { readFile, writeFile } from "node:fs/promises";
 import { extname, join } from "node:path";
@@ -379,18 +380,20 @@ const hoverTip = async (selValue, groupLabel) => {
         const KEYS = ["alp", "lnp", "grn", "onp", "oth"];
         const pi = partyRow ? KEYS.findIndex((k) => (k === "oth" ? "Others & independents" : D.PARTIES[k].name) === partyRow.label) : -1;
         const q = D.individualPolls.find((x) => x.pollster === title && x.dateLabel === field);
-        let printed = null;
+        let printed = null, expectSub = null;
         if (q && pi >= 0) {
           if (gLabel) {
             const gi = D.demoGroups.indexOf(gLabel);
             if (q.grp && q.grp.v && q.grp.v[gi]) printed = q.grp.v[gi][pi].toFixed(1);
-          } else if (q.p) printed = q.p[KEYS[pi]].toFixed(1);
+            if (q.grp && q.grp.n && q.grp.n[gi] != null) expectSub = "n ≈ " + q.grp.n[gi].toLocaleString();
+          } else if (q.p) { printed = q.p[KEYS[pi]].toFixed(1); expectSub = q.sample ? "n = " + q.sample.toLocaleString() : null; }
         }
+        const sub = ((t.querySelector(".tip-sub") || {}).textContent || "").trim() || null;
         const note = sec.querySelector(".rd-pv-chart .rd-note");
         let caption = null;
         const cd = sec.querySelector(".rd-pv-chart .chart[data-copy]");
         if (cd) { try { caption = JSON.parse(cd.getAttribute("data-copy")).caption; } catch {} }
-        return { title, partyRow, field, printed, noteText: note ? note.textContent : null, caption };
+        return { title, partyRow, field, printed, expectSub, sub, noteText: note ? note.textContent : null, caption };
       }, groupLabel);
     } catch {}
   }
@@ -406,6 +409,9 @@ for (const { view, group } of [{ view: "Gen Z", group: "Gen Z" }, { view: "Renti
   if (got && got.partyRow) {
     ok(`${name}: tip value is the printed figure`, got.printed != null && got.partyRow.value === got.printed,
       `tip ${got.partyRow.value} vs printed ${got.printed} (${got.title}, ${got.field})`);
+    ok(`${name}: sample line is ${group ? "the group's estimated subsample" : "the poll's own n"}`,
+      got.expectSub != null && got.sub === got.expectSub,
+      `tip "${got.sub}" vs expected "${got.expectSub}" (${got.title}, ${got.field})`);
   }
   if (group) {
     ok(`${name}: lift note under the chart`, !!got && !!got.noteText && got.noteText.includes("own all-voters figure") && got.noteText.includes("Demographics"),
