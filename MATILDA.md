@@ -349,7 +349,14 @@ relevant one before touching an area. Most load-bearing:
 3. Never weaken extractor guard checks.
 4. Pollster copy/methodology text often lives in 2–4 places that must move
    together — check the relevant skill before editing copy.
-5. An LLM may LOCATE evidence but never supply a figure on the filing
+5. The classic design (`?design=old`, the `rd === false` branches gated in
+   the `73de0c58` asset ~:2108) is ARCHIVED — frozen 2026-10-08, kept
+   reachable for comparison only. Make no copy, layout, or data-display
+   updates to it: changes land in the redesign paths alone, and the
+   rule-4 "move together" conventions never include the old design. (The
+   hashed assets still serve the redesign — archived is the `rd ===
+   false` branches, not those files.)
+6. An LLM may LOCATE evidence but never supply a figure on the filing
    path: every number it touches is re-read from the cited text and
    verified deterministically before it can land (see LLM READERS);
    weakening that verification IS weakening a guard check (rule 3).

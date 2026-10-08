@@ -2111,6 +2111,12 @@ function App() {
      "old" from before the unwiring cannot stick anyone to it). Its code
      stays in the branches below that read this flag, and a ?design=old
      query visits it for one load - for checking one against the other.
+     ---- ARCHIVED 2026-10-08 (user call): the old view is a frozen
+     record. ?design=old pages stay reachable for comparison, but nothing
+     behind rd === false is maintained from here on - copy, layout and
+     data-display work happens in the redesign paths alone, and the two
+     designs are never kept in sync. (Do not remove: no reader can be
+     stuck on it, and the branches keep the comparison reachable.)
      Every component reads the flag off window.AP while rendering, so the
      whole tree re-reads it when App re-renders - the views below are
      keyed on it and remount. */

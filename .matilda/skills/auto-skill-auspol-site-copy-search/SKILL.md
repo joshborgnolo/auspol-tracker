@@ -1,5 +1,10 @@
 # Locating user-facing copy in auspol-tracker (grep recipe)
 
+> **The classic design is ARCHIVED (frozen 2026-10-08)** — the `rd ===
+> false` branches reachable via `?design=old` (MATILDA.md rule 5). A copy
+> string that exists in both designs needs editing in the redesign path
+> only; leave the old-design copy exactly as it stands.
+
 Worked 2026-09-27 during the `turned out` → `ousted` rename: a naive
 workspace-wide grep for a copy string printed tens of thousands of OCR
 words before the live source turned up. The drill below finds copy's true
