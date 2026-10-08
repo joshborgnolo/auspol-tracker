@@ -1,0 +1,681 @@
+{
+  "_about": "ABS 2021 Census CED structure — code to division name, parsed from 2021Census_geog_desc_1st_2nd_3rd_release.xlsx (sheet 2021_ASGS_Non_ABS_Structures) inside https://www.abs.gov.au/census/find-census-data/datapacks/download/2021_GCP_CED_for_AUS_short-header.zip. 94x/97x codes are Migratory/No-usual-address padding rows, kept for provenance, excluded from the frame. State = ABS STE digit (1 NSW … 7 NT, 8 ACT).",
+  "divisions": [
+    {
+      "code": "CED101",
+      "name": "Banks"
+    },
+    {
+      "code": "CED102",
+      "name": "Barton"
+    },
+    {
+      "code": "CED103",
+      "name": "Bennelong"
+    },
+    {
+      "code": "CED104",
+      "name": "Berowra"
+    },
+    {
+      "code": "CED105",
+      "name": "Blaxland"
+    },
+    {
+      "code": "CED106",
+      "name": "Bradfield"
+    },
+    {
+      "code": "CED107",
+      "name": "Calare"
+    },
+    {
+      "code": "CED108",
+      "name": "Chifley"
+    },
+    {
+      "code": "CED109",
+      "name": "Cook"
+    },
+    {
+      "code": "CED110",
+      "name": "Cowper"
+    },
+    {
+      "code": "CED111",
+      "name": "Cunningham"
+    },
+    {
+      "code": "CED112",
+      "name": "Dobell"
+    },
+    {
+      "code": "CED113",
+      "name": "Eden-Monaro"
+    },
+    {
+      "code": "CED114",
+      "name": "Farrer"
+    },
+    {
+      "code": "CED115",
+      "name": "Fowler"
+    },
+    {
+      "code": "CED116",
+      "name": "Gilmore"
+    },
+    {
+      "code": "CED117",
+      "name": "Grayndler"
+    },
+    {
+      "code": "CED118",
+      "name": "Greenway"
+    },
+    {
+      "code": "CED119",
+      "name": "Hughes"
+    },
+    {
+      "code": "CED120",
+      "name": "Hume"
+    },
+    {
+      "code": "CED121",
+      "name": "Hunter"
+    },
+    {
+      "code": "CED122",
+      "name": "Kingsford Smith"
+    },
+    {
+      "code": "CED123",
+      "name": "Lindsay"
+    },
+    {
+      "code": "CED124",
+      "name": "Lyne"
+    },
+    {
+      "code": "CED125",
+      "name": "Macarthur"
+    },
+    {
+      "code": "CED126",
+      "name": "Mackellar"
+    },
+    {
+      "code": "CED127",
+      "name": "Macquarie"
+    },
+    {
+      "code": "CED128",
+      "name": "McMahon"
+    },
+    {
+      "code": "CED129",
+      "name": "Mitchell"
+    },
+    {
+      "code": "CED130",
+      "name": "New England"
+    },
+    {
+      "code": "CED131",
+      "name": "Newcastle"
+    },
+    {
+      "code": "CED132",
+      "name": "North Sydney"
+    },
+    {
+      "code": "CED133",
+      "name": "Page"
+    },
+    {
+      "code": "CED134",
+      "name": "Parkes"
+    },
+    {
+      "code": "CED135",
+      "name": "Parramatta"
+    },
+    {
+      "code": "CED136",
+      "name": "Paterson"
+    },
+    {
+      "code": "CED137",
+      "name": "Reid"
+    },
+    {
+      "code": "CED138",
+      "name": "Richmond"
+    },
+    {
+      "code": "CED139",
+      "name": "Riverina"
+    },
+    {
+      "code": "CED140",
+      "name": "Robertson"
+    },
+    {
+      "code": "CED141",
+      "name": "Shortland"
+    },
+    {
+      "code": "CED142",
+      "name": "Sydney"
+    },
+    {
+      "code": "CED143",
+      "name": "Warringah"
+    },
+    {
+      "code": "CED144",
+      "name": "Watson"
+    },
+    {
+      "code": "CED145",
+      "name": "Wentworth"
+    },
+    {
+      "code": "CED146",
+      "name": "Werriwa"
+    },
+    {
+      "code": "CED147",
+      "name": "Whitlam"
+    },
+    {
+      "code": "CED194",
+      "name": "No usual address (NSW)"
+    },
+    {
+      "code": "CED197",
+      "name": "Migratory - Offshore - Shipping (NSW)"
+    },
+    {
+      "code": "CED201",
+      "name": "Aston"
+    },
+    {
+      "code": "CED202",
+      "name": "Ballarat"
+    },
+    {
+      "code": "CED203",
+      "name": "Bendigo"
+    },
+    {
+      "code": "CED204",
+      "name": "Bruce"
+    },
+    {
+      "code": "CED205",
+      "name": "Calwell"
+    },
+    {
+      "code": "CED206",
+      "name": "Casey"
+    },
+    {
+      "code": "CED207",
+      "name": "Chisholm"
+    },
+    {
+      "code": "CED208",
+      "name": "Cooper"
+    },
+    {
+      "code": "CED209",
+      "name": "Corangamite"
+    },
+    {
+      "code": "CED210",
+      "name": "Corio"
+    },
+    {
+      "code": "CED211",
+      "name": "Deakin"
+    },
+    {
+      "code": "CED212",
+      "name": "Dunkley"
+    },
+    {
+      "code": "CED213",
+      "name": "Flinders"
+    },
+    {
+      "code": "CED214",
+      "name": "Fraser"
+    },
+    {
+      "code": "CED215",
+      "name": "Gellibrand"
+    },
+    {
+      "code": "CED216",
+      "name": "Gippsland"
+    },
+    {
+      "code": "CED217",
+      "name": "Goldstein"
+    },
+    {
+      "code": "CED218",
+      "name": "Gorton"
+    },
+    {
+      "code": "CED219",
+      "name": "Hawke"
+    },
+    {
+      "code": "CED220",
+      "name": "Higgins"
+    },
+    {
+      "code": "CED221",
+      "name": "Holt"
+    },
+    {
+      "code": "CED222",
+      "name": "Hotham"
+    },
+    {
+      "code": "CED223",
+      "name": "Indi"
+    },
+    {
+      "code": "CED224",
+      "name": "Isaacs"
+    },
+    {
+      "code": "CED225",
+      "name": "Jagajaga"
+    },
+    {
+      "code": "CED226",
+      "name": "Kooyong"
+    },
+    {
+      "code": "CED227",
+      "name": "La Trobe"
+    },
+    {
+      "code": "CED228",
+      "name": "Lalor"
+    },
+    {
+      "code": "CED229",
+      "name": "Macnamara"
+    },
+    {
+      "code": "CED230",
+      "name": "Mallee"
+    },
+    {
+      "code": "CED231",
+      "name": "Maribyrnong"
+    },
+    {
+      "code": "CED232",
+      "name": "McEwen"
+    },
+    {
+      "code": "CED233",
+      "name": "Melbourne"
+    },
+    {
+      "code": "CED234",
+      "name": "Menzies"
+    },
+    {
+      "code": "CED235",
+      "name": "Monash"
+    },
+    {
+      "code": "CED236",
+      "name": "Nicholls"
+    },
+    {
+      "code": "CED237",
+      "name": "Scullin"
+    },
+    {
+      "code": "CED238",
+      "name": "Wannon"
+    },
+    {
+      "code": "CED239",
+      "name": "Wills"
+    },
+    {
+      "code": "CED294",
+      "name": "No usual address (Vic.)"
+    },
+    {
+      "code": "CED297",
+      "name": "Migratory - Offshore - Shipping (Vic.)"
+    },
+    {
+      "code": "CED301",
+      "name": "Blair"
+    },
+    {
+      "code": "CED302",
+      "name": "Bonner"
+    },
+    {
+      "code": "CED303",
+      "name": "Bowman"
+    },
+    {
+      "code": "CED304",
+      "name": "Brisbane"
+    },
+    {
+      "code": "CED305",
+      "name": "Capricornia"
+    },
+    {
+      "code": "CED306",
+      "name": "Dawson"
+    },
+    {
+      "code": "CED307",
+      "name": "Dickson"
+    },
+    {
+      "code": "CED308",
+      "name": "Fadden"
+    },
+    {
+      "code": "CED309",
+      "name": "Fairfax"
+    },
+    {
+      "code": "CED310",
+      "name": "Fisher"
+    },
+    {
+      "code": "CED311",
+      "name": "Flynn"
+    },
+    {
+      "code": "CED312",
+      "name": "Forde"
+    },
+    {
+      "code": "CED313",
+      "name": "Griffith"
+    },
+    {
+      "code": "CED314",
+      "name": "Groom"
+    },
+    {
+      "code": "CED315",
+      "name": "Herbert"
+    },
+    {
+      "code": "CED316",
+      "name": "Hinkler"
+    },
+    {
+      "code": "CED317",
+      "name": "Kennedy"
+    },
+    {
+      "code": "CED318",
+      "name": "Leichhardt"
+    },
+    {
+      "code": "CED319",
+      "name": "Lilley"
+    },
+    {
+      "code": "CED320",
+      "name": "Longman"
+    },
+    {
+      "code": "CED321",
+      "name": "Maranoa"
+    },
+    {
+      "code": "CED322",
+      "name": "McPherson"
+    },
+    {
+      "code": "CED323",
+      "name": "Moncrieff"
+    },
+    {
+      "code": "CED324",
+      "name": "Moreton"
+    },
+    {
+      "code": "CED325",
+      "name": "Oxley"
+    },
+    {
+      "code": "CED326",
+      "name": "Petrie"
+    },
+    {
+      "code": "CED327",
+      "name": "Rankin"
+    },
+    {
+      "code": "CED328",
+      "name": "Ryan"
+    },
+    {
+      "code": "CED329",
+      "name": "Wide Bay"
+    },
+    {
+      "code": "CED330",
+      "name": "Wright"
+    },
+    {
+      "code": "CED394",
+      "name": "No usual address (Qld)"
+    },
+    {
+      "code": "CED397",
+      "name": "Migratory - Offshore - Shipping (Qld)"
+    },
+    {
+      "code": "CED401",
+      "name": "Adelaide"
+    },
+    {
+      "code": "CED402",
+      "name": "Barker"
+    },
+    {
+      "code": "CED403",
+      "name": "Boothby"
+    },
+    {
+      "code": "CED404",
+      "name": "Grey"
+    },
+    {
+      "code": "CED405",
+      "name": "Hindmarsh"
+    },
+    {
+      "code": "CED406",
+      "name": "Kingston"
+    },
+    {
+      "code": "CED407",
+      "name": "Makin"
+    },
+    {
+      "code": "CED408",
+      "name": "Mayo"
+    },
+    {
+      "code": "CED409",
+      "name": "Spence"
+    },
+    {
+      "code": "CED410",
+      "name": "Sturt"
+    },
+    {
+      "code": "CED494",
+      "name": "No usual address (SA)"
+    },
+    {
+      "code": "CED497",
+      "name": "Migratory - Offshore - Shipping (SA)"
+    },
+    {
+      "code": "CED501",
+      "name": "Brand"
+    },
+    {
+      "code": "CED502",
+      "name": "Burt"
+    },
+    {
+      "code": "CED503",
+      "name": "Canning"
+    },
+    {
+      "code": "CED504",
+      "name": "Cowan"
+    },
+    {
+      "code": "CED505",
+      "name": "Curtin"
+    },
+    {
+      "code": "CED506",
+      "name": "Durack"
+    },
+    {
+      "code": "CED507",
+      "name": "Forrest"
+    },
+    {
+      "code": "CED508",
+      "name": "Fremantle"
+    },
+    {
+      "code": "CED509",
+      "name": "Hasluck"
+    },
+    {
+      "code": "CED510",
+      "name": "Moore"
+    },
+    {
+      "code": "CED511",
+      "name": "O'Connor"
+    },
+    {
+      "code": "CED512",
+      "name": "Pearce"
+    },
+    {
+      "code": "CED513",
+      "name": "Perth"
+    },
+    {
+      "code": "CED514",
+      "name": "Swan"
+    },
+    {
+      "code": "CED515",
+      "name": "Tangney"
+    },
+    {
+      "code": "CED594",
+      "name": "No usual address (WA)"
+    },
+    {
+      "code": "CED597",
+      "name": "Migratory - Offshore - Shipping (WA)"
+    },
+    {
+      "code": "CED601",
+      "name": "Bass"
+    },
+    {
+      "code": "CED602",
+      "name": "Braddon"
+    },
+    {
+      "code": "CED603",
+      "name": "Clark"
+    },
+    {
+      "code": "CED604",
+      "name": "Franklin"
+    },
+    {
+      "code": "CED605",
+      "name": "Lyons"
+    },
+    {
+      "code": "CED694",
+      "name": "No usual address (Tas.)"
+    },
+    {
+      "code": "CED697",
+      "name": "Migratory - Offshore - Shipping (Tas.)"
+    },
+    {
+      "code": "CED701",
+      "name": "Lingiari"
+    },
+    {
+      "code": "CED702",
+      "name": "Solomon"
+    },
+    {
+      "code": "CED794",
+      "name": "No usual address (NT)"
+    },
+    {
+      "code": "CED797",
+      "name": "Migratory - Offshore - Shipping (NT)"
+    },
+    {
+      "code": "CED801",
+      "name": "Bean"
+    },
+    {
+      "code": "CED802",
+      "name": "Canberra"
+    },
+    {
+      "code": "CED803",
+      "name": "Fenner"
+    },
+    {
+      "code": "CED894",
+      "name": "No usual address (ACT)"
+    },
+    {
+      "code": "CED897",
+      "name": "Migratory - Offshore - Shipping (ACT)"
+    },
+    {
+      "code": "CED994",
+      "name": "No usual address (OT)"
+    },
+    {
+      "code": "CED997",
+      "name": "Migratory - Offshore - Shipping (OT)"
+    }
+  ]
+}

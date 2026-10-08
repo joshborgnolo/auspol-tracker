@@ -38,3 +38,6 @@ node_modules/
 
 # Babel reprint cache for the site build (content-addressed; safe to delete)
 .build/newtracker/.transpile-cache/
+
+# ABS census datapack cache for the W1 census-frame extractor (re-fetch with --fetch)
+.build/analysis/seat-model/cache/
