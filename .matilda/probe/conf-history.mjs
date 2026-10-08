@@ -120,7 +120,7 @@ check("back to term", s2, { found: true, boundary: false, histLabel: true, backL
    same kernel the monthly gauges get — a curve path, not straight
    segments) and DOTTED in its house's colour; the consumer twin is the
    gold Westpac–MI read of the same year. The business view stays
-   single — NAB's long series is a different measure and never joins. */
+   single — the term board carries Roy Morgan alone, no NAB twin. */
 const seriesInfo = (id) => page.evaluate((sid) => {
   const sec = document.getElementById("confidence");
   const p = [...sec.querySelectorAll("svg path")].find((el) =>
@@ -168,7 +168,7 @@ if (s2.found && s2.drawTerm) {
       if (bm.dash !== "0.1 3.6") fails.push("business 2019: main line not dotted: dash=" + bm.dash);
       if (!bm.curve) fails.push("business 2019: main line not a smoothed curve");
     }
-    if (bt) fails.push("business 2019: unexpected twin (NAB has no same-basis deep series)");
+    if (bt) fails.push("business 2019: unexpected twin (the business board draws no twin)");
     if (bm && !bt && bm.dash === "0.1 3.6" && bm.curve) console.log("business 2019: single dotted smoothed plum term line, no twin — ok");
   } else fails.push("2019 term button not found on the business board");
 }

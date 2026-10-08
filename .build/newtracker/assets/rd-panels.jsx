@@ -3927,8 +3927,8 @@ function RdConfidence({ rangeId }) {
      §5l's D.confDeep payload), the live dots and smooth re-run over the
      lane's WHOLE release file instead of the elected-term window, and the
      deep monthly rows draw as a lighter line joining the tail into the
-     past. NAB's deep series never joins (a conditions deviation, another
-     basis), so its lane just widens to its own release file. */
+     past. NAB's deep net-balance series joins from Mar 1997 (§5l); only
+     NAB's conditions DEVIATION stays on disk — another basis. */
   const [hist, setHist] = useState(false);
   const deepPoints = new Map((D.confDeep ? viewLanes.filter((l) => (D.confDeep[l.k] || []).length > 1) : []).map((l) => {
     const live0 = l.s.polls[0].x;
@@ -4205,8 +4205,8 @@ function RdConfidence({ rangeId }) {
     altKey: "NAB’s net-balance read, drawn 100 points up",
     copyTitle: "Business confidence (two gauges)",
     copySub: head + " Two published business gauges on one 100-neutral scale: Roy Morgan’s monthly business confidence index and NAB’s Monthly Business Survey.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its gold line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. The band pools the Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. A drawn past term is Roy Morgan’s line alone — smoothed like the live monthly gauge, dotted in its plum — NAB’s long series is a deviation-from-average measure, so no NAB term ever joins. No combining, no adjustment.",
-    copyHist: "Business confidence as far back as the series go, on one 100-neutral scale (NAB drawn 100 points up, as the live view draws it). The heavier lines are the smoothed trend of the live release file (each dot one release, as printed; 60-day half-life on both series); the lighter line underneath is Roy Morgan’s monthly history, from 2010. NAB’s own deep series is a deviation from average on another basis, so it never joins — its gold line widens only to its own releases. No combining, no adjustment.",
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its gold line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. The band pools the Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. A drawn past term is Roy Morgan’s line alone — smoothed like the live monthly gauge, dotted in its plum. No combining, no adjustment.",
+    copyHist: "Business confidence as far back as the series go, on one 100-neutral scale (NAB drawn 100 points up, as the live view draws it). The heavier lines are the smoothed trend of the live release file (each dot one release, as printed; 60-day half-life on both series); the lighter lines underneath are the houses’ own monthly history — Roy Morgan’s index from 2010, NAB’s printed net balance from March 1997 (two public calendar republications of NAB’s figure, merged at wire-verified seams; the pre-2009 head is sole-witness — one mirror’s record, not two-source verified). No combining, no adjustment.",
   };
   /* Election / 1 yr / 2 yrs / 3 yrs, plus Now where the sitting term
      stands — the same ruler gen-data §5k aligns the past terms on */

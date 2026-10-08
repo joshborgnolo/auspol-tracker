@@ -40,11 +40,32 @@
                 NOT the same basis as data/confidence.json's raw net-balance
                 `cond` (the difference wobbles month to month —
                 seasonal/reference effects — so no arithmetic conversion is
-                ever derived or applied). NAB business CONFIDENCE proper
-                (net balance, monthly since 1989) has no free
-                machine-readable source: the RBA is contractually barred
-                from republishing it (see the chart-pack "Data availability"
-                note) and the MI/NAB archives are paid.
+                ever derived or applied).
+     nabConfidence – NAB monthly business CONFIDENCE, the printed net-balance
+                headline (optimists minus pessimists, whole points — the
+                SAME basis as data/confidence.json's live NAB lane), Mar
+                1997 →, as two public economic-calendar republications of
+                NAB's printed figure carry it (NAB publishes no historical
+                workbook and the RBA is contractually barred from
+                republishing the series — the mirrors are the only free
+                machine-readable record). Dec 2008 – Aug 2014 comes from
+                Tradays' figure-history export, whose chain verifies
+                exactly against the contemporary wires (Crikey: Dec-08 −20,
+                Jan-09 record low −32; ibtimes: Dec-10 −3) where
+                Moneycontrol's old rows are month-mislabelled; the
+                pre-2009 head and the post-Aug-2014 tail come from
+                Moneycontrol (identical to Tradays on every shared month
+                from Sep 2014, and to the live lane across their overlap).
+                The pre-2009 head is SOLE-WITNESS — no second free source
+                reaches those years, so treat it as a mirror's
+                republication of NAB's print, not two-source verified.
+                Moneycontrol's calendar alone misses Jul 2012 – Jan 2013 —
+                the Tradays export carries those months (chain-plausible:
+                the Nov-12 −9 the press reported), so the merged lane is
+                contiguous from Mar 1997 and contiguity is demanded from
+                the start. Aug 2011 is a wire-verified override (−8,
+                SMH/AAP "dropped 10 points to be minus eight"; the mirrors
+                print −9/−7).
    Both RM pages render their tables inside __NEXT_DATA__ JSON payloads —
    the extractor reads the first YEAR×calendar-month grid on the page.
    The Roy Morgan consumer table carries footnote-marked cells
@@ -58,7 +79,8 @@
      contiguity floor broken)
    - --check computes everything, prints the status, never writes
    - --fixture-dir <dir> reads saved copies (cc.html, bc.html, h3.csv,
-     fred-cci.csv) instead of fetching (test seam)
+     fred-cci.csv, nab-tradays.tsv, nab-mc.json) instead of fetching
+     (test seam)
    - writes are atomic (.tmp + rename)
    Any failure fetching or parsing the FRED mirror is exit 1 and files
    NOTHING — the extractor never silently degrades to H3-only 2010+
@@ -86,7 +108,28 @@ const FRED_CCI_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CSCICP0
    months before it. */
 const WP_H3_FROM = "2010-01";
 
+/* NAB business CONFIDENCE mirror sources + merge seams. Tradays (MQL5's
+   economic-calendar site) serves a whole-history tab-separated export;
+   Moneycontrol's ecalendar API paginates its calendar's history (about
+   ten rows a page). The seams are fixed by wire-verification: Tradays is
+   source of record on [NAB_TR_FROM, NAB_TR_TILL) — its chain matches the
+   contemporary press figure-for-figure where Moneycontrol's old rows are
+   month-mislabelled; outside the window Tradays IS Moneycontrol (+/-
+   nothing on any shared month from Sep 2014) and Moneycontrol alone
+   reaches the 1997–2008 head, so Moneycontrol carries everything else. */
+const NAB_TRADAYS_URL = "https://www.tradays.com/en/economic-calendar/australia/nab-business-confidence/export";
+const NAB_MC_API = "https://api.moneycontrol.com/mcapi/v1/ecalendar/get-history-data?calendarId=4415070&page=";
+const NAB_MC_PAGES_MAX = 80;
+const NAB_TR_FROM = "2008-12", NAB_TR_TILL = "2014-09";
+/* Months where neither mirror is authoritative, per the contemporary
+   wire. 2011-08: SMH/AAP, 13 Sep 2011 — "dropped 10 points to be minus
+   eight in August" (mirrors print −9 and −7; the NEXT month NAB printed
+   −1, and −8 → −1 matches its "up seven points" while neither mirror
+   value does). Only ever add an override with the wire citation. */
+const NAB_OVERRIDES = { "2011-08": -8 };
+
 const MONTHS_TOK = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+const MON3 = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
 
 /* parseYearGrid(contentHtml): pull the first YEAR×JAN..DEC table out of a
    morgan-poll page-body HTML string → Map "YYYY-MM" → value. Shape guards
@@ -179,6 +222,88 @@ function parseFredCci(csvText) {
   return out;
 }
 
+/* parseTradaysNab(tsvText): the Tradays export (tab-separated
+   Date / ActualValue / ForecastValue / PreviousValue, stamps YYYY.MM.DD)
+   → Map survey-month "YYYY-MM" → NAB confidence net balance. A row names
+   its RELEASE — NAB fields in month M and prints early M+1 — so the
+   survey month is the release month minus one (a January print is last
+   December). One release month can carry two waves: Feb 2011 printed
+   both December's late wave (1 Feb, −3) and January's (8 Feb, +4) — the
+   ibtimes-verified reading, "retreated … to −3 in the final month of
+   2010". A multi-row release group is ordered by release day and
+   assigned to successive survey months walking BACK from the last row. */
+function parseTradaysNab(tsvText) {
+  const groups = new Map();   // release "YYYY.MM" → [{day, v}]
+  for (const line of tsvText.split(/\r?\n/)) {
+    const c = line.split("\t");
+    const dm = c[0] && c[0].match(/^(\d{4})\.(\d{2})\.(\d{2})$/);
+    if (!dm) continue;
+    const v = parseFloat(c[1]);
+    if (!Number.isFinite(v)) continue;
+    const key = dm[1] + "." + dm[2];
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({ day: +dm[3], v });
+  }
+  const out = new Map();
+  for (const [rel, rows] of groups) {
+    rows.sort((a, b) => a.day - b.day);
+    let [y, m] = rel.split(".").map(Number);
+    m -= 1; if (m === 0) { m = 12; y -= 1; }
+    for (let i = rows.length - 1; i >= 0; i--) {
+      out.set(`${y}-${String(m).padStart(2, "0")}`, rows[i].v);
+      m -= 1; if (m === 0) { m = 12; y -= 1; }
+    }
+  }
+  if (!out.size) throw new Error("Tradays export: zero data rows parsed");
+  return out;
+}
+
+/* parseMcNabRows(rows): Moneycontrol ecalendar history entries
+   ({date, reference, actual, ...} objects) → Map survey-month "YYYY-MM"
+   → value. Rows with an empty/garbage actual (the API's scheduled rows)
+   file nothing. The reference names the survey month three ways — bare
+   "Aug", explicit "Dec 2013", titled "Business Confidence Jun"; the LAST
+   month-name token wins. Without an explicit year, a reference month
+   after the release month belongs to the PREVIOUS year (a Jan 2014
+   release of "Dec" is Dec 2013). */
+function parseMcNabRows(rows) {
+  const out = new Map();
+  for (const r of (rows || [])) {
+    const dm = String(r.date || "").match(/^([A-Za-z]{3})[a-z]* (\d{1,2}), (\d{4})$/);
+    if (!dm) throw new Error(`Moneycontrol release date unparseable: ${JSON.stringify(r.date)}`);
+    const relM = MON3[dm[1].slice(0, 3).toLowerCase()], relY = +dm[3];
+    const raw = String(r.actual ?? "").trim();
+    if (raw === "") continue;                       // scheduled row, no print yet
+    const v = parseFloat(raw);
+    if (!Number.isFinite(v)) throw new Error(`Moneycontrol actual unparseable: ${JSON.stringify(r.actual)}`);
+    const toks = String(r.reference || "").trim().split(/\s+/);
+    let refM;
+    for (let i = toks.length - 1; i >= 0 && !refM; i--) refM = MON3[toks[i].slice(0, 3).toLowerCase()];
+    if (!refM) throw new Error(`Moneycontrol reference month unparseable: ${JSON.stringify(r.reference)}`);
+    const yTok = toks.find((t) => /^\d{4}$/.test(t));
+    const y = yTok ? +yTok : relY - (refM > relM ? 1 : 0);
+    out.set(`${y}-${String(refM).padStart(2, "0")}`, v);
+  }
+  if (!out.size) throw new Error("Moneycontrol rows: zero data rows parsed");
+  return out;
+}
+
+/* fetchMcNabHistory(): page the Moneycontrol ecalendar API until an
+   empty page, concatenating the data arrays; a loud pause between pages
+   (it's a third-party mirror, ~35 pages for the full 1997 history). */
+async function fetchMcNabHistory() {
+  const rows = [];
+  for (let page = 1; page <= NAB_MC_PAGES_MAX; page++) {
+    if (page > 1) await new Promise((r) => setTimeout(r, 400));
+    const body = await fetchWithRetry("Moneycontrol NAB history page " + page, NAB_MC_API + page);
+    const data = JSON.parse(body)?.data;
+    if (!Array.isArray(data)) throw new Error("Moneycontrol page " + page + ": no data array");
+    if (!data.length) return rows;
+    rows.push(...data);
+  }
+  return rows;
+}
+
 /* Structure + plausibility guards. Throws → exit 2. */
 function guardLane(name, map, { first, min, max, floor, contiguousFrom }) {
   const yms = [...map.keys()].sort();
@@ -226,7 +351,7 @@ function nextDataContent(html, label) {
   return content;
 }
 
-export { parseYearGrid, parseH3, parseFredCci, guardLane, nextDataContent, RM_CC_URL, RM_BC_URL, H3_CSV_URL, FRED_CCI_URL, WP_H3_FROM };
+export { parseYearGrid, parseH3, parseFredCci, parseTradaysNab, parseMcNabRows, guardLane, nextDataContent, RM_CC_URL, RM_BC_URL, H3_CSV_URL, FRED_CCI_URL, WP_H3_FROM, NAB_TRADAYS_URL, NAB_MC_API, NAB_TR_FROM, NAB_TR_TILL, NAB_OVERRIDES };
 
 if (!process.env.CONFIDENCE_HISTORY_LIB) {
   const prev = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : null;
@@ -241,6 +366,20 @@ if (!process.env.CONFIDENCE_HISTORY_LIB) {
        silently degrades to H3-only 2010+ output. Exit 1 (fetch/parse),
        NOT the exit-2 structure-guard class. */
     console.error("FRED FETCH/PARSE FAILURE: " + err.message);
+    process.exit(1);
+  }
+
+  let nabTr, nabMc;
+  try {
+    nabTr = parseTradaysNab(await grab("nab-tradays.tsv", "Tradays NAB export", NAB_TRADAYS_URL));
+    const mcRows = FIXTURE_DIR
+      ? JSON.parse(readFileSync(join(FIXTURE_DIR, "nab-mc.json"), "utf8"))?.data
+      : await fetchMcNabHistory();
+    nabMc = parseMcNabRows(mcRows);
+  } catch (err) {
+    /* Same contract as the FRED mirror above: a mirror fetch/parse
+       failure files NOTHING, exit 1. */
+    console.error("NAB MIRROR FETCH/PARSE FAILURE: " + err.message);
     process.exit(1);
   }
 
@@ -269,25 +408,40 @@ if (!process.env.CONFIDENCE_HISTORY_LIB) {
        it ever backfils a month the mirror currently covers alone. */
     const westpac = new Map([...[...fredCsi].filter(([ym]) => ym < WP_H3_FROM), ...westpacH3]);
 
+    /* NAB CONFIDENCE: Moneycontrol's republication everywhere except the
+       [NAB_TR_FROM, NAB_TR_TILL) window, where the wire-verified Tradays
+       chain is source of record (Moneycontrol's old rows there are
+       month-mislabelled — 38 figure-level diffs, none after Aug 2014).
+       The wire-override months apply last, so a mirror "revision" can
+       never silently overwrite the printed record. The overlay also
+       fills Moneycontrol's one hole (Jul 2012 – Jan 2013) from the
+       Tradays export — the merged lane is complete from Mar 1997, so
+       contiguity is demanded from the series' first month. */
+    const nabConf = new Map(nabMc);
+    for (const [ym, v] of nabTr) if (ym >= NAB_TR_FROM && ym < NAB_TR_TILL) nabConf.set(ym, v);
+    for (const [ym, v] of Object.entries(NAB_OVERRIDES)) nabConf.set(ym, v);
+
     const cc = guardLane("consumer", consumerMap, { first: "1973-03", min: 40, max: 170, floor: 550, contiguousFrom: "1987-01" });
     const bc = guardLane("business", businessMap, { first: "2010-12", min: 40, max: 170, floor: 170, contiguousFrom: "2010-12" });
     const wp = guardLane("westpacConsumer", westpac, { first: "1974-09", min: 50, max: 150, floor: 600, contiguousFrom: "1974-09" });
     const nb = guardLane("nabConditions", nabCondDev, { first: "1997-03", min: -60, max: 60, floor: 340, contiguousFrom: "1997-03" });
+    const nc = guardLane("nabConfidence", nabConf, { first: "1997-03", min: -80, max: 80, floor: 340, contiguousFrom: "1997-03" });
 
     const rowsOf = (yms, map) => yms.map((ym) => ({ ym, v: map.get(ym) }));
     doc = {
-      _about: "Deep back-history for the Snapshot's confidence series — one row per SURVEY MONTH, {ym, v}; the monthly-frequency sibling of data/confidence.json (recent months reconcile there). consumer: ANZ–Roy Morgan Consumer Confidence, Mar 1973 → (quarterly to 1986, monthly from Jan 1987), from Roy Morgan's own monthly-ratings table (roymorgan.com/morgan-poll/consumer-confidence-anz-roy-morgan-australian-cc-monthly-ratings); since Oct 2010 each month is the average of that month's weekly readings — the WEEKLY series (Aug 2008 →) is mirrored nowhere free and lives in data/confidence.json (Dec 2016 →) only. business: Roy Morgan Business Confidence, Dec 2010 → (series inception), RM's own mirror table (roymorgan.com/morgan-poll/consumer-confidence-roy-morgan-business-confidence) — the mirror can trail the newest couple of months. westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment, Sep 1974 → (series inception), two republications of the one published index: Jan 2010 → from RBA Statistical Table H3 series GICWMICS (rba.gov.au/statistics/tables), carrying MI's decimals and matching data/confidence.json's live lane 1:1 over the overlap; Sep 1974 – Dec 2009 from the OECD republication (FRED series CSCICP02AUM460S, fred.stlouisfed.org), which prints the SAME index as a net balance (index−100) rounded to whole index points — rebased +100 here, so pre-2010 months carry whole index points (±0.5 of MI's printed decimals; MI's exact-decimal 1974–2009 archive is a paid CASiE product; the extractor reconciles the mirror against H3 on every overlap month — within ±0.55 — before filing). nabConditions: NAB monthly business conditions, DEVIATION FROM LONG-RUN AVERAGE, sa, percentage points, Mar 1997 →, RBA H3 series GICNBC — never arithmetic-merge with the raw net-balance `cond` in data/confidence.json (different basis by source definition). NAB business CONFIDENCE (net balance, since 1989) has no free machine-readable source. Never hand-edit; regenerated by .build/confidence-history.mjs.",
+      _about: "Deep back-history for the Snapshot's confidence series — one row per SURVEY MONTH, {ym, v}; the monthly-frequency sibling of data/confidence.json (recent months reconcile there). consumer: ANZ–Roy Morgan Consumer Confidence, Mar 1973 → (quarterly to 1986, monthly from Jan 1987), from Roy Morgan's own monthly-ratings table (roymorgan.com/morgan-poll/consumer-confidence-anz-roy-morgan-australian-cc-monthly-ratings); since Oct 2010 each month is the average of that month's weekly readings — the WEEKLY series (Aug 2008 →) is mirrored nowhere free and lives in data/confidence.json (Dec 2016 →) only. business: Roy Morgan Business Confidence, Dec 2010 → (series inception), RM's own mirror table (roymorgan.com/morgan-poll/consumer-confidence-roy-morgan-business-confidence) — the mirror can trail the newest couple of months. westpacConsumer: Westpac–Melbourne Institute Consumer Sentiment, Sep 1974 → (series inception), two republications of the one published index: Jan 2010 → from RBA Statistical Table H3 series GICWMICS (rba.gov.au/statistics/tables), carrying MI's decimals and matching data/confidence.json's live lane 1:1 over the overlap; Sep 1974 – Dec 2009 from the OECD republication (FRED series CSCICP02AUM460S, fred.stlouisfed.org), which prints the SAME index as a net balance (index−100) rounded to whole index points — rebased +100 here, so pre-2010 months carry whole index points (±0.5 of MI's printed decimals; MI's exact-decimal 1974–2009 archive is a paid CASiE product; the extractor reconciles the mirror against H3 on every overlap month — within ±0.55 — before filing). nabConditions: NAB monthly business conditions, DEVIATION FROM LONG-RUN AVERAGE, sa, percentage points, Mar 1997 →, RBA H3 series GICNBC — never arithmetic-merge with the raw net-balance `cond` in data/confidence.json (different basis by source definition). nabConfidence: NAB monthly business confidence, the printed net balance (optimists minus pessimists, whole points — the same basis as data/confidence.json's live NAB lane), Mar 1997 → — NAB publishes no historical workbook and the RBA is contractually barred from republishing the series, so the record is two public economic-calendar republications of NAB's printed figure, merged at wire-verified seams: Dec 2008 – Aug 2014 from Tradays' figure-history export (tradays.com, chain verified against the contemporary press: Crikey Dec-08 −20 / Jan-09 record low −32; ibtimes Dec-10 −3), the 1997–2008 head and the Sep 2014 → tail from Moneycontrol's calendar history (api.moneycontrol.com/mcapi; identical to Tradays on every shared month from Sep 2014 and to the live lane across the overlap). The pre-2009 head is sole-witness — no second free source reaches it; treat it as a mirror's republication, not two-source verified. Aug 2011 is a wire override (−8, SMH/AAP 'dropped 10 points to be minus eight'; mirrors print −9/−7); Moneycontrol's calendar alone misses Jul 2012 – Jan 2013, months the Tradays export carries, so the merged series is complete from Mar 1997. Years before Mar 1997 (the survey runs from 1989) are mirrored nowhere free. Never hand-edit; regenerated by .build/confidence-history.mjs.",
       consumer: { label: "ANZ–Roy Morgan Consumer Confidence (monthly)", base: "Roy Morgan, index, 100 = neutral", source: RM_CC_URL, rows: rowsOf(cc, consumerMap) },
       business: { label: "Roy Morgan Business Confidence", base: "Roy Morgan, index, 100 = neutral", source: RM_BC_URL, rows: rowsOf(bc, businessMap) },
       westpacConsumer: { label: "Westpac–MI Consumer Sentiment", base: "Westpac–Melbourne Institute, index, 100 = neutral (sa)", source: H3_CSV_URL, seriesId: "GICWMICS", historySource: FRED_CCI_URL, historySeriesId: "CSCICP02AUM460S", historyNote: "months before 2010-01 are the OECD's whole-point republication of the same index (balance+100); 2010-01 → is RBA H3, one decimal", rows: rowsOf(wp, westpac) },
       nabConditions: { label: "NAB Business Conditions (deviation from average)", base: "NAB via RBA H3, deviation from long-run average, sa, percentage points", source: H3_CSV_URL, seriesId: "GICNBC", rows: rowsOf(nb, nabCondDev) },
+      nabConfidence: { label: "NAB Business Confidence (net balance)", base: "NAB, optimists minus pessimists, whole points", source: NAB_TRADAYS_URL, historySource: NAB_MC_API.slice(0, -6) + "1", historyNote: "Dec 2008 – Aug 2014 from Tradays' wire-verified figure-history export; the pre-2009 head and Sep 2014 → tail from Moneycontrol (sole-witness before 2009; identical to Tradays on every shared month from Sep 2014; its Jul 2012 – Jan 2013 hole filled from Tradays); 2011-08 = −8 per the SMH/AAP wire (mirrors print −9/−7)", rows: rowsOf(nc, nabConf) },
     };
   } catch (err) {
     console.error("GUARD TRIP: " + err.message);
     process.exit(2);
   }
 
-  const KEYS = ["consumer", "business", "westpacConsumer", "nabConditions"];
+  const KEYS = ["consumer", "business", "westpacConsumer", "nabConditions", "nabConfidence"];
   const next = JSON.stringify(doc, null, 1) + "\n";
   const changed = !prev || readFileSync(OUT, "utf8") !== next;
   if (changed && !CHECK) writeAtomic(OUT, next);

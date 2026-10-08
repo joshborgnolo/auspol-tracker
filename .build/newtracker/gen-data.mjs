@@ -4548,15 +4548,17 @@ const confHistory = (() => {
    month; this is the same history file as-calendar, one {ym, v} point per
    survey month, so the confidence panel's "Show complete history" toggle
    can widen the window to each house's full published run and extend the
-   live lines backwards. Only the three lanes whose printed basis the live
-   chart already draws travel: NAB's deep series is a conditions DEVIATION
-   (H3 CSV, never the printed net balance - the confidence-history skill's
-   "never arithmetic-merge" trap), so it stays on disk and out of the page. */
+   live lines backwards. Only the lanes whose printed basis the live chart
+   already draws travel: NAB's deep net-balance series (nabConfidence in
+   the history file) now rides too, renamed to the payload's nabBusiness;
+   the conditions DEVIATION lane (nabConditions — H3 CSV, never the printed
+   net balance, the confidence-history skill's "never arithmetic-merge"
+   trap) stays on disk and out of the page. */
 const confDeep = (() => {
   if (!CONF_HISTORY_FILE) return null;
   const out = {};
-  for (const k of ["consumer", "westpacConsumer", "business"]) {
-    const s = CONF_HISTORY_FILE[k];
+  for (const [src, k] of [["consumer", "consumer"], ["westpacConsumer", "westpacConsumer"], ["business", "business"], ["nabConfidence", "nabBusiness"]]) {
+    const s = CONF_HISTORY_FILE[src];
     if (s && Array.isArray(s.rows) && s.rows.length) out[k] = s.rows.map((r) => ({ ym: r.ym, v: r.v }));
   }
   return Object.keys(out).length ? out : null;
