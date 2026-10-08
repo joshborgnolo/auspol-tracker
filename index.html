@@ -4630,6 +4630,9 @@ body.rd .rd-ap-search:focus-within { border-color: var(--ink-3); }
 body.rd .rd-ap-search input { all: unset; flex: 1; min-width: 0; font-size: 14px; color: var(--ink); }
 body.rd .rd-ap-search input::placeholder { color: var(--ink-3); opacity: 1; }
 body.rd .rd-ap-search input::-webkit-search-cancel-button { display: none; }
+@media (pointer: coarse) {
+  body.rd .rd-ap-search input { font-size: 16px; }
+}
 body.rd .rd-ap-x { all: unset; cursor: pointer; font-size: 18px; line-height: 1; color: var(--ink-3); padding: 0 2px; }
 body.rd .rd-ap-pops { display: inline-flex; gap: 10px; }
 body.rd .rd-ap-bar .ap-popbtn, body.rd .rd-fl-ct .ap-popbtn {
