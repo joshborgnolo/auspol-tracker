@@ -63,25 +63,62 @@ function RdPrimary({ rangeId, setRangeId }) {
   const xDomain = rangeDomain(rangeId);
   const narrow = useNarrow("(max-width: 640px)");
   const [hidden, setHidden] = useState({});
-  const now = D.latest.primary;
-  const base = D.aggPrimary.find((d) => d.election) || null;
+  /* The group dropdown: any Who-votes-for-whom group, drawn from the §7g
+     payload the Who-votes panel itself pools (never re-derived here).
+     grpId === "" is the all-voters view; /vic/ has no demographics payload,
+     so the control never appears there. */
+  const T = D.demographics;
+  const [grpId, setGrpId] = useState("");
+  const sel = (() => {
+    if (!grpId || !T || !T.tabs) return null;
+    for (const t of T.tabs) for (const s of t.sets) {
+      const g = s.groups.find((x) => x.label === grpId);
+      if (g) return { label: grpId, g, who: RD_DEMO_SHORT[grpId] || grpId };
+    }
+    return null;
+  })();
+  const G = sel && sel.g;
   const lastM = D.aggPrimary[D.aggPrimary.length - 1];
-  const NAME = { oth: "Others & independents" };
+  const allBase = D.aggPrimary.find((d) => d.election) || null;
+  /* a group's election base exists only where the count itself was cut -
+     the AEC's state and division-class sums. The ring, the "since the
+     election" sub-lines and the dek's faller clause drop for every other
+     group, rather than reaching for a figure that was never counted. */
+  const gElec = G
+    ? [D.demoStateElection, D.demoLocElection].find((E) => E && E.groups && E.groups[sel.label])
+    : null;
+  const base = G
+    ? (gElec ? { x: gElec.x, election: true, ...Object.fromEntries(T.order.map((kk, i) => [kk, gElec.groups[sel.label][i]])) } : null)
+    : allBase;
+  /* a poll row's grp.v slots are gen-data's alp/lnp/grn/onp/oth order, NOT
+     §7g's DEMO_KEYS (alp/lnp/onp/grn/oth): map by key, never by a shared
+     index across the two */
+  const GRPV_KEYS = ["alp", "lnp", "grn", "onp", "oth"];
+  const mkParts = (V, C, W) => ["alp", "lnp", "grn", "onp", "oth"].map((id) => ({
+    id, color: D.PARTIES[id].color, name: (id === "oth" ? "Others & independents" : D.PARTIES[id].name),
+    v: V[id], was: W ? W[id] : null, ci: C[id] || 0,
+  })).sort((a, b) => b.v - a.v);
+  /* the level test, factored so the all-voters contrast behind a group's
+     dek runs the same check the drawn figures do */
+  const levelCount = (ps) => {
+    let kk = 1;
+    const t = ps[0];
+    while (kk < ps.length && t.v - ps[kk].v < Math.sqrt(t.ci * t.ci + ps[kk].ci * ps[kk].ci)) kk++;
+    return kk;
+  };
+  const partsAll = mkParts(D.latest.primary, lastM.ci || {}, allBase);
+  const kAll = levelCount(partsAll);
+  const parts = G ? mkParts(G.v, G.ci, base) : partsAll;
+  const top = parts[0];
   const SHORT = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "Others" };
   /* a phone's line ends carry the parties' letters, as the canvas drew them:
      the full names don't fit beside a 350px plot */
   const ABBR = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON", oth: "OTH" };
-  const parts = ["alp", "lnp", "grn", "onp", "oth"].map((id) => ({
-    id, color: D.PARTIES[id].color, name: NAME[id] || D.PARTIES[id].name,
-    v: now[id], was: base ? base[id] : null, ci: (lastM.ci && lastM.ci[id]) || 0,
-  })).sort((a, b) => b.v - a.v);
-  const top = parts[0];
-  const firstPolled = Object.fromEntries(parts.map((p) => [p.id, D.aggPrimary.find((d) => !d.election && d[p.id] != null)]));
-  const lateParties = base ? parts.map((p) => p.id).filter((id) => firstPolled[id] && firstPolled[id].x - base.x > 0.5) : [];
+  const firstPolled = G ? {} : Object.fromEntries(parts.map((p) => [p.id, D.aggPrimary.find((d) => !d.election && d[p.id] != null)]));
+  const lateParties = !G && base ? parts.map((p) => p.id).filter((id) => firstPolled[id] && firstPolled[id].x - base.x > 0.5) : [];
   /* the parties the leader cannot be told apart from: the gap to each is
      inside the two figures' 95% margins combined */
-  let k = 1;
-  while (k < parts.length && top.v - parts[k].v < Math.sqrt(top.ci * top.ci + parts[k].ci * parts[k].ci)) k++;
+  const k = levelCount(parts);
   const level = parts.slice(0, k);
 
   const story = (() => {
@@ -89,12 +126,24 @@ function RdPrimary({ rangeId, setRangeId }) {
     const pc = (v) => v.toFixed(1) + "%";
     let head, dek;
     if (k >= 2) {
-      head = rdCap(list(level.map((p) => rdPartyIn(p.id)))) + " are level";
-      dek = level.map((p, i) => (i === 0 ? rdPartyStart(p.id) : rdPartyIn(p.id)) + ", on " + pc(p.v)).reduce((s, c, i, a) =>
-        s + (i === 0 ? c : i === a.length - 1 ? ", and " + c : ", " + c), "") + ", are too close to separate.";
+      head = rdCap(list(level.map((p) => rdPartyIn(p.id)))) + " are level" + (G ? " among " + sel.who : "");
+      dek = (G ? "Among " + sel.who + ", " : "")
+        + level.map((p, i) => (i === 0 ? rdPartyStart(p.id) : rdPartyIn(p.id)) + ", on " + pc(p.v)).reduce((s, c, i, a) =>
+          s + (i === 0 ? c : i === a.length - 1 ? ", and " + c : ", " + c), "");
+      /* a group's level call is pooled from few polls, so the dek quotes the
+         gap it cannot read as a margin (the all-voters dek doesn't need to);
+         shares level to the tenth are simply dead level, not "0.0 points" */
+      const gapK = (top.v - level[k - 1].v).toFixed(1);
+      if (G && gapK === "0.0") dek += ", are dead level";
+      else {
+        dek += ", are too close to separate";
+        if (G) dek += ", " + gapK + " points " + (k === 2 ? "between them" : "across the " + ({ 3: "three", 4: "four", 5: "five" })[k]);
+      }
+      dek += ".";
     } else {
-      head = rdPartyStart(top.id) + " leads the primary vote";
-      dek = rdPartyStart(top.id) + " leads on " + pc(top.v) + ", " + (top.v - parts[1].v).toFixed(1) + " points clear of "
+      head = rdPartyStart(top.id) + (G ? " leads among " + sel.who : " leads the primary vote");
+      dek = (G ? "Among " + sel.who + ", " + rdPartyIn(top.id) : rdPartyStart(top.id))
+        + " leads on " + pc(top.v) + ", " + (top.v - parts[1].v).toFixed(1) + " points clear of "
         + rdPartyIn(parts[1].id) + " on " + pc(parts[1].v) + ".";
     }
     /* the biggest faller outside the leading group, if the fall is big */
@@ -112,10 +161,30 @@ function RdPrimary({ rangeId, setRangeId }) {
       dek += " " + rdPartyStart(id) + "’s line starts in " + rdMonthYear(firstPolled[id].ym)
         + ": until then, the polls counted " + (rdPlural(id) ? "them" : "it") + " among others.";
     }
+    /* a group's dek closes against the whole electorate, so the group's
+       figures never read as a shift in the headline itself */
+    if (G) {
+      const lvlAll = partsAll.slice(0, kAll);
+      dek += kAll >= 2
+        ? " Among all voters, " + list(lvlAll.map((p) => rdPartyIn(p.id))) + " are level."
+        : " Among all voters, " + rdPartyIn(partsAll[0].id) + " leads on " + pc(partsAll[0].v) + ".";
+    }
     return { head, dek };
   })();
 
-  const pts = filterPts(D.aggPrimary, xDomain[0]);
+  /* a selected group's monthly line, shaped exactly as an aggPrimary month
+     row ({x, ym, per-party value, ci:{…}}) so the series/areas/tooltip code
+     below needs no group branches of its own. A month the group went
+     unpolled is simply absent, as live() already tolerates */
+  const gMonths = React.useMemo(() => {
+    if (!G) return null;
+    return G.monthly.map((m) => {
+      const o = { ym: m[0], x: D.mx(m[0]), ci: {} };
+      T.order.forEach((kk, i) => { o[kk] = m[1 + i]; o.ci[kk] = m[1 + T.order.length + i]; });
+      return o;
+    });
+  }, [T, G]);
+  const pts = filterPts(G && gMonths ? gMonths : D.aggPrimary, xDomain[0]);
   const visible = parts.filter((p) => !hidden[p.id]);
   /* a monthly series drops the months that never carried the party's
      figure - the chart engine has no null-run guard (/vic/ has sparse ON
@@ -139,10 +208,27 @@ function RdPrimary({ rangeId, setRangeId }) {
     points: pts.filter((d) => d.ci && d.ci[p.id] != null && d[p.id] != null)
       .map((d) => ({ x: d.x, y0: d[p.id] - d.ci[p.id], y1: d[p.id] + d.ci[p.id] })),
   })).filter((a) => a.points.length >= 2);
+  /* group mode's per-poll dots: each wave's own reading of the group, sat
+     against its month's all-voters figure - exactly the point §7g's pooling
+     averages (never the raw group share, so a wave from a house that leans
+     toward the group still lands on the line the site draws) */
+  const gi = G && D.demoGroups ? D.demoGroups.indexOf(sel.label) : -1;
+  const aggByYm = React.useMemo(() => (!G ? null
+    : new Map(D.aggPrimary.filter((d) => !d.election).map((d) => [d.ym, d]))), [G]);
   const scatter = React.useMemo(() => D.individualPolls
     .filter((q) => q.x >= xDomain[0] && q.x <= xDomain[1])
-    .flatMap((q) => parts.filter((p) => q.p && q.p[p.id] != null)
-      .map((p) => ({ x: q.x, y: q.p[p.id], color: p.color, label: p.name, meta: q, party: p.id }))), [xDomain[0], xDomain[1]]);
+    .flatMap((q) => {
+      if (!G) return parts.filter((p) => q.p && q.p[p.id] != null)
+        .map((p) => ({ x: q.x, y: q.p[p.id], color: p.color, label: p.name, meta: q, party: p.id }));
+      const gv = q.grp && q.grp.v && q.grp.v[gi], tt = q.grp && q.grp.t;
+      if (!gv || !tt) return [];
+      const M = aggByYm && aggByYm.get(q.ym);
+      if (!M) return [];
+      return parts.map((p) => {
+        const i = GRPV_KEYS.indexOf(p.id);
+        return { x: q.x, y: M[p.id] + (gv[i] - tt[i]), color: p.color, label: p.name, meta: q, party: p.id };
+      });
+    }), [T, G, xDomain[0], xDomain[1]]);
   const shownScatter = React.useMemo(() => scatter.map((d) => (hidden[d.party] ? { ...d, op: 0 } : d)), [scatter, hidden]);
   const marks = base ? parts.map((p) => ({ x: base.x, y: base[p.id], color: p.color, r: 4.5, hidden: !!hidden[p.id] })) : [];
   /* the numbered events: the same set the 2PP hero marks, over this chart's
@@ -159,13 +245,21 @@ function RdPrimary({ rangeId, setRangeId }) {
   const pollsWord = window.JUR ? window.JUR.adj : "national";
   /* /vic/'s lines are a smoothed trend through every poll (gen-data §1a) */
   const KAL = !!(D.latest.method && D.latest.method.kind === "kalman");
-  const meta = narrow
-    ? D.latest.pollsTracked + " " + pollsWord + " polls, latest fieldwork " + rdDate(D.latest.updatedISO)
-    : D.latest.pollsTracked + " " + pollsWord + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true);
+  const meta = G
+    ? "Pooled from the last " + T.window + " of " + rdList(G.houses.map(demoHouse)) + " polls"
+    : narrow
+      ? D.latest.pollsTracked + " " + pollsWord + " polls, latest fieldwork " + rdDate(D.latest.updatedISO)
+      : D.latest.pollsTracked + " " + pollsWord + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true);
   const toggle = (id) => setHidden((h) => {
     const next = { ...h, [id]: !h[id] };
     return parts.every((p) => next[p.id]) ? {} : next;   // never an empty chart
   });
+  /* a group's monthly run can peak over the all-voters chart's fixed 40
+     (rural One Nation reaches it): the axis then lifts to the next ten,
+     y-domain and ticks together. All voters keeps the fixed [0,40] frame */
+  const yTop = !G ? 40 : Math.max(40, Math.ceil(Math.max(...gMonths.flatMap((m) =>
+    GRPV_KEYS.map((kk) => m[kk] + m.ci[kk]))) * 1.0001 / 10) * 10);
+  const yTickSet = [0, 10, 20, 30, 40, 50, 60, 70].filter((t) => t <= yTop);
 
   /* A phone lists the five as the canvas drew them: the parties the leader
      can't be told apart from grouped in a tinted box under "Within the margin
@@ -241,7 +335,20 @@ function RdPrimary({ rangeId, setRangeId }) {
 
   return (
     <RdSec id="primary-vote" title="Primary vote" meta={meta}>
-      <RdHed head={story.head} dek={story.dek} />
+      <div className="rd-pv-head">
+        <RdHed head={story.head} dek={story.dek} />
+        {T && (
+          <select className="rd-pv-sel" aria-label="The primary vote among" value={grpId}
+                  onChange={(e) => setGrpId(e.target.value)}>
+            <option value="">All voters</option>
+            {T.tabs.map((t) => t.sets.map((s) => (
+              <optgroup key={s.id} label={s.label || "By " + t.label.toLowerCase()}>
+                {s.groups.map((g) => <option key={g.label} value={g.label}>{g.label}</option>)}
+              </optgroup>
+            )))}
+          </select>
+        )}
+      </div>
       {narrow ? (
         <div className="rd-pv-list">
           {k >= 2 && (
@@ -278,7 +385,7 @@ function RdPrimary({ rangeId, setRangeId }) {
           key="rd-pv"
           heightPx={narrow ? 320 : 440}
           padPx={narrow ? { l: 34, r: 6, t: 34, b: 28 } : { l: 40, r: 16, t: 44, b: 30 }}
-          xDomain={xDomain} yDomain={[0, 40]} yTicks={[0, 10, 20, 30, 40]}
+          xDomain={xDomain} yDomain={[0, yTop]} yTicks={yTickSet}
           yTickFmt={(v) => (v === 0 ? "" : v + "%")} baseline
           xTicks={rdElectionTicks(xDomain[0], xDomain[1], narrow, base ? base.x : null)}
           series={chartSeries} spine={series(live("alp"), "alp")} areas={areas}
@@ -295,8 +402,8 @@ function RdPrimary({ rangeId, setRangeId }) {
           /* read away from the page, the copy names its measure and its
              base as well as the finding: "Primary vote" over "Labor and One
              Nation are level" said neither whose votes nor how many polls */
-          copy={{ title: "First-preference vote for each party", sub: story.head + (KAL ? ". Smoothed trends through " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord
-                    + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + ".",
+          copy={{ title: "First-preference vote for each party" + (G ? ", " + sel.who : ""), sub: story.head + (G ? ". Monthly averages of the readings every poll reported for " + sel.who + ", latest fieldwork " + rdDate(D.latest.updatedISO, true) + "." : (KAL ? ". Smoothed trends through " : ". Monthly averages of ") + D.latest.pollsTracked + " " + pollsWord
+                    + " polls since the " + (eDate ? rdDate(eDate, true) + " " : "") + "election, latest fieldwork " + rdDate(D.latest.updatedISO, true) + "."),
                   caption: KAL ? "Each dot is one poll; lines are smoothed trends, shaded bands their 95% intervals." : "Each dot is one poll; lines are monthly averages, shaded bands their 95% intervals.",
                   legend: visible.map((p) => ({ label: p.name, color: p.color, kind: p.id === "oth" ? "dashed" : "line" })) }}
         />
