@@ -1537,7 +1537,7 @@ function DirectionPanel({ rangeId }) {
    for the mood, not a predictor. No aggregation: one house, its own figures.
    Data: data/mood.json -> gen-data -> D.mood. */
 function MoodPanel({ rangeId }) {
-  if (window.AP.rd) return <RdMood rangeId={rangeId} />;
+  if (window.AP.rd) return <RdConfidence rangeId={rangeId} />;
   const { D, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
   const M = D.mood;
