@@ -2079,6 +2079,42 @@ const KBD_ROWS = [
   { keys: ["?"], what: "This sheet" },
 ];
 
+// ── useTweaks (inlined: the 052e810c dev-panel wrapper that re-exported it
+//    was never rendered in production) ──────────────────────────────────────
+// Single source of truth for tweak values. setTweak persists to localStorage
+// only; the dev host's live-rewrite protocol lived in the removed panel.
+const TWEAKS_STORE_KEY = 'auspol.tweaks';
+function __loadStoredTweaks(defaults) {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(TWEAKS_STORE_KEY) || 'null');
+    if (!stored || typeof stored !== 'object') return defaults;
+    // Merge only keys the app still knows: a stale stored value (or junk
+    // another origin-sharing page wrote) must not revive a retired key.
+    const merged = { ...defaults };
+    for (const k of Object.keys(defaults)) if (k in stored) merged[k] = stored[k];
+    return merged;
+  } catch { return defaults; }
+}
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(() => __loadStoredTweaks(defaults));
+  // Accepts either setTweak('key', value) or setTweak({ key: value, ... }) so a
+  // useState-style call doesn't write a "[object Object]" key into the persisted
+  // JSON block.
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null
+      ? keyOrEdits : { [keyOrEdits]: val };
+    setValues((prev) => {
+      const next = { ...prev, ...edits };
+      // setItem throws under private-mode Safari; appearance tweaks are
+      // nice-to-have, so a full quota or a blocked store degrades to the
+      // old session-only behaviour.
+      try { window.localStorage.setItem(TWEAKS_STORE_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+  return [values, setTweak];
+}
+
 function App() {
   /* body.js is the "app has mounted" flag (see the boot block below), so it
      is added by the first COMMIT, from this layout effect, and not by the
@@ -2705,32 +2741,6 @@ function App() {
           </div>
         </div>
       )}
-
-      <TweaksPanel>
-        <TweakSection label="Appearance" />
-        <TweakRadio label="Theme" value={t.theme}
-          options={["auto", "light", "dark"]}
-          onChange={(v) => setTweak("theme", v)} />
-        <p className="tweak-note">
-          {t.theme === "auto" ? "Follows your device setting." : t.theme === "dark" ? "Newsprint at night." : "Warm paper."}
-        </p>
-        <TweakSection label="Layout" />
-        <TweakRadio label="Style" value={t.layout}
-          options={["editorial", "panelled"]}
-          onChange={(v) => setTweak("layout", v)} />
-        <p className="tweak-note">
-          {t.layout === "editorial"
-            ? "Broadsheet – hairline rules, no card chrome."
-            : "Dashboard – each view in its own bordered card."}
-        </p>
-        <TweakSection label="Paper" />
-        <TweakRadio label="Tone" value={t.accent}
-          options={["warm", "cool"]}
-          onChange={(v) => setTweak("accent", v)} />
-        <TweakSection label="Hero chart" />
-        <TweakToggle label="Show individual polls" value={t.showScatter}
-          onChange={(v) => setTweak("showScatter", v)} />
-      </TweaksPanel>
     </div>
   );
 }

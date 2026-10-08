@@ -115326,38 +115326,7 @@ function App() {
     key: k
   }, k))), React.createElement("dd", null, r.what)))), React.createElement("p", {
     className: "rd-keysheet-foot"
-  }, "Hover gives a card its keys; a live text selection and a blinking caret keep every key quiet."))), React.createElement(TweaksPanel, null, React.createElement(TweakSection, {
-    label: "Appearance"
-  }), React.createElement(TweakRadio, {
-    label: "Theme",
-    value: t.theme,
-    options: ["auto", "light", "dark"],
-    onChange: v => setTweak("theme", v)
-  }), React.createElement("p", {
-    className: "tweak-note"
-  }, t.theme === "auto" ? "Follows your device setting." : t.theme === "dark" ? "Newsprint at night." : "Warm paper."), React.createElement(TweakSection, {
-    label: "Layout"
-  }), React.createElement(TweakRadio, {
-    label: "Style",
-    value: t.layout,
-    options: ["editorial", "panelled"],
-    onChange: v => setTweak("layout", v)
-  }), React.createElement("p", {
-    className: "tweak-note"
-  }, t.layout === "editorial" ? "Broadsheet – hairline rules, no card chrome." : "Dashboard – each view in its own bordered card."), React.createElement(TweakSection, {
-    label: "Paper"
-  }), React.createElement(TweakRadio, {
-    label: "Tone",
-    value: t.accent,
-    options: ["warm", "cool"],
-    onChange: v => setTweak("accent", v)
-  }), React.createElement(TweakSection, {
-    label: "Hero chart"
-  }), React.createElement(TweakToggle, {
-    label: "Show individual polls",
-    value: t.showScatter,
-    onChange: v => setTweak("showScatter", v)
-  })));
+  }, "Hover gives a card its keys; a live text selection and a blinking caret keep every key quiet."))));
 }
 const staticSummary = document.querySelector(".static-summary");
 if (staticSummary) {
