@@ -2214,6 +2214,7 @@ const DEMO_WHO = {
   "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "TAFE- or trade-qualified voters",
   University: "university graduates",
   NSW: "voters in NSW", Vic: "voters in Victoria", Qld: "voters in Queensland",
+  SA: "voters in South Australia", WA: "voters in Western Australia",
   "Rest of Australia": "voters in SA, WA, Tasmania, and the territories",
   "Inner metro": "voters in the inner suburbs", "Outer metro": "voters in the outer suburbs",
   Provincial: "voters in provincial towns and cities", Rural: "rural voters",

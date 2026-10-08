@@ -184,7 +184,7 @@ for (const [W, H] of [[1280, 900], [768, 1024], [390, 844]]) {
   ok("select exists", !!s.sel);
   if (!s.sel) continue;
   ok(`selected text is "All voters"`, s.sel.text === "All voters", s.sel.text);
-  ok("26 options (All voters + 25 groups)", s.sel.optCount === 26, s.sel.optCount);
+  ok("28 options (All voters + 27 groups)", s.sel.optCount === 28, s.sel.optCount);
   ok("8 optgroups", s.sel.groupCount === 8, s.sel.groupLabels.join(" | "));
   const g = s.geom;
   if (W > 640) {
@@ -447,7 +447,7 @@ console.log("== Space walks the group menu ==");
   const curVal = () => page.evaluate(() => document.querySelector("#primary-vote select.rd-pv-sel").value);
   const order = await page.evaluate(() =>
     [...document.querySelectorAll("#primary-vote select.rd-pv-sel option")].map((o) => o.value));
-  ok("menu order pins All voters to first group 18–34", order[0] === "" && order[1] === "18–34" && order.length === 26,
+  ok("menu order pins All voters to first group 18–34", order[0] === "" && order[1] === "18–34" && order.length === 28,
      order.slice(0, 4).join("|") + " | n=" + order.length);
 
   /* park where #primary-vote alone holds the key: below the hero's whole
@@ -478,7 +478,7 @@ console.log("== Space walks the group menu ==");
     seen.push(await curVal());
     if (seen[i] !== order[i] && firstGap < 0) firstGap = i;
   }
-  ok("each Space steps to the menu's next option (all 25 groups)", JSON.stringify(seen) === JSON.stringify(order),
+  ok("each Space steps to the menu's next option (all 27 groups)", JSON.stringify(seen) === JSON.stringify(order),
      firstGap >= 0 ? `press ${firstGap}: got ${JSON.stringify(seen[firstGap])}, want ${JSON.stringify(order[firstGap])}` : seen.slice(0, 4).join(" -> "));
   await page.keyboard.press("Space");
   await sleep(150);

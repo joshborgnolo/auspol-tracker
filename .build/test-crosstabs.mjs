@@ -253,7 +253,8 @@ const rbH = harmonize({ pollster: "RedBridge/Accent", dims: {
 const merged = rbH.education["Year 12 or less"];
 for (const [k, want] of Object.entries({ alp: 27.61, lnp: 23.17, onp: 26.36, grn: 17.03, oth: 5.83 }))
   assert.ok(Math.abs(merged[k] - want) < 0.01, `RedBridge school rows merge 39:61 (${k} ${merged[k]})`);
-// YouGov's SA, WA and ACT/NT/Tas are Rest of Australia at their 2025 vote shares; all three or none
+// YouGov's SA, WA and ACT/NT/Tas are Rest of Australia at their 2025 vote shares; all three or none –
+// and SA and WA also join as common groups of their own (Roy Morgan cuts them too, no ACT/NT/Tas)
 const ygPlace = harmonize({ pollster: "YouGov", dims: {
   state: { NSW: sh(29, 19, 26, 12, 15), SA: sh(34, 14, 40, 6, 6), WA: sh(37, 21, 21, 13, 8), "ACT/NT/Tas": sh(36, 21, 21, 8, 14) },
   location: { "Inner metro": sh(36, 24, 15, 12, 13), Rural: sh(18, 21, 35, 12, 15) },
@@ -262,9 +263,12 @@ const ygPlace = harmonize({ pollster: "YouGov", dims: {
 const rest = ygPlace.state["Rest of Australia"];
 for (const [k, want] of Object.entries({ alp: 35.809, lnp: 18.732, onp: 27.156, grn: 9.637, oth: 8.666 }))
   assert.ok(Math.abs(rest[k] - want) < 0.01, `YouGov's three smaller regions merge at 2025 vote shares (${k} ${rest[k]})`);
-assert.deepEqual(Object.keys(ygPlace.state), ["NSW", "Rest of Australia"]);
-assert.equal(harmonize({ dims: { state: { SA: sh(34, 14, 40, 6, 6), WA: sh(37, 21, 21, 13, 8) } } }).state, undefined,
-  "a wave missing one of the three smaller regions doesn't join at Rest of Australia");
+assert.deepEqual(Object.keys(ygPlace.state), ["NSW", "SA", "WA", "Rest of Australia"]);
+assert.deepEqual(ygPlace.state.SA, sh(34, 14, 40, 6, 6), "SA passes through as its own group");
+assert.deepEqual(ygPlace.state.WA, sh(37, 21, 21, 13, 8), "WA passes through as its own group");
+const morganLike = harmonize({ dims: { state: { SA: sh(34, 14, 40, 6, 6), WA: sh(37, 21, 21, 13, 8) } } });
+assert.deepEqual(Object.keys(morganLike.state), ["SA", "WA"],
+  "a wave missing one of the three smaller regions doesn't join at Rest of Australia, but SA and WA still join on their own (Roy Morgan)");
 assert.deepEqual(Object.keys(ygPlace.location), ["Inner metro", "Rural"]);
 assert.deepEqual(ygPlace.housing.Renting, sh(29, 8, 27, 21, 16));
 // DemosAU's Regional or rural is two common groups at once, and joins at neither
