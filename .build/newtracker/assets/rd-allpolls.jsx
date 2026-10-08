@@ -186,8 +186,8 @@ function rdPollHead(p) {
   const out = rdApOut(p.published);
   // a commissioned wave credits its client; a self-published poll is
   // published by its pollster, and says so. A confidence release keeps its
-  // product line (the mood lane's index name) in the client slot, so the
-  // byline comes from the house slot, not the product.
+  // product line (the confidence lane's index name) in the client slot, so
+  // the byline comes from the house slot, not the product.
   const by = "published by " + (p.conf ? p.pollster : p.client && !/^self/i.test(p.client) ? rdApThe(p.client) : p.pollster);
   const field = p.field || p.dateLabel;
   if (p.fieldPending) return <>{rdFieldTbc(p)}, from {n}{", " + by + (out ? " on " + out : "")}</>;
@@ -609,7 +609,7 @@ function RdApDirMini({ p }) {
    gauges are each publisher's own series (§5j), so there is no average
    line to draw against. The neutral line is emphasised (100 on the index
    gauges, 0 on NAB's net balance, which sits at its true printed figure
-   here, not the mood panel's +100 shift); every dot opens its own row. */
+   here, not the confidence panel's +100 shift); every dot opens its own row. */
 function RdApConfMini({ p }) {
   const D = window.AUSPOL;
   const c = p.conf;
@@ -621,7 +621,7 @@ function RdApConfMini({ p }) {
   const t0 = rdApDays(ms[0] + "-01");
   const [ly, lm] = ms[ms.length - 1].split("-").map(Number);
   const t1 = Date.UTC(ly, lm, 1) - 864e5;
-  const ser = (((D.mood || {})[c.k]) || {}).polls || [];
+  const ser = (((D.confidence || {})[c.k]) || {}).polls || [];
   const mine = ser.filter((q) => rdApDays(q.released) >= t0 && rdApDays(q.released) <= t1);
   if (!mine.length) return <div ref={box}></div>;
   const fmt = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
@@ -1306,7 +1306,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
      lean) would misread it, so isConf keeps them out below */
   const isConf = facet === "confidence";
   const conf = isConf ? p.conf || null : null;
-  const confSer = (conf && D.mood && D.mood[conf.k]) ? D.mood[conf.k] : null;
+  const confSer = (conf && D.confidence && D.confidence[conf.k]) ? D.confidence[conf.k] : null;
   const confFmt = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const outLabel = (q) => { const d = new Date(rdApDays(q.released)); return d.getUTCDate() + " " + D.monthName(d.getUTCMonth() + 1); };
   const confPeriod = !conf ? "month" : conf.k === "consumer" ? "week" : "month";
@@ -1566,7 +1566,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
             <span>{CONF_BLURB[conf.k] || conf.lab + "."}</span>
             <span className="rd-apd-k">Neutral</span>
             <span>{conf.vs === 0
-              ? <>Printed as a net balance – optimists minus pessimists – so the neutral print is 0. It enters the mood panel’s 40–120 meter shifted up 100, beside the index gauges.</>
+              ? <>Printed as a net balance – optimists minus pessimists – so the neutral print is 0. It enters the confidence panel’s 40–120 meter shifted up 100, beside the index gauges.</>
               : <>An index print – 100 is neutral; above it optimists outnumber pessimists{confPeriod === "week" ? ", read weekly" : ""}.</>}</span>
             <span className="rd-apd-k">In today’s panel</span>
             <span>{confSer && confSer.latest && confSer.latest.released === p.released
@@ -1915,7 +1915,7 @@ function rdApFacetStory(facet, upd, demSplit) {
   }
 
   if (facet === "confidence") {
-    const M = D.mood || {};
+    const M = D.confidence || {};
     const G = [["consumer", "ANZ–Roy Morgan’s consumer confidence", 100], ["westpacConsumer", "Westpac–MI’s consumer sentiment", 100],
                ["business", "Roy Morgan’s business confidence", 100], ["nabBusiness", "NAB’s business confidence", 0]]
       .filter(([k]) => M[k] && M[k].latest && M[k].latest.v != null)
@@ -2106,8 +2106,8 @@ function RdAllPolls(P) {
      table: the rare contests live in Includes now */
   React.useEffect(() => { if (measure !== "lnp" && measure !== "onp") onMeasure("onp"); }, [measure]);
 
-  /* the facets this build walks: Confidence only where the mood file's
-     releases ship (never /vic/: the JUR build files no
+  /* the facets this build walks: Confidence only where the confidence
+     file's releases ship (never /vic/: the JUR build files no
      confidenceOnlyPolls), and /vic/'s polls carry no direction, issues or
      group figures */
   const FACET_IDS = ["twopp", "primary", "leadership", "direction", "issues", "demographics"]
@@ -2450,17 +2450,17 @@ function RdAllPolls(P) {
   /* the confidence facet's meter: the four gauges' own printed figures on
      ONE fixed 40–120 scale - fixed so no release's dot moves under the
      reader as the filters change. The indices print 100-neutral; NAB's net
-     balance prints 0-neutral and its dot is drawn +100 just as the mood
+     balance prints 0-neutral and its dot is drawn +100 just as the panel
      chart draws its line up, while the figure shown stays NAB's own. */
   const CF_LO = 40, CF_HI = 120;
   const cfx = (v) => ((Math.max(CF_LO, Math.min(CF_HI, v)) - CF_LO) / (CF_HI - CF_LO)) * 100;
   const confPlot = (c) => c.v + (c.vs === 0 ? 100 : 0);
-  /* the mood panel's inks: one colour per subject, the second gauge of a
-     subject its dashed twin - the table can't dash one dot, so the twin
-     shares its subject's ink and its house is named in the row */
-  const confInk = (c) => (c.k === "consumer" || c.k === "westpacConsumer" ? "var(--mood-consumer)" : "var(--mood-business)");
+  /* the confidence panel's inks: one colour per subject, the second gauge
+     of a subject its dashed twin - the table can't dash one dot, so the
+     twin shares its subject's ink and its house is named in the row */
+  const confInk = (c) => (c.k === "consumer" || c.k === "westpacConsumer" ? "var(--confidence-consumer)" : "var(--confidence-business)");
   /* each house's own print: the indices carry decimals, NAB's net balance
-     whole numbers (the mood panel's NICE does the same) */
+     whole numbers (the panel's NICE does the same) */
   const confFig = (v) => (v < 0 ? "−" : "") + (Number.isInteger(Math.abs(v)) ? String(Math.abs(v)) : Math.abs(v).toFixed(1));
   const confChg = (v) => (v < 0 ? "−" : v > 0 ? "+" : "") + confFig(Math.abs(v));
   const CONF_TKS = [40, 60, 80, 100, 120];
@@ -2532,7 +2532,7 @@ function RdAllPolls(P) {
       {/* the demographics breakpoint stands in for this head too: under
           ~1150px the strip keeps only the ends and the neutral mark */}
       {facet === "confidence" && <>
-        {th("Figure", "conf.v", { title: "Sort by the gauge’s printed figure (the mood chart’s dot)" })}
+        {th("Figure", "conf.v", { title: "Sort by the gauge’s printed figure (the panel chart’s dot)" })}
         <span role="columnheader" aria-label="Each gauge’s figure on a fixed 40–120 scale, 100 neutral – NAB’s net balance drawn 100 points up, its figure printed as NAB’s own" className="rd-ap-hpic">{confScale(demMid)}</span>
         {th("Change", "conf.chg", { right: true, title: "Change on the gauge’s own previous release – NAB’s rows also carry its trading-conditions reading" })}
         <span></span>
