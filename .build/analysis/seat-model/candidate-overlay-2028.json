@@ -1,0 +1,17 @@
+{
+  "_about": "W6 of .build/analysis/seat-model-plan.md — HAND table of candidate-set changes since the 2025 election. build-candidate-set.mjs derives the 2025 contest set from data/aec-2025-seat-flows.json + data/seats-2025-baseline.json and merges THIS file over the top to produce data/seat-candidate-set-2028.json. Entries here are declared facts (retirements, defections, announced independent challenges, by-elections); everything not listed keeps its 2025 state under the assumptions below. Never derive entries — hand-edit as announcements land, with a date and a note naming the source.",
+  "_maintained": "Human-maintained. The builder fails loudly if an entry names an unknown seat or contradicts the baseline (e.g. a retirement naming someone who is not the recorded member), so stale rows cannot drift silently.",
+  "assumptions": {
+    "incumbentRecontests": true,
+    "indHeldRecontest": true,
+    "on": "everywhere",
+    "grn": "everywhere",
+    "_note": "2025 base, measured in HouseDopByDivisionDownload-31496: ALP and GRN contested all 150; ON contested 147 (absent Bean/Canberra/Fenner — the ACT seats); exactly one Coalition party per seat except the seven LP+NP three-cornered contests (Barker, Bendigo, Bullwinkel, Durack, Forrest, Grey, O'Connor). ON 'everywhere' for 2028 extends past the 2025 base — those seats are flagged in the build output."
+  },
+  "retirements": [],
+  "byElections": [],
+  "independents": {
+    "_note": "heldRecontest=true above carries the twelve member:<surname> holders. challenges[] is for declared plausible NEW independent challenges; likelihood 'declared' (candidate announced) or 'likely' (credible movement, no candidate yet).",
+    "challenges": []
+  }
+}

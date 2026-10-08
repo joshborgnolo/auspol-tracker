@@ -1,0 +1,4168 @@
+{
+  "_about": "W6 of .build/analysis/seat-model-plan.md — the 2028 candidate set the simulation layer draws around. Per seat: incumbent (+recontests), the 2028 contest set (groups booleans, coalition party mix, named independent entrants), and basis2025 — the measured 2025 contest set from the DoP — so every 2028 assumption sits next to its fact. contest.on true-but-basis2025.on false marks the ON-everywhere extension (2025: ON skipped only the three ACT seats). Produced by build-candidate-set.mjs from the HAND overlay candidate-overlay-2028.json; test-candidate-set.mjs pins the merge against the W2/W3 data.",
+  "_provenance": {
+    "flows": {
+      "file": "data/aec-2025-seat-flows.json",
+      "sha256": "9749abc1582b8a3a"
+    },
+    "baseline": {
+      "file": "data/seats-2025-baseline.json",
+      "sha256": "a076ea5a2877dfa0"
+    },
+    "overlay": {
+      "file": ".build/analysis/seat-model/candidate-overlay-2028.json",
+      "sha256": "cda0f0bba56b8221"
+    },
+    "builtAt": "2026-10-08"
+  },
+  "assumptions": {
+    "incumbentRecontests": true,
+    "indHeldRecontest": true,
+    "on": "everywhere",
+    "grn": "everywhere",
+    "_note": "2025 base, measured in HouseDopByDivisionDownload-31496: ALP and GRN contested all 150; ON contested 147 (absent Bean/Canberra/Fenner — the ACT seats); exactly one Coalition party per seat except the seven LP+NP three-cornered contests (Barker, Bendigo, Bullwinkel, Durack, Forrest, Grey, O'Connor). ON 'everywhere' for 2028 extends past the 2025 base — those seats are flagged in the build output.",
+    "onEverywhereAdds": [
+      "Bean",
+      "Canberra",
+      "Fenner"
+    ]
+  },
+  "seats": [
+    {
+      "name": "Banks",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Zhi Soon",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Barton",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Ash Ambihaipahar",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Bennelong",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Jerome Laxale",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Berowra",
+      "state": "NSW",
+      "incumbent": {
+        "group": "lp",
+        "name": "Julian Leeser",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Blaxland",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Jason Clare",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Bradfield",
+      "state": "NSW",
+      "incumbent": {
+        "group": "member:boele",
+        "name": "Nicolette Boele",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [
+          {
+            "key": "member:boele",
+            "label": "Nicolette Boele",
+            "kind": "held"
+          }
+        ],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": "member:boele"
+      }
+    },
+    {
+      "name": "Calare",
+      "state": "NSW",
+      "incumbent": {
+        "group": "member:gee",
+        "name": "Andrew Gee",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [
+          {
+            "key": "member:gee",
+            "label": "Andrew Gee",
+            "kind": "held"
+          }
+        ],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": "member:gee"
+      }
+    },
+    {
+      "name": "Chifley",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Ed Husic",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Cook",
+      "state": "NSW",
+      "incumbent": {
+        "group": "lp",
+        "name": "Simon Kennedy",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Cowper",
+      "state": "NSW",
+      "incumbent": {
+        "group": "np",
+        "name": "Pat Conaghan",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 7
+      },
+      "basis2025": {
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Cunningham",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Alison Byrnes",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Dobell",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Emma Mcbride",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Eden-Monaro",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Kristy Mcbain",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Farrer",
+      "state": "NSW",
+      "incumbent": {
+        "group": "lp",
+        "name": "Sussan Ley",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Fowler",
+      "state": "NSW",
+      "incumbent": {
+        "group": "member:le",
+        "name": "Dai Le",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [
+          {
+            "key": "member:le",
+            "label": "Dai Le",
+            "kind": "held"
+          }
+        ],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": "member:le"
+      }
+    },
+    {
+      "name": "Gilmore",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Fiona Phillips",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Grayndler",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Anthony Albanese",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Greenway",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Michelle Rowland",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Hughes",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "David Moncrieff",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Hume",
+      "state": "NSW",
+      "incumbent": {
+        "group": "lp",
+        "name": "Angus Taylor",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Hunter",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Dan Repacholi",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Kingsford Smith",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Matt Thistlethwaite",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 1
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Lindsay",
+      "state": "NSW",
+      "incumbent": {
+        "group": "lp",
+        "name": "Melissa Mcintosh",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 6
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Lyne",
+      "state": "NSW",
+      "incumbent": {
+        "group": "np",
+        "name": "Alison Penfold",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 6
+      },
+      "basis2025": {
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Macarthur",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Mike Freelander",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Mackellar",
+      "state": "NSW",
+      "incumbent": {
+        "group": "member:scamps",
+        "name": "Sophie Scamps",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [
+          {
+            "key": "member:scamps",
+            "label": "Sophie Scamps",
+            "kind": "held"
+          }
+        ],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": "member:scamps"
+      }
+    },
+    {
+      "name": "Macquarie",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Susan Templeman",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "McMahon",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Chris Bowen",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 1
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Mitchell",
+      "state": "NSW",
+      "incumbent": {
+        "group": "lp",
+        "name": "Alex Hawke",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 1
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "New England",
+      "state": "NSW",
+      "incumbent": {
+        "group": "np",
+        "name": "Barnaby Joyce",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Newcastle",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Sharon Claydon",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Page",
+      "state": "NSW",
+      "incumbent": {
+        "group": "np",
+        "name": "Kevin Hogan",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 7
+      },
+      "basis2025": {
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Parkes",
+      "state": "NSW",
+      "incumbent": {
+        "group": "np",
+        "name": "Jamie Chaffey",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 6
+      },
+      "basis2025": {
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Parramatta",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Andrew Charlton",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Paterson",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Meryl Swanson",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 6
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Reid",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Sally Sitou",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Richmond",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Justine Elliot",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 6
+      },
+      "basis2025": {
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Riverina",
+      "state": "NSW",
+      "incumbent": {
+        "group": "np",
+        "name": "Michael Mccormack",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 9
+      },
+      "basis2025": {
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Robertson",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Gordon Reid",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Shortland",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Pat Conroy",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Sydney",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Tanya Plibersek",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 1
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Warringah",
+      "state": "NSW",
+      "incumbent": {
+        "group": "member:steggall",
+        "name": "Zali Steggall",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [
+          {
+            "key": "member:steggall",
+            "label": "Zali Steggall",
+            "kind": "held"
+          }
+        ],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": "member:steggall"
+      }
+    },
+    {
+      "name": "Watson",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Tony Burke",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Wentworth",
+      "state": "NSW",
+      "incumbent": {
+        "group": "member:spender",
+        "name": "Allegra Spender",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [
+          {
+            "key": "member:spender",
+            "label": "Allegra Spender",
+            "kind": "held"
+          }
+        ],
+        "othCount2025": 1
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": "member:spender"
+      }
+    },
+    {
+      "name": "Werriwa",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Anne Maree Stanley",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Whitlam",
+      "state": "NSW",
+      "incumbent": {
+        "group": "alp",
+        "name": "Carol Berry",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 6
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Aston",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Mary Doyle",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Ballarat",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Catherine King",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Bendigo",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Lisa Chesters",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Bruce",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Julian Hill",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Calwell",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Basem Abdo",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 9
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Casey",
+      "state": "VIC",
+      "incumbent": {
+        "group": "lp",
+        "name": "Aaron Violi",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Chisholm",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Carina Garland",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Cooper",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Ged Kearney",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Corangamite",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Libby Coker",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Corio",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Richard Marles",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Deakin",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Matt Gregg",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Dunkley",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Jodie Belyea",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Flinders",
+      "state": "VIC",
+      "incumbent": {
+        "group": "lp",
+        "name": "Zoe Mckenzie",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Fraser",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Daniel Mulino",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Gellibrand",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Tim Watts",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 1
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Gippsland",
+      "state": "VIC",
+      "incumbent": {
+        "group": "np",
+        "name": "Darren Chester",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 1
+      },
+      "basis2025": {
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Goldstein",
+      "state": "VIC",
+      "incumbent": {
+        "group": "lp",
+        "name": "Tim Wilson",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Gorton",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Alice Jordan-baird",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Hawke",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Sam Rae",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Holt",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Cassandra Fernando",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Hotham",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Clare O'neil",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Indi",
+      "state": "VIC",
+      "incumbent": {
+        "group": "member:haines",
+        "name": "Helen Haines",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [
+          {
+            "key": "member:haines",
+            "label": "Helen Haines",
+            "kind": "held"
+          }
+        ],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": "member:haines"
+      }
+    },
+    {
+      "name": "Isaacs",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Mark Dreyfus",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 1
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Jagajaga",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Kate Thwaites",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Kooyong",
+      "state": "VIC",
+      "incumbent": {
+        "group": "member:ryan",
+        "name": "Monique Ryan",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [
+          {
+            "key": "member:ryan",
+            "label": "Monique Ryan",
+            "kind": "held"
+          }
+        ],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": "member:ryan"
+      }
+    },
+    {
+      "name": "La Trobe",
+      "state": "VIC",
+      "incumbent": {
+        "group": "lp",
+        "name": "Jason Wood",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Lalor",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Joanne Ryan",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Macnamara",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Josh Burns",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Mallee",
+      "state": "VIC",
+      "incumbent": {
+        "group": "np",
+        "name": "Anne Webster",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Maribyrnong",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Jo Briskey",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 0
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "McEwen",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Rob Mitchell",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Melbourne",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Sarah Witty",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Menzies",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Gabriel Ng",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Monash",
+      "state": "VIC",
+      "incumbent": {
+        "group": "lp",
+        "name": "Mary Aldred",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Nicholls",
+      "state": "VIC",
+      "incumbent": {
+        "group": "np",
+        "name": "Sam Birrell",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Scullin",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Andrew Giles",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Wannon",
+      "state": "VIC",
+      "incumbent": {
+        "group": "lp",
+        "name": "Dan Tehan",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Wills",
+      "state": "VIC",
+      "incumbent": {
+        "group": "alp",
+        "name": "Peter Khalil",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Blair",
+      "state": "QLD",
+      "incumbent": {
+        "group": "alp",
+        "name": "Shayne Neumann",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 6
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Bonner",
+      "state": "QLD",
+      "incumbent": {
+        "group": "alp",
+        "name": "Kara Cook",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Bowman",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Henry Pike",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Brisbane",
+      "state": "QLD",
+      "incumbent": {
+        "group": "alp",
+        "name": "Madonna Jarrett",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Capricornia",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Michelle Landry",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Dawson",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Andrew Willcox",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Dickson",
+      "state": "QLD",
+      "incumbent": {
+        "group": "alp",
+        "name": "Ali France",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Fadden",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Cameron Caldwell",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Fairfax",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Ted O'brien",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Fisher",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Andrew Wallace",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Flynn",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Colin Boyce",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Forde",
+      "state": "QLD",
+      "incumbent": {
+        "group": "alp",
+        "name": "Rowan Holzberger",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Griffith",
+      "state": "QLD",
+      "incumbent": {
+        "group": "alp",
+        "name": "Renee Coffey",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Groom",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Garth Hamilton",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Herbert",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Phillip Thompson",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Hinkler",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "David Batt",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Kennedy",
+      "state": "QLD",
+      "incumbent": {
+        "group": "member:katter",
+        "name": "Bob Katter",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [
+          {
+            "key": "member:katter",
+            "label": "Bob Katter",
+            "kind": "held"
+          }
+        ],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": "member:katter"
+      }
+    },
+    {
+      "name": "Leichhardt",
+      "state": "QLD",
+      "incumbent": {
+        "group": "alp",
+        "name": "Matt Smith",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 6
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Lilley",
+      "state": "QLD",
+      "incumbent": {
+        "group": "alp",
+        "name": "Anika Wells",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Longman",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Terry Young",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Maranoa",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "David Littleproud",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "McPherson",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Leon Rebello",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 8
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Moncrieff",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Angie Bell",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Moreton",
+      "state": "QLD",
+      "incumbent": {
+        "group": "alp",
+        "name": "Julie-Ann Campbell",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Oxley",
+      "state": "QLD",
+      "incumbent": {
+        "group": "alp",
+        "name": "Milton Dick",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Petrie",
+      "state": "QLD",
+      "incumbent": {
+        "group": "alp",
+        "name": "Emma Comer",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Rankin",
+      "state": "QLD",
+      "incumbent": {
+        "group": "alp",
+        "name": "Jim Chalmers",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Ryan",
+      "state": "QLD",
+      "incumbent": {
+        "group": "grn",
+        "name": "Elizabeth Watson-brown",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Wide Bay",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Llew O'brien",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Wright",
+      "state": "QLD",
+      "incumbent": {
+        "group": "lnp",
+        "name": "Scott Buchholz",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lnp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Adelaide",
+      "state": "SA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Steve Georganas",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Barker",
+      "state": "SA",
+      "incumbent": {
+        "group": "lp",
+        "name": "Tony Pasin",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Boothby",
+      "state": "SA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Louise Miller-frost",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Grey",
+      "state": "SA",
+      "incumbent": {
+        "group": "lp",
+        "name": "Tom Venning",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Hindmarsh",
+      "state": "SA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Mark Butler",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 5
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Kingston",
+      "state": "SA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Amanda Rishworth",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Makin",
+      "state": "SA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Tony Zappia",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Mayo",
+      "state": "SA",
+      "incumbent": {
+        "group": "member:sharkie",
+        "name": "Rebekha Sharkie",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [
+          {
+            "key": "member:sharkie",
+            "label": "Rebekha Sharkie",
+            "kind": "held"
+          }
+        ],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": "member:sharkie"
+      }
+    },
+    {
+      "name": "Spence",
+      "state": "SA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Matt Burnell",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Sturt",
+      "state": "SA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Claire Clutterham",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Brand",
+      "state": "WA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Madeleine King",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 1
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Bullwinkel",
+      "state": "WA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Trish Cook",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Burt",
+      "state": "WA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Matt Keogh",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Canning",
+      "state": "WA",
+      "incumbent": {
+        "group": "lp",
+        "name": "Andrew Hastie",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Cowan",
+      "state": "WA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Anne Aly",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Curtin",
+      "state": "WA",
+      "incumbent": {
+        "group": "member:chaney",
+        "name": "Kate Chaney",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [
+          {
+            "key": "member:chaney",
+            "label": "Kate Chaney",
+            "kind": "held"
+          }
+        ],
+        "othCount2025": 1
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": "member:chaney"
+      }
+    },
+    {
+      "name": "Durack",
+      "state": "WA",
+      "incumbent": {
+        "group": "lp",
+        "name": "Melissa Price",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Forrest",
+      "state": "WA",
+      "incumbent": {
+        "group": "lp",
+        "name": "Ben Small",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Fremantle",
+      "state": "WA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Josh Wilson",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Hasluck",
+      "state": "WA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Tania Lawrence",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Moore",
+      "state": "WA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Tom French",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "O'Connor",
+      "state": "WA",
+      "incumbent": {
+        "group": "lp",
+        "name": "Rick Wilson",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp",
+          "np"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Pearce",
+      "state": "WA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Tracey Roberts",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Perth",
+      "state": "WA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Patrick Gorman",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 0
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Swan",
+      "state": "WA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Zaneta Mascarenhas",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Tangney",
+      "state": "WA",
+      "incumbent": {
+        "group": "alp",
+        "name": "Sam Lim",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Bass",
+      "state": "TAS",
+      "incumbent": {
+        "group": "alp",
+        "name": "Jess Teesdale",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Braddon",
+      "state": "TAS",
+      "incumbent": {
+        "group": "alp",
+        "name": "Anne Urquhart",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Clark",
+      "state": "TAS",
+      "incumbent": {
+        "group": "member:wilkie",
+        "name": "Andrew Wilkie",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [
+          {
+            "key": "member:wilkie",
+            "label": "Andrew Wilkie",
+            "kind": "held"
+          }
+        ],
+        "othCount2025": 0
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": "member:wilkie"
+      }
+    },
+    {
+      "name": "Franklin",
+      "state": "TAS",
+      "incumbent": {
+        "group": "alp",
+        "name": "Julie Collins",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Lyons",
+      "state": "TAS",
+      "incumbent": {
+        "group": "alp",
+        "name": "Rebecca White",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 4
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Lingiari",
+      "state": "NT",
+      "incumbent": {
+        "group": "alp",
+        "name": "Marion Scrymgour",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "clp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 2
+      },
+      "basis2025": {
+        "coalition": [
+          "clp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Solomon",
+      "state": "NT",
+      "incumbent": {
+        "group": "alp",
+        "name": "Luke John Gosling",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "clp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "clp"
+        ],
+        "on": true,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Bean",
+      "state": "ACT",
+      "incumbent": {
+        "group": "alp",
+        "name": "David Smith",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 1
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": false,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Canberra",
+      "state": "ACT",
+      "incumbent": {
+        "group": "alp",
+        "name": "Alicia Payne",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 3
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": false,
+        "grn": true,
+        "indHeld": null
+      }
+    },
+    {
+      "name": "Fenner",
+      "state": "ACT",
+      "incumbent": {
+        "group": "alp",
+        "name": "Andrew Leigh",
+        "recontests": true
+      },
+      "contest": {
+        "alp": true,
+        "coalition": [
+          "lp"
+        ],
+        "on": true,
+        "grn": true,
+        "ind": [],
+        "othCount2025": 1
+      },
+      "basis2025": {
+        "coalition": [
+          "lp"
+        ],
+        "on": false,
+        "grn": true,
+        "indHeld": null
+      }
+    }
+  ]
+}
