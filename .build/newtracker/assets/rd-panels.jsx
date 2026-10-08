@@ -3932,7 +3932,7 @@ function RdMood({ rangeId }) {
           <div key={l.k} className="rd-un-read">
             <RdSwatch kind={l.dash ? "dash" : "line"} color={l.color} />
             <div>
-              <div className="rd-un-rtop"><b>{l.name}</b><span className="rd-un-rhouse">{l.by}</span><span className="rd-un-rv">{l.vfmt(l.lat.v)}</span>{l.lat.chg != null && Math.abs(l.lat.chg) >= 0.05 && <span className="rd-un-rci">{rdArrow(l.lat.chg)} {NICE(Math.abs(l.lat.chg))} on the {l.period}</span>}</div>
+              <div className="rd-un-rtop"><b>{l.name}</b><span className="rd-un-rhouse">{l.by}</span><span className="rd-un-rfig"><span className="rd-un-rv">{l.vfmt(l.lat.v)}</span>{l.lat.chg != null && Math.abs(l.lat.chg) >= 0.05 && <span className="rd-un-rci">{rdArrow(l.lat.chg)} {NICE(Math.abs(l.lat.chg))} on the {l.period}</span>}</span></div>
               <p>{l.short + (l.k === "nabBusiness" ? "" : " " + water(l, l.lat.v) + ".")}</p>
             </div>
           </div>

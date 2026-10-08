@@ -1612,6 +1612,32 @@ body.rd .rd-un-rhouse { font-size: 12px; color: var(--ink-3); }
 body.rd .rd-un-rv { font-size: 19px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 body.rd .rd-un-rci { font-size: 12px; color: var(--ink-3); }
 body.rd .rd-un-read p { margin: 2px 0 0; font-size: 13px; color: var(--ink-3); }
+/* the mood panel's read rows keep their figures in one column: a
+   fixed-width publisher track parks every series' figure at the same
+   indent (right-aligned inside a 3em track, which also fits a
+   four-digit index reading), so the figure column never drifts with
+   the length of a row's publisher name. The change note follows, its
+   left edge aligned too. 110px covers the longest publisher
+   ("ANZ–Roy Morgan", 93px); a house renaming beyond it makes this
+   track the thing to widen. The two series labels measure within
+   0.1px of each other as printed, so the auto first track never
+   jogs the column. */
+body.rd .rd-mood-chart .rd-un-read > div { flex: 1 1 auto; min-width: 0; }
+body.rd .rd-mood-chart .rd-un-rtop { display: grid; grid-template-columns: auto 110px 3em auto; gap: 0 10px; justify-content: start; }
+body.rd .rd-mood-chart .rd-un-rv { text-align: right; }
+/* the figure and its change note sit in one group: invisible on wide
+   screens (its children grid straight into the two tracks above), a
+   full-line flex pair on the phone */
+body.rd .rd-mood-chart .rd-un-rfig { display: contents; }
+/* on a phone the row splits: label and publisher on the first line,
+   figure and change note side by side on the second, the figure at
+   the same left x in every row (the old stacking wrapped "ANZ–Roy
+   Morgan" and even the change note itself mid-phrase under ~414px) */
+@media (max-width: 560px) {
+  body.rd .rd-mood-chart .rd-un-rtop { display: flex; flex-wrap: wrap; gap: 2px 10px; }
+  body.rd .rd-mood-chart .rd-un-rfig { display: flex; gap: 10px; flex: 0 0 100%; }
+  body.rd .rd-mood-chart .rd-un-rfig .rd-un-rv { text-align: left; }
+}
 body.rd .rd-un-sp { margin-top: 28px; }
 body.rd .rd-un-sm { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 body.rd .rd-un-age { margin-top: 20px; }
