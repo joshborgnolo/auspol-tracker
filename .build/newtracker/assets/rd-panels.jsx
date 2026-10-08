@@ -4050,12 +4050,22 @@ function RdConfidence({ rangeId }) {
      of the terms go fainter by class, and each term can be drawn as its
      own line. Only the view's MAIN gauge carries a past-terms panel –
      §5k ships consumer history for the consumer view, business for the
-     business one (NAB 1997- but a deviation series - never banded;
-     Westpac–MI's 1974- file is §5l's underlay, not banded either). */
+     business one (NAB 1997- but a deviation series - never banded).
+     Westpac–MI's 1974- file never bands either, but its terms ship so a
+     drawn consumer term carries Westpac–MI's same year as a dotted
+     gold twin (and its calendar file stays §5l's history underlay). */
   const HIST = D.confHistory || null;
   const histLane = view === "consumer" ? "consumer" : "business";
   const hband = HIST && HIST[histLane] && HIST[histLane].band.length ? HIST[histLane] : null;
   const histTerms = hband ? hband.terms : [];
+  /* the other house's past terms ride a drawn term as a DOTTED twin in
+     their own lane colour (consumer view only: §5k ships westpacConsumer
+     bandless; NAB's deep series is another measure, so the business view
+     never has a twin to draw) */
+  const altTerms = (() => {
+    const h = view === "consumer" && HIST ? HIST.westpacConsumer : null;
+    return h && Array.isArray(h.terms) && h.terms.length ? h.terms : null;
+  })();
   /* which past terms are lifted out of the band, per view: a lift on the
      consumer view never reads as a phantom pill on the business one */
   const [board, setBoard] = useState(false);
@@ -4099,13 +4109,29 @@ function RdConfidence({ rangeId }) {
     rdWidth: 1.9, opacity: 0.85, dash: "2 3.4", smooth: false, endCap: false,
     interpHover: true, points: hband.band.map((r) => ({ x: r.m, y: r.mean })),
   } : null;
-  const drawnSeries = histTerms.filter((t) => lifted.has(t.year)).map((t) => ({
-    id: "conf-term-" + t.year, label: "The " + t.year + " term", color: "var(--ink)",
-    rdWidth: 1.7, opacity: 0.9, smooth: false, endCap: false,
-    endLabel: narrow ? null : String(t.year),
-    interpHover: true,
-    points: t.v.map((v, m) => (v == null || m > xMax ? null : { x: m, y: v })).filter(Boolean),
-  }));
+  /* a drawn term carries its house's own colour, as the live lines do:
+     the main gauge's line in --confidence-main (both views' mains are
+     Roy Morgan reads), the other house's take on that year a gold DOTTED
+     twin where its history reaches back to it. The twin never asks for
+     the end label - the year names the pair once. */
+  const drawnSeries = histTerms.filter((t) => lifted.has(t.year)).flatMap((t) => {
+    const pts = (term) => term.v.map((v, m) => (v == null || m > xMax ? null : { x: m, y: v })).filter(Boolean);
+    const twin = altTerms && altTerms.find((a) => a.year === t.year);
+    return [{
+      id: "conf-term-" + t.year, color: "var(--confidence-main)",
+      label: "The " + t.year + " term" + (twin ? " · ANZ–Roy Morgan" : ""),
+      rdWidth: 1.7, opacity: 0.9, smooth: false, endCap: false,
+      endLabel: narrow ? null : String(t.year),
+      interpHover: true,
+      points: pts(t),
+    }].concat(twin ? [{
+      id: "conf-term-" + t.year + "-alt", color: "var(--confidence-alt)",
+      label: "The " + t.year + " term · Westpac–MI",
+      rdWidth: 1.7, opacity: 0.9, smooth: false, endCap: false, endLabel: null,
+      interpHover: true, dash: "0.1 3.6",
+      points: pts(twin),
+    }] : []);
+  });
   /* the footer download: every release behind the chart, every past-term
      reading behind the band - releases carry their release dates (and a
      link where there is one), history rows carry the term's opening
@@ -4113,7 +4139,7 @@ function RdConfidence({ rangeId }) {
   const exportCsv = () => {
     const rr = [["kind", "series", "term_opened", "months_into_term", "month", "value", "url"]];
     for (const l of lanes) for (const p of l.s.polls) rr.push(["release", CONF_SHEET[l.k], "", "", p.ym, p.v, p.url || ""]);
-    for (const k of ["consumer", "business"]) {
+    for (const k of ["consumer", "business", "westpacConsumer"]) {
       const h = HIST && HIST[k];
       if (!h) continue;
       for (const t of h.terms) {
@@ -4162,7 +4188,7 @@ function RdConfidence({ rangeId }) {
     altKey: "The Westpac–MI monthly read of the same household mood",
     copyTitle: "Consumer confidence (two gauges)",
     copySub: head + " Two published consumer gauges on one 100-neutral scale: the weekly ANZ–Roy Morgan consumer confidence index and Westpac–MI’s monthly consumer sentiment.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series). The band pools the ANZ–Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. No combining, no adjustment.",
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series). The band pools the ANZ–Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. A drawn past term carries its house’s colour — ANZ–Roy Morgan plum, Westpac–MI gold and dotted where its series reaches back that far. No combining, no adjustment.",
     copyHist: "Consumer confidence as far back as the series go, on one 100-neutral scale. The heavier lines are the smoothed trend of the live release file (each dot one release, as printed; half-life 14 days on the weekly ANZ–Roy Morgan index, 60 days on the monthly Westpac–MI series); the lighter lines underneath are the houses’ own monthly history files — ANZ–Roy Morgan consumer confidence from 1973, Westpac–MI consumer sentiment from 1974. No combining, no adjustment.",
   } : {
     title: "Business confidence",
@@ -4170,7 +4196,7 @@ function RdConfidence({ rangeId }) {
     altKey: "NAB’s net-balance read, drawn 100 points up",
     copyTitle: "Business confidence (two gauges)",
     copySub: head + " Two published business gauges on one 100-neutral scale: Roy Morgan’s monthly business confidence index and NAB’s Monthly Business Survey.",
-    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its gold line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. The band pools the Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. No combining, no adjustment.",
+    copyCaption: "Each dot is one release, as the house printed it; each line is a recency-weighted smooth of those readings (60-day half-life on both monthly series). NAB prints a net balance (0 = neutral), so its gold line is drawn 100 points up to share the neutral line; its read row and tooltips carry NAB’s own figures. The band pools the Roy Morgan index’s past terms, each lined up on its own election month — the middle half and the middle 80% of them, their average the dashed line; the bottom axis counts months since this term’s election. A drawn past term is Roy Morgan’s line alone, in its plum — NAB’s long series is a deviation-from-average measure, so no NAB term ever joins. No combining, no adjustment.",
     copyHist: "Business confidence as far back as the series go, on one 100-neutral scale (NAB drawn 100 points up, as the live view draws it). The heavier lines are the smoothed trend of the live release file (each dot one release, as printed; 60-day half-life on both series); the lighter line underneath is Roy Morgan’s monthly history, from 2010. NAB’s own deep series is a deviation from average on another basis, so it never joins — its gold line widens only to its own releases. No combining, no adjustment.",
   };
   /* Election / 1 yr / 2 yrs / 3 yrs, plus Now where the sitting term
@@ -4202,8 +4228,8 @@ function RdConfidence({ rangeId }) {
             <span className="rd-cc-drawn">
               <span className="rd-cc-l">Drawn over the band</span>
               {[...lifted].sort((a, b) => a - b).map((y) => (
-                <span key={y} className="rd-cc-pill" style={{ borderColor: "var(--ink)" }}>
-                  <span className="rd-cc-rule" style={{ background: "var(--ink)" }}></span>{y}
+                <span key={y} className="rd-cc-pill" style={{ borderColor: "var(--confidence-main)" }}>
+                  <span className="rd-cc-rule" style={{ background: "var(--confidence-main)" }}></span>{y}
                   <button type="button" aria-label={"Return " + y + " to the band"} onClick={() => lift(y)}>×</button>
                 </span>
               ))}
@@ -4226,14 +4252,14 @@ function RdConfidence({ rangeId }) {
                   <span key={t.year} className={"rd-cc-term" + (on ? " drawn" : "")}>
                     <button type="button" className="rd-cc-main" aria-pressed={on} onClick={() => lift(t.year)}
                             title={on ? "Return " + t.year + " to the band" : "Draw " + t.year + " as its own line"}>
-                      <span className="rd-cc-rule" style={{ background: "var(--ink)", opacity: on ? 1 : 0.4 }}></span>
+                      <span className="rd-cc-rule" style={{ background: "var(--confidence-main)", opacity: on ? 1 : 0.4 }}></span>
                       <b>{t.year}</b>
                     </button>
                   </span>
                 );
               })}
             </div>
-            <p className="rd-note">Click a term to draw its {histLane === "consumer" ? "consumer" : "business"} confidence line over the band, and again to put it back. Each line is lined up on its own election month, as the band is, and runs to the next election or 36 months, whichever came first.</p>
+            <p className="rd-note">Click a term to draw its {histLane === "consumer" ? "consumer" : "business"} confidence line over the band, and again to put it back. {altTerms ? "Westpac–MI’s reading of the same term draws with it, dotted gold beside Roy Morgan’s plum, wherever its series reaches back that far. " : ""}Each line is lined up on its own election month, as the band is, and runs to the next election or 36 months, whichever came first.</p>
           </div>
         )}
       </div>
@@ -4304,7 +4330,7 @@ function RdConfidence({ rangeId }) {
       </RdCrossfade>
       <HowTo paras={[
         <>Four published gauges of the same mood, split into two views — the consumer pair and the business pair, switched by the tabs over the chart — and set out as each house prints them from the 2025 election on: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
-        <>Behind the current term, the band pools that view’s main gauge over past terms — each term lined up on its own election month, so the bottom axis (months since this term’s election) is every term’s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own line, and “Source data, CSV” in the footer downloads every release and past-term reading. “Show complete history” instead draws whole years: each lane’s own published monthly series runs back as a pale line — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010 — with the releases and their smoothing re-drawn over the file. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB’s own releases.</>,
+        <>Behind the current term, the band pools that view’s main gauge over past terms — each term lined up on its own election month, so the bottom axis (months since this term’s election) is every term’s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own line, in the house’s own colour — and on the consumer view Westpac–MI’s reading of the same term draws beside it, dotted gold where its 1974 series reaches — and “Source data, CSV” in the footer downloads every release and past-term reading. “Show complete history” instead draws whole years: each lane’s own published monthly series runs back as a pale line — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010 — with the releases and their smoothing re-drawn over the file. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB’s own releases.</>,
         <>Three of the four are indices where 100 is neutral. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
         <>Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />

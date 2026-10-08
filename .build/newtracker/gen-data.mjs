@@ -4473,7 +4473,10 @@ for (const c of CYC_META) {
    1974 → (§5l carries it), but the band stays the two MAIN gauges — a
    whole-point-rounded pre-2010 lane has no business pooling beside the
    fifty-year ANZ–RM decimal run — and NAB's deep series is a conditions
-   DEVIATION, not a confidence figure, so neither lanes in. A term joins its lane's pool
+   DEVIATION, not a confidence figure, so neither lanes in. Westpac–MI's
+   TERMS still ship (bandless): the panel's draw-a-past-term lifts the
+   other house's same term as a dotted twin beside the main gauge's line,
+   each in its own lane colour, never blended in. A term joins its lane's pool
    only when interpolation reaches its election month (the consumer
    history opens March 1973, inside the already-running 1972 term, so
    that term never bands); quarterly-era months fill straight-line
@@ -4484,10 +4487,14 @@ for (const c of CYC_META) {
    stretches built from few terms (long parliaments outlive short ones,
    exactly as the past-cycles ribbon thins). */
 const CONF_HIST_MAXM = 36;
+/* Which of the shipped lanes pool a past-terms BAND. The alt lane draws
+   its terms only (the renderer's dotted twin); a band of whole-point
+   mirror years never pools beside the main gauges' decimals. */
+const CONF_HIST_BAND = new Set(["consumer", "business"]);
 const confHistory = (() => {
   if (!CONF_HISTORY_FILE) return null;   // the back-history file simply isn't there (JUR, fresh clone)
   const ymIdx = (ym) => +ym.slice(0, 4) * 12 + (+ym.slice(5, 7) - 1);
-  return Object.fromEntries(["consumer", "business"].map((k) => {
+  return Object.fromEntries(["consumer", "business", "westpacConsumer"].map((k) => {
     const s = CONF_HISTORY_FILE[k];
     if (!s || !Array.isArray(s.rows) || !s.rows.length) return [k, null];
     const byIdx = new Map(s.rows.map((r) => [ymIdx(r.ym), r.v]));
@@ -4522,7 +4529,7 @@ const confHistory = (() => {
     /* The band needs its three-term crowd, as the past-cycles ribbon
        does; below that a "band" is just the two lines' gap relabelled. */
     const band = [];
-    if (terms.length >= 3) {
+    if (terms.length >= 3 && CONF_HIST_BAND.has(k)) {
       for (let m = 0; m <= CONF_HIST_MAXM; m++) {
         const nums = terms.map((t) => t.v[m]).filter((v) => v != null).sort((a, b) => a - b);
         if (nums.length < 3) continue;
