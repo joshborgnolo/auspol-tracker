@@ -3956,6 +3956,11 @@
       "oth": null,
       "tpp_alp": 55,
       "tpp_lnp": 45,
+      "tpp3": {
+        "alp": 44.5,
+        "lnp": 19,
+        "onp": 36.5
+      },
       "url": "https://www.roymorgan.com/findings/10221-federal-voting-post-budget-special-sms-morgan-poll-may-14-2026"
     },
     {

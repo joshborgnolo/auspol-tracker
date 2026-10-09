@@ -2217,9 +2217,10 @@ function buildAlt(date, firm) {
   if (a && a.lo != null) out.tppAlt2 = { lnp: r1(a.lo), onp: r1(100 - a.lo) };
   return out;
 }
-/* tpp3 is a per-poll field (only Fox & Hedgehog prints a three-cornered
-   preferred), so it rides with the row rather than a join map, the same way
-   undecided and tppFlows do. */
+/* tpp3 is a per-poll field (Fox & Hedgehog prints a three-cornered
+   preferred every wave; Roy Morgan (SMS) printed one for its 13–14 May
+   2026 post-budget special), so it rides with the row rather than a join
+   map, the same way undecided and tppFlows do. */
 function build3cp(p) {
   if (!p.tpp3) return {};
   return { tppKind: "3cp", tpp3: { alp: r1(p.tpp3.alp), lnp: r1(p.tpp3.lnp), onp: r1(p.tpp3.onp) } };

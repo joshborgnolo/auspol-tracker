@@ -154,11 +154,13 @@ export function validate(D) {
         if (!(p.softAge[k] >= 0 && p.softAge[k] <= 100))
           fail("softage-shape", `softAge.${k} = ${p.softAge[k]}`);
     }
-    // 2b2. tpp3 (Fox & Hedgehog's three-cornered preferred) carries all
-    //      three slices or none, each in bounds, and the trio sums ~100 –
+    // 2b2. tpp3 (the three-cornered preferred Fox & Hedgehog prints every
+    //      wave and Roy Morgan (SMS) printed for its 13–14 May 2026 post-
+    //      budget special) carries all three slices or none, each in
+    //      bounds, and the trio sums ~100 –
     //      the same sum discipline as the 2PP pair.
     if (p.tpp3 != null) {
-      if (p.pollster !== "Fox & Hedgehog")
+      if (!["Fox & Hedgehog", "Roy Morgan (SMS)"].includes(p.pollster))
         fail("3cp-pollster", `tpp3 on a row for ${p.pollster}`);
       const t3 = ["alp", "lnp", "onp"].map((k) => p.tpp3[k]);
       if (t3.some((v) => v == null))
