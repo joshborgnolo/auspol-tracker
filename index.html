@@ -3272,6 +3272,8 @@ body.rd .rd-cal-track::after { content: ")"; }
 @media (max-width: 640px) {
   body.rd .rd-cal-list li { flex-wrap: wrap; gap: 4px 12px; }
   body.rd .rd-cal-q { flex-basis: 100%; padding-left: 108px; }
+  body.rd .rd-cal-wi { display: block; }
+  body.rd .rd-cal-wsep { display: none; }
 }
 body.rd .rd-xf { position: relative; }
 body.rd .rd-xf-was { position: absolute; inset: 0 0 auto 0; pointer-events: none; animation: rd-xf-out .13s ease-out both; }
@@ -104815,8 +104817,12 @@ function RdConfCal() {
   const dateTxt = it => it.win ? spanTxt(it.at, it.close) : it.irr ? "About " + dm(it.at) : WDs(it.at) + " " + new Date(it.at).getUTCDate();
   const overTxt = r => r.loose && !irregular(r) ? spanTxt(r.release - r.spread * DAY, r.release + r.spread * DAY) : irregular(r) ? "About " + dm(r.release) : wdm(r.release);
   const who = (w, i) => React.createElement("span", {
-    key: String(i)
-  }, i > 0 ? ", " : "", w.site ? React.createElement("a", {
+    key: String(i),
+    className: "rd-cal-wi"
+  }, i > 0 ? React.createElement("span", {
+    className: "rd-cal-wsep",
+    "aria-hidden": "true"
+  }, ", ") : null, w.site ? React.createElement("a", {
     href: w.site,
     target: "_blank",
     rel: "noopener noreferrer",
@@ -105468,9 +105474,9 @@ function RdConfidence({
   }, React.createElement("span", {
     className: "rd-cs-keythin",
     "aria-hidden": "true"
-  }), "Monthly history back to ", histX0, ", as the house published it"))))), React.createElement(RdConfCal, null), React.createElement(HowTo, {
+  }), "Monthly history back to ", histX0, ", as the house published it"))))), React.createElement(HowTo, {
     paras: [React.createElement(React.Fragment, null, "Four published gauges of economic confidence, split into two views \u2014 the consumer pair and the business pair, switched by the tabs over the chart \u2014 and set out as each house prints them from the 2025 election on: the weekly ANZ\u2013Roy Morgan consumer index and monthly business index, Westpac\u2013MI\u2019s monthly consumer sentiment, and NAB\u2019s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend \u2014 the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean \u2014 a record, not an estimate."), React.createElement(React.Fragment, null, "Behind the current term, the band pools that view\u2019s main gauge over past terms \u2014 each term lined up on its own election month, so the bottom axis (months since this term\u2019s election) is every term\u2019s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. \u201CDraw a past term\u201D lifts any single term out of the band as its own smoothed, dotted line in the house\u2019s own colour \u2014 and on the consumer view Westpac\u2013MI\u2019s reading of the same term draws beside it, dotted gold where its 1974 series reaches \u2014 and \u201CSource data, CSV\u201D in the footer downloads every release and past-term reading. \u201CShow complete history\u201D instead draws whole years: each lane\u2019s own published monthly series runs back as a pale line \u2014 ANZ\u2013Roy Morgan\u2019s consumer index to 1973, Westpac\u2013MI\u2019s consumer sentiment to 1974, Roy Morgan\u2019s business index to 2010 \u2014 with the releases and their smoothing re-drawn over the file. Westpac\u2013MI months before 2010 come from the OECD\u2019s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA\u2019s table carries Westpac\u2013MI\u2019s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB\u2019s own releases."), React.createElement(React.Fragment, null, "Three of the four are indices where 100 is neutral. NAB instead reports a net balance \u2014 the share of optimistic firms minus pessimistic ones \u2014 where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB\u2019s own printed number, and the row also carries the survey\u2019s conditions reading."), React.createElement(React.Fragment, null, "Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn\u2019t move together, and two houses asking differently worded questions needn\u2019t agree week to week.")]
-  }), React.createElement("div", {
+  }), React.createElement(RdConfCal, null), React.createElement("div", {
     className: "rd-foot"
   }, React.createElement("span", {
     className: "rd-foot-text"
@@ -106426,8 +106432,12 @@ function RdPolls({
   const calDateTxt = it => it.win ? calSpanTxt(it.at, it.close) : it.irr ? "About " + dm(it.at) : WDs(it.at) + " " + new Date(it.at).getUTCDate();
   const calOverTxt = r => r.loose && !irregular(r) ? calSpanTxt(r.release - r.spread * DAY_MS, r.release + r.spread * DAY_MS) : irregular(r) ? "About " + dm(r.release) : wdm(r.release);
   const calWho = (w, i) => React.createElement("span", {
-    key: String(i)
-  }, i > 0 ? ", " : "", w.site ? React.createElement("a", {
+    key: String(i),
+    className: "rd-cal-wi"
+  }, i > 0 ? React.createElement("span", {
+    className: "rd-cal-wsep",
+    "aria-hidden": "true"
+  }, ", ") : null, w.site ? React.createElement("a", {
     href: w.site,
     target: "_blank",
     rel: "noopener noreferrer",

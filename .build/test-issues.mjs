@@ -199,14 +199,27 @@ assert.equal(coverOf("report", "/x/IM_States_Jun_26_v4.pdf"), null, "the state r
 assert.equal(coverOf("statement", "/x/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20July%202026_0.pdf"), "2026-07");
 assert.equal(coverOf("statement", "/x/APC%20Methodology%20Disclosure%20Statement%20-%20Issues%20Monitor%20Q2%202023.pdf"), null);
 // the committed rows link the wave's APC statement (issues.mjs threads
-// ipStat.pdf onto every Ipsos wave)
+// ipStat.pdf onto every Ipsos wave). The NEWEST wave is waived while
+// Ipsos hasn't published that month's statement - the houses' page
+// lags the report by up to a month, so the September 2026 wave (landed
+// 2026-10-09 off the report PDF alone) could carry no link. Only the
+// newest wave may wait, and only for 60 days; an older or staler gap is
+// the threader gone blind, not publication lag
 {
   const iss = JSON.parse(fs.readFileSync("data/issues.json", "utf8"));
   const rows = [...iss.salience, ...iss.ownership].filter((r) => r.pollster === "Ipsos");
   assert.ok(rows.length >= 18, `enough Ipsos rows to pin (${rows.length})`);
-  for (const r of rows)
-    assert.match(r.methodUrl || "", /^https:\/\/www\.ipsos\.com\/.+Issues%20Monitor/,
-      `${r.date}: links the wave's APC methodology statement`);
+  const newest = rows.reduce((m, r) => (r.date > m ? r.date : m), "");
+  const newestAgeDays = (Date.now() - Date.parse(newest)) / 864e5;
+  for (const r of rows) {
+    if (r.methodUrl) {
+      assert.match(r.methodUrl, /^https:\/\/www\.ipsos\.com\/.+Issues%20Monitor/,
+        `${r.date}: links the wave's APC methodology statement`);
+    } else {
+      assert.equal(r.date, newest, `${r.date}: no methodUrl, and not the newest wave`);
+      assert.ok(newestAgeDays < 60, `${r.date}: wave has waited ${Math.round(newestAgeDays)}d for its statement - check ipsos.com`);
+    }
+  }
 }
 // ---- DemosAU: "Which political party do you trust more to handle…" (February 2026) ----
 const daRep = (f) => fs.readFileSync(path.join(".build/demosau-src", f + ".txt"), "utf8");

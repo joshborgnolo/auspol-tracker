@@ -56,14 +56,18 @@ for (const vp of [{ width: 1280, height: 900, tag: "desktop" }, { width: 390, he
     const det = sec.querySelector("details.rd-conf-cal");
     if (!det) return { ok: false, why: "no details.rd-conf-cal" };
     const chart = sec.querySelector(".rd-confidence-chart");
-    const hint = sec.querySelector(".table-hint");
+    /* the how-to DETAILS, not a .table-hint inside it: a closed details'
+       children keep a laid-out rect (content-visibility), so a paragraph
+       inside reports the box it WOULD fill if open - never the visible
+       geometry of the block */
+    const hint = sec.querySelector("details.hint-how");
     const dTop = det.getBoundingClientRect().top;
     return {
       ok: true,
       summary: (det.querySelector("summary") || {}).textContent || null,
       open: det.open,
       belowChart: chart ? dTop >= chart.getBoundingClientRect().bottom - 1 : null,
-      aboveHint: hint ? dTop <= hint.getBoundingClientRect().top + 1 : null,
+      belowHint: hint ? dTop >= hint.getBoundingClientRect().bottom - 1 : null,
       /* exactly one calendar in this section, and not the polls one */
       onlyOne: sec.querySelectorAll("details.rd-cal").length === 1,
       ownClass: !det.closest("#latest-polls"),
@@ -74,7 +78,7 @@ for (const vp of [{ width: 1280, height: 900, tag: "desktop" }, { width: 390, he
         JSON.stringify(r0.summary));
   check(`${vp.tag} starts closed`, r0.ok && r0.open === false, "open=" + r0.open);
   check(`${vp.tag} sits under the chart`, r0.ok && r0.belowChart === true, "belowChart=" + r0.belowChart);
-  check(`${vp.tag} sits above the how-to`, r0.ok && r0.aboveHint === true, "aboveHint=" + r0.aboveHint);
+  check(`${vp.tag} sits below the how-to`, r0.ok && r0.belowHint === true, "belowHint=" + r0.belowHint);
   check(`${vp.tag} the section's only calendar`, r0.ok && r0.onlyOne === true);
   check(`${vp.tag} not under latest-polls`, r0.ok && r0.ownClass === true);
 
@@ -175,6 +179,29 @@ for (const vp of [{ width: 1280, height: 900, tag: "desktop" }, { width: 390, he
         r1.noteTxt.includes("NAB") && r1.noteTxt.includes("four gauges"),
         (r1.noteTxt || "").slice(0, 120));
   if (vp.tag === "desktop") console.log("   first rows:", JSON.stringify(r1.liTexts), "chips:", JSON.stringify(r1.chips));
+
+  /* a day shared by two series renders each rd-cal-wi stacked one per
+     line on the phone (the ", " separator hides with it); desktop keeps
+     the inline flow. No merged day in the window skips the geometry */
+  const r3 = await page.evaluate(() => {
+    const det = document.querySelector("#confidence details.rd-conf-cal");
+    if (!det) return { ok: false };
+    const cells = [...det.querySelectorAll(".rd-cal-w")]
+      .map((w) => [...w.querySelectorAll(".rd-cal-wi")].map((s) => {
+        const r = s.getBoundingClientRect();
+        return { t: r.top, l: r.left };
+      }))
+      .filter((row) => row.length > 1);
+    const seps = [...det.querySelectorAll(".rd-cal-wsep")];
+    const sepShown = seps.length ? getComputedStyle(seps[0]).display !== "none" : null;
+    return { ok: true, nCells: cells.length, cells, sepShown };
+  });
+  const stacked = r3.ok && r3.cells.every((row) => row.every((p, i) =>
+    i === 0 || (p.t > row[i - 1].t + 2 && Math.abs(p.l - row[0].l) <= 1)));
+  if (vp.tag === "phone") check(`phone merged-day series stack one per line`,
+    r3.ok && (r3.nCells === 0 || stacked), `cells=${JSON.stringify(r3.cells)}`);
+  else check(`desktop merged-day series keep the inline comma`,
+    r3.ok && (r3.sepShown === true || r3.nCells === 0), "sepShown=" + r3.sepShown);
 
   const r2 = await page.evaluate(() => ({
     hOver: document.documentElement.scrollWidth - document.documentElement.clientWidth,

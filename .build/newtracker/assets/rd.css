@@ -322,6 +322,13 @@ body.rd .rd-cal-track::after { content: ")"; }
 @media (max-width: 640px) {
   body.rd .rd-cal-list li { flex-wrap: wrap; gap: 4px 12px; }
   body.rd .rd-cal-q { flex-basis: 100%; padding-left: 108px; }
+  /* a day shared by two series stacks one series per line instead of the
+     inline ", " flow, which could break inside a long series name and
+     strand its first word at the end of the line above (a phone showed
+     "…Consumer Confidence (weekly), NAB" over "Monthly Business Survey"):
+     the separator comma goes with the joining it no longer does */
+  body.rd .rd-cal-wi { display: block; }
+  body.rd .rd-cal-wsep { display: none; }
 }
 /* RdCrossfade: the view being left lies over the one arriving and fades */
 body.rd .rd-xf { position: relative; }

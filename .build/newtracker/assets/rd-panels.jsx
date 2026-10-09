@@ -4107,8 +4107,11 @@ function RdConfCal() {
   const overTxt = (r) => r.loose && !irregular(r) ? spanTxt(r.release - r.spread * DAY, r.release + r.spread * DAY)
     : irregular(r) ? "About " + dm(r.release)
     : wdm(r.release);
+  /* rd-cal-wi + rd-cal-wsep let the phone rung stack a merged day's
+     series one per line (rd.css): the inline ", "-joined flow broke
+     inside a long series name, stranding its first word one line up */
   const who = (w, i) => (
-    <span key={String(i)}>{i > 0 ? ", " : ""}{w.site
+    <span key={String(i)} className="rd-cal-wi">{i > 0 ? <span className="rd-cal-wsep" aria-hidden="true">, </span> : null}{w.site
       ? <a href={w.site} target="_blank" rel="noopener noreferrer" title={"Where " + w.name + "’s next release lands first"}>{w.name}<span className="plink-mark" aria-hidden="true">↗</span></a>
       : w.name}<span className="rd-cal-track">{w.freq}</span></span>);
   return (
@@ -4584,13 +4587,15 @@ function RdConfidence({ rangeId }) {
         </RdKey>
       </div>
       </RdCrossfade>
-      <RdConfCal />
       <HowTo paras={[
         <>Four published gauges of economic confidence, split into two views — the consumer pair and the business pair, switched by the tabs over the chart — and set out as each house prints them from the 2025 election on: the weekly ANZ–Roy Morgan consumer index and monthly business index, Westpac–MI’s monthly consumer sentiment, and NAB’s Monthly Business Survey. Each dot is one release, as printed; each line is the same readings smoothed with a recency-weighted kernel (half-life 14 days on the weekly index, 60 days on the monthly ones), so release-to-release noise reads as trend — the quoted figures stay the raw prints. There is no combining across houses and no adjustment for lean — a record, not an estimate.</>,
         <>Behind the current term, the band pools that view’s main gauge over past terms — each term lined up on its own election month, so the bottom axis (months since this term’s election) is every term’s ruler: the middle half of past terms in the heavier fill, the middle 80% in the lighter, their average the dashed line, paler where fewer terms ran that long. Consumer history runs to 1974, business to 2013. “Draw a past term” lifts any single term out of the band as its own smoothed, dotted line in the house’s own colour — and on the consumer view Westpac–MI’s reading of the same term draws beside it, dotted gold where its 1974 series reaches — and “Source data, CSV” in the footer downloads every release and past-term reading. “Show complete history” instead draws whole years: each lane’s own published monthly series runs back as a pale line — ANZ–Roy Morgan’s consumer index to 1973, Westpac–MI’s consumer sentiment to 1974, Roy Morgan’s business index to 2010 — with the releases and their smoothing re-drawn over the file. Westpac–MI months before 2010 come from the OECD’s republication of the index, which rounds them to the nearest whole index point; from 2010 the RBA’s table carries Westpac–MI’s own decimals. NAB stays out of that underlay: its long series is a deviation from its own average, a different measure to its printed net balance, so the NAB lane only ever carries NAB’s own releases.</>,
         <>Three of the four are indices where 100 is neutral. NAB instead reports a net balance — the share of optimistic firms minus pessimistic ones — where 0 is neutral, so the NAB line is drawn 100 points up to share the neutral line on the business view; the figure beside it and in its tooltips is NAB’s own printed number, and the row also carries the survey’s conditions reading.</>,
         <>Reading economic sentiment beside the polls is context, not a predictor of the vote. The consumer and business gauges needn’t move together, and two houses asking differently worded questions needn’t agree week to week.</>,
       ]} />
+      {/* placement is deliberate: under the how-to, not beside the chart
+          (user call 2026-10-09 evening) */}
+      <RdConfCal />
       <div className="rd-foot">
         <span className="rd-foot-text">Four published gauges — ANZ–Roy Morgan, Westpac–MI, Roy Morgan and NAB — joined as released. Context, not a predictor.</span>
         <span className="rd-grow"></span>

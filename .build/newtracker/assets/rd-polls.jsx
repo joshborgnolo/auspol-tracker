@@ -699,7 +699,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
      tracked-release monitor says what its release monitors instead, so a
      direction survey never passes for a poll even at a glance */
   const calWho = (w, i) => (
-    <span key={String(i)}>{i > 0 ? ", " : ""}{w.site
+    <span key={String(i)} className="rd-cal-wi">{i > 0 ? <span className="rd-cal-wsep" aria-hidden="true">, </span> : null}{w.site
       ? <a href={w.site} target="_blank" rel="noopener noreferrer" title={"Where " + w.name + "’s next release lands first"}>{w.name}<span className="plink-mark" aria-hidden="true">↗</span></a>
       : w.name}{w.tracked && RD_CAL_TRACK[w.tracked]
       ? <span className="rd-cal-track">{RD_CAL_TRACK[w.tracked]}</span> : null}</span>);
