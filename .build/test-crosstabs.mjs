@@ -39,6 +39,27 @@ assert.deepEqual(s.rows.onp, { alp: 2, lnp: 4, onp: 90, grn: 1, ind: 0, oth: 2, 
 assert.deepEqual(Object.keys(s.rows).sort(), ["alp", "grn", "ind", "lnp", "onp", "oth"]);
 assert.equal(sharesProblem(s.rows), null);
 
+// ---- YouGov: the 27 Jan 2026 crosstab (pre-switching-columns) -----------------
+/* Sky News Pulse, before the 2025-vote columns: the sheet keys on
+   National | Male | Female, "National" is the whole poll restated (the
+   `total` youGovDims hands back), and the Coalition prints as its parties –
+   lnp sums as the reads accumulate. */
+const tj = crosstabOfHtml(readFileSync(path.join(ROOT, ".build/news24-src/ig-fixtures-2026-01-27/ig-B9xevRv6O7Od5O3AHCQi.html"), "utf8"));
+assert.ok(tj, "the pre-switching crosstab sheet is found among the chart's sheets");
+assert.equal(ygGroup("National"), null, "the National column is not a group");
+const dj = youGovDims(tj);
+assert.deepEqual(dj.total, { alp: 31, lnp: 20, onp: 25, grn: 12, oth: 12 },
+  "the National column, Liberal + LNP + National summed to the poll row's 20");
+assert.equal(totalProblem(dj.total, poll("YouGov", "2026-01-27")), null, "National matches the published primaries");
+assert.deepEqual(dj.dims.gender.Men, { alp: 35, lnp: 20, onp: 25, grn: 9, oth: 11 });
+assert.deepEqual(dj.dims.age["18–24"], { alp: 36, lnp: 13, onp: 8, grn: 32, oth: 11 });
+assert.deepEqual(dj.dims.age["65+"], { alp: 23, lnp: 33, onp: 34, grn: 1, oth: 9 });
+assert.deepEqual(Object.keys(dj.dims.age), ["18–24", "25–34", "35–49", "50–64", "65+"], "the young band split this wave only");
+assert.deepEqual(dj.dims.location.Rural, { alp: 23, lnp: 20, onp: 35, grn: 9, oth: 13 });
+assert.deepEqual(dj.dims.state.Qld, { alp: 33, lnp: 18, onp: 28, grn: 11, oth: 10 });
+assert.deepEqual(dj.dims.income["$50–99k"], { alp: 29, lnp: 21, onp: 31, grn: 9, oth: 10 });
+assert.equal(dimsProblem(dj.dims), null, "every group passes the gate");
+
 // every header style YouGov has used for these groups in 2026
 const HEADERS = {
   "Age: 18-34": ["age", "18–34"], "Age: 35 - 49": ["age", "35–49"], "Age: 65+": ["age", "65+"],   // Feb–Mar

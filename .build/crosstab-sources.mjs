@@ -37,6 +37,10 @@ export const IG = (id) => `https://e.infogram.com/${id}?src=embed`;
    browser; the News24 waves before the extractor's cache kept them). New
    News24 waves need no entry here. */
 export const KNOWN_IG = {
+  // 27 Jan 2026 (Sky News Pulse): printed subgroups without the switching
+  // columns – its "National" column is the whole poll, not a group, so its
+  // sheet keys on Male/Female instead of the 2025 vote
+  "2026-01-27": "_/B9xevRv6O7Od5O3AHCQi",
   "2026-02-10": "_/ZmzvfoQcPMj4PREkMRoQ", "2026-02-24": "_/ihQUqVtPBNqqg4cvnJMI",
   "2026-03-10": "_/pb7kijCuicNCIZB3PVwM", "2026-03-24": "_/oLs7Ez236QuKo9b8951m",
   "2026-04-07": "_/5PSbKtbHyzvhiC0xbRSl", "2026-04-21": "_/GM5wSTEgnFLWxZ5bKCB4",
@@ -59,7 +63,10 @@ export function youGovSource(date) {
   return { ids: k >= 0 ? [ids[k], ...ids.filter((_, i) => i !== k)] : ids };
 }
 /* The crosstab sheet of a chart: the one with 2025-vote columns and a One
-   Nation row. Returned raw – head (column labels) and rows [label, …cells]. */
+   Nation row – or, before the switching columns appeared (27 Jan 2026), the
+   one opening with National | Male | Female ("National" is the whole poll,
+   and ygGroup never takes it for a group). Returned raw – head (column
+   labels) and rows [label, …cells]. */
 export function crosstabOfHtml(html) {
   const data = infographicDataOf(html);
   const ents = data?.elements?.content?.content?.entities || {};
@@ -69,7 +76,9 @@ export function crosstabOfHtml(html) {
     for (const sheet of cd.data) {
       if (!Array.isArray(sheet) || !Array.isArray(sheet[0])) continue;
       const rows = sheet.map((r) => r.map((c) => String(c?.value ?? c ?? "").trim()));
-      if (rows[0].filter((h) => /2025/.test(h)).length < 4) continue;
+      const h2025 = rows[0].filter((h) => /2025/.test(h)).length >= 4;
+      const jan26 = /^male$/i.test(rows[0][2] || "") && /^female$/i.test(rows[0][3] || "");
+      if (!h2025 && !jan26) continue;
       if (!rows.some((r) => /^one nation$/i.test(r[0]))) continue;
       return { head: rows[0], rows: rows.slice(1).filter((r) => r[0]),
                title: (html.match(/<title>(.*?)<\/title>/s) || [])[1]?.trim() };
@@ -87,11 +96,15 @@ export async function youGovCrosstab(ids) {
   return null;
 }
 /* YouGov's party rows onto the site's keys; independents, other parties and
-   any party the house names separately (Community Strong) fold into oth. */
+   any party the house names separately (Community Strong) fold into oth.
+   27 Jan 2026 printed the Coalition as its parties ("Liberal Party", "LNP",
+   "National Party") – lnp rows sum as the dims accumulate, exactly as a RedBridge
+   split table's, and their National column's sum matches the poll row. */
 export const ygParty = (r) => {
   const s = r.toLowerCase().trim();
-  if (s === "labor") return "alp";
+  if (s === "labor" || s === "labor party") return "alp";
   if (s === "coalition") return "lnp";
+  if (s === "liberal party" || s === "lnp" || s === "national party") return "lnp";
   if (s === "one nation") return "onp";
   if (/greens/.test(s)) return "grn";
   return "oth";

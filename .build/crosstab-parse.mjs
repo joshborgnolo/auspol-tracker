@@ -72,6 +72,9 @@ export function ygGroup(h) {
   // state (Jun 2026 on): the three big states, then SA, WA and the rest together
   if ((m = s.match(/^(NSW|VIC|QLD|SA|WA)$/i))) return ["state", { NSW: "NSW", VIC: "Vic", QLD: "Qld", SA: "SA", WA: "WA" }[m[1].toUpperCase()]];
   if (/^ACT\s*\/\s*NT\s*\/\s*TAS$/i.test(s)) return ["state", "ACT/NT/Tas"];
+  // "National" is the whole poll restated, not a group (27 Jan 2026, before
+  // the switching columns appeared); it stays unmapped on purpose
+  if (/^national$/i.test(s)) return null;
   // housing: "Own outright" (24 Mar), "Housing: Own outright" (Apr–May), "Own home outright" (Jun on)
   if (/^(?:housing:\s*)?own(?: home)? outright$/i.test(s)) return ["housing", "Own outright"];
   if (/^(?:housing:\s*)?(?:mortgage(?:-holder)?|mortgaging home)$/i.test(s)) return ["housing", "Mortgage"];
@@ -92,7 +95,9 @@ export function ygGroup(h) {
 }
 export function youGovDims(t) {
   const dims = {}, total = {};
-  const totalAt = t.head.findIndex((h) => /^total$/i.test(h));
+  // the all-voters column: headed "Total", or "National" pre-switching-columns
+  // (27 Jan 2026); totalProblem then checks it against the poll row
+  const totalAt = t.head.findIndex((h) => /^total$/i.test(h) || /^national$/i.test(h));
   const cols = t.head.map((h, n) => [ygGroup(h), n]).filter(([g]) => g);
   // a wave can print the same group as two columns (21 Apr 2026: "Household
   // income: <100k" beside an identical copy headed "Income: <100k") – the

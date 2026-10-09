@@ -896,8 +896,8 @@ try {
     const k = key(p);
     if (KNOWN_SKIP[k]) { skipped.push({ pollster: p.pollster, date: p.date, reason: KNOWN_SKIP[k] }); continue; }
     if (!refresh && have.has(k)) { waves.push(have.get(k)); continue; }
-    const base = { pollster: p.pollster, date: p.date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
-                   article: p.url ?? null };
+    const base = { pollster: p.pollster, date: p.date, dateStart: p.dateStart ?? null, dateEnd: p.dateEnd ?? p.date ?? null,
+                   sample: p.sample ?? null, article: p.url ?? null };
     try {
       if (p.pollster === "YouGov") {
         const src = youGovSource(p.date);
@@ -955,8 +955,8 @@ try {
     if (!p) { pend(k, "no Roy Morgan poll row for this wave's date yet"); continue; }
     const bad = dimsProblem(h.dims) || totalProblem(h.total, p);
     if (bad) { pend(k, `the hand-entered table failed the gate – ${bad}`); continue; }
-    push({ pollster: "Roy Morgan", date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
-           article: p.url ?? null, source: h.source, read: "published table", dims: h.dims,
+    push({ pollster: "Roy Morgan", date, dateStart: p.dateStart ?? null, dateEnd: p.dateEnd ?? p.date ?? null,
+           sample: p.sample ?? null, article: p.url ?? null, source: h.source, read: "published table", dims: h.dims,
            ...(h.total ? { total: h.total } : {}) });
     console.log(`${k}: ${Object.entries(h.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
   }
@@ -971,8 +971,8 @@ try {
       if (!p) { pend(k, `no ${house} poll row for this wave's date yet`); continue; }
       const bad = dimsProblem(h.dims) || totalProblem(h.total, p);
       if (bad) { pend(k, `the hand-entered table failed the gate – ${bad}`); continue; }
-      push({ pollster: house, date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
-             article: p.url ?? null, source: h.source, read: "published table", dims: h.dims,
+      push({ pollster: house, date, dateStart: p.dateStart ?? null, dateEnd: p.dateEnd ?? p.date ?? null,
+             sample: p.sample ?? null, article: p.url ?? null, source: h.source, read: "published table", dims: h.dims,
              ...(h.total ? { total: h.total } : {}) });
       console.log(`${k}: ${Object.entries(h.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
     }
@@ -988,8 +988,8 @@ try {
     const dims = { country: h.country };
     const bad = dimsProblem(dims) || totalProblem(h.total, p);
     if (bad) { pend(k, `the hand-entered country table failed the gate – ${bad}`); continue; }
-    push({ pollster: "Roy Morgan (pooled)", date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
-           article: p.url ?? null, source: h.source, read: "published table", dims, total: h.total });
+    push({ pollster: "Roy Morgan (pooled)", date, dateStart: p.dateStart ?? null, dateEnd: p.dateEnd ?? p.date ?? null,
+           sample: p.sample ?? null, article: p.url ?? null, source: h.source, read: "published table", dims, total: h.total });
     console.log(`${k}: country(${Object.keys(h.country).join("/")})`);
   }
   // Newspoll quarterly aggregates (NEWSPOLL_DEMO) — the "Newspoll (pooled)"
@@ -1001,8 +1001,8 @@ try {
     if (!p) { pend(k, "no Newspoll (pooled) poll row for this wave's date yet"); continue; }
     const bad = dimsProblem(h.dims) || totalProblem(h.total, p);
     if (bad) { pend(k, `the hand-entered table failed the gate – ${bad}`); continue; }
-    push({ pollster: "Newspoll (pooled)", date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
-           article: p.url ?? null, source: h.source, read: "published table", dims: h.dims, total: h.total });
+    push({ pollster: "Newspoll (pooled)", date, dateStart: p.dateStart ?? null, dateEnd: p.dateEnd ?? p.date ?? null,
+           sample: p.sample ?? null, article: p.url ?? null, source: h.source, read: "published table", dims: h.dims, total: h.total });
     console.log(`${k}: ${Object.entries(h.dims).map(([dm, g]) => `${dm}(${Object.keys(g).join("/")})`).join(" ")}`);
   }
   // Resolve: one fetch carries every month; rebuilt whole each run, or kept
