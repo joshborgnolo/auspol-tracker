@@ -2501,9 +2501,11 @@ function RdAllPolls(P) {
      line. A wave sits in every family its table covers (YouGov's weekly
      crosstabs carry working, children and class cuts on one wave), so the
      same poll can draw a row in several tables, each with that family's
-     pair. Only the date view stacks; a column sort falls back to the flat
-     pair-naming view */
-  const demFams = (spl.fams || []).length > 1 ? spl.fams : null;
+     pair. Only the demographics facet's date view stacks; a column sort
+     falls back to the flat pair-naming view, and the surviving split state
+     must not leak the stacked tables onto the other facets (the split
+     persists across a facet hop) */
+  const demFams = facet === "demographics" && (spl.fams || []).length > 1 ? spl.fams : null;
   const [demCapLo, demCapHi] = (() => {
     if (demFams && byDate) return [null, null];
     if (!spl.pairs.some((p) => p[3] != null && p[4] != null)) return [spl.lo, spl.hi];

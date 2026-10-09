@@ -112876,7 +112876,7 @@ function RdAllPolls(P) {
   const prims = rdApPrimList(D.latest && D.latest.primaryOrder || RD_AP_PRIM_FALLBACK);
   const SPLITS = window.DEM_SPLITS || [];
   const spl = SPLITS.find(x => x.id === demSplit) || SPLITS[0];
-  const demFams = (spl.fams || []).length > 1 ? spl.fams : null;
+  const demFams = facet === "demographics" && (spl.fams || []).length > 1 ? spl.fams : null;
   const [demCapLo, demCapHi] = (() => {
     if (demFams && byDate) return [null, null];
     if (!spl.pairs.some(p => p[3] != null && p[4] != null)) return [spl.lo, spl.hi];
