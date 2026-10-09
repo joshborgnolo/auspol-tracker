@@ -5035,8 +5035,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   /* "YouGov (MRP)" is YouGov: a parenthetical method tag names a product,
      never another pollster, and both the filter panel and the pollster
      count speak in houses. The table rows themselves keep the full name, so
-     an MRP or SMS release is still labelled as one. */
-  const baseHouse = (h) => h.replace(/ \((MRP|SMS)\)$/, "");
+     an MRP, SMS or pooled release is still labelled as one. */
+  const baseHouse = (h) => h.replace(/ \((MRP|SMS|pooled)\)$/, "");
   /* The house lists are memoised behind stable identities: the row build
      and the filter pipeline below key their own memos on these arrays, so
      re-deriving them per render would make every one of those memos miss. */
@@ -6411,8 +6411,8 @@ function infoTerms(D) {
   const counts = {};
   D.individualPolls.forEach((p) => { counts[p.pollster] = (counts[p.pollster] || 0) + 1; });
   /* One name per house, as the hero counts them (housesTracked): a house's
-     MRP or SMS release is the same pollster, not another source. */
-  const baseHouse = (h) => h.replace(/ \((MRP|SMS)\)$/, "");
+     MRP, SMS or pooled release is the same pollster, not another source. */
+  const baseHouse = (h) => h.replace(/ \((MRP|SMS|pooled)\)$/, "");
   const houseCounts = {};
   Object.keys(counts).forEach((h) => { houseCounts[baseHouse(h)] = (houseCounts[baseHouse(h)] || 0) + counts[h]; });
   const sources = Object.keys(houseCounts).sort((a, b) => houseCounts[b] - houseCounts[a]).join(", ");

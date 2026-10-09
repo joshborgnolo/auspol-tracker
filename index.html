@@ -92071,7 +92071,7 @@ function AllPollsView({
     ppmFlag
   } = window;
   const pubBasis = tppBasis === "resp";
-  const baseHouse = h => h.replace(/ \((MRP|SMS)\)$/, "");
+  const baseHouse = h => h.replace(/ \((MRP|SMS|pooled)\)$/, "");
   const {
     houses,
     housesDir,
@@ -93586,7 +93586,7 @@ function infoTerms(D) {
   D.individualPolls.forEach(p => {
     counts[p.pollster] = (counts[p.pollster] || 0) + 1;
   });
-  const baseHouse = h => h.replace(/ \((MRP|SMS)\)$/, "");
+  const baseHouse = h => h.replace(/ \((MRP|SMS|pooled)\)$/, "");
   const houseCounts = {};
   Object.keys(counts).forEach(h => {
     houseCounts[baseHouse(h)] = (houseCounts[baseHouse(h)] || 0) + counts[h];

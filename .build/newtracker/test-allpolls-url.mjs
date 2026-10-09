@@ -60,13 +60,15 @@ const liveHouses = [...new Set(polls.map((p) => baseHouse(p.pollster)))].sort();
 const eq = (a, b) => a.size === b.size && [...a].every((x) => b.has(x));
 const S = (...v) => new Set(v);
 
-/* --- the frozen house order: pinned verbatim, alphabetical today, covers
-     every house the live data offers, and no order member matches the b-token
-     grammar itself (or a legacy comma value could parse as a mask) --- */
-ok("URL_HOUSES is the pinned 12-house list", JSON.stringify(URL_HOUSES) === JSON.stringify([
+/* --- the frozen house order: pinned verbatim (append-only tail of the
+     direction/issues/confidence-only houses), covers every house the live
+     data offers, and no order member matches the b-token grammar itself
+     (or a legacy comma value could parse as a mask) --- */
+ok("URL_HOUSES is the pinned 17-house list", JSON.stringify(URL_HOUSES) === JSON.stringify([
   "Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater",
   "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy",
-  "Wolf & Smith", "YouGov",
+  "Wolf & Smith", "YouGov", "SEC Newgate", "Ipsos",
+  "ANZ–Roy Morgan", "Westpac–MI", "NAB",
 ]), JSON.stringify(URL_HOUSES));
 ok("every live house has a bit in URL_HOUSES", liveHouses.every((h) => URL_HOUSES.includes(h)),
   `live-only: ${JSON.stringify(liveHouses.filter((h) => !URL_HOUSES.includes(h)))}`);
