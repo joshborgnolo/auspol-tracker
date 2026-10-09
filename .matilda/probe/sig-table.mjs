@@ -134,7 +134,7 @@ const againstRow = (label, setLab, grp) => {
 };
 /* the conversation case and one from each gate outcome */
 againstRow("ALP outer-metro", "By location", "Outer metro");
-againstRow("ALP rest-of-Australia", "By state", "Rest of Australia");
+againstRow("ALP non-eastern-mainland", "By state", "Non-NSW/Vic/Qld");
 againstRow("ALP Queensland", "By state", "Qld");
 againstRow("ALP inner-metro", "By location", "Inner metro");
 const locHead = dom.sets.find((s) => s.head.startsWith("By location")).head;

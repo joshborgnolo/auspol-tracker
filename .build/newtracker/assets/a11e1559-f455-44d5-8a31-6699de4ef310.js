@@ -2215,7 +2215,7 @@ const DEMO_WHO = {
   University: "university graduates",
   NSW: "voters in NSW", Vic: "voters in Victoria", Qld: "voters in Queensland",
   SA: "voters in South Australia", WA: "voters in Western Australia",
-  "Rest of Australia": "voters in SA, WA, Tasmania, and the territories",
+  "Non-NSW/Vic/Qld": "voters in SA, WA, Tasmania, and the territories",
   "Inner metro": "voters in the inner suburbs", "Outer metro": "voters in the outer suburbs",
   Provincial: "voters in provincial towns and cities", Rural: "rural voters",
   "Own outright": "voters who own their home outright", Mortgage: "voters with a mortgage", Renting: "renters",
@@ -2605,7 +2605,7 @@ function DemographicsPanel({ rangeId = "all" }) {
         <p className="table-hint">
           Groups pool only where pollsters cut them the same way
           {tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34"
-            : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the rest of Australia at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups"
+            : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the non-eastern mainland at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups"
             : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups"
             : ""}.
         </p>

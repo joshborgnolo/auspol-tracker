@@ -1599,7 +1599,7 @@ const RD_DEMO_SHORT = {
   "18–34": "18–34s", "35–54": "35–54s", "55+": "over-55s", "Gen Z": "Gen Z", Millennials: "Millennials",
   "Gen X": "Gen X", Boomers: "Boomers", Men: "men", Women: "women",
   "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "TAFE- or trade-qualified voters", University: "university graduates",
-  NSW: "NSW voters", Vic: "Victorians", Qld: "Queenslanders", SA: "South Australians", WA: "West Australians", "Rest of Australia": "voters in the non-eastern-mainland states",
+  NSW: "NSW voters", Vic: "Victorians", Qld: "Queenslanders", SA: "South Australians", WA: "West Australians", "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
   "Inner metro": "inner-suburban voters", "Outer metro": "outer-suburban voters", Provincial: "provincial voters", Rural: "rural voters",
   "Own outright": "outright owners", Mortgage: "mortgage holders", Renting: "renters",
   "English only": "English-only speakers", "Other language": "voters who speak another language at home",
@@ -1884,8 +1884,8 @@ const RD_TREND_SKEW = {
   onp: "Its older, regional skew is no stronger or weaker now than it was then.",
   grn: "Its younger, urban skew remains.",
 };
-const RD_TREND_STATE = { NSW: "NSW", Vic: "Victoria", Qld: "Queensland", SA: "South Australia", WA: "Western Australia", "Rest of Australia": "the rest of Australia" };
-const RD_TREND_STATE_ORDER = ["NSW", "Vic", "Qld", "SA", "WA", "Rest of Australia"];
+const RD_TREND_STATE = { NSW: "NSW", Vic: "Victoria", Qld: "Queensland", SA: "South Australia", WA: "Western Australia", "Non-NSW/Vic/Qld": "the non-eastern-mainland states" };
+const RD_TREND_STATE_ORDER = ["NSW", "Vic", "Qld", "SA", "WA", "Non-NSW/Vic/Qld"];
 const RD_TREND_EASTERN = ["NSW", "Vic", "Qld"];
 const RD_TREND_LOC = {
   "Inner metro": { adj: "inner-metro", ref: "the inner metros" },
@@ -2144,8 +2144,8 @@ function RdDemographics({ rangeId = "all" }) {
     const stateDek = (ms, hedged) => {
       /* a side with no significant move of its own names the other side's
          complement: "away from NSW, Victoria, and Queensland, and towards
-         the rest of Australia" is rest-of-Australia's single move read the
-         other way. A side with a move of its own QUOTES its own figure
+         the non-eastern-mainland states" is that bucket's single move read
+         the other way. A side with a move of its own QUOTES its own figure
          (user dictate 2026-09-30); a complement-named side stays bare. */
       const towardMs = ms.filter((m) => m.dir > 0), awayMs = ms.filter((m) => m.dir < 0);
       const toward = towardMs.map((m) => m.group);

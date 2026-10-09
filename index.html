@@ -35757,7 +35757,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
             "oth": [9.4, 9.4, 12.3, 15.4]
           }
         }, {
-          "label": "Rest of Australia",
+          "label": "Non-NSW/Vic/Qld",
           "v": {
             "alp": 30.7,
             "lnp": 21,
@@ -36359,7 +36359,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "tab": "place",
         "set": "state",
         "setLabel": "By state",
-        "group": "Rest of Australia",
+        "group": "Non-NSW/Vic/Qld",
         "dir": 1,
         "tAbs": 3.17,
         "tLR": 3.77,
@@ -36714,7 +36714,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "tab": "place",
         "set": "state",
         "setLabel": "By state",
-        "group": "Rest of Australia",
+        "group": "Non-NSW/Vic/Qld",
         "from": "2025-07",
         "to": "2026-10",
         "dir": 1,
@@ -37301,7 +37301,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "tab": "place",
         "set": "state",
         "setLabel": "By state",
-        "group": "Rest of Australia",
+        "group": "Non-NSW/Vic/Qld",
         "from": "2025-07",
         "to": "2026-10",
         "dir": 1,
@@ -37808,7 +37808,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "tab": "place",
         "set": "state",
         "setLabel": "By state",
-        "group": "Rest of Australia",
+        "group": "Non-NSW/Vic/Qld",
         "from": "2025-07",
         "to": "2026-10",
         "dir": -1,
@@ -38299,7 +38299,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "tab": "place",
         "set": "state",
         "setLabel": "By state",
-        "group": "Rest of Australia",
+        "group": "Non-NSW/Vic/Qld",
         "from": "2025-07",
         "to": "2026-10",
         "dir": 1,
@@ -38531,7 +38531,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "tab": "place",
         "set": "state",
         "setLabel": "By state",
-        "group": "Rest of Australia",
+        "group": "Non-NSW/Vic/Qld",
         "dir": -1,
         "tAbs": -2.73,
         "tLR": -2.24,
@@ -38854,7 +38854,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "tab": "place",
         "set": "state",
         "setLabel": "By state",
-        "group": "Rest of Australia",
+        "group": "Non-NSW/Vic/Qld",
         "from": "2025-07",
         "to": "2026-10",
         "dir": -1,
@@ -39042,7 +39042,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "Qld": [30.98, 34.91, 7.84, 11.76, 14.5],
       "SA": [38.31, 28.45, 6.15, 13.42, 13.68],
       "WA": [35.59, 31.55, 7.61, 11.97, 13.28],
-      "Rest of Australia": [37.64, 29.01, 6.34, 12.55, 14.45]
+      "Non-NSW/Vic/Qld": [37.64, 29.01, 6.34, 12.55, 14.45]
     }
   };
   const demoLocElection = {
@@ -40532,7 +40532,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "window": "six weeks"
     }
   };
-  const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "SA", "WA", "Rest of Australia", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language"];
+  const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "SA", "WA", "Non-NSW/Vic/Qld", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language"];
   const accuracy = {
     "windowDays": 14,
     "cycles": [{
@@ -82956,7 +82956,7 @@ const DEMO_WHO = {
   Qld: "voters in Queensland",
   SA: "voters in South Australia",
   WA: "voters in Western Australia",
-  "Rest of Australia": "voters in SA, WA, Tasmania, and the territories",
+  "Non-NSW/Vic/Qld": "voters in SA, WA, Tasmania, and the territories",
   "Inner metro": "voters in the inner suburbs",
   "Outer metro": "voters in the outer suburbs",
   Provincial: "voters in provincial towns and cities",
@@ -83451,7 +83451,7 @@ function DemographicsPanel({
     className: "table-hint"
   }, "The charts are built the way the site\u2019s other monthly lines are: each poll is a dot and each line\u2019s 95% interval is shaded. Where two groups\u2019 shading overlaps, the polls can\u2019t tell them apart that month. \u221238% means the party\u2019s vote in that group is 38% lower than among all voters, not 38 points. Measured this way a party\u2019s growth doesn\u2019t read as a widening divide, so a flat line means the group moved with everyone else."), React.createElement("p", {
     className: "table-hint"
-  }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the rest of Australia at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups" : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups" : "", "."), tab.id === "age" && React.createElement("p", {
+  }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the non-eastern mainland at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups" : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups" : "", "."), tab.id === "age" && React.createElement("p", {
     className: "table-hint"
   }, "Neither pollster publishes the birth years behind its generations; the usual ones, and what is uncertain about them, are under", " ", React.createElement("a", {
     className: "hi-term",
@@ -92514,7 +92514,7 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "Limits."), " The margins can\u2019t see pollsters defining or weighting a group differently, and a pollster that joins the series part-way, reading a group its own way, can move a monthly line by that alone. The test looks for steady change, so a rise and a fall within the period cancel out."), working(React.createElement(React.Fragment, null, React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Which pollsters count where."), " Men and women: Resolve, DemosAU, YouGov, and RedBridge. 18\u201334: Resolve, DemosAU, and YouGov. 35\u201354 and 55+: Resolve and DemosAU, since YouGov\u2019s bands are 35\u201349 and 50+.", " ", xref("generations", "who votes for whom", "Generations"), ": YouGov and RedBridge. Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge\u2019s two school rows combined in proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the rest of Australia at their shares of the 2025 vote. Where people live: YouGov and RedBridge, which draw the same four areas, and DemosAU for the two metropolitan ones, since its third combines provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its renters include others who don\u2019t own. Language at home: YouGov and DemosAU."), React.createElement("span", {
+      }, React.createElement("b", null, "Which pollsters count where."), " Men and women: Resolve, DemosAU, YouGov, and RedBridge. 18\u201334: Resolve, DemosAU, and YouGov. 35\u201354 and 55+: Resolve and DemosAU, since YouGov\u2019s bands are 35\u201349 and 50+.", " ", xref("generations", "who votes for whom", "Generations"), ": YouGov and RedBridge. Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge\u2019s two school rows combined in proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the non-eastern mainland at their shares of the 2025 vote. Where people live: YouGov and RedBridge, which draw the same four areas, and DemosAU for the two metropolitan ones, since its third combines provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its renters include others who don\u2019t own. Language at home: YouGov and DemosAU."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Pooling."), " The gaps are weighted as the headline\u2019s polls are, so newer and larger polls count for more. A group\u2019s 95% margin is the interval taken over its pooled gaps, each poll\u2019s sample for the group being the poll\u2019s sample times the group\u2019s share of adults."), React.createElement("span", {
         className: "info-p"
@@ -100007,7 +100007,7 @@ const RD_DEMO_SHORT = {
   Qld: "Queenslanders",
   SA: "South Australians",
   WA: "West Australians",
-  "Rest of Australia": "voters in the non-eastern-mainland states",
+  "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
   "Inner metro": "inner-suburban voters",
   "Outer metro": "outer-suburban voters",
   Provincial: "provincial voters",
@@ -100391,9 +100391,9 @@ const RD_TREND_STATE = {
   Qld: "Queensland",
   SA: "South Australia",
   WA: "Western Australia",
-  "Rest of Australia": "the rest of Australia"
+  "Non-NSW/Vic/Qld": "the non-eastern-mainland states"
 };
-const RD_TREND_STATE_ORDER = ["NSW", "Vic", "Qld", "SA", "WA", "Rest of Australia"];
+const RD_TREND_STATE_ORDER = ["NSW", "Vic", "Qld", "SA", "WA", "Non-NSW/Vic/Qld"];
 const RD_TREND_EASTERN = ["NSW", "Vic", "Qld"];
 const RD_TREND_LOC = {
   "Inner metro": {

@@ -3499,9 +3499,9 @@ const primaryNow = primaryNowAt(refNow);
   per-state first-prefs-by-vote-type pages (event 31496,
   HouseStateFirstPrefsByPartyByVoteType-31496-<state>.htm); Coalition rows
   summed (Liberal + The Nationals; + Liberal National Party of Queensland in
-  Qld, + Country Liberal in the NT). Rest of Australia = national less
-  NSW+Vic+Qld (the panel's RoA group pools SA/WA/Tas/ACT/NT; SA's and WA's
-  marks come from their own state pages). x is the
+  Qld, + Country Liberal in the NT). Non-NSW/Vic/Qld = national less
+  NSW+Vic+Qld (the panel's non-eastern-mainland group pools SA/WA/Tas/ACT/NT;
+  SA's and WA's marks come from their own state pages). x is the
   election's mid-month mark, as aggPrimary's election row carries. Nat is
   the national share, so the All-voters line can be led back to its own
   election point in the guide tip (no ring - it draws no panel of its
@@ -3516,7 +3516,7 @@ const DEMO_STATE_ELECTION = {
     "Qld": [30.98, 34.91, 7.84, 11.76, 14.5],
     "SA": [38.31, 28.45, 6.15, 13.42, 13.68],
     "WA": [35.59, 31.55, 7.61, 11.97, 13.28],
-    "Rest of Australia": [37.64, 29.01, 6.34, 12.55, 14.45],
+    "Non-NSW/Vic/Qld": [37.64, 29.01, 6.34, 12.55, 14.45],
   },
 };
 

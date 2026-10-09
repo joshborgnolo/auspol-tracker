@@ -16,17 +16,18 @@
                  RedBridge's two school rows merge 39:61, the split of its own
                  printed group sizes (Jul–Aug 2026: 216 and 343 respondents;
                  its earlier reports print none).
-     state       NSW, Vic, Qld and Rest of Australia – Resolve's four, every
-                 month of the term. YouGov (Jun 2026 on) prints NSW, VIC and
-                 QLD, then SA, WA and ACT/NT/TAS. SA and WA are common groups
-                 of their own (YouGov and Roy Morgan both cut them); the
-                 three together are Rest of Australia, merged at their
-                 shares of the 2025 formal vote (AEC event 31496) – a known
-                 split, not an estimate. A wave missing any of the three
-                 doesn't join there. Roy Morgan (from the 2026-09-27 wave's
-                 fortnight release PDF) prints NSW, Vic, Qld, SA and WA but
-                 no Tas/ACT/NT cut, so it joins at the three big states and
-                 at SA and WA, never at Rest of Australia.
+     state       NSW, Vic, Qld and Non-NSW/Vic/Qld – Resolve's four (its
+                 fourth cut is filed "Rest of Australia"), every month of
+                 the term. YouGov (Jun 2026 on) prints NSW, VIC and QLD,
+                 then SA, WA and ACT/NT/TAS. SA and WA are common groups of
+                 their own (YouGov and Roy Morgan both cut them); the three
+                 together are Non-NSW/Vic/Qld, merged at their shares of the
+                 2025 formal vote (AEC event 31496) – a known split, not an
+                 estimate. A wave missing any of the three doesn't join
+                 there. Roy Morgan (from the 2026-09-27 wave's fortnight
+                 release PDF) prints NSW, Vic, Qld, SA and WA but no
+                 Tas/ACT/NT cut, so it joins at the three big states and at
+                 SA and WA, never at Non-NSW/Vic/Qld.
      location    Inner metro, Outer metro, Provincial and Rural – YouGov and
                  RedBridge cut identically. DemosAU's Regional/Rural is
                  provincial and rural voters together, so it joins only at
@@ -58,7 +59,7 @@ export const DEMO_SETS = [
   { tab: "age", id: "generation", label: "By generation", groups: ["Gen Z", "Millennials", "Gen X", "Boomers"] },
   { tab: "gender", id: "gender", label: null, groups: ["Men", "Women"] },
   { tab: "education", id: "education", label: null, groups: ["Year 12 or less", "TAFE or trade", "University"] },
-  { tab: "place", id: "state", label: "By state", groups: ["NSW", "Vic", "Qld", "SA", "WA", "Rest of Australia"] },
+  { tab: "place", id: "state", label: "By state", groups: ["NSW", "Vic", "Qld", "SA", "WA", "Non-NSW/Vic/Qld"] },
   { tab: "place", id: "location", label: "By location", groups: ["Inner metro", "Outer metro", "Provincial", "Rural"] },
   { tab: "home", id: "housing", label: "By housing", groups: ["Own outright", "Mortgage", "Renting"] },
   { tab: "home", id: "language", label: "By language at home", groups: ["English only", "Other language"] },
@@ -78,7 +79,7 @@ export const DEMO_SHARE = {
   "18–34": 0.28, "35–54": 0.33, "55+": 0.39,
   "Gen Z": 0.19, Millennials: 0.28, "Gen X": 0.25, Boomers: 0.28,
   "Year 12 or less": 0.40, "TAFE or trade": 0.31, University: 0.29,
-  NSW: 0.31, Vic: 0.26, Qld: 0.20, SA: 0.07, WA: 0.10, "Rest of Australia": 0.23,
+  NSW: 0.31, Vic: 0.26, Qld: 0.20, SA: 0.07, WA: 0.10, "Non-NSW/Vic/Qld": 0.23,
   "Inner metro": 0.30, "Outer metro": 0.33, Provincial: 0.16, Rural: 0.21,
   "Own outright": 0.32, Mortgage: 0.36, Renting: 0.32,
   "English only": 0.76, "Other language": 0.24,
@@ -119,7 +120,7 @@ export function harmonize(w) {
     const rest = st["Rest of Australia"] || (YG_REST.every(([l]) => st[l])
       ? Object.fromEntries(KEYS.map((k) => [k, YG_REST.reduce((t, [l, wt]) => t + (+st[l][k] || 0) * wt, 0)]))
       : null);
-    put("state", "Rest of Australia", rest);
+    put("state", "Non-NSW/Vic/Qld", rest);
   }
   // DemosAU's Regional or rural finds no key here; RedBridge's Renting and other neither
   for (const g of ["Inner metro", "Outer metro", "Provincial", "Rural"]) put("location", g, d.location && d.location[g]);

@@ -9,7 +9,7 @@
           on phones
        2. the All-voters state is unchanged from the baseline
        3. selections (Men / 18–34 / 55+ / Gen Z / NSW / University / Rural /
-          Rest of Australia) drive figures, bracket, head/dek/meta, y-domain,
+          Non-NSW/Vic/Qld) drive figures, bracket, head/dek/meta, y-domain,
           election sub-lines — figures asserted against window.AUSPOL itself.
           Every selection's x axis carries the Election landmark (2026-10-08:
           was "May 2025" for groups with no own election row); a cut group
@@ -225,10 +225,10 @@ console.log("== selections ==");
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const SHORT = {
   Men: "men", "18–34": "18–34s", "55+": "over-55s", "Gen Z": "Gen Z", University: "university graduates",
-  NSW: "NSW voters", Rural: "rural voters", "Rest of Australia": "voters in the non-eastern-mainland states",
+  NSW: "NSW voters", Rural: "rural voters", "Non-NSW/Vic/Qld": "voters in the non-eastern-mainland states",
 };
 for (const [label, ev] of [["Men", { level: true, chg: false }], ["18–34", {}], ["55+", { lead: "One Nation" }], ["Gen Z", {}],
-                           ["NSW", { chg: true }], ["University", {}], ["Rural", { tallTicks: true, chg: true }], ["Rest of Australia", { chg: true }]]) {
+                           ["NSW", { chg: true }], ["University", {}], ["Rural", { tallTicks: true, chg: true }], ["Non-NSW/Vic/Qld", { chg: true }]]) {
   const exp = await expectedFor(label);
   const s = await collect(1280, 900, label);
   console.log(`--- ${label}`);

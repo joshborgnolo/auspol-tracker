@@ -7165,7 +7165,7 @@ function infoTerms(D) {
           {" "}{xref("generations", "who votes for whom", "Generations")}: YouGov and RedBridge.
           Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge’s two school
           rows combined in proportion to its own group sizes. States: Resolve and, since June 2026,
-          YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the rest of Australia at
+          YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the non-eastern mainland at
           their shares of the 2025 vote. Where people live: YouGov and RedBridge, which draw the
           same four areas, and DemosAU for the two metropolitan ones, since its third combines
           provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for
