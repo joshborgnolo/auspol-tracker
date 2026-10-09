@@ -92,11 +92,19 @@ const HEADERS = {
   "Household income 100-149k": ["income", "$100–149k"], "Household income 150k+": ["income", "$150k+"],
   "Income: <100k": ["income", "Under $100k"], "Income less than $100k": ["income", "Under $100k"],
   "Income more than $100k": ["income", "$100k or more"],
-  // not read: the 2025 vote (the One Nation panel's), parental status
-  // ("parent" is not "rent"), employment and class
+  // children at home (24 Mar 2026 on; the long negative from 7 Apr), working
+  // status (2 Jun 2026 on) and self-assessed class (10 Feb 2026 on) —
+  // facet-only dims, each spawning a family of spellings
+  "No, I am neither a parent or guardian": ["children", "No children"],
+  "Parental Status: Yes, children <18": ["children", "Children under 18"],
+  "Yes, children <18": ["children", "Children under 18"], "No children": ["children", "No children"],
+  "Parental Status: Yes, children 18+": ["children", "Children 18+"],
+  "Full time": ["working", "Full time"], "Full time employed": ["working", "Full time"],
+  "Part time employed": ["working", "Part time"], Retired: ["working", "Retired"],
+  "Class: Working class": ["class", "Working class"], "Working class": ["class", "Working class"],
+  "Class: Well off": ["class", "Well off"],
+  // not read: the 2025 vote (the One Nation panel's)
   "Voted Labor in 2025": null,
-  "No, I am neither a parent or guardian": null, "Parental Status: Yes, children <18": null,
-  "Full time": null, Retired: null, "Class: Working class": null,
 };
 for (const [h, want] of Object.entries(HEADERS)) assert.deepEqual(ygGroup(h), want, `header "${h}"`);
 // the 24 Aug wave's place, housing and language columns

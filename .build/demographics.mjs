@@ -14,8 +14,12 @@
                  over 2026). Its household-income columns are read too, but
                  only for the All-polls demographics facet (no house cuts
                  income like another, so it joins no common group –
-                 .build/newtracker/demo-groups.mjs' header). Its employment,
-                 parental-status and class columns are not read.
+                 .build/newtracker/demo-groups.mjs' header). Its self-assessed
+                 class (Feb 2026 on), children-at-home (Mar on) and working-
+                 status (Jun on) columns are read to the same facet-only end:
+                 no shared axis can hold them across houses, so they ride to
+                 the facet's Other cuts tables (the Newspoll pooled waves'
+                 religion and working-status dims likewise).
      DemosAU   – the Gender, Age, Education, Location and Housing Tenure
                  charts (and Language Status from May) in the wave's report
                  PDF, measured from the rendered bars (.build/demosau-charts
@@ -1807,7 +1811,7 @@ const reminders = watchReminders({
 });
 
 const doc = {
-  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
+  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. YouGov's self-assessed class (Feb 2026 on), children-at-home (Mar on) and working-status columns (Jun on), and the Newspoll pooled waves' religion and working-status dims, ride dims[class|children|working|religion] to the same facet-only end. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
   waves,
   skipped,
 };

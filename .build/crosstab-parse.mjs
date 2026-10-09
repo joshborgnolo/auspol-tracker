@@ -91,6 +91,23 @@ export function ygGroup(h) {
   if ((m = s.match(/^(?:household\s+)?income:?\s*(?:>|over|more than)\s*\$?(\d+)\s*k\s*\+?$/i))) return ["income", `$${m[1]}k or more`];
   if ((m = s.match(/^(?:household\s+)?income:?\s*\$?(\d+)\s*k?\s*-\s*\$?(\d+)\s*k$/i))) return ["income", `$${m[1]}–${m[2]}k`];
   if ((m = s.match(/^(?:household\s+)?income:?\s*\$?(\d+)\s*k\s*\+$/i))) return ["income", `$${m[1]}k+`];
+  // children at home (24 Mar 2026 on): "No children" on 24 Mar, the long
+  // "No, I am neither a parent or guardian" from 7 Apr; a "Parental Status: "
+  // prefix dresses the 7 Apr–19 May set
+  if (/^(?:parental status:\s*)?yes, children <18$/i.test(s)) return ["children", "Children under 18"];
+  if (/^(?:parental status:\s*)?yes, children 18\+$/i.test(s)) return ["children", "Children 18+"];
+  if (/^(?:parental status:\s*)?no children$/i.test(s)) return ["children", "No children"];
+  if (/^(?:parental status:\s*)?no, i am neither a parent or guardian$/i.test(s)) return ["children", "No children"];
+  // working status (2 Jun 2026 on): spelled "Full time employed"/"Part time
+  // employed" through 10 Aug
+  if (/^full time(?: employed)?$/i.test(s)) return ["working", "Full time"];
+  if (/^part time(?: employed)?$/i.test(s)) return ["working", "Part time"];
+  if (/^retired$/i.test(s)) return ["working", "Retired"];
+  // self-assessed class (10 Feb 2026 on): "Class: " prefixed every wave but
+  // 24 Mar, which prints the three groups bare
+  if (/^(?:class:\s*)?well off$/i.test(s)) return ["class", "Well off"];
+  if (/^(?:class:\s*)?middle class$/i.test(s)) return ["class", "Middle class"];
+  if (/^(?:class:\s*)?working class$/i.test(s)) return ["class", "Working class"];
   return null;
 }
 export function youGovDims(t) {

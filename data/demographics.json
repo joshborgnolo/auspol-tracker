@@ -1,5 +1,5 @@
 {
- "_about": "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
+ "_about": "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|income|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). income is per-house only (YouGov household, DemosAU personal; no common brackets) – read for the All-polls demographics facet, never pooled. YouGov's self-assessed class (Feb 2026 on), children-at-home (Mar on) and working-status columns (Jun on), and the Newspoll pooled waves' religion and working-status dims, ride dims[class|children|working|religion] to the same facet-only end. Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
  "waves": [
   {
    "pollster": "Resolve",
@@ -4212,6 +4212,29 @@
       "oth": 13
      }
     },
+    "class": {
+     "Well off": {
+      "alp": 34,
+      "lnp": 24,
+      "onp": 16,
+      "grn": 12,
+      "oth": 14
+     },
+     "Middle class": {
+      "alp": 32,
+      "lnp": 23,
+      "onp": 23,
+      "grn": 13,
+      "oth": 9
+     },
+     "Working class": {
+      "alp": 27,
+      "lnp": 14,
+      "onp": 34,
+      "grn": 12,
+      "oth": 12
+     }
+    },
     "income": {
      "$100–149k": {
       "alp": 36,
@@ -4725,6 +4748,29 @@
       "grn": 13,
       "oth": 13
      }
+    },
+    "class": {
+     "Well off": {
+      "alp": 39,
+      "lnp": 35,
+      "onp": 6,
+      "grn": 5,
+      "oth": 15
+     },
+     "Middle class": {
+      "alp": 33,
+      "lnp": 25,
+      "onp": 22,
+      "grn": 9,
+      "oth": 11
+     },
+     "Working class": {
+      "alp": 24,
+      "lnp": 19,
+      "onp": 28,
+      "grn": 17,
+      "oth": 12
+     }
     }
    },
    "total": {
@@ -5204,6 +5250,29 @@
       "grn": 10,
       "oth": 17
      }
+    },
+    "class": {
+     "Well off": {
+      "alp": 29,
+      "lnp": 32,
+      "onp": 25,
+      "grn": 2,
+      "oth": 12
+     },
+     "Middle class": {
+      "alp": 35,
+      "lnp": 22,
+      "onp": 20,
+      "grn": 11,
+      "oth": 12
+     },
+     "Working class": {
+      "alp": 25,
+      "lnp": 17,
+      "onp": 31,
+      "grn": 15,
+      "oth": 12
+     }
     }
    },
    "total": {
@@ -5287,6 +5356,126 @@
       "grn": 12.47,
       "onp": 19.33,
       "oth": 17.94
+     }
+    }
+   }
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-03-19",
+   "dateStart": "2026-03-06",
+   "dateEnd": "2026-03-19",
+   "sample": 5563,
+   "article": "https://www.accent-research.com/projects/australian-financial-review%2C-redbridge-group-and-accent-research%3A-shifts-in-vote-intention-since-june-2025",
+   "source": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_93009c71944d4ab1b6ae52afef76e20f.pdf",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 32,
+      "lnp": 21,
+      "grn": 10,
+      "onp": 29,
+      "oth": 8
+     },
+     "Women": {
+      "alp": 30,
+      "lnp": 20,
+      "grn": 13,
+      "onp": 27,
+      "oth": 10
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 33,
+      "lnp": 13,
+      "grn": 31,
+      "onp": 15,
+      "oth": 8
+     },
+     "Millennials": {
+      "alp": 32,
+      "lnp": 17,
+      "grn": 15,
+      "onp": 26,
+      "oth": 10
+     },
+     "Gen X": {
+      "alp": 31,
+      "lnp": 19,
+      "grn": 8,
+      "onp": 33,
+      "oth": 9
+     },
+     "Boomers": {
+      "alp": 30,
+      "lnp": 27,
+      "grn": 3,
+      "onp": 32,
+      "oth": 8
+     }
+    },
+    "country": {
+     "Australia": {
+      "alp": 30,
+      "lnp": 21,
+      "grn": 12,
+      "onp": 28,
+      "oth": 9
+     },
+     "Another country": {
+      "alp": 36,
+      "lnp": 20,
+      "grn": 10,
+      "onp": 26,
+      "oth": 8
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 30,
+      "lnp": 20,
+      "grn": 12,
+      "onp": 29,
+      "oth": 9
+     },
+     "Other language": {
+      "alp": 39,
+      "lnp": 20,
+      "grn": 15,
+      "onp": 16,
+      "oth": 10
+     }
+    },
+    "state": {
+     "NSW": {
+      "alp": 31,
+      "lnp": 20,
+      "grn": 11,
+      "onp": 28,
+      "oth": 10
+     },
+     "Vic": {
+      "alp": 29,
+      "lnp": 23,
+      "grn": 14,
+      "onp": 25,
+      "oth": 9
+     },
+     "Qld": {
+      "alp": 28,
+      "lnp": 22,
+      "grn": 10,
+      "onp": 33,
+      "oth": 7
+     },
+     "WA": {
+      "alp": 35,
+      "lnp": 19,
+      "grn": 12,
+      "onp": 27,
+      "oth": 7
      }
     }
    }
@@ -5611,6 +5800,29 @@
       "oth": 11
      }
     },
+    "class": {
+     "Well off": {
+      "alp": 39,
+      "lnp": 31,
+      "onp": 12,
+      "grn": 8,
+      "oth": 10
+     },
+     "Middle class": {
+      "alp": 32,
+      "lnp": 23,
+      "onp": 22,
+      "grn": 13,
+      "oth": 10
+     },
+     "Working class": {
+      "alp": 26,
+      "lnp": 15,
+      "onp": 32,
+      "grn": 14,
+      "oth": 13
+     }
+    },
     "generation": {
      "Gen Z": {
       "alp": 32,
@@ -5676,6 +5888,29 @@
       "onp": 36,
       "grn": 10,
       "oth": 15
+     }
+    },
+    "children": {
+     "Children under 18": {
+      "alp": 28,
+      "lnp": 16,
+      "onp": 29,
+      "grn": 11,
+      "oth": 15
+     },
+     "Children 18+": {
+      "alp": 30,
+      "lnp": 25,
+      "onp": 29,
+      "grn": 5,
+      "oth": 10
+     },
+     "No children": {
+      "alp": 30,
+      "lnp": 16,
+      "onp": 23,
+      "grn": 20,
+      "oth": 11
      }
     },
     "housing": {
@@ -6203,6 +6438,52 @@
       "oth": 19
      }
     },
+    "class": {
+     "Well off": {
+      "alp": 31,
+      "lnp": 24,
+      "onp": 17,
+      "grn": 13,
+      "oth": 15
+     },
+     "Middle class": {
+      "alp": 30,
+      "lnp": 24,
+      "onp": 23,
+      "grn": 11,
+      "oth": 12
+     },
+     "Working class": {
+      "alp": 29,
+      "lnp": 16,
+      "onp": 28,
+      "grn": 14,
+      "oth": 13
+     }
+    },
+    "children": {
+     "Children under 18": {
+      "alp": 31,
+      "lnp": 21,
+      "onp": 28,
+      "grn": 10,
+      "oth": 10
+     },
+     "Children 18+": {
+      "alp": 30,
+      "lnp": 26,
+      "onp": 28,
+      "grn": 6,
+      "oth": 10
+     },
+     "No children": {
+      "alp": 27,
+      "lnp": 15,
+      "onp": 18,
+      "grn": 22,
+      "oth": 17
+     }
+    },
     "housing": {
      "Own outright": {
       "alp": 30,
@@ -6711,6 +6992,29 @@
       "oth": 11
      }
     },
+    "children": {
+     "Children under 18": {
+      "alp": 30,
+      "lnp": 20,
+      "onp": 29,
+      "grn": 9,
+      "oth": 12
+     },
+     "Children 18+": {
+      "alp": 26,
+      "lnp": 29,
+      "onp": 31,
+      "grn": 5,
+      "oth": 9
+     },
+     "No children": {
+      "alp": 28,
+      "lnp": 12,
+      "onp": 22,
+      "grn": 25,
+      "oth": 13
+     }
+    },
     "housing": {
      "Own outright": {
       "alp": 28,
@@ -7211,6 +7515,29 @@
       "oth": 11
      }
     },
+    "children": {
+     "Children under 18": {
+      "alp": 34,
+      "lnp": 18,
+      "onp": 26,
+      "grn": 10,
+      "oth": 11
+     },
+     "Children 18+": {
+      "alp": 30,
+      "lnp": 26,
+      "onp": 29,
+      "grn": 6,
+      "oth": 9
+     },
+     "No children": {
+      "alp": 28,
+      "lnp": 17,
+      "onp": 18,
+      "grn": 23,
+      "oth": 13
+     }
+    },
     "housing": {
      "Own outright": {
       "alp": 29,
@@ -7492,6 +7819,29 @@
       "onp": 23,
       "grn": 16,
       "oth": 11
+     }
+    },
+    "children": {
+     "Children under 18": {
+      "alp": 30,
+      "lnp": 27,
+      "onp": 20,
+      "grn": 14,
+      "oth": 9
+     },
+     "Children 18+": {
+      "alp": 25,
+      "lnp": 25,
+      "onp": 34,
+      "grn": 6,
+      "oth": 10
+     },
+     "No children": {
+      "alp": 28,
+      "lnp": 18,
+      "onp": 20,
+      "grn": 19,
+      "oth": 15
      }
     },
     "housing": {
@@ -8193,6 +8543,52 @@
       "oth": 14
      }
     },
+    "children": {
+     "Children under 18": {
+      "alp": 28,
+      "lnp": 18,
+      "onp": 32,
+      "grn": 10,
+      "oth": 12
+     },
+     "Children 18+": {
+      "alp": 24,
+      "lnp": 24,
+      "onp": 39,
+      "grn": 5,
+      "oth": 8
+     },
+     "No children": {
+      "alp": 27,
+      "lnp": 16,
+      "onp": 19,
+      "grn": 22,
+      "oth": 15
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 31,
+      "lnp": 17,
+      "onp": 27,
+      "grn": 14,
+      "oth": 11
+     },
+     "Part time": {
+      "alp": 23,
+      "lnp": 17,
+      "onp": 30,
+      "grn": 17,
+      "oth": 13
+     },
+     "Retired": {
+      "alp": 27,
+      "lnp": 31,
+      "onp": 33,
+      "grn": 4,
+      "oth": 5
+     }
+    },
     "income": {
      "Under $100k": {
       "alp": 26,
@@ -8269,6 +8665,29 @@
       "onp": 32,
       "grn": 18,
       "oth": 10
+     }
+    },
+    "class": {
+     "Well off": {
+      "alp": 34,
+      "lnp": 24,
+      "onp": 16,
+      "grn": 13,
+      "oth": 14
+     },
+     "Middle class": {
+      "alp": 32,
+      "lnp": 22,
+      "onp": 23,
+      "grn": 11,
+      "oth": 12
+     },
+     "Working class": {
+      "alp": 21,
+      "lnp": 17,
+      "onp": 35,
+      "grn": 15,
+      "oth": 11
      }
     }
    },
@@ -9146,6 +9565,52 @@
       "oth": 14
      }
     },
+    "children": {
+     "Children under 18": {
+      "alp": 28,
+      "lnp": 19,
+      "onp": 31,
+      "grn": 14,
+      "oth": 8
+     },
+     "Children 18+": {
+      "alp": 26,
+      "lnp": 21,
+      "onp": 39,
+      "grn": 5,
+      "oth": 9
+     },
+     "No children": {
+      "alp": 31,
+      "lnp": 14,
+      "onp": 23,
+      "grn": 19,
+      "oth": 13
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 33,
+      "lnp": 18,
+      "onp": 29,
+      "grn": 11,
+      "oth": 10
+     },
+     "Part time": {
+      "alp": 28,
+      "lnp": 14,
+      "onp": 27,
+      "grn": 21,
+      "oth": 10
+     },
+     "Retired": {
+      "alp": 26,
+      "lnp": 23,
+      "onp": 36,
+      "grn": 4,
+      "oth": 11
+     }
+    },
     "income": {
      "Under $100k": {
       "alp": 27,
@@ -9222,6 +9687,29 @@
       "onp": 27,
       "grn": 18,
       "oth": 16
+     }
+    },
+    "class": {
+     "Well off": {
+      "alp": 33,
+      "lnp": 24,
+      "onp": 13,
+      "grn": 22,
+      "oth": 8
+     },
+     "Middle class": {
+      "alp": 33,
+      "lnp": 19,
+      "onp": 25,
+      "grn": 11,
+      "oth": 12
+     },
+     "Working class": {
+      "alp": 25,
+      "lnp": 15,
+      "onp": 37,
+      "grn": 14,
+      "oth": 9
      }
     }
    },
@@ -9630,6 +10118,52 @@
       "oth": 14
      }
     },
+    "children": {
+     "Children under 18": {
+      "alp": 28,
+      "lnp": 23,
+      "onp": 26,
+      "grn": 8,
+      "oth": 15
+     },
+     "Children 18+": {
+      "alp": 27,
+      "lnp": 26,
+      "onp": 34,
+      "grn": 3,
+      "oth": 10
+     },
+     "No children": {
+      "alp": 28,
+      "lnp": 13,
+      "onp": 19,
+      "grn": 22,
+      "oth": 17
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 28,
+      "lnp": 24,
+      "onp": 26,
+      "grn": 9,
+      "oth": 13
+     },
+     "Part time": {
+      "alp": 29,
+      "lnp": 13,
+      "onp": 26,
+      "grn": 20,
+      "oth": 13
+     },
+     "Retired": {
+      "alp": 31,
+      "lnp": 25,
+      "onp": 30,
+      "grn": 4,
+      "oth": 10
+     }
+    },
     "income": {
      "Under $100k": {
       "alp": 28,
@@ -9706,6 +10240,29 @@
       "onp": 24,
       "grn": 19,
       "oth": 17
+     }
+    },
+    "class": {
+     "Well off": {
+      "alp": 30,
+      "lnp": 32,
+      "onp": 16,
+      "grn": 11,
+      "oth": 11
+     },
+     "Middle class": {
+      "alp": 30,
+      "lnp": 25,
+      "onp": 21,
+      "grn": 11,
+      "oth": 13
+     },
+     "Working class": {
+      "alp": 26,
+      "lnp": 14,
+      "onp": 31,
+      "grn": 13,
+      "oth": 15
      }
     }
    },
@@ -9935,6 +10492,52 @@
       "oth": 18
      }
     },
+    "children": {
+     "Children under 18": {
+      "alp": 31,
+      "lnp": 21,
+      "onp": 27,
+      "grn": 9,
+      "oth": 12
+     },
+     "Children 18+": {
+      "alp": 24,
+      "lnp": 28,
+      "onp": 31,
+      "grn": 4,
+      "oth": 13
+     },
+     "No children": {
+      "alp": 31,
+      "lnp": 15,
+      "onp": 20,
+      "grn": 24,
+      "oth": 11
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 30,
+      "lnp": 22,
+      "onp": 24,
+      "grn": 12,
+      "oth": 12
+     },
+     "Part time": {
+      "alp": 30,
+      "lnp": 20,
+      "onp": 19,
+      "grn": 20,
+      "oth": 12
+     },
+     "Retired": {
+      "alp": 27,
+      "lnp": 27,
+      "onp": 32,
+      "grn": 2,
+      "oth": 12
+     }
+    },
     "income": {
      "Under $100k": {
       "alp": 28,
@@ -10011,6 +10614,29 @@
       "onp": 25,
       "grn": 16,
       "oth": 16
+     }
+    },
+    "class": {
+     "Well off": {
+      "alp": 28,
+      "lnp": 23,
+      "onp": 27,
+      "grn": 11,
+      "oth": 11
+     },
+     "Middle class": {
+      "alp": 31,
+      "lnp": 24,
+      "onp": 20,
+      "grn": 11,
+      "oth": 13
+     },
+     "Working class": {
+      "alp": 25,
+      "lnp": 19,
+      "onp": 30,
+      "grn": 15,
+      "oth": 11
      }
     }
    },
@@ -10460,6 +11086,52 @@
       "oth": 20
      }
     },
+    "children": {
+     "Children under 18": {
+      "alp": 29,
+      "lnp": 18,
+      "onp": 31,
+      "grn": 11,
+      "oth": 12
+     },
+     "Children 18+": {
+      "alp": 25,
+      "lnp": 27,
+      "onp": 34,
+      "grn": 4,
+      "oth": 9
+     },
+     "No children": {
+      "alp": 29,
+      "lnp": 18,
+      "onp": 16,
+      "grn": 18,
+      "oth": 19
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 31,
+      "lnp": 21,
+      "onp": 22,
+      "grn": 14,
+      "oth": 12
+     },
+     "Part time": {
+      "alp": 25,
+      "lnp": 19,
+      "onp": 21,
+      "grn": 16,
+      "oth": 19
+     },
+     "Retired": {
+      "alp": 26,
+      "lnp": 31,
+      "onp": 32,
+      "grn": 2,
+      "oth": 9
+     }
+    },
     "income": {
      "Under $100k": {
       "alp": 26,
@@ -10536,6 +11208,29 @@
       "onp": 27,
       "grn": 16,
       "oth": 21
+     }
+    },
+    "class": {
+     "Well off": {
+      "alp": 22,
+      "lnp": 48,
+      "onp": 11,
+      "grn": 6,
+      "oth": 12
+     },
+     "Middle class": {
+      "alp": 30,
+      "lnp": 25,
+      "onp": 20,
+      "grn": 11,
+      "oth": 14
+     },
+     "Working class": {
+      "alp": 25,
+      "lnp": 16,
+      "onp": 31,
+      "grn": 14,
+      "oth": 14
      }
     }
    },
@@ -10944,6 +11639,52 @@
       "oth": 15
      }
     },
+    "children": {
+     "Children under 18": {
+      "alp": 32,
+      "lnp": 20,
+      "onp": 25,
+      "grn": 10,
+      "oth": 13
+     },
+     "Children 18+": {
+      "alp": 28,
+      "lnp": 27,
+      "onp": 32,
+      "grn": 4,
+      "oth": 10
+     },
+     "No children": {
+      "alp": 28,
+      "lnp": 16,
+      "onp": 22,
+      "grn": 20,
+      "oth": 13
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 30,
+      "lnp": 21,
+      "onp": 27,
+      "grn": 11,
+      "oth": 11
+     },
+     "Part time": {
+      "alp": 28,
+      "lnp": 18,
+      "onp": 23,
+      "grn": 19,
+      "oth": 13
+     },
+     "Retired": {
+      "alp": 28,
+      "lnp": 31,
+      "onp": 29,
+      "grn": 2,
+      "oth": 10
+     }
+    },
     "income": {
      "Under $100k": {
       "alp": 26,
@@ -11020,6 +11761,29 @@
       "onp": 27,
       "grn": 21,
       "oth": 16
+     }
+    },
+    "class": {
+     "Well off": {
+      "alp": 17,
+      "lnp": 33,
+      "onp": 15,
+      "grn": 19,
+      "oth": 15
+     },
+     "Middle class": {
+      "alp": 32,
+      "lnp": 25,
+      "onp": 22,
+      "grn": 12,
+      "oth": 9
+     },
+     "Working class": {
+      "alp": 27,
+      "lnp": 17,
+      "onp": 31,
+      "grn": 11,
+      "oth": 14
      }
     }
    },
@@ -11420,6 +12184,52 @@
       "oth": 13
      }
     },
+    "children": {
+     "Children under 18": {
+      "alp": 31,
+      "lnp": 13,
+      "onp": 30,
+      "grn": 9,
+      "oth": 17
+     },
+     "Children 18+": {
+      "alp": 22,
+      "lnp": 22,
+      "onp": 40,
+      "grn": 5,
+      "oth": 11
+     },
+     "No children": {
+      "alp": 28,
+      "lnp": 17,
+      "onp": 20,
+      "grn": 19,
+      "oth": 15
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 27,
+      "lnp": 17,
+      "onp": 31,
+      "grn": 11,
+      "oth": 14
+     },
+     "Part time": {
+      "alp": 27,
+      "lnp": 17,
+      "onp": 24,
+      "grn": 18,
+      "oth": 14
+     },
+     "Retired": {
+      "alp": 25,
+      "lnp": 23,
+      "onp": 37,
+      "grn": 4,
+      "oth": 11
+     }
+    },
     "income": {
      "Under $100k": {
       "alp": 24,
@@ -11496,6 +12306,29 @@
       "onp": 31,
       "grn": 15,
       "oth": 17
+     }
+    },
+    "class": {
+     "Well off": {
+      "alp": 32,
+      "lnp": 31,
+      "onp": 15,
+      "grn": 12,
+      "oth": 9
+     },
+     "Middle class": {
+      "alp": 29,
+      "lnp": 21,
+      "onp": 24,
+      "grn": 11,
+      "oth": 16
+     },
+     "Working class": {
+      "alp": 24,
+      "lnp": 15,
+      "onp": 36,
+      "grn": 12,
+      "oth": 13
      }
     }
    },
@@ -12144,6 +12977,52 @@
       "oth": 19
      }
     },
+    "children": {
+     "Children under 18": {
+      "alp": 28,
+      "lnp": 17,
+      "onp": 30,
+      "grn": 13,
+      "oth": 12
+     },
+     "Children 18+": {
+      "alp": 26,
+      "lnp": 27,
+      "onp": 33,
+      "grn": 5,
+      "oth": 9
+     },
+     "No children": {
+      "alp": 25,
+      "lnp": 16,
+      "onp": 18,
+      "grn": 23,
+      "oth": 17
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 25,
+      "lnp": 19,
+      "onp": 29,
+      "grn": 13,
+      "oth": 14
+     },
+     "Part time": {
+      "alp": 25,
+      "lnp": 21,
+      "onp": 19,
+      "grn": 23,
+      "oth": 12
+     },
+     "Retired": {
+      "alp": 30,
+      "lnp": 30,
+      "onp": 26,
+      "grn": 5,
+      "oth": 9
+     }
+    },
     "income": {
      "Under $100k": {
       "alp": 26,
@@ -12220,6 +13099,29 @@
       "onp": 30,
       "grn": 21,
       "oth": 15
+     }
+    },
+    "class": {
+     "Well off": {
+      "alp": 29,
+      "lnp": 32,
+      "onp": 18,
+      "grn": 10,
+      "oth": 10
+     },
+     "Middle class": {
+      "alp": 26,
+      "lnp": 26,
+      "onp": 20,
+      "grn": 13,
+      "oth": 15
+     },
+     "Working class": {
+      "alp": 25,
+      "lnp": 16,
+      "onp": 33,
+      "grn": 15,
+      "oth": 11
      }
     }
    },
@@ -12692,6 +13594,52 @@
       "oth": 13
      }
     },
+    "children": {
+     "Children under 18": {
+      "alp": 31,
+      "lnp": 15,
+      "onp": 29,
+      "grn": 13,
+      "oth": 12
+     },
+     "Children 18+": {
+      "alp": 20,
+      "lnp": 28,
+      "onp": 38,
+      "grn": 4,
+      "oth": 10
+     },
+     "No children": {
+      "alp": 28,
+      "lnp": 16,
+      "onp": 20,
+      "grn": 24,
+      "oth": 12
+     }
+    },
+    "working": {
+     "Full time": {
+      "alp": 29,
+      "lnp": 19,
+      "onp": 27,
+      "grn": 13,
+      "oth": 12
+     },
+     "Part time": {
+      "alp": 25,
+      "lnp": 18,
+      "onp": 23,
+      "grn": 25,
+      "oth": 9
+     },
+     "Retired": {
+      "alp": 20,
+      "lnp": 33,
+      "onp": 34,
+      "grn": 4,
+      "oth": 9
+     }
+    },
     "income": {
      "Under $100k": {
       "alp": 23,
@@ -12768,6 +13716,29 @@
       "onp": 28,
       "grn": 21,
       "oth": 14
+     }
+    },
+    "class": {
+     "Well off": {
+      "alp": 41,
+      "lnp": 22,
+      "onp": 12,
+      "grn": 14,
+      "oth": 12
+     },
+     "Middle class": {
+      "alp": 27,
+      "lnp": 24,
+      "onp": 22,
+      "grn": 14,
+      "oth": 13
+     },
+     "Working class": {
+      "alp": 22,
+      "lnp": 17,
+      "onp": 36,
+      "grn": 16,
+      "oth": 9
      }
     }
    },

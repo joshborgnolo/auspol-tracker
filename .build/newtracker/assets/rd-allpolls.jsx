@@ -1231,7 +1231,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     const cols = rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK);
     const tot = p.grp.t || null;
     const pr = window.demPairOf(p, demSplit);
-    const DN = { gender: "Gender", age: "Age", generation: "Generation", education: "Education", income: "Income", working: "Working status", state: "State", location: "Location", housing: "Housing", language: "Language at home", country: "Birth country", religion: "Religion" };
+    const DN = { gender: "Gender", age: "Age", generation: "Generation", education: "Education", income: "Income", working: "Working status", state: "State", location: "Location", housing: "Housing", language: "Language at home", country: "Birth country", religion: "Religion", children: "Children at home", class: "Self-assessed class" };
     const cell = (v, k) => {
       const t = tot ? tot[K.indexOf(k)] : null;
       const d = v != null && t != null ? v - t : 0;
@@ -2361,7 +2361,11 @@ function RdAllPolls(P) {
   const FACET_LAB = { twopp: "2PP", primary: "Primary", leadership: phone ? "Leaders" : "Leadership", direction: "Direction",
                       issues: "Issues", demographics: "Demographics", confidence: "Confidence" };
   const FACETS = FACET_IDS.map((id) => ({ id, label: FACET_LAB[id] }));
-  const rowNav = (e, p) => {
+  /* demFam: the cuts-family table this row sits in (null in the flat
+     view). The up/down walk then stays inside that family's row list -
+     a wave sits in several family tables, and an unconditional walk would
+     index it at its higher family and jump the focus there */
+  const rowNav = (e, p, demFam) => {
     if (e.target !== e.currentTarget) return;
     const id = rowKey(p);
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(open === id ? null : id); return; }
@@ -2391,12 +2395,14 @@ function RdAllPolls(P) {
     }
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
-    const j = visRows.indexOf(p) + (e.key === "ArrowDown" ? 1 : -1);
-    const nx = visRows[j];
+    const walk = demFam ? demFamRowsOf(demFam) : visRows;
+    const base = demFam ? demFamOffset(demFam) : 0;
+    const j = walk.indexOf(p) + (e.key === "ArrowDown" ? 1 : -1);
+    const nx = walk[j];
     if (!nx) return;
     if (open === id) setOpen(rowKey(nx));
     const rows = bodyRef.current ? bodyRef.current.querySelectorAll(phone ? ".rd-ap-card" : ".rd-ap-row") : [];
-    if (rows[j]) rows[j].focus();
+    if (rows[base + j]) rows[base + j].focus();
   };
 
   /* ---- the pinned bar: the headings stay in view all the way down ---------- */
@@ -2489,7 +2495,17 @@ function RdAllPolls(P) {
      d1a1 convention) can't be spanned by any one caption pair, so the caps
      come from the pair every visible row shares - and when the rows mix
      pairs, no labels show at all rather than lying about one of the rows */
+  /* Other-cuts families (the d1a1 def's `fams`, user call 2026-10-10 "you
+     can make another table … one under the other"): one stacked table per
+     cut family, newest rows first in each, headed by the family's own caps
+     line. A wave sits in every family its table covers (YouGov's weekly
+     crosstabs carry working, children and class cuts on one wave), so the
+     same poll can draw a row in several tables, each with that family's
+     pair. Only the date view stacks; a column sort falls back to the flat
+     pair-naming view */
+  const demFams = (spl.fams || []).length > 1 ? spl.fams : null;
   const [demCapLo, demCapHi] = (() => {
+    if (demFams && byDate) return [null, null];
     if (!spl.pairs.some((p) => p[3] != null && p[4] != null)) return [spl.lo, spl.hi];
     const found = new Map();
     for (const p of rows) {
@@ -2500,6 +2516,29 @@ function RdAllPolls(P) {
     if (found.size === 0) return [spl.lo, spl.hi];
     return [null, null];
   })();
+  /* …continued: with fams stacked the caps live on each family's table
+     head, so the split's own end labels step aside */
+  const demFamTables = demFams && byDate ? demFams.map((fam) => {
+    const list = (groups || []).flatMap((g) => g.list).filter((p) => window.demPairOf(p, demSplit, fam.id));
+    const gs = [];
+    for (const p of list) {
+      if (!gs.length || gs[gs.length - 1].ym !== p.ym) gs.push({ ym: p.ym, list: [] });
+      gs[gs.length - 1].list.push(p);
+    }
+    return { fam, groups: gs, rows: list };
+  }).filter((t) => t.rows.length) : null;
+  // each family's table caps: the [3]/[4] pair labels every visible row shares
+  const famCapsOf = (t) => {
+    const found = new Map();
+    for (const p of t.rows) {
+      const pr = window.demPairOf(p, demSplit, t.fam.id);
+      if (pr && pr.loCap != null && pr.hiCap != null) found.set(pr.a + "" + pr.b, [pr.loCap, pr.hiCap]);
+    }
+    return found.size === 1 ? [...found.values()][0] : [null, null];
+  };
+  // the fam-table a wave's row sits in, and its index among every fam row above it
+  const demFamRowsOf = (famId) => (demFamTables ? ((demFamTables.find((t) => t.fam.id === famId) || {}).rows || []) : []);
+  const demFamOffset = (famId) => { let o = 0; if (demFamTables) for (const t of demFamTables) { if (t.fam.id === famId) break; o += t.rows.length; } return o; };
   const DEM_M = 40;
   const gx = (v) => ((Math.max(-DEM_M, Math.min(DEM_M, v)) + DEM_M) / (2 * DEM_M)) * 100;
   // whole points: the groups are a few hundred people each, a decimal claims too much
@@ -2650,7 +2689,7 @@ function RdAllPolls(P) {
       </span>
     );
   };
-  const rowFor = (p) => {
+  const rowFor = (p, demFam) => {
     const id = rowKey(p);
     const isOpen = open === id;
     const arrived = !!focus && focus.key === id;
@@ -2825,10 +2864,12 @@ function RdAllPolls(P) {
       );
     } else if (facet === "demographics") {
       /* the split in view, read off the poll's own table (demPairOf, the
-         d1a1 asset - the scope and the sort quote the same pair). The pair
-         differs by pollster, so every row names its own under the figures,
-         and on a phone at the card's top right */
-      const pr = window.demPairOf(p, demSplit);
+         d1a1 asset - the scope and the sort quote the same pair; demFam, a
+         cuts family's id, when this row sits inside a family's own stacked
+         table, so it draws that family's pair). The pair differs by
+         pollster, so every row names its own under the figures, and on a
+         phone at the card's top right */
+      const pr = window.demPairOf(p, demSplit, demFam);
       figs = (
         <span role="cell" className="rd-ap-fig rd-ap-dgap">
           <span className="rd-ap-pnums">{prims.map((k) => <b key={k.id} style={{ color: k.ink }}>{pr ? gapTxt(pr.gap[k.id]) : "—"}</b>)}</span>
@@ -2900,7 +2941,7 @@ function RdAllPolls(P) {
       const sub = [p.client, fieldTxt(p), p.sample != null ? p.sample.toLocaleString() : null].filter(Boolean).join(", ");
       return (
         <React.Fragment key={id}>
-          <div className={"rd-ap-card " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle} tabIndex={0} onKeyDown={(e) => rowNav(e, p)}>
+          <div className={"rd-ap-card " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle} tabIndex={0} onKeyDown={(e) => rowNav(e, p, demFam)}>
             <div className="rd-ap-c1">
               <span className="rd-ap-firm">{rdPollNameLink(p, "rd-ap-ext")}</span>
               <span className="rd-grow"></span>{right1}
@@ -2914,7 +2955,7 @@ function RdAllPolls(P) {
     }
     return (
       <React.Fragment key={id}>
-        <div className={"rd-ap-row " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle} tabIndex={0} onKeyDown={(e) => rowNav(e, p)}>
+        <div className={"rd-ap-row " + cls + (isOpen ? " open" : "") + (arrived ? " arrived" : "")} role="row" aria-expanded={isOpen} onClick={toggle} tabIndex={0} onKeyDown={(e) => rowNav(e, p, demFam)}>
           {pollsterCell(p)}{fieldCell(p)}{sampleCell(p)}<span></span>
           {figs}{pic}{val}{facet === "twopp" && <>{hlCell}<span></span></>}{facet === "confidence" && <span></span>}
           <button type="button" className={"rd-ap-chev" + (isOpen ? " open" : "")} aria-expanded={isOpen}
@@ -2925,7 +2966,7 @@ function RdAllPolls(P) {
       </React.Fragment>
     );
   };
-  const monthRow = (g) => {
+  const monthRow = (g, famId) => {
     const [y, m] = g.ym.split("-").map(Number);
     const n = g.list.length;
     const lab = D.monthNameFull(m) + " " + y;
@@ -2965,9 +3006,38 @@ function RdAllPolls(P) {
         </div>
       );
     }
+    /* inside a cuts family's stacked table the month mark stays - the row
+       order needs its date cues - but a "4 polls" count doesn't: only the
+       waves with THIS cut sit here, so a count reads as a table total */
+    if (famId) {
+      return (
+        <div className={"rd-ap-mrow " + cls} role="row" key={"m" + g.ym}>
+          <span className="rd-ap-mlab" role="rowheader"><b>{lab}</b></span>
+        </div>
+      );
+    }
     return (
       <div className={"rd-ap-mrow " + cls} role="row" key={"m" + g.ym}>
         <span className="rd-ap-mlab" role="rowheader"><b>{lab}</b><span>{count}</span></span>
+      </div>
+    );
+  };
+  /* a cuts family's own table head in the stacked view: its title and
+     source on the left, its pair's caps over the scale column where the
+     split's own scale head would carry them (the caps the demCaps
+     gate took off the pinned head land here instead) */
+  const famHead = (t) => {
+    const [lo, hi] = famCapsOf(t);
+    return (
+      <div className={"rd-ap-frow " + cls} role="row" key={"f" + t.fam.id}>
+        <span className="rd-ap-flab" role="rowheader"><b>{t.fam.lab}</b><span>{t.fam.sub}</span></span>
+        <span className="rd-ap-fcap" aria-hidden={!lo && !hi ? "true" : undefined}
+              title={lo && hi ? "Each party’s gap between the two groups, from stronger with " + lo.toLowerCase() + " voters on the left to stronger with " + hi.toLowerCase() + " voters on the right" : undefined}>
+          <span className="rd-ap-in">
+            {lo && <b className="rd-ap-scl">◀ {lo}</b>}
+            {hi && <b className="rd-ap-scr">{hi} ▶</b>}
+          </span>
+        </span>
       </div>
     );
   };
@@ -3302,7 +3372,16 @@ function RdAllPolls(P) {
           {pinBar}
           {phone ? phoneHead : colHead}
         </div>
-        {byDate ? groups.map((g) => <React.Fragment key={g.ym}>{monthRow(g)}{g.list.map(rowFor)}</React.Fragment>) : flat.map(rowFor)}
+        {demFamTables
+          ? demFamTables.map((t) => (
+            <React.Fragment key={"fam" + t.fam.id}>
+              {famHead(t)}
+              {t.groups.map((g) => <React.Fragment key={t.fam.id + g.ym}>{monthRow(g, t.fam.id)}{g.list.map((p) => rowFor(p, t.fam.id))}</React.Fragment>)}
+            </React.Fragment>
+          ))
+          : byDate
+            ? groups.map((g) => <React.Fragment key={g.ym}>{monthRow(g)}{g.list.map((p) => rowFor(p, null))}</React.Fragment>)
+            : flat.map((p) => rowFor(p, null))}
         {sorted.length === 0 && <div className="rd-ap-empty">No {noun} match these filters. <button type="button" className="rd-link" onClick={clearAll}>Clear filters</button></div>}
       </div>
       {more && (
