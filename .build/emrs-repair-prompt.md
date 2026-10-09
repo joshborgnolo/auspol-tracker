@@ -30,20 +30,26 @@ the gate opens.
   Tasmanian-only readings that display in the archive and ride the
   solo-territory draws, but carry NO aggregate weight. That exclusion is
   deliberate — do NOT wire the house into any aggregate.
-- Already-published waves are VERIFIED against canon, never rewritten: a
-  wave whose poll-row date is within HEAL_DAYS (8) of an existing row is
-  re-parsed every run and must match VERIFY_FIELDS (date, dateStart,
-  sample, alp, lnp, grn, onp, ind, oth, tpp_alp, tpp_lnp) EXACTLY — a
-  mismatch trips EMRS_GUARD (exit 2), never an automatic rewrite.
-  `KNOWN_DIVERGENCE` (currently empty) is the whitelist for a house
-  re-upload; do NOT add an entry without evidence in the house's own
-  document.
+- Already-published waves are VERIFIED against canon, never rewritten:
+  `canonWaveFor` identifies the wave by its fieldwork-END MONTH (waves
+  run ~6 months apart; HEAL_DAYS 8 is only the near-window fallback) and
+  a listed wave is re-parsed every run — it must match VERIFY_FIELDS
+  (date, dateStart, sample, alp, lnp, grn, onp, ind, oth, tpp_alp,
+  tpp_lnp) EXACTLY: a mismatch trips EMRS_GUARD (exit 2), never an
+  automatic rewrite. A cached wave whose report leaves the listing ends
+  its verification (status.notes names it). `KNOWN_DIVERGENCE` (currently
+  empty) is the whitelist for a house re-upload; do NOT add an entry
+  without evidence in the house's own document.
 - The two waves before this pipeline shipped (2026-02: ALP 30 LNP 19 GRN
   13 ON 24 IND 12 OTH 1, TPP 60/40, n=953; 2026-08: 29/17/15/26/13/1,
   57/43, n=968) were hand-entered, and are the canon the verification
-  now runs against. `published` for a NEW wave is the first-seen date
-  (the listing carries no per-item dates); the canon rows keep their
-  hand-entered published dates, flagged note-only — never rewrite them.
+  now runs against. `published` for a NEW wave comes from
+  `publishedOf`'s ladder: the listing's Drupal field-document-date <time>
+  when the document article carries one (date-only; 12:00:00Z is a
+  placeholder), else the PDF's HTTP Last-Modified converted to the
+  Sydney date, else the first-seen date. The canon rows keep their
+  hand-entered published dates — never rewrite them; a divergence
+  surfaces as a fresh-fetch status note only.
 - QUIET_DAYS is 210, not the PDF methodology's "each quarter": the
   observed federal cadence is ~6-monthly (Feb→Aug 2026). A `stale` entry
   inside that window is not a failure — the weekly crosstabs run
