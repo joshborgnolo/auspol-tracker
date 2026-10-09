@@ -1,0 +1,51 @@
+PRIMARY VOTE
+ %                                               State                       Gender                       Age                          Education                Household income           Working status     Language at home    Religion
+                                                                                                                               No      TAFE/                     $50k - $100k -       Full Part                English Other              No
+                       ALL      NSW VIC          QLD       SA     WA Male Female 18-34 35-49 50-64                    65+    tertiary Technical University <$50k $99k    $149k $150k+ time time Retired Other   only language Christian religion
+
+Labor                   36        37      35       33      38      37      38       35       36      37       39      33        30          35            41          35        35         38        39       38        35    36      30      36      40       32      40
+Coalition               25        24      26       27      25      28      26       24       19      25       27      33        26          24            26          23        25         24        28       26        20    32      19      26      23       34      18
+Greens                  12        12      16       10      10      12      10       15       26      13         6      2        14           9            13          11        11         15        11        11       20     2      24      12       14      4       18
+One Nation              14        14      11       18      15      14      14       13        8      13       15       18       20          19            6           17        17         12        10        13       12    17      13      14       9       16      12
+Others                  13        13      12       12      12      9       12       13       11      12       13       14       10          13            14          14        12         11        12        12       13    13      14      12       14      14      12
+5 per cent ‘uncommitted’ excluded
+Question: If a federal election for the House of Representatives were held today, which one of the following would you vote for? If ‘uncommitted’, to which one of these do you have a leaning?
+
+TWO-PARTY PREFERRED
+ %                                               State                       Gender                       Age                          Education                Household income           Working status     Language at home    Religion
+                                                                                                                               No      TAFE/                     $50k - $100k -       Full Part                English Other              No
+                       ALL      NSW VIC          QLD       SA     WA Male Female 18-34 35-49 50-64                    65+    tertiary Technical University <$50k $99k    $149k $150k+ time time Retired Other   only language Christian religion
+Labor                   57        58      60       52      58      56      57       58       67      58       55      48        53          54            62          57        56        60         58       58        63    49      62      57      62       47      66
+Coalition               43        42      40       48      42     44       43       42       33      42       45       52       47          46            38          43        44        40         42       42        37    51      38      43      38       53      34
+Preference flows based on recent federal and state elections. Note, national preference flows are used to calculate 2PP for each demographic
+
+
+ALBANESE’S PERFORMANCE
+                                                 State                       Gender                       Age                          Education                Household income           Working status     Language at home    Religion
+                                                                                                                               No      TAFE/                     $50k - $100k -       Full Part                English Other              No
+ %                     ALL      NSW VIC          QLD       SA     WA Male Female 18-34 35-49 50-64                    65+    tertiary Technical University <$50k $99k    $149k $150k+ time time Retired Other   only language Christian religion
+Satisfied               46       46       47       44      52      45      47       46       51      46       47      42        39          42            54          43        45        50         50       50       46     42      41      46      48       41      50
+Dissatisfied            49        49      47       53      45      50      50       48       42      49       48      55        56          53            41          51        50        46         46       46        47    54      51      49      46       55      45
+Uncommitted              5        5        6        3       3      5        3        6        7       5         5      3         5           5             5          6          5         4          4        4        7      4      8        5       6       4        5
+Question: Are you satisfied or dissatisfied with the way Anthony Albanese is doing his job as Prime Minister?
+
+LEY’S PERFORMANCE
+                                                 State                       Gender                       Age                          Education                Household income           Working status     Language at home    Religion
+                                                                                                                               No      TAFE/                     $50k - $100k -       Full Part                English Other              No
+ %                     ALL      NSW VIC          QLD       SA     WA Male Female 18-34 35-49 50-64                    65+    tertiary Technical University <$50k $99k    $149k $150k+ time time Retired Other   only language Christian religion
+Satisfied               27        25      27       27      31      30      27       28       31      25       25      28        27          24            30          26        30         27        29       28        27    26      26      27      29       32      24
+Dissatisfied            55        55      55       57      49      53      60       49       47      54       59      60        54          57            54          56        55         56        53        55       51    61      49      56      49       52      57
+Uncommitted             18        20      18       16      20      17      13       23       22      21       16       12       19          19            16          18        15         17        18        17       22    13      25      17      22       16      19
+Question: Are you satisfied or dissatisfied with the way Sussan Ley is doing her job as Leader of the Opposition?
+
+BETTER PRIME MINISTER
+                                                 State                       Gender                       Age                          Education                Household income                                       Working status     Language at home    Religion
+                                                                                                                               No      TAFE/                     $50k - $100k -       Full                             Part               English Other               No
+ %                     ALL      NSW VIC          QLD       SA     WA Male Female 18-34 35-49 50-64                    65+    tertiary Technical University <$50k $99k    $149k $150k+ time                             time Retired Other   only language Christian religion
+Albanese                53        53      56       49      53      52      56       50       61      53       52       47       48          48            61          50        53         57        56       56        54    47      53      53       57      45      59
+Ley                     28        27      26       33      25      29      28       29       22      25       29       37       31          31            24          30        31         27        27       26        27    36      24      29      22       38      21
+Uncommitted             19        20      18       18      22      19      16       21       17      22       19       16       21          21            15          20        16         16        17        18       19    17      23      18       21      17      20
+Question: Who do you think would make the better prime minister?
+These surveys were conducted by Pyxis Polling & Insights between September 29 and November 20 with 3774 voters throughout Australia interviewed online. Individual state sample bases range from 280 to 1193 voters.
+It is compliant with the Australian Polling Council Code and methodology statements are available at https://www.pyxispolling.com/apc/. Copyright at all times remains with The Australian.
+

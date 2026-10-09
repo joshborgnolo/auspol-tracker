@@ -1,0 +1,4 @@
+{
+  "waves": [],
+  "_about": "Built by .build/extract-newspoll-quarterly.mjs — Newspoll (pooled) quarterly aggregate figures, re-verified against source every run (drift = guard). Consumed by .build/demographics.mjs; NEWSPOLL_DEMO hand-entered keys win."
+}

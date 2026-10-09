@@ -63,7 +63,26 @@ case "$LAST_LINE" in
   *) log "FAIL extract (no NP_STATUS line): $LAST_LINE"; exit 1 ;;
 esac
 
-if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
+# Quarterly aggregate pass ("Newspoll (pooled)") — extract-newspoll-quarterly.mjs
+# files pooled-quarter rows into polls.json plus data/newspoll-quarterly.json.
+# A new wave lands at most four times a year, and its guards/refs are loud
+# (NPQ_GUARD = recon drift or a parser-blocking source change, NPQ_NOTE =
+# tolerated oddity) but must NEVER block the main pass, so every outcome is
+# logged and the wrapper continues; repair picks the guard lines up.
+Q_CHANGED=0
+Q_OUT="$(node .build/extract-newspoll-quarterly.mjs 2>&1)"
+QCODE=$?
+echo "$Q_OUT" | grep '^NPQ_' >> "$LOG" || true
+QLAST="$(echo "$Q_OUT" | tail -1)"
+if [ $QCODE -ne 0 ]; then
+  log "WARN quarterly pass exited $QCODE (see NPQ_ lines above)"
+elif ! echo "$QLAST" | grep -q '^NPQ_STATUS'; then
+  log "WARN quarterly pass (no NPQ_STATUS line): $QLAST"
+elif echo "$QLAST" | grep -q '"changed":true'; then
+  Q_CHANGED=1
+fi
+
+if [ $Q_CHANGED -eq 0 ] && ! echo "$LAST_LINE" | grep -q '"changed":true'; then
   exit 0
 fi
 
@@ -79,7 +98,7 @@ if ! refresh_site; then
   exit 1
 fi
 
-FILES=(data/polls.json .build/newspoll-src/ "${SITE_FILES[@]}")
+FILES=(data/polls.json data/newspoll-quarterly.json .build/newspoll-src/ .build/newspoll-quarterly-src/ "${SITE_FILES[@]}")
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
 MSG="Update Newspoll data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
