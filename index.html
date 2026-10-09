@@ -5443,11 +5443,11 @@ body.rd .info-group { font-family: var(--sans); font-size: 17px; font-weight: 60
           <td>48.6%</td>
         </tr>
         <tr>
-          <th scope="row">Newspoll (pooled)</th>
-          <td>13 Jul–18 Sep</td>
-          <td>4,967</td>
-          <td>53.1%</td>
-          <td>46.9%</td>
+          <th scope="row">Newspoll</th>
+          <td>14–17 Sep</td>
+          <td>1,244</td>
+          <td>52.2%</td>
+          <td>47.8%</td>
         </tr>
         <tr>
           <th scope="row">DemosAU</th>
@@ -73908,63 +73908,112 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "ref": "2026-09-20"
     }
   }, {
-    "pollster": "Newspoll (pooled)",
+    "pollster": "Newspoll",
     "client": "The Australian",
-    "field": "13 Jul–18 Sep",
-    "released": "2026-09-18",
-    "releasedLabel": "18 Sep",
-    "published": "2026-09-27T20:00",
-    "publishedLabel": "27 Sep",
-    "pubSort": "2026-09-27T20:00",
-    "sample": 4967,
-    "alpImp": 53.1,
-    "alpOnImp": 51.3,
-    "noAgg": true,
-    "noAggWhy": "Because this release averages about ten weeks of interviewing into a single reading, it does not count towards any aggregates.",
+    "field": "14–17 Sep",
+    "released": "2026-09-17",
+    "releasedLabel": "17 Sep",
+    "published": "2026-09-20T21:00",
+    "publishedLabel": "20 Sep",
+    "pubSort": "2026-09-20T21:00",
+    "sample": 1244,
+    "sampleEff": 998,
+    "alpImp": 52.2,
+    "alpOnImp": 50.4,
+    "eff": {
+      "imp": {
+        "lo": 51.6,
+        "hi": 51.6,
+        "w": 1
+      },
+      "onimp": {
+        "lo": 51.4,
+        "hi": 51.4,
+        "w": 1
+      }
+    },
     "alp2pp": null,
     "lnp2pp": null,
     "p": {
-      "alp": 29,
+      "alp": 27,
       "lnp": 19,
       "grn": 13,
       "onp": 30,
-      "oth": 9
+      "oth": 11
     },
+    "ppmSets": [{
+      "alb": 44,
+      "taylor": 24,
+      "hanson": 32,
+      "unc": 0
+    }, {
+      "alb": 42,
+      "taylor": 41,
+      "unc": 17
+    }],
     "appr": {
-      "alb": null,
+      "alb": {
+        "app": 35,
+        "dis": 62
+      },
       "taylor": null,
-      "hanson": null,
-      "albNet": null,
-      "taylorNet": null,
-      "hansonNet": null,
-      "oppName": null,
-      "metric": null
+      "hanson": {
+        "app": 44,
+        "dis": 51
+      },
+      "albNet": -27,
+      "taylorNet": -15,
+      "hansonNet": -7,
+      "oppName": "Taylor",
+      "metricBy": {
+        "alb": "approval",
+        "taylor": "approval",
+        "hanson": "approval"
+      }
     },
     "chg": {
       "d": {
         "pAlp": -2,
         "pLnp": 0,
-        "pGrn": 1,
-        "pOnp": 2,
-        "pOth": -1,
-        "imp": -1.1,
-        "impOn": -1.7
+        "pGrn": 0,
+        "pOnp": 0,
+        "pOth": 2,
+        "imp": -0.9,
+        "impOn": -0.9,
+        "albNet": -6,
+        "taylorNet": 2,
+        "hansonNet": -6,
+        "ppmAlb": -2,
+        "ppmOpp": 1,
+        "ppmHan": 1
       },
       "r": {
-        "pAlp": "2026-06-26",
-        "pLnp": "2026-06-26",
-        "pGrn": "2026-06-26",
-        "pOnp": "2026-06-26",
-        "pOth": "2026-06-26",
-        "imp": "2026-06-26",
-        "impOn": "2026-06-26"
+        "pAlp": "2026-08-28",
+        "pLnp": "2026-08-28",
+        "pGrn": "2026-08-28",
+        "pOnp": "2026-08-28",
+        "pOth": "2026-08-28",
+        "imp": "2026-08-28",
+        "impOn": "2026-08-28",
+        "albNet": "2026-08-28",
+        "taylorNet": "2026-08-28",
+        "hansonNet": "2026-08-28",
+        "ppmAlb": "2026-08-28",
+        "ppmOpp": "2026-08-28",
+        "ppmHan": "2026-08-28"
       }
     },
-    "url": "https://www.theaustralian.com.au/nation/politics/one-nation-supports-rockets-in-queensland-nsw-and-wa-with-hanson-top-pm-choice-up-north/news-story/076a02f293b8834f3dc00dfa73b637b6",
+    "url": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455",
+    "methodUrl": "https://pyxispolling.com/api.php/images/document/28195281/NewspollMethodologyStatement21September2026byPyxis-bToKYVD66G-g0e4tmAkQNA.pdf",
     "links": [{
+      "k": "method",
+      "t": "APC methodology",
+      "href": "https://pyxispolling.com/api.php/images/document/28195281/NewspollMethodologyStatement21September2026byPyxis-bToKYVD66G-g0e4tmAkQNA.pdf",
+      "title": "This poll’s Australian Polling Council methodology statement"
+    }, {
       "k": "cite",
       "t": "The Australian’s report",
-      "href": "https://www.theaustralian.com.au/nation/politics/one-nation-supports-rockets-in-queensland-nsw-and-wa-with-hanson-top-pm-choice-up-north/news-story/076a02f293b8834f3dc00dfa73b637b6",
+      "href": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455",
       "title": "The published report this poll’s figures were read from"
     }]
   }, {
@@ -76408,67 +76457,6 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "gap": 63
     }],
     "gapsUsed": 6
-  }, {
-    "pollster": "Newspoll (pooled)",
-    "last": "2026-09-27",
-    "cadence": 92,
-    "loose": false,
-    "spread": 8,
-    "spreadEarly": 6,
-    "spreadLate": 9,
-    "basis": "published",
-    "lag": 0,
-    "lagMeasured": 0,
-    "releaseFrom": 1140,
-    "releaseTo": 1200,
-    "releaseMid": 1140,
-    "releaseTimed": 5,
-    "releaseVals": null,
-    "releaseMins": 1140,
-    "releaseDow": null,
-    "releaseDowN": 0,
-    "declared": [],
-    "waves": 5,
-    "site": null,
-    "skipped": [],
-    "skippedMonths": [],
-    "recent": [{
-      "field": "2025-09-11",
-      "pub": "2025-09-21",
-      "mins": 1140,
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-men-young-voters-desert-coalition/news-story/a4900d97e061d1e17f19af7cde5db432",
-      "since": null,
-      "gap": null
-    }, {
-      "field": "2025-11-20",
-      "pub": "2025-12-25",
-      "mins": 1140,
-      "url": "https://www.theaustralian.com.au/nation/politics/key-groups-shift-from-coalition-to-pauline-hanson-newspoll-finds/news-story/8826bb431e5ebcd98764193fa481603c",
-      "since": "2025-09-21",
-      "gap": 95
-    }, {
-      "field": "2026-03-26",
-      "pub": "2026-04-05",
-      "mins": 1140,
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-to-lead-labor-and-coalition-in-queensland/news-story/8e578a11d7ab609c38221490203dfc59",
-      "since": "2025-12-25",
-      "gap": 101
-    }, {
-      "field": "2026-06-26",
-      "pub": "2026-07-03",
-      "mins": 1140,
-      "url": "https://www.theaustralian.com.au/nation/politics/labor-and-anthony-albanese-on-the-slide-in-three-states-newspoll-finds/news-story/04a868def1628a7d516955cdd4bb5222",
-      "since": "2026-04-05",
-      "gap": 89
-    }, {
-      "field": "2026-09-18",
-      "pub": "2026-09-27",
-      "mins": 1200,
-      "url": "https://www.theaustralian.com.au/nation/politics/one-nation-supports-rockets-in-queensland-nsw-and-wa-with-hanson-top-pm-choice-up-north/news-story/076a02f293b8834f3dc00dfa73b637b6",
-      "since": "2026-07-03",
-      "gap": 86
-    }],
-    "gapsUsed": 4
   }, {
     "pollster": "Spectre Strategy",
     "last": "2026-07-23",

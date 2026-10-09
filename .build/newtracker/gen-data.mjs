@@ -3104,7 +3104,14 @@ if (KBONHAM?.series?.length) {
 const LATEST_WINDOW_DAYS = 49;
 const canon = (n) => n.replace(/\s*\(.*?\)\s*/g, "").replace(/\s*\/\s*Accent.*$/i, "").trim();
 const latestMs = Date.parse(LATEST_ISO);
-const recent = POLLS.filter((p) => (latestMs - Date.parse(p.date)) / 86400000 <= LATEST_WINDOW_DAYS);
+/* a NO_AGG release never takes the "latest" seat: the seat answers "each
+   house's newest current reading", and a ten-week pooled average (or an SMS
+   one-off) is not one. canon() otherwise lets a quarterly pool steal its
+   parent house's seat whenever its window END is the freshest date in the
+   house — Newspoll's 18 Sep quarter sat over its 17 Sep wave — while the
+   projection's fallback put the parent back as a SECOND row, so the table
+   carried the house twice. Their waves display in the archive instead. */
+const recent = POLLS.filter((p) => !NO_AGG_HOUSES.has(p.pollster) && (latestMs - Date.parse(p.date)) / 86400000 <= LATEST_WINDOW_DAYS);
 const perHouse = new Map();
 for (const p of recent.sort((a, b) => a.date.localeCompare(b.date))) perHouse.set(canon(p.pollster), p);
 const pollsterTable = [...perHouse.values()].map((p) => {
@@ -5251,6 +5258,13 @@ for (const p of POLLS) {
 const pollCadence = [];
 for (const [firm, rows] of Object.entries(byHouse)) {
   const dates = rows.map((r) => r.date).sort();
+  /* a NO_AGG series has no "next poll" to project: the quarterly pooled
+     Newspoll and its one-off siblings are demographics products, not a
+     release rhythm a reader plans around, and the parent's own walk already
+     answers when The Australian's polling next lands. Its slot otherwise
+     rode every cadence consumer (the table's Next column, the ticker, the
+     calendar fold) as a second Newspoll-branded entry. */
+  if (NO_AGG_HOUSES.has(firm)) continue;
   if (dates.length < CAD_MIN_POLLS) continue;
   // the unbroken dated tail – see CAD_PUB_MIN
   let tail = 0;
