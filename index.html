@@ -3261,6 +3261,9 @@ body.rd .rd-cal-list { list-style: none; margin: 2px 0 0; padding: 0; font-size:
 body.rd .rd-cal-list li { display: flex; align-items: baseline; gap: 14px; padding: 3px 0; }
 body.rd .rd-cal-d { flex: 0 0 auto; min-width: 86px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-w { flex: 1 1 auto; min-width: 0; font-weight: 500; }
+body.rd .rd-cal-w a { color: inherit; text-decoration: none; }
+body.rd .rd-cal-w a:hover { text-decoration: underline; text-underline-offset: 3px; }
+body.rd .rd-cal-w a:hover .plink-mark, body.rd .rd-cal-w a:focus-visible .plink-mark { color: var(--ink-2); }
 body.rd .rd-cal-q { flex: 0 0 auto; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 body.rd .rd-cal-sec-over .rd-cal-q { color: var(--mood-neg); }
 @media (max-width: 640px) {
@@ -105292,6 +105295,10 @@ function RdPolls({
       calOver.push(r);
       return;
     }
+    const me = {
+      name: r.pollster,
+      site: r.site
+    };
     if (r.loose && !irregular(r)) {
       calItems.push({
         key: "w" + r.pollster,
@@ -105299,7 +105306,7 @@ function RdPolls({
         close: r.release + r.spread * DAY_MS,
         win: true,
         spread: r.spread,
-        who: [r.pollster]
+        who: [me]
       });
     } else if (irregular(r)) {
       calItems.push({
@@ -105307,7 +105314,7 @@ function RdPolls({
         at: r.release,
         irr: true,
         spread: r.spread,
-        who: [r.pollster]
+        who: [me]
       });
     } else {
       const iso = new Date(r.release).toISOString().slice(0, 10);
@@ -105321,7 +105328,7 @@ function RdPolls({
         calDays.set(iso, e);
         calItems.push(e);
       }
-      e.who.push(r.pollster);
+      e.who.push(me);
     }
   });
   calOver.sort((a, b) => a.release - b.release);
@@ -105345,6 +105352,17 @@ function RdPolls({
   };
   const calDateTxt = it => it.win ? calSpanTxt(it.at, it.close) : it.irr ? "About " + dm(it.at) : WDs(it.at) + " " + new Date(it.at).getUTCDate();
   const calOverTxt = r => r.loose && !irregular(r) ? calSpanTxt(r.release - r.spread * DAY_MS, r.release + r.spread * DAY_MS) : irregular(r) ? "About " + dm(r.release) : wdm(r.release);
+  const calWho = (w, i) => React.createElement("span", {
+    key: String(i)
+  }, i > 0 ? ", " : "", w.site ? React.createElement("a", {
+    href: w.site,
+    target: "_blank",
+    rel: "noopener noreferrer",
+    title: "Where " + w.name + "’s next poll lands first"
+  }, w.name, React.createElement("span", {
+    className: "plink-mark",
+    "aria-hidden": "true"
+  }, "\u2197")) : w.name);
   return React.createElement(RdSec, {
     id: "latest-polls",
     cls: "rd-polls",
@@ -105528,7 +105546,7 @@ function RdPolls({
     className: "rd-note"
   }, "Projections read each pollster\u2019s last eight gaps between releases: they mark the earliest a poll could land, not the likeliest.", " ", "A pollster that misses its slot shows as overdue until the release is added.", staleOnes.length > 0 && React.createElement(React.Fragment, null, " ", staleOnes.map(e => e.poll.pollster).join(" and "), " ", staleOnes.length > 1 ? "have" : "has", " not published in six weeks, so ", staleOnes.length > 1 ? "their polls are" : "its poll is", " outside the averages.")), (calMonths.length > 0 || calOver.length > 0) && React.createElement("details", {
     className: "rd-evdrop rd-cal"
-  }, React.createElement("summary", null, "Calendar"), React.createElement("div", {
+  }, React.createElement("summary", null, "Release calendar"), React.createElement("div", {
     className: "rd-cal-body"
   }, calOver.length > 0 && React.createElement("div", {
     className: "rd-cal-sec rd-cal-sec-over"
@@ -105542,7 +105560,10 @@ function RdPolls({
     className: "rd-cal-d"
   }, calOverTxt(r)), React.createElement("span", {
     className: "rd-cal-w"
-  }, r.pollster), r.missed && React.createElement("span", {
+  }, calWho({
+    name: r.pollster,
+    site: r.site
+  }, 0)), r.missed && React.createElement("span", {
     className: "rd-cal-q"
   }, when(r.closesIn)))))), calMonths.map(g => React.createElement("div", {
     className: "rd-cal-sec",
@@ -105557,7 +105578,7 @@ function RdPolls({
     className: "rd-cal-d"
   }, calDateTxt(it)), React.createElement("span", {
     className: "rd-cal-w"
-  }, it.who.join(", ")), it.q && React.createElement("span", {
+  }, it.who.map((w, i) => calWho(w, i))), it.q && React.createElement("span", {
     className: "rd-cal-q"
   }, it.q))))))), React.createElement("p", {
     className: "rd-note"

@@ -640,15 +640,16 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const calDays = new Map();   /* a release date -> the houses landing on it */
   calProj.rows.forEach((r) => {
     if (r.overdue) { calOver.push(r); return; }
+    const me = { name: r.pollster, site: r.site };
     if (r.loose && !irregular(r)) {
-      calItems.push({ key: "w" + r.pollster, at: r.release - r.spread * DAY_MS, close: r.release + r.spread * DAY_MS, win: true, spread: r.spread, who: [r.pollster] });
+      calItems.push({ key: "w" + r.pollster, at: r.release - r.spread * DAY_MS, close: r.release + r.spread * DAY_MS, win: true, spread: r.spread, who: [me] });
     } else if (irregular(r)) {
-      calItems.push({ key: "i" + r.pollster + "-" + (r.ahead || 0), at: r.release, irr: true, spread: r.spread, who: [r.pollster] });
+      calItems.push({ key: "i" + r.pollster + "-" + (r.ahead || 0), at: r.release, irr: true, spread: r.spread, who: [me] });
     } else {
       const iso = new Date(r.release).toISOString().slice(0, 10);
       let e = calDays.get(iso);
       if (!e) { e = { key: "d" + iso, at: r.release, who: [] }; calDays.set(iso, e); calItems.push(e); }
-      e.who.push(r.pollster);
+      e.who.push(me);
     }
   });
   calOver.sort((a, b) => a.release - b.release);
@@ -678,6 +679,12 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const calOverTxt = (r) => r.loose && !irregular(r) ? calSpanTxt(r.release - r.spread * DAY_MS, r.release + r.spread * DAY_MS)
     : irregular(r) ? "About " + dm(r.release)
     : wdm(r.release);
+  /* a house name links out to where its wave lands first (its
+     pollsterRules.site) - the same claim the Next column's date makes */
+  const calWho = (w, i) => (
+    <span key={String(i)}>{i > 0 ? ", " : ""}{w.site
+      ? <a href={w.site} target="_blank" rel="noopener noreferrer" title={"Where " + w.name + "’s next poll lands first"}>{w.name}<span className="plink-mark" aria-hidden="true">↗</span></a>
+      : w.name}</span>);
 
   return (
     <RdSec id="latest-polls" cls="rd-polls" facet={facet} title="Latest and next polls"
@@ -763,7 +770,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
       </p>
       {(calMonths.length > 0 || calOver.length > 0) && (
         <details className="rd-evdrop rd-cal">
-          <summary>Calendar</summary>
+          <summary>Release calendar</summary>
           <div className="rd-cal-body">
             {calOver.length > 0 && (
               <div className="rd-cal-sec rd-cal-sec-over">
@@ -772,7 +779,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                   {calOver.map((r) => (
                     <li key={r.pollster}>
                       <span className="rd-cal-d">{calOverTxt(r)}</span>
-                      <span className="rd-cal-w">{r.pollster}</span>
+                      <span className="rd-cal-w">{calWho({ name: r.pollster, site: r.site }, 0)}</span>
                       {r.missed && <span className="rd-cal-q">{when(r.closesIn)}</span>}
                     </li>
                   ))}
@@ -786,7 +793,7 @@ function RdPolls({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                   {g.items.map((it) => (
                     <li key={it.key}>
                       <span className="rd-cal-d">{calDateTxt(it)}</span>
-                      <span className="rd-cal-w">{it.who.join(", ")}</span>
+                      <span className="rd-cal-w">{it.who.map((w, i) => calWho(w, i))}</span>
                       {it.q && <span className="rd-cal-q">{it.q}</span>}
                     </li>
                   ))}
