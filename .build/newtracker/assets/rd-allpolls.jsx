@@ -1227,7 +1227,7 @@ function RdApDetail({ p, onM, pub, today, winN, facet, onBack, backLabel, demSpl
     const cols = rdApPrimList((D.latest && D.latest.primaryOrder) || RD_AP_PRIM_FALLBACK);
     const tot = p.grp.t || null;
     const pr = window.demPairOf(p, demSplit);
-    const DN = { gender: "Gender", age: "Age", generation: "Generation", education: "Education", state: "State", location: "Location", housing: "Housing", language: "Language at home", country: "Birth country" };
+    const DN = { gender: "Gender", age: "Age", generation: "Generation", education: "Education", income: "Income", working: "Working status", state: "State", location: "Location", housing: "Housing", language: "Language at home", country: "Birth country", religion: "Religion" };
     const cell = (v, k) => {
       const t = tot ? tot[K.indexOf(k)] : null;
       const d = v != null && t != null ? v - t : 0;
