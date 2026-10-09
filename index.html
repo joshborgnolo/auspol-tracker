@@ -104253,13 +104253,14 @@ function RdConfidence({
       }));else if (v) lift(+v);
     }
   }, React.createElement("option", {
-    value: ""
+    value: "",
+    disabled: true
   }, "Draw a past term"), histTerms.map(t => React.createElement("option", {
     key: t.year,
     value: t.year
-  }, t.year, lifted.has(t.year) ? " (drawn)" : "")), lifted.size > 0 && React.createElement("option", {
+  }, lifted.has(t.year) ? "✓ " + t.year : t.year)), lifted.size > 0 && React.createElement("hr", null), lifted.size > 0 && React.createElement("option", {
     value: "clear"
-  }, "Clear lines")), !histOn && lifted.size > 0 && React.createElement("span", {
+  }, "\u2715 Clear lines")), !histOn && lifted.size > 0 && React.createElement("span", {
     className: "rd-cc-drawn"
   }, React.createElement("span", {
     className: "rd-cc-l"

@@ -1,9 +1,10 @@
 /* Pins two confidence-panel contracts:
    A. The "Draw a past term" menu is a native select styled with the
       primary-vote subpopulation menu's rules (shipped 2026-10-09,
-      replacing the chip + board): a "Draw a past term" label plus one
-      year per term on file; a pick draws the line (option marked drawn,
-      pills row names it, "Clear lines" joins to return them all).
+      replacing the chip + board): a DISABLED "Draw a past term" title
+      row plus one year per term on file; a pick draws the line (drawn
+      years carry a ✓, pills row names them, and a rule-separated
+      "✕ Clear lines" entry joins to return them all).
    B. interpHover - the history-view guide tooltip carries EVERY in-range lane
       row continuously (deep quarterly lane and monthly lane interpolated
       between their own prints) instead of dropping rows on months a lane does
@@ -43,15 +44,17 @@ let fails = 0;
 const ok = (cond, label) => { console.log(`${cond ? "  ok" : "FAIL"} ${label}`); if (!cond) fails++; };
 
 /* ---- A: the draw-a-term menu is a native select (the subpopulation
-   menu's control and style): label + one year option per term on file;
-   picking a year draws its line, and "Clear lines" empties the pills ---- */
+   menu's control and style): a disabled title row + one year option per
+   term on file (drawn ones ✓-marked); picking a year draws its line, and
+   a rule-separated "✕ Clear lines" empties the pills ---- */
 const menu = () => page.evaluate(() => {
   const sec = document.getElementById("confidence");
   const sel = sec && [...sec.querySelectorAll("select.rd-confidence-sel")]
     .find((el) => !el.closest(".rd-crossfade-out"));
   if (!sel) return null;
   return { value: sel.value,
-           options: [...sel.options].map((o) => ({ v: o.value, label: o.textContent.trim() })) };
+           hasHr: !!sel.querySelector("hr"),
+           options: [...sel.options].map((o) => ({ v: o.value, label: o.textContent.trim(), disabled: o.disabled })) };
 });
 const pick = (v) => page.evaluate((val) => {
   const sec = document.getElementById("confidence");
@@ -71,18 +74,21 @@ ok(m0 && m0.value === "" && m0.options[0].label === "Draw a past term",
    "draw-a-term select shows its label");
 ok(m0 && m0.options.filter((o) => /^\d{4}$/.test(o.v)).length >= 5,
    `one option per past term on file (${m0 ? m0.options.length - 1 : 0})`);
+ok(m0 && m0.options[0].disabled === true,
+   "the label is a disabled menu title, not a pickable option");
 ok(m0 && !m0.options.some((o) => o.v === "clear"), "no Clear-lines entry while nothing is drawn");
 ok(await pick("2019"), "picked 2019 from the menu");
 await new Promise((r) => setTimeout(r, 400));
 const m1 = await menu();
 ok(m1 && m1.value === "", "the menu snaps back to its label after a pick");
-ok(m1 && m1.options.some((o) => o.v === "2019" && /drawn/.test(o.label)), "the 2019 option is marked drawn");
-ok(m1 && m1.options.some((o) => o.v === "clear"), "Clear lines joins the menu once a line is drawn");
+ok(m1 && m1.options.some((o) => o.v === "2019" && o.label.startsWith("✓")), "the 2019 option carries its drawn ✓");
+ok(m1 && m1.hasHr && m1.options.some((o) => o.v === "clear" && /^✕/.test(o.label)),
+   "Clear lines joins separated by a rule once a line is drawn");
 ok((await pills() || "").includes("2019"), "the drawn pills row names 2019");
 ok(await pick("clear"), "picked Clear lines");
 await new Promise((r) => setTimeout(r, 400));
 const m2 = await menu();
-ok(m2 && !m2.options.some((o) => o.v === "clear") && !m2.options.some((o) => /drawn/.test(o.label)),
+ok(m2 && !m2.options.some((o) => o.v === "clear") && !m2.hasHr && !m2.options.some((o) => /✓/.test(o.label)),
    "Clear lines returns every term to the band");
 ok((await pills()) === null, "no drawn pills after the clear");
 

@@ -4391,11 +4391,12 @@ function RdConfidence({ rangeId }) {
                       if (v === "clear") setLiftedBy((s) => ({ ...s, [histLane]: new Set() }));
                       else if (v) lift(+v);
                     }}>
-              <option value="">Draw a past term</option>
+              <option value="" disabled>Draw a past term</option>
               {histTerms.map((t) => (
-                <option key={t.year} value={t.year}>{t.year}{lifted.has(t.year) ? " (drawn)" : ""}</option>
+                <option key={t.year} value={t.year}>{lifted.has(t.year) ? ("✓ " + t.year) : t.year}</option>
               ))}
-              {lifted.size > 0 && <option value="clear">Clear lines</option>}
+              {lifted.size > 0 && <hr />}
+              {lifted.size > 0 && <option value="clear">✕ Clear lines</option>}
             </select>
           )}
           {!histOn && lifted.size > 0 && (
