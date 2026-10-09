@@ -533,7 +533,12 @@ async function parsePdfAt(url, slug, fetcher = fetchBuffer) {
 const rowSeries = (p) => {
   const u = p.url || "";
   if (/skynews\.com\.au/i.test(u)) return "sky";
-  if (/news24\.com\.au/i.test(u)) return "news24";
+  /* Sky-era citations were host-migrated skynews.com.au -> news24.com.au
+     (2026-10-09, the publisher's own 301 keeps the path). The APC
+     statements keep their original series titles, so a news24 URL on a
+     Sky-era wave is still the "sky" series: last SkyPulse statement is
+     the 2026-07-14 wave's, first News24 one is 2026-07-28's. */
+  if (/news24\.com\.au/i.test(u)) return p.date < "2026-07-28" ? "sky" : "news24";
   return "publicdata";
 };
 const NEED_HOUSES = ["YouGov", "YouGov (MRP)", "Newspoll", "Essential", "DemosAU", "DemosAU (MRP)", "RedBridge/Accent"];
